@@ -15,7 +15,7 @@ For more details see http://www.klayout.org.
 Here is a list of packages required for various Linux flavors:
 
 * CentOS (6, 7): gcc gcc-c++ make qt qt-devel ruby ruby-devel python python-devel
-* OpenSuSE: (13.2, 41.1) gcc gcc-c++ make libqt4 libqt4-devel ruby ruby-devel python3 python3-devel 
+* OpenSuSE: (13.2, 41.1): gcc gcc-c++ make libqt4 libqt4-devel ruby ruby-devel python3 python3-devel 
 * Ubuntu (14.04, 16.10): gcc g++ make libz-dev libqt4-dev-bin libqt4-dev ruby ruby-dev python3 python3-dev
 
 ## Build options

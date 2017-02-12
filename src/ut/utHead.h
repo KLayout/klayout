@@ -114,6 +114,14 @@ enum NormalizationMode
 UT_PUBLIC std::string testsrc ();
 
 /**
+ *  @brief Gets the path of the private test data
+ *  This path is specified through the environment variable $TESTSRC and the
+ *  private testdata directory. If no private test data is available, this
+ *  method will throw a CancelException which makes the test skipped.
+ */
+UT_PUBLIC std::string testsrc_private ();
+
+/**
  *  @brief A basic exception for the unit test framework
  */
 struct Exception 
@@ -360,42 +368,9 @@ struct Registrar
     ms_instance->m_tests.push_back (t);
   }
 
-  static int do_tests (const std::vector<ut::TestBase *> *selected, const std::string &mode)
-  {
-    if (ms_instance) {
-      return ms_instance->run_tests (selected, mode);
-    } else {
-      return 0;
-    }
-  }
-
-  int run_tests (const std::vector<ut::TestBase *> *selected, const std::string &mode)
-  {
-    int failed = 0;
-    m_failed.clear ();
-    if (! selected) {
-      selected = &m_tests;
-    }
-    for (std::vector <ut::TestBase *>::const_iterator t = selected->begin (); t != selected->end (); ++t) {
-      (*t)->remove_tmp_folder ();
-    }
-    for (std::vector <ut::TestBase *>::const_iterator t = selected->begin (); t != selected->end (); ++t) {
-      if (! (*t)->do_test (mode)) {
-        m_failed.push_back (*t);
-        ++failed;
-      }
-    }
-    return failed;
-  }
-
   static Registrar *instance ()
   {
     return ms_instance;
-  }
-
-  const std::vector <ut::TestBase *> &failed_tests () const
-  {
-    return m_failed;
   }
 
   const std::vector <ut::TestBase *> &tests () const
@@ -409,7 +384,6 @@ private:
   Registrar () : m_tests () { }
 
   std::vector <ut::TestBase *> m_tests;
-  std::vector <ut::TestBase *> m_failed;
 };
 
 /**

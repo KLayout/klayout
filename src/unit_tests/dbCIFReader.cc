@@ -60,8 +60,8 @@ static void run_test (ut::TestBase *_this, const char *file, const char *file_au
   db::Layout layout (&m), layout2 (&m), layout2_cif (&m), layout_au (&m);
 
   {
-    std::string fn (ut::testsrc ());
-    fn += "/testdata_private/cif/";
+    std::string fn (ut::testsrc_private ());
+    fn += "/testdata/cif/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -120,8 +120,8 @@ static void run_test (ut::TestBase *_this, const char *file, const char *file_au
   }
 
   {
-    std::string fn (ut::testsrc ());
-    fn += "/testdata_private/cif/";
+    std::string fn (ut::testsrc_private ());
+    fn += "/testdata/cif/";
     fn += file_au;
     tl::InputStream stream (fn);
     db::Reader reader (stream);

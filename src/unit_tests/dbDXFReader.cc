@@ -59,15 +59,15 @@ static void run_test (ut::TestBase *_this, const char *file, const char *file_au
   db::Layout layout;
 
   {
-    std::string fn (ut::testsrc ());
-    fn += "/testdata_private/dxf/";
+    std::string fn (ut::testsrc_private ());
+    fn += "/testdata/dxf/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (layout, options);
   }
 
-  _this->compare_layouts (layout, ut::testsrc () + std::string ("/testdata_private/dxf/") + file_au);
+  _this->compare_layouts (layout, ut::testsrc_private () + std::string ("/testdata/dxf/") + file_au);
 }
 
 TEST(1a)

@@ -63,8 +63,8 @@ static void run_test (ut::TestBase *_this, const char *lef_dir, const char *file
 
     if (ex.test ("def:")) {
 
-      std::string fn (ut::testsrc ());
-      fn += "/testdata_private/lefdef/";
+      std::string fn (ut::testsrc_private ());
+      fn += "/testdata/lefdef/";
       fn += lef_dir;
       fn += "/";
       std::string f;
@@ -76,8 +76,8 @@ static void run_test (ut::TestBase *_this, const char *lef_dir, const char *file
 
     } else if (ex.test ("lef:")) {
 
-      std::string fn (ut::testsrc ());
-      fn += "/testdata_private/lefdef/";
+      std::string fn (ut::testsrc_private ());
+      fn += "/testdata/lefdef/";
       fn += lef_dir;
       fn += "/";
       std::string f;
@@ -120,8 +120,8 @@ static void run_test (ut::TestBase *_this, const char *lef_dir, const char *file
 
   if (au) {
 
-    std::string fn (ut::testsrc ());
-    fn += "/testdata_private/lefdef/";
+    std::string fn (ut::testsrc_private ());
+    fn += "/testdata/lefdef/";
     fn += lef_dir;
     fn += "/";
     fn += au;
@@ -213,5 +213,3 @@ TEST(16)
 {
   run_test (_this, "def7", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au.oas.gz");
 }
-
-

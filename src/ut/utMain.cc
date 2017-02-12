@@ -96,6 +96,16 @@ std::string testsrc ()
   return ts;
 }
 
+std::string testsrc_private ()
+{
+  QDir d (QDir (tl::to_qstring (ut::testsrc ())).filePath (QString::fromUtf8 ("private")));
+  if (! d.exists ()) {
+    throw tl::CancelException ();
+  }
+  return tl::to_string (d.path ());
+}
+
+
 bool equals (double a, double b)
 {
   double m = fabs (0.5 * (a + b));
@@ -504,7 +514,7 @@ TestBase::TestBase (const std::string &file, const std::string &name)
   ut::Registrar::reg (this);
 }
 
-bool TestBase::do_test (const std::string &mode)
+bool TestBase::do_test (const std::string & /*mode*/)
 {
   //  Ensures the test temp directory is present
   QDir dir (testtmp ());
@@ -526,57 +536,21 @@ bool TestBase::do_test (const std::string &mode)
   testtmp_value = std::string ("TESTTMP_WITH_NAME=") + m_testtmp.toUtf8().constData();
   putenv (const_cast<char *> (testtmp_value.c_str ()));
 
-  ut::ctrl << "<test-sub name=\"" << m_test << "\" mode=\"" << mode << "\">";
+  reset_checkpoint ();
 
-  ut::noctrl << replicate ("-", TestConsole::instance ()->real_columns ());
-  ut::noctrl << "Running " << m_test;
+  tl::Timer timer;
+  timer.start();
 
-  try {
+  execute (this);
 
-    reset_checkpoint ();
+  timer.stop();
 
-    tl::Timer timer;
-    timer.start();
+  m_testtmp.clear ();
 
-    execute (this);
+  ut::noctrl << "Time: " << timer.sec_wall () << "s (wall) " << timer.sec_user () << "s (user) " << timer.sec_sys () << "s (sys)";
+  ut::ctrl << "<test-sub-times wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
 
-    timer.stop();
-
-    if (m_any_failed) {
-
-      ut::ctrl << "<test-sub-result status=\"error\">";
-      tl::error << "Test " << m_test << " failed (continued mode - see previous messages)";
-      ut::ctrl << "</test-sub-result>";
-      ut::ctrl << "</test-sub>";
-
-      m_testtmp.clear ();
-      return false;
-
-    } else {
-
-      ut::noctrl << "Time: " << timer.sec_wall () << "s (wall) " << timer.sec_user () << "s (user) " << timer.sec_sys () << "s (sys)";
-      ut::ctrl << "<test-sub-times wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
-      ut::ctrl << "<test-sub-result status=\"success\"/>";
-      ut::ctrl << "</test-sub>";
-
-      m_testtmp.clear ();
-      return true;
-
-    }
-
-  } catch (tl::Exception &ex) {
-
-    ut::ctrl << "<test-sub-result status=\"error\">";
-    tl::error << "Test " << m_test << " failed:";
-    tl::info << ex.msg ();
-    ut::ctrl << "</test-sub-result>";
-
-    ut::ctrl << "</test-sub>";
-
-    m_testtmp.clear ();
-    return false;
-
-  }
+  return (!m_any_failed);
 }
 
 std::string TestBase::tmp_file (const std::string &fn) const
@@ -602,7 +576,6 @@ static void empty_dir (QDir dir)
     }
   }
 }
-
 
 void TestBase::remove_tmp_folder ()
 {
@@ -932,7 +905,7 @@ main_cont (int argc, char **argv)
     tl::info << "TESTSRC=" << ut::testsrc ();
     tl::info << "TESTTMP=" << tl::to_string (ut::testtmp ().absolutePath ());
 
-    std::vector<ut::TestBase *> *selected_tests = 0;
+    const std::vector<ut::TestBase *> *selected_tests = 0;
     std::vector<ut::TestBase *> subset;
     if (! test_list.empty ()) {
 
@@ -961,11 +934,15 @@ main_cont (int argc, char **argv)
 
       }
 
+    } else {
+      selected_tests = &ut::Registrar::instance()->tests ();
     }
 
     ut::s_verbose_flag = false;
     int failed_ne = 0, failed_e = 0;
     std::vector <ut::TestBase *> failed_tests_e, failed_tests_ne;
+    int skipped_ne = 0, skipped_e = 0;
+    std::vector <ut::TestBase *> skipped_tests_e, skipped_tests_ne;
 
     for (int e = 0; e < 2; ++e) {
 
@@ -978,13 +955,72 @@ main_cont (int argc, char **argv)
         app.set_editable (e != 0);
 
         int failed = 0;
+        std::vector <ut::TestBase *> failed_tests;
+        int skipped = 0;
+        std::vector <ut::TestBase *> skipped_tests;
 
         tl::Timer timer;
 
         timer.start ();
 
         try {
-          failed = ut::Registrar::do_tests (selected_tests, mode);
+
+          failed = 0;
+          failed_tests.clear ();
+          skipped = 0;
+          skipped_tests.clear ();
+
+          for (std::vector <ut::TestBase *>::const_iterator t = selected_tests->begin (); t != selected_tests->end (); ++t) {
+            (*t)->remove_tmp_folder ();
+          }
+
+          for (std::vector <ut::TestBase *>::const_iterator t = selected_tests->begin (); t != selected_tests->end (); ++t) {
+
+            ut::ctrl << "<test-sub name=\"" << (*t)->name () << "\" mode=\"" << mode << "\">";
+
+            ut::noctrl << replicate ("-", TestConsole::instance ()->real_columns ());
+            ut::noctrl << "Running " << (*t)->name ();
+
+            try {
+
+              if (! (*t)->do_test (mode)) {
+
+                ut::ctrl << "<test-sub-result status=\"error\">";
+                tl::error << "Test " << (*t)->name () << " failed (continued mode - see previous messages)";
+                ut::ctrl << "</test-sub-result>";
+
+                failed_tests.push_back (*t);
+                ++failed;
+
+              } else {
+                ut::ctrl << "<test-sub-result status=\"success\"/>";
+                ut::ctrl << "</test-sub>";
+              }
+
+            } catch (tl::CancelException &) {
+
+              ut::ctrl << "<test-sub-result status=\"skipped\"/>";
+              tl::error << "Test " << (*t)->name () << " skipped";
+
+              skipped_tests.push_back (*t);
+              ++skipped;
+
+            } catch (tl::Exception &ex) {
+
+              ut::ctrl << "<test-sub-result status=\"error\">";
+              tl::error << "Test " << (*t)->name () << " failed:";
+              tl::info << ex.msg ();
+              ut::ctrl << "</test-sub-result>";
+
+              failed_tests.push_back (*t);
+              ++failed;
+
+            }
+
+            ut::ctrl << "</test-sub>";
+
+          }
+
         } catch (tl::Exception &ex) {
           tl::error << "Caught tl::exception: " << ex.msg ();
           failed = 1;
@@ -1003,12 +1039,23 @@ main_cont (int argc, char **argv)
         ut::noctrl << replicate ("=", console.real_columns ());
         ut::noctrl << "Summary";
 
+        if (skipped > 0) {
+          if (e == 0) {
+            skipped_tests_ne = skipped_tests;
+            skipped_ne = skipped;
+          } else {
+            skipped_tests_e = skipped_tests;
+            skipped_e = skipped;
+          }
+          tl::warn << skipped << " test(s) skipped";
+        }
+
         if (failed > 0) {
           if (e == 0) {
-            failed_tests_ne = ut::Registrar::instance ()->failed_tests ();
+            failed_tests_ne = failed_tests;
             failed_ne = failed;
           } else {
-            failed_tests_e = ut::Registrar::instance ()->failed_tests ();
+            failed_tests_e = failed_tests;
             failed_e = failed;
           }
           tl::warn << failed << " test(s) failed";
@@ -1074,6 +1121,22 @@ main_cont (int argc, char **argv)
 
     ut::ctrl << "<grand-summary>";
 
+    if (skipped_e + skipped_ne > 0) {
+      if (non_editable) {
+        tl::warn << "Skipped in non-editable mode";
+        for (std::vector <ut::TestBase *>::const_iterator f = skipped_tests_ne.begin (); f != skipped_tests_ne.end (); ++f) {
+          tl::warn << replicate (" ", console.indent ()) << (*f)->name ();
+        }
+      }
+      if (editable) {
+        tl::warn << "Skipped in editable mode";
+        for (std::vector <ut::TestBase *>::const_iterator f = skipped_tests_e.begin (); f != skipped_tests_e.end (); ++f) {
+          tl::warn << replicate (" ", console.indent ()) << (*f)->name ();
+        }
+      }
+      tl::warn << tl::to_string (result) << " test(s) skipped";
+    }
+
     result = failed_e + failed_ne;
     if (result > 0) {
       if (non_editable) {
@@ -1120,6 +1183,8 @@ main_cont (int argc, char **argv)
 
   return result;
 }
+
+
 
 } // namespace ut
 

@@ -38,8 +38,8 @@ static void run_test (ut::TestBase *_this, const char *dir)
   db::Layout layout;
 
   {
-    std::string fn (ut::testsrc ());
-    fn += "/testdata_private/pcb/";
+    std::string fn (ut::testsrc_private ());
+    fn += "/testdata/pcb/";
     fn += dir;
     fn += "/import.pcb";
     tl::InputStream stream (fn);
@@ -47,7 +47,7 @@ static void run_test (ut::TestBase *_this, const char *dir)
     reader.read (layout, options);
   }
 
-  _this->compare_layouts (layout, ut::testsrc () + "/testdata_private/pcb/" + dir + "/au.oas.gz", ut::WriteOAS);
+  _this->compare_layouts (layout, ut::testsrc_private () + "/testdata/pcb/" + dir + "/au.oas.gz", ut::WriteOAS);
 }
 
 TEST(1)

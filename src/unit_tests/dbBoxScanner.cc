@@ -678,8 +678,8 @@ struct BooleanAndInteractionClusterCollector
 
 TEST(100)
 {
-  std::string fn (ut::testsrc ());
-  fn += "/testdata_private/other/";
+  std::string fn (ut::testsrc_private ());
+  fn += "/testdata/other/";
   fn += "bs100.oas.gz";
 
   db::Layout layout;

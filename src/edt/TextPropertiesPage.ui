@@ -1,0 +1,433 @@
+<ui version="4.0" >
+ <class>TextPropertiesPage</class>
+ <widget class="QWidget" name="TextPropertiesPage" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>555</width>
+    <height>366</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="2" column="3" >
+    <widget class="QLabel" name="label_7" >
+     <property name="text" >
+      <string>y = </string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" >
+    <widget class="QLineEdit" name="x_le" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="5" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>8</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="6" column="0" >
+    <widget class="QLabel" name="Text size" >
+     <property name="text" >
+      <string>Text size</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0" colspan="5" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>457</width>
+       <height>51</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>Text</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0" colspan="5" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>431</width>
+       <height>8</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QLabel" name="label_5" >
+     <property name="text" >
+      <string>x = </string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0" colspan="5" >
+    <widget class="QFrame" name="button_frame" >
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>0</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>211</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="prop_pb" >
+        <property name="text" >
+         <string>User Properties</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="inst_pb" >
+        <property name="text" >
+         <string>Instantiation</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="7" column="1" colspan="4" >
+    <widget class="QLabel" name="label_3" >
+     <property name="text" >
+      <string>Hint: orientation, alignments and size cannot be saved to OASIS files
+Enable a vector font and text scaling in the setup dialog 
+to show text objects scaled and rotated</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" >
+    <widget class="QLabel" name="Orientation" >
+     <property name="text" >
+      <string>Orientation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>Position (x/y)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="3" colspan="2" >
+    <widget class="QLabel" name="label_6" >
+     <property name="text" >
+      <string>(Leave empty for default)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="4" >
+    <widget class="QLineEdit" name="text_le" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="2" colspan="3" >
+    <widget class="QCheckBox" name="abs_cb" >
+     <property name="text" >
+      <string>Absolute (accumulated) transformations</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="4" >
+    <widget class="QLineEdit" name="y_le" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="2" colspan="3" >
+    <widget class="QCheckBox" name="dbu_cb" >
+     <property name="text" >
+      <string>Coordinates in database units</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="5" >
+    <widget class="QFrame" name="frame" >
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>0</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_12" >
+        <property name="font" >
+         <font>
+          <family>Sans Serif</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <italic>false</italic>
+          <bold>true</bold>
+          <underline>false</underline>
+          <strikeout>false</strikeout>
+         </font>
+        </property>
+        <property name="text" >
+         <string>Text Properties</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="layer_lbl" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>5</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="2" >
+    <widget class="QComboBox" name="orient_cbx" >
+     <item>
+      <property name="text" >
+       <string>(r0)</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="layResources.qrc" >:/r0.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>(r90)</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="layResources.qrc" >:/r90.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>(r180)</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="layResources.qrc" >:/r180.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>(r270)</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="layResources.qrc" >:/r270.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>(m0)</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="layResources.qrc" >:/m0.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>(m45)</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="layResources.qrc" >:/m45.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>(m90)</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="layResources.qrc" >:/m90.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>(m135)</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="layResources.qrc" >:/m135.png</iconset>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="6" column="1" colspan="2" >
+    <widget class="QLineEdit" name="size_le" />
+   </item>
+   <item row="5" column="2" >
+    <widget class="QComboBox" name="halign_cbx" >
+     <item>
+      <property name="text" >
+       <string>(Default)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Left</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Center</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Right</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="5" column="0" >
+    <widget class="QLabel" name="label_4" >
+     <property name="text" >
+      <string>Alignment</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1" >
+    <widget class="QLabel" name="label_8" >
+     <property name="text" >
+      <string>h =</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="3" >
+    <widget class="QLabel" name="label_9" >
+     <property name="text" >
+      <string>v =</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="4" >
+    <widget class="QComboBox" name="valign_cbx" >
+     <item>
+      <property name="text" >
+       <string>(Default)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Top</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Center</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Bottom</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>text_le</tabstop>
+  <tabstop>x_le</tabstop>
+  <tabstop>y_le</tabstop>
+  <tabstop>orient_cbx</tabstop>
+  <tabstop>halign_cbx</tabstop>
+  <tabstop>valign_cbx</tabstop>
+  <tabstop>size_le</tabstop>
+  <tabstop>dbu_cb</tabstop>
+  <tabstop>abs_cb</tabstop>
+  <tabstop>prop_pb</tabstop>
+  <tabstop>inst_pb</tabstop>
+ </tabstops>
+ <resources>
+  <include location="layResources.qrc" />
+ </resources>
+ <connections/>
+</ui>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Saving And Restoring A Session</title>
+  <keyword name="Sessions"/>
+  <keyword name="Save session"/>
+  <keyword name="Restore session"/>
+
+  <p>
+  A session can be saved and restored later. A "session" involves the files loaded, bookmarks, annotations, 
+  layer settings, hierarchy settings, images and application setup. Sessions are stored as XML files with the
+  suffix ".lys".
+  </p>
+
+  <p>
+  To save a session, choose "Save Session" from the "File" menu. To restore a session, choose "Restore Session".
+  KLayout can be started with a certain session using the "-u" option from the command line followed by the session file.
+  On Windows installations, session files are registered as being opened automatically by KLayout. 
+  </p>
+
+</doc>
+

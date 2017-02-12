@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Undo And Redo</title>
+  <keyword name="Undo"/>
+  <keyword name="Redo"/>
+
+  <p>
+  Most operations such as changing of layer colors can be undone using the "Undo"
+  function from the "Edit" menu. Analogous, the operations can be redone again using
+  the "Redo" function from the "Edit" menu.
+  </p>
+
+</doc>

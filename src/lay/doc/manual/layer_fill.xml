@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Choosing A Fill Pattern</title>
+  <keyword name="Layer display"/>
+  <keyword name="Layer fill"/>
+  <keyword name="Stipple"/>
+  <keyword name="Display specification"/>
+  <keyword name="Layer properties"/>
+
+  <p>
+  To choose a fill pattern, select the layer or the layers for which to
+  change the fill pattern and choose the fill pattern from the "Stipple"
+  panel.
+  </p>
+  <p>
+  New pattern can be created with the "Edit" button. A pattern editor
+  will come up that allows creating and editing of new pattern. The predefined
+  pattern cannot be changed. To select a new pattern, select "More" from the
+  pattern selection panel and choose the new pattern from the list.
+  The new pattern is saved with the layer display properties.
+  </p>
+
+</doc>

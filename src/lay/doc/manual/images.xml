@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Adding Images</title>
+  <keyword name="Images"/>
+
+  <p>
+  For some applications it is necessary to show flat pixel data together with
+  the layout. That can either be a SEM image taken or some output of a 
+  simulation tool. KLayout provides a way to add images to the display
+  and show them below the drawn layout. 
+  </p>
+
+  <p>
+  Currently, images can be read from any commonly used image format available
+  in Qt (i.e. PNG, JPG, TIF ...). Color and monochrome images are supported.
+  Internally an image is stored as a matrix of float values and it is possible
+  to write custom importers using RBA.
+  </p>
+
+  <p>
+  To add an image, use the "Add Image" function from the "Edit" menu.
+  An image property dialog will appear where the image can be specified.
+  Choose an image using the "Browse" button next to the file name box. 
+  </p>
+
+  <p>
+  An image has a variety of properties which mainly affect the way it is
+  displayed:
+  </p>
+
+  <ul>
+    <li><b>Pixel size:</b> The size of one pixel in micron units. This affects the total size of the image.</li>
+    <li><b>Center:</b> This is the point where the center of the image is placed (in micron units).</li>
+    <li><b>Rotation:</b> An arbitrary angle by which the image is rotated.</li>
+    <li><b>Shear/Perspective Tilt:</b> shear and perspective tilt angles. Although it is possible to specify these
+       angles explicitly it is far easiert to use the landmark adjustment feature to align an image with a layout.</li>
+    <li><b>Mirror flag:</b> If this option is checked, the image is mirrored at the bottom edge before it is rotated.</li>
+    <li><b>Pixel value range:</b> The pixel value corresponding to minimum and maximum. For normal 8 bit image formats,
+       these values are 0 and 255. They can be adjusted which allows brighten or darken images. For float images (i.e.
+       simulation data), this value should reflect the bounds of the output values, i.e. 0.0 and 1.0 for normalized data.</li>
+    <li><b>Color mapping:</b> For monochrome images, the values are converted to colors with a mapping function.
+       The image properties page contains a tab for specifying an arbitrary mapping of data values to colors. 
+       This is achieved by placing color sample points on the data range axis and assigning colors to them. Double click at
+       the axis to set new points, click on them to select them and adjust their color with the color box. Select
+       and press "Del" to delete a sample point.</li>
+    <li><b>Brightness, Contrast and Gamma:</b> Three sliders for changing these values are provided on the respective tab.</li>
+    <li><b>RGB channel gains:</b> Additionally, each color channel can be weighted with a given factor on the respective tab.</li>
+  </ul>
+
+  <p>
+  Once an image is placed, it can be moved and resized using the "Move" function.
+  The images properties can be adjusted using the "Properties" function from the
+  Edit menu or double-clicking at the image.
+  </p>
+
+  <p>
+  With KLayout 0.22, it is possible to define landmarks which can be set at arbitrary positions in the image and 
+  aligned with corresponding layout features by dragging them to the desired target location. See <link href="/manual/landmarks.xml"/> for
+  details.
+  </p>
+
+  <p>
+  An arbitrary number of images can be placed on the layout view. To store the setup, save the
+  session using the "File/Save Session" function.
+  </p>
+
+</doc>
+

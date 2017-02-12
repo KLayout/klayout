@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>PCell Operations</title>
+  <keyword name="Create PCell from shape"/>
+  <keyword name="Convert PCell"/>
+
+  <p>
+  PCell's can be created from shapes if the PCell is derived from a "guiding shape". 
+  Specifically the Basic library PCell's support derivation from guiding shapes with a few
+  exceptions. So for example, a round-cornered polygon can be created from a 
+  normal polygon by selecting the polygons, choosing "Edit/Selection/Convert To PCell" and 
+  selecting the "Basic.ROUND_POLYGON" for the PCell.
+  </p>
+
+  <p>
+  PCell's can be converted to normal cells by choosing "Edit/Cell/Convert Cell To Static" 
+  or "Edit/Layout/Convert All Cells To Static". Normal (static) cells can be edited
+  individually but do no longer offer parameters to control the look of the cell.
+  </p>
+
+</doc>
+
+

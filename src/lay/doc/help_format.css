@@ -1,0 +1,15 @@
+
+body { font-family: Verdana; }
+
+.navigator { font-size: medium; font-weight: bold; }
+p { font-size: medium; margin-bottom: 5px; }
+li { font-size: medium; margin-bottom: 2px; }
+a { font-size: medium; }
+h1 { font-size: huge; font-weight: bold; margin-bottom: 5px; }
+h2 { font-size: large; font-weight: bold; margin-bottom: 5px; }
+h3 { font-size: medium; font-weight: bold; text-decoration: underline; margin-bottom: 5px; }
+pre { text-indent: 20px; text-size: medium; }
+table { font-size: medium; margin-top: 5px; margin-bottom: 5px; }
+td { padding-left: medium; padding-top: 5px; }
+th { padding: 5px; background-color: #fff8c0; }
+

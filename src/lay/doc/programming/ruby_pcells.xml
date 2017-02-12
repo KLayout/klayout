@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Coding PCell's In Ruby</title>
+  <keyword name="Ruby"/>
+  <keyword name="PCell"/>
+  <keyword name="Programming"/>
+  <keyword name="RBA"/>
+
+  <h2-index/>
+
+  <p>
+  A good starting point for Ruby PCell's is the PCell sample. Create a macro in the 
+  macro development IDE (use the "+" button) and choose "PCell sample" from the 
+  templates.
+  </p>
+
+  <h2>The Sample</h2>
+
+  <p>
+  We'll do a code walk through that sample here and explain the concepts while 
+  doing so.
+  Here is the complete sample:
+  </p>
+
+  <pre># Sample PCell
+#
+# This sample PCell implements a library called "MyLib" with a single PCell that
+# draws a circle. It demonstrates the basic implementation techniques for a PCell 
+# and how to use the "guiding shape" feature to implement a handle for the circle
+# radius.
+# 
+# NOTE: after changing the code, the macro needs to be rerun to install the new
+# implementation. The macro is also set to "auto run" to install the PCell 
+# when KLayout is run.
+
+module MyLib
+
+  include RBA
+
+  # Remove any definition of our classes (this helps when 
+  # reexecuting this code after a change has been applied)
+  MyLib.constants.member?(:Circle) &amp;&amp; remove_const(:Circle)
+  MyLib.constants.member?(:MyLib) &amp;&amp; remove_const(:MyLib)
+  
+  # The PCell declaration for the circle
+  class Circle &lt; PCellDeclarationHelper
+  
+    include RBA
+
+    def initialize
+
+      # Important: initialize the super class
+      super
+
+      # declare the parameters
+      param(:l, TypeLayer, "Layer", :default =&gt; LayerInfo::new(1, 0))
+      param(:s, TypeShape, "", :default =&gt; DPoint::new(0, 0))
+      param(:r, TypeDouble, "Radius", :default =&gt; 0.1)
+      param(:n, TypeInt, "Number of points", :default =&gt; 64)     
+      # this hidden parameter is used to determine whether the radius has changed
+      # or the "s" handle has been moved
+      param(:ru, TypeDouble, "Radius", :default =&gt; 0.0, :hidden =&gt; true)
+
+    end
+  
+    def display_text_impl
+      # Provide a descriptive text for the cell
+      "Circle(L=#{l.to_s},R=#{'%.3f' % r.to_f})"
+    end
+    
+    def coerce_parameters_impl
+    
+      # We employ coerce_parameters_impl to decide whether the handle or the 
+      # numeric parameter has changed (by comparing against the effective 
+      # radius ru) and set ru to the effective radius. We also update the 
+      # numerical value or the shape, depending on which on has not changed.
+      rs = nil
+      if s.is_a?(DPoint) 
+        # compute distance in micron
+        rs = s.distance(DPoint::new(0, 0))
+      end 
+      if rs &amp;&amp; (r-ru).abs &lt; 1e-6
+        set_ru rs
+        set_r rs 
+      else
+        set_ru r 
+        set_s DPoint::new(-r, 0)
+      end
+      
+      # n must be larger or equal than 4
+      n &gt; 4 || (set_n 4)
+       
+    end
+    
+    def can_create_from_shape_impl
+      # Implement the "Create PCell from shape" protocol: we can use any shape which 
+      # has a finite bounding box
+      shape.is_box? || shape.is_polygon? || shape.is_path?
+    end
+    
+    def parameters_from_shape_impl
+      # Implement the "Create PCell from shape" protocol: we set r and l from the shape's 
+      # bounding box width and layer
+      set_r shape.bbox.width * layout.dbu / 2
+      set_l layout.get_info(layer)
+    end
+    
+    def transformation_from_shape_impl
+      # Implement the "Create PCell from shape" protocol: we use the center of the shape's
+      # bounding box to determine the transformation
+      Trans.new(shape.bbox.center)
+    end
+    
+    def produce_impl
+    
+      # This is the main part of the implementation: create the layout
+
+      # fetch the parameters
+      ru_dbu = ru / layout.dbu
+      
+      # compute the circle
+      pts = []
+      da = Math::PI * 2 / n
+      n.times do |i|
+        pts.push(Point.from_dpoint(DPoint.new(ru_dbu * Math::cos(i * da), ru_dbu * Math::sin(i * da))))
+      end
+      
+      # create the shape
+      cell.shapes(l_layer).insert(Polygon.new(pts))
+      
+    end
+  
+  end
+  
+  # The library where we will put the PCell into 
+  class MyLib &lt; Library
+  
+    def initialize  
+    
+      # Set the description
+      self.description = "My First Library"
+      
+      # Create the PCell declarations
+      layout.register_pcell("Circle", Circle::new)
+      # That would be the place to put in more PCells ...
+      
+      # Register us with the name "MyLib".
+      # If a library with that name already existed, it will be replaced then.
+      register("MyLib")
+      
+    end
+  
+  end
+  
+  # Instantiate and register the library
+  MyLib::new
+  
+end</pre>
+
+  <h2>Preamble</h2>
+
+  <p>The first important concepts are PCell class and library. A PCell is provided by implementing a 
+  certain class and providing the functionality of the PCell through various methods. In fact there are 
+  only three methods which must be implemented. In the sample we use <class_doc href="PCellDeclarationHelper"/> as the 
+  base class for our PCell. This is a convenience wrapper around the basic interface, <class_doc href="PCellDeclaration"/>.
+  Since that interface is too much "C++"-like and is somewhat tedious to use, the PCellDeclarationHelper
+  is the recommended starting point.
+  </p>
+
+  <p>Using the same concept, a library is an object derived from the <class_doc href="Library"/> class. It is basically
+  a container for PCell's and static layout cells. A library has to be initialized (most conveniently in
+  the constructor), registered and initialized once. That makes the library available to the system and
+  it can be used in layouts.
+  </p>
+
+  <p>
+  Please note, that the sample PCell is configured for auto-run. This way, the library is installed
+  when KLayout starts and before any layouts are loaded. That way, the library is available for 
+  layouts read from the command-line for example.
+  </p>
+
+  <p>
+  Let's now start with our code walk:
+  </p>
+
+  <pre>module MyLib
+
+  include RBA
+
+  # Remove any definition of our classes (this helps when 
+  # reexecuting this code after a change has been applied)
+  MyLib.constants.member?(:Circle) &amp;&amp; remove_const(:Circle)
+  MyLib.constants.member?(:MyLib) &amp;&amp; remove_const(:MyLib)</pre>
+
+  <p>
+  It is recommended to put the library code into a separate module. That allows 
+  mixing in other modules (in that case RBA) without affecting the main module. 
+  The second recommendation is to remove classes which are already defined
+  with the names we are going to create. While developing a PCell is it necessary to
+  frequently rerun the script to register the new version of the library and PCell.
+  If we do not remove the existing class, Ruby will refuse to reopen a class
+  for example if we change the super class or methods we have deleted will still 
+  remain. That is avoided by removing the classes before the create them again. In 
+  Ruby, a class can be removed by removing the constant with the class name. Note
+  the way, the script checks whether a class is defined by using "member?" on the
+  list of constants. This method should be preferred over "const_defined?" which 
+  behaves differently on Ruby 1.8 and Ruby 1.9.
+  </p>
+
+  <h2>The PCell Class</h2>
+
+  <p>First we define a PCell class derived from <class_doc href="PCellDeclarationHelper"/>. This
+  is the most convenient way to declare a PCell:
+  </p>
+
+  <pre>  # The PCell declaration for the circle
+  class Circle &lt; PCellDeclarationHelper
+  
+    include RBA</pre>
+ 
+  <p>
+  Again we include RBA which allows us to use RBA classes inside the PCell without
+  having to write "RBA::" in front of the class names.
+  </p>
+  
+  <p>The initialization of the object is alreay a very important step. First, it 
+  must initialize the super class. Then it has to declare the PCell parameters.
+  Each PCell has a set of parameters that define the appearance of the PCell.
+  Parameters have a symbolic name, a type, a description and optionally a default
+  value and further attributes. The name is important because it identifies the
+  parameter throughout the system and in layout files as well. It should not be 
+  changed. The description is an arbitrary string and can be changed or localized.
+  </p>
+
+  <p>
+  Parameters are declared using the "param" method of <class_doc href="PCellDeclarationHelper"/>:
+  </p>
+
+  <pre>    def initialize
+
+      # Important: initialize the super class
+      super
+
+      # declare the parameters
+      param(:l, TypeLayer, "Layer", :default =&gt; LayerInfo::new(1, 0))
+      param(:s, TypeShape, "", :default =&gt; DPoint::new(0, 0))
+      param(:r, TypeDouble, "Radius", :default =&gt; 0.1)
+      param(:n, TypeInt, "Number of points", :default =&gt; 64)     
+      # this hidden parameter is used to determine whether the radius has changed
+      # or the "s" handle has been moved
+      param(:ru, TypeDouble, "Radius", :default =&gt; 0.0, :hidden =&gt; true)
+
+    end</pre>
+
+  <p>
+  In that sample we declared a PCell parameter "l" with type "TypeLayer" which indicates that this is 
+  a layer in the layout. "s" is a parameter shape represents the handle and is a shape. A shape
+  is either of type <class_doc href="DBox"/>, <class_doc href="DText"/>, <class_doc href="DPath"/>, <class_doc href="DPolygon"/> or <class_doc href="DPoint"/>. Shape parameters
+  implement the "guiding shape feature" that KLayout offers to manipulate that parameter graphically.
+  "r" and "n" are simple numerical parameters. All parameters have default values which are set
+  with the "default" symbolic parameter. As a layer, "l" must have a <class_doc href="LayerInfo"/> value.
+  "s" is a <class_doc href="DPoint"/> which reflects the handle. Since default values not only preset the parameters
+  to a reasonable value but also define the subtype of a parameter (here the <class_doc href="DPoint"/> shape), providing
+  a default is strongly recommended. As shapes need to be independent from the database unit for portability, they are expressed in
+  micron units. Hence the use of the "D" forms (DPoint etc.).
+  </p>
+
+  <p>"ru" is a special parameter. Because we have two ways to modify the radius (the handle and the numerical value), 
+  it is used as a shadow parameter do determine which one of these two values has changed. Depending on that
+  information, either the handle or the radius is updated. Because this parameter should not be shown in the
+  parameter page, it is marked "hidden". 
+  </p>
+
+  <p>
+  There are some more options for parameters. See the documentation of <class_doc href="PCellDeclarationHelper"/> for 
+  more details about the further attributes.
+  </p>
+
+  <p>
+  The parameter declaration will create accessor methods for each parameter. These accessor methods can be
+  used to get and set the current value of the parameter inside the production method and other methods.
+  For that, it will use the symbolic name of the parameter. The setter is called "set_x" (where x is the parameter
+  name). Although Ruby would allow to use "x=" to mimic an assignment, this option leads to some confusion
+  with definition of local variables and was not considered here. The following methods are created in the sample:
+  </p>
+
+  <ul>
+    <li><tt>l, set_l, l_layer</tt>: getter and setter for the current value of "l". l_layer is the layer index in the context 
+      of the PCell production method. The layer index can be used to access the layer in the layout or cell.</li>
+    <li><tt>s, set_s</tt>: getter and setter for the current value of "s".</li>
+    <li><tt>r, set_r, n, set_n, ru, set_ru</tt>: same for "r", "n" and "ru".</li>
+  </ul>  
+
+  <p>
+  After the PCell initialization is finished, we can start with the production code. These are the methods
+  that KLayout will call on certain opportunities. The first method that a PCell must implement is the 
+  display text callback:
+  </p>
+
+  <pre>    def display_text_impl
+      # Provide a descriptive text for the cell
+      "Circle(L=#{l.to_s},R=#{'%.3f' % r.to_f})"
+    end</pre>
+
+  <p>
+  KLayout will call this method to fetch a formatted string that represents the content of a PCell. This text
+  is used for the cell tree and cell box labels. To avoid confusion, it should start with the name of the
+  PCell. The bracket notation is not mandatory, but it's always a good idea to follow some common style.
+  The information delivered by this method should be short but contain enough information so that a 
+  PCell variant can be distinguished from it's sibling. 
+  </p>
+
+  <p>
+  The next method is called whenever something on the parameters has changed. This method allows
+  to adjust the parameters so that they obey certain limitations. It can also raise exceptions for
+  invalid parameter combinations. In our case we use this method to adjust the handle or the 
+  numeric radius to the effective value. We also enforce a minimum number of vertex counts for the 
+  resulting polygon. Implementing this method in general is optional. By default, no modification 
+  of the parameters is done:
+  </p>
+    
+  <pre>    def coerce_parameters_impl
+    
+      # We employ coerce_parameters_impl to decide whether the handle or the 
+      # numeric parameter has changed (by comparing against the effective 
+      # radius ru) and set ru to the effective radius. We also update the 
+      # numerical value or the shape, depending on which on has not changed.
+      rs = nil
+      if s.is_a?(DPoint) 
+        # compute distance in micron
+        rs = s.distance(DPoint::new(0, 0))
+      end 
+      if rs &amp;&amp; (r-ru).abs &lt; 1e-6
+        set_ru rs
+        set_r rs 
+      else
+        set_ru r 
+        set_s DPoint::new(-r, 0)
+      end
+      
+      # n must be larger or equal than 4
+      n &gt; 4 || (set_n 4)
+       
+    end</pre>
+    
+  <p>
+  The implementation of the following three methods is optional: they are used to 
+  implement the "PCell from shape" protocol. If "Create PCell from shape" is selected
+  in KLayout's Edit menu, it will call "can_create_from_shape_impl" for each known 
+  PCell. This method will be given the shape, layout and layer. If this method responds
+  with "true", KLayout offers this PCell as a conversion target in the list. When this
+  PCell has been selected, KLayout calls "parameters_from_shape_impl" and "transformation_from_shape_impl"
+  to obtain the initial parameters and the initial transformation for the new PCell created
+  from that shape. "parameter_from_shape_impl" will use the default values for all parameters
+  unless they are set with the respective setters in the implementation body.
+  </p>
+
+  <pre>    def can_create_from_shape_impl
+      # Implement the "Create PCell from shape" protocol: we can use any shape which 
+      # has a finite bounding box
+      shape.is_box? || shape.is_polygon? || shape.is_path?
+    end
+
+    def parameters_from_shape_impl
+      # Implement the "Create PCell from shape" protocol: we set r and l from the shape's 
+      # bounding box width and layer
+      set_r shape.bbox.width * layout.dbu / 2
+      set_l layout.get_info(layer)
+    end
+    
+    def transformation_from_shape_impl
+      # Implement the "Create PCell from shape" protocol: we use the center of the shape's
+      # bounding box to determine the transformation
+      Trans.new(shape.bbox.center)
+    end</pre>
+    
+  <p>
+  The most important method is "produce_impl" which actually creates the layout.
+  For that, it can use all methods of <class_doc href="Layout"/> and <class_doc href="Cell"/> and most other RBA classes.
+  It can even create 
+  instances. Although that is possible, it is not recommended to create cells in the 
+  production code. This would pretty much degrade performance and lead to a confusing
+  variety of cells. It is possible to use boolean operations by using the methods
+  of <class_doc href="EdgeProcessor"/> for example. Some care must be taken to avoid interaction with 
+  the user interface, in particular calling methods of <class_doc href="LayoutView"/> and <class_doc href="MainWindow"/>
+  should be avoided.
+  </p>
+
+  <p>
+  The actual layout of the PCell is cached and the production code is called only
+  when the PCell parameters have changed. However, to reduce the risk of performance 
+  degradation, the method should run quickly and not spend too much time in 
+  long loops or huge data sets.
+  </p>
+
+  <pre>    def produce_impl
+    
+      # This is the main part of the implementation: create the layout
+
+      # fetch the parameters
+      ru_dbu = ru / layout.dbu
+      
+      # compute the circle
+      pts = []
+      da = Math::PI * 2 / n
+      n.times do |i|
+        pts.push(Point.from_dpoint(DPoint.new(ru_dbu * Math::cos(i * da), ru_dbu * Math::sin(i * da))))
+      end
+      
+      # create the shape
+      cell.shapes(l_layer).insert(Polygon.new(pts))
+      
+    end
+  
+  end
+</pre>
+
+  <p>
+  Of course, more than one PCell class can be declared. Each PCell type must 
+  have an own implementation class which we will use later to create the PCell's from.
+  </p>
+
+  <h2>The Library</h2>
+
+  <p>
+  The library is the container for the PCell's.
+  All important code is packed into the constructor of the library.
+  </p>
+
+  <pre>  # The library where we will put the PCell into 
+  class MyLib &lt; Library
+  
+    def initialize  
+    
+      # Set the description
+      self.description = "My First Library"
+      
+      # Create the PCell declarations
+      layout.register_pcell("Circle", Circle::new)
+      # That would be the place to put in more PCells ...
+      
+      # Register us with the name "MyLib".
+      # If a library with that name already existed, it will be replaced then.
+      register("MyLib")
+      
+    end
+  
+  end</pre>
+
+  <p>
+  First, a library needs a description that we set with the description setter. Then, we 
+  instantiate all PCell classes once and register that instance in the library space. 
+  </p>
+
+  <p>
+  The library is basically an ordinary <class_doc href="Layout"/> object that we can access through the 
+  "layout" method. The library can consist of more that PCells - all cells that we put into
+  the layout will become available as library components (more precisely: all top cells).
+  We could use RBA::Layout::read for example to feed the layout with cells from a file.
+  </p>
+
+  <p>At the end of the constructor we register our instance inside the system with the 
+  given name. To avoid confusion, it is recommended to use the same name for the class
+  and the library.
+  </p>
+
+  <p>
+  Finally we only need to instantiate the library:
+  </p>
+  
+  <pre>  # Instantiate and register the library
+  MyLib::new</pre>
+
+  <p>
+  This line of code will instantiate the library and, through the constructor, instantiate
+  the PCell's and register the library. We are done now and can use the library and our PCell.
+  </p>
+
+  <h2>Debugging The Code</h2>
+
+  <p>
+  When you have modified the code, you need to rerun the script. That will create the classes
+  again and re-register the PCell's and the Library with the new implementation. PCell's already
+  living in the layout will be migrated to the new implementation by mapping their parameters by
+  their symbolic names.
+  </p>
+
+  <p>
+  The PCell code can be debugged with KLayout's built-in Ruby debugger. If the macro development
+  IDE window is open, just load the PCell code and set a breakpoint. When KLayout calls the 
+  PCell implementation, the breakpoint will be triggered. Local variables can be inspected and modified in
+  the console for example. Single-stepping is supported as well. If the execution is stopped, KLayout
+  will finish the operation with some error message.
+  </p>
+
+  <p>
+  It is also possible to print output to the console if the macro development IDE is open. Just use
+  the methods of stdout that Ruby offers or simply "puts".
+  </p>
+
+  <p>
+  Please note that while the macro development IDE is opened, macro execution is considerably slower 
+  than usually, because the IDE will plug itself into the Ruby interpreter and trace the execution.
+  When the IDE window is closed, Ruby runs at full speed. While in a breakpoint, KLayout's main window
+  is only half alive. Only the IDE is active and the main window will not even repaint correctly. 
+  This prevents possible interactions with the executed code.
+  </p>
+  
+</doc>
+

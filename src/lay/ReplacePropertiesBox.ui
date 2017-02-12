@@ -1,0 +1,120 @@
+<ui version="4.0" >
+ <class>ReplacePropertiesBox</class>
+ <widget class="QWidget" name="ReplacePropertiesBox" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>255</width>
+    <height>265</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="label_54" >
+     <property name="text" >
+      <string>Height</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" >
+    <widget class="QLineEdit" name="box_height" />
+   </item>
+   <item row="3" column="0" colspan="3" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>200</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QLabel" name="label_60" >
+     <property name="text" >
+      <string/>
+     </property>
+     <property name="pixmap" >
+      <pixmap resource="layResources.qrc" >:/right.png</pixmap>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" >
+    <widget class="QLabel" name="label_58" >
+     <property name="text" >
+      <string/>
+     </property>
+     <property name="pixmap" >
+      <pixmap resource="layResources.qrc" >:/right.png</pixmap>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" >
+    <widget class="QLineEdit" name="box_width" />
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="label_55" >
+     <property name="text" >
+      <string>Width</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QLabel" name="label_59" >
+     <property name="text" >
+      <string/>
+     </property>
+     <property name="pixmap" >
+      <pixmap resource="layResources.qrc" >:/right.png</pixmap>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" >
+    <widget class="QLabel" name="label_53" >
+     <property name="text" >
+      <string>Layer</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>µm</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>µm</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" >
+    <widget class="lay::LayerSelectionComboBox" name="box_layer" />
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>lay::LayerSelectionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>layWidgets.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

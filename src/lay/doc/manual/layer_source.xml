@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Removing And Adding Layers To The Layer Set</title>
+  <keyword name="Layer properties"/>
+  <keyword name="Add layers to layer properties"/>
+  <keyword name="Remove layers from layer properties"/>
+
+  <p>
+  The layers shown in the layer list are rather "pointers" to the actual
+  layout layers and not representing the actual layers. Because of this, these
+  layers are more precisely referred to as "views". Layers can be removed and
+  created again without affecting the actual layout data.
+  </p>
+
+  <p>
+  To create a layer, choose "Insert View" from the layer context menu (right 
+  mouse button click on the layer list). Then, an input dialog prompts for the
+  source specification. The source specification tells, from which actual data
+  layer to take the displayed data from. The most simple form of a source 
+  specification is "layer/datatype" (i.e. "5/0") or the layer name, if an OASIS
+  layer name is present. This specification can be enhanced by a layout index.
+  The first layout loaded in the panel is referred to which "@1" or by omitting 
+  this specification. The source specification "10/5@2" therefore refers to layer
+  10, datatype 5 of the second layout loaded in the panel.
+  </p>
+
+  <p>
+  Source specifications can be wildcarded. That means, either layer, datatype
+  or layout index can be specified by "*". In this case, such a layer must
+  be contained in a group and the group parent must provide the missing specifications.
+  For example, if a layer is specified "10/*" and the parent is specified "*/5", the
+  effective layer looked for will be "10/5". Unlike the behaviour for the display
+  styles, the children override (or specialize) the parent's definition in the 
+  case of the source specification.
+  </p>
+
+  <p>
+  The layer list can be cleaned up to remove layer views that do not correspond to
+  actual layout layers using the function "Clean up views" from the context menu.
+  Similar, layers that are present in the layout but for which there is no view can
+  be added using the "Add other views" method.
+  </p>
+
+</doc>
+

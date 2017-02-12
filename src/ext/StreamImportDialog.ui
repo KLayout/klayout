@@ -1,0 +1,843 @@
+<ui version="4.0" >
+ <class>StreamImportDialog</class>
+ <widget class="QDialog" name="StreamImportDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>754</width>
+    <height>604</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="6" column="1" >
+    <widget class="QPushButton" name="last_pb" >
+     <property name="text" >
+      <string>Back</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="layResources.qrc" >:/back.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>331</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="6" column="3" >
+    <widget class="QPushButton" name="import_pb" >
+     <property name="text" >
+      <string>Import</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2" >
+    <widget class="QPushButton" name="next_pb" >
+     <property name="text" >
+      <string>Next</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="layResources.qrc" >:/forward.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="4" >
+    <widget class="QPushButton" name="cancel_pb" >
+     <property name="text" >
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="5" >
+    <widget class="Line" name="line_4" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="5" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>736</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="0" colspan="5" >
+    <widget class="Line" name="line" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="5" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>736</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="0" colspan="5" >
+    <widget class="QFrame" name="frame_3" >
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>0</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="section_header_lbl" >
+        <property name="font" >
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text" >
+         <string>SectionHeader</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="reset_pb" >
+        <property name="text" >
+         <string>Reset</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="5" >
+    <widget class="QStackedWidget" name="central_stack" >
+     <property name="currentIndex" >
+      <number>2</number>
+     </property>
+     <widget class="QWidget" name="page" >
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="groupBox_4" >
+         <property name="title" >
+          <string>Input</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="label_7" >
+            <property name="text" >
+             <string>Top cell </string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="2" >
+           <widget class="QLineEdit" name="file_le" />
+          </item>
+          <item row="0" column="3" >
+           <widget class="QToolButton" name="file_pb" >
+            <property name="text" >
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_6" >
+            <property name="text" >
+             <string>File </string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" colspan="2" >
+           <widget class="QLabel" name="label_2" >
+            <property name="sizePolicy" >
+             <sizepolicy>
+              <hsizetype>5</hsizetype>
+              <vsizetype>5</vsizetype>
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text" >
+             <string>(leave empty for selecting the top cell automatically)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QLineEdit" name="topcell_le" >
+            <property name="sizePolicy" >
+             <sizepolicy>
+              <hsizetype>7</hsizetype>
+              <vsizetype>0</vsizetype>
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="4" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>20</width>
+              <height>10</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="3" column="0" colspan="4" >
+           <widget class="QFrame" name="frame_2" >
+            <property name="frameShape" >
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" >
+             <property name="margin" >
+              <number>0</number>
+             </property>
+             <property name="spacing" >
+              <number>6</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_3" >
+               <property name="text" >
+                <string>Stream reader options   </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="edit_options_pb" >
+               <property name="text" >
+                <string>Edit ...</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="reset_options_pb" >
+               <property name="text" >
+                <string>Reset</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer>
+               <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" >
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox" >
+         <property name="title" >
+          <string>Import Mode</string>
+         </property>
+         <layout class="QVBoxLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="import_simple_rb" >
+            <property name="text" >
+             <string>Merge - Merge new cell into current cell and create a new cell hierarchy below</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="import_extra_rb" >
+            <property name="text" >
+             <string>Extra cells - Import as extra cells</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="import_instantiate_rb" >
+            <property name="text" >
+             <string>Instantiate - Instantiate a new cell tree below the current cell</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="import_merge_rb" >
+            <property name="text" >
+             <string>Merge hierarchy - Merge into current cell's hierarchy (attempt to identify corresponding cells)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>20</width>
+              <height>10</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_8" >
+            <property name="text" >
+             <string>Note: All modes except "Extra cells" require a unique top cell for the input file. Either one must be specified or the input file must have a single top cell.</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>16</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_2" >
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="frame" >
+         <property name="frameShape" >
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow" >
+          <enum>QFrame::Plain</enum>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item rowspan="5" row="0" column="0" >
+           <widget class="QGroupBox" name="groupBox_2" >
+            <property name="title" >
+             <string>Layer mapping</string>
+            </property>
+            <layout class="QGridLayout" >
+             <property name="margin" >
+              <number>9</number>
+             </property>
+             <property name="spacing" >
+              <number>6</number>
+             </property>
+             <item row="2" column="1" colspan="2" >
+              <widget class="QLabel" name="label" >
+               <property name="text" >
+                <string>Use "layer/datatype" notation to specify an offset to be added to layer and/or datatype.</string>
+               </property>
+               <property name="wordWrap" >
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1" >
+              <widget class="QLineEdit" name="offset_le" />
+             </item>
+             <item row="1" column="0" >
+              <widget class="QRadioButton" name="offset_rb" >
+               <property name="text" >
+                <string>On original layers plus offset</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" >
+              <widget class="QRadioButton" name="no_mapping_rb" >
+               <property name="text" >
+                <string>No mapping - use original layers</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2" >
+              <spacer>
+               <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" >
+                <size>
+                 <width>211</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="5" column="0" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_6" >
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="frame_5" >
+         <property name="frameShape" >
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow" >
+          <enum>QFrame::Plain</enum>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="3" column="5" >
+           <widget class="QLineEdit" name="layout_x1_le" />
+          </item>
+          <item row="5" column="2" >
+           <widget class="QLineEdit" name="pcb_y3_le" />
+          </item>
+          <item row="3" column="4" >
+           <widget class="QLabel" name="label_22" >
+            <property name="text" >
+             <string>Point 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="6" >
+           <widget class="QLabel" name="label_24" >
+            <property name="text" >
+             <string>y (micron)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="3" >
+           <widget class="QLabel" name="label_17" >
+            <property name="text" >
+             <string>Reference points coordinates on layout to import</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2" >
+           <widget class="QLineEdit" name="pcb_y2_le" />
+          </item>
+          <item row="5" column="4" >
+           <widget class="QLabel" name="Point 3" >
+            <property name="text" >
+             <string>Point 3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="5" >
+           <widget class="QLineEdit" name="layout_x2_le" />
+          </item>
+          <item row="0" column="4" colspan="3" >
+           <widget class="QLabel" name="label_18" >
+            <property name="text" >
+             <string>Reference point coordinates in existing layout</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="5" >
+           <widget class="QLineEdit" name="layout_x3_le" />
+          </item>
+          <item row="5" column="6" >
+           <widget class="QLineEdit" name="layout_y3_le" />
+          </item>
+          <item row="2" column="5" >
+           <widget class="QLabel" name="label_23" >
+            <property name="text" >
+             <string>x (micron)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="3" >
+           <widget class="Line" name="line_2" >
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" >
+           <widget class="QLabel" name="label_25" >
+            <property name="text" >
+             <string>Point 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" >
+           <widget class="QLineEdit" name="pcb_x2_le" />
+          </item>
+          <item row="5" column="0" >
+           <widget class="QLabel" name="label_26" >
+            <property name="text" >
+             <string>Point 3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" >
+           <widget class="QLabel" name="label_21" >
+            <property name="text" >
+             <string>Point 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1" >
+           <widget class="QLineEdit" name="pcb_x3_le" />
+          </item>
+          <item row="3" column="2" >
+           <widget class="QLineEdit" name="pcb_y1_le" />
+          </item>
+          <item row="1" column="4" colspan="3" >
+           <widget class="Line" name="line_3" >
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" >
+           <widget class="QLineEdit" name="pcb_x1_le" />
+          </item>
+          <item row="2" column="2" >
+           <widget class="QLabel" name="label_20" >
+            <property name="text" >
+             <string>y (micron)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" >
+           <widget class="QLabel" name="label_19" >
+            <property name="text" >
+             <string>x (micron)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="4" >
+           <widget class="QLabel" name="label_27" >
+            <property name="text" >
+             <string>Point 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="6" >
+           <widget class="QLineEdit" name="layout_y2_le" />
+          </item>
+          <item row="3" column="6" >
+           <widget class="QLineEdit" name="layout_y1_le" />
+          </item>
+          <item rowspan="6" row="0" column="3" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>16</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="6" column="0" colspan="7" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>691</width>
+              <height>8</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="8" column="0" colspan="7" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>20</width>
+              <height>15</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="9" column="0" colspan="7" >
+           <widget class="QFrame" name="frame_6" >
+            <property name="frameShape" >
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" >
+             <property name="margin" >
+              <number>0</number>
+             </property>
+             <property name="spacing" >
+              <number>6</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_30" >
+               <property name="text" >
+                <string>Explicit transformation</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="explicit_trans_le" >
+               <property name="toolTip" >
+                <string>Examples: "r90", "m45", "r90 (2000,-5000)"</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_31" >
+               <property name="text" >
+                <string>(Reference points have higher priority)</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="7" column="0" colspan="7" >
+           <widget class="QLabel" name="label_29" >
+            <property name="text" >
+             <string>Leave fields empty to specify less reference points. One point is used to derive the displacement, further points are used to derive the orientation. Currently, no magnification is implied and only simple rotations are derived from the mapping points.
+
+Alternatively the transformation (imported to existing layout) can be specified using the explicit transformation below. This allows to specify an arbitary transformation. Use the common notation (i.e. "*2 r90 10,-100").</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>file_le</tabstop>
+  <tabstop>file_pb</tabstop>
+  <tabstop>topcell_le</tabstop>
+  <tabstop>edit_options_pb</tabstop>
+  <tabstop>reset_options_pb</tabstop>
+  <tabstop>import_simple_rb</tabstop>
+  <tabstop>import_extra_rb</tabstop>
+  <tabstop>import_instantiate_rb</tabstop>
+  <tabstop>import_merge_rb</tabstop>
+  <tabstop>no_mapping_rb</tabstop>
+  <tabstop>offset_rb</tabstop>
+  <tabstop>offset_le</tabstop>
+  <tabstop>pcb_x1_le</tabstop>
+  <tabstop>pcb_y1_le</tabstop>
+  <tabstop>layout_x1_le</tabstop>
+  <tabstop>layout_y1_le</tabstop>
+  <tabstop>pcb_x2_le</tabstop>
+  <tabstop>pcb_y2_le</tabstop>
+  <tabstop>layout_x2_le</tabstop>
+  <tabstop>layout_y2_le</tabstop>
+  <tabstop>pcb_x3_le</tabstop>
+  <tabstop>pcb_y3_le</tabstop>
+  <tabstop>layout_x3_le</tabstop>
+  <tabstop>layout_y3_le</tabstop>
+  <tabstop>explicit_trans_le</tabstop>
+  <tabstop>last_pb</tabstop>
+  <tabstop>next_pb</tabstop>
+  <tabstop>import_pb</tabstop>
+  <tabstop>cancel_pb</tabstop>
+ </tabstops>
+ <resources>
+  <include location="layResources.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>import_pb</sender>
+   <signal>clicked()</signal>
+   <receiver>StreamImportDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>572</x>
+     <y>598</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>574</x>
+     <y>614</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cancel_pb</sender>
+   <signal>clicked()</signal>
+   <receiver>StreamImportDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>679</x>
+     <y>597</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>683</x>
+     <y>613</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

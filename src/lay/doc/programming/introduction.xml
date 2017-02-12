@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Introduction</title>
+  <keyword name="Programming"/>
+  <keyword name="RBA"/>
+  <keyword name="Ruby scripts"/>
+  <keyword name="Python"/>
+  <keyword name="pya"/>
+  <keyword name="Python scripts"/>
+
+  <p>
+  This chapter is about programming extensions for KLayout using the integrated Ruby API (RBA) or Python API (pya). 
+  </p>
+
+  <p>
+  To use RBA scripts, KLayout must be compiled with the Ruby interpreter.
+  On Linux, this is automatically the case when the build script is run with a Ruby interpreter in 
+  the path and when the Ruby development packages are installed (on Debian these packages are "ruby-1.9.1" and "ruby1.9.1-dev" for example). 
+  A Ruby version more recent than 1.9 is recommended. Ruby 2.0 and later versions are supported too.
+  </p>
+
+  <p>
+  To use pya scripts, KLayout must be compiled with the Python interpreter.
+  On Linux, this is automatically the case when the build script is run with a Python interpreter in 
+  the path and when the Python development packages are installed. 
+  A Python version more recent than 2.7 is recommended. Python 3.0 and later versions are supported too.
+  </p>
+
+  <p>
+  Basically there are a traditional, script-based style of programming and the macro-based style supported by version 0.22.
+  Scripts are simple text files which are prepared externally and KLayout acts as an interpreter for these scripts.
+  That traditional style was the only way to run scripts in version 0.21 and earlier. It is still supported and described
+  in <link href="/programming/traditional.xml"/>. From version 0.22, generic macros are supported which offer some advantages
+  over plain text files.
+  </p>
+
+  <p>
+  Macros are special XML files which contain Ruby code plus some additional information required to  
+  link them into the system, i.e. automatically execute them on startup or provide menu entries for them.
+  They can load normal ".rb" files to implement libraries of classes in the usual way. Macros are managed and developed conveniently
+  in the integrated macro development environment along with the supporting files. This method is the preferred way of creating application
+  extensions and is described in this chapter.
+  </p>
+
+  <p>
+  Before you start, please make yourself familiar with the macro development integrated environment (<link href="/about/macro_editor.xml"/>).
+  This documentation also assumes that you familiar with the Ruby programming language. There are numerous 
+  books and tutorials about Ruby. The most famous one is the "pickaxe book" (Programming Ruby - The Pragmatic Programmers Guide) by Dave Thomas.
+  If you are familiar with Ruby there is a technical article about the way Ruby and KLayout's core are
+  integrated (<link href="/programming/ruby_binding.xml"/>). There are special articles about the integrated Qt binding
+  (<link href="/programming/qt_binding.xml"/>) and PCell programming (<link href="/programming/ruby_pcells.xml"/>). If you want to 
+  use Python, please read the python implementation article (<link href="/programming/python.xml"/>) for details about how to
+  translate Ruby samples into Python and specific details of the Python integration.
+  </p>
+
+  <p>
+  An introduction into the basic concepts of the KLayout API are given in the article about the 
+  application API (<link href="/programming/application_api.xml"/>) and about the database API (<link href="/programming/database_api.xml"/>).
+  </p>
+
+  <h2>A First Sample</h2>
+  
+  <p>
+  The first sample is already a complete macro which counts all selected paths, boxes, polygons or text objects.
+  It demonstrates how to set up a macro, how to deal with the selection and how to access the layout database.
+  </p>
+
+  <p>
+  Here is the code:
+  </p>
+
+  <pre>module MyMacro
+
+  include RBA
+
+  app = Application.instance
+  mw = app.main_window
+
+  lv = mw.current_view
+  if lv == nil
+    raise "Shape Statistics: No view selected"
+  end
+
+  paths = 0
+  polygons = 0
+  boxes = 0
+  texts = 0
+
+  lv.each_object_selected do |sel|
+
+    shape = sel.shape
+
+    if shape.is_path?
+      paths += 1
+    elsif shape.is_box?
+      boxes += 1
+    elsif shape.is_polygon?
+      polygons += 1
+    elsif shape.is_text?
+      texts += 1
+    end
+
+  end
+
+  s = "Paths: #{paths}\n"
+  s += "Polygons: #{polygons}\n"
+  s += "Boxes: #{boxes}\n"
+  s += "Texts: #{texts}\n"
+
+  MessageBox::info("Shape Statistics", s, MessageBox::Ok)
+
+end</pre>
+
+  <p>
+  To run the macro, create a new macro in the macro development IDE: choose "Macros/Macro Development". Create a new macro 
+  using the "+" button. Rename the macro to a suitable name. Copy the code above into the text. Load a layout, select some
+  objects and in the macro development IDE press F5. A message box will appear the tells us how may boxes, polygons etc. 
+  we have selected.
+  </p>
+  
+  <p>
+  If we look at the code, the first observation is that we put the whole script into our own namespace (we can use any name which is not used
+  otherwise). The advantage of that approach is that we can import the "RBA" namespace which makes life somewhat easier.
+  The RBA namespace contains all KLayout classes and constants.
+  If we would import the RBA namespace into the main namespace we would do that for all other scripts in KLayout since 
+  the main namespace is a common resource for all scripts.
+  </p>
+
+  <p>
+  The first thing we do inside the macro is to access the layout view:
+  </p>
+
+  <pre>  app = Application.instance
+  mw = app.main_window
+
+  lv = mw.current_view
+  if lv == nil
+    raise "Shape Statistics: No view selected"
+  end</pre>
+
+  <p>
+  The Application class (<class_doc href="Application"/>) is a representative for the KLayout application. Since there is only one application, it is a singleton.
+  We can obtain the singleton instance with the class method ("static" in the language of C++) "instance". It delivers a
+  reference to the only Application object which is the main entrance to all internals of KLayout.
+  </p>
+
+  <p>
+  The next object which is important is the MainWindow object (<class_doc href="MainWindow"/>). Currently there is only
+  one MainWindow object which can be obtained with the "main_window" method of the Application object. The MainWindow 
+  object represents the application's window and manages the top level visual objects of the application.
+  The main visual components of the main window are the menus, the tool panels (cell tree, layer list, tool box, navigator ...) 
+  and the layout views. 
+  </p>
+
+  <p>
+  The layout view is the representation of a layout tab (<class_doc href="LayoutView"/>). That is basically the window to 
+  the layouts loaded into that tab. 
+  All related information such as the display settings, the zoom area, the layer properties and the informations about the 
+  cell shown, the hierarchy levels and further settings go here. 
+  </p>
+
+  <p>
+  A main window can display multiple tabs. Hence there are multiple LayoutView objects available. The currently selected
+  tab can be addressed with the "current_view" method. This method delivers the LayoutView object associated with that tab.
+  If no layout is loaded, that method returns nil (the Ruby  for "nothing")
+  </p>
+
+  <p>
+  The actual layouts loaded are separate entities. Technically, there is a many-to-many relationship between layout views
+  and layout objects. A layout view may display multiple layouts are one layout may be displayed in multiple layout views.
+  In addition, a layout view can address different cells from a layout. A layout view has a current cell and a path 
+  that leads to that cell. The path consists of a specific and unspecific part. The unspecific part of the path tells 
+  where the cell we show as the current cell is located in the cell tree. The unspecific part is a tribute to the fact that
+  a cell can appear in different branches of the cell tree (i.e. as child of cell A and cell B). The specific part of the
+  path addresses a specific instance of within some cell (the "context cell") above in the hierarchy. A specific path is created when 
+  we descend down in the hierarchy along a certain instantiation path.
+  </p>
+  
+  <p>
+  Layout, current cell, context cell, specific and unspecific 
+  path are combined into the CellView object (<class_doc href="CellView"/>). A layout view can have multiple cell views
+  corresponding to the different layouts that can be loaded into a panel. The cell views do not necessarily have to point
+  to different layouts.
+  </p>
+
+  <p>
+  For our sample we don't need the CellView objects, because we get all information directly from the view. But the 
+  concept of that object is important to understand the API documentation.
+  </p>
+
+  <p>
+  In our sample, we ask the layout view for all selected objects and collect the object counts:
+  </p>
+
+  <pre>  lv.each_object_selected do |sel|
+
+    shape = sel.shape
+
+    if shape.is_path?
+      paths += 1
+    elsif shape.is_box?
+      boxes += 1
+    elsif shape.is_polygon?
+      polygons += 1
+    elsif shape.is_text?
+      texts += 1
+    end
+
+  end</pre>
+
+  <p>
+  "each_object_selected" is a method of the LayoutView object. More precisely it's an iterator which calls the
+  given block for each selected object. Since the layout view can show multiple layouts, the selected objects may
+  originate from different layouts. In addition, the object may be selected in a child cell of the current cell.
+  Hence, the selection is described by a cell view index, an instantiation path (a sequence of instances leading to
+  the cell containing the selected object from the current cell) and the actual object selected.
+  That information is combined into an ObjectInstPath object (<class_doc href="ObjectInstPath"/>).
+  </p>
+
+  <p>
+  In our case we are not interested in the cell view that shape lives in. Neither are we in the instantiation path.
+  Hence all we need is the shape and we can obtain it with the "shape" method. 
+  This method delivers a Shape object (<class_doc href="Shape"/>), which is some kind of pointer to the
+  actual shape. The actual shape is either a polygon, a box, a text or a path. The Shape object has a multiple
+  identity and we can ask it what shape type is represents. For that, the Shape object offers methods like "is_box?" etc.
+  If we know the type we can ask it for the actual object and fetch a Polygon (<class_doc href="Polygon"/>), a 
+  Box (<class_doc href="Box"/>), a Text (<class_doc href="Text"/>) or a Path object (<class_doc href="Path"/>).
+  For our sample however we don't need access to the actual object. 
+  </p>
+
+  <p>
+  Finally we put together a message and display it in a message box:
+  </p>
+
+  <pre>  s = "Paths: #{paths}\n"
+  s += "Polygons: #{polygons}\n"
+  s += "Boxes: #{boxes}\n"
+  s += "Texts: #{texts}\n"
+
+  MessageBox::info("Shape Statistics", s, MessageBox::Ok)</pre>
+
+  <p>
+  MessageBox (<class_doc href="MessageBox"/>) is a class that provides modal message dialogs through 
+  several class methods. "info" shows an information box and with the given title and message. The third
+  parameter indicates which buttons will be shown. In that case, one "Ok" button is sufficient because 
+  we don't want to take specific actions when the message box is closed.
+  </p>
+
+  <p>
+  This is just a simple example, but it already illustrates some basic concepts. 
+  For a in-depth introduction into the API, read <link href="/programming/application_api.xml"/> and <link href="/programming/database_api.xml"/>.
+  </p>
+
+</doc>
+  

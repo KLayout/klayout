@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Configuring The Cell List</title>
+  <keyword name="Cell tree"/>
+  <keyword name="Cell list"/>
+
+  <p>
+  Two modes are provided for the cell list: a tree view (the default) and a flat cell
+  list. To switch to flat mode, check the "Flat Cell List" option in the cell panel's
+  context menu.
+  </p>
+
+  <p>
+  If multiple layouts are loaded, the cell lists of the individual layouts are shown 
+  separately. The drop-down box above the cell lists will select the current cell tree
+  to show. An alternative mode is available in which the cell lists are shown beside
+  each other in the cell tree panel. This mode is enabled by choosing the "Split Mode" option 
+  in the cell panel's context menu. In split mode, you can click on the headers to 
+  select the current cell tree. The current cell tree plays a role in some cases, for 
+  example for the layout operations available in the "Layout" submenu of the "Edit" menu.
+  </p>
+
+  <p>
+  In addition, three sorting modes are provided: alphabetically by name and by cell size
+  (bounding box area), descending and ascending. The cell size is supposed to reflect the 
+  design level: library and leaf cells are usually small which macro blocks are usually large. By
+  using cell size sorting in ascending order, the leaf cells will be shown first.
+  To change the sorting, check the corresponding option in the "Sorting" submenu of the
+  cell panel's context menu.
+  </p>
+
+</doc>

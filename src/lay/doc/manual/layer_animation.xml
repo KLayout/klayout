@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Animating Layers</title>
+  <keyword name="Layer display"/>
+  <keyword name="Layer properties"/>
+  <keyword name="Animation"/>
+
+  <p>
+  Layers can be animated, i.e. made blinking or the fill pattern scroll.
+  Select the layer or the layers for which to change the animation style
+  and choose the animation style from the "Animation" panel. For blinking
+  mode, two phases can be selected: "Blink" and "/Blink". Choosing
+  different phases for two layers makes the layers appear alternatively.
+  </p>
+
+</doc>

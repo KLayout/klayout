@@ -1,0 +1,22 @@
+# <test>
+#   <name>t1.3.ot</name>
+#   <content-description>Empty file (no cell, just header)</content-description>
+#   <test-intention>Basic reader capabilities</test-intention>
+#   <test-intention>Real data type 4 (for database unit)</test-intention>
+#   <test-intention>Database unit setting</test-intention>
+#   <content>
+#     begin_lib 0.4
+#     end_lib
+#   </content>
+# </test>
+
+header 
+# parts of START record
+real 4 10.0 4.0
+uint 0 ;# offset table is in start record
+for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# no body.
+
+tail
+

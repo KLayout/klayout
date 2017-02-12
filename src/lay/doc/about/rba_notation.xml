@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Notation used in Ruby API documentation</title>
+
+  <h2-index/>
+
+  <h2>Introduction</h2>
+
+  <p>
+  The documentation of the Ruby API is derived from the C++ declaration of the specific methods.
+  Hence the notation deviates somewhat from the usual documentation of Ruby methods. 
+  In particular the following differences are noteworthy:
+  </p>
+
+  <ul>
+    <li>
+      <p><b>"Static" methods are "class methods":</b></p>
+      <p>The C++ term "static" refers to methods available within a class
+      without requiring an object. In Ruby, the term "class method" is commonly used to refer to such methods.
+      </p>
+    </li>
+    <li>
+      <p><b>Different flavors of object arguments:</b></p>
+      <p>In C++ there are references, pointers and objects passed by
+      value. In Ruby there are only references. RBA maps the C++ concepts to ruby by allowing the "nil" value only
+      for pointer arguments. Pointer arguments are specially marked in the documentation.
+      </p>
+    </li>
+    <li>
+      <p><b>There is "constness":</b></p>
+      <p>C++ has the concept of "const" methods and arguments. In C++, an object reference
+      can be "const", which means that the object behind such a reference cannot be modified. A "const" method
+      is a method which can be called on "const" object reference and such a method may not alter the state of the
+      object.</p>
+      <p>A method can have "const" reference arguments which means that objects passed through such arguments
+      are not modified by the method. Such arguments are also said to have "in" semantics. Hence, "const" references
+      can be passed to such arguments. In Ruby there is no concept of "constness" or "in" parameters. Every method is
+      allowed to alter the state of the object it is called on and pf the objects it gets as arguments. In that sense, 
+      C++ allows specification of a more constraint "contract" between caller and method that is called. RBA emulates constness
+      in Ruby to some extent and it may disallow calling non-const methods on const references or passing const reference
+      to non-const arguments. Return value can also be const pointers which means that the object returned
+      cannot be modified.
+      </p>
+    </li>
+    <li>
+      <p><b>Strong typing:</b></p>
+      <p>In C++, arguments and return values are strongly typed. RBA will check the arguments passed
+      to a method and convert them properly. Hence the type of argument is important. "int" type arguments may not be passed
+      strings for example.</p>
+      <p>The type system if C++ is also somewhat more restricted: the value range of an integer argument is 
+      limited and for example there are unsigned types which cannot be passed negative values. Hence the type of an 
+      argument is noted in the documentation. A particular return type is "void" which basically means "no value returned".
+      Strong typing extends to object references and RBA checks if an argument can be converted to the object required.
+      </p>
+    </li>
+    <li>
+      <p><b>Virtual methods:</b></p>
+      <p>In C++, a method must be virtual before it can be reimplemented by a derived class. In Ruby
+      all methods are virtual. Since reimplementing a non-virtual method does not have any effect in RBA, virtual methods
+      are marked as such.
+      </p>
+    </li>
+  </ul>
+
+  <h2>General layout of the documentatation</h2>
+
+  <p>The documentation states the following methods (in that order):</p>
+
+  <ul>
+    <li>Public constructors</li>
+    <li>Public methods</li>
+    <li>Public static methods and constants</li>
+    <li>Protected methods (static, non-static and constructors)</li>
+    <li>Deprecated methods (protected, public, static, non-static and constructors)</li>
+  </ul>
+
+  <p>Deprecated methods are listed for reference only. Use of such methods or constants is not recommended because
+  they might be removed in the future.</p>
+
+  <h2>Examples</h2>
+
+  <p>Here are some examples for method documentations (signatures):</p>
+
+  <ul>
+    <li>
+      <p><b><i>[virtual]</i> bool event(QEvent ptr arg1)</b>:</p>
+      <p>A virtual method called "event" returning a boolean value 
+      (Ruby "true" or "false") and expecting one argument (a pointer to a QEvent object).
+      "ptr" indicates that the argument is a pointer, "arg1" is the argument name.
+      </p>
+    </li>
+    <li>
+      <p><b>void add_reference(const RdbReference rdb_ref)</b>:</p>
+      <p>A method without return value which expects one parameter.
+      The parameter must be a reference to the RdbReference object. The reference must not be nil since it is not a pointer,
+      but can be a reference to a const object. The name of the argument is "rdb_ref".</p>
+    </li>
+    <li>
+      <p><b><i>[const]</i> unsigned int num_items</b>:</p>
+      <p>A parameterless const method called "num_items" that delivers the number of items as an unsigned
+      integer value.</p>
+    </li>
+    <li>
+      <p><b><i>[iter]</i> RdbReference each_reference</b>:</p>
+      <p>An iterator called "each_reference" delivering RdbReference objects.</p>
+    </li>
+    <li>
+      <p><b><i>[event]</i> void layoutAboutToBeChanged</b>:</p>
+      <p>A parameterless event called "layoutAboutToBeChanged". 
+      </p>
+    </li>
+  </ul>
+
+</doc>
+

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Choosing A Layer Color</title>
+  <keyword name="Layer display"/>
+  <keyword name="Layer color"/>
+  <keyword name="Display specification"/>
+  <keyword name="Layer properties"/>
+
+  <p>
+  Select the layer or the layers for which to change the color and open
+  the color chooser panel in the layer panel to the right. If the color
+  chooser is not visible, select the small check box in the "Color"
+  header bar. Then the color chooser is expanded.
+  </p>
+  <p>
+  To change the color, click on the desired color. To select a color not
+  offered in the list, select the "More Colors" button. A color choose
+  dialog will open.
+  </p>
+  <p>
+  To choose the color of the frame to draw around the shapes, without
+  changing the fill color, use the "Frame Color" chooser panel. 
+  </p>
+  <p>
+  Layers can be "dimmed" by making their color darker or brighter so they
+  contrast less with the background. To do so, choose "Dark" or "Bright" 
+  from the color panel. Pressing the button multiple times makes the
+  colors darker or brighter each time. The brightness or darkness can be 
+  reset with the "Reset" button.
+  </p>
+
+</doc>
+

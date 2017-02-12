@@ -1,0 +1,181 @@
+# <test>
+#   <name>t11.5.ot</name>
+#   <content-description>Various repeated shapes with properties</content-description>
+#   <test-intention>Properties reader capabilities</test-intention>
+#   <test-intention>PROPERTY record reading on repeated shapes</test-intention>
+#   <test-intention>PROPSTRING record reading</test-intention>
+#   <test-intention>PROPNAME record reading</test-intention>
+#   <test-intention>Property string references by ID</test-intention>
+#   <test-intention>Property name references by ID</test-intention>
+#   <test-intention>Forward references</test-intention>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Cell A
+record CELL_STR
+  str A 
+
+record XYRELATIVE
+
+record RECTANGLE
+  bits 01100111 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  uint 1        ;# repetition (3x2 matrix)
+    uint 1       
+    uint 0
+    uint 300
+    uint 320
+
+record PROPERTY 
+  bits 00000100 ;# property info byte UUUUVCNS
+  str PROPX
+
+record RECTANGLE
+  bits 01111111 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 0   
+  int 1000
+  uint 0        ;# repetition (reuse)
+
+record PROPERTY 
+  bits 00010110 ;# property info byte UUUUVCNS
+  uint 0
+  real 1 -5     ;# prop value #0
+
+record RECTANGLE
+  bits 01111111 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 0   
+  int 1000
+  uint 0        ;# repetition (reuse)
+
+record PROPERTY 
+  bits 01000110 ;# property info byte UUUUVCNS
+  uint 0        ;# propname-id
+  uint 8        ;# prop-value #0 (unsigned int)
+    uint 25   
+  uint 9        ;# prop-value #1 (signed int)
+    int -124
+  uint 10       ;# prop-value #2 (a-string)
+    str PROP_VALUE2
+  uint 13       ;# prop-value #3 (prop-string reference number)
+    uint 12
+
+record RECTANGLE
+  bits 01111111 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 0   
+  int 1000
+  uint 0        ;# repetition (reuse)
+
+record PROPERTY 
+  bits 11110000 ;# property info byte UUUUVCNS
+  uint 3        ;# number of values
+  uint 0        ;# prop-value #0 (real as unsigned int)
+    uint 25   
+  uint 9        ;# prop-value #1 (signed int)
+    int -124
+  uint 14       ;# prop-value #2 (prop-string reference number)
+    uint 13
+
+record RECTANGLE
+  bits 01111111 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 0   
+  int 1000
+  uint 0        ;# repetition (reuse)
+
+record PROPERTY 
+  bits 00001000 ;# property info byte UUUUVCNS
+
+record XYABSOLUTE
+
+record TEXT
+  bits 01011111 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 2        ;# text-layer
+  uint 1        ;# text-datatype
+  int 1000
+  int 0
+  uint 0        ;# repetition (reuse)
+
+record PROPERTY_REP
+
+record PATH
+  bits 11111111 ;# EWPXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 10       ;# half-width
+  bits 00001111 ;# extension-scheme SSEE
+    int 5      
+    int -5
+  uint 0        ;# pointlist: 1-delta (hor. first)
+    uint 3 
+    int 150
+    int 50
+    int -50
+  int 2000      ;# geometry-x 
+  int 0         ;# geometry-y 
+  uint 0        ;# repetition (reuse)
+
+record PROPERTY_REP
+
+record POLYGON
+  bits 00111111 ;# 00PXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 0        ;# pointlist: 1-delta (hor. first)
+    uint 4   
+    int 150
+    int 50
+    int -50
+    int 50
+  int 3000      ;# geometry-x 
+  int 0         ;# geometry-y 
+  uint 0        ;# repetition (reuse)
+
+record PROPERTY_REP
+
+record PROPERTY 
+  bits 00000110 ;# property info byte UUUUVCNS
+  uint 1        ;# propname-id
+
+# property string 12
+record PROPSTRING_ID
+  str PropStringId12
+  uint 12
+
+# property string 13
+record PROPSTRING_ID
+  str {Property string value for ID 13}
+  uint 13
+
+# property name 0
+record PROPNAME
+  str PROP0 
+
+# property name 1
+record PROPNAME
+  str PROP1 
+
+tail
+

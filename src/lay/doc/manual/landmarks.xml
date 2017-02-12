@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Using Landmarks To Align Images</title>
+  <keyword name="Images"/>
+  <keyword name="Landmarks"/>
+  <keyword name="Image alignment"/>
+
+  <p>
+  "Landmarks" are arbitrary positions in the image. You can define such positions graphically in an image
+  and then, within the layout view, use the defined landmarks as handles to align an image with a layout.
+  Depending on the number of landmarks defined, you can use this feature to compensate the shift of an image,
+  rotation, shear or even perspective distortion. 
+  </p>
+
+  <p>
+  Landmarks are defined in the landmark editor. Open the landmark editor by pressing the "Define" button
+  in the image properties dialogs.
+  </p>
+
+  <p>
+  The landmarks editor shows the image in the left panel and a list of the landmarks already defined 
+  int the right panel. You can zoom around the image view using the same methods than in KLayout's
+  layout view (mouse wheel, middle mouse button, zoom box with right mouse button).
+  </p>
+
+  <p>
+  To add a landmark choose "Add" mode. Then click at the desired position of the new
+  landmark. It will be shown in the image as a small target cross symbol. 
+  To delete a landmark, choose "Delete" mode and click on the landmark to delete.
+  You can also select a landmark from the list and enter Delete mode. In that case,
+  the currently selected landmarks are deleted. 
+  </p>
+
+  <p>
+  To move a landmark, enter "Move" mode and move the landmark. Please note that the
+  move operations follows KLayouts "pick and place" philosophy, so you have to click
+  with the mouse twice: once to pick the landmark and second to drop it. The advantage
+  of this approach is that you can zoom while dragging the landmark.
+  </p>
+
+  <p>
+  It does not make much sense to define more than 4 landmarks because for more
+  the transformation derived from the landmarks is overdetermined. For best 
+  accuracy it is important to select landmark positions that span a large region.
+  In particular, landmarks should not be too close and three landmarks should
+  not form a line.
+  </p>
+
+  <p>
+  Dependent on the number of landmarks, KLayout can adjust the following 
+  parameters of the image:
+  </p>
+
+  <ul>
+    <li><b>1 Landmark</b>: displacement</li>
+    <li><b>2 Landmarks</b>: displacement, rotation and magnification</li>
+    <li><b>3 Landmarks</b>: displacement, rotation, magnification and shear</li>
+    <li><b>4 Landmarks</b>: displacement, rotation, magnification, shear and perspective distortion</li>
+  </ul>
+
+  <p>
+  Once the landmarks are defined, they can be used to adjust the image's display transformation.
+  To do so, enter "Move" move in KLayout. When the mouse is over the image, the landmark symbols are 
+  shown and can be picked with the mouse. When you pick up a landmark and move the mouse, KLayout will
+  adjust the image transformation and display the image frame according to the new transformation.
+  When you drop the landmark, the image will be transformed accordingly.
+  </p>
+
+  <p>
+  Depending on the number of landmarks, KLayout can adjust either some or all transformation parameters
+  such as displacement, angle etc. such that the other landmarks stay on the same position. 
+  In some cases that may not be desired. For example, if four landmarks are defined and one of them
+  is moved, the result may be an extreme perspective distortion. Usually one would do a coarse adjustment
+  by roughly adjusting the position and magnification and use the perspective transformation only to 
+  fine-adjust the image finally. 
+  </p>
+
+  <p>
+  Hence, KLayout allows reduction of the degree of freedom it has when adjusting the transformation.
+  While you drag a landmark, you can use these modifier keys:
+  </p>
+
+  <ul>
+    <li><b>Shift</b>: Only adjust displacement</li>
+    <li><b>Ctrl</b>: Adjust displacement, rotation and magnification</li>
+    <li><b>Shift+Ctrl</b>: Adjust displacement, rotation, magnification and shear</li>
+  </ul>
+
+</doc>
+
+

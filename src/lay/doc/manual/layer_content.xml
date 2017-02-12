@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Telling Used From Unused Layers</title>
+  <keyword name="Layer properties"/>
+  <keyword name="Used layers"/>
+
+  <p>
+  In some applications, the layer list will grow very large and keeping track
+  of the important layers may be hard. KLayout provides support for that task 
+  in two ways: KLayout checks whether a layer carries any information 
+  and displays the layers in a different way in the layer list, if it is empty.
+  </p>
+
+  <p>
+  Two ways of checking the information content of a layer are provided: either a layer is said to be 
+  empty if the current cell does not have any shapes on it. Alternatively, a layer can be 
+  identified to be empty by checking if any shape is shown in the current view (more precisely if
+  any shape's bounding box overlaps with the current view rectangle). The latter mode can be selected
+  in the layer list's context menu with the option "Test For Shapes in View".
+  </p>
+
+  <p>
+  If a layer is determined to be empty, it is either grayed out or it is now shown at all.
+  The latter option keeps the layer list short and is selected with "Hide Empty Layers" from the
+  layer list's context menu.
+  </p>
+
+</doc>
+

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Layout Transformations</title>
+  <keyword name="Layout Transformations"/>
+  <keyword name="Layout Scaling"/>
+
+  <p>
+  Some functions are available to transform a whole layout. Whole-layout 
+  transformations are applied to all cells in a way that every cell will 
+  be modified in the same way. This feature is specifically useful for scaling
+  layouts. It is worth noting that scaling a layout this way does not produce
+  instances with magnifications.
+  </p>
+
+  <p>
+  The layout transformation functions are available in "Edit/Layout" (flip, rotate, scale, move).
+  </p>
+
+</doc>
+

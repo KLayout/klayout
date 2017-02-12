@@ -1,0 +1,26 @@
+# <test>
+#   <name>t2.1.ot</name>
+#   <content-description>A single, empty cell</content-description>
+#   <test-intention>Basic reader capabilities</test-intention>
+#   <test-intention>CELL record reading</test-intention>
+#   <test-intention>Cell name specification by string</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     begin_cell {XYZ}
+#     end_cell
+#     end_lib
+#   </content>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+record CELL_STR
+  str XYZ
+
+# no body.
+
+tail
+

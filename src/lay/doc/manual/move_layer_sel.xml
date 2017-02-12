@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Moving Shapes To A Different Layer</title>
+  <keyword name="Editing"/>
+
+  <p>
+  The selected shapes can be moved to a different layer as a whole.
+  For this, choose "Change Layer" from the "Selection" submenu of the "Edit" menu.
+  All selected shapes are moved to the layer that is the current one (marked with a rectangle) in the layer list.
+  The shapes will not be moved across the hierarchy but just inside their cell.
+  </p>
+  <p>
+  All layers (source and target) must be located in the same layout. To move shapes to a 
+  different layout, use copy &amp; paste.
+  </p>
+
+</doc>
+

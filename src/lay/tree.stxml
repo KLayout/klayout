@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<html xmlns:x="www.klayout.de/layout-statistics-template">
+  <body>
+    <x:query expr=".*(.*)*" max="1000">
+      <x:each>
+        $("&#160;"*(hier_levels*4))<img src=":/st/st_plus_node.png"/>&#160;$(cell_name)  <br/>
+      </x:each>
+      <x:max>
+        <br/><i>.. Tree has been shortened (more than 1000 entries) ..</i>
+      </x:max>
+    </x:query>
+  </body>
+</html>

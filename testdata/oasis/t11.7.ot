@@ -1,0 +1,84 @@
+# <test>
+#   <name>t11.7.ot</name>
+#   <content-description>File-Level properties</content-description>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+record PROPERTY
+  bits 00010100 ;# UUUUVCNS
+  str FileProp1
+  uint 10       ;# prop-value #2 (a-string)
+    str FileProp1Value
+
+record PROPERTY
+  bits 00010110 ;# UUUUVCNS
+  uint 13
+  uint 10       ;# prop-value #2 (a-string)
+    str FileProp1Value
+
+# property name 13
+record PROPNAME_ID
+  str FileProp2
+  uint 13
+
+# ignored (associated with PROPNAME)
+record PROPERTY
+  bits 00010110 ;# UUUUVCNS
+  uint 13
+  uint 8        ;# prop-value #0 (unsigned int)
+    uint 17   
+
+# property string 12
+record PROPSTRING_ID
+  str FileProp2Value
+  uint 12
+
+# ignored (associated with PROPSTRING)
+record PROPERTY
+  bits 00010110 ;# UUUUVCNS
+  uint 13
+  uint 8        ;# prop-value #0 (unsigned int)
+    uint 42   
+
+# A cellname records
+record CELLNAME 
+  str A
+
+# property associated with cell A through CELLNAME
+record PROPERTY
+  bits 00010100 ;# UUUUVCNS
+  str CellProp0
+  uint 10       ;# prop-value #0 (string)
+    str CPValue0
+
+# Cell A
+record CELL_ID
+  uint 0
+
+# property associated with cell A
+record PROPERTY
+  bits 00010100 ;# UUUUVCNS
+  str CellProp1
+  uint 10       ;# prop-value #0 (string)
+    str CPValue    
+
+# property associated with cell A
+record PROPERTY
+  bits 00011100 ;# UUUUVCNS
+  str CellProp2
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 300       ;# geometry-x (absolute)
+  int -400      ;# geometry-y (absolute)
+
+tail
+

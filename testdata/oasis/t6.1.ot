@@ -1,0 +1,148 @@
+# <test>
+#   <name>t6.1.ot</name>
+#   <content-description>A single cell with a variety of paths</content-description>
+#   <test-intention>Geometrical objects reader capabilities</test-intention>
+#   <test-intention>PATH record reading</test-intention>
+#   <test-intention>Repetitions of paths</test-intention>
+#   <test-intention>Path-related modal variables</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     begin_cell {ABC}
+#     path 1 2 20 5 -5 {0 100} {150 100} {150 150} {100 150}
+#     path 1 2 20 5 -5 {0 300} {150 300} {150 350} {100 350}
+#     path 1 2 20 0 -5 {0 500} {150 500} {150 550} {100 550}
+#     path 1 2 24 0 0 {0 700} {150 700} {150 750} {100 750}
+#     path 1 2 24 12 12 {0 900} {150 900} {150 950} {100 950}
+#     path 2 3 24 12 12 {0 1100} {150 1100} {150 1150} {100 1150}
+#     path 2 3 24 12 12 {0 1300} {150 1300} {150 1350} {100 1350}
+#     path 2 3 24 12 12 {200 1300} {350 1300} {350 1350} {300 1350}
+#     path 2 3 24 12 12 {400 1300} {550 1300} {550 1350} {500 1350}
+#     path 2 3 24 12 12 {0 1600} {150 1600} {150 1650} {100 1650}
+#     path 2 3 24 12 12 {200 1600} {350 1600} {350 1650} {300 1650}
+#     path 2 3 24 12 12 {400 1600} {550 1600} {550 1650} {500 1650}
+#     path 2 3 24 12 12 {0 1900} {150 1900} {150 1950} {100 1950}
+#     path 2 3 24 12 12 {200 1900} {350 1900} {350 1950} {300 1950}
+#     path 2 3 24 12 12 {400 1900} {550 1900} {550 1950} {500 1950}
+#     path 2 3 24 12 12 {0 2200} {150 2200} {150 2250} {100 2250}
+#     path 2 3 24 12 12 {200 2200} {350 2200} {350 2250} {300 2250}
+#     path 2 3 24 12 12 {400 2200} {550 2200} {550 2250} {500 2250}
+#     path 1 3 24 12 12 {1000 1300} {1150 1300} {1150 1350} {1100 1350}
+#     path 1 3 24 12 12 {1200 1300} {1350 1300} {1350 1350} {1300 1350}
+#     path 1 3 24 12 12 {1400 1300} {1550 1300} {1550 1350} {1500 1350}
+#     path 1 3 24 12 12 {1000 1600} {1150 1600} {1150 1650} {1100 1650}
+#     path 1 3 24 12 12 {1200 1600} {1350 1600} {1350 1650} {1300 1650}
+#     path 1 3 24 12 12 {1400 1600} {1550 1600} {1550 1650} {1500 1650}
+#     path 1 3 24 12 12 {1000 1900} {1150 1900} {1150 1950} {1100 1950}
+#     path 1 3 24 12 12 {1200 1900} {1350 1900} {1350 1950} {1300 1950}
+#     path 1 3 24 12 12 {1400 1900} {1550 1900} {1550 1950} {1500 1950}
+#     path 1 3 24 12 12 {1000 2200} {1150 2200} {1150 2250} {1100 2250}
+#     path 1 3 24 12 12 {1200 2200} {1350 2200} {1350 2250} {1300 2250}
+#     path 1 3 24 12 12 {1400 2200} {1550 2200} {1550 2250} {1500 2250}
+#     end_cell
+#     end_lib
+#   </content>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Cell ABC
+record CELL_STR
+  str ABC 
+
+record PATH
+  bits 11111011 ;# EWPXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 10       ;# half-width
+  bits 00001111 ;# extension-scheme SSEE
+    int 5      
+    int -5
+  uint 0        ;# pointlist: 1-delta (hor. first)
+    uint 3 
+    int 150
+    int 50
+    int -50
+  int 0         ;# geometry-x (absolute)
+  int 100       ;# geometry-y (absolute)
+
+record XYRELATIVE
+
+record PATH
+  bits 11101011 ;# EWPXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 10       ;# half-width
+  bits 00000000 ;# extension-scheme SSEE
+  uint 0        ;# pointlist: 1-delta (hor. first)
+    uint 3 
+    int 150
+    int 50
+    int -50
+  int 200       ;# geometry-y (relative)
+
+record PATH
+  bits 11101001 ;# EWPXYRDL
+  uint 1        ;# layer
+  uint 10       ;# half-width
+  bits 00000100 ;# extension-scheme SSEE
+  uint 0        ;# pointlist: 1-delta (hor. first)
+    uint 3 
+    int 150
+    int 50
+    int -50
+  int 200       ;# geometry-y (relative)
+
+record PATH
+  bits 11101010 ;# EWPXYRDL
+  uint 2        ;# datatype
+  uint 12       ;# half-width
+  bits 00000101 ;# extension-scheme SSEE
+  uint 0        ;# pointlist: 1-delta (hor. first)
+    uint 3 
+    int 150
+    int 50
+    int -50
+  int 200       ;# geometry-y (relative)
+
+record PATH
+  bits 10101011 ;# EWPXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  bits 00001010 ;# extension-scheme SSEE
+  uint 0        ;# pointlist: 1-delta (hor. first)
+    uint 3 
+    int 150
+    int 50
+    int -50
+  int 200       ;# geometry-y (relative)
+
+record PATH
+  bits 00001011 ;# EWPXYRDL
+  uint 2        ;# layer
+  uint 3        ;# datatype
+  int 200       ;# geometry-y (relative)
+
+record PATH
+  bits 00001111 ;# EWPXYRDL
+  uint 2        ;# layer
+  uint 3        ;# datatype
+  int 200       ;# geometry-y (relative)
+  uint 1        ;# repetition (3x4 matrix)
+    uint 1       
+    uint 2
+    uint 200
+    uint 300
+
+record XYRELATIVE
+
+record PATH
+  bits 00010101 ;# EWPXYRDL
+  uint 1        ;# datatype
+  int 1000      ;# geometry-x (relative)
+  uint 0        ;# repetition (reuse)
+
+tail
+

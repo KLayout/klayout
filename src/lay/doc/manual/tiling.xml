@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>The Fill (Tiling) Utility</title>
+  <keyword name="Tiling"/>
+  <keyword name="Fill"/>
+
+  <p>
+  The fill utility creates a regular pattern of fill unit cell instances in certain areas of a layout.
+  This feature is usually referred to as "tiling" or "fill". It is based on a rectangular unit cell which 
+  is repeated in x- and y-direction to fill the available space. In most cases, the intention is to 
+  fill empty areas in the layout to enhance the layout uniformity for a better process performance.
+  </p>
+
+  <p>
+  Before the fill utility can be used, a fill cell must be prepared in the layout that is filled. The dimension of
+  the cell are defined by a box drawn on an arbitrary layer. This box must represent the "footprint" of the cell.
+  This is the space that one instance will cover in the region to be filled.
+  </p>
+
+  <p>
+  The fill utility is found in the "Utilities" sub-menu of the "edit" menu and is available in edit mode only.
+  To use this utility, open the dialog and
+  </p>
+
+  <ul>
+    <li>Select the outer boundary of the fill region ("what to fill"). Available choices are: Full cell, the interior or 
+        the polygons on a given layer, the interior of all selected polygons, a single box or an area defined by
+        a ruler.
+    </li>
+    <li>Specify if the fill area should keep a certain minimum distance to the border of the fill region.</li>
+    <li>Specify the regions within the fill region which must not be filled. Available choices are: All layers
+        (don't create fill over any polygon drawn), all visible layers (don't create fill over any polygon visible),
+        all selected layers or don't exclude anything.
+    </li>
+    <li>If the fill tiles must keep a certain minimum distance from the exclude regions, specify that distance
+        in the "Spacing around exclude areas" entry field.</li>
+    <li>Specify the fill cell and the boundary layer which defines the cell's footprint in the "Fill Cell" group.</li>
+  </ul>
+
+  <p>
+  By default, the fill utility operates on a fixed raster. This can lead to a poor fill efficiency in some cases.
+  The fill utility offers a "Enhanced fill" option, where it tries to find a cell arrangement which is not 
+  necessarily on a common raster but provides a better fill performance.
+  In addition, second-order fill is supported. In that case, a second - usually smaller - fill cell can be 
+  specified which is used to fill the remaining areas of the layout.
+  </p> 
+
+  <p>
+  The following screenshots show the effect of the different fill modes for some artificial fill 
+  problem.
+  </p>
+
+  <table>
+    <tr valign="top"><td><p>Default:</p></td><td width="5%"/><td><img src="/manual/fill_default.png"/></td></tr>
+    <tr valign="top"><td><p>Enhanced:</p></td><td width="5%"/><td><img src="/manual/fill_enhanced.png"/></td></tr>
+    <tr valign="top"><td><p>Enhanced plus<br/>second order:</p></td><td width="5%"/><td><img src="/manual/fill_second_order.png"/></td></tr>
+  </table>
+
+</doc>
+

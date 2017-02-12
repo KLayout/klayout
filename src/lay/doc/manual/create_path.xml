@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Creating A Path</title>
+  <keyword name="Drawing"/>
+  <keyword name="Path"/>
+
+  <p>
+  Select "Path" mode from the toolbar. The editor options dialog will open that additionally prompts for 
+  basic path parameters, such as width and extension scheme. When a path is being drawn, it will receive
+  the settings entered into this dialog. The path properties can even be changed, while the path is 
+  being drawn. Don't forget to click "Apply" to take over the current entries. If the dialog has been
+  closed unintentionally, it can be reopened with the F3 shortcut.
+  </p>
+
+  <p>
+  To actually draw a path, 
+  choose a layer from the layer panel in which to create a new box. 
+  Left click at the first vertex, move the mouse to the second vertex, click to place this one and continue 
+  to the last vertex. Double-click at the last vertex to finish the path. Press the ESC key to cancel the operation.
+  </p>
+
+  <p>
+  For paths, as for polygons, the segments created are subject to certain direction restrictions as 
+  imposed by the connection angle constraints. 
+  See <link href="/manual/editor_options.xml"/> 
+  for a detailed description of the modes. Use the "editor options" dialog (F3 shortcut) to change the mode,
+  also during editing.
+  </p>
+
+</doc>
+

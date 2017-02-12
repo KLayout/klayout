@@ -1,0 +1,68 @@
+<ui version="4.0" >
+ <class>LayoutViewConfigPage3a</class>
+ <widget class="QFrame" name="LayoutViewConfigPage3a" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>556</width>
+    <height>152</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Settings</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="buttonGroup6" >
+     <property name="title" >
+      <string>On Cell Change</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>11</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="0" column="0" >
+       <widget class="QCheckBox" name="fit_new_cell_cbx" >
+        <property name="text" >
+         <string>Fit window to cell when cell is changed</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QCheckBox" name="full_hier_new_cell_cbx" >
+        <property name="text" >
+         <string>Select all hierarchy levels</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QCheckBox" name="clear_ruler_new_cell_cbx" >
+        <property name="text" >
+         <string>Clear all rulers</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <tabstops>
+  <tabstop>fit_new_cell_cbx</tabstop>
+  <tabstop>full_hier_new_cell_cbx</tabstop>
+  <tabstop>clear_ruler_new_cell_cbx</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

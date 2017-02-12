@@ -1,0 +1,64 @@
+# <test>
+#   <name>t12.1.ot</name>
+#   <content-description>A single cell with a variety of circles</content-description>
+#   <test-intention>Geometrical objects reader capabilities</test-intention>
+#   <test-intention>CIRCLE record reading</test-intention>
+#   <test-intention>Repetitions of circles</test-intention>
+#   <test-intention>Circle-related modal variables</test-intention>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Cell A
+record CELL_STR
+  str A 
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 150      ;# radius
+  int -100      ;# geometry-x (absolute)
+  int 200       ;# geometry-y (absolute)
+
+record XYRELATIVE
+
+record CIRCLE
+  bits 00001000 ;# 00rXYRDL
+  int 400       ;# geometry-y (relative)
+
+record CIRCLE
+  bits 00101000 ;# 00rXYRDL
+  uint 0        ;# radius
+  int 400       ;# geometry-y (relative)
+
+record CIRCLE
+  bits 00101000 ;# 00rXYRDL
+  uint 1        ;# radius
+  int 400       ;# geometry-y (relative)
+
+record CIRCLE
+  bits 00101000 ;# 00rXYRDL
+  uint 6        ;# radius
+  int 400       ;# geometry-y (relative)
+
+record CIRCLE
+  bits 00101000 ;# 00rXYRDL
+  uint 20       ;# radius
+  int 400       ;# geometry-y (relative)
+
+record CIRCLE
+  bits 00101100 ;# TWHXYRDL
+  uint 100      ;# radius
+  int 400       ;# geometry-y (relative)
+  uint 1        ;# repetition (3x4 matrix)
+    uint 1       
+    uint 2
+    uint 400
+    uint 300
+
+tail
+

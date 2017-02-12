@@ -1,0 +1,302 @@
+<ui version="4.0" >
+ <class>LayoutViewConfigPage7</class>
+ <widget class="QFrame" name="LayoutViewConfigPage7" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>791</width>
+    <height>323</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Application Settings</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Oversampling</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Use oversampling:  </string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QComboBox" name="oversampling" >
+        <item>
+         <property name="text" >
+          <string>No oversampling</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>2x oversampling</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>3x oversampling</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="2" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="0" colspan="3" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Oversampling increases the image quality by using an internal resolution larger than the image resolution. Drawing speed is somewhat reduced and lines may appear thinner.</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4" >
+     <property name="title" >
+      <string>Default Font Size</string>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Font size for "Default" font and rulers</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="default_font_size" >
+        <item>
+         <property name="text" >
+          <string>Small</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Medium</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Large</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
+      <string>Global Transformation</string>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Transform the view globally with</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="global_trans" >
+        <item>
+         <property name="text" >
+          <string>(r0)</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/r0.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>(r90)</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/r90.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>(r180)</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/r180.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>(r270)</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/r270.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>(m0)</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/m0.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>(m45)</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/m45.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>(m90)</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/m90.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>(m135)</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/m135.png</iconset>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3" >
+     <property name="title" >
+      <string>Hierarchy Depth</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_13" >
+        <property name="text" >
+         <string>Initial hierarchy depth when opening a new panel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QSpinBox" name="def_depth" >
+        <property name="maximum" >
+         <number>1000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="0" colspan="3" >
+       <widget class="QLabel" name="label_14" >
+        <property name="text" >
+         <string>(This setting is not active if "select all hierarchy levels on new cell" is checked on the "Navigation/New Cell" tab)</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <resources>
+  <include location="layResources.qrc" />
+ </resources>
+ <connections/>
+</ui>

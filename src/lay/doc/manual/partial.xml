@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Partial Editing</title>
+  <keyword name="Editing"/>
+  <keyword name="Partial mode"/>
+
+  <p>
+  When objects have to be modified after the have been created, partial editing comes into play. 
+  "Partial" refers to the fact that just parts of a polygon or path are edited. For example, just one
+  vertex or an edge of a polygon can be moved. Partial editing mode also allows deleting single vertices or
+  edges or to insert new ones. In partial editing mode, multiple edges or vertices can be selected, even a 
+  whole shape can be selected and can then be moved or deleted.
+  </p>
+
+  <p>
+  When moving the selected parts, the movement direction constraint applies. 
+  See <link href="/manual/editor_options.xml"/> for details about the modes
+  available. For example, in manhattan mode, only horizontal and vertical movements of parts are allowed.
+  Again, the global movement constraint can be overridden by pressing Shift (orthogonal), Ctrl (diagonal) or 
+  both Shift and Ctrl (any angle) while moving the mouse.
+  </p>
+
+  <p>
+  To enter partial mode, click on the "Partial" button in the toolbar.
+  Parts (edges or vertices) can then be selected either by simply clicking at them or by dragging a selection rectangle.
+  As in normal selection mode, the modifier buttons Shift and Ctrl can be used to add a selection to
+  the existing one or to remove elements from the existing selection. Partial selection is subject to the 
+  "top level only" constraint (see <link href="/manual/editor_options.xml"/> for a description of the top level selection mode).
+  </p>
+
+  <p>
+  Simply clicking at an item immediately enters "move" mode. In this mode, you can position the element at the desired
+  target location and place it there by left-clicking at the position. Press "ESC" to cancel the operation.
+  When a complex selection is made, move mode is entered by clicking at one of the selected items (the edges
+  or vertices, not the shape to which they belong). 
+  </p>
+
+  <p>
+  When moving parts, certain constraints apply, i.e. single edges can only be moved perpendicular to their
+  current position. In addition, the movement is confined to the editing grid.
+  </p>
+
+  <p>
+  The selected items can be deleted by using the "Delete" function from the "Edit" menu or pressing the "Delete"
+  key. If not enough vertices remain to form a valid object, the object is deleted (i.e. a polygon with
+  less then 3 points). 
+  </p>
+
+  <p>
+  By double-clicking at an edge or path segment, an additional point is created on this edge at the 
+  cursor's position. You can create a "bend" on a path by placing two new vertices on that segment
+  and moving the connecting segment between these vertices away from the former center line. This basically
+  requires two double-clicks on the path's centerline, a single click on the newly formed segment and
+  a single click to drop it at the new position.
+  </p>
+
+</doc>

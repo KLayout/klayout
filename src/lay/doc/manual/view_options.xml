@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Further View Options</title>
+  <keyword name="Options"/>
+
+  <p>
+  The "View" menu offers some more options to tune the display:
+  </p>
+
+  <ul>
+    <li>
+      <b>Show Grid</b>: This is a fast access method for the respective configuration option.
+      Unchecking this menu entry hides the grid lines and the scale bar.
+    </li>
+    <li>
+      <b>Grids</b>: this submenu allows fast access to the current grid setting. You can choose from
+      one of the default grids that are configured on the "Default Grids" page in the "Application"
+      section of the setup dialog. Grids are mainly used for editing geometry but also for snapping
+      rulers if they are configured to do so.
+    </li>
+    <li>
+      <b>Show Texts</b>: when this option is unchecked, texts are not drawn. That applies to 
+      text objects and user properties. Drawing is somewhat faster when texts are not drawn.
+    </li>
+    <li>
+      <b>Show Cell Frames</b>: when this option is unchecked, cell frames from hidden cells or
+      cell below the hierarchy levels selected are not drawn.
+    </li>
+    <li>
+      <b>Show Layers Without Fill</b>: when this option is checked, the shapes are drawn without
+      fill. Hence the layout is shown in a kind of wire frame. This option is intended to temporarily
+      disabling the fill pattern. Keeping this option checked may be confusing because setting a 
+      fill pattern may not have any effect then.
+    </li>
+    <li>
+      <b>Synchronized Views</b>: with this option, all views (tabs) in the main window are synchronized, i.e.
+      they show the same region of the layout. This option can be useful if two layouts are loaded in
+      different views for clarity, but identical regions need to be inspected.
+    </li>
+    <li>
+      <b>Select Top Level Objects</b>: this menu item gives a quick access to the respective editor
+      option. If this option is checked, only objects from the top level are selected. This is 
+      in particular important for editing because editing a subcell can cause effects in other 
+      places there that cell is instantiated but no edit is intended.
+    </li>
+    <li>
+      <b>Toolbar</b>, <b>Navigator</b>, ...: disable or enable the respective tool windows.
+    </li>
+    <li>
+      <b>Highlight Object Under Mouse</b>: with this option checked, the object under the mouse is
+      highlighted temporarily if the mouse hovers over that object.
+      Since that can be confusing in some (rare) cases, this menu item provides quick access to
+      that configuration option.
+    </li>
+  </ul>
+
+</doc>
+
+
+

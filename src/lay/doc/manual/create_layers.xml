@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Creating A New Layer</title>
+  <keyword name="Layer"/>
+
+  <p>
+  You can create new layers using the "Layer/New Layer" function from the "Edit" menu. You are prompted to enter 
+  GDS layer and datatype numbers and optionally an OASIS layer name. On "Ok", the layer will be created and will be inserted
+  into the layer panel. 
+  </p>
+
+</doc>
+

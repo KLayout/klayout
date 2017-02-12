@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Descending Into A Cell With Context</title>
+  <keyword name="Hierarchy"/>
+  <keyword name="Descend"/>
+
+  <p>
+  A cell can be shown either isolated (this is the default, if the cell is the current cell), 
+  embedded (as a subcell of the current cell) or as the current cell in the context of another direct or
+  indirect parent cell. In the latter mode, the cell is highlighted while the context cell is shown
+  in dimmed or another, user-defined color.
+  </p>
+  <p>
+  To highlight a cell in a context, first choose the context cell. Then select a shape or a cell instance
+  within the cell to show in the context and choose "Descend" from the "Display" menu or press "Ctrl+D". Now, the first child 
+  cell leading to the selected shape is highlighted, while the surrounding shapes of the parent cell (the
+  previous current cell) is shown in dimmed colors. Choose "Descend" repeatedly to descend further into the
+  hierarchy until the selected shape or instance is on the level of the current cell. The current cell is
+  show underlined in the cell tree, while the context cell is shown in bold font in the cell tree as usual.
+  </p>
+  <p>
+  The reverse of this operation is "Ascend" (or "Ctrl+A") available from the "Display" menu. 
+  </p>
+  <p> 
+  The way how the context layout is shown can be adjusted in the setup dialog on the "Background" tab.
+  </p>
+
+</doc>
+

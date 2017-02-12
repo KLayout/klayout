@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Choosing A Hierarchy Depth</title>
+  <keyword name="Hierarchy depth"/>
+  <keyword name="Display"/>
+
+  <p>
+  By default, only the bounding box of the cell selected is shown. This
+  corresponds to zero hierarchy levels being shown. 
+  </p>
+  <p>
+  To select more hierarchy levels, choose
+  </p>
+
+  <ul>
+    <li>"Full Hierarchy" from the "Display" menu or press the "*" key to
+  show all hierarchy levels</li>
+    <li>"Box Only" from the "Display" menu or press the "0" key to show
+        only the bounding box (the default)</li>
+    <li>"Top Level Only" from the "Display" menu or press the "1" key to
+        show the top level elements</li>
+    <li>"Increment Hierarchy" from the "Display" menu or press the "+"
+        key to show one more hierarchy level</li>
+    <li>"Decrement Hierarchy" from the "Display" menu or press the "-"
+        key to show one hierarchy level less</li>
+    <li>the hierarchy level entry fields below the cell list to change the
+        current minimum or maximum level</li>
+  </ul>
+
+</doc>

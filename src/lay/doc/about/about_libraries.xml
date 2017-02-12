@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>About Libraries</title>
+  <keyword>Library</keyword>
+  <keyword>Libraries</keyword>
+
+  <p>
+  Starting with version 0.22, KLayout offers a library concept. 
+  Libraries are a way to import cell layout into a layout from the outside and
+  thus a convenient way to provide standard building blocks for the layout. 
+  Using a cell from a library is easy: when asked for a cell, select
+  the library where to take the cell from and choose a cell from that
+  library. 
+  </p>
+
+  <p>
+  Libraries are basically just foreign layouts that are virtually linked
+  to the current layout. When a cell is imported from a library, it is 
+  copied into the current layout, so that the current layout by itself 
+  is a valid entity.
+  </p>
+
+  <p>
+  When a layout containing library references is saved, KLayout stores
+  some meta information in that file which allows it to restore the
+  library links and related informations.
+  For GDS, that meta information is stored in a separate top cell. For OASIS,
+  the meta information is stored in special per-cell properties.
+  For other formats, the meta information is not stored currently.
+  </p>
+
+  <p>
+  Libraries can be provided in several ways:
+  </p>
+
+  <ul>
+    <li><p><b>As ordinary layout files:</b> 
+      Such libraries are simple layout files (GDS, OASIS or other support format). KLayout looks up
+      those libraries in the "libraries" subfolders of the search path and gathers all layout files
+      it finds there into the library repository.</p>
+      <p>The search path usually includes the installation site (where the KLayout executable resides)
+      and the application folder (i.e. "~/.klayout" on Linux). Hence libraries can be installed
+      locally (i.e. in "~/.klayout/libraries") or globally (at the installation site). 
+      </p>
+      <p>
+      For GDS files, the library name will be the LIBNAME of the GDS file. Otherwise it will be the
+      name of the library file minus the extension.
+      </p>
+    </li>
+    <li><b>Coded libraries:</b>
+      Such libraries are provided by code, either through shared objects/DLL's or through Ruby code.
+      Basically such code has to provide a layout object containing the library cells. 
+      A coded library can also provide PCell's (parametrized cells) as library components.
+      Sell <link href="/about/about_pcells.xml"/> for details about parametrized cells.
+    </li>
+  </ul>
+
+  <p>
+  Libraries are loaded on startup and reside in memory while KLayout is running. Therefore, in 
+  order to update a library when the content has changed, KLayout must be restarted.
+  </p>
+
+</doc>
+

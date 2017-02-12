@@ -1,0 +1,31 @@
+# <test>
+#   <name>t3.11.ot</name>
+#   <content-description>A single cell with one text object</content-description>
+#   <test-intention>Geometrical objects reader capabilities</test-intention>
+#   <test-intention>TEXT record reading</test-intention>
+#   <test-intention>Access to uninitialised modal variable text-string</test-intention>
+#   <must-fail>Modal variable accessed before being defined: text-string</must-fail>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Text definition
+record TEXTSTRING
+  str A
+  
+# Cell ABC
+record CELL_STR
+  str ABC 
+
+record TEXT
+  bits 00011011 ;# 0CNXYRTL
+  uint 1        ;# text-layer
+  uint 2        ;# text-datatype
+  int 100       ;# text-x (abs)
+  int -200      ;# text-y (abs)
+
+tail 
+

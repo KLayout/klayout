@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LayoutViewConfigPage2c</class>
+ <widget class="QFrame" name="LayoutViewConfigPage2c">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>608</width>
+    <height>235</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Settings</string>
+  </property>
+  <layout class="QVBoxLayout">
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <property name="margin">
+    <number>9</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>How the selection is shown</string>
+     </property>
+     <layout class="QGridLayout">
+      <property name="margin">
+       <number>9</number>
+      </property>
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <item row="1" column="1">
+       <widget class="lay::DitherPatternSelectionButton" name="stipple_pb">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>pixel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6">
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>71</width>
+          <height>31</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="5">
+       <widget class="QLabel" name="textLabel2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>pixel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QSpinBox" name="lw_spinbx"/>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="textLabel1_2">
+        <property name="text">
+         <string>Line width</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>41</width>
+          <height>31</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="vs_lbl">
+        <property name="text">
+         <string>Vertex size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QSpinBox" name="vs_spinbx"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="lay::ColorButton" name="color_pb">
+        <property name="toolTip">
+         <string>The color in which the rulers are drawn</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="textLabel3_2">
+        <property name="text">
+         <string>Marker color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Marker fill</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="7">
+       <widget class="QCheckBox" name="halo_cb">
+        <property name="text">
+         <string>With halo</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>561</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="transient_mode_cb">
+     <property name="text">
+      <string>Transient mode (tracking of selectable objects under the mouse)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="sel_inside_pcells_cb">
+     <property name="text">
+      <string>PCell content is selectable (Caution: PCell recomputation may conflict with edits)</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>lay::DitherPatternSelectionButton</class>
+   <extends>QPushButton</extends>
+   <header>layWidgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>lay::ColorButton</class>
+   <extends>QPushButton</extends>
+   <header>layWidgets.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>color_pb</tabstop>
+  <tabstop>lw_spinbx</tabstop>
+  <tabstop>halo_cb</tabstop>
+  <tabstop>vs_spinbx</tabstop>
+  <tabstop>transient_mode_cb</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

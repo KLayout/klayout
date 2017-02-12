@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>About Variant Notation</title>
+
+  <p>
+  KLayout employs a certain notation to enter variant types. Variant types are data items which
+  are either numerical or text information and are used specifically for property names and values.
+  In that case, the type of information is important, and a simple edit box won't be sufficient to 
+  enter the information. For example, "1" could either be a text "1" or the number 1. To solve that
+  issue, KLayout uses the following notation:
+  </p>
+
+  <table>
+    <tr><th width="20%">Notation</th><th width="50%">Description</th><th>Example</th></tr>
+    <tr><td><tt>#</tt>...</td><td>An integer value</td><td><tt>#17</tt></td></tr>
+    <tr><td><tt>##</tt>...</td><td>A floating-point value</td><td><tt>##0.5</tt></td></tr>
+    <tr>
+      <td><tt>'</tt>...<tt>'</tt> or <tt>"</tt>...<tt>"</tt></td>
+      <td>A text string which can contain any character. 
+        You can use the backslash character to escape quotes if you want to use quotes in your text string. 
+        To use the backslash character inside the text, use a double backslash (\\).</td>
+      <td><tt>'A text'</tt><br/>
+        <tt>'A \'quoted text\''</tt><br/>
+        <tt>'A single \\ character'</tt>
+      </td>
+    </tr>
+    <tr><td>A word (letters, digits and the underscore)</td><td>Taken as a text string</td><td><tt>NAME</tt></td></tr>
+  </table>
+
+</doc>
+

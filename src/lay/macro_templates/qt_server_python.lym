@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Qt server sample (Python)\nThis sample turns KLayout into a HTTP server at port 8082</description>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+import re
+
+class MyServer(pya.QTcpServer):
+  """
+  Implements a TCP server listening on port 8082
+  This server will accept HTTP requests and deliver a HTML page containing an image
+  with the current snapshot. The idea is taken from the fortune cookie server 
+  in the Qt samples. See there for more documentation about Qt server and connection
+  objects.
+  """ 
+
+  def new_connection(self):
+    """
+    Handler for a new connection
+    """
+
+    try:
+
+      url = None
+    
+      # Get a new connection object
+      connection = self.nextPendingConnection()
+
+      # Read the request header
+      while connection.isOpen() and connection.state() == pya.QTcpSocket.ConnectedState:
+        if connection.canReadLine():
+          line = connection.readLine().decode("utf-8")
+          if line.rstrip('\n').rstrip('\r') == "":
+            break
+          else:
+            m = re.match("GET\\s+(.*)\\s+HTTP", line)
+            if not m is None:
+              url = pya.QUrl(m.groups()[0])
+        else:
+          connection.waitForReadyRead(100)
+
+      view = pya.Application.instance().main_window().current_view()
+
+      if url is None:
+        pass
+      elif url.path == "/screenshot.png":
+        # Deliver the image
+        if not view is None:
+          b = pya.QBuffer()
+          b.open(pya.QIODevice.WriteOnly)
+          view.get_image(800, 800).save(b, "PNG")
+          b.close()
+          connection.write(b.buffer())
+      # Deliver the HTML page
+      elif view:
+        connection.write("HTTP/1.0 200 OK\nContent-Type: text/html\n\n" + '&lt;html&gt;&lt;body&gt;&lt;img src="screenshot.png"/&gt;&lt;/body&gt;&lt;/html&gt;\n\n')
+      else:
+        connection.write("HTTP/1.0 200 OK\nContent-Type: text/html\n\n" + '&lt;html&gt;&lt;body&gt;No view open to take screenshot from&lt;/body&gt;&lt;/html&gt;\n\n')
+
+      # automatically delete when disconnected
+      # Note: we cannot use RBA signal bindings for that purpose because the Ruby object might get 
+      # deleted before the C++ object is. Hence we do it explicitly. 
+      connection.disconnectFromHost()
+      #connection.destroy()
+      signal = pya.qt_signal("disconnected()")
+      slot = pya.qt_slot("deleteLater()")
+      pya.QObject.connect(connection, signal, connection, slot)
+
+    except Exception as ex: 
+      print("ERROR " + str(ex))
+
+
+  def __init__(self, parent = None):
+    """
+    Initialize the server and put into listen mode (port is 8081)
+    """
+  
+    super(MyServer, self).__init__(parent)
+    
+    ha = pya.QHostAddress("0.0.0.0")
+    self.listen(ha, 8082)
+  
+    # install an event on a new connection
+    self.newConnection(self.new_connection)
+  
+
+# Start the screenshot server 
+server = MyServer()
+</text>
+</klayout-macro>

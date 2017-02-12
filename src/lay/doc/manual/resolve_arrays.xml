@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Resolving Arrays</title>
+  <keyword name="Resolve Arrays"/>
+
+  <p>
+  Instance arrays are handy to produce large regular arrangements of cells.
+  Sometimes it is necessary to resolve these arrays - for example to remove or 
+  modify a single instance from the array. One way to achieve that is to create
+  cell variants (see <link href="/manual/create_variants.xml"/>, but this feature
+  will also create a copy of the instantiated cell.
+  </p>
+  
+  <p>
+  The "Resolve Arrays" function available in "Edit/Selection" allows resolving
+  of an array into individual instances which then can be edited individually.
+  </p>
+
+</doc>
+

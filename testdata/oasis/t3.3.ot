@@ -1,0 +1,38 @@
+# <test>
+#   <name>t3.3.ot</name>
+#   <content-description>A single cell with one text object</content-description>
+#   <test-intention>Geometrical objects reader capabilities</test-intention>
+#   <test-intention>TEXT record reading</test-intention>
+#   <test-intention>Text string specification by ID</test-intention>
+#   <test-intention>Mixed implicit and explicit assignment for text string ID</test-intention>
+#   <must-fail>Explicit and implicit TEXTSTRING modes cannot be mixed</must-fail>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Text definition
+record TEXTSTRING_ID
+  str A
+  uint 1
+  
+# Text definition
+record TEXTSTRING
+  str B           ;# FAILS
+
+# Cell ABC
+record CELL_STR
+  str ABC 
+
+record TEXT
+  bits 01111011 ;# 0CNXYRTL
+  uint 1        ;# text-id
+  uint 1        ;# text-layer
+  uint 2        ;# text-datatype
+  int 100       ;# text-x (abs)
+  int -200      ;# text-y (abs)
+
+tail
+

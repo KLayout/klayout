@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Events And Callbacks</title>
+  <keyword name="Events"/>
+  <keyword name="Callbacks"/>
+
+  <h2-index/>
+
+  <h2>Introduction</h2>
+
+  <p>
+  In some places, the API requires to attach code to an event. An event could be a menu item which is selected
+  or a change of some status which might require some action. The API allows implementation of specific code which is
+  called in that case. This enables us to implement initialisation functionality for example or the functionality
+  behind a menu item. In this text we will refer to such functionality by the general term "callback". In general
+  a callback is custom code that is called from the API in contrast to API code that is called from the custom code.
+  </p>
+
+  <p>
+  There are basically two ways to attach specific code to a callback:
+  </p>
+
+  <ul>
+    <li><b>Reimplementation (Strategy Pattern)</b>: some API classes provide "virtual" methods. "virtual" is a C++ term and 
+    means a method that can be overridden in a derived class. This technique is employed for example in the
+    "Strategy" design pattern. In strictly typed C++ this is quite a common pattern which allows definition of interfaces 
+    and concrete implementations based on those interfaces. Ruby as a dynamic language doesn't care much about
+    classes and their relationship: an object either has a method or it hasn't. So, reimplementation is just a matter
+    of providing the right method. An examples for the strategy pattern is the BrowserSource class (<class_doc href="BrowserSource"/>).
+    </li>
+
+    <li><b>Events</b>: events allow attaching a piece of code to an event. In Ruby, such a block is "Proc" object, in "Python" it is a
+    "callable" object ("lambda function" is a term used in both languages for this kind of concept). 
+    In case the event is triggered, this attached code is executed. Multiple lambda functions can be attached to the same event and 
+    removed from the latter. Events can be cleared of attached code, where only the blocks attached from one language can be cleared
+    together - code attached from Python cannot be cleared from Ruby.
+    An example for events is the Action class (<class_doc href="Action"/>) which provides both the reimplementation interface 
+    ("triggered" method) and the event interface ("on_triggered"). By the way, Qt signals are mapped to events in KLayout's Qt 
+    binding (<link href="/programming/qt_binding.xml"/>).
+    </li>
+  </ul>
+
+  <h2>Reimplementation (Strategy Pattern)</h2>
+
+  <p>
+  The BrowserSource (<class_doc href="BrowserSource"/>) class is a nice example for the Strategy pattern.
+  It is used by the BrowserDialog class (<class_doc href="BrowserDialog"/>) as a kind of internal HTML server
+  which handles URL's starting with "int:". For this, a script has to provide a class that reimplements the "get(url)"
+  method. In the following example, a BrowserSource is created that takes an URL with an integer index number and
+  delivers a HTML text with a link to the URL with the next index.
+  </p>
+
+  <p>
+  Here is the code:
+  </p>
+
+  <pre>module MyMacro
+  
+  include RBA
+  
+  class MyBrowserSource &lt; BrowserSource
+    def get(url)
+      next_url = url.sub(/\d+/) { |num| (num.to_i+1).to_s }
+      "This is #{url}. &lt;a href='#{next_url}'&gt;Goto next (#{next_url})&lt;/a&gt;"
+    end
+  end
+  
+  dialog = BrowserDialog::new
+  dialog.source = MyBrowserSource::new
+  dialog.home = "int:0"
+  dialog.exec
+
+end</pre>
+
+  <p>
+  This example demonstrates how the "get" method is reimplemented to deliver the actual text.
+  Ruby even allows reimplementation of a method without deriving a new class, because it allows
+  to define methods per instance:
+  </p>
+
+  <pre>module MyMacro
+  
+  include RBA
+  
+  source = BrowserSource::new
+  def source.get(url)
+    next_url = url.sub(/\d+/) { |num| (num.to_i+1).to_s }
+    "This is #{url}. &lt;a href='#{next_url}'&gt;Goto next (#{next_url})&lt;/a&gt;"
+  end
+  
+  dialog = BrowserDialog::new
+  dialog.source = source
+  dialog.home = "int:0"
+  dialog.exec
+
+end</pre>
+
+  <h2>Observer</h2>
+
+  <p>
+  Using the Observer pattern requires an additional object. Again reimplementation
+  allows attaching custom functionality to the callback. In contrast to the Strategy pattern,
+  the interface is very generic and can supply only few parameters, if there are parameters
+  at all.
+  </p>
+
+  <p>
+  An observer is an object of a class derived from the Observer class (<class_doc href="Observer"/>). 
+  An example for a use case for the Observer is the LayoutView class (<class_doc href="LayoutView"/>). This class
+  offers multiple events that indicate certain conditions. Here is some code:
+  </p>
+
+  <pre>module MyMacro
+  
+  include RBA
+  
+  class MyObserver &lt; Observer
+    def signal 
+      Application::instance.main_window.message("Selection changed", 1000)
+    end
+  end
+  
+  observer = MyObserver::new
+  Application::instance.main_window.current_view.add_selection_changed_observer(observer)  
+  
+end</pre>
+
+  <p>
+  In this example, an observer is created and attached to the "selection_changed" event of
+  LayoutView using "add_selection_changed_observer". When the selection changes, the "signal"
+  method of the observer is called. By reimplementing that method we show a short message
+  in the MainWindow's status bar.
+  </p>
+
+  <p>
+  Because Ruby is a dynamic language and allows overriding of methods per instance, we can simplify
+  the example further which avoids having to create a new class:
+  </p>
+
+  <pre>module MyMacro
+  
+  include RBA
+  
+  observer = MyObserver::new
+  def observer.signal
+    Application::instance.main_window.message("Selection changed", 1000)
+  end
+
+  Application::instance.main_window.current_view.add_selection_changed_observer(observer)  
+  
+end</pre>
+  
+  <h2>Events</h2>
+
+  <p>
+  Events are the callback variant that is the easiest one to use. Using an event it is possible
+  to directly attach a block of code to a callback. An event has a specific signature, i.e. 
+  the parameters it provides. The block can obtain this parameters by listing them in it's argument list.
+  </p>
+
+  <p>
+  Here is a simple example that uses the parameterless "on_triggered" event of the Action
+  class (<class_doc href="Action"/>). It puts a new entry into the tool bar and if it is 
+  clicked, it displays a message box:
+  </p>
+
+  <pre>module MyMacro
+  
+  include RBA
+  
+  action = Action::new
+  action.on_triggered do
+    MessageBox::info("A message", "The action was triggered", MessageBox::Ok)
+  end
+  action.title = "My Action"
+  
+  Application::instance.main_window.menu.insert_item("@toolbar.end", "my_action", action)
+  
+end</pre>
+
+  <p>
+  Specifying a block to an event will make the event only execute that block. A more flexible way of 
+  controlling the code attached to events is available through the += and -= operators:
+  </p>
+
+  <pre>module MyMacro
+
+  include RBA
+
+  code = lambda do 
+    MessageBox::info("A message", "The action was triggered", MessageBox::Ok)
+  end
+
+  action = Action::new
+  action.on_triggered += code
+
+  ...
+  
+  # to remove the code from the event, use:
+  action.on_triggered -= code
+
+  # to replace all event handlers by the one given by "code":
+  action.on_triggered = code
+
+  # to clear all event handlers use:
+  action.on_triggered.clear
+  </pre>
+
+  <p>
+  If the Qt binding is available (see <link href="/programming/qt_binding.xml"/>), Qt signals
+  are available as events which simplifies the implementation of a Qt dialog. In this example,
+  the "textChanged" signal of QLineEdit is attached a code block which copies the text of the 
+  input field to the label below:
+  </p>
+  
+  <pre>module MyMacro
+  
+  include RBA
+  
+  dialog = QDialog::new(Application::instance.main_window)
+  layout = QVBoxLayout::new(dialog)
+  input = QLineEdit::new(dialog)
+  label = QLabel::new(dialog)
+  layout.addWidget(input)
+  layout.addWidget(label)
+
+  # implement the textChanged signal as event:
+  input.textChanged { |text| label.text = text }
+
+end</pre>
+
+  <p>
+  Please note that unlike Qt signal/slots, this technique does not allow to attach multiple
+  handlers to one event/signal.
+  </p>
+
+</doc>
+

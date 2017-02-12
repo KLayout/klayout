@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>PCell template\nThis template provides the framework for a PCell</description>
+ <format>general</format>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <show-in-menu>false</show-in-menu>
+ <shortcut></shortcut>
+ <interpreter>ruby</interpreter>
+ <text># PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+module PCellLibModule
+
+  include RBA
+
+  # Remove any definition of our classes (this helps when 
+  # reexecuting this code after a change has been applied)
+  # TODO: adjust the names
+  PCellLibModule.constants.member?(:PCell) &amp;&amp; remove_const(:PCell)
+  PCellLibModule.constants.member?(:PCellLib) &amp;&amp; remove_const(:PCellLib)
+  
+  # The PCell declaration
+  # Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+  # TODO: change the class name
+  class PCell &lt; PCellDeclarationHelper
+  
+    include RBA
+
+    def initialize
+
+      # Important: initialize the super class
+      super
+
+      # declare the parameters
+      # i.e. param(:l, TypeLayer, "Layer", :default =&gt; LayerInfo::new(1, 0))
+      #      param(:s, TypeShape, "", :default =&gt; DPoint::new(0, 0))
+
+    end
+  
+    def display_text_impl
+      # Provide a descriptive text for the cell
+      "TODO: create description"
+    end
+    
+    def coerce_parameters_impl
+      # TODO: use x to access parameter x and set_x to modify it's value 
+    end
+    
+    def produce_impl
+      # TODO: produce the cell content 
+      # i.e. cell.shapes(l_layer).insert(Polygon.new(...))
+    end
+  
+    # optional:
+    # def can_create_from_shape_impl
+    #   TODO: determine if we have a shape that we can use to derive the 
+    #   PCell parameters from and return true in that case
+    # end
+    # 
+    # optional:
+    # def parameters_from_shape_impl
+    #   TODO: change parameters using set_x to reflect the parameter for the
+    #   given shape
+    # end
+    # 
+    # optional:
+    # def transformation_from_shape_impl
+    #   TODO: return a RBA::Trans object for the initial transformation of
+    #   the instance
+    # end
+    
+  end
+  
+  # TODO: add more PCell classes ..
+  
+  # The PCell library declaration
+  # A PCell library must be declared by deriving a custom class from RBA::Library.
+  # The main purpose of this class is to provide the PCell declarations and to register itself
+  # with a proper name.
+  # TODO: change the class name
+  class PCellLib &lt; Library
+  
+    def initialize  
+    
+      # TODO: change the description
+      self.description = "My PCell library"
+      
+      # register the PCell declarations
+      # TODO: change the names
+      layout.register_pcell("PCell", PCell::new)
+      # TODO: register more PCell declarations
+      
+      # register our library with the name "PCellLib"
+      # TODO: change the library name
+      register("PCellLib")
+      
+    end
+  
+  end
+  
+  # instantiate and register the library
+  # TODO: change the library name
+  PCellLib::new
+  
+end
+</text>
+</klayout-macro>

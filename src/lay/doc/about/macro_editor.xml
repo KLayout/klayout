@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>About Macro Development</title>
+
+  <h2-index/>
+
+  <h2>Basics</h2>
+
+  <p>
+  KLayout supports macro programming with the Ruby or Python language. Macros are basically Ruby or Python scripts that
+  are executed by the integrated interpreter. In order to enable macro programming, the program has to be built
+  with support by either one of those languages.
+  </p>
+
+  <p>
+  In a simple scenario, scripts can be stored in simple text files and loaded by KLayout using the "-rm" or "-r" command-line option. 
+  "-rm" will run a script and then execute the normal application. "-r" will run a script and then exit the 
+  application.
+  </p>
+  
+  <p>
+  In addition, KLayout supports special macro files with the suffix ".lym". Those files 
+  are XML files that store the macro code along with additional information, for example the description text, 
+  the interpreter language and certain flags. 
+  These flags tell KLayout to run the macro automatically when starting up for example.
+  In addition, KLayout can present such macros in the "Macros" menu without having to register a specific 
+  menu extension. 
+  </p>
+
+  <p>
+  KLayout also offers an integrated development environment (IDE) that allows editing 
+  and debugging of Ruby and Python scripts. It offers a simple debugger with the ability to set breakpoints and 
+  to interact with the current context while in a breakpoint. An interactive "console" allows entering and
+  evaluating of expressions. This feature is available also when execution has stopped in a breakpoint, 
+  so the console can be used to evaluate or modify variables in the current context. 
+  Watch expressions are supported as well: a 
+  series of expressions can be configured which is evaluated and displayed in a breakpoint.
+  With Python scripts, the local context can be inspected in the "Inspector" window: the variables
+  available in the local context are listed with their values.
+  </p>
+
+  <p>
+  While the debugger is open, execution will slow down somewhat and undesired interactions may happen - 
+  specifically when developing UI components. To mitigate this problem, debugging can 
+  be disabled in the macro IDE.
+  </p>
+
+  <p>
+  KLayout defines certain folders which it scans for macro files. Each directory is scanned recursively. It can 
+  contain subdirectories with more macros and can also contain support files such as images or additional Ruby or
+  Python modules. That allows organizing macros in modules where each module contains the root module files and supporting
+  files.
+  </p>
+
+  <p>
+  KLayout looks for macros in the following places:
+  </p>
+
+  <ul>
+    <li>
+      The "macros" or "pymacros" folders in the installation path. The installation path is where the KLayout binary resides. 
+      KLayout cannot modify macros that are stored in that path. This is the "global" repository.
+      Usually that repository is shared between all users. An administrator can use this location to install
+      macros globally. 
+    </li>
+    <li>
+      The "macros" or "pymacros" folders in KLayout's user specific application folder. On Unix that is "~/.klayout/macros".
+      This is the "local" repository. Any user can store his or her own macros here.
+    </li>
+    <li>
+      In addition, further repositories can be given on the command line with the "-j" option. This allows
+      adding development repositories which are under configuration management and contain the latest code
+      for the macros. Those repositories are called "project" repositories.
+    </li>
+  </ul>
+
+  <p>
+  The macro IDE will store Python and Ruby macros separately in "macros" and "pymacros" for easier management, 
+  but technically these folders are equivalent. KLayout will automatically derive the interpreter 
+  from the context stored in ".lym" files or the file extension (".rb" or ".py").
+  </p>
+
+  <p>
+  You can also add custom places using the "Add Location" entry from the repository browser's context menu
+  (right mouse click). These locations will be added to the tree. That setting is stored in the setup, so
+  it will be available when KLayout is started again. You can remove places again by using 
+  "Remove Location" from the macro tree's context menu.
+  </p>
+
+  <p>
+  KLayout will scan these places for files and present them in the macro development IDE's repository browser.
+  You can edit the files and their properties and run the macros from the IDE. KLayout's IDE supports these file
+  types:
+  </p>
+
+  <ul>
+    <li>
+      ".lym": generic KLayout macros.
+    </li>
+    <li>
+      ".rb": plain Ruby files. Such files can be imported into KLayout macros by Ruby's "require" or "load"
+      method.
+    </li>
+    <li>
+      ".py": plain Python files. Such files can be imported into KLayout macros by Pythons's "import"
+      method.
+    </li>
+    <li>
+      ".txt": text files for documentation for example.
+    </li>
+  </ul>
+
+  <p>
+  Other files can be stored inside the folders (for example Qt ".ui" files), but they won't be shown in 
+  the IDE.
+  </p>
+
+  <h2>The macro development IDE</h2>
+
+  <p>
+  The macro development IDE consists of three parts: the repository browser, the editor panel and the console.
+  The repository browser allows browsing of the macro repositories and to add new files, to move files, to delete 
+  files, to import plain ruby files as KLayout macros and to rename files. In the editor panel, the macro or other
+  files can be edited, breakpoints can be set and the macro can be run. In the console, Ruby expressions can be
+  entered and evaluated. This also works while KLayout is in a breakpoint. That feature evaluating of
+  expressions in the current context and to modify variables. The console also shows the output of the Ruby
+  scripts when they are run in the context of the IDE.
+  </p>
+
+  <p>
+  The following image shows the IDE with the three main parts:
+  </p>
+
+  <p>
+  <img src="/about/ide_snapshot.png"/>
+  </p>
+
+  <p>
+  When the debugger enters a breakpoint, the IDE also shows the call stack. By clicking on an entry in
+  the call stack panel, the editor will open the respective file and position the cursor at that line. 
+  A watch window shows the watch expressions with their evaluated values. Watch expressions are evaluated
+  every time a breakpoint it hit. They can be managed using the "Add", "Edit", "Delete" and "Clear" functions
+  from the context menu (right click on the watch list). For Python scripts, the local variables of the 
+  currently selected stack context can be browsed in the "Inspector" window in the middle.
+  Currently this feature is not available for Ruby scripts.
+  </p>
+
+  <p>
+  The following image shows the IDE in breakpoint mode for Ruby scripts:
+  </p>
+
+  <p>
+  <img src="/about/ide_debugging_snapshot.png"/>
+  </p>
+
+  <p>
+  The following image shows the IDE in breakpoint mode for Python scripts:
+  </p>
+
+  <p>
+  <img src="/about/ide_py_debugging_snapshot.png"/>
+  </p>
+
+  <p>
+  The editor panel features a toolbar with several tool buttons. The following image shows the
+  toolbar and the buttons with their function:
+  </p>
+
+  <p>
+  <img src="/about/ide_editor_toolbar.png"/>
+  </p>
+
+  <p>
+  Also the repository browser features a toolbar with more tool buttons. The following image shows
+  that toolbar and the buttons with their function:
+  </p>
+
+  <p>
+  <img src="/about/ide_browser_toolbar.png"/>
+  </p>
+
+  <p>
+  Finally the console panel allows interactive executing of Ruby or Python expressions. The following image
+  shows the console elements and their function:
+  </p>
+
+  <p>
+  <img src="/about/ide_console.png"/>
+  </p>
+
+  <h2>Basic tasks</h2>
+
+  <h3>Creating a new macro</h3>
+
+  <p>
+  To create a new macro, first open the tab to select a language you want to use.
+  Choose the branch in the repository browser where you want to create the macro.
+  Press the "+" button above the repository browser. A dialog will come up in which you can select a template.
+  A template is basically the initial content of the macro plus some default settings. After the macro is 
+  created, the new entry is highlighted and the name can be changed to the desired new name.
+  </p>
+
+  <h3>Editing the macro</h3>
+
+  <p>
+  After the macro has been created, it is shown in the editor window. Other macros or files can be opened
+  in the editor by double-clicking at their name. Depending on the type of file, the editor provides some
+  basic syntax highlighting. Each file is opened in a separate tab. The tabs can be closed by clicking at
+  the "x" button in the tab.
+  </p>
+
+  <p>
+  To save the current edits to the files, press the "Save all files" or the "Save current file" button
+  in the repository browser.
+  </p>
+
+  <p>
+  Search and search &amp; replace is available in the editor panel in the search box. The search a text, 
+  enter the text in the search box and hit Return. Use the "Find next" button to find the next occurrence
+  of the text. Click on the "RE" button to enable regular expressions in the search function. 
+  To enable "Replace" mode, open the replace text edit box by clicking on the little arrow right to the 
+  search tools. Enter the text to replace the search text into the edit box and use "Replace all" to 
+  replace all occurrences or use "Replace and search" to replace the current occurrence and highlight the
+  next one.
+  </p>
+
+  <h3>Running the macro</h3>
+
+  <p>
+  To run the macro, press the "Run current script" or the "Run script from the current tab" button in the
+  editor panel. "Run current" will run the script that was run the last time, irregardless if the script
+  is the one currently shown in the editor panel. That way, it is possible to run the same script while
+  editing support files for example. "Run script from the current tab" will always run the script from the 
+  current tab. 
+  </p>
+
+  <p>
+  When the macro runs, output will be sent to the console below the editor panel. Breakpoints can be set or reset with
+  the "Set breakpoint" button or the F9 key in the editor panel. Go to the line where you want to change the breakpoint and
+  use "Set breakpoint" to set or reset the breakpoint on the current line.
+  All breakpoints can be cleared with the "Clear all breakpoints" button.
+  </p>
+
+  <p>
+  While the macro is running or in a breakpoint, the execution can be aborted with the "Stop script" button. 
+  Execution can be interrupted with the "Pause script" button. In that case, KLayout will interrupt the script
+  execution at the current position.
+  </p>
+
+  <p>
+  When in a breakpoint, single-line step-by-step is supported with the "Step into" button or the F11 key. Stepping over a block or
+  procedure call is supported with the "Step over" button or the F10 key. Please note that "Step over" will also
+  step over blocks.
+  </p>
+
+  <p>
+  While KLayout has stopped the execution of the script, the console can be used to examine variables in the current
+  context or to modify their values. Ruby expressions entered into the console are simply executed in the current context.
+  </p>
+
+  <p>
+  When the macro editor window is open, macros will be run under debugger control. This will considerably slow down macro 
+  execution and create issues when you develop macros that integrate deeply into the system (for example 
+  macros filtering Qt events from the application). To avoid issues, debugging can be disabled by selecting
+  or unselecting the "Enable debugging" button in the editor's toolbar. If the button is checked (shown pressed),
+  debuggin is enabled and breakpoints can be used. If debugging is disabled, breakpoints will be ignored.
+  </p>
+
+  <h3>Working with the repository browser</h3>
+
+  <p>
+  The repository browser provides a tab for each category of macros. "DRC" is a special category which
+  provides macros that perform a DRC. Such macros are basically Ruby scripts that are executed in the 
+  context of a DRC engine and hence supply different functionality. Still, they execute in the usual
+  context and breakpoints, watch expressions and similar can be used. The other categories are macros
+  executing either in a Ruby or in a Python interpreter. 
+  </p>
+
+  <p>
+  Within the repository browser, you can add new folders using the "New folder" button. Before you do so, select the 
+  branch of the repository where you want to create the new folder. The new folder will be highlighted and the name
+  can be edited.
+  </p>
+
+  <p>
+  To delete files and folders, select the file or folder in the browser and click the "Delete" button (the "x").
+  Caution: deleting a file or folder cannot be undone currently.
+  </p>
+
+  <p>
+  To rename a file or folder, select the entry in the browser and click on the "Rename" button and enter the new
+  name. To move files or folder, simply drag and drop them to the desired target location.
+  </p>
+
+  <p>
+  Pain ruby scripts can be imported into the repository as KLayout macro files. Select the branch where you want to 
+  import the files in the repository browser, click on the "Import" button and 
+  select the file to import. ".rbm" files will automatically be set to "auto-run". 
+  </p>
+
+  <h3>Configuring macros</h3>
+
+  <p>
+  A macro can be configured in several ways:
+  </p>
+
+  <ul>
+    <li>
+      Description: a macro can be given a description text. This text is shown in the repository browser and
+      in the menu if a macro a configured to be shown in the menu.
+    </li>
+    <li>
+      Version: the version will be used in a later stage to check dependencies between packages. Currently the
+      version is not used. When used, enter a string of the form "v0.v1.v2" where v0 is the major version, v1
+      the minor version and v2 the patch. For example: "1.7.1".
+    </li>
+    <li>
+      Prolog and Epilog: these are statements which are executed before the script is started and after the 
+      script has been run respectively.
+    </li>
+    <li>
+      Run on start-up: if this flag is set, the macro is automatically run when KLayout starts. This feature
+      is required for macros defining libraries for example. "Run early on startup" is a special option which
+      makes sure the macro is run at the very beginning of the process. Such macros can be use to supply
+      classes and features for other macros that use the normal "run on start-up" mode.
+    </li>
+    <li>
+      Show in menu: with this flag, KLayout will show the macro in the "Macros" menu.
+      That is a simple way to run macros outside the IDE. 
+    </li>
+    <li>
+      Bind to a key: with key binding, a macro can be run when a certain key combination is pressed.
+      That is another way to run a macro outside the IDE.
+    </li>
+  </ul>
+
+  <p>
+  The macro properties can be edited using the "Edit properties" button in the editor panel.
+  </p>
+
+  <h2>Migrating code</h2>
+
+  <p> 
+  Before version 0.22, KLayout did not have a concept of macro IDE, macro folders, interpreters and
+  generic macros.
+  Ruby code written for the pre-0.22 system can be imported into the macro management system of
+  KLayout using the "Import" function from the repository browser toolbar. ".rbm" files are marked as "autorun" in order to emulate the behavior of KLayout 0.21 and
+  previous versions. ".rb" files are converted into KLayout macros without any further assumption.
+  ".rb" files can also simply be copied into the macro directories. However, such files are regarded as
+  secondary sources in KLayout. Typically those are files that are loaded by other macros. Importing 
+  a file makes code a generic source (".lym" file) with enhanced capabilities. 
+  </p>
+
+  <p>
+  After importing the code the macro can be attached to a menu entry by setting "Show in menu" on the
+  properties page. It is also possible to assign keyboard shortcuts. If either the menu item is selected
+  or the key specified in the shortcut is pressed, the macro is executed. 
+  </p>
+
+  <p>
+  This feature is more convenient to use than the scheme used previously. Until KLayout 0.22 it was only
+  possible to register a macro with a specific menu entry by performing the registration in the code.
+  The disadvantage of this approach is that when the macro code is re-executed, the menu item is registered
+  again and appears in the menu twice. It is therefore more convenient to remove the menu registration code
+  and let KLayout register the macro in the menu by setting the menu binding properties accordingly.
+  </p>
+
+  <h2>Hints</h2>
+
+  <p>
+  The editor and IDE can be configured using the "Setup" button in the editor panel. That dialog allows 
+  configuring fonts and colors to be used in the editor and the behavior of the debugger
+  in some respects.
+  </p>
+
+  <p>
+  The documentation of the Ruby and Python classes exposed by KLayout is available in KLayout's online help
+  system <a href="/programming/index.xml">here</a>.
+  </p>
+
+</doc>
+
+

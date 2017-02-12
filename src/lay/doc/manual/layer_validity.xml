@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+<title>Valid And Invalid Layers</title>
+<keyword name="Valid layer"/>
+<keyword name="Invalid layer"/>
+
+<p>
+Starting with version 0.23, KLayout offers "invalid" layers: invalid layers can be visible, but
+don't participate in selection and snapping. They just act as some kind of background drawing.
+</p>
+
+<p>
+Layers can be made invalid by choosing "Make invalid" from the layer's context menu.
+Layers can be made valid again by choosing "Make valid". Invalid layers are marked with a 
+small "x" in the layer list.
+</p>
+
+</doc>
+
+

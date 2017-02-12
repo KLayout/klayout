@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Browsing Instances</title>
+  <keyword name="Instance browser"/>
+
+  <p>
+  All instances of a cell can be browsed by selecting the cell in the cell 
+  list (not making it the new top), and choosing "Browse instances" from the "Tools"
+  menu. A simple instance browser comes up that shows all cells that the
+  given cell is instantiated in and how the cell is instantiated.
+  </p>
+ 
+  <p>
+  Another feature that among many other things allows inspection of instances 
+  is the "Search and replace" function (see <link href="/manual/search_replace.xml"/>).
+  </p>
+
+</doc>

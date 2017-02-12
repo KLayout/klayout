@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Other Layer Operations</title>
+  <keyword name="Layer specification"/>
+  <keyword name="Clear layer"/>
+  <keyword name="Copy layer"/>
+  <keyword name="Delete layer"/>
+
+  <p>
+  The layer specification can be edited using the "Edit Layer Specification" method from the "Layer" submenu
+  inside the "Edit" menu. A dialog is shown in which the layer, datatype and (OASIS) name of the layer
+  currently selected in the layer panel can be edited.
+  On save, the shapes are then mapped to the new layer.
+  </p>
+
+  <p>
+  A layer can be cleared (either cellwise, on a cell's hierarchy or for all cells) using the "Clear Layer"
+  method from the "Layer" submenu inside the "Edit" menu. 
+  </p>
+
+  <p>
+  Layers can be copied (duplicated) using "Copy Layer" from the "Layer" submenu inside the "Edit" menu
+  and deleted completely using "Delete Layer".
+  </p>
+
+</doc>
+

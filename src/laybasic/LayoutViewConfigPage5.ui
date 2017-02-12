@@ -1,0 +1,139 @@
+<ui version="4.0" >
+ <class>LayoutViewConfigPage5</class>
+ <widget class="QFrame" name="LayoutViewConfigPage5" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>694</width>
+    <height>301</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Application Settings</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="lyp_file_gbx" >
+     <property name="title" >
+      <string>Use default layer properties file</string>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="1" >
+       <widget class="QToolButton" name="browse_pb" >
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2" >
+       <widget class="QCheckBox" name="add_other_layers_cb" >
+        <property name="text" >
+         <string>Automatically add other layers</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLineEdit" name="lyp_file_le" />
+      </item>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>&lt;html>&lt;body>&lt;b>Hint&lt;/b>: a technology or reader specific layer properties file (i.e. for PCB import) will override this setting.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>The following layer properties file is loaded into the layer view list every time a layout is opened or created:</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>20</width>
+          <height>5</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Layer properties display</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="source_display_cb" >
+        <property name="text" >
+         <string>Always show layer source in layer list</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="ld_display_cb" >
+        <property name="text" >
+         <string>Always show layer and datatype together with database name in layer source</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="ly_index_cb" >
+        <property name="text" >
+         <string>Always show layout index in layer source</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <tabstops>
+  <tabstop>lyp_file_gbx</tabstop>
+  <tabstop>lyp_file_le</tabstop>
+  <tabstop>browse_pb</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

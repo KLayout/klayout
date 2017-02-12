@@ -1,0 +1,4173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category/>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>ruby</interpreter>
+ <dsl-interpreter-name/>
+ <text>
+# Extend the Float class by methods which convert
+# values with units, i.e. 1.3nm gives 0.0013
+class Float
+  def Float._dbu=(dbu)
+    @@dbu = dbu
+  end
+  def um
+    self
+  end
+  def micron
+    self
+  end
+  def degree
+    self
+  end
+  def nm
+    self*0.001
+  end
+  def mm
+    self*1000.0
+  end
+  def m
+    self*1000000.0
+  end
+  def nm2
+    self*1e-6
+  end
+  def um2
+    self
+  end
+  def micron2
+    self
+  end
+  def mm2
+    self*1.0e6
+  end
+  def m2
+    self*1.0e12
+  end
+  def dbu
+    @@dbu || raise("No layout loaded - cannot determine database unit")
+    self*@@dbu
+  end
+end
+
+# Extend the Fixnum class, so it is possible to 
+# convert a value to Float with a unit spec, i.e.
+# 5.nm -&gt; 0.005. A spec with ".dbu" gives the 
+# Fixnum value itself. This indicates a value in 
+# database units for most methods of the DRC 
+# framework.
+class Fixnum
+  def Fixnum._dbu=(dbu)
+    @@dbu = dbu
+  end
+  def um
+    self.to_f
+  end
+  def micron
+    self.to_f
+  end
+  def degree
+    self.to_f
+  end
+  def nm
+    self*0.001
+  end
+  def mm
+    self*1000.0
+  end
+  def m
+    self*1000000.0
+  end
+  def nm2
+    self*1.0e-6
+  end
+  def um2
+    self.to_f
+  end
+  def micron2
+    self.to_f
+  end
+  def mm2
+    self*1.0e6
+  end
+  def m2
+    self*1.0e12
+  end
+  def dbu
+    @@dbu || raise("No layout loaded - cannot determine database unit")
+    self*@@dbu
+  end
+end
+
+module DRC
+
+  include RBA
+
+  # A wrapper for a named value which is stored in
+  # a variable for delayed execution 
+  class DRCVar
+    def initialize(name)
+      @name = name
+    end
+    def inspect
+      @name
+    end
+    def to_s
+      @name
+    end
+  end
+  
+  # A wrapper for the sizing mode value
+  class DRCSizingMode
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
+  # A wrapper for the join flag for extended
+  class DRCJoinFlag
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
+  # A wrapper for the angle limit
+  # The purpose of this wrapper is to identify the
+  # angle limit specification
+  class DRCAngleLimit
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
+  # A wrapper for a metrics constant
+  # The purpose of this wrapper is to identify the 
+  # metrics constant by the class.
+  class DRCMetrics
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
+  # A wrapper for the "whole edges" flag for
+  # the DRC functions. The purpose of this class
+  # is to identify the value by the class.
+  class DRCWholeEdges
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
+  # A wrapper for a pair of limit values
+  # This class is used to identify projection limits for DRC
+  # functions
+  class DRCProjectionLimits
+    attr_accessor :min
+    attr_accessor :max
+    def initialize(*a)
+      if a.size &gt; 2 || a.size == 0
+        raise("A projection limits specification requires a maximum of two values and at least one argument")
+      elsif a.size == 1
+        if !a[0].is_a?(Range) || (!a[0].min.is_a?(Float) &amp;&amp; !a[0].min.is_a?(Fixnum))
+          raise("A projection limit requires an interval of two length values or two individual length values")
+        end
+        self.min = a[0].min
+        self.max = a[0].max
+      elsif a.size == 2
+        if a[0] &amp;&amp; !a[0].is_a?(Float) &amp;&amp; !a[0].is_a?(Fixnum)
+          raise("First argument to a projection limit must be either nil or a length value")
+        end
+        if a[1] &amp;&amp; !a[1].is_a?(Float) &amp;&amp; !a[1].is_a?(Fixnum)
+          raise("Second argument to a projection limit must be either nil or a length value")
+        end
+        self.min = a[0]
+        self.max = a[1]
+      end
+    end
+  end
+    
+  # A single DRC layer which is either 
+  # an edge pair, edge or region layer
+  
+  # %DRC%
+  # @scope
+  # @name Layer
+  # @brief DRC Reference: Layer Object
+  # The layer object represents a collection of polygons, edges or edge pairs.
+  
+  class DRCLayer
+    
+    def initialize(engine, data)
+      @engine = engine
+      @data = data
+    end
+    
+    def data
+      @data
+    end
+    
+    # %DRC%
+    # @name insert
+    # @brief Inserts one or many objects into the layer
+    # @synopsis insert(object, object ...)
+    # 
+    # Objects that can be inserted are RBA::Edge objects (into edge layers) or 
+    # RBA::DPolygon, RBA::DSimplePolygon, RBA::Path, RBA::DBox (into polygon layers).
+    # Convenience methods exist to create such objects (\global#edge, \global#polygon, \global#box and \#global#path).
+    # However, RBA constructors can used as well.
+    # 
+    # The insert method is useful in combination with the \global#polygon_layer or \global#edge_layer functions: 
+    #
+    # @code
+    # el = edge_layer
+    # el.insert(edge(0.0, 0.0, 100.0, 0.0)
+    #
+    # pl = polygon_layer
+    # pl.insert(box(0.0, 0.0, 100.0, 200.0)
+    # @/code
+    
+    def insert(*args)
+      requires_edges_or_region("insert")
+      args.each do |a|
+        if a.is_a?(RBA::DBox) 
+          @data.insert(RBA::Box::from_dbox(a * (1.0 / @engine.dbu)))
+        elsif a.is_a?(RBA::DPolygon) 
+          @data.insert(RBA::Polygon::from_dpoly(a * (1.0 / @engine.dbu)))
+        elsif a.is_a?(RBA::DSimplePolygon) 
+          @data.insert(RBA::SimplePolygon::from_dpoly(a * (1.0 / @engine.dbu)))
+        elsif a.is_a?(RBA::DPath) 
+          @data.insert(RBA::Path::from_dpath(a * (1.0 / @engine.dbu)))
+        elsif a.is_a?(RBA::DEdge) 
+          @data.insert(RBA::Edge::from_dedge(a * (1.0 / @engine.dbu)))
+        elsif a.is_a?(Array)
+          insert(*a)
+        else
+          raise("Invalid argument type #{a.class.to_s} for 'insert' method")
+        end
+      end
+      self
+    end
+    
+    # %DRC%
+    # @name strict
+    # @brief Marks a layer for strict handling
+    # @synopsis layer.strict
+    # If a layer is marked for strict handling, some optimizations 
+    # are disabled. Specifically for boolean operations, the results
+    # will also be merged if one input is empty. 
+    # For boolean operations, strict handling should be enabled for both inputs.
+    # Strict handling is disabled by default.
+    #
+    # See \non_strict about how to reset this mode.
+    # 
+    # This feature has been introduced in version 0.23.2.
+    
+    def strict
+      requires_region("strict")
+      @data.strict_handling = true
+      self
+    end
+    
+    # %DRC%
+    # @name non_strict
+    # @brief Marks a layer for non-strict handling
+    # @synopsis layer.non_strict
+    #
+    # See \strict for details about this option.
+    # 
+    # This feature has been introduced in version 0.23.2.
+    
+    def non_strict
+      requires_region("non_strict")
+      @data.strict_handling = false
+      self
+    end
+    
+    # %DRC% 
+    # @name strict?
+    # @brief Returns true, if strict handling is enabled for this layer
+    # @synopsis layer.is_strict?
+    #
+    # See \strict for a discussion of strict handling.
+    # 
+    # This feature has been introduced in version 0.23.2.
+    
+    def is_strict?
+      requires_region("is_strict?")
+      @data.strict_handling?
+    end
+    
+    # %DRC%
+    # @name clean
+    # @brief Marks a layer as clean
+    # @synopsis layer.clean
+    # A layer marked as clean will provide "merged" semantics, i.e.
+    # overlapping or touching polygons are considered as single
+    # polygons. Inner edges are removed and collinear edges are 
+    # connected. 
+    # Clean state is the default.
+    #
+    # See \raw for some remarks about how this state is 
+    # propagated.
+    
+    def clean
+      requires_edges_or_region("clean")
+      @data.merged_semantics = true
+      self
+    end
+    
+    # %DRC%
+    # @name raw
+    # @brief Marks a layer as raw
+    # @synopsis layer.raw
+    # 
+    # A raw layer basically is the opposite of a "clean" layer
+    # (see \clean). Polygons on a raw layer are considered "as is", i.e.
+    # overlapping polygons are not connected and inner edges may occur
+    # due to cut lines. Holes may not exists if the polygons are derived
+    # from a representation that does not allow holes (i.e. GDS2 files).
+    # 
+    # Note that this method will set the state of the layer. In combination
+    # with the fact, that copied layers are references to the original layer,
+    # this may lead to unexpected results:
+    # 
+    # @code
+    #   l = ...
+    #   l2 = l1
+    #   ... do something
+    #   l.raw
+    #   # now l2 is also a raw layer
+    # @/code
+    #
+    # To avoid that, use the \dup method to create a real (deep) copy.
+    
+    def raw
+      requires_edges_or_region("raw")
+      @data.merged_semantics = false
+      self
+    end
+    
+    # %DRC% 
+    # @name is_clean?
+    # @brief Returns true, if the layer is clean state
+    # @synopsis layer.is_clean?
+    #
+    # See \clean for a discussion of the clean state.
+    
+    def is_clean?
+      requires_edges_or_region("is_clean?")
+      @data.merged_semantics?
+    end
+    
+    # %DRC% 
+    # @name is_raw?
+    # @brief Returns true, if the layer is raw state
+    # @synopsis layer.is_raw?
+    #
+    # See \clean for a discussion of the raw state.
+    
+    def is_raw?
+      requires_edges_or_region("is_raw?")
+      !@data.merged_semantics?
+    end
+    
+    # %DRC%
+    # @name size 
+    # @brief Returns the number of objects on the layer
+    # @synopsis layer.size
+    #
+    # The number of objects is the number of raw objects, not merged
+    # regions or edges. It is more efficent to call this method on output layers than
+    # on input layers.
+
+    def size
+      @data.size
+    end
+    
+    # %DRC%
+    # @name dup
+    # @brief Duplicates a layer
+    # @synopsis layer.dup
+    # 
+    # Duplicates the layer. This basically will create a copy and
+    # modifications of the original layer will not affect the duplicate.
+    # Please note that just assigning the layer to another variable will
+    # not create a copy but rather a pointer to the original layer. Hence
+    # modifications will then be visible on the original and derived 
+    # layer. Using the dup method will avoid that.
+    # 
+    # However, dup will double the memory required to hold the data 
+    # and performing the deep copy may be expensive in terms of CPU time.
+    
+    def dup
+      DRCLayer::new(@engine, @data.dup)
+    end
+
+    # %DRC%
+    # @name with_area
+    # @brief Selects polygons by area
+    # @synopsis layer.with_area(min .. max)
+    # @synopsis layer.with_area(value)
+    # @synopsis layer.with_area(min, max)
+    # The first form will select all polygons with an area larger or
+    # equal to min and less (but not equal to) max. The second form
+    # will select the polygons with exactly the given area.
+    # The third form basically is equivalent to the first form, but
+    # allows specification of nil for min or max indicating no lower or 
+    # upper limit.
+    
+    # %DRC%
+    # @name without_area
+    # @brief Selects polygons by area
+    # @synopsis layer.without_area(min .. max)
+    # @synopsis layer.without_area(value)
+    # @synopsis layer.without_area(min, max)
+    # This method is the inverse of "with_area". It will select 
+    # polygons without an area equal to the given one or outside
+    # the given interval.
+    #
+    # This method is available for polygon layers only.
+    
+    %w(area).each do |f|
+      [true, false].each do |inv|
+        mn = (inv ? "without" : "with") + "_" + f
+        eval &lt;&lt;"CODE"
+        def #{mn}(*args)
+          requires_region("#{f}")
+          if args.size == 1
+            a = args[0]
+            if a.is_a?(Range)
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value_area(a.first), prep_value_area(a.last), #{inv.inspect}))
+            else
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value_area(a), #{inv.inspect}))
+            end
+          elsif args.size == 2
+            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value_area(args[0]), prep_value_area(args[1]), #{inv.inspect}))
+          else
+            raise("Invalid number of arguments for method '#{mn}'")
+          end
+        end
+CODE
+      end
+    end
+    
+    # %DRC%
+    # @name with_perimeter
+    # @brief Selects polygons by perimeter
+    # @synopsis layer.with_perimeter(min .. max)
+    # @synopsis layer.with_perimeter(value)
+    # @synopsis layer.with_perimeter(min, max)
+    # The first form will select all polygons with an perimeter larger or
+    # equal to min and less (but not equal to) max. The second form
+    # will select the polygons with exactly the given perimeter.
+    # The third form basically is equivalent to the first form, but
+    # allows specification of nil for min or max indicating no lower or 
+    # upper limit.
+    #
+    # This method is available for polygon layers only.
+    
+    # %DRC%
+    # @name without_perimeter
+    # @brief Selects polygons by perimeter
+    # @synopsis layer.without_perimeter(min .. max)
+    # @synopsis layer.without_perimeter(value)
+    # @synopsis layer.without_perimeter(min, max)
+    # This method is the inverse of "with_perimeter". It will select 
+    # polygons without a perimeter equal to the given one or outside
+    # the given interval.
+    #
+    # This method is available for polygon layers only.
+    
+    # %DRC%
+    # @name with_bbox_min
+    # @brief Selects polygons by the minimum dimension of the bounding box
+    # @synopsis layer.with_bbox_min(min .. max)
+    # @synopsis layer.with_bbox_min(value)
+    # @synopsis layer.with_bbox_min(min, max)
+    # The method selects polygons similar to \with_area or \with_perimeter.
+    # However, the measured dimension is the minimum dimension of the
+    # bounding box. The minimum dimension is either the width or height of 
+    # the bounding box, whichever is smaller.
+    #
+    # This method is available for polygon layers only.
+
+    # %DRC%
+    # @name without_bbox_min
+    # @brief Selects polygons by the minimum dimension of the bounding box
+    # @synopsis layer.without_bbox_min(min .. max)
+    # @synopsis layer.without_bbox_min(value)
+    # @synopsis layer.without_bbox_min(min, max)
+    # The method selects polygons similar to \without_area or \without_perimeter.
+    # However, the measured dimension is the minimum dimension of the
+    # bounding box. The minimum dimension is either the width or height of 
+    # the bounding box, whichever is smaller.
+    #
+    # This method is available for polygon layers only.
+    
+    # %DRC%
+    # @name with_bbox_max
+    # @brief Selects polygons by the maximum dimension of the bounding box
+    # @synopsis layer.with_bbox_max(min .. max)
+    # @synopsis layer.with_bbox_max(value)
+    # @synopsis layer.with_bbox_max(min, max)
+    # The method selects polygons similar to \with_area or \with_perimeter.
+    # However, the measured dimension is the maximum dimension of the
+    # bounding box. The maximum dimension is either the width or height of 
+    # the bounding box, whichever is larger.
+    #
+    # This method is available for polygon layers only.
+
+    # %DRC%
+    # @name without_bbox_max
+    # @brief Selects polygons by the maximum dimension of the bounding box
+    # @synopsis layer.without_bbox_max(min .. max)
+    # @synopsis layer.without_bbox_max(value)
+    # @synopsis layer.without_bbox_max(min, max)
+    # The method selects polygons similar to \without_area or \without_perimeter.
+    # However, the measured dimension is the maximum dimension of the
+    # bounding box. The minimum dimension is either the width or height of 
+    # the bounding box, whichever is larger.
+    #
+    # This method is available for polygon layers only.
+    
+    # %DRC%
+    # @name with_bbox_width
+    # @brief Selects polygons by the width of the bounding box
+    # @synopsis layer.with_bbox_width(min .. max)
+    # @synopsis layer.with_bbox_width(value)
+    # @synopsis layer.with_bbox_width(min, max)
+    # The method selects polygons similar to \with_area or \with_perimeter.
+    # However, the measured dimension is the width of the
+    # bounding box. 
+    #
+    # This method is available for polygon layers only.
+
+    # %DRC%
+    # @name without_bbox_width
+    # @brief Selects polygons by the width of the bounding box
+    # @synopsis layer.without_bbox_width(min .. max)
+    # @synopsis layer.without_bbox_width(value)
+    # @synopsis layer.without_bbox_width(min, max)
+    # The method selects polygons similar to \without_area or \without_perimeter.
+    # However, the measured dimension is the width of the
+    # bounding box.
+    #
+    # This method is available for polygon layers only.
+    
+    # %DRC%
+    # @name with_bbox_height
+    # @brief Selects polygons by the height of the bounding box
+    # @synopsis layer.with_bbox_height(min .. max)
+    # @synopsis layer.with_bbox_height(value)
+    # @synopsis layer.with_bbox_height(min, max)
+    # The method selects polygons similar to \with_area or \with_perimeter.
+    # However, the measured dimension is the width of the
+    # bounding box. 
+    #
+    # This method is available for polygon layers only.
+
+    # %DRC%
+    # @name without_bbox_height
+    # @brief Selects polygons by the height of the bounding box
+    # @synopsis layer.without_bbox_height(min .. max)
+    # @synopsis layer.without_bbox_height(value)
+    # @synopsis layer.without_bbox_height(min, max)
+    # The method selects polygons similar to \without_area or \without_perimeter.
+    # However, the measured dimension is the width of the
+    # bounding box.
+    #
+    # This method is available for polygon layers only.
+    
+    %w(bbox_height bbox_max bbox_min bbox_width perimeter).each do |f|
+      [true, false].each do |inv|
+        mn = (inv ? "without" : "with") + "_" + f
+        eval &lt;&lt;"CODE"
+        def #{mn}(*args)
+          requires_region("#{mn}")
+          if args.size == 1
+            a = args[0]
+            if a.is_a?(Range)
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value(a.first), prep_value(a.last), #{inv.inspect}))
+            else
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value(a), #{inv.inspect}))
+            end
+          elsif args.size == 2
+            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :with_#{f}, prep_value(args[0]), prep_value(args[1]), #{inv.inspect}))
+          else
+            raise("Invalid number of arguments for method '#{mn}'")
+          end
+        end
+CODE
+      end
+    end
+    
+    # %DRC%
+    # @name with_length
+    # @brief Selects edges by their length
+    # @synopsis layer.with_length(min .. max)
+    # @synopsis layer.with_length(value)
+    # @synopsis layer.with_length(min, max)
+    # The method selects edges by their length. The first version selected
+    # edges with a length larger or equal to min and less than max (but not equal).
+    # The second version selects edges with exactly the given length. The third
+    # version is similar to the first one, but allows specification of nil for min or
+    # max indicating that there is no lower or upper limit. 
+    #
+    # This method is available for edge layers only.
+
+    # %DRC%
+    # @name without_length
+    # @brief Selects edges by the their length
+    # @synopsis layer.without_length(min .. max)
+    # @synopsis layer.without_length(value)
+    # @synopsis layer.without_length(min, max)
+    # The method basically is the inverse of \with_length. It selects all edges
+    # of the edge layer which do not have the given length (second form) or are
+    # not inside the given interval (first and third form).
+    #
+    # This method is available for edge layers only.
+    
+    %w(length).each do |f|
+      [true, false].each do |inv|
+        mn = (inv ? "without" : "with") + "_" + f
+        eval &lt;&lt;"CODE"
+        def #{mn}(*args)
+          requires_edges("#{mn}")
+          if args.size == 1
+            a = args[0]
+            if a.is_a?(Range)
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, prep_value(a.first), prep_value(a.last), #{inv.inspect}))
+            else
+              DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, prep_value(a), #{inv.inspect}))
+            end
+          elsif args.size == 2
+            DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :with_#{f}, prep_value(args[0]), prep_value(args[1]), #{inv.inspect}))
+          else
+            raise("Invalid number of arguments for method '#{mn}'")
+          end
+        end
+CODE
+      end
+    end
+    
+    # %DRC%
+    # @name with_angle
+    # @brief Selects edges by their angle
+    # @synopsis layer.with_angle(min .. max)
+    # @synopsis layer.with_angle(value)
+    # @synopsis layer.with_angle(min, max)
+    #
+    # When called on an edge layer, the method selects edges by their angle, 
+    # measured against the horizontal axis in the mathematical sense. 
+    # The first version selects
+    # edges with a angle larger or equal to min and less than max (but not equal).
+    # The second version selects edges with exactly the given angle. The third
+    # version is identical to the first one. 
+    #
+    # When called on a polygon layer, this method selects corners which match the 
+    # given angle or is within the given angle interval. The angle is measured between the edges forming the corner.
+    # For each corner, an edge pair containing the edges forming in the angle is returned.
+    #
+    # A method delivering all objects not matching the angle criterion is \without_angle.
+    #
+    # The following images demonstrate some use cases of \with_angle and \without_angle:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_with_angle1.png) @/td
+    #     @td @img(/images/drc_with_angle2.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_with_angle3.png) @/td
+    #     @td @img(/images/drc_with_angle4.png) @/td
+    #   @/tr
+    # @/table
+
+
+    # %DRC%
+    # @name without_angle
+    # @brief Selects edges by the their angle
+    # @synopsis layer.without_angle(min .. max)
+    # @synopsis layer.without_angle(value)
+    # @synopsis layer.without_angle(min, max)
+    #
+    # The method basically is the inverse of \with_angle. It selects all edges
+    # of the edge layer or corners of the polygons which do not have the given angle (second form) or whose angle
+    # is not inside the given interval (first and third form).
+    
+    [true, false].each do |inv|
+      mn = (inv ? "without" : "with") + "_angle"
+      eval &lt;&lt;"CODE"
+      def #{mn}(*args)
+        requires_edges_or_region("#{mn}")
+        result_class = @data.is_a?(RBA::Region) ? RBA::EdgePairs : RBA::Edges
+        if args.size == 1
+          a = args[0]
+          if a.is_a?(Range)
+            DRCLayer::new(@engine, @engine._tcmd(@data, 0, result_class, :with_angle, a.first, a.last, #{inv.inspect}))
+          else
+            DRCLayer::new(@engine, @engine._tcmd(@data, 0, result_class, :with_angle, a, #{inv.inspect}))
+          end
+        elsif args.size == 2
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, result_class, :with_angle, args[0], args[1], #{inv.inspect}))
+        else
+          raise("Invalid number of arguments for method '#{mn}'")
+        end
+      end
+CODE
+    end
+    
+    # %DRC%
+    # @name rounded_corners
+    # @brief Applies corner rounding to each corner of the polygon
+    # @synopsis layer.rounded_corners(inner, outer, n)
+    #
+    # Inner (concave) corners are replaced by circle segments with a radius given by the 
+    # "inner" parameter. Outer (convex) corners are relaced by circle segments with a radius
+    # given by the "outer" parameter. 
+    #
+    # The circles are approximated by polygons. "n" segments are used to approximate a full circle.
+    #
+    # This method return a layer wit the modified polygons. Merged semantics applies for this
+    # method (see \raw and \clean).
+    #
+    # The following image shows the effect of the "rounded_corners" method. The upper ends of 
+    # the vertical bars are rounded with a smaller radius automatically because their width does not allow
+    # a larger radius.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_rounded_corners.png) @/td
+    #   @/tr
+    # @/table
+    
+    def rounded_corners(inner, outer, n)
+      requires_region("rounded_corners")
+      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :rounded_corners, prep_value(inner), prep_value(outer), n))
+    end
+    
+    # %DRC%
+    # @name odd_polygons
+    # @brief Checks for odd polygons (self-overlapping, non-orientable)
+    # @synopsis layer.odd_polygons
+    # Returns the parts of the polygons which are not orientable (i.e. "8" configuration) or self-overlapping.
+    # Merged semantics does not apply for this method. Always the raw polygons are taken (see \raw).
+    
+    def odd_polygons
+      requires_region("ongrid")
+      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :strange_polygon_check))
+    end
+    
+    # %DRC%
+    # @name ongrid
+    # @brief Checks for on-grid vertices
+    # @synopsis layer.ongrid(g)
+    # @synopsis layer.ongrid(gx, gy)
+    # Returns a single-vertex marker for each vertex whose x coordinate is not a
+    # multiple of g or gx or whose y coordinate is not a multiple of g or gy.
+    # The single-vertex markers are edge pair objects which describe a single point.
+    # When setting the grid to 0, no grid check is performed in that specific direction.
+    # 
+    # This method requires a polygon layer. Merged semantics applies (see \raw and \clean).
+    
+    def ongrid(*args)
+      requires_region("ongrid")
+      if args.size == 1
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::EdgePairs, :grid_check, prep_value(args[0]), prep_value(args[0])))
+      elsif args.size == 2
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::EdgePairs, :grid_check, prep_value(args[0]), prep_value(args[1])))
+      else
+        raise("Invalid number of arguments for method 'ongrid'")
+      end
+    end
+    
+    # %DRC%
+    # @name snap
+    # @brief Brings each vertex on the given grid (g or gx/gy for x or y direction)
+    # @synopsis layer.snap(g)
+    # @synopsis layer.snap(gx, gy)
+    # Shifts each off-grid vertex to the nearest on-grid location. If one grid is given, this
+    # grid is applied to x and y coordinates. If two grids are given, gx is applied to the x
+    # coordinates and gy is applied to the y coordinates. If 0 is given as a grid, no snapping
+    # is performed in that direction. 
+    # 
+    # This method modifies the layer. A version that returns a snapped version of the layer
+    # without modifying the layer is \snapped.
+    # 
+    # This method requires a polygon layer. Merged semantics applies (see \raw and \clean).
+    
+    # %DRC%
+    # @name snapped
+    # @brief Returns a snapped version of the layer
+    # @synopsis layer.snapped(g)
+    # @synopsis layer.snapped(gx, gy)
+    # See \snap for a description of the functionality. In contrast to \snap, this method does
+    # not modify the layer but returns a snapped copy.
+    
+    %w(snap snapped).each do |f| 
+      eval &lt;&lt;"CODE"
+      def #{f}(*args)
+        requires_region("#{f}")
+        gx = gy = 0
+        if args.size == 1
+          gx = gy = prep_value(args[0])
+        elsif args.size == 2
+          gx = prep_value(args[0])
+          gy = prep_value(args[1])
+        else
+          raise("Invalid number of arguments for method 'ongrid'")
+        end
+        aa = args.collect { |a| prep_value(a) }
+        if :#{f} == :snap &amp;&amp; @engine.is_tiled?
+          # in tiled mode, no modifying versions are available
+          @data = @engine._tcmd(@data, 0, @data.class, :snapped, gx, gy)
+          self
+        elsif :#{f} == :snap
+          @engine._tcmd(@data, 0, @data.class, :#{f}, gx, gy)
+          self
+        else
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, gx, gy))
+        end
+      end
+CODE
+    end
+    
+    # %DRC%
+    # @name and
+    # @brief Boolean AND operation
+    # @synopsis layer.and(other)
+    # The method computes a boolean AND between self and other.
+    # It is an alias for the "&amp;" operator.
+    #
+    # This method is available for polygon and edge layers.
+    # If the first operand is an edge layer and the second is an edge layer, the
+    # result will be the edges of the first operand which are inside or on the
+    # borders of the polygons of the second operand.
+    #
+    # The following images show the effect of the "and" method
+    # on polygons and egdes (layer1: red, layer2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_and1.png) @/td
+    #     @td @img(/images/drc_and2.png) @/td
+    #     @td @img(/images/drc_and3.png) @/td
+    #   @/tr
+    # @/table
+    
+    def and(other)
+      self &amp; other    
+    end
+    
+    # %DRC%
+    # @name not
+    # @brief Boolean NOT operation
+    # @synopsis layer.not(other)
+    # The method computes a boolean NOT between self and other.
+    # It is an alias for the "-" operator.
+    #
+    # This method is available for polygon and edge layers.
+    # If the first operand is an edge layer and the second is an edge layer, the
+    # result will be the edges of the first operand which are outside the polygons
+    # of the second operand.
+    #
+    # The following images show the effect of the "not" method
+    # on polygons and egdes (layer1: red, layer2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not1.png) @/td
+    #     @td @img(/images/drc_not2.png) @/td
+    #     @td @img(/images/drc_not3.png) @/td
+    #   @/tr
+    # @/table
+    
+    def not(other)
+      self - other    
+    end
+    
+    # %DRC%
+    # @name xor
+    # @brief Boolean XOR operation
+    # @synopsis layer.xor(other)
+    # The method computes a boolean XOR between self and other.
+    # It is an alias for the "^" operator.
+    #
+    # This method is available for polygon and edge layers.
+    #
+    # The following images show the effect of the "xor" method
+    # on polygons and egdes (layer1: red, layer2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_xor1.png) @/td
+    #     @td @img(/images/drc_xor2.png) @/td
+    #   @/tr
+    # @/table
+    
+    def xor(other)
+      self ^ other    
+    end
+    
+    # %DRC%
+    # @name or
+    # @brief Boolean OR operation
+    # @synopsis layer.or(other)
+    # The method computes a boolean OR between self and other.
+    # It is an alias for the "|" operator.
+    #
+    # This method is available for polygon and edge layers.
+    #
+    # The following images show the effect of the "or" method
+    # on polygons and egdes (layer1: red, layer2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_or1.png) @/td
+    #     @td @img(/images/drc_or2.png) @/td
+    #   @/tr
+    # @/table
+    
+    def or(other)
+      self | other    
+    end
+    
+    # %DRC%
+    # @name join
+    # @brief Joins the layer with another layer
+    # @synopsis layer.join(other)
+    # The method includes the edges or polygons from the other layer into this layer.
+    # It is an alias for the "+" operator.
+    #
+    # This method is available for polygon, edge and edge pair layers.
+    #
+    # The following images show the effect of the "join" method
+    # on polygons and egdes (layer1: red, layer2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_join1.png) @/td
+    #     @td @img(/images/drc_join2.png) @/td
+    #   @/tr
+    # @/table
+    
+    def join(other)
+      self + other
+    end
+    
+    # %DRC%
+    # @name &amp;
+    # @brief Boolean AND operation
+    # @synopsis self &amp; other
+    # The method computes a boolean AND between self and other.
+    #
+    # This method is available for polygon and edge layers. An alias
+    # is "\and". See there for a description of the function.
+    
+    # %DRC%
+    # @name |
+    # @brief Boolean OR operation
+    # @synopsis self | other
+    # The method computes a boolean OR between self and other. A similar
+    # operation is \join which will basically gives the same result but
+    # won't merge the shapes.
+    #
+    # This method is available for polygon and edge layers. An alias
+    # is "\or". See there for a description of the function.
+    
+    # %DRC%
+    # @name ^
+    # @brief Boolean XOR operation
+    # @synopsis self ^ other
+    # The method computes a boolean XOR between self and other.
+    #
+    # This method is available for polygon and edge layers. An alias
+    # is "\xor". See there for a description of the function.
+    
+    # %DRC%
+    # @name -
+    # @brief Boolean NOT operation
+    # @synopsis self - other
+    # The method computes a boolean NOT between self and other.
+    #
+    # This method is available for polygon and edge layers. An alias
+    # is "\not". See there for a description of the function.
+    
+    # %DRC%
+    # @name +
+    # @brief Join layers
+    # @synopsis self + other
+    # The method includes the edges or polygons from the other layer into this layer.
+    # The "+" operator is an alias for the \join method.
+    #
+    # This method is available for polygon, edge and edge pair layers. An alias
+    # is "\join". See there for a description of the function.
+   
+    # %DRC%
+    # @name overlapping
+    # @brief Selects shapes or regions of self which overlap shapes from the other region
+    # @synopsis layer.overlapping(other)
+    # This method selects all shapes or regions from self which overlap shapes from the other
+    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_overlapping.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+    #
+    # The following image shows the effect of the "overlapping" method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_overlapping.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name not_overlapping
+    # @brief Selects shapes or regions of self which do not overlap shapes from the other region
+    # @synopsis layer.not_overlapping(other)
+    # This method selects all shapes or regions from self which do not overlap shapes from the other
+    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected.
+    #
+    # The "not_overlapping" method is equivalent to the \outside method. It is provided
+    # as an alias for consistency.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_not_overlapping.
+    
+    # %DRC%
+    # @name select_overlapping
+    # @brief Selects shapes or regions of self which overlap shapes from the other region
+    # @synopsis layer.select_overlapping(other)
+    # This method selects all shapes or regions from self which overlap shapes from the other
+    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected.
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \overlapping.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+    
+    # %DRC%
+    # @name select_not_overlapping
+    # @brief Selects shapes or regions of self which do not overlap shapes from the other region
+    # @synopsis layer.select_not_overlapping(other)
+    # This method selects all shapes or regions from self which do not overlap shapes from the other
+    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected. 
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \not_overlapping.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+    
+    # %DRC%
+    # @name inside
+    # @brief Selects shapes or regions of self which are inside the other region
+    # @synopsis layer.inside(other)
+    # This method selects all shapes or regions from self which are inside the other region.
+    # completely (completely covered by polygons from the other region). If self is
+    # in raw mode, this method will select individual shapes. Otherwise, this method
+    # will select coherent regions and no part of these regions may be outside the 
+    # other region.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_inside.
+    #
+    # This method is available for polygon layers.
+    #
+    # The following image shows the effect of the "inside" method (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_inside.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name not_inside
+    # @brief Selects shapes or regions of self which are not inside the other region
+    # @synopsis layer.not_inside(other)
+    # This method selects all shapes or regions from self which are not inside the other region.
+    # completely (completely covered by polygons from the other region). If self is
+    # in raw mode, this method will select individual shapes. Otherwise, this method
+    # will select coherent regions and no part of these regions may be outside the 
+    # other region.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_not_inside.
+    #
+    # This method is available for polygon layers.
+    #
+    # The following image shows the effect of the "not_inside" method (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_inside.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name select_inside
+    # @brief Selects shapes or regions of self which are inside the other region
+    # @synopsis layer.select_inside(other)
+    # This method selects all shapes or regions from self which are inside the other region.
+    # completely (completely covered by polygons from the other region). If self is
+    # in raw mode, this method will select individual shapes. Otherwise, this method
+    # will select coherent regions and no part of these regions may be outside the 
+    # other region.
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \inside.
+    #
+    # This method is available for polygon layers.
+    
+    # %DRC%
+    # @name select_not_inside
+    # @brief Selects shapes or regions of self which are not inside the other region
+    # @synopsis layer.select_not_inside(other)
+    # This method selects all shapes or regions from self which are not inside the other region.
+    # completely (completely covered by polygons from the other region). If self is
+    # in raw mode, this method will select individual shapes. Otherwise, this method
+    # will select coherent regions and no part of these regions may be outside the 
+    # other region.
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \not_inside.
+    #
+    # This method is available for polygon layers.
+    
+    # %DRC%
+    # @name outside
+    # @brief Selects shapes or regions of self which are outside the other region
+    # @synopsis layer.outside(other)
+    # This method selects all shapes or regions from self which are completely outside 
+    # the other region (no part of these shapes or regions may be covered by shapes from
+    # the other region). If self is in raw mode, this method will select individual 
+    # shapes. Otherwise, this method will select coherent regions and no part of these 
+    # regions may overlap with shapes from the other region.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_outside.
+    #
+    # This method is available for polygon layers.
+    #
+    # The following image shows the effect of the "outside" method (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_outside.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name not_outside
+    # @brief Selects shapes or regions of self which are not outside the other region
+    # @synopsis layer.not_outside(other)
+    # This method selects all shapes or regions from self which are not completely outside 
+    # the other region (part of these shapes or regions may be covered by shapes from
+    # the other region). If self is in raw mode, this method will select individual 
+    # shapes. Otherwise, this method will select coherent regions and no part of these 
+    # regions may overlap with shapes from the other region.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_not_outside.
+    #
+    # This method is available for polygon layers.
+    #
+    # The following image shows the effect of the "not_outside" method (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_outside.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name select_outside
+    # @brief Selects shapes or regions of self which are outside the other region
+    # @synopsis layer.select_outside(other)
+    # This method selects all shapes or regions from self which are completely outside 
+    # the other region (no part of these shapes or regions may be covered by shapes from
+    # the other region). If self is in raw mode, this method will select individual 
+    # shapes. Otherwise, this method will select coherent regions and no part of these 
+    # regions may overlap with shapes from the other region.
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \outside.
+    #
+    # This method is available for polygon layers.
+    
+    # %DRC%
+    # @name select_not_outside
+    # @brief Selects shapes or regions of self which are not outside the other region
+    # @synopsis layer.select_not_outside(other)
+    # This method selects all shapes or regions from self which are not completely outside 
+    # the other region (part of these shapes or regions may be covered by shapes from
+    # the other region). If self is in raw mode, this method will select individual 
+    # shapes. Otherwise, this method will select coherent regions and no part of these 
+    # regions may overlap with shapes from the other region.
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \not_outside.
+    #
+    # This method is available for polygon layers.
+    
+    # %DRC%
+    # @name in
+    # @brief Selects shapes or regions of self which are contained in the other layer
+    # @synopsis layer.in(other)
+    # This method selects all shapes or regions from self which are contained  
+    # the other region exactly. It will use individual shapes from self or other if
+    # the respective region is in raw mode. If not, it will use coherent regions or combined edges from
+    # self or other.
+    #
+    # It will return a new layer containing the selected shapes.
+    # A method which selects all shapes not contained in the other layer is \not_in.
+    #
+    # This method is available for polygon and edge layers.
+    #
+    # The following image shows the effect of the "in" method (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_in.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name not_in
+    # @brief Selects shapes or regions of self which are not contained in the other layer
+    # @synopsis layer.not_in(other)
+    # This method selects all shapes or regions from self which are not contained  
+    # the other region exactly. It will use individual shapes from self or other if
+    # the respective region is in raw mode. If not, it will use coherent regions or combined edges from
+    # self or other.
+    # 
+    # It will return a new layer containing the selected shapes.
+    # A method which selects all shapes contained in the other layer is \in.
+    #
+    # This method is available for polygon and edge layers.
+    #
+    # The following image shows the effect of the "not_in" method (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_in.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name interacting
+    # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
+    # @synopsis layer.interacting(other)
+    # This method selects all shapes or regions from self which touch or overlap shapes from the other
+    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_interacting.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+    #
+    # The following image shows the effect of the "interacting" method (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_interacting.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name not_interacting
+    # @brief Selects shapes or regions of self which do not touch or overlap shapes from the other region
+    # @synopsis layer.not_interacting(other)
+    # This method selects all shapes or regions from self which do not touch or overlap shapes from the other
+    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected.
+    # It returns a new layer containing the selected shapes. A version which modifies self
+    # is \select_not_interacting.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+    #
+    # The following image shows the effect of the "not_interacting" method (input1: red, input2: blue):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_not_interacting.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name select_interacting
+    # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
+    # @synopsis layer.select_interacting(other)
+    # This method selects all shapes or regions from self which touch or overlap shapes from the other
+    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected.
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \interacting.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+    
+    # %DRC%
+    # @name select_not_interacting
+    # @brief Selects shapes or regions of self which do not touch or overlap shapes from the other region
+    # @synopsis layer.select_interacting(other)
+    # This method selects all shapes or regions from self which do not touch or overlap shapes from the other
+    # region. If self is in raw mode (see \raw), coherent regions are selected from self, 
+    # otherwise individual shapes are selected.
+    # It modifies self to contain the selected shapes. A version which does not modify self
+    # is \not_interacting.
+    #
+    # This method is available for polygon and edge layers. Edges can be selected
+    # with respect to other edges or polygons.
+    
+    # %DRC%
+    # @name inside_part
+    # @brief Returns the parts of the edges inside the given region
+    # @synopsis layer.inside_part(region)
+    # This method returns the parts of the edges which are inside the given region. This is similar to the
+    # "&amp;" operator, but this method does not return edges that are exactly on the boundaries
+    # of the polygons of the region.
+    #
+    # This method is available for edge layers. The argument must be a polygon layer.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_inside_part.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name outside_part
+    # @brief Returns the parts of the edges outside the given region
+    # @synopsis layer.outside_part(region)
+    # This method returns the parts of the edges which are outside the given region. This is similar to the
+    # "&amp;" operator, but this method does not remove edges that are exactly on the boundaries
+    # of the polygons of the region.
+    #
+    # This method is available for edge layers. The argument must be a polygon layer.
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_outside_part.png) @/td
+    #   @/tr
+    # @/table
+    
+    %w(&amp; | ^ - + interacting not_interacting overlapping not_overlapping inside not_inside outside not_outside in not_in).each do |f| 
+      eval &lt;&lt;"CODE"
+      def #{f}(other)
+        if :#{f} != :interacting &amp;&amp; :#{f} != :not_interacting &amp;&amp; :#{f} != :&amp; &amp;&amp; :#{f} != :-
+          requires_same_type(other, "#{f}")
+        else
+          other.requires_edges_or_region("#{f}")
+        end
+        if :#{f} != :+
+          requires_edges_or_region("#{f}")
+        end
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+      end
+CODE
+    end
+
+    %w(interacting not_interacting overlapping not_overlapping inside not_inside outside not_outside).each do |fi|
+      f = "select_" + fi
+      # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
+      eval &lt;&lt;"CODE"
+      def #{f}(other)
+        if :#{fi} != :interacting &amp;&amp; :#{f} != :not_interacting 
+          requires_same_type(other, "#{f}")
+        else
+          other.requires_edges_or_region("#{f}")
+        end
+        requires_edges_or_region("#{f}")
+        if @engine.is_tiled?
+          @data = @engine._tcmd(@data, 0, @data.class, :#{fi}, other.data)
+          DRCLayer::new(@engine, @data)
+        else
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        end
+      end
+CODE
+    end
+    
+    %w(inside_part outside_part).each do |f|
+      # In tiled mode, there are no modifying versions. Emulate using the non-modifying one.
+      eval &lt;&lt;"CODE"
+      def #{f}(other)
+        other.requires_region("#{f}")
+        requires_edges("#{f}")
+        if @engine.is_tiled?
+          @data = @engine._tcmd(@data, 0, @data.class, :#{f}, other.data)
+          DRCLayer::new(@engine, @data)
+        else
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :#{f}, other.data))
+        end
+      end
+CODE
+    end
+    
+    # %DRC%
+    # @name rectangles
+    # @brief Selects all rectangle polygons from the input
+    # @synopsis layer.rectangles
+    #
+    # This method is available for polygon layers. By default "merged" semantics applies, 
+    # i.e. all polygons are merged before rectangles are selected (see \clean and \raw).
+    # \non_rectangles will select all non-rectangles.
+
+    # %DRC%
+    # @name rectilinear
+    # @brief Selects all rectilinear polygons from the input
+    # @synopsis layer.rectilinear
+    #
+    # This method is available for polygon layers. By default "merged" semantics applies, 
+    # i.e. all polygons are merged before rectilinear polygons are selected (see \clean and \raw).
+    # \non_rectilinear will select all non-rectangles.
+    
+    # %DRC%
+    # @name non_rectangles
+    # @brief Selects all polygons from the input which are not rectangles
+    # @synopsis layer.non_rectangles
+    #
+    # This method is available for polygon layers. By default "merged" semantics applies, 
+    # i.e. all polygons are merged before non-rectangles are selected (see \clean and \raw).
+
+    # %DRC%
+    # @name non_rectilinear
+    # @brief Selects all non-rectilinear polygons from the input
+    # @synopsis layer.non_rectilinear
+    #
+    # This method is available for polygon layers. By default "merged" semantics applies, 
+    # i.e. all polygons are merged before non-rectilinear polygons are selected (see \clean and \raw).
+
+    # %DRC%
+    # @name holes
+    # @brief Selects all polygon holes from the input
+    # @synopsis layer.holes
+    #
+    # This method is available for polygon layers. It will create polygons from all holes inside 
+    # polygons of the input. Although it is possible, running this method on raw polygon layers will
+    # usually not render the expected result, since raw layers do not contain polygons with holes in
+    # most cases.
+    #
+    # The following image shows the effects of the holes method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_holes.png) @/td
+    #   @/tr
+    # @/table
+
+    # %DRC%
+    # @name hulls
+    # @brief Selects all polygon hulls from the input
+    # @synopsis layer.hulls
+    #
+    # This method is available for polygon layers. It will remove all holes from the input and 
+    # render the hull polygons only. Although it is possible, running this method on raw polygon layers will
+    # usually not render the expected result, since raw layers do not contain polygons with holes in
+    # most cases.
+    #
+    # The following image shows the effects of the hulls method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_hulls.png) @/td
+    #   @/tr
+    # @/table
+
+    %w(rectangles rectilinear non_rectangles non_rectilinear
+       holes hulls).each do |f| 
+      eval &lt;&lt;"CODE"
+      def #{f}
+        requires_region("#{f}")
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}))
+      end
+CODE
+    end
+    
+    # %DRC%
+    # @name end_segments 
+    # @brief Returns the part at the end of each edge
+    # @synopsis layer.end_segments(length)
+    # @synopsis layer.end_segments(length, fraction)
+    #
+    # This method will return a partial edge for each edge in the input, 
+    # located and the end of the original edge.
+    # The new edges will share the end point with the original edges, but not necessarily
+    # their start point. This method applies to edge layers only. 
+    # The direction of edges is defined by the clockwise orientation of a polygon: the 
+    # end point of the edges will be the terminal point of each edge when walking a polygon
+    # in clockwise direction. Or in other words: when looking from start to the end point
+    # of an edge, the filled part of the polygon is to the right.
+    # 
+    # The length of the new edge can be given in two ways: as a fixed length, or a fraction, or
+    # both. In the latter case, the length of the resulting edge will be either the fraction or
+    # the fixed length, whichever is larger.
+    # To specify a length only, omit the fraction argument or leave it at 0. To specify
+    # a fraction only, pass 0 to the length argument and specify the fraction in the second
+    # parameter. A fraction of 0.5 will result in edges which cover the end half of the 
+    # edge.
+    # 
+    # The following images show the effect of the method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_end_segments1.png) @/td
+    #     @td @img(/images/drc_end_segments2.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name start_segments
+    # @brief Returns the part at the beginning of each edge
+    # @synopsis layer.start_segments(length)
+    # @synopsis layer.start_segments(length, fraction)
+    #
+    # This method will return a partial edge for each edge in the input, 
+    # located and the end of the original edge.
+    # The new edges will share the start point with the original edges, but not necessarily
+    # their end points. For further details about the orientation of edges and the parameters
+    # of this method, see \end_segments.
+    # 
+    # The following images show the effect of the method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_start_segments1.png) @/td
+    #     @td @img(/images/drc_start_segments2.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name centers
+    # @brief Returns the center parts of the edges
+    # @synopsis layer.centers(length)
+    # @synopsis layer.centers(length, fraction)
+    # 
+    # Similar to \start_segments and \end_segments, this method will return partial
+    # edges for each given edge in the input. For the description of the parameters see
+    # \start_segments or \end_segments.
+    # 
+    # The following images show the effect of the method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_centers1.png) @/td
+    #     @td @img(/images/drc_centers2.png) @/td
+    #   @/tr
+    # @/table
+    
+    %w(end_segments start_segments centers).each do |f|
+      eval &lt;&lt;"CODE"
+      def #{f}(length, fraction = 0.0)
+        requires_edges("#{f}")
+        length = prep_value(length)
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :#{f}, length, fraction))
+      end
+CODE
+    end
+    
+    # %DRC%
+    # @name extended
+    # @brief Returns polygons describing an area along the edges of the input
+    # @synopsis layer.extended([:begin =&gt; b,] [:end =&gt; e,] [:out =&gt; o,] [:in =&gt; i], [:joined =&gt; true])
+    # @synopsis layer.extended(b, e, o, i)
+    # @synopsis layer.extended(b, e, o, i, joined)
+    # 
+    # This method is available for edge layers only. It will create a polygon for each edge
+    # tracing the edge with certain offsets to the edge. "o" is the offset applied to the 
+    # outer side of the edge, "i" is the offset applied to the inner side of the edge.
+    # "b" is the offset applied at the beginning and "e" is the offset applied at the end.
+    # 
+    # When looking from start to end point, the "inside" side is to the right, while the "outside"
+    # side is to the left.
+    # 
+    # "joined" is a flag, which, if present, will make connected edges behave as a continuous
+    # line. Start and end offsets are applied to the first and last unconnected point respectively.
+    # Please note that in order to specify joined mode, you'll need to specify "joined" as 
+    # a keyword in the third form of the method.
+    #
+    # The following images show the effects of some parameters:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_extended1.png) @/td
+    #     @td @img(/images/drc_extended2.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_extended3.png) @/td
+    #     @td @img(/images/drc_extended4.png) @/td
+    #   @/tr
+    # @/table
+    
+    %w(extended).each do |f| 
+      eval &lt;&lt;"CODE"
+      def #{f}(*args)
+      
+        requires_edges("#{f}")
+        
+        av = [ 0, 0, 0, 0, false ]
+        args.each_with_index do |a,i|
+          if a.is_a?(Hash)
+            a[:begin]  &amp;&amp; av[0] = prep_value(a[:begin])
+            a[:end]    &amp;&amp; av[1] = prep_value(a[:end])
+            a[:out]    &amp;&amp; av[2] = prep_value(a[:out])
+            a[:in]     &amp;&amp; av[3] = prep_value(a[:in])
+            a[:joined] &amp;&amp; av[4] = true
+          elsif i &lt; 4
+            if !a.is_a?(Fixnum) &amp;&amp; !a.is_a?(Float)
+              raise("Invalid type for argument " + (i+1).to_s + " (method '#{f}')")
+            end
+            av[i] = prep_value(a)
+          elsif i == 4
+            if a.is_a?(DRCJoinFlag)
+              av[i] = a.value
+            else
+              av[i] = (a ? true : false)
+            end
+          else
+            raise("Too many arguments for method '#{f}' (1 to 5 expected)")
+          end
+        end
+
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}, *av))
+
+      end
+CODE
+    end
+    
+    # %DRC%
+    # @name extended_in
+    # @brief Returns polygons describing an area along the edges of the input
+    # @synopsis layer.extended_in(d)
+    #
+    # This method applies to edge layers only. Polygons are generated for 
+    # each edge describing the edge drawn with a certain width extending into
+    # the "inside" (the right side when looking from start to end).
+    # This method is basically equivalent to the \extended method:
+    # "extended(0, 0, 0, dist)".
+    # A version extending to the outside is \extended_out.
+    
+    # %DRC%
+    # @name extended_out
+    # @brief Returns polygons describing an area along the edges of the input
+    # @synopsis layer.extended_out(d)
+    #
+    # This method applies to edge layers only. Polygons are generated for 
+    # each edge describing the edge drawn with a certain width extending into
+    # the "outside" (the left side when looking from start to end).
+    # This method is basically equivalent to the \extended method:
+    # "extended(0, 0, dist, 0)".
+    # A version extending to the inside is \extended_in.
+    
+    %w(extended_in extended_out).each do |f| 
+      eval &lt;&lt;"CODE"
+      def #{f}(dist)
+        requires_edges("#{f}")
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :#{f}, prep_value(dist)))
+      end
+CODE
+    end
+    
+    # %DRC%
+    # @name edges
+    # @brief Decomposes the layer into single edges
+    #
+    # Edge pair collections are decomposed into the individual edges that make up
+    # the edge pairs. Polygon layers are decomposed into the edges making up the 
+    # polygons. This method returns an edge layer but will not modify the layer it 
+    # is called on.
+    #
+    # Merged semantics applies, i.e. the result reflects merged polygons rather than
+    # individual ones unless raw mode is chosen.
+    
+    %w(edges).each do |f| 
+      eval &lt;&lt;"CODE"
+      def #{f}
+        if @data.is_a?(RBA::Region)
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Edges, :#{f}))
+        elsif @data.is_a?(RBA::EdgePairs)
+          DRCLayer::new(@engine, @engine._cmd(@data, :#{f}))
+        else
+          raise "#{f}: Layer must be a polygon or edge pair layer"
+        end
+      end
+CODE
+    end
+    
+    # %DRC%
+    # @name first_edges
+    # @brief Returns the first edges of an edge pair collection
+    # @synopsis layer.first_edges
+    # 
+    # Applies to edge pair collections only.
+    # Returns the first edges of the edge pairs in the collection.
+    
+    # %DRC%
+    # @name second_edges
+    # @brief Returns the second edges of an edge pair collection
+    # @synopsis layer.second_edges
+    # 
+    # Applies to edge pair collections only.
+    # Returns the second edges of the edge pairs in the collection.
+    
+    %w(first_edges second_edges).each do |f| 
+      eval &lt;&lt;"CODE"
+      def #{f}
+        requires_edge_pairs("#{f}")
+        DRCLayer::new(@engine, @engine._cmd(@data, :#{f}))
+      end
+CODE
+    end
+    
+    # %DRC%
+    # @name bbox
+    # @brief Returns the overall bounding box of the layer
+    # @synopsis layer.bbox
+    # The return value is a RBA::DBox object giving the bounding box in 
+    # micrometer units. 
+    
+    def bbox
+      RBA::DBox::from_ibox(@data.bbox) * @engine.dbu.to_f
+    end
+    
+    # %DRC%
+    # @name polygons?
+    # @brief Returns true, if the layer is a polygon layer
+    # @synopsis layer.polygons?
+    
+    def polygons?
+      @data.is_a?(RBA::Region)
+    end
+    
+    # %DRC%
+    # @name edges?
+    # @brief Returns true, if the layer is an edge layer
+    # @synopsis layer.edges?
+    
+    def edges?
+      @data.is_a?(RBA::Edges)
+    end
+    
+    # %DRC%
+    # @name edge_pairs?
+    # @brief Returns true, if the layer is an edge pair collection
+    # @synopsis layer.edge_pairs?
+    
+    def edge_pairs?
+      @data.is_a?(RBA::EdgePairs)
+    end
+    
+    # %DRC%
+    # @name area
+    # @brief Returns the total area of the polygons in the region
+    # @synopsis layer.area
+    # 
+    # This method requires a polygon layer. It returns the total
+    # area of all polygons in square micron. Merged semantics applies, 
+    # i.e. before computing the area, the polygons are merged unless
+    # raw mode is chosen (see \raw). Hence, in clean mode, overlapping
+    # polygons are not counted twice.
+    # 
+    # The returned value gives the area in square micrometer units.
+    
+    def area
+      requires_region("area")
+      @engine._tdcmd(@data, 0, :area) * (@engine.dbu.to_f * @engine.dbu.to_f)
+    end
+    
+    # %DRC%
+    # @name perimeter
+    # @brief Returns the total perimeter of the polygons in the region
+    # @synopsis layer.perimeter
+    # 
+    # This method requires a polygon layer. It returns the total
+    # perimeter of all polygons in micron. Merged semantics applies, 
+    # i.e. before computing the perimeter, the polygons are merged unless
+    # raw mode is chosen (see \raw).
+    # 
+    # The returned value gives the perimeter in micrometer units.
+    
+    def perimeter
+      requires_region("perimeter")
+      # Note: we have to add 1 DBU border to collect the neighbors. It's important
+      # to know then since they tell us whether an edge is an outside edge.
+      @engine._tdcmd(@data, 1, :perimeter) * @engine.dbu.to_f
+    end
+    
+    # %DRC%
+    # @name is_box?
+    # @brief Returns true, if the region contains a single box
+    # @synopsis layer.is_box?
+    # 
+    # The method returns true, if the region consists of a single box
+    # only. Merged semantics does not apply - if the region forms a box which
+    # is composed of multiple pieces, this method will not return true.
+    
+    def is_box?
+      requires_region("is_box?")
+      @engine._cmd(@data, :is_box?)
+    end
+    
+    # %DRC%
+    # @name length
+    # @brief Returns the total length of the edges in the edge layer
+    # @synopsis layer.length
+    # 
+    # This method requires an edge layer. It returns the total
+    # length of all edges in micron. Merged semantics applies, 
+    # i.e. before computing the length, the edges are merged unless
+    # raw mode is chosen (see \raw). Hence in clean mode (see \clean), overlapping
+    # edges are not counted twice.
+    
+    def length
+      requires_edges("length")
+      @engine._cmd(@data, :length) * @engine.dbu.to_f
+    end
+    
+    # %DRC%
+    # @name is_merged?
+    # @brief Returns true, if the polygons of the layer are merged
+    # @synopsis layer.is_merged?
+    #
+    # This method will return true, if the polygons of this layer are
+    # merged, i.e. they don't overlap and form single continuous polygons.
+    # In clean mode, this is ensured implicitly. In raw mode (see \raw),
+    # merging can be achieved by using the \merge method. \is_merged?
+    # tells, whether calling \merge is necessary.
+    
+    def is_merged?
+      requires_edges_or_region("is_merged?")
+      @data.is_merged?
+    end
+    
+    # %DRC%
+    # @name is_empty?
+    # @brief Returns true, if the layer is empty
+    # @synopsis layer.is_empty?
+    
+    def is_empty?
+      requires_edges_or_region("is_empty?")
+      @data.is_empty?
+    end
+    
+    # %DRC%
+    # @name iso
+    # @brief An alias for "isolated"
+    # @synopsis layer.iso(value [, options])
+    # See \isolated for a description of that method
+    
+    def iso(*args)
+      isolated(*args)
+    end
+    
+    # %DRC%
+    # @name enc
+    # @brief An alias for "enclosing"
+    # @synopsis layer.enc(value [, options])
+    # See \enclosing for a description of that method
+    
+    def enc(*args)
+      enclosing(*args)
+    end
+    
+    # %DRC%
+    # @name sep
+    # @brief An alias for "separation"
+    # @synopsis layer.sep(value [, options])
+    # See \separation for a description of that method
+    
+    def sep(*args)
+      separation(*args)
+    end
+    
+    # %DRC%
+    # @name width
+    # @brief A width check
+    # @synopsis layer.width(value [, options])
+    # 
+    # This method performs a width check and returns a collection of edge pairs.
+    # A width check can be performed on polygon and edge layers. On edge layers, all
+    # edges are checked against all other edges. If two edges form a "back to back" relation
+    # (i.e. their inner sides face each other) and their distance is less than the specified
+    # value, an error shape is generated for that edge pair. 
+    # On polygon layers, the polygons on each layer are checked for locations where their
+    # width is less than the specified value. In that case, an edge pair error shape is generated.
+    # 
+    # The options available are:
+    #
+    # @ul
+    #   @li @b euclidian @/b: perform the check using Euclidian metrics (this is the default) @/li  
+    #   @li @b square @/b: perform the check using Square metrics @/li  
+    #   @li @b projection @/b: perform the check using projection metrics @/li
+    #   @li @b whole_edges @/b: With this option, the check will return all of the edges,
+    #         even if the criterion is violated only over a part of the edge @/li
+    #   @li @b angle_limit(a) @/b: Specifies the angle above or equal to which no 
+    #         check is performed. The default value is 90, which means that for edges having 
+    #         an angle of 90 degree or more, no check is performed. Setting this value to 45 will
+    #         make the check only consider edges enclosing angles of less than 45 degree. @/li
+    #   @li @b projection_limits(min, max) or projection_limits(min .. max) @/b:
+    #         this option makes the check only consider edge pairs whose projected length on
+    #         each other is more or equal than min and less than max @/li
+    # @/ul
+    #
+    # Note that without the angle_limit, acute corners will always be reported, since two 
+    # connected edges always violate the width in the corner. By adjusting the angle_limit, an 
+    # acute corner check can be implemented.
+    #
+    # Merge semantics applies to this method, i.e. disconnected polygons are merged before the 
+    # width is checked unless "raw" mode is chosen.
+    # 
+    # The resulting edge pairs can be converted to polygons using the \polygons method.
+    # 
+    # Distance values can be given as floating-point values (in micron) or integer values (in
+    # database units). To explicitly specify the unit, use the unit denominators, i.e.
+    #
+    # @code
+    #   # width check for 1.5 micron:
+    #   markers = in.width(1.5)
+    #   # width check for 2 database units:
+    #   markers = in.width(2)
+    #   # width check for 2 micron:
+    #   markers = in.width(2.um)
+    #   # width check for 20 nanometers:
+    #   markers = in.width(20.nm)
+    # @/code
+    #
+    # The following images show the effect of various forms of the width check:
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_width1.png) @/td
+    #     @td @img(/images/drc_width2.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_width3.png) @/td
+    #     @td @img(/images/drc_width4.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name space
+    # @brief A space check
+    # @synopsis layer.space(value [, options])
+    #
+    # This method performs a space check and returns a collection of edge pairs.
+    # A space check can be performed on polygon and edge layers. On edge layers, all
+    # edges are checked against all other edges. If two edges form a "face to face" relation
+    # (i.e. their outer sides face each other) and their distance is less than the specified
+    # value, an error shape is generated for that edge pair. 
+    # On polygon layers, the polygons on each layer are checked for space against other polygons 
+    # for locations where their space is less than the specified value. In that case, an edge 
+    # pair error shape is generated.
+    # The space check will also check the polygons for space violations against themselves, i.e.
+    # notches violating the space condition are reported.
+    #
+    # The \notch method is similar, but will only report self-space violations. The \isolated
+    # method will only report space violations to other polygons. \separation is a two-layer 
+    # space check where space is checked against polygons of another layer.
+    #
+    # The options available are the same than for the \width method. Like for the \width 
+    # method, merged semantics applies.
+    # Distance values can be given as floating-point values (in micron) or integer values (in
+    # database units). To explicitly specify the unit, use the unit denominators.
+    #
+    # The following image shows the effect of the space check:
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_space1.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name isolated
+    # @brief An isolation check
+    # @synopsis layer.isolated(value [, options])
+    #
+    # See \space for a description of this method. 
+    # In contrast to \space, this
+    # method is available for polygon layers only, since only on such layers 
+    # different polygons can be identified.
+    #
+    # The following image shows the effect of the isolated check:
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_space3.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name notch
+    # @brief An intra-region spacing check
+    # @synopsis layer.notch(value [, options])
+    #
+    # See \space for a description of this method.
+    # In contrast to \space, this
+    # method is available for polygon layers only, since only on such layers 
+    # different polygons can be identified.
+    #
+    # The following image shows the effect of the notch check:
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_space2.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name separation
+    # @brief A two-layer spacing check
+    # @synopsis layer.separation(other_layer, value [, options])
+    # 
+    # This method performs a two-layer spacing check. Like \space, this method
+    # can be applied to edge or polygon layers. Locations where edges of the layer
+    # are closer than the specified distance to the other layer are reported
+    # as edge pair error markers.
+    # 
+    # In contrast to the \space and related methods, locations where both 
+    # layers touch are also reported. More specifically, the case of zero spacing
+    # will also trigger an error while for \space it will not.
+    # 
+    # As for the other DRC methods, merged semantics applies. The options available 
+    # are the same than for \width.  
+    # Distance values can be given as floating-point values (in micron) or integer values (in
+    # database units). To explicitly specify the unit, use the unit denominators.
+    #
+    # The following image shows the effect of the separation check (layer1: red, layer2: blue):
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_separation1.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC% 
+    # @name overlap 
+    # @brief An overlap check
+    # @synopsis layer.overlap(other_layer, value [, options])
+    #
+    # This method checks whether layer and other_layer overlap by at least the
+    # given length. Locations, where this is not the case will be reported in form
+    # of edge pair error markers.
+    # Locations, where both layers touch will be reported as errors as well. Formally
+    # such locations form an overlap with a value of 0. Locations, where both regions 
+    # do not overlap or touch will not be reported. Such regions can be detected 
+    # with \outside or by a boolean "not".
+    # 
+    # Formally, the overlap method is a two-layer width check. In contrast to the single-
+    # layer width method (\width), the zero value also triggers an error and separate
+    # polygons are checked against each other, while for the single-layer width, only 
+    # single polygons are considered.
+    #
+    # The overlap method can be applied to both edge or polygon layers. On edge layers 
+    # the orientation of the edges matters: only edges which run back to back with their
+    # inside side pointing towards each other are checked for distance.
+    #
+    # As for the other DRC methods, merged semantics applies. The options available 
+    # are the same than for \width.  
+    # Distance values can be given as floating-point values (in micron) or integer values (in
+    # database units). To explicitly specify the unit, use the unit denominators.
+    #
+    # The following images show the effect of the overlap check (layer1: red, layer2: blue):
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_overlap1.png) @/td
+    #     @td @img(/images/drc_overlap2.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC% 
+    # @name enclosing
+    # @brief An enclosing check
+    # @synopsis layer.enclosing(other_layer, value [, options])
+    #
+    # This method checks whether layer encloses (is bigger than) other_layer by the
+    # given dimension. Locations, where this is not the case will be reported in form
+    # of edge pair error markers.
+    # Locations, where both edges coincide will be reported as errors as well. Formally
+    # such locations form an enclosure with a distance of 0. Locations, where other_layer
+    # extends outside layer will not be reported as errors. Such regions can be detected
+    # by \not_inside or a boolean "not" operation.
+    #
+    # The enclosing method can be applied to both edge or polygon layers. On edge layers 
+    # the orientation of the edges matters and only edges looking into the same direction
+    # are checked.
+    # 
+    # As for the other DRC methods, merged semantics applies. The options available 
+    # are the same than for \width.  
+    # Distance values can be given as floating-point values (in micron) or integer values (in
+    # database units). To explicitly specify the unit, use the unit denominators.
+    #
+    # The following images show the effect of two enclosing checks (red: input1, blue: input2):
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_enc1.png) @/td
+    #     @td @img(/images/drc_enc2.png) @/td
+    #   @/tr
+    # @/table
+    
+    %w(width space overlap enclosing separation).each do |f|
+      eval &lt;&lt;"CODE"
+      def #{f}(*args)
+
+        requires_edges_or_region("#{f}")
+        
+        value = nil
+        metrics = nil
+        minp = nil
+        maxp = nil
+        alim = nil
+        whole_edges = false
+        other = nil
+
+        n = 1
+        args.each do |a|
+          if a.is_a?(DRCMetrics)
+            metrics = a.value
+          elsif a.is_a?(DRCWholeEdges)
+            whole_edges = a.value
+          elsif a.is_a?(DRCAngleLimit)
+            alim = a.value
+          elsif a.is_a?(DRCLayer)
+            other = a
+          elsif a.is_a?(DRCProjectionLimits)
+            minp = prep_value(a.min)
+            maxp = prep_value(a.max)
+          elsif a.is_a?(Float) || a.is_a?(Fixnum)
+            value &amp;&amp; raise("Value already specified")
+            value = prep_value(a)
+          else
+            raise("#{f}: Parameter #" + n.to_s + " does not have an expected type")
+          end
+          n += 1
+        end
+
+        if !value
+          raise("#{f}: A check value must be specified")
+        end
+        
+        border = (metrics == RBA::Region::Square ? value * 1.5 : value)
+        
+        if "#{f}" == "width" || "#{f}" == "space" || "#{f}" == "notch" || "#{f}" == "isolated"
+          if other
+            raise("No other layer must be specified for single-layer checks (i.e. width)")
+          end
+          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, value, whole_edges, metrics, alim, minp, maxp))
+        else
+          if !other
+            raise("The other layer must be specified for two-layer checks (i.e. overlap)")
+          end
+          requires_same_type(other, "#{f}")
+          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, other.data, value, whole_edges, metrics, alim, minp, maxp))
+        end
+        
+      end  
+CODE
+    end
+    
+    %w(isolated notch).each do |f|
+      eval &lt;&lt;"CODE"
+      def #{f}(*args)
+
+        requires_region("#{f}")
+        
+        value = nil
+        metrics = nil
+        minp = nil
+        maxp = nil
+        alim = nil
+        whole_edges = false
+        other = nil
+
+        n = 1
+        args.each do |a|
+          if a.is_a?(DRCMetrics)
+            metrics = a.value
+          elsif a.is_a?(DRCWholeEdges)
+            whole_edges = a.value
+          elsif a.is_a?(DRCAngleLimit)
+            alim = a.value
+          elsif a.is_a?(DRCLayer)
+            other = a
+          elsif a.is_a?(DRCProjectionLimits)
+            minp = prep_value(a.min)
+            maxp = prep_value(a.max)
+          elsif a.is_a?(Float) || a.is_a?(Fixnum)
+            value &amp;&amp; raise("Value already specified")
+            value = prep_value(a)
+          else
+            raise("#{f}: Parameter #" + n.to_s + " does not have an expected type")
+          end
+          n += 1
+        end
+
+        if !value
+          raise("A check value must be specified")
+        end
+        
+        border = (metrics == RBA::Region::Square ? value * 1.5 : value)
+        
+        if "#{f}" == "width" || "#{f}" == "space" || "#{f}" == "notch" || "#{f}" == "isolated"
+          if other
+            raise("#{f}: No other layer must be specified for single-layer checks (i.e. width)")
+          end
+          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, value, whole_edges, metrics, alim, minp, maxp))
+        else
+          if !other
+            raise("#{f}: The other layer must be specified for two-layer checks (i.e. overlap)")
+          end
+          DRCLayer::new(@engine, @engine._tcmd(@data, border, RBA::EdgePairs, :#{f}_check, other.data, value, whole_edges, metrics, alim, minp, maxp))
+        end
+        
+      end  
+CODE
+    end
+    
+    # %DRC%
+    # @name scaled
+    # @brief Scales a layer
+    # @synopsis layer.scaled(f)
+    # 
+    # Scales the input layer and returns a new layer whose features have a f times
+    # bigger dimension. The layer that this method is called upon is not modified.
+    #
+    # The following images shows the effect of the "scaled" method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_scaled1.png) @/td
+    #   @/tr
+    # @/table
+    
+    def scaled(f)
+      transformed(RBA::ICplxTrans::new(f.to_f))
+    end
+    
+    # %DRC%
+    # @name scale
+    # @brief Scales a layer (modifies the layer)
+    # @synopsis layer.scale(f)
+    # 
+    # Scales the input. After scaling, features have a f times
+    # bigger dimension. The layer that this method is called upon is modified and
+    # the modified version is returned for further processing.
+    
+    def scale(f)
+      transform(RBA::ICplxTrans::new(f.to_f))
+    end
+    
+    # %DRC%
+    # @name rotated
+    # @brief Rotates a layer
+    # @synopsis layer.rotated(a)
+    # 
+    # Rotates the input layer by the given angle (in degree) and returns
+    # the rotated layer. The layer that this method is called upon is not modified.
+    #
+    # The following image shows the effect of the "rotated" method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_rotated1.png) @/td
+    #   @/tr
+    # @/table
+    
+    def rotated(a)
+      transformed(RBA::ICplxTrans::new(1.0, a, false, 0, 0))
+    end
+    
+    # %DRC%
+    # @name rotate
+    # @brief Rotates a layer (modifies the layer)
+    # @synopsis layer.rotate(a)
+    # 
+    # Rotates the input by the given angle (in degree). The layer that this method is called 
+    # upon is modified and the modified version is returned for further processing.
+    
+    def rotate(a)
+      transform(RBA::ICplxTrans::new(1.0, a, false, 0, 0))
+    end
+    
+    # %DRC%
+    # @name sized
+    # @brief Polygon sizing (per-edge biasing)
+    # @synopsis layer.sized(d [, mode])
+    # @synopsis layer.sized(dx, dy [, mode]))
+    #
+    # This method requires a polygon layer. It will apply a bias per edge of the polygons 
+    # and return the biased layer. The layer that this method is called on is not modified.
+    # 
+    # In the single-value form, that bias is applied both in horizontal or vertical direction.
+    # In the two-value form, the horizontal and vertical bias can be specified separately.
+    # 
+    # The mode defines how to handle corners. The following modes are available:
+    #
+    # @ul
+    #   @li @b diamond_limit: @/b This mode will connect the shifted edges without corner interpolation @/li
+    #   @li @b octagon_limit: @/b This mode will create octagon-shaped corners @/li
+    #   @li @b square_limit: @/b This mode will leave 90 degree corners untouched but 
+    #           cut off corners with a sharper angle. This is the default mode. @/li
+    #   @li @b acute_limit: @/b This mode will leave 45 degree corners untouched but
+    #           cut off corners with a sharper angle @/li
+    #   @li @b no_limit: @/b This mode will not cut off (only at extremely sharp angles @/li
+    # @/ul
+    #
+    # Merged semantics applies, i.e. polygons will be merged before the sizing is applied 
+    # unless the layer was put into raw mode (see \raw). On output, the polygons are not
+    # merged immediately, so it is possible to detect overlapping regions after a positive 
+    # sizing using \raw and \merged with an overlap count, for example:
+    #
+    # @code
+    #   layer.sized(300.nm).raw.merged(2)
+    # @/code
+    #
+    # Bias values can be given as floating-point values (in micron) or integer values (in
+    # database units). To explicitly specify the unit, use the unit denominators.
+    #
+    # \size is working like \sized but modifies the layer it is called on.
+    #
+    # The following images show the effect of various forms of the "sized" method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_sized1.png) @/td
+    #     @td @img(/images/drc_sized2.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_sized3.png) @/td
+    #     @td @img(/images/drc_sized4.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_sized5.png) @/td
+    #     @td @img(/images/drc_sized6.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name size
+    # @brief Polygon sizing (per-edge biasing, modifies the layer)
+    # @synopsis layer.size(d [, mode])
+    # @synopsis layer.size(dx, dy [, mode]))
+    #
+    # See \sized. The size method basically does the same but modifies the layer
+    # it is called on. The input layer is returned and available for further processing.
+    
+    %w(size sized).each do |f|
+      eval &lt;&lt;"CODE"
+      def #{f}(*args)
+      
+        requires_region("#{f}")
+        
+        dist = 0
+        
+        mode = 2
+        values = []
+        args.each do |a|
+          if a.is_a?(Fixnum) || a.is_a?(Float)
+            v = prep_value(a)
+            v.abs &gt; dist &amp;&amp; dist = v.abs 
+            values.push(v)
+          elsif a.is_a?(DRCSizingMode)
+            mode = a.value
+          end
+        end
+        
+        aa = []
+        if values.size &lt; 1
+          raise "#{f}: Method requires one or two sizing values"
+        elsif values.size &gt; 2
+          raise "#{f}: Method must not have more than two values"
+        else
+          aa.push(values[0])
+          aa.push(values[-1])
+        end
+        
+        aa.push(mode)
+        
+        if :#{f} == :size &amp;&amp; @engine.is_tiled?
+          # in tiled mode, no modifying versions are available
+          @data = @engine._tcmd(@data, dist, RBA::Region, :sized, *aa)
+          self
+        elsif :#{f} == :size 
+          @engine._tcmd(@data, dist, RBA::Region, :#{f}, *aa)
+          self
+        else 
+          DRCLayer::new(@engine, @engine._tcmd(@data, dist, RBA::Region, :#{f}, *aa))
+        end
+        
+      end
+CODE
+    end
+    
+    # %DRC%
+    # @name polygons
+    # @brief Returns polygons from edge pairs
+    # @synopsis layer.polygons([ enlargement ])
+    #
+    # This method applies to edge pair collections. The edge pairs will be
+    # converted into polygons connecting the edges the edge pairs are made of.
+    # In order to properly handle special edge pairs (coincident edges, point-like
+    # edges etc.) an enlargement parameter can be specified which will make the 
+    # resulting polygon somewhat larger than the original edge pair. If the enlargement
+    # parameter is 0, special edge pairs with an area of 0 will be dropped.
+    
+    def polygons(*args)
+      requires_edge_pairs("polygons")
+      args.size &lt;= 1 || raise("polygons: Method requires 0 or 1 arguments")
+      aa = args.collect { |a| prep_value(a) }
+      DRCLayer::new(@engine, @engine._cmd(@data, :polygons, *aa))
+    end
+    
+    # %DRC%
+    # @name extents
+    # @brief Returns the bounding box of each input object
+    # @synopsis layer.extents([ enlargement ])
+    # 
+    # Applies to edge layers, polygon layers on edge pair collections.
+    # Returns a polygon layer consisting of boxes for each input object.
+    # The boxes enclose the original object. 
+    # 
+    # Merged semantics applies, so the box encloses the merged polygons
+    # or edges unless raw mode is chosen (see \raw).
+    #
+    # The enlargement parameter specifies an optional enlargement which 
+    # will make zero width/zero height object render valid polygons 
+    # (i.e. horizontal/vertical edges).
+    #
+    # The following images show the effect of the extents method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_extents1.png) @/td
+    #     @td @img(/images/drc_extents2.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name moved
+    # @brief Moves (shifts, translates) a layer
+    # @synopsis layer.moved(dx, dy)
+    # 
+    # Moves the input layer by the given distance (x, y) and returns
+    # the moved layer. The layer that this method is called upon is not modified.
+    #
+    # Shift distances can be given as floating-point values (in micron) or integer values (in
+    # database units). To explicitly specify the unit, use the unit denominators.
+    #
+    # The following images shows the effect of the "moved" method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_moved1.png) @/td
+    #   @/tr
+    # @/table
+
+    # %DRC%
+    # @name move
+    # @brief Moves (shifts, translates) a layer (modifies the layer)
+    # @synopsis layer.move(dx, dy)
+    # 
+    # Moved the input by the given distance. The layer that this method is called 
+    # upon is modified and the modified version is returned for further processing.
+    #
+    # Shift distances can be given as floating-point values (in micron) or integer values (in
+    # database units). To explicitly specify the unit, use the unit denominators.
+    
+    # %DRC%
+    # @name transformed
+    # @brief Transforms a layer
+    # @synopsis layer.transformed(t)
+    # 
+    # Transforms the input layer by the given transformation and returns
+    # the moved layer. The layer that this method is called upon is not modified.
+    # This is the most generic method is transform a layer. The transformation
+    # is a RBA::DCplxTrans object which describes many different kinds of affine transformations
+    # except shear and anisotropic magnification.
+    #
+    # The following image shows the effect of the "moved" method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_moved1.png) @/td
+    #   @/tr
+    # @/table
+
+    # %DRC%
+    # @name transform
+    # @brief Transforms a layer (modifies the layer)
+    # @synopsis layer.transform(t)
+    # 
+    # Like \transform, but modifies the input and returns a reference to it for
+    # further processing.
+    
+    %w(extents moved transformed).each do |f| 
+      eval &lt;&lt;"CODE"
+      def #{f}(*args)
+        aa = args.collect { |a| prep_value(a) }
+        DRCLayer::new(@engine, @engine._cmd(@data, :#{f}, *aa))
+      end
+CODE
+    end
+    
+    %w(move transform).each do |f| 
+      eval &lt;&lt;"CODE"
+      def #{f}(*args)
+        aa = args.collect { |a| prep_value(a) }
+        @engine._cmd(@data, :#{f}, *aa)
+        self
+      end
+CODE
+    end
+    
+    # %DRC%
+    # @name merged 
+    # @brief Returns the merged layer
+    # @synopsis layer.merged([overlap_count])
+    #
+    # Returns the merged input. Usually, merging is done implicitly using the
+    # \clean state (which is default). However, in raw state, merging can be 
+    # enforced by using this method. In addition, this method allows specification
+    # of a minimum overlap count, i.e. only where at least the given number of polygons
+    # overlap, output is produced. See \sized for an application of that.
+    #
+    # This method works both on edge or polygon layers. Edge merging forms
+    # single, continuous edges from coincident and connected individual edges.
+    #
+    # A version that modifies the input layer is \merge.
+    #
+    # The following images show the effect of various forms of the "merged" method:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_merged1.png) @/td
+    #     @td @img(/images/drc_merged2.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_merged3.png) @/td
+    #     @td @img(/images/drc_merged4.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name merge
+    # @brief Merges the layer (modifies the layer)
+    # @synopsis layer.merge([overlap_count])
+    #
+    # Like \merged, but modifies the input and returns a reference to the 
+    # new layer.
+    
+    def merged(*args)
+      requires_edges_or_region("merged")
+      aa = args.collect { |a| prep_value(a) }
+      DRCLayer::new(@engine, @engine._tcmd(@data, 0, @data.class, :merged, *aa))
+    end
+    
+    def merge(*args)
+      requires_edges_or_region("merge")
+      aa = args.collect { |a| prep_value(a) }
+      if @engine.is_tiled?
+        # in tiled mode, no modifying versions are available
+        @data = @engine._tcmd(@data, 0, @data.class, :merged, *aa)
+      else
+        @engine._tcmd(@data, 0, @data.class, :merge, *aa)
+      end
+      self
+    end
+    
+    # %DRC%
+    # @name output
+    # @brief Output the content of the layer
+    # @synopsis layer.output(specs)
+    # 
+    # This method will output the content of the layer to the specified output.
+    #
+    # If a report database is selected for the output, the specification has to include a 
+    # category name and optionally a category description.
+    #
+    # If the layout is selected for the output, the specification can consist of
+    # one to three parameters: a layer number, a data type (optional, default is 0)
+    # and a layer name (optional).
+    #
+    # See \global#report and \global#target on how to configure output to a target layout
+    # or report database. 
+    
+    def output(*args)
+      @engine._vcmd(@engine, :_output, @data, *args)
+    end
+    
+    # %DRC%
+    # @name data
+    # @brief Gets the low-level data object
+    # @synopsis layer.data 
+    #
+    # This method returns a RBA::Region, RBA::Edges or RBA::EdgePairs object
+    # representing the underlying RBA object for the data.
+    # Access to these objects is provided to support low-level iteration and manipulation
+    # of the layer's data. 
+    
+    def data
+      @data
+    end
+
+  private
+      
+    def prep_value(a)
+      if a.is_a?(RBA::DPoint)
+        RBA::Point::from_dpoint(a * (1.0 / @engine.dbu.to_f))
+      elsif a.is_a?(RBA::DCplxTrans)
+        RBA::ICplxTrans::from_dtrans(RBA::DCplxTrans::new(1.0 / @engine.dbu.to_f) * a * RBA::DCplxTrans::new(@engine.dbu.to_f))
+      elsif a.is_a?(RBA::DTrans)
+        RBA::ICplxTrans::from_dtrans(RBA::DCplxTrans::new(1.0 / @engine.dbu.to_f) * RBA::DCplxTrans::new(a) * RBA::DCplxTrans::new(@engine.dbu.to_f))
+      elsif a.is_a?(Float)
+        (0.5 + a / @engine.dbu).floor.to_i
+      else
+        a
+      end
+    end
+    
+    def prep_value_area(a)
+      dbu2 = @engine.dbu.to_f * @engine.dbu.to_f
+      if a.is_a?(Float)
+        (0.5 + a / dbu2).floor.to_i
+      else
+        a
+      end
+    end
+    
+  protected
+  
+    def requires_region(f)
+      @data.is_a?(RBA::Region) || raise("#{f}: Requires a polygon layer")
+    end
+    
+    def requires_edge_pairs(f)
+      @data.is_a?(RBA::EdgePairs) || raise("#{f}: Requires a edge pair layer")
+    end
+    
+    def requires_edges(f)
+      @data.is_a?(RBA::Edges) || raise("#{f}: Requires an edge layer")
+    end
+    
+    def requires_edges_or_region(f)
+      @data.is_a?(RBA::Edges) || @data.is_a?(RBA::Region) || raise("#{f}: Requires an edge or polygon layer")
+    end
+    
+    def requires_same_type(other, f)
+      @data.class == other.data.class || raise("#{f}: Requires input of the same kind")
+    end
+    
+  end
+  
+  # A layout source representative object.
+  # This object describes an input. It consists of a layout reference plus 
+  # some attributes describing how input is to be gathered. 
+  
+  # %DRC%
+  # @scope
+  # @name Source
+  # @brief DRC Reference: Source Object
+  # The layer object represents a collection of polygons, edges or edge pairs.
+  # A source specifies where to take layout from. That includes the actual layout,
+  # the top cell and options such as clip/query boxes, cell filters etc.
+  
+  class DRCSource
+  
+    def initialize(engine, layout, layout_var, cell)
+      @engine = engine
+      @layout = layout
+      @layout_var = layout_var
+      @cell = cell
+      @inside = nil
+      @box = nil
+      @layers = nil
+      @sel = []
+      @clip = false
+      @overlapping = false
+      @tmp_layers = []
+    end
+        
+    # %DRC%
+    # @name layout
+    # @brief Returns the RBA::Layout object associated with this source
+    # @synopsis layout
+    
+    def layout
+      @layout
+    end
+    
+    # %DRC%
+    # @name cell_name
+    # @brief Returns the name of the currently selected cell
+    # @synopsis cell_name
+    
+    def cell_name
+      @cell.name
+    end
+    
+    # %DRC%
+    # @name cell_obj
+    # @brief Returns the RBA::Cell object of the currently selected cell
+    # @synopsis cell_obj
+    
+    def cell_obj
+      @cell
+    end
+    
+    def finish
+      @tmp_layers.each do |li|
+        @layout.delete_layer(li)
+      end
+    end
+
+    def set_box(method, *args)
+      box = nil
+      if args.size == 1
+        box = args[0]
+        box.is_a?(RBA::DBox) || raise("'#{method}' method requires a box specification")
+      elsif args.size == 2
+        (args[0].is_a?(RBA::DPoint) &amp;&amp; args[1].is_a?(RBA::DPoint)) || raise("'#{method}' method requires a box specification with two points")
+        box = RBA::DBox::new(args[0], args[1])
+      elsif args.size == 4
+        box = RBA::DBox::new(*args)
+      else 
+        raise("Invalid number of arguments for '#{method}' method")
+      end
+      @box = RBA::Box::from_dbox(box * (1.0 / @layout.dbu))
+      self
+    end
+    
+    def inplace_clip(*args)
+      set_box("clip", *args)
+      @clip = true
+      @overlapping = true
+    end
+            
+    def inplace_touching(*args)
+      set_box("touching", *args)
+      @clip = false
+      @overlapping = false
+    end
+    
+    def inplace_overlapping(*args)
+      set_box("overlapping", *args)
+      @clip = false
+      @overlapping = true
+    end
+    
+    def inplace_cell(arg)
+      @cell = layout.cell(arg)
+      @cell ||= layout.create_cell(arg)
+      self  
+    end
+    
+    def inplace_select(*args)
+      args.each do |a|
+        a.is_a?(String) || raise("Invalid arguments to 'select' method - must be strings")
+        @sel.push(a)
+      end
+      self
+    end
+    
+    # %DRC%
+    # @name select
+    # @brief Adds cell name expressions to the cell filters
+    # @synopsis source.select(filter1, filter2, ...)
+    # This method will construct a new source object with the given cell filters 
+    # applied.
+    # Cell filters will enable or disable cells plus their subtree.
+    # Cells can be switched on and off, which makes the hierarchy traversal
+    # stop or begin delivering shapes at the given cell. The arguments of 
+    # the select method form a sequence of enabling or disabling instructions
+    # using cell name pattern in the glob notation ("*" as the wildcard, like shell).
+    # Disabling instructions start with a "-", enabling instructions with a "+" or
+    # no specification.
+    #
+    # The following options are available:
+    # 
+    # @ul
+    # @li @tt+@/tt @i name_filter @/i: Cells matching the name filter will be enabled @/li
+    # @li @i name_filter @/i: Same as "+name_filter" @/li
+    # @li @tt-@/tt @i name_filter @/i: Cells matching the name filter will be disabled @/li
+    # @/ul
+    #
+    # To disable the TOP cell but enabled a hypothetical cell B below the top cell, use that
+    # code:
+    #
+    # @code
+    # layout_with_selection = layout.select("-TOP", "+B")
+    # l1 = layout_with_selection.input(1, 0)
+    # ...
+    # @/code
+    #
+    # Please note that the sample above will deliver the children of "B" because there is 
+    # nothing said about how to proceed with cells other than "TOP" or "B".
+    # The following code will just select "B" without it's children, because in the 
+    # first "-*" selection, all cells including the children of "B" are disabled:
+    #
+    # @code
+    # layout_with_selection = layout.select("-*", "+B")
+    # l1 = layout_with_selection.input(1, 0)
+    # ...
+    # @/code
+    
+    # %DRC%
+    # @name cell
+    # @brief Specifies input from a specific cell
+    # @synopsis source.cell(name)
+    # This method will create a new source that delivers shapes from the 
+    # specified cell. 
+    
+    # %DRC%
+    # @name clip
+    # @brief Specifies clipped input
+    # @synopsis source.clip(box)
+    # @synopsis source.clip(p1, p2)
+    # @synopsis source.clip(l, b, r, t)
+    # Creates a source which represents a rectangular part of the 
+    # original input. Three ways are provided to specify the rectangular
+    # region: a single RBA::DBox object (micron units), two RBA::DPoint
+    # objects (lower/left and upper/right coordinate in micron units)
+    # or four coordinates: left, bottom, right and top coordinate.
+    # 
+    # This method will create a new source which delivers the shapes
+    # from that region clipped to the rectangle. A method doing the 
+    # same but without clipping is \touching or \overlapping.
+    
+    # %DRC%
+    # @name touching
+    # @brief Specifies input selected from a region in touching mode
+    # @synopsis source.touching(box)
+    # @synopsis source.touching(p1, p2)
+    # @synopsis source.touching(l, b, r, t)
+    # Like \clip, this method will create a new source delivering shapes
+    # from a specified rectangular region. In contrast to clip, all shapes
+    # touching the region with their bounding boxes are delivered as a whole
+    # and are not clipped. Hence shapes may extent beyond the limits of
+    # the specified rectangle.
+    # 
+    # \overlapping is a similar method which delivers shapes overlapping
+    # the search region with their bounding box (and not just touching)
+    
+    # %DRC%
+    # @name overlapping
+    # @brief Specifies input selected from a region in overlapping mode
+    # @synopsis source.overlapping(...)
+    # Like \clip, this method will create a new source delivering shapes
+    # from a specified rectangular region. In contrast to clip, all shapes
+    # overlapping the region with their bounding boxes are delivered as a whole
+    # and are not clipped. Hence shapes may extent beyond the limits of
+    # the specified rectangle.
+    # 
+    # \touching is a similar method which delivers shapes touching
+    # the search region with their bounding box (without the requirement to overlap)
+    
+    # export inplace_* as * out-of-place
+    %w(select cell clip touching overlapping).each do |f|
+      eval &lt;&lt;"CODE"
+        def #{f}(*args)
+          s = self.dup
+          s.inplace_#{f}(*args)
+          s
+        end
+CODE
+    end
+
+    # %DRC%
+    # @name extent
+    # @brief Returns a layer with the bounding box of the selected layout
+    # @synopsis source.extent
+    # The extent function is useful to invert a layer:
+    # 
+    # @code
+    # inverse_1 = extent.sized(100.0) - input(1, 0)
+    # @/code
+    
+    def extent
+      layer = input
+      if @box
+        layer.insert(RBA::DBox::from_ibox(@box) * @layout.dbu)
+      else
+        layer.insert(RBA::DBox::from_ibox(@cell.bbox) * @layout.dbu)
+      end
+      layer
+    end
+          
+    # %DRC%
+    # @name input
+    # @brief Specifies input from a source
+    # @synopsis source.input(layer)
+    # @synopsis source.input(layer, datatype)
+    # @synopsis source.input(filter, ...)
+    # Creates a layer with the shapes from the given layer of the source.
+    # The layer can be specified by layer and optionally datatype or by
+    # a sequence of filters. Filters are expressions describing ranges
+    # of layers and/or datatype numbers or layer names. Multiple filters
+    # can be given and all layers matching at least one of these filter
+    # expressions are joined to render the input layer for the DRC engine.
+    #
+    # Some filter expressions are:
+    #
+    # @ul
+    # @li @tt 1/0-255 @/tt: Datatypes 0 to 255 for layer 1 @/li
+    # @li @tt 1-10 @/tt: Layers 1 to 10, datatype 0 @/li
+    # @li @tt METAL @/tt: A layer named "METAL" @/li
+    # @li @tt METAL (17/0) @/tt: A layer named "METAL" or layer 17, datatype 0 (for GDS, which does
+    #           not have names)@/li
+    # @/ul
+    
+    def input(*args)
+    
+      layers = []
+     
+      if args.size == 0
+      
+        li = @layout.insert_layer(RBA::LayerInfo::new)
+        li &amp;&amp; layers.push(li)
+        li &amp;&amp; @tmp_layers.push(li)
+      
+      elsif (args.size == 1 || args.size == 2) &amp;&amp; args[0].is_a?(Fixnum)
+
+        li = @layout.find_layer(args[0], args[1] || 0)
+        li &amp;&amp; layers.push(li)
+        
+      else
+      
+        args.each do |a|
+          if a.is_a?(String)
+            # use the LayerMap class to fetch the matching layers
+            lm = RBA::LayerMap::new
+            lm.map(a, 0)
+            @layout.layer_indices.each do |li|
+              if lm.is_mapped?(@layout.get_info(li))
+                layers.push(li)
+              end
+            end
+          end
+        end
+        
+      end
+      
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping))
+
+    end
+
+  end
+
+  # The DRC engine
+  
+  # %DRC%
+  # @scope 
+  # @name global 
+  # @brief DRC Reference: Global Functions
+  # Some functions are available on global level and can be used without any object.
+  # Most of them are convenience functions that basically act on some default object
+  # or provide function-like alternatives for the methods.
+
+  class DRCEngine
+  
+    def initialize
+
+      cv = RBA::CellView::active
+
+      @def_layout = cv &amp;&amp; cv.layout
+      @def_cell = cv &amp;&amp; cv.cell
+      @def_source = nil
+      @dbu_read = false
+      use_dbu(@def_layout &amp;&amp; @def_layout.dbu)
+      @output_layout = nil
+      @output_rdb = nil
+      @output_rdb_file = nil
+      @output_rdb_cell_id = nil
+      @used_output_layers = {}
+      @output_layers = []
+      @vnum = 1
+      @layout_sources = {}
+      @lnum = 1
+      @log_file = nil
+
+      @verbose = false
+
+    end
+    
+    def joined
+      DRCJoinFlag::new(true)
+    end
+    
+    def diamond_limit
+      DRCSizingMode::new(0)
+    end
+    
+    def octagon_limit
+      DRCSizingMode::new(1)
+    end
+    
+    def square_limit
+      DRCSizingMode::new(2)
+    end
+    
+    def acute_limit
+      DRCSizingMode::new(3)
+    end
+    
+    def no_limit
+      DRCSizingMode::new(4)
+    end
+    
+    def projection_limits(*args)
+      DRCProjectionLimits::new(*args)
+    end
+    
+    def angle_limit(a)
+      DRCAngleLimit::new(a)
+    end
+    
+    def whole_edges(f = true)
+      DRCWholeEdges::new(f)
+    end
+    
+    def euclidian
+      DRCMetrics::new(RBA::Region::Euclidian)
+    end
+    
+    def square
+      DRCMetrics::new(RBA::Region::Square)
+    end
+    
+    def projection
+      DRCMetrics::new(RBA::Region::Projection)
+    end
+    
+    # %DRC%
+    # @name verbose?
+    # @brief Returns true, if verbose mode is enabled
+    # @synopsis verbose?
+    # In verbose mode, more output is generated in the log file
+    
+    def verbose?
+      @verbose
+    end
+    
+    # %DRC%
+    # @name verbose
+    # @brief Sets or resets verbose mode
+    # @synopsis verbose
+    # @synopsis verbose(m)
+    # In verbose mode, more output is generated in the log file
+    
+    def verbose(f = true)
+      self.verbose = f
+    end
+    
+    # %DRC%
+    # @name silent
+    # @brief Resets verbose mode
+    # @synopsis silent
+    # This function is equivalent to "verbose(false)" (see \verbose)
+    
+    def silent(f = true)
+      self.verbose = !f
+    end
+    
+    def verbose=(f)
+      @verbose = f
+    end
+    
+    # %DRC%
+    # @name info 
+    # @brief Outputs as message to the logger window
+    # @synopsis info(message)
+    # Prints the message to the log window in verbose mode.
+    # In non-verbose more, nothing is printed.
+    # \log is a function that always prints a message.
+    
+    def info(arg)
+      @verbose &amp;&amp; log(arg)
+    end
+    
+    # %DRC%
+    # @name log 
+    # @brief Outputs as message to the logger window
+    # @synopsis log(message)
+    # Prints the message to the log window.
+    # \info is a function that prints a message only if 
+    # verbose mode is enabled.
+    
+    def log(arg)
+      if @log_file
+        @log_file.puts(arg)
+      else
+        RBA::Logger::info(arg)
+      end
+    end
+    
+    # %DRC%
+    # @name error
+    # @brief Prints an error
+    # @synopsis error(message)
+    # Similar to \log, but the message is printed formatted as an error
+    
+    def error(arg)
+      if @log_file
+        @log_file.puts("ERROR: " + arg)
+      else
+        RBA::Logger::error(arg)
+      end
+    end
+    
+    # %DRC%
+    # @name log_file
+    # @brief Specify the log file where to send to log to
+    # @synopsis log_file(filename)
+    # After using that method, the log output is sent to the 
+    # given file instead of the logger window or the terminal.
+    
+    def log_file(arg)
+      @log_file &amp;&amp; @log_file.close
+      @log_file = File.open(arg, "w")
+    end
+    
+    # Specify the database unit to use
+    
+    def use_dbu(d)
+      if @dbu_read 
+        raise "Cannot change the database unit at this point"
+      end
+      # Should have a "context", but no such thing for Float or Fixnum
+      Float._dbu = d
+      Fixnum._dbu = d
+      @dbu = d
+    end
+    
+    # %DRC%
+    # @name dbu
+    # @brief Gets or sets the database unit to use
+    # @synopsis dbu(dbu)
+    # @synopsis dbu
+    # Without any argument, this method gets the database unit
+    # used inside the DRC engine. 
+    #
+    # With an argument, sets the database unit used internally in the DRC engine.
+    # Without using that method, the database unit is automatically
+    # taken as the database unit of the last input. 
+    # A specific database unit can be set in order to optimize
+    # for two layouts (i.e. take the largest common denominator).
+    # When the database unit is set, it must be set at the beginning
+    # of the script and before any operation that uses it.
+    
+    def dbu(d = nil)
+      if !d
+        @dbu || raise("No database unit specified")
+      else
+        use_dbu(d.to_f)
+      end
+      @dbu_read = true
+      @dbu
+    end
+    
+    # %DRC%
+    # @name tiles
+    # @brief Specifies tiling 
+    # @synopsis tiles(t)
+    # @synopsis tiles(w, h)
+    # Specifies tiling mode. In tiling mode, the DRC operations are evaluated in tiles
+    # with width w and height h. With one argument, square tiles with width and height
+    # t are used.
+    # 
+    # Special care must be taken when using tiling mode, since some operations may not
+    # behave as expected at the borders of the tile. Tiles can be made overlapping by
+    # specifying a tile border dimension with \tile_borders. Some operations like sizing,
+    # the DRC functions specify a tile border implicitly. Other operations without a
+    # defined range won't do so and the consequences of tiling mode can be difficult to
+    # predict.
+    #
+    # In tiling mode, the memory requirements are usually smaller (depending on the 
+    # choice of the tile size) and multi-CPU support is enabled (see \threads).
+    # To disable tiling mode use \flat. 
+    
+    def tiles(tx, ty = nil)
+      @tx = tx.to_f
+      @ty = (ty || tx).to_f
+    end
+    
+    # %DRC%
+    # @name is_tiled?
+    # @brief Returns true, if in tiled mode
+    # @synopsis is_tiled?
+    
+    def is_tiled?
+      @tx != nil
+    end
+    
+    # %DRC%
+    # @name tile_borders
+    # @brief Specifies a minimum tile border
+    # @synopsis tile_border(b)
+    # @synopsis tile_border(bx, by)
+    # The tile border specifies the distance to which shapes are collected into the 
+    # tile. In order words, when processing a tile, shapes within the border distance
+    # participate in the operations.
+    #
+    # For some operations such as booleans (\and, \or, ...), \size and the DRC functions (\width, \space, ...)
+    # a tile border is automatically established. For other operations such as \with_area
+    # or \edges, the exact distance is unknown, because such operations may have a long range.
+    # In that cases, no border is used. The tile_borders function may be used to specify a minimum border
+    # which is used in that case. That allows taking into account at least shapes within the 
+    # given range, although not necessarily all.
+    # 
+    # To reset the tile borders, use \no_borders or "tile_borders(nil)".
+    
+    def tile_borders(bx, by = nil)
+      @bx = bx.to_f
+      @by = (by || bx).to_f
+    end
+    
+    # %DRC%
+    # @name no_borders
+    # @brief Reset the tile borders
+    # @synopsis no_borders
+    # Resets the tile borders - see \tile_borders for a description of tile borders.
+    
+    def no_borders
+      @bx = @by = nil
+    end
+    
+    # %DRC%
+    # @name flat
+    # @brief Disables tiling mode 
+    # @synopsis flat
+    # Disables tiling mode. Tiling mode can be enabled again with \tiles later.
+    
+    def flat
+      @tx = @ty = nil
+    end
+    
+    # %DRC%
+    # @name threads
+    # @brief Specifies the number of CPU cores to use in tiling mode
+    # @synopsis threads(n)
+    # If using threads, tiles are distributed on multiple CPU cores for
+    # parallelization. Still, all tiles must be processed before the 
+    # operation proceeds with the next statement.
+    
+    def threads(n)
+      @tt = n.to_i
+    end
+    
+    # %DRC%
+    # @name polygon_layer
+    # @brief Creates an empty polygon layer
+    # @synopsis polygon_layer
+    # The intention of that method is to create an empty layer which can be 
+    # filled with polygon-like objects using \Layer#insert.
+    
+    def polygon_layer
+      DRCLayer::new(self, RBA::Region::new)
+    end
+      
+    # %DRC%
+    # @name edge_layer
+    # @brief Creates an empty edge layer
+    # @synopsis edge_layer
+    # The intention of that method is to create an empty layer which can be 
+    # filled with edge objects using \Layer#insert.
+    
+    def edge_layer
+      DRCLayer::new(self, RBA::Edges::new)
+    end
+      
+    # %DRC%
+    # @name source
+    # @brief Specifies a source layout
+    # @synopsis source
+    # @synopsis source(what)
+    # This function replaces the default source layout by the specified
+    # file. If this function is not used, the currently active layout 
+    # is used as input. 
+    #
+    # \layout is a similar method which specifies @i a additional @/i input layout.
+    # 
+    # "what" specifies what input to use. "what" be either
+    #
+    # @ul
+    # @li A string "\@n" specifying input from a layout in the current panel @/li
+    # @li A layout filename plus an optional cell name@/li
+    # @li A RBA::Layout object plus an optional cell name@/li
+    # @li A RBA::Cell object @/li
+    # @/ul
+    # 
+    # Without any arguments the default layout is returned. If a filename is given, a cell name
+    # can be specified as the second argument. If none is specified, the top cell is taken which
+    # must be unique in that case.
+    #
+    # @code
+    # # XOR between layers 1 of "first_layout.gds" and "second_layout.gds" and sends the results to "xor_layout.gds":
+    # target("xor_layout.gds")
+    # source("first_layout.gds")
+    # l2 = layout("second_layout.gds")
+    # (input(1, 0) ^ l2.input(1, 0)).output(100, 0)
+    # @/code
+    # 
+    # For further methods on the source object see \Source.
+    
+    def source(arg = nil, arg2 = nil)
+    
+      if arg
+      
+        if arg.is_a?(String)
+        
+          if arg =~ /^@(\d+)/
+            n = $1.to_i - 1
+            view = RBA::LayoutView::current
+            view || raise("No view open")
+            (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n}")
+            cv = view.cellview(n)
+            cv.is_valid? || raise("Invalid layout @#{n}")
+            @def_source = make_source(cv.layout, cv.cell)
+          else
+            layout = RBA::Layout::new
+            info("Reading #{arg} ..")
+            layout.read(arg)
+            cell = nil 
+            if arg2
+              arg2.is_a?(String) || raise("Second argument of 'source' must be a string")
+              cell = layout.cell(arg2)
+              cell || raise("Cell name #{arg2} not found in input layout")
+            end
+            @def_source = make_source(layout, cell)
+          end
+          
+        elsif arg.is_a?(RBA::Layout)
+
+          cell = arg2
+          if cell.is_a?(String)
+            cell = arg.cell(cell)
+            cell || raise("Cell name #{cell} not found in input layout")
+          elsif !cell.is_a?(RBA::Cell)
+            raise("Second argument of 'source' must be a string or RBA::Cell object")
+          end
+          @def_source = make_source(arg, cell)
+
+        elsif arg.is_a?(RBA::Cell)
+          @def_source = make_source(arg.layout, arg)
+        else
+          raise("Invalid argument for 'source' method")
+        end
+      
+      else
+        @def_source || @def_layout || raise("No layout loaded - no default layout. Use 'layout' or 'source' to explicitly specify a layout.")
+        @def_source ||= make_source(@def_layout, @def_cell)
+      end
+
+      # make default input also default output if none is set yet.
+      @def_layout ||= @def_source.layout
+      @def_cell ||= @def_source.cell_obj
+          
+      # use the DBU of the new input as DBU reference
+      @dbu_read || use_dbu(@def_source.layout.dbu)
+
+      @def_source
+
+    end
+
+    # %DRC%
+    # @name layout
+    # @brief Specifies an additional layout for the input source.
+    # @synopsis layout
+    # @synopsis layout(what)
+    # This function can be used to specify a new layout for input.
+    # It returns an Source object representing that layout. The "input" method
+    # of that object can be used to get input layers for that layout.
+    # 
+    # "what" specifies what input to use. "what" be either
+    #
+    # @ul
+    # @li A string "\@n" specifying input from a cellview in the current view @/li
+    # @li A layout filename plus an optional cell name @/li
+    # @li A RBA::Layout object @/li
+    # @li A RBA::Cell object @/li
+    # @/ul
+    # 
+    # Without any arguments the default layout is returned.
+    #
+    # If a file name is given, a cell name can be specified as the second argument.
+    # If not, the top cell is taken which must be unique in that case.
+    #
+    # Having specified a layout for input enables to use the input method
+    # for getting input:
+    #
+    # @code
+    # # XOR between layers 1 or the default input and "second_layout.gds":
+    # l2 = layout("second_layout.gds")
+    # (input(1, 0) ^ l2.input(1, 0)).output(100, 0)
+    # @/code
+    # 
+    # For further methods on the source object see \Source.
+    
+    def layout(arg = nil, arg2 = nil)
+    
+      if arg
+      
+        if arg.is_a?(String)
+        
+          if arg =~ /^@(\d+)/
+            n = $1.to_i - 1
+            view = RBA::LayoutView::current
+            view || raise("No view open")
+            (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n}")
+            cv = view.cellview(n)
+            cv.is_valid? || raise("Invalid layout @#{n}")
+            return make_source(cv.layout, cv.cell)
+          else
+            layout = RBA::Layout::new
+            info("Reading #{arg} ..")
+            layout.read(arg)
+            cell = nil 
+            if arg2
+              arg2.is_a?(String) || raise("Second argument of 'source' must be a string")
+              cell = layout.cell(arg2)
+              cell || raise("Cell name #{arg2} not found in input layout")
+            end
+            return make_source(layout, cell)
+          end
+          
+        elsif arg.is_a?(RBA::Layout)
+          return make_source(layout)
+        elsif arg.is_a?(RBA::Cell)
+          return make_source(arg.layout, arg)
+        else
+          raise("Invalid argument for 'layout' method")
+        end
+      
+      else
+        @def_source || @def_layout || raise("No layout loaded - no default layout. Use 'layout' or 'source' to explicitly specify a layout.")
+        @def_source ||= make_source(@def_layout, @def_cell)
+        @def_source
+      end
+          
+    end
+
+    # %DRC%
+    # @name report
+    # @brief Specifies a report database for output
+    # @synopsis report(description [, filename])
+    # After specifying a report database for output, \output method calls are redirected to
+    # the report database. The format of the \output calls changes and a category name plus
+    # description can be specified rather than a layer/datatype number of layer name.
+    # See the description of the output method for details.
+    #
+    # If a filename is given, the report database will be written to the specified file name.
+    # Otherwise it will be shown but not written.
+    #
+    # If external input is specified with \source, 
+    # "report" must be called after "source".
+      
+    def report(description, filename = nil)
+
+      @output_rdb_file = filename
+
+      name = filename &amp;&amp; File::basename(filename)
+      name ||= "DRC"
+      
+      lv = RBA::LayoutView::current
+      if lv
+        @output_rdb_index = lv.create_rdb(name)
+        @output_rdb = lv.rdb(@output_rdb_index)
+      else
+        @output_rdb = RBA::ReportDatabase::new(name)
+      end
+      
+      @output_layout = nil
+      @output_cell = nil
+      @output_layout_file = nil
+
+      cn = nil
+      cn ||= @def_cell &amp;&amp; @def_cell.name
+      cn ||= source.cell_name
+
+      @output_rdb_cell_id = @output_rdb.create_cell(cn).rdb_id
+      @output_rdb.generator = $0
+      @output_rdb.top_cell_name = cn
+      @output_rdb.description = description
+      
+    end
+    
+    # %DRC%
+    # @name output_cell
+    # @brief Specifies a target cell, but does not change the target layout
+    # @synopsis output_cell(cellname)
+    # This method switches output to the specified cell, but does not
+    # change the target layout nor does it switch the output channel to
+    # layout if is report database. 
+    
+    def output_cell(cellname)
+
+      # finish what we got so far
+      _flush
+      
+      if @output_rdb
+      
+        cell_id = nil
+        @output_rdb.each_cell do |c|
+          if c.name == cellname
+            cell_id = c.rdb_id
+          end
+        end
+        
+        cell_id ||= @output_rdb.create_cell(cellname).rdb_id
+        @output_rdb_cell_id = cell_id
+        
+      else
+      
+        @output_layout ||= @def_layout
+        if @output_layout
+          @output_cell = @output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)
+        end
+        
+      end
+          
+    end
+
+    # %DRC%
+    # @name target
+    # @brief Specify the target layout
+    # @synopsis target(what [, cellname])
+    # This function can be used to specify a target layout for output.
+    # Subsequent calls of "output" will send their results to that target
+    # layout. Using "target" will disable output to a report database.
+    # If any target was specified before, that target will be closed and 
+    # a new target will be set up.
+    # 
+    # "what" specifies what input to use. "what" be either
+    #
+    # @ul
+    # @li A string "\@n" specifying output to a layout in the current panel @/li
+    # @li A layout filename @/li 
+    # @li A RBA::Layout object @/li
+    # @li A RBA::Cell object @/li
+    # @/ul
+    # 
+    # Except if the argument is a RBA::Cell object, a cellname can be specified 
+    # stating the cell name under which the results are saved. If no cellname is 
+    # specified, either the current cell or "TOP" is used.
+    # 
+    
+    def target(arg, cellname = nil)
+    
+      # finish what we got so far
+      _finish(false)
+          
+      if arg.is_a?(String)
+      
+        if arg =~ /^@(\d+)/
+          n = $1.to_i - 1
+          view = RBA::LayoutView::current
+          view || raise("No view open")
+          (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n}")
+          cv = view.cellview(n)
+          cv.is_valid? || raise("Invalid layout @#{n}")
+          @output_layout = cv.layout
+          @output_cell = cellname ? (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)) : cv.cell
+          @output_layout_file = nil
+        else
+          @output_layout = RBA::Layout::new
+          @output_cell = @output_layout.create_cell(cellname.to_s || "TOP")
+          @output_layout_file = arg
+        end
+        
+      elsif arg.is_a?(RBA::Layout)
+      
+        @output_layout = arg
+        @output_cell = @output_layout.create_cell(cellname.to_s || "TOP")
+        @output_layout_file = nil
+        
+      elsif arg.is_a?(RBA::Cell)
+      
+        @output_layout = arg.layout
+        @output_cell = arg
+        @output_layout_file = nil
+
+      else
+        raise("Invalid argument for 'target' method")
+      end
+    
+    end
+    
+    # %DRC%
+    # @name box 
+    # @brief Creates a box object
+    # @synopsis box(...)
+    # This function creates a box object. The arguments are the same than for the 
+    # RBA::DBox constructors.
+ 
+    def box(*args)
+      RBA::DBox::new(*args)
+    end
+    
+    # %DRC%
+    # @name path 
+    # @brief Creates a path object
+    # @synopsis path(...)
+    # This function creates a path object. The arguments are the same than for the 
+    # RBA::DPath constructors.
+ 
+    def path(*args)
+      RBA::DPath::new(*args)
+    end
+    
+    # %DRC%
+    # @name polygon 
+    # @brief Creates a polygon object
+    # @synopsis polygon(...)
+    # This function creates a polygon object. The arguments are the same than for the 
+    # RBA::DPolygon constructors.
+ 
+    def polygon(*args)
+      RBA::DPolygon::new(*args)
+    end
+    
+    # %DRC%
+    # @name p
+    # @brief Creates a point object
+    # @synopsis p(x, y)
+    # A point is not a valid object by itself, but it is useful for creating 
+    # paths for polygons:
+    #
+    # @code
+    # x = polygon_layer
+    # x.insert(polygon([ p(0, 0), p(16.0, 0), p(8.0, 8.0) ]))
+    # @/code
+    
+    def p(x, y)
+      RBA::DPoint::new(x, y)
+    end
+    
+    # %DRC%
+    # @name edge 
+    # @brief Creates an edge object
+    # @synopsis edge(...)
+    # This function creates an edge object. The arguments are the same than for the 
+    # RBA::DEdge constructors.
+ 
+    def edge(*args)
+      RBA::DEdge::new(*args)
+    end
+    
+    # %DRC%
+    # @name extent 
+    # @brief Creates a new layer with the bounding box of the default source
+    # @synopsis extent
+    # See \Source#extent for a description of that function.
+ 
+    def extent
+      layout.extent
+    end
+    
+    # %DRC%
+    # @name input 
+    # @brief Fetches the shapes from the specified input from the default source
+    # @synopsis input(args)
+    # See \Source#input for a description of that function.
+ 
+    def input(*args)
+      layout.input(*args)
+    end
+    
+    # %DRC%
+    # @name output
+    # @brief Outputs a layer to the report database or output layout
+    # @synopsis output(layer, args)
+    # This function is equivalent to "layer.output(args)". See \Layer#output for details about this function.
+    
+    def output(layer, *args)
+      layer.output(*args)
+    end
+    
+    # %DRC%
+    # @name cell 
+    # @brief Selects a cell for input on the default source
+    # @synopsis cell(args)
+    # See \Source#cell for a description of that function.
+    # In addition to the functionality described there, the global function will also send the output
+    # to the specified cell.
+    # 
+    # The following code will select cell "MACRO" from the input layout:
+    # 
+    # @code
+    # cell("MACRO")
+    # # shapes now will be taken from cell "MACRO"
+    # l1 = input(1, 0)
+    # @/code
+ 
+    def cell(*args)
+      @def_source = layout.cell(*args)
+      output_cell(*args)
+      nil
+    end
+    
+    # %DRC%
+    # @name select 
+    # @brief Specifies cell filters on the default source
+    # @synopsis select(args)
+    # See \Source#select for a description of that function.
+ 
+    def select(*args)
+      @def_source = layout.select(*args)
+      nil
+    end
+    
+    # %DRC%
+    # @name clip 
+    # @brief Specifies clipped input on the default source
+    # @synopsis clip(args)
+    # See \Source#clip for a description of that function.
+    #
+    # The following code will select shapes within a 500x600 micron rectangle (lower left corner at 0,0) 
+    # from the input layout. The shapes will be clipped to that rectangle:
+    # 
+    # @code
+    # clip(0.mm, 0.mm, 0.5.mm, 0.6.mm)
+    # # shapes now will be taken from the given rectangle and clipped to it
+    # l1 = input(1, 0)
+    # @/code
+ 
+    def clip(*args)
+      @def_source = layout.clip(*args)
+      nil
+    end
+    
+    # make some DRCLayer methods available as functions
+    # for the engine
+    %w(join and or xor not 
+       in touching overlapping inside outside interacting
+       select_touching select_overlapping select_inside select_outside select_interacting
+       merge merged rectangles rectilinear non_rectangles non_rectilinear
+       with_area with_perimeter with_angle with_length with_bbox_width with_bbox_area with_bbox_height with_bbox_min with_bbox_max
+       without_area without_perimeter without_length without_angle without_bbox_width without_bbox_area without_bbox_height without_bbox_min without_bbox_max
+       bbox 
+       area length perimeter 
+       is_box? is_empty? is_merged? is_clean? is_raw? polygons? edges? edge_pairs?
+       strict non_strict is_strict?
+       centers end_segments start_segments
+       extended extended_in extended_out
+       extents hulls holes
+       scaled scale rotated rotate
+       move moved transform transformed
+       width space notch isolated overlap
+       size sized 
+       rounded_corners odd_polygons).each do |f|
+      eval &lt;&lt;"CODE"
+        def #{f}(*args)
+          obj = args.shift
+          obj.#{f}(*args)
+        end
+CODE
+    end
+    
+    def src_line
+      cc = caller.find do |c|
+        c !~ /drc.lym:/ &amp;&amp; c !~ /\(eval\)/
+      end
+      if cc =~ /(.*)\s*:\s*(\d+)\s*:\s*in.*$/
+        return File::basename($1) + ":" + $2
+      else
+        return cc
+      end
+    end
+    
+    def run_timed(desc, obj)
+
+      info(desc)
+
+      # enable progress
+      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs)
+        obj.enable_progress(desc)
+      end
+      
+      t = RBA::Timer::new
+      t.start
+      res = yield
+      t.stop
+
+      info("Elapsed: #{'%.3f'%(t.sys+t.user)}s")
+
+      # disable progress
+      if obj.is_a?(RBA::Region) || obj.is_a?(RBA::Edges) || obj.is_a?(RBA::EdgePairs)
+        obj.disable_progress
+      end
+          
+      res
+
+    end
+    
+    def _cmd(obj, method, *args)
+      run_timed("\"#{method}\" in: #{src_line}", obj) do
+        obj.send(method, *args)
+      end
+    end
+    
+    def _tcmd(obj, border, result_cls, method, *args)
+    
+      if @tx &amp;&amp; @ty
+      
+        tp = RBA::TilingProcessor::new
+        tp.dbu = self.dbu
+        tp.scale_to_dbu = false
+        tp.tile_size(@tx, @ty)
+        bx = [ @bx || 0.0, border * self.dbu ].max
+        by = [ @by || 0.0, border * self.dbu ].max
+        tp.tile_border(bx, by)
+
+        res = result_cls.new      
+        tp.output("res", res)
+        tp.input("self", obj)
+        tp.threads = (@tt || 1)
+        args.each_with_index do |a,i|
+          if a.is_a?(RBA::Edges) || a.is_a?(RBA::Region)
+            tp.input("a#{i}", a)
+          else
+            tp.var("a#{i}", a)
+          end
+        end
+        av = args.size.times.collect { |i| "a#{i}" }.join(", ")
+        tp.queue("_output(res, self.#{method}(#{av}))")
+        run_timed("\"#{method}\" in: #{src_line}", obj) do
+          tp.execute("Tiled \"#{method}\" in: #{src_line}")
+        end
+        
+      else
+        res = nil
+        run_timed("\"#{method}\" in: #{src_line}", obj) do
+          res = obj.send(method, *args)
+        end
+      end
+      
+      # enable progress
+      if obj.is_a?(RBA::Region)
+        obj.disable_progress
+      end
+      
+      res
+      
+    end
+
+    # used for area and perimeter only    
+    def _tdcmd(obj, border, method)
+    
+      if @tx &amp;&amp; @ty
+      
+        tp = RBA::TilingProcessor::new
+        tp.tile_size(@tx, @ty)
+        tp.tile_border(border * self.dbu, border * self.dbu)
+
+        res = RBA::Value::new
+        res.value = 0.0
+        tp.output("res", res)
+        tp.input("self", obj)
+        tp.threads = (@tt || 1)
+        tp.queue("_output(res, _tile ? self.#{method}(_tile.bbox) : self.#{method})")
+        run_timed("\"#{method}\" in: #{src_line}", obj) do
+          tp.execute("Tiled \"#{method}\" in: #{src_line}")
+        end
+        
+        res = res.value
+        
+      else
+        res = nil
+        run_timed("\"#{method}\" in: #{src_line}", obj) do
+          res = obj.send(method)
+        end
+      end
+      
+      # enable progress
+      if obj.is_a?(RBA::Region)
+        obj.disable_progress
+      end
+      
+      res
+      
+    end
+    
+    def _rcmd(obj, method, *args)
+      run_timed("\"#{method}\" in: #{src_line}", obj) do
+        RBA::Region::new(obj.send(method, *args))
+      end
+    end
+    
+    def _vcmd(obj, method, *args)
+      run_timed("\"#{method}\" in: #{src_line}", obj) do
+        obj.send(method, *args)
+      end
+    end
+    
+    def _start
+    
+      # clearing the selection avoids some nasty problems
+      view = RBA::LayoutView::current
+      view &amp;&amp; view.cancel
+      
+    end
+    
+    def _flush
+    
+      # clean up resources (i.e. temp layers)
+      @layout_sources.each do |n,l|
+        l.finish
+      end
+      
+    end
+    
+    def _finish(final = true)
+
+      _flush    
+      
+      view = RBA::LayoutView::current
+
+      # save the report database if requested
+      if @output_rdb_file
+        info("Writing #{@output_rdb_file} ..")
+        @output_rdb.save(@output_rdb_file)
+      end
+      if @output_rdb &amp;&amp; final &amp;&amp; view
+        view.show_rdb(@output_rdb_index, view.active_cellview_index)
+      end
+    
+      # save the output file if requested
+      if @output_layout &amp;&amp; @output_layout_file
+        opt = RBA::SaveLayoutOptions::new
+        gzip = opt.set_format_from_filename(@output_layout_file)
+        info("Writing #{@output_layout_file} ..")
+        @output_layout.write(@output_layout_file, gzip, opt)
+      end
+      
+      # create the new layers as visual layers if necessary
+      if view
+      
+        output = @output_layout || @def_layout
+        cv_index = nil
+        view.cellviews.times do |cvi|
+          view.cellview(cvi).layout == output &amp;&amp; cv_index = cvi
+        end
+        if cv_index
+        
+          view = RBA::LayoutView::current
+          
+          # clear selection
+          view.cancel 
+    
+          # create layer views for those layers which are not present yet
+                
+          present_layers = {}
+          l = view.begin_layers
+          while !l.at_end?
+            if l.current.cellview == cv_index
+              present_layers[l.current.layer_index] = true
+            end
+            l.next
+          end
+          
+          @output_layers.each do |li|
+            if !present_layers[li]
+              info = @def_layout.get_info(li)
+              lp = RBA::LayerProperties::new
+              lp.source_layer = info.layer
+              lp.source_datatype = info.datatype
+              lp.source_name = info.name
+              lp.source_cellview = cv_index
+              view.init_layer_properties(lp)
+              view.insert_layer(view.end_layers, lp)     
+            end
+          end
+          
+          view.update_content
+    
+        end
+        
+      end
+        
+      @output_layout = nil
+      @output_layout_file = nil
+      @output_cell = nil
+      @output_rdb_file = nil
+      @output_rdb = nil
+      @output_rdb_index = nil
+      
+      if final &amp;&amp; @log_file
+        @log_file.close
+        @log_file = nil
+      end
+
+    end
+    
+  private
+
+    def _make_string(v)
+      if v.class.respond_to?(:from_s)
+        v.class.to_s + "::from_s(" + v.to_s.inspect + ")"
+      else
+        v.inspect
+      end
+    end
+
+    def _input(layout, cell_index, layers, sel, box, clip, overlapping)
+    
+      if layers.empty?
+        r = RBA::Region::new
+      else
+    
+        if box
+          iter = RBA::RecursiveShapeIterator::new(layout, layout.cell(cell_index), layers, box, overlapping)
+        else
+          iter = RBA::RecursiveShapeIterator::new(layout, layout.cell(cell_index), layers)
+        end
+        
+        sel.each do |s|
+          if s == "-"
+            iter.unselect_cells(cell.cell_index)
+          elsif s == "-*"
+            iter.unselect_all_cells
+          elsif s == "+*"
+            iter.select_all_cells
+          elsif s =~ /^-(.*)/
+            iter.unselect_cells($1)
+          elsif s =~ /^\+(.*)/
+            iter.select_cells($1)
+          else
+            iter.select_cells(s)
+          end
+        end
+        
+        sf = layout.dbu / self.dbu
+        if (sf - 1.0).abs &gt; 1e-6
+          r = RBA::Region::new(iter, RBA::ICplxTrans::new(sf.to_f))
+        else
+          r = RBA::Region::new(iter)
+        end
+        
+        # clip if a box is specified
+        if box &amp;&amp; clip
+          r &amp;= RBA::Region::new(box)
+        end
+      
+      end
+      
+      r
+
+    end
+    
+    def _layout(name)
+      @layout_sources[name].layout
+    end
+    
+    def _output(data, *args)
+
+      if @output_rdb
+        
+        if args.size &lt; 1
+          raise("Invalid number of arguments for 'output' on report - category name and optional description expected")
+        end
+
+        cat = @output_rdb.create_category(args[0].to_s)
+        args[1] &amp;&amp; cat.description = args[1]
+        @output_rdb.create_items(@output_rdb_cell_id, cat.rdb_id, RBA::CplxTrans::new(self.dbu), data)
+      
+      else 
+
+        output = @output_layout || @def_layout
+        output || raise("No output layout specified")
+
+        output_cell = @output_cell || @def_cell
+        output_cell || raise("No output cell specified")
+
+        info = nil
+        if args.size == 1
+          if args[0].is_a?(Fixnum)
+            info = RBA::LayerInfo::new(args[0], 0)
+          elsif args[0].is_a?(String)
+            info = RBA::LayerInfo::from_string(args[0])
+          else
+            raise("Invalid parameter type for 'output' - must be string or number")
+          end
+        elsif args.size == 2 || args.size == 3
+          info = RBA::LayerInfo::new(*args)
+        else
+          raise("Invalid number of arguments for 'output' - one, two or three arguments expected")
+        end
+        li = output.find_layer(info)
+        if !li
+          li = output.insert_layer(info)
+        end
+
+        tmp = li
+
+        begin
+
+          if !@used_output_layers[li]
+            @output_layers.push(li)
+            # Note: to avoid issues with output onto the input layer, we
+            # output to a temp layer and later swap both. The simple implementation
+            # did a clear here and the effect of that was that the data potentially
+            # got invalidated.
+            tmp = output.insert_layer(RBA::LayerInfo::new)
+            @used_output_layers[li] = true
+          end
+
+          # make sure the output has the right database unit
+          output.dbu = self.dbu
+
+          # insert the data into the output layer
+          if data.is_a?(RBA::EdgePairs)
+            output_cell.shapes(tmp).insert_as_polygons(data, 1)
+          else
+            output_cell.shapes(tmp).insert(data)
+          end
+
+          #  make the temp layer the output layer
+          if tmp != li
+            output.swap_layers(tmp, li)
+          end
+
+        ensure
+          #  clean up the original layer if requested
+          if tmp != li
+            output.delete_layer(tmp)
+          end
+        end
+
+      end        
+    end
+    
+    def make_source(layout, cell = nil)
+      name = "layout" + @lnum.to_s
+      @lnum += 1
+      @dbu ||= layout.dbu
+      src = DRCSource::new(self, layout, layout, cell || layout.top_cell)
+      @layout_sources[name] = src
+      src
+    end
+    
+  end
+ 
+end
+</text>
+</klayout-macro>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Basic Editing Operations</title>
+
+  <p>
+  This section covers some basic operations when editing layout.
+  </p>
+
+  <topics>
+    <topic href="/manual/create_from_scratch.xml"/>
+    <topic href="/manual/create_layers.xml"/>
+    <topic href="/manual/create_cells.xml"/>
+    <topic href="/manual/create_polygon.xml"/>
+    <topic href="/manual/create_box.xml"/>
+    <topic href="/manual/create_text.xml"/>
+    <topic href="/manual/create_instance.xml"/>
+    <topic href="/manual/move_sel.xml"/>
+    <topic href="/manual/trans_sel.xml"/>
+    <topic href="/manual/partial.xml"/>
+    <topic href="/manual/move_layer_sel.xml"/>
+    <topic href="/manual/layer_ops.xml"/>
+    <topic href="/manual/copypaste_sel.xml"/>
+    <topic href="/manual/del_cell.xml"/>
+    <topic href="/manual/rename_cell.xml"/>
+    <topic href="/manual/copypaste_cell.xml"/>
+  </topics>
+
+</doc>
+
+

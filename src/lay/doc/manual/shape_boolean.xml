@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Shapewise Boolean Operations</title>
+  <keyword name="Boolean operations"/>
+  <keyword name="Shapewise boolean operations"/>
+  <keyword name="Merge"/>
+  <keyword name="Intersection"/>
+  <keyword name="Subtraction"/>
+
+  <p>
+  Boolean operations are also available on selected shape sets. 
+  These operations use the concept of "primary" and "secondary" selection. The primary selection contains all shapes that
+  are selected in the first step. The secondary selection contains all shapes that are selected in additional steps using the
+  "Shift" modifier key.
+  </p>
+
+  <p>
+  The following operations are available in the "Selection" submenu of the "Edit" menu:
+  </p>
+
+  <ul>
+  <li><b>Merge</b>: merge all shapes in the primary and secondary selection and write the results to the layer of the primary selection.</li>
+  <li><b>Intersection</b>: Compute the intersection (AND) of primary and secondary selection and write the results to the layer of the primary selection.</li>
+  <li><b>Subtraction</b>: Compute the difference (A NOT B) of primary (A) and secondary (B) selection and write the results to the layer of the primary selection.</li>
+  </ul>
+
+</doc>
+

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Creating A Layout From Scratch</title>
+  <keyword name="Layout"/>
+  <keyword name="New layout"/>
+
+  <p>
+  To start with a fresh, empty layout, choose "New" from the "File" menu.
+  A form is opened that requires you to specify some basic parameters. 
+  These are:
+  </p>
+
+  <ul>
+    <li><b>Top cell:</b> this is the name of the first (and only) cell that will be present in the layout.</li>
+    <li><b>Database unit:</b> this is the database unit (the conversion factor between integer coordinates
+      and micron units. This is basically the "resolution" of the layout.</li>
+    <li><b>Initial window size:</b> this is the size of the initial window shown, when the top cell is 
+      opened the first time. Since the initial view is empty, there is no geometrical guidance. By specifying 
+      an initial size, at least the "canvas" dimensions are known.</li>
+  </ul>
+
+  <p>
+  If a default layer properties file is specified in the setup dialog ("Application" tab), 
+  this is loaded into the layer view list automatically. Without such a file, the layer list is 
+  empty at the beginning and layers must be created with "Layer/New" from the "Edit" menu, before any
+  shapes can be drawn.
+  </p>
+
+</doc>
+

@@ -1,0 +1,64 @@
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Basic Editor Options</title>
+  <keyword name="Editing"/>
+  <keyword name="Drawing"/>
+  <keyword name="Edit mode"/>
+
+  <p>
+  Most tools being using in editing mode have certain options, i.e. 
+  when drawing a path, the width and extension mode has to be specified. 
+  There exists a general setup dialog for editing options. It can be 
+  opened using "Editor Options" from the "Edit" menu or using the F3 
+  shortcut (unless overridden).
+  </p>
+
+  <p>
+  In the dialog there is always a generic settings tab and - depending on 
+  the tool chosen - a tool specific tab. On the generic tab, these settings
+  can be changed:
+  </p>
+
+  <keyword name="Grid"/>
+  <keyword name="Angle constraint"/>
+  <keyword name="Direction constraint"/>
+  <keyword name="Top level mode"/>
+  <ul>
+    <li><b>Editor grid:</b> Every editing operation is confined to that grid.
+      It can be either disabled, aligned with the global grid (used i.e. for rulers and
+      display) or specified explicitly. It can even be anisotropic - i.e. there can be 
+      a different grid in y than in x direction.
+    </li>
+    <li><b>Connection angle constraint:</b> When a connection is drawing, i.e. a segment of a path
+      or an edge of a polygon, this mode determines, if the segment or edge is confined to 
+      certain directions. In "Any Angle" mode, there is no such confinement. In "Diagonal" mode, 
+      the edge or segment can be vertical, horizontal or in one of the two diagonal directions. In "Manhattan"
+      mode, only horizontal and vertical edges or segments are allowed. 
+    </li>
+    <li><a name="move_ac"/><b>Movement direction constraint:</b> When something a dragged (i.e. moved), this mode determines
+      if the movement is confined to certain directions. In "Any Direction" mode, there is no such
+      confinement. In "Diagonal" mode, 
+      the movement can be vertical, horizontal or in one of the two diagonal directions. 
+      In "Manhattan" mode, only horizontal and vertical movements are allowed. 
+    </li>
+    <li><b>Top level selection mode:</b> In top level selection mode (when the check box is checked), 
+      only elements on the 
+      level of the currently shown cell are selected ("top level" refers to the top level of the 
+      currently shown cell here). That means, that if shapes from a subcell are selected, the whole
+      instance of this subcell is selected.
+      <div>
+      In hierarchical selection mode (when the check box is not checked), elements are selected from 
+      subcells are well. This mode allows in-place editing of subcells which is a powerful feature but 
+      also creates strange side effects if other instances of this cell changes as well.
+      </div>
+    </li>
+  </ul>
+
+  <p>
+  Whenever you change something in the settings dialog, use "Apply" or "Ok" to apply your changes.
+  </p>
+
+</doc>
+

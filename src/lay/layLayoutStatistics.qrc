@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/st" >
+        <file alias="tree.stxml">tree.stxml</file>
+        <file alias="st_plus_node.png">images/st_plus_node.png</file>
+    </qresource>
+</RCC>

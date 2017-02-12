@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Qt server sample (Ruby)\nThis sample turns KLayout into a HTTP server at port 8081</description>
+ <format>general</format>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <show-in-menu>false</show-in-menu>
+ <shortcut/>
+ <interpreter>ruby</interpreter>
+ <text>module MyMacro
+
+  include RBA
+
+  # Implements a TCP server listening on port 8081
+  # This server will accept HTTP requests and deliver a HTML page containing an image
+  # with the current snapshot. The idea is taken from the fortune cookie server 
+  # in the Qt samples. See there for more documentation about Qt server and connection
+  # objects.
+  class MyServer &lt; QTcpServer
+  
+    include RBA
+
+    # Initialize the server and put into listen mode (port is 8081)
+    def initialize(parent = nil)
+    
+      super
+      
+      ha = QHostAddress.new("0.0.0.0")
+      listen(ha, 8081)
+    
+      # install an event on a new connection
+      newConnection do 
+    
+        begin
+		
+          url = nil
+        
+          connection = nextPendingConnection
+          while connection.isOpen &amp;&amp; connection.state == QTcpSocket::ConnectedState
+            if connection.canReadLine
+              line = connection.readLine.to_s
+              if line.chomp == "" 
+                break
+              elsif line =~ /GET\s+(.*)\s+HTTP/
+                url = QUrl.new($1)
+              end
+            else
+              connection.waitForReadyRead(100)
+            end
+          end
+    
+          view = Application.instance.main_window.current_view
+
+          if url &amp;&amp; url.path == "/screenshot.png" 
+            # Deliver the image
+            if view
+              buffer = QBuffer::new
+              buffer.open(QIODevice::WriteOnly)
+              view.get_image(800, 800).save(buffer, "PNG")
+              buffer.close
+              connection.write(buffer.buffer)
+            end
+          # Deliver the HTML page
+          elsif url &amp;&amp; view
+            connection.write("HTTP/1.0 200 OK\nContent-Type: text/html\n\n" + '&lt;html&gt;&lt;body&gt;&lt;img src="screenshot.png"/&gt;&lt;/body&gt;&lt;/html&gt;')
+          elsif url
+            connection.write("HTTP/1.0 200 OK\nContent-Type: text/html\n\n" + '&lt;html&gt;&lt;body&gt;No view open to take screenshot from&lt;/body&gt;&lt;/html&gt;')
+          end
+    
+          # automatically delete when disconnected
+          # Note: we cannot use RBA signal bindings for that purpose because the Ruby object might get 
+          # deleted before the C++ object is. Hence we do it explicitly. 
+          QObject::connect(connection, qt_signal("disconnected()"), connection, qt_slot("deleteLater()"))
+          connection.disconnectFromHost()
+    
+        rescue 
+          puts "ERROR #{$!}"
+        end
+    
+      end
+    end
+    
+  end
+
+  # Start the screenshot server 
+  if $server
+    $server.destroy
+  end
+  $server = MyServer.new
+
+end</text>
+</klayout-macro>

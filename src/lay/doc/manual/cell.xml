@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Choosing A Cell</title>
+  <keyword name="Cell selection"/>
+
+  <p>
+  To show a certain cell, select the cell in the cell hierarchy in
+  hierarchy browser to the left. Then, right-click in the cell tree to 
+  bring up the context menu and choose "Show as top" or simply select
+  the cell with the middle mouse button.
+  </p>
+
+  <p>
+  To select a cell by name, choose "Select Cell" in the "Display" menu. A
+  dialog will appear that allows selecting a cell by name or choosing it from
+  an alphabetically sorted list. Additionally, this dialog allows 
+  navigating the cell tree by moving to one of the child or parent cells.
+  </p>
+
+</doc>

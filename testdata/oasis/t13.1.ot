@@ -1,0 +1,207 @@
+# <test>
+#   <name>t13.1.ot</name>
+#   <content-description>A single cell with a variety of circles on named layers</content-description>
+#   <test-intention>Geometrical objects reader capabilities</test-intention>
+#   <test-intention>LAYERNAME record reading</test-intention>
+#   <test-intention>Mapping of layer and datatype ranges to names</test-intention>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# layer mapping
+record LAYERNAME
+  str AA
+  uint 0   ;# all datatypes
+  uint 0   ;# all layers
+
+record LAYERNAME
+  str L5A
+  uint 1   ;# layer 0 to 5
+  uint 5
+  uint 0   ;# all datatypes
+
+record LAYERNAME
+  str H5A
+  uint 2   ;# layer 5 to end
+  uint 5
+  uint 0   ;# all datatypes
+
+record LAYERNAME
+  str E5A
+  uint 3   ;# layer 5 
+  uint 5
+  uint 0   ;# all datatypes
+
+record LAYERNAME
+  str I56A
+  uint 4   ;# layer 5 to 6
+  uint 5
+  uint 6
+  uint 0   ;# all datatypes
+
+record LAYERNAME
+  str E5L4
+  uint 3   ;# layer 5 to 5
+  uint 5
+  uint 1   ;# datatypes 0 to 4
+  uint 4
+
+record LAYERNAME
+  str E5H4
+  uint 3   ;# layer 5 to 5
+  uint 5
+  uint 2   ;# datatypes 4 to end
+  uint 4
+
+record LAYERNAME
+  str E5E4
+  uint 3   ;# layer 5 to 5
+  uint 5
+  uint 3   ;# datatype 4 
+  uint 4
+
+record LAYERNAME
+  str E5I47
+  uint 3   ;# layer 5 to 5
+  uint 5
+  uint 4   ;# datatype 4 to 7
+  uint 4
+  uint 7
+
+# Cell A
+record CELL_STR
+  str A 
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 150      ;# radius
+  int 1000      ;# geometry-x (absolute)
+  int 2000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 1        ;# layer
+  uint 5        ;# datatype
+  uint 150      ;# radius
+  int 1000      ;# geometry-x (absolute)
+  int 5000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 1        ;# layer
+  uint 6        ;# datatype
+  uint 150      ;# radius
+  int 1000      ;# geometry-x (absolute)
+  int 6000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 1        ;# layer
+  uint 8        ;# datatype
+  uint 150      ;# radius
+  int 1000      ;# geometry-x (absolute)
+  int 8000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 5        ;# layer
+  uint 2        ;# datatype
+  uint 150      ;# radius
+  int 5000      ;# geometry-x (absolute)
+  int 2000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 5        ;# layer
+  uint 5        ;# datatype
+  uint 150      ;# radius
+  int 5000      ;# geometry-x (absolute)
+  int 5000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 5        ;# layer
+  uint 6        ;# datatype
+  uint 150      ;# radius
+  int 5000      ;# geometry-x (absolute)
+  int 6000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 5        ;# layer
+  uint 8        ;# datatype
+  uint 150      ;# radius
+  int 5000      ;# geometry-x (absolute)
+  int 8000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 6        ;# layer
+  uint 2        ;# datatype
+  uint 150      ;# radius
+  int 6000      ;# geometry-x (absolute)
+  int 2000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 6        ;# layer
+  uint 5        ;# datatype
+  uint 150      ;# radius
+  int 6000      ;# geometry-x (absolute)
+  int 5000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 6        ;# layer
+  uint 6        ;# datatype
+  uint 150      ;# radius
+  int 6000      ;# geometry-x (absolute)
+  int 6000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 6        ;# layer
+  uint 8        ;# datatype
+  uint 150      ;# radius
+  int 6000      ;# geometry-x (absolute)
+  int 8000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 7        ;# layer
+  uint 2        ;# datatype
+  uint 150      ;# radius
+  int 7000      ;# geometry-x (absolute)
+  int 2000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 7        ;# layer
+  uint 5        ;# datatype
+  uint 150      ;# radius
+  int 7000      ;# geometry-x (absolute)
+  int 5000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 7        ;# layer
+  uint 6        ;# datatype
+  uint 150      ;# radius
+  int 7000      ;# geometry-x (absolute)
+  int 6000      ;# geometry-y (absolute)
+
+record CIRCLE
+  bits 00111011 ;# 00rXYRDL
+  uint 7        ;# layer
+  uint 8        ;# datatype
+  uint 150      ;# radius
+  int 7000      ;# geometry-x (absolute)
+  int 8000      ;# geometry-y (absolute)
+
+tail
+

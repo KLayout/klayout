@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Managing The Panels And Loaded Layouts</title>
+  <keyword name="Layout views"/>
+  <keyword name="Layout panels"/>
+  <keyword name="Multiple layouts"/>
+  <keyword name="Pull in other layout"/>
+  <keyword name="Clone view"/>
+  <keyword name="Reload"/>
+  <keyword name="Close"/>
+
+  <p>
+  Choose "Close" in the "File" menu to remove a layout of a panel and 
+  close the panel unless there are still layouts loaded. If multiple
+  layouts are into the current panel, a dialog appears. This allows 
+  selecting one or many layouts for closing.
+  </p>
+
+  <p>
+  Choose "Clone" from the "File" menu to duplicate a panel. A new
+  panel will be created that is an exact copy of the current one.
+  Both, the current and the new panel are views to the same layout.
+  This way, only one copy of the layout is held in memory.
+  </p>
+
+  <p>
+  Choose "Reload" from the "File" menu to reload a file if the 
+  contents have changed. This does not happen automatically.
+  </p>
+
+  <p>
+  Choose "Pull In Other Layout" to combine other layouts already loaded into the
+  current panel. Basically, KLayout allows viewsing a layout in multiple panels, either
+  on it's own in different configurations or together with other layouts. "Pull In Other Layout" 
+  allows configuration of a panel to show another layout which has been loaded into another panel.
+  In that sense it's the reverse of closing one layout from a panel showing multiple layouts.
+  </p>
+
+</doc>
+

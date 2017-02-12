@@ -1,0 +1,379 @@
+<ui version="4.0" >
+ <class>GtfUiDialog</class>
+ <widget class="QMainWindow" name="GtfUiDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>GTF UI</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="layResources.qrc" >:/logo.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <layout class="QVBoxLayout" >
+    <property name="margin" >
+     <number>9</number>
+    </property>
+    <property name="spacing" >
+     <number>6</number>
+    </property>
+    <item>
+     <widget class="QSplitter" name="splitter" >
+      <property name="orientation" >
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QFrame" name="frame" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>5</hsizetype>
+         <vsizetype>5</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape" >
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow" >
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item row="1" column="1" >
+         <widget class="QTreeWidget" name="log_list" >
+          <column>
+           <property name="text" >
+            <string>Golden</string>
+           </property>
+          </column>
+          <column>
+           <property name="text" >
+            <string>Current</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="1" column="0" >
+         <widget class="gtf::StripedBar" name="striped_bar" >
+          <property name="sizePolicy" >
+           <sizepolicy>
+            <hsizetype>13</hsizetype>
+            <vsizetype>13</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+           <size>
+            <width>20</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::Panel</enum>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Sunken</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2" >
+         <widget class="QLabel" name="label_3" >
+          <property name="text" >
+           <string>Log</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="frame_2" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>5</hsizetype>
+         <vsizetype>5</vsizetype>
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape" >
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow" >
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QHBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QStackedWidget" name="compare_stck" >
+          <property name="enabled" >
+           <bool>true</bool>
+          </property>
+          <property name="currentIndex" >
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="page_3" />
+          <widget class="QWidget" name="page" >
+           <layout class="QVBoxLayout" >
+            <property name="margin" >
+             <number>0</number>
+            </property>
+            <property name="spacing" >
+             <number>6</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_2" >
+              <property name="text" >
+               <string>Image Diff</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTabWidget" name="compare_stck" >
+              <property name="currentIndex" >
+               <number>2</number>
+              </property>
+              <widget class="QWidget" name="tab_3" >
+               <attribute name="title" >
+                <string>Delta</string>
+               </attribute>
+               <layout class="QVBoxLayout" >
+                <property name="margin" >
+                 <number>9</number>
+                </property>
+                <property name="spacing" >
+                 <number>6</number>
+                </property>
+                <item>
+                 <widget class="QScrollArea" name="delta_img_frame" >
+                  <property name="frameShape" >
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow" >
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <widget class="QLabel" name="delta_lbl" >
+                   <property name="geometry" >
+                    <rect>
+                     <x>20</x>
+                     <y>40</y>
+                     <width>111</width>
+                     <height>31</height>
+                    </rect>
+                   </property>
+                   <property name="text" >
+                    <string>TextLabel</string>
+                   </property>
+                   <property name="alignment" >
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                   </property>
+                  </widget>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="tab_2" >
+               <attribute name="title" >
+                <string>Current</string>
+               </attribute>
+               <layout class="QVBoxLayout" >
+                <property name="margin" >
+                 <number>9</number>
+                </property>
+                <property name="spacing" >
+                 <number>6</number>
+                </property>
+                <item>
+                 <widget class="QScrollArea" name="current_img_frame" >
+                  <property name="frameShape" >
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow" >
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <widget class="QLabel" name="current_lbl" >
+                   <property name="geometry" >
+                    <rect>
+                     <x>40</x>
+                     <y>30</y>
+                     <width>81</width>
+                     <height>31</height>
+                    </rect>
+                   </property>
+                   <property name="text" >
+                    <string>TextLabel</string>
+                   </property>
+                   <property name="alignment" >
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                   </property>
+                  </widget>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="tab" >
+               <attribute name="title" >
+                <string>Golden</string>
+               </attribute>
+               <layout class="QVBoxLayout" >
+                <property name="margin" >
+                 <number>9</number>
+                </property>
+                <property name="spacing" >
+                 <number>6</number>
+                </property>
+                <item>
+                 <widget class="QScrollArea" name="golden_img_frame" >
+                  <property name="frameShape" >
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow" >
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <widget class="QLabel" name="golden_lbl" >
+                   <property name="geometry" >
+                    <rect>
+                     <x>20</x>
+                     <y>30</y>
+                     <width>91</width>
+                     <height>31</height>
+                    </rect>
+                   </property>
+                   <property name="text" >
+                    <string>TextLabel</string>
+                   </property>
+                   <property name="alignment" >
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                   </property>
+                  </widget>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_2" >
+           <layout class="QVBoxLayout" >
+            <property name="margin" >
+             <number>0</number>
+            </property>
+            <property name="spacing" >
+             <number>6</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label" >
+              <property name="text" >
+               <string>Event (Golden)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTreeWidget" name="au_event_list" >
+              <property name="alternatingRowColors" >
+               <bool>true</bool>
+              </property>
+              <column>
+               <property name="text" >
+                <string>Attribute</string>
+               </property>
+              </column>
+              <column>
+               <property name="text" >
+                <string>Value</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_4" >
+              <property name="text" >
+               <string>Event (Current)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTreeWidget" name="curr_event_list" >
+              <property name="alternatingRowColors" >
+               <bool>true</bool>
+              </property>
+              <column>
+               <property name="text" >
+                <string>Attribute</string>
+               </property>
+              </column>
+              <column>
+               <property name="text" >
+                <string>Value</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>File</string>
+    </property>
+    <addaction name="separator" />
+    <addaction name="actionExit" />
+   </widget>
+   <addaction name="menuFile" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+  <action name="actionExit" >
+   <property name="text" >
+    <string>Exit</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>gtf::StripedBar</class>
+   <extends>QFrame</extends>
+   <header>gtfUiDialog.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QScrollArea</class>
+   <extends>QFrame</extends>
+   <header>QtGui/QScrollArea</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="layResources.qrc" />
+ </resources>
+ <connections/>
+</ui>

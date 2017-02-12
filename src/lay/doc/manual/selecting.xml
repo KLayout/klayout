@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Selecting Rulers, Shapes Or Instances</title>
+  <keyword name="Selecting"/>
+  <keyword name="Shape Properties"/>
+  <keyword name="Object Properties"/>
+
+  <p>
+  Rulers, images, shapes or instances can be selected by either clicking on the shape, instance, ruler or image in "Select" mode or
+  by dragging a selection rectangle with the left mouse button pressed. In this case,
+  all objects inside the selection rectangle will be selected.
+  </p>
+
+  <p>
+  Pressing the Shift key in addition to selecting shapes, instances or other objects will extend the current
+  selection. Pressing Ctrl key will remove the given objects from the selection.
+  </p>
+
+  <p>
+  For layout objects (shapes and instances), it is possible to select the objects through the hierarchy or 
+  on the level of the current cell only (top level objects only). By default, objects are selected through the 
+  hierarchy. That means, objects in child cells can be selected. By extending the selection over multiple
+  instances of a cell, the same object can be selected multiple times. While editing objects inside a 
+  child cell may be a desirable feature, this can lead to confusing effects in the end. Hence, it may
+  to more intuitive to only work on top level, i.e. on the current cell. To enable this mode, check
+  the "Select Top Level Objects Only" menu item in the "View" menu or the same in the edit mode options 
+  dialog (F3).
+  </p>
+
+  <p>
+  In top-level only mode, instances of cells are selected only if the cells have a visual appearance. 
+  This is the case, if they contain at least one shape on a visible layer for example. If they
+  are empty with respect to the visible layers, they cannot be selected. If the cell's box is shown, because
+  the hierarchy levels shown are confined a sufficiently small interval, the cell instances will always be selected.
+  </p>
+
+  <p>
+  Images and rulers are simple objects not embedded in a hierarchy and can be selected by clicking at them or enclosing them in
+  the selection box.
+  </p>
+
+  <p>
+  Object properties can be inspected or edited (if allowed) by opening the properties dialog.
+  To edit or inspect the properties of selected objects, choose "Properties" from the "Edit" menu.
+  A dialog will open which shows the properties for the first selected object. To proceed to the next object 
+  push the "Next" button, to go back to the previous object push the "Previous" button. 
+  </p>
+
+  <p>
+  Depending on the application mode, the properties of the selected objects may be edited too. 
+  To apply changes to the current object, choose "Apply". To apply the changes and close the dialog,
+  choose "Ok". To apply the changes to the current object and all other selected objects of the same kind, choose "Apply To All"
+  (if applicable). To close the dialog without applying any changes, choose "Cancel".
+  </p>
+
+  <p>
+  "Apply To All" will try to apply the changes in some smart way to other objects. For example, for
+  boxes, and change of the box dimensions will be applied in the same way (same shift in the four directions)
+  than for the current object. If the width of a path has been changed, the same width will be applied
+  to all other paths and so forth. 
+  </p>
+  
+  <p>
+  For shapes and instances, the "User properties" can be edited too. "User properties" are arbitrary
+  properties attached to shapes and instances. They consist of a key (preferably a number for GDS2 compatibility)
+  and a value (preferably a string in GDS2). Multiple properties of that kind can be attached to one
+  object. User properties can be edited by pushing the "User Properties" button which will open a
+  dialog that allows editing of the properties. If this dialog is closed with "Ok", the user properties
+  will be kept, but applied to the layout object only after pressing "Apply"/"Ok" or "Apply To All".
+  The latter will apply the new properties to all other shapes of the same kind.
+  </p>
+
+  <p>
+  Finally, for shapes and instances, the "Instantiation" button will show the instantiation path of
+  the shapes or instances.
+  </p>
+
+  <p>
+  The layer of a shape cannot be changed through the properties dialog. To move a shape to a
+  different layer, use "Change Layer" from the "Selection" sub-menu in "Edit".
+  </p>
+
+</doc>

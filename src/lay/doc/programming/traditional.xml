@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Traditional Ruby Programming</title>
+  <keyword name="Programming"/>
+  <keyword name="RBA"/>
+  <keyword name="Ruby scripts"/>
+
+  <index/>
+
+  <p>
+  Before version 0.21 and the development IDE, Ruby scripts had to be prepared externally and KLayout had to be
+  restarted to use them. In addition, binding a script to a menu entry required some coding.
+  This method still is supported for version 0.22, hence it is described here. It is provided for backward compatibility
+  and because KLayout can be used as a standalone engine for RBA scripts without a user interface.
+  </p>
+
+  <h2>Using RBA scripts</h2>
+
+  <p>
+  To use RBA, the script location must be passed to KLayout using the "-r" option (in this example "hello_world.rb"):
+  </p>
+
+  <pre>
+klayout -r hello_world.rb</pre>
+
+  <p>
+  If used this way, all RBA functionality must be put into one script. Usually, this script will provide all the
+  classes and definitions required and register new menu items and handlers.
+  </p>
+
+  <h2>Basic RBA</h2>
+
+  <p>
+  The ruby script given with the "-r" option is executed before the actual application is 
+  started. In fact, the application execution is initiated by the script, if one is given.
+  In order to make the application start, the ruby script must contain at least this statement:
+  </p>
+
+  <pre>
+RBA::Application.instance.exec</pre>
+
+  <p>
+  "RBA" is the module provided by KLayout. "Application" is the main controller class (a singleton)
+  that refers to the application as a whole. It provides the "exec" method which runs the application
+  and returns if the main window is closed.
+  </p>
+
+  <p>
+  In most cases, the script will perform initialization steps before calling "exec" and may do cleanup
+  once the application returned. Initialization may involve loading of layouts, registering menu items, 
+  initializing other resources etc. However, the "exec" call can be omitted and then KLayout acts as
+  a pure interpreter for the script.
+  </p>
+
+  <p>
+  In larger applications 
+  however, source code is usually organised into libraries and a main code part. Libraries and 
+  supplementary code can be loaded prior to the loading of the main source with the "-rm" option. Files loaded
+  with this option do not need to (and in fact must not) contain the "RBA::Application.instance.exec" call. This allows 
+  providing independent libraries and initialisation code to a RBA script environment: 
+  </p>
+
+  <pre>
+klayout -rm setup1.rb -rm setup2.rb -r hello_world.rb</pre>
+
+  <p>
+  RBA code can be installed globally by creating a file with suffix ".rbm" in the same directory than the
+  KLayout binary. If such files are encountered, they will be executed automatically
+  before all files specified with "-rm" and "-r" are read.
+  </p>
+
+  <h2>A simple example</h2>
+
+  <p>
+  This example script registers a new menu item in the toolbar, which displays a message box saying "Hello, world!"
+  when selected, and runs the application:
+  </p>
+
+  <pre>
+  class MenuHandler &lt; RBA::Action
+    def triggered 
+      RBA::MessageBox::info( "Info", "Hello, world!", RBA::MessageBox::b_ok )
+    end
+  end
+
+  app = RBA::Application.instance
+
+  $menu_handler = MenuHandler.new
+  $menu_handler.title = "RBA test"
+
+  menu = app.main_window.menu
+  menu.insert_item("@toolbar.end", "rba_test", $menu_handler)
+  menu.insert_item("tools_menu.end", "rba_test", $menu_handler)
+
+  app.exec</pre>
+
+  <p>
+  This simple example already demonstrates some important concepts:
+  </p>
+
+  <ul>
+    <li><b>Reimplementation</b>: the menu item's functionality is implemented by 
+      reimplementing the Action object's "triggered" method. This method is called
+      when the menu item is selected.</li>
+    <li><b>Delegation</b>: the menu item is not implemented directly but
+      the implementation is delegated to an "Action" object. The action provides 
+      the "slot" that the menu item refers to. One action may be used for multiple
+      menu items. The action does not only provide the implementation but the 
+      title, keyboard shortcut and other properties of the menu item. This way, the
+      action may be used in multiple places (i.e. menu and toolbar) and still appear
+      the same.</li>
+    <li><b>Menu item addressing</b>: The menu item is addressed by a "path" expression.
+      In this case, the path is used for specifying the place where to insert the item.
+      The path "@toolbar.end" instructs the menu controller to insert the item at the
+      end of the toolbar. The path "tools_menu.end" instructs it to insert the item at
+      the end of the "Tools" menu. The second string passed to "insert" is the name 
+      of the new item. After inserting, the new item can be addressed with the path "@toolbar.rba_test"
+      and "tools_menu.rba_test".</li>
+    <li><b>Ownership of objects</b>: RBA is not able to guarantee a certain lifetime of an 
+      object, because Ruby and C++ implement different lifetime management models. Specifically, for 
+      the action object this means, that the menu controller, which is implemented in C++ cannot 
+      tell ruby that it keeps a reference to the action object. Without further measures, ruby will
+      ignore this relationship and delete the action object - the menu item will disappear.
+      To overcome this problem, an explicit reference to the action object must be held. In this
+      case, a global variable is used ("$menu_handler"). This could as well be a member of an object
+      or an array member.<br/>
+      It is very important to keep this aspect in mind when designing RBA applications.
+    </li>
+  </ul>
+
+  <p>
+  Documentation for the various classes involved can be found in <link href="/code/index.xml"/>. 
+  </p>
+
+  <h2>Extending the example</h2>
+
+  <p>
+  To give the menu callback a more "ruby style" look, a wrapper can be created what allows
+  to attach code to the menu in the style of a ruby iterator. Now the callback uses "yield" to
+  execute the code attached to the menu. In addition, the menu item now uses a icon and a keyboard
+  shortcut ("Shift+F7"):
+  </p>
+
+  <pre>
+  class MenuHandler &lt; RBA::Action
+    def initialize( t, k, i, &amp;action ) 
+      self.title = t
+      self.shortcut = k
+      self.icon = i
+      @action = action
+    end
+    def triggered 
+      @action.call( self ) 
+    end
+  private
+    @action
+  end
+
+  app = RBA::Application.instance
+
+  $menu_handler = MenuHandler.new( "RBA test", "Shift+F7", "icon.png" ) {
+    RBA::MessageBox::info( "Info", "Hello, world!", RBA::MessageBox::b_ok )
+  } 
+
+  menu = app.main_window.menu
+  menu.insert_item("@toolbar.end", "rba_test", $menu_handler)
+  menu.insert_item("tools_menu.end", "rba_test", $menu_handler)
+
+  app.exec</pre>
+
+  <h2>Events</h2>
+
+  <p>
+  Starting with version 0.21, RBA features "events". Events allow to specify a Ruby block which
+  is called when a certain condition takes place. Using events eliminates the need for 
+  deriving a from an existing class. In particular, with version 0.21, RBA::Action features one
+  event called "on_triggered". A block associated with this event is called, when the action
+  is triggered. 
+  </p>
+
+  <p>
+  With events the example looks like that:
+  </p>
+
+  <pre>
+  app = RBA::Application.instance
+
+  $menu_handler = RBA::Action.new
+  $menu_handler.title = "RBA test"
+  $menu_handler.shortcut = "Shift+F7"
+  $menu_handler.icon = "icon.png"
+
+  # install the event
+  $menu_handler.on_triggered {
+    RBA::MessageBox::info( "Info", "Hello, world!", RBA::MessageBox::b_ok )
+  } 
+
+  menu = app.main_window.menu
+  menu.insert_item("@toolbar.end", "rba_test", $menu_handler)
+  menu.insert_item("tools_menu.end", "rba_test", $menu_handler)
+
+  app.exec</pre>
+
+  <h2>Using KLayout as a pure interpreter</h2>
+
+  <p>
+  KLayout can be used as a RBA interpreter without user interface. That allows implementation of
+  layout processing scripts using the provided RBA bindings to the layout database objects, namely RBA::Layout. 
+  You cannot use user interface objects
+  in that mode and the RBA::MainWindow instance will be nil. You can pass parameters from the command line to 
+  the script by defining Ruby variables.
+  </p>
+
+  <p>
+  Here is an example which reads a layout and converts it to OASIS with some special settings:
+  </p>
+
+  <pre>
+  ly = RBA::Layout.new
+  ly.read($input)
+
+  gzip = false # or true to use gzip on the file
+
+  # special settings for OASIS output
+  opt = RBA::SaveLayoutOptions::new
+  opt.format = "OASIS"
+  opt.dbu = 0.0001
+  opt.oasis_write_cblocks = true
+  opt.oasis_strict_mode = false
+  opt.oasis_compression_level = 10
+
+  ly.write($output, gzip, opt)</pre>
+
+  <p>
+  Assume that script is saved to "write_oas.rb". To run that script, use the following KLayout call:
+  </p>
+
+  <pre>
+klayout -rx -r write_oas.rb -z -rd input=in.gds -rd output=out.oas</pre>
+
+  <p>
+  The two "-rd" options will instruct KLayout to define two Ruby variables for the input and output file name. They can be used 
+  as "$input" and "$output" in the script. 
+  </p>
+  <p>"-z" will disable the user interface. Therefore, this
+  KLayout call can be used in scripts and on servers without X connection for example.
+  </p>
+  <p>"-rx" will 
+  disable all implicitly loaded scripts such as autorun macros which speeds up application start and
+  avoids undesired side effects.
+  </p>
+
+</doc>
+
+

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Cell Origin Adjustment</title>
+  <keyword name="Cell origin"/>
+  <keyword name="Adjust origin"/>
+
+  <p>
+  The cell origin is important for a cell because this point is the instantiation anchor for 
+  cell instances.
+  The cell origin adjustment function allows shifting the origin to a certain place relative to a cell's bounding box. 
+  This can be either the center, a corner or the middle of an edge of the bounding box. The bounding box can either be computed
+  from all or just from the visible layers.
+  </p>
+
+  <p>
+  If the "Adjust instances in parents" check box is clicked, the instances of the cell will be
+  adjusted in the opposite direction. Hence, the cell effectively does not change, but locally the
+  origin of the layout will be shifted.
+  </p>
+
+  <p>
+  The cell origin adjustment function can be found in the "Cell" submenu of the "Edit" menu.
+  </p>
+
+</doc>
+

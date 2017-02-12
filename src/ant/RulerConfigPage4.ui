@@ -1,0 +1,371 @@
+<ui version="4.0" >
+ <class>RulerConfigPage4</class>
+ <widget class="QFrame" name="RulerConfigPage4" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>637</width>
+    <height>311</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Settings</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>5</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" >
+      <string>Ruler / annotation templates</string>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>16</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="frame_3" >
+        <property name="frameShape" >
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow" >
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item row="2" column="2" >
+          <widget class="QToolButton" name="up_templ_pb" >
+           <property name="toolTip" >
+            <string>Move selected template up in list</string>
+           </property>
+           <property name="text" >
+            <string>...</string>
+           </property>
+           <property name="icon" >
+            <iconset resource="layResources.qrc" >:/up.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" >
+          <widget class="QToolButton" name="add_templ_pb" >
+           <property name="toolTip" >
+            <string>Add a new template</string>
+           </property>
+           <property name="text" >
+            <string>...</string>
+           </property>
+           <property name="icon" >
+            <iconset resource="layResources.qrc" >:/add.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1" >
+          <widget class="QToolButton" name="del_templ_pb" >
+           <property name="toolTip" >
+            <string>Delete selected template</string>
+           </property>
+           <property name="text" >
+            <string>...</string>
+           </property>
+           <property name="icon" >
+            <iconset resource="layResources.qrc" >:/del.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="3" >
+          <widget class="QToolButton" name="down_templ_pb" >
+           <property name="toolTip" >
+            <string>Move selected template down in list</string>
+           </property>
+           <property name="text" >
+            <string>...</string>
+           </property>
+           <property name="icon" >
+            <iconset resource="layResources.qrc" >:/down.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="4" >
+          <widget class="QLabel" name="label_4" >
+           <property name="text" >
+            <string>Double-click to rename</string>
+           </property>
+           <property name="wordWrap" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="4" >
+          <widget class="QListWidget" name="template_list" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>7</hsizetype>
+             <vsizetype>13</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip" >
+            <string>The template selected for editing</string>
+           </property>
+           <property name="alternatingRowColors" >
+            <bool>false</bool>
+           </property>
+           <property name="uniformItemSizes" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_2" >
+        <property name="frameShape" >
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow" >
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" >
+         <property name="margin" >
+          <number>9</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item row="6" column="1" >
+          <widget class="QCheckBox" name="t_snap_cbx" >
+           <property name="toolTip" >
+            <string>If checked, snap to edges or vertices of objects unless disabled above</string>
+           </property>
+           <property name="text" >
+            <string>Snap to objects</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1" >
+          <widget class="QComboBox" name="outline_cb" >
+           <property name="toolTip" >
+            <string>Specify outline mode of the ruler template</string>
+           </property>
+           <item>
+            <property name="text" >
+             <string>Diagonal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Horizonal and vertical (in this order)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Diagonal plus horizonal and vertical (triangle)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Vertical and horizonal (in this order)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Diagonal plus vertical and horizontal (triangle)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Box marker</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="1" >
+          <widget class="QLineEdit" name="fmt_y_le" >
+           <property name="toolTip" >
+            <string>Specify the y label format (applicable only for outline modes that have a vertical component, i.e. box)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0" >
+          <widget class="QLabel" name="label_2" >
+           <property name="text" >
+            <string>Angle constraints</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0" >
+          <widget class="QLabel" name="label_17" >
+           <property name="text" >
+            <string>Outline</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" >
+          <widget class="QLabel" name="label_16" >
+           <property name="text" >
+            <string>Style</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" >
+          <widget class="QLabel" name="label_13" >
+           <property name="text" >
+            <string>Label format</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" >
+          <widget class="QLineEdit" name="fmt_x_le" >
+           <property name="toolTip" >
+            <string>Specify the x label format (applicable only for outline modes that have a horizontal component, i.e. box)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" >
+          <widget class="QLineEdit" name="fmt_le" >
+           <property name="toolTip" >
+            <string>Specify the main label format</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" >
+          <widget class="QLabel" name="label_14" >
+           <property name="text" >
+            <string>X label format</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" >
+          <widget class="QLabel" name="label_15" >
+           <property name="text" >
+            <string>Y label format</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1" >
+          <widget class="QComboBox" name="style_cb" >
+           <property name="toolTip" >
+            <string>Specify style of the ruler template</string>
+           </property>
+           <item>
+            <property name="text" >
+             <string>Ruler</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Arrow at end</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Arrow at start</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Arrow at both ends</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Plain line</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="5" column="1" >
+          <widget class="QComboBox" name="t_angle_cb" >
+           <property name="toolTip" >
+            <string>Override the global angle constraint setting for this type of rulers</string>
+           </property>
+           <item>
+            <property name="text" >
+             <string>Any angle</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Diagonal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Orthogonal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Horizontal only</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Vertical only</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Use global setting</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="7" column="0" colspan="2" >
+          <widget class="QLabel" name="help_label" >
+           <property name="text" >
+            <string>&lt;html>(See &lt;a href="int:/manual/ruler_properties.xml">here&lt;/a> for a description of the properties)&lt;/html></string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <tabstops>
+  <tabstop>template_list</tabstop>
+  <tabstop>add_templ_pb</tabstop>
+  <tabstop>del_templ_pb</tabstop>
+  <tabstop>up_templ_pb</tabstop>
+  <tabstop>down_templ_pb</tabstop>
+  <tabstop>fmt_le</tabstop>
+  <tabstop>fmt_x_le</tabstop>
+  <tabstop>fmt_y_le</tabstop>
+  <tabstop>style_cb</tabstop>
+  <tabstop>outline_cb</tabstop>
+  <tabstop>t_angle_cb</tabstop>
+  <tabstop>t_snap_cbx</tabstop>
+ </tabstops>
+ <resources>
+  <include location="layResources.qrc" />
+ </resources>
+ <connections/>
+</ui>

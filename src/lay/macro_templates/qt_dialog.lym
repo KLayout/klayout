@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Qt dialog sample (Ruby)\nCreates a Qt dialog that allows to take and display a screenshot</description>
+ <format>general</format>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <show-in-menu>false</show-in-menu>
+ <shortcut/>
+ <interpreter>ruby</interpreter>
+ <text>module MyMacro
+
+  include RBA
+
+  # This class implements a dialog with a screenshot display area and a
+  # screenshot button
+  class ScreenshotDialog &lt; QDialog
+  
+    include RBA
+
+    def initialize(parent = nil)
+
+      super
+
+      setWindowTitle("Screenshot Saver")
+
+      resize(400, 120)
+
+      layout = QVBoxLayout.new(self)
+      setLayout(layout)
+
+      @image = QLabel.new("Press the button to fetch a screenshot", self)
+      layout.addWidget(@image)
+
+      button = QPushButton.new('Screenshot', self)
+      button.setFont(QFont.new('Times', 18, QFont::Bold))
+      layout.addWidget(button)
+      
+      button.clicked do
+        view = Application.instance.main_window.current_view
+        if view
+          @image.setPixmap(QPixmap::fromImage(view.get_image(400, 400)))
+        else
+          @image.setText("No layout opened to take screenshot from")
+        end
+      end
+
+    end
+
+  end
+
+  # Instantiate the dialog and make it visible initially.
+  # Passing the $main_window will make it stay on top of the main window.
+  $dialog &amp;&amp; $dialog.destroy
+  $dialog = ScreenshotDialog.new(Application::instance.main_window)
+  $dialog.show
+
+end
+</text>
+</klayout-macro>

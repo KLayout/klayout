@@ -1,0 +1,115 @@
+# <test>
+#   <name>t8.6.ot</name>
+#   <content-description>A top cell and one child cell with one rectangle, child cell instantiated in various ways with magnification, cells specified by name, top cell before child cell</content-description>
+#   <test-intention>Hierarchical reader capabilities</test-intention>
+#   <test-intention>PLACEMENT record reading</test-intention>
+#   <test-intention>Placements with magnification</test-intention>
+#   <test-intention>Placed cell reference by string</test-intention>
+#   <test-intention>Placement-related modal variables</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     begin_cell {A}
+#     box 1 2 {300 -400} {400 -200}
+#     end_cell
+#     begin_cell {TOP}
+#     sref {A} 0 0 0.5 {-150 200}
+#     sref {A} 0 0 1 {-300 800}
+#     sref {A} 0 0 1 {-300 1200}
+#     sref {A} 0 0 1 {0 1200}
+#     sref {A} 90 0 1 {700 1400}
+#     sref {A} 0 1 1 {700 400}
+#     sref {A} 270 1 1 {700 2400}
+#     end_cell
+#     begin_cell {TOPTOP}
+#     sref {TOP} 0 0 1 {200 1000}
+#     sref {TOP} 90 0 0.5 {100 0}
+#     end_cell
+#     end_lib
+#   </content>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Cell TOPTOP
+record CELL_STR
+  str TOPTOP
+
+record XYRELATIVE
+
+uint 18         ;# PLACEMENT (mag 0.5, manhattan angles)
+  bits 10110110 ;# CNXYRMAF
+  str TOP
+  real 6 0.5
+  real 7 90.0
+  int 100       ;# placement-x
+  int 0         ;# placement-y
+
+uint 18         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00110000 ;# CNXYRMAF
+  int 100       ;# placement-x
+  int 1000      ;# placement-y
+
+# Cell TOP
+record CELL_STR
+  str TOP 
+
+record XYRELATIVE
+
+uint 18         ;# PLACEMENT (mag 0.5, manhattan angles)
+  bits 10110110 ;# CNXYRMAF
+  str A
+  real 6 0.5
+  real 7 0.0
+  int -150      ;# placement-x
+  int 200       ;# placement-y
+
+uint 18         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00110000 ;# CNXYRMAF
+  int -150      ;# placement-x
+  int 600       ;# placement-y
+
+uint 18         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00010000 ;# CNXYRMAF
+  int 400       ;# placement-y
+
+uint 18         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00100000 ;# CNXYRMAF
+  int 300       ;# placement-x
+
+record XYABSOLUTE
+
+uint 18         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00110001 ;# CNXYRMAF
+  int 700       ;# placement-x
+  int 400       ;# placement-y
+
+record XYRELATIVE
+
+uint 18         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00010010 ;# CNXYRMAF
+  real 0 90.0
+  int 1000      ;# placement-y
+
+uint 18         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00010011 ;# CNXYRMAF
+  real 1 -90.0
+  int 1000      ;# placement-y
+
+# Cell A
+record CELL_STR
+  str A 
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 300       ;# geometry-x (absolute)
+  int -400      ;# geometry-y (absolute)
+
+tail
+

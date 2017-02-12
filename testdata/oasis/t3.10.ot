@@ -1,0 +1,39 @@
+# <test>
+#   <name>t3.10.ot</name>
+#   <content-description>A single cell with one text object</content-description>
+#   <test-intention>Geometrical objects reader capabilities</test-intention>
+#   <test-intention>TEXT record reading</test-intention>
+#   <test-intention>Text string specification by ID</test-intention>
+#   <test-intention>Implicit assignment of text ID</test-intention>
+#   <test-intention>Access to (automatically) initialised modal variable text-y</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     begin_cell {ABC}
+#     text 1 2 0 0 {100 0} {A}
+#     end_cell
+#     end_lib
+#   </content>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Text definition
+record TEXTSTRING
+  str A
+  
+# Cell ABC
+record CELL_STR
+  str ABC 
+
+record TEXT
+  bits 01110011 ;# 0CNXYRTL
+  uint 0        ;# text-id
+  uint 1        ;# text-layer
+  uint 2        ;# text-datatype
+  int 100       ;# text-x (abs)
+
+tail 
+

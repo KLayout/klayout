@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Changing The Display Style</title>
+  <keyword name="Layer display"/>
+  <keyword name="Layer properties"/>
+  <keyword name="Display style"/>
+
+  <p>
+  The line width of the element's frame can be changed by using the width
+  buttons on the "Style" panel after having selected the layers to apply
+  the change on. "0px" removes the line, "1px" draws a single-pixel wide
+  line (the default), "2px" a somewhat thicker line and so on. 
+  </p>
+  <p>
+  "Simple" is the normal draw mode while "Marked" draws a cross on each
+  vertex of the element. The cross size is constant so the shapes stay
+  visible even on large scale where the elements would otherwise become
+  single pixels.
+  </p>
+
+</doc>

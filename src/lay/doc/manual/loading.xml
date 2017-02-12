@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Loading A File</title>
+  <keyword name="Load layout"/>
+
+  <p>
+  In the "File" menu, choose
+  </p>
+  <ul>
+    <li>"Open" to close the current view and open a new layout instead
+        of the currently loaded one</li>
+    <li>"Open in Same Panel" to open a new layout in addition to the
+        currently loaded one</li>
+    <li>"Open in New Panel" to open a new layout in a new view</li>
+  </ul>
+  <p>
+  Either way, a file selection dialog will appear where a file can be
+  chosen for loading. After choosing the file and clicking "Ok", the
+  file is loaded.
+  </p>
+  <p>
+  The program will automatically determine the type of the file. Currently,
+  OASIS and GDS2 are supported.
+  </p>
+
+  <p>
+  Certain options can be specified for the file loader with the 
+  reader option pages. To open the reader options dialog, choose
+  "Reader Options" from the "File" menu. This dialog allows specification of
+  certain options for all "Open" actions, for example:
+  </p>
+
+  <ul>
+    <li>Confine the reader to a certain set of layers. All other layers are not read.</li>
+    <li>Disable reading of text objects. Disable reading of text objects to reduce the memory consumption if you are interested 
+        in pure geometrical information.</li>
+    <li>Disable reading of properties. If properties are not required, the memory consumption can be reduced by disabling 
+        the properties.</li>
+    <li>Certain GDS specific options which mainly control the level of compatibility with other tools.</li>
+  </ul>
+
+</doc>
+

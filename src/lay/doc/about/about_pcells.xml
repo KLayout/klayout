@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>About PCell's</title>
+
+  <p>
+  Starting with version 0.22, KLayout offers parametrized cells (PCell's).
+  PCells are a feature found in other tools to simplify layout by providing generators
+  for common layout building blocks. Parametrized cells do not contain
+  static layout but are created dynamically by code using a given set of parameters.
+  </p>
+
+  <p>
+  For example, a circle PCell requires two parameters: the layer where the circle
+  should be produced and the radius of the circle to produce. The code is responsible
+  for creating the circle from these parameters.
+  </p>
+
+  <p>
+  Using a PCell is easy: choose the library and the PCell from that library when asked for
+  the cell in the instance options dialog. For PCell's, KLayout offers an additional
+  parameters page where it asks for the parameter required by the PCell. The placement
+  of the PCell is done as for simple instances. PCell's offer the same instantiation
+  options that normal cells.
+  </p>
+
+  <p>
+  KLayout provides a simple library called "Basic" with some useful basic PCell's.
+  See <link href="/about/basic_lib.xml"/> for more details about that library.
+  </p>
+
+  <p>
+  Unlike other tools, KLayout offers the unique feature of "guiding shapes". A guiding shape
+  is some kind of "ghost shape" that is not produced as real layout but is present as a 
+  part of the PCell instance. It is drawn in the style of the cell frame but can be edited
+  as a normal shape. In particular, a guiding shape can be manipulated with the properties
+  dialog and the partial edit mode. A special case is a point-like shape which can act 
+  as a handle of the PCell. In move mode, these shapes can be moved to change the parameter
+  related to that handle.
+  </p>
+
+  <p>
+  Another use case for guiding shapes is the rounded path. This PCell uses a path as the
+  input shape and applies rounding to the path's spine corners to compute a new path 
+  which smoothly bends around the corners. The radius of the bends is a numerical 
+  PCell parameter while the input shape controlling the geometry and the width of the
+  path is the guiding shape.
+  </p>
+
+  <p>
+  A PCell implementation consists of at least three parts: 
+  a description text, a parameter declaration and a production callback. In addition, a PCell
+  can provide a method that "fixes" parameters according to the PCell's consistency rules
+  (coerce parameters). Technically, a PCell is a class implementing a certain interface with
+  these methods.
+  </p>
+
+  <p>
+  PCell's are usually packed in libraries. PCell libraries can be provided as
+  shared objects/DLL's (in C++) or as Ruby scripts. Because PCell code is only executed if
+  required, performance is not absolutely mandatory. A Ruby implementation
+  will therefore be sufficient in most cases and
+  is a much easier to provide. The Ruby approach also benefits from KLayout's integrated development
+  environment.
+  </p>
+
+</doc>
+

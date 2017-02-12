@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category/>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>true</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>ruby</interpreter>
+ <dsl-interpreter-name/>
+ <text>
+module DRC
+
+  def DRC.execute_drc(_macro)
+
+    _timer = RBA::Timer::new
+    _timer.start
+    _drc = DRCEngine::new
+
+    begin
+
+      # Set a debugger scope so that our errors end up with the debugger set to the DRC's line
+      RBA::MacroExecutionContext::set_debugger_scope(_macro.path)
+      # No verbosity set in drc engine - we cannot use the engine's logger 
+      RBA::Logger::verbosity &gt;= 10 &amp;&amp; RBA::Logger::info("Running #{_macro.path}")
+      _drc.instance_eval(_macro.text, _macro.path)
+      # Remove the debugger scope
+      RBA::MacroExecutionContext::remove_debugger_scope
+
+    rescue =&gt; ex
+
+      _drc.error("In #{_macro.path}: #{ex.to_s}")
+      RBA::MacroExecutionContext::ignore_next_exception
+      raise ex
+
+    ensure
+
+      # cleans up and creates layout views
+      _drc._finish
+
+    end
+
+    _timer.stop
+    _drc.info("Total run time: #{'%.3f'%(_timer.sys+_timer.user)}s")
+
+  end
+  
+  # A DSL implementation for a DRC language (XML format)
+  class DRCInterpreter &lt; RBA::MacroInterpreter
+  
+    # Constructor
+    def initialize
+
+      # Make the DSL use ruby syntax highlighting
+      self.syntax_scheme = "ruby"
+      self.suffix = "lydrc"
+      self.debugger_scheme = RBA::MacroInterpreter::RubyDebugger
+      self.storage_scheme = RBA::MacroInterpreter::MacroFormat
+      self.description = "DRC"
+
+      # Registers the new interpreter
+      register("drc-dsl-xml")
+
+      # create a template for the macro editor:
+      mt = create_template("drc")
+      mt.text = "# Read about DRC scripts in the User Manual under \"Design Rule Check (DRC)\"\n# This is a sample:\n\npoly = input(6)\nactive = input(1)\ngate = poly &amp; active\ngate.width(0.25.micron).output(100, 0)"
+      mt.show_in_menu = true
+      mt.menu_path = "tools_menu.drc.end"
+      mt.group_name = "drc_scripts"
+      mt.description = "General;;DRC script (*.lydrc)\nA DRC script using KLayout's DRC language"
+      mt.category = "drc"
+
+    end
+    
+    # Implements the execute method
+    def execute(macro)
+      DRC::execute_drc(macro)
+    end
+    
+  end
+  
+  # A DSL implementation for a DRC language (Plain text format)
+  class DRCPlainTextInterpreter &lt; RBA::MacroInterpreter
+  
+    # Constructor
+    def initialize
+      # Registers the new interpreter
+      register("drc-dsl")
+    end
+    
+    # Implements the execute method
+    def execute(macro)
+      DRC::execute_drc(macro)
+    end
+    
+    # Make the DSL use ruby syntax highlighting
+    def syntax_scheme
+      "ruby"
+    end
+    
+    def suffix
+      "drc"
+    end
+    
+    def debugger_scheme
+      return RBA::MacroInterpreter::RubyDebugger
+    end
+    
+    def storage_scheme
+      return RBA::MacroInterpreter::PlainTextWithHashAnnotationsFormat
+    end
+
+    def description
+      return "DRC (Text)"
+    end
+
+  end
+  
+  # Register the new interpreters
+  DRCInterpreter::new
+  DRCPlainTextInterpreter::new
+ 
+end
+</text>
+</klayout-macro>
+

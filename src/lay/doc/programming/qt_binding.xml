@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>The Qt Binding</title>
+  <keyword name="Qt"/>
+
+  <h2-index/>
+
+  <p>
+  Starting with 0.22 comes with a large set of Qt classes available through the Ruby binding
+  mechanism. This allows integration of Qt user interfaces with Ruby scripts and to use the 
+  Qt API, for example the network or SQL classes. To use the Qt bindings, KLayout must be 
+  compiled with Qt binding, i.e.
+  </p>
+
+  <pre>build.sh -with-qtbinding ...</pre>
+
+  <p>
+  The API provided covers the functionality of Qt 4.6. To build KLayout with Qt binding, 
+  at least Qt version 4.6.2 is required. The API covers the following Qt modules:
+  </p>
+
+  <ul>
+    <li>QtCore: the basic Qt API</li>
+    <li>QtGui: the user interface widgets and supporting classes</li>
+    <li>QtXml: support for XML</li>
+    <li>QtSql: database support</li>
+    <li>QtNetwork: various network protocols and supporting classes</li>
+    <li>QtDesigner: dynamically load designer files (.ui)</li>
+  </ul>
+
+  <p>
+  This article covers the use of the Qt API and special topics related to that. It is recommended
+  to read the article about the Ruby binding (<link href="/programming/ruby_binding.xml"/>) for a deeper 
+  understanding of the mapping of the Qt API to Ruby.
+  </p>
+
+  <p>
+  There is some overlap with the "qtruby" project. This project also makes the Qt API available for 
+  Ruby. The approach of "qtruby" is similar. Yet there are some differences, in particular the 
+  event feature of KLayout, which allows a convient binding of code blocks to signals.
+  </p>
+
+  <h2>A First Sample</h2>
+
+  <p>
+  This is a first sample of how to use the Qt API.
+  To run that sample, open the Macro Development IDE from the "Macros" menu. Add a new macro with the "+" 
+  button in the left top tool bar. Choose "General KLayout Macro" from the "General" group as the template.
+  Paste the code above into the macro and run the macro with F5. 
+  </p>
+
+  <pre>module MyMacro
+
+  include RBA
+
+  dialog = QDialog::new(Application.instance.main_window)
+  dialog.windowTitle = "My Dialog"
+  
+  layout = QHBoxLayout::new(dialog)
+  dialog.setLayout(layout)
+  
+  button = QPushButton.new(dialog)
+  layout.addWidget(button)
+  button.text = "Click Me"
+  button.clicked do 
+    QMessageBox::information(dialog, "Message", "I was clicked!")
+  end
+  
+  dialog.exec
+
+end</pre>
+
+  <p>
+  The sample creates a <tt>QDialog</tt> with a layout and a button in it. When the button is clicked, a 
+  message box appears. This code demonstrates some features of the Ruby binding of the Qt library.
+  For example, the button's text is set with an attribute assignment ("<tt>button.text = ...</tt>") rather
+  than a method call ("<tt>button.setText(...)</tt>").
+  </p>
+
+  <p>
+  A noteworthy feature is the event binding which allows associating code blocks with signals.
+  In pure Qt, the "clicked" signal of the button would have to be connected to a slot. This is not
+  possible without creating a receiver object. With events, that receiver is created internally and
+  a code block can be attached to the signal directly:
+  </p>
+
+  <pre>  button.clicked do 
+    QMessageBox::information(dialog, "Message", "I was clicked!")
+  end</pre>
+
+  <p>
+  That binding includes the ability to receive signal arguments through block arguments.
+  </p>
+
+  <h2>Binding Details</h2>
+
+  <p>
+  Given the rules stated in the general Ruby binding documentation (<link href="/programming/ruby_binding.xml"/>)
+  the ruby versions of most methods can be derived readily. There are some exceptions however that 
+  we will cover here.
+  </p>
+
+  <p>
+  First, the C++ to Ruby binding lacks some features that are required for some methods. Those 
+  methods cannot be bound. Specifically that concerns:
+  </p>
+
+  <ul>
+    <li>Methods that return or require unsupported containers, for example <tt>QBitArray</tt></li>
+    <li>Methods that return or require function pointers</li>
+    <li>Methods that return or require pointers to pointers or references to pointers</li>
+    <li>Methods that require pointers to pass arrays (i.e. <tt>QPolygon::putPoints</tt>)</li>
+    <li>Methods that return or require objects which are not available in Ruby for some reason (i.e. <tt>QGenericArgument</tt> or some template classes like <tt>GenericMatrix</tt>)</li>
+    <li>Template members</li>
+    <li>Methods which are not available on one of the platforms (i.e. <tt>QPrinter::printerSelectionOption</tt>, which 
+        is not available on Windows)</li>
+    <li>Some operators, like the cast operators</li>
+    <li>Methods that require "char *" arguments which will be manipulated (i.e. <tt>QFile::readLineData</tt>)</li>
+    <li>Methods that require C++ resources (i.e FILE arguments)</li>
+    <li>Methods for which an alternative exists which cannot be distiguished (i.e. variants acceptings 
+        <tt>QByteArray</tt> and <tt>QString</tt> - only the <tt>QString</tt> variant is bound in that case)</li>
+    <li>Methods and operators which requires a typed argument as disambiguator (i.e. <tt>operator&gt;&gt;</tt>, where
+        the variant is selected by examining the type of the argument. For that case, alternatives exists
+        which explicitly state the type in the name, for example "<tt>read_i32</tt>")</li>
+  </ul>
+
+  <p>
+  Some template types are made available to Ruby. In particular that is valid for some <tt>QPair</tt> specializations.
+  For example "<tt>QPair&lt;double, double&gt;</tt>" is available as "<tt>QDoublePair</tt>".
+  </p>
+
+  <p>
+  The naming of some methods has been aligned to Ruby:
+  </p>
+
+  <ul>
+    <li><tt>isX</tt> is available as <tt>isX?</tt>, i.e. <tt>QAction::isSeparator?</tt></li>
+    <li><tt>setX</tt> is available as <tt>x=</tt>, i.e. <tt>QAction::iconText=</tt></li>
+  </ul>
+
+  <p>In those cases, the original declaration is still available also.</p>
+
+  <p>
+  The inheritance hierarchy of classes is mapped to Ruby in most cases. Sometimes that is not possible. For example, if
+  the base class is a template (i.e. <tt>QPolygon</tt>, where the base class is a <tt>QVector&lt;QPoint&gt;</tt>).
+  In that case, methods are provided that implement the features from the base class in the derived class.
+  </p>
+
+  <p>
+  Operators are bound to Ruby operators where that makes sense. For example, for <tt>QPoint</tt> the operators are 
+  available as expected ("<tt>==</tt>", "<tt>+</tt>" etc.).
+  </p>
+
+  <p>
+  "<tt>destroy</tt>" and "<tt>create</tt>" have been renamed to "<tt>qt_destroy</tt>" and "<tt>qt_create</tt>" to avoid name clashes with
+  identical methods inherited from the RBA binding. "<tt>destroy</tt>" and "<tt>create</tt>" are standard methods which 
+  KLayout's Ruby binding defines for every object exposed to Ruby.
+  </p>
+
+  <p>
+  When a Qt object is created in Ruby space with a parent, it's 
+  ownership is passed to the parent. It is safe however to keep a reference to that object, because
+  KLayout's Ruby binding employs a special Ruby class internally (a proxy) which keeps track of the lifetime
+  of the Qt object. If the parent is destroyed, the Qt object is destroyed as well. The internal Qt object will
+  be notified and the reference to the Qt object will be invalidated. As a consequence, the Ruby proxy will
+  refuse to execute methods on that object.
+  </p>
+
+  <p>
+  Destroying a Qt object can be necessary for example to free resources. To perform the equivalent of
+  the C++ delete operator, use the "<tt>destroy</tt>" method that comes with every class exposed to Ruby.
+  After an object is destroyed, the Ruby part of the binding still persists until all references to
+  that object are removed. However, it is no longer possible to call methods on these objects.
+  </p>
+
+  <p>
+  The Qt binding significantly benefits from the dynamic binding of C++ objects. 
+  If a C++ pointer is returned, this pointer often is a pointer to a base class. Behind the pointer
+  often is an object of a derived class. C++ allows calling of base class methods on that pointer, but 
+  not methods of the derived class - the identity of the object is reduced to the base class.
+  </p>
+
+  <p>
+  For example, if a method returns a <tt>QWidget</tt> pointer for a <tt>QPushButton</tt>, it is not possible to 
+  directly set the buttons text, because the method required for that is not part of the <tt>QWidget</tt>
+  interface. In C++ one would dynamic_cast the pointer to <tt>QWidget</tt> and set the text then.
+  </p>
+
+  <p>
+  The Ruby binding automatically upcasts the pointer to the actual object, so the value returned has the real object's
+  identity. In that case, delivering a <tt>QWidget</tt> would render a Ruby object that has a <tt>QPushButton</tt>
+  identity and it's possible to set the text immediately. If the object was not a <tt>QPushButton</tt>, an
+  error would be issued when an attempt is made to call a <tt>QPushButton</tt> method.
+  </p>
+
+  <h3>Enums</h3>
+
+  <p>
+  Enum types are available as classes to give them a specific context. Since Ruby does not allow to
+  declare classes within classes, enums declared inside a class must be declared as separate classes outside that class.
+  The relationship is indicated by the Enum's class name. For example, <tt>QMessageBox::Icon</tt> (C++) is available
+  as the Ruby class <tt>QMessageBox_Icon</tt>. The enum values are defined as constants within that class and the enclosing class. 
+  For example <tt>QMessageBox::Critical</tt> which is a value for <tt>QMessageBox::Icon</tt> is available as <tt>QMessageBox_Icon::Critical</tt> and <tt>QMessageBox::Critical</tt>
+  in Ruby.
+  </p>
+
+  <p>
+  Starting with version 0.24, the <tt>QFlags</tt> template is supported as a separate class.
+  The name of the class indicates the relationship to the enum class.
+  For example, <tt>QFlags&lt;QMessageBox::Icon&gt;</tt> is available as <tt>QMessageBox_QFlags_Icon</tt>.
+  Enum classes are derived from their respective flags class, so they can serve to initialize aguments
+  expecting flags.
+  It's hardly required to operate with the flags classes directly, since they are created automatically
+  when joining enum's with the "or" (<tt>|</tt>) operator:
+  </p>
+
+  <pre>  QMessageBox::Ok                         # A QMessageBox_StandardButton object
+  QMessageBox::Ok | QMessageBox::Cancel   # A QMessageBox_QFlags_StandardButton object</pre>
+
+  <p>
+  With these definitions, the following is allowed:
+  </p>
+
+  <pre>  QMessageBox::information(parent, title, text, QMessageBox::Ok | QMessageBox::Cancel)
+  QMessageBox::information(parent, title, text, QMessageBox::Ok)</pre>
+
+  <h2>Using the designer</h2>
+
+  <p>
+  It is possible to load a dialog from a UI designer (.ui) file. Have a look at the following sample:
+  </p>
+
+  <pre>module MyMacro
+ 
+  include RBA
+
+  ui_file = QFile::new(QFileInfo::new($0).dir.filePath("MyDialog.ui"))
+  ui_file.open(QIODevice::ReadOnly.to_i)
+  dialog = QFormBuilder::new.load(ui_file, Application::instance.main_window)
+  ui_file.close
+  
+  def dialog.setup
+    button.clicked do
+      slider.value = (slider.value + 1) % 100
+    end
+  end
+
+  dialog.setup
+  dialog.exec
+
+end</pre>
+
+  <p>
+  This sample tries to locate a designer file called "<tt>MyDialog.ui</tt>" relative to the 
+  macro's path (in <tt>$0</tt>). It uses the <class_doc href="QFormBuilder"/> class to load and 
+  create the dialog. In that sample, "<tt>MyDialog</tt>" defines a dialog with two widgets: a <tt>QPushButton</tt>
+  ("button") and a <tt>QSlider</tt> ("slider").
+  Because of the dynamic binding in Ruby, "dialog" will already have the correct class and
+  we don't have to cast the pointer delivered by <tt>QFormBuilder::load</tt> before we can call "exec".
+  </p>
+
+  <p>
+  This sample exploits a nice Ruby feature: in Ruby it is possible to dynamically add methods
+  to an instance. This allows extending the <tt>QDialog</tt> object we got from <tt>QFormLoader</tt> by custom code.
+  In our case we add a "setup" method. This method installs the custom logic of the dialog. 
+  It makes use of a convenience feature implemented in <tt>QObject</tt>'s Ruby binding: all named child objects
+  of an object are available through accessor methods. Therefore we can access "button" and "slider"
+  by their name to install an event handler that updates the slider value each time the button
+  is clicked.
+  </p>
+
+  <p>
+  After calling setup on the dialog we have initialized it and we can show it with "exec".
+  </p>
+
+  <h2>Behind The Scenes</h2>
+
+  <p>
+  The mechanism behind the Ruby binding a based on the RBA/GSI framework of KLayout. 
+  In order to be able to derive from existing classes, that framework needs to add a 
+  kind of interfacing class atop of existing classes. Thus, the framework exposes
+  every Qt class in two ways:
+  </p>
+
+  <ul>
+    <li>Directly, without the ability to reimplement virtual methods. This is the way,
+    existing Qt objects are addressed. The Ruby classes for that case are called "X_Native" where
+    "X" is the name of the Qt class (for example, "<tt>QObject_Native</tt>"). When you receive a 
+    reference to a Qt object created by C++ code, this reference will have the native class
+    type.
+    </li>
+    <li>Indirectly through an interface class. This is the object created when you instantiate
+    a Qt object in Ruby. All virtual methods will be rerouted to the Ruby dispatcher. That allows
+    to reimplement every virtual method, but also adds some overhead to every virtual method call.
+    The name of these classes is identical to the name of the Qt class. In the swig tool, those
+    classes are called "director classes".
+    </li>
+  </ul>
+
+  <p>
+  The difference between the native and interface classes is important if you test the type
+  of a object. The difference between both cases is the scope. The native classes will always
+  match. The interface classes will only match if the object was created by Ruby code:
+  </p>
+
+  <pre>b = dialog.button
+# this will not render true, if the button was created by QFormBuilder for example
+b.is_a?(QPushButton)
+# this is correct:
+b.is_a?(QPushButton_Native)</pre>
+
+  <p>
+  To avoid confusion, the native classes do not appear in the documentation. They would just
+  add another level of inheritance without providing additional methods.
+  </p>
+
+</doc>

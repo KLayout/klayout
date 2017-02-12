@@ -1,0 +1,166 @@
+<ui version="4.0" >
+ <class>MarkerBrowserConfigPage2</class>
+ <widget class="QFrame" name="MarkerBrowserConfigPage2" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>571</width>
+    <height>174</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Marker Database Browser</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
+      <string>Marker Appearance</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="2" column="1" colspan="2" >
+       <widget class="QCheckBox" name="halo_cb" >
+        <property name="text" >
+         <string>With halo</string>
+        </property>
+        <property name="tristate" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4" >
+       <widget class="QLineEdit" name="vs_le" />
+      </item>
+      <item row="0" column="4" >
+       <widget class="QLineEdit" name="lw_le" />
+      </item>
+      <item row="1" column="5" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>pixel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>71</width>
+          <height>31</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="5" >
+       <widget class="QLabel" name="textLabel2_2" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>0</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>pixel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3" >
+       <widget class="QLabel" name="textLabel1_4" >
+        <property name="text" >
+         <string>Line width</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>41</width>
+          <height>31</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="3" >
+       <widget class="QLabel" name="vs_lbl" >
+        <property name="text" >
+         <string>Vertex size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="lay::ColorButton" name="color_pb" >
+        <property name="toolTip" >
+         <string>The color in which the rulers are drawn</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="textLabel3_2" >
+        <property name="text" >
+         <string>Marker color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Stipple</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="lay::DitherPatternSelectionButton" name="stipple_pb" >
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>lay::DitherPatternSelectionButton</class>
+   <extends>QPushButton</extends>
+   <header>layWidgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>lay::ColorButton</class>
+   <extends>QPushButton</extends>
+   <header>layWidgets.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

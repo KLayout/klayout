@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Zooming Into The Layout</title>
+  <keyword name="Zooming"/>
+
+  <p>
+  Select the zoom area with the right mouse button in the layout canvas. 
+  </p>
+  <p>
+  Press the button, drag the box to the desired position and release the
+  button. 
+  </p>
+  <p>
+  To zoom in (enlarge) drag the box right and down. To zoom out (shrink)
+  drag the box up and left. To choose a new center, single-click the new
+  center point with the right mouse button.
+  </p>
+  <p>
+  Additionally, these functions are available from the menu or by hotkeys:
+  </p>
+
+  <ul>
+    <li>Pan to the left, right, top or bottom using the arrow keys or
+        choosing one of these functions from the "Display" menu.</li>
+    <li>Fill the whole selected cell into the window by pressing "F2" or
+        choosing "Zoom Fit" from the "Display" menu</li>
+    <li>Zoom in or out by a fixed amount by pressing "Enter" or
+        "Shift+Enter" or choosing "Zoom In" or "Zoom Out" from the "Display"
+        menu</li>
+    <li>Zoom in and out by using the mouse wheel if available. The current
+        mouse location will stay fixed, while the surrounding layout will be enlarged or
+        reduced in size</li>
+    <li>Press "Shift" while dragging the mouse with the right mouse button pressed will
+        drag the layout similar to what happens in recent map service web applications</li>
+  </ul>
+
+</doc>
+

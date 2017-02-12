@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Symbolic Connectivity Layers</title>
+
+  <p>
+  Use the symbol table to specify derived layers and to assign names to layer/datatype combinations.
+  A symbolic layer must have a name which can be used in the connectivity table instead of the 
+  original layers. In addition, an expression must be specified that defines the contents of the 
+  layer.
+  </p>
+  <p>
+  Inside the expressions
+  </p>
+
+  <ul>
+  <li>
+    Use "layer/datatype" notation to specify an original layer with explicit GDS layers and datatypes.
+  </li>
+  <li>
+    Use the name to specify a named original layer or to refer to a symbolic layer defined in another entry.
+  </li>
+  <li>
+    Use the operators '+', '*', '-' and '^' to specify logical OR, AND, NOT and XOR respectively. 
+    The precedence of evaluation is '^' and '*' before '+' and '-'.
+  </li>
+  <li>
+    Use round brackets to group expressions.
+  </li>
+  </ul>
+  <p>
+  Examples:
+  </p>
+  <table>
+  <tr>
+    <td><b>17</b></td>
+    <td>Abbreviation for GDS layer 17, datatype 0</td>
+  </tr>
+  <tr>
+    <td><b>2/0*17/0</b></td>
+    <td>Logical AND between layer 2 and 17, both datatype 0</td>
+  </tr>
+  <tr>
+    <td><b>2*(5+7)</b></td>
+    <td>Logical AND between layer 2 and the logical OR combination of 5 and 7</td>
+  </tr>
+  <tr>
+    <td><b>ACTIVE-POLY</b></td>
+    <td>Logical NOT between the symbolic layer ACTIVE (defined in another entry) and POLY (also defined in another entry).</td>
+  </tr>
+  </table>
+
+</doc>

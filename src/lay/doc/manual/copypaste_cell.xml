@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Copy And Paste Of Cells</title>
+  <keyword name="Copy cells"/>
+  <keyword name="Paste cells"/>
+
+  <p>
+  Whole cells can be copied to the clipboard as well. To copy a whole cell, 
+  select the cell in the hierarchy browser (make sure the focus is in that window)
+  and choose "Copy" or "Cut" from the "Edit" menu.
+  To paste such a cell into a target layout, choose "Paste" from the "Edit" menu.
+  </p>
+
+  <p>
+  Two copy modes are provided: deep and shallow copy. When "copy" or "cut" is choosen and 
+  the cell instantiates other cells, a dialog will been shown in which the mode can be selected:
+  </p>
+
+  <ul>
+    <li>
+      <b>Shallow copy</b>: In shallow mode, only the cell itself will be copied. No copies of the child cells
+      will be created. If a cell copy is created, the cell will call the same cells than
+      the original cell. If a cell is copied to another layout (in a different tab), the 
+      child cells will not be carried along and "ghost" cells will be created or existing
+      cells with the same name will be used as child cells.
+    </li>
+    <li>
+      <b>Deep copy</b>: In deep copy mode, the cell plus it's child cells are copied. All cells will be carried
+      along and when pasting the cell, copies of all children will be created as well.
+    </li>
+  </ul>    
+
+  <p>
+  When a cell is pasted into another layout and there is a "ghost cell" with that name, the
+  pasted cell will replace the ghost cell. If there is a normal cell with that name, 
+  a new cell variant will be created and the name of the pasted cell will be changed by adding
+  a suffix to create a unique name.
+  </p>
+
+  <p>
+  Copying a cell in deep copy mode from one layout to another provides a way to merge two layouts
+  into one: simply copy the top cell of the first layout into the second one and instantiate
+  both in a new top cell for example. 
+  </p>
+
+</doc>
+

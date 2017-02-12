@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <doc>@class QObject
+@method method_missing
+@brief Maps unknown methods to accessors for child objects
+@args id, ...
+This method implements Ruby's fallback mechanism and adds some convenience to 
+QObject: through that implementation, each child object can be accessed through
+it's name. That method will deliver a reference to the child object or nil if there
+is no child element with that name.
+For example:
+
+@code
+  dialog = MyDialog.new  # has a widget named "button"
+  dialog.button.text = "The button text"
+@/code
+
+If no child object with the given name exists, an exception is thrown.
+You can use "respond_to?(child_name)" to check whether a child with the
+given name exists.
+ </doc>
+ <format>general</format>
+ <autorun>false</autorun>
+ <autorun-early>true</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>ruby</interpreter>
+ <text>
+
+# provide the qt_signal method which is equivalent to 
+# the SIGNAL macro of Qt
+def qt_signal(s)
+  "2" + s
+end
+
+# provide the qt_slot method which is equivalent to 
+# the SLOT macro of Qt
+def qt_slot(s)
+  "1" + s
+end
+
+module RBA
+
+  # Add "method_missing" to QObject
+  class QObject_Native 
+    def method_missing(id, *args)
+      self.findChild(id.to_s) || super 
+    end
+    def respond_to?(id, include_private = false)
+      if self.findChild(id.to_s) 
+        true
+      else
+        super
+      end
+    end
+  end
+
+end
+</text>
+</klayout-macro>

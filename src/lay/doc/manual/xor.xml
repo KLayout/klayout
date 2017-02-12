@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>The XOR Tool</title>
+  <keyword name="XOR tool"/>
+  <keyword name="Compare layouts"/>
+
+  <p>
+  The XOR tool performs a geometrical XOR (also ANOTB and BNOTA for asymmetric differences) on two layouts by performing the respective boolean operations layer by layer.
+  The XOR tool is started using "XOR Tool" from the "Tools" menu). 
+  Currently, the tool compares all or just the visible layers. Currently, it compares layers from one layout vs. the identical layers from
+  the other layout.
+  </p>
+
+  <p>
+  The current implementation employs a flat XOR processor. This limits the application somewhat to small and medium sized layouts and does not 
+  make use of hierarchy, which basically excludes applications for very hierarchical layouts (i.e. memory arrays).
+  The memory footprint associated with the flat approach can be mitigated by using the tiling feature which performs the operation
+  on a tile with limited size. This does not reduce the run times but the memory requirements.
+  </p>
+
+  <p>
+  The XOR tool allows specification of tolerances. Basically a tolerance is an undersizing step following the boolean operation. This way, small markers can be suppressed.
+  This is particular useful to remove markers resulting from tiny differences between the layouts being compared.
+  Multiple tolerances can be specified. In that case, multiple undersize steps are performed to create sets of layers with different 
+  tolerances each. For example, a tolerance specification of "0,0.001,0.005,0.010" will create four sets (marker categories) containing all difference
+  markers and others for markers indicating differences larger than 1nm, 5nm and 10nm.
+  </p>
+
+  <p>
+  Tiling can be enabled by entering a tile size into the entry box. For semi-flat layouts such as standard cell blocks, a tile size
+  of 1000 micron is a good starting point. The choice of the tile size mainly determines memory requirements.
+  </p>
+
+  <p>
+  The XOR tool allows sending the output either to a marker database or to another or one of the input layouts. The mode can be selected
+  with the "Output" drop-down box. If output is sent to one of the original inputs, it is mandatory to specify a layer offset which maps the 
+  original layer to a new layer. An offset of "1000/0" for example means, that differences between shapes on layer "16/0" will be sent to "1016/0" for the first tolerance
+  category and "2016/0" for the second.
+  </p>
+
+  <p>
+  Finally, the XOR can be confined to a region. This saves time if differences in parts of the layout are 
+  of interest. To select a region use the drop-down box next to "From region":
+  </p>
+
+  <ul>
+    <li><b>All:</b> Do an XOR on the whole area (default)</li>
+    <li><b>Visible region:</b> Confine the XOR to the visible part of the layouts</li>
+    <li><b>Clipped to ruler:</b> Draw one or many rulers to specify the region to which the
+      XOR shall be confined. Each ruler specifies a region given be the extension of the ruler.
+      If you use a box-type ruler, the ruler gives a better visualization of the region</li>
+  </ul>
+
+</doc>
+

@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>About Expressions</title>
+
+  <p>
+  Beside a ruby programming API, KLayout provides support for simple expressions in some places.
+  In particular this feature is employed to generate dynamic strings, for example when deriving the
+  label text for a ruler.
+  </p>
+
+  <h2>String interpolation</h2>
+
+  <p>
+  The feature of inserting dynamic content into a string is called interpolation. 
+  The Syntax KLayout uses for string interpolation is a dollar character followed by
+  the expression which is evaluated. Simple expressions can be put directly after the dollar character.
+  Others must be put into brackets.
+  </p>
+
+  <p>
+  Every dollar expression is evaluated and the expression is substituted by the result string.
+  For example:
+  </p>
+
+  <p>
+  <table>
+  <tr><th>String</th><th>Evaluates to</th></tr>
+  <tr><td><tt>An irrational number: $sqrt(2).</tt></td><td><tt>An irrational number: 1.4142136</tt></td></tr>
+  <tr><td><tt>1+2 is $(1+2).</tt></td><td><tt>1+2 is 3.</tt></td></tr>
+  </table>
+  </p>
+
+  <p>
+  String interpolation plays a role where expressions are used to generate dynamic strings. 
+  When expressions are used as standalone features (i.e. as parts of a custom layout query - see <link href="/about/custom_queries.xml"/>), 
+  string interpolation is not supported inside string constants, but strings can be built dynamically using the "+" operator. 
+  </p>
+
+  <h2>Basic data types</h2>
+
+  <p>
+  Expressions use different data types to represent strings or numeric values.
+  The following data types are supported currently:
+  </p>
+
+  <p>
+  <table>
+  <tr><th>Type</th><th>Examples</th></tr>
+  <tr><td>Numeric</td><td><tt>1.2<br/>-0.5e-6</tt></td></tr>
+  <tr><td>String</td><td><tt>"abc"<br/>'x'</tt></td></tr>
+  <tr><td>Boolean</td><td><tt>true<br/>false</tt></td></tr>
+  <tr><td>Array</td><td><tt>[1,5,4]</tt></td></tr>
+  <tr><td>Undefined (no value)</td><td><tt>nil</tt></td></tr>
+  </table>
+  </p>
+
+  <p>
+  Apart from that, all RBA objects are supported with their methods (see <link href="/code/index.xml"/>). For example, that is 
+  a valid expression which gives a value of 100:
+  </p>
+
+  <pre>
+Box.new(-10, 0, 90, 60).width
+</pre>
+
+  <p>
+  In a boolean context (i.e. the conditional evaluation "condition ? expr1 : expr2"), "nil"
+  and the boolean "false" will render false, while all other values render true. This follows
+  the Ruby convention and in effect, unlike some other languages, a numeric value if 0 is not treated 
+  as "false" but as "true"!
+  </p>
+
+  <h2>Constants</h2>
+
+  <p>
+  The following constants are defined currently:
+  </p>
+
+  <p>
+  <table>
+  <tr><th>Constant</th><th>Description</th></tr>
+  <tr><td><tt>M_PI</tt></td><td>The mathematical constant 'pi'</td></tr>
+  <tr><td><tt>M_E</tt></td><td>The mathematical constant 'e'</td></tr>
+  <tr><td><tt>false</tt></td><td>'false' boolean value</td></tr>
+  <tr><td><tt>true</tt></td><td>'true' boolean value</td></tr>
+  <tr><td><tt>nil</tt></td><td>The 'undefined' value</td></tr>
+  </table>
+  </p>
+
+  <h2>Operators and precedence</h2>
+
+  <p>
+  KLayout's expressions support the following operators with the given precedence:
+  </p>
+
+  <p>
+  <table>
+  <tr><th>Prec.</th><th>Operator</th><th>Data types</th><th>Result type</th><th>Description</th></tr>
+  <tr><td>1</td><td><tt>(</tt>...<tt>)</tt></td><td>Any</td><td></td><td>Grouping of sub-expressions</td></tr>
+  <tr><td>2</td><td><tt>[</tt>...<tt>,</tt>...<tt>]</tt></td><td>Any</td><td>Array</td><td>Array formation</td></tr>
+  <tr><td>3</td><td><tt>!</tt>...</td><td>Boolean</td><td>Boolean</td><td>Logical 'not'</td></tr>
+  <tr><td>3</td><td><tt>~</tt>...</td><td>Numeric</td><td>Numeric</td><td>Bitwise 'not' (evaluated as 32 bit integers)</td></tr>
+  <tr><td>3</td><td><tt>-</tt>...</td><td>Numeric</td><td>Numeric</td><td>Negation</td></tr>
+  <tr><td>4</td><td>...<tt>^</tt>...</td><td>Numeric</td><td>Numeric</td><td>Bitwise 'xor' (evaluated as 32 bit integers)</td></tr>
+  <tr><td>4</td><td>...<tt>&amp;</tt>...</td><td>Numeric</td><td>Numeric</td><td>Bitwise 'and' (evaluated as 32 bit integers)</td></tr>
+  <tr><td>4</td><td>...<tt>|</tt>...</td><td>Numeric</td><td>Numeric</td><td>Bitwise 'or' (evaluated as 32 bit integers)</td></tr>
+  <tr><td>5</td><td>...<tt>%</tt>...</td><td>Numeric</td><td>Numeric</td><td>Modulo</td></tr>
+  <tr><td>5</td><td>...<tt>/</tt>...</td><td>Numeric</td><td>Numeric</td><td>Division</td></tr>
+  <tr><td>5</td><td>...<tt>*</tt>...</td><td>Numeric</td><td>Numeric</td><td>Product</td></tr>
+  <tr><td></td><td></td><td>Numeric*String</td><td>String</td><td>String multiplication (n times the same string)</td></tr>
+  <tr><td>6</td><td>...<tt>-</tt>...</td><td>Numeric</td><td>Numeric</td><td>Subtraction</td></tr>
+  <tr><td>6</td><td>...<tt>+</tt>...</td><td>Numeric</td><td>Numeric</td><td>Addition</td></tr>
+  <tr><td></td><td></td><td>String</td><td>string</td><td>Concatenation</td></tr>
+  <tr><td>7</td><td>...<tt>&lt;&lt;</tt>...</td><td>Numeric</td><td>Numeric</td><td>Bit shift to left</td></tr>
+  <tr><td>7</td><td>...<tt>&gt;&gt;</tt>...</td><td>Numeric</td><td>Numeric</td><td>Bit shift to right</td></tr>
+  <tr><td>8</td><td>...<tt>==</tt>...</td><td>Any</td><td>Boolean</td><td>Equality</td></tr>
+  <tr><td>8</td><td>...<tt>!=</tt>...</td><td>Any</td><td>Boolean</td><td>Inequality</td></tr>
+  <tr><td>8</td><td>...<tt>&lt;=</tt>...</td><td>Any</td><td>Boolean</td><td>Less or equal</td></tr>
+  <tr><td>8</td><td>...<tt>&lt;</tt>...</td><td>Any</td><td>Boolean</td><td>Less</td></tr>
+  <tr><td>8</td><td>...<tt>&gt;=</tt>...</td><td>Any</td><td>Boolean</td><td>Greater or equal</td></tr>
+  <tr><td>8</td><td>...<tt>&gt;</tt>...</td><td>Any</td><td>Boolean</td><td>Greater</td></tr>
+  <tr><td>8</td><td>...<tt>~</tt>...</td><td>String</td><td>Boolean</td><td>Match with a glob expression</td></tr>
+  <tr><td>8</td><td>...<tt>!~</tt>...</td><td>String</td><td>Boolean</td><td>Non-match with a glob expression</td></tr>
+  <tr><td>9</td><td>...<tt>&amp;&amp;</tt>...</td><td>Boolean</td><td>Boolean</td><td>Logical 'and'</td></tr>
+  <tr><td>9</td><td>...<tt>||</tt>...</td><td>Boolean</td><td>Boolean</td><td>Logical 'or'</td></tr>
+  <tr><td>10</td><td>...<tt>?</tt>...<tt>:</tt>...</td><td>Boolean?Any:Any</td><td>Any</td><td>Conditional evaluation</td></tr>
+  </table>
+  </p>
+
+  <p>
+  The match operators work on strings. They use the glob pattern notation (as used in the shell for example) and support substring matching with the usual bracket notation. Substrings can be referred to by "$n" later, where 
+  n is the nth bracket. For example:
+  </p>
+
+  <table>
+  <tr><th>Expression</th><th>Result</th></tr>
+  <tr><td><tt>"foo" ~ "f*"</tt></td><td>true</td></tr>
+  <tr><td><tt>"foo" ~ "bar"</tt></td><td>false</td></tr>
+  <tr><td><tt>"foo" !~ "bar"</tt></td><td>true</td></tr>
+  <tr><td><tt>"foo" ~ "f(*)"; $1</tt></td><td>"oo"</td></tr>
+  </table>
+
+  <h2>Method calls</h2>
+
+  <p>
+  Expressions support all the objects provided by KLayout for the Ruby API. Objects are values inside
+  expressions like integers or strings are. Sometimes, objects can be manipulated with the operators
+  as well (like "box1 + box2"). The most important way to work with objects however are methods.
+  </p>
+
+  <p>
+  The dot calls a method on an object. Before the dot an expression must be given which results in an object, or 
+  a class name must be given. In the latter case, static methods will be called. After the dot, a valid method name 
+  is expected.
+  </p>
+
+  <p><b>Important note:</b> the method names used inside expressions usually is equivalent to the names
+  mentioned in the class documentation. Setter methods like "box_with=" can be used as targets in assignments, i.e.
+  </p>
+
+  <pre>
+shape.box_width = 20
+</pre>
+
+  <p>Boolean predicates (like "is_box?") are used <b>without</b> the question mark because that is reserved
+  for the decision operator (".. ? .. : .."):
+  </p>
+
+  <pre>
+shape.is_box
+</pre>
+
+  <h2>Concatenation of expressions</h2>
+
+  <p>
+  The semicolon separates two expressions. The value of that compound expression is the value of the last one.
+  </p>
+
+  <h2>Variables</h2>
+
+  <p>
+  Depending on the context, some variables may be already defined. For example, when used for generating ruler
+  dimension labels, "D" is a predefined variable that is the length of the ruler. See the specific documentation
+  on these variables.
+  </p>
+
+  <p>
+  Inside expressions, variables can be defined to store intermediate results for example.
+  To define a variable use the "var" keyword followed by the variable name and an optional initialisation.
+  Assignment of values can be done with the "=" operator.
+  For example, the following expression gives the result 4:
+  </p>
+
+  <pre>
+var x = 3; x = x + 1; x
+</pre>
+
+  <h2>Special variables</h2>
+
+  <p>
+  Special variables start with a dollar character. Currently the only special variables available are
+  "$1..9" which is the 1 to 9nth substring match of the last match expression.
+  </p>
+
+  <h2>Special constants</h2>
+
+  <p>
+  In the context of a layout, various additional constant expressions are supported:
+  </p>
+
+  <h3>Distance and area units</h3> 
+  
+  <p>
+  A value with a unit is automatically converted to database units. For example, "<tt>0.15 um</tt>" will give
+  150 if the database unit of the layout is 1 nm. See below for a list of units available.
+  Supported units are:
+  </p>
+
+  <table>
+  <tr><th>Unit</th><th>Description</th></tr>
+  <tr><td><tt>nm</tt></td><td>Nanometers</td></tr>
+  <tr><td><tt>um</tt>, <tt>mic</tt>, <tt>micron</tt></td><td>Micrometers</td></tr>
+  <tr><td><tt>mm</tt></td><td>Millimeters</td></tr>
+  <tr><td><tt>m</tt></td><td>Meters</td></tr>
+  <tr><td><tt>nm2</tt></td><td>Square nanometers</td></tr>
+  <tr><td><tt>um2</tt>, <tt>mic2</tt>, <tt>micron2</tt></td><td>Square micrometers</td></tr>
+  <tr><td><tt>mm2</tt></td><td>Square millimeters</td></tr>
+  <tr><td><tt>m2</tt></td><td>Square meters (for very big chips)</td></tr>
+  </table>
+
+  <h3>Layer index constants</h3> 
+
+  <p>
+  A layer given in the common notation and enclosed in angle brackets is converted to 
+  a layer index. For example: "<tt>&lt;16/0&gt;</tt>" will be converted to the layer index of the layer with layer number 16 and datatype 0.
+  </p>
+
+  <h3>Cell index constants</h3>
+  
+  <p>
+  A cell name enclosed in double angle brackets will be converted to the index
+  of that cell, for example "<tt>&lt;&lt;TOP&gt;&gt;</tt>".
+  </p>
+
+  <h2>Functions</h2>
+
+  <p>
+  KLayout's expressions support the following functions:
+  </p>
+
+  <table>
+  <tr><th>Function</th><th>Data types</th><th>Result type</th><th>Description</th></tr>
+  <tr><td><tt>absolute_file_path(</tt>x<tt>)</tt></td><td>String</td><td>String</td><td>Convert a relative file path to an absolute one</td></tr>
+  <tr><td><tt>absolute_path(</tt>x<tt>)</tt></td><td>String</td><td>String</td><td>Returns the absolute path component of a file specification</td></tr>
+  <tr><td><tt>abs(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Returns the absolute value of a number</td></tr>
+  <tr><td><tt>acos(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Inverse cosine function</td></tr>
+  <tr><td><tt>asin(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Inverse sine function</td></tr>
+  <tr><td><tt>atan2(</tt>x<tt>,</tt>y<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Inverse tangent of x/y</td></tr>
+  <tr><td><tt>atan(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Inverse tangent function</td></tr>
+  <tr><td><tt>basename(</tt>x<tt>)</tt></td><td>String</td><td>String</td><td>Returns the basename component of a file specification</td></tr>
+  <tr><td><tt>ceil(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Round up</td></tr>
+  <tr><td><tt>combine(</tt>x<tt>,</tt>y<tt>)</tt></td><td>String</td><td>String</td><td>Combines the path components x and y using the system specific separator</td></tr>
+  <tr><td><tt>cosh(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Hyperbolic cosine function</td></tr>
+  <tr><td><tt>cos(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Cosine function</td></tr>
+  <tr><td><tt>env(</tt>x<tt>)</tt></td><td>String</td><td>String</td><td>Access an environment variable</td></tr>
+  <tr><td><tt>error(</tt>x<tt>)</tt></td><td>String</td><td></td><td>Raise an error</td></tr>
+  <tr><td><tt>exp(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Exponential function</td></tr>
+  <tr><td><tt>extension(</tt>x<tt>)</tt></td><td>String</td><td>String</td><td>Returns the extension component of a file specification</td></tr>
+  <tr><td><tt>file_exists(</tt>x<tt>)</tt></td><td>String</td><td>Boolean</td><td>Returns true if the given file exists</td></tr>
+  <tr><td><tt>find(</tt>s<tt>,</tt>t<tt>)</tt></td><td>String</td><td>Numeric</td><td>Finds the first occurrence of a t in s and returns the position (where 0 is the first character)</td></tr>
+  <tr><td><tt>floor(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Round down</td></tr>
+  <tr><td><tt>gsub(</tt>s<tt>,</tt>x<tt>,<tt>y</tt>)</tt></td><td>String</td><td>String</td><td>Substitute all occurrences of a x in s by y</td></tr>
+  <tr><td><tt>is_array(</tt>x<tt>)</tt></td><td>Any</td><td>Boolean</td><td>True if the argument is an array</td></tr>
+  <tr><td><tt>is_dir(</tt>x<tt>)</tt></td><td>String</td><td>Boolean</td><td>Returns true if the given path is a directory</td></tr>
+  <tr><td><tt>is_nil(</tt>x<tt>)</tt></td><td>Any</td><td>Boolean</td><td>True if the argument is undefined</td></tr>
+  <tr><td><tt>is_numeric(</tt>x<tt>)</tt></td><td>Any</td><td>Boolean</td><td>True if the argument is numeric</td></tr>
+  <tr><td><tt>is_string(</tt>x<tt>)</tt></td><td>Any</td><td>Boolean</td><td>True if the argument is a string</td></tr>
+  <tr><td><tt>item(</tt>a<tt>,</tt>i<tt>)</tt></td><td>Array</td><td>Any</td><td>Access a certain item of an array</td></tr>
+  <tr><td><tt>join(</tt>a<tt>,</tt>s<tt>)</tt></td><td>Array, String</td><td>String</td><td>Join all array members in a into a string using the separator s</td></tr>
+  <tr><td><tt>len(</tt>x<tt>)</tt></td><td>String</td><td>Numeric</td><td>Return the length of a string</td></tr>
+  <tr><td><tt>log10(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Base 10 logarithm function</td></tr>
+  <tr><td><tt>log(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Natural logarithm function</td></tr>
+  <tr><td><tt>max(</tt>a<tt>,</tt>b ...<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Maximum of the given arguments</td></tr>
+  <tr><td><tt>min(</tt>a<tt>,</tt>b ...<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Minimum of the given arguments</td></tr>
+  <tr><td><tt>path(</tt>x<tt>)</tt></td><td>String</td><td>String</td><td>Returns the path component of a file specification</td></tr>
+  <tr><td><tt>pow(</tt>x<tt>,</tt>y<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Power function (x to the power of y)</td></tr>
+  <tr><td><tt>rfind(</tt>s<tt>,</tt>t<tt>)</tt></td><td>String</td><td>Numeric</td><td>Finds the last occurrence of a t in s and returns the position (where 0 is the first character)</td></tr>
+  <tr><td><tt>round(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Round up or down</td></tr>
+  <tr><td><tt>sinh(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Hyperbolic sine function</td></tr>
+  <tr><td><tt>sin(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Sine function</td></tr>
+  <tr><td><tt>split(</tt>t<tt>,</tt>s<tt>)</tt></td><td>String</td><td>Array</td><td>Splits t into elements using the separator s</td></tr>
+  <tr><td><tt>sprintf(</tt>f<tt>,</tt>a ...<tt>)</tt></td><td>String, Any</td><td>String</td><td>Implement of 'C' sprintf. Provides not all features but the most commonly used ones (precision, field width, alignment, zero padding, 'e', 'g', 'f', 'd', 'x', 'u' and 's' formats)</td></tr>
+  <tr><td><tt>sqrt(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Square root</td></tr>
+  <tr><td><tt>substr(</tt>t<tt>,</tt>f[<tt>,</tt>l]<tt>)</tt></td><td>String</td><td>String</td><td>Return a substring of t (starting from position f with length l). 'l' is optional. If omitted, the tail of the string is returned.</td></tr>
+  <tr><td><tt>sub(</tt>s<tt>,</tt>x<tt>,</tt>y<tt>)</tt></td><td>String</td><td>String</td><td>Substitute the first occurrence of a x in s by y</td></tr>
+  <tr><td><tt>tanh(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Hyperbolic tangent function</td></tr>
+  <tr><td><tt>tan(</tt>x<tt>)</tt></td><td>Numeric</td><td>Numeric</td><td>Tangent function</td></tr>
+  <tr><td><tt>to_f(</tt>x<tt>)</tt></td><td>Any</td><td>Numeric</td><td>Convert argument to numeric if possible</td></tr>
+  <tr><td><tt>to_i(</tt>x<tt>)</tt></td><td>Any</td><td>Numeric (integer)</td><td>Convert argument to numeric (32 bit integer)</td></tr>
+  <tr><td><tt>to_s(</tt>x<tt>)</tt></td><td>Any</td><td>String</td><td>Convert argument to string</td></tr>
+  </table>
+
+</doc>
+

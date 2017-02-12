@@ -1,0 +1,44 @@
+# Macro template list
+# List all macro template files here. A file "x" must be available as resource ":/macro-templates/x".
+# Override the description text by appending a description with ":...".
+# Add a default description prefix with a line containing only a ":..." specification (i.e. to establish a group).
+# Note that group titles are separated from the normal description with ";;"
+# This list also defines the order the macros will appear in the template selection dialog.
+
+# General group
+:General;;
+new_macro.lym
+new_text_file.txt :Plain text file (*.txt)\nUse this type for documentation for example.
+new_ruby_file.rb :Plain Ruby file (*.rb)\nCan be imported or required by other Ruby scripts. Use this type for library components for example.
+
+# Special group
+:Special;;
+pcell.lym
+#plugin.lym
+#qt_dialog.lym
+
+# Samples
+:Samples;;
+pcell_sample.lym
+qt_designer.lym
+qt_dialog.lym
+qt_server.lym
+
+[pymacros]
+# General group
+:General;;
+new_python_macro.lym
+new_text_file.txt :Plain text file (*.txt)\nUse this type for documentation for example.
+new_python_file.py :Plain Python file (*.py)\nCan be imported or required by other Python scripts. Use this type for library components for example.
+
+# Special group
+:Special;;
+pcell_python.lym
+
+# Samples
+:Samples;;
+pcell_sample_python.lym
+qt_designer_python.lym
+qt_dialog_python.lym
+qt_server_python.lym
+

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Ruler Properties</title>
+  <keyword name="Rulers"/>
+  <keyword name="Ruler properties"/>
+
+  <p> 
+  These are the properties that can be configured for rulers:
+  </p>
+  <ul>
+    <li><b>Labels:</b> depending on the outline of the ruler, up to three labels an be present.
+      Each label can be configure individually to either show a text or the measurement 
+      values. The main label is always present, X and Y labels are only present, if the ruler
+      has an explicit vertical or horizontal component (all outline styles except "diagonal").
+    </li>
+    <li><b>Style:</b> the style determines how the ruler or it's components are drawn. This can be
+      "ruler-like" (with ticks), arrow style or a plain line.
+    </li>
+    <li><b>Outline:</b> the outline determines how the two points forming the ruler are connected
+      to render the ruler shape. This is either just one line ("diagonal"), a horizontal and a vertical line
+      (in some outline styles combined with the diagonal line) or a box given by the two points of the 
+      ruler.
+    </li>
+    <li><b>Angle constraint:</b> the orientation of the ruler can be restricted in several ways, i.e. 
+      just being horizontal. By default, the ruler uses the global setting. It can however be configured 
+      to provide it's own constraint.
+    </li>
+    <li><b>Object snapping:</b> each ruler can be configure to snap to the closest object edge or vertex.
+      By default, the rulers use the global setting. It may be disabled however for each ruler.
+    </li>
+  </ul>
+
+  <p>
+  The label format is an arbitrary text with embedded expressions that may represent a measurement
+  value. Each such expression starts with a dollar sign, followed by the expression string. The expression 
+  syntax supportis the basic operations ("*", "/", "+", "-" ..), bitwise operations ("|", "&amp;", ..), 
+  the conditional operator ("x:y?z") as well as some functions, i.e. "abs", "sqrt", "exp". It includes a "sprintf" 
+  function. These are some examples:
+  </p>
+
+  <ul>
+    <li><b>$X</b>: The value of the X variable (the horizontal distance, see below for a complete list of variables).</li>
+    <li><b>$(sprintf('%.2f',X))</b>: The value of the 'X' variable formatted as two digit fixed precision value.</li>
+    <li><b>$(abs(X)+abs(Y))</b>: The manhattan distance of the ruler.</li>
+    <li><b>$min(X,Y)</b>: The minimum of X and Y.</li>
+  </ul>
+
+  <p>
+  A description of the expression syntax and the functions available can be found in <link href="/about/expressions.xml"/>.
+  </p>
+
+  <p>
+  This is a list of all variables available:
+  </p>
+
+  <ul>
+    <li><b>D:</b> The length of the ruler in micron units.</li>
+    <li><b>L:</b> The manhattan length of the ruler in micron units.</li>
+    <li><b>U:</b> The x-position of the ruler's first point in micron units.</li>
+    <li><b>V:</b> The y-position of the ruler's first point in micron units.</li>
+    <li><b>P:</b> The x-position of the ruler's second point in micron units.</li>
+    <li><b>Q:</b> The y-position of the ruler's second point in micron units.</li>
+    <li><b>X:</b> The horizontal extension of the ruler in micron units.</li>
+    <li><b>Y:</b> The vertical extension of the ruler in micron units.</li>
+    <li><b>A:</b> The area enclosed by the ruler (if it was a box) in square millimeters.</li>
+  </ul>
+
+</doc>
+

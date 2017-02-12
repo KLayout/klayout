@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Copy And Paste Of The Selection</title>
+  <keyword name="Copy"/>
+  <keyword name="Paste"/>
+
+  <p>
+  Of course, copy and paste is supported as usual. 
+  Shapes can be copied between layouts: by opening two layouts, shapes can be moved from one 
+  layout to another.
+  The shapes are mapped to the same layer than they have been on in the source layout. 
+  If a layer does not exist yet in the target layout, it is created.
+  </p>
+
+  <p>
+  Shapes in the selection are simply copied to the clipboard in the way they appear in 
+  the current cell. This means, if the shapes are pasted into a different layout 
+  they are put on the same position, but flat into the current cell. 
+  This provides a way to flatten a hierarchy: choose "hierarchical selection mode" in the editor options
+  dialog (deselect "top level only"), select the shapes to flatten and copy everything to a different 
+  cell. 
+  </p>
+
+  <p>
+  In non-hierarchical selection mode ("top level only" selection 
+  mode) or by clicking on a cell frame when the hierarchy levels are limited, instances can be selected as well.
+  When copying instances to the clipboard, two possible methods exist:
+  </p>
+
+  <ul>
+    <li><b>Shallow copy:</b> In this mode, just the instance is copied. When it is pasted into 
+      any target layout, the target cell of the instance is looked up and instantiated.</li>
+    <li><b>Deep copy:</b> Not only the instance but the instantiated cell is copied as well.
+      When pasting that into a different layout, the target cell will be created as well. If a
+      cell with that name already exists, a variant is created and instantiated.</li>
+  </ul>
+
+</doc>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Editing Functions</title>
+
+  <p>
+  Welcome to KLayout's user manual. This is the manual chapter covering the editing features of KLayout. 
+  The editor features are available only if KLayout is started in editor mode. The following subtopics are available:
+  </p>
+
+  <topics>
+    <topic href="/manual/edit_mode.xml"/>
+    <topic href="/manual/editor_basics.xml"/>
+    <topic href="/manual/editor_operations.xml"/>
+    <topic href="/manual/editor_advanced.xml"/>
+  </topics>
+
+</doc>

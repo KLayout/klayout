@@ -1,0 +1,38 @@
+# <test>
+#   <name>t3.4.ot</name>
+#   <content-description>A single cell with one text object</content-description>
+#   <test-intention>Geometrical objects reader capabilities</test-intention>
+#   <test-intention>TEXT record reading</test-intention>
+#   <test-intention>Text string specification by ID</test-intention>
+#   <test-intention>Explicit assignment for text string ID</test-intention>
+#   <test-intention>Use of undefined text string ID</test-intention>
+#   <must-fail>No text string defined for id 2</must-fail>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Text definition
+record TEXTSTRING
+  str A
+  
+# Text definition
+record TEXTSTRING
+  str B        
+
+# Cell ABC
+record CELL_STR
+  str ABC 
+
+record TEXT
+  bits 01111011 ;# 0CNXYRTL
+  uint 2        ;# text-id (FAILS: not defined)
+  uint 1        ;# text-layer
+  uint 2        ;# text-datatype
+  int 100       ;# text-x (abs)
+  int -200      ;# text-y (abs)
+
+tail
+

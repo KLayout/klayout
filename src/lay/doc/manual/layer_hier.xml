@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Organizing Layers Hierarchically</title>
+  <keyword name="Layer groups"/>
+
+  <p>
+  Layers can be organized hierarchically. For example, certain layers can 
+  be grouped together. Choose "Group" in the context menu of the layer
+  list (right-click the layer list). The selected layers will be replaced
+  by a tree node that represents these layers. Click on the tree node to
+  expand or collapse this group.
+  </p>
+
+  <p>
+  Once layers are grouped, they can be hidden or made visible with a single
+  double-click on the node representative. The node representative also
+  controls the appearance of the layers in the group: if a color or style
+  is assigned to the representative, it overrides the respective style
+  of all layers contained in the group. This way for example, the color of the layers
+  contained in the group can be changed at once. To remove a color override
+  of a node representative, set the color to "None". 
+  </p>
+
+  <p>
+  To resolve a group, select the group representative and choose "Ungroup" from
+  the context menu. 
+  </p>
+
+  <p>
+  A variety of automatic grouping methods is provided. For example,
+  the "Regroup views by layout index" from the layer context menu will collect all
+  layers and put them into one group per layout shown in the panel. 
+  </p>
+
+</doc>
+

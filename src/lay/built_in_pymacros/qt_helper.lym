@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <format>general</format>
+ <autorun>false</autorun>
+ <autorun-early>true</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <text>import pya
+
+def _qt_signal(s):
+  """
+  provide the qt_signal method which is equivalent to 
+  the SIGNAL macro of Qt
+  """
+  return "2" + s
+
+def _qt_slot(s):
+  """
+  provide the qt_slot method which is equivalent to 
+  the SLOT macro of Qt
+  """
+  return "1" + s
+
+def _getattr_with_child_objects(s, n):
+  """
+  Provides a new __getattr__ implementation which looks for child widgets
+  and maps them into the attribute space.
+  """
+  c = s.findChild(n)
+  if c is None:
+    raise AttributeError("Attribute " + n + " not found (tried lookup as a child widget)")
+  else:
+    return c
+      
+# If Qt binding is enabled, install the new getattr function.
+# Also install the qt_signal and qt_slot functions which go into the pya module.
+if "QObject_Native" in pya.__dict__:
+  pya.QObject_Native.__getattr__ = _getattr_with_child_objects
+  pya.__dict__["qt_signal"] = _qt_signal
+  pya.__dict__["qt_slot"] = _qt_slot
+
+</text>
+</klayout-macro>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Returning To A Previous View</title>
+  <keyword name="Previous view"/>
+
+  <p>
+  Choose "Last State" from the "Display" menu to return to the last
+  window shown. Choose "Next state" to switch to a more recent state
+  again.
+  </p>
+
+</doc>
+

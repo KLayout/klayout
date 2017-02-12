@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Connectivity</title>
+
+  <p>
+  Use the connectivity page to specify the conductor layers and their connections.
+  On a conductor layer, all touching or overlapping shapes are connected.
+  A connection is made between conductor layer when the shapes of the two conductor layers overlap. 
+  Optionally a via layer can be specified which must be present to make a connection between the two conductor layer.
+  </p>
+
+  <p>
+  To specify a conductor layer
+  </p>
+
+  <ul>
+    <li>
+      Use "layer/datatype" notation to specify explicit GDS layers and datatypes.
+    </li>
+    <li>
+      Enter the layer name to specify either a named layer or a symbolic layer.
+      Symbolic layers must be defined in the symbol table (see <link href="/about/symbolic_layers.xml"/>) 
+      and can be computed from boolean expressions.
+    </li>
+    <li>
+      Instead of using a symbolic layer, 
+      enter a expression directly without defining a symbol (see <link href="/about/symbolic_layers.xml"/>).
+      Inside the expressions
+      <ul>
+      <li>
+        Use "layer/datatype" notation to specify an original layer with explicit GDS layers and datatypes.
+      </li>
+      <li>
+        Use the name to specify a named original layer or to refer to a different symbolic layer defined in a symbol entry.
+      </li>
+      <li>
+        Use the operators '+', '*', '-' and '^' to specify logical OR, AND, NOT and XOR respectively. 
+        The precedence of evaluation is '^' and '*' before '+' and '-'.
+      </li>
+      <li>
+        Use round brackets to group expressions.
+      </li>
+      </ul>
+    </li>
+  </ul>
+
+  <p>
+  By creating conductor layers with boolean expressions, it is possible for example to separate an active area
+  layer of a CMOS transistor into source and drain regions by subtracting the gate poly. Symbolic layers are useful
+  to use "speaking" names for layers instead of the numeric layer/datatype specificiation.
+  Please note, that the net tracer is considerably slower when using boolean expressions.
+  </p>
+
+</doc>
+
+

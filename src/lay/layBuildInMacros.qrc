@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/built-in-macros" >
+        <!-- Hint: the URL's of the templates must be listed in built_in_macros/index.txt -->
+        <file alias="index.txt">built_in_macros/index.txt</file>
+        <file alias="pcell_declaration_helper.lym">built_in_macros/pcell_declaration_helper.lym</file>
+        <file alias="qobject_helper.lym">built_in_macros/qobject_helper.lym</file>
+        <file alias="drc.lym">built_in_macros/drc.lym</file>
+        <file alias="drc_interpreters.lym">built_in_macros/drc_interpreters.lym</file>
+    </qresource>
+    <qresource prefix="/built-in-pymacros" >
+        <!-- Hint: the URL's of the templates must be listed in built_in_pymacros/index.txt -->
+        <file alias="index.txt">built_in_pymacros/index.txt</file>
+        <file alias="pcell_declaration_helper.lym">built_in_pymacros/pcell_declaration_helper.lym</file>
+        <file alias="qt_helper.lym">built_in_pymacros/qt_helper.lym</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Using Python</title>
+  <keyword name="Programming"/>
+  <keyword name="Python"/>
+  <keyword name="pya"/>
+  <keyword name="Python scripts"/>
+
+
+  <h2-index/>
+
+  <p>
+  KLayout does not come with one integrated interpreter. Instead Python and Ruby can <b>both</b> be used together. 
+  So it is possible to write one script in Ruby and another one in Python. Just pick your favorite language. 
+  Scripts written in different languages share the same KLayout data structures.
+  Naturally they cannot directly share variables or language-specific data. But you can, for example, 
+  implement PCell's in Python and Ruby and use those different PCells in the same layout at the same time. 
+  Depending on the type of PCell, KLayout will either execute Python or Ruby code.
+  </p>
+
+  <p>
+  Python macros are loaded into KLayout using either ".py" files or ".lym" files with the interpreter 
+  set to "Python". To create Python macros, a new tab is available in the Macro Development IDE. 
+  When creating macros in the "Python" tab, they will use the Python interpreter. Macros created 
+  in the "Ruby" tab will use the Ruby interpreter. Files loaded by "import" need to be in plain
+  text format and use the ".py" suffix. The macro folder is called "pymacros" for a clean separation 
+  between the two macro worlds. Technically, both Ruby and Python macros are .lym files with
+  a different interpreter specified in these files.
+  </p>
+
+  <p>
+  The Python macro folder is in the "sys.path" search path so it is possible to install modules
+  there. To install libraries globally use "%INST_PATH%/lib/python/Lib" and "%INST_PATH%/lib/python/DLLs" on 
+  Windows. %INST_PATH% is the installation path (where klayout.exe is located). On Linux, the 
+  installation will share the Python interpreter with the system and modules installed there
+  will be available for KLayout too.
+  </p>
+
+  <p>
+  "$PYTHONPATH" is supported in the usual way.
+  </p>
+
+  <h2>Writing Macros in Python</h2>
+
+  <p>
+  A good way is to start with the samples provided when creating new macros on the Python tab.
+  The samples are available at the end of the template list. There is a sample for a PCell
+  implementation, a sample for a Qt dialog, a sample for using Qt's .ui files in Python
+  macros and one sample turning KLayout into a HTTP server using a Python macro.
+  </p>
+
+  <p>
+  Apart from a few specialities and the different language of course, Python macros do not look much different from Ruby 
+  macros. Ruby's "RBA" namespace is "pya" for Python (lowercase to conform with PEP-8). The
+  class and methods names are the same with very few exceptions and the documentation can be
+  used for Python too. Where necessary, a special remark is made regarding the Python implementation.
+  </p>
+
+  <p>
+  Here is a basic Python Macro. It creates a layout with a single cell and single layer and
+  puts one rectangle on that layer:
+  </p>
+
+  <pre>
+# Python version:
+
+import pya
+
+layout = pya.Layout()
+top = layout.create_cell("TOP")
+l1 = layout.layer(1, 0)
+top.shapes(l1).insert(pya.Box(0, 0, 1000, 2000))
+
+layout.write("t.gds")
+</pre>
+
+  <p>
+  Here is the Ruby variant to demonstrate the similarity:
+  </p>
+
+  <pre>
+# Ruby version:
+
+layout = RBA::Layout::new()
+top = layout.create_cell("TOP")
+l1 = layout.layer(1, 0)
+top.shapes(l1).insert(RBA::Box::new(0, 0, 1000, 2000))
+
+layout.write("t.gds")
+</pre>
+
+  <p>
+  Of course, not everything can be translated that easily between Ruby and Python. The
+  details are given below. Usually however, it's straightforward to translate Ruby into
+  Python.
+  </p>
+
+  <p>
+  There is no clear advantage of one language over the other. The Python community
+  is somewhat stronger, but performance-wise, Ruby is better.
+  In KLayout, the debugger support for Python is a little better, since the guts
+  of the interpreter are well documented in Python. For example, it is possible
+  to evaluate expressions in the context of the current stack frame. 
+  </p>
+
+  <p>
+  Apart from that, Python and Ruby coexist remarkably well and it was amazing, how easy it
+  was to extend the interfaces from Ruby to Python: not counting the different memory 
+  management model (mark and sweep garbage collector in Ruby, reference counting in Python),
+  the concepts are very similar. 
+  </p>
+
+  <p>
+  Please read the Python specific notes below before you start. Some things need to be
+  considered when going from Ruby to Python.
+  </p>
+
+  <h2>Python PCell's</h2>
+
+  <p>
+  Please have a look at the PCell sample available in the templates. Pick the PCell sample
+  after you have created a new Python macro.
+  </p>
+
+  <p>
+  PCell implementation in Python is very similar to Ruby. 
+  </p>
+
+  <h2>Python Implementation Notes</h2>
+
+  <ul>
+    <li><b>KLayout module:</b>
+    KLayout's module is "pya" (lowercase conforming to PEP 8). 
+    </li>
+
+    <li><b>Reserved names:</b>
+    Some methods with reserved names are not available (i.e. "exec", "in").
+    Some of these methods have been renamed and their original name is still available
+    in Ruby, but use is deprecated.
+    Where this was not possible, they are available with an appended underscore. 
+    For example: "QDialog.exec" is available as "QDialog.exec_". That is the same scheme PyQt uses.
+    </li>
+    
+    <li><b>Assignment methods (attribute setters):</b>
+    Assignment methods (i.e. "Box#left=" are available as attributes. If there is a
+    read accessor method too, the attribute can be read and written. For example:
+
+    <pre>
+box = pya.Box()
+box.left = 10
+box.right = box.right + 100
+</pre>
+
+    <p>
+    If the translation is ambiguous (i.e. because there is more than one getter or setter, 
+    the setter will be translated to a method "set_x(value)" where "x" is the attribute name.
+    </p>
+    </li>
+
+    <li><b>Predicate getters:</b>
+    Question-mark names for predicates are translated to non-question-marker names:
+
+    <pre>
+# Ruby: 
+  edges.is_empty?
+
+# Python:
+  edges.is_empty()
+</pre>
+    </li>
+
+    <li><b>Constants:</b>
+    Constants (upper-case static variable) are made available as static attributes.
+    </li>
+
+    <li><b>Arrays:</b>
+    Arrays will be represented as lists, but on assignment, they accept tuples as
+    well.
+    </li>
+
+    <li><b>Boolean values:</b>
+    Boolean values are True and False.
+    </li>
+
+    <li><b>No protected methods:</b>
+    Protected methods are not supported - methods are public always.
+    </li>
+
+    <li><b>Iterators:</b>
+    Iterator binding:
+
+    <pre>
+edges = pya.Edges()
+...
+for edge in edges.each():
+  ...
+</pre>
+
+    <p>
+    If there is an iterator named "each", it will become the default iterator:
+    </p>
+
+    <pre>
+for edge in edges:
+  ...
+</pre>
+    </li>
+
+    <li><b>Standard protcols:</b>
+
+    <p>"x.to_s()" is available as "str(x)" too.</p>
+
+    <p>"x.size()" is available as "len(x)" too.</p>
+
+    <p>If there is a "[]" operator and a "size" method, the object implements
+    the sequence protocol too.</p>
+    </li>
+
+    <li><b>Operators:</b>
+
+    <p>
+    Operators are made available through Python operators. For example
+    </p>
+   
+    <ul>
+      <li>"+"  will be available as   "+" ("__add__")</li>
+      <li>"&amp;"  will be available as   "and" ("__and__")</li>
+      <li>"|"  will be available as  "or" ("__or__")</li>
+      <li>"==" will be available as  "==" ("__eq__")</li>
+    </ul>
+    </li>
+
+    <li><b>Deep copies:</b>
+    Deep copies of pya objects can be made with dup()
+
+    <pre>
+box = pya.Box(10, 20, 110, 220)
+copy_box = box.dup()
+</pre>
+    </li>
+
+    <li><b>Events (signals):</b>
+
+    Events can be bound to lambdas or functions:
+
+    <pre>
+action.on_triggered( lambda: action.text += "X" )
+</pre>
+
+    or to function:
+
+    <pre>
+def f():
+  print "triggered"
+
+action.on_triggered(f)
+</pre>
+
+    <p>
+    Events have to match precisely - exactly the number of arguments have to be declared.
+    </p>
+    </li>
+
+    <li><b>sys.settrace:</b>
+    Using "sys.settrace" will disable the debugger support permanently.
+    </li>
+
+    <li><b>Instance attributes can't reimplement virtual methods:</b>
+    This is a limitation driven by the need to avoid cyclic references.
+    Instance-bound methods require a reference to the instance and that 
+    will create a cycle with the reimplementation callable object which
+    is held by the class itself.
+    </li>
+
+    <li><p><b>Tips when developing own modules:</b></p>
+      <ul>
+        <li>The macro paths are added to sys.path, so modules can be put as plain .py files
+        into the "pymacros" folder and imported with "import module".</li>
+        <li>Or: modules can be put into folders using an "__init__.py" file to indicate
+        the folder is a module.</li>
+        <li>Use "reload(module)" on the console to refresh module cache if changes have been applied.</li>
+      </ul>
+    </li>
+
+  </ul>
+
+</doc>
+

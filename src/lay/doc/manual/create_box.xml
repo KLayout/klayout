@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Creating A Box</title>
+  <keyword name="Drawing"/>
+  <keyword name="Box"/>
+
+  <p>
+  Select "Box" mode from the toolbar. 
+  Choose a layer from the layer panel in which to create a new box. 
+  Left click at the first point, move the mouse to the second point and finish the box by left-clicking at
+  the second point. Press the ESC key to cancel the operation.
+  </p>
+
+  <p><b>Hint:</b> A box, once created, will remain a box. For example, it is not possible to delete one vertex 
+  of it, thus forming a triangle. This is only possible for polygons.
+  </p>
+
+</doc>
+

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Using Multiple Layer Setups With Tabs</title>
+  <keyword name="Layer display"/>
+  <keyword name="Layer properties"/>
+  <keyword name="Layer tabs"/>
+
+  <p>
+  With version 0.21, a new feature was introduced. Using tabs in the layer panel
+  it is very simple to switch between different setups.
+  </p>
+
+  <p>
+  A layer tab can be created by choosing "New Tab" from the "Tabs" submenu in the layer panel's context
+  menu (right mouse button click). A new tab will appear at the top of the layer 
+  properties panel. Initially this tab will be a copy of the current setup. 
+  Any edits on the layer properties will apply to this tab only. When switching 
+  to a different tab, the layout view will reflect the new tab's settings. That way, 
+  different setups can be prepared and easily exchanged.
+  </p>
+
+  <p>
+  When the layer properties are saved, the layer properties file will contain 
+  all tabs. Thus, a multi-page setup can easily be stored and retrieved.
+  </p>
+
+  <p>
+  The initial title of the tab will be the tab number. The title can be set
+  with the "Rename Tab" function in the "Tabs" submenu of the layer panel's context menu. 
+  To remove a tab, choose "Remove Tab".
+  </p>
+
+</doc>
+

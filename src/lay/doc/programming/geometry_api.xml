@@ -1,0 +1,684 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>The Geometry API</title>
+
+  <h2-index/>
+
+  <h2>The Geometry API</h2>
+
+  <p>
+  The central class of the layout database is the <class_doc href="Layout"/> class, which provides
+  a concept for layers, shape containers, cells and hierarchy. Separate from that, a set of 
+  classes exist, which represent basic shapes and geometrical objects. While shapes embedded in 
+  a Layout object are not independent and care has to be taken when manipulating them inside the 
+  database API, the free objects are easy to manage, manipulate and in general to work with as they
+  are normal objects in the script interpreter's context.
+  </p>
+
+  <p>
+  In addition, the gometry API provides basic objects such as points, edges and transformations for
+  general use throughout the API. Higher objects such as regions and edge collections provide implementations
+  for geometrical algorithms like boolean operations and DRC checks.
+  </p>
+
+  <h2>The Point class</h2>
+
+  <keyword name="Point"/>
+  <p>
+  The <class_doc href="Point"/> object represents an integer coordinate in the 2-dimensional layout space,
+  expressed in database units. 
+  That object provides the x and y coordinates through the <class_doc href="Point#x"/> and <class_doc href="Point#y"/> attributes. Points can be added, 
+  subtracted, the euclidian distance and it's square can be computed using the <class_doc href="Point#distance"/> and <class_doc href="Point#sq_distance"/>
+  methods. The <b>*</b> operator used with a factor as the second operand will scale both the x and y coordinates.
+  </p>
+
+  <h2>The Box class</h2>
+
+  <keyword name="Box"/>
+  <p>
+  <img src="/programming/box.png"/>
+  </p>
+
+  <p>
+  The <class_doc href="Box"/> object represents a rectangle whose sides
+  are parallel to the axes. The coordinates are integer values and express the rectangle's dimensions in database units.
+  The basic specification consists of two points, giving the lower left
+  and upper right corner. The constructor takes either two points (which are ordered internally) or four coordinates
+  representing the left, bottom, right and top coordinates.
+  </p>
+
+  <p>
+  A box has a couple of attributes which are shown in the figure above. The <class_doc href="Box#area"/> method delivers the area of 
+  the rectangle. A box can be "empty" (non-existing). Such a rectangle can be created by the default constructor
+  without parameters. An empty box basically behaves as a region without a point, i.e. testing the intersection with
+  an empty box always returns false. An empty box returns true on <class_doc href="Box#empty?"/>. A box whose lower left point is
+  identical to the upper right one contains just a single point. Such a box returns true on <class_doc href="Box#is_point?"/>.
+  </p>
+
+  <p>
+  A box supports a couple of operations:
+  </p>
+
+  <ul>
+    <li><b>Box &amp; Box</b>: this operator computes the intersection of two boxes. If the boxes do not intersect, an
+    empty box is returned. 
+    </li>
+    <li><b>Box * Box</b>: computes the "convolution" of two boxes. This operation 
+    can basically be viewed as the box which results when the first box is painted with a pen that has the size 
+    and displacement of the second box. 
+    </li>
+    <li><b>Box * factor</b>: scales the box, i.e. multiplies all coordinates with the 
+    given factor.
+    </li>
+    <li><b>Box + Box</b>: computes the box that encloses both boxes given in the
+    operation.
+    </li>
+    <li><b>Box + Point</b>: computes the box that encloses the box and the point given
+    as the second operand. It basically enlarges the first box so it includes the second point as well.
+    </li>
+    <li><b>contains?(Point)</b>: returns true, if the point is inside the box or on it's edges.
+    </li>
+    <li><b>enlarge(Point)</b>: will enlarge the box by the x and y coordinates of the Point. Basically the x value
+    of the point is subtracted from the left side and added to the right. The same way, the y coordinate is added
+    to the top and subtracted from the bottom coordinate.
+    </li>
+    <li><b>enlarged(Point)</b>: returns the enlarged box without modifying the box this method is called on (out-of-place operation).</li>
+    <li><b>move(Point)</b>: moves the box by the displacement given by the point. Basically the x value of the point
+    is added to the left and right coordinate while the y coordinate is added to the top and bottom coordinates.
+    </li>
+    <li><b>moved(Point)</b>: returns the moved box without modifying the box this method is called on (out-of-place operation).</li>
+    <li><b>inside?(Box)</b>: returns true, if the box the method is called on is inside the box given by the method's argument.</li>
+    <li><b>overlaps?(Box)</b>: returns true, if the given box overlaps with the box the method is called on.</li>
+    <li><b>touches?(Box)</b>: returns true, if the given box touches the box the method is called on.</li>
+    <li><b>transformed(Trans)</b>: returns the box transformed with the given transformation.</li>
+
+    <li>
+    <p>
+    <b>transformed_cplx(ICplxTrans)</b>: returns the box transformed with the given complex, integer-based transformation (see <class_doc href="ICplxTrans"/>). 
+    Note, that if the complex transformation includes a rotation by a non-90-degree angle (for example 45 degree), this operation
+    does not return a rotated box, because by definition a box has edges which are parallel to the axes. Hence the general 
+    solution is to convert the box to a polygon:
+    </p>
+
+    <pre># Wrong result
+box = RBA::Box::new(0, 0, 100, 200)
+transformed_box = box.transformed_cplx(RBA::ICplxTrans::new(1, 45, false, RBA::Point::new))
+# -&gt; (-141,0;71,212)
+
+# Correct result
+transformed_box_as_polygon = RBA::Polygon::new(box).transformed_cplx(RBA::ICplxTrans::new(1, 45, false, RBA::Point::new))
+# -&gt; (0,0;-141,141;-71,212;71,71)</pre>
+    </li>
+
+    <li><b>transformed_cplx(CplxTrans)</b>: behaves like the previous "transformed_cplx" method but returns a 
+    floating-point coordinate object which is the target coordinate type of the CplxTrans object (see <class_doc href="CplxTrans"/>).
+    </li>
+
+  </ul>
+
+  <p>The class method <class_doc href="Box#from_dbox"/> creates a integer-coordinate type Box object from a floating-point coordinate type DBox
+  object (see below). The floating-point coordinates are rounded to the nearest integer coordinates.
+  </p>
+  
+  <h2>The SimplePolygon class</h2>
+  
+  <keyword name="SimplePolygon"/>
+  <p>
+  <img src="/programming/simple_polygon.png"/>
+  </p>
+
+  <p>
+  A <class_doc href="SimplePolygon"/> object is a polygon that does not have holes. It consists of
+  a single, closed contour. Such polygons are compatible with the GDS2 format for example.
+  A SimplePolygon object can be created from a Box object or from an array of Point objects.
+  Internally, the points will be ordered into a clockwise orientation. 
+  </p>
+
+  <p>The class method <class_doc href="SimplePolygon#from_dpoly"/> creates a integer-coordinate type SimplePolygon object from a floating-point coordinate type DSimplePolygon
+  object (see below). The floating-point coordinates are rounded to the nearest integer coordinates.
+  </p>
+  
+  <p>
+  The <class_doc href="SimplePolygon#bbox"/> method returns the bounding box of the polyon. <class_doc href="SimplePolygon#area"/> will return the area of the polygon.
+  <class_doc href="SimplePolygon#num_points"/> returns the number of points, while <class_doc href="SimplePolygon#point"/> returns the point for a given index. <class_doc href="SimplePolygon#points="/>
+  replaces the polygon by a new polygon with the given array of points.
+  </p>
+
+  <p>The <class_doc href="SimplePolygon#each_point"/> iterator will deliver each point in clockwise orienation, starting form the bottom/leftmost one.
+  <class_doc href="SimplePolygon#each_edge"/> will deliver all edges of the polygon (connecting every point with the next one). 
+  </p>
+
+  <p>
+  <class_doc href="SimplePolygon#compress"/> will remove points that connect two collinear edges. It has a parameter that controls whether to remove
+  reflecting edges (spikes) as well. <class_doc href="SimplePolygon#inside?"/> returns true, if a given point is inside the polygon. <class_doc href="SimplePolygon#minkowsky_sum"/>
+  computes the Minkowsky sum between a polygon and another object in various flavors. <class_doc href="SimplePolygon#move"/> will displace the polygon
+  by the distance given by the Point argument. <class_doc href="SimplePolygon#moved"/> will return the moved polygon without modifying the 
+  polygon it is called on (out-of-place operation). <class_doc href="SimplePolygon#transformed"/> and <class_doc href="SimplePolygon#transformed_cplx"/> will return the 
+  transformed polygon, either with a simple or a complex transformation (see the description of the Box object and the
+  section about transformations below for a discussion of transformations). Finally, <class_doc href="SimplePolygon#round_corners"/> will apply a
+  corner rounding to a copy of the polygon and return that copy without modifying the polygon.
+  </p>
+
+  <p>
+  Please note that using the Point-array constructors it is possible to create polygons with self-intersecting or 
+  twisted contours. Such polygons may not behave as expected.
+  </p>
+
+  <h2>The Polygon class</h2>
+  
+  <keyword name="Polygon"/>
+  <p>
+  <img src="/programming/polygon.png"/>
+  </p>
+
+  <p>
+  The <class_doc href="Polygon"/> object is basically an extension of the SimplePolygon object and 
+  in contrast to that object, supports holes. Polygon objects are not compatible with the GDS2 or OASIS format
+  and will be converted to SimplePolygon objects by introducing cutlines when writing them.
+  </p>
+
+  <p>
+  A polygon consists of an outer contour (the hull) and zero to many hole contours. The outer contour like for the SimplePolygon
+  is oriented clockwise while the hole contours are oriented counterclockwise. This orientation is established
+  internally. For the API, contours are represented by arrays of Point objects.
+  </p>
+
+  <p>
+  A Polygon differs from a SimplyPolygon by providing methods to modify holes and the hull. Holes can be inserted by 
+  using the <class_doc href="Polygon#insert_hole"/> method. A hole is identified by an index. The <class_doc href="Polygon#holes"/> method returns the number of holes. The 
+  hole index runs from 0 to the number of holes minus one.
+  </p>
+
+  <p>The class method <class_doc href="Polygon#from_dpoly"/> creates a integer-coordinate type Polygon object from a floating-point coordinate type DPolygon
+  object (see below). The floating-point coordinates are rounded to the nearest integer coordinates. A constructor is provided
+  that creates a Polygon object from a SimplePolygon object.
+  </p>
+  
+  <p>
+  <class_doc href="Polygon#each_edge"/> will deliver all edges. The orientation of the edges determines whether they belong to a hole or the hull contour.
+  <class_doc href="Polygon#each_point_hull"/> will iterated over all points of the hull and <class_doc href="Polygon#each_point_hole"/> over the points of the hole with the 
+  given index. <class_doc href="Polygon#num_points_hull"/> will return the number of points for the hull and <class_doc href="Polygon#num_points_hole"/> the number of 
+  points for the given hole. <class_doc href="Polygon#point_hull"/> will return a specific point from the hull and <class_doc href="Polygon#point_hole"/> a specific point
+  for the given hole. <class_doc href="Polygon#num_points"/> returns the total number of points.
+  </p>
+
+  <p>
+  <class_doc href="Polygon#resolve_holes"/> will remove all holes and connect them with the hull by introducing cutlines that connect the hole with
+  the hull. This operation introduces new vertexes and hence may apply some distortion due to grid snapping. <class_doc href="Polygon#resolved_holes"/>
+  returns the polygon with the holes removed without modifying the object it is called on (out-of-place operation). <class_doc href="Polygon#to_simple_polygon"/>
+  basically does the same but returns a SimplePolygon object.
+  </p>
+
+  <p>
+  Using <class_doc href="Polygon#assign_hull"/> (or <class_doc href="Polygon#hull="/>) and <class_doc href="Polygon#assign_hole"/> the hull contour or a hole contour can be replaced with the given array of Point objects.
+  Please note that it is possible to create invalid polygons where the holes are not completely contained in the hull. Such polygons
+  may not behave as expected. The same is true for polygons with self-intersecting or twisted contours.
+  </p>
+
+  <h2>The Path class</h2>
+  
+  <keyword name="Path"/>
+  <p>
+  <img src="/programming/path.png"/>
+  </p>
+
+  <p>
+  A <class_doc href="Path"/> object represents a line with a certain width. The figure above depicts the basic properties
+  of a path. The basic geometry of a path is defined by it's spine - a sequence of points that the path follows.
+  By default, a path has rectangular end caps with variable length. The end caps can be round, in which case the extension 
+  should be half the path width to avoid paths which are not compatible with the GDS2 format. Round-ended paths return
+  true on <class_doc href="Path#is_round?"/>. An example for such a path is depicted in the following figure:
+  </p>
+
+  <p>
+  <img src="/programming/round_ended_path.png"/>
+  </p>
+
+  <p>
+  A path with is given in database units. The hull contour of paths with an odd width cannot be represented on-grid and should
+  be avoided. Such path objects are allowed in the GDS2 format, but not in OASIS.
+  </p>
+
+  <p>
+  The spine points of a path can be iterated with <class_doc href="Path#each_point"/>. <class_doc href="Path#num_points"/> returns the number of points.
+  <class_doc href="Path#point"/> returns a specific point and <class_doc href="Path#points="/> allows replacing of the spine with the given array of Point objects.
+  <class_doc href="Path#round="/> sets the "round ended" flag. <class_doc href="Path#bbox"/> and <class_doc href="Path#area"/> deliver the bounding box and the area, where the area
+  is only approximate and is computed from the spine's length including the extensions times the width for efficiency. For
+  certain acute-angle configurations that value may not be the exact area.
+  </p>
+
+  <p>
+  <class_doc href="Path#polygon"/> returns the polygon representing the path's hull. <class_doc href="Path#simple_polygon"/> returns a SimplePolygon
+  object that represents the hull. <class_doc href="Path#move"/>, <class_doc href="Path#moved"/>, <class_doc href="Path#transformed"/> and <class_doc href="Path#transformed_cplx"/> basically work
+  like for the other objects.
+  </p>
+
+  <p>The class method <class_doc href="Path#from_dpath"/> creates a integer-coordinate type Path object from a floating-point coordinate type DPath
+  object (see below). The floating-point coordinates are rounded to the nearest integer coordinates.
+  </p>
+  
+  <h2>The Text class</h2>
+  
+  <keyword name="Text"/>
+  <p>
+  A <class_doc href="Text"/> object is basically a point with a label attached. The extension of a text object
+  only includes the point, not the text itself. For display purposes, a text orientation, font and alignment options can 
+  be specified.
+  </p>
+
+  <p>
+  The location and the orientation of the text are combined in a <class_doc href="Trans"/> object. That transformation
+  can be read and written with the <class_doc href="Text#trans"/> attribute. The text orientation is not always shown in the drawing. Whether the
+  text is shown in the orientation specified depends on the application settings.
+  </p>
+
+  <p>
+  Font number and alignment flags can be read and written using the <class_doc href="Text#font"/>, <class_doc href="Text#halign"/> and <class_doc href="Text#valign"/> attributes.
+  If one of these attributes is not set, the application-provided default is used. The font is currently just a number and 
+  is provided to support the respective property of the GDS2 format. For the documentation of the alignment flags see the 
+  class documentation for the <class_doc href="Text"/> class.
+  </p>
+
+  <p>
+  The text string is accessible with the <class_doc href="Text#string"/> attribute. Not all characters are supported. Depending on 
+  the format, only a subset of the ASCII character set are supported. Sometimes, line-feed control characters are found
+  in text strings. Following the strict OASIS specification for example, such characters are not allowed. The 
+  lower and upper case letters and most of the special printing characters of the ASCII character set are usually safe
+  for use in text strings.
+  </p>
+
+  <p>
+  <class_doc href="Text#move"/>, <class_doc href="Text#moved"/>, <class_doc href="Text#transformed"/> and <class_doc href="Text#transformed_cplx"/> basically work
+  like for the other objects.
+  The class method <class_doc href="Text#from_dtext"/> creates a integer-coordinate type Text object from a floating-point coordinate type DText
+  object (see below). The floating-point coordinates are rounded to the nearest integer coordinates.
+  </p>
+
+  <h2>The Edge class</h2>
+
+  <keyword name="Edge"/>
+  <p>
+  <class_doc href="Edge"/> objects are basically connections between two points. Edge objects are provided to support
+  special applications and are mapped to zero-width, two-point paths in the GDS2 format. 
+  Edge objects are not supported as editable objects in KLayout currently. Edge objects may be created by script and 
+  are useful sometimes to represent the output of a design rule check tool for example.
+  </p>
+
+  <p>
+  Edge objects however a frequently used as raw objects in various applications, i.e. as one output option of a boolean operation.
+  Therefore, the Edge class provides a couple of operations on edges, mainly tests for the geometrical relationship of two
+  edges and points in relation to edges. An edge also may represent a straight line through the two endpoints of the edge, i.e.
+  for the <class_doc href="Edge#crossed_by?"/> check.
+  </p>
+
+  <p>An edge is defined by two points: the start and end point. <class_doc href="Edge#p1"/> is the attribute for the start point, <class_doc href="Edge#p2"/> the 
+  attribute for the end point. Various properties deliver extensions of the edge (<class_doc href="Edge#dx"/> and <class_doc href="Edge#dy"/> for the horizontal
+  and vertical extension, <class_doc href="Edge#length"/> and <class_doc href="Edge#sq_length"/> for the length and the square of the length, <class_doc href="Edge#ortho_length"/>
+  for the Manhattan distance between the points). <class_doc href="Edge#swap_points"/> swaps p1 and p2 and effectively inverts the orientation 
+  of the edge. <class_doc href="Edge#bbox"/> is the bounding box of the edge.
+  </p>
+
+  <p>Various methods test the relationship between two edges or an edge and a point. See the following figure for a 
+  summary of these methods:
+  </p>
+
+  <p>
+  <img src="/programming/edge_relations.png"/>
+  </p>
+
+  <p>
+  <class_doc href="Edge#move"/>, <class_doc href="Edge#moved"/>, <class_doc href="Edge#transformed"/> and <class_doc href="Edge#transformed_cplx"/> basically work
+  like for the other objects.
+  The class method <class_doc href="Edge#from_dedge"/> creates a integer-coordinate type Edge object from a floating-point coordinate type DEdge
+  object (see below). The floating-point coordinates are rounded to the nearest integer coordinates.
+  </p>
+
+  <h2>The floating-point geometrical primitives</h2>
+
+  <keyword name="DPoint"/>
+  <keyword name="DBox"/>
+  <keyword name="DText"/>
+  <keyword name="DPath"/>
+  <keyword name="DPolygon"/>
+  <keyword name="DSimplePolygon"/>
+  <keyword name="DEdge"/>
+  <p>
+  Beside the integer-coordinate primitives like Box, Edge, Polygon etc., KLayout provides floating-point coordinate variants
+  as well. These objects require more memory and are subject to floating-point rounding issues and are therefore not employed
+  inside the database. They are provided however, to allow a temporary representation of micron-unit objects or for use
+  int the <class_doc href="Marker"/> class for example.
+  </p>
+
+  <p>
+  The class names for the floating-point variants is the same the integer-coordinate type prefixed with a "D" (for example, DBox
+  is the floating-point variant of Box).
+  Since floating-point variants support fractional coordinates, scaling with an arbitrary value is not connected with a 
+  loss of accuracy due to rounding. That is why floating-point coordinates are the target type of general transformations including
+  an arbitrary scaling. For example:
+  </p>
+
+  <pre>RBA::Box.new(1,1,2,2)*2.5
+# -&gt; (3,3;5,5)
+# but:
+RBA::DBox.new(1,1,2,2)*2.5
+# -&gt; (2.5,2.5;5,5)</pre>
+
+  <p>
+  However, the higher precision of floating-point coordinates comes with subtle issues originating from the 
+  finite-precision representation. For example, the value of 0.1 cannot be precisely represented by a 
+  floating-point value. The value of 0.1 is approximated and therefore depending on the way it is approximated,
+  0.1 is not necessarily equal to 0.1. For example (try this in the Ruby console):
+  </p>
+
+  <pre>a = 0.1
+b = 1e-6*1e5
+a
+# -&gt; 0.1
+b
+# -&gt; 0.1
+# but:
+a == b
+# -&gt; false!
+# the reason is:
+"%.21g"%a
+# -&gt; 0.100000000000000005551
+"%.21g"%b
+# -&gt; 0.0999999999999999916733</pre>
+ 
+  <p>
+  Because of that, operations that depend on the equality of coordinates (like "box.touches(other_box)") may not work as
+  expected unless the coordinates can be expressed precisely.
+  For the same reason, some operations which are implemented on integer coordinates (like the removal of holes in polygons)
+  are not available for the floating-point type objects.
+  </p>
+
+  <p>
+  All floating-point type objects have class methods like "from_i.." (i.e. <class_doc href="DBox#from_ibox"/>) which convert integer-coordinate
+  type objects to floating-point type ones without loss of precision. The reverse path is opened by using the "from_d.." class
+  methods of the integer-type objects (i.e. <class_doc href="Box#from_dbox"/>). These methods however require some rounding and are therefore
+  responsible for a potential distortion of the geometry of the object.
+  </p>
+
+  <p>
+  For the point object there is also a floating-point equivalent (DPoint, see <class_doc href="DPoint"/>). Is behaves like
+  the integer-coordinate point.
+  </p>
+
+  <h2>Transformations</h2>
+
+  <keyword name="Trans"/>
+  <keyword name="DTrans"/>
+  <keyword name="DCplxTrans"/>
+  <keyword name="CplxTrans"/>
+  <keyword name="ICplxTrans"/>
+  <p>
+  Transformations in KLayout are restricted affine transformations which lack shear transformations and the ability to apply
+  an anisotropic scaling. A transformation in KLayout follows the conventions implied by the GDS2 and OASIS formats and include in that order:
+  </p>
+
+  <ul>
+    <li>Mirroring around the x axis</li>
+    <li>Rotation</li>
+    <li>Scaling</li>
+    <li>Displacement</li>
+  </ul>
+
+  <p>
+  For memory performance, unless necessary a restricted version of that transformation is used. In that restricted version, the
+  rotation angles are confined to a multiple of 90 degree and scaling is not supported. This restricted affine transformation
+  is provided through the <class_doc href="Trans"/> class. The 8 possible rotation/mirror variants can be coded in 
+  a single rotation/mirror code which is used frequently throughout KLayout (see <link href="/about/transformations.xml"/>).
+  </p>
+
+  <p>
+  For transforming floating-point coordinates, the <class_doc href="DTrans"/> object is provided. The basic difference 
+  is that the displacement uses floating-point coordinates (by employing a DPoint object).
+  </p>
+
+  <p>
+  To support more complex affine transformations include arbitrary-angle rotations and scaling, the complex transformation objects
+  are provided. The precise representation of a coordinate transformed with such a transformation requires floating-point 
+  precision. Since that is not practical, different versions of transformations exists which render different output types and 
+  work on different input types:
+  </p>
+
+  <ul>
+    <li><class_doc href="CplxTrans"/>: takes integer coordinates and delivers floating-point coordinates. 
+    Therefore it uses a DPoint for the displacement.
+    </li>
+    <li><class_doc href="DCplxTrans"/>: takes floating-point coordinates and delivers floating-point coordinates. 
+    Therefore it also uses a DPoint for the displacement.
+    </li>
+    <li><class_doc href="ICplxTrans"/>: takes integer coordinates and delivers integer coordinates. 
+    Therefore it uses a Point for the displacement. This transformation is convenient to provide complex transformations
+    for database operations but implies rounding errors due to rounding to integer coordinates on output. It is safe to use however
+    for integer-factor scaling operations for example.
+    </li>
+  </ul>
+
+  <h2>The Region class</h2>
+
+  <keyword name="Region"/>
+
+  <p>
+  Regions are basically collections of polygons. Regions provide higher functions such as boolean operations and
+  sizing which cannot be implemented on pure polygons because their output may be a number of polygons.
+  A Region is a general representation of a set of points in a two-dimensional area while a polygon is 
+  a coherence set of points.
+  </p>
+
+  <p>
+  Regions can be created by starting with an empty region and filling the latter with polygons. Regions
+  can also be created from a <class_doc href="RecursiveShapeIterator"/> which allows feeding layout data
+  into the region in a very flexible way. In the latter case, boxes and paths will be converted to polygons when feeding them 
+  into the region.
+  </p>
+
+  <p>
+  Regions feature some important concepts:
+  </p>
+
+  <ul>
+    <li><b>Merged semantics:</b> A region can be created from a series of polygons which
+      potentially overlap or touch. In "merged semantics" the region will merge
+      the polygons forming big polygons from touching ones and removing overlaps.
+    </li>
+    <li><b>Minimum coherence:</b> In certain cases, the output of merging polygons is 
+      ambiguous. In the "kissing corner" case, the touching polygons may be either 
+      considered separate ("minimum coherence") or belonging together.
+    </li>
+    <li><b>strict mode:</b> In strict mode, some operations are performed even if 
+      they are not necessary. For example, an XOR between a region and an empty
+      region will render the first input. Hence the implementation can simply copy
+      the first input in that case. With strict mode, the operation will be performed
+      in every case which is less efficient but renders merged polygons.
+    </li>
+  </ul>
+
+  <p>
+  The region object is very mighty and easy to use. Here is an example which
+  computes the difference of two boxes (rendering a ring) and sizes the latter:
+  </p>
+
+  <pre>r1 = RBA::Region::new
+r1.insert(RBA::Box::new(-2000, -3000, 2000, 3000))
+
+r2 = RBA::Region::new
+r2.insert(RBA::Box::new(-1500, -2000, 1500, 2000))
+
+r = (r1 - r2).sized(100)
+
+puts r
+</pre>
+
+  <p>
+  Using a Region object with input from a cell is almost as simple as this.
+  The following example will take the input from layer 11 and 21 from the top 
+  cell and the hierarchy below (as is flat) and compute the intersection 
+  in layer 100:</p>
+
+  <pre>ly = RBA::CellView::active.layout
+
+l11 = ly.layer(11, 0)
+l21 = ly.layer(21, 0)
+
+r11 = RBA::Region::new(ly.top_cell.begin_shapes_rec(l11))
+r21 = RBA::Region::new(ly.top_cell.begin_shapes_rec(l21))
+
+ly.top_cell.shapes(ly.layer(100, 0)).insert(r11 &amp; r21)
+  </pre>
+
+  <p>
+  A variety of operations is implemented on regions:
+  </p>
+
+  <p><class_doc href="Region#&amp;"/>, <class_doc href="Region#|"/>, <class_doc href="Region#-"/> and
+     <class_doc href="Region#^"/> implement boolean operations (AND, OR, NOT and XOR).
+     The operations can be combined with assignment (in-place) using <class_doc href="Region#&amp;="/> etc.
+     <class_doc href="Region#+"/> adds the polygons from another region to self which is basically
+     the same then a boolean OR.
+  </p>
+  <p><class_doc href="Region#area"/> and <class_doc href="Region#bbox"/> deliver the area and bounding
+    box of the region.
+  </p>
+  <p><class_doc href="Region#each"/> will deliver all original polygons (unless the region was already merged).</p>
+  <p><class_doc href="Region#each_merged"/> will deliver the merged polygons.</p>
+  <p><class_doc href="Region#edges"/> will translate the polygons to edges covering their boundaries.
+    If merged semantics is specified, the edges will only cover the outer edges, not inner ones.</p>
+  <p><class_doc href="Region#enclosing_check"/>, <class_doc href="Region#inside_check"/>, 
+    <class_doc href="Region#isolated_check"/>, <class_doc href="Region#notch_check"/>, 
+    <class_doc href="Region#separation_check"/>, <class_doc href="Region#space_check"/>
+    and <class_doc href="Region#width_check"/> implement DRC functions. DRC functions deliver 
+    <class_doc href="EdgePairs"/> edge pair collections, not regions. Each edge pair marks a
+    violation of the given check.
+  </p>
+  <p><class_doc href="Region#extents"/> replaces each polygon with it's bounding box.</p>
+  <p><class_doc href="Region#grid_check"/> performs an on-grid check returning edge pairs for off-grid markers.</p>
+  <p><class_doc href="Region#holes"/> identifies holes and delivers a new region with the holes as filled polygons.</p>
+  <p><class_doc href="Region#hulls"/> identifies holes and delivers a new region without the holes.</p>
+  <p><class_doc href="Region#insert"/> adds polygons in various flavors.</p>
+  <p><class_doc href="Region#interacting"/> and <class_doc href="Region#not_interacting"/> select polygons 
+    interacting (overlapping or touching) or not interacting with polygons from another region.</p>
+  <p><class_doc href="Region#members_of"/> selects polygons which are contained in the same 
+    way in another region.</p>
+  <p><class_doc href="Region#merge"/> and <class_doc href="Region#merged"/> merge the polygons. This feature allows to select overlapping polygons 
+    (minimum wrap count parameter).</p>
+  <p><class_doc href="Region#minkowsky_sum"/> computes the Minkowsky sum of the region with other objects (edges, single polygons and other regions).</p>
+  <p><class_doc href="Region#move"/>, <class_doc href="Region#moved"/>, <class_doc href="Region#transform"/> and
+    <class_doc href="Region#transformed"/> apply geometrical transformations.</p>
+  <p><class_doc href="Region#rectangles"/>, <class_doc href="Region#rectilinear"/>, <class_doc href="Region#non_rectangles"/> and
+    <class_doc href="Region#non_rectilinear"/> filter out polygons by their appearance.</p>
+  <p><class_doc href="Region#inside"/>, <class_doc href="Region#outside"/>, <class_doc href="Region#not_inside"/> and
+    <class_doc href="Region#not_outside"/> filter out polygons by their relation to the polygons in the other region.</p>
+  <p><class_doc href="Region#round_corners"/> and <class_doc href="Region#rounded_corners"/> apply corner rounding
+    to polygons.</p>
+  <p><class_doc href="Region#size"/> and <class_doc href="Region#sized"/> will size the polygons
+    (shift edges).</p>
+  <p><class_doc href="Region#smooth"/> smoothes out coarse steps of the polygons.</p>
+  <p><class_doc href="Region#snap"/> and <class_doc href="Region#snapped"/> apply grid snapping.</p>
+  <p><class_doc href="Region#with_angle"/> marks polygon vertices which satisfy a certain angle criterion.</p>
+  <p><class_doc href="Region#with_perimeter"/>, <class_doc href="Region#with_area"/> and many more "with_..."
+    methods select polygons based on their properties.</p>
+
+  <h2>The Edges class</h2>
+
+  <keyword name="Edges"/>
+
+  <p>
+  <class_doc href="Edges"/> represents a collection of edges which comprise either full polygons
+  (forming closed contours) or parts of polygons. Edges can be derived from Region objects
+  using the <class_doc href="Region#edges"/>
+  </p>
+
+  <p>
+  A variety of operations is implemented on regions:
+  </p>
+
+  <p><class_doc href="Edges#&amp;"/>, <class_doc href="Edges#|"/>, <class_doc href="Edges#-"/> and
+     <class_doc href="Edges#^"/> implement boolean operations (AND, OR, NOT and XOR).
+     The operations can be combined with assignment (in-place) using <class_doc href="Region#&amp;="/> etc.
+     <class_doc href="Edges#+"/> adds the polygons from another edge set to self which is basically
+     the same then a boolean OR. Boolean AND and NOT are available between edges and regions as well 
+     and will deliver the edge parts inside the given region or not inside the given region.
+  </p>
+  <p><class_doc href="Edges#length"/> and <class_doc href="Edges#bbox"/> deliver the total length and bounding
+    box of the edge set.
+  </p>
+  <p><class_doc href="Edges#each"/> will deliver the edges in the collection.</p>
+  <p><class_doc href="Edges#centers"/> will deliver the center parts of the edges.</p>
+  <p><class_doc href="Edges#enclosing_check"/>, <class_doc href="Edges#inside_check"/>, 
+    <class_doc href="Edges#separation_check"/>, <class_doc href="Edges#space_check"/>
+    and <class_doc href="Edges#width_check"/> implement DRC functions. DRC functions deliver 
+    <class_doc href="EdgePairs"/> edge pair collections, not edge sets. Each edge pair marks a
+    violation of the given check.
+  </p>
+  <p><class_doc href="Edges#start_segments"/> and <class_doc href="Edges#end_segments"/> replaces
+    each edge with a part at the beginning or end.</p>
+  <p><class_doc href="Edges#extended"/>, <class_doc href="Edges#extended_in"/> and
+    <class_doc href="Edges#extended_out"/> create polygons on that represent the edge with a 
+    certain width.</p>
+  <p><class_doc href="Edges#extents"/> returns a region with the bounding boxes of the edges.</p>
+  <p><class_doc href="Edges#inside_part"/> and <class_doc href="Edges#outside_part"/> 
+    return the parts of the edge set which are inside or outside a given region. The
+    effect is comparable to the boolean operations but differs at the exact boundary
+    of the polygons of the region.</p>
+  <p><class_doc href="Edges#interacting"/> and <class_doc href="Edges#not_interacting"/> select edges
+    interacting (overlapping or touching) or not interacting with edges of another edge set or
+    polygons from another region.</p>
+  <p><class_doc href="Edges#members_of"/> selects edges which are contained in the same 
+    way in another edge set.</p>
+  <p><class_doc href="Edges#merge"/> and <class_doc href="Edges#merged"/> merge (join) the edges.</p>
+  <p><class_doc href="Edges#move"/>, <class_doc href="Edges#moved"/>, <class_doc href="Region#transform"/> and
+    <class_doc href="Edges#transformed"/> apply geometrical transformations.</p>
+  <p><class_doc href="Edges#with_length"/>, <class_doc href="Region#with_angle"/> and many more "with_..."
+    methods select edges based on their properties.</p>
+
+  <h2>The EdgePair class</h2>
+
+  <keyword name="EdgePair"/>
+
+  <p>
+  Edge pairs are handy objects to describe the output of a DRC violation. A space violation marker
+  for example will consist of two edges which mark the opposite parts of the space violation.
+  Such markers are represented by objects of <class_doc href="EdgePair"/>.
+  </p>
+
+  <p>
+  Edge pairs are simple objects consisting of two edges ("first" and "second").
+  Polygons can generated from edge pairs covering the marked edges and their connecting
+  files using <class_doc href="EdgePair#polygon"/>. Edge pairs can be transformed using
+  <class_doc href="EdgePair#transformed"/>.
+  </p>
+
+  <p>
+  Edge pairs can be "normalized" using <class_doc href="EdgePair#normalize"/>. Normalization
+  will bring the edge pairs in a form such that when connecting their start and end 
+  points a closed loop without intersections is formed. Normalized edge pairs will produce
+  nicer polygons later on.
+  </p>
+
+  <p>
+  A floating-point version of the EdgePair class exists as well: <class_doc href="DEdgePair"/>.
+  </p>
+
+  <h2>The EdgePairs class</h2>
+
+  <keyword name="EdgePairs"/>
+
+  <p>
+  <class_doc href="EdgePairs"/> provides a collection of edge pairs and is the preferred output
+  of DRC functions which deliver one DRC marker for each violation.
+  </p>
+
+  <p>
+  EdgePair collections can be conveniently split into individual edges using <class_doc href="EdgePairs#edges"/>
+  or converted into polygons covering the markers with <class_doc href="EdgePairs#polygons"/>. The
+  first and second edges can be extracted as a Edges edge collection with <class_doc href="EdgePairs#first_edges"/>
+  and <class_doc href="EdgePairs#second_edges"/>. <class_doc href="EdgePairs#extents"/> will deliver
+  a region containing the bounding boxes of the edge pairs.
+  </p>
+
+</doc>

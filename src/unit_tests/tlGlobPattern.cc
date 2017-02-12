@@ -1,0 +1,138 @@
+
+/*
+
+  KLayout Layout Viewer
+  Copyright (C) 2006-2016 Matthias Koefferlein
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+*/
+
+
+
+#include "tlGlobPattern.h"
+#include "utHead.h"
+
+TEST(1) 
+{
+  tl::GlobPattern a ("*");
+  tl::GlobPattern b ("a");
+
+  EXPECT_EQ (a.match ("abc"), true);
+  EXPECT_EQ (a.match ("a"), true);
+  EXPECT_EQ (a.match (""), true);
+  EXPECT_EQ (b.match ("abc"), false);
+  EXPECT_EQ (b.match ("a"), true);
+  EXPECT_EQ (b.match (""), false);
+}
+
+TEST(2) 
+{
+  tl::GlobPattern a ("*a*");
+  tl::GlobPattern b ("*a?");
+  tl::GlobPattern c ("*a\\?");
+
+  EXPECT_EQ (a.match ("abc"), true);
+  EXPECT_EQ (a.match ("a"), true);
+  EXPECT_EQ (a.match (""), false);
+  EXPECT_EQ (a.match ("bcd"), false);
+  EXPECT_EQ (a.match ("bad"), true);
+  EXPECT_EQ (a.match ("dba"), true);
+
+  EXPECT_EQ (b.match ("abc"), false);
+  EXPECT_EQ (b.match ("a"), false);
+  EXPECT_EQ (b.match (""), false);
+  EXPECT_EQ (b.match ("bcd"), false);
+  EXPECT_EQ (b.match ("bad"), true);
+  EXPECT_EQ (b.match ("dba"), false);
+
+  EXPECT_EQ (c.match ("bcd"), false);
+  EXPECT_EQ (c.match ("bad"), false);
+  EXPECT_EQ (c.match ("ba?"), true);
+}
+
+TEST(3) 
+{
+  tl::GlobPattern a ("*a[bcd]");
+
+  EXPECT_EQ (a.match ("ab"), true);
+  EXPECT_EQ (a.match ("a"), false);
+  EXPECT_EQ (a.match ("had"), true);
+  EXPECT_EQ (a.match ("hax"), false);
+
+  tl::GlobPattern b ("a[0-9\\abcdef]");
+
+  EXPECT_EQ (b.match ("a0"), true);
+  EXPECT_EQ (b.match ("aa"), true);
+  EXPECT_EQ (b.match ("aax"), false);
+  EXPECT_EQ (b.match ("ax"), false);
+  EXPECT_EQ (b.match ("a"), false);
+}
+
+TEST(4) 
+{
+  tl::GlobPattern a ("*a[^bcd]");
+
+  EXPECT_EQ (a.match ("ab"), false);
+  EXPECT_EQ (a.match ("a"), false);
+  EXPECT_EQ (a.match ("had"), false);
+  EXPECT_EQ (a.match ("hax"), true);
+}
+
+TEST(5) 
+{
+  tl::GlobPattern a ("*a[bcd]*");
+
+  EXPECT_EQ (a.match ("ab"), true);
+  EXPECT_EQ (a.match ("a"), false);
+  EXPECT_EQ (a.match ("had"), true);
+
+  EXPECT_EQ (a.match ("abx"), true);
+  EXPECT_EQ (a.match ("ax"), false);
+  EXPECT_EQ (a.match ("hadx"), true);
+}
+
+TEST(6) 
+{
+  tl::GlobPattern a ("a{bc,d}g");
+
+  EXPECT_EQ (a.match ("abcg"), true);
+  EXPECT_EQ (a.match ("adg"), true);
+  EXPECT_EQ (a.match ("ag"), false);
+  EXPECT_EQ (a.match ("abch"), false);
+  EXPECT_EQ (a.match ("adh"), false);
+  EXPECT_EQ (a.match ("ah"), false);
+}
+
+TEST(7) 
+{
+  tl::GlobPattern a ("(*({bc,d}))(*)");
+
+  std::vector <std::string> v;
+  EXPECT_EQ (a.match ("abcg", v), true);
+  EXPECT_EQ (v.size (), 3);
+  EXPECT_EQ (v[0], "abc");
+  EXPECT_EQ (v[1], "bc");
+  EXPECT_EQ (v[2], "g");
+
+  EXPECT_EQ (a.match ("bc", v), true);
+  EXPECT_EQ (v.size (), 3);
+  EXPECT_EQ (v[0], "bc");
+  EXPECT_EQ (v[1], "bc");
+  EXPECT_EQ (v[2], "");
+}
+
+
+

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Browsing Shapes</title>
+  <keyword name="Shape browser"/>
+
+  <p>
+  A simple shape browser allows browsing all shapes on a layer. To do
+  so, select the layer or layers to browse in the layer list and choose "Browse
+  shapes" from the "Tools" menu. 
+  </p>
+  <p>
+  A browser dialog will appear that lists the cells, shapes and cell
+  instances. Selecting a cell will display all shapes in the cell in the
+  middle list and the cell's instances with respect to the top cell in
+  the right list. 
+  </p>
+  <p>
+  If a shape is selected, the layout canvas highlights this shape by
+  drawing a marker box around the shape and zooming to the shape. How the 
+  shape is shown can be configured on the "Configure" tab of the shape
+  browser dialog or on the respective page in the "Setup" dialog.
+  </p>
+
+  <p>
+  Another feature that among many other things allows inspection of shapes 
+  is the "Search and replace" function (see <link href="/manual/search_replace.xml"/>).
+  </p>
+
+</doc>

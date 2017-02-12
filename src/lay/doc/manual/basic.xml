@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>KLayout Basics</title>
+
+  <p>
+  Welcome to KLayout's user manual. This is the manual chapter covering the basic features of KLayout. The following subtopics are
+  available:
+  </p>
+
+  <topics>
+    <topic href="/manual/main_window.xml"/>
+    <topic href="/manual/loading.xml"/>
+    <topic href="/manual/panels.xml"/>
+    <topic href="/manual/cell.xml"/>
+    <topic href="/manual/hier.xml"/>
+    <topic href="/manual/cell_list.xml"/>
+    <topic href="/manual/hiding.xml"/>
+    <topic href="/manual/zoom.xml"/>
+    <topic href="/manual/global_trans.xml"/>
+    <topic href="/manual/view_state.xml"/>
+    <topic href="/manual/bookmarks.xml"/>
+    <topic href="/manual/descend.xml"/>
+    <topic href="/manual/layer_color.xml"/>
+    <topic href="/manual/layer_content.xml"/>
+    <topic href="/manual/layer_fill.xml"/>
+    <topic href="/manual/layer_animation.xml"/>
+    <topic href="/manual/layer_style.xml"/>
+    <topic href="/manual/layer_visibility.xml"/>
+    <topic href="/manual/layer_validity.xml"/>
+    <topic href="/manual/layer_hier.xml"/>
+    <topic href="/manual/layer_tabs.xml"/>
+    <topic href="/manual/layer_source.xml"/>
+    <topic href="/manual/layer_source_expert.xml"/>
+    <topic href="/manual/explicit_hier_levels.xml"/>
+    <topic href="/manual/load_save_layers.xml"/>
+    <topic href="/manual/screenshots.xml"/>
+    <topic href="/manual/measure.xml"/>
+    <topic href="/manual/ruler_properties.xml"/>
+    <topic href="/manual/images.xml"/>
+    <topic href="/manual/landmarks.xml"/>
+    <topic href="/manual/browse_shapes.xml"/>
+    <topic href="/manual/browse_instances.xml"/>
+    <topic href="/manual/marker_browser.xml"/>
+    <topic href="/manual/technology_manager.xml"/>
+    <topic href="/manual/selecting.xml"/>
+    <topic href="/manual/setup.xml"/>
+    <topic href="/manual/undo_redo.xml"/>
+    <topic href="/manual/save.xml"/>
+    <topic href="/manual/session.xml"/>
+    <topic href="/manual/view_options.xml"/>
+  </topics>
+
+</doc>
+

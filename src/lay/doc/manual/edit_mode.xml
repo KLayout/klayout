@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Edit Mode</title>
+  <keyword name="Editing"/>
+  <keyword name="Drawing"/>
+  <keyword name="Edit mode"/>
+
+  <p>
+  Editor functions can only be used if KLayout runs in edit mode. 
+  KLayout can be put into editing mode by simply supplying the "-e" option on the command line:
+  </p>
+
+  <p class="indent">
+    <tt>klayout -e</tt> [&lt;input file&gt;] [<tt>-l</tt> &lt;layer properties file&gt;]
+  </p>
+
+  <p>
+  Accordingly, with the command line option "-ne", non-editable mode can be enforced.
+  </p>
+
+  <p>
+  On Windows, there are start menu entries for editor and viewer mode. 
+  Klayout can be configured to use editing mode as default when started. To enable editing by default,
+  check the "Edit mode" check box on the "Application" tab in the setup dialog ("File/Setup").
+  </p>
+
+  <p>
+  In editing mode, some optimizations are disabled. This results in somewhat longer loading times and
+  a somewhat higher memory consumption. The actual increase strongly depends on the nature of 
+  the input file: for example, OASIS shape arrays are not kept as such in editing mode and resolved
+  into individual shapes.
+  </p>
+
+</doc>
+

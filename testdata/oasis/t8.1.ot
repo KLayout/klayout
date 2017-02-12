@@ -1,0 +1,154 @@
+# <test>
+#   <name>t8.1.ot</name>
+#   <content-description>A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by name, child cell before top cell</content-description>
+#   <test-intention>Hierarchical reader capabilities</test-intention>
+#   <test-intention>PLACEMENT record reading</test-intention>
+#   <test-intention>Repetitions of placements</test-intention>
+#   <test-intention>Placed cell reference by string</test-intention>
+#   <test-intention>Placement-related modal variables</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     begin_cell {A}
+#     box 1 2 {300 -400} {400 -200}
+#     end_cell
+#     begin_cell {TOP}
+#     sref {A} 0 0 1 {-300 400}
+#     sref {A} 0 0 1 {-300 800}
+#     sref {A} 0 0 1 {-300 1200}
+#     sref {A} 0 0 1 {0 1200}
+#     sref {A} 90 0 1 {700 1400}
+#     sref {A} 0 1 1 {700 400}
+#     sref {A} 90 1 1 {700 2400}
+#     aref {A} 270 1 1 3 4 {2000 0} {2900 0} {2000 1200}
+#     aref {A} 270 1 1 3 4 {4000 0} {4900 0} {4000 1200}
+#     aref {A} 270 1 1 3 1 {6000 0} {6960 0} {6000 0}
+#     aref {A} 270 1 1 1 4 {8000 0} {8000 0} {8000 1240}
+#     sref {A} 270 1 1 {10000 0}
+#     sref {A} 270 1 1 {10320 0}
+#     sref {A} 270 1 1 {10650 0}
+#     sref {A} 270 1 1 {10990 0}
+#     aref {A} 270 1 1 3 4 {12000 0} {12930 960} {10680 1320}
+#     end_cell
+#     end_lib
+#   </content>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Cell A
+record CELL_STR
+  str A 
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 300       ;# geometry-x (absolute)
+  int -400      ;# geometry-y (absolute)
+
+# Cell TOP
+record CELL_STR
+  str TOP 
+
+record XYRELATIVE
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 10110000 ;# CNXYRAAF
+  str A
+  int -300      ;# placement-x
+  int 400       ;# placement-y
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00110000 ;# CNXYRAAF
+  int 0         ;# placement-x
+  int 400       ;# placement-y
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00010000 ;# CNXYRAAF
+  int 400       ;# placement-y
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00100000 ;# CNXYRAAF
+  int 300       ;# placement-x
+
+record XYABSOLUTE
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00110001 ;# CNXYRAAF
+  int 700       ;# placement-x
+  int 400       ;# placement-y
+
+record XYRELATIVE
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00010010 ;# CNXYRAAF
+  int 1000      ;# placement-y
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00010011 ;# CNXYRAAF
+  int 1000      ;# placement-y
+
+record XYABSOLUTE
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00111111 ;# CNXYRAAF
+  int 2000      ;# placement-x
+  int 0         ;# placement-y
+  uint 1        ;# repetition (3x4 matrix)
+    uint 1       
+    uint 2
+    uint 300
+    uint 300
+
+record XYRELATIVE
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00111111 ;# CNXYRAAF
+  int 2000      ;# placement-x
+  int 0         ;# placement-y
+  uint 0        ;# repetition (reuse)
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00111111 ;# CNXYRAAF
+  int 2000      ;# placement-x
+  int 0         ;# placement-y
+  uint 2        ;# repetition (3 columns)
+    uint 1       
+    uint 320
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00111111 ;# CNXYRAAF
+  int 2000      ;# placement-x
+  int 0         ;# placement-y
+  uint 3        ;# repetition (4 columns)
+    uint 2       
+    uint 310
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00111111 ;# CNXYRAAF
+  int 2000      ;# placement-x
+  int 0         ;# placement-y
+  uint 4        ;# repetition (4 columns, arbitrary spacing)
+    uint 2       
+    uint 320
+    uint 330
+    uint 340
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00111111 ;# CNXYRAAF
+  int 2000      ;# placement-x
+  int 0         ;# placement-y
+  uint 8        ;# repetition (3x4 matrix, arbitary displacement vectors)
+    uint 1      ;# n-dimension 
+    uint 2      ;# m-dimension 
+    uint [ expr 4*310+1 ]    ;# n-displacement (g-delta: 310,320) 
+    int 320
+    uint [ expr 16*330+10 ]  ;# n-displacement (g-delta: 330-northwest=-330,330)
+
+tail
+

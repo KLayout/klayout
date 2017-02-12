@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>About LEF/DEF Import</title>
+  <keyword name="LEF import"/>
+  <keyword name="DEF import"/>
+
+  <p>
+  KLayout supports import of LEF and DEF files. Because LEF and DEF import is substantially different from 
+  a single-file reader, this functionality is wrapped in an import feature rather than a standard file
+  format reader. For example, reading a DEF file without accessing the library LEF files does not make
+  much sense. Therefore the import feature requires additional information beyond the simple file name, 
+  specifically the list of LEF files to load additionally and the order in which to do so.
+  </p>
+
+  <p>
+  You can find the import feature in the "File/Import" submenu. Choose "LEF" to import a single LEF file
+  (plus potentially more LEF files from the technology specific settings) or "DEF/LEF" to import a DEF file
+  plus additional LEF files. 
+  </p>
+
+  <p>
+  In the import dialog, the files to import are selected. The top edit box specifies the main file to 
+  import (the LEF file in the LEF import case or the DEF file in the DEF import case. Use the "..."
+  button to browse for the file. In the DEF import case, additional LEF file can be specified which are 
+  imported before the DEF file is read. You can add LEF files to the list using the "+" button and 
+  remove the selected LEF files using the "x" button. The order of LEF files matters - the technology
+  LEF file (if there is one) should be read first. The LEF files are read in the order they appear
+  in the list. You can move entries up using the "up" button and down using the "down" button.
+  </p>
+
+  <p>
+  If you browse for a DEF file, KLayout will automatically fill the list of LEF files with the 
+  LEF files found at the location of the DEF file. LEF files are searched for relative to the
+  DEF file path. Unless an absolute path is specified for the LEF file, KLayout will look relative
+  to the path of the DEF file.
+  </p>
+
+  <p>
+  In both LEF or DEF import case you have the choice to read the layout into the existing
+  view (add to the current layout or overwrite the current one) or open a new view using the
+  "Import Mode" options.
+  </p>
+
+  <p>
+  The following image shows the LEF import dialog:
+  </p>
+
+  <p>
+  <img src="/about/lef_import_snapshot.png"/>
+  </p>
+
+  <p>
+  And this one is the DEF import dialog:
+  </p>
+
+  <p>
+  <img src="/about/def_import_snapshot.png"/>
+  </p>
+
+  <p>
+  LEF and DEF import can be configured in many ways. The configuration of the LEF/DEF import
+  feature is attached to a technology, so there can be individual configurations per technology.
+  For a description of the technology feature, see <link href="about/technology_manager.xml"/>.
+  The import feature uses the current technology. The current technology can be selected from
+  the main toolbar's technology selector if specific technology settings exist. Otherwise, the
+  default technology will be used.
+  </p>
+
+  <p>
+  You can edit the import settings using the "Options" button from the import dialogs.
+  This will open a dialog for editing the settings attached to the selected technology.
+  The settings basically consist of three parts: the layer mapping, the LEF files which are
+  always read before the LEF files specified per DEF file and 
+  various import settings. The following image shows the LEF/DEF import options dialog:
+  </p>
+
+  <p>
+  <img src="/about/lefdef_options_snapshot.png"/>
+  </p>
+
+  <h2>Layer Mapping</h2>
+
+  <p>
+  By default, no layer mapping is specified. Layer mapping can be employed to confine input to 
+  certain layers or layer/purpose pairs and to specifiy mapping of LEF layers/purposes to GDS
+  layer/datatypes.
+  </p>
+
+  <p>
+  In the Options part you will learn how the DEF/LEF importer generates layers. Basically, layers
+  are generated from the LEF/DEF layer name plus some suffix describing the purpose. For example,
+  pin geometry will be put to "Metal1.PIN" for "Metal1" geometry if the suffix for the "pin" 
+  purpose is set to ".PIN".
+  In addition, the LEF/DEF reader will already assign some GDS layer/datatype, the layer is either
+  the position of the layer in the layer list if there is a technology LEF file or a consecutive
+  number based on the alphabetic order of the layer names. The datatype can be specified for each
+  purpose.
+  </p>
+
+  <p>
+  However, that may not be sufficient to convert a DEF file to a certain GDS representation. 
+  Usually there is a layer mapping table, for example "Metal1.PIN" should be put to GDS layer
+  17, datatype 6. In order to facilitate such a use case, KLayout allows specification of a layer
+  mapping table. The basis for the table is the layer name plus the suffix defined for the
+  particular purpose. In the previous example, the mapping would be:
+  </p>
+
+  <p><tt>Metal1.OBS : 100/22</tt></p>
+
+  <p>
+  You can disable all other layer/purpose pairs by unchecking the "Read all layers" option
+  at the top of the layer mapping table. If this option is enabled, KLayout will generate
+  the GDS layers using the scheme described above for all layers it does not find in the 
+  mapping table.
+  </p>
+
+  <h2>LEF Files</h2>
+
+  <p>
+  You can specify a list of LEF files to load before any other LEF files. This feature
+  is intended to allow specification of a technology LEF file containing the layer definitions
+  or any standard library which should be present for every macro built on that technology.
+  You can add and delete LEF files using the "+" and "x" button respectively. You can move
+  files up and down using the "up" and "down" arrow buttons. The LEF files are read in the
+  given order, so the technology LEF file must be the first in the list.
+  </p>
+
+  <h2>Options</h2>
+
+  <p>
+  On the left side of the option panel, two basic options are provided:
+  </p>
+
+  <ul>
+    <li><b>Produce net names:</b> Check this option to assign user properties with the
+      net name to the net shapes in DEF files. The user propery name used for that
+      purpose can be specified in the edit box below the check box. Use KLayout's 
+      variant notation (see <link href="about/variant_notation.xml"/>) to specify
+      value and type of the property name.
+    </li>
+    <li><b>Produce outline shapes:</b> If this option is checked, outline shapes are
+      produced for the macros and the design (for DEF import). The layer to be used can 
+      be specified in the edit box below. You can use KLayout's usual layer specification
+      notation, i.e. "OUTLINE" for a named layer without GDS layer/datatype value, 
+      "10/0" for GDS layer 10, datatype 0 without a name or "OUTLINE (10/0)" for a 
+      combination of both. The outline layer is subject to layer mapping as well, so 
+      the layer map can be used alternatively to assign GDS layer/datatype numbers.
+    </li>
+  </ul>
+  
+  <p>
+  On the right side, the default layer generation for various purposes can be configured.
+  In all cases, a layer suffix can be set which is just added to the layer name and 
+  a default GDS datatype can be set. Please note, that the GDS datatype may be overruled
+  by a layer map if one is set. All contributions can be disabled individually.
+  </p>
+
+  <p>
+  The purposes available are:
+  </p>
+
+  <ul>
+    <li><b>Via geometry:</b> generated for shapes making up a via.</li>
+    <li><b>Pins:</b> generated for shapes making up a pin.</li>
+    <li><b>Obstructions:</b> generated for obstruction area markers.</li>
+    <li><b>Routing:</b> generated for routing geometry.</li>
+    <li><b>Pin labels:</b> generated for pin labels.</li>
+  </ul>  
+
+  <p><b>Note:</b> if the suffix of two purposes is identical, the default GDS datatype should
+    be identical as well. Otherwise it is not defined which layer will be generated.
+    Vice versa, the GDS datatypes should be different for different layer suffixes.
+  </p>
+
+</doc>
+

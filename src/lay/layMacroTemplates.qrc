@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/macro-templates" >
+        <!-- Hint: the URL's of the templates must be listed in macro_templates/index.txt -->
+        <file alias="index.txt">macro_templates/index.txt</file>
+        <file alias="new_macro.lym">macro_templates/new_macro.lym</file>
+        <file alias="new_text_file.txt">macro_templates/new_text_file.txt</file>
+        <file alias="new_ruby_file.rb">macro_templates/new_ruby_file.rb</file>
+        <file alias="pcell.lym">macro_templates/pcell.lym</file>
+        <file alias="pcell_sample.lym">macro_templates/pcell_sample.lym</file>
+        <file alias="qt_designer.lym">macro_templates/qt_designer.lym</file>
+        <file alias="qt_server.lym">macro_templates/qt_server.lym</file>
+        <file alias="qt_dialog.lym">macro_templates/qt_dialog.lym</file>
+        <file alias="qt_designer.ui">macro_templates/qt_designer.ui</file>
+        <file alias="new_python_macro.lym">macro_templates/new_python_macro.lym</file>
+        <file alias="new_python_file.py">macro_templates/new_python_file.py</file>
+        <file alias="qt_designer_python.lym">macro_templates/qt_designer_python.lym</file>
+        <file alias="qt_server_python.lym">macro_templates/qt_server_python.lym</file>
+        <file alias="qt_dialog_python.lym">macro_templates/qt_dialog_python.lym</file>
+        <file alias="pcell_python.lym">macro_templates/pcell_python.lym</file>
+        <file alias="pcell_sample_python.lym">macro_templates/pcell_sample_python.lym</file>
+    </qresource>
+</RCC>

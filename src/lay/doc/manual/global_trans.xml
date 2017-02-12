@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Global Rotation and Flip</title>
+  <keyword name="Global transformation"/>
+
+  <p>
+  KLayout offers an option to flip or rotate the whole window. This is a useful option for
+  example to view mask data which a mirrored image of the chip.
+  </p>
+
+  <p>
+  To access this option, choose the desired transformation from one of the options
+  available in the "Global Transformation" submenu of the "Display" menu.
+  </p>
+
+</doc>
+

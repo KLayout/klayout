@@ -1,0 +1,65 @@
+# <test>
+#   <name>t9.2.ot</name>
+#   <content-description>A single cell with one CTRAPEZOID object</content-description>
+#   <test-intention>Geometrical objects reader capabilities</test-intention>
+#   <test-intention>CTRAPEZOID record reading</test-intention>
+#   <test-intention>Unused CTRAPEZOID-related modal variable "height" not being tested</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     begin_cell {A}
+#     boundary 1 2 {-100 200} {-100 400} {100 200} {-100 200}
+#     boundary 1 2 {-100 600} {-100 800} {100 600} {-100 600}
+#     end_cell
+#     end_lib
+#   </content>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Cell A
+record CELL_STR
+  str A 
+
+# This test is supposed to test, if the H modal variable is not tested
+# if the CTRAPEZOID does not need it.
+record CTRAPEZOID
+  bits 11011011 ;# TWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 16       ;# type
+  uint 200      ;# width
+  int -100      ;# geometry-x (absolute)
+  int 200       ;# geometry-y (absolute)
+
+record XYRELATIVE
+
+record CTRAPEZOID
+  bits 00001000 ;# TWHXYRDL
+  int 400       ;# geometry-y (relative)
+
+# Cell B
+record CELL_STR
+  str B 
+
+# This test is supposed to test, if the W modal variable is not tested
+# if the CTRAPEZOID does not need it.
+record CTRAPEZOID
+  bits 10111011 ;# TWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 20       ;# type
+  uint 200      ;# height
+  int -100      ;# geometry-x (absolute)
+  int 200       ;# geometry-y (absolute)
+
+record XYRELATIVE
+
+record CTRAPEZOID
+  bits 00001000 ;# TWHXYRDL
+  int 400       ;# geometry-y (relative)
+
+tail
+

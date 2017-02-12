@@ -1,0 +1,1747 @@
+<html>
+<body>
+<h1>OASIS Tests By Cathegory</h1>
+<h4>Cathegory 1: Empty file. Various ways to specify a float (database unit).</h4>
+  <ul>
+  <li><a href="#1_1">1.1 Empty file (no cell, just header)</a></li>
+  <li><a href="#1_2">1.2 Empty file (no cell, just header)</a></li>
+  <li><a href="#1_3">1.3 Empty file (no cell, just header)</a></li>
+  <li><a href="#1_4">1.4 Empty file (no cell, just header)</a></li>
+  <li><a href="#1_5">1.5 Empty file (no cell, just header)</a></li>
+  </ul>
+<h4>Cathegory 2: Cells. Various ways to specify cell names (id, string) and refer to them.</h4>
+  <ul>
+  <li><a href="#2_1">2.1 A single, empty cell</a></li>
+  <li><a href="#2_2">2.2 Two empty cells</a></li>
+  <li><a href="#2_3">2.3 Two empty cells</a></li>
+  <li><a href="#2_4">2.4 Two empty cells</a></li>
+  <li><a href="#2_5">2.5 Two empty cells</a></li>
+  <li><a href="#2_6">2.6 Two empty cells</a></li>
+  </ul>
+<h4>Cathegory 3: Texts. Various ways to specify text strings and to refer to them.</h4>
+  <ul>
+  <li><a href="#3_10">3.10 A single cell with one text object</a></li>
+  <li><a href="#3_11">3.11 A single cell with one text object</a></li>
+  <li><a href="#3_12">3.12 A single cell with several text object</a></li>
+  <li><a href="#3_1">3.1 A single cell with several text object</a></li>
+  <li><a href="#3_2">3.2 A single cell with several text object</a></li>
+  <li><a href="#3_3">3.3 A single cell with one text object</a></li>
+  <li><a href="#3_4">3.4 A single cell with one text object</a></li>
+  <li><a href="#3_5">3.5 A single cell with several text object</a></li>
+  <li><a href="#3_6">3.6 A single cell with one text object</a></li>
+  <li><a href="#3_7">3.7 A single cell with one text object</a></li>
+  <li><a href="#3_8">3.8 A single cell with one text object</a></li>
+  <li><a href="#3_9">3.9 A single cell with one text object</a></li>
+  </ul>
+<h4>Cathegory 4: Rectangles</h4>
+  <ul>
+  <li><a href="#4_1">4.1 A single cell with a variety of rectangles</a></li>
+  <li><a href="#4_2">4.2 A single cell with a variety of rectangles</a></li>
+  </ul>
+<h4>Cathegory 5: Polygons</h4>
+  <ul>
+  <li><a href="#5_1">5.1 A single cell with a variety of polygons</a></li>
+  <li><a href="#5_2">5.2 A single cell with a single huge polygons</a></li>
+  <li><a href="#5_3">5.3 A single cell with a variety of polygons</a></li>
+  </ul>
+<h4>Cathegory 6: Paths</h4>
+  <ul>
+  <li><a href="#6_1">6.1 A single cell with a variety of paths</a></li>
+  </ul>
+<h4>Cathegory 7: Trapezoids</h4>
+  <ul>
+  <li><a href="#7_1">7.1 A single cell with a variety of trapezoids of types 23 to 25</a></li>
+  </ul>
+<h4>Cathegory 8: Placements</h4>
+  <ul>
+  <li><a href="#8_1">8.1 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by name, child cell before top cell</a></li>
+  <li><a href="#8_2">8.2 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by name, child cell after top cell</a></li>
+  <li><a href="#8_3">8.3 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by ID, child cell before top cell</a></li>
+  <li><a href="#8_4">8.4 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by ID, child cell after top cell</a></li>
+  <li><a href="#8_5">8.5 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by ID, child cell after top cell</a></li>
+  <li><a href="#8_6">8.6 A top cell and one child cell with one rectangle, child cell instantiated in various ways with magnification, cells specified by name, top cell before child cell</a></li>
+  <li><a href="#8_7">8.7 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by ID, child cell after top cell, forward references to IDs</a></li>
+  <li><a href="#8_8">8.8 A top cell and one child cell with one rectangle, child cell instantiated in various ways with magnification, cells specified by name, top cell before child cell</a></li>
+  </ul>
+<h4>Cathegory 9: Ctrapezoids</h4>
+  <ul>
+  <li><a href="#9_1">9.1 A single cell with a variety of CTRAPEZOID objects</a></li>
+  <li><a href="#9_2">9.2 A single cell with one CTRAPEZOID object</a></li>
+  </ul>
+<h4>Cathegory 10: Modal variables</h4>
+  <ul>
+  <li><a href="#10_1">10.1 Some cells with content (texts, rectangles) and instances</a></li>
+  </ul>
+<h4>Cathegory 11: Properties</h4>
+  <ul>
+  <li><a href="#11_1">11.1 Various shapes with properties</a></li>
+  <li><a href="#11_2">11.2 Various repeated shapes with properties</a></li>
+  <li><a href="#11_3">11.3 Various shapes with S_GDS_PROPERTY properties</a></li>
+  <li><a href="#11_4">11.4 Instances with properties</a></li>
+  <li><a href="#11_5">11.5 Various repeated shapes with properties</a></li>
+  <li><a href="#11_6">11.6 Instances with properties</a></li>
+  </ul>
+<h4>Cathegory 12: Circles</h4>
+  <ul>
+  <li><a href="#12_1">12.1 A single cell with a variety of circles</a></li>
+  </ul>
+<h4>Cathegory 13: Layer names</h4>
+  <ul>
+  <li><a href="#13_1">13.1 A single cell with a variety of circles on named layers</a></li>
+  <li><a href="#13_2">13.2 A single cell with a variety of texts on named layers</a></li>
+  <li><a href="#13_3">13.3 A single cell with a variety of circles on named layers</a></li>
+  <li><a href="#13_4">13.4 A single cell with a variety of circles on named layers</a></li>
+  </ul>
+<h4>Cathegory 14: CBLOCK compression</h4>
+  <ul>
+  <li><a href="#14_1">14.1 A cell with a variety of polygons in a CBLOCK-compressed file</a></li>
+  </ul>
+<h1>OASIS Tests By Target</h1>
+<table>
+  <tr><td>Access to (automatically) initialised modal variable text-x</td><td><a href="#3_9">3.9</a></td>  <tr><td>Access to (automatically) initialised modal variable text-y</td><td><a href="#3_10">3.10</a></td>  <tr><td>Access to undefined modal variable</td><td><a href="#3_6">3.6</a>
+<a href="#3_7">3.7</a>
+<a href="#3_8">3.8</a></td>  <tr><td>Access to uninitialised modal variable text-string</td><td><a href="#3_11">3.11</a></td>  <tr><td>Backward referencing of cell name ID</td><td><a href="#2_2">2.2</a>
+<a href="#2_3">2.3</a></td>  <tr><td>Basic objects reader capabilities</td><td><a href="#14_1">14.1</a></td>  <tr><td>Basic reader capabilities</td><td><a href="#1_1">1.1</a>
+<a href="#1_2">1.2</a>
+<a href="#1_3">1.3</a>
+<a href="#1_4">1.4</a>
+<a href="#1_5">1.5</a>
+<a href="#2_1">2.1</a>
+<a href="#2_2">2.2</a>
+<a href="#2_3">2.3</a>
+<a href="#2_4">2.4</a>
+<a href="#2_5">2.5</a>
+<a href="#2_6">2.6</a></td>  <tr><td>CBLOCK record reading</td><td><a href="#14_1">14.1</a></td>  <tr><td>CELL record reading</td><td><a href="#2_1">2.1</a>
+<a href="#2_2">2.2</a>
+<a href="#2_3">2.3</a>
+<a href="#2_4">2.4</a>
+<a href="#2_5">2.5</a>
+<a href="#2_6">2.6</a></td>  <tr><td>CIRCLE record reading</td><td><a href="#12_1">12.1</a></td>  <tr><td>CTRAPEZOID record reading</td><td><a href="#9_1">9.1</a>
+<a href="#9_2">9.2</a></td>  <tr><td>Cell name specification by ID</td><td><a href="#2_2">2.2</a>
+<a href="#2_3">2.3</a>
+<a href="#2_4">2.4</a>
+<a href="#2_5">2.5</a>
+<a href="#2_6">2.6</a></td>  <tr><td>Cell name specification by string</td><td><a href="#2_1">2.1</a></td>  <tr><td>Circle-related modal variables</td><td><a href="#12_1">12.1</a></td>  <tr><td>Database unit setting</td><td><a href="#1_1">1.1</a>
+<a href="#1_2">1.2</a>
+<a href="#1_3">1.3</a>
+<a href="#1_4">1.4</a>
+<a href="#1_5">1.5</a></td>  <tr><td>Explicit assignment for text string ID</td><td><a href="#3_2">3.2</a>
+<a href="#3_4">3.4</a>
+<a href="#3_6">3.6</a>
+<a href="#3_7">3.7</a>
+<a href="#3_8">3.8</a>
+<a href="#3_12">3.12</a></td>  <tr><td>Explicit assignment of ID's</td><td><a href="#2_4">2.4</a>
+<a href="#2_5">2.5</a>
+<a href="#2_6">2.6</a></td>  <tr><td>Forward references</td><td><a href="#11_5">11.5</a></td>  <tr><td>Forward references to ID declaration (ID to string assignment after use of ID)</td><td><a href="#8_7">8.7</a></td>  <tr><td>Forward string ID references</td><td><a href="#3_12">3.12</a></td>  <tr><td>Geometrical objects reader capabilities</td><td><a href="#3_1">3.1</a>
+<a href="#3_2">3.2</a>
+<a href="#3_3">3.3</a>
+<a href="#3_4">3.4</a>
+<a href="#3_5">3.5</a>
+<a href="#3_6">3.6</a>
+<a href="#3_7">3.7</a>
+<a href="#3_8">3.8</a>
+<a href="#3_9">3.9</a>
+<a href="#3_10">3.10</a>
+<a href="#3_11">3.11</a>
+<a href="#3_12">3.12</a>
+<a href="#4_1">4.1</a>
+<a href="#4_2">4.2</a>
+<a href="#5_1">5.1</a>
+<a href="#5_2">5.2</a>
+<a href="#5_3">5.3</a>
+<a href="#6_1">6.1</a>
+<a href="#7_1">7.1</a>
+<a href="#9_1">9.1</a>
+<a href="#9_2">9.2</a>
+<a href="#10_1">10.1</a>
+<a href="#12_1">12.1</a>
+<a href="#13_1">13.1</a>
+<a href="#13_2">13.2</a>
+<a href="#13_3">13.3</a>
+<a href="#13_4">13.4</a></td>  <tr><td>Hierarchical reader capabilities</td><td><a href="#8_1">8.1</a>
+<a href="#8_2">8.2</a>
+<a href="#8_3">8.3</a>
+<a href="#8_4">8.4</a>
+<a href="#8_5">8.5</a>
+<a href="#8_6">8.6</a>
+<a href="#8_7">8.7</a>
+<a href="#8_8">8.8</a>
+<a href="#10_1">10.1</a></td>  <tr><td>Implicit assignment for text string ID</td><td><a href="#3_5">3.5</a></td>  <tr><td>Implicit assignment of ID's</td><td><a href="#2_2">2.2</a></td>  <tr><td>Implicit assignment of text ID</td><td><a href="#3_9">3.9</a>
+<a href="#3_10">3.10</a></td>  <tr><td>Instances with properties</td><td><a href="#11_4">11.4</a>
+<a href="#11_6">11.6</a></td>  <tr><td>Invalid string used for cell name</td><td><a href="#2_6">2.6</a></td>  <tr><td>LAYERNAME record reading</td><td><a href="#13_1">13.1</a>
+<a href="#13_2">13.2</a>
+<a href="#13_3">13.3</a>
+<a href="#13_4">13.4</a></td>  <tr><td>LAYERNAME records at end of file</td><td><a href="#13_4">13.4</a></td>  <tr><td>Mapping of layer and datatype ranges to names</td><td><a href="#13_1">13.1</a></td>  <tr><td>Mapping of layer and datatype ranges to names, mapping of textlayer and texttype ranges to names in the same context but to different names</td><td><a href="#13_3">13.3</a>
+<a href="#13_4">13.4</a></td>  <tr><td>Mapping of textlayer and texttype ranges to names</td><td><a href="#13_2">13.2</a></td>  <tr><td>Mixed implicit and explicit assignment for text string ID</td><td><a href="#3_3">3.3</a></td>  <tr><td>Mixing of implicit and explicit assignment of ID's</td><td><a href="#2_3">2.3</a></td>  <tr><td>Modal variables for text objects</td><td><a href="#3_1">3.1</a>
+<a href="#3_2">3.2</a>
+<a href="#3_5">3.5</a>
+<a href="#3_12">3.12</a></td>  <tr><td>PAD record reading</td><td><a href="#1_1">1.1</a></td>  <tr><td>PATH record reading</td><td><a href="#6_1">6.1</a></td>  <tr><td>PLACEMENT record reading</td><td><a href="#8_1">8.1</a>
+<a href="#8_2">8.2</a>
+<a href="#8_3">8.3</a>
+<a href="#8_4">8.4</a>
+<a href="#8_5">8.5</a>
+<a href="#8_6">8.6</a>
+<a href="#8_7">8.7</a>
+<a href="#8_8">8.8</a></td>  <tr><td>POLYGON record reading</td><td><a href="#5_1">5.1</a>
+<a href="#5_2">5.2</a>
+<a href="#5_3">5.3</a></td>  <tr><td>PROPERTY record reading</td><td><a href="#11_1">11.1</a>
+<a href="#11_3">11.3</a>
+<a href="#11_4">11.4</a>
+<a href="#11_6">11.6</a></td>  <tr><td>PROPERTY record reading on repeated shapes</td><td><a href="#11_2">11.2</a>
+<a href="#11_5">11.5</a></td>  <tr><td>PROPNAME record reading</td><td><a href="#11_1">11.1</a>
+<a href="#11_2">11.2</a>
+<a href="#11_3">11.3</a>
+<a href="#11_4">11.4</a>
+<a href="#11_5">11.5</a>
+<a href="#11_6">11.6</a></td>  <tr><td>PROPSTRING record reading</td><td><a href="#11_1">11.1</a>
+<a href="#11_2">11.2</a>
+<a href="#11_3">11.3</a>
+<a href="#11_4">11.4</a>
+<a href="#11_5">11.5</a>
+<a href="#11_6">11.6</a></td>  <tr><td>Path-related modal variables</td><td><a href="#6_1">6.1</a></td>  <tr><td>Placed cell reference by ID</td><td><a href="#8_3">8.3</a>
+<a href="#8_4">8.4</a>
+<a href="#8_5">8.5</a>
+<a href="#8_7">8.7</a></td>  <tr><td>Placed cell reference by string</td><td><a href="#8_1">8.1</a>
+<a href="#8_2">8.2</a>
+<a href="#8_6">8.6</a>
+<a href="#8_8">8.8</a></td>  <tr><td>Placement-related modal variables</td><td><a href="#8_1">8.1</a>
+<a href="#8_2">8.2</a>
+<a href="#8_3">8.3</a>
+<a href="#8_4">8.4</a>
+<a href="#8_5">8.5</a>
+<a href="#8_6">8.6</a>
+<a href="#8_7">8.7</a>
+<a href="#8_8">8.8</a></td>  <tr><td>Placements with arbitrary rotation angles</td><td><a href="#8_8">8.8</a></td>  <tr><td>Placements with magnification</td><td><a href="#8_6">8.6</a>
+<a href="#8_8">8.8</a></td>  <tr><td>Polygon-related modal variables</td><td><a href="#5_1">5.1</a>
+<a href="#5_3">5.3</a></td>  <tr><td>Polygons with many points</td><td><a href="#5_2">5.2</a></td>  <tr><td>Properties reader capabilities</td><td><a href="#11_1">11.1</a>
+<a href="#11_2">11.2</a>
+<a href="#11_3">11.3</a>
+<a href="#11_4">11.4</a>
+<a href="#11_5">11.5</a>
+<a href="#11_6">11.6</a></td>  <tr><td>Property attachement to polygons in various combinations</td><td><a href="#5_3">5.3</a></td>  <tr><td>Property attachement to rectangles in various combinations</td><td><a href="#4_2">4.2</a></td>  <tr><td>Property name references by ID</td><td><a href="#11_1">11.1</a>
+<a href="#11_2">11.2</a>
+<a href="#11_3">11.3</a>
+<a href="#11_4">11.4</a>
+<a href="#11_5">11.5</a>
+<a href="#11_6">11.6</a></td>  <tr><td>Property string references by ID</td><td><a href="#11_1">11.1</a>
+<a href="#11_2">11.2</a>
+<a href="#11_3">11.3</a>
+<a href="#11_4">11.4</a>
+<a href="#11_5">11.5</a>
+<a href="#11_6">11.6</a></td>  <tr><td>RECTANGLE record reading</td><td><a href="#4_1">4.1</a>
+<a href="#4_2">4.2</a></td>  <tr><td>Real data type 0 (for database unit)</td><td><a href="#1_1">1.1</a></td>  <tr><td>Real data type 2 (for database unit)</td><td><a href="#1_2">1.2</a></td>  <tr><td>Real data type 4 (for database unit)</td><td><a href="#1_3">1.3</a></td>  <tr><td>Real data type 6 (for database unit)</td><td><a href="#1_4">1.4</a></td>  <tr><td>Real data type 7 (for database unit)</td><td><a href="#1_5">1.5</a></td>  <tr><td>Rectangle-related modal variables</td><td><a href="#4_1">4.1</a>
+<a href="#4_2">4.2</a></td>  <tr><td>Repetitions of CTRAPEZOIDs</td><td><a href="#9_1">9.1</a></td>  <tr><td>Repetitions of circles</td><td><a href="#12_1">12.1</a></td>  <tr><td>Repetitions of paths</td><td><a href="#6_1">6.1</a></td>  <tr><td>Repetitions of placements</td><td><a href="#8_1">8.1</a>
+<a href="#8_4">8.4</a></td>  <tr><td>Repetitions of polygons</td><td><a href="#5_1">5.1</a>
+<a href="#5_3">5.3</a></td>  <tr><td>Repetitions of rectangles</td><td><a href="#4_1">4.1</a>
+<a href="#4_2">4.2</a></td>  <tr><td>Repetitions of trapezoids</td><td><a href="#7_1">7.1</a></td>  <tr><td>Reset of modal variables upon entry to a new cell</td><td><a href="#10_1">10.1</a></td>  <tr><td>S_GDS_PROPERTY interpretation</td><td><a href="#11_3">11.3</a></td>  <tr><td>TEXT record reading</td><td><a href="#3_1">3.1</a>
+<a href="#3_2">3.2</a>
+<a href="#3_3">3.3</a>
+<a href="#3_4">3.4</a>
+<a href="#3_5">3.5</a>
+<a href="#3_6">3.6</a>
+<a href="#3_7">3.7</a>
+<a href="#3_8">3.8</a>
+<a href="#3_9">3.9</a>
+<a href="#3_10">3.10</a>
+<a href="#3_11">3.11</a>
+<a href="#3_12">3.12</a></td>  <tr><td>Text string backward references</td><td><a href="#3_2">3.2</a>
+<a href="#3_5">3.5</a>
+<a href="#3_12">3.12</a></td>  <tr><td>Text string specification by ID</td><td><a href="#3_2">3.2</a>
+<a href="#3_3">3.3</a>
+<a href="#3_4">3.4</a>
+<a href="#3_5">3.5</a>
+<a href="#3_6">3.6</a>
+<a href="#3_7">3.7</a>
+<a href="#3_8">3.8</a>
+<a href="#3_9">3.9</a>
+<a href="#3_10">3.10</a>
+<a href="#3_12">3.12</a></td>  <tr><td>Text string specification by string directly</td><td><a href="#3_1">3.1</a></td>  <tr><td>Trapezoid record reading (types 23 to 25)</td><td><a href="#7_1">7.1</a></td>  <tr><td>Trapezoid-related modal variables</td><td><a href="#7_1">7.1</a>
+<a href="#9_1">9.1</a></td>  <tr><td>Unused CTRAPEZOID-related modal variable "height" not being tested</td><td><a href="#9_2">9.2</a></td>  <tr><td>Use of undefined ID</td><td><a href="#2_5">2.5</a></td>  <tr><td>Use of undefined text string ID</td><td><a href="#3_4">3.4</a></td>  <tr><td>Various repetition types for text objects</td><td><a href="#3_1">3.1</a>
+<a href="#3_2">3.2</a>
+<a href="#3_5">3.5</a>
+<a href="#3_12">3.12</a></td></table>
+<h1>OASIS Test Descriptions</h1>
+<h2>1 Empty file. Various ways to specify a float (database unit).</h2>
+<h3>1.1 Empty file (no cell, just header)</h3>
+  <a name="1_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic reader capabilities</li>
+    <li>Real data type 0 (for database unit)</li>
+    <li>Database unit setting</li>
+    <li>PAD record reading</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+end_lib</pre>
+<h3>1.2 Empty file (no cell, just header)</h3>
+  <a name="1_2"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic reader capabilities</li>
+    <li>Real data type 2 (for database unit)</li>
+    <li>Database unit setting</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 2
+end_lib</pre>
+<h3>1.3 Empty file (no cell, just header)</h3>
+  <a name="1_3"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic reader capabilities</li>
+    <li>Real data type 4 (for database unit)</li>
+    <li>Database unit setting</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.4
+end_lib</pre>
+<h3>1.4 Empty file (no cell, just header)</h3>
+  <a name="1_4"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic reader capabilities</li>
+    <li>Real data type 6 (for database unit)</li>
+    <li>Database unit setting</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.08
+end_lib</pre>
+<h3>1.5 Empty file (no cell, just header)</h3>
+  <a name="1_5"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic reader capabilities</li>
+    <li>Real data type 7 (for database unit)</li>
+    <li>Database unit setting</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.08
+end_lib</pre>
+<h2>2 Cells. Various ways to specify cell names (id, string) and refer to them.</h2>
+<h3>2.1 A single, empty cell</h3>
+  <a name="2_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic reader capabilities</li>
+    <li>CELL record reading</li>
+    <li>Cell name specification by string</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {XYZ}
+end_cell
+end_lib</pre>
+<h3>2.2 Two empty cells</h3>
+  <a name="2_2"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic reader capabilities</li>
+    <li>CELL record reading</li>
+    <li>Cell name specification by ID</li>
+    <li>Backward referencing of cell name ID</li>
+    <li>Implicit assignment of ID's</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+end_cell
+begin_cell {XYZ}
+end_cell
+end_lib</pre>
+<h3>2.3 Two empty cells</h3>
+  <a name="2_3"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic reader capabilities</li>
+    <li>CELL record reading</li>
+    <li>Cell name specification by ID</li>
+    <li>Backward referencing of cell name ID</li>
+    <li>Mixing of implicit and explicit assignment of ID's</li>
+  </ul>
+<h3>2.4 Two empty cells</h3>
+  <a name="2_4"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic reader capabilities</li>
+    <li>CELL record reading</li>
+    <li>Cell name specification by ID</li>
+    <li>Explicit assignment of ID's</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+end_cell
+begin_cell {XYZ}
+end_cell
+end_lib</pre>
+<h3>2.5 Two empty cells</h3>
+  <a name="2_5"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic reader capabilities</li>
+    <li>CELL record reading</li>
+    <li>Cell name specification by ID</li>
+    <li>Explicit assignment of ID's</li>
+    <li>Use of undefined ID</li>
+  </ul>
+<h3>2.6 Two empty cells</h3>
+  <a name="2_6"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic reader capabilities</li>
+    <li>CELL record reading</li>
+    <li>Cell name specification by ID</li>
+    <li>Explicit assignment of ID's</li>
+    <li>Invalid string used for cell name</li>
+  </ul>
+<h2>3 Texts. Various ways to specify text strings and to refer to them.</h2>
+<h3>3.10 A single cell with one text object</h3>
+  <a name="3_10"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Text string specification by ID</li>
+    <li>Implicit assignment of text ID</li>
+    <li>Access to (automatically) initialised modal variable text-y</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+text 1 2 0 0 {100 0} {A}
+end_cell
+end_lib</pre>
+<h3>3.11 A single cell with one text object</h3>
+  <a name="3_11"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Access to uninitialised modal variable text-string</li>
+  </ul>
+<h3>3.12 A single cell with several text object</h3>
+  <a name="3_12"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Text string specification by ID</li>
+    <li>Forward string ID references</li>
+    <li>Explicit assignment for text string ID</li>
+    <li>Text string backward references</li>
+    <li>Modal variables for text objects</li>
+    <li>Various repetition types for text objects</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+text 1 2 0 0 {100 -200} {A}
+text 2 1 0 0 {300 -400} {B}
+text 2 1 0 0 {300 -300} {B}
+text 2 1 0 0 {300 -500} {A}
+text 2 1 0 0 {310 -500} {A}
+text 2 1 0 0 {320 -500} {A}
+text 2 1 0 0 {300 -488} {A}
+text 2 1 0 0 {310 -488} {A}
+text 2 1 0 0 {320 -488} {A}
+text 2 1 0 0 {300 -476} {A}
+text 2 1 0 0 {310 -476} {A}
+text 2 1 0 0 {320 -476} {A}
+text 2 1 0 0 {300 -464} {A}
+text 2 1 0 0 {310 -464} {A}
+text 2 1 0 0 {320 -464} {A}
+text 2 1 0 0 {300 -700} {A}
+text 2 1 0 0 {310 -700} {A}
+text 2 1 0 0 {320 -700} {A}
+text 2 1 0 0 {300 -688} {A}
+text 2 1 0 0 {310 -688} {A}
+text 2 1 0 0 {320 -688} {A}
+text 2 1 0 0 {300 -676} {A}
+text 2 1 0 0 {310 -676} {A}
+text 2 1 0 0 {320 -676} {A}
+text 2 1 0 0 {300 -664} {A}
+text 2 1 0 0 {310 -664} {A}
+text 2 1 0 0 {320 -664} {A}
+text 2 1 0 0 {300 -900} {A}
+text 2 1 0 0 {310 -900} {A}
+text 2 1 0 0 {320 -900} {A}
+text 2 1 0 0 {300 -1100} {A}
+text 2 1 0 0 {300 -1088} {A}
+text 2 1 0 0 {300 -1076} {A}
+text 2 1 0 0 {300 -1064} {A}
+text 2 1 0 0 {300 -1300} {A}
+text 2 1 0 0 {312 -1300} {A}
+text 2 1 0 0 {325 -1300} {A}
+text 2 1 0 0 {339 -1300} {A}
+text 2 1 0 0 {300 -1500} {A}
+text 2 1 0 0 {312 -1500} {A}
+text 2 1 0 0 {327 -1500} {A}
+text 2 1 0 0 {345 -1500} {A}
+text 2 1 0 0 {300 -1700} {A}
+text 2 1 0 0 {300 -1690} {A}
+text 2 1 0 0 {300 -1679} {A}
+text 2 1 0 0 {300 -1890} {A}
+text 2 1 0 0 {300 -1875} {A}
+text 2 1 0 0 {200 -400} {B}
+text 2 1 0 0 {267 -2136} {A}
+text 2 1 0 0 {270 -2270} {A}
+text 2 1 0 0 {270 -2670} {A}
+text 2 1 0 0 {320 -2100} {A}
+text 2 1 0 0 {289 -2112} {A}
+text 2 1 0 0 {299 -2112} {A}
+text 2 1 0 0 {309 -2112} {A}
+text 2 1 0 0 {278 -2124} {A}
+text 2 1 0 0 {288 -2124} {A}
+text 2 1 0 0 {298 -2124} {A}
+text 2 1 0 0 {300 -1900} {A}
+text 2 1 0 0 {277 -2136} {A}
+text 2 1 0 0 {287 -2136} {A}
+text 2 1 0 0 {300 -2300} {A}
+text 2 1 0 0 {311 -2288} {A}
+text 2 1 0 0 {322 -2276} {A}
+text 2 1 0 0 {290 -2290} {A}
+text 2 1 0 0 {301 -2278} {A}
+text 2 1 0 0 {312 -2266} {A}
+text 2 1 0 0 {280 -2280} {A}
+text 2 1 0 0 {291 -2268} {A}
+text 2 1 0 0 {302 -2256} {A}
+text 2 1 0 0 {300 -2100} {A}
+text 2 1 0 0 {281 -2258} {A}
+text 2 1 0 0 {292 -2246} {A}
+text 2 1 0 0 {300 -2500} {A}
+text 2 1 0 0 {311 -2488} {A}
+text 2 1 0 0 {322 -2476} {A}
+text 2 1 0 0 {300 -2700} {A}
+text 2 1 0 0 {290 -2690} {A}
+text 2 1 0 0 {280 -2680} {A}
+text 2 1 0 0 {310 -2100} {A}
+text 2 1 0 0 {300 -2900} {A}
+text 2 1 0 0 {310 -2900} {A}
+text 2 1 0 0 {310 -2890} {A}
+text 2 1 0 0 {300 -2890} {A}
+text 2 1 0 0 {300 -2900} {A}
+text 2 1 0 0 {310 -2890} {A}
+text 2 1 0 0 {300 -2880} {A}
+text 2 1 0 0 {290 -2890} {A}
+text 2 1 0 0 {300 -2900} {A}
+text 2 1 0 0 {300 -3100} {A}
+text 2 1 0 0 {289 -3088} {A}
+text 2 1 0 0 {299 -3098} {A}
+text 2 1 0 0 {300 -3300} {A}
+text 2 1 0 0 {310 -3300} {A}
+text 2 1 0 0 {310 -3290} {A}
+text 2 1 0 0 {300 -3290} {A}
+text 2 1 0 0 {300 -3300} {A}
+text 2 1 0 0 {310 -3290} {A}
+text 2 1 0 0 {300 -3280} {A}
+text 2 1 0 0 {290 -3290} {A}
+text 2 1 0 0 {300 -3300} {A}
+text 2 1 0 0 {300 -3500} {A}
+text 2 1 0 0 {288 -3488} {A}
+text 2 1 0 0 {297 -3497} {A}
+end_cell
+end_lib</pre>
+<h3>3.1 A single cell with several text object</h3>
+  <a name="3_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Text string specification by string directly</li>
+    <li>Modal variables for text objects</li>
+    <li>Various repetition types for text objects</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+text 1 2 0 0 {100 -200} {TEXT_ABC}
+text 2 1 0 0 {300 -400} {TEXT_ABC}
+text 2 1 0 0 {300 -300} {TEXT_ABC}
+text 2 1 0 0 {300 -500} {TEXT_ABC}
+text 2 1 0 0 {310 -500} {TEXT_ABC}
+text 2 1 0 0 {320 -500} {TEXT_ABC}
+text 2 1 0 0 {300 -488} {TEXT_ABC}
+text 2 1 0 0 {310 -488} {TEXT_ABC}
+text 2 1 0 0 {320 -488} {TEXT_ABC}
+text 2 1 0 0 {300 -476} {TEXT_ABC}
+text 2 1 0 0 {310 -476} {TEXT_ABC}
+text 2 1 0 0 {320 -476} {TEXT_ABC}
+text 2 1 0 0 {300 -464} {TEXT_ABC}
+text 2 1 0 0 {310 -464} {TEXT_ABC}
+text 2 1 0 0 {320 -464} {TEXT_ABC}
+text 2 1 0 0 {300 -700} {TEXT_ABC}
+text 2 1 0 0 {310 -700} {TEXT_ABC}
+text 2 1 0 0 {320 -700} {TEXT_ABC}
+text 2 1 0 0 {300 -688} {TEXT_ABC}
+text 2 1 0 0 {310 -688} {TEXT_ABC}
+text 2 1 0 0 {320 -688} {TEXT_ABC}
+text 2 1 0 0 {300 -676} {TEXT_ABC}
+text 2 1 0 0 {310 -676} {TEXT_ABC}
+text 2 1 0 0 {320 -676} {TEXT_ABC}
+text 2 1 0 0 {300 -664} {TEXT_ABC}
+text 2 1 0 0 {310 -664} {TEXT_ABC}
+text 2 1 0 0 {320 -664} {TEXT_ABC}
+text 2 1 0 0 {300 -900} {TEXT_ABC}
+text 2 1 0 0 {310 -900} {TEXT_ABC}
+text 2 1 0 0 {320 -900} {TEXT_ABC}
+text 2 1 0 0 {300 -1100} {TEXT_ABC}
+text 2 1 0 0 {300 -1088} {TEXT_ABC}
+text 2 1 0 0 {300 -1076} {TEXT_ABC}
+text 2 1 0 0 {300 -1064} {TEXT_ABC}
+text 2 1 0 0 {300 -1300} {TEXT_ABC}
+text 2 1 0 0 {312 -1300} {TEXT_ABC}
+text 2 1 0 0 {325 -1300} {TEXT_ABC}
+text 2 1 0 0 {339 -1300} {TEXT_ABC}
+text 2 1 0 0 {300 -1500} {TEXT_ABC}
+text 2 1 0 0 {312 -1500} {TEXT_ABC}
+text 2 1 0 0 {327 -1500} {TEXT_ABC}
+text 2 1 0 0 {345 -1500} {TEXT_ABC}
+text 2 1 0 0 {300 -1700} {TEXT_ABC}
+text 2 1 0 0 {300 -1690} {TEXT_ABC}
+text 2 1 0 0 {300 -1679} {TEXT_ABC}
+text 2 1 0 0 {300 -1890} {TEXT_ABC}
+text 2 1 0 0 {300 -1875} {TEXT_ABC}
+text 2 1 0 0 {200 -400} {TEXT_ABC}
+text 2 1 0 0 {267 -2136} {TEXT_ABC}
+text 2 1 0 0 {270 -2270} {TEXT_ABC}
+text 2 1 0 0 {270 -2670} {TEXT_ABC}
+text 2 1 0 0 {320 -2100} {TEXT_ABC}
+text 2 1 0 0 {289 -2112} {TEXT_ABC}
+text 2 1 0 0 {299 -2112} {TEXT_ABC}
+text 2 1 0 0 {309 -2112} {TEXT_ABC}
+text 2 1 0 0 {278 -2124} {TEXT_ABC}
+text 2 1 0 0 {288 -2124} {TEXT_ABC}
+text 2 1 0 0 {298 -2124} {TEXT_ABC}
+text 2 1 0 0 {300 -1900} {TEXT_ABC}
+text 2 1 0 0 {277 -2136} {TEXT_ABC}
+text 2 1 0 0 {287 -2136} {TEXT_ABC}
+text 2 1 0 0 {300 -2300} {TEXT_ABC}
+text 2 1 0 0 {311 -2288} {TEXT_ABC}
+text 2 1 0 0 {322 -2276} {TEXT_ABC}
+text 2 1 0 0 {290 -2290} {TEXT_ABC}
+text 2 1 0 0 {301 -2278} {TEXT_ABC}
+text 2 1 0 0 {312 -2266} {TEXT_ABC}
+text 2 1 0 0 {280 -2280} {TEXT_ABC}
+text 2 1 0 0 {291 -2268} {TEXT_ABC}
+text 2 1 0 0 {302 -2256} {TEXT_ABC}
+text 2 1 0 0 {300 -2100} {TEXT_ABC}
+text 2 1 0 0 {281 -2258} {TEXT_ABC}
+text 2 1 0 0 {292 -2246} {TEXT_ABC}
+text 2 1 0 0 {300 -2500} {TEXT_ABC}
+text 2 1 0 0 {311 -2488} {TEXT_ABC}
+text 2 1 0 0 {322 -2476} {TEXT_ABC}
+text 2 1 0 0 {300 -2700} {TEXT_ABC}
+text 2 1 0 0 {290 -2690} {TEXT_ABC}
+text 2 1 0 0 {280 -2680} {TEXT_ABC}
+text 2 1 0 0 {310 -2100} {TEXT_ABC}
+text 2 1 0 0 {300 -2900} {TEXT_ABC}
+text 2 1 0 0 {310 -2900} {TEXT_ABC}
+text 2 1 0 0 {310 -2890} {TEXT_ABC}
+text 2 1 0 0 {300 -2890} {TEXT_ABC}
+text 2 1 0 0 {300 -2900} {TEXT_ABC}
+text 2 1 0 0 {310 -2890} {TEXT_ABC}
+text 2 1 0 0 {300 -2880} {TEXT_ABC}
+text 2 1 0 0 {290 -2890} {TEXT_ABC}
+text 2 1 0 0 {300 -2900} {TEXT_ABC}
+text 2 1 0 0 {300 -3100} {TEXT_ABC}
+text 2 1 0 0 {289 -3088} {TEXT_ABC}
+text 2 1 0 0 {299 -3098} {TEXT_ABC}
+text 2 1 0 0 {300 -3300} {TEXT_ABC}
+text 2 1 0 0 {310 -3300} {TEXT_ABC}
+text 2 1 0 0 {310 -3290} {TEXT_ABC}
+text 2 1 0 0 {300 -3290} {TEXT_ABC}
+text 2 1 0 0 {300 -3300} {TEXT_ABC}
+text 2 1 0 0 {310 -3290} {TEXT_ABC}
+text 2 1 0 0 {300 -3280} {TEXT_ABC}
+text 2 1 0 0 {290 -3290} {TEXT_ABC}
+text 2 1 0 0 {300 -3300} {TEXT_ABC}
+text 2 1 0 0 {300 -3500} {TEXT_ABC}
+text 2 1 0 0 {288 -3488} {TEXT_ABC}
+text 2 1 0 0 {297 -3497} {TEXT_ABC}
+end_cell
+end_lib</pre>
+<h3>3.2 A single cell with several text object</h3>
+  <a name="3_2"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Text string specification by ID</li>
+    <li>Explicit assignment for text string ID</li>
+    <li>Text string backward references</li>
+    <li>Modal variables for text objects</li>
+    <li>Various repetition types for text objects</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+text 1 2 0 0 {100 -200} {A}
+text 2 1 0 0 {300 -400} {B}
+text 2 1 0 0 {300 -300} {B}
+text 2 1 0 0 {300 -500} {A}
+text 2 1 0 0 {310 -500} {A}
+text 2 1 0 0 {320 -500} {A}
+text 2 1 0 0 {300 -488} {A}
+text 2 1 0 0 {310 -488} {A}
+text 2 1 0 0 {320 -488} {A}
+text 2 1 0 0 {300 -476} {A}
+text 2 1 0 0 {310 -476} {A}
+text 2 1 0 0 {320 -476} {A}
+text 2 1 0 0 {300 -464} {A}
+text 2 1 0 0 {310 -464} {A}
+text 2 1 0 0 {320 -464} {A}
+text 2 1 0 0 {300 -700} {A}
+text 2 1 0 0 {310 -700} {A}
+text 2 1 0 0 {320 -700} {A}
+text 2 1 0 0 {300 -688} {A}
+text 2 1 0 0 {310 -688} {A}
+text 2 1 0 0 {320 -688} {A}
+text 2 1 0 0 {300 -676} {A}
+text 2 1 0 0 {310 -676} {A}
+text 2 1 0 0 {320 -676} {A}
+text 2 1 0 0 {300 -664} {A}
+text 2 1 0 0 {310 -664} {A}
+text 2 1 0 0 {320 -664} {A}
+text 2 1 0 0 {300 -900} {A}
+text 2 1 0 0 {310 -900} {A}
+text 2 1 0 0 {320 -900} {A}
+text 2 1 0 0 {300 -1100} {A}
+text 2 1 0 0 {300 -1088} {A}
+text 2 1 0 0 {300 -1076} {A}
+text 2 1 0 0 {300 -1064} {A}
+text 2 1 0 0 {300 -1300} {A}
+text 2 1 0 0 {312 -1300} {A}
+text 2 1 0 0 {325 -1300} {A}
+text 2 1 0 0 {339 -1300} {A}
+text 2 1 0 0 {300 -1500} {A}
+text 2 1 0 0 {312 -1500} {A}
+text 2 1 0 0 {327 -1500} {A}
+text 2 1 0 0 {345 -1500} {A}
+text 2 1 0 0 {300 -1700} {A}
+text 2 1 0 0 {300 -1690} {A}
+text 2 1 0 0 {300 -1679} {A}
+text 2 1 0 0 {300 -1890} {A}
+text 2 1 0 0 {300 -1875} {A}
+text 2 1 0 0 {200 -400} {B}
+text 2 1 0 0 {267 -2136} {A}
+text 2 1 0 0 {270 -2270} {A}
+text 2 1 0 0 {270 -2670} {A}
+text 2 1 0 0 {320 -2100} {A}
+text 2 1 0 0 {289 -2112} {A}
+text 2 1 0 0 {299 -2112} {A}
+text 2 1 0 0 {309 -2112} {A}
+text 2 1 0 0 {278 -2124} {A}
+text 2 1 0 0 {288 -2124} {A}
+text 2 1 0 0 {298 -2124} {A}
+text 2 1 0 0 {300 -1900} {A}
+text 2 1 0 0 {277 -2136} {A}
+text 2 1 0 0 {287 -2136} {A}
+text 2 1 0 0 {300 -2300} {A}
+text 2 1 0 0 {311 -2288} {A}
+text 2 1 0 0 {322 -2276} {A}
+text 2 1 0 0 {290 -2290} {A}
+text 2 1 0 0 {301 -2278} {A}
+text 2 1 0 0 {312 -2266} {A}
+text 2 1 0 0 {280 -2280} {A}
+text 2 1 0 0 {291 -2268} {A}
+text 2 1 0 0 {302 -2256} {A}
+text 2 1 0 0 {300 -2100} {A}
+text 2 1 0 0 {281 -2258} {A}
+text 2 1 0 0 {292 -2246} {A}
+text 2 1 0 0 {300 -2500} {A}
+text 2 1 0 0 {311 -2488} {A}
+text 2 1 0 0 {322 -2476} {A}
+text 2 1 0 0 {300 -2700} {A}
+text 2 1 0 0 {290 -2690} {A}
+text 2 1 0 0 {280 -2680} {A}
+text 2 1 0 0 {310 -2100} {A}
+text 2 1 0 0 {300 -2900} {A}
+text 2 1 0 0 {310 -2900} {A}
+text 2 1 0 0 {310 -2890} {A}
+text 2 1 0 0 {300 -2890} {A}
+text 2 1 0 0 {300 -2900} {A}
+text 2 1 0 0 {310 -2890} {A}
+text 2 1 0 0 {300 -2880} {A}
+text 2 1 0 0 {290 -2890} {A}
+text 2 1 0 0 {300 -2900} {A}
+text 2 1 0 0 {300 -3100} {A}
+text 2 1 0 0 {289 -3088} {A}
+text 2 1 0 0 {299 -3098} {A}
+text 2 1 0 0 {300 -3300} {A}
+text 2 1 0 0 {310 -3300} {A}
+text 2 1 0 0 {310 -3290} {A}
+text 2 1 0 0 {300 -3290} {A}
+text 2 1 0 0 {300 -3300} {A}
+text 2 1 0 0 {310 -3290} {A}
+text 2 1 0 0 {300 -3280} {A}
+text 2 1 0 0 {290 -3290} {A}
+text 2 1 0 0 {300 -3300} {A}
+text 2 1 0 0 {300 -3500} {A}
+text 2 1 0 0 {288 -3488} {A}
+text 2 1 0 0 {297 -3497} {A}
+end_cell
+end_lib</pre>
+<h3>3.3 A single cell with one text object</h3>
+  <a name="3_3"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Text string specification by ID</li>
+    <li>Mixed implicit and explicit assignment for text string ID</li>
+  </ul>
+<h3>3.4 A single cell with one text object</h3>
+  <a name="3_4"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Text string specification by ID</li>
+    <li>Explicit assignment for text string ID</li>
+    <li>Use of undefined text string ID</li>
+  </ul>
+<h3>3.5 A single cell with several text object</h3>
+  <a name="3_5"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Text string specification by ID</li>
+    <li>Implicit assignment for text string ID</li>
+    <li>Text string backward references</li>
+    <li>Modal variables for text objects</li>
+    <li>Various repetition types for text objects</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+text 1 2 0 0 {100 -200} {B}
+text 2 1 0 0 {300 -400} {A}
+text 2 1 0 0 {300 -300} {A}
+text 2 1 0 0 {300 -500} {B}
+text 2 1 0 0 {310 -500} {B}
+text 2 1 0 0 {320 -500} {B}
+text 2 1 0 0 {300 -488} {B}
+text 2 1 0 0 {310 -488} {B}
+text 2 1 0 0 {320 -488} {B}
+text 2 1 0 0 {300 -476} {B}
+text 2 1 0 0 {310 -476} {B}
+text 2 1 0 0 {320 -476} {B}
+text 2 1 0 0 {300 -464} {B}
+text 2 1 0 0 {310 -464} {B}
+text 2 1 0 0 {320 -464} {B}
+text 2 1 0 0 {300 -700} {B}
+text 2 1 0 0 {310 -700} {B}
+text 2 1 0 0 {320 -700} {B}
+text 2 1 0 0 {300 -688} {B}
+text 2 1 0 0 {310 -688} {B}
+text 2 1 0 0 {320 -688} {B}
+text 2 1 0 0 {300 -676} {B}
+text 2 1 0 0 {310 -676} {B}
+text 2 1 0 0 {320 -676} {B}
+text 2 1 0 0 {300 -664} {B}
+text 2 1 0 0 {310 -664} {B}
+text 2 1 0 0 {320 -664} {B}
+text 2 1 0 0 {300 -900} {B}
+text 2 1 0 0 {310 -900} {B}
+text 2 1 0 0 {320 -900} {B}
+text 2 1 0 0 {300 -1100} {B}
+text 2 1 0 0 {300 -1088} {B}
+text 2 1 0 0 {300 -1076} {B}
+text 2 1 0 0 {300 -1064} {B}
+text 2 1 0 0 {300 -1300} {B}
+text 2 1 0 0 {312 -1300} {B}
+text 2 1 0 0 {325 -1300} {B}
+text 2 1 0 0 {339 -1300} {B}
+text 2 1 0 0 {300 -1500} {B}
+text 2 1 0 0 {312 -1500} {B}
+text 2 1 0 0 {327 -1500} {B}
+text 2 1 0 0 {345 -1500} {B}
+text 2 1 0 0 {300 -1700} {B}
+text 2 1 0 0 {300 -1690} {B}
+text 2 1 0 0 {300 -1679} {B}
+text 2 1 0 0 {300 -1890} {B}
+text 2 1 0 0 {300 -1875} {B}
+text 2 1 0 0 {200 -400} {A}
+text 2 1 0 0 {267 -2136} {B}
+text 2 1 0 0 {270 -2270} {B}
+text 2 1 0 0 {270 -2670} {B}
+text 2 1 0 0 {320 -2100} {B}
+text 2 1 0 0 {289 -2112} {B}
+text 2 1 0 0 {299 -2112} {B}
+text 2 1 0 0 {309 -2112} {B}
+text 2 1 0 0 {278 -2124} {B}
+text 2 1 0 0 {288 -2124} {B}
+text 2 1 0 0 {298 -2124} {B}
+text 2 1 0 0 {300 -1900} {B}
+text 2 1 0 0 {277 -2136} {B}
+text 2 1 0 0 {287 -2136} {B}
+text 2 1 0 0 {300 -2300} {B}
+text 2 1 0 0 {311 -2288} {B}
+text 2 1 0 0 {322 -2276} {B}
+text 2 1 0 0 {290 -2290} {B}
+text 2 1 0 0 {301 -2278} {B}
+text 2 1 0 0 {312 -2266} {B}
+text 2 1 0 0 {280 -2280} {B}
+text 2 1 0 0 {291 -2268} {B}
+text 2 1 0 0 {302 -2256} {B}
+text 2 1 0 0 {300 -2100} {B}
+text 2 1 0 0 {281 -2258} {B}
+text 2 1 0 0 {292 -2246} {B}
+text 2 1 0 0 {300 -2500} {B}
+text 2 1 0 0 {311 -2488} {B}
+text 2 1 0 0 {322 -2476} {B}
+text 2 1 0 0 {300 -2700} {B}
+text 2 1 0 0 {290 -2690} {B}
+text 2 1 0 0 {280 -2680} {B}
+text 2 1 0 0 {310 -2100} {B}
+text 2 1 0 0 {300 -2900} {B}
+text 2 1 0 0 {310 -2900} {B}
+text 2 1 0 0 {310 -2890} {B}
+text 2 1 0 0 {300 -2890} {B}
+text 2 1 0 0 {300 -2900} {B}
+text 2 1 0 0 {310 -2890} {B}
+text 2 1 0 0 {300 -2880} {B}
+text 2 1 0 0 {290 -2890} {B}
+text 2 1 0 0 {300 -2900} {B}
+text 2 1 0 0 {300 -3100} {B}
+text 2 1 0 0 {289 -3088} {B}
+text 2 1 0 0 {299 -3098} {B}
+text 2 1 0 0 {300 -3300} {B}
+text 2 1 0 0 {310 -3300} {B}
+text 2 1 0 0 {310 -3290} {B}
+text 2 1 0 0 {300 -3290} {B}
+text 2 1 0 0 {300 -3300} {B}
+text 2 1 0 0 {310 -3290} {B}
+text 2 1 0 0 {300 -3280} {B}
+text 2 1 0 0 {290 -3290} {B}
+text 2 1 0 0 {300 -3300} {B}
+text 2 1 0 0 {300 -3500} {B}
+text 2 1 0 0 {288 -3488} {B}
+text 2 1 0 0 {297 -3497} {B}
+end_cell
+end_lib</pre>
+<h3>3.6 A single cell with one text object</h3>
+  <a name="3_6"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Text string specification by ID</li>
+    <li>Explicit assignment for text string ID</li>
+    <li>Access to undefined modal variable</li>
+  </ul>
+<h3>3.7 A single cell with one text object</h3>
+  <a name="3_7"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Text string specification by ID</li>
+    <li>Explicit assignment for text string ID</li>
+    <li>Access to undefined modal variable</li>
+  </ul>
+<h3>3.8 A single cell with one text object</h3>
+  <a name="3_8"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Text string specification by ID</li>
+    <li>Explicit assignment for text string ID</li>
+    <li>Access to undefined modal variable</li>
+  </ul>
+<h3>3.9 A single cell with one text object</h3>
+  <a name="3_9"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>TEXT record reading</li>
+    <li>Text string specification by ID</li>
+    <li>Implicit assignment of text ID</li>
+    <li>Access to (automatically) initialised modal variable text-x</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+text 1 2 0 0 {0 -200} {A}
+end_cell
+end_lib</pre>
+<h2>4 Rectangles</h2>
+<h3>4.1 A single cell with a variety of rectangles</h3>
+  <a name="4_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>RECTANGLE record reading</li>
+    <li>Repetitions of rectangles</li>
+    <li>Rectangle-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+box 1 2 {300 -400} {400 -200}
+box 1 2 {400 -500} {500 -300}
+box 1 2 {600 -300} {700 -100}
+box 1 2 {800 -300} {900 -100}
+box 2 3 {800 -600} {900 -400}
+box 2 3 {800 -900} {900 -700}
+box 2 3 {800 -1200} {900 -1000}
+box 2 3 {800 -1500} {950 -1350}
+box 2 3 {800 -1800} {950 -1650}
+box 2 3 {800 2000} {950 2150}
+box 2 3 {1000 2000} {1150 2150}
+box 2 3 {1300 2000} {1450 2150}
+box 2 3 {800 500} {950 650}
+box 2 3 {1000 500} {1150 650}
+box 2 3 {1200 500} {1350 650}
+box 2 3 {800 800} {950 950}
+box 2 3 {1000 800} {1150 950}
+box 2 3 {1200 800} {1350 950}
+box 2 3 {800 1100} {950 1250}
+box 2 3 {1000 1100} {1150 1250}
+box 2 3 {1200 1100} {1350 1250}
+box 2 3 {800 1400} {950 1550}
+box 2 3 {1000 1400} {1150 1550}
+box 2 3 {1200 1400} {1350 1550}
+end_cell
+end_lib</pre>
+<h3>4.2 A single cell with a variety of rectangles</h3>
+  <a name="4_2"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>RECTANGLE record reading</li>
+    <li>Repetitions of rectangles</li>
+    <li>Rectangle-related modal variables</li>
+    <li>Property attachement to rectangles in various combinations</li>
+  </ul>
+<h2>5 Polygons</h2>
+<h3>5.1 A single cell with a variety of polygons</h3>
+  <a name="5_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>POLYGON record reading</li>
+    <li>Repetitions of polygons</li>
+    <li>Polygon-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+boundary 1 2 {0 100} {0 200} {100 200} {100 150} {150 150} {150 100} {0 100}
+boundary 1 2 {-200 400} {-200 500} {-100 500} {-100 450} {-50 450} {-50 400} {-200 400}
+boundary 2 3 {0 400} {0 500} {100 500} {100 450} {150 450} {150 400} {0 400}
+boundary 2 3 {0 1000} {0 1100} {100 1100} {100 1050} {150 1050} {150 1000} {0 1000}
+boundary 2 3 {200 1000} {200 1150} {250 1150} {250 1100} {300 1100} {300 1000} {200 1000}
+boundary 2 3 {400 1000} {400 1050} {450 1050} {450 1100} {500 1100} {500 1050} {550 1050} {550 1000} {400 1000}
+boundary 2 3 {675 1000} {625 1050} {625 1100} {675 1150} {725 1150} {775 1100} {775 1050} {725 1000} {675 1000}
+boundary 2 3 {860 1000} {835 1025} {825 1100} {875 1150} {925 1150} {975 1100} {975 1050} {925 1000} {860 1000}
+boundary 2 3 {1100 1000} {1095 1575} {1135 1575} {1200 1550} {1275 1450} {1300 1300} {1275 1150} {1200 1050} {1125 1000} {1100 1000}
+boundary 2 3 {0 2000} {0 2150} {50 2150} {50 2100} {100 2100} {100 2000} {0 2000}
+boundary 2 3 {200 2000} {200 2150} {250 2150} {250 2100} {300 2100} {300 2000} {200 2000}
+boundary 2 3 {400 2000} {400 2150} {450 2150} {450 2100} {500 2100} {500 2000} {400 2000}
+boundary 2 3 {0 2300} {0 2450} {50 2450} {50 2400} {100 2400} {100 2300} {0 2300}
+boundary 2 3 {200 2300} {200 2450} {250 2450} {250 2400} {300 2400} {300 2300} {200 2300}
+boundary 2 3 {400 2300} {400 2450} {450 2450} {450 2400} {500 2400} {500 2300} {400 2300}
+boundary 2 3 {0 2600} {0 2750} {50 2750} {50 2700} {100 2700} {100 2600} {0 2600}
+boundary 2 3 {200 2600} {200 2750} {250 2750} {250 2700} {300 2700} {300 2600} {200 2600}
+boundary 2 3 {400 2600} {400 2750} {450 2750} {450 2700} {500 2700} {500 2600} {400 2600}
+boundary 2 3 {0 2900} {0 3050} {50 3050} {50 3000} {100 3000} {100 2900} {0 2900}
+boundary 2 3 {200 2900} {200 3050} {250 3050} {250 3000} {300 3000} {300 2900} {200 2900}
+boundary 2 3 {400 2900} {400 3050} {450 3050} {450 3000} {500 3000} {500 2900} {400 2900}
+boundary 2 1 {2000 2000} {2000 2150} {2050 2150} {2050 2100} {2100 2100} {2100 2000} {2000 2000}
+boundary 2 1 {2000 2200} {2000 2350} {2050 2350} {2050 2300} {2100 2300} {2100 2200} {2000 2200}
+boundary 2 1 {2000 2500} {2000 2650} {2050 2650} {2050 2600} {2100 2600} {2100 2500} {2000 2500}
+boundary 2 1 {1000 2000} {1000 2150} {1050 2150} {1050 2100} {1100 2100} {1100 2000} {1000 2000}
+boundary 2 1 {1200 2000} {1200 2150} {1250 2150} {1250 2100} {1300 2100} {1300 2000} {1200 2000}
+boundary 2 1 {1400 2000} {1400 2150} {1450 2150} {1450 2100} {1500 2100} {1500 2000} {1400 2000}
+boundary 2 1 {1000 2300} {1000 2450} {1050 2450} {1050 2400} {1100 2400} {1100 2300} {1000 2300}
+boundary 2 1 {1200 2300} {1200 2450} {1250 2450} {1250 2400} {1300 2400} {1300 2300} {1200 2300}
+boundary 2 1 {1400 2300} {1400 2450} {1450 2450} {1450 2400} {1500 2400} {1500 2300} {1400 2300}
+boundary 2 1 {1000 2600} {1000 2750} {1050 2750} {1050 2700} {1100 2700} {1100 2600} {1000 2600}
+boundary 2 1 {1200 2600} {1200 2750} {1250 2750} {1250 2700} {1300 2700} {1300 2600} {1200 2600}
+boundary 2 1 {1400 2600} {1400 2750} {1450 2750} {1450 2700} {1500 2700} {1500 2600} {1400 2600}
+boundary 2 1 {1000 2900} {1000 3050} {1050 3050} {1050 3000} {1100 3000} {1100 2900} {1000 2900}
+boundary 2 1 {1200 2900} {1200 3050} {1250 3050} {1250 3000} {1300 3000} {1300 2900} {1200 2900}
+boundary 2 1 {1400 2900} {1400 3050} {1450 3050} {1450 3000} {1500 3000} {1500 2900} {1400 2900}
+end_cell
+end_lib</pre>
+<h3>5.2 A single cell with a single huge polygons</h3>
+  <a name="5_2"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>POLYGON record reading</li>
+    <li>Polygons with many points</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+boundary 2 3 {-1000 0} {-990 20} {-1000 40} {-990 60} {-1000 80} {-990 100} {-1000 120} ... {-990 159980} {-1000 160000} {0 160000} {0 0} {-1000 0}
+end_cell
+end_lib</pre>
+<h3>5.3 A single cell with a variety of polygons</h3>
+  <a name="5_3"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>POLYGON record reading</li>
+    <li>Repetitions of polygons</li>
+    <li>Polygon-related modal variables</li>
+    <li>Property attachement to polygons in various combinations</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>end_cell
+end_lib</pre>
+<h2>6 Paths</h2>
+<h3>6.1 A single cell with a variety of paths</h3>
+  <a name="6_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>PATH record reading</li>
+    <li>Repetitions of paths</li>
+    <li>Path-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+path 1 2 20 5 -5 {0 100} {150 100} {150 150} {100 150}
+path 1 2 20 5 -5 {0 300} {150 300} {150 350} {100 350}
+path 1 2 20 0 -5 {0 500} {150 500} {150 550} {100 550}
+path 1 2 24 0 0 {0 700} {150 700} {150 750} {100 750}
+path 1 2 24 12 12 {0 900} {150 900} {150 950} {100 950}
+path 2 3 24 12 12 {0 1100} {150 1100} {150 1150} {100 1150}
+path 2 3 24 12 12 {0 1300} {150 1300} {150 1350} {100 1350}
+path 2 3 24 12 12 {200 1300} {350 1300} {350 1350} {300 1350}
+path 2 3 24 12 12 {400 1300} {550 1300} {550 1350} {500 1350}
+path 2 3 24 12 12 {0 1600} {150 1600} {150 1650} {100 1650}
+path 2 3 24 12 12 {200 1600} {350 1600} {350 1650} {300 1650}
+path 2 3 24 12 12 {400 1600} {550 1600} {550 1650} {500 1650}
+path 2 3 24 12 12 {0 1900} {150 1900} {150 1950} {100 1950}
+path 2 3 24 12 12 {200 1900} {350 1900} {350 1950} {300 1950}
+path 2 3 24 12 12 {400 1900} {550 1900} {550 1950} {500 1950}
+path 2 3 24 12 12 {0 2200} {150 2200} {150 2250} {100 2250}
+path 2 3 24 12 12 {200 2200} {350 2200} {350 2250} {300 2250}
+path 2 3 24 12 12 {400 2200} {550 2200} {550 2250} {500 2250}
+path 1 3 24 12 12 {1000 1300} {1150 1300} {1150 1350} {1100 1350}
+path 1 3 24 12 12 {1200 1300} {1350 1300} {1350 1350} {1300 1350}
+path 1 3 24 12 12 {1400 1300} {1550 1300} {1550 1350} {1500 1350}
+path 1 3 24 12 12 {1000 1600} {1150 1600} {1150 1650} {1100 1650}
+path 1 3 24 12 12 {1200 1600} {1350 1600} {1350 1650} {1300 1650}
+path 1 3 24 12 12 {1400 1600} {1550 1600} {1550 1650} {1500 1650}
+path 1 3 24 12 12 {1000 1900} {1150 1900} {1150 1950} {1100 1950}
+path 1 3 24 12 12 {1200 1900} {1350 1900} {1350 1950} {1300 1950}
+path 1 3 24 12 12 {1400 1900} {1550 1900} {1550 1950} {1500 1950}
+path 1 3 24 12 12 {1000 2200} {1150 2200} {1150 2250} {1100 2250}
+path 1 3 24 12 12 {1200 2200} {1350 2200} {1350 2250} {1300 2250}
+path 1 3 24 12 12 {1400 2200} {1550 2200} {1550 2250} {1500 2250}
+end_cell
+end_lib</pre>
+<h2>7 Trapezoids</h2>
+<h3>7.1 A single cell with a variety of trapezoids of types 23 to 25</h3>
+  <a name="7_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>Trapezoid record reading (types 23 to 25)</li>
+    <li>Repetitions of trapezoids</li>
+    <li>Trapezoid-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABC}
+boundary 1 2 {20 100} {0 150} {100 150} {60 100} {20 100}
+boundary 1 2 {100 400} {0 420} {0 450} {100 410} {100 400}
+boundary 1 2 {150 700} {0 720} {0 730} {150 750} {150 700}
+boundary 1 2 {0 1000} {20 1050} {130 1050} {150 1000} {0 1000}
+boundary 1 2 {200 1000} {220 1050} {330 1050} {350 1000} {200 1000}
+boundary 1 2 {400 1000} {420 1050} {530 1050} {550 1000} {400 1000}
+boundary 1 2 {0 1300} {20 1350} {130 1350} {150 1300} {0 1300}
+boundary 1 2 {200 1300} {220 1350} {330 1350} {350 1300} {200 1300}
+boundary 1 2 {400 1300} {420 1350} {530 1350} {550 1300} {400 1300}
+boundary 1 2 {0 1600} {20 1650} {130 1650} {150 1600} {0 1600}
+boundary 1 2 {200 1600} {220 1650} {330 1650} {350 1600} {200 1600}
+boundary 1 2 {400 1600} {420 1650} {530 1650} {550 1600} {400 1600}
+boundary 1 2 {0 1900} {20 1950} {130 1950} {150 1900} {0 1900}
+boundary 1 2 {200 1900} {220 1950} {330 1950} {350 1900} {200 1900}
+boundary 1 2 {400 1900} {420 1950} {530 1950} {550 1900} {400 1900}
+boundary 1 2 {1020 100} {1000 150} {1100 150} {1100 100} {1020 100}
+boundary 1 2 {1100 400} {1000 420} {1000 450} {1100 450} {1100 400}
+boundary 1 2 {1150 700} {1000 720} {1000 750} {1150 750} {1150 700}
+boundary 1 2 {1000 1000} {1020 1050} {1150 1050} {1150 1000} {1000 1000}
+boundary 1 2 {1200 1000} {1220 1050} {1350 1050} {1350 1000} {1200 1000}
+boundary 1 2 {1400 1000} {1420 1050} {1550 1050} {1550 1000} {1400 1000}
+boundary 1 2 {1000 1300} {1020 1350} {1150 1350} {1150 1300} {1000 1300}
+boundary 1 2 {1200 1300} {1220 1350} {1350 1350} {1350 1300} {1200 1300}
+boundary 1 2 {1400 1300} {1420 1350} {1550 1350} {1550 1300} {1400 1300}
+boundary 1 2 {1000 1600} {1020 1650} {1150 1650} {1150 1600} {1000 1600}
+boundary 1 2 {1200 1600} {1220 1650} {1350 1650} {1350 1600} {1200 1600}
+boundary 1 2 {1400 1600} {1420 1650} {1550 1650} {1550 1600} {1400 1600}
+boundary 1 2 {1000 1900} {1020 1950} {1150 1950} {1150 1900} {1000 1900}
+boundary 1 2 {1200 1900} {1220 1950} {1350 1950} {1350 1900} {1200 1900}
+boundary 1 2 {1400 1900} {1420 1950} {1550 1950} {1550 1900} {1400 1900}
+boundary 1 2 {2000 100} {2000 150} {2100 150} {2060 100} {2000 100}
+boundary 1 2 {2000 400} {2000 450} {2100 410} {2100 400} {2000 400}
+boundary 1 2 {2000 700} {2000 730} {2150 750} {2150 700} {2000 700}
+boundary 1 2 {2000 1000} {2000 1050} {2130 1050} {2150 1000} {2000 1000}
+boundary 1 2 {2200 1000} {2200 1050} {2330 1050} {2350 1000} {2200 1000}
+boundary 1 2 {2400 1000} {2400 1050} {2530 1050} {2550 1000} {2400 1000}
+boundary 1 2 {2000 1300} {2000 1350} {2130 1350} {2150 1300} {2000 1300}
+boundary 1 2 {2200 1300} {2200 1350} {2330 1350} {2350 1300} {2200 1300}
+boundary 1 2 {2400 1300} {2400 1350} {2530 1350} {2550 1300} {2400 1300}
+boundary 1 2 {2000 1600} {2000 1650} {2130 1650} {2150 1600} {2000 1600}
+boundary 1 2 {2200 1600} {2200 1650} {2330 1650} {2350 1600} {2200 1600}
+boundary 1 2 {2400 1600} {2400 1650} {2530 1650} {2550 1600} {2400 1600}
+boundary 1 2 {2000 1900} {2000 1950} {2130 1950} {2150 1900} {2000 1900}
+boundary 1 2 {2200 1900} {2200 1950} {2330 1950} {2350 1900} {2200 1900}
+boundary 1 2 {2400 1900} {2400 1950} {2530 1950} {2550 1900} {2400 1900}
+end_cell
+end_lib</pre>
+<h2>8 Placements</h2>
+<h3>8.1 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by name, child cell before top cell</h3>
+  <a name="8_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Hierarchical reader capabilities</li>
+    <li>PLACEMENT record reading</li>
+    <li>Repetitions of placements</li>
+    <li>Placed cell reference by string</li>
+    <li>Placement-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {A}
+box 1 2 {300 -400} {400 -200}
+end_cell
+begin_cell {TOP}
+sref {A} 0 0 1 {-300 400}
+sref {A} 0 0 1 {-300 800}
+sref {A} 0 0 1 {-300 1200}
+sref {A} 0 0 1 {0 1200}
+sref {A} 90 0 1 {700 1400}
+sref {A} 0 1 1 {700 400}
+sref {A} 90 1 1 {700 2400}
+aref {A} 270 1 1 3 4 {2000 0} {2900 0} {2000 1200}
+aref {A} 270 1 1 3 4 {4000 0} {4900 0} {4000 1200}
+aref {A} 270 1 1 3 1 {6000 0} {6960 0} {6000 0}
+aref {A} 270 1 1 1 4 {8000 0} {8000 0} {8000 1240}
+sref {A} 270 1 1 {10000 0}
+sref {A} 270 1 1 {10320 0}
+sref {A} 270 1 1 {10650 0}
+sref {A} 270 1 1 {10990 0}
+aref {A} 270 1 1 3 4 {12000 0} {12930 960} {10680 1320}
+end_cell
+end_lib</pre>
+<h3>8.2 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by name, child cell after top cell</h3>
+  <a name="8_2"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Hierarchical reader capabilities</li>
+    <li>PLACEMENT record reading</li>
+    <li>Placed cell reference by string</li>
+    <li>Placement-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {A}
+box 1 2 {300 -400} {400 -200}
+end_cell
+begin_cell {TOP}
+sref {A} 0 0 1 {-300 400}
+sref {A} 0 0 1 {-300 800}
+sref {A} 0 0 1 {-300 1200}
+sref {A} 0 0 1 {0 1200}
+sref {A} 90 0 1 {700 1400}
+sref {A} 0 1 1 {700 400}
+sref {A} 90 1 1 {700 2400}
+end_cell
+end_lib</pre>
+<h3>8.3 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by ID, child cell before top cell</h3>
+  <a name="8_3"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Hierarchical reader capabilities</li>
+    <li>PLACEMENT record reading</li>
+    <li>Placed cell reference by ID</li>
+    <li>Placement-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {A}
+box 1 2 {300 -400} {400 -200}
+end_cell
+begin_cell {TOP}
+sref {A} 0 0 1 {-300 400}
+sref {A} 0 0 1 {-300 800}
+sref {A} 0 0 1 {-300 1200}
+sref {A} 0 0 1 {0 1200}
+sref {A} 90 0 1 {700 1400}
+sref {A} 0 1 1 {700 400}
+sref {A} 90 1 1 {700 2400}
+end_cell
+end_lib</pre>
+<h3>8.4 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by ID, child cell after top cell</h3>
+  <a name="8_4"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Hierarchical reader capabilities</li>
+    <li>PLACEMENT record reading</li>
+    <li>Repetitions of placements</li>
+    <li>Placed cell reference by ID</li>
+    <li>Placement-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {A}
+box 1 2 {300 -400} {400 -200}
+end_cell
+begin_cell {TOP}
+aref {A} 0 0 1 3 4 {-300 400} {-240 400} {-300 520}
+aref {A} 0 0 1 3 4 {-300 800} {-240 800} {-300 920}
+aref {A} 0 0 1 3 4 {-300 1200} {-240 1200} {-300 1320}
+aref {A} 0 0 1 3 4 {0 1200} {60 1200} {0 1320}
+aref {A} 90 0 1 3 4 {700 1400} {760 1400} {700 1520}
+aref {A} 0 1 1 3 4 {700 400} {760 400} {700 520}
+aref {A} 90 1 1 3 4 {700 2400} {760 2400} {700 2520}
+end_cell
+end_lib</pre>
+<h3>8.5 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by ID, child cell after top cell</h3>
+  <a name="8_5"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Hierarchical reader capabilities</li>
+    <li>PLACEMENT record reading</li>
+    <li>Placed cell reference by ID</li>
+    <li>Placement-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {A}
+box 1 2 {300 -400} {400 -200}
+end_cell
+begin_cell {TOP}
+sref {A} 0 0 1 {-300 400}
+sref {A} 0 0 1 {-300 800}
+sref {A} 0 0 1 {-300 1200}
+sref {A} 0 0 1 {0 1200}
+sref {A} 90 0 1 {700 1400}
+sref {A} 0 1 1 {700 400}
+sref {A} 90 1 1 {700 2400}
+end_cell
+end_lib</pre>
+<h3>8.6 A top cell and one child cell with one rectangle, child cell instantiated in various ways with magnification, cells specified by name, top cell before child cell</h3>
+  <a name="8_6"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Hierarchical reader capabilities</li>
+    <li>PLACEMENT record reading</li>
+    <li>Placements with magnification</li>
+    <li>Placed cell reference by string</li>
+    <li>Placement-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {A}
+box 1 2 {300 -400} {400 -200}
+end_cell
+begin_cell {TOP}
+sref {A} 0 0 0.5 {-150 200}
+sref {A} 0 0 1 {-300 800}
+sref {A} 0 0 1 {-300 1200}
+sref {A} 0 0 1 {0 1200}
+sref {A} 90 0 1 {700 1400}
+sref {A} 0 1 1 {700 400}
+sref {A} 270 1 1 {700 2400}
+end_cell
+begin_cell {TOPTOP}
+sref {TOP} 0 0 1 {200 1000}
+sref {TOP} 90 0 0.5 {100 0}
+end_cell
+end_lib</pre>
+<h3>8.7 A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by ID, child cell after top cell, forward references to IDs</h3>
+  <a name="8_7"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Hierarchical reader capabilities</li>
+    <li>PLACEMENT record reading</li>
+    <li>Placed cell reference by ID</li>
+    <li>Forward references to ID declaration (ID to string assignment after use of ID)</li>
+    <li>Placement-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {A}
+box 1 2 {300 -400} {400 -200}
+end_cell
+begin_cell {TOP}
+sref {A} 0 0 1 {-300 400}
+sref {A} 0 0 1 {-300 800}
+sref {A} 0 0 1 {-300 1200}
+sref {A} 0 0 1 {0 1200}
+sref {A} 90 0 1 {700 1400}
+sref {A} 0 1 1 {700 400}
+sref {A} 90 1 1 {700 2400}
+end_cell
+end_lib</pre>
+<h3>8.8 A top cell and one child cell with one rectangle, child cell instantiated in various ways with magnification, cells specified by name, top cell before child cell</h3>
+  <a name="8_8"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Hierarchical reader capabilities</li>
+    <li>PLACEMENT record reading</li>
+    <li>Placements with magnification</li>
+    <li>Placements with arbitrary rotation angles</li>
+    <li>Placed cell reference by string</li>
+    <li>Placement-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {A}
+box 1 2 {300 -400} {400 -200}
+end_cell
+begin_cell {TOP}
+sref {A} 0 0 0.5 {-150 200}
+sref {A} 0 0 1 {-300 800}
+sref {A} 0 0 1 {-300 1200}
+sref {A} 0 0 1 {0 1200}
+sref {A} 90 0 1 {700 1400}
+sref {A} 0 1 1 {700 400}
+sref {A} 270 1 1 {700 2400}
+end_cell
+begin_cell {TOPTOP}
+sref {TOP} 0 0 1 {200 1000}
+sref {TOP} 90 0 0.5 {100 0}
+end_cell
+end_lib</pre>
+<h2>9 Ctrapezoids</h2>
+<h3>9.1 A single cell with a variety of CTRAPEZOID objects</h3>
+  <a name="9_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>CTRAPEZOID record reading</li>
+    <li>Repetitions of CTRAPEZOIDs</li>
+    <li>Trapezoid-related modal variables</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {A}
+boundary 1 2 {-100 200} {-100 400} {0 400} {0 200} {-100 200}
+boundary 1 2
+boundary 1 2 {-100 1000} {-100 1100} {50 1100} {150 1000} {-100 1000}
+boundary 1 2 {-100 1400} {-100 1500} {150 1500} {50 1400} {-100 1400}
+boundary 1 2 {-100 1800} {0 1900} {150 1900} {150 1800} {-100 1800}
+boundary 1 2 {0 2200} {-100 2300} {150 2300} {150 2200} {0 2200}
+boundary 1 2 {-100 2600} {0 2700} {50 2700} {150 2600} {-100 2600}
+boundary 1 2 {0 3000} {-100 3100} {150 3100} {50 3000} {0 3000}
+boundary 1 2 {-100 3400} {0 3500} {150 3500} {50 3400} {-100 3400}
+boundary 1 2 {0 3800} {-100 3900} {50 3900} {150 3800} {0 3800}
+boundary 1 2 {-100 4200} {-100 4450} {0 4350} {0 4200} {-100 4200}
+boundary 1 2 {-100 4600} {-100 4750} {0 4850} {0 4600} {-100 4600}
+boundary 1 2 {-100 5000} {-100 5250} {0 5250} {0 5100} {-100 5000}
+boundary 1 2 {0 5400} {-100 5500} {-100 5650} {0 5650} {0 5400}
+boundary 1 2 {-100 5800} {-100 6050} {0 5950} {0 5900} {-100 5800}
+boundary 1 2 {0 6200} {-100 6300} {-100 6350} {0 6450} {0 6200}
+boundary 1 2 {-100 6600} {-100 6750} {0 6850} {0 6700} {-100 6600}
+boundary 1 2 {0 7000} {-100 7100} {-100 7250} {0 7150} {0 7000}
+boundary 1 2 {-100 7400} {-100 7650} {150 7400} {-100 7400}
+boundary 1 2 {-100 7800} {-100 8050} {150 8050} {-100 7800}
+boundary 1 2 {-100 8200} {150 8450} {150 8200} {-100 8200}
+boundary 1 2 {150 8600} {-100 8850} {150 8850} {150 8600}
+boundary 1 2 {-100 9000} {0 9100} {100 9000} {-100 9000}
+boundary 1 2 {0 9400} {-100 9500} {100 9500} {0 9400}
+boundary 1 2 {-100 9800} {-100 10000} {0 9900} {-100 9800}
+boundary 1 2 {0 10200} {-100 10300} {0 10400} {0 10200}
+boundary 1 2 {-100 10600} {-100 10700} {150 10700} {150 10600} {-100 10600}
+boundary 1 2 {-100 11000} {-100 11250} {150 11250} {150 11000} {-100 11000}
+boundary 2 3 {-100 11400} {-100 11650} {150 11650} {150 11400} {-100 11400}
+boundary 2 3 {300 11400} {300 11650} {550 11650} {550 11400} {300 11400}
+boundary 2 3 {700 11400} {700 11650} {950 11650} {950 11400} {700 11400}
+boundary 2 3 {-100 11700} {-100 11950} {150 11950} {150 11700} {-100 11700}
+boundary 2 3 {300 11700} {300 11950} {550 11950} {550 11700} {300 11700}
+boundary 2 3 {700 11700} {700 11950} {950 11950} {950 11700} {700 11700}
+boundary 2 3 {-100 12000} {-100 12250} {150 12250} {150 12000} {-100 12000}
+boundary 2 3 {300 12000} {300 12250} {550 12250} {550 12000} {300 12000}
+boundary 2 3 {700 12000} {700 12250} {950 12250} {950 12000} {700 12000}
+boundary 2 3 {-100 12300} {-100 12550} {150 12550} {150 12300} {-100 12300}
+boundary 2 3 {300 12300} {300 12550} {550 12550} {550 12300} {300 12300}
+boundary 2 3 {700 12300} {700 12550} {950 12550} {950 12300} {700 12300}
+box 2 3 {-100 600} {0 600}
+box 2 3 {-100 1000} {150 1100}
+box 2 3 {-100 1400} {150 1500}
+box 2 3 {-100 1800} {150 1900}
+box 2 3 {-100 2200} {150 2300}
+box 2 3 {-100 2600} {150 2700}
+box 2 3 {-100 3000} {150 3100}
+box 2 3 {-100 3400} {150 3500}
+box 2 3 {-100 3800} {150 3900}
+box 2 3 {-100 4200} {0 4450}
+box 2 3 {-100 4600} {0 4850}
+box 2 3 {-100 5000} {0 5250}
+box 2 3 {-100 5400} {0 5650}
+box 2 3 {-100 5800} {0 6050}
+box 2 3 {-100 6200} {0 6450}
+box 2 3 {-100 6600} {0 6850}
+box 2 3 {-100 7000} {0 7250}
+box 2 3 {-100 7400} {150 7650}
+box 2 3 {-100 7800} {150 8050}
+box 2 3 {-100 8200} {150 8450}
+box 2 3 {-100 8600} {150 8850}
+box 2 3 {-100 9000} {100 9100}
+box 2 3 {-100 9400} {100 9500}
+box 2 3 {-100 9800} {0 10000}
+box 2 3 {-100 10200} {0 10400}
+box 2 3 {-100 10600} {150 10700}
+box 2 3 {-100 11000} {150 11250}
+end_cell
+end_lib</pre>
+<h3>9.2 A single cell with one CTRAPEZOID object</h3>
+  <a name="9_2"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>CTRAPEZOID record reading</li>
+    <li>Unused CTRAPEZOID-related modal variable "height" not being tested</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {A}
+boundary 1 2 {-100 200} {-100 400} {100 200} {-100 200}
+boundary 1 2 {-100 600} {-100 800} {100 600} {-100 600}
+end_cell
+end_lib</pre>
+<h2>10 Modal variables</h2>
+<h3>10.1 Some cells with content (texts, rectangles) and instances</h3>
+  <a name="10_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>Hierarchical reader capabilities</li>
+    <li>Reset of modal variables upon entry to a new cell</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {A}
+box 1 2 {0 0} {10 20}
+box 1 2 {100 -100} {110 -80}
+box 1 2 {200 -200} {210 -180}
+box 1 2 {300 -300} {310 -280}
+text 2 1 0 0 {0 0} {A}
+text 2 1 0 0 {100 -100} {A}
+text 2 1 0 0 {200 -200} {A}
+text 2 1 0 0 {300 -300} {A}
+end_cell
+begin_cell {B}
+sref {A} 0 0 1 {0 0}
+sref {A} 0 0 1 {50 50}
+box 1 2 {0 0} {20 10}
+box 1 2 {100 100} {120 110}
+box 1 2 {200 200} {220 210}
+box 1 2 {300 300} {320 310}
+text 2 1 0 0 {0 0} {B}
+text 2 1 0 0 {100 100} {B}
+text 2 1 0 0 {200 200} {B}
+text 2 1 0 0 {300 300} {B}
+end_cell
+begin_cell {TOP}
+sref {B} 0 0 1 {0 0}
+box 1 2 {0 0} {50 5}
+text 2 1 0 0 {0 0} {TOP}
+end_cell
+end_lib</pre>
+<h2>11 Properties</h2>
+<h3>11.1 Various shapes with properties</h3>
+  <a name="11_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Properties reader capabilities</li>
+    <li>PROPERTY record reading</li>
+    <li>PROPSTRING record reading</li>
+    <li>PROPNAME record reading</li>
+    <li>Property string references by ID</li>
+    <li>Property name references by ID</li>
+  </ul>
+<h3>11.2 Various repeated shapes with properties</h3>
+  <a name="11_2"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Properties reader capabilities</li>
+    <li>PROPERTY record reading on repeated shapes</li>
+    <li>PROPSTRING record reading</li>
+    <li>PROPNAME record reading</li>
+    <li>Property string references by ID</li>
+    <li>Property name references by ID</li>
+  </ul>
+<h3>11.3 Various shapes with S_GDS_PROPERTY properties</h3>
+  <a name="11_3"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Properties reader capabilities</li>
+    <li>PROPERTY record reading</li>
+    <li>PROPSTRING record reading</li>
+    <li>PROPNAME record reading</li>
+    <li>S_GDS_PROPERTY interpretation</li>
+    <li>Property string references by ID</li>
+    <li>Property name references by ID</li>
+  </ul>
+<h3>11.4 Instances with properties</h3>
+  <a name="11_4"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Properties reader capabilities</li>
+    <li>PROPERTY record reading</li>
+    <li>PROPSTRING record reading</li>
+    <li>PROPNAME record reading</li>
+    <li>Property string references by ID</li>
+    <li>Property name references by ID</li>
+    <li>Instances with properties</li>
+  </ul>
+<h3>11.5 Various repeated shapes with properties</h3>
+  <a name="11_5"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Properties reader capabilities</li>
+    <li>PROPERTY record reading on repeated shapes</li>
+    <li>PROPSTRING record reading</li>
+    <li>PROPNAME record reading</li>
+    <li>Property string references by ID</li>
+    <li>Property name references by ID</li>
+    <li>Forward references</li>
+  </ul>
+<h3>11.6 Instances with properties</h3>
+  <a name="11_6"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Properties reader capabilities</li>
+    <li>PROPERTY record reading</li>
+    <li>PROPSTRING record reading</li>
+    <li>PROPNAME record reading</li>
+    <li>Property string references by ID</li>
+    <li>Property name references by ID</li>
+    <li>Instances with properties</li>
+  </ul>
+<h2>12 Circles</h2>
+<h3>12.1 A single cell with a variety of circles</h3>
+  <a name="12_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>CIRCLE record reading</li>
+    <li>Repetitions of circles</li>
+    <li>Circle-related modal variables</li>
+  </ul>
+<h2>13 Layer names</h2>
+<h3>13.1 A single cell with a variety of circles on named layers</h3>
+  <a name="13_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>LAYERNAME record reading</li>
+    <li>Mapping of layer and datatype ranges to names</li>
+  </ul>
+<h3>13.2 A single cell with a variety of texts on named layers</h3>
+  <a name="13_2"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>LAYERNAME record reading</li>
+    <li>Mapping of textlayer and texttype ranges to names</li>
+  </ul>
+<h3>13.3 A single cell with a variety of circles on named layers</h3>
+  <a name="13_3"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>LAYERNAME record reading</li>
+    <li>Mapping of layer and datatype ranges to names, mapping of textlayer and texttype ranges to names in the same context but to different names</li>
+  </ul>
+<h3>13.4 A single cell with a variety of circles on named layers</h3>
+  <a name="13_4"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Geometrical objects reader capabilities</li>
+    <li>LAYERNAME record reading</li>
+    <li>LAYERNAME records at end of file</li>
+    <li>Mapping of layer and datatype ranges to names, mapping of textlayer and texttype ranges to names in the same context but to different names</li>
+  </ul>
+<h2>14 CBLOCK compression</h2>
+<h3>14.1 A cell with a variety of polygons in a CBLOCK-compressed file</h3>
+  <a name="14_1"/>
+  <p><a href="#top">Back to top</a></p>
+  <p>Test targets:</p>
+  <ul>
+    <li>Basic objects reader capabilities</li>
+    <li>CBLOCK record reading</li>
+  </ul>
+  <p>Normalized content:</p>
+  <pre>begin_lib 0.001
+begin_cell {ABCDH}
+box 0 0 {110 1270} {650 1800}
+boundary 1 0 {1970 1590} {1490 1640} {1520 2000} {2150 2020} {1970 1590}
+boundary 1 0 {120 680} {50 900} {-400 860} {-370 1260} {-400 2630} {940 2570} {900 1750} {690 1740} {690 1840} {80 1850} {80 1240} {700 1230} {680 1700} {1340 1700} {1320 2170} {2130 2160} {2120 2060} {1490 2040} {1440 1540} {870 1530} {870 870} {130 890} {120 680}
+boundary 1 0 {2220 610} {1730 660} {1690 1420} {2330 1410} {2220 610}
+boundary 1 0 {-210 -100} {-420 810} {-50 850} {90 470} {430 460} {460 360} {140 380} {270 -80} {-210 -100}
+boundary 1 0 {1620 640} {1560 780} {170 830} {180 860} {900 840} {920 860} {1610 860} {1600 1510} {1580 1540} {1490 1530} {1500 1600} {1970 1570} {1990 1450} {1670 1450} {1710 660} {1620 640}
+boundary 1 0 {1690 -80} {370 -40} {300 330} {610 300} {620 520} {870 480} {910 260} {1250 270} {1230 560} {160 580} {160 810} {1540 750} {1690 -80}
+boundary 1 0 {970 1740} {970 2590} {1900 2530} {1910 2200} {1290 2220} {1300 1740} {970 1740}
+boundary 1 0 {2030 1450} {2020 1590} {2160 2000} {2150 2190} {1940 2200} {1930 2530} {2430 2480} {2300 1450} {2030 1450}
+box 1 0 {900 890} {1580 1500}
+end_cell
+end_lib</pre>
+</body>
+</html>

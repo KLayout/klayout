@@ -1,0 +1,38 @@
+# <test>
+#   <name>t2.6.ot</name>
+#   <content-description>Two empty cells</content-description>
+#   <test-intention>Basic reader capabilities</test-intention>
+#   <test-intention>CELL record reading</test-intention>
+#   <test-intention>Cell name specification by ID</test-intention>
+#   <test-intention>Explicit assignment of ID's</test-intention>
+#   <test-intention>Invalid string used for cell name</test-intention>
+#   <must-fail>Invalid n-string</must-fail>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# ABC gets assigned 1 
+record CELLNAME_ID
+  str ABC 
+  uint 1
+
+# XYZ gets assigned 0 
+record CELLNAME_ID
+  str " XYZ"  ;# FAIL: invalid n-string
+  uint 0
+
+# Cell XYZ (empty)
+record CELL_ID
+  uint 0
+
+# Cell ABC
+record CELL_ID
+  uint 1
+
+# no body.
+
+tail
+

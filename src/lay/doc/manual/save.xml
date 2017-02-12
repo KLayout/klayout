@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Saving A Layout Or Parts Of It</title>
+  <keyword name="Save layout"/>
+  <keyword name="Save a cell"/>
+
+  <p>
+  A layout or a subcell of it can be saved to either GDS2 or OASIS. 
+  To save a layout, choose "Save As" from the "File" menu. To save just a cell, select the cell in
+  the cell tree (it does not need to be the currently shown one) and select "Save Current Cell As" from
+  the context menu (right mouse button) of the cell tree.
+  </p>
+
+  <p>
+  A file dialog will pop up to select the file name to which to write the cell or layout.
+  After a file has been selected, an option dialog will be shown to specify further options.
+  In this dialog, it is possible to constrain saving to a subset of layers, i.e. just visible ones.  
+  Also, the database unit can be changed or the layout can be scaled by a given factor.
+  </p>
+
+  <p>
+  For OASIS, a compression level can be specified. At a level of 0, no particular attempt is made to
+  compress shapes. At higher levels, shapes are classified and array compression is tried. The higher
+  the level, the more attempts are made to compress shapes into arrays. In particular for flat layouts, 
+  compression of shapes requires some memory and slows down OASIS writing considerably.
+  </p>
+
+</doc>
+

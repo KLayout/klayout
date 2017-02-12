@@ -1,0 +1,43 @@
+# <test>
+#   <name>t2.2.ot</name>
+#   <content-description>Two empty cells</content-description>
+#   <test-intention>Basic reader capabilities</test-intention>
+#   <test-intention>CELL record reading</test-intention>
+#   <test-intention>Cell name specification by ID</test-intention>
+#   <test-intention>Backward referencing of cell name ID</test-intention>
+#   <test-intention>Implicit assignment of ID's</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     begin_cell {ABC}
+#     end_cell
+#     begin_cell {XYZ}
+#     end_cell
+#     end_lib
+#   </content>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# XYZ gets assigned 0 implicitly
+record CELLNAME
+  str XYZ 
+
+# ABC gets assigned 1 implicitly
+record CELLNAME
+  str ABC
+
+# Cell XYZ (empty)
+record CELL_ID
+  uint 0
+
+# Cell ABC
+record CELL_ID
+  uint 1
+
+# no body.
+
+tail
+

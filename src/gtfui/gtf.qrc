@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="gtf_basic.png">images/gtf_basic.png</file>
+        <file alias="gtf_lb.png">images/gtf_lb.png</file>
+        <file alias="gtf_mb.png">images/gtf_mb.png</file>
+        <file alias="gtf_rb.png">images/gtf_rb.png</file>
+    </qresource>
+</RCC>

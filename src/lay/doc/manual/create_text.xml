@@ -1,0 +1,35 @@
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Creating A Text Object</title>
+  <keyword name="Drawing"/>
+  <keyword name="Text"/>
+
+  <p>
+  Select "Text" mode from the toolbar. The editor options dialog will open that additionally prompts for 
+  the text string. 
+  Don't forget to click "Apply" to take over the current string. If the dialog has been
+  closed unintentionally, it can be reopened with the F3 shortcut.
+  </p>
+
+  <p>
+  To actually draw the text, move the mouse to the desired location and left-click to place it.
+  </p>
+
+  <p>
+  A text can be given a size which is stored in a GDS2 file (OASIS files do not provide this feature). 
+  The size of the text is only shown in the layout if a scalable text font is selected (the "Default" font
+  is not scalable) and text scaling is enabled. In order to do so, choose a scalable font from the "Text font" 
+  selection box in the "Display" tab of the setup dialog and check the "Apply text scaling and rotation" box in 
+  the same tab. 
+  </p>
+
+  <p>
+  The text can also be rotated, which is shown as well only if text scaling and rotation is enabled. 
+  To rotate a text while placing it, click the right mouse button. This will rotate the text by 90 degree
+  counterclockwise.
+  </p>
+
+</doc>
+

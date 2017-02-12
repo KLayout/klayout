@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Other Transformations Of The Selection</title>
+  <keyword name="Selection"/>
+  <keyword name="Editing"/>
+  <keyword name="Transforming selection"/>
+
+  <p>
+  The selection can be flipped at x- or y-axis, rotated as a whole or moved by a certain distance using the 
+  functions available in the "Selection" submenu of the "Edit" menu. For example, "Flip Vertically" flips the
+  selection at the x-axis. A selection can be rotated by an arbitrary angle using the "Rotation By Angle" function 
+  from the "Selection" submenu.
+  </p>
+
+</doc>
+

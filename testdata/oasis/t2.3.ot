@@ -1,0 +1,37 @@
+# <test>
+#   <name>t2.3.ot</name>
+#   <content-description>Two empty cells</content-description>
+#   <test-intention>Basic reader capabilities</test-intention>
+#   <test-intention>CELL record reading</test-intention>
+#   <test-intention>Cell name specification by ID</test-intention>
+#   <test-intention>Backward referencing of cell name ID</test-intention>
+#   <test-intention>Mixing of implicit and explicit assignment of ID's</test-intention>
+#   <must-fail>Explicit and implicit CELLNAME modes cannot be mixed</must-fail>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# XYZ gets assigned 1 
+record CELLNAME_ID
+  str ABC 
+  uint 1
+
+# ABC gets assigned 0 implicitly
+record CELLNAME
+  str XYZ  ;# FAIL: implicit and explicit assignment may not be mixed
+
+# Cell XYZ (empty)
+record CELL_ID
+  uint 0
+
+# Cell ABC
+record CELL_ID
+  uint 1
+
+# no body.
+
+tail
+

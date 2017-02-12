@@ -1,0 +1,646 @@
+
+/*
+
+  KLayout Layout Viewer
+  Copyright (C) 2006-2016 Matthias Koefferlein
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+*/
+
+
+
+#include "gsiDecl.h"
+#include "dbLayout.h"
+#include "dbLibrary.h"
+#include "dbPCellDeclaration.h"
+#include "dbLibrary.h"
+#include "dbLibraryManager.h"
+
+namespace gsi
+{
+
+// ---------------------------------------------------------------
+//  db::Library binding
+
+/**
+ *  @brief A basic implementation of the library 
+ */
+static db::Library *new_lib ()
+{
+  return new db::Library ();
+}
+
+static db::Library *library_by_name (const std::string &name)
+{
+  return db::LibraryManager::instance ().lib_ptr_by_name (name);
+}
+
+static std::vector<std::string> library_names ()
+{
+  std::vector<std::string> r;
+  for (db::LibraryManager::iterator l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
+    r.push_back (l->first);
+  }
+  return r;
+}
+
+static void register_lib (db::Library *lib, const std::string &name)
+{
+  lib->set_name (name);
+  db::LibraryManager::instance ().register_lib (lib);
+}
+
+static void delete_lib (db::Library *lib)
+{
+  db::LibraryManager::instance ().delete_lib (lib);
+}
+
+Class<db::Library> decl_Library ("Library", 
+  gsi::constructor ("new", &new_lib,
+    "@brief Creates a new, empty library"
+  ) +
+  gsi::method ("library_by_name", &library_by_name,
+    "@brief Gets a library by name\n"
+    "@args name\n"
+    "Returns the library object for the given name. If the name is not a valid\n"
+    "library name, nil is returned.\n"
+  ) +
+  gsi::method ("library_names", &library_names,
+    "@brief Returns a list of the names of all libraries registered in the system.\n"
+  ) +
+  gsi::method_ext ("register", &register_lib,
+    "@brief Registers the library with the given name\n"
+    "@args name\n"
+    "\n"
+    "This method can be called in the constructor to register the library after \n"
+    "the layout object has been filled with content. If a library with that name\n"
+    "already exists, it will be replaced with this library. \n"
+    "\n"
+    "This method will set the libraries' name.\n"
+  ) +
+  gsi::method_ext ("delete", &delete_lib,
+    "@brief Deletes the library\n"
+    "\n"
+    "This method will delete the library object. Library proxies pointing to this library will become "
+    "invalid and the library object cannot be used any more after calling this method.\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
+  gsi::method ("name", &db::Library::get_name, 
+    "@brief Returns the libraries' name\n"
+    "The name is set when the library is registered and cannot be changed\n"
+  ) +
+  gsi::method ("id", &db::Library::get_id, 
+    "@brief Returns the library's ID\n"
+    "The ID is set when the library is registered and cannot be changed \n"
+  ) +
+  gsi::method ("description", &db::Library::get_description, 
+    "@brief Returns the libraries' description text\n"
+  ) +
+  gsi::method ("description=", &db::Library::set_description, 
+    "@brief Sets the libraries' description text\n"
+    "@args description\n"
+  ) +
+  gsi::method ("layout_const", (const db::Layout &(db::Library::*)() const) &db::Library::layout, 
+    "@brief The layout object where the cells reside that this library defines (const version)\n"
+  ) +
+  gsi::method ("layout", (db::Layout &(db::Library::*)()) &db::Library::layout, 
+    "@brief The layout object where the cells reside that this library defines\n"
+  ),
+  "@brief A Library \n"
+  "\n"
+  "A library is basically a wrapper around a layout object. The layout object\n"
+  "provides cells and potentially PCells that can be imported into other layouts.\n"
+  "\n"
+  "The library provides a name which is used to identify the library and a description\n"
+  "which is used for identifying the library in a user interface. \n"
+   "\n"
+  "After a library is created and the layout is filled, it must be registered using the register method.\n"
+  "\n"
+  "This class has been introduced in version 0.22.\n"
+);
+
+// ---------------------------------------------------------------
+//  db::PCellDeclaration binding
+
+static std::vector<db::LayerProperties> get_layer_declarations_native (const db::PCellDeclaration *pd, const db::pcell_parameters_type &parameters)
+{
+  std::vector<db::PCellLayerDeclaration> lp = pd->db::PCellDeclaration::get_layer_declarations (parameters);
+  std::vector<db::LayerProperties> ret;
+  for (std::vector<db::PCellLayerDeclaration>::const_iterator l = lp.begin (); l != lp.end (); ++l) {
+    ret.push_back (db::LayerProperties(*l));
+  }
+  return ret;
+}
+
+static db::pcell_parameters_type coerce_parameters_native (const db::PCellDeclaration *pd, const db::Layout &layout, const db::pcell_parameters_type &input)
+{
+  db::pcell_parameters_type param = input;
+  pd->db::PCellDeclaration::coerce_parameters (layout, param);
+  return param;
+}
+
+//  Provide a binding for db::PCellDeclaration for native PCell implementations
+Class<db::PCellDeclaration> decl_PCellDeclaration_Native ("PCellDeclaration_Native", 
+  gsi::method_ext ("get_layers", &get_layer_declarations_native) +
+  gsi::method ("get_parameters", &db::PCellDeclaration::get_parameter_declarations) +
+  gsi::method ("produce", &db::PCellDeclaration::produce) +
+  gsi::method_ext ("coerce_parameters", &coerce_parameters_native) +
+  gsi::method ("can_create_from_shape", &db::PCellDeclaration::can_create_from_shape) +
+  gsi::method ("parameters_from_shape", &db::PCellDeclaration::parameters_from_shape) +
+  gsi::method ("transformation_from_shape", &db::PCellDeclaration::transformation_from_shape) +
+  gsi::method ("display_text", &db::PCellDeclaration::get_display_name) +
+  gsi::method ("id", &db::PCellDeclaration::id,
+    "@brief Gets the integer ID of the PCell declaration\n"
+    "This ID is used to identify the PCell in the context of a Layout object for example"
+  ) +
+  gsi::method ("name", &db::PCellDeclaration::name,
+    "@brief Gets the name of the PCell\n"
+  ),
+  "@hide\n@alias PCellDeclaration\n"
+);
+
+class PCellDeclarationImpl
+  : public db::PCellDeclaration
+{
+public:
+  //  dummy implementation to provide the signature 
+  virtual std::vector<db::LayerProperties> get_layer_declarations_impl (const db::pcell_parameters_type &) const
+  {
+    return std::vector<db::LayerProperties> ();
+  }
+
+  virtual std::vector<db::PCellLayerDeclaration> get_layer_declarations (const db::pcell_parameters_type &parameters) const
+  {
+    std::vector<db::LayerProperties> lp;
+    if (cb_get_layer_declarations.can_issue ()) {
+      lp = cb_get_layer_declarations.issue<PCellDeclarationImpl, std::vector<db::LayerProperties>, const db::pcell_parameters_type &> (&PCellDeclarationImpl::get_layer_declarations_impl, parameters);
+    } else {
+      lp = PCellDeclarationImpl::get_layer_declarations_impl (parameters);
+    }
+
+    std::vector<db::PCellLayerDeclaration> ret;
+    for (std::vector<db::LayerProperties>::const_iterator l = lp.begin (); l != lp.end (); ++l) {
+      ret.push_back (db::PCellLayerDeclaration (*l));
+    }
+
+    return ret;
+  }
+
+  std::vector<db::PCellParameterDeclaration> get_parameter_declarations_fb () const
+  {
+    return db::PCellDeclaration::get_parameter_declarations ();
+  }
+
+  virtual std::vector<db::PCellParameterDeclaration> get_parameter_declarations () const
+  {
+    if (cb_get_parameter_declarations.can_issue ()) {
+      return cb_get_parameter_declarations.issue<db::PCellDeclaration, std::vector<db::PCellParameterDeclaration> > (&db::PCellDeclaration::get_parameter_declarations);
+    } else {
+      return db::PCellDeclaration::get_parameter_declarations ();
+    }
+  }
+
+  //  dummy implementation to provide the signature 
+  virtual db::pcell_parameters_type coerce_parameters_impl (const db::Layout & /*layout*/, const db::pcell_parameters_type &input) const
+  {
+    return input;
+  }
+
+  virtual void coerce_parameters (const db::Layout &layout, db::pcell_parameters_type &parameters) const
+  {
+    db::pcell_parameters_type output;
+    if (cb_coerce_parameters.can_issue ()) {
+      output = cb_coerce_parameters.issue<PCellDeclarationImpl, db::pcell_parameters_type, const db::Layout &, const db::pcell_parameters_type &> (&PCellDeclarationImpl::coerce_parameters_impl, layout, parameters);
+    } else {
+      output = PCellDeclarationImpl::coerce_parameters_impl (layout, parameters);
+    }
+    if (! output.empty ()) {
+      parameters = output;
+    }
+  }
+
+  void produce_fb (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
+  {
+    return db::PCellDeclaration::produce (layout, layer_ids, parameters, cell);
+  }
+
+  virtual void produce (const db::Layout &layout, const std::vector<unsigned int> &layer_ids, const db::pcell_parameters_type &parameters, db::Cell &cell) const
+  {
+    if (cb_produce.can_issue ()) {
+      cb_produce.issue<db::PCellDeclaration, const db::Layout &, const std::vector<unsigned int> &, const db::pcell_parameters_type &, db::Cell &> (&db::PCellDeclaration::produce, layout, layer_ids, parameters, cell);
+    } else {
+      db::PCellDeclaration::produce (layout, layer_ids, parameters, cell);
+    }
+  }
+
+  bool can_create_from_shape_fb (const db::Layout &layout, const db::Shape &shape, unsigned int layer) const
+  {
+    return db::PCellDeclaration::can_create_from_shape (layout, shape, layer);
+  }
+
+  virtual bool can_create_from_shape (const db::Layout &layout, const db::Shape &shape, unsigned int layer) const
+  {
+    if (cb_can_create_from_shape.can_issue ()) {
+      return cb_can_create_from_shape.issue<db::PCellDeclaration, bool, const db::Layout &, const db::Shape &, unsigned int> (&db::PCellDeclaration::can_create_from_shape, layout, shape, layer);
+    } else {
+      return db::PCellDeclaration::can_create_from_shape (layout, shape, layer);
+    }
+  }
+
+  db::pcell_parameters_type parameters_from_shape_fb (const db::Layout &layout, const db::Shape &shape, unsigned int layer) const
+  {
+    return db::PCellDeclaration::parameters_from_shape (layout, shape, layer);
+  }
+
+  virtual db::pcell_parameters_type parameters_from_shape (const db::Layout &layout, const db::Shape &shape, unsigned int layer) const
+  {
+    if (cb_parameters_from_shape.can_issue ()) {
+      return cb_parameters_from_shape.issue<db::PCellDeclaration, db::pcell_parameters_type, const db::Layout &, const db::Shape &, unsigned int> (&db::PCellDeclaration::parameters_from_shape, layout, shape, layer);
+    } else {
+      return db::PCellDeclaration::parameters_from_shape (layout, shape, layer);
+    }
+  }
+
+  db::Trans transformation_from_shape_fb (const db::Layout &layout, const db::Shape &shape, unsigned int layer) const
+  {
+    return db::PCellDeclaration::transformation_from_shape (layout, shape, layer);
+  }
+
+  virtual db::Trans transformation_from_shape (const db::Layout &layout, const db::Shape &shape, unsigned int layer) const
+  {
+    if (cb_transformation_from_shape.can_issue ()) {
+      return cb_transformation_from_shape.issue<db::PCellDeclaration, db::Trans, const db::Layout &, const db::Shape &, unsigned int> (&db::PCellDeclaration::transformation_from_shape, layout, shape, layer);
+    } else {
+      return db::PCellDeclaration::transformation_from_shape (layout, shape, layer);
+    }
+  }
+
+  std::string get_display_name_fb (const db::pcell_parameters_type &parameters) const
+  {
+    return db::PCellDeclaration::get_display_name (parameters);
+  }
+
+  virtual std::string get_display_name (const db::pcell_parameters_type &parameters) const
+  {
+    if (cb_get_display_name.can_issue ()) {
+      return cb_get_display_name.issue<db::PCellDeclaration, std::string, const db::pcell_parameters_type &> (&db::PCellDeclaration::get_display_name, parameters);
+    } else {
+      return db::PCellDeclaration::get_display_name (parameters);
+    }
+  }
+
+  gsi::Callback cb_get_layer_declarations;
+  gsi::Callback cb_get_parameter_declarations;
+  gsi::Callback cb_produce;
+  gsi::Callback cb_can_create_from_shape;
+  gsi::Callback cb_parameters_from_shape;
+  gsi::Callback cb_transformation_from_shape;
+  gsi::Callback cb_coerce_parameters;
+  gsi::Callback cb_get_display_name;
+};
+
+Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native, "PCellDeclaration", 
+  //  fallback implementations to reroute Ruby calls to the base class:
+  gsi::method ("get_parameters", &PCellDeclarationImpl::get_parameter_declarations_fb, "@hide") +
+  gsi::method ("produce", &PCellDeclarationImpl::produce_fb, "@hide") +
+  gsi::method ("can_create_from_shape", &PCellDeclarationImpl::can_create_from_shape_fb, "@hide") +
+  gsi::method ("parameters_from_shape", &PCellDeclarationImpl::parameters_from_shape_fb, "@hide") +
+  gsi::method ("transformation_from_shape", &PCellDeclarationImpl::transformation_from_shape_fb, "@hide") +
+  gsi::method ("display_text", &PCellDeclarationImpl::get_display_name_fb, "@hide") +
+  gsi::callback ("get_layers", &PCellDeclarationImpl::get_layer_declarations_impl, &PCellDeclarationImpl::cb_get_layer_declarations, 
+    "@brief Returns a list of layer declarations\n"
+    "@args parameters\n"
+    "Reimplement this method to return a list of layers this PCell wants to create.\n"
+    "The layer declarations are returned as a list of LayerInfo objects which are\n"
+    "used as match expressions to look up the layer in the actual layout.\n"
+    "\n"
+    "This method receives the PCell parameters which allows it to deduce layers\n"
+    "from the parameters."
+  ) +
+  gsi::callback ("get_parameters", &PCellDeclarationImpl::get_parameter_declarations, &PCellDeclarationImpl::cb_get_parameter_declarations, 
+    "@brief Returns a list of parameter declarations\n"
+    "Reimplement this method to return a list of parameters used in that PCell \n"
+    "implementation. A parameter declaration is a PCellParameterDeclaration object\n"
+    "and defines the parameter name, type, description text and possible choices for\n"
+    "the parameter value.\n"
+  ) +
+  gsi::callback ("coerce_parameters", &PCellDeclarationImpl::coerce_parameters_impl, &PCellDeclarationImpl::cb_coerce_parameters, 
+    "@brief Modifies the parameters to match the requirements\n"
+    "@args layout, input\n"
+    "@param layout The layout object in which the PCell will be produced\n"
+    "@param input The parameters before the modification\n"
+    "@return The modified parameters or an empty array, indicating that no modification was done\n"
+    "This method can be reimplemented to change the parameter set according to some\n"
+    "constraints for example. The reimplementation may modify the parameters in a way\n"
+    "that they are usable for the \\produce method.\n"
+    "\n"
+    "The method receives a reference to the layout so it is able to verify\n"
+    "the parameters against layout properties.\n"
+    "\n"
+    "It can raise an exception to indicate that something is not correct.\n"
+  ) +
+  gsi::callback ("produce", &PCellDeclarationImpl::produce, &PCellDeclarationImpl::cb_produce, 
+    "@brief The production callback\n"
+    "@args layout, layer_ids, parameters, cell\n"
+    "@param layout The layout object where the cell resides\n"
+    "@param layer_ids A list of layer ID's which correspond to the layers declared with get_layers\n"
+    "@param parameters A list of parameter values which correspond to the parameters declared with get_parameters\n"
+    "@param cell The cell where the layout will be created\n"
+    "Reimplement this method to provide the code that implements the PCell.\n"
+    "The code is supposed to create the layout in the target cell using the provided \n"
+    "parameters and the layers passed in the layer_ids list.\n"
+  ) +
+  gsi::callback ("can_create_from_shape", &PCellDeclarationImpl::can_create_from_shape, &PCellDeclarationImpl::cb_can_create_from_shape,
+    "@brief Returns true, if the PCell can be created from the given shape\n"
+    "@args layout,shape,layer\n"
+    "@param layout The layout the shape lives in\n"
+    "@param shape The shape from which a PCell shall be created\n"
+    "@param layer The layer index (in layout) of the shape\n"
+    "KLayout offers a way to convert a shape into a PCell. To test whether the PCell can be created "
+    "from a shape, it will call this method. If this method returns true, KLayout will use "
+    "\\parameters_from_shape and \\transformation_from_shape to derive the parameters and instance "
+    "transformation for the new PCell instance that will replace the shape.\n"
+  ) +
+  gsi::callback ("parameters_from_shape", &PCellDeclarationImpl::parameters_from_shape, &PCellDeclarationImpl::cb_parameters_from_shape,
+    "@brief Gets the parameters for the PCell which can replace the given shape\n"
+    "@args layout,shape,layer\n"
+    "@param layout The layout the shape lives in\n"
+    "@param shape The shape from which a PCell shall be created\n"
+    "@param layer The layer index (in layout) of the shape\n"
+    "KLayout offers a way to convert a shape into a PCell. If \\can_create_from_shape returns true, "
+    "it will use this method to derive the parameters for the PCell instance that will replace the shape. "
+    "See also \\transformation_from_shape and \\can_create_from_shape."
+  ) +
+  gsi::callback ("transformation_from_shape", &PCellDeclarationImpl::transformation_from_shape, &PCellDeclarationImpl::cb_transformation_from_shape,
+    "@brief Gets the instance transformation for the PCell which can replace the given shape\n"
+    "@args layout,shape,layer\n"
+    "@param layout The layout the shape lives in\n"
+    "@param shape The shape from which a PCell shall be created\n"
+    "@param layer The layer index (in layout) of the shape\n"
+    "KLayout offers a way to convert a shape into a PCell. If \\can_create_from_shape returns true, "
+    "it will use this method to derive the transformation for the PCell instance that will replace the shape. "
+    "See also \\parameters_from_shape and \\can_create_from_shape."
+  ) +
+  gsi::callback ("display_text", &PCellDeclarationImpl::get_display_name, &PCellDeclarationImpl::cb_get_display_name, 
+    "@brief Returns the display text for this PCell given a certain parameter set\n"
+    "@args parameters\n"
+    "Reimplement this method to create a distinct display text for a PCell variant with \n"
+    "the given parameter set. If this method is not implemented, a default text is created. \n"
+  ),
+  "@brief A PCell declaration providing the parameters and code to produce the PCell\n"
+  "\n"
+  "A PCell declaration is basically the recipe of how to create a PCell layout from\n"
+  "a parameter set. The declaration includes\n"
+  "\n"
+  "@ul\n"
+    "@li Parameters: names, types, default values @/li\n"
+    "@li Layers: the layers the PCell wants to create @/li\n"
+    "@li Code: a production callback that is called whenever a PCell is instantiated with a certain parameter set @/li\n"
+    "@li Display name: the name that is shown for a given PCell instance @/li\n"
+  "@/ul\n"
+  "\n"
+  "All these declarations are implemented by deriving from the PCellDeclaration class\n"
+  "and reimplementing the specific methods. Reimplementing the \\display_name method is \n"
+  "optional. The default implementation creates a name from the PCell name plus the \n"
+  "parameters.\n"
+  "\n"
+  "By supplying the information about the layers it wants to create, KLayout is able to\n"
+  "call the production callback with a defined set of the layer ID's which are already\n"
+  "mapped to valid actual layout layers.\n"
+  "\n"
+  "This class has been introduced in version 0.22.\n"
+);
+
+// ---------------------------------------------------------------
+//  db::PCellParameterDeclaration binding
+
+unsigned int get_type (const db::PCellParameterDeclaration *pd)
+{
+  return (unsigned int) pd->get_type ();
+}
+
+void set_type (db::PCellParameterDeclaration *pd, unsigned int t)
+{
+  pd->set_type (db::PCellParameterDeclaration::type (t));
+}
+
+void clear_choices (db::PCellParameterDeclaration *pd)
+{
+  pd->set_choices (std::vector<tl::Variant> ());
+  pd->set_choice_descriptions (std::vector<std::string> ());
+}
+
+void add_choice (db::PCellParameterDeclaration *pd, const std::string &d, const tl::Variant &v)
+{
+  std::vector<tl::Variant> vv = pd->get_choices ();
+  std::vector<std::string> dd = pd->get_choice_descriptions ();
+  vv.push_back (v);
+  dd.push_back (d);
+  pd->set_choice_descriptions (dd);
+  pd->set_choices (vv);
+}
+
+static unsigned int pd_type_int ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_int;
+}
+
+static unsigned int pd_type_double ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_double;
+}
+
+static unsigned int pd_type_shape ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_shape;
+}
+
+static unsigned int pd_type_string ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_string;
+}
+
+static unsigned int pd_type_boolean ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_boolean;
+}
+
+static unsigned int pd_type_layer ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_layer;
+}
+
+static unsigned int pd_type_list ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_list;
+}
+
+static unsigned int pd_type_none ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_none;
+}
+
+db::PCellParameterDeclaration *ctor_pcell_parameter (const std::string &name, unsigned int type, const std::string &description)
+{
+  db::PCellParameterDeclaration *pd = new db::PCellParameterDeclaration ();
+  pd->set_name (name);
+  pd->set_type (db::PCellParameterDeclaration::type (type));
+  pd->set_description (description);
+  return pd;
+}
+
+db::PCellParameterDeclaration *ctor_pcell_parameter_2 (const std::string &name, unsigned int type, const std::string &description, const tl::Variant &def)
+{
+  db::PCellParameterDeclaration *pd = new db::PCellParameterDeclaration ();
+  pd->set_name (name);
+  pd->set_type (db::PCellParameterDeclaration::type (type));
+  pd->set_description (description);
+  pd->set_default (def);
+  return pd;
+}
+
+db::PCellParameterDeclaration *ctor_pcell_parameter_3 (const std::string &name, unsigned int type, const std::string &description, const tl::Variant &def, const std::string &unit)
+{
+  db::PCellParameterDeclaration *pd = new db::PCellParameterDeclaration ();
+  pd->set_name (name);
+  pd->set_type (db::PCellParameterDeclaration::type (type));
+  pd->set_description (description);
+  pd->set_default (def);
+  pd->set_unit (unit);
+  return pd;
+}
+
+Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("PCellParameterDeclaration", 
+  gsi::constructor ("new", &ctor_pcell_parameter, 
+    "@brief Create a new parameter declaration with the given name and type\n"
+    "@args name, type, description\n"
+    "@param name The parameter name\n"
+    "@param type One of the Type... constants describing the type of the parameter\n"
+    "@param description The description text\n"
+  ) +
+  gsi::constructor ("new", &ctor_pcell_parameter_2, 
+    "@brief Create a new parameter declaration with the given name, type and default value\n"
+    "@args name, type, description, default\n"
+    "@param name The parameter name\n"
+    "@param type One of the Type... constants describing the type of the parameter\n"
+    "@param description The description text\n"
+    "@param default The default (initial) value\n"
+  ) +
+  gsi::constructor ("new", &ctor_pcell_parameter_3, 
+    "@brief Create a new parameter declaration with the given name, type, default value and unit string\n"
+    "@args name, type, description, default\n"
+    "@param name The parameter name\n"
+    "@param type One of the Type... constants describing the type of the parameter\n"
+    "@param description The description text\n"
+    "@param default The default (initial) value\n"
+    "@param unit The unit string\n"
+  ) +
+  gsi::method ("name", &db::PCellParameterDeclaration::get_name, 
+    "@brief Gets the name\n"
+  ) +
+  gsi::method ("name=", &db::PCellParameterDeclaration::set_name, 
+    "@brief Sets the name\n"
+    "@args value\n"
+  ) +
+  gsi::method ("unit", &db::PCellParameterDeclaration::get_unit, 
+    "@brief Gets the unit string\n"
+  ) +
+  gsi::method ("unit=", &db::PCellParameterDeclaration::set_unit, 
+    "@brief Sets the unit string\n"
+    "The unit string is shown right to the edit fields for numeric parameters.\n"
+    "@args unit\n"
+  ) +
+  gsi::method_ext ("type", &get_type, 
+    "@brief Gets the type\n"
+    "The type is one of the T... constants."
+  ) +
+  gsi::method_ext ("type=", &set_type, 
+    "@brief Sets the type\n"
+    "@args type\n"
+  ) +
+  gsi::method ("description", &db::PCellParameterDeclaration::get_description, 
+    "@brief Gets the description text\n"
+  ) +
+  gsi::method ("description=", &db::PCellParameterDeclaration::set_description, 
+    "@brief Sets the description\n"
+    "@args description\n"
+  ) +
+  gsi::method ("hidden?", &db::PCellParameterDeclaration::is_hidden, 
+    "@brief Returns true, if the parameter is a hidden parameter that should not be shown in the user interface\n"
+    "By making a parameter hidden, it is possible to create internal parameters which cannot be\n"
+    "edited.\n"
+  ) +
+  gsi::method ("hidden=", &db::PCellParameterDeclaration::set_hidden, 
+    "@brief Makes the parameter hidden if this attribute is set to true\n"
+    "@args flag\n"
+  ) +
+  gsi::method ("readonly?", &db::PCellParameterDeclaration::is_readonly, 
+    "@brief Returns true, if the parameter is a read-only parameter\n"
+    "By making a parameter read-only, it is shown but cannot be\n"
+    "edited.\n"
+  ) +
+  gsi::method ("readonly=", &db::PCellParameterDeclaration::set_readonly, 
+    "@brief Makes the parameter read-only if this attribute is set to true\n"
+    "@args flag\n"
+  ) +
+  gsi::method_ext ("clear_choices", &clear_choices, 
+    "@brief Clears the list of choices\n"
+  ) +
+  gsi::method_ext ("add_choice", &add_choice, 
+    "@brief Add a new value to the list of choices\n"
+    "@args description, value\n"
+    "This method will add the given value with the given description to the list of\n"
+    "choices. If choices are defined, KLayout will show a drop-down box instead of an\n"
+    "entry field in the parameter user interface.\n"
+  ) +
+  gsi::method ("choice_values", &db::PCellParameterDeclaration::get_choices, 
+    "@brief Returns a list of choice values\n"
+  ) +
+  gsi::method ("choice_descriptions", &db::PCellParameterDeclaration::get_choice_descriptions, 
+    "@brief Returns a list of choice descriptions\n"
+  ) +
+  gsi::method ("default", &db::PCellParameterDeclaration::get_default, 
+    "@brief Gets the default value\n"
+  ) +
+  gsi::method ("default=", &db::PCellParameterDeclaration::set_default, 
+    "@brief Sets the default value\n"
+    "@args value\n"
+    "If a default value is defined, it will be used to initialize the parameter value\n"
+    "when a PCell is created.\n"
+  ) +
+  gsi::method ("TypeInt", &pd_type_int, "@brief Type code: integer data") +
+  gsi::method ("TypeDouble", &pd_type_double, "@brief Type code: floating-point data") +
+  gsi::method ("TypeString", &pd_type_string, "@brief Type code: string data") +
+  gsi::method ("TypeBoolean", &pd_type_boolean, "@brief Type code: boolean data") +
+  gsi::method ("TypeList", &pd_type_list, "@brief Type code: a list of variants") +
+  gsi::method ("TypeLayer", &pd_type_layer, "@brief Type code: a layer (a \\LayerInfo object)") +
+  gsi::method ("TypeShape", &pd_type_shape, "@brief Type code: a guiding shape (Box, Edge, Point, Polygon or Path)") +
+  gsi::method ("TypeNone", &pd_type_none, "@brief Type code: unspecific type") 
+  ,
+  "@brief A PCell parameter declaration\n"
+  "\n"
+  "This class declares a PCell parameter by providing a name, the type and a value \n"
+  "and additional \n"
+  "information like description, unit string and default value. It is used in the \\PCellDeclaration class to \n"
+  "deliver the necessary information.\n"
+  "\n"
+  "This class has been introduced in version 0.22.\n"
+);
+
+}
+
+

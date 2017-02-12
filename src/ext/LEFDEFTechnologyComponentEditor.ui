@@ -1,0 +1,757 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LEFDEFTechnologyComponentEditor</class>
+ <widget class="QWidget" name="LEFDEFTechnologyComponentEditor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>775</width>
+    <height>766</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="toolTip">
+   <string/>
+  </property>
+  <layout class="QVBoxLayout">
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>LEF Files (specify what LEF files to use additionally)</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>4</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="lef_files_frame">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>16</width>
+          <height>120</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item row="1" column="1">
+          <widget class="QToolButton" name="del_lef_files">
+           <property name="toolTip">
+            <string>Delete selected files</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../lay/layResources.qrc">
+             <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" rowspan="5">
+          <widget class="QListWidget" name="lef_files">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::ExtendedSelection</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QToolButton" name="move_lef_files_down">
+           <property name="toolTip">
+            <string>Move selected files down</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../lay/layResources.qrc">
+             <normaloff>:/down.png</normaloff>:/down.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <spacer>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="0" column="1">
+          <widget class="QToolButton" name="add_lef_file">
+           <property name="toolTip">
+            <string>Add LEF file</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../lay/layResources.qrc">
+             <normaloff>:/add.png</normaloff>:/add.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QToolButton" name="move_lef_files_up">
+           <property name="toolTip">
+            <string>Move selected files up</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../lay/layResources.qrc">
+             <normaloff>:/up.png</normaloff>:/up.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Options</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="topMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Layout database unit</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="dbu">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>µm</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Production (specify what objects to produce and on what layers)</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout">
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>4</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <item row="0" column="7">
+       <widget class="QLabel" name="lbl1">
+        <property name="text">
+         <string>Layer name suffix ...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5" colspan="2">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Produce ...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="8">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>GDS datatype ...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4" rowspan="7">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="8">
+       <widget class="QLineEdit" name="datatype_via_geometry"/>
+      </item>
+      <item row="3" column="8">
+       <widget class="QLineEdit" name="datatype_obstructions"/>
+      </item>
+      <item row="5" column="8">
+       <widget class="QLineEdit" name="datatype_labels"/>
+      </item>
+      <item row="4" column="8">
+       <widget class="QLineEdit" name="datatype_routing"/>
+      </item>
+      <item row="6" column="7">
+       <widget class="QLineEdit" name="suffix_blockages"/>
+      </item>
+      <item row="3" column="7">
+       <widget class="QLineEdit" name="suffix_obstructions"/>
+      </item>
+      <item row="2" column="0" colspan="4">
+       <widget class="QLabel" name="help_label">
+        <property name="text">
+         <string>&lt;html&gt;&lt;body&gt;(&lt;a href=&quot;int:/about/variant_notation.xml&quot;&gt;See here for the name notation&lt;/a&gt;)&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="produce_net_names">
+        <property name="font">
+         <font>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Net names</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="8">
+       <widget class="QLineEdit" name="datatype_pins"/>
+      </item>
+      <item row="2" column="5">
+       <widget class="QCheckBox" name="produce_pins">
+        <property name="text">
+         <string>Pins</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="5">
+       <widget class="QCheckBox" name="produce_routing">
+        <property name="text">
+         <string>Routing</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="7">
+       <widget class="QLineEdit" name="suffix_pins"/>
+      </item>
+      <item row="1" column="7">
+       <widget class="QLineEdit" name="suffix_via_geometry"/>
+      </item>
+      <item row="3" column="5">
+       <widget class="QCheckBox" name="produce_obstructions">
+        <property name="text">
+         <string>Obstructions</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="7">
+       <widget class="QLineEdit" name="suffix_routing"/>
+      </item>
+      <item row="1" column="5">
+       <widget class="QCheckBox" name="produce_via_geometry">
+        <property name="text">
+         <string>Via geometry</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="2">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>As properties with name ...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="8">
+       <widget class="QLineEdit" name="datatype_blockages"/>
+      </item>
+      <item row="5" column="5">
+       <widget class="QCheckBox" name="produce_labels">
+        <property name="text">
+         <string>Pin labels</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="7">
+       <widget class="QLineEdit" name="suffix_labels"/>
+      </item>
+      <item row="6" column="0">
+       <widget class="QCheckBox" name="produce_placement_blockages">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Blockages</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2" colspan="2">
+       <widget class="QLineEdit" name="outline_layer"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="produce_outlines">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Cell outlines</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="5">
+       <widget class="QCheckBox" name="produce_blockages">
+        <property name="text">
+         <string>Blockages</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2" colspan="2">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>On layer with spec ...</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2" colspan="2">
+       <widget class="QLineEdit" name="placement_blockage_layer"/>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLabel" name="label_10">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" colspan="2">
+       <widget class="QLineEdit" name="net_prop_name"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLabel" name="label_9">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label_2">
+        <property name="font">
+         <font>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+          <underline>false</underline>
+         </font>
+        </property>
+        <property name="text">
+         <string>Produce ...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="6">
+       <widget class="QLabel" name="label_17">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="6">
+       <widget class="QLabel" name="label_12">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="6">
+       <widget class="QLabel" name="label_15">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Produce ...</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="6">
+       <widget class="QLabel" name="label_13">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="6">
+       <widget class="QLabel" name="label_14">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="label_11">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="6">
+       <widget class="QLabel" name="label_16">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../lay/layResources.qrc">:/right.png</pixmap>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Layer Mapping (filter/modify layers, assign GDS layer/datatypes)</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>4</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="read_all_cbx">
+        <property name="text">
+         <string>Read all layers (additionally to the ones in the mapping table)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="lay::LayerMappingWidget" name="layer_map">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>16</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>lay::LayerMappingWidget</class>
+   <extends>QFrame</extends>
+   <header>layLayerMappingWidget.h</header>
+   <container>1</container>
+   <slots>
+    <signal>enable_all_layers(bool)</signal>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>lef_files</tabstop>
+  <tabstop>add_lef_file</tabstop>
+  <tabstop>del_lef_files</tabstop>
+  <tabstop>move_lef_files_up</tabstop>
+  <tabstop>move_lef_files_down</tabstop>
+  <tabstop>dbu</tabstop>
+  <tabstop>produce_net_names</tabstop>
+  <tabstop>net_prop_name</tabstop>
+  <tabstop>produce_outlines</tabstop>
+  <tabstop>outline_layer</tabstop>
+  <tabstop>produce_placement_blockages</tabstop>
+  <tabstop>placement_blockage_layer</tabstop>
+  <tabstop>produce_via_geometry</tabstop>
+  <tabstop>suffix_via_geometry</tabstop>
+  <tabstop>datatype_via_geometry</tabstop>
+  <tabstop>produce_pins</tabstop>
+  <tabstop>suffix_pins</tabstop>
+  <tabstop>datatype_pins</tabstop>
+  <tabstop>produce_obstructions</tabstop>
+  <tabstop>suffix_obstructions</tabstop>
+  <tabstop>datatype_obstructions</tabstop>
+  <tabstop>produce_routing</tabstop>
+  <tabstop>suffix_routing</tabstop>
+  <tabstop>datatype_routing</tabstop>
+  <tabstop>produce_labels</tabstop>
+  <tabstop>suffix_labels</tabstop>
+  <tabstop>datatype_labels</tabstop>
+  <tabstop>produce_blockages</tabstop>
+  <tabstop>suffix_blockages</tabstop>
+  <tabstop>datatype_blockages</tabstop>
+  <tabstop>read_all_cbx</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../lay/layResources.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>layer_map</sender>
+   <signal>enable_all_layers(bool)</signal>
+   <receiver>read_all_cbx</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>186</x>
+     <y>598</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>155</x>
+     <y>553</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

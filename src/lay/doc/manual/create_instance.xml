@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Creating A Cell Instance</title>
+  <keyword name="Cell instance"/>
+
+  <p>
+  Select "Instance" mode from the toolbar. The editor options dialog will open that additionally prompts for 
+  some instance parameters.
+  The most important one of course is the cell that shall be placed.
+  Geometrically, the rotation angle can be specified, the mirror option can be set and the instance
+  may be specified as a regular array. As an array, the instance represents multiple placements of the cell, 
+  arranged in regular grid which is specified by the two axis vectors and instance counts in each direction.
+  Don't forget to click "Apply" to take over the current settings. If the dialog has been
+  closed unintentionally, it can be reopened with the F3 shortcut.
+  </p>
+
+  <p>
+  To place the instance, move the mouse to the desired location and left-click to place it. 
+  While moving, the right mouse button can be used to rotate the instance by 90 degree counterclockwise.
+  Press the ESC key to cancel the operation.
+  </p>
+
+  <p>
+  Starting with version 0.22, KLayout supports libraries. Libraries provide cells from the outside of the layout.
+  These cells are imported into the layout and a copy is stored inside the layout. Still, KLayout maintains
+  the reference to the original layout, so if the library changes, the cell will be replaced when the
+  layout is loaded again. Cells imported from a library appear as "Library.Cell" in the cell tree and
+  the layout. Here, "Library" is the library name and "Cell" is the cell name.
+  </p>
+
+  <p>
+  The library is selected from the pull-down box to the right of the cell name. You can use the "..." button to 
+  browse the cells available in the selected library.
+  </p>
+
+  <p>
+  Libraries are a convenient way to provide common layout building blocks. In addition, KLayout now also
+  supports PCells (parametrized cells). Such cells do not have a static content, but instead they are 
+  created dynamically from a piece of code using a set of parameters specific for the PCell type. For example,
+  a circle has two parameters: the layer where the circle should appear and the radius of the circle. 
+  </p>
+
+  <p>
+  PCells are provided by libraries. If a PCell is selected from a library, the instance properties 
+  page also offers a panel to edit the PCell parameters. What parameters are available depends on the 
+  type of PCell.
+  </p>
+
+  <p>
+  KLayout comes with a standard library "Basic" which offers some basic curved shape types and 
+  a text generator.
+  </p>
+
+  <p>
+  KLayout offers a unique feature for the PCell implementation: a PCell can employ "guiding shapes".
+  "Guiding shapes" are shapes that do not appear as layout themselves but are used by the PCell
+  to derive it's geometry from. For example the "rounded path" PCell of the "Basic" library 
+  uses a path as a guiding shape. This path is manipulated to obtain the final shape. 
+  </p>
+
+  <p>
+  Guiding shapes are drawn on the cell box layer and can be manipulated with the normal shape 
+  manipulation functions (in particular move and partial edit). Also, the shape properties 
+  can be edited via the "Edit/Properties" function.
+  </p>
+
+  <p>
+  To learn more about libraries, read <link href="/about/about_libraries.xml"/>. Read 
+  <link href="/about/about_pcells.xml"/> for details about PCell's.
+  </p>
+
+</doc>
+

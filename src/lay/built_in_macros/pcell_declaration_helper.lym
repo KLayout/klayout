@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <doc>@class PCellDeclarationHelper &lt; PCellDeclaration
+@brief A helper class to simplify the declaration of a PCell (Ruby version)
+
+This class provides adds some convenience to the PCell declaration based
+on PCellDeclaration. PCellDeclaration is a C++ object which is less
+convenient to use than a Ruby-based approach. In particular this class
+simplifies the declaration and use of parameters through accessor methods
+that are created automatically from the declaration of the parameters.
+
+The basic usage of this class is the following:
+
+@code
+# Derive your PCell from PCellDeclarationHelper
+class MyPCell &lt; RBA::PCellDeclarationHelper
+
+  # initalize
+  def initialize
+    super
+    # your initialization: add parameters with name, type, description and
+    # optional other values
+    param :p, TypeInt, "The parameter", :default => 1
+    param :l, TypeLayer, "The layer", :default => RBA::LayerInfo::new(1, 0)
+    # add other parameters ..
+  end
+
+  # reimplement display_text_impl
+  def display_text_impl
+    # implement the method here
+  end
+
+  # reimplement produce_impl
+  def produce_impl
+    # implement the method here
+  end
+
+  # optionally reimplement coerce_parameters_impl
+  def coerce_parameters_impl
+    # implement the method here
+  end
+
+end
+@/code
+
+An implementation of \\display_text_impl could look like this:
+
+@code
+  def display_text_impl
+    "We have p=#{p}"
+  end
+@/code
+
+Because in the sample declaration above we have declared parameter "p" we can access the value of p inside
+the implementation simply by using the "p" method.
+
+Similarily the \\produce_impl implementation could use code like the following. Please note that
+\\layout and \\cell are available to get the layout and cell. Also because we have declared a layer parameter "l", 
+we can access the layer index with the "l_layer" method:
+
+@code
+  def produce_impl
+    cell.shapes(l_layer).insert(RBA::Box.new(0, 0, p*100, p*200))
+  end
+@/code
+
+Again in this sample, we used "p" to access the parameter "p".
+
+The implementation of \\coerce_parameter_impl can make use of the parameter setters. In the case of the "p"
+parameter, the setter is "set_p":
+
+@code
+  def coerce_parameter_impl
+    p &lt; 10 || set_p(10)
+  end
+@/code
+
+@method initialize
+@brief Initializes this instance
+
+@method layout
+@brief Gets the reference to the current layout within \\produce_impl, \\can_create_from_shape_impl, \\parameters_from_shape_impl and \\transformation_from_shape_impl
+
+The object returned is the \\Layout object of the shape which will be converted.
+
+@method shape
+@brief Gets the reference to the current shape within \\can_create_from_shape_impl, \\parameters_from_shape_impl and \\transformation_from_shape_impl
+
+The object returned is the \\Shape object of the shape which will be converted.
+
+@method layer
+@brief Gets the reference to the current layer index within \\can_create_from_shape_impl, \\parameters_from_shape_impl and \\transformation_from_shape_impl
+
+The object returned is the layer index within the \\Layout object of the shape which will be converted.
+
+@method cell
+@brief Gets the reference to the current cell within \\produce_impl
+
+@method param
+@args name, type, description, ...
+
+@brief Declares a parameter with the given name, type and description and optional attributes.
+
+@param name The name of the parameter. Must be a simple word.
+@param type The type. One of the Type... constants, that this class borrowed from \\PCellParameterDeclaration.
+@param description The description text for this parameter
+
+Optional, named parameters are
+
+@ul
+  @li 
+    @b:hidden@/b: (boolean) true, if the parameter is not shown in the dialog
+  @/li
+  @li 
+    @b:readonly@/b: (boolean) true, if the parameter cannot be edited
+  @/li
+  @li 
+    @b:unit@/b: the unit string
+  @/li
+  @li 
+    @b:default@/b: the default value
+  @/li
+  @li 
+    @b:choices@/b: ([ [ d, v ], ... ]) choice descriptions/value for choice type
+  @/li
+@/ul
+
+":choices" must be an array of two-element arrays (description text, value) which specify one
+choice each for parameters with a choice of values. Such parameters are represented by a drop-down box.
+
+This declaration will create accessor methods "x" and "set_x", where "x" is the name of the parameter.
+If the type is TypeLayer, an accessor "x_layer" delivering the layer index inside \\produce_impl is
+created as well.
+
+@method display_text_impl
+
+@brief Delivers the display text
+
+This method must be reimplemented in a PCell class to identify the PCell in human-readable form.
+This text is shown in the cell tree for the PCell for example.
+
+@method produce_impl
+
+@brief Produces the layout
+
+This method must be reimplemented in a PCell class.
+Using the parameter values provided by the parameter accessor methods and the layout and cell through \\layout and \\cell,
+this method is supposed to produce the final layout inside the given cell.
+
+@method coerce_parameters_impl
+
+@brief Coerces the parameters
+
+This method can be reimplemented in a PCell class.
+It is supposed to adjust parameters to render a consistent parameter set and to fix 
+parameter range errors. This method is called for example inside the PCell user interface to 
+compute the actual parameters when "Apply" is pressed.
+
+@method can_create_from_shape_impl
+
+@brief Returns true if the PCell can be created from the given shape
+
+This method can be reimplemented in a PCell class.
+If the PCell can be created from the shape available through the \\shape accessor (a \\Shape object), this
+method is supposed to return true. The layout the shape lives in can be accessed with \\layout and the 
+layer with \\layer.
+
+The default implementation returns false.
+
+@method parameters_from_shape_impl
+
+@brief Sets the parameters from a shape
+
+This method can be reimplemented in a PCell class.
+If \\can_create_from_shape_impl returns true, this method is called to set the parameters from the 
+given shape (see \\shape, \\layout and \\layer). Note, that for setting a layer parameter you need
+to create the \\LayerInfo object, i.e. like this:
+
+@code
+  set_l layout.get_info(layer)
+@/code
+
+The default implementation does nothing. All parameters not set in this method will receive their default value.
+
+@method transformation_from_shape_impl
+
+@brief Gets the initial PCell instance transformation when creating from a shape
+
+This method can be reimplemented in a PCell class.
+If \\can_create_from_shape_impl returns true, this method is called to get the initial transformation from the 
+given shape (see \\shape, \\layout and \\layer). 
+
+This method must return a \\Trans object. The default implementation returns a unit transformation (no displacement, no rotation).
+
+ </doc>
+ <format>general</format>
+ <autorun>false</autorun>
+ <autorun-early>true</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>ruby</interpreter>
+ <text>
+module RBA
+
+  # A helper class that somewhat simplifies the implementation
+  # of a PCell
+  class PCellDeclarationHelper &lt; PCellDeclaration
+
+    # import the Type... constants from PCellParameterDeclaration
+    PCellParameterDeclaration.constants.each do |c|
+      if !const_defined?(c)
+        const_set(c, PCellParameterDeclaration::const_get(c))
+      end
+    end
+    
+    # initialize this instance
+    def initialize
+      @param_decls = []
+      @param_values = nil
+      @layout = nil
+      @shape = nil
+      @layer = nil
+      @cell = nil
+      @layer_param_index = []
+      @layers = []
+    end
+    
+    # provide accessors for the current layout and cell (for prod)
+    attr_reader :layout, :cell, :shape, :layer
+    
+    # define a parameter
+    #   name         -&gt; the short name of the parameter
+    #   type         -&gt; the type of the parameter
+    #   description  -&gt; the description text
+    # named parameters
+    #   :hidden      -&gt; (boolean) true, if the parameter is not shown in the dialog
+    #   :readonly    -&gt; (boolean) true, if the parameter cannot be edited
+    #   :unit        -&gt; the unit string
+    #   :default     -&gt; the default value
+    #   :choices     -&gt; ([ [ d, v ], ...) choice descriptions/value for choice type
+    # this method defines accessor methods for the parameters
+    #   {name}       -&gt; read accessor
+    #   set_{name}   -&gt; write accessor ({name}= does not work because the
+    #                   Ruby confuses that method with variables)
+    #   {name}_layer -&gt; read accessor for the layer index for TypeLayer parameters
+    def param(name, type, description, args = {})
+    
+      # create accessor methods for the parameters
+      param_index = @param_decls.length
+      self.instance_eval("def #{name.to_s}; @param_values[#{param_index}]; end")
+      self.instance_eval("def set_#{name.to_s}(v); @param_values[#{param_index}] = v; end")
+      if type == TypeLayer
+        self.instance_eval("def #{name.to_s}_layer; @layers[#{@layer_param_index.length}]; end")
+        @layer_param_index.push(param_index)
+      end
+      
+      # store the parameter declarations
+      pdecl = PCellParameterDeclaration.new(name.to_s, type, description)
+      @param_decls.push(pdecl)    
+      
+      # set additional attributes of the parameters
+      args[:default] &amp;&amp; pdecl.default = args[:default]
+      args[:hidden] &amp;&amp; pdecl.hidden = args[:hidden]
+      args[:readonly] &amp;&amp; pdecl.readonly = args[:readonly]
+      args[:unit] &amp;&amp; pdecl.unit = args[:unit]
+      if args[:choices]
+        if !args[:choices].is_a?(Array)
+          raise ":choices value must be an array of two-element arrays (description, value)"
+        end
+        args[:choices].each do |c|
+          if !c.is_a?(Array) || c.length != 2
+            raise ":choices value must be an array of two-element arrays (description, value)"
+          end
+          pdecl.add_choice(c[0],c[1])
+        end
+      end
+      
+      # return the declaration object for further operations
+      pdecl
+      
+    end
+    
+    # implementation of display_text
+    def display_text(parameters)
+      @param_values = parameters
+      text = display_text_impl
+      @param_values = nil
+      text
+    end
+    
+    # get the parameters
+    def get_parameters
+      @param_decls
+    end
+    
+    # get the layer definitions
+    def get_layers(parameters)
+      @layer_param_index.collect { |i| parameters[i] }
+    end
+      
+    # coerce parameters (make consistent)
+    def coerce_parameters(layout, parameters)
+      @param_values = parameters
+      @layout = layout
+      coerce_parameters_impl
+      @layout = nil
+      @param_values
+    end
+
+    # produce the layout    
+    def produce(layout, layers, parameters, cell)
+      @layers = layers
+      @cell = cell
+      @param_values = parameters
+      @layout = layout
+      produce_impl
+      @layers = nil
+      @cell = nil
+      @param_values = nil
+      @layout = nil
+    end
+
+    # produce a helper for can_create_from_shape
+    def can_create_from_shape(layout, shape, layer)
+      @layout = layout
+      @shape = shape
+      @layer = layer
+      ret = can_create_from_shape_impl
+      @layout = nil
+      @shape = nil
+      @layer = nil
+      ret
+    end
+    
+    # produce a helper for parameters_from_shape
+    def transformation_from_shape(layout, shape, layer)
+      @layout = layout
+      @shape = shape
+      @layer = layer
+      t = transformation_from_shape_impl
+      @layout = nil
+      @shape = nil
+      @layer = nil
+      t
+    end
+    
+    # produce a helper for parameters_from_shape
+    # with this helper, the implementation can use the parameter setters
+    def parameters_from_shape(layout, shape, layer)
+      @param_values = @param_decls.map { |pd| pd.default }
+      @layout = layout
+      @shape = shape
+      @layer = layer
+      parameters_from_shape_impl
+      @layout = nil
+      @shape = nil
+      @layer = nil
+      @param_values
+    end
+    
+    # default implementation
+    def display_text_impl
+      ""
+    end
+   
+    # default implementation 
+    def coerce_parameters_impl
+    end
+    
+    # default implementation
+    def produce_impl
+    end
+
+    # default implementation
+    def can_create_from_shape_impl
+      false
+    end
+    
+    # default implementation
+    def parameters_from_shape_impl
+    end
+    
+    # default implementation
+    def transformation_from_shape_impl
+      Trans.new
+    end
+    
+  end
+
+end
+</text>
+</klayout-macro>

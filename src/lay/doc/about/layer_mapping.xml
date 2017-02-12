@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Layer Mapping Tables</title>
+
+  <p>
+  Layer mapping tables are used to specify the behavior of the layout reader. Specifically, 
+  they define what actions are taken when a shape on a certain layer is encountered.
+  They can be used to
+  </p>
+
+  <ul>
+    <li>Filter layers</li>
+    <li>Supply layer names for GDS layer and datatype combinations</li>
+    <li>Map layers to different ones</li>
+    <li>Combine different layers into the same layer</li>
+  </ul>
+
+  <p>
+  A layer mapping table consists of two specifications: a match expression and an optional target expression.
+  If a shape is encountered, the reader looks up the shape's layer in the mapping table. If an 
+  entry is found whose match expression matches the layer of the shape, the shape is assigned
+  a new layer given by the target expression if present. By assigning different match expressions the
+  same target expressions, multiple input layers can be combined into a single one.
+  </p>
+
+  <p>
+  If no matching entry is found, the reader can be configured to either store the shape 
+  under the original layer or discard it. This option can be found in the reader options
+  dialog as the "Read all layers" option. If that box is checked, the shapes are stored under
+  their original layer and discarded if not.
+  </p>
+
+  <p>
+  A target expression can be used also to add information, specifically a layer name. In GDS there
+  is no layer name but just a layer and datatype number. In OASIS, there is a layer name in addition.
+  Other formats just use named layers and don't have the concept of layer number or datatype number.
+  When the target expression specifies a layer name that name is used. That allows adding of OASIS 
+  layer names to GDS files for example. Layers with names are usually more useful than 
+  layers that just have a number.
+  </p>
+
+  <p>
+  The layer mapping table consists of lines, each specifying the match expression and optional target
+  expression. The match and target expressions are separated by a colon.
+  Each expression has the form "layer" (numeric), "layer/datatype" (both numberic), "name" (a string)
+  or "name(layer)" or "name(layer/datatype)" (all specifications). When name and layer/datatype
+  are specified in a match string, KLayout will first look for a matching layer/datatype and then for
+  a matching layer name. The name match is case sensitive.
+  For the numerical specifications, ranges are allowed using a hyphen for an interval and
+  the comma for enumerations (see second example below).
+  </p>
+
+  <p>
+  Here are some examples:
+  </p>
+
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr>
+      <td><b>1/0</b> or <b>1</b></td>
+      <td>Matching layer 1, datatype 0</td>
+    </tr>
+    <tr>
+      <td><b>17/1-5,10</b></td>
+      <td>Matching layer 17, datatypes 1 to 5 and 10</td>
+    </tr>
+    <tr>
+      <td><b>1/0:22</b></td>
+      <td>Matching Layer 1, datatype 0. Shapes are shifted to layer 22, datatype 0</td>
+    </tr>
+    <tr>
+      <td><b>1/0:A</b></td>
+      <td>Matching layer 1, datatype 0. The name "A" is added to that layer</td>
+    </tr>
+    <tr>
+      <td><b>1/0:A(2/0)</b></td>
+      <td>Matching Layer 1, datatype 0 mapped. Shapes are shifted to layer 2, datatype 0 and name "A"</td>
+    </tr>
+    <tr>
+      <td><b>A</b></td>
+      <td>Matching named layer "A"</td>
+    </tr>
+    <tr>
+      <td><b>A:1/0</b></td>
+      <td>Matching named layer "A". Shapes are shifted to layer 1, datatype 0</td>
+    </tr>
+  </table>
+
+  <p>
+  When the layer mapping is read from a file, each line corresponds to one entry. Blanks are ignored as
+  are empty lines. Comments can be inserted using the "#" character in front of the comment.
+  </p>
+
+</doc>
+

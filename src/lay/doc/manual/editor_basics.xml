@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Basic Principles Of Editor Mode</title>
+
+  <p>
+  This section covers the basic working principles of editor mode. 
+  </p>
+
+  <topics>
+    <topic href="/manual/pick_and_drop.xml"/>
+    <topic href="/manual/editor_options.xml"/>
+    <topic href="/manual/background_modes.xml"/>
+    <topic href="/manual/editor_selection.xml"/>
+    <topic href="/manual/partial_vs_full.xml"/>
+  </topics>
+
+</doc>
+

@@ -1,0 +1,290 @@
+<ui version="4.0" >
+ <class>GridNetConfigPage</class>
+ <widget class="QFrame" name="GridNetConfigPage" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>483</width>
+    <height>204</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Settings</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="grid_group" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>5</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" >
+      <string>Show background decoration</string>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>Grid   </string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Color</string>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QLabel" name="Close style" >
+        <property name="text" >
+         <string>Close style</string>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" colspan="2" >
+       <widget class="QComboBox" name="style1_cbx" >
+        <item>
+         <property name="text" >
+          <string>Invisible</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Dots</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Dotted lines</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Light dotted lines</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Dotted lines, ten dots per division </string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Crosses</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Lines</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Lines with ticks, ten ticks per division</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Checkerboard</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="4" column="2" colspan="2" >
+       <widget class="QCheckBox" name="show_ruler" >
+        <property name="text" >
+         <string>Show Ruler</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="3" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QPushButton" name="grid_net_color_pb" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Far style</string>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" colspan="2" >
+       <widget class="QComboBox" name="style2_cbx" >
+        <item>
+         <property name="text" >
+          <string>Invisible</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Dots</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Dotted lines</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Light dotted lines</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Dotted lines, ten dots per division </string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Crosses</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Lines</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Lines with ticks, ten ticks per division</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Checkerboard</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="3" column="1" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Axis style</string>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2" colspan="2" >
+       <widget class="QComboBox" name="style0_cbx" >
+        <item>
+         <property name="text" >
+          <string>Invisible</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Dots</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Dotted lines</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Light dotted lines</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Dotted lines, ten dots per division </string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Crosses</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Lines</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Lines with ticks, ten ticks per division</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <resources/>
+ <connections/>
+</ui>

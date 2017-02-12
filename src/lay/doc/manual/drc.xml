@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Design Rule Check (DRC)</title>
+
+  <p>
+  The DRC feature of KLayout is described here. The "Basics" section describes the basic concepts and
+  the "Runsets" section the DRC language.
+  </p>
+
+  <topics>
+    <topic href="/manual/drc_basic.xml"/>
+    <topic href="/manual/drc_runsets.xml"/>
+  </topics>
+
+  <p>Further information about the DRC features can be found here: <link href="/about/drc_ref.xml"/>.</p>
+
+</doc>
+

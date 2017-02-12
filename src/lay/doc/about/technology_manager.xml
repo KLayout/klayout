@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>About Technology Management</title>
+
+  <p>
+  Technology management summarizes features which require a certain interpretation of a layout.
+  In particular, layout layers are assigned a physical meaning, for example via layers or active area
+  layers in CMOS technologies. Since that interpretation often is depending on the technology
+  the product will be fabricated with, the ability to provide multiple setups is summarized
+  as "technology management".
+  </p>
+
+  <p>
+  A technology setup implements the following aspects:
+  </p>
+
+  <ul>
+    <li>Layer mapping: when the layout reader loads a file that for a certain technology, it can 
+      apply a layer mapping, i.e. apply layer names to GDS layers, filter layer etc.
+    </li>
+    <li>Layer properties: depending on the technology, the layer display can be configured by
+      providing a technology specific layer properties file.
+    </li>
+    <li>Connectivity: the layer stack and the connections made by layers for the net tracer
+      feature.
+    </li>
+    <li>Macros: macros associated with the technology. When the corresponding technology is
+      selected (is the one of the current layout), such macros will show up in the menu if they
+      are bound to a menu entry. Otherwise they will be invisible.
+    </li>
+    <li>DRC scripts: in the same way, DRC scripts can be associated with a technology.</li>
+  </ul>
+
+  <p>
+  In the future, more aspects may be added to the technology definition.
+  </p>
+
+  <h2>Setting up technologies</h2>
+
+  <p>
+  Technologies can be set up using the "Technology Manager" in the "Tools" menu.
+  There is always a "Default" technology which provides the settings when no
+  technology is selected. New technologies can be added or technologies can be
+  deleted using the "+" or "x" buttons below the technology tree.
+  </p>
+
+  <p>
+  A technology has a name (a short string) and a description. The name is used
+  to identify the technology in various places. The description is the human-readable
+  text that is displayed in the technology selection boxes for example. The short name can 
+  be changed by selecting the technology and pressing the "Rename" button or using "Rename"
+  from the technology tree's context menu (right mouse click). The description can be
+  edited on the "General" page.
+  </p>
+
+  <p>
+  In the technology manager, below each technology, the components are shown that define
+  the various aspects of a technology. Beside the "General" aspect (names, descriptions) there
+  is a "Layers" component which defines the layer mapping table and layer properties file and
+  the "Connectivity" component which defines the settings for the net tracer.
+  </p>
+
+  <h2>Using technologies</h2>
+
+  <p>
+  When more than the default technology is defined, KLayout provides a drop-down menu in 
+  the tool bar to select the current technology. The current technology is the technology
+  used when new files are loaded. It is also possible to define the technology to be used 
+  on the command line using the "-n" switch (applies to following files and specifies the
+  technology to use by their short name).
+  </p>
+
+  <p>
+  The technology of the currently selected layout is shown in the status bar of the main 
+  window in the left section. It is possible to switch the technology of a layout already 
+  loaded by using the "Layout Properties" dialog from the "File" menu. After switching the
+  technology, the layer properties defined in the technology can be applied and the associated
+  macros or DRC scripts are shown in the menu if they are associated bound to a menu entry or
+  the key binding becomes active if a shortcut is defined for that macro.
+  </p>
+
+  <h2>Technologies and macros or DRC scripts</h2>
+
+  <p>
+  Macros or DRC scripts are stored in sub-folders relative to the technology's base path. When 
+  no base path is specified or the base path is invalid, macros or DRC scripts cannot be associated. 
+  KLayout will look search for macros, if a directory called "macros" is present in the 
+  base path. If it finds files with a valid macro suffix there it will associate them with 
+  this technology. The same way, KLayout will look for DRC scripts, if a directory called "drc"
+  is present in the base path.
+  </p>
+
+  <p>
+  Macros and DRC scripts associated with a technology are shown in the technology manager, but
+  cannot be edited there. The right place to edit, run or debug macros or DRC script is the 
+  macro development environment. To open the macro development environment choose "Macros/Macro Development".
+  If a technology has a macros or DRC scripts folder, the macro or DRC scripts tree in the
+  development environment will show a corresponding top-level branch for that technology.
+  </p>
+
+  <p>
+  Multiple technologies can share the same base path - hence it is possible to share macros
+  or DRC scripts between technologies.
+  </p>
+
+  <h2>Importing and exporting technologies</h2>
+
+  <p>
+  Technologies can be imported and exported to technology files (suffix ".lyt"). There is
+  one file per technology. To import or export a technology, choose "Import" or "Export" from
+  the technology tree's context menu (right mouse click). This way, technologies can be 
+  shared between users.
+  </p>
+
+  <p>
+  When importing or exporting a technology, the associated files (i.e. scripts, layer properties
+  files etc.) are not exported. They have to be transferred manually. However, if no base path
+  is specified in the technology file, KLayout will use the location of the ".lyt" file as the
+  future base path. That way, a technology plus related files can be made into a self-contained 
+  package using the following recipe:
+  </p>
+
+  <ul>
+    <li>Create any directory where you develop the technology. This will be the workspace.</li>
+    <li>Develop a technology with the technology manager. Enter the workspace path into the base path of the technology. 
+      In the workspace you store all the required additional files.</li>
+    <li>If you want to include DRC scripts or macros, create a "drc" or "macros" folder in the 
+      workspace. Store DRC scripts in the "drc" folder and macros in the macros folder.</li>
+    <li>If you need other files, store them in the workspace or in any sub-folder of the base 
+      path. Other files are layer properties file or LEF files for example. Use relative paths to specify
+      those files or simply use the file name.</li>
+    <li>Export the technology as ".lyt" file into the workspace.</li>
+    <li>Open the ".lyt" file in an text editor and remove the line containing the base path. This
+      line is at the beginning of the file and uses the XML element "base-path". For example: "&lt;base-path&gt;/home/matthias/tech_devel&lt;/base-path&gt;".</li>
+    <li>The workspace with the ".lyt" can now be packaged (tar or zip for example) and send elsewhere. To 
+      install, unpack the package and import the technology file from there. Since no base path
+      is specified, KLayout will set the default path to the ".lyt" file's location and 
+      look for all the additional files from there.</li>
+  </ul>
+
+  <h2>Auto-import feature</h2>
+
+  <p>
+  KLayout offers an additional feature useful for the distribution or central installation
+  of a technology: On startup, KLayout will look for directories called "tech" in KLayout's
+  search path. If such an directory is found, KLayout will scan that directory recursively 
+  for ".lyt" files and automatically import them. It will apply the same rules as for the
+  manual import and the imported technology will also show up in the technology manager, but
+  it cannot be edited.
+  </p>
+
+  <p>
+  Because the search path includes the application's installation path, this scheme
+  allows for a central installation of technology files plus the associated macros and DRC 
+  scripts, by providing them together with the application binary on some network share.
+  </p>
+
+</doc>
+

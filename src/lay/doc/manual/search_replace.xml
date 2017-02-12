@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Search and Replace</title>
+  <keyword name="Search"/>
+  <keyword name="Replace"/>
+
+  <h2-index/>
+
+  <p>
+  KLayout offers a "search and replace" function which provides a basic 
+  search and search+replace, but also a very generic and powerful extended feature
+  called "custom queries" (see below for that). The search and replace dialog can be found in the
+  "Edit" menu under "Search and replace".
+  </p>
+
+  <p>
+  The dialog provides four tabs in the left panel: "Find", "Delete", "Replace" and
+  "Custom". The functionality of these four tabs is explained below.
+  </p>
+
+  <p>
+  The left side of the dialog will hold results for operations which deliver
+  a result, for example the "Find" operation. The result is a list which displays
+  various items, depending on the nature and parameters of the operation. 
+  If the item represents a layout object, for example a shape
+  or a cell instance, the items selected in the list are highlighted in the 
+  layout to indicate their position. The length of the list is limited to 
+  avoid performance degradation for very long lists. The number of items shown
+  can be configured on the configuration page.
+  </p>
+
+  <p>
+  The configuration page which allows configuration of the search and replace
+  dialog's behavior is shown when the "Configure" button at the left bottom 
+  corner is pressed.
+  It can be found as well in the setup dialog under "Browsers", "Search Result Browser".
+  </p>
+
+  <h2>Find</h2>
+
+  <p>
+  The functionality of the "Find" tab is simple: Various conditions can be specified 
+  and all objects matching that condition are listed when the "Find" button is 
+  pressed.
+  </p>
+
+  <p>
+  The parameters of that function involve: Object type, cell scope and object specific conditions.
+  The object type is either "Instances" or a shape object. For shapes, the 
+  shape type can be confined to "Box", "Polygon", "Path" or "Text" which enables
+  specific features.
+  </p>
+
+  <p> 
+  The cell context can be one of:
+  </p>
+
+  <ul>
+    <li><b>Current cell</b>: look in the current cell and none else. Child cells are ignored.</li>
+    <li><b>Current cell and below</b>: look into the current cell and all child cells, where all instances of the children are considered.</li>
+    <li><b>All cells</b>: look into every cell individually, but don't consider the way the cells are instantiated.</li>
+  </ul>
+
+  <p>
+  Depending on the object type various parameters are available to be included in the
+  condition. Each condition applies to one specific parameter and is usually composed of
+  an operator (less, less than, equal ...) and a value against which the value of the 
+  parameter is checked. Length and area values are given in micron or square micron units.
+  </p>
+
+  <p>
+  String values can be matched against glob pattern using the tilde ("~")
+  match and non-match ("!~") operators. Glob pattern are the ones used for file names on 
+  the command line and use "*" for an arbitrary sequence of characters and "?" for 
+  a single arbitrary character. Here are some examples for glob pattern:
+  </p>
+
+  <table>
+    <tr><td><tt><b>A*</b></tt></td><td>The string must start with a capital "A"</td></tr> 
+    <tr><td><tt><b>*A*</b></tt></td><td>The string must contain a capital "A" somewhere</td></tr> 
+    <tr><td><tt><b>ABC?</b></tt></td><td>"ABC" followed by any character</td></tr> 
+    <tr><td><tt><b>N{AND,OR}</b></tt></td><td>"NAND" or "NOR"</td></tr> 
+    <tr><td><tt><b>A[0-9]</b></tt></td><td>"A" followed by a digit</td></tr> 
+    <tr><td><tt><b>A[^0-9]</b></tt></td><td>"A" followed by a non-digit</td></tr> 
+  </table>
+  
+  <p>
+  If the value field is left empty, no check is made on that
+  parameter. All conditions which are checked must be fulfilled to 
+  make the object listed on the results page.
+  </p>
+
+  <h2>Delete</h2>
+
+  <p>
+  Similar to the find page, this function asks for an object type, a cell context
+  and object specific conditions. 
+  </p>
+
+  <p>
+  If the "Delete All" button is pressed, all selected objects are deleted. 
+  </p>
+
+  <p>
+  If the "Select+Delete" button is pressed, the selected objects will first be shown
+  in the result page, similar to the "Find" function. Then, some or all of them can be 
+  selected and deleted by pressing the "Delete" button below the list.
+  </p>
+
+  <h2>Replace</h2>
+
+  <p>
+  Similar to the find page, this function asks for an object type, a cell context
+  and object specific conditions. In addition, the function allows specification of
+  replacement values for the parameters. If an entry field is left empty for the 
+  replacement value, no replacement is made.
+  </p>
+
+  <p>
+  For strings with glob pattern matching, name parts can be reused in the replacement
+  string. For example, if the operator is "~" on a text's string and the match string
+  is "A(*)", the replacement string can be set to "B\1". "\1" means the value of the 
+  first bracket in the match string, hence this setup replaces all leading "A"'s 
+  by "B".
+  </p>
+
+  <p>
+  If the "Replace All" button is pressed, the replacement parameters are set on all
+  selected objects.
+  </p>
+
+  <p>
+  If the "Select+Replace" button is pressed, the selected objects will first be shown
+  in the result page, similar to the "Find" function. Then, some or all of them can be 
+  selected and the replacement is made on them the "Replace" button is pressed below
+  the list.
+  </p>
+
+  <h2>Custom queries</h2>
+
+  <p>
+  The full power of this dialog is unleashed when using that page. Custom queries
+  are not only able to provide the functionality of the three other pages (find, delete and
+  replace), but provide functionality far beyond that simple scenarios.
+  </p>
+
+  <p>
+  Custom queries are statements resembling SQL statements with embedded expressions and
+  a rich language to describe shape or cell instantiation details. A in-depth description 
+  can be found here: <link href="/about/custom_queries.xml"/>.
+  </p>
+
+  <p>
+  The custom query dialog page offers an entry field to enter the query 
+  and below an "Execute" button to run it. The most recently used queries can be pulled back
+  into the edit field using the drop-down box below the edit field.
+  Custom queries can be saved under a given name and reused. The list of saved queries
+  can be manipulated with the buttons right to it. See the button's tooltips for 
+  a description of the button's functionality.
+  </p>
+
+  <p>
+  If the tab is switched to another tab and back, the custom query will be updated 
+  reflecting the query corresponding to the current functionality selected on the 
+  other tab.
+  </p>
+
+</doc>
+

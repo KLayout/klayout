@@ -1,0 +1,991 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>The Application API</title>
+
+  <h2-index/>
+
+  <p>
+  This section covers the basic application API. The application API consists of the main application class
+  and a couple of classes that represent the user interface. This sections presents a selection of classes 
+  that make up the application API. These classes provide the main entry points into the application API. 
+  Further classes are documented in <link href="/code/index.xml">RBA Class Index</link>.
+  </p>
+
+  <p>
+  All classes discussed herein are contained in the RBA namespace. In you code you either have to use
+  qualified names (i.e. RBA::Application) or include the RBA module in you macro's namespace.
+  </p>
+
+  <h2>The Application class</h2>
+  <keyword name="Application"/>
+
+  <p>
+  The Application class is documented in detail in <class_doc href="Application"/>. It represents the application
+  and because there is just one application, there also is just one instance of the application object.
+  That instance can be obtained through the "instance" class method: 
+  </p>
+
+  <pre>Application::instance</pre>
+
+  <p>The application object is the main entry point into the API. It offers a couple of methods. In particular:</p>
+
+  <ul>
+    <li><class_doc href="Application#application_data_path"/>: returns the user-local storage path. This is where KLayout saves
+      user-specific files, for example the configuration file.
+    </li>
+    <li><class_doc href="Application#exec"/>: runs the application. Normally, this method is called implicitly when the application
+      is started. It is possible to use KLayout as a Ruby interpreter by supplying a Ruby script on the command
+      line with the "-r" option. Such scripts must run the application explicitly if they want to.
+    </li>
+    <li><class_doc href="Application#exit"/>: exits the application. This method unconditionally terminates the application in a clean
+      way.
+    </li>
+    <li><class_doc href="Application#get_config"/> and <class_doc href="Application#set_config"/>: read and write the configuration database. 
+      The configuration database
+      is a storage of name/value pairs which is stored in the configuration file. These methods can be used
+      to manipulate that storage. Use the <class_doc href="Application#get_config_names"/> method to retrieve the names of the configuration
+      parameters stored inside the configuration database.
+    </li>
+    <li><class_doc href="Application#inst_path"/>: returns the installation path. That is where the executable is located.
+    </li>
+    <li><class_doc href="Application#is_editable?"/>: returns true, if KLayout runs in editable mode.
+    </li>
+    <li><class_doc href="Application#klayout_path"/>: returns the KLAYOUT_PATH value. This is the search path where 
+      KLayout looks for library files or macros. This method delivers the application data path and 
+      can be used to look up files required by the macro.
+    </li>
+    <li><class_doc href="Application#main_window"/>: delivers the MainWindow object which represents the application's main window.
+      See below for a description of that class.
+    </li>
+    <li><class_doc href="Application#process_events"/>: process pending events. If that method is called periodically during 
+      long operations, the application will be able to process events and thus handle clicks on a "Stop"
+      button for example. Please note that calling this method is not safe in every context, because
+      not every execution context is reentrant.
+    </li>
+    <li><class_doc href="Application#read_config"/>: reads the configuration database from a file.
+    </li>
+    <li><class_doc href="Application#version"/>: delivers KLayout's version string. This string can be used to switch 
+      the implementation of a script depending on KLayout's version.
+    </li>
+    <li><class_doc href="Application#write_config"/>: writes the configuration database to a file.
+    </li>
+  </ul>
+
+  <h2>The MainWindow class</h2>
+  <keyword name="MainWindow"/>
+
+  <p>
+  The MainWindow class is documented in detail in <class_doc href="MainWindow"/>. It represents the main application
+  window. The main window instance can be obtained with:
+  </p>
+
+  <pre>Application::instance.main_window</pre>
+
+  <p>
+  The main window object is the entry point to all user-interface related objects. 
+  It offers a couple of methods. In particular:
+  </p>
+
+  <ul>
+    <li><class_doc href="MainWindow#cancel"/>: cancels any pending operation (i.e. dragging of an object in move mode) and resets the
+      mode to the default mode (Select). Use this method to establish a known user interface state.</li>
+    <li><class_doc href="MainWindow#close_all"/> and <class_doc href="MainWindow#close_current_view"/>: close all or the current tab.</li>
+    <li><u>MainWindow#cm_*</u>: these are methods which are bound to the menu items in the menu bar. They can be used 
+      to trigger a menu function from a script.</li>
+    <li><class_doc href="MainWindow#create_layout"/>: create a new layout and load it into a layout view. This method has a parameter
+      that controls whether the layout is shown in a new tab, replaces the layout in the current tab or adds to
+      the current tab.</li>
+    <li><class_doc href="MainWindow#create_layout"/>: creates a new, empty layout and loads it.</li>
+    <li><class_doc href="MainWindow#create_view"/>: creates a new, empty tab.</li>
+    <li><class_doc href="MainWindow#current_view"/>: returns a LayoutView object (see below) which represents the current tab.</li>
+    <li><class_doc href="MainWindow#current_view_index"/>: returns the index of the current tab. Some methods like "select_view" operate
+      with view indexes. The view index is the number of the tab (0 is the leftmost one). The "view" method
+      allows obtaining the LayoutView object from a view index.</li>
+    <li><class_doc href="MainWindow#grid_micron"/>: gets the global grid in micrometer units.</li>
+    <li><class_doc href="MainWindow#initial_technology"/> and <class_doc href="MainWindow#initial_technology="/>: gets or sets the name of the technology to use to new layouts
+      or for layouts loaded without an explicit technology specification.</li>
+    <li><class_doc href="MainWindow#load_layout"/>: loads a layout into a tab. There are various variants of this method, offering 
+      various levels of configuration. All these variants have a parameter
+      that controls whether the layout is shown in a new tab, replaces the layout in the current tab or adds to
+      the current tab.</li>
+    <li><class_doc href="MainWindow#menu"/>: provides access to the menu object of class AbstractMenu (see <class_doc href="AbstractMenu"/>). 
+      This object provides access to the main menu, the toolbar and various context menus. With this object it 
+      is possible to manipulate the menu.</li>
+    <li><class_doc href="MainWindow#message"/>: show a message in the status bar.</li>
+    <li><class_doc href="MainWindow#reader_options"/>: gets the current layout reader options and allows modification of the latter. 
+      The reader options configure the reading of layouts.</li>
+    <li><class_doc href="MainWindow#save_session"/> and <class_doc href="MainWindow#restore_session"/>: save or restore a session. 
+      Sessions contain a window settings and informations about the layouts loaded. 
+      Sessions allows storing and restoring of the state of the main window.</li>
+    <li><class_doc href="MainWindow#select_view"/>: switch to the given tab.</li>
+    <li><class_doc href="MainWindow#view"/>: gets the LayoutView object for a given tab index.</li>
+    <li><class_doc href="MainWindow#views"/>: gets the number of tabs.</li>
+  </ul>
+
+  <p>
+  The MainWindow supplies two events.  
+  See <link href="/programming/events.xml"/> for details about events. 
+  These are the events:
+  </p>
+
+  <ul>
+    <li><b>on_current_view_changed</b>: 
+    This event is triggered when the current tab changes. The signal is available with an integer parameter: this is the index of the 
+    previous tab. The new tab is already the current tab when this event is triggered.
+    </li>
+    <li><b>on_view_created</b>: 
+    This event is triggered when a new view is created. The signal is available with an integer parameter: this is the index of the 
+    new tab.
+    </li>
+    <li><b>on_view_closed</b>: 
+    This event is triggered when a new view is closed. The signal is available with an integer parameter: this is the index of the 
+    tab that was closed.
+    </li>
+  </ul>
+
+  <p>
+  The MainWindow class features a couple of parameterless methods starting with "cm_...". These methods are identical with 
+  the methods called when the respective menu functions are triggered. They are of use when menu events need to be emulated 
+  in code, for example to implement special key bindings.
+  </p>
+
+  <h2>The LayoutView class</h2>
+  <keyword name="LayoutView"/>
+
+  <p>
+  The LayoutView class is documented in detail in <class_doc href="LayoutView"/>. It represents one layout tab in the 
+  main window. A layout view can show multiple layouts. The specification about which layout and which cell of that
+  layout is shown is combined in the CellView objects (<class_doc href="CellView"/>). Each LayoutView has a list 
+  of CellView objects corresponding to the layouts shown in the same panel.
+  </p>
+
+  <p>
+  A LayoutView object can be obtained from the main window either by obtaining the current view or by obtaining
+  the view object for a tab given by the tab index:
+  </p>
+
+  <pre># Current view:
+Application::instance.main_window.current_view
+# or short:
+LayoutView::current
+
+# By index:
+Application::instance.main_window.view(index)
+
+# Note: the index of the current view is
+Application::instance.main_window.current_view_index
+# and the number of views is
+Application::instance.main_window.views</pre>
+
+  <p>
+  The index is 0 for the first tab. Note that the value returned by current_view can be "nil" if no layout
+  is shown.
+  </p>
+
+  <p>
+  A layout view is the container for a couple of resources. These resources are mainly display objects like 
+  annotations, markers and images. In addition, the report database system in anchored in the LayoutView object.
+  The following resources are managed in the layout view:
+  </p>
+
+  <ul>
+    <li><b>Annotations (rulers)</b>: an arbitrary number of annotations can be registered in the view. 
+    The annotations are objects of the Annotation class (<class_doc href="Annotation"/>). Annotations
+    are independent of layouts and are defined in micron units. 
+    </li>
+    <li><b>Images</b>: images are also objects independent of layouts. Any number of images can be 
+    placed below the drawn layout.
+    </li>
+    <li><b>Markers</b>: markers are temporary overlay objects which can be used a highlights or to 
+    add some elaborate annotation to a layout view. Markers can be layout database objects, hence
+    it is possible to draw polygons or other objects over the layout. Markers can be configured
+    to a large degree, so different colors can be used for example. Markers are objects of class
+    Marker (<class_doc href="Marker"/>).
+    </li>
+    <li><b>Local configuration</b>: be default, the layout view draws it's configuration from the global
+    configuration database. It is possible however to override certain configuration parameters for a 
+    particular view. This allows for example to set the background color for a particular view.
+    </li>
+    <li><b>Layer properties</b>: the layer properties tree is also managed by the layout view. 
+    Since there can be multiple layer properties trees in different tabs in the layer properties panel, 
+    there are method to access either the current or a specific one of the layer properties trees.
+    </li>
+    <li><b>Custom stipples</b>: custom stipples can be defined in the layout view and used in the
+    layer properties. Custom stipples are bitmaps that define the fill pattern used for the inside
+    area of a polygon.
+    </li>
+    <li><b>Selection</b>: the layout view also manages the selection. This is a set of objects and their
+    instantiation path in the layout database. It represents the set of selected objects. Each
+    selected object is described by a instantiation path and the object itself. That information is
+    combined in the ObjectInstPath object (<class_doc href="ObjectInstPath"/>).
+    </li>
+    <li><b>Transient selection</b>: this is the object that is highlighted briefly when the mouse
+    hovers over it.
+    </li>
+    <li><b>Cell views</b>: the list of layouts and cells shown in the layout view as overlays. The 
+    cell view list cannot be manipulated directly. Instead, it is expanded when a layout is loaded.
+    One of the cell views is the "active" one. That is the one which is selected in the drop-down box
+    in the cell tree and for which the cell tree is shown.</li>
+    <li><b>Cell visibility</b>: the information about what cell is visible and what cell is not. Each
+    cell can be made invisible. In that case, only the cell frame is drawn and the cell is shown 
+    stroked out in the cell tree.
+    </li>
+    <li><b>Hierarchy levels</b>: this attribute controls which hierarchy levels are shown by default.</li>
+    <li><b>Viewport</b>: the geometrical dimensions of the area which is drawn in micron space.</li>
+    <li><b>Report databases</b>: a layout view can have multiple report databases attached to it.
+    Report databases can be shown in the marker browser and are collections of general information
+    or geometrical information related to a certain position or area.</li>
+    <li><b>Transactions</b>: transactions are grouped layout operations which form an atomic operation which 
+    can be undone. Transactions can be created within the layout view. Transactions must be opened and closed
+    before they are available as operations on the undo stack.</li>
+    <li><b>Plugins</b>: plugins are a way to implement new functionality inside the layout view related
+    to mouse actions. By using plugins it is possible to track the mouse and implement actions related
+    to mouse activity.</li>
+    <li><b>Title</b>: finally, a layout view has a title which is shown in the tab.</li>
+  </ul>
+
+  <p>
+  The layout view offers a couple of methods. Here's a brief explanation of some of these methods:
+  </p>
+
+  <ul>
+    <li><class_doc href="LayoutView#active_cellview"/> and <class_doc href="LayoutView#active_cellview_index"/>: 
+    gets the active CellView object or index of this object. The active cell view is the one that
+    is selected in the drop-down box above the cell tree. <class_doc href="CellView#active"/> gets the active cellview
+    of the current layout view.
+    </li>
+    <li><class_doc href="LayoutView#add_missing_layers"/> will add the layers to the layer tree for which there is no 
+    layer properties entry yet. This method can be used after a layout has been created and populated to show all
+    layers of the layout.
+    </li>
+    <li><class_doc href="LayoutView#add_stipple"/>, <class_doc href="LayoutView#clear_stipples"/> and <class_doc href="LayoutView#remove_stipple"/>: 
+    manage custom stipples.
+    </li>
+    <li><class_doc href="LayoutView#begin_layers"/> and <class_doc href="LayoutView#end_layers"/>: 
+    gets an start or end iterator object that allows traversing of the layer properties tree
+    in a recursive or non-recursive fashion.
+    See below for a description of how to deal with the layer properties.
+    </li>
+    <li><class_doc href="LayoutView#each_layer"/> is a convenient alternative way of iterating over the layers
+    without directly using the layer tree iterator.
+    </li>
+    <li><class_doc href="LayoutView#box"/>: 
+    gets the display area in micron units (the viewport).
+    </li>
+    <li><class_doc href="LayoutView#cellview"/>: 
+    gets the CellView object for a given index.
+    </li>
+    <li><class_doc href="LayoutView#cellviews"/>: 
+    gets the number of cell views registered.
+    </li>
+    <li><class_doc href="LayoutView#clear_annotations"/>, <class_doc href="LayoutView#insert_annotation"/>, <class_doc href="LayoutView#erase_annotation"/> and <class_doc href="LayoutView#replace_annotation"/>: 
+    manage annotations (rulers).
+    </li>
+    <li><class_doc href="LayoutView#clear_images"/>, <class_doc href="LayoutView#insert_image"/>, <class_doc href="LayoutView#erase_image"/> and <class_doc href="LayoutView#replace_image"/>: 
+    manage images.
+    </li>
+    <li><class_doc href="LayoutView#clear_config"/>, <class_doc href="LayoutView#get_config"/> and <class_doc href="LayoutView#set_config"/>: 
+    allow manipulation of the configuration for that layout view
+    only. For example it is possible to set a different background color for that specific layout view.
+    </li>
+    <li><class_doc href="LayoutView#clear_layers"/>, <class_doc href="LayoutView#delete_layer"/>, <class_doc href="LayoutView#delete_layer_list"/>, 
+        <class_doc href="LayoutView#insert_layer"/>, <class_doc href="LayoutView#insert_layer_list"/>, <class_doc href="LayoutView#replace_layer_node"/>
+        and <class_doc href="LayoutView#remove_unused_layers"/>: 
+    manage the layer properties. See below for a detailed explanation.
+    </li>
+    <li><class_doc href="LayoutView#clear_transactions"/>: 
+    clears all transactions (clears the undo stack).
+    </li>
+    <li><class_doc href="LayoutView#transaction"/> and <class_doc href="LayoutView#commit"/>: 
+    starts or ends a transaction. All operations between the 
+    start and end of a transaction can be undone in one step.
+    </li>
+    <li><class_doc href="LayoutView#create_layout"/> and <class_doc href="LayoutView#load_layout"/>: 
+    creates a new layout or loads a layout. In both cases, you can either
+    replace the current layouts or add the new one to the layouts present.
+    </li>
+    <li><class_doc href="LayoutView#create_rdb"/>, <class_doc href="LayoutView#remove_rdb"/> and <class_doc href="LayoutView#num_rdbs"/>: 
+    manage report databases.
+    </li>
+    <li><class_doc href="LayoutView#current_layer"/>: 
+    returns an iterator pointing to the current layer (the one that has the focus 
+    frame in the layer tree.
+    </li>
+    <li><class_doc href="LayoutView#current_layer_list"/>: 
+    returns the index of the current layer list (if multiple tabs are present
+    in the layer control panel, the current layer list is the tab that is selected).</li>
+    <li><class_doc href="LayoutView#each_annotation"/> and <class_doc href="LayoutView#each_annotation_selected"/>: 
+    delivers all or the selected annotations.
+    </li>
+    <li><class_doc href="LayoutView#each_image"/> and <class_doc href="LayoutView#each_image_selected"/>: 
+    delivers all or the selected images.
+    </li>
+    <li><class_doc href="LayoutView#each_object_selected"/> and <class_doc href="LayoutView#each_object_selected_transient"/>: 
+    delivers ObjectInstPath objects (<class_doc href="ObjectInstPath"/>) 
+    that point to one selected object each.
+    </li>
+    <li><class_doc href="LayoutView#erase_cellview"/>: 
+    close a cell view, i.e. remove that specific layout from the list of loaded layouts.</li>
+    <li><class_doc href="LayoutView#get_image"/>, <class_doc href="LayoutView#get_image_with_options"/> and <class_doc href="LayoutView#get_screenshot"/>: 
+    dump the screen content into a QImage with or without a specific resolution.</li>
+    <li><class_doc href="LayoutView#init_layer_properties"/>: provides an initialization of a "LayerProperties" object for a new layer
+    according to the current settings of the view.
+    </li>
+    <li><class_doc href="LayoutView#is_cell_hidden?"/>, <class_doc href="LayoutView#hide_cell"/>, <class_doc href="LayoutView#show_cell"/> and  <class_doc href="LayoutView#show_all_cells"/>: 
+    manage cell visibility.
+    </li>
+    <li><class_doc href="LayoutView#load_layer_prop"/> and <class_doc href="LayoutView#save_layer_props"/>: 
+    load or save layer properties files.
+    </li>
+    <li><class_doc href="LayoutView#max_hier"/>, <class_doc href="LayoutView#max_hier_levels="/> and <class_doc href="LayoutView#min_hier_levels="/>: 
+    manage hierarchy levels shown.
+    </li>
+    <li><class_doc href="LayoutView#object_selection"/>, <class_doc href="LayoutView#object_selection="/>, <class_doc href="LayoutView#select_object"/> and <class_doc href="LayoutView#clear_object_selection"/>:
+    return or manipulate the selection of geometrical objects (shapes, instances). The key descriptor object for that purpose
+    is <class_doc href="ObjectInstPath"/>, which refers to a geometrical object throug an instantiation path.
+    </li>
+    <li><class_doc href="LayoutView#pan_center"/> (and other pan... methods), <class_doc href="LayoutView#zoom_box"/> (and other zoom... methods): 
+    change the viewport.
+    </li>
+    <li><class_doc href="LayoutView#reload_layout"/>: 
+    reload a given layout.
+    </li>
+    <li><class_doc href="LayoutView#rename_cellview"/>: 
+    changes the name of a cellview.
+    </li>
+    <li><class_doc href="LayoutView#title"/>, <class_doc href="LayoutView#title="/> and <class_doc href="LayoutView#reset_title"/>: 
+    set or reset the layout view's title.
+    </li>
+    <li><class_doc href="LayoutView#show_image"/>: 
+    show or hide an image.
+    </li>
+    <li><class_doc href="LayoutView#viewport_width"/>, <class_doc href="LayoutView#viewport_height"/> and <class_doc href="LayoutView#viewport_trans"/>:
+    get the viewport parameters.
+    </li>
+  </ul>
+
+  <h3>Implementing Undo/Redo</h3>
+
+  <p>Undo/Redo functionality is implemented by using "transactions". Transactions are 
+  groups of operations which comprise one user operation. Transactions are built internally
+  and automatically once a transaction is initiated. Most operations performed in the framework
+  of the LayoutView and Layout objects are tracked within these transactions. When a transacting
+  is finished, it needs to be committed. After that, a new operation will be available for
+  "Undo" or "Redo".
+  </p>
+
+  <p>
+  Transactions can be initiated with <link href="LayoutView#transaction"/> and committed with <link href="LayoutView#commit"/>.
+  To ensure, every initiation of a transaction is matched by a "commit", it is recommended to employ "ensure":
+  </p>
+
+  <pre>begin
+
+  view.transaction("Some operation")
+
+  ... do your thing here ...
+  
+ensure
+  view.commit
+end
+</pre>
+
+  <h3>Manipulating the selection</h3>
+
+  <p>
+  The selection of geometrical objects can be manipulated by providing the necessary <class_doc href="ObjectInstPath"/> objects.
+  Each such object provides a "pointer" to a shape or instance through the hierarchy. Specifically it lists all the 
+  cells and their instantiation transformations down to the shape selected. By accumulating these selections, a shape can be
+  addressed in a flat view, even if the shape is instantiated many levels down in the hierarchy.
+  </p>
+
+  <p>
+  Generating such instantiation path object is somewhat tedious, but usually the requirement is not 
+  to generate such paths, but to take an existing selecting, manipulate it somehow and then reset it back.
+  This is fairly easy by taking a copy of the selection, manipulation of the shapes and setting the 
+  manipulated selection as the new one.
+  </p>
+
+  <p>
+  The following is a sample which replaces all shapes by their hull polygons. Note that is provides
+  undo/redo support through "transaction":
+  </p>
+
+  <pre>  view = mw.current_view
+
+begin
+
+  view.transaction("Convert selected shapes to polygons")
+
+  sel = view.object_selection
+
+  sel.each do |s|
+    if !s.is_cell_inst? &amp;&amp; !s.shape.is_text?
+      ly = view.cellview(s.cv_index).layout
+      # convert to polygon
+      s.shape.polygon = s.shape.polygon
+    end
+  end
+  
+  view.object_selection = sel
+
+ensure
+  view.commit
+end
+</pre>
+
+  <h3>Events</h3>
+
+  <p>
+  The LayoutView can supply several events.  
+  See <link href="/programming/events.xml"/> for details about events. 
+  These are the events:
+  </p>
+
+  <ul>
+    <li><b>on_active_cellview_changed</b>: 
+    This event is triggered when the active cellview changes. The active cellview is the one indicated
+    by the drop-down-box atop of the cell list if multiple layouts are loaded into one view.
+    </li>
+    <li><b>on_cell_visibility_changed</b>: 
+    This event is triggered when the visibility of a cell changes. The visibility of a cell is changed by using 
+    "Hide Cell" or "Show Cell" from the cell tree's context menu.
+    </li>
+    <li><b>on_cellview_list_changed</b>:
+    This event is triggered when a new cellview is added or a cellview is removed.
+    </li>
+    <li><b>on_cellview_changed</b>:
+    This event is triggered when a cellview changed (i.e. the current cell has been changed. The integer 
+    slot ("signal_int") is called with the index of the cellview that has changed.
+    </li>
+    <li><b>on_file_open</b>:
+    This event is triggered when a file is loaded.
+    </li>
+    <li><b>on_layer_list_changed</b>:
+    This event is triggered when the layer properties list was changed.
+    </li>
+    <li><b>on_rdb_list_changed</b>:
+    This event is triggered when a report database is opened or removed.
+    </li>
+    <li><b>on_selection_changed</b>:
+    This event is triggered when the selection has changed.
+    </li>
+    <li><b>on_transient_selection_changed</b>:
+    This event is triggered when the transient selection has changed.
+    </li>
+    <li><b>on_viewport_changed</b>:
+    This event is triggered when the viewport has changed, for example the view is zoomed in or panned.
+    </li>
+  </ul>
+
+  <h3>Working with layer properties</h3>
+
+  <p>
+  The API provides methods by which the layer properties list of the layout view can be traversed and manipulated in many ways.
+  In particular:
+  </p>
+
+  <ul>
+    <li>Add or remove entries to or from the layer properties list: <class_doc href="LayoutView#insert_layer"/> and <class_doc href="LayoutView#delete_layer"/></li>
+    <li>Clear all entries: <class_doc href="LayoutView#clear_layers"/></li>
+    <li>Manage custom stipple pattern: <class_doc href="LayoutView#add_stipple"/>, <class_doc href="LayoutView#clear_stipples"/> and <class_doc href="LayoutView#remove_stipple"/></li>
+    <li>Add, rename or remove tabs, get or change the current tab: <class_doc href="LayoutView#insert_layer_list"/>, <class_doc href="LayoutView#rename_layer_list"/>, <class_doc href="LayoutView#delete_layer_list"/>, <class_doc href="LayoutView#current_layer_list"/> and <class_doc href="LayoutView#set_current_layer_list"/></li>
+    <li>Remove unused layers from the layer list or add entries for missing layers: <class_doc href="LayoutView#remove_unused_layers"/>, <class_doc href="LayoutView#add_missing_layers"/></li>
+    <li>Load or save layer properties from or to a ".lyp" file: <class_doc href="LayoutView#load_layer_props"/> and <class_doc href="LayoutView#save_layer_props"/></li>
+    <li>Obtain the selected entries from the layer properties tree: <class_doc href="LayoutView#selected_layers"/> and <class_doc href="LayoutView#current_layer"/></li>
+    <li>Initialize layer properties with the default settings: <class_doc href="LayoutView#init_layer_properties"/></li>
+    <li>Expand layer properties which contain wildcard entries ("stylesheet" layer properties files): <class_doc href="LayoutView#expand_layer_properties"/></li>
+  </ul>
+
+  <keyword name="LayerPropertiesIterator"/>
+  <p>
+  Many of these functions use LayerPropertiesIterator objects (<class_doc href="LayerPropertiesIterator"/>)
+  to identify entries in the layer tree. Such an object is basically a pointer into the tree. The term "iterator"
+  refers to the fact, that such a pointer can be moved to neighboring entries in the layer tree.
+  By default, the LayerPropertiesIterator performs a preorder, depth-first traversal of the layer properties tree (the
+  virtual root object is omitted).
+  This is how to work with LayerPropertiesIterator objects:
+  </p>
+
+  <pre>layout_view = Application::instance.main_window.current_view
+# Get the iterator for the first entry:
+lp = layout_view.begin_layers
+# advance to the next entry (preorder, depth-first traversal):
+lp.next
+# advance to the next sibling 
+lp.next_sibling(1)
+# advance to the previous sibling
+lp.next_sibling(-1)
+# move down in the hierarchy to the first child
+lp.down_first_child
+# move down in the hierarchy to the last child
+lp.down_last_child
+# move up to the parent node
+lp.up
+# get the value of the current node
+props = lp.current</pre>
+
+  <p>
+  The LayerPropertiesIterator has a couple of attributes:
+  </p>
+  
+  <ul>
+    <li><class_doc href="LayerPropertiesIterator#current"/>: returns the LayerPropertiesNodeRef object (<class_doc href="LayerPropertiesNodeRef"/>) which is a 
+    representative for the layer the iterator points to. This object can be manipulated which has an immediate effect on the layer list of the view.</li>
+    <li><class_doc href="LayerPropertiesIterator#at_end?"/>: returns true, if the iterator is at the end of the layer properties tree (if "next" is
+    used to traverse) or at the end of the current child node list if other methods of traversal are used.
+    It "at_end?" is true, the iterator does not point to a valid entry.
+    </li>
+    <li><class_doc href="LayerPropertiesIterator#is_null?"/>: returns true, if this iterator is a null iterator (i.e. default-constructed).</li>
+    <li><class_doc href="LayerPropertiesIterator#at_top?"/>: returns true, if this iterator is pointing to a top-level entry.</li>
+    <li><class_doc href="LayerPropertiesIterator#child_index"/>: returns the index of the current entry in the current child list.</li>
+  </ul>
+
+  <p>
+  Iterators can be compared against each other. If two iterators point to the same object, the equality
+  operator "==" returns true.
+  </p>
+
+  <p>
+  The actual entry that the iterators "current" property is a LayerPropertiesNodeRef object (a reference to a LayerPropertiesNode object). 
+  If behaves the same way than a LayerPropertiesNode object (<class_doc href="LayerPropertiesNode"/>), but modifications of the latter 
+  will change the way the layer is displayed in the view.
+  </p>
+
+  <keyword name="LayerPropertiesNode"/>
+  <p>
+  The LayerPropertiesNode object contributes only a few methods, namely:
+  </p>
+
+  <ul>
+    <li><class_doc href="LayerPropertiesNode#id"/>: an integer ID that uniquely identifies the entry in the tree.</li>
+    <li><class_doc href="LayerPropertiesNode#flat"/>: computes and delivers an effective set of properties as a LayerProperties object.</li>
+    <li><class_doc href="LayerPropertiesNode#bbox"/>: computes the bounding box of the drawn layer represented by this entry.</li>
+    <li><class_doc href="LayerPropertiesNode#has_children?"/>: returns true, if this node is not a leaf node.</li>
+    <li><class_doc href="LayerPropertiesNode#add_child"/>: adds a child node to the node. It returns a reference to the new node created inside the node's hierarchy. Is is possible to add new children to the node returned.</li>
+    <li><class_doc href="LayerPropertiesNode#clear_children"/>: removes all children from the node.</li>
+  </ul>
+
+  <p>
+  The actual properties of the layer are accessible through methods of the LayerProperties object.
+  Since the parent node may override or contribute properties, a LayerProperties object has a twofold
+  identity: the way it appears finally ("real") and the way it is configured ("local"). The property
+  accessors have a "real" parameter and deliver the real value if this parameter is set to true and 
+  the local value otherwise. There are also convenience methods which always deliver the "real" value.
+  </p>
+
+  <pre>lp = layout_view.begin_layers
+
+# manipulate the layer 
+lp.current.width = 2
+lp.current.fill_color = 0x80ff40
+
+# which is equivalent to this somewhat more efficient way:
+props = lp.current.dup
+props.width = 2
+props.fill_color = 0x80ff40
+lp.current.assign(props)</pre>
+
+  <p>
+  It is possible to directly manipulate the hierarchy this way:
+  </p>
+
+  <pre>lp = layout_view.begin_layers
+# create a copy that we can manipulate
+# add two child nodes
+cp = RBA::LayerProperties::new
+cp.source = "100/0"
+lp.current.add_child(cp)
+cp = RBA::LayerProperties::new
+cp.source = "101/0"
+lp.current.add_child(cp)
+</pre>
+
+  <p>
+  New entries can be created by using LayoutView's insert_layer method and a LayerPropertiesIterator to 
+  specify the location where the node shall be created. Here is an example how to create a child entry
+  using that technique. Please note how "down_first_child" is used to navigate into the node's child space
+  which works even if there are no children yet:
+  </p>
+
+  <pre>lp = layout_view.begin_layers
+# let the iterator point to the first child, even if it does not exist
+lp.down_first_child
+# (lp.current may not be valid, but still lp is a valid insert position)
+# prepare a new entry for insert:
+props = RBA::LayerProperties.new
+props.source = "100/0"
+# insert the child node:
+layout_view.insert_layer(lp, props)
+# now, lp points to a valid object: lp.current.source == "100/0"</pre>
+
+  <h3>LayerProperties objects</h3>
+  <keyword name="LayerProperties"/>
+
+  <p>
+  The LayerProperties object (<class_doc href="LayerProperties"/>) represents one entry in the layer properties tree
+  and has a couple of basic properties. For each of these properties,
+  a getter for the real and local value exists as well as a setter that installs a local value.
+  For example, for the width property, the following methods are defined:
+  </p>
+
+  <ul>
+    <li><b>width(real)</b>: the getter for the real ("width(true)") or local ("width(false)") value.</li>
+    <li><b>width</b>: the real value.</li>
+    <li><b>width=</b>: the setter for the local value.</li>
+  </ul>
+
+  <p>
+  Width is a "weak" property. That means that for computing the effective width, child nodes 
+  can override the settings inherited from the parent nodes. A width of 0 is considered "not set" and does not
+  override parent defined widths. Other properties like visibility are "strong", i.e. 
+  the parent can override the properties set for it's children. Another form of combination is "additive" where
+  the effective property value is the "sum" (or in general combination) of all local properties from parent
+  to child.
+  </p>
+
+  <p>
+  Some properties like "fill_color" do not have a neutral value but instead they can be cleared (in that case with
+  "clear_fill_color"). The LayerProperties object can be asked whether a fill color is set using the "has_fill_color?" method.
+  </p>
+
+  <p>
+  This is a brief list of properties:
+  </p>
+
+  <ul>
+    <li><class_doc href="LayerProperties#animation"/> (strong): specifies animation (blinking, scrolling)</li>
+    <li><class_doc href="LayerProperties#dither_pattern"/> (strong): specifies the fill pattern</li>
+    <li><class_doc href="LayerProperties#fill_brightness"/> (additive): specifies the fill color's brightness</li>
+    <li><class_doc href="LayerProperties#fill_color"/> (strong): specifies the fill color</li>
+    <li><class_doc href="LayerProperties#frame_brightness"/> (additive): specifies the frame color's brightness</li>
+    <li><class_doc href="LayerProperties#frame_color"/> (strong): specifies the frame color</li>
+    <li><class_doc href="LayerProperties#lower_hier_level"/> (weak): the lower hierarchy level shown. This property has various flavors related to the definition of "lower level".</li>
+    <li><class_doc href="LayerProperties#upper_hier_level"/> (weak): the upper hierarchy level shown. This property has various flavors related to the definition of "upper level".</li>
+    <li><class_doc href="LayerProperties#marked?"/> (strong): specifies whether the layout is rendered with small crosses at each vertex</li>
+    <li><class_doc href="LayerProperties#transparent?"/> (strong): specifies whether the layer is semi-transparent (color bitmap combination)</li>
+    <li><class_doc href="LayerProperties#visible?"/> (strong): specifies whether the layer is visible</li>
+    <li><class_doc href="LayerProperties#valid?"/> (strong): specifies whether the layer is valid</li>
+    <li><class_doc href="LayerProperties#width"/> (weak): specifies the line width</li>
+    <li><class_doc href="LayerProperties#source"/> (weak, additive): specifies the origin of the data. This property can be set or obtained either a string using KLayout's source notation or be accessed
+      through a couple of specialized properties delivering a part of the source specification each (<class_doc href="LayerProperties#source_layer"/>, <class_doc href="LayerProperties#source_datatype"/>, <class_doc href="LayerProperties#source_name"/>, <class_doc href="LayerProperties#source_layer_index"/>, <class_doc href="LayerProperties#source_cellview"/> and <class_doc href="LayerProperties#trans"/>)</li>
+  </ul>
+
+  <p>
+  In addition, a couple of getters for computed and derived values are present (i.e. "eff_frame_color"). There are
+  no setters for these properties. The effective frame color for example delivers the frame color which results
+  from combining the frame color and the frame brightness.
+  </p>
+
+  <h2>The CellView class</h2>
+  <keyword name="CellView"/>
+
+  <p>
+  The CellView (<class_doc href="CellView"/>) identifies the cell drawn and the context the cell is drawn in. A CellView can be created as a object
+  but usually it is obtained from a LayoutView object. In the following example, the active cell view is used:
+  </p>
+
+  <pre>RBA::Application::instance.main_window.current_view.active_cellview</pre>
+
+  <p>
+  Alternatively, a cell view can be addressed by index:
+  </p>
+
+  <pre>lv = RBA::Application::instance.main_window.current_view
+num_cellviews = lv.cellviews # number of cell views
+lv.cellview(0) # first one</pre>
+
+  <p>
+  A cellview carries the following information:
+  </p>
+
+  <ul>
+    <li><class_doc href="CellView#cell"/>: a reference to the cell shown (a Cell object: <class_doc href="Cell"/>).</li>
+    <li><class_doc href="CellView#layout"/>: a reference to the layout object (a Layout object: <class_doc href="Layout"/>) which contains the cell shown.</li>
+    <li><class_doc href="CellView#name"/>: the unique name of the layout.</li>
+    <li><class_doc href="CellView#filename"/>: the name (actually the path) of the file loaded if the layout was loaded from a file.</li>
+    <li><class_doc href="CellView#path"/>: the unspecific path (see below)</li>
+    <li><class_doc href="CellView#context_path"/>: the specific path (see below)</li>
+    <li><class_doc href="CellView#ctx_cell"/>: the context cell (see below). Alternatively the cell index of the context cell is available by <class_doc href="CellView#ctx_cell_index"/>.</li>
+    <li><class_doc href="CellView#technology"/>: the technology (name) used with this layout</li>
+    <li><class_doc href="CellView#is_cell_hidden?"/>: returns a value indicating whether a given cell is hidden</li>
+  </ul>
+
+  <p>
+  A cellview can be manipulated to change the cell shown in the layout view. For this purpose, assignment methods
+  exist which will reconfigure the cellview:
+  </p>
+
+  <ul>
+    <li><class_doc href="CellView#cell="/>: a reference to the cell shown (a Cell object: <class_doc href="Cell"/>).</li>
+    <li><class_doc href="CellView#name="/>: the unique name of the layout.</li>
+    <li><class_doc href="CellView#path="/>: sets the unspecific path (see below)</li>
+    <li><class_doc href="CellView#context_path="/>: sets the specific path (see below)</li>
+    <li><class_doc href="CellView#technology="/>: applies the given technology to this layout</li>
+    <li><class_doc href="CellView#show_cell"/>, <class_doc href="CellView#show_all_cells"/>, <class_doc href="CellView#hide_cell"/>: shows or hides cells</li>
+    <li><class_doc href="CellView#close"/>: closes this cell view (removes it from the layout view)</li>
+  </ul>
+
+  <h3>Unspecific and specific path, context cell</h3>
+
+  <p>
+  In addition to the cell the cell view specifies how the cell is embedded in the hierarchy.
+  Embedding can happen in two ways: an unspecific and a specific way. Both ways contribute to a path which 
+  leads from a top cell to the cell drawn.
+  </p>
+
+  <p>
+  The first part is always the unspecific path. This path specifies, where the cell drawn is located in the cell 
+  tree. That has no effect on the drawing, but is determines what entry in the cell tree is selected. 
+  Giving a path for that information is required, because a cell can be child of different cells which itself can be 
+  children of other cells. The unspecific path lists the top cell and further cells which are all direct or indirect 
+  parents of the cell addressed.
+  </p>
+
+  <p>
+  The unspecific path ends at the "context cell" which usually is identical to the cell addressed by the cell view.
+  However, KLayout allows addressing of a specific instance of a direct or indirect child cell as the actual cell. In that
+  case, the specific path comes into play. Bascially that means, that a cell is drawn within a context of embedding 
+  layout. The specific path leads from the context cell to the cell view's target cell and consists of specific instances 
+  (hence the name "specific path"). The "descend" and "ascend" feature
+  bascially adds or removes instances from that path.
+  </p>
+
+  <p>
+  The unspecific path can be obtained with the <class_doc href="CellView#path"/> method, the specific path with the <class_doc href="CellView#context_path"/> method.
+  The unspecific path is just an array of cell indexes specifying the top cell and further cells down to the context cell
+  and includes the context cell. The specific path is an array of InstElement objects (<class_doc href="InstElement"/>).
+  Each InstElement object describes a specific instantiation (a cell instance plus information when a specific array instance
+  is addressed). When there is no context, the specific path is an empty array.
+  Using the setters <class_doc href="CellView#path="/> and <class_doc href="CellView#context_path="/> these paths can be changed
+  to select a new cell into the layout view.
+  </p>
+
+  <h2>The Image class</h2>
+  <keyword name="Image"/>
+
+  <p>
+  Images can be placed onto the drawing canvas and display colored or monochrome images below the layout.
+  Images are represented by Image objects (<class_doc href="Image"/>). Basically an image is a two-dimensional
+  array of pixel values with a specification how these pixels are to be displayed on the canvas. An image
+  can be created an placed on the canvas like this:
+  </p>
+
+  <pre>lv = RBA::Application::instance.main_window.current_view
+image = RBA::Image::new("image.png")
+lv.insert_image(image)</pre>
+
+  <p>
+  An image can be configured by using different properties and attributes:
+  </p>
+
+  <ul>
+    <li>The images' data can be loaded from a file by using a constructor with a file name. In addition, the image 
+    can use data from an array of floating-point values using either a constructor or the <class_doc href="Image#set_data"/> method. 
+    An image can be colored, in which case three channels are present or it can be monochrome. In the latter case,
+    a single channel is present only. Together with the data, the dimensions of the image have to be specified (width
+    and height in pixel units).
+    </li>
+    <li>The image's data can be manipulated per pixel using the <class_doc href="Image#get_pixel"/> or <class_doc href="Image#set_pixel"/> method.</li>
+    <li>The data range for the data stored in the image can be set using the <class_doc href="Image#min_value="/> and <class_doc href="Image#max_value="/>
+    attributes. The data range determines which value is considered "maximum intensity" (max_value) and "zero intensity"
+    (min_value).
+    </li>
+    <li>For monochrome images, a data mapping can be specified. A data mapping converts a monochrome value (a scalar)
+    to a color. Data mapping is specified through a ImageDataMapping object (<class_doc href="ImageDataMapping"/>)
+    using the <class_doc href="Image#data_mapping"/> method. 
+    </li>
+    <li>The geometrical properties of an image are encapsulated in a Matrix3d object (<class_doc href="Matrix3d"/>).
+    Such a matrix describes the transformation from pixel coordinates to the micron unit space of the canvas.
+    A 3x3 matrix is a generic way to specify a transformation, including translation, rotation, mirror, shear or 
+    perspective distortion. The matrix is obtained and set using the <class_doc href="Image#matrix"/> attribute. 
+    Convenience methods like <class_doc href="Image#trans"/>, <class_doc href="Image#pixel_width"/> and <class_doc href="Image#pixel_height"/> allow to access sub-aspects
+    of the generic transformation (affine transformation, scaling).
+    </li>
+  </ul>
+
+  <p>
+  An image can be transformed using one of the <class_doc href="Image#transformed"/> methods. It can be hidden or shown using the 
+  <class_doc href="Image#visible="/>
+  method. The bounding box of the image can be obtained with the <class_doc href="Image#box"/> method.
+  </p>
+
+  <h2>The Annotation class</h2>
+  <keyword name="Annotation"/>
+
+  <p>
+  Annotations (<class_doc href="Annotation"/>) are basically rulers but can be used for other purposes as well, i.e. 
+  to simply add a text object.
+  Annotations, like images, are objects stored in the LayoutView and can be selected, deleted, transformed etc.
+  </p>
+ 
+  <p>Programmatically, annotations are created that way:</p>
+
+  <pre>lv = RBA::Application::instance.main_window.current_view
+ant = RBA::Annotation::new
+ant.p1 = RBA::DPoint.new(0.0, 0.0)
+ant.p2 = RBA::DPoint.new(100.0, 0.0)
+lv.insert_annotation(ant)</pre>
+
+  <p>The annotation carries a couple of properties, which copy the properties that can be set using the
+  ruler properties dialog for example. The most important properties are the two positions (start and end 
+  position) accessible through the <class_doc href="Annotation#p1"/> and <class_doc href="Annotation#p2"/> properties, the style (<class_doc href="Annotation#style"/> property)
+  and the outline (<class_doc href="Annotation#outline"/> property).
+  </p>
+
+  <p>Annotations cannot be manipulated directly. But annotations can be replaced by new annotations. For replacement,
+  the annotation ID is the key. The following
+  example demonstrates how rulers are manipulated. In this example, the style of all rulers 
+  is set to "arrow on both sides". Note, how in this example transactions are used to implement
+  undo/redo:
+  </p>
+
+  <pre>view = RBA::LayoutView::current
+
+begin
+
+  view.transaction("Restyle annotations")
+
+  view.each_annotation do |a|
+    adup = a.dup
+    adup.style = RBA::Annotation::StyleArrowBoth
+    view.replace_annotation(a.id, adup)
+  end
+  
+ensure
+  view.commit
+end
+</pre>
+
+  <h2>The Marker class</h2>
+  <keyword name="Marker"/>
+
+  <p>
+  A marker is a temporary highlight object. A marker is represented by the Marker class (<class_doc href="Marker"/>).
+  Markers appear when they are created and disappear when they are destroyed. Since destruction by the garbage
+  collector happens at undefined times, the destroy method can be used to destroy the marker explicitly.
+  Markers accept some plain shapes (i.e. a Box) which will be displayed as the marker. Markers can be configures in 
+  manifold ways, i.e. the colors, the fill pattern, line width etc. See the class documentation for details about 
+  the configuration properties.
+  </p>
+
+  <p>
+  This is how to create and destroy a marker:
+  </p>
+
+  <pre>lv = RBA::Application::instance.main_window.current_view
+marker = RBA::Marker.new(lv)
+marker.set(RBA::DBox::new(0.0, 0.0, 100.0, 200.0))
+# to hide the marker:
+marker.destroy</pre>
+
+  <p>
+  Markers are temporary objects intended for highlighting a certain area or shape. Markers are not 
+  persisted in sessions nor can they be edited.
+  </p>
+
+  <h2>The Plugin and PluginFactory classes</h2>
+  <keyword name="Plugin"/>
+  <keyword name="PluginFactory"/>
+
+  <p>
+  Plugins (<class_doc href="Plugin"/>) are objects which provide modular extensions of KLayout. Plugins are 
+  the only way to handle 
+  mouse events in the canvas.
+  The basic operation of a plugin is the following:
+  </p>
+  
+  <ul>
+    <li>For each plugin type, a PluginFactory (<class_doc href="PluginFactory"/>) object must be provided. KLayout 
+    uses this object to 
+    configure itself and to create a particular plugin instance for each LayoutView. The PluginFactory must provide 
+    certain configuration information and can handle some events in a global manner, for example menu entries that 
+    do not refer to a certain plugin instance. The PluginFactory must register itself in the KLayout framework. After doing 
+    so, KLayout will provide a new button in the tool bar. If this button is selected, the plugin will be activated.
+    </li>
+    <li>When a LayoutView is created, it will use the PluginFactory to create a specific Plugin instance for the view.
+    When the tool bar button is pressed which relates to this plugin, the plugin will be activated and mouse or other
+    events will be redirected to this plugin.
+    </li>
+  </ul>
+
+  <p>
+  The PluginFactory itself acts as a singleton per plugin class and provides not only the ability to create
+  Plugin objects but also a couple of configuration options and a global handler for configuration and menu
+  events. The configuration includes: 
+  </p>
+
+  <ul>
+    <li>Menu items: by configuring menu items in the PluginFactory, KLayout can create these items when 
+    the plugin is initialized. Each menu entry is connected with the plugin through a symbol: this is a string
+    that tells the plugin's <class_doc href="Plugin#menu_activated"/> method which menu item was selected. By configuring a menu
+    rather than creating it explicitly, KLayout has a somewhat better control over what menu items belong to
+    which plugin. Menu items are configured by calling <class_doc href="PluginFactory#add_menu_entry"/> in the PluginFactory's constructor.
+    </li>
+    <li>Configuration options: Instead of directly taking values from the configuration database, it is more
+    convenient to register configuration keys in the PluginFactory's constructor using the <class_doc href="PluginFactory#add_option"/> method.
+    After an option is configured, the individual Plugin objects and the PluginFactory receives "configure" calls 
+    when a configuration option changes or for the initial configuration.
+    </li>
+  </ul>
+
+  <p>
+  A PluginFactory must be instantiated and register itself. Menu items and configuration options should be
+  set before the object is registered. Upon registration, a unique name must be specified for the plugin class.
+  Also, the tool button title and optionally an icon can be specified.
+  </p>
+
+  <p>
+  The main objective of the PluginFactory class however is to create the actual plugin object. For this,
+  the create_plugin method needs to be reimplemented. The implementation is supposed to create an object of
+  the specific class.
+  </p>
+
+  <p>
+  The actual implementation of the plugin is a class derived from Plugin (<class_doc href="Plugin"/>).
+  The plugin comes into life, when it is activated. That is, when the tool button is pressed that is 
+  associated with the plugin. When the plugin is activated, the <class_doc href="Plugin#activated"/> method is called. The method
+  can be reimplemented in order to prepare the plugin for taking actions on mouse events. When the 
+  plugin is not longer active, i.e. because another mode has been selected, the <class_doc href="Plugin#deactivated"/> method is called.
+  </p>
+
+  <p>
+  Every plugin has the ability to receive and intercept mouse events. Various mouse events are available: mouse moved,
+  mouse button clicked (button pressed and released), mouse button double clicked, mouse button pressed, mouse button
+  released, entry or leave of the window and agitation of the mouse wheel. Each event follows a certain protocol depending 
+  whether the plugin is
+  active or not. In addition, plugins can request exclusive control over the mouse by "grabbing" the mouse. 
+  Each event is associated with a certain callback. The callback has a parameter - "prio" - which determines the
+  role of the event.
+  The protocol is described here:
+  </p>
+
+  <ul>
+    <li>First, all plugins that grabbed the mouse with grab_mouse will receive an event callback with 
+    'prio' set to true in the reverse order the plugins grabbed the mouse. 
+    If any one of the mouse event handlers returns true, the protocol terminates.
+    </li>
+    <li>
+    If that is not the case or no plugin has grabbed the mouse, the active plugin receives 
+    the mouse event with 'prio' set to true.
+    </li>
+    <li>
+    If no receiver accepted the mouse event by returning true, it is sent again to all plugins with 'prio' set to false. 
+    Again, the loop terminates if one of the receivers returns true. The second pass gives inactive 
+    plugins a chance to monitor the mouse and implement specific actions - i.e. displaying the current position.
+    </li>
+  </ul>
+
+  <p>
+  In an mouse event handler, the plugin can take any action, i.e. transform objects or create/remove markers. 
+  This allows implementing of interactive functionality upon KLayout's canvas object. Using "set_cursor", the 
+  plugin can set the mouse cursor to a specific shape for example. A plugin should consider implementing "drag_cancel" 
+  in order to terminate any pending dragging operations. <class_doc href="Plugin#drag_cancel"/> is called by KLayout to regain control 
+  over the mouse in certain circumstances and is supposed to put the plugin into a "watching" instead of "dragging" state.
+  </p>
+
+</doc>
+

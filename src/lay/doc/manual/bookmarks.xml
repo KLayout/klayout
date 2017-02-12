@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Bookmarking Views</title>
+  <keyword name="Bookmarks"/>
+
+  <p>
+  Views (window, cell) can be bookmarked for later retrieval. Choose
+  "Bookmark This View" from the "Bookmarks" menu. A name is required to
+  be entered for the bookmark. The bookmark will then appear in the "Goto
+  Bookmarks" list.
+  </p>
+  <p>
+  The list of bookmarks defined can be loaded or saved by using the "Load
+  Bookmarks" and "Save Bookmarks" functions from the "Bookmarks" menu.
+  </p>
+
+</doc>

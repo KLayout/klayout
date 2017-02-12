@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>PCell sample (Ruby)\nThis sample provides a simple PCell that draws a circle</description>
+ <format>general</format>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <show-in-menu>false</show-in-menu>
+ <shortcut></shortcut>
+ <interpreter>ruby</interpreter>
+ <text># Sample PCell
+#
+# This sample PCell implements a library called "MyLib" with a single PCell that
+# draws a circle. It demonstrates the basic implementation techniques for a PCell 
+# and how to use the "guiding shape" feature to implement a handle for the circle
+# radius.
+# 
+# NOTE: after changing the code, the macro needs to be rerun to install the new
+# implementation. The macro is also set to "auto run" to install the PCell 
+# when KLayout is run.
+
+module MyLib
+
+  include RBA
+
+  # Remove any definition of our classes (this helps when 
+  # reexecuting this code after a change has been applied)
+  MyLib.constants.member?(:Circle) &amp;&amp; remove_const(:Circle)
+  MyLib.constants.member?(:MyLib) &amp;&amp; remove_const(:MyLib)
+  
+  # The PCell declaration for the circle
+  class Circle &lt; PCellDeclarationHelper
+  
+    include RBA
+
+    def initialize
+
+      # Important: initialize the super class
+      super
+
+      # declare the parameters
+      param(:l, TypeLayer, "Layer", :default =&gt; LayerInfo::new(1, 0))
+      param(:s, TypeShape, "", :default =&gt; DPoint::new(0, 0))
+      param(:r, TypeDouble, "Radius", :default =&gt; 0.1)
+      param(:n, TypeInt, "Number of points", :default =&gt; 64)     
+      # this hidden parameter is used to determine whether the radius has changed
+      # or the "s" handle has been moved
+      param(:ru, TypeDouble, "Radius", :default =&gt; 0.0, :hidden =&gt; true)
+
+    end
+  
+    def display_text_impl
+      # Provide a descriptive text for the cell
+      "Circle(L=#{l.to_s},R=#{'%.3f' % r.to_f})"
+    end
+    
+    def coerce_parameters_impl
+    
+      # We employ coerce_parameters_impl to decide whether the handle or the 
+      # numeric parameter has changed (by comparing against the effective 
+      # radius ru) and set ru to the effective radius. We also update the 
+      # numerical value or the shape, depending on which on has not changed.
+      rs = nil
+      if s.is_a?(DPoint) 
+        # compute distance in micron
+        rs = s.distance(DPoint::new(0, 0))
+      end 
+      if rs &amp;&amp; (r-ru).abs &lt; 1e-6
+        set_ru rs
+        set_r rs 
+      else
+        set_ru r 
+        set_s DPoint::new(-r, 0)
+      end
+      
+      # n must be larger or equal than 4
+      n &gt; 4 || (set_n 4)
+       
+    end
+    
+    def can_create_from_shape_impl
+      # Implement the "Create PCell from shape" protocol: we can use any shape which 
+      # has a finite bounding box
+      shape.is_box? || shape.is_polygon? || shape.is_path?
+    end
+    
+    def parameters_from_shape_impl
+      # Implement the "Create PCell from shape" protocol: we set r and l from the shape's 
+      # bounding box width and layer
+      set_r shape.bbox.width * layout.dbu / 2
+      set_l layout.get_info(layer)
+    end
+    
+    def transformation_from_shape_impl
+      # Implement the "Create PCell from shape" protocol: we use the center of the shape's
+      # bounding box to determine the transformation
+      Trans.new(shape.bbox.center)
+    end
+    
+    def produce_impl
+    
+      # This is the main part of the implementation: create the layout
+
+      # fetch the parameters
+      ru_dbu = ru / layout.dbu
+      
+      # compute the circle
+      pts = []
+      da = Math::PI * 2 / n
+      n.times do |i|
+        pts.push(Point.from_dpoint(DPoint.new(ru_dbu * Math::cos(i * da), ru_dbu * Math::sin(i * da))))
+      end
+      
+      # create the shape
+      cell.shapes(l_layer).insert(Polygon.new(pts))
+      
+    end
+  
+  end
+  
+  # The library where we will put the PCell into 
+  class MyLib &lt; Library
+  
+    def initialize  
+    
+      # Set the description
+      self.description = "My First Library"
+      
+      # Create the PCell declarations
+      layout.register_pcell("Circle", Circle::new)
+      # That would be the place to put in more PCells ...
+      
+      # Register us with the name "MyLib".
+      # If a library with that name already existed, it will be replaced then.
+      register("MyLib")
+      
+    end
+  
+  end
+  
+  # Instantiate and register the library
+  MyLib::new
+  
+end
+</text>
+</klayout-macro>

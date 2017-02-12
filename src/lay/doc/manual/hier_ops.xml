@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Hierarchical Operations: Flatten Instances, Make Cell From Selection, Move Up In Hierarchy</title>
+  <keyword name="Hierarchical operations"/>
+  <keyword name="Flatten instance"/>
+  <keyword name="Make cell"/>
+  <keyword name="Move up"/>
+
+  <p>
+  Klayout provides several operations that move shapes or instances up and down in hierarchy.
+  All these operations are accessible through the "Edit" menu in the "Selection" sub-menu.
+  </p>
+
+  <ul>
+    <li><b>Flatten instances</b>: Replace the selected instances by the contents of the instantiated cell. 
+      KLayout will ask, if all levels or just the first level of the cell should be expanded. If all levels
+      are expanded, the cell will be resolved into a set of shapes in the current cell's hierarchy.</li>
+    <li><b>Move up in hierarchy</b>: Applies only to selections inside child cells of the current cell (thus
+      does not make sense if 'top level only' selection mode is active). The selected shapes and instances 
+      are brought up to the current cell's level and removed from the original cell.<br/>
+      A non-destructive way of moving a shape up in the hierarchy is to copy and paste the shape. This does an 
+      explicit flattening of the shapes selected when inserting them.<br/>
+      <b>Hint:</b> the current implementation removes the selected object from it's original cell. Since it only creates
+      new copies for the selected instances, the object ist lost for all other instances of the cell. This may create undesired
+      side effects and it is likely that this behaviour will change in future implementations.
+      </li>
+    <li><b>Make cell from selection</b>: Removes the currently selected objects and places them into a 
+      new cell whose name can be specified.</li>
+  </ul>
+
+</doc>
+

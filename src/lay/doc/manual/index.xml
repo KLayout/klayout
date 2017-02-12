@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>KLayout User Manual</title>
+
+  <p>
+  This is KLayout's main user manual. The manual is organised in major topics:
+  </p>
+
+  <topics>
+    <topic href="/manual/basic.xml"/>
+    <topic href="/manual/editor.xml"/>
+    <topic href="/manual/advanced.xml"/>
+    <topic href="/manual/drc.xml"/>
+  </topics>
+
+</doc>
+

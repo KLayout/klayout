@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Creating A Screenshot</title>
+  <keyword name="Screenshot"/>
+
+  <p>
+  To save the canvas as a PNG file, choose "Screenshot" from the "File"
+  menu or press the "Print" key. A file dialog box will appear in which the file can be specified
+  where the screenshot is saved to.
+  </p>
+
+</doc>
+

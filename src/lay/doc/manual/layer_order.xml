@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Bringing Layers To The Front Or Pushing Them To The Back</title>
+  <keyword name="Layer display"/>
+  <keyword name="Layer order"/>
+
+  <p>
+  Layers can be brought to the front so they to do get obscured. To do so,
+  select the layers and push the "down to bottom" button below the layer list.
+  This will bring the layers to the end thus making them the last to be drawn
+  (the top of the stack).
+  </p>
+  <p>
+  Analogous layers can be pushed one level front using the "down" button and
+  can be brought to the back by using the "up to top" or "up" buttons.
+  </p>
+  <p>
+  The stacking order is saved with the "Save layer properties" function.
+  </p>
+
+</doc>
+

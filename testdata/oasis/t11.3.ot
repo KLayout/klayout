@@ -1,0 +1,161 @@
+# <test>
+#   <name>t11.3.ot</name>
+#   <content-description>Various shapes with S_GDS_PROPERTY properties</content-description>
+#   <test-intention>Properties reader capabilities</test-intention>
+#   <test-intention>PROPERTY record reading</test-intention>
+#   <test-intention>PROPSTRING record reading</test-intention>
+#   <test-intention>PROPNAME record reading</test-intention>
+#   <test-intention>S_GDS_PROPERTY interpretation</test-intention>
+#   <test-intention>Property string references by ID</test-intention>
+#   <test-intention>Property name references by ID</test-intention>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# property string 12
+record PROPSTRING_ID
+  str PropStringId12
+  uint 12
+
+# property string 13
+record PROPSTRING_ID
+  str {Property string value for ID 13}
+  uint 13
+
+# property name 0
+record PROPNAME
+  str S_GDS_PROPERTY 
+
+# Cell A
+record CELL_STR
+  str A 
+
+record XYRELATIVE
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 0   
+  int 1000
+
+record PROPERTY 
+  bits 00100111 ;# property info byte UUUUVCNS
+  uint 0        ;# propname-id
+  uint 8        ;# prop-value #0 (unsigned int)
+    uint 25   
+  uint 10       ;# prop-value #2 (a-string)
+    str PROP_VALUE2
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 0   
+  int 1000
+
+record PROPERTY 
+  bits 11110001 ;# property info byte UUUUVCNS
+  uint 2        ;# number of values
+  uint 8        ;# prop-value #0 (unsigned int)
+    uint 10   
+  uint 14       ;# prop-value #2 (prop-string reference number)
+    uint 13
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 0   
+  int 1000
+
+record PROPERTY 
+  bits 00001001 ;# property info byte UUUUVCNS
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 0   
+  int 1000
+
+record PROPERTY_REP 
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 0   
+  int 1000
+
+record PROPERTY 
+  bits 00001001 ;# property info byte UUUUVCNS
+
+record PROPERTY 
+  bits 00100111 ;# property info byte UUUUVCNS
+  uint 0        ;# propname-id
+  uint 8        ;# prop-value #0 (unsigned int)
+    uint 25   
+  uint 10       ;# prop-value #2 (a-string)
+    str PROP_VALUE2
+
+record XYABSOLUTE
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 2        ;# text-layer
+  uint 1        ;# text-datatype
+  int 1000
+  int 0
+
+record PROPERTY_REP
+
+record PATH
+  bits 11111011 ;# EWPXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 10       ;# half-width
+  bits 00001111 ;# extension-scheme SSEE
+    int 5      
+    int -5
+  uint 0        ;# pointlist: 1-delta (hor. first)
+    uint 3 
+    int 150
+    int 50
+    int -50
+  int 2000      ;# geometry-x 
+  int 0         ;# geometry-y 
+
+record PROPERTY_REP
+
+record POLYGON
+  bits 00111011 ;# 00PXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 0        ;# pointlist: 1-delta (hor. first)
+    uint 4   
+    int 150
+    int 50
+    int -50
+    int 50
+  int 3000      ;# geometry-x 
+  int 0         ;# geometry-y 
+
+record PROPERTY_REP
+
+tail
+

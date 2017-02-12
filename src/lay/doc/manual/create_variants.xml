@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Create Cell Variants</title>
+  <keyword name="Create variants"/>
+  <keyword name="Cell variants"/>
+  <keyword name="Variants"/>
+
+  <p>
+  KLayout offers a feature that is very useful when you want to edit a single instance of a cell rather the
+  cell itself. Editing a cell means that the changes applied to the cell appear at all places where this
+  cell is placed. That may not be desired - if you want to modify a layout in one particular place you may
+  not want to have side effects at other places. 
+  </p>
+
+  <p>
+  The usual way of achieving that is to copy a cell, replace a particular instance by the new cell and edit
+  the new cell. This can be tedious, in particular if there is an array instance where just one instance 
+  must be modified. In that case, the array has to be split so the single instance is isolated before it
+  can be replaced with a new cell.
+  </p>
+
+  <p>
+  KLayout offers a feature that automates this task. It is found in the "Edit/Selection/Make Cell Variants" menu.
+  It basically works like this: For all selected objects it will follow the hierarchy up to the current cell. 
+  It will create new cell copies for all cells found along that path and use these new cells instead of the 
+  original ones.
+  </p>
+
+  <p>
+  The effect is, that after using "Make Cell Variants", the selection can be modified (i.e. deleted) without 
+  having any undesired side effects.
+  </p>
+
+  <p>
+  This feature can also transform array instances and isolate certain instances of the array.
+  The following screenshots demonstrate that feature.
+  </p>
+
+  <p>
+  This is the initial situation: a cell is instantiated 9 times in a 3x3 array and one shape
+  inside one of these instances is selected. The two following screenshots show the full-level
+  hierarchy view and just the top level hiearchy to demonstrate that the cell is placed 
+  9 times.
+  </p>
+
+  <p>
+  <img src="/manual/create_cv1.png"/>
+  </p>
+  <p>
+  <img src="/manual/create_cv2.png"/>
+  </p>
+
+  <p>
+  If that shape would be deleted, it would disappear in all instances. Imagine that is not intended.
+  You can now use the "Make Cell Variants" feature to create a cell variant for the one instance
+  that we have selected the shape in. After we did so, one instance is replaced by a copy of the cell
+  which is called "INV2$1". The picture looks like this:
+  </p>
+
+  <p>
+  <img src="/manual/create_cv3.png"/>
+  </p>
+
+  <p>
+  We can now delete the single shape without any side effect on the other instances:
+  </p>
+
+  <p>
+  <img src="/manual/create_cv4.png"/>
+  </p>
+
+</doc>
+

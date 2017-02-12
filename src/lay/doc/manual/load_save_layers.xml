@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Loading And Saving The Layer Sets</title>
+  <keyword name="Layer display"/>
+  <keyword name="Layer properties"/>
+  <keyword name="Loading layer properties"/>
+  <keyword name="Saving layer properties"/>
+
+  <p>
+  The visual layer properties can be saved to a file using the "Save
+  Layer Properties" function from the "File" menu. This list can be
+  loaded again using the "Load Layer Properties" function.
+  </p>
+
+</doc>
+

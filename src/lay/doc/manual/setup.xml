@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>More Configuration Options</title>
+  <keyword name="Oversampling"/>
+  <keyword name="Color palette"/>
+  <keyword name="Stipple palette"/>
+
+  <p>
+  The option dialog available with the "Setup" function from the "File" menu offers 
+  numerous configuration options from background to rulers configuration. 
+  </p>
+
+  <p>
+  In this dialog for example, the color palette can be edited, so that different colors
+  are available or the stipple palette can be configured. 
+  In addition, it is possible to define the order how these colors or stipples are
+  assigned to layers initially and which colors are not used for layer coloring.
+  </p>
+
+  <p>
+  A particular useful feature is the oversampling scheme.
+  Oversampling is provided as an option to enhance the image quality. The image is rendered 
+  at a higher resolution and then downsampled to the screen resolution. In effect, lines appear
+  thinner and more details can be resolved. As a negative side effect currently the 
+  stipple pattern becomes finer and the crosses in marker mode are smaller. On the other hand
+  the resolution effect can be quite impressive.
+  </p>
+  <p>
+  Oversampling can 
+  be enabled on the "Display/General" page in the setup dialog. 2x and 3x oversampling is
+  provided. The following screenshots illustrate the effect of oversampling:
+  </p>
+
+  <table>
+    <tr><td valign="top"><p>Normal (1x)</p></td><td width="5%"/><td><img src="/manual/pcb_1x.png"/></td></tr>
+    <tr><td valign="top"><p>2x oversampling</p></td><td width="5%"/><td><img src="/manual/pcb_2x.png"/></td></tr>
+    <tr><td valign="top"><p>3x oversampling</p></td><td width="5%"/><td><img src="/manual/pcb_3x.png"/></td></tr>
+  </table>
+
+</doc>

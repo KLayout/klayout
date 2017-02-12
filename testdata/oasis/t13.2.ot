@@ -1,0 +1,178 @@
+# <test>
+#   <name>t13.2.ot</name>
+#   <content-description>A single cell with a variety of texts on named layers</content-description>
+#   <test-intention>Geometrical objects reader capabilities</test-intention>
+#   <test-intention>LAYERNAME record reading</test-intention>
+#   <test-intention>Mapping of textlayer and texttype ranges to names</test-intention>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# layer mapping
+record LAYERNAME_TXT
+  str AA
+  uint 0   ;# all datatypes
+  uint 0   ;# all layers
+
+record LAYERNAME_TXT
+  str L5A
+  uint 1   ;# layer 0 to 5
+  uint 5
+  uint 0   ;# all datatypes
+
+record LAYERNAME_TXT
+  str H5A
+  uint 2   ;# layer 5 to end
+  uint 5
+  uint 0   ;# all datatypes
+
+record LAYERNAME_TXT
+  str E5A
+  uint 3   ;# layer 5 
+  uint 5
+  uint 0   ;# all datatypes
+
+record LAYERNAME_TXT
+  str I56A
+  uint 4   ;# layer 5 to 6
+  uint 5
+  uint 6
+  uint 0   ;# all datatypes
+
+# Cell A
+record CELL_STR
+  str A 
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 1        ;# text-layer
+  uint 2        ;# text-datatype
+  int 1000      ;# geometry-x (absolute)
+  int 2000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 1        ;# layer
+  uint 5        ;# datatype
+  int 1000      ;# geometry-x (absolute)
+  int 5000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 1        ;# layer
+  uint 6        ;# datatype
+  int 1000      ;# geometry-x (absolute)
+  int 6000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 1        ;# layer
+  uint 8        ;# datatype
+  int 1000      ;# geometry-x (absolute)
+  int 8000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 5        ;# text-layer
+  uint 2        ;# text-datatype
+  int 5000      ;# geometry-x (absolute)
+  int 2000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 5        ;# layer
+  uint 5        ;# datatype
+  int 5000      ;# geometry-x (absolute)
+  int 5000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 5        ;# layer
+  uint 6        ;# datatype
+  int 5000      ;# geometry-x (absolute)
+  int 6000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 5        ;# layer
+  uint 8        ;# datatype
+  int 5000      ;# geometry-x (absolute)
+  int 8000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 6        ;# text-layer
+  uint 2        ;# text-datatype
+  int 6000      ;# geometry-x (absolute)
+  int 2000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 6        ;# layer
+  uint 5        ;# datatype
+  int 6000      ;# geometry-x (absolute)
+  int 5000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 6        ;# layer
+  uint 6        ;# datatype
+  int 6000      ;# geometry-x (absolute)
+  int 6000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 6        ;# layer
+  uint 8        ;# datatype
+  int 6000      ;# geometry-x (absolute)
+  int 8000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 7        ;# text-layer
+  uint 2        ;# text-datatype
+  int 7000      ;# geometry-x (absolute)
+  int 2000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 7        ;# layer
+  uint 5        ;# datatype
+  int 7000      ;# geometry-x (absolute)
+  int 5000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 7        ;# layer
+  uint 6        ;# datatype
+  int 7000      ;# geometry-x (absolute)
+  int 6000      ;# geometry-y (absolute)
+
+record TEXT
+  bits 01011011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 7        ;# layer
+  uint 8        ;# datatype
+  int 7000      ;# geometry-x (absolute)
+  int 8000      ;# geometry-y (absolute)
+
+tail
+

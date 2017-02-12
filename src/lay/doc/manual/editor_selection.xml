@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Selection</title>
+  <keyword name="Selection"/>
+
+  <p>
+  The basic entity that some operations work with is the "selection". This is basically a set
+  of shapes of instances on which an operation should be applied.
+  A selection can be established by either clicking on a element in "Select" mode or by
+  dragging a selection rectangle. When the mouse is released, all elements inside the selection
+  rectangle are selected. 
+  </p>
+
+  <p>
+  The selection set can be modified by adding elements (press the Shift button in addition to 
+  selecting elements), by removing elements (press Ctrl in addition) or by toggling the selecting
+  (press Shift and Ctrl in addition: remove already selected ones and add new ones).
+  </p>
+
+</doc>
+

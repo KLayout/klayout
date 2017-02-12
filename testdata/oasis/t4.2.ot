@@ -1,0 +1,133 @@
+# <test>
+#   <name>t4.2.ot</name>
+#   <content-description>A single cell with a variety of rectangles</content-description>
+#   <test-intention>Geometrical objects reader capabilities</test-intention>
+#   <test-intention>RECTANGLE record reading</test-intention>
+#   <test-intention>Repetitions of rectangles</test-intention>
+#   <test-intention>Rectangle-related modal variables</test-intention>
+#   <test-intention>Property attachement to rectangles in various combinations</test-intention>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# property name 0
+record PROPNAME
+  str PROP0
+
+# Cell ABC
+record CELL_STR
+  str ABC 
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 300       ;# geometry-x (absolute)
+  int -400      ;# geometry-y (absolute)
+
+record PROPERTY
+  bits 00010110 ;# property info byte UUUUVCNS
+  uint 0
+  real 2 0.2    ;# prop value #0 = 0.2
+
+record XYRELATIVE
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 100       ;# geometry-x (relative)
+  int -100      ;# geometry-y (relative)
+
+record PROPERTY_REP
+
+record XYABSOLUTE
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 600       ;# geometry-x (absolute)
+  int -300      ;# geometry-y (absolute)
+
+record PROPERTY_REP
+
+record RECTANGLE
+  bits 01110011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 800       ;# geometry-x (absolute)
+
+record PROPERTY_REP
+
+record RECTANGLE
+  bits 01101011 ;# SWHXYRDL
+  uint 2        ;# layer
+  uint 3        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int -600      ;# geometry-y (absolute)
+
+record PROPERTY_REP
+
+record RECTANGLE
+  bits 01101000 ;# SWHXYRDL
+  uint 100      ;# width
+  uint 200      ;# height
+  int -900      ;# geometry-y (absolute)
+
+record PROPERTY_REP
+
+record RECTANGLE
+  bits 00001000 ;# SWHXYRDL
+  int -1200     ;# geometry-y (absolute)
+
+record PROPERTY_REP
+
+record RECTANGLE
+  bits 11001000 ;# SWHXYRDL
+  uint 150      ;# width
+  int -1500     ;# geometry-y (absolute)
+
+record PROPERTY_REP
+
+record RECTANGLE
+  bits 00001000 ;# SWHXYRDL
+  int -1800     ;# geometry-y (absolute)
+
+record PROPERTY_REP
+
+record RECTANGLE
+  bits 00001100 ;# SWHXYRDL
+  int 500       ;# geometry-y (absolute)
+  uint 1        ;# repetition (3x4 matrix)
+    uint 1       
+    uint 2
+    uint 200
+    uint 300
+
+record PROPERTY_REP
+
+record RECTANGLE
+  bits 00001100 ;# SWHXYRDL
+  int 2000      ;# geometry-y (absolute)
+  uint 4        ;# non-regular repetition (3 placements with specified x-delta)
+    uint 1       
+    uint 200
+    uint 300
+
+record PROPERTY_REP
+
+tail
+

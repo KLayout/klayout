@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Various Topics</title>
+
+  <p>
+  This category covers various special topics and provides additional information 
+  for certain features in KLayout. The following topics are available:
+  </p>
+
+  <topics>
+    <topic href="/about/layer_mapping.xml"/>
+    <topic href="/about/transformations.xml"/>
+    <topic href="/about/expressions.xml"/>
+    <topic href="/about/variant_notation.xml"/>
+    <topic href="/about/lef_def_import.xml"/>
+    <topic href="/about/connectivity.xml"/>
+    <topic href="/about/symbolic_layers.xml"/>
+    <topic href="/about/layer_sources.xml"/>
+    <topic href="/about/macro_editor.xml"/>
+    <topic href="/about/macro_in_menu.xml"/>
+    <topic href="/about/about_libraries.xml"/>
+    <topic href="/about/about_pcells.xml"/>
+    <topic href="/about/basic_lib.xml"/>
+    <topic href="/about/technology_manager.xml"/>
+    <topic href="/about/custom_queries.xml"/>
+    <topic href="/about/rba_notation.xml"/>
+    <topic href="/about/drc_ref.xml"/>
+    <!-- TODO: more -->
+  </topics>
+
+</doc>
+

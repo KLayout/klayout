@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Transforming Views And Property Selectors</title>
+  <keyword name="Layer display"/>
+  <keyword name="Layer properties"/>
+  <keyword name="Transformation"/>
+
+  <p>
+  The source specification described in the section before is much more powerful 
+  than just allowing to describe the data source. In addition to that, the layer can 
+  be geometrically transformed and the display can be confined to shapes 
+  that belong to a certain class described by a property selector.
+  </p>
+
+  <p>
+  A geometrical transformation is specified by appending a transformation in 
+  round brackets to the layer/datatype source specification. The format of this
+  transformation is (not necessarily in this order):
+  </p>
+
+  <p class="indent">
+  <tt>(</tt> [&lt;dx&gt;<tt>,</tt>&lt;dy&gt;] [<tt>r</tt>&lt;angle&gt; | <tt>m</tt>&lt;angle&gt;] [<tt>*</tt>&lt;mag&gt;] <tt>)</tt>
+  </p>
+
+  <p>
+  For example, "(r90)" specifies a rotation by 90 degree counter-clockwise.
+  "(0,100.0 m45 *0.5)" will shrink the layout to half the size, flip at the 
+  45 degree-axis (swap x and y axes) and finally shift the layout by 100 micron
+  upwards.
+  </p>
+
+  <p>
+  A comprehensive explanation of the transformation syntax can be found in <link href="/about/transformations.xml"/>.
+  </p>
+
+  <p>
+  Transformations accumulate over the layer hierarchy. This means, that if a layer is transformed
+  and the layer is inside a group whose representative specifies a transformation as well, the
+  resulting transformation is the combination of the layer's transformation (first applied) and
+  the group representative's transformation.
+  </p>
+
+  <p>
+  Multiple transformations can be present. In this case, the layout is shown in multiple
+  instances.
+  </p>
+
+  <p>
+  A particular application is to regroup layers by layout index and assign a 
+  transformation to the group representative belonging to a certain layout
+  such that the layouts get aligned.
+  </p>
+
+  <p>
+  The property selector is specified in square brackets. A selector combines 
+  several expressions of the form "&lt;property&gt;==value&gt;" or "&lt;property&gt;!=&lt;value&gt;" with
+  operators "&amp;&amp;", "||", "!" and allows usage to round brackets to 
+  prioritize the evaluation of these operators:
+  </p>
+
+  <p class="indent">
+  <tt>[</tt> &lt;expr&gt; <tt>]</tt>
+  </p>
+
+  <p>In GDS2 files, the property is always
+  named with a integer value which is written with a single hash characters (i.e.
+  "#43". The value of a GDS property is always a string. A string is either
+  written as a text atom or can be enclosed in single or double quotes.
+  The following is an example for a valid property selector for GDS files:
+  </p>
+
+  <p class="indent">
+  <tt>10/5 [#43==X]</tt>
+  </p>
+
+  <p>
+  With this source specification, the layer will show all shapes from layer 10, datatype 5 
+  which have a user property with number 43 and value string "X".
+  A more complex example is this:
+  </p>
+
+  <p class="indent">
+  <tt>10/5 [!(#43==X&amp;&amp;(#2==Y||#2==U))]</tt>
+  </p>
+
+  <p>
+  With OASIS files, the properties can be named with a string. In this case, the property
+  selector can be "[prop==X]" for example. In addition, the value can be a an integer or 
+  a double value. This is reflected by the choice of the value: "[prop==#200]" will check, 
+  if the property named "prop" has an integer value which is 200. In the same fashion, 
+  "[prop==##0.5]" checks, if the property "prop" has a double value and this is 0.5.
+  </p>
+
+  <p>
+  Property selectors combine over a layer hierarchy. This means, that if a group
+  representative specifies a property selector and a layer in this group specifies
+  a selector as well, only those shapes will be shown that meet both criteria.
+  </p>
+
+</doc>
+

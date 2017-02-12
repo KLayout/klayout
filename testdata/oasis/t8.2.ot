@@ -1,0 +1,87 @@
+# <test>
+#   <name>t8.2.ot</name>
+#   <content-description>A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by name, child cell after top cell</content-description>
+#   <test-intention>Hierarchical reader capabilities</test-intention>
+#   <test-intention>PLACEMENT record reading</test-intention>
+#   <test-intention>Placed cell reference by string</test-intention>
+#   <test-intention>Placement-related modal variables</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     begin_cell {A}
+#     box 1 2 {300 -400} {400 -200}
+#     end_cell
+#     begin_cell {TOP}
+#     sref {A} 0 0 1 {-300 400}
+#     sref {A} 0 0 1 {-300 800}
+#     sref {A} 0 0 1 {-300 1200}
+#     sref {A} 0 0 1 {0 1200}
+#     sref {A} 90 0 1 {700 1400}
+#     sref {A} 0 1 1 {700 400}
+#     sref {A} 90 1 1 {700 2400}
+#     end_cell
+#     end_lib
+#   </content>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Cell TOP
+record CELL_STR
+  str TOP 
+
+record XYRELATIVE
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 10110000 ;# CNXYRAAF
+  str A
+  int -300      ;# placement-x
+  int 400       ;# placement-y
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00110000 ;# CNXYRAAF
+  int 0         ;# placement-x
+  int 400       ;# placement-y
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00010000 ;# CNXYRAAF
+  int 400       ;# placement-y
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00100000 ;# CNXYRAAF
+  int 300       ;# placement-x
+
+record XYABSOLUTE
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00110001 ;# CNXYRAAF
+  int 700       ;# placement-x
+  int 400       ;# placement-y
+
+record XYRELATIVE
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00010010 ;# CNXYRAAF
+  int 1000      ;# placement-y
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00010011 ;# CNXYRAAF
+  int 1000      ;# placement-y
+
+# Cell A
+record CELL_STR
+  str A 
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 300       ;# geometry-x (absolute)
+  int -400      ;# geometry-y (absolute)
+
+tail
+

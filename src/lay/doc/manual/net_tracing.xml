@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>The Net Tracing Feature</title>
+  <keyword name="Net tracer"/>
+  <keyword name="Connectivity"/>
+
+  <p>
+  The net tracing function allows tracing of a net by detecting touching shapes that together form a conductive
+  region. It features specification of a stack of metal (or in general "conductive") layers optionally connected through 
+  via shapes. The net tracing algorithm will follow connections over the via shapes to form connections to other
+  metal layers. The material footprint can be derived from single layout layers or a boolean combination of several
+  layers. For example, this allows selecting source and drain regions of transistors by subtracting the poly region from the 
+  active area region.
+  </p>
+
+  <p>
+  The algorithm is intended for extracting single nets and employs an incremental extraction approach. Therefore 
+  extraction of a single small net is comparatively fast while extraction of large nets such as power nets is considerably 
+  slower compared to hierarchical LVS tools currently.
+  </p>
+
+  <p>
+  The net tracing function can be found in the "Tools" menu. The user interface allows tracing of multiple nets which are stored 
+  in a list of nets extracted. If labels are found on the nets, these are used to derive a net name. Beside that, the cells which
+  are traversed in the net extraction are listed, so the cells being connected by this net can be identified.
+  </p>
+
+  <p>
+  Before nets can be extracted, a layer stack must be specified. Press "Layer Stack" on the user interface to open the 
+  layer stack dialog. Layers must be specified in the "layer/datatype" notation. The 
+  via specification is optional. If no via layer is specified, both metal layer shapes are required to touch in order to form a 
+  connection. If a via layer is specified, a via shape must be present to form the connection.
+  </p>
+
+  <p>
+  KLayout allows specification of symbolic layers and to use boolean expressions. That way it is possible to 
+  assign meaningful names to layers (i.e. "POLY" or "VIA1") and to use derived layers (i.e. "ACTIVE-POLY" for
+  the source and drain regions of a CMOS transistor). Read more about these features in <link href="/about/connectivity.xml"/>
+  and <link href="/about/symbolic_layers.xml"/>.
+  </p>
+
+  <p>
+  If a layer stack has been defined, a net can be traced by pressing the "Trace Net" button and clicking on a point in the
+  layout. Starting from shapes found under this point, the net is extracted and listed in the net list on the left side of the 
+  net tracing dialog. If "Lock" is checked, another net can be traced by clicking at another point without having to press
+  the "Trace Net" button again.
+  </p>
+
+  <p>
+  The "Trace Path" function works similar but allows specification of two points and let the algorithm find the shortest connection
+  (in terms of shape count, not geometrical length) between those points. If the points are not connected, a message is given
+  which indicates that no path leads from one point to the other.
+  </p>
+
+  <p>
+  The display of the nets can be configured in many ways. The configuration dialog is opened when "Configure" is pressed in 
+  the trace net dialog. Beside the color and style of the markers used to display the net it can be specified if and how the window
+  is changed to fit the net.
+  </p>
+
+</doc>
+

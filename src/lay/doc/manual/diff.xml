@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>The Diff Tool</title>
+  <keyword name="Compare"/>
+  <keyword name="Diff"/>
+
+  <p>
+  As the XOR tool, the Diff tool performs a comparison of two layouts. In contrast to the XOR tool, it does a
+  cell-by-cell and object-by-object comparison and reports differing cells, instances and geometrical objects. 
+  In effect, the comparison is more strict and not purely geometry-related. It does not verify the 
+  identity of the layouts on mask level but rather the exact identity of the objects that comprise the 
+  layout file. On the other hand, the Diff tool usually detects the actual changes rather than their 
+  effect on geometry.
+  </p>
+
+  <p>
+  Usually, that kind of comparison is very sensitive to "cosmetic" changes, i.e. cell renaming. KLayout's Diff
+  tool tries to mitigate this effect with these features:
+  </p>
+
+  <ul>
+    <li>Before it does the cell-by-cell comparison it tries to detect cells which have been renamed by comparing 
+        their instantiation. That way, it can compare the right cells even though their names may be different.
+        The basis of that functionality is a cell matching algorithm. This algorithm compares cells by taking
+        into account their bounding boxes, shape counts per layer, number of instances and other parameters.
+        The algorithm will choose a partner cell which matches closest with respect to these parameters. 
+        If that scheme fails, it is possible to revert to name matching by unchecking the option "Don't use names
+        to match cells".
+    </li>
+    <li>It allows some level of control over the strictness of the compare. For example, cell arrays can be expanded
+        before the individual instances are compared. By default, some second-order information like users properties
+        or certain text properties is not compared.
+    </li>
+    <li>The diff tool can also work in "XOR" more. In that mode, the differences found are used to 
+        provide input for a subsequent, polygon-only XOR step. The result is a fair approximation of a true, as-if-flat XOR 
+        which delivers a superset of the true XOR's results. It may report some locations as being different
+        which if fact are not, but it will not fail to report differences where there are some. Compared with 
+        the XOR tool's functionality, some options are missing (i.e. tolerance), but the performance is much 
+        better.
+    </li>
+  </ul>    
+
+  <p>
+  The Diff tool is found in the "Tools" menu. In this dialog:
+  </p>
+
+  <ul>
+    <li>Select layout A and B in the "Input" section.</li>
+    <li>Uncheck "Don't use names to match cells" to revert to pure name matching. Cells which have been
+        renamed will not be compared against then.</li>
+    <li>Check "Run XOR on differences" to select the "XOR mode".</li>
+    <li>Check "Summarize missing layers" to have missing layers reported as one difference instead of one per shape.</li>
+    <li>Check "Detailed information" to receive detailed information about every difference. Without that option, 
+        only the number of differing shapes or instances is reported.</li>
+    <li>Check "Expand cell arrays" to compare individual instances of array instances.</li>
+    <li>Check "Exact compare" to include second-order information (i.e. user properties, text orientation) in the compare.</li>
+  </ul>
+
+  <p>
+  The Diff tool will create a marker database and show the results in the marker database browser.
+  </p>
+
+</doc>
+

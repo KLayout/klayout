@@ -1,0 +1,233 @@
+<ui version="4.0" >
+ <class>EditorOptionsText</class>
+ <widget class="QWidget" name="EditorOptionsText" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>542</width>
+    <height>243</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="frame" >
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Alignment</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QLabel" name="label_8" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>0</hsizetype>
+          <vsizetype>5</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>h =</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="Text size" >
+        <property name="text" >
+         <string>Text size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="4" >
+       <widget class="QLineEdit" name="text_le" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_2" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>0</hsizetype>
+          <vsizetype>5</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>Text</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" colspan="4" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Hint: orientation, alignments and size cannot be saved to OASIS files
+Enable a vector font and text scaling in the setup dialog 
+to show text objects scaled and rotated</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="2" >
+       <widget class="QLineEdit" name="size_le" />
+      </item>
+      <item row="3" column="3" colspan="2" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>(Leave empty for default)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4" >
+       <widget class="QComboBox" name="valign_cbx" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <item>
+         <property name="text" >
+          <string>(Default)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Top</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Center</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Bottom</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="3" >
+       <widget class="QLabel" name="label_9" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>0</hsizetype>
+          <vsizetype>5</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>v =</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" >
+       <widget class="QComboBox" name="halign_cbx" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <item>
+         <property name="text" >
+          <string>(Default)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Left</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Center</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Right</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="5" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>20</width>
+          <height>5</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>text_le</tabstop>
+  <tabstop>halign_cbx</tabstop>
+  <tabstop>valign_cbx</tabstop>
+  <tabstop>size_le</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

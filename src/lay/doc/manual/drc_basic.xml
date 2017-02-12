@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Design Rule Checks (DRC) Basics</title>
+  <keyword name="DRC"/>
+
+  <h2-index/>
+
+  <p>
+  KLayout supports design rule checks beginning with version 0.23. The capabilities of the DRC feature 
+  include:
+  </p>
+
+  <ul>
+    <li>Basic DRC checks such as checks for minimum width and space.</li>
+    <li>Layer-generation methods such as boolean operations and sizing.</li>
+    <li>Extended geometrical checks such as overlap, enclosure and inside and outside checks.</li>
+    <li>Support for edge objects derived from polygons or as output from other functions.
+        Edge objects are useful to implement edge-related operations, for example selective sizing.</li>
+    <li>The capability the work with multiple input layouts.</li>
+    <li>Cell filtering, local (region-constrained) operation.</li>
+    <li>A tiling approach for large layouts which can be configured to make use of multiple CPU cores.</li>
+  </ul>
+
+  <p>
+  The DRC functionality is controlled by a DRC script. A DRC script is basically a piece of code which is executed in the
+  context of the DRC engine. 
+  The script language is based on KLayout's integrated Ruby interpreter and wraps the underlying object model
+  into a lean and expressive language. Script execution is immediate. That means, that 
+  it is possible to embed conditional statements or loops based on the result of a previous
+  operation. It is also possible to code low-level operations on shapes inside the script, although
+  this will be considerably slower than using the functions provided.
+  </p>
+
+  <p>
+  Output of the DRC script can be sent to a layout layer or a report database. The report database
+  is visualized in the marker database browser.
+  </p>
+
+  <h2>Basic scripts</h2>
+
+  <p>
+  Runset writing is described in detail in <link href="/manual/drc_runsets.xml"/>.
+  Here is a simple example for a DRC script:
+  </p>
+
+  <pre>
+report("A simple script")
+
+active = input(1, 0)
+poly = input(6, 0)
+gate = active &amp; poly
+gate.width(0.3).output("gate_width", "Gate width violations")
+
+metal1 = input(17, 0)
+metal1.width(0.7).output("m1_width", "M1 width violations")
+metal1.space(0.4).output("m1_space", "M1 spacing violations")</pre>
+
+  <p>
+  This script will compute the gate poly shapes from the active and poly layers using a boolean "AND".
+  The active layer has GDS layer 1, while the poly layer has GDS layer 6.
+  On this computed gate layer, the script will perform a width check for 0.3 micrometer. In addition a width and space
+  check is performed on the first metal layer, which is on GDS layer 17.
+  </p>
+
+  <p>
+  Let's take the script apart:
+  </p>
+
+  <ul>
+    <li> 
+      <tt>report("A simple script")</tt> <br/>
+      This line will instruct the script to send output to a report database. The report database is shown in the 
+      marker database browser. The description text of the report database is given in brackets. 
+    </li>
+    <li> 
+      <tt>active = input(1, 0)</tt> <br/>
+      This line will create an input layer. "Layers" are basically collections of shapes, edges or edge pairs
+      (edge pairs are objects created as output of check methods). "input" is a function which delivers a
+      layer object. Checks and other functions are performed on those layer objects in the spirit of object-oriented
+      programming and the underlying Ruby interpreter. "active" will be a variable that holds such an object. <br/>
+      The parameters of the "input" method specify where to take the input from, in that case GDS layer 1 and database 0.
+      In that simple form, the first layout loaded into the current view is used for input.
+    </li>
+    <li> 
+      <tt>poly = input(6, 0)</tt> <br/>
+      This line will create another input layer for poly silicon (from GDS layer 6, datatype 0).
+    </li>
+    <li> 
+      <tt>gate = active &amp; poly</tt> <br/>
+      This line will compute the boolean "AND" of active and poly layers. The "&amp;" is the operator
+      for the boolean "AND" operation which computes the intersection of active and poly.
+      The result will be sent to a new layer and a new layer object is created and put into the 
+      "gate" variable. This layer object is a temporary one and will not appear in the output but
+      can be used in subsequent operations.
+    </li>
+    <li>
+      <tt>gate.width(0.3).output("gate_width", "Gate width violations")</tt> <br/>
+      This line combines two operations into one statement: first is performs a width check against
+      a minimum width of 0.3 micrometer using the
+      width method on the "gate" layer. A "method" is a function performed on a specific object and
+      the notation used in the DRC script is the ".". "gate.width(0.3)" will perform a width
+      check on the gate layer and create a new layer object with "edge pairs" for each violation.
+      "Edge pairs" are marker objects consisting of two edges or partial edges which describe where
+      two edges violate the check condition. In the simple geometrical checks, there are always two
+      edges involved in such a violation - hence such a violation is best described by a pair of edges. <br/>
+      The result of the check is sent to a report database category using the "output" method.
+      Again this is a method called on an object, in that case the edge pair collection returned by
+      the width check. The parameters of the output method describe a formal name and a readable 
+      description of the category.
+    </li>
+    <li>
+      <tt>metal1 = input(17, 0)</tt> <br/>
+      As before, this statement will fetch input from GDS layer 17 and datatype 0 and create
+      a layer object representing that input.
+    </li>
+    <li>
+      <tt>metal1.width(0.7).output("m1_width", "M1 width violations")</tt> <br/>
+      As for the gate, this statement will perform a width check (this time for 0.7 micrometer) and
+      output the violation markers to a report database category.
+    </li>
+    <li>
+      <tt>metal1.space(0.4).output("m1_space", "M1 spacing violations")</tt> <br/>
+      And again a geometrical check: this time a space check for minimum space of 0.4 micrometer.
+    </li>
+  </ul>
+
+  <p>
+  The script can be written in several alternative forms. Here for example is a very brief version of
+  the gate width check:
+  </p>
+
+  <pre>
+(input(1, 0)*input(6, 0)).width(0.3).output("gate_width", "Gate width violations")</pre>
+
+  <p>
+  Some aliases are provided for the boolean operation, so if you prefer object-oriented notation, you can use
+  the "and" method:
+  </p>
+
+  <pre>
+input(1, 0).and(input(6, 0)).width(0.3).output("gate_width", "Gate width violations")</pre>
+
+  <p>
+  or the functional notation:
+  </p>
+
+  <pre>
+and(input(1, 0), input(6, 0)).width(0.3).output("gate_width", "Gate width violations")</pre>
+
+  <p>
+  Dimensions can be given in different ways:
+  </p>
+
+  <pre>
+# floating-point (will default to micrometer)
+gate.width(0.3).output("gate_width", "Gate width violations")
+
+# floating-point with unit
+gate.width(0.3.micron).output("gate_width", "Gate width violations")
+gate.width(300.nm).output("gate_width", "Gate width violations")
+
+# integer values will give dimensions in database units!
+gate.width(300).output("gate_width", "Gate width violations")
+
+# as variable
+min_width = 300.nm
+gate.width(min_width).output("gate_width", "Gate width violations")</pre>
+
+  <h2>Installing and running scripts</h2>
+
+  <p>
+  To create a DRC script, choose "Tools/DRC/New DRC Script". KLayout will open the 
+  Macro development IDE and create a new script. The first thing to do is to give the 
+  script a proper name. The cursor is already on the name - just enter a new name and press "Enter".
+  </p>
+
+  <p>
+  The next step is to give the DRC script some description. Press the "Properties" button in the 
+  macro editor's toolbar and enter a description text - this is the text that will appear in the 
+  menu entry.
+  </p>
+
+  <p>
+  The DRC script will now appear in "Tools/DRC" with the description and selecting
+  that entry will run the script.
+  </p>
+
+  <p>
+  To edit the DRC script, choose "Edit DRC Scripts" from "Tools/DRC" or enter
+  the macro editor IDE and select the DRC category (the tab above the macro list).
+  </p>
+
+  <p>
+  DRC scripts can be shared or installed globally like normal macros. They can be put into
+  the "macros" folders, but the preferred way is to deploy them in a folder called "drc" beside
+  the "macros" folder. KLayout will scan various places for DRC scripts or macros, including the installation
+  path and the application folder (usually in the home directory). Both places can be used to 
+  store DRC scripts.
+  </p>
+
+  <p>
+  For the more experienced user, DRC scripts are basically just macros bound to a DRC interpreter instead
+  of the plain Ruby interpreter. 
+  You can create and run DRC scripts like ordinary macros.
+  Use "Macros/Macro Development" to enter the macro IDE and create a DRC scripts with the "add macro"
+  function (the "+" button). Choose "DRC scripts" as the template to use (in the "General" section).
+  DRC scripts are by default bound to the DRC menu, but that can be changed in the same way than for any ordinary macro.
+  </p>
+
+  <p>See <link href="/about/macro_editor.xml"/> for more details about the macro development
+  facility.</p>
+
+  <p>
+  By default, DRC scripts are put into the DRC category of the macro IDE. Macro categories are 
+  a way to organize macros, but do not imply a certain runtime behavior. Hence, DRC scripts can be 
+  put into any other location beside the "drc" folders selected by the DRC category.
+  </p>
+
+  <p>
+  DRC scripts can be executed in the debugger like ordinary macros and breakpoints or single-stepping can be used to 
+  debug DRC scripts. Behind the scene, the DRC commands are mapped to Ruby functions, so stepping into 
+  such commands will reveal the code behind the DRC functions.
+  </p>
+
+  <p>
+  DRC scripts are stored in ".lydrc" files in KLayout's macro format. Those are XML files containing the
+  script code in the text element. KLayout also recognizes plain text files with the extension ".drc", but
+  those files are usually lacking the necessary meta-information that allow KLayout to bind them to a menu entry.
+  Hence such files can only be run from the macro IDE.
+  </p>
+  
+  <h2>Using KLayout as a standalone DRC engine</h2>
+
+  <p>
+  KLayout can be used as a non-interactive DRC engine using a specific kind of 
+  DRC scripts. Since there is no "current layout" in standalong engine mode, those
+  DRC scripts have to specify input explicitly using the "source" function. The same
+  way, output has to be specified explicitly using either "target" to create an output layout
+  or "report" to create an output report database (see <link href="/about/drc_ref_global.xml"/> for 
+  details about these functions).
+  </p>
+
+  <p>
+  Here is an example. It reads layer 1, datatype 0 from "input.gds", sizes it by 200 nanometers
+  and writes the output to "out.gds", layer 10, datatype 0:
+  </p>
+
+  <pre>
+source("input.gds")
+target("out.gds")
+input(1, 0).sized(200.nm).output(10, 0)</pre>
+
+  <p>
+  Here is another example which saves the results to category "sized" of the
+  report database file "out.lyrdb":
+  </p>
+
+  <pre>
+source("input.gds")
+report("out.lyrdb")
+input(1, 0).sized(200.nm).output("sized")</pre>
+
+  <p>
+  To run these DRC scripts, save the scripts to a file with suffix ".drc" and run it
+  like shown below (replace "my.drc" by your file).
+  It is recommended to disable some of the features not used in that case and put KLayout 
+  into non-interactive batch mode with "-b":
+  </p>
+
+  <pre>
+klayout -b -r my.drc</pre>
+
+  <p>
+  "-b" will disable all of the user interface functionality and puts KLayout in engine mode
+  in which no display connection is required on Unix. Implicit loading of macros from the 
+  various search locations is disabled (you can still load some with "-rm") and
+  the configuration file is neither read nor written, which causes less I/O and
+  avoids write conflicts between different instances of KLayout.
+  </p>
+
+</doc>
+

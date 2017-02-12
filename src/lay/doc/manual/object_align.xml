@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Object Alignment</title>
+  <keyword name="Editing"/>
+  <keyword name="Alignment"/>
+
+  <p>
+  This operation use the concept of "primary" and "secondary" selection. The primary selection contains all shapes that
+  are selected in the first step. The secondary selection contains all shapes that are selected in additional steps using the
+  "Shift" modifier key.
+  </p>
+
+  <p>
+  The object alignment function allows aligning of all objects in the secondary selection to the objects in the primary selection (i.e.
+  objects in the primary selection define the reference points but are not moved).
+  An "object" can be a shape or an instance of a cell. Cell instances are referred to by their bounding box which can be either computed
+  from the visible layers alone or from all layers.
+  </p>
+
+  <p>
+  Alignment can be specified differently in horizontal and vertical direction. Horizontal alignment can be "none" (no change), "left" (align left sides), "center" (align centers) or "right" (align right sides).
+  Vertical alignment can be "none", "bottom", "center" or "top".
+  </p>
+
+  <p>
+  The alignment function can be found in the "Selection" submenu of the "Edit" menu. A dialog will open which allows specification of the alignment mode
+  and bounding box computation mode for cell instances.
+  </p>
+
+</doc>
+

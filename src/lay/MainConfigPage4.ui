@@ -1,0 +1,62 @@
+<ui version="4.0" >
+ <class>MainConfigPage4</class>
+ <widget class="QFrame" name="MainConfigPage4" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>476</width>
+    <height>164</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Application Settings</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Editing mode</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>If this option is selected, the application will enter edit mode when it is started. In any case, editing mode can be forced or disabled with the "-e" or "-ne" command line switch.</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="edit_mode_cbx" >
+        <property name="text" >
+         <string>Use editing mode by default</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <tabstops>
+  <tabstop>edit_mode_cbx</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

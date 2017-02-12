@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Corner Rounding</title>
+  <keyword name="Round corners"/>
+  <keyword name="Corner rounding"/>
+
+  <p>
+  In some applications, i.e. power devices, it is desirable to have round corners instead of sharp corners to limit the electrical field.
+  Klayout now offers a convenient way to create such structures. The basic idea is to draw the structures with sharp, 90 degree corners and then
+  "soften" the corners by rounding them to a given radius. The resulting polygons can then be written to GDS files, even though GDS does not 
+  have the concept of "soft" (or circular) geometries.
+  </p>
+
+  <p>
+  The interesting part is: <b>the corner rounding function can be re-applied on such geometries on a polygon basic</b>. That means, that even if such a modified 
+  polygons are saved to GDS or otherwise modified, the original geometry can be reconstructed and the corner radius can be changed. No special geometrical objects
+  or special GDS annotation is required to achieve this. This requirement imposes some (probably weak) limitations:
+  </p>
+
+  <ul>
+  <li>The number of points per corner must not be too small (currently at least 32 on the full circle)</li>
+  <li>The original geometry must not exhibit sharp corners and the original segments must be at least twice the corner radius in length.</li>
+  <li>The corner segments must be perceivable as such, i.e the angle between adjacent edges must be "nearly" 180 degree. This imposes some 
+  restrictions on the minimum length of such a segment and on the accuracy by which they can be expressed in database units. This boils down to 
+  a certain length limit in terms of database units.</li>
+  </ul>
+
+  <p>
+  The following screenshot illustrates the round corners function. As can be seen in this example, it is necessary to allow a different
+  radius specification for "inner" and "outer" corners.
+  </p>
+
+  <p><img src="/manual/round_corners.png"/></p>
+
+  <p>
+  The corner rounding function operates on selected shapes. It can be found in the "Selection" submenu of the "Edit" menu. 
+  A dialog will open which allows specification of the radius values and the desired resolution. If the selected polygon already has rounded corners, 
+  the corner rounding will be removed and the original polygon reconstructed before the new corner rounding is applied. By
+  specifying "0" for the radius, the original sharp corners will be recovered.
+  </p>
+
+</doc>
+

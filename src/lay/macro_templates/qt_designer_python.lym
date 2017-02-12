@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Designer dialog sample (Python)\nA sample how to create a dialog from a Qt designer file</description>
+ <doc/>
+ <format>general</format>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <text>import pya
+import types
+
+# Create the form object from the uic file:
+
+ui_file = pya.QFile(":/macro-templates/qt_designer.ui")
+ui_file.open(pya.QIODevice.ReadOnly)
+form = pya.QFormBuilder().load(ui_file, pya.Application.instance().main_window())
+ui_file.close()
+
+# Install an event handler for the button clicked event
+# Note: we are using MethodType to create a method bound to the instance.
+# We cannot add this method to the class since we don't want to make it 
+# visible to every QDialog.
+
+def button_clicked(self, clicked):
+  self.slider.value = (self.slider.value + 1) % 100
+
+form.button.clicked(types.MethodType(button_clicked, form))
+
+# Create and execute the dialog
+# (Note: it's exec_, with an underscore. "exec" is a reserved word in Python)
+
+form.exec_()  
+
+</text>
+</klayout-macro>

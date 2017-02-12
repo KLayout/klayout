@@ -1,0 +1,33 @@
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Pick And Drop Principle</title>
+
+  <p>
+  Most drawing programs employ the click-and-drag paradigm: left-click on an element and
+  drag it to the destination keeping the mouse button pressed. 
+  Although being pretty intuitive, this principle has one disadvantage: it is hard to do 
+  something other than dragging, while you keep the mouse button pressed. In particular this means: 
+  no zooming (or would you like to press the right mouse button as well, draw the zoom box and then
+  release just the right mouse button ...?). In order to allow zoom and potentially other operations, 
+  KLayout employs the pick-and-drop-principle.</p>
+
+  <p>
+  In pick-and-drop, you pick an element by clicking at it with the left mouse button, move it (without any
+  mouse button pressed) and drop it (by left-clicking at the target position). Since the mouse button
+  is not pressed, the mouse is free for other operations: just the dragged item is "sticking" to the
+  mouse cursor.
+  </p>
+
+  <p>
+  In addition, while dragging the object, Shift and Ctrl keys can be used to force certain 
+  direction constraints or override the ones specified in the options (i.e. "move" or "edit" options):
+  The Shift key forces KLayout into orthogonal mode: movements are restricted to horizontal or vertical
+  unless not applicable. The Ctrl key forces KLayout into diagonal mode: movements are restricted to
+  horizontal, vertical or the diagonal axes. Ctrl plus Shift will release all directional constraints - 
+  movements will be allowed in any direction.
+  </p>
+
+</doc>
+

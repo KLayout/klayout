@@ -1,0 +1,61 @@
+# <test>
+#   <name>t14.1.ot</name>
+#   <content-description>A cell with a variety of polygons in a CBLOCK-compressed file</content-description>
+#   <test-intention>Basic objects reader capabilities</test-intention>
+#   <test-intention>CBLOCK record reading</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     begin_cell {ABCDH}
+#     box 0 0 {110 1270} {650 1800}
+#     boundary 1 0 {1970 1590} {1490 1640} {1520 2000} {2150 2020} {1970 1590}
+#     boundary 1 0 {120 680} {50 900} {-400 860} {-370 1260} {-400 2630} {940 2570} {900 1750} {690 1740} {690 1840} {80 1850} {80 1240} {700 1230} {680 1700} {1340 1700} {1320 2170} {2130 2160} {2120 2060} {1490 2040} {1440 1540} {870 1530} {870 870} {130 890} {120 680}
+#     boundary 1 0 {2220 610} {1730 660} {1690 1420} {2330 1410} {2220 610}
+#     boundary 1 0 {-210 -100} {-420 810} {-50 850} {90 470} {430 460} {460 360} {140 380} {270 -80} {-210 -100}
+#     boundary 1 0 {1620 640} {1560 780} {170 830} {180 860} {900 840} {920 860} {1610 860} {1600 1510} {1580 1540} {1490 1530} {1500 1600} {1970 1570} {1990 1450} {1670 1450} {1710 660} {1620 640}
+#     boundary 1 0 {1690 -80} {370 -40} {300 330} {610 300} {620 520} {870 480} {910 260} {1250 270} {1230 560} {160 580} {160 810} {1540 750} {1690 -80}
+#     boundary 1 0 {970 1740} {970 2590} {1900 2530} {1910 2200} {1290 2220} {1300 1740} {970 1740}
+#     boundary 1 0 {2030 1450} {2020 1590} {2160 2000} {2150 2190} {1940 2200} {1930 2530} {2430 2480} {2300 1450} {2030 1450}
+#     box 1 0 {900 890} {1580 1500}
+#     end_cell
+#     end_lib
+#   </content>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Cell A
+record CELL_STR
+  str ABCDH 
+
+set cblock_bytes {
+  22 00 b0 02 b2 02 13
+  a9 66 60 98 c3 32 89 e5 0e e3 1b 61 91 4a c6 15
+  ac 8f 58 3a f8 be f0 8a 5a b0 30 57 5f 64 6d e4
+  4f bd c8 7a 87 ed 81 f8 02 79 a0 88 68 f5 42 b6
+  4e be 80 99 4c 3b 99 35 97 30 4f 14 d7 3c 14 f4
+  52 50 e4 24 e3 0b f6 9b c2 1a 9a 27 18 57 4b 8a
+  04 ae 65 3f 12 04 24 36 0b 8b 2c f2 e9 14 16 3d
+  c6 73 92 4d 64 21 e3 0b 9e cf 9a 15 4f 59 6f 08
+  83 cc 5d c8 f8 91 7b 25 7f ea 4e e6 03 3c 5b a4
+  66 88 01 85 d8 37 b2 fc 64 bd c8 25 5a 79 92 b1 
+  99 4b a3 93 65 26 7b 33 bf e6 69 b6 39 7c a9 4b 
+  40 2e e1 3b 28 a6 79 82 69 41 98 f6 14 ae 60 9b
+  d7 4c a2 9a 3d 8c 37 f9 6c 03 3f 32 b6 68 2c 64
+  5c cb f3 9a 49 f3 33 e3 0c a6 dd da 29 2f 98 76
+  80 d4 73 df 64 f9 cb b3 58 33 60 36 d3 13 d6 9b
+  9c b6 9a 3b 98 5f b2 07 2e 64 dc c9 7c 91 4b 24
+  f8 08 cb 6e 45 8d 47 32 1d 12 77 b8 81 4a 59 17
+  68 6a 1f 60 df 28 ac a9 3d 85 b5 5b b6 62 0a ff
+  0c 69 90 7b 36 b3 6c 65 d3 9c c9 f4 40 b1 93 a5
+  47 e0 32 7f 8a e6 54 d6 93 6c a2 0f 14 17 c8 03
+  00 }
+
+foreach x $cblock_bytes {
+  byte [ scan $x "%x" ]
+}
+
+tail
+

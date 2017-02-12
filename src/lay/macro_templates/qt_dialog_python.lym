@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Qt dialog sample (Python)\nCreates a Qt dialog that allows to take and display a screenshot</description>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+
+class ScreenshotDialog(pya.QDialog):
+  """
+  This class implements a dialog with a screenshot display area and a
+  screenshot button
+  """
+
+  def button_clicked(self, checked):
+    """ Event handler: "Screenshot" button clicked """
+
+    view = pya.Application.instance().main_window().current_view()
+
+    # get the screenshot and place it in the image label
+    if not view is None:
+      self.image.setPixmap(pya.QPixmap.fromImage(view.get_image(400, 400)))
+    else:
+      self.image.setText("No layout opened to take screenshot from")
+
+  def __init__(self, parent = None):
+    """ Dialog constructor """
+    
+    super(ScreenshotDialog, self).__init__()
+
+    self.setWindowTitle("Screenshot Saver")
+
+    self.resize(400, 120)
+
+    layout = pya.QVBoxLayout(self)
+    self.setLayout(layout)
+
+    self.image = pya.QLabel("Press the button to fetch a screenshot", self)
+    layout.addWidget(self.image)
+
+    button = pya.QPushButton('Screenshot', self)
+    button.setFont(pya.QFont('Times', 18, pya.QFont.Bold))
+    layout.addWidget(button)
+    
+    # attach the event handler
+    button.clicked(self.button_clicked)
+
+# Instantiate the dialog and make it visible initially.
+# Passing the main_window will make it stay on top of the main window.
+dialog = ScreenshotDialog(pya.Application.instance().main_window())
+dialog.show()
+</text>
+</klayout-macro>

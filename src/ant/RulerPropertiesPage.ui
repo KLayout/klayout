@@ -1,0 +1,404 @@
+<ui version="4.0" >
+ <class>RulerPropertiesPage</class>
+ <widget class="QWidget" name="RulerPropertiesPage" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>525</width>
+    <height>414</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="frame" >
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>0</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="11" column="1" >
+       <widget class="QLabel" name="label_9" >
+        <property name="text" >
+         <string>x = </string>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="4" >
+       <widget class="QLineEdit" name="dy" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="readOnly" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2" >
+       <widget class="QLabel" name="label_16" >
+        <property name="text" >
+         <string>Style</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="5" >
+       <widget class="QLabel" name="label_12" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font" >
+         <font>
+          <family>Sans Serif</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <italic>false</italic>
+          <bold>true</bold>
+          <underline>false</underline>
+          <strikeout>false</strikeout>
+         </font>
+        </property>
+        <property name="text" >
+         <string>Ruler Properties</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2" colspan="3" >
+       <widget class="QLineEdit" name="fmt_y_le" />
+      </item>
+      <item row="5" column="0" colspan="2" >
+       <widget class="QLabel" name="label_17" >
+        <property name="text" >
+         <string>Outline</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="3" >
+       <widget class="QLabel" name="label_8" >
+        <property name="text" >
+         <string>y = </string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="2" >
+       <widget class="QLineEdit" name="x1" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QLabel" name="label_14" >
+        <property name="text" >
+         <string>X label format</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="4" >
+       <widget class="QLineEdit" name="y1" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>x = </string>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="1" >
+       <widget class="QLabel" name="label_11" >
+        <property name="text" >
+         <string>d = </string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QLabel" name="label_13" >
+        <property name="text" >
+         <string>Label format</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="2" >
+       <widget class="QLineEdit" name="x2" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2" colspan="3" >
+       <widget class="QComboBox" name="style_cb" >
+        <item>
+         <property name="text" >
+          <string>Ruler</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Arrow at end</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Arrow at start</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Arrow at both ends</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Plain line</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="7" column="0" colspan="5" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>456</width>
+          <height>16</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="11" column="3" >
+       <widget class="QLabel" name="label_10" >
+        <property name="text" >
+         <string>y = </string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="3" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>y = </string>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Length</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" colspan="3" >
+       <widget class="QLineEdit" name="fmt_le" />
+      </item>
+      <item row="11" column="0" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Delta (x/y)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>First point (x/y)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2" colspan="3" >
+       <widget class="QComboBox" name="outline_cb" >
+        <item>
+         <property name="text" >
+          <string>Diagonal</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Horizonal and vertical (in this order)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Diagonal plus horizonal and vertical (triangle)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Vertical and horizonal (in this order)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Diagonal plus vertical and horizontal (triangle)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Box</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2" >
+       <widget class="QLabel" name="label_15" >
+        <property name="text" >
+         <string>Y label format</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" colspan="3" >
+       <widget class="QLineEdit" name="fmt_x_le" />
+      </item>
+      <item row="11" column="2" >
+       <widget class="QLineEdit" name="dx" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="readOnly" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Second point (x/y)    </string>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="2" >
+       <widget class="QLineEdit" name="dd" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="readOnly" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0" colspan="5" >
+       <widget class="Line" name="line" >
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="4" >
+       <widget class="QLineEdit" name="y2" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>x = </string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2" colspan="3" >
+       <widget class="QLabel" name="help_label" >
+        <property name="text" >
+         <string>&lt;html>(See &lt;a href="int:/manual/ruler_properties.xml">here&lt;/a> for a description of the properties)&lt;/html></string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>fmt_le</tabstop>
+  <tabstop>fmt_x_le</tabstop>
+  <tabstop>fmt_y_le</tabstop>
+  <tabstop>style_cb</tabstop>
+  <tabstop>outline_cb</tabstop>
+  <tabstop>x1</tabstop>
+  <tabstop>y1</tabstop>
+  <tabstop>x2</tabstop>
+  <tabstop>y2</tabstop>
+  <tabstop>dx</tabstop>
+  <tabstop>dy</tabstop>
+  <tabstop>dd</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>General KLayout macro (*.lym)\nCan be configured to appear in the menu or for auto-run.</description>
+ <format>general</format>
+ <autorun>false</autorun>
+ <show-in-menu>false</show-in-menu>
+ <shortcut/>
+ <interpreter>ruby</interpreter>
+ <text>module MyMacro
+ 
+  include RBA
+
+  # Enter your Ruby code here ..
+
+end
+</text>
+</klayout-macro>

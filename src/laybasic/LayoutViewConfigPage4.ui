@@ -1,0 +1,751 @@
+<ui version="4.0" >
+ <class>LayoutViewConfigPage4</class>
+ <widget class="QFrame" name="LayoutViewConfigPage4" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>467</width>
+    <height>331</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy>
+    <hsizetype>5</hsizetype>
+    <vsizetype>0</vsizetype>
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle" >
+   <string>Edit Color Palette</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="0" column="1" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="2" >
+    <widget class="QFrame" name="frame" >
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>0</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="undo_pb" >
+        <property name="text" >
+         <string>Undo</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="redo_pb" >
+        <property name="text" >
+         <string>Redo</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType" >
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>20</width>
+          <height>10</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="reset_pb" >
+        <property name="text" >
+         <string>Reset</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="3" >
+    <widget class="QCheckBox" name="edit_order_cbx" >
+     <property name="text" >
+      <string>Set assignment order (click on the color buttons to define order)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" >
+    <widget class="QFrame" name="frame5_2" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>5</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="frameShape" >
+      <enum>QFrame::Panel</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Sunken</enum>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>8</number>
+      </property>
+      <property name="spacing" >
+       <number>4</number>
+      </property>
+      <item row="0" column="0" >
+       <widget class="QToolButton" name="cb_1" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>0</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QToolButton" name="cb_2" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QToolButton" name="cb_3" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" >
+       <widget class="QToolButton" name="cb_4" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0" >
+       <widget class="QToolButton" name="cb_5" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0" >
+       <widget class="QToolButton" name="cb_6" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="1" >
+       <widget class="QToolButton" name="cb_12" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1" >
+       <widget class="QToolButton" name="cb_10" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QToolButton" name="cb_8" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" >
+       <widget class="QToolButton" name="cb_9" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1" >
+       <widget class="QToolButton" name="cb_11" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QToolButton" name="cb_7" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2" >
+       <widget class="QToolButton" name="cb_15" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="2" >
+       <widget class="QToolButton" name="cb_17" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QToolButton" name="cb_13" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2" >
+       <widget class="QToolButton" name="cb_16" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="2" >
+       <widget class="QToolButton" name="cb_18" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" >
+       <widget class="QToolButton" name="cb_14" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3" >
+       <widget class="QToolButton" name="cb_21" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3" >
+       <widget class="QToolButton" name="cb_19" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="3" >
+       <widget class="QToolButton" name="cb_23" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="3" >
+       <widget class="QToolButton" name="cb_24" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3" >
+       <widget class="QToolButton" name="cb_20" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="3" >
+       <widget class="QToolButton" name="cb_22" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="4" >
+       <widget class="QToolButton" name="cb_27" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="4" >
+       <widget class="QToolButton" name="cb_28" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="4" >
+       <widget class="QToolButton" name="cb_30" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4" >
+       <widget class="QToolButton" name="cb_26" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="4" >
+       <widget class="QToolButton" name="cb_29" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4" >
+       <widget class="QToolButton" name="cb_25" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="5" >
+       <widget class="QToolButton" name="cb_33" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="5" >
+       <widget class="QToolButton" name="cb_36" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="5" >
+       <widget class="QToolButton" name="cb_34" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5" >
+       <widget class="QToolButton" name="cb_32" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="5" >
+       <widget class="QToolButton" name="cb_35" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5" >
+       <widget class="QToolButton" name="cb_31" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="6" >
+       <widget class="QToolButton" name="cb_39" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="6" >
+       <widget class="QToolButton" name="cb_42" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="6" >
+       <widget class="QToolButton" name="cb_40" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="6" >
+       <widget class="QToolButton" name="cb_38" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="6" >
+       <widget class="QToolButton" name="cb_41" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6" >
+       <widget class="QToolButton" name="cb_37" >
+        <property name="minimumSize" >
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <tabstops>
+  <tabstop>cb_1</tabstop>
+  <tabstop>cb_7</tabstop>
+  <tabstop>cb_13</tabstop>
+  <tabstop>cb_19</tabstop>
+  <tabstop>cb_25</tabstop>
+  <tabstop>cb_31</tabstop>
+  <tabstop>cb_37</tabstop>
+  <tabstop>cb_2</tabstop>
+  <tabstop>cb_8</tabstop>
+  <tabstop>cb_14</tabstop>
+  <tabstop>cb_20</tabstop>
+  <tabstop>cb_26</tabstop>
+  <tabstop>cb_32</tabstop>
+  <tabstop>cb_38</tabstop>
+  <tabstop>cb_3</tabstop>
+  <tabstop>cb_9</tabstop>
+  <tabstop>cb_15</tabstop>
+  <tabstop>cb_21</tabstop>
+  <tabstop>cb_27</tabstop>
+  <tabstop>cb_33</tabstop>
+  <tabstop>cb_39</tabstop>
+  <tabstop>cb_4</tabstop>
+  <tabstop>cb_10</tabstop>
+  <tabstop>cb_16</tabstop>
+  <tabstop>cb_22</tabstop>
+  <tabstop>cb_28</tabstop>
+  <tabstop>cb_34</tabstop>
+  <tabstop>cb_40</tabstop>
+  <tabstop>cb_5</tabstop>
+  <tabstop>cb_11</tabstop>
+  <tabstop>cb_17</tabstop>
+  <tabstop>cb_23</tabstop>
+  <tabstop>cb_29</tabstop>
+  <tabstop>cb_35</tabstop>
+  <tabstop>cb_41</tabstop>
+  <tabstop>cb_6</tabstop>
+  <tabstop>cb_12</tabstop>
+  <tabstop>cb_18</tabstop>
+  <tabstop>cb_24</tabstop>
+  <tabstop>cb_30</tabstop>
+  <tabstop>cb_36</tabstop>
+  <tabstop>cb_42</tabstop>
+  <tabstop>undo_pb</tabstop>
+  <tabstop>redo_pb</tabstop>
+  <tabstop>reset_pb</tabstop>
+  <tabstop>edit_order_cbx</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

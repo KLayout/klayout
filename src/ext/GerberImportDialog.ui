@@ -1,0 +1,1500 @@
+<ui version="4.0" >
+ <class>GerberImportDialog</class>
+ <widget class="QDialog" name="GerberImportDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>754</width>
+    <height>604</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>PCB Import</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="3" column="0" colspan="5" >
+    <widget class="QStackedWidget" name="central_stack" >
+     <property name="currentIndex" >
+      <number>9</number>
+     </property>
+     <widget class="QWidget" name="page" >
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="groupBox_4" >
+         <property name="title" >
+          <string>Base Directory</string>
+         </property>
+         <layout class="QHBoxLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="base_dir_le" />
+          </item>
+          <item>
+           <widget class="QToolButton" name="base_dir_pb" >
+            <property name="text" >
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox" >
+         <property name="title" >
+          <string>Import Mode</string>
+         </property>
+         <layout class="QVBoxLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="import_into_rb" >
+            <property name="text" >
+             <string>Import into current layout (layers are added or overwritten)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="import_same_panel_rb" >
+            <property name="text" >
+             <string>Import as new layout in same panel</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="import_new_panel_rb" >
+            <property name="text" >
+             <string>Import as new layout in new panel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>16</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="free_mapping_cb" >
+         <property name="text" >
+          <string>Free layer mapping (allows to specify arbitrary mapping between PCB files and layout layers)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>211</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_2" >
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="frame" >
+         <property name="frameShape" >
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow" >
+          <enum>QFrame::Plain</enum>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item rowspan="5" row="0" column="0" >
+           <widget class="QLabel" name="label_3" >
+            <property name="text" >
+             <string>Specify the target layers 
+for the layout here.
+
+Double-click the layer to
+edit the properties.
+
+The layers should reflect 
+the physical layer stack as
+seen from the chip for flip-
+chip mounting. Metal layers
+interleave with via layers. 
+
+The first layer will be the 
+one closest to the chip
+surface.</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>26</width>
+              <height>201</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item rowspan="5" row="0" column="1" >
+           <widget class="QTreeWidget" name="layout_layers_tree" >
+            <property name="alternatingRowColors" >
+             <bool>true</bool>
+            </property>
+            <property name="selectionMode" >
+             <enum>QAbstractItemView::ExtendedSelection</enum>
+            </property>
+            <property name="rootIsDecorated" >
+             <bool>false</bool>
+            </property>
+            <property name="uniformRowHeights" >
+             <bool>true</bool>
+            </property>
+            <property name="allColumnsShowFocus" >
+             <bool>true</bool>
+            </property>
+            <column>
+             <property name="text" >
+              <string>Type</string>
+             </property>
+            </column>
+            <column>
+             <property name="text" >
+              <string>Layer Specification</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item row="3" column="2" >
+           <widget class="QToolButton" name="move_target_layer_down_pb" >
+            <property name="toolTip" >
+             <string>Move selected layer down (Ctrl+Down)</string>
+            </property>
+            <property name="text" >
+             <string>...</string>
+            </property>
+            <property name="icon" >
+             <iconset resource="layResources.qrc" >:/down.png</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>Ctrl+Down</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2" >
+           <widget class="QToolButton" name="move_target_layer_up_pb" >
+            <property name="toolTip" >
+             <string>Move selected layer up (Ctrl+Up)</string>
+            </property>
+            <property name="text" >
+             <string>...</string>
+            </property>
+            <property name="icon" >
+             <iconset resource="layResources.qrc" >:/up.png</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>Ctrl+Up</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" >
+           <widget class="QToolButton" name="delete_target_layer_pb" >
+            <property name="toolTip" >
+             <string>Delete selected layers (Delete)</string>
+            </property>
+            <property name="text" >
+             <string>...</string>
+            </property>
+            <property name="icon" >
+             <iconset resource="layResources.qrc" >:/clear.png</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>Del</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QToolButton" name="add_target_layer_pb" >
+            <property name="toolTip" >
+             <string>Add new layer (Return)</string>
+            </property>
+            <property name="text" >
+             <string>...</string>
+            </property>
+            <property name="icon" >
+             <iconset resource="layResources.qrc" >:/add.png</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>Return</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_3" >
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="frame_2" >
+         <property name="frameShape" >
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow" >
+          <enum>QFrame::Plain</enum>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="0" column="1" colspan="2" >
+           <widget class="QComboBox" name="mounting_cbx" >
+            <item>
+             <property name="text" >
+              <string>Top Mounting</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Bottom Mounting</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="3" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>321</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="3" column="0" >
+           <widget class="QLabel" name="label_33" >
+            <property name="text" >
+             <string>Number of metal layers</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" >
+           <widget class="QLineEdit" name="num_via_le" />
+          </item>
+          <item row="4" column="0" >
+           <widget class="QLabel" name="Number of via layers" >
+            <property name="text" >
+             <string>Number of via types</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" >
+           <widget class="QLineEdit" name="num_metal_le" />
+          </item>
+          <item row="2" column="0" colspan="4" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>691</width>
+              <height>16</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_28" >
+            <property name="text" >
+             <string>Chip mounting</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2" colspan="2" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>441</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="1" colspan="3" >
+           <widget class="QLabel" name="label_32" >
+            <property name="text" >
+             <string>Chip mounting determines the order by which the artwork layers are assigned to layout layers. 
+
+For "top" mounting, the top PCB layer will be assigned to the first layout layer. 
+For "bottom" mounting, the top PCB layer will be assigned to the last layout layer.</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_4" >
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QTreeWidget" name="artwork_files_tree" >
+         <property name="focusPolicy" >
+          <enum>Qt::WheelFocus</enum>
+         </property>
+         <property name="toolTip" >
+          <string/>
+         </property>
+         <property name="editTriggers" >
+          <set>QAbstractItemView::AllEditTriggers</set>
+         </property>
+         <property name="tabKeyNavigation" >
+          <bool>true</bool>
+         </property>
+         <property name="alternatingRowColors" >
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode" >
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights" >
+          <bool>true</bool>
+         </property>
+         <property name="allColumnsShowFocus" >
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Index</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Artwork File</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_5" >
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QTreeWidget" name="drill_files_tree" >
+         <property name="editTriggers" >
+          <set>QAbstractItemView::AllEditTriggers</set>
+         </property>
+         <property name="alternatingRowColors" >
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode" >
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights" >
+          <bool>true</bool>
+         </property>
+         <property name="allColumnsShowFocus" >
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Index</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Start Layer</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Stop Layer</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Drill File</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_10" >
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item rowspan="5" row="0" column="0" >
+        <widget class="QTreeWidget" name="free_files_tree" >
+         <property name="editTriggers" >
+          <set>QAbstractItemView::AllEditTriggers</set>
+         </property>
+         <property name="alternatingRowColors" >
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode" >
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights" >
+          <bool>true</bool>
+         </property>
+         <property name="allColumnsShowFocus" >
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Files</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item row="4" column="1" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>26</width>
+           <height>311</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QToolButton" name="move_free_file_up_pb" >
+         <property name="toolTip" >
+          <string>Move selected layer up (Ctrl+Up)</string>
+         </property>
+         <property name="text" >
+          <string>...</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/up.png</iconset>
+         </property>
+         <property name="shortcut" >
+          <string>Ctrl+Up</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QToolButton" name="add_free_file_pb" >
+         <property name="toolTip" >
+          <string>Add new layer (Return)</string>
+         </property>
+         <property name="text" >
+          <string>...</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/add.png</iconset>
+         </property>
+         <property name="shortcut" >
+          <string>Return</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QToolButton" name="move_free_file_down_pb" >
+         <property name="toolTip" >
+          <string>Move selected layer down (Ctrl+Down)</string>
+         </property>
+         <property name="text" >
+          <string>...</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/down.png</iconset>
+         </property>
+         <property name="shortcut" >
+          <string>Ctrl+Down</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QToolButton" name="delete_free_file_pb" >
+         <property name="toolTip" >
+          <string>Delete selected layers (Delete)</string>
+         </property>
+         <property name="text" >
+          <string>...</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/clear.png</iconset>
+         </property>
+         <property name="shortcut" >
+          <string>Del</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_8" >
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item rowspan="5" row="0" column="0" >
+        <widget class="QTreeWidget" name="free_layout_layers_tree" >
+         <property name="alternatingRowColors" >
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode" >
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights" >
+          <bool>true</bool>
+         </property>
+         <property name="allColumnsShowFocus" >
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Layer Specification</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item row="4" column="1" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>26</width>
+           <height>201</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="5" column="0" colspan="2" >
+        <widget class="QLabel" name="label" >
+         <property name="text" >
+          <string>Double-click the entry to edit the layer properties</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QToolButton" name="free_move_target_layer_down_pb" >
+         <property name="toolTip" >
+          <string>Move selected layer down (Ctrl+Down)</string>
+         </property>
+         <property name="text" >
+          <string>...</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/down.png</iconset>
+         </property>
+         <property name="shortcut" >
+          <string>Ctrl+Down</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QToolButton" name="free_move_target_layer_up_pb" >
+         <property name="toolTip" >
+          <string>Move selected layer up (Ctrl+Up)</string>
+         </property>
+         <property name="text" >
+          <string>...</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/up.png</iconset>
+         </property>
+         <property name="shortcut" >
+          <string>Ctrl+Up</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QToolButton" name="free_delete_target_layer_pb" >
+         <property name="toolTip" >
+          <string>Delete selected layers (Delete)</string>
+         </property>
+         <property name="text" >
+          <string>...</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/clear.png</iconset>
+         </property>
+         <property name="shortcut" >
+          <string>Del</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QToolButton" name="free_add_target_layer_pb" >
+         <property name="toolTip" >
+          <string>Add new layer (Return)</string>
+         </property>
+         <property name="text" >
+          <string>...</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/add.png</iconset>
+         </property>
+         <property name="shortcut" >
+          <string>Return</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_9" >
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item row="1" column="1" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>381</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QToolButton" name="reset_mapping_pb" >
+         <property name="toolTip" >
+          <string>Clear settings for selected layers</string>
+         </property>
+         <property name="text" >
+          <string>...</string>
+         </property>
+         <property name="icon" >
+          <iconset resource="layResources.qrc" >:/clear.png</iconset>
+         </property>
+         <property name="shortcut" >
+          <string>Del</string>
+         </property>
+        </widget>
+       </item>
+       <item rowspan="2" row="0" column="0" >
+        <widget class="QTreeWidget" name="free_layer_mapping_tree" >
+         <property name="editTriggers" >
+          <set>QAbstractItemView::AllEditTriggers</set>
+         </property>
+         <property name="alternatingRowColors" >
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode" >
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights" >
+          <bool>true</bool>
+         </property>
+         <property name="allColumnsShowFocus" >
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Layer Mapping</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_6" >
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="frame_5" >
+         <property name="frameShape" >
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow" >
+          <enum>QFrame::Plain</enum>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="3" column="5" >
+           <widget class="QLineEdit" name="layout_x1_le" />
+          </item>
+          <item row="5" column="2" >
+           <widget class="QLineEdit" name="pcb_y3_le" />
+          </item>
+          <item row="3" column="4" >
+           <widget class="QLabel" name="label_22" >
+            <property name="text" >
+             <string>Point 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="6" >
+           <widget class="QLabel" name="label_24" >
+            <property name="text" >
+             <string>y (micron)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="3" >
+           <widget class="QLabel" name="label_17" >
+            <property name="text" >
+             <string>Reference points coordinates on PCB</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2" >
+           <widget class="QLineEdit" name="pcb_y2_le" />
+          </item>
+          <item row="5" column="4" >
+           <widget class="QLabel" name="Point 3" >
+            <property name="text" >
+             <string>Point 3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="5" >
+           <widget class="QLineEdit" name="layout_x2_le" />
+          </item>
+          <item row="0" column="4" colspan="3" >
+           <widget class="QLabel" name="label_18" >
+            <property name="text" >
+             <string>Reference point coordinates in layout</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="5" >
+           <widget class="QLineEdit" name="layout_x3_le" />
+          </item>
+          <item row="5" column="6" >
+           <widget class="QLineEdit" name="layout_y3_le" />
+          </item>
+          <item row="2" column="5" >
+           <widget class="QLabel" name="label_23" >
+            <property name="text" >
+             <string>x (micron)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="3" >
+           <widget class="Line" name="line_2" >
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" >
+           <widget class="QLabel" name="label_25" >
+            <property name="text" >
+             <string>Point 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" >
+           <widget class="QLineEdit" name="pcb_x2_le" />
+          </item>
+          <item row="5" column="0" >
+           <widget class="QLabel" name="label_26" >
+            <property name="text" >
+             <string>Point 3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" >
+           <widget class="QLabel" name="label_21" >
+            <property name="text" >
+             <string>Point 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1" >
+           <widget class="QLineEdit" name="pcb_x3_le" />
+          </item>
+          <item row="3" column="2" >
+           <widget class="QLineEdit" name="pcb_y1_le" />
+          </item>
+          <item row="1" column="4" colspan="3" >
+           <widget class="Line" name="line_3" >
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" >
+           <widget class="QLineEdit" name="pcb_x1_le" />
+          </item>
+          <item row="2" column="2" >
+           <widget class="QLabel" name="label_20" >
+            <property name="text" >
+             <string>y (micron)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" >
+           <widget class="QLabel" name="label_19" >
+            <property name="text" >
+             <string>x (micron)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="4" >
+           <widget class="QLabel" name="label_27" >
+            <property name="text" >
+             <string>Point 2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="6" >
+           <widget class="QLineEdit" name="layout_y2_le" />
+          </item>
+          <item row="3" column="6" >
+           <widget class="QLineEdit" name="layout_y1_le" />
+          </item>
+          <item rowspan="6" row="0" column="3" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>16</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="6" column="0" colspan="7" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>691</width>
+              <height>8</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="8" column="0" colspan="7" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>20</width>
+              <height>15</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="9" column="0" colspan="7" >
+           <widget class="QFrame" name="frame_6" >
+            <property name="frameShape" >
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" >
+             <property name="margin" >
+              <number>0</number>
+             </property>
+             <property name="spacing" >
+              <number>6</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_30" >
+               <property name="text" >
+                <string>Explicit transformation</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="explicit_trans_le" >
+               <property name="toolTip" >
+                <string>Examples: "r90", "m45", "r90 (2000,-5000)"</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_31" >
+               <property name="text" >
+                <string>(Reference points have higher priority)</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="7" column="0" colspan="7" >
+           <widget class="QLabel" name="label_29" >
+            <property name="text" >
+             <string>Leave fields empty to specify less reference points. One point is used to derive the displacement, further points are used to derive the orientation. Currently, no magnification is implied and only simple rotations are derived from the mapping points.
+
+Alternatively the transformation (imported to existing layout) can be specified using the explicit transformation below. This allows to specify an arbitary transformation. Use the common notation (i.e. "*2 r90 10,-100").</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_7" >
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2" >
+         <property name="title" >
+          <string>Layer Properties File</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="1" column="0" colspan="3" >
+           <widget class="QLabel" name="label_5" >
+            <property name="text" >
+             <string>Hint: this file is applied to the final layout. If PCB data is imported into an existing layout, the layer file should contain the previous layers as well.</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QLabel" name="label_4" >
+            <property name="text" >
+             <string>(leave empty to not load any file)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" >
+           <widget class="QLineEdit" name="layer_properties_file_le" />
+          </item>
+          <item row="0" column="1" >
+           <widget class="QToolButton" name="layer_properties_file_browse_pb" >
+            <property name="text" >
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_3" >
+         <property name="title" >
+          <string>Import Options</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="3" column="2" >
+           <widget class="QLineEdit" name="border_le" />
+          </item>
+          <item row="2" column="0" >
+           <widget class="QLabel" name="label_2" >
+            <property name="text" >
+             <string>Inverse layers</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3" >
+           <widget class="QLabel" name="label_16" >
+            <property name="text" >
+             <string>Min. 4 points</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3" >
+           <widget class="QLabel" name="dbu_lbl2" >
+            <property name="text" >
+             <string>Micron</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="label_12" >
+            <property name="text" >
+             <string>Merge polygons</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_11" >
+            <property name="text" >
+             <string>Number of points per circle   </string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" >
+           <widget class="QLabel" name="dbu_lbl1" >
+            <property name="text" >
+             <string>Database unit (for new layouts)   </string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" >
+           <widget class="QLabel" name="topcell_lbl" >
+            <property name="text" >
+             <string>Top cell name (for new layouts)    </string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" >
+           <widget class="QLabel" name="label_7" >
+            <property name="text" >
+             <string>... with a layout border of</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" colspan="2" >
+           <widget class="QLineEdit" name="dbu_le" />
+          </item>
+          <item row="5" column="1" colspan="2" >
+           <widget class="QLineEdit" name="topcell_le" />
+          </item>
+          <item row="2" column="1" colspan="3" >
+           <widget class="QCheckBox" name="invert_cb" >
+            <property name="text" >
+             <string>(Check to invert layer for negative contrast)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" colspan="3" >
+           <widget class="QCheckBox" name="merge_cb" >
+            <property name="text" >
+             <string>(Check to remove all overlaps after importing)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="2" >
+           <widget class="QLineEdit" name="circle_points_le" />
+          </item>
+          <item row="3" column="3" >
+           <widget class="QLabel" name="label_6" >
+            <property name="text" >
+             <string>Micron</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="6" column="2" >
+    <widget class="QPushButton" name="next_pb" >
+     <property name="text" >
+      <string>Next</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="layResources.qrc" >:/forward.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="4" >
+    <widget class="QPushButton" name="cancel_pb" >
+     <property name="text" >
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="3" >
+    <widget class="QPushButton" name="import_pb" >
+     <property name="text" >
+      <string>Import</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1" >
+    <widget class="QPushButton" name="last_pb" >
+     <property name="text" >
+      <string>Back</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="layResources.qrc" >:/back.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>331</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="0" colspan="5" >
+    <widget class="Line" name="line_4" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="5" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>736</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="0" colspan="5" >
+    <widget class="QFrame" name="frame_3" >
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="margin" >
+       <number>0</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="section_header_lbl" >
+        <property name="font" >
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text" >
+         <string>SectionHeader</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="file_menu" >
+        <property name="text" >
+         <string>File ...</string>
+        </property>
+        <property name="popupMode" >
+         <enum>QToolButton::InstantPopup</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="5" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>736</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="0" colspan="5" >
+    <widget class="Line" name="line" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>import_into_rb</tabstop>
+  <tabstop>import_same_panel_rb</tabstop>
+  <tabstop>import_new_panel_rb</tabstop>
+  <tabstop>layout_layers_tree</tabstop>
+  <tabstop>add_target_layer_pb</tabstop>
+  <tabstop>delete_target_layer_pb</tabstop>
+  <tabstop>move_target_layer_up_pb</tabstop>
+  <tabstop>move_target_layer_down_pb</tabstop>
+  <tabstop>mounting_cbx</tabstop>
+  <tabstop>num_metal_le</tabstop>
+  <tabstop>num_via_le</tabstop>
+  <tabstop>artwork_files_tree</tabstop>
+  <tabstop>drill_files_tree</tabstop>
+  <tabstop>pcb_x1_le</tabstop>
+  <tabstop>pcb_y1_le</tabstop>
+  <tabstop>layout_x1_le</tabstop>
+  <tabstop>layout_y1_le</tabstop>
+  <tabstop>pcb_x2_le</tabstop>
+  <tabstop>pcb_y2_le</tabstop>
+  <tabstop>layout_x2_le</tabstop>
+  <tabstop>layout_y2_le</tabstop>
+  <tabstop>pcb_x3_le</tabstop>
+  <tabstop>pcb_y3_le</tabstop>
+  <tabstop>layout_x3_le</tabstop>
+  <tabstop>layout_y3_le</tabstop>
+  <tabstop>explicit_trans_le</tabstop>
+  <tabstop>layer_properties_file_le</tabstop>
+  <tabstop>layer_properties_file_browse_pb</tabstop>
+  <tabstop>circle_points_le</tabstop>
+  <tabstop>merge_cb</tabstop>
+  <tabstop>dbu_le</tabstop>
+  <tabstop>topcell_le</tabstop>
+  <tabstop>last_pb</tabstop>
+  <tabstop>next_pb</tabstop>
+  <tabstop>import_pb</tabstop>
+  <tabstop>cancel_pb</tabstop>
+ </tabstops>
+ <resources>
+  <include location="layResources.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>import_pb</sender>
+   <signal>clicked()</signal>
+   <receiver>GerberImportDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>572</x>
+     <y>598</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>574</x>
+     <y>614</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cancel_pb</sender>
+   <signal>clicked()</signal>
+   <receiver>GerberImportDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>679</x>
+     <y>597</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>683</x>
+     <y>613</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

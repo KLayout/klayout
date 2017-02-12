@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Changing The Layer Visibility</title>
+  <keyword name="Layer display"/>
+  <keyword name="Layer properties"/>
+  <keyword name="Visibility"/>
+
+  <p>
+  The selected layers can be made invisible by choosing the "Hide" option
+  on the "Visibility" panel. Choosing "Show" makes the layers
+  visible again. 
+  </p>
+  <p>
+  Also, double-clicking a visible layer in the layer list toggles the
+  layer's visibility.
+  </p>
+  <p>
+  To make a layer "transparent" (i.e. let the other layers show through),
+  select "Transp." on the "Visibility" panel. To make it opaque again,
+  select "Opaque" (the default).
+  </p>
+
+</doc>
+

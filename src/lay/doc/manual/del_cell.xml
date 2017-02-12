@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Delete A Cell</title>
+  <keyword name="Cell"/>
+  <keyword name="Delete cell"/>
+
+  <p>
+  To delete a whole cell, select the cell in the hierarchy browser and choose "Delete Cell" from the 
+  context menu (right mouse button). This time, three possible modes are offered:
+  </p>
+
+  <ul>
+    <li><b>Shallow delete:</b> Just the cell (it's shapes and instances) are deleted, not
+      any cells referenced by this cell. Since cells might no longer be referenced after
+      that, they may appear as new top cells in the layout.</li>
+    <li><b>Deep delete:</b> The cell and all it's subcells are deleted, unless the subcells are
+      referenced otherwise (by cells that are not deleted).
+      In this delete mode a complete hierarchy of cells can be removed without side effects.</li>
+    <li><b>Complete delete:</b> The cell and all it's subcells are deleted, even if other cells
+      would reference these subcells.</li>
+  </ul>
+
+</doc>
+

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Macros in Menus</title>
+
+  <p>
+  KLayout allows installing macros as menu entries. Each time that menu entry is selected, 
+  the macro will be executed.
+  To configure a macro for installation in the menu, open the macro in the macro development environment 
+  and open the macro properties dialog. 
+  </p>
+
+  <p>
+  The macro is configured to be shown in the menu by checking the "Show in menu" check box.
+  That also enables two other fields: the menu path and the group name.
+  </p>
+
+  <p>
+  The menu path specifies the position where the macro shall be put. A macro path is a 
+  sequence of symbolic names separated by a dot. For example "edit_menu.end" is the end
+  of the "Edit" menu and "edit_menu.undo" is the "Undo" entry in the "Edit" menu. To obtain
+  a list of the paths available, have a look at the "Key Bindings" page in the "Application"
+  section of the setup dialog ("File/Setup"). The pseudo element "end" denotes the position
+  after the last entry. The same way "begin" indicates the first entry in the menu.
+  The macro will be inserted before the entry indicated by the path. Hence the if a 
+  path of "edit_menu.end" is given, the macro will be inserted at the end of the 
+  "Edit" menu and "edit_menu.undo" will insert the macro before the "Undo" entry.
+  </p>
+
+  <p>
+  If no macro path is specified, the macro is inserted in the "Macros" menu.
+  The description of the macro is used as the menu title. If a shortcut is specified, that
+  shortcut is used for the macro entry as well.
+  </p>
+
+  <p>
+  The group name can be used to group together all menu entries with the same group name.
+  Any text is allowed here.
+  A group is separated from the other entries in the menu by a separator line. It is recommended to
+  use the group feature in conjunction with a "end"-terminated menu path which is identical
+  for all entries of the same group. Other uses cases are possible, but the result is 
+  not defined. 
+  </p>
+
+</doc>
+

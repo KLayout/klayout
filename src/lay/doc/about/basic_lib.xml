@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>About The Basic Library</title>
+
+  <h2-index/>
+
+  <h2>The "Basic" library</h2>
+
+  <p>
+  The "Basic" Library provides some useful generic PCell's.
+  One use model is to draw a shape and convert the shape to one
+  of the provided PCell's. This use model is suitable for creating
+  Circles, Ellipses, Donuts, Texts and rounded and stroked polygons or
+  rounded paths.
+  </p>
+
+  <p>
+  To use that feature, draw the shape and choose "Convert To PCell's"
+  from the "Edit"/"Selection" menu. A dialog will be shown where the
+  target PCell can be selected. Only those PCell's supporting that
+  shape type will be shown.
+  </p>
+
+  <p>
+  The "Basic" library provides the following PCell's:
+  </p>
+
+  <ul>
+    <li><b>TEXT</b>: A text generator</li>
+    <li><b>CIRCLE</b>: A circle</li>
+    <li><b>DONUT</b>: A donut (circle with hole)</li>
+    <li><b>ELLIPSE</b>: An ellipse</li>
+    <li><b>PIE</b>: A pie (a segment of a circle)</li>
+    <li><b>ARC</b>: An arc (a segment of a donut)</li>
+    <li><b>ROUND_PATH</b>: A rounded path (a path bending around the corners with a given radius)</li>
+    <li><b>ROUND_POLYGON</b>: A rounded polygon (a polygon with rounded corners)</li>
+    <li><b>STROKED_BOX</b>: A stroked box (the "rim" of a box, optionally with smooth corners)</li>
+    <li><b>STROKED_POLYGON</b>: A stroked polygon (the "rim" of a polygon, optionally with smooth corners)</li>
+  </ul>
+
+  <h2>TEXT</h2>
+
+  <p>
+  The text generator can produce texts in various forms.
+  The following sample shows inverse text, normal text and text with bias and 
+  enlarged character spacing:
+  </p>
+
+  <p>
+  <img src="/about/basic_text.png"/>
+  </p>
+
+  <p>
+  It's even possible to install custom fonts. Fonts are basically GDS files
+  with the following features:
+  </p>
+
+  <ul>
+    <li>One cell per character. Cells must be either named like the character "A", "B", "0" etc. or 
+    like the ASCII code in 3-digit decimal notation (i.e. "036" for the dollar character).
+    </li>
+    <li>The characters must be drawn in the character cells on layer 1/0. A box defining the 
+    extension of the characters (including spacing) must be drawn on layer 2/0. Optionally a 
+    background rectangle for the "inverse font" feature can be drawn on layer 3/0.
+    </li>
+    <li>One cell called "COMMENT" with text objects defining the basic text properties through their
+      strings, in particular:
+      <ul>
+        <li><b>design_grid=x</b>: specifies the basic grid the characters are designed on. 
+          "x" is the grid in database units.
+        </li>
+        <li><b>line_width=x</b>: specifies the line width in database units.</li>
+        <li>A comment string which is displayed in the font selection box on the
+          PCell parameters page.
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <p>
+  Custom fonts are installed by copying the font file to a folder named "fonts" 
+  in one of the places in KLayout's path. The standard font can be found in 
+  "src/std_font.gds" in the source package.
+  </p>
+
+  <h2>CIRCLE and ELLIPSE</h2>
+
+  <p>These PCell's define a circle and an ellipse. In both cases, the number of interpolation
+  points (per full circle) can be specified. The default is 64 points. A circle features 
+  a handle to define the diameter. An ellipse features two handles defining the diameters in
+  x and y direction.
+  </p>
+
+  <p>When a shape is converted to a circle or ellipse PCell, the shape's bounding box will
+  be used to define the enclosing box of the circle or ellipse.
+  </p>
+
+  <h2>DONUT</h2>
+
+  <p>The donut PCell creates a circle with a hole. This PCell features the same parameters than
+  the circle but an additional parameter defining the hole radius. For that, it provides two
+  handles - one for the outer and one for the inner radius.
+  </p>
+  
+  <p>When a shape is converted to a donut, the shape's bounding box will be used to define the
+  enclosing box of the donut and the hole's diameter will be choosen to be half of the outer
+  diameter.
+  </p>
+
+  <h2>PIE and ARC</h2>
+
+  <p>Both of these PCell's are segments of circles or donuts. The PIE PCell features two handles to
+  define the radius and start and end angle. The ARC PCell also features two handles to define outer 
+  and inner radius as well. The following image shows PIE and ARC in action:</p>
+
+  <p>
+  <img src="/about/pie_arc.png"/>
+  </p>
+
+  <p>Both PCell's do not support conversion of shapes.</p>
+
+  <h2>ROUND_PATH</h2>
+
+  <p>The round path is a PCell that is based on a path object but is capable of smoothing
+  the path's corners by applying a radius. The following image gives an example:
+  </p>
+
+  <p>
+  <img src="/about/round_path.png"/>
+  </p>
+
+  <p>
+  The PCell features a parameter that defines the radius. The path itself
+  can be manipulated as usual, in particular with partial edit mode.
+  Path objects can be converted to ROUND_PATH pcells. In that case, the initial radius
+  will be choosen to be roughly 10 percent of the minimum bounding box dimensions
+  of the original path.
+  </p>
+
+  <h2>ROUND_POLYGON</h2>
+
+  <p>The round polygon is a PCell that is based on a polygon object but is capable of smoothing
+  the polygon's corners by applying a radius. The following image gives an example:
+  </p>
+
+  <p>
+  <img src="/about/round_polygon.png"/>
+  </p>
+
+  <p>
+  The PCell features a parameter that defines the radius. The polygon itself
+  can be manipulated as usual, in particular with partial edit mode.
+  Polygon, box or path objects can be converted to ROUND_POLYGON pcells. In that case, the initial radius
+  will be choosen to be roughly 10 percent of the minimum bounding box dimensions
+  of the original polygon.
+  </p>
+
+  <h2>STROKED_POLYGON or STROKED_BOX</h2>
+
+  <p>The stroked polygon or box is a PCell that is based on a polygon object but will 
+  produce the "rim" of this polygon. In addition, it can apply corner rounding with a 
+  given radius.
+  </p>
+
+  <p>
+  <img src="/about/stroked_polygon.png"/>
+  </p>
+
+  <p>
+  The PCell features two parameters that define the radius and width of the "rim" line. 
+  The polygon or box itself can be manipulated as usual.
+  Polygon, box or path objects can be converted to STROKED_POLYGON or STROKED_BOX pcells. 
+  In that case, the initial radius will be zero. The width of the rim line will be choosen
+  to be roughly 10 percent of the minimum bounding box dimensions of the original polygon.
+  For STROKED_BOX, the bounding box of the original shape will be used as the basic shape.
+  </p>
+
+</doc>
+
+
+  

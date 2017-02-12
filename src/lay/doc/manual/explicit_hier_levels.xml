@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Specifying Explicit Hierarchy Levels For One Layer Or A Layer Group</title>
+  <keyword name="Layer display"/>
+  <keyword name="Display specification"/>
+  <keyword name="Layer properties"/>
+
+  <p>
+  By default, only the hierarchy levels that are selected in the hierarchy level
+  selection boxes are shown, i.e. if levels 0 to 1 are selected, just the top level 
+  shapes and instances are shown. This selection can be modified for certain layers or layer groups.
+  To specify a different hierarchy selection for a certain layer, use an optional source specification 
+  element, the hierarchy level selector:
+  </p>
+
+  <p class="indent">
+  <tt>#</tt>[&lt;lower-level&gt;][ <tt>..</tt> &lt;upper-level&gt;]
+  </p>
+
+  <p> 
+  Upper and lower level can be omitted. In this case, the respective level is not overridden. 
+  The upper level can be '*' which means: every level that is available.
+  If just one level and no ".." is given, it is taken as upper level and the lower level is set to zero.
+  </p>
+
+  <p> 
+  Some examples might illustrate this:
+  </p>
+
+  <table>
+    <tr><td><tt>#*&nbsp;&nbsp;</tt></td><td>Display all hierarchy levels</td></tr>
+    <tr><td><tt>#0..1&nbsp;&nbsp;</tt></td><td>Display top level only</td></tr>
+    <tr><td><tt>#..5&nbsp;&nbsp;</tt></td><td>Override upper level with 5</td></tr>
+    <tr><td><tt>#2..&nbsp;&nbsp;</tt></td><td>Override lower level with 2</td></tr>
+    <tr><td><tt>#..*&nbsp;&nbsp;</tt></td><td>Override upper level setting by "all levels"</td></tr>
+  </table>
+
+  <p>
+  Modifications of this notation are provide in order to support more use cases. Instead of specifying 
+  a single number for the level, the following alternative notations are supported:
+  </p>
+
+  <table>
+    <tr><td><tt>(1)&nbsp;&nbsp;</tt></td><td>Relative specification: Hierarchy level 1 related to the current cell's level. The effective specification differs in "Descend" mode where the current cell is on a lower hierarchy level than the context cell which is the top cell drawn.</td></tr>
+    <tr><td><tt>&lt;1&nbsp;&nbsp;</tt></td><td>Constrained specification: Hierarchy level 1 or less if the upper or lower default level set in the user interface is less.</td></tr>
+    <tr><td><tt>&gt;1&nbsp;&nbsp;</tt></td><td>Constrained specification: Hierarchy level 1 or greater if the upper or lower default level set in the user interface is greater.</td></tr>
+    <tr><td><tt>(&gt;1)&nbsp;&nbsp;</tt></td><td>Combined specification: Hierarchy level 1 related to the current cell's level or less.</td></tr>
+    <tr><td><tt>&gt;*&nbsp;&nbsp;</tt></td><td>Equals the currently set maximum hierarchy level.</td></tr>
+  </table>
+
+  <p>
+  For example: 
+  </p>
+
+  <table>
+    <tr><td><tt>#(0)..(1)&nbsp;&nbsp;</tt></td><td>The top level of the current cell (works also in "Descend" mode).</td></tr>
+    <tr><td><tt>#&gt;0..&lt;1&nbsp;&nbsp;</tt></td><td>Everything exactly on top level unless the top level is not selected in the controls.</td></tr>
+    <tr><td><tt>#&gt;1..&lt;*&nbsp;&nbsp;</tt></td><td>Everything below the context cell's top level unless not selected by the user interface controls.</td></tr>
+    <tr><td><tt>#(&gt;1)..&lt;*&nbsp;&nbsp;</tt></td><td>Same than before but related to the current cell, not the context cell.</td></tr>
+  </table>
+
+</doc>
+

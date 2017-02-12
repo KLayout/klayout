@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Hiding Cells</title>
+  <keyword name="Hide cells"/>
+
+  <p>
+  Independent of the hierarchy levels shown, cells can be hidden. In this case, the 
+  cell is now shown but rather the bounding box is shown. To do so, select the cell from
+  the cell list and choose "Hide" from the context menu. To show a cell again, choose
+  "Show". To make all cells visible again, choose "Show All".
+  </p>
+
+</doc>

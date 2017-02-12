@@ -1,0 +1,174 @@
+# <test>
+#   <name>t10.1.ot</name>
+#   <content-description>Some cells with content (texts, rectangles) and instances</content-description>
+#   <test-intention>Geometrical objects reader capabilities</test-intention>
+#   <test-intention>Hierarchical reader capabilities</test-intention>
+#   <test-intention>Reset of modal variables upon entry to a new cell</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     begin_cell {A}
+#     box 1 2 {0 0} {10 20}
+#     box 1 2 {100 -100} {110 -80}
+#     box 1 2 {200 -200} {210 -180}
+#     box 1 2 {300 -300} {310 -280}
+#     text 2 1 0 0 {0 0} {A}
+#     text 2 1 0 0 {100 -100} {A}
+#     text 2 1 0 0 {200 -200} {A}
+#     text 2 1 0 0 {300 -300} {A}
+#     end_cell
+#     begin_cell {B}
+#     sref {A} 0 0 1 {0 0}
+#     sref {A} 0 0 1 {50 50}
+#     box 1 2 {0 0} {20 10}
+#     box 1 2 {100 100} {120 110}
+#     box 1 2 {200 200} {220 210}
+#     box 1 2 {300 300} {320 310}
+#     text 2 1 0 0 {0 0} {B}
+#     text 2 1 0 0 {100 100} {B}
+#     text 2 1 0 0 {200 200} {B}
+#     text 2 1 0 0 {300 300} {B}
+#     end_cell
+#     begin_cell {TOP}
+#     sref {B} 0 0 1 {0 0}
+#     box 1 2 {0 0} {50 5}
+#     text 2 1 0 0 {0 0} {TOP}
+#     end_cell
+#     end_lib
+#   </content>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# Cell A
+record CELL_STR
+  str A 
+
+record RECTANGLE
+  bits 01100011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 10       ;# width
+  uint 20       ;# height
+
+record TEXT
+  bits 01000011 ;# 0CNXYRTL
+  str A         ;# text-string
+  uint 2        ;# text-layer
+  uint 1        ;# text-datatype
+
+record RECTANGLE
+  bits 00011000 ;# SWHXYRDL
+  int 100       ;# geometry-x (absolute)
+  int -100      ;# geometry-y (absolute)
+
+record TEXT
+  bits 00011000 ;# 0CNXYRTL
+  int 100       ;# text-x (abs)
+  int -100      ;# text-y (abs)
+
+record RECTANGLE
+  bits 00011000 ;# SWHXYRDL
+  int 200       ;# geometry-x (absolute)
+  int -200      ;# geometry-y (absolute)
+
+record TEXT
+  bits 00011000 ;# 0CNXYRTL
+  int 200       ;# text-x (abs)
+  int -200      ;# text-y (abs)
+
+record XYRELATIVE
+
+record RECTANGLE
+  bits 00011000 ;# SWHXYRDL
+  int 100       ;# geometry-x (rel.)
+  int -100      ;# geometry-y (rel.)
+
+record TEXT
+  bits 00011000 ;# 0CNXYRTL
+  int 100       ;# text-x (rel.)
+  int -100      ;# text-y (rel.)
+
+# Cell B
+record CELL_STR
+  str B 
+
+record RECTANGLE
+  bits 01100011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 20       ;# width
+  uint 10       ;# height
+
+record TEXT
+  bits 01000011 ;# 0CNXYRTL
+  str B         ;# text-string
+  uint 2        ;# text-layer
+  uint 1        ;# text-datatype
+
+record RECTANGLE
+  bits 00011000 ;# SWHXYRDL
+  int 100       ;# geometry-x (absolute)
+  int 100       ;# geometry-y (absolute)
+
+record TEXT
+  bits 00011000 ;# 0CNXYRTL
+  int 100       ;# text-x (abs)
+  int 100       ;# text-y (abs)
+
+record RECTANGLE
+  bits 00011000 ;# SWHXYRDL
+  int 200       ;# geometry-x (absolute)
+  int 200       ;# geometry-y (absolute)
+
+record TEXT
+  bits 00011000 ;# 0CNXYRTL
+  int 200       ;# text-x (abs)
+  int 200       ;# text-y (abs)
+
+record XYRELATIVE 
+
+record RECTANGLE
+  bits 00011000 ;# SWHXYRDL
+  int 100       ;# geometry-x (rel.)
+  int 100       ;# geometry-y (rel.)
+
+record TEXT
+  bits 00011000 ;# 0CNXYRTL
+  int 100       ;# text-x (rel.)
+  int 100       ;# text-y (rel.)
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 10000000 ;# CNXYRAAF
+  str A
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00110000 ;# CNXYRAAF
+  int 50        ;# placement-x
+  int 50        ;# placement-y
+
+# Cell TOP
+record CELL_STR
+  str TOP 
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 10000000 ;# CNXYRAAF
+  str B
+
+record RECTANGLE
+  bits 01100011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 50       ;# width
+  uint 5        ;# height
+
+record TEXT
+  bits 01000011 ;# 0CNXYRTL
+  str TOP       ;# text-string
+  uint 2        ;# text-layer
+  uint 1        ;# text-datatype
+
+tail
+

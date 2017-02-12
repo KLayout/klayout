@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>The Main Window</title>
+  <keyword name="Main window"/>
+
+  <p>
+  The main window is divided into three parts: the left panel is the
+  hierarchy browser which depicts the cell hierarchy. Cell nodes can be
+  expanded showing the child nodes. The cell selected in the cell browser
+  is shown in the center panel.
+  </p>
+  <p>
+  The center panel is the actual canvas. There, the layout is drawn. Click
+  there to zoom or to draw rulers for measuring distances.
+  </p>
+  <p>
+  The right panel is showing the layer list with the layer drawing style.
+  Below a set of control panels is located. The control panels are
+  minimized per default. They can be expanded by clicking on the header
+  bar. 
+  </p>
+  <p>
+  Several control panels are available allowing to control colors, fill
+  and drawing styles etc. Select one or many layers in the layer list to
+  apply the selections from the control panels to.
+  </p>
+  <p>
+  Multiple layouts can be shown at once. Either they can be overlayed or
+  they can be shown in separate views. In this case, a tab panel appears
+  at top of the main window. Switch between the views by selecting the
+  tab. 
+  </p>
+
+</doc>
+

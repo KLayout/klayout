@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Advanced Editing Operations</title>
+
+  <p>
+  This section covers the more advanced features of editor mode.
+  </p>
+
+  <topics>
+    <topic href="/manual/layout_transforms.xml"/>
+    <topic href="/manual/search_replace.xml"/>
+    <topic href="/manual/hier_ops.xml"/>
+    <topic href="/manual/clip.xml"/>
+    <topic href="/manual/flatten.xml"/>
+    <topic href="/manual/resolve_arrays.xml"/>
+    <topic href="/manual/pcell_operations.xml"/>
+    <topic href="/manual/layer_boolean.xml"/>
+    <topic href="/manual/layer_size.xml"/>
+    <topic href="/manual/shape_boolean.xml"/>
+    <topic href="/manual/shape_size.xml"/>
+    <topic href="/manual/object_align.xml"/>
+    <topic href="/manual/round_corners.xml"/>
+    <topic href="/manual/adjust_origin.xml"/>
+    <topic href="/manual/create_variants.xml"/>
+  </topics>
+
+</doc>
+

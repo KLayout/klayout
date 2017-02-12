@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Rename A Cell</title>
+  <keyword name="Rename cell"/>
+
+  <p>
+  To rename a cell, select the cell in the hierarchy browser and choose "Rename Cell" from the 
+  context menu (right mouse button). You are prompted for a new name which must not exist yet.
+  </p>
+
+</doc>
+

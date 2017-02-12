@@ -1,0 +1,60 @@
+<ui version="4.0" >
+ <class>LayoutViewConfigPage3c</class>
+ <widget class="QFrame" name="LayoutViewConfigPage3c" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>556</width>
+    <height>117</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Settings</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Coordinate Display</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="dbu_units_cbx" >
+        <property name="text" >
+         <string>Default coordinate units are database units instead of micron</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="abs_units_cbx" >
+        <property name="text" >
+         <string>By default, transformations are shown in top cell, not in local cell</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <tabstops>
+  <tabstop>dbu_units_cbx</tabstop>
+  <tabstop>abs_units_cbx</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

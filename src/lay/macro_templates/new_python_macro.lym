@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>General KLayout macro (*.lym)\nCan be configured to appear in the menu or for auto-run.</description>
+ <format>general</format>
+ <autorun>false</autorun>
+ <show-in-menu>false</show-in-menu>
+ <shortcut/>
+ <interpreter>python</interpreter>
+ <category>pymacro</category>
+ <text>import pya
+
+# Enter your Python code here ..
+
+</text>
+</klayout-macro>

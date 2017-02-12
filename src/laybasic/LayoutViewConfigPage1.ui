@@ -1,0 +1,270 @@
+<ui version="4.0" >
+ <class>LayoutViewConfigPage1</class>
+ <widget class="QFrame" name="LayoutViewConfigPage1" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>536</width>
+    <height>347</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Settings</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>How Context Layout (Above in Hierarchy) Is Shown</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="2" column="1" colspan="3" >
+       <widget class="QCheckBox" name="ctx_hollow_cbx" >
+        <property name="text" >
+         <string>Hollow (no fill)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QSpinBox" name="ctx_dimming_spinbx" >
+        <property name="maximum" >
+         <number>100</number>
+        </property>
+        <property name="singleStep" >
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="2" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>("Automatic" for normal colors)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>.. or in faded colors, dimmed by</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>In this color ..</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="lay::ColorButton" name="ctx_color_pb" >
+        <property name="autoFillBackground" >
+         <bool>false</bool>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="2" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>percent</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="cctx_grp" >
+     <property name="title" >
+      <string>How Child Cell Layout (Below in Hierarchy) Is Shown</string>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <property name="checked" >
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="2" column="1" colspan="3" >
+       <widget class="QCheckBox" name="cctx_hollow_cbx" >
+        <property name="text" >
+         <string>Hollow (no fill)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="2" >
+       <widget class="QLabel" name="label_8" >
+        <property name="text" >
+         <string>("Automatic" for normal colors)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>.. or in faded colors, dimmed by</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QSpinBox" name="cctx_dimming_spinbx" >
+        <property name="maximum" >
+         <number>100</number>
+        </property>
+        <property name="singleStep" >
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>In this color ..</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="lay::ColorButton" name="cctx_color_pb" >
+        <property name="autoFillBackground" >
+         <bool>false</bool>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="2" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>percent</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="abstract_mode_grp" >
+     <property name="title" >
+      <string>Abstract Mode</string>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="2" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QLabel" name="label_10" >
+        <property name="text" >
+         <string>micron</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLineEdit" name="abstract_mode_width_le" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="3" >
+       <widget class="QLabel" name="label_9" >
+        <property name="text" >
+         <string>Instead of drawing the whole child cell, just draw the shapes touching the border within that distance:</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>lay::ColorButton</class>
+   <extends>QPushButton</extends>
+   <header>layWidgets.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>ctx_color_pb</tabstop>
+  <tabstop>ctx_dimming_spinbx</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

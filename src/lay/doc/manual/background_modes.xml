@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Background combination modes</title>
+  <keyword name="Erase mode"/>
+  <keyword name="Background combination modes"/>
+
+  <p>
+  KLayout offers several ways to combine the shapes drawn with shapes that are
+  already there. The mode can be selected with the "Select background combination mode"
+  tool button in the tool bar:
+  </p>
+
+  <p>
+  <img src="/manual/background_combination_modes.png"/>
+  </p>
+
+  <p>
+  These are the modes available:
+  </p>
+  
+  <ul>
+    <li><b>Add</b>: this is the default mode: the drawn shape will simply be added to the 
+    existing shapes.
+    </li>
+    <li><b>Merge</b>: in this mode, the drawn shape will be merged with the existing shapes.
+    This operation will always render a polygon that is the drawn shape merged with any polygons
+    that touch or overlap the drawn shape. Paths will be converted to polygons always.
+    This mode is equivalent to a boolean "OR" operation.
+    </li>
+    <li><b>Erase</b>: in this mode, the drawn shape will be subtracted from the existing shapes.
+    This mode can be used to create notches or slits in shapes touching or overlapping the 
+    drawn shape. The drawn shape will vanish.
+    This mode is equivalent to a boolean "NOT" operation.
+    </li>
+    <li><b>Mask</b>: in this mode, the drawn shape will act as a mask for existing shapes.
+    Only the parts overlapping the drawn shape will remain. 
+    This mode is equivalent to a boolean "AND" operation.
+    </li>
+    <li><b>Diff</b>: finally, in this mode, the drawn shape will invert existing shape.
+    This mode is equivalent to a boolean "XOR" operation.
+    </li>
+  </ul>
+
+</doc>
+

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Layer Sizing</title>
+  <keyword name="Layer operations"/>
+  <keyword name="Size operation"/>
+
+  <p>
+  A sizing operation allows growing or shrinking of the shapes of a layer by a given offset, which is applied per edge. 
+  Positive values will enlarge the shapes while negative values will shrink the shapes. 
+  The offset can be given separately for horizontal and vertical direction. However, the sign of both values must be identical (i.e. "0.5,0" or "1.0,0.2", but not "0.2,-0.2").
+  </p>
+
+  <p>
+  The sizing function can be found in the "Layers" submenu of the "Edit" menu. 
+  A dialog will open that allows specification of input and output layers, sizing value in micron: 
+  a single value for same sizing in x and y direction or comma-separated list of two values
+  (i.e. "0.2,0.1"). 
+  </p>
+
+  <p>
+  As for the boolean operations, hierarchical mode and kissing corner resolution can be specified (see 
+  <link href="/manual/layer_boolean.xml"/> for a description of these modes).
+  In addition, the cutoff strategy for sharp edges can be chosen from strict to virtually unlimited.
+  The following screenshot demonstrates the effect for "strict" (red) to "weak" (purple) cutoff modes.
+  </p>
+
+  <p><img src="/manual/size_modes.png"/></p>
+
+</doc>
+

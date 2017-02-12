@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Designer dialog sample (Ruby)\nA sample how to create a dialog from a Qt designer file</description>
+ <doc/>
+ <format>general</format>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>ruby</interpreter>
+ <text>module MyMacro
+ 
+  include RBA
+
+  # load the UI file
+  # TODO: this is how to load a file from a path next to the .lym file
+  # ui_file = QFile::new(QFileInfo::new($0).dir.filePath("MyDialog.ui"))
+  # Initially we use the sample file provided as resoure
+  ui_file = QFile::new(":/macro-templates/qt_designer.ui")
+  ui_file.open(QIODevice::ReadOnly)
+  dialog = QFormBuilder::new.load(ui_file, Application::instance.main_window)
+  ui_file.close
+  
+  def dialog.setup
+    button.clicked do
+      slider.value = (slider.value + 1) % 100
+    end
+  end
+
+  dialog.setup
+  dialog.exec  
+
+end
+</text>
+</klayout-macro>

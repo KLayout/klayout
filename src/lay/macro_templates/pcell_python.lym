@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>PCell template (Python)\nThis template provides the framework for a PCell</description>
+ <format>general</format>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <show-in-menu>false</show-in-menu>
+ <shortcut></shortcut>
+ <interpreter>python</interpreter>
+ <text>import pya
+
+# PCell template
+# This macro template provides the framework for a PCell library
+
+# It is recommended to put PCell code into namespaces.
+# TODO: change the module name
+
+# The PCell declaration
+# Each PCell must provide a declaration. It is recommended to use the PCell name as the class name.
+# TODO: change the class name
+class PCell(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(PCell, self).__init__()
+
+    # declare the parameters
+    # i.e. self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
+    #      self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "TODO: create description"
+  
+  def coerce_parameters_impl(self):
+    # TODO: use x to access parameter x and set_x to modify it's value 
+  
+  def produce_impl(self):
+    # TODO: produce the cell content 
+    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+
+  # optional:
+  # def can_create_from_shape_impl(self):
+  #   TODO: determine if we have a shape that we can use to derive the 
+  #   PCell parameters from and return true in that case
+  # 
+  # optional:
+  # def parameters_from_shape_impl(self):
+  #   TODO: change parameters using set_x to reflect the parameter for the
+  #   given shape
+  # 
+  # optional:
+  # def transformation_from_shape_impl(self):
+  #   TODO: return a RBA::Trans object for the initial transformation of
+  #   the instance
+  
+# TODO: add more PCell classes ..
+
+# The PCell library declaration
+# A PCell library must be declared by deriving a custom class from RBA::Library.
+# The main purpose of this class is to provide the PCell declarations and to register itself
+# with a proper name.
+# TODO: change the class name
+class PCellLib(pya.Library):
+
+  def __init__(self):
+  
+    # TODO: change the description
+    self.description = "My PCell library"
+    
+    # register the PCell declarations
+    # TODO: change the names
+    self.layout().register_pcell("PCell", PCell())
+    # TODO: register more PCell declarations
+    
+    # register our library with the name "PCellLib"
+    # TODO: change the library name
+    self.register("PCellLib")
+    
+# instantiate and register the library
+# TODO: change the library name
+PCellLib()
+
+</text>
+</klayout-macro>

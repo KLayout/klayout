@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Programming scripts</title>
+
+  <p>
+  This category is about programming KLayout using the integrated Ruby or Python scripting language.
+  The following topics are available:
+  </p>
+
+  <topics>
+    <topic href="/programming/introduction.xml"/>
+    <topic href="/programming/python.xml"/>
+    <topic href="/programming/application_api.xml"/>
+    <topic href="/programming/database_api.xml"/>
+    <topic href="/programming/geometry_api.xml"/>
+    <topic href="/programming/events.xml"/>
+    <topic href="/programming/ruby_binding.xml"/>
+    <topic href="/programming/ruby_pcells.xml"/>
+    <topic href="/programming/qt_binding.xml"/>
+    <topic href="/programming/traditional.xml"/>
+    <!-- TODO: more -->
+  </topics>
+
+</doc>
+

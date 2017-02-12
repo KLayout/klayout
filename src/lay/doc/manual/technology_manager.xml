@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Technology Management</title>
+  <keyword name="Technology management"/>
+
+  <p>
+  A new feature of KLayout 0.22 is technology management.
+  Technology management summarizes features which require a certain interpretation of a layout.
+  In particular, layout layers are assigned a physical meaning, for example via layers or active area
+  layers in CMOS technologies. Since that interpretation often is depending on the technology
+  the product will be fabricated with, the ability to provide multiple setups is summarized
+  as "technology management".
+  </p>
+
+  <p>
+  The "Technology Manager" in the "Tools" menu is the user interface that allows creating,
+  deleting and editing of technology setups. Read more about the technology manager in 
+  <link href="/about/technology_manager.xml"/>
+  </p>
+
+</doc>
+

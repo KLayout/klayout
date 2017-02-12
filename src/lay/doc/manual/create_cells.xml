@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Creating A New Cell</title>
+  <keyword name="Cell"/>
+
+  <p>
+  You can create new cells using the "New Cell" function from the hierarchy panel's context menu (right mouse click on the cell hierarchy panel). 
+  You are prompted to enter the new cell's name (a cell with that name must not exists yet) and a window size.
+  The window size is the initial dimension of the view when the new cell is shown. Apart from that it does not
+  have any meaning.
+  </p>
+
+</doc>
+

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Advanced Topics</title>
+
+  <p>
+  This section describes some more advanced features of KLayout:
+  </p>
+
+  <topics>
+    <topic href="/manual/xor.xml"/>
+    <topic href="/manual/diff.xml"/>
+    <topic href="/manual/tiling.xml"/>
+    <topic href="/manual/import_gerber.xml"/>
+    <topic href="/manual/import_layout.xml"/>
+    <topic href="/manual/net_tracing.xml"/>
+  </topics>
+
+</doc>
+

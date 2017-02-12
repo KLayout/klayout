@@ -1,0 +1,718 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+  <title>About Custom Layout Queries</title>
+  <keyword name="Custom queries"/>
+  <keyword name="Cell queries"/>
+  <keyword name="Shape queries"/>
+  <keyword name="Layout queries"/>
+
+  <p>
+  Layout queries are an advanced feature of KLayout which provides a very generic 
+  method to manipulate or search the geometrical or cell information of a layout.
+  The basic concept of custom queries is borrowed from SQL, the language widely used for
+  accessing databases. Instead of working on linear tables with rows and columns, KLayout's
+  queries work on the layout structure which basically a cell tree, a layer set orthogonal to that
+  and per-cell/per-layer geometrical information which itself is divided into shape classes.
+  </p>
+
+  <p>
+  Layout queries have a layered structure, like an onion: the core of the query 
+  is a cell query which selects one or many cells with or without their children. The cell
+  query can be wrapped by a shape query which addresses the shapes of the selected cells or
+  instances, optionally confined to specific layers. The last layer is formed by the action: this is the activity that KLayout will
+  perform on the selected objects. The default action is simply to report the results.
+  It is also possible to delete the selected objects or to perform a custom operation on them.
+  </p>
+
+  <p>
+  On cell and shape level, conditions can be specified which will restrict the operation on a
+  subset of the selected objects. Reports can be sorted by a arbitrary key derived from the 
+  current object.
+  </p>
+
+  <p>
+  On cell level three different relationship models are supported:
+  </p>
+  
+  <ul>
+    <li>Individual cells: no hierarchy is involved</li>
+    <li>The cell tree: the cell tree  is the parent/child relationship without explicit instantiation information</li>
+    <li>The cell instance tree: every individual instance of a cell is considered</li>
+  </ul>
+
+  <p>
+  Expressions play an important part in layout queries, both as actions (assignment type expressions) 
+  as well as conditions or for the derivation of sorting keys. See <link href="/about/expressions.xml"/> for
+  details about expressions. Within expressions, RBA objects are used to represent shapes or instances (see <link href="/code/index.xml"/> for a list of classes available).
+  Depending on the context of the query, a variety of functions is available to access the properties of the current item and context.
+  </p>
+
+  <p>
+  The key to layout queries is the "Search and Replace" feature: this dialog uses custom queries 
+  to emulate simple search and replace functionality on the first three tabs of the dialog ("Delete" 
+  is regarded as a special kind of "replacement" here). However, the true power is revealed on the 
+  forth page: here you can enter all kind of custom queries. Clicking on "Execute" will run the
+  query and display the results in the right panel.
+  </p>
+
+  <p>
+  If a search or replace action is specified on the first three tabs, the corresponding 
+  custom layout query will be shown in the entry box of the forth one. That way it is very easy
+  to create a first query using the standard functions, switch to the custom query page 
+  and adjust it to fit the specific requirements.
+  </p>
+
+  <h2>Building queries: cells</h2>
+
+  <p>
+  The very core of a query is a cell expression. The most simple form of a cell expression is a simple cell name.
+  This expression will select the cell called "RINGO":
+  </p>
+
+  <pre>
+RINGO
+</pre>
+  
+  <p>
+  Cell expressions can contain wildcard in the "glob" form
+  made popular by the Unix and Windows command line. "*" is for an arbitrary sequence of zero to many characters, "?"
+  for any single character. "{A,B,C}" is for either the character sequence "A", "B" or "C", "[ABC]" is any of the characters 
+  "A", "B" or "C" and "[^ABC]" is for any character not "A", "B" or "C". Round brackets can be used to group 
+  parts of the string for later reference. If brackets of any kind are used inside a match string, either single or 
+  double quotes should be used around match strings in order to avoid ambiguities with other parts 
+  of the query syntax.
+  </p>
+
+  <p>
+  This expression will select all cells starting with "T":
+  </p>
+
+  <pre>
+T*
+</pre>
+
+  <p>
+  Although it is not necessary to do so, it is recommended to mark a cell query explicitly
+  as such using the optional "cells" or "cell" keyword. This query has the same effect than the
+  previous one but is somewhat more robust if used in nested queries we will learn about later:
+  </p>
+
+  <pre>
+cells T*
+</pre>
+
+  <p>
+  A cell expression can already be used by it's own. The report of such a query will simply contain the cells
+  selected by that expression. If combined with an action, such expressions already provide useful manipulation
+  functionality.
+  </p>
+
+  <p>
+  The "delete ..." action will delete the given cells:
+  </p>
+
+  <pre>
+delete cells T*
+</pre>
+
+  <p>
+  The "with .. do ..." action can be used to manipulate the cell. This example will rename the cell by replacing 
+  the "T" prefix with a "S". The part after "do" is an expression which is evaluated for each hit. 
+  Note that "$1" is used to refer to the first matching bracket in the last match.
+  "cell.name" is a method call on the object "cell" which is provided by the query in the context of a cell query. 
+  "cell" is a "Cell" object (see <class_doc href="Cell"/>) and setting the name will basically rename the cell. The expression used
+  for the assignment will put an "S" in front of the rear part of the name, hence replace "T" by "S":
+  </p>
+
+  <pre>
+with cells "T(*)" do cell.name = "S"+$1
+</pre>
+
+  <p>
+  Note the quotes around the "T(*)" match expression. They are necessary to make the brackets part of the 
+  match expression rather than the cell query. It is usually a good idea to put the match expression inside quotes
+  to avoid ambiguities.
+  </p>
+
+  <p>
+  The last example already demonstrates how a combination of two simple concepts - simple cell queries and expressions -
+  form a new and very generic feature. We will soon learn about the power of that concept.
+  </p>
+  
+  <h2>Building queries: cell trees</h2>
+
+  <p>
+  Cell queries are the most simple form of core queries. The next level is entered by extending
+  the concept to hierarchies. Cell hierarchies come on two flavors: a parent-to-child relationship tree (the cell tree) 
+  and the instantiation tree. In the cell tree, each cell is at most present once in the context of a parent
+  cell, independent of the number of times a cell is used inside a parent cell. The cell tree just describes
+  the fact that a cell is a child cell of another, not how the cell is used. The instance tree adds this
+  detailed information as well: how many times a cell is used and what transformations are applied per 
+  such instance.
+  </p>
+
+  <p>
+  The cell tree can be accessed within cell queries using the "." operator to separate parent and child cell.
+  The following cell query returns all cells which are children of a cell "A":
+  </p>
+
+  <pre>
+cells A.*
+</pre>
+  
+  <p>
+  Multiple levels may be nested, for example the following query lists all cells which are second-level 
+  children of the "A" cell:
+  </p>
+
+  <pre>
+cells A.*.*
+</pre>
+
+  <p>
+  Such expressions form a "path" leading from an initial cell to some cell, which is returned by 
+  the query. The "." separates the path elements like the slash or backslash does in a file path.
+  </p>
+
+  <p>
+  Top cells can be addressed by a leading "." similar to the leading slash of an absolute file
+  path in Unix. The following query will return all top cells:
+  </p>
+
+  <pre>
+cells .*
+</pre>
+
+  <p>
+  Brackets can be used to group parts of the path. That has no immediate effect, but it can be
+  usedful in combination with quantifiers and branches as we will see soon. The following queries are equivalent:
+  </p>
+
+  <pre>
+cells TOP.*.A
+cells TOP(.*.A)
+cells TOP(.*)(.A)
+</pre>
+
+  <p>
+  Please note that brackets can only be put between the dot and the previous element. 
+  A query like "cells TOP.(*.A)" is invalid since the opening bracket is after the dot.
+  </p>
+
+  <p>
+  Alternative paths can be specified by separating them with a comma. Such alternatives must
+  be put inside brackets. For example, this query selects all cells that are children of 
+  "TOP" and start with an "A" or which are second-level children and start with an "E":
+  </p>
+
+  <pre>
+cells TOP(.A*,.*.E*)
+</pre>
+
+  <p>
+  Path elements can be made optional with a "?" symbol and expanded an variable number of times
+  using quantifiers like "*" (0 to many) and "+" (one to many) or "{n,m}" (n to m times). Note
+  that you'll have to put the expression subject to the quantifier in brackets in order to 
+  avoid ambiguities of the star operator. The following expression will return the A cell in every 
+  possible child context of "TOP", i.e. as direct child, second-level child and so on:
+  </p>
+
+  <pre>
+cells TOP(.*)*.A
+</pre>
+  
+  <p>
+  To understand that query, note that the "*" inside the brackets is forming the match string while
+  the outer star is forming the quantifier. That query reads in expanded form "TOP.A", "TOP.*.A", "TOP.*.*.A" etc.
+  </p>
+
+  <p>
+  There is a useful abbreviation for the above case. The following query will also produce "A" in every
+  child context of "TOP":
+  </p>
+
+  <pre>
+cells TOP..A
+</pre>
+
+  <p>
+  The double dot operator matches an arbitrary part of the instantiation path before and after a cell 
+  even without being anchored at one end. Used before a cell name, it will return all contexts a cell
+  is used in (including top cells and all child contexts). Used after a cell, it will return the cell 
+  plus all child cells in each possible context. Used before a cell it will deliver all contexts that cell
+  is used in every top cells. 
+  The following query will deliver "TOP" plus all it's direct and indirect children:
+  </p>
+
+  <pre>
+cells TOP..
+</pre>
+
+  <p>
+  Note that the previous query may deliver the same cell multiple times - once for each context
+  (call path from TOP) it is used in. Hence "TOP.." will basically expand into the cell tree with 
+  "TOP" as the root.
+  </p>
+
+  <p>
+  In order to get the names of all cells called from a given cell, you can use the "select" action
+  with the cell name and the "sorted by .. unique" output selector to remove duplicates of 
+  cell names:
+  </p>
+
+  <pre>
+select cell_name of cells TOP.. sorted by cell_name unique
+</pre>
+
+  <p>
+  See below for a description of the "select" action.
+  </p>
+
+  <p>
+  Within a path, dynamically computed components can be inserted using the "$(..)" notation
+  which wraps an expression. That expression is evaluated in the context of the previous path
+  component. For example, the following query selects all child cells which are named like their
+  parent with an "A" prefix:
+  </p>
+
+  <pre>
+cells *.$("A"+cell_name)
+</pre>
+
+
+  <h2>Building queries: instances</h2>
+
+  <p>
+  Cell trees can be expanded into instance trees simply by prepending "instances". This
+  will deliver all direct instances of "TOP":
+  </p>
+
+  <pre>
+instances of TOP.*
+</pre>
+
+  <p>
+  When asking for instances, more information is available inside the query. For
+  example, the instance's orientation and position is available. With the "instances" specification,
+  array references are expanded into single instances. To keep arrays as such, use "arrays" instead
+  of "instances":
+  </p>
+
+  <pre>
+arrays of TOP.*
+</pre>
+
+  <p>
+  Cell or instance queries can be filtered using the "where" clause. After the "where" an expression
+  is expected with a number of predefined variables that reflect the context (see below for the variables
+  available).
+  The following query selects all child cells of "A" where the cell name has a length of 5 characters:
+  </p>
+
+  <pre>
+cells A.* where len(cell_name)==5
+</pre>
+
+  <h2>Building queries: shapes</h2>
+
+  <p>
+  So far we have dealt with cells and their instantiations.
+  We enter the next level now by introducing shapes. 
+  </p>
+
+  <p>
+  Shape queries are built atop of the cell/instance level. A simple example selects all shapes
+  of the cell "TOP":
+  </p>
+
+  <pre>
+shapes of cell TOP
+</pre>
+
+  <p>
+  Shape queries can be confined to certain shape types. For example, this confines the query
+  to boxes:
+  </p>
+
+  <pre>
+boxes from cell TOP
+</pre>
+
+  <p>
+  Allowed shape type are "boxes", "polygons", "texts" and "paths". In the context of a shape query
+  additional variables are available for expressions. The most important one is "shape" which 
+  is a Shape object (see <class_doc href="Shape"/>) That objects provides access to the shape addressed in a generic
+  way. Specialization to a specific shape type is possible through the shape specific accessor
+  methods (i.e. "shape.box_width") or the specific objects (i.e. "shape.box").
+  </p>
+
+  <p>
+  Multiple shape types can be given with "or" or a comma:
+  </p>
+
+  <pre>
+boxes or polygons from cell TOP
+</pre>
+
+  <p>
+  Shape queries can be confined to certain layers. This query will report all shapes from 
+  layer 8, datatype 0:
+  </p>
+
+  <pre>
+shapes on layer 8/0 from cell TOP
+</pre>
+
+  <p>
+  Intervals can be specified with the hyphen ("-") and multiple layers or intervals can be
+  listed with a comma or semicolon. The following will list the shapes from layer 8, datatype
+  0 to 10 and layer 9, datatype 0 only (note that "no datatype" is interpreted as datatype 0):
+  </p>
+
+  <pre>
+shapes on layer 8/0-10, 9 from cell TOP
+</pre>
+
+  <p>
+  For formats that support named layers only (i.e. DXF), the layer name can be 
+  given. The following query lists shapes from layers METAL and POLY (case sensitive!):
+  </p>
+
+  <pre>
+shapes on layer METAL, POLY from cell TOP
+</pre>
+
+  <p>
+  Any kind of cell query can be used inside the shape query. If a cell query renders multiple 
+  cells, the shape query will be applied to each of the cells returned. If instances are selected
+  by the cell query, the shapes will be reported for each instance. Since the cumulated transformation
+  of a specific instance into the top cell is available through the "path_trans" variable, 
+  it is possible to transform each shape into the top cell in the instance case. The following expression 
+  combines a "with .. do" action with a shape query to flatten all shapes below "TOP": 
+  </p>
+
+  <pre>
+with shapes on layer 6 from instances of TOP.. do initial_cell.shapes(&lt;10/0&gt;).insert(shape).transform(path_trans)
+</pre>
+
+  <p>
+  That expression reads all shapes of cell "TOP" and it's children, inserts them into a new layer 10, datatype 0 and
+  transforms the shape after it has been inserted. This expression makes use of the variables "initial_cell" (a Cell object
+  representing the root cell of the cell query), "shape" (a pointer to the currently selected shape and "path_trans"
+  (a Trans object representing the transformation of the current shape into the root cell of the query). 
+  It also employs the angle bracket layer constant notation which specifies a layer in the target notation
+  and can be used in place of the layer index value usually used inside the API. Note that the target
+  layer must exist already, i.e. must have been created in "Edit/Layer/New Layer" for example.
+  </p>
+
+  <p>
+  Shape queries can be confined with conditions. A condition is entered with a "where" clause 
+  plus an expression that selects the shapes. This condition selects shapes with an area of more than
+  4 square micron (note that the "um2" unit must be given, since it will cause the value to be
+  converted into the database units used internally):
+  </p>
+
+  <pre>
+shapes from cell TOP where shape.area &lt; 4 um2
+</pre>
+
+  <p>
+  Shape conditions can be combined with cell conditions. To avoid ambiguities, the cell query must be 
+  put into brackets in that case:
+  </p>
+
+  <pre>
+shapes from (cells * where len(cell_name)==4) where shape.area &lt; 4 um2
+</pre>
+
+  <h2>Actions</h2>
+
+  <p>
+  Actions specify operations that are to be performed on the results of a query. 
+  The default action is to just list the results. In the "Search and replace" dialog, the 
+  results will be listed right to the query entry box as a table. Depending on the 
+  context of the query, cell names, cell names plus parent cell, cell instances or shapes
+  are listed.
+  </p>
+
+  <h3>"select" action</h3>
+
+  <p>
+  The "select" action will compute one or more results from each item returned by the query and 
+  present the computed value in a table. The general form is:
+  </p>
+
+  <p><tt><b>select</b></tt> expr1, expr2, ... <tt><b>from</b></tt> query</p>
+
+  <p>
+  "expr1", "expr2" ... are expressions. For example this action computes area and perimeter for all
+  shapes of cell "TOP":
+  </p>
+
+  <pre>
+select shape.area, shape.perimeter from shapes of cell TOP
+</pre>
+
+  <p>
+  The "select" action offers sorting with optional reduction to unique values:
+  </p>
+
+  <p><tt><b>select</b></tt> expr1, expr2, ... <tt><b>from</b></tt> query <tt><b>sorted by</b></tt> sort_key</p>
+  <p><tt><b>select</b></tt> expr1, expr2, ... <tt><b>from</b></tt> query <tt><b>sorted by</b></tt> sort_key <tt><b>unique</b></tt></p>
+
+  <p>
+  Here "sort_key" is an expression which delivers the value by which the output will be sorted.
+  If "unique" is specified, items with identical sort key are reduced to a single output.
+  </p>
+
+  <h3>"with" action</h3>
+
+  <p>
+  The "with" action executes an expression on each item returned by the expression. 
+  In that sense it is basically equivalent to the "select" action but the results
+  of the operation are discarded and the intention of the expression is to modify
+  the results. The general form of that action is this:
+  </p>
+
+  <p><tt><b>with</b></tt> query <tt><b>do</b></tt> expr</p>
+
+  <p>
+  For example, this action will move all shapes of cell "TOP" from layer 6 to layer 10, datatype 0:
+  </p>
+
+  <pre>
+with shapes on layer 6 of cell TOP do shape.layer = &lt;10/0&gt;
+</pre>
+
+  <h3>"delete" action</h3>
+
+  <p>
+  This action will simply delete the objects selected by the query:
+  </p>
+
+  <p><tt><b>delete</b></tt> query</p>
+
+  <p>
+  For example, this query deletes all shapes from layer 6, datatype 0 on cell TOP:
+  </p>
+
+  <pre>
+delete shapes on layer 6 of cell TOP
+</pre>
+
+  <h2>Variables available per context</h2>
+
+  <h3>Common variables</h3>
+
+  <p>
+  The following variables are available in all queries:
+  </p>
+
+  <table>
+    <tr><th>Name</th><th>Value type</th><th>Description</th></tr>
+    <tr>
+      <td>layout</td>
+      <td><class_doc href="Layout"/></td>
+      <td>The layout object that this query runs on.</td>
+    </tr>
+  </table>
+
+  <h3>Cell query context</h3>
+
+  <p>
+  In the plain cell and cell tree context, the following variables are available:
+  </p>
+
+  <table>
+    <tr><th>Name</th><th>Value type</th><th>Description</th></tr>
+    <tr>
+      <td>path</td>
+      <td>Array</td>
+      <td>Array with the indexes of the cells in that path.<br/>
+          For a plain cell, this array will have length 1 and contain the index of the selected cell only.</td>
+    </tr>
+    <tr>
+      <td>path_names</td>
+      <td>Array</td>
+      <td>Array with the names of the cells in that path.<br/>
+          For a plain cell, this array will have length 1 and contain the name of the selected cell only.</td>
+    </tr>
+    <tr>
+      <td>initial_cell</td>
+      <td><class_doc href="Cell"/></td>
+      <td>Object representing the initial cell (first of path)</td>
+    </tr>
+    <tr>
+      <td>initial_cell_index</td>
+      <td>Integer</td>
+      <td>Index of initial cell (first of path)</td>
+    </tr>
+    <tr>
+      <td>initial_cell_name</td>
+      <td>String</td>
+      <td>Name of initial cell (first of path)</td>
+    </tr>
+    <tr>
+      <td>cell</td>
+      <td><class_doc href="Cell"/></td>
+      <td>Object representing the current cell (last of path)</td>
+    </tr>
+    <tr>
+      <td>cell_index</td>
+      <td>Integer</td>
+      <td>Index of current cell (last of path)</td>
+    </tr>
+    <tr>
+      <td>cell_name</td>
+      <td>String</td>
+      <td>Name of current cell (last of path)</td>
+    </tr>
+    <tr>
+      <td>hier_levels</td>
+      <td>Integer</td>
+      <td>Number of hierarchy levels in path (length of path - 1)</td>
+    </tr>
+    <tr>
+      <td>references</td>
+      <td>Integer</td>
+      <td>The number of instances of this cell in the parent cell. Array references count as 1.<br/>
+          For plain cells, this value is 0.</td>
+    </tr>
+    <tr>
+      <td>weight</td>
+      <td>Integer</td>
+      <td>The number of instances of this cell in the parent cell. Array references count as multiple instances.<br/>
+          For plain cells, this value is 0.</td>
+    </tr>
+    <tr>
+      <td>tot_weight</td>
+      <td>Integer</td>
+      <td>The number of instances of this cell in the initial cell along the given path. Array references count as multiple instances.<br/>
+          for plain cells, this value is 0.</td>
+    </tr>
+    <tr>
+      <td>instances</td>
+      <td>Integer</td>
+      <td>Equivalent to "weight", but also available for plain cells. For plain cells, the value represents
+          the number of times, the cell is used in all top cells.</td>
+    </tr>
+    <tr>
+      <td>bbox</td>
+      <td><class_ref href="Box"/></td>
+      <td>The cell's bounding box.</td>
+    </tr>
+    <tr>
+      <td>cell_bbox</td>
+      <td><class_ref href="Box"/></td>
+      <td>Same as "bbox" (disambiguator for shape and instance bounding boxes).</td>
+    </tr>
+  </table>
+
+  <h3>Instance query context</h3>
+
+  <p>
+  In an instance query context, the properties of the current instance are available as variables
+  in addition to most of the ones provided by the cell query context. These variables are not available
+  in instance context: "weight", "references" and "tot_weight". Apart from that these additional variable
+  are provided:
+  </p>
+
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Value type</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td>path_trans</td>
+      <td><class_doc href="ICplxTrans"/></td>
+      <td>The transformation of that instance into the top cell.
+          For a plain cell that is a unit transformation.</td>
+    </tr>
+    <tr>
+      <td>trans</td>
+      <td><class_doc href="ICplxTrans"/></td>
+      <td>The transformation of that instance (first instance if an array).</td>
+    </tr>
+    <tr>
+      <td>inst_bbox</td>
+      <td><class_doc href="Box"/></td>
+      <td>The instance bounding box in the initial cell.</td>
+    </tr>
+    <tr>
+      <td>inst</td>
+      <td><class_doc href="Instance"/></td>
+      <td>The instance object of the current instance.</td>
+    </tr>
+    <tr>
+      <td>array_a</td>
+      <td><class_doc href="Point"/></td>
+      <td>The a vector for an array instance or nil if the instance is not an array.</td>
+    </tr>
+    <tr>
+      <td>array_na</td>
+      <td>Integer</td>
+      <td>The a axis array dimension or nil if the instance is not an array.</td>
+    </tr>
+    <tr>
+      <td>array_b</td>
+      <td><class_doc href="Point"/></td>
+      <td>The b vector for an array instance or nil if the instance is not an array.</td>
+    </tr>
+    <tr>
+      <td>array_nb</td>
+      <td>Integer</td>
+      <td>The b axis array dimension or nil if the instance is not an array.</td>
+    </tr>
+    <tr>
+      <td>array_ia</td>
+      <td>Integer</td>
+      <td>The a index when an array is iterated (0 to array_na). Not available with instance queries with "arrays of ...".</td>
+    </tr>
+    <tr>
+      <td>array_ib </td>
+      <td>Integer</td>
+      <td>he b index when an array is iterated (0 to array_nb). Not available with instance queries with "arrays of ...".</td>
+    </tr>
+  </table>
+
+  <h3>Shape query context</h3>
+
+  <p>
+  In the context of the shape query, the following variables are available in addition to the variables
+  made available by the inner cell query. The inner cell query is either a instance query or a cell query:
+  </p>
+  
+  <table>
+    <tr><th>Name</th><th>Value type</th><th>Description</th></tr>
+    <tr>
+      <td>bbox</td>
+      <td><class_doc href="Box"/></td>
+      <td>The shape's bounding box</td>
+    </tr>
+    <tr>
+      <td>shape_bbox</td>
+      <td><class_doc href="Box"/></td>
+      <td>Same as "bbox" (disambiguator for cell or instance bounding boxes)</td>
+    </tr>
+    <tr>
+      <td>shape</td>
+      <td><class_doc href="Shape"/></td>
+      <td>The shape object</td>
+    </tr>
+    <tr>
+      <td>layer_info</td>
+      <td><class_doc href="LayerInfo"/></td>
+      <td>The layer description of the current shape's layer</td>
+    </tr>
+    <tr>
+      <td>layer_index</td>
+      <td>Integer</td>
+      <td>The layer index of the current shape</td>
+    </tr>
+  </table>
+
+</doc>
+

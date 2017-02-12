@@ -1,0 +1,104 @@
+# <test>
+#   <name>t8.4.ot</name>
+#   <content-description>A top cell and one child cell with one rectangle, child cell instantiated in various ways, cells specified by ID, child cell after top cell</content-description>
+#   <test-intention>Hierarchical reader capabilities</test-intention>
+#   <test-intention>PLACEMENT record reading</test-intention>
+#   <test-intention>Repetitions of placements</test-intention>
+#   <test-intention>Placed cell reference by ID</test-intention>
+#   <test-intention>Placement-related modal variables</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     begin_cell {A}
+#     box 1 2 {300 -400} {400 -200}
+#     end_cell
+#     begin_cell {TOP}
+#     aref {A} 0 0 1 3 4 {-300 400} {-240 400} {-300 520}
+#     aref {A} 0 0 1 3 4 {-300 800} {-240 800} {-300 920}
+#     aref {A} 0 0 1 3 4 {-300 1200} {-240 1200} {-300 1320}
+#     aref {A} 0 0 1 3 4 {0 1200} {60 1200} {0 1320}
+#     aref {A} 90 0 1 3 4 {700 1400} {760 1400} {700 1520}
+#     aref {A} 0 1 1 3 4 {700 400} {760 400} {700 520}
+#     aref {A} 90 1 1 3 4 {700 2400} {760 2400} {700 2520}
+#     end_cell
+#     end_lib
+#   </content>
+# </test>
+
+header 
+  real 0 1000.0
+  uint 0 ;# offset table is in start record
+  for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+record CELLNAME 
+  str A
+record CELLNAME 
+  str TOP
+
+# Cell TOP
+record CELL_ID
+  uint 1
+
+record XYRELATIVE
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 11111000 ;# CNXYRAAF
+  uint 0
+  int -300      ;# placement-x
+  int 400       ;# placement-y
+  uint 1        ;# repetition (3x4 matrix)
+    uint 1       
+    uint 2
+    uint 20
+    uint 30
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00111000 ;# CNXYRAAF
+  int 0         ;# placement-x
+  int 400       ;# placement-y
+  uint 0        ;# repetition (reuse)
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00011000 ;# CNXYRAAF
+  int 400       ;# placement-y
+  uint 0        ;# repetition (reuse)
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00101000 ;# CNXYRAAF
+  int 300       ;# placement-x
+  uint 0        ;# repetition (reuse)
+
+record XYABSOLUTE
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00111001 ;# CNXYRAAF
+  int 700       ;# placement-x
+  int 400       ;# placement-y
+  uint 0        ;# repetition (reuse)
+
+record XYRELATIVE
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00011010 ;# CNXYRAAF
+  int 1000      ;# placement-y
+  uint 0        ;# repetition (reuse)
+
+uint 17         ;# PLACEMENT (no mag, manhattan angles)
+  bits 00011011 ;# CNXYRAAF
+  int 1000      ;# placement-y
+  uint 0        ;# repetition (reuse)
+
+# Cell A
+record CELL_ID
+  uint 0
+
+record RECTANGLE
+  bits 01111011 ;# SWHXYRDL
+  uint 1        ;# layer
+  uint 2        ;# datatype
+  uint 100      ;# width
+  uint 200      ;# height
+  int 300       ;# geometry-x (absolute)
+  int -400      ;# geometry-y (absolute)
+
+tail
+

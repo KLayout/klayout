@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Import Other Layout Files</title>
+  <keyword name="Import other layouts"/>
+
+  <p>
+  This function can merge other layouts into the layout loaded. Merging means that the hierarchy of the specified layout is
+  inserted into the given layout. Different modes are available that control the way how the hierarchy is merged.
+  This function is available in the "File" menu as "Import/Other File Into Current".
+  </p>
+
+  <p>
+  The workflow for importing a different layout is this:
+  </p>
+
+  <ul>
+    <li>Specify the file to input. At least the file name is required. Additionally, a cell can be specified. In that case,
+        only the cells referred to by the given cell (directly or indirectly) are imported. Reader options can be specified separately 
+        for the import. Reader options are applied the same way than the reader options are used for the standard load function.</li>
+    <li>Specify the import mode. The modes are described below.</li>
+    <li>Specify the layer mapping. Either the shapes are imported on their original layer or an offset can be used that will be added
+        to the layer to form the target layer of the import. An offset of "1000/0" for example specifies to add 1000 to the layer and
+        use the original datatype.</li>
+    <li>Specify an optional transformation. The imported layout will be transformed accordingly. The transformation can be specified explicitly 
+        or with up to three points which are mapped onto each other.</li>
+  </ul>
+
+  <p>
+  Four import modes are available that control how the hierarchy of the imported layout is
+  inserted into the existing layout:
+  </p>
+
+  <ul>
+    <li><b>Merge</b>: in this mode, the contents of the imported cell will be put into the current cell and
+      the child hierarchy is added below the current cell.</li>
+    <li><b>Extra</b>: in this mode,  new top level cells containing the hierarchy tree of the 
+      imported cell or cells will be created. In this mode, multiple cells can be imported
+      if the imported layout contains multiple top cells. Leave the cell specification empty for this.
+    </li>
+    <li><b>Instantiate</b>: the imported cell will be instantiated into the current cell as a separate 
+      hierarchy.</li>
+    <li><b>Merge hierarchy</b>: The fourth mode is a little bit more complex. Basically it works like 
+      "Merge", but identifies corresponding cells and merges the contents for the 
+      corresponding imported cells into the original cells. 
+      The algorithm identifies corresponding cells by requiring that the flat 
+      instances of the imported child cell exactly equal the flat instances of the 
+      corresponding original cell (where flat refers to the instances of a cell in 
+      the context of the current cell). This is done by selectively thinning out the 
+      candidate list and finally employing a name similarity measure to resolve 
+      ambiguities.</li>
+  </ul>
+
+  <p>
+  The import function will create new cell names using the "$x" suffix to avoid name ambiguities.
+  </p>
+
+</doc>
+

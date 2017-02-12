@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Partial Mode</title>
+  <keyword name="Editing"/>
+  <keyword name="Partial mode"/>
+
+  <p>
+  "Partial editing" is a powerful feature that allows modification of shapes. Edges or segments
+  of polygons resp. paths can be moved, vertices, edges or segments from polygons or paths can be deleted and 
+  new points can be inserted into polygons and paths. "Partial editing" can be applied to a complex partial selection: 
+  Multiple edges or vertices can be selected and deleted or moved.
+  </p>
+
+  <p>
+  The normal selection works "full element". In this mode, the whole shape is being moved or deleted. 
+  Only in full element mode, shapes or instances can be sent to the clipboard.
+  </p>
+
+</doc>
+

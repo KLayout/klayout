@@ -1,0 +1,26 @@
+# <test>
+#   <name>t1.1.ot</name>
+#   <content-description>Empty file (no cell, just header)</content-description>
+#   <test-intention>Basic reader capabilities</test-intention>
+#   <test-intention>Real data type 0 (for database unit)</test-intention>
+#   <test-intention>Database unit setting</test-intention>
+#   <test-intention>PAD record reading</test-intention>
+#   <content>
+#     begin_lib 0.001
+#     end_lib
+#   </content>
+# </test>
+
+header 
+# parts of START record
+real 0 1000.0
+uint 0 ;# offset table is in start record
+for { set i 0 } { $i < 12 } { incr i } { uint 0 }
+
+# dummy content
+record PAD
+
+# no body.
+
+tail
+

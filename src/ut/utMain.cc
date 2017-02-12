@@ -994,7 +994,6 @@ main_cont (int argc, char **argv)
 
               } else {
                 ut::ctrl << "<test-sub-result status=\"success\"/>";
-                ut::ctrl << "</test-sub>";
               }
 
             } catch (tl::CancelException &) {
@@ -1034,7 +1033,7 @@ main_cont (int argc, char **argv)
 
         timer.stop ();
 
-        ut::ctrl << "<summary>";
+        ut::ctrl << "<summary mode=\"" << mode << "\">";
 
         ut::noctrl << replicate ("=", console.real_columns ());
         ut::noctrl << "Summary";
@@ -1066,11 +1065,13 @@ main_cont (int argc, char **argv)
         ut::ctrl << "</summary>";
 
         ut::noctrl << "Total time: " << timer.sec_wall () << "s (wall) " << timer.sec_user () << "s (user) " << timer.sec_sys () << "s (sys)";
-        ut::ctrl << "<summary-times wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
+        ut::ctrl << "<summary-times mode=\"" << mode << "\" wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
 
       }
 
     }
+
+    grand_timer.stop ();
 
     //  GSI diagnostics: print all methods that have not been called
     if (gsi_coverage) {

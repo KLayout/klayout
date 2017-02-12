@@ -20,8 +20,9 @@
 
 */
 
-
 #include "dbRecursiveShapeIterator.h"
+#include "dbRegion.h"
+#include "dbEdgeProcessor.h"
 #include "tlProgress.h"
 
 namespace db
@@ -73,6 +74,32 @@ RecursiveShapeIterator::RecursiveShapeIterator (const shapes_type &shapes, const
   init ();
 }
 
+RecursiveShapeIterator::RecursiveShapeIterator (const shapes_type &shapes, const region_type &region, bool overlapping)
+{
+  m_layer = 0;
+  m_has_layers = false;
+  m_region = region.bbox ();
+  mp_layout = 0;
+  mp_shapes = &shapes;
+  mp_top_cell = 0;
+  m_overlapping = overlapping;
+  init ();
+  init_complex_region (region);
+}
+
+RecursiveShapeIterator::RecursiveShapeIterator (const shapes_type &shapes, const box_type &region, const region_type &excl_region, bool overlapping)
+{
+  m_layer = 0;
+  m_has_layers = false;
+  m_region = region;
+  mp_layout = 0;
+  mp_shapes = &shapes;
+  mp_top_cell = 0;
+  m_overlapping = overlapping;
+  init ();
+  init_complex_region (region, excl_region);
+}
+
 RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer, const box_type &region, bool overlapping)
   : m_box_convert (layout, layer)
 {
@@ -84,6 +111,34 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
   mp_top_cell = &cell;
   m_overlapping = overlapping;
   init ();
+}
+
+RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer, const region_type &region, bool overlapping)
+  : m_box_convert (layout, layer)
+{
+  m_layer = layer;
+  m_has_layers = false;
+  m_region = region.bbox ();
+  mp_layout = &layout;
+  mp_shapes = 0;
+  mp_top_cell = &cell;
+  m_overlapping = overlapping;
+  init ();
+  init_complex_region (region);
+}
+
+RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer, const box_type &region, const region_type &excl_region, bool overlapping)
+  : m_box_convert (layout, layer)
+{
+  m_layer = layer;
+  m_has_layers = false;
+  m_region = region;
+  mp_layout = &layout;
+  mp_shapes = 0;
+  mp_top_cell = &cell;
+  m_overlapping = overlapping;
+  init ();
+  init_complex_region (region, excl_region);
 }
 
 RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer)
@@ -111,6 +166,36 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
   mp_top_cell = &cell;
   m_overlapping = overlapping;
   init ();
+}
+
+RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::vector<unsigned int> &layers, const region_type &region, bool overlapping)
+  : m_box_convert (layout)
+{
+  m_layer = 0;
+  m_layers = layers;
+  m_has_layers = true;
+  m_region = region.bbox ();
+  mp_layout = &layout;
+  mp_shapes = 0;
+  mp_top_cell = &cell;
+  m_overlapping = overlapping;
+  init ();
+  init_complex_region (region);
+}
+
+RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::vector<unsigned int> &layers, const box_type &region, const region_type &excl_region, bool overlapping)
+  : m_box_convert (layout)
+{
+  m_layer = 0;
+  m_layers = layers;
+  m_has_layers = true;
+  m_region = region;
+  mp_layout = &layout;
+  mp_shapes = 0;
+  mp_top_cell = &cell;
+  m_overlapping = overlapping;
+  init ();
+  init_complex_region (region, excl_region);
 }
 
 RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::vector<unsigned int> &layers)
@@ -141,6 +226,36 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
   init ();
 }
 
+RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers, const region_type &region, bool overlapping)
+  : m_box_convert (layout)
+{
+  m_layer = 0;
+  m_layers.insert (m_layers.end (), layers.begin (), layers.end ());
+  m_has_layers = true;
+  m_region = region.bbox ();
+  mp_layout = &layout;
+  mp_shapes = 0;
+  mp_top_cell = &cell;
+  m_overlapping = overlapping;
+  init ();
+  init_complex_region (region);
+}
+
+RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers, const box_type &region, const region_type &excl_region, bool overlapping)
+  : m_box_convert (layout)
+{
+  m_layer = 0;
+  m_layers.insert (m_layers.end (), layers.begin (), layers.end ());
+  m_has_layers = true;
+  m_region = region;
+  mp_layout = &layout;
+  mp_shapes = 0;
+  mp_top_cell = &cell;
+  m_overlapping = overlapping;
+  init ();
+  init_complex_region (region, excl_region);
+}
+
 RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers)
   : m_box_convert (layout)
 {
@@ -164,6 +279,72 @@ RecursiveShapeIterator::init ()
   m_shape_flags = shape_iterator::All;
   mp_shape_prop_sel = 0;
   m_shape_inv_prop_sel = false;
+  m_inst_quad_id = 0;
+  m_shape_quad_id = 0;
+}
+
+namespace {
+
+struct BoxTreePusher
+  : public db::SimplePolygonSink
+{
+  BoxTreePusher (RecursiveShapeIterator::box_tree_type *bt)
+    : mp_bt (bt)
+  {
+    //  .. nothing yet ..
+  }
+
+  void put (const db::SimplePolygon &sp)
+  {
+    mp_bt->insert (sp.box ());
+  }
+
+private:
+  RecursiveShapeIterator::box_tree_type *mp_bt;
+};
+
+}
+
+void
+RecursiveShapeIterator::init_complex_region (const RecursiveShapeIterator::box_type &box, const RecursiveShapeIterator::region_type &excl_region)
+{
+  //  Use a boolean NOT and the trapezoid generator to produce a decomposition that goes into the complex region
+
+  db::EdgeProcessor ep;
+  ep.insert (db::Polygon (box), 0);
+  size_t n = 1;
+  for (region_type::const_iterator p = excl_region.begin (); !p.at_end (); ++p) {
+    ep.insert (*p, n);
+    n += 2;
+  }
+
+  BoxTreePusher btp (&m_complex_region);
+  db::TrapezoidGenerator tg (btp);
+
+  db::BooleanOp op (BooleanOp::ANotB);
+  ep.process (tg, op);
+
+  m_complex_region.sort (db::box_convert <db::Box> ());
+}
+
+void
+RecursiveShapeIterator::init_complex_region (const RecursiveShapeIterator::region_type &region)
+{
+  //  Use a merge and the trapezoid generator to produce a decomposition that goes into the complex region
+
+  db::EdgeProcessor ep;
+  size_t n = 0;
+  for (region_type::const_iterator p = region.begin (); !p.at_end (); ++p, ++n) {
+    ep.insert (*p, n);
+  }
+
+  BoxTreePusher btp (&m_complex_region);
+  db::TrapezoidGenerator tg (btp);
+
+  db::MergeOp op (0);
+  ep.process (tg, op);
+
+  m_complex_region.sort (db::box_convert <db::Box> ());
 }
 
 void
@@ -179,11 +360,16 @@ RecursiveShapeIterator::validate () const
   mp_cell = mp_top_cell;
   m_trans_stack.clear ();
   m_inst_iterators.clear ();
+  m_inst_quad_id_stack.clear ();
   m_inst_array_iterators.clear ();
   m_cells.clear ();
   m_trans = cplx_trans_type ();
   m_current_layer = 0;
   m_shape = shape_iterator ();
+  m_local_region_stack.push_back (m_region);
+  if (!m_complex_region.empty ()) {
+    m_local_complex_region_stack.push_back (m_complex_region);
+  }
 
   if (mp_shapes) {
     //  Ensures the trees are built properly - this is important in MT contexts (i.e. TilingProcessor)
@@ -311,7 +497,33 @@ RecursiveShapeIterator::bbox () const
   return box;
 }
 
-void 
+void
+RecursiveShapeIterator::next ()
+{
+  if (! at_end ()) {
+
+    ++m_shape;
+
+    //  skip shape quad if possible
+    if (! m_local_complex_region_stack.empty () && m_shape_quad_id != m_shape.quad_id ()) {
+      while (! m_shape.at_end ()) {
+        if (is_outside_complex_region (m_shape.quad_box ())) {
+          m_shape.skip_quad ();
+        } else {
+          m_shape_quad_id = m_shape.quad_id ();
+          break;
+        }
+      }
+    }
+
+    if (! mp_shapes && m_shape.at_end ()) {
+      next_shape ();
+    }
+
+  }
+}
+
+void
 RecursiveShapeIterator::next_shape () const
 {
   while (at_end ()) {
@@ -365,12 +577,12 @@ RecursiveShapeIterator::next_shape () const
 
       } else {
 
-        //  no more instances: up and next instance
         if (m_inst_iterators.empty ()) {
           //  nothing left:
           return;
         }
 
+        //  no more instances: up and next instance
         up ();
 
         ++m_inst_array;
@@ -394,12 +606,56 @@ RecursiveShapeIterator::down () const
 
   m_inst_iterators.push_back (m_inst);
   m_inst_array_iterators.push_back (m_inst_array);
+  m_inst_quad_id_stack.push_back (m_inst_quad_id);
 
   bool ia = is_inactive ();
   mp_cell = &mp_layout->cell (m_inst->cell_index ());
   set_inactive (ia);
 
   m_trans = m_trans * m_inst->complex_trans (*m_inst_array);
+
+  //  don't transform the world region, since transformation of that region might not work properly
+  box_type new_region = box_type::world ();
+
+  //  compute the region inside the new cell
+  if (m_region != m_local_region_stack.front ()) {
+    new_region = m_trans.inverted () * m_local_region_stack.front ();
+  }
+  new_region &= mp_cell->bbox ();
+  m_local_region_stack.push_back (new_region);
+
+  if (! m_local_complex_region_stack.empty ()) {
+
+    const box_tree_type &pcl = m_local_complex_region_stack.back ();
+
+    m_local_complex_region_stack.push_back (box_tree_type ());
+
+    if (! new_region.empty ()) {
+
+      //  compute a new, reduced complex region for use inside the new cell
+
+      db::CellInstArray::complex_trans_type tinst = m_inst->complex_trans (*m_inst_array);
+      db::CellInstArray::complex_trans_type tinst_inv = tinst.inverted ();
+
+      db::Box bb;
+
+      for (box_tree_type::touching_iterator b = pcl.begin_touching (new_region.transformed (tinst), db::box_convert<db::Box> ()); ! b.at_end (); ++b) {
+        db::Box lb = (b->transformed (tinst_inv) & new_region);
+        if (! lb.empty ()) {
+          m_local_complex_region_stack.back ().insert (lb);
+          bb += lb;
+        }
+      }
+
+      m_local_complex_region_stack.back ().sort (db::box_convert<db::Box> ());
+
+      //  re-adjust the new local region, so we take into account additional clipping by the complex region.
+      //  in the extreme case, this box is empty:
+      m_local_region_stack.back () = bb;
+
+    }
+
+  }
 
   new_cell ();
 }
@@ -408,20 +664,22 @@ void
 RecursiveShapeIterator::up () const
 {
   m_shape = shape_iterator ();
+  m_shape_quad_id = 0;
 
   m_inst = m_inst_iterators.back ();
   m_inst_array = m_inst_array_iterators.back ();
+  m_inst_quad_id = m_inst_quad_id_stack.back ();
   m_inst_iterators.pop_back ();
   m_inst_array_iterators.pop_back ();
+  m_inst_quad_id_stack.pop_back ();
 
   m_trans = m_trans_stack.back ();
   m_trans_stack.pop_back ();
   mp_cell = m_cells.back ();
   m_cells.pop_back ();
-
-  m_local_region = box_type::world ();
-  if (m_region != m_local_region) {
-    m_local_region = trans ().inverted () * m_region;
+  m_local_region_stack.pop_back ();
+  if (! m_local_complex_region_stack.empty ()) {
+    m_local_complex_region_stack.pop_back ();
   }
 }
 
@@ -429,9 +687,23 @@ void
 RecursiveShapeIterator::start_shapes () const
 {
   if (! m_overlapping) {
-    m_shape = mp_shapes->begin_touching (m_region, m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel); 
+    m_shape = mp_shapes->begin_touching (m_local_region_stack.back (), m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel);
   } else {
-    m_shape = mp_shapes->begin_overlapping (m_region, m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel); 
+    m_shape = mp_shapes->begin_overlapping (m_local_region_stack.back (), m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel);
+  }
+
+  m_shape_quad_id = 0;
+
+  //  skip instance quad if possible
+  if (! m_local_complex_region_stack.empty ()) {
+    while (! m_shape.at_end ()) {
+      if (is_outside_complex_region (m_shape.quad_box ())) {
+        m_shape.skip_quad ();
+      } else {
+        m_shape_quad_id = m_shape.quad_id ();
+        break;
+      }
+    }
   }
 }
 
@@ -441,21 +713,29 @@ RecursiveShapeIterator::new_layer () const
   if (int (m_trans_stack.size ()) < m_min_depth || int (m_trans_stack.size ()) > m_max_depth) {
     m_shape = shape_iterator ();
   } else if (! m_overlapping) {
-    m_shape = cell ()->shapes (m_layer).begin_touching (m_local_region, m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel); 
+    m_shape = cell ()->shapes (m_layer).begin_touching (m_local_region_stack.back (), m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel);
   } else {
-    m_shape = cell ()->shapes (m_layer).begin_overlapping (m_local_region, m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel); 
+    m_shape = cell ()->shapes (m_layer).begin_overlapping (m_local_region_stack.back (), m_shape_flags, mp_shape_prop_sel, m_shape_inv_prop_sel);
+  }
+
+  m_shape_quad_id = 0;
+
+  //  skip instance quad if possible
+  if (! m_local_complex_region_stack.empty ()) {
+    while (! m_shape.at_end ()) {
+      if (is_outside_complex_region (m_shape.quad_box ())) {
+        m_shape.skip_quad ();
+      } else {
+        m_shape_quad_id = m_shape.quad_id ();
+        break;
+      }
+    }
   }
 }
 
 void 
 RecursiveShapeIterator::new_cell () const
 {
-  //  don't transform the world region, since transformation of that region might not work properly
-  m_local_region = box_type::world ();
-  if (m_region != m_local_region) {
-    m_local_region = trans ().inverted () * m_region;
-  }
-
   if (m_has_layers) {
     m_current_layer = 0;
     m_layer = m_layers.front ();
@@ -469,7 +749,22 @@ RecursiveShapeIterator::new_cell () const
 
   new_layer ();
 
-  m_inst = cell ()->begin_touching (m_local_region);
+  m_inst = cell ()->begin_touching (m_local_region_stack.back ());
+
+  m_inst_quad_id = 0;
+
+  //  skip instance quad if possible
+  if (! m_local_complex_region_stack.empty ()) {
+    while (! m_inst.at_end ()) {
+      if (is_outside_complex_region (m_inst.quad_box ())) {
+        m_inst.skip_quad ();
+      } else {
+        m_inst_quad_id = m_inst.quad_id ();
+        break;
+      }
+    }
+  }
+
   new_inst ();
 }
 
@@ -481,8 +776,26 @@ RecursiveShapeIterator::new_inst () const
   //  touching instance iterator.
   while (! m_inst.at_end ()) {
 
-    if (m_local_region != box_type::world ()) {
-      m_inst_array = m_inst->cell_inst ().begin_touching (m_local_region, m_box_convert); 
+    //  skip instance quad if possible
+    if (! m_local_complex_region_stack.empty () && m_inst_quad_id != m_inst.quad_id ()) {
+
+      while (! m_inst.at_end ()) {
+        if (is_outside_complex_region (m_inst.quad_box ())) {
+          m_inst.skip_quad ();
+        } else {
+          m_inst_quad_id = m_inst.quad_id ();
+          break;
+        }
+      }
+
+      if (m_inst.at_end ()) {
+        break;
+      }
+
+    }
+
+    if (m_local_region_stack.back () != box_type::world ()) {
+      m_inst_array = m_inst->cell_inst ().begin_touching (m_local_region_stack.back (), m_box_convert);
     } else {
       m_inst_array = m_inst->cell_inst ().begin (); 
     }
@@ -493,6 +806,16 @@ RecursiveShapeIterator::new_inst () const
       ++m_inst;
     }
 
+  }
+}
+
+bool
+RecursiveShapeIterator::is_outside_complex_region (const db::Box &box) const
+{
+  if (m_overlapping) {
+    return m_local_complex_region_stack.back ().begin_overlapping (box, db::box_convert<db::Box> ()).at_end ();
+  } else {
+    return m_local_complex_region_stack.back ().begin_touching (box, db::box_convert<db::Box> ()).at_end ();
   }
 }
 

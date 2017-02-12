@@ -27,3 +27,11 @@
 *.exe
 *.out
 *.app
+
+# Build and binary directories for shadow build:
+build-*
+bin-*
+
+# QTCreator files
+src/klayout.pro.user
+

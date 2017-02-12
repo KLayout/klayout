@@ -79,7 +79,7 @@ For more options use
 
 ## Running the Test Suite (Linux)
 
-Go to the build directory and enter
+Go to the build directory (i.e. "bin-release") and enter
 
     export TESTTMP=testtmp    # path to a directory that will hold temporary data (will be created)
     export TESTSRC=..         # path to the source directory

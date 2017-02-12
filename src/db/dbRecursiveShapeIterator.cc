@@ -618,10 +618,10 @@ RecursiveShapeIterator::down () const
   box_type new_region = box_type::world ();
 
   //  compute the region inside the new cell
-  if (m_region != m_local_region_stack.front ()) {
+  if (new_region != m_local_region_stack.front ()) {
     new_region = m_trans.inverted () * m_local_region_stack.front ();
+    new_region &= cell ()->bbox ();
   }
-  new_region &= mp_cell->bbox ();
   m_local_region_stack.push_back (new_region);
 
   if (! m_local_complex_region_stack.empty ()) {

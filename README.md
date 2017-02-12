@@ -23,7 +23,7 @@ Here is a list of packages required for various Linux flavors:
 * <b>Ruby</b>: with this option, Ruby scripts can be executed and developped within KLayout. Ruby support is detected automatically by the build script.
 * <b>Python</b>: with this option, Python scripts can be executed and developped within KLayout. Python support is detected automatically by the build script.
 * <b>Qt binding</b>: with this option, Qt objects are made available to Ruby and Python scripts. Qt bindings are enabled by default. Qt binding offers an option to create custom user interfaces from scripts and to interact with KLayout's main GUI. On the other hand, they provide a considerable overhead when building and running the application.
-* <b>64 bit coordinate suppoort</b>: with this option, the coordinate type used internally is extended to 64bit as compared to 32bit in the standard version. This will duplicate memory requirements for coordinate lists, but allow a larger design space. 64bit coordinate support is experimental and disabled by default.
+* <b>64 bit coordinate support</b>: with this option, the coordinate type used internally is extended to 64bit as compared to 32bit in the standard version. This will duplicate memory requirements for coordinate lists, but allow a larger design space. 64bit coordinate support is experimental and disabled by default.
 
 ## Building instructions (Linux)
 

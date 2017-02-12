@@ -32,6 +32,9 @@
 build-*
 bin-*
 
+# private data
+private
+
 # QTCreator files
 src/klayout.pro.user
 

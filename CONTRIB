@@ -1,0 +1,19 @@
+
+List of Contributions and 3rd Party Sources
+
+1.) contrib/gds2_txt
+
+    The original version of the code for the GDS2 text format reader and writer has been contributed 
+    by Romain Gauci from Oscillated Recall Technology (http://www.or-tech.co.jp).
+
+2.) contrib/zlib 
+
+    ZLIB 1.2.5
+    See license terms and conditions in zlib.h
+
+    Copyright (C) 1995-2010 Jean-loup Gailly and Mark Adler
+
+    Jean-loup Gailly        Mark Adler
+    jloup@gzip.org          madler@alumni.caltech.edu
+
+

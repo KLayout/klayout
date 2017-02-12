@@ -81,7 +81,3 @@ plugins.depends += lay ext lib ut
 klayout_main.depends += lay ext lib plugins
 unit_tests.depends += ut plugins
 
-RESOURCES += \
-    laybasic/layResources.qrc
-
-

@@ -20,7 +20,6 @@
 
 */
 
-
 #include "gsiDecl.h"
 
 #include "dbRegion.h"

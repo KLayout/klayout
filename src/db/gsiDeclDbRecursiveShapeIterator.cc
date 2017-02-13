@@ -161,7 +161,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
   ) +
   gsi::constructor ("new", &new_si3a,
     "@brief Creates a recursive, single-layer shape iterator with a region.\n"
-    "@args layout, cell, layer, box, overlapping\n"
+    "@args layout, cell, layer, box, excl_region, overlapping\n"
     "@param layout The layout which shall be iterated\n"
     "@param cell The initial cell which shall be iterated (including it's children)\n"
     "@param layer The layer (index) from which the shapes are taken\n"
@@ -184,7 +184,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
   ) +
   gsi::constructor ("new", &new_si3b,
     "@brief Creates a recursive, single-layer shape iterator with a region.\n"
-    "@args layout, cell, layer, box, overlapping\n"
+    "@args layout, cell, layer, region, overlapping\n"
     "@param layout The layout which shall be iterated\n"
     "@param cell The initial cell which shall be iterated (including it's children)\n"
     "@param layer The layer (index) from which the shapes are taken\n"
@@ -222,7 +222,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
   ) +
   gsi::constructor ("new", &new_si4a,
     "@brief Creates a recursive, multi-layer shape iterator with a region.\n"
-    "@args layout, cell, layers, box, overlapping\n"
+    "@args layout, cell, layers, box, excl_region, overlapping\n"
     "@param layout The layout which shall be iterated\n"
     "@param cell The initial cell which shall be iterated (including it's children)\n"
     "@param layers The layer indexes from which the shapes are taken\n"
@@ -246,7 +246,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
   ) +
   gsi::constructor ("new", &new_si4b,
     "@brief Creates a recursive, multi-layer shape iterator with a region.\n"
-    "@args layout, cell, layers, box, overlapping\n"
+    "@args layout, cell, layers, region, overlapping\n"
     "@param layout The layout which shall be iterated\n"
     "@param cell The initial cell which shall be iterated (including it's children)\n"
     "@param layers The layer indexes from which the shapes are taken\n"

@@ -498,22 +498,68 @@ RecursiveShapeIterator::bbox () const
 }
 
 void
+RecursiveShapeIterator::skip_shape_iter_for_complex_region () const
+{
+  while (! m_shape.at_end ()) {
+
+    //  skip shape quad if possible
+    while (! m_shape.at_end ()) {
+      if (is_outside_complex_region (m_shape.quad_box ())) {
+        m_shape.skip_quad ();
+      } else {
+        m_shape_quad_id = m_shape.quad_id ();
+        break;
+      }
+    }
+
+    //  skip shapes outside the complex region
+    if (! m_shape.at_end ()) {
+      if (! is_outside_complex_region (m_shape->bbox ())) {
+        break;
+      } else {
+        ++m_shape;
+      }
+    }
+
+  }
+}
+
+void
+RecursiveShapeIterator::skip_inst_iter_for_complex_region () const
+{
+  while (! m_inst.at_end ()) {
+
+    //  skip inst quad if possible
+    while (! m_inst.at_end ()) {
+      if (is_outside_complex_region (m_inst.quad_box ())) {
+        m_inst.skip_quad ();
+      } else {
+        m_inst_quad_id = m_inst.quad_id ();
+        break;
+      }
+    }
+
+    //  skip insts outside the complex region
+    if (! m_inst.at_end ()) {
+      if (! is_outside_complex_region (m_inst->bbox ())) {
+        break;
+      } else {
+        ++m_inst;
+      }
+    }
+
+  }
+}
+
+void
 RecursiveShapeIterator::next ()
 {
   if (! at_end ()) {
 
     ++m_shape;
 
-    //  skip shape quad if possible
-    if (! m_local_complex_region_stack.empty () && m_shape_quad_id != m_shape.quad_id ()) {
-      while (! m_shape.at_end ()) {
-        if (is_outside_complex_region (m_shape.quad_box ())) {
-          m_shape.skip_quad ();
-        } else {
-          m_shape_quad_id = m_shape.quad_id ();
-          break;
-        }
-      }
+    if (! m_local_complex_region_stack.empty ()) {
+      skip_shape_iter_for_complex_region ();
     }
 
     if (! mp_shapes && m_shape.at_end ()) {
@@ -626,9 +672,8 @@ RecursiveShapeIterator::down () const
 
   if (! m_local_complex_region_stack.empty ()) {
 
-    const box_tree_type &pcl = m_local_complex_region_stack.back ();
-
     m_local_complex_region_stack.push_back (box_tree_type ());
+    const box_tree_type &pcl = m_local_complex_region_stack.end ()[-2];
 
     if (! new_region.empty ()) {
 
@@ -694,16 +739,8 @@ RecursiveShapeIterator::start_shapes () const
 
   m_shape_quad_id = 0;
 
-  //  skip instance quad if possible
   if (! m_local_complex_region_stack.empty ()) {
-    while (! m_shape.at_end ()) {
-      if (is_outside_complex_region (m_shape.quad_box ())) {
-        m_shape.skip_quad ();
-      } else {
-        m_shape_quad_id = m_shape.quad_id ();
-        break;
-      }
-    }
+    skip_shape_iter_for_complex_region ();
   }
 }
 
@@ -722,14 +759,7 @@ RecursiveShapeIterator::new_layer () const
 
   //  skip instance quad if possible
   if (! m_local_complex_region_stack.empty ()) {
-    while (! m_shape.at_end ()) {
-      if (is_outside_complex_region (m_shape.quad_box ())) {
-        m_shape.skip_quad ();
-      } else {
-        m_shape_quad_id = m_shape.quad_id ();
-        break;
-      }
-    }
+    skip_shape_iter_for_complex_region ();
   }
 }
 
@@ -755,14 +785,7 @@ RecursiveShapeIterator::new_cell () const
 
   //  skip instance quad if possible
   if (! m_local_complex_region_stack.empty ()) {
-    while (! m_inst.at_end ()) {
-      if (is_outside_complex_region (m_inst.quad_box ())) {
-        m_inst.skip_quad ();
-      } else {
-        m_inst_quad_id = m_inst.quad_id ();
-        break;
-      }
-    }
+    skip_inst_iter_for_complex_region ();
   }
 
   new_inst ();
@@ -777,21 +800,11 @@ RecursiveShapeIterator::new_inst () const
   while (! m_inst.at_end ()) {
 
     //  skip instance quad if possible
-    if (! m_local_complex_region_stack.empty () && m_inst_quad_id != m_inst.quad_id ()) {
-
-      while (! m_inst.at_end ()) {
-        if (is_outside_complex_region (m_inst.quad_box ())) {
-          m_inst.skip_quad ();
-        } else {
-          m_inst_quad_id = m_inst.quad_id ();
-          break;
-        }
-      }
-
+    if (! m_local_complex_region_stack.empty ()) {
+      skip_inst_iter_for_complex_region ();
       if (m_inst.at_end ()) {
         break;
       }
-
     }
 
     if (m_local_region_stack.back () != box_type::world ()) {

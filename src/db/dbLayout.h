@@ -1672,6 +1672,45 @@ private:
   void do_prune_cells_or_subcells (const std::set<cell_index_type> &ids, int levels, bool subcells);
 };
 
+/**
+ *  @brief A nice helper class that employs RAII for locking the layout against updates
+ *
+ *  If a layout shall be locked against internal updates temporarily, use this locker:
+ *  @code
+ *  Layout *ly = ...;
+ *  {
+ *    db::LayoutLocker locker (ly);
+ *    //  the layout is not updated here
+ *    ... modify the layout
+ *  }
+ *  //  now only the layout gets updated
+ *  @endcode
+ */
+class DB_PUBLIC LayoutLocker
+{
+public:
+  explicit LayoutLocker (db::Layout *layout = 0)
+    : mp_layout (layout)
+  {
+    if (mp_layout) {
+      mp_layout->start_changes ();
+    }
+  }
+
+  ~LayoutLocker ()
+  {
+    if (mp_layout) {
+      mp_layout->end_changes ();
+    }
+  }
+
+private:
+  LayoutLocker (const LayoutLocker &);
+  LayoutLocker &operator= (const LayoutLocker &);
+
+  db::Layout *mp_layout;
+};
+
 }
 
 #endif

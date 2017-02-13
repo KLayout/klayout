@@ -694,6 +694,8 @@ private:
   void init ();
   void init_complex_region (const box_type &box, const region_type &excl_region);
   void init_complex_region (const region_type &excl_region);
+  void skip_shape_iter_for_complex_region () const;
+  void skip_inst_iter_for_complex_region () const;
   void validate () const;
   void start_shapes () const;
   void next_shape () const;

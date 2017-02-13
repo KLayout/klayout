@@ -22,6 +22,7 @@
 
 
 #include "dbRecursiveShapeIterator.h"
+#include "dbRegion.h"
 #include "tlString.h"
 #include "utHead.h"
 
@@ -274,6 +275,10 @@ TEST(1a)
 
   std::string x;
 
+  db::RecursiveShapeIterator i0 (g, c0, 0, db::Box ());
+  x = collect(i0, g);
+  EXPECT_EQ (x, "");
+
   db::RecursiveShapeIterator i1 (g, c0, 0, db::Box (0, 0, 100, 100));
   x = collect(i1, g);
   EXPECT_EQ (x, "[$2](0,100;1000,1200)/[$3](100,0;1100,1100)");
@@ -393,6 +398,10 @@ TEST(2)
 
   std::string x;
 
+  db::RecursiveShapeIterator i0 (g, c0, 0, db::Box ());
+  x = collect(i0, g);
+  EXPECT_EQ (x, "");
+
   db::RecursiveShapeIterator i (g, c0, 0, db::Box::world ());
   x = collect(i, g);
   EXPECT_EQ (x, "[$3](1000,-500;2000,500)/[$3](1000,1500;2000,2500)/[$3](4000,500;5000,1500)/[$3](4000,2500;5000,3500)/[$3](1000,5500;2000,6500)/[$3](1000,7500;2000,8500)/[$3](4000,6500;5000,7500)/[$3](4000,8500;5000,9500)/[$3](7000,-500;8000,500)/[$3](7000,1500;8000,2500)/[$3](10000,500;11000,1500)/[$3](10000,2500;11000,3500)/[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)/[$3](10000,6500;11000,7500)/[$3](10000,8500;11000,9500)");
@@ -414,4 +423,59 @@ TEST(2)
   EXPECT_EQ (x, "[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)");
 }
 
+TEST(3)
+{
+  db::Manager m;
+  db::Layout g (&m);
+  g.insert_layer(0);
+
+  db::Cell &c0 (g.cell (g.add_cell ()));
+  db::Cell &c1 (g.cell (g.add_cell ()));
+  db::Cell &c2 (g.cell (g.add_cell ()));
+
+  db::Box b (1000, -500, 2000, 500);
+  c2.shapes (0).insert (b);
+
+  db::Trans tt;
+  c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), tt, db::Vector (0, 6000), db::Vector (6000, 0), 2, 2));
+  c1.insert (db::CellInstArray (db::CellInst (c2.cell_index ()), tt, db::Vector (0, 2000), db::Vector (3000, 1000), 2, 2));
+
+  std::string x;
+
+  db::RecursiveShapeIterator i (g, c0, 0, db::Box::world ());
+  x = collect(i, g);
+  EXPECT_EQ (x, "[$3](1000,-500;2000,500)/[$3](1000,1500;2000,2500)/[$3](4000,500;5000,1500)/[$3](4000,2500;5000,3500)/[$3](1000,5500;2000,6500)/[$3](1000,7500;2000,8500)/[$3](4000,6500;5000,7500)/[$3](4000,8500;5000,9500)/[$3](7000,-500;8000,500)/[$3](7000,1500;8000,2500)/[$3](10000,500;11000,1500)/[$3](10000,2500;11000,3500)/[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)/[$3](10000,6500;11000,7500)/[$3](10000,8500;11000,9500)");
+
+  db::RecursiveShapeIterator i2 (g, c0, 0, db::Region (db::Box (3400, 3450, 5600, 6500)));
+  x = collect(i2, g);
+  EXPECT_EQ (x, "[$3](4000,2500;5000,3500)/[$3](4000,6500;5000,7500)");
+
+  db::RecursiveShapeIterator i3 (g, c0, 0, db::Region (db::Box (6650, 5300, 10000, 7850)));
+  x = collect(i3, g);
+  EXPECT_EQ (x, "[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)/[$3](10000,6500;11000,7500)");
+
+  db::Region rr;
+  rr.insert (db::Box (3400, 3450, 5600, 6500));
+  rr.insert (db::Box (6650, 5300, 10000, 7850));
+
+  db::RecursiveShapeIterator i23 (g, c0, 0, rr);
+  x = collect(i23, g);
+  EXPECT_EQ (x, "[$3](4000,2500;5000,3500)/[$3](4000,6500;5000,7500)/[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)/[$3](10000,6500;11000,7500)");
+
+  db::RecursiveShapeIterator i2o (g, c0, 0, db::Region (db::Box (3400, 3450, 5600, 6500)), true);
+  x = collect(i2o, g);
+  EXPECT_EQ (x, "[$3](4000,2500;5000,3500)");
+
+  db::RecursiveShapeIterator i3o (g, c0, 0, db::Region (db::Box (6650, 5300, 10000, 7850)), true);
+  x = collect(i3o, g);
+  EXPECT_EQ (x, "[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)");
+
+  db::Region rro;
+  rro.insert (db::Box (3400, 3450, 5600, 6500));
+  rro.insert (db::Box (6650, 5300, 10000, 7850));
+
+  db::RecursiveShapeIterator i23o (g, c0, 0, rro);
+  x = collect(i23o, g);
+  EXPECT_EQ (x, "[$3](4000,2500;5000,3500)/[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)");
+}
 

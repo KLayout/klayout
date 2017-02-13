@@ -207,6 +207,9 @@ static db::Shape insert_shape_with_dcplx_trans (db::Shapes *s, const db::Shape &
 
 static void insert_region (db::Shapes *sh, const db::Region &r)
 {
+  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
+  //  lock the layout against updates while inserting
+  db::LayoutLocker locker (sh->layout ());
   for (db::Region::const_iterator s = r.begin (); ! s.at_end (); ++s) {
     sh->insert (*s);
   }
@@ -214,6 +217,9 @@ static void insert_region (db::Shapes *sh, const db::Region &r)
 
 static void insert_region_with_trans (db::Shapes *sh, const db::Region &r, const db::ICplxTrans &trans)
 {
+  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
+  //  lock the layout against updates while inserting
+  db::LayoutLocker locker (sh->layout ());
   for (db::Region::const_iterator s = r.begin (); ! s.at_end (); ++s) {
     sh->insert (s->transformed (trans));
   }

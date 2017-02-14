@@ -28,6 +28,7 @@
 
 #include "dbLayout.h"
 #include "dbInstElement.h"
+#include "tlAssert.h"
 
 #include <map>
 #include <set>
@@ -68,6 +69,16 @@ public:
   RecursiveShapeIterator ();
 
   /**
+   *  @brief Copy constructor
+   */
+  RecursiveShapeIterator (const RecursiveShapeIterator &d);
+
+  /**
+   *  @brief Assignment
+   */
+  RecursiveShapeIterator &operator= (const RecursiveShapeIterator &d);
+
+  /**
    *  @brief Standard constructor iterating a single shape container
    *
    *  @param shapes The shape container to iterate
@@ -102,20 +113,6 @@ public:
   RecursiveShapeIterator (const shapes_type &shapes, const region_type &region, bool overlapping = false);
 
   /**
-   *  @brief Standard constructor iterating a single shape container
-   *
-   *  @param shapes The shape container to iterate
-   *  @param region The basic region from which to select the shapes
-   *  @param excl_region A complex region that will be excluded from the rectangular region
-   *  @param overlapping Specify overlapping mode
-   *
-   *  This iterator will iterate the shapes from the given shapes container using
-   *  the given search region in overlapping or touching mode. It allows specification of a complex
-   *  search region using a basic region and a complex region that is excluded from the search.
-   */
-  RecursiveShapeIterator (const shapes_type &shapes, const box_type &region, const region_type &excl_region, bool overlapping = false);
-
-  /**
    *  @brief Standard constructor
    *
    *  @param layout The layout from which to get the cell hierarchy
@@ -145,23 +142,6 @@ public:
    *  search region.
    */
   RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer, const region_type &region, bool overlapping = false);
-
-  /**
-   *  @brief Standard constructor
-   *
-   *  @param layout The layout from which to get the cell hierarchy
-   *  @param cell The starting cell
-   *  @param layer The layer from which to deliver the shapes
-   *  @param region The region from which to select the shapes
-   *  @param excl_region A complex region that will be excluded from the rectangular region
-   *  @param overlapping Specify overlapping mode
-   *
-   *  By default the iterator operates in touching mode - i.e. shapes that touch the given region
-   *  are returned. By specifying the "overlapping" flag with a true value, the iterator delivers shapes that
-   *  overlap the given region by at least one database unit. It allows specification of a complex
-   *  search region using a basic region and a complex region that is excluded from the search.
-   */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, unsigned int layer, const box_type &region, const region_type &excl_region, bool overlapping = false);
 
   /**
    *  @brief Standard constructor for "world" iteration
@@ -212,23 +192,6 @@ public:
    *  @param cell The starting cell
    *  @param layers The layers from which to deliver the shapes
    *  @param region The region from which to select the shapes
-   *  @param excl_region A complex region that will be excluded from the rectangular region
-   *  @param overlapping Specify overlapping mode
-   *
-   *  By default the iterator operates in touching mode - i.e. shapes that touch the given region
-   *  are returned. By specifying the "overlapping" flag with a true value, the iterator delivers shapes that
-   *  overlap the given region by at least one database unit. It allows specification of a complex
-   *  search region using a basic region and a complex region that is excluded from the search.
-   */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::vector<unsigned int> &layers, const box_type &region, const region_type &excl_region, bool overlapping = false);
-
-  /**
-   *  @brief Standard constructor with a layer selection
-   *
-   *  @param layout The layout from which to get the cell hierarchy
-   *  @param cell The starting cell
-   *  @param layers The layers from which to deliver the shapes
-   *  @param region The region from which to select the shapes
    *  @param overlapping Specify overlapping mode
    *
    *  By default the iterator operates in touching mode - i.e. shapes that touch the given region
@@ -252,23 +215,6 @@ public:
    *  search region.
    */
   RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers, const region_type &region, bool overlapping = false);
-
-  /**
-   *  @brief Standard constructor with a layer selection
-   *
-   *  @param layout The layout from which to get the cell hierarchy
-   *  @param cell The starting cell
-   *  @param layers The layers from which to deliver the shapes
-   *  @param region The region from which to select the shapes
-   *  @param excl_region A complex region that will be excluded from the rectangular region
-   *  @param overlapping Specify overlapping mode
-   *
-   *  By default the iterator operates in touching mode - i.e. shapes that touch the given region
-   *  are returned. By specifying the "overlapping" flag with a true value, the iterator delivers shapes that
-   *  overlap the given region by at least one database unit. It allows specification of a complex
-   *  search region using a basic region and a complex region that is excluded from the search.
-   */
-  RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers, const box_type &region, const region_type &excl_region, bool overlapping = false);
 
   /**
    *  @brief Standard constructor for "world" iteration with a layer set
@@ -345,7 +291,9 @@ public:
   }
 
   /**
-   *  @brief Gets the region the iterator is using (will be world if none is set)
+   *  @brief Gets the basic region the iterator is using (will be world if none is set)
+   *  In addition to the basic region, a complex region may be defined that is further confining the
+   *  search to a subregion of the basic region.
    */
   const box_type &region () const
   {
@@ -353,15 +301,47 @@ public:
   }
 
   /**
-   *  @brief Sets the region 
+   *  @brief Returns true if a complex region is given
    */
-  void set_region (const box_type &region)
+  bool has_complex_region () const
   {
-    if (m_region != region) {
-      m_region = region;
-      m_needs_reinit = true;
-    }
+    return mp_complex_region.get () != 0;
   }
+
+  /**
+   *  @brief Gets the complex region the iterator is using
+   */
+  const region_type &complex_region () const
+  {
+    tl_assert (mp_complex_region.get ());
+    return *mp_complex_region;
+  }
+
+  /**
+   *  @brief Sets the region to a basic rectangle
+   *  This will reset the iterator.
+   */
+  void set_region (const box_type &region);
+
+  /**
+   *  @brief Sets a complex search region
+   *  This will reset the iterator to the beginning.
+   */
+  void set_region (const region_type &region);
+
+  /**
+   *  @brief Confines the search further to the given rectangle.
+   *  This will reset the iterator and confine the search to the given rectangle
+   *  in addition to any region or complex region already defined.
+   */
+  void confine_region (const box_type &region);
+
+  /**
+   *  @brief Confines the search further to the given complex region.
+   *  This will reset the iterator and confine the search to the given region
+   *  in addition to any simple region or complex region already defined.
+   */
+  void confine_region (const region_type &region);
 
   /**
    *  @brief Gets a flag indicating whether overlapping shapes are selected when a region is used
@@ -669,7 +649,7 @@ private:
   const shapes_type *mp_shapes;
 
   box_type m_region;
-  box_tree_type m_complex_region;
+  std::auto_ptr<region_type> mp_complex_region;
   db::box_convert<db::CellInst> m_box_convert;
 
   mutable inst_iterator m_inst;
@@ -692,8 +672,8 @@ private:
   mutable size_t m_shape_quad_id;
 
   void init ();
-  void init_complex_region (const box_type &box, const region_type &excl_region);
-  void init_complex_region (const region_type &excl_region);
+  void init_region (const region_type &region);
+  void init_region (const box_type &region);
   void skip_shape_iter_for_complex_region () const;
   void skip_inst_iter_for_complex_region () const;
   void validate () const;

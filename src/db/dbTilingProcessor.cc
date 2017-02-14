@@ -509,7 +509,7 @@ TilingProcessorWorker::do_perform (const TilingProcessorTask *tile_task)
       db::RecursiveShapeIterator iter;
       if (! region_dbu.empty ()) {
         iter = i->iter;
-        iter.set_region (region_dbu);
+        iter.confine_region (region_dbu);
       }
 
       if (i->region) {

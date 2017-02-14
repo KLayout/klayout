@@ -474,7 +474,62 @@ TEST(3)
   rro.insert (db::Box (3400, 3450, 5600, 6500));
   rro.insert (db::Box (6650, 5300, 10000, 7850));
 
-  db::RecursiveShapeIterator i23o (g, c0, 0, rro);
+  db::RecursiveShapeIterator i23o (g, c0, 0, rro, true);
+  db::RecursiveShapeIterator i23ocopy = i23o;
+
+  x = collect(i23o, g);
+  EXPECT_EQ (x, "[$3](4000,2500;5000,3500)/[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)");
+
+  x = collect (i23ocopy, g);
+  EXPECT_EQ (x, "[$3](4000,2500;5000,3500)/[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)");
+
+  //  reset
+  i23o.reset ();
+  x = collect (i23o, g);
+  EXPECT_EQ (x, "[$3](4000,2500;5000,3500)/[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)");
+
+  //  copy constructor
+  i23ocopy = i23o;
+  i23ocopy.reset ();
+  x = collect (i23ocopy, g);
+  EXPECT_EQ (x, "[$3](4000,2500;5000,3500)/[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)");
+
+  //  setting of region
+
+  db::Region rg;
+  i23o.set_region (rg);
+  x = collect(i23o, g);
+  EXPECT_EQ (x, "");
+
+  rg.insert (db::Box (3400, 3450, 5600, 6500));
+  rg.insert (db::Box (16650, 5300, 20000, 7850));
+
+  i23o.set_region (rg);
+  x = collect(i23o, g);
+  EXPECT_EQ (x, "[$3](4000,2500;5000,3500)");
+
+  i23o.set_region (db::Box (6650, 5300, 10000, 7850));
+  x = collect(i23o, g);
+  EXPECT_EQ (x, "[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)");
+
+  //  region confinement
+
+  i23o.confine_region (db::Box (3400, 3450, 5600, 6500));
+  x = collect(i23o, g);
+  EXPECT_EQ (x, "");
+
+  i23o.set_region (rro);
+  i23o.confine_region (db::Box (3400, 3450, 5600, 6500));
+  x = collect(i23o, g);
+  EXPECT_EQ (x, "[$3](4000,2500;5000,3500)");
+
+  i23o.set_region (db::Box (3400, 3450, 5600, 6500));
+  i23o.confine_region (rro);
+  x = collect(i23o, g);
+  EXPECT_EQ (x, "[$3](4000,2500;5000,3500)");
+
+  i23o.set_region (rro);
+  i23o.confine_region (rro);
   x = collect(i23o, g);
   EXPECT_EQ (x, "[$3](4000,2500;5000,3500)/[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)");
 }

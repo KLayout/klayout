@@ -48,12 +48,7 @@ static db::RecursiveShapeIterator *new_si3 (const db::Layout &layout, const db::
   return new db::RecursiveShapeIterator (layout, cell, layer, box, overlapping);
 }
 
-static db::RecursiveShapeIterator *new_si3a (const db::Layout &layout, const db::Cell &cell, unsigned int layer, const db::Box &box, const db::Region &excl_region, bool overlapping)
-{
-  return new db::RecursiveShapeIterator (layout, cell, layer, box, excl_region, overlapping);
-}
-
-static db::RecursiveShapeIterator *new_si3b (const db::Layout &layout, const db::Cell &cell, unsigned int layer, const db::Region &region, bool overlapping)
+static db::RecursiveShapeIterator *new_si3a (const db::Layout &layout, const db::Cell &cell, unsigned int layer, const db::Region &region, bool overlapping)
 {
   return new db::RecursiveShapeIterator (layout, cell, layer, region, overlapping);
 }
@@ -63,12 +58,7 @@ static db::RecursiveShapeIterator *new_si4 (const db::Layout &layout, const db::
   return new db::RecursiveShapeIterator (layout, cell, layers, box, overlapping);
 }
 
-static db::RecursiveShapeIterator *new_si4a (const db::Layout &layout, const db::Cell &cell, const std::vector<unsigned int> &layers, const db::Box &box, const db::Region &excl_region, bool overlapping)
-{
-  return new db::RecursiveShapeIterator (layout, cell, layers, box, excl_region, overlapping);
-}
-
-static db::RecursiveShapeIterator *new_si4b (const db::Layout &layout, const db::Cell &cell, const std::vector<unsigned int> &layers, const db::Region &region, bool overlapping)
+static db::RecursiveShapeIterator *new_si4a (const db::Layout &layout, const db::Cell &cell, const std::vector<unsigned int> &layers, const db::Region &region, bool overlapping)
 {
   return new db::RecursiveShapeIterator (layout, cell, layers, region, overlapping);
 }
@@ -113,6 +103,14 @@ static void unselect_cells2 (db::RecursiveShapeIterator *r, const std::string &p
   r->unselect_cells (cc);
 }
 
+static db::Region complex_region (const db::RecursiveShapeIterator *iter)
+{
+  if (iter->has_complex_region ()) {
+    return iter->complex_region ();
+  } else {
+    return db::Region (iter->region ());
+  }
+}
 
 Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIterator", 
   gsi::constructor ("new", &new_si1, 
@@ -161,29 +159,6 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
   ) +
   gsi::constructor ("new", &new_si3a,
     "@brief Creates a recursive, single-layer shape iterator with a region.\n"
-    "@args layout, cell, layer, box, excl_region, overlapping\n"
-    "@param layout The layout which shall be iterated\n"
-    "@param cell The initial cell which shall be iterated (including it's children)\n"
-    "@param layer The layer (index) from which the shapes are taken\n"
-    "@param box The basic search region\n"
-    "@param excl_region The region that is excluded from the basic search region\n"
-    "@param overlapping If set to true, shapes overlapping the search region are reported, otherwise touching is sufficient\n"
-    "\n"
-    "This constructor creates a new recursive shape iterator which delivers the shapes of "
-    "the given cell plus it's children from the layer given by the layer index in the \"layer\" parameter.\n"
-    "\n"
-    "The search is confined to the region given by the \"box\" and the \"excl_region\" parameter. "
-    "The box specifies the basic region. From that basic region the parts specified with \"excl_region\" "
-    "are excluded. The excluded region needs to be a rectilinear region.\n"
-    "\n"
-    "If \"overlapping\" is true, shapes whose "
-    "bounding box is overlapping the search region are reported. If \"overlapping\" is false, shapes whose "
-    "bounding box is touching the search region are reported.\n"
-    "\n"
-    "This constructor has been introduced in version 0.25.\n"
-  ) +
-  gsi::constructor ("new", &new_si3b,
-    "@brief Creates a recursive, single-layer shape iterator with a region.\n"
     "@args layout, cell, layer, region, overlapping\n"
     "@param layout The layout which shall be iterated\n"
     "@param cell The initial cell which shall be iterated (including it's children)\n"
@@ -221,30 +196,6 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
     "This constructor has been introduced in version 0.23.\n"
   ) +
   gsi::constructor ("new", &new_si4a,
-    "@brief Creates a recursive, multi-layer shape iterator with a region.\n"
-    "@args layout, cell, layers, box, excl_region, overlapping\n"
-    "@param layout The layout which shall be iterated\n"
-    "@param cell The initial cell which shall be iterated (including it's children)\n"
-    "@param layers The layer indexes from which the shapes are taken\n"
-    "@param box The basic search region\n"
-    "@param excl_region The region that is excluded from the basic search region\n"
-    "@param overlapping If set to true, shapes overlapping the search region are reported, otherwise touching is sufficient\n"
-    "\n"
-    "This constructor creates a new recursive shape iterator which delivers the shapes of "
-    "the given cell plus it's children from the layers given by the layer indexes in the \"layers\" parameter.\n"
-    "While iterating use the \\layer method to retrieve the layer of the current shape.\n"
-    "\n"
-    "The search is confined to the region given by the \"box\" and the \"excl_region\" parameter. "
-    "The box specifies the basic region. From that basic region the parts specified with \"excl_region\" "
-    "are excluded. The excluded region needs to be a rectilinear region.\n"
-    "\n"
-    "If \"overlapping\" is true, shapes whose "
-    "bounding box is overlapping the search region are reported. If \"overlapping\" is false, shapes whose "
-    "bounding box is touching the search region are reported.\n"
-    "\n"
-    "This constructor has been introduced in version 0.23.\n"
-  ) +
-  gsi::constructor ("new", &new_si4b,
     "@brief Creates a recursive, multi-layer shape iterator with a region.\n"
     "@args layout, cell, layers, region, overlapping\n"
     "@param layout The layout which shall be iterated\n"
@@ -305,17 +256,54 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
     "This method has been introduced in version 0.23.\n"
   ) +
   gsi::method ("region", &db::RecursiveShapeIterator::region, 
-    "@brief Gets the region that is iterator is using\n"
+    "@brief Gets the basic region that is iterator is using\n"
+    "The basic region is the overall box the region iterator iterates over. "
+    "There may be an additional complex region that confines the region iterator. "
+    "See \\complex_region for this attribute.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("region=", &db::RecursiveShapeIterator::set_region, 
-    "@brief Sets the region that is iterator is using\n"
+  gsi::method_ext ("complex_region", &complex_region,
+    "@brief Gets the complex region that is iterator is using\n"
+    "The complex region is the effective region (a \\Region object) that the "
+    "iterator is selecting from the layout layers. This region can be a single box "
+    "or a complex region.\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
+  gsi::method ("region=", (void (db::RecursiveShapeIterator::*)(const db::RecursiveShapeIterator::box_type &)) &db::RecursiveShapeIterator::set_region,
+    "@brief Sets the rectangular region that is iterator is iterating over\n"
     "@args region\n"
+    "See \\region for a description of this attribute.\n"
+    "Setting a simple region will reset the complex region to a rectangle and reset the iterator to "
+    "the beginning of the sequence."
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
-  gsi::method ("overlapping?", &db::RecursiveShapeIterator::overlapping, 
+  gsi::method ("region=", (void (db::RecursiveShapeIterator::*)(const db::RecursiveShapeIterator::region_type &)) &db::RecursiveShapeIterator::set_region,
+    "@brief Sets the complex region that is iterator is using\n"
+    "@args complex_region\n"
+    "See \\complex_region for a description of this attribute. Setting the complex region will "
+    "reset the basic region (see \\region) to the bounding box of the complex region and "
+    "reset the iterator to the beginning of the sequence.\n"
+    "\n"
+    "This method overload has been introduced in version 0.25.\n"
+  ) +
+  gsi::method ("confine_region", (void (db::RecursiveShapeIterator::*)(const db::RecursiveShapeIterator::box_type &)) &db::RecursiveShapeIterator::confine_region,
+    "@brief Confines the region that is iterator is iterating over\n"
+    "@args region\n"
+    "This method is similar to setting the region (see \\region=), but will add to any (complex or simple) region already set. "
+    "\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
+  gsi::method ("region=", (void (db::RecursiveShapeIterator::*)(const db::RecursiveShapeIterator::region_type &)) &db::RecursiveShapeIterator::confine_region,
+    "@brief Confines the region that is iterator is iterating over\n"
+    "@args region\n"
+    "This method is similar to setting the complex region (see \\region=), but will add to any (complex or simple) region already set."
+    "\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
+  gsi::method ("overlapping?", &db::RecursiveShapeIterator::overlapping,
     "@brief Gets a flag indicating whether overlapping shapes are selected when a region is used\n"
     "\n"
     "This method has been introduced in version 0.23.\n"

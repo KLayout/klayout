@@ -23,8 +23,11 @@
 
 #include "dbRecursiveShapeIterator.h"
 #include "dbRegion.h"
+#include "dbLayoutDiff.h"
 #include "tlString.h"
 #include "utHead.h"
+
+#include <vector>
 
 std::string collect(db::RecursiveShapeIterator &s, const db::Layout &layout, bool with_layer = false) 
 {
@@ -539,3 +542,148 @@ TEST(3)
   EXPECT_EQ (x, "[$3](4000,2500;5000,3500)/[$3](7000,5500;8000,6500)/[$3](7000,7500;8000,8500)");
 }
 
+static db::Layout boxes2layout (const std::set<db::Box> &boxes)
+{
+  db::Layout l;
+  l.insert_layer(0, db::LayerProperties (1, 0));
+  db::Cell &top (l.cell (l.add_cell ()));
+
+  for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
+    top.shapes (0).insert (*b);
+  }
+
+  return l;
+}
+
+TEST(4)
+{
+  //  Big fun
+
+  db::Manager m;
+  db::Layout g (&m);
+  g.insert_layer(0);
+
+  db::Cell &c0 (g.cell (g.add_cell ()));
+
+  std::set<db::Box> boxes;
+
+  for (int i = 0; i < 100000; ++i) {
+
+    int x = rand () % 10000;
+    int y = rand () % 10000;
+    db::Box box (x, y, x + 10, y + 10);
+
+    boxes.insert (box);
+
+    c0.shapes (0).insert (box);
+
+  }
+
+  db::Box search_box (2500, 2500, 7500, 7500);
+
+  std::set<db::Box> selected_boxes;
+  std::set<db::Box> selected_boxes2;
+
+  for (db::RecursiveShapeIterator iter = db::RecursiveShapeIterator (g, c0, 0, search_box, true); !iter.at_end (); ++iter) {
+    selected_boxes.insert (iter->bbox ());
+  }
+
+  for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
+    if (search_box.overlaps (*b)) {
+      selected_boxes2.insert (*b);
+    }
+  }
+
+  EXPECT_EQ (selected_boxes.size () > 100, true);
+  EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
+
+  db::Box search_box2 (500, 500, 1000, 1000);
+
+  selected_boxes.clear ();
+  selected_boxes2.clear ();
+
+  db::Region reg;
+  reg.insert (search_box);
+  reg.insert (search_box2);
+
+  for (db::RecursiveShapeIterator iter = db::RecursiveShapeIterator (g, c0, 0, reg, true); !iter.at_end (); ++iter) {
+    selected_boxes.insert (iter->bbox ());
+  }
+
+  for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
+    if (search_box.overlaps (*b) || search_box2.overlaps (*b)) {
+      selected_boxes2.insert (*b);
+    }
+  }
+
+  EXPECT_EQ (selected_boxes.size () > 100, true);
+  EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
+}
+
+TEST(5)
+{
+  //  Big fun with cells
+
+  db::Manager m;
+  db::Layout g (&m);
+  g.insert_layer(0);
+
+  db::Cell &c0 (g.cell (g.add_cell ()));
+  db::Cell &c1 (g.cell (g.add_cell ()));
+
+  db::Box basic_box (0, 0, 10, 10);
+  c1.shapes (0).insert (basic_box);
+
+  std::set<db::Box> boxes;
+
+  for (int i = 0; i < 100000; ++i) {
+
+    int x = rand () % 10000;
+    int y = rand () % 10000;
+
+    boxes.insert (basic_box.moved (db::Vector (x, y)));
+
+    c0.insert (db::CellInstArray (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (x, y))));
+
+  }
+
+  db::Box search_box (2500, 2500, 7500, 7500);
+
+  std::set<db::Box> selected_boxes;
+  std::set<db::Box> selected_boxes2;
+
+  for (db::RecursiveShapeIterator iter = db::RecursiveShapeIterator (g, c0, 0, search_box, true); !iter.at_end (); ++iter) {
+    selected_boxes.insert (iter.trans () * iter->bbox ());
+  }
+
+  for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
+    if (search_box.overlaps (*b)) {
+      selected_boxes2.insert (*b);
+    }
+  }
+
+  EXPECT_EQ (selected_boxes.size () > 100, true);
+  EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
+
+  db::Box search_box2 (500, 500, 1000, 1000);
+
+  selected_boxes.clear ();
+  selected_boxes2.clear ();
+
+  db::Region reg;
+  reg.insert (search_box);
+  reg.insert (search_box2);
+
+  for (db::RecursiveShapeIterator iter = db::RecursiveShapeIterator (g, c0, 0, reg, true); !iter.at_end (); ++iter) {
+    selected_boxes.insert (iter.trans () * iter->bbox ());
+  }
+
+  for (std::set<db::Box>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
+    if (search_box.overlaps (*b) || search_box2.overlaps (*b)) {
+      selected_boxes2.insert (*b);
+    }
+  }
+
+  EXPECT_EQ (selected_boxes.size () > 100, true);
+  EXPECT_EQ (db::compare_layouts (boxes2layout (selected_boxes), boxes2layout (selected_boxes2), db::layout_diff::f_verbose, 0, 100 /*max diff lines*/), true);
+}

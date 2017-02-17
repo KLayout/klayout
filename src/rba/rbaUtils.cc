@@ -26,7 +26,7 @@
 #include "rba.h"
 #include "rbaUtils.h"
 
-#if HAVE_RUBY_VERSION_CODE >= 20300
+#if HAVE_RUBY_VERSION_CODE >= 20200
 #  include <ruby/debug.h>
 #endif
 

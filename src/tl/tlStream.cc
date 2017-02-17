@@ -318,7 +318,7 @@ InputStream::InputStream (const std::string &abstract_path)
   mp_buffer = new char [m_bcap];
 
   tl::Extractor ex (abstract_path.c_str ());
-  if (ex.test ("http:")) {
+  if (ex.test ("http:") || ex.test ("https:")) {
     mp_delegate = new InputHttpStream (abstract_path);
 #ifndef _WIN32 // not available on Windows
   } else if (ex.test ("pipe:")) {
@@ -338,7 +338,7 @@ std::string InputStream::absolute_path (const std::string &abstract_path)
   //  TODO: align this implementation with InputStream ctor
 
   tl::Extractor ex (abstract_path.c_str ());
-  if (ex.test ("http:")) {
+  if (ex.test ("http:") || ex.test ("https:")) {
     return abstract_path;
 #ifndef _WIN32 // not available on Windows
   } else if (ex.test ("pipe:")) {
@@ -927,8 +927,8 @@ OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode o
   }
 
   tl::Extractor ex (abstract_path.c_str ());
-  if (ex.test ("http:")) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot write to http: or pipe: URL's")));
+  if (ex.test ("http:") || ex.test ("https:")) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Cannot write to http:, https: or pipe: URL's")));
 #ifndef _WIN32 // not available on Windows
   } else if (ex.test ("pipe:")) {
     mp_delegate = new OutputPipe (ex.get ());

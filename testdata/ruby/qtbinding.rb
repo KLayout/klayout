@@ -210,20 +210,20 @@ class QtBinding_TestClass < TestBase
 
     a.installEventFilter(ef)
 
-    aa = MyAction.new(nil, "aa")
+    aa = MyAction.new(nil, "aa1")
     assert_equal(ce_log.join(","), "")
     aa.setParent(a)
-    assert_equal(ce_log.join(","), "true:aa")
+    assert_equal(ce_log.join(","), "true:aa1")
     ce_log = []
 
     # destroy aa
     aa.destroy
     aa = nil
-    assert_equal(ce_log.join(","), "false:aa")
+    assert_equal(ce_log.join(","), "false:aa1")
     ce_log = []
 
     no_event = true
-    aa = MyAction.new(nil, "aa")
+    aa = MyAction.new(nil, "aa2")
     aa.setParent(a)
     assert_equal(ce_log.join(","), "")
     ce_log = []
@@ -231,7 +231,7 @@ class QtBinding_TestClass < TestBase
     no_event = false
     aa.destroy
     aa = nil
-    assert_equal(ce_log.join(","), "false:aa")
+    assert_equal(ce_log.join(","), "false:aa2")
     ce_log = []
 
   end
@@ -537,6 +537,32 @@ class QtBinding_TestClass < TestBase
     slm.srn(rn)
     rn = slm.roleNames
     assert_equal(rn.keys.sort.collect { |k| "#{k}=>\"#{rn[k]}\"" }.join(", "), "0=>\"display\", 1=>\"decoration\", 2=>\"edit\", 3=>\"toolTip\", 4=>\"statusTip\", 5=>\"whatsThis\", 7=>\"blabla\"")
+
+  end
+
+  def test_44
+
+    # Ability to monitor native child objects
+
+    parent = RBA::QScrollArea::new
+    child = parent.viewport
+
+    # ensure parent and child are working
+    assert_equal(child.destroyed?, false)
+
+    parent.resize(200, 200)
+    assert_equal(child.width() > 100, true)
+    assert_equal(child.height() > 100, true)
+    
+    parent.resize(100, 100)
+    assert_equal(child.width() < 100, true)
+    assert_equal(child.height() < 100, true)
+
+    # now if we delete the parent, the child needs to become disconnected
+
+    parent._destroy()
+    assert_equal(parent.destroyed?, true)
+    assert_equal(child.destroyed?, true)
 
   end
 

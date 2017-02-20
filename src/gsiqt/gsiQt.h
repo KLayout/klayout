@@ -48,10 +48,59 @@ class QGraphicsObject;
 namespace qt_gsi
 {
 
+gsi::ObjectBase *get_watcher_object (QObject *qobject);
+
 /**
- *   @brief A generic way to implement a method binding
+ *  @brief A Qt class declaration
  *
- *   Using that way saves compile time and memory
+ *  The purpose of this class declaration is to modify the behavior for the "native" classes.
+ *  It will register a helper object along with the native object that will issue destruction events
+ *  when the parent object is destroyed through the gsi::ObjectBase interface.
+ *
+ *  This template shall be used instead of gsi::Class for Qt native classes.
+ */
+template <class X>
+class QtNativeClass
+  : public gsi::Class<X>
+{
+public:
+  QtNativeClass (const std::string &name, const gsi::Methods &mm, const std::string &doc = std::string ())
+    : gsi::Class<X> (name, mm, doc)
+  {
+  }
+
+  template <class B>
+  QtNativeClass (const gsi::Class<B> &base, const std::string &name, const gsi::Methods &mm, const std::string &doc = std::string ())
+    : gsi::Class<X> (base, name, mm, doc)
+  {
+  }
+
+  QtNativeClass (const std::string &name, const std::string &doc = std::string ())
+    : gsi::Class<X> (name, doc)
+  {
+  }
+
+  template <class B>
+  QtNativeClass (const gsi::Class<B> &base, const std::string &name, const std::string &doc = std::string ())
+    : gsi::Class<X> (base, name, doc)
+  {
+  }
+
+  bool is_managed () const
+  {
+    return true;
+  }
+
+  gsi::ObjectBase *gsi_object (void *p) const
+  {
+    return get_watcher_object ((QObject *) p);
+  }
+};
+
+/**
+ *  @brief A generic way to implement a method binding
+ *
+ *  Using that way saves compile time and memory
  */
 class GenericMethod : public gsi::MethodBase 
 {

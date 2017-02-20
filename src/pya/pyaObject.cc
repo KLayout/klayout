@@ -334,7 +334,12 @@ PYAObjectBase::object_status_changed (gsi::ObjectBase::StatusEventType type)
 
       bool prev_owner = m_owned;
 
-      detach ();
+      //  external reset - the object no longer will be available so we unlink from it
+      m_callee.clear_callbacks ();
+      m_obj = 0;
+      m_const_ref = false;
+      m_owned = false;
+      m_can_destroy = false;
       m_destroyed = true;
 
       //  NOTE: this may delete "this"!

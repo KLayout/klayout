@@ -1,25 +1,3 @@
-
-/*
-
-  KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-*/
-
 /**
 *  @file gsiDeclQApplication.cc 
 *
@@ -1157,7 +1135,7 @@ static gsi::Methods methods_QApplication () {
 
 gsi::Class<QGuiApplication> &qtdecl_QGuiApplication ();
 
-gsi::Class<QApplication> decl_QApplication (qtdecl_QGuiApplication (), "QApplication_Native",
+qt_gsi::QtNativeClass<QApplication> decl_QApplication (qtdecl_QGuiApplication (), "QApplication_Native",
   gsi::constructor("new_app", &ctor_QApplication, "@brief Creates a new QApplication object\n\nThis implementation is provided for test purposes only. It is not required usually to create a QApplication object. Use the object provided by QApplication::instance instead.")
 +
   methods_QApplication (),

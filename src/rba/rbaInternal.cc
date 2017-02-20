@@ -562,7 +562,16 @@ void
 Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
 {
   if (type == gsi::ObjectBase::ObjectDestroyed) {
-    detach ();
+
+    //  external reset - the object no longer will be available so we unlink from it
+    m_cbfuncs.clear ();
+    m_self = Qnil;
+    m_obj = 0;
+    m_destroyed = true;
+    m_const_ref = false;
+    m_owned = false;
+    m_can_destroy = false;
+
   } else if (type == gsi::ObjectBase::ObjectKeep) {
     keep_internal ();
   } else if (type == gsi::ObjectBase::ObjectRelease) {

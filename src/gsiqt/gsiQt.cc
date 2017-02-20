@@ -118,6 +118,39 @@ AbstractMethodCalledException::AbstractMethodCalledException (const char *method
 }
 
 // ---------------------------------------------------------------------------
+//  QtNativeClass implementation
+
+namespace
+{
+  /**
+   *  @brief A tiny watcher object linking QObject and gsi::ObjectBase
+   *  This object is hooked into the watched object's child list to watch it's lifetime.
+   */
+  class QtWatcherObject
+    : public QObject, public gsi::ObjectBase
+  {
+  public:
+    QtWatcherObject (QObject *parent)
+      : QObject (parent), gsi::ObjectBase ()
+    {
+      //  .. nothing yet ..
+    }
+  };
+}
+
+/**
+ *  @brief Attaches a watcher object to a native QObject
+ */
+gsi::ObjectBase *get_watcher_object (QObject *qobject)
+{
+  QtWatcherObject *watcher = qobject->findChild<QtWatcherObject *> ();
+  if (! watcher) {
+    watcher = new QtWatcherObject (qobject);
+  }
+  return watcher;
+}
+
+// ---------------------------------------------------------------------------
 //  QtObjectBase implementation
 
 void QtObjectBase::init(QObject *object)

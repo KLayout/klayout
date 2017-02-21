@@ -48,7 +48,7 @@ class QGraphicsObject;
 namespace qt_gsi
 {
 
-gsi::ObjectBase *get_watcher_object (QObject *qobject);
+gsi::ObjectBase *get_watcher_object (QObject *qobject, bool required);
 
 /**
  *  @brief A Qt class declaration
@@ -91,9 +91,9 @@ public:
     return true;
   }
 
-  gsi::ObjectBase *gsi_object (void *p) const
+  gsi::ObjectBase *gsi_object (void *p, bool required) const
   {
-    return get_watcher_object ((QObject *) p);
+    return get_watcher_object ((QObject *) p, required);
   }
 };
 

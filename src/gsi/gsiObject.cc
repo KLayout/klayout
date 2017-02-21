@@ -92,7 +92,10 @@ void
 Proxy::detach ()
 {
   if (m_cls_decl && m_cls_decl->is_managed ()) {
-    m_cls_decl->gsi_object (m_obj)->status_changed_event ().remove (this, &Proxy::object_status_changed);
+    gsi::ObjectBase *gsi_object = m_cls_decl->gsi_object (m_obj, false);
+    if (gsi_object) {
+      gsi_object->status_changed_event ().remove (this, &Proxy::object_status_changed);
+    }
   }
 
   m_obj = 0;
@@ -157,7 +160,10 @@ Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy)
     if (m_obj) {
 
       if (cls->is_managed ()) {
-        cls->gsi_object (m_obj)->status_changed_event ().remove (this, &Proxy::object_status_changed);
+        gsi::ObjectBase *gsi_object = cls->gsi_object (m_obj, false);
+        if (gsi_object) {
+          gsi_object->status_changed_event ().remove (this, &Proxy::object_status_changed);
+        }
       }
 
       //  Destroy the object if we are owner. We don't destroy the object if it was locked
@@ -211,14 +217,7 @@ void
 Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
 {
   if (type == gsi::ObjectBase::ObjectDestroyed) {
-
-    //  external reset - the object no longer will be available so we unlink from it
-    m_obj = 0;
-    m_destroyed = true;
-    m_const_ref = false;
-    m_owned = false;
-    m_can_destroy = false;
-
+    detach ();
   } else if (type == gsi::ObjectBase::ObjectKeep) {
     m_owned = false;
   } else if (type == gsi::ObjectBase::ObjectRelease) {

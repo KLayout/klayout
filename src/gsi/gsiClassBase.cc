@@ -39,13 +39,15 @@ namespace gsi
 
 ClassBase::class_collection *ClassBase::mp_class_collection = 0;
 
-ClassBase::ClassBase (const std::string &doc, const Methods &mm)
+ClassBase::ClassBase (const std::string &doc, const Methods &mm, bool do_register)
   : mp_base (0), mp_parent (0), m_doc (doc), m_methods (mm)
 { 
-  if (! mp_class_collection) {
-    mp_class_collection = new class_collection ();
+  if (do_register) {
+    if (! mp_class_collection) {
+      mp_class_collection = new class_collection ();
+    }
+    mp_class_collection->push_back (this);
   }
-  mp_class_collection->push_back (this);
 }
 
 ClassBase::~ClassBase ()

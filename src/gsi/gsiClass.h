@@ -729,29 +729,29 @@ public:
   typedef typename tl::type_traits<X>::has_default_constructor has_default_ctor;
   typedef typename tl::type_traits<X>::has_public_destructor has_public_dtor;
 
-  Class (const std::string &name, const Methods &mm, const std::string &doc = std::string ())
-    : ClassBase (doc, mm)
+  Class (const std::string &name, const Methods &mm, const std::string &doc = std::string (), bool do_register = true)
+    : ClassBase (doc, mm, do_register)
   {
     set_name (name);
   }
 
   template <class B>
-  Class (const Class<B> &base, const std::string &name, const Methods &mm, const std::string &doc = std::string ())
-    : ClassBase (doc, mm), m_subclass_tester (new SubClassTester<X, B, typename is_polymorphic<B>::value> ())
+  Class (const Class<B> &base, const std::string &name, const Methods &mm, const std::string &doc = std::string (), bool do_register = true)
+    : ClassBase (doc, mm, do_register), m_subclass_tester (new SubClassTester<X, B, typename is_polymorphic<B>::value> ())
   {
     set_name (name);
     set_base (&base);
   }
 
-  Class (const std::string &name, const std::string &doc = std::string ())
-    : ClassBase (doc, Methods ())
+  Class (const std::string &name, const std::string &doc = std::string (), bool do_register = true)
+    : ClassBase (doc, Methods (), do_register)
   {
     set_name (name);
   }
 
   template <class B>
-  Class (const Class<B> &base, const std::string &name, const std::string &doc = std::string ())
-    : ClassBase (doc, Methods ()), m_subclass_tester (new SubClassTester<X, B, typename is_polymorphic<B>::value> ())
+  Class (const Class<B> &base, const std::string &name, const std::string &doc = std::string (), bool do_register = true)
+    : ClassBase (doc, Methods (), do_register), m_subclass_tester (new SubClassTester<X, B, typename is_polymorphic<B>::value> ())
   {
     set_name (name);
     set_base (&base);
@@ -785,7 +785,7 @@ public:
     return tl::is_derived<gsi::ObjectBase, X> ();
   }
 
-  gsi::ObjectBase *gsi_object (void *p) const
+  gsi::ObjectBase *gsi_object (void *p, bool /*required*/) const
   {
     return tl::try_static_cast<gsi::ObjectBase, X> ((X *) p);
   }

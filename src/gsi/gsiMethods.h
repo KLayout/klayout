@@ -194,9 +194,26 @@ public:
   }
 
   /**
+   *  @brief Sets the documentation text
+   */
+  void set_doc (const std::string &d)
+  {
+    m_doc = d;
+  }
+
+  /**
    *  @brief Returns the nth (index) argument
    */
   const ArgType &arg (size_t index) const
+  {
+    tl_assert (m_arg_types.size () > index);
+    return m_arg_types [index];
+  }
+
+  /**
+   *  @brief Returns the nth (index) argument (non_const version)
+   */
+  ArgType &arg (size_t index)
   {
     tl_assert (m_arg_types.size () > index);
     return m_arg_types [index];
@@ -222,6 +239,14 @@ public:
    *  @brief Gets the return type
    */
   const ArgType &ret_type () const
+  {
+    return m_ret_type;
+  }
+
+  /**
+   *  @brief Gets the return type (non-const version)
+   */
+  ArgType &ret_type ()
   {
     return m_ret_type;
   }

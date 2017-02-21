@@ -255,7 +255,10 @@ void
 Proxy::detach ()
 {
   if (m_cls_decl && m_cls_decl->is_managed ()) {
-    m_cls_decl->gsi_object (m_obj)->status_changed_event ().remove (this, &Proxy::object_status_changed);
+    gsi::ObjectBase *gsi_object = m_cls_decl->gsi_object (m_obj, false);
+    if (gsi_object) {
+      gsi_object->status_changed_event ().remove (this, &Proxy::object_status_changed);
+    }
     if (!m_owned && m_self != Qnil) {
       rb_gc_unregister_address (&m_self);
     }
@@ -562,16 +565,7 @@ void
 Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
 {
   if (type == gsi::ObjectBase::ObjectDestroyed) {
-
-    //  external reset - the object no longer will be available so we unlink from it
-    m_cbfuncs.clear ();
-    m_self = Qnil;
-    m_obj = 0;
-    m_destroyed = true;
-    m_const_ref = false;
-    m_owned = false;
-    m_can_destroy = false;
-
+    detach ();
   } else if (type == gsi::ObjectBase::ObjectKeep) {
     keep_internal ();
   } else if (type == gsi::ObjectBase::ObjectRelease) {

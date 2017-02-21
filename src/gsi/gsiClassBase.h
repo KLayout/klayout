@@ -85,7 +85,7 @@ public:
    *
    *  The constructor supplies information about the connector class (can be 0), a documentation string and the method declarations.
    */
-  ClassBase (const std::string &doc, const Methods &mm);
+  ClassBase (const std::string &doc, const Methods &mm, bool do_register = true);
 
   /**
    *  @brief Destructor
@@ -437,8 +437,13 @@ public:
   /**
    *  @brief Gets the basic gsi::ObjectBase object from a generic pointer
    *  This method will return 0, if the object is not managed.
+   *  If required is false, a return value of 0 is permitted, indicating that
+   *  no dynamic allocation of a gsi::ObjectBase has happened yet. This is useful
+   *  in case of the Qt-GSI bridge which means a special Qt object needs to be
+   *  created in order to provide the gsi::ObjectBase interface. If required is
+   *  false, this initialization does not need to happen.
    */
-  virtual gsi::ObjectBase *gsi_object (void * /*p*/) const
+  virtual gsi::ObjectBase *gsi_object (void * /*p*/, bool /*required*/ = true) const
   {
     tl_assert (false);
     return 0;

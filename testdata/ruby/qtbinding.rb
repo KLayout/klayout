@@ -545,6 +545,7 @@ class QtBinding_TestClass < TestBase
     # Ability to monitor native child objects
 
     parent = RBA::QScrollArea::new
+    parent.show  # this makes resize actually change the widget's size
     child = parent.viewport
 
     # ensure parent and child are working

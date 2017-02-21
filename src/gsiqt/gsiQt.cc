@@ -141,10 +141,10 @@ namespace
 /**
  *  @brief Attaches a watcher object to a native QObject
  */
-gsi::ObjectBase *get_watcher_object (QObject *qobject)
+gsi::ObjectBase *get_watcher_object (QObject *qobject, bool required)
 {
   QtWatcherObject *watcher = qobject->findChild<QtWatcherObject *> ();
-  if (! watcher) {
+  if (! watcher && required) {
     watcher = new QtWatcherObject (qobject);
   }
   return watcher;

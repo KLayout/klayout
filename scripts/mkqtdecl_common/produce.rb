@@ -2211,7 +2211,11 @@ END
     ofile.puts("}")
     ofile.puts("")
 
-    decl_type = "gsi::Class<#{cls}>"
+    if is_qobject
+      decl_type = "qt_gsi::QtNativeClass<#{cls}>"
+    else
+      decl_type = "gsi::Class<#{cls}>"
+    end
 
     if base_cls
       ofile.puts("gsi::Class<#{base_cls}> &qtdecl_#{base_clsn} ();")

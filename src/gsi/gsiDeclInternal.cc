@@ -226,7 +226,7 @@ Class<MethodBase> decl_Method ("Method",
   gsi::iterator ("each_argument", &MethodBase::begin_arguments, &MethodBase::end_arguments,
     "@brief Iterate over all arguments of this method\n"
   ) +
-  gsi::method ("ret_type", &MethodBase::ret_type,
+  gsi::method ("ret_type", (const gsi::ArgType &(MethodBase::*)() const) &MethodBase::ret_type,
     "@brief The return type of this method\n"
   ) +
   gsi::method ("is_protected?", &MethodBase::is_protected,

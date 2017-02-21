@@ -11,10 +11,12 @@ TEMPLATE = lib
 SOURCES += \
   gsiQt.cc \
   gsiDeclQtBasic.cc \
+    gsiQtHelper.cc
 
 HEADERS += \
   gsiQt.h \
-    gsiQtCommon.h
+    gsiQtCommon.h \
+    gsiQtHelper.h
 
 # NOTE: db is required since some bridges to db are provided (i.e db::Polygon)
 INCLUDEPATH += ../tl ../gsi ../db

@@ -455,6 +455,31 @@ class QtBindingTest(unittest.TestCase):
     r2 = "{0L: \'display\', 1L: \'decoration\', 2L: \'edit\', 3L: \'toolTip\', 4L: \'statusTip\', 5L: \'whatsThis\', 7L: \'blabla\'}"
     self.assertEqual(str(slm.roleNames()) == r1 or str(slm.roleNames()) == r2, True)
 
+  def test_44(self):
+
+    # Ability to monitor native child objects
+
+    parent = pya.QScrollArea()
+    parent.show()  # this makes resize actually change the widget's size
+    child = parent.viewport
+
+    # ensure parent and child are working
+    self.assertEqual(child._destroyed(), False)
+
+    parent.resize(200, 200)
+    self.assertEqual(child.width > 100, True)
+    self.assertEqual(child.height > 100, True)
+    
+    parent.resize(100, 100)
+    self.assertEqual(child.width < 100, True)
+    self.assertEqual(child.height < 100, True)
+
+    # now if we delete the parent, the child needs to become disconnected
+
+    parent._destroy()
+    self.assertEqual(parent._destroyed(), True)
+    self.assertEqual(child._destroyed(), True)
+
 
 # run unit tests
 if __name__ == '__main__':

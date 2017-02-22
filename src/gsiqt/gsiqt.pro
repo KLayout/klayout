@@ -3,24 +3,15 @@ DESTDIR=$$OUT_PWD/..
 
 include($$PWD/../klayout.pri)
 include(qtdecl.pro)
+include($$PWD/../gsiqt_common/gsiqt_common.pri)
 
 DEFINES += MAKE_GSIQT_LIBRARY
 
 TEMPLATE = lib
 
-SOURCES += \
-  gsiQt.cc \
-  gsiDeclQtBasic.cc \
-    gsiQtHelper.cc
-
-HEADERS += \
-  gsiQt.h \
-    gsiQtCommon.h \
-    gsiQtHelper.h
-
 # NOTE: db is required since some bridges to db are provided (i.e db::Polygon)
-INCLUDEPATH += ../tl ../gsi ../db
-DEPENDPATH += ../tl ../gsi ../db
+INCLUDEPATH += ../tl ../gsi ../db ../gsiqt_common
+DEPENDPATH += ../tl ../gsi ../db ../gsiqt_common
 
 LIBS += -L$$DESTDIR -ltl -lgsi -ldb
 

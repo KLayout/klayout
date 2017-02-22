@@ -20,6 +20,7 @@
 
 */
 
+#if QT_VERSION >= 0x050000
 
 #include "gsiQt.h"
 
@@ -88,11 +89,7 @@ class QUrlTwoFlagsClass
   : public gsi::Class<QUrlTwoFlagsAdaptor<A, B>, QUrlTwoFlags<A, B> >
 {
 public:
-#if QT_VERSION >= 0x050000
   typedef typename QFlags<A>::Int int_repr;
-#else
-  typedef int int_repr;
-#endif
 
   QUrlTwoFlagsClass (const std::string &name, const std::string &doc = std::string ())
     : gsi::Class<QUrlTwoFlagsAdaptor<A, B>, QUrlTwoFlags<A, B> > (name, methods (), doc)
@@ -324,3 +321,4 @@ static gsi::ClassExt<QUrl> decl_QUrlTwoFlags_as_child (decl_QUrlTwoFlags, "Forma
 
 }
 
+#endif

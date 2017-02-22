@@ -42,6 +42,11 @@
 #include <QMap>
 #include <QSet>
 
+#if QT_VERSION >= 0x050000
+//  contributes the WIN specific typedefs
+#  include <QWindow>
+#endif
+
 class QGraphicsItem;
 class QGraphicsObject;
 
@@ -401,6 +406,7 @@ public:
   static unsigned int toc (QChar qc) { return qc.unicode (); }
 };
 
+#if QT_VERSION < 0x050000
 template <>
 struct Converter<QBool>
 {
@@ -410,6 +416,7 @@ public:
   static QBool toq (bool b) { return QBool (b); }
   static bool toc (QBool qb) { return qb; }
 };
+#endif
 
 std::vector<std::string> to_string_vector (const QStringList &sl);
 QStringList to_string_list (const std::vector<std::string> &sv);

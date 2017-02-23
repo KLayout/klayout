@@ -151,6 +151,16 @@ public:
   const shapes_type &shapes (unsigned int index) const;
 
   /**
+   *  @brief Gets the index of a given shapes array
+   *
+   *  If the shapes container is not part of the cell, std::numeric_limits<unsigned int>::max ()
+   *  is returned.
+   *
+   *  This is not a cheap operation.
+   */
+  unsigned int index_of_shapes (const shapes_type *shapes) const;
+
+  /**
    *  @brief Clear all shapes in the cell
    */
   void clear_shapes ();

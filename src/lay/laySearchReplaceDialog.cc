@@ -1397,7 +1397,7 @@ void
 SearchReplaceDialog::attach_layout (db::Layout *layout)
 {
   layout->hier_changed_event.add (this, &SearchReplaceDialog::layout_changed);
-  layout->bboxes_changed_event.add (this, &SearchReplaceDialog::layout_changed);
+  layout->bboxes_changed_any_event.add (this, &SearchReplaceDialog::layout_changed);
   layout->cell_name_changed_event.add (this, &SearchReplaceDialog::layout_changed);
   layout->layer_properties_changed_event.add (this, &SearchReplaceDialog::layout_changed);
 }

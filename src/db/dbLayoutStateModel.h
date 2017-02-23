@@ -96,11 +96,14 @@ public:
    *
    *  This method is supposed to be called by shape containers for example if 
    *  some event has occured that changed the bounding boxes.
+   *
+   *  If the index is std::numeric_limits<unsigned int>::max, this method
+   *  applies to all layers.
    */
-  void invalidate_bboxes ()
+  void invalidate_bboxes (unsigned int index)
   {
     if (! m_bboxes_dirty || m_busy) {
-      do_invalidate_bboxes ();  //  must be called before the bboxes are invalidated (stopping of redraw thread requires this)
+      do_invalidate_bboxes (index);  //  must be called before the bboxes are invalidated (stopping of redraw thread requires this)
       m_bboxes_dirty = true;
     }
   }
@@ -199,7 +202,8 @@ protected:
 
 public:
   tl::Event hier_changed_event;
-  tl::Event bboxes_changed_event;
+  tl::event<unsigned int> bboxes_changed_event;
+  tl::Event bboxes_changed_any_event;
   tl::Event dbu_changed_event;
   tl::Event cell_name_changed_event;
   tl::Event prop_ids_changed_event;
@@ -211,7 +215,7 @@ private:
   bool m_busy;
 
   void do_invalidate_hier ();
-  void do_invalidate_bboxes ();
+  void do_invalidate_bboxes (unsigned int index);
 };
 
 }

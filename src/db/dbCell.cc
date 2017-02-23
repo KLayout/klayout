@@ -27,6 +27,8 @@
 #include "dbBox.h"
 #include "dbPCellVariant.h"
 
+#include <limits>
+
 namespace db
 {
 
@@ -176,7 +178,7 @@ Cell::clear (unsigned int index)
 {
   shapes_map::iterator s = m_shapes_map.find(index);
   if (s != m_shapes_map.end() && ! s->second.empty ()) {
-    mp_layout->invalidate_bboxes ();  //  HINT: must come before the change is done!
+    mp_layout->invalidate_bboxes (index);  //  HINT: must come before the change is done!
     s->second.clear ();
     m_bbox_needs_update = true;
   }
@@ -210,10 +212,21 @@ Cell::shapes (unsigned int index) const
   }
 }
 
-void 
+unsigned int
+Cell::index_of_shapes (const Cell::shapes_type *shapes) const
+{
+  for (shapes_map::const_iterator s = m_shapes_map.begin (); s != m_shapes_map.end (); ++s) {
+    if (&s->second == shapes) {
+      return s->first;
+    }
+  }
+  return std::numeric_limits<unsigned int>::max ();
+}
+
+void
 Cell::clear_shapes ()
 {
-  mp_layout->invalidate_bboxes ();  //  HINT: must come before the change is done!
+  mp_layout->invalidate_bboxes (std::numeric_limits<unsigned int>::max ());  //  HINT: must come before the change is done!
   clear_shapes_no_invalidate ();
 }
 
@@ -534,7 +547,7 @@ void
 Cell::invalidate_insts ()
 {
   mp_layout->invalidate_hier ();  //  HINT: must come before the change is done!
-  mp_layout->invalidate_bboxes ();
+  mp_layout->invalidate_bboxes (std::numeric_limits<unsigned int>::max ());
   m_bbox_needs_update = true;
 }
 

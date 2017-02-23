@@ -645,7 +645,7 @@ void LayoutView::update_event_handlers ()
 
   for (unsigned int i = 0; i < cellviews (); ++i) {
     cellview (i)->layout ().hier_changed_event.add (this, &LayoutView::signal_hier_changed);
-    cellview (i)->layout ().bboxes_changed_event.add (this, &LayoutView::signal_bboxes_changed);
+    cellview (i)->layout ().bboxes_changed_event.add (this, &LayoutView::signal_bboxes_from_layer_changed, i);
     cellview (i)->layout ().dbu_changed_event.add (this, &LayoutView::signal_bboxes_changed);
     cellview (i)->layout ().prop_ids_changed_event.add (this, &LayoutView::signal_prop_ids_changed);
     cellview (i)->layout ().layer_properties_changed_event.add (this, &LayoutView::signal_layer_properties_changed);
@@ -653,7 +653,7 @@ void LayoutView::update_event_handlers ()
     cellview (i)->apply_technology_with_sender_event.add (this, &LayoutView::signal_apply_technology);
   }
 
-  annotation_shapes ().bboxes_changed_event.add (this, &LayoutView::signal_annotations_changed);
+  annotation_shapes ().bboxes_changed_any_event.add (this, &LayoutView::signal_annotations_changed);
 
   mp_canvas->viewport_changed_event.add (this, &LayoutView::viewport_changed);
 }
@@ -2067,14 +2067,34 @@ LayoutView::signal_hier_changed ()
 }
 
 void
+LayoutView::signal_bboxes_from_layer_changed (unsigned int cv_index, unsigned int layer_index)
+{
+  if (layer_index == std::numeric_limits<unsigned int>::max ()) {
+
+    //  redraw all
+    signal_bboxes_changed ();
+
+  } else {
+
+    //  redraw only the layers required for redrawing
+    for (std::vector<lay::RedrawLayerInfo>::const_iterator l = mp_canvas->get_redraw_layers ().begin (); l != mp_canvas->get_redraw_layers ().end (); ++l) {
+      if (l->cellview_index == int (cv_index) && (layer_index == std::numeric_limits<unsigned int>::max () || l->layer_index == int (layer_index))) {
+        redraw_layer ((unsigned int) (l - mp_canvas->get_redraw_layers ().begin ()));
+      }
+    }
+
+    //  forward this event to our observers
+    geom_changed_event ();
+
+  }
+}
+
+void
 LayoutView::signal_bboxes_changed ()
 {
   //  schedule a redraw request for all layers
-  //  HINT: it could be optimized if we knew which layer to redraw. However, this 
-  //  is somewhat difficult to find out: first, we had to identify the layer we need to
-  //  redraw, the the layout which to redraw and then the layer views which need to be
-  //  redrawn ..
   redraw ();
+
   //  forward this event to our observers
   geom_changed_event ();
 }

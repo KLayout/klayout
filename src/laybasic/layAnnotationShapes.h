@@ -32,6 +32,7 @@
 #include "dbLayoutStateModel.h"
 
 #include <vector>
+#include <limits>
 
 namespace lay
 {
@@ -351,7 +352,7 @@ public:
 private:
   void invalidate_state ()
   {
-    invalidate_bboxes ();
+    invalidate_bboxes (std::numeric_limits<unsigned int>::max ());
   }
 
   virtual void do_update ();

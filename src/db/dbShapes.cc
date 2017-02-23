@@ -29,6 +29,8 @@
 #include "dbUserObject.h"
 #include "dbLayout.h"
 
+#include <limits>
+
 namespace db
 {
   
@@ -191,8 +193,11 @@ Shapes::invalidate_state ()
 {
   if (! is_dirty ()) {
     set_dirty (true);
-    if (layout ()) {
-      layout ()->invalidate_bboxes ();
+    if (layout () && cell ()) {
+      unsigned int index = cell ()->index_of_shapes (this);
+      if (index != std::numeric_limits<unsigned int>::max ()) {
+        layout ()->invalidate_bboxes (index);
+      }
     }
   }
 }
@@ -852,12 +857,14 @@ Shapes::replace (const Shapes::shape_type &ref, const Sh &sh)
 void 
 Shapes::clear ()
 {
-  for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    (*l)->clear (this, manager ());
-    delete *l;
+  if (!m_layers.empty ()) {
+    for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
+      (*l)->clear (this, manager ());
+      delete *l;
+    }
+    invalidate_state ();  //  HINT: must come before the change is done!
+    m_layers.clear ();
   }
-  invalidate_state ();  //  HINT: must come before the change is done!
-  m_layers.clear ();
 }
 
 void Shapes::update_bbox ()

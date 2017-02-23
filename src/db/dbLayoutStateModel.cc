@@ -59,9 +59,10 @@ LayoutStateModel::do_invalidate_hier ()
 }
 
 void 
-LayoutStateModel::do_invalidate_bboxes ()
+LayoutStateModel::do_invalidate_bboxes (unsigned int index)
 {
-  bboxes_changed_event ();
+  bboxes_changed_event (index);
+  bboxes_changed_any_event ();
 }
 
 }

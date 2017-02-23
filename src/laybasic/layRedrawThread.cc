@@ -193,6 +193,7 @@ RedrawThread::restart (const std::vector<int> &restart)
 {
   m_redraw_regions.clear ();
   m_redraw_regions.push_back (db::Box (db::Point (0, 0), db::Point (m_width, m_height)));
+  m_valid_region = m_stored_region = db::DBox ();
 
   do_start (false, 0, 0, restart, -1);
 }
@@ -241,13 +242,13 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
         cv->layout ().update ();
         //  attach to the layout object to receive change notifications to stop the redraw thread
         cv->layout ().hier_changed_event.add (this, &RedrawThread::layout_changed);
-        cv->layout ().bboxes_changed_event.add (this, &RedrawThread::layout_changed);
+        cv->layout ().bboxes_changed_any_event.add (this, &RedrawThread::layout_changed);
       }
     }
     mp_view->annotation_shapes ().update ();
     //  attach to the layout object to receive change notifications to stop the redraw thread
     mp_view->annotation_shapes ().hier_changed_event.add (this, &RedrawThread::layout_changed);  //  not really required, since the shapes have no hierarchy, but for completeness ..
-    mp_view->annotation_shapes ().bboxes_changed_event.add (this, &RedrawThread::layout_changed);
+    mp_view->annotation_shapes ().bboxes_changed_any_event.add (this, &RedrawThread::layout_changed);
     mp_view->cellviews_about_to_change_event.add (this, &RedrawThread::layout_changed);
     mp_view->cellview_about_to_change_event.add (this, &RedrawThread::layout_changed_with_int);
 
@@ -275,8 +276,10 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
           if (*l == draw_custom_queue_entry) {
             planes_to_init.push_back (-1); 
           } else if (*l >= 0 && *l < int (m_layers.size ())) {
-            for (int o = 0; o < planes_per_layer; ++o) {
-              planes_to_init.push_back (o + *l * planes_per_layer + special_planes_before + special_planes_after);
+            for (int i = 0; i < planes_per_layer / 3; ++i) {
+              planes_to_init.push_back (*l * (planes_per_layer / 3) + special_planes_before + i);
+              planes_to_init.push_back ((*l + m_nlayers) * (planes_per_layer / 3) + special_planes_before + i);
+              planes_to_init.push_back ((*l + m_nlayers * 2) * (planes_per_layer / 3) + special_planes_before + i);
             }
           }
         }

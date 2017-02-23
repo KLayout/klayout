@@ -2494,6 +2494,7 @@ public slots:
 
   //  event handlers used to connect to the layout object's events
   void signal_hier_changed ();
+  void signal_bboxes_from_layer_changed (unsigned int cv_index, unsigned int layer_index);
   void signal_bboxes_changed ();
   void signal_prop_ids_changed ();
   void signal_layer_properties_changed ();

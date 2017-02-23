@@ -1146,19 +1146,25 @@ InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase 
 
     view ()->cancel ();
 
-    set_edit_marker (0);
+    //  NOTE: the cancel above might delete the cell we are dragging (if that is
+    //  a non-placed PCell). Hence we need to check whether the cell still is valid
+    if (cd->layout ()->is_valid_cell_index (cd->cell_index ())) {
 
-    m_cv_index = view ()->active_cellview_index ();
-    m_in_drag_drop = true;
-    m_drag_drop_cell = cd->cell_index ();
+      set_edit_marker (0);
 
-    do_begin_edit (p);
+      m_cv_index = view ()->active_cellview_index ();
+      m_in_drag_drop = true;
+      m_drag_drop_cell = cd->cell_index ();
 
-    return true; 
+      do_begin_edit (p);
 
-  } else {
-    return false; 
+      return true;
+
+    }
+
   }
+
+  return false;
 }
 
 bool 

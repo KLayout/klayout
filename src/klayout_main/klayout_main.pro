@@ -26,15 +26,9 @@ INCLUDEPATH += $$DESTDIR/laybasic $$OUT_PWD/../lay
 DEPENDPATH += $$DESTDIR/laybasic $$OUT_PWD/../lay
 
 equals(HAVE_QTBINDINGS, "1") {
-  equals(HAVE_QT5, "1") {
-    INCLUDEPATH += ../gsiqt5
-    DEPENDPATH += ../gsiqt5
-    LIBS += -lgsiqt5 
-  } else {
-    INCLUDEPATH += ../gsiqt
-    DEPENDPATH += ../gsiqt
-    LIBS += -lgsiqt 
-  }
+  INCLUDEPATH += ../gsiqt
+  DEPENDPATH += ../gsiqt
+  LIBS += -lgsiqt
 }
 
 equals(HAVE_RUBY, "1") {

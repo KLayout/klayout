@@ -10,15 +10,9 @@ INCLUDEPATH += $$DESTDIR/laybasic $$DESTDIR/lay $$DESTDIR/ext
 DEPENDPATH += $$DESTDIR/laybasic $$DESTDIR/lay $$DESTDIR/ext
 
 equals(HAVE_QTBINDINGS, "1") {
-  equals(HAVE_QT5, "1") {
-    INCLUDEPATH += $$PWD/gsiqt5
-    DEPENDPATH += $$PWD/gsiqt5
-    LIBS += -lgsiqt5 
-  } else {
-    INCLUDEPATH += $$PWD/gsiqt
-    DEPENDPATH += $$PWD/gsiqt
-    LIBS += -lgsiqt 
-  }
+  INCLUDEPATH += $$PWD/gsiqt
+  DEPENDPATH += $$PWD/gsiqt
+  LIBS += -lgsiqt
 }
 
 equals(HAVE_RUBY, "1") {

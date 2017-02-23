@@ -2970,8 +2970,6 @@ END
       extfile.puts("#if !defined(HDR_gsiQtExternals)")
       extfile.puts("#define HDR_gsiQtExternals")
       extfile.puts("")
-      extfile.puts("#if defined(HAVE_QTBINDINGS)")
-      extfile.puts("")
 
       extfile.puts("#include \"gsiClassBase.h\"")
       extfile.puts("#include \"gsiQtCommon.h\"")
@@ -2984,10 +2982,6 @@ END
       extfile.puts("")
       extfile.puts("#define QT_EXTERNAL_BASE(X) gsi::qtdecl_##X(),")
       extfile.puts("")
-      extfile.puts("#else")
-      extfile.puts("#define QT_EXTERNAL_BASE(X)")
-      extfile.puts("#endif")
-      extfile.puts("")
       extfile.puts("#endif")
       extfile.puts("")
 
@@ -2997,7 +2991,7 @@ END
 
   def produce_makefile
 
-    makefile_name = "qtdecl.pro"
+    makefile_name = "qtdecl.pri"
     makefile_path = $gen_dir + "/" + makefile_name
 
     File.open(makefile_path, "w") do |makefile|
@@ -3012,7 +3006,7 @@ END
       if @source_files
         makefile.puts("")
         makefile.puts("SOURCES += \\")
-        makefile.puts(@source_files.collect { |s| "  " + s }.join(" \\\n"))
+        makefile.puts(@source_files.collect { |s| "  $$PWD/" + s }.join(" \\\n"))
       end
 
       puts("#{makefile_name} written.")

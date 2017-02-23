@@ -47,8 +47,10 @@ inst_dir_common=`pwd`/scripts/mkqtdecl_common
 inst_dir=`pwd`/scripts/mkqtdecl
 inst_dir5=`pwd`/scripts/mkqtdecl5
 src_dir=`pwd`/src
-src_name=gsiqt
+src_name4=gsiqt4
 src_name5=gsiqt5
+
+src_name=$src_name4
 
 while [ "$1" != "" ]; do
 
@@ -194,7 +196,7 @@ else
 fi
 
 count=0
-for f in {*.cc,*.h} qtdecl.pro; do
+for f in {*.cc,*.h} qtdecl.pri; do
   needs_update=0
   if ! [ -e $src_dir/$src_name/$f ]; then
     echo "# INFO: creating new file $src_dir/$src_name/$f"

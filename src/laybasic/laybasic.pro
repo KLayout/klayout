@@ -276,22 +276,10 @@ INCLUDEPATH += ../tl ../gsi ../db ../rdb
 DEPENDPATH += ../tl ../gsi ../db ../rdb
 LIBS += -L$$DESTDIR -ltl -lgsi -ldb -lrdb
 
-# for gsiQtExternals.h:
-equals(HAVE_QT5, "1") {
-  INCLUDEPATH += ../gsiqt5
-  DEPENDPATH += ../gsiqt5
-} else {
-  INCLUDEPATH += ../gsiqt
-  DEPENDPATH += ../gsiqt
-}
+INCLUDEPATH += ../gsiqt
+DEPENDPATH += ../gsiqt
 
 equals(HAVE_QTBINDINGS, "1") {
-  INCLUDEPATH += ../gsiqt_common
-  DEPENDPATH += ../gsiqt_common
-  equals(HAVE_QT5, "1") {
-    LIBS += -lgsiqt5
-  } else {
-    LIBS += -lgsiqt
-  }
+  LIBS += -lgsiqt
 }
 

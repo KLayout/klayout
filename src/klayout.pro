@@ -60,17 +60,10 @@ equals(HAVE_PYTHON, "1") {
 lib.depends += db
 
 equals(HAVE_QTBINDINGS, "1") {
-  equals(HAVE_QT5, "1") {
-    SUBDIRS += gsiqt5
-    gsiqt5.depends += gsi
-    laybasic.depends += gsiqt5
-    lay.depends += gsiqt5 
-  } else {
-    SUBDIRS += gsiqt
-    gsiqt.depends += gsi
-    laybasic.depends += gsiqt
-    lay.depends += gsiqt 
-  }
+  SUBDIRS += gsiqt
+  gsiqt.depends += gsi
+  laybasic.depends += gsiqt
+  lay.depends += gsiqt
 }
 
 ext.depends += lay

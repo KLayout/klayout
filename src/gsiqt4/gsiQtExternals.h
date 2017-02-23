@@ -33,29 +33,8 @@
 #include "gsiClassBase.h"
 #include "gsiQtCommon.h"
 
-class QAbstractAnimation;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractAnimation> &qtdecl_QAbstractAnimation (); }
-
-class QAbstractAudioDeviceInfo;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractAudioDeviceInfo> &qtdecl_QAbstractAudioDeviceInfo (); }
-
-class QAbstractAudioInput;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractAudioInput> &qtdecl_QAbstractAudioInput (); }
-
-class QAbstractAudioOutput;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractAudioOutput> &qtdecl_QAbstractAudioOutput (); }
-
 class QAbstractButton;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractButton> &qtdecl_QAbstractButton (); }
-
-class QAbstractEventDispatcher;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractEventDispatcher> &qtdecl_QAbstractEventDispatcher (); }
-
-class QAbstractExtensionFactory;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractExtensionFactory> &qtdecl_QAbstractExtensionFactory (); }
-
-class QAbstractExtensionManager;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractExtensionManager> &qtdecl_QAbstractExtensionManager (); }
 
 class QAbstractFormBuilder;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractFormBuilder> &qtdecl_QAbstractFormBuilder (); }
@@ -75,14 +54,11 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractItemView> &qtdecl_QAbstractItem
 class QAbstractListModel;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractListModel> &qtdecl_QAbstractListModel (); }
 
-class QAbstractMessageHandler;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractMessageHandler> &qtdecl_QAbstractMessageHandler (); }
-
-class QAbstractNativeEventFilter;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractNativeEventFilter> &qtdecl_QAbstractNativeEventFilter (); }
-
 class QAbstractNetworkCache;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractNetworkCache> &qtdecl_QAbstractNetworkCache (); }
+
+class QAbstractPageSetupDialog;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractPageSetupDialog> &qtdecl_QAbstractPageSetupDialog (); }
 
 class QAbstractPrintDialog;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractPrintDialog> &qtdecl_QAbstractPrintDialog (); }
@@ -102,95 +78,29 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractSocket> &qtdecl_QAbstractSocket
 class QAbstractSpinBox;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractSpinBox> &qtdecl_QAbstractSpinBox (); }
 
-class QAbstractState;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractState> &qtdecl_QAbstractState (); }
-
 class QAbstractTableModel;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractTableModel> &qtdecl_QAbstractTableModel (); }
 
 class QAbstractTextDocumentLayout;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractTextDocumentLayout> &qtdecl_QAbstractTextDocumentLayout (); }
 
-class QAbstractTransition;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractTransition> &qtdecl_QAbstractTransition (); }
-
 class QAbstractUndoItem;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractUndoItem> &qtdecl_QAbstractUndoItem (); }
-
-class QAbstractUriResolver;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractUriResolver> &qtdecl_QAbstractUriResolver (); }
-
-class QAbstractVideoBuffer;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractVideoBuffer> &qtdecl_QAbstractVideoBuffer (); }
-
-class QAbstractVideoFilter;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractVideoFilter> &qtdecl_QAbstractVideoFilter (); }
-
-class QAbstractVideoSurface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractVideoSurface> &qtdecl_QAbstractVideoSurface (); }
-
-class QAbstractXmlNodeModel;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractXmlNodeModel> &qtdecl_QAbstractXmlNodeModel (); }
-
-class QAbstractXmlReceiver;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAbstractXmlReceiver> &qtdecl_QAbstractXmlReceiver (); }
 
 class QAccessible;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessible> &qtdecl_QAccessible (); }
 
-class QAccessibleActionInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleActionInterface> &qtdecl_QAccessibleActionInterface (); }
-
-class QAccessibleEditableTextInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleEditableTextInterface> &qtdecl_QAccessibleEditableTextInterface (); }
+class QAccessibleApplication;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleApplication> &qtdecl_QAccessibleApplication (); }
 
 class QAccessibleEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleEvent> &qtdecl_QAccessibleEvent (); }
-
-class QAccessibleImageInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleImageInterface> &qtdecl_QAccessibleImageInterface (); }
 
 class QAccessibleInterface;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleInterface> &qtdecl_QAccessibleInterface (); }
 
 class QAccessibleObject;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleObject> &qtdecl_QAccessibleObject (); }
-
-class QAccessibleStateChangeEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleStateChangeEvent> &qtdecl_QAccessibleStateChangeEvent (); }
-
-class QAccessibleTableCellInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleTableCellInterface> &qtdecl_QAccessibleTableCellInterface (); }
-
-class QAccessibleTableInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleTableInterface> &qtdecl_QAccessibleTableInterface (); }
-
-class QAccessibleTableModelChangeEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleTableModelChangeEvent> &qtdecl_QAccessibleTableModelChangeEvent (); }
-
-class QAccessibleTextCursorEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleTextCursorEvent> &qtdecl_QAccessibleTextCursorEvent (); }
-
-class QAccessibleTextInsertEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleTextInsertEvent> &qtdecl_QAccessibleTextInsertEvent (); }
-
-class QAccessibleTextInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleTextInterface> &qtdecl_QAccessibleTextInterface (); }
-
-class QAccessibleTextRemoveEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleTextRemoveEvent> &qtdecl_QAccessibleTextRemoveEvent (); }
-
-class QAccessibleTextSelectionEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleTextSelectionEvent> &qtdecl_QAccessibleTextSelectionEvent (); }
-
-class QAccessibleTextUpdateEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleTextUpdateEvent> &qtdecl_QAccessibleTextUpdateEvent (); }
-
-class QAccessibleValueChangeEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleValueChangeEvent> &qtdecl_QAccessibleValueChangeEvent (); }
-
-class QAccessibleValueInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleValueInterface> &qtdecl_QAccessibleValueInterface (); }
 
 class QAccessibleWidget;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAccessibleWidget> &qtdecl_QAccessibleWidget (); }
@@ -204,74 +114,11 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QActionEvent> &qtdecl_QActionEvent (); }
 class QActionGroup;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QActionGroup> &qtdecl_QActionGroup (); }
 
-class QAnimationDriver;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAnimationDriver> &qtdecl_QAnimationDriver (); }
-
-class QAnimationGroup;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAnimationGroup> &qtdecl_QAnimationGroup (); }
-
 class QApplication;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QApplication> &qtdecl_QApplication (); }
 
-class QApplicationStateChangeEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QApplicationStateChangeEvent> &qtdecl_QApplicationStateChangeEvent (); }
-
-class QAssociativeIterable;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAssociativeIterable> &qtdecl_QAssociativeIterable (); }
-
-class QAudioBuffer;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioBuffer> &qtdecl_QAudioBuffer (); }
-
-class QAudioDecoder;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioDecoder> &qtdecl_QAudioDecoder (); }
-
-class QAudioDecoderControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioDecoderControl> &qtdecl_QAudioDecoderControl (); }
-
-class QAudioDeviceInfo;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioDeviceInfo> &qtdecl_QAudioDeviceInfo (); }
-
-class QAudioEncoderSettings;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioEncoderSettings> &qtdecl_QAudioEncoderSettings (); }
-
-class QAudioEncoderSettingsControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioEncoderSettingsControl> &qtdecl_QAudioEncoderSettingsControl (); }
-
-class QAudioFormat;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioFormat> &qtdecl_QAudioFormat (); }
-
-class QAudioInput;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioInput> &qtdecl_QAudioInput (); }
-
-class QAudioInputSelectorControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioInputSelectorControl> &qtdecl_QAudioInputSelectorControl (); }
-
-class QAudioOutput;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioOutput> &qtdecl_QAudioOutput (); }
-
-class QAudioOutputSelectorControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioOutputSelectorControl> &qtdecl_QAudioOutputSelectorControl (); }
-
-class QAudioProbe;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioProbe> &qtdecl_QAudioProbe (); }
-
-class QAudioRecorder;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioRecorder> &qtdecl_QAudioRecorder (); }
-
-class QAudioSystemFactoryInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioSystemFactoryInterface> &qtdecl_QAudioSystemFactoryInterface (); }
-
-class QAudioSystemPlugin;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioSystemPlugin> &qtdecl_QAudioSystemPlugin (); }
-
 class QAuthenticator;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAuthenticator> &qtdecl_QAuthenticator (); }
-
-class QBackingStore;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QBackingStore> &qtdecl_QBackingStore (); }
-
-class QBasicMutex;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QBasicMutex> &qtdecl_QBasicMutex (); }
 
 class QBasicTimer;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QBasicTimer> &qtdecl_QBasicTimer (); }
@@ -291,80 +138,14 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QBuffer> &qtdecl_QBuffer (); }
 class QButtonGroup;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QButtonGroup> &qtdecl_QButtonGroup (); }
 
-class QByteArrayDataPtr;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QByteArrayDataPtr> &qtdecl_QByteArrayDataPtr (); }
-
 class QByteArrayMatcher;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QByteArrayMatcher> &qtdecl_QByteArrayMatcher (); }
 
+class QCDEStyle;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QCDEStyle> &qtdecl_QCDEStyle (); }
+
 class QCalendarWidget;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QCalendarWidget> &qtdecl_QCalendarWidget (); }
-
-class QCamera;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCamera> &qtdecl_QCamera (); }
-
-class QCameraCaptureBufferFormatControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraCaptureBufferFormatControl> &qtdecl_QCameraCaptureBufferFormatControl (); }
-
-class QCameraCaptureDestinationControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraCaptureDestinationControl> &qtdecl_QCameraCaptureDestinationControl (); }
-
-class QCameraControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraControl> &qtdecl_QCameraControl (); }
-
-class QCameraExposure;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraExposure> &qtdecl_QCameraExposure (); }
-
-class QCameraExposureControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraExposureControl> &qtdecl_QCameraExposureControl (); }
-
-class QCameraFeedbackControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraFeedbackControl> &qtdecl_QCameraFeedbackControl (); }
-
-class QCameraFlashControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraFlashControl> &qtdecl_QCameraFlashControl (); }
-
-class QCameraFocus;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraFocus> &qtdecl_QCameraFocus (); }
-
-class QCameraFocusControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraFocusControl> &qtdecl_QCameraFocusControl (); }
-
-class QCameraFocusZone;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraFocusZone> &qtdecl_QCameraFocusZone (); }
-
-class QCameraImageCapture;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraImageCapture> &qtdecl_QCameraImageCapture (); }
-
-class QCameraImageCaptureControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraImageCaptureControl> &qtdecl_QCameraImageCaptureControl (); }
-
-class QCameraImageProcessing;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraImageProcessing> &qtdecl_QCameraImageProcessing (); }
-
-class QCameraImageProcessingControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraImageProcessingControl> &qtdecl_QCameraImageProcessingControl (); }
-
-class QCameraInfo;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraInfo> &qtdecl_QCameraInfo (); }
-
-class QCameraInfoControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraInfoControl> &qtdecl_QCameraInfoControl (); }
-
-class QCameraLocksControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraLocksControl> &qtdecl_QCameraLocksControl (); }
-
-class QCameraViewfinderSettings;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraViewfinderSettings> &qtdecl_QCameraViewfinderSettings (); }
-
-class QCameraViewfinderSettingsControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraViewfinderSettingsControl> &qtdecl_QCameraViewfinderSettingsControl (); }
-
-class QCameraViewfinderSettingsControl2;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraViewfinderSettingsControl2> &qtdecl_QCameraViewfinderSettingsControl2 (); }
-
-class QCameraZoomControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCameraZoomControl> &qtdecl_QCameraZoomControl (); }
 
 class QCheckBox;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QCheckBox> &qtdecl_QCheckBox (); }
@@ -372,17 +153,17 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QCheckBox> &qtdecl_QCheckBox (); }
 class QChildEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QChildEvent> &qtdecl_QChildEvent (); }
 
+class QCleanlooksStyle;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QCleanlooksStyle> &qtdecl_QCleanlooksStyle (); }
+
 class QClipboard;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QClipboard> &qtdecl_QClipboard (); }
 
+class QClipboardEvent;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QClipboardEvent> &qtdecl_QClipboardEvent (); }
+
 class QCloseEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QCloseEvent> &qtdecl_QCloseEvent (); }
-
-class QCollator;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCollator> &qtdecl_QCollator (); }
-
-class QCollatorSortKey;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCollatorSortKey> &qtdecl_QCollatorSortKey (); }
 
 class QColor;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QColor> &qtdecl_QColor (); }
@@ -398,12 +179,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QColumnView> &qtdecl_QColumnView (); }
 
 class QComboBox;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QComboBox> &qtdecl_QComboBox (); }
-
-class QCommandLineOption;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCommandLineOption> &qtdecl_QCommandLineOption (); }
-
-class QCommandLineParser;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QCommandLineParser> &qtdecl_QCommandLineParser (); }
 
 class QCommandLinkButton;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QCommandLinkButton> &qtdecl_QCommandLinkButton (); }
@@ -447,15 +222,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QDateTime> &qtdecl_QDateTime (); }
 class QDateTimeEdit;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QDateTimeEdit> &qtdecl_QDateTimeEdit (); }
 
-class QDebug;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QDebug> &qtdecl_QDebug (); }
-
-class QDebugStateSaver;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QDebugStateSaver> &qtdecl_QDebugStateSaver (); }
-
-class QDeferredDeleteEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QDeferredDeleteEvent> &qtdecl_QDeferredDeleteEvent (); }
-
 class QDesktopServices;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QDesktopServices> &qtdecl_QDesktopServices (); }
 
@@ -479,24 +245,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QDirIterator> &qtdecl_QDirIterator (); }
 
 class QDirModel;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QDirModel> &qtdecl_QDirModel (); }
-
-class QDnsDomainNameRecord;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QDnsDomainNameRecord> &qtdecl_QDnsDomainNameRecord (); }
-
-class QDnsHostAddressRecord;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QDnsHostAddressRecord> &qtdecl_QDnsHostAddressRecord (); }
-
-class QDnsLookup;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QDnsLookup> &qtdecl_QDnsLookup (); }
-
-class QDnsMailExchangeRecord;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QDnsMailExchangeRecord> &qtdecl_QDnsMailExchangeRecord (); }
-
-class QDnsServiceRecord;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QDnsServiceRecord> &qtdecl_QDnsServiceRecord (); }
-
-class QDnsTextRecord;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QDnsTextRecord> &qtdecl_QDnsTextRecord (); }
 
 class QDockWidget;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QDockWidget> &qtdecl_QDockWidget (); }
@@ -570,6 +318,9 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QDragLeaveEvent> &qtdecl_QDragLeaveEvent
 class QDragMoveEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QDragMoveEvent> &qtdecl_QDragMoveEvent (); }
 
+class QDragResponseEvent;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QDragResponseEvent> &qtdecl_QDragResponseEvent (); }
+
 class QDropEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QDropEvent> &qtdecl_QDropEvent (); }
 
@@ -578,12 +329,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QDynamicPropertyChangeEvent> &qtdecl_QDy
 
 class QEasingCurve;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QEasingCurve> &qtdecl_QEasingCurve (); }
-
-class QElapsedTimer;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QElapsedTimer> &qtdecl_QElapsedTimer (); }
-
-class QEnterEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QEnterEvent> &qtdecl_QEnterEvent (); }
 
 class QErrorMessage;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QErrorMessage> &qtdecl_QErrorMessage (); }
@@ -594,23 +339,11 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QEvent> &qtdecl_QEvent (); }
 class QEventLoop;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QEventLoop> &qtdecl_QEventLoop (); }
 
-class QEventLoopLocker;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QEventLoopLocker> &qtdecl_QEventLoopLocker (); }
-
-class QEventTransition;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QEventTransition> &qtdecl_QEventTransition (); }
-
-class QExposeEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QExposeEvent> &qtdecl_QExposeEvent (); }
-
 class QFactoryInterface;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QFactoryInterface> &qtdecl_QFactoryInterface (); }
 
 class QFile;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QFile> &qtdecl_QFile (); }
-
-class QFileDevice;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QFileDevice> &qtdecl_QFileDevice (); }
 
 class QFileDialog;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QFileDialog> &qtdecl_QFileDialog (); }
@@ -624,17 +357,11 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QFileInfo> &qtdecl_QFileInfo (); }
 class QFileOpenEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QFileOpenEvent> &qtdecl_QFileOpenEvent (); }
 
-class QFileSelector;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QFileSelector> &qtdecl_QFileSelector (); }
-
 class QFileSystemModel;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QFileSystemModel> &qtdecl_QFileSystemModel (); }
 
 class QFileSystemWatcher;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QFileSystemWatcher> &qtdecl_QFileSystemWatcher (); }
-
-class QFinalState;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QFinalState> &qtdecl_QFinalState (); }
 
 class QFocusEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QFocusEvent> &qtdecl_QFocusEvent (); }
@@ -672,11 +399,8 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QFormLayout> &qtdecl_QFormLayout (); }
 class QFrame;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QFrame> &qtdecl_QFrame (); }
 
-class QGenericPlugin;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QGenericPlugin> &qtdecl_QGenericPlugin (); }
-
-class QGenericPluginFactory;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QGenericPluginFactory> &qtdecl_QGenericPluginFactory (); }
+class QFtp;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QFtp> &qtdecl_QFtp (); }
 
 class QGesture;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QGesture> &qtdecl_QGesture (); }
@@ -686,9 +410,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QGestureEvent> &qtdecl_QGestureEvent ();
 
 class QGestureRecognizer;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QGestureRecognizer> &qtdecl_QGestureRecognizer (); }
-
-class QGlyphRun;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QGlyphRun> &qtdecl_QGlyphRun (); }
 
 class QGradient;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QGradient> &qtdecl_QGradient (); }
@@ -798,17 +519,11 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QGraphicsSceneWheelEvent> &qtdecl_QGraph
 class QGraphicsSimpleTextItem;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QGraphicsSimpleTextItem> &qtdecl_QGraphicsSimpleTextItem (); }
 
-class QGraphicsSvgItem;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QGraphicsSvgItem> &qtdecl_QGraphicsSvgItem (); }
-
 class QGraphicsTextItem;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QGraphicsTextItem> &qtdecl_QGraphicsTextItem (); }
 
 class QGraphicsTransform;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QGraphicsTransform> &qtdecl_QGraphicsTransform (); }
-
-class QGraphicsVideoItem;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QGraphicsVideoItem> &qtdecl_QGraphicsVideoItem (); }
 
 class QGraphicsView;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QGraphicsView> &qtdecl_QGraphicsView (); }
@@ -822,9 +537,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QGridLayout> &qtdecl_QGridLayout (); }
 class QGroupBox;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QGroupBox> &qtdecl_QGroupBox (); }
 
-class QGuiApplication;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QGuiApplication> &qtdecl_QGuiApplication (); }
-
 class QHBoxLayout;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QHBoxLayout> &qtdecl_QHBoxLayout (); }
 
@@ -837,9 +549,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QHelpEvent> &qtdecl_QHelpEvent (); }
 class QHideEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QHideEvent> &qtdecl_QHideEvent (); }
 
-class QHistoryState;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QHistoryState> &qtdecl_QHistoryState (); }
-
 class QHostAddress;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QHostAddress> &qtdecl_QHostAddress (); }
 
@@ -848,12 +557,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QHostInfo> &qtdecl_QHostInfo (); }
 
 class QHoverEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QHoverEvent> &qtdecl_QHoverEvent (); }
-
-class QHttpMultiPart;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QHttpMultiPart> &qtdecl_QHttpMultiPart (); }
-
-class QHttpPart;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QHttpPart> &qtdecl_QHttpPart (); }
 
 class QIODevice;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QIODevice> &qtdecl_QIODevice (); }
@@ -873,17 +576,14 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QIconEngine> &qtdecl_QIconEngine (); }
 class QIconEnginePlugin;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QIconEnginePlugin> &qtdecl_QIconEnginePlugin (); }
 
-class QIdentityProxyModel;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QIdentityProxyModel> &qtdecl_QIdentityProxyModel (); }
+class QIconEnginePluginV2;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QIconEnginePluginV2> &qtdecl_QIconEnginePluginV2 (); }
+
+class QIconEngineV2;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QIconEngineV2> &qtdecl_QIconEngineV2 (); }
 
 class QImage;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QImage> &qtdecl_QImage (); }
-
-class QImageEncoderControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QImageEncoderControl> &qtdecl_QImageEncoderControl (); }
-
-class QImageEncoderSettings;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QImageEncoderSettings> &qtdecl_QImageEncoderSettings (); }
 
 class QImageIOHandler;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QImageIOHandler> &qtdecl_QImageIOHandler (); }
@@ -894,8 +594,20 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QImageIOPlugin> &qtdecl_QImageIOPlugin (
 class QImageReader;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QImageReader> &qtdecl_QImageReader (); }
 
+class QImageTextKeyLang;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QImageTextKeyLang> &qtdecl_QImageTextKeyLang (); }
+
 class QImageWriter;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QImageWriter> &qtdecl_QImageWriter (); }
+
+class QInputContext;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QInputContext> &qtdecl_QInputContext (); }
+
+class QInputContextFactory;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QInputContextFactory> &qtdecl_QInputContextFactory (); }
+
+class QInputContextPlugin;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QInputContextPlugin> &qtdecl_QInputContextPlugin (); }
 
 class QInputDialog;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QInputDialog> &qtdecl_QInputDialog (); }
@@ -903,14 +615,8 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QInputDialog> &qtdecl_QInputDialog (); }
 class QInputEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QInputEvent> &qtdecl_QInputEvent (); }
 
-class QInputMethod;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QInputMethod> &qtdecl_QInputMethod (); }
-
 class QInputMethodEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QInputMethodEvent> &qtdecl_QInputMethodEvent (); }
-
-class QInputMethodQueryEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QInputMethodQueryEvent> &qtdecl_QInputMethodQueryEvent (); }
 
 class QIntValidator;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QIntValidator> &qtdecl_QIntValidator (); }
@@ -933,38 +639,11 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QItemSelectionModel> &qtdecl_QItemSelect
 class QItemSelectionRange;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QItemSelectionRange> &qtdecl_QItemSelectionRange (); }
 
-class QJsonArray;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QJsonArray> &qtdecl_QJsonArray (); }
-
-class QJsonDocument;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QJsonDocument> &qtdecl_QJsonDocument (); }
-
-class QJsonObject;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QJsonObject> &qtdecl_QJsonObject (); }
-
-class QJsonParseError;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QJsonParseError> &qtdecl_QJsonParseError (); }
-
-class QJsonValue;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QJsonValue> &qtdecl_QJsonValue (); }
-
-class QJsonValuePtr;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QJsonValuePtr> &qtdecl_QJsonValuePtr (); }
-
-class QJsonValueRef;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QJsonValueRef> &qtdecl_QJsonValueRef (); }
-
-class QJsonValueRefPtr;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QJsonValueRefPtr> &qtdecl_QJsonValueRefPtr (); }
-
 class QKeyEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QKeyEvent> &qtdecl_QKeyEvent (); }
 
 class QKeySequence;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QKeySequence> &qtdecl_QKeySequence (); }
-
-class QKeySequenceEdit;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QKeySequenceEdit> &qtdecl_QKeySequenceEdit (); }
 
 class QLCDNumber;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QLCDNumber> &qtdecl_QLCDNumber (); }
@@ -1014,26 +693,11 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QLocalSocket> &qtdecl_QLocalSocket (); }
 class QLocale;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QLocale> &qtdecl_QLocale (); }
 
-class QLockFile;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QLockFile> &qtdecl_QLockFile (); }
-
-class QLoggingCategory;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QLoggingCategory> &qtdecl_QLoggingCategory (); }
-
 class QMainWindow;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMainWindow> &qtdecl_QMainWindow (); }
 
-class QMapDataBase;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMapDataBase> &qtdecl_QMapDataBase (); }
-
-class QMapNodeBase;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMapNodeBase> &qtdecl_QMapNodeBase (); }
-
 class QMargins;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMargins> &qtdecl_QMargins (); }
-
-class QMarginsF;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMarginsF> &qtdecl_QMarginsF (); }
 
 class QMatrix;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMatrix> &qtdecl_QMatrix (); }
@@ -1047,116 +711,17 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QMdiArea> &qtdecl_QMdiArea (); }
 class QMdiSubWindow;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMdiSubWindow> &qtdecl_QMdiSubWindow (); }
 
-class QMediaAudioProbeControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaAudioProbeControl> &qtdecl_QMediaAudioProbeControl (); }
-
-class QMediaAvailabilityControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaAvailabilityControl> &qtdecl_QMediaAvailabilityControl (); }
-
-class QMediaBindableInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaBindableInterface> &qtdecl_QMediaBindableInterface (); }
-
-class QMediaContainerControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaContainerControl> &qtdecl_QMediaContainerControl (); }
-
-class QMediaContent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaContent> &qtdecl_QMediaContent (); }
-
-class QMediaControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaControl> &qtdecl_QMediaControl (); }
-
-class QMediaGaplessPlaybackControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaGaplessPlaybackControl> &qtdecl_QMediaGaplessPlaybackControl (); }
-
-class QMediaNetworkAccessControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaNetworkAccessControl> &qtdecl_QMediaNetworkAccessControl (); }
-
-class QMediaObject;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaObject> &qtdecl_QMediaObject (); }
-
-class QMediaPlayer;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaPlayer> &qtdecl_QMediaPlayer (); }
-
-class QMediaPlayerControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaPlayerControl> &qtdecl_QMediaPlayerControl (); }
-
-class QMediaPlaylist;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaPlaylist> &qtdecl_QMediaPlaylist (); }
-
-class QMediaRecorder;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaRecorder> &qtdecl_QMediaRecorder (); }
-
-class QMediaRecorderControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaRecorderControl> &qtdecl_QMediaRecorderControl (); }
-
-class QMediaResource;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaResource> &qtdecl_QMediaResource (); }
-
-class QMediaService;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaService> &qtdecl_QMediaService (); }
-
-class QMediaServiceCameraInfoInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceCameraInfoInterface> &qtdecl_QMediaServiceCameraInfoInterface (); }
-
-class QMediaServiceDefaultDeviceInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceDefaultDeviceInterface> &qtdecl_QMediaServiceDefaultDeviceInterface (); }
-
-class QMediaServiceFeaturesInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceFeaturesInterface> &qtdecl_QMediaServiceFeaturesInterface (); }
-
-class QMediaServiceProviderFactoryInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceProviderFactoryInterface> &qtdecl_QMediaServiceProviderFactoryInterface (); }
-
-class QMediaServiceProviderHint;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceProviderHint> &qtdecl_QMediaServiceProviderHint (); }
-
-class QMediaServiceProviderPlugin;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceProviderPlugin> &qtdecl_QMediaServiceProviderPlugin (); }
-
-class QMediaServiceSupportedDevicesInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceSupportedDevicesInterface> &qtdecl_QMediaServiceSupportedDevicesInterface (); }
-
-class QMediaServiceSupportedFormatsInterface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceSupportedFormatsInterface> &qtdecl_QMediaServiceSupportedFormatsInterface (); }
-
-class QMediaStreamsControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaStreamsControl> &qtdecl_QMediaStreamsControl (); }
-
-class QMediaTimeInterval;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaTimeInterval> &qtdecl_QMediaTimeInterval (); }
-
-class QMediaTimeRange;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaTimeRange> &qtdecl_QMediaTimeRange (); }
-
-class QMediaVideoProbeControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaVideoProbeControl> &qtdecl_QMediaVideoProbeControl (); }
-
 class QMenu;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMenu> &qtdecl_QMenu (); }
 
 class QMenuBar;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMenuBar> &qtdecl_QMenuBar (); }
 
-class QMessageAuthenticationCode;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMessageAuthenticationCode> &qtdecl_QMessageAuthenticationCode (); }
-
 class QMessageBox;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMessageBox> &qtdecl_QMessageBox (); }
 
-class QMessageLogContext;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMessageLogContext> &qtdecl_QMessageLogContext (); }
-
-class QMessageLogger;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMessageLogger> &qtdecl_QMessageLogger (); }
-
 class QMetaClassInfo;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaClassInfo> &qtdecl_QMetaClassInfo (); }
-
-class QMetaDataReaderControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaDataReaderControl> &qtdecl_QMetaDataReaderControl (); }
-
-class QMetaDataWriterControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaDataWriterControl> &qtdecl_QMetaDataWriterControl (); }
 
 class QMetaEnum;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaEnum> &qtdecl_QMetaEnum (); }
@@ -1170,17 +735,20 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaObject> &qtdecl_QMetaObject (); }
 class QMetaProperty;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaProperty> &qtdecl_QMetaProperty (); }
 
+class QMetaType;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaType> &qtdecl_QMetaType (); }
+
 class QMimeData;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMimeData> &qtdecl_QMimeData (); }
 
-class QMimeDatabase;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMimeDatabase> &qtdecl_QMimeDatabase (); }
-
-class QMimeType;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QMimeType> &qtdecl_QMimeType (); }
+class QMimeSource;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QMimeSource> &qtdecl_QMimeSource (); }
 
 class QModelIndex;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QModelIndex> &qtdecl_QModelIndex (); }
+
+class QMotifStyle;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QMotifStyle> &qtdecl_QMotifStyle (); }
 
 class QMouseEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMouseEvent> &qtdecl_QMouseEvent (); }
@@ -1194,9 +762,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QMovie> &qtdecl_QMovie (); }
 class QMutex;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMutex> &qtdecl_QMutex (); }
 
-class QNativeGestureEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QNativeGestureEvent> &qtdecl_QNativeGestureEvent (); }
-
 class QNetworkAccessManager;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QNetworkAccessManager> &qtdecl_QNetworkAccessManager (); }
 
@@ -1205,12 +770,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QNetworkAddressEntry> &qtdecl_QNetworkAd
 
 class QNetworkCacheMetaData;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QNetworkCacheMetaData> &qtdecl_QNetworkCacheMetaData (); }
-
-class QNetworkConfiguration;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QNetworkConfiguration> &qtdecl_QNetworkConfiguration (); }
-
-class QNetworkConfigurationManager;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QNetworkConfigurationManager> &qtdecl_QNetworkConfigurationManager (); }
 
 class QNetworkCookie;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QNetworkCookie> &qtdecl_QNetworkCookie (); }
@@ -1239,35 +798,14 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QNetworkReply> &qtdecl_QNetworkReply ();
 class QNetworkRequest;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QNetworkRequest> &qtdecl_QNetworkRequest (); }
 
-class QNetworkSession;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QNetworkSession> &qtdecl_QNetworkSession (); }
-
-class QNoDebug;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QNoDebug> &qtdecl_QNoDebug (); }
-
 class QObject;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QObject> &qtdecl_QObject (); }
-
-class QOffscreenSurface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QOffscreenSurface> &qtdecl_QOffscreenSurface (); }
-
-class QPageLayout;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QPageLayout> &qtdecl_QPageLayout (); }
 
 class QPageSetupDialog;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QPageSetupDialog> &qtdecl_QPageSetupDialog (); }
 
-class QPageSize;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QPageSize> &qtdecl_QPageSize (); }
-
-class QPagedPaintDevice;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QPagedPaintDevice> &qtdecl_QPagedPaintDevice (); }
-
 class QPaintDevice;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QPaintDevice> &qtdecl_QPaintDevice (); }
-
-class QPaintDeviceWindow;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QPaintDeviceWindow> &qtdecl_QPaintDeviceWindow (); }
 
 class QPaintEngine;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QPaintEngine> &qtdecl_QPaintEngine (); }
@@ -1293,15 +831,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QPalette> &qtdecl_QPalette (); }
 class QPanGesture;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QPanGesture> &qtdecl_QPanGesture (); }
 
-class QParallelAnimationGroup;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QParallelAnimationGroup> &qtdecl_QParallelAnimationGroup (); }
-
-class QPauseAnimation;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QPauseAnimation> &qtdecl_QPauseAnimation (); }
-
-class QPdfWriter;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QPdfWriter> &qtdecl_QPdfWriter (); }
-
 class QPen;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QPen> &qtdecl_QPen (); }
 
@@ -1311,14 +840,8 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QPersistentModelIndex> &qtdecl_QPersiste
 class QPicture;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QPicture> &qtdecl_QPicture (); }
 
-class QPictureFormatPlugin;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QPictureFormatPlugin> &qtdecl_QPictureFormatPlugin (); }
-
 class QPinchGesture;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QPinchGesture> &qtdecl_QPinchGesture (); }
-
-class QPixelFormat;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QPixelFormat> &qtdecl_QPixelFormat (); }
 
 class QPixmap;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QPixmap> &qtdecl_QPixmap (); }
@@ -1332,8 +855,8 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QPlainTextDocumentLayout> &qtdecl_QPlain
 class QPlainTextEdit;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QPlainTextEdit> &qtdecl_QPlainTextEdit (); }
 
-class QPlatformSurfaceEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QPlatformSurfaceEvent> &qtdecl_QPlatformSurfaceEvent (); }
+class QPlastiqueStyle;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QPlastiqueStyle> &qtdecl_QPlastiqueStyle (); }
 
 class QPluginLoader;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QPluginLoader> &qtdecl_QPluginLoader (); }
@@ -1380,9 +903,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QProgressBar> &qtdecl_QProgressBar (); }
 class QProgressDialog;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QProgressDialog> &qtdecl_QProgressDialog (); }
 
-class QPropertyAnimation;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QPropertyAnimation> &qtdecl_QPropertyAnimation (); }
-
 class QPushButton;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QPushButton> &qtdecl_QPushButton (); }
 
@@ -1394,24 +914,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QRadialGradient> &qtdecl_QRadialGradient
 
 class QRadioButton;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QRadioButton> &qtdecl_QRadioButton (); }
-
-class QRadioData;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QRadioData> &qtdecl_QRadioData (); }
-
-class QRadioDataControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QRadioDataControl> &qtdecl_QRadioDataControl (); }
-
-class QRadioTuner;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QRadioTuner> &qtdecl_QRadioTuner (); }
-
-class QRadioTunerControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QRadioTunerControl> &qtdecl_QRadioTunerControl (); }
-
-class QRasterWindow;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QRasterWindow> &qtdecl_QRasterWindow (); }
-
-class QRawFont;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QRawFont> &qtdecl_QRawFont (); }
 
 class QReadLocker;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QReadLocker> &qtdecl_QReadLocker (); }
@@ -1434,18 +936,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QRegExpValidator> &qtdecl_QRegExpValidat
 class QRegion;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QRegion> &qtdecl_QRegion (); }
 
-class QRegularExpression;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QRegularExpression> &qtdecl_QRegularExpression (); }
-
-class QRegularExpressionMatch;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QRegularExpressionMatch> &qtdecl_QRegularExpressionMatch (); }
-
-class QRegularExpressionMatchIterator;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QRegularExpressionMatchIterator> &qtdecl_QRegularExpressionMatchIterator (); }
-
-class QRegularExpressionValidator;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QRegularExpressionValidator> &qtdecl_QRegularExpressionValidator (); }
-
 class QResizeEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QResizeEvent> &qtdecl_QResizeEvent (); }
 
@@ -1455,53 +945,17 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QResource> &qtdecl_QResource (); }
 class QRubberBand;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QRubberBand> &qtdecl_QRubberBand (); }
 
-class QRunnable;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QRunnable> &qtdecl_QRunnable (); }
-
-class QSaveFile;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSaveFile> &qtdecl_QSaveFile (); }
-
-class QScreen;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QScreen> &qtdecl_QScreen (); }
-
-class QScreenOrientationChangeEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QScreenOrientationChangeEvent> &qtdecl_QScreenOrientationChangeEvent (); }
-
 class QScrollArea;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QScrollArea> &qtdecl_QScrollArea (); }
 
 class QScrollBar;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QScrollBar> &qtdecl_QScrollBar (); }
 
-class QScrollEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QScrollEvent> &qtdecl_QScrollEvent (); }
-
-class QScrollPrepareEvent;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QScrollPrepareEvent> &qtdecl_QScrollPrepareEvent (); }
-
-class QScroller;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QScroller> &qtdecl_QScroller (); }
-
-class QScrollerProperties;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QScrollerProperties> &qtdecl_QScrollerProperties (); }
-
 class QSemaphore;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSemaphore> &qtdecl_QSemaphore (); }
 
-class QSequentialAnimationGroup;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSequentialAnimationGroup> &qtdecl_QSequentialAnimationGroup (); }
-
-class QSequentialIterable;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSequentialIterable> &qtdecl_QSequentialIterable (); }
-
-class QSessionManager;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSessionManager> &qtdecl_QSessionManager (); }
-
 class QSettings;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSettings> &qtdecl_QSettings (); }
-
-class QSharedMemory;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSharedMemory> &qtdecl_QSharedMemory (); }
 
 class QShortcut;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QShortcut> &qtdecl_QShortcut (); }
@@ -1512,17 +966,8 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QShortcutEvent> &qtdecl_QShortcutEvent (
 class QShowEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QShowEvent> &qtdecl_QShowEvent (); }
 
-class QSignalBlocker;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSignalBlocker> &qtdecl_QSignalBlocker (); }
-
 class QSignalMapper;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSignalMapper> &qtdecl_QSignalMapper (); }
-
-class QSignalTransition;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSignalTransition> &qtdecl_QSignalTransition (); }
-
-class QSimpleXmlNodeModel;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSimpleXmlNodeModel> &qtdecl_QSimpleXmlNodeModel (); }
 
 class QSize;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSize> &qtdecl_QSize (); }
@@ -1547,12 +992,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QSortFilterProxyModel> &qtdecl_QSortFilt
 
 class QSound;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSound> &qtdecl_QSound (); }
-
-class QSoundEffect;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSoundEffect> &qtdecl_QSoundEffect (); }
-
-class QSourceLocation;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSourceLocation> &qtdecl_QSourceLocation (); }
 
 class QSpacerItem;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSpacerItem> &qtdecl_QSpacerItem (); }
@@ -1611,26 +1050,17 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QSqlTableModel> &qtdecl_QSqlTableModel (
 class QSslCertificate;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSslCertificate> &qtdecl_QSslCertificate (); }
 
-class QSslCertificateExtension;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSslCertificateExtension> &qtdecl_QSslCertificateExtension (); }
-
 class QSslCipher;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSslCipher> &qtdecl_QSslCipher (); }
 
 class QSslConfiguration;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSslConfiguration> &qtdecl_QSslConfiguration (); }
 
-class QSslEllipticCurve;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSslEllipticCurve> &qtdecl_QSslEllipticCurve (); }
-
 class QSslError;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSslError> &qtdecl_QSslError (); }
 
 class QSslKey;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSslKey> &qtdecl_QSslKey (); }
-
-class QSslPreSharedKeyAuthenticator;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSslPreSharedKeyAuthenticator> &qtdecl_QSslPreSharedKeyAuthenticator (); }
 
 class QSslSocket;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSslSocket> &qtdecl_QSslSocket (); }
@@ -1647,32 +1077,11 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QStandardItem> &qtdecl_QStandardItem ();
 class QStandardItemModel;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStandardItemModel> &qtdecl_QStandardItemModel (); }
 
-class QStandardPaths;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QStandardPaths> &qtdecl_QStandardPaths (); }
-
-class QState;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QState> &qtdecl_QState (); }
-
-class QStateMachine;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QStateMachine> &qtdecl_QStateMachine (); }
-
-class QStaticPlugin;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QStaticPlugin> &qtdecl_QStaticPlugin (); }
-
-class QStaticText;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QStaticText> &qtdecl_QStaticText (); }
-
 class QStatusBar;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStatusBar> &qtdecl_QStatusBar (); }
 
 class QStatusTipEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStatusTipEvent> &qtdecl_QStatusTipEvent (); }
-
-class QStorageInfo;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QStorageInfo> &qtdecl_QStorageInfo (); }
-
-class QStringDataPtr;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QStringDataPtr> &qtdecl_QStringDataPtr (); }
 
 class QStringListModel;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStringListModel> &qtdecl_QStringListModel (); }
@@ -1695,9 +1104,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleHintReturnMask> &qtdecl_QStyleHint
 class QStyleHintReturnVariant;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleHintReturnVariant> &qtdecl_QStyleHintReturnVariant (); }
 
-class QStyleHints;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleHints> &qtdecl_QStyleHints (); }
-
 class QStyleOption;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOption> &qtdecl_QStyleOption (); }
 
@@ -1719,6 +1125,12 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionFocusRect> &qtdecl_QStyleOpt
 class QStyleOptionFrame;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionFrame> &qtdecl_QStyleOptionFrame (); }
 
+class QStyleOptionFrameV2;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionFrameV2> &qtdecl_QStyleOptionFrameV2 (); }
+
+class QStyleOptionFrameV3;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionFrameV3> &qtdecl_QStyleOptionFrameV3 (); }
+
 class QStyleOptionGraphicsItem;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionGraphicsItem> &qtdecl_QStyleOptionGraphicsItem (); }
 
@@ -1733,6 +1145,18 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionMenuItem> &qtdecl_QStyleOpti
 
 class QStyleOptionProgressBar;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionProgressBar> &qtdecl_QStyleOptionProgressBar (); }
+
+class QStyleOptionProgressBarV2;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionProgressBarV2> &qtdecl_QStyleOptionProgressBarV2 (); }
+
+class QStyleOptionQ3DockWindow;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionQ3DockWindow> &qtdecl_QStyleOptionQ3DockWindow (); }
+
+class QStyleOptionQ3ListView;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionQ3ListView> &qtdecl_QStyleOptionQ3ListView (); }
+
+class QStyleOptionQ3ListViewItem;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionQ3ListViewItem> &qtdecl_QStyleOptionQ3ListViewItem (); }
 
 class QStyleOptionRubberBand;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionRubberBand> &qtdecl_QStyleOptionRubberBand (); }
@@ -1752,6 +1176,15 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionTab> &qtdecl_QStyleOptionTab
 class QStyleOptionTabBarBase;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionTabBarBase> &qtdecl_QStyleOptionTabBarBase (); }
 
+class QStyleOptionTabBarBaseV2;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionTabBarBaseV2> &qtdecl_QStyleOptionTabBarBaseV2 (); }
+
+class QStyleOptionTabV2;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionTabV2> &qtdecl_QStyleOptionTabV2 (); }
+
+class QStyleOptionTabV3;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionTabV3> &qtdecl_QStyleOptionTabV3 (); }
+
 class QStyleOptionTabWidgetFrame;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionTabWidgetFrame> &qtdecl_QStyleOptionTabWidgetFrame (); }
 
@@ -1764,11 +1197,23 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionToolBar> &qtdecl_QStyleOptio
 class QStyleOptionToolBox;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionToolBox> &qtdecl_QStyleOptionToolBox (); }
 
+class QStyleOptionToolBoxV2;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionToolBoxV2> &qtdecl_QStyleOptionToolBoxV2 (); }
+
 class QStyleOptionToolButton;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionToolButton> &qtdecl_QStyleOptionToolButton (); }
 
 class QStyleOptionViewItem;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionViewItem> &qtdecl_QStyleOptionViewItem (); }
+
+class QStyleOptionViewItemV2;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionViewItemV2> &qtdecl_QStyleOptionViewItemV2 (); }
+
+class QStyleOptionViewItemV3;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionViewItemV3> &qtdecl_QStyleOptionViewItemV3 (); }
+
+class QStyleOptionViewItemV4;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QStyleOptionViewItemV4> &qtdecl_QStyleOptionViewItemV4 (); }
 
 class QStylePainter;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStylePainter> &qtdecl_QStylePainter (); }
@@ -1779,21 +1224,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QStylePlugin> &qtdecl_QStylePlugin (); }
 class QStyledItemDelegate;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStyledItemDelegate> &qtdecl_QStyledItemDelegate (); }
 
-class QSurface;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSurface> &qtdecl_QSurface (); }
-
-class QSurfaceFormat;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSurfaceFormat> &qtdecl_QSurfaceFormat (); }
-
-class QSvgGenerator;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSvgGenerator> &qtdecl_QSvgGenerator (); }
-
-class QSvgRenderer;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSvgRenderer> &qtdecl_QSvgRenderer (); }
-
-class QSvgWidget;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSvgWidget> &qtdecl_QSvgWidget (); }
-
 class QSwipeGesture;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSwipeGesture> &qtdecl_QSwipeGesture (); }
 
@@ -1803,8 +1233,8 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QSyntaxHighlighter> &qtdecl_QSyntaxHighl
 class QSysInfo;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSysInfo> &qtdecl_QSysInfo (); }
 
-class QSystemSemaphore;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QSystemSemaphore> &qtdecl_QSystemSemaphore (); }
+class QSystemLocale;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QSystemLocale> &qtdecl_QSystemLocale (); }
 
 class QSystemTrayIcon;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QSystemTrayIcon> &qtdecl_QSystemTrayIcon (); }
@@ -1842,9 +1272,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QTcpServer> &qtdecl_QTcpServer (); }
 class QTcpSocket;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QTcpSocket> &qtdecl_QTcpSocket (); }
 
-class QTemporaryDir;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QTemporaryDir> &qtdecl_QTemporaryDir (); }
-
 class QTemporaryFile;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QTemporaryFile> &qtdecl_QTemporaryFile (); }
 
@@ -1859,9 +1286,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QTextBlockGroup> &qtdecl_QTextBlockGroup
 
 class QTextBlockUserData;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QTextBlockUserData> &qtdecl_QTextBlockUserData (); }
-
-class QTextBoundaryFinder;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QTextBoundaryFinder> &qtdecl_QTextBoundaryFinder (); }
 
 class QTextBrowser;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QTextBrowser> &qtdecl_QTextBrowser (); }
@@ -1956,9 +1380,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QTextTableFormat> &qtdecl_QTextTableForm
 class QThread;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QThread> &qtdecl_QThread (); }
 
-class QThreadPool;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QThreadPool> &qtdecl_QThreadPool (); }
-
 class QTime;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QTime> &qtdecl_QTime (); }
 
@@ -1967,9 +1388,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QTimeEdit> &qtdecl_QTimeEdit (); }
 
 class QTimeLine;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QTimeLine> &qtdecl_QTimeLine (); }
-
-class QTimeZone;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QTimeZone> &qtdecl_QTimeZone (); }
 
 class QTimer;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QTimer> &qtdecl_QTimer (); }
@@ -1991,9 +1409,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QToolButton> &qtdecl_QToolButton (); }
 
 class QToolTip;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QToolTip> &qtdecl_QToolTip (); }
-
-class QTouchDevice;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QTouchDevice> &qtdecl_QTouchDevice (); }
 
 class QTouchEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QTouchEvent> &qtdecl_QTouchEvent (); }
@@ -2031,20 +1446,20 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QUndoStack> &qtdecl_QUndoStack (); }
 class QUndoView;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QUndoView> &qtdecl_QUndoView (); }
 
+class QUnixPrintWidget;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QUnixPrintWidget> &qtdecl_QUnixPrintWidget (); }
+
 class QUrl;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QUrl> &qtdecl_QUrl (); }
 
-class QUrlQuery;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QUrlQuery> &qtdecl_QUrlQuery (); }
+class QUrlInfo;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QUrlInfo> &qtdecl_QUrlInfo (); }
 
 class QVBoxLayout;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QVBoxLayout> &qtdecl_QVBoxLayout (); }
 
 class QValidator;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QValidator> &qtdecl_QValidator (); }
-
-class QVariantAnimation;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QVariantAnimation> &qtdecl_QVariantAnimation (); }
 
 class QVector2D;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QVector2D> &qtdecl_QVector2D (); }
@@ -2054,36 +1469,6 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QVector3D> &qtdecl_QVector3D (); }
 
 class QVector4D;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QVector4D> &qtdecl_QVector4D (); }
-
-class QVideoDeviceSelectorControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QVideoDeviceSelectorControl> &qtdecl_QVideoDeviceSelectorControl (); }
-
-class QVideoEncoderSettings;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QVideoEncoderSettings> &qtdecl_QVideoEncoderSettings (); }
-
-class QVideoEncoderSettingsControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QVideoEncoderSettingsControl> &qtdecl_QVideoEncoderSettingsControl (); }
-
-class QVideoFilterRunnable;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QVideoFilterRunnable> &qtdecl_QVideoFilterRunnable (); }
-
-class QVideoFrame;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QVideoFrame> &qtdecl_QVideoFrame (); }
-
-class QVideoProbe;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QVideoProbe> &qtdecl_QVideoProbe (); }
-
-class QVideoRendererControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QVideoRendererControl> &qtdecl_QVideoRendererControl (); }
-
-class QVideoSurfaceFormat;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QVideoSurfaceFormat> &qtdecl_QVideoSurfaceFormat (); }
-
-class QVideoWidget;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QVideoWidget> &qtdecl_QVideoWidget (); }
-
-class QVideoWindowControl;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QVideoWindowControl> &qtdecl_QVideoWindowControl (); }
 
 class QWaitCondition;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QWaitCondition> &qtdecl_QWaitCondition (); }
@@ -2106,11 +1491,11 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QWidgetAction> &qtdecl_QWidgetAction ();
 class QWidgetItem;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QWidgetItem> &qtdecl_QWidgetItem (); }
 
-class QWindow;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QWindow> &qtdecl_QWindow (); }
-
 class QWindowStateChangeEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QWindowStateChangeEvent> &qtdecl_QWindowStateChangeEvent (); }
+
+class QWindowsStyle;
+namespace gsi { GSIQT_PUBLIC gsi::Class<QWindowsStyle> &qtdecl_QWindowsStyle (); }
 
 class QWizard;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QWizard> &qtdecl_QWizard (); }
@@ -2142,14 +1527,8 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlEntityResolver> &qtdecl_QXmlEntityRe
 class QXmlErrorHandler;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlErrorHandler> &qtdecl_QXmlErrorHandler (); }
 
-class QXmlFormatter;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlFormatter> &qtdecl_QXmlFormatter (); }
-
 class QXmlInputSource;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlInputSource> &qtdecl_QXmlInputSource (); }
-
-class QXmlItem;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlItem> &qtdecl_QXmlItem (); }
 
 class QXmlLexicalHandler;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlLexicalHandler> &qtdecl_QXmlLexicalHandler (); }
@@ -2157,68 +1536,17 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlLexicalHandler> &qtdecl_QXmlLexicalH
 class QXmlLocator;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlLocator> &qtdecl_QXmlLocator (); }
 
-class QXmlName;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlName> &qtdecl_QXmlName (); }
-
-class QXmlNamePool;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlNamePool> &qtdecl_QXmlNamePool (); }
-
 class QXmlNamespaceSupport;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlNamespaceSupport> &qtdecl_QXmlNamespaceSupport (); }
-
-class QXmlNodeModelIndex;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlNodeModelIndex> &qtdecl_QXmlNodeModelIndex (); }
 
 class QXmlParseException;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlParseException> &qtdecl_QXmlParseException (); }
 
-class QXmlQuery;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlQuery> &qtdecl_QXmlQuery (); }
-
 class QXmlReader;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlReader> &qtdecl_QXmlReader (); }
 
-class QXmlResultItems;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlResultItems> &qtdecl_QXmlResultItems (); }
-
-class QXmlSchema;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlSchema> &qtdecl_QXmlSchema (); }
-
-class QXmlSchemaValidator;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlSchemaValidator> &qtdecl_QXmlSchemaValidator (); }
-
-class QXmlSerializer;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlSerializer> &qtdecl_QXmlSerializer (); }
-
 class QXmlSimpleReader;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlSimpleReader> &qtdecl_QXmlSimpleReader (); }
-
-class QXmlStreamAttribute;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlStreamAttribute> &qtdecl_QXmlStreamAttribute (); }
-
-class QXmlStreamAttributes;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlStreamAttributes> &qtdecl_QXmlStreamAttributes (); }
-
-class QXmlStreamEntityDeclaration;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlStreamEntityDeclaration> &qtdecl_QXmlStreamEntityDeclaration (); }
-
-class QXmlStreamEntityResolver;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlStreamEntityResolver> &qtdecl_QXmlStreamEntityResolver (); }
-
-class QXmlStreamNamespaceDeclaration;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlStreamNamespaceDeclaration> &qtdecl_QXmlStreamNamespaceDeclaration (); }
-
-class QXmlStreamNotationDeclaration;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlStreamNotationDeclaration> &qtdecl_QXmlStreamNotationDeclaration (); }
-
-class QXmlStreamReader;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlStreamReader> &qtdecl_QXmlStreamReader (); }
-
-class QXmlStreamStringRef;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlStreamStringRef> &qtdecl_QXmlStreamStringRef (); }
-
-class QXmlStreamWriter;
-namespace gsi { GSIQT_PUBLIC gsi::Class<QXmlStreamWriter> &qtdecl_QXmlStreamWriter (); }
 
 
 #define QT_EXTERNAL_BASE(X) gsi::qtdecl_##X(),

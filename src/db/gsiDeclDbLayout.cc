@@ -371,6 +371,11 @@ static unsigned int get_layer (db::Layout *l, const db::LayerProperties &lp)
   }
 }
 
+static unsigned int get_layer0 (db::Layout *l)
+{
+  return get_layer (l, db::LayerProperties ());
+}
+
 static unsigned int get_layer1 (db::Layout *l, const std::string &name)
 {
   return get_layer (l, db::LayerProperties (name));
@@ -1267,6 +1272,15 @@ Class<db::Layout> decl_Layout ("Layout",
     "use integer coordinates. The basic unit of these coordinates is the database unit.\n" 
     "You can convert coordinates to micrometers by multiplying the integer value with the database unit.\n"
     "Typical values for the database unit are 0.001 micrometer (one nanometer).\n"
+  ) +
+  gsi::method_ext ("layer", &get_layer0,
+    "@brief Finds or creates a new internal layer\n"
+    "\n"
+    "This method will create a new internal layer and return the layer index for this layer.\n"
+    "The layer does not have any properties attached to it. That means, it is not going to be saved "
+    "to a layout file unless it is given database properties with \\set_info.\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
   ) +
   gsi::method_ext ("layer", &get_layer,
     "@brief Finds or creates a layer with the given properties\n"

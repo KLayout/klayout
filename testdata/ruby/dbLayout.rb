@@ -162,12 +162,17 @@ class DBLayout_TestClass < TestBase
     b = ly.layer(RBA::LayerInfo.new(3, 0))
     assert_equal(a, b)
     assert_equal(ll(ly), "3/0")
-    b = ly.layer(RBA::LayerInfo.new)
+    bb = b
+    b = ly.layer
     assert_equal(ll(ly), "3/0,")
+    assert_equal(b != bb, true)
+    bb = b
     b = ly.layer(RBA::LayerInfo.new)
     assert_equal(ll(ly), "3/0,,")
+    assert_equal(b != bb, true)
     n = ly.layer(RBA::LayerInfo.new ("hallo"));
     assert_equal(ll(ly), "3/0,,,hallo")
+    assert_equal(b != n, true)
 
     ly = RBA::Layout.new
     li = ly.layer(2, 0)

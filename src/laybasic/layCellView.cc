@@ -264,7 +264,9 @@ LayoutHandle::save_as (const std::string &fn, tl::OutputStream::OutputStreamMode
     file_watcher ().remove_file (filename ());
 
     rename (filename_for_caption (fn));
-    set_filename (fn);
+
+    //  NOTE: we don't use set_filename since this would re-attach the file watcher
+    m_filename = fn;
 
   }
 

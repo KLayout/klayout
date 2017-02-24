@@ -778,21 +778,22 @@ smooth (const db::Polygon &polygon, db::Coord d)
 // -------------------------------------------------------------------------
 //  Rounding tools
 
-bool 
-extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::Point> *new_pts, bool fallback)
+template <class C>
+static bool
+do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator from, typename db::polygon<C>::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::point<C> > *new_pts, bool fallback)
 {
   if (from == to) {
     return false;
   }
 
-  db::Polygon::polygon_contour_iterator p0 = from;
+  typename db::polygon<C>::polygon_contour_iterator p0 = from;
 
-  db::Polygon::polygon_contour_iterator p1 = p0;
+  typename db::polygon<C>::polygon_contour_iterator p1 = p0;
   ++p1;
   if (p1 == to) {
     p1 = from;
   }
-  db::Polygon::polygon_contour_iterator p2 = p1;
+  typename db::polygon<C>::polygon_contour_iterator p2 = p1;
 
   const double cos_thr = 0.8;
   const double circle_segment_thr = 2.5;
@@ -810,8 +811,8 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
         p2 = from;
       }
 
-      db::Edge ep (*p0, *p1);
-      db::Edge e (*p1, *p2);
+      db::edge<C> ep (*p0, *p1);
+      db::edge<C> e (*p1, *p2);
 
       bool inner = (db::vprod_sign (ep, e) > 0);
       double &ls = inner ? ls_inner : ls_outer;
@@ -841,7 +842,7 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
   //  search for the first circle segment (where cos(a) > cos_thr) 
   //  or a long segment is followed by a short one or the curvature changes.
 
-  db::Polygon::polygon_contour_iterator pm1 = from;
+  typename db::polygon<C>::polygon_contour_iterator pm1 = from;
 
   p0 = pm1;
   ++p0;
@@ -861,7 +862,7 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
     p2 = from;
   }
 
-  db::Polygon::polygon_contour_iterator p3 = p2;
+  typename db::polygon<C>::polygon_contour_iterator p3 = p2;
 
   do {
 
@@ -870,10 +871,10 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
       p3 = from;
     }
 
-    db::Edge em (*pm1, *p0);
-    db::Edge ep (*p0, *p1);
-    db::Edge e (*p1, *p2);
-    db::Edge en (*p2, *p3);
+    db::edge<C> em (*pm1, *p0);
+    db::edge<C> ep (*p0, *p1);
+    db::edge<C> e (*p1, *p2);
+    db::edge<C> en (*p2, *p3);
 
     bool first_or_last = fallback || (e.double_length () > circle_segment_thr * ep.double_length () || ep.double_length () > circle_segment_thr * e.double_length ()) 
                                   || (db::vprod_sign (em, ep) * db::vprod_sign (ep, e) < 0 || db::vprod_sign (ep, e) * db::vprod_sign (e, en) < 0);
@@ -907,11 +908,11 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
     new_pts->clear ();
   }
 
-  db::Polygon::polygon_contour_iterator pfirst = p0;
+  typename db::polygon<C>::polygon_contour_iterator pfirst = p0;
   bool in_corner = false;
   double ls_corner = 0.0;
-  db::Edge elast;
-  db::Polygon::polygon_contour_iterator plast;
+  db::edge<C> elast;
+  typename db::polygon<C>::polygon_contour_iterator plast;
   double asum = 0.0;
   unsigned int nseg = 0;
 
@@ -931,10 +932,10 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
       p3 = from;
     }
 
-    db::Edge em (*pm1, *p0);
-    db::Edge ep (*p0, *p1);
-    db::Edge e (*p1, *p2);
-    db::Edge en (*p2, *p3);
+    db::edge<C> em (*pm1, *p0);
+    db::edge<C> ep (*p0, *p1);
+    db::edge<C> e (*p1, *p2);
+    db::edge<C> en (*p2, *p3);
 
     //  Heuristic detection of a new circle segment: 
     //  In fallback mode vertical or horizontal edges separate circle segments.
@@ -956,7 +957,7 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
         if (! in_corner) {
           elast = ep;
           plast = p1;
-          asum = db::vprod (*p1 - db::Point (), *p2 - db::Point ());
+          asum = db::vprod (*p1 - db::point<C> (), *p2 - db::point<C> ());
           nseg = 1;
           ls_corner = ls;
         } 
@@ -967,13 +968,13 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
 
         if (in_corner) {
 
-          std::pair<bool, db::Point> cp = elast.cut_point (e);
+          std::pair<bool, db::point<C> > cp = elast.cut_point (e);
           if (! cp.first) {
 
             //  We have a full 180 degree bend without a stop (actually two corners).
             //  Use the segment in between that is perpendicular to the start and end segment as stop edge.
-            db::Polygon::polygon_contour_iterator pp1 = plast;
-            db::Polygon::polygon_contour_iterator pp2 = pp1;
+            typename db::polygon<C>::polygon_contour_iterator pp1 = plast;
+            typename db::polygon<C>::polygon_contour_iterator pp2 = pp1;
             double asum_part = 0.0;
             unsigned int nseg_part = 0;
 
@@ -984,12 +985,12 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
                 pp2 = from;
               }
 
-              e = db::Edge (*pp1, *pp2);
+              e = db::edge<C> (*pp1, *pp2);
               if (db::sprod_sign (elast, e) == 0) {
                 break;
               }
 
-              asum_part += db::vprod (*pp1 - db::Point (), *pp2 - db::Point ());
+              asum_part += db::vprod (*pp1 - db::point<C> (), *pp2 - db::point<C> ());
               ++nseg_part;
 
               pp1 = pp2;
@@ -1008,11 +1009,11 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
             ++nseg_part;
 
             asum -= asum_part;
-            asum -= db::vprod (e.p1 () - db::Point (), e.p2 () - db::Point ());
+            asum -= db::vprod (e.p1 () - db::point<C> (), e.p2 () - db::point<C> ());
             nseg -= nseg_part;
 
-            asum_part += db::vprod (cp.second - db::Point (), elast.p2 () - db::Point ());
-            asum_part += db::vprod (*pp1 - db::Point (), cp.second - db::Point ());
+            asum_part += db::vprod (cp.second - db::point<C> (), elast.p2 () - db::point<C> ());
+            asum_part += db::vprod (*pp1 - db::point<C> (), cp.second - db::point<C> ());
 
             double sin_atot = db::vprod (elast, e);
             double cos_atot = db::sprod (elast, e);
@@ -1034,7 +1035,7 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
 
             elast = e;
 
-            e = db::Edge (*p1, *p2);
+            e = db::edge<C> (*p1, *p2);
             cp = elast.cut_point (e);
             if (! cp.first) {
               return false;
@@ -1046,8 +1047,8 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
             new_pts->push_back (cp.second);
           }
 
-          asum += db::vprod (cp.second - db::Point (), elast.p2 () - db::Point ());
-          asum += db::vprod (*p1 - db::Point (), cp.second - db::Point ());
+          asum += db::vprod (cp.second - db::point<C> (), elast.p2 () - db::point<C> ());
+          asum += db::vprod (*p1 - db::point<C> (), cp.second - db::point<C> ());
 
           ++nseg;
 
@@ -1074,7 +1075,7 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
 
       } else if (in_corner) {
 
-        asum += db::vprod (*p1 - db::Point (), *p2 - db::Point ());
+        asum += db::vprod (*p1 - db::point<C> (), *p2 - db::point<C> ());
         ++nseg;
 
       } else {
@@ -1112,45 +1113,58 @@ extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygo
   }
 }
 
-bool 
-extract_rad (const db::Polygon &polygon, double &rinner, double &router, unsigned int &n, db::Polygon *new_polygon)
+bool
+extract_rad_from_contour (typename db::Polygon::polygon_contour_iterator from, typename db::Polygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::Point> *new_pts, bool fallback)
+{
+  return do_extract_rad_from_contour (from, to, rinner, router, n, new_pts, fallback);
+}
+
+bool
+extract_rad_from_contour (typename db::DPolygon::polygon_contour_iterator from, typename db::DPolygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::DPoint> *new_pts, bool fallback)
+{
+  return do_extract_rad_from_contour (from, to, rinner, router, n, new_pts, fallback);
+}
+
+template <class C>
+static bool
+do_extract_rad (const db::polygon<C> &polygon, double &rinner, double &router, unsigned int &n, db::polygon<C> *new_polygon)
 {
   if (new_polygon) {
 
-    std::vector <db::Point> new_pts;
+    std::vector <db::point<C> > new_pts;
 
-    if (! extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, &new_pts) && 
-        ! extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, &new_pts, true)) {
+    if (! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, &new_pts, false) &&
+        ! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, &new_pts, true)) {
       //  no radius found
       return false;
     } else {
-      new_polygon->assign_hull (new_pts.begin (), new_pts.end (), true /*compress*/);
+      new_polygon->assign_hull (new_pts.begin (), new_pts.end ());
     }
 
     for (unsigned int h = 0; h < polygon.holes (); ++h) {
 
       new_pts.clear ();
-      if (! extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, &new_pts) && 
-          ! extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, &new_pts, true)) {
+      if (! do_extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, &new_pts, false) &&
+          ! do_extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, &new_pts, true)) {
         //  no radius found
         return false;
       } else {
-        new_polygon->insert_hole (new_pts.begin (), new_pts.end (), true /*compress*/);
+        new_polygon->insert_hole (new_pts.begin (), new_pts.end ());
       }
 
     }
 
   } else {
 
-    if (! extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, 0)) {
-      if (! extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, 0, true)) {
+    if (! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, (std::vector<db::point<C> > *) 0, false)) {
+      if (! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, (std::vector<db::point<C> > *) 0, true)) {
         return false;
       }
     }
 
     for (unsigned int h = 0; h < polygon.holes (); ++h) {
-      if (! extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, 0)) {
-        if (! extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, 0, true)) {
+      if (! do_extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, (std::vector<db::point<C> > *) 0, false)) {
+        if (! do_extract_rad_from_contour (polygon.begin_hole (h), polygon.end_hole (h), rinner, router, n, (std::vector<db::point<C> > *) 0, true)) {
           return false;
         }
       }
@@ -1162,22 +1176,36 @@ extract_rad (const db::Polygon &polygon, double &rinner, double &router, unsigne
 
 }
 
-void 
-compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector <db::Point> &new_pts, double rinner, double router, unsigned int n)
+bool
+extract_rad (const db::Polygon &polygon, double &rinner, double &router, unsigned int &n, db::Polygon *new_polygon)
 {
-  std::vector<db::Point> points;
+  return do_extract_rad (polygon, rinner, router, n, new_polygon);
+}
+
+bool
+extract_rad (const db::DPolygon &polygon, double &rinner, double &router, unsigned int &n, db::DPolygon *new_polygon)
+{
+  return do_extract_rad (polygon, rinner, router, n, new_polygon);
+}
+
+
+template <class C>
+static void
+do_compute_rounded_contour (typename db::polygon<C>::polygon_contour_iterator from, typename db::polygon<C>::polygon_contour_iterator to, std::vector <db::point<C> > &new_pts, double rinner, double router, unsigned int n)
+{
+  std::vector<db::point<C> > points;
 
   //  collect the points into a vector
 
   if (from != to) {
 
-    db::Polygon::polygon_contour_iterator p0 = from;
-    db::Polygon::polygon_contour_iterator p1 = p0;
+    typename db::polygon<C>::polygon_contour_iterator p0 = from;
+    typename db::polygon<C>::polygon_contour_iterator p1 = p0;
     ++p1;
     if (p1 == to) {
       p1 = from;
     }
-    db::Polygon::polygon_contour_iterator p2 = p1;
+    typename db::polygon<C>::polygon_contour_iterator p2 = p1;
 
     do {
 
@@ -1186,7 +1214,7 @@ compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon
         p2 = from;
       }
 
-      if (! db::Edge (*p0, *p1).parallel (db::Edge (*p1, *p2))) {
+      if (! db::edge<C> (*p0, *p1).parallel (db::edge<C> (*p1, *p2))) {
         points.push_back (*p1);
       }
 
@@ -1204,9 +1232,9 @@ compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon
 
   for (size_t i = 0; i < points.size (); ++i) {
 
-    db::Point p0 = points [(i + points.size () - 1) % points.size ()];
-    db::Point p1 = points [i];
-    db::Point p2 = points [(i + points.size () + 1) % points.size ()];
+    db::point<C>  p0 = points [(i + points.size () - 1) % points.size ()];
+    db::point<C>  p1 = points [i];
+    db::point<C>  p2 = points [(i + points.size () + 1) % points.size ()];
 
     db::DVector e1 = (db::DPoint (p1) - db::DPoint (p0)) * (1.0 / p0.double_distance (p1));
     db::DVector e2 = (db::DPoint (p2) - db::DPoint (p1)) * (1.0 / p1.double_distance (p2));
@@ -1227,9 +1255,9 @@ compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon
 
   for (size_t i = 0; i < points.size (); ++i) {
 
-    db::Point p0 = points [(i + points.size () - 1) % points.size ()];
-    db::Point p1 = points [i];
-    db::Point p2 = points [(i + points.size () + 1) % points.size ()];
+    db::point<C>  p0 = points [(i + points.size () - 1) % points.size ()];
+    db::point<C>  p1 = points [i];
+    db::point<C>  p2 = points [(i + points.size () + 1) % points.size ()];
 
     db::DVector e1 = (db::DPoint (p1) - db::DPoint (p0)) * (1.0 / p0.double_distance (p1));
     db::DVector e2 = (db::DPoint (p2) - db::DPoint (p1)) * (1.0 / p1.double_distance (p2));
@@ -1274,7 +1302,7 @@ compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon
           db::DPoint qm = q0 + (q1 - q0) * 0.5;
           db::DPoint q = qm + (qm - pr) * (q0.sq_distance (qm) / pr.sq_distance (qm));
 
-          new_pts.push_back (db::Point (q));
+          new_pts.push_back (db::point<C> (q));
 
           q0 = q1;
 
@@ -1289,11 +1317,24 @@ compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon
   } 
 }
 
-db::Polygon 
-compute_rounded (const db::Polygon &polygon, double rinner, double router, unsigned int n)
+void
+compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector <db::Point> &new_pts, double rinner, double router, unsigned int n)
 {
-  db::Polygon new_poly;
-  std::vector <db::Point> new_pts;
+  do_compute_rounded_contour (from, to, new_pts, rinner, router, n);
+}
+
+void
+compute_rounded_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, std::vector <db::DPoint> &new_pts, double rinner, double router, unsigned int n)
+{
+  do_compute_rounded_contour (from, to, new_pts, rinner, router, n);
+}
+
+template <class C>
+static db::polygon<C>
+do_compute_rounded (const db::polygon<C> &polygon, double rinner, double router, unsigned int n)
+{
+  db::polygon<C> new_poly;
+  std::vector <db::point<C> > new_pts;
 
   compute_rounded_contour (polygon.begin_hull (), polygon.end_hull (), new_pts, rinner, router, n);
   new_poly.assign_hull (new_pts.begin (), new_pts.end (), false /*don't compress*/);
@@ -1305,6 +1346,18 @@ compute_rounded (const db::Polygon &polygon, double rinner, double router, unsig
   }
 
   return new_poly;
+}
+
+db::Polygon
+compute_rounded (const db::Polygon &polygon, double rinner, double router, unsigned int n)
+{
+  return do_compute_rounded (polygon, rinner, router, n);
+}
+
+db::DPolygon
+compute_rounded (const db::DPolygon &polygon, double rinner, double router, unsigned int n)
+{
+  return do_compute_rounded (polygon, rinner, router, n);
 }
 
 // -------------------------------------------------------------------------

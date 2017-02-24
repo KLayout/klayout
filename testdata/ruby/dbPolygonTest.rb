@@ -472,6 +472,59 @@ class DBPolygon_TestClass < TestBase
 
   end
 
+  # polygon decomposition
+  def test_extractRad
+
+    ex = RBA::SimplePolygon::new.extract_rad
+    assert_equal(ex.inspect, "[]")
+
+    sp = RBA::SimplePolygon::from_s("(0,0;0,200000;300000,200000;300000,100000;100000,100000;100000,0)")
+
+    sp = sp.round_corners(10000, 5000, 200)
+    ex = sp.extract_rad
+
+    assert_equal(ex.inspect, "[(0,0;0,200000;300000,200000;300000,100000;100000,100000;100000,0), 10000.0, 5000.0, 200]")
+
+    ex = RBA::Polygon::new.extract_rad
+    assert_equal(ex.inspect, "[]")
+
+    sp = RBA::Polygon::from_s("(0,0;0,300000;300000,300000;300000,0/100000,100000;200000,100000;200000,200000;100000,200000)")
+
+    sp = sp.round_corners(10000, 5000, 200)
+    ex = sp.extract_rad
+
+    assert_equal(ex.inspect, "[(0,0;0,300000;300000,300000;300000,0/100000,100000;200000,100000;200000,200000;100000,200000), 10000.0, 5000.0, 200]")
+
+    # double coords too ...
+
+    ex = RBA::DSimplePolygon::new.extract_rad
+    assert_equal(ex.inspect, "[]")
+
+    sp = RBA::DSimplePolygon::from_s("(0,0;0,200000;300000,200000;300000,100000;100000,100000;100000,0)")
+
+    sp = sp.round_corners(10000, 5000, 200)
+    ex = sp.extract_rad
+
+    # round to integers for better comparison
+    
+    ex[0] = RBA::SimplePolygon::new(ex[0])
+    assert_equal(ex.inspect, "[(0,0;0,200000;300000,200000;300000,100000;100000,100000;100000,0), 10000.0, 5000.0, 200]")
+
+    ex = RBA::DPolygon::new.extract_rad
+    assert_equal(ex.inspect, "[]")
+
+    sp = RBA::DPolygon::from_s("(0,0;0,300000;300000,300000;300000,0/100000,100000;200000,100000;200000,200000;100000,200000)")
+
+    sp = sp.round_corners(10000, 5000, 200)
+    ex = sp.extract_rad
+
+    # round to integers for better comparison
+    ex[0] = RBA::Polygon::new(ex[0])
+
+    assert_equal(ex.inspect, "[(0,0;0,300000;300000,300000;300000,0/100000,100000;200000,100000;200000,200000;100000,200000), 10000.0, 5000.0, 200]")
+
+  end
+
 end
 
 load("test_epilogue.rb")

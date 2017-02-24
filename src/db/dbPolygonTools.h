@@ -360,11 +360,21 @@ inline bool interact (const db::DSimplePolygon &poly1,  const db::DSimplePolygon
 bool DB_PUBLIC extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::Point> *new_pts = 0, bool fallback = false);
 
 /**
+ *  @brief Extract a corner radius from a contour (version for double coordinates)
+ */
+bool DB_PUBLIC extract_rad_from_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::DPoint> *new_pts = 0, bool fallback = false);
+
+/**
  *  @brief Extract the radius (better: radii) from a polygon and if requested, compute the new polygon without the rounding
  *
  *  See extract_rad_from_contour for details.
  */
 bool DB_PUBLIC extract_rad (const db::Polygon &polygon, double &rinner, double &router, unsigned int &n, db::Polygon *new_polygon = 0);
+
+/**
+ *  @brief Extract a corner radius from a polygon (version for double coordinates)
+ */
+bool DB_PUBLIC extract_rad (const db::DPolygon &polygon, double &rinner, double &router, unsigned int &n, db::DPolygon *new_polygon = 0);
 
 /**
  *  @brief Compute the rounded version of a polygon contour
@@ -380,11 +390,21 @@ bool DB_PUBLIC extract_rad (const db::Polygon &polygon, double &rinner, double &
 void DB_PUBLIC compute_rounded_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, std::vector <db::Point> &new_pts, double rinner, double router, unsigned int n);
 
 /**
+ *  @brief Compute the rounded version of a polygon contour (double coordinate version)
+ */
+void DB_PUBLIC compute_rounded_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, std::vector <db::DPoint> &new_pts, double rinner, double router, unsigned int n);
+
+/**
  *  @brief Compute the rounded version of the polygon
  *
  *  See compute_rounded_contour for details.
  */
 db::Polygon DB_PUBLIC compute_rounded (const db::Polygon &poly, double rinner, double router, unsigned int n);
+
+/**
+ *  @brief Compute the rounded version of the polygon (double coordinate version)
+ */
+db::DPolygon DB_PUBLIC compute_rounded (const db::DPolygon &poly, double rinner, double router, unsigned int n);
 
 /**
  *  @brief Smooth a contour 

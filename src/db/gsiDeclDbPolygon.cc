@@ -173,6 +173,37 @@ struct simple_polygon_defs
     return poly->area ();
   }
 
+  static std::vector<tl::Variant> extract_rad (const C *sp)
+  {
+    db::polygon<coord_type> p, pnew;
+    p.assign_hull (sp->begin_hull (), sp->end_hull (), false);
+    double rinner = 0.0, router = 0.0;
+    unsigned int n = 1;
+    if (! db::extract_rad (p, rinner, router, n, &pnew) || pnew.holes () > 0) {
+      return std::vector<tl::Variant> ();
+    } else {
+      std::vector<tl::Variant> res;
+      C spnew;
+      spnew.assign_hull (pnew.begin_hull (), pnew.end_hull ());
+      res.push_back (tl::Variant (spnew));
+      res.push_back (rinner);
+      res.push_back (router);
+      res.push_back (n);
+      return res;
+    }
+  }
+
+  static C round_corners (const C *sp, double rinner, double router, unsigned int n)
+  {
+    db::polygon<coord_type> p;
+    p.assign_hull (sp->begin_hull (), sp->end_hull (), false);
+    p = db::compute_rounded (p, rinner, router, n);
+    tl_assert (p.holes () == 0);
+    C res;
+    res.assign_hull (p.begin_hull (), p.end_hull ());
+    return res;
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -382,6 +413,45 @@ struct simple_polygon_defs
     method ("to_s", (std::string (C::*) () const) &C::to_string,
       "@brief Convert to a string\n"
     ) +
+    method_ext ("round_corners", &round_corners,
+      "@brief Round the corners of the polygon\n"
+      "@args rinner, router, n\n"
+      "\n"
+      "Replaces the corners of the polygon with circle segments.\n"
+      "\n"
+      "@param rinner The circle radius of inner corners (in database units).\n"
+      "@param router The circle radius of outer corners (in database units).\n"
+      "@param n The number of points per full circle.\n"
+      "\n"
+      "@return The new polygon.\n"
+      "\n"
+      "This method was introduced in version 0.22 for integer coordinates and in 0.25 for all coordinate types.\n"
+    ) +
+    method_ext ("extract_rad", &extract_rad,
+      "@brief Extracts the corner radii from a rounded polygon\n"
+      "\n"
+      "Attempts to extract the radii of rounded corner polygon. This is essentially the inverse of "
+      "the \\round_corners method. If this method succeeds, if will return an array of four elements: "
+      "@ul\n"
+      "@li The polygon with the rounded corners replaced by edgy ones @/li\n"
+      "@li The radius of the inner corners @/li\n"
+      "@li The radius of the outer corners @/li\n"
+      "@li The number of points per full circle @/li\n"
+      "@/ul\n"
+      "\n"
+      "This method is based on some assumptions and may fail. In this case, an empty array is returned.\n"
+      "\n"
+      "If successful, the following code will more or less render the original polygon and parameters\n"
+      "\n"
+      "@code\n"
+      "p = ...   # some polygon\n"
+      "p.round_corners(ri, ro, n)\n"
+      "(p2, ri2, ro2, n2) = p.extract_rad\n"
+      "# -> p2 == p, ro2 == ro, ri2 == ri, n2 == n (within some limits)\n"
+      "@/code\n"
+      "\n"
+      "This method was introduced in version 0.25.\n"
+    ) +
     method_ext ("area", &area,
       "@brief The area of the polygon\n"
       "The area is correct only if the polygon is not self-overlapping and the polygon is oriented clockwise."
@@ -395,13 +465,6 @@ struct simple_polygon_defs
     );
   }
 };
-
-static db::Polygon sp_round_corners (const db::SimplePolygon *sp, double rinner, double router, unsigned int n)
-{
-  db::Polygon p;
-  p.assign_hull (sp->begin_hull (), sp->end_hull (), false);
-  return db::compute_rounded (p, rinner, router, n);
-}
 
 static db::Polygon sp_minkowsky_sum_pe (const db::SimplePolygon *sp, const db::Edge &e, bool rh)
 {
@@ -473,20 +536,6 @@ Class<db::SimplePolygon> decl_SimplePolygon ("SimplePolygon",
     "polygon in micron units. The database unit is basically a scaling factor.\n"
     "\n"
     "This method has been introduced in version 0.25."
-  ) +
-  method_ext ("round_corners", &sp_round_corners,
-    "@brief Round the corners of the polygon\n"
-    "@args rinner, router, n\n"
-    "\n"
-    "Replaces the corners of the polygon with circle segments.\n"
-    "\n"
-    "@param rinner The circle radius of inner corners (in database units).\n"
-    "@param router The circle radius of outer corners (in database units).\n"
-    "@param n The number of points per full circle.\n"
-    "\n"
-    "@return The new polygon.\n"
-    "\n"
-    "This method was introduced in version 0.22.\n"
   ) +
   method_ext ("minkowsky_sum", &sp_minkowsky_sum_pe,
     "@brief Compute the Minkowsky sum of a polygon and an edge\n"
@@ -879,6 +928,28 @@ struct polygon_defs
     return poly->area ();
   }
 
+  static std::vector<tl::Variant> extract_rad (const C *p)
+  {
+    C pnew;
+    double rinner = 0.0, router = 0.0;
+    unsigned int n = 1;
+    if (! db::extract_rad (*p, rinner, router, n, &pnew)) {
+      return std::vector<tl::Variant> ();
+    } else {
+      std::vector<tl::Variant> res;
+      res.push_back (tl::Variant (pnew));
+      res.push_back (rinner);
+      res.push_back (router);
+      res.push_back (n);
+      return res;
+    }
+  }
+
+  static C round_corners (const C *p, double rinner, double router, unsigned int n)
+  {
+    return db::compute_rounded (*p, rinner, router, n);
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -1259,6 +1330,45 @@ struct polygon_defs
     method ("to_s", (std::string (C::*) () const) &C::to_string,
       "@brief Convert to a string\n"
     ) +
+    method_ext ("round_corners", &round_corners,
+      "@brief Rounds the corners of the polygon\n"
+      "@args rinner, router, n\n"
+      "\n"
+      "Replaces the corners of the polygon with circle segments.\n"
+      "\n"
+      "@param rinner The circle radius of inner corners (in database units).\n"
+      "@param router The circle radius of outer corners (in database units).\n"
+      "@param n The number of points per full circle.\n"
+      "\n"
+      "@return The new polygon.\n"
+      "\n"
+      "This method was introduced in version 0.20 for integer coordinates and in 0.25 for all coordinate types.\n"
+    ) +
+    method_ext ("extract_rad", &extract_rad,
+      "@brief Extracts the corner radii from a rounded polygon\n"
+      "\n"
+      "Attempts to extract the radii of rounded corner polygon. This is essentially the inverse of "
+      "the \\round_corners method. If this method succeeds, if will return an array of four elements: "
+      "@ul\n"
+      "@li The polygon with the rounded corners replaced by edgy ones @/li\n"
+      "@li The radius of the inner corners @/li\n"
+      "@li The radius of the outer corners @/li\n"
+      "@li The number of points per full circle @/li\n"
+      "@/ul\n"
+      "\n"
+      "This method is based on some assumptions and may fail. In this case, an empty array is returned.\n"
+      "\n"
+      "If successful, the following code will more or less render the original polygon and parameters\n"
+      "\n"
+      "@code\n"
+      "p = ...   # some polygon\n"
+      "p.round_corners(ri, ro, n)\n"
+      "(p2, ri2, ro2, n2) = p.extract_rad\n"
+      "# -> p2 == p, ro2 == ro, ri2 == ri, n2 == n (within some limits)\n"
+      "@/code\n"
+      "\n"
+      "This method was introduced in version 0.25.\n"
+    ) +
     method_ext ("area", &area,
       "@brief The area of the polygon\n"
       "The area is correct only if the polygon is not self-overlapping and the polygon is oriented clockwise."
@@ -1314,11 +1424,6 @@ static db::Polygon transformed_icplx_dp (const db::Polygon *p, const db::ICplxTr
 static db::Polygon smooth (const db::Polygon *p, db::Coord d)
 {
   return db::smooth (*p, d);
-}
-
-static db::Polygon round_corners (const db::Polygon *p, double rinner, double router, unsigned int n)
-{
-  return db::compute_rounded (*p, rinner, router, n);
 }
 
 static db::Polygon minkowsky_sum_pe (const db::Polygon *p, const db::Edge &e, bool rh)
@@ -1513,20 +1618,6 @@ Class<db::Polygon> decl_Polygon ("Polygon",
     "@return The smoothed polygon.\n"
     "\n"
     "This method was introduced in version 0.23.\n"
-  ) +
-  method_ext ("round_corners", &round_corners,
-    "@brief Rounds the corners of the polygon\n"
-    "@args rinner, router, n\n"
-    "\n"
-    "Replaces the corners of the polygon with circle segments.\n"
-    "\n"
-    "@param rinner The circle radius of inner corners (in database units).\n"
-    "@param router The circle radius of outer corners (in database units).\n"
-    "@param n The number of points per full circle.\n"
-    "\n"
-    "@return The new polygon.\n"
-    "\n"
-    "This method was introduced in version 0.20.\n"
   ) +
   method_ext ("minkowsky_sum", &minkowsky_sum_pe,
     "@brief Computes the Minkowsky sum of the polygon and an edge\n"

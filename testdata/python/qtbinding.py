@@ -480,6 +480,73 @@ class QtBindingTest(unittest.TestCase):
     self.assertEqual(parent._destroyed(), True)
     self.assertEqual(child._destroyed(), True)
 
+  def test_45(self):
+
+    triggered = ""
+
+    class TriggerLog:
+      triggered = ""
+      def triggered1(self, b):
+        if b:
+          self.triggered += "1"
+        else:
+          self.triggered += "0"
+      def triggered0(self):
+        self.triggered += "*"
+
+    # Ability to connect to signals while ignoring arguments and 
+    # to emit signals
+
+    b = pya.QPushButton()
+
+    log = TriggerLog()
+
+    b.clicked(log.triggered1)
+
+    self.assertEqual(log.triggered, "")
+    b.emit_clicked(True)
+    self.assertEqual(log.triggered, "1")
+    b.emit_clicked(False)
+    self.assertEqual(log.triggered, "10")
+
+    b.clicked(log.triggered0)
+
+    b.emit_clicked(True)
+    self.assertEqual(log.triggered, "10*")
+    b.emit_clicked(False)
+    self.assertEqual(log.triggered, "10**")
+
+    # We do the same with free functions since they behave differently in Python:
+
+    global trigger_log 
+    trigger_log = ""
+
+    def triggered_f0():
+      global trigger_log
+      trigger_log += "x"
+      
+    def triggered_f1(b):
+      global trigger_log
+      if b:
+        trigger_log += "+"
+      else:
+        trigger_log += "-"
+        
+    b.clicked(triggered_f1)
+
+    self.assertEqual(trigger_log, "")
+    b.emit_clicked(True)
+    self.assertEqual(trigger_log, "+")
+    b.emit_clicked(False)
+    self.assertEqual(trigger_log, "+-")
+
+    b.clicked(triggered_f0)
+
+    b.emit_clicked(True)
+    self.assertEqual(trigger_log, "+-x")
+    b.emit_clicked(False)
+    self.assertEqual(trigger_log, "+-xx")
+
 
 # run unit tests
 if __name__ == '__main__':

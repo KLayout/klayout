@@ -24,6 +24,7 @@
 #include "pyaObject.h"
 #include "pyaMarshal.h"
 #include "pyaUtils.h"
+#include "pyaConvert.h"
 #include "pya.h"
 
 #include "tlLog.h"
@@ -214,19 +215,46 @@ void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gs
 
     tl::Heap heap;
 
-    PythonRef argv (PyTuple_New (std::distance (meth->begin_arguments (), meth->end_arguments ())));
-
-    //  TODO: callbacks with default arguments?
+    int args_avail = int (std::distance (meth->begin_arguments (), meth->end_arguments ()));
+    PythonRef argv (PyTuple_New (args_avail));
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
       PyTuple_SetItem (argv.get (), int (a - meth->begin_arguments ()), pop_arg (*a, args, NULL, heap).release ());
     }
 
     PythonRef result;
     for (std::vector<CallbackFunction>::const_iterator c = m_cbfuncs.begin (); c != m_cbfuncs.end (); ++c) {
-      result = PythonRef (PyObject_CallObject (c->callable ().get (), argv.get ()));
+
+      //  determine the number of arguments required
+      int arg_count = args_avail;
+      if (args_avail > 0) {
+
+        PythonRef fc (PyObject_GetAttrString (c->callable ().get (), "__code__"));
+        if (fc) {
+          PythonRef ac (PyObject_GetAttrString (fc.get (), "co_argcount"));
+          if (ac) {
+            arg_count = python2c<int> (ac.get ());
+            if (PyObject_HasAttrString (c->callable ().get (), "__self__")) {
+              arg_count -= 1;
+            }
+          }
+        }
+
+      }
+
+      //  use less arguments if applicable
+      if (arg_count == 0) {
+        result = PythonRef (PyObject_CallObject (c->callable ().get (), NULL));
+      } else if (arg_count < args_avail) {
+        PythonRef argv_less (PyTuple_GetSlice (argv.get (), 0, arg_count));
+        result = PythonRef (PyObject_CallObject (c->callable ().get (), argv_less.get ()));
+      } else {
+        result = PythonRef (PyObject_CallObject (c->callable ().get (), argv.get ()));
+      }
+
       if (! result) {
         check_error ();
       }
+
     }
 
     push_arg (meth->ret_type (), ret, result.get (), heap);

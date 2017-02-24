@@ -44,13 +44,14 @@ reuse=0
 qt="/opt/qt/4.6.3/include"
 qt5="/opt/qt/5.5.1/include"
 inst_dir_common=`pwd`/scripts/mkqtdecl_common
-inst_dir=`pwd`/scripts/mkqtdecl
+inst_dir4=`pwd`/scripts/mkqtdecl4
 inst_dir5=`pwd`/scripts/mkqtdecl5
 src_dir=`pwd`/src
 src_name4=gsiqt4
 src_name5=gsiqt5
 
 src_name=$src_name4
+inst_dir=$inst_dir4
 
 while [ "$1" != "" ]; do
 

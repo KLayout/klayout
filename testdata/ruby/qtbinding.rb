@@ -567,6 +567,31 @@ class QtBinding_TestClass < TestBase
 
   end
 
+  def test_45
+
+    # Ability to connect to signals while ignoring arguments and 
+    # to emit signals
+
+    b = RBA::QPushButton::new
+
+    triggered = ""
+    b.clicked { |checked| triggered += (checked ? "1" : "0") }
+
+    assert_equal(triggered, "")
+    b.emit_clicked(true)
+    assert_equal(triggered, "1")
+    b.emit_clicked(false)
+    assert_equal(triggered, "10")
+
+    b.clicked { triggered += "*" }
+
+    b.emit_clicked(true)
+    assert_equal(triggered, "10*")
+    b.emit_clicked(false)
+    assert_equal(triggered, "10**")
+
+  end
+
 end 
 
 load("test_epilogue.rb")

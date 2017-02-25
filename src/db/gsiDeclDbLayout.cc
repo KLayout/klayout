@@ -1274,11 +1274,13 @@ Class<db::Layout> decl_Layout ("Layout",
     "Typical values for the database unit are 0.001 micrometer (one nanometer).\n"
   ) +
   gsi::method_ext ("layer", &get_layer0,
-    "@brief Finds or creates a new internal layer\n"
+    "@brief Creates a new internal layer\n"
     "\n"
     "This method will create a new internal layer and return the layer index for this layer.\n"
     "The layer does not have any properties attached to it. That means, it is not going to be saved "
     "to a layout file unless it is given database properties with \\set_info.\n"
+    "\n"
+    "This method is equivalent to \"layer(RBA::LayerInfo::new())\".\n"
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +

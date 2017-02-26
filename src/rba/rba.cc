@@ -1937,9 +1937,6 @@ trace_callback (VALUE /*data*/, rb_trace_arg_t *trace_arg)
       //  see below for a description of s_block_exceptions
       d->block_exceptions = false;
 
-      int line = rb_sourceline ();
-      size_t file_id = prepare_trace (RubyInterpreter::instance (), rb_sourcefile ());
-
       RBA_TRY
 
         if (d->exit_on_next) {
@@ -1947,9 +1944,15 @@ trace_callback (VALUE /*data*/, rb_trace_arg_t *trace_arg)
         }
 
         try {
+
+          int line = rb_sourceline ();
+          size_t file_id = prepare_trace (RubyInterpreter::instance (), rb_sourcefile ());
+
           RubyStackTraceProvider st_provider (d->debugger_scope);
           d->current_exec_handler->trace (RubyInterpreter::instance (), file_id, line, &st_provider);
+
           finish_trace (RubyInterpreter::instance ());
+
         } catch (...) {
           finish_trace (RubyInterpreter::instance ());
           throw;

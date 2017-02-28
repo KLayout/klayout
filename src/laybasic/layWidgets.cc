@@ -934,7 +934,8 @@ const int le_decoration_space = 2; //  additional distance between decoration ic
 
 DecoratedLineEdit::DecoratedLineEdit (QWidget *parent)
   : QLineEdit (parent),
-    m_clear_button_enabled (false), m_options_button_enabled (false), mp_options_menu (0)
+    m_clear_button_enabled (false), m_options_button_enabled (false), mp_options_menu (0),
+    m_escape_signal_enabled (false), m_tab_signal_enabled (false)
 {
   mp_options_label = new QLabel (this);
   mp_options_label->hide ();
@@ -955,6 +956,56 @@ DecoratedLineEdit::DecoratedLineEdit (QWidget *parent)
 DecoratedLineEdit::~DecoratedLineEdit ()
 {
   //  .. nothing yet ..
+}
+
+void DecoratedLineEdit::set_escape_signal_enabled (bool en)
+{
+  m_escape_signal_enabled = en;
+}
+
+void DecoratedLineEdit::set_tab_signal_enabled (bool en)
+{
+  m_tab_signal_enabled = en;
+}
+
+bool DecoratedLineEdit::event (QEvent *event)
+{
+  //  Handling this event makes the widget receive all keystrokes
+  if (event->type () == QEvent::ShortcutOverride) {
+    QKeyEvent *ke = static_cast<QKeyEvent *> (event);
+    if (ke->key () == Qt::Key_Escape && m_escape_signal_enabled) {
+      ke->accept ();
+    }
+  }
+  return QLineEdit::event (event);
+}
+
+void DecoratedLineEdit::keyPressEvent (QKeyEvent *event)
+{
+  if (m_escape_signal_enabled && event->key () == Qt::Key_Escape) {
+    emit esc_pressed ();
+    event->accept ();
+  } else if (m_tab_signal_enabled && event->key () == Qt::Key_Tab) {
+    emit tab_pressed ();
+    event->accept ();
+  } else if (m_tab_signal_enabled && event->key () == Qt::Key_Backtab) {
+    emit backtab_pressed ();
+    event->accept ();
+  } else {
+    QLineEdit::keyPressEvent (event);
+  }
+}
+
+bool DecoratedLineEdit::focusNextPrevChild (bool next)
+{
+  if (m_tab_signal_enabled && isEnabled ()) {
+    QKeyEvent event (QEvent::KeyPress, next ? Qt::Key_Tab : Qt::Key_Backtab, Qt::NoModifier);
+    keyPressEvent (&event);
+    if (event.isAccepted ()) {
+      return true;
+    }
+  }
+  return QLineEdit::focusNextPrevChild (next);
 }
 
 void DecoratedLineEdit::set_clear_button_enabled (bool en)

@@ -392,17 +392,51 @@ public:
    */
   QMenu *options_menu () const;
 
+  /**
+   *  @brief Sets a value indicating whether the widgets accepts ESC keys and sends an esc_pressed signal for this
+   */
+  void set_escape_signal_enabled (bool f);
+
+  /**
+   *  @brief gets a value indicating whether the widgets accepts ESC keys and sends an esc_pressed signal for this
+   */
+  bool escape_signal_enabled () const
+  {
+    return m_escape_signal_enabled;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether the widgets accepts Tab keys and sends an tab_pressed or backtab_pressed signal for this
+   */
+  void set_tab_signal_enabled (bool f);
+
+  /**
+   *  @brief gets a value indicating whether the widgets accepts Tab keys and sends an tab_pressed or backtab_pressed signal for this
+   */
+  bool tab_signal_enabled () const
+  {
+    return m_tab_signal_enabled;
+  }
+
 signals:
   void options_button_clicked ();
+  void esc_pressed ();
+  void tab_pressed ();
+  void backtab_pressed ();
 
 protected:
   void mousePressEvent (QMouseEvent *event);
   void mouseReleaseEvent (QMouseEvent *event);
   void resizeEvent (QResizeEvent *event);
+  void keyPressEvent (QKeyEvent *event);
+  bool focusNextPrevChild (bool next);
+  bool event (QEvent *event);
 
 private:
   bool m_clear_button_enabled;
   bool m_options_button_enabled;
+  bool m_escape_signal_enabled;
+  bool m_tab_signal_enabled;
   QLabel *mp_options_label;
   QLabel *mp_clear_label;
   QMenu *mp_options_menu;

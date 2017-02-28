@@ -168,15 +168,20 @@ public:
   /**
    *  @brief Locate an index by name (at least closest)
    *
-   *  Only top-level items are searched. An invalid model index is returned if
+   *  If top_only is set, only top-level items are searched. An invalid model index is returned if
    *  no corresponding item could be found.
    */
-  QModelIndex locate (const char *name, bool glob_pattern = false);
+  QModelIndex locate (const char *name, bool glob_pattern = false, bool case_sensitive = true, bool top_only = true);
 
   /**
    *  @brief Locate the next index (after the first locate)
    */
   QModelIndex locate_next ();
+
+  /**
+   *  @brief Locate the previous index (after the first locate)
+   */
+  QModelIndex locate_prev ();
 
   /**
    *  @brief Clears the locate flags
@@ -226,11 +231,14 @@ private:
   int m_cv_index;
   const db::Cell *mp_base;
   std::vector <CellTreeItem *> m_toplevel;
-  std::set <QModelIndex> m_selected_indexes;
-  std::set <QModelIndex>::const_iterator m_current_index;
+  std::set <QModelIndex> m_selected_indexes_set;
+  std::vector <QModelIndex> m_selected_indexes;
+  std::vector <QModelIndex>::const_iterator m_current_index;
 
   void build_top_level ();
   void clear_top_level ();
+  void search_children (const tl::GlobPattern &pattern, CellTreeItem *item);
+  void search_children (const char *name, CellTreeItem *item);
 };
 
 /**

@@ -116,7 +116,7 @@ TEST(6)
   EXPECT_EQ (a.match ("ah"), false);
 }
 
-TEST(7) 
+TEST(7)
 {
   tl::GlobPattern a ("(*({bc,d}))(*)");
 
@@ -134,5 +134,64 @@ TEST(7)
   EXPECT_EQ (v[2], "");
 }
 
+TEST(8)
+{
+  //  case insensitive
 
+  tl::GlobPattern a ("(*({bc,d}))(*)");
 
+  std::vector <std::string> v;
+  EXPECT_EQ (a.case_sensitive (), true);
+  EXPECT_EQ (a.match ("aBcG", v), false);
+
+  a.set_case_sensitive (false);
+  EXPECT_EQ (a.case_sensitive (), false);
+  EXPECT_EQ (a.match ("aBcG", v), true);
+  EXPECT_EQ (v.size (), 3);
+  EXPECT_EQ (v[0], "aBc");
+  EXPECT_EQ (v[1], "Bc");
+  EXPECT_EQ (v[2], "G");
+
+  tl::GlobPattern b ("*a[bcd]");
+
+  EXPECT_EQ (b.match ("ab"), true);
+  EXPECT_EQ (b.match ("Ab"), false);
+  EXPECT_EQ (b.match ("aB"), false);
+
+  b.set_case_sensitive (false);
+  EXPECT_EQ (b.match ("ab"), true);
+  EXPECT_EQ (b.match ("Ab"), true);
+  EXPECT_EQ (b.match ("aB"), true);
+}
+
+TEST(9)
+{
+  //  exact match
+
+  tl::GlobPattern a ("(*({bc,d}))(*)");
+  a.set_exact (true);
+
+  EXPECT_EQ (a.exact (), true);
+  EXPECT_EQ (a.match ("abcg"), false);
+  EXPECT_EQ (a.match ("(*({bc,d}))(*)"), true);
+  EXPECT_EQ (a.match ("(*({bc,D}))(*)"), false);
+
+  a.set_case_sensitive (false);
+  EXPECT_EQ (a.match ("abcg"), false);
+  EXPECT_EQ (a.match ("(*({bc,d}))(*)"), true);
+  EXPECT_EQ (a.match ("(*({bc,D}))(*)"), true);
+}
+
+TEST(10)
+{
+  //  header match
+
+  tl::GlobPattern a ("abc");
+  EXPECT_EQ (a.match ("abcg"), false);
+  EXPECT_EQ (a.match ("abc"), true);
+
+  a.set_header_match (true);
+  EXPECT_EQ (a.header_match (), true);
+  EXPECT_EQ (a.match ("abcg"), true);
+  EXPECT_EQ (a.match ("abc"), true);
+}

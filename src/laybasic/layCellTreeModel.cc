@@ -27,6 +27,7 @@
 #include "dbPCellHeader.h"
 
 #include <QTreeView>
+#include <QPalette>
 #include <QMimeData>
 
 #include <string.h>
@@ -314,22 +315,24 @@ CellTreeModel::build_top_level ()
 
     m_flat = true; //  no "hierarchical children" yet.
 
-    m_toplevel.reserve (mp_base->child_cells ());
-
-    for (db::Cell::child_cell_iterator child = mp_base->begin_child_cells (); ! child.at_end (); ++child) {
-      CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *child, true, m_sorting);
-      m_toplevel.push_back (item);
+    if (mp_base) {
+      m_toplevel.reserve (mp_base->child_cells ());
+      for (db::Cell::child_cell_iterator child = mp_base->begin_child_cells (); ! child.at_end (); ++child) {
+        CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *child, true, m_sorting);
+        m_toplevel.push_back (item);
+      }
     }
 
   } else if ((m_flags & Parents) != 0) {
 
     m_flat = true; //  no "hierarchical parents" yet.
 
-    m_toplevel.reserve (mp_base->parent_cells ());
-
-    for (db::Cell::parent_cell_iterator parent = mp_base->begin_parent_cells (); parent != mp_base->end_parent_cells (); ++parent) {
-      CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *parent, true, m_sorting);
-      m_toplevel.push_back (item);
+    if (mp_base) {
+      m_toplevel.reserve (mp_base->parent_cells ());
+      for (db::Cell::parent_cell_iterator parent = mp_base->begin_parent_cells (); parent != mp_base->end_parent_cells (); ++parent) {
+        CellTreeItem *item = new CellTreeItem (mp_layout, 0, false, *parent, true, m_sorting);
+        m_toplevel.push_back (item);
+      }
     }
 
   } else {
@@ -498,8 +501,12 @@ CellTreeModel::data (const QModelIndex &index, int role) const
 
   } else if (role == Qt::BackgroundRole) {
 
-    if (m_selected_indexes.find (index) != m_selected_indexes.end ()) {
-      return QVariant (QColor (Qt::blue).lighter (180));
+    if (m_selected_indexes_set.find (index) != m_selected_indexes_set.end ()) {
+      //  for selected items pick a color between Highlight and Base
+      QPalette pl (mp_parent->palette ());
+      QColor c1 = pl.color (QPalette::Highlight);
+      QColor cb = pl.color (QPalette::Base);
+      return QVariant (QColor ((c1.red () + cb.red ()) / 2, (c1.green () + cb.green ()) / 2, (c1.blue () + cb.blue ()) / 2));
     } else {
       return QVariant ();
     }
@@ -512,11 +519,11 @@ CellTreeModel::data (const QModelIndex &index, int role) const
     } else {
       QPalette pl (mp_parent->palette ());
       if (mp_view->is_cell_hidden (item->cell_index (), m_cv_index)) {
-        QColor c1 = pl.color (QColorGroup::Text);
-        QColor cb = pl.color (QColorGroup::Base);
+        QColor c1 = pl.color (QPalette::Text);
+        QColor cb = pl.color (QPalette::Base);
         return QVariant (QColor ((c1.red () + cb.red ()) / 2, (c1.green () + cb.green ()) / 2, (c1.blue () + cb.blue ()) / 2));
       } else {
-        return QVariant (pl.color (QColorGroup::Text));
+        return QVariant (pl.color (QPalette::Text));
       }
     }
 #else
@@ -693,6 +700,7 @@ CellTreeModel::clear_locate ()
 {
   m_selected_indexes.clear ();
   m_current_index = m_selected_indexes.begin ();
+  m_selected_indexes_set.clear ();
 
   signal_data_changed ();
 }
@@ -715,8 +723,56 @@ CellTreeModel::locate_next ()
   }
 }
 
+QModelIndex
+CellTreeModel::locate_prev ()
+{
+  if (mp_layout->under_construction () || (mp_layout->manager () && mp_layout->manager ()->transacting ())) {
+    return QModelIndex ();
+  }
+
+  if (m_current_index == m_selected_indexes.end ()) {
+    return QModelIndex ();
+  } else {
+    if (m_current_index == m_selected_indexes.begin ()) {
+      m_current_index = m_selected_indexes.end ();
+    }
+    --m_current_index;
+    return *m_current_index;
+  }
+}
+
+void
+CellTreeModel::search_children (const tl::GlobPattern &pattern, CellTreeItem *item)
+{
+  int children = item->children ();
+  for (int i = 0; i < children; ++i) {
+    CellTreeItem *c = item->child (i);
+    if (c) {
+      if (c->name_matches (pattern)) {
+        m_selected_indexes.push_back (model_index (c));
+      }
+      search_children (pattern, c);
+    }
+  }
+}
+
+void
+CellTreeModel::search_children (const char *name, CellTreeItem *item)
+{
+  int children = item->children ();
+  for (int i = 0; i < children; ++i) {
+    CellTreeItem *c = item->child (i);
+    if (c) {
+      if (c->name_equals (name)) {
+        m_selected_indexes.push_back (model_index (c));
+      }
+      search_children (name, c);
+    }
+  }
+}
+
 QModelIndex 
-CellTreeModel::locate (const char *name, bool glob_pattern) 
+CellTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive, bool top_only)
 {
   if (mp_layout->under_construction () || (mp_layout->manager () && mp_layout->manager ()->transacting ())) {
     return QModelIndex ();
@@ -724,25 +780,22 @@ CellTreeModel::locate (const char *name, bool glob_pattern)
 
   m_selected_indexes.clear ();
 
-  std::vector <CellTreeItem *>::const_iterator lc;
-  if (m_sorting == ByName && ! glob_pattern) {
-    // employ sorting to look for the cell with that name
-    lc = std::lower_bound (m_toplevel.begin (), m_toplevel.end (), name, cmp_cell_tree_item_vs_name_f ());
-  } else if (glob_pattern) {
-    tl::GlobPattern p (std::string (name) + "*");
-    for (lc = m_toplevel.begin (); lc != m_toplevel.end (); ++lc) {
-      if ((*lc)->name_matches (p)) {
-        m_selected_indexes.insert (model_index (*lc));
-      }
+  tl::GlobPattern p = tl::GlobPattern (std::string (name));
+  p.set_case_sensitive (case_sensitive);
+  p.set_exact (!glob_pattern);
+  p.set_header_match (true);
+
+  for (std::vector <CellTreeItem *>::const_iterator lc = m_toplevel.begin (); lc != m_toplevel.end (); ++lc) {
+    if ((*lc)->name_matches (p)) {
+      m_selected_indexes.push_back (model_index (*lc));
     }
-  } else {
-    // sorting does not help: linear search
-    for (lc = m_toplevel.begin (); lc != m_toplevel.end (); ++lc) {
-      if ((*lc)->name_equals (name)) {
-        m_selected_indexes.insert (model_index (*lc));
-      }
+    if (! top_only) {
+      search_children (p, *lc);
     }
   }
+
+  m_selected_indexes_set.clear ();
+  m_selected_indexes_set.insert (m_selected_indexes.begin (), m_selected_indexes.end ());
   
   signal_data_changed ();
 

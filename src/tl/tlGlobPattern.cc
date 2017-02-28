@@ -27,11 +27,11 @@ namespace tl
 {
 
 static bool 
-do_match (const char *p, const char *s, std::vector<std::string> *o, std::vector<std::pair<unsigned int, const char *> > &bstart)
+do_match (const char *p, const char *s, bool cs, bool exact, bool hm, std::vector<std::string> *o, std::vector<std::pair<unsigned int, const char *> > &bstart)
 {
   while (*p) {
 
-    if (*p == '\\') {
+    if (!exact && *p == '\\') {
 
       ++p;
       if (!*s || *s != *p) {
@@ -42,7 +42,7 @@ do_match (const char *p, const char *s, std::vector<std::string> *o, std::vector
       }
       ++s;
 
-    } else if (*p == '?') {
+    } else if (!exact && *p == '?') {
 
       ++p;
       if (! *s) {
@@ -50,7 +50,7 @@ do_match (const char *p, const char *s, std::vector<std::string> *o, std::vector
       }
       ++s;
 
-    } else if (*p == '*') {
+    } else if (!exact && *p == '*') {
 
       ++p;
 
@@ -63,7 +63,7 @@ do_match (const char *p, const char *s, std::vector<std::string> *o, std::vector
       size_t no = o ? o->size () : 0;
 
       while (*s) {
-        if (do_match (p, s, o, bstart)) {
+        if (do_match (p, s, cs, exact, hm, o, bstart)) {
           return true;
         }
         bstart = bs;
@@ -73,7 +73,7 @@ do_match (const char *p, const char *s, std::vector<std::string> *o, std::vector
         ++s;
       }
 
-    } else if (*p == '[') {
+    } else if (!exact && *p == '[') {
 
       if (! *s) {
         return false;
@@ -111,7 +111,10 @@ do_match (const char *p, const char *s, std::vector<std::string> *o, std::vector
         }
 
         if (! hit) {
-          if (*s >= c1 && *s <= c2) {
+          if (cs && *s >= c1 && *s <= c2) {
+            hit = true;
+          //  TODO: implement UTF-8 support
+          } else if (!cs && tolower (*s) >= tolower (c1) && tolower (*s) <= tolower (c2)) {
             hit = true;
           }
         }
@@ -127,7 +130,7 @@ do_match (const char *p, const char *s, std::vector<std::string> *o, std::vector
         ++p;
       }
 
-    } else if (*p == '{') {
+    } else if (!exact && *p == '{') {
 
       ++p;
 
@@ -158,7 +161,10 @@ do_match (const char *p, const char *s, std::vector<std::string> *o, std::vector
             if (hit) {
               if (! *s) {
                 hit = false;
-              } else if (*p != *s) {
+              } else if (cs && *p != *s) {
+                hit = false;
+              //  TODO: implement UTF-8 support
+              } else if (!cs && tolower (*p) != tolower (*s)) {
                 hit = false;
               } else {
                 ++s;
@@ -184,7 +190,7 @@ do_match (const char *p, const char *s, std::vector<std::string> *o, std::vector
         return false;
       }
 
-    } else if (*p == ')') {
+    } else if (!exact && *p == ')') {
 
       ++p;
 
@@ -195,7 +201,7 @@ do_match (const char *p, const char *s, std::vector<std::string> *o, std::vector
         bstart.pop_back ();
       }
 
-    } else if (*p == '(') {
+    } else if (!exact && *p == '(') {
 
       ++p;
       if (o) {
@@ -203,33 +209,78 @@ do_match (const char *p, const char *s, std::vector<std::string> *o, std::vector
         o->push_back (std::string ());
       }
 
-    } else if (*s != *p) {
-      return false;
     } else {
-      ++s;
-      ++p;
+
+      if (cs) {
+        if (*s != *p) {
+          return false;
+        } else {
+          ++s;
+          ++p;
+        }
+      } else {
+        //  TODO: implement UTF-8 support
+        if (tolower (*s) != tolower (*p)) {
+          return false;
+        } else {
+          ++s;
+          ++p;
+        }
+      }
+
     }
 
   } 
 
-  return (*s == 0);
+  return (hm || *s == 0);
 }
 
 GlobPattern::GlobPattern ()
+  : m_case_sensitive (true), m_exact (false), m_header_match (false)
 {
   //  .. nothing yet ..
 }
 
 GlobPattern::GlobPattern (const std::string &p)
-  : m_p (p)
+  : m_p (p), m_case_sensitive (true), m_exact (false), m_header_match (false)
 {
   //  .. nothing yet ..
+}
+
+void GlobPattern::set_case_sensitive (bool f)
+{
+  m_case_sensitive = f;
+}
+
+bool GlobPattern::case_sensitive () const
+{
+  return m_case_sensitive;
+}
+
+void GlobPattern::set_exact (bool f)
+{
+  m_exact = f;
+}
+
+bool GlobPattern::exact () const
+{
+  return m_exact;
+}
+
+void GlobPattern::set_header_match (bool f)
+{
+  m_header_match = f;
+}
+
+bool GlobPattern::header_match () const
+{
+  return m_header_match;
 }
 
 bool GlobPattern::match (const char *s) const
 {
   std::vector<std::pair<unsigned int, const char *> > bstart;
-  return do_match (m_p.c_str (), s, 0, bstart);
+  return do_match (m_p.c_str (), s, m_case_sensitive, m_exact, m_header_match, 0, bstart);
 }
 
 bool GlobPattern::match (const char *s, std::vector<std::string> &e) const
@@ -238,13 +289,13 @@ bool GlobPattern::match (const char *s, std::vector<std::string> &e) const
     e.clear ();
   }
   std::vector<std::pair<unsigned int, const char *> > bstart;
-  return do_match (m_p.c_str (), s, &e, bstart);
+  return do_match (m_p.c_str (), s, m_case_sensitive, m_exact, m_header_match, &e, bstart);
 }
 
 bool GlobPattern::match (const std::string &s) const
 {
   std::vector<std::pair<unsigned int, const char *> > bstart;
-  return do_match (m_p.c_str (), s.c_str (), 0, bstart);
+  return do_match (m_p.c_str (), s.c_str (), m_case_sensitive, m_exact, m_header_match, 0, bstart);
 }
 
 bool GlobPattern::match (const std::string &s, std::vector<std::string> &e) const
@@ -253,7 +304,7 @@ bool GlobPattern::match (const std::string &s, std::vector<std::string> &e) cons
     e.clear ();
   }
   std::vector<std::pair<unsigned int, const char *> > bstart;
-  return do_match (m_p.c_str (), s.c_str (), &e, bstart);
+  return do_match (m_p.c_str (), s.c_str (), m_case_sensitive, m_exact, m_header_match, &e, bstart);
 }
 
 }

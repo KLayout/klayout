@@ -394,17 +394,21 @@ CellSelectionForm::name_changed (const QString &s)
       return;
     }
 
-    QModelIndex mi = model->locate (tl::to_string (s).c_str (), true);
-    if (mi.isValid ()) {
-
-      m_cells_cb_enabled = false;
-      lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
-      lv_cells->scrollTo (mi);
-      update_children_list ();
-      update_parents_list ();
-      m_cells_cb_enabled = true;
-
+    QModelIndex mi;
+    if (!s.isEmpty ()) {
+      mi = model->locate (tl::to_string (s).c_str (), true);
+    } else {
+      model->clear_locate ();
     }
+
+    m_cells_cb_enabled = false;
+    lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
+    if (mi.isValid ()) {
+      lv_cells->scrollTo (mi);
+    }
+    update_children_list ();
+    update_parents_list ();
+    m_cells_cb_enabled = true;
 
   }
 }

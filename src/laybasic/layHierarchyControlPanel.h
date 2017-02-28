@@ -36,6 +36,7 @@
 #include "layViewOp.h"
 #include "layLayoutView.h"
 #include "layCellTreeModel.h"
+#include "layWidgets.h"
 #include "tlDeferredExecution.h"
 
 class QModelIndex;
@@ -44,6 +45,9 @@ class QMenu;
 class QSplitter;
 class QFrame;
 class QToolButton;
+class QLineEdit;
+class QAction;
+class QCheckBox;
 
 namespace lay 
 {
@@ -67,12 +71,15 @@ signals:
   void cell_clicked (const QModelIndex &);
   void cell_double_clicked (const QModelIndex &);
   void cell_middle_clicked (const QModelIndex &);
+  void search_triggered (const QString &t);
 
 protected:
   virtual void mouseDoubleClickEvent (QMouseEvent *event);
   virtual void mousePressEvent (QMouseEvent *event);
   virtual void mouseReleaseEvent (QMouseEvent *event);
   virtual void startDrag (Qt::DropActions supportedActions);
+  virtual void keyPressEvent (QKeyEvent *event);
+  virtual bool event (QEvent *event);
 };
 
 /**
@@ -259,6 +266,11 @@ public slots:
   void middle_clicked (const QModelIndex &index);
   void selection_changed (int index);
   void context_menu (const QPoint &pt);  
+  void search_triggered (const QString &t);
+  void search_edited ();
+  void search_editing_finished ();
+  void search_next ();
+  void search_prev ();
   void cm_cell_select ();
 
 private:
@@ -277,6 +289,12 @@ private:
   bool m_split_mode;
   CellTreeModel::Sorting m_sorting;
   QComboBox *mp_selector;
+  lay::DecoratedLineEdit *mp_search_edit_box;
+  QAction *mp_case_sensitive;
+  QAction *mp_use_regular_expressions;
+  CellTreeModel *mp_search_model;
+  QFrame *mp_search_frame;
+  QCheckBox *mp_search_close_cb;
   QSplitter *mp_splitter;
   QColor m_background_color;
   QColor m_text_color;

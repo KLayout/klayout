@@ -61,6 +61,36 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating whether to treat the match case sensitive
+   */
+  void set_case_sensitive (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether to treat the match case sensitive
+   */
+  bool case_sensitive () const;
+
+  /**
+   *  @brief Sets a value indicating whether to match exact (without brackets and wildcards)
+   */
+  void set_exact (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether to match exact (without brackets and wildcards)
+   */
+  bool exact () const;
+
+  /**
+   *  @brief Sets a value indicating whether to allow trailing characters in the subject
+   */
+  void set_header_match (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether to allow trailing characters in the subject
+   */
+  bool header_match () const;
+
+  /**
    *  @brief Get the pattern string
    */
   const std::string &pattern () const
@@ -94,6 +124,9 @@ public:
 
 private:
   std::string m_p;
+  bool m_case_sensitive;
+  bool m_exact;
+  bool m_header_match;
 };
 
 } // namespace tl

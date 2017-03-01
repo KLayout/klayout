@@ -35,6 +35,9 @@
 #include <QLabel>
 #include <QToolButton>
 #include <QCheckBox>
+#include <QProxyStyle>
+#include <QPainter>
+#include <QPen>
 
 #include "dbClipboard.h"
 #include "dbClipboardData.h"
@@ -320,6 +323,8 @@ HierarchyControlPanel::HierarchyControlPanel (lay::LayoutView *view, QWidget *pa
 
   mp_view->cellviews_changed_event.add (this, &HierarchyControlPanel::update_required);
   mp_view->hier_changed_event.add (this, &HierarchyControlPanel::update_required);
+
+  mp_tree_style.reset (new BackgroundAwareTreeStyle (style ()));
 
   do_update_content ();
 }
@@ -660,13 +665,6 @@ void
 HierarchyControlPanel::set_background_color (QColor c)
 {
   m_background_color = c;
-  QColor hl;
-  if (c.green () > 128) {
-    hl = QColor (192, 192, 255);
-  } else {
-    hl = QColor (0, 0, 80);
-  }
-
   for (std::vector <QTreeView *>::const_iterator f = mp_cell_lists.begin (); f != mp_cell_lists.end (); ++f) {
     QPalette pl ((*f)->palette ());
     pl.setColor (QPalette::Base, c);
@@ -889,6 +887,7 @@ HierarchyControlPanel::do_update_content (int cv_index)
 
     HCPCellTreeWidget *cell_list = new HCPCellTreeWidget (cl_frame, "tree");
     cl_ly->addWidget (cell_list);
+    cell_list->setStyle (mp_tree_style.get ());
     cell_list->setModel (new CellTreeModel (cell_list, mp_view, cv_index, m_flat ? CellTreeModel::Flat : 0, 0, m_sorting));
     cell_list->setUniformRowHeights (true);
 

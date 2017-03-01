@@ -308,6 +308,8 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
 
   mp_model = new lay::LayerTreeModel (this, view);
   mp_layer_list = new LCPTreeWidget (this, mp_model, "layer_tree");
+  mp_ll_style.reset (new BackgroundAwareTreeStyle (mp_layer_list->style ()));
+  mp_layer_list->setStyle (mp_ll_style.get ());
   mp_model->set_font (mp_layer_list->font ());
   /*
    * At least with Qt 4.2.x setting uniform row heights has a strange side effect: 

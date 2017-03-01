@@ -326,6 +326,7 @@ public slots:
 private:
   QTabBar *mp_tab_bar;
   LCPTreeWidget *mp_layer_list;
+  std::auto_ptr<QStyle> mp_ll_style;
   LayerTreeModel *mp_model;
   lay::LayoutView *mp_view;
   bool m_needs_update;

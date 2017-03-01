@@ -934,8 +934,9 @@ const int le_decoration_space = 2; //  additional distance between decoration ic
 
 DecoratedLineEdit::DecoratedLineEdit (QWidget *parent)
   : QLineEdit (parent),
-    m_clear_button_enabled (false), m_options_button_enabled (false), mp_options_menu (0),
-    m_escape_signal_enabled (false), m_tab_signal_enabled (false)
+    m_clear_button_enabled (false), m_options_button_enabled (false),
+    m_escape_signal_enabled (false), m_tab_signal_enabled (false),
+    mp_options_menu (0)
 {
   mp_options_label = new QLabel (this);
   mp_options_label->hide ();
@@ -1103,6 +1104,85 @@ void DecoratedLineEdit::resizeEvent (QResizeEvent * /*event*/)
     QRect r = geometry ();
     mp_options_label->setGeometry (fw, 0, label_size.width (), r.height ());
   }
+}
+
+// -------------------------------------------------------------
+//  BackgroundAwareTreeStyle implementation
+
+BackgroundAwareTreeStyle::BackgroundAwareTreeStyle (QStyle *org_style)
+  : QProxyStyle (org_style)
+{
+  //  .. nothing yet ..
+}
+
+void
+BackgroundAwareTreeStyle::drawPrimitive (QStyle::PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w) const
+{
+  if (pe == PE_IndicatorBranch) {
+
+    static const int sz = 9;
+
+    int mid_h = opt->rect.x () + opt->rect.width () / 2;
+    int mid_v = opt->rect.y () + opt->rect.height () / 2;
+
+    if (opt->state & State_Children) {
+
+      QColor c;
+
+      QPalette::ColorGroup cg = QPalette::Disabled;
+      if ((w && w->isEnabled ()) || (!w && (opt->state & State_Enabled))) {
+        if ((w && w->hasFocus ()) || (!w && (opt->state & State_HasFocus))) {
+          cg = QPalette::Normal;
+        } else {
+          cg = QPalette::Inactive;
+        }
+      }
+      if (opt->state & State_Selected) {
+        c = opt->palette.color (cg, QPalette::HighlightedText);
+      } else {
+        c = opt->palette.color (cg, QPalette::Text);
+      }
+      if (! (opt->state & State_MouseOver)) {
+        if (c.green () < 128) {
+          c = QColor ((c.red () * 3 + 255) / 4, (c.green () * 3 + 255) / 4, (c.blue () * 3 + 255) / 4);
+        } else {
+          c = QColor ((c.red () * 8) / 9, (c.green () * 8) / 9, (c.blue () * 8) / 9);
+        }
+      }
+
+      QPen old_pen = p->pen ();
+      p->setPen (Qt::NoPen);
+      QBrush old_brush = p->brush ();
+      p->setBrush (c);
+      QPainter::RenderHints old_rh = p->renderHints ();
+      p->setRenderHints (QPainter::Antialiasing);
+
+      if (opt->state & State_Open) {
+        QPoint points[] = {
+          QPoint (mid_h - sz / 2, mid_v - sz / 3),
+          QPoint (mid_h + sz / 2, mid_v - sz / 3),
+          QPoint (mid_h, mid_v + sz / 3)
+        };
+        p->drawPolygon (points, sizeof (points) / sizeof (points[0]));
+      } else {
+        QPoint points[] = {
+          QPoint (mid_h - sz / 3, mid_v - sz / 2),
+          QPoint (mid_h + sz / 3, mid_v),
+          QPoint (mid_h - sz / 3, mid_v + sz / 2)
+        };
+        p->drawPolygon (points, sizeof (points) / sizeof (points[0]));
+      }
+
+      p->setPen (old_pen);
+      p->setBrush (old_brush);
+      p->setRenderHints (old_rh);
+      return;
+
+    }
+
+  }
+
+  QProxyStyle::drawPrimitive (pe, opt, p, w);
 }
 
 }

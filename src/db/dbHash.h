@@ -53,7 +53,7 @@ namespace std_ext = std;
 
 namespace DB_HASH_NAMESPACE
 {
-#if !defined(__LP64__)
+#if defined(_WIN64)
   /**
    *  @brief Specialization missing for size_t on WIN32
    */

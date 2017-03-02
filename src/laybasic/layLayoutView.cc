@@ -42,6 +42,7 @@
 #include "tlString.h"
 #include "tlLog.h"
 #include "tlAssert.h"
+#include "layLayoutView.h"
 #include "layViewOp.h"
 #include "layViewObject.h"
 #include "layLayoutViewConfigPages.h"

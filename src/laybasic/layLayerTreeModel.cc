@@ -27,6 +27,7 @@
 #include "dbLayoutUtils.h"
 #include "tlLog.h"
 #include "tlTimer.h"
+#include "tlGlobPattern.h"
 
 #include <QTreeView>
 #include <QModelIndex>
@@ -275,6 +276,92 @@ LayerTreeModel::index (int row, int column, const QModelIndex &parent) const
     }
   } else {
     return QModelIndex ();
+  }
+}
+
+void
+LayerTreeModel::clear_locate ()
+{
+  m_selected_indexes.clear ();
+  m_current_index = m_selected_indexes.begin ();
+  m_selected_ids.clear ();
+
+  signal_data_changed ();
+}
+
+QModelIndex
+LayerTreeModel::locate_next ()
+{
+  if (m_current_index == m_selected_indexes.end ()) {
+    return QModelIndex ();
+  } else {
+    ++m_current_index;
+    if (m_current_index == m_selected_indexes.end ()) {
+      m_current_index = m_selected_indexes.begin ();
+    }
+    return *m_current_index;
+  }
+}
+
+QModelIndex
+LayerTreeModel::locate_prev ()
+{
+  if (m_current_index == m_selected_indexes.end ()) {
+    return QModelIndex ();
+  } else {
+    if (m_current_index == m_selected_indexes.begin ()) {
+      m_current_index = m_selected_indexes.end ();
+    }
+    --m_current_index;
+    return *m_current_index;
+  }
+}
+
+void
+LayerTreeModel::search_children (const tl::GlobPattern &pattern, const QModelIndex &parent, bool recurse)
+{
+  int children = rowCount (parent);
+  for (int i = 0; i < children; ++i) {
+
+    QModelIndex child = index (i, 0, parent);
+
+    lay::LayerPropertiesConstIterator iter (iterator (child));
+    if (!iter.is_null () && !iter.at_end () &&
+        pattern.match (iter->display_string (mp_view, true /*real*/))) {
+      m_selected_indexes.push_back (child);
+    }
+
+    if (recurse && iter->has_children ()) {
+      search_children (pattern, child, recurse);
+    }
+
+  }
+}
+
+QModelIndex
+LayerTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive, bool top_only)
+{
+  m_selected_indexes.clear ();
+
+  tl::GlobPattern p = tl::GlobPattern (std::string (name));
+  p.set_case_sensitive (case_sensitive);
+  p.set_exact (!glob_pattern);
+  p.set_header_match (true);
+
+  search_children (p, QModelIndex (), !top_only);
+
+  m_selected_ids.clear ();
+  for (std::vector<QModelIndex>::const_iterator i = m_selected_indexes.begin (); i != m_selected_indexes.end (); ++i) {
+    m_selected_ids.insert (size_t (i->internalPointer ()));
+  }
+
+  signal_data_changed ();
+
+  m_current_index = m_selected_indexes.begin ();
+  if (m_current_index == m_selected_indexes.end ()) {
+    return QModelIndex ();
+  } else {
+    return *m_current_index;
   }
 }
 
@@ -646,6 +733,18 @@ LayerTreeModel::data (const QModelIndex &index, int role) const
           return QVariant (QIcon ());
         }
 
+      }
+
+    } else if (role == Qt::BackgroundRole) {
+
+      if (m_selected_ids.find (size_t (index.internalPointer ())) != m_selected_ids.end ()) {
+        //  for selected items pick a color between Highlight and Base
+        QPalette pl (mp_view->palette ());
+        QColor c1 = pl.color (QPalette::Highlight);
+        QColor cb = pl.color (QPalette::Base);
+        return QVariant (QColor ((c1.red () + cb.red ()) / 2, (c1.green () + cb.green ()) / 2, (c1.blue () + cb.blue ()) / 2));
+      } else {
+        return QVariant ();
       }
 
     } else if (role == Qt::TextColorRole || role == Qt::FontRole) {

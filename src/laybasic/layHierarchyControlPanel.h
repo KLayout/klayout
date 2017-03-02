@@ -65,7 +65,7 @@ class HCPCellTreeWidget
 Q_OBJECT
 
 public:
-  HCPCellTreeWidget (QWidget *parent, const char *name);
+  HCPCellTreeWidget (QWidget *parent, const char *name, QWidget *key_event_receiver);
 
 signals:
   void cell_clicked (const QModelIndex &);
@@ -78,8 +78,11 @@ protected:
   virtual void mousePressEvent (QMouseEvent *event);
   virtual void mouseReleaseEvent (QMouseEvent *event);
   virtual void startDrag (Qt::DropActions supportedActions);
+  virtual bool focusNextPrevChild (bool next);
   virtual void keyPressEvent (QKeyEvent *event);
   virtual bool event (QEvent *event);
+
+  QWidget *mp_key_event_receiver;
 };
 
 /**
@@ -253,6 +256,14 @@ public:
   bool split_mode () const
   {
     return m_split_mode;
+  }
+
+  /**
+   *  @brief Gets the layout view this panel is attached to
+   */
+  lay::LayoutView *view ()
+  {
+    return mp_view;
   }
 
 signals:

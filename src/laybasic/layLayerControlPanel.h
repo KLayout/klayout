@@ -44,6 +44,7 @@
 #include "layDitherPattern.h"
 #include "layLayerProperties.h"
 #include "layLayerTreeModel.h"
+#include "layWidgets.h"
 #include "dbObject.h"
 #include "tlDeferredExecution.h"
 
@@ -52,6 +53,7 @@ class QModelIndex;
 class QMenu;
 class QLabel;
 class QTabBar;
+class QCheckBox;
 
 namespace lay 
 {
@@ -85,6 +87,12 @@ public:
 
 signals:
   void double_clicked (const QModelIndex &, Qt::KeyboardModifiers);
+  void search_triggered (const QString &t);
+
+protected:
+  virtual void keyPressEvent (QKeyEvent *event);
+  virtual bool event (QEvent *event);
+  virtual bool focusNextPrevChild (bool next);
 
 private:
   lay::LayerTreeModel *mp_model;
@@ -322,6 +330,11 @@ public slots:
   void upup_clicked ();
   void down_clicked ();
   void downdown_clicked ();
+  void search_triggered (const QString &t);
+  void search_edited ();
+  void search_editing_finished ();
+  void search_next ();
+  void search_prev ();
 
 private:
   QTabBar *mp_tab_bar;
@@ -341,6 +354,11 @@ private:
   std::set<unsigned int> m_expanded;
   bool m_no_stipples;
   QLabel *m_no_stipples_label;
+  lay::DecoratedLineEdit *mp_search_edit_box;
+  QAction *mp_case_sensitive;
+  QAction *mp_use_regular_expressions;
+  QFrame *mp_search_frame;
+  QCheckBox *mp_search_close_cb;
 
   void clear_selection ();
 

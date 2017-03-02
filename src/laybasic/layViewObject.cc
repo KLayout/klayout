@@ -25,6 +25,7 @@
 #include <QWheelEvent>
 #include <QKeyEvent>
 #include <QMimeData>
+#include <QCoreApplication>
 
 #include "layViewObject.h"
 #include "layCanvasPlane.h"
@@ -365,6 +366,12 @@ ViewObjectWidget::end_mouse_event ()
   } else if (m_cursor != lay::Cursor::keep) {
     setCursor (lay::Cursor::qcursor (m_cursor));
   }
+}
+
+bool
+ViewObjectWidget::focusNextPrevChild (bool /*next*/)
+{
+  return false;
 }
 
 void 

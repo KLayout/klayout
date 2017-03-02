@@ -69,13 +69,9 @@ public:
 // --------------------------------------------------------------------
 //  HCPCellTreeWidget implementation
 
-HCPCellTreeWidget::HCPCellTreeWidget (QWidget *parent, const char *name)
-  : QTreeView (parent)
+HCPCellTreeWidget::HCPCellTreeWidget (QWidget *parent, const char *name, QWidget *key_event_receiver)
+  : QTreeView (parent), mp_key_event_receiver (key_event_receiver)
 {
-  //  Don't request focus: this leaves focus on the canvas and the arrow keys functional there
-  // @@@ setFocusPolicy (Qt::NoFocus); -> solve differently!!!
-  setFocusPolicy (Qt::ClickFocus);
-
   //  Allow dragging from here to 
   setDragDropMode (QAbstractItemView::DragOnly);
 
@@ -97,12 +93,24 @@ HCPCellTreeWidget::event (QEvent *event)
   return QTreeView::event (event);
 }
 
+bool
+HCPCellTreeWidget::focusNextPrevChild (bool /*next*/)
+{
+  return false;
+}
+
 void
 HCPCellTreeWidget::keyPressEvent (QKeyEvent *event)
 {
   QString t = event->text ();
-  if (!t.isEmpty ()) {
+  if (!t.isEmpty () && t[0].isPrint ()) {
     emit search_triggered (t);
+  } else if (mp_key_event_receiver) {
+    //  send other key events to the alternative receiver - this way we can make the
+    //  view receive arrow keys for panning.
+    QCoreApplication::sendEvent (mp_key_event_receiver, event);
+  } else {
+    return QTreeView::keyPressEvent (event);
   }
 }
 
@@ -885,7 +893,7 @@ HierarchyControlPanel::do_update_content (int cv_index)
     header->setVisible (split_mode);
     cl_ly->addWidget (header);
 
-    HCPCellTreeWidget *cell_list = new HCPCellTreeWidget (cl_frame, "tree");
+    HCPCellTreeWidget *cell_list = new HCPCellTreeWidget (cl_frame, "tree", mp_view->view_object_widget ());
     cl_ly->addWidget (cell_list);
     cell_list->setStyle (mp_tree_style.get ());
     cell_list->setModel (new CellTreeModel (cell_list, mp_view, cv_index, m_flat ? CellTreeModel::Flat : 0, 0, m_sorting));

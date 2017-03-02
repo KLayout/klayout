@@ -604,66 +604,6 @@ public:
   ~ViewObjectWidget ();
 
   /**
-   *  @brief Qt keyboard event handler
-   */
-  void keyPressEvent (QKeyEvent *e);
-
-  /**
-   *  @brief Qt mouse move event handler
-   */
-  void mouseMoveEvent (QMouseEvent *e);
-
-  /**
-   *  @brief Qt mouse leave event handler
-   */
-  void leaveEvent (QEvent *e);
-
-  /**
-   *  @brief Qt mouse enter event handler
-   */
-  void enterEvent (QEvent *e);
-
-  /**
-   *  @brief Qt mouse button press event handler
-   */
-  void mousePressEvent (QMouseEvent *e);
-
-  /**
-   *  @brief Qt mouse button double-click event handler
-   */
-  void mouseDoubleClickEvent (QMouseEvent *e);
-
-  /**
-   *  @brief Qt mouse button release event handler
-   */
-  void mouseReleaseEvent (QMouseEvent *e);
-
-  /**
-   *  @brief Qt drag enter event handler
-   */
-  void dragEnterEvent (QDragEnterEvent *event);
-
-  /**
-   *  @brief Qt drag leave event handler
-   */
-  void dragLeaveEvent (QDragLeaveEvent *event);
-
-  /**
-   *  @brief Qt drag enter event handler
-   */
-  void dragMoveEvent (QDragMoveEvent *event);
-
-  /**
-   *  @brief Qt drop event handler
-   */
-  void dropEvent (QDropEvent *event);
-
-  /**
-   *  @brief Qt mouse wheel event handler
-   */
-  void wheelEvent (QWheelEvent *e);
-
-  /**
    *  @brief Cancel all drag operations
    */
   void drag_cancel ();
@@ -966,6 +906,71 @@ public:
   void set_default_cursor (lay::Cursor::cursor_shape cursor);
 
 protected:
+  /**
+   *  @brief Qt focus event handler
+   */
+  bool focusNextPrevChild (bool next);
+
+  /**
+   *  @brief Qt keyboard event handler
+   */
+  void keyPressEvent (QKeyEvent *e);
+
+  /**
+   *  @brief Qt mouse move event handler
+   */
+  void mouseMoveEvent (QMouseEvent *e);
+
+  /**
+   *  @brief Qt mouse leave event handler
+   */
+  void leaveEvent (QEvent *e);
+
+  /**
+   *  @brief Qt mouse enter event handler
+   */
+  void enterEvent (QEvent *e);
+
+  /**
+   *  @brief Qt mouse button press event handler
+   */
+  void mousePressEvent (QMouseEvent *e);
+
+  /**
+   *  @brief Qt mouse button double-click event handler
+   */
+  void mouseDoubleClickEvent (QMouseEvent *e);
+
+  /**
+   *  @brief Qt mouse button release event handler
+   */
+  void mouseReleaseEvent (QMouseEvent *e);
+
+  /**
+   *  @brief Qt drag enter event handler
+   */
+  void dragEnterEvent (QDragEnterEvent *event);
+
+  /**
+   *  @brief Qt drag leave event handler
+   */
+  void dragLeaveEvent (QDragLeaveEvent *event);
+
+  /**
+   *  @brief Qt drag enter event handler
+   */
+  void dragMoveEvent (QDragMoveEvent *event);
+
+  /**
+   *  @brief Qt drop event handler
+   */
+  void dropEvent (QDropEvent *event);
+
+  /**
+   *  @brief Qt mouse wheel event handler
+   */
+  void wheelEvent (QWheelEvent *e);
+
   /**
    *  @brief Set the transformation for mouse events
    */

@@ -97,9 +97,6 @@ private:
 LCPTreeWidget::LCPTreeWidget (QWidget *parent, lay::LayerTreeModel *model, const char *name)
   : QTreeView (parent), mp_model (model)
 {
-  //  Don't request focus: this leaves focus on the canvas and the arrow keys functional there
-  setFocusPolicy (Qt::NoFocus);
-
   setObjectName (QString::fromUtf8 (name));
   setModel (model);
   setItemDelegate (new LCPItemDelegate (this));
@@ -149,7 +146,38 @@ LCPTreeWidget::mouseDoubleClickEvent (QMouseEvent *event)
   }
 }
 
-void 
+bool
+LCPTreeWidget::focusNextPrevChild (bool /*next*/)
+{
+  return false;
+}
+
+bool
+LCPTreeWidget::event (QEvent *event)
+{
+  //  Handling this event makes the widget receive all keystrokes
+  if (event->type () == QEvent::ShortcutOverride) {
+    QKeyEvent *ke = static_cast<QKeyEvent *> (event);
+    QString t = ke->text ();
+    if (!t.isEmpty () && t[0].isPrint ()) {
+      ke->accept ();
+    }
+  }
+  return QTreeView::event (event);
+}
+
+void
+LCPTreeWidget::keyPressEvent (QKeyEvent *event)
+{
+  QString t = event->text ();
+  if (!t.isEmpty () && t[0].isPrint ()) {
+    emit search_triggered (t);
+  } else {
+    QTreeView::keyPressEvent (event);
+  }
+}
+
+void
 LCPTreeWidget::collapse_all ()
 {
 #if QT_VERSION >= 0x040200
@@ -299,6 +327,70 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
   l->setMargin (0);
   l->setSpacing (0);
 
+  mp_search_frame = new QFrame (this);
+  l->addWidget (mp_search_frame);
+  mp_search_frame->hide ();
+  mp_search_frame->setAutoFillBackground (true);
+  mp_search_frame->setObjectName (QString::fromUtf8 ("panel"));
+  mp_search_frame->setFrameStyle (QFrame::Panel | QFrame::Raised);
+  mp_search_frame->setLineWidth (1);
+  mp_search_frame->setBackgroundRole (QPalette::Highlight);
+
+  QHBoxLayout *sf_ly = new QHBoxLayout (mp_search_frame);
+  sf_ly->setMargin (0);
+  sf_ly->setContentsMargins (0, 0, 0, 0);
+  sf_ly->setSpacing (0);
+
+  mp_search_close_cb = new QCheckBox (mp_search_frame);
+  sf_ly->addWidget (mp_search_close_cb);
+
+  mp_search_close_cb->setFocusPolicy (Qt::NoFocus);
+  mp_search_close_cb->setBackgroundRole (QPalette::Highlight);
+  mp_search_close_cb->setSizePolicy (QSizePolicy (QSizePolicy::Fixed, QSizePolicy::Preferred));
+  QPalette pl (mp_search_close_cb->palette ());
+  pl.setColor (QPalette::Foreground, pl.color (QPalette::Active, QPalette::HighlightedText));
+  mp_search_close_cb->setPalette (pl);
+  mp_search_close_cb->setMaximumSize (QSize (mp_search_close_cb->maximumSize ().width (), mp_search_close_cb->sizeHint ().height () - 4));
+  connect (mp_search_close_cb, SIGNAL (clicked ()), this, SLOT (search_editing_finished ()));
+
+  mp_search_edit_box = new lay::DecoratedLineEdit (mp_search_frame);
+  mp_search_edit_box->setObjectName (QString::fromUtf8 ("cellview_search_edit_box"));
+  mp_search_edit_box->set_escape_signal_enabled (true);
+  mp_search_edit_box->set_tab_signal_enabled (true);
+  connect (mp_search_edit_box, SIGNAL (returnPressed ()), this, SLOT (search_editing_finished ()));
+  connect (mp_search_edit_box, SIGNAL (textEdited (const QString &)), this, SLOT (search_edited ()));
+  connect (mp_search_edit_box, SIGNAL (esc_pressed ()), this, SLOT (search_editing_finished ()));
+  connect (mp_search_edit_box, SIGNAL (tab_pressed ()), this, SLOT (search_next ()));
+  connect (mp_search_edit_box, SIGNAL (backtab_pressed ()), this, SLOT (search_prev ()));
+  sf_ly->addWidget (mp_search_edit_box);
+
+  mp_use_regular_expressions = new QAction (this);
+  mp_use_regular_expressions->setCheckable (true);
+  mp_use_regular_expressions->setChecked (true);
+  mp_use_regular_expressions->setText (tr ("Use expressions (use * and ? for any character)"));
+
+  mp_case_sensitive = new QAction (this);
+  mp_case_sensitive->setCheckable (true);
+  mp_case_sensitive->setChecked (true);
+  mp_case_sensitive->setText (tr ("Case sensitive search"));
+
+  QMenu *m = new QMenu (mp_search_edit_box);
+  m->addAction (mp_use_regular_expressions);
+  m->addAction (mp_case_sensitive);
+  connect (mp_use_regular_expressions, SIGNAL (triggered ()), this, SLOT (search_edited ()));
+  connect (mp_case_sensitive, SIGNAL (triggered ()), this, SLOT (search_edited ()));
+
+  mp_search_edit_box->set_clear_button_enabled (true);
+  mp_search_edit_box->set_options_button_enabled (true);
+  mp_search_edit_box->set_options_menu (m);
+
+  QToolButton *sf_next = new QToolButton (mp_search_frame);
+  sf_next->setAutoRaise (true);
+  sf_next->setToolTip (tr ("Find next"));
+  sf_next->setIcon (QIcon (QString::fromUtf8 (":/find.png")));
+  connect (sf_next, SIGNAL (clicked ()), this, SLOT (search_next ()));
+  sf_ly->addWidget (sf_next);
+
   mp_tab_bar = new QTabBar (this);
   mp_tab_bar->setObjectName (QString::fromUtf8 ("lcp_tabs"));
   connect (mp_tab_bar, SIGNAL (currentChanged (int)), this, SLOT (tab_selected (int)));
@@ -321,6 +413,7 @@ LayerControlPanel::LayerControlPanel (lay::LayoutView *view, db::Manager *manage
   connect (mp_layer_list, SIGNAL (double_clicked (const QModelIndex &, Qt::KeyboardModifiers)), this, SLOT (double_clicked (const QModelIndex &, Qt::KeyboardModifiers)));
   connect (mp_layer_list, SIGNAL (collapsed (const QModelIndex &)), this, SLOT (group_collapsed (const QModelIndex &)));
   connect (mp_layer_list, SIGNAL (expanded (const QModelIndex &)), this, SLOT (group_expanded (const QModelIndex &)));
+  connect (mp_layer_list, SIGNAL (search_triggered (const QString &)), this, SLOT (search_triggered (const QString &)));
   mp_layer_list->setContextMenuPolicy (Qt::CustomContextMenu);
   connect (mp_layer_list, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
   mp_layer_list->header ()->hide ();
@@ -1131,6 +1224,77 @@ LayerControlPanel::clear_selection ()
 }
 
 void
+LayerControlPanel::search_triggered (const QString &t)
+{
+  if (mp_model) {
+    mp_search_close_cb->setChecked (true);
+    mp_search_frame->show ();
+    mp_search_edit_box->setText (t);
+    mp_search_edit_box->setFocus ();
+    search_edited ();
+  }
+}
+
+void
+LayerControlPanel::search_edited ()
+{
+  if (! mp_model) {
+    return;
+  }
+
+  QString t = mp_search_edit_box->text ();
+  if (t.isEmpty ()) {
+    mp_model->clear_locate ();
+    mp_layer_list->setCurrentIndex (QModelIndex ());
+  } else {
+    QModelIndex found = mp_model->locate (t.toUtf8 ().constData (), mp_use_regular_expressions->isChecked (), mp_case_sensitive->isChecked (), false);
+    mp_layer_list->setCurrentIndex (found);
+    if (found.isValid ()) {
+      mp_layer_list->scrollTo (found);
+    }
+  }
+}
+
+void
+LayerControlPanel::search_next ()
+{
+  if (! mp_model) {
+    return;
+  }
+
+  QModelIndex found = mp_model->locate_next ();
+  if (found.isValid ()) {
+    mp_layer_list->setCurrentIndex (found);
+    mp_layer_list->scrollTo (found);
+  }
+}
+
+void
+LayerControlPanel::search_prev ()
+{
+  if (! mp_model) {
+    return;
+  }
+
+  QModelIndex found = mp_model->locate_prev ();
+  if (found.isValid ()) {
+    mp_layer_list->setCurrentIndex (found);
+    mp_layer_list->scrollTo (found);
+  }
+}
+
+void
+LayerControlPanel::search_editing_finished ()
+{
+  if (! mp_model) {
+    return;
+  }
+
+  mp_model->clear_locate ();
+  mp_search_frame->hide ();
+}
+
+void
 LayerControlPanel::cm_regroup_flatten ()
 {
   BEGIN_PROTECTED_CLEANUP
@@ -1727,6 +1891,10 @@ set_hidden_flags_rec (LayerTreeModel *model, QTreeView *tree_view, const QModelI
 void
 LayerControlPanel::do_update_content ()
 {
+  //  clear search. TODO: update search instead of clearing
+  mp_search_edit_box->clear ();
+  mp_model->clear_locate();
+
   mp_model->set_phase (m_phase);
 
   if (m_tabs_need_update) {

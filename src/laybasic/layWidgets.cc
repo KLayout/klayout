@@ -976,6 +976,8 @@ bool DecoratedLineEdit::event (QEvent *event)
     QKeyEvent *ke = static_cast<QKeyEvent *> (event);
     if (ke->key () == Qt::Key_Escape && m_escape_signal_enabled) {
       ke->accept ();
+    } else if ((ke->key () == Qt::Key_Tab || ke->key () == Qt::Key_Backtab) && m_tab_signal_enabled) {
+      ke->accept ();
     }
   }
   return QLineEdit::event (event);

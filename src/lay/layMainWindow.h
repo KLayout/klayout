@@ -662,8 +662,7 @@ public slots:
    */
   void intrinsic_mode_triggered ();
 
-  void popup_menu_show ();
-  void popup_menu_hide ();
+  void update_action_states ();
   void cancel ();
   void redraw ();
   void exit ();
@@ -900,6 +899,7 @@ private:
   tl::DeferredMethod<MainWindow> dm_do_update_menu;
   QTimer m_message_timer;
   QTimer m_file_changed_timer;
+  QTimer m_menu_update_timer;
   std::string m_config_window_state;
 
   std::string m_initial_technology;

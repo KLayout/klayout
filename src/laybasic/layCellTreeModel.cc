@@ -756,21 +756,6 @@ CellTreeModel::search_children (const tl::GlobPattern &pattern, CellTreeItem *it
   }
 }
 
-void
-CellTreeModel::search_children (const char *name, CellTreeItem *item)
-{
-  int children = item->children ();
-  for (int i = 0; i < children; ++i) {
-    CellTreeItem *c = item->child (i);
-    if (c) {
-      if (c->name_equals (name)) {
-        m_selected_indexes.push_back (model_index (c));
-      }
-      search_children (name, c);
-    }
-  }
-}
-
 QModelIndex 
 CellTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive, bool top_only)
 {

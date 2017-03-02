@@ -38,6 +38,11 @@ namespace db
   class Layout;
 }
 
+namespace tl
+{
+  class GlobPattern;
+}
+
 namespace lay
 {
 
@@ -162,6 +167,29 @@ public:
   void signal_data_changed ();
 
   /**
+   *  @brief Locate an index by name (at least closest)
+   *
+   *  If top_only is set, only top-level items are searched. An invalid model index is returned if
+   *  no corresponding item could be found.
+   */
+  QModelIndex locate (const char *name, bool glob_pattern = false, bool case_sensitive = true, bool top_only = true);
+
+  /**
+   *  @brief Locate the next index (after the first locate)
+   */
+  QModelIndex locate_next ();
+
+  /**
+   *  @brief Locate the previous index (after the first locate)
+   */
+  QModelIndex locate_prev ();
+
+  /**
+   *  @brief Clears the locate flags
+   */
+  void clear_locate ();
+
+  /**
    *  @brief Set the test_shapes_in_view flag
    *
    *  This method does not issue a data changed signal. This has to be done somewhere else.
@@ -194,6 +222,11 @@ private:
   QFont m_font;
   QColor m_text_color, m_background_color;
   mutable EmptyWithinViewCache m_test_shapes_cache;
+  std::set <size_t> m_selected_ids;
+  std::vector <QModelIndex> m_selected_indexes;
+  std::vector <QModelIndex>::const_iterator m_current_index;
+
+  void search_children (const tl::GlobPattern &pattern, const QModelIndex &parent, bool recurse);
 };
 
 }

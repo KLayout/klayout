@@ -238,7 +238,6 @@ private:
   void build_top_level ();
   void clear_top_level ();
   void search_children (const tl::GlobPattern &pattern, CellTreeItem *item);
-  void search_children (const char *name, CellTreeItem *item);
 };
 
 /**

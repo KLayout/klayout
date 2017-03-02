@@ -581,16 +581,6 @@ MainWindow::MainWindow (QApplication *app, const char *name)
   cp_frame_ly->insertSpacing (-1, 6);
 
   //  connect to the menus to provide the dynamic parts
-  QMenu *edit_menu = mp_menu->menu ("edit_menu");
-  tl_assert (edit_menu != 0);
-  connect (edit_menu, SIGNAL (aboutToShow ()), this, SLOT (popup_menu_show ()));
-  connect (edit_menu, SIGNAL (aboutToHide ()), this, SLOT (popup_menu_hide ()));
-
-  QMenu *zoom_menu = mp_menu->menu ("zoom_menu");
-  tl_assert (zoom_menu != 0);
-  connect (zoom_menu, SIGNAL (aboutToShow ()), this, SLOT (popup_menu_show ()));
-  connect (zoom_menu, SIGNAL (aboutToHide ()), this, SLOT (popup_menu_hide ()));
-
   QMenu *bookmark_menu = mp_menu->menu ("bookmark_menu");
   tl_assert (bookmark_menu != 0);
   connect (bookmark_menu, SIGNAL (aboutToShow ()), this, SLOT (bookmark_menu_show ()));
@@ -672,6 +662,11 @@ MainWindow::MainWindow (QApplication *app, const char *name)
   //  install timer for reload message display
   connect (&m_file_changed_timer, SIGNAL (timeout ()), this, SLOT (file_changed_timer()));
   m_file_changed_timer.setSingleShot (true);
+
+  //  install timer for menu update
+  connect (&m_menu_update_timer, SIGNAL (timeout ()), this, SLOT (update_action_states ()));
+  m_menu_update_timer.setSingleShot (false);
+  m_menu_update_timer.start (200);
 
   connect (&lay::LayoutHandle::file_watcher (), SIGNAL (fileChanged (const QString &)), this, SLOT (file_changed (const QString &)));
   connect (&lay::LayoutHandle::file_watcher (), SIGNAL (fileRemoved (const QString &)), this, SLOT (file_removed (const QString &)));
@@ -1695,9 +1690,6 @@ MainWindow::edits_enabled_changed ()
   for (std::vector<std::string>::const_iterator g = edit_grp.begin (); g != edit_grp.end (); ++g) {
     mp_menu->action (*g).set_enabled (enable);
   }
-
-  //  call this to establish a consistent set of options on the menu entries
-  popup_menu_show ();
 }
 
 void 
@@ -2664,123 +2656,73 @@ MainWindow::cm_zoom_out ()
 }
 
 void 
-MainWindow::popup_menu_hide ()
+MainWindow::update_action_states ()
 {
-  //  Enable all menu items as far as required on closing of the menu. Otherwise,
-  //  keyboard shortcuts are not effective when the window is closed and the actions are
-  //  left disabled.
+  try {
 
-  BEGIN_PROTECTED
+    if (mp_menu->is_valid ("edit_menu.undo")) {
 
-  if (mp_menu->is_valid ("edit_menu.undo")) {
-    Action undo_action = mp_menu->action ("edit_menu.undo");
-    undo_action.set_enabled (edits_enabled ());
-  }
+      Action undo_action = mp_menu->action ("edit_menu.undo");
 
-  if (mp_menu->is_valid ("edit_menu.redo")) {
-    Action redo_action = mp_menu->action ("edit_menu.redo");
-    redo_action.set_enabled (edits_enabled ());
-  }
+      std::string undo_txt (tl::to_string (QObject::tr ("&Undo")));
+      bool undo_enable = false;
+      if (current_view () && m_manager.available_undo ().first) {
+        undo_txt += " - " + m_manager.available_undo ().second;
+        undo_enable = true;
+      }
+      undo_action.set_title (undo_txt);
+      undo_action.set_enabled (undo_enable && edits_enabled ());
 
-  if (mp_menu->is_valid ("edit_menu.copy")) {
-    Action copy_action = mp_menu->action ("edit_menu.copy");
-    copy_action.set_enabled (edits_enabled ());
-  }
-
-  if (mp_menu->is_valid ("edit_menu.cut")) {
-    Action cut_action = mp_menu->action ("edit_menu.cut");
-    cut_action.set_enabled (edits_enabled ());
-  }
-
-  if (mp_menu->is_valid ("edit_menu.paste")) {
-    Action paste_action = mp_menu->action ("edit_menu.paste");
-    paste_action.set_enabled (edits_enabled ());
-  }
-
-  if (mp_menu->is_valid ("edit_menu.duplicate")) {
-    Action paste_action = mp_menu->action ("edit_menu.duplicate");
-    paste_action.set_enabled (edits_enabled ());
-  }
-
-  if (mp_menu->is_valid ("zoom_menu.next_display_state")) {
-    Action next_display_state_action = mp_menu->action ("zoom_menu.next_display_state");
-    next_display_state_action.set_enabled (true);
-  } 
-
-  if (mp_menu->is_valid ("zoom_menu.last_display_state")) {
-    Action last_display_state_action = mp_menu->action ("zoom_menu.last_display_state");
-    last_display_state_action.set_enabled (true);
-  }
-
-  END_PROTECTED
-}
-
-void 
-MainWindow::popup_menu_show ()
-{
-  BEGIN_PROTECTED
-
-  if (mp_menu->is_valid ("edit_menu.undo")) {
-
-    Action undo_action = mp_menu->action ("edit_menu.undo");
-
-    std::string undo_txt (tl::to_string (QObject::tr ("&Undo")));
-    bool undo_enable = false;
-    if (current_view () && m_manager.available_undo ().first) {
-      undo_txt += " - " + m_manager.available_undo ().second;
-      undo_enable = true;
     }
-    undo_action.set_title (undo_txt); 
-    undo_action.set_enabled (undo_enable && edits_enabled ());
 
-  }
+    if (mp_menu->is_valid ("edit_menu.redo")) {
 
-  if (mp_menu->is_valid ("edit_menu.redo")) {
+      Action redo_action = mp_menu->action ("edit_menu.redo");
 
-    Action redo_action = mp_menu->action ("edit_menu.redo");
+      std::string redo_txt (tl::to_string (QObject::tr ("&Redo")));
+      bool redo_enable = false;
+      if (current_view () && m_manager.available_redo ().first) {
+        redo_txt += " - " + m_manager.available_redo ().second;
+        redo_enable = true;
+      }
+      redo_action.set_title (redo_txt);
+      redo_action.set_enabled (redo_enable && edits_enabled ());
 
-    std::string redo_txt (tl::to_string (QObject::tr ("&Redo")));
-    bool redo_enable = false;
-    if (current_view () && m_manager.available_redo ().first) {
-      redo_txt += " - " + m_manager.available_redo ().second;
-      redo_enable = true;
     }
-    redo_action.set_title (redo_txt); 
-    redo_action.set_enabled (redo_enable && edits_enabled ());
 
+    if (mp_menu->is_valid ("edit_menu.copy")) {
+      Action copy_action = mp_menu->action ("edit_menu.copy");
+      copy_action.set_enabled (current_view () && current_view ()->has_selection () && edits_enabled ());
+    }
+
+    if (mp_menu->is_valid ("edit_menu.duplicate")) {
+      Action copy_action = mp_menu->action ("edit_menu.duplicate");
+      copy_action.set_enabled (current_view () && current_view ()->has_selection () && edits_enabled ());
+    }
+
+    if (mp_menu->is_valid ("edit_menu.cut")) {
+      Action cut_action = mp_menu->action ("edit_menu.cut");
+      cut_action.set_enabled (current_view () && current_view ()->has_selection () && edits_enabled ());
+    }
+
+    if (mp_menu->is_valid ("edit_menu.paste")) {
+      Action paste_action = mp_menu->action ("edit_menu.paste");
+      paste_action.set_enabled (! db::Clipboard::instance ().empty () && edits_enabled ());
+    }
+
+    if (mp_menu->is_valid ("zoom_menu.next_display_state")) {
+      Action next_display_state_action = mp_menu->action ("zoom_menu.next_display_state");
+      next_display_state_action.set_enabled (has_next_display_state ());
+    }
+
+    if (mp_menu->is_valid ("zoom_menu.last_display_state")) {
+      Action last_display_state_action = mp_menu->action ("zoom_menu.last_display_state");
+      last_display_state_action.set_enabled (has_last_display_state ());
+    }
+
+  } catch (...) {
+    //  ignore exceptions
   }
-
-  if (mp_menu->is_valid ("edit_menu.copy")) {
-    Action copy_action = mp_menu->action ("edit_menu.copy");
-    copy_action.set_enabled (current_view () && current_view ()->has_selection () && edits_enabled ());
-  }
-
-  if (mp_menu->is_valid ("edit_menu.duplicate")) {
-    Action copy_action = mp_menu->action ("edit_menu.duplicate");
-    copy_action.set_enabled (current_view () && current_view ()->has_selection () && edits_enabled ());
-  }
-
-  if (mp_menu->is_valid ("edit_menu.cut")) {
-    Action cut_action = mp_menu->action ("edit_menu.cut");
-    cut_action.set_enabled (current_view () && current_view ()->has_selection () && edits_enabled ());
-  }
-
-  if (mp_menu->is_valid ("edit_menu.paste")) {
-    Action paste_action = mp_menu->action ("edit_menu.paste");
-    paste_action.set_enabled (! db::Clipboard::instance ().empty () && edits_enabled ());
-  }
-
-  if (mp_menu->is_valid ("zoom_menu.next_display_state")) {
-    Action next_display_state_action = mp_menu->action ("zoom_menu.next_display_state");
-    next_display_state_action.set_enabled (has_next_display_state ());
-  } 
-
-  if (mp_menu->is_valid ("zoom_menu.last_display_state")) {
-    Action last_display_state_action = mp_menu->action ("zoom_menu.last_display_state");
-    last_display_state_action.set_enabled (has_last_display_state ());
-  }
-
-  END_PROTECTED
 }
 
 void

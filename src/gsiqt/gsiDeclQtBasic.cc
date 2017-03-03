@@ -23,12 +23,12 @@
 
 #include "gsiQt.h"
 
-#include <QtCore/QPair>
-#include <QtCore/QString>
-#include <QtCore/QPoint>
-#include <QtGui/QColor>
-#include <QtGui/QAccessibleInterface>
-#include <QtNetwork/QHostAddress>
+#include <QPair>
+#include <QString>
+#include <QPoint>
+#include <QColor>
+#include <QAccessibleInterface>
+#include <QHostAddress>
 
 // ------------------------------------------------------------
 //  Generic declarations for a pair

@@ -60,16 +60,18 @@ class Float
   end
 end
 
-# Extend the Fixnum class, so it is possible to 
-# convert a value to Float with a unit spec, i.e.
-# 5.nm -&gt; 0.005. A spec with ".dbu" gives the 
-# Fixnum value itself. This indicates a value in 
-# database units for most methods of the DRC 
-# framework.
-class Fixnum
-  def Fixnum._dbu=(dbu)
-    @@dbu = dbu
+module IntegerClassExtensions
+  @dbu = nil
+  def _dbu=(dbu)
+    @dbu = dbu
   end
+  def _dbu
+    @dbu
+  end
+end
+
+module IntegerExtensions
+
   def um
     self.to_f
   end
@@ -104,10 +106,21 @@ class Fixnum
     self*1.0e12
   end
   def dbu
-    @@dbu || raise("No layout loaded - cannot determine database unit")
-    self*@@dbu
+    self.class._dbu || raise("No layout loaded - cannot determine database unit")
+    self*self.class._dbu
   end
+
 end
+
+
+# Extend the Fixnum class, so it is possible to 
+# convert a value to Float with a unit spec, i.e.
+# 5.nm -&gt; 0.005. A spec with ".dbu" gives the 
+# Fixnum value itself. This indicates a value in 
+# database units for most methods of the DRC 
+# framework.
+1.class.include(IntegerExtensions)
+1.class.extend(IntegerClassExtensions)
 
 module DRC
 
@@ -134,7 +147,7 @@ module DRC
       self.value = v
     end
   end
-  
+ 
   # A wrapper for the join flag for extended
   class DRCJoinFlag
     attr_accessor :value
@@ -183,16 +196,16 @@ module DRC
       if a.size &gt; 2 || a.size == 0
         raise("A projection limits specification requires a maximum of two values and at least one argument")
       elsif a.size == 1
-        if !a[0].is_a?(Range) || (!a[0].min.is_a?(Float) &amp;&amp; !a[0].min.is_a?(Fixnum))
+        if !a[0].is_a?(Range) || (!a[0].min.is_a?(Float) &amp;&amp; !a[0].min.is_a?(1.class))
           raise("A projection limit requires an interval of two length values or two individual length values")
         end
         self.min = a[0].min
         self.max = a[0].max
       elsif a.size == 2
-        if a[0] &amp;&amp; !a[0].is_a?(Float) &amp;&amp; !a[0].is_a?(Fixnum)
+        if a[0] &amp;&amp; !a[0].is_a?(Float) &amp;&amp; !a[0].is_a?(1.class)
           raise("First argument to a projection limit must be either nil or a length value")
         end
-        if a[1] &amp;&amp; !a[1].is_a?(Float) &amp;&amp; !a[1].is_a?(Fixnum)
+        if a[1] &amp;&amp; !a[1].is_a?(Float) &amp;&amp; !a[1].is_a?(1.class)
           raise("Second argument to a projection limit must be either nil or a length value")
         end
         self.min = a[0]
@@ -1632,7 +1645,7 @@ CODE
             a[:in]     &amp;&amp; av[3] = prep_value(a[:in])
             a[:joined] &amp;&amp; av[4] = true
           elsif i &lt; 4
-            if !a.is_a?(Fixnum) &amp;&amp; !a.is_a?(Float)
+            if !a.is_a?(1.class) &amp;&amp; !a.is_a?(Float)
               raise("Invalid type for argument " + (i+1).to_s + " (method '#{f}')")
             end
             av[i] = prep_value(a)
@@ -2154,7 +2167,7 @@ CODE
           elsif a.is_a?(DRCProjectionLimits)
             minp = prep_value(a.min)
             maxp = prep_value(a.max)
-          elsif a.is_a?(Float) || a.is_a?(Fixnum)
+          elsif a.is_a?(Float) || a.is_a?(1.class)
             value &amp;&amp; raise("Value already specified")
             value = prep_value(a)
           else
@@ -2213,7 +2226,7 @@ CODE
           elsif a.is_a?(DRCProjectionLimits)
             minp = prep_value(a.min)
             maxp = prep_value(a.max)
-          elsif a.is_a?(Float) || a.is_a?(Fixnum)
+          elsif a.is_a?(Float) || a.is_a?(1.class)
             value &amp;&amp; raise("Value already specified")
             value = prep_value(a)
           else
@@ -2384,7 +2397,7 @@ CODE
         mode = 2
         values = []
         args.each do |a|
-          if a.is_a?(Fixnum) || a.is_a?(Float)
+          if a.is_a?(1.class) || a.is_a?(Float)
             v = prep_value(a)
             v.abs &gt; dist &amp;&amp; dist = v.abs 
             values.push(v)
@@ -2946,7 +2959,7 @@ CODE
         li &amp;&amp; layers.push(li)
         li &amp;&amp; @tmp_layers.push(li)
       
-      elsif (args.size == 1 || args.size == 2) &amp;&amp; args[0].is_a?(Fixnum)
+      elsif (args.size == 1 || args.size == 2) &amp;&amp; args[0].is_a?(1.class)
 
         li = @layout.find_layer(args[0], args[1] || 0)
         li &amp;&amp; layers.push(li)
@@ -3155,7 +3168,7 @@ CODE
       end
       # Should have a "context", but no such thing for Float or Fixnum
       Float._dbu = d
-      Fixnum._dbu = d
+      1.class._dbu = d
       @dbu = d
     end
     
@@ -4101,7 +4114,7 @@ CODE
 
         info = nil
         if args.size == 1
-          if args[0].is_a?(Fixnum)
+          if args[0].is_a?(1.class)
             info = RBA::LayerInfo::new(args[0], 0)
           elsif args[0].is_a?(String)
             info = RBA::LayerInfo::from_string(args[0])

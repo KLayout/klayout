@@ -350,6 +350,9 @@ p, li { white-space: pre-wrap; }
               <iconset resource="layResources.qrc">
                <normaloff>:/forward_16.png</normaloff>:/forward_16.png</iconset>
              </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item>

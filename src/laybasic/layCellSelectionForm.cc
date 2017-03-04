@@ -44,6 +44,9 @@
 namespace lay
 {
 
+static const std::string cfg_cell_selection_search_case_sensitive ("cell-selection-search-case-sensitive");
+static const std::string cfg_cell_selection_search_use_expressions ("cell-selection-search-use-expression");
+
 // ------------------------------------------------------------
 
 CellSelectionForm::CellSelectionForm (QWidget *parent, lay::LayoutView *view, const char *name, bool simple_mode)
@@ -61,6 +64,38 @@ CellSelectionForm::CellSelectionForm (QWidget *parent, lay::LayoutView *view, co
 
   Ui::CellSelectionForm::setupUi (this);
 
+  le_cell_name->set_tab_signal_enabled (true);
+
+  mp_use_regular_expressions = new QAction (this);
+  mp_use_regular_expressions->setCheckable (true);
+  mp_use_regular_expressions->setChecked (true);
+  mp_use_regular_expressions->setText (tr ("Use expressions (use * and ? for any character)"));
+
+  mp_case_sensitive = new QAction (this);
+  mp_case_sensitive->setCheckable (true);
+  mp_case_sensitive->setChecked (true);
+  mp_case_sensitive->setText (tr ("Case sensitive search"));
+
+  if (lay::PluginRoot::instance ()) {
+    bool cs = true;
+    lay::PluginRoot::instance ()->config_get (cfg_cell_selection_search_case_sensitive, cs);
+    mp_case_sensitive->setChecked (cs);
+    bool ue = true;
+    lay::PluginRoot::instance ()->config_get (cfg_cell_selection_search_use_expressions, ue);
+    mp_use_regular_expressions->setChecked (ue);
+  }
+
+  QMenu *m = new QMenu (le_cell_name);
+  m->addAction (mp_use_regular_expressions);
+  m->addAction (mp_case_sensitive);
+  connect (mp_use_regular_expressions, SIGNAL (triggered ()), this, SLOT (name_changed ()));
+  connect (mp_case_sensitive, SIGNAL (triggered ()), this, SLOT (name_changed ()));
+
+  le_cell_name->set_clear_button_enabled (true);
+  le_cell_name->set_options_button_enabled (true);
+  le_cell_name->set_options_menu (m);
+
+
   // signals and slots connections
   connect (cancel_button, SIGNAL(clicked()), this, SLOT(reject()));
   connect (cb_views, SIGNAL(activated(int)), this, SLOT(view_changed(int)));
@@ -68,13 +103,16 @@ CellSelectionForm::CellSelectionForm (QWidget *parent, lay::LayoutView *view, co
   connect (tb_set_child, SIGNAL(clicked()), this, SLOT(set_child()));
   connect (pb_hide, SIGNAL(clicked()), this, SLOT(hide_cell()));
   connect (pb_show, SIGNAL(clicked()), this, SLOT(show_cell()));
-  connect (le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed(const QString&)));
+  connect (le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed()));
   connect (ok_button, SIGNAL(clicked()), this, SLOT(accept()));
   connect (apply_button, SIGNAL(clicked()), this, SLOT(apply_clicked()));
   connect (find_next, SIGNAL(clicked()), this, SLOT(find_next_clicked()));
+  connect (le_cell_name, SIGNAL(tab_pressed()), this, SLOT(find_next_clicked()));
+  connect (le_cell_name, SIGNAL(backtab_pressed()), this, SLOT(find_prev_clicked()));
 
   connect (lv_parents, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(parent_changed(const QModelIndex &)));
   connect (lv_children, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(child_changed(const QModelIndex &)));
+
 
   m_cellviews.reserve (mp_view->cellviews ());
   for (unsigned int i = 0; i < mp_view->cellviews (); ++i) {
@@ -232,8 +270,25 @@ CellSelectionForm::view_changed (int cv)
 void
 CellSelectionForm::accept ()
 {
+  store_config ();
   commit_cv ();
   QDialog::accept ();
+}
+
+void
+CellSelectionForm::reject ()
+{
+  store_config ();
+  QDialog::reject ();
+}
+
+void
+CellSelectionForm::store_config ()
+{
+  if (lay::PluginRoot::instance ()) {
+    lay::PluginRoot::instance ()->config_set (cfg_cell_selection_search_case_sensitive, mp_case_sensitive->isChecked ());
+    lay::PluginRoot::instance ()->config_set (cfg_cell_selection_search_use_expressions, mp_use_regular_expressions->isChecked ());
+  }
 }
 
 void
@@ -384,10 +439,33 @@ CellSelectionForm::find_next_clicked ()
   }
 }
 
-void 
-CellSelectionForm::name_changed (const QString &s)
+void
+CellSelectionForm::find_prev_clicked ()
+{
+  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
+  if (! model) {
+    return;
+  }
+
+  QModelIndex mi = model->locate_prev ();
+  if (mi.isValid ()) {
+
+    m_cells_cb_enabled = false;
+    lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
+    lv_cells->scrollTo (mi);
+    update_children_list ();
+    update_parents_list ();
+    m_cells_cb_enabled = true;
+
+  }
+}
+
+void
+CellSelectionForm::name_changed ()
 {
   if (m_name_cb_enabled) {
+
+    QString s = le_cell_name->text ();
 
     lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
     if (! model) {
@@ -396,7 +474,7 @@ CellSelectionForm::name_changed (const QString &s)
 
     QModelIndex mi;
     if (!s.isEmpty ()) {
-      mi = model->locate (tl::to_string (s).c_str (), true);
+      mi = model->locate (tl::to_string (s).c_str (), mp_use_regular_expressions->isChecked (), mp_case_sensitive->isChecked ());
     } else {
       model->clear_locate ();
     }
@@ -455,264 +533,6 @@ CellSelectionForm::hide_cell ()
   }
 
   model->signal_data_changed ();
-}
-
-// ------------------------------------------------------------
-
-SimpleCellSelectionForm::SimpleCellSelectionForm (QWidget *parent, db::Layout *layout, const char *name)
-  : QDialog (parent), Ui::SimpleCellSelectionForm (),
-    mp_layout (layout),
-    m_name_cb_enabled (true),
-    m_cells_cb_enabled (true),
-    m_children_cb_enabled (true),
-    m_parents_cb_enabled (true),
-    m_update_all_dm (this, &SimpleCellSelectionForm::update_all),
-    m_cell_index (-1)
-{
-  setObjectName (QString::fromUtf8 (name));
-
-  Ui::SimpleCellSelectionForm::setupUi (this);
-
-  // signals and slots connections
-  connect (cancel_button, SIGNAL(clicked()), this, SLOT(reject()));
-  connect (tb_set_parent, SIGNAL(clicked()), this, SLOT(set_parent()));
-  connect (tb_set_child, SIGNAL(clicked()), this, SLOT(set_child()));
-  connect (le_cell_name, SIGNAL(textChanged(const QString&)), this, SLOT(name_changed(const QString&)));
-  connect (ok_button, SIGNAL(clicked()), this, SLOT(accept()));
-  connect (find_next, SIGNAL(clicked()), this, SLOT(find_next_clicked()));
-
-  connect (lv_parents, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(parent_changed(const QModelIndex &)));
-  connect (lv_children, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(child_changed(const QModelIndex &)));
-
-  lv_cells->header ()->hide ();
-  lv_cells->setRootIsDecorated (false);
-
-  lv_children->header ()->hide ();
-  lv_children->setRootIsDecorated (false);
-
-  lv_parents->header ()->hide ();
-  lv_parents->setRootIsDecorated (false);
-    
-  ok_button->setText (QObject::tr ("Ok"));
-  cancel_button->setText (QObject::tr ("Cancel"));
-
-  update_cell_list ();  
-}
-
-void 
-SimpleCellSelectionForm::set_selected_cell_index (db::cell_index_type ci)
-{
-  if (ci != m_cell_index) {
-    m_cell_index = ci;
-    select_entry (m_cell_index);
-  }
-}
-
-void 
-SimpleCellSelectionForm::update_cell_list () 
-{
-  if (lv_cells->model ()) {
-    delete lv_cells->model ();
-  }
-
-  lay::CellTreeModel *model = new lay::CellTreeModel (lv_cells, mp_layout, lay::CellTreeModel::Flat);
-  
-  lv_cells->setModel (model);
-  //  connect can only happen after setModel()
-  connect (lv_cells->selectionModel (), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(cell_changed(const QModelIndex &, const QModelIndex &)));
-
-  select_entry (m_cell_index);
-}
-
-void 
-SimpleCellSelectionForm::update_parents_list ()
-{
-  m_parents_cb_enabled = false;
-
-  if (lv_parents->model ()) {
-    delete lv_parents->model ();
-  }
-
-  if (mp_layout->is_valid_cell_index (m_cell_index)) {
-    lv_parents->setModel (new lay::CellTreeModel (lv_parents, mp_layout, lay::CellTreeModel::Flat | lay::CellTreeModel::Parents, &mp_layout->cell (m_cell_index)));
-  }
-
-  m_parents_cb_enabled = true;
-}
-
-void 
-SimpleCellSelectionForm::update_children_list ()
-{
-  m_children_cb_enabled = false;
-  
-  if (lv_children->model ()) {
-    delete lv_children->model ();
-  }
-
-  if (mp_layout->is_valid_cell_index (m_cell_index)) {
-    lv_children->setModel (new lay::CellTreeModel (lv_children, mp_layout, lay::CellTreeModel::Flat | lay::CellTreeModel::Children, &mp_layout->cell (m_cell_index)));
-  }
-
-  m_children_cb_enabled = true;
-}
-
-void 
-SimpleCellSelectionForm::cell_changed (const QModelIndex &current, const QModelIndex &)
-{
-  if (m_cells_cb_enabled) {
-
-    m_name_cb_enabled = false;
-
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
-    if (model) {
-      le_cell_name->setText (tl::to_qstring (model->cell_name (current)));
-      m_cell_index = model->cell_index (current);
-      model->clear_locate ();
-    } else {
-      m_cell_index = -1;
-    }
-
-    m_name_cb_enabled = true;
-
-    update_children_list ();
-    update_parents_list ();
-
-  }
-}
-
-void
-SimpleCellSelectionForm::set_child ()
-{
-  child_changed (lv_children->selectionModel ()->currentIndex ());
-}
-
-void 
-SimpleCellSelectionForm::child_changed(const QModelIndex &current)
-{
-  if (m_children_cb_enabled && current.isValid ()) {
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_children->model ());
-    if (model) {
-      select_entry (model->cell_index (lv_children->selectionModel ()->currentIndex ()));
-    }
-  }
-}
-
-void
-SimpleCellSelectionForm::set_parent ()
-{
-  parent_changed (lv_parents->selectionModel ()->currentIndex ());
-}
-
-void 
-SimpleCellSelectionForm::parent_changed(const QModelIndex &current)
-{
-  if (m_parents_cb_enabled && current.isValid ()) {
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_parents->model ());
-    if (model) {
-      select_entry (model->cell_index (lv_parents->selectionModel ()->currentIndex ()));
-    }
-  }
-}
-
-void 
-SimpleCellSelectionForm::select_entry (lay::CellView::cell_index_type ci)
-{
-  m_cells_cb_enabled = false;
-  m_cell_index = ci;
-
-  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
-  if (! model) {
-    return;
-  }
-
-  //  select the current entry
-  QModelIndex mi;
-  for (int c = 0; c < model->toplevel_items (); ++c) {
-    lay::CellTreeItem *item = model->toplevel_item (c);
-    if (item->cell_index () == ci) {
-      mi = model->model_index (item);
-      break;
-    }
-  }
-        
-  if (mi.isValid ()) {
-
-    m_cells_cb_enabled = false;
-    lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
-    lv_cells->scrollTo (mi);
-    m_cells_cb_enabled = true;
-
-    m_name_cb_enabled = false;
-    le_cell_name->setText (tl::to_qstring (model->cell_name (mi)));
-    model->clear_locate ();
-    m_name_cb_enabled = true;
-
-    //  do child list updates in a user event handler. Otherwise changing the models
-    //  immediately interferes with Qt's internal logic. So we do an deferred update.
-    m_update_all_dm ();
-
-  }
-  
-  m_cells_cb_enabled = true;
-}
-
-void 
-SimpleCellSelectionForm::update_all ()
-{
-  update_children_list ();
-  update_parents_list ();
-}
-
-void 
-SimpleCellSelectionForm::find_next_clicked ()
-{
-  lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
-  if (! model) {
-    return;
-  }
-
-  QModelIndex mi = model->locate_next ();
-  if (mi.isValid ()) {
-
-    m_cells_cb_enabled = false;
-    lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
-    lv_cells->scrollTo (mi);
-    m_cell_index = model->cell_index (mi);
-    update_children_list ();
-    update_parents_list ();
-    m_cells_cb_enabled = true;
-
-  } else {
-    m_cell_index = -1;
-  }
-}
-
-void 
-SimpleCellSelectionForm::name_changed (const QString &s)
-{
-  if (m_name_cb_enabled) {
-
-    lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (lv_cells->model ());
-    if (! model) {
-      return;
-    }
-
-    QModelIndex mi = model->locate (tl::to_string (s).c_str (), true);
-    if (mi.isValid ()) {
-
-      m_cells_cb_enabled = false;
-      lv_cells->selectionModel ()->setCurrentIndex (mi, QItemSelectionModel::SelectCurrent);
-      lv_cells->scrollTo (mi);
-      m_cell_index = model->cell_index (mi);
-      update_children_list ();
-      update_parents_list ();
-      m_cells_cb_enabled = true;
-
-    } else {
-      m_cell_index = -1;
-    }
-
-  }
 }
 
 // ------------------------------------------------------------

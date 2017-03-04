@@ -24,7 +24,8 @@
 #ifndef HDR_layCellSelectionForm
 #define HDR_layCellSelectionForm
 
-#include <QObject>  //  required during the dependency pass
+#include <QAction>
+
 #include "ui_CellSelectionForm.h"
 #include "ui_SimpleCellSelectionForm.h"
 #include "ui_LibraryCellSelectionForm.h"
@@ -62,17 +63,18 @@ public:
   const lay::CellView &selected_cellview () const;
 
 public slots:
-  virtual void view_changed(int);
-  virtual void cell_changed(const QModelIndex &current, const QModelIndex &);
-  virtual void child_changed(const QModelIndex &current);
-  virtual void parent_changed(const QModelIndex &current);
-  virtual void name_changed(const QString &);
-  virtual void set_parent();
-  virtual void set_child();
-  virtual void hide_cell();
-  virtual void show_cell();
-  virtual void apply_clicked();
-  virtual void find_next_clicked();
+  void view_changed(int);
+  void cell_changed(const QModelIndex &current, const QModelIndex &);
+  void child_changed(const QModelIndex &current);
+  void parent_changed(const QModelIndex &current);
+  void name_changed();
+  void set_parent();
+  void set_child();
+  void hide_cell();
+  void show_cell();
+  void apply_clicked();
+  void find_next_clicked();
+  void find_prev_clicked();
 
 private:
   lay::LayoutView *mp_view;
@@ -84,6 +86,8 @@ private:
   bool m_parents_cb_enabled;
   tl::DeferredMethod<CellSelectionForm> m_update_all_dm;
   bool m_simple_mode;
+  QAction *mp_use_regular_expressions;
+  QAction *mp_case_sensitive;
 
   void update_cell_list ();
   void update_parents_list ();
@@ -91,56 +95,9 @@ private:
   void update_all ();
   void select_entry (lay::CellView::cell_index_type n);
   void commit_cv ();
+  void store_config ();
   void accept ();
-};
-
-/**
- *  @brief A form to select a cell from a layout
- */
-class LAYBASIC_PUBLIC SimpleCellSelectionForm
-  : public QDialog, private Ui::SimpleCellSelectionForm
-{
-  Q_OBJECT 
-
-public:
-  SimpleCellSelectionForm (QWidget *parent, db::Layout *layout, const char *name);
-
-  /**
-   *  @brief Obtain the selected cell's index
-   */
-  db::cell_index_type selected_cell_index () const
-  {
-    return m_cell_index;
-  }
-
-  /**
-   *  @brief Set the selected cell's index
-   */
-  void set_selected_cell_index (db::cell_index_type ci);
-
-public slots:
-  virtual void cell_changed(const QModelIndex &current, const QModelIndex &);
-  virtual void child_changed(const QModelIndex &current);
-  virtual void parent_changed(const QModelIndex &current);
-  virtual void name_changed(const QString &);
-  virtual void set_parent();
-  virtual void set_child();
-  virtual void find_next_clicked();
-
-private:
-  db::Layout *mp_layout;
-  bool m_name_cb_enabled;
-  bool m_cells_cb_enabled;
-  bool m_children_cb_enabled;
-  bool m_parents_cb_enabled;
-  tl::DeferredMethod<SimpleCellSelectionForm> m_update_all_dm;
-  db::cell_index_type m_cell_index;
-
-  void update_cell_list ();
-  void update_parents_list ();
-  void update_children_list ();
-  void update_all ();
-  void select_entry (lay::CellView::cell_index_type n);
+  void reject ();
 };
 
 /**

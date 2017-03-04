@@ -67,7 +67,6 @@ FORMS = \
   SaveLayoutOptionsDialog.ui \
   SaveLayoutAsOptionsDialog.ui \
   SelectStippleForm.ui \
-  SimpleCellSelectionForm.ui \
   TipDialog.ui \
   UserPropertiesForm.ui \
   UserPropertiesEditForm.ui \
@@ -176,7 +175,8 @@ SOURCES = \
     laySelectLineStyleForm.cc \
     layLineStylePalette.cc \
     layEditLineStylesForm.cc \
-    layEditLineStyleWidget.cc
+    layEditLineStyleWidget.cc \
+    layBackgroundAwareTreeStyle.cc
 
 HEADERS = \
   gtf.h \
@@ -270,7 +270,8 @@ HEADERS = \
     layEditLineStylesForm.h \
     layEditLineStyleWidget.h \
     laybasicCommon.h \
-    laybasicConfig.h
+    laybasicConfig.h \
+    layBackgroundAwareTreeStyle.h
 
 INCLUDEPATH += ../tl ../gsi ../db ../rdb
 DEPENDPATH += ../tl ../gsi ../db ../rdb

@@ -27,12 +27,12 @@
 #include "layMainWindow.h"
 #include "layMacroEditorDialog.h"
 #include "layVersion.h"
-#include "tlExceptions.h"
 #include "layMacro.h"
 #include "layCrashMessage.h"
 #include "layRuntimeErrorForm.h"
 #include "layProgress.h"
 #include "layTextProgress.h"
+#include "layBackgroundAwareTreeStyle.h"
 #include "gtf.h"
 #include "gsiDecl.h"
 #include "gsiInterpreter.h"
@@ -42,6 +42,7 @@
 #include "dbStatic.h"
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
+#include "tlExceptions.h"
 #include "tlException.h"
 #include "tlAssert.h"
 #include "tlLog.h"
@@ -498,6 +499,11 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
 
   mp_qapp = this;
   mp_qapp_gui = (non_ui_mode ? 0 : this);
+
+  //  install a special style proxy to overcome the issue of black-on-black tree expanders
+  if (mp_qapp_gui) {
+    mp_qapp_gui->setStyle (new lay::BackgroundAwareTreeStyle (0));
+  }
   
   //  initialize the system codecs (Hint: this must be done after the QApplication is initialized because
   //  it will call setlocale)

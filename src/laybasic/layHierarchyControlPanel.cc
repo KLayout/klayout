@@ -332,7 +332,9 @@ HierarchyControlPanel::HierarchyControlPanel (lay::LayoutView *view, QWidget *pa
   mp_view->cellviews_changed_event.add (this, &HierarchyControlPanel::update_required);
   mp_view->hier_changed_event.add (this, &HierarchyControlPanel::update_required);
 
+  /* @@@
   mp_tree_style.reset (new BackgroundAwareTreeStyle (style ()));
+  @@@ */
 
   do_update_content ();
 }
@@ -895,7 +897,6 @@ HierarchyControlPanel::do_update_content (int cv_index)
 
     HCPCellTreeWidget *cell_list = new HCPCellTreeWidget (cl_frame, "tree", mp_view->view_object_widget ());
     cl_ly->addWidget (cell_list);
-    cell_list->setStyle (mp_tree_style.get ());
     cell_list->setModel (new CellTreeModel (cell_list, mp_view, cv_index, m_flat ? CellTreeModel::Flat : 0, 0, m_sorting));
     cell_list->setUniformRowHeights (true);
 

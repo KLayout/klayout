@@ -27,7 +27,6 @@
 #include <QAction>
 
 #include "ui_CellSelectionForm.h"
-#include "ui_SimpleCellSelectionForm.h"
 #include "ui_LibraryCellSelectionForm.h"
 #include "layCellView.h"
 #include "tlDeferredExecution.h"

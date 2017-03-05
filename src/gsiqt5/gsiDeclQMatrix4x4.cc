@@ -60,25 +60,6 @@ static void _call_ctor_QMatrix4x4_0 (const qt_gsi::GenericStaticMethod * /*decl*
 }
 
 
-//  Constructor QMatrix4x4::QMatrix4x4(Qt::Initialization)
-
-
-static void _init_ctor_QMatrix4x4_2229 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const qt_gsi::Converter<Qt::Initialization>::target_type & > (argspec_0);
-  decl->set_return_new<QMatrix4x4> ();
-}
-
-static void _call_ctor_QMatrix4x4_2229 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<Qt::Initialization>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Initialization>::target_type & > (heap);
-  ret.write<QMatrix4x4 *> (new QMatrix4x4 (qt_gsi::QtToCppAdaptor<Qt::Initialization>(arg1).cref()));
-}
-
-
 //  Constructor QMatrix4x4::QMatrix4x4(const float *values)
 
 
@@ -1387,7 +1368,6 @@ namespace gsi
 static gsi::Methods methods_QMatrix4x4 () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMatrix4x4::QMatrix4x4()\nThis method creates an object of class QMatrix4x4.", &_init_ctor_QMatrix4x4_0, &_call_ctor_QMatrix4x4_0);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMatrix4x4::QMatrix4x4(Qt::Initialization)\nThis method creates an object of class QMatrix4x4.", &_init_ctor_QMatrix4x4_2229, &_call_ctor_QMatrix4x4_2229);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMatrix4x4::QMatrix4x4(const float *values)\nThis method creates an object of class QMatrix4x4.", &_init_ctor_QMatrix4x4_1851, &_call_ctor_QMatrix4x4_1851);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMatrix4x4::QMatrix4x4(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33, float m34, float m41, float m42, float m43, float m44)\nThis method creates an object of class QMatrix4x4.", &_init_ctor_QMatrix4x4_13900, &_call_ctor_QMatrix4x4_13900);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMatrix4x4::QMatrix4x4(const float *values, int cols, int rows)\nThis method creates an object of class QMatrix4x4.", &_init_ctor_QMatrix4x4_3169, &_call_ctor_QMatrix4x4_3169);

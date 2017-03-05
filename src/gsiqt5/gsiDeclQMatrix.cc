@@ -46,25 +46,6 @@
 // -----------------------------------------------------------------------
 // class QMatrix
 
-//  Constructor QMatrix::QMatrix(Qt::Initialization)
-
-
-static void _init_ctor_QMatrix_2229 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const qt_gsi::Converter<Qt::Initialization>::target_type & > (argspec_0);
-  decl->set_return_new<QMatrix> ();
-}
-
-static void _call_ctor_QMatrix_2229 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<Qt::Initialization>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Initialization>::target_type & > (heap);
-  ret.write<QMatrix *> (new QMatrix (qt_gsi::QtToCppAdaptor<Qt::Initialization>(arg1).cref()));
-}
-
-
 //  Constructor QMatrix::QMatrix()
 
 
@@ -791,7 +772,6 @@ namespace gsi
 
 static gsi::Methods methods_QMatrix () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMatrix::QMatrix(Qt::Initialization)\nThis method creates an object of class QMatrix.", &_init_ctor_QMatrix_2229, &_call_ctor_QMatrix_2229);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMatrix::QMatrix()\nThis method creates an object of class QMatrix.", &_init_ctor_QMatrix_0, &_call_ctor_QMatrix_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMatrix::QMatrix(double m11, double m12, double m21, double m22, double dx, double dy)\nThis method creates an object of class QMatrix.", &_init_ctor_QMatrix_5886, &_call_ctor_QMatrix_5886);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMatrix::QMatrix(const QMatrix &matrix)\nThis method creates an object of class QMatrix.", &_init_ctor_QMatrix_2023, &_call_ctor_QMatrix_2023);

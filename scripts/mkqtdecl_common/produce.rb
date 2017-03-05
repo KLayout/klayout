@@ -1380,17 +1380,26 @@ class BindingProducer
       return
     end
 
-    (cls, clsn) = make_cls_names(decl_obj)
+    index = 0
 
-    ofile_name = "gsiDecl#{clsn}.cc"
-    ofile_path = $gen_dir + "/" + ofile_name
+    cont = true
+    while cont
+
+      (cls, clsn) = make_cls_names(decl_obj)
+
+      if index > 0
+        ofile_name = "gsiDecl#{clsn}_#{index}.cc"
+      else
+        ofile_name = "gsiDecl#{clsn}.cc"
+      end
+      ofile_path = $gen_dir + "/" + ofile_name
+        
+      File.open(ofile_path, "w") do |ofile|
       
-    File.open(ofile_path, "w") do |ofile|
-    
-      @source_files ||= []
-      @source_files << ofile_name
+        @source_files ||= []
+        @source_files << ofile_name
 
-      ofile.puts(<<"END");
+        ofile.puts(<<"END");
 
 /*
 
@@ -1422,13 +1431,17 @@ class BindingProducer
 
 END
 
-      if decl_obj.is_a?(CPPStructDeclaration)
-        produce_class(conf, decl_obj, ofile)
-      elsif decl_obj.is_a?(CPPNamespace)
-        produce_namespace(conf, decl_obj, ofile)
-      end
+        if decl_obj.is_a?(CPPStructDeclaration)
+          cont = produce_class(conf, decl_obj, ofile, index)
+        elsif decl_obj.is_a?(CPPNamespace)
+          cont = produce_namespace(conf, decl_obj, ofile, index)
+        end
 
-      puts("#{ofile_name} written.")
+        puts("#{ofile_name} written.")
+
+        index += 1
+
+      end
         
     end
 
@@ -1527,7 +1540,7 @@ END
 
   end
 
-  def produce_namespace(conf, decl_obj, ofile)
+  def produce_namespace(conf, decl_obj, ofile, index)
 
     ( cls, clsn ) = make_cls_names(decl_obj)
 
@@ -1544,20 +1557,32 @@ END
     ofile.puts("")
     ofile.puts("class #{cls}_Namespace { };")
     ofile.puts("")
-    ofile.puts("namespace gsi")
-    ofile.puts("{")
-    ofile.puts("gsi::Class<#{cls}_Namespace> decl_#{cls}_Namespace (\"#{clsn}\",")
-    ofile.puts("  gsi::Methods(),")
-    ofile.puts("  \"@qt\\n@brief This class represents the #{cls} namespace\");")
-    ofile.puts("}")
-    ofile.puts("")
+
+    if index == 0
+      ofile.puts("namespace gsi")
+      ofile.puts("{")
+      ofile.puts("gsi::Class<#{cls}_Namespace> decl_#{cls}_Namespace (\"#{clsn}\",")
+      ofile.puts("  gsi::Methods(),")
+      ofile.puts("  \"@qt\\n@brief This class represents the #{cls} namespace\");")
+      ofile.puts("}")
+      ofile.puts("")
+    end
 
     # emit enum wrapper classes
+
+    enums_per_file = 20
+
+    en_names = enum_decls_by_name.keys.sort
   
-    enum_decls_by_name.keys.sort.each do |en|
-      ed = enum_decls_by_name[en]
-      produce_enum_wrapper_class(ofile, conf, cls, en, ed) 
+    en_names.each_with_index do |en,en_index|
+      if en_index < (index + 1) * enums_per_file && en_index >= index * enums_per_file
+        ed = enum_decls_by_name[en]
+        produce_enum_wrapper_class(ofile, conf, cls, en, ed) 
+      end
     end
+
+    # produce more files if required
+    return en_names.size > (index + 1) * enums_per_file
 
   end
 
@@ -1697,7 +1722,11 @@ END
 
   end
 
-  def produce_class(conf, decl_obj, ofile)
+  def produce_class(conf, decl_obj, ofile, index)
+
+    if index > 0
+      raise "Internal error: no splitting of class definitions yet."
+    end
 
     struct = decl_obj.struct
 
@@ -2778,6 +2807,9 @@ END
       ed = enum_decls_by_name[en]
       produce_enum_wrapper_class(ofile, conf, cls, en, ed) 
     end
+
+    # don't continue
+    return false
 
   end
 

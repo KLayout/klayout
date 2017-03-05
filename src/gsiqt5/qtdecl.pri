@@ -766,4 +766,8 @@ SOURCES += \
   $$PWD/gsiDeclQXmlStreamReader.cc \
   $$PWD/gsiDeclQXmlStreamStringRef.cc \
   $$PWD/gsiDeclQXmlStreamWriter.cc \
-  $$PWD/gsiDeclQt.cc
+  $$PWD/gsiDeclQt.cc \
+  $$PWD/gsiDeclQt_1.cc \
+  $$PWD/gsiDeclQt_2.cc \
+  $$PWD/gsiDeclQt_3.cc \
+  $$PWD/gsiDeclQt_4.cc

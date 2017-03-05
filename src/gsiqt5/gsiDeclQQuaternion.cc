@@ -53,25 +53,6 @@ static void _call_ctor_QQuaternion_0 (const qt_gsi::GenericStaticMethod * /*decl
 }
 
 
-//  Constructor QQuaternion::QQuaternion(Qt::Initialization)
-
-
-static void _init_ctor_QQuaternion_2229 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const qt_gsi::Converter<Qt::Initialization>::target_type & > (argspec_0);
-  decl->set_return_new<QQuaternion> ();
-}
-
-static void _call_ctor_QQuaternion_2229 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<Qt::Initialization>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Initialization>::target_type & > (heap);
-  ret.write<QQuaternion *> (new QQuaternion (qt_gsi::QtToCppAdaptor<Qt::Initialization>(arg1).cref()));
-}
-
-
 //  Constructor QQuaternion::QQuaternion(float scalar, float xpos, float ypos, float zpos)
 
 
@@ -1013,7 +994,6 @@ namespace gsi
 static gsi::Methods methods_QQuaternion () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QQuaternion::QQuaternion()\nThis method creates an object of class QQuaternion.", &_init_ctor_QQuaternion_0, &_call_ctor_QQuaternion_0);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QQuaternion::QQuaternion(Qt::Initialization)\nThis method creates an object of class QQuaternion.", &_init_ctor_QQuaternion_2229, &_call_ctor_QQuaternion_2229);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QQuaternion::QQuaternion(float scalar, float xpos, float ypos, float zpos)\nThis method creates an object of class QQuaternion.", &_init_ctor_QQuaternion_3556, &_call_ctor_QQuaternion_3556);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QQuaternion::QQuaternion(float scalar, const QVector3D &vector)\nThis method creates an object of class QQuaternion.", &_init_ctor_QQuaternion_3002, &_call_ctor_QQuaternion_3002);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QQuaternion::QQuaternion(const QVector4D &vector)\nThis method creates an object of class QQuaternion.", &_init_ctor_QQuaternion_2141, &_call_ctor_QQuaternion_2141);

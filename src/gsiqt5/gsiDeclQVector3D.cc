@@ -53,25 +53,6 @@ static void _call_ctor_QVector3D_0 (const qt_gsi::GenericStaticMethod * /*decl*/
 }
 
 
-//  Constructor QVector3D::QVector3D(Qt::Initialization)
-
-
-static void _init_ctor_QVector3D_2229 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const qt_gsi::Converter<Qt::Initialization>::target_type & > (argspec_0);
-  decl->set_return_new<QVector3D> ();
-}
-
-static void _call_ctor_QVector3D_2229 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<Qt::Initialization>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Initialization>::target_type & > (heap);
-  ret.write<QVector3D *> (new QVector3D (qt_gsi::QtToCppAdaptor<Qt::Initialization>(arg1).cref()));
-}
-
-
 //  Constructor QVector3D::QVector3D(float xpos, float ypos, float zpos)
 
 
@@ -874,7 +855,6 @@ namespace gsi
 static gsi::Methods methods_QVector3D () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVector3D::QVector3D()\nThis method creates an object of class QVector3D.", &_init_ctor_QVector3D_0, &_call_ctor_QVector3D_0);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVector3D::QVector3D(Qt::Initialization)\nThis method creates an object of class QVector3D.", &_init_ctor_QVector3D_2229, &_call_ctor_QVector3D_2229);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVector3D::QVector3D(float xpos, float ypos, float zpos)\nThis method creates an object of class QVector3D.", &_init_ctor_QVector3D_2694, &_call_ctor_QVector3D_2694);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVector3D::QVector3D(const QPoint &point)\nThis method creates an object of class QVector3D.", &_init_ctor_QVector3D_1916, &_call_ctor_QVector3D_1916);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVector3D::QVector3D(const QPointF &point)\nThis method creates an object of class QVector3D.", &_init_ctor_QVector3D_1986, &_call_ctor_QVector3D_1986);

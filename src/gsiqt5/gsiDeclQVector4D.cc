@@ -53,25 +53,6 @@ static void _call_ctor_QVector4D_0 (const qt_gsi::GenericStaticMethod * /*decl*/
 }
 
 
-//  Constructor QVector4D::QVector4D(Qt::Initialization)
-
-
-static void _init_ctor_QVector4D_2229 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const qt_gsi::Converter<Qt::Initialization>::target_type & > (argspec_0);
-  decl->set_return_new<QVector4D> ();
-}
-
-static void _call_ctor_QVector4D_2229 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<Qt::Initialization>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Initialization>::target_type & > (heap);
-  ret.write<QVector4D *> (new QVector4D (qt_gsi::QtToCppAdaptor<Qt::Initialization>(arg1).cref()));
-}
-
-
 //  Constructor QVector4D::QVector4D(float xpos, float ypos, float zpos, float wpos)
 
 
@@ -760,7 +741,6 @@ namespace gsi
 static gsi::Methods methods_QVector4D () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVector4D::QVector4D()\nThis method creates an object of class QVector4D.", &_init_ctor_QVector4D_0, &_call_ctor_QVector4D_0);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVector4D::QVector4D(Qt::Initialization)\nThis method creates an object of class QVector4D.", &_init_ctor_QVector4D_2229, &_call_ctor_QVector4D_2229);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVector4D::QVector4D(float xpos, float ypos, float zpos, float wpos)\nThis method creates an object of class QVector4D.", &_init_ctor_QVector4D_3556, &_call_ctor_QVector4D_3556);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVector4D::QVector4D(const QPoint &point)\nThis method creates an object of class QVector4D.", &_init_ctor_QVector4D_1916, &_call_ctor_QVector4D_1916);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVector4D::QVector4D(const QPointF &point)\nThis method creates an object of class QVector4D.", &_init_ctor_QVector4D_1986, &_call_ctor_QVector4D_1986);

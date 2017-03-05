@@ -47,25 +47,6 @@
 // -----------------------------------------------------------------------
 // class QTransform
 
-//  Constructor QTransform::QTransform(Qt::Initialization)
-
-
-static void _init_ctor_QTransform_2229 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const qt_gsi::Converter<Qt::Initialization>::target_type & > (argspec_0);
-  decl->set_return_new<QTransform> ();
-}
-
-static void _call_ctor_QTransform_2229 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<Qt::Initialization>::target_type & arg1 = args.read<const qt_gsi::Converter<Qt::Initialization>::target_type & > (heap);
-  ret.write<QTransform *> (new QTransform (qt_gsi::QtToCppAdaptor<Qt::Initialization>(arg1).cref()));
-}
-
-
 //  Constructor QTransform::QTransform()
 
 
@@ -1288,7 +1269,6 @@ namespace gsi
 
 static gsi::Methods methods_QTransform () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTransform::QTransform(Qt::Initialization)\nThis method creates an object of class QTransform.", &_init_ctor_QTransform_2229, &_call_ctor_QTransform_2229);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTransform::QTransform()\nThis method creates an object of class QTransform.", &_init_ctor_QTransform_0, &_call_ctor_QTransform_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTransform::QTransform(double h11, double h12, double h13, double h21, double h22, double h23, double h31, double h32, double h33)\nThis method creates an object of class QTransform.", &_init_ctor_QTransform_8775, &_call_ctor_QTransform_8775);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTransform::QTransform(double h11, double h12, double h21, double h22, double dx, double dy)\nThis method creates an object of class QTransform.", &_init_ctor_QTransform_5886, &_call_ctor_QTransform_5886);

@@ -59,14 +59,14 @@ BackgroundAwareTreeStyle::drawPrimitive (QStyle::PrimitiveElement pe, const QSty
           cg = QPalette::Inactive;
         }
       }
-      if (opt->state & State_Selected) {
+      if ((opt->state & State_Selected) && styleHint(QStyle::SH_ItemView_ShowDecorationSelected, opt, w)) {
         c = opt->palette.color (cg, QPalette::HighlightedText);
       } else {
         c = opt->palette.color (cg, QPalette::Text);
       }
       if (! (opt->state & State_MouseOver)) {
         if (c.green () < 128) {
-          c = QColor ((c.red () * 3 + 255) / 4, (c.green () * 3 + 255) / 4, (c.blue () * 3 + 255) / 4);
+          c = QColor ((c.red () * 2 + 255) / 3, (c.green () * 2 + 255) / 3, (c.blue () * 2 + 255) / 3);
         } else {
           c = QColor ((c.red () * 8) / 9, (c.green () * 8) / 9, (c.blue () * 8) / 9);
         }

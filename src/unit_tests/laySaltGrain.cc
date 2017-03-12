@@ -24,6 +24,8 @@
 #include "laySaltGrain.h"
 #include "utHead.h"
 
+#include <QDir>
+
 TEST (1)
 {
   lay::SaltGrain g;
@@ -70,6 +72,14 @@ TEST (1)
   gg.load (tmp);
   gg.set_path (g.path ());  //  path is not set by load(file)
   EXPECT_EQ (int (gg.dependencies ().size ()), 1);
+  EXPECT_EQ (g == gg, true);
+
+  gg.add_dependency (lay::SaltGrain::Dependency ());
+  EXPECT_EQ (g == gg, false);
+  gg.set_path (tl::to_string (QFileInfo (tl::to_qstring (tmp)).absolutePath ()));
+  gg.save ();
+
+  g = lay::SaltGrain::from_path (gg.path ());
   EXPECT_EQ (g == gg, true);
 }
 

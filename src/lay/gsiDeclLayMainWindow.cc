@@ -539,6 +539,10 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "MainWind
     "@brief 'cm_technologies' action (bound to a menu)"
     "\nThis method has been added in version 0.22."
   ) +
+  gsi::method ("cm_packages", &lay::MainWindow::cm_packages,
+    "@brief 'cm_packages' action (bound to a menu)"
+    "\nThis method has been added in version 0.25."
+  ) +
   gsi::method ("cm_open_too", &lay::MainWindow::cm_open_too,
     "@brief 'cm_open_too' action (bound to a menu)"
   ) +

@@ -45,7 +45,11 @@ HEADERS = \
   layTextProgress.h \
   layVersion.h \
     layCommon.h \
-    layConfig.h
+    layConfig.h \
+    laySalt.h \
+    laySaltGrain.h \
+    laySaltGrains.h \
+    laySaltManagerDialog.h
 
 FORMS = \
   ClipDialog.ui \
@@ -90,7 +94,8 @@ FORMS = \
   XORToolDialog.ui \
     TechLoadOptionsEditorPage.ui \
     TechSaveOptionsEditorPage.ui \
-    MainConfigPage7.ui
+    MainConfigPage7.ui \
+    SaltManagerDialog.ui
 
 SOURCES = \
   gsiDeclLayApplication.cc \
@@ -134,6 +139,10 @@ SOURCES = \
   layTechSetupDialog.cc \
   layTextProgress.cc \
   layVersion.cc \
+    laySalt.cc \
+    laySaltGrain.cc \
+    laySaltGrains.cc \
+    laySaltManagerDialog.cc
 
 RESOURCES = layBuildInMacros.qrc \
   layHelpResources.qrc \

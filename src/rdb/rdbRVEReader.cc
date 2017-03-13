@@ -30,6 +30,7 @@
 #include "dbTrans.h"
 #include "dbPolygon.h"
 #include "dbEdge.h"
+#include "dbEdgePair.h"
 
 #include <cctype>
 #include <cstring>
@@ -80,6 +81,7 @@ public:
     db::DCplxTrans trans;
     db::DCplxTrans shape_trans;
     std::vector <db::DPoint> points;
+    std::vector <db::DEdge> edges;
 
     ex = tl::Extractor (m_input_stream.get_line ().c_str ());
     ex.read (s, " ");
@@ -360,10 +362,7 @@ public:
 
         } else if (shape_type == 'e') {
 
-          Item *item = db.create_item (cell->id (), cath->id ());
-          if (waived) {
-            db.add_item_tag (item, waived_tag_id);
-          }
+          edges.clear ();
 
           for (size_t point = 0; point < npoints; ++point) {
 
@@ -387,8 +386,17 @@ public:
 
             ex.expect_end ();
 
-            values.add (new Value<db::DEdge> (db::DEdge (db::DPoint (x1 * dbu, y1 * dbu), db::DPoint (x2 * dbu, y2 * dbu)).transformed (shape_trans)));
+            edges.push_back (db::DEdge (db::DPoint (x1 * dbu, y1 * dbu), db::DPoint (x2 * dbu, y2 * dbu)).transformed (shape_trans));
 
+          }
+
+          if (edges.size () == 2) {
+            //  produce an edge pair from two edges
+            values.add (new Value<db::DEdgePair> (db::DEdgePair (edges [0], edges [1])));
+          } else {
+            for (std::vector <db::DEdge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+              values.add (new Value<db::DEdge> (*e));
+            }
           }
 
         } else {

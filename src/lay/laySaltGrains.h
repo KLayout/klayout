@@ -120,7 +120,7 @@ public:
    */
   collection_iterator end_collections () const
   {
-    return m_collections.begin ();
+    return m_collections.end ();
   }
 
   /**
@@ -146,7 +146,7 @@ public:
    */
   grain_iterator end_grains () const
   {
-    return m_grains.begin ();
+    return m_grains.end ();
   }
 
   /**
@@ -170,7 +170,7 @@ public:
    *  the grains from this path.
    *  Sub-collections are created from folders which contain grains or sub-collections.
    */
-  static SaltGrains from_path (const std::string &path);
+  static SaltGrains from_path (const std::string &path, const std::string &pfx = std::string ());
 
 private:
   std::string m_name;

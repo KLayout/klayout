@@ -22,6 +22,7 @@
 
 
 #include "laySaltGrain.h"
+#include "laySaltGrains.h"
 #include "utHead.h"
 
 #include <QDir>
@@ -106,4 +107,102 @@ TEST (2)
   EXPECT_EQ (lay::SaltGrain::compare_versions ("990", "991"), -1);
   EXPECT_EQ (lay::SaltGrain::compare_versions ("990", "990"), 0);
   EXPECT_EQ (lay::SaltGrain::compare_versions ("991", "990"), 1);
+}
+
+
+static std::string grains_to_string (const lay::SaltGrains &gg)
+{
+  std::string res;
+  res += "[";
+  bool first = true;
+  for (lay::SaltGrains::grain_iterator g = gg.begin_grains (); g != gg.end_grains (); ++g) {
+    if (! first) {
+      res += ",";
+    }
+    first = false;
+    res += g->name ();
+  }
+  for (lay::SaltGrains::collection_iterator gc = gg.begin_collections (); gc != gg.end_collections (); ++gc) {
+    if (! first) {
+      res += ",";
+    }
+    first = false;
+    res += gc->name ();
+    res += grains_to_string (*gc);
+  }
+  res += "]";
+  return res;
+}
+
+static bool empty_dir (const QString &path)
+{
+  QDir dir (path);
+  QStringList entries = dir.entryList (QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs);
+  for (QStringList::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+    QFileInfo fi (dir.absoluteFilePath (*e));
+    if (fi.isDir ()) {
+      if (! empty_dir (fi.filePath ())) {
+        return false;
+      }
+      if (! dir.rmdir (*e)) {
+        return false;
+      }
+    } else if (fi.isFile ()) {
+      if (! dir.remove (*e)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+TEST (3)
+{
+  const QString grain_spec_file = QString::fromUtf8 ("grain.xml");
+
+  lay::SaltGrain g;
+  g.set_name ("x");
+
+  QDir tmp_dir (QFileInfo (tl::to_qstring (tmp_file ())).absolutePath ());
+  QDir dir_a (tmp_dir.filePath (QString::fromUtf8 ("a")));
+  QDir dir_b (tmp_dir.filePath (QString::fromUtf8 ("b")));
+  QDir dir_c (tmp_dir.filePath (QString::fromUtf8 ("c")));
+  QDir dir_cu (dir_c.filePath (QString::fromUtf8 ("u")));
+  QDir dir_cc (dir_c.filePath (QString::fromUtf8 ("c")));
+  QDir dir_ccv (dir_cc.filePath (QString::fromUtf8 ("v")));
+
+  tl_assert (empty_dir (tmp_dir.path ()));
+
+  lay::SaltGrains gg;
+  gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (gg.is_empty (), true);
+  EXPECT_EQ (grains_to_string (gg), "[]");
+
+  tmp_dir.mkdir (dir_a.dirName ());
+  tmp_dir.mkdir (dir_b.dirName ());
+  tmp_dir.mkdir (dir_c.dirName ());
+  dir_c.mkdir (dir_cu.dirName ());
+  dir_c.mkdir (dir_cc.dirName ());
+  dir_cc.mkdir (dir_ccv.dirName ());
+
+  gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (gg.is_empty (), true);
+  EXPECT_EQ (grains_to_string (gg), "[]");
+  EXPECT_EQ (gg.path (), tl::to_string (tmp_dir.path ()));
+
+  g.save (tl::to_string (dir_a.absoluteFilePath (grain_spec_file)));
+
+  gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (gg.is_empty (), false);
+  EXPECT_EQ (grains_to_string (gg), "[a]");
+  EXPECT_EQ (gg.begin_grains ()->path (), tl::to_string (dir_a.absolutePath ()));
+
+  g.save (tl::to_string (dir_b.absoluteFilePath (grain_spec_file)));
+  g.save (tl::to_string (dir_cu.absoluteFilePath (grain_spec_file)));
+  g.save (tl::to_string (dir_ccv.absoluteFilePath (grain_spec_file)));
+
+  gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (gg.is_empty (), false);
+  EXPECT_EQ (grains_to_string (gg), "[a,b,c[c/u,c/c[c/c/v]]]");
+  EXPECT_EQ (gg.begin_collections ()->path (), tl::to_string (dir_c.absolutePath ()));
 }

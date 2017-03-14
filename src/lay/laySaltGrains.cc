@@ -105,23 +105,33 @@ SaltGrains::is_empty () const
 }
 
 SaltGrains
-SaltGrains::from_path (const std::string &path)
+SaltGrains::from_path (const std::string &path, const std::string &prefix)
 {
   SaltGrains grains;
+  grains.set_path (path);
 
   QDir dir (tl::to_qstring (path));
-  QStringList entries = dir.entryList (QDir::NoFilter, QDir::Name);
+  QStringList entries = dir.entryList (QDir::NoDotAndDotDot | QDir::Dirs, QDir::Name);
   for (QStringList::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+
+    std::string new_prefix = prefix;
+    if (! new_prefix.empty ()) {
+      new_prefix += "/";
+    }
+    new_prefix += tl::to_string (*e);
 
     std::string epath = tl::to_string (dir.absoluteFilePath (*e));
     if (SaltGrain::is_grain (epath)) {
       try {
-        grains.add_grain (SaltGrain::from_path (epath));
+        SaltGrain g (SaltGrain::from_path (epath));
+        g.set_name (new_prefix);
+        grains.add_grain (g);
       } catch (...) {
         //  ignore errors (TODO: what to do here?)
       }
     } else if (QFileInfo (tl::to_qstring (epath)).isDir ()) {
-      SaltGrains c = SaltGrains::from_path (epath);
+      SaltGrains c = SaltGrains::from_path (epath, new_prefix);
+      c.set_name (new_prefix);
       if (! c.is_empty ()) {
         grains.add_collection (c);
       }

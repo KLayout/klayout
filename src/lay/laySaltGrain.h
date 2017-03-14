@@ -213,6 +213,11 @@ public:
   }
 
   /**
+   *  @brief Returns true, if the collection is read-only
+   */
+  bool is_readonly () const;
+
+  /**
    *  @brief Loads the data from a given file
    *  This method will *not* set the path.
    */

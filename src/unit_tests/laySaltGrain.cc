@@ -23,6 +23,7 @@
 
 #include "laySaltGrain.h"
 #include "laySaltGrains.h"
+#include "tlFileUtils.h"
 #include "utHead.h"
 
 #include <QDir>
@@ -134,28 +135,6 @@ static std::string grains_to_string (const lay::SaltGrains &gg)
   return res;
 }
 
-static bool empty_dir (const QString &path)
-{
-  QDir dir (path);
-  QStringList entries = dir.entryList (QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs);
-  for (QStringList::const_iterator e = entries.begin (); e != entries.end (); ++e) {
-    QFileInfo fi (dir.absoluteFilePath (*e));
-    if (fi.isDir ()) {
-      if (! empty_dir (fi.filePath ())) {
-        return false;
-      }
-      if (! dir.rmdir (*e)) {
-        return false;
-      }
-    } else if (fi.isFile ()) {
-      if (! dir.remove (*e)) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
 TEST (3)
 {
   const QString grain_spec_file = QString::fromUtf8 ("grain.xml");
@@ -171,7 +150,7 @@ TEST (3)
   QDir dir_cc (dir_c.filePath (QString::fromUtf8 ("c")));
   QDir dir_ccv (dir_cc.filePath (QString::fromUtf8 ("v")));
 
-  tl_assert (empty_dir (tmp_dir.path ()));
+  tl_assert (tl::rm_dir_recursive (tmp_dir.path ()));
 
   lay::SaltGrains gg;
   gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));

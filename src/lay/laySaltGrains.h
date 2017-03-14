@@ -130,8 +130,10 @@ public:
 
   /**
    *  @brief Removes the collection given by the collection iterator
+   *  If "with_files" is true, also the folder and all sub-folders will be removed
+   *  @return true, if the remove was successful.
    */
-  void remove_collection (collection_iterator iter);
+  bool remove_collection (collection_iterator iter, bool with_files = false);
 
   /**
    *  @brief Gets the grains (leaf nodes) which are members of this collection (begin iterator)
@@ -156,13 +158,20 @@ public:
 
   /**
    *  @brief Removes the grain given by the grain iterator
+   *  If "with_files" is true, also the files and the folder will be removed.
+   *  @return true, if the remove was successful.
    */
-  void remove_grain (grain_iterator iter);
+  bool remove_grain (grain_iterator iter, bool with_files = false);
 
   /**
    *  @brief Gets a value indicating whether the collection is empty
    */
   bool is_empty () const;
+
+  /**
+   *  @brief Returns true, if the collection is read-only
+   */
+  bool is_readonly () const;
 
   /**
    *  @brief Scan grains from a given path

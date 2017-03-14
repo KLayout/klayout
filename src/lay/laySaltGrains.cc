@@ -22,6 +22,7 @@
 
 #include "laySaltGrains.h"
 #include "tlString.h"
+#include "tlFileUtils.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -68,16 +69,21 @@ SaltGrains::add_collection (const SaltGrains &collection)
   m_collections.push_back (collection);
 }
 
-void
-SaltGrains::remove_collection (collection_iterator iter)
+bool
+SaltGrains::remove_collection (collection_iterator iter, bool with_files)
 {
   //  NOTE: this is kind of inefficient, but in order to maintain the const iterator semantics this approach is required
   for (collections_type::iterator i = m_collections.begin (); i != m_collections.end (); ++i) {
     if (i == iter) {
+      if (with_files && !tl::rm_dir_recursive (tl::to_qstring (path ()))) {
+        return false;
+      }
       m_collections.erase (i);
-      break;
+      return true;
     }
   }
+
+  return false;
 }
 
 void
@@ -86,22 +92,33 @@ SaltGrains::add_grain (const SaltGrain &grain)
   m_grains.push_back (grain);
 }
 
-void
-SaltGrains::remove_grain (grain_iterator iter)
+bool
+SaltGrains::remove_grain (grain_iterator iter, bool with_files)
 {
   //  NOTE: this is kind of inefficient, but in order to maintain the const iterator semantics this approach is required
   for (grains_type::iterator i = m_grains.begin (); i != m_grains.end (); ++i) {
     if (i == iter) {
+      if (with_files && !tl::rm_dir_recursive (tl::to_qstring (path ()))) {
+        return false;
+      }
       m_grains.erase (i);
-      break;
+      return true;
     }
   }
+
+  return false;
 }
 
 bool
 SaltGrains::is_empty () const
 {
   return m_collections.empty () && m_grains.empty ();
+}
+
+bool
+SaltGrains::is_readonly () const
+{
+  return QFileInfo (tl::to_qstring (path ())).isWritable ();
 }
 
 SaltGrains

@@ -141,6 +141,12 @@ static tl::XMLStruct<lay::SaltGrain> xml_struct ("salt-grain",
   )
 );
 
+bool
+SaltGrain::is_readonly () const
+{
+  return QFileInfo (tl::to_qstring (path ())).isWritable ();
+}
+
 void
 SaltGrain::load (const std::string &p)
 {

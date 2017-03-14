@@ -669,15 +669,15 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "Image",
     "this method does nothing.\n"
   ) +
   gsi::method ("get_pixel", (double (ImageRef::*)(size_t x, size_t y) const) &ImageRef::pixel,
-    "@brief Gets one pixel (monochrome and color)\n"
+    "@brief Gets one pixel (monochrome only)\n"
     "@args x, y\n"
     "\n"
     "@param x The x coordinate of the pixel (0..width()-1)\n"
     "@param y The y coordinate of the pixel (mathematical order: 0 is the lowest, 0..height()-1)\n"
-    "@param component 0 for red, 1 for green, 2 for blue.\n"
     "\n"
-    "If the component index, x or y value exceeds the image bounds, this method \n"
-    "returns 0.0. For monochrome images, the component index is ignored.\n"
+    "If x or y value exceeds the image bounds, this method \n"
+    "returns 0.0. This method is valid for monochrome images only. For color images it will return 0.0 always.\n"
+    "Use \\is_color? to decide whether the image is a color image or monochrome one.\n"
   ) +
   gsi::method ("get_pixel", (double (ImageRef::*)(size_t x, size_t y, unsigned int component) const) &ImageRef::pixel,
     "@brief Gets one pixel (monochrome and color)\n"

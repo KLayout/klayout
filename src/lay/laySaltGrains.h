@@ -23,6 +23,7 @@
 #ifndef HDR_laySaltGrains
 #define HDR_laySaltGrains
 
+#include "layCommon.h"
 #include "laySaltGrain.h"
 
 #include <list>

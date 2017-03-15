@@ -23,10 +23,52 @@
 
 #include "laySaltGrain.h"
 #include "laySaltGrains.h"
+#include "laySalt.h"
 #include "tlFileUtils.h"
 #include "utHead.h"
 
 #include <QDir>
+#include <QSignalSpy>
+
+static std::string grains_to_string (const lay::SaltGrains &gg)
+{
+  std::string res;
+  res += "[";
+  bool first = true;
+  for (lay::SaltGrains::grain_iterator g = gg.begin_grains (); g != gg.end_grains (); ++g) {
+    if (! first) {
+      res += ",";
+    }
+    first = false;
+    res += g->name ();
+  }
+  for (lay::SaltGrains::collection_iterator gc = gg.begin_collections (); gc != gg.end_collections (); ++gc) {
+    if (! first) {
+      res += ",";
+    }
+    first = false;
+    res += gc->name ();
+    res += grains_to_string (*gc);
+  }
+  res += "]";
+  return res;
+}
+
+static std::string salt_to_string (lay::Salt &salt)
+{
+  std::string res;
+  res += "[";
+  bool first = true;
+  for (lay::Salt::flat_iterator i = salt.begin_flat (); i != salt.end_flat (); ++i) {
+    if (! first) {
+      res += ",";
+    }
+    first = false;
+    res += (*i)->name ();
+  }
+  res += "]";
+  return res;
+}
 
 TEST (1)
 {
@@ -111,30 +153,6 @@ TEST (2)
 }
 
 
-static std::string grains_to_string (const lay::SaltGrains &gg)
-{
-  std::string res;
-  res += "[";
-  bool first = true;
-  for (lay::SaltGrains::grain_iterator g = gg.begin_grains (); g != gg.end_grains (); ++g) {
-    if (! first) {
-      res += ",";
-    }
-    first = false;
-    res += g->name ();
-  }
-  for (lay::SaltGrains::collection_iterator gc = gg.begin_collections (); gc != gg.end_collections (); ++gc) {
-    if (! first) {
-      res += ",";
-    }
-    first = false;
-    res += gc->name ();
-    res += grains_to_string (*gc);
-  }
-  res += "]";
-  return res;
-}
-
 TEST (3)
 {
   const QString grain_spec_file = QString::fromUtf8 ("grain.xml");
@@ -184,4 +202,107 @@ TEST (3)
   EXPECT_EQ (gg.is_empty (), false);
   EXPECT_EQ (grains_to_string (gg), "[a,b,c[c/u,c/c[c/c/v]]]");
   EXPECT_EQ (gg.begin_collections ()->path (), tl::to_string (dir_c.absolutePath ()));
+
+  gg.remove_grain (gg.begin_grains (), false);
+  EXPECT_EQ (grains_to_string (gg), "[b,c[c/u,c/c[c/c/v]]]");
+
+  gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (grains_to_string (gg), "[a,b,c[c/u,c/c[c/c/v]]]");
+  gg.remove_grain (gg.begin_grains (), true);
+
+  gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (grains_to_string (gg), "[b,c[c/u,c/c[c/c/v]]]");
+
+  gg.remove_collection (gg.begin_collections (), false);
+  EXPECT_EQ (grains_to_string (gg), "[b]");
+
+  gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (grains_to_string (gg), "[b,c[c/u,c/c[c/c/v]]]");
+
+  gg.remove_collection (gg.begin_collections (), true);
+  EXPECT_EQ (grains_to_string (gg), "[b]");
+  gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (grains_to_string (gg), "[b]");
+}
+
+TEST (4)
+{
+  const QString grain_spec_file = QString::fromUtf8 ("grain.xml");
+
+  //  That's just preparation ...
+
+  lay::SaltGrain g;
+  g.set_name ("x");
+
+  QDir tmp_dir (QFileInfo (tl::to_qstring (tmp_file ())).absolutePath ());
+  QDir dir_a (tmp_dir.filePath (QString::fromUtf8 ("a")));
+  QDir dir_b (tmp_dir.filePath (QString::fromUtf8 ("b")));
+  QDir dir_c (tmp_dir.filePath (QString::fromUtf8 ("c")));
+  QDir dir_cu (dir_c.filePath (QString::fromUtf8 ("u")));
+  QDir dir_cc (dir_c.filePath (QString::fromUtf8 ("c")));
+  QDir dir_ccv (dir_cc.filePath (QString::fromUtf8 ("v")));
+
+  tl_assert (tl::rm_dir_recursive (tmp_dir.path ()));
+
+  lay::SaltGrains gg;
+  gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (gg.is_empty (), true);
+  EXPECT_EQ (grains_to_string (gg), "[]");
+
+  tmp_dir.mkdir (dir_a.dirName ());
+  tmp_dir.mkdir (dir_b.dirName ());
+  tmp_dir.mkdir (dir_c.dirName ());
+  dir_c.mkdir (dir_cu.dirName ());
+  dir_c.mkdir (dir_cc.dirName ());
+  dir_cc.mkdir (dir_ccv.dirName ());
+
+  gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (gg.is_empty (), true);
+  EXPECT_EQ (grains_to_string (gg), "[]");
+  EXPECT_EQ (gg.path (), tl::to_string (tmp_dir.path ()));
+
+  g.save (tl::to_string (dir_a.absoluteFilePath (grain_spec_file)));
+  g.save (tl::to_string (dir_b.absoluteFilePath (grain_spec_file)));
+  g.save (tl::to_string (dir_cu.absoluteFilePath (grain_spec_file)));
+  g.save (tl::to_string (dir_ccv.absoluteFilePath (grain_spec_file)));
+
+  //  That's the main test part
+
+  lay::Salt salt;
+  QSignalSpy spy (&salt, SIGNAL (collections_changed ()));
+  EXPECT_EQ (salt_to_string (salt), "[]");
+
+  spy.clear ();
+  salt.add_location (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (spy.count (), 1);
+  EXPECT_EQ (salt_to_string (salt), "[a,b,c/c/v,c/u]");
+
+  spy.clear ();
+  salt.add_location (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (spy.count (), 0);
+  EXPECT_EQ (salt_to_string (salt), "[a,b,c/c/v,c/u]");
+
+  spy.clear ();
+  salt.add_location (tl::to_string (dir_c.path ()));
+  EXPECT_EQ (spy.count (), 1);
+  EXPECT_EQ (salt_to_string (salt), "[a,b,c/c/v,c/u,c/v,u]");
+
+  lay::Salt salt_copy = salt;
+  (const_cast<lay::SaltGrains &> (*salt_copy.begin ())).remove_grain (salt_copy.begin ()->begin_grains (), true);
+
+  spy.clear ();
+  salt.refresh ();
+  EXPECT_EQ (spy.count (), 1);
+  EXPECT_EQ (salt_to_string (salt), "[b,c/c/v,c/u,c/v,u]");
+
+  spy.clear ();
+  salt.remove_location (tl::to_string (dir_c.path ()));
+  EXPECT_EQ (spy.count (), 1);
+  EXPECT_EQ (salt_to_string (salt), "[b,c/c/v,c/u]");
+
+  spy.clear ();
+  //  location already removed
+  salt.remove_location (tl::to_string (dir_c.path ()));
+  EXPECT_EQ (spy.count (), 0);
+  EXPECT_EQ (salt_to_string (salt), "[b,c/c/v,c/u]");
 }

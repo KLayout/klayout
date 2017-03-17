@@ -327,6 +327,18 @@ TL_PUBLIC int edit_distance (const std::string &a, const std::string &b);
 TL_PUBLIC std::string to_word_or_quoted_string (const std::string &s, const char *non_term = "_.$");
 
 /**
+ *  @brief Escapes HTML (or XML) characters from in and adds the result to out
+ *  If "replace_newlines" is true, "\n" will be replaced by "<br/>".
+ */
+TL_PUBLIC void escape_to_html (std::string &out, const std::string &in, bool replace_newlines = true);
+
+/**
+ *  @brief Escapes HTML (or XML) characters from in and returns the resulting string
+ *  If "replace_newlines" is true, "\n" will be replaced by "<br/>".
+ */
+TL_PUBLIC std::string escaped_to_html (const std::string &in, bool replace_newlines = true);
+
+/**
  *  @brief Set the number of digits resolution for a micron display
  */
 TL_PUBLIC void set_micron_resolution (unsigned int ndigits);

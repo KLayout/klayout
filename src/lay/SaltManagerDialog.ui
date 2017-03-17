@@ -21,6 +21,9 @@
      </property>
      <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
        <item>
         <widget class="QFrame" name="frame_2">
          <property name="sizePolicy">
@@ -56,6 +59,9 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string>Install Package</string>
+            </property>
             <property name="text">
              <string>...</string>
             </property>
@@ -76,7 +82,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>50</width>
-              <height>20</height>
+              <height>0</height>
              </size>
             </property>
            </spacer>
@@ -85,6 +91,9 @@
            <widget class="QToolButton" name="toolButton_2">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Create New Package</string>
             </property>
             <property name="text">
              <string>...</string>
@@ -103,6 +112,9 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string>Uninstall Package</string>
+            </property>
             <property name="text">
              <string>...</string>
             </property>
@@ -115,47 +127,13 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QToolButton" name="toolButton">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset resource="layResources.qrc">
-              <normaloff>:/new_folder.png</normaloff>:/new_folder.png</iconset>
-            </property>
-            <property name="autoRaise">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="toolButton_5">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset resource="layResources.qrc">
-              <normaloff>:/rename.png</normaloff>:/rename.png</iconset>
-            </property>
-            <property name="autoRaise">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -178,15 +156,13 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QTreeWidget" name="treeWidget">
-             <attribute name="headerVisible">
-              <bool>false</bool>
-             </attribute>
-             <column>
-              <property name="text">
-               <string notr="true">1</string>
-              </property>
-             </column>
+            <widget class="QListView" name="salt_view">
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
+             <property name="selectionRectVisible">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
           </layout>
@@ -214,23 +190,69 @@
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_6">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item>
-               <widget class="QLabel" name="label_2">
-                <property name="text">
-                 <string>&lt;html&gt;&lt;body&gt;&lt;center&gt;No packages are installed currently.&lt;br&gt;&lt;br&gt;You can use:&lt;br&gt;
+               <widget class="QScrollArea" name="scrollArea">
+                <property name="frameShape">
+                 <enum>QFrame::NoFrame</enum>
+                </property>
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>218</width>
+                   <height>138</height>
+                  </rect>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_3">
+                  <item>
+                   <widget class="QLabel" name="label_2">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>200</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>&lt;html&gt;&lt;body&gt;&lt;center&gt;No packages are installed currently.&lt;br&gt;&lt;br&gt;You can use:&lt;br&gt;
 &lt;/center&gt;
 &lt;table&gt;
   &lt;tr&gt;&lt;td width=&quot;30&quot;&gt;&lt;a href=&quot;:import&quot;&gt;&lt;img src=&quot;:/import.png&quot;&gt;&lt;/a&gt;&lt;/td&gt;&lt;td&gt;to import a package from an external source&lt;/td&gt;&lt;/tr&gt;
   &lt;tr&gt;&lt;td&gt;&lt;a href=&quot;:add&quot;&gt;&lt;img src=&quot;:/add.png&quot;&gt;&lt;/a&gt;&lt;/td&gt;&lt;td&gt;to create a new package&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
 &lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignHCenter|Qt::AlignTop</set>
-                </property>
-                <property name="wordWrap">
-                 <bool>true</bool>
-                </property>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignHCenter|Qt::AlignTop</set>
+                    </property>
+                    <property name="wordWrap">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </widget>
               </item>
              </layout>
@@ -250,13 +272,25 @@
        </sizepolicy>
       </property>
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="font">
           <font>
@@ -269,11 +303,35 @@
          </property>
         </widget>
        </item>
-       <item>
+       <item row="0" column="1">
+        <widget class="QToolButton" name="edit_button">
+         <property name="toolTip">
+          <string>Edit Package Details</string>
+         </property>
+         <property name="text">
+          <string>Edit</string>
+         </property>
+         <property name="icon">
+          <iconset resource="layResources.qrc">
+           <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
         <widget class="QTextBrowser" name="textBrowser"/>
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
     </widget>
    </item>
   </layout>
@@ -336,16 +394,31 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>treeWidget</tabstop>
+  <tabstop>salt_view</tabstop>
   <tabstop>toolButton_4</tabstop>
   <tabstop>toolButton_2</tabstop>
   <tabstop>toolButton_3</tabstop>
-  <tabstop>toolButton</tabstop>
-  <tabstop>toolButton_5</tabstop>
   <tabstop>textBrowser</tabstop>
  </tabstops>
  <resources>
   <include location="layResources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>clicked(QAbstractButton*)</signal>
+   <receiver>SaltManagerDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>635</x>
+     <y>421</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>653</x>
+     <y>432</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -27,6 +27,7 @@
 #include <QTextStream>
 #include <QBuffer>
 #include <QIcon>
+#include <QPainter>
 
 namespace lay
 {
@@ -49,9 +50,54 @@ QVariant
 SaltGrainDetailsTextWidget::loadResource (int type, const QUrl &url)
 {
   if (url.path () == QString::fromUtf8 ("/icon")) {
-    //  @@@
-    return QImage (":/salt_icon.png");
-    //  @@@
+
+    if (!mp_grain || mp_grain->icon ().isNull ()) {
+      return QImage (":/salt_icon.png");
+    } else {
+      QImage img = mp_grain->icon ();
+      if (img.width () != 64) {
+        return img.scaled (QSize (64, 64), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+      } else {
+        return img;
+      }
+    }
+
+  } else if (url.path () == QString::fromUtf8 ("/screenshot")) {
+
+    QImage s = mp_grain->screenshot ().convertToFormat (QImage::Format_ARGB32_Premultiplied);
+
+    QImage smask (s.size (), QImage::Format_ARGB32_Premultiplied);
+    smask.fill (QColor (0, 0, 0, 0));
+    {
+      int border = 4;
+      int radius = 6;
+
+      QPainter painter (&smask);
+
+      painter.setRenderHint (QPainter::Antialiasing);
+
+      painter.setCompositionMode (QPainter::CompositionMode_Source);
+      for (int b = border; b > 0; --b) {
+        QPen pen (QColor (255, 255, 255, ((border - b + 1) * 255) / border));
+        pen.setWidth (b * 2 + 1);
+        painter.setBrush (Qt::NoBrush);
+        painter.setPen (pen);
+        painter.drawRoundedRect (QRectF (border, border, s.width () - 2 * border, s.height () - 2 * border), radius, radius, Qt::AbsoluteSize);
+      }
+
+      painter.setPen (Qt::white);
+      painter.setBrush (Qt::white);
+      painter.drawRoundedRect (QRectF (border, border, s.width () - 2 * border, s.height () - 2 * border), radius, radius, Qt::AbsoluteSize);
+    }
+
+    {
+      QPainter painter (&s);
+      painter.setCompositionMode (QPainter::CompositionMode_DestinationIn);
+      painter.drawImage (0, 0, smask);
+    }
+
+    return s;
+
   } else {
     return QTextBrowser::loadResource (type, url);
   }
@@ -72,8 +118,9 @@ SaltGrainDetailsTextWidget::details_text ()
 
   stream << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/></head><body>";
 
-  stream << "<table><tr>";
-  stream << "<td><img src=\":/icon\"/></td>";
+  stream << "<table cellpadding=\"6\"><tr>";
+  stream << "<td><img src=\":/icon\" width=\"64\" height=\"64\"/></td>";
+
   stream << "<td>";
   stream << "<h1>";
   stream << tl::to_qstring (tl::escaped_to_html (g->name ())) << " " << tl::to_qstring (tl::escaped_to_html (g->version ()));
@@ -95,8 +142,6 @@ SaltGrainDetailsTextWidget::details_text ()
                            "Use the &lt;title&gt; element of the specification file or edit the package properties to provide a title.");
     stream << "</font></i></p>";
   }
-
-  stream << "</td></tr></table>";
 
   stream << "<p><br/>";
   if (! g->doc ().empty ()) {
@@ -128,15 +173,51 @@ SaltGrainDetailsTextWidget::details_text ()
   stream << "</p>";
 
   stream << "<p>";
-  if (! g->url ().empty ()) {
-    stream << "<b>" << QObject::tr ("Documentation link") << ":</b> <a href=\"" << tl::to_qstring (g->url ()) << "\">" << tl::to_qstring (tl::escaped_to_html (g->url ())) << "</a>";
+  if (! g->license ().empty ()) {
+    stream << "<b>" << QObject::tr ("License") << ":</b> " << tl::to_qstring (tl::escaped_to_html (g->license ())) << " ";
   } else {
     stream << "<i><font color='gray'>";
-    stream << QObject::tr ("This package does not have a documentation link. "
-                           "Use the &lt;url&gt; element of the specification file or edit the package properties to provide a link.");
+    stream << QObject::tr ("This package does not have license information. "
+                           "Use the &lt;license&gt; elements of the specification file or edit the package properties to provide license information.");
     stream << "</font></i>";
   }
   stream << "</p>";
+
+  stream << "<p>";
+  if (! g->doc_url ().empty ()) {
+    stream << "<b>" << QObject::tr ("Documentation link") << ":</b> <a href=\"" << tl::to_qstring (g->doc_url ()) << "\">" << tl::to_qstring (tl::escaped_to_html (g->doc_url ())) << "</a>";
+  } else {
+    stream << "<i><font color='gray'>";
+    stream << QObject::tr ("This package does not have a documentation link. "
+                           "Use the &lt;doc-url&gt; element of the specification file or edit the package properties to provide a link.");
+    stream << "</font></i>";
+  }
+  stream << "</p>";
+
+  if (! g->screenshot ().isNull ()) {
+    stream << "<br/>";
+    stream << "<h3>" << QObject::tr ("Screenshot") << "</h3><p><img src=\":/screenshot\"/></p>";
+  }
+
+  stream << "<br/>";
+  stream << "<h3>" << QObject::tr ("Installation") << "</h3>";
+
+  stream << "<p><b>" << QObject::tr ("Installation path: ") << "</b>" << tl::to_qstring (tl::escaped_to_html (g->path ())) << "</p>";
+  if (! g->url ().empty ()) {
+    stream << "<p><b>" << QObject::tr ("Download URL: ") << "</b>" << tl::to_qstring (tl::escaped_to_html (g->url ())) << "</p>";
+  }
+  if (! g->installed_time ().isNull ()) {
+    stream << "<p><b>" << QObject::tr ("Installed: ") << "</b>" << g->installed_time ().toString () << "</p>";
+  }
+  if (! g->dependencies ().empty ()) {
+    stream << "<p><b>" << QObject::tr ("Depends on: ") << "</b></p><p>";
+    for (std::vector<lay::SaltGrain::Dependency>::const_iterator d = g->dependencies ().begin (); d != g->dependencies ().end (); ++d) {
+      stream << "&nbsp;&nbsp;&nbsp;&nbsp;" << tl::to_qstring (tl::escaped_to_html (d->name)) << " " << tl::to_qstring (tl::escaped_to_html (d->url)) << "<br/>";
+    }
+    stream << "</p>";
+  }
+
+  stream << "</td></tr></table>";
 
   stream << "</body></html>";
 

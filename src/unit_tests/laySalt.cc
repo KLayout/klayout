@@ -99,6 +99,8 @@ TEST (1)
   EXPECT_EQ (g.title (), "title");
   g.set_doc ("doc");
   EXPECT_EQ (g.doc (), "doc");
+  g.set_doc_url ("doc-url");
+  EXPECT_EQ (g.doc_url (), "doc-url");
   g.set_author ("me");
   EXPECT_EQ (g.author (), "me");
   g.set_author_contact ("ac");

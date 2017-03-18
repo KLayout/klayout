@@ -26,6 +26,7 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QBuffer>
 
 namespace lay
 {
@@ -46,6 +47,9 @@ SaltGrain::operator== (const SaltGrain &other) const
          m_url == other.m_url &&
          m_title == other.m_title &&
          m_doc == other.m_doc &&
+         m_doc_url == other.m_doc_url &&
+         m_icon == other.m_icon &&
+         m_screenshot == other.m_screenshot &&
          m_dependencies == other.m_dependencies &&
          m_author == other.m_author &&
          m_author_contact == other.m_author_contact &&
@@ -91,6 +95,12 @@ SaltGrain::set_doc (const std::string &t)
 }
 
 void
+SaltGrain::set_doc_url (const std::string &u)
+{
+  m_doc_url = u;
+}
+
+void
 SaltGrain::set_author (const std::string &a)
 {
   m_author = a;
@@ -118,6 +128,18 @@ void
 SaltGrain::set_installed_time (const QDateTime &t)
 {
   m_installed_time = t;
+}
+
+void
+SaltGrain::set_screenshot (const QImage &i)
+{
+  m_screenshot = i;
+}
+
+void
+SaltGrain::set_icon (const QImage &i)
+{
+  m_icon = i;
 }
 
 int
@@ -184,17 +206,45 @@ struct TimeConverter
   }
 };
 
+struct ImageConverter
+{
+  std::string to_string (const QImage &image) const
+  {
+    if (image.isNull ()) {
+      return std::string ();
+    } else {
+      QBuffer buffer;
+      buffer.open (QIODevice::WriteOnly);
+      image.save (&buffer, "PNG");
+      buffer.close ();
+      return buffer.buffer ().toBase64 ().constData ();
+    }
+  }
+
+  void from_string (const std::string &image, QImage &res) const
+  {
+    if (image.empty ()) {
+      res = QImage ();
+    } else {
+      res = QImage::fromData (QByteArray::fromBase64 (QByteArray (image.c_str (), image.size ())));
+    }
+  }
+};
+
 static tl::XMLStruct<lay::SaltGrain> xml_struct ("salt-grain",
   tl::make_member (&SaltGrain::name, &SaltGrain::set_name, "name") +
   tl::make_member (&SaltGrain::version, &SaltGrain::set_version, "version") +
   tl::make_member (&SaltGrain::title, &SaltGrain::set_title, "title") +
   tl::make_member (&SaltGrain::doc, &SaltGrain::set_doc, "doc") +
+  tl::make_member (&SaltGrain::doc_url, &SaltGrain::set_doc_url, "doc-url") +
   tl::make_member (&SaltGrain::url, &SaltGrain::set_url, "url") +
   tl::make_member (&SaltGrain::license, &SaltGrain::set_license, "license") +
   tl::make_member (&SaltGrain::author, &SaltGrain::set_author, "author") +
   tl::make_member (&SaltGrain::author_contact, &SaltGrain::set_author_contact, "author-contact") +
   tl::make_member (&SaltGrain::authored_time, &SaltGrain::set_authored_time, "authored-time", TimeConverter ()) +
   tl::make_member (&SaltGrain::installed_time, &SaltGrain::set_installed_time, "installed-time", TimeConverter ()) +
+  tl::make_member (&SaltGrain::icon, &SaltGrain::set_icon, "icon", ImageConverter ()) +
+  tl::make_member (&SaltGrain::screenshot, &SaltGrain::set_screenshot, "screenshot", ImageConverter ()) +
   tl::make_element (&SaltGrain::begin_dependencies, &SaltGrain::end_dependencies, &SaltGrain::add_dependency, "depends",
     tl::make_member (&SaltGrain::Dependency::name, "name") +
     tl::make_member (&SaltGrain::Dependency::url, "url") +

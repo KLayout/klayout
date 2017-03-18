@@ -27,6 +27,7 @@
 #include "tlObject.h"
 
 #include <QTime>
+#include <QImage>
 
 namespace lay
 {
@@ -115,8 +116,7 @@ public:
   /**
    *  @brief Gets the documentation text of the grain
    *
-   *  The documentation text is an XML document using
-   *  KLayout's doc format.
+   *  The documentation text is a brief description.
    */
   const std::string &doc () const
   {
@@ -127,6 +127,21 @@ public:
    *  @brief Sets the documentation text of the grain
    */
   void set_doc (const std::string &t);
+
+  /**
+   *  @brief Gets the documentation URL of the grain
+   *
+   *  The documentation URL provides a detailed documentation.
+   */
+  const std::string &doc_url () const
+  {
+    return m_doc_url;
+  }
+
+  /**
+   *  @brief Sets the documentation URL of the grain
+   */
+  void set_doc_url (const std::string &u);
 
   /**
    *  @brief Gets the version of the grain
@@ -208,6 +223,35 @@ public:
    *  @brief Sets the installation date and/or time
    */
   void set_installed_time (const QDateTime &t);
+
+  /**
+   *  @brief Gets the icon image for the grain.
+   *  The preferred image size is 64x64 pixels.
+   *  The image may be null image. In this case, a default image is used.
+   */
+  const QImage &icon () const
+  {
+    return m_icon;
+  }
+
+  /**
+   *  @brief Sets icon image
+   */
+  void set_icon (const QImage &i);
+
+  /**
+   *  @brief Gets a screenshot image for documentation.
+   *  The image may be null image. In this case, no screenshot is shown.
+   */
+  const QImage &screenshot () const
+  {
+    return m_screenshot;
+  }
+
+  /**
+   *  @brief Sets screenshot image
+   */
+  void set_screenshot (const QImage &i);
 
   /**
    *  @brief Gets the absolute file path of the installed grain
@@ -327,11 +371,12 @@ private:
   std::string m_path;
   std::string m_url;
   std::string m_title;
-  std::string m_doc;
+  std::string m_doc, m_doc_url;
   std::string m_author;
   std::string m_author_contact;
   std::string m_license;
   QDateTime m_authored_time, m_installed_time;
+  QImage m_icon, m_screenshot;
   std::vector<Dependency> m_dependencies;
 };
 

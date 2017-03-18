@@ -80,9 +80,17 @@ public:
 
     } else if (role == Qt::DecorationRole) {
 
-      //  @@@
-      return QIcon (":/salt_icon.png");
-      //  @@@
+      const lay::SaltGrain *g = mp_salt->begin_flat ()[index.row ()];
+      if (g->icon ().isNull ()) {
+        return QIcon (":/salt_icon.png");
+      } else {
+        QPixmap px = QPixmap::fromImage (g->icon ());
+        if (px.width () == 64) {
+          return px;
+        } else {
+          return px.scaled (QSize (64, 64), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+        }
+      }
 
     } else {
       return QVariant ();

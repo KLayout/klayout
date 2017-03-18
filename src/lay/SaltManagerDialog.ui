@@ -167,7 +167,7 @@
               </size>
              </property>
              <property name="selectionRectVisible">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>

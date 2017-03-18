@@ -112,7 +112,15 @@ SaltGrains::remove_grain (grain_iterator iter, bool with_files)
 bool
 SaltGrains::is_empty () const
 {
-  return m_collections.empty () && m_grains.empty ();
+  if (! m_grains.empty ()) {
+    return false;
+  }
+  for (collections_type::const_iterator i = m_collections.begin (); i != m_collections.end (); ++i) {
+    if (!i->is_empty ()) {
+      return false;
+    }
+  }
+  return true;
 }
 
 bool

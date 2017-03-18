@@ -26,6 +26,8 @@
 #include "layCommon.h"
 #include "tlObject.h"
 
+#include <QTime>
+
 namespace lay
 {
 
@@ -141,6 +143,71 @@ public:
    *  @brief Sets the version of the grain
    */
   void set_version (const std::string &v);
+
+  /**
+   *  @brief Gets the author of the grain
+   */
+  const std::string &author () const
+  {
+    return m_author;
+  }
+
+  /**
+   *  @brief Sets the author of the grain
+   */
+  void set_author (const std::string &a);
+
+  /**
+   *  @brief Gets the author's contact
+   */
+  const std::string &author_contact () const
+  {
+    return m_author_contact;
+  }
+
+  /**
+   *  @brief Sets the author's contact
+   */
+  void set_author_contact (const std::string &a);
+
+  /**
+   *  @brief Gets the license of the grain
+   */
+  const std::string &license () const
+  {
+    return m_license;
+  }
+
+  /**
+   *  @brief Sets the license of the grain
+   */
+  void set_license (const std::string &l);
+
+  /**
+   *  @brief Gets the release date and/or time of the grain
+   */
+  const QDateTime &authored_time () const
+  {
+    return m_authored_time;
+  }
+
+  /**
+   *  @brief Sets the release date and/or time
+   */
+  void set_authored_time (const QDateTime &t);
+
+  /**
+   *  @brief Gets the installation date and/or time of the grain
+   */
+  const QDateTime &installed_time () const
+  {
+    return m_installed_time;
+  }
+
+  /**
+   *  @brief Sets the installation date and/or time
+   */
+  void set_installed_time (const QDateTime &t);
 
   /**
    *  @brief Gets the absolute file path of the installed grain
@@ -261,6 +328,10 @@ private:
   std::string m_url;
   std::string m_title;
   std::string m_doc;
+  std::string m_author;
+  std::string m_author_contact;
+  std::string m_license;
+  QDateTime m_authored_time, m_installed_time;
   std::vector<Dependency> m_dependencies;
 };
 

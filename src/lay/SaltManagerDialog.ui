@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Manage Packages</string>
+   <string>Salt Package Manager</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -55,7 +55,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QToolButton" name="toolButton_4">
+           <widget class="QToolButton" name="install_button">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -88,7 +88,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton_2">
+           <widget class="QToolButton" name="create_button">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -108,7 +108,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton_3">
+           <widget class="QToolButton" name="delete_button">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -131,7 +131,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QStackedWidget" name="stackedWidget">
+        <widget class="QStackedWidget" name="list_stack">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -159,6 +159,12 @@
             <widget class="QListView" name="salt_view">
              <property name="alternatingRowColors">
               <bool>true</bool>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>64</width>
+               <height>64</height>
+              </size>
              </property>
              <property name="selectionRectVisible">
               <bool>true</bool>
@@ -215,41 +221,100 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>218</width>
-                   <height>138</height>
+                   <width>320</width>
+                   <height>204</height>
                   </rect>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_3">
-                  <item>
+                 <layout class="QGridLayout" name="gridLayout_2">
+                  <item row="3" column="1">
+                   <spacer name="verticalSpacer">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>40</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_4">
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="pixmap">
+                     <pixmap resource="layResources.qrc">:/salt.png</pixmap>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0" colspan="2">
+                   <widget class="QLabel" name="label_3">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>9</pointsize>
+                      <weight>50</weight>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>&lt;h1&gt;Salt Package Manager&lt;/h1&gt;</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
                    <widget class="QLabel" name="label_2">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>1</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>200</width>
+                      <width>0</width>
                       <height>0</height>
                      </size>
                     </property>
                     <property name="text">
-                     <string>&lt;html&gt;&lt;body&gt;&lt;center&gt;No packages are installed currently.&lt;br&gt;&lt;br&gt;You can use:&lt;br&gt;
-&lt;/center&gt;
+                     <string>&lt;html&gt;&lt;body&gt;&lt;h4&gt;No packages are installed currently.&lt;/h4&gt;&lt;p&gt;Use&lt;br/&gt;
 &lt;table&gt;
-  &lt;tr&gt;&lt;td width=&quot;30&quot;&gt;&lt;a href=&quot;:import&quot;&gt;&lt;img src=&quot;:/import.png&quot;&gt;&lt;/a&gt;&lt;/td&gt;&lt;td&gt;to import a package from an external source&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td width=&quot;30&quot;&gt;&lt;a href=&quot;:import&quot;&gt;&lt;img src=&quot;:/import.png&quot;&gt;&lt;/a&gt;&lt;/td&gt;&lt;td&gt;to import a package from an&lt;br/&gt;external repository&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;/tr&gt;
   &lt;tr&gt;&lt;td&gt;&lt;a href=&quot;:add&quot;&gt;&lt;img src=&quot;:/add.png&quot;&gt;&lt;/a&gt;&lt;/td&gt;&lt;td&gt;to create a new package&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
 &lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="alignment">
-                     <set>Qt::AlignHCenter|Qt::AlignTop</set>
+                     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                     </property>
                     <property name="wordWrap">
-                     <bool>true</bool>
+                     <bool>false</bool>
                     </property>
                    </widget>
+                  </item>
+                  <item row="1" column="0" colspan="2">
+                   <spacer name="verticalSpacer_2">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Fixed</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
                   </item>
                  </layout>
                 </widget>
@@ -264,7 +329,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QFrame" name="frame">
+     <widget class="QFrame" name="details_frame">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>1</horstretch>
@@ -299,7 +364,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Package Details</string>
+          <string>Details</string>
          </property>
         </widget>
        </item>
@@ -321,7 +386,11 @@
         </widget>
        </item>
        <item row="1" column="0" colspan="2">
-        <widget class="QTextBrowser" name="textBrowser"/>
+        <widget class="lay::SaltGrainDetailsTextWidget" name="details_text">
+         <property name="openExternalLinks">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -335,15 +404,6 @@
     </widget>
    </item>
   </layout>
-  <action name="actionNewFolder">
-   <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/new_folder.png</normaloff>:/new_folder.png</iconset>
-   </property>
-   <property name="text">
-    <string>New Folder</string>
-   </property>
-  </action>
   <action name="actionNew">
    <property name="icon">
     <iconset resource="layResources.qrc">
@@ -353,7 +413,7 @@
     <string>New</string>
    </property>
    <property name="toolTip">
-    <string>New Package</string>
+    <string>New package</string>
    </property>
   </action>
   <action name="actionDelete">
@@ -365,19 +425,7 @@
     <string>Delete</string>
    </property>
    <property name="toolTip">
-    <string>Delete Package</string>
-   </property>
-  </action>
-  <action name="actionRename">
-   <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/rename.png</normaloff>:/rename.png</iconset>
-   </property>
-   <property name="text">
-    <string>Rename</string>
-   </property>
-   <property name="toolTip">
-    <string>Rename Package</string>
+    <string>Delete package</string>
    </property>
   </action>
   <action name="actionImport">
@@ -389,16 +437,23 @@
     <string>Import</string>
    </property>
    <property name="toolTip">
-    <string>Import Package</string>
+    <string>Import package</string>
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>lay::SaltGrainDetailsTextWidget</class>
+   <extends>QTextBrowser</extends>
+   <header>laySaltGrainDetailsTextWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>salt_view</tabstop>
-  <tabstop>toolButton_4</tabstop>
-  <tabstop>toolButton_2</tabstop>
-  <tabstop>toolButton_3</tabstop>
-  <tabstop>textBrowser</tabstop>
+  <tabstop>install_button</tabstop>
+  <tabstop>create_button</tabstop>
+  <tabstop>delete_button</tabstop>
+  <tabstop>details_text</tabstop>
  </tabstops>
  <resources>
   <include location="layResources.qrc"/>

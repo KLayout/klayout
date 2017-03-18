@@ -97,6 +97,14 @@ public:
   }
 
   /**
+   *  @brief Returns a value indicating whether the collection is empty
+   */
+  bool is_empty () const
+  {
+    return m_root.is_empty ();
+  }
+
+  /**
    *  @brief A flat iterator of (sorted) grains (begin)
    */
   flat_iterator begin_flat ()

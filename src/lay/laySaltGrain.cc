@@ -41,12 +41,17 @@ bool
 SaltGrain::operator== (const SaltGrain &other) const
 {
   return m_name == other.m_name &&
-         m_version == other.m_version &&
          m_path == other.m_path &&
+         m_version == other.m_version &&
          m_url == other.m_url &&
          m_title == other.m_title &&
          m_doc == other.m_doc &&
-         m_dependencies == other.m_dependencies;
+         m_dependencies == other.m_dependencies &&
+         m_author == other.m_author &&
+         m_author_contact == other.m_author_contact &&
+         m_license == other.m_license &&
+         m_authored_time == other.m_authored_time &&
+         m_installed_time == other.m_installed_time;
 }
 
 void
@@ -83,6 +88,36 @@ void
 SaltGrain::set_doc (const std::string &t)
 {
   m_doc = t;
+}
+
+void
+SaltGrain::set_author (const std::string &a)
+{
+  m_author = a;
+}
+
+void
+SaltGrain::set_author_contact (const std::string &a)
+{
+  m_author_contact = a;
+}
+
+void
+SaltGrain::set_license (const std::string &l)
+{
+  m_license = l;
+}
+
+void
+SaltGrain::set_authored_time (const QDateTime &t)
+{
+  m_authored_time = t;
+}
+
+void
+SaltGrain::set_installed_time (const QDateTime &t)
+{
+  m_installed_time = t;
 }
 
 int
@@ -128,12 +163,38 @@ SaltGrain::compare_versions (const std::string &v1, const std::string &v2)
   }
 }
 
+struct TimeConverter
+{
+  std::string to_string (const QDateTime &time) const
+  {
+    if (time.isNull ()) {
+      return std::string ();
+    } else {
+      return tl::to_string (time.toString (Qt::ISODate));
+    }
+  }
+
+  void from_string (const std::string &time, QDateTime &res) const
+  {
+    if (time.empty ()) {
+      res = QDateTime ();
+    } else {
+      res = QDateTime::fromString (tl::to_qstring (time), Qt::ISODate);
+    }
+  }
+};
+
 static tl::XMLStruct<lay::SaltGrain> xml_struct ("salt-grain",
   tl::make_member (&SaltGrain::name, &SaltGrain::set_name, "name") +
   tl::make_member (&SaltGrain::version, &SaltGrain::set_version, "version") +
   tl::make_member (&SaltGrain::title, &SaltGrain::set_title, "title") +
   tl::make_member (&SaltGrain::doc, &SaltGrain::set_doc, "doc") +
   tl::make_member (&SaltGrain::url, &SaltGrain::set_url, "url") +
+  tl::make_member (&SaltGrain::license, &SaltGrain::set_license, "license") +
+  tl::make_member (&SaltGrain::author, &SaltGrain::set_author, "author") +
+  tl::make_member (&SaltGrain::author_contact, &SaltGrain::set_author_contact, "author-contact") +
+  tl::make_member (&SaltGrain::authored_time, &SaltGrain::set_authored_time, "authored-time", TimeConverter ()) +
+  tl::make_member (&SaltGrain::installed_time, &SaltGrain::set_installed_time, "installed-time", TimeConverter ()) +
   tl::make_element (&SaltGrain::begin_dependencies, &SaltGrain::end_dependencies, &SaltGrain::add_dependency, "depends",
     tl::make_member (&SaltGrain::Dependency::name, "name") +
     tl::make_member (&SaltGrain::Dependency::url, "url") +

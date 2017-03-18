@@ -30,10 +30,17 @@
 #include <QTextDocument>
 #include <QPainter>
 #include <QDir>
+#include <QTextStream>
+#include <QBuffer>
 
 namespace lay
 {
 
+// --------------------------------------------------------------------------------------
+
+/**
+ *  @brief A model representing the salt grains for a QListView
+ */
 class SaltModel
   : public QAbstractItemModel
 {
@@ -71,6 +78,12 @@ public:
 
       return tl::to_qstring (text);
 
+    } else if (role == Qt::DecorationRole) {
+
+      //  @@@
+      return QIcon (":/salt_icon.png");
+      //  @@@
+
     } else {
       return QVariant ();
     }
@@ -81,7 +94,7 @@ public:
     if (parent.isValid ()) {
       return QModelIndex ();
     } else {
-      return createIndex (row, column);
+      return createIndex (row, column, mp_salt->begin_flat () [row]);
     }
   }
 
@@ -104,10 +117,29 @@ public:
     }
   }
 
+  SaltGrain *grain_from_index (const QModelIndex &index) const
+  {
+    if (index.isValid ()) {
+      return static_cast<SaltGrain *> (index.internalPointer ());
+    } else {
+      return 0;
+    }
+  }
+
+  void update ()
+  {
+    //  @@@
+  }
+
 public:
   lay::Salt *mp_salt;
 };
 
+// --------------------------------------------------------------------------------------
+
+/**
+ *  @brief A delegate displaying the summary of a grain
+ */
 class SaltItemDelegate
   : public QStyledItemDelegate
 {
@@ -152,12 +184,21 @@ public:
     QStyleOptionViewItemV4 optionV4 = option;
     initStyleOption (&optionV4, index);
 
+    const QListView *view = dynamic_cast<const QListView *> (optionV4.widget);
+    QSize icon_size (0, 0);
+    if (view) {
+      icon_size = view->iconSize ();
+    }
+
     QTextDocument doc;
     doc.setHtml (optionV4.text);
     doc.setTextWidth (textWidth);
-    return QSize (textWidth, doc.size ().height ());
+    return QSize (textWidth + icon_size.width () + 6, std::max (icon_size.height () + 12, int (doc.size ().height ())));
   }
 };
+
+// --------------------------------------------------------------------------------------
+//  SaltManager implementation
 
 // @@@
 lay::Salt salt;
@@ -172,16 +213,76 @@ void make_salt ()
 // @@@
 
 SaltManagerDialog::SaltManagerDialog (QWidget *parent)
-  : QDialog (parent)
+  : QDialog (parent),
+    m_current_changed_enabled (true)
 {
   Ui::SaltManagerDialog::setupUi (this);
 
-  salt = lay::Salt (); salt_initialized = false; // @@@
-  make_salt (); // @@@
-  salt_view->setModel (new SaltModel (this, &salt));
+// @@@
+  salt = lay::Salt (); salt_initialized = false;
+  make_salt ();
+  mp_salt = &salt;
+// @@@
+
+  SaltModel *model = new SaltModel (this, mp_salt);
+  salt_view->setModel (model);
   salt_view->setItemDelegate (new SaltItemDelegate (this));
 
+  connect (mp_salt, SIGNAL (collections_changed ()), this, SLOT (salt_changed ()));
+
+  //  select the first grain
+  if (model->rowCount (QModelIndex ()) > 0) {
+    salt_view->setCurrentIndex (model->index (0, 0, QModelIndex ()));
+  }
+
+  salt_changed ();
+
+  connect (salt_view->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_changed ()));
+
+
   // ...
+}
+
+void
+SaltManagerDialog::salt_changed ()
+{
+  SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
+  if (! model) {
+    return;
+  }
+
+  m_current_changed_enabled = false;
+  model->update ();
+  m_current_changed_enabled = true;
+
+  if (mp_salt->is_empty ()) {
+    list_stack->setCurrentIndex (1);
+    details_frame->hide ();
+  } else {
+    list_stack->setCurrentIndex (0);
+    details_frame->show ();
+  }
+
+  current_changed ();
+}
+
+void
+SaltManagerDialog::current_changed ()
+{
+  SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
+  if (! model) {
+    return;
+  }
+
+  SaltGrain *g = model->grain_from_index (salt_view->currentIndex ());
+  details_text->set_grain (g);
+  if (!g) {
+    details_frame->setEnabled (false);
+    delete_button->setEnabled (false);
+  } else {
+    details_frame->setEnabled (true);
+    delete_button->setEnabled (true);
+  }
 }
 
 }

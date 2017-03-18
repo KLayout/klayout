@@ -49,7 +49,8 @@ HEADERS = \
     laySalt.h \
     laySaltGrain.h \
     laySaltGrains.h \
-    laySaltManagerDialog.h
+    laySaltManagerDialog.h \
+    laySaltGrainDetailsTextWidget.h
 
 FORMS = \
   ClipDialog.ui \
@@ -142,7 +143,8 @@ SOURCES = \
     laySalt.cc \
     laySaltGrain.cc \
     laySaltGrains.cc \
-    laySaltManagerDialog.cc
+    laySaltManagerDialog.cc \
+    laySaltGrainDetailsTextWidget.cc
 
 RESOURCES = layBuildInMacros.qrc \
   layHelpResources.qrc \

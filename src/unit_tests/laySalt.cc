@@ -72,7 +72,20 @@ static std::string salt_to_string (lay::Salt &salt)
 
 TEST (1)
 {
+  std::string tmp0 = tmp_file ("tmp0");
+
   lay::SaltGrain g;
+  g.save (tmp0);
+  EXPECT_EQ (g.authored_time ().isNull (), true);
+  EXPECT_EQ (g.installed_time ().isNull (), true);
+
+  lay::SaltGrain g0;
+  g0.load (tmp0);
+  EXPECT_EQ (g0.authored_time ().isNull (), true);
+  EXPECT_EQ (g0.installed_time ().isNull (), true);
+  EXPECT_EQ (g == g0, true);
+
+  std::string tmp = tmp_file ();
 
   g.set_name ("abc");
   EXPECT_EQ (g.name (), "abc");
@@ -86,6 +99,20 @@ TEST (1)
   EXPECT_EQ (g.title (), "title");
   g.set_doc ("doc");
   EXPECT_EQ (g.doc (), "doc");
+  g.set_author ("me");
+  EXPECT_EQ (g.author (), "me");
+  g.set_author_contact ("ac");
+  EXPECT_EQ (g.author_contact (), "ac");
+  g.set_license ("free");
+  EXPECT_EQ (g.license (), "free");
+  g.set_authored_time (QDateTime ());
+  EXPECT_EQ (g.authored_time ().isNull (), true);
+  g.set_authored_time (QDateTime::fromMSecsSinceEpoch (1000000000));
+  EXPECT_EQ (QDateTime::fromMSecsSinceEpoch (0).msecsTo (g.authored_time ()), 1000000000);
+  g.set_installed_time (QDateTime ());
+  EXPECT_EQ (g.installed_time ().isNull (), true);
+  g.set_installed_time (QDateTime::fromMSecsSinceEpoch (2000000000));
+  EXPECT_EQ (QDateTime::fromMSecsSinceEpoch (0).msecsTo (g.installed_time ()), 2000000000);
 
   g.add_dependency (lay::SaltGrain::Dependency ());
   g.dependencies ().back ().name = "depname";
@@ -104,8 +131,6 @@ TEST (1)
 
   gg.set_doc ("blabla");
   EXPECT_EQ (g == gg, false);
-
-  std::string tmp = tmp_file ();
 
   EXPECT_EQ (g == gg, false);
   g.save (tmp);
@@ -269,11 +294,14 @@ TEST (4)
   //  That's the main test part
 
   lay::Salt salt;
+  EXPECT_EQ (salt.is_empty (), true);
+
   QSignalSpy spy (&salt, SIGNAL (collections_changed ()));
   EXPECT_EQ (salt_to_string (salt), "[]");
 
   spy.clear ();
   salt.add_location (tl::to_string (tmp_dir.path ()));
+  EXPECT_EQ (salt.is_empty (), false);
   EXPECT_EQ (spy.count (), 1);
   EXPECT_EQ (salt_to_string (salt), "[a,b,c/c/v,c/u]");
 

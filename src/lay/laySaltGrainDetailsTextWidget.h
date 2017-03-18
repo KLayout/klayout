@@ -20,47 +20,40 @@
 
 */
 
-#ifndef HDR_laySaltManager
-#define HDR_laySaltManager
+#ifndef HDR_laySaltGrainDetailsTextWidget
+#define HDR_laySaltGrainDetailsTextWidget
 
-#include <QDialog>
-
-#include "ui_SaltManagerDialog.h"
+#include <QTextBrowser>
 
 namespace lay
 {
 
-class Salt;
 class SaltGrain;
 
 /**
- *  @brief The dialog for managing the Salt ("Packages")
+ *  @brief A specialisation of QTextBrowser that displays the details of the salt grain
  */
-class SaltManagerDialog
-  : public QDialog, private Ui::SaltManagerDialog
+class SaltGrainDetailsTextWidget
+  : public QTextBrowser
 {
-Q_OBJECT
-
 public:
   /**
    *  @brief Constructor
    */
-  SaltManagerDialog (QWidget *parent);
-
-private slots:
-  /**
-   *  @brief Called when the list of packages (grains) has changed
-   */
-  void salt_changed ();
+  SaltGrainDetailsTextWidget (QWidget *w);
 
   /**
-   *  @brief Called when the currently selected package (grain) has changed
+   *  @brief Sets the grain whose details are to be shown
    */
-  void current_changed ();
+  void set_grain (SaltGrain *g);
+
+protected:
+  virtual QVariant loadResource (int type, const QUrl &url);
 
 private:
-  lay::Salt *mp_salt;
-  bool m_current_changed_enabled;
+  lay::SaltGrain *mp_grain;
+
+  QString details_text ();
 };
 
 }

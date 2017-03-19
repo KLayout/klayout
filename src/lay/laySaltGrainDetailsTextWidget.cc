@@ -40,10 +40,8 @@ SaltGrainDetailsTextWidget::SaltGrainDetailsTextWidget (QWidget *w)
 
 void SaltGrainDetailsTextWidget::set_grain (SaltGrain *g)
 {
-  if (mp_grain != g) {
-    mp_grain = g;
-    setHtml (details_text ());
-  }
+  mp_grain = g;
+  setHtml (details_text ());
 }
 
 QVariant
@@ -51,15 +49,30 @@ SaltGrainDetailsTextWidget::loadResource (int type, const QUrl &url)
 {
   if (url.path () == QString::fromUtf8 ("/icon")) {
 
+    int icon_dim = 64;
+
     if (!mp_grain || mp_grain->icon ().isNull ()) {
+
       return QImage (":/salt_icon.png");
+
     } else {
+
       QImage img = mp_grain->icon ();
-      if (img.width () != 64) {
-        return img.scaled (QSize (64, 64), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+      if (img.width () != icon_dim || img.height () != icon_dim) {
+
+        img = img.scaled (QSize (icon_dim, icon_dim), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+        QImage final_img (icon_dim, icon_dim, QImage::Format_ARGB32);
+        final_img.fill (QColor (0, 0, 0, 0));
+        QPainter painter (&final_img);
+        painter.drawImage ((icon_dim - img.width ()) / 2, (icon_dim - img.height ()) / 2, img);
+
+        return final_img;
+
       } else {
         return img;
       }
+
     }
 
   } else if (url.path () == QString::fromUtf8 ("/screenshot")) {
@@ -69,7 +82,7 @@ SaltGrainDetailsTextWidget::loadResource (int type, const QUrl &url)
     QImage smask (s.size (), QImage::Format_ARGB32_Premultiplied);
     smask.fill (QColor (0, 0, 0, 0));
     {
-      int border = 4;
+      int border = 0;
       int radius = 6;
 
       QPainter painter (&smask);
@@ -210,9 +223,11 @@ SaltGrainDetailsTextWidget::details_text ()
     stream << "<p><b>" << QObject::tr ("Installed: ") << "</b>" << g->installed_time ().toString () << "</p>";
   }
   if (! g->dependencies ().empty ()) {
-    stream << "<p><b>" << QObject::tr ("Depends on: ") << "</b></p><p>";
+    stream << "<p><b>" << QObject::tr ("Depends on: ") << "</b><br/>";
     for (std::vector<lay::SaltGrain::Dependency>::const_iterator d = g->dependencies ().begin (); d != g->dependencies ().end (); ++d) {
-      stream << "&nbsp;&nbsp;&nbsp;&nbsp;" << tl::to_qstring (tl::escaped_to_html (d->name)) << " " << tl::to_qstring (tl::escaped_to_html (d->url)) << "<br/>";
+      stream << "&nbsp;&nbsp;&nbsp;&nbsp;" << tl::to_qstring (tl::escaped_to_html (d->name)) << " ";
+      stream << tl::to_qstring (tl::escaped_to_html (d->version)) << " - ";
+      stream << "[" << tl::to_qstring (tl::escaped_to_html (d->url)) << "]<br/>";
     }
     stream << "</p>";
   }

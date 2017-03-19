@@ -21,6 +21,7 @@
 */
 
 #include "laySaltManagerDialog.h"
+#include "laySaltGrainPropertiesDialog.h"
 #include "laySalt.h"
 #include "tlString.h"
 
@@ -80,16 +81,29 @@ public:
 
     } else if (role == Qt::DecorationRole) {
 
+      int icon_dim = 64;
+
       const lay::SaltGrain *g = mp_salt->begin_flat ()[index.row ()];
       if (g->icon ().isNull ()) {
         return QIcon (":/salt_icon.png");
       } else {
-        QPixmap px = QPixmap::fromImage (g->icon ());
-        if (px.width () == 64) {
-          return px;
+
+        QImage img = g->icon ();
+        if (img.width () == icon_dim && img.height () == icon_dim) {
+          return QPixmap::fromImage (img);
         } else {
-          return px.scaled (QSize (64, 64), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+
+          img = img.scaled (QSize (icon_dim, icon_dim), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+          QImage final_img (icon_dim, icon_dim, QImage::Format_ARGB32);
+          final_img.fill (QColor (0, 0, 0, 0));
+          QPainter painter (&final_img);
+          painter.drawImage ((icon_dim - img.width ()) / 2, (icon_dim - img.height ()) / 2, img);
+
+          return QPixmap::fromImage (final_img);
+
         }
+
       }
 
     } else {
@@ -225,6 +239,9 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent)
     m_current_changed_enabled (true)
 {
   Ui::SaltManagerDialog::setupUi (this);
+  mp_properties_dialog = new lay::SaltGrainPropertiesDialog (this);
+
+  connect (edit_button, SIGNAL (clicked ()), this, SLOT (edit_properties ()));
 
 // @@@
   salt = lay::Salt (); salt_initialized = false;
@@ -247,8 +264,19 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent)
 
   connect (salt_view->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_changed ()));
 
+  // @@@
+}
 
-  // ...
+void
+SaltManagerDialog::edit_properties ()
+{
+  SaltGrain *g = current_grain ();
+  if (g) {
+    if (mp_properties_dialog->exec_dialog (g, mp_salt)) {
+      current_changed ();
+      // @@@
+    }
+  }
 }
 
 void
@@ -277,12 +305,7 @@ SaltManagerDialog::salt_changed ()
 void
 SaltManagerDialog::current_changed ()
 {
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
-  if (! model) {
-    return;
-  }
-
-  SaltGrain *g = model->grain_from_index (salt_view->currentIndex ());
+  SaltGrain *g = current_grain ();
   details_text->set_grain (g);
   if (!g) {
     details_frame->setEnabled (false);
@@ -291,6 +314,13 @@ SaltManagerDialog::current_changed ()
     details_frame->setEnabled (true);
     delete_button->setEnabled (true);
   }
+}
+
+lay::SaltGrain *
+SaltManagerDialog::current_grain ()
+{
+  SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
+  return model ? model->grain_from_index (salt_view->currentIndex ()) : 0;
 }
 
 }

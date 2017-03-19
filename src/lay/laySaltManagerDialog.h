@@ -20,8 +20,8 @@
 
 */
 
-#ifndef HDR_laySaltManager
-#define HDR_laySaltManager
+#ifndef HDR_laySaltManagerDialog
+#define HDR_laySaltManagerDialog
 
 #include <QDialog>
 
@@ -32,6 +32,7 @@ namespace lay
 
 class Salt;
 class SaltGrain;
+class SaltGrainPropertiesDialog;
 
 /**
  *  @brief The dialog for managing the Salt ("Packages")
@@ -58,9 +59,17 @@ private slots:
    */
   void current_changed ();
 
+  /**
+   *  @brief Called when the "edit" button is pressed
+   */
+  void edit_properties ();
+
 private:
   lay::Salt *mp_salt;
   bool m_current_changed_enabled;
+  lay::SaltGrainPropertiesDialog *mp_properties_dialog;
+
+  lay::SaltGrain *current_grain ();
 };
 
 }

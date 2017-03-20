@@ -30,6 +30,8 @@
 #include <QTreeWidgetItem>
 #include <QItemDelegate>
 #include <QPainter>
+#include <QCompleter>
+#include <memory>
 
 namespace lay
 {
@@ -43,8 +45,8 @@ class SaltGrainEditDelegate
   : public QItemDelegate
 {
 public:
-  SaltGrainEditDelegate (QWidget *parent, SaltGrainPropertiesDialog *dialog, int column)
-    : QItemDelegate (parent), mp_dialog (dialog), m_column (column)
+  SaltGrainEditDelegate (QWidget *parent)
+    : QItemDelegate (parent)
   {
     //  .. nothing yet ..
   }
@@ -67,9 +69,6 @@ public:
     QLineEdit *editor = dynamic_cast<QLineEdit *> (widget);
     if (editor) {
       editor->setText (index.model ()->data (index, Qt::UserRole).toString ());
-      if (m_column > 0) {
-        editor->setPlaceholderText (index.model ()->data (index, Qt::EditRole).toString ());
-      }
     }
   }
 
@@ -81,17 +80,43 @@ public:
     }
   }
 
-  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
+  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
   {
-    QWidget *editor = createEditor (0, option, index);
-    QSize size = editor->sizeHint ();
-    delete editor;
-    return size;
+    QSize sz = option.fontMetrics.size (Qt::TextSingleLine, QString::fromUtf8 ("M"));
+    sz += QSize (0, 8);
+    return sz;
+  }
+};
+
+/**
+ *  @brief A delegate for editing a field of the dependency list
+ */
+class SaltGrainNameEditDelegate
+  : public SaltGrainEditDelegate
+{
+public:
+  SaltGrainNameEditDelegate (QWidget *parent, Salt *salt)
+    : SaltGrainEditDelegate (parent), mp_completer (0)
+  {
+    QStringList names;
+    for (lay::Salt::flat_iterator i = salt->begin_flat (); i != salt->end_flat (); ++i) {
+      names << tl::to_qstring ((*i)->name ());
+    }
+    mp_completer = new QCompleter (names, this);
+  }
+
+  QWidget *createEditor (QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+  {
+    QWidget *editor = SaltGrainEditDelegate::createEditor (parent, option, index);
+    QLineEdit *line_edit = dynamic_cast<QLineEdit *> (editor);
+    if (line_edit) {
+      line_edit->setCompleter (mp_completer);
+    }
+    return editor;
   }
 
 public:
-  SaltGrainPropertiesDialog *mp_dialog;
-  int m_column;
+  QCompleter *mp_completer;
 };
 
 // ----------------------------------------------------------------------------------------------------
@@ -114,9 +139,8 @@ SaltGrainPropertiesDialog::SaltGrainPropertiesDialog (QWidget *parent)
   connect (remove_dependency, SIGNAL (clicked ()), this, SLOT (remove_dependency_clicked ()));
   connect (dependencies, SIGNAL (itemChanged (QTreeWidgetItem *, int)), this, SLOT (dependency_changed (QTreeWidgetItem *, int)));
 
-  dependencies->setItemDelegateForColumn (0, new SaltGrainEditDelegate (dependencies, this, 0));
-  dependencies->setItemDelegateForColumn (1, new SaltGrainEditDelegate (dependencies, this, 1));
-  dependencies->setItemDelegateForColumn (2, new SaltGrainEditDelegate (dependencies, this, 2));
+  dependencies->setItemDelegateForColumn (1, new SaltGrainEditDelegate (dependencies));
+  dependencies->setItemDelegateForColumn (2, new SaltGrainEditDelegate (dependencies));
 
   url_changed (QString ());
 }
@@ -349,6 +373,8 @@ SaltGrainPropertiesDialog::exec_dialog (lay::SaltGrain *grain, lay::Salt *salt)
   m_grain = *grain;
   mp_salt = salt;
 
+  dependencies->setItemDelegateForColumn (0, new SaltGrainNameEditDelegate (dependencies, mp_salt));
+
   update_controls ();
 
   bool res = exec ();
@@ -356,6 +382,9 @@ SaltGrainPropertiesDialog::exec_dialog (lay::SaltGrain *grain, lay::Salt *salt)
     update_data ();
     *grain = m_grain;
   }
+
+  delete dependencies->itemDelegateForColumn (0);
+  dependencies->setItemDelegateForColumn (0, 0);
 
   mp_salt = 0;
   return res;

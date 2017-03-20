@@ -115,6 +115,7 @@
         <file alias="yellow_flag.png">images/yellow_flag.png</file>
         <file alias="salt.png">images/salt.png</file>
         <file alias="salt_icon.png">images/salt_icon.png</file>
+        <file alias="warn.png">images/warn.png</file>
     </qresource>
     <qresource prefix="/syntax">
         <file alias="ruby.xml">syntax/ruby.xml</file>

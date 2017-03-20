@@ -353,6 +353,11 @@ public:
   static int compare_versions (const std::string &v1, const std::string &v2);
 
   /**
+   *  @brief Gets a value indicating whether the given version string is a valid version
+   */
+  static bool valid_version (const std::string &v);
+
+  /**
    *  @brief Detects a grain from the given directory
    *  This method will return a grain constructed from the given directory.
    *  The data is read from "path/grain.xml". This method will throw an

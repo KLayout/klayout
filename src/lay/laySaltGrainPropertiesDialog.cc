@@ -31,6 +31,8 @@
 #include <QItemDelegate>
 #include <QPainter>
 #include <QCompleter>
+#include <QMessageBox>
+
 #include <memory>
 
 namespace lay
@@ -149,6 +151,10 @@ void
 SaltGrainPropertiesDialog::update_controls ()
 {
   setWindowTitle (m_title + tl::to_qstring (" - " + m_grain.name ()));
+  license_alert->clear ();
+  version_alert->clear ();
+  doc_url_alert->clear ();
+  dependencies_alert->clear ();
 
   version->setText (tl::to_qstring (m_grain.version ()));
   title->setText (tl::to_qstring (m_grain.title ()));
@@ -300,15 +306,27 @@ BEGIN_PROTECTED
 
   const int max_dim = 256;
 
-  QString fileName = QFileDialog::getOpenFileName (this, tr ("Pick Icon Image File"), m_image_dir, tr ("Images (*.png *.jpg)"));
+  QString fileName = QFileDialog::getOpenFileName (this, tr ("Pick Icon Image File"), m_image_dir, tr ("Images (*.png *.jpg);;All Files (*)"));
   if (! fileName.isNull ()) {
+
+    bool ok = true;
     QImage img = QImage (fileName);
     if (img.width () > max_dim || img.height () > max_dim) {
-      throw tl::Exception (tl::to_string (tr ("Icon image too big -\nmust be %1x%2 pixels max, but is %3x%4").arg (max_dim).arg (max_dim).arg (img.width ()).arg (img.height ())));
+      if (QMessageBox::warning (this, tr ("Image Too Big"),
+                                      tr ("Icon image too big - must be %1x%2 pixels max, but is %3x%4.\n\nScale image?").arg (max_dim).arg (max_dim).arg (img.width ()).arg (img.height ()),
+                                      QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
+        ok = false;
+      } else {
+        img = img.scaled (max_dim, max_dim, Qt::KeepAspectRatio);
+      }
     }
-    m_grain.set_icon (img);
-    m_image_dir = QFileInfo (fileName).path ();
-    update_icon ();
+
+    if (ok) {
+      m_grain.set_icon (img);
+      m_image_dir = QFileInfo (fileName).path ();
+      update_icon ();
+    }
+
   }
 
 END_PROTECTED
@@ -328,15 +346,27 @@ BEGIN_PROTECTED
 
   const int max_dim = 1024;
 
-  QString fileName = QFileDialog::getOpenFileName (this, tr ("Pick Showcase Image File"), m_image_dir, tr ("Images (*.png *.jpg)"));
+  QString fileName = QFileDialog::getOpenFileName (this, tr ("Pick Showcase Image File"), m_image_dir, tr ("Images (*.png *.jpg);;All Files (*)"));
   if (! fileName.isNull ()) {
+
+    bool ok = true;
     QImage img = QImage (fileName);
     if (img.width () > max_dim || img.height () > max_dim) {
-      throw tl::Exception (tl::to_string (tr ("Showcase image too big -\nmust be %1x%2 pixels max, but is %3x%4").arg (max_dim).arg (max_dim).arg (img.width ()).arg (img.height ())));
+      if (QMessageBox::warning (this, tr ("Image Too Big"),
+                                      tr ("Showcase image too big - must be %1x%2 pixels max, but is %3x%4.\n\nScale image?").arg (max_dim).arg (max_dim).arg (img.width ()).arg (img.height ()),
+                                      QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
+        ok = false;
+      } else {
+        img = img.scaled (max_dim, max_dim, Qt::KeepAspectRatio);
+      }
     }
-    m_grain.set_screenshot (img);
-    m_image_dir = QFileInfo (fileName).path ();
-    update_screenshot ();
+
+    if (ok) {
+      m_grain.set_screenshot (img);
+      m_image_dir = QFileInfo (fileName).path ();
+      update_screenshot ();
+    }
+
   }
 
 END_PROTECTED
@@ -367,6 +397,44 @@ SaltGrainPropertiesDialog::remove_dependency_clicked ()
   }
 }
 
+void
+SaltGrainPropertiesDialog::accept ()
+{
+  update_data ();
+
+  //  Perform some checks
+  license_alert->clear ();
+  if (m_grain.license ().empty ()) {
+    license_alert->warn () << tr ("License field is empty. Please consider specifying a license model.");
+  }
+
+  version_alert->clear ();
+  if (m_grain.version ().empty ()) {
+    version_alert->warn () << tr ("Version field is empty. Please consider specifying a version number.");
+  } else if (! SaltGrain::valid_version (m_grain.version ())) {
+    version_alert->error () << tr ("'%1' is not a valid version string. A version string needs to be numeric (like '1.2.3' or '4.5'').").arg (tl::to_qstring (m_grain.version ()));
+  }
+
+  doc_url_alert->clear ();
+  //  @@@ TODO
+
+  dependencies_alert->clear ();
+  //  @@@ TODO
+
+  if (!license_alert->needs_attention () &&
+      !doc_url_alert->needs_attention () &&
+      !dependencies_alert->needs_attention () &&
+      !version_alert->needs_attention ()) {
+    QDialog::accept ();
+  } else {
+    if (QMessageBox::warning (this, tr ("Issues Encountered"),
+                                    tr ("Some issues have been found when inspecting the package details.\nThe respective fields are marked with warning icons.\n\nIgnore these issues and commit the package details?"),
+                                    QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes) {
+      QDialog::accept ();
+    }
+  }
+}
+
 bool
 SaltGrainPropertiesDialog::exec_dialog (lay::SaltGrain *grain, lay::Salt *salt)
 {
@@ -379,7 +447,6 @@ SaltGrainPropertiesDialog::exec_dialog (lay::SaltGrain *grain, lay::Salt *salt)
 
   bool res = exec ();
   if (res) {
-    update_data ();
     *grain = m_grain;
   }
 

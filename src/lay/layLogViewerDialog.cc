@@ -27,6 +27,7 @@
 #include <QMutexLocker>
 #include <QTimer>
 #include <QClipboard>
+#include <QFrame>
 
 #include <stdio.h>
 
@@ -97,25 +98,30 @@ LogReceiver::begin ()
 // -----------------------------------------------------------------
 //  LogFile implementation
 
-LogFile::LogFile (size_t max_entries)
-  : m_error_receiver (this, 0, &LogFile::error),
-    m_warn_receiver (this, 0, &LogFile::warn),
-    m_log_receiver (this, 10, &LogFile::info),
-    m_info_receiver (this, 0, &LogFile::info),
+LogFile::LogFile (size_t max_entries, bool register_global)
+  : m_error_receiver (this, 0, &LogFile::add_error),
+    m_warn_receiver (this, 0, &LogFile::add_warn),
+    m_log_receiver (this, 10, &LogFile::add_info),
+    m_info_receiver (this, 0, &LogFile::add_info),
     m_max_entries (max_entries),
     m_generation_id (0), 
-    m_last_generation_id (0)
+    m_last_generation_id (0),
+    m_has_errors (false),
+    m_has_warnings (false),
+    m_last_attn (false)
 {
   connect (&m_timer, SIGNAL (timeout ()), this, SLOT (timeout ()));
 
-  m_timer.setSingleShot (true);
+  m_timer.setSingleShot (false);
   m_timer.setInterval (100);
   m_timer.start ();
 
-  tl::info.add (&m_info_receiver, false);
-  tl::log.add (&m_log_receiver, false);
-  tl::error.add (&m_error_receiver, false);
-  tl::warn.add (&m_warn_receiver, false);
+  if (register_global) {
+    tl::info.add (&m_info_receiver, false);
+    tl::log.add (&m_log_receiver, false);
+    tl::error.add (&m_error_receiver, false);
+    tl::warn.add (&m_warn_receiver, false);
+  }
 }
 
 void
@@ -123,8 +129,23 @@ LogFile::clear ()
 {
   QMutexLocker locker (&m_lock);
 
-  m_messages.clear ();
-  ++m_generation_id;
+  if (!m_messages.empty ()) {
+    m_messages.clear ();
+    m_has_errors = m_has_warnings = false;
+    ++m_generation_id;
+  }
+}
+
+bool
+LogFile::has_errors () const
+{
+  return m_has_errors;
+}
+
+bool
+LogFile::has_warnings () const
+{
+  return m_has_warnings;
 }
 
 void
@@ -159,9 +180,13 @@ void
 LogFile::timeout ()
 {
   bool changed = false;
+  bool attn = false, last_attn = false;
 
   m_lock.lock ();
   if (m_generation_id != m_last_generation_id) {
+    attn = m_has_errors || m_has_warnings;
+    last_attn = m_last_attn;
+    m_last_attn = attn;
     m_last_generation_id = m_generation_id;
     changed = true;
   }
@@ -169,9 +194,10 @@ LogFile::timeout ()
 
   if (changed) {
     emit layoutChanged ();
+    if (last_attn != attn) {
+      emit attention_changed (attn);
+    }
   }
-
-  m_timer.start ();
 }
 
 void 
@@ -181,6 +207,12 @@ LogFile::add (LogFileEntry::mode_type mode, const std::string &msg, bool continu
 
   if (m_messages.size () >= m_max_entries) {
     m_messages.pop_front ();
+  }
+
+  if (mode == LogFileEntry::Warning || mode == LogFileEntry::WarningContinued) {
+    m_has_warnings = true;
+  } else if (mode == LogFileEntry::Error || mode == LogFileEntry::ErrorContinued) {
+    m_has_errors = true;
   }
 
   m_messages.push_back (LogFileEntry (mode, msg, continued));
@@ -251,27 +283,93 @@ LogFile::data(const QModelIndex &index, int role) const
 // -----------------------------------------------------------------
 //  LogViewerDialog implementation
 
-LogViewerDialog::LogViewerDialog (QWidget *parent)
+LogViewerDialog::LogViewerDialog (QWidget *parent, bool register_global, bool interactive)
   : QDialog (parent), 
-    m_file (50000)  //  TODO: make this variable ..
+    m_file (50000, register_global)  //  TODO: make this variable ..
 {
   setupUi (this);
 
+  //  For non-global log views, the verbosity selector does not make sense
+  if (!register_global) {
+    verbosity_cbx->hide ();
+    verbosity_label->hide ();
+  } else {
+    verbosity_cbx->setCurrentIndex (std::min (4, tl::verbosity () / 10));
+    connect (verbosity_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (verbosity_changed (int)));
+  }
+
+  if (!interactive) {
+    clear_pb->hide ();
+    separator_pb->hide ();
+    copy_pb->hide ();
+  } else {
+    connect (clear_pb, SIGNAL (clicked ()), &m_file, SLOT (clear ()));
+    connect (separator_pb, SIGNAL (clicked ()), &m_file, SLOT (separator ()));
+    connect (copy_pb, SIGNAL (clicked ()), &m_file, SLOT (copy ()));
+  }
+
+  attn_frame->hide ();
   log_view->setModel (&m_file);
 
-  verbosity_cbx->setCurrentIndex (std::min (4, tl::verbosity () / 10));
-
   connect (&m_file, SIGNAL (layoutChanged ()), log_view, SLOT (scrollToBottom ()));
-  connect (verbosity_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (verbosity_changed (int)));
-  connect (clear_pb, SIGNAL (clicked ()), &m_file, SLOT (clear ()));
-  connect (separator_pb, SIGNAL (clicked ()), &m_file, SLOT (separator ()));
-  connect (copy_pb, SIGNAL (clicked ()), &m_file, SLOT (copy ()));
+  connect (&m_file, SIGNAL (attention_changed (bool)), attn_frame, SLOT (setVisible (bool)));
 }
 
 void
 LogViewerDialog::verbosity_changed (int index)
 {
   tl::verbosity (index * 10 + 1);
+}
+
+// -----------------------------------------------------------------
+//  AlertLog implementation
+
+AlertLogButton::AlertLogButton (QWidget *parent)
+  : QToolButton (parent)
+{
+  mp_logger = new LogViewerDialog (this, false, false);
+  hide ();
+  connect (&mp_logger->file (), SIGNAL (attention_changed (bool)), this, SLOT (attention_changed (bool)));
+  connect (this, SIGNAL (clicked ()), mp_logger, SLOT (exec ()));
+}
+
+void
+AlertLogButton::attention_changed (bool attn)
+{
+  setVisible (attn);
+
+  //  as a special service, enlarge and color any surrounding frame red -
+  //  this feature allows putting the alert button together with other entry fields into a frame and
+  //  make this frame highlighted on error or warning.
+  QFrame *frame = dynamic_cast<QFrame *> (parent ());
+  if (frame) {
+
+    if (frame->layout ()) {
+      int l = 0, t = 0, r = 0, b = 0;
+      frame->layout ()->getContentsMargins (&l, &t, &r, &b);
+      if (attn) {
+        l += 3; t += 3; r += 2; b += 2;
+      } else {
+        l -= 3; t -= 3; r -= 2; b -= 2;
+      }
+      frame->layout ()->setContentsMargins (l, t, r, b);
+    }
+
+    if (attn) {
+
+      frame->setAutoFillBackground (true);
+      QPalette palette = frame->palette ();
+      palette.setColor (QPalette::Window, QColor (255, 160, 160));
+      frame->setPalette (palette);
+
+    } else {
+
+      frame->setAutoFillBackground (false);
+      frame->setPalette (QPalette ());
+
+    }
+
+  }
 }
 
 }

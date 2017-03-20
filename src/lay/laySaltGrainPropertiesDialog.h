@@ -74,6 +74,9 @@ private slots:
   void remove_dependency_clicked ();
   void dependency_changed (QTreeWidgetItem *item, int column);
 
+protected:
+  void accept ();
+
 private:
   lay::SaltGrain m_grain;
   lay::Salt *mp_salt;

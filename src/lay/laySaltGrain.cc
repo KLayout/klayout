@@ -185,6 +185,28 @@ SaltGrain::compare_versions (const std::string &v1, const std::string &v2)
   }
 }
 
+bool
+SaltGrain::valid_version (const std::string &v)
+{
+  tl::Extractor ex (v.c_str ());
+
+  while (! ex.at_end ()) {
+    int n = 0;
+    if (! ex.try_read (n)) {
+      return false;
+    }
+    if (! ex.at_end ()) {
+      if (*ex != '.') {
+        return false;
+      } else {
+        ++ex;
+      }
+    }
+  }
+
+  return true;
+}
+
 struct TimeConverter
 {
   std::string to_string (const QDateTime &time) const

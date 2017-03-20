@@ -56,6 +56,14 @@ public:
    */
   bool exec_dialog (lay::SaltGrain *grain, lay::Salt *salt);
 
+  /**
+   *  @brief Gets the current package index
+   */
+  lay::Salt *salt ()
+  {
+    return mp_salt;
+  }
+
 private slots:
   void reset_icon ();
   void set_icon ();
@@ -72,6 +80,7 @@ private:
   QString m_title;
   QString m_open_label;
   QString m_image_dir;
+  bool m_update_enabled;
 
   void update_controls ();
   void update_data ();

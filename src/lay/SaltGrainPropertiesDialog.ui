@@ -578,6 +578,9 @@ Depends on</string>
          </item>
          <item row="0" column="0" rowspan="3">
           <widget class="QTreeWidget" name="dependencies">
+           <property name="editTriggers">
+            <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+           </property>
            <property name="tabKeyNavigation">
             <bool>true</bool>
            </property>

@@ -28,12 +28,77 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QTreeWidgetItem>
+#include <QItemDelegate>
+#include <QPainter>
 
 namespace lay
 {
 
+// ----------------------------------------------------------------------------------------------------
+
+/**
+ *  @brief A delegate for editing a field of the dependency list
+ */
+class SaltGrainEditDelegate
+  : public QItemDelegate
+{
+public:
+  SaltGrainEditDelegate (QWidget *parent, SaltGrainPropertiesDialog *dialog, int column)
+    : QItemDelegate (parent), mp_dialog (dialog), m_column (column)
+  {
+    //  .. nothing yet ..
+  }
+
+  QWidget *createEditor (QWidget *parent, const QStyleOptionViewItem & /*option*/, const QModelIndex & /*index*/) const
+  {
+    QLineEdit *editor = new QLineEdit (parent);
+    editor->setFrame (false);
+    editor->setTextMargins (2, 0, 2, 0);
+    return editor;
+  }
+
+  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex & /*index*/) const
+  {
+    editor->setGeometry(option.rect);
+  }
+
+  void setEditorData (QWidget *widget, const QModelIndex &index) const
+  {
+    QLineEdit *editor = dynamic_cast<QLineEdit *> (widget);
+    if (editor) {
+      editor->setText (index.model ()->data (index, Qt::UserRole).toString ());
+      if (m_column > 0) {
+        editor->setPlaceholderText (index.model ()->data (index, Qt::EditRole).toString ());
+      }
+    }
+  }
+
+  void setModelData (QWidget *widget, QAbstractItemModel *model, const QModelIndex &index) const
+  {
+    QLineEdit *editor = dynamic_cast<QLineEdit *> (widget);
+    if (editor) {
+      model->setData (index, QVariant (editor->text ()), Qt::UserRole);
+    }
+  }
+
+  QSize sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
+  {
+    QWidget *editor = createEditor (0, option, index);
+    QSize size = editor->sizeHint ();
+    delete editor;
+    return size;
+  }
+
+public:
+  SaltGrainPropertiesDialog *mp_dialog;
+  int m_column;
+};
+
+// ----------------------------------------------------------------------------------------------------
+//  SaltGrainPropertiesDialog implementation
+
 SaltGrainPropertiesDialog::SaltGrainPropertiesDialog (QWidget *parent)
-  : QDialog (parent), mp_salt (0)
+  : QDialog (parent), mp_salt (0), m_update_enabled (true)
 {
   Ui::SaltGrainPropertiesDialog::setupUi (this);
 
@@ -48,6 +113,12 @@ SaltGrainPropertiesDialog::SaltGrainPropertiesDialog (QWidget *parent)
   connect (add_dependency, SIGNAL (clicked ()), this, SLOT (add_dependency_clicked ()));
   connect (remove_dependency, SIGNAL (clicked ()), this, SLOT (remove_dependency_clicked ()));
   connect (dependencies, SIGNAL (itemChanged (QTreeWidgetItem *, int)), this, SLOT (dependency_changed (QTreeWidgetItem *, int)));
+
+  dependencies->setItemDelegateForColumn (0, new SaltGrainEditDelegate (dependencies, this, 0));
+  dependencies->setItemDelegateForColumn (1, new SaltGrainEditDelegate (dependencies, this, 1));
+  dependencies->setItemDelegateForColumn (2, new SaltGrainEditDelegate (dependencies, this, 2));
+
+  url_changed (QString ());
 }
 
 void
@@ -67,9 +138,9 @@ SaltGrainPropertiesDialog::update_controls ()
   for (std::vector<SaltGrain::Dependency>::const_iterator d = m_grain.dependencies ().begin (); d != m_grain.dependencies ().end (); ++d) {
     QTreeWidgetItem *item = new QTreeWidgetItem (dependencies);
     item->setFlags (item->flags () | Qt::ItemIsEditable);
-    item->setText (0, tl::to_qstring (d->name));
-    item->setText (1, tl::to_qstring (d->version));
-    item->setText (2, tl::to_qstring (d->url));
+    item->setData (0, Qt::UserRole, tl::to_qstring (d->name));
+    item->setData (1, Qt::UserRole, tl::to_qstring (d->version));
+    item->setData (2, Qt::UserRole, tl::to_qstring (d->url));
     dependencies->addTopLevelItem (item);
   }
 
@@ -120,10 +191,12 @@ SaltGrainPropertiesDialog::update_data ()
 
   m_grain.dependencies ().clear ();
   for (int i = 0; i < dependencies->topLevelItemCount (); ++i) {
+
     QTreeWidgetItem *item = dependencies->topLevelItem (i);
-    QString name = item->text (0).simplified ();
-    QString version = item->text (1).simplified ();
-    QString url = item->text (2).simplified ();
+    QString name = item->data (0, Qt::UserRole).toString ().simplified ();
+    QString version = item->data (1, Qt::UserRole).toString ().simplified ();
+    QString url = item->data (2, Qt::UserRole).toString ().simplified ();
+
     if (! name.isEmpty ()) {
       lay::SaltGrain::Dependency dep = lay::SaltGrain::Dependency ();
       dep.name = tl::to_string (name);
@@ -131,20 +204,31 @@ SaltGrainPropertiesDialog::update_data ()
       dep.url = tl::to_string (url);
       m_grain.dependencies ().push_back (dep);
     }
+
   }
 }
 
 void
 SaltGrainPropertiesDialog::dependency_changed (QTreeWidgetItem *item, int column)
 {
+  if (! m_update_enabled) {
+    return;
+  }
+  m_update_enabled = false;
+
   if (column == 0 && mp_salt) {
 
+    std::string name = tl::to_string (item->data (0, Qt::UserRole).toString ().simplified ());
+    item->setData (0, Qt::EditRole, tl::to_qstring (name));
+
     //  set URL and version for known grains
-    std::string name = tl::to_string (item->text (0).simplified ());
     if (name == m_grain.name ()) {
 
-      item->setText (1, QString ());
-      item->setText (2, tr ("(must not depend on itself)"));
+      item->setData (1, Qt::UserRole, QString ());
+      item->setData (2, Qt::UserRole, QString ());
+      //  placeholder texts:
+      item->setData (1, Qt::EditRole, QString ());
+      item->setData (2, Qt::EditRole, tr ("(must not depend on itself)"));
 
     } else {
 
@@ -155,16 +239,26 @@ SaltGrainPropertiesDialog::dependency_changed (QTreeWidgetItem *item, int column
         }
       }
       if (g) {
-        item->setText (1, tl::to_qstring (g->version ()));
-        item->setText (2, tl::to_qstring (g->url ()));
+        item->setData (1, Qt::UserRole, tl::to_qstring (g->version ()));
+        item->setData (2, Qt::UserRole, tl::to_qstring (g->url ()));
+        //  placeholder texts:
+        item->setData (1, Qt::EditRole, tl::to_qstring (g->version ()));
+        item->setData (2, Qt::EditRole, tl::to_qstring (g->url ()));
       } else {
-        item->setText (1, QString ());
-        item->setText (2, tr ("(unknown packet)"));
+        item->setData (1, Qt::UserRole, QString ());
+        item->setData (2, Qt::UserRole, QString ());
+        //  placeholder texts:
+        item->setData (1, Qt::EditRole, QString ());
+        item->setData (2, Qt::EditRole, tr ("(unknown packet)"));
       }
 
     }
 
+  } else if (column > 0) {
+    item->setData (column, Qt::EditRole, item->data (column, Qt::UserRole).toString ());
   }
+
+  m_update_enabled = true;
 }
 
 void
@@ -172,6 +266,7 @@ SaltGrainPropertiesDialog::url_changed (const QString &url)
 {
   //  inserts the URL into the label
   open_label->setText (m_open_label.arg (url));
+  open_label->setEnabled (! url.isEmpty ());
 }
 
 void
@@ -253,6 +348,7 @@ SaltGrainPropertiesDialog::exec_dialog (lay::SaltGrain *grain, lay::Salt *salt)
 {
   m_grain = *grain;
   mp_salt = salt;
+
   update_controls ();
 
   bool res = exec ();

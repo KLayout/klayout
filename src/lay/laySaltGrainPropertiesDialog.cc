@@ -593,8 +593,10 @@ SaltGrainPropertiesDialog::exec_dialog (lay::SaltGrain *grain, lay::Salt *salt)
   update_controls ();
 
   bool res = exec ();
-  if (res) {
+  if (res && *grain != m_grain) {
     *grain = m_grain;
+    //  save modified grain
+    grain->save ();
   }
 
   delete dependencies->itemDelegateForColumn (0);

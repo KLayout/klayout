@@ -96,7 +96,8 @@ SOURCES = \
   tlXMLParser.cc \
   gsiTest.cc \
     tlFileSystemWatcher.cc \
-    laySalt.cc
+    laySalt.cc \
+    tlFileUtils.cc
 
 # main components:
 SOURCES += \

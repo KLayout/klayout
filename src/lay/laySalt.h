@@ -29,8 +29,12 @@
 
 #include <QObject>
 
+#include <map>
+
 namespace lay
 {
+
+class SaltDownloadManager;
 
 /**
  *  @brief The global salt (package manager) object
@@ -107,20 +111,48 @@ public:
   /**
    *  @brief A flat iterator of (sorted) grains (begin)
    */
-  flat_iterator begin_flat ()
-  {
-    ensure_flat_present ();
-    return mp_flat_grains.begin ();
-  }
+  flat_iterator begin_flat ();
 
   /**
    *  @brief A flat iterator of (sorted) grains (end)
    */
-  flat_iterator end_flat ()
-  {
-    ensure_flat_present ();
-    return mp_flat_grains.end ();
-  }
+  flat_iterator end_flat ();
+
+  /**
+   *  @brief Gets the grain with the given name
+   */
+  SaltGrain *grain_by_name (const std::string &name);
+
+  /**
+   *  @brief Removes a grain from the salt
+   *
+   *  This operation will remove the grain with the given name from the salt and delete all files and directories related to it.
+   *  If multiple grains with the same name exist, they will all be removed.
+   *
+   *  Returns true, if the package could be removed successfully.
+   */
+  bool remove_grain (const SaltGrain &grain);
+
+  /**
+   *  @brief Creates a new grain from a template
+   *
+   *  This method will create a folder for a grain with the given path and download or copy
+   *  all files related to this grain. It will copy the download URL from the template into the
+   *  new grain, so updates will come from the original location.
+   *
+   *  The target's name must be set. If a specific target location is desired, the target's
+   *  path must be set too.
+   *
+   *  This method refuses to overwrite existing grains, so an update needs to be performed by first
+   *  deleting the grain and then re-installing it.
+   *
+   *  The target grain will be updated with the installation information. If the target grain
+   *  contains an installation path prior to the installation, this path will be used for the
+   *  installation of the grain files.
+   *
+   *  Returns true, if the package could be created successfully.
+   */
+  bool create_grain (const SaltGrain &templ, SaltGrain &target, SaltDownloadManager &download_manager);
 
 signals:
   /**
@@ -131,8 +163,10 @@ signals:
 private:
   SaltGrains m_root;
   std::vector<SaltGrain *> mp_flat_grains;
+  std::map<std::string, SaltGrain *> m_grains_by_name;
 
-  void ensure_flat_present ();
+  void validate ();
+  void invalidate ();
   void add_collection_to_flat (lay::SaltGrains &gg);
 };
 

@@ -201,8 +201,6 @@ TEST (3)
   QDir dir_cc (dir_c.filePath (QString::fromUtf8 ("c")));
   QDir dir_ccv (dir_cc.filePath (QString::fromUtf8 ("v")));
 
-  tl_assert (tl::rm_dir_recursive (tmp_dir.path ()));
-
   lay::SaltGrains gg;
   gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
   EXPECT_EQ (gg.is_empty (), true);
@@ -275,8 +273,6 @@ TEST (4)
   QDir dir_cc (dir_c.filePath (QString::fromUtf8 ("c")));
   QDir dir_ccv (dir_cc.filePath (QString::fromUtf8 ("v")));
 
-  tl_assert (tl::rm_dir_recursive (tmp_dir.path ()));
-
   lay::SaltGrains gg;
   gg = lay::SaltGrains::from_path (tl::to_string (tmp_dir.path ()));
   EXPECT_EQ (gg.is_empty (), true);
@@ -341,4 +337,8 @@ TEST (4)
   salt.remove_location (tl::to_string (dir_c.path ()));
   EXPECT_EQ (spy.count (), 0);
   EXPECT_EQ (salt_to_string (salt), "[b,c/c/v,c/u]");
+
+  EXPECT_EQ (salt.grain_by_name ("x"), 0);
+  EXPECT_EQ (salt.grain_by_name ("b")->name (), "b");
+  EXPECT_EQ (salt.grain_by_name ("c/c/v")->name (), "c/c/v");
 }

@@ -313,6 +313,7 @@ SaltManagerDialog::current_changed ()
   } else {
     details_frame->setEnabled (true);
     delete_button->setEnabled (true);
+    edit_button->setEnabled (! g->is_readonly ());
   }
 }
 

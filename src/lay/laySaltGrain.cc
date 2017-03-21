@@ -185,6 +185,48 @@ SaltGrain::compare_versions (const std::string &v1, const std::string &v2)
   }
 }
 
+std::string
+SaltGrain::spec_url (const std::string &url)
+{
+  std::string res = url;
+  if (! res.empty()) {
+    if (res [res.size () - 1] != '/') {
+      res += "/";
+    }
+    res += grain_filename;
+  }
+  return res;
+}
+
+bool
+SaltGrain::valid_name (const std::string &n)
+{
+  std::string res;
+
+  tl::Extractor ex (n);
+
+  std::string s;
+  if (! ex.try_read_word (s, "_")) {
+    return false;
+  }
+  res += s;
+
+  while (! ex.at_end ()) {
+    if (! ex.test ("/")) {
+      return false;
+    }
+    if (! ex.try_read_word (s, "_")) {
+      return false;
+    }
+    res += "/";
+    res += s;
+  }
+
+  //  this captures the cases where the extractor skips blanks
+  //  TODO: the extractor should have a "non-blank-skipping" mode
+  return s == n;
+}
+
 bool
 SaltGrain::valid_version (const std::string &v)
 {

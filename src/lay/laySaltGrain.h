@@ -358,12 +358,22 @@ public:
   static bool valid_version (const std::string &v);
 
   /**
+   *  @brief Checks whether the given string is a valid name
+   */
+  static bool valid_name (const std::string &n);
+
+  /**
    *  @brief Detects a grain from the given directory
    *  This method will return a grain constructed from the given directory.
    *  The data is read from "path/grain.xml". This method will throw an
    *  exception if an error occurs during reading.
    */
   static SaltGrain from_path (const std::string &path);
+
+  /**
+   *  @brief Forms the spec file download URL from a given download URL
+   */
+  static std::string spec_url (const std::string &url);
 
   /**
    *  @brief Returns a value indicating whether the given path represents is a grain

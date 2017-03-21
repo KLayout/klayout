@@ -24,6 +24,7 @@
 #include "laySalt.h"
 #include "tlString.h"
 #include "tlExceptions.h"
+#include "tlHttpStream.h"
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -34,6 +35,8 @@
 #include <QMessageBox>
 
 #include <memory>
+#include <map>
+#include <set>
 
 namespace lay
 {
@@ -397,29 +400,173 @@ SaltGrainPropertiesDialog::remove_dependency_clicked ()
   }
 }
 
+namespace
+{
+
+class DependencyGraph
+{
+public:
+  DependencyGraph (Salt *salt)
+  {
+    for (lay::Salt::flat_iterator i = salt->begin_flat (); i != salt->end_flat (); ++i) {
+      m_name_to_grain.insert (std::make_pair ((*i)->name (), *i));
+    }
+  }
+
+  bool is_valid_name (const std::string &name) const
+  {
+    return m_name_to_grain.find (name) != m_name_to_grain.end ();
+  }
+
+  const lay::SaltGrain *grain_for_name (const std::string &name) const
+  {
+    std::map <std::string, const lay::SaltGrain *>::const_iterator n = m_name_to_grain.find (name);
+    if (n != m_name_to_grain.end ()) {
+      return n->second;
+    } else {
+      return 0;
+    }
+  }
+
+  void check_circular (const lay::SaltGrain *current, const lay::SaltGrain *new_dep)
+  {
+    std::vector <const lay::SaltGrain *> path;
+    path.push_back (current);
+    check_circular_follow (new_dep, path);
+  }
+
+private:
+  std::map <std::string, const lay::SaltGrain *> m_name_to_grain;
+
+  void check_circular_follow (const lay::SaltGrain *current, std::vector <const lay::SaltGrain *> &path)
+  {
+    if (! current) {
+      return;
+    }
+
+    path.push_back (current);
+
+    for (std::vector <const lay::SaltGrain *>::const_iterator p = path.begin (); p != path.end () - 1; ++p) {
+      if (*p == current) {
+        circular_reference_error (path);
+      }
+    }
+
+    for (std::vector<SaltGrain::Dependency>::const_iterator d = current->dependencies ().begin (); d != current->dependencies ().end (); ++d) {
+      check_circular_follow (grain_for_name (d->name), path);
+    }
+
+    path.pop_back ();
+  }
+
+  void circular_reference_error (std::vector <const lay::SaltGrain *> &path)
+  {
+    std::string msg = tl::to_string (QObject::tr ("The following path forms a circular dependency: "));
+    for (std::vector <const lay::SaltGrain *>::const_iterator p = path.begin (); p != path.end (); ++p) {
+      if (p != path.begin ()) {
+        msg += "->";
+      }
+      msg += (*p)->name ();
+    }
+    throw tl::Exception (msg);
+  }
+};
+
+}
+
 void
 SaltGrainPropertiesDialog::accept ()
 {
   update_data ();
 
   //  Perform some checks
+
+  //  license
   license_alert->clear ();
   if (m_grain.license ().empty ()) {
-    license_alert->warn () << tr ("License field is empty. Please consider specifying a license model.");
+    license_alert->warn () << tr ("License field is empty. Please consider specifying a license model.") << tl::endl
+                           << tr ("A license model tells users whether and how to use the source code of the package.");
   }
 
+  //  version
   version_alert->clear ();
   if (m_grain.version ().empty ()) {
-    version_alert->warn () << tr ("Version field is empty. Please consider specifying a version number.");
+    version_alert->warn () << tr ("Version field is empty. Please consider specifying a version number.") << tl::endl
+                           << tr ("Versions help the system to apply upgrades if required.");
   } else if (! SaltGrain::valid_version (m_grain.version ())) {
     version_alert->error () << tr ("'%1' is not a valid version string. A version string needs to be numeric (like '1.2.3' or '4.5'').").arg (tl::to_qstring (m_grain.version ()));
   }
 
+  //  doc URL
   doc_url_alert->clear ();
-  //  @@@ TODO
+  if (! m_grain.doc_url ().empty ()) {
+    tl::InputHttpStream stream (m_grain.doc_url ());
+    try {
+      char b;
+      stream.read (&b, 1);
+    } catch (tl::Exception &ex) {
+      doc_url_alert->error () << tr ("Attempt to read documentation URL failed. Error details follow.") << tl::endl
+                              << tr ("URL: ") << m_grain.doc_url () << tl::endl
+                              << tr ("Message: ") << ex.msg ();
+    }
+  }
 
+  //  dependencies
   dependencies_alert->clear ();
-  //  @@@ TODO
+  DependencyGraph dep (mp_salt);
+  std::set <std::string> dep_seen;
+  for (std::vector<SaltGrain::Dependency>::const_iterator d = m_grain.dependencies ().begin (); d != m_grain.dependencies ().end (); ++d) {
+
+    if (! SaltGrain::valid_name (d->name)) {
+      dependencies_alert->error () << tr ("'%1' is not a valid package name").arg (tl::to_qstring (d->name)) << tl::endl
+                                   << tr ("Valid package names are words (letters, digits, underscores)") << tl::endl
+                                   << tr ("Package groups can be specified in the form 'group/package'");
+      continue;
+    }
+
+    if (dep_seen.find (d->name) != dep_seen.end ()) {
+      dependencies_alert->error () << tr ("Duplicate dependency '%1'").arg (tl::to_qstring (d->name)) << tl::endl
+                                   << tr ("A package cannot be dependent on the same package twice. Remove on entry.");
+      continue;
+    }
+    dep_seen.insert (d->name);
+
+    if (! dep.is_valid_name (d->name)) {
+      dependencies_alert->warn () << tr ("'%1' is not a name of a package loaded already").arg (tl::to_qstring (d->name)) << tl::endl
+                                  << tr ("You need to specify the details (version, URL) manually");
+    } else {
+      try {
+        dep.check_circular (dep.grain_for_name (m_grain.name ()), dep.grain_for_name (d->name));
+      } catch (tl::Exception &ex) {
+        dependencies_alert->error () << ex.msg () << tl::endl
+                                     << tr ("Circular dependency means a package is eventually depending on itself.");
+      }
+    }
+
+    if (d->version.empty ()) {
+      dependencies_alert->warn () << tr ("No version specified for dependency '%1'").arg (tl::to_qstring (d->name)) << tl::endl
+                                  << tr ("Versions help checking dependencies.") << tl::endl
+                                  << tr ("If the dependency package has a version itself, the version is automatically set to it's current version");
+    }
+
+    if (d->url.empty ()) {
+      dependencies_alert->warn () << tr ("No download URL specified for dependency '%1'").arg (tl::to_qstring (d->name)) << tl::endl
+                                  << tr ("A download URL should be specified to ensure the package dependencies can be resolved.") << tl::endl
+                                  << tr ("If the dependency package was downloaded itself, the URL is automatically set to the download source");
+    } else {
+      std::string spec_url = SaltGrain::spec_url (d->url);
+      tl::InputHttpStream stream (spec_url);
+      try {
+        char b;
+        stream.read (&b, 1);
+      } catch (tl::Exception &ex) {
+        dependencies_alert->error () << tr ("Attempt to read download URL failed. Error details follow.") << tl::endl
+                                     << tr ("URL: ") << spec_url << tl::endl
+                                     << tr ("Message: ") << ex.msg ();
+      }
+    }
+
+  }
 
   if (!license_alert->needs_attention () &&
       !doc_url_alert->needs_attention () &&

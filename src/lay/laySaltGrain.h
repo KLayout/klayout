@@ -25,6 +25,7 @@
 
 #include "layCommon.h"
 #include "tlObject.h"
+#include "tlStream.h"
 
 #include <QTime>
 #include <QImage>
@@ -335,6 +336,11 @@ public:
   void load (const std::string &file_path);
 
   /**
+   *  @brief Loads the data from a given stream
+   */
+  void load (tl::InputStream &stream);
+
+  /**
    *  @brief Saves the data to the path inside the grain folder given by the "path" property
    */
   void save () const;
@@ -369,6 +375,14 @@ public:
    *  exception if an error occurs during reading.
    */
   static SaltGrain from_path (const std::string &path);
+
+  /**
+   *  @brief Loads the grain from the given URL
+   *  This method will return a grain constructed from the downloaded data.
+   *  The data is read from "URL/grain.xml". This method will throw an
+   *  exception if an error occurs during reading.
+   */
+  static SaltGrain from_url (const std::string &url);
 
   /**
    *  @brief Forms the spec file download URL from a given download URL

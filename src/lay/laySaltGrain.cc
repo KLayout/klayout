@@ -23,6 +23,7 @@
 #include "laySaltGrain.h"
 #include "tlString.h"
 #include "tlXMLParser.h"
+#include "tlHttpStream.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -319,13 +320,20 @@ static tl::XMLStruct<lay::SaltGrain> xml_struct ("salt-grain",
 bool
 SaltGrain::is_readonly () const
 {
-  return QFileInfo (tl::to_qstring (path ())).isWritable ();
+  return !QFileInfo (tl::to_qstring (path ())).isWritable ();
 }
 
 void
 SaltGrain::load (const std::string &p)
 {
   tl::XMLFileSource source (p);
+  xml_struct.parse (source, *this);
+}
+
+void
+SaltGrain::load (tl::InputStream &p)
+{
+  tl::XMLStreamSource source (p);
   xml_struct.parse (source, *this);
 }
 
@@ -350,6 +358,18 @@ SaltGrain::from_path (const std::string &path)
   SaltGrain g;
   g.load (tl::to_string (dir.filePath (tl::to_qstring (grain_filename))));
   g.set_path (tl::to_string (dir.absolutePath ()));
+  return g;
+}
+
+SaltGrain
+SaltGrain::from_url (const std::string &url)
+{
+  tl::InputHttpStream http (SaltGrain::spec_url (url));
+  tl::InputStream stream (http);
+
+  SaltGrain g;
+  g.load (stream);
+  g.set_url (url);
   return g;
 }
 

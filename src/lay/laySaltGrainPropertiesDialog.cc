@@ -554,14 +554,17 @@ SaltGrainPropertiesDialog::accept ()
                                   << tr ("A download URL should be specified to ensure the package dependencies can be resolved.") << tl::endl
                                   << tr ("If the dependency package was downloaded itself, the URL is automatically set to the download source.");
     } else {
-      std::string spec_url = SaltGrain::spec_url (d->url);
-      tl::InputHttpStream stream (spec_url);
+      SaltGrain gdep;
       try {
-        char b;
-        stream.read (&b, 1);
+        gdep = SaltGrain::from_url (d->url);
+        if (gdep.name () != d->name) {
+          dependencies_alert->error () << tr ("Package name obtained from download URL is not the expected name.") << tl::endl
+                                       << tr ("Downloaded name: ") << gdep.name () << tl::endl
+                                       << tr ("Expected name: ") << d->name;
+        }
       } catch (tl::Exception &ex) {
-        dependencies_alert->error () << tr ("Attempt to read download URL failed. Error details follow.") << tl::endl
-                                     << tr ("URL: ") << spec_url << tl::endl
+        dependencies_alert->error () << tr ("Attempt to test-download package from URL failed. Error details follow.") << tl::endl
+                                     << tr ("URL: ") << d->url << tl::endl
                                      << tr ("Message: ") << ex.msg ();
       }
     }

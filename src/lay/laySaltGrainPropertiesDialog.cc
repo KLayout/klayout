@@ -519,8 +519,8 @@ SaltGrainPropertiesDialog::accept ()
 
     if (! SaltGrain::valid_name (d->name)) {
       dependencies_alert->error () << tr ("'%1' is not a valid package name").arg (tl::to_qstring (d->name)) << tl::endl
-                                   << tr ("Valid package names are words (letters, digits, underscores)") << tl::endl
-                                   << tr ("Package groups can be specified in the form 'group/package'");
+                                   << tr ("Valid package names are words (letters, digits, underscores).") << tl::endl
+                                   << tr ("Package groups can be specified in the form 'group/package'.");
       continue;
     }
 
@@ -539,20 +539,20 @@ SaltGrainPropertiesDialog::accept ()
         dep.check_circular (dep.grain_for_name (m_grain.name ()), dep.grain_for_name (d->name));
       } catch (tl::Exception &ex) {
         dependencies_alert->error () << ex.msg () << tl::endl
-                                     << tr ("Circular dependency means a package is eventually depending on itself.");
+                                     << tr ("Circular dependency means, a package is eventually depending on itself.");
       }
     }
 
     if (d->version.empty ()) {
       dependencies_alert->warn () << tr ("No version specified for dependency '%1'").arg (tl::to_qstring (d->name)) << tl::endl
-                                  << tr ("Versions help checking dependencies.") << tl::endl
-                                  << tr ("If the dependency package has a version itself, the version is automatically set to it's current version");
+                                  << tr ("Please consider giving a version here. Versions help deciding whether a package needs to be updated.") << tl::endl
+                                  << tr ("If the dependency package has a version itself, the version is automatically set to it's current version.");
     }
 
     if (d->url.empty ()) {
       dependencies_alert->warn () << tr ("No download URL specified for dependency '%1'").arg (tl::to_qstring (d->name)) << tl::endl
                                   << tr ("A download URL should be specified to ensure the package dependencies can be resolved.") << tl::endl
-                                  << tr ("If the dependency package was downloaded itself, the URL is automatically set to the download source");
+                                  << tr ("If the dependency package was downloaded itself, the URL is automatically set to the download source.");
     } else {
       std::string spec_url = SaltGrain::spec_url (d->url);
       tl::InputHttpStream stream (spec_url);

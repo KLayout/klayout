@@ -233,18 +233,25 @@ LogFile::data(const QModelIndex &index, int role) const
 {
   QMutexLocker locker (&m_lock);
 
-  if (role == Qt::DisplayRole) {
+  if (role == Qt::DecorationRole) {
 
     if (index.row () < int (m_messages.size ()) && index.row () >= 0) {
       LogFileEntry::mode_type mode = m_messages [index.row ()].mode ();
-      std::string message = m_messages [index.row ()].text ();
       if (mode == LogFileEntry::Error) {
-        return QVariant (tl::to_qstring (tl::to_string (QObject::tr ("ERROR: ")) + message));
+        return QIcon (QString::fromUtf8 (":/error_16.png"));
       } else if (mode == LogFileEntry::Warning) {
-        return QVariant (tl::to_qstring (tl::to_string (QObject::tr ("Warning: ")) + message));
+        return QIcon (QString::fromUtf8 (":/warn_16.png"));
+      } else if (mode == LogFileEntry::Info) {
+        return QIcon (QString::fromUtf8 (":/info_16.png"));
       } else {
-        return QVariant (tl::to_qstring (message));
+        return QIcon (QString::fromUtf8 (":/empty_16.png"));
       }
+    }
+
+  } else if (role == Qt::DisplayRole) {
+
+    if (index.row () < int (m_messages.size ()) && index.row () >= 0) {
+      return QVariant (tl::to_qstring (m_messages [index.row ()].text ()));
     } 
 
   } else if (role == Qt::FontRole) {

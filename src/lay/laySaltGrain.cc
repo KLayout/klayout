@@ -28,6 +28,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QBuffer>
+#include <QResource>
 
 namespace lay
 {
@@ -326,8 +327,28 @@ SaltGrain::is_readonly () const
 void
 SaltGrain::load (const std::string &p)
 {
-  tl::XMLFileSource source (p);
-  xml_struct.parse (source, *this);
+  tl_assert (!p.empty ());
+
+  if (p[0] != ':') {
+
+    tl::XMLFileSource source (p);
+    xml_struct.parse (source, *this);
+
+  } else {
+
+    QResource res (tl::to_qstring (p));
+    QByteArray data;
+    if (res.isCompressed ()) {
+      data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+    } else {
+      data = QByteArray ((const char *)res.data (), (int)res.size ());
+    }
+
+    std::string str_data (data.constData (), data.size ());
+    tl::XMLStringSource source (str_data);
+    xml_struct.parse (source, *this);
+
+  }
 }
 
 void
@@ -376,9 +397,15 @@ SaltGrain::from_url (const std::string &url)
 bool
 SaltGrain::is_grain (const std::string &path)
 {
-  QDir dir (tl::to_qstring (path));
-  QString gf = dir.filePath (tl::to_qstring (grain_filename));
-  return QFileInfo (gf).exists ();
+  tl_assert (! path.empty ());
+
+  if (path[0] != ':') {
+    QDir dir (tl::to_qstring (path));
+    QString gf = dir.filePath (tl::to_qstring (grain_filename));
+    return QFileInfo (gf).exists ();
+  } else {
+    return QResource (tl::to_qstring (path + "/" + grain_filename)).isValid ();
+  }
 }
 
 }

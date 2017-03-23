@@ -23,6 +23,7 @@
 #include "laySaltManagerDialog.h"
 #include "laySaltGrainPropertiesDialog.h"
 #include "laySalt.h"
+#include "ui_SaltGrainTemplateSelectionDialog.h"
 #include "tlString.h"
 
 #include <QAbstractItemModel>
@@ -33,6 +34,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QBuffer>
+#include <QResource>
 
 namespace lay
 {
@@ -220,6 +222,56 @@ public:
 };
 
 // --------------------------------------------------------------------------------------
+
+/**
+ *  @brief A tiny dialog to select a template and a name for the grain
+ */
+class SaltGrainTemplateSelectionDialog
+  : public QDialog, private Ui::SaltGrainTemplateSelectionDialog
+{
+public:
+  SaltGrainTemplateSelectionDialog (QWidget *parent)
+    : QDialog (parent)
+  {
+    Ui::SaltGrainTemplateSelectionDialog::setupUi (this);
+
+    m_salt_templates.add_location (":/salt_templates");
+    salt_view->setModel (new SaltModel (this, &m_salt_templates));
+    salt_view->setItemDelegate (new SaltItemDelegate (this));
+    salt_view->setCurrentIndex (salt_view->model ()->index (0, 0, QModelIndex ()));
+  }
+
+  lay::SaltGrain templ () const
+  {
+    SaltModel *model = dynamic_cast<SaltModel *> (salt_view->model ());
+    tl_assert (model != 0);
+
+    SaltGrain *g = model->grain_from_index (salt_view->currentIndex ());
+    tl_assert (g != 0);
+
+    g->set_name (tl::to_string (name_edit->text ().simplified ()));
+
+    return *g;
+  }
+
+  void accept ()
+  {
+    name_alert->clear ();
+    std::string name = tl::to_string (name_edit->text ().simplified ());
+    if (name.empty ()) {
+      name_alert->error () << tr ("Name must not be empty");
+    } else if (! SaltGrain::valid_name (name)) {
+      name_alert->error () << tr ("Name is not valid (must be composed of letters, digits or underscores.\nGroups and names need to be separated with slashes.");
+    } else {
+      QDialog::accept ();
+    }
+  }
+
+private:
+  lay::Salt m_salt_templates;
+};
+
+// --------------------------------------------------------------------------------------
 //  SaltManager implementation
 
 // @@@
@@ -242,6 +294,9 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent)
   mp_properties_dialog = new lay::SaltGrainPropertiesDialog (this);
 
   connect (edit_button, SIGNAL (clicked ()), this, SLOT (edit_properties ()));
+  connect (create_button, SIGNAL (clicked ()), this, SLOT (create_grain ()));
+  connect (delete_button, SIGNAL (clicked ()), this, SLOT (delete_grain ()));
+  connect (install_button, SIGNAL (clicked ()), this, SLOT (install_grain ()));
 
 // @@@
   salt = lay::Salt (); salt_initialized = false;
@@ -277,6 +332,58 @@ SaltManagerDialog::edit_properties ()
       // @@@
     }
   }
+}
+
+// @@@
+namespace
+{
+
+/**
+ *  @brief A helper class required because directory traversal is not supported by QResource directly
+ */
+class OpenResource
+  : public QResource
+{
+public:
+  using QResource::isDir;
+  using QResource::isFile;
+  using QResource::children;
+
+  OpenResource (const QString &path)
+    : QResource (path)
+  {
+    //  .. nothing yet ..
+  }
+};
+
+}
+// @@@
+
+void
+SaltManagerDialog::create_grain ()
+{
+  SaltGrainTemplateSelectionDialog temp_dialog (this);
+  if (temp_dialog.exec ()) {
+
+    // @@@
+
+  }
+}
+
+void
+SaltManagerDialog::delete_grain ()
+{
+
+  // @@@
+
+}
+
+void
+SaltManagerDialog::install_grain ()
+{
+
+  // @@@
+
 }
 
 void

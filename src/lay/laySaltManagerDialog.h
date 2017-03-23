@@ -64,6 +64,21 @@ private slots:
    */
   void edit_properties ();
 
+  /**
+   *  @brief Called when the "edit" button is pressed
+   */
+  void create_grain ();
+
+  /**
+   *  @brief Called when the "delete" button is pressed
+   */
+  void delete_grain ();
+
+  /**
+   *  @brief Called when the "install" button is pressed
+   */
+  void install_grain ();
+
 private:
   lay::Salt *mp_salt;
   bool m_current_changed_enabled;

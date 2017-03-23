@@ -99,7 +99,8 @@ FORMS = \
     TechSaveOptionsEditorPage.ui \
     MainConfigPage7.ui \
     SaltManagerDialog.ui \
-    SaltGrainPropertiesDialog.ui
+    SaltGrainPropertiesDialog.ui \
+    SaltGrainTemplateSelectionDialog.ui
 
 SOURCES = \
   gsiDeclLayApplication.cc \
@@ -156,6 +157,7 @@ RESOURCES = layBuildInMacros.qrc \
   layLayoutStatistics.qrc \
   layMacroTemplates.qrc \
   layResources.qrc \
+    laySaltTemplates.qrc
 
 INCLUDEPATH += ../tl ../gsi ../db ../rdb ../laybasic ../ant ../img ../edt
 DEPENDPATH += ../tl ../gsi ../db ../rdb ../laybasic ../ant ../img ../edt

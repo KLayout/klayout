@@ -81,11 +81,15 @@ Salt::grain_by_name (const std::string &name)
 void
 Salt::add_location (const std::string &path)
 {
-  //  do nothing if the collection is already there
-  QFileInfo fi (tl::to_qstring (path));
-  for (lay::SaltGrains::collection_iterator g = m_root.begin_collections (); g != m_root.end_collections (); ++g) {
-    if (QFileInfo (tl::to_qstring (g->path ())) == fi) {
-      return;
+  tl_assert (! path.empty ());
+
+  if (path[0] != ':') {
+    //  do nothing if the collection is already there
+    QFileInfo fi (tl::to_qstring (path));
+    for (lay::SaltGrains::collection_iterator g = m_root.begin_collections (); g != m_root.end_collections (); ++g) {
+      if (QFileInfo (tl::to_qstring (g->path ())) == fi) {
+        return;
+      }
     }
   }
 

@@ -29,6 +29,7 @@
 
 #include <QFileInfo>
 #include <QDir>
+#include <QResource>
 
 namespace lay
 {
@@ -215,8 +216,91 @@ Salt::remove_grain (const SaltGrain &grain)
   }
 }
 
+namespace
+{
+
+/**
+ *  @brief A helper class required because directory traversal is not supported by QResource directly
+ *  This class supports resource file trees and extraction of a tree from the latter
+ */
+class ResourceDir
+  : public QResource
+{
+public:
+  using QResource::isFile;
+
+  /**
+   *  @brief Constructor
+   *  Creates a resource representing a resource tree.
+   */
+  ResourceDir (const QString &path)
+    : QResource (path)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Writes the resource tree to the target directory
+   *  Returns false on error - see log in this case.
+   */
+  bool copy_to (const QDir &target)
+  {
+    if (isDir ()) {
+
+      QStringList templ_dir = children ();
+      for (QStringList::const_iterator t = templ_dir.begin (); t != templ_dir.end (); ++t) {
+
+        ResourceDir child_res (fileName () + QString::fromUtf8 ("/") + *t);
+        if (child_res.isFile ()) {
+
+          QFile file (target.absoluteFilePath (*t));
+          if (! file.open (QIODevice::WriteOnly)) {
+            tl::error << QObject::tr ("Unable to open target file for writing: %1").arg (target.absoluteFilePath (*t));
+            return false;
+          }
+
+          QByteArray data;
+          if (child_res.isCompressed ()) {
+            data = qUncompress ((const unsigned char *)child_res.data (), (int)child_res.size ());
+          } else {
+            data = QByteArray ((const char *)child_res.data (), (int)child_res.size ());
+          }
+
+          file.write (data);
+
+          file.close ();
+
+        } else {
+
+          QFileInfo child_dir (target.absoluteFilePath (*t));
+          if (! child_dir.exists ()) {
+            if (! target.mkdir (*t)) {
+              tl::error << QObject::tr ("Unable to create target directory: %1").arg (child_dir.path ());
+              return false;
+            }
+          } else if (! child_dir.isDir ()) {
+            tl::error << QObject::tr ("Unable to create target directory (is a file already): %1").arg (child_dir.path ());
+            return false;
+          }
+
+          if (! child_res.copy_to (QDir (target.absoluteFilePath (*t)))) {
+            return false;
+          }
+
+        }
+
+      }
+
+    }
+
+    return true;
+  }
+};
+
+}
+
 bool
-Salt::create_grain (const SaltGrain &templ, SaltGrain &target, SaltDownloadManager &download_manager)
+Salt::create_grain (const SaltGrain &templ, SaltGrain &target, SaltDownloadManager *download_manager)
 {
   tl_assert (!m_root.is_empty ());
 
@@ -243,15 +327,23 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, SaltDownloadManag
     //  change down to the desired target location and create the directory structure while doing so
     std::vector<std::string> name_parts = tl::split (target.name (), "/");
     for (std::vector<std::string>::const_iterator n = name_parts.begin (); n != name_parts.end (); ++n) {
-      QDir subdir (target_dir.filePath (tl::to_qstring (*n)));
-      if (! subdir.exists ()) {
+
+      QFileInfo subdir (target_dir.filePath (tl::to_qstring (*n)));
+      if (subdir.exists () && ! subdir.isDir ()) {
+        throw tl::Exception (tl::to_string (tr ("Unable to create target directory '%1' for installing package - is already a file").arg (subdir.path ())));
+      } else if (! subdir.exists ()) {
         if (! target_dir.mkdir (tl::to_qstring (*n))) {
           throw tl::Exception (tl::to_string (tr ("Unable to create target directory '%1' for installing package").arg (subdir.path ())));
         }
         if (! target_dir.cd (tl::to_qstring (*n))) {
           throw tl::Exception (tl::to_string (tr ("Unable to change to target directory '%1' for installing package").arg (subdir.path ())));
         }
+      } else {
+        if (! target_dir.cd (tl::to_qstring (*n))) {
+          throw tl::Exception (tl::to_string (tr ("Unable to change to target directory '%1' for installing package").arg (subdir.path ())));
+        }
       }
+
     }
 
   } catch (tl::Exception &ex) {
@@ -261,29 +353,45 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, SaltDownloadManag
 
   bool res = true;
 
+  std::string target_name = target.name ();
   target = templ;
   target.set_path (tl::to_string (target_dir.absolutePath ()));
+  target.set_name (target_name);
 
   if (! templ.path ().empty ()) {
 
-    //  if the template represents an actual folder, use the files from there
-    tl::info << QObject::tr ("Copying package from '%1' to '%2' ..").arg (tl::to_qstring (templ.path ())).arg (tl::to_qstring (target.path ()));
-    res = tl::cp_dir_recursive (templ.path (), target.path ());
+    if (templ.path ()[0] != ':') {
+
+      //  if the template represents an actual folder, use the files from there
+      tl::info << QObject::tr ("Copying package from '%1' to '%2' ..").arg (tl::to_qstring (templ.path ())).arg (tl::to_qstring (target.path ()));
+      res = tl::cp_dir_recursive (templ.path (), target.path ());
+
+    } else {
+
+      //  if the template represents a resource path, use the files from there
+      tl::info << QObject::tr ("Installing package from resource '%1' to '%2' ..").arg (tl::to_qstring (templ.path ())).arg (tl::to_qstring (target.path ()));
+      res = ResourceDir (tl::to_qstring (templ.path ())).copy_to (QDir (tl::to_qstring (target.path ())));
+
+    }
 
   } else if (! templ.url ().empty ()) {
 
+    tl_assert (download_manager != 0);
+
     //  otherwise download from the URL
     tl::info << QObject::tr ("Downloading package from '%1' to '%2' ..").arg (tl::to_qstring (templ.url ())).arg (tl::to_qstring (target.path ()));
-    res = download_manager.download (templ.url (), target.path ());
+    res = download_manager->download (templ.url (), target.path ());
 
   }
 
   if (res) {
 
     tl::info << QObject::tr ("Package '%1' installed").arg (tl::to_qstring (target.name ()));
-
     target.set_installed_time (QDateTime::currentDateTime ());
     target.save ();
+
+    //  NOTE: this is a bit brute force .. we could as well try to insert the new grain into the existing structure
+    refresh ();
 
   } else {
 

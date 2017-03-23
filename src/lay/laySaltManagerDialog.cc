@@ -25,6 +25,7 @@
 #include "laySalt.h"
 #include "ui_SaltGrainTemplateSelectionDialog.h"
 #include "tlString.h"
+#include "tlExceptions.h"
 
 #include <QAbstractItemModel>
 #include <QAbstractTextDocumentLayout>
@@ -152,7 +153,7 @@ public:
 
   void update ()
   {
-    //  @@@
+    reset ();
   }
 
 public:
@@ -230,8 +231,8 @@ class SaltGrainTemplateSelectionDialog
   : public QDialog, private Ui::SaltGrainTemplateSelectionDialog
 {
 public:
-  SaltGrainTemplateSelectionDialog (QWidget *parent)
-    : QDialog (parent)
+  SaltGrainTemplateSelectionDialog (QWidget *parent, lay::Salt *salt)
+    : QDialog (parent), mp_salt (salt)
   {
     Ui::SaltGrainTemplateSelectionDialog::setupUi (this);
 
@@ -249,9 +250,12 @@ public:
     SaltGrain *g = model->grain_from_index (salt_view->currentIndex ());
     tl_assert (g != 0);
 
-    g->set_name (tl::to_string (name_edit->text ().simplified ()));
-
     return *g;
+  }
+
+  std::string name () const
+  {
+    return tl::to_string (name_edit->text ());
   }
 
   void accept ()
@@ -263,12 +267,23 @@ public:
     } else if (! SaltGrain::valid_name (name)) {
       name_alert->error () << tr ("Name is not valid (must be composed of letters, digits or underscores.\nGroups and names need to be separated with slashes.");
     } else {
+
+      //  check, if this name does not exist yet
+      for (Salt::flat_iterator g = mp_salt->begin_flat (); g != mp_salt->end_flat (); ++g) {
+        if ((*g)->name () == name) {
+          name_alert->error () << tr ("A package with this name already exists");
+          return;
+        }
+      }
+
       QDialog::accept ();
+
     }
   }
 
 private:
   lay::Salt m_salt_templates;
+  lay::Salt *mp_salt;
 };
 
 // --------------------------------------------------------------------------------------
@@ -310,11 +325,6 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent)
 
   connect (mp_salt, SIGNAL (collections_changed ()), this, SLOT (salt_changed ()));
 
-  //  select the first grain
-  if (model->rowCount (QModelIndex ()) > 0) {
-    salt_view->setCurrentIndex (model->index (0, 0, QModelIndex ()));
-  }
-
   salt_changed ();
 
   connect (salt_view->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_changed ()));
@@ -334,40 +344,41 @@ SaltManagerDialog::edit_properties ()
   }
 }
 
-// @@@
-namespace
-{
-
-/**
- *  @brief A helper class required because directory traversal is not supported by QResource directly
- */
-class OpenResource
-  : public QResource
-{
-public:
-  using QResource::isDir;
-  using QResource::isFile;
-  using QResource::children;
-
-  OpenResource (const QString &path)
-    : QResource (path)
-  {
-    //  .. nothing yet ..
-  }
-};
-
-}
-// @@@
-
 void
 SaltManagerDialog::create_grain ()
 {
-  SaltGrainTemplateSelectionDialog temp_dialog (this);
+BEGIN_PROTECTED
+
+  SaltGrainTemplateSelectionDialog temp_dialog (this, mp_salt);
   if (temp_dialog.exec ()) {
 
-    // @@@
+    SaltGrain target;
+    target.set_name (temp_dialog.name ());
+
+    if (mp_salt->create_grain (temp_dialog.templ (), target)) {
+
+      //  select the new one
+      SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
+      if (model) {
+        for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+          --i;
+          QModelIndex index = model->index (i, 0, QModelIndex ());
+          SaltGrain *g = model->grain_from_index (index);
+          if (g && g->name () == target.name ()) {
+            salt_view->setCurrentIndex (index);
+            break;
+          }
+        }
+
+      }
+
+    } else {
+      throw tl::Exception (tl::to_string (tr ("Initialization of new package failed - see log window (File/Log Viewer) for details")));
+    }
 
   }
+
+END_PROTECTED
 }
 
 void
@@ -399,11 +410,20 @@ SaltManagerDialog::salt_changed ()
   m_current_changed_enabled = true;
 
   if (mp_salt->is_empty ()) {
+
     list_stack->setCurrentIndex (1);
     details_frame->hide ();
+
   } else {
+
     list_stack->setCurrentIndex (0);
     details_frame->show ();
+
+    //  select the first grain
+    if (model->rowCount (QModelIndex ()) > 0) {
+      salt_view->setCurrentIndex (model->index (0, 0, QModelIndex ()));
+    }
+
   }
 
   current_changed ();

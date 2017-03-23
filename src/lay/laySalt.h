@@ -152,7 +152,7 @@ public:
    *
    *  Returns true, if the package could be created successfully.
    */
-  bool create_grain (const SaltGrain &templ, SaltGrain &target, SaltDownloadManager &download_manager);
+  bool create_grain (const SaltGrain &templ, SaltGrain &target, SaltDownloadManager *download_manager = 0);
 
 signals:
   /**

@@ -226,7 +226,7 @@ SaltGrain::valid_name (const std::string &n)
 
   //  this captures the cases where the extractor skips blanks
   //  TODO: the extractor should have a "non-blank-skipping" mode
-  return s == n;
+  return res == n;
 }
 
 bool

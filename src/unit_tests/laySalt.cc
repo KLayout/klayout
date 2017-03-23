@@ -162,6 +162,13 @@ TEST (2)
   EXPECT_EQ (lay::SaltGrain::valid_version ("\t1 . 2.\n3"), true);
   EXPECT_EQ (lay::SaltGrain::valid_version ("x"), false);
   EXPECT_EQ (lay::SaltGrain::valid_version ("1.2x"), false);
+  EXPECT_EQ (lay::SaltGrain::valid_name (""), false);
+  EXPECT_EQ (lay::SaltGrain::valid_name ("x"), true);
+  EXPECT_EQ (lay::SaltGrain::valid_name ("x1"), true);
+  EXPECT_EQ (lay::SaltGrain::valid_name ("x1 "), false);
+  EXPECT_EQ (lay::SaltGrain::valid_name ("x$1"), false);
+  EXPECT_EQ (lay::SaltGrain::valid_name ("x/y"), true);
+  EXPECT_EQ (lay::SaltGrain::valid_name ("x_y"), true);
   EXPECT_EQ (lay::SaltGrain::compare_versions ("", ""), 0);
   EXPECT_EQ (lay::SaltGrain::compare_versions ("1", "2"), -1);
   EXPECT_EQ (lay::SaltGrain::compare_versions ("1", ""), 1);
@@ -184,7 +191,6 @@ TEST (2)
   EXPECT_EQ (lay::SaltGrain::compare_versions ("990", "990"), 0);
   EXPECT_EQ (lay::SaltGrain::compare_versions ("991", "990"), 1);
 }
-
 
 TEST (3)
 {

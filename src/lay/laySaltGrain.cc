@@ -297,7 +297,7 @@ struct ImageConverter
   }
 };
 
-static tl::XMLStruct<lay::SaltGrain> xml_struct ("salt-grain",
+static tl::XMLElementList s_xml_elements =
   tl::make_member (&SaltGrain::name, &SaltGrain::set_name, "name") +
   tl::make_member (&SaltGrain::version, &SaltGrain::set_version, "version") +
   tl::make_member (&SaltGrain::title, &SaltGrain::set_title, "title") +
@@ -315,8 +315,15 @@ static tl::XMLStruct<lay::SaltGrain> xml_struct ("salt-grain",
     tl::make_member (&SaltGrain::Dependency::name, "name") +
     tl::make_member (&SaltGrain::Dependency::url, "url") +
     tl::make_member (&SaltGrain::Dependency::version, "version")
-  )
-);
+  );
+
+static tl::XMLStruct<lay::SaltGrain> s_xml_struct ("salt-grain", s_xml_elements);
+
+tl::XMLElementList &
+SaltGrain::xml_struct ()
+{
+  return s_xml_elements;
+}
 
 bool
 SaltGrain::is_readonly () const
@@ -332,7 +339,7 @@ SaltGrain::load (const std::string &p)
   if (p[0] != ':') {
 
     tl::XMLFileSource source (p);
-    xml_struct.parse (source, *this);
+    s_xml_struct.parse (source, *this);
 
   } else {
 
@@ -346,7 +353,7 @@ SaltGrain::load (const std::string &p)
 
     std::string str_data (data.constData (), data.size ());
     tl::XMLStringSource source (str_data);
-    xml_struct.parse (source, *this);
+    s_xml_struct.parse (source, *this);
 
   }
 }
@@ -355,7 +362,7 @@ void
 SaltGrain::load (tl::InputStream &p)
 {
   tl::XMLStreamSource source (p);
-  xml_struct.parse (source, *this);
+  s_xml_struct.parse (source, *this);
 }
 
 void
@@ -368,7 +375,7 @@ void
 SaltGrain::save (const std::string &p) const
 {
   tl::OutputStream os (p, tl::OutputStream::OM_Plain);
-  xml_struct.write (os, *this);
+  s_xml_struct.write (os, *this);
 }
 
 SaltGrain

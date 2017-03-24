@@ -189,6 +189,7 @@ bool remove_from_collection (SaltGrains &collection, const std::string &name)
       ++gnext;
       collection.remove_grain (g, true);
       res = true;
+      g = gnext;
     }
   }
 
@@ -207,9 +208,15 @@ Salt::remove_grain (const SaltGrain &grain)
 {
   tl::info << QObject::tr ("Removing package '%1' ..").arg (tl::to_qstring (grain.name ()));
   if (remove_from_collection (m_root, grain.name ())) {
+
     tl::info << QObject::tr ("Package '%1' removed.").arg (tl::to_qstring (grain.name ()));
+
+    //  NOTE: this is a bit brute force .. we could as well try to insert the new grain into the existing structure
+    refresh ();
+
     invalidate ();
     return true;
+
   } else {
     tl::warn << QObject::tr ("Failed to remove package '%1'.").arg (tl::to_qstring (grain.name ()));
     return false;

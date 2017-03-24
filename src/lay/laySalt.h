@@ -124,6 +124,31 @@ public:
   SaltGrain *grain_by_name (const std::string &name);
 
   /**
+   *  @brief Loads the salt from a "salt mine" file
+   */
+  void load (const std::string &p)
+  {
+    m_root.load (p);
+  }
+
+  /**
+   *  @brief Loads the salt from a "salt mine" stream
+   */
+  void load (tl::InputStream &s)
+  {
+    m_root.load (s);
+  }
+
+  /**
+   *  @brief Saves the salt to a "salt mine" file
+   *  This feature is provided for debugging purposes mainly.
+   */
+  void save (const std::string &p)
+  {
+    m_root.save (p);
+  }
+
+  /**
    *  @brief Removes a grain from the salt
    *
    *  This operation will remove the grain with the given name from the salt and delete all files and directories related to it.

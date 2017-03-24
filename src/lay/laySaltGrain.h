@@ -26,6 +26,7 @@
 #include "layCommon.h"
 #include "tlObject.h"
 #include "tlStream.h"
+#include "tlXMLParser.h"
 
 #include <QTime>
 #include <QImage>
@@ -349,6 +350,11 @@ public:
    *  @brief Saves the data to the given file
    */
   void save (const std::string &file_path) const;
+
+  /**
+   *  @brief Gets the XML structure representing a grain
+   */
+  static tl::XMLElementList &xml_struct ();
 
   /**
    *  @brief Compares two version strings

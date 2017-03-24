@@ -175,6 +175,21 @@ public:
   bool is_readonly () const;
 
   /**
+   *  @brief Loads the grain collection from the given path
+   */
+  void load (const std::string &p);
+
+  /**
+   *  @brief Loads the grain collection from the given input stream
+   */
+  void load (tl::InputStream &p);
+
+  /**
+   *  @brief Saves the grain collection to the given file
+   */
+  void save (const std::string &p) const;
+
+  /**
    *  @brief Scan grains from a given path
    *  This will scan the grains found within this path and return a collection containing
    *  the grains from this path.

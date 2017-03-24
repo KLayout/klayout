@@ -240,6 +240,15 @@ TEST (3)
   EXPECT_EQ (grains_to_string (gg), "[a,b,c[c/u,c/c[c/c/v]]]");
   EXPECT_EQ (gg.begin_collections ()->path (), tl::to_string (dir_c.absolutePath ()));
 
+  std::string gg_path = tmp_file ("gg.tmp");
+  gg.save (gg_path);
+
+  lay::SaltGrains ggg;
+  ggg.load (gg_path);
+  EXPECT_EQ (grains_to_string (ggg), "[a,b,c[c/u,c/c[c/c/v]]]");
+  //  NOTE: The path is not set, so this will fail:
+  //  EXPECT_EQ (gg == ggg, true);
+
   gg.remove_grain (gg.begin_grains (), false);
   EXPECT_EQ (grains_to_string (gg), "[b,c[c/u,c/c[c/c/v]]]");
 

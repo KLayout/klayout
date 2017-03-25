@@ -23,7 +23,6 @@
 #include "laySaltManagerDialog.h"
 #include "laySaltModel.h"
 #include "laySaltGrainPropertiesDialog.h"
-#include "laySaltGrainInstallationDialog.h"
 #include "laySalt.h"
 #include "ui_SaltGrainTemplateSelectionDialog.h"
 #include "tlString.h"
@@ -119,6 +118,25 @@ void make_salt ()
     salt.add_location (tl::to_string (QDir::homePath () + QString::fromUtf8("/.klayout/salt")));
   }
 }
+lay::Salt *get_salt ()
+{
+  salt = lay::Salt (); salt_initialized = false;
+  make_salt ();
+  return &salt;
+}
+// @@@
+
+// @@@
+lay::Salt salt_mine;
+void make_salt_mine ()
+{
+  salt_mine.load ("/home/matthias/salt.mine");
+}
+lay::Salt *get_salt_mine ()
+{
+  make_salt_mine();
+  return &salt_mine;
+}
 // @@@
 
 SaltManagerDialog::SaltManagerDialog (QWidget *parent)
@@ -131,25 +149,44 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent)
   connect (edit_button, SIGNAL (clicked ()), this, SLOT (edit_properties ()));
   connect (create_button, SIGNAL (clicked ()), this, SLOT (create_grain ()));
   connect (delete_button, SIGNAL (clicked ()), this, SLOT (delete_grain ()));
-  connect (install_button, SIGNAL (clicked ()), this, SLOT (install_grain ()));
 
-// @@@
-  salt = lay::Salt (); salt_initialized = false;
-  make_salt ();
-  mp_salt = &salt;
-// @@@
+  mp_salt = get_salt ();
+  mp_salt_mine = get_salt_mine ();
 
-  SaltModel *model = new SaltModel (this, mp_salt);
+  SaltModel *model;
+
+  model = new SaltModel (this, mp_salt);
   salt_view->setModel (model);
   salt_view->setItemDelegate (new SaltItemDelegate (this));
 
+  model = new SaltModel (this, mp_salt_mine);
+  salt_mine_view->setModel (model);
+  salt_mine_view->setItemDelegate (new SaltItemDelegate (this));
+
+  mode_tab->setCurrentIndex (mp_salt->is_empty () ? 1 : 0);
+
+  connect (mode_tab, SIGNAL (currentChanged (int)), this, SLOT (mode_changed ()));
   connect (mp_salt, SIGNAL (collections_changed ()), this, SLOT (salt_changed ()));
+  connect (mp_salt_mine, SIGNAL (collections_changed ()), this, SLOT (salt_mine_changed ()));
 
   salt_changed ();
+  salt_mine_changed ();
 
   connect (salt_view->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_changed ()));
+  connect (salt_mine_view->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (mine_current_changed ()));
 
   // @@@
+}
+
+void
+SaltManagerDialog::mode_changed ()
+{
+  //  keeps the splitters in sync
+  if (mode_tab->currentIndex () == 1) {
+    splitter_new->setSizes (splitter->sizes ());
+  } else if (mode_tab->currentIndex () == 0) {
+    splitter->setSizes (splitter_new->sizes ());
+  }
 }
 
 void
@@ -159,7 +196,6 @@ SaltManagerDialog::edit_properties ()
   if (g) {
     if (mp_properties_dialog->exec_dialog (g, mp_salt)) {
       current_changed ();
-      // @@@
     }
   }
 }
@@ -219,18 +255,6 @@ END_PROTECTED
 }
 
 void
-SaltManagerDialog::install_grain ()
-{
-BEGIN_PROTECTED
-
-  //  @@@ TODO: cache this somewhere - don't recreate this dialog always
-  SaltGrainInstallationDialog inst_dialog (this, mp_salt);
-  inst_dialog.exec ();
-
-END_PROTECTED
-}
-
-void
 SaltManagerDialog::salt_changed ()
 {
   SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
@@ -284,6 +308,43 @@ SaltManagerDialog::current_grain ()
 {
   SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
   return model ? model->grain_from_index (salt_view->currentIndex ()) : 0;
+}
+
+void
+SaltManagerDialog::salt_mine_changed ()
+{
+  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view->model ());
+  if (! model) {
+    return;
+  }
+
+  //  NOTE: the disabling of the event handler prevents us from
+  //  letting the model connect to the salt's signal directly.
+  m_current_changed_enabled = false;
+  model->update ();
+  m_current_changed_enabled = true;
+
+  //  select the first grain
+  if (model->rowCount (QModelIndex ()) > 0) {
+    salt_mine_view->setCurrentIndex (model->index (0, 0, QModelIndex ()));
+  }
+
+  mine_current_changed ();
+}
+
+void
+SaltManagerDialog::mine_current_changed ()
+{
+  SaltGrain *g = mine_current_grain ();
+  details_new_text->set_grain (g);
+  details_new_frame->setEnabled (g != 0);
+}
+
+lay::SaltGrain *
+SaltManagerDialog::mine_current_grain ()
+{
+  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view->model ());
+  return model ? model->grain_from_index (salt_mine_view->currentIndex ()) : 0;
 }
 
 }

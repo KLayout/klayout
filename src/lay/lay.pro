@@ -53,8 +53,7 @@ HEADERS = \
     laySaltGrainDetailsTextWidget.h \
     laySaltGrainPropertiesDialog.h \
     laySaltDownloadManager.h \
-    laySaltModel.h \
-    laySaltGrainInstallationDialog.h
+    laySaltModel.h
 
 FORMS = \
   ClipDialog.ui \
@@ -102,8 +101,7 @@ FORMS = \
     MainConfigPage7.ui \
     SaltManagerDialog.ui \
     SaltGrainPropertiesDialog.ui \
-    SaltGrainTemplateSelectionDialog.ui \
-    SaltGrainInstallationDialog.ui
+    SaltGrainTemplateSelectionDialog.ui
 
 SOURCES = \
   gsiDeclLayApplication.cc \
@@ -154,8 +152,7 @@ SOURCES = \
     laySaltGrainDetailsTextWidget.cc \
     laySaltGrainPropertiesDialog.cc \
     laySaltDownloadManager.cc \
-    laySaltModel.cc \
-    laySaltGrainInstallationDialog.cc
+    laySaltModel.cc
 
 RESOURCES = layBuildInMacros.qrc \
   layHelpResources.qrc \

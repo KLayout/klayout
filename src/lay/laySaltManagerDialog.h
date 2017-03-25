@@ -55,9 +55,19 @@ private slots:
   void salt_changed ();
 
   /**
+   *  @brief Called when the repository (salt mine) has changed
+   */
+  void salt_mine_changed ();
+
+  /**
    *  @brief Called when the currently selected package (grain) has changed
    */
   void current_changed ();
+
+  /**
+   *  @brief Called when the currently selected package from the salt mine has changed
+   */
+  void mine_current_changed ();
 
   /**
    *  @brief Called when the "edit" button is pressed
@@ -79,12 +89,18 @@ private slots:
    */
   void install_grain ();
 
+  /**
+   *  @brief Called when the mode tab changed
+   */
+  void mode_changed ();
+
 private:
-  lay::Salt *mp_salt;
+  lay::Salt *mp_salt, *mp_salt_mine;
   bool m_current_changed_enabled;
   lay::SaltGrainPropertiesDialog *mp_properties_dialog;
 
   lay::SaltGrain *current_grain ();
+  lay::SaltGrain *mine_current_grain ();
 };
 
 }

@@ -23,9 +23,10 @@
 #ifndef HDR_laySaltManagerDialog
 #define HDR_laySaltManagerDialog
 
-#include <QDialog>
-
 #include "ui_SaltManagerDialog.h"
+
+#include <QDialog>
+#include <memory>
 
 namespace lay
 {
@@ -94,8 +95,14 @@ private slots:
    */
   void mode_changed ();
 
+  /**
+   *  @brief Called when one search text changed
+   */
+  void search_text_changed (const QString &text);
+
 private:
   lay::Salt *mp_salt, *mp_salt_mine;
+  std::auto_ptr<lay::SaltGrain> m_remote_grain;
   bool m_current_changed_enabled;
   lay::SaltGrainPropertiesDialog *mp_properties_dialog;
 

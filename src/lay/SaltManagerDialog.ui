@@ -21,7 +21,7 @@
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Installed Packages</string>
+       <string>Browse Installed Packages</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -410,7 +410,7 @@
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>Install New Packages</string>
+       <string>Install or Update Packages</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_9">
        <item>

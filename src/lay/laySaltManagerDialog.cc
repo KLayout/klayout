@@ -27,6 +27,7 @@
 #include "ui_SaltGrainTemplateSelectionDialog.h"
 #include "tlString.h"
 #include "tlExceptions.h"
+#include "tlHttpStream.h"
 
 #include <QTextDocument>
 #include <QPainter>
@@ -130,6 +131,7 @@ lay::Salt *get_salt ()
 lay::Salt salt_mine;
 void make_salt_mine ()
 {
+  salt_mine = lay::Salt ();
   salt_mine.load ("/home/matthias/salt.mine");
 }
 lay::Salt *get_salt_mine ()
@@ -175,7 +177,10 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent)
   connect (salt_view->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_changed ()));
   connect (salt_mine_view->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (mine_current_changed ()));
 
-  // @@@
+  search_installed_edit->set_clear_button_enabled (true);
+  search_new_edit->set_clear_button_enabled (true);
+  connect (search_installed_edit, SIGNAL (textChanged (const QString &)), this, SLOT (search_text_changed (const QString &)));
+  connect (search_new_edit, SIGNAL (textChanged (const QString &)), this, SLOT (search_text_changed (const QString &)));
 }
 
 void
@@ -186,6 +191,45 @@ SaltManagerDialog::mode_changed ()
     splitter_new->setSizes (splitter->sizes ());
   } else if (mode_tab->currentIndex () == 0) {
     splitter->setSizes (splitter_new->sizes ());
+  }
+}
+
+void
+SaltManagerDialog::search_text_changed (const QString &text)
+{
+  QListView *view = 0;
+  if (sender () == search_installed_edit) {
+    view = salt_view;
+  } else if (sender () == search_new_edit) {
+    view = salt_mine_view;
+  } else {
+    return;
+  }
+
+  SaltModel *model = dynamic_cast <SaltModel *> (view->model ());
+  if (! model) {
+    return;
+  }
+
+  if (text.isEmpty ()) {
+
+    for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+      --i;
+      view->setRowHidden (i, false);
+    }
+
+  } else {
+
+    QRegExp re (text, Qt::CaseInsensitive);
+
+    for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+      --i;
+      QModelIndex index = model->index (i, 0, QModelIndex ());
+      SaltGrain *g = model->grain_from_index (index);
+      bool hidden = (!g || re.indexIn (tl::to_qstring (g->name ())) < 0);
+      view->setRowHidden (i, hidden);
+    }
+
   }
 }
 
@@ -335,9 +379,63 @@ SaltManagerDialog::salt_mine_changed ()
 void
 SaltManagerDialog::mine_current_changed ()
 {
+BEGIN_PROTECTED
+
   SaltGrain *g = mine_current_grain ();
-  details_new_text->set_grain (g);
   details_new_frame->setEnabled (g != 0);
+
+  if (! g) {
+    details_new_text->set_grain (0);
+    return;
+  }
+
+  m_remote_grain.reset (0);
+
+  //  Download actual grain definition file
+  try {
+
+    if (g->url ().empty ()) {
+      throw tl::Exception (tl::to_string (tr ("No download link available")));
+    }
+
+    tl::InputHttpStream http (SaltGrain::spec_url (g->url ()));
+    tl::InputStream stream (http);
+
+    m_remote_grain.reset (new SaltGrain ());
+    m_remote_grain->load (stream);
+    m_remote_grain->set_url (g->url ());
+
+    if (g->name () != m_remote_grain->name ()) {
+      throw tl::Exception (tl::to_string (tr ("Name mismatch between repository and actual package (repository: %1, package: %2)").arg (tl::to_qstring (g->name ())).arg (tl::to_qstring (m_remote_grain->name ()))));
+    }
+    if (SaltGrain::compare_versions (g->version (), m_remote_grain->version ()) != 0) {
+      throw tl::Exception (tl::to_string (tr ("Version mismatch between repository and actual package (repository: %1, package: %2)").arg (tl::to_qstring (g->version ())).arg (tl::to_qstring (m_remote_grain->version ()))));
+    }
+
+    details_new_text->set_grain (m_remote_grain.get ());
+
+  } catch (tl::Exception &ex) {
+
+    m_remote_grain.reset (0);
+
+    QString text = tr (
+      "<html>"
+        "<body>"
+          "<font color=\"#ff0000\">"
+          "<h2>Error Fetching Package Definition</h2>"
+          "<p><b>URL</b>: %1</p>"
+          "<p><b>Error</b>: %2</p>"
+        "</body>"
+      "</html>"
+    )
+    .arg (tl::to_qstring (SaltGrain::spec_url (g->url ())))
+    .arg (tl::to_qstring (tl::escaped_to_html (ex.msg ())));
+
+    details_new_text->setHtml (text);
+
+  }
+
+END_PROTECTED
 }
 
 lay::SaltGrain *

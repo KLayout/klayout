@@ -91,11 +91,6 @@ private slots:
   void delete_grain ();
 
   /**
-   *  @brief Called when the "install" button is pressed
-   */
-  void install_grain ();
-
-  /**
    *  @brief Called when the mode tab changed
    */
   void mode_changed ();

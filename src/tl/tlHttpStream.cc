@@ -78,7 +78,7 @@ public:
 static QNetworkAccessManager *s_network_manager (0);
 
 InputHttpStream::InputHttpStream (const std::string &url)
-  : m_url (url)
+  : m_url (url), m_request ("GET"), mp_buffer (0)
 {
   if (! s_network_manager) {
     s_network_manager = new QNetworkAccessManager(0);
@@ -87,7 +87,7 @@ InputHttpStream::InputHttpStream (const std::string &url)
   connect (s_network_manager, SIGNAL (finished (QNetworkReply *)), this, SLOT (finished (QNetworkReply *)));
   connect (s_network_manager, SIGNAL (authenticationRequired (QNetworkReply *, QAuthenticator *)), this, SLOT (authenticationRequired (QNetworkReply *, QAuthenticator *)));
   connect (s_network_manager, SIGNAL (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)), this, SLOT (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)));
-  s_network_manager->get (QNetworkRequest (QUrl (tl::to_qstring (url))));
+  issue_request (QUrl (tl::to_qstring (url)));
   mp_reply = 0;
 }
 
@@ -95,6 +95,24 @@ InputHttpStream::~InputHttpStream ()
 {
   delete mp_reply;
   mp_reply = 0;
+}
+
+void
+InputHttpStream::set_request (const char *r)
+{
+  m_request = QByteArray (r);
+}
+
+void
+InputHttpStream::set_data (const char *data)
+{
+  m_data = QByteArray (data);
+}
+
+void
+InputHttpStream::set_data (const char *data, size_t n)
+{
+  m_data = QByteArray (data, int (n));
 }
 
 void 
@@ -117,10 +135,24 @@ InputHttpStream::finished (QNetworkReply *reply)
   QVariant redirect_target = reply->attribute (QNetworkRequest::RedirectionTargetAttribute);
   if (reply->error () == QNetworkReply::NoError && ! redirect_target.isNull ()) {
     m_url = tl::to_string (redirect_target.toString ());
-    s_network_manager->get (QNetworkRequest (QUrl (redirect_target.toString ())));
+    issue_request (QUrl (redirect_target.toString ()));
     delete reply;
   } else {
     mp_reply = reply;
+  }
+}
+
+void
+InputHttpStream::issue_request (const QUrl &url)
+{
+  delete mp_buffer;
+  mp_buffer = 0;
+
+  if (m_data.isEmpty ()) {
+    s_network_manager->sendCustomRequest (QNetworkRequest (url), m_request);
+  } else {
+    mp_buffer = new QBuffer (&m_data);
+    s_network_manager->sendCustomRequest (QNetworkRequest (url), m_request, mp_buffer);
   }
 }
 
@@ -160,4 +192,3 @@ InputHttpStream::filename () const
 }
 
 }
-

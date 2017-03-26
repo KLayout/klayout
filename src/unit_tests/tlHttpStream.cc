@@ -28,6 +28,11 @@ std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trun
 
 TEST(1)
 {
-  EXPECT_EQ (to_string (12.5), "12.5");
+  tl::InputHttpStream stream (test_url1);
+
+  char b[100];
+  size_t n = stream.read (b, sizeof (b));
+  std::string res (b, n);
+  EXPECT_EQ (res, "hello, world.\n");
 }
 

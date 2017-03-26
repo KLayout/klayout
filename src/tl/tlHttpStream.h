@@ -27,6 +27,8 @@
 #include "tlStream.h"
 
 #include <QObject>
+#include <QBuffer>
+#include <QByteArray>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -69,13 +71,32 @@ public:
   virtual ~InputHttpStream ();
 
   /**
+   *  @brief Sets the request verb
+   *  The default verb is "GET"
+   */
+  void set_request (const char *r);
+
+  /**
+   *  @brief Sets data to be sent with the request
+   *  If data is given, it is sent along with the request.
+   *  This version takes a null-terminated string.
+   */
+  void set_data (const char *data);
+
+  /**
+   *  @brief Sets data to be sent with the request
+   *  If data is given, it is sent along with the request.
+   *  This version takes a data plus length.
+   */
+  void set_data (const char *data, size_t n);
+
+  /**
    *  @brief Read from the stream 
-   *
    *  Implements the basic read method. 
    */
   virtual size_t read (char *b, size_t n);
 
-  virtual void reset ();
+  virtual void reset ();  
 
   virtual std::string source () const
   {
@@ -89,14 +110,19 @@ public:
 
   virtual std::string filename () const;
 
-private:
-  std::string m_url;
-  QNetworkReply *mp_reply;
-
 private slots:
   void finished (QNetworkReply *);
   void authenticationRequired (QNetworkReply *, QAuthenticator *);
   void proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *);
+
+private:
+  std::string m_url;
+  QNetworkReply *mp_reply;
+  QByteArray m_request;
+  QByteArray m_data;
+  QBuffer *mp_buffer;
+
+  void issue_request (const QUrl &url);
 };
 
 }

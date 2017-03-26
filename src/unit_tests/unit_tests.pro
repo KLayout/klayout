@@ -97,7 +97,8 @@ SOURCES = \
   gsiTest.cc \
     tlFileSystemWatcher.cc \
     laySalt.cc \
-    tlFileUtils.cc
+    tlFileUtils.cc \
+    tlHttpStream.cc
 
 # main components:
 SOURCES += \

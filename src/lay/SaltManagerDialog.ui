@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="mode_tab">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -231,8 +231,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>343</width>
-                       <height>207</height>
+                       <width>537</width>
+                       <height>284</height>
                       </rect>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_2">
@@ -456,10 +456,17 @@
               <item>
                <widget class="QToolButton" name="mark_button">
                 <property name="toolTip">
-                 <string>Mark for installation</string>
+                 <string>Mark or unmark for installation</string>
                 </property>
                 <property name="text">
                  <string>Mark</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="layResources.qrc">
+                  <normaloff>:/marked_16.png</normaloff>:/marked_16.png</iconset>
+                </property>
+                <property name="autoRaise">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>

@@ -120,6 +120,9 @@
         <file alias="empty_16.png">images/empty_16.png</file>
         <file alias="error_16.png">images/error_16.png</file>
         <file alias="info_16.png">images/info_16.png</file>
+        <file alias="marked_24.png">images/marked_24.png</file>
+        <file alias="marked_64.png">images/marked_64.png</file>
+        <file alias="marked_16.png">images/marked_16.png</file>
     </qresource>
     <qresource prefix="/syntax">
         <file alias="ruby.xml">syntax/ruby.xml</file>

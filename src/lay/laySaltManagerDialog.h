@@ -76,6 +76,11 @@ private slots:
   void edit_properties ();
 
   /**
+   *  @brief Called when the "mark" button is pressed
+   */
+  void mark_clicked ();
+
+  /**
    *  @brief Called when the "edit" button is pressed
    */
   void create_grain ();

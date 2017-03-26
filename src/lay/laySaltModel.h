@@ -29,6 +29,8 @@
 #include <QAbstractItemModel>
 #include <QStyledItemDelegate>
 #include <string>
+#include <set>
+#include <map>
 
 namespace lay
 {
@@ -86,8 +88,23 @@ public:
    */
   void update ();
 
+  /**
+   *  @brief Sets or resets the "marked" flag on the grain with the given name
+   */
+  void set_marked (const std::string &name, bool marked);
+
+  /**
+   *  @brief Installs a message on the grain with the given name
+   *  Installing an empty message basically removes the message.
+   */
+  void set_message (const std::string &name, const std::string &message);
+
 public:
   lay::Salt *mp_salt;
+  std::set<std::string> m_marked;
+  std::map<std::string, std::string> m_messages;
+
+  bool is_marked (const std::string &name) const;
 };
 
 // --------------------------------------------------------------------------------------

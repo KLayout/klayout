@@ -120,6 +120,12 @@ SaltModel::data (const QModelIndex &index, int role) const
       text += tl::escaped_to_html (g->doc ());
       text += "</p>";
     }
+
+    std::map<std::string, std::string>::const_iterator m = m_messages.find (g->name ());
+    if (m != m_messages.end ()) {
+      text += "<p><font color=\"#ff0000\"><b>" + tl::escaped_to_html (m->second) + "</b></font></p>";
+    }
+
     text += "</body></html>";
 
     return tl::to_qstring (text);
@@ -129,27 +135,38 @@ SaltModel::data (const QModelIndex &index, int role) const
     int icon_dim = 64;
 
     const lay::SaltGrain *g = mp_salt->begin_flat ()[index.row ()];
+
+    QImage img;
     if (g->icon ().isNull ()) {
-      return QIcon (":/salt_icon.png");
+      img = QImage (":/salt_icon.png");
     } else {
+      img = g->icon ();
+    }
 
-      QImage img = g->icon ();
-      if (img.width () == icon_dim && img.height () == icon_dim) {
-        return QPixmap::fromImage (img);
-      } else {
+    if (img.width () != icon_dim || img.height () != icon_dim) {
 
-        img = img.scaled (QSize (icon_dim, icon_dim), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+      QImage scaled = img.scaled (QSize (icon_dim, icon_dim), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-        QImage final_img (icon_dim, icon_dim, QImage::Format_ARGB32);
-        final_img.fill (QColor (0, 0, 0, 0));
-        QPainter painter (&final_img);
-        painter.drawImage ((icon_dim - img.width ()) / 2, (icon_dim - img.height ()) / 2, img);
-
-        return QPixmap::fromImage (final_img);
-
-      }
+      img = QImage (icon_dim, icon_dim, QImage::Format_ARGB32);
+      img.fill (QColor (0, 0, 0, 0));
+      QPainter painter (&img);
+      painter.drawImage ((icon_dim - scaled.width ()) / 2, (icon_dim - scaled.height ()) / 2, scaled);
 
     }
+
+    if (m_marked.find (g->name ()) != m_marked.end ()) {
+      QPainter painter (&img);
+      QImage warn (":/marked_64.png");
+      painter.drawImage (0, 0, warn);
+    }
+
+    if (m_messages.find (g->name ()) != m_messages.end ()) {
+      QPainter painter (&img);
+      QImage warn (":/warn_16.png");
+      painter.drawImage (0, 0, warn);
+    }
+
+    return QPixmap::fromImage (img);
 
   } else {
     return QVariant ();
@@ -196,6 +213,34 @@ SaltModel::grain_from_index (const QModelIndex &index) const
   } else {
     return 0;
   }
+}
+
+bool
+SaltModel::is_marked (const std::string &name) const
+{
+  return m_marked.find (name) != m_marked.end ();
+}
+
+void
+SaltModel::set_marked (const std::string &name, bool marked)
+{
+  if (! marked) {
+    m_marked.erase (name);
+  } else {
+    m_marked.insert (name);
+  }
+  emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex ()) - 1, 0, QModelIndex ()));
+}
+
+void
+SaltModel::set_message (const std::string &name, const std::string &message)
+{
+  if (message.empty ()) {
+    m_messages.erase (name);
+  } else {
+    m_messages.insert (std::make_pair (name, message));
+  }
+  emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex ()) - 1, 0, QModelIndex ()));
 }
 
 void 

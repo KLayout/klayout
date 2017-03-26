@@ -155,19 +155,27 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent)
   mp_salt = get_salt ();
   mp_salt_mine = get_salt_mine ();
 
-  SaltModel *model;
-
-  model = new SaltModel (this, mp_salt);
+  SaltModel *model = new SaltModel (this, mp_salt);
   salt_view->setModel (model);
   salt_view->setItemDelegate (new SaltItemDelegate (this));
 
-  model = new SaltModel (this, mp_salt_mine);
-  salt_mine_view->setModel (model);
+  SaltModel *mine_model = new SaltModel (this, mp_salt_mine);
+  salt_mine_view->setModel (mine_model);
   salt_mine_view->setItemDelegate (new SaltItemDelegate (this));
+
+  //  Establish a message saying that an update is available
+  for (Salt::flat_iterator g = mp_salt->begin_flat (); g != mp_salt->end_flat (); ++g) {
+    SaltGrain *gm = mp_salt_mine->grain_by_name ((*g)->name ());
+    if (gm && SaltGrain::compare_versions (gm->version (), (*g)->version ()) > 0) {
+      model->set_message ((*g)->name (), tl::to_string (tr ("An update to version %1 is available").arg (tl::to_qstring (gm->version ()))));
+      mine_model->set_message ((*g)->name (), tl::to_string (tr ("The installed version is outdated (%1)").arg (tl::to_qstring ((*g)->version ()))));
+    }
+  }
 
   mode_tab->setCurrentIndex (mp_salt->is_empty () ? 1 : 0);
 
   connect (mode_tab, SIGNAL (currentChanged (int)), this, SLOT (mode_changed ()));
+
   connect (mp_salt, SIGNAL (collections_changed ()), this, SLOT (salt_changed ()));
   connect (mp_salt_mine, SIGNAL (collections_changed ()), this, SLOT (salt_mine_changed ()));
 
@@ -175,12 +183,14 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent)
   salt_mine_changed ();
 
   connect (salt_view->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_changed ()));
-  connect (salt_mine_view->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (mine_current_changed ()));
+  connect (salt_mine_view->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (mine_current_changed ()), Qt::QueuedConnection);
 
   search_installed_edit->set_clear_button_enabled (true);
   search_new_edit->set_clear_button_enabled (true);
   connect (search_installed_edit, SIGNAL (textChanged (const QString &)), this, SLOT (search_text_changed (const QString &)));
   connect (search_new_edit, SIGNAL (textChanged (const QString &)), this, SLOT (search_text_changed (const QString &)));
+
+  connect (mark_button, SIGNAL (clicked ()), this, SLOT (mark_clicked ()));
 }
 
 void
@@ -231,6 +241,21 @@ SaltManagerDialog::search_text_changed (const QString &text)
     }
 
   }
+}
+
+void
+SaltManagerDialog::mark_clicked ()
+{
+  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view->model ());
+  if (! model) {
+    return;
+  }
+  SaltGrain *g = mine_current_grain ();
+  if (! g) {
+    return;
+  }
+
+  model->set_marked (g->name (), !model->is_marked (g->name ()));
 }
 
 void
@@ -379,6 +404,7 @@ SaltManagerDialog::salt_mine_changed ()
 void
 SaltManagerDialog::mine_current_changed ()
 {
+
 BEGIN_PROTECTED
 
   SaltGrain *g = mine_current_grain ();
@@ -397,6 +423,22 @@ BEGIN_PROTECTED
     if (g->url ().empty ()) {
       throw tl::Exception (tl::to_string (tr ("No download link available")));
     }
+
+    QString text = tr (
+      "<html>"
+        "<body>"
+          "<font color=\"#c0c0c0\">"
+            "<h2>Fetching Package Definition ...</h2>"
+            "<p><b>URL</b>: %1</p>"
+          "</font>"
+        "</body>"
+      "</html>"
+    )
+    .arg (tl::to_qstring (SaltGrain::spec_url (g->url ())));
+
+    details_new_text->setHtml (text);
+
+    QApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
 
     tl::InputHttpStream http (SaltGrain::spec_url (g->url ()));
     tl::InputStream stream (http);
@@ -422,9 +464,10 @@ BEGIN_PROTECTED
       "<html>"
         "<body>"
           "<font color=\"#ff0000\">"
-          "<h2>Error Fetching Package Definition</h2>"
-          "<p><b>URL</b>: %1</p>"
-          "<p><b>Error</b>: %2</p>"
+            "<h2>Error Fetching Package Definition</h2>"
+            "<p><b>URL</b>: %1</p>"
+            "<p><b>Error</b>: %2</p>"
+          "</font>"
         "</body>"
       "</html>"
     )

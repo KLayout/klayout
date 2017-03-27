@@ -101,7 +101,8 @@ FORMS = \
     MainConfigPage7.ui \
     SaltManagerDialog.ui \
     SaltGrainPropertiesDialog.ui \
-    SaltGrainTemplateSelectionDialog.ui
+    SaltGrainTemplateSelectionDialog.ui \
+    SaltManagerInstallConfirmationDialog.ui
 
 SOURCES = \
   gsiDeclLayApplication.cc \

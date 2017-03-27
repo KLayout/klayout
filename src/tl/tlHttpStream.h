@@ -91,6 +91,11 @@ public:
   void set_data (const char *data, size_t n);
 
   /**
+   *  @brief Sets a header field
+   */
+  void add_header (const std::string &name, const std::string &value);
+
+  /**
    *  @brief Read from the stream 
    *  Implements the basic read method. 
    */
@@ -121,6 +126,7 @@ private:
   QByteArray m_request;
   QByteArray m_data;
   QBuffer *mp_buffer;
+  std::map<std::string, std::string> m_headers;
 
   void issue_request (const QUrl &url);
 };

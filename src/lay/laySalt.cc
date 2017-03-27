@@ -21,11 +21,11 @@
 */
 
 #include "laySalt.h"
-#include "laySaltDownloadManager.h"
 #include "tlString.h"
 #include "tlFileUtils.h"
 #include "tlLog.h"
 #include "tlInternational.h"
+#include "tlWebDAV.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -307,11 +307,22 @@ public:
 }
 
 bool
-Salt::create_grain (const SaltGrain &templ, SaltGrain &target, SaltDownloadManager *download_manager)
+Salt::create_grain (const SaltGrain &templ, SaltGrain &target)
 {
   tl_assert (!m_root.is_empty ());
 
   const SaltGrains *coll = m_root.begin_collections ().operator-> ();
+
+  if (target.name ().empty ()) {
+    target.set_name (templ.name ());
+  }
+
+  if (target.path ().empty ()) {
+    lay::SaltGrain *g = grain_by_name (target.name ());
+    if (g) {
+      target.set_path (g->path ());
+    }
+  }
 
   std::string path = target.path ();
   if (! path.empty ()) {
@@ -383,11 +394,11 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, SaltDownloadManag
 
   } else if (! templ.url ().empty ()) {
 
-    tl_assert (download_manager != 0);
-
     //  otherwise download from the URL
     tl::info << QObject::tr ("Downloading package from '%1' to '%2' ..").arg (tl::to_qstring (templ.url ())).arg (tl::to_qstring (target.path ()));
-    res = download_manager->download (templ.url (), target.path ());
+    res = tl::WebDAVObject::download (templ.url (), target.path ());
+
+    target.set_url (templ.url ());
 
   }
 

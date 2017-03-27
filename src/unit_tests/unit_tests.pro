@@ -98,7 +98,8 @@ SOURCES = \
     tlFileSystemWatcher.cc \
     laySalt.cc \
     tlFileUtils.cc \
-    tlHttpStream.cc
+    tlHttpStream.cc \
+    tlWebDAV.cc
 
 # main components:
 SOURCES += \

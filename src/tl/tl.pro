@@ -40,7 +40,8 @@ SOURCES = \
   tlXMLParser.cc \
   tlXMLWriter.cc \
     tlFileSystemWatcher.cc \
-    tlFileUtils.cc
+    tlFileUtils.cc \
+    tlWebDAV.cc
 
 HEADERS = \
   tlAlgorithm.h \
@@ -83,7 +84,8 @@ HEADERS = \
   tlXMLWriter.h \
     tlFileSystemWatcher.h \
     tlCommon.h \
-    tlFileUtils.h
+    tlFileUtils.h \
+    tlWebDAV.h
 
 INCLUDEPATH =
 DEPENDPATH =

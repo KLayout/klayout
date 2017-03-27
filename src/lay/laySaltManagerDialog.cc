@@ -23,6 +23,7 @@
 #include "laySaltManagerDialog.h"
 #include "laySaltModel.h"
 #include "laySaltGrainPropertiesDialog.h"
+#include "laySaltDownloadManager.h"
 #include "laySalt.h"
 #include "ui_SaltGrainTemplateSelectionDialog.h"
 #include "tlString.h"
@@ -151,6 +152,7 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent)
   connect (edit_button, SIGNAL (clicked ()), this, SLOT (edit_properties ()));
   connect (create_button, SIGNAL (clicked ()), this, SLOT (create_grain ()));
   connect (delete_button, SIGNAL (clicked ()), this, SLOT (delete_grain ()));
+  connect (apply_button, SIGNAL (clicked ()), this, SLOT (apply ()));
 
   mp_salt = get_salt ();
   mp_salt_mine = get_salt_mine ();
@@ -256,6 +258,42 @@ SaltManagerDialog::mark_clicked ()
   }
 
   model->set_marked (g->name (), !model->is_marked (g->name ()));
+}
+
+void
+SaltManagerDialog::apply ()
+{
+BEGIN_PROTECTED
+
+  lay::SaltDownloadManager manager;
+
+  bool any = false;
+
+  //  fetch all marked grains and register for download
+  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view->model ());
+  if (model) {
+    for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+      --i;
+      QModelIndex index = model->index (i, 0, QModelIndex ());
+      SaltGrain *g = model->grain_from_index (index);
+      if (g && model->is_marked (g->name ())) {
+        manager.register_download (g->name (), g->url (), g->version ());
+        any = true;
+      }
+    }
+  }
+
+  if (! any) {
+    throw tl::Exception (tl::to_string (tr ("No packages marked for installation or update")));
+  }
+
+  manager.compute_dependencies (*mp_salt, *mp_salt_mine);
+
+  if (manager.show_confirmation_dialog (this, *mp_salt)) {
+    manager.execute (*mp_salt);
+  }
+
+END_PROTECTED
 }
 
 void

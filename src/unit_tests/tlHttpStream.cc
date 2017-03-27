@@ -24,7 +24,8 @@
 #include "tlHttpStream.h"
 #include "utHead.h"
 
-std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
+static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
+static std::string test_url2 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1");
 
 TEST(1)
 {
@@ -36,3 +37,39 @@ TEST(1)
   EXPECT_EQ (res, "hello, world.\n");
 }
 
+TEST(2)
+{
+  tl::InputHttpStream stream (test_url2);
+  stream.add_header ("User-Agent", "SVN");
+  stream.add_header ("Depth", "1");
+  stream.set_request ("PROPFIND");
+  stream.set_data ("<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><resourcetype xmlns=\"DAV:\"/></prop></propfind>");
+
+  char b[10000];
+  size_t n = stream.read (b, sizeof (b));
+  std::string res (b, n);
+
+  EXPECT_EQ (res,
+    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+    "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n"
+    "<D:response xmlns:lp1=\"DAV:\">\n"
+    "<D:href>/svn-public/klayout-resources/trunk/testdata/dir1/</D:href>\n"
+    "<D:propstat>\n"
+    "<D:prop>\n"
+    "<lp1:resourcetype><D:collection/></lp1:resourcetype>\n"
+    "</D:prop>\n"
+    "<D:status>HTTP/1.1 200 OK</D:status>\n"
+    "</D:propstat>\n"
+    "</D:response>\n"
+    "<D:response xmlns:lp1=\"DAV:\">\n"
+    "<D:href>/svn-public/klayout-resources/trunk/testdata/dir1/text</D:href>\n"
+    "<D:propstat>\n"
+    "<D:prop>\n"
+    "<lp1:resourcetype/>\n"
+    "</D:prop>\n"
+    "<D:status>HTTP/1.1 200 OK</D:status>\n"
+    "</D:propstat>\n"
+    "</D:response>\n"
+    "</D:multistatus>\n"
+  );
+}

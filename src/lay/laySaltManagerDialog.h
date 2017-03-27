@@ -96,6 +96,11 @@ private slots:
   void mode_changed ();
 
   /**
+   *  @brief Called when the "apply" button is clicked
+   */
+  void apply ();
+
+  /**
    *  @brief Called when one search text changed
    */
   void search_text_changed (const QString &text);

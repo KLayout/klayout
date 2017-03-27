@@ -87,7 +87,6 @@ InputHttpStream::InputHttpStream (const std::string &url)
   connect (s_network_manager, SIGNAL (finished (QNetworkReply *)), this, SLOT (finished (QNetworkReply *)));
   connect (s_network_manager, SIGNAL (authenticationRequired (QNetworkReply *, QAuthenticator *)), this, SLOT (authenticationRequired (QNetworkReply *, QAuthenticator *)));
   connect (s_network_manager, SIGNAL (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)), this, SLOT (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)));
-  issue_request (QUrl (tl::to_qstring (url)));
   mp_reply = 0;
 }
 
@@ -113,6 +112,12 @@ void
 InputHttpStream::set_data (const char *data, size_t n)
 {
   m_data = QByteArray (data, int (n));
+}
+
+void
+InputHttpStream::add_header (const std::string &name, const std::string &value)
+{
+  m_headers.insert (std::make_pair (name, value));
 }
 
 void 
@@ -148,19 +153,26 @@ InputHttpStream::issue_request (const QUrl &url)
   delete mp_buffer;
   mp_buffer = 0;
 
+  QNetworkRequest request (url);
+  for (std::map<std::string, std::string>::const_iterator h = m_headers.begin (); h != m_headers.end (); ++h) {
+    request.setRawHeader (QByteArray (h->first.c_str ()), QByteArray (h->second.c_str ()));
+  }
   if (m_data.isEmpty ()) {
-    s_network_manager->sendCustomRequest (QNetworkRequest (url), m_request);
+    s_network_manager->sendCustomRequest (request, m_request);
   } else {
     mp_buffer = new QBuffer (&m_data);
-    s_network_manager->sendCustomRequest (QNetworkRequest (url), m_request, mp_buffer);
+    s_network_manager->sendCustomRequest (request, m_request, mp_buffer);
   }
 }
 
 size_t 
 InputHttpStream::read (char *b, size_t n)
 {
+  if (mp_reply == 0) {
+    issue_request (QUrl (tl::to_qstring (m_url)));
+  }
   while (mp_reply == 0) {
-    QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
+    QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents, 100);
   }
 
   if (mp_reply->error () != QNetworkReply::NoError) {

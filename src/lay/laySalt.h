@@ -34,8 +34,6 @@
 namespace lay
 {
 
-class SaltDownloadManager;
-
 /**
  *  @brief The global salt (package manager) object
  *  This object can be configured to represent a couple of locations.
@@ -124,6 +122,14 @@ public:
   SaltGrain *grain_by_name (const std::string &name);
 
   /**
+   *  @brief Gets the grain with the given name (const version)
+   */
+  const SaltGrain *grain_by_name (const std::string &name) const
+  {
+    return const_cast<Salt *> (this)->grain_by_name (name);
+  }
+
+  /**
    *  @brief Loads the salt from a "salt mine" file
    */
   void load (const std::string &p)
@@ -165,11 +171,11 @@ public:
    *  all files related to this grain. It will copy the download URL from the template into the
    *  new grain, so updates will come from the original location.
    *
-   *  The target's name must be set. If a specific target location is desired, the target's
-   *  path must be set too.
-   *
-   *  This method refuses to overwrite existing grains, so an update needs to be performed by first
-   *  deleting the grain and then re-installing it.
+   *  If the target's name is not set, it will be taken from the template.
+   *  If the target's path is not set and a grain with the given name already exists in
+   *  the package, the path is taken from that grain.
+   *  If no target path is set and no grain with this name exists yet, a new path will
+   *  be constructed using the first location in the salt.
    *
    *  The target grain will be updated with the installation information. If the target grain
    *  contains an installation path prior to the installation, this path will be used for the
@@ -177,7 +183,7 @@ public:
    *
    *  Returns true, if the package could be created successfully.
    */
-  bool create_grain (const SaltGrain &templ, SaltGrain &target, SaltDownloadManager *download_manager = 0);
+  bool create_grain (const SaltGrain &templ, SaltGrain &target);
 
 signals:
   /**

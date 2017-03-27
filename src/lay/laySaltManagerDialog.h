@@ -24,6 +24,7 @@
 #define HDR_laySaltManagerDialog
 
 #include "ui_SaltManagerDialog.h"
+#include "tlDeferredExecution.h"
 
 #include <QDialog>
 #include <memory>
@@ -105,14 +106,32 @@ private slots:
    */
   void search_text_changed (const QString &text);
 
-private:
-  lay::Salt *mp_salt, *mp_salt_mine;
-  std::auto_ptr<lay::SaltGrain> m_remote_grain;
-  bool m_current_changed_enabled;
-  lay::SaltGrainPropertiesDialog *mp_properties_dialog;
+  /**
+   *  @brief Called to show the marked items only
+   */
+  void show_marked_only ();
 
-  lay::SaltGrain *current_grain ();
-  lay::SaltGrain *mine_current_grain ();
+  /**
+   *  @brief Called to show all items again
+   */
+  void show_all ();
+
+  /**
+   *  @brief Called to unmark all items
+   */
+  void unmark_all ();
+
+private:
+  Salt *mp_salt, *mp_salt_mine;
+  std::auto_ptr<SaltGrain> m_remote_grain;
+  bool m_current_changed_enabled;
+  SaltGrainPropertiesDialog *mp_properties_dialog;
+  tl::DeferredMethod<SaltManagerDialog> dm_update_models;
+
+  SaltGrain *current_grain ();
+  SaltGrain *mine_current_grain ();
+  void update_models ();
+  void update_apply_state ();
 };
 
 }

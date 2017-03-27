@@ -28,6 +28,7 @@
 #include "ui_SaltManagerInstallConfirmationDialog.h"
 
 #include <QTreeWidgetItem>
+#include <QMessageBox>
 
 namespace lay
 {
@@ -47,10 +48,17 @@ public:
   void add_info (const std::string &name, bool update, const std::string &version, const std::string &url)
   {
     QTreeWidgetItem *item = new QTreeWidgetItem (list);
+
+    item->setFlags (item->flags () & ~Qt::ItemIsSelectable);
+
     item->setText (0, tl::to_qstring (name));
     item->setText (1, update ? tr ("UPDATE") : tr ("INSTALL"));
     item->setText (2, tl::to_qstring (version));
     item->setText (3, tl::to_qstring (url));
+
+    for (int column = 0; column < list->colorCount (); ++column) {
+      item->setData (column, Qt::ForegroundRole, update ? Qt::blue : Qt::black);
+    }
   }
 };
 
@@ -72,11 +80,25 @@ SaltDownloadManager::compute_dependencies (const lay::Salt &salt, const lay::Sal
 {
   tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Computing package dependencies ..")));
 
+  std::map<std::string, Descriptor> registry;
+
+  //  remove those registered entries which don't need to be updated
+
+  registry = m_registry;
+  for (std::map<std::string, Descriptor>::const_iterator p = registry.begin (); p != registry.end (); ++p) {
+    const SaltGrain *g = salt.grain_by_name (p->first);
+    if (g && SaltGrain::compare_versions (p->second.version, g->version ()) == 0 && p->second.url == g->url ()) {
+      m_registry.erase (p->first);
+    }
+  }
+
+  //  add further entries as derived from the dependencies
+
   while (needs_iteration ()) {
 
     fetch_missing (salt_mine, progress);
 
-    std::map<std::string, Descriptor> registry = m_registry;
+    registry = m_registry;
     for (std::map<std::string, Descriptor>::const_iterator p = registry.begin (); p != registry.end (); ++p) {
 
       for (std::vector<SaltGrain::Dependency>::const_iterator d = p->second.grain.dependencies ().begin (); d != p->second.grain.dependencies ().end (); ++d) {
@@ -147,7 +169,12 @@ SaltDownloadManager::fetch_missing (const lay::Salt &salt_mine, tl::AbsoluteProg
         p->second.url = g->url ();
       }
 
-      p->second.grain = SaltGrain::from_url (p->second.url);
+      try {
+        p->second.grain = SaltGrain::from_url (p->second.url);
+      } catch (tl::Exception &ex) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Error fetching spec file for package '%1': %2").arg (tl::to_qstring (p->first)).arg (tl::to_qstring (ex.msg ()))));
+      }
+
       p->second.downloaded = true;
 
     }
@@ -158,13 +185,20 @@ SaltDownloadManager::fetch_missing (const lay::Salt &salt_mine, tl::AbsoluteProg
 bool
 SaltDownloadManager::show_confirmation_dialog (QWidget *parent, const lay::Salt &salt)
 {
+  //  Stop with a warning if there is nothing to do
+  if (m_registry.empty()) {
+    QMessageBox::warning (parent, tr ("Nothing to do"), tr ("No packages need update or are marked for installation"));
+    return false;
+  }
+
   lay::ConfirmationDialog dialog (parent);
 
   //  First the packages to update
   for (std::map<std::string, Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
     const lay::SaltGrain *g = salt.grain_by_name (p->first);
     if (g) {
-      dialog.add_info (p->first, true, g->version () + "->" + p->second.version, p->second.url);
+      //  \342\206\222 is UTF-8 "right arrow"
+      dialog.add_info (p->first, true, g->version () + " \342\206\222 " + p->second.version, p->second.url);
     }
   }
 

@@ -273,8 +273,10 @@ WebDAVObject::download (const std::string &url, const std::string &target)
   bool has_errors = false;
 
   {
-    tl::info << tl::to_string (QObject::tr ("Downloading %1 files now").arg (items.size ()));
+    tl::info << tl::to_string (QObject::tr ("Downloading %1 file(s) now ..").arg (items.size ()));
+
     tl::RelativeProgress progress (tl::to_string (QObject::tr ("Downloading file(s) from %1").arg (tl::to_qstring (url))), items.size (), 1);
+
     for (std::list<DownloadItem>::const_iterator i = items.begin (); i != items.end (); ++i) {
 
       tl::info << QObject::tr ("Downloading '%1' to '%2' ..").arg (tl::to_qstring  (i->url)).arg (tl::to_qstring (i->path));
@@ -306,6 +308,8 @@ WebDAVObject::download (const std::string &url, const std::string &target)
         tl::error << QObject::tr ("Error downloading file from '") << i->url << "':" << tl::endl << ex.msg ();
         has_errors = true;
       }
+
+      ++progress;
 
     }
   }

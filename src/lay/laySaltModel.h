@@ -48,6 +48,17 @@ Q_OBJECT
 
 public:
   /**
+   *  @brief An enum describing the severity of a message
+   */
+  enum Severity
+  {
+    None = 0,
+    Info = 1,
+    Warning = 2,
+    Error = 3
+  };
+
+  /**
    *  @brief Constructor
    */
   SaltModel (QObject *parent, lay::Salt *salt);
@@ -56,6 +67,11 @@ public:
    *  @brief Implementation of the QAbstractItemModel interface
    */
   QVariant data (const QModelIndex &index, int role) const;
+
+  /**
+   *  @brief Implementation of the QAbstractItemModel interface
+   */
+  Qt::ItemFlags flags (const QModelIndex &index) const;
 
   /**
    *  @brief Implementation of the QAbstractItemModel interface
@@ -94,17 +110,69 @@ public:
   void set_marked (const std::string &name, bool marked);
 
   /**
+   *  @brief Clears the marked state of all grains
+   */
+  void clear_marked ();
+
+  /**
+   *  @brief Enables or disables the grain with the given name
+   */
+  void set_enabled (const std::string &name, bool enabled);
+
+  /**
+   *  @brief Enables all grains
+   */
+  void enable_all ();
+
+  /**
    *  @brief Installs a message on the grain with the given name
    *  Installing an empty message basically removes the message.
    */
-  void set_message (const std::string &name, const std::string &message);
+  void set_message (const std::string &name, Severity severity, const std::string &message);
+
+  /**
+   *  @brief Removes a message
+   */
+  void reset_message (const std::string &name)
+  {
+    set_message (name, None, std::string ());
+  }
+
+  /**
+   *  @brief Clears all messages
+   */
+  void clear_messages ();
+
+  /**
+   *  @brief Sets the display order
+   *  Specifying a display order for a name will make the grain appear
+   *  before or after other grains.
+   *  "update" needs to be called before the order becomes active.
+   *  Non-assigned items are considered to have order (0).
+   */
+  void set_order (const std::string &name, int order);
+
+  /**
+   *  @brief Resets any display order
+   */
+  void reset_order (const std::string &name);
+
+  /**
+   *  @brief Resets all display order specs
+   */
+  void clear_order ();
 
 public:
   lay::Salt *mp_salt;
   std::set<std::string> m_marked;
-  std::map<std::string, std::string> m_messages;
+  std::set<std::string> m_disabled;
+  std::map<std::string, std::pair<Severity, std::string> > m_messages;
+  std::map<std::string, int> m_display_order;
+  std::vector<SaltGrain *> m_ordered_grains;
 
   bool is_marked (const std::string &name) const;
+  bool is_enabled (const std::string &name) const;
+  void create_ordered_list ();
 };
 
 // --------------------------------------------------------------------------------------

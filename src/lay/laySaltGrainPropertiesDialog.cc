@@ -169,12 +169,19 @@ SaltGrainPropertiesDialog::update_controls ()
 
   dependencies->clear ();
   for (std::vector<SaltGrain::Dependency>::const_iterator d = m_grain.dependencies ().begin (); d != m_grain.dependencies ().end (); ++d) {
+
     QTreeWidgetItem *item = new QTreeWidgetItem (dependencies);
     item->setFlags (item->flags () | Qt::ItemIsEditable);
+
     item->setData (0, Qt::UserRole, tl::to_qstring (d->name));
+    dependency_changed (item, 0);
     item->setData (1, Qt::UserRole, tl::to_qstring (d->version));
+    dependency_changed (item, 1);
     item->setData (2, Qt::UserRole, tl::to_qstring (d->url));
+    dependency_changed (item, 2);
+
     dependencies->addTopLevelItem (item);
+
   }
 
   update_icon ();
@@ -249,9 +256,11 @@ SaltGrainPropertiesDialog::dependency_changed (QTreeWidgetItem *item, int column
   }
   m_update_enabled = false;
 
+  std::string name = tl::to_string (item->data (0, Qt::UserRole).toString ().simplified ());
+  SaltGrain *g = mp_salt->grain_by_name (name);
+
   if (column == 0 && mp_salt) {
 
-    std::string name = tl::to_string (item->data (0, Qt::UserRole).toString ().simplified ());
     item->setData (0, Qt::EditRole, tl::to_qstring (name));
 
     //  set URL and version for known grains
@@ -265,30 +274,48 @@ SaltGrainPropertiesDialog::dependency_changed (QTreeWidgetItem *item, int column
 
     } else {
 
-      SaltGrain *g = 0;
-      for (lay::Salt::flat_iterator i = mp_salt->begin_flat (); i != mp_salt->end_flat (); ++i) {
-        if ((*i)->name () == name) {
-          g = *i;
-        }
-      }
       if (g) {
         item->setData (1, Qt::UserRole, tl::to_qstring (g->version ()));
-        item->setData (2, Qt::UserRole, tl::to_qstring (g->url ()));
+        item->setData (2, Qt::UserRole, QString ());
         //  placeholder texts:
         item->setData (1, Qt::EditRole, tl::to_qstring (g->version ()));
-        item->setData (2, Qt::EditRole, tl::to_qstring (g->url ()));
+        if (! g->url ().empty ()) {
+          item->setData (2, Qt::EditRole, tl::to_qstring ("(" + g->url () + ")"));
+        } else {
+          item->setData (2, Qt::EditRole, tr ("(from repository)"));
+        }
       } else {
         item->setData (1, Qt::UserRole, QString ());
         item->setData (2, Qt::UserRole, QString ());
         //  placeholder texts:
         item->setData (1, Qt::EditRole, QString ());
-        item->setData (2, Qt::EditRole, tr ("(unknown packet)"));
+        item->setData (2, Qt::EditRole, tr ("(from repository)"));
       }
 
     }
 
-  } else if (column > 0) {
-    item->setData (column, Qt::EditRole, item->data (column, Qt::UserRole).toString ());
+  } else if (column == 1) {
+
+    QString text = item->data (column, Qt::UserRole).toString ();
+    if (! text.isEmpty ()) {
+      item->setData (1, Qt::EditRole, text);
+    } else if (g) {
+      item->setData (1, Qt::EditRole, tl::to_qstring (g->version ()));
+    }
+
+  } else if (column == 2) {
+
+    QString text = item->data (column, Qt::UserRole).toString ();
+    if (! text.isEmpty ()) {
+      item->setData (2, Qt::EditRole, text);
+    } else if (g) {
+      if (! g->url ().empty ()) {
+        item->setData (2, Qt::EditRole, tl::to_qstring ("(" + g->url () + ")"));
+      } else {
+        item->setData (2, Qt::EditRole, tr ("(from repository)"));
+      }
+    }
+
   }
 
   m_update_enabled = true;
@@ -531,10 +558,7 @@ SaltGrainPropertiesDialog::accept ()
     }
     dep_seen.insert (d->name);
 
-    if (! dep.is_valid_name (d->name)) {
-      dependencies_alert->warn () << tr ("'%1' is not a name of a package loaded already").arg (tl::to_qstring (d->name)) << tl::endl
-                                  << tr ("You need to specify the details (version, URL) manually");
-    } else {
+    if (dep.is_valid_name (d->name)) {
       try {
         dep.check_circular (dep.grain_for_name (m_grain.name ()), dep.grain_for_name (d->name));
       } catch (tl::Exception &ex) {
@@ -549,11 +573,7 @@ SaltGrainPropertiesDialog::accept ()
                                   << tr ("If the dependency package has a version itself, the version is automatically set to it's current version.");
     }
 
-    if (d->url.empty ()) {
-      dependencies_alert->warn () << tr ("No download URL specified for dependency '%1'").arg (tl::to_qstring (d->name)) << tl::endl
-                                  << tr ("A download URL should be specified to ensure the package dependencies can be resolved.") << tl::endl
-                                  << tr ("If the dependency package was downloaded itself, the URL is automatically set to the download source.");
-    } else {
+    if (!d->url.empty ()) {
       SaltGrain gdep;
       try {
         gdep = SaltGrain::from_url (d->url);

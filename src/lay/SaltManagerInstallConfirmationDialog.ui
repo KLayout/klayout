@@ -26,6 +26,15 @@
    </item>
    <item>
     <widget class="QTreeWidget" name="list">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="rootIsDecorated">
+      <bool>false</bool>
+     </property>
+     <property name="allColumnsShowFocus">
+      <bool>true</bool>
+     </property>
      <column>
       <property name="text">
        <string>Package</string>

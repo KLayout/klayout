@@ -392,6 +392,10 @@ SaltGrain::from_path (const std::string &path)
 SaltGrain
 SaltGrain::from_url (const std::string &url)
 {
+  if (url.empty ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("No download link available")));
+  }
+
   tl::InputHttpStream http (SaltGrain::spec_url (url));
   tl::InputStream stream (http);
 

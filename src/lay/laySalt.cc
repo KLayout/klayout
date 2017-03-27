@@ -49,6 +49,7 @@ Salt &Salt::operator= (const Salt &other)
 {
   if (this != &other) {
     m_root = other.m_root;
+    invalidate ();
   }
   return *this;
 }

@@ -231,8 +231,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>537</width>
-                       <height>284</height>
+                       <width>343</width>
+                       <height>207</height>
                       </rect>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_2">
@@ -674,6 +674,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="apply_label">
+            <property name="text">
+             <string>Set in code</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -725,16 +732,19 @@
     <string>Delete package</string>
    </property>
   </action>
-  <action name="actionImport">
-   <property name="icon">
-    <iconset resource="layResources.qrc">
-     <normaloff>:/import.png</normaloff>:/import.png</iconset>
-   </property>
+  <action name="actionUnmarkAll">
    <property name="text">
-    <string>Import</string>
+    <string>Unmark all</string>
    </property>
-   <property name="toolTip">
-    <string>Import package</string>
+  </action>
+  <action name="actionShowMarkedOnly">
+   <property name="text">
+    <string>Show marked only</string>
+   </property>
+  </action>
+  <action name="actionShowAll">
+   <property name="text">
+    <string>Show all</string>
    </property>
   </action>
  </widget>

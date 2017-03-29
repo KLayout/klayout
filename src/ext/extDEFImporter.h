@@ -62,7 +62,7 @@ private:
   LEFImporter m_lef_importer;
   std::map<std::string, std::map<std::string, double> > m_nondefault_widths;
 
-  db::FTrans orient_string_to_ftrans (const std::string &s);
+  db::FTrans get_orient (bool optional);
   void read_polygon (db::Polygon &poly, double scale);
   void read_rect (db::Polygon &poly, double scale);
 };

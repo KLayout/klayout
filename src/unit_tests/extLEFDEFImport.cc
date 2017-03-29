@@ -213,3 +213,8 @@ TEST(16)
 {
   run_test (_this, "def7", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au.oas.gz");
 }
+
+TEST(17)
+{
+  run_test (_this, "def8", "lef:tech.lef+def:in.def", "au.oas.gz");
+}

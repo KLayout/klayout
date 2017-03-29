@@ -43,26 +43,28 @@ DEFImporter::read_lef (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerD
 
 
 db::FTrans 
-DEFImporter::orient_string_to_ftrans (const std::string &s) 
+DEFImporter::get_orient (bool optional)
 {
-  if (s == "N") {
+  if (test ("N")) {
     return db::FTrans (db::FTrans::r0);
-  } else if (s == "S") {
+  } else if (test ("S")) {
     return db::FTrans (db::FTrans::r180);
-  } else if (s == "W") {
+  } else if (test ("W")) {
     return db::FTrans (db::FTrans::r90);
-  } else if (s == "E") {
+  } else if (test ("E")) {
     return db::FTrans (db::FTrans::r270);
-  } else if (s == "FN") {
+  } else if (test ("FN")) {
     return db::FTrans (db::FTrans::m90);
-  } else if (s == "FS") {
+  } else if (test ("FS")) {
     return db::FTrans (db::FTrans::m0);
-  } else if (s == "FW") {
+  } else if (test ("FW")) {
     return db::FTrans (db::FTrans::m45);
-  } else if (s == "FE") {
+  } else if (test ("FE")) {
     return db::FTrans (db::FTrans::m135);
+  } else if (optional) {
+    return db::FTrans (db::FTrans::r0);
   } else {
-    error (tl::to_string (QObject::tr ("Invalid orientation specification: ")) + s);
+    error (tl::to_string (QObject::tr ("Invalid orientation specification: ")) + get ());
     return db::FTrans (db::FTrans::r0);
   }
 }
@@ -479,6 +481,9 @@ DEFImporter::do_read (db::Layout &layout)
                     error (tl::to_string (QObject::tr ("RECT routing specification not followed by coordinate list")));
                   }
 
+                  //  breaks wiring
+                  pts.clear ();
+
                   //  rect spec
 
                   double x1 = get_double ();
@@ -505,11 +510,11 @@ DEFImporter::do_read (db::Layout &layout)
                 } else if (test ("VIRTUAL")) {
 
                   //  virtual specs simply create a new segment
+                  pts.clear ();
 
                 } else if (peek ("(")) {
 
                   ext.clear ();
-                  pts.clear ();
 
                   while (peek ("(") || peek ("MASK")) {
 
@@ -627,10 +632,7 @@ DEFImporter::do_read (db::Layout &layout)
 
                   //  indicates a via
                   std::string vn = get ();
-                  db::FTrans ft;
-                  if (! peek ("NEW") && ! peek ("+") && ! peek ("-") && ! peek (";")) {
-                    ft = orient_string_to_ftrans (get ());
-                  }
+                  db::FTrans ft = get_orient (true /*optional*/);
 
                   std::map<std::string, ViaDesc>::const_iterator vd = via_desc.find (vn);
                   if (vd != via_desc.end () && ! pts.empty ()) {
@@ -640,6 +642,11 @@ DEFImporter::do_read (db::Layout &layout)
                     } else if (ln == vd->second.m2) {
                       ln = vd->second.m1;
                     }
+                  }
+
+                  //  continue a segment with the current point and the new layer
+                  if (pts.size () > 1) {
+                    pts.erase (pts.begin (), pts.end () - 1);
                   }
 
                 } else {
@@ -904,7 +911,7 @@ DEFImporter::do_read (db::Layout &layout)
             db::Point pt = db::Point (db::DPoint (x * scale, y * scale));
             test (")");
 
-            db::FTrans ft = orient_string_to_ftrans (get ());
+            db::FTrans ft = get_orient (false /*mandatory*/);
             db::Vector d = pt - m_lef_importer.macro_bbox_by_name (model).transformed (ft).lower_left ();
 
             if (cell) {
@@ -1012,7 +1019,7 @@ DEFImporter::do_read (db::Layout &layout)
             db::Vector d = db::Vector (db::DVector (x * scale, y * scale));
             test (")");
 
-            db::FTrans ft = orient_string_to_ftrans (get ());
+            db::FTrans ft = get_orient (false /*mandatory*/);
             trans = db::Trans (ft.rot (), d);
 
           } else if (test ("PORT")) {

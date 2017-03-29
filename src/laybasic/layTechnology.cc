@@ -97,9 +97,19 @@ Technologies::to_xml () const
 void 
 Technologies::load_from_xml (const std::string &s)
 {
+  //  create a copy to filter out the ones which are not persisted and remain
+  lay::Technologies copy;
+  for (const_iterator t = begin (); t != end (); ++t) {
+    if (! t->is_persisted ()) {
+      copy.add (new Technology (*t));
+    }
+  }
+
   tl::XMLStringSource source (s);
   tl::XMLStruct<lay::Technologies> xml_struct ("technologies", xml_elements ());
-  xml_struct.parse (source, *this);
+  xml_struct.parse (source, copy);
+
+  *this = copy;
 }
 
 void 

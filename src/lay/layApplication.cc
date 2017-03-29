@@ -1639,7 +1639,22 @@ void
 Application::set_config (const std::string &name, const std::string &value)
 {
   if (mp_plugin_root) {
-    mp_plugin_root->config_set (name, value);
+
+    if (name == cfg_technologies) {
+
+      //  HACK: cfg_technologies is not a real configuration parameter currently. Hence we emulate that
+      //  behavior. But currently this is the only way to access technology data indirectly from a script.
+      //  Note that this method will set only the technologies accessible through the configuration parameter.
+      //  I.e. the ones not auto-imported.
+      //  TODO: rework this one. This is only half-hearted.
+      if (! value.empty ()) {
+        lay::Technologies::instance ()->load_from_xml (value);
+      }
+
+    } else {
+      mp_plugin_root->config_set (name, value);
+    }
+
   }
 }
 
@@ -1655,7 +1670,16 @@ std::string
 Application::get_config (const std::string &name) const
 {
   if (mp_plugin_root) {
-    return mp_plugin_root->config_get (name);
+    if (name == cfg_technologies) {
+      //  HACK: cfg_technologies is not a real configuration parameter currently. Hence we emulate that
+      //  behavior. But currently this is the only way to access technology data indirectly from a script.
+      //  Note that this method will return only the technologies accessible through the configuration parameter.
+      //  I.e. the ones not auto-imported.
+      //  TODO: rework this one.
+      return lay::Technologies::instance ()->to_xml ();
+    } else {
+      return mp_plugin_root->config_get (name);
+    }
   } else {
     return std::string ();
   }

@@ -1612,6 +1612,15 @@ static std::string filename (const lay::CellViewRef *cv)
   }
 }
 
+static bool is_dirty (const lay::CellViewRef *cv)
+{
+  if ((*cv).operator-> ()) {
+    return (*cv)->is_dirty ();
+  } else {
+    return false;
+  }
+}
+
 static void apply_technology (const lay::CellViewRef *cv, const std::string &tech)
 {
   if ((*cv).operator-> ()) {
@@ -1815,6 +1824,13 @@ Class<lay::CellViewRef> decl_CellView ("CellView",
   ) +
   method_ext ("filename", &gsi::filename,
     "@brief Gets filename associated with the layout behind the cellview\n"
+  ) +
+  method_ext ("is_dirty?", &gsi::is_dirty,
+    "@brief Gets a flag indicating whether the layout needs saving\n"
+    "A layout is 'dirty' if it is modified and needs saving. This method returns "
+    "true in this case.\n"
+    "\n"
+    "This method has been introduced in version 0.24.10.\n"
   ) +
   method_ext ("name", &gsi::name,
     "@brief Gets the unique name associated with the layout behind the cellview\n"

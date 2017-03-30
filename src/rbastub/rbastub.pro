@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_rbastub
 
 include($$PWD/../klayout.pri)
 
@@ -13,5 +14,5 @@ SOURCES = rba.cc
 
 INCLUDEPATH += ../tl ../gsi
 DEPENDPATH += ../tl ../gsi
-LIBS += -L$$DESTDIR -ltl -lgsi
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi
   

@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_tl
 
 include($$PWD/../klayout.pri)
 

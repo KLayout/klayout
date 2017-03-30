@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_gsi
 
 include($$PWD/../klayout.pri)
 
@@ -50,5 +51,5 @@ SOURCES += gsiDeclTl.cc
 
 INCLUDEPATH += ../tl
 DEPENDPATH += ../tl
-LIBS += -L$$DESTDIR -ltl
+LIBS += -L$$DESTDIR -lklayout_tl
 

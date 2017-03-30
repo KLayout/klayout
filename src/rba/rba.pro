@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_rba
 
 include($$PWD/../klayout.pri)
 
@@ -17,7 +18,7 @@ SOURCES = rba.cc \
 # NOTE: ../common needs to be before RUBYINCLUDE since there is a config.h too.
 INCLUDEPATH += ../common $$RUBYINCLUDE $$RUBYINCLUDE2 ../tl ../gsi
 DEPENDPATH += ../common $$RUBYINCLUDE $$RUBYINCLUDE2 ../tl ../gsi
-LIBS += $$RUBYLIBFILE -L$$DESTDIR -ltl -lgsi
+LIBS += $$RUBYLIBFILE -L$$DESTDIR -lklayout_tl -lklayout_gsi
   
 
 HEADERS += \

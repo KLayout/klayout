@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_laybasic
 
 include($$PWD/../klayout.pri)
 
@@ -275,12 +276,12 @@ HEADERS = \
 
 INCLUDEPATH += ../tl ../gsi ../db ../rdb
 DEPENDPATH += ../tl ../gsi ../db ../rdb
-LIBS += -L$$DESTDIR -ltl -lgsi -ldb -lrdb
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb
 
 INCLUDEPATH += ../gsiqt
 DEPENDPATH += ../gsiqt
 
 equals(HAVE_QTBINDINGS, "1") {
-  LIBS += -lgsiqt
+  LIBS += -lklayout_gsiqt
 }
 

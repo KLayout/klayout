@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_pyastub
 
 include($$PWD/../klayout.pri)
 
@@ -11,7 +12,7 @@ SOURCES = pya.cc
 
 INCLUDEPATH += ../tl ../gsi
 DEPENDPATH += ../tl ../gsi
-LIBS += -L$$DESTDIR -ltl -lgsi
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi
 
 HEADERS += \
     pyaCommon.h

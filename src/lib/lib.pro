@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_lib
 
 include($$PWD/../klayout.pri)
 
@@ -37,5 +38,5 @@ RESOURCES = \
 
 INCLUDEPATH += ../gsi ../tl ../db
 DEPENDPATH += ../gsi ../tl ../db
-LIBS += -L$$DESTDIR -lgsi -ltl -ldb
+LIBS += -L$$DESTDIR -lklayout_gsi -lklayout_tl -lklayout_db
 

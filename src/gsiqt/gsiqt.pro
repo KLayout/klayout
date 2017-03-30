@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_gsiqt
 
 include($$PWD/../klayout.pri)
 
@@ -11,7 +12,7 @@ TEMPLATE = lib
 INCLUDEPATH += ../tl ../gsi ../db ../gsiqt
 DEPENDPATH += ../tl ../gsi ../db ../gsiqt
 
-LIBS += -L$$DESTDIR -ltl -lgsi -ldb
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db
 
 SOURCES += \
   gsiQt.cc \

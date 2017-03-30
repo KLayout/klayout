@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_lay
 
 include($$PWD/../klayout.pri)
 
@@ -143,7 +144,7 @@ RESOURCES = layBuildInMacros.qrc \
 
 INCLUDEPATH += ../tl ../gsi ../db ../rdb ../laybasic ../ant ../img ../edt
 DEPENDPATH += ../tl ../gsi ../db ../rdb ../laybasic ../ant ../img ../edt
-LIBS += -L$$DESTDIR -ltl -lgsi -ldb -lrdb -llaybasic -lant -limg -ledt
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_laybasic -lklayout_ant -lklayout_img -lklayout_edt
 
 win32 {
   # for stack trace support:
@@ -161,26 +162,26 @@ INCLUDEPATH += ../gsiqt
 DEPENDPATH += ../gsiqt
 
 equals(HAVE_QTBINDINGS, "1") {
-  LIBS += -lgsiqt
+  LIBS += -lklayout_gsiqt
 }
 
 equals(HAVE_RUBY, "1") {
   INCLUDEPATH += ../rba
   DEPENDPATH += ../rba
-  LIBS += -lrba 
+  LIBS += -lklayout_rba
 } else {
   INCLUDEPATH += ../rbastub
   DEPENDPATH += ../rbastub
-  LIBS += -lrbastub 
+  LIBS += -lklayout_rbastub
 }
 
 equals(HAVE_PYTHON, "1") {
   INCLUDEPATH += ../pya
   DEPENDPATH += ../pya
-  LIBS += -lpya 
+  LIBS += -lklayout_pya
 } else {
   INCLUDEPATH += ../pyastub
   DEPENDPATH += ../pyastub
-  LIBS += -lpyastub
+  LIBS += -lklayout_pyastub
 }
 

@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_ant
 
 include($$PWD/../klayout.pri)
 
@@ -38,5 +39,5 @@ SOURCES = \
 
 INCLUDEPATH += ../tl ../gsi ../laybasic ../db
 DEPENDPATH += ../tl ../gsi ../laybasic ../db
-LIBS += -L$$DESTDIR -ltl -lgsi -llaybasic -ldb
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_db
 

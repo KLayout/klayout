@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_ext
 
 include($$PWD/../klayout.pri)
 
@@ -79,5 +80,5 @@ DEPENDPATH += ../tl ../gsi ../laybasic ../lay ../db ../rdb ../ant ../edt
 INCLUDEPATH += $$DESTDIR/laybasic $$OUT_PWD/../lay
 DEPENDPATH += $$DESTDIR/laybasic $$OUT_PWD/../lay
 
-LIBS += -L$$DESTDIR -ltl -lgsi -llaybasic -ldb -lrdb -llay -lant -ledt
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_db -lklayout_rdb -lklayout_lay -lklayout_ant -lklayout_edt
 

@@ -1,5 +1,6 @@
 
-DESTDIR=$$OUT_PWD/..
+DESTDIR = $$OUT_PWD/..
+TARGET = klayout_pya
 
 include($$PWD/../klayout.pri)
 
@@ -19,7 +20,7 @@ SOURCES = \
 
 INCLUDEPATH += $$PYTHONINCLUDE ../tl ../gsi
 DEPENDPATH += $$PYTHONINCLUDE ../tl ../gsi
-LIBS += $$PYTHONLIBFILE -L$$DESTDIR -ltl -lgsi
+LIBS += $$PYTHONLIBFILE -L$$DESTDIR -lklayout_tl -lklayout_gsi
 
 # Python is somewhat sloppy and relies on the compiler initializing fields 
 # of strucs to 0:

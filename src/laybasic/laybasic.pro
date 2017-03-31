@@ -177,7 +177,8 @@ SOURCES = \
     layLineStylePalette.cc \
     layEditLineStylesForm.cc \
     layEditLineStyleWidget.cc \
-    layBackgroundAwareTreeStyle.cc
+    layBackgroundAwareTreeStyle.cc \
+    gsiDeclLayTechnologies.cc
 
 HEADERS = \
   gtf.h \

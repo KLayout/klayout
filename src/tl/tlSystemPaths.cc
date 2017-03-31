@@ -110,32 +110,58 @@ split_path (const std::string &path, std::vector <std::string> &pc)
   }
 }
 
+
+static std::vector<std::string> s_klayout_path;
+static bool s_klayout_path_set = false;
+
+void
+set_klayout_path (const std::vector<std::string> &path)
+{
+  s_klayout_path = path;
+  s_klayout_path_set = true;
+}
+
+void
+reset_klayout_path ()
+{
+  s_klayout_path.clear ();
+  s_klayout_path_set = false;
+}
+
 std::vector<std::string>
 get_klayout_path ()
 {
-  std::vector<std::string> klayout_path;
+  if (s_klayout_path_set) {
 
-  //  generate the klayout path: the first component is always the appdata path
-  klayout_path.push_back (get_appdata_path ());
+    return s_klayout_path;
+
+  } else {
+
+    std::vector<std::string> klayout_path;
+
+    //  generate the klayout path: the first component is always the appdata path
+    klayout_path.push_back (get_appdata_path ());
 #ifdef _WIN32
-  wchar_t *env = _wgetenv (L"KLAYOUT_PATH");
-  if (env) {
-    split_path (tl::to_string (QString ((const QChar *) env)), klayout_path);
-  } else {
-    get_other_system_paths (klayout_path);
-    klayout_path.push_back (get_inst_path ());
-  }
+    wchar_t *env = _wgetenv (L"KLAYOUT_PATH");
+    if (env) {
+      split_path (tl::to_string (QString ((const QChar *) env)), klayout_path);
+    } else {
+      get_other_system_paths (klayout_path);
+      klayout_path.push_back (get_inst_path ());
+    }
 #else
-  char *env = getenv ("KLAYOUT_PATH");
-  if (env) {
-    split_path (tl::system_to_string (env), klayout_path);
-  } else {
-    get_other_system_paths (klayout_path);
-    klayout_path.push_back (get_inst_path ());
-  }
+    char *env = getenv ("KLAYOUT_PATH");
+    if (env) {
+      split_path (tl::system_to_string (env), klayout_path);
+    } else {
+      get_other_system_paths (klayout_path);
+      klayout_path.push_back (get_inst_path ());
+    }
 #endif
 
-  return klayout_path;
+    return klayout_path;
+
+  }
 }
 
 }

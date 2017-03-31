@@ -101,7 +101,7 @@ void run_pythontest (ut::TestBase *_this, const std::string &fn)
 }
 
 #define PYTHONTEST(n, file) \
-  TEST(2_##n) { run_pythontest(_this, file); }
+  TEST(n) { run_pythontest(_this, file); }
 
 PYTHONTEST (dbLayoutTest, "dbLayoutTest.py")
 PYTHONTEST (dbRegionTest, "dbRegionTest.py")

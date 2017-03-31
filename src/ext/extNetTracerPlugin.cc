@@ -139,30 +139,37 @@ public:
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new NetTracerPluginDeclaration (), 13000, "NetTracerPlugin");
 
+}
+
 // -----------------------------------------------------------------------------------
 //  GSI binding
 
-static void def_connection2 (NetTracerTechnologyComponent *tech, const std::string &la, const std::string &lb)
+namespace gsi
 {
-  NetTracerLayerExpressionInfo la_info = NetTracerLayerExpressionInfo::compile (la);
-  NetTracerLayerExpressionInfo lb_info = NetTracerLayerExpressionInfo::compile (lb);
-  tech->add (NetTracerConnectionInfo (la_info, lb_info));
+
+static void def_connection2 (ext::NetTracerTechnologyComponent *tech, const std::string &la, const std::string &lb)
+{
+  ext::NetTracerLayerExpressionInfo la_info = ext::NetTracerLayerExpressionInfo::compile (la);
+  ext::NetTracerLayerExpressionInfo lb_info = ext::NetTracerLayerExpressionInfo::compile (lb);
+  tech->add (ext::NetTracerConnectionInfo (la_info, lb_info));
 }
 
-static void def_connection3 (NetTracerTechnologyComponent *tech, const std::string &la, const std::string &via, const std::string &lb)
+static void def_connection3 (ext::NetTracerTechnologyComponent *tech, const std::string &la, const std::string &via, const std::string &lb)
 {
-  NetTracerLayerExpressionInfo la_info = NetTracerLayerExpressionInfo::compile (la);
-  NetTracerLayerExpressionInfo via_info = NetTracerLayerExpressionInfo::compile (via);
-  NetTracerLayerExpressionInfo lb_info = NetTracerLayerExpressionInfo::compile (lb);
-  tech->add (NetTracerConnectionInfo (la_info, via_info, lb_info));
+  ext::NetTracerLayerExpressionInfo la_info = ext::NetTracerLayerExpressionInfo::compile (la);
+  ext::NetTracerLayerExpressionInfo via_info = ext::NetTracerLayerExpressionInfo::compile (via);
+  ext::NetTracerLayerExpressionInfo lb_info = ext::NetTracerLayerExpressionInfo::compile (lb);
+  tech->add (ext::NetTracerConnectionInfo (la_info, via_info, lb_info));
 }
 
-static void def_symbol (NetTracerTechnologyComponent *tech, const std::string &name, const std::string &expr)
+static void def_symbol (ext::NetTracerTechnologyComponent *tech, const std::string &name, const std::string &expr)
 {
-  tech->add_symbol (NetTracerSymbolInfo (db::LayerProperties (name), expr));
+  tech->add_symbol (ext::NetTracerSymbolInfo (db::LayerProperties (name), expr));
 }
 
-gsi::Class<NetTracerTechnologyComponent> decl_NetTracerTechnology ("NetTracerTechnology",
+gsi::Class<lay::TechnologyComponent> &decl_layTechnologyComponent ();
+
+gsi::Class<ext::NetTracerTechnologyComponent> decl_NetTracerTechnology (decl_layTechnologyComponent (), "NetTracerTechnology",
   gsi::method_ext ("connection", &def_connection2, gsi::arg("a"), gsi::arg("b"),
     "@brief Defines a connection between two materials\n"
     "See the class description for details about this method."
@@ -194,90 +201,90 @@ gsi::Class<NetTracerTechnologyComponent> decl_NetTracerTechnology ("NetTracerTec
   "This class has been introduced in version 0.25.\n"
 );
 
-static void trace1 (NetTracer *net_tracer, const NetTracerTechnologyComponent &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer)
+static void trace1 (ext::NetTracer *net_tracer, const ext::NetTracerTechnologyComponent &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer)
 {
-  NetTracerData tracer_data = tech.get_tracer_data (layout);
+  ext::NetTracerData tracer_data = tech.get_tracer_data (layout);
   net_tracer->trace (layout, cell, start_point, start_layer, tracer_data);
 }
 
-static void trace2 (NetTracer *net_tracer, const NetTracerTechnologyComponent &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer, const db::Point &stop_point, unsigned int stop_layer)
+static void trace2 (ext::NetTracer *net_tracer, const ext::NetTracerTechnologyComponent &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer, const db::Point &stop_point, unsigned int stop_layer)
 {
-  NetTracerData tracer_data = tech.get_tracer_data (layout);
+  ext::NetTracerData tracer_data = tech.get_tracer_data (layout);
   net_tracer->trace (layout, cell, start_point, start_layer, stop_point, stop_layer, tracer_data);
 }
 
-static NetTracerData get_tracer_data_from_cv (const lay::CellViewRef &cv)
+static ext::NetTracerData get_tracer_data_from_cv (const lay::CellViewRef &cv)
 {
   const lay::Technology *tech = cv->technology ();
   tl_assert (tech != 0);
 
-  const NetTracerTechnologyComponent *tech_component = dynamic_cast <const NetTracerTechnologyComponent *> (tech->component_by_name (net_tracer_component_name));
+  const ext::NetTracerTechnologyComponent *tech_component = dynamic_cast <const ext::NetTracerTechnologyComponent *> (tech->component_by_name (ext::net_tracer_component_name));
   tl_assert (tech_component != 0);
 
   return tech_component->get_tracer_data (cv->layout ());
 }
 
-static void trace1_cv (NetTracer *net_tracer, const lay::CellViewRef &cv, const db::Point &start_point, unsigned int start_layer)
+static void trace1_cv (ext::NetTracer *net_tracer, const lay::CellViewRef &cv, const db::Point &start_point, unsigned int start_layer)
 {
-  NetTracerData tracer_data = get_tracer_data_from_cv (cv);
+  ext::NetTracerData tracer_data = get_tracer_data_from_cv (cv);
   net_tracer->trace (cv->layout (), *cv.cell (), start_point, start_layer, tracer_data);
 }
 
-static void trace2_cv (NetTracer *net_tracer, const lay::CellViewRef &cv, const db::Point &start_point, unsigned int start_layer, const db::Point &stop_point, unsigned int stop_layer)
+static void trace2_cv (ext::NetTracer *net_tracer, const lay::CellViewRef &cv, const db::Point &start_point, unsigned int start_layer, const db::Point &stop_point, unsigned int stop_layer)
 {
-  NetTracerData tracer_data = get_tracer_data_from_cv (cv);
+  ext::NetTracerData tracer_data = get_tracer_data_from_cv (cv);
   net_tracer->trace (cv->layout (), *cv.cell (), start_point, start_layer, stop_point, stop_layer, tracer_data);
 }
 
-static NetTracerData get_tracer_data_from_tech (const std::string &tech_name, const db::Layout &layout)
+static ext::NetTracerData get_tracer_data_from_tech (const std::string &tech_name, const db::Layout &layout)
 {
   const lay::Technology *tech = lay::Technologies::instance ()->technology_by_name (tech_name);
   tl_assert (tech != 0);
 
-  const NetTracerTechnologyComponent *tech_component = dynamic_cast <const NetTracerTechnologyComponent *> (tech->component_by_name (net_tracer_component_name));
+  const ext::NetTracerTechnologyComponent *tech_component = dynamic_cast <const ext::NetTracerTechnologyComponent *> (tech->component_by_name (ext::net_tracer_component_name));
   tl_assert (tech_component != 0);
 
   return tech_component->get_tracer_data (layout);
 }
 
-static void trace1_tn (NetTracer *net_tracer, const std::string &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer)
+static void trace1_tn (ext::NetTracer *net_tracer, const std::string &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer)
 {
-  NetTracerData tracer_data = get_tracer_data_from_tech (tech, layout);
+  ext::NetTracerData tracer_data = get_tracer_data_from_tech (tech, layout);
   net_tracer->trace (layout, cell, start_point, start_layer, tracer_data);
 }
 
-static void trace2_tn (NetTracer *net_tracer, const std::string &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer, const db::Point &stop_point, unsigned int stop_layer)
+static void trace2_tn (ext::NetTracer *net_tracer, const std::string &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer, const db::Point &stop_point, unsigned int stop_layer)
 {
-  NetTracerData tracer_data = get_tracer_data_from_tech (tech, layout);
+  ext::NetTracerData tracer_data = get_tracer_data_from_tech (tech, layout);
   net_tracer->trace (layout, cell, start_point, start_layer, stop_point, stop_layer, tracer_data);
 }
 
-gsi::Class<NetTracerShape> decl_NetElement ("NetElement",
-  gsi::method ("trans", &NetTracerShape::trans,
+gsi::Class<ext::NetTracerShape> decl_NetElement ("NetElement",
+  gsi::method ("trans", &ext::NetTracerShape::trans,
     "@brief Gets the transformation to apply for rendering the shape in the original top cell\n"
     "See the class description for more details about this attribute."
   ) +
-  gsi::method ("shape", (const db::Shape &(NetTracerShape::*) () const) &NetTracerShape::shape,
+  gsi::method ("shape", (const db::Shape &(ext::NetTracerShape::*) () const) &ext::NetTracerShape::shape,
     "@brief Gets the shape that makes up this net element\n"
     "See the class description for more details about this attribute."
   ) +
 #if 0
-  gsi::method ("is_valid?", &NetTracerShape::is_valid,
+  gsi::method ("is_valid?", &ext::NetTracerShape::is_valid,
     "@brief Gets a value indicating whether the shape is valid\n"
     "Currently this flag is not used."
   ) +
-  gsi::method ("is_pseudo?", &NetTracerShape::is_pseudo,
+  gsi::method ("is_pseudo?", &ext::NetTracerShape::is_pseudo,
     "@brief Gets a value indicating whether the shape is a pseudo shape\n"
     "Currently this flag is not used."
   ) +
 #endif
-  gsi::method ("cell_index", &NetTracerShape::cell_index,
+  gsi::method ("cell_index", &ext::NetTracerShape::cell_index,
     "@brief Gets the index of the cell the shape is inside"
   ) +
-  gsi::method ("layer", &NetTracerShape::layer,
+  gsi::method ("layer", &ext::NetTracerShape::layer,
     "@brief Gets the index of the layer the shape is on"
   ) +
-  gsi::method ("bbox", &NetTracerShape::bbox,
+  gsi::method ("bbox", &ext::NetTracerShape::bbox,
     "@brief Delivers the bounding box of the shape as seen from the original top cell"
   ),
   "@brief A net element for the \\NetTracer net tracing facility\n"
@@ -297,7 +304,7 @@ gsi::Class<NetTracerShape> decl_NetElement ("NetElement",
   "This class has been introduced in version 0.25.\n"
 );
 
-gsi::Class<NetTracer> decl_NetTracer ("NetTracer",
+gsi::Class<ext::NetTracer> decl_NetTracer ("NetTracer",
   gsi::method_ext ("trace", &trace1, gsi::arg ("tech"), gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("start_point"), gsi::arg ("start_layer"),
     "@brief Runs a net extraction\n"
     "\n"
@@ -353,23 +360,23 @@ gsi::Class<NetTracer> decl_NetTracer ("NetTracer",
     "This method behaves identical as the version with a technology, layout and cell object, except that it will take these "
     "from the cellview specified."
   ) +
-  gsi::iterator ("each_element", &NetTracer::begin, &NetTracer::end,
+  gsi::iterator ("each_element", &ext::NetTracer::begin, &ext::NetTracer::end,
     "@brief Iterates over the elements found during extraction\n"
     "The elements are available only after the extraction has been performed."
   ) +
-  gsi::method ("num_elements", &NetTracer::size,
+  gsi::method ("num_elements", &ext::NetTracer::size,
     "@brief Returns the number of elements found during extraction\n"
     "This attribute is useful only after the extraction has been performed."
   ) +
-  gsi::method ("clear", &NetTracer::clear,
+  gsi::method ("clear", &ext::NetTracer::clear,
     "@brief Clears the data from the last extraction\n"
   ) +
-  gsi::method ("name", &NetTracer::name,
+  gsi::method ("name", &ext::NetTracer::name,
     "@brief Returns the name of the net found during extraction\n"
     "The net name is extracted from labels found during the extraction. "
     "This attribute is useful only after the extraction has been performed."
   ) +
-  gsi::method ("incomplete?", &NetTracer::incomplete,
+  gsi::method ("incomplete?", &ext::NetTracer::incomplete,
     "@brief Returns a value indicating whether the net is incomplete\n"
     "A net may be incomplete if the extraction has been stopped by the user for example. "
     "This attribute is useful only after the extraction has been performed."

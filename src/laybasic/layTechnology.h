@@ -30,6 +30,7 @@
 #include "tlString.h"
 #include "tlEvents.h"
 #include "tlXMLParser.h"
+#include "tlTypeTraits.h"
 #include "dbStreamLayers.h"
 #include "dbLoadLayoutOptions.h"
 #include "dbSaveLayoutOptions.h"
@@ -819,6 +820,17 @@ public:
   }
 };
 
+}
+
+namespace tl
+{
+  /**
+   *  @brief Type traits
+   */
+  template <> struct type_traits <lay::TechnologyComponent> : public type_traits<void> {
+    typedef tl::false_tag has_default_constructor;
+    typedef tl::false_tag has_copy_constructor;
+  };
 }
 
 #endif

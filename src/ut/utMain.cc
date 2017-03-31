@@ -26,6 +26,7 @@
 #include "pya.h"
 #include "tlStaticObjects.h"
 #include "tlTimer.h"
+#include "tlSystemPaths.h"
 #include "layApplication.h"
 #include "gsiExpression.h"
 #include "gsiExternalMain.h"
@@ -761,6 +762,9 @@ main_cont (int argc, char **argv)
 {
   pya::PythonInterpreter::initialize ();
   gsi::initialize_external ();
+
+  //  No side effects
+  tl::set_klayout_path (std::vector<std::string> ());
 
   int ac = 2;
   static char av0[] = "unit_test";

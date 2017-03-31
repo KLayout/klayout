@@ -85,7 +85,7 @@ void run_rubytest (ut::TestBase * /*_this*/, const std::string &fn)
 }
 
 #define RUBYTEST(n, file) \
-  TEST(2_##n) { run_rubytest(_this, file); }
+  TEST(n) { run_rubytest(_this, file); }
 
 RUBYTEST (antTest, "antTest.rb")
 RUBYTEST (dbBooleanTest, "dbBooleanTest.rb")
@@ -123,6 +123,7 @@ RUBYTEST (layLayoutView, "layLayoutView.rb")
 RUBYTEST (layMarkers, "layMarkers.rb")
 RUBYTEST (layMenuTest, "layMenuTest.rb")
 RUBYTEST (laySession, "laySession.rb")
+RUBYTEST (layTechnologies, "layTechnologies.rb")
 #if defined(HAVE_QTBINDINGS)
 RUBYTEST (qtbinding, "qtbinding.rb")
 #endif

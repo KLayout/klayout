@@ -888,7 +888,7 @@ TEST (9)
   lay::LayerPropertiesList list;
   list.load (s);
 
-  EXPECT_EQ (size (list), 8);
+  EXPECT_EQ (size (list), size_t (8));
 
   size_t n, nn;
   
@@ -917,7 +917,7 @@ TEST (9)
     }
     EXPECT_EQ (iter3 == end, true);
   }
-  EXPECT_EQ (n, 8);
+  EXPECT_EQ (n, size_t (8));
 }
 
 TEST (10)
@@ -954,7 +954,7 @@ TEST (10)
 
   lay::LayerPropertiesList org_list = list;
 
-  EXPECT_EQ (size (list), 8);
+  EXPECT_EQ (size (list), size_t (8));
 
   std::vector<lay::LayerPropertiesNode> nodes;
   std::vector<size_t> positions;
@@ -969,7 +969,7 @@ TEST (10)
     list.erase (iter);
   }
 
-  EXPECT_EQ (nodes.size (), 8);
+  EXPECT_EQ (nodes.size (), size_t (8));
 
   for (unsigned int i = 0; i < 8; ++i) {
     lay::LayerPropertiesIterator iter (list, positions.back ());
@@ -987,7 +987,7 @@ TEST (10)
     list.erase (iter);
   }
 
-  EXPECT_EQ (nodes.size (), 2);
+  EXPECT_EQ (nodes.size (), size_t (2));
 
   for (unsigned int i = 0; i < 2; ++i) {
     lay::LayerPropertiesIterator iter (list, positions.back ());

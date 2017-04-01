@@ -36,29 +36,29 @@ TEST(1)
 
   db::cut_polygon (in, db::Edge (db::Point (0, 500), db::Point (1, 500)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,500;1000,500;1000,0)");
 
   right_of.clear ();
 
   db::cut_polygon (in, db::Edge (db::Point (0, -100), db::Point (1, -100)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 0);
+  EXPECT_EQ (right_of.size (), size_t (0));
 
   right_of.clear ();
 
   db::cut_polygon (in, db::Edge (db::Point (0, 0), db::Point (1, 0)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 0);
+  EXPECT_EQ (right_of.size (), size_t (0));
 
   right_of.clear ();
 
   db::cut_polygon (in, db::Edge (db::Point (0, 1000), db::Point (1, 1000)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,1000;1000,1000;1000,0)");
 
   right_of.clear ();
 
   db::cut_polygon (in, db::Edge (db::Point (0, 1001), db::Point (1, 1001)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,1000;1000,1000;1000,0)");
 }
 
@@ -86,41 +86,41 @@ TEST(2)
 
   db::cut_polygon (in, db::Edge (db::Point (0, 200), db::Point (1, 200)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 2);
+  EXPECT_EQ (right_of.size (), size_t (2));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,200;100,200;100,100;200,100;200,0)");
   EXPECT_EQ (right_of[1].to_string (), "(300,0;300,200;400,200;400,100;600,100;600,200;700,200;700,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 100), db::Point (1, 100)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 2);
+  EXPECT_EQ (right_of.size (), size_t (2));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;200,100;200,0)");
   EXPECT_EQ (right_of[1].to_string (), "(300,0;300,100;700,100;700,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 50), db::Point (1, 50)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 2);
+  EXPECT_EQ (right_of.size (), size_t (2));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,50;200,50;200,0)");
   EXPECT_EQ (right_of[1].to_string (), "(300,0;300,50;700,50;700,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 300), db::Point (1, 300)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 2);
+  EXPECT_EQ (right_of.size (), size_t (2));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,300;100,300;100,100;200,100;200,0)");
   EXPECT_EQ (right_of[1].to_string (), "(300,0;300,300;400,300;400,100;600,100;600,300;700,300;700,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 400), db::Point (1, 400)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,400;400,400;400,100;600,100;600,300;700,300;700,0;300,0;300,300;100,300;100,100;200,100;200,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 500), db::Point (1, 500)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,400;400,400;400,100;600,100;600,300;700,300;700,0;300,0;300,300;100,300;100,100;200,100;200,0)");
 }
 
@@ -146,19 +146,19 @@ TEST(3)
   std::vector<db::Polygon> right_of;
   db::cut_polygon (in, db::Edge (db::Point (0, 200), db::Point (1, 200)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,200;100,200;100,100;200,100;200,200;400,200;400,100;500,100;500,200;1000,200;1000,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 50), db::Point (1, 50)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,50;1000,50;1000,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 500), db::Point (1, 500)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,500;1000,500;1000,0/100,100;200,100;200,400;100,400/400,100;500,100;500,400;400,400)");
 }
 
@@ -182,38 +182,38 @@ TEST(4)
 
   db::cut_polygon (in, db::Edge (db::Point (0, 300), db::Point (1, 300)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,300;400,300;400,200;300,200;300,100;400,100;400,300;600,300;600,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (1, 300), db::Point (0, 300)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 2);
+  EXPECT_EQ (right_of.size (), size_t (2));
   EXPECT_EQ (right_of[0].to_string (), "(400,300;400,400;600,400;600,300)");
   EXPECT_EQ (right_of[1].to_string (), "(0,300;0,400;400,400;400,300)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 50), db::Point (1, 50)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,50;600,50;600,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 100), db::Point (1, 100)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;600,100;600,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 150), db::Point (1, 150)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,150;300,150;300,100;400,100;400,150;600,150;600,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (0, 200), db::Point (1, 200)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,200;300,200;300,100;400,100;400,200;600,200;600,0)");
 
 }
@@ -287,7 +287,7 @@ TEST(5)
 
   db::cut_polygon (in, db::Edge (db::Point (565, 1), db::Point (565, 0)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,884;565,884;565,332;72,332;72,313;89,313;89,332;565,332;565,327;173,327;173,304;211,304;211,327;565,327;565,302;174,302;174,275;212,275;212,302;565,302;565,268;47,268;47,257;62,257;62,268;565,268;565,243;49,243;49,231;63,231;63,243;565,243;565,214;72,214;72,194;93,194;93,214;565,214;565,77;5,77;5,15;67,15;67,77;565,77;565,38;328,38;328,17;405,17;405,38;565,38;565,0)");
 }
 
@@ -310,7 +310,7 @@ TEST(6)
 
   db::cut_polygon (in, db::Edge (db::Point (0, 200), db::Point (1, 200)), std::back_inserter (right_of));
 
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;100,100;200,200;300,100;400,100;400,200;500,200;500,0)");
   c.push_back (db::Point ());
 }
@@ -330,12 +330,12 @@ TEST(7)
   std::vector<db::Polygon> right_of;
 
   db::cut_polygon (in, db::Edge (db::Point (2, 0), db::Point (2, 1)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(2,0;2,1;3,1;3,0)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (2, 1), db::Point (2, 0)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,1;2,1;2,0)");
 
 }
@@ -359,13 +359,13 @@ TEST(8)
   std::vector<db::Polygon> right_of;
 
   db::cut_polygon (in, db::Edge (db::Point (200, 0), db::Point (200, 1)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 2);
+  EXPECT_EQ (right_of.size (), size_t (2));
   EXPECT_EQ (right_of[0].to_string (), "(200,0;200,50;300,50;300,0)");
   EXPECT_EQ (right_of[1].to_string (), "(200,200;200,300;300,300)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (200, 1), db::Point (200, 0)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(0,0;0,300;200,300;200,200;100,200;100,100;200,200;150,50;200,50;200,0)");
 
 }
@@ -395,13 +395,13 @@ TEST(9)
   std::vector<db::Polygon> right_of;
 
   db::cut_polygon (in, db::Edge (db::Point (200, 0), db::Point (200, 1)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 2);
+  EXPECT_EQ (right_of.size (), size_t (2));
   EXPECT_EQ (right_of[0].to_string (), "(200,0;200,200;250,200;250,100;300,100;300,200;200,200;200,400;400,400;400,0)");
   EXPECT_EQ (right_of[1].to_string (), "(200,400;200,500;400,500;400,400)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (200, 1), db::Point (200, 0)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 2);
+  EXPECT_EQ (right_of.size (), size_t (2));
   EXPECT_EQ (right_of[0].to_string (), "(0,200;0,500;200,500;200,400;100,400;100,300;150,300;150,400;200,400;200,200)");
   EXPECT_EQ (right_of[1].to_string (), "(0,0;0,200;200,200;200,0)");
 }
@@ -477,7 +477,7 @@ TEST(9a)
   std::vector<db::Polygon> right_of;
 
   db::cut_polygon (in, db::Edge (db::Point (1016, 0), db::Point (1016, 1)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 4);
+  EXPECT_EQ (right_of.size (), size_t (4));
   EXPECT_EQ (right_of[0].to_string (), "(1016,10230;1016,10259;1027,10252;1037,10266;1021,10280;1034,10280;1038,10269;1039,10277;1036,10285;1090,10285;1090,10252;1027,10252;1017,10237;1019,10230)");
   EXPECT_EQ (right_of[1].to_string (), "(1016,10265;1016,10280;1021,10280)");
   EXPECT_EQ (right_of[2].to_string (), "(1016,10280;1016,10283;1017,10283;1016,10284;1016,10288;1024,10288;1022,10283;1032,10285;1027,10297;1031,10297;1036,10285;1041,10286;1043,10302;1090,10302;1090,10285;1032,10285;1034,10280)");
@@ -485,7 +485,7 @@ TEST(9a)
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (1016, 1), db::Point (1016, 0)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 2);
+  EXPECT_EQ (right_of.size (), size_t (2));
   EXPECT_EQ (right_of[0].to_string (), "(942,10230;994,10274;988,10278;999,10278;994,10274;1007,10265;1002,10280;1016,10280;1016,10265;1007,10265;1012,10252;1014,10260;1007,10265;1016,10265;1014,10260;1016,10259;1016,10230;942,10230;942,10281;983,10281;988,10278;1002,10280;994,10302;1016,10302;1016,10288;1011,10288;1003,10281;1016,10283;1016,10280;1002,10280;999,10278;988,10278;943,10272)");
   EXPECT_EQ (right_of[1].to_string (), "(1016,10284;1011,10288;1016,10288)");
 }
@@ -514,12 +514,12 @@ TEST(9b)
   std::vector<db::Polygon> right_of;
 
   db::cut_polygon (in, db::Edge (db::Point (1007, 0), db::Point (1007, 1)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(1007,10230;1007,10265;1012,10252;1014,10260;1007,10265;1016,10265;1014,10260;1016,10259;1016,10230)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (1007, 1), db::Point (1007, 0)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(942,10230;942,10265;943,10265;942,10230;983,10265;1007,10265;1007,10230)");
 
 }
@@ -559,14 +559,14 @@ TEST(9c)
   std::vector<db::Polygon> right_of;
 
   db::cut_polygon (in, db::Edge (db::Point (15835, 0), db::Point (15835, 1)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 3);
+  EXPECT_EQ (right_of.size (), size_t (3));
   EXPECT_EQ (right_of[0].to_string (), "(17335,8265;16335,9265;15835,9265;15835,9765;17335,9765)");
   EXPECT_EQ (right_of[1].to_string (), "(15835,9765;16002,9932;15835,10015;17335,10015;17335,9765)");
   EXPECT_EQ (right_of[2].to_string (), "(15835,10015;15835,10265;17335,10265;17335,10015)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (15835, 1), db::Point (15835, 0)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(14335,8265;14335,10265;15335,10265;15335,9765;15668,9932;15335,10265;15835,10265;15835,10015;15668,9932;15835,9765;15335,9765;14335,9265;15335,9265;15335,9765;15835,9765;15835,9265;15335,9265)");
 }
 
@@ -592,12 +592,12 @@ TEST(9d)
   std::vector<db::Polygon> right_of;
 
   db::cut_polygon (in, db::Edge (db::Point (16002, 0), db::Point (16002, 1)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 1);
+  EXPECT_EQ (right_of.size (), size_t (1));
   EXPECT_EQ (right_of[0].to_string (), "(17335,8265;16335,9265;16002,9265;16002,10265;17335,10265)");
 
   right_of.clear ();
   db::cut_polygon (in, db::Edge (db::Point (16002, 1), db::Point (16002, 0)), std::back_inserter (right_of));
-  EXPECT_EQ (right_of.size (), 2);
+  EXPECT_EQ (right_of.size (), size_t (2));
   EXPECT_EQ (right_of[0].to_string (), "(15668,9932;15335,10265;16002,10265;16002,9932;15835,10015)");
   EXPECT_EQ (right_of[1].to_string (), "(15335,9265;15335,9765;15668,9932;15835,9765;16002,9932;16002,9265)");
 }
@@ -1284,7 +1284,7 @@ TEST(200)
     unsigned int n;
     db::Polygon pr;
     db::Polygon pp = compute_rounded (p, 0, 20000, 200);
-    EXPECT_EQ (pp.hull ().size (), 200);
+    EXPECT_EQ (pp.hull ().size (), size_t (200));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
     
     EXPECT_EQ (tl::to_string (rinner),  "0");
@@ -1298,7 +1298,7 @@ TEST(200)
     unsigned int n;
     db::Polygon pr;
     db::Polygon pp = compute_rounded (p, 0, 50000, 200);
-    EXPECT_EQ (pp.hull ().size (), 200);
+    EXPECT_EQ (pp.hull ().size (), size_t (200));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
     
     EXPECT_EQ (tl::to_string (rinner),  "0");
@@ -1312,7 +1312,7 @@ TEST(200)
     unsigned int n;
     db::Polygon pr;
     db::Polygon pp = compute_rounded (p, 0, 70000, 200);
-    EXPECT_EQ (pp.hull ().size (), 200);
+    EXPECT_EQ (pp.hull ().size (), size_t (200));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
     
     EXPECT_EQ (tl::to_string (rinner),  "0");
@@ -1340,7 +1340,7 @@ TEST(201)
     unsigned int n;
     db::Polygon pr;
     db::Polygon pp = compute_rounded (p, 0, 50000, 200);
-    EXPECT_EQ (pp.hull ().size (), 200);
+    EXPECT_EQ (pp.hull ().size (), size_t (200));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
     
     EXPECT_EQ (tl::to_string (rinner),  "0");
@@ -1380,7 +1380,7 @@ TEST(202)
     unsigned int n;
     db::Polygon pr;
     db::Polygon pp = compute_rounded (p, 50000, 150000, 200);
-    EXPECT_EQ (pp.hull ().size (), 300);
+    EXPECT_EQ (pp.hull ().size (), size_t (300));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
     
     EXPECT_EQ (tl::to_string (rinner),  "50000");
@@ -1394,7 +1394,7 @@ TEST(202)
     unsigned int n;
     db::Polygon pr;
     db::Polygon pp = compute_rounded (p, 100000, 150000, 200);
-    EXPECT_EQ (pp.hull ().size (), 300);
+    EXPECT_EQ (pp.hull ().size (), size_t (300));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
     
     EXPECT_EQ (tl::to_string (rinner),  "92000");
@@ -1419,7 +1419,7 @@ TEST(202)
     ep.simple_merge (in, out, false /*no cut line*/);
     pp = out.front ();
 
-    EXPECT_EQ (pp.hull ().size (), 301);
+    EXPECT_EQ (pp.hull ().size (), size_t (301));
     EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
     
     EXPECT_EQ (tl::to_string (rinner),  "50000");
@@ -1470,7 +1470,7 @@ TEST(203)
   pp = out.front ();
   pp = smooth (pp, 1);
 
-  EXPECT_EQ (pp.hull ().size (), 300);
+  EXPECT_EQ (pp.hull ().size (), size_t (300));
   EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
   
   EXPECT_EQ (tl::to_string (rinner),  "5000");
@@ -1516,7 +1516,7 @@ TEST(204)
   pp = out.front ();
   pp = smooth (pp, 1);
 
-  EXPECT_EQ (pp.hull ().size (), 200);
+  EXPECT_EQ (pp.hull ().size (), size_t (200));
   EXPECT_EQ (extract_rad (pp, rinner, router, n, &pr), true);
   
   EXPECT_EQ (tl::to_string (rinner),  "10000");

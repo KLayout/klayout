@@ -69,7 +69,7 @@ TEST(2)
   EXPECT_EQ (t < tt, false);
   EXPECT_EQ (tt < t, false);
 
-  EXPECT_EQ (rep.size (), 1);
+  EXPECT_EQ (rep.size (), size_t (1));
 
   rep.change_string_ref (ref, "NOCHWAS");
   EXPECT_EQ (std::string (t.string ()), "NOCHWAS");
@@ -80,12 +80,12 @@ TEST(2)
   EXPECT_EQ (t < tt, false);
   EXPECT_EQ (tt < t, false);
 
-  EXPECT_EQ (rep.size (), 1);
+  EXPECT_EQ (rep.size (), size_t (1));
 
   t = db::Text ();
   tt = db::Text ();
 
-  EXPECT_EQ (rep.size (), 0);
+  EXPECT_EQ (rep.size (), size_t (0));
 }
 
 TEST(3)

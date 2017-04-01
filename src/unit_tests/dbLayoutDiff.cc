@@ -669,16 +669,16 @@ TEST(2P)
     db::PropertiesRepository::properties_set ps;
     ps.insert (std::make_pair (g.properties_repository ().prop_name_id ("A"), tl::Variant (1)));
     pi1 = g.properties_repository ().properties_id (ps);
-    EXPECT_EQ (pi1, 1);
+    EXPECT_EQ (pi1, db::properties_id_type (1));
 
     ps.clear ();
     ps.insert (std::make_pair (g.properties_repository ().prop_name_id ("B"), tl::Variant (2)));
     pi2 = g.properties_repository ().properties_id (ps);
-    EXPECT_EQ (pi2, 2);
+    EXPECT_EQ (pi2, db::properties_id_type (2));
 
     ps.insert (std::make_pair (g.properties_repository ().prop_name_id ("C"), tl::Variant ("c")));
     pi3 = g.properties_repository ().properties_id (ps);
-    EXPECT_EQ (pi3, 3);
+    EXPECT_EQ (pi3, db::properties_id_type (3));
 
     EXPECT_EQ (ps2string (g.properties_repository (), 1), "A:1");
     EXPECT_EQ (ps2string (g.properties_repository (), 2), "B:2");

@@ -48,24 +48,24 @@ TEST(1)
   db::EdgesToContours e2c;
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), false);
 
-  EXPECT_EQ (e2c.contours (), 1);
+  EXPECT_EQ (e2c.contours (), size_t (1));
   EXPECT_EQ (c2s (e2c.contour (0)), "0,0;100,0;100,100;0,100;0,0");
 
   edges [0].swap_points ();
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), false);
 
-  EXPECT_EQ (e2c.contours (), 2);
+  EXPECT_EQ (e2c.contours (), size_t (2));
   EXPECT_EQ (c2s (e2c.contour (0)), "100,0;0,0");
   EXPECT_EQ (c2s (e2c.contour (1)), "100,0;100,100;0,100;0,0");
 
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), true);
-  EXPECT_EQ (e2c.contours (), 1);
+  EXPECT_EQ (e2c.contours (), size_t (1));
   EXPECT_EQ (c2s (e2c.contour (0)), "100,0;0,0;0,100;100,100;100,0");
 
   edges [2].swap_points ();
 
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), true);
-  EXPECT_EQ (e2c.contours (), 1);
+  EXPECT_EQ (e2c.contours (), size_t (1));
   EXPECT_EQ (c2s (e2c.contour (0)), "100,0;0,0;0,100;100,100;100,0");
 }
 
@@ -84,7 +84,7 @@ TEST(2)
   db::EdgesToContours e2c;
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), true);
 
-  EXPECT_EQ (e2c.contours (), 2);
+  EXPECT_EQ (e2c.contours (), size_t (2));
   EXPECT_EQ (c2s (e2c.contour (0)), "-100,-100;100,-100;0,0;-100,-100");
   EXPECT_EQ (c2s (e2c.contour (1)), "200,-50;0,0;-200,-50;0,100;200,-50");
 
@@ -92,7 +92,7 @@ TEST(2)
 
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), true);
 
-  EXPECT_EQ (e2c.contours (), 2);
+  EXPECT_EQ (e2c.contours (), size_t (2));
   EXPECT_EQ (c2s (e2c.contour (0)), "200,-50;0,100;-200,-50;0,0;200,-50");
   EXPECT_EQ (c2s (e2c.contour (1)), "100,-100;0,0;-100,-100;100,-100");
 
@@ -113,7 +113,7 @@ TEST(3)
   db::EdgesToContours e2c;
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), false);
 
-  EXPECT_EQ (e2c.contours (), 2);
+  EXPECT_EQ (e2c.contours (), size_t (2));
   EXPECT_EQ (c2s (e2c.contour (0)), "-100,-100;100,-100;0,0;-100,-100");
   EXPECT_EQ (c2s (e2c.contour (1)), "0,0;200,-50;0,100;-200,-50;0,0");
 
@@ -121,7 +121,7 @@ TEST(3)
 
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), false);
 
-  EXPECT_EQ (e2c.contours (), 2);
+  EXPECT_EQ (e2c.contours (), size_t (2));
   EXPECT_EQ (c2s (e2c.contour (0)), "200,-50;0,100;-200,-50;0,0;200,-50");
   EXPECT_EQ (c2s (e2c.contour (1)), "100,-100;0,0;-100,-100;100,-100");
 
@@ -145,7 +145,7 @@ TEST(4)
   db::EdgesToContours e2c;
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), false);
 
-  EXPECT_EQ (e2c.contours (), 1);
+  EXPECT_EQ (e2c.contours (), size_t (1));
   EXPECT_EQ (c2s (e2c.contour (0)), "0,0;0,100;-100,100;-100,200;200,200;200,100;0,100;0,200;100,200;100,0;0,0");
 }
 
@@ -166,7 +166,7 @@ TEST(5)
   db::EdgesToContours e2c;
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), false);
 
-  EXPECT_EQ (e2c.contours (), 1);
+  EXPECT_EQ (e2c.contours (), size_t (1));
   EXPECT_EQ (c2s (e2c.contour (0)), "0,0;0,100;-100,100;-100,200;200,200;200,100;0,100;0,200;100,200;100,0");
 }
 
@@ -186,7 +186,7 @@ TEST(6)
   db::EdgesToContours e2c;
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), false);
 
-  EXPECT_EQ (e2c.contours (), 2);
+  EXPECT_EQ (e2c.contours (), size_t (2));
   EXPECT_EQ (c2s (e2c.contour (0)), "0,0;100,0;100,100;0,100;0,0");
   EXPECT_EQ (c2s (e2c.contour (1)), "1000,0;1100,0;1100,100;1000,100;1000,0");
 }
@@ -211,7 +211,7 @@ TEST(7)
   db::EdgesToContours e2c;
   e2c.fill (&edges[0], &edges[0] + (sizeof (edges) / sizeof (edges [0])), false);
 
-  EXPECT_EQ (e2c.contours (), 1);
+  EXPECT_EQ (e2c.contours (), size_t (1));
   EXPECT_EQ (c2s (e2c.contour (0)), "0,0;0,100;200,100;400,100;400,0;300,0;300,100;200,100;200,0;200,100;100,100;100,0;0,0");
 }
 

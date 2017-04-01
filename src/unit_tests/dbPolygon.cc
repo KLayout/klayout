@@ -49,9 +49,9 @@ TEST(1)
   c1.push_back (db::Point (100, 0));
   p.assign_hull (c1.begin (), c1.end ());
   b = p.box ();
-  EXPECT_EQ (p.holes (), 0);
+  EXPECT_EQ (p.holes (), size_t (0));
   EXPECT_EQ (p.area (), 1000*100);
-  EXPECT_EQ (p.perimeter (), 2200);
+  EXPECT_EQ (p.perimeter (), db::Polygon::perimeter_type (2200));
   EXPECT_EQ (p.is_box (), true);
 
   c2.push_back (db::Point (10, 10));
@@ -65,28 +65,28 @@ TEST(1)
   c3.push_back (db::Point (90, 890));
   c3.push_back (db::Point (90, 510));
   p.insert_hole (c3.begin (), c3.end ());
-  EXPECT_EQ (p.holes (), 2);
+  EXPECT_EQ (p.holes (), size_t (2));
 
   EXPECT_EQ (p.to_string (), std::string ("(0,0;0,1000;100,1000;100,0/10,10;90,10;90,390;10,390/10,510;90,510;90,890;10,890)"));
   db::DPolygon dp (p, db::cast_op<db::DPoint, db::Point> ());
   EXPECT_EQ (dp.to_string (), std::string ("(0,0;0,1000;100,1000;100,0/10,10;90,10;90,390;10,390/10,510;90,510;90,890;10,890)"));
   db::Polygon ip = db::Polygon (dp);
   EXPECT_EQ (ip.to_string (), std::string ("(0,0;0,1000;100,1000;100,0/10,10;90,10;90,390;10,390/10,510;90,510;90,890;10,890)"));
-  EXPECT_EQ (ip.vertices (), 12);
+  EXPECT_EQ (ip.vertices (), size_t (12));
 
   EXPECT_EQ (p.area (), 1000*100-2*380*80);
-  EXPECT_EQ (p.perimeter (), 2000+200+4*(380+80));
+  EXPECT_EQ (p.perimeter (), db::Polygon::perimeter_type (2000+200+4*(380+80)));
   EXPECT_EQ (p.is_box (), false);
   EXPECT_EQ (p.box (), b);
 
-  unsigned e = 0;
+  unsigned int e = 0;
   db::Edge::distance_type u = 0;
   for (db::Polygon::polygon_edge_iterator i = p.begin_edge (); ! i.at_end (); ++i) {
     ++e;
     u += (*i).length ();
   }
-  EXPECT_EQ (e, 12);
-  EXPECT_EQ (u, 2*(1000+100)+4*(380+80));
+  EXPECT_EQ (e, (unsigned int) 12);
+  EXPECT_EQ (u, db::Edge::distance_type (2*(1000+100)+4*(380+80)));
 
   db::Polygon pp;
   pp.insert_hole (c3.begin (), c3.end ());
@@ -133,9 +133,9 @@ TEST(2)
   c1.push_back (db::Point (100, 0));
   p.assign_hull (c1.begin (), c1.end ());
   b = p.box ();
-  EXPECT_EQ (p.holes (), 0);
+  EXPECT_EQ (p.holes (), size_t (0));
   EXPECT_EQ (p.area (), 1000*100);
-  EXPECT_EQ (p.perimeter (), 2000+200);
+  EXPECT_EQ (p.perimeter (), db::SimplePolygon::perimeter_type (2000+200));
   EXPECT_EQ (p.is_box (), true);
 
   EXPECT_EQ (p.to_string (), "(0,0;0,1000;100,1000;100,0)");
@@ -144,14 +144,14 @@ TEST(2)
   db::SimplePolygon ip = db::SimplePolygon (dp);
   EXPECT_EQ (ip.to_string (), "(0,0;0,1000;100,1000;100,0)");
 
-  unsigned e = 0;
+  unsigned int e = 0;
   db::Edge::distance_type u = 0;
   for (db::SimplePolygon::polygon_edge_iterator i = p.begin_edge (); ! i.at_end (); ++i) {
     ++e;
     u += (*i).length ();
   }
-  EXPECT_EQ (e, 4);
-  EXPECT_EQ (u, 2*(1000+100));
+  EXPECT_EQ (e, (unsigned int) 4);
+  EXPECT_EQ (u, db::Edge::distance_type (2*(1000+100)));
 
   db::SimplePolygon pp;
   pp = p;
@@ -207,7 +207,7 @@ TEST(3)
     }
     contour.assign (c1.begin (), c1.end (), false);
 
-    EXPECT_EQ (contour.size (), 6);
+    EXPECT_EQ (contour.size (), size_t (6));
     EXPECT_EQ (contour.is_hole (), false);
     EXPECT_EQ (contour.mem_used (), 3 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (100,100));
@@ -219,7 +219,7 @@ TEST(3)
 
     contour.assign (c1.begin (), c1.end (), true);
 
-    EXPECT_EQ (contour.size (), 6);
+    EXPECT_EQ (contour.size (), size_t (6));
     EXPECT_EQ (contour.is_hole (), true);
     EXPECT_EQ (contour.mem_used (), 3 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (100,100));
@@ -238,7 +238,7 @@ TEST(3)
     contour2.transform (t.inverted ());
     EXPECT_EQ (contour2 == contour, true);
 
-    EXPECT_EQ (contour2.size (), 6);
+    EXPECT_EQ (contour2.size (), size_t (6));
     EXPECT_EQ (contour2.is_hole (), true);
     EXPECT_EQ (contour2.mem_used (), 3 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour2[0], db::Point (100,100));
@@ -274,7 +274,7 @@ TEST(4)
     }
     contour.assign (c1.begin (), c1.end (), false);
 
-    EXPECT_EQ (contour.size (), 5);
+    EXPECT_EQ (contour.size (), size_t (5));
     EXPECT_EQ (contour.is_hole (), false);
     EXPECT_EQ (contour.mem_used (), 5 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (100,100));
@@ -285,7 +285,7 @@ TEST(4)
 
     contour.assign (c1.begin (), c1.end (), true);
 
-    EXPECT_EQ (contour.size (), 5);
+    EXPECT_EQ (contour.size (), size_t (5));
     EXPECT_EQ (contour.is_hole (), true);
     EXPECT_EQ (contour.mem_used (), 5 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (100,100));
@@ -304,7 +304,7 @@ TEST(4)
     contour2.transform (t.inverted ());
     EXPECT_EQ (contour2 == contour, true);
 
-    EXPECT_EQ (contour2.size (), 5);
+    EXPECT_EQ (contour2.size (), size_t (5));
     EXPECT_EQ (contour2.is_hole (), true);
     EXPECT_EQ (contour2.mem_used (), 5 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour2[0], db::Point (100,100));
@@ -327,7 +327,7 @@ TEST(5)
   c1.push_back (db::Point (100, 1000));
   c1.push_back (db::Point (100, 0));
   p.assign_hull (c1.begin (), c1.end ());
-  EXPECT_EQ (p.vertices (), 4);
+  EXPECT_EQ (p.vertices (), size_t (4));
 
   std::vector <db::Point> c2;
   c2.push_back (db::Point (10, 10));
@@ -335,7 +335,7 @@ TEST(5)
   c2.push_back (db::Point (20, 110));
   c2.push_back (db::Point (20, 10));
   p.insert_hole (c2.begin (), c2.end ());
-  EXPECT_EQ (p.vertices (), 8);
+  EXPECT_EQ (p.vertices (), size_t (8));
 
   {
     db::Polygon::polygon_contour_iterator pt = p.begin_hull ();
@@ -417,9 +417,9 @@ TEST(5)
   }
 
   EXPECT_EQ (p.area (), 100*1000-10*100);
-  EXPECT_EQ (p.perimeter (), 200+2000+20+200);
+  EXPECT_EQ (p.perimeter (), db::Polygon::perimeter_type (200+2000+20+200));
   EXPECT_EQ (pref.area (), 100*1000-10*100);
-  EXPECT_EQ (pref.perimeter (), 200+2000+20+200);
+  EXPECT_EQ (pref.perimeter (), db::Polygon::perimeter_type (200+2000+20+200));
 
 }
 
@@ -551,7 +551,7 @@ TEST(7)
     }
     contour.assign (c1.begin (), c1.end (), false);
 
-    EXPECT_EQ (contour.size (), 6);
+    EXPECT_EQ (contour.size (), size_t (6));
     EXPECT_EQ (contour.is_hole (), false);
     EXPECT_EQ (contour.mem_used (), 6 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (0,0));
@@ -563,7 +563,7 @@ TEST(7)
 
     contour.assign (c1.begin (), c1.end (), true);
 
-    EXPECT_EQ (contour.size (), 6);
+    EXPECT_EQ (contour.size (), size_t (6));
     EXPECT_EQ (contour.is_hole (), true);
     EXPECT_EQ (contour.mem_used (), 6 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (0,0));
@@ -582,7 +582,7 @@ TEST(7)
     contour2.transform (t.inverted ());
     EXPECT_EQ (contour2 == contour, true);
 
-    EXPECT_EQ (contour2.size (), 6);
+    EXPECT_EQ (contour2.size (), size_t (6));
     EXPECT_EQ (contour2.is_hole (), true);
     EXPECT_EQ (contour2.mem_used (), 6 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour2[0], db::Point (0,0));
@@ -880,22 +880,22 @@ TEST(13M)
   p.assign_hull (pts.begin (), pts.end (), false /*not compressed*/);
 
   EXPECT_EQ (p.to_string(), "(0,0;0,2000;1000,2000;1000,3000;1000,2000;1000,2000;1000,2000;1000,1500;1000,1000;1000,0)");
-  EXPECT_EQ (p.vertices (), 10);
+  EXPECT_EQ (p.vertices (), size_t (10));
 
   p.compress (true /*remove reflected*/);
 
   EXPECT_EQ (p.to_string(), "(0,0;0,2000;1000,2000;1000,0)");
-  EXPECT_EQ (p.vertices (), 4);
+  EXPECT_EQ (p.vertices (), size_t (4));
 
   p.assign_hull (pts.begin (), pts.end (), true /*compressed*/);
 
   EXPECT_EQ (p.to_string(), "(0,0;0,2000;1000,2000;1000,3000;1000,0)");
-  EXPECT_EQ (p.vertices (), 5);
+  EXPECT_EQ (p.vertices (), size_t (5));
 
   p.assign_hull (pts.begin (), pts.end (), true /*compressed*/, true /*remove reflected*/);
 
   EXPECT_EQ (p.to_string(), "(0,0;0,2000;1000,2000;1000,0)");
-  EXPECT_EQ (p.vertices (), 4);
+  EXPECT_EQ (p.vertices (), size_t (4));
 
 }
 
@@ -952,12 +952,12 @@ TEST(14S)
   p.assign_hull (pts.begin (), pts.end (), false /*not compressed*/);
 
   EXPECT_EQ (p.to_string(), "(0,0;0,2000;1000,2000;1000,3000;1000,2000;1000,2000;1000,2000;1000,1500;1000,1000;500,500;200,200)");
-  EXPECT_EQ (p.vertices (), 11);
+  EXPECT_EQ (p.vertices (), size_t (11));
 
   p.compress (true);
 
   EXPECT_EQ (p.to_string(), "(0,0;0,2000;1000,2000;1000,1000)");
-  EXPECT_EQ (p.vertices (), 4);
+  EXPECT_EQ (p.vertices (), size_t (4));
 
   p.assign_hull (pts.begin (), pts.end (), true /*not compressed*/);
 

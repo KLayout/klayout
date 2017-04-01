@@ -780,8 +780,8 @@ TEST(100)
 
     }
 
-    EXPECT_EQ (top_cell.shapes (ltmp1).size (), 0);
-    EXPECT_EQ (top_cell.shapes (ltmp2).size (), 0);
+    EXPECT_EQ (top_cell.shapes (ltmp1).size (), size_t (0));
+    EXPECT_EQ (top_cell.shapes (ltmp2).size (), size_t (0));
 
   }
 

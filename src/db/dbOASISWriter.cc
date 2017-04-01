@@ -25,7 +25,7 @@
 #include "dbPolygonGenerators.h"
 
 #include "tlDeflate.h"
-#include "tlUtils.h"
+#include "tlMath.h"
 
 #include <math.h>
 

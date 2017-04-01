@@ -122,13 +122,13 @@ TEST(7)
 
   std::vector <std::string> v;
   EXPECT_EQ (a.match ("abcg", v), true);
-  EXPECT_EQ (v.size (), 3);
+  EXPECT_EQ (v.size (), size_t (3));
   EXPECT_EQ (v[0], "abc");
   EXPECT_EQ (v[1], "bc");
   EXPECT_EQ (v[2], "g");
 
   EXPECT_EQ (a.match ("bc", v), true);
-  EXPECT_EQ (v.size (), 3);
+  EXPECT_EQ (v.size (), size_t (3));
   EXPECT_EQ (v[0], "bc");
   EXPECT_EQ (v[1], "bc");
   EXPECT_EQ (v[2], "");
@@ -147,7 +147,7 @@ TEST(8)
   a.set_case_sensitive (false);
   EXPECT_EQ (a.case_sensitive (), false);
   EXPECT_EQ (a.match ("aBcG", v), true);
-  EXPECT_EQ (v.size (), 3);
+  EXPECT_EQ (v.size (), size_t (3));
   EXPECT_EQ (v[0], "aBc");
   EXPECT_EQ (v[1], "Bc");
   EXPECT_EQ (v[2], "G");

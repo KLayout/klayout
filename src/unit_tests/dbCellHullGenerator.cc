@@ -258,8 +258,8 @@ TEST(2)
   hull.clear ();
   chg.set_complexity (0);
   chg.generate_hull (c1, hull);
-  EXPECT_EQ (hull.size (), 1);
-  EXPECT_EQ (hull.front ().holes (), 0);
+  EXPECT_EQ (hull.size (), size_t (1));
+  EXPECT_EQ (hull.front ().holes (), size_t (0));
   EXPECT_EQ (hull.front ().hull ().size () <= 8, true);
   EXPECT_EQ (check_hull (hull, c1.shapes (l1)), true);
 }

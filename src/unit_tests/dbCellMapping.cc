@@ -286,7 +286,7 @@ TEST(3)
 
       cm.clear ();
       nc = cm.create_from_geometry_full (h, b0.cell_index (), g, a0.cell_index ());
-      EXPECT_EQ (nc.size (), 0);
+      EXPECT_EQ (nc.size (), size_t (0));
       if (pass < 3) {
         if (order == 1) {
           EXPECT_EQ (m2sr (cm, g, h), "a0->b0;a5->b5;a4->b4");
@@ -354,7 +354,7 @@ TEST(4)
   cm.clear ();
   db::Layout hh = h;
   nc = cm.create_from_names_full (hh, b0.cell_index (), g, a0.cell_index ());
-  EXPECT_EQ (nc.size (), 0);
+  EXPECT_EQ (nc.size (), size_t (0));
   EXPECT_EQ (m2sr (cm, g, hh), "a0->a0top;a4->a4;a5->a5");
 }
 
@@ -410,7 +410,7 @@ TEST(5)
   cm.clear ();
   db::Layout hh = h;
   nc = cm.create_single_mapping_full (hh, b0.cell_index (), g, a0.cell_index ());
-  EXPECT_EQ (nc.size (), 2);
+  EXPECT_EQ (nc.size (), size_t (2));
   EXPECT_EQ (m2sr (cm, g, hh), "a0->a0top;a4->a4$1;a5->a5$1");
 
   EXPECT_EQ (l2s (g), "a0#0:cell_index=1 r90 0,0 array=(0,10,10,0 5x2),cell_index=2 r90 0,0 array=(0,10,10,0 5x2);a4#1:;a5#2:");
@@ -421,7 +421,7 @@ TEST(5)
   hh = h;
   hh.dbu (hh.dbu () * 0.5);
   nc = cm.create_single_mapping_full (hh, b0.cell_index (), g, a0.cell_index ());
-  EXPECT_EQ (nc.size (), 2);
+  EXPECT_EQ (nc.size (), size_t (2));
   EXPECT_EQ (m2sr (cm, g, hh), "a0->a0top;a4->a4$1;a5->a5$1");
 
   EXPECT_EQ (l2s (hh), "a0top#0:cell_index=4 r90 0,0 array=(0,10,10,0 5x1),cell_index=5 r90 0,0 array=(0,10,10,0 5x2),cell_index=1 r0 10,0,cell_index=6 r90 0,0 array=(0,20,20,0 5x2),cell_index=7 r90 0,0 array=(0,20,20,0 5x2);a1#1:cell_index=2 r0 0,0,cell_index=2 r0 0,20,cell_index=3 r0 0,40;a2#2:cell_index=3 r0 0,0,cell_index=3 r0 0,10;a3#3:cell_index=4 r90 0,0;a4#4:;a5#5:;a4$1#6:;a5$1#7:");

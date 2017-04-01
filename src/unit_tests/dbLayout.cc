@@ -85,7 +85,7 @@ TEST(1)
   for (db::Layout::bottom_up_iterator c = g.begin_bottom_up (); c != g.end_bottom_up (); ++c) {
     m = (m << 4) + *c;
   }
-  EXPECT_EQ (m, 0x04231); // c1,c5,c3,c4,c2
+  EXPECT_EQ (m, (unsigned int) 0x04231); // c1,c5,c3,c4,c2
 
   //  check relation informations ..
   db::Cell::child_cell_iterator ch;
@@ -94,12 +94,12 @@ TEST(1)
   db::Cell::parent_inst_iterator pai;
 
   //  .. for c1
-  EXPECT_EQ (c1.child_cells (), 0);
+  EXPECT_EQ (c1.child_cells (), size_t (0));
   ch = c1.begin_child_cells ();
   EXPECT_EQ (ch.at_end (), true);
   chi = c1.begin ();
   EXPECT_EQ (chi.at_end (), true);
-  EXPECT_EQ (c1.parent_cells (), 3);
+  EXPECT_EQ (c1.parent_cells (), size_t (3));
   pa = c1.begin_parent_cells ();
   EXPECT_EQ (*pa, c2.cell_index ());
   ++pa;
@@ -128,7 +128,7 @@ TEST(1)
 
   //  .. for c2
   ch = c2.begin_child_cells ();
-  EXPECT_EQ (c2.child_cells (), 3);
+  EXPECT_EQ (c2.child_cells (), size_t (3));
   EXPECT_EQ (*ch, c1.cell_index ());
   ++ch;
   EXPECT_EQ (*ch, c4.cell_index ());
@@ -154,19 +154,19 @@ TEST(1)
   ++chi;
   EXPECT_EQ (chi.at_end (), true);
   // ...
-  EXPECT_EQ (c2.parent_cells (), 0);
+  EXPECT_EQ (c2.parent_cells (), size_t (0));
   pa = c2.begin_parent_cells ();
   EXPECT_EQ (pa == c2.end_parent_cells (), true);
   pai = c2.begin_parent_insts ();
   EXPECT_EQ (pai.at_end (), true);
 
   //  .. for c3,c4,c5
-  EXPECT_EQ (c3.child_cells (), 1);
-  EXPECT_EQ (c3.parent_cells (), 1);
-  EXPECT_EQ (c4.child_cells (), 2);
-  EXPECT_EQ (c4.parent_cells (), 1);
-  EXPECT_EQ (c5.child_cells (), 1);
-  EXPECT_EQ (c5.parent_cells (), 2);
+  EXPECT_EQ (c3.child_cells (), size_t (1));
+  EXPECT_EQ (c3.parent_cells (), size_t (1));
+  EXPECT_EQ (c4.child_cells (), size_t (2));
+  EXPECT_EQ (c4.parent_cells (), size_t (1));
+  EXPECT_EQ (c5.child_cells (), size_t (1));
+  EXPECT_EQ (c5.parent_cells (), size_t (2));
 
   //  get some called cell sets
   std::set<db::cell_index_type> cc;

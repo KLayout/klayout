@@ -525,7 +525,7 @@ TEST(2)
   //  iterator. Therefore we make a copy in order to prevent that problem. See bug #120.
   cx = c0;
   EXPECT_EQ (c2s_unsorted(cx), "4[r0 *1 0,0]#0,3[r90 *1 100,-200]#11,5[r0 *1 0,0]#2,1[r0 *1 0,0]#1,3[r0 *1 0,0]#13");
-  EXPECT_EQ (c0.cell_instances (), 5);
+  EXPECT_EQ (c0.cell_instances (), size_t (5));
   // not yet: EXPECT_EQ (c0.empty (), false);
   inst = c0.begin ();
   db::Instance i1 = *inst;
@@ -572,10 +572,10 @@ TEST(2)
 
   c0.erase (i4);
   EXPECT_EQ (c2s_unsorted(c0), "5[r0 *1 0,0]#2,3[r0 *1 0,0]#13");
-  EXPECT_EQ (c0.cell_instances (), 2);
+  EXPECT_EQ (c0.cell_instances (), size_t (2));
   c0.erase (i5);
   EXPECT_EQ (c2s_unsorted(c0), "5[r0 *1 0,0]#2");
-  EXPECT_EQ (c0.cell_instances (), 1);
+  EXPECT_EQ (c0.cell_instances (), size_t (1));
   // not yet: EXPECT_EQ (c0.empty (), false);
 
   //  note: double delete is not supported in non-editable mode 
@@ -607,7 +607,7 @@ TEST(2)
 
   c0.erase (i3);
   EXPECT_EQ (c2s_unsorted(c0), "");
-  EXPECT_EQ (c0.cell_instances (), 0);
+  EXPECT_EQ (c0.cell_instances (), size_t (0));
   // not yet: EXPECT_EQ (c0.empty (), true);
 }
 
@@ -748,42 +748,42 @@ TEST(3b)
     g.transform (db::ICplxTrans (2.5));
     m.commit ();
 
-    EXPECT_EQ (c1.cell_instances (), 0); 
-    EXPECT_EQ (c0.cell_instances (), 1); 
+    EXPECT_EQ (c1.cell_instances (), size_t (0));
+    EXPECT_EQ (c0.cell_instances (), size_t (1));
     EXPECT_EQ (c0.begin ()->to_string (), "cell_index=1 r0 250,-250 prop_id=5"); 
 
-    EXPECT_EQ (c0.shapes (0).size (), 1); 
-    EXPECT_EQ (c0.shapes (1).size (), 0); 
-    EXPECT_EQ (c1.shapes (0).size (), 0); 
-    EXPECT_EQ (c1.shapes (1).size (), 1); 
+    EXPECT_EQ (c0.shapes (0).size (), size_t (1));
+    EXPECT_EQ (c0.shapes (1).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (0).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (1).size (), size_t (1));
  
     EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000) prop_id=17"); 
     EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000)"); 
 
     m.undo ();
 
-    EXPECT_EQ (c1.cell_instances (), 0); 
-    EXPECT_EQ (c0.cell_instances (), 1); 
+    EXPECT_EQ (c1.cell_instances (), size_t (0));
+    EXPECT_EQ (c0.cell_instances (), size_t (1));
     EXPECT_EQ (c0.begin ()->to_string (), "cell_index=1 r0 100,-100 prop_id=5"); 
 
-    EXPECT_EQ (c0.shapes (0).size (), 1); 
-    EXPECT_EQ (c0.shapes (1).size (), 0); 
-    EXPECT_EQ (c1.shapes (0).size (), 0); 
-    EXPECT_EQ (c1.shapes (1).size (), 1); 
+    EXPECT_EQ (c0.shapes (0).size (), size_t (1));
+    EXPECT_EQ (c0.shapes (1).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (0).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (1).size (), size_t (1));
  
     EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,100;1000,1200) prop_id=17"); 
     EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,100;1000,1200)"); 
 
     m.redo ();
 
-    EXPECT_EQ (c1.cell_instances (), 0); 
-    EXPECT_EQ (c0.cell_instances (), 1); 
+    EXPECT_EQ (c1.cell_instances (), size_t (0));
+    EXPECT_EQ (c0.cell_instances (), size_t (1));
     EXPECT_EQ (c0.begin ()->to_string (), "cell_index=1 r0 250,-250 prop_id=5"); 
 
-    EXPECT_EQ (c0.shapes (0).size (), 1); 
-    EXPECT_EQ (c0.shapes (1).size (), 0); 
-    EXPECT_EQ (c1.shapes (0).size (), 0); 
-    EXPECT_EQ (c1.shapes (1).size (), 1); 
+    EXPECT_EQ (c0.shapes (0).size (), size_t (1));
+    EXPECT_EQ (c0.shapes (1).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (0).size (), size_t (0));
+    EXPECT_EQ (c1.shapes (1).size (), size_t (1));
  
     EXPECT_EQ (c0.shapes (0).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000) prop_id=17"); 
     EXPECT_EQ (c1.shapes (1).begin (db::ShapeIterator::All)->to_string (), "box (0,250;2500,3000)"); 

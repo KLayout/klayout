@@ -268,14 +268,14 @@ TEST (5)
   }
 
   EXPECT_EQ (error, "");
-  EXPECT_EQ (root.m_subs.size (), 2);
+  EXPECT_EQ (root.m_subs.size (), size_t (2));
   EXPECT_EQ (root.m_subs [0], 1.0);
   EXPECT_EQ (root.m_subs [1], -2.5);
-  EXPECT_EQ (root.m_isubs.size (), 1);
+  EXPECT_EQ (root.m_isubs.size (), size_t (1));
   EXPECT_EQ (root.m_isubs [0], -100);
   EXPECT_EQ (root.m, 10);
-  EXPECT_EQ (root.mi, 21);
-  EXPECT_EQ (root.m_children.size (), 2);
+  EXPECT_EQ (root.mi, (unsigned int) 21);
+  EXPECT_EQ (root.m_children.size (), size_t (2));
   EXPECT_EQ (root.m_children [0].txt, " Text ");
   EXPECT_EQ (fabs (root.m_children [0].d - 0.001) < 1e-12, true);
   EXPECT_EQ (root.m_children [1].txt, "T2");
@@ -374,13 +374,13 @@ TEST (7)
   }
 
   EXPECT_EQ (error, "");
-  EXPECT_EQ (root.m_subs.size (), 2);
+  EXPECT_EQ (root.m_subs.size (), size_t (2));
   EXPECT_EQ (root.m_subs [0], 1.0);
   EXPECT_EQ (root.m_subs [1], -2.5);
-  EXPECT_EQ (root.m_isubs.size (), 1);
+  EXPECT_EQ (root.m_isubs.size (), size_t (1));
   EXPECT_EQ (root.m_isubs [0], -100);
   EXPECT_EQ (root.m, 10);
-  EXPECT_EQ (root.m_children.size (), 2);
+  EXPECT_EQ (root.m_children.size (), size_t (2));
   EXPECT_EQ (root.m_children [0].txt, " Text ");
   EXPECT_EQ (fabs (root.m_children [0].d - 0.001) < 1e-12, true);
   EXPECT_EQ (root.m_children [1].txt, "T2");
@@ -430,13 +430,13 @@ TEST (7a)
   }
 
   EXPECT_EQ (error, "");
-  EXPECT_EQ (root.m_subs.size (), 2);
+  EXPECT_EQ (root.m_subs.size (), size_t (2));
   EXPECT_EQ (root.m_subs [0], 1.0);
   EXPECT_EQ (root.m_subs [1], -2.5);
-  EXPECT_EQ (root.m_isubs.size (), 1);
+  EXPECT_EQ (root.m_isubs.size (), size_t (1));
   EXPECT_EQ (root.m_isubs [0], -100);
   EXPECT_EQ (root.m, 10);
-  EXPECT_EQ (root.m_children.size (), 2);
+  EXPECT_EQ (root.m_children.size (), size_t (2));
   EXPECT_EQ (root.m_children [0].txt, " Text ");
   EXPECT_EQ (fabs (root.m_children [0].d - 0.001) < 1e-12, true);
   EXPECT_EQ (root.m_children [1].txt, "T2");
@@ -493,13 +493,13 @@ TEST (8)
 
   EXPECT_EQ (error, "");
   EXPECT_EQ (root.m, 10);
-  EXPECT_EQ (root.m_children.size (), 2);
+  EXPECT_EQ (root.m_children.size (), size_t (2));
   EXPECT_EQ (root.m_children [0].txt, " Text ");
   EXPECT_EQ (fabs (root.m_children [0].d - 0.125) < 1e-12, true);
-  EXPECT_EQ (root.m_children [0].children.size (), 2);
+  EXPECT_EQ (root.m_children [0].children.size (), size_t (2));
   EXPECT_EQ (root.m_children [0].children [0].txt, "C1");
   EXPECT_EQ (root.m_children [0].children [1].txt, "c2");
-  EXPECT_EQ (root.m_children [0].children [1].children.size (), 1);
+  EXPECT_EQ (root.m_children [0].children [1].children.size (), size_t (1));
   EXPECT_EQ (root.m_children [0].children [1].children [0].txt, "d2");
   EXPECT_EQ (root.m_children [1].txt, "T2");
   EXPECT_EQ (root.m_children [1].d, -1.0);
@@ -567,13 +567,13 @@ TEST (8a)
 
   EXPECT_EQ (error, "");
   EXPECT_EQ (root.m, 10);
-  EXPECT_EQ (root.m_children.size (), 2);
+  EXPECT_EQ (root.m_children.size (), size_t (2));
   EXPECT_EQ (root.m_children [0].txt, " Text ");
   EXPECT_EQ (fabs (root.m_children [0].d - 0.125) < 1e-12, true);
-  EXPECT_EQ (root.m_children [0].children.size (), 2);
+  EXPECT_EQ (root.m_children [0].children.size (), size_t (2));
   EXPECT_EQ (root.m_children [0].children [0].txt, "C1");
   EXPECT_EQ (root.m_children [0].children [1].txt, "c2");
-  EXPECT_EQ (root.m_children [0].children [1].children.size (), 1);
+  EXPECT_EQ (root.m_children [0].children [1].children.size (), size_t (1));
   EXPECT_EQ (root.m_children [0].children [1].children [0].txt, "d2");
   EXPECT_EQ (root.m_children [1].txt, "T2");
   EXPECT_EQ (root.m_children [1].d, -1.0);
@@ -640,13 +640,13 @@ TEST (9)
 
   EXPECT_EQ (error, "");
   EXPECT_EQ (root.m, 10);
-  EXPECT_EQ (root.m_children.size (), 2);
+  EXPECT_EQ (root.m_children.size (), size_t (2));
   EXPECT_EQ (root.m_children [0].txt, " Text ");
   EXPECT_EQ (fabs (root.m_children [0].d - 0.125) < 1e-12, true);
-  EXPECT_EQ (root.m_children [0].children.size (), 2);
+  EXPECT_EQ (root.m_children [0].children.size (), size_t (2));
   EXPECT_EQ (root.m_children [0].children [0].txt, "C1");
   EXPECT_EQ (root.m_children [0].children [1].txt, "c2");
-  EXPECT_EQ (root.m_children [0].children [1].children.size (), 1);
+  EXPECT_EQ (root.m_children [0].children [1].children.size (), size_t (1));
   EXPECT_EQ (root.m_children [0].children [1].children [0].txt, "d2");
   EXPECT_EQ (root.m_children [1].txt, "T2");
   EXPECT_EQ (root.m_children [1].d, -1.0);

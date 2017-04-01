@@ -340,9 +340,9 @@ TEST(1)
   v.morph<long long> ();
   EXPECT_EQ (*(long long *)v.native_ptr (), 5);
   v.morph<unsigned long> ();
-  EXPECT_EQ (*(unsigned long *)v.native_ptr (), 5);
+  EXPECT_EQ (*(unsigned long *)v.native_ptr (), (unsigned long) 5);
   v.morph<unsigned int> ();
-  EXPECT_EQ (*(unsigned int *)v.native_ptr (), 5);
+  EXPECT_EQ (*(unsigned int *)v.native_ptr (), (unsigned int) 5);
   v.morph<unsigned short> ();
   EXPECT_EQ (*(unsigned short *)v.native_ptr (), 5);
   v.morph<unsigned char> ();
@@ -424,7 +424,7 @@ TEST(1)
   EXPECT_EQ (vx == v, true);
   EXPECT_EQ (vx.is_ulong (), true);
   EXPECT_EQ (v.is<unsigned short> (), true);
-  EXPECT_EQ (*(unsigned long *)vx.native_ptr(), 2);
+  EXPECT_EQ (*(unsigned long *)vx.native_ptr(), (unsigned long) 2);
   EXPECT_EQ (*(unsigned short *)v.native_ptr(), 2);
   v.morph<unsigned long>();
   EXPECT_EQ (vx == v, true);
@@ -505,7 +505,7 @@ TEST(1)
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_double (), false);
   EXPECT_EQ (v.to_parsable_string (), "(#1,#5,#25)");
-  EXPECT_EQ (v.get_list ().size (), 3);
+  EXPECT_EQ (v.get_list ().size (), size_t (3));
   EXPECT_EQ (v.begin ()->is_long (), true);
   EXPECT_EQ (v.begin ()->to_long (), 1);
   EXPECT_EQ (v.begin ()[1].is_long (), true);

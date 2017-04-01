@@ -20,27 +20,21 @@
 
 */
 
+#include "tlMath.h"
+#include "utHead.h"
 
-
-#ifndef HDR_tlAssert
-#define HDR_tlAssert
-
-#include "tlCommon.h"
-#include "tlCpp.h"
-
-namespace tl
+TEST(1) 
 {
-
-/** 
- *  @brief The corresponding assert macro
- */
-
-TL_PUBLIC NO_RETURN void assertion_failed (const char *filename, unsigned int line, const char *condition);
-
-//  the throw int(0) instruction will tell the compiler that the assertion will not return
-#define tl_assert(COND) if (!(COND)) { tl::assertion_failed (__FILE__, __LINE__, #COND); }
-
-} // namespace tl
-
-#endif
+  int x;
+  x = tl::lcd (17, 6);
+  EXPECT_EQ (x, 1);
+  x = tl::lcd (27, 6);
+  EXPECT_EQ (x, 3);
+  x = tl::lcd (30, 6);
+  EXPECT_EQ (x, 6);
+  x = tl::lcd (31*17, 371*17);
+  EXPECT_EQ (x, 17);
+  x = tl::lcd (702*17, 372*17);
+  EXPECT_EQ (x, 102);
+}
 

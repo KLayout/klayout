@@ -182,7 +182,7 @@ static void test_tree_overlap (ut::TestBase *_this, const Tree &t, const Box &b,
     ++i;
   }
 
-  EXPECT_EQ (good_idx.size (), 0);
+  EXPECT_EQ (good_idx.size (), size_t (0));
 }
 
 template <class Tree, class Box, class BoxConv>
@@ -220,7 +220,7 @@ static void test_tree_touching (ut::TestBase *_this, const Tree &t, const Box &b
     ++i;
   }
 
-  EXPECT_EQ (good_idx.size (), 0);
+  EXPECT_EQ (good_idx.size (), size_t (0));
 }
 
 inline int rvalue () 
@@ -264,7 +264,7 @@ TEST(0)
 
   t.sort (conv);
 
-  EXPECT_EQ (t.size (), 1);
+  EXPECT_EQ (t.size (), size_t (1));
 
   it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
   bitset = 0;
@@ -278,7 +278,7 @@ TEST(0)
     ++it;
   }
 
-  EXPECT_EQ (bitset, 0x1);
+  EXPECT_EQ (bitset, (unsigned int) 0x1);
 
   t.insert (db::Box (-10, 20, 0, 100));
   t.insert (db::Box (-10, -20, 20, -15));
@@ -290,7 +290,7 @@ TEST(0)
   t.insert (db::Box (-10, -20, 5, -10));
   t.sort (conv);
 
-  EXPECT_EQ (t.size (), 9);
+  EXPECT_EQ (t.size (), size_t (9));
 
   it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
   bitset = 0;
@@ -304,7 +304,7 @@ TEST(0)
     ++it;
   }
 
-  EXPECT_EQ (bitset, 0x1ff);
+  EXPECT_EQ (bitset, (unsigned int) 0x1ff);
 
   it = t.begin_touching (db::Box (-10, 20, -9, 21), conv);
   bitset = 0;
@@ -318,7 +318,7 @@ TEST(0)
     ++it;
   }
 
-  EXPECT_EQ (bitset, 0xc2);
+  EXPECT_EQ (bitset, (unsigned int) 0xc2);
 
   it = t.begin_touching (db::Box (-20, 20, -19, 21), conv);
   bitset = 0;
@@ -332,7 +332,7 @@ TEST(0)
     ++it;
   }
 
-  EXPECT_EQ (bitset, 0);
+  EXPECT_EQ (bitset, (unsigned int) 0);
 }
 
 TEST(1)
@@ -681,7 +681,7 @@ TEST(0U)
 
   t.sort (conv);
 
-  EXPECT_EQ (t.size (), 1);
+  EXPECT_EQ (t.size (), size_t (1));
 
   it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
   bitset = 0;
@@ -690,7 +690,7 @@ TEST(0U)
     ++it;
   }
 
-  EXPECT_EQ (bitset, 0x1);
+  EXPECT_EQ (bitset, (unsigned int) 0x1);
 
   t.insert (db::Box (-10, 20, 0, 100));
   t.insert (db::Box (-10, -20, 20, -15));
@@ -702,7 +702,7 @@ TEST(0U)
   t.insert (db::Box (-10, -20, 5, -10));
   t.sort (conv);
 
-  EXPECT_EQ (t.size (), 9);
+  EXPECT_EQ (t.size (), size_t (9));
 
   it = t.begin_touching (db::Box (db::Point (-m,-m), db::Point (m, m)), conv);
   bitset = 0;
@@ -711,7 +711,7 @@ TEST(0U)
     ++it;
   }
 
-  EXPECT_EQ (bitset, 0x1ff);
+  EXPECT_EQ (bitset, (unsigned int) 0x1ff);
 
   it = t.begin_touching (db::Box (-10, 20, -9, 21), conv);
   bitset = 0;
@@ -720,7 +720,7 @@ TEST(0U)
     ++it;
   }
 
-  EXPECT_EQ (bitset, 0x31);
+  EXPECT_EQ (bitset, (unsigned int) 0x31);
 
   it = t.begin_touching (db::Box (-20, 20, -19, 21), conv);
   bitset = 0;
@@ -729,7 +729,7 @@ TEST(0U)
     ++it;
   }
 
-  EXPECT_EQ (bitset, 0);
+  EXPECT_EQ (bitset, (unsigned int) 0);
 }
 
 TEST(1U)

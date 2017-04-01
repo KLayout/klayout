@@ -237,7 +237,7 @@ TEST(1)
     EXPECT_EQ (copy_top.is_pcell_instance (i1_copy).second, pd_id_copy);
 
     std::vector<tl::Variant> parameters = copy_top.get_pcell_parameters (i1_copy);
-    EXPECT_EQ (parameters.size (), 3);
+    EXPECT_EQ (parameters.size (), size_t (3));
     EXPECT_EQ (std::string (parameters[0].to_string()), "0.4");
     EXPECT_EQ (std::string (parameters[1].to_string()), "0.8");
     EXPECT_EQ (std::string (parameters[2].to_string()), "1");

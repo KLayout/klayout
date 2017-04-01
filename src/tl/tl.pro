@@ -82,7 +82,9 @@ HEADERS = \
   tlXMLParser.h \
   tlXMLWriter.h \
     tlFileSystemWatcher.h \
-    tlCommon.h
+    tlCommon.h \
+    tlMath.h \
+    tlCpp.h
 
 INCLUDEPATH =
 DEPENDPATH =

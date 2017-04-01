@@ -274,9 +274,9 @@ TEST(3)
   }
 
   EXPECT_EQ (or2.has_valid_polygons (), true);
-  EXPECT_EQ (or2.size () / 1000, 100);  //  because we use rand () the value may vary - it's only accurate to 1%
+  EXPECT_EQ (or2.size () / 1000, size_t (100));  //  because we use rand () the value may vary - it's only accurate to 1%
   EXPECT_EQ (or2_copy.has_valid_polygons (), true);
-  EXPECT_EQ (or2_copy.size () / 1000, 81);  //  because we use rand () the value may vary - it's only accurate to 1%
+  EXPECT_EQ (or2_copy.size () / 1000, size_t (81));  //  because we use rand () the value may vary - it's only accurate to 1%
   EXPECT_EQ ((or2 ^ or2_copy).empty (), true);
 
 #if 0

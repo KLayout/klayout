@@ -231,12 +231,12 @@ TEST (5)
   ids.clear ();
   inv = ps1.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, false);
-  EXPECT_EQ (ids.size (), 1);
+  EXPECT_EQ (ids.size (), size_t (1));
   EXPECT_EQ (*ids.begin (), id1);
   ids.clear ();
   inv = ps0.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, true);
-  EXPECT_EQ (ids.size (), 0);
+  EXPECT_EQ (ids.size (), size_t (0));
   ps.clear ();
 
   ps.insert (std::make_pair (rep.prop_name_id (tl::Variant ("X")), tl::Variant (3l)));
@@ -246,13 +246,13 @@ TEST (5)
   ids.clear ();
   inv = ps1.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, false);
-  EXPECT_EQ (ids.size (), 1);
+  EXPECT_EQ (ids.size (), size_t (1));
   EXPECT_EQ (*ids.begin () == id2, false);
   EXPECT_EQ (*ids.begin (), id1);
   ids.clear ();
   inv = ps0.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, true);
-  EXPECT_EQ (ids.size (), 0);
+  EXPECT_EQ (ids.size (), size_t (0));
   ps.clear ();
 
   ps.insert (std::make_pair (rep.prop_name_id (tl::Variant ("X")), tl::Variant (2l)));
@@ -263,13 +263,13 @@ TEST (5)
   ids.clear ();
   inv = ps2.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, false);
-  EXPECT_EQ (ids.size (), 1);
+  EXPECT_EQ (ids.size (), size_t (1));
   EXPECT_EQ (*ids.begin () == id3, false);
   EXPECT_EQ (*ids.begin (), id1);
   ids.clear ();
   inv = ps0.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, true);
-  EXPECT_EQ (ids.size (), 0);
+  EXPECT_EQ (ids.size (), size_t (0));
   ps.clear ();
 
   ps.insert (std::make_pair (rep.prop_name_id (tl::Variant ("X")), tl::Variant (2l)));
@@ -279,7 +279,7 @@ TEST (5)
   ids.clear ();
   inv = ps2.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, false);
-  EXPECT_EQ (ids.size (), 2);
+  EXPECT_EQ (ids.size (), size_t (2));
   EXPECT_EQ (*ids.begin (), id1);
   EXPECT_EQ (*(++ids.begin ()), id4);
   ps.clear ();
@@ -291,7 +291,7 @@ TEST (5)
   ids.clear ();
   inv = ps2.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, false);
-  EXPECT_EQ (ids.size (), 3);
+  EXPECT_EQ (ids.size (), size_t (3));
   EXPECT_EQ (*ids.begin (), id1);
   EXPECT_EQ (*(++ids.begin ()), id4);
   EXPECT_EQ (*(++(++ids.begin ())), id5);
@@ -300,7 +300,7 @@ TEST (5)
   ids.clear ();
   inv = ps2a.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, true);
-  EXPECT_EQ (ids.size (), 3);
+  EXPECT_EQ (ids.size (), size_t (3));
   EXPECT_EQ (*ids.begin (), id1);
   EXPECT_EQ (*(++ids.begin ()), id4);
   EXPECT_EQ (*(++(++ids.begin ())), id5);
@@ -309,7 +309,7 @@ TEST (5)
   ids.clear ();
   inv = ps2b.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, true);
-  EXPECT_EQ (ids.size (), 3);
+  EXPECT_EQ (ids.size (), size_t (3));
   EXPECT_EQ (*ids.begin (), id1);
   EXPECT_EQ (*(++ids.begin ()), id4);
   EXPECT_EQ (*(++(++ids.begin ())), id5);
@@ -321,7 +321,7 @@ TEST (5)
   ids.clear ();
   inv = ps2.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, false);
-  EXPECT_EQ (ids.size (), 3);
+  EXPECT_EQ (ids.size (), size_t (3));
   EXPECT_EQ (*ids.begin (), id1);
   EXPECT_EQ (*(++ids.begin ()), id4);
   EXPECT_EQ (*(++(++ids.begin ())), id5);
@@ -330,7 +330,7 @@ TEST (5)
   ids.clear ();
   inv = ps0.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, true);
-  EXPECT_EQ (ids.size (), 0);
+  EXPECT_EQ (ids.size (), size_t (0));
 
   ps.insert (std::make_pair (rep.prop_name_id (tl::Variant ("Z")), tl::Variant (5l)));
   db::properties_id_type id7 = rep.properties_id (ps);
@@ -338,7 +338,7 @@ TEST (5)
   ids.clear ();
   inv = ps4.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, false);
-  EXPECT_EQ (ids.size (), 5);
+  EXPECT_EQ (ids.size (), size_t (5));
   EXPECT_EQ (ids.find (id7) == ids.end (), true);
 
   ps.insert (std::make_pair (rep.prop_name_id (tl::Variant ("X")), tl::Variant (15l)));
@@ -347,7 +347,7 @@ TEST (5)
   ids.clear ();
   inv = ps4.property_selector ().matching (rep, ids);
   EXPECT_EQ (inv, false);
-  EXPECT_EQ (ids.size (), 6);
+  EXPECT_EQ (ids.size (), size_t (6));
   EXPECT_EQ (ids.find (id8) != ids.end (), true);
 }
 

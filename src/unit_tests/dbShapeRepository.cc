@@ -55,7 +55,7 @@ TEST(1)
 
   db::PolygonRef pref2 (p2, rep);
 
-  EXPECT_EQ (rep.repository (db::Polygon::tag ()).size (), 1);
+  EXPECT_EQ (rep.repository (db::Polygon::tag ()).size (), size_t (1));
 
   EXPECT_EQ (pref1.trans (), db::Disp (db::Vector (100, 0)));
   EXPECT_EQ (pref1.instantiate (), p1); 
@@ -124,7 +124,7 @@ TEST(2)
 
   db::PolygonRef pr2 (p2, *rep);
 
-  EXPECT_EQ (rep->repository (db::Polygon::tag ()).size (), 1);
+  EXPECT_EQ (rep->repository (db::Polygon::tag ()).size (), size_t (1));
 
   //  copy everything into a new repository
   db::GenericRepository rep2;
@@ -135,7 +135,7 @@ TEST(2)
   delete rep;
   rep = 0;
 
-  EXPECT_EQ (rep2.repository (db::Polygon::tag ()).size (), 1);
+  EXPECT_EQ (rep2.repository (db::Polygon::tag ()).size (), size_t (1));
 
   EXPECT_EQ (pref1.trans (), db::Disp (db::Vector (100, 0)));
   EXPECT_EQ (pref1.instantiate (), p1); 
@@ -165,7 +165,7 @@ TEST(1SIMPLE)
 
   db::SimplePolygonRef pref2 (p2, rep);
 
-  EXPECT_EQ (rep.repository (db::SimplePolygon::tag ()).size (), 1);
+  EXPECT_EQ (rep.repository (db::SimplePolygon::tag ()).size (), size_t (1));
 
   EXPECT_EQ (pref1.trans (), db::Disp (db::Vector (100, 0)));
   EXPECT_EQ (pref1.instantiate (), p1); 
@@ -234,7 +234,7 @@ TEST(2SIMPLE)
 
   db::SimplePolygonRef pr2 (p2, *rep);
 
-  EXPECT_EQ (rep->repository (db::SimplePolygon::tag ()).size (), 1);
+  EXPECT_EQ (rep->repository (db::SimplePolygon::tag ()).size (), size_t (1));
 
   //  copy everything into a new repository
   db::GenericRepository rep2;
@@ -245,7 +245,7 @@ TEST(2SIMPLE)
   delete rep;
   rep = 0;
 
-  EXPECT_EQ (rep2.repository (db::SimplePolygon::tag ()).size (), 1);
+  EXPECT_EQ (rep2.repository (db::SimplePolygon::tag ()).size (), size_t (1));
 
   EXPECT_EQ (pref1.trans (), db::Disp (db::Vector (100, 0)));
   EXPECT_EQ (pref1.instantiate (), p1); 
@@ -276,7 +276,7 @@ TEST(3)
   shapes.insert (p2);
   shapes.insert (db::SimplePolygonRef (p2, *rep));
 
-  EXPECT_EQ (rep->repository (db::SimplePolygon::tag ()).size (), 1);
+  EXPECT_EQ (rep->repository (db::SimplePolygon::tag ()).size (), size_t (1));
 
   db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::All);
   unsigned int n = 0;
@@ -304,7 +304,7 @@ TEST(3)
 
   }
 
-  EXPECT_EQ (n, 4);
+  EXPECT_EQ (n, (unsigned int) 4);
 
   db::Layout rep2;
   db::Cell &rep2_cell = rep2.cell (rep2.add_cell ());
@@ -316,7 +316,7 @@ TEST(3)
   delete rep;
   rep = 0;
 
-  EXPECT_EQ (rep2.shape_repository ().repository (db::SimplePolygon::tag ()).size (), 1);
+  EXPECT_EQ (rep2.shape_repository ().repository (db::SimplePolygon::tag ()).size (), size_t (1));
 
   s = shapes2.begin (db::ShapeIterator::All);
   n = 0;
@@ -328,7 +328,7 @@ TEST(3)
     ++n;
   }
 
-  EXPECT_EQ (n, 4);
+  EXPECT_EQ (n, size_t (4));
 
 }
 
@@ -364,10 +364,10 @@ TEST(4)
   shapes.insert (tt);
   shapes.insert (db::TextRef (tt, rep));
 
-  EXPECT_EQ (rep.repository (db::SimplePolygon::tag ()).size (), 1);
-  EXPECT_EQ (rep.repository (db::Polygon::tag ()).size (), 1);
-  EXPECT_EQ (rep.repository (db::Path::tag ()).size (), 1);
-  EXPECT_EQ (rep.repository (db::Text::tag ()).size (), 1);
+  EXPECT_EQ (rep.repository (db::SimplePolygon::tag ()).size (), size_t (1));
+  EXPECT_EQ (rep.repository (db::Polygon::tag ()).size (), size_t (1));
+  EXPECT_EQ (rep.repository (db::Path::tag ()).size (), size_t (1));
+  EXPECT_EQ (rep.repository (db::Text::tag ()).size (), size_t (1));
 
   db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::All);
   unsigned int n = 0;
@@ -390,7 +390,7 @@ TEST(4)
       EXPECT_EQ (r == c1.end (), true);
       EXPECT_EQ (s->path_width (), 21);
     } else {
-      EXPECT_EQ (s->holes (), 0);
+      EXPECT_EQ (s->holes (), size_t (0));
       std::vector<db::Point>::const_iterator r = c1.begin ();
       for (db::Shape::point_iterator pt = s->begin_hull (); pt != s->end_hull (); ++pt) {
         EXPECT_EQ (*pt, *r);
@@ -404,7 +404,7 @@ TEST(4)
 
   }
 
-  EXPECT_EQ (n, 8);
+  EXPECT_EQ (n, size_t (8));
 
 }
 

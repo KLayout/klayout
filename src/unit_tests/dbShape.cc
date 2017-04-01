@@ -711,7 +711,7 @@ TEST(5)
   EXPECT_EQ (si->area (), bx1.area());
   EXPECT_EQ (si->perimeter (), bx1.perimeter());
   EXPECT_EQ (si->has_prop_id (), true);
-  EXPECT_EQ (si->prop_id (), 17);
+  EXPECT_EQ (si->prop_id (), size_t (17));
 
   ++si;
   
@@ -735,7 +735,7 @@ TEST(6)
   EXPECT_EQ (si->area (), bx1.area ());
   EXPECT_EQ (si->perimeter (), bx1.perimeter ());
   EXPECT_EQ (si->has_prop_id (), true);
-  EXPECT_EQ (si->prop_id (), 17);
+  EXPECT_EQ (si->prop_id (), size_t (17));
 
   ++si;
   

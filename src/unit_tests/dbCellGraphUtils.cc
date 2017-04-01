@@ -48,69 +48,69 @@ TEST(1)
   {
     db::CellCounter cc (&g);
 
-    EXPECT_EQ (cc.weight (c0.cell_index ()), 1);
-    EXPECT_EQ (cc.weight (c1.cell_index ()), 10);
-    EXPECT_EQ (cc.weight (c2.cell_index ()), 13);
-    EXPECT_EQ (cc.weight (c3.cell_index ()), 27);
-    EXPECT_EQ (cc.weight (c4.cell_index ()), 1);
+    EXPECT_EQ (cc.weight (c0.cell_index ()), size_t (1));
+    EXPECT_EQ (cc.weight (c1.cell_index ()), size_t (10));
+    EXPECT_EQ (cc.weight (c2.cell_index ()), size_t (13));
+    EXPECT_EQ (cc.weight (c3.cell_index ()), size_t (27));
+    EXPECT_EQ (cc.weight (c4.cell_index ()), size_t (1));
   }
 
   {
     db::CellCounter cc (&g);
 
-    EXPECT_EQ (cc.weight (c4.cell_index ()), 1);
-    EXPECT_EQ (cc.weight (c3.cell_index ()), 27);
-    EXPECT_EQ (cc.weight (c0.cell_index ()), 1);
-    EXPECT_EQ (cc.weight (c1.cell_index ()), 10);
-    EXPECT_EQ (cc.weight (c2.cell_index ()), 13);
+    EXPECT_EQ (cc.weight (c4.cell_index ()), size_t (1));
+    EXPECT_EQ (cc.weight (c3.cell_index ()), size_t (27));
+    EXPECT_EQ (cc.weight (c0.cell_index ()), size_t (1));
+    EXPECT_EQ (cc.weight (c1.cell_index ()), size_t (10));
+    EXPECT_EQ (cc.weight (c2.cell_index ()), size_t (13));
   }
 
   {
     db::CellCounter cc (&g);
 
-    EXPECT_EQ (cc.weight (c4.cell_index ()), 1);
-    EXPECT_EQ (cc.weight (c3.cell_index ()), 27);
-    EXPECT_EQ (cc.weight (c2.cell_index ()), 13);
-    EXPECT_EQ (cc.weight (c0.cell_index ()), 1);
-    EXPECT_EQ (cc.weight (c1.cell_index ()), 10);
+    EXPECT_EQ (cc.weight (c4.cell_index ()), size_t (1));
+    EXPECT_EQ (cc.weight (c3.cell_index ()), size_t (27));
+    EXPECT_EQ (cc.weight (c2.cell_index ()), size_t (13));
+    EXPECT_EQ (cc.weight (c0.cell_index ()), size_t (1));
+    EXPECT_EQ (cc.weight (c1.cell_index ()), size_t (10));
   }
 
   {
     db::CellCounter cc (&g, c2.cell_index ());
-    EXPECT_EQ (cc.weight (c3.cell_index ()), 2);
-    EXPECT_EQ (cc.weight (c2.cell_index ()), 1);
-    EXPECT_EQ (cc.weight (c4.cell_index ()), 0);
-    EXPECT_EQ (cc.weight (c0.cell_index ()), 0);
-    EXPECT_EQ (cc.weight (c1.cell_index ()), 0);
+    EXPECT_EQ (cc.weight (c3.cell_index ()), size_t (2));
+    EXPECT_EQ (cc.weight (c2.cell_index ()), size_t (1));
+    EXPECT_EQ (cc.weight (c4.cell_index ()), size_t (0));
+    EXPECT_EQ (cc.weight (c0.cell_index ()), size_t (0));
+    EXPECT_EQ (cc.weight (c1.cell_index ()), size_t (0));
   }
 
   {
     db::CellCounter cc (&g, c3.cell_index ());
-    EXPECT_EQ (cc.weight (c3.cell_index ()), 1);
-    EXPECT_EQ (cc.weight (c4.cell_index ()), 0);
-    EXPECT_EQ (cc.weight (c0.cell_index ()), 0);
-    EXPECT_EQ (cc.weight (c1.cell_index ()), 0);
-    EXPECT_EQ (cc.weight (c2.cell_index ()), 0);
+    EXPECT_EQ (cc.weight (c3.cell_index ()), size_t (1));
+    EXPECT_EQ (cc.weight (c4.cell_index ()), size_t (0));
+    EXPECT_EQ (cc.weight (c0.cell_index ()), size_t (0));
+    EXPECT_EQ (cc.weight (c1.cell_index ()), size_t (0));
+    EXPECT_EQ (cc.weight (c2.cell_index ()), size_t (0));
   }
 
   {
     db::CellCounter cc (&g, c0.cell_index ());
 
-    EXPECT_EQ (cc.weight (c4.cell_index ()), 0);
-    EXPECT_EQ (cc.weight (c3.cell_index ()), 3);
-    EXPECT_EQ (cc.weight (c2.cell_index ()), 1);
-    EXPECT_EQ (cc.weight (c0.cell_index ()), 1);
-    EXPECT_EQ (cc.weight (c1.cell_index ()), 10);
+    EXPECT_EQ (cc.weight (c4.cell_index ()), size_t (0));
+    EXPECT_EQ (cc.weight (c3.cell_index ()), size_t (3));
+    EXPECT_EQ (cc.weight (c2.cell_index ()), size_t (1));
+    EXPECT_EQ (cc.weight (c0.cell_index ()), size_t (1));
+    EXPECT_EQ (cc.weight (c1.cell_index ()), size_t (10));
   }
 
   {
     db::CellCounter cc (&g, c4.cell_index ());
 
-    EXPECT_EQ (cc.weight (c4.cell_index ()), 1);
-    EXPECT_EQ (cc.weight (c3.cell_index ()), 24);
-    EXPECT_EQ (cc.weight (c2.cell_index ()), 12);
-    EXPECT_EQ (cc.weight (c0.cell_index ()), 0);
-    EXPECT_EQ (cc.weight (c1.cell_index ()), 0);
+    EXPECT_EQ (cc.weight (c4.cell_index ()), size_t (1));
+    EXPECT_EQ (cc.weight (c3.cell_index ()), size_t (24));
+    EXPECT_EQ (cc.weight (c2.cell_index ()), size_t (12));
+    EXPECT_EQ (cc.weight (c0.cell_index ()), size_t (0));
+    EXPECT_EQ (cc.weight (c1.cell_index ()), size_t (0));
   }
 }
 

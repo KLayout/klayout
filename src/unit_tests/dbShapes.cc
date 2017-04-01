@@ -3160,11 +3160,11 @@ TEST(20)
 {
   db::Shapes shapes;
   db::ShapeIterator s = shapes.begin (db::ShapeIterator::All);
-  EXPECT_EQ (s.quad_id (), 0);
+  EXPECT_EQ (s.quad_id (), size_t (0));
   EXPECT_EQ (s.quad_box ().to_string (), db::Box::world ().to_string ());
 
   s = shapes.begin_touching (db::Box (-500, -500, 500, 500), db::ShapeIterator::All);
-  EXPECT_EQ (s.quad_id (), 0);
+  EXPECT_EQ (s.quad_id (), size_t (0));
   EXPECT_EQ (s.quad_box ().to_string (), "()");
 
   for (int i = 0; i < 200; ++i) {
@@ -3203,11 +3203,11 @@ TEST(21)
 {
   db::Shapes shapes;
   db::ShapeIterator s = shapes.begin (db::ShapeIterator::All);
-  EXPECT_EQ (s.quad_id (), 0);
+  EXPECT_EQ (s.quad_id (), size_t (0));
   EXPECT_EQ (s.quad_box ().to_string (), db::Box::world ().to_string ());
 
   s = shapes.begin_touching (db::Box (-500, -500, 500, 500), db::ShapeIterator::All);
-  EXPECT_EQ (s.quad_id (), 0);
+  EXPECT_EQ (s.quad_id (), size_t (0));
   EXPECT_EQ (s.quad_box ().to_string (), "()");
 
   for (int i = 0; i < 50; ++i) {

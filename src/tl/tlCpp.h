@@ -21,26 +21,26 @@
 */
 
 
+#ifndef HDR_tlCpp
+#define HDR_tlCpp
 
-#ifndef HDR_tlAssert
-#define HDR_tlAssert
-
-#include "tlCommon.h"
-#include "tlCpp.h"
+//  A subsitute for C++11 [[noreturn]]
+#ifdef __GNUC__
+#define NO_RETURN __attribute__((noreturn))
+#elif __MINGW32__
+#define NO_RETURN __attribute__((noreturn))
+#elif __clang__
+#define NO_RETURN __attribute__((noreturn))
+#elif _MSC_VER
+#define NO_RETURN __declspec(noreturn)
+#endif
 
 namespace tl
 {
 
-/** 
- *  @brief The corresponding assert macro
- */
+//  .. nothing yet ..
 
-TL_PUBLIC NO_RETURN void assertion_failed (const char *filename, unsigned int line, const char *condition);
-
-//  the throw int(0) instruction will tell the compiler that the assertion will not return
-#define tl_assert(COND) if (!(COND)) { tl::assertion_failed (__FILE__, __LINE__, #COND); }
-
-} // namespace tl
+}
 
 #endif
 

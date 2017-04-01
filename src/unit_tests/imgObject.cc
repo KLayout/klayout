@@ -35,7 +35,7 @@ TEST(1)
   EXPECT_EQ (image.float_data ()[0], 0.0);
   EXPECT_EQ (image.float_data ()[1], 0.0);
   EXPECT_EQ (image.float_data ()[12*8-1], 0.0);
-  EXPECT_EQ (image.data_length(), 12 * 8);
+  EXPECT_EQ (image.data_length(), size_t (12 * 8));
   
   EXPECT_EQ (db::DCplxTrans (image.matrix ()).to_string (), "r0 *1 0,0");
 
@@ -57,8 +57,8 @@ TEST(1)
   copy1.set_data (12, 8, d);
   EXPECT_EQ (copy1.equals (&image), true);
   EXPECT_EQ (copy1.float_data () == image.float_data (), false);
-  EXPECT_EQ (copy1.width (), 12);
-  EXPECT_EQ (copy1.height (), 8);
+  EXPECT_EQ (copy1.width (), size_t (12));
+  EXPECT_EQ (copy1.height (), size_t (8));
 
   d[0] = 12.5;
   d[5] = -12.5;
@@ -104,14 +104,14 @@ TEST(1)
 
   EXPECT_EQ (copy1.data_mapping ().brightness, 0.5);
   EXPECT_EQ (copy1.data_mapping ().red_gain, 1.25);
-  EXPECT_EQ (copy1.data_mapping ().false_color_nodes.size (), 3);
+  EXPECT_EQ (copy1.data_mapping ().false_color_nodes.size (), size_t (3));
 
   img::Object copy2;
   copy2.from_string (image.to_string ().c_str ());
 
   EXPECT_EQ (copy2.data_mapping ().brightness, 0.5);
   EXPECT_EQ (tl::to_string (copy2.data_mapping ().red_gain), "1.25");
-  EXPECT_EQ (copy2.data_mapping ().false_color_nodes.size (), 3);
+  EXPECT_EQ (copy2.data_mapping ().false_color_nodes.size (), size_t (3));
   EXPECT_EQ (copy2.equals (&image), true);
 
   EXPECT_EQ (image.to_string (), copy2.to_string ());
@@ -141,7 +141,7 @@ TEST(2)
     EXPECT_EQ (image.float_data (channel)[0], 0.0);
     EXPECT_EQ (image.float_data (channel)[1], 0.0);
     EXPECT_EQ (image.float_data (channel)[12*8-1], 0.0);
-    EXPECT_EQ (image.data_length(), 12 * 8);
+    EXPECT_EQ (image.data_length(), size_t (12 * 8));
     
     EXPECT_EQ (db::DCplxTrans (image.matrix ()).to_string (), "r0 *1 0,0");
 
@@ -165,8 +165,8 @@ TEST(2)
     copy1.set_data (12, 8, d[0], d[1], d[2]);
     EXPECT_EQ (copy1.equals (&image), true);
     EXPECT_EQ (copy1.float_data (channel) == image.float_data (channel), false);
-    EXPECT_EQ (copy1.width (), 12);
-    EXPECT_EQ (copy1.height (), 8);
+    EXPECT_EQ (copy1.width (), size_t (12));
+    EXPECT_EQ (copy1.height (), size_t (8));
 
     d[channel][0] = 12.5;
     d[channel][5] = -12.5;
@@ -212,14 +212,14 @@ TEST(2)
 
     EXPECT_EQ (copy1.data_mapping ().brightness, 0.5);
     EXPECT_EQ (copy1.data_mapping ().red_gain, 1.25);
-    EXPECT_EQ (copy1.data_mapping ().false_color_nodes.size (), 3);
+    EXPECT_EQ (copy1.data_mapping ().false_color_nodes.size (), size_t (3));
 
     img::Object copy2;
     copy2.from_string (image.to_string ().c_str ());
 
     EXPECT_EQ (copy2.data_mapping ().brightness, 0.5);
     EXPECT_EQ (tl::to_string (copy2.data_mapping ().red_gain), "1.25");
-    EXPECT_EQ (copy2.data_mapping ().false_color_nodes.size (), 3);
+    EXPECT_EQ (copy2.data_mapping ().false_color_nodes.size (), size_t (3));
     EXPECT_EQ (copy2.equals (&image), true);
 
     EXPECT_EQ (image.to_string (), copy2.to_string ());
@@ -263,7 +263,7 @@ TEST(3)
   EXPECT_EQ ((int)image.byte_data ()[0], 11);
   EXPECT_EQ ((int)image.byte_data ()[1], 12);
   EXPECT_EQ ((int)image.byte_data ()[12*8-1], 81);
-  EXPECT_EQ (image.data_length(), 12 * 8);
+  EXPECT_EQ (image.data_length (), size_t (12 * 8));
   
   img::Object copy1 (image);
   EXPECT_EQ (copy1.equals (&image), true);
@@ -286,8 +286,8 @@ TEST(3)
   EXPECT_EQ (copy1.is_byte_data (), true);
   EXPECT_EQ (copy1.equals (&image), true);
   EXPECT_EQ (copy1.byte_data () == image.byte_data (), false);
-  EXPECT_EQ (copy1.width (), 12);
-  EXPECT_EQ (copy1.height (), 8);
+  EXPECT_EQ (copy1.width (), size_t (12));
+  EXPECT_EQ (copy1.height (), size_t (8));
 
   EXPECT_EQ (image.mask (1, 2), true);
   image.set_mask (1, 2, false);

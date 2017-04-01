@@ -77,16 +77,16 @@ TEST(1)
   EXPECT_EQ (r.is_box (), false);
   EXPECT_EQ (r.to_string (), "(0,0;0,200;100,200;100,0);(10,20;10,220;110,220;110,20)");
   EXPECT_EQ (r.is_merged (), false);
-  EXPECT_EQ (r.size (), 2);
+  EXPECT_EQ (r.size (), size_t (2));
   r.set_merged_semantics (false);
   EXPECT_EQ (r.area (), 40000);
   EXPECT_EQ (r.area (db::Box (db::Point (-10, -10), db::Point (50, 50))), 50 * 50 + 40 * 30);
-  EXPECT_EQ (r.perimeter (), 1200);
-  EXPECT_EQ (r.perimeter (db::Box (db::Point (-10, -10), db::Point (50, 50))), 170);
-  EXPECT_EQ (r.perimeter (db::Box (db::Point (-10, -10), db::Point (0, 50))), 0);
-  EXPECT_EQ (r.perimeter (db::Box (db::Point (0, 0), db::Point (50, 50))), 170);
-  EXPECT_EQ (r.perimeter (db::Box (db::Point (10, 20), db::Point (50, 50))), 70);
-  EXPECT_EQ (r.perimeter (db::Box (db::Point (90, 200), db::Point (110, 220))), 40);
+  EXPECT_EQ (r.perimeter (), db::Region::perimeter_type (1200));
+  EXPECT_EQ (r.perimeter (db::Box (db::Point (-10, -10), db::Point (50, 50))), db::Region::perimeter_type (170));
+  EXPECT_EQ (r.perimeter (db::Box (db::Point (-10, -10), db::Point (0, 50))), db::Region::perimeter_type (0));
+  EXPECT_EQ (r.perimeter (db::Box (db::Point (0, 0), db::Point (50, 50))), db::Region::perimeter_type (170));
+  EXPECT_EQ (r.perimeter (db::Box (db::Point (10, 20), db::Point (50, 50))), db::Region::perimeter_type (70));
+  EXPECT_EQ (r.perimeter (db::Box (db::Point (90, 200), db::Point (110, 220))), db::Region::perimeter_type (40));
   db::Coord ptot = 0;
   for (db::Coord x = 0; x < 110; x += 10) {
     for (db::Coord y = 0; y < 220; y += 10) {
@@ -97,19 +97,19 @@ TEST(1)
   r.set_merged_semantics (true);
   EXPECT_EQ (r.area (), 23800);
   EXPECT_EQ (r.area (db::Box (db::Point (-10, -10), db::Point (50, 50))), 50 * 50);
-  EXPECT_EQ (r.perimeter (), 660);
-  EXPECT_EQ (r.perimeter (db::Box (db::Point (-10, -10), db::Point (50, 50))), 100);
-  EXPECT_EQ (r.perimeter (db::Box (db::Point (-10, -10), db::Point (0, 50))), 0);
-  EXPECT_EQ (r.perimeter (db::Box (db::Point (0, 0), db::Point (50, 50))), 100);
+  EXPECT_EQ (r.perimeter (), db::Region::perimeter_type (660));
+  EXPECT_EQ (r.perimeter (db::Box (db::Point (-10, -10), db::Point (50, 50))), db::Region::perimeter_type (100));
+  EXPECT_EQ (r.perimeter (db::Box (db::Point (-10, -10), db::Point (0, 50))), db::Region::perimeter_type (0));
+  EXPECT_EQ (r.perimeter (db::Box (db::Point (0, 0), db::Point (50, 50))), db::Region::perimeter_type (100));
   r.merge ();
   EXPECT_EQ (r.to_string (), "(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0)");
   EXPECT_EQ (r.bbox ().to_string (), "(0,0;110,220)");
   EXPECT_EQ (r.is_merged (), true);
   EXPECT_EQ (r.is_box (), false);
   EXPECT_EQ (r.empty (), false);
-  EXPECT_EQ (r.size (), 1);
+  EXPECT_EQ (r.size (), size_t (1));
   EXPECT_EQ (r.area (), 23800);
-  EXPECT_EQ (r.perimeter (), 660);
+  EXPECT_EQ (r.perimeter (), db::Region::perimeter_type (660));
 
   r.clear ();
   EXPECT_EQ (r.empty (), true);
@@ -134,8 +134,8 @@ TEST(1b)
   db::Region r;
   r.insert (db::Box (db::Point (52200, 20000), db::Point (55200, 21000)));
   r.set_merged_semantics (false);
-  EXPECT_EQ (r.perimeter (db::Box (db::Point (51100, 20000), db::Point (55200, 21000))), 8000);
-  EXPECT_EQ (r.perimeter (db::Box (db::Point (55200, 20000), db::Point (59300, 21000))), 0);
+  EXPECT_EQ (r.perimeter (db::Box (db::Point (51100, 20000), db::Point (55200, 21000))), db::Region::perimeter_type (8000));
+  EXPECT_EQ (r.perimeter (db::Box (db::Point (55200, 20000), db::Point (59300, 21000))), db::Region::perimeter_type (0));
 }
 
 TEST(2) 
@@ -658,7 +658,7 @@ TEST(18a)
     EXPECT_EQ (o.to_string (), "(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60)");
     o = r;
     EXPECT_EQ (o.selected_not_outside (rr).to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
-    EXPECT_EQ (o.selected_outside (rr).size () + o.selected_not_outside (rr).size (), 6);
+    EXPECT_EQ (o.selected_outside (rr).size () + o.selected_not_outside (rr).size (), size_t (6));
     o.select_not_outside (rr);
     EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
   }
@@ -669,7 +669,7 @@ TEST(18a)
     EXPECT_EQ (o.to_string (), "(20,30;20,50;40,50;40,30)");
     o = r;
     EXPECT_EQ (o.selected_not_inside (rr).to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
-    EXPECT_EQ (o.selected_inside (rr).size () + o.selected_not_inside (rr).size (), 6);
+    EXPECT_EQ (o.selected_inside (rr).size () + o.selected_not_inside (rr).size (), size_t (6));
     o.select_not_inside (rr);
     EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
   }
@@ -680,7 +680,7 @@ TEST(18a)
     EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(50,10;50,30;70,30;70,10);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
     o = r;
     EXPECT_EQ (o.selected_not_interacting (rr).to_string (), "(70,60;70,80;90,80;90,60)");
-    EXPECT_EQ (o.selected_interacting (rr).size () + o.selected_not_interacting (rr).size (), 6);
+    EXPECT_EQ (o.selected_interacting (rr).size () + o.selected_not_interacting (rr).size (), size_t (6));
     o.select_not_interacting (rr);
     EXPECT_EQ (o.to_string (), "(70,60;70,80;90,80;90,60)");
   }
@@ -691,7 +691,7 @@ TEST(18a)
     EXPECT_EQ (o.to_string (), "(0,0;0,20;20,20;20,0);(20,30;20,50;40,50;40,30);(0,60;0,80;60,80;60,60);(0,100;0,130;30,130;30,100)");
     o = r;
     EXPECT_EQ (o.selected_not_overlapping (rr).to_string (), "(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60)");
-    EXPECT_EQ (o.selected_overlapping (rr).size () + o.selected_not_overlapping (rr).size (), 6);
+    EXPECT_EQ (o.selected_overlapping (rr).size () + o.selected_not_overlapping (rr).size (), size_t (6));
     o.select_not_overlapping (rr);
     EXPECT_EQ (o.to_string (), "(50,10;50,30;70,30;70,10);(70,60;70,80;90,80;90,60)");
   }
@@ -811,10 +811,10 @@ TEST(20)
     EXPECT_EQ (r1.to_string (), "(120,20;120,40;140,40;140,20);(160,80;160,140;220,140;220,80)");
     EXPECT_EQ (r1.has_valid_polygons (), false);
     EXPECT_EQ (r1.area (), 4000);
-    EXPECT_EQ (r1.perimeter (), 320);
+    EXPECT_EQ (r1.perimeter (), db::Region::perimeter_type (320));
     EXPECT_EQ (r1.bbox ().to_string (), "(120,20;220,140)");
     EXPECT_EQ (r1.is_box (), false);
-    EXPECT_EQ (r1.size (), 2);
+    EXPECT_EQ (r1.size (), size_t (2));
     EXPECT_EQ (r1.empty (), false);
 
     db::RegionPerimeterFilter f0 (0, 100, false);
@@ -824,27 +824,27 @@ TEST(20)
     db::Region r2 = r1;
     EXPECT_EQ (r2.has_valid_polygons (), false);
     EXPECT_EQ (r2.area (), 4000);
-    EXPECT_EQ (r2.perimeter (), 320);
+    EXPECT_EQ (r2.perimeter (), db::Region::perimeter_type (320));
     EXPECT_EQ (r2.bbox ().to_string (), "(120,20;220,140)");
     EXPECT_EQ (r2.is_box (), false);
-    EXPECT_EQ (r2.size (), 2);
+    EXPECT_EQ (r2.size (), size_t (2));
     EXPECT_EQ (r2.empty (), false);
     r2.filter (f0);
     EXPECT_EQ (r2.has_valid_polygons (), true);
     EXPECT_EQ (r2.to_string (), "(120,20;120,40;140,40;140,20)");
-    EXPECT_EQ (r2.size (), 1);
+    EXPECT_EQ (r2.size (), size_t (1));
     EXPECT_EQ (r2.empty (), false);
     EXPECT_EQ (r2.is_box (), true);
     EXPECT_EQ (r2.area (), 400);
-    EXPECT_EQ (r2.perimeter (), 80);
+    EXPECT_EQ (r2.perimeter (), db::Region::perimeter_type (80));
 
     r1.insert (db::Box (0, 0, 10, 20));
     EXPECT_EQ (r1.has_valid_polygons (), true);
     EXPECT_EQ (r1.to_string (), "(120,20;120,40;140,40;140,20);(160,80;160,140;220,140;220,80);(0,0;0,20;10,20;10,0)");
     EXPECT_EQ (r1.to_string (2), "(120,20;120,40;140,40;140,20);(160,80;160,140;220,140;220,80)...");
-    EXPECT_EQ (r1.size (), 3);
+    EXPECT_EQ (r1.size (), size_t (3));
     EXPECT_EQ (r1.area (), 4200);
-    EXPECT_EQ (r1.perimeter (), 380);
+    EXPECT_EQ (r1.perimeter (), db::Region::perimeter_type (380));
 
     rr = r1.filtered (f0);
     EXPECT_EQ (rr.to_string (), "(0,0;0,20;10,20;10,0);(120,20;120,40;140,40;140,20)");
@@ -860,7 +860,7 @@ TEST(20)
     EXPECT_EQ (r1.to_string (), "(120,20;120,40;140,40;140,20)");
     EXPECT_EQ (r1.has_valid_polygons (), false);
     EXPECT_EQ (r1.is_box (), true);
-    EXPECT_EQ (r1.size (), 1);
+    EXPECT_EQ (r1.size (), size_t (1));
     EXPECT_EQ (r1.empty (), false);
 
     db::Region r2 = r1;
@@ -872,9 +872,9 @@ TEST(20)
 
     r1.clear ();
     EXPECT_EQ (r1.has_valid_polygons (), true);
-    EXPECT_EQ (r1.size (), 0);
+    EXPECT_EQ (r1.size (), size_t (0));
     EXPECT_EQ (r1.empty (), true);
-    EXPECT_EQ (r1.perimeter (), 0);
+    EXPECT_EQ (r1.perimeter (), db::Region::perimeter_type (0));
     EXPECT_EQ (r1.area (), 0);
 
     EXPECT_EQ (r2.to_string (), "(120,20;120,40;140,40;140,20)");
@@ -883,9 +883,9 @@ TEST(20)
     EXPECT_EQ (r1.to_string (), "(120,20;120,40;140,40;140,20)");
     EXPECT_EQ (r1.has_valid_polygons (), false);
     EXPECT_EQ (r2.has_valid_polygons (), true);
-    EXPECT_EQ (r2.size (), 0);
+    EXPECT_EQ (r2.size (), size_t (0));
     EXPECT_EQ (r2.empty (), true);
-    EXPECT_EQ (r2.perimeter (), 0);
+    EXPECT_EQ (r2.perimeter (), db::Region::perimeter_type (0));
     EXPECT_EQ (r2.area (), 0);
   }
 

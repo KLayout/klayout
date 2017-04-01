@@ -231,7 +231,7 @@ TEST(1)
   EXPECT_EQ (fabs (layout.dbu () / 0.001 - 1.0) < 1e-6, true);
   EXPECT_EQ (reader.libname (), "LIB.DB");
 
-  EXPECT_EQ (layout.layers (), 11);
+  EXPECT_EQ (layout.layers (), size_t (11));
   EXPECT_EQ (map.mapping_str (0), "2/0 : 2/0");
   EXPECT_EQ (map.mapping_str (1), "4/0 : 4/0");
   EXPECT_EQ (map.mapping_str (2), "6/0 : 6/0");
@@ -246,7 +246,7 @@ TEST(1)
   EXPECT_EQ (map.mapping (10).layer, 8);
   EXPECT_EQ (map.mapping (10).datatype, 1);
 
-  EXPECT_EQ (layout.cells (), 3);
+  EXPECT_EQ (layout.cells (), size_t (3));
   EXPECT_EQ (std::string (layout.cell_name (0)), "TRANS");
   EXPECT_EQ (std::string (layout.cell_name (1)), "INV2");
   EXPECT_EQ (std::string (layout.cell_name (2)), "RINGO");
@@ -254,7 +254,7 @@ TEST(1)
   db::Layout layout2 (&m);
   layout2 = layout;
 
-  EXPECT_EQ (layout2.cells (), 3);
+  EXPECT_EQ (layout2.cells (), size_t (3));
   EXPECT_EQ (std::string (layout2.cell_name (0)), "TRANS");
   EXPECT_EQ (std::string (layout2.cell_name (1)), "INV2");
   EXPECT_EQ (std::string (layout2.cell_name (2)), "RINGO");
@@ -292,7 +292,7 @@ TEST(2)
     EXPECT_EQ (reader.libname (), "LIB.DB");
   }
 
-  EXPECT_EQ (layout_none.layers (), 0);
+  EXPECT_EQ (layout_none.layers (), size_t (0));
 
   db::LDPair pairs[] = {
     db::LDPair(1, 0),
@@ -325,7 +325,7 @@ TEST(2)
     db::GDS2Reader reader (file);
     reader.read (layout_layer, options);
 
-    EXPECT_EQ (layout_layer.layers (), 1);
+    EXPECT_EQ (layout_layer.layers (), size_t (1));
     EXPECT_EQ (layout_layer.get_properties (0).layer, pairs[i].layer);
     EXPECT_EQ (layout_layer.get_properties (0).datatype, pairs[i].datatype);
 

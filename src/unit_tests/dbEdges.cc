@@ -79,24 +79,24 @@ TEST(1)
   r += db::Edges (db::Box (db::Point (10, 0), db::Point (110, 200)));
   EXPECT_EQ (r.to_string (), "(0,0;0,200);(0,200;100,200);(100,200;100,0);(100,0;0,0);(10,0;10,200);(10,200;110,200);(110,200;110,0);(110,0;10,0)");
   EXPECT_EQ (r.is_merged (), false);
-  EXPECT_EQ (r.size (), 8);
+  EXPECT_EQ (r.size (), size_t (8));
   r.set_merged_semantics (false);
-  EXPECT_EQ (r.length (), 1200);
-  EXPECT_EQ (r.length (db::Box (db::Point (-10, -10), db::Point (50, 50))), 190);
-  EXPECT_EQ (r.length (db::Box (db::Point (-10, -10), db::Point (0, 50))), 0);
-  EXPECT_EQ (r.length (db::Box (db::Point (0, 0), db::Point (50, 50))), 190);
+  EXPECT_EQ (r.length (), db::Edges::length_type (1200));
+  EXPECT_EQ (r.length (db::Box (db::Point (-10, -10), db::Point (50, 50))), db::Edges::length_type (190));
+  EXPECT_EQ (r.length (db::Box (db::Point (-10, -10), db::Point (0, 50))), db::Edges::length_type (0));
+  EXPECT_EQ (r.length (db::Box (db::Point (0, 0), db::Point (50, 50))), db::Edges::length_type (190));
   r.set_merged_semantics (true);
-  EXPECT_EQ (r.length (), 1020);
-  EXPECT_EQ (r.length (db::Box (db::Point (-10, -10), db::Point (50, 50))), 150);
-  EXPECT_EQ (r.length (db::Box (db::Point (-10, -10), db::Point (0, 50))), 0);
-  EXPECT_EQ (r.length (db::Box (db::Point (0, 0), db::Point (50, 50))), 150);
+  EXPECT_EQ (r.length (), db::Edges::length_type (1020));
+  EXPECT_EQ (r.length (db::Box (db::Point (-10, -10), db::Point (50, 50))), db::Edges::length_type (150));
+  EXPECT_EQ (r.length (db::Box (db::Point (-10, -10), db::Point (0, 50))), db::Edges::length_type (0));
+  EXPECT_EQ (r.length (db::Box (db::Point (0, 0), db::Point (50, 50))), db::Edges::length_type (150));
   r.merge ();
   EXPECT_EQ (r.to_string (), "(0,0;0,200);(100,200;100,0);(10,0;10,200);(0,200;110,200);(110,200;110,0);(110,0;0,0)");
   EXPECT_EQ (r.bbox ().to_string (), "(0,0;110,200)");
   EXPECT_EQ (r.is_merged (), true);
   EXPECT_EQ (r.empty (), false);
-  EXPECT_EQ (r.size (), 6);
-  EXPECT_EQ (r.length (), 1020);
+  EXPECT_EQ (r.size (), size_t (6));
+  EXPECT_EQ (r.length (), db::Edges::length_type (1020));
 
   r.clear ();
   EXPECT_EQ (r.empty (), true);
@@ -405,7 +405,7 @@ TEST(9)
     }
 
     // std::cerr << "Interacting edges: " << ea.size () << std::endl;
-    EXPECT_NE (ea.size (), 0);
+    EXPECT_NE (ea.size (), size_t (0));
 
     //  brute force
     for (db::Edges::const_iterator i = e.begin (); ! i.at_end (); ++i) {
@@ -466,7 +466,7 @@ TEST(10)
     }
 
     // std::cerr << "Interacting edges: " << ea.size () << std::endl;
-    EXPECT_NE (ea.size (), 0);
+    EXPECT_NE (ea.size (), size_t (0));
 
     //  brute force
     for (db::Edges::const_iterator i = e.begin (); ! i.at_end (); ++i) {
@@ -592,10 +592,10 @@ TEST(20)
     EXPECT_EQ (r1.has_valid_edges (), false);
     EXPECT_EQ (r1.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20);(160,80;160,140);(220,80;160,80)");
     EXPECT_EQ (r1.has_valid_edges (), false);
-    EXPECT_EQ (r1.length (), 200);
+    EXPECT_EQ (r1.length (), db::Edges::length_type (200));
     EXPECT_EQ (r1.has_valid_edges (), true); // length, since merging, will implicitly convert to valid edges
     EXPECT_EQ (r1.bbox ().to_string (), "(120,20;220,140)");
-    EXPECT_EQ (r1.size (), 6);
+    EXPECT_EQ (r1.size (), size_t (6));
     EXPECT_EQ (r1.empty (), false);
 
     db::EdgeLengthFilter f0 (0, 50, false);
@@ -605,23 +605,23 @@ TEST(20)
 
     db::Edges r2 = r1;
     EXPECT_EQ (r2.has_valid_edges (), true);
-    EXPECT_EQ (r2.length (), 200);
+    EXPECT_EQ (r2.length (), db::Edges::length_type (200));
     EXPECT_EQ (r2.bbox ().to_string (), "(120,20;220,140)");
-    EXPECT_EQ (r2.size (), 6);
+    EXPECT_EQ (r2.size (), size_t (6));
     EXPECT_EQ (r2.empty (), false);
     r2.filter (f0);
     EXPECT_EQ (r2.has_valid_edges (), true);
     EXPECT_EQ (r2.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20)");
-    EXPECT_EQ (r2.size (), 4);
+    EXPECT_EQ (r2.size (), size_t (4));
     EXPECT_EQ (r2.empty (), false);
-    EXPECT_EQ (r2.length (), 80);
+    EXPECT_EQ (r2.length (), db::Edges::length_type (80));
 
     r1.insert (db::Box (0, 0, 10, 20));
     EXPECT_EQ (r1.has_valid_edges (), true);
     EXPECT_EQ (r1.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20);(160,80;160,140);(220,80;160,80);(0,0;0,20);(0,20;10,20);(10,20;10,0);(10,0;0,0)");
     EXPECT_EQ (r1.to_string (2), "(120,20;120,40);(120,40;140,40)...");
-    EXPECT_EQ (r1.size (), 10);
-    EXPECT_EQ (r1.length (), 260);
+    EXPECT_EQ (r1.size (), size_t (10));
+    EXPECT_EQ (r1.length (), db::Edges::length_type (260));
 
     rr = r1.filtered (f0);
     EXPECT_EQ (rr.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20);(0,0;0,20);(0,20;10,20);(10,20;10,0);(10,0;0,0)");
@@ -636,7 +636,7 @@ TEST(20)
     EXPECT_EQ (r1.has_valid_edges (), false);
     EXPECT_EQ (r1.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20)");
     EXPECT_EQ (r1.has_valid_edges (), false);
-    EXPECT_EQ (r1.size (), 4);
+    EXPECT_EQ (r1.size (), size_t (4));
     EXPECT_EQ (r1.empty (), false);
 
     db::Edges r2 = r1;
@@ -648,9 +648,9 @@ TEST(20)
 
     r1.clear ();
     EXPECT_EQ (r1.has_valid_edges (), true);
-    EXPECT_EQ (r1.size (), 0);
+    EXPECT_EQ (r1.size (), size_t (0));
     EXPECT_EQ (r1.empty (), true);
-    EXPECT_EQ (r1.length (), 0);
+    EXPECT_EQ (r1.length (), db::Edges::length_type (0));
 
     EXPECT_EQ (r2.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20)");
     r1.swap (r2);
@@ -658,9 +658,9 @@ TEST(20)
     EXPECT_EQ (r1.to_string (), "(120,20;120,40);(120,40;140,40);(140,40;140,20);(140,20;120,20)");
     EXPECT_EQ (r1.has_valid_edges (), false);
     EXPECT_EQ (r2.has_valid_edges (), true);
-    EXPECT_EQ (r2.size (), 0);
+    EXPECT_EQ (r2.size (), size_t (0));
     EXPECT_EQ (r2.empty (), true);
-    EXPECT_EQ (r2.length (), 0);
+    EXPECT_EQ (r2.length (), db::Edges::length_type (0));
   }
 
   {

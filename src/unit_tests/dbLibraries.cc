@@ -514,7 +514,7 @@ TEST(2)
     EXPECT_EQ (tmp_i2.cell_index (), tmp_pd2.second);
     std::vector<tl::Variant> new_param = tmp.get_pcell_parameters (tmp_pd2.second);
 
-    EXPECT_EQ (new_param.size (), 3);
+    EXPECT_EQ (new_param.size (), size_t (3));
     EXPECT_EQ (new_param[0].to_string (), std::string ("2"));
     EXPECT_EQ (new_param[1].to_string (), std::string ("10"));
     EXPECT_EQ (new_param[2].to_string (), std::string ("3"));

@@ -85,14 +85,14 @@ TEST(2)
   size_t id1 = rep.prop_name_id (n1);
   size_t id2 = rep.prop_name_id (n2);
 
-  EXPECT_EQ (id1, 0);
-  EXPECT_EQ (id2, 1);
+  EXPECT_EQ (id1, size_t (0));
+  EXPECT_EQ (id2, size_t (1));
 
   id2 = rep.prop_name_id (n2);
   id1 = rep.prop_name_id (n1);
 
-  EXPECT_EQ (id1, 0);
-  EXPECT_EQ (id2, 1);
+  EXPECT_EQ (id1, size_t (0));
+  EXPECT_EQ (id2, size_t (1));
 
   EXPECT_EQ (rep.prop_name (0) == n1, true);
   EXPECT_EQ (rep.prop_name (1) == n2, true);
@@ -103,8 +103,8 @@ TEST(2)
   id2 = rep2.prop_name_id (n2);
   id1 = rep2.prop_name_id (n1);
 
-  EXPECT_EQ (id1, 0);
-  EXPECT_EQ (id2, 1);
+  EXPECT_EQ (id1, size_t (0));
+  EXPECT_EQ (id2, size_t (1));
 
   EXPECT_EQ (rep2.prop_name (0) == n1, true);
   EXPECT_EQ (rep2.prop_name (1) == n2, true);
@@ -113,7 +113,7 @@ TEST(2)
   rep2 = empty_rep;
 
   id1 = rep2.prop_name_id (n2);
-  EXPECT_EQ (id1, 0);
+  EXPECT_EQ (id1, size_t (0));
 }
 
 TEST(3) 
@@ -126,14 +126,14 @@ TEST(3)
   size_t id1 = rep.prop_name_id (n1);
   size_t id2 = rep.prop_name_id (n2);
 
-  EXPECT_EQ (id1, 0);
-  EXPECT_EQ (id2, 1);
+  EXPECT_EQ (id1, size_t (0));
+  EXPECT_EQ (id2, size_t (1));
 
   id2 = rep.prop_name_id (n2);
   id1 = rep.prop_name_id (n1);
 
-  EXPECT_EQ (id1, 0);
-  EXPECT_EQ (id2, 1);
+  EXPECT_EQ (id1, size_t (0));
+  EXPECT_EQ (id2, size_t (1));
 
   EXPECT_EQ (rep.prop_name (0) == n1, true);
   EXPECT_EQ (rep.prop_name (1) == n2, true);
@@ -144,8 +144,8 @@ TEST(3)
   id2 = rep2.prop_name_id (n2);
   id1 = rep2.prop_name_id (n1);
 
-  EXPECT_EQ (id1, 0);
-  EXPECT_EQ (id2, 1);
+  EXPECT_EQ (id1, size_t (0));
+  EXPECT_EQ (id2, size_t (1));
 
   EXPECT_EQ (rep2.prop_name (0) == n1, true);
   EXPECT_EQ (rep2.prop_name (1) == n2, true);
@@ -154,7 +154,7 @@ TEST(3)
   rep2 = empty_rep;
 
   id1 = rep2.prop_name_id (n2);
-  EXPECT_EQ (id1, 0);
+  EXPECT_EQ (id1, size_t (0));
 }
 
 TEST(4) 
@@ -173,14 +173,14 @@ TEST(4)
   size_t id1 = rep.properties_id (set1);
   size_t id2 = rep.properties_id (set2);
 
-  EXPECT_EQ (id1, 1);
-  EXPECT_EQ (id2, 2);
+  EXPECT_EQ (id1, size_t (1));
+  EXPECT_EQ (id2, size_t (2));
 
   id2 = rep.properties_id (set2);
   id1 = rep.properties_id (set1);
 
-  EXPECT_EQ (id1, 1);
-  EXPECT_EQ (id2, 2);
+  EXPECT_EQ (id1, size_t (1));
+  EXPECT_EQ (id2, size_t (2));
 
   EXPECT_EQ (rep.properties (1) == set1, true);
   EXPECT_EQ (rep.properties (2) == set2, true);
@@ -191,8 +191,8 @@ TEST(4)
   id2 = rep2.properties_id (set2);
   id1 = rep2.properties_id (set1);
 
-  EXPECT_EQ (id1, 1);
-  EXPECT_EQ (id2, 2);
+  EXPECT_EQ (id1, size_t (1));
+  EXPECT_EQ (id2, size_t (2));
 
   EXPECT_EQ (rep2.properties (1) == set1, true);
   EXPECT_EQ (rep2.properties (2) == set2, true);
@@ -201,7 +201,7 @@ TEST(4)
   rep2 = empty_rep;
 
   id1 = rep2.properties_id (set2);
-  EXPECT_EQ (id1, 1);
+  EXPECT_EQ (id1, size_t (1));
 }
 
 TEST(5) 
@@ -243,8 +243,8 @@ TEST(6)
   size_t id1 = rep.prop_name_id (n1);
   size_t id2 = rep.prop_name_id (n2);
 
-  EXPECT_EQ (id1, 0);
-  EXPECT_EQ (id2, 0);
+  EXPECT_EQ (id1, size_t (0));
+  EXPECT_EQ (id2, size_t (0));
 
   db::PropertiesRepository::properties_set set1;
   db::PropertiesRepository::properties_set set2;
@@ -255,7 +255,7 @@ TEST(6)
   size_t pid1 = rep.properties_id (set1);
   size_t pid2 = rep.properties_id (set2);
 
-  EXPECT_EQ (pid1, 1);
-  EXPECT_EQ (pid2, 2);
+  EXPECT_EQ (pid1, size_t (1));
+  EXPECT_EQ (pid2, size_t (2));
 }
 

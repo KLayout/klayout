@@ -32,11 +32,11 @@ TEST(1)
   lm.map (db::LDPair (1, 5), 17);
   EXPECT_EQ (lm.logical (db::LDPair (1, 6)).first, false);
   EXPECT_EQ (lm.logical (db::LDPair (1, 5)).first, true);
-  EXPECT_EQ (lm.logical (db::LDPair (1, 5)).second, 17);
+  EXPECT_EQ (lm.logical (db::LDPair (1, 5)).second, (unsigned int) 17);
 
   lm.map (db::LDPair (1, 0), db::LDPair (5,0), 18);
   EXPECT_EQ (lm.logical (db::LDPair (2, 0)).first, true);
-  EXPECT_EQ (lm.logical (db::LDPair (2, 0)).second, 18);
+  EXPECT_EQ (lm.logical (db::LDPair (2, 0)).second, (unsigned int) 18);
   EXPECT_EQ (lm.logical (db::LDPair (0, 0)).first, false);
 
   EXPECT_EQ (lm.mapping_str (18), "1/0;2-5/0");
@@ -63,11 +63,11 @@ TEST(1)
 
   lm.map_expr ("XP;10/7-8 : XN", 13);
   EXPECT_EQ (lm.mapping_str (13), "10/7-8;XP : XN");
-  EXPECT_EQ (lm.logical ("XP").second, 13);
+  EXPECT_EQ (lm.logical ("XP").second, (unsigned int) 13);
   EXPECT_EQ (lm.logical ("XP").first, true);
   EXPECT_EQ (lm.logical (db::LDPair(10, 6)).first, false);
   EXPECT_EQ (lm.logical (db::LDPair(10, 7)).first, true);
-  EXPECT_EQ (lm.logical (db::LDPair(10, 7)).second, 13);
+  EXPECT_EQ (lm.logical (db::LDPair(10, 7)).second, (unsigned int) 13);
 
   EXPECT_EQ (lm.mapping (13).to_string (), "XN (10/7)");
 

@@ -119,7 +119,7 @@ static void test_tree (ut::TestBase *_this, const Tree &t, const Picker &p, cons
     ++i;
   }
 
-  EXPECT_EQ (good_idx.size (), 0);
+  EXPECT_EQ (good_idx.size (), size_t (0));
 }
 
 TEST(1)

@@ -21,26 +21,38 @@
 */
 
 
+#ifndef HDR_tlMath
+#define HDR_tlMath
 
-#ifndef HDR_tlAssert
-#define HDR_tlAssert
-
-#include "tlCommon.h"
-#include "tlCpp.h"
+#include "tlAssert.h"
 
 namespace tl
 {
 
-/** 
- *  @brief The corresponding assert macro
+/**
+ *  @brief Compute the largest common divider of two numbers using the euclidian method
  */
+template <class T>
+T lcd (T a, T b)
+{
+  while (true) {
+    if (a < b) {
+      b %= a;
+      if (b == 0) {
+        return a;
+      }
+    } else if (b < a) {
+      a %= b;
+      if (a == 0) {
+        return b;
+      }
+    } else {
+      return a;
+    }
+  }
+}
 
-TL_PUBLIC NO_RETURN void assertion_failed (const char *filename, unsigned int line, const char *condition);
-
-//  the throw int(0) instruction will tell the compiler that the assertion will not return
-#define tl_assert(COND) if (!(COND)) { tl::assertion_failed (__FILE__, __LINE__, #COND); }
-
-} // namespace tl
+}
 
 #endif
 

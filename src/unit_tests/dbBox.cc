@@ -83,10 +83,10 @@ TEST(5)
   db::Box empty;
 
   EXPECT_EQ (b.area (), 100.0 * 200.0);
-  EXPECT_EQ (b.perimeter (), 600);
+  EXPECT_EQ (b.perimeter (), db::Box::perimeter_type (600));
   EXPECT_EQ (b.to_string (), "(10,10;110,210)");
-  EXPECT_EQ (b.width (), 100);
-  EXPECT_EQ (b.height (), 200);
+  EXPECT_EQ (b.width (), db::Box::distance_type (100));
+  EXPECT_EQ (b.height (), db::Box::distance_type (200));
   EXPECT_EQ (b.top (), 210);
   EXPECT_EQ (b.left (), 10);
   EXPECT_EQ (b.right (), 110);

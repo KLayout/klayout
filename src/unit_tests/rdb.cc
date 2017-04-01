@@ -131,42 +131,42 @@ TEST(3)
   rdb::Item *i2 = db.create_item (c2->id (), cath2->id ());
   rdb::Item *i3 = db.create_item (c1->id (), cath2->id ());
 
-  EXPECT_EQ (cath2->num_items (), 2);
-  EXPECT_EQ (cath->num_items (), 1);
-  EXPECT_EQ (c1->num_items (), 2);
-  EXPECT_EQ (c2->num_items (), 1);
+  EXPECT_EQ (cath2->num_items (), size_t (2));
+  EXPECT_EQ (cath->num_items (), size_t (1));
+  EXPECT_EQ (c1->num_items (), size_t (2));
+  EXPECT_EQ (c2->num_items (), size_t (1));
 
   db.set_item_visited (i1, true);
 
-  EXPECT_EQ (cath2->num_items_visited (), 0);
-  EXPECT_EQ (cath->num_items_visited (), 1);
-  EXPECT_EQ (c1->num_items_visited (), 1);
-  EXPECT_EQ (c2->num_items_visited (), 0);
-  EXPECT_EQ (db.num_items_visited (), 1);
+  EXPECT_EQ (cath2->num_items_visited (), size_t (0));
+  EXPECT_EQ (cath->num_items_visited (), size_t (1));
+  EXPECT_EQ (c1->num_items_visited (), size_t (1));
+  EXPECT_EQ (c2->num_items_visited (), size_t (0));
+  EXPECT_EQ (db.num_items_visited (), size_t (1));
 
   db.set_item_visited (i2, true);
 
-  EXPECT_EQ (cath2->num_items_visited (), 1);
-  EXPECT_EQ (cath->num_items_visited (), 1);
-  EXPECT_EQ (c1->num_items_visited (), 1);
-  EXPECT_EQ (c2->num_items_visited (), 1);
-  EXPECT_EQ (db.num_items_visited (), 2);
+  EXPECT_EQ (cath2->num_items_visited (), size_t (1));
+  EXPECT_EQ (cath->num_items_visited (), size_t (1));
+  EXPECT_EQ (c1->num_items_visited (), size_t (1));
+  EXPECT_EQ (c2->num_items_visited (), size_t (1));
+  EXPECT_EQ (db.num_items_visited (), size_t (2));
 
   db.set_item_visited (i3, true);
 
-  EXPECT_EQ (cath2->num_items_visited (), 2);
-  EXPECT_EQ (cath->num_items_visited (), 1);
-  EXPECT_EQ (c1->num_items_visited (), 2);
-  EXPECT_EQ (c2->num_items_visited (), 1);
-  EXPECT_EQ (db.num_items_visited (), 3);
+  EXPECT_EQ (cath2->num_items_visited (), size_t (2));
+  EXPECT_EQ (cath->num_items_visited (), size_t (1));
+  EXPECT_EQ (c1->num_items_visited (), size_t (2));
+  EXPECT_EQ (c2->num_items_visited (), size_t (1));
+  EXPECT_EQ (db.num_items_visited (), size_t (3));
 
   db.set_item_visited (i1, false);
 
-  EXPECT_EQ (cath2->num_items_visited (), 2);
-  EXPECT_EQ (cath->num_items_visited (), 0);
-  EXPECT_EQ (c1->num_items_visited (), 1);
-  EXPECT_EQ (c2->num_items_visited (), 1);
-  EXPECT_EQ (db.num_items_visited (), 2);
+  EXPECT_EQ (cath2->num_items_visited (), size_t (2));
+  EXPECT_EQ (cath->num_items_visited (), size_t (0));
+  EXPECT_EQ (c1->num_items_visited (), size_t (1));
+  EXPECT_EQ (c2->num_items_visited (), size_t (1));
+  EXPECT_EQ (db.num_items_visited (), size_t (2));
 }
 
 TEST(4) 
@@ -506,28 +506,28 @@ TEST(6)
   rdb::Cell *c1 = db.create_cell ("c1");
   EXPECT_EQ (c1->qname (), "c1");
 
-  EXPECT_EQ (db.variants ("c1").size (), 0);
+  EXPECT_EQ (db.variants ("c1").size (), size_t (0));
 
   rdb::Cell *c1a = db.create_cell ("c1");
   EXPECT_EQ (c1a->qname (), "c1:2");
   EXPECT_EQ (c1->qname (), "c1:1")
 
-  EXPECT_EQ (db.variants ("c1").size (), 2);
+  EXPECT_EQ (db.variants ("c1").size (), size_t (2));
   EXPECT_EQ (db.variants ("c1")[0], c1->id ());
   EXPECT_EQ (db.variants ("c1")[1], c1a->id ());
 
   rdb::Cell *c1b = db.create_cell ("c1", "var");
   EXPECT_EQ (c1b->qname (), "c1:var")
-  EXPECT_EQ (db.variants ("c1").size (), 3);
+  EXPECT_EQ (db.variants ("c1").size (), size_t (3));
 
   rdb::Cell *c2 = db.create_cell ("c2", "1027");
   EXPECT_EQ (c2->qname (), "c2:1027");
-  EXPECT_EQ (db.variants ("c2").size (), 1);
+  EXPECT_EQ (db.variants ("c2").size (), size_t (1));
 
   rdb::Cell *c2a = db.create_cell ("c2");
   EXPECT_EQ (c2a->qname (), "c2:1");
   EXPECT_EQ (c2->qname (), "c2:1027")
-  EXPECT_EQ (db.variants ("c2").size (), 2);
+  EXPECT_EQ (db.variants ("c2").size (), size_t (2));
 
   rdb::Cell *c2b = db.create_cell ("c2", "var");
   EXPECT_EQ (c2b->qname (), "c2:var")
@@ -541,7 +541,7 @@ TEST(6)
   rdb::Cell *c2e = db.create_cell ("c2");
   EXPECT_EQ (c2e->qname (), "c2:4");
 
-  EXPECT_EQ (db.variants ("c2").size (), 6);
+  EXPECT_EQ (db.variants ("c2").size (), size_t (6));
   EXPECT_EQ (db.variants ("c2")[0], c2->id ());
   EXPECT_EQ (db.variants ("c2")[5], c2e->id ());
 }

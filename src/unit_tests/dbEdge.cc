@@ -40,8 +40,8 @@ TEST(1)
   EXPECT_EQ (e.dx (), 100);
   EXPECT_EQ (e.dy (), 200);
   EXPECT_EQ (e.transformed (db::Trans (1, db::Vector (0, 0))).dx (), -200);
-  EXPECT_EQ (e.transformed (db::Trans (1, db::Vector (0, 0))).dx_abs (), 200);
-  EXPECT_EQ (e.transformed (db::Trans (1, db::Vector (0, -100))).dy_abs (), 100);
+  EXPECT_EQ (e.transformed (db::Trans (1, db::Vector (0, 0))).dx_abs (), db::Edge::distance_type (200));
+  EXPECT_EQ (e.transformed (db::Trans (1, db::Vector (0, -100))).dy_abs (), db::Edge::distance_type (100));
   EXPECT_EQ (e.dy (), 200);
   EXPECT_EQ (e != db::Edge (db::Point (0, 0), db::Point (100, 200)), false);
   EXPECT_EQ (e == db::Edge (db::Point (0, 0), db::Point (100, 200)), true);
@@ -49,7 +49,7 @@ TEST(1)
   EXPECT_EQ (e.enlarged (db::Vector (10, 20)), db::Edge (db::Point (-10, -20), db::Point (110, 220)));
   EXPECT_EQ (e.length (), db::coord_traits <db::Coord>::rounded_distance (sqrt (double (100*100+200*200))));
   EXPECT_EQ (e.sq_length (), 100*100+200*200);
-  EXPECT_EQ (e.ortho_length (), 100+200);
+  EXPECT_EQ (e.ortho_length (), size_t (100+200));
   EXPECT_EQ (e.to_string (), "(0,0;100,200)");
   EXPECT_EQ (e.swapped_points ().to_string (), "(100,200;0,0)");
   EXPECT_EQ (e.to_string (), "(0,0;100,200)");
@@ -94,10 +94,10 @@ TEST(2)
   EXPECT_EQ (e.contains (db::Point (-200,-400)), false);
   EXPECT_EQ (e.contains (db::Point (0,0)), true);
   EXPECT_EQ (db::Edge (10,20,110,230).distance (db::Point (100, 200)), -4);
-  EXPECT_EQ (db::Edge (10,20,110,230).distance_abs (db::Point (100, 200)), 4);
+  EXPECT_EQ (db::Edge (10,20,110,230).distance_abs (db::Point (100, 200)), db::Edge::distance_type (4));
   EXPECT_EQ (db::Edge (10,20,110,210).distance (db::Point (100, 200)), 4);
   EXPECT_EQ (db::Edge (10,20,110,222).distance (db::Point (100, 200)), -1);
-  EXPECT_EQ (db::Edge (10,20,110,222).distance_abs (db::Point (100, 200)), 1);
+  EXPECT_EQ (db::Edge (10,20,110,222).distance_abs (db::Point (100, 200)), db::Edge::distance_type (1));
   EXPECT_EQ (db::Edge (10,20,110,222).contains (db::Point (0, 0)), false);
   EXPECT_EQ (db::Edge (10,20,110,222).contains (db::Point (100, 200)), false);
 }

@@ -358,29 +358,6 @@ struct get_inner_type<X &>
   typedef X result;
 };
 
-/**
- *  @brief Compute the largest common divider of two numbers using the euclidian method
- */
-template <class T>
-T lcd (T a, T b)
-{
-  while (true) {
-    if (a < b) {
-      b %= a;
-      if (b == 0) {
-        return a;
-      }
-    } else if (b < a) {
-      a %= b;
-      if (a == 0) {
-        return b;
-      }
-    } else {
-      return a;
-    }
-  }
-}
-
 }
 
 #endif

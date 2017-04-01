@@ -127,19 +127,19 @@ TEST(1)
   boss2.register_job(job1);
 
   n = 0; for (tl::Boss::iterator j = boss1.begin (); j != boss1.end (); ++j) { ++n; }
-  EXPECT_EQ (n, 1);
+  EXPECT_EQ (n, size_t (1));
 
   n = 0; for (tl::Boss::iterator j = boss2.begin (); j != boss2.end (); ++j) { ++n; }
-  EXPECT_EQ (n, 1);
+  EXPECT_EQ (n, size_t (1));
 
   delete job1;
   job1 = new MyJob (2);
 
   n = 0; for (tl::Boss::iterator j = boss1.begin (); j != boss1.end (); ++j) { ++n; }
-  EXPECT_EQ (n, 0);
+  EXPECT_EQ (n, size_t (0));
 
   n = 0; for (tl::Boss::iterator j = boss2.begin (); j != boss2.end (); ++j) { ++n; }
-  EXPECT_EQ (n, 0);
+  EXPECT_EQ (n, size_t (0));
 
   tl::Boss *tmp_boss = new tl::Boss ();
   tmp_boss->register_job(job1);
@@ -150,19 +150,19 @@ TEST(1)
   delete tmp_boss;
 
   n = 0; for (tl::Boss::iterator j = boss1.begin (); j != boss1.end (); ++j) { ++n; }
-  EXPECT_EQ (n, 1);
+  EXPECT_EQ (n, size_t (1));
 
   n = 0; for (tl::Boss::iterator j = boss2.begin (); j != boss2.end (); ++j) { ++n; }
-  EXPECT_EQ (n, 2);
+  EXPECT_EQ (n, size_t (2));
 
   delete job1;
   delete job2;
 
   n = 0; for (tl::Boss::iterator j = boss1.begin (); j != boss1.end (); ++j) { ++n; }
-  EXPECT_EQ (n, 0);
+  EXPECT_EQ (n, size_t (0));
 
   n = 0; for (tl::Boss::iterator j = boss2.begin (); j != boss2.end (); ++j) { ++n; }
-  EXPECT_EQ (n, 0);
+  EXPECT_EQ (n, size_t (0));
 }
 
 TEST(2) 

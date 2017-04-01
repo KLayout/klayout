@@ -28,24 +28,24 @@
 
 TEST(1)
 {
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (50, 0), db::Point (75, 0))), 25);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (100, 0), db::Point (0, 0)), db::Edge (db::Point (50, 0), db::Point (75, 0))), 25);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (100, 0), db::Point (0, 0)), db::Edge (db::Point (75, 0), db::Point (50, 0))), 25);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (75, 0), db::Point (50, 0))), 25);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (50, 10), db::Point (75, 100))), 25);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (10, 10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (60, 0))), 28);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (10, 10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (0, 0))), 0);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (0, 0), db::Point (0, 0)), db::Edge (db::Point (0, 0), db::Point (0, 0))), 0);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (0, 0), db::Point (0, 0)), db::Edge (db::Point (0, 0), db::Point (10, 0))), 0);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (10, 10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (10, 0))), 0);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (-10, -10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (10, 0))), 7);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (100, 100), db::Point (-10, -10)), db::Edge (db::Point (0, 0), db::Point (10, 0))), 7);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (100, 100), db::Point (-10, -10)), db::Edge (db::Point (10, 0), db::Point (0, 0))), 7);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (-10, -10), db::Point (100, 100)), db::Edge (db::Point (10, 0), db::Point (0, 0))), 7);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (-10, -10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (12, -10))), 1);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (-10, -10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (10, -12))), 1);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (-5, -15), db::Point (105, 95)), db::Edge (db::Point (-20, 24), db::Point (20, -24))), 6);
-  EXPECT_EQ (edge_projection (db::Edge (db::Point (-15, -5), db::Point (95, 105)), db::Edge (db::Point (24, -20), db::Point (-24, 20))), 6);
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (50, 0), db::Point (75, 0))), db::Edge::distance_type (25));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (100, 0), db::Point (0, 0)), db::Edge (db::Point (50, 0), db::Point (75, 0))), db::Edge::distance_type (25));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (100, 0), db::Point (0, 0)), db::Edge (db::Point (75, 0), db::Point (50, 0))), db::Edge::distance_type (25));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (75, 0), db::Point (50, 0))), db::Edge::distance_type (25));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (50, 10), db::Point (75, 100))), db::Edge::distance_type (25));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (10, 10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (60, 0))), db::Edge::distance_type (28));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (10, 10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (0, 0))), db::Edge::distance_type (0));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (0, 0), db::Point (0, 0)), db::Edge (db::Point (0, 0), db::Point (0, 0))), db::Edge::distance_type (0));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (0, 0), db::Point (0, 0)), db::Edge (db::Point (0, 0), db::Point (10, 0))), db::Edge::distance_type (0));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (10, 10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (10, 0))), db::Edge::distance_type (0));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (-10, -10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (10, 0))), db::Edge::distance_type (7));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (100, 100), db::Point (-10, -10)), db::Edge (db::Point (0, 0), db::Point (10, 0))), db::Edge::distance_type (7));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (100, 100), db::Point (-10, -10)), db::Edge (db::Point (10, 0), db::Point (0, 0))), db::Edge::distance_type (7));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (-10, -10), db::Point (100, 100)), db::Edge (db::Point (10, 0), db::Point (0, 0))), db::Edge::distance_type (7));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (-10, -10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (12, -10))), db::Edge::distance_type (1));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (-10, -10), db::Point (100, 100)), db::Edge (db::Point (0, 0), db::Point (10, -12))), db::Edge::distance_type (1));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (-5, -15), db::Point (105, 95)), db::Edge (db::Point (-20, 24), db::Point (20, -24))), db::Edge::distance_type (6));
+  EXPECT_EQ (edge_projection (db::Edge (db::Point (-15, -5), db::Point (95, 105)), db::Edge (db::Point (24, -20), db::Point (-24, 20))), db::Edge::distance_type (6));
 }
 
 TEST(2)

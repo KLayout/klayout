@@ -82,7 +82,7 @@ TEST(1)
     ++n;
   }
 
-  EXPECT_EQ (n, 9);
+  EXPECT_EQ (n, (unsigned int) 9);
   EXPECT_EQ (s.at_end (), true);
 
   for (unsigned int i = 0; i < n; ++i) {

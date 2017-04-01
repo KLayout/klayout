@@ -135,7 +135,7 @@ TEST(2)
   EXPECT_EQ (error, true);
   
   from_string ("   12   ", ul);
-  EXPECT_EQ (ul, 12);
+  EXPECT_EQ (ul, (unsigned int) 12);
   error = false;
   try { from_string ("a", ul); } catch (...) { error = true; }
   EXPECT_EQ (error, true);
@@ -150,7 +150,7 @@ TEST(2)
   EXPECT_EQ (error, true);
 
   from_string ("   12   ", ui);
-  EXPECT_EQ (ui, 12);
+  EXPECT_EQ (ui, (unsigned int) 12);
   error = false;
   try { from_string ("a", ui); } catch (...) { error = true; }
   EXPECT_EQ (error, true);
@@ -181,14 +181,14 @@ TEST(4)
   tl::string s;
   EXPECT_EQ (std::string (s.c_str ()), "");
   EXPECT_EQ (s.std_str (), "");
-  EXPECT_EQ (s.size (), 0);
-  EXPECT_EQ (s.capacity (), 0);
+  EXPECT_EQ (s.size (), size_t (0));
+  EXPECT_EQ (s.capacity (), size_t (0));
 
   s = "abc";
   EXPECT_EQ (std::string (s.c_str ()), "abc");
   EXPECT_EQ (s.std_str (), "abc");
-  EXPECT_EQ (s.size (), 3);
-  EXPECT_EQ (s.capacity (), 3);
+  EXPECT_EQ (s.size (), size_t (3));
+  EXPECT_EQ (s.capacity (), size_t (3));
 
   s.assign ("abc", 1, 2);
   EXPECT_EQ (std::string (s.c_str ()), "b");
@@ -204,28 +204,28 @@ TEST(4)
   EXPECT_EQ (s < "ba", true);
   EXPECT_EQ (s < "c", true);
   EXPECT_EQ (s.std_str (), "b");
-  EXPECT_EQ (s.size (), 1);
-  EXPECT_EQ (s.capacity (), 3);
+  EXPECT_EQ (s.size (), size_t (1));
+  EXPECT_EQ (s.capacity (), size_t (3));
 
   s = std::string ("abcdef");
   EXPECT_EQ (s.std_str (), "abcdef");
-  EXPECT_EQ (s.size (), 6);
-  EXPECT_EQ (s.capacity (), 6);
+  EXPECT_EQ (s.size (), size_t (6));
+  EXPECT_EQ (s.capacity (), size_t (6));
 
   s = std::string ();
   EXPECT_EQ (s.std_str (), "");
-  EXPECT_EQ (s.size (), 0);
-  EXPECT_EQ (s.capacity (), 6);
+  EXPECT_EQ (s.size (), size_t (0));
+  EXPECT_EQ (s.capacity (), size_t (6));
 
   s = "xyz";
   EXPECT_EQ (s.std_str (), "xyz");
-  EXPECT_EQ (s.size (), 3);
-  EXPECT_EQ (s.capacity (), 6);
+  EXPECT_EQ (s.size (), size_t (3));
+  EXPECT_EQ (s.capacity (), size_t (6));
 
   s.clear ();
   EXPECT_EQ (s.std_str (), "");
-  EXPECT_EQ (s.size (), 0);
-  EXPECT_EQ (s.capacity (), 0);
+  EXPECT_EQ (s.size (), size_t (0));
+  EXPECT_EQ (s.capacity (), size_t (0));
 
   // ...
 
@@ -250,7 +250,7 @@ TEST(5)
   x.read (s, "-");
   x.read (d);
 
-  EXPECT_EQ (ui, 5);
+  EXPECT_EQ (ui, (unsigned int) 5);
   EXPECT_EQ (l, -6);
   EXPECT_EQ (s, "oder");
   EXPECT_EQ (d, -15.0);
@@ -268,7 +268,7 @@ TEST(6)
 
   EXPECT_EQ (x.try_read (ul), true);
   EXPECT_EQ (x.try_read (ul), false);
-  EXPECT_EQ (ul, 5);
+  EXPECT_EQ (ul, (unsigned long) 5);
   EXPECT_EQ (x.test (";"), false);
   x.expect (":");
   EXPECT_EQ (x.try_read (i), true);

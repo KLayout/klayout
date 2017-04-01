@@ -20,25 +20,8 @@
 
 */
 
-
-
 #include "tlUtils.h"
 #include "utHead.h"
-
-TEST(1) 
-{
-  int x;
-  x = tl::lcd (17, 6);
-  EXPECT_EQ (x, 1);
-  x = tl::lcd (27, 6);
-  EXPECT_EQ (x, 3);
-  x = tl::lcd (30, 6);
-  EXPECT_EQ (x, 6);
-  x = tl::lcd (31*17, 371*17);
-  EXPECT_EQ (x, 17);
-  x = tl::lcd (702*17, 372*17);
-  EXPECT_EQ (x, 102);
-}
 
 namespace
 {
@@ -56,7 +39,7 @@ struct XXX
 
 class XX : public XXX, private tl::Object { };
 
-TEST(2)
+TEST(1)
 {
   EXPECT_EQ (tl::value_from_type (tl::type_from_value<false>::value ()), false);
   EXPECT_EQ (tl::value_from_type (tl::type_from_value<true>::value ()), true);

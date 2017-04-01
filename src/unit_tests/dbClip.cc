@@ -52,7 +52,7 @@ TEST(1)
   out_spoly.clear ();
   db::clip_poly (in_poly, t270 * box, out_spoly);
 
-  EXPECT_EQ (out_spoly.size (), 1);
+  EXPECT_EQ (out_spoly.size (), size_t (1));
   EXPECT_EQ (out_spoly[0].to_string(), "(0,-90;0,-20;20,-20;20,-80;80,-80;80,-20;0,-20;0,0;90,0;90,-90)");
 
   db::FTrans t180 (db::FTrans::r180);
@@ -60,7 +60,7 @@ TEST(1)
   out_spoly.clear ();
   db::clip_poly (in_poly, t180 * box, out_spoly);
 
-  EXPECT_EQ (out_spoly.size (), 1);
+  EXPECT_EQ (out_spoly.size (), size_t (1));
   EXPECT_EQ (out_spoly[0].to_string(), "(-90,-90;-90,-20;-80,-20;-80,-80;-20,-80;-20,-20;-90,-20;-90,0;0,0;0,-90)");
 
   db::FTrans t90 (db::FTrans::r90);
@@ -68,14 +68,14 @@ TEST(1)
   out_spoly.clear ();
   db::clip_poly (in_poly, t90 * box, out_spoly);
 
-  EXPECT_EQ (out_spoly.size (), 1);
+  EXPECT_EQ (out_spoly.size (), size_t (1));
   EXPECT_EQ (out_spoly[0].to_string(), "(-90,0;-90,80;-80,80;-80,20;-20,20;-20,80;-90,80;-90,90;0,90;0,0)");
 
   in_poly.assign_hull(input, input + sizeof(input) / sizeof(input[0]));
   out_spoly.clear ();
   db::clip_poly (in_poly, box, out_spoly);
 
-  EXPECT_EQ (out_spoly.size (), 1);
+  EXPECT_EQ (out_spoly.size (), size_t (1));
   EXPECT_EQ (out_spoly[0].to_string(), "(0,0;0,80;20,80;20,20;80,20;80,80;0,80;0,90;90,90;90,0)");
 }
 
@@ -105,7 +105,7 @@ TEST(2)
   out_spoly.clear ();
   db::clip_poly (in_poly, box, out_spoly);
 
-  EXPECT_EQ (out_spoly.size (), 1);
+  EXPECT_EQ (out_spoly.size (), size_t (1));
   EXPECT_EQ (out_spoly[0].to_string(), "(0,0;0,1000;400,1000;400,500;1000,500;1000,1000;0,1000;0,1700;1400,1700;1400,1000;2200,1000;2200,0)");
   
   box = db::Box (0, 0, 1200, 2000);
@@ -114,7 +114,7 @@ TEST(2)
   out_spoly.clear ();
   db::clip_poly (in_poly, box, out_spoly);
 
-  EXPECT_EQ (out_spoly.size (), 1);
+  EXPECT_EQ (out_spoly.size (), size_t (1));
   EXPECT_EQ (out_spoly[0].to_string(), "(0,0;0,1000;400,1000;400,500;1000,500;1000,1000;0,1000;0,1700;1200,1700;1200,0)");
   
   box = db::Box (0, 0, 1200, 1200);
@@ -123,7 +123,7 @@ TEST(2)
   out_spoly.clear ();
   db::clip_poly (in_poly, box, out_spoly);
 
-  EXPECT_EQ (out_spoly.size (), 1);
+  EXPECT_EQ (out_spoly.size (), size_t (1));
   EXPECT_EQ (out_spoly[0].to_string(), "(0,0;0,1000;400,1000;400,500;1000,500;1000,1000;0,1000;0,1200;1200,1200;1200,0)");
   
   box = db::Box (200, 200, 1200, 1200);
@@ -132,7 +132,7 @@ TEST(2)
   out_spoly.clear ();
   db::clip_poly (in_poly, box, out_spoly);
 
-  EXPECT_EQ (out_spoly.size (), 1);
+  EXPECT_EQ (out_spoly.size (), size_t (1));
   EXPECT_EQ (out_spoly[0].to_string(), "(200,200;200,1000;400,1000;400,500;1000,500;1000,1000;200,1000;200,1200;1200,1200;1200,200)");
   
   box = db::Box (200, 200, 800, 1200);
@@ -141,7 +141,7 @@ TEST(2)
   out_spoly.clear ();
   db::clip_poly (in_poly, box, out_spoly);
 
-  EXPECT_EQ (out_spoly.size (), 1);
+  EXPECT_EQ (out_spoly.size (), size_t (1));
   EXPECT_EQ (out_spoly[0].to_string(), "(200,200;200,1200;800,1200;800,1000;400,1000;400,500;800,500;800,200)");
 }
 
@@ -481,7 +481,7 @@ TEST(3)
     }
   }
 
-  EXPECT_EQ (out_spoly.size (), 2);
+  EXPECT_EQ (out_spoly.size (), size_t (2));
   EXPECT_EQ (out_spoly[0].to_string (), "(104931394,20747500;105644194,21460300;105644194,20747500)");
   EXPECT_EQ (out_spoly[1].to_string (), "(102977000,26550100;102928399,26559767;102859667,26628499;102850000,26677100;"
                                          "102850000,27150000;101100000,27150000;101100000,26877100;101090333,26828499;"
@@ -549,7 +549,7 @@ TEST(4)
 
   std::vector<db::Polygon> out_poly;
   db::clip_poly (in_poly, box, out_poly);
-  EXPECT_EQ (out_poly.size (), 0);
+  EXPECT_EQ (out_poly.size (), size_t (0));
 }
 
 TEST(5) 
@@ -580,7 +580,7 @@ TEST(5)
 
   std::vector<db::Polygon> out_poly;
   db::clip_poly (in_poly, box, out_poly);
-  EXPECT_EQ (out_poly.size (), 2);
+  EXPECT_EQ (out_poly.size (), size_t (2));
 
   EXPECT_EQ (out_poly[0].to_string(), "(54,0;54,10;100,671;100,631)");
   EXPECT_EQ (out_poly[1].to_string(), "(51,20;51,40;100,737;100,711;53,50;52,30)");

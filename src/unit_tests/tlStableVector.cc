@@ -50,7 +50,7 @@ struct test_compare {
 TEST(1) 
 {
   tl::stable_vector<std::string> v;
-  EXPECT_EQ (v.size (), 0);
+  EXPECT_EQ (v.size (), size_t (0));
   v.push_back ("d");
   EXPECT_EQ (v.back (), "d");
   v.push_back (new std::string ("a"));
@@ -93,7 +93,7 @@ TEST(1)
   EXPECT_EQ (i == v.end (), false);
   EXPECT_EQ (i != v.end (), true);
 
-  EXPECT_EQ (v.size (), 4);
+  EXPECT_EQ (v.size (), size_t (4));
 
   tl::sort (v.begin (), v.end ());
   EXPECT_EQ (to_string (v), "a ba bx d ");
@@ -117,7 +117,7 @@ TEST(1)
 
   vv.pop_back ();
   EXPECT_EQ (to_string (vv), "d bx ba ");
-  EXPECT_EQ (vv.size (), 3);
+  EXPECT_EQ (vv.size (), size_t (3));
 
   v = vv;
   EXPECT_EQ (to_string (vv), "d bx ba ");
@@ -130,13 +130,13 @@ TEST(1)
   EXPECT_EQ (v == vv, false);
   EXPECT_EQ (v != vv, true);
   EXPECT_EQ (to_string (vv), "");
-  EXPECT_EQ (vv.size (), 0);
+  EXPECT_EQ (vv.size (), size_t (0));
   EXPECT_EQ (vv.empty (), true);
 
   EXPECT_EQ (v.empty (), false);
   v.erase (v.begin (), v.end ());
   EXPECT_EQ (to_string (v), "");
-  EXPECT_EQ (v.size (), 0);
+  EXPECT_EQ (v.size (), size_t (0));
   EXPECT_EQ (v.empty (), true);
 
 }

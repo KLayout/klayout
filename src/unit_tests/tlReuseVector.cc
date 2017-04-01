@@ -171,13 +171,13 @@ TEST(3)
 
   rv.erase (a);
   EXPECT_EQ (a.is_valid (), false);
-  EXPECT_EQ (rv.size (), 3);
-  EXPECT_EQ (rv.capacity (), 4);
+  EXPECT_EQ (rv.size (), size_t (3));
+  EXPECT_EQ (rv.capacity (), size_t (4));
   EXPECT_EQ (to_string (rv), "b,c,d");
 
   a = rv.insert ("a");
   EXPECT_EQ (a.is_valid (), true);
-  EXPECT_EQ (rv.size (), 4);
+  EXPECT_EQ (rv.size (), size_t (4));
   EXPECT_EQ (to_string (rv), "a,b,c,d")
 
   EXPECT_EQ (*d, "d");

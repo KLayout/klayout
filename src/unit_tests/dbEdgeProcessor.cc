@@ -902,11 +902,11 @@ TEST(13)
 
   db::EdgeProcessor ep;
   ep.size (in, -75, out);
-  EXPECT_EQ (out.size (), 0);
+  EXPECT_EQ (out.size (), size_t (0));
 
   out.clear();
   ep.size (in, -25, out);
-  EXPECT_EQ (out.size (), 1);
+  EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out[0].to_string (), "(25,25;25,75;75,75;75,25)");
 }
 
@@ -969,7 +969,7 @@ TEST(14)
   db::EdgeProcessor ep;
   ep.boolean (in1, in2, out, db::BooleanOp::Xor, false, false);
 
-  EXPECT_EQ (out.size (), 3);
+  EXPECT_EQ (out.size (), size_t (3));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(71239900,114014305;71192097,114062108;71192097,114062113;71151715,114102490;71117705,114136500;71117701,114136500;70303697,114950403;70198487,114950397;70124100,114876000;70124100,115107255;71239900,115107255)");
   EXPECT_EQ (out[1].to_string (), "(70198495,114696400;70164485,114730410;70198499,114696400)");
@@ -1010,7 +1010,7 @@ TEST(15)
   db::EdgeProcessor ep;
   ep.boolean (in1, in2, out, db::BooleanOp::And, false, false);
 
-  EXPECT_EQ (out.size (), 1);
+  EXPECT_EQ (out.size (), size_t (1));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(43264,22390;1467712,245710;1511719,25671;1511726,25637;1512360,22467)");
 }
@@ -1053,7 +1053,7 @@ TEST(16)
   db::EdgeProcessor ep;
   ep.simple_merge (in1, out, false, false);
 
-  EXPECT_EQ (out.size (), 1);
+  EXPECT_EQ (out.size (), size_t (1));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(13,0;13,2818;0,2818;13,6286;13,6422;4,9832;25,9817;27,10304;2825,7874;10592,2485;7336,2442;10873,6)");
 }
@@ -1096,7 +1096,7 @@ TEST(17)
   db::EdgeProcessor ep;
   ep.simple_merge (in1, out, false, false);
 
-  EXPECT_EQ (out.size (), 1);
+  EXPECT_EQ (out.size (), size_t (1));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(0,18;130,64;113,64;218,100;204,100;700,266;706,268;1177,434;1177,429;1293,469;1293,463;1388,495;1387,101;1293,101;1293,64;1178,64;1178,18)");
 }
@@ -1139,7 +1139,7 @@ TEST(18)
   db::EdgeProcessor ep;
   ep.simple_merge (in1, out, false, false);
 
-  EXPECT_EQ (out.size (), 1);
+  EXPECT_EQ (out.size (), size_t (1));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(419,1400;468,1405;453,1405;926,1451;953,1454;2281,1589;2284,1589;2284,1585;2316,1588;2316,1405;2284,1405;2284,1400)");
 }
@@ -1185,7 +1185,7 @@ TEST(19)
   db::EdgeProcessor ep;
   ep.simple_merge (in1, out, false, false);
 
-  EXPECT_EQ (out.size (), 1);
+  EXPECT_EQ (out.size (), size_t (1));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(12654800,0;0,8492100;12316037,26845401;12771101,29120740;12851400,29524600;12851876,29524621;16663400,48582400;31607400,45593600;28260773,30196549;145086300,35290900;145086300,20050900;27739393,27797800;26821540,23574973;27109200,23471400;26629840,22693003;26029700,19931900;25128663,20255356)");
 }
@@ -1228,7 +1228,7 @@ TEST(20)
   db::EdgeProcessor ep;
   ep.simple_merge (in1, out, false, false);
 
-  EXPECT_EQ (out.size (), 2);
+  EXPECT_EQ (out.size (), size_t (2));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(7362,2768;7532,2826;7374,2768)");
   EXPECT_EQ (out[1].to_string (), "(7394,2768;7533,2826;7434,2768;7427,2768;7533,2826;7404,2768)");
@@ -1266,7 +1266,7 @@ TEST(21)
   db::EdgeProcessor ep;
   ep.boolean (in1, in2, out, db::BooleanOp::And, false, false);
 
-  EXPECT_EQ (out.size (), 1);
+  EXPECT_EQ (out.size (), size_t (1));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(3527,4261;3805,5687;4217,5015;4217,5014)");
 }
@@ -1301,7 +1301,7 @@ TEST(22)
   db::EdgeProcessor ep;
   ep.boolean (in1, in2, out, db::BooleanOp::And, false, false);
 
-  EXPECT_EQ (out.size (), 1);
+  EXPECT_EQ (out.size (), size_t (1));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(9985,0;0,2236;13709,3746;12464,2479)");
 }
@@ -1325,7 +1325,7 @@ TEST(23)
   db::EdgeProcessor ep;
   ep.simple_merge (in1, out, false, false);
 
-  EXPECT_EQ (out.size (), 1);
+  EXPECT_EQ (out.size (), size_t (1));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(0,0;0,1;1,0)");
 }
@@ -1390,7 +1390,7 @@ TEST(24)
   db::EdgeProcessor ep;
   ep.simple_merge (in1, out, false, false);
 
-  EXPECT_EQ (out.size (), 2);
+  EXPECT_EQ (out.size (), size_t (2));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(0,-9;0,0;3,0;3,-2;1,0;1,-9)");
   EXPECT_EQ (out[1].to_string (), "(-2,1;-2,3;0,1;0,10;1,10;1,1)");
@@ -1435,7 +1435,7 @@ TEST(25)
   db::EdgeProcessor ep;
   ep.simple_merge (in1, out, false, false, 1);
 
-  EXPECT_EQ (out.size (), 2);
+  EXPECT_EQ (out.size (), size_t (2));
   std::sort (out.begin (), out.end ());
   EXPECT_EQ (out[0].to_string (), "(-471,2264;-471,2367;-353,2367;-353,2264)");
   EXPECT_EQ (out[1].to_string (), "(-323,2390;-327,2392;-324,2392)");
@@ -1538,7 +1538,7 @@ TEST(27)
 
     ep.process (pg, op);
 
-    EXPECT_EQ (out.size (), 4);
+    EXPECT_EQ (out.size (), size_t (4));
     EXPECT_EQ (out[0].to_string (), "(100,0;100,100;900,100;900,0)");
     EXPECT_EQ (out[1].to_string (), "(0,100;0,900;100,900;100,100)");
     EXPECT_EQ (out[2].to_string (), "(900,100;900,900;1000,900;1000,100)");
@@ -1558,7 +1558,7 @@ TEST(27)
 
     ep.process (pg, op);
 
-    EXPECT_EQ (out.size (), 1);
+    EXPECT_EQ (out.size (), size_t (1));
     EXPECT_EQ (out[0].to_string (), "(100,0;100,100;0,100;0,900;100,900;100,1000;900,1000;900,900;1000,900;1000,100;900,100;900,0/100,100;900,100;900,900;100,900)");
   }
 
@@ -1575,7 +1575,7 @@ TEST(27)
 
     ep.process (pg, op);
 
-    EXPECT_EQ (out.size (), 1);
+    EXPECT_EQ (out.size (), size_t (1));
     EXPECT_EQ (out[0].to_string (), "(0,0;0,1000;1000,1000;1000,0/100,100;900,100;900,900;100,900)");
   }
 
@@ -1591,7 +1591,7 @@ TEST(27)
 
     ep.process (pg, op);
 
-    EXPECT_EQ (out.size (), 1);
+    EXPECT_EQ (out.size (), size_t (1));
     EXPECT_EQ (out[0].to_string (), "(100,0;100,100;0,100;0,900;100,900;100,1000;900,1000;900,900;1000,900;1000,100;900,100;900,0/100,100;900,100;900,900;100,900)");
   }
 
@@ -1607,7 +1607,7 @@ TEST(27)
 
     ep.process (pg, op);
 
-    EXPECT_EQ (out.size (), 1);
+    EXPECT_EQ (out.size (), size_t (1));
     EXPECT_EQ (out[0].to_string (), "(0,0;0,1000;1000,1000;1000,0/100,100;900,100;900,900;100,900)");
   }
 }
@@ -1667,7 +1667,7 @@ TEST(28)
 
   ep.process (pg, op);
 
-  EXPECT_EQ (out.size (), 1);
+  EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out[0].to_string (), "(-488720,-758200;-490960,-728451;-489451,-724867;-489450,-724867;-487680,-724734;-487675,-724800;-485180,-757934)");
 }
 
@@ -1714,7 +1714,7 @@ TEST(29)
 
   ep.process (pg, op);
 
-  EXPECT_EQ (out.size (), 1);
+  EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out[0].to_string (), "(0,0;0,608;172,602;572,588;580,588;710,583;710,0)");
 }
 
@@ -1744,7 +1744,7 @@ TEST(30)
 
   ep.process (ec, op);
 
-  EXPECT_EQ (out.size (), 2);
+  EXPECT_EQ (out.size (), size_t (2));
   EXPECT_EQ (out[0].to_string (), "(0,400;400,400)");
   EXPECT_EQ (out[1].to_string (), "(0,403;386,414)");
 }
@@ -1959,7 +1959,7 @@ TEST(40)
 
   ep.process (pg, op);
 
-  EXPECT_EQ (out.size (), 4);
+  EXPECT_EQ (out.size (), size_t (4));
   EXPECT_EQ (out[0].to_string (), "(0,0;0,100;1000,100;1000,0)");
   EXPECT_EQ (out[1].to_string (), "(0,100;0,800;100,800;100,100)");
   EXPECT_EQ (out[2].to_string (), "(800,100;800,800;1000,800;1000,100)");
@@ -1980,7 +1980,7 @@ TEST(41)
 
   ep.process (pg, op);
 
-  EXPECT_EQ (out.size (), 6);
+  EXPECT_EQ (out.size (), size_t (6));
   EXPECT_EQ (out[0].to_string (), "(0,0;0,100;1000,100;1000,0)");
   EXPECT_EQ (out[1].to_string (), "(0,100;0,400;100,400;100,100)");
   EXPECT_EQ (out[2].to_string (), "(400,100;400,400;1000,400;1000,100)");
@@ -2002,7 +2002,7 @@ TEST(42)
 
   ep.process (pg, op);
 
-  EXPECT_EQ (out.size (), 4);
+  EXPECT_EQ (out.size (), size_t (4));
   EXPECT_EQ (out[0].to_string (), "(400,0;400,400;1000,400;1000,0)");
   EXPECT_EQ (out[1].to_string (), "(0,400;0,600;400,600;400,400)");
   EXPECT_EQ (out[2].to_string (), "(600,400;600,600;1000,600;1000,400)");
@@ -2024,7 +2024,7 @@ TEST(43)
 
   ep.process (pg, op);
 
-  EXPECT_EQ (out.size (), 2);
+  EXPECT_EQ (out.size (), size_t (2));
   EXPECT_EQ (out[0].to_string (), "(0,0;250,500;1000,500;1000,0)");
   EXPECT_EQ (out[1].to_string (), "(250,500;500,1000;1000,500)");
 }
@@ -2054,7 +2054,7 @@ TEST(44)
 
   ep.process (pg, op);
 
-  EXPECT_EQ (out.size (), 5);
+  EXPECT_EQ (out.size (), size_t (5));
   EXPECT_EQ (out[0].to_string (), "(0,0;0,2000;9000,2000;9000,0)");
   EXPECT_EQ (out[1].to_string (), "(0,2000;0,2500;3000,2500;6500,2000)");
   EXPECT_EQ (out[2].to_string (), "(0,2500;0,3000;2500,3000;3000,2500)");
@@ -2087,7 +2087,7 @@ TEST(45)
 
   ep.process (pg, op);
 
-  EXPECT_EQ (out.size (), 5);
+  EXPECT_EQ (out.size (), size_t (5));
   EXPECT_EQ (out[0].to_string (), "(0,0;0,50;1000,50;1000,0)");
   EXPECT_EQ (out[1].to_string (), "(0,50;0,100;300,100;800,50)");
   EXPECT_EQ (out[2].to_string (), "(0,100;0,150;250,150;300,100)");
@@ -2117,7 +2117,7 @@ TEST(46)
 
   ep.process (pg, op);
 
-  EXPECT_EQ (out.size (), 6);
+  EXPECT_EQ (out.size (), size_t (6));
   EXPECT_EQ (out[0].to_string (), "(0,0;73,122;326,122)");
   EXPECT_EQ (out[1].to_string (), "(350,0;326,122;391,122)");
   EXPECT_EQ (out[2].to_string (), "(326,122;400,150;391,122)");

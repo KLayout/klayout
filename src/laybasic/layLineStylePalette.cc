@@ -137,7 +137,6 @@ LineStylePalette::from_string (const std::string &s)
     while (true) {
 
       unsigned int s = 0;
-      unsigned int st = 0;
 
       if (! x.try_read (s)) {
         break;

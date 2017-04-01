@@ -95,7 +95,8 @@ SOURCES = \
   tlVariant.cc \
   tlXMLParser.cc \
   gsiTest.cc \
-    tlFileSystemWatcher.cc
+    tlFileSystemWatcher.cc \
+    tlMath.cc
 
 # main components:
 SOURCES += \

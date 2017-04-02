@@ -82,7 +82,9 @@ HCPCellTreeWidget::HCPCellTreeWidget (QWidget *parent, const char *name, QWidget
 bool
 HCPCellTreeWidget::event (QEvent *event)
 {
-  //  Handling this event makes the widget receive all keystrokes
+#if 0
+  //  Handling this event makes the widget receive all keystrokes.
+  //  Without this code, shortcuts override the search function.
   if (event->type () == QEvent::ShortcutOverride) {
     QKeyEvent *ke = static_cast<QKeyEvent *> (event);
     QString t = ke->text ();
@@ -90,6 +92,7 @@ HCPCellTreeWidget::event (QEvent *event)
       ke->accept ();
     }
   }
+#endif
   return QTreeView::event (event);
 }
 
@@ -103,7 +106,11 @@ void
 HCPCellTreeWidget::keyPressEvent (QKeyEvent *event)
 {
   QString t = event->text ();
-  if (!t.isEmpty () && t[0].isPrint ()) {
+  if (! t.isEmpty () && t[0].isPrint ()) {
+    // "/" is a search initiator
+    if (t == QString::fromUtf8 ("/")) {
+      t.clear ();
+    }
     emit search_triggered (t);
   } else if (mp_key_event_receiver) {
     //  send other key events to the alternative receiver - this way we can make the

@@ -155,7 +155,9 @@ LCPTreeWidget::focusNextPrevChild (bool /*next*/)
 bool
 LCPTreeWidget::event (QEvent *event)
 {
-  //  Handling this event makes the widget receive all keystrokes
+#if 0
+  //  Handling this event makes the widget receive all keystrokes.
+  //  Without this code, shortcuts override the search function.
   if (event->type () == QEvent::ShortcutOverride) {
     QKeyEvent *ke = static_cast<QKeyEvent *> (event);
     QString t = ke->text ();
@@ -163,6 +165,7 @@ LCPTreeWidget::event (QEvent *event)
       ke->accept ();
     }
   }
+#endif
   return QTreeView::event (event);
 }
 
@@ -171,6 +174,10 @@ LCPTreeWidget::keyPressEvent (QKeyEvent *event)
 {
   QString t = event->text ();
   if (!t.isEmpty () && t[0].isPrint ()) {
+    // "/" is a search initiator
+    if (t == QString::fromUtf8 ("/")) {
+      t.clear ();
+    }
     emit search_triggered (t);
   } else {
     QTreeView::keyPressEvent (event);

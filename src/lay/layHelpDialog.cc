@@ -74,15 +74,6 @@ HelpDialog::~HelpDialog ()
   //  .. nothing yet ..
 }
 
-void 
-HelpDialog::build_index ()
-{
-  if (! mp_help_source) {
-    mp_help_source = new lay::HelpSource ();
-    tl::StaticObjects::reg (&mp_help_source);
-  }
-}
-
 void HelpDialog::title_changed (const QString &)
 {
   QString wt;
@@ -127,9 +118,11 @@ void HelpDialog::initialize ()
   if (! m_initialized) {
     m_initialized = true;
     mp_browser_panel->set_search_url ("int:/search.xml", "string");
-    if (mp_help_source) {
-      mp_browser_panel->set_source (mp_help_source);
+    if (! mp_help_source) {
+      mp_help_source = new lay::HelpSource ();
+      tl::StaticObjects::reg (&mp_help_source);
     }
+    mp_browser_panel->set_source (mp_help_source);
     mp_browser_panel->set_home ("int:/index.xml");
   }
 }

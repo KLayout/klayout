@@ -248,42 +248,43 @@ help_index_structure ("help-index",
 HelpSource::HelpSource ()
   : m_kindex (0)
 {
+  initialize_index ();
+}
+
+HelpSource::HelpSource (bool make_index)
+  : m_kindex (0)
+{
+  if (make_index) {
+    initialize_index ();
+  }
+}
+
+void
+HelpSource::initialize_index ()
+{
   try {
 
     tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (QObject::tr ("Initializing help index")));
 
     bool ok = false;
 
-    std::string cache_file = tl::to_string (QDir (tl::to_qstring (lay::Application::instance ()->appdata_path ())).absoluteFilePath (QString::fromUtf8 ("help-index.xml")));
+    const QString help_index_cache_file = QString::fromUtf8 ("help-index.xml");
+    std::string per_user_cache_file = tl::to_string (QDir (tl::to_qstring (lay::Application::instance ()->appdata_path ())).absoluteFilePath (help_index_cache_file));
 
-    try {
-      tl::XMLFileSource in (cache_file);
-      help_index_structure.parse (in, *this);
-      if (m_klayout_version == lay::Application::instance ()->version ()) {
-        ok = true;
-      }
-    } catch (tl::Exception &ex) {
-      tl::warn << ex.msg ();
-    } catch (std::runtime_error &ex) {
-      tl::warn << ex.what ();
-    } catch (...) {
-      tl::warn << "unknown error.";
-    }
+    //  Try to obtain the help index from the installation or application path
 
-    if (! ok) {
+    std::vector<std::string> cache_files;
+    cache_files.push_back (tl::to_string (QDir (tl::to_qstring (lay::Application::instance ()->inst_path ())).absoluteFilePath (help_index_cache_file)));
+    cache_files.push_back (per_user_cache_file);
 
-      m_index.clear ();
-      m_titles.clear ();
-      m_title_map.clear ();
+    for (std::vector<std::string>::const_iterator c = cache_files.begin (); ! ok && c != cache_files.end (); ++c) {
 
-      tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Initializing help index")), 1);
-      progress.can_cancel (false);
-      scan ("/index.xml", progress);
       try {
-
-        tl::OutputStream os (cache_file, tl::OutputStream::OM_Plain);
-        help_index_structure.write (os, *this);
-
+        tl::XMLFileSource in (*c);
+        help_index_structure.parse (in, *this);
+        if (m_klayout_version == lay::Application::instance ()->version ()) {
+          ok = true;
+        }
       } catch (tl::Exception &ex) {
         tl::warn << ex.msg ();
       } catch (std::runtime_error &ex) {
@@ -294,17 +295,58 @@ HelpSource::HelpSource ()
 
     }
 
+    if (! ok) {
+      //  If no index is found, create one in "per_user_cache_file"
+      produce_index_file (per_user_cache_file);
+    }
+
   } catch (tl::Exception &ex) {
+
     m_index.clear ();
     m_titles.clear ();
     m_title_map.clear ();
+    m_parent_of.clear ();
+
     tl::error << ex.msg ();
+
   }
 }
 
 HelpSource::~HelpSource()
 {
   //  .. nothing yet ..
+}
+
+void
+HelpSource::produce_index_file (const std::string &path)
+{
+  m_index.clear ();
+  m_titles.clear ();
+  m_title_map.clear ();
+  m_parent_of.clear ();
+
+  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Initializing help index")), 1);
+  progress.can_cancel (false);
+  scan ("/index.xml", progress);
+  try {
+
+    tl::OutputStream os (path, tl::OutputStream::OM_Plain);
+    help_index_structure.write (os, *this);
+
+  } catch (tl::Exception &ex) {
+    tl::warn << ex.msg ();
+  } catch (std::runtime_error &ex) {
+    tl::warn << ex.what ();
+  } catch (...) {
+    tl::warn << "unknown error.";
+  }
+}
+
+void
+HelpSource::create_index_file (const std::string &path)
+{
+  HelpSource source (false);
+  source.produce_index_file (path);
 }
 
 std::string

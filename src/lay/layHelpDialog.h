@@ -53,8 +53,6 @@ public:
   void showEvent (QShowEvent *);
   void hideEvent (QHideEvent *);
 
-  static void build_index ();
-
 protected slots:
   void title_changed (const QString &t);
 

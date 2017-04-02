@@ -1183,9 +1183,6 @@ MainWindow::close_all ()
 void
 MainWindow::about_to_exec ()
 {
-  //  do this now since we have a window where we can show the progress on the first call ..
-  HelpDialog::build_index ();
-
   //  Give the plugins a change to do some last-minute initialisation and checks
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);

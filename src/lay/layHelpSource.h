@@ -145,6 +145,11 @@ public:
 
   std::vector<std::string> urls ();
 
+  /**
+   *  @brief Creates a help index file at the given path
+   */
+  static void create_index_file (const std::string &path);
+
 private:
   std::vector<IndexEntry> m_index;
   std::map<std::string, std::string> m_parent_of;
@@ -153,8 +158,11 @@ private:
   std::string m_klayout_version;
   int m_kindex;
 
+  HelpSource (bool make_index);
   QDomDocument produce_search (const std::string &index);
   QDomDocument produce_main_index ();
+  void produce_index_file (const std::string &path);
+  void initialize_index ();
   std::string process (const QDomDocument &doc, const std::string &path);
   void process_child_nodes (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer);
   void process (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer);

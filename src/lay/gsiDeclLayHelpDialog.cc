@@ -99,8 +99,9 @@ Class<lay::HelpSource> decl_HelpSource (laybasicdecl_BrowserSource (), "HelpSour
   gsi::method ("get_dom", &lay::HelpSource::get_dom, "@brief For internal use") + 
 #endif
   gsi::method ("urls", &lay::HelpSource::urls, "@brief Reserved for internal use") +
-  gsi::method ("title_for", &lay::HelpSource::title_for, "@brief Reserved internal use") +
-  gsi::method ("parent_of", &lay::HelpSource::parent_of, "@brief Reserved internal use"),
+  gsi::method ("title_for", &lay::HelpSource::title_for, gsi::arg ("path"), "@brief Reserved internal use") +
+  gsi::method ("parent_of", &lay::HelpSource::parent_of, gsi::arg ("path"), "@brief Reserved internal use") +
+  gsi::method ("create_index_file", &lay::HelpSource::create_index_file, gsi::arg ("path"), "@brief Reserved internal use"),
   "@brief A \\BrowserSource implementation delivering the help text for the help dialog\n"
   "This class can be used together with a \\BrowserPanel or \\BrowserDialog object to implement "
   "custom help systems.\n"

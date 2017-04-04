@@ -265,6 +265,17 @@ public:
   }
 
   /**
+   *  @brief Gets a value indicating whether the plugin can exit
+   *
+   *  If the plugin wants to prevent the application from closing, it may return false
+   *  in this method.
+   */
+  virtual bool can_exit (lay::PluginRoot * /*root*/) const
+  {
+    return true;
+  }
+
+  /**
    *  @brief Fetch the menu objects for this plugin
    *
    *  The implementation of this method is supposed to call the base
@@ -367,6 +378,22 @@ public:
   bool editable_enabled () const
   {
     return m_editable_enabled;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the plugin will accept a dropped file with the given URL or path
+   */
+  virtual bool accepts_drop (const std::string & /*path_or_url*/) const
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Gets called when a file or URL is dropped on the plugin
+   */
+  virtual void drop_url (const std::string & /*path_or_url*/)
+  {
+    //  .. nothing yet ..
   }
 
   /**
@@ -659,6 +686,22 @@ public:
   virtual lay::Editable *editable_interface ()
   {
     return 0;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the plugin will accept a dropped file with the given URL or path
+   */
+  virtual bool accepts_drop (const std::string & /*path_or_url*/) const
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Gets called when a file or URL is dropped on the plugin
+   */
+  virtual void drop_url (const std::string & /*path_or_url*/)
+  {
+    //  .. nothing yet ..
   }
 
   /**

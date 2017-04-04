@@ -37,6 +37,7 @@
 #include "layQtTools.h"
 #include "layConfig.h"
 #include "layWidgets.h"
+#include "layProgress.h"
 #include "tlString.h"
 #include "tlClassRegistry.h"
 #include "tlExceptions.h"
@@ -253,6 +254,10 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
     m_add_edit_trace_enabled (true),
     dm_refresh_file_watcher (this, &MacroEditorDialog::do_refresh_file_watcher)
 {
+  //  Makes this dialog receive events while progress bars are on - this way we can set breakpoints
+  //  during execution of a macro even if anything lengthy is running.
+  lay::mark_widget_alive (this, true);
+
   Ui::MacroEditorDialog::setupUi (this);
 
   connect (mp_root, SIGNAL (macro_changed (Macro *)), this, SLOT (macro_changed (Macro *)));

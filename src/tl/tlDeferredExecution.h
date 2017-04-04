@@ -72,6 +72,16 @@ class TL_PUBLIC DeferredMethodScheduler
 Q_OBJECT
 public:
   /**
+   *  @brief Constructor
+   */
+  DeferredMethodScheduler ();
+
+  /**
+   *  @brief Destructor
+   */
+  ~DeferredMethodScheduler ();
+
+  /**
    *  @brief The singleton instance of the scheduler
    */
   static DeferredMethodScheduler *instance ();
@@ -93,17 +103,27 @@ public:
    *  when the application is supposed only to show a progress bar and
    *  therefore will process events but is not supposed to execute anything else.
    *
-   *  Enabling is cumulative: multiple enable(true) calls must be matched to 
-   *  the same number of enable(false) calls. 
+   *  Enabling is cumulative: multiple enable(true) calls must be matched to
+   *  the same number of enable(false) calls.
    */
-  void enable (bool en);
+  static void enable (bool en)
+  {
+    if (instance ()) {
+      instance ()->do_enable (en);
+    }
+  }
 
   /**
    *  @brief Execute all queued methods
-   *  
+   *
    *  This method can be called to force execution of all queued methods.
    */
-  void execute ();
+  static void execute ()
+  {
+    if (instance ()) {
+      instance ()->do_execute ();
+    }
+  }
 
 private slots:
   void timer ();
@@ -115,10 +135,9 @@ private:
   QTimer m_timer, m_fallback_timer;
   QMutex m_lock;
 
-  DeferredMethodScheduler (QObject *parent);
-  ~DeferredMethodScheduler ();
-
   virtual bool event (QEvent *event);
+  void do_enable (bool en);
+  void do_execute ();
 };
 
 /**
@@ -169,7 +188,9 @@ public:
    */
   ~DeferredMethod ()
   {
-    DeferredMethodScheduler::instance ()->unqueue (this);
+    if (DeferredMethodScheduler::instance ()) {
+      DeferredMethodScheduler::instance ()->unqueue (this);
+    }
   }
 
   /**
@@ -177,9 +198,13 @@ public:
    */
   void operator() ()
   {
-    //  management of m_compressed and m_scheduled is done in the DeferredMethodScheduler -
-    //  there it is safely locked. Doing it there saves a private mutex for this object.
-    DeferredMethodScheduler::instance ()->schedule (this);
+    if (DeferredMethodScheduler::instance ()) {
+      //  management of m_compressed and m_scheduled is done in the DeferredMethodScheduler -
+      //  there it is safely locked. Doing it there saves a private mutex for this object.
+      DeferredMethodScheduler::instance ()->schedule (this);
+    } else {
+      execute ();
+    }
   }
 
   /**
@@ -187,7 +212,9 @@ public:
    */
   void cancel ()
   {
-    DeferredMethodScheduler::instance ()->unqueue (this);
+    if (DeferredMethodScheduler::instance ()) {
+      DeferredMethodScheduler::instance ()->unqueue (this);
+    }
   }
 
   /**
@@ -196,7 +223,7 @@ public:
   void execute ()
   {
     //  cancel execution which might be pending
-    DeferredMethodScheduler::instance ()->unqueue (this);
+    cancel ();
     (mp_t->*m_method) ();
   }
 

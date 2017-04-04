@@ -44,6 +44,8 @@ public:
 
 TEST(1) 
 {
+  tl::DeferredMethodScheduler scheduler ();
+
   g_na = g_nb = 0;
 
   QCoreApplication::instance ()->processEvents ();
@@ -70,8 +72,8 @@ TEST(1)
   EXPECT_EQ (g_na, 0);
   EXPECT_EQ (g_nb, 0);
 
-  tl::DeferredMethodScheduler::instance ()->enable (false);
-  tl::DeferredMethodScheduler::instance ()->enable (false);
+  tl::DeferredMethodScheduler::enable (false);
+  tl::DeferredMethodScheduler::enable (false);
 
   QCoreApplication::instance ()->processEvents ();
 
@@ -80,7 +82,7 @@ TEST(1)
   EXPECT_EQ (g_na, 0);
   EXPECT_EQ (g_nb, 0);
 
-  tl::DeferredMethodScheduler::instance ()->enable (true);
+  tl::DeferredMethodScheduler::enable (true);
 
   x->db ();
   x->db ();
@@ -92,7 +94,7 @@ TEST(1)
   EXPECT_EQ (g_na, 0);
   EXPECT_EQ (g_nb, 0);
 
-  tl::DeferredMethodScheduler::instance ()->enable (true);
+  tl::DeferredMethodScheduler::enable (true);
 
   QCoreApplication::instance ()->processEvents ();
 

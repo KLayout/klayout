@@ -23,17 +23,37 @@
 
 #include <QMutex>
 #include <QApplication>
+#include <QInputEvent>
 
 #include <stdlib.h>
 #include <math.h>
 
 #include "layProgress.h"
 #include "layMainWindow.h"
-#include "layApplication.h"
+#include "layProgressWidget.h"
 #include "tlProgress.h"
+#include "tlDeferredExecution.h"
 
 namespace lay
 {
+
+// --------------------------------------------------------------------
+
+static const char *s_alive_prop_name = "klayout_progressAlive";
+
+void mark_widget_alive (QWidget *w, bool alive)
+{
+  if (alive) {
+    w->setProperty (s_alive_prop_name, QVariant (true));
+  } else {
+    w->setProperty (s_alive_prop_name, QVariant ());
+  }
+}
+
+static bool is_marked_alive (QObject *obj)
+{
+  return obj->property (s_alive_prop_name).isValid ();
+}
 
 // --------------------------------------------------------------------
 
@@ -55,11 +75,11 @@ ProgressReporter::set_progress_bar (lay::ProgressBar *pb)
     return;
   }
   if (mp_pb) {
-    mp_pb->show_progress_bar (m_pw_visible);
+    set_visible (m_pw_visible);
   }
   mp_pb = pb;
   if (mp_pb) {
-    mp_pb->show_progress_bar (m_pw_visible);
+    set_visible (m_pw_visible);
   }
 }
 
@@ -75,10 +95,7 @@ ProgressReporter::register_object (tl::Progress *progress)
 
   //  make dialog visible after some time has passed
   if (! m_pw_visible && (tl::Clock::current () - m_start_time).seconds () > 1.0) {
-    if (mp_pb) {
-      mp_pb->show_progress_bar (true);
-    }
-    m_pw_visible = true;
+    set_visible (true);
   }
 
   update_and_yield ();
@@ -95,10 +112,9 @@ ProgressReporter::unregister_object (tl::Progress *progress)
 
       //  close or refresh window
       if (mp_objects.empty ()) {
-        if (mp_pb) {
-          mp_pb->show_progress_bar (false);
+        if (m_pw_visible) {
+          set_visible (false);
         }
-        m_pw_visible = false;
         m_start_time = tl::Clock ();
       } 
       
@@ -116,10 +132,7 @@ ProgressReporter::trigger (tl::Progress *progress)
   if (! mp_objects.empty () && mp_objects.front () == progress) {
     //  make dialog visible after some time has passed
     if (! m_pw_visible && (tl::Clock::current () - m_start_time).seconds () > 1.0) {
-      if (mp_pb) {
-        mp_pb->show_progress_bar (true);
-      }
-      m_pw_visible = true;
+      set_visible (true);
     }
     update_and_yield ();
   }
@@ -130,10 +143,7 @@ ProgressReporter::yield (tl::Progress * /*progress*/)
 {
   //  make dialog visible after some time has passed
   if (! m_pw_visible && (tl::Clock::current () - m_start_time).seconds () > 1.0) {
-    if (mp_pb) {
-      mp_pb->show_progress_bar (true);
-    }
-    m_pw_visible = true;
+    set_visible (true);
     update_and_yield ();
   } else if (m_pw_visible) {
     //  process events if necessary
@@ -166,8 +176,67 @@ ProgressReporter::update_and_yield ()
 void
 ProgressReporter::process_events ()
 {
-  if (m_pw_visible && lay::MainWindow::instance () && lay::Application::instance ()) {
-    lay::Application::instance ()->process_events ();
+  if (m_pw_visible && lay::MainWindow::instance () && QApplication::instance ()) {
+    QApplication::instance ()->processEvents (QEventLoop::AllEvents);
+  }
+}
+
+void
+ProgressReporter::set_visible (bool vis)
+{
+  if (mp_pb) {
+    mp_pb->show_progress_bar (vis);
+  }
+
+  if (vis != m_pw_visible) {
+    //  prevent deferred method execution inside progress events - this might interfere with the
+    //  actual operation
+    tl::DeferredMethodScheduler::enable (!vis);
+  }
+
+  m_pw_visible = vis;
+
+  if (QApplication::instance()) {
+    if (vis) {
+      //  to avoid recursions of any kind, disallow any user interaction except
+      //  cancelling the operation
+      QApplication::instance ()->installEventFilter (this);
+    } else {
+      QApplication::instance ()->removeEventFilter (this);
+    }
+  }
+}
+
+bool
+ProgressReporter::eventFilter (QObject *obj, QEvent *event)
+{
+  //  do not handle events that are not targeted towards widgets
+  if (! dynamic_cast <QWidget *> (obj)) {
+    return false;
+  }
+
+  //  do not handle events if a modal widget is active (i.e. a message box)
+  if (QApplication::activeModalWidget () && ! dynamic_cast<lay::MainWindow *> (QApplication::activeModalWidget ())) {
+    return false;
+  }
+
+  if (dynamic_cast <QInputEvent *> (event)) {
+
+    QObject *o = obj;
+    while (o) {
+      //  If the watched object is a child of the progress widget or the macro editor, pass the event on to this.
+      //  Including the macro editor keeps it alive while progress events are processed.
+      if (dynamic_cast<lay::ProgressWidget *> (o) || is_marked_alive (o)) {
+        return false;
+      }
+      o = o->parent ();
+    }
+
+    // eat the event
+    return true;
+
+  } else {
+    return false;
   }
 }
 

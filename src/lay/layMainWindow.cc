@@ -50,6 +50,7 @@
 #include "tlAssert.h"
 #include "tlDeferredExecution.h"
 #include "tlStream.h"
+#include "tlExceptions.h"
 #include "dbMemStatistics.h"
 #include "dbManager.h"
 #include "dbStream.h"
@@ -81,7 +82,6 @@
 #include "layMainConfigPages.h"
 #include "layAbstractMenu.h"
 #include "layQtTools.h"
-#include "tlExceptions.h"
 #include "laySaveLayoutOptionsDialog.h"
 #include "layLoadLayoutOptionsDialog.h"
 #include "layLogViewerDialog.h"
@@ -93,6 +93,7 @@
 #include "laySelectCellViewForm.h"
 #include "layLayoutPropertiesForm.h"
 #include "layLayoutStatisticsForm.h"
+#include "layMacroController.h"
 #include "ui_HelpAboutDialog.h"
 #include "gsi.h"
 #include "gtf.h"
@@ -410,7 +411,6 @@ MainWindow::MainWindow (QApplication *app, const char *name)
       m_open_mode (0),
       m_disable_tab_selected (false),
       m_exited (false),
-      dm_do_update_menu_with_macros (this, &MainWindow::do_update_menu_with_macros),
       dm_do_update_menu (this, &MainWindow::do_update_menu),
       m_grid_micron (0.001), 
       m_default_grids_updated (true),
@@ -419,7 +419,6 @@ MainWindow::MainWindow (QApplication *app, const char *name)
       m_synchronized_views (false),
       m_synchronous (false),
       m_busy (false),
-      m_work_in_progress (false),
       mp_app (app)
 {
   setObjectName (QString::fromUtf8 (name));
@@ -436,16 +435,6 @@ MainWindow::MainWindow (QApplication *app, const char *name)
   init_menu ();
 
   lay::register_help_handler (this, SLOT (show_help (const QString &)));
-
-  connect (&lay::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (update_menu_with_macros ()));
-  connect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (update_menu_with_macros ()));
-
-  if (lay::Application::instance ()) {
-    mp_macro_editor = new lay::MacroEditorDialog (this, &lay::MacroCollection::root ());
-    mp_macro_editor->setModal (false);
-  } else {
-    mp_macro_editor = 0;
-  }
 
   mp_assistant = new lay::HelpDialog (this);
 
@@ -679,13 +668,6 @@ MainWindow::~MainWindow ()
 {
   lay::register_help_handler (0, 0);
 
-  //  uninitialize the plugins (this should be the first action in the constructor since the
-  //  main window should be functional still.
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-    pd->uninitialize (this);
-  }
-
   //  since the configuration actions unregister themselves, we need to do this before the main
   //  window is gone:
   m_ca_collection.clear ();
@@ -711,9 +693,6 @@ MainWindow::~MainWindow ()
 
   delete mp_log_viewer_dialog;
   mp_log_viewer_dialog = 0;
-
-  delete mp_macro_editor;
-  mp_macro_editor = 0;
 
   delete mp_assistant;
   mp_assistant = 0;
@@ -1183,12 +1162,6 @@ MainWindow::close_all ()
 void
 MainWindow::about_to_exec ()
 {
-  //  Give the plugins a change to do some last-minute initialisation and checks
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-    pd->initialized (this);
-  }
-
   bool f;
 
   //  TODO: later, each view may get it's own editable flag
@@ -1654,18 +1627,10 @@ void
 MainWindow::apply_key_bindings ()
 {
   for (std::vector<std::pair<std::string, std::string> >::const_iterator kb = m_key_bindings.begin (); kb != m_key_bindings.end (); ++kb) {
-
     if (menu ()->is_valid (kb->first)) {
-
       lay::Action a = menu ()->action (kb->first);
       a.set_shortcut (kb->second);
-
-      if (m_action_to_macro.find (a.qaction ()) != m_action_to_macro.end ()) {
-        m_action_to_macro [a.qaction ()]->set_shortcut (kb->second);
-      }
-
     }
-
   }
 }
 
@@ -1793,8 +1758,11 @@ MainWindow::can_close ()
 
   }
 
-  if (mp_macro_editor && ! mp_macro_editor->can_exit ()) {
-    return false;
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+    lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
+    if (! pd->can_exit (this)) {
+      return false;
+    }
   }
 
   std::string df_list;
@@ -1901,6 +1869,8 @@ MainWindow::cm_view_log ()
 void
 MainWindow::cm_print ()
 {
+  //  TODO: move to lay::LayoutView
+
   BEGIN_PROTECTED
 
   //  Late-initialize the printer to save time on startup
@@ -2293,116 +2263,6 @@ MainWindow::cm_redo ()
   }
 
   END_PROTECTED
-}
-
-void
-MainWindow::add_macro_items_to_menu (lay::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech)
-{
-  for (lay::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
-
-    //  check whether the macro collection is associated with the selected technology (if there is one)
-    bool consider = false; 
-    if (! tech || c->second->virtual_mode () != lay::MacroCollection::TechFolder) {
-      consider = true;
-    } else {
-      const std::vector<std::pair<std::string, std::string> > &mc = lay::Application::instance ()->macro_categories ();
-      for (std::vector<std::pair<std::string, std::string> >::const_iterator cc = mc.begin (); cc != mc.end () && !consider; ++cc) {
-        consider = (c->second->path () == tl::to_string (QDir (tl::to_qstring (tech->base_path ())).filePath (tl::to_qstring (cc->first))));
-      }
-    }
-
-    if (consider) {
-      add_macro_items_to_menu (*c->second, n, groups, 0 /*don't check 2nd level and below*/);
-    }
-
-  }
-
-  for (lay::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
-
-    std::string sc = tl::trim (c->second->shortcut ());
-
-    if (c->second->show_in_menu ()) {
-
-      std::string mp = tl::trim (c->second->menu_path ());
-      if (mp.empty ()) {
-        mp = "macros_menu.end";
-      }
-
-      std::string gn = tl::trim (c->second->group_name ());
-      if (! gn.empty () && groups.find (gn) == groups.end ()) {
-        groups.insert (gn);
-        lay::Action as;
-        as.set_separator (true);
-        m_macro_actions.push_back (as);
-        menu ()->insert_item (mp, "macro_in_menu_" + tl::to_string (n++), as);
-      }
-
-      lay::Action a;
-      if (c->second->description ().empty ()) {
-        a.set_title (c->second->path ());
-      } else {
-        a.set_title (c->second->description ());
-      }
-      a.set_shortcut (sc);
-      m_macro_actions.push_back (a);
-      menu ()->insert_item (mp, "macro_in_menu_" + tl::to_string (n++), a);
-
-      m_action_to_macro.insert (std::make_pair (a.qaction (), c->second));
-
-      MacroSignalAdaptor *adaptor = new MacroSignalAdaptor (a.qaction (), c->second);
-      QObject::connect (a.qaction (), SIGNAL (triggered ()), adaptor, SLOT (run ()));
-
-    } else if (! sc.empty ()) {
-
-      //  Create actions for shortcut-only actions too and add them to the main window 
-      //  to register their shortcut.
-
-      lay::Action a;
-      if (c->second->description ().empty ()) {
-        a.set_title (c->second->path ());
-      } else {
-        a.set_title (c->second->description ());
-      }
-      a.set_shortcut (sc);
-      m_macro_actions.push_back (a);
-
-      addAction (a.qaction ());
-      MacroSignalAdaptor *adaptor = new MacroSignalAdaptor (a.qaction (), c->second);
-      QObject::connect (a.qaction (), SIGNAL (triggered ()), adaptor, SLOT (run ()));
-
-    }
-
-  }
-}
-
-void
-MainWindow::update_menu_with_macros ()
-{
-  //  empty action to macro table now we know it's invalid
-  m_action_to_macro.clear ();
-  dm_do_update_menu_with_macros ();
-}
-
-void
-MainWindow::do_update_menu_with_macros ()
-{
-  const lay::Technology *tech = 0;
-  if (current_view () && current_view ()->active_cellview_index () >= 0 &&  current_view ()->active_cellview_index () <= int (current_view ()->cellviews ())) {
-    std::string active_tech = current_view ()->active_cellview ()->tech_name ();
-    tech = lay::Technologies::instance ()->technology_by_name (active_tech);
-  }
-
-  //  delete all existing items
-  for (std::vector<lay::Action>::iterator a = m_macro_actions.begin (); a != m_macro_actions.end (); ++a) {
-    menu ()->delete_items (*a);
-  }
-  m_macro_actions.clear ();
-  m_action_to_macro.clear ();
-
-  int n = 1;
-  std::set<std::string> groups;
-  add_macro_items_to_menu (m_temp_macros, n, groups, tech);
-  add_macro_items_to_menu (lay::MacroCollection::root (), n, groups, tech);
 }
 
 void 
@@ -3475,6 +3335,8 @@ MainWindow::cm_adjust_origin ()
 void 
 MainWindow::cm_new_cell ()
 {
+  //  TODO: move this function to lay::LayoutView
+
   BEGIN_PROTECTED
 
   lay::LayoutView *curr = current_view ();
@@ -4634,65 +4496,12 @@ MainWindow::show_progress_bar (bool show)
 
   } else {
 
-    if (m_work_in_progress != show) {
-
-      m_work_in_progress = show;
-      if (show) {
-        //  to avoid recursions of any kind, disallow any user interaction except
-        //  cancelling the operation
-        mp_app->installEventFilter (this);
-        QApplication::setOverrideCursor (QCursor (Qt::WaitCursor));
-      } else {
-        mp_app->removeEventFilter (this);
-        QApplication::restoreOverrideCursor ();
-      }
-
-      //  HINT: enabling the scheduler is accumulative - make sure that this method is only called when necessary
-      tl::DeferredMethodScheduler::instance ()->enable (! show);
-
-      mp_main_stack_widget->setCurrentIndex (show ? 1 : 0);
-
-      if (show) {
-        clear_current_pos ();
-      }
-
+    mp_main_stack_widget->setCurrentIndex (show ? 1 : 0);
+    if (show) {
+      clear_current_pos ();
     }
-
     return true;
 
-  }
-}
-
-bool
-MainWindow::eventFilter (QObject *obj, QEvent *event)
-{
-  //  do not handle events that are not targeted towards widgets
-  if (! dynamic_cast <QWidget *> (obj)) {
-    return false;
-  }
-
-  //  do not handle events if a modal widget is active (i.e. a message box)
-  if (QApplication::activeModalWidget () && QApplication::activeModalWidget () != this) {
-    return false;
-  }
-
-  if (dynamic_cast <QInputEvent *> (event)) {
-
-    QObject *o = obj;
-    while (o) {
-      //  If the watched object is a child of the progress widget or the macro editor, pass the event on to this.
-      //  Including the macro editor keeps it alive while progress events are processed.
-      if (o == mp_progress_widget || o == mp_macro_editor) {
-        return false;
-      }
-      o = o->parent ();
-    }
-
-    // eat the event
-    return true;
-
-  } else {
-    return false;
   }
 }
 
@@ -4716,41 +4525,42 @@ MainWindow::cm_technologies ()
     }
 
     //  because the macro-tech association might have changed, do this:
-    update_menu_with_macros ();
+    //  TODO: let the macro controller monitor the technologies.
+    lay::MacroController *mc = lay::MacroController::instance ();
+    if (mc) {
+      mc->update_menu_with_macros ();
+    }
 
   }
 }
 
 void 
-MainWindow::add_temp_macro (lay::Macro *m)
-{
-  m_temp_macros.add_unspecific (m);
-  update_menu_with_macros ();
-}
-
-void 
 MainWindow::show_macro_editor (const std::string &cat, bool add)
 {
-  if (mp_macro_editor) {
-    mp_macro_editor->show (cat, add);
+  lay::MacroController *mc = lay::MacroController::instance ();
+  if (mc) {
+    mc->show_editor (cat, add);
   }
 }
 
 void
 MainWindow::cm_edit_drc_scripts ()
 {
+  //  TODO: implement this as generic menu provided by the Interpreter
   show_macro_editor ("drc", false);
 }
 
 void
 MainWindow::cm_new_drc_script ()
 {
+  //  TODO: implement this as generic menu provided by the Interpreter
   show_macro_editor ("drc", true);
 }
 
 void
 MainWindow::cm_macro_editor ()
 {
+  //  TODO: implement this as generic menu provided by the plugin declaration
   show_macro_editor ();
 }
 
@@ -5394,8 +5204,10 @@ MainWindow::dropEvent(QDropEvent *event)
     QList<QUrl> urls = event->mimeData ()->urls ();
     for (QList<QUrl>::const_iterator url = urls.begin (); url != urls.end (); ++url) {
 
+      QUrl eff_url (*url);
+
       QString path;
-      if (url->scheme () == QString::fromUtf8 ("file")) {
+      if (eff_url.scheme () == QString::fromUtf8 ("file")) {
         path = url->toLocalFile ();
 
 #if defined(__APPLE__)
@@ -5452,101 +5264,38 @@ MainWindow::dropEvent(QDropEvent *event)
           CFRelease( relCFURL );
           CFRelease( relCFStringRef );
         }
+
+        eff_url = QUrl::fromLocalFile (path);
 #endif
 
-      } else if (url->scheme () == QString::fromUtf8 ("http") || url->scheme () == QString::fromUtf8 ("https")) {
-        path = url->toString ();
+      } else if (eff_url.scheme () == QString::fromUtf8 ("http") || eff_url.scheme () == QString::fromUtf8 ("https")) {
+        path = eff_url.toString ();
       } else {
         //  other schemes are not supported currently.
         continue;
       }
 
-#if defined(__APPLE__)
-      QFileInfo file_info (path); // Use the one resolved above
-      QString suffix = file_info.suffix ().toLower ();
-#else
-      QFileInfo file_info (url->path ()); // Original
-      QString suffix = file_info.suffix ().toLower ();
-#endif
-      if (suffix == QString::fromUtf8 ("rb") || 
-          suffix == QString::fromUtf8 ("rbm") || 
-          suffix == QString::fromUtf8 ("lym") || 
-          suffix == QString::fromUtf8 ("lydrc") || 
-          suffix == QString::fromUtf8 ("drc")) {
+      //  Let the plugins decide if they accept the drop
 
-        //  load and run macro
-        std::auto_ptr<lay::Macro> macro (new lay::Macro ());
-        macro->load_from (tl::to_string (path));
-        macro->set_file_path (tl::to_string (path));
-
-        if (macro->is_autorun () || macro->show_in_menu ()) {
-
-          //  install ruby module permanently
-          if (QMessageBox::question (this, 
-                                     QObject::tr ("Install Macro"), 
-                                     tl::to_qstring (tl::sprintf (tl::to_string (QObject::tr ("Install macro '%s' permanently?\n\nPress 'Yes' to install the macro in the application settings folder permanently.")).c_str (), tl::to_string (file_info.fileName ()).c_str ())),
-                                     QMessageBox::Yes | QMessageBox::No, 
-                                     QMessageBox::No) == QMessageBox::Yes) {
-
-            //  Use the application data folder
-            QDir folder (tl::to_qstring (lay::Application::instance ()->appdata_path ()));
-
-            std::string cat = "macros";
-            if (! macro->category ().empty ()) {
-              cat = macro->category ();
-            }
-
-            if (! folder.cd (tl::to_qstring (cat))) {
-              throw tl::Exception (tl::to_string (QObject::tr ("Folder '%s' does not exists in installation path '%s' - cannot install")).c_str (), cat, lay::Application::instance ()->appdata_path ());
-            }
-
-            QFileInfo target (folder, file_info.fileName ());
-
-            if (! target.exists () || QMessageBox::question (this,
-                                                             QObject::tr ("Overwrite Macro"), 
-                                                             QObject::tr ("Overwrite existing macro?"),
-                                                             QMessageBox::Yes | QMessageBox::No, 
-                                                             QMessageBox::No) == QMessageBox::Yes) {
-
-              QFile target_file (target.filePath ());
-              if (target.exists () && ! target_file.remove ()) {
-                throw tl::Exception (tl::to_string (QObject::tr ("Unable to remove file '%s'")).c_str (), tl::to_string (target.filePath ()).c_str ());
-              }
-
-              macro->set_file_path (tl::to_string (target.filePath ()));
-
-              //  run the macro now - if it fails, it is not installed, but the file path is already set to
-              //  the target path.
-              if (macro->is_autorun ()) {
-                macro->run ();
-              }
-
-              macro->save ();
-
-              //  refresh macro editor to show new macro plus to install the menus
-              if (mp_macro_editor) {
-                mp_macro_editor->refresh ();
-              }
-
-            }
-
-          } else {
-
-            if (macro->is_autorun ()) {
-              //  If it is not installed, run it now ..
-              macro->run ();
-            } else if (macro->show_in_menu ()) {
-              //  .. or add as temporary macro so it is shown in the menu.
-              add_temp_macro (macro.release ());
-            }
-
-          }
-
-        } else {
-          macro->run ();
+      for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+        lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
+        if (pd->accepts_drop (tl::to_string (eff_url.toString ()))) {
+          pd->drop_url (tl::to_string (eff_url.toString ()));
+          return;
         }
+      }
 
-      } else if (suffix == QString::fromUtf8 ("lyp")) {
+      if (current_view () && current_view ()->accepts_drop (tl::to_string (eff_url.toString ()))) {
+        current_view ()->drop_url (tl::to_string (eff_url.toString ()));
+        return;
+      }
+
+      //  Now try the built-in ones
+
+      QFileInfo file_info (eff_url.path ());
+      QString suffix = file_info.suffix ().toLower ();
+
+      if (suffix == QString::fromUtf8 ("lyp")) {
 
         load_layer_properties (tl::to_string (path), false /*current view only*/, false /*don't add a default*/);
 

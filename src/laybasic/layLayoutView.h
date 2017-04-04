@@ -1878,7 +1878,17 @@ public:
     return m_drawing_workers;
   }
 
-  /** 
+  /**
+   *  @brief Gets a value indicating whether the view will accept a dropped file with the given URL or path
+   */
+  virtual bool accepts_drop (const std::string &path_or_url) const;
+
+  /**
+   *  @brief Gets called when a file or URL is dropped on the view
+   */
+  virtual void drop_url (const std::string &path_or_url);
+
+  /**
    *  @brief Localize a plugin by name
    *
    *  This method will return 0, if no such plugin is registered

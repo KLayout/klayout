@@ -41,6 +41,7 @@
 #include "tlString.h"
 
 #include <QFileInfo>
+#include <QUrl>
 
 namespace tl
 {
@@ -325,7 +326,8 @@ InputStream::InputStream (const std::string &abstract_path)
     mp_delegate = new InputPipe (ex.get ());
 #endif
   } else if (ex.test ("file:")) {
-    mp_delegate = new InputZLibFile (ex.get ());
+    QUrl url (tl::to_qstring (abstract_path));
+    mp_delegate = new InputZLibFile (tl::to_string (url.toLocalFile ()));
   } else {
     mp_delegate = new InputZLibFile (abstract_path);
   }
@@ -345,7 +347,8 @@ std::string InputStream::absolute_path (const std::string &abstract_path)
     return abstract_path;
 #endif
   } else if (ex.test ("file:")) {
-    return tl::to_string (QFileInfo (tl::to_qstring (ex.get ())).absoluteFilePath ());
+    QUrl url (tl::to_qstring (abstract_path));
+    return tl::to_string (QFileInfo (url.toLocalFile ()).absoluteFilePath ());
   } else {
     return tl::to_string (QFileInfo (tl::to_qstring (abstract_path)).absoluteFilePath ());
   }

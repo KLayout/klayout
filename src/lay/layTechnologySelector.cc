@@ -25,6 +25,7 @@
 #include "layPlugin.h"
 #include "laybasicConfig.h"
 #include "layMainWindow.h"
+#include "layMacroController.h"
 #include "layTechnology.h"
 #include "laybasicConfig.h"
 #include "tlDeferredExecution.h"
@@ -112,8 +113,12 @@ private:
       lay::MainWindow *mw = lay::MainWindow::instance ();
       if (mw) {
         mw->tech_message (tech_string_from_name (active_tech));
+      }
+      lay::MacroController *mc = lay::MacroController::instance ();
+      if (mc) {
+        //  TODO: let the macro controller monitor the active technology
         //  need to do this since macros may be bound to the new technology
-        mw->update_menu_with_macros ();
+        mc->update_menu_with_macros ();
       }
 
     }

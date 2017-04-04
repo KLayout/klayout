@@ -664,6 +664,26 @@ void LayoutView::viewport_changed ()
   viewport_changed_event ();
 }
 
+bool LayoutView::accepts_drop (const std::string &path_or_url) const
+{
+  for (std::vector<lay::Plugin *>::const_iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
+    if ((*p)->accepts_drop (path_or_url)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void LayoutView::drop_url (const std::string &path_or_url)
+{
+  for (std::vector<lay::Plugin *>::const_iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
+    if ((*p)->accepts_drop (path_or_url)) {
+      (*p)->drop_url (path_or_url);
+      break;
+    }
+  }
+}
+
 lay::Plugin *LayoutView::create_plugin (lay::PluginRoot *root, const lay::PluginDeclaration *cls)
 {
   lay::Plugin *p = cls->create_plugin (manager (), root, this);
@@ -2584,7 +2604,7 @@ LayoutView::get_screenshot ()
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save screenshot")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::instance ()->execute ();
+  tl::DeferredMethodScheduler::execute ();
   
   return mp_canvas->screenshot ();
 }
@@ -2614,7 +2634,7 @@ LayoutView::save_screenshot (const std::string &fn)
   writer.setText (QString::fromUtf8 ("Rect"), tl::to_qstring (desc));
 
   //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::instance ()->execute ();
+  tl::DeferredMethodScheduler::execute ();
   
   if (! writer.write (mp_canvas->screenshot ())) {
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
@@ -2629,7 +2649,7 @@ LayoutView::get_image (unsigned int width, unsigned int height)
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::instance ()->execute ();
+  tl::DeferredMethodScheduler::execute ();
   
   return mp_canvas->image (width, height);
 }
@@ -2641,7 +2661,7 @@ LayoutView::get_image_with_options (unsigned int width, unsigned int height, int
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Save image")));
 
   //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::instance ()->execute ();
+  tl::DeferredMethodScheduler::execute ();
   
   return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box, monochrome);
 }
@@ -2667,7 +2687,7 @@ LayoutView::save_image (const std::string &fn, unsigned int width, unsigned int 
   writer.setText (QString::fromUtf8 ("Rect"), tl::to_qstring (vp.box ().to_string ()));
   
   //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::instance ()->execute ();
+  tl::DeferredMethodScheduler::execute ();
   
   if (! writer.write (mp_canvas->image (width, height))) {
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
@@ -2699,7 +2719,7 @@ LayoutView::save_image_with_options (const std::string &fn,
   writer.setText (QString::fromUtf8 ("Rect"), tl::to_qstring (vp.box ().to_string ()));
   
   //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::instance ()->execute ();
+  tl::DeferredMethodScheduler::execute ();
   
   if (! writer.write (mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box, monochrome))) {
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));

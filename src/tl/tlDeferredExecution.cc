@@ -34,8 +34,8 @@ namespace tl
 
 static DeferredMethodScheduler *s_inst = 0;
 
-DeferredMethodScheduler::DeferredMethodScheduler (QObject *parent)
-  : QObject (parent), 
+DeferredMethodScheduler::DeferredMethodScheduler ()
+  : QObject (0),
     m_disabled (0), m_scheduled (false)
 {
   connect (&m_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
@@ -47,6 +47,9 @@ DeferredMethodScheduler::DeferredMethodScheduler (QObject *parent)
   connect (&m_fallback_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
   m_fallback_timer.setInterval (500);
   m_fallback_timer.setSingleShot (false);
+
+  tl_assert (! s_inst);
+  s_inst = this;
 }
 
 DeferredMethodScheduler::~DeferredMethodScheduler ()
@@ -57,12 +60,8 @@ DeferredMethodScheduler::~DeferredMethodScheduler ()
 DeferredMethodScheduler *
 DeferredMethodScheduler::instance ()
 {
-  static QMutex lock;
-  lock.lock ();
-  if (s_inst == 0) {
-    s_inst = new DeferredMethodScheduler (qApp);
-  }
-  lock.unlock ();
+  //  NOTE: this is not locked intentionally. The instance is shut down once in the application shortly before it
+  //  will terminate and it is created initially before any threads start.
   return s_inst;
 }
 
@@ -98,7 +97,7 @@ DeferredMethodScheduler::unqueue (DeferredMethodBase *method)
 }
 
 void 
-DeferredMethodScheduler::enable (bool en)
+DeferredMethodScheduler::do_enable (bool en)
 {
   m_lock.lock ();
   if (en) {
@@ -129,7 +128,7 @@ DeferredMethodScheduler::timer ()
     m_timer.start ();
   } else {
     try {
-      execute ();
+      do_execute ();
     } catch (tl::Exception &ex) {
       tl::error << tl::to_string (QObject::tr ("Exception caught: ")) << ex.msg ();
     } catch (std::exception &ex) {
@@ -141,7 +140,7 @@ DeferredMethodScheduler::timer ()
 }
 
 void
-DeferredMethodScheduler::execute ()
+DeferredMethodScheduler::do_execute ()
 {
   std::list<DeferredMethodBase *> methods;
 

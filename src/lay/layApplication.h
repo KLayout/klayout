@@ -33,6 +33,7 @@
 
 #include <set>
 #include <string>
+#include <memory>
 
 namespace gsi
 {
@@ -42,6 +43,11 @@ namespace gsi
 namespace gtf
 {
   class Recorder;
+}
+
+namespace tl
+{
+  class DeferredMethodScheduler;
 }
 
 namespace lay
@@ -339,6 +345,7 @@ private:
   bool m_enable_undo;
   QCoreApplication *mp_qapp;
   QApplication *mp_qapp_gui;
+  std::auto_ptr<tl::DeferredMethodScheduler> mp_dm_scheduler;
   //  HINT: the ruby interpreter must be destroyed before MainWindow
   //  in order to maintain a valid MainWindow reference for ruby scripts and Ruby's GC all the time.
   gsi::Interpreter *mp_ruby_interpreter;

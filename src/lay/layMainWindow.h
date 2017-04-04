@@ -521,17 +521,6 @@ public:
   void show_macro_editor (const std::string &cat = std::string (), bool add = false);
 
   /**
-   *  @brief Adds a temporary macro 
-   *
-   *  Temporary macros are such present on the command line or 
-   *  dragged into the main window without installing.
-   *  They need to be present so they participate in the 
-   *  menu building. Hence they are stored temporarily.
-   *  The MainWindow object will become owner of the macro object.
-   */
-  void add_temp_macro (lay::Macro *m);
-  
-  /**
    *  @brief Reimplementation of the plugin interface: handle a generic menu request
    */
   void menu_activated (const std::string &symbol);
@@ -828,11 +817,6 @@ public slots:
    *  Intended as a connection target for QLabel linkVisisted signals.
    */
   void show_help (const QString &url);
-  
-  /**
-   *  @brief Update the menu with macros bound to a menu
-   */
-  void update_menu_with_macros ();
 
   /**
    *  @brief visibility of one of the dock widgets changed
@@ -852,7 +836,6 @@ protected slots:
 protected:
   void update_content ();
   void do_update_menu ();
-  void do_update_menu_with_macros ();
 
 private:
   TextProgressDelegate m_text_progress;
@@ -895,7 +878,6 @@ private:
   QLabel *mp_tech_status_label;
   bool m_disable_tab_selected;
   bool m_exited;
-  tl::DeferredMethod<MainWindow> dm_do_update_menu_with_macros;
   tl::DeferredMethod<MainWindow> dm_do_update_menu;
   QTimer m_message_timer;
   QTimer m_file_changed_timer;
@@ -914,16 +896,11 @@ private:
   bool m_synchronized_views;
   bool m_synchronous;
   bool m_busy;
-  bool m_work_in_progress;
   QApplication *mp_app;
-  lay::MacroEditorDialog *mp_macro_editor;
   lay::HelpDialog *mp_assistant;
   std::string m_current_session;
   std::string m_message;
   std::auto_ptr<QPrinter> mp_printer;
-  std::vector<lay::Action> m_macro_actions;
-  std::map<QAction *, lay::Macro *> m_action_to_macro;
-  lay::MacroCollection m_temp_macros;
   std::vector<QString> m_changed_files;
 
   std::map<std::string, lay::Action> m_actions_for_slot;
@@ -937,7 +914,6 @@ private:
 
   void init_menu ();
 
-  bool eventFilter (QObject *watched, QEvent *event);
   void closeEvent (QCloseEvent *event);
   void resizeEvent (QResizeEvent *event);
 
@@ -963,8 +939,6 @@ private:
   virtual void plugin_removed (lay::PluginDeclaration *cls);
 
   void libraries_changed ();
-
-  void add_macro_items_to_menu (lay::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech);
   void apply_key_bindings ();
 };
 

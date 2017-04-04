@@ -148,6 +148,12 @@ public:
   void select_category (const std::string &cat);
 
 public slots:
+  /**
+   *  @brief Reloads all macros from the paths registered
+   */
+  void refresh ();
+
+private slots:
   void help_button_clicked ();
   void add_button_clicked ();
   void close_button_clicked ();
@@ -166,7 +172,6 @@ public slots:
   void properties_button_clicked ();
   void setup_button_clicked ();
   void breakpoint_button_clicked ();
-  void refresh ();
   void add_location ();
   void remove_location ();
   void clear_breakpoints_button_clicked ();

@@ -474,6 +474,9 @@ KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::stri
 
   }
 
+  mp_ui->binding_le->setText (QString ());
+  mp_ui->binding_le->setEnabled (false);
+
   m_enable_event = true;
 }
 

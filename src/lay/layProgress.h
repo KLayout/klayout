@@ -54,7 +54,7 @@ public:
 };
 
 class LAY_PUBLIC ProgressReporter 
-  : public tl::ProgressAdaptor
+  : public QObject, public tl::ProgressAdaptor
 {
 public:
   ProgressReporter ();
@@ -64,6 +64,7 @@ public:
   virtual void unregister_object (tl::Progress *progress);
   virtual void trigger (tl::Progress *progress);
   virtual void yield (tl::Progress *progress);
+  virtual bool eventFilter (QObject *dest, QEvent *event);
 
   void signal_break ();
   void set_progress_bar (lay::ProgressBar *pb);
@@ -76,7 +77,14 @@ private:
 
   void process_events ();
   void update_and_yield ();
+  void set_visible (bool vis);
 };
+
+/**
+ *  @brief Marks a widget as alive
+ *  "alive" widgets receive input events also while a progress reporter is shown
+ */
+LAY_PUBLIC void mark_widget_alive (QWidget *w, bool alive);
 
 }
 

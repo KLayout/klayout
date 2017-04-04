@@ -90,8 +90,17 @@ module DRC
   
     # Constructor
     def initialize
+
+      # Make the DSL use ruby syntax highlighting
+      self.syntax_scheme = "ruby"
+      self.suffix = "drc"
+      self.debugger_scheme = RBA::MacroInterpreter::RubyDebugger
+      self.storage_scheme = RBA::MacroInterpreter::PlainTextWithHashAnnotationsFormat
+      self.description = "DRC (Text)"
+
       # Registers the new interpreter
       register("drc-dsl")
+
     end
     
     # Implements the execute method
@@ -99,27 +108,6 @@ module DRC
       DRC::execute_drc(macro)
     end
     
-    # Make the DSL use ruby syntax highlighting
-    def syntax_scheme
-      "ruby"
-    end
-    
-    def suffix
-      "drc"
-    end
-    
-    def debugger_scheme
-      return RBA::MacroInterpreter::RubyDebugger
-    end
-    
-    def storage_scheme
-      return RBA::MacroInterpreter::PlainTextWithHashAnnotationsFormat
-    end
-
-    def description
-      return "DRC (Text)"
-    end
-
   end
   
   # Register the new interpreters

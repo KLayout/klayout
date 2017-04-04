@@ -33,6 +33,7 @@
 #include "layProgress.h"
 #include "layTextProgress.h"
 #include "layBackgroundAwareTreeStyle.h"
+#include "layMacroController.h"
 #include "gtf.h"
 #include "gsiDecl.h"
 #include "gsiInterpreter.h"
@@ -499,6 +500,8 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
 
   mp_qapp = this;
   mp_qapp_gui = (non_ui_mode ? 0 : this);
+
+  mp_dm_scheduler.reset (new tl::DeferredMethodScheduler ());
 
   //  install a special style proxy to overcome the issue of black-on-black tree expanders
   if (mp_qapp_gui) {
@@ -1099,11 +1102,10 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
     mp_plugin_root = new lay::PluginRoot ();
   }
 
-  //  initialize the plugins (this should be the last action in the constructor since the
-  //  main window should be functional now.
+  //  initialize the plugins for the first time
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-    pd->initialize (mp_mw);
+    pd->initialize (mp_plugin_root);
   }
 
   //  establish the configuration
@@ -1199,6 +1201,12 @@ Application::finish ()
 void
 Application::shutdown ()
 {
+  //  uninitialize the plugins
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+    lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
+    pd->uninitialize (mp_plugin_root);
+  }
+
   if (mp_mw) {
     delete mp_mw;
     mp_mw = 0;
@@ -1357,9 +1365,10 @@ Application::run ()
       macro->set_file_path (*m);
       if (macro->show_in_menu ()) {
         //  menu-based macros are just registered so they are shown in the menu
-        if (mp_mw) {
-          tl::log << "Register macro '" << *m << "'";
-          mp_mw->add_temp_macro (macro.release ());
+        lay::MacroController *mc = lay::MacroController::instance ();
+        if (mc) {
+          tl::log << "Registering macro '" << *m << "'";
+          mc->add_temp_macro (macro.release ());
         }
       } else {
         //  other macros given with -rm are run
@@ -1479,13 +1488,23 @@ Application::run ()
       player.replay (m_gtf_replay_rate, m_gtf_replay_stop);
     }
 
-    //  update the menus with the macro menu bindings as late as possible (now we 
-    //  can be sure that the menus are created propertly)
-    mp_mw->update_menu_with_macros ();
+    //  Give the plugins a change to do some last-minute initialisation and checks
+    for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+      lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
+      pd->initialized (mp_mw);
+    }
 
     if (! m_no_gui && m_gtf_replay.empty () && ! mp_recorder) {
       //  Show initial tip window if required
       mp_mw->about_to_exec ();
+    }
+
+  } else if (mp_plugin_root) {
+
+    //  Give the plugins a change to do some last-minute initialisation and checks
+    for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+      lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
+      pd->initialized (mp_plugin_root);
     }
 
   }
@@ -1586,7 +1605,7 @@ Application::process_events (QEventLoop::ProcessEventsFlags flags, bool silent)
   if (mp_mw) {
 
     if (silent) {
-      tl::DeferredMethodScheduler::instance ()->enable (false);
+      mp_dm_scheduler->enable (false);
     }
 
 #if QT_VERSION < 0x050000
@@ -1598,7 +1617,7 @@ Application::process_events (QEventLoop::ProcessEventsFlags flags, bool silent)
     mp_mw->enter_busy_mode (false);
 
     if (silent) {
-      tl::DeferredMethodScheduler::instance ()->enable (true);
+      mp_dm_scheduler->enable (true);
     }
 
   }

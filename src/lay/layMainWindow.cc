@@ -69,10 +69,8 @@
 #include "laybasicConfig.h"
 #include "layConfig.h"
 #include "layMainWindow.h"
-#include "layMacroEditorDialog.h"
 #include "layHelpDialog.h"
 #include "layHelpSource.h" // because of escape_xml
-#include "layMacro.h"
 #include "layNavigator.h"
 #include "layProgress.h"
 #include "layProgressWidget.h"
@@ -96,6 +94,7 @@
 #include "layMacroController.h"
 #include "ui_HelpAboutDialog.h"
 #include "gsi.h"
+#include "gsiInterpreter.h"
 #include "gtf.h"
 
 namespace lay

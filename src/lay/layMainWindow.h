@@ -82,9 +82,6 @@ class CellView;
 class Navigator;
 class LayerToolbox;
 class MainWindow;
-class MacroEditorDialog;
-class MacroCollection;
-class Macro;
 class HelpDialog;
 
 /**

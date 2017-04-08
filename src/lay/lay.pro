@@ -41,13 +41,13 @@ HEADERS = \
     laySelectCellViewForm.h \
     laySession.h \
     laySettingsForm.h \
-    layTechnologySelector.h \
     layTechSetupDialog.h \
     layTextProgress.h \
     layVersion.h \
     layCommon.h \
     layConfig.h \
-    layMacroController.h
+    layMacroController.h \
+    layTechnologyController.h
 
 FORMS = \
     ClipDialog.ui \
@@ -132,11 +132,11 @@ SOURCES = \
     laySelectCellViewForm.cc \
     laySession.cc \
     laySettingsForm.cc \
-    layTechnologySelector.cc \
     layTechSetupDialog.cc \
     layTextProgress.cc \
     layVersion.cc \
-    layMacroController.cc
+    layMacroController.cc \
+    layTechnologyController.cc
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \

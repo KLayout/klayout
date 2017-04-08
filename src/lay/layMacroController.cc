@@ -21,6 +21,7 @@
 */
 
 #include "layMacroController.h"
+#include "layTechnologyController.h"
 #include "layMacroEditorDialog.h"
 #include "layMacroInterpreter.h"
 #include "layMainWindow.h"
@@ -54,6 +55,8 @@ MacroController::initialized (lay::PluginRoot *root)
 
   connect (&lay::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (update_menu_with_macros ()));
   connect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (update_menu_with_macros ()));
+  connect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
+  connect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (update_menu_with_macros ()));
 
   //  update the menus with the macro menu bindings as late as possible (now we
   //  can be sure that the menus are created propertly)
@@ -65,6 +68,8 @@ MacroController::uninitialize (lay::PluginRoot * /*root*/)
 {
   disconnect (&lay::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (update_menu_with_macros ()));
   disconnect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (update_menu_with_macros ()));
+  disconnect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
+  disconnect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (update_menu_with_macros ()));
 
   delete mp_macro_editor;
   mp_macro_editor = 0;

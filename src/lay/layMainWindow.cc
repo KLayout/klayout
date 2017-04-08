@@ -86,7 +86,7 @@
 #include "layLayerToolbox.h"
 #include "laySettingsForm.h"
 #include "laySettingsForm.h"
-#include "layTechSetupDialog.h"
+#include "layTechnologyController.h"
 #include "layTipDialog.h"
 #include "laySelectCellViewForm.h"
 #include "layLayoutPropertiesForm.h"
@@ -4507,29 +4507,9 @@ MainWindow::show_progress_bar (bool show)
 void
 MainWindow::cm_technologies ()
 {
-  lay::TechSetupDialog dialog (this);
-  if (dialog.exec ()) {
-
-    std::vector<lay::MacroCollection *> nm = lay::Application::instance ()->sync_tech_macro_locations ();
-
-    bool has_autorun = false;
-    for (std::vector<lay::MacroCollection *>::const_iterator m = nm.begin (); m != nm.end () && ! has_autorun; ++m) {
-      has_autorun = (*m)->has_autorun ();
-    }
-
-    if (has_autorun && QMessageBox::question (this, QObject::tr ("Run Macros"), QObject::tr ("Some macros associated with technologies now are configured to run automatically.\n\nChoose 'Yes' to run these macros now. Choose 'No' to not run them."), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-      for (std::vector<lay::MacroCollection *>::const_iterator m = nm.begin (); m != nm.end (); ++m) {
-        (*m)->autorun ();
-      }
-    }
-
-    //  because the macro-tech association might have changed, do this:
-    //  TODO: let the macro controller monitor the technologies.
-    lay::MacroController *mc = lay::MacroController::instance ();
-    if (mc) {
-      mc->update_menu_with_macros ();
-    }
-
+  lay::TechnologyController *tc = lay::TechnologyController::instance ();
+  if (tc) {
+    tc->show_editor ();
   }
 }
 

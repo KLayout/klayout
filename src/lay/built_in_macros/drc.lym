@@ -17,10 +17,19 @@
  <text>
 # Extend the Float class by methods which convert
 # values with units, i.e. 1.3nm gives 0.0013
-class Float
-  def Float._dbu=(dbu)
-    @@dbu = dbu
+
+1.0.class.class_eval do
+
+  class &lt;&lt; self
+    @dbu = nil
+    def _dbu=(dbu)
+      @dbu = dbu
+    end
+    def _dbu
+      @dbu
+    end
   end
+
   def um
     self
   end
@@ -55,22 +64,30 @@ class Float
     self*1.0e12
   end
   def dbu
-    @@dbu || raise("No layout loaded - cannot determine database unit")
-    self*@@dbu
+    self.class._dbu || raise("No layout loaded - cannot determine database unit")
+    self*self.class._dbu
   end
+
 end
 
-module IntegerClassExtensions
-  @dbu = nil
-  def _dbu=(dbu)
-    @dbu = dbu
-  end
-  def _dbu
-    @dbu
-  end
-end
+# Extend the Fixnum class, so it is possible to 
+# convert a value to Float with a unit spec, i.e.
+# 5.nm -&gt; 0.005. A spec with ".dbu" gives the 
+# Fixnum value itself. This indicates a value in 
+# database units for most methods of the DRC 
+# framework.
 
-module IntegerExtensions
+1.class.class_eval do
+
+  class &lt;&lt; self
+    @dbu = nil
+    def _dbu=(dbu)
+      @dbu = dbu
+    end
+    def _dbu
+      @dbu
+    end
+  end
 
   def um
     self.to_f
@@ -111,16 +128,6 @@ module IntegerExtensions
   end
 
 end
-
-
-# Extend the Fixnum class, so it is possible to 
-# convert a value to Float with a unit spec, i.e.
-# 5.nm -&gt; 0.005. A spec with ".dbu" gives the 
-# Fixnum value itself. This indicates a value in 
-# database units for most methods of the DRC 
-# framework.
-1.class.include(IntegerExtensions)
-1.class.extend(IntegerClassExtensions)
 
 module DRC
 
@@ -3167,7 +3174,7 @@ CODE
         raise "Cannot change the database unit at this point"
       end
       # Should have a "context", but no such thing for Float or Fixnum
-      Float._dbu = d
+      1.0.class._dbu = d
       1.class._dbu = d
       @dbu = d
     end

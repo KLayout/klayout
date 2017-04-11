@@ -99,7 +99,13 @@ TechnologyController::update_after_change ()
   //  re-attach all events
   tl::Object::detach_from_all_events ();
 
-  lay::MainWindow::instance ()->current_view_changed_event.add (this, &TechnologyController::update_after_change);
+  lay::MainWindow *mw = lay::MainWindow::instance ();
+  lay::MacroController *mc = lay::MacroController::instance ();
+
+  if (mw) {
+    mw->current_view_changed_event.add (this, &TechnologyController::update_after_change);
+  }
+
   lay::Technologies::instance ()->technology_changed_event.add (this, &TechnologyController::technology_changed);
   lay::Technologies::instance ()->technologies_changed_event.add (this, &TechnologyController::technologies_changed);
 
@@ -117,11 +123,10 @@ TechnologyController::update_after_change ()
 
     m_active_technology = active_tech;
 
-    lay::MainWindow *mw = lay::MainWindow::instance ();
     if (mw) {
       mw->tech_message (tech_string_from_name (active_tech));
     }
-    lay::MacroController *mc = lay::MacroController::instance ();
+
     if (mc) {
       //  TODO: let the macro controller monitor the active technology
       //  need to do this since macros may be bound to the new technology

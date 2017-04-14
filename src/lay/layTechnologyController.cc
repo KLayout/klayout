@@ -29,6 +29,9 @@
 #include "laybasicConfig.h"
 
 #include <QMessageBox>
+#include <QDir>
+#include <QDirIterator>
+#include <QFileInfo>
 
 namespace lay
 {
@@ -43,9 +46,15 @@ std::string tech_string_from_name (const std::string &tn)
 }
 
 TechnologyController::TechnologyController ()
-  : PluginDeclaration (), mp_editor (0), mp_mw (0)
+  : PluginDeclaration (), mp_editor (0), mp_mw (0), m_no_macros (false)
 {
   m_current_technology_updated = false;
+}
+
+void
+TechnologyController::enable_macros (bool enable)
+{
+  m_no_macros = !enable;
 }
 
 TechnologyController *
@@ -61,8 +70,16 @@ TechnologyController::instance ()
 }
 
 void
+TechnologyController::initialize (lay::PluginRoot * /*root*/)
+{
+  //  .. nothing yet ..
+}
+
+void
 TechnologyController::initialized (lay::PluginRoot *root)
 {
+  sync_tech_macro_locations ();
+
   mp_mw = dynamic_cast <lay::MainWindow *> (root);
   if (mp_mw) {
     mp_editor = new lay::TechSetupDialog (mp_mw);
@@ -272,7 +289,7 @@ TechnologyController::show_editor ()
 {
   if (mp_editor && mp_editor->exec ()) {
 
-    std::vector<lay::MacroCollection *> nm = lay::Application::instance ()->sync_tech_macro_locations ();
+    std::vector<lay::MacroCollection *> nm = sync_tech_macro_locations ();
 
     bool has_autorun = false;
     for (std::vector<lay::MacroCollection *>::const_iterator m = nm.begin (); m != nm.end () && ! has_autorun; ++m) {
@@ -293,6 +310,204 @@ TechnologyController::show_editor ()
     }
 
   }
+}
+
+const std::string &
+TechnologyController::default_root ()
+{
+  tl_assert (!m_paths.empty ());
+  return m_paths.front ();
+}
+
+void
+TechnologyController::refresh ()
+{
+  try {
+
+    lay::Technologies::instance ()->begin_updates ();
+    lay::Technologies::instance ()->clear ();
+
+    for (std::vector<std::string>::const_iterator p = m_paths.begin (); p != m_paths.end (); ++p) {
+
+      QDir dir (tl::to_qstring (*p));
+      if (! dir.exists ()) {
+        continue;
+      }
+
+      QStringList name_filters;
+      name_filters << QString::fromUtf8 ("*.lyt");
+
+      QStringList lyt_files;
+
+      QDirIterator di (dir.path (), name_filters, QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+      while (di.hasNext ()) {
+        lyt_files << di.next ();
+      }
+
+      lyt_files.sort ();
+
+      for (QStringList::const_iterator lf = lyt_files.begin (); lf != lyt_files.end (); ++lf) {
+
+        try {
+
+          if (tl::verbosity () >= 20) {
+            tl::info << "Auto-importing technology from " << tl::to_string (*lf);
+          }
+
+          lay::Technology t;
+          t.load (tl::to_string (*lf));
+          t.set_persisted (false);   // don't save that one in the configuration
+          t.set_readonly (! QFileInfo (dir.filePath (*lf)).isWritable ());
+          lay::Technologies::instance ()->add (new lay::Technology (t));
+
+        } catch (tl::Exception &ex) {
+          tl::warn << tl::to_string (QObject::tr ("Unable to auto-import technology file ")) << tl::to_string (*lf) << ": " << ex.msg ();
+        }
+
+      }
+
+    }
+
+    for (std::vector<lay::Technology>::const_iterator t = m_temp_tech.begin (); t != m_temp_tech.end (); ++t) {
+
+      lay::Technology *tech = new lay::Technology (*t);
+      tech->set_persisted (false);    // don't save that one in the configuration
+      tech->set_readonly (true);
+      lay::Technologies::instance ()->add (tech);
+
+    }
+
+    lay::Technologies::instance ()->end_updates ();
+
+  } catch (...) {
+    lay::Technologies::instance ()->end_updates ();
+    throw;
+  }
+}
+
+void
+TechnologyController::add_temp_tech (const lay::Technology &t)
+{
+  m_temp_tech.push_back (t);
+}
+
+void
+TechnologyController::add_path (const std::string &p)
+{
+  m_paths.push_back (p);
+}
+
+std::vector<lay::MacroCollection *>
+TechnologyController::sync_tech_macro_locations ()
+{
+  lay::MacroController *mc = lay::MacroController::instance ();
+
+  if (! mc || m_no_macros) {
+    return std::vector<lay::MacroCollection *> ();
+  }
+
+  std::set<std::pair<std::string, std::string> > tech_macro_paths;
+  std::map<std::pair<std::string, std::string>, std::string> tech_names_by_path;
+
+  //  Add additional places where the technologies define some macros
+  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
+
+    if (t->base_path ().empty ()) {
+      continue;
+    }
+
+    for (size_t c = 0; c < mc->macro_categories ().size (); ++c) {
+
+      QDir base_dir (tl::to_qstring (t->base_path ()));
+      if (base_dir.exists ()) {
+
+        QDir macro_dir (base_dir.filePath (tl::to_qstring (mc->macro_categories () [c].first)));
+        if (macro_dir.exists ()) {
+
+          std::string mp = tl::to_string (macro_dir.path ());
+          std::pair<std::string, std::string> cp (mc->macro_categories () [c].first, mp);
+          tech_macro_paths.insert (cp);
+          std::string &tn = tech_names_by_path [cp];
+          if (! tn.empty ()) {
+            tn += ",";
+          }
+          tn += t->name ();
+
+        }
+
+      }
+
+    }
+
+  }
+
+  //  delete macro collections which are no longer required or update description
+  std::vector<lay::MacroCollection *> folders_to_delete;
+  std::string desc_prefix = tl::to_string (QObject::tr ("Technology")) + " - ";
+
+  lay::MacroCollection *root = &lay::MacroCollection::root ();
+
+  for (lay::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
+
+    std::pair<std::string, std::string> cp (m->second->category (), m->second->path ());
+    if (m->second->virtual_mode () == lay::MacroCollection::TechFolder && m_tech_macro_paths.find (cp) != m_tech_macro_paths.end ()) {
+
+      if (tech_macro_paths.find (cp) == tech_macro_paths.end ()) {
+        //  no longer used
+        folders_to_delete.push_back (m->second);
+      } else {
+        //  used: update description if required
+        std::string desc = desc_prefix + tech_names_by_path [cp];
+        m->second->set_description (desc);
+      }
+
+    }
+
+  }
+
+  for (std::vector<lay::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
+    if (tl::verbosity () >= 20) {
+      tl::info << "Removing macro folder " << (*m)->path () << ", category '" << (*m)->category () << "' because no longer in use";
+    }
+    root->erase (*m);
+  }
+
+  //  store new paths
+  m_tech_macro_paths = tech_macro_paths;
+
+  //  add new folders
+  for (lay::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
+    if (m->second->virtual_mode () == lay::MacroCollection::TechFolder) {
+      std::pair<std::string, std::string> cp (m->second->category (), m->second->path ());
+      tech_macro_paths.erase (cp);
+    }
+  }
+
+  std::vector<lay::MacroCollection *> new_folders;
+
+  for (std::set<std::pair<std::string, std::string> >::const_iterator p = tech_macro_paths.begin (); p != tech_macro_paths.end (); ++p) {
+
+    const std::string &tn = tech_names_by_path [*p];
+
+    //  TODO: is it wise to make it writeable?
+    if (tl::verbosity () >= 20) {
+      tl::info << "Adding macro folder " << p->second << ", category '" << p->first << "' for technologies " << tn;
+    }
+
+    //  Add the folder. Note: it may happen that a macro folder for the tech specific macros already exists in
+    //  a non-tech context.
+    //  In that case, the add_folder method will return 0.
+    lay::MacroCollection *mc = lay::MacroCollection::root ().add_folder (desc_prefix + tn, p->second, p->first, false);
+    if (mc) {
+
+      mc->set_virtual_mode (lay::MacroCollection::TechFolder);
+      new_folders.push_back (mc);
+
+    }
+
+  }
+
+  return new_folders;
 }
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new TechnologyController (), 110, "TechnologyController");

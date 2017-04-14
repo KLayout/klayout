@@ -137,6 +137,7 @@ protected slots:
   void rename_clicked ();
   void import_clicked ();
   void export_clicked ();
+  void refresh_clicked ();
 
 private:
   void update_tech_tree ();
@@ -148,6 +149,8 @@ private:
   std::string selected_tech_component_name ();
   void commit_tech_component ();
   void clear_components ();
+  bool commit ();
+  void update ();
 
   lay::Technologies m_technologies;
   lay::Technology *mp_current_tech;

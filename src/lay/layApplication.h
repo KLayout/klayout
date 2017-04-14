@@ -203,14 +203,6 @@ public:
   bool special_app_flag (const std::string &name);
 
   /**
-   *  @brief Obtain the list of macro categories
-   */
-  const std::vector< std::pair<std::string, std::string> > &macro_categories () const
-  {
-    return m_macro_categories;
-  }
-
-  /**
    *  @brief Return a reference to the Ruby interpreter
    */
   gsi::Interpreter &ruby_interpreter () 

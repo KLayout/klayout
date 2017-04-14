@@ -38,6 +38,8 @@ namespace lay
 Technologies::Technologies ()
 {
   m_technologies.push_back (new Technology (std::string (""), "(Default)"));
+  m_changed = false;
+  m_in_update = false;
 }
 
 Technologies::Technologies (const Technologies &other)
@@ -128,7 +130,7 @@ Technologies::add (Technology *technology)
     technology->technology_changed_with_sender_event.add (this, &Technologies::technology_changed);
   }
 
-  technologies_changed_event ();
+  technologies_changed ();
 }
 
 void 
@@ -137,11 +139,51 @@ Technologies::remove (const std::string &name)
   for (tl::stable_vector<Technology>::iterator t = m_technologies.begin (); t != m_technologies.end (); ++t) {
     if (t->name () == name) {
       m_technologies.erase (t);
-      technologies_changed_event ();
+      technologies_changed ();
       break;
     }
   }
 }
+
+void
+Technologies::clear ()
+{
+  if (! m_technologies.empty ()) {
+    m_technologies.clear ();
+    technologies_changed ();
+  }
+}
+
+void
+Technologies::technologies_changed ()
+{
+  if (m_in_update) {
+    m_changed = true;
+  } else {
+    technologies_changed_event ();
+  }
+}
+
+void
+Technologies::begin_updates ()
+{
+  tl_assert (! m_in_update);
+  m_in_update = true;
+  m_changed = false;
+}
+
+void
+Technologies::end_updates ()
+{
+  if (m_in_update) {
+    m_in_update = false;
+    if (m_changed) {
+      m_changed = false;
+      technologies_changed ();
+    }
+  }
+}
+
 
 bool 
 Technologies::has_technology (const std::string &name) const
@@ -171,13 +213,13 @@ Technologies::technology_by_name (const std::string &name)
 //  Technology implementation
 
 Technology::Technology ()
-  : m_name (), m_description (), m_dbu (0.001), m_persisted (true)
+  : m_name (), m_description (), m_dbu (0.001), m_persisted (true), m_readonly (false)
 {
   init ();
 }
 
 Technology::Technology (const std::string &name, const std::string &description)
-  : m_name (name), m_description (description), m_dbu (0.001), m_persisted (true)
+  : m_name (name), m_description (description), m_dbu (0.001), m_persisted (true), m_readonly (false)
 {
   init ();
 }
@@ -350,7 +392,9 @@ Technology::load (const std::string &fn)
   xml_struct.parse (source, *this);
 
   //  use the tech file's path as the default base path
-  set_default_base_path (tl::to_string (QFileInfo (tl::to_qstring (fn)).absoluteDir ().path ()));
+  std::string lyt_file = tl::to_string (QFileInfo (tl::to_qstring (fn)).absoluteDir ().path ());
+  set_default_base_path (lyt_file);
+  set_tech_file_path (lyt_file);
 }
 
 void

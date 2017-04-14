@@ -29,11 +29,14 @@
 #include "layTechnology.h"
 #include "layAbstractMenu.h"
 
+#include <vector>
+
 namespace lay
 {
 
 class TechSetupDialog;
 class MainWindow;
+class MacroCollection;
 
 /**
  *  @brief A "controller" for the technologies
@@ -52,6 +55,7 @@ public:
    */
   TechnologyController ();
 
+  void initialize (lay::PluginRoot *root);
   void initialized (lay::PluginRoot *root);
   void uninitialize (lay::PluginRoot *root);
 
@@ -69,6 +73,41 @@ public:
     return m_active_technology;
   }
 
+  /**
+   *  @brief Enables or disables macros
+   *  If macros are enabled, the macro tree contains the macros defined within the technologies.
+   *  This flag needs to be set initially and before the technology tree is updated.
+   */
+  void enable_macros (bool enable);
+
+  /**
+   *  @brief Adds a path as a search path for technologies
+   *  "refresh" needs to be called after search paths have been added.
+   */
+  void add_path (const std::string &path);
+
+  /**
+   *  @brief Adds a temporary technology
+   *  Temporary technologies are additional technologies which are added to the list of technologies
+   *  but are not persisted or editable.
+   *  "refresh" needs to be called after temp technologies have been added.
+   */
+  void add_temp_tech (const lay::Technology &t);
+
+  /**
+   *  @brief Updates the technology collection with the technologies from the search path and teh temp technologies
+   */
+  void refresh ();
+
+  /**
+   *  @brief Gets the default root folder
+   *  The default root is the first one of the paths added with add_path.
+   */
+  const std::string &default_root ();
+
+  /**
+   *  @brief Gets the singleton instance of the controller
+   */
   static TechnologyController *instance ();
 
 signals:
@@ -92,6 +131,10 @@ private:
   bool m_current_technology_updated;
   lay::TechSetupDialog *mp_editor;
   lay::MainWindow *mp_mw;
+  bool m_no_macros;
+  std::vector<std::string> m_paths;
+  std::vector<lay::Technology> m_temp_tech;
+  std::set<std::pair<std::string, std::string> > m_tech_macro_paths;
 
   void update_after_change ();
   void technologies_changed ();
@@ -101,6 +144,7 @@ private:
   bool menu_activated (const std::string &symbol) const;
   void update_current_technology ();
   void update_menu ();
+  std::vector<lay::MacroCollection *> sync_tech_macro_locations ();
 };
 
 }

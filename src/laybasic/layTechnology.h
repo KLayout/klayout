@@ -134,6 +134,22 @@ public:
   void remove (const std::string &name);
 
   /**
+   *  @brief Clears the list of technologies
+   */
+  void clear ();
+
+  /**
+   *  @brief Begins a bulk operation
+   *  This method will disable "technologies_changed" events until (later) end_updates () is called.
+   */
+  void begin_updates ();
+
+  /**
+   *  @brief Ends a bulk operation
+   */
+  void end_updates ();
+
+  /**
    *  @brief Checks, if a technology with the given name exists
    */
   bool has_technology (const std::string &name) const;
@@ -191,8 +207,15 @@ protected:
     technology_changed_event (t);
   }
 
+  /**
+   *  @brief Sends the technologies_changed event
+   */
+  void technologies_changed ();
+
 private:
   tl::stable_vector<Technology> m_technologies;
+  bool m_changed;
+  bool m_in_update;
 };
 
 /**
@@ -306,6 +329,23 @@ public:
       m_explicit_base_path = p;
       technology_changed ();
     }
+  }
+
+  /**
+   *  @brief Gets the path of the tech file if the technology was loaded from a tech file
+   */
+  const std::string &tech_file_path () const
+  {
+    return m_lyt_file;
+  }
+
+  /**
+   *  @brief Sets the path of the tech file
+   *  This method is intended for internal use only.
+   */
+  void set_tech_file_path (const std::string &lyt_file)
+  {
+    m_lyt_file = lyt_file;
   }
 
   /**
@@ -498,6 +538,24 @@ public:
   }
 
   /**
+   *  @brief Returns a flag indicating whether the technology is readonly
+   *
+   *  If the flag is false, the technology can be edited. Otherwise it's locked for editing.
+   */
+  bool is_readonly () const
+  {
+    return m_readonly;
+  }
+
+  /**
+   *  @brief Sets a flag indicating whether the technology is readonly
+   */
+  void set_readonly (bool f)
+  {
+    m_readonly = f;
+  }
+
+  /**
    *  @brief An event indicating that the technology has changed
    */
   tl::Event technology_changed_event;
@@ -514,9 +572,12 @@ private:
   db::LoadLayoutOptions m_load_layout_options;
   db::SaveLayoutOptions m_save_layout_options;
   std::string m_lyp_path;
+  std::string m_lyt_path;
   bool m_add_other_layers;
   std::vector <TechnologyComponent *> m_components;
   bool m_persisted;
+  bool m_readonly;
+  std::string m_lyt_file;
 
   void init ();
 

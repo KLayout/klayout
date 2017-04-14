@@ -45,6 +45,38 @@ MacroController::MacroController ()
 }
 
 void
+MacroController::initialize (lay::PluginRoot * /*root*/)
+{
+  //  Scan built-in macros
+  //  These macros are always taken, even if there are no macros requested (they are required to
+  //  fully form the API).
+  lay::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
+  lay::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
+
+  //  TODO: consider adding "drc" dynamically and allow more dynamic categories
+  m_macro_categories.push_back (std::pair<std::string, std::string> ("macros", tl::to_string (QObject::tr ("Ruby"))));
+  m_macro_categories.push_back (std::pair<std::string, std::string> ("pymacros", tl::to_string (QObject::tr ("Python"))));
+  m_macro_categories.push_back (std::pair<std::string, std::string> ("drc", tl::to_string (QObject::tr ("DRC"))));
+
+  //  Scan for macros and set interpreter path
+  for (std::vector <std::pair<std::string, std::pair<std::string, std::pair<std::string, bool> > > >::const_iterator p = m_paths.begin (); p != m_paths.end (); ++p) {
+
+    std::string path = p->first;
+    std::string description = p->second.first;
+    std::string cat = p->second.second.first;
+    bool readonly = p->second.second.second;
+
+    for (size_t c = 0; c < m_macro_categories.size (); ++c) {
+      if (cat.empty () || cat == m_macro_categories [c].first) {
+        std::string mp = tl::to_string (QDir (tl::to_qstring (p->first)).filePath (tl::to_qstring (m_macro_categories [c].first)));
+        lay::MacroCollection::root ().add_folder (description, mp, m_macro_categories [c].first, readonly);
+      }
+    }
+
+  }
+}
+
+void
 MacroController::initialized (lay::PluginRoot *root)
 {
   mp_mw = dynamic_cast <lay::MainWindow *> (root);
@@ -237,6 +269,12 @@ MacroController::refresh ()
 }
 
 void
+MacroController::add_path (const std::string &path, const std::string &description, const std::string &category, bool readonly)
+{
+  m_paths.push_back (std::make_pair (path, std::make_pair (description, std::make_pair (category, readonly))));
+}
+
+void
 MacroController::add_temp_macro (lay::Macro *m)
 {
   m_temp_macros.add_unspecific (m);
@@ -252,7 +290,7 @@ MacroController::add_macro_items_to_menu (lay::MacroCollection &collection, int 
     if (! tech || c->second->virtual_mode () != lay::MacroCollection::TechFolder) {
       consider = true;
     } else {
-      const std::vector<std::pair<std::string, std::string> > &mc = lay::Application::instance ()->macro_categories ();
+      const std::vector<std::pair<std::string, std::string> > &mc = macro_categories ();
       for (std::vector<std::pair<std::string, std::string> >::const_iterator cc = mc.begin (); cc != mc.end () && !consider; ++cc) {
         consider = (c->second->path () == tl::to_string (QDir (tl::to_qstring (tech->base_path ())).filePath (tl::to_qstring (cc->first))));
       }

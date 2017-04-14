@@ -22,6 +22,7 @@
 
 
 #include "ui_MacroTemplateSelectionDialog.h"
+#include "layMacroController.h"
 #include "layMacroEditorTree.h"
 #include "layMacroEditorDialog.h"
 #include "layMacroEditorSetupDialog.h"
@@ -263,7 +264,7 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
   connect (mp_root, SIGNAL (macro_changed (Macro *)), this, SLOT (macro_changed (Macro *)));
   connect (mp_root, SIGNAL (macro_deleted (Macro *)), this, SLOT (macro_deleted (Macro *)));
 
-  m_categories = lay::Application::instance ()->macro_categories ();
+  m_categories = lay::MacroController::instance ()->macro_categories ();
 
   treeTab->clear ();
 

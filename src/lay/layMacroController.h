@@ -71,6 +71,11 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
+  virtual void initialize (lay::PluginRoot *root);
+
+  /**
+   *  @brief Reimplementation of the PluginDeclaration interface
+   */
   virtual void initialized (lay::PluginRoot *root);
 
   /**
@@ -118,6 +123,11 @@ public:
   void refresh ();
 
   /**
+   *  @brief Adds a search path to the macros
+   */
+  void add_path (const std::string &path, const std::string &description, const std::string &category, bool readonly);
+
+  /**
    *  @brief Adds a temporary macro
    *
    *  Temporary macros are such present on the command line or
@@ -127,6 +137,14 @@ public:
    *  The MainWindow object will become owner of the macro object.
    */
   void add_temp_macro (lay::Macro *m);
+
+  /**
+   *  @brief Obtain the list of macro categories
+   */
+  const std::vector< std::pair<std::string, std::string> > &macro_categories () const
+  {
+    return m_macro_categories;
+  }
 
   /**
    *  @brief Gets the singleton instance for this object
@@ -146,6 +164,8 @@ private:
   std::vector<lay::Action> m_macro_actions;
   std::map<QAction *, lay::Macro *> m_action_to_macro;
   lay::MacroCollection m_temp_macros;
+  std::vector< std::pair<std::string, std::pair<std::string, std::pair<std::string, bool> > > > m_paths;
+  std::vector< std::pair<std::string, std::string> > m_macro_categories;
 
   void add_macro_items_to_menu (lay::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings);
   void do_update_menu_with_macros ();

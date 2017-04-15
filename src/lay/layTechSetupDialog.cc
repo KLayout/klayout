@@ -504,14 +504,6 @@ TechSetupDialog::TechSetupDialog (QWidget *parent)
   connect (add_pb, SIGNAL (clicked ()), this, SLOT (add_clicked ()));
   connect (delete_pb, SIGNAL (clicked ()), this, SLOT (delete_clicked ()));
   connect (rename_pb, SIGNAL (clicked ()), this, SLOT (rename_clicked ()));
-
-  if (s_first_show) {
-    TipDialog td (this, 
-                  tl::to_string (QObject::tr ("<html><body>To get started with the technology manager, read the documentation provided: <a href=\"int:/about/technology_manager.xml\">About Technology Management</a>.</body></html>")), 
-                  "tech-manager-basic-tips");
-    td.exec_dialog ();
-    s_first_show = false;
-  }
 }
 
 TechSetupDialog::~TechSetupDialog ()
@@ -559,6 +551,14 @@ TechSetupDialog::update ()
 int
 TechSetupDialog::exec (lay::Technologies &technologies)
 {
+  if (s_first_show) {
+    TipDialog td (this,
+                  tl::to_string (QObject::tr ("<html><body>To get started with the technology manager, read the documentation provided: <a href=\"int:/about/technology_manager.xml\">About Technology Management</a>.</body></html>")),
+                  "tech-manager-basic-tips");
+    td.exec_dialog ();
+    s_first_show = false;
+  }
+
   m_technologies = technologies;
   update ();
 
@@ -613,12 +613,17 @@ BEGIN_PROTECTED
     QDir root = QDir (tl::to_qstring (lay::TechnologyController::instance ()->default_root ()));
     QDir tech_dir (root.filePath (tn));
     if (tech_dir.exists ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("A target folder with path '%1' already exists").arg (tech_dir.path ())));
+      if (QMessageBox::question (this, QObject::tr ("Creating Technology"),
+                                       QObject::tr ("A target folder with path '%1' already exists\nUse this directory for the new technology?").arg (tech_dir.path ()),
+                                       QMessageBox::No | QMessageBox::Yes) == QMessageBox::No) {
+        throw tl::CancelException ();
+      }
     }
 
     lay::Technology *nt = new lay::Technology (*t);
 
     nt->set_tech_file_path (tl::to_string (tech_dir.absoluteFilePath (tn + QString::fromUtf8 (".lyt"))));
+    nt->set_default_base_path (tl::to_string (tech_dir.absolutePath ()));
     nt->set_persisted (false);
     nt->set_name (tl::to_string (tn));
     nt->set_description (std::string ());
@@ -990,9 +995,11 @@ TechSetupDialog::commit_tech_component ()
     mp_current_editor->commit ();
   }
 
-  if (mp_current_tech && mp_current_tech_component && !mp_current_tech->is_readonly ()) {
+  if (mp_current_tech && !mp_current_tech->is_readonly ()) {
 
-    mp_current_tech->set_component (mp_current_tech_component->clone ());
+    if (mp_current_tech_component) {
+      mp_current_tech->set_component (mp_current_tech_component->clone ());
+    }
 
     //  because commit may have changed the description text, update the technology titles
     for (int i = tech_tree->topLevelItemCount (); i > 0; --i) {

@@ -873,7 +873,6 @@ AbstractMenu::build (QToolBar *t, std::list<AbstractMenuItem> &items)
     }
 
   }
-
 }
 
 QMenu *

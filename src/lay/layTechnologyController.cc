@@ -26,6 +26,7 @@
 #include "layMainWindow.h"
 #include "layApplication.h"
 #include "layConfig.h"
+#include "layQtTools.h"
 #include "laybasicConfig.h"
 
 #include <QMessageBox>
@@ -35,6 +36,8 @@
 
 namespace lay
 {
+
+static const std::string cfg_tech_editor_window_state ("tech-editor-window-state");
 
 std::string tech_string_from_name (const std::string &tn)
 {
@@ -65,20 +68,18 @@ TechnologyController::instance ()
 }
 
 void
-TechnologyController::initialize (lay::PluginRoot * /*root*/)
-{
-  //  .. nothing yet ..
-}
-
-void
-TechnologyController::initialized (lay::PluginRoot *root)
+TechnologyController::initialize (lay::PluginRoot *root)
 {
   mp_mw = dynamic_cast <lay::MainWindow *> (root);
   if (mp_mw) {
     mp_editor = new lay::TechSetupDialog (mp_mw);
     mp_editor->setModal (false);
   }
+}
 
+void
+TechnologyController::initialized (lay::PluginRoot * /*root*/)
+{
   update_menu ();
   connect_events ();
 }
@@ -94,6 +95,7 @@ void
 TechnologyController::get_options (std::vector < std::pair<std::string, std::string> > &options) const
 {
   options.push_back (std::pair<std::string, std::string> (cfg_initial_technology, ""));
+  options.push_back (std::pair<std::string, std::string> (cfg_tech_editor_window_state, ""));
 }
 
 void
@@ -153,7 +155,12 @@ TechnologyController::update_active_technology ()
 {
   lay::Technology *active_tech = 0;
   if (mp_mw && mp_mw->current_view () && mp_mw->current_view ()->active_cellview_index () >= 0 && mp_mw->current_view ()->active_cellview_index () <= int (mp_mw->current_view ()->cellviews ())) {
-    active_tech = lay::Technologies::instance ()->technology_by_name (mp_mw->current_view ()->active_cellview ()->tech_name ());
+
+    std::string tn = mp_mw->current_view ()->active_cellview ()->tech_name ();
+    if (lay::Technologies::instance ()->has_technology (tn)) {
+      active_tech = lay::Technologies::instance ()->technology_by_name (tn);
+    }
+
   }
 
   if (mp_active_technology != active_tech) {
@@ -192,6 +199,7 @@ TechnologyController::technologies_changed ()
   }
 
   update_menu ();
+  emit technologies_edited ();
 }
 
 void
@@ -209,6 +217,10 @@ TechnologyController::configure (const std::string &name, const std::string &val
       m_current_technology = value;
       m_current_technology_updated = true;
     }
+
+  } else if (name == cfg_tech_editor_window_state) {
+
+    lay::restore_dialog_state (mp_editor, value);
 
   } else if (name == cfg_technologies) {
 
@@ -295,6 +307,10 @@ TechnologyController::update_menu ()
     m_current_technology = lay::LayoutView::current ()->active_cellview ()->tech_name ();
   }
 
+  if (! lay::Technologies::instance()->has_technology (m_current_technology)) {
+    m_current_technology = std::string ();
+  }
+
   std::string title = tech_string_from_name (m_current_technology);
 
   size_t ntech = 0;
@@ -307,7 +323,7 @@ TechnologyController::update_menu ()
   for (std::vector<std::string>::const_iterator t = tech_group.begin (); t != tech_group.end (); ++t) {
     lay::Action action = pr->menu ()->action (*t);
     action.set_title (title);
-    action.set_visible (ntech > 1);
+    action.set_enabled (ntech > 1);
     std::vector<std::string> items = pr->menu ()->items (*t);
     for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
       pr->menu ()->delete_item (*i);
@@ -428,9 +444,12 @@ TechnologyController::show_editor ()
                                     QMessageBox::Ok);
     }
 
-    update_menu ();
-    emit technologies_edited ();
+    technologies_changed ();
 
+  }
+
+  if (mp_mw) {
+    mp_mw->config_set (cfg_tech_editor_window_state, lay::save_dialog_state (mp_editor));
   }
 }
 

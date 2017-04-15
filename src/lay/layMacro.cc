@@ -1083,7 +1083,7 @@ void MacroCollection::on_macro_changed (Macro *macro)
   }
 }
 
-void MacroCollection::collect_used_nodes(std::set <Macro *> &macros, std::set <MacroCollection *> &macro_collections)
+void MacroCollection::collect_used_nodes (std::set <Macro *> &macros, std::set <MacroCollection *> &macro_collections)
 {
   for (MacroCollection::child_iterator c = begin_children (); c != end_children (); ++c) {
     macro_collections.insert (c->second);

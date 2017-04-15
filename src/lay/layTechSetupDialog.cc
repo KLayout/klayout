@@ -542,7 +542,7 @@ TechSetupDialog::refresh_clicked ()
 {
 BEGIN_PROTECTED
 
-  lay::TechnologyController::instance ()->refresh (m_technologies);
+  lay::TechnologyController::instance ()->rescan (m_technologies);
   update ();
 
 END_PROTECTED

@@ -192,6 +192,7 @@ private slots:
   void help_requested (const QString &s);
   void macro_changed (Macro *macro);
   void macro_deleted (Macro *macro);
+  void macro_collection_deleted (MacroCollection *collection);
   void add_watch ();
   void edit_watch ();
   void del_watches ();

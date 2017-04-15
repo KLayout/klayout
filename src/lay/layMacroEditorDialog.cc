@@ -263,6 +263,7 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
 
   connect (mp_root, SIGNAL (macro_changed (Macro *)), this, SLOT (macro_changed (Macro *)));
   connect (mp_root, SIGNAL (macro_deleted (Macro *)), this, SLOT (macro_deleted (Macro *)));
+  connect (mp_root, SIGNAL (macro_collection_deleted (MacroCollection *)), this, SLOT (macro_collection_deleted (MacroCollection *)));
 
   m_categories = lay::MacroController::instance ()->macro_categories ();
 
@@ -1535,6 +1536,35 @@ MacroEditorDialog::commit ()
 }
 
 void
+MacroEditorDialog::macro_collection_deleted (lay::MacroCollection *collection)
+{
+  //  close the tab pages related to the collection we want to delete
+  std::set <lay::Macro *> used_macros;
+  std::set <lay::MacroCollection *> used_collections;
+  collection->collect_used_nodes (used_macros, used_collections);
+
+  for (std::set <lay::Macro *>::iterator mc = used_macros.begin (); mc != used_macros.end (); ++mc) {
+
+    if (mp_run_macro == *mc) {
+      mp_run_macro = 0;
+    }
+
+    std::map <Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.find (*mc);
+    if (p != m_tab_widgets.end ()) {
+      p->second->connect_macro (0);
+      tabWidget->blockSignals (true); // blockSignals prevents a reentrant call into set_current of the tree
+      tabWidget->removeTab (tabWidget->indexOf (p->second));
+      tabWidget->blockSignals (false);
+      delete p->second;
+      m_tab_widgets.erase (p);
+    }
+
+  }
+
+  refresh_file_watcher ();
+}
+
+void
 MacroEditorDialog::macro_deleted (lay::Macro *macro)
 {
   if (mp_run_macro == macro) {
@@ -2594,29 +2624,12 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to remove that location")));
   } 
 
-  //  close the tab pages related to the collection we want to delete
-  std::set <lay::Macro *> used_macros;
-  std::set <lay::MacroCollection *> used_collections;
-  collection->collect_used_nodes (used_macros, used_collections);
-
-  for (std::set <lay::Macro *>::iterator mc = used_macros.begin (); mc != used_macros.end (); ++mc) {
-
-    std::map <Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.find (*mc);
-    if (p != m_tab_widgets.end ()) {
-      p->second->connect_macro (0);
-      delete p->second;
-      m_tab_widgets.erase (p);
-    }
-
-  }
-
-  //  actually remove the collection
+  //  actually remove the collection (update is done through the
+  //  macro_collection_deleted signal handler).
   mp_root->erase (collection);
 
   //  save the new paths
   set_custom_paths (paths);
-
-  refresh_file_watcher ();
 
 END_PROTECTED
 }

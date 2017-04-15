@@ -104,6 +104,14 @@ public:
   virtual void drop_url (const std::string &path_or_url);
 
   /**
+   *  @brief Enables or disables implicit macros
+   *  If implicit macros are enabled, the macro tree contains the macros defined within the technologies
+   *  and other implicit sources.
+   *  This flag needs to be set initially and before the technology tree is updated.
+   */
+  void enable_implicit_macros (bool enable);
+
+  /**
    *  @brief Shows the macro editor
    *
    *  Depending on the category, a different tip dialog will be shown.
@@ -159,16 +167,24 @@ public slots:
    */
   void update_menu_with_macros ();
 
+  /**
+   *  @brief Called when the technologies got changed
+   */
+  void technologies_edited ();
+
 private:
   lay::MacroEditorDialog *mp_macro_editor;
   lay::MainWindow *mp_mw;
+  bool m_no_implicit_macros;
   tl::DeferredMethod<MacroController> dm_do_update_menu_with_macros;
   std::vector<lay::Action> m_macro_actions;
   std::map<QAction *, lay::Macro *> m_action_to_macro;
   lay::MacroCollection m_temp_macros;
   std::vector< std::pair<std::string, std::pair<std::string, std::pair<std::string, bool> > > > m_paths;
   std::vector< std::pair<std::string, std::string> > m_macro_categories;
+  std::set<std::pair<std::string, std::string> > m_tech_macro_paths;
 
+  void sync_implicit_macros (bool check_autorun);
   void add_macro_items_to_menu (lay::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings);
   void do_update_menu_with_macros ();
 };

@@ -929,36 +929,9 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
 
   lay::MacroController *mc = lay::MacroController::instance ();
 
-  if (mc && ! m_no_macros) {
-
-    //  Add the global ruby modules as the first ones.
-    m_load_macros.insert (m_load_macros.begin (), global_modules.begin (), global_modules.end ());
-
-    for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-      if (p == m_klayout_path.begin ()) {
-        mc->add_path (*p, tl::to_string (QObject::tr ("Local")), std::string (), false);
-      } else if (m_klayout_path.size () == 2) {
-        mc->add_path (*p, tl::to_string (QObject::tr ("Global")), std::string (), true);
-      } else {
-        mc->add_path (*p, tl::to_string (QObject::tr ("Global")) + " - " + *p, std::string (), true);
-      }
-    }
-
-    //  Install the custom folders
-    for (std::vector <std::pair<std::string, std::string> >::const_iterator p = custom_macro_paths.begin (); p != custom_macro_paths.end (); ++p) {
-      mc->add_path (p->first, tl::to_string (QObject::tr ("Project")) + " - " + p->first, p->second, false);
-    }
-
-    //  Actually load the macros
-    mc->load ();
-
-  }
-
   lay::TechnologyController *tc = lay::TechnologyController::instance ();
 
   if (tc) {
-
-    tc->enable_macros (! m_no_macros);
 
     //  auto-import technologies
     for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
@@ -987,7 +960,38 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
 
     }
 
-    tc->refresh ();
+    tc->load ();
+
+  }
+
+  if (mc) {
+
+    mc->enable_implicit_macros (! m_no_macros);
+
+    if (! m_no_macros) {
+
+      //  Add the global ruby modules as the first ones.
+      m_load_macros.insert (m_load_macros.begin (), global_modules.begin (), global_modules.end ());
+
+      for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
+        if (p == m_klayout_path.begin ()) {
+          mc->add_path (*p, tl::to_string (QObject::tr ("Local")), std::string (), false);
+        } else if (m_klayout_path.size () == 2) {
+          mc->add_path (*p, tl::to_string (QObject::tr ("Global")), std::string (), true);
+        } else {
+          mc->add_path (*p, tl::to_string (QObject::tr ("Global")) + " - " + *p, std::string (), true);
+        }
+      }
+
+      //  Install the custom folders
+      for (std::vector <std::pair<std::string, std::string> >::const_iterator p = custom_macro_paths.begin (); p != custom_macro_paths.end (); ++p) {
+        mc->add_path (p->first, tl::to_string (QObject::tr ("Project")) + " - " + p->first, p->second, false);
+      }
+
+    }
+
+    //  Actually load the macros
+    mc->load ();
 
   }
 

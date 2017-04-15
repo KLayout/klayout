@@ -37,7 +37,7 @@ namespace lay
 {
 
 MacroController::MacroController ()
-  : mp_macro_editor (0), mp_mw (0),
+  : mp_macro_editor (0), mp_mw (0), m_no_implicit_macros (false),
     dm_do_update_menu_with_macros (this, &MacroController::do_update_menu_with_macros)
 {
   connect (&m_temp_macros, SIGNAL (menu_needs_update ()), this, SLOT (update_menu_with_macros ()));
@@ -74,6 +74,8 @@ MacroController::load ()
     }
 
   }
+
+  sync_implicit_macros (false);
 }
 
 void
@@ -89,7 +91,7 @@ MacroController::initialized (lay::PluginRoot *root)
   connect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (update_menu_with_macros ()));
   if (lay::TechnologyController::instance ()) {
     connect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
-    connect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (update_menu_with_macros ()));
+    connect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (technologies_edited ()));
   }
 
   //  update the menus with the macro menu bindings as late as possible (now we
@@ -104,7 +106,7 @@ MacroController::uninitialize (lay::PluginRoot * /*root*/)
   disconnect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (update_menu_with_macros ()));
   if (lay::TechnologyController::instance ()) {
     disconnect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
-    disconnect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (update_menu_with_macros ()));
+    disconnect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (technologies_edited ()));
   }
 
   delete mp_macro_editor;
@@ -265,6 +267,136 @@ MacroController::show_editor (const std::string &cat, bool force_add)
 }
 
 void
+MacroController::enable_implicit_macros (bool enable)
+{
+  m_no_implicit_macros = !enable;
+}
+
+void
+MacroController::sync_implicit_macros (bool check_autorun)
+{
+  if (m_no_implicit_macros) {
+    return;
+  }
+
+  std::set<std::pair<std::string, std::string> > tech_macro_paths;
+  std::map<std::pair<std::string, std::string>, std::string> tech_names_by_path;
+
+  //  Add additional places where the technologies define some macros
+  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
+
+    if (t->base_path ().empty ()) {
+      continue;
+    }
+
+    for (size_t c = 0; c < macro_categories ().size (); ++c) {
+
+      QDir base_dir (tl::to_qstring (t->base_path ()));
+      if (base_dir.exists ()) {
+
+        QDir macro_dir (base_dir.filePath (tl::to_qstring (macro_categories () [c].first)));
+        if (macro_dir.exists ()) {
+
+          std::string mp = tl::to_string (macro_dir.path ());
+          std::pair<std::string, std::string> cp (macro_categories () [c].first, mp);
+          tech_macro_paths.insert (cp);
+          std::string &tn = tech_names_by_path [cp];
+          if (! tn.empty ()) {
+            tn += ",";
+          }
+          tn += t->name ();
+
+        }
+
+      }
+
+    }
+
+  }
+
+  //  delete macro collections which are no longer required or update description
+  std::vector<lay::MacroCollection *> folders_to_delete;
+  std::string desc_prefix = tl::to_string (QObject::tr ("Technology")) + " - ";
+
+  lay::MacroCollection *root = &lay::MacroCollection::root ();
+
+  for (lay::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
+
+    std::pair<std::string, std::string> cp (m->second->category (), m->second->path ());
+    if (m->second->virtual_mode () == lay::MacroCollection::TechFolder && m_tech_macro_paths.find (cp) != m_tech_macro_paths.end ()) {
+
+      if (tech_macro_paths.find (cp) == tech_macro_paths.end ()) {
+        //  no longer used
+        folders_to_delete.push_back (m->second);
+      } else {
+        //  used: update description if required
+        std::string desc = desc_prefix + tech_names_by_path [cp];
+        m->second->set_description (desc);
+      }
+
+    }
+
+  }
+
+  for (std::vector<lay::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
+    if (tl::verbosity () >= 20) {
+      tl::info << "Removing macro folder " << (*m)->path () << ", category '" << (*m)->category () << "' because no longer in use";
+    }
+    root->erase (*m);
+  }
+
+  //  store new paths
+  m_tech_macro_paths = tech_macro_paths;
+
+  //  add new folders
+  for (lay::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
+    if (m->second->virtual_mode () == lay::MacroCollection::TechFolder) {
+      std::pair<std::string, std::string> cp (m->second->category (), m->second->path ());
+      tech_macro_paths.erase (cp);
+    }
+  }
+
+  std::vector<lay::MacroCollection *> new_folders;
+
+  for (std::set<std::pair<std::string, std::string> >::const_iterator p = tech_macro_paths.begin (); p != tech_macro_paths.end (); ++p) {
+
+    const std::string &tn = tech_names_by_path [*p];
+
+    //  TODO: is it wise to make it writeable?
+    if (tl::verbosity () >= 20) {
+      tl::info << "Adding macro folder " << p->second << ", category '" << p->first << "' for technologies " << tn;
+    }
+
+    //  Add the folder. Note: it may happen that a macro folder for the tech specific macros already exists in
+    //  a non-tech context.
+    //  In that case, the add_folder method will return 0.
+    lay::MacroCollection *mc = lay::MacroCollection::root ().add_folder (desc_prefix + tn, p->second, p->first, false);
+    if (mc) {
+
+      mc->set_virtual_mode (lay::MacroCollection::TechFolder);
+      new_folders.push_back (mc);
+
+    }
+
+  }
+
+  if (check_autorun) {
+
+    bool has_autorun = false;
+    for (std::vector<lay::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end () && ! has_autorun; ++m) {
+      has_autorun = (*m)->has_autorun ();
+    }
+
+    if (has_autorun && QMessageBox::question (mp_mw, QObject::tr ("Run Macros"), QObject::tr ("Some macros associated with new items are configured to run automatically.\n\nChoose 'Yes' to run these macros now. Choose 'No' to not run them."), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+      for (std::vector<lay::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end (); ++m) {
+        (*m)->autorun ();
+      }
+    }
+
+  }
+}
+
+void
 MacroController::refresh ()
 {
   if (mp_macro_editor) {
@@ -367,6 +499,14 @@ MacroController::add_macro_items_to_menu (lay::MacroCollection &collection, int 
     }
 
   }
+}
+
+void
+MacroController::technologies_edited ()
+{
+  sync_implicit_macros (true);
+  refresh ();
+  update_menu_with_macros ();
 }
 
 void

@@ -256,7 +256,8 @@ Technology::Technology (const Technology &d)
     m_explicit_base_path (d.m_explicit_base_path), m_default_base_path (d.m_default_base_path),
     m_load_layout_options (d.m_load_layout_options),
     m_save_layout_options (d.m_save_layout_options),
-    m_lyp_path (d.m_lyp_path), m_add_other_layers (d.m_add_other_layers), m_persisted (d.m_persisted)
+    m_lyp_path (d.m_lyp_path), m_add_other_layers (d.m_add_other_layers), m_persisted (d.m_persisted),
+    m_readonly (d.m_readonly), m_lyt_file (d.m_lyt_file)
 {
   for (std::vector <TechnologyComponent *>::const_iterator c = d.m_components.begin (); c != d.m_components.end (); ++c) {
     m_components.push_back ((*c)->clone ());
@@ -277,6 +278,8 @@ Technology &Technology::operator= (const Technology &d)
     m_lyp_path = d.m_lyp_path;
     m_add_other_layers = d.m_add_other_layers;
     m_persisted = d.m_persisted;
+    m_readonly = d.m_readonly;
+    m_lyt_file = d.m_lyt_file;
 
     for (std::vector <TechnologyComponent *>::const_iterator c = m_components.begin (); c != m_components.end (); ++c) {
       delete *c;
@@ -400,7 +403,8 @@ Technology::load (const std::string &fn)
   //  use the tech file's path as the default base path
   std::string lyt_file = tl::to_string (QFileInfo (tl::to_qstring (fn)).absoluteDir ().path ());
   set_default_base_path (lyt_file);
-  set_tech_file_path (lyt_file);
+
+  set_tech_file_path (fn);
 }
 
 void

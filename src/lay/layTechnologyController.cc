@@ -284,9 +284,14 @@ TechnologyController::update_current_technology ()
     action.set_title (title);
   }
 
-  size_t it = 0;
-  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end () && it < m_tech_actions.size (); ++t, ++it) {
-    m_tech_actions[it].set_checked (t->name () == m_current_technology);
+  std::map<std::string, const lay::Technology *> tech_by_name;
+  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
+    tech_by_name.insert (std::make_pair (t->name (), t.operator-> ()));
+  }
+
+  int it = 0;
+  for (std::map<std::string, const lay::Technology *>::const_iterator t = tech_by_name.begin (); t != tech_by_name.end (); ++t, ++it) {
+    m_tech_actions[it].set_checked (t->second->name () == m_current_technology);
   }
 }
 
@@ -323,17 +328,22 @@ TechnologyController::update_menu ()
 
   m_tech_actions.clear ();
 
+  std::map<std::string, const lay::Technology *> tech_by_name;
+  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
+    tech_by_name.insert (std::make_pair (t->name (), t.operator-> ()));
+  }
+
   int it = 0;
-  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t, ++it) {
+  for (std::map<std::string, const lay::Technology *>::const_iterator t = tech_by_name.begin (); t != tech_by_name.end (); ++t, ++it) {
 
-    std::string title = tech_string_from_name (t->name ());
+    std::string title = tech_string_from_name (t->first);
 
-    m_tech_actions.push_back (pr->create_config_action ("", cfg_initial_technology, t->name ()));
+    m_tech_actions.push_back (pr->create_config_action ("", cfg_initial_technology, t->first));
     m_tech_actions.back ().set_title (title); // setting the title here avoids interpretation of '(...)' etc.
     m_tech_actions.back ().set_checkable (true);
-    m_tech_actions.back ().set_checked (t->name () == m_current_technology);
-    for (std::vector<std::string>::const_iterator t = tech_group.begin (); t != tech_group.end (); ++t) {
-      pr->menu ()->insert_item (*t + ".end", "technology_" + tl::to_string (it), m_tech_actions.back ());
+    m_tech_actions.back ().set_checked (t->first == m_current_technology);
+    for (std::vector<std::string>::const_iterator tg = tech_group.begin (); tg != tech_group.end (); ++tg) {
+      pr->menu ()->insert_item (*tg + ".end", "technology_" + tl::to_string (it), m_tech_actions.back ());
     }
 
   }
@@ -353,7 +363,7 @@ TechnologyController::show_editor ()
     //  determine the technology files that need to be deleted and delete them
     std::set<std::string> files_before;
     for (lay::Technologies::const_iterator t = new_tech.begin (); t != new_tech.end (); ++t) {
-      if (! ! t->tech_file_path ().empty () && ! t->is_persisted ()) {
+      if (! t->tech_file_path ().empty () && ! t->is_persisted ()) {
         files_before.insert (t->tech_file_path ());
       }
     }

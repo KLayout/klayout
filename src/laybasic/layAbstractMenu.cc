@@ -635,7 +635,6 @@ ConfigureAction::triggered ()
   } 
 
   m_pr->config_set (m_cname, m_cvalue);
-  m_pr->config_end ();
 }
 
 void

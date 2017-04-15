@@ -65,13 +65,10 @@ public:
   void show_editor ();
 
   /**
-   *  @brief Gets the name of the active technology
+   *  @brief Gets the active technology object or 0 if none is active
    *  The active technology is the one the current cellview uses
    */
-  const std::string &active_technology () const
-  {
-    return m_active_technology;
-  }
+  lay::Technology *active_technology () const;
 
   /**
    *  @brief Enables or disables macros
@@ -95,7 +92,12 @@ public:
   void add_temp_tech (const lay::Technology &t);
 
   /**
-   *  @brief Updates the technology collection with the technologies from the search path and teh temp technologies
+   *  @brief Updates the given technology collection with the technologies from the search path and teh temp technologies
+   */
+  void refresh (lay::Technologies &technologies);
+
+  /**
+   *  @brief Refreshes the global list of technologies
    */
   void refresh ();
 
@@ -127,16 +129,18 @@ signals:
 private:
   tl::stable_vector <lay::Action> m_tech_actions;
   std::string m_current_technology;
-  std::string m_active_technology;
   bool m_current_technology_updated;
+  bool m_technologies_configured;
   lay::TechSetupDialog *mp_editor;
   lay::MainWindow *mp_mw;
   bool m_no_macros;
   std::vector<std::string> m_paths;
   std::vector<lay::Technology> m_temp_tech;
   std::set<std::pair<std::string, std::string> > m_tech_macro_paths;
+  lay::Technology *mp_active_technology;
 
-  void update_after_change ();
+  void update_active_technology ();
+  void connect_events ();
   void technologies_changed ();
   void technology_changed (lay::Technology *);
   bool configure (const std::string &name, const std::string &value);

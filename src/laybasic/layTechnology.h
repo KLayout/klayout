@@ -150,6 +150,14 @@ public:
   void end_updates ();
 
   /**
+   *  @brief Ends a bulk operation
+   *  This version does not send an technologies_changed event but just cancels the bulk
+   *  operation. begin_updates/end_updates_no_event is essentially equivalent to blocking
+   *  signals.
+   */
+  void end_updates_no_event ();
+
+  /**
    *  @brief Checks, if a technology with the given name exists
    */
   bool has_technology (const std::string &name) const;

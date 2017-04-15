@@ -163,6 +163,11 @@ public:
       return mp_pos->m_name;
     }
 
+    int current_position () const
+    {
+      return mp_pos->m_position;
+    }
+
     X &operator* () const
     {
       return *(mp_pos->mp_object);

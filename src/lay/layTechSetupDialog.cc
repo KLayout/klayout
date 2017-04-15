@@ -542,8 +542,7 @@ TechSetupDialog::refresh_clicked ()
 {
 BEGIN_PROTECTED
 
-  commit ();
-  lay::TechnologyController::instance ()->refresh ();
+  lay::TechnologyController::instance ()->refresh (m_technologies);
   update ();
 
 END_PROTECTED
@@ -552,68 +551,22 @@ END_PROTECTED
 void
 TechSetupDialog::update ()
 {
-  m_technologies = *lay::Technologies ().instance ();
   update_tech_tree ();
   tech_tree->setCurrentItem (tech_tree->topLevelItem (0));
   update_tech (selected_tech ());
 }
 
-bool
-TechSetupDialog::commit ()
-{
-  std::string err_msg;
-
-  //  determine the technology files that need to be deleted and delete them
-  std::set<std::string> files_before;
-  for (lay::Technologies::const_iterator t = m_technologies.begin (); t != m_technologies.end (); ++t) {
-    if (! ! t->tech_file_path ().empty () && ! t->is_persisted ()) {
-      files_before.insert (t->tech_file_path ());
-    }
-  }
-  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
-    if (! t->tech_file_path ().empty () && ! t->is_persisted () && files_before.find (t->tech_file_path ()) == files_before.end ()) {
-      //  TODO: issue an error if files could not be removed
-      QFile (tl::to_qstring (t->tech_file_path ())).remove ();
-    }
-  }
-
-  *lay::Technologies ().instance () = m_technologies;
-
-  //  save the technologies that need to be saved
-  //  TODO: save only the ones that really need saving
-  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
-    if (! t->tech_file_path ().empty () && ! t->is_persisted ()) {
-      try {
-        t->save (t->tech_file_path ());
-      } catch (...) {
-        if (! err_msg.empty ()) {
-          err_msg += "\n";
-        }
-        err_msg += t->tech_file_path ();
-      }
-    }
-  }
-
-  if (! err_msg.empty ()) {
-    QMessageBox::critical (this, QObject::tr ("Error Saving Technology Files"),
-                                 QObject::tr ("The following files could not be saved:\n\n") + tl::to_qstring (err_msg),
-                                 QMessageBox::Ok);
-    return false;
-  } else {
-    return true;
-  }
-}
-
 int
-TechSetupDialog::exec ()
+TechSetupDialog::exec (lay::Technologies &technologies)
 {
+  m_technologies = technologies;
   update ();
 
   tc_stack->setMinimumSize (tc_stack->sizeHint ());
 
   int ret = QDialog::exec ();
   if (ret) {
-    commit ();
+    technologies = m_technologies;
   }
 
   //  clean up
@@ -661,9 +614,6 @@ BEGIN_PROTECTED
     QDir tech_dir (root.filePath (tn));
     if (tech_dir.exists ()) {
       throw tl::Exception (tl::to_string (QObject::tr ("A target folder with path '%1' already exists").arg (tech_dir.path ())));
-    }
-    if (! root.mkdir (tn)) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Unable to create target folder '%1'").arg (tech_dir.path ())));
     }
 
     lay::Technology *nt = new lay::Technology (*t);

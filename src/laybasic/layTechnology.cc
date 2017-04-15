@@ -184,6 +184,12 @@ Technologies::end_updates ()
   }
 }
 
+void
+Technologies::end_updates_no_event ()
+{
+  m_in_update = false;
+  m_changed = false;
+}
 
 bool 
 Technologies::has_technology (const std::string &name) const

@@ -26,6 +26,7 @@
 #include "layMainWindow.h"
 #include "layMacroController.h"
 #include "layApplication.h"
+#include "layConfig.h"
 #include "laybasicConfig.h"
 
 #include <QMessageBox>
@@ -46,9 +47,10 @@ std::string tech_string_from_name (const std::string &tn)
 }
 
 TechnologyController::TechnologyController ()
-  : PluginDeclaration (), mp_editor (0), mp_mw (0), m_no_macros (false)
+  : PluginDeclaration (), mp_editor (0), mp_mw (0), m_no_macros (false), mp_active_technology (0)
 {
   m_current_technology_updated = false;
+  m_technologies_configured = false;
 }
 
 void
@@ -87,7 +89,7 @@ TechnologyController::initialized (lay::PluginRoot *root)
   }
 
   update_menu ();
-  update_after_change ();
+  connect_events ();
 }
 
 void
@@ -111,54 +113,80 @@ TechnologyController::get_menu_entries (std::vector<lay::MenuEntry> &menu_entrie
 }
 
 void
-TechnologyController::update_after_change ()
+TechnologyController::connect_events ()
 {
-  //  re-attach all events
+  //  NOTE: the whole concept is a but strange here: the goal is to
+  //  connect to the current view's active_cellview_changed event and
+  //  the active cellview's technology_changed event. We could register
+  //  events tracking the current view and active cellview which detach
+  //  and attach event handlers. This is more tedious than doing this:
+  //  we detach and re-attach the events whenever something changes.
+  //  The event system supports this case, hence we do so.
+
   tl::Object::detach_from_all_events ();
-
-  lay::MainWindow *mw = lay::MainWindow::instance ();
-  lay::MacroController *mc = lay::MacroController::instance ();
-
-  if (mw) {
-    mw->current_view_changed_event.add (this, &TechnologyController::update_after_change);
-  }
 
   lay::Technologies::instance ()->technology_changed_event.add (this, &TechnologyController::technology_changed);
   lay::Technologies::instance ()->technologies_changed_event.add (this, &TechnologyController::technologies_changed);
 
-  if (lay::LayoutView::current ()) {
-    lay::LayoutView::current ()->active_cellview_changed_event.add (this, &TechnologyController::update_after_change);
-  }
+  if (mp_mw) {
 
-  std::string active_tech;
-  if (lay::LayoutView::current () && lay::LayoutView::current ()->active_cellview_index () >= 0 && lay::LayoutView::current ()->active_cellview_index () <= int (lay::LayoutView::current ()->cellviews ())) {
-    lay::LayoutView::current ()->active_cellview ()->technology_changed_event.add (this, &TechnologyController::update_after_change);
-    active_tech = lay::LayoutView::current ()->active_cellview ()->tech_name ();
-  }
+    //  NOTE: the "real" call needs to come before the re-connect handler because
+    //  the latter will remove the update call
+    mp_mw->current_view_changed_event.add (this, &TechnologyController::update_active_technology);
+    mp_mw->current_view_changed_event.add (this, &TechnologyController::connect_events);
 
-  if (m_active_technology != active_tech) {
+    if (mp_mw->current_view ()) {
 
-    m_active_technology = active_tech;
+      //  NOTE: the "real" call needs to come before the re-connect handler because
+      //  the latter will remove the update call
+      mp_mw->current_view ()->active_cellview_changed_event.add (this, &TechnologyController::update_active_technology);
+      mp_mw->current_view ()->active_cellview_changed_event.add (this, &TechnologyController::connect_events);
 
-    if (mw) {
-      mw->tech_message (tech_string_from_name (active_tech));
+      if (mp_mw->current_view ()->active_cellview_index () >= 0 && mp_mw->current_view ()->active_cellview_index () <= int (mp_mw->current_view ()->cellviews ())) {
+        mp_mw->current_view ()->active_cellview ()->technology_changed_event.add (this, &TechnologyController::update_active_technology);
+      }
+
     }
 
-    if (mc) {
-      //  TODO: let the macro controller monitor the active technology
-      //  need to do this since macros may be bound to the new technology
-      mc->update_menu_with_macros ();
+  }
+}
+
+lay::Technology *
+TechnologyController::active_technology () const
+{
+  return mp_active_technology;
+}
+
+void
+TechnologyController::update_active_technology ()
+{
+  lay::Technology *active_tech = 0;
+  if (mp_mw && mp_mw->current_view () && mp_mw->current_view ()->active_cellview_index () >= 0 && mp_mw->current_view ()->active_cellview_index () <= int (mp_mw->current_view ()->cellviews ())) {
+    active_tech = lay::Technologies::instance ()->technology_by_name (mp_mw->current_view ()->active_cellview ()->tech_name ());
+  }
+
+  if (mp_active_technology != active_tech) {
+
+    mp_active_technology = active_tech;
+
+    if (mp_mw) {
+      if (active_tech) {
+        mp_mw->tech_message (tech_string_from_name (active_tech->name ()));
+      } else {
+        mp_mw->tech_message (std::string ());
+      }
     }
+
+    emit active_technology_changed ();
 
   }
 
 #if 0 
   //  Hint with this implementation, the current technology follows the current layout.
   //  Although that's a nice way to display the current technology, it's pretty confusing
-  lay::PluginRoot *pr = lay::PluginRoot::instance ();
+  lay::PluginRoot *pr = mp_mw;
   if (pr) {
     pr->config_set (cfg_initial_technology, active_tech);
-    pr->config_finalize ();
   }
 #endif
 }
@@ -166,14 +194,18 @@ TechnologyController::update_after_change ()
 void
 TechnologyController::technologies_changed ()
 {
-  //  delay actual update of menu so we can compress multiple events
+  //  update the configuration to reflect the persisted technologies
+  lay::PluginRoot *pr = mp_mw;
+  if (pr) {
+    pr->config_set (cfg_technologies, lay::Technologies::instance ()->to_xml ());
+  }
+
   update_menu ();
 }
 
 void
 TechnologyController::technology_changed (lay::Technology *)
 {
-  //  delay actual update of menu so we can compress multiple events
   update_menu ();
 }
 
@@ -187,6 +219,23 @@ TechnologyController::configure (const std::string &name, const std::string &val
       m_current_technology_updated = true;
     }
 
+  } else if (name == cfg_technologies) {
+
+    if (! value.empty ()) {
+
+      //  sync the non-persisted technologies with the configuration
+      lay::Technologies::instance ()->begin_updates ();
+      try {
+        lay::Technologies::instance ()->load_from_xml (value);
+      } catch (...) {
+      }
+      lay::Technologies::instance ()->end_updates_no_event ();
+
+      //  explicitly handle changes -> no recursion
+      m_technologies_configured = true;
+
+    }
+
   }
   return false;
 }
@@ -197,6 +246,12 @@ TechnologyController::config_finalize ()
   if (m_current_technology_updated) {
     update_current_technology ();
     m_current_technology_updated = false;
+  }
+
+  if (m_technologies_configured) {
+    update_menu ();
+    emit technologies_edited ();
+    m_technologies_configured = false;
   }
 }
 
@@ -282,12 +337,82 @@ TechnologyController::update_menu ()
     }
 
   }
+
+  update_active_technology ();
 }
 
 void
 TechnologyController::show_editor ()
 {
-  if (mp_editor && mp_editor->exec ()) {
+  lay::Technologies new_tech = *lay::Technologies ().instance ();
+
+  if (mp_editor && mp_editor->exec (new_tech)) {
+
+    std::string err_msg;
+
+    //  determine the technology files that need to be deleted and delete them
+    std::set<std::string> files_before;
+    for (lay::Technologies::const_iterator t = new_tech.begin (); t != new_tech.end (); ++t) {
+      if (! ! t->tech_file_path ().empty () && ! t->is_persisted ()) {
+        files_before.insert (t->tech_file_path ());
+      }
+    }
+    for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
+      if (! t->tech_file_path ().empty () && ! t->is_persisted () && files_before.find (t->tech_file_path ()) == files_before.end ()) {
+        //  TODO: issue an error if files could not be removed
+        QFile (tl::to_qstring (t->tech_file_path ())).remove ();
+      }
+    }
+
+    lay::Technologies ().instance ()->begin_updates ();
+    *lay::Technologies ().instance () = new_tech;
+    lay::Technologies ().instance ()->end_updates_no_event ();
+
+    //  save the technologies that need to be saved
+    //  TODO: save only the ones that really need saving
+    for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
+
+      if (! t->tech_file_path ().empty () && ! t->is_persisted ()) {
+
+        //  create the tech folder if required
+
+        try {
+
+          QDir dir = QFileInfo (tl::to_qstring (t->tech_file_path ())).absoluteDir ();
+          QStringList to_create;
+          while (! dir.isRoot() && ! dir.exists ()) {
+            to_create << dir.dirName ();
+            dir = QFileInfo (dir.path ()).absoluteDir ();
+          }
+
+          while (! to_create.empty ()) {
+            if (! dir.mkdir (to_create.back ())) {
+              throw tl::CancelException ();
+            }
+            if (! dir.cd (to_create.back ())) {
+              throw tl::CancelException ();
+            }
+            to_create.pop_back ();
+          }
+
+          t->save (t->tech_file_path ());
+
+        } catch (...) {
+          if (! err_msg.empty ()) {
+            err_msg += "\n";
+          }
+          err_msg += t->tech_file_path ();
+        }
+
+      }
+
+    }
+
+    if (! err_msg.empty ()) {
+      QMessageBox::critical (mp_mw, QObject::tr ("Error Saving Technology Files"),
+                                    QObject::tr ("The following files could not be saved:\n\n") + tl::to_qstring (err_msg),
+                                    QMessageBox::Ok);
+    }
 
     std::vector<lay::MacroCollection *> nm = sync_tech_macro_locations ();
 
@@ -302,12 +427,8 @@ TechnologyController::show_editor ()
       }
     }
 
-    //  because the macro-tech association might have changed, do this:
-    //  TODO: let the macro controller monitor the technologies.
-    lay::MacroController *mc = lay::MacroController::instance ();
-    if (mc) {
-      mc->update_menu_with_macros ();
-    }
+    update_menu ();
+    emit technologies_edited ();
 
   }
 }
@@ -325,63 +446,80 @@ TechnologyController::refresh ()
   try {
 
     lay::Technologies::instance ()->begin_updates ();
-    lay::Technologies::instance ()->clear ();
+    refresh (*lay::Technologies::instance ());
+    lay::Technologies::instance ()->end_updates_no_event ();
 
-    for (std::vector<std::string>::const_iterator p = m_paths.begin (); p != m_paths.end (); ++p) {
-
-      QDir dir (tl::to_qstring (*p));
-      if (! dir.exists ()) {
-        continue;
-      }
-
-      QStringList name_filters;
-      name_filters << QString::fromUtf8 ("*.lyt");
-
-      QStringList lyt_files;
-
-      QDirIterator di (dir.path (), name_filters, QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-      while (di.hasNext ()) {
-        lyt_files << di.next ();
-      }
-
-      lyt_files.sort ();
-
-      for (QStringList::const_iterator lf = lyt_files.begin (); lf != lyt_files.end (); ++lf) {
-
-        try {
-
-          if (tl::verbosity () >= 20) {
-            tl::info << "Auto-importing technology from " << tl::to_string (*lf);
-          }
-
-          lay::Technology t;
-          t.load (tl::to_string (*lf));
-          t.set_persisted (false);   // don't save that one in the configuration
-          t.set_readonly (! QFileInfo (dir.filePath (*lf)).isWritable ());
-          lay::Technologies::instance ()->add (new lay::Technology (t));
-
-        } catch (tl::Exception &ex) {
-          tl::warn << tl::to_string (QObject::tr ("Unable to auto-import technology file ")) << tl::to_string (*lf) << ": " << ex.msg ();
-        }
-
-      }
-
-    }
-
-    for (std::vector<lay::Technology>::const_iterator t = m_temp_tech.begin (); t != m_temp_tech.end (); ++t) {
-
-      lay::Technology *tech = new lay::Technology (*t);
-      tech->set_persisted (false);    // don't save that one in the configuration
-      tech->set_readonly (true);
-      lay::Technologies::instance ()->add (tech);
-
-    }
-
-    lay::Technologies::instance ()->end_updates ();
+    update_menu ();
+    emit technologies_edited ();
 
   } catch (...) {
-    lay::Technologies::instance ()->end_updates ();
+    lay::Technologies::instance ()->end_updates_no_event ();
     throw;
+  }
+}
+
+void
+TechnologyController::refresh (lay::Technologies &technologies)
+{
+  lay::Technologies current = technologies;
+
+  //  start with all persisted technologies (at least "default")
+  technologies.clear ();
+  for (lay::Technologies::const_iterator t = current.begin (); t != current.end (); ++t) {
+    if (t->is_persisted ()) {
+      technologies.add (new lay::Technology (*t));
+    }
+  }
+
+  for (std::vector<std::string>::const_iterator p = m_paths.begin (); p != m_paths.end (); ++p) {
+
+    QDir dir (tl::to_qstring (*p));
+    if (! dir.exists ()) {
+      continue;
+    }
+
+    QStringList name_filters;
+    name_filters << QString::fromUtf8 ("*.lyt");
+
+    QStringList lyt_files;
+
+    QDirIterator di (dir.path (), name_filters, QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+    while (di.hasNext ()) {
+      lyt_files << di.next ();
+    }
+
+    lyt_files.sort ();
+
+    for (QStringList::const_iterator lf = lyt_files.begin (); lf != lyt_files.end (); ++lf) {
+
+      try {
+
+        if (tl::verbosity () >= 20) {
+          tl::info << "Auto-importing technology from " << tl::to_string (*lf);
+        }
+
+        lay::Technology t;
+        t.load (tl::to_string (*lf));
+        t.set_persisted (false);   // don't save that one in the configuration
+        t.set_readonly (! QFileInfo (dir.filePath (*lf)).isWritable ());
+        technologies.add (new lay::Technology (t));
+
+      } catch (tl::Exception &ex) {
+        tl::warn << tl::to_string (QObject::tr ("Unable to auto-import technology file ")) << tl::to_string (*lf) << ": " << ex.msg ();
+      }
+
+    }
+
+  }
+
+  for (std::vector<lay::Technology>::const_iterator t = m_temp_tech.begin (); t != m_temp_tech.end (); ++t) {
+
+    lay::Technology *tech = new lay::Technology (*t);
+    tech->set_persisted (false);                //  don't save that one in the configuration
+    tech->set_tech_file_path (std::string ());  //  don't save to a file either
+    tech->set_readonly (true);                  //  don't edit
+    technologies.add (tech);
+
   }
 }
 

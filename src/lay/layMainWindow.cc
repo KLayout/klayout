@@ -997,6 +997,11 @@ MainWindow::init_menu ()
 
   }
 
+  //  Add a hook for inserting new items after the modes
+  Action end_modes;
+  end_modes.set_separator (true);
+  mp_menu->insert_item ("@toolbar.end", "end_modes", end_modes);
+
   //  make the plugins create their menu items
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     //  TODO: get rid of the const_cast hack

@@ -128,7 +128,7 @@ public:
   TechSetupDialog (QWidget *parent);
   ~TechSetupDialog ();
 
-  int exec ();
+  int exec (lay::Technologies &technologies);
 
 protected slots:
   void current_tech_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous);
@@ -149,7 +149,6 @@ private:
   std::string selected_tech_component_name ();
   void commit_tech_component ();
   void clear_components ();
-  bool commit ();
   void update ();
 
   lay::Technologies m_technologies;

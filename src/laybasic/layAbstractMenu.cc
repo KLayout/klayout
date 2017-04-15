@@ -1123,14 +1123,17 @@ AbstractMenu::find_item (const std::string &path)
         return std::make_pair ((AbstractMenuItem *) 0, m_root.children.end ());
       }
 
-    } else if (extr.test ("begin")) {
-      return std::make_pair (parent, parent->children.begin ());
-    } else if (extr.test ("end")) {
-      return std::make_pair (parent, parent->children.end ());
     } else {
 
       std::string n;
       extr.read (n, ".+");
+
+      if (n == "begin") {
+        return std::make_pair (parent, parent->children.begin ());
+      } else if (n == "end") {
+        return std::make_pair (parent, parent->children.end ());
+      }
+
       std::string name (parent->name ());
       if (! name.empty ()) {
         name += ".";

@@ -71,11 +71,6 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
-  virtual void initialize (lay::PluginRoot *root);
-
-  /**
-   *  @brief Reimplementation of the PluginDeclaration interface
-   */
   virtual void initialized (lay::PluginRoot *root);
 
   /**
@@ -124,8 +119,15 @@ public:
 
   /**
    *  @brief Adds a search path to the macros
+   *  After adding the paths, "load" needs to be called to actually load the macros.
    */
   void add_path (const std::string &path, const std::string &description, const std::string &category, bool readonly);
+
+  /**
+   *  @brief Loads the macros from the predefined paths
+   *  This method will also establish the macro categories.
+   */
+  void load ();
 
   /**
    *  @brief Adds a temporary macro

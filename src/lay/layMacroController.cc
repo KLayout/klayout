@@ -45,7 +45,7 @@ MacroController::MacroController ()
 }
 
 void
-MacroController::initialize (lay::PluginRoot * /*root*/)
+MacroController::load ()
 {
   //  Scan built-in macros
   //  These macros are always taken, even if there are no macros requested (they are required to
@@ -87,8 +87,10 @@ MacroController::initialized (lay::PluginRoot *root)
 
   connect (&lay::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (update_menu_with_macros ()));
   connect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (update_menu_with_macros ()));
-  connect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
-  connect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (update_menu_with_macros ()));
+  if (lay::TechnologyController::instance ()) {
+    connect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
+    connect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (update_menu_with_macros ()));
+  }
 
   //  update the menus with the macro menu bindings as late as possible (now we
   //  can be sure that the menus are created propertly)
@@ -100,8 +102,10 @@ MacroController::uninitialize (lay::PluginRoot * /*root*/)
 {
   disconnect (&lay::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (update_menu_with_macros ()));
   disconnect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (update_menu_with_macros ()));
-  disconnect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
-  disconnect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (update_menu_with_macros ()));
+  if (lay::TechnologyController::instance ()) {
+    disconnect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
+    disconnect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (update_menu_with_macros ()));
+  }
 
   delete mp_macro_editor;
   mp_macro_editor = 0;
@@ -380,11 +384,9 @@ MacroController::do_update_menu_with_macros ()
     return;
   }
 
-  //  TODO: implement this by asking the technology manager for the active technology
   const lay::Technology *tech = 0;
-  if (mp_mw->current_view () && mp_mw->current_view ()->active_cellview_index () >= 0 && mp_mw->current_view ()->active_cellview_index () <= int (mp_mw->current_view ()->cellviews ())) {
-    std::string active_tech = mp_mw->current_view ()->active_cellview ()->tech_name ();
-    tech = lay::Technologies::instance ()->technology_by_name (active_tech);
+  if (lay::TechnologyController::instance ()) {
+    tech = lay::TechnologyController::instance ()->active_technology ();
   }
 
   std::vector<std::pair<std::string, std::string> > key_bindings = unpack_key_binding (mp_mw->config_get (cfg_key_bindings));

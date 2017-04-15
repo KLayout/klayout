@@ -888,37 +888,6 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   mp_ruby_interpreter = new rba::RubyInterpreter ();
   mp_python_interpreter = new pya::PythonInterpreter ();
 
-  if (! m_no_gui) {
-    //  Install the signal handlers after the interpreters, so we can be sure we
-    //  installed our handler. 
-    install_signal_handlers ();
-  }
-
-  if (! m_no_macros) {
-
-    //  Add the global ruby modules as the first ones.
-    m_load_macros.insert (m_load_macros.begin (), global_modules.begin (), global_modules.end ());
-
-    lay::MacroController *mc = lay::MacroController::instance ();
-    if (mc) {
-      for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-        if (p == m_klayout_path.begin ()) {
-          mc->add_path (*p, tl::to_string (QObject::tr ("Local")), std::string (), false);
-        } else if (m_klayout_path.size () == 2) {
-          mc->add_path (*p, tl::to_string (QObject::tr ("Global")), std::string (), true);
-        } else {
-          mc->add_path (*p, tl::to_string (QObject::tr ("Global")) + " - " + *p, std::string (), true);
-        }
-      }
-    }
-
-    //  Install the custom folders
-    for (std::vector <std::pair<std::string, std::string> >::const_iterator p = custom_macro_paths.begin (); p != custom_macro_paths.end (); ++p) {
-      mc->add_path (p->first, tl::to_string (QObject::tr ("Project")) + " - " + p->first, p->second, false);
-    }
-
-  }
-
   //  Read some configuration values that we need early
   bool editable_from_config = false;
 
@@ -950,17 +919,38 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
       }
     } catch (...) { }
 
-    try {
-      std::string s;
-      cfg.config_get (cfg_technologies, s);
-      lay::Technologies tt;
-      if (! s.empty ()) {
-        tt.load_from_xml (s);
+  }
+
+  if (! m_no_gui) {
+    //  Install the signal handlers after the interpreters, so we can be sure we
+    //  installed our handler. 
+    install_signal_handlers ();
+  }
+
+  lay::MacroController *mc = lay::MacroController::instance ();
+
+  if (mc && ! m_no_macros) {
+
+    //  Add the global ruby modules as the first ones.
+    m_load_macros.insert (m_load_macros.begin (), global_modules.begin (), global_modules.end ());
+
+    for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
+      if (p == m_klayout_path.begin ()) {
+        mc->add_path (*p, tl::to_string (QObject::tr ("Local")), std::string (), false);
+      } else if (m_klayout_path.size () == 2) {
+        mc->add_path (*p, tl::to_string (QObject::tr ("Global")), std::string (), true);
+      } else {
+        mc->add_path (*p, tl::to_string (QObject::tr ("Global")) + " - " + *p, std::string (), true);
       }
-      *lay::Technologies::instance () = tt;
-    } catch (tl::Exception &ex) {
-      tl::warn << tl::to_string (QObject::tr ("Unable to restore technologies: ")) << ex.msg ();
     }
+
+    //  Install the custom folders
+    for (std::vector <std::pair<std::string, std::string> >::const_iterator p = custom_macro_paths.begin (); p != custom_macro_paths.end (); ++p) {
+      mc->add_path (p->first, tl::to_string (QObject::tr ("Project")) + " - " + p->first, p->second, false);
+    }
+
+    //  Actually load the macros
+    mc->load ();
 
   }
 
@@ -1050,8 +1040,14 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   }
 
   //  initialize the plugins for the first time
+  if (tl::verbosity () >= 20) {
+    tl::info << "Initializing plugins:";
+  }
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
+    if (tl::verbosity () >= 20) {
+      tl::info << "  " << cls.current_name () << " [" << cls.current_position () << "]";
+    }
     pd->initialize (mp_plugin_root);
   }
 
@@ -1125,9 +1121,6 @@ Application::finish ()
   }
 
   if (mp_plugin_root && m_write_config_file) {
-
-    //  save the technology setup in the configuration 
-    mp_plugin_root->config_set (cfg_technologies, lay::Technologies::instance ()->to_xml ());
 
     if (! m_config_file_to_write.empty ()) {
       if (tl::verbosity () >= 20) {
@@ -1605,22 +1598,7 @@ void
 Application::set_config (const std::string &name, const std::string &value)
 {
   if (mp_plugin_root) {
-
-    if (name == cfg_technologies) {
-
-      //  HACK: cfg_technologies is not a real configuration parameter currently. Hence we emulate that
-      //  behavior. But currently this is the only way to access technology data indirectly from a script.
-      //  Note that this method will set only the technologies accessible through the configuration parameter.
-      //  I.e. the ones not auto-imported.
-      //  TODO: rework this one. This is only half-hearted.
-      if (! value.empty ()) {
-        lay::Technologies::instance ()->load_from_xml (value);
-      }
-
-    } else {
-      mp_plugin_root->config_set (name, value);
-    }
-
+    mp_plugin_root->config_set (name, value);
   }
 }
 
@@ -1636,16 +1614,7 @@ std::string
 Application::get_config (const std::string &name) const
 {
   if (mp_plugin_root) {
-    if (name == cfg_technologies) {
-      //  HACK: cfg_technologies is not a real configuration parameter currently. Hence we emulate that
-      //  behavior. But currently this is the only way to access technology data indirectly from a script.
-      //  Note that this method will return only the technologies accessible through the configuration parameter.
-      //  I.e. the ones not auto-imported.
-      //  TODO: rework this one.
-      return lay::Technologies::instance ()->to_xml ();
-    } else {
-      return mp_plugin_root->config_get (name);
-    }
+    return mp_plugin_root->config_get (name);
   } else {
     return std::string ();
   }

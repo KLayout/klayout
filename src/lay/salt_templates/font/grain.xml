@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<salt-grain>
+ <name>font</name>
+ <version>0.0</version>
+ <title>Font package</title>
+ <doc>This template provides a font for the Basic.TEXT PCell</doc>
+ <doc-url/>
+ <url/>
+ <license>GPLv3</license>
+ <author/>
+ <author-contact/>
+ <authored-time/>
+ <installed-time/>
+ <icon/>
+ <screenshot/>
+</salt-grain>

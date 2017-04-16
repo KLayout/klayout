@@ -423,3 +423,20 @@ TEST(10)
   EXPECT_EQ (unescape_string (escape_string ("'a\n\003")), "'a\n\003");
 }
 
+TEST(11)
+{
+  std::string s;
+  tl::escape_to_html (s, "x");
+  EXPECT_EQ (s, "x");
+  tl::escape_to_html (s, "<&>");
+  EXPECT_EQ (s, "x&lt;&amp;&gt;");
+  s = std::string ();
+  tl::escape_to_html (s, "a\nb");
+  EXPECT_EQ (s, "a<br/>b");
+  s = std::string ();
+  tl::escape_to_html (s, "a\nb", false);
+  EXPECT_EQ (s, "a\nb");
+  EXPECT_EQ (tl::escaped_to_html ("x<&>"), "x&lt;&amp;&gt;");
+  EXPECT_EQ (tl::escaped_to_html ("a\nb"), "a<br/>b");
+  EXPECT_EQ (tl::escaped_to_html ("a\nb", false), "a\nb");
+}

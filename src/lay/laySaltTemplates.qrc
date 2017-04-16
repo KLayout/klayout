@@ -1,0 +1,47 @@
+<RCC>
+    <qresource prefix="/salt_templates">
+    </qresource>
+
+    <!-- font template -->
+    <qresource prefix="/salt_templates/font">
+        <file alias="grain.xml">salt_templates/font/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/font/fonts">
+    </qresource>
+
+    <!-- lib template -->
+    <qresource prefix="/salt_templates/lib">
+        <file alias="grain.xml">salt_templates/lib/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/lib/libraries">
+    </qresource>
+
+    <!-- pcell_lib template -->
+    <qresource prefix="/salt_templates/pcell_lib">
+        <file alias="grain.xml">salt_templates/pcell_lib/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/pcell_lib/macros">
+    </qresource>
+
+    <!-- macro template -->
+    <qresource prefix="/salt_templates/macro">
+        <file alias="grain.xml">salt_templates/macro/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/macro/macros">
+    </qresource>
+
+    <!-- pymacro template -->
+    <qresource prefix="/salt_templates/pymacro">
+        <file alias="grain.xml">salt_templates/pymacro/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/pymacro/pymacros">
+    </qresource>
+
+    <!-- tech template -->
+    <qresource prefix="/salt_templates/tech">
+        <file alias="grain.xml">salt_templates/tech/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/tech/tech">
+    </qresource>
+
+</RCC>

@@ -85,8 +85,8 @@
 #include "layLogViewerDialog.h"
 #include "layLayerToolbox.h"
 #include "laySettingsForm.h"
-#include "laySettingsForm.h"
 #include "layTechnologyController.h"
+#include "laySaltManagerDialog.h"
 #include "layTipDialog.h"
 #include "laySelectCellViewForm.h"
 #include "layLayoutPropertiesForm.h"
@@ -928,6 +928,7 @@ MainWindow::init_menu ()
   };
 
   MenuLayoutEntry tools_menu [] = {
+    MenuLayoutEntry ("packages",                        tl::to_string (QObject::tr ("Manage Packages")),                  SLOT (cm_packages ())),
     MenuLayoutEntry ("technologies",                    tl::to_string (QObject::tr ("Manage Technologies")),              SLOT (cm_technologies ())),
     MenuLayoutEntry::separator ("verification_group"),
     MenuLayoutEntry ("drc",                             tl::to_string (QObject::tr ("DRC")),                              drc_menu),
@@ -4507,6 +4508,13 @@ MainWindow::show_progress_bar (bool show)
     return true;
 
   }
+}
+
+void
+MainWindow::cm_packages ()
+{
+  lay::SaltManagerDialog dialog (this);
+  dialog.exec ();
 }
 
 void

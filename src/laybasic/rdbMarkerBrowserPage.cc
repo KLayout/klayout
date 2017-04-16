@@ -1820,24 +1820,6 @@ MarkerBrowserPage::set_max_marker_count (size_t max_marker_count)
   }
 }
 
-static void
-escape_to_html (std::string &out, const std::string &in)
-{
-  for (const char *cp = in.c_str (); *cp; ++cp) {
-    if (*cp == '<') {
-      out += "&lt;";
-    } else if (*cp == '>') {
-      out += "&gt;";
-    } else if (*cp == '&') {
-      out += "&amp;";
-    } else if (*cp == '\n') {
-      out += "<br/>";
-    } else {
-      out += *cp;
-    }
-  }
-}
-
 void 
 MarkerBrowserPage::enable_updates (bool f)
 {
@@ -1955,13 +1937,13 @@ MarkerBrowserPage::update_info_text ()
 
     if (category && n_category == 1 && ! category->description ().empty ()) {
       info += "<p style=\"color:blue; font-weight: bold\">";
-      escape_to_html (info, category->description ());
+      tl::escape_to_html (info, category->description ());
       info += "</p>";
     }
 
     if (! m_error_text.empty ()) {
       info += "<p style=\"color:red; font-weight: bold\">";
-      escape_to_html (info, m_error_text);
+      tl::escape_to_html (info, m_error_text);
       info += "</p>";
     }
 
@@ -1978,7 +1960,7 @@ MarkerBrowserPage::update_info_text ()
           if (v->tag_id () != 0) {
             const rdb::Tag &tag = mp_database->tags ().tag (v->tag_id ());
             info += "<b>";
-            escape_to_html (info, tag.name ());
+            tl::escape_to_html (info, tag.name ());
             info += ":</br> ";
           }
 
@@ -1989,7 +1971,7 @@ MarkerBrowserPage::update_info_text ()
             value_string = std::string (value_string.begin (), value_string.begin () + max_length) + "...";
           }
 
-          escape_to_html (info, value_string);
+          tl::escape_to_html (info, value_string);
 
           info += "<br/>";
 

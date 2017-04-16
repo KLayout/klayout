@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<salt-grain>
+ <name>lib</name>
+ <version>0.0</version>
+ <title>Static Library</title>
+ <doc>This template provides a static library</doc>
+ <doc-url/>
+ <url/>
+ <license>GPLv3</license>
+ <author/>
+ <author-contact/>
+ <authored-time/>
+ <installed-time/>
+ <icon/>
+ <screenshot/>
+</salt-grain>

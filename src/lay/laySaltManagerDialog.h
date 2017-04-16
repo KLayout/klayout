@@ -48,7 +48,7 @@ public:
   /**
    *  @brief Constructor
    */
-  SaltManagerDialog (QWidget *parent);
+  SaltManagerDialog (QWidget *parent, lay::Salt *salt, lay::Salt *salt_mine);
 
 private slots:
   /**

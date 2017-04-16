@@ -258,11 +258,6 @@ public:
   }
 
   /**
-   *  @brief For debugging purposes: get a symbol name (a description actually) from an address
-   */
-  static QString symbol_name_from_address (const QString &mod_name, size_t addr);
-
-  /**
    *  @brief Reset config to global configuration
    */
   void reset_config (); 
@@ -301,6 +296,7 @@ public:
 private:
   void shutdown ();
   void finish ();
+  std::vector<std::string> scan_global_modules ();
 
   enum file_type {
     layout_file,

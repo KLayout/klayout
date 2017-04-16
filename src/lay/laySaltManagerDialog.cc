@@ -110,39 +110,7 @@ private:
 // --------------------------------------------------------------------------------------
 //  SaltManager implementation
 
-// @@@
-lay::Salt salt;
-static bool salt_initialized = false;
-void make_salt ()
-{
-  if (!salt_initialized) {
-    salt_initialized = true;
-    salt.add_location (tl::to_string (QDir::homePath () + QString::fromUtf8("/.klayout/salt")));
-  }
-}
-lay::Salt *get_salt ()
-{
-  salt = lay::Salt (); salt_initialized = false;
-  make_salt ();
-  return &salt;
-}
-// @@@
-
-// @@@
-lay::Salt salt_mine;
-void make_salt_mine ()
-{
-  salt_mine = lay::Salt ();
-  salt_mine.load ("/home/matthias/salt.mine");
-}
-lay::Salt *get_salt_mine ()
-{
-  make_salt_mine();
-  return &salt_mine;
-}
-// @@@
-
-SaltManagerDialog::SaltManagerDialog (QWidget *parent)
+SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, lay::Salt *salt_mine)
   : QDialog (parent),
     m_current_changed_enabled (true), dm_update_models (this, &SaltManagerDialog::update_models)
 {
@@ -154,8 +122,8 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent)
   connect (delete_button, SIGNAL (clicked ()), this, SLOT (delete_grain ()));
   connect (apply_button, SIGNAL (clicked ()), this, SLOT (apply ()));
 
-  mp_salt = get_salt ();
-  mp_salt_mine = get_salt_mine ();
+  mp_salt = salt;
+  mp_salt_mine = salt_mine;
 
   SaltModel *model = new SaltModel (this, mp_salt);
   salt_view->setModel (model);

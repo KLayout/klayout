@@ -22,19 +22,21 @@
 
 
 #include "layApplication.h"
+#include "laySignalHandler.h"
 #include "laybasicConfig.h"
 #include "layConfig.h"
 #include "layMainWindow.h"
 #include "layMacroEditorDialog.h"
 #include "layVersion.h"
 #include "layMacro.h"
-#include "layCrashMessage.h"
+#include "laySignalHandler.h"
 #include "layRuntimeErrorForm.h"
 #include "layProgress.h"
 #include "layTextProgress.h"
 #include "layBackgroundAwareTreeStyle.h"
 #include "layMacroController.h"
 #include "layTechnologyController.h"
+#include "laySaltController.h"
 #include "gtf.h"
 #include "gsiDecl.h"
 #include "gsiInterpreter.h"
@@ -61,26 +63,15 @@
 #include <QAction>
 #include <QMessageBox>
 
-#ifdef _WIN32
-#  include <windows.h>
-#  include <DbgHelp.h>
-#  include <Psapi.h>
-//  get rid of these - we have std::min/max ..
-#  ifdef min
-#    undef min
-#  endif
-#  ifdef max
-#    undef max
-#  endif
-#else
-#  include <dlfcn.h>
-#  include <execinfo.h>
-#endif
-
 #include <iostream>
 #include <memory>
 #include <algorithm>
-#include <signal.h>
+
+#ifdef _WIN32
+#  include <windows.h>
+#else
+#  include <dlfcn.h>
+#endif
 
 namespace lay
 {
@@ -162,292 +153,6 @@ static void ui_exception_handler_def (QWidget *parent)
 // --------------------------------------------------------------------------------
 
 static Application *ms_instance = 0;
-
-#if defined(WIN32)
-
-static QString
-addr2symname (DWORD64 addr)
-{
-  const int max_symbol_length = 255;
-
-  SYMBOL_INFO *symbol = (SYMBOL_INFO *) calloc (sizeof (SYMBOL_INFO) + (max_symbol_length + 1) * sizeof (char), 1);
-  symbol->MaxNameLen = max_symbol_length;
-  symbol->SizeOfStruct = sizeof (SYMBOL_INFO);
-
-  HANDLE process = GetCurrentProcess ();
-
-  QString sym_name;
-  DWORD64 d;
-  bool has_symbol = false;
-  DWORD64 disp = addr;
-  if (SymFromAddr(process, addr, &d, symbol)) {
-    //  Symbols taken from the export table seem to be unreliable - skip these
-    //  and report the module name + offset.
-    if (! (symbol->Flags & SYMFLAG_EXPORT)) {
-      sym_name = QString::fromLocal8Bit (symbol->Name);
-      disp = d;
-      has_symbol = true;
-    }
-  }
-
-  //  find the module name from the module base address
-
-  HMODULE modules[1024];
-  DWORD modules_size = 0;
-  if (! EnumProcessModules (process, modules, sizeof (modules), &modules_size)) {
-    modules_size = 0;
-  }
-
-  QString mod_name;
-  for (unsigned int i = 0; i < (modules_size / sizeof (HMODULE)); i++) {
-    TCHAR mn[MAX_PATH];
-    if (GetModuleFileName (modules[i], mn, sizeof (mn) / sizeof (TCHAR))) {
-      MODULEINFO mi;
-      if (GetModuleInformation (process, modules[i], &mi, sizeof (mi))) {
-        if ((DWORD64) mi.lpBaseOfDll <= addr && (DWORD64) mi.lpBaseOfDll + mi.SizeOfImage > addr) {
-          mod_name = QFileInfo (QString::fromUtf16 ((unsigned short *) mn)).fileName ();
-          if (! has_symbol) {
-            disp -= (DWORD64) mi.lpBaseOfDll;
-          }
-          break;
-        }
-      }
-    }
-  }
-
-  if (! mod_name.isNull ()) {
-    mod_name = QString::fromUtf8 ("(") + mod_name + QString::fromUtf8 (") ");
-  }
-
-  free (symbol);
-
-  return QString::fromUtf8 ("0x%1 - %2%3+%4").
-            arg (addr, 0, 16).
-            arg (mod_name).
-            arg (sym_name).
-            arg (disp);
-}
-
-static QString
-get_symbol_name_from_address (const QString &mod_name, size_t addr)
-{
-  HANDLE process = GetCurrentProcess ();
-
-  DWORD64 mod_base = 0;
-  if (! mod_name.isEmpty ()) {
-
-    //  find the module name from the module base address
-    HMODULE modules[1024];
-    DWORD modules_size = 0;
-    if (! EnumProcessModules (process, modules, sizeof (modules), &modules_size)) {
-      modules_size = 0;
-    }
-
-    for (unsigned int i = 0; i < (modules_size / sizeof (HMODULE)); i++) {
-      TCHAR mn[MAX_PATH];
-      if (GetModuleFileName (modules[i], mn, sizeof (mn) / sizeof (TCHAR))) {
-        if (mod_name == QFileInfo (QString::fromUtf16 ((unsigned short *) mn)).fileName ()) {
-          MODULEINFO mi;
-          if (GetModuleInformation (process, modules[i], &mi, sizeof (mi))) {
-            mod_base = (DWORD64) mi.lpBaseOfDll;
-          }
-        }
-      }
-    }
-
-    if (mod_base == 0) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Unknown module name: ") + mod_name));
-    }
-
-  }
-
-  SymInitialize (process, NULL, TRUE);
-  QString res = addr2symname (mod_base + (DWORD64) addr);
-  SymCleanup (process);
-
-  return res;
-}
-
-LONG WINAPI ExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
-{
-  HANDLE process = GetCurrentProcess ();
-  SymInitialize (process, NULL, TRUE);
- 
-  QString text;
-  text += QObject::tr ("Exception code: 0x%1\n").arg (pExceptionInfo->ExceptionRecord->ExceptionCode, 0, 16);
-  text += QObject::tr ("Program Version: ") + 
-          QString::fromUtf8 (lay::Version::name ()) + 
-          QString::fromUtf8 (" ") +
-          QString::fromUtf8 (lay::Version::version ()) +
-          QString::fromUtf8 (" (") +
-          QString::fromUtf8 (lay::Version::subversion ()) +
-          QString::fromUtf8 (")");
-#if defined(_WIN64)
-  text += QString::fromUtf8 (" AMD64");
-#else
-  text += QString::fromUtf8 (" x86");
-#endif
-  text += QString::fromUtf8 ("\n");
-  text += QObject::tr ("\nBacktrace:\n");
-
-  CONTEXT context_record = *pExceptionInfo->ContextRecord;
-
-  // Initialize stack walking.
-  STACKFRAME64 stack_frame;
-  memset(&stack_frame, 0, sizeof(stack_frame));
-
-#if defined(_WIN64)
-  int machine_type = IMAGE_FILE_MACHINE_AMD64;
-  stack_frame.AddrPC.Offset = context_record.Rip;
-  stack_frame.AddrFrame.Offset = context_record.Rbp;
-  stack_frame.AddrStack.Offset = context_record.Rsp;
-#else
-  int machine_type = IMAGE_FILE_MACHINE_I386;
-  stack_frame.AddrPC.Offset = context_record.Eip;
-  stack_frame.AddrFrame.Offset = context_record.Ebp;
-  stack_frame.AddrStack.Offset = context_record.Esp;
-#endif
-  stack_frame.AddrPC.Mode = AddrModeFlat;
-  stack_frame.AddrFrame.Mode = AddrModeFlat;
-  stack_frame.AddrStack.Mode = AddrModeFlat;
-
-  while (StackWalk64 (machine_type,
-                      GetCurrentProcess(),
-                      GetCurrentThread(),
-                      &stack_frame,
-                      &context_record,
-                      NULL,
-                      &SymFunctionTableAccess64,
-                      &SymGetModuleBase64,
-                      NULL)) {
-    text += addr2symname (stack_frame.AddrPC.Offset);
-    text += QString::fromUtf8 ("\n");
-  }
-
-  SymCleanup (process);
-
-  //  YES! I! KNOW!
-  //  In a signal handler you shall not do fancy stuff (in particular not 
-  //  open dialogs) nor shall you throw exceptions! But that scheme appears to
-  //  be working since in most cases the signal is raised from our code (hence 
-  //  from our stack frames) and everything is better than just showing 
-  //  the "application stopped working" dialog. 
-  //  Isn't it?
-  
-  CrashMessage msg (0, true, text);
-  if (! msg.exec ()) {
-    //  terminate unconditionally
-    return EXCEPTION_EXECUTE_HANDLER;
-  } else {
-    throw tl::CancelException ();
-  }
-}
-
-static void handle_signal (int signo)
-{
-  signal (signo, handle_signal);
-  int user_base = (1 << 29); 
-  RaiseException(signo + user_base, 0, 0, NULL);
-}
-
-static void install_signal_handlers ()
-{
-  //  disable any signal handlers that Ruby might have installed.
-  signal (SIGSEGV, SIG_DFL);
-  signal (SIGILL, SIG_DFL);
-  signal (SIGFPE, SIG_DFL);
-
-  signal (SIGABRT, handle_signal);
-
-#if 0
-  //  TODO: not available to MinGW - linking against msvc100 would help
-  //  but then the app crashes.
-  _set_abort_behavior( 0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT );
-#endif
-
-  SetUnhandledExceptionFilter(ExceptionHandler);
-}
-
-#else
-
-QString get_symbol_name_from_address (const QString &, size_t)
-{
-  return QString::fromUtf8 ("n/a");
-}
-
-void signal_handler (int signo, siginfo_t *si, void *)
-{
-  void *array [100];
-  
-  bool can_resume = (signo != SIGILL);
-
-  size_t nptrs = backtrace (array, sizeof (array) / sizeof (array[0]));
-
-  QString text;
-  text += QObject::tr ("Signal number: %1\n").arg (signo);
-  text += QObject::tr ("Address: 0x%1\n").arg ((size_t) si->si_addr, 0, 16);
-  text += QObject::tr ("Program Version: ") + 
-          QString::fromUtf8 (lay::Version::name ()) + 
-          QString::fromUtf8 (" ") +
-          QString::fromUtf8 (lay::Version::version ()) +
-          QString::fromUtf8 (" (") +
-          QString::fromUtf8 (lay::Version::subversion ()) +
-          QString::fromUtf8 (")");
-  text += QString::fromUtf8 ("\n");
-  text += QObject::tr ("Backtrace:\n");
-
-  char **symbols = backtrace_symbols (array, nptrs);
-  if (symbols == NULL) {
-    text += QObject::tr ("-- Unable to obtain stack trace --");
-  } else {
-    for (size_t i = 2; i < nptrs; i++) {
-      text += QString::fromUtf8 (symbols [i]) + QString::fromUtf8 ("\n");
-    }
-  }
-  free(symbols);
- 
-  //  YES! I! KNOW!
-  //  In a signal handler you shall not do fancy stuff (in particular not 
-  //  open dialogs) nor shall you throw exceptions! But that scheme appears to
-  //  be working since in most cases the signal is raised from our code (hence 
-  //  from our stack frames) and everything is better than just core dumping. 
-  //  Isn't it?
-  
-  CrashMessage msg (0, can_resume, text);
-  if (! msg.exec ()) {
-
-    _exit (signo);
-
-  } else {
-
-    sigset_t x;
-    sigemptyset (&x);
-    sigaddset(&x, signo);
-    sigprocmask(SIG_UNBLOCK, &x, NULL);
-
-    throw tl::CancelException ();
-
-  }
-}
-
-static void install_signal_handlers ()
-{
-  struct sigaction act;
-  act.sa_sigaction = signal_handler;
-  sigemptyset (&act.sa_mask);
-  act.sa_flags = SA_SIGINFO;
-#if !defined(__APPLE__)
-  act.sa_restorer = 0;
-#endif
-
-  sigaction (SIGSEGV, &act, NULL);
-  sigaction (SIGILL, &act, NULL);
-  sigaction (SIGFPE, &act, NULL);
-  sigaction (SIGABRT, &act, NULL);
-  sigaction (SIGBUS, &act, NULL);
-}
-
-#endif
 
 static void load_plugin (const std::string &pp)
 {
@@ -571,47 +276,6 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
         m_config_files.push_back (tl::to_string (qd.absoluteFilePath (filename)));
         if (m_config_files.back () != m_config_file_to_write) {
           m_initial_config_files.push_back (m_config_files.back ());
-        }
-      }
-    }
-
-  }
-
-  //  try to locate a global rbainit file and rbm modules
-  std::vector<std::string> global_modules;
-  std::set<std::string> modules;
-
-  //  try to locate a global plugins
-  for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-
-#if 0
-    //  deprecated functionality
-    QFileInfo rbainit_file (tl::to_qstring (*p), QString::fromUtf8 ("rbainit"));
-    if (rbainit_file.exists () && rbainit_file.isReadable ()) {
-      std::string m = tl::to_string (rbainit_file.absoluteFilePath ());
-      if (modules.find (m) == modules.end ()) {
-        global_modules.push_back (m);
-        modules.insert (m);
-      }
-    }
-#endif
-
-    QDir inst_path_dir (tl::to_qstring (*p));
-
-    QStringList name_filters;
-    name_filters << QString::fromUtf8 ("*.rbm");
-    name_filters << QString::fromUtf8 ("*.pym");
-
-    QStringList inst_modules = inst_path_dir.entryList (name_filters);
-    inst_modules.sort ();
-
-    for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
-      QFileInfo rbm_file (tl::to_qstring (*p), *im);
-      if (rbm_file.exists () && rbm_file.isReadable ()) {
-        std::string m = tl::to_string (rbm_file.absoluteFilePath ());
-        if (modules.find (m) == modules.end ()) {
-          global_modules.push_back (m);
-          modules.insert (m);
         }
       }
     }
@@ -927,9 +591,21 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
     install_signal_handlers ();
   }
 
+  lay::SaltController *sc = lay::SaltController::instance ();
+  lay::TechnologyController *tc = lay::TechnologyController::instance ();
   lay::MacroController *mc = lay::MacroController::instance ();
 
-  lay::TechnologyController *tc = lay::TechnologyController::instance ();
+  if (sc) {
+
+    //  auto-import technologies
+    for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
+      std::string tp = tl::to_string (QDir (tl::to_qstring (*p)).filePath (QString::fromUtf8 ("salt")));
+      sc->add_path (tp);
+    }
+
+    sc->set_salt_mine_url (tl::salt_mine_url ());
+
+  }
 
   if (tc) {
 
@@ -971,6 +647,8 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
     if (! m_no_macros) {
 
       //  Add the global ruby modules as the first ones.
+      //  TODO: this is a deprecated feature.
+      std::vector<std::string> global_modules = scan_global_modules ();
       m_load_macros.insert (m_load_macros.begin (), global_modules.begin (), global_modules.end ());
 
       for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
@@ -1085,10 +763,56 @@ Application::~Application ()
   shutdown ();
 }
 
-QString
-Application::symbol_name_from_address (const QString &mod_name, size_t addr)
+std::vector<std::string>
+Application::scan_global_modules ()
 {
-  return get_symbol_name_from_address (mod_name, addr);
+  //  NOTE:
+  //  this is deprecated functionality - for backward compatibility, global "*.rbm" and "*.pym" modules
+  //  are still considered. The desired solution is autorun macros.
+
+  //  try to locate a global rbainit file and rbm modules
+  std::vector<std::string> global_modules;
+  std::set<std::string> modules;
+
+  //  try to locate a global plugins
+  for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
+
+#if 0
+    //  deprecated functionality
+    QFileInfo rbainit_file (tl::to_qstring (*p), QString::fromUtf8 ("rbainit"));
+    if (rbainit_file.exists () && rbainit_file.isReadable ()) {
+      std::string m = tl::to_string (rbainit_file.absoluteFilePath ());
+      if (modules.find (m) == modules.end ()) {
+        global_modules.push_back (m);
+        modules.insert (m);
+      }
+    }
+#endif
+
+    QDir inst_path_dir (tl::to_qstring (*p));
+
+    QStringList name_filters;
+    name_filters << QString::fromUtf8 ("*.rbm");
+    name_filters << QString::fromUtf8 ("*.pym");
+
+    QStringList inst_modules = inst_path_dir.entryList (name_filters);
+    inst_modules.sort ();
+
+    for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
+      QFileInfo rbm_file (tl::to_qstring (*p), *im);
+      if (rbm_file.exists () && rbm_file.isReadable ()) {
+        std::string m = tl::to_string (rbm_file.absoluteFilePath ());
+        if (modules.find (m) == modules.end ()) {
+          tl::warn << tl::to_string (tr ("Global modules are deprecated. Turn '%1'' into an autorun macro instead and put it into 'macros' or 'pymacros'.").arg (tl::to_qstring (m)));
+          global_modules.push_back (m);
+          modules.insert (m);
+        }
+      }
+    }
+
+  }
+
+  return global_modules;
 }
 
 bool 

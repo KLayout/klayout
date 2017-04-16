@@ -66,6 +66,11 @@ TL_PUBLIC void set_klayout_path (const std::vector<std::string> &path);
  */
 TL_PUBLIC void reset_klayout_path ();
 
+/**
+ *  @brief Gets the package manager URL
+ */
+TL_PUBLIC std::string salt_mine_url ();
+
 }
 
 #endif

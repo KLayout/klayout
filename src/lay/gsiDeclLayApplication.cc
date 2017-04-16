@@ -23,6 +23,7 @@
 
 #include "layApplication.h"
 #include "layMainWindow.h"
+#include "laySignalHandler.h"
 #include "gsiDecl.h"
 #include "gsiQtExternals.h"
 
@@ -68,7 +69,7 @@ Class<lay::Application> decl_Application (QT_EXTERNAL_BASE (QApplication) "Appli
     "method."
   ) +
   method ("crash_me", &crash_me, "@hide") +
-  method ("symname", &lay::Application::symbol_name_from_address, "@hide") + 
+  method ("symname", &lay::get_symbol_name_from_address, "@hide") +
   method ("is_editable?", &lay::Application::is_editable, 
     "@brief Returns true if the application is in editable mode\n"
   ) +

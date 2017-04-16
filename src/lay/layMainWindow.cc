@@ -86,7 +86,7 @@
 #include "layLayerToolbox.h"
 #include "laySettingsForm.h"
 #include "layTechnologyController.h"
-#include "laySaltManagerDialog.h"
+#include "laySaltController.h"
 #include "layTipDialog.h"
 #include "laySelectCellViewForm.h"
 #include "layLayoutPropertiesForm.h"
@@ -4513,8 +4513,10 @@ MainWindow::show_progress_bar (bool show)
 void
 MainWindow::cm_packages ()
 {
-  lay::SaltManagerDialog dialog (this);
-  dialog.exec ();
+  lay::SaltController *sc = lay::SaltController::instance ();
+  if (sc) {
+    sc->show_editor ();
+  }
 }
 
 void

@@ -55,7 +55,9 @@ HEADERS = \
     laySaltGrainDetailsTextWidget.h \
     laySaltGrainPropertiesDialog.h \
     laySaltDownloadManager.h \
-    laySaltModel.h
+    laySaltModel.h \
+    laySaltController.h \
+    laySignalHandler.h
 
 FORMS = \
     ClipDialog.ui \
@@ -156,7 +158,9 @@ SOURCES = \
     laySaltGrainDetailsTextWidget.cc \
     laySaltGrainPropertiesDialog.cc \
     laySaltDownloadManager.cc \
-    laySaltModel.cc
+    laySaltModel.cc \
+    laySaltController.cc \
+    laySignalHandler.cc
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \

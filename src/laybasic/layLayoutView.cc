@@ -3124,6 +3124,9 @@ LayoutView::load_layout (const std::string &filename, const db::LoadLayoutOption
   }
   update_content ();
 
+  //  this event may not be generated otherwise:
+  active_cellview_changed (cv_index);
+
   return cv_index;
 }
 

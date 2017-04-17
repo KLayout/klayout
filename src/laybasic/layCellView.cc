@@ -217,7 +217,11 @@ void
 LayoutHandle::set_tech_name (const std::string &tn)
 {
   if (tn != m_tech_name) {
-    m_tech_name = tn;
+    if (lay::Technologies::instance ()->has_technology (tn)) {
+      m_tech_name = tn;
+    } else {
+      m_tech_name = std::string ();
+    }
     technology_changed_event ();
   }
 }

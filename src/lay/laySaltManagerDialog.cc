@@ -28,7 +28,6 @@
 #include "ui_SaltGrainTemplateSelectionDialog.h"
 #include "tlString.h"
 #include "tlExceptions.h"
-#include "tlHttpStream.h"
 
 #include <QTextDocument>
 #include <QPainter>
@@ -560,8 +559,7 @@ BEGIN_PROTECTED
 
     QApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
 
-    tl::InputHttpStream http (SaltGrain::spec_url (g->url ()));
-    tl::InputStream stream (http);
+    tl::InputStream stream (SaltGrain::spec_url (g->url ()));
 
     m_remote_grain.reset (new SaltGrain ());
     m_remote_grain->load (stream);

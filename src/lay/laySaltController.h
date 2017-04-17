@@ -125,6 +125,22 @@ public:
   void set_salt_mine_url (const std::string &url);
 
   /**
+   *  @brief Gets the salt
+   */
+  lay::Salt &salt ()
+  {
+    return m_salt;
+  }
+
+  /**
+   *  @brief Gets the salt (const version)
+   */
+  const lay::Salt &salt () const
+  {
+    return m_salt;
+  }
+
+  /**
    *  @brief Gets the singleton instance for this object
    */
   static SaltController *instance ();

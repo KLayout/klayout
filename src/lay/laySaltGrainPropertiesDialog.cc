@@ -527,10 +527,11 @@ SaltGrainPropertiesDialog::accept ()
   //  doc URL
   doc_url_alert->clear ();
   if (! m_grain.doc_url ().empty ()) {
-    tl::InputHttpStream stream (m_grain.doc_url ());
+    tl::InputStream stream (m_grain.doc_url ());
     try {
-      char b;
-      stream.read (&b, 1);
+      if (! stream.get (1)) {
+        throw tl::Exception (tl::to_string (tr ("Empty document")));
+      }
     } catch (tl::Exception &ex) {
       doc_url_alert->error () << tr ("Attempt to read documentation URL failed. Error details follow.") << tl::endl
                               << tr ("URL: ") << m_grain.doc_url () << tl::endl

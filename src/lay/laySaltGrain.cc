@@ -192,6 +192,7 @@ SaltGrain::spec_url (const std::string &url)
 {
   std::string res = url;
   if (! res.empty()) {
+    //  TODO: use system path separator unless this is a URL
     if (res [res.size () - 1] != '/') {
       res += "/";
     }
@@ -396,8 +397,7 @@ SaltGrain::from_url (const std::string &url)
     throw tl::Exception (tl::to_string (QObject::tr ("No download link available")));
   }
 
-  tl::InputHttpStream http (SaltGrain::spec_url (url));
-  tl::InputStream stream (http);
+  tl::InputStream stream (SaltGrain::spec_url (url));
 
   SaltGrain g;
   g.load (stream);

@@ -22,6 +22,7 @@
 
 #include "layMacroController.h"
 #include "layTechnologyController.h"
+#include "laySaltController.h"
 #include "layMacroEditorDialog.h"
 #include "layMacroInterpreter.h"
 #include "layMainWindow.h"
@@ -59,17 +60,12 @@ MacroController::load ()
   m_macro_categories.push_back (std::pair<std::string, std::string> ("drc", tl::to_string (QObject::tr ("DRC"))));
 
   //  Scan for macros and set interpreter path
-  for (std::vector <std::pair<std::string, std::pair<std::string, std::pair<std::string, bool> > > >::const_iterator p = m_paths.begin (); p != m_paths.end (); ++p) {
-
-    std::string path = p->first;
-    std::string description = p->second.first;
-    std::string cat = p->second.second.first;
-    bool readonly = p->second.second.second;
+  for (std::vector <InternalPathDescriptor>::const_iterator p = m_internal_paths.begin (); p != m_internal_paths.end (); ++p) {
 
     for (size_t c = 0; c < m_macro_categories.size (); ++c) {
-      if (cat.empty () || cat == m_macro_categories [c].first) {
-        std::string mp = tl::to_string (QDir (tl::to_qstring (p->first)).filePath (tl::to_qstring (m_macro_categories [c].first)));
-        lay::MacroCollection::root ().add_folder (description, mp, m_macro_categories [c].first, readonly);
+      if (p->cat.empty () || p->cat == m_macro_categories [c].first) {
+        std::string mp = tl::to_string (QDir (tl::to_qstring (p->path)).absoluteFilePath (tl::to_qstring (m_macro_categories [c].first)));
+        lay::MacroCollection::root ().add_folder (p->description, mp, m_macro_categories [c].first, p->readonly);
       }
     }
 
@@ -93,6 +89,9 @@ MacroController::initialized (lay::PluginRoot *root)
     connect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
     connect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (technologies_edited ()));
   }
+  if (lay::SaltController::instance ()) {
+    connect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (salt_changed ()));
+  }
 
   //  update the menus with the macro menu bindings as late as possible (now we
   //  can be sure that the menus are created propertly)
@@ -107,6 +106,9 @@ MacroController::uninitialize (lay::PluginRoot * /*root*/)
   if (lay::TechnologyController::instance ()) {
     disconnect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
     disconnect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (technologies_edited ()));
+  }
+  if (lay::SaltController::instance ()) {
+    disconnect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (salt_changed ()));
   }
 
   delete mp_macro_editor;
@@ -279,32 +281,62 @@ MacroController::sync_implicit_macros (bool check_autorun)
     return;
   }
 
-  std::set<std::pair<std::string, std::string> > tech_macro_paths;
-  std::map<std::pair<std::string, std::string>, std::string> tech_names_by_path;
+  std::vector<ExternalPathDescriptor> external_paths;
 
   //  Add additional places where the technologies define some macros
-  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
 
-    if (t->base_path ().empty ()) {
-      continue;
+  std::map<std::string, std::vector<std::string> > tech_names_by_path;
+
+  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
+    if (! t->base_path ().empty ()) {
+      QDir base_dir (tl::to_qstring (t->base_path ()));
+      if (base_dir.exists ()) {
+        tech_names_by_path [tl::to_string (base_dir.absolutePath ())].push_back (t->name ());
+      }
     }
+  }
+
+  for (std::map<std::string, std::vector<std::string> >::const_iterator t = tech_names_by_path.begin (); t != tech_names_by_path.end (); ++t) {
 
     for (size_t c = 0; c < macro_categories ().size (); ++c) {
 
-      QDir base_dir (tl::to_qstring (t->base_path ()));
-      if (base_dir.exists ()) {
+      QDir base_dir (tl::to_qstring (t->first));
+      QDir macro_dir (base_dir.filePath (tl::to_qstring (macro_categories () [c].first)));
+      if (macro_dir.exists ()) {
 
+        std::string description;
+        if (t->second.size () == 1) {
+          description = tl::to_string (tr ("Technology %1").arg (tl::to_qstring (t->second.front ())));
+        } else {
+          description = tl::to_string (tr ("Technologies %1").arg (tl::to_qstring (tl::join (t->second, ","))));
+        }
+
+        external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lay::MacroCollection::TechFolder));
+
+      }
+
+    }
+
+  }
+
+  //  Add additional places where the salt defines macros
+
+  lay::SaltController *sc = lay::SaltController::instance ();
+  if (sc) {
+
+    lay::Salt &salt = sc->salt ();
+    for (lay::Salt::flat_iterator i = salt.begin_flat (); i != salt.end_flat (); ++i) {
+
+      const lay::SaltGrain *g = *i;
+
+      for (size_t c = 0; c < macro_categories ().size (); ++c) {
+
+        QDir base_dir (tl::to_qstring (g->path ()));
         QDir macro_dir (base_dir.filePath (tl::to_qstring (macro_categories () [c].first)));
         if (macro_dir.exists ()) {
 
-          std::string mp = tl::to_string (macro_dir.path ());
-          std::pair<std::string, std::string> cp (macro_categories () [c].first, mp);
-          tech_macro_paths.insert (cp);
-          std::string &tn = tech_names_by_path [cp];
-          if (! tn.empty ()) {
-            tn += ",";
-          }
-          tn += t->name ();
+          std::string description = tl::to_string (tr ("Package %1").arg (tl::to_qstring (g->name ())));
+          external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lay::MacroCollection::SaltFolder));
 
         }
 
@@ -315,27 +347,28 @@ MacroController::sync_implicit_macros (bool check_autorun)
   }
 
   //  delete macro collections which are no longer required or update description
+
   std::vector<lay::MacroCollection *> folders_to_delete;
-  std::string desc_prefix = tl::to_string (QObject::tr ("Technology")) + " - ";
+
+  //  determine the paths currently in use
+  std::map<std::string, const ExternalPathDescriptor *> used_folders_by_path;
+  for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
+    used_folders_by_path.insert (std::make_pair (p->path, p.operator-> ()));
+  }
 
   lay::MacroCollection *root = &lay::MacroCollection::root ();
 
   for (lay::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
-
-    std::pair<std::string, std::string> cp (m->second->category (), m->second->path ());
-    if (m->second->virtual_mode () == lay::MacroCollection::TechFolder && m_tech_macro_paths.find (cp) != m_tech_macro_paths.end ()) {
-
-      if (tech_macro_paths.find (cp) == tech_macro_paths.end ()) {
+    if (m->second->virtual_mode () == lay::MacroCollection::TechFolder ||
+        m->second->virtual_mode () == lay::MacroCollection::SaltFolder) {
+      std::map<std::string, const ExternalPathDescriptor *>::const_iterator u = used_folders_by_path.find (m->second->path ());
+      if (u == used_folders_by_path.end ()) {
         //  no longer used
         folders_to_delete.push_back (m->second);
       } else {
-        //  used: update description if required
-        std::string desc = desc_prefix + tech_names_by_path [cp];
-        m->second->set_description (desc);
+        m->second->set_description (u->second->description);
       }
-
     }
-
   }
 
   for (std::vector<lay::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
@@ -346,36 +379,31 @@ MacroController::sync_implicit_macros (bool check_autorun)
   }
 
   //  store new paths
-  m_tech_macro_paths = tech_macro_paths;
+  m_external_paths = external_paths;
 
   //  add new folders
-  for (lay::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
-    if (m->second->virtual_mode () == lay::MacroCollection::TechFolder) {
-      std::pair<std::string, std::string> cp (m->second->category (), m->second->path ());
-      tech_macro_paths.erase (cp);
-    }
-  }
 
   std::vector<lay::MacroCollection *> new_folders;
 
-  for (std::set<std::pair<std::string, std::string> >::const_iterator p = tech_macro_paths.begin (); p != tech_macro_paths.end (); ++p) {
+  for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
 
-    const std::string &tn = tech_names_by_path [*p];
+    if (used_folders_by_path.find (p->path) != used_folders_by_path.end ()) {
+      continue;
+    }
 
-    //  TODO: is it wise to make it writeable?
     if (tl::verbosity () >= 20) {
-      tl::info << "Adding macro folder " << p->second << ", category '" << p->first << "' for technologies " << tn;
+      tl::info << "Adding macro folder " << p->path << ", category '" << p->cat << "' for '" << p->description << "'";
     }
 
     //  Add the folder. Note: it may happen that a macro folder for the tech specific macros already exists in
     //  a non-tech context.
     //  In that case, the add_folder method will return 0.
-    lay::MacroCollection *mc = lay::MacroCollection::root ().add_folder (desc_prefix + tn, p->second, p->first, false);
+
+    //  TODO: is it wise to make this writeable?
+    lay::MacroCollection *mc = lay::MacroCollection::root ().add_folder (p->description, p->path, p->cat, false);
     if (mc) {
-
-      mc->set_virtual_mode (lay::MacroCollection::TechFolder);
+      mc->set_virtual_mode (p->type);
       new_folders.push_back (mc);
-
     }
 
   }
@@ -407,7 +435,7 @@ MacroController::refresh ()
 void
 MacroController::add_path (const std::string &path, const std::string &description, const std::string &category, bool readonly)
 {
-  m_paths.push_back (std::make_pair (path, std::make_pair (description, std::make_pair (category, readonly))));
+  m_internal_paths.push_back (InternalPathDescriptor (path, description, category, readonly));
 }
 
 void
@@ -499,6 +527,14 @@ MacroController::add_macro_items_to_menu (lay::MacroCollection &collection, int 
     }
 
   }
+}
+
+void
+MacroController::salt_changed ()
+{
+  sync_implicit_macros (true);
+  refresh ();
+  update_menu_with_macros ();
 }
 
 void

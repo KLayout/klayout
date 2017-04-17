@@ -172,7 +172,46 @@ public slots:
    */
   void technologies_edited ();
 
+  /**
+   *  @brief Called when the salt (packages) got changed
+   */
+  void salt_changed ();
+
 private:
+  /**
+   *  @brief A structure describing an external macro location
+   */
+  struct ExternalPathDescriptor
+  {
+    ExternalPathDescriptor (const std::string &_path, const std::string &_description, const std::string &_cat, lay::MacroCollection::FolderType _type)
+      : path (_path), description (_description), cat (_cat), type (_type)
+    {
+      //  .. nothing yet ..
+    }
+
+    std::string path;
+    std::string description;
+    std::string cat;
+    lay::MacroCollection::FolderType type;
+  };
+
+  /**
+   *  @brief A structure describing an internal macro location
+   */
+  struct InternalPathDescriptor
+  {
+    InternalPathDescriptor (const std::string &_path, const std::string &_description, const std::string &_cat, bool _readonly)
+      : path (_path), description (_description), cat (_cat), readonly (_readonly)
+    {
+      //  .. nothing yet ..
+    }
+
+    std::string path;
+    std::string description;
+    std::string cat;
+    bool readonly;
+  };
+
   lay::MacroEditorDialog *mp_macro_editor;
   lay::MainWindow *mp_mw;
   bool m_no_implicit_macros;
@@ -180,9 +219,9 @@ private:
   std::vector<lay::Action> m_macro_actions;
   std::map<QAction *, lay::Macro *> m_action_to_macro;
   lay::MacroCollection m_temp_macros;
-  std::vector< std::pair<std::string, std::pair<std::string, std::pair<std::string, bool> > > > m_paths;
   std::vector< std::pair<std::string, std::string> > m_macro_categories;
-  std::set<std::pair<std::string, std::string> > m_tech_macro_paths;
+  std::vector<InternalPathDescriptor> m_internal_paths;
+  std::vector<ExternalPathDescriptor> m_external_paths;
 
   void sync_implicit_macros (bool check_autorun);
   void add_macro_items_to_menu (lay::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings);

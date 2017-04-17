@@ -29,6 +29,7 @@
 
 #include <QFileInfo>
 #include <QDir>
+#include <QUrl>
 #include <QResource>
 
 namespace lay
@@ -395,9 +396,25 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target)
 
   } else if (! templ.url ().empty ()) {
 
-    //  otherwise download from the URL
-    tl::info << QObject::tr ("Downloading package from '%1' to '%2' ..").arg (tl::to_qstring (templ.url ())).arg (tl::to_qstring (target.path ()));
-    res = tl::WebDAVObject::download (templ.url (), target.path ());
+    if (templ.url ().find ("http:") == 0 || templ.url ().find ("https:") == 0) {
+
+      //  otherwise download from the URL
+      tl::info << QObject::tr ("Downloading package from '%1' to '%2' ..").arg (tl::to_qstring (templ.url ())).arg (tl::to_qstring (target.path ()));
+      res = tl::WebDAVObject::download (templ.url (), target.path ());
+
+    } else {
+
+      //  or copy from a file path for "file" URL's
+      std::string src = templ.url ();
+      if (src.find ("file:") == 0) {
+        QUrl url (tl::to_qstring (src));
+        src = tl::to_string (QFileInfo (url.toLocalFile ()).absoluteFilePath ());
+      }
+
+      tl::info << QObject::tr ("Copying package from '%1' to '%2' ..").arg (tl::to_qstring (src)).arg (tl::to_qstring (target.path ()));
+      res = tl::cp_dir_recursive (src, target.path ());
+
+    }
 
     target.set_url (templ.url ());
 

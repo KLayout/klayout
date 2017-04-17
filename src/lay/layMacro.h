@@ -643,10 +643,11 @@ public:
   /**
    *  @brief Some constants for virtual_mode
    */
-  enum {
+  enum FolderType {
     NotVirtual = 0,
     ProjectFolder = 1,
-    TechFolder = 2
+    TechFolder = 2,
+    SaltFolder = 3
   };
 
   /**

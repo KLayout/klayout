@@ -38,11 +38,13 @@ namespace lay
 {
 
 MacroController::MacroController ()
-  : mp_macro_editor (0), mp_mw (0), m_no_implicit_macros (false),
-    dm_do_update_menu_with_macros (this, &MacroController::do_update_menu_with_macros)
+  : mp_macro_editor (0), mp_mw (0), m_no_implicit_macros (false), m_file_watcher (0),
+    dm_do_update_menu_with_macros (this, &MacroController::do_update_menu_with_macros),
+    dm_sync_file_watcher (this, &MacroController::sync_file_watcher),
+    dm_sync_files (this, &MacroController::sync_files)
 {
-  connect (&m_temp_macros, SIGNAL (menu_needs_update ()), this, SLOT (update_menu_with_macros ()));
-  connect (&m_temp_macros, SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (update_menu_with_macros ()));
+  connect (&m_temp_macros, SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
+  connect (&m_temp_macros, SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (macro_collection_changed ()));
 }
 
 void
@@ -70,8 +72,6 @@ MacroController::load ()
     }
 
   }
-
-  sync_implicit_macros (false);
 }
 
 void
@@ -83,32 +83,48 @@ MacroController::initialized (lay::PluginRoot *root)
     mp_macro_editor->setModal (false);
   }
 
-  connect (&lay::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (update_menu_with_macros ()));
-  connect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (update_menu_with_macros ()));
+  if (! m_file_watcher) {
+    m_file_watcher = new tl::FileSystemWatcher (this);
+    connect (m_file_watcher, SIGNAL (fileChanged (const QString &)), this, SLOT (file_watcher_triggered ()));
+    connect (m_file_watcher, SIGNAL (fileRemoved (const QString &)), this, SLOT (file_watcher_triggered ()));
+  }
+
+  connect (&lay::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
+  connect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (macro_collection_changed ()));
   if (lay::TechnologyController::instance ()) {
-    connect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
-    connect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (technologies_edited ()));
+    connect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (macro_collection_changed ()));
+    connect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (sync_with_external_sources ()));
   }
   if (lay::SaltController::instance ()) {
-    connect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (salt_changed ()));
+    connect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (sync_with_external_sources ()));
   }
+
+  //  synchronize the macro collection with all external sources
+  sync_implicit_macros (false);
 
   //  update the menus with the macro menu bindings as late as possible (now we
   //  can be sure that the menus are created propertly)
-  do_update_menu_with_macros ();
+  macro_collection_changed ();
 }
 
 void
 MacroController::uninitialize (lay::PluginRoot * /*root*/)
 {
-  disconnect (&lay::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (update_menu_with_macros ()));
-  disconnect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (update_menu_with_macros ()));
+  disconnect (&lay::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
+  disconnect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (macro_collection_changed ()));
   if (lay::TechnologyController::instance ()) {
-    disconnect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (update_menu_with_macros ()));
-    disconnect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (technologies_edited ()));
+    disconnect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (macro_collection_changed ()));
+    disconnect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (sync_with_external_sources ()));
   }
   if (lay::SaltController::instance ()) {
-    disconnect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (salt_changed ()));
+    disconnect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (sync_with_external_sources ()));
+  }
+
+  if (m_file_watcher) {
+    disconnect (m_file_watcher, SIGNAL (fileChanged (const QString &)), this, SLOT (file_watcher_triggered ()));
+    disconnect (m_file_watcher, SIGNAL (fileRemoved (const QString &)), this, SLOT (file_watcher_triggered ()));
+    delete m_file_watcher;
+    m_file_watcher = 0;
   }
 
   delete mp_macro_editor;
@@ -238,9 +254,6 @@ MacroController::drop_url (const std::string &path_or_url)
 
         macro->save ();
 
-        //  refresh macro editor to show new macro plus to install the menus
-        refresh ();
-
       }
 
     } else {
@@ -350,10 +363,16 @@ MacroController::sync_implicit_macros (bool check_autorun)
 
   std::vector<lay::MacroCollection *> folders_to_delete;
 
+  //  determine the paths that will be in use
+  std::map<std::string, const ExternalPathDescriptor *> new_folders_by_path;
+  for (std::vector<ExternalPathDescriptor>::const_iterator p = external_paths.begin (); p != external_paths.end (); ++p) {
+    new_folders_by_path.insert (std::make_pair (p->path, p.operator-> ()));
+  }
+
   //  determine the paths currently in use
-  std::map<std::string, const ExternalPathDescriptor *> used_folders_by_path;
+  std::map<std::string, const ExternalPathDescriptor *> prev_folders_by_path;
   for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
-    used_folders_by_path.insert (std::make_pair (p->path, p.operator-> ()));
+    prev_folders_by_path.insert (std::make_pair (p->path, p.operator-> ()));
   }
 
   lay::MacroCollection *root = &lay::MacroCollection::root ();
@@ -361,8 +380,8 @@ MacroController::sync_implicit_macros (bool check_autorun)
   for (lay::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
     if (m->second->virtual_mode () == lay::MacroCollection::TechFolder ||
         m->second->virtual_mode () == lay::MacroCollection::SaltFolder) {
-      std::map<std::string, const ExternalPathDescriptor *>::const_iterator u = used_folders_by_path.find (m->second->path ());
-      if (u == used_folders_by_path.end ()) {
+      std::map<std::string, const ExternalPathDescriptor *>::const_iterator u = new_folders_by_path.find (m->second->path ());
+      if (u == new_folders_by_path.end ()) {
         //  no longer used
         folders_to_delete.push_back (m->second);
       } else {
@@ -387,7 +406,7 @@ MacroController::sync_implicit_macros (bool check_autorun)
 
   for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
 
-    if (used_folders_by_path.find (p->path) != used_folders_by_path.end ()) {
+    if (prev_folders_by_path.find (p->path) != prev_folders_by_path.end ()) {
       continue;
     }
 
@@ -421,14 +440,6 @@ MacroController::sync_implicit_macros (bool check_autorun)
       }
     }
 
-  }
-}
-
-void
-MacroController::refresh ()
-{
-  if (mp_macro_editor) {
-    mp_macro_editor->refresh ();
   }
 }
 
@@ -530,27 +541,22 @@ MacroController::add_macro_items_to_menu (lay::MacroCollection &collection, int 
 }
 
 void
-MacroController::salt_changed ()
+MacroController::sync_with_external_sources ()
 {
-  sync_implicit_macros (true);
-  refresh ();
-  update_menu_with_macros ();
+  try {
+    sync_implicit_macros (true);
+  } catch (tl::Exception &ex) {
+    tl::error << ex.msg ();
+  }
 }
 
 void
-MacroController::technologies_edited ()
-{
-  sync_implicit_macros (true);
-  refresh ();
-  update_menu_with_macros ();
-}
-
-void
-MacroController::update_menu_with_macros ()
+MacroController::macro_collection_changed ()
 {
   //  empty action to macro table now we know it's invalid
   m_action_to_macro.clear ();
   dm_do_update_menu_with_macros ();
+  dm_sync_file_watcher ();
 }
 
 void
@@ -595,6 +601,39 @@ MacroController::do_update_menu_with_macros ()
   if (new_key_bindings != key_bindings) {
     mp_mw->config_set (cfg_key_bindings, pack_key_binding (new_key_bindings));
   }
+}
+
+void
+MacroController::file_watcher_triggered ()
+{
+  dm_sync_files ();
+}
+
+static void
+add_collections_to_file_watcher (const lay::MacroCollection &collection, tl::FileSystemWatcher *watcher)
+{
+  for (lay::MacroCollection::const_child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
+    if (! c->second->path ().empty () && c->second->path ()[0] != ':') {
+      watcher->add_file (c->second->path ());
+      add_collections_to_file_watcher (*c->second, watcher);
+    }
+  }
+}
+
+void
+MacroController::sync_file_watcher ()
+{
+  m_file_watcher->clear ();
+  m_file_watcher->enable (false);
+  add_collections_to_file_watcher (lay::MacroCollection::root (), m_file_watcher);
+  m_file_watcher->enable (true);
+}
+
+void
+MacroController::sync_files ()
+{
+  tl::log << tl::to_string (tr ("Detected file system change in macro folders - updating"));
+  lay::MacroCollection::root ().reload ();
 }
 
 MacroController *

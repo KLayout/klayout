@@ -1173,7 +1173,7 @@ MacroCollection::make_readonly (bool f)
 }
 
 MacroCollection *
-MacroCollection::add_folder (const std::string &description, const std::string &path, const std::string &cat, bool readonly)
+MacroCollection::add_folder (const std::string &description, const std::string &path, const std::string &cat, bool readonly, bool force_create)
 {
   if (! path.empty () && path[0] == ':') {
     readonly = true;
@@ -1183,15 +1183,25 @@ MacroCollection::add_folder (const std::string &description, const std::string &
 
     if (! file_info.exists ()) {
 
-      //  Try to create the folder since it does not exist yet
-      if (tl::verbosity () >= 20) {
-        tl::log << "Folder does not exist yet - trying to create it: " << path;
-      }
-      if (! QDir::root ().mkpath (file_info.absoluteFilePath ())) {
-        if (tl::verbosity () >= 10) {
-          tl::error << "Unable to create folder path: " << path;
+      //  Try to create the folder since it does not exist yet or skip that one
+      if (! force_create) {
+
+        if (tl::verbosity () >= 20) {
+          tl::log << "Folder does not exist - skipping: " << path;
         }
         return 0;
+
+      } else {
+
+        if (tl::verbosity () >= 20) {
+          tl::log << "Folder does not exist yet - trying to create it: " << path;
+        }
+        if (! QDir::root ().mkpath (file_info.absoluteFilePath ())) {
+          if (tl::verbosity () >= 10) {
+            tl::error << "Unable to create folder path: " << path;
+          }
+          return 0;
+        }
       }
 
       file_info.refresh ();
@@ -1664,6 +1674,91 @@ lay::Macro *MacroCollection::find_macro (const std::string &path)
 MacroCollection &MacroCollection::root ()
 {
   return ms_root;
+}
+
+static bool sync_macros (lay::MacroCollection *current, lay::MacroCollection *actual)
+{
+  bool ret = false;
+
+  if (actual) {
+    current->make_readonly (actual->is_readonly ());
+  }
+
+  std::vector<lay::MacroCollection *> folders_to_delete;
+
+  for (lay::MacroCollection::child_iterator m = current->begin_children (); m != current->end_children (); ++m) {
+    lay::MacroCollection *cm = actual ? actual->folder_by_name (m->first) : 0;
+    if (! cm) {
+      folders_to_delete.push_back (m->second);
+    }
+  }
+
+  if (actual) {
+    for (lay::MacroCollection::child_iterator m = actual->begin_children (); m != actual->end_children (); ++m) {
+      lay::MacroCollection *cm = current->folder_by_name (m->first);
+      if (! cm) {
+        cm = current->create_folder (m->first.c_str (), false);
+        ret = true;
+      }
+      if (sync_macros(cm, m->second)) {
+        ret = true;
+      }
+    }
+  }
+
+  //  delete folders which do no longer exist
+  for (std::vector<lay::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
+    ret = true;
+    sync_macros (*m, 0);
+    current->erase (*m);
+  }
+
+  std::vector<lay::Macro *> macros_to_delete;
+
+  for (lay::MacroCollection::iterator m = current->begin (); m != current->end (); ++m) {
+    lay::Macro *cm = actual ? actual->macro_by_name (m->first, m->second->format ()) : 0;
+    if (! cm) {
+      macros_to_delete.push_back (m->second);
+    }
+  }
+
+  if (actual) {
+    for (lay::MacroCollection::iterator m = actual->begin (); m != actual->end (); ++m) {
+      lay::Macro *cm = current->macro_by_name (m->first, m->second->format ());
+      if (cm) {
+        if (*cm != *m->second) {
+          cm->assign (*m->second);
+        }
+        cm->set_readonly (m->second->is_readonly ());
+      } else {
+        cm = current->create (m->first.c_str (), m->second->format ());
+        cm->assign (*m->second);
+        cm->set_readonly (m->second->is_readonly ());
+        ret = true;
+      }
+    }
+  }
+
+  //  erase macros from collection which are no longer used
+  for (std::vector<lay::Macro *>::const_iterator m = macros_to_delete.begin (); m != macros_to_delete.end (); ++m) {
+    current->erase (*m);
+    ret = true;
+  }
+
+  return ret;
+}
+
+void MacroCollection::reload ()
+{
+  //  create a new collection and synchronize
+
+  lay::MacroCollection new_collection;
+  for (lay::MacroCollection::child_iterator c = begin_children (); c != end_children (); ++c) {
+    new_collection.add_folder (c->second->description (), c->second->path (), c->second->category (), c->second->is_readonly (), false /* don't force to create */);
+  }
+
+  //  and synchronize current with the actual one
+  sync_macros (this, &new_collection);
 }
 
 static bool has_autorun_for (const lay::MacroCollection &collection, bool early)

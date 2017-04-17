@@ -33,14 +33,21 @@ namespace lay
 static const std::string cfg_salt_manager_window_state ("salt-manager-window-state");
 
 SaltController::SaltController ()
-  : mp_salt_dialog (0), mp_mw (0)
+  : mp_salt_dialog (0), mp_mw (0), m_file_watcher (0),
+    dm_sync_file_watcher (this, &SaltController::sync_file_watcher),
+    dm_sync_files (this, &SaltController::sync_files)
 {
-  //  .. nothing yet ..
 }
 
 void
 SaltController::initialized (lay::PluginRoot *root)
 {
+  if (! m_file_watcher) {
+    m_file_watcher = new tl::FileSystemWatcher (this);
+    connect (m_file_watcher, SIGNAL (fileChanged (const QString &)), this, SLOT (file_watcher_triggered ()));
+    connect (m_file_watcher, SIGNAL (fileRemoved (const QString &)), this, SLOT (file_watcher_triggered ()));
+  }
+
   mp_mw = dynamic_cast <lay::MainWindow *> (root);
 
   connect (&m_salt, SIGNAL (collections_changed ()), this, SIGNAL (salt_changed ()));
@@ -50,6 +57,13 @@ void
 SaltController::uninitialize (lay::PluginRoot * /*root*/)
 {
   disconnect (&m_salt, SIGNAL (collections_changed ()), this, SIGNAL (salt_changed ()));
+
+  if (m_file_watcher) {
+    disconnect (m_file_watcher, SIGNAL (fileChanged (const QString &)), this, SLOT (file_watcher_triggered ()));
+    disconnect (m_file_watcher, SIGNAL (fileRemoved (const QString &)), this, SLOT (file_watcher_triggered ()));
+    delete m_file_watcher;
+    m_file_watcher = 0;
+  }
 
   delete mp_salt_dialog;
   mp_salt_dialog = 0;
@@ -133,7 +147,27 @@ SaltController::show_editor ()
       mp_mw->config_set (cfg_salt_manager_window_state, lay::save_dialog_state (mp_salt_dialog));
     }
 
+    sync_file_watcher ();
+
   }
+}
+
+void
+SaltController::sync_file_watcher ()
+{
+  m_file_watcher->clear ();
+  m_file_watcher->enable (false);
+  for (lay::Salt::flat_iterator g = m_salt.begin_flat (); g != m_salt.end_flat (); ++g) {
+    m_file_watcher->add_file ((*g)->path ());
+  }
+  m_file_watcher->enable (true);
+}
+
+void
+SaltController::sync_files ()
+{
+  tl::log << tl::to_string (tr ("Detected file system change in packages - updating"));
+  emit salt_changed ();
 }
 
 void
@@ -142,9 +176,16 @@ SaltController::add_path (const std::string &path)
   try {
     tl::log << tl::to_string (tr ("Scanning %1 for packages").arg (tl::to_qstring (path)));
     m_salt.add_location (path);
+    dm_sync_file_watcher ();
   } catch (tl::Exception &ex) {
     tl::error << ex.msg ();
   }
+}
+
+void
+SaltController::file_watcher_triggered ()
+{
+  dm_sync_files ();
 }
 
 void

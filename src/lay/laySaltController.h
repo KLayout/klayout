@@ -27,6 +27,8 @@
 #include "layCommon.h"
 #include "layPlugin.h"
 #include "laySalt.h"
+#include "tlFileSystemWatcher.h"
+#include "tlDeferredExecution.h"
 
 #include <vector>
 #include <string>
@@ -145,6 +147,12 @@ public:
    */
   static SaltController *instance ();
 
+private slots:
+  /**
+   *  @brief Called when the file watcher detects a change in the file system
+   */
+  void file_watcher_triggered ();
+
 signals:
   /**
    *  @brief This signal is emitted if the salt changed
@@ -156,6 +164,12 @@ private:
   lay::MainWindow *mp_mw;
   std::string m_salt_mine_url;
   lay::Salt m_salt, m_salt_mine;
+  tl::FileSystemWatcher *m_file_watcher;
+  tl::DeferredMethod<SaltController> dm_sync_file_watcher;
+  tl::DeferredMethod<SaltController> dm_sync_files;
+
+  void sync_file_watcher ();
+  void sync_files ();
 };
 
 }

@@ -29,6 +29,7 @@
 #include "layMacro.h"
 #include "tlObject.h"
 #include "tlDeferredExecution.h"
+#include "tlFileSystemWatcher.h"
 
 #include <string>
 #include <map>
@@ -121,11 +122,6 @@ public:
   void show_editor (const std::string &cat = std::string (), bool force_add = false);
 
   /**
-   *  @brief Reloads all macros from the paths registered
-   */
-  void refresh ();
-
-  /**
    *  @brief Adds a search path to the macros
    *  After adding the paths, "load" needs to be called to actually load the macros.
    */
@@ -163,19 +159,20 @@ public:
 
 public slots:
   /**
-   *  @brief Update the menu with macros bound to a menu
+   *  @brief Updates the menu with macros bound to a menu
    */
-  void update_menu_with_macros ();
+  void macro_collection_changed ();
 
   /**
-   *  @brief Called when the technologies got changed
+   *  @brief Called when the technologies or the salt got changed
    */
-  void technologies_edited ();
+  void sync_with_external_sources ();
 
+private slots:
   /**
-   *  @brief Called when the salt (packages) got changed
+   *  @brief Called when the file watcher detects a change in the file system
    */
-  void salt_changed ();
+  void file_watcher_triggered ();
 
 private:
   /**
@@ -215,17 +212,22 @@ private:
   lay::MacroEditorDialog *mp_macro_editor;
   lay::MainWindow *mp_mw;
   bool m_no_implicit_macros;
-  tl::DeferredMethod<MacroController> dm_do_update_menu_with_macros;
   std::vector<lay::Action> m_macro_actions;
   std::map<QAction *, lay::Macro *> m_action_to_macro;
   lay::MacroCollection m_temp_macros;
   std::vector< std::pair<std::string, std::string> > m_macro_categories;
   std::vector<InternalPathDescriptor> m_internal_paths;
   std::vector<ExternalPathDescriptor> m_external_paths;
+  tl::FileSystemWatcher *m_file_watcher;
+  tl::DeferredMethod<MacroController> dm_do_update_menu_with_macros;
+  tl::DeferredMethod<MacroController> dm_sync_file_watcher;
+  tl::DeferredMethod<MacroController> dm_sync_files;
 
   void sync_implicit_macros (bool check_autorun);
   void add_macro_items_to_menu (lay::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings);
   void do_update_menu_with_macros ();
+  void sync_file_watcher ();
+  void sync_files ();
 };
 
 }

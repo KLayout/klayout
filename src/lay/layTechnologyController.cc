@@ -25,6 +25,7 @@
 #include "layTechSetupDialog.h"
 #include "layMainWindow.h"
 #include "layApplication.h"
+#include "laySaltController.h"
 #include "layConfig.h"
 #include "layQtTools.h"
 #include "laybasicConfig.h"
@@ -82,6 +83,10 @@ TechnologyController::initialized (lay::PluginRoot * /*root*/)
 {
   update_menu ();
   connect_events ();
+
+  if (lay::SaltController::instance ()) {
+    connect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (sync_with_external_sources ()));
+  }
 }
 
 void
@@ -89,6 +94,10 @@ TechnologyController::uninitialize (lay::PluginRoot * /*root*/)
 {
   m_tech_actions.clear ();
   tl::Object::detach_from_all_events ();
+
+  if (lay::SaltController::instance ()) {
+    disconnect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (sync_with_external_sources ()));
+  }
 }
 
 void
@@ -467,6 +476,12 @@ TechnologyController::load ()
 }
 
 void
+TechnologyController::sync_with_external_sources ()
+{
+  rescan (*lay::Technologies::instance ());
+}
+
+void
 TechnologyController::rescan (lay::Technologies &technologies)
 {
   lay::Technologies current = technologies;
@@ -479,7 +494,17 @@ TechnologyController::rescan (lay::Technologies &technologies)
     }
   }
 
-  for (std::vector<std::string>::const_iterator p = m_paths.begin (); p != m_paths.end (); ++p) {
+  std::vector<std::string> paths = m_paths;
+
+  //  add the salt grains as potential sources for tech definitions
+  lay::SaltController *sc = lay::SaltController::instance ();
+  if (sc) {
+    for (lay::Salt::flat_iterator g = sc->salt ().begin_flat (); g != sc->salt ().end_flat (); ++g) {
+      paths.push_back ((*g)->path ());
+    }
+  }
+
+  for (std::vector<std::string>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
 
     QDir dir (tl::to_qstring (*p));
     if (! dir.exists ()) {
@@ -540,7 +565,8 @@ TechnologyController::add_temp_tech (const lay::Technology &t)
 void
 TechnologyController::add_path (const std::string &p)
 {
-  m_paths.push_back (p);
+  std::string tp = tl::to_string (QDir (tl::to_qstring (p)).filePath (QString::fromUtf8 ("tech")));
+  m_paths.push_back (tp);
 }
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new TechnologyController (), 110, "TechnologyController");

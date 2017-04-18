@@ -429,14 +429,19 @@ MacroController::sync_implicit_macros (bool check_autorun)
 
   if (check_autorun) {
 
+    //  This prevents the message dialog below to issue deferred methods
+    tl::NoDeferredMethods silent;
+
     bool has_autorun = false;
     for (std::vector<lay::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end () && ! has_autorun; ++m) {
       has_autorun = (*m)->has_autorun ();
     }
 
-    if (has_autorun && QMessageBox::question (mp_mw, QObject::tr ("Run Macros"), QObject::tr ("Some macros associated with new items are configured to run automatically.\n\nChoose 'Yes' to run these macros now. Choose 'No' to not run them."), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-      for (std::vector<lay::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end (); ++m) {
-        (*m)->autorun ();
+    if (has_autorun) {
+      if (QMessageBox::question (mp_mw, QObject::tr ("Run Macros"), QObject::tr ("Some macros associated with new items are configured to run automatically.\n\nChoose 'Yes' to run these macros now. Choose 'No' to not run them."), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+        for (std::vector<lay::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end (); ++m) {
+          (*m)->autorun ();
+        }
       }
     }
 

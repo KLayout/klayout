@@ -27,6 +27,8 @@
 #include "layQtTools.h"
 #include "tlLog.h"
 
+#include <QDir>
+
 namespace lay
 {
 
@@ -141,7 +143,11 @@ SaltController::show_editor ()
       }
     }
 
+    //  while running the dialog, don't watch file events - that would interfere with
+    //  the changes applied by the dialog itself.
+    m_file_watcher->enable (false);
     mp_salt_dialog->exec ();
+    m_file_watcher->enable (true);
 
     if (mp_mw) {
       mp_mw->config_set (cfg_salt_manager_window_state, lay::save_dialog_state (mp_salt_dialog));
@@ -174,9 +180,14 @@ void
 SaltController::add_path (const std::string &path)
 {
   try {
-    tl::log << tl::to_string (tr ("Scanning %1 for packages").arg (tl::to_qstring (path)));
-    m_salt.add_location (path);
+
+    std::string tp = tl::to_string (QDir (tl::to_qstring (path)).filePath (QString::fromUtf8 ("salt")));
+
+    tl::log << tl::to_string (tr ("Scanning %1 for packages").arg (tl::to_qstring (tp)));
+    m_salt.add_location (tp);
+
     dm_sync_file_watcher ();
+
   } catch (tl::Exception &ex) {
     tl::error << ex.msg ();
   }

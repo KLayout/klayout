@@ -141,6 +141,40 @@ private:
 };
 
 /**
+ *  @brief A protected region that ensures that deferred methods are not executed
+ *
+ *  This class employs the RAII pattern to block a region of code for execution of
+ *  deferred methods. This is useful to protect message boxes against having a side
+ *  effects of issuing deferred method calls:
+ *
+ *  @code
+ *  {
+ *    tl::NoDeferredMethods block;
+ *    QMessageBox::warning (...);
+ *  }
+ *  @endcode
+ */
+class TL_PUBLIC NoDeferredMethods
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  NoDeferredMethods ()
+  {
+    DeferredMethodScheduler::enable (false);
+  }
+
+  /**
+   *  @brief Destructor
+   */
+  ~NoDeferredMethods ()
+  {
+    DeferredMethodScheduler::enable (true);
+  }
+};
+
+/**
  *  @brief Deferred execution of a const method
  *
  *  This template allows to schedule a deferred execution of a certain method.

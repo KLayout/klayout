@@ -465,7 +465,7 @@ TechMacrosPage::commit ()
 static bool s_first_show = true;
 
 TechSetupDialog::TechSetupDialog (QWidget *parent)
-  : QDialog (parent), mp_current_tech (0), mp_current_editor (0), mp_current_tech_component (0)
+  : QDialog (parent), mp_current_tech (0), mp_current_editor (0), mp_current_tech_component (0), m_current_tech_changed_enabled (true)
 {
   setObjectName (QString::fromUtf8 ("tech_setup_dialog"));
 
@@ -532,12 +532,60 @@ TechSetupDialog::clear_components ()
 void
 TechSetupDialog::refresh_clicked ()
 {
+  m_current_tech_changed_enabled = false;
+
 BEGIN_PROTECTED
 
+  commit_tech_component ();
+  update_tech (0);
+
+  std::string tech_name;
+  if (selected_tech ()) {
+    tech_name = selected_tech ()->name ();
+  }
+
+  //  Save the expanded state of the items
+  std::set<std::string> expanded_techs;
+  for (int i = 0; i < tech_tree->topLevelItemCount (); ++i) {
+    QTreeWidgetItem *item = tech_tree->topLevelItem (i);
+    if (item && item->isExpanded ()) {
+      QVariant d = item->data (0, Qt::UserRole);
+      if (d != QVariant ()) {
+        expanded_techs.insert (tl::to_string (d.toString ()));
+      }
+    }
+  }
+
   lay::TechnologyController::instance ()->rescan (m_technologies);
-  update ();
+
+  update_tech_tree ();
+
+  QTreeWidgetItem *new_item = 0;
+
+  for (int i = 0; i < tech_tree->topLevelItemCount () && !new_item; ++i) {
+    QTreeWidgetItem *item = tech_tree->topLevelItem (i);
+    QVariant d = item->data (0, Qt::UserRole);
+    if (d != QVariant () && tech_name == tl::to_string (d.toString ())) {
+      new_item = item;
+    }
+  }
+
+  tech_tree->setCurrentItem (new_item);
+
+  //  restore the expanded state
+  for (int i = 0; i < tech_tree->topLevelItemCount (); ++i) {
+    QTreeWidgetItem *item = tech_tree->topLevelItem (i);
+    QVariant d = item->data (0, Qt::UserRole);
+    bool expand = (d != QVariant () && expanded_techs.find (tl::to_string (d.toString ())) != expanded_techs.end ());
+    item->setExpanded (expand);
+  }
+
+  update_tech (selected_tech ());
+  update_tech_component ();
 
 END_PROTECTED
+
+  m_current_tech_changed_enabled = true;
 }
 
 void
@@ -971,6 +1019,10 @@ END_PROTECTED
 void
 TechSetupDialog::current_tech_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous)
 {
+  if (! m_current_tech_changed_enabled) {
+    return;
+  }
+
 BEGIN_PROTECTED
   try {
     if (current) {

@@ -119,6 +119,12 @@ signals:
    */
   void technologies_edited ();
 
+private slots:
+  /**
+   *  @brief Called when the salt got changed
+   */
+  void sync_with_external_sources ();
+
 private:
   tl::stable_vector <lay::Action> m_tech_actions;
   std::string m_current_technology;

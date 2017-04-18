@@ -81,6 +81,9 @@ namespace lay
 
 static void ui_exception_handler_tl (const tl::Exception &ex, QWidget *parent)
 {
+  //  Prevents severe side effects if there are pending deferred methods
+  tl::NoDeferredMethods silent;
+
   //  if any transaction is pending (this may happen when an operation threw an exception)
   //  close transactions.
   if (lay::MainWindow::instance () && lay::MainWindow::instance ()->manager ().transacting ()) {
@@ -123,6 +126,9 @@ static void ui_exception_handler_tl (const tl::Exception &ex, QWidget *parent)
 
 static void ui_exception_handler_std (const std::exception &ex, QWidget *parent)
 {
+  //  Prevents severe side effects if there are pending deferred methods
+  tl::NoDeferredMethods silent;
+
   //  if any transaction is pending (this may happen when an operation threw an exception)
   //  close transactions.
   if (lay::MainWindow::instance () && lay::MainWindow::instance ()->manager ().transacting ()) {
@@ -138,6 +144,9 @@ static void ui_exception_handler_std (const std::exception &ex, QWidget *parent)
 
 static void ui_exception_handler_def (QWidget *parent)
 {
+  //  Prevents severe side effects if there are pending deferred methods
+  tl::NoDeferredMethods silent;
+
   //  if any transaction is pending (this may happen when an operation threw an exception)
   //  close transactions.
   if (lay::MainWindow::instance () && lay::MainWindow::instance ()->manager ().transacting ()) {
@@ -597,10 +606,9 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
 
   if (sc) {
 
-    //  auto-import technologies
+    //  auto-import salt grains
     for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-      std::string tp = tl::to_string (QDir (tl::to_qstring (*p)).filePath (QString::fromUtf8 ("salt")));
-      sc->add_path (tp);
+      sc->add_path (*p);
     }
 
     sc->set_salt_mine_url (tl::salt_mine_url ());
@@ -611,8 +619,7 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
 
     //  auto-import technologies
     for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-      std::string tp = tl::to_string (QDir (tl::to_qstring (*p)).filePath (QString::fromUtf8 ("tech")));
-      tc->add_path (tp);
+      tc->add_path (*p);
     }
 
     //  import technologies from the command line

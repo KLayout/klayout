@@ -157,6 +157,7 @@ private:
   std::map <std::string, lay::TechnologyComponent *> m_technology_components;
   lay::TechnologyComponentEditor *mp_current_editor;
   lay::TechnologyComponent *mp_current_tech_component;
+  bool m_current_tech_changed_enabled;
 };
 
 class LAY_PUBLIC TechComponentSetupDialog

@@ -40,6 +40,7 @@ namespace lay
 MacroController::MacroController ()
   : mp_macro_editor (0), mp_mw (0), m_no_implicit_macros (false), m_file_watcher (0),
     dm_do_update_menu_with_macros (this, &MacroController::do_update_menu_with_macros),
+    dm_do_sync_with_external_sources (this, &MacroController::do_sync_with_external_sources),
     dm_sync_file_watcher (this, &MacroController::sync_file_watcher),
     dm_sync_files (this, &MacroController::sync_files)
 {
@@ -288,7 +289,7 @@ MacroController::enable_implicit_macros (bool enable)
 }
 
 void
-MacroController::sync_implicit_macros (bool check_autorun)
+MacroController::sync_implicit_macros (bool ask_before_autorun)
 {
   if (m_no_implicit_macros) {
     return;
@@ -427,7 +428,7 @@ MacroController::sync_implicit_macros (bool check_autorun)
 
   }
 
-  if (check_autorun) {
+  {
 
     //  This prevents the message dialog below to issue deferred methods
     tl::NoDeferredMethods silent;
@@ -438,7 +439,7 @@ MacroController::sync_implicit_macros (bool check_autorun)
     }
 
     if (has_autorun) {
-      if (QMessageBox::question (mp_mw, QObject::tr ("Run Macros"), QObject::tr ("Some macros associated with new items are configured to run automatically.\n\nChoose 'Yes' to run these macros now. Choose 'No' to not run them."), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+      if (! ask_before_autorun || QMessageBox::question (mp_mw, QObject::tr ("Run Macros"), QObject::tr ("Some macros associated with new items are configured to run automatically.\n\nChoose 'Yes' to run these macros now. Choose 'No' to not run them."), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
         for (std::vector<lay::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end (); ++m) {
           (*m)->autorun ();
         }
@@ -547,6 +548,12 @@ MacroController::add_macro_items_to_menu (lay::MacroCollection &collection, int 
 
 void
 MacroController::sync_with_external_sources ()
+{
+  dm_do_sync_with_external_sources ();
+}
+
+void
+MacroController::do_sync_with_external_sources ()
 {
   try {
     sync_implicit_macros (true);

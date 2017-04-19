@@ -99,6 +99,13 @@ public:
   SaltGrain *grain_from_index (const QModelIndex &index) const;
 
   /**
+   *  @brief Marks the model as "under construction"
+   *  This method can be called (multiple times) before update to mark the model
+   *  as being under construction. update() will end this state.
+   */
+  void begin_update ();
+
+  /**
    *  @brief Updates the model
    *  Needs to be called when the salt has changed.
    */
@@ -169,6 +176,7 @@ public:
   std::map<std::string, std::pair<Severity, std::string> > m_messages;
   std::map<std::string, int> m_display_order;
   std::vector<SaltGrain *> m_ordered_grains;
+  bool m_in_update;
 
   bool is_marked (const std::string &name) const;
   bool is_enabled (const std::string &name) const;

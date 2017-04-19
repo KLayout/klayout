@@ -1055,48 +1055,6 @@ Application::run ()
 
   }
 
-  //  scan for libraries
-  for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-
-    QDir lp = QDir (tl::to_qstring (*p)).filePath (tl::to_qstring ("libraries"));
-
-    QStringList name_filters;
-    name_filters << QString::fromUtf8 ("*");
-
-    QStringList libs = lp.entryList (name_filters, QDir::Files);
-    for (QStringList::const_iterator im = libs.begin (); im != libs.end (); ++im) {
-
-      std::string filename = tl::to_string (*im);
-
-      try {
-
-        std::auto_ptr<db::Library> lib (new db::Library ());
-        lib->set_description (filename);
-        lib->set_name (tl::to_string (QFileInfo (*im).baseName ()));
-
-        tl::log << "Reading library '" << filename << "'";
-        tl::InputStream stream (tl::to_string (lp.filePath (*im)));
-        db::Reader reader (stream);
-        reader.read (lib->layout ());
-
-        //  Use the libname if there is one
-        for (db::Layout::meta_info_iterator m = lib->layout ().begin_meta (); m != lib->layout ().end_meta (); ++m) {
-            if (m->name == "libname" && ! m->value.empty ()) {
-                lib->set_name (m->value);
-                break;
-            }
-        }
-
-        db::LibraryManager::instance ().register_lib (lib.release ());
-
-      } catch (tl::Exception &ex) {
-        tl::error << ex.msg ();
-      }
-
-    }
-
-  }
-
   //  run all autorun macros
   lay::MacroCollection::root ().autorun ();
 

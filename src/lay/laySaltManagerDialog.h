@@ -52,9 +52,19 @@ public:
 
 private slots:
   /**
+   *  @brief Called when the list of packages (grains) is about to change
+   */
+  void salt_about_to_change ();
+
+  /**
    *  @brief Called when the list of packages (grains) has changed
    */
   void salt_changed ();
+
+  /**
+   *  @brief Called when the repository (salt mine) is about to change
+   */
+  void salt_mine_about_to_change ();
 
   /**
    *  @brief Called when the repository (salt mine) has changed

@@ -220,12 +220,14 @@ private:
   std::vector<ExternalPathDescriptor> m_external_paths;
   tl::FileSystemWatcher *m_file_watcher;
   tl::DeferredMethod<MacroController> dm_do_update_menu_with_macros;
+  tl::DeferredMethod<MacroController> dm_do_sync_with_external_sources;
   tl::DeferredMethod<MacroController> dm_sync_file_watcher;
   tl::DeferredMethod<MacroController> dm_sync_files;
 
-  void sync_implicit_macros (bool check_autorun);
+  void sync_implicit_macros (bool ask_before_autorun);
   void add_macro_items_to_menu (lay::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings);
   void do_update_menu_with_macros ();
+  void do_sync_with_external_sources ();
   void sync_file_watcher ();
   void sync_files ();
 };

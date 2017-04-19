@@ -187,6 +187,11 @@ public:
 
 signals:
   /**
+   *  @brief A signal triggered before one of the collections changed
+   */
+  void collections_about_to_change ();
+
+  /**
    *  @brief A signal triggered when one of the collections changed
    */
   void collections_changed ();

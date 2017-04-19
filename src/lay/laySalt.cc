@@ -49,6 +49,7 @@ Salt::Salt (const Salt &other)
 Salt &Salt::operator= (const Salt &other)
 {
   if (this != &other) {
+    emit collections_about_to_change ();
     m_root = other.m_root;
     invalidate ();
   }
@@ -97,6 +98,7 @@ Salt::add_location (const std::string &path)
   }
 
   lay::SaltGrains gg = lay::SaltGrains::from_path (path);
+  emit collections_about_to_change ();
   m_root.add_collection (gg);
   invalidate ();
 }
@@ -107,6 +109,7 @@ Salt::remove_location (const std::string &path)
   QFileInfo fi (tl::to_qstring (path));
   for (lay::SaltGrains::collection_iterator g = m_root.begin_collections (); g != m_root.end_collections (); ++g) {
     if (QFileInfo (tl::to_qstring (g->path ())) == fi) {
+      emit collections_about_to_change ();
       m_root.remove_collection (g, false);
       invalidate ();
       return;
@@ -122,6 +125,7 @@ Salt::refresh ()
     new_root.add_collection (lay::SaltGrains::from_path (g->path ()));
   }
   if (new_root != m_root) {
+    emit collections_about_to_change ();
     m_root = new_root;
     invalidate ();
   }
@@ -208,21 +212,18 @@ bool remove_from_collection (SaltGrains &collection, const std::string &name)
 bool
 Salt::remove_grain (const SaltGrain &grain)
 {
+  emit collections_about_to_change ();
+
   tl::info << QObject::tr ("Removing package '%1' ..").arg (tl::to_qstring (grain.name ()));
-  if (remove_from_collection (m_root, grain.name ())) {
-
+  bool res = remove_from_collection (m_root, grain.name ());
+  if (res) {
     tl::info << QObject::tr ("Package '%1' removed.").arg (tl::to_qstring (grain.name ()));
-
-    //  NOTE: this is a bit brute force .. we could as well try to insert the new grain into the existing structure
-    refresh ();
-
-    invalidate ();
-    return true;
-
   } else {
     tl::warn << QObject::tr ("Failed to remove package '%1'.").arg (tl::to_qstring (grain.name ()));
-    return false;
   }
+
+  invalidate ();
+  return res;
 }
 
 namespace

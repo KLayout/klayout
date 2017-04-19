@@ -137,7 +137,9 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, lay::Sal
   connect (mode_tab, SIGNAL (currentChanged (int)), this, SLOT (mode_changed ()));
 
   connect (mp_salt, SIGNAL (collections_changed ()), this, SLOT (salt_changed ()));
+  connect (mp_salt, SIGNAL (collections_about_to_change ()), this, SLOT (salt_about_to_change ()));
   connect (mp_salt_mine, SIGNAL (collections_changed ()), this, SLOT (salt_mine_changed ()));
+  connect (mp_salt_mine, SIGNAL (collections_about_to_change ()), this, SLOT (salt_mine_about_to_change ()));
 
   update_models ();
 
@@ -408,9 +410,25 @@ END_PROTECTED
 }
 
 void
+SaltManagerDialog::salt_about_to_change ()
+{
+  SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
+  tl_assert (model != 0);
+  model->begin_update ();
+}
+
+void
 SaltManagerDialog::salt_changed ()
 {
   dm_update_models ();
+}
+
+void
+SaltManagerDialog::salt_mine_about_to_change ()
+{
+  SaltModel *mine_model = dynamic_cast <SaltModel *> (salt_mine_view->model ());
+  tl_assert (mine_model != 0);
+  mine_model->begin_update ();
 }
 
 void

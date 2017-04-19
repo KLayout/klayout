@@ -96,7 +96,7 @@ SaltItemDelegate::sizeHint (const QStyleOptionViewItem &option, const QModelInde
 // --------------------------------------------------------------------------------------
 
 SaltModel::SaltModel (QObject *parent, lay::Salt *salt)
-  : QAbstractItemModel (parent), mp_salt (salt)
+  : QAbstractItemModel (parent), mp_salt (salt), m_in_update (false)
 {
   create_ordered_list ();
 }
@@ -221,7 +221,7 @@ SaltModel::index (int row, int column, const QModelIndex &parent) const
   if (parent.isValid ()) {
     return QModelIndex ();
   } else {
-    return createIndex (row, column, m_ordered_grains [row]);
+    return createIndex (row, column);
   }
 }
 
@@ -250,8 +250,8 @@ SaltModel::rowCount (const QModelIndex &parent) const
 SaltGrain *
 SaltModel::grain_from_index (const QModelIndex &index) const
 {
-  if (index.isValid ()) {
-    return static_cast<SaltGrain *> (index.internalPointer ());
+  if (index.isValid () && index.row () >= 0 && index.row () < int (m_ordered_grains.size ())) {
+    return m_ordered_grains [index.row ()];
   } else {
     return 0;
   }
@@ -363,10 +363,22 @@ SaltModel::clear_messages ()
 }
 
 void
+SaltModel::begin_update ()
+{
+  if (! m_in_update) {
+    m_ordered_grains.clear ();
+    beginResetModel ();
+    m_in_update = true;
+  }
+}
+
+void
 SaltModel::update ()
 {
+  begin_update ();
   create_ordered_list ();
-  reset ();
+  endResetModel ();
+  m_in_update = false;
 }
 
 void

@@ -1114,13 +1114,13 @@ do_extract_rad_from_contour (typename db::polygon<C>::polygon_contour_iterator f
 }
 
 bool
-extract_rad_from_contour (typename db::Polygon::polygon_contour_iterator from, typename db::Polygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::Point> *new_pts, bool fallback)
+extract_rad_from_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::Point> *new_pts, bool fallback)
 {
   return do_extract_rad_from_contour (from, to, rinner, router, n, new_pts, fallback);
 }
 
 bool
-extract_rad_from_contour (typename db::DPolygon::polygon_contour_iterator from, typename db::DPolygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::DPoint> *new_pts, bool fallback)
+extract_rad_from_contour (db::DPolygon::polygon_contour_iterator from, db::DPolygon::polygon_contour_iterator to, double &rinner, double &router, unsigned int &n, std::vector <db::DPoint> *new_pts, bool fallback)
 {
   return do_extract_rad_from_contour (from, to, rinner, router, n, new_pts, fallback);
 }

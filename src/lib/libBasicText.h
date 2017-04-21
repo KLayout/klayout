@@ -83,6 +83,17 @@ public:
    */
   virtual std::vector<db::PCellParameterDeclaration> get_parameter_declarations () const;
 
+protected:
+  /**
+   *  @brief Returns a value indicating that this PCell wants to update it's parameter declarations dynamically
+   *
+   *  This is be required because the fonts can be updated dynamically when new packages are installed.
+   */
+  virtual bool wants_parameter_declaration_caching () const
+  {
+    return false;
+  }
+
 public:
   int get_font_index (const db::pcell_parameters_type &parameters) const;
 };

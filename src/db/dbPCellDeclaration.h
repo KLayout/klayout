@@ -453,7 +453,7 @@ public:
    */
   const std::vector<PCellParameterDeclaration> &parameter_declarations () const
   {
-    if (! m_has_parameter_declarations) {
+    if (! m_has_parameter_declarations || ! wants_parameter_declaration_caching ()) {
       m_parameter_declarations = get_parameter_declarations ();
       m_has_parameter_declarations = true;
     }
@@ -494,6 +494,18 @@ public:
    *  @brief Map a named parameter set to a parameter vector
    */
   pcell_parameters_type map_parameters (const std::map<std::string, tl::Variant> &named_parameters) const;
+
+protected:
+  /**
+   *  @brief Gets a value indicating whether the PCell wants caching of the parameter declarations
+   *
+   *  Some PCells with a dynamic parameter definition may not want paramater declaration caching. These
+   *  PCells can override this method and return false.
+   */
+  virtual bool wants_parameter_declaration_caching () const
+  {
+    return true;
+  }
 
 private:
   int m_ref_count;

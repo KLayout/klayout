@@ -58,7 +58,8 @@ HEADERS = \
     laySaltModel.h \
     laySaltController.h \
     laySignalHandler.h \
-    layLibraryController.h
+    layLibraryController.h \
+    layFontController.h
 
 FORMS = \
     ClipDialog.ui \
@@ -162,7 +163,8 @@ SOURCES = \
     laySaltModel.cc \
     laySaltController.cc \
     laySignalHandler.cc \
-    layLibraryController.cc
+    layLibraryController.cc \
+    layFontController.cc
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \

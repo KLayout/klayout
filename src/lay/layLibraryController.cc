@@ -255,7 +255,7 @@ LibraryController::instance ()
 }
 
 //  The singleton instance of the library controller
-static tl::RegisteredClass<lay::PluginDeclaration> salt_controller_decl (new lay::LibraryController (), 150, "LibraryController");
+static tl::RegisteredClass<lay::PluginDeclaration> library_controller_decl (new lay::LibraryController (), 150, "LibraryController");
 
 }
 

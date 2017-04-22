@@ -512,7 +512,10 @@ SaltManagerDialog::edit_properties ()
 {
   SaltGrain *g = current_grain ();
   if (g) {
-    if (mp_properties_dialog->exec_dialog (g, mp_salt)) {
+    if (g->is_readonly ()) {
+      QMessageBox::critical (this, tr ("Package is not Editable"),
+                                   tr ("This package cannot be edited.\n\nEither you don't have write permissions on the directory or the package was installed from a repository."));
+    } else if (mp_properties_dialog->exec_dialog (g, mp_salt)) {
       current_changed ();
     }
   }

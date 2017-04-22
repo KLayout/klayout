@@ -337,7 +337,9 @@ SaltGrain::xml_struct ()
 bool
 SaltGrain::is_readonly () const
 {
-  return !QFileInfo (tl::to_qstring (path ())).isWritable ();
+  //  A grain is readonly if the directory is not writable or there is a download URL
+  //  (this means the grain has been installed from an URL).
+  return !QFileInfo (tl::to_qstring (path ())).isWritable () || !m_url.empty ();
 }
 
 void

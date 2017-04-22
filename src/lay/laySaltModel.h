@@ -61,7 +61,7 @@ public:
   /**
    *  @brief Constructor
    */
-  SaltModel (QObject *parent, lay::Salt *salt);
+  SaltModel (QObject *parent, lay::Salt *salt, Salt *salt_filtered = 0, bool salt_exclude = false);
 
   /**
    *  @brief Implementation of the QAbstractItemModel interface
@@ -170,7 +170,8 @@ public:
   void clear_order ();
 
 public:
-  lay::Salt *mp_salt;
+  lay::Salt *mp_salt, *mp_salt_filtered;
+  bool m_salt_exclude;
   std::set<std::string> m_marked;
   std::set<std::string> m_disabled;
   std::map<std::string, std::pair<Severity, std::string> > m_messages;

@@ -24,6 +24,7 @@
 #define HDR_laySaltManagerDialog
 
 #include "ui_SaltManagerDialog.h"
+#include "laySalt.h"
 #include "tlDeferredExecution.h"
 
 #include <QDialog>
@@ -32,8 +33,6 @@
 namespace lay
 {
 
-class Salt;
-class SaltGrain;
 class SaltGrainPropertiesDialog;
 
 /**
@@ -48,7 +47,7 @@ public:
   /**
    *  @brief Constructor
    */
-  SaltManagerDialog (QWidget *parent, lay::Salt *salt, lay::Salt *salt_mine);
+  SaltManagerDialog (QWidget *parent, lay::Salt *salt, const std::string &salt_mine_url);
 
 private slots:
   /**
@@ -77,9 +76,14 @@ private slots:
   void current_changed ();
 
   /**
-   *  @brief Called when the currently selected package from the salt mine has changed
+   *  @brief Called when the currently selected package from the update page has changed
    */
-  void mine_current_changed ();
+  void mine_update_current_changed ();
+
+  /**
+   *  @brief Called when the currently selected package from the new installation page has changed
+   */
+  void mine_new_current_changed ();
 
   /**
    *  @brief Called when the "edit" button is pressed
@@ -117,31 +121,54 @@ private slots:
   void search_text_changed (const QString &text);
 
   /**
-   *  @brief Called to show the marked items only
+   *  @brief Called to show the marked items only (new packages tab)
    */
-  void show_marked_only ();
+  void show_marked_only_new ();
 
   /**
-   *  @brief Called to show all items again
+   *  @brief Called to show all items again (new packages tab)
    */
-  void show_all ();
+  void show_all_new ();
 
   /**
-   *  @brief Called to unmark all items
+   *  @brief Called to unmark all items (new packages tab)
    */
-  void unmark_all ();
+  void unmark_all_new ();
+
+  /**
+   *  @brief Called to show the marked items only (update packages tab)
+   */
+  void show_marked_only_update ();
+
+  /**
+   *  @brief Called to show all items again (update packages tab)
+   */
+  void show_all_update ();
+
+  /**
+   *  @brief Called to unmark all items (update packages tab)
+   */
+  void unmark_all_update ();
+
+  /**
+   *  @brief Reloads the salt mine
+   */
+  void refresh ();
 
 private:
-  Salt *mp_salt, *mp_salt_mine;
-  std::auto_ptr<SaltGrain> m_remote_grain;
-  bool m_current_changed_enabled;
+  Salt *mp_salt;
+  Salt m_salt_mine;
+  std::string m_salt_mine_url;
+  std::auto_ptr<SaltGrain> m_remote_update_grain;
+  std::auto_ptr<SaltGrain> m_remote_new_grain;
   SaltGrainPropertiesDialog *mp_properties_dialog;
   tl::DeferredMethod<SaltManagerDialog> dm_update_models;
+  int m_current_tab;
 
   SaltGrain *current_grain ();
-  SaltGrain *mine_current_grain ();
   void update_models ();
   void update_apply_state ();
+  SaltGrain *get_remote_grain_info (lay::SaltGrain *g, QString &html);
 };
 
 }

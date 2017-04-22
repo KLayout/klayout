@@ -121,16 +121,7 @@ SaltController::show_editor ()
 {
   if (mp_mw && !mp_salt_dialog) {
 
-    try {
-      if (! m_salt_mine_url.empty ()) {
-        tl::log << tl::to_string (tr ("Downloading package repository from %1").arg (tl::to_qstring (m_salt_mine_url)));
-        m_salt_mine.load (m_salt_mine_url);
-      }
-    } catch (tl::Exception &ex) {
-      tl::error << ex.msg ();
-    }
-
-    mp_salt_dialog = new lay::SaltManagerDialog (mp_mw, &m_salt, &m_salt_mine);
+    mp_salt_dialog = new lay::SaltManagerDialog (mp_mw, &m_salt, m_salt_mine_url);
 
   }
 

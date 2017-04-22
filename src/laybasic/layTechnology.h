@@ -281,6 +281,24 @@ public:
   }
 
   /**
+   *  @brief Sets the package source
+   *
+   *  This attribute indicates that this technology was contributed by a package
+   */
+  void set_grain_name (const std::string &g)
+  {
+    m_grain_name = g;
+  }
+
+  /**
+   *  @brief Gets the package source
+   */
+  const std::string &grain_name () const
+  {
+    return m_grain_name;
+  }
+
+  /**
    *  @brief Gets the base path 
    *
    *  The base path is an effective path - if the explicit path is set, it is 
@@ -575,6 +593,7 @@ public:
 
 private:
   std::string m_name, m_description;
+  std::string m_grain_name;
   double m_dbu;
   std::string m_explicit_base_path, m_default_base_path;
   db::LoadLayoutOptions m_load_layout_options;

@@ -50,6 +50,28 @@ namespace lay
 {
 
 // ----------------------------------------------------------------
+
+static std::string
+title_for_technology (const lay::Technology *t)
+{
+  std::string d;
+  if (t->name ().empty ()) {
+    d = t->description ();
+  } else {
+    d += t->name ();
+    if (! t->grain_name ().empty ()) {
+      d += " ";
+      d += tl::to_string (QObject::tr ("[Package %1]").arg (tl::to_qstring (t->grain_name ())));
+    }
+    if (! t->description ().empty ()) {
+      d += " - ";
+      d += t->description ();
+    }
+  }
+  return d;
+}
+
+// ----------------------------------------------------------------
 //  TechBaseEditorPage implementation
 
 TechBaseEditorPage::TechBaseEditorPage (QWidget *parent)
@@ -843,15 +865,8 @@ TechSetupDialog::update_tech_tree ()
     QFont f (tech_tree->font ());
     f.setItalic (t->second->is_readonly ());
 
-    std::string d;
-    d += t->first;
-    if (! d.empty () && ! t->second->description ().empty ()) {
-      d += " - ";
-    }
-    d += t->second->description ();
-
     QTreeWidgetItem *ti = new QTreeWidgetItem (tech_tree);
-    ti->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (d)));
+    ti->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (title_for_technology (t->second))));
     ti->setData (0, Qt::UserRole, QVariant (tl::to_qstring (t->first)));
     ti->setData (0, Qt::FontRole, QVariant (f));
     if (! t->second->tech_file_path ().empty ()) {
@@ -1059,13 +1074,7 @@ TechSetupDialog::commit_tech_component ()
       QTreeWidgetItem *item = tech_tree->topLevelItem (i - 1);
 
       lay::Technology *t = m_technologies.technology_by_name (tl::to_string (item->data (0, Qt::UserRole).toString ()));
-      std::string d = t->name ();
-      if (! d.empty () && ! t->description ().empty ()) {
-        d += " - ";
-      }
-      d += t->description ();
-
-      item->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (d)));
+      item->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (title_for_technology (t))));
 
     }
 

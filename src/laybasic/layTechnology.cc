@@ -252,7 +252,7 @@ Technology::~Technology ()
 
 Technology::Technology (const Technology &d)
   : tl::Object (),
-    m_name (d.m_name), m_description (d.m_description), m_dbu (d.m_dbu),
+    m_name (d.m_name), m_description (d.m_description), m_grain_name (d.m_grain_name), m_dbu (d.m_dbu),
     m_explicit_base_path (d.m_explicit_base_path), m_default_base_path (d.m_default_base_path),
     m_load_layout_options (d.m_load_layout_options),
     m_save_layout_options (d.m_save_layout_options),
@@ -270,6 +270,7 @@ Technology &Technology::operator= (const Technology &d)
 
     m_name = d.m_name;
     m_description = d.m_description;
+    m_grain_name = d.m_grain_name;
     m_dbu = d.m_dbu;
     m_default_base_path = d.m_default_base_path;
     m_explicit_base_path = d.m_explicit_base_path;

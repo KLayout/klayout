@@ -495,12 +495,18 @@ TechnologyController::rescan (lay::Technologies &technologies)
   }
 
   std::vector<std::string> paths = m_paths;
+  std::set<std::string> readonly_paths;
+  std::map<std::string, std::string> grain_names;
 
   //  add the salt grains as potential sources for tech definitions
   lay::SaltController *sc = lay::SaltController::instance ();
   if (sc) {
     for (lay::Salt::flat_iterator g = sc->salt ().begin_flat (); g != sc->salt ().end_flat (); ++g) {
       paths.push_back ((*g)->path ());
+      grain_names.insert (std::make_pair ((*g)->path (), (*g)->name ()));
+      if ((*g)->is_readonly ()) {
+        readonly_paths.insert ((*g)->path ());
+      }
     }
   }
 
@@ -509,6 +515,14 @@ TechnologyController::rescan (lay::Technologies &technologies)
     QDir dir (tl::to_qstring (*p));
     if (! dir.exists ()) {
       continue;
+    }
+
+    bool readonly = (readonly_paths.find (*p) != readonly_paths.end ());
+
+    std::string grain_name;
+    std::map<std::string, std::string>::const_iterator gn = grain_names.find (*p);
+    if (gn != grain_names.end ()) {
+      grain_name = gn->second;
     }
 
     QStringList name_filters;
@@ -534,7 +548,8 @@ TechnologyController::rescan (lay::Technologies &technologies)
         lay::Technology t;
         t.load (tl::to_string (*lf));
         t.set_persisted (false);   // don't save that one in the configuration
-        t.set_readonly (! QFileInfo (dir.filePath (*lf)).isWritable ());
+        t.set_readonly (readonly || ! QFileInfo (dir.filePath (*lf)).isWritable ());
+        t.set_grain_name (grain_name);
         technologies.add (new lay::Technology (t));
 
       } catch (tl::Exception &ex) {

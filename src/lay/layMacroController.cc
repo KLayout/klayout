@@ -300,12 +300,21 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
   //  Add additional places where the technologies define some macros
 
   std::map<std::string, std::vector<std::string> > tech_names_by_path;
+  std::map<std::string, std::vector<std::string> > grain_names_by_path;
+  std::set<std::string> readonly_paths;
 
   for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
     if (! t->base_path ().empty ()) {
       QDir base_dir (tl::to_qstring (t->base_path ()));
       if (base_dir.exists ()) {
-        tech_names_by_path [tl::to_string (base_dir.absolutePath ())].push_back (t->name ());
+        std::string path = tl::to_string (base_dir.absolutePath ());
+        tech_names_by_path [path].push_back (t->name ());
+        if (t->is_readonly ()) {
+          readonly_paths.insert (path);
+        }
+        if (! t->grain_name ().empty ()) {
+          grain_names_by_path [path].push_back (t->grain_name ());
+        }
       }
     }
   }
@@ -325,7 +334,17 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
           description = tl::to_string (tr ("Technologies %1").arg (tl::to_qstring (tl::join (t->second, ","))));
         }
 
-        external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lay::MacroCollection::TechFolder));
+        std::map<std::string, std::vector<std::string> >::const_iterator gn = grain_names_by_path.find (t->first);
+        if (gn != grain_names_by_path.end ()) {
+          description += " - ";
+          if (gn->second.size () == 1) {
+            description += tl::to_string (tr ("Package %1").arg (tl::to_qstring (gn->second.front ())));
+          } else {
+            description += tl::to_string (tr ("Packages %1").arg (tl::to_qstring (tl::join (gn->second, ","))));
+          }
+        }
+
+        external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lay::MacroCollection::TechFolder, readonly_paths.find (t->first) != readonly_paths.end ()));
 
       }
 
@@ -350,7 +369,7 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
         if (macro_dir.exists ()) {
 
           std::string description = tl::to_string (tr ("Package %1").arg (tl::to_qstring (g->name ())));
-          external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lay::MacroCollection::SaltFolder));
+          external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lay::MacroCollection::SaltFolder, g->is_readonly ()));
 
         }
 
@@ -420,7 +439,7 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
     //  In that case, the add_folder method will return 0.
 
     //  TODO: is it wise to make this writeable?
-    lay::MacroCollection *mc = lay::MacroCollection::root ().add_folder (p->description, p->path, p->cat, false);
+    lay::MacroCollection *mc = lay::MacroCollection::root ().add_folder (p->description, p->path, p->cat, p->readonly);
     if (mc) {
       mc->set_virtual_mode (p->type);
       new_folders.push_back (mc);

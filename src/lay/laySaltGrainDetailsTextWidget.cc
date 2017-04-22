@@ -28,6 +28,8 @@
 #include <QBuffer>
 #include <QIcon>
 #include <QPainter>
+#include <QDir>
+#include <QFileInfo>
 
 namespace lay
 {
@@ -116,6 +118,37 @@ SaltGrainDetailsTextWidget::loadResource (int type, const QUrl &url)
   }
 }
 
+static void produce_listing (QTextStream &stream, QDir dir, int level)
+{
+  for (int i = 0; i < level + 1; ++i) {
+    stream << "<img src=\":/empty_12.png\"/>&nbsp;&nbsp;";
+  }
+  stream << "<img src=\":/folder_12.png\"/>&nbsp;&nbsp;<i>";
+  if (level > 0) {
+    stream << tl::escaped_to_html (tl::to_string (dir.dirName ())).c_str ();
+  } else {
+    stream << tl::escaped_to_html (tl::to_string (dir.absolutePath ())).c_str ();
+  }
+  stream << "</i><br/>\n";
+
+  level += 1;
+
+  QStringList entries = dir.entryList (QDir::AllEntries | QDir::NoDotAndDotDot, QDir::Name);
+  for (QStringList::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+
+    QFileInfo fi (dir.filePath (*e));
+    if (fi.isDir ()) {
+      produce_listing (stream, QDir (fi.filePath ()), level);
+    } else {
+      for (int i = 0; i < level + 1; ++i) {
+        stream << "<img src=\":/empty_12.png\"/>&nbsp;&nbsp;";
+      }
+      stream << "<img src=\":/file_12.png\"/>&nbsp;&nbsp;" << tl::escaped_to_html (tl::to_string (*e)).c_str () << "<br/>\n";
+    }
+
+  }
+}
+
 QString
 SaltGrainDetailsTextWidget::details_text ()
 {
@@ -197,6 +230,12 @@ SaltGrainDetailsTextWidget::details_text ()
   stream << "</p>";
 
   stream << "<p>";
+  if (! g->api_version ().empty ()) {
+    stream << "<b>" << QObject::tr ("API version") << ":</b> " << tl::to_qstring (tl::escaped_to_html (g->api_version ())) << " ";
+  }
+  stream << "</p>";
+
+  stream << "<p>";
   if (! g->doc_url ().empty ()) {
     stream << "<b>" << QObject::tr ("Documentation link") << ":</b> <a href=\"" << tl::to_qstring (g->doc_url ()) << "\">" << tl::to_qstring (tl::escaped_to_html (g->doc_url ())) << "</a>";
   } else {
@@ -215,7 +254,6 @@ SaltGrainDetailsTextWidget::details_text ()
   stream << "<br/>";
   stream << "<h3>" << QObject::tr ("Installation") << "</h3>";
 
-  stream << "<p><b>" << QObject::tr ("Installation path: ") << "</b>" << tl::to_qstring (tl::escaped_to_html (g->path ())) << "</p>";
   if (! g->url ().empty ()) {
     stream << "<p><b>" << QObject::tr ("Download URL: ") << "</b>" << tl::to_qstring (tl::escaped_to_html (g->url ())) << "</p>";
   }
@@ -232,6 +270,12 @@ SaltGrainDetailsTextWidget::details_text ()
         stream << "[" << tl::to_qstring (tl::escaped_to_html (d->url)) << "]<br/>";
       }
     }
+    stream << "</p>";
+  }
+
+  if (! g->path ().empty ()) {
+    stream << "<p><b>" << QObject::tr ("Installed files: ") << "</b></p><p>";
+    produce_listing (stream, QDir (tl::to_qstring (g->path ())), 0);
     stream << "</p>";
   }
 

@@ -162,6 +162,23 @@ public:
   void set_version (const std::string &v);
 
   /**
+   *  @brief Gets the API version of the grain
+   *
+   *  The API version is the KLayout version required to run the grain's macros.
+   *  A version string is of the form "x.y..." where x, y and other version
+   *  components are integer numbers.
+   */
+  const std::string &api_version () const
+  {
+    return m_api_version;
+  }
+
+  /**
+   *  @brief Sets the API version of the grain
+   */
+  void set_api_version (const std::string &v);
+
+  /**
    *  @brief Gets the author of the grain
    */
   const std::string &author () const
@@ -403,6 +420,7 @@ public:
 private:
   std::string m_name;
   std::string m_version;
+  std::string m_api_version;
   std::string m_path;
   std::string m_url;
   std::string m_title;

@@ -217,6 +217,9 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
 void
 SaltManagerDialog::mode_changed ()
 {
+  //  commits edits:
+  setFocus (Qt::NoFocusReason);
+
   QList<int> sizes;
   if (m_current_tab == 0) {
     sizes = splitter->sizes ();
@@ -747,12 +750,8 @@ BEGIN_PROTECTED
 
   details_update_frame->setEnabled (g != 0);
 
-  QString html;
-  SaltGrain *remote_grain = get_remote_grain_info (g, html);
-
+  SaltGrain *remote_grain = get_remote_grain_info (g, details_update_text);
   m_remote_update_grain.reset (remote_grain);
-  details_update_text->set_grain (remote_grain);
-  details_update_text->setHtml (html);
 
 END_PROTECTED
 }
@@ -768,18 +767,14 @@ BEGIN_PROTECTED
 
   details_new_frame->setEnabled (g != 0);
 
-  QString html;
-  SaltGrain *remote_grain = get_remote_grain_info (g, html);
-
+  SaltGrain *remote_grain = get_remote_grain_info (g, details_new_text);
   m_remote_new_grain.reset (remote_grain);
-  details_new_text->set_grain (remote_grain);
-  details_new_text->setHtml (html);
 
 END_PROTECTED
 }
 
 lay::SaltGrain *
-SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, QString &html)
+SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details)
 {
   if (! g) {
     return 0;
@@ -795,7 +790,7 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, QString &html)
       throw tl::Exception (tl::to_string (tr ("No download link available")));
     }
 
-    html = tr (
+    QString html = tr (
       "<html>"
         "<body>"
           "<font color=\"#c0c0c0\">"
@@ -806,6 +801,8 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, QString &html)
       "</html>"
     )
     .arg (tl::to_qstring (SaltGrain::spec_url (g->url ())));
+
+    details->setHtml (html);
 
     QApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
 
@@ -822,11 +819,13 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, QString &html)
       throw tl::Exception (tl::to_string (tr ("Version mismatch between repository and actual package (repository: %1, package: %2)").arg (tl::to_qstring (g->version ())).arg (tl::to_qstring (remote_grain->version ()))));
     }
 
+    details->set_grain (remote_grain.get ());
+
   } catch (tl::Exception &ex) {
 
     remote_grain.reset (0);
 
-    html = tr (
+    QString html = tr (
       "<html>"
         "<body>"
           "<font color=\"#ff0000\">"
@@ -839,6 +838,8 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, QString &html)
     )
     .arg (tl::to_qstring (SaltGrain::spec_url (g->url ())))
     .arg (tl::to_qstring (tl::escaped_to_html (ex.msg ())));
+
+    details->setHtml (html);
 
   }
 

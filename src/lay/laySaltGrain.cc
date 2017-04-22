@@ -46,6 +46,7 @@ SaltGrain::operator== (const SaltGrain &other) const
   return m_name == other.m_name &&
          m_path == other.m_path &&
          m_version == other.m_version &&
+         m_api_version == other.m_api_version &&
          m_url == other.m_url &&
          m_title == other.m_title &&
          m_doc == other.m_doc &&
@@ -70,6 +71,12 @@ void
 SaltGrain::set_version (const std::string &v)
 {
   m_version = v;
+}
+
+void
+SaltGrain::set_api_version (const std::string &v)
+{
+  m_api_version = v;
 }
 
 void
@@ -301,6 +308,7 @@ struct ImageConverter
 static tl::XMLElementList s_xml_elements =
   tl::make_member (&SaltGrain::name, &SaltGrain::set_name, "name") +
   tl::make_member (&SaltGrain::version, &SaltGrain::set_version, "version") +
+  tl::make_member (&SaltGrain::api_version, &SaltGrain::set_api_version, "api-version") +
   tl::make_member (&SaltGrain::title, &SaltGrain::set_title, "title") +
   tl::make_member (&SaltGrain::doc, &SaltGrain::set_doc, "doc") +
   tl::make_member (&SaltGrain::doc_url, &SaltGrain::set_doc_url, "doc-url") +

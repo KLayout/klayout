@@ -168,7 +168,7 @@ private:
   SaltGrain *current_grain ();
   void update_models ();
   void update_apply_state ();
-  SaltGrain *get_remote_grain_info (lay::SaltGrain *g, QString &html);
+  SaltGrain *get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details);
 };
 
 }

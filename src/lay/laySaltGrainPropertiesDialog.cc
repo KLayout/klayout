@@ -160,6 +160,7 @@ SaltGrainPropertiesDialog::update_controls ()
   dependencies_alert->clear ();
 
   version->setText (tl::to_qstring (m_grain.version ()));
+  api_version->setText (tl::to_qstring (m_grain.api_version ()));
   title->setText (tl::to_qstring (m_grain.title ()));
   author->setText (tl::to_qstring (m_grain.author ()));
   author_contact->setText (tl::to_qstring (m_grain.author_contact ()));
@@ -222,6 +223,7 @@ void
 SaltGrainPropertiesDialog::update_data ()
 {
   m_grain.set_version (tl::to_string (version->text ()));
+  m_grain.set_api_version (tl::to_string (api_version->text ()));
   m_grain.set_title (tl::to_string (title->text ()));
   m_grain.set_author (tl::to_string (author->text ()));
   m_grain.set_author_contact (tl::to_string (author_contact->text ()));
@@ -524,6 +526,12 @@ SaltGrainPropertiesDialog::accept ()
     version_alert->error () << tr ("'%1' is not a valid version string. A version string needs to be numeric (like '1.2.3' or '4.5'').").arg (tl::to_qstring (m_grain.version ()));
   }
 
+  //  API version
+  api_version_alert->clear ();
+  if (! m_grain.api_version ().empty () && ! SaltGrain::valid_version (m_grain.api_version ())) {
+    api_version_alert->error () << tr ("'%1' is not a valid API version string. An API version string needs to be numeric (like '0.25'').").arg (tl::to_qstring (m_grain.api_version ()));
+  }
+
   //  doc URL
   doc_url_alert->clear ();
   if (! m_grain.doc_url ().empty ()) {
@@ -595,7 +603,8 @@ SaltGrainPropertiesDialog::accept ()
   if (!license_alert->needs_attention () &&
       !doc_url_alert->needs_attention () &&
       !dependencies_alert->needs_attention () &&
-      !version_alert->needs_attention ()) {
+      !version_alert->needs_attention () &&
+      !api_version_alert->needs_attention ()) {
     QDialog::accept ();
   } else {
     if (QMessageBox::warning (this, tr ("Issues Encountered"),

@@ -17,11 +17,11 @@
    <item>
     <widget class="QTabWidget" name="mode_tab">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Browse Installed Packages</string>
+       <string>Installed Packages</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -231,8 +231,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>343</width>
-                       <height>207</height>
+                       <width>537</width>
+                       <height>284</height>
                       </rect>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_2">

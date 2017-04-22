@@ -25,6 +25,7 @@
 #include "laySaltGrainPropertiesDialog.h"
 #include "laySaltDownloadManager.h"
 #include "laySalt.h"
+#include "layVersion.h"
 #include "ui_SaltGrainTemplateSelectionDialog.h"
 #include "tlString.h"
 #include "tlExceptions.h"
@@ -685,6 +686,14 @@ SaltManagerDialog::update_models ()
     }
   }
 
+  //  Establish a message indicating whether the API version does not match
+  for (Salt::flat_iterator g = m_salt_mine.begin_flat (); g != m_salt_mine.end_flat (); ++g) {
+    if (SaltGrain::compare_versions (lay::Version::version (), (*g)->api_version ()) < 0) {
+      mine_model->set_message ((*g)->name (), SaltModel::Warning, tl::to_string (tr ("This package requires a newer API (%1)").arg (tl::to_qstring ((*g)->api_version ()))));
+      mine_model->set_enabled ((*g)->name (), false);
+    }
+  }
+
   if (has_warning) {
     mode_tab->setTabIcon (1, QIcon (":/warn_16.png"));
   } else {
@@ -704,6 +713,15 @@ SaltManagerDialog::update_models ()
   mine_model->clear_order ();
   mine_model->clear_messages ();
   mine_model->enable_all ();
+
+  //  Establish a message indicating whether the API version does not match
+  for (Salt::flat_iterator g = m_salt_mine.begin_flat (); g != m_salt_mine.end_flat (); ++g) {
+    if (SaltGrain::compare_versions (lay::Version::version (), (*g)->api_version ()) < 0) {
+      mine_model->set_message ((*g)->name (), SaltModel::Warning, tl::to_string (tr ("This package requires a newer API (%1)").arg (tl::to_qstring ((*g)->api_version ()))));
+      mine_model->set_enabled ((*g)->name (), false);
+    }
+  }
+
   mine_model->update ();
 
   //  select the first grain

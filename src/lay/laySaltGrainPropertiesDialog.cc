@@ -327,7 +327,8 @@ void
 SaltGrainPropertiesDialog::url_changed (const QString &url)
 {
   //  inserts the URL into the label
-  open_label->setText (m_open_label.arg (url));
+  m_grain.set_doc_url (tl::to_string (url));
+  open_label->setText (m_open_label.arg (tl::to_qstring (m_grain.eff_doc_url ())));
   open_label->setEnabled (! url.isEmpty ());
 }
 

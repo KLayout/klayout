@@ -30,6 +30,7 @@
 #include <QPainter>
 #include <QDir>
 #include <QFileInfo>
+#include <QDesktopServices>
 
 namespace lay
 {
@@ -37,13 +38,21 @@ namespace lay
 SaltGrainDetailsTextWidget::SaltGrainDetailsTextWidget (QWidget *w)
   : QTextBrowser (w), mp_grain (0)
 {
-  //  .. nothing yet ..
+  setOpenLinks (false);
+  setOpenExternalLinks (false);
+  connect (this, SIGNAL (anchorClicked (const QUrl &)), this, SLOT (open_link (const QUrl &)));
 }
 
 void SaltGrainDetailsTextWidget::set_grain (SaltGrain *g)
 {
   mp_grain = g;
   setHtml (details_text ());
+}
+
+void
+SaltGrainDetailsTextWidget::open_link (const QUrl &url)
+{
+  QDesktopServices::openUrl (url);
 }
 
 QVariant
@@ -237,7 +246,7 @@ SaltGrainDetailsTextWidget::details_text ()
 
   stream << "<p>";
   if (! g->doc_url ().empty ()) {
-    stream << "<b>" << QObject::tr ("Documentation link") << ":</b> <a href=\"" << tl::to_qstring (g->doc_url ()) << "\">" << tl::to_qstring (tl::escaped_to_html (g->doc_url ())) << "</a>";
+    stream << "<b>" << QObject::tr ("Documentation link") << ":</b> <a href=\"" << tl::to_qstring (g->eff_doc_url ()) << "\">" << tl::to_qstring (tl::escaped_to_html (g->eff_doc_url ())) << "</a>";
   } else {
     stream << "<i><font color='gray'>";
     stream << QObject::tr ("This package does not have a documentation link. "

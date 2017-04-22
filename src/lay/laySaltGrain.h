@@ -146,6 +146,14 @@ public:
   void set_doc_url (const std::string &u);
 
   /**
+   *  @brief Gets the effective documentation URL
+   *
+   *  The effective documentation URL is formed from the installation path
+   *  and the documentation URL if the latter is a relative one.
+   */
+  std::string eff_doc_url () const;
+
+  /**
    *  @brief Gets the version of the grain
    *
    *  A version string is of the form "x.y..." where x, y and other version

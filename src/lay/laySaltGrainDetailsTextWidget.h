@@ -36,6 +36,8 @@ class SaltGrain;
 class SaltGrainDetailsTextWidget
   : public QTextBrowser
 {
+Q_OBJECT
+
 public:
   /**
    *  @brief Constructor
@@ -49,6 +51,9 @@ public:
 
 protected:
   virtual QVariant loadResource (int type, const QUrl &url);
+
+private slots:
+  void open_link (const QUrl &url);
 
 private:
   lay::SaltGrain *mp_grain;

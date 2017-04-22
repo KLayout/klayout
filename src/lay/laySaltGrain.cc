@@ -29,6 +29,7 @@
 #include <QFileInfo>
 #include <QBuffer>
 #include <QResource>
+#include <QUrl>
 
 namespace lay
 {
@@ -107,6 +108,38 @@ void
 SaltGrain::set_doc_url (const std::string &u)
 {
   m_doc_url = u;
+}
+
+std::string
+SaltGrain::eff_doc_url () const
+{
+  if (m_doc_url.empty ()) {
+    return std::string ();
+  }
+
+  QUrl url (tl::to_qstring (m_doc_url));
+  if (! url.scheme ().isEmpty ()) {
+    return m_doc_url;
+  }
+
+  if (! path ().empty ()) {
+
+    //  if the URL is a relative URL, make it absolute relative to the grain's installation directory
+    QFileInfo fi (url.toLocalFile ());
+    if (! fi.isAbsolute ()) {
+      url = QUrl::fromLocalFile (QDir (tl::to_qstring (path ())).absoluteFilePath (fi.filePath ()));
+    }
+    url.setScheme (tl::to_qstring ("file"));
+    return tl::to_string (url.toString ());
+
+  } else {
+
+    //  base the documentation URL on the download URL
+    QUrl eff_url = QUrl (tl::to_qstring (m_url));
+    eff_url.setPath (eff_url.path () + QString::fromUtf8 ("/") + url.path ());
+    return tl::to_string (eff_url.toString ());
+
+  }
 }
 
 void

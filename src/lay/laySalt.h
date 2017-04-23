@@ -185,6 +185,13 @@ public:
    */
   bool create_grain (const SaltGrain &templ, SaltGrain &target);
 
+  /**
+   *  @brief Gets the root collection
+   *
+   *  This method is provided for test purposes mainly.
+   */
+  SaltGrains &root ();
+
 signals:
   /**
    *  @brief A signal triggered before one of the collections changed

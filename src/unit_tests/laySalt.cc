@@ -357,3 +357,45 @@ TEST (4)
   EXPECT_EQ (salt.grain_by_name ("b")->name (), "b");
   EXPECT_EQ (salt.grain_by_name ("c/c/v")->name (), "c/c/v");
 }
+
+TEST (5)
+{
+  lay::SaltGrains grains;
+
+  lay::SaltGrain g1;
+  g1.set_name ("g1");
+  lay::SaltGrain::Dependency dep;
+  dep.name = "g2";
+  g1.dependencies ().push_back (dep);
+  dep.name = "g3";
+  g1.dependencies ().push_back (dep);
+  grains.add_grain (g1);
+
+  lay::SaltGrains g34;
+
+  lay::SaltGrain g3;
+  g3.set_name ("g3");
+  g34.add_grain (g3);
+
+  lay::SaltGrain g4;
+  g4.set_name ("g4");
+  g34.add_grain (g4);
+
+  grains.add_collection (g34);
+
+  lay::SaltGrain g2;
+  g2.set_name ("g2");
+  dep.name = "g3";
+  g2.dependencies ().push_back (dep);
+  grains.add_grain (g2);
+
+  lay::Salt salt;
+  salt.root ().add_collection (grains);
+
+  std::vector<std::string> names;
+  for (lay::Salt::flat_iterator i = salt.begin_flat (); i != salt.end_flat (); ++i) {
+    names.push_back ((*i)->name ());
+  }
+
+  EXPECT_EQ (tl::join (names, ","), "g3,g2,g1,g4");
+}

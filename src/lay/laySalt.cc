@@ -56,6 +56,12 @@ Salt &Salt::operator= (const Salt &other)
   return *this;
 }
 
+SaltGrains &
+Salt::root ()
+{
+  return m_root;
+}
+
 Salt::flat_iterator
 Salt::begin_flat ()
 {
@@ -146,13 +152,32 @@ Salt::add_collection_to_flat (SaltGrains &gg)
 
 namespace {
 
-struct NameCompare
+struct NameAndTopoIndexCompare
 {
+  NameAndTopoIndexCompare (const std::map<std::string, int> &topo_index)
+    : mp_topo_index (&topo_index)
+  {
+    //  .. nothing yet ..
+  }
+
   bool operator () (lay::SaltGrain *a, lay::SaltGrain *b) const
   {
+    std::map<std::string, int>::const_iterator ti_a = mp_topo_index->find (a->name ());
+    std::map<std::string, int>::const_iterator ti_b = mp_topo_index->find (b->name ());
+
+    //  Reverse sorting by topological index as highest priority
+    if (ti_a != mp_topo_index->end () && ti_b != mp_topo_index->end ()) {
+      if (ti_a->second != ti_b->second) {
+        return ti_a->second > ti_b->second;
+      }
+    }
+
     //  TODO: UTF-8 support?
     return a->name () < b->name ();
   }
+
+private:
+  const std::map<std::string, int> *mp_topo_index;
 };
 
 }
@@ -169,9 +194,41 @@ Salt::validate ()
       m_grains_by_name.insert (std::make_pair ((*i)->name (), *i));
     }
 
+    //  Compute a set of topological indexes. Packages which serve depedencies of other packages have a higher
+    //  topological index. Later we sort the packages by descending topo index to ensure the packages which are
+    //  input to others come first.
+
+    std::map<std::string, int> topological_index;
+    for (std::map<std::string, SaltGrain *>::const_iterator g = m_grains_by_name.begin (); g != m_grains_by_name.end (); ++g) {
+      topological_index.insert (std::make_pair (g->first, 0));
+    }
+
+    //  NOTE: we allow max. 10 levels of dependencies. That should be sufficient. Limiting the levels of dependencies prevents
+    //  infinite recursion due to faulty recursive dependencies.
+    for (int n = 0; n < 10; ++n) {
+
+      bool any_updated = false;
+
+      for (std::map<std::string, SaltGrain *>::const_iterator g = m_grains_by_name.begin (); g != m_grains_by_name.end (); ++g) {
+        int index = topological_index [g->first];
+        for (std::vector<SaltGrain::Dependency>::const_iterator d = g->second->dependencies ().begin (); d != g->second->dependencies ().end (); ++d) {
+          std::map<std::string, int>::iterator ti = topological_index.find (d->name);
+          if (ti != topological_index.end () && ti->second < index + 1) {
+            ti->second = index + 1;
+            any_updated = true;
+          }
+        }
+      }
+
+      if (! any_updated) {
+        break;
+      }
+
+    }
+
     //  NOTE: we intentionally sort after the name list has been built - this way
     //  the first entry will win in the name to grain map.
-    std::sort (mp_flat_grains.begin (), mp_flat_grains.end (), NameCompare ());
+    std::sort (mp_flat_grains.begin (), mp_flat_grains.end (), NameAndTopoIndexCompare (topological_index));
 
   }
 }

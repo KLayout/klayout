@@ -269,6 +269,11 @@ TechnologyController::menu_activated (const std::string &symbol) const
 {
   if (symbol == "technology_selector:apply_technology") {
     if (lay::LayoutView::current () && lay::LayoutView::current ()->active_cellview ().is_valid ()) {
+      //  Cancels the current modes - changing the technology may make libraries unavailable
+      //  for example.
+      if (mp_mw) {
+        mp_mw->cancel ();
+      }
       lay::LayoutView::current ()->active_cellview ()->apply_technology (m_current_technology);
     }
     return true;

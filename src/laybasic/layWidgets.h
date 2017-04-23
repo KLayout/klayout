@@ -147,6 +147,19 @@ public:
    *  @brief Update the list of libraries
    */
   void update_list ();
+
+  /**
+   *  @brief Sets the technology filter
+   *
+   *  If a technology filter is set, only the libraries associated with the given
+   *  technology are shown. If enable is false, the technology name is ignored and
+   *  all libraries are shown.
+   */
+  void set_technology_filter (const std::string &tech, bool enable);
+
+private:
+  std::string m_tech;
+  bool m_tech_set;
 };
 
 /**

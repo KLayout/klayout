@@ -21,6 +21,7 @@
 */
 
 #include "layLibraryController.h"
+#include "layTechnology.h"
 #include "layApplication.h"
 #include "laySaltController.h"
 #include "layConfig.h"
@@ -125,76 +126,96 @@ LibraryController::sync_files ()
 
   std::map<std::string, std::pair<std::string, QDateTime> > new_lib_files;
 
-  std::vector<std::string> paths = lay::Application::instance ()->klayout_path ();
+  //  build a list of paths vs. technology
+  std::vector<std::pair<std::string, std::string> > paths;
+
+  std::vector<std::string> klayout_path = lay::Application::instance ()->klayout_path ();
+  for (std::vector<std::string>::const_iterator p = klayout_path.begin (); p != klayout_path.end (); ++p) {
+    paths.push_back (std::make_pair (*p, std::string ()));
+  }
 
   //  add the salt grains as potential sources for library definitions
 
   lay::SaltController *sc = lay::SaltController::instance ();
   if (sc) {
     for (lay::Salt::flat_iterator g = sc->salt ().begin_flat (); g != sc->salt ().end_flat (); ++g) {
-      paths.push_back ((*g)->path ());
+      paths.push_back (std::make_pair ((*g)->path (), std::string ()));
+    }
+  }
+
+  //  add the technologies as potential sources for library definitions
+
+  for (lay::Technologies::iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
+    if (! t->base_path ().empty ()) {
+      paths.push_back (std::make_pair (t->base_path (), t->name ()));
     }
   }
 
   //  scan for libraries
 
-  for (std::vector <std::string>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
+  for (std::vector <std::pair<std::string, std::string> >::const_iterator p = paths.begin (); p != paths.end (); ++p) {
 
-    QDir lp = QDir (tl::to_qstring (*p)).filePath (tl::to_qstring ("libraries"));
-    m_file_watcher->add_file (tl::to_string (lp.absolutePath ()));
+    QDir lp = QDir (tl::to_qstring (p->first)).filePath (tl::to_qstring ("libraries"));
+    if (lp.exists ()) {
 
-    QStringList name_filters;
-    name_filters << QString::fromUtf8 ("*");
+      m_file_watcher->add_file (tl::to_string (lp.absolutePath ()));
 
-    QStringList libs = lp.entryList (name_filters, QDir::Files);
-    for (QStringList::const_iterator im = libs.begin (); im != libs.end (); ++im) {
+      QStringList name_filters;
+      name_filters << QString::fromUtf8 ("*");
 
-      std::string filename = tl::to_string (*im);
-      std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
+      QStringList libs = lp.entryList (name_filters, QDir::Files);
+      for (QStringList::const_iterator im = libs.begin (); im != libs.end (); ++im) {
 
-      try {
+        std::string filename = tl::to_string (*im);
+        std::string lib_path = tl::to_string (lp.absoluteFilePath (*im));
 
-        QFileInfo fi (tl::to_qstring (lib_path));
+        try {
 
-        bool needs_load = false;
-        std::map<std::string, std::pair<std::string, QDateTime> >::iterator ll = m_lib_files.find (lib_path);
-        if (ll == m_lib_files.end ()) {
-          needs_load = true;
-        } else {
-          if (fi.lastModified () > ll->second.second) {
+          QFileInfo fi (tl::to_qstring (lib_path));
+
+          bool needs_load = false;
+          std::map<std::string, std::pair<std::string, QDateTime> >::iterator ll = m_lib_files.find (lib_path);
+          if (ll == m_lib_files.end ()) {
             needs_load = true;
           } else {
-            new_lib_files.insert (*ll);
-          }
-        }
-
-        if (needs_load) {
-
-          std::auto_ptr<db::Library> lib (new db::Library ());
-          lib->set_description (filename);
-          lib->set_name (tl::to_string (QFileInfo (*im).baseName ()));
-
-          tl::log << "Reading library '" << filename << "'";
-          tl::InputStream stream (lib_path);
-          db::Reader reader (stream);
-          reader.read (lib->layout ());
-
-          //  Use the libname if there is one
-          for (db::Layout::meta_info_iterator m = lib->layout ().begin_meta (); m != lib->layout ().end_meta (); ++m) {
-            if (m->name == "libname" && ! m->value.empty ()) {
-              lib->set_name (m->value);
-              break;
+            if (fi.lastModified () > ll->second.second) {
+              needs_load = true;
+            } else {
+              new_lib_files.insert (*ll);
             }
           }
 
-          new_lib_files.insert (std::make_pair (lib_path, std::make_pair (lib->get_name (), fi.lastModified ())));
+          if (needs_load) {
 
-          db::LibraryManager::instance ().register_lib (lib.release ());
+            std::auto_ptr<db::Library> lib (new db::Library ());
+            lib->set_description (filename);
+            lib->set_technology (p->second);
+            lib->set_name (tl::to_string (QFileInfo (*im).baseName ()));
 
+            tl::log << "Reading library '" << lib_path << "'";
+            tl::InputStream stream (lib_path);
+            db::Reader reader (stream);
+            reader.read (lib->layout ());
+
+            //  Use the libname if there is one
+            for (db::Layout::meta_info_iterator m = lib->layout ().begin_meta (); m != lib->layout ().end_meta (); ++m) {
+              if (m->name == "libname" && ! m->value.empty ()) {
+                lib->set_name (m->value);
+                break;
+              }
+            }
+
+            tl::log << "Registering as '" << lib->get_name () << "' for tech '" << lib->get_technology () << "'";
+            new_lib_files.insert (std::make_pair (lib_path, std::make_pair (lib->get_name (), fi.lastModified ())));
+
+            db::LibraryManager::instance ().register_lib (lib.release ());
+
+          }
+
+        } catch (tl::Exception &ex) {
+          tl::error << ex.msg ();
         }
 
-      } catch (tl::Exception &ex) {
-        tl::error << ex.msg ();
       }
 
     }

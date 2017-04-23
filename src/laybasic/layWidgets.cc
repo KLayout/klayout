@@ -230,7 +230,8 @@ struct CellViewSelectionComboBoxPrivateData
   const lay::LayoutView *layout_view;
 };
 
-CellViewSelectionComboBox::CellViewSelectionComboBox (QWidget * /*parent*/)
+CellViewSelectionComboBox::CellViewSelectionComboBox (QWidget *parent)
+  : QComboBox (parent)
 {
   mp_private = new CellViewSelectionComboBoxPrivateData ();
   mp_private->layout_view = 0;
@@ -299,7 +300,8 @@ struct LayerSelectionComboBoxPrivateData
   int cv_index;
 };
 
-LayerSelectionComboBox::LayerSelectionComboBox (QWidget * /*parent*/)
+LayerSelectionComboBox::LayerSelectionComboBox (QWidget *parent)
+  : QComboBox (parent)
 {
   mp_private = new LayerSelectionComboBoxPrivateData ();
   mp_private->no_layer_available = false;
@@ -569,9 +571,20 @@ LayerSelectionComboBox::current_layer_props () const
 // -------------------------------------------------------------
 //  LibrarySelectionComboBox implementation
 
-LibrarySelectionComboBox::LibrarySelectionComboBox (QWidget * /*parent*/)
+LibrarySelectionComboBox::LibrarySelectionComboBox (QWidget *parent)
+  : QComboBox (parent), m_tech_set (false)
 {
   update_list ();
+}
+
+void
+LibrarySelectionComboBox::set_technology_filter (const std::string &tech, bool enabled)
+{
+  if (m_tech != tech || m_tech_set != enabled) {
+    m_tech = tech;
+    m_tech_set = enabled;
+    update_list ();
+  }
 }
 
 void 
@@ -585,12 +598,23 @@ LibrarySelectionComboBox::update_list ()
 
   addItem (QObject::tr ("Local (no library)"), QVariant ());
   for (db::LibraryManager::iterator l = db::LibraryManager::instance ().begin (); l != db::LibraryManager::instance ().end (); ++l) {
+
     db::Library *lib = db::LibraryManager::instance ().lib (l->second);
-    if (! lib->get_description ().empty ()) {
-      addItem (tl::to_qstring (lib->get_name () + " - " + lib->get_description ()), QVariant ((unsigned int) lib->get_id ()));
-    } else {
-      addItem (tl::to_qstring (lib->get_name ()), QVariant ((unsigned int) lib->get_id ()));
+    if (! m_tech_set || lib->get_technology ().empty () || m_tech == lib->get_technology ()) {
+
+      std::string item_text = lib->get_name ();
+      if (! lib->get_description ().empty ()) {
+        item_text += " - " + lib->get_description ();
+      }
+      if (m_tech_set && !lib->get_technology ().empty ()) {
+        item_text += " ";
+        item_text += tl::to_string (QObject::tr ("[Technology %1]").arg (tl::to_qstring (lib->get_technology ())));
+      }
+
+      addItem (tl::to_qstring (item_text), QVariant ((unsigned int) lib->get_id ()));
+
     }
+
   }
 
   set_current_library (lib);

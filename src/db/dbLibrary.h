@@ -102,6 +102,25 @@ public:
   }
 
   /**
+   *  @brief Gets the technology name this library is associated with
+   *
+   *  If this attribute is non-empty, the library is selected only when the given technology is
+   *  used for the layout.
+   */
+  const std::string &get_technology () const
+  {
+    return m_technology;
+  }
+
+  /**
+   *  @brief Sets the technology name this library is associated with
+   */
+  void set_technology (const std::string &t)
+  {
+    m_technology = t;
+  }
+
+  /**
    *  @brief Getter for the description property
    */
   const std::string &get_description () const
@@ -153,6 +172,7 @@ public:
 private:
   std::string m_name;
   std::string m_description;
+  std::string m_technology;
   lib_id_type m_id;
   db::Layout m_layout;
   std::map<db::Layout *, int> m_referrers;

@@ -2608,7 +2608,6 @@ MainWindow::cm_cancel ()
 {
   BEGIN_PROTECTED 
   cancel ();
-  select_mode (lay::LayoutView::default_mode ());
   END_PROTECTED
 }
 
@@ -2618,8 +2617,6 @@ MainWindow::cm_cancel ()
 void
 MainWindow::cancel ()
 {
-  BEGIN_PROTECTED 
-
   //  if any transaction is pending (this may happen when an operation threw an exception)
   //  close transactions.
   if (m_manager.transacting ()) {
@@ -2630,7 +2627,7 @@ MainWindow::cancel ()
     (*vp)->cancel ();
   }
 
-  END_PROTECTED
+  select_mode (lay::LayoutView::default_mode ());
 }
 
 void

@@ -223,6 +223,7 @@ InstPropertiesPage::update ()
   const db::Cell &def_cell = def_layout->cell (def_cell_index);
 
   std::pair<db::Library *, db::cell_index_type> dl = def_layout->defining_library (def_cell_index);
+  lib_cbx->set_technology_filter (cv->tech_name (), true);
   lib_cbx->set_current_library (dl.first);
   if (dl.first) {
     def_layout = &dl.first->layout ();

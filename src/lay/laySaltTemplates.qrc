@@ -28,6 +28,10 @@
         <file alias="grain.xml">salt_templates/macro/grain.xml</file>
     </qresource>
     <qresource prefix="/salt_templates/macro/macros">
+        <file alias="new_macro.lym">salt_templates/macro/macros/new_macro.lym</file>
+    </qresource>
+    <qresource prefix="/salt_templates/macro/doc">
+        <file alias="readme.html">salt_templates/macro/doc/readme.html</file>
     </qresource>
 
     <!-- pymacro template -->

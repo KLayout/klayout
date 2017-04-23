@@ -4,7 +4,7 @@
  <version>0.0</version>
  <title>Ruby Macro</title>
  <doc>This template provides a Ruby macro</doc>
- <doc-url/>
+ <doc-url>doc/readme.html</doc-url>
  <url/>
  <license>GPLv3</license>
  <author/>

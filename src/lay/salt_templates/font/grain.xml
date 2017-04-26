@@ -3,8 +3,8 @@
  <name>font</name>
  <version>0.0</version>
  <title>Font package</title>
- <doc>This template provides a font for the Basic.TEXT PCell</doc>
- <doc-url/>
+ <doc>This template provides a font for the Basic.TEXT PCell.</doc>
+ <doc-url>doc/readme.html</doc-url>
  <url/>
  <license>GPLv3</license>
  <author/>

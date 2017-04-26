@@ -536,8 +536,8 @@ SaltGrainPropertiesDialog::accept ()
   //  doc URL
   doc_url_alert->clear ();
   if (! m_grain.doc_url ().empty ()) {
-    tl::InputStream stream (m_grain.doc_url ());
     try {
+      tl::InputStream stream (m_grain.eff_doc_url ());
       if (! stream.get (1)) {
         throw tl::Exception (tl::to_string (tr ("Empty document")));
       }

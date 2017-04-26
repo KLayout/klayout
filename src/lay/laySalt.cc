@@ -248,11 +248,8 @@ bool remove_from_collection (SaltGrains &collection, const std::string &name)
 
   for (SaltGrains::grain_iterator g = collection.begin_grains (); g != collection.end_grains (); ++g) {
     if (g->name () == name) {
-      SaltGrains::grain_iterator gnext = g;
-      ++gnext;
-      collection.remove_grain (g, true);
-      res = true;
-      g = gnext;
+      res = collection.remove_grain (g, true);
+      break;
     }
   }
 

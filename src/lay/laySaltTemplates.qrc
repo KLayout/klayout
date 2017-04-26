@@ -7,6 +7,10 @@
         <file alias="grain.xml">salt_templates/font/grain.xml</file>
     </qresource>
     <qresource prefix="/salt_templates/font/fonts">
+        <file alias="new_font.gds">salt_templates/font/fonts/new_font.gds</file>
+    </qresource>
+    <qresource prefix="/salt_templates/font/doc">
+        <file alias="readme.html">salt_templates/font/doc/readme.html</file>
     </qresource>
 
     <!-- lib template -->
@@ -39,6 +43,10 @@
         <file alias="grain.xml">salt_templates/pymacro/grain.xml</file>
     </qresource>
     <qresource prefix="/salt_templates/pymacro/pymacros">
+        <file alias="new_macro.lym">salt_templates/pymacro/pymacros/new_macro.lym</file>
+    </qresource>
+    <qresource prefix="/salt_templates/pymacro/doc">
+        <file alias="readme.html">salt_templates/pymacro/doc/readme.html</file>
     </qresource>
 
     <!-- tech template -->

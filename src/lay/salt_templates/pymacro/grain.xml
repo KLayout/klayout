@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <salt-grain>
- <name>macro</name>
+ <name>pymacro</name>
  <version>0.0</version>
  <title>Python Macro</title>
  <doc>This template provides a Python macro.</doc>

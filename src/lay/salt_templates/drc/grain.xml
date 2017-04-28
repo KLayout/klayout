@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<salt-grain>
+ <name>drc</name>
+ <version>0.0</version>
+ <title>DRC template</title>
+ <doc>This template provides a template for a DRC script</doc>
+ <doc-url>doc/readme.html</doc-url>
+ <url/>
+ <license>GPLv3</license>
+ <author/>
+ <author-contact/>
+ <authored-time/>
+ <installed-time/>
+ <icon/>
+ <screenshot/>
+</salt-grain>

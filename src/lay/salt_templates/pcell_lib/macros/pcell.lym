@@ -82,7 +82,7 @@ module PCellPackageModule
   library = Library::new
 
   # TODO: change the description
-  library = "My PCell package"
+  library.description = "My PCell package"
       
   # register the PCell declarations
   # TODO: change the names

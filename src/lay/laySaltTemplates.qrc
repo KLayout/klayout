@@ -51,7 +51,7 @@
         <file alias="grain.xml">salt_templates/ruby_lib/grain.xml</file>
     </qresource>
     <qresource prefix="/salt_templates/ruby_lib/macros">
-        <file alias="new_ruby_lib.lym">salt_templates/ruby_lib/macros/new_ruby_lib.lym</file>
+        <file alias="new_macro.lym">salt_templates/ruby_lib/macros/new_macro.lym</file>
     </qresource>
     <qresource prefix="/salt_templates/ruby_lib/doc">
         <file alias="readme.html">salt_templates/ruby_lib/doc/readme.html</file>
@@ -72,8 +72,8 @@
     <qresource prefix="/salt_templates/python_lib">
         <file alias="grain.xml">salt_templates/python_lib/grain.xml</file>
     </qresource>
-    <qresource prefix="/salt_templates/python_lib/macros">
-        <file alias="new_python_lib.lym">salt_templates/python_lib/macros/new_python_lib.lym</file>
+    <qresource prefix="/salt_templates/python_lib/pymacros">
+        <file alias="new_macro.lym">salt_templates/python_lib/pymacros/new_macro.lym</file>
     </qresource>
     <qresource prefix="/salt_templates/python_lib/doc">
         <file alias="readme.html">salt_templates/python_lib/doc/readme.html</file>

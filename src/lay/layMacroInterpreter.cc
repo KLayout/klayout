@@ -31,9 +31,6 @@
 namespace lay
 {
 
-template<>
-tl::Registrar<lay::MacroInterpreter> *tl::Registrar<lay::MacroInterpreter>::instance = 0;
-
 void 
 MacroInterpreter::execute (const lay::Macro *) const
 {
@@ -126,3 +123,8 @@ MacroInterpreter::suffix (const std::string &dsl_name)
 
 }
 
+namespace tl
+{
+  template<> tl::Registrar<lay::MacroInterpreter> *Registrar<lay::MacroInterpreter>::instance = 0;
+  template class LAY_PUBLIC tl::RegisteredClass<lay::MacroInterpreter>;
+}

@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QAbstractEventDispatcher::TimerInfo
+// struct QAbstractEventDispatcher::TimerInfo
 
 //  Constructor QAbstractEventDispatcher::TimerInfo::TimerInfo(int id, int i, Qt::TimerType t)
 

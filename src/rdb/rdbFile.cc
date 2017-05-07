@@ -190,10 +190,12 @@ class StandardFormatDeclaration
 
 static tl::RegisteredClass<rdb::FormatDeclaration> format_decl (new StandardFormatDeclaration (), 0, "KLayout-RDB");
 
-// -------------------------------------------------------------
-
-template<>
-RDB_PUBLIC tl::Registrar<rdb::FormatDeclaration> *tl::Registrar<rdb::FormatDeclaration>::instance = 0;
-
 }
 
+// -------------------------------------------------------------
+
+namespace tl
+{
+  template<> RDB_PUBLIC tl::Registrar<rdb::FormatDeclaration> *tl::Registrar<rdb::FormatDeclaration>::instance = 0;
+  template class RDB_PUBLIC tl::RegisteredClass<rdb::FormatDeclaration>;
+}

@@ -42,7 +42,7 @@ namespace db
 namespace lay 
 {
 
-struct LayerProperties;
+class LayerProperties;
 class LayoutView;
 class PropertySelectorBase;
 

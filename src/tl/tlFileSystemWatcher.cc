@@ -31,9 +31,6 @@
 namespace tl
 {
 
-//  Timer interval (in ms)
-const int timer_interval = 100;
-
 //  The maximum allowed processing tim
 const int processing_time = 20;
 

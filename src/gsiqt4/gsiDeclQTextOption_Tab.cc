@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QTextOption::Tab
+// struct QTextOption::Tab
 
 //  Constructor QTextOption::Tab::Tab()
 

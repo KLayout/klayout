@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QMediaServiceSupportedDevicesInterface
+// struct QMediaServiceSupportedDevicesInterface
 
 // QString QMediaServiceSupportedDevicesInterface::deviceDescription(const QByteArray &service, const QByteArray &device)
 

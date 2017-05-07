@@ -447,6 +447,10 @@ template <class T>
 class weak_collection
   : public weak_or_shared_collection<T, false>
 {
+public:
+  weak_collection ()
+    : weak_or_shared_collection<T, false> ()
+  { }
 };
 
 /**
@@ -456,6 +460,10 @@ template <class T>
 class shared_collection
   : public weak_or_shared_collection<T, true>
 {
+public:
+  shared_collection ()
+    : weak_or_shared_collection<T, true> ()
+  { }
 };
 
 }

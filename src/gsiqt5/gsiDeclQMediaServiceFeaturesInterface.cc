@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QMediaServiceFeaturesInterface
+// struct QMediaServiceFeaturesInterface
 
 // QFlags<QMediaServiceProviderHint::Feature> QMediaServiceFeaturesInterface::supportedFeatures(const QByteArray &service)
 

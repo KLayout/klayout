@@ -35,7 +35,7 @@ namespace gsi
 {
 
 class ClassBase;
-class NoAdaptorTag;
+struct NoAdaptorTag;
 template <class T, class A> class Class;
 
 /**
@@ -59,7 +59,7 @@ public:
 private:
   const gsi::ClassBase *mp_cls;
   const tl::VariantUserClassBase *mp_self, *mp_object_cls;
-  bool m_reference, m_is_const;
+  bool m_is_const;
 
   virtual void execute_gsi (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const;
 

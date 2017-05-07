@@ -440,8 +440,7 @@ class TilingProcessorCountFunction
   : public tl::EvalFunction
 {
 public:
-  TilingProcessorCountFunction (TilingProcessor *proc)
-    : mp_proc (proc)
+  TilingProcessorCountFunction (TilingProcessor * /*proc*/)
   {
     //  .. nothing yet ..
   }
@@ -450,9 +449,6 @@ public:
   {
     // TODO: ... implement ..
   }
-
-private:
-  TilingProcessor *mp_proc;
 };
 
 void

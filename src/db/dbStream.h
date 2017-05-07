@@ -107,12 +107,6 @@ public:
 
 }
 
-namespace tl
-{
-  //  make registration available to external DLL's
-  template class DB_PUBLIC tl::RegisteredClass<db::StreamFormatDeclaration>;
-}
-
 #endif
 
 

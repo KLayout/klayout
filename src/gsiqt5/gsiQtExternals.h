@@ -258,7 +258,7 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioProbe> &qtdecl_QAudioProbe (); }
 class QAudioRecorder;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioRecorder> &qtdecl_QAudioRecorder (); }
 
-class QAudioSystemFactoryInterface;
+struct QAudioSystemFactoryInterface;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QAudioSystemFactoryInterface> &qtdecl_QAudioSystemFactoryInterface (); }
 
 class QAudioSystemPlugin;
@@ -291,7 +291,7 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QBuffer> &qtdecl_QBuffer (); }
 class QButtonGroup;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QButtonGroup> &qtdecl_QButtonGroup (); }
 
-class QByteArrayDataPtr;
+struct QByteArrayDataPtr;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QByteArrayDataPtr> &qtdecl_QByteArrayDataPtr (); }
 
 class QByteArrayMatcher;
@@ -603,7 +603,7 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QEventTransition> &qtdecl_QEventTransiti
 class QExposeEvent;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QExposeEvent> &qtdecl_QExposeEvent (); }
 
-class QFactoryInterface;
+struct QFactoryInterface;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QFactoryInterface> &qtdecl_QFactoryInterface (); }
 
 class QFile;
@@ -942,7 +942,7 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QJsonDocument> &qtdecl_QJsonDocument ();
 class QJsonObject;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QJsonObject> &qtdecl_QJsonObject (); }
 
-class QJsonParseError;
+struct QJsonParseError;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QJsonParseError> &qtdecl_QJsonParseError (); }
 
 class QJsonValue;
@@ -1023,10 +1023,10 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QLoggingCategory> &qtdecl_QLoggingCatego
 class QMainWindow;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMainWindow> &qtdecl_QMainWindow (); }
 
-class QMapDataBase;
+struct QMapDataBase;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMapDataBase> &qtdecl_QMapDataBase (); }
 
-class QMapNodeBase;
+struct QMapNodeBase;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMapNodeBase> &qtdecl_QMapNodeBase (); }
 
 class QMargins;
@@ -1095,16 +1095,16 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaResource> &qtdecl_QMediaResource (
 class QMediaService;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaService> &qtdecl_QMediaService (); }
 
-class QMediaServiceCameraInfoInterface;
+struct QMediaServiceCameraInfoInterface;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceCameraInfoInterface> &qtdecl_QMediaServiceCameraInfoInterface (); }
 
-class QMediaServiceDefaultDeviceInterface;
+struct QMediaServiceDefaultDeviceInterface;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceDefaultDeviceInterface> &qtdecl_QMediaServiceDefaultDeviceInterface (); }
 
-class QMediaServiceFeaturesInterface;
+struct QMediaServiceFeaturesInterface;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceFeaturesInterface> &qtdecl_QMediaServiceFeaturesInterface (); }
 
-class QMediaServiceProviderFactoryInterface;
+struct QMediaServiceProviderFactoryInterface;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceProviderFactoryInterface> &qtdecl_QMediaServiceProviderFactoryInterface (); }
 
 class QMediaServiceProviderHint;
@@ -1113,10 +1113,10 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceProviderHint> &qtdecl_QMedi
 class QMediaServiceProviderPlugin;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceProviderPlugin> &qtdecl_QMediaServiceProviderPlugin (); }
 
-class QMediaServiceSupportedDevicesInterface;
+struct QMediaServiceSupportedDevicesInterface;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceSupportedDevicesInterface> &qtdecl_QMediaServiceSupportedDevicesInterface (); }
 
-class QMediaServiceSupportedFormatsInterface;
+struct QMediaServiceSupportedFormatsInterface;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMediaServiceSupportedFormatsInterface> &qtdecl_QMediaServiceSupportedFormatsInterface (); }
 
 class QMediaStreamsControl;
@@ -1164,7 +1164,7 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaEnum> &qtdecl_QMetaEnum (); }
 class QMetaMethod;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaMethod> &qtdecl_QMetaMethod (); }
 
-class QMetaObject;
+struct QMetaObject;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaObject> &qtdecl_QMetaObject (); }
 
 class QMetaProperty;
@@ -1656,7 +1656,7 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QState> &qtdecl_QState (); }
 class QStateMachine;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStateMachine> &qtdecl_QStateMachine (); }
 
-class QStaticPlugin;
+struct QStaticPlugin;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStaticPlugin> &qtdecl_QStaticPlugin (); }
 
 class QStaticText;
@@ -1671,7 +1671,7 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QStatusTipEvent> &qtdecl_QStatusTipEvent
 class QStorageInfo;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStorageInfo> &qtdecl_QStorageInfo (); }
 
-class QStringDataPtr;
+struct QStringDataPtr;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QStringDataPtr> &qtdecl_QStringDataPtr (); }
 
 class QStringListModel;

@@ -52,7 +52,7 @@ public:
   { }
 };
 
-class RubyInterpreterPrivateData;
+struct RubyInterpreterPrivateData;
 
 /**
  *  @brief The ruby interpreter wrapper class

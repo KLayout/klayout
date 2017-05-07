@@ -44,8 +44,6 @@ public:
 
 TEST(1) 
 {
-  tl::DeferredMethodScheduler scheduler ();
-
   g_na = g_nb = 0;
 
   QCoreApplication::instance ()->processEvents ();

@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QMediaServiceDefaultDeviceInterface
+// struct QMediaServiceDefaultDeviceInterface
 
 // QByteArray QMediaServiceDefaultDeviceInterface::defaultDevice(const QByteArray &service)
 

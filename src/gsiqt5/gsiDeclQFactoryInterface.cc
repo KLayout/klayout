@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QFactoryInterface
+// struct QFactoryInterface
 
 // QStringList QFactoryInterface::keys()
 

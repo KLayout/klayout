@@ -245,7 +245,7 @@ struct A_NC
   A_NC (int nn) : A (nn) { }
   
 private:
-  friend class B;
+  friend struct B;
 
   A_NC (const A_NC &a) : A (a) { }
   A_NC &operator= (const A_NC &);

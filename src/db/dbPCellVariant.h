@@ -151,7 +151,6 @@ protected:
 private:
   pcell_parameters_type m_parameters;
   mutable std::string m_display_name;
-  mutable bool m_valid_display_name;
   size_t m_pcell_id;
   bool m_registered;
 };

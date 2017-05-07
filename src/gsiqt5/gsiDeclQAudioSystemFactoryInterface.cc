@@ -37,7 +37,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QAudioSystemFactoryInterface
+// struct QAudioSystemFactoryInterface
 
 // QList<QByteArray> QAudioSystemFactoryInterface::availableDevices(QAudio::Mode)
 

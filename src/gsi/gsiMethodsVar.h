@@ -813,9 +813,9 @@ public:
   }
 
 #if _COUNT != 0
-  virtual void call (void *cls, SerialArgs &args, SerialArgs &ret) const 
+  virtual void call (void * /*cls*/, SerialArgs &args, SerialArgs &ret) const
 #else
-  virtual void call (void *cls, SerialArgs &, SerialArgs &ret) const 
+  virtual void call (void * /*cls*/, SerialArgs &, SerialArgs &ret) const
 #endif
   {
     this->mark_called ();
@@ -862,9 +862,9 @@ public:
   }
 
 #if _COUNT != 0
-  virtual void call (void *cls, SerialArgs &args, SerialArgs &ret) const 
+  virtual void call (void * /*cls*/, SerialArgs &args, SerialArgs &ret) const
 #else
-  virtual void call (void *cls, SerialArgs &, SerialArgs &ret) const 
+  virtual void call (void * /*cls*/, SerialArgs &, SerialArgs &ret) const
 #endif
   {
     this->mark_called ();
@@ -1249,9 +1249,9 @@ public:
   }
 
 #if _COUNT != 0
-  virtual void call (void *cls, SerialArgs &args, SerialArgs &ret) const 
+  virtual void call (void * /*cls*/, SerialArgs &args, SerialArgs &ret) const
 #else
-  virtual void call (void *cls, SerialArgs &, SerialArgs &ret) const 
+  virtual void call (void * /*cls*/, SerialArgs &, SerialArgs &ret) const
 #endif
   {
     this->mark_called ();

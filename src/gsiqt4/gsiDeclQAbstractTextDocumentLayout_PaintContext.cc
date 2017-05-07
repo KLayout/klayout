@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QAbstractTextDocumentLayout::PaintContext
+// struct QAbstractTextDocumentLayout::PaintContext
 
 //  Constructor QAbstractTextDocumentLayout::PaintContext::PaintContext()
 

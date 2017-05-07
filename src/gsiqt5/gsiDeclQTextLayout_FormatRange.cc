@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QTextLayout::FormatRange
+// struct QTextLayout::FormatRange
 
 //  Constructor QTextLayout::FormatRange::FormatRange()
 

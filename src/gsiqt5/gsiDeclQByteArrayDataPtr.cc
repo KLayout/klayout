@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QByteArrayDataPtr
+// struct QByteArrayDataPtr
 
 //  Constructor QByteArrayDataPtr::QByteArrayDataPtr()
 

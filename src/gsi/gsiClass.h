@@ -244,19 +244,6 @@ private:
 //  GSI implementation
 
 template <class X> 
-void *_take_and_create (SerialArgs & /*args*/, tl::false_tag /*has_copy_ctor*/)
-{
-  tl_assert (false); // cannot copy object of this type
-  return 0;
-}
-
-template <class X> 
-void *_take_and_create (SerialArgs &from, tl::true_tag /*has_copy_ctor*/)
-{
-  return from.template take_object<X> ();
-}
-
-template <class X> 
 void *_get_vector_of (SerialArgs & /*from*/, const ArgType & /*a*/, void * /*data*/, void (* /*cb*/) (void * /*data*/, void * /*obj*/), tl::false_tag /*has_copy_ctor*/) 
 {
   tl_assert (false); // cannot copy object of this type

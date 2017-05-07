@@ -127,7 +127,6 @@ public:
 
 private:
   unsigned int m_num_planes;
-  Drawings *mp_drawings;
 };
 
 /**

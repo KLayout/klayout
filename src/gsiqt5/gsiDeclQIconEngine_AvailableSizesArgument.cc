@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QIconEngine::AvailableSizesArgument
+// struct QIconEngine::AvailableSizesArgument
 
 //  Constructor QIconEngine::AvailableSizesArgument::AvailableSizesArgument()
 

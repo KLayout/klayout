@@ -1085,7 +1085,7 @@ template <> struct type_traits<QAudioRecorder_Adaptor> : public type_traits<void
 };
 }
 
-class QAudioSystemFactoryInterface;
+struct QAudioSystemFactoryInterface;
 namespace tl {
 template <> struct type_traits<QAudioSystemFactoryInterface> : public type_traits<void> {
   typedef tl::false_tag has_copy_constructor;
@@ -1196,7 +1196,7 @@ template <> struct type_traits<QButtonGroup_Adaptor> : public type_traits<void> 
 };
 }
 
-class QByteArrayDataPtr;
+struct QByteArrayDataPtr;
 namespace tl {
 template <> struct type_traits<QByteArrayDataPtr> : public type_traits<void> {
 };
@@ -2291,7 +2291,7 @@ template <> struct type_traits<QExposeEvent_Adaptor> : public type_traits<void> 
 };
 }
 
-class QFactoryInterface;
+struct QFactoryInterface;
 namespace tl {
 template <> struct type_traits<QFactoryInterface> : public type_traits<void> {
   typedef tl::false_tag has_copy_constructor;
@@ -3721,7 +3721,7 @@ template <> struct type_traits<QJsonObject::const_iterator> : public type_traits
 };
 }
 
-class QJsonParseError;
+struct QJsonParseError;
 namespace tl {
 template <> struct type_traits<QJsonParseError> : public type_traits<void> {
 };
@@ -3995,14 +3995,14 @@ template <> struct type_traits<QMainWindow_Adaptor> : public type_traits<void> {
 };
 }
 
-class QMapDataBase;
+struct QMapDataBase;
 namespace tl {
 template <> struct type_traits<QMapDataBase> : public type_traits<void> {
   typedef tl::false_tag has_copy_constructor;
 };
 }
 
-class QMapNodeBase;
+struct QMapNodeBase;
 namespace tl {
 template <> struct type_traits<QMapNodeBase> : public type_traits<void> {
 };
@@ -4292,7 +4292,7 @@ template <> struct type_traits<QMediaService_Adaptor> : public type_traits<void>
 };
 }
 
-class QMediaServiceCameraInfoInterface;
+struct QMediaServiceCameraInfoInterface;
 namespace tl {
 template <> struct type_traits<QMediaServiceCameraInfoInterface> : public type_traits<void> {
   typedef tl::false_tag has_copy_constructor;
@@ -4306,7 +4306,7 @@ template <> struct type_traits<QMediaServiceCameraInfoInterface_Adaptor> : publi
 };
 }
 
-class QMediaServiceDefaultDeviceInterface;
+struct QMediaServiceDefaultDeviceInterface;
 namespace tl {
 template <> struct type_traits<QMediaServiceDefaultDeviceInterface> : public type_traits<void> {
   typedef tl::false_tag has_copy_constructor;
@@ -4320,7 +4320,7 @@ template <> struct type_traits<QMediaServiceDefaultDeviceInterface_Adaptor> : pu
 };
 }
 
-class QMediaServiceFeaturesInterface;
+struct QMediaServiceFeaturesInterface;
 namespace tl {
 template <> struct type_traits<QMediaServiceFeaturesInterface> : public type_traits<void> {
   typedef tl::false_tag has_copy_constructor;
@@ -4334,7 +4334,7 @@ template <> struct type_traits<QMediaServiceFeaturesInterface_Adaptor> : public 
 };
 }
 
-class QMediaServiceProviderFactoryInterface;
+struct QMediaServiceProviderFactoryInterface;
 namespace tl {
 template <> struct type_traits<QMediaServiceProviderFactoryInterface> : public type_traits<void> {
   typedef tl::false_tag has_copy_constructor;
@@ -4369,7 +4369,7 @@ template <> struct type_traits<QMediaServiceProviderPlugin_Adaptor> : public typ
 };
 }
 
-class QMediaServiceSupportedDevicesInterface;
+struct QMediaServiceSupportedDevicesInterface;
 namespace tl {
 template <> struct type_traits<QMediaServiceSupportedDevicesInterface> : public type_traits<void> {
   typedef tl::false_tag has_copy_constructor;
@@ -4383,7 +4383,7 @@ template <> struct type_traits<QMediaServiceSupportedDevicesInterface_Adaptor> :
 };
 }
 
-class QMediaServiceSupportedFormatsInterface;
+struct QMediaServiceSupportedFormatsInterface;
 namespace tl {
 template <> struct type_traits<QMediaServiceSupportedFormatsInterface> : public type_traits<void> {
   typedef tl::false_tag has_copy_constructor;
@@ -4552,7 +4552,7 @@ template <> struct type_traits<QMetaMethod> : public type_traits<void> {
 };
 }
 
-class QMetaObject;
+struct QMetaObject;
 namespace tl {
 template <> struct type_traits<QMetaObject> : public type_traits<void> {
 };
@@ -6380,7 +6380,7 @@ template <> struct type_traits<QStateMachine_WrappedEvent_Adaptor> : public type
 };
 }
 
-class QStaticPlugin;
+struct QStaticPlugin;
 namespace tl {
 template <> struct type_traits<QStaticPlugin> : public type_traits<void> {
 };
@@ -6426,7 +6426,7 @@ template <> struct type_traits<QStorageInfo> : public type_traits<void> {
 };
 }
 
-class QStringDataPtr;
+struct QStringDataPtr;
 namespace tl {
 template <> struct type_traits<QStringDataPtr> : public type_traits<void> {
 };

@@ -35,7 +35,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QStaticPlugin
+// struct QStaticPlugin
 
 //  Constructor QStaticPlugin::QStaticPlugin()
 

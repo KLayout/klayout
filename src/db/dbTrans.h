@@ -318,7 +318,7 @@ struct unit_trans
  */
 template <class C>
 inline unit_trans<C> 
-operator* (const unit_trans<C> &t1, const unit_trans<C> &t2)
+operator* (const unit_trans<C> & /*t1*/, const unit_trans<C> & /*t2*/)
 {
   return unit_trans<C>();
 }

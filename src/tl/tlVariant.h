@@ -43,7 +43,7 @@
 namespace gsi
 {
   class ClassBase;
-  class NoAdaptorTag;
+  struct NoAdaptorTag;
   template <class T, class A> class Class;
   template <class X> const ClassBase *cls_decl ();
 }

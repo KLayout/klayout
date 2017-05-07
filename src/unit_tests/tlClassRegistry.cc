@@ -113,7 +113,9 @@ TEST(3)
 
 }
 
-template <> tl::Registrar<class_registry_test::X> *tl::Registrar<class_registry_test::X>::instance = 0;
-template <> tl::Registrar<class_registry_test::A> *tl::Registrar<class_registry_test::A>::instance = 0;
-
+namespace tl
+{
+  template <> tl::Registrar<class_registry_test::X> *Registrar<class_registry_test::X>::instance = 0;
+  template <> tl::Registrar<class_registry_test::A> *Registrar<class_registry_test::A>::instance = 0;
+}
 

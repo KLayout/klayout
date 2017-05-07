@@ -179,12 +179,6 @@ public:
 
 }
 
-namespace tl
-{
-  //  make registration available to external DLL's
-  template class LAY_PUBLIC tl::RegisteredClass<lay::MacroInterpreter>;
-}
-
 #endif
 
 

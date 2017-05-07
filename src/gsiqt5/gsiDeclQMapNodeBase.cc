@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QMapNodeBase
+// struct QMapNodeBase
 
 //  Constructor QMapNodeBase::QMapNodeBase()
 

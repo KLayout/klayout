@@ -694,7 +694,7 @@ smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon
 
       bool can_drop = false;
 
-      if (db::Coord(p1.distance(p0)) <= d && db::sprod_sign (p2 - p1, p0 - pm1) > 0 && abs (db::vprod (p2 - p1, p0 - pm1)) < 0.8 * p2.distance (p1) * p0.distance (pm1)) {
+      if (db::Coord (p1.distance(p0)) <= d && db::sprod_sign (p2 - p1, p0 - pm1) > 0 && std::abs (db::vprod (p2 - p1, p0 - pm1)) < 0.8 * p2.distance (p1) * p0.distance (pm1)) {
         //  jog configurations with small edges are candidates
         can_drop = true;
       } else if (db::vprod_sign (p2 - p1, p1 - p0) < 0) {
@@ -702,7 +702,7 @@ smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon
         can_drop = true;
       } else {
         //  convex corners enclosing a little more than 45 degree are candidates too
-        can_drop = (db::sprod_sign (p2 - p1, p1 - p0) > 0 && abs (db::vprod (p2 - p1, p1 - p0)) < 0.8 * p2.distance (p1) * p1.distance (p0));
+        can_drop = (db::sprod_sign (p2 - p1, p1 - p0) > 0 && std::abs (db::vprod (p2 - p1, p1 - p0)) < 0.8 * p2.distance (p1) * p1.distance (p0));
       }
 
       for (size_t j = pi0; can_drop; ) {

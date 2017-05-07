@@ -1198,7 +1198,7 @@ template <> struct type_traits<QEventLoop_Adaptor> : public type_traits<void> {
 };
 }
 
-class QFactoryInterface;
+struct QFactoryInterface;
 namespace tl {
 template <> struct type_traits<QFactoryInterface> : public type_traits<void> {
   typedef tl::false_tag has_copy_constructor;
@@ -2775,7 +2775,7 @@ template <> struct type_traits<QMetaMethod> : public type_traits<void> {
 };
 }
 
-class QMetaObject;
+struct QMetaObject;
 namespace tl {
 template <> struct type_traits<QMetaObject> : public type_traits<void> {
 };

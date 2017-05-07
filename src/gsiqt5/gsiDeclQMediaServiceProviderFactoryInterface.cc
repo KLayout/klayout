@@ -35,7 +35,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QMediaServiceProviderFactoryInterface
+// struct QMediaServiceProviderFactoryInterface
 
 // QMediaService *QMediaServiceProviderFactoryInterface::create(QString const &key)
 

@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QMediaServiceCameraInfoInterface
+// struct QMediaServiceCameraInfoInterface
 
 // int QMediaServiceCameraInfoInterface::cameraOrientation(const QByteArray &device)
 

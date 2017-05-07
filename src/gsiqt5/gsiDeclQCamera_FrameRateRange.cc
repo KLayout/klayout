@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QCamera::FrameRateRange
+// struct QCamera::FrameRateRange
 
 //  Constructor QCamera::FrameRateRange::FrameRateRange()
 

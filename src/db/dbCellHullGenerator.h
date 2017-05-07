@@ -61,7 +61,6 @@ public:
   }
 
 private:
-  const db::Layout *mp_layout;
   std::vector <unsigned int> m_layers;
   bool m_all_layers;
   db::Coord m_small_cell_size;

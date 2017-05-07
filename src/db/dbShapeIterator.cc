@@ -31,7 +31,7 @@ namespace db
 
 template <class Sh, class Iter>
 inline db::Shape
-iterator_to_shape (db::Shapes *shapes, const db::layer<Sh, db::unstable_layer_tag> &l, const Iter &iter)
+iterator_to_shape (db::Shapes *shapes, const db::layer<Sh, db::unstable_layer_tag> & /*l*/, const Iter &iter)
 {
   //  for unstable containers, we simply use the pointer as a reference
   return db::Shape (shapes, *iter);

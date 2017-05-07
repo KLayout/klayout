@@ -27,10 +27,6 @@
 namespace lay
 {
 
-//  registration point for help providers
-template<>
-tl::Registrar<lay::HelpProvider> *tl::Registrar<lay::HelpProvider>::instance = 0;
-
 // --------------------------------------------------------------------------------------
 //  HelpProvider implementation
 
@@ -41,3 +37,9 @@ HelpProvider::HelpProvider ()
 
 }
 
+namespace tl
+{
+  //  registration point for help providers
+  template<>
+  tl::Registrar<lay::HelpProvider> *Registrar<lay::HelpProvider>::instance = 0;
+}

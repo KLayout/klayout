@@ -2213,7 +2213,7 @@ private:
   trans_type m_trans;
   basic_array <coord_type> *mp_base;
 
-  void transform_into_from (const unit_trans_type &tr, const array<Obj, Trans> &d)
+  void transform_into_from (const unit_trans_type & /*tr*/, const array<Obj, Trans> & /*d*/)
   {
     //  .. nothing to do ..
   }
@@ -2249,7 +2249,7 @@ private:
     set_complex (t.mag (), t.rcos (), d);
   }
 
-  void translate_from (const unit_trans_type &tr, const array<Obj, Trans> &d, db::generic_repository<coord_type> &rep, db::ArrayRepository &array_rep)
+  void translate_from (const unit_trans_type & /*tr*/, const array<Obj, Trans> & /*d*/, db::generic_repository<coord_type> & /*rep*/, db::ArrayRepository & /*array_rep*/)
   {
     //  .. nothing to do ..
   }
@@ -2297,7 +2297,7 @@ private:
     }
   }
 
-  void transform_from (const unit_trans_type &tr, const array<Obj, Trans> &d)
+  void transform_from (const unit_trans_type & /*tr*/, const array<Obj, Trans> & /*d*/)
   {
     //  .. nothing to do ..
   }

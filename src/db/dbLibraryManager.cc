@@ -34,6 +34,7 @@
 namespace tl
 {
   template<> DB_PUBLIC tl::Registrar<db::Library> *tl::Registrar<db::Library>::instance = 0;
+  template class DB_PUBLIC tl::RegisteredClass<db::Library>;
 }
 
 namespace db

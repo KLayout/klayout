@@ -153,7 +153,7 @@ class PGContourList
 {
 public:
   PGContourList () 
-    : m_free_contours (-1), m_next_id (1)
+    : m_free_contours (-1)
   { }
 
   PGPolyContour &operator[] (size_t n) 
@@ -240,7 +240,6 @@ public:
 
 private:
   long m_free_contours;
-  size_t m_next_id;
   std::vector <PGPolyContour> m_contours;
 };
 

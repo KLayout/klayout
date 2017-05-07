@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QMediaServiceSupportedFormatsInterface
+// struct QMediaServiceSupportedFormatsInterface
 
 // QMultimedia::SupportEstimate QMediaServiceSupportedFormatsInterface::hasSupport(const QString &mimeType, const QStringList &codecs)
 

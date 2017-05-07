@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QTextCodec::ConverterState
+// struct QTextCodec::ConverterState
 
 //  Constructor QTextCodec::ConverterState::ConverterState(QFlags<QTextCodec::ConversionFlag> f)
 

@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QJsonParseError
+// struct QJsonParseError
 
 //  Constructor QJsonParseError::QJsonParseError()
 

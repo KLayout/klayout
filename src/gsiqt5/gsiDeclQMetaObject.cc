@@ -39,7 +39,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QMetaObject
+// struct QMetaObject
 
 //  Constructor QMetaObject::QMetaObject()
 

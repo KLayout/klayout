@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QTextEdit::ExtraSelection
+// struct QTextEdit::ExtraSelection
 
 //  Constructor QTextEdit::ExtraSelection::ExtraSelection()
 

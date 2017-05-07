@@ -589,7 +589,7 @@ public:
    *
    *  @return The transformation that must be applied to render the original edge
    */
-  void reduce (unit_trans<coord_type> &tr)
+  void reduce (unit_trans<coord_type> & /*tr*/)
   {
     //  .. no reduction possible ..
   }

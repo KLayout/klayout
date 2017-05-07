@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QAccessible::State
+// struct QAccessible::State
 
 //  Constructor QAccessible::State::State()
 

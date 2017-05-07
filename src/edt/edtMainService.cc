@@ -2012,7 +2012,7 @@ class NewObjectsSelection
 {
 public:
   NewObjectsSelection (int cv_index, db::cell_index_type topcell, lay::LayoutView *view)
-    : m_cv_index (cv_index), m_topcell (topcell), mp_view (view)
+    : m_cv_index (cv_index), m_topcell (topcell)
   {
     mp_polygon_service = view->get_plugin <edt::PolygonService> ();
     mp_box_service = view->get_plugin <edt::BoxService> ();
@@ -2071,7 +2071,6 @@ private:
   edt::InstService *mp_inst_service;
   int m_cv_index;
   db::cell_index_type m_topcell;
-  lay::LayoutView *mp_view;
 };
 
 void 

@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QStringDataPtr
+// struct QStringDataPtr
 
 //  Constructor QStringDataPtr::QStringDataPtr()
 

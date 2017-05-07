@@ -160,10 +160,5 @@ private:
 
 }
 
-namespace tl {
-  //  make registration available to external DLL's
-  template class RDB_PUBLIC tl::RegisteredClass<rdb::FormatDeclaration>;
-}
-
 #endif
 

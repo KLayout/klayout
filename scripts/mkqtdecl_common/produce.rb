@@ -1833,7 +1833,7 @@ END
 
     ofile.puts("")
     ofile.puts("// -----------------------------------------------------------------------")
-    ofile.puts("// class #{cls}")
+    ofile.puts("// #{struct.kind.to_s} #{cls}")
 
     if has_metaobject
 
@@ -2287,7 +2287,7 @@ END
 
     if !is_child_class
       # only for top-level classes external declarations are produced currently
-      @ext_decls << "class #{cls};\nnamespace gsi { GSIQT_PUBLIC gsi::Class<#{cls}> &qtdecl_#{clsn} (); }\n\n"
+      @ext_decls << "#{struct.kind.to_s} #{cls};\nnamespace gsi { GSIQT_PUBLIC gsi::Class<#{cls}> &qtdecl_#{clsn} (); }\n\n"
     end
 
     ofile.puts("")
@@ -2835,7 +2835,7 @@ END
     if cls =~ /^(.*?)::/
       ttfile.puts("#include <#{$1}>")
     else
-      ttfile.puts("class #{cls};")
+      ttfile.puts("#{struct.kind.to_s} #{cls};")
     end
 
     ttfile.puts("namespace tl {")

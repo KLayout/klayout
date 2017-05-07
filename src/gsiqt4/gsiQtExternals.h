@@ -339,7 +339,7 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QEvent> &qtdecl_QEvent (); }
 class QEventLoop;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QEventLoop> &qtdecl_QEventLoop (); }
 
-class QFactoryInterface;
+struct QFactoryInterface;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QFactoryInterface> &qtdecl_QFactoryInterface (); }
 
 class QFile;
@@ -729,7 +729,7 @@ namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaEnum> &qtdecl_QMetaEnum (); }
 class QMetaMethod;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaMethod> &qtdecl_QMetaMethod (); }
 
-class QMetaObject;
+struct QMetaObject;
 namespace gsi { GSIQT_PUBLIC gsi::Class<QMetaObject> &qtdecl_QMetaObject (); }
 
 class QMetaProperty;

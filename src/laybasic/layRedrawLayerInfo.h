@@ -31,7 +31,7 @@
 
 namespace lay {
 
-struct LayerProperties;
+class LayerProperties;
 
 /**
  *  @brief A helper struct to describe one entry in the redraw queue

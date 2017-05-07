@@ -532,7 +532,6 @@ private:
 
   //  The look of the markers
   QColor m_color;
-  int m_line_width, m_vertex_size;
 
   //  The current transformation on movement
   db::DTrans m_move_trans;

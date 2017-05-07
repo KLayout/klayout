@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QTimeZone::OffsetData
+// struct QTimeZone::OffsetData
 
 //  Constructor QTimeZone::OffsetData::OffsetData()
 

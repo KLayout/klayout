@@ -503,10 +503,6 @@ typedef tl::RegisteredClass<user_object_factory_base<db::DCoord> > DUserObjectDe
 
 namespace tl 
 {
-  //  make registration available to external DLL's
-  template class DB_PUBLIC tl::RegisteredClass<db::user_object_factory_base<db::Coord> >;
-  template class DB_PUBLIC tl::RegisteredClass<db::user_object_factory_base<db::DCoord> >;
-
   /**
    *  @brief The type traits for the user object type
    */

@@ -2665,7 +2665,7 @@ public:
    *
    *  Asserts, if begin called.
    */
-  const contour_type &hole (unsigned int h) const
+  const contour_type &hole (unsigned int /*h*/) const
   {
     tl_assert (false);
     return hull (); // to please the compiler

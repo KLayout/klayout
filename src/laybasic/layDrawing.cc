@@ -28,7 +28,7 @@ namespace lay
 {
 
 Drawing::Drawing (unsigned int num_planes, Drawings *drawings)
-  : m_num_planes (num_planes), mp_drawings (drawings)
+  : m_num_planes (num_planes)
 {
   drawings->push_back (this);
 }

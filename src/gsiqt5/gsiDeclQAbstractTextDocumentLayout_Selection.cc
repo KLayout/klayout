@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QAbstractTextDocumentLayout::Selection
+// struct QAbstractTextDocumentLayout::Selection
 
 //  Constructor QAbstractTextDocumentLayout::Selection::Selection()
 

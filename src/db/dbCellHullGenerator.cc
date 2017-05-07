@@ -202,7 +202,7 @@ private:
 const size_t default_complexity = 100;
 
 CellHullGenerator::CellHullGenerator (const db::Layout &layout)
-  : mp_layout (&layout), m_all_layers (true), m_small_cell_size (100), m_complexity (default_complexity)
+  : m_all_layers (true), m_small_cell_size (100), m_complexity (default_complexity)
 {
   for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
     m_layers.push_back ((*l).first);
@@ -210,7 +210,7 @@ CellHullGenerator::CellHullGenerator (const db::Layout &layout)
 }
 
 CellHullGenerator::CellHullGenerator (const db::Layout &layout, const std::vector <unsigned int> &layers)
-  : mp_layout (&layout), m_all_layers (true), m_small_cell_size (100), m_complexity (default_complexity)
+  : m_all_layers (true), m_small_cell_size (100), m_complexity (default_complexity)
 {
   std::set <unsigned int> ll;
   ll.insert (layers.begin (), layers.end ());

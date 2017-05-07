@@ -146,7 +146,7 @@ class LandmarkEditorService
 public:
   LandmarkEditorService (lay::LayoutView *view, img::Object *img)
     : lay::ViewService (view->view_object_widget ()), 
-      mp_view (view), mp_image (img), m_selected (-1), m_dragging (false), 
+      mp_image (img), m_selected (-1), m_dragging (false),
       m_mode (LandmarksDialog::None)
   {
     update ();
@@ -362,7 +362,6 @@ public:
   tl::Event updated_event;
 
 private:
-  lay::LayoutView *mp_view;
   img::Object *mp_image;
   std::vector<LandmarkMarker *> m_markers;
   int m_selected;

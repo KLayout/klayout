@@ -871,9 +871,6 @@ inline bool test_and_set (T &target, const T &source)
 
 namespace tl
 {
-  //  make registration available to external DLL's
-  template class LAYBASIC_PUBLIC tl::RegisteredClass<lay::PluginDeclaration>;
-
   //  disable copy ctor for PluginRoot
   template <> struct type_traits<lay::PluginRoot> : public type_traits<void> {
     typedef tl::false_tag has_copy_constructor;

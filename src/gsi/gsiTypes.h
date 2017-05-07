@@ -61,7 +61,7 @@ class MapAdaptor;
 class StringAdaptor;
 class VariantAdaptor;
 class ClassBase;
-class NoAdaptorTag;
+struct NoAdaptorTag;
 template <class X, class A> class Class;
 template <class X> struct ClassTag;
 template <class I> class IterAdaptor;
@@ -1376,8 +1376,9 @@ public:
  *  is an iterator delivering the given types of a vector of the given types and
  *  adds class informations if the type is "T_object", "T_object_ref", "T_object_cref". 
  */
-struct GSI_PUBLIC ArgType
+class GSI_PUBLIC ArgType
 {
+public:
   /**
    *  @brief Default constructor
    *

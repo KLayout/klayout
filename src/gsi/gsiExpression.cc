@@ -1092,7 +1092,7 @@ initialize_expressions ()
 //  VariantUserClassImpl implementation
 
 VariantUserClassImpl::VariantUserClassImpl () 
-  : mp_cls (0), mp_self (0), mp_object_cls (0), m_reference (false), m_is_const (false)
+  : mp_cls (0), mp_self (0), mp_object_cls (0), m_is_const (false)
 { 
   //  .. nothing yet ..
 }

@@ -34,7 +34,7 @@
 #include <memory>
 
 // -----------------------------------------------------------------------
-// class QPagedPaintDevice::Margins
+// struct QPagedPaintDevice::Margins
 
 //  Constructor QPagedPaintDevice::Margins::Margins()
 

@@ -27,7 +27,9 @@
 namespace tl
 {
   template<> DB_PUBLIC tl::Registrar<db::user_object_factory_base<db::Coord> > *tl::Registrar<db::user_object_factory_base<db::Coord> >::instance = 0;
+  template class DB_PUBLIC tl::RegisteredClass<db::user_object_factory_base<db::Coord> >;
   template<> DB_PUBLIC tl::Registrar<db::user_object_factory_base<db::DCoord> > *tl::Registrar<db::user_object_factory_base<db::DCoord> >::instance = 0;
+  template class DB_PUBLIC tl::RegisteredClass<db::user_object_factory_base<db::DCoord> >;
 }
 
 namespace db

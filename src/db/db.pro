@@ -230,6 +230,9 @@ HEADERS = \
     dbGlyphs.h \
     dbCommon.h
 
+RESOURCES = \
+  dbResources.qrc
+
 INCLUDEPATH += ../tl ../gsi
 DEPENDPATH += ../tl ../gsi
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi

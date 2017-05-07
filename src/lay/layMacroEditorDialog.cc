@@ -22,6 +22,7 @@
 
 
 #include "ui_MacroTemplateSelectionDialog.h"
+#include "layMacroController.h"
 #include "layMacroEditorTree.h"
 #include "layMacroEditorDialog.h"
 #include "layMacroEditorSetupDialog.h"
@@ -252,7 +253,8 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
     m_font_size (0),
     m_edit_trace_index (-1),
     m_add_edit_trace_enabled (true),
-    dm_refresh_file_watcher (this, &MacroEditorDialog::do_refresh_file_watcher)
+    dm_refresh_file_watcher (this, &MacroEditorDialog::do_refresh_file_watcher),
+    dm_update_ui_to_run_mode (this, &MacroEditorDialog::do_update_ui_to_run_mode)
 {
   //  Makes this dialog receive events while progress bars are on - this way we can set breakpoints
   //  during execution of a macro even if anything lengthy is running.
@@ -262,8 +264,10 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
 
   connect (mp_root, SIGNAL (macro_changed (Macro *)), this, SLOT (macro_changed (Macro *)));
   connect (mp_root, SIGNAL (macro_deleted (Macro *)), this, SLOT (macro_deleted (Macro *)));
+  connect (mp_root, SIGNAL (macro_collection_deleted (MacroCollection *)), this, SLOT (macro_collection_deleted (MacroCollection *)));
+  connect (mp_root, SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (macro_collection_changed (MacroCollection *)));
 
-  m_categories = lay::Application::instance ()->macro_categories ();
+  m_categories = lay::MacroController::instance ()->macro_categories ();
 
   treeTab->clear ();
 
@@ -389,7 +393,6 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
   watchList->addAction (actionDeleteWatches);
   watchList->addAction (actionClearWatches);
 
-  connect (actionAddWatch, SIGNAL (triggered ()), this, SLOT (add_watch ()));
   connect (actionAddWatch, SIGNAL (triggered ()), this, SLOT (add_watch ()));
   connect (actionEditWatch, SIGNAL (triggered ()), this, SLOT (edit_watch ()));
   connect (actionDeleteWatches, SIGNAL (triggered ()), this, SLOT (del_watches ()));
@@ -1023,7 +1026,7 @@ MacroEditorDialog::add_edit_trace (bool compress)
   }
 
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
-  if (! page) {
+  if (! page || ! page->macro ()) {
     return;
   }
 
@@ -1534,6 +1537,34 @@ MacroEditorDialog::commit ()
 }
 
 void
+MacroEditorDialog::macro_collection_deleted (lay::MacroCollection *collection)
+{
+  //  close the tab pages related to the collection we want to delete
+  std::set <lay::Macro *> used_macros;
+  std::set <lay::MacroCollection *> used_collections;
+  collection->collect_used_nodes (used_macros, used_collections);
+
+  for (std::set <lay::Macro *>::iterator mc = used_macros.begin (); mc != used_macros.end (); ++mc) {
+
+    if (mp_run_macro == *mc) {
+      mp_run_macro = 0;
+    }
+
+    std::map <Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.find (*mc);
+    if (p != m_tab_widgets.end ()) {
+      //  disable the macro on the page - we'll ask for updates when the file
+      //  watcher becomes active. So long, the macro is "zombie".
+      p->second->connect_macro (0);
+      m_tab_widgets.erase (p);
+    }
+
+  }
+
+  refresh_file_watcher ();
+  update_ui_to_run_mode ();
+}
+
+void
 MacroEditorDialog::macro_deleted (lay::Macro *macro)
 {
   if (mp_run_macro == macro) {
@@ -1542,14 +1573,19 @@ MacroEditorDialog::macro_deleted (lay::Macro *macro)
 
   std::map <Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
   if (page != m_tab_widgets.end ()) {
+    //  disable the macro on the page - we'll ask for updates when the file
+    //  watcher becomes active. So long, the macro is "zombie".
     page->second->connect_macro (0);
-    tabWidget->blockSignals (true); // blockSignals prevents a reentrant call into set_current of the tree
-    tabWidget->removeTab (tabWidget->indexOf (page->second));
-    tabWidget->blockSignals (false);
-    delete page->second;
     m_tab_widgets.erase (page);
   }
 
+  refresh_file_watcher ();
+  update_ui_to_run_mode ();
+}
+
+void
+MacroEditorDialog::macro_collection_changed (lay::MacroCollection * /*collection*/)
+{
   refresh_file_watcher ();
 }
 
@@ -1593,7 +1629,7 @@ MacroEditorDialog::current_tab_changed (int index)
   update_ui_to_run_mode ();
 }
 
-lay::Macro *MacroEditorDialog::create_macro_here(const char *prefix)
+lay::Macro *MacroEditorDialog::create_macro_here (const char *prefix)
 {
   lay::MacroEditorTree *mt = current_macro_tree ();
   MacroCollection *collection = mt->current_macro_collection ();
@@ -1923,11 +1959,14 @@ MacroEditorDialog::setup_button_clicked ()
 
     m_save_all_on_run = data.save_all_on_run;
 
-    for (std::map<Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
-      f->second->set_ntab (m_ntab);
-      f->second->set_nindent (m_nindent);
-      f->second->apply_attributes ();
-      f->second->set_font (m_font_family, m_font_size);
+    for (int i = 0; i < tabWidget->count (); ++i) {
+      MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->widget (i));
+      if (page) {
+        page->set_ntab (m_ntab);
+        page->set_nindent (m_nindent);
+        page->apply_attributes ();
+        page->set_font (m_font_family, m_font_size);
+      }
     }
 
     //  write configuration
@@ -2059,14 +2098,16 @@ BEGIN_PROTECTED
   }
 
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->widget (index));
-  if (! page || ! page->macro ()) {
+  if (! page) {
     delete tabWidget->currentWidget ();
     return;
   }
 
-  std::map <Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.find (page->macro ());
-  if (p != m_tab_widgets.end ()) {
-    m_tab_widgets.erase (p);
+  for (std::map <Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
+    if (p->second == page) {
+      m_tab_widgets.erase (p);
+      break;
+    }
   }
 
   page->connect_macro (0);
@@ -2343,7 +2384,7 @@ MacroEditorDialog::file_changed (const QString &path)
 {
   m_changed_files.push_back (path);
 
-  //  Wait a little to let more to allow for more reload requests to collect
+  //  Wait a little to allow for more reload requests to collect
   m_file_changed_timer->setInterval (300);
   m_file_changed_timer->start ();
 }
@@ -2388,79 +2429,6 @@ MacroEditorDialog::sync_file_watcher (lay::MacroCollection * /*collection*/)
 #endif
 }
 
-bool
-MacroEditorDialog::sync_macros (lay::MacroCollection *current, lay::MacroCollection *actual)
-{
-  bool ret = false;
-
-  if (actual) {
-    current->make_readonly (actual->is_readonly ());
-  }
-
-  std::vector<lay::MacroCollection *> folders_to_delete;
-
-  for (lay::MacroCollection::child_iterator m = current->begin_children (); m != current->end_children (); ++m) {
-    lay::MacroCollection *cm = actual ? actual->folder_by_name (m->first) : 0;
-    if (! cm) {
-      folders_to_delete.push_back (m->second);
-    }
-  }
-
-  if (actual) {
-    for (lay::MacroCollection::child_iterator m = actual->begin_children (); m != actual->end_children (); ++m) {
-      lay::MacroCollection *cm = current->folder_by_name (m->first);
-      if (! cm) {
-        cm = current->create_folder (m->first.c_str (), false);
-        ret = true;
-      }
-      if (sync_macros(cm, m->second)) {
-        ret = true;
-      }
-    }
-  }
-
-  //  delete folders which do no longer exist
-  for (std::vector<lay::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
-    ret = true;
-    sync_macros (*m, 0);
-    current->erase (*m);
-  }
-
-  std::vector<lay::Macro *> macros_to_delete;
-
-  for (lay::MacroCollection::iterator m = current->begin (); m != current->end (); ++m) {
-    lay::Macro *cm = actual ? actual->macro_by_name (m->first, m->second->format ()) : 0;
-    if (! cm) {
-      macros_to_delete.push_back (m->second);
-    }
-  }
-
-  if (actual) {
-    for (lay::MacroCollection::iterator m = actual->begin (); m != actual->end (); ++m) {
-      lay::Macro *cm = current->macro_by_name (m->first, m->second->format ());
-      if (cm) {
-        if (*cm != *m->second) {
-          cm->assign (*m->second);
-        }
-        cm->set_readonly (m->second->is_readonly ());
-      } else {
-        cm = current->create (m->first.c_str (), m->second->format ());
-        cm->assign (*m->second);
-        cm->set_readonly (m->second->is_readonly ());
-        ret = true;
-      }
-    }
-  }
-
-  //  erase macros from collection which are no longer used
-  for (std::vector<lay::Macro *>::const_iterator m = macros_to_delete.begin (); m != macros_to_delete.end (); ++m) {
-    current->erase (*m);
-    ret = true;
-  }
-
-  return ret;
-}
-
 void
 MacroEditorDialog::refresh_file_watcher ()
 {
@@ -2488,18 +2456,13 @@ void
 MacroEditorDialog::reload_macros ()
 {
   m_file_watcher->clear ();
-
-  lay::MacroCollection new_root;
-
-  //  create a new root
-  for (lay::MacroCollection::child_iterator c = mp_root->begin_children (); c != mp_root->end_children (); ++c) {
-    new_root.add_folder (c->second->description (), c->second->path (), c->second->category (), c->second->is_readonly ());
+  try {
+    mp_root->reload ();
+    refresh_file_watcher ();
+  } catch (...) {
+    refresh_file_watcher ();
+    throw;
   }
-
-  //  and synchronize current with the actual one
-  sync_macros (mp_root, &new_root);
-
-  refresh_file_watcher ();
 }
 
 void
@@ -2593,29 +2556,12 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to remove that location")));
   } 
 
-  //  close the tab pages related to the collection we want to delete
-  std::set <lay::Macro *> used_macros;
-  std::set <lay::MacroCollection *> used_collections;
-  collection->collect_used_nodes (used_macros, used_collections);
-
-  for (std::set <lay::Macro *>::iterator mc = used_macros.begin (); mc != used_macros.end (); ++mc) {
-
-    std::map <Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.find (*mc);
-    if (p != m_tab_widgets.end ()) {
-      p->second->connect_macro (0);
-      delete p->second;
-      m_tab_widgets.erase (p);
-    }
-
-  }
-
-  //  actually remove the collection
+  //  actually remove the collection (update is done through the
+  //  macro_collection_deleted signal handler).
   mp_root->erase (collection);
 
   //  save the new paths
   set_custom_paths (paths);
-
-  refresh_file_watcher ();
 
 END_PROTECTED
 }
@@ -3045,17 +2991,25 @@ MacroEditorDialog::leave_breakpoint_mode ()
 void 
 MacroEditorDialog::update_ui_to_run_mode ()
 {
+  dm_update_ui_to_run_mode ();
+}
+
+void
+MacroEditorDialog::do_update_ui_to_run_mode ()
+{
   double alpha = 0.95;
 
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
 
   dbgOn->setEnabled (! m_in_exec);
-  runButton->setEnabled ((! m_in_exec && (mp_run_macro || (page && page->macro ()->interpreter () != lay::Macro::None))) || m_in_breakpoint);
-  runThisButton->setEnabled ((! m_in_exec && page && page->macro ()->interpreter () != lay::Macro::None) || m_in_breakpoint);
+  runButton->setEnabled ((! m_in_exec && (mp_run_macro || (page && page->macro () && page->macro ()->interpreter () != lay::Macro::None))) || m_in_breakpoint);
+  runThisButton->setEnabled ((! m_in_exec && page && page->macro () && page->macro ()->interpreter () != lay::Macro::None) || m_in_breakpoint);
   singleStepButton->setEnabled (! m_in_exec || m_in_breakpoint);
   nextStepButton->setEnabled (! m_in_exec || m_in_breakpoint);
   stopButton->setEnabled (m_in_exec);
   pauseButton->setEnabled (m_in_exec && ! m_in_breakpoint);
+  breakpointButton->setEnabled (page && page->macro ());
+  clearBreakpointsButton->setEnabled (page && page->macro ());
 
   for (std::vector<lay::MacroEditorTree *>::const_iterator mt = m_macro_trees.begin (); mt != m_macro_trees.end (); ++mt) {
     (*mt)->setEditTriggers (m_in_exec ? QAbstractItemView::NoEditTriggers : QAbstractItemView::SelectedClicked);

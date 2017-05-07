@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<technology>
+ <name>new_tech</name>
+ <description/>
+ <dbu>0.001</dbu>
+ <base-path/>
+ <layer-properties_file/>
+ <add-other-layers>true</add-other-layers>
+</technology>

@@ -490,6 +490,8 @@ DXFReader::open_layer (db::Layout &layout, const std::string &n)
 void 
 DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
 {
+  tl::SelfTimer timer (tl::verbosity () >= 21, "File read");
+
   m_new_layers.clear ();
 
   //  create the zero layer - this is not mapped to GDS but can be specified in the layer mapping as

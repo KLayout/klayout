@@ -414,6 +414,32 @@ tl::to_word_or_quoted_string (const std::string &s, const char *non_term)
 }
 
 void
+tl::escape_to_html (std::string &out, const std::string &in, bool replace_newlines)
+{
+  for (const char *cp = in.c_str (); *cp; ++cp) {
+    if (*cp == '<') {
+      out += "&lt;";
+    } else if (*cp == '>') {
+      out += "&gt;";
+    } else if (*cp == '&') {
+      out += "&amp;";
+    } else if (replace_newlines && *cp == '\n') {
+      out += "<br/>";
+    } else {
+      out += *cp;
+    }
+  }
+}
+
+std::string
+tl::escaped_to_html (const std::string &in, bool replace_newlines)
+{
+  std::string s;
+  escape_to_html (s, in, replace_newlines);
+  return s;
+}
+
+void
 tl::from_string (const std::string &s, const char * &result)
 {
   result = s.c_str ();

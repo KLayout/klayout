@@ -22,18 +22,21 @@
 
 
 #include "layApplication.h"
+#include "laySignalHandler.h"
 #include "laybasicConfig.h"
 #include "layConfig.h"
 #include "layMainWindow.h"
 #include "layMacroEditorDialog.h"
 #include "layVersion.h"
 #include "layMacro.h"
-#include "layCrashMessage.h"
+#include "laySignalHandler.h"
 #include "layRuntimeErrorForm.h"
 #include "layProgress.h"
 #include "layTextProgress.h"
 #include "layBackgroundAwareTreeStyle.h"
 #include "layMacroController.h"
+#include "layTechnologyController.h"
+#include "laySaltController.h"
 #include "gtf.h"
 #include "gsiDecl.h"
 #include "gsiInterpreter.h"
@@ -55,32 +58,20 @@
 
 #include <QIcon>
 #include <QDir>
-#include <QDirIterator>
 #include <QFileInfo>
 #include <QFile>
 #include <QAction>
 #include <QMessageBox>
 
-#ifdef _WIN32
-#  include <windows.h>
-#  include <DbgHelp.h>
-#  include <Psapi.h>
-//  get rid of these - we have std::min/max ..
-#  ifdef min
-#    undef min
-#  endif
-#  ifdef max
-#    undef max
-#  endif
-#else
-#  include <dlfcn.h>
-#  include <execinfo.h>
-#endif
-
 #include <iostream>
 #include <memory>
 #include <algorithm>
-#include <signal.h>
+
+#ifdef _WIN32
+#  include <windows.h>
+#else
+#  include <dlfcn.h>
+#endif
 
 namespace lay
 {
@@ -90,6 +81,9 @@ namespace lay
 
 static void ui_exception_handler_tl (const tl::Exception &ex, QWidget *parent)
 {
+  //  Prevents severe side effects if there are pending deferred methods
+  tl::NoDeferredMethods silent;
+
   //  if any transaction is pending (this may happen when an operation threw an exception)
   //  close transactions.
   if (lay::MainWindow::instance () && lay::MainWindow::instance ()->manager ().transacting ()) {
@@ -132,6 +126,9 @@ static void ui_exception_handler_tl (const tl::Exception &ex, QWidget *parent)
 
 static void ui_exception_handler_std (const std::exception &ex, QWidget *parent)
 {
+  //  Prevents severe side effects if there are pending deferred methods
+  tl::NoDeferredMethods silent;
+
   //  if any transaction is pending (this may happen when an operation threw an exception)
   //  close transactions.
   if (lay::MainWindow::instance () && lay::MainWindow::instance ()->manager ().transacting ()) {
@@ -147,6 +144,9 @@ static void ui_exception_handler_std (const std::exception &ex, QWidget *parent)
 
 static void ui_exception_handler_def (QWidget *parent)
 {
+  //  Prevents severe side effects if there are pending deferred methods
+  tl::NoDeferredMethods silent;
+
   //  if any transaction is pending (this may happen when an operation threw an exception)
   //  close transactions.
   if (lay::MainWindow::instance () && lay::MainWindow::instance ()->manager ().transacting ()) {
@@ -162,292 +162,6 @@ static void ui_exception_handler_def (QWidget *parent)
 // --------------------------------------------------------------------------------
 
 static Application *ms_instance = 0;
-
-#if defined(WIN32)
-
-static QString
-addr2symname (DWORD64 addr)
-{
-  const int max_symbol_length = 255;
-
-  SYMBOL_INFO *symbol = (SYMBOL_INFO *) calloc (sizeof (SYMBOL_INFO) + (max_symbol_length + 1) * sizeof (char), 1);
-  symbol->MaxNameLen = max_symbol_length;
-  symbol->SizeOfStruct = sizeof (SYMBOL_INFO);
-
-  HANDLE process = GetCurrentProcess ();
-
-  QString sym_name;
-  DWORD64 d;
-  bool has_symbol = false;
-  DWORD64 disp = addr;
-  if (SymFromAddr(process, addr, &d, symbol)) {
-    //  Symbols taken from the export table seem to be unreliable - skip these
-    //  and report the module name + offset.
-    if (! (symbol->Flags & SYMFLAG_EXPORT)) {
-      sym_name = QString::fromLocal8Bit (symbol->Name);
-      disp = d;
-      has_symbol = true;
-    }
-  }
-
-  //  find the module name from the module base address
-
-  HMODULE modules[1024];
-  DWORD modules_size = 0;
-  if (! EnumProcessModules (process, modules, sizeof (modules), &modules_size)) {
-    modules_size = 0;
-  }
-
-  QString mod_name;
-  for (unsigned int i = 0; i < (modules_size / sizeof (HMODULE)); i++) {
-    TCHAR mn[MAX_PATH];
-    if (GetModuleFileName (modules[i], mn, sizeof (mn) / sizeof (TCHAR))) {
-      MODULEINFO mi;
-      if (GetModuleInformation (process, modules[i], &mi, sizeof (mi))) {
-        if ((DWORD64) mi.lpBaseOfDll <= addr && (DWORD64) mi.lpBaseOfDll + mi.SizeOfImage > addr) {
-          mod_name = QFileInfo (QString::fromUtf16 ((unsigned short *) mn)).fileName ();
-          if (! has_symbol) {
-            disp -= (DWORD64) mi.lpBaseOfDll;
-          }
-          break;
-        }
-      }
-    }
-  }
-
-  if (! mod_name.isNull ()) {
-    mod_name = QString::fromUtf8 ("(") + mod_name + QString::fromUtf8 (") ");
-  }
-
-  free (symbol);
-
-  return QString::fromUtf8 ("0x%1 - %2%3+%4").
-            arg (addr, 0, 16).
-            arg (mod_name).
-            arg (sym_name).
-            arg (disp);
-}
-
-static QString
-get_symbol_name_from_address (const QString &mod_name, size_t addr)
-{
-  HANDLE process = GetCurrentProcess ();
-
-  DWORD64 mod_base = 0;
-  if (! mod_name.isEmpty ()) {
-
-    //  find the module name from the module base address
-    HMODULE modules[1024];
-    DWORD modules_size = 0;
-    if (! EnumProcessModules (process, modules, sizeof (modules), &modules_size)) {
-      modules_size = 0;
-    }
-
-    for (unsigned int i = 0; i < (modules_size / sizeof (HMODULE)); i++) {
-      TCHAR mn[MAX_PATH];
-      if (GetModuleFileName (modules[i], mn, sizeof (mn) / sizeof (TCHAR))) {
-        if (mod_name == QFileInfo (QString::fromUtf16 ((unsigned short *) mn)).fileName ()) {
-          MODULEINFO mi;
-          if (GetModuleInformation (process, modules[i], &mi, sizeof (mi))) {
-            mod_base = (DWORD64) mi.lpBaseOfDll;
-          }
-        }
-      }
-    }
-
-    if (mod_base == 0) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Unknown module name: ") + mod_name));
-    }
-
-  }
-
-  SymInitialize (process, NULL, TRUE);
-  QString res = addr2symname (mod_base + (DWORD64) addr);
-  SymCleanup (process);
-
-  return res;
-}
-
-LONG WINAPI ExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
-{
-  HANDLE process = GetCurrentProcess ();
-  SymInitialize (process, NULL, TRUE);
- 
-  QString text;
-  text += QObject::tr ("Exception code: 0x%1\n").arg (pExceptionInfo->ExceptionRecord->ExceptionCode, 0, 16);
-  text += QObject::tr ("Program Version: ") + 
-          QString::fromUtf8 (lay::Version::name ()) + 
-          QString::fromUtf8 (" ") +
-          QString::fromUtf8 (lay::Version::version ()) +
-          QString::fromUtf8 (" (") +
-          QString::fromUtf8 (lay::Version::subversion ()) +
-          QString::fromUtf8 (")");
-#if defined(_WIN64)
-  text += QString::fromUtf8 (" AMD64");
-#else
-  text += QString::fromUtf8 (" x86");
-#endif
-  text += QString::fromUtf8 ("\n");
-  text += QObject::tr ("\nBacktrace:\n");
-
-  CONTEXT context_record = *pExceptionInfo->ContextRecord;
-
-  // Initialize stack walking.
-  STACKFRAME64 stack_frame;
-  memset(&stack_frame, 0, sizeof(stack_frame));
-
-#if defined(_WIN64)
-  int machine_type = IMAGE_FILE_MACHINE_AMD64;
-  stack_frame.AddrPC.Offset = context_record.Rip;
-  stack_frame.AddrFrame.Offset = context_record.Rbp;
-  stack_frame.AddrStack.Offset = context_record.Rsp;
-#else
-  int machine_type = IMAGE_FILE_MACHINE_I386;
-  stack_frame.AddrPC.Offset = context_record.Eip;
-  stack_frame.AddrFrame.Offset = context_record.Ebp;
-  stack_frame.AddrStack.Offset = context_record.Esp;
-#endif
-  stack_frame.AddrPC.Mode = AddrModeFlat;
-  stack_frame.AddrFrame.Mode = AddrModeFlat;
-  stack_frame.AddrStack.Mode = AddrModeFlat;
-
-  while (StackWalk64 (machine_type,
-                      GetCurrentProcess(),
-                      GetCurrentThread(),
-                      &stack_frame,
-                      &context_record,
-                      NULL,
-                      &SymFunctionTableAccess64,
-                      &SymGetModuleBase64,
-                      NULL)) {
-    text += addr2symname (stack_frame.AddrPC.Offset);
-    text += QString::fromUtf8 ("\n");
-  }
-
-  SymCleanup (process);
-
-  //  YES! I! KNOW!
-  //  In a signal handler you shall not do fancy stuff (in particular not 
-  //  open dialogs) nor shall you throw exceptions! But that scheme appears to
-  //  be working since in most cases the signal is raised from our code (hence 
-  //  from our stack frames) and everything is better than just showing 
-  //  the "application stopped working" dialog. 
-  //  Isn't it?
-  
-  CrashMessage msg (0, true, text);
-  if (! msg.exec ()) {
-    //  terminate unconditionally
-    return EXCEPTION_EXECUTE_HANDLER;
-  } else {
-    throw tl::CancelException ();
-  }
-}
-
-static void handle_signal (int signo)
-{
-  signal (signo, handle_signal);
-  int user_base = (1 << 29); 
-  RaiseException(signo + user_base, 0, 0, NULL);
-}
-
-static void install_signal_handlers ()
-{
-  //  disable any signal handlers that Ruby might have installed.
-  signal (SIGSEGV, SIG_DFL);
-  signal (SIGILL, SIG_DFL);
-  signal (SIGFPE, SIG_DFL);
-
-  signal (SIGABRT, handle_signal);
-
-#if 0
-  //  TODO: not available to MinGW - linking against msvc100 would help
-  //  but then the app crashes.
-  _set_abort_behavior( 0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT );
-#endif
-
-  SetUnhandledExceptionFilter(ExceptionHandler);
-}
-
-#else
-
-QString get_symbol_name_from_address (const QString &, size_t)
-{
-  return QString::fromUtf8 ("n/a");
-}
-
-void signal_handler (int signo, siginfo_t *si, void *)
-{
-  void *array [100];
-  
-  bool can_resume = (signo != SIGILL);
-
-  size_t nptrs = backtrace (array, sizeof (array) / sizeof (array[0]));
-
-  QString text;
-  text += QObject::tr ("Signal number: %1\n").arg (signo);
-  text += QObject::tr ("Address: 0x%1\n").arg ((size_t) si->si_addr, 0, 16);
-  text += QObject::tr ("Program Version: ") + 
-          QString::fromUtf8 (lay::Version::name ()) + 
-          QString::fromUtf8 (" ") +
-          QString::fromUtf8 (lay::Version::version ()) +
-          QString::fromUtf8 (" (") +
-          QString::fromUtf8 (lay::Version::subversion ()) +
-          QString::fromUtf8 (")");
-  text += QString::fromUtf8 ("\n");
-  text += QObject::tr ("Backtrace:\n");
-
-  char **symbols = backtrace_symbols (array, nptrs);
-  if (symbols == NULL) {
-    text += QObject::tr ("-- Unable to obtain stack trace --");
-  } else {
-    for (size_t i = 2; i < nptrs; i++) {
-      text += QString::fromUtf8 (symbols [i]) + QString::fromUtf8 ("\n");
-    }
-  }
-  free(symbols);
- 
-  //  YES! I! KNOW!
-  //  In a signal handler you shall not do fancy stuff (in particular not 
-  //  open dialogs) nor shall you throw exceptions! But that scheme appears to
-  //  be working since in most cases the signal is raised from our code (hence 
-  //  from our stack frames) and everything is better than just core dumping. 
-  //  Isn't it?
-  
-  CrashMessage msg (0, can_resume, text);
-  if (! msg.exec ()) {
-
-    _exit (signo);
-
-  } else {
-
-    sigset_t x;
-    sigemptyset (&x);
-    sigaddset(&x, signo);
-    sigprocmask(SIG_UNBLOCK, &x, NULL);
-
-    throw tl::CancelException ();
-
-  }
-}
-
-static void install_signal_handlers ()
-{
-  struct sigaction act;
-  act.sa_sigaction = signal_handler;
-  sigemptyset (&act.sa_mask);
-  act.sa_flags = SA_SIGINFO;
-#if !defined(__APPLE__)
-  act.sa_restorer = 0;
-#endif
-
-  sigaction (SIGSEGV, &act, NULL);
-  sigaction (SIGILL, &act, NULL);
-  sigaction (SIGFPE, &act, NULL);
-  sigaction (SIGABRT, &act, NULL);
-  sigaction (SIGBUS, &act, NULL);
-}
-
-#endif
 
 static void load_plugin (const std::string &pp)
 {
@@ -571,47 +285,6 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
         m_config_files.push_back (tl::to_string (qd.absoluteFilePath (filename)));
         if (m_config_files.back () != m_config_file_to_write) {
           m_initial_config_files.push_back (m_config_files.back ());
-        }
-      }
-    }
-
-  }
-
-  //  try to locate a global rbainit file and rbm modules
-  std::vector<std::string> global_modules;
-  std::set<std::string> modules;
-
-  //  try to locate a global plugins
-  for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-
-#if 0
-    //  deprecated functionality
-    QFileInfo rbainit_file (tl::to_qstring (*p), QString::fromUtf8 ("rbainit"));
-    if (rbainit_file.exists () && rbainit_file.isReadable ()) {
-      std::string m = tl::to_string (rbainit_file.absoluteFilePath ());
-      if (modules.find (m) == modules.end ()) {
-        global_modules.push_back (m);
-        modules.insert (m);
-      }
-    }
-#endif
-
-    QDir inst_path_dir (tl::to_qstring (*p));
-
-    QStringList name_filters;
-    name_filters << QString::fromUtf8 ("*.rbm");
-    name_filters << QString::fromUtf8 ("*.pym");
-
-    QStringList inst_modules = inst_path_dir.entryList (name_filters);
-    inst_modules.sort ();
-
-    for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
-      QFileInfo rbm_file (tl::to_qstring (*p), *im);
-      if (rbm_file.exists () && rbm_file.isReadable ()) {
-        std::string m = tl::to_string (rbm_file.absoluteFilePath ());
-        if (modules.find (m) == modules.end ()) {
-          global_modules.push_back (m);
-          modules.insert (m);
         }
       }
     }
@@ -888,52 +561,6 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   mp_ruby_interpreter = new rba::RubyInterpreter ();
   mp_python_interpreter = new pya::PythonInterpreter ();
 
-  if (! m_no_gui) {
-    //  Install the signal handlers after the interpreters, so we can be sure we
-    //  installed our handler. 
-    install_signal_handlers ();
-  }
-
-  if (! m_no_macros) {
-    //  Add the global ruby modules as the first ones.
-    m_load_macros.insert (m_load_macros.begin (), global_modules.begin (), global_modules.end ());
-  }
-
-  //  Scan built-in macros
-  //  These macros are always taken, even if there are no macros requested (they are required to 
-  //  fully form the API).
-  lay::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
-  lay::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
-
-  m_macro_categories.push_back (std::pair<std::string, std::string> ("macros", tl::to_string (QObject::tr ("Ruby"))));
-  m_macro_categories.push_back (std::pair<std::string, std::string> ("pymacros", tl::to_string (QObject::tr ("Python"))));
-  m_macro_categories.push_back (std::pair<std::string, std::string> ("drc", tl::to_string (QObject::tr ("DRC"))));
-
-  //  Scan for macros and set interpreter path
-  for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-
-    for (size_t c = 0; c < m_macro_categories.size (); ++c) {
-
-      std::string mp = tl::to_string (QDir (tl::to_qstring (*p)).filePath (tl::to_qstring (m_macro_categories [c].first)));
-
-      //  don't scan if macros are disabled
-      if (! m_no_macros) {
-        if (p == m_klayout_path.begin ()) {
-          lay::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Local")), mp, m_macro_categories [c].first, false);
-        } else if (m_klayout_path.size () == 2) {
-          lay::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Global")), mp, m_macro_categories [c].first, true);
-        } else {
-          lay::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Global")) + " - " + *p, mp, m_macro_categories [c].first, true);
-        }
-      }
-
-      ruby_interpreter ().add_path (mp);
-      python_interpreter ().add_path (mp);
-
-    }
-
-  }
-
   //  Read some configuration values that we need early
   bool editable_from_config = false;
 
@@ -965,94 +592,93 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
       }
     } catch (...) { }
 
-    try {
-      std::string s;
-      cfg.config_get (cfg_technologies, s);
-      lay::Technologies tt;
-      if (! s.empty ()) {
-        tt.load_from_xml (s);
-      }
-      *lay::Technologies::instance () = tt;
-    } catch (tl::Exception &ex) {
-      tl::warn << tl::to_string (QObject::tr ("Unable to restore technologies: ")) << ex.msg ();
+  }
+
+  if (! m_no_gui) {
+    //  Install the signal handlers after the interpreters, so we can be sure we
+    //  installed our handler. 
+    install_signal_handlers ();
+  }
+
+  lay::SaltController *sc = lay::SaltController::instance ();
+  lay::TechnologyController *tc = lay::TechnologyController::instance ();
+  lay::MacroController *mc = lay::MacroController::instance ();
+
+  if (sc) {
+
+    //  auto-import salt grains
+    for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
+      sc->add_path (*p);
     }
+
+    sc->set_salt_mine_url (tl::salt_mine_url ());
 
   }
 
-  //  auto-import technologies
-  for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
+  if (tc) {
 
-    QDir inst_path_dir (tl::to_qstring (*p));
-    if (! inst_path_dir.cd (QString::fromUtf8 ("tech"))) {
-      continue;
+    //  auto-import technologies
+    for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
+      tc->add_path (*p);
     }
 
-    QStringList name_filters;
-    name_filters << QString::fromUtf8 ("*.lyt");
+    //  import technologies from the command line
+    for (std::vector <std::pair<file_type, std::pair<std::string, std::string> > >::iterator f = m_files.begin (); f != m_files.end (); ++f) {
 
-    QStringList lyt_files;
-
-    QDirIterator di (inst_path_dir.path (), name_filters, QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-    while (di.hasNext ()) {
-      lyt_files << di.next ();
-    }
-
-    lyt_files.sort ();
-
-    for (QStringList::const_iterator lf = lyt_files.begin (); lf != lyt_files.end (); ++lf) {
-
-      try {
+      if (f->first == layout_file_with_tech_file) {
 
         if (tl::verbosity () >= 20) {
-          tl::info << "Auto-importing technology from " << tl::to_string (*lf);
+          tl::info << "Importing technology from " << f->second.second;
         }
 
         lay::Technology t;
-        t.load (tl::to_string (*lf));
-        t.set_persisted (false);   // don't save that one in the configuration
-        lay::Technologies::instance ()->add (new lay::Technology (t));
+        t.load (f->second.second);
 
-      } catch (tl::Exception &ex) {
-        tl::warn << tl::to_string (QObject::tr ("Unable to auto-import technology file ")) << tl::to_string (*lf) << ": " << ex.msg ();
+        tc->add_temp_tech (t);
+
+        f->first = layout_file_with_tech;
+        f->second.second = t.name ();
+
       }
 
     }
 
+    tc->load ();
+
   }
 
-  //  import technologies from the command line
-  for (std::vector <std::pair<file_type, std::pair<std::string, std::string> > >::iterator f = m_files.begin (); f != m_files.end (); ++f) {
+  if (mc) {
 
-    if (f->first == layout_file_with_tech_file) {
+    mc->enable_implicit_macros (! m_no_macros);
 
-      if (tl::verbosity () >= 20) {
-        tl::info << "Importing technology from " << f->second.second;
+    if (! m_no_macros) {
+
+      //  Add the global ruby modules as the first ones.
+      //  TODO: this is a deprecated feature.
+      std::vector<std::string> global_modules = scan_global_modules ();
+      m_load_macros.insert (m_load_macros.begin (), global_modules.begin (), global_modules.end ());
+
+      for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
+        if (p == m_klayout_path.begin ()) {
+          mc->add_path (*p, tl::to_string (QObject::tr ("Local")), std::string (), false);
+        } else if (m_klayout_path.size () == 2) {
+          mc->add_path (*p, tl::to_string (QObject::tr ("Global")), std::string (), true);
+        } else {
+          mc->add_path (*p, tl::to_string (QObject::tr ("Global")) + " - " + *p, std::string (), true);
+        }
       }
 
-      lay::Technology t;
-      t.load (f->second.second);
-      t.set_persisted (false);   // don't save that one in the configuration
-      lay::Technologies::instance ()->add (new lay::Technology (t));
-
-      f->first = layout_file_with_tech;
-      f->second.second = t.name ();
+      //  Install the custom folders
+      for (std::vector <std::pair<std::string, std::string> >::const_iterator p = custom_macro_paths.begin (); p != custom_macro_paths.end (); ++p) {
+        mc->add_path (p->first, tl::to_string (QObject::tr ("Project")) + " - " + p->first, p->second, false);
+      }
 
     }
 
-  }
+    //  Actually load the macros
+    mc->load ();
 
-  //  Install the custom folders
-  if (! m_no_macros) {
-    for (std::vector <std::pair<std::string, std::string> >::const_iterator p = custom_macro_paths.begin (); p != custom_macro_paths.end (); ++p) {
-      lay::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Project")) + " - " + p->first, p->first, p->second, false);
-      //  TODO: put somewhere else:
-      ruby_interpreter ().add_path (p->first);
-      python_interpreter ().add_path (p->first);
-    }
   }
-
-  //  Add locations defined by the technologies
-  sync_tech_macro_locations ();
 
   //  If the editable flag was not set, use it from the 
   //  configuration. Since it is too early now, we cannot use the
@@ -1103,8 +729,14 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   }
 
   //  initialize the plugins for the first time
+  if (tl::verbosity () >= 20) {
+    tl::info << "Initializing plugins:";
+  }
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
+    if (tl::verbosity () >= 20) {
+      tl::info << "  " << cls.current_name () << " [" << cls.current_position () << "]";
+    }
     pd->initialize (mp_plugin_root);
   }
 
@@ -1138,10 +770,56 @@ Application::~Application ()
   shutdown ();
 }
 
-QString
-Application::symbol_name_from_address (const QString &mod_name, size_t addr)
+std::vector<std::string>
+Application::scan_global_modules ()
 {
-  return get_symbol_name_from_address (mod_name, addr);
+  //  NOTE:
+  //  this is deprecated functionality - for backward compatibility, global "*.rbm" and "*.pym" modules
+  //  are still considered. The desired solution is autorun macros.
+
+  //  try to locate a global rbainit file and rbm modules
+  std::vector<std::string> global_modules;
+  std::set<std::string> modules;
+
+  //  try to locate a global plugins
+  for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
+
+#if 0
+    //  deprecated functionality
+    QFileInfo rbainit_file (tl::to_qstring (*p), QString::fromUtf8 ("rbainit"));
+    if (rbainit_file.exists () && rbainit_file.isReadable ()) {
+      std::string m = tl::to_string (rbainit_file.absoluteFilePath ());
+      if (modules.find (m) == modules.end ()) {
+        global_modules.push_back (m);
+        modules.insert (m);
+      }
+    }
+#endif
+
+    QDir inst_path_dir (tl::to_qstring (*p));
+
+    QStringList name_filters;
+    name_filters << QString::fromUtf8 ("*.rbm");
+    name_filters << QString::fromUtf8 ("*.pym");
+
+    QStringList inst_modules = inst_path_dir.entryList (name_filters);
+    inst_modules.sort ();
+
+    for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
+      QFileInfo rbm_file (tl::to_qstring (*p), *im);
+      if (rbm_file.exists () && rbm_file.isReadable ()) {
+        std::string m = tl::to_string (rbm_file.absoluteFilePath ());
+        if (modules.find (m) == modules.end ()) {
+          tl::warn << tl::to_string (tr ("Global modules are deprecated. Turn '%1'' into an autorun macro instead and put it into 'macros' or 'pymacros'.").arg (tl::to_qstring (m)));
+          global_modules.push_back (m);
+          modules.insert (m);
+        }
+      }
+    }
+
+  }
+
+  return global_modules;
 }
 
 bool 
@@ -1178,9 +856,6 @@ Application::finish ()
   }
 
   if (mp_plugin_root && m_write_config_file) {
-
-    //  save the technology setup in the configuration 
-    mp_plugin_root->config_set (cfg_technologies, lay::Technologies::instance ()->to_xml ());
 
     if (! m_config_file_to_write.empty ()) {
       if (tl::verbosity () >= 20) {
@@ -1377,48 +1052,6 @@ Application::run ()
       }
 
     END_PROTECTED
-
-  }
-
-  //  scan for libraries
-  for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-
-    QDir lp = QDir (tl::to_qstring (*p)).filePath (tl::to_qstring ("libraries"));
-
-    QStringList name_filters;
-    name_filters << QString::fromUtf8 ("*");
-
-    QStringList libs = lp.entryList (name_filters, QDir::Files);
-    for (QStringList::const_iterator im = libs.begin (); im != libs.end (); ++im) {
-
-      std::string filename = tl::to_string (*im);
-
-      try {
-
-        std::auto_ptr<db::Library> lib (new db::Library ());
-        lib->set_description (filename);
-        lib->set_name (tl::to_string (QFileInfo (*im).baseName ()));
-
-        tl::log << "Reading library '" << filename << "'";
-        tl::InputStream stream (tl::to_string (lp.filePath (*im)));
-        db::Reader reader (stream);
-        reader.read (lib->layout ());
-
-        //  Use the libname if there is one
-        for (db::Layout::meta_info_iterator m = lib->layout ().begin_meta (); m != lib->layout ().end_meta (); ++m) {
-            if (m->name == "libname" && ! m->value.empty ()) {
-                lib->set_name (m->value);
-                break;
-            }
-        }
-
-        db::LibraryManager::instance ().register_lib (lib.release ());
-
-      } catch (tl::Exception &ex) {
-        tl::error << ex.msg ();
-      }
-
-    }
 
   }
 
@@ -1658,22 +1291,7 @@ void
 Application::set_config (const std::string &name, const std::string &value)
 {
   if (mp_plugin_root) {
-
-    if (name == cfg_technologies) {
-
-      //  HACK: cfg_technologies is not a real configuration parameter currently. Hence we emulate that
-      //  behavior. But currently this is the only way to access technology data indirectly from a script.
-      //  Note that this method will set only the technologies accessible through the configuration parameter.
-      //  I.e. the ones not auto-imported.
-      //  TODO: rework this one. This is only half-hearted.
-      if (! value.empty ()) {
-        lay::Technologies::instance ()->load_from_xml (value);
-      }
-
-    } else {
-      mp_plugin_root->config_set (name, value);
-    }
-
+    mp_plugin_root->config_set (name, value);
   }
 }
 
@@ -1689,16 +1307,7 @@ std::string
 Application::get_config (const std::string &name) const
 {
   if (mp_plugin_root) {
-    if (name == cfg_technologies) {
-      //  HACK: cfg_technologies is not a real configuration parameter currently. Hence we emulate that
-      //  behavior. But currently this is the only way to access technology data indirectly from a script.
-      //  Note that this method will return only the technologies accessible through the configuration parameter.
-      //  I.e. the ones not auto-imported.
-      //  TODO: rework this one.
-      return lay::Technologies::instance ()->to_xml ();
-    } else {
-      return mp_plugin_root->config_get (name);
-    }
+    return mp_plugin_root->config_get (name);
   } else {
     return std::string ();
   }
@@ -1720,121 +1329,6 @@ Application::special_app_flag (const std::string &name)
   // TODO: some more elaborate scheme?
   const char *env = getenv (("KLAYOUT_" + name).c_str ());
   return (env && *env);
-}
-
-std::vector<lay::MacroCollection *> 
-Application::sync_tech_macro_locations ()
-{
-  if (m_no_macros) {
-    return std::vector<lay::MacroCollection *> ();
-  }
-
-  std::set<std::pair<std::string, std::string> > tech_macro_paths;
-  std::map<std::pair<std::string, std::string>, std::string> tech_names_by_path;
-
-  //  Add additional places where the technologies define some macros
-  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
-
-    if (t->base_path ().empty ()) {
-      continue;
-    }
-
-    for (size_t c = 0; c < m_macro_categories.size (); ++c) {
-
-      QDir base_dir (tl::to_qstring (t->base_path ()));
-      if (base_dir.exists ()) {
-
-        QDir macro_dir (base_dir.filePath (tl::to_qstring (m_macro_categories [c].first)));
-        if (macro_dir.exists ()) {
-
-          std::string mp = tl::to_string (macro_dir.path ());
-          std::pair<std::string, std::string> cp (m_macro_categories [c].first, mp);
-          tech_macro_paths.insert (cp);
-          std::string &tn = tech_names_by_path [cp];
-          if (! tn.empty ()) {
-            tn += ",";
-          }
-          tn += t->name ();
-
-        }
-
-      }
-
-    }
-
-  }
-
-  //  delete macro collections which are no longer required or update description
-  std::vector<lay::MacroCollection *> folders_to_delete;
-  std::string desc_prefix = tl::to_string (QObject::tr ("Technology")) + " - ";
-
-  lay::MacroCollection *root = &lay::MacroCollection::root ();
-
-  for (lay::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
-
-    std::pair<std::string, std::string> cp (m->second->category (), m->second->path ());
-    if (m->second->virtual_mode () == lay::MacroCollection::TechFolder && m_tech_macro_paths.find (cp) != m_tech_macro_paths.end ()) {
-
-      if (tech_macro_paths.find (cp) == tech_macro_paths.end ()) {
-        //  no longer used
-        folders_to_delete.push_back (m->second);
-      } else {
-        //  used: update description if required
-        std::string desc = desc_prefix + tech_names_by_path [cp];
-        m->second->set_description (desc);
-      }
-
-    }
-
-  }
-  
-  for (std::vector<lay::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
-    if (tl::verbosity () >= 20) {
-      tl::info << "Removing macro folder " << (*m)->path () << ", category '" << (*m)->category () << "' because no longer in use";
-    }
-    root->erase (*m);
-  }
-
-  //  store new paths
-  m_tech_macro_paths = tech_macro_paths;
-
-  //  add new folders
-  for (lay::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
-    if (m->second->virtual_mode () == lay::MacroCollection::TechFolder) {
-      std::pair<std::string, std::string> cp (m->second->category (), m->second->path ());
-      tech_macro_paths.erase (cp);
-    }
-  }
-
-  std::vector<lay::MacroCollection *> new_folders;
-
-  for (std::set<std::pair<std::string, std::string> >::const_iterator p = tech_macro_paths.begin (); p != tech_macro_paths.end (); ++p) {
-
-    const std::string &tn = tech_names_by_path [*p];
-
-    //  TODO: is it wise to make it writeable?
-    if (tl::verbosity () >= 20) {
-      tl::info << "Adding macro folder " << p->second << ", category '" << p->first << "' for technologies " << tn;
-    }
-
-    //  Add the folder. Note: it may happen that a macro folder for the tech specific macros already exists in
-    //  a non-tech context.
-    //  In that case, the add_folder method will return 0.
-    lay::MacroCollection *mc = lay::MacroCollection::root ().add_folder (desc_prefix + tn, p->second, p->first, false);
-    if (mc) {
-
-      mc->set_virtual_mode (lay::MacroCollection::TechFolder);
-      new_folders.push_back (mc);
-
-      //  TODO: put somewhere else:
-      ruby_interpreter ().add_path (p->second);
-      python_interpreter ().add_path (p->second);
-
-    }
-
-  }
-
-  return new_folders;
 }
 
 }

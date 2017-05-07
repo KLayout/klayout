@@ -41,13 +41,25 @@ HEADERS = \
     laySelectCellViewForm.h \
     laySession.h \
     laySettingsForm.h \
-    layTechnologySelector.h \
     layTechSetupDialog.h \
     layTextProgress.h \
     layVersion.h \
     layCommon.h \
     layConfig.h \
-    layMacroController.h
+    layMacroController.h \
+    layTechnologyController.h \
+    laySalt.h \
+    laySaltGrain.h \
+    laySaltGrains.h \
+    laySaltManagerDialog.h \
+    laySaltGrainDetailsTextWidget.h \
+    laySaltGrainPropertiesDialog.h \
+    laySaltDownloadManager.h \
+    laySaltModel.h \
+    laySaltController.h \
+    laySignalHandler.h \
+    layLibraryController.h \
+    layFontController.h
 
 FORMS = \
     ClipDialog.ui \
@@ -92,7 +104,11 @@ FORMS = \
     XORToolDialog.ui \
     TechLoadOptionsEditorPage.ui \
     TechSaveOptionsEditorPage.ui \
-    MainConfigPage7.ui
+    MainConfigPage7.ui \
+    SaltManagerDialog.ui \
+    SaltGrainPropertiesDialog.ui \
+    SaltGrainTemplateSelectionDialog.ui \
+    SaltManagerInstallConfirmationDialog.ui
 
 SOURCES = \
     gsiDeclLayApplication.cc \
@@ -132,17 +148,30 @@ SOURCES = \
     laySelectCellViewForm.cc \
     laySession.cc \
     laySettingsForm.cc \
-    layTechnologySelector.cc \
     layTechSetupDialog.cc \
     layTextProgress.cc \
     layVersion.cc \
-    layMacroController.cc
+    layMacroController.cc \
+    layTechnologyController.cc \
+    laySalt.cc \
+    laySaltGrain.cc \
+    laySaltGrains.cc \
+    laySaltManagerDialog.cc \
+    laySaltGrainDetailsTextWidget.cc \
+    laySaltGrainPropertiesDialog.cc \
+    laySaltDownloadManager.cc \
+    laySaltModel.cc \
+    laySaltController.cc \
+    laySignalHandler.cc \
+    layLibraryController.cc \
+    layFontController.cc
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \
     layLayoutStatistics.qrc \
     layMacroTemplates.qrc \
     layResources.qrc \
+    laySaltTemplates.qrc
 
 INCLUDEPATH += ../tl ../gsi ../db ../rdb ../laybasic ../ant ../img ../edt
 DEPENDPATH += ../tl ../gsi ../db ../rdb ../laybasic ../ant ../img ../edt

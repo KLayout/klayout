@@ -203,14 +203,6 @@ public:
   bool special_app_flag (const std::string &name);
 
   /**
-   *  @brief Obtain the list of macro categories
-   */
-  const std::vector< std::pair<std::string, std::string> > &macro_categories () const
-  {
-    return m_macro_categories;
-  }
-
-  /**
    *  @brief Return a reference to the Ruby interpreter
    */
   gsi::Interpreter &ruby_interpreter () 
@@ -266,11 +258,6 @@ public:
   }
 
   /**
-   *  @brief For debugging purposes: get a symbol name (a description actually) from an address
-   */
-  static QString symbol_name_from_address (const QString &mod_name, size_t addr);
-
-  /**
    *  @brief Reset config to global configuration
    */
   void reset_config (); 
@@ -309,6 +296,7 @@ public:
 private:
   void shutdown ();
   void finish ();
+  std::vector<std::string> scan_global_modules ();
 
   enum file_type {
     layout_file,

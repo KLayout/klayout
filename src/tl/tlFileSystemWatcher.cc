@@ -82,10 +82,12 @@ FileSystemWatcher::add_file (const std::string &path)
   QDateTime time;
 
   QFileInfo fi (tl::to_qstring (path));
-  if (fi.exists ()) {
-    size = size_t (fi.size ());
-    time = fi.lastModified ();
+  if (! fi.exists () || ! fi.isReadable ()) {
+    return;
   }
+
+  size = size_t (fi.size ());
+  time = fi.lastModified ();
 
   std::map<std::string, FileEntry>::iterator i = m_files.find (path);
   if (i != m_files.end ()) {

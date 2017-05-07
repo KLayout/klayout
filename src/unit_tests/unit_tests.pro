@@ -96,7 +96,11 @@ SOURCES = \
   tlXMLParser.cc \
   gsiTest.cc \
     tlFileSystemWatcher.cc \
-    tlMath.cc
+    tlMath.cc \
+    laySalt.cc \
+    tlFileUtils.cc \
+    tlHttpStream.cc \
+    tlWebDAV.cc
 
 # main components:
 SOURCES += \

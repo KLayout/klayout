@@ -115,6 +115,9 @@
              <iconset resource="layResources.qrc">
               <normaloff>:/add.png</normaloff>:/add.png</iconset>
             </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -125,6 +128,9 @@
             <property name="icon">
              <iconset resource="layResources.qrc">
               <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

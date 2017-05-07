@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>The New Macro</description>
+ <prolog/>
+ <epilog/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text># This is the new macro created with the sample macro package
+
+pya.MessageBox.info("Information", "This is the new macro created with the sample macro package", pya.MessageBox.Ok)
+
+# In order pull in classes from other packages, just specify these classes
+# in the dependencies of this package. Provided those packages contain macros
+# which are marked as "autorun-early", they will be loaded before this package
+# and their modules and classes will become available.
+ </text>
+</klayout-macro>

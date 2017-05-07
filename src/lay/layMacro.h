@@ -643,10 +643,11 @@ public:
   /**
    *  @brief Some constants for virtual_mode
    */
-  enum {
+  enum FolderType {
     NotVirtual = 0,
     ProjectFolder = 1,
-    TechFolder = 2
+    TechFolder = 2,
+    SaltFolder = 3
   };
 
   /**
@@ -665,8 +666,11 @@ public:
    *  @brief Add a folder (will also scan the folder)
    *
    *  @return A pointer to the new collection if successful
+   *
+   *  If force_create is true (the default), the folder will be created if it does not
+   *  exist yet. On error, 0 is returned.
    */
-  MacroCollection *add_folder (const std::string &description, const std::string &path, const std::string &category, bool readonly);
+  MacroCollection *add_folder (const std::string &description, const std::string &path, const std::string &category, bool readonly, bool force_create = true);
 
   /**
    *  @brief Gets the category tag of the collection
@@ -996,6 +1000,13 @@ public:
    *  This method must be called on root.
    */
   void rescan ();
+
+  /**
+   *  @brief Reloads the macro collection
+   *
+   *  This method is similar to rescan, but it will also remove folders and macros.
+   */
+  void reload ();
 
   /**
    *  @brief Gets the root of the macro hierarchy corresponding to the configuration space

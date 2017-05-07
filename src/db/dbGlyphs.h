@@ -189,6 +189,12 @@ public:
   static const std::vector<TextGenerator> &generators ();
 
   /**
+   *  @brief Sets the search path for font files
+   *  The given folders are scanned for font files.
+   */
+  static void set_font_paths (const std::vector<std::string> &paths);
+
+  /**
    *  @brief Returns the font with the given name
    *  If no font with that name exsist, 0 is returned.
    */

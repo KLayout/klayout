@@ -27,6 +27,7 @@
 #include "tlStaticObjects.h"
 #include "tlTimer.h"
 #include "tlSystemPaths.h"
+#include "tlFileUtils.h"
 #include "layApplication.h"
 #include "gsiExpression.h"
 #include "gsiExternalMain.h"
@@ -519,8 +520,12 @@ bool TestBase::do_test (const std::string & /*mode*/)
 {
   //  Ensures the test temp directory is present
   QDir dir (testtmp ());
+  QDir tmpdir (dir.absoluteFilePath (tl::to_qstring (m_testdir)));
+  if (tmpdir.exists () && ! tl::rm_dir_recursive (tmpdir.absolutePath ())) {
+    throw tl::Exception ("Unable to clean temporary dir: " + tl::to_string (tmpdir.absolutePath ()));
+  }
   if (! dir.mkpath (tl::to_qstring (m_testdir))) {
-    throw tl::Exception ("Unable to create path for temporary files: " + tl::to_string (dir.filePath (tl::to_qstring (m_test))));
+    throw tl::Exception ("Unable to create path for temporary files: " + tl::to_string (tmpdir.absolutePath ()));
   }
   dir.cd (tl::to_qstring (m_testdir));
 

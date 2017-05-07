@@ -3028,10 +3028,11 @@ LayoutView::load_layout (const std::string &filename, const db::LoadLayoutOption
 
   try {
 
+    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading")));
+
     //  load the file
     {
       tl::log << tl::to_string (QObject::tr ("Loading file: ")) << filename << tl::to_string (QObject::tr (" with technology: ")) << technology;
-      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Loading")));
       lmap = cv->load (options, technology);
     }
 
@@ -3039,7 +3040,6 @@ LayoutView::load_layout (const std::string &filename, const db::LoadLayoutOption
     //  implicitly at some other time. This may throw an exception
     //  if the operation was cancelled.
     {
-      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Sorting")));
       cv->layout ().update ();
     }
 
@@ -3123,6 +3123,9 @@ LayoutView::load_layout (const std::string &filename, const db::LoadLayoutOption
     max_hier ();
   }
   update_content ();
+
+  //  this event may not be generated otherwise:
+  active_cellview_changed (cv_index);
 
   return cv_index;
 }

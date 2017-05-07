@@ -196,7 +196,7 @@ PluginDeclaration::init_menu ()
     m_mouse_mode_action.qaction ()->setData (QVariant (id ()));
 
     menu.insert_item ("edit_menu.mode_menu.end", name, m_mouse_mode_action);
-    menu.insert_item ("@toolbar.end", name, m_mouse_mode_action);
+    menu.insert_item ("@toolbar.end_modes", name, m_mouse_mode_action);
 
     gtf::action_connect (m_mouse_mode_action.qaction (), SIGNAL (triggered ()), this, SLOT (mode_triggered ()));
 

@@ -31,6 +31,8 @@
 #include "layApplication.h"
 #include "layMacroEditorTree.h"
 #include "layMacro.h"
+#include "layMacroController.h"
+#include "layTechnologyController.h"
 #include "tlAssert.h"
 #include "tlStream.h"
 #include "dbStream.h"
@@ -46,6 +48,28 @@
 
 namespace lay
 {
+
+// ----------------------------------------------------------------
+
+static std::string
+title_for_technology (const lay::Technology *t)
+{
+  std::string d;
+  if (t->name ().empty ()) {
+    d = t->description ();
+  } else {
+    d += t->name ();
+    if (! t->grain_name ().empty ()) {
+      d += " ";
+      d += tl::to_string (QObject::tr ("[Package %1]").arg (tl::to_qstring (t->grain_name ())));
+    }
+    if (! t->description ().empty ()) {
+      d += " - ";
+      d += t->description ();
+    }
+  }
+  return d;
+}
 
 // ----------------------------------------------------------------
 //  TechBaseEditorPage implementation
@@ -463,7 +487,7 @@ TechMacrosPage::commit ()
 static bool s_first_show = true;
 
 TechSetupDialog::TechSetupDialog (QWidget *parent)
-  : QDialog (parent), mp_current_tech (0), mp_current_editor (0), mp_current_tech_component (0)
+  : QDialog (parent), mp_current_tech (0), mp_current_editor (0), mp_current_tech_component (0), m_current_tech_changed_enabled (true)
 {
   setObjectName (QString::fromUtf8 ("tech_setup_dialog"));
 
@@ -479,29 +503,29 @@ TechSetupDialog::TechSetupDialog (QWidget *parent)
   connect (import_action, SIGNAL (triggered ()), this, SLOT (import_clicked ()));
   QAction *export_action = new QAction (QObject::tr ("Export Technology"), this);
   connect (export_action, SIGNAL (triggered ()), this, SLOT (export_clicked ()));
+  QAction *refresh_action = new QAction (QObject::tr ("Refresh"), this);
+  connect (refresh_action, SIGNAL (triggered ()), this, SLOT (refresh_clicked ()));
+
+  QAction *separator;
 
   tech_tree->addAction (add_action);
   tech_tree->addAction (delete_action);
   tech_tree->addAction (rename_action);
-  QAction *separator = new QAction (this);
+  separator = new QAction (this);
   separator->setSeparator (true);
   tech_tree->addAction (separator);
   tech_tree->addAction (import_action);
   tech_tree->addAction (export_action);
+  separator = new QAction (this);
+  separator->setSeparator (true);
+  tech_tree->addAction (separator);
+  tech_tree->addAction (refresh_action);
 
   tech_tree->header ()->hide ();
   connect (tech_tree, SIGNAL (currentItemChanged (QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT (current_tech_changed (QTreeWidgetItem *, QTreeWidgetItem *)));
   connect (add_pb, SIGNAL (clicked ()), this, SLOT (add_clicked ()));
   connect (delete_pb, SIGNAL (clicked ()), this, SLOT (delete_clicked ()));
   connect (rename_pb, SIGNAL (clicked ()), this, SLOT (rename_clicked ()));
-
-  if (s_first_show) {
-    TipDialog td (this, 
-                  tl::to_string (QObject::tr ("<html><body>To get started with the technology manager, read the documentation provided: <a href=\"int:/about/technology_manager.xml\">About Technology Management</a>.</body></html>")), 
-                  "tech-manager-basic-tips");
-    td.exec_dialog ();
-    s_first_show = false;
-  }
 }
 
 TechSetupDialog::~TechSetupDialog ()
@@ -527,23 +551,96 @@ TechSetupDialog::clear_components ()
   mp_current_tech_component = 0;
 }
 
-int
-TechSetupDialog::exec ()
+void
+TechSetupDialog::refresh_clicked ()
 {
-  m_technologies = *lay::Technologies ().instance ();
+  m_current_tech_changed_enabled = false;
+
+BEGIN_PROTECTED
+
+  commit_tech_component ();
+  update_tech (0);
+
+  std::string tech_name;
+  if (selected_tech ()) {
+    tech_name = selected_tech ()->name ();
+  }
+
+  //  Save the expanded state of the items
+  std::set<std::string> expanded_techs;
+  for (int i = 0; i < tech_tree->topLevelItemCount (); ++i) {
+    QTreeWidgetItem *item = tech_tree->topLevelItem (i);
+    if (item && item->isExpanded ()) {
+      QVariant d = item->data (0, Qt::UserRole);
+      if (d != QVariant ()) {
+        expanded_techs.insert (tl::to_string (d.toString ()));
+      }
+    }
+  }
+
+  lay::TechnologyController::instance ()->rescan (m_technologies);
+
+  update_tech_tree ();
+
+  QTreeWidgetItem *new_item = 0;
+
+  for (int i = 0; i < tech_tree->topLevelItemCount () && !new_item; ++i) {
+    QTreeWidgetItem *item = tech_tree->topLevelItem (i);
+    QVariant d = item->data (0, Qt::UserRole);
+    if (d != QVariant () && tech_name == tl::to_string (d.toString ())) {
+      new_item = item;
+    }
+  }
+
+  tech_tree->setCurrentItem (new_item);
+
+  //  restore the expanded state
+  for (int i = 0; i < tech_tree->topLevelItemCount (); ++i) {
+    QTreeWidgetItem *item = tech_tree->topLevelItem (i);
+    QVariant d = item->data (0, Qt::UserRole);
+    bool expand = (d != QVariant () && expanded_techs.find (tl::to_string (d.toString ())) != expanded_techs.end ());
+    item->setExpanded (expand);
+  }
+
+  update_tech (selected_tech ());
+  update_tech_component ();
+
+END_PROTECTED
+
+  m_current_tech_changed_enabled = true;
+}
+
+void
+TechSetupDialog::update ()
+{
   update_tech_tree ();
   tech_tree->setCurrentItem (tech_tree->topLevelItem (0));
   update_tech (selected_tech ());
+}
+
+int
+TechSetupDialog::exec (lay::Technologies &technologies)
+{
+  if (s_first_show) {
+    TipDialog td (this,
+                  tl::to_string (QObject::tr ("<html><body>To get started with the technology manager, read the documentation provided: <a href=\"int:/about/technology_manager.xml\">About Technology Management</a>.</body></html>")),
+                  "tech-manager-basic-tips");
+    td.exec_dialog ();
+    s_first_show = false;
+  }
+
+  m_technologies = technologies;
+  update ();
+
   tc_stack->setMinimumSize (tc_stack->sizeHint ());
 
   int ret = QDialog::exec ();
   if (ret) {
-    *lay::Technologies ().instance () = m_technologies;
+    technologies = m_technologies;
   }
 
   //  clean up
   update_tech (0);
-  clear_components ();
   m_technologies = lay::Technologies ();
   update_tech_tree ();
 
@@ -583,7 +680,21 @@ BEGIN_PROTECTED
       throw tl::Exception (tl::to_string (QObject::tr ("A technology with this name already exists")));
     }
 
+    QDir root = QDir (tl::to_qstring (lay::TechnologyController::instance ()->default_root ()));
+    QDir tech_dir (root.filePath (tn));
+    if (tech_dir.exists ()) {
+      if (QMessageBox::question (this, QObject::tr ("Creating Technology"),
+                                       QObject::tr ("A target folder with path '%1' already exists\nUse this directory for the new technology?").arg (tech_dir.path ()),
+                                       QMessageBox::No | QMessageBox::Yes) == QMessageBox::No) {
+        throw tl::CancelException ();
+      }
+    }
+
     lay::Technology *nt = new lay::Technology (*t);
+
+    nt->set_tech_file_path (tl::to_string (tech_dir.absoluteFilePath (tn + QString::fromUtf8 (".lyt"))));
+    nt->set_default_base_path (tl::to_string (tech_dir.absolutePath ()));
+    nt->set_persisted (false);
     nt->set_name (tl::to_string (tn));
     nt->set_description (std::string ());
     m_technologies.add (nt);
@@ -610,8 +721,8 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::to_string (QObject::tr ("The default technology cannot be deleted")));
   }
 
-  if (! t->is_persisted ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Auto-imported technologies cannot be deleted")));
+  if (t->is_readonly ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("This technology is read-only and cannot be deleted")));
   }
 
   if (QMessageBox::question (this, QObject::tr ("Deleting Technology"),
@@ -623,6 +734,7 @@ BEGIN_PROTECTED
       if (i->name () == t->name ()) {
 
         m_technologies.remove (i->name ());
+
         update_tech_tree ();
         select_tech (*m_technologies.technology_by_name (std::string ()));
 
@@ -652,8 +764,8 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::to_string (QObject::tr ("The default technology cannot be renamed")));
   }
 
-  if (! t->is_persisted ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Auto-imported technologies cannot be renamed")));
+  if (t->is_readonly ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("This technology is read-only and cannot be renamed")));
   }
 
   bool ok = false;
@@ -670,10 +782,21 @@ BEGIN_PROTECTED
       throw tl::Exception (tl::to_string (QObject::tr ("A technology with this name already exists")));
     }
 
-    t->set_name (tl::to_string (tn));
+    if (t->name () != tl::to_string (tn)) {
 
-    update_tech_tree ();
-    select_tech (*t);
+      t->set_name (tl::to_string (tn));
+
+      if (! t->is_persisted () && ! t->tech_file_path().empty ()) {
+        TipDialog td (this,
+                      tl::to_string (QObject::tr ("<html><body>Renaming of a technology will neither rename the technology file or the folder the file is stored in.<br/>The file or folder needs to be renamed manually.</body></html>")),
+                      "tech-manager-rename-tip");
+        td.exec_dialog ();
+      }
+
+      update_tech_tree ();
+      select_tech (*t);
+
+    }
 
   }
 
@@ -740,19 +863,15 @@ TechSetupDialog::update_tech_tree ()
   for (std::map <std::string, const lay::Technology *>::const_iterator t = tech_by_name.begin (); t != tech_by_name.end (); ++t) {
     
     QFont f (tech_tree->font ());
-    f.setItalic (! t->second->is_persisted ());
-
-    std::string d;
-    d += t->first;
-    if (! d.empty () && ! t->second->description ().empty ()) {
-      d += " - ";
-    }
-    d += t->second->description ();
+    f.setItalic (t->second->is_readonly ());
 
     QTreeWidgetItem *ti = new QTreeWidgetItem (tech_tree);
-    ti->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (d)));
+    ti->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (title_for_technology (t->second))));
     ti->setData (0, Qt::UserRole, QVariant (tl::to_qstring (t->first)));
     ti->setData (0, Qt::FontRole, QVariant (f));
+    if (! t->second->tech_file_path ().empty ()) {
+      ti->setData (0, Qt::ToolTipRole, QVariant (tl::to_qstring (t->second->tech_file_path ())));
+    }
     
     std::vector <std::string> tc_names = t->second->component_names ();
     std::map <std::string, const lay::TechnologyComponent *> tc_by_name;
@@ -775,12 +894,14 @@ TechSetupDialog::update_tech_tree ()
     tci->setData (0, Qt::UserRole + 1, QVariant (tl::to_qstring ("_save_options")));
     tci->setData (0, Qt::FontRole, QVariant (f));
 
-    const std::vector<std::pair<std::string, std::string> > &mc = lay::Application::instance ()->macro_categories ();
-    for (std::vector<std::pair<std::string, std::string> >::const_iterator c = mc.begin (); c != mc.end (); ++c) {
-      tci = new QTreeWidgetItem (ti);
-      tci->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (c->second)));
-      tci->setData (0, Qt::UserRole + 1, QVariant (tl::to_qstring (std::string ("_macros_") + c->first)));
-      tci->setData (0, Qt::FontRole, QVariant (f));
+    if (lay::MacroController::instance ()) {
+      const std::vector<std::pair<std::string, std::string> > &mc = lay::MacroController::instance ()->macro_categories ();
+      for (std::vector<std::pair<std::string, std::string> >::const_iterator c = mc.begin (); c != mc.end (); ++c) {
+        tci = new QTreeWidgetItem (ti);
+        tci->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (c->second)));
+        tci->setData (0, Qt::UserRole + 1, QVariant (tl::to_qstring (std::string ("_macros_") + c->first)));
+        tci->setData (0, Qt::FontRole, QVariant (f));
+      }
     }
 
     for (std::map <std::string, const lay::TechnologyComponent *>::const_iterator c = tc_by_name.begin (); c != tc_by_name.end (); ++c) {
@@ -791,7 +912,6 @@ TechSetupDialog::update_tech_tree ()
     }
 
   }
-
 }
 
 void 
@@ -808,28 +928,30 @@ TechSetupDialog::update_tech (lay::Technology *t)
   if (t) {
 
     lay::TechnologyComponentEditor *tce_widget = new TechBaseEditorPage (this);
-    tce_widget->setEnabled (t->is_persisted ());
+    tce_widget->setEnabled (!t->is_readonly ());
     tce_widget->set_technology (t, 0);
     tc_stack->addWidget (tce_widget);
     m_component_editors.insert (std::make_pair (std::string ("_general"), tce_widget));
 
-    const std::vector<std::pair<std::string, std::string> > &mc = lay::Application::instance ()->macro_categories ();
-    for (std::vector<std::pair<std::string, std::string> >::const_iterator c = mc.begin (); c != mc.end (); ++c) {
-      tce_widget = new TechMacrosPage (this, c->first, c->second);
-      tce_widget->setEnabled (t->is_persisted ());
-      tce_widget->set_technology (t, 0);
-      tc_stack->addWidget (tce_widget);
-      m_component_editors.insert (std::make_pair (std::string ("_macros_") + c->first, tce_widget));
+    if (lay::MacroController::instance ()) {
+      const std::vector<std::pair<std::string, std::string> > &mc = lay::MacroController::instance ()->macro_categories ();
+      for (std::vector<std::pair<std::string, std::string> >::const_iterator c = mc.begin (); c != mc.end (); ++c) {
+        tce_widget = new TechMacrosPage (this, c->first, c->second);
+        tce_widget->setEnabled (!t->is_readonly ());
+        tce_widget->set_technology (t, 0);
+        tc_stack->addWidget (tce_widget);
+        m_component_editors.insert (std::make_pair (std::string ("_macros_") + c->first, tce_widget));
+      }
     }
 
     tce_widget = new TechLoadOptionsEditorPage (this);
-    tce_widget->setEnabled (t->is_persisted ());
+    tce_widget->setEnabled (!t->is_readonly ());
     tce_widget->set_technology (t, 0);
     tc_stack->addWidget (tce_widget);
     m_component_editors.insert (std::make_pair (std::string ("_load_options"), tce_widget));
 
     tce_widget = new TechSaveOptionsEditorPage (this);
-    tce_widget->setEnabled (t->is_persisted ());
+    tce_widget->setEnabled (!t->is_readonly ());
     tce_widget->set_technology (t, 0);
     tc_stack->addWidget (tce_widget);
     m_component_editors.insert (std::make_pair (std::string ("_save_options"), tce_widget));
@@ -842,7 +964,7 @@ TechSetupDialog::update_tech (lay::Technology *t)
 
       tce_widget = tc->create_editor (this);
       if (tce_widget) {
-        tce_widget->setEnabled (t->is_persisted ());
+        tce_widget->setEnabled (!t->is_readonly ());
         tce_widget->set_technology (t, tc);
         tc_stack->addWidget (tce_widget);
         m_component_editors.insert (std::make_pair (tc->name (), tce_widget));
@@ -912,6 +1034,10 @@ END_PROTECTED
 void
 TechSetupDialog::current_tech_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous)
 {
+  if (! m_current_tech_changed_enabled) {
+    return;
+  }
+
 BEGIN_PROTECTED
   try {
     if (current) {
@@ -936,9 +1062,11 @@ TechSetupDialog::commit_tech_component ()
     mp_current_editor->commit ();
   }
 
-  if (mp_current_tech && mp_current_tech_component && mp_current_tech->is_persisted ()) {
+  if (mp_current_tech && !mp_current_tech->is_readonly ()) {
 
-    mp_current_tech->set_component (mp_current_tech_component->clone ());
+    if (mp_current_tech_component) {
+      mp_current_tech->set_component (mp_current_tech_component->clone ());
+    }
 
     //  because commit may have changed the description text, update the technology titles
     for (int i = tech_tree->topLevelItemCount (); i > 0; --i) {
@@ -946,13 +1074,7 @@ TechSetupDialog::commit_tech_component ()
       QTreeWidgetItem *item = tech_tree->topLevelItem (i - 1);
 
       lay::Technology *t = m_technologies.technology_by_name (tl::to_string (item->data (0, Qt::UserRole).toString ()));
-      std::string d = t->name ();
-      if (! d.empty () && ! t->description ().empty ()) {
-        d += " - ";
-      }
-      d += t->description ();
-
-      item->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (d)));
+      item->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (title_for_technology (t))));
 
     }
 

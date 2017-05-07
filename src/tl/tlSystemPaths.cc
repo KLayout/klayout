@@ -164,5 +164,27 @@ get_klayout_path ()
   }
 }
 
+std::string
+salt_mine_url ()
+{
+  const std::string default_url ("https://www.klayout.org/salt.mine");
+
+#ifdef _WIN32
+  wchar_t *env = _wgetenv (L"KLAYOUT_SALT_MINE");
+  if (env) {
+    return tl::to_string (QString ((const QChar *) env)));
+  } else {
+    return default_url;
+  }
+#else
+  char *env = getenv ("KLAYOUT_SALT_MINE");
+  if (env) {
+    return (tl::system_to_string (env));
+  } else {
+    return default_url;
+  }
+#endif
+}
+
 }
 

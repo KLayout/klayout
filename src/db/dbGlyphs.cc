@@ -299,12 +299,25 @@ TextGenerator::default_generator ()
   return fonts.empty () ? 0 : &fonts [0];
 }
 
+
+static std::vector<std::string> s_font_paths;
+static std::vector<TextGenerator> s_fonts;
+static bool s_fonts_loaded = false;
+
+void
+TextGenerator::set_font_paths (const std::vector<std::string> &paths)
+{
+  s_font_paths = paths;
+  s_fonts.clear ();
+  s_fonts_loaded = false;
+}
+
 const std::vector<TextGenerator> &
 TextGenerator::generators ()
 {
-  static std::vector<TextGenerator> m_fonts;
+  if (! s_fonts_loaded) {
 
-  if (m_fonts.empty ()) {
+    s_fonts.clear ();
 
     const char *resources[] = {
       ":/fonts/std_font.gds"
@@ -312,42 +325,47 @@ TextGenerator::generators ()
 
     for (size_t i = 0 ; i < sizeof (resources) / sizeof (resources [0]); ++i) {
       try {
-        m_fonts.push_back (TextGenerator ());
-        m_fonts.back ().load_from_resource (resources [i]);
+        tl::log << "Loading font from resource " << resources [i] << " ..";
+        s_fonts.push_back (TextGenerator ());
+        s_fonts.back ().load_from_resource (resources [i]);
       } catch (tl::Exception &ex) {
         tl::error << ex.msg ();
-        m_fonts.pop_back ();
+        s_fonts.pop_back ();
       }
     }
 
-    std::vector<std::string> system_path = tl::get_klayout_path ();
-
     //  scan for font files
-    for (std::vector<std::string>::const_iterator p = system_path.begin (); p != system_path.end (); ++p) {
+    for (std::vector<std::string>::const_iterator p = s_font_paths.begin (); p != s_font_paths.end (); ++p) {
 
-      QDir fp = QDir (tl::to_qstring (*p)).filePath (tl::to_qstring ("fonts"));
+      QDir fp = QDir (tl::to_qstring (*p));
+      if (fp.exists ()) {
 
-      QStringList name_filters;
-      name_filters << QString::fromUtf8 ("*");
+        QStringList name_filters;
+        name_filters << QString::fromUtf8 ("*");
 
-      QStringList font_files = fp.entryList (name_filters, QDir::Files);
-      for (QStringList::const_iterator ff = font_files.begin (); ff != font_files.end (); ++ff) {
+        QStringList font_files = fp.entryList (name_filters, QDir::Files);
+        for (QStringList::const_iterator ff = font_files.begin (); ff != font_files.end (); ++ff) {
 
-        try {
-          m_fonts.push_back (TextGenerator ());
-          m_fonts.back ().load_from_file (tl::to_string (fp.filePath (*ff)));
-        } catch (tl::Exception &ex) {
-          tl::error << ex.msg ();
-          m_fonts.pop_back ();
+          try {
+            tl::log << "Loading font from " << tl::to_string (fp.filePath (*ff)) << " ..";
+            s_fonts.push_back (TextGenerator ());
+            s_fonts.back ().load_from_file (tl::to_string (fp.filePath (*ff)));
+          } catch (tl::Exception &ex) {
+            tl::error << ex.msg ();
+            s_fonts.pop_back ();
+          }
+
         }
 
       }
 
     }
 
+    s_fonts_loaded = true;
+
   }
 
-  return m_fonts;
+  return s_fonts;
 }
 
 }

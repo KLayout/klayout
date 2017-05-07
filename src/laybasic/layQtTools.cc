@@ -103,6 +103,10 @@ save_dialog_state (QWidget *w)
 void 
 restore_dialog_state (QWidget *dialog, const std::string &s)
 {
+  if (! dialog) {
+    return;
+  }
+
   tl::Extractor ex (s.c_str ());
 
   while (! ex.at_end ()) {

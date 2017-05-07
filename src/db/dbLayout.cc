@@ -1271,6 +1271,8 @@ Layout::update () const
 void 
 Layout::do_update ()
 {
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (QObject::tr ("Sorting")));
+
   //  establish a progress report since this operation can take some time.
   //  HINT: because of some gcc bug, automatic destruction of the tl::Progress
   //  object does not work. We overcome this problem by creating the object with new 

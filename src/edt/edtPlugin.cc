@@ -239,7 +239,7 @@ public:
     menu_entries.push_back (lay::MenuEntry ("edt::sel_convert_to_pcell", "convert_to_pcell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Convert To PCell"))));
     menu_entries.push_back (lay::MenuEntry ("edt::sel_convert_to_cell", "convert_to_cell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Convert To Static Cell"))));
 
-    menu_entries.push_back (lay::MenuEntry ("edt::combine_mode", "combine_mode:edit_mode", "@toolbar.end", tl::to_string (QObject::tr ("Combine{Select background combination mode}"))));
+    menu_entries.push_back (lay::MenuEntry ("edt::combine_mode", "combine_mode:edit_mode", "@toolbar.end_modes", tl::to_string (QObject::tr ("Combine{Select background combination mode}"))));
   }
 
   bool configure (const std::string &name, const std::string &value)

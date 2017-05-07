@@ -110,11 +110,25 @@ Class<db::Library> decl_Library ("Library",
   gsi::method ("description", &db::Library::get_description, 
     "@brief Returns the libraries' description text\n"
   ) +
-  gsi::method ("description=", &db::Library::set_description, 
+  gsi::method ("description=", &db::Library::set_description,
     "@brief Sets the libraries' description text\n"
     "@args description\n"
   ) +
-  gsi::method ("layout_const", (const db::Layout &(db::Library::*)() const) &db::Library::layout, 
+  gsi::method ("technology", &db::Library::get_technology,
+    "@brief Returns name of the technology the library is associated with\n"
+    "If this attribute is a non-empty string, this library is only offered for "
+    "selection if the current layout uses this technology.\n"
+    "\n"
+    "This attribute has been introduced in version 0.25."
+  ) +
+  gsi::method ("technology=", &db::Library::set_technology,
+    "@brief sets the name of the technology the library is associated with\n"
+    "@args technology\n"
+    "\n"
+    "See \\technology for details. "
+    "This attribute has been introduced in version 0.25."
+  ) +
+  gsi::method ("layout_const", (const db::Layout &(db::Library::*)() const) &db::Library::layout,
     "@brief The layout object where the cells reside that this library defines (const version)\n"
   ) +
   gsi::method ("layout", (db::Layout &(db::Library::*)()) &db::Library::layout, 

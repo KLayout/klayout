@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>The New DRC Script</description>
+ <category>drc</category>
+ <prolog/>
+ <epilog/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>dsl</interpreter>
+ <dsl-interpreter-name>drc-dsl-xml</dsl-interpreter-name>
+ <text># This is the new DRC script created with the sample DRC package
+
+report("Sample DRC")
+
+l1 = input(1, 0)
+l1.width(1.0.um).output("Width (Layer 1) &lt; 1.0 um")
+</text>
+</klayout-macro>

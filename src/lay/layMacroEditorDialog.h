@@ -192,6 +192,8 @@ private slots:
   void help_requested (const QString &s);
   void macro_changed (Macro *macro);
   void macro_deleted (Macro *macro);
+  void macro_collection_deleted (MacroCollection *collection);
+  void macro_collection_changed (MacroCollection *collection);
   void add_watch ();
   void edit_watch ();
   void del_watches ();
@@ -248,10 +250,10 @@ private:
   void run (int stop_stack_depth, lay::Macro *macro);
   lay::Macro *current_run_macro ();
   void update_ui_to_run_mode ();
+  void do_update_ui_to_run_mode ();
   void set_run_macro (lay::Macro *m);
   void apply_search (bool if_needed);
   void process_events (QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents);
-  bool sync_macros (lay::MacroCollection *current, lay::MacroCollection *actual);
   void sync_file_watcher (lay::MacroCollection *current);
   void do_refresh_file_watcher ();
   void refresh_file_watcher ();
@@ -309,6 +311,7 @@ private:
   QTimer *m_file_changed_timer;
   std::vector<QString> m_changed_files, m_removed_files;
   tl::DeferredMethod<MacroEditorDialog> dm_refresh_file_watcher;
+  tl::DeferredMethod<MacroEditorDialog> dm_update_ui_to_run_mode;
 };
 
 }

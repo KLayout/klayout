@@ -1,0 +1,112 @@
+<RCC>
+    <qresource prefix="/salt_templates">
+    </qresource>
+
+    <!-- font template -->
+    <qresource prefix="/salt_templates/font">
+        <file alias="grain.xml">salt_templates/font/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/font/fonts">
+        <file alias="new_font.gds">salt_templates/font/fonts/new_font.gds</file>
+    </qresource>
+    <qresource prefix="/salt_templates/font/doc">
+        <file alias="readme.html">salt_templates/font/doc/readme.html</file>
+    </qresource>
+
+    <!-- lib template -->
+    <qresource prefix="/salt_templates/lib">
+        <file alias="grain.xml">salt_templates/lib/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/lib/libraries">
+        <file alias="new_lib.gds">salt_templates/lib/libraries/new_lib.gds</file>
+    </qresource>
+    <qresource prefix="/salt_templates/lib/doc">
+        <file alias="readme.html">salt_templates/lib/doc/readme.html</file>
+    </qresource>
+
+    <!-- pcell_lib template -->
+    <qresource prefix="/salt_templates/pcell_lib">
+        <file alias="grain.xml">salt_templates/pcell_lib/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/pcell_lib/macros">
+        <file alias="pcell.lym">salt_templates/pcell_lib/macros/pcell.lym</file>
+    </qresource>
+    <qresource prefix="/salt_templates/pcell_lib/doc">
+        <file alias="readme.html">salt_templates/pcell_lib/doc/readme.html</file>
+    </qresource>
+
+    <!-- macro template -->
+    <qresource prefix="/salt_templates/macro">
+        <file alias="grain.xml">salt_templates/macro/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/macro/macros">
+        <file alias="new_macro.lym">salt_templates/macro/macros/new_macro.lym</file>
+    </qresource>
+    <qresource prefix="/salt_templates/macro/doc">
+        <file alias="readme.html">salt_templates/macro/doc/readme.html</file>
+    </qresource>
+
+    <!-- ruby library template -->
+    <qresource prefix="/salt_templates/ruby_lib">
+        <file alias="grain.xml">salt_templates/ruby_lib/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/ruby_lib/macros">
+        <file alias="new_macro.lym">salt_templates/ruby_lib/macros/new_macro.lym</file>
+    </qresource>
+    <qresource prefix="/salt_templates/ruby_lib/doc">
+        <file alias="readme.html">salt_templates/ruby_lib/doc/readme.html</file>
+    </qresource>
+
+    <!-- pymacro template -->
+    <qresource prefix="/salt_templates/pymacro">
+        <file alias="grain.xml">salt_templates/pymacro/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/pymacro/pymacros">
+        <file alias="new_macro.lym">salt_templates/pymacro/pymacros/new_macro.lym</file>
+    </qresource>
+    <qresource prefix="/salt_templates/pymacro/doc">
+        <file alias="readme.html">salt_templates/pymacro/doc/readme.html</file>
+    </qresource>
+
+    <!-- python library template -->
+    <qresource prefix="/salt_templates/python_lib">
+        <file alias="grain.xml">salt_templates/python_lib/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/python_lib/pymacros">
+        <file alias="new_macro.lym">salt_templates/python_lib/pymacros/new_macro.lym</file>
+    </qresource>
+    <qresource prefix="/salt_templates/python_lib/doc">
+        <file alias="readme.html">salt_templates/python_lib/doc/readme.html</file>
+    </qresource>
+
+    <!-- drc template -->
+    <qresource prefix="/salt_templates/drc">
+        <file alias="grain.xml">salt_templates/drc/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/drc/drc">
+        <file alias="new_drc.lym">salt_templates/drc/drc/new_drc.lym</file>
+    </qresource>
+    <qresource prefix="/salt_templates/drc/doc">
+        <file alias="readme.html">salt_templates/drc/doc/readme.html</file>
+    </qresource>
+
+    <!-- tech template -->
+    <qresource prefix="/salt_templates/tech">
+        <file alias="grain.xml">salt_templates/tech/grain.xml</file>
+    </qresource>
+    <qresource prefix="/salt_templates/tech/tech">
+        <file alias="tech.lyt">salt_templates/tech/tech/tech.lyt</file>
+    </qresource>
+    <qresource prefix="/salt_templates/tech/tech/libraries">
+    </qresource>
+    <qresource prefix="/salt_templates/tech/tech/macros">
+    </qresource>
+    <qresource prefix="/salt_templates/tech/tech/pymacros">
+    </qresource>
+    <qresource prefix="/salt_templates/tech/tech/drc">
+    </qresource>
+    <qresource prefix="/salt_templates/tech/doc">
+        <file alias="readme.html">salt_templates/tech/doc/readme.html</file>
+    </qresource>
+
+</RCC>

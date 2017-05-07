@@ -671,12 +671,12 @@ public:
     return m_name;
   }
 
-  bool check_name (const std::string &, const std::string &, const std::string &qname) const
+  bool check_name (const std::string & /*uri*/, const std::string &lname, const std::string & /*qname*/) const
   {
     if (m_name == "*") {
       return true;
     } else {
-      return m_name == qname; // no namespace currently
+      return m_name == lname; // no namespace currently
     }
   }
 

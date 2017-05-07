@@ -85,8 +85,8 @@
 #include "layLogViewerDialog.h"
 #include "layLayerToolbox.h"
 #include "laySettingsForm.h"
-#include "laySettingsForm.h"
-#include "layTechSetupDialog.h"
+#include "layTechnologyController.h"
+#include "laySaltController.h"
 #include "layTipDialog.h"
 #include "laySelectCellViewForm.h"
 #include "layLayoutPropertiesForm.h"
@@ -928,6 +928,7 @@ MainWindow::init_menu ()
   };
 
   MenuLayoutEntry tools_menu [] = {
+    MenuLayoutEntry ("packages",                        tl::to_string (QObject::tr ("Manage Packages")),                  SLOT (cm_packages ())),
     MenuLayoutEntry ("technologies",                    tl::to_string (QObject::tr ("Manage Technologies")),              SLOT (cm_technologies ())),
     MenuLayoutEntry::separator ("verification_group"),
     MenuLayoutEntry ("drc",                             tl::to_string (QObject::tr ("DRC")),                              drc_menu),
@@ -996,6 +997,11 @@ MainWindow::init_menu ()
     }
 
   }
+
+  //  Add a hook for inserting new items after the modes
+  Action end_modes;
+  end_modes.set_separator (true);
+  mp_menu->insert_item ("@toolbar.end", "end_modes", end_modes);
 
   //  make the plugins create their menu items
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
@@ -2602,7 +2608,6 @@ MainWindow::cm_cancel ()
 {
   BEGIN_PROTECTED 
   cancel ();
-  select_mode (lay::LayoutView::default_mode ());
   END_PROTECTED
 }
 
@@ -2612,8 +2617,6 @@ MainWindow::cm_cancel ()
 void
 MainWindow::cancel ()
 {
-  BEGIN_PROTECTED 
-
   //  if any transaction is pending (this may happen when an operation threw an exception)
   //  close transactions.
   if (m_manager.transacting ()) {
@@ -2624,7 +2627,7 @@ MainWindow::cancel ()
     (*vp)->cancel ();
   }
 
-  END_PROTECTED
+  select_mode (lay::LayoutView::default_mode ());
 }
 
 void
@@ -4505,31 +4508,20 @@ MainWindow::show_progress_bar (bool show)
 }
 
 void
+MainWindow::cm_packages ()
+{
+  lay::SaltController *sc = lay::SaltController::instance ();
+  if (sc) {
+    sc->show_editor ();
+  }
+}
+
+void
 MainWindow::cm_technologies ()
 {
-  lay::TechSetupDialog dialog (this);
-  if (dialog.exec ()) {
-
-    std::vector<lay::MacroCollection *> nm = lay::Application::instance ()->sync_tech_macro_locations ();
-
-    bool has_autorun = false;
-    for (std::vector<lay::MacroCollection *>::const_iterator m = nm.begin (); m != nm.end () && ! has_autorun; ++m) {
-      has_autorun = (*m)->has_autorun ();
-    }
-
-    if (has_autorun && QMessageBox::question (this, QObject::tr ("Run Macros"), QObject::tr ("Some macros associated with technologies now are configured to run automatically.\n\nChoose 'Yes' to run these macros now. Choose 'No' to not run them."), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-      for (std::vector<lay::MacroCollection *>::const_iterator m = nm.begin (); m != nm.end (); ++m) {
-        (*m)->autorun ();
-      }
-    }
-
-    //  because the macro-tech association might have changed, do this:
-    //  TODO: let the macro controller monitor the technologies.
-    lay::MacroController *mc = lay::MacroController::instance ();
-    if (mc) {
-      mc->update_menu_with_macros ();
-    }
-
+  lay::TechnologyController *tc = lay::TechnologyController::instance ();
+  if (tc) {
+    tc->show_editor ();
   }
 }
 

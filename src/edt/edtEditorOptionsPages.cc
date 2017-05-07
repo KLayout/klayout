@@ -691,6 +691,11 @@ EditorOptionsInst::setup (lay::Plugin *root)
     m_cv_index = lay::LayoutView::current ()->active_cellview_index ();
   }
   mp_ui->lib_cbx->update_list ();
+  if (m_cv_index >= 0 && lay::LayoutView::current () && lay::LayoutView::current ()->cellview (m_cv_index).is_valid ()) {
+    mp_ui->lib_cbx->set_technology_filter (lay::LayoutView::current ()->cellview (m_cv_index)->tech_name (), true);
+  } else {
+    mp_ui->lib_cbx->set_technology_filter (std::string (), false);
+  }
 
   //  cell name
   std::string s;

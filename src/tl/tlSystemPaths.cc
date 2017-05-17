@@ -167,12 +167,12 @@ get_klayout_path ()
 std::string
 salt_mine_url ()
 {
-  const std::string default_url ("https://www.klayout.org/salt.mine");
+  const std::string default_url ("https://sami.klayout.org/repository.xml");
 
 #ifdef _WIN32
   wchar_t *env = _wgetenv (L"KLAYOUT_SALT_MINE");
   if (env) {
-    return tl::to_string (QString ((const QChar *) env)));
+    return tl::to_string (QString ((const QChar *) env));
   } else {
     return default_url;
   }

@@ -118,6 +118,10 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
   Ui::SaltManagerDialog::setupUi (this);
   mp_properties_dialog = new lay::SaltGrainPropertiesDialog (this);
 
+  //  TODO: clarify where the delete button should go ... currently it's too easy to
+  //  mistake add and delete buttons
+  delete_button->hide ();
+
   connect (edit_button, SIGNAL (clicked ()), this, SLOT (edit_properties ()));
   connect (create_button, SIGNAL (clicked ()), this, SLOT (create_grain ()));
   connect (delete_button, SIGNAL (clicked ()), this, SLOT (delete_grain ()));
@@ -136,6 +140,7 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
   }
 
   SaltModel *model = new SaltModel (this, mp_salt);
+  model->set_empty_explanation (tr ("No packages are present on this system"));
   salt_view->setModel (model);
   salt_view->setItemDelegate (new SaltItemDelegate (this));
 
@@ -143,15 +148,17 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
 
   //  This model will show only the grains of mp_salt_mine which are not present in mp_salt yet.
   mine_model = new SaltModel (this, &m_salt_mine, mp_salt, true);
+  mine_model->set_empty_explanation (tr ("All available packages are installed"));
   salt_mine_view_new->setModel (mine_model);
   salt_mine_view_new->setItemDelegate (new SaltItemDelegate (this));
 
   //  This model will show only the grains of mp_salt_mine which are present in mp_salt already.
   mine_model = new SaltModel (this, &m_salt_mine, mp_salt, false);
+  mine_model->set_empty_explanation (tr ("No packages are installed"));
   salt_mine_view_update->setModel (mine_model);
   salt_mine_view_update->setItemDelegate (new SaltItemDelegate (this));
 
-  mode_tab->setCurrentIndex (mp_salt->is_empty () ? 1 : 0);
+  mode_tab->setCurrentIndex (0);
 
   connect (mode_tab, SIGNAL (currentChanged (int)), this, SLOT (mode_changed ()));
   m_current_tab = mode_tab->currentIndex ();
@@ -182,37 +189,57 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
 
   QAction *a;
 
+  salt_view->addAction (actionCreatePackage);
+  salt_view->addAction (actionDelete);
+  salt_view->setContextMenuPolicy (Qt::ActionsContextMenu);
+
+  salt_mine_view_new->addAction (actionMarkNew);
+  salt_mine_view_new->addAction (actionMarkAllNew);
+  salt_mine_view_new->addAction (actionUnmarkNew);
   salt_mine_view_new->addAction (actionUnmarkAllNew);
   a = new QAction (this);
   a->setSeparator (true);
   salt_mine_view_new->addAction (a);
   salt_mine_view_new->addAction (actionShowMarkedOnlyNew);
-  salt_mine_view_new->addAction (actionShowAllNew);
+  actionShowMarkedOnlyNew->setCheckable (true);
   a = new QAction (this);
   a->setSeparator (true);
   salt_mine_view_new->addAction (a);
   salt_mine_view_new->addAction (actionRefresh);
   salt_mine_view_new->setContextMenuPolicy (Qt::ActionsContextMenu);
 
+  salt_mine_view_update->addAction (actionMarkForUpdate);
+  salt_mine_view_update->addAction (actionMarkAllUpdate);
+  salt_mine_view_update->addAction (actionUnmarkForUpdate);
   salt_mine_view_update->addAction (actionUnmarkAllUpdate);
   a = new QAction (this);
   a->setSeparator (true);
   salt_mine_view_update->addAction (a);
   salt_mine_view_update->addAction (actionShowMarkedOnlyUpdate);
-  salt_mine_view_update->addAction (actionShowAllUpdate);
+  actionShowMarkedOnlyUpdate->setCheckable (true);
   a = new QAction (this);
   a->setSeparator (true);
   salt_mine_view_update->addAction (a);
   salt_mine_view_update->addAction (actionRefresh);
   salt_mine_view_update->setContextMenuPolicy (Qt::ActionsContextMenu);
 
+  connect (actionCreatePackage, SIGNAL (triggered ()), this, SLOT (create_grain ()));
+  connect (actionDelete, SIGNAL (triggered ()), this, SLOT (delete_grain ()));
   connect (actionUnmarkAllNew, SIGNAL (triggered ()), this, SLOT (unmark_all_new ()));
+  connect (actionMarkAllNew, SIGNAL (triggered ()), this, SLOT (mark_all_new ()));
   connect (actionShowMarkedOnlyNew, SIGNAL (triggered ()), this, SLOT (show_marked_only_new ()));
-  connect (actionShowAllNew, SIGNAL (triggered ()), this, SLOT (show_all_new ()));
   connect (actionUnmarkAllUpdate, SIGNAL (triggered ()), this, SLOT (unmark_all_update ()));
+  connect (actionMarkAllUpdate, SIGNAL (triggered ()), this, SLOT (mark_all_update ()));
   connect (actionShowMarkedOnlyUpdate, SIGNAL (triggered ()), this, SLOT (show_marked_only_update ()));
-  connect (actionShowAllUpdate, SIGNAL (triggered ()), this, SLOT (show_all_update ()));
   connect (actionRefresh, SIGNAL (triggered ()), this, SLOT (refresh ()));
+  connect (actionMarkNew, SIGNAL (triggered ()), this, SLOT (mark_clicked ()));
+  connect (actionUnmarkNew, SIGNAL (triggered ()), this, SLOT (mark_clicked ()));
+  connect (actionMarkForUpdate, SIGNAL (triggered ()), this, SLOT (mark_clicked ()));
+  connect (actionUnmarkForUpdate, SIGNAL (triggered ()), this, SLOT (mark_clicked ()));
+
+  mine_update_current_changed ();
+  mine_new_current_changed ();
+  current_changed ();
 }
 
 void
@@ -222,11 +249,11 @@ SaltManagerDialog::mode_changed ()
   setFocus (Qt::NoFocusReason);
 
   QList<int> sizes;
-  if (m_current_tab == 0) {
+  if (m_current_tab == 2) {
     sizes = splitter->sizes ();
   } else if (m_current_tab == 1) {
     sizes = splitter_update->sizes ();
-  } else if (m_current_tab == 2) {
+  } else if (m_current_tab == 0) {
     sizes = splitter_new->sizes ();
   }
 
@@ -237,45 +264,22 @@ SaltManagerDialog::mode_changed ()
     splitter->setSizes (sizes);
   }
 
-  if (mode_tab->currentIndex () >= 1) {
-    show_all_new ();
-    show_all_update ();
+  actionShowMarkedOnlyNew->setChecked (false);
+  actionShowMarkedOnlyUpdate->setChecked (false);
+
+  if (mode_tab->currentIndex () < 2) {
+    show_marked_only_new ();
+    show_marked_only_update ();
   }
 
   m_current_tab = mode_tab->currentIndex ();
 }
 
 void
-SaltManagerDialog::show_all_new ()
-{
-  search_new_edit->clear ();
-
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
-  if (model) {
-    for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
-      --i;
-      salt_mine_view_new->setRowHidden (i, false);
-    }
-  }
-}
-
-void
-SaltManagerDialog::show_all_update ()
-{
-  search_update_edit->clear ();
-
-  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
-  if (model) {
-    for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
-      --i;
-      salt_mine_view_update->setRowHidden (i, false);
-    }
-  }
-}
-
-void
 SaltManagerDialog::show_marked_only_new ()
 {
+  bool show_marked_only = actionShowMarkedOnlyNew->isChecked ();
+
   search_new_edit->clear ();
 
   SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
@@ -288,7 +292,7 @@ SaltManagerDialog::show_marked_only_new ()
   for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
     --i;
     SaltGrain *g = model->grain_from_index (model->index (i, 0, QModelIndex ()));
-    salt_mine_view_new->setRowHidden (i, !(g && model->is_marked (g->name ())));
+    salt_mine_view_new->setRowHidden (i, show_marked_only && !(g && model->is_marked (g->name ())));
     mine_new_current_changed ();
   }
 }
@@ -296,6 +300,8 @@ SaltManagerDialog::show_marked_only_new ()
 void
 SaltManagerDialog::show_marked_only_update ()
 {
+  bool show_marked_only = actionShowMarkedOnlyUpdate->isChecked ();
+
   search_update_edit->clear ();
 
   SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
@@ -308,7 +314,7 @@ SaltManagerDialog::show_marked_only_update ()
   for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
     --i;
     SaltGrain *g = model->grain_from_index (model->index (i, 0, QModelIndex ()));
-    salt_mine_view_update->setRowHidden (i, !(g && model->is_marked (g->name ())));
+    salt_mine_view_update->setRowHidden (i, show_marked_only && !(g && model->is_marked (g->name ())));
     mine_update_current_changed ();
   }
 }
@@ -319,7 +325,20 @@ SaltManagerDialog::unmark_all_new ()
   SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
   if (model) {
     model->clear_marked ();
-    show_all_new ();
+    actionShowMarkedOnlyNew->setChecked (false);
+    show_marked_only_new ();
+    update_apply_state ();
+  }
+}
+
+void
+SaltManagerDialog::mark_all_new ()
+{
+  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
+  if (model) {
+    model->mark_all ();
+    actionShowMarkedOnlyNew->setChecked (false);
+    show_marked_only_new ();
     update_apply_state ();
   }
 }
@@ -330,7 +349,20 @@ SaltManagerDialog::unmark_all_update ()
   SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
   if (model) {
     model->clear_marked ();
-    show_all_update ();
+    actionShowMarkedOnlyUpdate->setChecked (false);
+    show_marked_only_update ();
+    update_apply_state ();
+  }
+}
+
+void
+SaltManagerDialog::mark_all_update ()
+{
+  SaltModel *model = dynamic_cast <SaltModel *> (salt_mine_view_update->model ());
+  if (model) {
+    model->mark_all ();
+    actionShowMarkedOnlyUpdate->setChecked (false);
+    show_marked_only_update ();
     update_apply_state ();
   }
 }
@@ -380,11 +412,14 @@ void
 SaltManagerDialog::mark_clicked ()
 {
   QListView *view;
-  if (sender () == salt_mine_view_new || sender () == mark_new_button) {
+  if (sender () == salt_mine_view_new || sender () == mark_new_button || sender () == actionMarkNew || sender () == actionUnmarkNew) {
     view = salt_mine_view_new;
   } else {
     view = salt_mine_view_update;
   }
+
+  bool toggle = (sender () != actionMarkNew && sender () != actionUnmarkNew && sender () != actionMarkForUpdate && sender () != actionUnmarkForUpdate);
+  bool set = (sender () == actionMarkNew || sender () == actionMarkForUpdate);
 
   SaltModel *model = dynamic_cast <SaltModel *> (view->model ());
   if (! model) {
@@ -393,7 +428,7 @@ SaltManagerDialog::mark_clicked ()
 
   SaltGrain *g = model->grain_from_index (view->currentIndex ());
   if (g) {
-    model->set_marked (g->name (), ! model->is_marked (g->name ()));
+    model->set_marked (g->name (), toggle ? ! model->is_marked (g->name ()) : set);
     update_apply_state ();
   }
 }
@@ -632,6 +667,9 @@ SaltManagerDialog::salt_mine_changed ()
 void
 SaltManagerDialog::update_models ()
 {
+  actionShowMarkedOnlyNew->setChecked (false);
+  actionShowMarkedOnlyUpdate->setChecked (false);
+
   SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
   tl_assert (model != 0);
 
@@ -771,8 +809,7 @@ BEGIN_PROTECTED
 
   details_update_frame->setEnabled (g != 0);
 
-  SaltGrain *remote_grain = get_remote_grain_info (g, details_update_text);
-  m_remote_update_grain.reset (remote_grain);
+  get_remote_grain_info (g, details_update_text);
 
 END_PROTECTED
 }
@@ -788,21 +825,19 @@ BEGIN_PROTECTED
 
   details_new_frame->setEnabled (g != 0);
 
-  SaltGrain *remote_grain = get_remote_grain_info (g, details_new_text);
-  m_remote_new_grain.reset (remote_grain);
+  get_remote_grain_info (g, details_new_text);
 
 END_PROTECTED
 }
 
-lay::SaltGrain *
+void
 SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details)
 {
   if (! g) {
-    return 0;
+    return;
   }
 
   std::auto_ptr<lay::SaltGrain> remote_grain;
-  remote_grain.reset (0);
 
   //  Download actual grain definition file
   try {
@@ -863,8 +898,6 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
     details->setHtml (html);
 
   }
-
-  return remote_grain.release ();
 }
 
 }

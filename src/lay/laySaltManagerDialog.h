@@ -126,14 +126,14 @@ private slots:
   void show_marked_only_new ();
 
   /**
-   *  @brief Called to show all items again (new packages tab)
-   */
-  void show_all_new ();
-
-  /**
    *  @brief Called to unmark all items (new packages tab)
    */
   void unmark_all_new ();
+
+  /**
+   *  @brief Called to mark all items (new packages tab)
+   */
+  void mark_all_new ();
 
   /**
    *  @brief Called to show the marked items only (update packages tab)
@@ -141,14 +141,14 @@ private slots:
   void show_marked_only_update ();
 
   /**
-   *  @brief Called to show all items again (update packages tab)
-   */
-  void show_all_update ();
-
-  /**
    *  @brief Called to unmark all items (update packages tab)
    */
   void unmark_all_update ();
+
+  /**
+   *  @brief Called to mark all items (update packages tab)
+   */
+  void mark_all_update ();
 
   /**
    *  @brief Reloads the salt mine
@@ -159,8 +159,6 @@ private:
   Salt *mp_salt;
   Salt m_salt_mine;
   std::string m_salt_mine_url;
-  std::auto_ptr<SaltGrain> m_remote_update_grain;
-  std::auto_ptr<SaltGrain> m_remote_new_grain;
   SaltGrainPropertiesDialog *mp_properties_dialog;
   tl::DeferredMethod<SaltManagerDialog> dm_update_models;
   int m_current_tab;
@@ -168,7 +166,7 @@ private:
   SaltGrain *current_grain ();
   void update_models ();
   void update_apply_state ();
-  SaltGrain *get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details);
+  void get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details);
 };
 
 }

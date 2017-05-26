@@ -112,6 +112,11 @@ public:
   void update ();
 
   /**
+   *  @brief Sets the explanation text for an empty list (i.e. "there are no new packages")
+   */
+  void set_empty_explanation (const QString &text);
+
+  /**
    *  @brief Sets or resets the "marked" flag on the grain with the given name
    */
   void set_marked (const std::string &name, bool marked);
@@ -120,6 +125,11 @@ public:
    *  @brief Clears the marked state of all grains
    */
   void clear_marked ();
+
+  /**
+   *  @brief Sets the marked state of all grains
+   */
+  void mark_all ();
 
   /**
    *  @brief Enables or disables the grain with the given name
@@ -178,6 +188,7 @@ public:
   std::map<std::string, int> m_display_order;
   std::vector<SaltGrain *> m_ordered_grains;
   bool m_in_update;
+  QString m_empty_explanation;
 
   bool is_marked (const std::string &name) const;
   bool is_enabled (const std::string &name) const;

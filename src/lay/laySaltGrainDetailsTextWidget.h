@@ -24,6 +24,7 @@
 #define HDR_laySaltGrainDetailsTextWidget
 
 #include <QTextBrowser>
+#include <memory>
 
 namespace lay
 {
@@ -47,7 +48,7 @@ public:
   /**
    *  @brief Sets the grain whose details are to be shown
    */
-  void set_grain (SaltGrain *g);
+  void set_grain (const SaltGrain *g);
 
 protected:
   virtual QVariant loadResource (int type, const QUrl &url);
@@ -56,7 +57,7 @@ private slots:
   void open_link (const QUrl &url);
 
 private:
-  lay::SaltGrain *mp_grain;
+  std::auto_ptr<lay::SaltGrain> mp_grain;
 
   QString details_text ();
 };

@@ -40,6 +40,8 @@ SaltItemDelegate::SaltItemDelegate (QObject *parent)
   // .. nothing yet ..
 }
 
+const int textWidth = 500;
+
 void
 SaltItemDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
@@ -69,15 +71,14 @@ SaltItemDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, 
   painter->save ();
   painter->translate (textRect.topLeft ());
   painter->setClipRect (textRect.translated (-textRect.topLeft ()));
-  doc.documentLayout()->draw (painter, ctx);
+  doc.setTextWidth (textWidth);
+  doc.documentLayout ()->draw (painter, ctx);
   painter->restore ();
 }
 
 QSize
 SaltItemDelegate::sizeHint (const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-  const int textWidth = 500;
-
   QStyleOptionViewItemV4 optionV4 = option;
   initStyleOption (&optionV4, index);
 
@@ -103,13 +104,19 @@ SaltModel::SaltModel (QObject *parent, lay::Salt *salt, lay::Salt *salt_filtered
   create_ordered_list ();
 }
 
+void
+SaltModel::set_empty_explanation (const QString &text)
+{
+  m_empty_explanation = text;
+}
+
 Qt::ItemFlags
 SaltModel::flags (const QModelIndex &index) const
 {
   Qt::ItemFlags f = QAbstractItemModel::flags (index);
 
   const lay::SaltGrain *g = grain_from_index (index);
-  if (g && ! is_enabled (g->name ())) {
+  if (! g /*|| ! is_enabled (g->name ())*/) {
     f &= ~Qt::ItemIsSelectable;
     f &= ~Qt::ItemIsEnabled;
   }
@@ -124,10 +131,15 @@ SaltModel::data (const QModelIndex &index, int role) const
 
     const lay::SaltGrain *g = grain_from_index (index);
     if (!g) {
-      return QVariant ();
+      return QVariant (tr ("<html><body><h4>There are no items to show in this list</h4><p>%1</p></body></html>").arg (m_empty_explanation));
     }
 
+    bool en = is_enabled (g->name ());
+
     std::string text = "<html><body>";
+    if (! en) {
+      text += "<font color=\"#c0c0c0\">";
+    }
     text += "<h4>";
     text += tl::escaped_to_html (g->name ());
     if (!g->version ().empty ()) {
@@ -156,6 +168,9 @@ SaltModel::data (const QModelIndex &index, int role) const
       }
     }
 
+    if (! en) {
+      text += "</font>";
+    }
     text += "</body></html>";
 
     return tl::to_qstring (text);
@@ -245,7 +260,7 @@ SaltModel::rowCount (const QModelIndex &parent) const
   if (parent.isValid ()) {
     return 0;
   } else {
-    return int (m_ordered_grains.size ());
+    return std::max (1, int (m_ordered_grains.size ()));
   }
 }
 
@@ -291,6 +306,16 @@ SaltModel::clear_marked ()
     m_marked.clear ();
     emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex ()) - 1, 0, QModelIndex ()));
   }
+}
+
+void
+SaltModel::mark_all ()
+{
+  m_marked.clear ();
+  for (std::vector<SaltGrain *>::const_iterator g = m_ordered_grains.begin (); g != m_ordered_grains.end (); ++g) {
+    m_marked.insert ((*g)->name ());
+  }
+  emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex ()) - 1, 0, QModelIndex ()));
 }
 
 void

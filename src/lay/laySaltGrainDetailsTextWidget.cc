@@ -36,16 +36,20 @@ namespace lay
 {
 
 SaltGrainDetailsTextWidget::SaltGrainDetailsTextWidget (QWidget *w)
-  : QTextBrowser (w), mp_grain (0)
+  : QTextBrowser (w), mp_grain ()
 {
   setOpenLinks (false);
   setOpenExternalLinks (false);
   connect (this, SIGNAL (anchorClicked (const QUrl &)), this, SLOT (open_link (const QUrl &)));
 }
 
-void SaltGrainDetailsTextWidget::set_grain (SaltGrain *g)
+void SaltGrainDetailsTextWidget::set_grain (const SaltGrain *g)
 {
-  mp_grain = g;
+  if (g) {
+    mp_grain.reset (new SaltGrain (*g));
+  } else {
+    mp_grain.reset (0);
+  }
   setHtml (details_text ());
 }
 
@@ -62,7 +66,7 @@ SaltGrainDetailsTextWidget::loadResource (int type, const QUrl &url)
 
     int icon_dim = 64;
 
-    if (!mp_grain || mp_grain->icon ().isNull ()) {
+    if (!mp_grain.get () || mp_grain->icon ().isNull ()) {
 
       return QImage (":/salt_icon.png");
 
@@ -161,7 +165,7 @@ static void produce_listing (QTextStream &stream, QDir dir, int level)
 QString
 SaltGrainDetailsTextWidget::details_text ()
 {
-  SaltGrain *g = mp_grain;
+  SaltGrain *g = mp_grain.get ();
   if (! g) {
     return QString ();
   }

@@ -33,6 +33,7 @@
 
 #include <list>
 #include <string>
+#include <set>
 
 struct _typeobject;
 typedef _typeobject PyTypeObject;
@@ -109,6 +110,16 @@ public:
    *  @brief Add the given path to the search path
    */
   void add_path (const std::string &path);
+
+  /**
+   *  @brief Adds a package location to this interpreter
+   */
+  void add_package_location (const std::string &package_path);
+
+  /**
+   *  @brief Removes a package location from this interpreter
+   */
+  void remove_package_location (const std::string &package_path);
 
   /**
    *  @brief Requires the given module
@@ -263,6 +274,7 @@ private:
   std::list<PythonRef> m_object_heap;
   std::list<std::string> m_string_heap;
   std::map<const gsi::MethodBase *, std::string> m_python_doc;
+  std::set<std::string> m_package_paths;
   std::vector<PyMethodDef *> m_methods_heap;
   std::vector<PyGetSetDef *> m_getseters_heap;
   PythonRef m_stdout_channel, m_stderr_channel;

@@ -55,6 +55,7 @@
 #include "tlExpression.h"
 #include "tlExceptions.h"
 #include "tlInternational.h"
+#include "tlArch.h"
 
 #include <QIcon>
 #include <QDir>
@@ -291,28 +292,51 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
 
   }
 
-  //  try to locate the global plugins
+  //  Try to locate the native plugins:
+  //  Native plugins are DLL's or SO's disguised as "*.klp" files.
+  //  The are installed either
+  //    - directly in one of the KLAYOUT_PATH directories
+  //    - in a folder named by the architecture (i.e. "i686-win32-mingw" or "x86_64-linux-gcc") below
+  //      one of these folders
+  //    - in one of the Salt packages
+  //    - in one of the Salt packages, in a folder named after the architecture
+
   for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
 
     std::set<std::string> modules;
 
-    QDir inst_path_dir (tl::to_qstring (*p));
+    std::vector<QString> klp_paths;
+    klp_paths.push_back (tl::to_qstring (*p));
+    klp_paths.push_back (QDir (klp_paths.back ()).filePath (tl::to_qstring (tl::arch_string ())));
 
-    QStringList name_filters;
-    name_filters << QString::fromUtf8 ("*.klp");
+    lay::Salt salt;
+    //  TODO: this is code duplicated from the SaltController. But this one
+    //  is initialized much later.
+    salt.add_location (tl::to_string (QDir (tl::to_qstring (*p)).filePath (QString::fromUtf8 ("salt"))));
+    for (lay::Salt::flat_iterator g = salt.begin_flat (); g != salt.end_flat (); ++g) {
+      klp_paths.push_back (tl::to_qstring ((*g)->path ()));
+      klp_paths.push_back (QDir (klp_paths.back ()).filePath (tl::to_qstring (tl::arch_string ())));
+    }
 
-    QStringList inst_modules = inst_path_dir.entryList (name_filters);
-    inst_modules.sort ();
+    for (std::vector<QString>::const_iterator p = klp_paths.begin (); p != klp_paths.end (); ++p) {
 
-    for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
-      QFileInfo klp_file (tl::to_qstring (*p), *im);
-      if (klp_file.exists () && klp_file.isReadable ()) {
-        std::string m = tl::to_string (klp_file.absoluteFilePath ());
-        if (modules.find (m) == modules.end ()) {
-          load_plugin (m);
-          modules.insert (m);
+      QStringList name_filters;
+      name_filters << QString::fromUtf8 ("*.klp");
+
+      QStringList inst_modules = QDir (*p).entryList (name_filters);
+      inst_modules.sort ();
+
+      for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
+        QFileInfo klp_file (*p, *im);
+        if (klp_file.exists () && klp_file.isReadable ()) {
+          std::string m = tl::to_string (klp_file.absoluteFilePath ());
+          if (modules.find (m) == modules.end ()) {
+            load_plugin (m);
+            modules.insert (m);
+          }
         }
       }
+
     }
 
   }

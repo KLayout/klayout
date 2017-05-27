@@ -49,6 +49,7 @@
 
 #include <QString>
 #include <QByteArray>
+#include <QDir>
 
 #if !defined(HAVE_RUBY_VERSION_CODE)
 #  define HAVE_RUBY_VERSION_CODE 10901
@@ -1336,6 +1337,7 @@ struct RubyInterpreterPrivateData
   std::string debugger_scope;
   std::map<const char *, size_t> file_id_map;
   std::vector<gsi::ExecutionHandler *> exec_handlers;
+  std::set<std::string> package_paths;
 };
 
 static RubyInterpreter *sp_rba_interpreter = 0;
@@ -1754,7 +1756,23 @@ RubyInterpreter::ignore_next_exception ()
   }
 }
 
-void 
+void
+RubyInterpreter::add_package_location (const std::string &package_path)
+{
+  std::string path = tl::to_string (QDir (tl::to_qstring (package_path)).absoluteFilePath (QString::fromUtf8 ("ruby")));
+  if (QDir (tl::to_qstring (path)).exists () && d->package_paths.find (path) == d->package_paths.end ()) {
+    d->package_paths.insert (path);
+    add_path (path);
+  }
+}
+
+void
+RubyInterpreter::remove_package_location (const std::string & /*package_path*/)
+{
+  //  Currently, we do not really remove the location. Ruby might get screwed up this way.
+}
+
+void
 RubyInterpreter::add_path (const std::string &path)
 {
   VALUE pv = rb_gv_get ("$:");

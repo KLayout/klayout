@@ -72,6 +72,10 @@ MacroController::load ()
       }
     }
 
+    for (tl::Registrar<gsi::Interpreter>::iterator i = gsi::interpreters.begin (); i != gsi::interpreters.end (); ++i) {
+      i->add_package_location (p->path);
+    }
+
   }
 }
 
@@ -296,6 +300,7 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
   }
 
   std::vector<ExternalPathDescriptor> external_paths;
+  std::vector<std::string> package_locations;
 
   //  Add additional places where the technologies define some macros
 
@@ -362,6 +367,8 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
 
       const lay::SaltGrain *g = *i;
 
+      package_locations.push_back (g->path ());
+
       for (size_t c = 0; c < macro_categories ().size (); ++c) {
 
         QDir base_dir (tl::to_qstring (g->path ()));
@@ -415,6 +422,23 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
       tl::info << "Removing macro folder " << (*m)->path () << ", category '" << (*m)->category () << "' because no longer in use";
     }
     root->erase (*m);
+  }
+
+  //  refresh the package locations by first removing the package locations and then rebuilding
+  //  TODO: maybe that is a performance bottleneck, but right now, remove_package_location doesn't do a lot.
+
+  for (std::vector<std::string>::const_iterator p = m_package_locations.begin (); p != m_package_locations.end (); ++p) {
+    for (tl::Registrar<gsi::Interpreter>::iterator i = gsi::interpreters.begin (); i != gsi::interpreters.end (); ++i) {
+      i->remove_package_location (*p);
+    }
+  }
+
+  m_package_locations = package_locations;
+
+  for (std::vector<std::string>::const_iterator p = m_package_locations.begin (); p != m_package_locations.end (); ++p) {
+    for (tl::Registrar<gsi::Interpreter>::iterator i = gsi::interpreters.begin (); i != gsi::interpreters.end (); ++i) {
+      i->add_package_location (*p);
+    }
   }
 
   //  store new paths

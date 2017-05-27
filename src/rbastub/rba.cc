@@ -40,7 +40,19 @@ RubyInterpreter::~RubyInterpreter ()
   // .. nothing ..
 }
 
-void 
+void
+RubyInterpreter::add_package_location (const std::string &)
+{
+  // .. nothing ..
+}
+
+void
+RubyInterpreter::remove_package_location (const std::string &)
+{
+  // .. nothing ..
+}
+
+void
 RubyInterpreter::add_path (const std::string &)
 {
   // .. nothing ..

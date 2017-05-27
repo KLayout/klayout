@@ -24,6 +24,7 @@
 #define _HDR_gsiInterpreter
 
 #include "tlScriptError.h"
+#include "tlClassRegistry.h"
 #include "gsiCommon.h"
 
 namespace gsi
@@ -169,12 +170,13 @@ public:
  *  @brief A generic interpreter interface
  */
 class GSI_PUBLIC Interpreter
+  : public tl::RegisteredClass<Interpreter>
 {
 public:
   /**
    *  @brief Constructor
    */
-  Interpreter ();
+  Interpreter (int position = 0, const char *name = "");
 
   /**
    *  @brief Destructor
@@ -301,7 +303,30 @@ public:
    *  @brief Removes the given execution handler
    */
   virtual void remove_exec_handler (ExecutionHandler *exec_handler) = 0;
+
+  /**
+   *  @brief Adds a package location to this interpreter
+   *
+   *  Interpreters may look for their packages here or in a subfolder
+   *  of this path. For example, the Python interpreter will add
+   *  <package location>/python to the sys.path search path.
+   *  If this path is already registered, the interpreter shall ignore
+   *  this request.
+   */
+  virtual void add_package_location (const std::string &package_path) = 0;
+
+  /**
+   *  @brief Removes a package location from this interpreter
+   *
+   *  This is the inverse of "add_package_location".
+   */
+  virtual void remove_package_location (const std::string &package_path) = 0;
 };
+
+/**
+ *  @brief The interpreter registry
+ */
+extern GSI_PUBLIC tl::Registrar<Interpreter> interpreters;
 
 }
 

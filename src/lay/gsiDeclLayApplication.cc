@@ -26,6 +26,7 @@
 #include "laySignalHandler.h"
 #include "gsiDecl.h"
 #include "gsiQtExternals.h"
+#include "tlArch.h"
 
 namespace gsi
 {
@@ -58,6 +59,11 @@ void crash_me (int reason)
     double x = -1.0;
     printf ("%g", sqrt (x));
   }
+}
+
+static std::string arch (lay::Application *)
+{
+  return tl::arch_string ();
 }
 
 Class<lay::Application> decl_Application (QT_EXTERNAL_BASE (QApplication) "Application",
@@ -203,7 +209,12 @@ Class<lay::Application> decl_Application (QT_EXTERNAL_BASE (QApplication) "Appli
   ) + 
   method ("version", &lay::Application::version,
     "@brief Returns the application's version string\n"
-  ),
+  ) +
+  method_ext ("arch", &arch,
+    "@brief Returns the architecture string\n"
+    "This method has been introduced in version 0.25."
+  )
+  ,
 
   "@brief The application object\n"
   "\n"

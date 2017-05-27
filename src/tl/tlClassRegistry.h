@@ -82,10 +82,10 @@ class RegisteredClass
 {
 public:
   /** 
-   *  @brief register an object Y in space X (Y must be derived from X)
+   *  @brief register an object of type X
    *
-   *  This will register the given object in X space. The Y pointer 
-   *  will become owned by the registrar.
+   *  This will register the given object. The X pointer
+   *  will become owned by the registrar if "owned" is true.
    *  The position parameter tells where to insert the class in the
    *  chain - higher positions come later.
    *  The name is an arbitrary string that is used for debugging purposes only.
@@ -99,7 +99,7 @@ public:
     mp_node = Registrar<X>::instance->insert (inst, owned, position, name);
     
     if (tl::verbosity () >= 40) {
-      tl::info << "Registered plugin '" << name << "' with priority " << position;
+      tl::info << "Registered object '" << name << "' with priority " << position;
     }
   }
 

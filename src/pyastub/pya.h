@@ -51,6 +51,16 @@ public:
   void add_path (const std::string &path);
 
   /**
+   *  @brief Adds a package location to this interpreter
+   */
+  void add_package_location (const std::string &package_path);
+
+  /**
+   *  @brief Removes a package location from this interpreter
+   */
+  void remove_package_location (const std::string &package_path);
+
+  /**
    *  @brief Requires the given module
    */
   void require (const std::string &filename);

@@ -2976,6 +2976,22 @@ PythonInterpreter::add_path (const std::string &p)
 }
 
 void
+PythonInterpreter::add_package_location (const std::string &package_path)
+{
+  std::string path = tl::to_string (QDir (tl::to_qstring (package_path)).absoluteFilePath (QString::fromUtf8 ("python")));
+  if (QDir (tl::to_qstring (path)).exists () && m_package_paths.find (path) == m_package_paths.end ()) {
+    m_package_paths.insert (path);
+    add_path (path);
+  }
+}
+
+void
+PythonInterpreter::remove_package_location (const std::string & /*package_path*/)
+{
+  //  Currently, we do not really remove the location. Python might get screwed up this way.
+}
+
+void
 PythonInterpreter::require (const std::string & /*filename*/)
 {
   //  TOOD: is there a way to implement that?

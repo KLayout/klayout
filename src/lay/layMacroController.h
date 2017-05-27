@@ -219,6 +219,7 @@ private:
   std::vector< std::pair<std::string, std::string> > m_macro_categories;
   std::vector<InternalPathDescriptor> m_internal_paths;
   std::vector<ExternalPathDescriptor> m_external_paths;
+  std::vector<std::string> m_package_locations;
   tl::FileSystemWatcher *m_file_watcher;
   tl::DeferredMethod<MacroController> dm_do_update_menu_with_macros;
   tl::DeferredMethod<MacroController> dm_do_sync_with_external_sources;

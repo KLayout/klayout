@@ -20,28 +20,26 @@
 
 */
 
-#include "gsiInterpreter.h"
+
+#ifndef HDR_tlArch
+#define HDR_tlArch
+
+#include "tlCommon.h"
+
+#include <string>
 
 namespace tl
 {
-  template<> GSI_PUBLIC tl::Registrar<gsi::Interpreter> *tl::Registrar<gsi::Interpreter>::instance = 0;
-}
 
-namespace gsi
-{
-
-GSI_PUBLIC tl::Registrar<Interpreter> interpreters;
-
-Interpreter::Interpreter (int position, const char *name)
-  : tl::RegisteredClass<Interpreter> (this, position, name, false)
-{
-  //  .. nothing yet ..
-}
-
-Interpreter::~Interpreter ()
-{
-  //  .. nothing yet ..
-}
+/**
+ *  @brief Returns the architecture string
+ *
+ *  The architecture string is made from the cpu, os and compiler.
+ *  For example: i686-win32-mingw or x86_64-linux-gcc.
+ */
+TL_PUBLIC std::string arch_string ();
 
 }
+
+#endif
 

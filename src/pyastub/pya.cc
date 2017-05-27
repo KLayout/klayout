@@ -48,6 +48,18 @@ PythonInterpreter::add_path (const std::string &)
 }
 
 void
+PythonInterpreter::add_package_location (const std::string &)
+{
+  // .. nothing ..
+}
+
+void
+PythonInterpreter::remove_package_location (const std::string &)
+{
+  // .. nothing ..
+}
+
+void
 PythonInterpreter::require (const std::string &)
 {
   // .. nothing ..

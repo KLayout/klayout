@@ -557,6 +557,25 @@ SaltManagerDialog::edit_properties ()
 }
 
 void
+SaltManagerDialog::set_current_grain_by_name (const std::string &current)
+{
+  SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
+  if (!model) {
+    return;
+  }
+
+  for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
+    --i;
+    QModelIndex index = model->index (i, 0, QModelIndex ());
+    SaltGrain *g = model->grain_from_index (index);
+    if (g && g->name () == current) {
+      salt_view->setCurrentIndex (index);
+      break;
+    }
+  }
+}
+
+void
 SaltManagerDialog::create_grain ()
 {
 BEGIN_PROTECTED
@@ -572,15 +591,12 @@ BEGIN_PROTECTED
       //  select the new one
       SaltModel *model = dynamic_cast <SaltModel *> (salt_view->model ());
       if (model) {
-        for (int i = model->rowCount (QModelIndex ()); i > 0; ) {
-          --i;
-          QModelIndex index = model->index (i, 0, QModelIndex ());
-          SaltGrain *g = model->grain_from_index (index);
-          if (g && g->name () == target.name ()) {
-            salt_view->setCurrentIndex (index);
-            break;
-          }
-        }
+
+        //  NOTE: this is basically redundant (because it happens in the background later
+        //  through dm_update_models). But we need this now to establish the selection.
+        model->update();
+
+        set_current_grain_by_name (target.name ());
 
       }
 
@@ -675,6 +691,15 @@ SaltManagerDialog::update_models ()
 
   model->clear_messages ();
 
+  //  Maintain the current index while updating
+  std::string current;
+  if (salt_view->currentIndex ().isValid ()) {
+    const lay::SaltGrain *g = model->grain_from_index (salt_view->currentIndex ());
+    if (g) {
+      current = g->name ();
+    }
+  }
+
   //  Establish a message saying that an update is available
   for (Salt::flat_iterator g = mp_salt->begin_flat (); g != mp_salt->end_flat (); ++g) {
     SaltGrain *gm = m_salt_mine.grain_by_name ((*g)->name ());
@@ -684,6 +709,10 @@ SaltManagerDialog::update_models ()
   }
 
   model->update ();
+
+  if (! current.empty ()) {
+    set_current_grain_by_name (current);
+  }
 
   if (mp_salt->is_empty ()) {
 
@@ -695,8 +724,8 @@ SaltManagerDialog::update_models ()
     list_stack->setCurrentIndex (0);
     details_frame->show ();
 
-    //  select the first grain
-    if (model->rowCount (QModelIndex ()) > 0) {
+    //  select the first grain if required
+    if (! salt_view->currentIndex ().isValid () && model->rowCount (QModelIndex ()) > 0) {
       salt_view->setCurrentIndex (model->index (0, 0, QModelIndex ()));
     }
 

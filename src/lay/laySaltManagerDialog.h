@@ -164,6 +164,7 @@ private:
   int m_current_tab;
 
   SaltGrain *current_grain ();
+  void set_current_grain_by_name (const std::string &current);
   void update_models ();
   void update_apply_state ();
   void get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details);

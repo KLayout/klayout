@@ -29,6 +29,7 @@
 #include <QObject>
 #include <QBuffer>
 #include <QByteArray>
+#include <memory>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -45,6 +46,19 @@ public:
   HttpErrorException (const std::string &f, int en, const std::string &url)
     : tl::Exception (tl::to_string (QObject::tr ("Error %d: %s, fetching %s")), en, f, url)
   { }
+};
+
+class AuthenticationHandler
+  : public QObject
+{
+Q_OBJECT
+
+public:
+  AuthenticationHandler ();
+
+public slots:
+  void authenticationRequired (QNetworkReply *, QAuthenticator *);
+  void proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *);
 };
 
 /**
@@ -117,12 +131,11 @@ public:
 
 private slots:
   void finished (QNetworkReply *);
-  void authenticationRequired (QNetworkReply *, QAuthenticator *);
-  void proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *);
 
 private:
   std::string m_url;
   QNetworkReply *mp_reply;
+  std::auto_ptr<QNetworkReply> mp_active_reply;
   QByteArray m_request;
   QByteArray m_data;
   QBuffer *mp_buffer;

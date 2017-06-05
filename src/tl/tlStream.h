@@ -41,6 +41,7 @@ namespace tl
 
 class InflateFilter;
 class DeflateFilter;
+class OutputStream;
 
 // ---------------------------------------------------------------------------------
 
@@ -229,6 +230,11 @@ public:
    *  This function reads all remaining of max_count bytes.
    */
   std::string read_all (size_t max_count);
+
+  /**
+   *  @brief Copies the content of the stream to the output stream
+   */
+  void copy_to (tl::OutputStream &os);
 
   /**
    *  @brief Enable uncompression of the following DEFLATE-compressed block

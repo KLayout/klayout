@@ -29,6 +29,7 @@
 #include "tlProgress.h"
 #include "tlLog.h"
 
+#include <memory>
 #include <QUrl>
 #include <QDir>
 
@@ -136,16 +137,11 @@ static std::string item_name (const QString &path1, const QString &path2)
     sl2.pop_back ();
   }
 
-  int i = 0;
-  for ( ; i < sl1.length () && i < sl2.length (); ++i) {
-    if (sl1 [i] != sl2 [i]) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Invalid WebDAV response: %1 is not a collection item of %2").arg (path2).arg (path1)));
-    }
-  }
-  if (i == sl2.length ()) {
+  if (sl1 == sl2) {
+    //  This is the top-level item (echoed in the PROPFIND response)
     return std::string ();
-  } else if (i + 1 == sl2.length ()) {
-    return tl::to_string (sl2[i]);
+  } else if (! sl2.empty ()) {
+    return tl::to_string (sl2.back ());
   } else {
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid WebDAV response: %1 is not a collection sub-item of %2").arg (path2).arg (path1)));
   }
@@ -254,6 +250,15 @@ void fetch_download_items (const std::string &url, const std::string &target, st
   }
 }
 
+tl::InputStream *
+WebDAVObject::download_item (const std::string &url)
+{
+  tl::InputHttpStream *http = new tl::InputHttpStream (url);
+  //  This trick allows accessing GitHub repos through their SVN API
+  http->add_header ("User-Agent", "SVN");
+  return new tl::InputStream (*http);
+}
+
 bool
 WebDAVObject::download (const std::string &url, const std::string &target)
 {
@@ -283,26 +288,9 @@ WebDAVObject::download (const std::string &url, const std::string &target)
 
       try {
 
-        tl::InputHttpStream http (i->url);
-
-        QFile file (tl::to_qstring (i->path));
-        if (! file.open (QIODevice::WriteOnly)) {
-          has_errors = true;
-          tl::error << QObject::tr ("Unable to open file '%1' for writing").arg (tl::to_qstring (i->path));
-        }
-
-        const size_t chunk = 65536;
-        char b[chunk];
-        size_t read;
-        while ((read = http.read (b, sizeof (b))) > 0) {
-          if (! file.write (b, read)) {
-            tl::error << QObject::tr ("Unable to write %2 bytes file '%1'").arg (tl::to_qstring (i->path)).arg (int (read));
-            has_errors = true;
-            break;
-          }
-        }
-
-        file.close ();
+        tl::OutputStream os (i->path);
+        std::auto_ptr<tl::InputStream> is (download_item (i->url));
+        is->copy_to (os);
 
       } catch (tl::Exception &ex) {
         tl::error << QObject::tr ("Error downloading file from '") << i->url << "':" << tl::endl << ex.msg ();

@@ -536,7 +536,9 @@ BEGIN_PROTECTED
     } else {
       unmark_all_new ();
     }
-    manager.execute (*mp_salt);
+    if (! manager.execute (*mp_salt)) {
+      throw tl::Exception (tl::to_string (tr ("Failed to install some of the selected packages. Please see log for details.")));
+    }
   }
 
 END_PROTECTED
@@ -863,6 +865,7 @@ void
 SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details)
 {
   if (! g) {
+    details->setHtml (QString ());
     return;
   }
 
@@ -891,11 +894,7 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
 
     QApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
 
-    tl::InputStream stream (SaltGrain::spec_url (g->url ()));
-
-    remote_grain.reset (new SaltGrain ());
-    remote_grain->load (stream);
-    remote_grain->set_url (g->url ());
+    remote_grain.reset (new SaltGrain (SaltGrain::from_url (g->url ())));
 
     if (g->name () != remote_grain->name ()) {
       throw tl::Exception (tl::to_string (tr ("Name mismatch between repository and actual package (repository: %1, package: %2)").arg (tl::to_qstring (g->name ())).arg (tl::to_qstring (remote_grain->name ()))));

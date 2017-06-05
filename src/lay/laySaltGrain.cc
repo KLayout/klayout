@@ -24,7 +24,9 @@
 #include "tlString.h"
 #include "tlXMLParser.h"
 #include "tlHttpStream.h"
+#include "tlWebDAV.h"
 
+#include <memory>
 #include <QDir>
 #include <QFileInfo>
 #include <QBuffer>
@@ -440,10 +442,17 @@ SaltGrain::from_url (const std::string &url)
     throw tl::Exception (tl::to_string (QObject::tr ("No download link available")));
   }
 
-  tl::InputStream stream (SaltGrain::spec_url (url));
+  std::auto_ptr<tl::InputStream> stream;
+  std::string spec_url = SaltGrain::spec_url (url);
+
+  if (spec_url.find ("http:") == 0 || spec_url.find ("https:") == 0) {
+    stream.reset (tl::WebDAVObject::download_item (spec_url));
+  } else {
+    stream.reset (new tl::InputStream (spec_url));
+  }
 
   SaltGrain g;
-  g.load (stream);
+  g.load (*stream);
   g.set_url (url);
   return g;
 }

@@ -25,6 +25,8 @@
 #define HDR_tlWebDAV
 
 #include "tlCommon.h"
+#include "tlStream.h"
+
 #include <string>
 #include <vector>
 
@@ -141,6 +143,13 @@ public:
    *  not be obtained or downloading of one file failed.
    */
   static bool download (const std::string &url, const std::string &target);
+
+  /**
+   *  @brief Gets a stream object for downloading the single item of the given URL
+   *
+   *  The stream object returned needs to be deleted by the caller.
+   */
+  static tl::InputStream *download_item (const std::string &url);
 
 private:
   container m_items;

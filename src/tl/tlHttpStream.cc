@@ -73,27 +73,55 @@ public:
 };
 
 // ---------------------------------------------------------------
+//  AuthenticationHandler implementation
+
+AuthenticationHandler::AuthenticationHandler ()
+  : QObject (0)
+{
+  //  .. nothing yet ..
+}
+
+void
+AuthenticationHandler::authenticationRequired (QNetworkReply *reply, QAuthenticator *auth)
+{
+  PasswordDialog pw_dialog (0 /*no parent*/);
+  pw_dialog.exec_auth (false, reply->url ().toString (), auth);
+}
+
+void
+AuthenticationHandler::proxyAuthenticationRequired (const QNetworkProxy &proxy, QAuthenticator *auth)
+{
+  PasswordDialog pw_dialog (0 /*no parent*/);
+  pw_dialog.exec_auth (true, proxy.hostName (), auth);
+}
+
+// ---------------------------------------------------------------
 //  InputHttpFile implementation
 
 static QNetworkAccessManager *s_network_manager (0);
+static AuthenticationHandler *s_auth_handler (0);
 
 InputHttpStream::InputHttpStream (const std::string &url)
-  : m_url (url), m_request ("GET"), mp_buffer (0)
+  : m_url (url), m_request ("GET"), mp_buffer (0), mp_reply (0)
 {
   if (! s_network_manager) {
-    s_network_manager = new QNetworkAccessManager(0);
+
+    s_network_manager = new QNetworkAccessManager (0);
+    s_auth_handler = new AuthenticationHandler ();
+    connect (s_network_manager, SIGNAL (authenticationRequired (QNetworkReply *, QAuthenticator *)), s_auth_handler, SLOT (authenticationRequired (QNetworkReply *, QAuthenticator *)));
+    connect (s_network_manager, SIGNAL (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)), s_auth_handler, SLOT (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)));
+
     tl::StaticObjects::reg (&s_network_manager);
+    tl::StaticObjects::reg (&s_auth_handler);
+
   }
+
   connect (s_network_manager, SIGNAL (finished (QNetworkReply *)), this, SLOT (finished (QNetworkReply *)));
-  connect (s_network_manager, SIGNAL (authenticationRequired (QNetworkReply *, QAuthenticator *)), this, SLOT (authenticationRequired (QNetworkReply *, QAuthenticator *)));
-  connect (s_network_manager, SIGNAL (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)), this, SLOT (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)));
-  mp_reply = 0;
 }
 
 InputHttpStream::~InputHttpStream ()
 {
-  delete mp_reply;
-  mp_reply = 0;
+  //  .. nothing yet ..
 }
 
 void
@@ -121,27 +149,16 @@ InputHttpStream::add_header (const std::string &name, const std::string &value)
 }
 
 void 
-InputHttpStream::authenticationRequired (QNetworkReply *reply, QAuthenticator *auth)
-{
-  PasswordDialog pw_dialog (0 /*no parent*/);
-  pw_dialog.exec_auth (false, reply->url ().toString (), auth);
-}
-
-void 
-InputHttpStream::proxyAuthenticationRequired (const QNetworkProxy &proxy, QAuthenticator *auth)
-{
-  PasswordDialog pw_dialog (0 /*no parent*/);
-  pw_dialog.exec_auth (true, proxy.hostName (), auth);
-}
-
-void 
 InputHttpStream::finished (QNetworkReply *reply)
 {
+  if (reply != mp_active_reply.get ()) {
+    return;
+  }
+
   QVariant redirect_target = reply->attribute (QNetworkRequest::RedirectionTargetAttribute);
   if (reply->error () == QNetworkReply::NoError && ! redirect_target.isNull ()) {
     m_url = tl::to_string (redirect_target.toString ());
     issue_request (QUrl (redirect_target.toString ()));
-    delete reply;
   } else {
     mp_reply = reply;
   }
@@ -158,10 +175,10 @@ InputHttpStream::issue_request (const QUrl &url)
     request.setRawHeader (QByteArray (h->first.c_str ()), QByteArray (h->second.c_str ()));
   }
   if (m_data.isEmpty ()) {
-    s_network_manager->sendCustomRequest (request, m_request);
+    mp_active_reply.reset (s_network_manager->sendCustomRequest (request, m_request));
   } else {
     mp_buffer = new QBuffer (&m_data);
-    s_network_manager->sendCustomRequest (request, m_request, mp_buffer);
+    mp_active_reply.reset (s_network_manager->sendCustomRequest (request, m_request, mp_buffer));
   }
 }
 
@@ -171,6 +188,8 @@ InputHttpStream::read (char *b, size_t n)
   if (mp_reply == 0) {
     issue_request (QUrl (tl::to_qstring (m_url)));
   }
+
+  //  @@@ TODO: progress, timeout
   while (mp_reply == 0) {
     QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents, 100);
   }

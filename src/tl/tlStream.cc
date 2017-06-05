@@ -469,6 +469,17 @@ InputStream::read_all ()
 }
 
 void
+InputStream::copy_to (tl::OutputStream &os)
+{
+  const size_t chunk = 65536;
+  char b [chunk];
+  size_t read;
+  while ((read = mp_delegate->read (b, sizeof (b))) > 0) {
+    os.put (b, read);
+  }
+}
+
+void
 InputStream::inflate ()
 {
   tl_assert (mp_inflate == 0);

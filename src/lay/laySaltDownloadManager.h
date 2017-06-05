@@ -25,7 +25,10 @@
 
 #include "layCommon.h"
 #include "laySaltGrain.h"
+#include "layLogViewerDialog.h"
 #include "tlProgress.h"
+
+#include "ui_SaltManagerInstallConfirmationDialog.h"
 
 #include <QObject>
 #include <string>
@@ -35,6 +38,40 @@ namespace lay
 {
 
 class Salt;
+
+class ConfirmationDialog
+  : public QDialog, private Ui::SaltManagerInstallConfirmationDialog
+{
+Q_OBJECT
+
+public:
+  ConfirmationDialog (QWidget *parent);
+
+  void add_info (const std::string &name, bool update, const std::string &version, const std::string &url);
+
+  bool is_confirmed () const  { return m_confirmed; }
+  bool is_cancelled () const  { return m_cancelled; }
+  bool is_closed () const     { return m_closed; }
+
+  void start ();
+  void separator ();
+  void finish ();
+
+  void mark_error (const std::string &name);
+  void mark_success (const std::string &name);
+
+private slots:
+  void confirm_pressed ()     { m_confirmed = true; }
+  void cancel_pressed ()      { m_cancelled = true; }
+  void close_pressed ()       { m_closed = true; }
+
+private:
+  bool m_confirmed, m_cancelled, m_closed;
+  lay::LogFile m_file;
+  std::map<std::string, QTreeWidgetItem *> m_items_by_name;
+
+  void set_icon_for_name (const std::string &name, const QIcon &icon);
+};
 
 /**
  *  @brief The download manager
@@ -74,24 +111,15 @@ public:
   void compute_dependencies (const lay::Salt &salt, const Salt &salt_mine);
 
   /**
-   *  @brief Presents a dialog showing the packages scheduled for download
-   *
-   *  This method requires all dependencies to be computed. It will return false
-   *  if the dialog is not confirmed.
-   *
-   *  "salt" needs to be the currently installed packages so the dialog can
-   *  indicate which packages will be updated.
-   */
-  bool show_confirmation_dialog (QWidget *parent, const lay::Salt &salt);
-
-  /**
    *  @brief Actually execute the downloads
    *
-   *  This method will return false if anything goes wrong.
-   *  Failed packages will be removed entirely after they have been listed in
-   *  an error dialog.
+   *  This method will show a confirmation dialog and start installation
+   *  if this dialog is confirmed. It will return false if
+   *  the dialog was cancelled and an exception if something goes
+   *  wrong.
+   *  It will return true if the packages were installed successfully.
    */
-  bool execute (lay::Salt &salt);
+  bool execute (QWidget *parent, lay::Salt &salt);
 
 private:
   struct Descriptor
@@ -110,6 +138,7 @@ private:
 
   bool needs_iteration ();
   void fetch_missing (const lay::Salt &salt_mine, tl::AbsoluteProgress &progress);
+  lay::ConfirmationDialog *make_confirmation_dialog (QWidget *parent, const lay::Salt &salt);
 };
 
 }

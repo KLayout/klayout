@@ -25,8 +25,7 @@
 #include "tlFileUtils.h"
 #include "tlWebDAV.h"
 
-#include "ui_SaltManagerInstallConfirmationDialog.h"
-
+#include <memory>
 #include <QTreeWidgetItem>
 #include <QMessageBox>
 
@@ -35,32 +34,81 @@ namespace lay
 
 // ----------------------------------------------------------------------------------
 
-class ConfirmationDialog
-  : public QDialog, private Ui::SaltManagerInstallConfirmationDialog
+ConfirmationDialog::ConfirmationDialog (QWidget *parent)
+  : QDialog (parent), m_confirmed (false), m_cancelled (false), m_closed (false), m_file (50000, true)
 {
-public:
-  ConfirmationDialog (QWidget *parent)
-    : QDialog (parent)
-  {
-    Ui::SaltManagerInstallConfirmationDialog::setupUi (this);
+  Ui::SaltManagerInstallConfirmationDialog::setupUi (this);
+
+  connect (ok_button, SIGNAL (clicked ()), this, SLOT (confirm_pressed ()));
+  connect (cancel_button, SIGNAL (clicked ()), this, SLOT (cancel_pressed ()));
+  connect (close_button, SIGNAL (clicked ()), this, SLOT (close_pressed ()));
+
+  log_panel->hide ();
+  attn_frame->hide ();
+  log_view->setModel (&m_file);
+
+  connect (&m_file, SIGNAL (layoutChanged ()), log_view, SLOT (scrollToBottom ()));
+  connect (&m_file, SIGNAL (attention_changed (bool)), attn_frame, SLOT (setVisible (bool)));
+}
+
+void
+ConfirmationDialog::add_info (const std::string &name, bool update, const std::string &version, const std::string &url)
+{
+  QTreeWidgetItem *item = new QTreeWidgetItem (list);
+  m_items_by_name.insert (std::make_pair (name, item));
+
+  item->setFlags (item->flags () & ~Qt::ItemIsSelectable);
+
+  item->setText (0, tl::to_qstring (name));
+  item->setText (1, update ? tr ("UPDATE") : tr ("INSTALL"));
+  item->setText (2, tl::to_qstring (version));
+  item->setText (3, tl::to_qstring (url));
+
+  for (int column = 0; column < list->colorCount (); ++column) {
+    item->setData (column, Qt::ForegroundRole, update ? Qt::blue : Qt::black);
   }
+}
 
-  void add_info (const std::string &name, bool update, const std::string &version, const std::string &url)
-  {
-    QTreeWidgetItem *item = new QTreeWidgetItem (list);
+void
+ConfirmationDialog::separator ()
+{
+  m_file.separator ();
+}
 
-    item->setFlags (item->flags () & ~Qt::ItemIsSelectable);
+void
+ConfirmationDialog::mark_error (const std::string &name)
+{
+  set_icon_for_name (name, QIcon (QString::fromUtf8 (":/error_16.png")));
+}
 
-    item->setText (0, tl::to_qstring (name));
-    item->setText (1, update ? tr ("UPDATE") : tr ("INSTALL"));
-    item->setText (2, tl::to_qstring (version));
-    item->setText (3, tl::to_qstring (url));
+void
+ConfirmationDialog::mark_success (const std::string &name)
+{
+  set_icon_for_name (name, QIcon (QString::fromUtf8 (":/marked_16.png")));
+}
 
-    for (int column = 0; column < list->colorCount (); ++column) {
-      item->setData (column, Qt::ForegroundRole, update ? Qt::blue : Qt::black);
-    }
+void
+ConfirmationDialog::set_icon_for_name (const std::string &name, const QIcon &icon)
+{
+  std::map<std::string, QTreeWidgetItem *>::const_iterator i = m_items_by_name.find (name);
+  if (i != m_items_by_name.end ()) {
+    i->second->setData (0, Qt::DecorationRole, icon);
   }
-};
+}
+
+void
+ConfirmationDialog::start ()
+{
+  confirm_panel->hide ();
+  log_panel->show ();
+  close_button->setEnabled (false);
+}
+
+void
+ConfirmationDialog::finish ()
+{
+  close_button->setEnabled (true);
+}
 
 // ----------------------------------------------------------------------------------
 
@@ -182,23 +230,17 @@ SaltDownloadManager::fetch_missing (const lay::Salt &salt_mine, tl::AbsoluteProg
   }
 }
 
-bool
-SaltDownloadManager::show_confirmation_dialog (QWidget *parent, const lay::Salt &salt)
+lay::ConfirmationDialog *
+SaltDownloadManager::make_confirmation_dialog (QWidget *parent, const lay::Salt &salt)
 {
-  //  Stop with a warning if there is nothing to do
-  if (m_registry.empty()) {
-    QMessageBox::warning (parent, tr ("Nothing to do"), tr ("No packages need update or are marked for installation"));
-    return false;
-  }
-
-  lay::ConfirmationDialog dialog (parent);
+  lay::ConfirmationDialog *dialog = new lay::ConfirmationDialog (parent);
 
   //  First the packages to update
   for (std::map<std::string, Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
     const lay::SaltGrain *g = salt.grain_by_name (p->first);
     if (g) {
       //  \342\206\222 is UTF-8 "right arrow"
-      dialog.add_info (p->first, true, g->version () + " \342\206\222 " + p->second.version, p->second.url);
+      dialog->add_info (p->first, true, g->version () + " \342\206\222 " + p->second.version, p->second.url);
     }
   }
 
@@ -206,19 +248,37 @@ SaltDownloadManager::show_confirmation_dialog (QWidget *parent, const lay::Salt 
   for (std::map<std::string, Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
     const lay::SaltGrain *g = salt.grain_by_name (p->first);
     if (!g) {
-      dialog.add_info (p->first, false, p->second.version, p->second.url);
+      dialog->add_info (p->first, false, p->second.version, p->second.url);
     }
   }
 
-  return dialog.exec ();
+  return dialog;
 }
 
 bool
-SaltDownloadManager::execute (lay::Salt &salt)
+SaltDownloadManager::execute (QWidget *parent, lay::Salt &salt)
 {
-  bool result = true;
+  //  Stop with a warning if there is nothing to do
+  if (m_registry.empty()) {
+    QMessageBox::warning (parent, tr ("Nothing to do"), tr ("No packages need update or are marked for installation"));
+    return true;
+  }
 
-  tl::RelativeProgress progress (tl::to_string (QObject::tr ("Downloading packages")), m_registry.size (), 1);
+  std::auto_ptr<lay::ConfirmationDialog> dialog (make_confirmation_dialog (parent, salt));
+
+  dialog->setModal (true);
+  dialog->show ();
+
+  while (! dialog->is_confirmed ()) {
+    QCoreApplication::processEvents (QEventLoop::AllEvents | QEventLoop::WaitForMoreEvents, 100);
+    if (dialog->is_cancelled () || ! dialog->isVisible ()) {
+      return false;
+    }
+  }
+
+  dialog->start ();
+
+  bool result = true;
 
   for (std::map<std::string, Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
 
@@ -230,11 +290,20 @@ SaltDownloadManager::execute (lay::Salt &salt)
     }
 
     if (! salt.create_grain (p->second.grain, target)) {
+      dialog->mark_error (p->first);
       result = false;
+    } else {
+      dialog->mark_success (p->first);
     }
 
-    ++progress;
+    dialog->separator ();
 
+  }
+
+  dialog->finish ();
+
+  while (! dialog->is_closed () && dialog->isVisible ()) {
+    QCoreApplication::processEvents (QEventLoop::AllEvents | QEventLoop::WaitForMoreEvents, 100);
   }
 
   return result;

@@ -529,15 +529,11 @@ BEGIN_PROTECTED
   }
 
   manager.compute_dependencies (*mp_salt, m_salt_mine);
-
-  if (manager.show_confirmation_dialog (this, *mp_salt)) {
+  if (manager.execute (this, *mp_salt)) {
     if (update) {
       unmark_all_update ();
     } else {
       unmark_all_new ();
-    }
-    if (! manager.execute (*mp_salt)) {
-      throw tl::Exception (tl::to_string (tr ("Failed to install some of the selected packages. Please see log for details.")));
     }
   }
 

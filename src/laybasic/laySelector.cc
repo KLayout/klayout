@@ -188,9 +188,12 @@ SelectionService::mouse_click_event (const db::DPoint &p, unsigned int buttons, 
 
       mp_view->select (p, mode);
 
-      m_hover_wait = true;
-      m_timer.start ();
-      m_hover_point = p;
+      //  add a transient selection trigger to capture the "next" selection.
+      if (mp_view->transient_selection_mode ()) {
+        m_hover_wait = true;
+        m_timer.start ();
+        m_hover_point = p;
+      }
 
     } catch (tl::Exception &ex) {
       tl::error << ex.msg ();

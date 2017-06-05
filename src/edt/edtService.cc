@@ -932,11 +932,14 @@ Service::transient_select (const db::DPoint &pos)
         marker->set (inst, gt, tv);
         marker->set_line_width (1);
         marker->set_halo (0);
+        marker->set_text_enabled (false);
 
         mp_transient_marker = marker;
 
       } else {
 
+        //  In viewer mode, individual instances of arrays can be selected. Since that is not supported by
+        //  InstanceMarker, we just indicate the individual instance's bounding box.
         lay::Marker *marker = new lay::Marker (view (), r->cv_index ());
         db::box_convert<db::CellInst> bc (cv->layout ());
         marker->set (bc (r->back ().inst_ptr.cell_inst ().object ()), gt * r->back ().inst_ptr.cell_inst ().complex_trans (*r->back ().array_inst), tv);

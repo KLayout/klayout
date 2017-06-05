@@ -844,27 +844,6 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
 
             d += 1; // the instance has a small penalty so that shapes win over instances
 
-            if (match && closer (d)) {
-
-              //  in point mode just store that found that has the least "distance"
-              if (m_founds.empty ()) {
-                m_founds.push_back (lay::ObjectInstPath ());
-              }
-
-              m_founds.back ().set_cv_index (m_cv_index);
-              m_founds.back ().set_topcell (m_topcell);
-              m_founds.back ().assign_path (path ().begin (), path ().end ());
-
-              //  add the selected instance as the last element of the path
-              db::InstElement el;
-              el.inst_ptr = *inst;
-              if (! m_full_arrays) {
-                el.array_inst = p;
-              }
-              m_founds.back ().add_path (el);
-
-            }
-
           }
 
           if (match) {

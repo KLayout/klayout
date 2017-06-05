@@ -205,8 +205,6 @@ Editables::transient_select (const db::DPoint &pt)
     clear_previous_selection ();
   }
 
-  m_last_selected_point = db::DBox (pt, pt);
-
   //  in a first pass evaluate the point selection proximity value to select
   //  those plugins that are active. This code is a copy of the code for the single-point selection below.
 
@@ -256,6 +254,8 @@ Editables::transient_select (const db::DPoint &pt)
     }
 
   }
+
+  m_last_selected_point = db::DBox (pt, pt);
 
   //  send a signal to the observers
   signal_transient_selection_changed ();
@@ -343,8 +343,6 @@ Editables::select (const db::DPoint &pt, lay::Editable::SelectionMode mode)
     clear_previous_selection ();
   }
 
-  m_last_selected_point = db::DBox (pt, pt);
-
   cancel_edits ();
   clear_transient_selection ();
 
@@ -403,6 +401,8 @@ Editables::select (const db::DPoint &pt, lay::Editable::SelectionMode mode)
       pi->second->select (db::DBox (), lay::Editable::Reset);
     }
   }
+
+  m_last_selected_point = db::DBox (pt, pt);
 
   //  send a signal to the observers
   signal_selection_changed ();

@@ -39,11 +39,12 @@ namespace lay
 
 void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, const db::CplxTrans &tr, lay::Renderer &r,
                        unsigned int font, lay::CanvasPlane *fill, lay::CanvasPlane *contour, lay::CanvasPlane *vertex, lay::CanvasPlane *text,
-                       bool draw_outline, size_t max_shapes)
+                       bool cell_name_text_transform, int min_size_for_label, bool draw_outline, size_t max_shapes)
 {
   bool render_origins = false;
 
   const db::Cell &cell = layout.cell (inst.object ().cell_index ());
+  std::string cell_name = layout.cell_name (inst.object ().cell_index ());
   db::Box cell_box = cell.bbox ();
 
   db::Vector a, b;
@@ -103,12 +104,30 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 
       db::DBox arr_box (db::DPoint (), db::DPoint () + tr * (av * long (amax - 1) + bv * long (bmax - 1)));
       arr_box *= cb;
-      r.draw (arr_box, tl::sprintf (tl::to_string (QObject::tr ("Array %ldx%ld")), amax, bmax), (db::Font) font, db::HAlignCenter, db::VAlignCenter, db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
+      r.draw (arr_box, tl::sprintf (tl::to_string (QObject::tr ("Array %ldx%ld")), amax, bmax), db::Font (font), db::HAlignCenter, db::VAlignCenter, db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
 
     } else {
 
       for (db::CellInstArray::iterator arr = inst.begin (); ! arr.at_end (); ++arr) {
-        r.draw (cell_box, tr * inst.complex_trans (*arr), fill, contour, 0, text);
+
+        //  fallback to simpler representation using a description text
+        db::CplxTrans tbox (tr * inst.complex_trans ());
+
+        r.draw (cell_box, tbox, fill, contour, 0, 0);
+
+        db::DBox dbox = tbox * cell_box;
+        if (! cell_name.empty () && dbox.width () > min_size_for_label && dbox.height () > min_size_for_label) {
+
+          //  Hint: we render to contour because the texts plane is reserved for properties
+          r.draw (dbox, cell_name,
+                  db::Font (font),
+                  db::HAlignCenter,
+                  db::VAlignCenter,
+                  //  TODO: apply "real" transformation?
+                  db::DFTrans (cell_name_text_transform ? tbox.fp_trans ().rot () : db::DFTrans::r0), 0, 0, 0, text);
+
+        }
+
       }
 
       render_origins = true;
@@ -154,7 +173,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
 
 MarkerBase::MarkerBase (lay::LayoutView *view)
   : lay::ViewObject (view->view_object_widget ()),
-    m_line_width (-1), m_vertex_size (-1), m_halo (-1), m_vertex_shape (lay::ViewOp::Rect), m_line_style (-1), m_dither_pattern (-1), m_frame_pattern (0), mp_view (view)
+    m_line_width (-1), m_vertex_size (-1), m_halo (-1), m_text_enabled (true), m_vertex_shape (lay::ViewOp::Rect), m_line_style (-1), m_dither_pattern (-1), m_frame_pattern (0), mp_view (view)
 { 
   // .. nothing yet ..
 }
@@ -213,7 +232,16 @@ MarkerBase::set_halo (int halo)
   }
 }
 
-void 
+void
+MarkerBase::set_text_enabled (bool en)
+{
+  if (m_text_enabled != en) {
+    m_text_enabled = en;
+    redraw ();
+  }
+}
+
+void
 MarkerBase::set_frame_pattern (int frame_pattern)
 {
   if (m_frame_pattern != frame_pattern) {
@@ -283,7 +311,9 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
     ops[1] = lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, (unsigned int) line_style, (unsigned int) m_frame_pattern, 0, lay::ViewOp::Rect, line_width * basic_width, 1);
     contour = canvas.plane (ops);
 
-    if (line_width == 1) {
+    if (! m_text_enabled) {
+      text = 0;
+    } else if (line_width == 1) {
       text = contour;
     } else {
       ops[0] = lay::ViewOp (canvas.background_color ().rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, 3 * basic_width, 0);
@@ -312,7 +342,9 @@ MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay:
 
     contour = canvas.plane (lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, (unsigned int) line_style, (unsigned int) m_frame_pattern, 0, lay::ViewOp::Rect, line_width * basic_width));
     vertex = canvas.plane (lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, 0, 0, 0, m_vertex_shape, vertex_size * basic_width));
-    if (line_width == 1) {
+    if (! m_text_enabled) {
+      text = 0;
+    } else if (line_width == 1) {
       text = contour;
     } else {
       text = canvas.plane (lay::ViewOp (frame_color.rgb (), lay::ViewOp::Copy, 0, 0, 0, lay::ViewOp::Rect, basic_width));
@@ -487,19 +519,16 @@ InstanceMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
   }
 
   lay::Renderer &r = canvas.renderer ();
-
-  r.set_font (db::Font (view ()->text_font ()));
-  r.apply_text_trans (view ()->apply_text_trans ());
-  r.default_text_size (db::Coord (view ()->default_text_size () / ly->dbu ()));
-  r.set_precise (true);
+  bool label_transform = view ()->cell_box_text_transform ();
+  int min_size = view ()->min_inst_label_size ();
 
   db::box_convert<db::CellInst> bc (*ly);
 
   if (! trans_vector ()) {
-    render_cell_inst (*ly, m_inst.cell_inst (), vp.trans () * trans (), r, view ()->cell_box_text_font (), fill, contour, vertex, text, m_draw_outline, m_max_shapes);
+    render_cell_inst (*ly, m_inst.cell_inst (), vp.trans () * trans (), r, view ()->cell_box_text_font (), fill, contour, vertex, text, label_transform, min_size, m_draw_outline, m_max_shapes);
   } else {
     for (std::vector<db::DCplxTrans>::const_iterator tr = trans_vector ()->begin (); tr != trans_vector ()->end (); ++tr) {
-      render_cell_inst (*ly, m_inst.cell_inst (), vp.trans () * *tr * trans (), r, view ()->cell_box_text_font (), fill, contour, vertex, text, m_draw_outline, m_max_shapes);
+      render_cell_inst (*ly, m_inst.cell_inst (), vp.trans () * *tr * trans (), r, view ()->cell_box_text_font (), fill, contour, vertex, text, label_transform, min_size, m_draw_outline, m_max_shapes);
     }
   }
 }
@@ -1026,7 +1055,9 @@ Marker::draw (lay::Renderer &r, const db::CplxTrans &t, lay::CanvasPlane *fill, 
     r.draw (poly, db::DCplxTrans (t), fill, 0, 0, 0);
   } else if (m_type == Instance) {
     const lay::CellView &cv = view ()->cellview (cv_index ());
-    render_cell_inst (cv->layout (), *m_object.inst, t, r, view ()->cell_box_text_font (), fill, contour, vertex, text, m_draw_outline, m_max_shapes);
+    bool label_transform = view ()->cell_box_text_transform ();
+    int min_size = view ()->min_inst_label_size ();
+    render_cell_inst (cv->layout (), *m_object.inst, t, r, view ()->cell_box_text_font (), fill, contour, vertex, text, label_transform, min_size, m_draw_outline, m_max_shapes);
   }
 }
 

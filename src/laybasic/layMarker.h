@@ -205,6 +205,22 @@ public:
   void set_halo (int halo);
 
   /**
+   *  @brief Gets a value indicating whether text drawing is enabled
+   *
+   *  If this value is false, texts are never drawn. If true (the default), texts are drawn as usual.
+   *  This is specifically useful for disabling cell boxes of instances.
+   */
+  bool is_text_enabled () const
+  {
+    return m_text_enabled;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether text drawing is enabled
+   */
+  void set_text_enabled (bool en);
+
+  /**
    *  @brief Gets the bounding box
    */
   virtual db::DBox bbox () const = 0;
@@ -215,6 +231,7 @@ protected:
   QColor m_color;
   QColor m_frame_color;
   char m_line_width, m_vertex_size, m_halo;
+  bool m_text_enabled;
   lay::ViewOp::Shape m_vertex_shape;
   int m_line_style, m_dither_pattern, m_frame_pattern;
   lay::LayoutView *mp_view;

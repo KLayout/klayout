@@ -102,9 +102,11 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
       p.assign_hull (points, points + sizeof (points) / sizeof (points[0]));
       r.draw (p, fill, contour, 0, text);
 
-      db::DBox arr_box (db::DPoint (), db::DPoint () + tr * (av * long (amax - 1) + bv * long (bmax - 1)));
-      arr_box *= cb;
-      r.draw (arr_box, tl::sprintf (tl::to_string (QObject::tr ("Array %ldx%ld")), amax, bmax), db::Font (font), db::HAlignCenter, db::VAlignCenter, db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
+      if (text) {
+        db::DBox arr_box (db::DPoint (), db::DPoint () + tr * (av * long (amax - 1) + bv * long (bmax - 1)));
+        arr_box *= cb;
+        r.draw (arr_box, tl::sprintf (tl::to_string (QObject::tr ("Array %ldx%ld")), amax, bmax), db::Font (font), db::HAlignCenter, db::VAlignCenter, db::DFTrans (db::DFTrans::r0), 0, 0, 0, text);
+      }
 
     } else {
 
@@ -116,7 +118,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
         r.draw (cell_box, tbox, fill, contour, 0, 0);
 
         db::DBox dbox = tbox * cell_box;
-        if (! cell_name.empty () && dbox.width () > min_size_for_label && dbox.height () > min_size_for_label) {
+        if (text && ! cell_name.empty () && dbox.width () > min_size_for_label && dbox.height () > min_size_for_label) {
 
           //  Hint: we render to contour because the texts plane is reserved for properties
           r.draw (dbox, cell_name,

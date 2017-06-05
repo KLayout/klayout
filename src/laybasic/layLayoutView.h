@@ -2391,11 +2391,7 @@ public slots:
    *
    *  This signal is forwarded to the active_cellview_changed event
    */
-  void active_cellview_changed (int index)
-  {
-    active_cellview_changed_event ();
-    active_cellview_changed_with_index_event (index);
-  }
+  void active_cellview_changed (int index);
 
   /**
    *  @brief Gets the full field box
@@ -2687,6 +2683,7 @@ private:
   int m_copy_layera, m_copy_layerr;
 
   bool m_visibility_changed;
+  bool m_active_cellview_changed_event_enabled;
   tl::DeferredMethod<lay::LayoutView> dm_prop_changed;
 
   void init (db::Manager *mgr, lay::PluginRoot *root, QWidget *parent);

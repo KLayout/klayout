@@ -335,7 +335,7 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   m_annotation_shapes.manager (mgr);
 
   m_visibility_changed = false;
-
+  m_active_cellview_changed_event_enabled = true;
   m_disabled_edits = 0;
   m_synchronous = false;
   m_drawing_workers = 1;
@@ -2886,103 +2886,119 @@ LayoutView::reload_layout (unsigned int cv_index)
 unsigned int 
 LayoutView::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview, bool initialize_layers)
 {
-  stop ();
-  
-  bool set_max_hier = (m_full_hier_new_cell || has_max_hier ());
+  unsigned int cv_index = 0;
 
-  lay::CellView cv;
-  unsigned int cv_index;
+  try {
 
-  if (! add_cellview) {
-    clear_cellviews ();
-  }
+    m_active_cellview_changed_event_enabled = false;
 
-  cv.set (layout_handle);
+    stop ();
 
-  cv->layout ().update ();
+    bool set_max_hier = (m_full_hier_new_cell || has_max_hier ());
 
-  //  select the cell with the largest area as the first top cell
-  db::Layout::top_down_const_iterator top = cv->layout ().begin_top_down ();
-  for (db::Layout::top_down_const_iterator t = cv->layout ().begin_top_down (); t != cv->layout ().end_top_cells (); ++t) {
-    if (cv->layout ().cell (*t).bbox ().area () > cv->layout ().cell (*top).bbox ().area ()) {
-      top = t;
-    }
-  }
+    lay::CellView cv;
 
-  if (top != cv->layout ().end_top_down ()) {
-    std::vector <db::cell_index_type> p;
-    p.push_back (*top);
-    cv.set_unspecific_path (p);
-  }
-
-  cv_index = cellviews ();
-  set_layout (cv, cv_index);
-
-  if (top != cv->layout ().end_top_cells ()) {
-    std::vector <db::cell_index_type> p;
-    p.push_back (*top);
-    select_cell (p, cv_index);
-  } else {
-    //  even if there is no cell, select the cellview item
-    //  to support applications with an active cellview (that is however invalid)
-    set_active_cellview_index (cv_index);
-  }
-  
-  if (initialize_layers) {
-
-    bool add_other_layers = m_add_other_layers;
-
-    //  Use the "layer-properties-file" meta info from the handle to get the layer properties file.
-    //  If no such file is present, use the default file or the technology specific file.
-    std::string lyp_file = m_def_lyp_file;
-    const lay::Technology *tech = lay::Technologies::instance ()->technology_by_name (layout_handle->tech_name ());
-    if (tech && ! tech->eff_layer_properties_file ().empty ()) {
-      lyp_file = tech->eff_layer_properties_file ();
-      add_other_layers = tech->add_other_layers ();
+    if (! add_cellview) {
+      clear_cellviews ();
     }
 
-    //  Give the layout object a chance to specify a certain layer property file
-    for (db::Layout::meta_info_iterator meta = cv->layout ().begin_meta (); meta != cv->layout ().end_meta (); ++meta) {
-      if (meta->name == "layer-properties-file") {
-        lyp_file = meta->value;
+    cv.set (layout_handle);
+
+    cv->layout ().update ();
+
+    //  select the cell with the largest area as the first top cell
+    db::Layout::top_down_const_iterator top = cv->layout ().begin_top_down ();
+    for (db::Layout::top_down_const_iterator t = cv->layout ().begin_top_down (); t != cv->layout ().end_top_cells (); ++t) {
+      if (cv->layout ().cell (*t).bbox ().area () > cv->layout ().cell (*top).bbox ().area ()) {
+        top = t;
       }
-      if (meta->name == "layer-properties-add-other-layers") {
-        try {
-          tl::from_string (meta->value, add_other_layers);
-        } catch (...) {
+    }
+
+    if (top != cv->layout ().end_top_down ()) {
+      std::vector <db::cell_index_type> p;
+      p.push_back (*top);
+      cv.set_unspecific_path (p);
+    }
+
+    cv_index = cellviews ();
+    set_layout (cv, cv_index);
+
+    if (top != cv->layout ().end_top_cells ()) {
+      std::vector <db::cell_index_type> p;
+      p.push_back (*top);
+      select_cell (p, cv_index);
+    } else {
+      //  even if there is no cell, select the cellview item
+      //  to support applications with an active cellview (that is however invalid)
+      set_active_cellview_index (cv_index);
+    }
+
+    if (initialize_layers) {
+
+      bool add_other_layers = m_add_other_layers;
+
+      //  Use the "layer-properties-file" meta info from the handle to get the layer properties file.
+      //  If no such file is present, use the default file or the technology specific file.
+      std::string lyp_file = m_def_lyp_file;
+      const lay::Technology *tech = lay::Technologies::instance ()->technology_by_name (layout_handle->tech_name ());
+      if (tech && ! tech->eff_layer_properties_file ().empty ()) {
+        lyp_file = tech->eff_layer_properties_file ();
+        add_other_layers = tech->add_other_layers ();
+      }
+
+      //  Give the layout object a chance to specify a certain layer property file
+      for (db::Layout::meta_info_iterator meta = cv->layout ().begin_meta (); meta != cv->layout ().end_meta (); ++meta) {
+        if (meta->name == "layer-properties-file") {
+          lyp_file = meta->value;
+        }
+        if (meta->name == "layer-properties-add-other-layers") {
+          try {
+            tl::from_string (meta->value, add_other_layers);
+          } catch (...) {
+          }
         }
       }
+
+      //  interpolate the layout properties file name
+      tl::Eval expr;
+      expr.set_var ("layoutfile", layout_handle->filename ());
+      lyp_file = expr.interpolate (lyp_file);
+
+      //  create the initial layer properties
+      create_initial_layer_props (cv_index, lyp_file, add_other_layers);
+
     }
 
-    //  interpolate the layout properties file name
-    tl::Eval expr;
-    expr.set_var ("layoutfile", layout_handle->filename ());
-    lyp_file = expr.interpolate (lyp_file);
+    //  signal to any observers
+    file_open_event ();
 
-    //  create the initial layer properties
-    create_initial_layer_props (cv_index, lyp_file, add_other_layers);
+    if (cv->layout ().begin_top_down () != cv->layout ().end_top_down ()) {
 
-  }
+      //  do a fit and update layer lists etc.
+      zoom_fit ();
+      if (set_max_hier) {
+        max_hier ();
+      }
+      update_content ();
 
-  //  signal to any observers
-  file_open_event ();
-
-  if (cv->layout ().begin_top_down () != cv->layout ().end_top_down ()) {
-
-    //  do a fit and update layer lists etc.
-    zoom_fit ();
-    if (set_max_hier) {
-      max_hier ();
+    } else {
+      //  even if there is no cell, select the cellview item
+      //  to support applications with an active cellview (that is however invalid)
+      set_active_cellview_index (cv_index);
     }
+
+    m_active_cellview_changed_event_enabled = true;
+
+  } catch (...) {
+
     update_content ();
 
-  } else {
-    //  even if there is no cell, select the cellview item
-    //  to support applications with an active cellview (that is however invalid)
-    set_active_cellview_index (cv_index);
+    m_active_cellview_changed_event_enabled = true;
+    throw;
+
   }
 
-  //  this event may not be generated otherwise:
+  //  this event may not be generated otherwise, hence force it now.
   active_cellview_changed (cv_index);
 
   return cv_index;
@@ -3066,65 +3082,80 @@ LayoutView::load_layout (const std::string &filename, const db::LoadLayoutOption
 
   }
 
-  //  select the cell with the largest area as the first top cell
-  db::Layout::top_down_const_iterator top = cv->layout ().begin_top_down ();
-  for (db::Layout::top_down_const_iterator t = cv->layout ().begin_top_down (); t != cv->layout ().end_top_cells (); ++t) {
-    if (cv->layout ().cell (*t).bbox ().area () > cv->layout ().cell (*top).bbox ().area ()) {
-      top = t;
-    }
-  }
-  if (top != cv->layout ().end_top_cells ()) {
-    std::vector <db::cell_index_type> p;
-    p.push_back (*top);
-    select_cell (p, cv_index);
-  } else {
-    //  even if there is no cell, select the cellview item
-    //  to support applications with an active cellview (that is however invalid)
-    set_active_cellview_index (cv_index);
-  }
-  
-  bool add_other_layers = m_add_other_layers;
+  try {
 
-  //  Use the "layer-properties-file" meta info from the handle to get the layer properties file.
-  //  If no such file is present, use the default file or the technology specific file.
-  std::string lyp_file = m_def_lyp_file;
-  if (tech && ! tech->eff_layer_properties_file ().empty ()) {
-    lyp_file = tech->eff_layer_properties_file ();
-    add_other_layers = tech->add_other_layers ();
-  }
+    m_active_cellview_changed_event_enabled = false;
 
-  //  Give the layout object a chance to specify a certain layer property file
-  for (db::Layout::meta_info_iterator meta = cv->layout().begin_meta (); meta != cv->layout().end_meta (); ++meta) {
-    if (meta->name == "layer-properties-file") {
-      lyp_file = meta->value;
-    }
-    if (meta->name == "layer-properties-add-other-layers") {
-      try {
-        tl::from_string (meta->value, add_other_layers);
-      } catch (...) {
+    //  select the cell with the largest area as the first top cell
+    db::Layout::top_down_const_iterator top = cv->layout ().begin_top_down ();
+    for (db::Layout::top_down_const_iterator t = cv->layout ().begin_top_down (); t != cv->layout ().end_top_cells (); ++t) {
+      if (cv->layout ().cell (*t).bbox ().area () > cv->layout ().cell (*top).bbox ().area ()) {
+        top = t;
       }
     }
+    if (top != cv->layout ().end_top_cells ()) {
+      std::vector <db::cell_index_type> p;
+      p.push_back (*top);
+      select_cell (p, cv_index);
+    } else {
+      //  even if there is no cell, select the cellview item
+      //  to support applications with an active cellview (that is however invalid)
+      set_active_cellview_index (cv_index);
+    }
+
+    bool add_other_layers = m_add_other_layers;
+
+    //  Use the "layer-properties-file" meta info from the handle to get the layer properties file.
+    //  If no such file is present, use the default file or the technology specific file.
+    std::string lyp_file = m_def_lyp_file;
+    if (tech && ! tech->eff_layer_properties_file ().empty ()) {
+      lyp_file = tech->eff_layer_properties_file ();
+      add_other_layers = tech->add_other_layers ();
+    }
+
+    //  Give the layout object a chance to specify a certain layer property file
+    for (db::Layout::meta_info_iterator meta = cv->layout().begin_meta (); meta != cv->layout().end_meta (); ++meta) {
+      if (meta->name == "layer-properties-file") {
+        lyp_file = meta->value;
+      }
+      if (meta->name == "layer-properties-add-other-layers") {
+        try {
+          tl::from_string (meta->value, add_other_layers);
+        } catch (...) {
+        }
+      }
+    }
+
+    //  interpolate the layout properties file name
+    tl::Eval expr;
+    expr.set_var ("layoutfile", filename);
+    lyp_file = expr.interpolate (lyp_file);
+
+    //  create the initial layer properties
+    create_initial_layer_props (cv_index, lyp_file, add_other_layers);
+
+    //  signal to any observers
+    file_open_event ();
+
+    //  do a fit and update layer lists etc.
+    zoom_fit ();
+    if (set_max_hier) {
+      max_hier ();
+    }
+    update_content ();
+
+    m_active_cellview_changed_event_enabled = true;
+
+  } catch (...) {
+
+    update_content ();
+
+    m_active_cellview_changed_event_enabled = true;
+    throw;
+
   }
 
-  //  interpolate the layout properties file name
-  tl::Eval expr;
-  expr.set_var ("layoutfile", filename);
-  lyp_file = expr.interpolate (lyp_file);
-
-  //  create the initial layer properties
-  create_initial_layer_props (cv_index, lyp_file, add_other_layers);
-
-  //  signal to any observers
-  file_open_event ();
-
-  //  do a fit and update layer lists etc.
-  zoom_fit ();
-  if (set_max_hier) {
-    max_hier ();
-  }
-  update_content ();
-
-  //  this event may not be generated otherwise:
+  //  this event may not be generated otherwise, hence force it now.
   active_cellview_changed (cv_index);
 
   return cv_index;
@@ -4293,6 +4324,15 @@ LayoutView::select_cellviews_fit (const std::list <CellView> &cvs)
 
   } else {
     zoom_fit ();
+  }
+}
+
+void
+LayoutView::active_cellview_changed (int index)
+{
+  if (m_active_cellview_changed_event_enabled) {
+    active_cellview_changed_event ();
+    active_cellview_changed_with_index_event (index);
   }
 }
 

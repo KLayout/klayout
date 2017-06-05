@@ -47,12 +47,12 @@ public:
   RubyBasedStringAdaptor (VALUE value)
   {
     m_string = rba_safe_string_value (value);
-    rb_gc_register_address (&m_string);
+    gc_lock_object (m_string);
   }
 
   ~RubyBasedStringAdaptor ()
   {
-    rb_gc_unregister_address (&m_string);
+    gc_unlock_object (m_string);
   }
 
   virtual const char *c_str () const
@@ -691,12 +691,12 @@ struct reader<gsi::VoidType>
 RubyBasedVariantAdaptor::RubyBasedVariantAdaptor (VALUE var)
   : m_var (var)
 {
-  rb_gc_register_address (&m_var);
+  gc_lock_object (m_var);
 }
 
 RubyBasedVariantAdaptor::~RubyBasedVariantAdaptor ()
 {
-  rb_gc_unregister_address (&m_var);
+  gc_unlock_object (m_var);
 }
 
 tl::Variant RubyBasedVariantAdaptor::var () const
@@ -739,12 +739,12 @@ void RubyBasedVectorAdaptorIterator::inc ()
 RubyBasedVectorAdaptor::RubyBasedVectorAdaptor (VALUE array, const gsi::ArgType *ainner)
   : mp_ainner (ainner), m_array (array)
 {
-  rb_gc_register_address (&m_array);
+  gc_lock_object (m_array);
 }
 
 RubyBasedVectorAdaptor::~RubyBasedVectorAdaptor ()
 {
-  rb_gc_unregister_address (&m_array);
+  gc_unlock_object (m_array);
 }
 
 gsi::VectorAdaptorIterator *RubyBasedVectorAdaptor::create_iterator () const
@@ -815,12 +815,12 @@ void RubyBasedMapAdaptorIterator::inc ()
 RubyBasedMapAdaptor::RubyBasedMapAdaptor (VALUE hash, const gsi::ArgType *ainner, const gsi::ArgType *ainner_k)
   : mp_ainner (ainner), mp_ainner_k (ainner_k), m_hash (hash)
 {
-  rb_gc_register_address (&m_hash);
+  gc_lock_object (m_hash);
 }
 
 RubyBasedMapAdaptor::~RubyBasedMapAdaptor()
 {
-  rb_gc_unregister_address (&m_hash);
+  gc_unlock_object (m_hash);
 }
 
 gsi::MapAdaptorIterator *RubyBasedMapAdaptor::create_iterator () const

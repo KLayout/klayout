@@ -1075,6 +1075,33 @@ class DBLayout_TestClass < TestBase
 
   end
 
+  # Slow cleanup test
+  def test_13
+
+    n = 1000
+    w = 10000
+
+    ly = RBA::Layout::new
+    l1 = ly.layer(1, 0)
+    top = ly.create_cell("TOP")
+
+    n.times do |ix|
+      $stdout.puts("#{ix}/#{n}")
+      $stdout.flush
+      n.times do |iy|
+        x = ix * w
+        y = iy * w
+        cell = ly.create_cell("X#{ix}Y#{iy}")
+        cell.shapes(l1).insert(RBA::Box::new(0, 0, w, w))
+        top.insert(RBA::CellInstArray::new(cell.cell_index, RBA::Trans::new(RBA::Point::new(ix * w, iy * w))))
+      end
+    end
+
+    # took forever:
+    ly._destroy
+
+  end
+
 end
 
 load("test_epilogue.rb")

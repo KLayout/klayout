@@ -34,6 +34,131 @@ namespace rba
 {
 
 // --------------------------------------------------------------------------
+//  Implementation of the locked object vault
+
+class LockedObjectVault
+{
+public:
+  static void init (VALUE module, const char *name);
+
+  LockedObjectVault ();
+  ~LockedObjectVault ();
+
+  static LockedObjectVault *instance ()
+  {
+    return mp_instance;
+  }
+
+  void add (VALUE object);
+  void remove (VALUE object);
+  void mark_this ();
+
+private:
+  std::set<VALUE> m_objects;
+
+  static VALUE m_klass;
+  static VALUE m_instance;
+  static LockedObjectVault *mp_instance;
+
+  static void free (void *p);
+  static void mark (void *p);
+  static VALUE alloc (VALUE klass);
+};
+
+VALUE LockedObjectVault::m_klass = Qnil;
+VALUE LockedObjectVault::m_instance = Qnil;
+LockedObjectVault *LockedObjectVault::mp_instance = 0;
+
+LockedObjectVault::LockedObjectVault ()
+{
+  mp_instance = this;
+}
+
+LockedObjectVault::~LockedObjectVault ()
+{
+  if (mp_instance == this) {
+    mp_instance = 0;
+  }
+}
+
+void
+LockedObjectVault::add (VALUE object)
+{
+  m_objects.insert (object);
+}
+
+void
+LockedObjectVault::remove (VALUE object)
+{
+  m_objects.erase (object);
+}
+
+void
+LockedObjectVault::mark_this ()
+{
+  for (std::set<VALUE>::iterator o = m_objects.begin (); o != m_objects.end (); ++o) {
+    rb_gc_mark (*o);
+  }
+}
+
+void
+LockedObjectVault::mark (void *p)
+{
+  ((LockedObjectVault *) p)->mark_this ();
+}
+
+void
+LockedObjectVault::free (void *p)
+{
+  delete ((LockedObjectVault *) p);
+}
+
+VALUE
+LockedObjectVault::alloc (VALUE klass)
+{
+  tl_assert (TYPE (klass) == T_CLASS);
+
+  LockedObjectVault *vault = new LockedObjectVault ();
+  return Data_Wrap_Struct (klass, &LockedObjectVault::mark, &LockedObjectVault::free, vault);
+}
+
+void
+LockedObjectVault::init (VALUE module, const char *name)
+{
+  if (m_instance != Qnil) {
+    return;
+  }
+
+  m_klass = rb_define_class_under (module, name, rb_cObject);
+  rb_define_alloc_func (m_klass, LockedObjectVault::alloc);
+
+  m_instance = rba_class_new_instance_checked (0, 0, m_klass);
+  rb_gc_register_address (&m_instance);
+}
+
+void
+make_locked_object_vault (VALUE module)
+{
+  LockedObjectVault::init (module, "RBALockedObjectVault");
+}
+
+void
+gc_lock_object (VALUE value)
+{
+  if (LockedObjectVault::instance ()) {
+    LockedObjectVault::instance ()->add (value);
+  }
+}
+
+void
+gc_unlock_object (VALUE value)
+{
+  if (LockedObjectVault::instance ()) {
+    LockedObjectVault::instance ()->remove (value);
+  }
+}
+
+// --------------------------------------------------------------------------
 
 /**
  *  @brief A final finalizer
@@ -260,7 +385,7 @@ Proxy::detach ()
       gsi_object->status_changed_event ().remove (this, &Proxy::object_status_changed);
     }
     if (!m_owned && m_self != Qnil) {
-      rb_gc_unregister_address (&m_self);
+      gc_unlock_object (m_self);
     }
   }
 
@@ -442,7 +567,7 @@ Proxy::release ()
 
     if (!m_owned) {
       if (cls->is_managed () && m_self != Qnil) {
-        rb_gc_unregister_address (&m_self);
+        gc_unlock_object (m_self);
       }
       m_owned = true;
     }
@@ -475,7 +600,7 @@ Proxy::keep_internal ()
     m_owned = false;
     tl_assert (m_self != Qnil);
     if (m_cls_decl->is_managed ()) {
-      rb_gc_register_address (&m_self);
+      gc_lock_object (m_self);
     }
   }
 }
@@ -522,7 +647,7 @@ Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy, VALUE self)
         gsi_object->status_changed_event ().add (this, &Proxy::object_status_changed);
 
         if (! m_owned) {
-          rb_gc_register_address (&m_self);
+          gc_lock_object (m_self);
         }
 
       }

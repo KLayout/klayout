@@ -198,6 +198,31 @@ VALUE ruby_cls (const gsi::ClassBase *cls);
  */
 bool is_registered (const gsi::ClassBase *gsi_cls);
 
+/**
+ *  @brief Locks the Ruby object against destruction by the GC
+ *
+ *  After calling this function, the object given by value is no longer
+ *  managed by the GC. This is equivalent to rb_gc_register_address, but
+ *  faster.
+ */
+void gc_lock_object (VALUE value);
+
+/**
+ *  @brief Unlocks the Ruby object against destruction by the GC
+ *
+ *  After calling this function, the object given by value is no longer
+ *  managed by the GC. This is equivalent to rb_gc_unregister_address, but
+ *  faster.
+ */
+void gc_unlock_object (VALUE value);
+
+/**
+ *  @brief Makes the locked object vault required for gc_lock_object and gc_unlock_object
+ *
+ *  This function needs to be called by the interpreter initially.
+ */
+void make_locked_object_vault (VALUE module);
+
 }
 
 #endif

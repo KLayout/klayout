@@ -1356,6 +1356,9 @@ rba_init (RubyInterpreterPrivateData *d)
 {
   VALUE module = rb_define_module ("RBA");
 
+  //  initialize the locked object vault as a fast replacement for rb_gc_register_address/rb_gc_unregister_address.
+  rba::make_locked_object_vault (module);
+
   //  save all constants for later (we cannot declare them while we are still producing classes
   //  because of the enum representative classes and enum constants are important)
   std::vector <RubyConstDescriptor> constants;

@@ -1078,7 +1078,7 @@ class DBLayout_TestClass < TestBase
   # Slow cleanup test
   def test_13
 
-    n = 1000
+    n = 100
     w = 10000
 
     ly = RBA::Layout::new

@@ -145,14 +145,6 @@ public:
   }
 
   /**
-   *  @brief Gets the method declaration collection
-   */
-  Methods &methods () 
-  {
-    return m_methods;
-  }
-
-  /**
    *  @brief Gets the documentation string
    */
   const std::string &doc () const
@@ -233,6 +225,38 @@ public:
   method_iterator end_methods () const
   {
     return m_methods.end ();
+  }
+
+  /**
+   *  @brief Iterates the constructor methods (begin)
+   */
+  method_iterator begin_constructors () const
+  {
+    return m_constructors.begin ();
+  }
+
+  /**
+   *  @brief Iterates the constructor methods (end)
+   */
+  method_iterator end_constructors () const
+  {
+    return m_constructors.end ();
+  }
+
+  /**
+   *  @brief Iterates the callback methods (begin)
+   */
+  method_iterator begin_callbacks () const
+  {
+    return m_callbacks.begin ();
+  }
+
+  /**
+   *  @brief Iterates the callback methods (end)
+   */
+  method_iterator end_callbacks () const
+  {
+    return m_callbacks.end ();
   }
 
   /**
@@ -476,10 +500,7 @@ public:
    *  In that case, this initialization step is useful. It will call the initialize
    *  method on all method declarations.
    */
-  virtual void initialize () 
-  {
-    m_methods.initialize ();
-  }
+  virtual void initialize ();
 
   /**
    *  @brief Adds a method to the class
@@ -545,12 +566,17 @@ private:
   const ClassBase *mp_base, *mp_parent;
   std::string m_doc;
   Methods m_methods;
+  std::vector<MethodBase *> m_callbacks, m_constructors;
   std::string m_name;
   tl::weak_collection<ClassBase> m_child_classes, m_subclasses;
   mutable std::auto_ptr<PerClassClientSpecificData> mp_data[ClientIndex::MaxClientIndex];
 
   static class_collection *mp_class_collection;
   static unsigned int m_class_count;
+
+  //  No copying
+  ClassBase (const ClassBase &other);
+  ClassBase &operator= (const ClassBase &other);
 };
 
 /**

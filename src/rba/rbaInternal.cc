@@ -479,37 +479,33 @@ Proxy::initialize_callbacks ()
   // (the object has been created on C++ side).
   while (cls) {
 
-    for (gsi::ClassBase::method_iterator m = cls->begin_methods (); m != cls->end_methods (); ++m) {
+    for (gsi::ClassBase::method_iterator m = cls->begin_callbacks (); m != cls->end_callbacks (); ++m) {
 
-      if ((*m)->is_callback ()) {
+      //  HINT: all callback may not have aliases nor overloads
+      const char *nstr = (*m)->primary_name ().c_str ();
 
-        //  HINT: all callback may not have aliases nor overloads
-        const char *nstr = (*m)->primary_name ().c_str ();
+      //  There is no place in the ruby API to determine whether a method is defined.
+      //  Instead we explicitly call "method_defined?" to check, whether the given method
+      //  is defined.
+      VALUE name = rb_str_new (nstr, strlen (nstr));
+      RB_GC_GUARD (name);
 
-        //  There is no place in the ruby API to determine whether a method is defined.
-        //  Instead we explicitly call "method_defined?" to check, whether the given method
-        //  is defined.
-        VALUE name = rb_str_new (nstr, strlen (nstr));
-        RB_GC_GUARD (name);
+      for (int prot = 0; prot < 2; ++prot) {
 
-        for (int prot = 0; prot < 2; ++prot) {
+        VALUE rb_ret;
+        if (prot) {
+          rb_ret = rba_funcall2_checked (rb_class_of (m_self), rb_intern ("protected_method_defined?"), 1, &name);
+        } else {
+          rb_ret = rba_funcall2_checked (rb_class_of (m_self), rb_intern ("method_defined?"), 1, &name);
+        }
+        if (RTEST (rb_ret)) {
 
-          VALUE rb_ret;
-          if (prot) {
-            rb_ret = rba_funcall2_checked (rb_class_of (m_self), rb_intern ("protected_method_defined?"), 1, &name);
-          } else {
-            rb_ret = rba_funcall2_checked (rb_class_of (m_self), rb_intern ("method_defined?"), 1, &name);
-          }
-          if (RTEST (rb_ret)) {
+          //  Only if the class defines that method we can link the virtual method call to the
+          //  Ruby method
+          int id = add_callback (Proxy::CallbackFunction (rb_intern (nstr), *m));
+          (*m)->set_callback (m_obj, gsi::Callback (id, this, (*m)->argsize (), (*m)->retsize ()));
 
-            //  Only if the class defines that method we can link the virtual method call to the
-            //  Ruby method
-            int id = add_callback (Proxy::CallbackFunction (rb_intern (nstr), *m));
-            (*m)->set_callback (m_obj, gsi::Callback (id, this, (*m)->argsize (), (*m)->retsize ()));
-
-            break;
-
-          }
+          break;
 
         }
 
@@ -538,10 +534,8 @@ Proxy::clear_callbacks ()
   while (cls) {
 
     //  reset all callbacks
-    for (gsi::ClassBase::method_iterator m = cls->begin_methods (); m != cls->end_methods (); ++m) {
-      if ((*m)->is_callback ()) {
-        (*m)->set_callback (m_obj, gsi::Callback ());
-      }
+    for (gsi::ClassBase::method_iterator m = cls->begin_callbacks (); m != cls->end_callbacks (); ++m) {
+      (*m)->set_callback (m_obj, gsi::Callback ());
     }
 
     //  consider base classes as well.

@@ -250,6 +250,11 @@ Class<MethodBase> decl_Method ("Method",
   gsi::method ("is_static?", &MethodBase::is_static,
     "@brief True, if this method is static (a class method)\n"
   ) +
+  gsi::method ("is_constructor?", &MethodBase::is_constructor,
+    "@brief True, if this method is a constructor\n"
+    "Static methods that return new objects are constructors.\n"
+    "This method has been introduced in version 0.25."
+  ) +
   gsi::method ("is_signal?", &MethodBase::is_signal,
     "@brief True, if this method is a signal\n"
     "\n"

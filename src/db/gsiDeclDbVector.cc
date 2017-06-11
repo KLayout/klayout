@@ -98,10 +98,10 @@ struct vector_defs
   {
     return
     constructor ("new", &new_v,
-      "@brief Default constructor: creates a null vector with coordinates 0,0"
+      "@brief Default constructor: creates a null vector with coordinates (0,0)"
     ) +
     constructor ("new", &new_point,
-      "@brief Default constructor: creates a vector to a point\n"
+      "@brief Default constructor: creates a vector from a point\n"
       "@args p\n"
       "This constructor is equivalent to computing p-point(0,0).\n"
       "This method has been introduced in version 0.25."

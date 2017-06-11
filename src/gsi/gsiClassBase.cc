@@ -106,11 +106,7 @@ ClassBase::is_derived_from (const ClassBase *base) const
 static bool 
 is_constructor_of (const ClassBase *target, const MethodBase *m, const ClassBase *from)
 {
-  if (! m->is_static ()) {
-    //  only static methods are constructors
-    return false;
-  }
-  if (! m->ret_type ().pass_obj () || ! m->ret_type ().is_ptr () || m->ret_type ().cls () != target) {
+  if (m->ret_type ().cls () != target) {
     //  the return type has to be a new'd pointer of the right type
     return false;
   }
@@ -139,7 +135,7 @@ is_constructor_of (const ClassBase *target, const MethodBase *m, const ClassBase
 bool 
 ClassBase::can_convert_to (const ClassBase *target) const
 {
-  for (method_iterator m = target->begin_methods (); m != target->end_methods (); ++m) {
+  for (method_iterator m = target->begin_constructors (); m != target->end_constructors (); ++m) {
     if (is_constructor_of (target, *m, this)) {
       return true;
     }
@@ -152,7 +148,7 @@ ClassBase::create_obj_from (const ClassBase *from, void *obj) const
 {
   const MethodBase *ctor = 0;
 
-  for (method_iterator m = begin_methods (); m != end_methods (); ++m) {
+  for (method_iterator m = begin_constructors (); m != end_constructors (); ++m) {
     if (is_constructor_of (this, *m, from)) {
       if (ctor) {
         throw tl::Exception (tl::to_string (QObject::tr ("There are multiple conversion constructors available to convert object of type %s to type %s")), from->name (), name ());
@@ -464,6 +460,26 @@ ClassBase::merge_declarations ()
 
     }
 
+  }
+}
+
+void
+ClassBase::initialize ()
+{
+  m_methods.initialize ();
+
+  m_constructors.clear ();
+  for (Methods::iterator m = m_methods.begin (); m != m_methods.end (); ++m) {
+    if ((*m)->is_constructor ()) {
+      m_constructors.push_back (*m);
+    }
+  }
+
+  m_callbacks.clear ();
+  for (Methods::iterator m = m_methods.begin (); m != m_methods.end (); ++m) {
+    if ((*m)->is_callback ()) {
+      m_callbacks.push_back (*m);
+    }
   }
 }
 

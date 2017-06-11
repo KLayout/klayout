@@ -523,9 +523,9 @@ PYAObjectBase::initialize_callbacks ()
     //  (the object has been created on C++ side).
     while (cls) {
 
-      for (gsi::ClassBase::method_iterator m = cls->begin_methods (); m != cls->end_methods (); ++m) {
+      for (gsi::ClassBase::method_iterator m = cls->begin_callbacks (); m != cls->end_callbacks (); ++m) {
 
-        if ((*m)->is_callback () && m_owned) {
+        if (m_owned) {
 
           //  NOTE: only Python-implemented classes can reimplement methods. Since we
           //  take the attribute from the class object, only Python instances can overwrite 

@@ -276,6 +276,16 @@ public:
   }
 
   /**
+   *  @brief Gets a value indicator whether the method is a constructor
+   *
+   *  Static methods returning a new object are constructors.
+   */
+  bool is_constructor () const
+  {
+    return (is_static () && ret_type ().pass_obj () && ret_type ().is_ptr ());
+  }
+
+  /**
    *  @brief Returns a value indicating whether the method is compatible with the given number of arguments
    */
   bool compatible_with_num_args (unsigned int num) const;

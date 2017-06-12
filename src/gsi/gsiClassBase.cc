@@ -115,7 +115,7 @@ is_constructor_of (const ClassBase *target, const MethodBase *m, const ClassBase
     return false;
   }
 
-  const ArgType a0 = m->arg (0);
+  const ArgType &a0 = m->arg (0);
 
   if (! a0.cls () || ! from->is_derived_from (a0.cls ())) {
     //  the single argument must be of the right type

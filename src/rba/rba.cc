@@ -153,6 +153,54 @@ class MethodTableEntry
 public:
   typedef std::vector<const gsi::MethodBase *>::const_iterator method_iterator;
 
+  struct MethodVariantKey
+  {
+    MethodVariantKey (int argc, VALUE *argv, bool block_given, bool is_ctor, bool is_static, bool is_const)
+      : m_block_given (block_given), m_is_ctor (is_ctor), m_is_static (is_static), m_is_const (is_const)
+    {
+      m_argtypes.reserve (size_t (argc));
+      for (int i = 0; i < argc; ++i) {
+        m_argtypes.push_back (CLASS_OF (argv[i]));
+      }
+    }
+
+    bool operator== (const MethodVariantKey &other) const
+    {
+      return m_argtypes == other.m_argtypes &&
+             m_block_given == other.m_block_given &&
+             m_is_ctor == other.m_is_ctor &&
+             m_is_static == other.m_is_static &&
+             m_is_const == other.m_is_const;
+    }
+
+    bool operator< (const MethodVariantKey &other) const
+    {
+      if (m_argtypes != other.m_argtypes) {
+        return m_argtypes < other.m_argtypes;
+      }
+      if (m_block_given != other.m_block_given) {
+        return m_block_given < other.m_block_given;
+      }
+      if (m_is_ctor != other.m_is_ctor) {
+        return m_is_ctor < other.m_is_ctor;
+      }
+      if (m_is_static != other.m_is_static) {
+        return m_is_static < other.m_is_static;
+      }
+      if (m_is_const != other.m_is_const) {
+        return m_is_const < other.m_is_const;
+      }
+      return false;
+    }
+
+  private:
+    std::vector<size_t> m_argtypes;
+    bool m_block_given;
+    bool m_is_ctor;
+    bool m_is_static;
+    bool m_is_const;
+  };
+
   MethodTableEntry (const std::string &name, bool ctor, bool st, bool prot, bool signal)
     : m_name (name), m_is_ctor (ctor), m_is_static (st), m_is_protected (prot), m_is_signal (signal)
   { }
@@ -205,13 +253,184 @@ public:
     return m_methods.end ();
   }
 
+  const gsi::MethodBase *get_variant (int argc, VALUE *argv, bool block_given, bool is_ctor, bool is_static, bool is_const) const
+  {
+    //  caching can't work for arrays or hashes - in this case, give up
+
+    for (int i = 0; i < argc; ++i) {
+      int t = TYPE (argv[i]);
+      if (t == T_ARRAY || t == T_HASH) {
+        return find_variant (argc, argv, block_given, is_ctor, is_static, is_const);
+      }
+    }
+
+    //  try to find the variant in the cache
+
+    MethodVariantKey key (argc, argv, block_given, is_ctor, is_static, is_const);
+    std::map<MethodVariantKey, const gsi::MethodBase *>::const_iterator v = m_variants.find (key);
+    if (v != m_variants.end ()) {
+      return v->second;
+    }
+
+    const gsi::MethodBase *meth = find_variant (argc, argv, block_given, is_ctor, is_static, is_const);
+    m_variants[key] = meth;
+    return meth;
+  }
+
 private:
+  const gsi::MethodBase *find_variant (int argc, VALUE *argv, bool block_given, bool is_ctor, bool is_static, bool is_const) const
+  {
+    //  get number of candidates by argument count
+    const gsi::MethodBase *meth = 0;
+    unsigned int candidates = 0;
+    for (MethodTableEntry::method_iterator m = begin (); m != end (); ++m) {
+
+      if ((*m)->is_signal ()) {
+
+        if (block_given) {
+
+          //  events do not have parameters, but accept a Proc object -> no overloading -> take this one.
+          candidates = 1;
+          meth = *m;
+          break;
+
+        } else if (argc <= 1 && (*m)->is_signal ()) {
+
+          //  calling a signal without an argument will return the SignalHandler object with further
+          //  options - with one argument it will reset the signal to this specific handler
+          candidates = 1;
+          meth = *m;
+          break;
+
+        } else {
+          throw tl::Exception (tl::to_string (QObject::tr ("An event needs a block")));
+        }
+
+      } else if ((*m)->is_callback()) {
+
+        //  ignore callbacks
+
+      } else if ((*m)->compatible_with_num_args (argc)) {
+
+        ++candidates;
+        meth = *m;
+
+      }
+
+    }
+
+    //  no method found, but the ctor was requested - implement that method as replacement for the default "initialize"
+    if (! meth && argc == 0 && is_ctor) {
+      return 0;
+    }
+
+    //  no candidate -> error
+    if (! meth) {
+
+      std::set<unsigned int> nargs;
+      for (MethodTableEntry::method_iterator m = begin (); m != end (); ++m) {
+        if (! (*m)->is_callback ()) {
+          nargs.insert (std::distance ((*m)->begin_arguments (), (*m)->end_arguments ()));
+        }
+      }
+
+      std::string nargs_s;
+      for (std::set<unsigned int>::const_iterator na = nargs.begin (); na != nargs.end (); ++na) {
+        if (na != nargs.begin ()) {
+          nargs_s += "/";
+        }
+        nargs_s += tl::to_string (*na);
+      }
+
+      throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Invalid number of arguments (got %d, expected %s)")), argc, nargs_s));
+
+    }
+
+    //  more than one candidate -> refine by checking the arguments
+    if (candidates > 1) {
+
+      meth = 0;
+      candidates = 0;
+      int score = 0;
+      bool const_matching = true;
+
+      for (MethodTableEntry::method_iterator m = begin (); m != end (); ++m) {
+
+        if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
+
+          //  check arguments (count and type)
+          bool is_valid = (*m)->compatible_with_num_args (argc);
+          int sc = 0;
+          VALUE *av = argv;
+          for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && av < argv + argc && a != (*m)->end_arguments (); ++a, ++av) {
+            if (test_arg (*a, *av, false /*strict*/)) {
+              ++sc;
+            } else if (test_arg (*a, *av, true /*loose*/)) {
+              //  non-scoring match
+            } else {
+              is_valid = false;
+            }
+          }
+
+          if (is_valid && ! is_static) {
+
+            //  constness matching candidates have precedence
+            if ((*m)->is_const () != is_const) {
+              if (const_matching && candidates > 0) {
+                is_valid = false;
+              } else {
+                const_matching = false;
+              }
+            } else if (! const_matching) {
+              const_matching = true;
+              candidates = 0;
+            }
+
+          }
+
+          if (is_valid) {
+
+            //  otherwise take the candidate with the better score
+            if (candidates > 0 && sc > score) {
+              candidates = 1;
+              meth = *m;
+              score = sc;
+            } else if (candidates == 0 || sc == score) {
+              ++candidates;
+              meth = *m;
+              score = sc;
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+    if (! meth) {
+      throw tl::Exception (tl::to_string (QObject::tr ("No overload with matching arguments")));
+    }
+
+    if (candidates > 1) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Ambiguous overload variants - multiple method declarations match arguments")));
+    }
+
+    if (is_const && ! meth->is_const ()) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Cannot call non-const method on a const reference")));
+    }
+
+    return meth;
+  }
+
   std::string m_name;
   bool m_is_ctor : 1;
   bool m_is_static : 1;
   bool m_is_protected : 1;
   bool m_is_signal : 1;
   std::vector<const gsi::MethodBase *> m_methods;
+  mutable std::map<MethodVariantKey, const gsi::MethodBase *> m_variants;
 };
 
 /**
@@ -334,19 +553,11 @@ public:
   }
 
   /**
-   *  @brief Begins iteration of the overload variants for method ID mid
+   *  @brief Gets the method table entry for the given method
    */
-  MethodTableEntry::method_iterator begin (size_t mid) const
+  const MethodTableEntry &entry (size_t mid) const
   {
-    return m_table[mid - m_method_offset].begin ();
-  }
-
-  /**
-   *  @brief Ends iteration of the overload variants for method ID mid
-   */
-  MethodTableEntry::method_iterator end (size_t mid) const
-  {
-    return m_table[mid - m_method_offset].end ();
+    return m_table[mid - m_method_offset];
   }
 
   /**
@@ -657,148 +868,13 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
     }
 
-    //  get number of candidates by argument count
-    const gsi::MethodBase *meth = 0;
-    unsigned int candidates = 0;
-    for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-
-      if ((*m)->is_signal ()) {
-
-        if (rb_block_given_p ()) {
-
-          //  events do not have parameters, but accept a Proc object -> no overloading -> take this one.
-          candidates = 1;
-          meth = *m;
-          break;
-
-        } else if (argc <= 1 && (*m)->is_signal ()) {
-
-          //  calling a signal without an argument will return the SignalHandler object with further
-          //  options - with one argument it will reset the signal to this specific handler
-          candidates = 1;
-          meth = *m;
-          break;
-
-        } else {
-          throw tl::Exception (tl::to_string (QObject::tr ("An event needs a block")));
-        }
-
-      } else if ((*m)->is_callback()) {
-
-        //  ignore callbacks
-      
-      } else if ((*m)->compatible_with_num_args (argc)) {
-
-        ++candidates;
-        meth = *m;
-
-      }
-
-    }
-
-    //  no method found, but the ctor was requested - implement that method as replacement for the default "initialize"
-    if (! meth && argc == 0 && ctor) {
-      return Qnil;
-    }
-
-    //  no candidate -> error
-    if (! meth) {
-
-      std::set<unsigned int> nargs;
-      for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-        if (! (*m)->is_callback ()) {
-          nargs.insert (std::distance ((*m)->begin_arguments (), (*m)->end_arguments ()));
-        }
-      }
-
-      std::string nargs_s;
-      for (std::set<unsigned int>::const_iterator na = nargs.begin (); na != nargs.end (); ++na) {
-        if (na != nargs.begin ()) {
-          nargs_s += "/";
-        }
-        nargs_s += tl::to_string (*na);
-      }
-
-      throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Invalid number of arguments (got %d, expected %s)")), argc, nargs_s));
-
-    }
-
-    //  more than one candidate -> refine by checking the arguments
-    if (candidates > 1) {
-
-      meth = 0;
-      candidates = 0;
-      int score = 0;
-      bool const_matching = true;
-
-      for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-
-        if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
-
-          //  check arguments (count and type)
-          bool is_valid = (*m)->compatible_with_num_args (argc);
-          int sc = 0;
-          VALUE *av = argv;
-          for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && av < argv + argc && a != (*m)->end_arguments (); ++a, ++av) {
-            if (test_arg (*a, *av, false /*strict*/)) {
-              ++sc;
-            } else if (test_arg (*a, *av, true /*loose*/)) {
-              //  non-scoring match
-            } else {
-              is_valid = false;
-            }
-          }
-
-          if (is_valid && p) {
-
-            //  constness matching candidates have precedence
-            if ((*m)->is_const () != p->const_ref ()) {
-              if (const_matching && candidates > 0) {
-                is_valid = false;
-              } else {
-                const_matching = false;
-              }
-            } else if (! const_matching) {
-              const_matching = true;
-              candidates = 0;
-            }
-
-          }
-
-          if (is_valid) {
-
-            //  otherwise take the candidate with the better score
-            if (candidates > 0 && sc > score) {
-              candidates = 1;
-              meth = *m;
-              score = sc;
-            } else if (candidates == 0 || sc == score) {
-              ++candidates;
-              meth = *m;
-              score = sc;
-            }
-
-          }
-
-        }
-
-      }
-
-    }
+    const gsi::MethodBase *meth = mt->entry (mid).get_variant (argc, argv, rb_block_given_p (), ctor, p == 0, p != 0 && p->const_ref ());
 
     if (! meth) {
-      throw tl::Exception (tl::to_string (QObject::tr ("No overload with matching arguments")));
-    }
 
-    if (candidates > 1) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Ambiguous overload variants - multiple method declarations match arguments")));
-    }
+      //  no method found, but the ctor was requested - implement that method as replacement for the default "initialize"
 
-    if (p && p->const_ref () && ! meth->is_const ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Cannot call non-const method on a const reference")));
-    }
-
-    if (meth->smt () != gsi::MethodBase::None) {
+    } else if (meth->smt () != gsi::MethodBase::None) {
 
       ret = special_method_impl (meth, argc, argv, self, ctor);
 

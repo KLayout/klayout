@@ -6,7 +6,7 @@ load("test_prologue.rb")
 class DBLayout_TestClass < TestBase
 
   # LayerInfo
-  def test_1_Layout
+  def _test_1_Layout
 
     lp = RBA::LayerInfo::new
 
@@ -42,7 +42,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Basics: cells and instances
-  def test_2_Layout
+  def _test_2_Layout
 
     ly = RBA::Layout::new
 
@@ -161,7 +161,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Instances and bboxes
-  def test_5_Layout
+  def _test_5_Layout
 
     ly = RBA::Layout::new
 
@@ -205,7 +205,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Instances and bboxes
-  def test_6_Layout
+  def _test_6_Layout
 
     ly = RBA::Layout::new
 
@@ -377,7 +377,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Instances and editable mode
-  def test_6_EditableLayout
+  def _test_6_EditableLayout
 
     ly = RBA::Layout::new( true )
     assert_equal( ly.is_editable?, true )
@@ -449,7 +449,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Instances and bboxes
-  def test_6_Layout_props
+  def _test_6_Layout_props
 
     ly = RBA::Layout::new
     pid = ly.properties_id( { 17 => "a", "b" => [ 1, 5, 7 ] }.to_a )
@@ -627,7 +627,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Properties
-  def test_6_Layout_props2
+  def _test_6_Layout_props2
 
     ly = RBA::Layout::new(true)
     pid = ly.properties_id( { 17 => "a", "b" => [ 1, 5, 7 ] }.to_a )
@@ -676,7 +676,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Instances and bboxes (editable mode)
-  def test_6_Layout_new
+  def _test_6_Layout_new
 
     if( RBA::Application::instance.is_editable? )
 
@@ -784,7 +784,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Copy/move between cells
-  def test_7_cells_copy_move
+  def _test_7_cells_copy_move
 
     # because of set_property ...
     if !RBA::Application::instance.is_editable? 
@@ -858,7 +858,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # top cells
-  def test_8
+  def _test_8
 
     l = RBA::Layout.new
     tc = []
@@ -895,7 +895,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # under construction and update
-  def test_9
+  def _test_9
 
     ly = RBA::Layout::new
     l1 = ly.insert_layer(RBA::LayerInfo::new(1, 0))
@@ -925,7 +925,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Instance editing
-  def test_10
+  def _test_10
 
     ly = RBA::Layout::new
 
@@ -1004,7 +1004,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # User properties
-  def test_11
+  def _test_11
 
     ly = RBA::Layout::new
 
@@ -1028,7 +1028,7 @@ class DBLayout_TestClass < TestBase
   end
 
   # Meta information
-  def test_12
+  def _test_12
 
     mi = RBA::LayoutMetaInfo::new("myinfo", "a")
 

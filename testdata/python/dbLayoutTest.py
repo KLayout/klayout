@@ -1085,8 +1085,8 @@ class DBLayoutTest(unittest.TestCase):
         iy += 1
       ix += 1
 
-    # took forever:
-    ly._destroy
+    ly._destroy()
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(DBLayoutTest)

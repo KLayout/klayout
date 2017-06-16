@@ -1061,6 +1061,32 @@ class DBLayoutTest(unittest.TestCase):
     ly.delete_property("x")
     self.assertEqual(ly.property("x"), None)
 
+  # Performance test
+  def test_13(self):
+
+    n = 100
+    w = 10000
+
+    ly = pya.Layout()
+    l1 = ly.layer(1, 0)
+    top = ly.create_cell("TOP")
+
+    ix = 0
+    while ix < n:
+      sys.stdout.write(str(ix) + "/" + str(n) + "\n")
+      sys.stdout.flush()
+      iy = 0
+      while iy < n:
+        x = ix * w
+        y = iy * w
+        cell = ly.create_cell("X" + str(ix) + "Y" + str(iy))
+        cell.shapes(l1).insert(pya.Box(0, 0, w, w))
+        top.insert(pya.CellInstArray(cell.cell_index(), pya.Trans(pya.Point(ix * w, iy * w))))
+        iy += 1
+      ix += 1
+
+    # took forever:
+    ly._destroy
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(DBLayoutTest)

@@ -236,7 +236,9 @@ public:
         return;
       }
     }
-    m_receivers.push_back (typename receivers::value_type (tl::weak_ptr<tl::Object> (obj, true /*is an event*/), new event_function<T, _TMPLARGLISTP> (f)));
+    m_receivers.push_back (typename receivers::value_type ());
+    m_receivers.back ().first.reset (obj, true /*is an event*/);
+    m_receivers.back ().second.reset (new event_function<T, _TMPLARGLISTP> (f));
   }
 
   template <class T>
@@ -262,7 +264,9 @@ public:
         return;
       }
     }
-    m_receivers.push_back (typename receivers::value_type (tl::weak_ptr<tl::Object> (obj, true /*is an event*/), new event_function_with_data<T, D, _TMPLARGLISTP> (f)));
+    m_receivers.push_back (typename receivers::value_type ());
+    m_receivers.back ().first.reset (obj, true /*is an event*/);
+    m_receivers.back ().second.reset (new event_function_with_data<T, D, _TMPLARGLISTP> (f));
   }
 
   template <class T, class D>
@@ -288,7 +292,9 @@ public:
         return;
       }
     }
-    m_receivers.push_back (typename receivers::value_type (tl::weak_ptr<tl::Object> (obj, true /*is an event*/), new generic_event_function<T, _TMPLARGLISTP> (f)));
+    m_receivers.push_back (typename receivers::value_type ());
+    m_receivers.back ().first.reset (obj, true /*is an event*/);
+    m_receivers.back ().second.reset (new generic_event_function<T, _TMPLARGLISTP> (f));
   }
 
   template <class T>
@@ -314,7 +320,9 @@ public:
         return;
       }
     }
-    m_receivers.push_back (typename receivers::value_type (tl::weak_ptr<tl::Object> (obj, true /*is an event*/), new generic_event_function_with_data<T, D, _TMPLARGLISTP> (f)));
+    m_receivers.push_back (typename receivers::value_type ());
+    m_receivers.back ().first.reset (obj, true /*is an event*/);
+    m_receivers.back ().second.reset (new generic_event_function_with_data<T, D, _TMPLARGLISTP> (f));
   }
 
   template <class T, class D>

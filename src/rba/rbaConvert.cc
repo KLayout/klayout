@@ -208,7 +208,7 @@ object_to_ruby (void *obj, const gsi::ClassBase *cls, bool pass_obj, bool is_con
     //  of the exposed property. Hence copying is safer.
 
     //  create a instance and copy the value
-    ret = rba_class_new_instance_checked (0, 0, ruby_cls (clsact));
+    ret = rb_obj_alloc (ruby_cls (clsact));
     Proxy *p = 0;
     Data_Get_Struct (ret, Proxy, p);
     clsact->assign (p->obj (), obj);
@@ -238,7 +238,7 @@ object_to_ruby (void *obj, const gsi::ClassBase *cls, bool pass_obj, bool is_con
     //  TODO: we will create a fresh object here, delete it again and link the
     //  reference to the existing object to the Ruby object. This is not quite
     //  efficient - we should avoid creating and deleting a dummy object first.
-    ret = rba_class_new_instance_checked (0, 0, ruby_cls (clsact));
+    ret = rb_obj_alloc (ruby_cls (clsact));
     Proxy *p = 0;
     Data_Get_Struct (ret, Proxy, p);
     p->set (obj, pass_obj, is_const /*const*/, can_destroy /*can_destroy*/, ret);

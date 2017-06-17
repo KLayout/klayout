@@ -198,7 +198,11 @@ rba_safe_string_value (VALUE obj)
 VALUE
 rba_safe_obj_as_string (VALUE obj)
 {
-  return rba_safe_func (rb_obj_as_string, obj);
+  if (TYPE(obj) == T_STRING) {
+    return obj;
+  } else {
+    return rba_safe_func (rb_obj_as_string, obj);
+  }
 }
 
 /**

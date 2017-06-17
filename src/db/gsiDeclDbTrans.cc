@@ -24,6 +24,10 @@
 #include "gsiDecl.h"
 #include "dbPoint.h"
 #include "dbBox.h"
+#include "dbEdge.h"
+#include "dbPolygon.h"
+#include "dbPath.h"
+#include "dbText.h"
 
 namespace gsi
 {
@@ -104,6 +108,31 @@ struct trans_defs
   static void set_mirror (C *trans, bool mirror)
   {
     *trans = C (trans->angle (), mirror, trans->disp ());
+  }
+
+  static db::edge<coord_type> trans_edge (const C *t, const db::edge<coord_type> &edge)
+  {
+    return edge.transformed (*t);
+  }
+
+  static db::box<coord_type> trans_box (const C *t, const db::box<coord_type> &box)
+  {
+    return box.transformed (*t);
+  }
+
+  static db::polygon<coord_type> trans_polygon (const C *t, const db::polygon<coord_type> &polygon)
+  {
+    return polygon.transformed (*t);
+  }
+
+  static db::path<coord_type> trans_path (const C *t, const db::path<coord_type> &path)
+  {
+    return path.transformed (*t);
+  }
+
+  static db::text<coord_type> trans_text (const C *t, const db::text<coord_type> &text)
+  {
+    return text.transformed (*t);
   }
 
   static gsi::Methods methods ()
@@ -216,6 +245,56 @@ struct trans_defs
       "\n"
       "@param v The vector to transform\n"
       "@return The transformed vector\n"
+    ) +
+    method_ext ("trans|*", &trans_box, arg ("box"),
+      "@brief Transforms a box\n"
+      "\n"
+      "'t*box' or 't.trans(box)' is equivalent to box.transformed(t).\n"
+      "\n"
+      "@param box The box to transform\n"
+      "@return The transformed box\n"
+      "\n"
+      "This convenience method has been introduced in version 0.25."
+    ) +
+    method_ext ("trans|*", &trans_edge, arg ("edge"),
+      "@brief Transforms an edge\n"
+      "\n"
+      "'t*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).\n"
+      "\n"
+      "@param edge The edge to transform\n"
+      "@return The transformed edge\n"
+      "\n"
+      "This convenience method has been introduced in version 0.25."
+    ) +
+    method_ext ("trans|*", &trans_polygon, arg ("polygon"),
+      "@brief Transforms a polygon\n"
+      "\n"
+      "'t*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).\n"
+      "\n"
+      "@param polygon The polygon to transform\n"
+      "@return The transformed polygon\n"
+      "\n"
+      "This convenience method has been introduced in version 0.25."
+    ) +
+    method_ext ("trans|*", &trans_path, arg ("path"),
+      "@brief Transforms a path\n"
+      "\n"
+      "'t*path' or 't.trans(path)' is equivalent to path.transformed(t).\n"
+      "\n"
+      "@param path The path to transform\n"
+      "@return The transformed path\n"
+      "\n"
+      "This convenience method has been introduced in version 0.25."
+    ) +
+    method_ext ("trans|*", &trans_text, arg ("text"),
+      "@brief Transforms a text\n"
+      "\n"
+      "'t*text' or 't.trans(text)' is equivalent to text.transformed(t).\n"
+      "\n"
+      "@param text The text to transform\n"
+      "@return The transformed text\n"
+      "\n"
+      "This convenience method has been introduced in version 0.25."
     ) +
     method ("*", &C::concat, arg ("t"),
       "@brief Returns the concatenated transformation\n"
@@ -343,7 +422,7 @@ static db::DTrans trans_to_dtrans (const db::Trans *t, double dbu)
 }
 
 Class<db::Trans> decl_Trans ("Trans",
-  constructor ("new", &trans_from_dtrans, gsi::arg ("dtrans"),
+  constructor ("new|#from_dtrans", &trans_from_dtrans, gsi::arg ("dtrans"),
     "@brief Creates an integer coordinate transformation from a floating-point coordinate transformation\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dtrans'."
@@ -393,7 +472,7 @@ static db::Trans dtrans_to_trans (const db::DTrans *t, double dbu)
 }
 
 Class<db::DTrans> decl_DTrans ("DTrans",
-  constructor ("new", &dtrans_from_itrans, gsi::arg ("trans"),
+  constructor ("new|#from_itrans", &dtrans_from_itrans, gsi::arg ("trans"),
     "@brief Creates a floating-point coordinate transformation from an integer coordinate transformation\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_itrans'."
@@ -516,6 +595,31 @@ struct cplx_trans_defs
   static simple_trans_type s_trans (const C *cplx_trans)
   {
     return simple_trans_type (db::complex_trans<coord_type, coord_type> (*cplx_trans));
+  }
+
+  static db::edge<target_coord_type> trans_edge (const C *t, const db::edge<coord_type> &edge)
+  {
+    return edge.transformed (*t);
+  }
+
+  static db::box<target_coord_type> trans_box (const C *t, const db::box<coord_type> &box)
+  {
+    return box.transformed (*t);
+  }
+
+  static db::polygon<target_coord_type> trans_polygon (const C *t, const db::polygon<coord_type> &polygon)
+  {
+    return polygon.transformed (*t);
+  }
+
+  static db::path<target_coord_type> trans_path (const C *t, const db::path<coord_type> &path)
+  {
+    return path.transformed (*t);
+  }
+
+  static db::text<target_coord_type> trans_text (const C *t, const db::text<coord_type> &text)
+  {
+    return text.transformed (*t);
   }
 
   static gsi::Methods methods ()
@@ -650,6 +754,56 @@ struct cplx_trans_defs
       "\n"
       "@param v The vector to transform\n"
       "@return The transformed vector\n"
+    ) +
+    method_ext ("trans|*", &trans_box, arg ("box"),
+      "@brief Transforms a box\n"
+      "\n"
+      "'t*box' or 't.trans(box)' is equivalent to box.transformed(t).\n"
+      "\n"
+      "@param box The box to transform\n"
+      "@return The transformed box\n"
+      "\n"
+      "This convenience method has been introduced in version 0.25."
+    ) +
+    method_ext ("trans|*", &trans_edge, arg ("edge"),
+      "@brief Transforms an edge\n"
+      "\n"
+      "'t*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).\n"
+      "\n"
+      "@param edge The edge to transform\n"
+      "@return The transformed edge\n"
+      "\n"
+      "This convenience method has been introduced in version 0.25."
+    ) +
+    method_ext ("trans|*", &trans_polygon, arg ("polygon"),
+      "@brief Transforms a polygon\n"
+      "\n"
+      "'t*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).\n"
+      "\n"
+      "@param polygon The polygon to transform\n"
+      "@return The transformed polygon\n"
+      "\n"
+      "This convenience method has been introduced in version 0.25."
+    ) +
+    method_ext ("trans|*", &trans_path, arg ("path"),
+      "@brief Transforms a path\n"
+      "\n"
+      "'t*path' or 't.trans(path)' is equivalent to path.transformed(t).\n"
+      "\n"
+      "@param path The path to transform\n"
+      "@return The transformed path\n"
+      "\n"
+      "This convenience method has been introduced in version 0.25."
+    ) +
+    method_ext ("trans|*", &trans_text, arg ("text"),
+      "@brief Transforms a text\n"
+      "\n"
+      "'t*text' or 't.trans(text)' is equivalent to text.transformed(t).\n"
+      "\n"
+      "@param text The text to transform\n"
+      "@return The transformed text\n"
+      "\n"
+      "This convenience method has been introduced in version 0.25."
     ) +
     method ("*", (C (C::*) (const C &c) const) &C::concat_same, arg ("t"),
       "@brief Returns the concatenated transformation\n"
@@ -813,7 +967,7 @@ static F cplxtrans_to_dcplxtrans (const I *t, double dbu)
 }
 
 Class<db::DCplxTrans> decl_DCplxTrans ("DCplxTrans",
-  constructor ("new", &cplxtrans_from_cplxtrans<db::DCplxTrans, db::CplxTrans>, gsi::arg ("trans"),
+  constructor ("new|#from_itrans", &cplxtrans_from_cplxtrans<db::DCplxTrans, db::CplxTrans>, gsi::arg ("trans"),
     "@brief Creates a floating-point coordinate transformation from another coordinate flavour\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_itrans'."
@@ -893,7 +1047,7 @@ Class<db::DCplxTrans> decl_DCplxTrans ("DCplxTrans",
 );
 
 Class<db::CplxTrans> decl_CplxTrans ("CplxTrans", 
-  constructor ("new", &cplxtrans_from_cplxtrans<db::CplxTrans, db::DCplxTrans>, gsi::arg ("trans"),
+  constructor ("new|#from_dtrans", &cplxtrans_from_cplxtrans<db::CplxTrans, db::DCplxTrans>, gsi::arg ("trans"),
     "@brief Creates a floating-point coordinate transformation from another coordinate flavour\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dtrans'."
@@ -985,12 +1139,12 @@ Class<db::CplxTrans> decl_CplxTrans ("CplxTrans",
 );
 
 Class<db::ICplxTrans> decl_ICplxTrans ("ICplxTrans", 
-  constructor ("new", &cplxtrans_from_cplxtrans<db::ICplxTrans, db::DCplxTrans>, gsi::arg ("trans"),
+  constructor ("new|#from_dtrans", &cplxtrans_from_cplxtrans<db::ICplxTrans, db::DCplxTrans>, gsi::arg ("trans"),
     "@brief Creates a floating-point coordinate transformation from another coordinate flavour\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dtrans'."
   ) +
-  constructor ("new", &cplxtrans_from_cplxtrans<db::ICplxTrans, db::CplxTrans>, gsi::arg ("trans"),
+  constructor ("new|#from_trans", &cplxtrans_from_cplxtrans<db::ICplxTrans, db::CplxTrans>, gsi::arg ("trans"),
     "@brief Creates a floating-point coordinate transformation from another coordinate flavour\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_trans'."

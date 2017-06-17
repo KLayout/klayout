@@ -13,6 +13,7 @@ class DBTrans_TestClass < TestBase
     c = RBA::DTrans::new( 3, true, RBA::DPoint::new( 17, 5 ))
     d = RBA::DTrans::new( RBA::DPoint::new( 17, 5 ))
     e = RBA::DTrans::new( RBA::DTrans::M135 )
+    e2 = RBA::DTrans::from_itrans( RBA::Trans::M135 )
     f = RBA::DTrans::new( RBA::Trans::new( RBA::Trans::M135, RBA::Point::new( 17, 5 )) )
 
     assert_equal( a.to_s, "r0 0,0" )
@@ -21,6 +22,7 @@ class DBTrans_TestClass < TestBase
     assert_equal( c.to_s, "m135 17,5" )
     assert_equal( d.to_s, "r0 17,5" )
     assert_equal( e.to_s, "m135 0,0" )
+    assert_equal( e2.to_s, "m135 0,0" )
     assert_equal( f.to_s, "m135 17,5" )
     assert_equal( RBA::DTrans::from_s(f.to_s).to_s, f.to_s )
 
@@ -55,6 +57,17 @@ class DBTrans_TestClass < TestBase
     assert_equal( RBA::Trans::new(RBA::Trans::R180, RBA::Vector::new(5,-7)).to_s, "r180 5,-7" )
     assert_equal( RBA::Trans::new(RBA::Trans::R180, RBA::DVector::new(5,-7)).to_s, "r180 5,-7" )
     assert_equal( RBA::Trans::new(RBA::Trans::R180).to_s, "r180 0,0" )
+
+    assert_equal( e.trans( RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-1,0;-3,-2)" )
+    assert_equal( ( e * RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-1,0;-3,-2)" )
+    assert_equal( e.trans( RBA::Box::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
+    assert_equal( ( e * RBA::Box::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
+    assert_equal( e.trans( RBA::Text::new("text", RBA::Vector::new(0, 1)) ).to_s, "('text',m135 -1,0)" )
+    assert_equal( ( e * RBA::Text::new("text", RBA::Vector::new(0, 1)) ).to_s, "('text',m135 -1,0)" )
+    assert_equal( e.trans( RBA::Polygon::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, -3), RBA::Point::new(4, 5) ] ) ).to_s, "(-5,-4;-1,0;3,-2)" )
+    assert_equal( ( e * RBA::Polygon::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, -3), RBA::Point::new(4, 5) ] ) ).to_s, "(-5,-4;-1,0;3,-2)" )
+    assert_equal( e.trans( RBA::Path::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, 3) ], 10 ) ).to_s, "(-1,0;-3,-2) w=10 bx=0 ex=0 r=false" )
+    assert_equal( ( e * RBA::Path::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, 3) ], 10 ) ).to_s, "(-1,0;-3,-2) w=10 bx=0 ex=0 r=false" )
 
   end
 
@@ -103,6 +116,20 @@ class DBTrans_TestClass < TestBase
     assert_equal( c.rot, RBA::DCplxTrans::M135.rot )
     assert_equal( c.s_trans.to_s, "m135 0,0" )
     assert_equal( c.angle, 270 )
+
+    assert_equal( c.trans( RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-1,0;-3,-2)" )
+    assert_equal( ( c * RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-1,0;-3,-2)" )
+    assert_equal( c.trans( RBA::Box::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
+    assert_equal( ( c * RBA::Box::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
+    assert_equal( c.trans( RBA::Text::new("text", RBA::Vector::new(0, 1)) ).to_s, "('text',m135 -1,0)" )
+    assert_equal( ( c * RBA::Text::new("text", RBA::Vector::new(0, 1)) ).to_s, "('text',m135 -1,0)" )
+    assert_equal( c.trans( RBA::Polygon::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, -3), RBA::Point::new(4, 5) ] ) ).to_s, "(-5,-4;-1,0;3,-2)" )
+    assert_equal( ( c * RBA::Polygon::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, -3), RBA::Point::new(4, 5) ] ) ).to_s, "(-5,-4;-1,0;3,-2)" )
+    assert_equal( c.trans( RBA::Path::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, 3) ], 10 ) ).to_s, "(-1,0;-3,-2) w=10 bx=0 ex=0 r=false" )
+    assert_equal( ( c * RBA::Path::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, 3) ], 10 ) ).to_s, "(-1,0;-3,-2) w=10 bx=0 ex=0 r=false" )
+
+    c = RBA::DCplxTrans::from_itrans( RBA::CplxTrans::M135 )
+    assert_equal( c.to_s, "m135 *1 0,0" )
 
     c = RBA::DCplxTrans::new( 1.5 )
     assert_equal( c.to_s, "r0 *1.5 0,0" )
@@ -153,6 +180,7 @@ class DBTrans_TestClass < TestBase
     c = RBA::Trans::new( 3, true, RBA::Point::new( 17, 5 ))
     d = RBA::Trans::new( RBA::Point::new( 17, 5 ))
     e = RBA::Trans::new( RBA::Trans::M135 )
+    e2 = RBA::Trans::from_dtrans( RBA::DTrans::M135 )
     f = RBA::Trans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 )) )
 
     assert_equal( a.to_s, "r0 0,0" )
@@ -161,6 +189,7 @@ class DBTrans_TestClass < TestBase
     assert_equal( c.to_s, "m135 17,5" )
     assert_equal( d.to_s, "r0 17,5" )
     assert_equal( e.to_s, "m135 0,0" )
+    assert_equal( e2.to_s, "m135 0,0" )
     assert_equal( f.to_s, "m135 17,5" )
     assert_equal( RBA::Trans::from_s(f.to_s).to_s, f.to_s )
 
@@ -189,6 +218,17 @@ class DBTrans_TestClass < TestBase
     assert_equal( c.to_s, "r270 1,7" )
     c.mirror = true
     assert_equal( c.to_s, "m135 1,7" )
+
+    assert_equal( e.trans( RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-1,0;-3,-2)" )
+    assert_equal( ( e * RBA::Edge::new(0, 1, 2, 3) ).to_s, "(-1,0;-3,-2)" )
+    assert_equal( e.trans( RBA::Box::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
+    assert_equal( ( e * RBA::Box::new(0, 1, 2, 3) ).to_s, "(-3,-2;-1,0)" )
+    assert_equal( e.trans( RBA::Text::new("text", RBA::Vector::new(0, 1)) ).to_s, "('text',m135 -1,0)" )
+    assert_equal( ( e * RBA::Text::new("text", RBA::Vector::new(0, 1)) ).to_s, "('text',m135 -1,0)" )
+    assert_equal( e.trans( RBA::Polygon::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, -3), RBA::Point::new(4, 5) ] ) ).to_s, "(-5,-4;-1,0;3,-2)" )
+    assert_equal( ( e * RBA::Polygon::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, -3), RBA::Point::new(4, 5) ] ) ).to_s, "(-5,-4;-1,0;3,-2)" )
+    assert_equal( e.trans( RBA::Path::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, 3) ], 10 ) ).to_s, "(-1,0;-3,-2) w=10 bx=0 ex=0 r=false" )
+    assert_equal( ( e * RBA::Path::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, 3) ], 10 ) ).to_s, "(-1,0;-3,-2) w=10 bx=0 ex=0 r=false" )
 
   end
 
@@ -240,6 +280,9 @@ class DBTrans_TestClass < TestBase
     assert_equal( c.rot, RBA::CplxTrans::M135.rot )
     assert_equal( c.s_trans.to_s, "m135 0,0" )
     assert_equal( c.angle, 270 )
+
+    c = RBA::CplxTrans::from_dtrans( RBA::DCplxTrans::M135 )
+    assert_equal( c.to_s, "m135 *1 0,0" )
 
     c = RBA::CplxTrans::new( 1.5 )
     assert_equal( c.to_s, "r0 *1.5 0,0" )
@@ -321,6 +364,11 @@ class DBTrans_TestClass < TestBase
     assert_equal( RBA::ICplxTrans::new(RBA::ICplxTrans::R180, 1.5, RBA::Vector::new(5,-7)).to_s, "r180 *1.5 5,-7" )
     assert_equal( RBA::ICplxTrans::new(RBA::ICplxTrans::R180, 1.5, RBA::DVector::new(5,-7)).to_s, "r180 *1.5 5,-7" )
     assert_equal( RBA::ICplxTrans::new(RBA::ICplxTrans::R180, 1.5).to_s, "r180 *1.5 0,0" )
+
+    c = RBA::ICplxTrans::from_dtrans( RBA::DCplxTrans::M135 )
+    assert_equal( c.to_s, "m135 *1 0,0" )
+    c = RBA::ICplxTrans::from_trans( RBA::CplxTrans::M135 )
+    assert_equal( c.to_s, "m135 *1 0,0" )
 
   end
 

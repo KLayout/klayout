@@ -342,7 +342,7 @@ static db::Path path_round_corners (const db::Path *p, double radius, int npoint
 }
 
 Class<db::Path> decl_Path ("Path",
-  constructor ("new", &path_from_dpath, gsi::arg ("dpath"),
+  constructor ("new|#from_dpath", &path_from_dpath, gsi::arg ("dpath"),
     "@brief Creates an integer coordinate path from a floating-point coordinate path\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dpath'."
@@ -408,7 +408,7 @@ static db::DPath dpath_round_corners (const db::DPath *p, double radius, int npo
 }
 
 Class<db::DPath> decl_DPath ("DPath",
-  constructor ("new", &dpath_from_ipath, gsi::arg ("path"),
+  constructor ("new|#from_ipath", &dpath_from_ipath, gsi::arg ("path"),
     "@brief Creates a floating-point coordinate path from an integer coordinate path\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_ipath'."

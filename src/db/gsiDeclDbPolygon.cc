@@ -524,7 +524,7 @@ static db::DSimplePolygon spolygon_to_dspolygon (const db::SimplePolygon *p, dou
 }
 
 Class<db::SimplePolygon> decl_SimplePolygon ("SimplePolygon",
-  constructor ("new", &spolygon_from_dspolygon, gsi::arg ("dpolygon"),
+  constructor ("new|#from_dpoly", &spolygon_from_dspolygon, gsi::arg ("dpolygon"),
     "@brief Creates an integer coordinate polygon from a floating-point coordinate polygon\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dpoly'."
@@ -640,7 +640,7 @@ static db::SimplePolygon dspolygon_to_spolygon (const db::DSimplePolygon *p, dou
 }
 
 Class<db::DSimplePolygon> decl_DSimplePolygon ("DSimplePolygon",
-  constructor ("new", &dspolygon_from_ispolygon, gsi::arg ("polygon"),
+  constructor ("new|#from_ipoly", &dspolygon_from_ispolygon, gsi::arg ("polygon"),
     "@brief Creates a floating-point coordinate polygon from an integer coordinate polygon"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_ipoly'."
@@ -1538,7 +1538,7 @@ static gsi::Methods make_td_constants ()
 }
 
 Class<db::Polygon> decl_Polygon ("Polygon",
-  constructor ("new", &polygon_from_dpolygon, gsi::arg ("dpolygon"),
+  constructor ("new|#from_dpoly", &polygon_from_dpolygon, gsi::arg ("dpolygon"),
     "@brief Creates an integer coordinate polygon from a floating-point coordinate polygon\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dpolygon'."
@@ -1749,7 +1749,7 @@ static db::Polygon dpolygon_to_polygon (const db::DPolygon *p, double dbu)
 }
 
 Class<db::DPolygon> decl_DPolygon ("DPolygon",
-  constructor ("new", &dpolygon_from_ipolygon, gsi::arg ("polygon"),
+  constructor ("new|#from_ipoly", &dpolygon_from_ipolygon, gsi::arg ("polygon"),
     "@brief Creates a floating-point coordinate polygon from an integer coordinate polygon\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_ipolygon'."

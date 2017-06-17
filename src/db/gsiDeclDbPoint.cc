@@ -216,7 +216,7 @@ static db::Point dpoint_to_point (const db::DPoint *p, double dbu)
 }
 
 Class<db::DPoint> decl_DPoint ("DPoint",
-  constructor ("new", &dpoint_from_ipoint, gsi::arg ("point"),
+  constructor ("new|#from_ipoint", &dpoint_from_ipoint, gsi::arg ("point"),
     "@brief Creates a floating-point coordinate point from an integer coordinate point\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_ipoint'."
@@ -252,7 +252,7 @@ static db::DPoint point_to_dpoint (const db::Point *p, double dbu)
 }
 
 Class<db::Point> decl_Point ("Point",
-  constructor ("new", &point_from_dpoint, gsi::arg ("dpoint"),
+  constructor ("new|#from_dpoint", &point_from_dpoint, gsi::arg ("dpoint"),
     "@brief Creates an integer coordinate point from a floating-point coordinate point\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dpoint'."

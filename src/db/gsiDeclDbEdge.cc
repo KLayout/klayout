@@ -586,7 +586,7 @@ static db::DEdge edge_to_dedge (const db::Edge *e, double dbu)
 }
 
 Class<db::Edge> decl_Edge ("Edge", 
-  constructor ("new", &edge_from_dedge, gsi::arg ("dedge"),
+  constructor ("new|#from_dedge", &edge_from_dedge, gsi::arg ("dedge"),
     "@brief Creates an integer coordinate edge from a floating-point coordinate edge\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dedge'."
@@ -635,7 +635,7 @@ static db::Edge dedge_to_edge (const db::DEdge *e, double dbu)
 }
 
 Class<db::DEdge> decl_DEdge ("DEdge",
-  constructor ("new", &dedge_from_iedge, gsi::arg ("edge"),
+  constructor ("new|#from_iedge", &dedge_from_iedge, gsi::arg ("edge"),
     "@brief Creates a floating-point coordinate edge from an integer coordinate edge\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_iedge'."

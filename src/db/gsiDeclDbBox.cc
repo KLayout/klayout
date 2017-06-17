@@ -462,7 +462,7 @@ static db::DBox box_to_dbox (const db::Box *b, double dbu)
 }
 
 Class<db::Box> decl_Box ("Box", 
-  constructor ("new", &box_from_dbox, gsi::arg ("dbox"),
+  constructor ("new|#from_dbox", &box_from_dbox, gsi::arg ("dbox"),
     "@brief Creates an integer coordinate box from a floating-point coordinate box\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dbox'."
@@ -517,7 +517,7 @@ static db::Box dbox_to_box (const db::DBox *b, double dbu)
 }
 
 Class<db::DBox> decl_DBox ("DBox",
-  constructor ("new", &dbox_from_ibox, gsi::arg ("box"),
+  constructor ("new|#from_ibox", &dbox_from_ibox, gsi::arg ("box"),
     "@brief Creates a floating-point coordinate box from an integer coordinate box\n"
     "\n"
     "This constructor has been introduced in version 0.25 and replaces the previous static method 'from_ibox'."

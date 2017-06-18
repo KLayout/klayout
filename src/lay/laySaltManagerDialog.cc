@@ -86,7 +86,7 @@ public:
     if (name.empty ()) {
       name_alert->error () << tr ("Name must not be empty");
     } else if (! SaltGrain::valid_name (name)) {
-      name_alert->error () << tr ("Name is not valid (must be composed of letters, digits or underscores.\nGroups and names need to be separated with slashes.");
+      name_alert->error () << tr ("Name is not valid (must be composed of letters, digits, dots or underscores.\nGroups and names need to be separated with slashes.");
     } else {
 
       //  check, if this name does not exist yet

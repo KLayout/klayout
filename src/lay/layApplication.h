@@ -60,6 +60,24 @@ class ProgressBar;
 class MacroCollection;
 
 /**
+ *  @brief A tiny struct describing a native plugin
+ */
+struct PluginDescriptor
+{
+  typedef void (*runner_func_t) ();
+
+  runner_func_t autorun;
+  runner_func_t autorun_early;
+  std::string version;
+  std::string path;
+  std::string description;
+
+  PluginDescriptor ()
+    : autorun (0), autorun_early (0)
+  { }
+};
+
+/**
  *  @brief The basic application object
  *
  *  This object encapsulates command line parsing, creation of the main window
@@ -293,6 +311,14 @@ public:
     return m_klayout_path;
   }
 
+  /**
+   *  @brief Gets the native plugin descriptors
+   */
+  const std::vector<PluginDescriptor> &native_plugins () const
+  {
+    return m_native_plugins;
+  }
+
 private:
   void shutdown ();
   void finish ();
@@ -343,6 +369,7 @@ private:
   lay::ProgressBar *mp_pb;
   lay::PluginRoot *mp_plugin_root;
   gtf::Recorder *mp_recorder;
+  std::vector<PluginDescriptor> m_native_plugins;
 };
 
 } // namespace lay

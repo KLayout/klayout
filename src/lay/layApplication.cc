@@ -27,6 +27,7 @@
 #include "layConfig.h"
 #include "layMainWindow.h"
 #include "layMacroEditorDialog.h"
+#include "layNativePlugin.h"
 #include "layVersion.h"
 #include "layMacro.h"
 #include "laySignalHandler.h"
@@ -164,23 +165,47 @@ static void ui_exception_handler_def (QWidget *parent)
 
 static Application *ms_instance = 0;
 
-static void load_plugin (const std::string &pp)
+static PluginDescriptor load_plugin (const std::string &pp)
 {
+  PluginDescriptor desc;
+  desc.path = pp;
+
+  klp_init_func_t init_func = 0;
+  static const char *init_func_name = "klp_init";
+
+  //  NOTE: since we are using a different suffix ("*.klp"), we can't use QLibrary.
 #ifdef _WIN32
   //  there is no "dlopen" on mingw, so we need to emulate it.
   HINSTANCE handle = LoadLibraryW ((const wchar_t *) tl::to_qstring (pp).constData ());
   if (! handle) {
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to load plugin: %s with error message: %s ")), pp, GetLastError ());
   }
+  init_func = reinterpret_cast<init_func_t> (GetProcAddress (handle, init_func_name));
 #else
   void *handle;
   handle = dlopen (tl::string_to_system (pp).c_str (), RTLD_LAZY);
   if (! handle) {
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to load plugin: %s")), pp);
   }
+  init_func = reinterpret_cast<klp_init_func_t> (dlsym (handle, init_func_name));
 #endif
 
+  //  If present, call the initialization function to fetch some details from the plugin
+  if (init_func) {
+    const char *version = 0;
+    const char *description = 0;
+    (*init_func) (&desc.autorun, &desc.autorun_early, &version, &description);
+    if (version) {
+      desc.version = version;
+    }
+    if (description) {
+      desc.description = description;
+    }
+  }
+
   tl::log << "Loaded plugin '" << pp << "'";
+
+  return desc;
 }
 
 Application::Application (int &argc, char **argv, bool non_ui_mode)
@@ -301,6 +326,9 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   //    - in one of the Salt packages
   //    - in one of the Salt packages, in a folder named after the architecture
 
+  std::string version = lay::Version::version ();
+  std::vector<std::string> vv = tl::split (version, ".");
+
   for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
 
     std::set<std::string> modules;
@@ -310,12 +338,27 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
     klp_paths.push_back (QDir (klp_paths.back ()).filePath (tl::to_qstring (tl::arch_string ())));
 
     lay::Salt salt;
-    //  TODO: this is code duplicated from the SaltController. But this one
-    //  is initialized much later.
     salt.add_location (tl::to_string (QDir (tl::to_qstring (*p)).filePath (QString::fromUtf8 ("salt"))));
+
+    //  Build the search path for the *.klp files. The search priority is for example:
+    //    salt/mypackage/x86_64-linux-gcc-0.25.1
+    //    salt/mypackage/x86_64-linux-gcc-0.25
+    //    salt/mypackage/x86_64-linux-gcc-0
+    //    salt/mypackage/x86_64-linux-gcc
+    //    salt/mypackage
+
     for (lay::Salt::flat_iterator g = salt.begin_flat (); g != salt.end_flat (); ++g) {
+      QDir dir = QDir (tl::to_qstring ((*g)->path ()));
+      klp_paths.push_back (dir.filePath (tl::to_qstring (tl::arch_string () + "-" + lay::Version::version())));
+      if (vv.size () >= 2) {
+        klp_paths.push_back (dir.filePath (tl::to_qstring (tl::arch_string () + "-" + vv[0] + "." + vv[1])));
+      }
+      if (vv.size () >= 1) {
+        klp_paths.push_back (dir.filePath (tl::to_qstring (tl::arch_string () + "-" + vv[0])));
+      }
+      klp_paths.push_back (dir.filePath (tl::to_qstring (tl::arch_string () + "-" + tl::to_string (lay::Version::version ()))));
+      klp_paths.push_back (dir.filePath (tl::to_qstring (tl::arch_string ())));
       klp_paths.push_back (tl::to_qstring ((*g)->path ()));
-      klp_paths.push_back (QDir (klp_paths.back ()).filePath (tl::to_qstring (tl::arch_string ())));
     }
 
     for (std::vector<QString>::const_iterator p = klp_paths.begin (); p != klp_paths.end (); ++p) {
@@ -330,9 +373,10 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
         QFileInfo klp_file (*p, *im);
         if (klp_file.exists () && klp_file.isReadable ()) {
           std::string m = tl::to_string (klp_file.absoluteFilePath ());
-          if (modules.find (m) == modules.end ()) {
-            load_plugin (m);
-            modules.insert (m);
+          std::string mn = tl::to_string (klp_file.fileName ());
+          if (modules.find (mn) == modules.end ()) {
+            m_native_plugins.push_back (load_plugin (m));
+            modules.insert (mn);
           }
         }
       }
@@ -472,7 +516,7 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
 
     } else if (a == "-p" && (i + 1) < argc) {
 
-      load_plugin (args [++i]);
+      m_native_plugins.push_back (load_plugin (args [++i]));
 
     } else if (a == "-s") {
 

@@ -5428,7 +5428,27 @@ HelpAboutDialog::HelpAboutDialog (QWidget *parent)
     }
     s += "</ul>";
   }
-  
+
+  if (! lay::Application::instance ()->native_plugins ().empty ()) {
+    s += "<p>";
+    s += "<h4>";
+    s += escape_xml (tl::to_string (QObject::tr ("Native extensions:")));
+    s += "</h4><ul>";
+    for (std::vector<lay::PluginDescriptor>::const_iterator pd = lay::Application::instance ()->native_plugins ().begin (); pd != lay::Application::instance ()->native_plugins ().end (); ++pd) {
+      s += "<li>";
+      if (! pd->description.empty ()) {
+        s += escape_xml (pd->description);
+      } else {
+        s += escape_xml (pd->path);
+      }
+      if (! pd->version.empty ()) {
+        s += " (" + escape_xml (pd->version) + ")";
+      }
+      s += "</li>";
+    }
+    s += "</ul>";
+  }
+
   s += "</body></html>";
 
   std::string t = tl::to_string (QObject::tr ("About ")) + lay::Version::name ();

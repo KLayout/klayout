@@ -59,7 +59,8 @@ HEADERS = \
     laySaltController.h \
     laySignalHandler.h \
     layLibraryController.h \
-    layFontController.h
+    layFontController.h \
+    layNativePlugin.h
 
 FORMS = \
     ClipDialog.ui \

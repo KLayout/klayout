@@ -24,7 +24,7 @@ RUN_MAKE=1
 
 HAVE_QTBINDINGS=1
 HAVE_64BIT_COORD=0
-HAVE_QT5=0
+HAVE_QT5=""
 
 RUBYINCLUDE=""
 RUBYINCLUDE2=""
@@ -158,8 +158,7 @@ while [ "$*" != "" ]; do
     echo "                        (only available for gcc>=4.4 for 64bit build)"
     echo "  -without-64bit-coord  Don't use long (64bit) coordinates [default]"
     echo ""
-    echo "  -qt5                  Use Qt5"
-    echo "  -qt4                  Use Qt4 [default]"
+    echo "  -qt4|-qt5             Use Qt4 or Qt5 API [default: auto detect]"
     echo ""
     echo "  -dry-run              Don't build, just run qmake"
     echo ""
@@ -183,6 +182,23 @@ done
 
 echo "Scanning installation .."
 echo ""
+
+# if not given, try to detect the qt major version to use
+if [ "$HAVE_QT5" = "" ]; then
+  qt_major=`$QMAKE -v | grep 'Using Qt version' | sed 's/.*version  *\([0-9][0-9]*\).*/\1/'`
+  if [ "$qt_major" = "4" ]; then
+    HAVE_QT5=0
+    echo "Using Qt 4 API"
+    echo ""
+  elif [ "$qt_major" = "5" ]; then
+    HAVE_QT5=1
+    echo "Using Qt 5 API"
+    echo ""
+  else
+    echo "*** ERROR: could not determine Qt version from '$QMAKE -v'"
+    exit 1
+  fi
+fi
 
 # if not given, locate ruby interpreter (prefer 1.9, then default, finally 1.8 as fallback)
 if [ "$RUBY" != "-" ]; then

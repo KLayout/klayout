@@ -23,6 +23,8 @@
 #ifndef HDR_layNativePlugin
 #define HDR_layNativePlugin
 
+#include "layCommon.h"
+
 /**
  *  @brief A struct to hold the data of the plugin
  *
@@ -51,25 +53,45 @@ struct NativePlugin {
 typedef void (*klp_init_func_t) (void (**autorun) (), void (**autorun_early) (), const char **version, const char **description);
 
 # if defined _WIN32 || defined __CYGWIN__
-#   define _INIT_PUBLIC __declspec(dllexport)
+#   define KLP_PUBLIC __declspec(dllexport)
 # else
 #   if __GNUC__ >= 4
-#     define _INIT_PUBLIC __attribute__ ((visibility ("default")))
+#     define KLP_PUBLIC __attribute__ ((visibility ("default")))
 #   else
-#     define _INIT_PUBLIC
+#     define KLP_PUBLIC
 #   endif
 
 # endif
 
 #define DECLARE_NATIVE_PLUGIN(desc) \
   extern "C" { \
-    _INIT_PUBLIC void klp_init (void (**autorun) (), void (**autorun_early) (), const char **version, const char **description) { \
+    KLP_PUBLIC void klp_init (void (**autorun) (), void (**autorun_early) (), const char **version, const char **description) { \
       *autorun = desc.autorun; \
       *autorun_early = desc.autorun_early; \
       *version = desc.version; \
       *description = desc.description; \
     } \
   }
+
+/**
+ *  @brief Some (opaque) types for representing some gsi classes in the native API
+ */
+
+struct klp_class_t { };
+struct klp_method_t { };
+
+/**
+ *  @brief The gsi API functions wrapped for the native API
+ */
+extern "C" {
+  LAY_PUBLIC const klp_class_t *klp_class_by_name (const char *name);
+  LAY_PUBLIC void *klp_create (const klp_class_t *cls);
+  LAY_PUBLIC void klp_destroy (const klp_class_t *cls, void *obj);
+  LAY_PUBLIC void *klp_clone (const klp_class_t *cls, const void *source);
+  LAY_PUBLIC void klp_assign (const klp_class_t *cls, void *target, const void *source);
+  LAY_PUBLIC void klp_require_api_version (const char *version);
+}
+
 
 #endif
 

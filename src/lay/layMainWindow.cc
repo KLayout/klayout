@@ -5432,7 +5432,7 @@ HelpAboutDialog::HelpAboutDialog (QWidget *parent)
   if (! lay::Application::instance ()->native_plugins ().empty ()) {
     s += "<p>";
     s += "<h4>";
-    s += escape_xml (tl::to_string (QObject::tr ("Native extensions:")));
+    s += escape_xml (tl::to_string (QObject::tr ("Binary extensions:")));
     s += "</h4><ul>";
     for (std::vector<lay::PluginDescriptor>::const_iterator pd = lay::Application::instance ()->native_plugins ().begin (); pd != lay::Application::instance ()->native_plugins ().end (); ++pd) {
       s += "<li>";

@@ -329,6 +329,13 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   std::string version = lay::Version::version ();
   std::vector<std::string> vv = tl::split (version, ".");
 
+  std::string arch_string = tl::arch_string ();
+  std::vector<std::string> as = tl::split (arch_string, "-");
+  if (as.size () > 2) {
+    as.resize (2);
+  }
+  std::string short_arch_string = tl::join (as, "-");
+
   for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
 
     std::set<std::string> modules;
@@ -345,26 +352,28 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
     //    salt/mypackage/x86_64-linux-gcc-0.25
     //    salt/mypackage/x86_64-linux-gcc-0
     //    salt/mypackage/x86_64-linux-gcc
+    //    salt/mypackage/x86_64-linux
     //    salt/mypackage
 
     for (lay::Salt::flat_iterator g = salt.begin_flat (); g != salt.end_flat (); ++g) {
       QDir dir = QDir (tl::to_qstring ((*g)->path ()));
-      klp_paths.push_back (dir.filePath (tl::to_qstring (tl::arch_string () + "-" + lay::Version::version())));
+      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + lay::Version::version())));
       if (vv.size () >= 2) {
-        klp_paths.push_back (dir.filePath (tl::to_qstring (tl::arch_string () + "-" + vv[0] + "." + vv[1])));
+        klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + vv[0] + "." + vv[1])));
       }
       if (vv.size () >= 1) {
-        klp_paths.push_back (dir.filePath (tl::to_qstring (tl::arch_string () + "-" + vv[0])));
+        klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + vv[0])));
       }
-      klp_paths.push_back (dir.filePath (tl::to_qstring (tl::arch_string () + "-" + tl::to_string (lay::Version::version ()))));
-      klp_paths.push_back (dir.filePath (tl::to_qstring (tl::arch_string ())));
+      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + tl::to_string (lay::Version::version ()))));
+      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string)));
+      klp_paths.push_back (dir.filePath (tl::to_qstring (short_arch_string)));
       klp_paths.push_back (tl::to_qstring ((*g)->path ()));
     }
 
-    for (std::vector<QString>::const_iterator p = klp_paths.begin (); p != klp_paths.end (); ++p) {
+    QStringList name_filters;
+    name_filters << QString::fromUtf8 ("*.klp");
 
-      QStringList name_filters;
-      name_filters << QString::fromUtf8 ("*.klp");
+    for (std::vector<QString>::const_iterator p = klp_paths.begin (); p != klp_paths.end (); ++p) {
 
       QStringList inst_modules = QDir (*p).entryList (name_filters);
       inst_modules.sort ();
@@ -778,6 +787,13 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   tl::Variant kp (m_klayout_path.begin (), m_klayout_path.end ());
   tl::Eval::set_global_var ("klayout_path", kp);
 
+  //  call "autorun_early" on all plugins that wish so
+  for (std::vector <lay::PluginDescriptor>::const_iterator p = m_native_plugins.begin (); p != m_native_plugins.end (); ++p) {
+    if (p->autorun_early) {
+      (*p->autorun_early) ();
+    }
+  }
+
   //  run all early autorun macros
   lay::MacroCollection::root ().autorun_early ();
 
@@ -1121,6 +1137,13 @@ Application::run ()
 
     END_PROTECTED
 
+  }
+
+  //  call "autorun" on all plugins that wish so
+  for (std::vector <lay::PluginDescriptor>::const_iterator p = m_native_plugins.begin (); p != m_native_plugins.end (); ++p) {
+    if (p->autorun) {
+      (*p->autorun) ();
+    }
   }
 
   //  run all autorun macros

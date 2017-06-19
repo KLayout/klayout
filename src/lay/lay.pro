@@ -165,7 +165,8 @@ SOURCES = \
     laySaltController.cc \
     laySignalHandler.cc \
     layLibraryController.cc \
-    layFontController.cc
+    layFontController.cc \
+    layNativePlugin.cc
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \

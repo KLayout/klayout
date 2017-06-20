@@ -978,51 +978,9 @@ OASISReader::do_read (db::Layout &layout)
         error (tl::sprintf (tl::to_string (QObject::tr ("A PROPSTRING with id %ld is present already")), id));
       }
 
-      //  resolve forward references to property names
-      std::set <unsigned long>::iterator pvf = m_propvalue_forward_references.find (id);
-      if (pvf != m_propvalue_forward_references.end ()) {
-
-        //  replace the id variant placeholder by the correct one
-        tl::Variant id_var (id, true /*dummy for id type*/);
-
-        for (db::PropertiesRepository::non_const_iterator pi = layout.properties_repository ().begin_non_const (); pi != layout.properties_repository ().end_non_const (); ++pi) {
-
-          for (db::PropertiesRepository::properties_set::iterator ps = pi->second.begin (); ps != pi->second.end (); ++ps) {
-
-            if (ps->second == id_var) {
-              ps->second = tl::Variant (name);
-            } else if (ps->second.is_list ()) {
-
-              //  Replace list elements as well
-              //  TODO: Q: can there be a list of lists? would need recursive replacement -> make that a method of tl::Variant
-
-              const std::vector<tl::Variant> &l = ps->second.get_list ();
-              bool needs_replacement = false;
-              for (std::vector<tl::Variant>::const_iterator ll = l.begin (); ll != l.end () && ! needs_replacement; ++ll) {
-                needs_replacement = (*ll == id_var);
-              }
-
-              if (needs_replacement) {
-
-                std::vector<tl::Variant> new_list (l);
-                for (std::vector<tl::Variant>::iterator ll = new_list.begin (); ll != new_list.end (); ++ll) {
-                  if (*ll == id_var) {
-                    *ll = tl::Variant (name);
-                  }
-                }
-
-                ps->second = tl::Variant (new_list.begin (), new_list.end ());
-
-              }
-
-            }
-
-          }
-
-        }
-        
-        m_propvalue_forward_references.erase (pvf);
-
+      std::map<unsigned long, std::string>::iterator fw = m_propvalue_forward_references.find (id);
+      if (fw != m_propvalue_forward_references.end ()) {
+        fw->second = name;
       }
 
       reset_modal_variables ();
@@ -1292,9 +1250,61 @@ OASISReader::do_read (db::Layout &layout)
     error (tl::sprintf (tl::to_string (QObject::tr ("No property name defined for property name id %ld")), fw->first));
   }
 
-  //  all forward references to property value string id's must be resolved
-  for (std::set <unsigned long>::const_iterator fw = m_propvalue_forward_references.begin (); fw != m_propvalue_forward_references.end (); ++fw) {
-    error (tl::sprintf (tl::to_string (QObject::tr ("No property value defined for property value id %ld")), *fw));
+  //  resolve all propvalue forward referenced
+  if (! m_propvalue_forward_references.empty ()) {
+
+    for (db::PropertiesRepository::non_const_iterator pi = layout.properties_repository ().begin_non_const (); pi != layout.properties_repository ().end_non_const (); ++pi) {
+
+      for (db::PropertiesRepository::properties_set::iterator ps = pi->second.begin (); ps != pi->second.end (); ++ps) {
+
+        if (ps->second.is_id ()) {
+
+          unsigned long id = (unsigned long) ps->second.to_id ();
+          std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+          if (fw != m_propvalue_forward_references.end ()) {
+            ps->second = tl::Variant (fw->second);
+          } else {
+            error (tl::sprintf (tl::to_string (QObject::tr ("No property value defined for property value id %ld")), id));
+          }
+
+        } else if (ps->second.is_list ()) {
+
+          //  Replace list elements as well
+          //  TODO: Q: can there be a list of lists? would need recursive replacement -> make that a method of tl::Variant
+
+          const std::vector<tl::Variant> &l = ps->second.get_list ();
+          bool needs_replacement = false;
+          for (std::vector<tl::Variant>::const_iterator ll = l.begin (); ll != l.end () && ! needs_replacement; ++ll) {
+            needs_replacement = ll->is_id ();
+          }
+
+          if (needs_replacement) {
+
+            std::vector<tl::Variant> new_list (l);
+            for (std::vector<tl::Variant>::iterator ll = new_list.begin (); ll != new_list.end (); ++ll) {
+              if (ll->is_id ()) {
+                unsigned long id = (unsigned long) ps->second.to_id ();
+                std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+                if (fw != m_propvalue_forward_references.end ()) {
+                  *ll = tl::Variant (fw->second);
+                } else {
+                  error (tl::sprintf (tl::to_string (QObject::tr ("No property value defined for property value id %ld")), id));
+                }
+              }
+            }
+
+            ps->second = tl::Variant (new_list.begin (), new_list.end ());
+
+          }
+
+        }
+
+      }
+
+    }
+
+    m_propvalue_forward_references.clear ();
+
   }
 
   for (std::map <unsigned long, db::cell_index_type>::const_iterator fw = m_forward_references.begin (); fw != m_forward_references.end (); ++fw) {
@@ -1568,7 +1578,7 @@ OASISReader::read_properties (db::PropertiesRepository &rep)
         if (m_read_properties) {
           std::map <unsigned long, std::string>::const_iterator sid = m_propstrings.find (id);
           if (sid == m_propstrings.end ()) {
-            m_propvalue_forward_references.insert (id);
+            m_propvalue_forward_references.insert (std::make_pair (id, std::string ()));
             mm_last_value_list.get_non_const ().push_back (tl::Variant (id, true /*dummy for id type*/));
           } else {
             mm_last_value_list.get_non_const ().push_back (tl::Variant (sid->second));

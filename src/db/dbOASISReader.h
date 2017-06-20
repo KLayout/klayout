@@ -269,7 +269,7 @@ private:
   std::set <std::string> m_defined_cells_by_name;
 
   std::map <unsigned long, db::property_names_id_type> m_propname_forward_references;
-  std::set <unsigned long> m_propvalue_forward_references;
+  std::map <unsigned long, std::string> m_propvalue_forward_references;
   db::property_names_id_type m_s_gds_property_name_id;
   db::property_names_id_type m_klayout_context_property_name_id;
 

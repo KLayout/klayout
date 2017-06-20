@@ -1626,7 +1626,7 @@ MacroEditorDialog::current_tab_changed (int index)
   searchEditBox->clear ();
   apply_search ();
 
-  update_ui_to_run_mode ();
+  do_update_ui_to_run_mode ();
 }
 
 lay::Macro *MacroEditorDialog::create_macro_here (const char *prefix)
@@ -2735,7 +2735,7 @@ MacroEditorDialog::start_exec (gsi::Interpreter *ec)
     f->second->exec_model ()->set_run_mode (true);
   }
 
-  update_ui_to_run_mode ();
+  do_update_ui_to_run_mode ();
 }
 
 void
@@ -2760,7 +2760,7 @@ MacroEditorDialog::end_exec (gsi::Interpreter *ec)
     f->second->exec_model ()->set_run_mode (false);
   }
 
-  update_ui_to_run_mode ();
+  do_update_ui_to_run_mode ();
 }
 
 
@@ -2965,7 +2965,7 @@ MacroEditorDialog::enter_breakpoint_mode (gsi::Interpreter *interpreter, const g
   //  Adjust the current stack level
   m_current_stack_depth = stack_trace_provider->stack_depth ();
 
-  update_ui_to_run_mode ();
+  do_update_ui_to_run_mode ();
 
   //  Hint: apparently it's necessary to process the events to make the layout system
   //  recognize that we have hidden parts from the edit field by the runtime frame.
@@ -2984,7 +2984,7 @@ MacroEditorDialog::leave_breakpoint_mode ()
   m_in_breakpoint = false;
   m_eval_context = -1;
   mp_current_interpreter = 0;
-  update_ui_to_run_mode ();
+  do_update_ui_to_run_mode ();
   set_exec_point (0, -1, -1);
 }
 

@@ -136,7 +136,7 @@ public:
 #endif
 
 private:
-  std::string m_scope;
+  const std::string &m_scope;
 };
 
 // -------------------------------------------------------------------
@@ -2191,7 +2191,6 @@ RubyInterpreter::remove_exec_handler (gsi::ExecutionHandler *exec_handler)
 void
 RubyInterpreter::begin_exec ()
 {
-  d->file_id_map.clear ();
   d->exit_on_next = false;
   d->block_exceptions = false;
   if (d->current_exec_level++ == 0 && d->current_exec_handler) {

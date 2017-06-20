@@ -102,7 +102,7 @@ static QNetworkAccessManager *s_network_manager (0);
 static AuthenticationHandler *s_auth_handler (0);
 
 InputHttpStream::InputHttpStream (const std::string &url)
-  : m_url (url), m_request ("GET"), mp_buffer (0), mp_reply (0)
+  : m_url (url), mp_reply (0), m_request ("GET"), mp_buffer (0)
 {
   if (! s_network_manager) {
 

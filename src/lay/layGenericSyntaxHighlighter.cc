@@ -1612,6 +1612,7 @@ GenericSyntaxHighlighter::highlightBlock(const QString &text)
         SyntaxHighlighterElement el;
         el.start_offset = last_index;
         el.length = index - last_index;
+        el.basic_attribute_id = mp_attributes->basic_id (def_attribute_id);
         user_data->elements ().push_back (el);
       }
 
@@ -1627,6 +1628,7 @@ GenericSyntaxHighlighter::highlightBlock(const QString &text)
         SyntaxHighlighterElement el;
         el.start_offset = index;
         el.length = end_index - index;
+        el.basic_attribute_id = mp_attributes->basic_id (attribute_id);
         user_data->elements ().push_back (el);
       }
 

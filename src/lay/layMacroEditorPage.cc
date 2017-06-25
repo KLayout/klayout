@@ -586,6 +586,11 @@ void MacroEditorPage::breakpoints_changed ()
   }
 }
 
+static bool valid_element (const SyntaxHighlighterElement &e)
+{
+  return e.basic_attribute_id != lay::dsComment && e.basic_attribute_id != lay::dsString;
+}
+
 void MacroEditorPage::cursor_position_changed ()
 {
   QTextCursor cursor = mp_text->textCursor ();
@@ -601,6 +606,12 @@ void MacroEditorPage::cursor_position_changed ()
   QTextBlock b = cursor.block ();
   SyntaxHighlighterUserData *user_data = dynamic_cast<SyntaxHighlighterUserData *> (b.userData());
   if (user_data) {
+
+    //  Look for matching brackets and highlight the other one
+    //  NOTE: the whole scheme is somewhat more complex than it could be. It's
+    //  based on the syntax highlighter elements and we confine ourselves to
+    //  elements not being comment or string. So we need to iterate over elements
+    //  and over characters inside these elements.
 
     size_t pos = size_t (cursor.positionInBlock ());
 
@@ -619,12 +630,12 @@ void MacroEditorPage::cursor_position_changed ()
     static const QString close_cbracket (QString::fromUtf8 ("}"));
 
     bool forward = false, backward = false;
-    if (e != user_data->elements ().end ()) {
-      QString t = b.text ().mid (e->start_offset, e->length).trimmed ();
+    if (e != user_data->elements ().end () && valid_element (*e)) {
+      QString t = b.text ().mid (pos, 1);
       forward = (t == open_rbracket || t == open_sqbracket || t == open_cbracket);
     }
-    if (e != user_data->elements ().begin () && e[-1].start_offset + e[-1].length == pos) {
-      QString t = b.text ().mid (e[-1].start_offset, e[-1].length).trimmed ();
+    if (e != user_data->elements ().begin () && e[-1].start_offset + e[-1].length >= pos && valid_element (*e)) {
+      QString t = b.text ().mid (pos - 1, 1);
       backward = (t == close_rbracket || t == close_sqbracket || t == close_cbracket);
     }
 
@@ -637,34 +648,68 @@ void MacroEditorPage::cursor_position_changed ()
     if (forward || backward) {
 
       std::vector<QString> bs;
-      std::vector<SyntaxHighlighterElement>::const_iterator e0 = e;
 
-      bool found = false;
-      while (e != user_data->elements ().end ()) {
+      int found = -1;
+      while (true) {
 
         QString t = b.text ().mid (e->start_offset, e->length).trimmed ();
-        if (forward && t == open_rbracket) {
-          bs.push_back (close_rbracket);
-        } else if (forward && t == open_cbracket) {
-          bs.push_back (close_cbracket);
-        } else if (forward && t == open_sqbracket) {
-          bs.push_back (close_sqbracket);
-        } else if (backward && t == close_rbracket) {
-          bs.push_back (open_rbracket);
-        } else if (backward && t == close_cbracket) {
-          bs.push_back (open_cbracket);
-        } else if (backward && t == close_sqbracket) {
-          bs.push_back (open_sqbracket);
-        } else if (t == bs.back ()) {
-          bs.pop_back ();
-          if (bs.empty ()) {
-            found = true;
-            break;
+
+        if (valid_element (*e)) {
+
+          if (forward) {
+
+            for (int p = 0; p != t.size () && found < 0; ++p) {
+              if (p + e->start_offset >= pos) {
+                QString c = t.mid (p, 1);
+                if (c == open_rbracket) {
+                  bs.push_back (close_rbracket);
+                } else if (c == open_cbracket) {
+                  bs.push_back (close_cbracket);
+                } else if (c == open_sqbracket) {
+                  bs.push_back (close_sqbracket);
+                } else if (c == bs.back ()) {
+                  bs.pop_back ();
+                  if (bs.empty ()) {
+                    found = p + e->start_offset;
+                  }
+                }
+              }
+            }
+
+          } else if (backward) {
+
+            for (int p = t.size (); p > 0 && found < 0; ) {
+              --p;
+              if (p + e->start_offset < pos) {
+                QString c = t.mid (p, 1);
+                if (c == close_rbracket) {
+                  bs.push_back (open_rbracket);
+                } else if (c == close_cbracket) {
+                  bs.push_back (open_cbracket);
+                } else if (c == close_sqbracket) {
+                  bs.push_back (open_sqbracket);
+                } else if (c == bs.back ()) {
+                  bs.pop_back ();
+                  if (bs.empty ()) {
+                    found = p + e->start_offset;
+                  }
+                }
+              }
+            }
+
           }
+
+        }
+
+        if (found >= 0) {
+          break;
         }
 
         if (forward) {
           ++e;
+          if (e == user_data->elements ().end ()) {
+            break;
+          }
         } else {
           if (e == user_data->elements ().begin ()) {
             break;
@@ -674,7 +719,7 @@ void MacroEditorPage::cursor_position_changed ()
 
       }
 
-      if (found) {
+      if (found >= 0) {
 
         QList<QTextEdit::ExtraSelection> extra_selections = mp_text->extraSelections ();
         for (QList<QTextEdit::ExtraSelection>::iterator i = extra_selections.begin (); i != extra_selections.end (); ) {
@@ -689,13 +734,13 @@ void MacroEditorPage::cursor_position_changed ()
         es.format = fmt;
 
         es.cursor = QTextCursor (b);
-        es.cursor.setPosition (b.position () + e0->start_offset);
-        es.cursor.movePosition (QTextCursor::NextCharacter, QTextCursor::KeepAnchor, e0->length);
+        es.cursor.setPosition (b.position () + found);
+        es.cursor.movePosition (QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 1);
         extra_selections.push_back (es);
 
         es.cursor = QTextCursor (b);
-        es.cursor.setPosition (b.position () + e->start_offset);
-        es.cursor.movePosition (QTextCursor::NextCharacter, QTextCursor::KeepAnchor, e->length);
+        es.cursor.setPosition (b.position () + found);
+        es.cursor.movePosition (QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 1);
         extra_selections.push_back (es);
 
         mp_text->setExtraSelections (extra_selections);

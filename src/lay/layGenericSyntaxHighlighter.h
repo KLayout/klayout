@@ -46,12 +46,13 @@ public:
    *  @brief Default constructor
    */
   SyntaxHighlighterElement ()
-    : start_offset (0), length (0)
+    : start_offset (0), length (0), basic_attribute_id (0)
   {
     //  .. nothing yet ..
   }
 
   size_t start_offset, length;
+  int basic_attribute_id;
 };
 
 /**

@@ -566,6 +566,58 @@ Shape::perimeter_type Shape::perimeter () const
   }
 }
 
+size_t Shape::array_size () const
+{
+  switch (m_type) {
+  case Null:
+    return 0;
+  case Polygon:
+  case PolygonRef:
+  case PolygonPtrArrayMember:
+    return 1;
+  case PolygonPtrArray:
+    {
+      const polygon_ptr_array_type *arr = basic_ptr (polygon_ptr_array_type::tag ());
+      return arr->size ();
+    }
+  case SimplePolygon:
+  case SimplePolygonRef:
+  case SimplePolygonPtrArrayMember:
+    return 1;
+  case SimplePolygonPtrArray:
+    {
+      const simple_polygon_ptr_array_type *arr = basic_ptr (simple_polygon_ptr_array_type::tag ());
+      return arr->size ();
+    }
+  case Path:
+  case PathRef:
+  case PathPtrArrayMember:
+    return 1;
+  case PathPtrArray:
+    {
+      const path_ptr_array_type *arr = basic_ptr (path_ptr_array_type::tag ());
+      return arr->size ();
+    }
+  case BoxArray:
+    {
+      const box_array_type *arr = basic_ptr (box_array_type::tag ());
+      return arr->size ();
+    }
+  case ShortBoxArray:
+    {
+      const short_box_array_type *arr = basic_ptr (short_box_array_type::tag ());
+      return arr->size ();
+    }
+  case Box:
+  case ShortBox:
+  case BoxArrayMember:
+  case ShortBoxArrayMember:
+    return 1;
+  default:
+    return 1;
+  }
+}
+
 Shape::area_type Shape::area () const
 {
   switch (m_type) {

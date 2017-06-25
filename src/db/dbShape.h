@@ -2420,6 +2420,11 @@ public:
   }
 
   /**
+   *  @brief Returns the array size if the shape references an array
+   */
+  size_t array_size () const;
+
+  /**
    *  @brief Array instance member transformation
    *
    *  This attribute is valid only if is_array_member is true.

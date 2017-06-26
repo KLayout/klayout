@@ -43,6 +43,8 @@ class ANT_PUBLIC Template
 public:
   typedef ant::Object::style_type style_type;
   typedef ant::Object::outline_type outline_type;
+  typedef ant::Object::position_type position_type;
+  typedef ant::Object::alignment_type alignment_type;
   typedef lay::angle_constraint_type angle_constraint_type;
 
   /**
@@ -105,6 +107,57 @@ public:
   }
 
   /**
+   *  @brief Sets the position of the main label
+   *  See the \position_type enum for details.
+   */
+  void set_main_position (position_type pos)
+  {
+    m_main_position = pos;
+  }
+
+  /**
+   *  @brief Gets the position of the main label
+   */
+  position_type main_position () const
+  {
+    return m_main_position;
+  }
+
+  /**
+   *  @brief Sets the x alignment flag of the main label
+   *  See \alignment_type for details.
+   */
+  void set_main_xalign (alignment_type a)
+  {
+    m_main_xalign = a;
+  }
+
+  /**
+   *  @brief Gets the x alignment flag of the main label
+   */
+  alignment_type main_xalign () const
+  {
+    return m_main_xalign;
+  }
+
+  /**
+   *  @brief Sets the y alignment flag of the main label
+   *  See \alignment_type for details.
+   */
+  void set_main_yalign (alignment_type a)
+  {
+    m_main_yalign = a;
+  }
+
+  /**
+   *  @brief Gets the y alignment flag of the main label
+   */
+  alignment_type main_yalign () const
+  {
+    return m_main_yalign;
+  }
+
+  /**
    *  @brief x axis format string read accessor
    */
   const std::string &fmt_x () const
@@ -124,6 +177,40 @@ public:
   }
 
   /**
+   *  @brief Sets the x alignment flag of the x axis label
+   *  See \alignment_type for details.
+   */
+  void set_xlabel_xalign (alignment_type a)
+  {
+    m_xlabel_xalign = a;
+  }
+
+  /**
+   *  @brief Gets the x alignment flag of the x axis label
+   */
+  alignment_type xlabel_xalign () const
+  {
+    return m_xlabel_xalign;
+  }
+
+  /**
+   *  @brief Sets the y alignment flag of the x axis label
+   *  See \alignment_type for details.
+   */
+  void set_xlabel_yalign (alignment_type a)
+  {
+    m_xlabel_yalign = a;
+  }
+
+  /**
+   *  @brief Gets the y alignment flag of the x axis label
+   */
+  alignment_type xlabel_yalign () const
+  {
+    return m_xlabel_yalign;
+  }
+
+  /**
    *  @brief y axis format string read accessor
    */
   const std::string &fmt_y () const
@@ -140,6 +227,40 @@ public:
   void fmt_y (const std::string &s)
   {
     m_fmt_y = s;
+  }
+
+  /**
+   *  @brief Sets the x alignment flag of the y axis label
+   *  See \alignment_type for details.
+   */
+  void set_ylabel_xalign (alignment_type a)
+  {
+    m_ylabel_xalign = a;
+  }
+
+  /**
+   *  @brief Gets the x alignment flag of the y axis label
+   */
+  alignment_type ylabel_xalign () const
+  {
+    return m_ylabel_xalign;
+  }
+
+  /**
+   *  @brief Sets the y alignment flag of the y axis label
+   *  See \alignment_type for details.
+   */
+  void set_ylabel_yalign (alignment_type a)
+  {
+    m_ylabel_yalign = a;
+  }
+
+  /**
+   *  @brief Gets the y alignment flag of the y axis label
+   */
+  alignment_type ylabel_yalign () const
+  {
+    return m_ylabel_yalign;
   }
 
   /**
@@ -241,6 +362,10 @@ private:
   outline_type m_outline;
   bool m_snap;
   lay::angle_constraint_type m_angle_constraint;
+  position_type m_main_position;
+  alignment_type m_main_xalign, m_main_yalign;
+  alignment_type m_xlabel_xalign, m_xlabel_yalign;
+  alignment_type m_ylabel_xalign, m_ylabel_yalign;
 };
 
 }

@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>RulerConfigPage3</class>
- <widget class="QFrame" name="RulerConfigPage3" >
-  <property name="geometry" >
+ <widget class="QFrame" name="RulerConfigPage3">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,67 +10,83 @@
     <height>103</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Settings</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QGroupBox" name="buttonGroup2" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
+    <widget class="QGroupBox" name="buttonGroup2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="title" >
+     <property name="title">
       <string> Angle constraint (unless disabled in template)</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="leftMargin">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <property name="spacing">
        <number>0</number>
       </property>
-      <item row="0" column="2" >
-       <widget class="QRadioButton" name="ruler_hor_rb" >
-        <property name="text" >
-         <string>Horizontal only</string>
+      <item row="0" column="2">
+       <widget class="QRadioButton" name="ruler_hor_rb">
+        <property name="text">
+         <string>Hori&amp;zontal only</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QRadioButton" name="ruler_any_angle_rb" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="ruler_any_angle_rb">
+        <property name="text">
          <string>Any angle</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QRadioButton" name="ruler_ortho_rb" >
-        <property name="text" >
+      <item row="0" column="1">
+       <widget class="QRadioButton" name="ruler_ortho_rb">
+        <property name="text">
          <string>Orthogonal</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QRadioButton" name="ruler_diag_rb" >
-        <property name="text" >
+      <item row="1" column="1">
+       <widget class="QRadioButton" name="ruler_diag_rb">
+        <property name="text">
          <string>Diagonal</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
-       <widget class="QRadioButton" name="ruler_vert_rb" >
-        <property name="text" >
+      <item row="1" column="2">
+       <widget class="QRadioButton" name="ruler_vert_rb">
+        <property name="text">
          <string>Vertical only</string>
         </property>
        </widget>
@@ -79,7 +96,7 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <tabstops>
   <tabstop>ruler_any_angle_rb</tabstop>
   <tabstop>ruler_ortho_rb</tabstop>
@@ -87,8 +104,6 @@
   <tabstop>ruler_hor_rb</tabstop>
   <tabstop>ruler_vert_rb</tabstop>
  </tabstops>
- <resources>
-  <include location="layResources.qrc" />
- </resources>
+ <resources/>
  <connections/>
 </ui>

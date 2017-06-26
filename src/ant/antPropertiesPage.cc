@@ -118,6 +118,14 @@ PropertiesPage::update ()
   y2->setText (tl::to_qstring (tl::micron_to_string (current ().p2 ().y ())));
   y2->setCursorPosition (0);
 
+  main_position->setCurrentIndex (current ().main_position ());
+  main_xalign->setCurrentIndex (current ().main_xalign ());
+  main_yalign->setCurrentIndex (current ().main_yalign ());
+  xlabel_xalign->setCurrentIndex (current ().xlabel_xalign ());
+  xlabel_yalign->setCurrentIndex (current ().xlabel_yalign ());
+  ylabel_xalign->setCurrentIndex (current ().ylabel_xalign ());
+  ylabel_yalign->setCurrentIndex (current ().ylabel_yalign ());
+
   double sx = (current ().p2 ().x () - current ().p1 ().x ());
   double sy = (current ().p2 ().y () - current ().p1 ().y ());
   dx->setText (tl::to_qstring (tl::micron_to_string (sx)));
@@ -161,6 +169,16 @@ PropertiesPage::apply ()
   Object::outline_type outline = Object::outline_type (outline_cb->currentIndex ());
 
   ant::Object ruler (db::DPoint (dx1, dy1), db::DPoint (dx2, dy2), current ().id (), fmt_x, fmt_y, fmt, style, outline, current ().snap (), current ().angle_constraint ());
+
+  ruler.set_main_position (Object::position_type (main_position->currentIndex ()));
+  ruler.set_main_xalign (Object::alignment_type (main_xalign->currentIndex ()));
+  ruler.set_main_yalign (Object::alignment_type (main_yalign->currentIndex ()));
+  ruler.set_xlabel_xalign (Object::alignment_type (xlabel_xalign->currentIndex ()));
+  ruler.set_xlabel_yalign (Object::alignment_type (xlabel_yalign->currentIndex ()));
+  ruler.set_ylabel_xalign (Object::alignment_type (ylabel_xalign->currentIndex ()));
+  ruler.set_ylabel_yalign (Object::alignment_type (ylabel_yalign->currentIndex ()));
+
+  ruler.set_category (current ().category ());
 
   mp_rulers->change_ruler (*m_pos, ruler);
 }

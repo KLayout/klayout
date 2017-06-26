@@ -53,6 +53,20 @@ static int angle_horizontal ()  { return int (lay::AC_Horizontal); }
 static int angle_vertical ()    { return int (lay::AC_Vertical); }
 static int angle_global ()      { return int (lay::AC_Global); }
 
+static int pos_auto ()          { return int (ant::Object::POS_auto); }
+static int pos_p1 ()            { return int (ant::Object::POS_p1); }
+static int pos_p2 ()            { return int (ant::Object::POS_p2); }
+static int pos_center ()        { return int (ant::Object::POS_center); }
+
+static int align_auto ()        { return int (ant::Object::AL_auto); }
+static int align_center ()      { return int (ant::Object::AL_center); }
+static int align_left ()        { return int (ant::Object::AL_left); }
+static int align_bottom ()      { return int (ant::Object::AL_bottom); }
+static int align_down ()        { return int (ant::Object::AL_down); }
+static int align_right ()       { return int (ant::Object::AL_right); }
+static int align_top ()         { return int (ant::Object::AL_top); }
+static int align_up ()          { return int (ant::Object::AL_up); }
+
 static void clear_annotations (lay::LayoutView *view);
 static void insert_annotation (lay::LayoutView *view, AnnotationRef *obj);
 static void erase_annotation (lay::LayoutView *view, int id);
@@ -221,6 +235,76 @@ static void set_angle_constraint (AnnotationRef *obj, int angle_constraint)
   obj->angle_constraint (lay::angle_constraint_type (angle_constraint));
 }
 
+static int get_main_position (const AnnotationRef *obj)
+{
+  return int (obj->main_position ());
+}
+
+static void set_main_position (AnnotationRef *obj, int pos)
+{
+  obj->set_main_position ((ant::Object::position_type) pos);
+}
+
+static int get_main_xalign (const AnnotationRef *obj)
+{
+  return int (obj->main_xalign ());
+}
+
+static void set_main_xalign (AnnotationRef *obj, int align)
+{
+  obj->set_main_xalign ((ant::Object::alignment_type) align);
+}
+
+static int get_main_yalign (const AnnotationRef *obj)
+{
+  return int (obj->main_yalign ());
+}
+
+static void set_main_yalign (AnnotationRef *obj, int align)
+{
+  obj->set_main_yalign ((ant::Object::alignment_type) align);
+}
+
+static int get_xlabel_xalign (const AnnotationRef *obj)
+{
+  return int (obj->xlabel_xalign ());
+}
+
+static void set_xlabel_xalign (AnnotationRef *obj, int align)
+{
+  obj->set_xlabel_xalign ((ant::Object::alignment_type) align);
+}
+
+static int get_xlabel_yalign (const AnnotationRef *obj)
+{
+  return int (obj->xlabel_yalign ());
+}
+
+static void set_xlabel_yalign (AnnotationRef *obj, int align)
+{
+  obj->set_xlabel_yalign ((ant::Object::alignment_type) align);
+}
+
+static int get_ylabel_xalign (const AnnotationRef *obj)
+{
+  return int (obj->ylabel_xalign ());
+}
+
+static void set_ylabel_xalign (AnnotationRef *obj, int align)
+{
+  obj->set_ylabel_xalign ((ant::Object::alignment_type) align);
+}
+
+static int get_ylabel_yalign (const AnnotationRef *obj)
+{
+  return int (obj->ylabel_yalign ());
+}
+
+static void set_ylabel_yalign (AnnotationRef *obj, int align)
+{
+  obj->set_ylabel_yalign ((ant::Object::alignment_type) align);
+}
+
 /**
  *  @brief An alternative iterator that returns "live" AnnotationRef objects
  */
@@ -383,6 +467,79 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "Annotation",
     "@brief Gets the global angle code for use with the \\angle_constraint method.\n"
     "This code will tell the ruler or marker to use the angle constraint defined globally."
   ) +
+  gsi::method ("PositionAuto", &gsi::pos_auto,
+    "@brief This code indicates automatic positioning.\n"
+    "The main label will be put either to p1 or p2, whichever the annotation considers best.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
+  gsi::method ("PositionP1", &gsi::pos_p1,
+    "@brief This code indicates positioning of the main label at p1.\n"
+    "The main label will be put to p1.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
+  gsi::method ("PositionP2", &gsi::pos_p2,
+    "@brief This code indicates positioning of the main label at p2.\n"
+    "The main label will be put to p2.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
+  gsi::method ("PositionCenter", &gsi::pos_center,
+    "@brief This code indicates positioning of the main label at the mid point between p1 and p2.\n"
+    "The main label will be put to the center point.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
+  gsi::method ("AlignAuto", &gsi::align_auto,
+    "@brief This code indicates automatic alignment.\n"
+    "This code makes the annotation align the label the way it thinks is best.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
+  gsi::method ("AlignCenter", &gsi::align_center,
+    "@brief This code indicates automatic alignment.\n"
+    "This code makes the annotation align the label centered. When used in a horizontal context, "
+    "centering is in horizontal direction. If used in a vertical context, centering is in vertical direction.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
+  gsi::method ("AlignLeft", &gsi::align_left,
+    "@brief This code indicates left alignment.\n"
+    "If used in a horizontal context, this alignment code makes the label aligned at the left side - i.e. it will appear right of the reference point.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
+  gsi::method ("AlignBottom", &gsi::align_bottom,
+    "@brief This code indicates bottom alignment.\n"
+    "If used in a vertical context, this alignment code makes the label aligned at the bottom side - i.e. it will appear top of the reference point.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
+  gsi::method ("AlignDown", &gsi::align_down,
+    "@brief This code indicates left or bottom alignment, depending on the context.\n"
+    "This code is equivalent to \\AlignLeft and \\AlignBottom.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
+  gsi::method ("AlignRight", &gsi::align_right,
+    "@brief This code indicates right alignment.\n"
+    "If used in a horizontal context, this alignment code makes the label aligned at the right side - i.e. it will appear left of the reference point.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
+  gsi::method ("AlignBottom", &gsi::align_top,
+    "@brief This code indicates top alignment.\n"
+    "If used in a vertical context, this alignment code makes the label aligned at the top side - i.e. it will appear bottom of the reference point.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
+  gsi::method ("AlignUp", &gsi::align_up,
+    "@brief This code indicates right or top alignment, depending on the context.\n"
+    "This code is equivalent to \\AlignRight and \\AlignTop.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
   gsi::method ("detach", &AnnotationRef::detach,
     "@brief Detaches the annotation object from the view\n"
     "If the annotation object was inserted into the view, property changes will be "
@@ -515,6 +672,103 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "Annotation",
   ) +
   gsi::method_ext ("outline", &gsi::get_outline,
     "@brief Returns the outline style of the annotation object\n"
+  ) +
+  gsi::method ("category=", &ant::Object::set_category, gsi::arg ("cat"),
+    "@brief Sets the category string of the annotation\n"
+    "The category string is an arbitrary string that can be used by various consumers "
+    "or generators to mark 'their' annotation.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method ("category", &ant::Object::category,
+    "@brief Gets the category string\n"
+    "See \\category= for details.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("main_position=", &gsi::set_main_position, gsi::arg ("pos"),
+    "@brief Sets the position of the main label\n"
+    "This method accepts one of the Position... constants.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("main_position", &gsi::get_main_position,
+    "@brief Gets the position of the main label\n"
+    "See \\main_position= for details.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("main_xalign=", &gsi::set_main_xalign, gsi::arg ("align"),
+    "@brief Sets the horizontal alignment type of the main label\n"
+    "This method accepts one of the Align... constants.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("main_xalign", &gsi::get_main_xalign,
+    "@brief Gets the horizontal alignment type of the main label\n"
+    "See \\main_xalign= for details.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("main_yalign=", &gsi::set_main_yalign, gsi::arg ("align"),
+    "@brief Sets the vertical alignment type of the main label\n"
+    "This method accepts one of the Align... constants.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("main_yalign", &gsi::get_main_yalign,
+    "@brief Gets the vertical alignment type of the main label\n"
+    "See \\main_yalign= for details.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("xlabel_xalign=", &gsi::set_xlabel_xalign, gsi::arg ("align"),
+    "@brief Sets the horizontal alignment type of the x axis label\n"
+    "This method accepts one of the Align... constants.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("xlabel_xalign", &gsi::get_xlabel_xalign,
+    "@brief Gets the horizontal alignment type of the x axis label\n"
+    "See \\xlabel_xalign= for details.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("xlabel_yalign=", &gsi::set_xlabel_yalign, gsi::arg ("align"),
+    "@brief Sets the vertical alignment type of the x axis label\n"
+    "This method accepts one of the Align... constants.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("xlabel_yalign", &gsi::get_xlabel_yalign,
+    "@brief Gets the vertical alignment type of the x axis label\n"
+    "See \\xlabel_yalign= for details.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("ylabel_xalign=", &gsi::set_ylabel_xalign, gsi::arg ("align"),
+    "@brief Sets the horizontal alignment type of the y axis label\n"
+    "This method accepts one of the Align... constants.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("ylabel_xalign", &gsi::get_ylabel_xalign,
+    "@brief Gets the horizontal alignment type of the y axis label\n"
+    "See \\ylabel_xalign= for details.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("ylabel_yalign=", &gsi::set_ylabel_yalign, gsi::arg ("align"),
+    "@brief Sets the vertical alignment type of the y axis label\n"
+    "This method accepts one of the Align... constants.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
+  ) +
+  gsi::method_ext ("ylabel_yalign", &gsi::get_ylabel_yalign,
+    "@brief Gets the vertical alignment type of the y axis label\n"
+    "See \\ylabel_yalign= for details.\n"
+    "\n"
+    "This method has been introduced in version 0.25"
   ) +
   gsi::method ("snap=", (void (AnnotationRef::*) (bool)) &AnnotationRef::snap,
     "@brief Sets the 'snap to objects' attribute\n"

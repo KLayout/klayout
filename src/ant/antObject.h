@@ -58,9 +58,13 @@ public:
    *  STY_arrow_end: a line with an arrow at the end
    *  STY_arrow_start: a line with a arrow at the start
    *  STY_arrow_both: a line with an arrow at both ends
+   *  STY_cross_end: a cross at the end
+   *  STY_cross_start: a cross at the start
+   *  STY_cross_both: a cross at both ends
    *  STY_line: a simple line
+   *  STY_none: used internally
    */
-  enum style_type { STY_ruler, STY_arrow_end, STY_arrow_start, STY_arrow_both, STY_line };
+  enum style_type { STY_ruler = 0, STY_arrow_end = 1, STY_arrow_start = 2, STY_arrow_both = 3, STY_line = 4, STY_cross_end = 5, STY_cross_start = 6, STY_cross_both = 7, STY_none = 8 };
 
   /**
    *  @brief The outline modes
@@ -71,273 +75,59 @@ public:
    *  OL_yx: connecting start and end point, vertical first then horizontal
    *  OL_diag_yx: both OL_diag and OL_yx
    *  OL_box: draw a box defined by start and end point
+   *  OL_ellipse: draws an ellipse with p1 and p2 defining the extension (style is ignored)
    */
-  enum outline_type { OL_diag, OL_xy, OL_diag_xy, OL_yx, OL_diag_yx, OL_box };
+  enum outline_type { OL_diag = 0, OL_xy = 1, OL_diag_xy = 2, OL_yx = 3, OL_diag_yx = 4, OL_box = 5, OL_ellipse = 6 };
 
+  /**
+   *  @brief The position type of the main label
+   *
+   *  POS_auto: automatic
+   *  POS_p1: at P1
+   *  POS_p2: at P2
+   *  POS_center: at mid point between P1 and P2
+   */
+  enum position_type { POS_auto = 0, POS_p1 = 1, POS_p2 = 2, POS_center = 3 };
+
+  /**
+   *  @brief The alignment type
+   *
+   *  AL_auto: automatic
+   *  AL_center: centered
+   *  AL_left, AL_bottom, AL_down: left or bottom
+   *  AL_right, AL_top, AL_up: right or top
+   */
+  enum alignment_type { AL_auto = 0, AL_center = 1, AL_down = 2, AL_left = 2, AL_bottom = 2, AL_up = 3, AL_right = 3, AL_top = 3 };
+
+  /**
+   *  @brief Default constructor
+   */
   Object ();
 
+  /**
+   *  @brief Parametrized constructor
+   */
   Object (const db::DPoint &p1, const db::DPoint &p2, int id, const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraint);
 
+  /**
+   *  @brief Parametrized constructor from a template
+   */
   Object (const db::DPoint &p1, const db::DPoint &p2, int id, const ant::Template &d);
 
+  /**
+   *  @brief Copy constructor
+   */
   Object (const ant::Object &d);
 
+  /**
+   *  @brief Assignment
+   */
   Object &operator= (const ant::Object &d);
 
-  virtual bool equals (const db::DUserObjectBase *d) const;
-
-  virtual bool less (const db::DUserObjectBase *d) const;
-
-  virtual unsigned int class_id () const;
-
-  virtual db::DUserObjectBase *clone () const;
-
-  virtual db::DBox box () const;
-
-  void transform (const db::ICplxTrans &t)
-  {
-    transform (db::DCplxTrans (t));
-    property_changed ();
-  }
-
-  virtual void transform (const db::DCplxTrans &t)
-  {
-    *this = ant::Object (t * m_p1, t * m_p2, m_id, m_fmt_x, m_fmt_y, m_fmt, m_style, m_outline, m_snap, m_angle_constraint);
-    property_changed ();
-  }
-
-  virtual void transform (const db::DTrans &t)
-  {
-    *this = ant::Object (t * m_p1, t * m_p2, m_id, m_fmt_x, m_fmt_y, m_fmt, m_style, m_outline, m_snap, m_angle_constraint);
-    property_changed ();
-  }
-
-  virtual void transform (const db::DFTrans &t)
-  {
-    *this = ant::Object (t * m_p1, t * m_p2, m_id, m_fmt_x, m_fmt_y, m_fmt, m_style, m_outline, m_snap, m_angle_constraint);
-    property_changed ();
-  }
-
-  template <class Trans>
-  ant::Object transformed (const Trans &t) const
-  {
-    ant::Object obj (*this);
-    obj.transform (t);
-    return obj;
-  }
-
-  Object &move (const db::DVector &p)
-  {
-    m_p1 += p;
-    m_p2 += p;
-    return *this;
-  }
-
-  Object moved (const db::DVector &p) const
-  {
-    ant::Object d (*this);
-    d.move (p);
-    return d;
-  }
-
-  const db::DPoint &p1 () const
-  {
-    return m_p1;
-  }
-
-  const db::DPoint &p2 () const
-  {
-    return m_p2;
-  }
-
-  void p1 (const db::DPoint &p)
-  {
-    if (!m_p1.equal (p)) {
-      m_p1 = p;
-      property_changed ();
-    }
-  }
-
-  void p2 (const db::DPoint &p)
-  {
-    if (!m_p2.equal (p)) {
-      m_p2 = p;
-      property_changed ();
-    }
-  }
-
-  int id () const
-  {
-    return m_id;
-  }
-
-  void id (int _id) 
-  {
-    m_id = _id;
-  }
-
-  const std::string &fmt () const
-  {
-    return m_fmt;
-  }
-
-  void fmt (const std::string &s)
-  {
-    if (m_fmt != s) {
-      m_fmt = s;
-      property_changed ();
-    }
-  }
-
-  const std::string &fmt_x () const
-  {
-    return m_fmt_x;
-  }
-
-  void fmt_x (const std::string &s)
-  {
-    if (m_fmt_x != s) {
-      m_fmt_x = s;
-      property_changed ();
-    }
-  }
-
-  const std::string &fmt_y () const
-  {
-    return m_fmt_y;
-  }
-
-  void fmt_y (const std::string &s)
-  {
-    if (m_fmt_y != s) {
-      m_fmt_y = s;
-      property_changed ();
-    }
-  }
-
-  style_type style () const
-  {
-    return m_style;
-  }
-
-  void style (style_type s) 
-  {
-    if (m_style != s) {
-      m_style = s;
-      property_changed ();
-    }
-  }
-
-  outline_type outline () const
-  {
-    return m_outline;
-  }
-
-  void outline (outline_type s) 
-  {
-    if (m_outline != s) {
-      m_outline = s;
-      property_changed ();
-    }
-  }
-
   /**
-   *  @brief Angle constraint flag read accessor
-   */ 
-  bool snap () const
-  {
-    return m_snap;
-  }
-  
-  /**
-   *  @brief Snap flag write accessor
-   * 
-   *  The snap flag controls whether snapping to objects (edges and vertices)
-   *  is active when this template is selected.
+   *  @brief Less operator
    */
-  void snap (bool s)
-  {
-    if (m_snap != s) {
-      m_snap = s;
-      property_changed ();
-    }
-  }
-
-  /**
-   *  @brief Angle constraint read accessor
-   */ 
-  lay::angle_constraint_type angle_constraint () const
-  {
-    return m_angle_constraint;
-  }
-  
-  /**
-   *  @brief Angle constraint write accessor
-   * 
-   *  The angle constraint flag controls which angle constraint is to be used 
-   *  for this ruler or the global setting should be used
-   *  (if ant::Service::Global is used for the angle constraint).
-   */
-  void angle_constraint (lay::angle_constraint_type a)
-  {
-    if (m_angle_constraint != a) {
-      m_angle_constraint = a;
-      property_changed ();
-    }
-  }
-  
   bool operator< (const ant::Object &b) const;
-
-  /**
-   *  @brief Obtain the formatted text for the x label
-   */
-  std::string text_x () const
-  {
-    return formatted (m_fmt_x, db::DFTrans ());
-  }
-
-  /**
-   *  @brief Obtain the formatted text for the y label
-   */
-  std::string text_y () const
-  {
-    return formatted (m_fmt_y, db::DFTrans ());
-  }
-
-  /**
-   *  @brief Obtain the formatted text for the main label
-   */
-  std::string text () const
-  {
-    return formatted (m_fmt, db::DFTrans ());
-  }
-
-  /**
-   *  @brief Obtain the formatted text for the x label
-   *  @param t The transformation to apply to the vector before producing the text
-   */
-  std::string text_x (const db::DFTrans &t) const
-  {
-    return formatted (m_fmt_x, t);
-  }
-
-  /**
-   *  @brief Obtain the formatted text for the y label
-   *  @param t The transformation to apply to the vector before producing the text
-   */
-  std::string text_y (const db::DFTrans &t) const
-  {
-    return formatted (m_fmt_y, t);
-  }
-
-  /**
-   *  @brief Obtain the formatted text for the main label
-   *  @param t The transformation to apply to the vector before producing the text
-   */
-  std::string text (const db::DFTrans &t) const
-  {
-    return formatted (m_fmt, t);
-  }
 
   /**
    *  @brief Equality
@@ -353,12 +143,534 @@ public:
   }
 
   /**
-   *  @brief The class name for the generic user object factory 
+   *  @brief Equality check
+   *  This is the generic equality that involves an other object
+   *  of any kind.
+   */
+  virtual bool equals (const db::DUserObjectBase *d) const;
+
+  /**
+   *  @brief Less criterion
+   *  This is the generic equality that involves an other object
+   *  of any kind.
+   */
+  virtual bool less (const db::DUserObjectBase *d) const;
+
+  /**
+   *  @brief Gets the user object class ID
+   */
+  virtual unsigned int class_id () const;
+
+  /**
+   *  @brief Clones the user object
+   */
+  virtual db::DUserObjectBase *clone () const;
+
+  /**
+   *  @brief Returns the bounding box of the object
+   */
+  virtual db::DBox box () const;
+
+  /**
+   *  @brief Transforms the object (in place)
+   */
+  void transform (const db::ICplxTrans &t)
+  {
+    transform (db::DCplxTrans (t));
+    property_changed ();
+  }
+
+  /**
+   *  @brief Transforms the object (in place)
+   */
+  virtual void transform (const db::DCplxTrans &t)
+  {
+    *this = ant::Object (t * m_p1, t * m_p2, m_id, m_fmt_x, m_fmt_y, m_fmt, m_style, m_outline, m_snap, m_angle_constraint);
+    property_changed ();
+  }
+
+  /**
+   *  @brief Transforms the object (in place)
+   */
+  virtual void transform (const db::DTrans &t)
+  {
+    *this = ant::Object (t * m_p1, t * m_p2, m_id, m_fmt_x, m_fmt_y, m_fmt, m_style, m_outline, m_snap, m_angle_constraint);
+    property_changed ();
+  }
+
+  /**
+   *  @brief Transforms the object (in place)
+   */
+  virtual void transform (const db::DFTrans &t)
+  {
+    *this = ant::Object (t * m_p1, t * m_p2, m_id, m_fmt_x, m_fmt_y, m_fmt, m_style, m_outline, m_snap, m_angle_constraint);
+    property_changed ();
+  }
+
+  /**
+   *  @brief Returns the transformed object
+   */
+  template <class Trans>
+  ant::Object transformed (const Trans &t) const
+  {
+    ant::Object obj (*this);
+    obj.transform (t);
+    return obj;
+  }
+
+  /**
+   *  @brief Moves the object by the given distance
+   */
+  Object &move (const db::DVector &p)
+  {
+    m_p1 += p;
+    m_p2 += p;
+    return *this;
+  }
+
+  /**
+   *  @brief Returns the moved object
+   */
+  Object moved (const db::DVector &p) const
+  {
+    ant::Object d (*this);
+    d.move (p);
+    return d;
+  }
+
+  /**
+   *  @brief Gets the category string
+   *  The category string is an arbitrary string that can be used to identify an annotation for
+   *  a particular purpose.
+   */
+
+  const std::string &category () const
+  {
+    return m_category;
+  }
+
+  /**
+   *  @brief Sets the category string
+   *  See \category for a description of this attribute.
+   */
+  void set_category (const std::string &cat)
+  {
+    if (m_category != cat) {
+      m_category = cat;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the first definition point
+   */
+  const db::DPoint &p1 () const
+  {
+    return m_p1;
+  }
+
+  /**
+   *  @brief Gets the second definition point
+   */
+  const db::DPoint &p2 () const
+  {
+    return m_p2;
+  }
+
+  /**
+   *  @brief Sets the first definition point
+   */
+  void p1 (const db::DPoint &p)
+  {
+    if (!m_p1.equal (p)) {
+      m_p1 = p;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Sets the second definition point
+   */
+  void p2 (const db::DPoint &p)
+  {
+    if (!m_p2.equal (p)) {
+      m_p2 = p;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the ID of the annotation object
+   *  The ID is a unique identifier for the annotation object. The ID is used
+   *  by the layout view to identify the object.
+   */
+  int id () const
+  {
+    return m_id;
+  }
+
+  /**
+   *  @brief Sets the ID of the annotation object
+   *  This method is provided for use by the layout view.
+   */
+  void id (int _id)
+  {
+    m_id = _id;
+  }
+
+  /**
+   *  @brief Sets the main format string
+   *  The central label is placed either at the first or the second point.
+   *  \main_position, \main_xalign, \main_yalign control how the
+   *  main label is positioned.
+   */
+  const std::string &fmt () const
+  {
+    return m_fmt;
+  }
+
+  /**
+   *  @brief Sets the main format string
+   *  See \fmt for details.
+   */
+  void fmt (const std::string &s)
+  {
+    if (m_fmt != s) {
+      m_fmt = s;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Sets the position of the main label
+   *  See the \position_type enum for details.
+   */
+  void set_main_position (position_type pos)
+  {
+    if (m_main_position != pos) {
+      m_main_position = pos;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the position of the main label
+   */
+  position_type main_position () const
+  {
+    return m_main_position;
+  }
+
+  /**
+   *  @brief Sets the x alignment flag of the main label
+   *  See \alignment_type for details.
+   */
+  void set_main_xalign (alignment_type a)
+  {
+    if (m_main_xalign != a) {
+      m_main_xalign = a;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the x alignment flag of the main label
+   */
+  alignment_type main_xalign () const
+  {
+    return m_main_xalign;
+  }
+
+  /**
+   *  @brief Sets the y alignment flag of the main label
+   *  See \alignment_type for details.
+   */
+  void set_main_yalign (alignment_type a)
+  {
+    if (m_main_yalign != a) {
+      m_main_yalign = a;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the y alignment flag of the main label
+   */
+  alignment_type main_yalign () const
+  {
+    return m_main_yalign;
+  }
+
+  /**
+   *  @brief Gets the x label format string
+   *  The x label is drawn at the x axis for styles that support a x axis.
+   *  \xlabel_xalign and \xlabel_yalign control how the x label is
+   *  positioned.
+   */
+  const std::string &fmt_x () const
+  {
+    return m_fmt_x;
+  }
+
+  /**
+   *  @brief Gets the x label format string
+   *  See \fmt_x for a description of this attribute.
+   */
+  void fmt_x (const std::string &s)
+  {
+    if (m_fmt_x != s) {
+      m_fmt_x = s;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Sets the x alignment flag of the x axis label
+   *  See \alignment_type for details.
+   */
+  void set_xlabel_xalign (alignment_type a)
+  {
+    if (m_xlabel_xalign != a) {
+      m_xlabel_xalign = a;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the x alignment flag of the x axis label
+   */
+  alignment_type xlabel_xalign () const
+  {
+    return m_xlabel_xalign;
+  }
+
+  /**
+   *  @brief Sets the y alignment flag of the x axis label
+   *  See \alignment_type for details.
+   */
+  void set_xlabel_yalign (alignment_type a)
+  {
+    if (m_xlabel_yalign != a) {
+      m_xlabel_yalign = a;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the y alignment flag of the x axis label
+   */
+  alignment_type xlabel_yalign () const
+  {
+    return m_xlabel_yalign;
+  }
+
+  /**
+   *  @brief Gets the y label format string
+   *  The y label is drawn at the y axis for styles that support a y axis.
+   *  \ylabel_xalign and \ylabel_yalign control how the y label is
+   *  positioned.
+   */
+  const std::string &fmt_y () const
+  {
+    return m_fmt_y;
+  }
+
+  /**
+   *  @brief Gets the y label format string
+   *  See \fmt_y for a description of this attribute.
+   */
+  void fmt_y (const std::string &s)
+  {
+    if (m_fmt_y != s) {
+      m_fmt_y = s;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Sets the x alignment flag of the y axis label
+   *  See \alignment_type for details.
+   */
+  void set_ylabel_xalign (alignment_type a)
+  {
+    if (m_ylabel_xalign != a) {
+      m_ylabel_xalign = a;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the x alignment flag of the y axis label
+   */
+  alignment_type ylabel_xalign () const
+  {
+    return m_ylabel_xalign;
+  }
+
+  /**
+   *  @brief Sets the y alignment flag of the y axis label
+   *  See \alignment_type for details.
+   */
+  void set_ylabel_yalign (alignment_type a)
+  {
+    if (m_ylabel_yalign != a) {
+      m_ylabel_yalign = a;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the y alignment flag of the y axis label
+   */
+  alignment_type ylabel_yalign () const
+  {
+    return m_ylabel_yalign;
+  }
+
+  /**
+   *  @brief Sets the style
+   *  See \style_type enum for the various styles available.
+   */
+  style_type style () const
+  {
+    return m_style;
+  }
+
+  /**
+   *  @brief Gets the style
+   */
+  void style (style_type s)
+  {
+    if (m_style != s) {
+      m_style = s;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Sets the outline type
+   *  See \outline_type enum for the various outline types available.
+   */
+  outline_type outline () const
+  {
+    return m_outline;
+  }
+
+  /**
+   *  @brief Gets the outline type
+   */
+  void outline (outline_type s) 
+  {
+    if (m_outline != s) {
+      m_outline = s;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the snap mode
+   *  See \snap for details about this attribute
+   */ 
+  bool snap () const
+  {
+    return m_snap;
+  }
+  
+  /**
+   *  @brief Sets snap mode
+   * 
+   *  The snap flag controls whether snapping to objects (edges and vertices)
+   *  is active when this template is selected.
+   */
+  void snap (bool s)
+  {
+    if (m_snap != s) {
+      m_snap = s;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the angle constraint
+   */ 
+  lay::angle_constraint_type angle_constraint () const
+  {
+    return m_angle_constraint;
+  }
+  
+  /**
+   *  @brief Sets the angle constraint
+   * 
+   *  The angle constraint flag controls which angle constraint is to be used 
+   *  for this ruler or the global setting should be used
+   *  (if ant::Service::Global is used for the angle constraint).
+   */
+  void angle_constraint (lay::angle_constraint_type a)
+  {
+    if (m_angle_constraint != a) {
+      m_angle_constraint = a;
+      property_changed ();
+    }
+  }
+
+  /**
+   *  @brief Gets the formatted text for the x label
+   */
+  std::string text_x () const
+  {
+    return formatted (m_fmt_x, db::DFTrans ());
+  }
+
+  /**
+   *  @brief Gets the formatted text for the y label
+   */
+  std::string text_y () const
+  {
+    return formatted (m_fmt_y, db::DFTrans ());
+  }
+
+  /**
+   *  @brief Gets the formatted text for the main label
+   */
+  std::string text () const
+  {
+    return formatted (m_fmt, db::DFTrans ());
+  }
+
+  /**
+   *  @brief Gets the formatted text for the x label
+   *  @param t The transformation to apply to the vector before producing the text
+   */
+  std::string text_x (const db::DFTrans &t) const
+  {
+    return formatted (m_fmt_x, t);
+  }
+
+  /**
+   *  @brief Gets the formatted text for the y label
+   *  @param t The transformation to apply to the vector before producing the text
+   */
+  std::string text_y (const db::DFTrans &t) const
+  {
+    return formatted (m_fmt_y, t);
+  }
+
+  /**
+   *  @brief Gets the formatted text for the main label
+   *  @param t The transformation to apply to the vector before producing the text
+   */
+  std::string text (const db::DFTrans &t) const
+  {
+    return formatted (m_fmt, t);
+  }
+
+  /**
+   *  @brief Gets the class name for the generic user object factory
    */
   virtual const char *class_name () const;
 
   /**
-   *  @brief Fill from a string
+   *  @brief Initializes the object from a string
    *
    *  This method needs to be implemented mainly if the object is to be created from the
    *  generic factory.
@@ -366,7 +678,7 @@ public:
   virtual void from_string (const char *);
 
   /**
-   *  @brief Convert to a string
+   *  @brief Converts the object to a string
    *
    *  This method needs to be implemented mainly if the object is to be created from the
    *  generic factory.
@@ -374,7 +686,7 @@ public:
   virtual std::string to_string () const;
 
   /**
-   *  @brief Return the memory used in bytes
+   *  @brief Returns the memory used in bytes
    */
   virtual size_t mem_used () const 
   {
@@ -382,7 +694,7 @@ public:
   }
 
   /**
-   *  @brief Return the memory required in bytes
+   *  @brief Returns the memory required in bytes
    */
   virtual size_t mem_reqd () const 
   {
@@ -405,6 +717,11 @@ private:
   outline_type m_outline;
   bool m_snap;
   lay::angle_constraint_type m_angle_constraint;
+  std::string m_category;
+  position_type m_main_position;
+  alignment_type m_main_xalign, m_main_yalign;
+  alignment_type m_xlabel_xalign, m_xlabel_yalign;
+  alignment_type m_ylabel_xalign, m_ylabel_yalign;
 
   std::string formatted (const std::string &fmt, const db::DFTrans &trans) const;
 };

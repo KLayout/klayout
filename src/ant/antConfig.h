@@ -69,7 +69,19 @@ struct OutlineConverter
   void from_string (const std::string &s, ant::Object::outline_type &outline);
 };
 
-struct TemplatesConverter 
+struct PositionConverter
+{
+  std::string to_string (ant::Object::position_type p);
+  void from_string (const std::string &s, ant::Object::position_type &pos);
+};
+
+struct AlignmentConverter
+{
+  std::string to_string (ant::Object::alignment_type a);
+  void from_string (const std::string &s, ant::Object::alignment_type &a);
+};
+
+struct TemplatesConverter
 {
   std::string to_string (const std::vector <ant::Template> &t);
   void from_string (const std::string &s, std::vector <ant::Template> &t);

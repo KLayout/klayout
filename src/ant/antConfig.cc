@@ -81,6 +81,12 @@ StyleConverter::to_string (ant::Object::style_type s)
     return "arrow_start";
   } else if (s == ant::Object::STY_arrow_both) {
     return "arrow_both";
+  } else if (s == ant::Object::STY_cross_start) {
+    return "cross_start";
+  } else if (s == ant::Object::STY_cross_end) {
+    return "cross_end";
+  } else if (s == ant::Object::STY_cross_both) {
+    return "cross_both";
   } else if (s == ant::Object::STY_line) {
     return "line";
   } else {
@@ -100,6 +106,12 @@ StyleConverter::from_string (const std::string &tt, ant::Object::style_type &s)
     s = ant::Object::STY_arrow_start;
   } else if (t == "arrow_both") {
     s = ant::Object::STY_arrow_both;
+  } else if (t == "cross_start") {
+    s = ant::Object::STY_cross_start;
+  } else if (t == "cross_end") {
+    s = ant::Object::STY_cross_end;
+  } else if (t == "cross_both") {
+    s = ant::Object::STY_cross_both;
   } else if (t == "line") {
     s = ant::Object::STY_line;
   } else {
@@ -122,6 +134,8 @@ OutlineConverter::to_string (ant::Object::outline_type o)
     return "diag_yx";
   } else if (o == ant::Object::OL_box) {
     return "box";
+  } else if (o == ant::Object::OL_ellipse) {
+    return "ellipse";
   } else {
     return "";
   }
@@ -143,12 +157,80 @@ OutlineConverter::from_string (const std::string &s, ant::Object::outline_type &
     o = ant::Object::OL_diag_yx;
   } else if (t == "box") {
     o = ant::Object::OL_box;
+  } else if (t == "ellipse") {
+    o = ant::Object::OL_ellipse;
   } else {
     o = ant::Object::OL_diag;
   }
 }
 
-std::string 
+std::string
+PositionConverter::to_string (ant::Object::position_type p)
+{
+  if (p == ant::Object::POS_auto) {
+    return "auto";
+  } else if (p == ant::Object::POS_p1) {
+    return "p1";
+  } else if (p == ant::Object::POS_p2) {
+    return "p2";
+  } else if (p == ant::Object::POS_center) {
+    return "center";
+  } else {
+    return "";
+  }
+}
+
+void
+PositionConverter::from_string (const std::string &s, ant::Object::position_type &p)
+{
+  std::string t (tl::trim (s));
+  if (t == "auto") {
+    p = ant::Object::POS_auto;
+  } else if (t == "p1") {
+    p = ant::Object::POS_p1;
+  } else if (t == "p2") {
+    p = ant::Object::POS_p2;
+  } else if (t == "center") {
+    p = ant::Object::POS_center;
+  } else {
+    p = ant::Object::POS_auto;
+  }
+}
+
+std::string
+AlignmentConverter::to_string (ant::Object::alignment_type a)
+{
+  if (a == ant::Object::AL_auto) {
+    return "auto";
+  } else if (a == ant::Object::AL_center) {
+    return "center";
+  } else if (a == ant::Object::AL_down) {
+    return "down";
+  } else if (a == ant::Object::AL_up) {
+    return "up";
+  } else {
+    return "";
+  }
+}
+
+void
+AlignmentConverter::from_string (const std::string &s, ant::Object::alignment_type &a)
+{
+  std::string t (tl::trim (s));
+  if (t == "auto") {
+    a = ant::Object::AL_auto;
+  } else if (t == "center") {
+    a = ant::Object::AL_center;
+  } else if (t == "down") {
+    a = ant::Object::AL_down;
+  } else if (t == "up") {
+    a = ant::Object::AL_up;
+  } else {
+    a = ant::Object::AL_auto;
+  }
+}
+
+std::string
 TemplatesConverter::to_string (const std::vector <ant::Template> &t)
 {
   return ant::Template::to_string (t);

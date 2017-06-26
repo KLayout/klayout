@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>RulerConfigPage</class>
- <widget class="QFrame" name="RulerConfigPage" >
-  <property name="geometry" >
+ <widget class="QFrame" name="RulerConfigPage">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,120 +10,141 @@
     <height>191</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Settings</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Snapping</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="leftMargin">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="0" column="0" >
-       <widget class="QCheckBox" name="ruler_grid_snap_cbx" >
-        <property name="toolTip" >
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="ruler_grid_snap_cbx">
+        <property name="toolTip">
          <string>If checked, all coordinates are snapped to the global grid</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Snap to grid</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QCheckBox" name="ruler_obj_snap_cbx" >
-        <property name="toolTip" >
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="ruler_obj_snap_cbx">
+        <property name="toolTip">
          <string>If checked, all positions are snapped to edges and vertices in the vicinity unless this feature is disabled in the template</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Snap to edge / vertex (unless disabled in template)</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
-       <widget class="QFrame" name="frame" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>5</vsizetype>
+      <item row="3" column="0">
+       <widget class="QFrame" name="frame">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="frameShadow" >
+        <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QHBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
-          <widget class="QLabel" name="textLabel1_2" >
-           <property name="text" >
+          <widget class="QLabel" name="textLabel1_2">
+           <property name="text">
             <string>Snap range</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="ruler_snap_range_edit" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>5</hsizetype>
-             <vsizetype>0</vsizetype>
+          <widget class="QLineEdit" name="ruler_snap_range_edit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="minimumSize" >
+           <property name="minimumSize">
             <size>
              <width>0</width>
              <height>0</height>
             </size>
            </property>
-           <property name="toolTip" >
+           <property name="toolTip">
             <string>The range around the current cursor location which is searched for edges or vertices to snap to</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="textLabel2" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>5</hsizetype>
-             <vsizetype>5</vsizetype>
+          <widget class="QLabel" name="textLabel2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>pixel</string>
            </property>
           </widget>
          </item>
          <item>
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeType" >
+           <property name="sizeType">
             <enum>QSizePolicy::Expanding</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>111</width>
              <height>21</height>
@@ -133,15 +155,15 @@
         </layout>
        </widget>
       </item>
-      <item row="2" column="0" >
+      <item row="2" column="0">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>597</width>
           <height>10</height>
@@ -154,9 +176,7 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
- <resources>
-  <include location="layResources.qrc" />
- </resources>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
  <connections/>
 </ui>

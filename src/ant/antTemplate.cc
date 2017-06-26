@@ -34,7 +34,11 @@ Template::Template ()
   : m_title (tl::to_string (QObject::tr ("Ruler"))),
     m_fmt_x ("$X"), m_fmt_y ("$Y"), m_fmt ("$D"),
     m_style (ant::Object::STY_ruler), m_outline (ant::Object::OL_diag),
-    m_snap (true), m_angle_constraint (lay::AC_Global)
+    m_snap (true), m_angle_constraint (lay::AC_Global),
+    m_main_position (ant::Object::POS_auto),
+    m_main_xalign (ant::Object::AL_auto), m_main_yalign (ant::Object::AL_auto),
+    m_xlabel_xalign (ant::Object::AL_auto), m_xlabel_yalign (ant::Object::AL_auto),
+    m_ylabel_xalign (ant::Object::AL_auto), m_ylabel_yalign (ant::Object::AL_auto)
 {
   //  .. nothing yet ..
 }
@@ -45,7 +49,11 @@ Template::Template (const std::string &title,
   : m_title (title),
     m_fmt_x (fmt_x), m_fmt_y (fmt_y), m_fmt (fmt),
     m_style (style), m_outline (outline),
-    m_snap (snap), m_angle_constraint (angle_constraint)
+    m_snap (snap), m_angle_constraint (angle_constraint),
+    m_main_position (ant::Object::POS_auto),
+    m_main_xalign (ant::Object::AL_auto), m_main_yalign (ant::Object::AL_auto),
+    m_xlabel_xalign (ant::Object::AL_auto), m_xlabel_yalign (ant::Object::AL_auto),
+    m_ylabel_xalign (ant::Object::AL_auto), m_ylabel_yalign (ant::Object::AL_auto)
 {
   //  .. nothing else ..
 }
@@ -54,7 +62,11 @@ Template::Template (const ant::Template &d)
   : m_title (d.m_title),
     m_fmt_x (d.m_fmt_x), m_fmt_y (d.m_fmt_y), m_fmt (d.m_fmt),
     m_style (d.m_style), m_outline (d.m_outline),
-    m_snap (d.m_snap), m_angle_constraint (d.m_angle_constraint)
+    m_snap (d.m_snap), m_angle_constraint (d.m_angle_constraint),
+    m_main_position (d.m_main_position),
+    m_main_xalign (d.m_main_xalign), m_main_yalign (d.m_main_yalign),
+    m_xlabel_xalign (d.m_xlabel_xalign), m_xlabel_yalign (d.m_xlabel_yalign),
+    m_ylabel_xalign (d.m_ylabel_xalign), m_ylabel_yalign (d.m_ylabel_yalign)
 {
   //  .. nothing else ..
 }
@@ -71,6 +83,13 @@ Template::operator= (const ant::Template &d)
     m_outline = d.m_outline;
     m_snap = d.m_snap;
     m_angle_constraint = d.m_angle_constraint;
+    m_main_position = d.m_main_position;
+    m_main_xalign = d.m_main_xalign;
+    m_main_yalign = d.m_main_yalign;
+    m_xlabel_xalign = d.m_xlabel_xalign;
+    m_xlabel_yalign = d.m_xlabel_yalign;
+    m_ylabel_xalign = d.m_ylabel_xalign;
+    m_ylabel_yalign = d.m_ylabel_yalign;
   }
   return *this;
 }
@@ -116,6 +135,76 @@ Template::from_string (const std::string &s)
           std::string s;
           ex.read_word_or_quoted (s);
           r.back ().fmt_y (s);
+          ex.test (",");
+
+        } else if (ex.test ("position=")) {
+
+          std::string s;
+          ex.read_word (s);
+          ant::PositionConverter pc;
+          ant::Object::position_type pos;
+          pc.from_string (s, pos);
+          r.back ().set_main_position (pos);
+          ex.test (",");
+
+        } else if (ex.test ("xalign=")) {
+
+          std::string s;
+          ex.read_word (s);
+          ant::AlignmentConverter ac;
+          ant::Object::alignment_type a;
+          ac.from_string (s, a);
+          r.back ().set_main_xalign (a);
+          ex.test (",");
+
+        } else if (ex.test ("yalign=")) {
+
+          std::string s;
+          ex.read_word (s);
+          ant::AlignmentConverter ac;
+          ant::Object::alignment_type a;
+          ac.from_string (s, a);
+          r.back ().set_main_yalign (a);
+          ex.test (",");
+
+        } else if (ex.test ("xlabel_xalign=")) {
+
+          std::string s;
+          ex.read_word (s);
+          ant::AlignmentConverter ac;
+          ant::Object::alignment_type a;
+          ac.from_string (s, a);
+          r.back ().set_xlabel_xalign (a);
+          ex.test (",");
+
+        } else if (ex.test ("xlabel_yalign=")) {
+
+          std::string s;
+          ex.read_word (s);
+          ant::AlignmentConverter ac;
+          ant::Object::alignment_type a;
+          ac.from_string (s, a);
+          r.back ().set_xlabel_yalign (a);
+          ex.test (",");
+
+        } else if (ex.test ("ylabel_xalign=")) {
+
+          std::string s;
+          ex.read_word (s);
+          ant::AlignmentConverter ac;
+          ant::Object::alignment_type a;
+          ac.from_string (s, a);
+          r.back ().set_ylabel_xalign (a);
+          ex.test (",");
+
+        } else if (ex.test ("ylabel_yalign=")) {
+
+          std::string s;
+          ex.read_word (s);
+          ant::AlignmentConverter ac;
+          ant::Object::alignment_type a;
+          ac.from_string (s, a);
+          r.back ().set_ylabel_yalign (a);
           ex.test (",");
 
         } else if (ex.test ("style=")) {
@@ -200,6 +289,31 @@ Template::to_string (const std::vector<Template> &v)
     r += tl::to_word_or_quoted_string (t->fmt_y ());
     r += ",";
     
+    r += "pos=";
+    ant::PositionConverter pc;
+    r += pc.to_string (t->main_position ());
+    r += ",";
+
+    ant::AlignmentConverter ac;
+    r += "xalign=";
+    r += ac.to_string (t->main_xalign ());
+    r += ",";
+    r += "yalign=";
+    r += ac.to_string (t->main_yalign ());
+    r += ",";
+    r += "xlabel_xalign=";
+    r += ac.to_string (t->xlabel_xalign ());
+    r += ",";
+    r += "xlabel_yalign=";
+    r += ac.to_string (t->xlabel_yalign ());
+    r += ",";
+    r += "ylabel_xalign=";
+    r += ac.to_string (t->ylabel_xalign ());
+    r += ",";
+    r += "ylabel_yalign=";
+    r += ac.to_string (t->ylabel_yalign ());
+    r += ",";
+
     r += "style=";
     ant::StyleConverter sc;
     r += sc.to_string (t->style ());
@@ -215,8 +329,8 @@ Template::to_string (const std::vector<Template> &v)
     r += ",";
 
     r += "angle_constraint=";
-    ant::ACConverter ac;
-    r += ac.to_string (t->angle_constraint ());
+    ant::ACConverter acc;
+    r += acc.to_string (t->angle_constraint ());
 
   }
  

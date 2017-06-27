@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>637</width>
-    <height>311</height>
+    <width>668</width>
+    <height>373</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -192,7 +192,14 @@
          <property name="spacing">
           <number>6</number>
          </property>
-         <item row="6" column="1">
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>   ... position</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
           <widget class="QCheckBox" name="t_snap_cbx">
            <property name="toolTip">
             <string>If checked, snap to edges or vertices of objects unless disabled above</string>
@@ -202,82 +209,10 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
-          <widget class="QComboBox" name="outline_cb">
-           <property name="toolTip">
-            <string>Specify outline mode of the ruler template</string>
-           </property>
-           <item>
-            <property name="text">
-             <string>Diagonal</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Horizonal and vertical (in this order)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Diagonal plus horizonal and vertical (triangle)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Vertical and horizonal (in this order)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Diagonal plus vertical and horizontal (triangle)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Box marker</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="fmt_y_le">
-           <property name="toolTip">
-            <string>Specify the y label format (applicable only for outline modes that have a vertical component, i.e. box)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Angle constraints</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
+         <item row="7" column="0">
           <widget class="QLabel" name="label_17">
            <property name="text">
             <string>Outline</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_16">
-           <property name="text">
-            <string>Style</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_13">
-           <property name="text">
-            <string>Label format</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="fmt_x_le">
-           <property name="toolTip">
-            <string>Specify the x label format (applicable only for outline modes that have a horizontal component, i.e. box)</string>
            </property>
           </widget>
          </item>
@@ -288,53 +223,224 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_14">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_13">
            <property name="text">
-            <string>X label format</string>
+            <string>Label format</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_15">
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Y label format</string>
+            <string>Angle constraints</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="style_cb">
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="fmt_x_le">
            <property name="toolTip">
-            <string>Specify style of the ruler template</string>
+            <string>Specify the x label format (applicable only for outline modes that have a horizontal component, i.e. box)</string>
            </property>
-           <item>
-            <property name="text">
-             <string>Ruler</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Arrow at end</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Arrow at start</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Arrow at both ends</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Plain line</string>
-            </property>
-           </item>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_16">
+           <property name="text">
+            <string>Style</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="fmt_y_le">
+           <property name="toolTip">
+            <string>Specify the y label format (applicable only for outline modes that have a vertical component, i.e. box)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QFrame" name="frame">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QFrame" name="frame_4">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QGridLayout" name="gridLayout">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item row="1" column="1">
+                <widget class="QComboBox" name="main_position">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="sizeAdjustPolicy">
+                  <enum>QComboBox::AdjustToContents</enum>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>Auto</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>At first point</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>At second point</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>At center</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_19">
+                 <property name="text">
+                  <string>P</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="5">
+                <widget class="QLabel" name="label_21">
+                 <property name="text">
+                  <string>V</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="6">
+                <widget class="QComboBox" name="main_yalign">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>Auto</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>V. center</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Bottom</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Top</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="4">
+                <widget class="QComboBox" name="main_xalign">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>Auto</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>H. center</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Left</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Right</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QLabel" name="label_20">
+                 <property name="text">
+                  <string>H</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>   ... position</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
           <widget class="QComboBox" name="t_angle_cb">
            <property name="toolTip">
             <string>Override the global angle constraint setting for this type of rulers</string>
@@ -371,11 +477,343 @@
            </item>
           </widget>
          </item>
-         <item row="7" column="0" colspan="2">
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_15">
+           <property name="text">
+            <string>Y label format</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0" colspan="2">
           <widget class="QLabel" name="help_label">
            <property name="text">
             <string>&lt;html&gt;(See &lt;a href=&quot;int:/manual/ruler_properties.xml&quot;&gt;here&lt;/a&gt; for a description of the properties)&lt;/html&gt;</string>
            </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QComboBox" name="outline_cb">
+           <property name="toolTip">
+            <string>Specify outline mode of the ruler template</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Diagonal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Horizonal and vertical (in this order)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Diagonal plus horizonal and vertical (triangle)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Vertical and horizonal (in this order)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Diagonal plus vertical and horizontal (triangle)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Box marker</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Ellipse</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QComboBox" name="style_cb">
+           <property name="toolTip">
+            <string>Specify style of the ruler template</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Ruler</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Arrow at end</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Arrow at start</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Arrow at both ends</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Plain line</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Cross at end</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Cross at start</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Cross at both ends</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_14">
+           <property name="text">
+            <string>X label format</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>   ... position</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QFrame" name="frame_5">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>148</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_22">
+              <property name="text">
+               <string>H</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="xlabel_xalign">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <item>
+               <property name="text">
+                <string>Auto</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>H. center</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Left</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Right</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_23">
+              <property name="text">
+               <string>V</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="xlabel_yalign">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <item>
+               <property name="text">
+                <string>Auto</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>V. center</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Bottom</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Top</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QFrame" name="frame_6">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>148</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_28">
+              <property name="text">
+               <string>H</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="ylabel_xalign">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <item>
+               <property name="text">
+                <string>Auto</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>H. center</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Left</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Right</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_27">
+              <property name="text">
+               <string>V</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="ylabel_yalign">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <item>
+               <property name="text">
+                <string>Auto</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>V. center</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Bottom</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Top</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>

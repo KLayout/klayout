@@ -355,6 +355,14 @@ ConfigPage4::show ()
   mp_ui->outline_cb->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].outline ());
   mp_ui->t_angle_cb->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].angle_constraint ());
   mp_ui->t_snap_cbx->setChecked (m_ruler_templates [m_current_template].snap ());
+
+  mp_ui->main_position->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].main_position ());
+  mp_ui->main_xalign->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].main_xalign ());
+  mp_ui->main_yalign->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].main_yalign ());
+  mp_ui->xlabel_xalign->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].xlabel_xalign ());
+  mp_ui->xlabel_yalign->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].xlabel_yalign ());
+  mp_ui->ylabel_xalign->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].ylabel_xalign ());
+  mp_ui->ylabel_yalign->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].ylabel_yalign ());
 }
 
 void   
@@ -378,6 +386,14 @@ ConfigPage4::commit ()
   m_ruler_templates [m_current_template].angle_constraint (ac);
 
   m_ruler_templates [m_current_template].snap (mp_ui->t_snap_cbx->isChecked ());
+
+  m_ruler_templates [m_current_template].set_main_position (Object::position_type (mp_ui->main_position->currentIndex ()));
+  m_ruler_templates [m_current_template].set_main_xalign (Object::alignment_type (mp_ui->main_xalign->currentIndex ()));
+  m_ruler_templates [m_current_template].set_main_yalign (Object::alignment_type (mp_ui->main_yalign->currentIndex ()));
+  m_ruler_templates [m_current_template].set_xlabel_xalign (Object::alignment_type (mp_ui->xlabel_xalign->currentIndex ()));
+  m_ruler_templates [m_current_template].set_xlabel_yalign (Object::alignment_type (mp_ui->xlabel_yalign->currentIndex ()));
+  m_ruler_templates [m_current_template].set_ylabel_xalign (Object::alignment_type (mp_ui->ylabel_xalign->currentIndex ()));
+  m_ruler_templates [m_current_template].set_ylabel_yalign (Object::alignment_type (mp_ui->ylabel_yalign->currentIndex ()));
 }
 
 } // namespace ant

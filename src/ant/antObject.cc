@@ -63,11 +63,10 @@ Object::Object (const db::DPoint &p1, const db::DPoint &p2, int id, const ant::T
     m_fmt_x (t.fmt_x ()), m_fmt_y (t.fmt_y ()), m_fmt (t.fmt ()),
     m_style (t.style ()), m_outline (t.outline ()),
     m_snap (t.snap ()), m_angle_constraint (t.angle_constraint ()),
-    //  TODO: make this part of the template
-    m_main_position (POS_auto),
-    m_main_xalign (AL_auto), m_main_yalign (AL_auto),
-    m_xlabel_xalign (AL_auto), m_xlabel_yalign (AL_auto),
-    m_ylabel_xalign (AL_auto), m_ylabel_yalign (AL_auto)
+    m_main_position (t.main_position ()),
+    m_main_xalign (t.main_xalign ()), m_main_yalign (t.main_yalign ()),
+    m_xlabel_xalign (t.xlabel_xalign ()), m_xlabel_yalign (t.xlabel_yalign ()),
+    m_ylabel_xalign (t.ylabel_xalign ()), m_ylabel_yalign (t.ylabel_yalign ())
 {
   //  .. nothing else ..
 }
@@ -342,6 +341,7 @@ Object::class_name () const
 void 
 Object::from_string (const char *s)
 {
+printf("@@@ %s\n", s); fflush(stdout);
   tl::Extractor ex (s);
   while (! ex.at_end ()) {
 
@@ -555,7 +555,7 @@ Object::to_string () const
   r += tl::to_word_or_quoted_string (fmt_y ());
   r += ",";
   
-  r += "pos=";
+  r += "position=";
   ant::PositionConverter pc;
   r += pc.to_string (main_position ());
   r += ",";

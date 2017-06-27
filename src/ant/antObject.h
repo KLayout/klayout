@@ -185,7 +185,8 @@ public:
    */
   virtual void transform (const db::DCplxTrans &t)
   {
-    *this = ant::Object (t * m_p1, t * m_p2, m_id, m_fmt_x, m_fmt_y, m_fmt, m_style, m_outline, m_snap, m_angle_constraint);
+    m_p1 = t * m_p1;
+    m_p2 = t * m_p2;
     property_changed ();
   }
 
@@ -194,7 +195,8 @@ public:
    */
   virtual void transform (const db::DTrans &t)
   {
-    *this = ant::Object (t * m_p1, t * m_p2, m_id, m_fmt_x, m_fmt_y, m_fmt, m_style, m_outline, m_snap, m_angle_constraint);
+    m_p1 = t * m_p1;
+    m_p2 = t * m_p2;
     property_changed ();
   }
 
@@ -203,7 +205,8 @@ public:
    */
   virtual void transform (const db::DFTrans &t)
   {
-    *this = ant::Object (t * m_p1, t * m_p2, m_id, m_fmt_x, m_fmt_y, m_fmt, m_style, m_outline, m_snap, m_angle_constraint);
+    m_p1 = t * m_p1;
+    m_p2 = t * m_p2;
     property_changed ();
   }
 

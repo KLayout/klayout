@@ -289,7 +289,7 @@ Template::to_string (const std::vector<Template> &v)
     r += tl::to_word_or_quoted_string (t->fmt_y ());
     r += ",";
     
-    r += "pos=";
+    r += "position=";
     ant::PositionConverter pc;
     r += pc.to_string (t->main_position ());
     r += ",";

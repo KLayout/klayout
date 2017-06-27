@@ -528,7 +528,7 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "Annotation",
     "\n"
     "This constant has been introduced in version 0.25."
   ) +
-  gsi::method ("AlignBottom", &gsi::align_top,
+  gsi::method ("AlignTop", &gsi::align_top,
     "@brief This code indicates top alignment.\n"
     "If used in a vertical context, this alignment code makes the label aligned at the top side - i.e. it will appear bottom of the reference point.\n"
     "\n"

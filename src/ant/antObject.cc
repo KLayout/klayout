@@ -190,6 +190,7 @@ Object::operator== (const ant::Object &d) const
          m_fmt_x == d.m_fmt_x && m_fmt_y == d.m_fmt_y && m_fmt == d.m_fmt &&
          m_style == d.m_style && m_outline == d.m_outline && 
          m_snap == d.m_snap && m_angle_constraint == d.m_angle_constraint &&
+         m_category == d.m_category &&
          m_main_position == d.m_main_position &&
          m_main_xalign == d.m_main_xalign && m_main_yalign == d.m_main_yalign &&
          m_xlabel_xalign == d.m_xlabel_xalign && m_xlabel_yalign == d.m_xlabel_yalign &&

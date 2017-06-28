@@ -38,7 +38,8 @@ Template::Template ()
     m_main_position (ant::Object::POS_auto),
     m_main_xalign (ant::Object::AL_auto), m_main_yalign (ant::Object::AL_auto),
     m_xlabel_xalign (ant::Object::AL_auto), m_xlabel_yalign (ant::Object::AL_auto),
-    m_ylabel_xalign (ant::Object::AL_auto), m_ylabel_yalign (ant::Object::AL_auto)
+    m_ylabel_xalign (ant::Object::AL_auto), m_ylabel_yalign (ant::Object::AL_auto),
+    m_mode (ant::Template::RulerNormal)
 {
   //  .. nothing yet ..
 }
@@ -53,20 +54,23 @@ Template::Template (const std::string &title,
     m_main_position (ant::Object::POS_auto),
     m_main_xalign (ant::Object::AL_auto), m_main_yalign (ant::Object::AL_auto),
     m_xlabel_xalign (ant::Object::AL_auto), m_xlabel_yalign (ant::Object::AL_auto),
-    m_ylabel_xalign (ant::Object::AL_auto), m_ylabel_yalign (ant::Object::AL_auto)
+    m_ylabel_xalign (ant::Object::AL_auto), m_ylabel_yalign (ant::Object::AL_auto),
+    m_mode (ant::Template::RulerNormal)
 {
   //  .. nothing else ..
 }
 
 Template::Template (const ant::Template &d)
   : m_title (d.m_title),
+    m_category (d.m_category),
     m_fmt_x (d.m_fmt_x), m_fmt_y (d.m_fmt_y), m_fmt (d.m_fmt),
     m_style (d.m_style), m_outline (d.m_outline),
     m_snap (d.m_snap), m_angle_constraint (d.m_angle_constraint),
     m_main_position (d.m_main_position),
     m_main_xalign (d.m_main_xalign), m_main_yalign (d.m_main_yalign),
     m_xlabel_xalign (d.m_xlabel_xalign), m_xlabel_yalign (d.m_xlabel_yalign),
-    m_ylabel_xalign (d.m_ylabel_xalign), m_ylabel_yalign (d.m_ylabel_yalign)
+    m_ylabel_xalign (d.m_ylabel_xalign), m_ylabel_yalign (d.m_ylabel_yalign),
+    m_mode (d.m_mode)
 {
   //  .. nothing else ..
 }
@@ -76,6 +80,7 @@ Template::operator= (const ant::Template &d)
 {
   if (this != &d) {
     m_title = d.m_title;
+    m_category = d.m_category;
     m_fmt_x = d.m_fmt_x;
     m_fmt_y = d.m_fmt_y;
     m_fmt = d.m_fmt;
@@ -90,6 +95,7 @@ Template::operator= (const ant::Template &d)
     m_xlabel_yalign = d.m_xlabel_yalign;
     m_ylabel_xalign = d.m_ylabel_xalign;
     m_ylabel_yalign = d.m_ylabel_yalign;
+    m_mode = d.m_mode;
   }
   return *this;
 }
@@ -109,13 +115,30 @@ Template::from_string (const std::string &s)
 
       while (! ex.at_end ()) {
 
-        if (ex.test ("title=")) {
+        if (ex.test ("mode=")) {
+
+          std::string s;
+          ex.read_word_or_quoted (s);
+          ant::RulerModeConverter mc;
+          ant::Template::ruler_mode_type mode;
+          mc.from_string (s, mode);
+          r.back ().set_mode (mode);
+          ex.test (",");
+
+        } else if (ex.test ("title=")) {
           
           std::string s;
           ex.read_word_or_quoted (s);
           r.back ().title (s);
           ex.test (",");
           
+        } else if (ex.test ("category=")) {
+
+          std::string s;
+          ex.read_word_or_quoted (s);
+          r.back ().category (s);
+          ex.test (",");
+
         } else if (ex.test ("fmt=")) {
 
           std::string s;
@@ -276,8 +299,16 @@ Template::to_string (const std::vector<Template> &v)
       r += ";";
     }
 
+    r += "mode=";
+    ant::RulerModeConverter mc;
+    r += mc.to_string (t->mode ());
+    r += ",";
+
     r += "title=";
     r += tl::to_word_or_quoted_string (t->title ());
+    r += ",";
+    r += "category=";
+    r += tl::to_word_or_quoted_string (t->category ());
     r += ",";
     r += "fmt=";
     r += tl::to_word_or_quoted_string (t->fmt ());

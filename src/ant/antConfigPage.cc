@@ -355,6 +355,7 @@ ConfigPage4::show ()
   mp_ui->outline_cb->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].outline ());
   mp_ui->t_angle_cb->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].angle_constraint ());
   mp_ui->t_snap_cbx->setChecked (m_ruler_templates [m_current_template].snap ());
+  mp_ui->t_mode_cb->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].mode ());
 
   mp_ui->main_position->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].main_position ());
   mp_ui->main_xalign->setCurrentIndex ((unsigned int) m_ruler_templates [m_current_template].main_xalign ());
@@ -384,6 +385,9 @@ ConfigPage4::commit ()
   
   lay::angle_constraint_type ac = lay::angle_constraint_type (mp_ui->t_angle_cb->currentIndex ());
   m_ruler_templates [m_current_template].angle_constraint (ac);
+
+  ant::Template::ruler_mode_type mode = ant::Template::ruler_mode_type (mp_ui->t_mode_cb->currentIndex ());
+  m_ruler_templates [m_current_template].set_mode (mode);
 
   m_ruler_templates [m_current_template].snap (mp_ui->t_snap_cbx->isChecked ());
 

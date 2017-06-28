@@ -437,6 +437,11 @@ public:
    *  @brief An event triggered when the selected annotations changed
    */
   tl::Event annotation_selection_changed_event;
+
+  /**
+   *  @brief Registers an annotation template globally
+   */
+  static void register_annotation_template (const ant::Template &t);
   
 private:
   //  Ruler display and snapping configuration

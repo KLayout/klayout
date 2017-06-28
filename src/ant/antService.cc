@@ -125,7 +125,7 @@ draw_ruler (const db::DPoint &q1,
   double arrow_length = 12 / renderer.resolution ();
   double sel_width = 2 / renderer.resolution ();
 
-  if (length_u < 1e-5 /*micron*/) {
+  if (length_u < 1e-5 /*micron*/ && style != ant::Object::STY_cross_both && style != ant::Object::STY_cross_end && style != ant::Object::STY_cross_start) {
 
     if (sel) {
       
@@ -153,7 +153,7 @@ draw_ruler (const db::DPoint &q1,
     //  normal and unit vector
     
     double len = q1.double_distance (q2);
-    if (style == ant::Object::STY_arrow_end && len < double (arrow_length) * 1.2) {
+    if ((style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_start) && len < double (arrow_length) * 1.2) {
       arrow_length = len / 1.2;
       arrow_width = arrow_length * 2.0 / 3.0;
     } else if (style == ant::Object::STY_arrow_both && len < double (arrow_length) * 2.4) {
@@ -165,7 +165,7 @@ draw_ruler (const db::DPoint &q1,
     if (len > 1e-10) {
       qq *= 1.0 / len;
     } else {
-      qq = db::DVector (1.0, 0.0);
+      qq = db::DVector (0.0, 1.0);
     }
     if (!right) {
       qq = -qq;
@@ -340,7 +340,7 @@ draw_text (const db::DPoint &q1,
     pos = ant::Object::POS_p2;
   }
 
-  if (length_u < 1e-5 /*micron*/) {
+  if (length_u < 1e-5 /*micron*/ && style != ant::Object::STY_cross_both && style != ant::Object::STY_cross_end && style != ant::Object::STY_cross_start) {
 
     renderer.draw (db::DBox (q1, q1),
                      label,
@@ -357,7 +357,7 @@ draw_text (const db::DPoint &q1,
     //  normal and unit vector
 
     double len = q1.double_distance (q2);
-    if (style == ant::Object::STY_arrow_end && len < double (arrow_length) * 1.2) {
+    if ((style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_start) && len < double (arrow_length) * 1.2) {
       arrow_length = len / 1.2;
       arrow_width = arrow_length * 2.0 / 3.0;
     } else if (style == ant::Object::STY_arrow_both && len < double (arrow_length) * 2.4) {
@@ -369,10 +369,17 @@ draw_text (const db::DPoint &q1,
     if (len > 1e-10) {
       qq *= 1.0 / len;
     } else {
-      qq = db::DVector (1.0, 0.0);
+      qq = db::DVector (0.0, 1.0);
     }
     if (!right) {
       qq = -qq;
+    }
+
+    db::DVector qu = q2 - q1;
+    if (len > 1e-10) {
+      qu *= 1.0 / len;
+    } else {
+      qu = db::DVector (1.0, 0.0);
     }
 
     db::HAlign text_halign = db::HAlignCenter;
@@ -380,6 +387,8 @@ draw_text (const db::DPoint &q1,
       //  Compute a nice alignment depending on the anchor point
       if (fabs (qq.x ()) > 1e-6) {
         text_halign = qq.x () > 0.0 ? db::HAlignLeft : db::HAlignRight;
+      } else if (length_u < 1e-5) {
+        text_halign = db::HAlignLeft;
       } else if (pos == ant::Object::POS_p2) {
         text_halign = q2.x () < q1.x () ? db::HAlignLeft : db::HAlignRight;
       } else if (pos == ant::Object::POS_p1) {
@@ -396,7 +405,9 @@ draw_text (const db::DPoint &q1,
     db::VAlign text_valign = db::VAlignCenter;
     if (valign == ant::Object::AL_auto) {
       //  Compute a nice alignment depending on the anchor point
-      if (fabs (qq.y ()) > 1e-6) {
+      if (length_u < 1e-5) {
+        text_valign = db::VAlignBottom;
+      } else if (fabs (qq.y ()) > 1e-6) {
         text_valign = qq.y () > 0.0 ? db::VAlignBottom : db::VAlignTop;
       } else if (pos == ant::Object::POS_p2) {
         text_valign = q1.y () > q2.y () ? db::VAlignBottom : db::VAlignTop;
@@ -415,7 +426,17 @@ draw_text (const db::DPoint &q1,
     if (style == ant::Object::STY_arrow_start || style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_end) {
       tv_text = qq * (arrow_width * 0.5 + 2.0);
     } else if (style == ant::Object::STY_cross_start || style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_end) {
-      tv_text = qq * (arrow_width + 2.0);
+      if (length_u < 1e-5 /*micron*/) {
+        if (text_halign == db::HAlignRight) {
+          tv_text = (qq - qu) * 2.0;
+        } else if (text_halign == db::HAlignLeft) {
+          tv_text = (qq + qu) * 2.0;
+        } else {
+          tv_text = qq * 2.0;
+        }
+      } else {
+        tv_text = qq * (arrow_width + 2.0);
+      }
     } else {
       tv_text = qq * (tick_length + 2.0);
     }
@@ -1366,21 +1387,40 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
       //  and clear surplus rulers
       reduce_rulers (m_max_number_of_rulers - 1);
 
-      m_p1 = snap1 (p, m_obj_snap && current_template ().snap ()).second;
+      const ant::Template &tpl = current_template ();
+
+      m_p1 = snap1 (p, m_obj_snap && tpl.snap ()).second;
 
       //  create and start dragging the ruler
       
-      m_current = ant::Object (m_p1, m_p1, 0, current_template ());
-      show_message ();
-      
-      if (mp_active_ruler) {
-        delete mp_active_ruler;
-      }
-      mp_active_ruler = new ant::View (this, &m_current, false /*not selected*/);
-      mp_active_ruler->thaw ();
-      m_drawing = true;
+      if (tpl.mode () == ant::Template::RulerSingleClick) {
 
-      widget ()->grab_mouse (this, false);
+        //  begin the transaction
+        tl_assert (! manager ()->transacting ());
+        manager ()->transaction (tl::to_string (QObject::tr ("Create ruler")));
+
+        show_message ();
+
+        insert_ruler (ant::Object (m_p1, m_p1, 0, tpl), true);
+
+        //  end the transaction
+        manager ()->commit ();
+
+      } else {
+
+        m_current = ant::Object (m_p1, m_p1, 0, tpl);
+        show_message ();
+
+        if (mp_active_ruler) {
+          delete mp_active_ruler;
+        }
+        mp_active_ruler = new ant::View (this, &m_current, false /*not selected*/);
+        mp_active_ruler->thaw ();
+        m_drawing = true;
+
+        widget ()->grab_mouse (this, false);
+
+      }
 
     } else {
 
@@ -2044,6 +2084,33 @@ Service::menu_activated (const std::string &symbol)
   } else {
     lay::Plugin::menu_activated (symbol);
   }
+}
+
+void
+Service::register_annotation_template (const ant::Template &t)
+{
+  std::string value = lay::PluginRoot::instance ()->config_get (cfg_ruler_templates);
+
+  std::vector<ant::Template> templates = ant::Template::from_string (value);
+
+  //  Remove a template with the same category if such a template already exists
+  if (! t.category ().empty ()) {
+    for (size_t i = 0; i < templates.size (); ) {
+      if (templates[i].category () == t.category ()) {
+        templates.erase (templates.begin () + i);
+      } else {
+        ++i;
+      }
+    }
+  }
+
+  //  and add the new one
+  templates.push_back (t);
+
+  value = ant::Template::to_string (templates);
+
+  lay::PluginRoot::instance ()->config_set (cfg_ruler_templates, value);
+  lay::PluginRoot::instance ()->config_end ();
 }
 
 // -------------------------------------------------------------

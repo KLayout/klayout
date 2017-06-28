@@ -47,6 +47,24 @@ public:
   typedef ant::Object::alignment_type alignment_type;
   typedef lay::angle_constraint_type angle_constraint_type;
 
+  enum ruler_mode_type
+  {
+    /**
+     *  @brief The rulers acts normal and a start and end point need to be defined
+     */
+    RulerNormal = 0,
+
+    /**
+     *  @brief The ruler is single-click: a single click is sufficient to place a ruler and p1 will be == p2
+     */
+    RulerSingleClick = 1,
+
+    /**
+     *  @brief The ruler is auto-metric: a single click will place a ruler and the ruler will extend to the next adjacent structures
+     */
+    RulerAutoMetric = 2
+  };
+
   /**
    *  @brief Default constructor
    * 
@@ -70,6 +88,40 @@ public:
    *  @brief Assignment
    */
   Template &operator= (const ant::Template &d);
+
+  /**
+   *  @brief Gets the category string
+   *  The category string is used to label the rulers generated from this template.
+   *  Templates that use a category string are regarded "system templates" and are not editable.
+   */
+  const std::string &category () const
+  {
+    return m_category;
+  }
+
+  /**
+   *  @brief Sets the category string
+   */
+  void category (const std::string &c)
+  {
+    m_category = c;
+  }
+
+  /**
+   *  @brief Sets the ruler mode
+   */
+  void set_mode (ruler_mode_type mode)
+  {
+    m_mode = mode;
+  }
+
+  /**
+   *  @brief Gets the ruler mode
+   */
+  ruler_mode_type mode () const
+  {
+    return m_mode;
+  }
 
   /**
    *  @brief Title read accessor
@@ -355,6 +407,7 @@ public:
 
 private:
   std::string m_title;
+  std::string m_category;
   std::string m_fmt_x;
   std::string m_fmt_y;
   std::string m_fmt;
@@ -366,6 +419,7 @@ private:
   alignment_type m_main_xalign, m_main_yalign;
   alignment_type m_xlabel_xalign, m_xlabel_yalign;
   alignment_type m_ylabel_xalign, m_ylabel_yalign;
+  ruler_mode_type m_mode;
 };
 
 }

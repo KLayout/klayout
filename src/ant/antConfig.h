@@ -81,6 +81,12 @@ struct AlignmentConverter
   void from_string (const std::string &s, ant::Object::alignment_type &a);
 };
 
+struct RulerModeConverter
+{
+  std::string to_string (ant::Template::ruler_mode_type a);
+  void from_string (const std::string &s, ant::Template::ruler_mode_type &a);
+};
+
 struct TemplatesConverter
 {
   std::string to_string (const std::vector <ant::Template> &t);

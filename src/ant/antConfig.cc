@@ -231,6 +231,35 @@ AlignmentConverter::from_string (const std::string &s, ant::Object::alignment_ty
 }
 
 std::string
+RulerModeConverter::to_string (ant::Template::ruler_mode_type m)
+{
+  if (m == ant::Template::RulerNormal) {
+    return "normal";
+  } else if (m == ant::Template::RulerSingleClick) {
+    return "single_click";
+  } else if (m == ant::Template::RulerAutoMetric) {
+    return "auto_metric";
+  } else {
+    return "normal";
+  }
+}
+
+void
+RulerModeConverter::from_string (const std::string &s, ant::Template::ruler_mode_type &a)
+{
+  std::string t (tl::trim (s));
+  if (t == "normal") {
+    a = ant::Template::RulerNormal;
+  } else if (t == "single_click") {
+    a = ant::Template::RulerSingleClick;
+  } else if (t == "auto_metric") {
+    a = ant::Template::RulerAutoMetric;
+  } else {
+    a = ant::Template::RulerNormal;
+  }
+}
+
+std::string
 TemplatesConverter::to_string (const std::vector <ant::Template> &t)
 {
   return ant::Template::to_string (t);

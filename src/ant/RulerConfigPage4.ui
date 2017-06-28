@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>668</width>
-    <height>373</height>
+    <height>410</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -169,7 +169,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="frame_2">
+       <widget class="QFrame" name="mode_cb">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -192,48 +192,10 @@
          <property name="spacing">
           <number>6</number>
          </property>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_3">
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_5">
            <property name="text">
             <string>   ... position</string>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="1">
-          <widget class="QCheckBox" name="t_snap_cbx">
-           <property name="toolTip">
-            <string>If checked, snap to edges or vertices of objects unless disabled above</string>
-           </property>
-           <property name="text">
-            <string>Snap to objects</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="label_17">
-           <property name="text">
-            <string>Outline</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="fmt_le">
-           <property name="toolTip">
-            <string>Specify the main label format</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_13">
-           <property name="text">
-            <string>Label format</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Angle constraints</string>
            </property>
           </widget>
          </item>
@@ -244,18 +206,122 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="label_16">
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Style</string>
+            <string>Angle constraints</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
-          <widget class="QLineEdit" name="fmt_y_le">
-           <property name="toolTip">
-            <string>Specify the y label format (applicable only for outline modes that have a vertical component, i.e. box)</string>
+         <item row="5" column="1">
+          <widget class="QFrame" name="frame_6">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
            </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>148</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_28">
+              <property name="text">
+               <string>H</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="ylabel_xalign">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <item>
+               <property name="text">
+                <string>Auto</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>H. center</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Left</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Right</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_27">
+              <property name="text">
+               <string>V</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="ylabel_yalign">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <item>
+               <property name="text">
+                <string>Auto</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>V. center</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Bottom</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Top</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
          <item row="1" column="1">
@@ -433,61 +499,38 @@
            </layout>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label">
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_14">
            <property name="text">
-            <string>   ... position</string>
+            <string>X label format</string>
            </property>
           </widget>
          </item>
-         <item row="8" column="1">
-          <widget class="QComboBox" name="t_angle_cb">
-           <property name="toolTip">
-            <string>Override the global angle constraint setting for this type of rulers</string>
-           </property>
-           <item>
-            <property name="text">
-             <string>Any angle</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Diagonal</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Orthogonal</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Horizontal only</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Vertical only</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Use global setting</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_15">
-           <property name="text">
-            <string>Y label format</string>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="0" colspan="2">
+         <item row="11" column="0" colspan="2">
           <widget class="QLabel" name="help_label">
            <property name="text">
             <string>&lt;html&gt;(See &lt;a href=&quot;int:/manual/ruler_properties.xml&quot;&gt;here&lt;/a&gt; for a description of the properties)&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="fmt_y_le">
+           <property name="toolTip">
+            <string>Specify the y label format (applicable only for outline modes that have a vertical component, i.e. box)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>Label format</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_16">
+           <property name="text">
+            <string>Style</string>
            </property>
           </widget>
          </item>
@@ -533,65 +576,79 @@
            </item>
           </widget>
          </item>
-         <item row="6" column="1">
-          <widget class="QComboBox" name="style_cb">
-           <property name="toolTip">
-            <string>Specify style of the ruler template</string>
-           </property>
-           <item>
-            <property name="text">
-             <string>Ruler</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Arrow at end</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Arrow at start</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Arrow at both ends</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Plain line</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Cross at end</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Cross at start</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Cross at both ends</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_14">
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_17">
            <property name="text">
-            <string>X label format</string>
+            <string>Outline</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_5">
+         <item row="10" column="1">
+          <widget class="QCheckBox" name="t_snap_cbx">
+           <property name="toolTip">
+            <string>If checked, snap to edges or vertices of objects unless disabled above</string>
+           </property>
+           <property name="text">
+            <string>Snap to objects</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="fmt_le">
+           <property name="toolTip">
+            <string>Specify the main label format</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_15">
+           <property name="text">
+            <string>Y label format</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label">
            <property name="text">
             <string>   ... position</string>
            </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QComboBox" name="t_angle_cb">
+           <property name="toolTip">
+            <string>Override the global angle constraint setting for this type of rulers</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Any angle</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Diagonal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Orthogonal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Horizontal only</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Vertical only</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Use global setting</string>
+            </property>
+           </item>
           </widget>
          </item>
          <item row="3" column="1">
@@ -705,115 +762,84 @@
            </layout>
           </widget>
          </item>
-         <item row="5" column="1">
-          <widget class="QFrame" name="frame_6">
-           <property name="frameShape">
-            <enum>QFrame::NoFrame</enum>
+         <item row="6" column="1">
+          <widget class="QComboBox" name="style_cb">
+           <property name="toolTip">
+            <string>Specify style of the ruler template</string>
            </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+           <item>
+            <property name="text">
+             <string>Ruler</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Arrow at end</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Arrow at start</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Arrow at both ends</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Plain line</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Cross at end</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Cross at start</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Cross at both ends</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>   ... position</string>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <property name="leftMargin">
-             <number>0</number>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="QComboBox" name="t_mode_cb">
+           <item>
+            <property name="text">
+             <string>Normal</string>
             </property>
-            <property name="topMargin">
-             <number>0</number>
+           </item>
+           <item>
+            <property name="text">
+             <string>Single click (both points will be equal)</string>
             </property>
-            <property name="rightMargin">
-             <number>0</number>
+           </item>
+           <item>
+            <property name="text">
+             <string>Auto measure (points will be set automatically)</string>
             </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>148</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_28">
-              <property name="text">
-               <string>H</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="ylabel_xalign">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <item>
-               <property name="text">
-                <string>Auto</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>H. center</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Left</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Right</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_27">
-              <property name="text">
-               <string>V</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="ylabel_yalign">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <item>
-               <property name="text">
-                <string>Auto</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>V. center</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Bottom</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Top</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-           </layout>
+           </item>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Mode</string>
+           </property>
           </widget>
          </item>
         </layout>

@@ -379,10 +379,79 @@ static tl::event<int> &get_annotation_changed_event (lay::LayoutView *view)
   return ant_service->annotation_changed_event;
 }
 
+static int ruler_mode_normal ()
+{
+  return ant::Template::RulerNormal;
+}
+
+static int ruler_mode_single_click ()
+{
+  return ant::Template::RulerSingleClick;
+}
+
+static int ruler_mode_auto_metric ()
+{
+  return ant::Template::RulerAutoMetric;
+}
+
+static void register_annotation_template (const ant::Object &a, const std::string &title, int mode)
+{
+  ant::Template t;
+
+  t.angle_constraint (a.angle_constraint ());
+  t.category (a.category ());
+  t.fmt (a.fmt ());
+  t.fmt_x (a.fmt_x ());
+  t.fmt_y (a.fmt_y ());
+  t.set_main_position (a.main_position ());
+  t.set_main_xalign (a.main_xalign ());
+  t.set_main_yalign (a.main_yalign ());
+  t.set_xlabel_xalign (a.xlabel_xalign ());
+  t.set_xlabel_yalign (a.xlabel_yalign ());
+  t.set_ylabel_xalign (a.ylabel_xalign ());
+  t.set_ylabel_yalign (a.ylabel_yalign ());
+  t.outline (a.outline ());
+  t.style (a.style ());
+  t.title (title);
+
+  t.set_mode (ant::Template::ruler_mode_type (mode));
+
+  ant::Service::register_annotation_template (t);
+}
+
 //  NOTE: ant::Object is available as "BasicAnnotation" to allow binding for other methods.
-gsi::Class<ant::Object> decl_BasicAnnotation ("BasicAnnotation", gsi::Methods (), "@hide");
+gsi::Class<ant::Object> decl_BasicAnnotation ("BasicAnnotation", gsi::Methods (), "@hide\n@alias Annotation");
 
 gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "Annotation",
+  gsi::method ("register_template", &gsi::register_annotation_template,
+    gsi::arg ("annotation"), gsi::arg ("title"), gsi::arg ("mode", ruler_mode_normal (), "\\RulerModeNormal"),
+    "@brief Registers the given annotation as a template\n"
+    "@param title The title to use for the ruler template\n"
+    "@param mode The mode the ruler will be created in (see Ruler... constants)\n"
+    "\n"
+    "In order to register a system template, the category string of the annotation should be "
+    "a unique and non-empty string. The annotation is added to the list of annotation templates "
+    "and becomes available as a new template in the ruler drop-down menu.\n"
+    "\n"
+    "This method has been added in version 0.25."
+  ) +
+  gsi::method ("RulerModeNormal", &gsi::ruler_mode_normal,
+    "@brief Specifies normal ruler mode for the \\register_template method\n"
+    "\n"
+    "This constant has been introduced in version 0.25"
+  ) +
+  gsi::method ("RulerModeSingleClick", &gsi::ruler_mode_single_click,
+    "@brief Specifies single-click ruler mode for the \\register_template method\n"
+    "In single click-mode, a ruler can be placed with a single click and p1 will be == p2."
+    "\n"
+    "This constant has been introduced in version 0.25"
+  ) +
+  gsi::method ("RulerModeAutoMetric", &gsi::ruler_mode_auto_metric,
+    "@brief Specifies auto-metric ruler mode for the \\register_template method\n"
+    "In auto-metric mode, a ruler can be placed with a single click and p1/p2 will be determined from the neighborhood."
+    "\n"
+    "This constant has been introduced in version 0.25"
+  ) +
   gsi::method ("StyleRuler|#style_ruler", &gsi::style_ruler,
     "@brief Gets the ruler style code for use the \\style method\n"
     "When this style is specified, the annotation will show a ruler with "

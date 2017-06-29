@@ -1389,24 +1389,61 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       const ant::Template &tpl = current_template ();
 
-      m_p1 = snap1 (p, m_obj_snap && tpl.snap ()).second;
-
       //  create and start dragging the ruler
       
       if (tpl.mode () == ant::Template::RulerSingleClick) {
+
+        db::DPoint pt = snap1 (p, m_obj_snap && tpl.snap ()).second;
 
         //  begin the transaction
         tl_assert (! manager ()->transacting ());
         manager ()->transaction (tl::to_string (QObject::tr ("Create ruler")));
 
+        m_current = ant::Object (pt, pt, 0, tpl);
         show_message ();
 
-        insert_ruler (ant::Object (m_p1, m_p1, 0, tpl), true);
+        insert_ruler (m_current, true);
 
         //  end the transaction
         manager ()->commit ();
 
+      } else if (tpl.mode () == ant::Template::RulerAutoMetric) {
+
+        //  for auto-metric we need some cutline constraint - any or global won't do.
+        lay::angle_constraint_type ac = tpl.angle_constraint ();
+        ac = (ac == lay::AC_Global ? m_snap_mode : ac);
+        if (ac == lay::AC_Any || ac == lay::AC_Global) {
+          ac = lay::AC_Diagonal;
+        }
+
+        db::DVector g;
+        if (m_grid_snap) {
+          g = db::DVector (m_grid, m_grid);
+        }
+
+        double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
+        snap_range *= 0.5;
+
+        std::pair<bool, db::DEdge> ee = lay::obj_snap2 (mp_view, p, p, g, ac, snap_range, snap_range * 1000.0);
+        if (ee.first) {
+
+          //  begin the transaction
+          tl_assert (! manager ()->transacting ());
+          manager ()->transaction (tl::to_string (QObject::tr ("Create ruler")));
+
+          m_current = ant::Object (ee.second.p1 (), ee.second.p2 (), 0, tpl);
+          show_message ();
+
+          insert_ruler (m_current, true);
+
+          //  end the transaction
+          manager ()->commit ();
+
+        }
+
       } else {
+
+        m_p1 = snap1 (p, m_obj_snap && tpl.snap ()).second;
 
         m_current = ant::Object (m_p1, m_p1, 0, tpl);
         show_message ();

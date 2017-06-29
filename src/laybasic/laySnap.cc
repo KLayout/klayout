@@ -25,6 +25,8 @@
 #include "laySnap.h"
 #include "layLayoutView.h"
 
+#include "dbEdge.h"
+
 namespace lay
 {
 
@@ -223,12 +225,14 @@ snap_angle (const db::DVector &in, lay::angle_constraint_type ac)
 class ContourFinder
 {
 public:
-  ContourFinder (const db::DPoint &original, const db::DVector &grid, const std::vector <db::DEdge> &cutlines)
+  ContourFinder (const db::DPoint &original, const db::DVector &grid, const std::vector <db::DEdge> &cutlines, bool directed = false)
     : m_any (false), m_any_exact (false), 
-      m_original (original), m_tests (10000 /* max. number of tests, TODO: make variable? */),
-      mp_layout (0), m_cutlines (cutlines), mp_prop_sel (0), m_inv_prop_sel (false)
+      m_original (original), m_is_vertex (false), m_is_vertex_exact (false),
+      m_tests (10000 /* max. number of tests, TODO: make variable? */),
+      mp_layout (0), m_cutlines (cutlines), mp_prop_sel (0), m_inv_prop_sel (false),
+      m_directed (directed)
   {
-    m_projection_constraint = ! m_cutlines.empty ();
+    m_projection_constraint = ! m_cutlines.empty () && ! directed;
 
     //  Add synthetic cutlines for the grid snap along edges
     if (m_cutlines.empty () && grid != db::DVector ()) {
@@ -250,7 +254,7 @@ public:
   find (lay::LayoutView *view, int cv_index, const std::vector<db::DCplxTrans> &trans, const db::Layout &layout, const db::DBox &region, const db::Cell &cell, unsigned int l,
         const std::set<db::properties_id_type> *prop_sel, bool inv_prop_sel, int min_hier_level, int max_hier_level)
   {
-    m_region = region; 
+    m_region = region * (1.0 / layout.dbu ());
     mp_layout = &layout;
     mp_prop_sel = prop_sel;
     m_inv_prop_sel = inv_prop_sel;
@@ -258,16 +262,60 @@ public:
     const lay::CellView &cv = view->cellview (cv_index);
 
     for (std::vector<db::DCplxTrans>::const_iterator t = trans.begin (); t != trans.end () && m_tests > 0; ++t) {
-      do_find (view, cv_index, cell, l, min_hier_level, max_hier_level, *t * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans ());
+      do_find (view, cv_index, cell, l, min_hier_level, max_hier_level, *t * db::CplxTrans () * cv.context_trans ());
     }
   }
 
-  const db::DPoint &get_found () const
+  bool is_vertex () const
   {
     if (m_any_exact) {
-      return m_closest_exact;
+      return m_is_vertex_exact;
     } else if (m_any) {
-      return m_closest;
+      return m_is_vertex;
+    } else {
+      return false;
+    }
+  }
+
+  std::pair<db::DEdge, db::DEdge> get_found_vertex_edges () const
+  {
+    if (m_any_exact) {
+      return std::make_pair (m_edge1_exact * mp_layout->dbu (), m_edge2_exact * mp_layout->dbu ());
+    } else if (m_any) {
+      return std::make_pair (m_edge1 * mp_layout->dbu (), m_edge2 * mp_layout->dbu ());
+    } else {
+      return std::pair<db::DEdge, db::DEdge> ();
+    }
+  }
+
+  bool has_found_edge () const
+  {
+    if (m_any_exact) {
+      return ! m_edge1_exact.is_degenerate ();
+    } else if (m_any) {
+      return ! m_edge1.is_degenerate ();
+    } else {
+      return false;
+    }
+  }
+
+  db::DEdge get_found_edge () const
+  {
+    if (m_any_exact) {
+      return m_edge1_exact * mp_layout->dbu ();
+    } else if (m_any) {
+      return m_edge1 * mp_layout->dbu ();
+    } else {
+      return db::DEdge ();
+    }
+  }
+
+  db::DPoint get_found () const
+  {
+    if (m_any_exact) {
+      return m_closest_exact * mp_layout->dbu ();
+    } else if (m_any) {
+      return m_closest * mp_layout->dbu ();
     } else {
       return m_original;
     }
@@ -275,30 +323,54 @@ public:
 
   bool any () const
   {
-// It looks like it's better to deliver any value than nothing ..
-#if 0
-    return (m_any || m_any_exact) && m_tests > 0;
-#else
     return (m_any || m_any_exact);
-#endif
+  }
+
+  bool any_exact () const
+  {
+    return m_any_exact;
   }
 
 private:
   void 
-  find_closest_exact (const db::DPoint &p)
+  find_closest_exact (const db::DPoint &p, const db::DEdge &e)
   {
-    if (! m_any_exact || m_original.distance (p) < m_original.distance (m_closest_exact)) {
+    if (! m_any_exact || m_original.distance (p * mp_layout->dbu ()) < m_original.distance (m_closest_exact * mp_layout->dbu ())) {
+
+      if (m_directed) {
+        for (std::vector<db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
+          if (db::sprod_sign (p - cl->p1 () * (1.0 / mp_layout->dbu ()), cl->d () * (1.0 / mp_layout->dbu ())) <= 0) {
+            return;
+          }
+        }
+      }
+
+      m_edge1_exact = m_edge2_exact = e;
+      m_is_vertex_exact = false;
       m_closest_exact = p;
       m_any_exact = true;
+
     }
   }
 
   void 
-  find_closest (const db::DPoint &p)
+  find_closest (const db::DPoint &p, const db::DEdge &e)
   {
-    if (! m_any || m_original.distance (p) < m_original.distance (m_closest)) {
+    if (! m_any || m_original.distance (p * mp_layout->dbu ()) < m_original.distance (m_closest * mp_layout->dbu ())) {
+
+      if (m_directed) {
+        for (std::vector<db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
+          if (db::sprod_sign (p - cl->p1 () * (1.0 / mp_layout->dbu ()), cl->d () * (1.0 / mp_layout->dbu ())) < 0) {
+            return;
+          }
+        }
+      }
+
+      m_edge1 = m_edge2 = e;
+      m_is_vertex = false;
       m_closest = p;
       m_any = true;
+
     }
   }
 
@@ -306,7 +378,7 @@ private:
   {
     if (! m_projection_constraint) {
 
-      find_closest_exact (p);
+      find_closest_exact (p, db::DEdge (p, p));
 
     } else {
 
@@ -315,13 +387,13 @@ private:
       //  test point.
       for (std::vector <db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
         std::pair<bool, db::DPoint> ret;
-        ret = db::DEdge (p, p + db::DVector (1.0, 0.0)).cut_point (*cl);
+        ret = db::DEdge (p, p + db::DVector (1.0, 0.0)).cut_point (*cl * (1.0 / mp_layout->dbu ()));
         if (ret.first) {
-          find_closest_exact (ret.second);
+          find_closest_exact (ret.second, db::DEdge (p, p));
         }
-        ret = db::DEdge (p, p + db::DVector (0.0, 1.0)).cut_point (*cl);
+        ret = db::DEdge (p, p + db::DVector (0.0, 1.0)).cut_point (*cl * (1.0 / mp_layout->dbu ()));
         if (ret.first) {
-          find_closest_exact (ret.second);
+          find_closest_exact (ret.second, db::DEdge (p, p));
         }
       }
 
@@ -335,16 +407,16 @@ private:
     //  do the checks in dbu space rather than micron space because
     //  the tolerances are set up for this.
     for (std::vector <db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
-      std::pair<bool, db::DPoint> ret = e.cut_point (*cl);
+      std::pair<bool, db::DPoint> ret = e.cut_point (*cl * (1.0 / mp_layout->dbu ()));
       if (ret.first) {
         //  if the projection exactly hits the edge and the point
         //  of crossing is inside the search region, take this as
         //  the exact hit. Exact hits have priority over projected
         //  hits.
         if (e.contains (ret.second) && m_region.contains (ret.second)) {
-          find_closest_exact (ret.second);
+          find_closest_exact (ret.second, e);
         } else {
-          find_closest (ret.second);
+          find_closest (ret.second, e);
         }
         any_point = true;
       }
@@ -361,26 +433,43 @@ private:
       db::DVector n (-v.y (), v.x ());
       double f = d / n.double_length ();
 
-      db::DPoint e1 (m_original.x () - n.x () * f,
-                     m_original.y () - n.y () * f);
-      db::DPoint e2 (m_original.x () + n.x () * f,
-                     m_original.y () + n.y () * f);
+      db::DPoint e1 (m_original.x () * (1.0 / mp_layout->dbu ()) - n.x () * f,
+                     m_original.y () * (1.0 / mp_layout->dbu ()) - n.y () * f);
+      db::DPoint e2 (m_original.x () * (1.0 / mp_layout->dbu ()) + n.x () * f,
+                     m_original.y () * (1.0 / mp_layout->dbu ()) + n.y () * f);
       
-      double dmin = mp_layout->dbu () * std::numeric_limits <db::Coord>::min ();
-      double dmax = mp_layout->dbu () * std::numeric_limits <db::Coord>::max ();
+      double dmin = std::numeric_limits <db::Coord>::min ();
+      double dmax = std::numeric_limits <db::Coord>::max ();
       db::DBox dworld (dmin, dmin, dmax, dmax);
 
       if (dworld.contains (e1) && dworld.contains (e2)) {
 
         std::pair<bool, db::DPoint> ip = e.intersect_point (db::DEdge (e1, e2));
         if (ip.first) { 
-          find_closest (ip.second);
+          find_closest (ip.second, e);
         }
 
       }
 
     }
 
+    if (m_any && m_closest.equal (e.p1 ())) {
+      m_edge1 = e;
+      m_is_vertex = true;
+    }
+    if (m_any && m_closest.equal (e.p2 ())) {
+      m_edge2 = e;
+      m_is_vertex = true;
+    }
+
+    if (m_any_exact && m_closest_exact.equal (e.p1 ())) {
+      m_edge1_exact = e;
+      m_is_vertex_exact = true;
+    }
+    if (m_any_exact && m_closest_exact.equal (e.p2 ())) {
+      m_edge2_exact = e;
+      m_is_vertex_exact = true;
+    }
   }
 
   void
@@ -508,6 +597,9 @@ private:
   bool m_any, m_any_exact;
   db::DPoint m_closest, m_closest_exact;
   db::DPoint m_original;
+  db::DEdge m_edge1, m_edge2;
+  db::DEdge m_edge1_exact, m_edge2_exact;
+  bool m_is_vertex, m_is_vertex_exact;
   int m_tests;
   const db::Layout *mp_layout;
   db::DBox m_region;
@@ -515,7 +607,60 @@ private:
   const std::set<db::properties_id_type> *mp_prop_sel;
   bool m_inv_prop_sel;
   bool m_projection_constraint;
+  bool m_directed;
 };
+
+static
+void run_finder (ContourFinder &finder, lay::LayoutView *view, const db::DPoint &dp, double snap_range)
+{
+  if (! view) {
+    return;
+  }
+
+  for (lay::LayerPropertiesConstIterator l = view->begin_layers (); ! l.at_end (); ++l) {
+
+    if (l->is_visual ()) {
+
+      const lay::CellView &cv = view->cellview (l->cellview_index ());
+      if (cv.is_valid ()) {
+
+        double px = dp.x ();
+        double py = dp.y ();
+        double dd = std::max (0.0, snap_range);
+
+        double dmin = cv->layout ().dbu () * std::numeric_limits <db::Coord>::min ();
+        double dmax = cv->layout ().dbu () * std::numeric_limits <db::Coord>::max ();
+        db::DBox dworld (dmin, dmin, dmax, dmax);
+
+        db::DBox dregion = dworld & db::DBox (px - dd, py - dd, px + dd, py + dd);
+
+        const lay::CellView &cv = view->cellview (l->cellview_index ());
+        int ctx_levels = cv.specific_path ().size ();
+
+        int min_hier_level = view->get_min_hier_levels () - ctx_levels;
+        int max_hier_level = view->get_max_hier_levels () - ctx_levels;
+        if (l->hier_levels ().has_from_level ()) {
+          min_hier_level = l->hier_levels ().from_level (ctx_levels, min_hier_level);
+        }
+        if (l->hier_levels ().has_to_level ()) {
+          max_hier_level = l->hier_levels ().to_level (ctx_levels, max_hier_level);
+        }
+
+        if (! dregion.empty ()) {
+          finder.find (view, l->cellview_index (), l->trans (), cv->layout (),
+                       db::DBox (dregion.p1 (), dregion.p2 ()),
+                       *cv.cell (),
+                       l->layer_index (),
+                       &l->prop_sel (), l->inverse_prop_sel (),
+                       min_hier_level, max_hier_level);
+        }
+
+      }
+
+    }
+
+  }
+}
 
 std::pair <bool, db::DPoint>
 obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double snap_range, const std::vector <db::DEdge> &cutlines)
@@ -523,54 +668,7 @@ obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, 
   db::DPoint dp (pt);
 
   ContourFinder finder (dp, grid, cutlines);
-
-  if (view) {
-
-    for (lay::LayerPropertiesConstIterator l = view->begin_layers (); ! l.at_end (); ++l) {
-
-      if (l->is_visual ()) {
-
-        const lay::CellView &cv = view->cellview (l->cellview_index ());
-        if (cv.is_valid ()) {
-
-          double px = dp.x ();
-          double py = dp.y ();
-          double dd = std::max (0.0, snap_range);
-          
-          double dmin = cv->layout ().dbu () * std::numeric_limits <db::Coord>::min ();
-          double dmax = cv->layout ().dbu () * std::numeric_limits <db::Coord>::max ();
-          db::DBox dworld (dmin, dmin, dmax, dmax);
-
-          db::DBox dregion = dworld & db::DBox (px - dd, py - dd, px + dd, py + dd);
-
-          const lay::CellView &cv = view->cellview (l->cellview_index ());
-          int ctx_levels = cv.specific_path ().size ();
-
-          int min_hier_level = view->get_min_hier_levels () - ctx_levels;
-          int max_hier_level = view->get_max_hier_levels () - ctx_levels;
-          if (l->hier_levels ().has_from_level ()) {
-            min_hier_level = l->hier_levels ().from_level (ctx_levels, min_hier_level);
-          }
-          if (l->hier_levels ().has_to_level ()) {
-            max_hier_level = l->hier_levels ().to_level (ctx_levels, max_hier_level);
-          }
-
-          if (! dregion.empty ()) {
-            finder.find (view, l->cellview_index (), l->trans (), cv->layout (), 
-                         db::DBox (dregion.p1 (), dregion.p2 ()), 
-                         *cv.cell (), 
-                         l->layer_index (), 
-                         &l->prop_sel (), l->inverse_prop_sel (),
-                         min_hier_level, max_hier_level); 
-          }
-
-        }
-
-      }
-
-    }
-
-  } 
+  run_finder (finder, view, dp, snap_range);
 
   //  in grid snap mode, for the "object free" analysis snap to the grid now
   if (grid != db::DVector ()) {
@@ -593,7 +691,7 @@ obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, 
 
   if (finder.any () && anyp) {
     //  if both the projection and the finder are sucessful, decide by a heuristic criterion which to take
-    //  (the projection gets a penalty (of the snap range) a counts less than the finder's choice)
+    //  (the projection gets a penalty (of the snap range) to make it count less than the finder's choice)
     //  This avoids extreme distortions of the ruler due to projection on long edges.
     if ((dp.distance (closest) + snap_range) * 5.0 < dp.distance (finder.get_found ())) {
       return std::make_pair (false, closest);
@@ -609,11 +707,77 @@ obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, 
   }
 }
 
-std::pair <bool, db::DPoint>
-obj_snap (lay::LayoutView *view, const db::DPoint &p1, const db::DPoint &p2, const db::DVector &grid, lay::angle_constraint_type snap_mode, double snap_range)
+std::pair <bool, db::DEdge>
+obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range, const std::vector <db::DEdge> &cutlines)
 {
-  std::vector <db::DEdge> cutlines;
+  db::DPoint dp (pt);
+  ContourFinder finder (dp, grid, cutlines);
 
+  double sr = min_search_range;
+  while (sr < max_search_range + 1e-6) {
+
+    run_finder (finder, view, dp, sr);
+
+    if (finder.any ()) {
+
+      db::DPoint p1 = finder.get_found ();
+
+      std::vector <db::DEdge> cl;
+      db::DVector n;
+
+      if (finder.is_vertex () || finder.has_found_edge ()) {
+
+        if (finder.is_vertex ()) {
+
+          std::pair<db::DEdge, db::DEdge> ee = finder.get_found_vertex_edges ();
+          db::DVector d1 = ee.first.d ();
+          if (d1.double_length () > 1e-6) {
+            d1 *= (1.0 / d1.double_length ());
+          }
+          db::DVector d2 = ee.second.d ();
+          if (d2.double_length () > 1e-6) {
+            d2 *= (1.0 / d1.double_length ());
+          }
+
+          n = ((d1 + d2) * 0.5).transformed (db::DTrans (db::DTrans::r90));
+
+        } else {
+          n = finder.get_found_edge ().d ().transformed (db::DTrans (db::DTrans::r90));
+        }
+
+        if (db::sprod (n, dp - p1) < 0.0) {
+          n = -n;
+        }
+        cl.push_back (db::DEdge (p1, p1 + n));
+
+      }
+
+      ContourFinder finder2 (dp, grid, cl, true /*directional cutlines*/);
+
+      double sr2 = min_search_range;
+      while (sr2 < max_search_range + 1e-6) {
+        run_finder (finder2, view, dp, sr2);
+        if (finder2.any_exact ()) {
+          db::DPoint p2 = finder2.get_found ();
+          return std::make_pair (true, db::DEdge (p1, p2));
+        }
+        sr2 *= 2.0;
+      }
+
+      return std::make_pair (false, db::DEdge ());
+
+    }
+
+    sr *= 2.0;
+
+  }
+
+  return std::make_pair (false, db::DEdge ());
+}
+
+static void
+make_cutlines (lay::angle_constraint_type snap_mode, const db::DPoint &p1, std::vector <db::DEdge> &cutlines)
+{
   //  set up cutlines depending on the mode
   if (snap_mode == lay::AC_Ortho) {
     cutlines.reserve (2);
@@ -629,9 +793,23 @@ obj_snap (lay::LayoutView *view, const db::DPoint &p1, const db::DPoint &p2, con
     cutlines.push_back (db::DEdge (p1, p1 + db::DVector (1.0, 0.0)));
     cutlines.push_back (db::DEdge (p1, p1 + db::DVector (1.0, 1.0)));
     cutlines.push_back (db::DEdge (p1, p1 + db::DVector (1.0, -1.0)));
-  } 
+  }
+}
 
+std::pair <bool, db::DPoint>
+obj_snap (lay::LayoutView *view, const db::DPoint &p1, const db::DPoint &p2, const db::DVector &grid, lay::angle_constraint_type snap_mode, double snap_range)
+{
+  std::vector <db::DEdge> cutlines;
+  make_cutlines (snap_mode, p1, cutlines);
   return obj_snap (view, p2, grid, snap_range, cutlines); 
+}
+
+std::pair <bool, db::DEdge>
+obj_snap2 (lay::LayoutView *view, const db::DPoint &p1, const db::DPoint &p2, const db::DVector &grid, lay::angle_constraint_type snap_mode, double min_search_range, double max_search_range)
+{
+  std::vector <db::DEdge> cutlines;
+  make_cutlines (snap_mode, p1, cutlines);
+  return obj_snap2 (view, p2, grid, min_search_range, max_search_range, cutlines);
 }
 
 }

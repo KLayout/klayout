@@ -128,14 +128,6 @@ namespace lay
   LAYBASIC_PUBLIC std::pair <bool, db::DPoint> obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double snap_range);
 
   /**
-   *  @brief Same than obj_snap, but delivers two points on two opposite sides of the initial point
-   *
-   *  This method basically implements "auto measure". The first value of the returned pair
-   *  is true if such an edge could be found. Otherwise it's false.
-   */
-  LAYBASIC_PUBLIC std::pair <bool, db::DEdge> obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range);
-
-  /**
    *  @brief combined grid-, projection- and object snapping provided to implementing "magnetic features"
    *
    *  This is a convenience method that creates the projection axes from a reference point and an angle mode.
@@ -149,7 +141,14 @@ namespace lay
    *  This method basically implements "auto measure". The first value of the returned pair
    *  is true if such an edge could be found. Otherwise it's false.
    */
-  LAYBASIC_PUBLIC std::pair <bool, db::DEdge> obj_snap2 (lay::LayoutView *view, const db::DPoint &pr, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range);
+  LAYBASIC_PUBLIC std::pair <bool, db::DEdge> obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range);
+
+  /**
+   *  @brief Same than the previous obj_snap2, but allows specification of an angle constraint
+   *
+   *  Measurements will be confined to the direction specified.
+   */
+  LAYBASIC_PUBLIC std::pair <bool, db::DEdge> obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range);
 
   /**
    *  @brief Reduce a given vector according to the angle constraint

@@ -1410,9 +1410,14 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
       } else if (tpl.mode () == ant::Template::RulerAutoMetric) {
 
         //  for auto-metric we need some cutline constraint - any or global won't do.
-        lay::angle_constraint_type ac = tpl.angle_constraint ();
-        ac = (ac == lay::AC_Global ? m_snap_mode : ac);
-        if (ac == lay::AC_Any || ac == lay::AC_Global) {
+        lay::angle_constraint_type ac = ac_from_buttons (buttons);
+        if (ac == lay::AC_Global) {
+          ac = tpl.angle_constraint ();
+        }
+        if (ac == lay::AC_Global) {
+          ac = m_snap_mode;
+        }
+        if (ac == lay::AC_Global) {
           ac = lay::AC_Diagonal;
         }
 
@@ -1424,7 +1429,7 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
         double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
         snap_range *= 0.5;
 
-        std::pair<bool, db::DEdge> ee = lay::obj_snap2 (mp_view, p, p, g, ac, snap_range, snap_range * 1000.0);
+        std::pair<bool, db::DEdge> ee = lay::obj_snap2 (mp_view, p, g, ac, snap_range, snap_range * 1000.0);
         if (ee.first) {
 
           //  begin the transaction

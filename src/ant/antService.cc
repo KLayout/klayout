@@ -1509,7 +1509,7 @@ Service::deactivated ()
 }
 
 std::pair<bool, db::DPoint> 
-Service::snap1 (const db::DPoint &p, bool obj_snap, const std::vector <db::DEdge> &cutlines)
+Service::snap1 (const db::DPoint &p, bool obj_snap)
 {
   db::DVector g;
   if (m_grid_snap) {
@@ -1517,7 +1517,7 @@ Service::snap1 (const db::DPoint &p, bool obj_snap, const std::vector <db::DEdge
   }
 
   double snap_range = widget ()->mouse_event_trans ().inverted ().ctrans (m_snap_range);
-  return lay::obj_snap (obj_snap ? mp_view : 0, p, g, snap_range, cutlines);
+  return lay::obj_snap (obj_snap ? mp_view : 0, p, g, snap_range);
 }
 
 

@@ -486,7 +486,7 @@ private:
   std::vector<ant::Template> m_ruler_templates;
   unsigned int m_current_template;
 
-  std::pair<bool, db::DPoint> snap1 (const db::DPoint &p, bool obj_snap, const std::vector <db::DEdge> &cutlines = std::vector <db::DEdge> ());
+  std::pair<bool, db::DPoint> snap1 (const db::DPoint &p, bool obj_snap);
   std::pair<bool, db::DPoint> snap2 (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
   
   const ant::Template &current_template () const;

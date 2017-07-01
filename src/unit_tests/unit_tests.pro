@@ -100,7 +100,8 @@ SOURCES = \
     laySalt.cc \
     tlFileUtils.cc \
     tlHttpStream.cc \
-    tlWebDAV.cc
+    tlWebDAV.cc \
+    laySnap.cc
 
 # main components:
 SOURCES += \

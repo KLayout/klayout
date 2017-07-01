@@ -124,16 +124,16 @@ namespace lay
    *  @param pt The point to snap
    *  @param grid Either (0,0) to disable grid snapping or a (gx,gy) value for the (potentially anisotropic grid)
    *  @param snap_range The search range for objects 
-   *  @param axes The projection edges.
    */
-  LAYBASIC_PUBLIC std::pair <bool, db::DPoint> obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double snap_range, const std::vector <db::DEdge> &axes = std::vector <db::DEdge> ());
+  LAYBASIC_PUBLIC std::pair <bool, db::DPoint> obj_snap (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double snap_range);
 
   /**
    *  @brief Same than obj_snap, but delivers two points on two opposite sides of the initial point
    *
-   *  This method basically implements "auto measure"
+   *  This method basically implements "auto measure". The first value of the returned pair
+   *  is true if such an edge could be found. Otherwise it's false.
    */
-  LAYBASIC_PUBLIC std::pair <bool, db::DEdge> obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range, const std::vector <db::DEdge> &axes = std::vector <db::DEdge> ());
+  LAYBASIC_PUBLIC std::pair <bool, db::DEdge> obj_snap2 (lay::LayoutView *view, const db::DPoint &pt, const db::DVector &grid, double min_search_range, double max_search_range);
 
   /**
    *  @brief combined grid-, projection- and object snapping provided to implementing "magnetic features"
@@ -146,7 +146,8 @@ namespace lay
   /**
    *  @brief Same than obj_snap, but delivers two points on two opposite sides of the initial point
    *
-   *  This method basically implements "auto measure"
+   *  This method basically implements "auto measure". The first value of the returned pair
+   *  is true if such an edge could be found. Otherwise it's false.
    */
   LAYBASIC_PUBLIC std::pair <bool, db::DEdge> obj_snap2 (lay::LayoutView *view, const db::DPoint &pr, const db::DPoint &pt, const db::DVector &grid, lay::angle_constraint_type ac, double min_search_range, double max_search_range);
 

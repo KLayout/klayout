@@ -346,7 +346,9 @@ struct coord_traits<int64_t>
  *  @brief Coord_traits specialisation for double coordinates 
  *
  *  The precision is choosen such that the double coordinate
- *  can represent a 32bit coordinate space with this precision.
+ *  can represent "micrometers" with a physical resolution limit of 0.01 nm.
+ *  The area precision will render reliable vector product signs for vectors
+ *  of roughly up to 60 mm length.
  */
 template <>
 struct coord_traits<double>
@@ -357,9 +359,9 @@ struct coord_traits<double>
   typedef double perimeter_type;
   typedef float short_coord_type;
 
-  static double prec ()                       { return 1e-4; }
-  static double prec_distance ()              { return 1e-2; }
-  static double prec_area ()                  { return 1e-2; }
+  static double prec ()                       { return 1e-5; }
+  static double prec_distance ()              { return 1e-5; }
+  static double prec_area ()                  { return 1e-10; }
   template <class X>
   static double rounded (X v)                 { return double (v); }
   static double rounded_up (double v)         { return v; }
@@ -431,99 +433,6 @@ struct coord_traits<double>
   static bool equals_area (double a, double v) 
   { 
     return fabs (double (a) - v) < prec_area (); 
-  }  
-
-};
-
-/** 
- *  @brief Coord_traits specialisation for float coordinates 
- *
- *  This is mainly required because of the "short type" of "double" which
- *  requires an coord_traits for it's own.
- */
-template <>
-struct coord_traits<float>
-{
-  typedef float coord_type;
-  typedef double area_type;
-  typedef float distance_type;
-  typedef double perimeter_type;
-  typedef float short_coord_type;
-
-  static float prec ()                      { return 1e-4f; } // just a copy from "double"
-  static float prec_distance ()             { return 1e-2f; } // just a copy from "double"
-  static float prec_area ()                 { return 1e-2f; } // just a copy from "double"
-  template <class X>
-  static float rounded (X v)                { return float (v); }
-  static float rounded_up (float v)         { return v; }
-  static float rounded_down (float v)       { return v; }
-  static float rounded_distance (float v)   { return v; }
-  static float rounded_perimeter (float v)  { return v; }
-
-  static area_type sq_length (coord_type ax, coord_type ay, 
-                              coord_type bx, coord_type by) 
-  {
-    return (ax - bx) * (ax - bx) + (ay - by) * (ay - by);
-  }
-
-  static area_type sprod (coord_type ax, coord_type ay, 
-                          coord_type bx, coord_type by, 
-                          coord_type cx, coord_type cy) 
-  {
-    return (ax - cx) * (bx - cx) + (ay - cy) * (by - cy);
-  }
-
-  static int sprod_sign (float ax, float ay, float bx, float by, float cx, float cy) 
-  {
-    area_type p1 = (ax - cx) * (bx - cx);
-    area_type p2 = -(ay - cy) * (by - cy);
-    if (p1 <= p2 - prec_area ()) {
-      return -1;
-    } else if (p1 < p2 + prec_area ()) {
-      return 0;
-    } else {
-      return 1;
-    }  
-  }
-
-  static area_type vprod (coord_type ax, coord_type ay, 
-                          coord_type bx, coord_type by, 
-                          coord_type cx, coord_type cy) 
-  {
-    return (ax - cx) * (by - cy) - (ay - cy) * (bx - cx);
-  }
-
-  static int vprod_sign (float ax, float ay, float bx, float by, float cx, float cy) 
-  {
-    area_type p1 = (ax - cx) * (by - cy);
-    area_type p2 = (ay - cy) * (bx - cx);
-    if (p1 <= p2 - prec_area ()) {
-      return -1;
-    } else if (p1 < p2 + prec_area ()) {
-      return 0;
-    } else {
-      return 1;
-    }  
-  }
-
-  static bool equal (float c1, float c2)
-  {
-    return fabs (c1 - c2) < prec (); 
-  }
-
-  static bool less (float c1, float c2)
-  {
-    return c1 < c2 - prec () * 0.5;
-  }
-
-  static bool equals (float c, float v) 
-  { 
-    return fabs (float (c) - v) < prec (); 
-  }  
-
-  static bool equals_area (float a, float v) 
-  { 
-    return fabs (float (a) - v) < prec_area (); 
   }  
 
 };

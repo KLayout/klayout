@@ -1283,7 +1283,7 @@ OASISReader::do_read (db::Layout &layout)
             std::vector<tl::Variant> new_list (l);
             for (std::vector<tl::Variant>::iterator ll = new_list.begin (); ll != new_list.end (); ++ll) {
               if (ll->is_id ()) {
-                unsigned long id = (unsigned long) ps->second.to_id ();
+                unsigned long id = (unsigned long) ll->to_id ();
                 std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
                 if (fw != m_propvalue_forward_references.end ()) {
                   *ll = tl::Variant (fw->second);

@@ -379,7 +379,7 @@ public:
   /**
    *  @brief Gets the XML structure representing a grain
    */
-  static tl::XMLElementList &xml_struct ();
+  static tl::XMLElementList &xml_elements ();
 
   /**
    *  @brief Compares two version strings

@@ -340,33 +340,43 @@ struct ImageConverter
   }
 };
 
-static tl::XMLElementList s_xml_elements =
-  tl::make_member (&SaltGrain::name, &SaltGrain::set_name, "name") +
-  tl::make_member (&SaltGrain::version, &SaltGrain::set_version, "version") +
-  tl::make_member (&SaltGrain::api_version, &SaltGrain::set_api_version, "api-version") +
-  tl::make_member (&SaltGrain::title, &SaltGrain::set_title, "title") +
-  tl::make_member (&SaltGrain::doc, &SaltGrain::set_doc, "doc") +
-  tl::make_member (&SaltGrain::doc_url, &SaltGrain::set_doc_url, "doc-url") +
-  tl::make_member (&SaltGrain::url, &SaltGrain::set_url, "url") +
-  tl::make_member (&SaltGrain::license, &SaltGrain::set_license, "license") +
-  tl::make_member (&SaltGrain::author, &SaltGrain::set_author, "author") +
-  tl::make_member (&SaltGrain::author_contact, &SaltGrain::set_author_contact, "author-contact") +
-  tl::make_member (&SaltGrain::authored_time, &SaltGrain::set_authored_time, "authored-time", TimeConverter ()) +
-  tl::make_member (&SaltGrain::installed_time, &SaltGrain::set_installed_time, "installed-time", TimeConverter ()) +
-  tl::make_member (&SaltGrain::icon, &SaltGrain::set_icon, "icon", ImageConverter ()) +
-  tl::make_member (&SaltGrain::screenshot, &SaltGrain::set_screenshot, "screenshot", ImageConverter ()) +
-  tl::make_element (&SaltGrain::begin_dependencies, &SaltGrain::end_dependencies, &SaltGrain::add_dependency, "depends",
-    tl::make_member (&SaltGrain::Dependency::name, "name") +
-    tl::make_member (&SaltGrain::Dependency::url, "url") +
-    tl::make_member (&SaltGrain::Dependency::version, "version")
-  );
-
-static tl::XMLStruct<lay::SaltGrain> s_xml_struct ("salt-grain", s_xml_elements);
+static tl::XMLElementList *sp_xml_elements = 0;
 
 tl::XMLElementList &
-SaltGrain::xml_struct ()
+SaltGrain::xml_elements ()
 {
-  return s_xml_elements;
+  if (! sp_xml_elements) {
+    sp_xml_elements = new tl::XMLElementList (
+      tl::make_member (&SaltGrain::name, &SaltGrain::set_name, "name") +
+      tl::make_member (&SaltGrain::version, &SaltGrain::set_version, "version") +
+      tl::make_member (&SaltGrain::api_version, &SaltGrain::set_api_version, "api-version") +
+      tl::make_member (&SaltGrain::title, &SaltGrain::set_title, "title") +
+      tl::make_member (&SaltGrain::doc, &SaltGrain::set_doc, "doc") +
+      tl::make_member (&SaltGrain::doc_url, &SaltGrain::set_doc_url, "doc-url") +
+      tl::make_member (&SaltGrain::url, &SaltGrain::set_url, "url") +
+      tl::make_member (&SaltGrain::license, &SaltGrain::set_license, "license") +
+      tl::make_member (&SaltGrain::author, &SaltGrain::set_author, "author") +
+      tl::make_member (&SaltGrain::author_contact, &SaltGrain::set_author_contact, "author-contact") +
+      tl::make_member (&SaltGrain::authored_time, &SaltGrain::set_authored_time, "authored-time", TimeConverter ()) +
+      tl::make_member (&SaltGrain::installed_time, &SaltGrain::set_installed_time, "installed-time", TimeConverter ()) +
+      tl::make_member (&SaltGrain::icon, &SaltGrain::set_icon, "icon", ImageConverter ()) +
+      tl::make_member (&SaltGrain::screenshot, &SaltGrain::set_screenshot, "screenshot", ImageConverter ()) +
+      tl::make_element (&SaltGrain::begin_dependencies, &SaltGrain::end_dependencies, &SaltGrain::add_dependency, "depends",
+        tl::make_member (&SaltGrain::Dependency::name, "name") +
+        tl::make_member (&SaltGrain::Dependency::url, "url") +
+        tl::make_member (&SaltGrain::Dependency::version, "version")
+      )
+    );
+  }
+
+  return *sp_xml_elements;
+}
+
+static
+tl::XMLStruct<lay::SaltGrain>
+xml_struct ()
+{
+  return tl::XMLStruct<lay::SaltGrain> ("salt-grain", SaltGrain::xml_elements ());
 }
 
 bool
@@ -385,7 +395,7 @@ SaltGrain::load (const std::string &p)
   if (p[0] != ':') {
 
     tl::XMLFileSource source (p);
-    s_xml_struct.parse (source, *this);
+    xml_struct ().parse (source, *this);
 
   } else {
 
@@ -399,7 +409,7 @@ SaltGrain::load (const std::string &p)
 
     std::string str_data (data.constData (), data.size ());
     tl::XMLStringSource source (str_data);
-    s_xml_struct.parse (source, *this);
+    xml_struct ().parse (source, *this);
 
   }
 }
@@ -408,7 +418,7 @@ void
 SaltGrain::load (tl::InputStream &p)
 {
   tl::XMLStreamSource source (p);
-  s_xml_struct.parse (source, *this);
+  xml_struct ().parse (source, *this);
 }
 
 void
@@ -421,7 +431,7 @@ void
 SaltGrain::save (const std::string &p) const
 {
   tl::OutputStream os (p, tl::OutputStream::OM_Plain);
-  s_xml_struct.write (os, *this);
+  xml_struct ().write (os, *this);
 }
 
 SaltGrain

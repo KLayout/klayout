@@ -236,7 +236,7 @@ SaltGrains::from_path (const std::string &path, const std::string &prefix)
 static tl::XMLElementList s_group_struct =
   tl::make_member (&SaltGrains::name, &SaltGrains::set_name, "name") +
   tl::make_element (&SaltGrains::begin_collections, &SaltGrains::end_collections, &SaltGrains::add_collection, "group", &s_group_struct) +
-  tl::make_element (&SaltGrains::begin_grains, &SaltGrains::end_grains, &SaltGrains::add_grain, "salt-grain", SaltGrain::xml_struct ());
+  tl::make_element (&SaltGrains::begin_grains, &SaltGrains::end_grains, &SaltGrains::add_grain, "salt-grain", SaltGrain::xml_elements ());
 
 static tl::XMLStruct<lay::SaltGrains> s_xml_struct ("salt-mine", s_group_struct);
 

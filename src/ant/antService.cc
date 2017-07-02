@@ -182,14 +182,18 @@ draw_ruler (const db::DPoint &q1,
       
     if (sel && style != ant::Object::STY_none) {
 
-      db::DVector qw = qq * (double (sel_width) * 0.5);
+      db::DVector qw = qq * (sel_width * 0.5);
       
       db::DVector dq1, dq2;
       if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_start) {
-        dq1 = qu * double (arrow_length - 1);
+        dq1 = qu * (arrow_length - 1);
+      } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_start) {
+        dq1 = qu * (sel_width * 0.5);
       }
       if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_end) {
-        dq2 = qu * double (-(arrow_length - 1));
+        dq2 = qu * -(arrow_length - 1);
+      } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_end) {
+        dq2 = qu * -(sel_width * 0.5);
       }
 
       db::DPolygon p;

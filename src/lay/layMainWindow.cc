@@ -92,6 +92,8 @@
 #include "layLayoutPropertiesForm.h"
 #include "layLayoutStatisticsForm.h"
 #include "layMacroController.h"
+#include "antObject.h"
+#include "antService.h"
 #include "ui_HelpAboutDialog.h"
 #include "gsi.h"
 #include "gsiInterpreter.h"
@@ -2355,12 +2357,46 @@ MainWindow::cm_goto_position ()
         std::string tt (tl::to_string (text));
         tl::Extractor ex (tt.c_str ());
         ex >> x >> "," >> y;
+
+        db::DPoint pt (x, y);
+
         if (! ex.at_end ()) {
           ex >> "," >> s >> tl::Extractor::end ();
-          current_view ()->goto_window (db::DPoint (x, y), s);
+          current_view ()->goto_window (pt, s);
         } else {
-          current_view ()->goto_window (db::DPoint (x, y));
+          current_view ()->goto_window (pt);
         }
+
+        std::string goto_marker_cat = "_goto_marker";
+
+        ant::Service *ant_service = current_view ()->get_plugin<ant::Service> ();
+        if (ant_service) {
+
+          //  Produce a "goto marker" at the target position
+
+          ant::AnnotationIterator a = ant_service->begin_annotations ();
+          while (! a.at_end ()) {
+            if (a->category () == goto_marker_cat) {
+              ant_service->delete_ruler (a.current ());
+            }
+            ++a;
+          }
+
+          ant::Object marker;
+          marker.p1 (pt);
+          marker.p2 (pt);
+          marker.fmt_x ("");
+          marker.fmt_y ("");
+          marker.fmt ("$U,$V");
+          marker.angle_constraint (lay::AC_Any);
+          marker.style (ant::Object::STY_cross_both);
+          marker.outline (ant::Object::OL_diag);
+          marker.set_category (goto_marker_cat);
+
+          ant_service->insert_ruler (marker, false);
+
+        }
+
         break;
 
       }

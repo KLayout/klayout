@@ -148,7 +148,7 @@ public:
   {
     do {
       ++m_n;
-    } while (*this != mp_v->end () && ! mp_v->is_used (m_n));
+    } while (! at_end () && ! mp_v->is_used (m_n));
     return *this;
   }
 
@@ -157,7 +157,7 @@ public:
    */
   bool at_end () const
   {
-    return *this == mp_v->end ();
+    return index () >= mp_v->last ();
   }
 
   /** 
@@ -317,7 +317,7 @@ public:
   {
     do {
       ++m_n;
-    } while (*this != mp_v->end () && ! mp_v->is_used (m_n));
+    } while (! at_end () && ! mp_v->is_used (m_n));
     return *this;
   }
 
@@ -326,7 +326,7 @@ public:
    */
   bool at_end () const
   {
-    return *this == mp_v->end ();
+    return index () >= mp_v->last ();
   }
 
   /** 

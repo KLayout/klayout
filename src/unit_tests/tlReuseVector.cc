@@ -287,3 +287,103 @@ TEST(4)
   EXPECT_EQ (B::ccc, 22);
 }
 
+//  destroy while iterate
+TEST(5)
+{
+  tl::reuse_vector<A> v;
+  v.insert (A (1));
+  v.insert (A (2));
+  v.insert (A (3));
+
+  tl::reuse_vector<A>::iterator i;
+  tl::reuse_vector<A>::iterator ii;
+
+  ii = v.end ();
+  for (i = v.begin (); i != ii; ++i) {
+    if (i->x == 2) {
+      v.erase (i);
+    }
+  }
+
+  EXPECT_EQ (v.size (), size_t (2));
+  i = v.begin ();
+  EXPECT_EQ (i->x, 1);
+  ++i;
+  EXPECT_EQ (i->x, 3);
+
+  v = tl::reuse_vector<A> ();
+  v.insert (A (1));
+  v.insert (A (2));
+  v.insert (A (3));
+
+  for (i = v.begin (); !i.at_end (); ++i) {
+    if (i->x == 2) {
+      v.erase (i);
+    }
+  }
+
+  EXPECT_EQ (v.size (), size_t (2));
+  i = v.begin ();
+  EXPECT_EQ (i->x, 1);
+  ++i;
+  EXPECT_EQ (i->x, 3);
+
+  v = tl::reuse_vector<A> ();
+  v.insert (A (1));
+  v.insert (A (2));
+  v.insert (A (3));
+
+  ii = v.end ();
+  for (i = v.begin (); i != ii; ++i) {
+    if (i->x == 3) {
+      v.erase (i);
+    }
+  }
+
+  EXPECT_EQ (v.size (), size_t (2));
+  i = v.begin ();
+  EXPECT_EQ (i->x, 1);
+  ++i;
+  EXPECT_EQ (i->x, 2);
+
+  v = tl::reuse_vector<A> ();
+  v.insert (A (1));
+  v.insert (A (2));
+  v.insert (A (3));
+
+  for (i = v.begin (); !i.at_end (); ++i) {
+    if (i->x == 3) {
+      v.erase (i);
+    }
+  }
+
+  EXPECT_EQ (v.size (), size_t (2));
+  i = v.begin ();
+  EXPECT_EQ (i->x, 1);
+  ++i;
+  EXPECT_EQ (i->x, 2);
+
+  v = tl::reuse_vector<A> ();
+  v.insert (A (1));
+  v.insert (A (2));
+  v.insert (A (3));
+
+  ii = v.end ();
+  for (i = v.begin (); i != ii; ++i) {
+    v.erase (i);
+  }
+  EXPECT_EQ (v.size (), size_t (0));
+  EXPECT_EQ (v.empty (), true);
+
+  v = tl::reuse_vector<A> ();
+  v.insert (A (1));
+  v.insert (A (2));
+  v.insert (A (3));
+
+  for (i = v.begin (); !i.at_end (); ++i) {
+    v.erase (i);
+  }
+  EXPECT_EQ (v.size (), size_t (0));
+  EXPECT_EQ (v.empty (), true);
+}
+

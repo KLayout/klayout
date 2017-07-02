@@ -46,9 +46,13 @@ public:
   virtual bool configure (const std::string &name, const std::string &value);
   virtual std::vector<std::pair <std::string, lay::ConfigPage *> > config_pages (QWidget *parent) const;
   virtual void config_finalize ();
-  virtual void initialize (lay::PluginRoot *);
+  virtual void initialized (lay::PluginRoot *);
   virtual void uninitialize (lay::PluginRoot *);
   virtual bool menu_activated (const std::string &symbol) const;
+
+  void register_annotation_template (const ant::Template &t);
+
+  static PluginDeclaration *instance ();
 
 private:
   void update_current_template ();

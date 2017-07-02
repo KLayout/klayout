@@ -2128,33 +2128,6 @@ Service::menu_activated (const std::string &symbol)
   }
 }
 
-void
-Service::register_annotation_template (const ant::Template &t)
-{
-  std::string value = lay::PluginRoot::instance ()->config_get (cfg_ruler_templates);
-
-  std::vector<ant::Template> templates = ant::Template::from_string (value);
-
-  //  Remove a template with the same category if such a template already exists
-  if (! t.category ().empty ()) {
-    for (size_t i = 0; i < templates.size (); ) {
-      if (templates[i].category () == t.category ()) {
-        templates.erase (templates.begin () + i);
-      } else {
-        ++i;
-      }
-    }
-  }
-
-  //  and add the new one
-  templates.push_back (t);
-
-  value = ant::Template::to_string (templates);
-
-  lay::PluginRoot::instance ()->config_set (cfg_ruler_templates, value);
-  lay::PluginRoot::instance ()->config_end ();
-}
-
 // -------------------------------------------------------------
 
 } // namespace ant

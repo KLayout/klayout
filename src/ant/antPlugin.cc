@@ -35,16 +35,24 @@
 namespace ant
 {
 
+static PluginDeclaration *sp_instance = 0;
+
 PluginDeclaration::PluginDeclaration ()
   : m_current_template (0), 
     m_current_template_updated (true), m_templates_updated (true)
 {
-  // .. nothing yet ..
+  sp_instance = this;
 }
 
 PluginDeclaration::~PluginDeclaration ()
 {
-  // .. nothing yet ..
+  sp_instance = 0;
+}
+
+PluginDeclaration *
+PluginDeclaration::instance ()
+{
+  return sp_instance;
 }
 
 void 
@@ -124,7 +132,7 @@ PluginDeclaration::configure (const std::string &name, const std::string &value)
 
     m_templates = ant::Template::from_string (value);
     m_templates_updated = true;
-    
+
   } else if (name == cfg_current_ruler_template) {
     
     int n = 0;
@@ -161,9 +169,15 @@ PluginDeclaration::config_finalize ()
 }
 
 void 
-PluginDeclaration::initialize (lay::PluginRoot *)
+PluginDeclaration::initialized (lay::PluginRoot *)
 {
-  // .. nothing yet ..
+  ant::Template pos_template (tl::to_string (QObject::tr ("Cross")), "", "", "$U,$V", ant::Object::STY_cross_both, ant::Object::OL_diag, true, lay::AC_Global, "_cross");
+  pos_template.set_mode (ant::Template::RulerSingleClick);
+  register_annotation_template (pos_template);
+
+  ant::Template auto_template (tl::to_string (QObject::tr ("Measure")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_measure");
+  auto_template.set_mode (ant::Template::RulerAutoMetric);
+  register_annotation_template (auto_template);
 }
 
 void 
@@ -242,6 +256,24 @@ PluginDeclaration::update_menu ()
     }
   }
     
+}
+
+void
+PluginDeclaration::register_annotation_template (const ant::Template &t)
+{
+  if (t.category ().empty ()) {
+    return;
+  }
+
+  for (std::vector<ant::Template>::iterator i = m_templates.begin (); i != m_templates.end (); ++i) {
+    if (i->category () == t.category ()) {
+      return;
+    }
+  }
+
+  m_templates.push_back (t);
+  lay::PluginRoot::instance ()->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
+  lay::PluginRoot::instance ()->config_end ();
 }
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ant::PluginDeclaration (), 3000, "ant::Plugin");

@@ -77,7 +77,7 @@ public:
    * 
    *  Creates a template with the given format strings and styles
    */
-  Template (const std::string &title, const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraints);
+  Template (const std::string &title, const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraints, const std::string &cat);
 
   /** 
    *  @brief Copy constructor

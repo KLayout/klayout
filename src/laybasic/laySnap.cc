@@ -108,8 +108,7 @@ snap (const db::DPoint &p1, const db::DPoint &p2, db::DCoord grid)
   if (grid <= 1e-10) {
     return std::make_pair (p1, p2);
   } else {
-    std::pair<db::DPoint, db
-::DPoint> v = snap (db::DPoint (p1.x () / grid, p1.y () / grid),
+    std::pair<db::DPoint, db::DPoint> v = snap (db::DPoint (p1.x () / grid, p1.y () / grid),
                                                 db::DPoint (p2.x () / grid, p2.y () / grid));
     return std::make_pair (v.first * grid, v.second * grid);
   }

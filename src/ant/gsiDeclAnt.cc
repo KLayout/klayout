@@ -20,12 +20,11 @@
 
 */
 
-
-
 #include "gsiDecl.h"
 #include "gsiSignals.h"
 #include "antObject.h"
 #include "antService.h"
+#include "antPlugin.h"
 #include "layLayoutView.h"
 
 namespace gsi
@@ -416,7 +415,9 @@ static void register_annotation_template (const ant::Object &a, const std::strin
 
   t.set_mode (ant::Template::ruler_mode_type (mode));
 
-  ant::Service::register_annotation_template (t);
+  if (ant::PluginDeclaration::instance ()) {
+    ant::PluginDeclaration::instance ()->register_annotation_template (t);
+  }
 }
 
 //  NOTE: ant::Object is available as "BasicAnnotation" to allow binding for other methods.

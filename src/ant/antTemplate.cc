@@ -46,8 +46,10 @@ Template::Template ()
 
 Template::Template (const std::string &title,
                     const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, 
-                    style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraint)
+                    style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraint,
+                    const std::string &cat)
   : m_title (title),
+    m_category (cat),
     m_fmt_x (fmt_x), m_fmt_y (fmt_y), m_fmt (fmt),
     m_style (style), m_outline (outline),
     m_snap (snap), m_angle_constraint (angle_constraint),

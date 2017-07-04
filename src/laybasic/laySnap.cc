@@ -321,14 +321,14 @@ public:
               max_hier_level = l->hier_levels ().to_level (ctx_levels, max_hier_level);
             }
 
-            m_region = db::DBox (dregion.p1 (), dregion.p2 ()) * (1.0 / layout.dbu ());
+            m_region = db::DBox (dregion.p1 (), dregion.p2 ());
             mp_layout = &layout;
             mp_prop_sel = &l->prop_sel ();
             m_inv_prop_sel = l->inverse_prop_sel ();
 
             const std::vector<db::DCplxTrans> &trans = l->trans ();
             for (std::vector<db::DCplxTrans>::const_iterator t = trans.begin (); t != trans.end () && m_tests > 0; ++t) {
-              do_find (view, cv_index, *cv.cell (), l->layer_index (), min_hier_level, max_hier_level, *t * db::CplxTrans () * cv.context_trans ());
+              do_find (view, cv_index, *cv.cell (), l->layer_index (), min_hier_level, max_hier_level, *t * db::CplxTrans (mp_layout->dbu ()) * cv.context_trans ());
             }
 
           }
@@ -364,9 +364,9 @@ public:
   std::pair<db::DEdge, db::DEdge> get_found_vertex_edges () const
   {
     if (m_any_exact) {
-      return std::make_pair (m_edge1_exact * mp_layout->dbu (), m_edge2_exact * mp_layout->dbu ());
+      return std::make_pair (m_edge1_exact, m_edge2_exact);
     } else if (m_any) {
-      return std::make_pair (m_edge1 * mp_layout->dbu (), m_edge2 * mp_layout->dbu ());
+      return std::make_pair (m_edge1, m_edge2);
     } else {
       return std::pair<db::DEdge, db::DEdge> ();
     }
@@ -395,9 +395,9 @@ public:
   db::DEdge get_found_edge () const
   {
     if (m_any_exact) {
-      return m_edge1_exact * mp_layout->dbu ();
+      return m_edge1_exact;
     } else if (m_any) {
-      return m_edge1 * mp_layout->dbu ();
+      return m_edge1;
     } else {
       return db::DEdge ();
     }
@@ -409,9 +409,9 @@ public:
   db::DPoint get_found () const
   {
     if (m_any_exact) {
-      return m_closest_exact * mp_layout->dbu ();
+      return m_closest_exact;
     } else if (m_any) {
-      return m_closest * mp_layout->dbu ();
+      return m_closest;
     } else {
       return m_original;
     }
@@ -437,11 +437,11 @@ private:
   void 
   find_closest_exact (const db::DPoint &p, const db::DEdge &e)
   {
-    if (! m_any_exact || m_original.distance (p * mp_layout->dbu ()) < m_original.distance (m_closest_exact * mp_layout->dbu ())) {
+    if (! m_any_exact || m_original.distance (p) < m_original.distance (m_closest_exact)) {
 
       if (m_directed) {
         for (std::vector<db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
-          if (db::sprod_sign (p - cl->p1 () * (1.0 / mp_layout->dbu ()), cl->d () * (1.0 / mp_layout->dbu ())) <= 0) {
+          if (db::sprod_sign (p - cl->p1 (), cl->d ()) <= 0) {
             return;
           }
         }
@@ -458,11 +458,11 @@ private:
   void 
   find_closest (const db::DPoint &p, const db::DEdge &e)
   {
-    if (! m_any || m_original.distance (p * mp_layout->dbu ()) < m_original.distance (m_closest * mp_layout->dbu ())) {
+    if (! m_any || m_original.distance (p) < m_original.distance (m_closest)) {
 
       if (m_directed) {
         for (std::vector<db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
-          if (db::sprod_sign (p - cl->p1 () * (1.0 / mp_layout->dbu ()), cl->d () * (1.0 / mp_layout->dbu ())) < 0) {
+          if (db::sprod_sign (p - cl->p1 (), cl->d ()) < 0) {
             return;
           }
         }
@@ -493,11 +493,11 @@ private:
       //  test point.
       for (std::vector <db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
         std::pair<bool, db::DPoint> ret;
-        ret = db::DEdge (p, p + db::DVector (1.0, 0.0)).cut_point (*cl * (1.0 / mp_layout->dbu ()));
+        ret = db::DEdge (p, p + db::DVector (1.0, 0.0)).cut_point (*cl);
         if (ret.first) {
           find_closest_exact (ret.second, db::DEdge (p, p));
         }
-        ret = db::DEdge (p, p + db::DVector (0.0, 1.0)).cut_point (*cl * (1.0 / mp_layout->dbu ()));
+        ret = db::DEdge (p, p + db::DVector (0.0, 1.0)).cut_point (*cl);
         if (ret.first) {
           find_closest_exact (ret.second, db::DEdge (p, p));
         }
@@ -513,7 +513,7 @@ private:
     //  do the checks in dbu space rather than micron space because
     //  the tolerances are set up for this.
     for (std::vector <db::DEdge>::const_iterator cl = m_cutlines.begin (); cl != m_cutlines.end (); ++cl) {
-      std::pair<bool, db::DPoint> ret = e.cut_point (*cl * (1.0 / mp_layout->dbu ()));
+      std::pair<bool, db::DPoint> ret = e.cut_point (*cl);
       if (ret.first) {
         //  if the projection exactly hits the edge and the point
         //  of crossing is inside the search region, take this as
@@ -539,13 +539,13 @@ private:
       db::DVector n (-v.y (), v.x ());
       double f = d / n.double_length ();
 
-      db::DPoint e1 (m_original.x () * (1.0 / mp_layout->dbu ()) - n.x () * f,
-                     m_original.y () * (1.0 / mp_layout->dbu ()) - n.y () * f);
-      db::DPoint e2 (m_original.x () * (1.0 / mp_layout->dbu ()) + n.x () * f,
-                     m_original.y () * (1.0 / mp_layout->dbu ()) + n.y () * f);
+      db::DPoint e1 (m_original.x () - n.x () * f,
+                     m_original.y () - n.y () * f);
+      db::DPoint e2 (m_original.x () + n.x () * f,
+                     m_original.y () + n.y () * f);
       
-      double dmin = std::numeric_limits <db::Coord>::min ();
-      double dmax = std::numeric_limits <db::Coord>::max ();
+      double dmin = mp_layout->dbu () * std::numeric_limits <db::Coord>::min ();
+      double dmax = mp_layout->dbu () * std::numeric_limits <db::Coord>::max ();
       db::DBox dworld (dmin, dmin, dmax, dmax);
 
       if (dworld.contains (e1) && dworld.contains (e2)) {

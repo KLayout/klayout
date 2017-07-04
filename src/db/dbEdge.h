@@ -738,17 +738,19 @@ public:
       bool res = true;
       bool ends_on_edge = false;
 
-      area_type vxa = coord_traits::vprod (e.p2 ().x (), e.p2 ().y (), m_p1.x (), m_p1.y (), e.p1 ().x (), e.p1 ().y ()); 
-      if (vxa <= -coord_traits::prec_area ()) {
+      std::pair<area_type, int> vsa = coord_traits::vprod_with_sign (e.p2 ().x (), e.p2 ().y (), m_p1.x (), m_p1.y (), e.p1 ().x (), e.p1 ().y ());
+      area_type vxa = vsa.first;
+      if (vsa.second < 0) {
         res = false;
-      } else if (vxa < coord_traits::prec_area ()) {
+      } else if (vsa.second == 0) {
         ends_on_edge = true;
       }
 
-      area_type vxb = -coord_traits::vprod (e.p2 ().x (), e.p2 ().y (), m_p2.x (), m_p2.y (), e.p1 ().x (), e.p1 ().y ()); 
-      if (vxb <= -coord_traits::prec_area ()) {
+      std::pair<area_type, int> vsb = coord_traits::vprod_with_sign (e.p2 ().x (), e.p2 ().y (), m_p2.x (), m_p2.y (), e.p1 ().x (), e.p1 ().y ());
+      area_type vxb = -vsb.first;
+      if (vsb.second > 0) {
         res = !res;
-      } else if (vxb < coord_traits::prec_area ()) {
+      } else if (vsb.second == 0) {
         ends_on_edge = true;
       }
 
@@ -833,14 +835,7 @@ public:
       return 0;
     } else {
       //  compute the side as the sign of the distance as in "distance"
-      area_type axb = coord_traits::vprod (m_p2.x (), m_p2.y (), p.x (), p.y (), m_p1.x (), m_p1.y ()); 
-      if (axb >= coord_traits::prec_area ()) {
-        return 1;
-      } else if (axb <= -coord_traits::prec_area ()) {
-        return -1;
-      } else {
-        return 0;
-      }
+      return coord_traits::vprod_sign (m_p2.x (), m_p2.y (), p.x (), p.y (), m_p1.x (), m_p1.y ());
     }
   }
 
@@ -1007,17 +1002,17 @@ public:
 
     bool res = true;
 
-    area_type vxa = coord_traits::vprod (m_p2.x (), m_p2.y (), e.p1 ().x (), e.p1 ().y (), m_p1.x (), m_p1.y ()); 
-    if (vxa <= -coord_traits::prec_area ()) {
+    int vsa = coord_traits::vprod_sign (m_p2.x (), m_p2.y (), e.p1 ().x (), e.p1 ().y (), m_p1.x (), m_p1.y ());
+    if (vsa < 0) {
       res = false;
-    } else if (vxa < coord_traits::prec_area ()) {
+    } else if (vsa == 0) {
       return true;
     }
 
-    area_type vxb = -coord_traits::vprod (m_p2.x (), m_p2.y (), e.p2 ().x (), e.p2 ().y (), m_p1.x (), m_p1.y ()); 
-    if (vxb <= -coord_traits::prec_area ()) {
+    int vsb = coord_traits::vprod_sign (m_p2.x (), m_p2.y (), e.p2 ().x (), e.p2 ().y (), m_p1.x (), m_p1.y ());
+    if (vsb > 0) {
       res = !res;
-    } else if (vxb < coord_traits::prec_area ()) {
+    } else if (vsb == 0) {
       return true;
     }
 
@@ -1036,17 +1031,19 @@ public:
   {
     bool res = true;
 
-    area_type vxa = coord_traits::vprod (m_p2.x (), m_p2.y (), e.p1 ().x (), e.p1 ().y (), m_p1.x (), m_p1.y ()); 
-    if (vxa <= -coord_traits::prec_area ()) {
+    std::pair<area_type, int> vsa = coord_traits::vprod_with_sign (m_p2.x (), m_p2.y (), e.p1 ().x (), e.p1 ().y (), m_p1.x (), m_p1.y ());
+    area_type vxa = vsa.first;
+    if (vsa.second < 0) {
       res = false;
-    } else if (vxa < coord_traits::prec_area ()) {
+    } else if (vsa.second == 0) {
       return std::make_pair (true, e.p1 ());
     }
 
-    area_type vxb = -coord_traits::vprod (m_p2.x (), m_p2.y (), e.p2 ().x (), e.p2 ().y (), m_p1.x (), m_p1.y ()); 
-    if (vxb <= -coord_traits::prec_area ()) {
+    std::pair<area_type, int> vsb = coord_traits::vprod_with_sign (m_p2.x (), m_p2.y (), e.p2 ().x (), e.p2 ().y (), m_p1.x (), m_p1.y ());
+    area_type vxb = -vsb.first;
+    if (vsb.second > 0) {
       res = !res;
-    } else if (vxb < coord_traits::prec_area ()) {
+    } else if (vsb.second == 0) {
       return std::make_pair (true, e.p2 ());
     }
 
@@ -1088,9 +1085,10 @@ public:
    */
   std::pair <bool, db::point<C> > cut_point (const db::edge<C> &e2) const
   {
-    double pr1 = double (coord_traits::vprod (e2.p1 ().x (), e2.p1 ().y (), this->p2 ().x (), this->p2 ().y (), this->p1 ().x (), this->p1 ().y ()));
-    double pr2 = double (coord_traits::vprod (e2.dx (), e2.dy (), this->dx (), this->dy (), 0, 0));
-    if (fabs (pr2) > double (coord_traits::prec_area ())) {
+    std::pair<typename coord_traits::area_type, int> vps = coord_traits::vprod_with_sign (e2.dx (), e2.dy (), this->dx (), this->dy (), 0, 0);
+    if (vps.second != 0) {
+      double pr1 = double (coord_traits::vprod (e2.p1 ().x (), e2.p1 ().y (), this->p2 ().x (), this->p2 ().y (), this->p1 ().x (), this->p1 ().y ()));
+      double pr2 = double (vps.first);
       db::point<C> p = e2.p1 () - db::vector<C> ((e2.p2 () - e2.p1 ()) * (pr1 / pr2));
       return std::make_pair (true, p);
     } else {

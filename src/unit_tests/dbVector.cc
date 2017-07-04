@@ -103,4 +103,72 @@ TEST(5)
   EXPECT_EQ (p1.to_string (), "150,-150")
 }
 
+TEST(6)
+{
+  EXPECT_EQ (db::sprod (db::Vector (0, 1000), db::Vector (1000, 1)), 1000);
+  EXPECT_EQ (db::sprod_with_sign (db::Vector (0, 1000), db::Vector (1000, 1)).first, 1000);
+  EXPECT_EQ (db::sprod (db::DVector (0, 1000), db::DVector (1000, 0.5)), 500);
+  EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 1000), db::DVector (1000, 0.5)).first, 500);
+
+  EXPECT_EQ (db::vprod (db::Vector (2, 1000), db::Vector (1000, 1)), -999998);
+  EXPECT_EQ (db::vprod_with_sign (db::Vector (2, 1000), db::Vector (1000, 1)).first, -999998);
+  EXPECT_EQ (db::vprod (db::DVector (0.5, 1000), db::DVector (1000, 2)), -999999);
+  EXPECT_EQ (db::vprod_with_sign (db::DVector (0.5, 1000), db::DVector (1000, 2)).first, -999999);
+
+  EXPECT_EQ (db::sprod_sign (db::Vector (0, 1000000000), db::Vector (1000000000, 0)), 0);
+  EXPECT_EQ (db::sprod_sign (db::Vector (0, 1000000000), db::Vector (1000000000, 1)), 1);
+  EXPECT_EQ (db::sprod_sign (db::Vector (0, 1000000000), db::Vector (1000000000, -1)), -1);
+  EXPECT_EQ (db::sprod_sign (db::Vector (1000000000, 0), db::Vector (0, 1000000000)), 0);
+  EXPECT_EQ (db::sprod_sign (db::Vector (1000000000, 0), db::Vector (1, 1000000000)), 1);
+  EXPECT_EQ (db::sprod_sign (db::Vector (1000000000, 0), db::Vector (-1, 1000000000)), -1);
+  EXPECT_EQ (db::vprod_sign (db::Vector (0, 1000000000), db::Vector (0, 1000000000)), 0);
+  EXPECT_EQ (db::vprod_sign (db::Vector (0, 1000000000), db::Vector (1, 1000000000)), -1);
+  EXPECT_EQ (db::vprod_sign (db::Vector (0, 1000000000), db::Vector (-1, 1000000000)), 1);
+  EXPECT_EQ (db::vprod_sign (db::Vector (1000000000, 0), db::Vector (1000000000, 0)), 0);
+  EXPECT_EQ (db::vprod_sign (db::Vector (1000000000, 0), db::Vector (1000000000, 1)), 1);
+  EXPECT_EQ (db::vprod_sign (db::Vector (1000000000, 0), db::Vector (1000000000, -1)), -1);
+
+  EXPECT_EQ (db::sprod_with_sign (db::Vector (0, 1000000000), db::Vector (1000000000, 0)).second, 0);
+  EXPECT_EQ (db::sprod_with_sign (db::Vector (0, 1000000000), db::Vector (1000000000, 1)).second, 1);
+  EXPECT_EQ (db::sprod_with_sign (db::Vector (0, 1000000000), db::Vector (1000000000, -1)).second, -1);
+  EXPECT_EQ (db::sprod_with_sign (db::Vector (1000000000, 0), db::Vector (0, 1000000000)).second, 0);
+  EXPECT_EQ (db::sprod_with_sign (db::Vector (1000000000, 0), db::Vector (1, 1000000000)).second, 1);
+  EXPECT_EQ (db::sprod_with_sign (db::Vector (1000000000, 0), db::Vector (-1, 1000000000)).second, -1);
+  EXPECT_EQ (db::vprod_with_sign (db::Vector (0, 1000000000), db::Vector (0, 1000000000)).second, 0);
+  EXPECT_EQ (db::vprod_with_sign (db::Vector (0, 1000000000), db::Vector (1, 1000000000)).second, -1);
+  EXPECT_EQ (db::vprod_with_sign (db::Vector (0, 1000000000), db::Vector (-1, 1000000000)).second, 1);
+  EXPECT_EQ (db::vprod_with_sign (db::Vector (1000000000, 0), db::Vector (1000000000, 0)).second, 0);
+  EXPECT_EQ (db::vprod_with_sign (db::Vector (1000000000, 0), db::Vector (1000000000, 1)).second, 1);
+  EXPECT_EQ (db::vprod_with_sign (db::Vector (1000000000, 0), db::Vector (1000000000, -1)).second, -1);
+
+  EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 0)), 0);
+  EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 1e-7)), 0);
+  EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 0.0001)), 1);
+  EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, -1e-7)), 0);
+  EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, -0.0001)), -1);
+  EXPECT_EQ (db::sprod_sign (db::DVector (100000.0000, 0), db::DVector (0, 100000.0000)), 0);
+  EXPECT_EQ (db::sprod_sign (db::DVector (100000.0000, 0), db::DVector (0.0001, 100000.0000)), 1);
+  EXPECT_EQ (db::sprod_sign (db::DVector (100000.0000, 0), db::DVector (-0.0001, 100000.0000)), -1);
+  EXPECT_EQ (db::vprod_sign (db::DVector (0, 100000.0000), db::DVector (0, 100000.0000)), 0);
+  EXPECT_EQ (db::vprod_sign (db::DVector (0, 100000.0000), db::DVector (0.0001, 100000.0000)), -1);
+  EXPECT_EQ (db::vprod_sign (db::DVector (0, 100000.0000), db::DVector (-0.0001, 100000.0000)), 1);
+  EXPECT_EQ (db::vprod_sign (db::DVector (100000.0000, 0), db::DVector (100000.0000, 0)), 0);
+  EXPECT_EQ (db::vprod_sign (db::DVector (100000.0000, 0), db::DVector (100000.0000, 0.0001)), 1);
+  EXPECT_EQ (db::vprod_sign (db::DVector (100000.0000, 0), db::DVector (100000.0000, -0.0001)), -1);
+
+  EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 0)).second, 0);
+  EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 1e-7)).second, 0);
+  EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 0.0001)).second, 1);
+  EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, -1e-7)).second, 0);
+  EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, -0.0001)).second, -1);
+  EXPECT_EQ (db::sprod_with_sign (db::DVector (100000.0000, 0), db::DVector (0, 100000.0000)).second, 0);
+  EXPECT_EQ (db::sprod_with_sign (db::DVector (100000.0000, 0), db::DVector (0.0001, 100000.0000)).second, 1);
+  EXPECT_EQ (db::sprod_with_sign (db::DVector (100000.0000, 0), db::DVector (-0.0001, 100000.0000)).second, -1);
+  EXPECT_EQ (db::vprod_with_sign (db::DVector (0, 100000.0000), db::DVector (0, 100000.0000)).second, 0);
+  EXPECT_EQ (db::vprod_with_sign (db::DVector (0, 100000.0000), db::DVector (0.0001, 100000.0000)).second, -1);
+  EXPECT_EQ (db::vprod_with_sign (db::DVector (0, 100000.0000), db::DVector (-0.0001, 100000.0000)).second, 1);
+  EXPECT_EQ (db::vprod_with_sign (db::DVector (100000.0000, 0), db::DVector (100000.0000, 0)).second, 0);
+  EXPECT_EQ (db::vprod_with_sign (db::DVector (100000.0000, 0), db::DVector (100000.0000, 0.0001)).second, 1);
+  EXPECT_EQ (db::vprod_with_sign (db::DVector (100000.0000, 0), db::DVector (100000.0000, -0.0001)).second, -1);
+}
 

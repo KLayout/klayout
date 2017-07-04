@@ -128,6 +128,62 @@ compute_normals (const db::vector<C> &d, C dx, C dy, int nsign, db::DVector &ed,
   }
 }
 
+/**
+ *  @brief Provides a special DVector vprod sign for the purpose of representing integer-coordinate vectors
+ *  The "zero" criterion is somewhat tigher than that of the normal integer value vectors.
+ *  Hence, parallelity is somewhat more strict which makes the size function produce a
+ *  better approximation to the desired target contour.
+ */
+static inline int
+vprod_sign_for (const db::DVector &a, const db::DVector &b, const db::Vector &)
+{
+  double vp = db::vprod (a, b);
+  if (vp <= -1e-2) {
+    return -1;
+  } else if (vp < 1e-2) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+/**
+ *  @brief Fallback to the default vprod sign in the double-coordinate case
+ */
+static inline int
+vprod_sign_for (const db::DVector &a, const db::DVector &b, const db::DVector &)
+{
+  return db::vprod_sign (a, b);
+}
+
+/**
+ *  @brief Provides a special DVector sprod sign for the purpose of representing integer-coordinate vectors
+ *  The "zero" criterion is somewhat tigher than that of the normal integer value vectors.
+ *  Hence, orthogonality is somewhat more strict which makes the size function produce a
+ *  better approximation to the desired target contour.
+ */
+static inline int
+sprod_sign_for (const db::DVector &a, const db::DVector &b, const db::Vector &)
+{
+  double sp = db::sprod (a, b);
+  if (sp <= -1e-2) {
+    return -1;
+  } else if (sp < 1e-2) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+/**
+ *  @brief Fallback to the default sprod sign in the double-coordinate case
+ */
+static inline int
+sprod_sign_for (const db::DVector &a, const db::DVector &b, const db::DVector &)
+{
+  return db::sprod_sign (a, b);
+}
+
 template <class C>
 void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
 {
@@ -192,7 +248,7 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
     db::DVector eed, nnd;
     compute_normals (dd, dx, dy, nsign, eed, nnd);
 
-    int vpsign = db::vprod_sign (eed, ed) * nsign;
+    int vpsign = vprod_sign_for (eed, ed, dd) * nsign;
 
     if (vpsign <= 0) {
 
@@ -210,7 +266,7 @@ void polygon_contour<C>::size (C dx, C dy, unsigned int mode)
         *pts++ = *pp + vector<C> (nd);
         *pts++ = *pp;
 
-      } else if (vpsign == 0 && db::sprod_sign (nd, nnd) > 0) {
+      } else if (vpsign == 0 && sprod_sign_for (nd, nnd, dd) > 0) {
 
         //  colinear edges: simply shift the point
         *pts++ = *pp + vector<C> (nd);

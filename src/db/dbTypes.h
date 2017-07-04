@@ -27,6 +27,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <stdio.h>
+#include <algorithm>
 
 namespace db {
 
@@ -247,7 +248,25 @@ struct generic_coord_traits
     }
   }
 
-  /** 
+  /**
+   *  @brief A combination of sign and value of sprod.
+   */
+  static std::pair<area_type, int> sprod_with_sign (coord_type ax, coord_type ay,
+                                                    coord_type bx, coord_type by,
+                                                    coord_type cx, coord_type cy)
+  {
+    area_type p1 = ((area_type) ax - (area_type) cx) * ((area_type) bx - (area_type) cx);
+    area_type p2 = -(((area_type) ay - (area_type) cy) * ((area_type) by - (area_type) cy));
+    if (p1 > p2) {
+      return std::make_pair (p1 - p2, 1);
+    } else if (p1 == p2) {
+      return std::make_pair (0, 0);
+    } else {
+      return std::make_pair (p1 - p2, -1);
+    }
+  }
+
+  /**
    *  @brief the vector product of two vectors.
    *  
    *  Computes the vector product of two vectors.
@@ -303,6 +322,23 @@ struct generic_coord_traits
     }
   }
 
+  /**
+   *  @brief A combination of sign and value of vprod.
+   */
+  static std::pair<area_type, int> vprod_with_sign (coord_type ax, coord_type ay,
+                                                    coord_type bx, coord_type by,
+                                                    coord_type cx, coord_type cy)
+  {
+    area_type p1 = ((area_type) ax - (area_type) cx) * ((area_type) by - (area_type) cy);
+    area_type p2 = ((area_type) ay - (area_type) cy) * ((area_type) bx - (area_type) cx);
+    if (p1 > p2) {
+      return std::make_pair (p1 - p2, 1);
+    } else if (p1 == p2) {
+      return std::make_pair (0, 0);
+    } else {
+      return std::make_pair (p1 - p2, -1);
+    }
+  }
 };
 
 /** 
@@ -382,17 +418,37 @@ struct coord_traits<double>
     return (ax - cx) * (bx - cx) + (ay - cy) * (by - cy);
   }
 
+
   static int sprod_sign (double ax, double ay, double bx, double by, double cx, double cy) 
   {
-    area_type p1 = (ax - cx) * (bx - cx);
-    area_type p2 = -(ay - cy) * (by - cy);
-    if (p1 <= p2 - prec_area ()) {
+    double dx1 = ax - cx, dy1 = ay - cy;
+    double dx2 = bx - cx, dy2 = by - cy;
+    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * prec ();
+    area_type p1 = dx1 * dx2;
+    area_type p2 = -dy1 * dy2;
+    if (p1 <= p2 - pa) {
       return -1;
-    } else if (p1 < p2 + prec_area ()) {
+    } else if (p1 < p2 + pa) {
       return 0;
     } else {
       return 1;
     }  
+  }
+
+  static std::pair<area_type, int> sprod_with_sign (double ax, double ay, double bx, double by, double cx, double cy)
+  {
+    double dx1 = ax - cx, dy1 = ay - cy;
+    double dx2 = bx - cx, dy2 = by - cy;
+    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * prec ();
+    area_type p1 = dx1 * dx2;
+    area_type p2 = -dy1 * dy2;
+    if (p1 <= p2 - pa) {
+      return std::make_pair (p1 - p2, -1);
+    } else if (p1 < p2 + pa) {
+      return std::make_pair (0, 0);
+    } else {
+      return std::make_pair (p1 - p2, 1);
+    }
   }
 
   static area_type vprod (coord_type ax, coord_type ay, 
@@ -404,15 +460,34 @@ struct coord_traits<double>
 
   static int vprod_sign (double ax, double ay, double bx, double by, double cx, double cy) 
   {
-    area_type p1 = (ax - cx) * (by - cy);
-    area_type p2 = (ay - cy) * (bx - cx);
-    if (p1 <= p2 - prec_area ()) {
+    double dx1 = ax - cx, dy1 = ay - cy;
+    double dx2 = bx - cx, dy2 = by - cy;
+    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * prec ();
+    area_type p1 = dx1 * dy2;
+    area_type p2 = dy1 * dx2;
+    if (p1 <= p2 - pa) {
       return -1;
-    } else if (p1 < p2 + prec_area ()) {
+    } else if (p1 < p2 + pa) {
       return 0;
     } else {
       return 1;
-    }  
+    }
+  }
+
+  static std::pair<area_type, int> vprod_with_sign (double ax, double ay, double bx, double by, double cx, double cy)
+  {
+    double dx1 = ax - cx, dy1 = ay - cy;
+    double dx2 = bx - cx, dy2 = by - cy;
+    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * prec ();
+    area_type p1 = dx1 * dy2;
+    area_type p2 = dy1 * dx2;
+    if (p1 <= p2 - pa) {
+      return std::make_pair (p1 - p2, -1);
+    } else if (p1 < p2 + pa) {
+      return std::make_pair (0, 0);
+    } else {
+      return std::make_pair (p1 - p2, 1);
+    }
   }
 
   static bool equal (double c1, double c2)

@@ -583,6 +583,15 @@ int vprod_sign (const db::vector<C> &p, const db::vector<C> &q)
 }
 
 /**
+ *  @brief Convenience wrappers for coord_traits functions: vector product with sign
+ */
+template <class C>
+std::pair<typename db::coord_traits<C>::area_type, int> vprod_with_sign (const db::vector<C> &p, const db::vector<C> &q)
+{
+  return db::coord_traits<C>::vprod_with_sign (p.x (), p.y (), q.x (), q.y (), 0, 0);
+}
+
+/**
  *  @brief Convenience wrappers for coord_traits functions: scalar product: 0->p x 0->q
  */
 template <class C>
@@ -598,6 +607,15 @@ template <class C>
 int sprod_sign (const db::vector<C> &p, const db::vector<C> &q)
 {
   return db::coord_traits<C>::sprod_sign (p.x (), p.y (), q.x (), q.y (), 0, 0);
+}
+
+/**
+ *  @brief Convenience wrappers for coord_traits functions: scalar product with sign
+ */
+template <class C>
+std::pair<typename db::coord_traits<C>::area_type, int> sprod_with_sign (const db::vector<C> &p, const db::vector<C> &q)
+{
+  return db::coord_traits<C>::sprod_with_sign (p.x (), p.y (), q.x (), q.y (), 0, 0);
 }
 
 /**

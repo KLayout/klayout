@@ -802,6 +802,35 @@ CODE
     end
     
     # %DRC%
+    # @name texts
+    # @brief Selects texts from an original layer
+    # @synopsis layer.texts
+    # @synopsis layer.texts(text)
+    # @synopsis layer.texts(text, true)
+    # @synopsis layer.texts(text, false)
+    # This method can be applied to original layers - i.e. ones that have
+    # been created with \input. It will produce a small box (2x2 DBU) on each
+    # selected texts. 
+    #
+    # Texts can be selected either by exact match or pattern match with a 
+    # glob-style pattern. The second argument selects pattern style (true)
+    # or exact match (false).
+    #
+    # @code
+    #   # Selects all texts
+    #   t = input(1, 0).texts
+    #   # Selects all texts beginning with an "A"
+    #   t = input(1, 0).texts("A*")
+    #   t = input(1, 0).texts("A*", true)
+    #   # Selects all texts whose string is "A*"
+    #   t = input(1, 0).texts("A*", false)
+    # @/code
+     
+    def texts(expr = "*", as_pattern = true)
+      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts, expr, as_pattern))
+    end
+    
+    # %DRC%
     # @name odd_polygons
     # @brief Checks for odd polygons (self-overlapping, non-orientable)
     # @synopsis layer.odd_polygons

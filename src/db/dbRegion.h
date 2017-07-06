@@ -1494,6 +1494,16 @@ public:
   }
 
   /**
+   *  @brief Gets the internal iterator
+   *
+   *  This method is intended for users who know what they are doing
+   */
+  const db::RecursiveShapeIterator &iter () const
+  {
+    return m_iter;
+  }
+
+  /**
    *  @brief Ensures the region has valid polygons
    *
    *  This method is const since it has const semantics.

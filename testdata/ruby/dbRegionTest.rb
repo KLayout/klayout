@@ -115,12 +115,15 @@ class DBRegion_TestClass < TestBase
 
     ly = RBA::Layout::new
     l1 = ly.layer("l1")
+    l2 = ly.layer("l2")
     c1 = ly.create_cell("C1")
     c2 = ly.create_cell("C2")
     c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(0, 0)))
     c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(0, 100)))
     c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(200, 100)))
     c2.shapes(l1).insert(RBA::Box::new(-10, -20, 10, 20))
+    c2.shapes(l2).insert(RBA::Text::new("AA", RBA::Vector::new(-10, -20)))
+    c2.shapes(l2).insert(RBA::Text::new("BB", RBA::Vector::new(10, 20)))
     
     r = RBA::Region::new(ly.begin_shapes(c1.cell_index, l1))
     assert_equal(r.to_s, "(-10,-20;-10,20;10,20;10,-20);(-10,80;-10,120;10,120;10,80);(190,80;190,120;210,120;210,80)")
@@ -131,6 +134,15 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.bbox.to_s, "(-10,-20;210,120)")
     assert_equal(r.is_merged?, false)
     
+    r = RBA::Region::new(ly.begin_shapes(c1.cell_index, l2), "*")
+    assert_equal(r.to_s, "(-11,-21;-11,-19;-9,-19;-9,-21);(9,19;9,21;11,21;11,19);(-11,79;-11,81;-9,81;-9,79);(9,119;9,121;11,121;11,119);(189,79;189,81;191,81;191,79);(209,119;209,121;211,121;211,119)")
+    r = RBA::Region::new(ly.begin_shapes(c1.cell_index, l2), "A*")
+    assert_equal(r.to_s, "(-11,-21;-11,-19;-9,-19;-9,-21);(-11,79;-11,81;-9,81;-9,79);(189,79;189,81;191,81;191,79)")
+    r = RBA::Region::new(ly.begin_shapes(c1.cell_index, l2), "A*", false)
+    assert_equal(r.to_s, "")
+    r = RBA::Region::new(ly.begin_shapes(c1.cell_index, l2), "AA", false)
+    assert_equal(r.to_s, "(-11,-21;-11,-19;-9,-19;-9,-21);(-11,79;-11,81;-9,81;-9,79);(189,79;189,81;191,81;191,79)")
+
     r = RBA::Region::new(ly.begin_shapes(c1.cell_index, l1), RBA::ICplxTrans::new(10, 20))
     assert_equal(r.to_s, "(0,0;0,40;20,40;20,0);(0,100;0,140;20,140;20,100);(200,100;200,140;220,140;220,100)")
     assert_equal(r.extents.to_s, "(0,0;0,40;20,40;20,0);(0,100;0,140;20,140;20,100);(200,100;200,140;220,140;220,100)")

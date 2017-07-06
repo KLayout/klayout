@@ -26,6 +26,9 @@
 #include "dbPolygonTools.h"
 #include "dbLayoutUtils.h"
 #include "dbShapes.h"
+#include "tlGlobPattern.h"
+
+#include <memory>
 
 namespace gsi
 {
@@ -67,6 +70,43 @@ static db::Region *new_shapes (const db::Shapes &s)
     r->insert (*i);
   }
   return r;
+}
+
+static db::Region *new_si_texts (const db::RecursiveShapeIterator &si_in, const std::string &pat, bool pattern)
+{
+  db::RecursiveShapeIterator si (si_in);
+  si.shape_flags (db::ShapeIterator::Texts);
+
+  tl::GlobPattern glob_pat;
+  bool all = false;
+  if (pattern) {
+    if (pat == "*") {
+      all = true;
+    } else {
+      glob_pat = tl::GlobPattern (pat);
+    }
+  }
+
+  std::auto_ptr<db::Region> r (new db::Region ());
+
+  while (! si.at_end ()) {
+    if (si.shape ().is_text () &&
+        (all || (pattern && glob_pat.match (si.shape ().text_string ())) || (!pattern && si.shape ().text_string () == pat))) {
+      db::Text t;
+      si.shape ().text (t);
+      t.transform (si.trans ());
+      r->insert (db::Box (t.box ().enlarged (db::Vector (1, 1))));
+    }
+    si.next ();
+  }
+
+  return r.release ();
+}
+
+static db::Region texts (const db::Region *r, const std::string &pat, bool pattern)
+{
+  std::auto_ptr<db::Region> o (new_si_texts (r->iter (), pat, pattern));
+  return *o;
 }
 
 static db::Region *new_si (const db::RecursiveShapeIterator &si)
@@ -594,6 +634,30 @@ Class<db::Region> decl_Region ("Region",
     "dbu    = 0.1 # the target database unit\n"
     "r = RBA::Region::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))\n"
     "@/code\n"
+  ) +
+  constructor ("new", &new_si_texts, gsi::arg("shape_iterator"), gsi::arg ("expr"), gsi::arg ("as_pattern", true),
+    "@brief Constructor from a text set\n"
+    "\n"
+    "@param shape_iterator The iterator from which to derive the texts\n"
+    "@param expr The selection string\n"
+    "@param as_pattern If true, the selection string is treated as a glob pattern. Otherwise the match is exact.\n"
+    "\n"
+    "This special constructor will create a region from the text objects delivered by the shape iterator. "
+    "Each text object will deliver a small (non-empty) box that represents the text origin.\n"
+    "Texts can be selected by their strings - either through a glob pattern or by exact comparison with "
+    "the given string. The following options are available:\n"
+    "\n"
+    "@code\n"
+    "region = RBA::Region::new(iter, \"*\")           # all texts\n"
+    "region = RBA::Region::new(iter, \"A*\")          # all texts starting with an 'A'\n"
+    "region = RBA::Region::new(iter, \"A*\", false)   # all texts exactly matchin 'A*'\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  method_ext ("texts", &texts, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true),
+    "@hide\n"
+    "This method is provided for DRC implementation only."
   ) +
   method ("merged_semantics=", &db::Region::set_merged_semantics,
     "@brief Enables or disables merged semantics\n"

@@ -261,6 +261,16 @@ Region::rounded_corners (double rinner, double router, unsigned int n) const
   return r;
 }
 
+Region
+Region::smoothed (coord_type d) const
+{
+  Region r;
+  for (const_iterator p = begin_merged (); ! p.at_end (); ++p) {
+    r.insert (db::smooth (*p, d));
+  }
+  return r;
+}
+
 Region 
 Region::in (const Region &other, bool invert) const
 {

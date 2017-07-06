@@ -260,6 +260,7 @@ class DBRegion_TestClass < TestBase
     assert_equal(rr.to_s, "(0,0;0,200;11,200;12,201;14,202;16,202;18,201;19,200;100,200;100,0)")
     rr.smooth(1)
     assert_equal(rr.to_s, "(0,0;0,200;11,200;14,202;18,201;100,200;100,0)")
+    assert_equal(rr.smoothed(5).to_s, "(0,0;0,200;100,200;100,0)")
     rr.smooth(5)
     assert_equal(rr.to_s, "(0,0;0,200;100,200;100,0)")
 

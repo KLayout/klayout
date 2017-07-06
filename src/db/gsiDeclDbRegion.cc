@@ -132,16 +132,6 @@ static void insert_si2 (db::Region *r, db::RecursiveShapeIterator si, db::ICplxT
   }
 }
 
-static db::Region &smooth (db::Region *r, db::Coord d)
-{
-  db::Region o;
-  for (db::Region::const_iterator p = r->begin_merged (); ! p.at_end (); ++p) {
-    o.insert (db::smooth (*p, d));
-  }
-  r->swap (o);
-  return *r;
-}
-
 static db::Region minkowsky_sum_pe (const db::Region *r, const db::Edge &e)
 {
   db::Region o;
@@ -1004,6 +994,26 @@ Class<db::Region> decl_Region ("Region",
     "See \\round_corners for a description of this method. This version returns a new region instead of "
     "modifying self (out-of-place)."
   ) +
+  method ("smooth", &db::Region::smooth,
+    "@brief Smoothing\n"
+    "@args d\n"
+    "@param d The smoothing tolerance (in database units)\n"
+    "\n"
+    "This method will simplify the merged polygons of the region by removing vertexes if the "
+    "resulting polygon stays equivalent with the original polygon. Equivalence is measured "
+    "in terms of a deviation which is guaranteed to not become larger than \\d."
+    "\n"
+    "This method modifies the region. \\smoothed is a method that does the same but returns a new "
+    "region without modifying self. Merged semantics applies for this method.\n"
+  ) +
+  method ("smoothed", &db::Region::smoothed,
+    "@brief Smoothing\n"
+    "@args d\n"
+    "@param d The smoothing tolerance (in database units)\n"
+    "\n"
+    "See \\smooth for a description of this method. This version returns a new region instead of "
+    "modifying self (out-of-place). It has been introduced in version 0.25."
+  ) +
   method ("size", (db::Region & (db::Region::*) (db::Coord, db::Coord, unsigned int)) &db::Region::size,
     "@brief Anisotropic sizing (biasing)\n"
     "\n"
@@ -1345,21 +1355,6 @@ Class<db::Region> decl_Region ("Region",
     "@args other\n"
     "This method is useful to avoid excessive memory allocation in some cases. "
     "For managed memory languages such as Ruby, those cases will be rare. " 
-  ) +
-  method_ext ("smooth", &smooth,
-    "@brief Smooth the region\n"
-    "@args d\n"
-    "\n"
-    "Remove vertices that deviate by more than the distance d from the average contours.\n"
-    "The value d is basically the roughness which is removed.\n"
-    "This method will apply smoothing to all polygons in the region.\n"
-    "This method will modify the region it is called on.\n"
-    "\n"
-    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
-    "\n"
-    "@param d The smoothing \"roughness\".\n"
-    "\n"
-    "@return The smoothed region (self).\n"
   ) +
   method ("holes", &db::Region::holes,
     "@brief Returns the holes of the region\n"

@@ -765,6 +765,9 @@ CODE
     #
     # This method return a layer wit the modified polygons. Merged semantics applies for this
     # method (see \raw and \clean).
+    # If used with tiling, the rounded_corners function may render invalid results because
+    # in tiling mode, not the whole merged region may be captured. In that case, inner
+    # edges may appear as outer ones and their corners will receive rounding.
     #
     # The following image shows the effect of the "rounded_corners" method. The upper ends of 
     # the vertical bars are rounded with a smaller radius automatically because their width does not allow
@@ -779,6 +782,23 @@ CODE
     def rounded_corners(inner, outer, n)
       requires_region("rounded_corners")
       DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :rounded_corners, prep_value(inner), prep_value(outer), n))
+    end
+    
+    # %DRC%
+    # @name smoothed
+    # @brief Smoothes the polygons of the region
+    # @synopsis layer.smoothed(d)
+    #
+    # "Smoothing" returns a simplified version of the polygons. Simplification is 
+    # achieved by removing vertices unless the resulting polygon deviates by more
+    # than the given distance d from the original polygon.
+    #
+    # This method return a layer wit the modified polygons. Merged semantics applies for this
+    # method (see \raw and \clean).
+    
+    def smoothed(d)
+      requires_region("smoothed")
+      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :smoothed, prep_value(d)))
     end
     
     # %DRC%

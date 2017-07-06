@@ -1445,13 +1445,30 @@ public:
    */
   void round_corners (double rinner, double router, unsigned int n)
   {
-    *this = rounded_corners (rinner, router, n);
+    Region r = rounded_corners (rinner, router, n);
+    swap (r);
   }
 
   /**
    *  @brief Returns a new region with rounded corners (out of place)
    */
   Region rounded_corners (double rinner, double router, unsigned int n) const;
+
+  /**
+   *  @brief Returns the smoothed region
+   *
+   *  @param d The smoothing accuracy
+   */
+  Region smoothed (coord_type d) const;
+
+  /**
+   *  @brief Smoothes the region (in-place)
+   */
+  void smooth (coord_type d)
+  {
+    Region r = smoothed (d);
+    swap (r);
+  }
 
   /**
    *  @brief Returns the nth polygon 

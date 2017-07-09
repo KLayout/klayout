@@ -140,6 +140,51 @@ class DBText_TestClass < TestBase
 
   end
 
+  # Fuzzy compare
+  def test_2_Text
+
+    a1 = RBA::DText::new( "hallo", 10.0, -15.0 )
+    a2 = RBA::DText::new( "hallo", 10.0 + 1e-7, -15.0 )
+    a3 = RBA::DText::new( "hallo", 10.0 + 1e-4, -15.0 )
+    a4 = RBA::DText::new( "hllo", 10.0, -15.0 )
+
+    assert_equal(a1 == a2, true)
+    assert_equal(a1 != a2, false)
+    assert_equal(a1.eql?(a2), true)
+    assert_equal(a1 < a2, false)
+    assert_equal(a2 < a1, false)
+
+    assert_equal(a1 == a3, false)
+    assert_equal(a1 != a3, true)
+    assert_equal(a1.eql?(a3), false)
+    assert_equal(a1 < a3, true)
+    assert_equal(a3 < a1, false)
+
+    assert_equal(a1 == a4, false)
+    assert_equal(a1 != a4, true)
+    assert_equal(a1.eql?(a4), false)
+    assert_equal(a1 < a4, true)
+    assert_equal(a4 < a1, false)
+
+  end
+
+  # Hash function
+  def test_3_Text
+
+    a1 = RBA::DText::new( "hallo", 10.0, -15.0 )
+    a2 = RBA::DText::new( "hallo", 10.0 + 1e-7, -15.0 )
+    a3 = RBA::DText::new( "hallo", 10.0 + 1e-4, -15.0 )
+    a4 = RBA::DText::new( "hllo", 10.0, -15.0 )
+
+    h = { a1 => "a1", a3 => "a3", a4 => "a4" }
+    
+    assert_equal(h[a1], "a1")
+    assert_equal(h[a2], "a1")
+    assert_equal(h[a3], "a3")
+    assert_equal(h[a4], "a4")
+
+  end
+
 end
 
 load("test_epilogue.rb")

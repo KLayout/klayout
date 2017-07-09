@@ -372,6 +372,179 @@ class DBTrans_TestClass < TestBase
 
   end
 
+  # Fuzzy compare
+  def test_5_Trans_FuzzyCompare
+
+    t1 = RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ))
+    t2 = RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17 + 1e-7, 5 ))
+    t3 = RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17 + 1e-4, 5 ))
+    t4a = RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 18, 5 ))
+    t4b = RBA::DTrans::new( RBA::DTrans::R90, RBA::DPoint::new( 18, 5 ))
+
+    assert_equal(t1 == t2, true)
+    assert_equal(t1.eql?(t2), true)
+    assert_equal(t1 != t2, false)
+    assert_equal(t1 < t2, false)
+    assert_equal(t2 < t1, false)
+
+    assert_equal(t1 == t3, false)
+    assert_equal(t1.eql?(t3), false)
+    assert_equal(t1 != t3, true)
+    assert_equal(t1 < t3, true)
+    assert_equal(t3 < t1, false)
+
+    assert_equal(t1 == t4a, false)
+    assert_equal(t1.eql?(t4a), false)
+    assert_equal(t1 != t4a, true)
+    assert_equal(t1 < t4a, true)
+    assert_equal(t4a < t1, false)
+
+    assert_equal(t1 == t4b, false)
+    assert_equal(t1.eql?(t4b), false)
+    assert_equal(t1 != t4b, true)
+    assert_equal(t1 < t4b, false)
+    assert_equal(t4b < t1, true)
+
+  end
+
+  # Complex trans fuzzy compare
+  def test_5_CplxTrans_FuzzyCompare
+
+    t1 = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ) ), 1.0)
+    t2a = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17 + 1e-7, 5 ) ), 1.0)
+    t2b = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ) ), 1.0 + 1e-11)
+    t2c = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ) ), 1.0)
+    t2c.angle = t2c.angle + 1e-11
+    t3a = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17 + 1e-4, 5 ) ), 1.0)
+    t3b = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ) ), 1.0 + 1e-4)
+    t3c = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ) ), 1.0)
+    t3c.angle = t3c.angle + 1e-4
+    t4 = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::R90, RBA::DPoint::new( 18, 5 ) ), 1.0)
+
+    assert_equal(t1 == t2a, true)
+    assert_equal(t1.eql?(t2a), true)
+    assert_equal(t1 != t2a, false)
+    assert_equal(t1 < t2a, false)
+    assert_equal(t2a < t1, false)
+
+    assert_equal(t1 == t2b, true)
+    assert_equal(t1.eql?(t2b), true)
+    assert_equal(t1 != t2b, false)
+    assert_equal(t1 < t2b, false)
+    assert_equal(t2b < t1, false)
+
+    assert_equal(t1 == t2c, true)
+    assert_equal(t1.eql?(t2c), true)
+    assert_equal(t1 != t2c, false)
+    assert_equal(t1 < t2c, false)
+    assert_equal(t2c < t1, false)
+
+    assert_equal(t1 == t3a, false)
+    assert_equal(t1.eql?(t3a), false)
+    assert_equal(t1 != t3a, true)
+    assert_equal(t1 < t3a, true)
+    assert_equal(t3a < t1, false)
+
+    assert_equal(t1 == t3b, false)
+    assert_equal(t1.eql?(t3b), false)
+    assert_equal(t1 != t3b, true)
+    assert_equal(t1 < t3b, false)
+    assert_equal(t3b < t1, true)
+
+    assert_equal(t1 == t3c, false)
+    assert_equal(t1.eql?(t3c), false)
+    assert_equal(t1 != t3c, true)
+    assert_equal(t1 < t3c, true)
+    assert_equal(t3c < t1, false)
+
+    assert_equal(t3a == t3b, false)
+    assert_equal(t3a.eql?(t3b), false)
+    assert_equal(t3a != t3b, true)
+    assert_equal(t3a < t3b, false)
+    assert_equal(t3b < t3a, true)
+
+    assert_equal(t3a == t3c, false)
+    assert_equal(t3a.eql?(t3c), false)
+    assert_equal(t3a != t3c, true)
+    assert_equal(t3a < t3c, false)
+    assert_equal(t3c < t3a, true)
+
+    assert_equal(t3b == t3c, false)
+    assert_equal(t3b.eql?(t3c), false)
+    assert_equal(t3b != t3c, true)
+    assert_equal(t3b < t3c, true)
+    assert_equal(t3c < t3b, false)
+
+    assert_equal(t1 == t4, false)
+    assert_equal(t1.eql?(t4), false)
+    assert_equal(t1 != t4, true)
+    assert_equal(t1 < t4, true)
+    assert_equal(t4 < t1, false)
+
+  end
+
+  # Hash values 
+  def test_5_Trans_Hash
+
+    t1 = RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ))
+    t2 = RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17 + 1e-7, 5 ))
+    t3 = RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17 + 1e-4, 5 ))
+    t4a = RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 18, 5 ))
+    t4b = RBA::DTrans::new( RBA::DTrans::R90, RBA::DPoint::new( 18, 5 ))
+
+    assert_equal(t1.hash == t2.hash, true)
+    assert_equal(t1.hash == t3.hash, false)
+    assert_equal(t1.hash == t4a.hash, false)
+    assert_equal(t1.hash == t4b.hash, false)
+
+    h = { t1 => "t1", t3 => "t3", t4a => "t4a", t4b => "t4b" }
+
+    assert_equal(h[t1], "t1")
+    assert_equal(h[t2], "t1")
+    assert_equal(h[t3], "t3")
+    assert_equal(h[t4a], "t4a")
+    assert_equal(h[t4b], "t4b")
+
+  end
+
+  # Complex trans hash values
+  def test_5_CplxTrans_Hash
+
+    t1 = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ) ), 1.0)
+    t2a = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17 + 1e-7, 5 ) ), 1.0)
+    t2b = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ) ), 1.0 + 1e-11)
+    t2c = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ) ), 1.0)
+    t2c.angle = t2c.angle + 1e-11
+    t3a = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17 + 1e-4, 5 ) ), 1.0)
+    t3b = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ) ), 1.0 + 1e-4)
+    t3c = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::M135, RBA::DPoint::new( 17, 5 ) ), 1.0)
+    t3c.angle = t3c.angle + 1e-4
+    t4 = RBA::DCplxTrans::new( RBA::DTrans::new( RBA::DTrans::R90, RBA::DPoint::new( 18, 5 ) ), 1.0)
+
+    assert_equal(t1.hash == t2a.hash, true)
+    assert_equal(t1.hash == t2b.hash, true)
+    assert_equal(t1.hash == t2c.hash, true)
+    assert_equal(t1.hash == t3a.hash, false)
+    assert_equal(t1.hash == t3b.hash, false)
+    assert_equal(t1.hash == t3c.hash, false)
+    assert_equal(t3a.hash == t3b.hash, false)
+    assert_equal(t3a.hash == t3c.hash, false)
+    assert_equal(t3b.hash == t3c.hash, false)
+    assert_equal(t1.hash == t4.hash, false)
+
+    h = { t1 => "t1", t3a => "t3a", t3b => "t3b", t3c => "t3c", t4 => "t4" }
+
+    assert_equal(h[t1], "t1")
+    assert_equal(h[t2a], "t1")
+    assert_equal(h[t2b], "t1")
+    assert_equal(h[t2c], "t1")
+    assert_equal(h[t3a], "t3a")
+    assert_equal(h[t3b], "t3b")
+    assert_equal(h[t3c], "t3c")
+    assert_equal(h[t4], "t4")
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -24,6 +24,7 @@
 #include "gsiDecl.h"
 #include "dbVector.h"
 #include "dbPoint.h"
+#include "dbHash.h"
 
 namespace gsi
 {
@@ -94,6 +95,11 @@ struct vector_defs
     return db::sprod_sign (*p, q);
   }
 
+  static size_t hash_value (const C *v)
+  {
+    return std_ext::hfunc (*v);
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -137,7 +143,7 @@ struct vector_defs
       "\n"
       "Subtract vector v from self by subtracting the coordinates.\n"
     ) +
-    method ("<", &C::operator<,
+    method ("<", &C::less,
       "@brief \"less\" comparison operator\n"
       "\n"
       "@args v\n"
@@ -145,15 +151,21 @@ struct vector_defs
       "This operator is provided to establish a sorting\n"
       "order\n"
     ) +
-    method ("==", &C::operator==,
+    method ("==", &C::equal,
       "@brief Equality test operator\n"
       "\n"
       "@args v\n"
     ) +
-    method ("!=", &C::operator!=,
+    method ("!=", &C::not_equal,
       "@brief Inequality test operator\n"
       "\n"
       "@args v\n"
+    ) +
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given vector. This method enables vectors as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
     ) +
     method ("x", &C::x,
       "@brief Accessor to the x coordinate\n"

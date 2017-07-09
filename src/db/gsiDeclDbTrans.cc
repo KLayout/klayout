@@ -28,6 +28,7 @@
 #include "dbPolygon.h"
 #include "dbPath.h"
 #include "dbText.h"
+#include "dbHash.h"
 
 namespace gsi
 {
@@ -133,6 +134,11 @@ struct trans_defs
   static db::text<coord_type> trans_text (const C *t, const db::text<coord_type> &text)
   {
     return text.transformed (*t);
+  }
+
+  static size_t hash_value (const C *t)
+  {
+    return std_ext::hfunc (*t);
   }
 
   static gsi::Methods methods ()
@@ -304,16 +310,22 @@ struct trans_defs
       "@param t The transformation to apply before\n"
       "@return The modified transformation\n"
     ) +
-    method ("<", &C::operator<, arg ("other"),
+    method ("<", &C::less, arg ("other"),
       "@brief Provides a 'less' criterion for sorting\n"
       "This method is provided to implement a sorting order. The definition of 'less' is opaque and might change in "
       "future versions."
     ) +
-    method ("==", &C::operator==, arg ("other"),
+    method ("==", &C::equal, arg ("other"),
       "@brief Tests for equality\n"
     ) +
-    method ("!=", &C::operator!=, arg ("other"),
+    method ("!=", &C::not_equal, arg ("other"),
       "@brief Tests for inequality\n"
+    ) +
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given transformation. This method enables transformations as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
     ) +
     constructor ("from_s", &from_string, arg ("s"),
       "@brief Creates a transformation from a string\n"
@@ -622,6 +634,11 @@ struct cplx_trans_defs
     return text.transformed (*t);
   }
 
+  static size_t hash_value (const C *t)
+  {
+    return std_ext::hfunc (*t);
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -813,16 +830,22 @@ struct cplx_trans_defs
       "@param t The transformation to apply before\n"
       "@return The modified transformation\n"
     ) +
-    method ("<", &C::operator<, arg ("other"),
+    method ("<", &C::less, arg ("other"),
       "@brief Provides a 'less' criterion for sorting\n"
       "This method is provided to implement a sorting order. The definition of 'less' is opaque and might change in "
       "future versions."
     ) +
-    method ("==", &C::operator==, arg ("other"),
+    method ("==", &C::equal, arg ("other"),
       "@brief Tests for equality\n"
     ) +
-    method ("!=", &C::operator!=, arg ("other"),
+    method ("!=", &C::not_equal, arg ("other"),
       "@brief Tests for inequality\n"
+    ) +
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given transformation. This method enables transformations as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
     ) +
     constructor ("from_s", &from_string, arg ("s"),
       "@brief Creates an object from a string\n"

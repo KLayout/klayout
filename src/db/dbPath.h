@@ -339,6 +339,48 @@ public:
   }
 
   /**
+   *  @brief A fuzzy operator to establish a sorting order.
+   */
+  bool less (const path<C> &b) const
+  {
+    if (! coord_traits::equal (m_width, b.m_width)) {
+      return m_width < b.m_width;
+    }
+    if (! coord_traits::equal (m_bgn_ext, b.m_bgn_ext)) {
+      return m_bgn_ext < b.m_bgn_ext;
+    }
+    if (! coord_traits::equal (m_end_ext, b.m_end_ext)) {
+      return m_end_ext < b.m_end_ext;
+    }
+    return db::less (m_points, b.m_points);
+  }
+
+  /**
+   *  @brief Fuzzy qquality test
+   */
+  bool equal (const path<C> &b) const
+  {
+    if (! coord_traits::equal (m_width, b.m_width)) {
+      return false;
+    }
+    if (! coord_traits::equal (m_bgn_ext, b.m_bgn_ext)) {
+      return false;
+    }
+    if (! coord_traits::equal (m_end_ext, b.m_end_ext)) {
+      return false;
+    }
+    return db::equal (m_points, b.m_points);
+  }
+
+  /**
+   *  @brief Fuzzy inequality test
+   */
+  bool not_equal (const path<C> &b) const
+  {
+    return !equal (b);
+  }
+
+  /**
    *  @brief Set the width
    */
   void width (coord_type w)

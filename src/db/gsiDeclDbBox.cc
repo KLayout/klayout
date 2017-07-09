@@ -24,6 +24,7 @@
 #include "gsiDecl.h"
 #include "dbPoint.h"
 #include "dbBox.h"
+#include "dbHash.h"
 
 namespace gsi
 {
@@ -93,6 +94,11 @@ struct box_defs
   static C moved (const C *box, coord_type x, coord_type y)
   {
     return box->moved (vector_type (x, y));
+  }
+
+  static size_t hash_value (const C *box)
+  {
+    return std_ext::hfunc (*box);
   }
 
   static gsi::Methods methods ()
@@ -408,7 +414,7 @@ struct box_defs
       "@return The enlarged box.\n"
     ) +
     method ("transformed", &C::template transformed<simple_trans_type>,
-      "@brief Transform the box with the given simple transformation\n"
+      "@brief Transforms the box with the given simple transformation\n"
       "\n"
       "@args t\n"
       "\n"
@@ -416,27 +422,33 @@ struct box_defs
       "@return The transformed box\n"
     ) +
     method ("transformed", &C::template transformed<complex_trans_type>,
-      "@brief Transform the box with the given complex transformation\n"
+      "@brief Transforms the box with the given complex transformation\n"
       "\n"
       "@args t\n"
       "\n"
       "@param t The magnifying transformation to apply\n"
       "@return The transformed box (a DBox now)\n"
     ) +
-    method ("<", &C::operator<,
+    method ("<", &C::less,
       "@brief Less operator\n"
       "@args box\n"
-      "Return true, if this box is 'less' with respect to first and second point (in this order)"
+      "Returns true, if this box is 'less' with respect to first and second point (in this order)"
     ) +
-    method ("==", &C::operator==,
+    method ("==", &C::equal,
       "@brief Equality\n"
       "@args box\n"
-      "Return true, if this box and the given box are equal "
+      "Returns true, if this box and the given box are equal "
     ) +
-    method ("!=", &C::operator!=,
+    method ("!=", &C::not_equal,
       "@brief Inequality\n"
       "@args box\n"
-      "Return true, if this box and the given box are not equal "
+      "Returns true, if this box and the given box are not equal "
+    ) +
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given box. This method enables boxes as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
     ) +
     constructor ("from_s", &from_string,
       "@brief Creates an object from a string\n"

@@ -24,6 +24,7 @@
 #include "gsiDecl.h"
 #include "dbPoint.h"
 #include "dbPath.h"
+#include "dbHash.h"
 
 namespace gsi
 {
@@ -107,6 +108,11 @@ struct path_defs
     return C (p->transformed (icomplex_trans_type (s)));
   }
 
+  static size_t hash_value (const C *e)
+  {
+    return std_ext::hfunc (*e);
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -142,21 +148,27 @@ struct path_defs
       "@param end_ext The end extension of the path\n"
       "@param round If this flag is true, the path will get rounded ends\n"
     ) +
-    method ("<", &C::operator<,
+    method ("<", &C::less,
       "@brief Less operator\n"
       "@args p\n"
       "@param p The object to compare against\n"
       "This operator is provided to establish some, not necessarily a certain sorting order"
     ) +
-    method ("==", &C::operator==,
+    method ("==", &C::equal,
       "@brief Equality test\n"
       "@args p\n"
       "@param p The object to compare against"
     ) +
-    method ("!=", &C::operator!=,
+    method ("!=", &C::not_equal,
       "@brief Inequality test\n"
       "@args p\n"
       "@param p The object to compare against\n"
+    ) +
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given polygon. This method enables polygons as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
     ) +
     method_ext ("points=", &set_points,
       "@brief Set the points of the path\n"

@@ -94,7 +94,7 @@ public:
    */
   bool operator< (const edge_pair<C> &b) const
   {
-    return m_first < b.m_first || (m_first == b.m_first && m_first < b.m_first);
+    return m_first < b.m_first || (m_first == b.m_first && m_second < b.m_second);
   }
 
   /** 
@@ -111,6 +111,30 @@ public:
   bool operator!= (const edge_pair<C> &b) const
   {
     return !operator== (b);
+  }
+
+  /**
+   *  @brief A fuzzy less operator to establish a sorting order.
+   */
+  bool less (const edge_pair<C> &b) const
+  {
+    return m_first.less (b.m_first) || (m_first.equal (b.m_first) && m_second.less (b.m_second));
+  }
+
+  /**
+   *  @brief Fuzzy equality test
+   */
+  bool equal (const edge_pair<C> &b) const
+  {
+    return m_first.equal (b.m_first) && m_second.equal (b.m_second);
+  }
+
+  /**
+   *  @brief Fuzzy inequality test
+   */
+  bool not_equal (const edge_pair<C> &b) const
+  {
+    return !equal (b);
   }
 
   /**

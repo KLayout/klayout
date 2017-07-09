@@ -3,9 +3,6 @@ verbose(true)
 
 source(File.dirname(__FILE__) + "/drctest.gds", "TOPTOP")
 
-big_tests = false # @@@ set to true to enable all tests
-
-
 
 0.1.um.to_s == "0.1" || raise("unexpected value")
 0.1.micron.to_s == "0.1" || raise("unexpected value")

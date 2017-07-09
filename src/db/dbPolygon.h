@@ -848,20 +848,6 @@ public:
   }
 
   /**
-   *  @brief Compute a hash value
-   */
-  size_t hash () const
-  {
-    size_t h = ((size_t) mp_points & 3);
-    point_type *p = (point_type *) ((size_t) mp_points & ~3);
-    for (size_type i = 0; i < m_size; ++i, ++p) {
-      h = (h << 4) ^ (h >> 4) ^ size_t (p->x ());
-      h = (h << 4) ^ (h >> 4) ^ size_t (p->y ());
-    }
-    return h;
-  }
-
-  /**
    *  @brief Compute the bounding box
    *
    *  The bounding box is computed on-the-fly and is not stored.
@@ -937,7 +923,57 @@ public:
     return false;
   }
 
-  /** 
+  /**
+   *  @brief Fuzzy equality test
+   */
+  bool equal (const polygon_contour<C> &d) const
+  {
+    if (size () != d.size ()) {
+      return false;
+    }
+    if (is_hole () != d.is_hole ()) {
+      return false;
+    }
+    simple_iterator p1 = begin (), p2 = d.begin ();
+    while (p1 != end ()) {
+      if (! (*p1).equal (*p2)) {
+        return false;
+      }
+      ++p1; ++p2;
+    }
+    return true;
+  }
+
+  /**
+   *  @brief Fuzzy inequality test
+   */
+  bool not_equal (const polygon_contour<C> &d) const
+  {
+    return ! equal (d);
+  }
+
+  /**
+   *  @brief Fuzzy less than-operator
+   */
+  bool less (const polygon_contour<C> &d) const
+  {
+    if (size () != d.size ()) {
+      return size () < d.size ();
+    }
+    if (is_hole () != d.is_hole ()) {
+      return is_hole () < d.is_hole ();
+    }
+    simple_iterator p1 = begin (), p2 = d.begin ();
+    while (p1 != end ()) {
+      if (! (*p1).equal (*p2)) {
+        return (*p1).less (*p2);
+      }
+      ++p1; ++p2;
+    }
+    return false;
+  }
+
+  /**
    *  @brief swap with a different contour
    */
   void swap (polygon_contour<C> &d)
@@ -1506,6 +1542,75 @@ public:
   bool operator!= (const polygon<C> &b) const
   {
     return !operator== (b);
+  }
+
+  /**
+   *  @brief A fuzzy less operator to establish a sorting order.
+   */
+  bool less (const polygon<C> &b) const
+  {
+    //  do the simple tests first
+    if (holes () < b.holes ()) {
+      return true;
+    } else if (holes () != b.holes ()) {
+      return false;
+    }
+
+    if (m_bbox.less (b.m_bbox)) {
+      return true;
+    } else if (m_bbox.not_equal (b.m_bbox)) {
+      return false;
+    }
+
+    //  since the list of holes is maintained sorted, we can just
+    //  compare by comparing the holes contours (all must be equal)
+    typename contour_list_type::const_iterator hh = b.m_ctrs.begin ();
+    typename contour_list_type::const_iterator h = m_ctrs.begin ();
+    while (h != m_ctrs.end ()) {
+      if (h->less (*hh)) {
+        return true;
+      } else if (h->not_equal (*hh)) {
+        return false;
+      }
+      ++h;
+      ++hh;
+    }
+
+    return false;
+  }
+
+  /**
+   *  @brief Fuzzy equality test
+   */
+  bool equal (const polygon<C> &b) const
+  {
+    if (m_bbox.equal (b.m_bbox) && holes () == b.holes ()) {
+
+      //  since the list of holes is maintained sorted, we can just
+      //  compare by comparing the holes contours (all must be equal)
+      typename contour_list_type::const_iterator hh = b.m_ctrs.begin ();
+      typename contour_list_type::const_iterator h = m_ctrs.begin ();
+      while (h != m_ctrs.end ()) {
+        if (h->not_equal (*hh)) {
+          return false;
+        }
+        ++h;
+        ++hh;
+      }
+
+      return true;
+
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   *  @brief Fuzzy inequality test
+   */
+  bool not_equal (const polygon<C> &b) const
+  {
+    return !equal (b);
   }
 
   /**
@@ -2359,6 +2464,36 @@ public:
   bool operator!= (const simple_polygon<C> &b) const
   {
     return !operator== (b);
+  }
+
+  /**
+   *  @brief A fuzzy less operator to establish a sorting order.
+   */
+  bool less (const simple_polygon<C> &b) const
+  {
+    if (m_bbox.less (b.m_bbox)) {
+      return true;
+    } else if (m_bbox.not_equal (b.m_bbox)) {
+      return false;
+    }
+
+    return m_hull.less (b.m_hull);
+  }
+
+  /**
+   *  @brief Fuzzy equality test
+   */
+  bool equal (const simple_polygon<C> &b) const
+  {
+    return m_hull.equal (b.m_hull);
+  }
+
+  /**
+   *  @brief Fuzzy inequality test
+   */
+  bool not_equal (const simple_polygon<C> &b) const
+  {
+    return ! equal (b);
   }
 
   /**

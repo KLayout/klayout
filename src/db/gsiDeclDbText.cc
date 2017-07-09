@@ -24,6 +24,7 @@
 #include "gsiDecl.h"
 #include "dbPoint.h"
 #include "dbText.h"
+#include "dbHash.h"
 
 namespace gsi
 {
@@ -140,6 +141,11 @@ struct text_defs
   {
     c->transform (simple_trans_type (vector_type (dx, dy)));
     return *c;
+  }
+
+  static size_t hash_value (const C *box)
+  {
+    return std_ext::hfunc (*box);
   }
 
   static gsi::Methods methods ()
@@ -327,25 +333,31 @@ struct text_defs
       "@param t The magnifying transformation to apply\n"
       "@return The transformed text (a DText now)\n"
     ) +
-    method ("<", &C::operator<,
+    method ("<", &C::less,
       "@brief Less operator\n"
       "@args t\n"
       "@param t The object to compare against\n"
       "This operator is provided to establish some, not necessarily a certain sorting order"
     ) +
-    method ("==", &C::operator==,
+    method ("==", &C::equal,
       "@brief Equality\n"
       "\n"
       "@args text\n"
       "\n"
       "Return true, if this text object and the given text are equal "
     ) +
-    method ("!=", &C::operator!=,
+    method ("!=", &C::not_equal,
       "@brief Inequality\n"
       "\n"
       "@args text\n"
       "\n"
       "Return true, if this text object and the given text are not equal "
+    ) +
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given text object. This method enables texts as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
     ) +
     constructor ("from_s", &from_string,
       "@brief Creates an object from a string\n"

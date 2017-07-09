@@ -166,6 +166,30 @@ public:
   }
 
   /**
+   *  @brief A fuzzy less operator to establish a sorting order.
+   */
+  bool less (const edge<C> &b) const
+  {
+    return m_p1.less (b.m_p1) || (m_p1.equal (b.m_p1) && m_p2.less (b.m_p2));
+  }
+
+  /**
+   *  @brief Fuzzy equality test
+   */
+  bool equal (const edge<C> &b) const
+  {
+    return m_p1.equal (b.m_p1) && m_p2.equal (b.m_p2);
+  }
+
+  /**
+   *  @brief Fuzzy inequality test
+   */
+  bool not_equal (const edge<C> &b) const
+  {
+    return !equal (b);
+  }
+
+  /**
    *  @brief A method binding of operator* (mainly for automation purposes)
    */
   edge<C> scaled (double s) const

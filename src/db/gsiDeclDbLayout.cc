@@ -31,6 +31,7 @@
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
 #include "dbPCellDeclaration.h"
+#include "dbHash.h"
 #include "tlStream.h"
 
 namespace gsi
@@ -111,6 +112,12 @@ db::LayerProperties li_from_string (const char *s)
   return lp;
 }
 
+static
+size_t hash_value (const db::LayerProperties *l)
+{
+  return std_ext::hfunc (*l);
+}
+
 //  since there already exists a "LayerProperties" object, we call this one "LayerInfo"
 Class<db::LayerProperties> decl_LayerInfo ("LayerInfo", 
   gsi::constructor ("new", &ctor_layer_info_default, 
@@ -164,14 +171,14 @@ Class<db::LayerProperties> decl_LayerInfo ("LayerInfo",
     "This method was added in version 0.18.\n"
   ) +
   gsi::method ("==", &db::LayerProperties::operator==, 
-    "@brief Compare two layer info objects\n"
+    "@brief Compares two layer info objects\n"
     "@return True, if both are equal\n"
     "@args b\n"
     "\n"
     "This method was added in version 0.18.\n"
   ) +
   gsi::method ("!=", &db::LayerProperties::operator!=, 
-    "@brief Compare two layer info objects\n"
+    "@brief Compares two layer info objects\n"
     "@return True, if both are not equal\n"
     "@args b\n"
     "\n"
@@ -187,7 +194,13 @@ Class<db::LayerProperties> decl_LayerInfo ("LayerInfo",
     "\n"
     "This method was added in version 0.18.\n"
   ) +
-  gsi::method ("anonymous?", &db::LayerProperties::is_null, 
+  gsi::method_ext ("hash", &hash_value,
+    "@brief Computes a hash value\n"
+    "Returns a hash value for the given layer info object. This method enables layer info objects as hash keys.\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
+  gsi::method ("anonymous?", &db::LayerProperties::is_null,
     "@brief Returns true, if the layer has no specification (i.e. is created by the default constructor).\n"
     "@return True, if the layer does not have any specification.\n"
     "\n"

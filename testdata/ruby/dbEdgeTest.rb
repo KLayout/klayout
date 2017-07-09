@@ -224,6 +224,46 @@ class DBEdge_TestClass < TestBase
 
   end
 
+  # Fuzzy compare
+  def test_2_Edge
+
+    b1 = RBA::DEdge::new(1, 2, 3, 4)
+    b2 = RBA::DEdge::new(1 + 1e-7, 2, 3, 4)
+    b3 = RBA::DEdge::new(1 + 1e-4, 2, 3, 4)
+    assert_equal(b1.to_s, "(1,2;3,4)")
+    assert_equal(b2.to_s, "(1.0000001,2;3,4)")
+    assert_equal(b3.to_s, "(1.0001,2;3,4)")
+
+    assert_equal(b1 == b2, true)
+    assert_equal(b1.eql?(b2), true)
+    assert_equal(b1 != b2, false)
+    assert_equal(b1 < b2, false)
+    assert_equal(b2 < b1, false)
+    assert_equal(b1 == b3, false)
+    assert_equal(b1.eql?(b3), false)
+    assert_equal(b1 != b3, true)
+    assert_equal(b1 < b3, true)
+    assert_equal(b3 < b1, false)
+
+  end
+
+  # Hash values 
+  def test_3_Edge
+
+    b1 = RBA::DEdge::new(1, 2, 3, 4)
+    b2 = RBA::DEdge::new(1 + 1e-7, 2, 3, 4)
+    b3 = RBA::DEdge::new(1 + 1e-4, 2, 3, 4)
+
+    assert_equal(b1.hash == b2.hash, true)
+    assert_equal(b1.hash == b3.hash, false)
+
+    h = { b1 => "a", b3 => "b" }
+    assert_equal(h[b1], "a")
+    assert_equal(h[b2], "a")
+    assert_equal(h[b3], "b")
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -37,6 +37,7 @@
 #include "dbPCellDeclaration.h"
 #include "dbSaveLayoutOptions.h"
 #include "dbWriter.h"
+#include "dbHash.h"
 #include "tlStream.h"
 
 namespace gsi
@@ -342,6 +343,102 @@ struct cell_inst_array_defs
     return ComplexTransIterator (c);
   }
 
+  static size_t hash_value (const C *i)
+  {
+    return std_ext::hfunc (*i);
+  }
+
+  static bool less (const C *i, const C &other)
+  {
+    if (i->object ().cell_index () != other.object ().cell_index ()) {
+      return i->object ().cell_index () < other.object ().cell_index ();
+    }
+
+    db::vector<coord_type> a, b;
+    unsigned long na = 1, nb = 1;
+    bool r = i->is_regular_array (a, b, na, nb);
+
+    db::vector<coord_type> aother, bother;
+    unsigned long naother = 1, nbother = 1;
+    bool rother = other.is_regular_array (aother, bother, naother, nbother);
+
+    if (r != rother) {
+      return r < rother;
+    } else if (r) {
+      if (a.not_equal (aother)) {
+        return a.less (aother);
+      }
+      if (b.not_equal (bother)) {
+        return b.less (bother);
+      }
+      if (na != naother) {
+        return na < naother;
+      }
+      if (nb != nbother) {
+        return nb < nbother;
+      }
+    }
+
+    bool c = i->is_complex ();
+    bool cother = other.is_complex ();
+
+    if (c != cother) {
+      return c < cother;
+    } else if (c) {
+      return i->complex_trans ().less (other.complex_trans ());
+    } else {
+      return i->front ().less (other.front ());
+    }
+  }
+
+  static bool equal (const C *i, const C &other)
+  {
+    if (i->object ().cell_index () != other.object ().cell_index ()) {
+      return false;
+    }
+
+    db::vector<coord_type> a, b;
+    unsigned long na = 1, nb = 1;
+    bool r = i->is_regular_array (a, b, na, nb);
+
+    db::vector<coord_type> aother, bother;
+    unsigned long naother = 1, nbother = 1;
+    bool rother = other.is_regular_array (aother, bother, naother, nbother);
+
+    if (r != rother) {
+      return false;
+    } else if (r) {
+      if (a.not_equal (aother)) {
+        return false;
+      }
+      if (b.not_equal (bother)) {
+        return false;
+      }
+      if (na != naother) {
+        return false;
+      }
+      if (nb != nbother) {
+        return false;
+      }
+    }
+
+    bool c = i->is_complex ();
+    bool cother = other.is_complex ();
+
+    if (c != cother) {
+      return false;
+    } else if (c) {
+      return i->complex_trans ().equal (other.complex_trans ());
+    } else {
+      return i->front ().equal (other.front ());
+    }
+  }
+
+  static bool not_equal (const C *i, const C &other)
+  {
+    return ! equal (i, other);
+  }
+
   static gsi::Methods methods (bool new_doc)
   {
     return
@@ -484,20 +581,26 @@ struct cell_inst_array_defs
         "This method has been introduced in version 0.20.\n"
       )
     ) +
-    gsi::method ("<", &C::operator<,
+    gsi::method_ext ("<", &less,
       "@brief Compares two arrays for 'less'\n"
       "@args other\n"
       "The comparison provides an arbitrary sorting criterion and not specific sorting order. It "
       "is guaranteed that if an array a is less than b, b is not less than a. In addition, it a "
       "is not less than b and b is not less than a, then a is equal to b."
     ) +
-    gsi::method ("==", &C::operator==,
+    gsi::method_ext ("==", &equal,
       "@brief Compares two arrays for equality\n"
       "@args other"
     ) +
-    gsi::method ("!=", &C::operator!=,
+    gsi::method_ext ("!=", &not_equal,
       "@brief Compares two arrays for inequality\n"
       "@args other"
+    ) +
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given cell instance. This method enables cell instances as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
     ) +
     gsi::method ("is_complex?", &C::is_complex,
       "@brief Gets a value indicating whether the array is a complex array\n"

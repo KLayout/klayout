@@ -61,9 +61,9 @@ class DBCellInst_TestClass < TestBase
     assert_equal(at.trans.to_s, "r90 0,0")
     assert_equal(at.cplx_trans.to_s, "r135 *1 0,0")
 
-    assert_equal(at < a, false)
+    assert_equal(at < a, true)
     assert_equal(at < atdup, false)
-    assert_equal(a < at, true)
+    assert_equal(a < at, false)
     assert_equal(atdup < at, false)
     assert_equal(a != at, true)
     assert_equal(a == at, false)
@@ -123,9 +123,9 @@ class DBCellInst_TestClass < TestBase
     assert_equal(at.cplx_trans.to_s, "r135 *1 0,0")
     assert_equal(at.to_s, "#0 r135 *1 0,0 [-20,10*3;-40,30*5]")
 
-    assert_equal(at < a, false)
+    assert_equal(at < a, true)
     assert_equal(at < atdup, false)
-    assert_equal(a < at, true)
+    assert_equal(a < at, false)
     assert_equal(atdup < at, false)
     assert_equal(a != at, true)
     assert_equal(a == at, false)
@@ -190,9 +190,9 @@ class DBCellInst_TestClass < TestBase
     assert_equal(at.trans.to_s, "r90 0,0")
     assert_equal(at.cplx_trans.to_s, "r135 *1 0,0")
 
-    assert_equal(at < a, false)
+    assert_equal(at < a, true)
     assert_equal(at < atdup, false)
-    assert_equal(a < at, true)
+    assert_equal(a < at, false)
     assert_equal(atdup < at, false)
     assert_equal(a != at, true)
     assert_equal(a == at, false)
@@ -252,9 +252,9 @@ class DBCellInst_TestClass < TestBase
     assert_equal(at.cplx_trans.to_s, "r135 *1 0,0")
     assert_equal(at.to_s, "#0 r135 *1 0,0 [-20,10*3;-40,30*5]")
 
-    assert_equal(at < a, false)
+    assert_equal(at < a, true)
     assert_equal(at < atdup, false)
-    assert_equal(a < at, true)
+    assert_equal(a < at, false)
     assert_equal(atdup < at, false)
     assert_equal(a != at, true)
     assert_equal(a == at, false)
@@ -416,6 +416,134 @@ class DBCellInst_TestClass < TestBase
     assert_equal(cci2str(ii), "r270 *1 0,0;r270 *1 30,40;r270 *1 60,80")
     ii.na = 0
     assert_equal(ii.to_s, "#8 r270 0,0")
+
+  end
+
+  # DCellInstArray fuzzy compare
+  def test_2_FuzzyCompare
+
+    i1 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)))
+    i2 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5 + 1e-7, 2.5)))
+    i3 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5 + 1e-4, 2.5)))
+
+    assert_equal(i1 == i2, true)
+    assert_equal(i1 != i2, false)
+    assert_equal(i1.eql?(i2), true)
+    assert_equal(i1 < i2, false)
+    assert_equal(i2 < i1, false)
+
+    assert_equal(i1 == i3, false)
+    assert_equal(i1 != i3, true)
+    assert_equal(i1.eql?(i3), false)
+    assert_equal(i1 < i3, true)
+    assert_equal(i3 < i1, false)
+
+  end
+
+  # DCellInstArray hash function 
+  def test_2_Hash
+
+    i1 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)))
+    i2 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5 + 1e-7, 2.5)))
+    i3 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5 + 1e-4, 2.5)))
+    i4 = RBA::DCellInstArray.new(3, RBA::DTrans.new(RBA::DPoint.new(1.5 + 1e-4, 2.5)))
+
+    assert_equal(i1.hash == i2.hash, true)
+    assert_equal(i1.hash == i3.hash, false)
+    assert_equal(i1.hash == i4.hash, false)
+
+    h = { i1 => "i1", i3 => "i3", i4 => "i4" }
+
+    assert_equal(h[i1], "i1")
+    assert_equal(h[i2], "i1")
+    assert_equal(h[i3], "i3")
+    assert_equal(h[i4], "i4")
+
+  end
+
+  # DCellInstArray hash function 
+  def test_3_Hash
+
+    i1 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1, 2), RBA::DPoint::new(3, 4), 5, 6)
+    i2 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1 + 1e-7, 2), RBA::DPoint::new(3, 4), 5, 6)
+    i3 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1 + 1e-4, 2), RBA::DPoint::new(3, 4), 5, 6)
+    i4 = RBA::DCellInstArray.new(3, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1, 2), RBA::DPoint::new(3, 4), 7, 6)
+
+    assert_equal(i1.hash == i2.hash, true)
+    assert_equal(i1.hash == i3.hash, false)
+    assert_equal(i1.hash == i4.hash, false)
+
+    h = { i1 => "i1", i3 => "i3", i4 => "i4" }
+
+    assert_equal(h[i1], "i1")
+    assert_equal(h[i2], "i1")
+    assert_equal(h[i3], "i3")
+    assert_equal(h[i4], "i4")
+
+  end
+
+  # DCellInstArray fuzzy compare
+  def test_3_FuzzyCompare
+
+    i1 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1, 2), RBA::DPoint::new(3, 4), 5, 6)
+    i2 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1 + 1e-7, 2), RBA::DPoint::new(3, 4), 5, 6)
+    i3 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1 + 1e-4, 2), RBA::DPoint::new(3, 4), 5, 6)
+
+    assert_equal(i1 == i2, true)
+    assert_equal(i1 != i2, false)
+    assert_equal(i1.eql?(i2), true)
+    assert_equal(i1 < i2, false)
+    assert_equal(i2 < i1, false)
+
+    assert_equal(i1 == i3, false)
+    assert_equal(i1 != i3, true)
+    assert_equal(i1.eql?(i3), false)
+    assert_equal(i1 < i3, true)
+    assert_equal(i3 < i1, false)
+
+  end
+
+  # DCellInstArray hash function 
+  def test_4_Hash
+
+    i1 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1, 2), RBA::DPoint::new(3, 4), 5, 6)
+    i2 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1, 2), RBA::DPoint::new(3 + 1e-7, 4), 5, 6)
+    i3 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1, 2), RBA::DPoint::new(3 + 1e-4, 4), 5, 6)
+    i4 = RBA::DCellInstArray.new(3, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1, 2), RBA::DPoint::new(3, 4), 5, 8)
+    i5 = RBA::DCellInstArray.new(3, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)))
+
+    assert_equal(i1.hash == i2.hash, true)
+    assert_equal(i1.hash == i3.hash, false)
+    assert_equal(i1.hash == i4.hash, false)
+
+    h = { i1 => "i1", i3 => "i3", i4 => "i4", i5 => "i5" }
+
+    assert_equal(h[i1], "i1")
+    assert_equal(h[i2], "i1")
+    assert_equal(h[i3], "i3")
+    assert_equal(h[i4], "i4")
+    assert_equal(h[i5], "i5")
+
+  end
+
+  # DCellInstArray fuzzy compare
+  def test_4_FuzzyCompare
+
+    i1 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1, 2), RBA::DPoint::new(3, 4), 5, 6)
+    i2 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1, 2), RBA::DPoint::new(3 + 1e-7, 4), 5, 6)
+    i3 = RBA::DCellInstArray.new(7, RBA::DTrans.new(RBA::DPoint.new(1.5, 2.5)), RBA::DPoint::new(1, 2), RBA::DPoint::new(3 + 1e-4, 4), 5, 6)
+
+    assert_equal(i1 == i2, true)
+    assert_equal(i1 != i2, false)
+    assert_equal(i1.eql?(i2), true)
+    assert_equal(i1 < i2, false)
+    assert_equal(i2 < i1, false)
+
+    assert_equal(i1 == i3, false)
+    assert_equal(i1 != i3, true)
+    assert_equal(i1.eql?(i3), false)
+    assert_equal(i1 < i3, true)
+    assert_equal(i3 < i1, false)
 
   end
 

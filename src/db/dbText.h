@@ -445,49 +445,7 @@ public:
     if (m_trans != b.m_trans) {
       return m_trans < b.m_trans;
     }
-
-    //  Compare strings or StringRef's by pointer (that is
-    //  the intention of StringRef's: if the text changes, the sort
-    //  order must not!)
-    if (((size_t) mp_ptr & 1) == 0 || ((size_t) b.mp_ptr & 1) == 0) {
-      int c = strcmp (string (), b.string ());
-      if (c != 0) {
-        return c < 0;
-      }
-    } else {
-      if (mp_ptr != b.mp_ptr) {
-        //  if references are present, use their pointers rather than the strings
-        //  if they belong to the same collection
-        const StringRef *r1 = reinterpret_cast<const StringRef *> (mp_ptr - 1);
-        const StringRef *r2 = reinterpret_cast<const StringRef *> (b.mp_ptr - 1);
-        if (r1->rep () != r2->rep ()) {
-          int c = strcmp (r1->value ().c_str (), r2->value ().c_str ());
-          if (c != 0) {
-            return c < 0;
-          }
-        } else {
-          return mp_ptr < b.mp_ptr;
-        }
-      }
-    }
-
-#if 1
-    //  Compare size and presentation flags - without that, the text repository does not work properly.
-    if (m_size != b.m_size) {
-      return m_size < b.m_size;
-    }
-    if (m_font != b.m_font) {
-      return m_font < b.m_font;
-    }
-    if (m_halign != b.m_halign) {
-      return m_halign < b.m_halign;
-    }
-    if (m_valign != b.m_valign) {
-      return m_valign < b.m_valign;
-    }
-#endif
-
-    return false;
+    return text_less (b);
   }
 
   /**
@@ -499,42 +457,7 @@ public:
     if (m_trans != b.m_trans) {
       return false;
     }
-
-    //  Compare strings or StringRef's by pointer (that is
-    //  the intention of StringRef's: if the text changes, the sort
-    //  order must not!)
-    if (((size_t) mp_ptr & 1) == 0 || ((size_t) b.mp_ptr & 1) == 0) {
-      int c = strcmp (string (), b.string ());
-      if (c != 0) {
-        return false;
-      }
-    } else {
-      if (mp_ptr != b.mp_ptr) {
-        //  if references are present, use their pointers rather than the strings
-        //  if they belong to the same collection
-        const StringRef *r1 = reinterpret_cast<const StringRef *> (mp_ptr - 1);
-        const StringRef *r2 = reinterpret_cast<const StringRef *> (b.mp_ptr - 1);
-        if (r1->rep () != r2->rep ()) {
-          int c = strcmp (r1->value ().c_str (), r2->value ().c_str ());
-          if (c != 0) {
-            return false;
-          }
-        } else {
-          return false;
-        }
-      }
-    }
-
-#if 1
-    //  Compare size and presentation flags - without that, the text repository does not work properly.
-    if (m_size != b.m_size) {
-      return false;
-    }
-    return m_font == b.m_font && m_halign == b.m_halign && m_valign == b.m_valign;
-#else
-    //  Don't compare size, font and alignment
-    return true;
-#endif
+    return text_equal (b);
   }
 
   /** 
@@ -543,6 +466,38 @@ public:
   bool operator!= (const text<C> &b) const
   {
     return !operator== (b);
+  }
+
+  /**
+   *  @brief Fuzzy ordering operator
+   */
+  bool less (const text<C> &b) const
+  {
+    //  Compare transformation
+    if (m_trans.not_equal (b.m_trans)) {
+      return m_trans.less (b.m_trans);
+    }
+    return text_less (b);
+  }
+
+  /**
+   *  @brief Fuzzy equality test
+   */
+  bool equal (const text<C> &b) const
+  {
+    //  Compare transformation
+    if (m_trans.not_equal (b.m_trans)) {
+      return false;
+    }
+    return text_equal (b);
+  }
+
+  /**
+   *  @brief Fuzzy inequality test
+   */
+  bool not_equal (const text<C> &b) const
+  {
+    return !equal (b);
   }
 
   /**
@@ -820,6 +775,91 @@ private:
   {
     mp_ptr = new char[s.size() + 1];
     strncpy (mp_ptr, s.c_str (), s.size () + 1);
+  }
+
+  bool text_less (const text<C> &b) const
+  {
+    //  Compare strings or StringRef's by pointer (that is
+    //  the intention of StringRef's: if the text changes, the sort
+    //  order must not!)
+    if (((size_t) mp_ptr & 1) == 0 || ((size_t) b.mp_ptr & 1) == 0) {
+      int c = strcmp (string (), b.string ());
+      if (c != 0) {
+        return c < 0;
+      }
+    } else {
+      if (mp_ptr != b.mp_ptr) {
+        //  if references are present, use their pointers rather than the strings
+        //  if they belong to the same collection
+        const StringRef *r1 = reinterpret_cast<const StringRef *> (mp_ptr - 1);
+        const StringRef *r2 = reinterpret_cast<const StringRef *> (b.mp_ptr - 1);
+        if (r1->rep () != r2->rep ()) {
+          int c = strcmp (r1->value ().c_str (), r2->value ().c_str ());
+          if (c != 0) {
+            return c < 0;
+          }
+        } else {
+          return mp_ptr < b.mp_ptr;
+        }
+      }
+    }
+
+#if 1
+    //  Compare size and presentation flags - without that, the text repository does not work properly.
+    if (m_size != b.m_size) {
+      return m_size < b.m_size;
+    }
+    if (m_font != b.m_font) {
+      return m_font < b.m_font;
+    }
+    if (m_halign != b.m_halign) {
+      return m_halign < b.m_halign;
+    }
+    if (m_valign != b.m_valign) {
+      return m_valign < b.m_valign;
+    }
+#endif
+
+    return false;
+  }
+
+  bool text_equal (const text<C> &b) const
+  {
+    //  Compare strings or StringRef's by pointer (that is
+    //  the intention of StringRef's: if the text changes, the sort
+    //  order must not!)
+    if (((size_t) mp_ptr & 1) == 0 || ((size_t) b.mp_ptr & 1) == 0) {
+      int c = strcmp (string (), b.string ());
+      if (c != 0) {
+        return false;
+      }
+    } else {
+      if (mp_ptr != b.mp_ptr) {
+        //  if references are present, use their pointers rather than the strings
+        //  if they belong to the same collection
+        const StringRef *r1 = reinterpret_cast<const StringRef *> (mp_ptr - 1);
+        const StringRef *r2 = reinterpret_cast<const StringRef *> (b.mp_ptr - 1);
+        if (r1->rep () != r2->rep ()) {
+          int c = strcmp (r1->value ().c_str (), r2->value ().c_str ());
+          if (c != 0) {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      }
+    }
+
+#if 1
+    //  Compare size and presentation flags - without that, the text repository does not work properly.
+    if (m_size != b.m_size) {
+      return false;
+    }
+    return m_font == b.m_font && m_halign == b.m_halign && m_valign == b.m_valign;
+#else
+    //  Don't compare size, font and alignment
+    return true;
+#endif
   }
 };
 

@@ -30,6 +30,7 @@
 #include "dbTypes.h"
 #include "tlString.h"
 #include "tlTypeTraits.h"
+#include "tlVector.h"
 
 #include <string>
 
@@ -273,6 +274,14 @@ public:
    *  @brief Fuzzy comparison of points
    */
   bool equal (const point<C> &p) const;
+
+  /**
+   *  @brief Fuzzy comparison of points for inequality
+   */
+  bool not_equal (const point<C> &p) const
+  {
+    return ! equal (p);
+  }
 
   /**
    *  @brief Fuzzy "less" comparison of points
@@ -627,6 +636,44 @@ struct point_coord_converter
     return db::point<D> (dp);
   }
 };
+
+/**
+ *  A fuzzy "less" operator for point lists
+ */
+template <class C>
+inline bool less (const tl::vector<point<C> > &a, const tl::vector<point<C> > &b)
+{
+  if (a.size () != b.size ()) {
+    return a.size () < b.size ();
+  }
+
+  for (typename tl::vector<point<C> >::const_iterator i = a.begin (), j = b.begin (); i != a.end (); ++i, ++j) {
+    if (! i->equal (*j)) {
+      return i->less (*j);
+    }
+  }
+
+  return false;
+}
+
+/**
+ *  A fuzzy "equal" operator for point lists
+ */
+template <class C>
+inline bool equal (const tl::vector<point<C> > &a, const tl::vector<point<C> > &b)
+{
+  if (a.size () != b.size ()) {
+    return false;
+  }
+
+  for (typename tl::vector<point<C> >::const_iterator i = a.begin (), j = b.begin (); i != a.end (); ++i, ++j) {
+    if (! i->equal (*j)) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 }
 

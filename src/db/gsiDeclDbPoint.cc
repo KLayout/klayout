@@ -24,6 +24,7 @@
 #include "gsiDecl.h"
 #include "dbPoint.h"
 #include "dbBox.h"
+#include "dbHash.h"
 
 namespace gsi
 {
@@ -72,6 +73,11 @@ struct point_defs
   static C negate (const C *p)
   {
     return -*p;
+  }
+
+  static size_t hash_value (const C *pt)
+  {
+    return std_ext::hfunc (*pt);
   }
 
   static gsi::Methods methods ()
@@ -123,7 +129,7 @@ struct point_defs
       "\n"
       "Starting with version 0.25, this method renders a vector."
     ) +
-    method ("<", &C::operator<,
+    method ("<", &C::less,
       "@brief \"less\" comparison operator\n"
       "\n"
       "@args p\n"
@@ -131,15 +137,21 @@ struct point_defs
       "This operator is provided to establish a sorting\n"
       "order\n"
     ) +
-    method ("==", &C::operator==,
+    method ("==", &C::equal,
       "@brief Equality test operator\n"
       "\n"
       "@args p\n"
     ) +
-    method ("!=", &C::operator!=,
+    method ("!=", &C::not_equal,
       "@brief Inequality test operator\n"
       "\n"
       "@args p\n"
+    ) +
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given point. This method enables points as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
     ) +
     method ("x", &C::x,
       "@brief Accessor to the x coordinate\n"

@@ -225,12 +225,20 @@ public:
   void set_y (C _y);
 
   /**
-   *  @brief Fuzzy comparison of points
+   *  @brief Fuzzy comparison of vectors
    */
   bool equal (const vector<C> &p) const;
 
   /**
-   *  @brief Fuzzy "less" comparison of points
+   *  @brief Fuzzy comparison of vectors for inequality
+   */
+  bool not_equal (const vector<C> &p) const
+  {
+    return !equal (p);
+  }
+
+  /**
+   *  @brief Fuzzy "less" comparison of vectors
    */
   bool less (const vector<C> &p) const;
 

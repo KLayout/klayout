@@ -525,6 +525,115 @@ class DBPolygon_TestClass < TestBase
 
   end
 
+  # fuzzy compare 
+  def test_FuzzyCompare
+
+    p1 = RBA::DPolygon::from_s("(0,0;0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
+    p2a = RBA::DPolygon::from_s("(0.0000001,0;0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
+    p2b = RBA::DPolygon::from_s("(0,0;0,40;40,40;40,0/10.0000001,10;30,10;30,30;10,30)")
+    p3a = RBA::DPolygon::from_s("(0.0001,0;0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
+    p3b = RBA::DPolygon::from_s("(0,0;0,40;40,40;40,0/10.0001,10;30,10;30,30;10,30)")
+    p4a = RBA::DPolygon::from_s("(0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
+    p4b = RBA::DPolygon::from_s("(0,0;1,1;0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
+    p4c = RBA::DPolygon::from_s("(0,0;0,40;40,40;40,0)")
+    p4d = RBA::DPolygon::from_s("(0,0;1,1;0,40;40,40;40,0/10,10;30,10;30,30;10,30/15,15;16,15;16,16;15,16)")
+
+    assert_equal(p1 == p2a, true)
+    assert_equal(p1 == p2b, true)
+    assert_equal(p1 == p3a, false)
+    assert_equal(p1 == p3b, false)
+    assert_equal(p1 == p4a, false)
+    assert_equal(p1 == p4b, false)
+    assert_equal(p1 == p4c, false)
+    assert_equal(p1 == p4d, false)
+    assert_equal(p1.eql?(p2a), true)
+    assert_equal(p1.eql?(p2b), true)
+    assert_equal(p1.eql?(p3a), false)
+    assert_equal(p1.eql?(p3b), false)
+    assert_equal(p3a.eql?(p3b), false)
+    assert_equal(p1.eql?(p4a), false)
+    assert_equal(p1.eql?(p4b), false)
+    assert_equal(p1.eql?(p4c), false)
+    assert_equal(p1.eql?(p4d), false)
+    assert_equal(p4a.eql?(p4b), false)
+    assert_equal(p4a.eql?(p4c), false)
+    assert_equal(p4a.eql?(p4d), false)
+    assert_equal(p4b.eql?(p4c), false)
+    assert_equal(p4b.eql?(p4d), false)
+    assert_equal(p4c.eql?(p4d), false)
+    assert_equal(p1 < p2a, false)
+    assert_equal(p1 < p2b, false)
+    assert_equal(p1 < p3a, true)
+    assert_equal(p1 < p3b, true)
+    assert_equal(p1 < p4a, false)
+    assert_equal(p1 < p4b, true)
+    assert_equal(p1 < p4c, false)
+    assert_equal(p1 < p4d, true)
+    assert_equal(p4a < p4b, true)
+    assert_equal(p4a < p4c, false)
+    assert_equal(p4a < p4d, true)
+    assert_equal(p4b < p4c, false)
+    assert_equal(p4b < p4d, true)
+    assert_equal(p4c < p4d, true)
+    assert_equal(p2a < p1, false)
+    assert_equal(p2b < p1, false)
+    assert_equal(p3a < p1, false)
+    assert_equal(p3b < p1, false)
+    assert_equal(p4a < p1, true)
+    assert_equal(p4b < p1, false)
+    assert_equal(p4c < p1, true)
+    assert_equal(p4d < p1, false)
+    assert_equal(p4b < p4a, false)
+    assert_equal(p4c < p4a, true)
+    assert_equal(p4d < p4a, false)
+    assert_equal(p4c < p4b, true)
+    assert_equal(p4d < p4b, false)
+    assert_equal(p4d < p4c, false)
+
+  end
+
+  # hash values 
+  def test_HashValues
+
+    p1 = RBA::DPolygon::from_s("(0,0;0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
+    p2a = RBA::DPolygon::from_s("(0.0000001,0;0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
+    p2b = RBA::DPolygon::from_s("(0,0;0,40;40,40;40,0/10.0000001,10;30,10;30,30;10,30)")
+    p3a = RBA::DPolygon::from_s("(0.0001,0;0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
+    p3b = RBA::DPolygon::from_s("(0,0;0,40;40,40;40,0/10.0001,10;30,10;30,30;10,30)")
+    p4a = RBA::DPolygon::from_s("(0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
+    p4b = RBA::DPolygon::from_s("(0,0;1,1;0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
+    p4c = RBA::DPolygon::from_s("(0,0;0,40;40,40;40,0)")
+    p4d = RBA::DPolygon::from_s("(0,0;1,1;0,40;40,40;40,0/10,10;30,10;30,30;10,30/15,15;16,15;16,16;15,16)")
+
+    assert_equal(p1.hash == p2a.hash, true)
+    assert_equal(p1.hash == p2b.hash, true)
+    assert_equal(p1.hash == p3a.hash, false)
+    assert_equal(p1.hash == p3b.hash, false)
+    assert_equal(p1.hash == p4a.hash, false)
+    assert_equal(p1.hash == p4b.hash, false)
+    assert_equal(p1.hash == p4c.hash, false)
+    assert_equal(p1.hash == p4d.hash, false)
+    assert_equal(p4a.hash == p4b.hash, false)
+    assert_equal(p4a.hash == p4c.hash, false)
+    assert_equal(p4a.hash == p4d.hash, false)
+    assert_equal(p4b.hash == p4c.hash, false)
+    assert_equal(p4b.hash == p4d.hash, false)
+    assert_equal(p4c.hash == p4d.hash, false)
+
+    h = { p1 => "p1", p3a => "p3a", p3b => "p3b", p4a => "p4a", p4b => "p4b", p4c => "p4c", p4d => "p4d" }
+
+    assert_equal(h[p1], "p1")
+    assert_equal(h[p2a], "p1")
+    assert_equal(h[p2b], "p1")
+    assert_equal(h[p3a], "p3a")
+    assert_equal(h[p3b], "p3b")
+    assert_equal(h[p4a], "p4a")
+    assert_equal(h[p4b], "p4b")
+    assert_equal(h[p4c], "p4c")
+    assert_equal(h[p4d], "p4d")
+
+  end
+
 end
 
 load("test_epilogue.rb")

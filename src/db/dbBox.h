@@ -169,6 +169,14 @@ struct box
   bool equal (const box_type &b) const;
 
   /**
+   *  @brief Fuzzy comparison of boxes
+   */
+  bool not_equal (const box_type &b) const
+  {
+    return !equal (b);
+  }
+
+  /**
    *  @brief Fuzzy "less" comparison of points
    */
   bool less (const box_type &p) const;

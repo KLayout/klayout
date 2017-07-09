@@ -26,6 +26,7 @@
 #include "dbPolygon.h"
 #include "dbPolygonTools.h"
 #include "dbPolygonGenerators.h"
+#include "dbHash.h"
 
 namespace gsi
 {
@@ -204,6 +205,11 @@ struct simple_polygon_defs
     return res;
   }
 
+  static size_t hash_value (const C *p)
+  {
+    return std_ext::hfunc (*p);
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -244,17 +250,31 @@ struct simple_polygon_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method ("==", &C::operator==,
+    method ("<", &C::less,
+      "@brief Less operator\n"
+      "@args p\n"
+      "@param p The object to compare against\n"
+      "This operator is provided to establish some, not necessarily a certain sorting order\n"
+      "\n"
+      "This method has been introduced in version 0.25."
+    ) +
+    method ("==", &C::equal,
       "@brief Equality test\n"
       "@args p\n"
       "@param p The object to compare against\n"
     ) +
-    method ("!=", &C::operator!=,
+    method ("!=", &C::not_equal,
       "@brief Inequality test\n"
       "@args p\n"
       "@param p The object to compare against\n"
     ) +
-    method_ext ("points=", &set_points1, 
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given polygon. This method enables polygons as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
+    ) +
+    method_ext ("points=", &set_points1,
       "@brief Set the points of the simple polygon\n"
       "\n"
       "@args pts\n"
@@ -950,6 +970,11 @@ struct polygon_defs
     return db::compute_rounded (*p, rinner, router, n);
   }
 
+  static size_t hash_value (const C *p)
+  {
+    return std_ext::hfunc (*p);
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -987,21 +1012,27 @@ struct polygon_defs
       "\n"
       "This method has been introduced in version 0.23.\n"
     ) +
-    method ("<", &C::operator<,
+    method ("<", &C::less,
       "@brief Less operator\n"
       "@args p\n"
       "@param p The object to compare against\n"
       "This operator is provided to establish some, not necessarily a certain sorting order\n"
     ) +
-    method ("==", &C::operator==,
+    method ("==", &C::equal,
       "@brief Equality test\n"
       "@args p\n"
       "@param p The object to compare against\n"
     ) +
-    method ("!=", &C::operator!=,
+    method ("!=", &C::not_equal,
       "@brief Inequality test\n"
       "@args p\n"
       "@param p The object to compare against\n"
+    ) +
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given polygon. This method enables polygons as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
     ) +
     method_ext ("hull=", &set_hull1,
       "@brief Set the points of the hull of polygon\n"

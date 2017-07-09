@@ -201,6 +201,14 @@ struct unit_trans
   }
 
   /**
+   *  @brief A (fuzzy) inequality test
+   */
+  bool not_equal (const unit_trans &t) const
+  {
+    return ! equal (t);
+  }
+
+  /**
    *  @brief (dummy) inequality
    */
   bool operator!= (unit_trans /*b*/) const
@@ -615,6 +623,14 @@ public:
   }
 
   /**
+   *  @brief A (dummy) fuzzy inequality test
+   */
+  bool not_equal (const fixpoint_trans &t) const
+  {
+    return ! equal (t);
+  }
+
+  /**
    *  @brief String conversion
    */
   std::string to_string () const
@@ -928,6 +944,14 @@ public:
   bool equal (const disp_trans<C> &t) const
   {
     return m_u.equal (t.m_u);
+  }
+
+  /**
+   *  @brief A fuzzy inequality test
+   */
+  bool not_equal (const disp_trans<C> &t) const
+  {
+    return ! equal (t);
   }
 
   /**
@@ -1319,12 +1343,20 @@ public:
     return !operator== (t);
   }
 
-  /*
+  /**
    *  @brief A fuzzy equality test
    */
   bool equal (const simple_trans<C> &t) const
   {
     return fixpoint_trans<C>::operator== (t) && m_u.equal (t.m_u);
+  }
+
+  /**
+   *  @brief A fuzzy inequality test
+   */
+  bool not_equal (const simple_trans<C> &t) const
+  {
+    return ! equal (t);
   }
 
   /**
@@ -2075,6 +2107,14 @@ public:
            fabs (m_sin - t.m_sin) <= eps_f () &&
            fabs (m_cos - t.m_cos) <= eps_f () &&
            fabs (m_mag - t.m_mag) <= eps_f ();
+  }
+
+  /**
+   *  @brief A (fuzzy) inequality test
+   */
+  bool not_equal (const complex_trans &t) const
+  {
+    return ! equal (t);
   }
 
   /**

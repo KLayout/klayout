@@ -42,7 +42,14 @@ namespace std_ext = std;
 #include "dbText.h"
 #include "dbPath.h"
 #include "dbPolygon.h"
+#include "dbTrans.h"
+#include "dbEdgePair.h"
 #include "dbInstances.h"
+#include "dbLayout.h"
+
+#include <string>
+#include <functional>
+#include <stdint.h>
 
 /**
  *  This header defines some hash functions for various database objects 
@@ -86,37 +93,53 @@ namespace DB_HASH_NAMESPACE
     return hcombine (h, hf (t));
   }
 
-  /**
-   *  @brief Hash value for a point
-   */
-  template <> 
-  struct hash <db::Point>
+  inline size_t hfunc_coord (db::DCoord d)
   {
-    size_t operator() (const db::Point &o) const
-    {
-      return hfunc (o.x (), hfunc (o.y ()));
-    }
-  };
+    return hfunc (int64_t (floor (0.5 + d / db::coord_traits<db::DCoord>::prec ())));
+  }
+
+  inline size_t hfunc_coord (db::Coord d)
+  {
+    return hfunc (d);
+  }
+
+  template <class C>
+  inline size_t hfunc_coord (C d, size_t h)
+  {
+    return hcombine (hfunc_coord (d), h);
+  }
 
   /**
    *  @brief Hash value for a point
    */
-  template <>
-  struct hash <db::Vector>
+  template <class C>
+  struct hash <db::point<C> >
   {
-    size_t operator() (const db::Vector &o) const
+    size_t operator() (const db::point<C> &o) const
     {
-      return hfunc (o.x (), hfunc (o.y ()));
+      return hfunc_coord (o.x (), hfunc_coord (o.y ()));
+    }
+  };
+
+  /**
+   *  @brief Hash value for a vector
+   */
+  template <class C>
+  struct hash <db::vector<C> >
+  {
+    size_t operator() (const db::vector<C> &o) const
+    {
+      return hfunc_coord (o.x (), hfunc_coord (o.y ()));
     }
   };
 
   /**
    *  @brief Hash value for a box
    */
-  template <> 
-  struct hash <db::Box>
+  template <class C>
+  struct hash <db::box<C> >
   {
-    size_t operator() (const db::Box &o) const
+    size_t operator() (const db::box<C> &o) const
     {
       return hfunc (o.p1 (), hfunc (o.p2 ()));
     }
@@ -125,30 +148,40 @@ namespace DB_HASH_NAMESPACE
   /**
    *  @brief Hash value for an edge
    */
-  template <> 
-  struct hash <db::Edge>
+  template <class C>
+  struct hash <db::edge<C> >
   {
-    size_t operator() (const db::Edge &o) const
+    size_t operator() (const db::edge<C> &o) const
     {
       return hfunc (o.p1 (), hfunc (o.p2 ()));
     }
   };
 
   /**
+   *  @brief Hash value for an edge pair
+   */
+  template <class C>
+  struct hash <db::edge_pair<C> >
+  {
+    size_t operator() (const db::edge_pair<C> &o) const
+    {
+      return hfunc (o.first (), hfunc (o.second ()));
+    }
+  };
+
+  /**
    *  @brief Hash value for a text object
    */
-  template <> 
-  struct hash <db::Text>
+  template <class C>
+  struct hash <db::text<C> >
   {
-    size_t operator() (const db::Text &o) const
+    size_t operator() (const db::text<C> &o) const
     {
       size_t h = hfunc (int (o.halign ()));
       h = hfunc (int (o.valign ()), h);
       h = hfunc (o.trans ().rot (), h);
       h = hfunc (o.trans ().disp (), h);
-      for (const char *cp = o.string (); *cp; ++cp) {
-        h = hfunc (*cp, h);
-      }
+      h = hfunc (hfunc (o.string ()), h);
       return h;
     }
   };
@@ -156,17 +189,33 @@ namespace DB_HASH_NAMESPACE
   /**
    *  @brief Hash value for a path
    */
-  template <> 
-  struct hash <db::Path>
+  template <class C>
+  struct hash <db::path<C> >
   {
-    size_t operator() (const db::Path &o) const
+    size_t operator() (const db::path<C> &o) const
     {
       size_t h = hfunc (int (o.round ()));
-      h = hfunc (o.bgn_ext (), h);
-      h = hfunc (o.end_ext (), h);
-      h = hfunc (o.width (), h);
-      for (db::Path::iterator p = o.begin (); p != o.end (); ++p) {
+      h = hfunc_coord (o.bgn_ext (), h);
+      h = hfunc_coord (o.end_ext (), h);
+      h = hfunc_coord (o.width (), h);
+      for (typename db::path<C>::iterator p = o.begin (); p != o.end (); ++p) {
         h = hfunc (*p, h);
+      }
+      return h;
+    }
+  };
+
+  /**
+   *  @brief Hash value for a polygon contour
+   */
+  template <class C>
+  struct hash <db::polygon_contour<C> >
+  {
+    size_t operator() (const db::polygon_contour<C> &o) const
+    {
+      size_t h = 0;
+      for (typename db::polygon_contour<C>::simple_iterator i = o.begin (); i != o.end (); ++i) {
+        h = hfunc (*i, h);
       }
       return h;
     }
@@ -175,14 +224,14 @@ namespace DB_HASH_NAMESPACE
   /**
    *  @brief Hash value for a polygon
    */
-  template <> 
-  struct hash <db::Polygon>
+  template <class C>
+  struct hash <db::polygon<C> >
   {
-    size_t operator() (const db::Polygon &o) const
+    size_t operator() (const db::polygon<C> &o) const
     {
-      size_t h = o.hull ().hash ();
+      size_t h = hfunc (o.hull ());
       for (size_t i = 0; i < o.holes (); ++i) {
-        h = hfunc (o.hole (i).hash (), h);
+        h = hfunc (o.hole (i), h);
       }
       return h;
     }
@@ -191,25 +240,54 @@ namespace DB_HASH_NAMESPACE
   /**
    *  @brief Hash value for a simple polygon
    */
-  template <> 
-  struct hash <db::SimplePolygon>
+  template <class C>
+  struct hash <db::simple_polygon<C> >
   {
-    size_t operator() (const db::SimplePolygon &o) const
+    size_t operator() (const db::simple_polygon<C> &o) const
     {
-      return o.hull ().hash ();
+      return hfunc (o.hull ());
     }
   };
 
   /**
-   *  @brief A hash value for a db::CellInstArray
+   *  @brief Hash value for a simple transformation
    */
-  template <> 
-  struct hash <db::CellInstArray>
+  template <class C>
+  struct hash <db::simple_trans<C> >
   {
-    size_t operator() (const db::CellInstArray &o) const
+    size_t operator() (const db::simple_trans<C> &t) const
+    {
+      return hfunc (int (t.rot ()), hfunc (t.disp ()));
+    }
+  };
+
+  /**
+   *  @brief Hash value for a complex transformation
+   */
+  template <class I, class F, class R>
+  struct hash <db::complex_trans<I, F, R> >
+  {
+    size_t operator() (const db::complex_trans<I, F, R> &t) const
+    {
+      size_t h = hfunc (int64_t (0.5 + t.angle () / db::epsilon));
+      h = hfunc (int64_t (0.5 + t.mag () / db::epsilon), h);
+      h = hfunc (int (t.is_mirror ()), h);
+      h = hfunc (t.disp (), h);
+      return h;
+    }
+  };
+
+  /**
+   *  @brief A hash value for a db::CellInstArray and db::DCellInstArray
+   */
+  template <class C>
+  struct hash <db::array <db::CellInst, db::simple_trans<C> > >
+  {
+    size_t operator() (const db::array <db::CellInst, db::simple_trans<C> > &o) const
     {
       size_t h = hfunc (o.object ().cell_index ());
-      db::Vector a, b;
+
+      db::vector<C> a, b;
       unsigned long na = 1, nb = 1;
       if (o.is_regular_array (a, b, na, nb)) {
         h = hfunc (a, h);
@@ -219,15 +297,9 @@ namespace DB_HASH_NAMESPACE
       }
 
       if (o.is_complex ()) {
-        db::ICplxTrans t = o.complex_trans ();
-        h = hfunc (int (0.5 + t.angle () * 1000000), h);
-        h = hfunc (int (0.5 + t.mag () * 1000000), h);
-        h = hfunc (int (t.is_mirror ()), h);
-        h = hfunc (db::Vector (t.disp ()), h);
+        h = hfunc (o.complex_trans (), h);
       } else {
-        db::Trans t = o.front ();
-        h = hfunc (int (t.rot ()), h);
-        h = hfunc (t.disp (), h);
+        h = hfunc (o.front (), h);
       }
 
       return h;
@@ -243,6 +315,25 @@ namespace DB_HASH_NAMESPACE
     size_t operator() (const db::object_with_properties<O> &o) const
     {
       return hfunc ((const O &) o, hfunc (o.properties_id ()));
+    }
+  };
+
+  /**
+   *  @brief A hash value for a db::LayerProperties object
+   */
+  template <>
+  struct hash <db::LayerProperties>
+  {
+    size_t operator() (const db::LayerProperties &o) const
+    {
+      if (o.is_named ()) {
+        return hfunc (o.name.c_str ());
+      } else {
+        size_t h = hfunc (o.layer);
+        h = hfunc (o.datatype, h);
+        h = hfunc (o.name.c_str (), h);
+        return h;
+      }
     }
   };
 

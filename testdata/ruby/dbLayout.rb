@@ -1985,6 +1985,30 @@ END
 
   end
 
+  # LayerInfo hash values 
+  def test_19
+
+    l1 = RBA::LayerInfo::new("a")
+    l1c = RBA::LayerInfo::new("a")
+    l2 = RBA::LayerInfo::new(1, 2, "a")
+    l3 = RBA::LayerInfo::new(1, 2)
+
+    assert_equal(l1.eql?(l2), false)
+    assert_equal(l1.eql?(l3), false)
+    assert_equal(l2.eql?(l3), false)
+    assert_equal(l1.eql?(l1c), true)
+
+    assert_equal(l1.hash == l2.hash, false)
+    assert_equal(l1.hash == l3.hash, false)
+    assert_equal(l2.hash == l3.hash, false)
+
+    h = { l1 => "a", l2 => "b", l3 => "c" }
+    assert_equal(h[l1], "a")
+    assert_equal(h[l2], "b")
+    assert_equal(h[l3], "c")
+
+  end
+
 end
 
 load("test_epilogue.rb")

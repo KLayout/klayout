@@ -304,6 +304,61 @@ class DBSimplePolygon_TestClass < TestBase
     
   end
 
+  # fuzzy compare 
+  def test_FuzzyCompare
+
+    p1 = RBA::DSimplePolygon::from_s("(0,0;0,40;40,40;40,0)")
+    p2a = RBA::DSimplePolygon::from_s("(0.0000001,0;0,40;40,40;40,0)")
+    p3a = RBA::DSimplePolygon::from_s("(0.0001,0;0,40;40,40;40,0)")
+    p4a = RBA::DSimplePolygon::from_s("(0,40;40,40;40,0)")
+    p4b = RBA::DSimplePolygon::from_s("(0,0;1,1;0,40;40,40;40,0)")
+
+    assert_equal(p1 == p2a, true)
+    assert_equal(p1 == p3a, false)
+    assert_equal(p1 == p4a, false)
+    assert_equal(p1 == p4b, false)
+    assert_equal(p1.eql?(p2a), true)
+    assert_equal(p1.eql?(p3a), false)
+    assert_equal(p1.eql?(p4a), false)
+    assert_equal(p1.eql?(p4b), false)
+    assert_equal(p4a.eql?(p4b), false)
+    assert_equal(p1 < p2a, false)
+    assert_equal(p1 < p3a, true)
+    assert_equal(p1 < p4a, false)
+    assert_equal(p1 < p4b, true)
+    assert_equal(p4a < p4b, true)
+    assert_equal(p2a < p1, false)
+    assert_equal(p3a < p1, false)
+    assert_equal(p4a < p1, true)
+    assert_equal(p4b < p1, false)
+    assert_equal(p4b < p4a, false)
+
+  end
+
+  # hash values 
+  def test_HashValues
+
+    p1 = RBA::DSimplePolygon::from_s("(0,0;0,40;40,40;40,0)")
+    p2a = RBA::DSimplePolygon::from_s("(0.0000001,0;0,40;40,40;40,0)")
+    p3a = RBA::DSimplePolygon::from_s("(0.0001,0;0,40;40,40;40,0)")
+    p4a = RBA::DSimplePolygon::from_s("(0,40;40,40;40,0)")
+    p4b = RBA::DSimplePolygon::from_s("(0,0;1,1;0,40;40,40;40,0)")
+
+    assert_equal(p1.hash == p2a.hash, true)
+    assert_equal(p1.hash == p3a.hash, false)
+    assert_equal(p1.hash == p4a.hash, false)
+    assert_equal(p1.hash == p4b.hash, false)
+    assert_equal(p4a.hash == p4b.hash, false)
+
+    h = { p1 => "p1", p3a => "p3a", p4a => "p4a", p4b => "p4b" }
+
+    assert_equal(h[p1], "p1")
+    assert_equal(h[p3a], "p3a")
+    assert_equal(h[p4a], "p4a")
+    assert_equal(h[p4b], "p4b")
+
+  end
+
 end
 
 load("test_epilogue.rb")

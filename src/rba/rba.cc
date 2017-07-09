@@ -1619,12 +1619,14 @@ rba_init (RubyInterpreterPrivateData *d)
           rb_define_alias (klass, (mt->name (mid) + "=").c_str (), mt->name (mid).c_str ());
         }
 
+        if (mt->name (mid) == "to_s") {
 #if HAVE_RUBY_VERSION_CODE>=20000
         //  Ruby 2.x does no longer alias "inspect" to "to_s" automatically, so we have to do this:
-        if (mt->name (mid) == "to_s") {
           rb_define_alias (klass, "inspect", "to_s");
-        }
 #endif
+        } else if (mt->name (mid) == "==") {
+          rb_define_alias (klass, "eql?", "==");
+        }
 
       }
 

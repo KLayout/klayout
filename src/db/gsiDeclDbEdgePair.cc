@@ -24,6 +24,7 @@
 #include "gsiDecl.h"
 
 #include "dbEdgePair.h"
+#include "dbHash.h"
 
 namespace gsi
 {
@@ -56,6 +57,11 @@ struct edge_pair_defs
   static C *new_ee (const edge_type &first, const edge_type &second) 
   {
     return new C (first, second);
+  }
+
+  static size_t hash_value (const C *ep)
+  {
+    return std_ext::hfunc (*ep);
   }
 
   static gsi::Methods methods ()
@@ -132,6 +138,33 @@ struct edge_pair_defs
     ) +
     method ("bbox", &C::bbox, 
       "@brief Gets the bounding box of the edge pair\n"
+    ) +
+    method ("<", &C::less,
+      "@brief Less operator\n"
+      "@args box\n"
+      "Returns true, if this edge pair is 'less' with respect to first and second edge\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
+    ) +
+    method ("==", &C::equal,
+      "@brief Equality\n"
+      "@args box\n"
+      "Returns true, if this edge pair and the given one are equal\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
+    ) +
+    method ("!=", &C::not_equal,
+      "@brief Inequality\n"
+      "@args box\n"
+      "Returns true, if this edge pair and the given one are not equal\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
+    ) +
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given edge pair. This method enables edge pairs as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
     ) +
     method ("transformed", &C::template transformed<simple_trans_type>,
       "@brief Returns the transformed pair\n"

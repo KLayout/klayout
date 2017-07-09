@@ -24,6 +24,7 @@
 #include "gsiDecl.h"
 #include "dbPoint.h"
 #include "dbEdge.h"
+#include "dbHash.h"
 
 namespace gsi
 {
@@ -131,6 +132,11 @@ struct edge_defs
     return edge->sq_length ();
   }
 
+  static size_t hash_value (const C *e)
+  {
+    return std_ext::hfunc (*e);
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -151,21 +157,27 @@ struct edge_defs
       "\n"
       "Two points are given to create a new edge."
     ) +
-    method ("<", &C::operator<,
+    method ("<", &C::less,
       "@brief Less operator\n"
       "@args e\n"
       "@param e The object to compare against\n"
       "@return True, if the edge is 'less' as the other edge with respect to first and second point"
     ) +
-    method ("==", &C::operator==,
+    method ("==", &C::equal,
       "@brief Equality test\n"
       "@args e\n"
       "@param e The object to compare against"
     ) +
-    method ("!=", &C::operator!=,
+    method ("!=", &C::not_equal,
       "@brief Inequality test\n"
       "@args e\n"
       "@param e The object to compare against"
+    ) +
+    method_ext ("hash", &hash_value,
+      "@brief Computes a hash value\n"
+      "Returns a hash value for the given edge. This method enables edges as hash keys.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
     ) +
     method ("moved", &C::moved,
       "@brief Returns the moved edge (does not modify self)\n"

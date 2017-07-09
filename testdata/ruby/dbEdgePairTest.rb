@@ -71,6 +71,75 @@ class DBEdgePair_TestClass < TestBase
 
   end
 
+  # Fuzzy compare
+  def test_3
+
+    b1 = RBA::DEdgePair::new(RBA::DEdge::new(1, 2, 3, 4), RBA::DEdge::new(11, 12, 13, 14))
+    b2a = RBA::DEdgePair::new(RBA::DEdge::new(1 + 1e-7, 2, 3, 4), RBA::DEdge::new(11, 12, 13, 14))
+    b2b = RBA::DEdgePair::new(RBA::DEdge::new(1, 2, 3, 4), RBA::DEdge::new(11 + 1e-7, 12, 13, 14))
+    b3a = RBA::DEdgePair::new(RBA::DEdge::new(1 + 1e-4, 2, 3, 4), RBA::DEdge::new(11, 12, 13, 14))
+    b3b = RBA::DEdgePair::new(RBA::DEdge::new(1, 2, 3, 4), RBA::DEdge::new(11 + 1e-4, 12, 13, 14))
+    assert_equal(b1.to_s, "(1,2;3,4)/(11,12;13,14)")
+    assert_equal(b2a.to_s, "(1.0000001,2;3,4)/(11,12;13,14)")
+    assert_equal(b2b.to_s, "(1,2;3,4)/(11.0000001,12;13,14)")
+    assert_equal(b3a.to_s, "(1.0001,2;3,4)/(11,12;13,14)")
+    assert_equal(b3b.to_s, "(1,2;3,4)/(11.0001,12;13,14)")
+
+    assert_equal(b1 == b2a, true)
+    assert_equal(b1.eql?(b2a), true)
+    assert_equal(b1 != b2a, false)
+    assert_equal(b1 < b2a, false)
+    assert_equal(b2a < b1, false)
+    assert_equal(b1 == b2b, true)
+    assert_equal(b1.eql?(b2b), true)
+    assert_equal(b1 != b2b, false)
+    assert_equal(b1 < b2b, false)
+    assert_equal(b2b < b1, false)
+    assert_equal(b2a == b2b, true)
+    assert_equal(b2a.eql?(b2b), true)
+    assert_equal(b2a != b2b, false)
+    assert_equal(b2a < b2b, false)
+    assert_equal(b2b < b2a, false)
+
+    assert_equal(b1 == b3a, false)
+    assert_equal(b1 == b3b, false)
+    assert_equal(b1.eql?(b3a), false)
+    assert_equal(b1.eql?(b3b), false)
+    assert_equal(b1 != b3a, true)
+    assert_equal(b1 != b3b, true)
+    assert_equal(b1 < b3a, true)
+    assert_equal(b1 < b3b, true)
+    assert_equal(b3a < b1, false)
+    assert_equal(b3b < b1, false)
+    assert_equal(b3b < b3a, true)
+    assert_equal(b3a < b3b, false)
+
+  end
+
+  # Hash values 
+  def test_4
+
+    b1 = RBA::DEdgePair::new(RBA::DEdge::new(1, 2, 3, 4), RBA::DEdge::new(11, 12, 13, 14))
+    b2a = RBA::DEdgePair::new(RBA::DEdge::new(1 + 1e-7, 2, 3, 4), RBA::DEdge::new(11, 12, 13, 14))
+    b2b = RBA::DEdgePair::new(RBA::DEdge::new(1, 2, 3, 4), RBA::DEdge::new(11 + 1e-7, 12, 13, 14))
+    b3a = RBA::DEdgePair::new(RBA::DEdge::new(1 + 1e-4, 2, 3, 4), RBA::DEdge::new(11, 12, 13, 14))
+    b3b = RBA::DEdgePair::new(RBA::DEdge::new(1, 2, 3, 4), RBA::DEdge::new(11 + 1e-4, 12, 13, 14))
+
+    assert_equal(b1.hash == b2a.hash, true)
+    assert_equal(b1.hash == b2b.hash, true)
+    assert_equal(b1.hash == b3a.hash, false)
+    assert_equal(b1.hash == b3b.hash, false)
+    assert_equal(b3a.hash == b3b.hash, false)
+
+    h = { b1 => "a", b3a => "b", b3b => "c" }
+    assert_equal(h[b1], "a")
+    assert_equal(h[b2a], "a")
+    assert_equal(h[b2b], "a")
+    assert_equal(h[b3a], "b")
+    assert_equal(h[b3b], "c")
+
+  end
+
 end
 
 load("test_epilogue.rb")

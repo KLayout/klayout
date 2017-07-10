@@ -59,6 +59,7 @@ def run_demo(gen, cmd, out)
   lp.fill_color = lp.frame_color = 0xffffff
   lp.source_layer = 100
   lp.source_datatype = 0
+  lp.dither_pattern = 1
   lp.width = 3
   lp.name = "OUT"
   view.insert_layer(view.end_layers, lp)

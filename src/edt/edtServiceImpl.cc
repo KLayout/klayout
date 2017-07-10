@@ -1142,7 +1142,7 @@ bool
 InstService::drag_enter_event (const db::DPoint &p, const lay::DragDropDataBase *data)
 { 
   const lay::CellDragDropData *cd = dynamic_cast <const lay::CellDragDropData *> (data);
-  if (cd && cd->layout () == & view ()->active_cellview ()->layout ()) {
+  if (view ()->is_editable () && cd && cd->layout () == & view ()->active_cellview ()->layout ()) {
 
     view ()->cancel ();
 

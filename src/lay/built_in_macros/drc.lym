@@ -805,16 +805,16 @@ CODE
     # @name texts
     # @brief Selects texts from an original layer
     # @synopsis layer.texts
-    # @synopsis layer.texts(text)
-    # @synopsis layer.texts(text, true)
-    # @synopsis layer.texts(text, false)
+    # @synopsis layer.texts(pattern)
+    # @synopsis layer.texts(pattern, true)
+    # @synopsis layer.texts(string, false)
     # This method can be applied to original layers - i.e. ones that have
     # been created with \input. It will produce a small box (2x2 DBU) on each
-    # selected texts. 
+    # selected text. 
     #
-    # Texts can be selected either by exact match or pattern match with a 
+    # Texts can be selected either by exact match string or a pattern match with a 
     # glob-style pattern. The second argument selects pattern style (true)
-    # or exact match (false).
+    # or exact match (false). The default is pattern match.
     #
     # @code
     #   # Selects all texts
@@ -2666,17 +2666,18 @@ CODE
     
     # %DRC%
     # @name output
-    # @brief Output the content of the layer
+    # @brief Outputs the content of the layer
     # @synopsis layer.output(specs)
     # 
-    # This method will output the content of the layer to the specified output.
+    # This method will copy the content of the layer to the specified output.
     #
     # If a report database is selected for the output, the specification has to include a 
     # category name and optionally a category description.
     #
     # If the layout is selected for the output, the specification can consist of
     # one to three parameters: a layer number, a data type (optional, default is 0)
-    # and a layer name (optional).
+    # and a layer name (optional). Alternatively, the output can be specified by 
+    # a single RBA::LayerInfo object.
     #
     # See \global#report and \global#target on how to configure output to a target layout
     # or report database. 
@@ -2987,10 +2988,12 @@ CODE
     # @brief Specifies input from a source
     # @synopsis source.input(layer)
     # @synopsis source.input(layer, datatype)
+    # @synopsis source.input(layer_into)
     # @synopsis source.input(filter, ...)
     # Creates a layer with the shapes from the given layer of the source.
-    # The layer can be specified by layer and optionally datatype or by
-    # a sequence of filters. Filters are expressions describing ranges
+    # The layer can be specified by layer and optionally datatype, by a RBA::LayerInfo
+    # object or by a sequence of filters. 
+    # Filters are expressions describing ranges
     # of layers and/or datatype numbers or layer names. Multiple filters
     # can be given and all layers matching at least one of these filter
     # expressions are joined to render the input layer for the DRC engine.
@@ -3015,6 +3018,11 @@ CODE
         li &amp;&amp; layers.push(li)
         li &amp;&amp; @tmp_layers.push(li)
       
+      elsif (args.size == 1 &amp;&amp; args[0].is_a?(RBA::LayerInfo))
+
+        li = @layout.find_layer(args[0])
+        li &amp;&amp; layers.push(li)
+
       elsif (args.size == 1 || args.size == 2) &amp;&amp; args[0].is_a?(1.class)
 
         li = @layout.find_layer(args[0], args[1] || 0)
@@ -3041,6 +3049,31 @@ CODE
 
     end
 
+    # %DRC%
+    # @name layers
+    # @brief Gets the layers the source contains
+    # @synopsis source.layers
+    # Delivers a list of RBA::LayerInfo objects representing the layers
+    # inside the source.
+    #
+    # One application is to read all layers from a source. In the following
+    # example, the "and" operation is used to perform a clip with the given
+    # rectangle. Note that this solution is not efficient - it's provided
+    # as an example only:
+    # 
+    # @code
+    # output_cell("Clipped")
+    # 
+    # clip_box = polygon_layer
+    # clip_box.insert(box(0.um, -4.um, 4.um, 0.um))
+    # 
+    # layers.each { |l| (input(l) &amp; clip_box).output(l) }
+    # @/code
+    
+    def layers
+      @layout.layer_indices.collect { |li| @layout.get_info(li) }
+    end
+     
   end
 
   # The DRC engine
@@ -3773,6 +3806,16 @@ CODE
     end
     
     # %DRC%
+    # @name layers 
+    # @brief Gets the layers contained in the default source
+    # @synopsis layers
+    # See \Source#layers for a description of that function.
+ 
+    def layers
+      layout.layers
+    end
+    
+    # %DRC%
     # @name cell 
     # @brief Selects a cell for input on the default source
     # @synopsis cell(args)
@@ -4172,6 +4215,8 @@ CODE
         if args.size == 1
           if args[0].is_a?(1.class)
             info = RBA::LayerInfo::new(args[0], 0)
+          elsif args[0].is_a?(RBA::LayerInfo)
+            info = args[0]
           elsif args[0].is_a?(String)
             info = RBA::LayerInfo::from_string(args[0])
           else

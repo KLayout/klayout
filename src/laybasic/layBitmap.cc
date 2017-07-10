@@ -45,6 +45,7 @@ Bitmap::Bitmap (unsigned int w, unsigned int h, double r)
 Bitmap::Bitmap (const Bitmap &d)
   : m_empty_scanline (0)
 {
+  init (d.m_width, d.m_height);
   operator= (d);
 }
 

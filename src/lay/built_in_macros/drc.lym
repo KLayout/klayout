@@ -3572,7 +3572,7 @@ CODE
     # %DRC%
     # @name report
     # @brief Specifies a report database for output
-    # @synopsis report(description [, filename])
+    # @synopsis report(description [, filename [, cellname ] ])
     # After specifying a report database for output, \output method calls are redirected to
     # the report database. The format of the \output calls changes and a category name plus
     # description can be specified rather than a layer/datatype number of layer name.
@@ -3583,8 +3583,13 @@ CODE
     #
     # If external input is specified with \source, 
     # "report" must be called after "source".
+    #
+    # The cellname specifies the top cell used for the report file.
+    # By default this is the cell name of the default source. If there
+    # is no source layout you'll need to give the cell name in the 
+    # third parameter.
       
-    def report(description, filename = nil)
+    def report(description, filename = nil, cellname = nil)
 
       @output_rdb_file = filename
 
@@ -3605,7 +3610,10 @@ CODE
 
       cn = nil
       cn ||= @def_cell &amp;&amp; @def_cell.name
-      cn ||= source.cell_name
+      cn ||= source &amp;&amp; source.cell_name
+      cn ||= cellname
+
+      cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter of 'report'")
 
       @output_rdb_cell_id = @output_rdb.create_cell(cn).rdb_id
       @output_rdb.generator = $0

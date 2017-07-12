@@ -1169,3 +1169,62 @@ TEST(29)
   EXPECT_EQ (b.perimeter (), 8000000000.0);
 }
 
+TEST(30a)
+{
+  db::Region r;
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
+  r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  r.insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
+  r.set_merged_semantics (false);
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_not_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (30, 30)))).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
+  db::Region rr = r;
+  r.select_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (-10, -10))));
+  EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+  rr.select_not_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (-10, -10))));
+  EXPECT_EQ (rr.to_string (), "(0,0;0,200;100,200;100,0)");
+
+  r.clear ();
+  r.insert(db::Box (db::Point (1000, 0), db::Point (6000, 4000)));
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (0, 4000), db::Point (2000, 6000)))).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (1000, 4000), db::Point (2000, 6000)))).to_string (), "(1000,0;1000,4000;6000,4000;6000,0)");
+  EXPECT_EQ (db::Edges (db::Edge (db::Point (0, 4000), db::Point (2000, 6000))).selected_interacting (r).to_string (), "");
+  EXPECT_EQ (db::Edges (db::Edge (db::Point (1000, 4000), db::Point (2000, 6000))).selected_interacting (r).to_string (), "(1000,4000;2000,6000)");
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (1000, 4001), db::Point (2000, 6000)))).to_string (), "");
+  EXPECT_EQ (db::Edges (db::Edge (db::Point (1000, 4001), db::Point (2000, 6000))).selected_interacting (r).to_string (), "");
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (1000, 3999), db::Point (1000, 6000)))).to_string (), "(1000,0;1000,4000;6000,4000;6000,0)");
+  EXPECT_EQ (db::Edges (db::Edge (db::Point (1000, 3999), db::Point (1000, 6000))).selected_interacting (r).to_string (), "(1000,3999;1000,6000)");
+}
+
+TEST(30b)
+{
+  db::Region r;
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
+  r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  r.insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
+  r.set_merged_semantics (true);
+  r.set_min_coherence (true);
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (30, 30)))).to_string (), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)");
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
+  r.select_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (-10, -10))));
+  EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,-100)");
+}
+
+TEST(30c)
+{
+  db::Region r;
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "");
+  r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
+  r.insert (db::Box (db::Point (-100, -100), db::Point (0, 0)));
+  r.set_merged_semantics (true);
+  r.set_min_coherence (false);
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (20, 20), db::Point (30, 30)))).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (30, 30)))).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_interacting (db::Edges (db::Edge (db::Point (-200, -200), db::Point (-190, -190)))).to_string (), "");
+  r.select_interacting (db::Edges (db::Edge (db::Point (-20, -20), db::Point (-10, -10))));
+  EXPECT_EQ (r.to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+}
+

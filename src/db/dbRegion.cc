@@ -929,7 +929,201 @@ Region::select_interacting_generic (const Region &other, int mode, bool touching
   set_valid_polygons ();
 }
 
-EdgePairs  
+namespace
+{
+
+/**
+ *  @brief A helper class for the region to edge interaction functionality
+ *
+ *  Note: This special scanner uses pointers to two different objects: edges and polygons.
+ *  It uses odd value pointers to indicate pointers to polygons and even value pointers to indicate
+ *  pointers to edges.
+ *
+ *  There is a special box converter which is able to sort that out as well.
+ */
+template <class OutputContainer>
+class region_to_edge_interaction_filter
+  : public db::box_scanner_receiver<char, size_t>
+{
+public:
+  region_to_edge_interaction_filter (OutputContainer &output)
+    : mp_output (&output), m_inverse (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  region_to_edge_interaction_filter (OutputContainer &output, const db::Region &region)
+    : mp_output (&output), m_inverse (true)
+  {
+    for (db::Region::const_iterator p = region.begin_merged (); ! p.at_end (); ++p) {
+      m_seen.insert (&*p);
+    }
+  }
+
+  void add (const char *o1, size_t p1, const char *o2, size_t p2)
+  {
+    const db::Edge *e = 0;
+    const db::Polygon *p = 0;
+
+    //  Note: edges have property 0 and have even-valued pointers.
+    //  Polygons have property 1 and odd-valued pointers.
+    if (p1 == 0 && p2 == 1) {
+      e = reinterpret_cast<const db::Edge *> (o1);
+      p = reinterpret_cast<const db::Polygon *> (o2 - 1);
+    } else if (p1 == 1 && p2 == 0) {
+      e = reinterpret_cast<const db::Edge *> (o2);
+      p = reinterpret_cast<const db::Polygon *> (o1 - 1);
+    }
+
+    if (e && p && (m_seen.find (p) == m_seen.end ()) != m_inverse) {
+
+      //  A polygon and an edge interact if the edge is either inside completely
+      //  of at least one edge of the polygon intersects with the edge
+      bool interacts = false;
+      if (p->box ().contains (e->p1 ()) && db::inside_poly (p->begin_edge (), e->p1 ()) >= 0) {
+        interacts = true;
+      } else {
+        for (db::Polygon::polygon_edge_iterator pe = p->begin_edge (); ! pe.at_end () && ! interacts; ++pe) {
+          if ((*pe).intersect (*e)) {
+            interacts = true;
+          }
+        }
+      }
+
+      if (interacts) {
+        if (m_inverse) {
+          m_seen.erase (p);
+        } else {
+          m_seen.insert (p);
+          mp_output->insert (*p);
+        }
+      }
+
+    }
+  }
+
+  void fill_output ()
+  {
+    for (std::set<const db::Polygon *>::const_iterator p = m_seen.begin (); p != m_seen.end (); ++p) {
+      mp_output->insert (**p);
+    }
+  }
+
+private:
+  OutputContainer *mp_output;
+  std::set<const db::Polygon *> m_seen;
+  bool m_inverse;
+};
+
+/**
+ *  @brief A special box converter that splits the pointers into polygon and edge pointers
+ */
+struct EdgeOrRegionBoxConverter
+{
+  typedef db::Box box_type;
+
+  db::Box operator() (const char &c) const
+  {
+    //  Note: edges have property 0 and have even-valued pointers.
+    //  Polygons have property 1 and odd-valued pointers.
+    const char *cp = &c;
+    if ((size_t (cp) & 1) == 1) {
+      //  it's a polygon
+      return (reinterpret_cast<const db::Polygon *> (cp - 1))->box ();
+    } else {
+      //  it's an edge
+      const db::Edge *e = reinterpret_cast<const db::Edge *> (cp);
+      return db::Box (e->p1 (), e->p2 ());
+    }
+  }
+};
+
+}
+
+Region
+Region::selected_interacting_generic (const Edges &other, bool inverse) const
+{
+  if (other.empty ()) {
+    if (! inverse) {
+      return Region ();
+    } else {
+      return *this;
+    }
+  } else if (empty ()) {
+    return *this;
+  }
+
+  db::box_scanner<char, size_t> scanner (m_report_progress, m_progress_desc);
+  scanner.reserve (size () + other.size ());
+
+  ensure_valid_polygons ();
+  for (const_iterator p = begin_merged (); ! p.at_end (); ++p) {
+    scanner.insert ((char *) &*p + 1, 1);
+  }
+
+  other.ensure_valid_merged_edges ();
+  for (Edges::const_iterator e = other.begin (); ! e.at_end (); ++e) {
+    scanner.insert ((char *) &*e, 0);
+  }
+
+  Region output;
+  EdgeOrRegionBoxConverter bc;
+
+  if (! inverse) {
+    region_to_edge_interaction_filter<Region> filter (output);
+    scanner.process (filter, 1, bc);
+  } else {
+    region_to_edge_interaction_filter<Region> filter (output, *this);
+    scanner.process (filter, 1, bc);
+    filter.fill_output ();
+  }
+
+  return output;
+}
+
+void
+Region::select_interacting_generic (const Edges &other, bool inverse)
+{
+  //  shortcut
+  if (other.empty ()) {
+    if (! inverse) {
+      clear ();
+    }
+    return;
+  } else if (empty ()) {
+    return;
+  }
+
+  db::box_scanner<char, size_t> scanner (m_report_progress, m_progress_desc);
+  scanner.reserve (size () + other.size ());
+
+  ensure_valid_polygons ();
+  for (const_iterator p = begin_merged (); ! p.at_end (); ++p) {
+    scanner.insert ((char *) &*p + 1, 1);
+  }
+
+  other.ensure_valid_merged_edges ();
+  for (Edges::const_iterator e = other.begin (); ! e.at_end (); ++e) {
+    scanner.insert ((char *) &*e, 0);
+  }
+
+  db::Shapes output (false);
+  EdgeOrRegionBoxConverter bc;
+
+  if (! inverse) {
+    region_to_edge_interaction_filter<db::Shapes> filter (output);
+    scanner.process (filter, 1, bc);
+  } else {
+    region_to_edge_interaction_filter<db::Shapes> filter (output, *this);
+    scanner.process (filter, 1, bc);
+    filter.fill_output ();
+  }
+
+  m_polygons.swap (output);
+  set_valid_polygons ();
+}
+
+EdgePairs
 Region::grid_check (db::Coord gx, db::Coord gy) const
 {
   EdgePairs out;

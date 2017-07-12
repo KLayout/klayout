@@ -1312,7 +1312,7 @@ Class<db::Region> decl_Region ("Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) + 
-  method ("interacting", &db::Region::selected_interacting,
+  method ("interacting", (db::Region (db::Region::*) (const db::Region &) const) &db::Region::selected_interacting,
     "@brief Returns the polygons of this region which overlap or touch polygons from the other region\n"
     "\n"
     "@args other\n"
@@ -1320,7 +1320,7 @@ Class<db::Region> decl_Region ("Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) + 
-  method ("not_interacting", &db::Region::selected_not_interacting,
+  method ("not_interacting", (db::Region (db::Region::*) (const db::Region &) const) &db::Region::selected_not_interacting,
     "@brief Returns the polygons of this region which do not overlap or touch polygons from the other region\n"
     "\n"
     "@args other\n"
@@ -1328,7 +1328,7 @@ Class<db::Region> decl_Region ("Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) + 
-  method ("select_interacting", &db::Region::select_interacting,
+  method ("select_interacting", (db::Region &(db::Region::*) (const db::Region &)) &db::Region::select_interacting,
     "@brief Selects the polygons from this region which overlap or touch polygons from the other region\n"
     "\n"
     "@args other\n"
@@ -1336,7 +1336,7 @@ Class<db::Region> decl_Region ("Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) + 
-  method ("select_not_interacting", &db::Region::select_not_interacting,
+  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Region &)) &db::Region::select_not_interacting,
     "@brief Selects the polygons from this region which do not overlap or touch polygons from the other region\n"
     "\n"
     "@args other\n"
@@ -1344,6 +1344,46 @@ Class<db::Region> decl_Region ("Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) + 
+  method ("interacting", (db::Region (db::Region::*) (const db::Edges &) const) &db::Region::selected_interacting,
+    "@brief Returns the polygons of this region which overlap or touch edges from the edge collection\n"
+    "\n"
+    "@args other\n"
+    "@return A new region containing the polygons overlapping or touching edges from the edge collection\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.25\n"
+  ) +
+  method ("not_interacting", (db::Region (db::Region::*) (const db::Edges &) const) &db::Region::selected_not_interacting,
+    "@brief Returns the polygons of this region which do not overlap or touch edges from the edge collection\n"
+    "\n"
+    "@args other\n"
+    "@return A new region containing the polygons not overlapping or touching edges from the edge collection\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.25\n"
+  ) +
+  method ("select_interacting", (db::Region &(db::Region::*) (const db::Edges &)) &db::Region::select_interacting,
+    "@brief Selects the polygons from this region which overlap or touch edges from the edge collection\n"
+    "\n"
+    "@args other\n"
+    "@return The region after the polygons have been selected (self)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.25\n"
+  ) +
+  method ("select_not_interacting", (db::Region &(db::Region::*) (const db::Edges &)) &db::Region::select_not_interacting,
+    "@brief Selects the polygons from this region which do not overlap or touch edges from the edge collection\n"
+    "\n"
+    "@args other\n"
+    "@return The region after the polygons have been selected (self)\n"
+    "\n"
+    "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
+    "\n"
+    "This method has been introduced in version 0.25\n"
+  ) +
   method ("overlapping", &db::Region::selected_overlapping,
     "@brief Returns the polygons of this region which overlap polygons from the other region\n"
     "\n"

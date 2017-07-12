@@ -651,7 +651,7 @@ public:
       p = reinterpret_cast<const db::Polygon *> (o1 - 1);
     }
 
-    if (e && p) {
+    if (e && p && m_seen.find (e) == m_seen.end ()) {
 
       //  A polygon and an edge interact if the edge is either inside completely
       //  of at least one edge of the polygon intersects with the edge
@@ -666,7 +666,8 @@ public:
         }
       }
 
-      if (interacts && m_seen.insert (e).second) {
+      if (interacts) {
+        m_seen.insert (e);
         mp_output->insert (*e);
       }
 
@@ -706,6 +707,14 @@ struct EdgeOrRegionBoxConverter
 Edges &
 Edges::select_interacting (const Region &other)
 {
+  //  shortcuts
+  if (other.empty ()) {
+    clear ();
+    return *this;
+  } else if (empty ()) {
+    return *this;
+  }
+
   db::box_scanner<char, size_t> scanner (m_report_progress, m_progress_desc);
   scanner.reserve (size () + other.size ());
 
@@ -731,6 +740,11 @@ Edges::select_interacting (const Region &other)
 Edges &
 Edges::select_not_interacting (const Region &other)
 {
+  //  shortcuts
+  if (other.empty () || empty ()) {
+    return *this;
+  }
+
   db::box_scanner<char, size_t> scanner (m_report_progress, m_progress_desc);
   scanner.reserve (size () + other.size ());
 

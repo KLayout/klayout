@@ -1199,9 +1199,6 @@ public:
   /**
    *  @brief Selects all polygons of this region which are completly outside polygons from the other region
    *
-   *  This method does not merge the polygons before using them. If whole connected
-   *  regions shall be selected, merge the region first.
-   *
    *  Merged semantics applies.
    */
   Region &select_outside (const Region &other)
@@ -1212,9 +1209,6 @@ public:
 
   /**
    *  @brief Selects all polygons of this region which are not completly outside polygons from the other region
-   *
-   *  This method does not merge the polygons before using them. If whole connected
-   *  regions shall be selected, merge the region first.
    *
    *  Merged semantics applies.
    */
@@ -1251,9 +1245,6 @@ public:
   /**
    *  @brief Selects all polygons of this region which are completly inside polygons from the other region
    *
-   *  This method does not merge the polygons before using them. If whole connected
-   *  regions shall be selected, merge the region first.
-   *
    *  Merged semantics applies.
    */
   Region &select_inside (const Region &other)
@@ -1264,9 +1255,6 @@ public:
 
   /**
    *  @brief Selects all polygons of this region which are not completly inside polygons from the other region
-   *
-   *  This method does not merge the polygons before using them. If whole connected
-   *  regions shall be selected, merge the region first.
    *
    *  Merged semantics applies.
    */
@@ -1303,9 +1291,6 @@ public:
   /**
    *  @brief Selects all polygons of this region which overlap or touch polygons from the other region
    *
-   *  This method does not merge the polygons before using them. If whole connected
-   *  regions shall be selected, merge the region first.
-   *
    *  Merged semantics applies.
    */
   Region &select_interacting (const Region &other)
@@ -1316,9 +1301,6 @@ public:
 
   /**
    *  @brief Selects all polygons of this region which do not overlap or touch polygons from the other region
-   *
-   *  This method does not merge the polygons before using them. If whole connected
-   *  regions shall be selected, merge the region first.
    *
    *  Merged semantics applies.
    */
@@ -1353,10 +1335,53 @@ public:
   }
 
   /**
-   *  @brief Selects all polygons of this region which overlap polygons from the other region
+   *  @brief Selects all polygons of this region which overlap or touch edges from the given edge collection
    *
-   *  This method does not merge the polygons before using them. If whole connected
-   *  regions shall be selected, merge the region first.
+   *  Merged semantics applies to both operators.
+   */
+  Region &select_interacting (const Edges &other)
+  {
+    select_interacting_generic (other, false);
+    return *this;
+  }
+
+  /**
+   *  @brief Selects all polygons of this region which do not overlap or touch edges from the edge collection
+   *
+   *  Merged semantics applies to both operators.
+   */
+  Region &select_not_interacting (const Edges &other)
+  {
+    select_interacting_generic (other, true);
+    return *this;
+  }
+
+  /**
+   *  @brief Returns all polygons of this which overlap or touch edges from the edge collection
+   *
+   *  This method is an out-of-place version of select_interacting.
+   *
+   *  Merged semantics applies to both operators.
+   */
+  Region selected_interacting (const Edges &other) const
+  {
+    return selected_interacting_generic (other, false);
+  }
+
+  /**
+   *  @brief Returns all polygons of this which do not overlap or touch polygons from the other region
+   *
+   *  This method is an out-of-place version of select_not_interacting.
+   *
+   *  Merged semantics applies to both operators.
+   */
+  Region selected_not_interacting (const Edges &other) const
+  {
+    return selected_interacting_generic (other, true);
+  }
+
+  /**
+   *  @brief Selects all polygons of this region which overlap polygons from the other region
    *
    *  Merged semantics applies.
    */
@@ -1368,9 +1393,6 @@ public:
 
   /**
    *  @brief Selects all polygons of this region which do not overlap polygons from the other region
-   *
-   *  This method does not merge the polygons before using them. If whole connected
-   *  regions shall be selected, merge the region first.
    *
    *  Merged semantics applies.
    */
@@ -1563,6 +1585,8 @@ private:
   EdgePairs run_single_polygon_check (db::edge_relation_type rel, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
   void select_interacting_generic (const Region &other, int mode, bool touching, bool inverse);
   Region selected_interacting_generic (const Region &other, int mode, bool touching, bool inverse) const;
+  Region selected_interacting_generic (const Edges &other, bool inverse) const;
+  void select_interacting_generic (const Edges &other, bool inverse);
 };
 
 /**

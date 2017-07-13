@@ -88,10 +88,10 @@ expressions are joined to render the input layer for the DRC engine.
 Some filter expressions are:
 </p><p>
 <ul>
-<li><tt>1/0-255</tt>: Datatypes 0 to 255 for layer 1</li>
-<li><tt>1-10</tt>: Layers 1 to 10, datatype 0</li>
-<li><tt>METAL</tt>: A layer named "METAL"</li>
-<li><tt>METAL (17/0)</tt>: A layer named "METAL" or layer 17, datatype 0 (for GDS, which does
+<li><tt>1/0-255 </tt>: Datatypes 0 to 255 for layer 1 </li>
+<li><tt>1-10 </tt>: Layers 1 to 10, datatype 0 </li>
+<li><tt>METAL </tt>: A layer named "METAL" </li>
+<li><tt>METAL (17/0) </tt>: A layer named "METAL" or layer 17, datatype 0 (for GDS, which does
 not have names)</li>
 </ul>
 </p>
@@ -161,9 +161,9 @@ no specification.
 The following options are available:
 </p><p>
 <ul>
-<li><tt>+</tt><i>name_filter</i>: Cells matching the name filter will be enabled</li>
-<li><i>name_filter</i>: Same as "+name_filter"</li>
-<li><tt>-</tt><i>name_filter</i>: Cells matching the name filter will be disabled</li>
+<li><tt>+</tt><i>name_filter </i>: Cells matching the name filter will be enabled </li>
+<li><i>name_filter </i>: Same as "+name_filter" </li>
+<li><tt>-</tt><i>name_filter </i>: Cells matching the name filter will be disabled </li>
 </ul>
 </p><p>
 To disable the TOP cell but enabled a hypothetical cell B below the top cell, use that

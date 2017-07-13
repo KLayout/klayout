@@ -76,6 +76,22 @@
         <file alias="drc_with_angle3.png">doc/images/drc_with_angle3.png</file>
         <file alias="drc_with_angle4.png">doc/images/drc_with_angle4.png</file>
         <file alias="drc_rounded_corners.png">doc/images/drc_rounded_corners.png</file>
+        <file alias="drc_middle1.png">doc/images/drc_middle1.png</file>
+        <file alias="drc_extent_refs1.png">doc/images/drc_extent_refs1.png</file>
+        <file alias="drc_extent_refs10.png">doc/images/drc_extent_refs10.png</file>
+        <file alias="drc_extent_refs11.png">doc/images/drc_extent_refs11.png</file>
+        <file alias="drc_extent_refs12.png">doc/images/drc_extent_refs12.png</file>
+        <file alias="drc_extent_refs13.png">doc/images/drc_extent_refs13.png</file>
+        <file alias="drc_extent_refs20.png">doc/images/drc_extent_refs20.png</file>
+        <file alias="drc_extent_refs21.png">doc/images/drc_extent_refs21.png</file>
+        <file alias="drc_extent_refs22.png">doc/images/drc_extent_refs22.png</file>
+        <file alias="drc_extent_refs23.png">doc/images/drc_extent_refs23.png</file>
+        <file alias="drc_extent_refs24.png">doc/images/drc_extent_refs24.png</file>
+        <file alias="drc_extent_refs25.png">doc/images/drc_extent_refs25.png</file>
+        <file alias="drc_extent_refs26.png">doc/images/drc_extent_refs26.png</file>
+        <file alias="drc_extent_refs27.png">doc/images/drc_extent_refs27.png</file>
+        <file alias="drc_extent_refs30.png">doc/images/drc_extent_refs30.png</file>
+        <file alias="drc_extent_refs31.png">doc/images/drc_extent_refs31.png</file>
     </qresource>
     <qresource prefix="/help/about">
         <file alias="rba_notation.xml">doc/about/rba_notation.xml</file>

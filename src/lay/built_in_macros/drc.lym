@@ -193,6 +193,28 @@ module DRC
     end
   end
   
+  # A wrapper for the "as_dots" or "as_boxes" flag for
+  # some DRC functions. The purpose of this class
+  # is to identify the value by the class.
+  class DRCAsDots
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
+  # A wrapper for a glob-pattern style text selection for
+  # some DRC functions. The purpose of this class
+  # is to identify the value by the class.
+  class DRCPattern
+    attr_accessor :as_pattern
+    attr_accessor :pattern
+    def initialize(f, p)
+      self.as_pattern = f
+      self.pattern = p
+    end
+  end
+  
   # A wrapper for a pair of limit values
   # This class is used to identify projection limits for DRC
   # functions
@@ -805,29 +827,253 @@ CODE
     # @name texts
     # @brief Selects texts from an original layer
     # @synopsis layer.texts
-    # @synopsis layer.texts(pattern)
-    # @synopsis layer.texts(pattern, true)
-    # @synopsis layer.texts(string, false)
+    # @synopsis layer.texts(p)
+    # @synopsis layer.texts([ options ])
     # This method can be applied to original layers - i.e. ones that have
-    # been created with \input. It will produce a small box (2x2 DBU) on each
-    # selected text. 
+    # been created with \input. By default, a small box (2x2 DBU) will be produced on each
+    # selected text. By using the "as_dots" option, degenerated point-like edges will be
+    # produced.
     #
     # Texts can be selected either by exact match string or a pattern match with a 
-    # glob-style pattern. The second argument selects pattern style (true)
-    # or exact match (false). The default is pattern match.
+    # glob-style pattern. By default, glob-style pattern are used. 
+    # The options available are:
+    #
+    # @ul
+    #   @li @b pattern(p) @/b: Use a pattern to match the string (this is the default) @/li  
+    #   @li @b text(s) @/b: Select the texts that exactly match the given string @/li  
+    #   @li @b as_boxes @/b: with this option, small boxes will be produced as markers @/li  
+    #   @li @b as_dots @/b: with this option, point-like edges will be produced instead of small boxes @/li  
+    # @/ul
+    #
+    # Here are some examples:
     #
     # @code
     #   # Selects all texts
     #   t = input(1, 0).texts
     #   # Selects all texts beginning with an "A"
     #   t = input(1, 0).texts("A*")
-    #   t = input(1, 0).texts("A*", true)
+    #   t = input(1, 0).texts(pattern("A*"))
     #   # Selects all texts whose string is "A*"
-    #   t = input(1, 0).texts("A*", false)
+    #   t = input(1, 0).texts(text("A*"))
     # @/code
      
-    def texts(expr = "*", as_pattern = true)
-      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts, expr, as_pattern))
+    def texts(*args)
+
+      requires_region("texts")
+
+      as_pattern = true
+      pattern = "*"
+      as_dots = false
+
+      args.each do |a|
+        if a.is_a?(String)
+          as_pattern = true
+          pattern = a
+        elsif a.is_a?(DRCPattern)
+          as_pattern = a.as_pattern
+          pattern = a.pattern
+        elsif a.is_a?(DRCAsDots)
+          as_dots = a.value
+        else
+          raise("Invalid argument for 'texts' method")
+        end
+      end
+          
+      if as_dots
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts_dots, pattern, as_pattern))
+      else
+        DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :texts, pattern, as_pattern))
+      end
+
+    end
+
+    # %DRC%
+    # @name middle
+    # @brief Returns the center points of the bounding boxes of the polygons
+    # @synopsis layer.middle([ options ])
+    #
+    # This method produces markers on the centers of the polygon's bounding box centers. 
+    # These markers can be point-like edges or small 2x2 DBU boxes. The latter is the default.
+    # A more generic function is \extent_refs. "middle" is basically a synonym for "extent_refs(:center)".
+    # 
+    # The options available are:
+    #
+    # @ul
+    #   @li @b as_boxes @/b: with this option, small boxes will be produced as markers @/li  
+    #   @li @b as_dots @/b: with this option, point-like edges will be produced instead of small boxes @/li  
+    # @/ul
+    #
+    # The following image shows the effect of this method
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_middle1.png) @/td
+    #   @/tr
+    # @/table
+    
+    # %DRC%
+    # @name extent_refs
+    # @brief Returns partial references to the boundings boxes of the polygons
+    # @synopsis layer.extent_refs(fx, fy [, options ])
+    # @synopsis layer.extent_refs(fx1, fy1, fx2, fx2 [, options ])
+    # @synopsis layer.extent_refs(ref_spec [, options ])
+    #
+    # This method produces parts of the bounding box of the polygons. It can select 
+    # either edges, certain points or partial boxes. It can be used the following
+    # ways:
+    #  
+    # @ul
+    #   @li @b With a formal specification @/b: This is an identifier like
+    #     ":center" or ":left" to indicate which part will be produced. @/li
+    #   @li @b With two floating-point arguments @/b: These arguments specify
+    #     a point relative to the bounding box. The first argument is a relative
+    #     x coordinate where 0.0 means "left side of the bounding box" and 1.0
+    #     is the right side. The second argument is a relative y coordinate where
+    #     0.0 means "bottom" and 1.0 means "top". The results will be small 
+    #     (2x2 DBU) boxes or point-like edges for edge output @/li
+    #   @li @b With four floating-point arguments @/b: These arguments specify
+    #     a box in relative coordinates: a pair of x/y relative coordinate for
+    #     the first point and another pair for the second point. The results will
+    #     be boxes or a tilted edge in case of edge output. If the range specifies
+    #     a finite-area box (height and width are not zero), no adjustment of 
+    #     the boxes will happen for polygon output - i.e. the additional enlargement 
+    #     by 1 DBU which is applied for zero-area boxes does not happen.@/li
+    # @/ul
+    # 
+    # The formal specifiers are for points:
+    # 
+    # @ul
+    #   @li @b :center @/b or @b :c @/b: the center point @/li
+    #   @li @b :bottom_center @/b or @b :bc @/b: the bottom center point @/li
+    #   @li @b :bottom_left @/b or @b :bl @/b: the bottom left point @/li
+    #   @li @b :bottom_right @/b or @b :br @/b: the bottom right point @/li
+    #   @li @b :left @/b or @b :l @/b: the left point @/li
+    #   @li @b :right @/b or @b :r @/b: the right point @/li
+    #   @li @b :top_center @/b or @b :tc @/b: the top center point @/li
+    #   @li @b :top_left @/b or @b :tl @/b: the top left point @/li
+    #   @li @b :top_right @/b or @b :tr @/b: the top right point @/li
+    # @/ul
+    #
+    # The formal specifiers for lines are:
+    # 
+    # @ul
+    #   @li @b :bottom @/b or @b :b @/b: the bottom line @/li
+    #   @li @b :top @/b or @b :t @/b: the top line @/li
+    #   @li @b :left @/b or @b :l @/b: the left line @/li
+    #   @li @b :right @/b or @b :r @/b: the right line @/li
+    # @/ul
+    #
+    # Dots are represented by small (2x2 DBU) boxes or point-like
+    # edges with edge output. Lines are represented by narrow or 
+    # flat (2 DBU) boxes or edges for edge output. Edges will follow
+    # the orientation convention for the corresponding edges - i.e.
+    # "inside" of the bounding box is on the right side of the edge.
+    #
+    # The following additional option controls the output format:
+    #
+    # @ul
+    #   @li @b as_boxes @/b: with this option, small boxes will be produced as markers @/li  
+    #   @li @b as_dots @/b or @b as_edges @/b: with this option, point-like edges will be produced for dots
+    #                         and edges will be produced for line-like selections @/li  
+    # @/ul
+    #
+    # The following table shows a few applications:
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_extent_refs1.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_extent_refs10.png) @/td
+    #     @td @img(/images/drc_extent_refs11.png) @/td
+    #     @td @img(/images/drc_extent_refs12.png) @/td
+    #     @td @img(/images/drc_extent_refs13.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_extent_refs20.png) @/td
+    #     @td @img(/images/drc_extent_refs21.png) @/td
+    #     @td @img(/images/drc_extent_refs22.png) @/td
+    #     @td @img(/images/drc_extent_refs23.png) @/td
+    #     @td @img(/images/drc_extent_refs24.png) @/td
+    #     @td @img(/images/drc_extent_refs25.png) @/td
+    #     @td @img(/images/drc_extent_refs26.png) @/td
+    #     @td @img(/images/drc_extent_refs27.png) @/td
+    #   @/tr
+    #   @tr 
+    #     @td @img(/images/drc_extent_refs30.png) @/td
+    #     @td @img(/images/drc_extent_refs31.png) @/td
+    #   @/tr
+    # @/table
+
+    %w(middle extent_refs).each do |f| 
+      eval &lt;&lt;"CODE"
+      def #{f}(*args)
+
+        requires_region("#{f}")
+
+        f = []
+        as_edges = false
+
+        @@std_refs ||= { 
+          :center => [0.5] * 4,
+          :c => [0.5] * 4,
+          :bottom_center => [ 0.5, 0.0, 0.5, 0.0 ],
+          :bc => [ 0.5, 0.0, 0.5, 0.0 ],
+          :bottom_left => [ 0.0, 0.0, 0.0, 0.0 ],
+          :bl => [ 0.0, 0.0, 0.0, 0.0 ],
+          :bottom_right => [ 1.0, 0.0, 1.0, 0.0 ],
+          :br => [ 1.0, 0.0, 1.0, 0.0 ],
+          :top_center => [ 0.5, 1.0, 0.5, 1.0 ],
+          :tc => [ 0.5, 1.0, 0.5, 1.0 ],
+          :top_left => [ 0.0, 1.0, 0.0, 1.0 ],
+          :tl => [ 0.0, 1.0, 0.0, 1.0 ],
+          :top_right => [ 1.0, 1.0, 1.0, 1.0 ],
+          :tr => [ 1.0, 1.0, 1.0, 1.0 ],
+          :left_center => [ 0.0, 0.5, 0.0, 0.5 ],
+          :lc => [ 0.0, 0.5, 0.0, 0.5 ],
+          :right_center => [ 1.0, 0.5, 1.0, 0.5 ],
+          :rc => [ 1.0, 0.5, 1.0, 0.5 ],
+          :south => [ 0.5, 0.0, 0.5, 0.0 ],
+          :s => [ 0.5, 0.0, 0.5, 0.0 ],
+          :left => [ 0.0, 0.0, 0.0, 1.0 ],
+          :l => [ 0.0, 0.0, 0.0, 1.0 ],
+          :bottom => [ 1.0, 0.0, 0.0, 0.0 ],
+          :b => [ 1.0, 0.0, 0.0, 0.0 ],
+          :right => [ 1.0, 1.0, 1.0, 0.0 ],
+          :r => [ 1.0, 1.0, 1.0, 0.0 ],
+          :top => [ 0.0, 1.0, 1.0, 1.0 ],
+          :t => [ 0.0, 1.0, 1.0, 1.0 ]
+        }
+
+        args.each do |a|
+          if a.is_a?(1.0.class) &amp;&amp; :#{f} != :middle
+            f &lt;&lt; a 
+          elsif a.is_a?(DRCAsDots)
+            as_edges = a.value
+          elsif @@std_refs[a] &amp;&amp; :#{f} != :middle
+            f = @@std_refs[a]
+          else
+            raise("Invalid argument for '#{f}' method")
+          end
+        end
+
+        if f.size == 2
+          f = f + f
+        else
+          f = (f + [0.5] * 4)[0..3]
+        end
+            
+        if as_edges
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :extent_refs_edges, *f))
+        else
+          # add oversize for point- and edge-like regions
+          zero_area = (f[0] - f[2]).abs &lt; 1e-7 || (f[1] - f[3]).abs &lt; 1e-7
+          f += [ zero_area ? 1 : 0 ] * 2
+          DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :extent_refs, *f))
+        end
+
+      end
+CODE
     end
     
     # %DRC%
@@ -2393,13 +2639,13 @@ CODE
     # The mode defines how to handle corners. The following modes are available:
     #
     # @ul
-    #   @li @b diamond_limit: @/b This mode will connect the shifted edges without corner interpolation @/li
-    #   @li @b octagon_limit: @/b This mode will create octagon-shaped corners @/li
-    #   @li @b square_limit: @/b This mode will leave 90 degree corners untouched but 
+    #   @li @b diamond_limit @/b: This mode will connect the shifted edges without corner interpolation @/li
+    #   @li @b octagon_limit @/b: This mode will create octagon-shaped corners @/li
+    #   @li @b square_limit @/b: This mode will leave 90 degree corners untouched but 
     #           cut off corners with a sharper angle. This is the default mode. @/li
-    #   @li @b acute_limit: @/b This mode will leave 45 degree corners untouched but
+    #   @li @b acute_limit @/b: This mode will leave 45 degree corners untouched but
     #           cut off corners with a sharper angle @/li
-    #   @li @b no_limit: @/b This mode will not cut off (only at extremely sharp angles @/li
+    #   @li @b no_limit @/b: This mode will not cut off (only at extremely sharp angles @/li
     # @/ul
     #
     # Merged semantics applies, i.e. polygons will be merged before the sizing is applied 
@@ -3158,6 +3404,26 @@ CODE
     
     def projection
       DRCMetrics::new(RBA::Region::Projection)
+    end
+    
+    def pattern(p)
+      DRCPattern::new(true, p)
+    end
+    
+    def text(p)
+      DRCPattern::new(false, p)
+    end
+
+    def as_dots
+      DRCAsDots::new(true)
+    end
+    
+    def as_edges
+      DRCAsDots::new(true)
+    end
+    
+    def as_boxes
+      DRCAsDots::new(false)
     end
     
     # %DRC%

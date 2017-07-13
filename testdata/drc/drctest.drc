@@ -1,4 +1,5 @@
 
+# Set to false for a short run
 big_tests = false
 
 verbose(true)
@@ -500,9 +501,46 @@ cell("TOP")
 
 c1.rounded_corners(0.5, 0.5, 16).output(1010, 0)
 c1.smoothed(1.5).output(1011, 0)
+
 a1.texts.output(1020, 0)
 a1.texts("A*").output(1021, 0)
-a1.texts("A*", false).output(1022, 0)
+a1.texts(text("A*")).output(1022, 0)
+a1.texts(pattern("A*")).output(1023, 0)
+a1.texts(pattern("A*"), as_dots).extended(0.05, 0.05, 0.05, 0.05).output(1024, 0)
+a1.texts(pattern("A*"), as_boxes).output(1025, 0)
+
+a1.middle.sized(0.05).output(1030, 0)
+a1.middle(as_dots).extended(0.05, 0.05, 0.05, 0.05).output(1031, 0)
+a1.middle(as_boxes).sized(0.05).output(1032, 0)
+a1.extent_refs(0.5, 0.5).sized(0.05).output(1040, 0)
+a1.extent_refs(:center).sized(0.05).output(1040, 1)
+a1.extent_refs(:c).sized(0.05).output(1040, 2)
+a1.extent_refs(:bottom).sized(0.05).output(1041, 0)
+a1.extent_refs(:b).sized(0.05).output(1041, 1)
+a1.extent_refs(:b, as_edges).extended(0.05, 0.05, 0.05, 0.05).output(1041, 2)
+a1.extent_refs(:top).sized(0.05).output(1042, 0)
+a1.extent_refs(:t).sized(0.05).output(1042, 1)
+a1.extent_refs(:left).sized(0.05).output(1043, 0)
+a1.extent_refs(:l).sized(0.05).output(1043, 1)
+a1.extent_refs(:right).sized(0.05).output(1044, 0)
+a1.extent_refs(:r).sized(0.05).output(1044, 1)
+a1.extent_refs(:bottom_left).sized(0.05).output(1045, 0)
+a1.extent_refs(:bl).sized(0.05).output(1045, 1)
+a1.extent_refs(:bottom_center).sized(0.05).output(1046, 0)
+a1.extent_refs(:bc).sized(0.05).output(1046, 1)
+a1.extent_refs(:bottom_right).sized(0.05).output(1047, 0)
+a1.extent_refs(:br).sized(0.05).output(1047, 1)
+a1.extent_refs(:top_left).sized(0.05).output(1048, 0)
+a1.extent_refs(:tl).sized(0.05).output(1048, 1)
+a1.extent_refs(:top_center).sized(0.05).output(1049, 0)
+a1.extent_refs(:tc).sized(0.05).output(1049, 1)
+a1.extent_refs(:top_right).sized(0.05).output(1050, 0)
+a1.extent_refs(:tr).sized(0.05).output(1050, 1)
+a1.extent_refs(:left_center).sized(0.05).output(1051, 0)
+a1.extent_refs(:lc).sized(0.05).output(1051, 1)
+a1.extent_refs(:right_center).sized(0.05).output(1052, 0)
+a1.extent_refs(:rc).sized(0.05).output(1052, 1)
+a1.extent_refs(0.25, 0.5, 0.5, 0.75).output(1053, 0)
 
 puts "=== Single-cell testsuite ==="
 

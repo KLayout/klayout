@@ -206,6 +206,11 @@ Edges::start_segments (db::Edges::length_type length, double fraction) const
   Edges edges;
   edges.reserve (m_edges.size ());
 
+  //  zero-length edges would vanish in merged sematics, so we don't set it now
+  if (length == 0) {
+    edges.set_merged_semantics (false);
+  }
+
   for (const_iterator e = begin_merged (); ! e.at_end (); ++e) {
     double l = std::max (e->double_length () * fraction, double (length));
     edges.insert (db::Edge (e->p1 (), db::Point (db::DPoint (e->p1 ()) + db::DVector (e->d()) * (l / e->double_length ()))));
@@ -220,6 +225,11 @@ Edges::end_segments (db::Edges::length_type length, double fraction) const
   Edges edges;
   edges.reserve (m_edges.size ());
 
+  //  zero-length edges would vanish in merged sematics, so we don't set it now
+  if (length == 0) {
+    edges.set_merged_semantics (false);
+  }
+
   for (const_iterator e = begin_merged (); ! e.at_end (); ++e) {
     double l = std::max (e->double_length () * fraction, double (length));
     edges.insert (db::Edge (db::Point (db::DPoint (e->p2 ()) - db::DVector (e->d()) * (l / e->double_length ())), e->p2 ()));
@@ -233,6 +243,11 @@ Edges::centers (db::Edges::length_type length, double fraction) const
 {
   Edges edges;
   edges.reserve (m_edges.size ());
+
+  //  zero-length edges would vanish in merged sematics, so we don't set it now
+  if (length == 0) {
+    edges.set_merged_semantics (false);
+  }
 
   for (const_iterator e = begin_merged (); ! e.at_end (); ++e) {
     double l = std::max (e->double_length () * fraction, double (length));

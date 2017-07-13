@@ -571,3 +571,42 @@ gen = Gen::new
 
 run_demo gen, "input.rounded_corners(1.um, 2.um, 16)", "drc_rounded_corners.png"
 
+class Gen
+  def produce(s1, s2)
+    pts = [ 
+      RBA::Point::new(1000, 0),
+      RBA::Point::new(1000, 2000),
+      RBA::Point::new(4000, 2000),
+      RBA::Point::new(4000, 5000),
+      RBA::Point::new(1000, 5000),
+      RBA::Point::new(1000, 7000),
+      RBA::Point::new(5000, 7000),
+      RBA::Point::new(5000, 0)
+    ];
+    s1.insert(RBA::Polygon::new(pts))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input.middle.sized(0.1)", "drc_middle1.png"
+
+run_demo gen, "input.extent_refs(:center).sized(0.1)", "drc_extent_refs1.png"
+
+run_demo gen, "input.extent_refs(:bottom, as_edges)", "drc_extent_refs10.png"
+run_demo gen, "input.extent_refs(:top, as_edges)", "drc_extent_refs11.png"
+run_demo gen, "input.extent_refs(:left, as_edges)", "drc_extent_refs12.png"
+run_demo gen, "input.extent_refs(:right, as_edges)", "drc_extent_refs13.png"
+
+run_demo gen, "input.extent_refs(:bottom_left).sized(0.1)", "drc_extent_refs20.png"
+run_demo gen, "input.extent_refs(:bottom_center).sized(0.1)", "drc_extent_refs21.png"
+run_demo gen, "input.extent_refs(:bottom_right).sized(0.1)", "drc_extent_refs22.png"
+run_demo gen, "input.extent_refs(:right_center).sized(0.1)", "drc_extent_refs23.png"
+run_demo gen, "input.extent_refs(:left_center).sized(0.1)", "drc_extent_refs24.png"
+run_demo gen, "input.extent_refs(:top_left).sized(0.1)", "drc_extent_refs25.png"
+run_demo gen, "input.extent_refs(:top_center).sized(0.1)", "drc_extent_refs26.png"
+run_demo gen, "input.extent_refs(:top_right).sized(0.1)", "drc_extent_refs27.png"
+
+run_demo gen, "input.extent_refs(0.25, 0.75).sized(0.1)", "drc_extent_refs30.png"
+run_demo gen, "input.extent_refs(0.25, 0.75, 0.5, 1.0)", "drc_extent_refs31.png"
+

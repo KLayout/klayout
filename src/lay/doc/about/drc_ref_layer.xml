@@ -339,6 +339,102 @@ This method is basically equivalent to the <a href="#extended">extended</a> meth
 "extended(0, 0, dist, 0)".
 A version extending to the inside is <a href="#extended_in">extended_in</a>.
 </p>
+<h2>"extent_refs" - Returns partial references to the boundings boxes of the polygons</h2>
+<keyword name="extent_refs"/>
+<a name="extent_refs"/><p>Usage:</p>
+<ul>
+<li><tt>layer.extent_refs(fx, fy [, options ])</tt></li>
+<li><tt>layer.extent_refs(fx1, fy1, fx2, fx2 [, options ])</tt></li>
+<li><tt>layer.extent_refs(ref_spec [, options ])</tt></li>
+</ul>
+<p>
+This method produces parts of the bounding box of the polygons. It can select 
+either edges, certain points or partial boxes. It can be used the following
+ways:
+</p><p>
+<ul>
+<li><b>With a formal specification </b>: This is an identifier like
+":center" or ":left" to indicate which part will be produced. </li>
+<li><b>With two floating-point arguments </b>: These arguments specify
+a point relative to the bounding box. The first argument is a relative
+x coordinate where 0.0 means "left side of the bounding box" and 1.0
+is the right side. The second argument is a relative y coordinate where
+0.0 means "bottom" and 1.0 means "top". The results will be small 
+(2x2 DBU) boxes or point-like edges for edge output </li>
+<li><b>With four floating-point arguments </b>: These arguments specify
+a box in relative coordinates: a pair of x/y relative coordinate for
+the first point and another pair for the second point. The results will
+be boxes or a tilted edge in case of edge output. If the range specifies
+a finite-area box (height and width are not zero), no adjustment of 
+the boxes will happen for polygon output - i.e. the additional enlargement 
+by 1 DBU which is applied for zero-area boxes does not happen.</li>
+</ul>
+</p><p>
+The formal specifiers are for points:
+</p><p>
+<ul>
+<li><b>:center </b>or <b>:c </b>: the center point </li>
+<li><b>:bottom_center </b>or <b>:bc </b>: the bottom center point </li>
+<li><b>:bottom_left </b>or <b>:bl </b>: the bottom left point </li>
+<li><b>:bottom_right </b>or <b>:br </b>: the bottom right point </li>
+<li><b>:left </b>or <b>:l </b>: the left point </li>
+<li><b>:right </b>or <b>:r </b>: the right point </li>
+<li><b>:top_center </b>or <b>:tc </b>: the top center point </li>
+<li><b>:top_left </b>or <b>:tl </b>: the top left point </li>
+<li><b>:top_right </b>or <b>:tr </b>: the top right point </li>
+</ul>
+</p><p>
+The formal specifiers for lines are:
+</p><p>
+<ul>
+<li><b>:bottom </b>or <b>:b </b>: the bottom line </li>
+<li><b>:top </b>or <b>:t </b>: the top line </li>
+<li><b>:left </b>or <b>:l </b>: the left line </li>
+<li><b>:right </b>or <b>:r </b>: the right line </li>
+</ul>
+</p><p>
+Dots are represented by small (2x2 DBU) boxes or point-like
+edges with edge output. Lines are represented by narrow or 
+flat (2 DBU) boxes or edges for edge output. Edges will follow
+the orientation convention for the corresponding edges - i.e.
+"inside" of the bounding box is on the right side of the edge.
+</p><p>
+The following additional option controls the output format:
+</p><p>
+<ul>
+<li><b>as_boxes </b>: with this option, small boxes will be produced as markers </li>
+<li><b>as_dots </b>or <b>as_edges </b>: with this option, point-like edges will be produced for dots
+and edges will be produced for line-like selections </li>
+</ul>
+</p><p>
+The following table shows a few applications:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_extent_refs1.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_extent_refs10.png"/></td>
+<td><img src="/images/drc_extent_refs11.png"/></td>
+<td><img src="/images/drc_extent_refs12.png"/></td>
+<td><img src="/images/drc_extent_refs13.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_extent_refs20.png"/></td>
+<td><img src="/images/drc_extent_refs21.png"/></td>
+<td><img src="/images/drc_extent_refs22.png"/></td>
+<td><img src="/images/drc_extent_refs23.png"/></td>
+<td><img src="/images/drc_extent_refs24.png"/></td>
+<td><img src="/images/drc_extent_refs25.png"/></td>
+<td><img src="/images/drc_extent_refs26.png"/></td>
+<td><img src="/images/drc_extent_refs27.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_extent_refs30.png"/></td>
+<td><img src="/images/drc_extent_refs31.png"/></td>
+</tr>
+</table>
+</p>
 <h2>"extents" - Returns the bounding box of each input object</h2>
 <keyword name="extents"/>
 <a name="extents"/><p>Usage:</p>
@@ -681,6 +777,32 @@ The following images show the effect of various forms of the "merged" method:
 <tr>
 <td><img src="/images/drc_merged3.png"/></td>
 <td><img src="/images/drc_merged4.png"/></td>
+</tr>
+</table>
+</p>
+<h2>"middle" - Returns the center points of the bounding boxes of the polygons</h2>
+<keyword name="middle"/>
+<a name="middle"/><p>Usage:</p>
+<ul>
+<li><tt>layer.middle([ options ])</tt></li>
+</ul>
+<p>
+This method produces markers on the centers of the polygon's bounding box centers. 
+These markers can be point-like edges or small 2x2 DBU boxes. The latter is the default.
+A more generic function is <a href="#extent_refs">extent_refs</a>. "middle" is basically a synonym for "extent_refs(:center)".
+</p><p>
+The options available are:
+</p><p>
+<ul>
+<li><b>as_boxes </b>: with this option, small boxes will be produced as markers </li>
+<li><b>as_dots </b>: with this option, point-like edges will be produced instead of small boxes </li>
+</ul>
+</p><p>
+The following image shows the effect of this method
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_middle1.png"/></td>
 </tr>
 </table>
 </p>
@@ -1463,13 +1585,13 @@ In the two-value form, the horizontal and vertical bias can be specified separat
 The mode defines how to handle corners. The following modes are available:
 </p><p>
 <ul>
-<li><b>diamond_limit:</b>This mode will connect the shifted edges without corner interpolation</li>
-<li><b>octagon_limit:</b>This mode will create octagon-shaped corners</li>
-<li><b>square_limit:</b>This mode will leave 90 degree corners untouched but 
-cut off corners with a sharper angle. This is the default mode.</li>
-<li><b>acute_limit:</b>This mode will leave 45 degree corners untouched but
-cut off corners with a sharper angle</li>
-<li><b>no_limit:</b>This mode will not cut off (only at extremely sharp angles</li>
+<li><b>diamond_limit </b>: This mode will connect the shifted edges without corner interpolation </li>
+<li><b>octagon_limit </b>: This mode will create octagon-shaped corners </li>
+<li><b>square_limit </b>: This mode will leave 90 degree corners untouched but 
+cut off corners with a sharper angle. This is the default mode. </li>
+<li><b>acute_limit </b>: This mode will leave 45 degree corners untouched but
+cut off corners with a sharper angle </li>
+<li><b>no_limit </b>: This mode will not cut off (only at extremely sharp angles </li>
 </ul>
 </p><p>
 Merged semantics applies, i.e. polygons will be merged before the sizing is applied 
@@ -1637,27 +1759,36 @@ This feature has been introduced in version 0.23.2.
 <a name="texts"/><p>Usage:</p>
 <ul>
 <li><tt>layer.texts</tt></li>
-<li><tt>layer.texts(pattern)</tt></li>
-<li><tt>layer.texts(pattern, true)</tt></li>
-<li><tt>layer.texts(string, false)</tt></li>
+<li><tt>layer.texts(p)</tt></li>
+<li><tt>layer.texts([ options ])</tt></li>
 </ul>
 <p>
 This method can be applied to original layers - i.e. ones that have
-been created with <a href="#input">input</a>. It will produce a small box (2x2 DBU) on each
-selected text. 
+been created with <a href="#input">input</a>. By default, a small box (2x2 DBU) will be produced on each
+selected text. By using the "as_dots" option, degenerated point-like edges will be
+produced.
 </p><p>
 Texts can be selected either by exact match string or a pattern match with a 
-glob-style pattern. The second argument selects pattern style (true)
-or exact match (false). The default is pattern match.
+glob-style pattern. By default, glob-style pattern are used. 
+The options available are:
+</p><p>
+<ul>
+<li><b>pattern(p) </b>: Use a pattern to match the string (this is the default) </li>
+<li><b>text(s) </b>: Select the texts that exactly match the given string </li>
+<li><b>as_boxes </b>: with this option, small boxes will be produced as markers </li>
+<li><b>as_dots </b>: with this option, point-like edges will be produced instead of small boxes </li>
+</ul>
+</p><p>
+Here are some examples:
 </p><p>
 <pre>
 # Selects all texts
 t = input(1, 0).texts
 # Selects all texts beginning with an "A"
 t = input(1, 0).texts("A*")
-t = input(1, 0).texts("A*", true)
+t = input(1, 0).texts(pattern("A*"))
 # Selects all texts whose string is "A*"
-t = input(1, 0).texts("A*", false)
+t = input(1, 0).texts(text("A*"))
 </pre>
 </p>
 <h2>"transform" - Transforms a layer (modifies the layer)</h2>
@@ -1709,18 +1840,18 @@ width is less than the specified value. In that case, an edge pair error shape i
 The options available are:
 </p><p>
 <ul>
-<li><b>euclidian</b>: perform the check using Euclidian metrics (this is the default)</li>
-<li><b>square</b>: perform the check using Square metrics</li>
-<li><b>projection</b>: perform the check using projection metrics</li>
-<li><b>whole_edges</b>: With this option, the check will return all of the edges,
-even if the criterion is violated only over a part of the edge</li>
-<li><b>angle_limit(a)</b>: Specifies the angle above or equal to which no 
+<li><b>euclidian </b>: perform the check using Euclidian metrics (this is the default) </li>
+<li><b>square </b>: perform the check using Square metrics </li>
+<li><b>projection </b>: perform the check using projection metrics </li>
+<li><b>whole_edges </b>: With this option, the check will return all of the edges,
+even if the criterion is violated only over a part of the edge </li>
+<li><b>angle_limit(a) </b>: Specifies the angle above or equal to which no 
 check is performed. The default value is 90, which means that for edges having 
 an angle of 90 degree or more, no check is performed. Setting this value to 45 will
-make the check only consider edges enclosing angles of less than 45 degree.</li>
-<li><b>projection_limits(min, max) or projection_limits(min .. max)</b>:
+make the check only consider edges enclosing angles of less than 45 degree. </li>
+<li><b>projection_limits(min, max) or projection_limits(min .. max) </b>:
 this option makes the check only consider edge pairs whose projected length on
-each other is more or equal than min and less than max</li>
+each other is more or equal than min and less than max </li>
 </ul>
 </p><p>
 Note that without the angle_limit, acute corners will always be reported, since two 

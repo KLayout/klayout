@@ -93,10 +93,10 @@ class DocItem
               gsub(/\\@/, "&at;").
               gsub(/\s*@code\s*/, "<pre>").
               gsub(/\s*@\/code\s*/, "</pre>").
-              gsub(/\s*@img\((.*)\)\s*/) { "<img src=\"" + $1 + "\"/>" }.
-              gsub(/\s*@\/img\s*/, "</img>").
-              gsub(/\s*@(\w+)\s*/) { "<" + $1 + ">" }.
-              gsub(/\s*@\/(\w+)\s*/) { "</" + $1 + ">" }.
+              gsub(/@img\((.*)\)\s*/) { "<img src=\"" + $1 + "\"/>" }.
+              gsub(/@\/img\s*/, "</img>").
+              gsub(/@(\w+)\s*/) { "<" + $1 + ">" }.
+              gsub(/@\/(\w+)\s*/) { "</" + $1 + ">" }.
               gsub(/&at;/, "@")
         doc += "\n"
       end

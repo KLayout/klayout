@@ -888,6 +888,66 @@ CODE
     end
 
     # %DRC%
+    # @name corners
+    # @brief Selects corners of polygons
+    # @synopsis layer.corners([ options ])
+    # @synopsis layer.corners(angle, [ options ])
+    # @synopsis layer.corners(amin .. amax, [ options ])
+    #
+    # This method produces markers on the corners of the polygons. An angle criterion can be given which
+    # selects corners based on the angle of the connecting edges. Positive angles indicate a left turn
+    # while negative angles indicate a right turn. Since polygons are oriented clockwise, postive angles
+    # indicate concave corners while negative ones indicate convex corners.
+    # 
+    # The markers generated can be point-like edges or small 2x2 DBU boxes. The latter is the default.
+    # 
+    # The options available are:
+    #
+    # @ul
+    #   @li @b as_boxes @/b: with this option, small boxes will be produced as markers @/li  
+    #   @li @b as_dots @/b: with this option, point-like edges will be produced instead of small boxes @/li  
+    # @/ul
+    #
+    # The following image shows the effect of this method
+    #
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_corners1.png) @/td
+    #     @td @img(/images/drc_corners2.png) @/td
+    #     @td @img(/images/drc_corners3.png) @/td
+    #   @/tr
+    # @/table
+
+    def corners(*args)
+
+      requires_region("corners")
+
+      as_dots = false
+      amin = -180.0
+      amax = 180.0
+
+      args.each do |a|
+        if a.is_a?(Range)
+          if (!a.min.is_a?(1.0.class) &amp;&amp; !a.min.is_a?(1.class)) || (!a.max.is_a?(1.0.class) &amp;&amp; !a.max.is_a?(1.class))
+            raise("An angle limit requires an interval of two angles")
+          end
+          amin = a.min.to_f
+          amax = a.max.to_f
+        elsif a.is_a?(1.0.class) || a.is_a?(1.class)
+          amin = a.to_f
+          amax = a.to_f
+        elsif a.is_a?(DRCAsDots)
+          as_dots = a.value
+        else
+          raise("Invalid argument for 'corners' method")
+        end
+      end
+
+      DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, as_dots ? :corners_dots : :corners, amin, amax))
+
+    end
+
+    # %DRC%
     # @name middle
     # @brief Returns the center points of the bounding boxes of the polygons
     # @synopsis layer.middle([ options ])

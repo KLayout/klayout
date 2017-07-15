@@ -220,7 +220,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class R _COMMA _TMPLARG>
+template <class X, class R _COMMA _TMPLARG, class F = gsi::return_by_value>
 class _NAME(Method)
   : public MethodSpecificBase <X>
 {
@@ -240,7 +240,11 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<R> ();
+    if (tl::value_from_type (typename F::is_factory ())) {
+      this->template set_return_new<R> ();
+    } else {
+      this->template set_return<R> ();
+    }
   }
 
   virtual MethodBase *clone () const 
@@ -264,7 +268,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class R _COMMA _TMPLARG>
+template <class X, class R _COMMA _TMPLARG, class F = gsi::return_by_value>
 class _NAME(ConstMethod)
   : public MethodSpecificBase <X>
 {
@@ -284,7 +288,11 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<R> ();
+    if (tl::value_from_type (typename F::is_factory ())) {
+      this->template set_return_new<R> ();
+    } else {
+      this->template set_return<R> ();
+    }
   }
 
   virtual MethodBase *clone () const 
@@ -308,7 +316,7 @@ private:
   _ARGSPECMEM
 };
 
-template <class X, class R _COMMA _TMPLARG>
+template <class X, class R _COMMA _TMPLARG, class F = gsi::return_by_value>
 class _NAME(ExtMethod)
   : public MethodBase
 {
@@ -328,7 +336,11 @@ public:
   {
     this->clear ();
     _ADDARGS
-    this->template set_return<R> ();
+    if (tl::value_from_type (typename F::is_factory ())) {
+      this->template set_return_new<R> ();
+    } else {
+      this->template set_return<R> ();
+    }
   }
 
   virtual MethodBase *clone () const 
@@ -428,50 +440,6 @@ public:
   virtual void call (void *, SerialArgs &args, SerialArgs &ret) const 
 #else
   virtual void call (void *, SerialArgs &, SerialArgs &ret) const 
-#endif
-  {
-    this->mark_called ();
-    _GETARGVARS;
-    ret.write<X *> ((*m_m) (_ARGVARLIST));
-  }
-
-private:
-  X *(*m_m) (_FUNCARGLIST);
-  _ARGSPECMEM
-};
-
-template <class X _COMMA _TMPLARG>
-class _NAME(Factory)
-  : public MethodBase
-{
-public:
-  _NAME(Factory) (const std::string &name, X *(*m) (_FUNCARGLIST), const std::string &doc)
-    : MethodBase (name, doc), m_m (m)
-  {
-  }
-
-  _NAME(Factory) *add_args (_ARGSPEC)
-  {
-    _ARGSPECINIT;
-    return this;
-  }
-
-  void initialize ()
-  {
-    this->clear ();
-    _ADDARGS
-    this->template set_return_new<X *> ();
-  }
-
-  virtual MethodBase *clone () const
-  {
-    return new _NAME(Factory) (*this);
-  }
-
-#if _COUNT != 0
-  virtual void call (void *, SerialArgs &args, SerialArgs &ret) const
-#else
-  virtual void call (void *, SerialArgs &, SerialArgs &ret) const
 #endif
   {
     this->mark_called ();
@@ -1400,6 +1368,22 @@ method_ext (const std::string &name, R (*xm) (X * _COMMA _FUNCARGLIST) _COMMA _A
 }
 #endif
 
+template <class X, class R _COMMA _TMPLARG>
+Methods
+factory_ext (const std::string &name, R *(*xm) (X * _COMMA _FUNCARGLIST), const std::string &doc = std::string ())
+{
+  return Methods (new _NAME(ExtMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, xm, doc));
+}
+
+#if _COUNT != 0
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
+Methods
+factory_ext (const std::string &name, R *(*xm) (X * _COMMA _FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(ExtMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, xm, doc))->add_args (_ARGSPECARGS));
+}
+#endif
+
 template <class X _COMMA _TMPLARG>
 Methods
 constructor (const std::string &name, X *(*m) (_FUNCARGLIST), const std::string &doc = std::string ())
@@ -1413,22 +1397,6 @@ Methods
 constructor (const std::string &name, X *(*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
   return Methods ((new _NAME(Constructor) <X _COMMA _FUNCARGLIST> (name, m, doc))->add_args (_ARGSPECARGS));
-}
-#endif
-
-template <class X _COMMA _TMPLARG>
-Methods
-factory (const std::string &name, X *(*m) (_FUNCARGLIST), const std::string &doc = std::string ())
-{
-  return Methods (new _NAME(Factory) <X _COMMA _FUNCARGLIST> (name, m, doc));
-}
-
-#if _COUNT != 0
-template <class X _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
-Methods
-factory (const std::string &name, X *(*m) (_FUNCARGLIST) _COMMA _ARGSPECS, const std::string &doc = std::string ())
-{
-  return Methods ((new _NAME(Factory) <X _COMMA _FUNCARGLIST> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 
@@ -1477,6 +1445,22 @@ Methods
 method (const std::string &name, R (X::*m) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
 {
   return Methods ((new _NAME(ConstMethod) <X, R _COMMA _FUNCARGLIST> (name, m, doc))->add_args (_ARGSPECARGS));
+}
+#endif
+
+template <class X, class R _COMMA _TMPLARG>
+Methods
+factory (const std::string &name, R *(X::*m) (_FUNCARGLIST) const, const std::string &doc = std::string ())
+{
+  return Methods (new _NAME(ConstMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc));
+}
+
+#if _COUNT != 0
+template <class X, class R _COMMA _TMPLARG _COMMA _TMPLARGSPECS>
+Methods
+factory (const std::string &name, R *(X::*m) (_FUNCARGLIST) const _COMMA _ARGSPECS, const std::string &doc = std::string ())
+{
+  return Methods ((new _NAME(ConstMethod) <X, R * _COMMA _FUNCARGLIST, gsi::return_new_object> (name, m, doc))->add_args (_ARGSPECARGS));
 }
 #endif
 

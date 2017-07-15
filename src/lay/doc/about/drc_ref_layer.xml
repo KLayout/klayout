@@ -148,6 +148,38 @@ Clean state is the default.
 See <a href="#raw">raw</a> for some remarks about how this state is 
 propagated.
 </p>
+<h2>"corners" - Selects corners of polygons</h2>
+<keyword name="corners"/>
+<a name="corners"/><p>Usage:</p>
+<ul>
+<li><tt>layer.corners([ options ])</tt></li>
+<li><tt>layer.corners(angle, [ options ])</tt></li>
+<li><tt>layer.corners(amin .. amax, [ options ])</tt></li>
+</ul>
+<p>
+This method produces markers on the corners of the polygons. An angle criterion can be given which
+selects corners based on the angle of the connecting edges. Positive angles indicate a left turn
+while negative angles indicate a right turn. Since polygons are oriented clockwise, postive angles
+indicate concave corners while negative ones indicate convex corners.
+</p><p>
+The markers generated can be point-like edges or small 2x2 DBU boxes. The latter is the default.
+</p><p>
+The options available are:
+</p><p>
+<ul>
+<li><b>as_boxes </b>: with this option, small boxes will be produced as markers </li>
+<li><b>as_dots </b>: with this option, point-like edges will be produced instead of small boxes </li>
+</ul>
+</p><p>
+The following image shows the effect of this method
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_corners1.png"/></td>
+<td><img src="/images/drc_corners2.png"/></td>
+</tr>
+</table>
+</p>
 <h2>"data" - Gets the low-level data object</h2>
 <keyword name="data"/>
 <a name="data"/><p>Usage:</p>

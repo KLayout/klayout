@@ -610,3 +610,23 @@ run_demo gen, "input.extent_refs(:top_right).sized(0.1)", "drc_extent_refs27.png
 run_demo gen, "input.extent_refs(0.25, 0.75).sized(0.1)", "drc_extent_refs30.png"
 run_demo gen, "input.extent_refs(0.25, 0.75, 0.5, 1.0)", "drc_extent_refs31.png"
 
+class Gen
+  def produce(s1, s2)
+    pts = [ 
+      RBA::Point::new(0, 0),
+      RBA::Point::new(0, 8000),
+      RBA::Point::new(4000, 4000),
+      RBA::Point::new(4000, 2000),
+      RBA::Point::new(6000, 2000),
+      RBA::Point::new(6000, 0),
+    ];
+    s1.insert(RBA::Polygon::new(pts))
+  end
+end
+
+gen = Gen::new
+
+run_demo gen, "input.corners.sized(0.1)", "drc_corners1.png"
+run_demo gen, "input.corners(90.0).sized(0.1)", "drc_corners2.png"
+run_demo gen, "input.corners(-90.0 .. -45.0).sized(0.1)", "drc_corners3.png"
+

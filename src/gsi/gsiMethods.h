@@ -25,6 +25,7 @@
 #define _HDR_gsiMethods
 
 #include "tlString.h"
+#include "tlUtils.h"
 #include "tlAssert.h"
 #include "gsiSerialisation.h"
 
@@ -809,6 +810,16 @@ constant (const std::string &name, R (*m) (), const std::string &doc = std::stri
 {
   return Methods (new ConstantGetter <R> (name, m, doc));
 }
+
+struct return_by_value
+{
+  typedef tl::False is_factory;
+};
+
+struct return_new_object
+{
+  typedef tl::True is_factory;
+};
 
 // 0 argument
 

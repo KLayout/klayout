@@ -72,7 +72,43 @@ static db::Region *new_shapes (const db::Shapes &s)
   return r;
 }
 
-static db::Region *new_texts (const db::RecursiveShapeIterator &si_in, const std::string &pat, bool pattern)
+struct DotDelivery
+{
+  typedef db::Edges container_type;
+
+  DotDelivery () : container ()
+  {
+    container.reset (new container_type ());
+    container->set_merged_semantics (false);
+  }
+
+  void insert (const db::Point &pt)
+  {
+    container->insert (db::Edge (pt, pt));
+  }
+
+  std::auto_ptr<container_type> container;
+};
+
+struct BoxDelivery
+{
+  typedef db::Region container_type;
+
+  BoxDelivery () : container ()
+  {
+    container.reset (new container_type ());
+  }
+
+  void insert (const db::Point &pt)
+  {
+    container->insert (db::Box (pt - db::Vector (1, 1), pt + db::Vector (1, 1)));
+  }
+
+  std::auto_ptr<container_type> container;
+};
+
+template <class Delivery>
+static typename Delivery::container_type *new_texts (const db::RecursiveShapeIterator &si_in, const std::string &pat, bool pattern)
 {
   db::RecursiveShapeIterator si (si_in);
   si.shape_flags (db::ShapeIterator::Texts);
@@ -87,7 +123,7 @@ static db::Region *new_texts (const db::RecursiveShapeIterator &si_in, const std
     }
   }
 
-  std::auto_ptr<db::Region> r (new db::Region ());
+  Delivery delivery;
 
   while (! si.at_end ()) {
     if (si.shape ().is_text () &&
@@ -95,58 +131,81 @@ static db::Region *new_texts (const db::RecursiveShapeIterator &si_in, const std
       db::Text t;
       si.shape ().text (t);
       t.transform (si.trans ());
-      r->insert (db::Box (t.box ().enlarged (db::Vector (1, 1))));
+      delivery.insert (t.box ().center ());
     }
     si.next ();
   }
 
-  return r.release ();
+  return delivery.container.release ();
 }
 
-static db::Edges *new_texts_dots (const db::RecursiveShapeIterator &si_in, const std::string &pat, bool pattern)
+template <class Delivery>
+static typename Delivery::container_type *texts (const db::Region *r, const std::string &pat, bool pattern)
 {
-  db::RecursiveShapeIterator si (si_in);
-  si.shape_flags (db::ShapeIterator::Texts);
+  return new_texts<Delivery> (r->iter (), pat, pattern);
+}
 
-  tl::GlobPattern glob_pat;
-  bool all = false;
-  if (pattern) {
-    if (pat == "*") {
-      all = true;
-    } else {
-      glob_pat = tl::GlobPattern (pat);
+template <class Delivery>
+static typename Delivery::container_type *corners (const db::Region *r, double angle_start, double angle_end)
+{
+  db::CplxTrans t_start (1.0, angle_start, false, db::DVector ());
+  db::CplxTrans t_end (1.0, angle_end, false, db::DVector ());
+
+  bool big_angle = (angle_end - angle_start + db::epsilon) > 180.0;
+  bool all = (angle_end - angle_start - db::epsilon) > 360.0;
+
+  Delivery delivery;
+
+  for (db::Region::const_iterator p = r->begin_merged (); ! p.at_end (); ++p) {
+
+    size_t n = p->holes () + 1;
+    for (size_t i = 0; i < n; ++i) {
+
+      const db::Polygon::contour_type &ctr = p->contour (i);
+      size_t nn = ctr.size ();
+      if (nn > 2) {
+
+        db::Point pp = ctr [nn - 2];
+        db::Point pt = ctr [nn - 1];
+        for (size_t j = 0; j < nn; ++j) {
+
+          db::Point pn = ctr [j];
+
+          if (all) {
+            delivery.insert (pt);
+          } else {
+
+            db::Vector vin (pt - pp);
+            db::DVector vout (pn - pt);
+
+            db::DVector v1 = t_start * vin;
+            db::DVector v2 = t_end * vin;
+
+            bool vp1 = db::vprod_sign (v1, vout) >= 0;
+            bool vp2 = db::vprod_sign (v2, vout) <= 0;
+
+            if (big_angle && (vp1 || vp2)) {
+              delivery.insert (pt);
+            } else if (! big_angle && vp1 && vp2) {
+              if (db::sprod_sign (v1, vout) > 0 && db::sprod_sign (v2, vout) > 0) {
+                delivery.insert (pt);
+              }
+            }
+
+          }
+
+          pp = pt;
+          pt = pn;
+
+        }
+
+      }
+
     }
+
   }
 
-  std::auto_ptr<db::Edges> r (new db::Edges ());
-  //  Dots will vanish when we try to merge them ... hence disable merged semantics
-  r->set_merged_semantics (false);
-
-  while (! si.at_end ()) {
-    if (si.shape ().is_text () &&
-        (all || (pattern && glob_pat.match (si.shape ().text_string ())) || (!pattern && si.shape ().text_string () == pat))) {
-      db::Text t;
-      si.shape ().text (t);
-      t.transform (si.trans ());
-      db::Point c = t.box ().center ();
-      r->insert (db::Edge (c, c));
-    }
-    si.next ();
-  }
-
-  return r.release ();
-}
-
-static db::Region texts (const db::Region *r, const std::string &pat, bool pattern)
-{
-  std::auto_ptr<db::Region> o (new_texts (r->iter (), pat, pattern));
-  return *o;
-}
-
-static db::Edges texts_dots (const db::Region *r, const std::string &pat, bool pattern)
-{
-  std::auto_ptr<db::Edges> o (new_texts_dots (r->iter (), pat, pattern));
-  return *o;
+  return delivery.container.release ();
 }
 
 static db::Region *new_si (const db::RecursiveShapeIterator &si)
@@ -597,32 +656,34 @@ static int projection_metrics ()
   return db::Projection;
 }
 
-static db::Shapes decompose_convex (const db::Region *r, int mode)
+template <class Container>
+static Container *decompose_convex (const db::Region *r, int mode)
 {
-  db::Shapes shapes;
+  std::auto_ptr<Container> shapes (new Container ());
   db::SimplePolygonContainer sp;
   for (db::Region::const_iterator p = r->begin_merged (); ! p.at_end(); ++p) {
     sp.polygons ().clear ();
     db::decompose_convex (*p, db::PreferredOrientation (mode), sp);
     for (std::vector <db::SimplePolygon>::const_iterator i = sp.polygons ().begin (); i != sp.polygons ().end (); ++i) {
-      shapes.insert (*i);
+      shapes->insert (*i);
     }
   }
-  return shapes;
+  return shapes.release ();
 }
 
-static db::Shapes decompose_trapezoids (const db::Region *r, int mode)
+template <class Container>
+static Container *decompose_trapezoids (const db::Region *r, int mode)
 {
-  db::Shapes shapes;
+  std::auto_ptr<Container> shapes (new Container ());
   db::SimplePolygonContainer sp;
   for (db::Region::const_iterator p = r->begin_merged (); ! p.at_end(); ++p) {
     sp.polygons ().clear ();
     db::decompose_trapezoids (*p, db::TrapezoidDecompositionMode (mode), sp);
     for (std::vector <db::SimplePolygon>::const_iterator i = sp.polygons ().begin (); i != sp.polygons ().end (); ++i) {
-      shapes.insert (*i);
+      shapes->insert (*i);
     }
   }
-  return shapes;
+  return shapes.release ();
 }
 
 //  provided by gsiDeclDbPolygon.cc:
@@ -706,7 +767,7 @@ Class<db::Region> decl_Region ("Region",
     "r = RBA::Region::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))\n"
     "@/code\n"
   ) +
-  constructor ("new", &new_texts, gsi::arg("shape_iterator"), gsi::arg ("expr"), gsi::arg ("as_pattern", true),
+  constructor ("new", &new_texts<BoxDelivery>, gsi::arg("shape_iterator"), gsi::arg ("expr"), gsi::arg ("as_pattern", true),
     "@brief Constructor from a text set\n"
     "\n"
     "@param shape_iterator The iterator from which to derive the texts\n"
@@ -726,11 +787,11 @@ Class<db::Region> decl_Region ("Region",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method_ext ("texts", &texts, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true),
+  factory_ext ("texts", &texts<BoxDelivery>, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true),
     "@hide\n"
     "This method is provided for DRC implementation only."
   ) +
-  method_ext ("texts_dots", &texts_dots, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true),
+  factory_ext ("texts_dots", &texts<DotDelivery>, gsi::arg ("expr", std::string ("*")), gsi::arg ("as_pattern", true),
     "@hide\n"
     "This method is provided for DRC implementation only."
   ) +
@@ -1041,6 +1102,26 @@ Class<db::Region> decl_Region ("Region",
   method_ext ("extent_refs_edges", &extent_refs_edges,
     "@hide\n"
     "This method is provided for DRC implementation.\n"
+  ) +
+  factory_ext ("corners", &corners<BoxDelivery>, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0),
+    "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
+    "\n"
+    "The angle values specify a range of angles: all corners whose attached edges form an angle "
+    "between angle_start and angle_end will be reported as small (2x2 DBU) boxes. The angle is measured "
+    "between the incoming and the outcoming edge in mathematical sense: a positive value is a turn left "
+    "while a negative value is a turn right. Since polygon contours are oriented clockwise, positive "
+    "angles will report concave corners while negative ones report convex ones.\n"
+    "\n"
+    "A similar function that reports corners as point-like edges is \\corners_dots.\n"
+    "\n"
+    "This function has been introduced in version 0.25.\n"
+  ) +
+  method_ext ("corners_dots", &corners<DotDelivery>, gsi::arg ("angle_start", -180.0), gsi::arg ("angle_end", 180.0),
+    "@brief This method will select all corners whose attached edges satisfy the angle condition.\n"
+    "\n"
+    "This method is similar to \\corners, but delivers an \\Edges collection with dot-like edges for each corner.\n"
+    "\n"
+    "This function has been introduced in version 0.25.\n"
   ) +
   method ("merge", (db::Region &(db::Region::*) ()) &db::Region::merge,
     "@brief Merge the region\n"
@@ -1518,19 +1599,33 @@ Class<db::Region> decl_Region ("Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) + 
-  method_ext ("decompose_convex", &decompose_convex, gsi::arg ("preferred_orientation", po_any (), "\\Polygon#PO_any"),
+  factory_ext ("decompose_convex", &decompose_convex<db::Shapes>, gsi::arg ("preferred_orientation", po_any (), "\\Polygon#PO_any"),
     "@brief Decomposes the region into convex pieces.\n"
     "\n"
     "This method will return a \\Shapes container that holds a decomposition of the region into convex, simple polygons.\n"
-    "See \\Polygon#decompose_convex for details.\n"
+    "See \\Polygon#decompose_convex for details. If you want \\Region output, you should use \\decompose_convex_to_region.\n"
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method_ext ("decompose_trapezoids", &decompose_trapezoids, gsi::arg ("mode", td_simple (), "\\Polygon#TD_simple"),
+  factory_ext ("decompose_convex_to_region", &decompose_convex<db::Region>, gsi::arg ("preferred_orientation", po_any (), "\\Polygon#PO_any"),
+    "@brief Decomposes the region into convex pieces into a region.\n"
+    "\n"
+    "This method is identical to \\decompose_convex, but delivers a \\Region object.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  factory_ext ("decompose_trapezoids", &decompose_trapezoids<db::Shapes>, gsi::arg ("mode", td_simple (), "\\Polygon#TD_simple"),
     "@brief Decomposes the region into trapezoids.\n"
     "\n"
     "This method will return a \\Shapes container that holds a decomposition of the region into trapezoids.\n"
-    "See \\Polygon#decompose_trapezoids for details.\n"
+    "See \\Polygon#decompose_trapezoids for details. If you want \\Region output, you should use \\decompose_trapezoids_to_region.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  factory_ext ("decompose_trapezoids_to_region", &decompose_trapezoids<db::Region>, gsi::arg ("mode", td_simple (), "\\Polygon#TD_simple"),
+    "@brief Decomposes the region into trapezoids.\n"
+    "\n"
+    "This method is identical to \\decompose_trapezoids, but delivers a \\Region object.\n"
     "\n"
     "This method has been introduced in version 0.25."
   ) +

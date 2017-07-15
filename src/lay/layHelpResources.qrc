@@ -92,6 +92,9 @@
         <file alias="drc_extent_refs27.png">doc/images/drc_extent_refs27.png</file>
         <file alias="drc_extent_refs30.png">doc/images/drc_extent_refs30.png</file>
         <file alias="drc_extent_refs31.png">doc/images/drc_extent_refs31.png</file>
+        <file alias="drc_corners1.png">doc/images/drc_corners1.png</file>
+        <file alias="drc_corners2.png">doc/images/drc_corners2.png</file>
+        <file alias="drc_corners3.png">doc/images/drc_corners3.png</file>
     </qresource>
     <qresource prefix="/help/about">
         <file alias="rba_notation.xml">doc/about/rba_notation.xml</file>

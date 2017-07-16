@@ -255,6 +255,28 @@ static void insert_a (db::Region *r, const std::vector <db::Polygon> &a)
   }
 }
 
+static void insert_r (db::Region *r, const db::Region &a)
+{
+  for (db::Region::const_iterator p = a.begin (); ! p.at_end (); ++p) {
+    r->insert (*p);
+  }
+}
+
+template <class Trans>
+static void insert_st (db::Region *r, const db::Shapes &a, const Trans &t)
+{
+  for (db::Shapes::shape_iterator p = a.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes | db::ShapeIterator::Paths); !p.at_end (); ++p) {
+    db::Polygon poly;
+    p->polygon (poly);
+    r->insert (poly.transformed (t));
+  }
+}
+
+static void insert_s (db::Region *r, const db::Shapes &a)
+{
+  insert_st (r, a, db::UnitTrans ());
+}
+
 static void insert_si (db::Region *r, db::RecursiveShapeIterator si)
 {
   while (! si.at_end ()) {
@@ -1066,6 +1088,40 @@ Class<db::Region> decl_Region ("Region",
   method_ext ("insert", &insert_a, 
     "@brief Inserts all polygons from the array into this region\n"
     "@args array\n"
+  ) +
+  method_ext ("insert", &insert_r,
+    "@brief Inserts all polygons from the other region into this region\n"
+    "@args region\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  method_ext ("insert", &insert_s,
+    "@brief Inserts all polygons from the shape collection into this region\n"
+    "@args shapes\n"
+    "This method takes each \"polygon-like\" shape from the shape collection and "
+    "insertes this shape into the region. Paths and boxes are converted to polygons during this process. "
+    "Edges and text objects are ignored.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  method_ext ("insert", &insert_st<db::Trans>,
+    "@brief Inserts all polygons from the shape collection into this region with transformation\n"
+    "@args shapes\n"
+    "This method takes each \"polygon-like\" shape from the shape collection and "
+    "insertes this shape into the region after applying the given transformation. "
+    "Paths and boxes are converted to polygons during this process. "
+    "Edges and text objects are ignored.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  method_ext ("insert", &insert_st<db::ICplxTrans>,
+    "@brief Inserts all polygons from the shape collection into this region with complex transformation\n"
+    "@args shapes\n"
+    "This method takes each \"polygon-like\" shape from the shape collection and "
+    "insertes this shape into the region after applying the given complex transformation. "
+    "Paths and boxes are converted to polygons during this process. "
+    "Edges and text objects are ignored.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
   ) +
   method_ext ("extents", &extents0,
     "@brief Returns a region with the bounding boxes of the polygons\n"

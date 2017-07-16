@@ -131,6 +131,13 @@ static db::Edges second_edges (const db::EdgePairs *ep)
   return e;
 }
 
+static void insert_e (db::EdgePairs *e, const db::EdgePairs &a)
+{
+  for (db::EdgePairs::const_iterator p = a.begin (); p != a.end (); ++p) {
+    e->insert (*p);
+  }
+}
+
 Class<db::EdgePairs> decl_EdgePairs ("EdgePairs", 
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
@@ -258,6 +265,11 @@ Class<db::EdgePairs> decl_EdgePairs ("EdgePairs",
     "@param t The transformation to apply.\n"
     "\n"
     "@return The transformed edge pair collection.\n"
+  ) +
+  method_ext ("insert", &insert_e,
+    "@brief Inserts all edge pairs from the other edge pair collection into this edge pair collection\n"
+    "@args edge_pairs\n"
+    "This method has been introduced in version 0.25."
   ) +
   method_ext ("edges", &edges,
     "@brief Decomposes the edge pairs into single edges\n"

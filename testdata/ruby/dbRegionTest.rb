@@ -184,6 +184,42 @@ class DBRegion_TestClass < TestBase
     r.insert(ly.begin_shapes(c1.cell_index, l1), RBA::ICplxTrans::new(10, 20))
     assert_equal(r.to_s, "(0,0;0,40;20,40;20,0);(0,100;0,140;20,140;20,100);(200,100;200,140;220,140;220,100)")
 
+    r = RBA::Region::new
+    rr = RBA::Region::new
+    rr.insert(RBA::Box::new(10, 20, 100, 200))
+    r.insert(rr)
+    assert_equal(r.to_s, "(10,20;10,200;100,200;100,20)")
+
+    r = RBA::Region::new
+    s = RBA::Shapes::new
+    s.insert(RBA::Box::new(10, 20, 100, 200))
+    r.insert(s)
+    assert_equal(r.to_s, "(10,20;10,200;100,200;100,20)")
+
+    r = RBA::Region::new
+    s = RBA::Shapes::new
+    s.insert(RBA::Polygon::new(RBA::Box::new(10, 20, 100, 200)))
+    r.insert(s)
+    assert_equal(r.to_s, "(10,20;10,200;100,200;100,20)")
+
+    r = RBA::Region::new
+    s = RBA::Shapes::new
+    s.insert(RBA::Edge::new(10, 20, 100, 200))
+    r.insert(s)
+    assert_equal(r.to_s, "")
+
+    r = RBA::Region::new
+    s = RBA::Shapes::new
+    s.insert(RBA::Box::new(10, 20, 100, 200))
+    r.insert(s, RBA::Trans::new(1, 1))
+    assert_equal(r.to_s, "(11,21;11,201;101,201;101,21)")
+
+    r = RBA::Region::new
+    s = RBA::Shapes::new
+    s.insert(RBA::Box::new(10, 20, 100, 200))
+    r.insert(s, RBA::ICplxTrans::new(RBA::Trans::new(1, 1)))
+    assert_equal(r.to_s, "(11,21;11,201;101,201;101,21)")
+
   end
 
   # Booleans

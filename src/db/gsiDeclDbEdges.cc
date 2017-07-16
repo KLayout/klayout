@@ -328,6 +328,40 @@ static int projection_metrics ()
   return db::Projection;
 }
 
+static void insert_r (db::Edges *e, const db::Region &a)
+{
+  for (db::Region::const_iterator p = a.begin (); ! p.at_end (); ++p) {
+    e->insert (*p);
+  }
+}
+
+static void insert_e (db::Edges *e, const db::Edges &a)
+{
+  for (db::Edges::const_iterator p = a.begin (); ! p.at_end (); ++p) {
+    e->insert (*p);
+  }
+}
+
+template <class Trans>
+static void insert_st (db::Edges *e, const db::Shapes &a, const Trans &t)
+{
+  for (db::Shapes::shape_iterator p = a.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Boxes | db::ShapeIterator::Paths); !p.at_end (); ++p) {
+    db::Polygon poly;
+    p->polygon (poly);
+    e->insert (poly.transformed (t));
+  }
+  for (db::Shapes::shape_iterator p = a.begin (db::ShapeIterator::Edges); !p.at_end (); ++p) {
+    db::Edge edge;
+    p->edge (edge);
+    e->insert (edge.transformed (t));
+  }
+}
+
+static void insert_s (db::Edges *e, const db::Shapes &a)
+{
+  insert_st (e, a, db::UnitTrans ());
+}
+
 Class<db::Edges> dec_Edges ("Edges", 
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
@@ -488,7 +522,44 @@ Class<db::Edges> dec_Edges ("Edges",
     "\n"
     "Inserts the edges that form the contour of the path into the edge collection.\n"
   ) +
-  method_ext ("insert", &insert_si, 
+  method_ext ("insert", &insert_e,
+    "@brief Inserts all edges from the other edge collection into this one\n"
+    "@args edges\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  method_ext ("insert", &insert_r,
+    "@brief Inserts a region\n"
+    "@args region\n"
+    "Inserts the edges that form the contours of the polygons from the region into the edge collection.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  method_ext ("insert", &insert_s,
+    "@brief Inserts all edges from the shape collection into this edge collection\n"
+    "@args shapes\n"
+    "This method takes each edge from the shape collection and "
+    "insertes it into the region. \"Polygon-like\" objects are inserted as edges forming the contours of the polygons.\n"
+    "Text objects are ignored.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  method_ext ("insert", &insert_st<db::Trans>,
+    "@brief Inserts all edges from the shape collection into this edge collection (with transformation)\n"
+    "@args shapes\n"
+    "This method acts as the version without transformation, but will apply the given "
+    "transformation before inserting the edges.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  method_ext ("insert", &insert_st<db::ICplxTrans>,
+    "@brief Inserts all edges from the shape collection into this edge collection with complex transformation\n"
+    "@args shapes\n"
+    "This method acts as the version without transformation, but will apply the given "
+    "complex transformation before inserting the edges.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  method_ext ("insert", &insert_si,
     "@brief Inserts all shapes delivered by the recursive shape iterator into this edge collection\n"
     "@args shape_iterator\n"
     "\n"

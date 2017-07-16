@@ -63,6 +63,12 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(r.size, 0)
     assert_equal(r.bbox.to_s, "()")
 
+    ep = RBA::EdgePairs::new
+    e = RBA::EdgePairs::new
+    e.insert(RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 100), RBA::Edge::new(-10, 0, -20, 50)))
+    ep.insert(e)
+    assert_equal(ep.to_s, "(0,0;0,100)/(-10,0;-20,50)")
+
   end
 
   # Basics

@@ -262,7 +262,7 @@ module DRC
     def data
       @data
     end
-    
+
     # %DRC%
     # @name insert
     # @brief Inserts one or many objects into the layer
@@ -908,7 +908,7 @@ CODE
     #   @li @b as_dots @/b: with this option, point-like edges will be produced instead of small boxes @/li  
     # @/ul
     #
-    # The following image shows the effect of this method
+    # The following images show the effect of this method:
     #
     # @table
     #   @tr 
@@ -1131,6 +1131,136 @@ CODE
           f += [ zero_area ? 1 : 0 ] * 2
           DRCLayer::new(@engine, @engine._tcmd(@data, 0, RBA::Region, :extent_refs, *f))
         end
+
+      end
+CODE
+    end
+
+    # %DRC%
+    # @name select
+    # @brief Selects edges, edge pairs or polygons based on evaluation of a block
+    # @synopsis layer.select { |object| ... }
+    # This method evaluates the block and returns a new container with those objects for which
+    # the block evaluates to true. It is available for edge, polygon and edge pair layers.
+    # The corresponding objects are RBA::DPolygon, RBA::DEdge or RBA::DEdgePair.
+    #
+    # Because this method executes inside the interpreter, it's inherently slow. Tiling does not
+    # apply to this method.
+    #
+    # Here is a (slow) equivalent of the area selection method:
+    #
+    # @code
+    # new_layer = layer.select { |polygon| polygon.area >= 10.0 }
+    # @/code
+  
+    def select(&amp;block)
+      new_data = @data.class.new
+      t = RBA::CplxTrans::new(@engine.dbu)
+      @engine.run_timed("\"select\" in: #{@engine.src_line}", @data) do
+        @data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
+          block.call(object.transformed(t)) &amp;&amp; new_data.insert(object)
+        end
+      end
+      DRCLayer::new(@engine, new_data)
+    end
+    
+    # %DRC%
+    # @name each
+    # @brief Iterates over the objects from the layer
+    # @synopsis layer.each { |object| ... }
+    # This method evaluates the block on each object of the layer. Depending on the
+    # layer type, these objects are of RBA::DPolygon, RBA::DEdge or RBA::DEdgePair type.
+    #
+    # Because this method executes inside the interpreter, it's inherently slow. Tiling does not
+    # apply to this method.
+  
+    def each(&amp;block)
+      t = RBA::CplxTrans::new(@engine.dbu)
+      @engine.run_timed("\"select\" in: #{@engine.src_line}", @data) do
+        @data.send(@data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
+          block.call(object.transformed(t))
+        end
+      end
+    end
+    
+    # %DRC%
+    # @name collect
+    # @brief Transforms a layer
+    # @synopsis layer.collect { |object| ... }
+    # This method evaluates the block for each object in the layer and returns a new layer with the objects
+    # returned from the block. It is available for edge, polygon and edge pair layers.
+    # The corresponding objects are RBA::DPolygon, RBA::DEdge or RBA::DEdgePair.
+    #
+    # If the block evaluates to nil, no object is added to the output layer. If it returns an array, each of
+    # the objects in the array is added.
+    # The returned layer is of the original type and will only accept objects of the respective type. Hence,
+    # for polygon layers, RBA::DPolygon objects need to be returned. For edge layers those need to be RBA::DEdge
+    # and for edge pair layers, they need to be RBA::DEdgePair objects. For convenience, RBA::Polygon, RBA::Edge
+    # and RBA::EdgePair objects are accepted too and are scaled by the database unit to render micrometer-unit
+    # objects. RBA::Region, RBA::Edges and RBA::EdgePair objects are accepted as well and the corresponding 
+    # content of that collections is inserted into the output layer.
+    #
+    # Other versions are available that allow translation of objects into other types (\collect_to_polygons, 
+    # \collect_to_edges and \collect_to_edge_pairs).
+    #
+    # Because this method executes inside the interpreter, it's inherently slow. Tiling does not
+    # apply to this method.
+    #
+    # Here is a slow equivalent of the rotated method
+    #
+    # @code
+    # # Rotates by 45 degree
+    # t = RBA::DCplxTrans(1.0, 45.0, false, RBA::DVector::new)
+    # new_layer = layer.collect { |polygon| polygon.transformed(t) }
+    # @/code
+
+    # %DRC%
+    # @name collect_to_region
+    # @brief Transforms a layer into polygon objects
+    # @synopsis layer.collect { |object| ... }
+    # This method is similar to \collect, but creates a polygon layer. It expects the block to 
+    # deliver objects that can be converted into polygons. Such objects are of class RBA::DPolygon,
+    # RBA::DBox, RBA::DPath, RBA::Polygon, RBA::Path, RBA::Box and RBA::Region.
+    
+    # %DRC%
+    # @name collect_to_edges
+    # @brief Transforms a layer into edge objects
+    # @synopsis layer.collect { |object| ... }
+    # This method is similar to \collect, but creates an edge layer. It expects the block to 
+    # deliver objects that can be converted into edges. If polygon-like objects are returned, their
+    # contours will be turned into edge sequences.
+    
+    # %DRC%
+    # @name collect_to_edge_pairs
+    # @brief Transforms a layer into edge pair objects
+    # @synopsis layer.collect { |object| ... }
+    # This method is similar to \collect, but creates an edge pair layer. It expects the block to 
+    # deliver RBA::EdgePair, RBA::DEdgePair or RBA::EdgePairs objects.
+    
+    %w(collect collect_to_region collect_to_edges collect_to_edge_pairs).each do |f| 
+      eval &lt;&lt;"CODE"
+      def #{f}(&amp;block)
+
+        if :#{f} == :collect
+          new_data = @data.class.new
+        elsif :#{f} == :collect_to_region
+          new_data = RBA::Region.new
+        elsif :#{f} == :collect_to_edges
+          new_data = RBA::Edges.new
+        elsif :#{f} == :collect_to_edge_pairs
+          new_data = RBA::EdgePairs.new
+        end
+
+        t = RBA::CplxTrans::new(@engine.dbu)
+        dbu_trans = RBA::VCplxTrans::new(1.0 / @engine.dbu)
+
+        @engine.run_timed("\\"select\\" in: " + @engine.src_line, @data) do
+          @data.send(new_data.is_a?(RBA::EdgePairs) ? :each : :each_merged) do |object| 
+            insert_object_into(new_data, block.call(object.transformed(t)), dbu_trans)
+          end
+        end
+
+        DRCLayer::new(@engine, new_data)
 
       end
 CODE
@@ -3008,6 +3138,30 @@ CODE
 
   private
       
+    def insert_object_into(container, object, dbu_trans)
+      if object.is_a?(Array)
+        object.each { |o| insert_object_into(container, o, dbu_trans) }
+      elsif container.is_a?(RBA::Region)
+        if object.is_a?(RBA::Region) || object.is_a?(RBA::Polygon) || object.is_a?(RBA::SimplePolygon) || object.is_a?(RBA::Box) || object.is_a?(RBA::Path)
+          container.insert(object)
+        elsif object.is_a?(RBA::DPolygon) || object.is_a?(RBA::DSimplePolygon) || object.is_a?(RBA::DBox) || object.is_a?(RBA::DPath)
+          container.insert(object.transformed(dbu_trans))
+        end
+      elsif container.is_a?(RBA::Edges)
+        if object.is_a?(RBA::Region) || object.is_a?(RBA::Edges) || object.is_a?(RBA::Edge) || object.is_a?(RBA::Polygon) || object.is_a?(RBA::SimplePolygon) || object.is_a?(RBA::Box) || object.is_a?(RBA::Path)
+          container.insert(object)
+        elsif object.is_a?(RBA::DPolygon) || object.is_a?(RBA::DSimplePolygon) || object.is_a?(RBA::DBox) || object.is_a?(RBA::DPath) || object.is_a?(RBA::DEdge)
+          container.insert(object.transformed(dbu_trans))
+        end
+      elsif container.is_a?(RBA::EdgePairs)
+        if object.is_a?(RBA::EdgePairs) || object.is_a?(RBA::EdgePair)
+          container.insert(object)
+        elsif object.is_a?(RBA::DEdgePair)
+          container.insert(object.transformed(dbu_trans))
+        end
+      end
+    end
+  
     def prep_value(a)
       if a.is_a?(RBA::DPoint)
         RBA::Point::from_dpoint(a * (1.0 / @engine.dbu.to_f))
@@ -4252,6 +4406,7 @@ CODE
       
       t = RBA::Timer::new
       t.start
+      GC.start # force a garbage collection before the operation to free unused memory
       res = yield
       t.stop
 

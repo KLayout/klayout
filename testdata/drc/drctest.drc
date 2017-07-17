@@ -546,6 +546,37 @@ a1.corners.sized(0.05).output(1060, 0)
 a1.corners(-90.0, as_boxes).sized(0.05).output(1061, 0)
 a1.corners(-90.0, as_dots).extended(0.05, 0.05, 0.05, 0.05).output(1062, 0)
 
+a1.select { |p| p.bbox.width < 0.8 }.output(1100, 0)
+a1.collect { |p| p.is_box? && p.bbox.enlarged(0.1, 0.1) }.output(1101, 0)
+a1.collect_to_region { |p| p.is_box? && p.bbox.enlarged(0.1, 0.1) }.output(1102, 0)
+a1.collect_to_edges { |p| p.is_box? && p.bbox.enlarged(0.1, 0.1) }.output(1103, 0)
+a1.collect { |p| p.is_box? && p.bbox.transformed(RBA::VCplxTrans::new(1000.0)).enlarged(120, 120) }.output(1104, 0)
+a1.collect { |p| p.is_box? && [ p.bbox.transformed(RBA::VCplxTrans::new(1000.0)).enlarged(150, 150), p.bbox.transformed(RBA::VCplxTrans::new(1000.0)).enlarged(120, 120) ] }.output(1105, 0)
+lx = polygon_layer
+a1.each { |p| p.is_box? && lx.insert(p) }
+lx.output(1106, 0)
+a1.collect { |p| p.is_box? && RBA::Region::new(p.bbox.transformed(RBA::VCplxTrans::new(1000.0))).sized(120) }.output(1107, 0)
+a1.collect { |p| p.is_box? && RBA::Polygon::new(p.bbox.transformed(RBA::VCplxTrans::new(1000.0))) }.output(1108, 0)
+a1.collect { |p| p.is_box? && RBA::DPolygon::new(p.bbox) }.output(1109, 0)
+a1.collect { |p| p.is_box? && RBA::SimplePolygon::new(p.bbox.transformed(RBA::VCplxTrans::new(1000.0))) }.output(1110, 0)
+a1.collect { |p| p.is_box? && RBA::DSimplePolygon::new(p.bbox) }.output(1111, 0)
+a1.collect_to_edges { |p| p.is_box? && p.bbox.transformed(RBA::VCplxTrans::new(1000.0)).enlarged(120, 120) }.output(1112, 0)
+a1.collect_to_edges { |p| p.is_box? && [ p.bbox.transformed(RBA::VCplxTrans::new(1000.0)).enlarged(150, 150), p.bbox.transformed(RBA::VCplxTrans::new(1000.0)).enlarged(120, 120) ] }.output(1113, 0)
+a1.collect_to_edges { |p| p.is_box? && RBA::Region::new(p.bbox.transformed(RBA::VCplxTrans::new(1000.0))).sized(120) }.output(1114, 0)
+a1.collect_to_edges { |p| p.is_box? && RBA::Polygon::new(p.bbox.transformed(RBA::VCplxTrans::new(1000.0))) }.output(1115, 0)
+a1.collect_to_edges { |p| p.is_box? && RBA::DPolygon::new(p.bbox) }.output(1116, 0)
+a1.collect_to_edges { |p| p.is_box? && RBA::SimplePolygon::new(p.bbox.transformed(RBA::VCplxTrans::new(1000.0))) }.output(1117, 0)
+a1.collect_to_edges { |p| p.is_box? && RBA::DSimplePolygon::new(p.bbox) }.output(1118, 0)
+
+a1.edges.select { |p| p.length < 0.8 }.output(1120, 0)
+a1.edges.collect { |p| p.length < 0.8 && p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1121, 0)
+a1.edges.collect_to_region { |p| p.length < 0.8 && p.bbox.enlarged(0.1, 0.1) }.output(1122, 0)
+a1.edges.collect_to_region { |p| p.length < 0.8 && p.bbox.transformed(RBA::VCplxTrans::new(1000.0)).enlarged(100, 100) }.output(1123, 0)
+
+# edge pair collect
+a1.width(1.5).collect { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1120, 0)
+a1.width(1.5).collect_to_edge_pairs { |p| p.transformed(RBA::VCplxTrans::new(1000.0)) }.output(1121, 0)
+
 puts "=== Single-cell testsuite ==="
 
 run_testsuite(0, 1)

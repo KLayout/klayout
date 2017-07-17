@@ -220,6 +220,7 @@ HEAD
       doc += "<doc>\n"
 
       doc += "<title>#{escape($title)}</title>\n"
+      doc += "<keyword name=\"#{escape($title)}\"/>\n"
 
       doc += "<topics>\n"
 

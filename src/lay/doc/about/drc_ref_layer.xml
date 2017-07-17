@@ -148,6 +148,74 @@ Clean state is the default.
 See <a href="#raw">raw</a> for some remarks about how this state is 
 propagated.
 </p>
+<h2>"collect" - Transforms a layer</h2>
+<keyword name="collect"/>
+<a name="collect"/><p>Usage:</p>
+<ul>
+<li><tt>layer.collect { |object| ... }</tt></li>
+</ul>
+<p>
+This method evaluates the block for each object in the layer and returns a new layer with the objects
+returned from the block. It is available for edge, polygon and edge pair layers.
+The corresponding objects are <class_doc href="DPolygon">DPolygon</class_doc>, <class_doc href="DEdge">DEdge</class_doc> or <class_doc href="DEdgePair">DEdgePair</class_doc>.
+</p><p>
+If the block evaluates to nil, no object is added to the output layer. If it returns an array, each of
+the objects in the array is added.
+The returned layer is of the original type and will only accept objects of the respective type. Hence,
+for polygon layers, <class_doc href="DPolygon">DPolygon</class_doc> objects need to be returned. For edge layers those need to be <class_doc href="DEdge">DEdge</class_doc>
+and for edge pair layers, they need to be <class_doc href="DEdgePair">DEdgePair</class_doc> objects. For convenience, <class_doc href="Polygon">Polygon</class_doc>, <class_doc href="Edge">Edge</class_doc>
+and <class_doc href="EdgePair">EdgePair</class_doc> objects are accepted too and are scaled by the database unit to render micrometer-unit
+objects. <class_doc href="Region">Region</class_doc>, <class_doc href="Edges">Edges</class_doc> and <class_doc href="EdgePair">EdgePair</class_doc> objects are accepted as well and the corresponding 
+content of that collections is inserted into the output layer.
+</p><p>
+Other versions are available that allow translation of objects into other types (<a href="#collect_to_polygons">collect_to_polygons</a>, 
+<a href="#collect_to_edges">collect_to_edges</a> and <a href="#collect_to_edge_pairs">collect_to_edge_pairs</a>).
+</p><p>
+Because this method executes inside the interpreter, it's inherently slow. Tiling does not
+apply to this method.
+</p><p>
+Here is a slow equivalent of the rotated method
+</p><p>
+<pre>
+# Rotates by 45 degree
+t = <class_doc href="DCplxTrans">DCplxTrans</class_doc>(1.0, 45.0, false, <class_doc href="DVector">DVector</class_doc>::new)
+new_layer = layer.collect do |polygon|
+polygon.transformed(t)
+end
+</pre>
+</p>
+<h2>"collect_to_edge_pairs" - Transforms a layer into edge pair objects</h2>
+<keyword name="collect_to_edge_pairs"/>
+<a name="collect_to_edge_pairs"/><p>Usage:</p>
+<ul>
+<li><tt>layer.collect { |object| ... }</tt></li>
+</ul>
+<p>
+This method is similar to <a href="#collect">collect</a>, but creates an edge pair layer. It expects the block to 
+deliver <class_doc href="EdgePair">EdgePair</class_doc>, <class_doc href="DEdgePair">DEdgePair</class_doc> or <class_doc href="EdgePairs">EdgePairs</class_doc> objects.
+</p>
+<h2>"collect_to_edges" - Transforms a layer into edge objects</h2>
+<keyword name="collect_to_edges"/>
+<a name="collect_to_edges"/><p>Usage:</p>
+<ul>
+<li><tt>layer.collect { |object| ... }</tt></li>
+</ul>
+<p>
+This method is similar to <a href="#collect">collect</a>, but creates an edge layer. It expects the block to 
+deliver objects that can be converted into edges. If polygon-like objects are returned, their
+contours will be turned into edge sequences.
+</p>
+<h2>"collect_to_region" - Transforms a layer into polygon objects</h2>
+<keyword name="collect_to_region"/>
+<a name="collect_to_region"/><p>Usage:</p>
+<ul>
+<li><tt>layer.collect { |object| ... }</tt></li>
+</ul>
+<p>
+This method is similar to <a href="#collect">collect</a>, but creates a polygon layer. It expects the block to 
+deliver objects that can be converted into polygons. Such objects are of class <class_doc href="DPolygon">DPolygon</class_doc>,
+<class_doc href="DBox">DBox</class_doc>, <class_doc href="DPath">DPath</class_doc>, <class_doc href="Polygon">Polygon</class_doc>, <class_doc href="Path">Path</class_doc>, <class_doc href="Box">Box</class_doc> and <class_doc href="Region">Region</class_doc>.
+</p>
 <h2>"corners" - Selects corners of polygons</h2>
 <keyword name="corners"/>
 <a name="corners"/><p>Usage:</p>
@@ -177,6 +245,7 @@ The following image shows the effect of this method
 <tr>
 <td><img src="/images/drc_corners1.png"/></td>
 <td><img src="/images/drc_corners2.png"/></td>
+<td><img src="/images/drc_corners3.png"/></td>
 </tr>
 </table>
 </p>
@@ -208,6 +277,19 @@ layer. Using the dup method will avoid that.
 </p><p>
 However, dup will double the memory required to hold the data 
 and performing the deep copy may be expensive in terms of CPU time.
+</p>
+<h2>"each" - Iterates over the objects from the layer</h2>
+<keyword name="each"/>
+<a name="each"/><p>Usage:</p>
+<ul>
+<li><tt>layer.each { |object| ... }</tt></li>
+</ul>
+<p>
+This method evaluates the block on each object of the layer. Depending on the
+layer type, these objects are of <class_doc href="DPolygon">DPolygon</class_doc>, <class_doc href="DEdge">DEdge</class_doc> or <class_doc href="DEdgePair">DEdgePair</class_doc> type.
+</p><p>
+Because this method executes inside the interpreter, it's inherently slow. Tiling does not
+apply to this method.
 </p>
 <h2>"edge_pairs?" - Returns true, if the layer is an edge pair collection</h2>
 <keyword name="edge_pairs?"/>
@@ -1418,6 +1500,28 @@ The following images shows the effect of the "scaled" method:
 <p>
 Applies to edge pair collections only.
 Returns the second edges of the edge pairs in the collection.
+</p>
+<h2>"select" - Selects edges, edge pairs or polygons based on evaluation of a block</h2>
+<keyword name="select"/>
+<a name="select"/><p>Usage:</p>
+<ul>
+<li><tt>layer.select { |object| ... }</tt></li>
+</ul>
+<p>
+This method evaluates the block and returns a new container with those objects for which
+the block evaluates to true. It is available for edge, polygon and edge pair layers.
+The corresponding objects are <class_doc href="DPolygon">DPolygon</class_doc>, <class_doc href="DEdge">DEdge</class_doc> or <class_doc href="DEdgePair">DEdgePair</class_doc>.
+</p><p>
+Because this method executes inside the interpreter, it's inherently slow. Tiling does not
+apply to this method.
+</p><p>
+Here is a (slow) equivalent of the area selection method:
+</p><p>
+<pre>
+new_layer = layer.select do |polygon|
+polygon.area &gt;= 10.0
+end
+</pre>
 </p>
 <h2>"select_inside" - Selects shapes or regions of self which are inside the other region</h2>
 <keyword name="select_inside"/>

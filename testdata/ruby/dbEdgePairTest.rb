@@ -62,7 +62,10 @@ class DBEdgePair_TestClass < TestBase
     assert_equal(ep.normalized.to_s, "(10,20;0,0)/(-10,0;-10,30)")
 
     assert_equal(ep.transformed(RBA::DTrans::new(1)).to_s, "(0,0;-20,10)/(0,-10;-30,-10)")
+    assert_equal(ep.transformed(RBA::DCplxTrans::new(2.5)).class.to_s, "RBA::DEdgePair")
     assert_equal(ep.transformed(RBA::DCplxTrans::new(2.5)).to_s, "(0,0;25,50)/(-25,0;-25,75)")
+    assert_equal(ep.transformed(RBA::VCplxTrans::new(2.5)).class.to_s, "RBA::EdgePair")
+    assert_equal(ep.transformed(RBA::VCplxTrans::new(2.5)).to_s, "(0,0;25,50)/(-25,0;-25,75)")
 
     assert_equal(ep.polygon(0).to_s, "(-10,0;-10,30;0,0;10,20)")
     assert_equal(ep.polygon(0).class.to_s, "RBA::DPolygon")

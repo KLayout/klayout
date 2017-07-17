@@ -96,6 +96,10 @@ class DBEdge_TestClass < TestBase
     assert_equal( a.to_s, "(6,2;-2,2)" )
 
     assert_equal( a.transformed(RBA::DCplxTrans::new(2.2)).to_s, "(13.2,4.4;-4.4,4.4)" )
+    assert_equal( a.transformed(RBA::DCplxTrans::new(2.2)).class.to_s, "RBA::DEdge" )
+
+    assert_equal( a.transformed(RBA::VCplxTrans::new(22)).to_s, "(132,44;-44,44)" )
+    assert_equal( a.transformed(RBA::VCplxTrans::new(22)).class.to_s, "RBA::Edge" )
 
     assert_equal( RBA::DEdge::new( -1, -5, -1, -1 ).crossed_by?( a ), true )
     assert_equal( RBA::DEdge::new( -1, -5, -1, -1 ).crossing_point( a ).to_s, "-1,2" )

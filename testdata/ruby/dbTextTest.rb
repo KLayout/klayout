@@ -68,7 +68,12 @@ class DBText_TestClass < TestBase
     assert_equal( b.to_s, "('hallo',m45 6,7)" )
 
     m = RBA::DCplxTrans::new( RBA::DTrans::new, 1.5 )
+    assert_equal( a.transformed(m).class.to_s, "RBA::DText" )
     assert_equal( a.transformed(m).to_s, "('hallo',m45 9,10.5)" )
+
+    m = RBA::VCplxTrans::new( 1000.0 )
+    assert_equal( a.transformed(m).class.to_s, "RBA::Text" )
+    assert_equal( a.transformed(m).to_s, "('hallo',m45 6000,7000)" )
 
   end
 

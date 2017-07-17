@@ -659,6 +659,11 @@ static db::SimplePolygon dspolygon_to_spolygon (const db::DSimplePolygon *p, dou
   return db::SimplePolygon (*p * (1.0 / dbu), false);
 }
 
+static db::SimplePolygon transformed_vplx_sp (const db::DSimplePolygon *p, const db::VCplxTrans &t)
+{
+  return p->transformed (t, false /*no compression*/);
+}
+
 Class<db::DSimplePolygon> decl_DSimplePolygon ("DSimplePolygon",
   constructor ("new|#from_ipoly", &dspolygon_from_ispolygon, gsi::arg ("polygon"),
     "@brief Creates a floating-point coordinate polygon from an integer coordinate polygon"
@@ -684,6 +689,16 @@ Class<db::DSimplePolygon> decl_DSimplePolygon ("DSimplePolygon",
     "@param t The transformation to apply.\n"
     "\n"
     "This method has been introduced in version 0.24.\n"
+  ) +
+  method_ext ("transformed", &transformed_vplx_sp,
+    "@brief Transforms the polygon with the given complex transformation\n"
+    "\n"
+    "@args t\n"
+    "\n"
+    "@param t The magnifying transformation to apply\n"
+    "@return The transformed polygon (in this case an integer coordinate polygon)\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
   ) +
   simple_polygon_defs<db::DSimplePolygon>::methods (),
   "@brief A simple polygon class\n"
@@ -1779,6 +1794,11 @@ static db::Polygon dpolygon_to_polygon (const db::DPolygon *p, double dbu)
   return db::Polygon (*p * (1.0 / dbu), false);
 }
 
+static db::Polygon transformed_vcplx_dp (const db::DPolygon *p, const db::VCplxTrans &t)
+{
+  return p->transformed (t, false /*don't compress*/);
+}
+
 Class<db::DPolygon> decl_DPolygon ("DPolygon",
   constructor ("new|#from_ipoly", &dpolygon_from_ipolygon, gsi::arg ("polygon"),
     "@brief Creates a floating-point coordinate polygon from an integer coordinate polygon\n"
@@ -1804,6 +1824,16 @@ Class<db::DPolygon> decl_DPolygon ("DPolygon",
     "@param t The transformation to apply.\n"
     "\n"
     "This method has been introduced in version 0.24.\n"
+  ) +
+  method_ext ("transformed", &transformed_vcplx_dp,
+    "@brief Transforms the polygon with the given complex transformation\n"
+    "\n"
+    "@args t\n"
+    "\n"
+    "@param t The magnifying transformation to apply\n"
+    "@return The transformed polygon (in this case an integer coordinate polygon)\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
   ) +
   polygon_defs<db::DPolygon>::methods (),
   "@brief A polygon class\n"

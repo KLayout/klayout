@@ -124,7 +124,11 @@ class DBBox_TestClass < TestBase
     t = RBA::DTrans::new( RBA::DTrans::R90, RBA::DPoint::new( 5, 6 ))
     assert_equal( b.transformed(t).to_s, "(-17,7;6,23)" )
     m = RBA::DCplxTrans::new( t, 1.5 )
+    assert_equal( b.transformed(m).class.to_s, "RBA::DBox" )
     assert_equal( b.transformed(m).to_s, "(-28,7.5;6.5,31.5)" )
+    m = RBA::VCplxTrans::new( 1000.0 )
+    assert_equal( b.transformed(m).class.to_s, "RBA::Box" )
+    assert_equal( b.transformed(m).to_s, "(1000,-1000;17000,22000)" )
 
   end
 

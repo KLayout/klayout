@@ -265,6 +265,16 @@ Class<db::DEdgePair> decl_DEdgePair ("DEdgePair",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
+  method ("transformed", &db::DEdgePair::transformed<db::VCplxTrans>,
+    "@brief Transforms the edge pair with the given complex transformation\n"
+    "\n"
+    "@args t\n"
+    "\n"
+    "@param t The magnifying transformation to apply\n"
+    "@return The transformed edge pair (in this case an integer coordinate edge pair)\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
   edge_pair_defs<db::DEdgePair>::methods (),
   "@brief An edge pair (a pair of two edges)\n"
   "Edge pairs are objects representing two edges or parts of edges. They play a role mainly in the context "

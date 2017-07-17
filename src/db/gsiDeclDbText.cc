@@ -446,6 +446,16 @@ Class<db::DText> decl_DText ("DText",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
+  method ("transformed", &db::DText::transformed<db::VCplxTrans>,
+    "@brief Transforms the text with the given complex transformation\n"
+    "\n"
+    "@args t\n"
+    "\n"
+    "@param t The magnifying transformation to apply\n"
+    "@return The transformed text (in this case an integer coordinate text)\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
   text_defs<db::DText>::methods (),
   "@brief A text object\n"
   "\n"

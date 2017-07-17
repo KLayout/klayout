@@ -488,7 +488,7 @@ Class<db::Box> decl_Box ("Box",
     "This method has been introduced in version 0.25."
   ) +
   method ("transformed", &db::Box::transformed<db::ICplxTrans>,
-    "@brief Transform the box with the given complex transformation\n"
+    "@brief Transforms the box with the given complex transformation\n"
     "\n"
     "@args t\n"
     "\n"
@@ -542,6 +542,16 @@ Class<db::DBox> decl_DBox ("DBox",
     "coordinates will be divided by the database unit.\n"
     "\n"
     "This method has been introduced in version 0.25."
+  ) +
+  method ("transformed", &db::DBox::transformed<db::VCplxTrans>,
+    "@brief Transforms the box with the given complex transformation\n"
+    "\n"
+    "@args t\n"
+    "\n"
+    "@param t The magnifying transformation to apply\n"
+    "@return The transformed box (in this case an integer coordinate box)\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
   ) +
   box_defs<db::DBox>::methods (),
   "@brief A box class with floating-point coordinates\n"

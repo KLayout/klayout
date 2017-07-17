@@ -65,12 +65,17 @@ class DBSimplePolygon_TestClass < TestBase
     assert_equal( b.to_s, "(6,-10;6,15;21,15;21,-10)" )
 
     m = RBA::DCplxTrans::new( RBA::DTrans::new, 1.5 )
+    assert_equal( a.transformed(m).class.to_s, "RBA::DSimplePolygon" )
     assert_equal( a.transformed(m).to_s, "(9,-15;9,22.5;31.5,22.5;31.5,-15)" )
     assert_equal( a.to_s, "(6,-10;6,15;21,15;21,-10)" )
 
     b = a.dup
     b.transform(m)
     assert_equal( b.to_s, "(9,-15;9,22.5;31.5,22.5;31.5,-15)" )
+
+    m = RBA::VCplxTrans::new( 1000.0 )
+    assert_equal( a.transformed(m).class.to_s, "RBA::SimplePolygon" )
+    assert_equal( a.transformed(m).to_s, "(6000,-10000;6000,15000;21000,15000;21000,-10000)" )
 
     a.points = [ RBA::DPoint::new( 0, 1 ), RBA::DPoint::new( 1, 1 ), RBA::DPoint::new( 1, 5 ) ]
     assert_equal( a.bbox.to_s, "(0,1;1,5)" )

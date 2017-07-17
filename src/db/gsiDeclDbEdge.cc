@@ -661,6 +661,16 @@ Class<db::DEdge> decl_DEdge ("DEdge",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
+  method ("transformed", &db::DEdge::transformed<db::VCplxTrans>,
+    "@brief Transforms the edge with the given complex transformation\n"
+    "\n"
+    "@args t\n"
+    "\n"
+    "@param t The magnifying transformation to apply\n"
+    "@return The transformed edge (in this case an integer coordinate edge)\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
   edge_defs<db::DEdge>::methods (),
   "@brief An edge class\n"
   "\n"

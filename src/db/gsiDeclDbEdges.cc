@@ -1425,6 +1425,13 @@ Class<db::Edges> dec_Edges ("Edges",
   gsi::iterator ("each", &db::Edges::begin,
     "@brief Returns each edge of the region\n"
   ) +
+  gsi::iterator ("each_merged", &db::Edges::begin_merged,
+    "@brief Returns each edge of the region\n"
+    "\n"
+    "In contrast to \\each, this method delivers merged edges if merge semantics applies while \\each delivers the original edges only.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
   method ("[]", &db::Edges::nth,
     "@brief Returns the nth edge of the edge collection\n"
     "@args n\n"

@@ -76,7 +76,12 @@ class DBPath_TestClass < TestBase
     assert_equal( b.to_s, "(1,1;3,2;2,5) w=2.5 bx=-0.5 ex=1.5 r=false" )
 
     m = RBA::DCplxTrans::new( RBA::DTrans::new, 1.5 )
+    assert_equal( a.transformed(m).class.to_s, "RBA::DPath")
     assert_equal( a.transformed(m).to_s, "(1.5,1.5;4.5,3;3,7.5) w=3.75 bx=-0.75 ex=2.25 r=false" )
+
+    m = RBA::VCplxTrans::new(1000.0)
+    assert_equal( a.transformed(m).class.to_s, "RBA::Path")
+    assert_equal( a.transformed(m).to_s, "(1000,1000;3000,2000;2000,5000) w=2500 bx=-500 ex=1500 r=false" )
 
     a.points = [ RBA::DPoint::new( 0, 1 ), RBA::DPoint::new( 1, 1 ), RBA::DPoint::new( 1, 5 ) ]
     a.width = 2.0

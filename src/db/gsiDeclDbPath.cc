@@ -447,6 +447,16 @@ Class<db::DPath> decl_DPath ("DPath",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
+  method ("transformed", &db::DPath::transformed<db::VCplxTrans>,
+    "@brief Transforms the polygon with the given complex transformation\n"
+    "\n"
+    "@args t\n"
+    "\n"
+    "@param t The magnifying transformation to apply\n"
+    "@return The transformed path (in this case an integer coordinate path)\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
   path_defs<db::DPath>::methods (),
   "@brief A path class\n"
   "\n"

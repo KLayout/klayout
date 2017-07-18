@@ -26,30 +26,116 @@
 
 #include "tlAssert.h"
 
+#include <cmath>
+
 namespace tl
 {
 
 /**
- *  @brief Compute the largest common divider of two numbers using the euclidian method
+ *  @brief A generic less operator
  */
 template <class T>
-T lcd (T a, T b)
+bool less (T a, T b)
 {
-  while (true) {
-    if (a < b) {
-      b %= a;
-      if (b == 0) {
-        return a;
-      }
-    } else if (b < a) {
-      a %= b;
-      if (a == 0) {
-        return b;
-      }
-    } else {
-      return a;
-    }
+  return a < b;
+}
+
+/**
+ *  @brief A generic equal operator
+ */
+template <class T>
+bool equal (T a, T b)
+{
+  return a == b;
+}
+
+/**
+ *  @brief A generalization of the modulo operator
+ */
+template <class T>
+T modulo (T a, T b)
+{
+  return a % b;
+}
+
+/**
+ *  @brief A common uncertainty value for double compares
+ *  This implementation uses an uncertainty value of 1e-10
+ *  which is suitable for values in the order of 1.
+ */
+const double epsilon = 1e-10;
+
+/**
+ *  @brief A specialization for double values
+ */
+bool less (double a, double b)
+{
+  return a < b - tl::epsilon;
+}
+
+/**
+ *  @brief A specialization for double values
+ */
+bool equal (double a, double b)
+{
+  return fabs (a - b) < tl::epsilon;
+}
+
+/**
+ *  @brief A specialization of the modulo operator for doubles
+ *  a % b == a - b * floor (a / b)
+ */
+double modulo (double a, double b)
+{
+  return a - b * floor (a / b + tl::epsilon);
+}
+
+/**
+ *  @brief Compute the greatest common divider of two numbers using the euclidian method
+ */
+template <class T>
+T gcd (T a, T b)
+{
+  while (! equal (b, T (0))) {
+    T h = modulo (a, b);
+    a = b;
+    b = h;
   }
+  return a;
+}
+
+/**
+ *  @brief Compute the lowest common multiple of two numbers using the euclidian method
+ */
+template <class T>
+T lcm (T a, T b)
+{
+  return a * (b / gcd (a, b));
+}
+
+/**
+ *  @brief Rounding down to the closest multiple of g
+ */
+double round_down (double x, double g)
+{
+  return g * floor (x / g + tl::epsilon);
+}
+
+/**
+ *  @brief Rounding up to the closest multiple of g
+ */
+double round_up (double x, double g)
+{
+  return g * ceil (x / g - tl::epsilon);
+}
+
+/**
+ *  @brief Rounding to the closest multiple of g
+ *  A value of (n+1/2)*g is rounded down.
+ */
+double round (double x, double g)
+{
+  return g * floor (0.5 + x / g - tl::epsilon);
 }
 
 }

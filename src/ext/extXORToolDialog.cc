@@ -31,6 +31,7 @@
 #include "tlProgress.h"
 #include "tlThreadedWorkers.h"
 #include "tlExceptions.h"
+#include "tlMath.h"
 #include "layCellView.h"
 #include "layLayoutView.h"
 #include "layApplication.h"
@@ -1181,7 +1182,12 @@ XORToolDialog::run_xor ()
     }
     XORJob job (nworkers, output_mode, op, el_handling, dbu, cva, cvb, tolerances, sub_categories, layer_categories, sub_cells, sub_output_layers, rdb, rdb_cell);
 
-    for (std::vector<db::DBox>::const_iterator box = boxes.begin (); box != boxes.end (); ++box) {
+    double common_dbu = tl::lcm (cva->layout ().dbu (), cvb->layout ().dbu ());
+
+    for (std::vector<db::DBox>::const_iterator b = boxes.begin (); b != boxes.end (); ++b) {
+
+      db::DBox box (tl::round_down (b->left (), common_dbu), tl::round_down (b->bottom (), common_dbu),
+                    tl::round_up (b->right (), common_dbu), tl::round_up (b->top (), common_dbu));
 
       //  compute the tiles if required
       db::Box box_a, box_b, box_out;
@@ -1189,33 +1195,34 @@ XORToolDialog::run_xor ()
       db::Coord box_width_b = 0, box_height_b = 0, box_height_out = 0;
 
       size_t ntiles_w = 1, ntiles_h = 1;
-      if (box->empty ()) {
+      if (box.empty ()) {
 
         ntiles_w = ntiles_h = 0;
 
-      } else if (tile_size > 0.0) {
-
-        box_a = db::Box (*box * (1.0 / cva->layout ().dbu ()));
-        box_b = db::Box (*box * (1.0 / cvb->layout ().dbu ()));
-        box_out = db::Box (*box * (1.0 / dbu));
-
-        ntiles_w = std::max (size_t (1), size_t (floor (box->width () / tile_size + 0.5)));
-        ntiles_h = std::max (size_t (1), size_t (floor (box->height () / tile_size + 0.5)));
-
-        box_width_a  = box_a.width () / ntiles_w;
-        box_height_a = box_a.height () / ntiles_h;
-
-        box_width_b  = box_b.width () / ntiles_w;
-        box_height_b = box_b.height () / ntiles_h;
-
-        box_width_out  = box_out.width () / ntiles_w;
-        box_height_out = box_out.height () / ntiles_h;
-
       } else {
 
-        box_a = db::Box (*box * (1.0 / cva->layout ().dbu ()));
-        box_b = db::Box (*box * (1.0 / cvb->layout ().dbu ()));
-        box_out = db::Box (*box * (1.0 / dbu));
+        box_a = db::Box (box * (1.0 / cva->layout ().dbu ()));
+        box_b = db::Box (box * (1.0 / cvb->layout ().dbu ()));
+        box_out = db::Box (box * (1.0 / dbu));
+
+        if (tile_size > 0.0) {
+
+          ntiles_w = std::max (size_t (1), size_t (floor (box.width () / tile_size + 0.5)));
+          ntiles_h = std::max (size_t (1), size_t (floor (box.height () / tile_size + 0.5)));
+
+          double box_width = tl::round_up (box.width () / ntiles_w, common_dbu);
+          double box_height = tl::round_up (box.height () / ntiles_h, common_dbu);
+
+          box_width_a  = db::coord_traits<db::Coord>::rounded (box_width / cva->layout ().dbu ());
+          box_height_a  = db::coord_traits<db::Coord>::rounded (box_height / cva->layout ().dbu ());
+
+          box_width_b  = db::coord_traits<db::Coord>::rounded (box_width / cvb->layout ().dbu ());
+          box_height_b  = db::coord_traits<db::Coord>::rounded (box_height / cvb->layout ().dbu ());
+
+          box_width_out  = db::coord_traits<db::Coord>::rounded (box_width / dbu);
+          box_height_out  = db::coord_traits<db::Coord>::rounded (box_height / dbu);
+
+        }
 
       }
 

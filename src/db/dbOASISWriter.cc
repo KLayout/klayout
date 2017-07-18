@@ -1792,7 +1792,7 @@ OASISWriter::write (const Repetition &rep)
           x = -x;
         }
         if (x != 0) {
-          g = (g == 0) ? x : tl::lcd (g, x);
+          g = (g == 0) ? x : tl::gcd (g, x);
         }
 
         db::Coord y = safe_scale (m_sf, p->y ());
@@ -1800,7 +1800,7 @@ OASISWriter::write (const Repetition &rep)
           y = -y;
         }
         if (y != 0) {
-          g = (g == 0) ? y : tl::lcd (g, y);
+          g = (g == 0) ? y : tl::gcd (g, y);
         }
 
       }

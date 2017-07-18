@@ -27,6 +27,7 @@
 #include "dbShapeProcessor.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbClip.h"
+#include "dbLayoutUtils.h"
 #include "tlTimer.h"
 #include "tlProgress.h"
 #include "tlThreadedWorkers.h"
@@ -436,7 +437,7 @@ public:
     return m_tolerances;
   }
 
-  const std::vector <std::vector <unsigned int> > sub_output_layers () const
+  const std::vector <std::vector <unsigned int> > &sub_output_layers () const
   {
     return m_sub_output_layers;
   }
@@ -490,7 +491,16 @@ public:
 
       subcell = m_sub_cells[tol_index];
       layout_layer = m_sub_output_layers[tol_index][layer_index];
-      subcell->shapes (layout_layer).insert (polygon);
+
+      double factor = 1.0;
+      if (subcell->layout ()) {
+        factor = dbu () / subcell->layout ()->dbu ();
+      }
+      if (tl::equal (factor, 1.0)) {
+        subcell->shapes (layout_layer).insert (polygon);
+      } else {
+        subcell->shapes (layout_layer).insert (db::Polygon (polygon * factor));
+      }
 
     }
   }
@@ -1289,6 +1299,11 @@ XORToolDialog::run_xor ()
       //  TODO: there should be a general scheme of how thread-specific progress is merged
       //  into a global one ..
       tl::RelativeProgress progress (tl::to_string (QObject::tr ("Performing ")) + op_name, todo_count, 1);
+
+      //  We need to lock the layouts during the processing - in OMNewLayerA and OMNewLayerB mode
+      //  we actually modify the layout we iterate over
+      db::LayoutLocker locker_a (& cva->layout ());
+      db::LayoutLocker locker_b (& cvb->layout ());
 
       try {
 

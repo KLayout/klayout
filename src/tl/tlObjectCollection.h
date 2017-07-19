@@ -41,20 +41,21 @@ namespace tl
  *  It is based on a opaque internal iterator (Iter) which provides the standard
  *  compare and assignment methods.
  */
-template <class T, class Iter, bool Shared>
+template <class T, class Holder, bool Shared>
 class weak_or_shared_collection_iterator
-  : public Iter
 {
 public:
   typedef T value_type;
   typedef T &reference;
   typedef T *pointer;
+  typedef std::bidirectional_iterator_tag iterator_category;
+  typedef std::ptrdiff_t difference_type;
 
   /**
    *  @brief Default constructor
    */
   weak_or_shared_collection_iterator ()
-    : Iter ()
+    : mp_holder (0)
   {
     //  .. nothing yet ..
   }
@@ -62,10 +63,26 @@ public:
   /**
    *  @brief Constructor from the internal iterator type
    */
-  weak_or_shared_collection_iterator (Iter i)
-    : Iter (i)
+  weak_or_shared_collection_iterator (Holder *holder)
+    : mp_holder (holder)
   {
     //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Equality of iterators
+   */
+  bool operator== (const weak_or_shared_collection_iterator &other) const
+  {
+    return mp_holder == other.mp_holder;
+  }
+
+  /**
+   *  @brief Inequality of iterators
+   */
+  bool operator!= (const weak_or_shared_collection_iterator &other) const
+  {
+    return mp_holder != other.mp_holder;
   }
 
   /**
@@ -74,9 +91,8 @@ public:
    */
   reference operator* () const
   {
-    T *t = dynamic_cast<T *> (Iter::operator* ().operator-> ());
-    tl_assert (t != 0);
-    return *t;
+    tl_assert (mp_holder != 0);
+    return mp_holder->operator* ();
   }
 
   /**
@@ -84,63 +100,64 @@ public:
    */
   pointer operator-> () const
   {
-    return dynamic_cast<T *> (Iter::operator* ().operator-> ());
-  }
-
-  /**
-   *  @brief Returns the iterator offset by the distance d.
-   */
-  weak_or_shared_collection_iterator<T, Iter, Shared> operator+ (typename Iter::difference_type d) const
-  {
-    return weak_or_shared_collection_iterator<T, Iter, Shared> (Iter::operator+ (d));
-  }
-
-  /**
-   *  @brief Offsets the iterator by the distance d.
-   */
-  weak_or_shared_collection_iterator<T, Iter, Shared> operator+= (typename Iter::difference_type d) const
-  {
-    Iter::operator+= (d);
-    return *this;
+    tl_assert (mp_holder != 0);
+    return mp_holder->operator-> ();
   }
 
   /**
    *  @brief Pre-decrement
    */
-  weak_or_shared_collection_iterator<T, Iter, Shared> &operator-- ()
+  weak_or_shared_collection_iterator<T, Holder, Shared> &operator-- ()
   {
-    Iter::operator-- ();
+    tl_assert (mp_holder);
+    mp_holder = mp_holder->prev;
     return *this;
   }
 
   /**
    *  @brief Post-decrement
    */
-  weak_or_shared_collection_iterator<T, Iter, Shared> operator-- (int n)
+  weak_or_shared_collection_iterator<T, Holder, Shared> operator-- (int n)
   {
-    weak_or_shared_collection_iterator<T, Iter, Shared> ret = *this;
-    Iter::operator-- (n);
+    weak_or_shared_collection_iterator<T, Holder, Shared> ret = *this;
+    while (n-- > 0) {
+      operator-- ();
+    }
     return ret;
   }
 
   /**
    *  @brief Pre-increment
    */
-  weak_or_shared_collection_iterator<T, Iter, Shared> &operator++ ()
+  weak_or_shared_collection_iterator<T, Holder, Shared> &operator++ ()
   {
-    Iter::operator++ ();
+    tl_assert (mp_holder);
+    mp_holder = mp_holder->next;
     return *this;
   }
 
   /**
    *  @brief Post-increment
    */
-  weak_or_shared_collection_iterator<T, Iter, Shared> operator++ (int n)
+  weak_or_shared_collection_iterator<T, Holder, Shared> operator++ (int n)
   {
-    weak_or_shared_collection_iterator<T, Iter, Shared> ret = *this;
-    Iter::operator++ (n);
+    weak_or_shared_collection_iterator<T, Holder, Shared> ret = *this;
+    while (n-- > 0) {
+      operator++ ();
+    }
     return ret;
   }
+
+  /**
+   *  @brief Internal: access to the holder object
+   */
+  Holder *holder () const
+  {
+    return mp_holder;
+  }
+
+public:
+  Holder *mp_holder;
 };
 
 /**
@@ -155,28 +172,30 @@ public:
 template <class T, bool Shared>
 class weak_or_shared_collection
 {
-private:
+public:
   class holder_type
     : public weak_or_shared_ptr<T, Shared>
   {
   public:
     holder_type (weak_or_shared_collection<T, Shared> *collection)
-      : weak_or_shared_ptr<T, Shared> (), mp_collection (collection)
+      : weak_or_shared_ptr<T, Shared> (), next (0), prev (0), mp_collection (collection)
     {
       //  .. nothing yet ..
     }
 
     holder_type (weak_or_shared_collection<T, Shared> *collection, T *t)
-      : weak_or_shared_ptr<T, Shared> (t), mp_collection (collection)
+      : weak_or_shared_ptr<T, Shared> (t), next (0), prev (0), mp_collection (collection)
     {
       //  .. nothing yet ..
     }
 
     holder_type (weak_or_shared_collection<T, Shared> *collection, const weak_or_shared_ptr<T, Shared> &d)
-      : weak_or_shared_ptr<T, Shared> (d), mp_collection (collection)
+      : weak_or_shared_ptr<T, Shared> (d), next (0), prev (0), mp_collection (collection)
     {
       //  .. nothing yet ..
     }
+
+    holder_type *next, *prev;
 
   protected:
     virtual void reset_object ()
@@ -192,11 +211,8 @@ private:
     weak_or_shared_collection<T, Shared> *mp_collection;
   };
 
-  typedef std::vector<holder_type> basic_vector_type;
-
-public:
-  typedef weak_or_shared_collection_iterator<T, typename basic_vector_type::iterator, Shared> iterator;
-  typedef weak_or_shared_collection_iterator<const T, typename basic_vector_type::const_iterator, Shared> const_iterator;
+  typedef weak_or_shared_collection_iterator<T, holder_type, Shared> iterator;
+  typedef weak_or_shared_collection_iterator<const T, holder_type, Shared> const_iterator;
   typedef T value_type;
   typedef T &reference;
   typedef T *pointer;
@@ -205,8 +221,18 @@ public:
    *  @brief The default constructor
    */
   weak_or_shared_collection ()
-    : m_c ()
+    : mp_first (0), mp_last (0), m_size (0)
   {
+  }
+
+  /**
+   *  @brief Destructor
+   */
+  ~weak_or_shared_collection ()
+  {
+    while (! empty ()) {
+      erase (mp_first);
+    }
   }
 
   /**
@@ -214,15 +240,15 @@ public:
    */
   bool empty () const
   {
-    return m_c.empty ();
+    return mp_first == 0;
   }
 
   /**
    *  @brief Returns the size of the collection
    */
-  typename basic_vector_type::size_type size () const
+  size_t size () const
   {
-    return m_c.size ();
+    return m_size;
   }
 
   /**
@@ -230,11 +256,12 @@ public:
    */
   void clear ()
   {
-    if (! m_c.empty ()) {
-      m_about_to_change ();
-      m_c.clear ();
-      m_changed ();
+    m_about_to_change ();
+    while (! empty ()) {
+      erase (mp_first);
     }
+    tl_assert (m_size == 0);
+    m_changed ();
   }
 
   /**
@@ -244,11 +271,15 @@ public:
    */
   void erase (T *t)
   {
-    for (iterator i = begin (); i != end (); ++i) {
-      if (i.operator->() == t) {
-        erase (i);
-        break;
-      }
+    holder_type *h = mp_first;
+    while (h && h->operator-> () != t) {
+      h = h->next;
+    }
+
+    if (h) {
+      m_about_to_change ();
+      erase (h);
+      m_changed ();
     }
   }
 
@@ -260,7 +291,7 @@ public:
   void erase (iterator i)
   {
     m_about_to_change ();
-    m_c.erase (i);
+    erase (i.holder ());
     m_changed ();
   }
 
@@ -271,7 +302,7 @@ public:
   void insert (iterator before, T *object)
   {
     m_about_to_change ();
-    m_c.insert (before, holder_type (this, object));
+    insert (before.holder (), new holder_type (this, object));
     m_changed ();
   }
 
@@ -282,7 +313,7 @@ public:
   void insert (iterator before, const weak_or_shared_ptr<T, Shared> &object)
   {
     m_about_to_change ();
-    m_c.insert (before, holder_type (this, object));
+    insert (before.holder (), new holder_type (this, object));
     m_changed ();
   }
 
@@ -293,7 +324,7 @@ public:
   void push_back (T *object)
   {
     m_about_to_change ();
-    m_c.insert (m_c.end (), holder_type (this, object));
+    insert (0, new holder_type (this, object));
     m_changed ();
   }
 
@@ -304,7 +335,7 @@ public:
   void push_back (const weak_or_shared_ptr<T, Shared> &object)
   {
     m_about_to_change ();
-    m_c.insert (m_c.end (), holder_type (this, object));
+    insert (0, new holder_type (this, object));
     m_changed ();
   }
 
@@ -317,7 +348,7 @@ public:
   {
     if (! empty ()) {
       m_about_to_change ();
-      m_c.pop_back ();
+      erase (mp_last);
       m_changed ();
     }
   }
@@ -327,7 +358,7 @@ public:
    */
   typename iterator::pointer front ()
   {
-    return begin ().operator-> ();
+    return mp_first->operator-> ();
   }
 
   /**
@@ -335,7 +366,7 @@ public:
    */
   typename iterator::pointer back ()
   {
-    return (--end ()).operator-> ();
+    return mp_last->operator-> ();
   }
 
   /**
@@ -343,7 +374,7 @@ public:
    */
   typename const_iterator::pointer front () const
   {
-    return begin ().operator-> ();
+    return mp_first->operator-> ();
   }
 
   /**
@@ -351,23 +382,7 @@ public:
    */
   typename const_iterator::pointer back () const
   {
-    return (--end ()).operator-> ();
-  }
-
-  /**
-   *  @brief Gets a pointer to the nth object in the collection
-   */
-  typename iterator::pointer operator[] (typename iterator::difference_type i)
-  {
-    return (begin () + i).operator-> ();
-  }
-
-  /**
-   *  @brief Gets a pointer to the nth object in the collection (const version)
-   */
-  typename const_iterator::pointer operator[] (typename iterator::difference_type i) const
-  {
-    return (begin () + i).operator-> ();
+    return mp_last->operator-> ();
   }
 
   /**
@@ -375,7 +390,7 @@ public:
    */
   iterator begin ()
   {
-    return iterator (m_c.begin ());
+    return iterator (mp_first);
   }
   
   /**
@@ -383,7 +398,7 @@ public:
    */
   iterator end ()
   {
-    return iterator (m_c.end ());
+    return iterator (0);
   }
   
   /**
@@ -391,7 +406,7 @@ public:
    */
   const_iterator begin () const
   {
-    return const_iterator (m_c.begin ());
+    return const_iterator (mp_first);
   }
   
   /**
@@ -399,7 +414,7 @@ public:
    */
   const_iterator end () const
   {
-    return const_iterator (m_c.end ());
+    return const_iterator (0);
   }
 
   /**
@@ -420,24 +435,70 @@ public:
 
 private:
   friend class holder_type;
-  basic_vector_type m_c;
   QMutex m_lock;
 
   void remove_element (holder_type *h)
   {
     QMutexLocker locker (&m_lock);
     tl_assert (! empty ());
-    //  NOTE: this is a quick but somewhat dirty hack to obtain the index of an element.
-    //  It is based on the assumption that a vector's elements are stored inside a
-    //  contiguous memory array.
-    size_t index = h - &(m_c.front ());
-    tl_assert (index < m_c.size ());
     m_about_to_change ();
-    m_c.erase (m_c.begin () + index);
+    erase (h);
     m_changed ();
   }
 
+  void erase (holder_type *h)
+  {
+    if (h == mp_first) {
+      mp_first = h->next;
+    }
+    if (h == mp_last) {
+      mp_last = h->prev;
+    }
+    if (h->next) {
+      h->next->prev = h->prev;
+    }
+    if (h->prev) {
+      h->prev->next = h->next;
+    }
+
+    delete h;
+
+    --m_size;
+  }
+
+  void insert (holder_type *before, holder_type *h)
+  {
+    if (! before) {
+
+      h->prev = mp_last;
+      h->next = 0;
+      if (mp_last) {
+        mp_last->next = h;
+      }
+
+      mp_last = h;
+      if (! mp_first) {
+        mp_first = h;
+      }
+
+    } else {
+
+      h->prev = before->prev;
+      h->next = before;
+      before->prev = h;
+
+      if (before == mp_first) {
+        mp_first = h;
+      }
+
+    }
+
+    ++m_size;
+  }
+
   tl::Event m_about_to_change, m_changed;
+  holder_type *mp_first, *mp_last;
+  size_t m_size;
 };
 
 /**

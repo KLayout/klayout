@@ -1,7 +1,10 @@
 
 # in MSVC environment:
-if ENV["RUBY"] && !$:.member?(ENV["RUBY"])
-  $:.push("#{ENV["RUBY"]}/lib/ruby/#{RUBY_VERSION}")
+if ENV["RUBY"]
+  ruby_libs = "#{ENV["RUBY"]}/lib/ruby/#{RUBY_VERSION}"
+  if !$:.member?(ruby_libs)
+    $:.push(ruby_libs)
+  end
 end
 
 # Set this to true to disable some tests involving exceptions

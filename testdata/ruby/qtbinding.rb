@@ -156,8 +156,8 @@ class QtBinding_TestClass < TestBase
 
     # destroying a will also destroy aa
     a.destroy
-    assert_equal(a.destroyed?, true)
-    assert_equal(aa.destroyed?, true)
+    assert_equal(a._destroyed?, true)
+    assert_equal(aa._destroyed?, true)
 
   end
 
@@ -174,7 +174,7 @@ class QtBinding_TestClass < TestBase
     a = nil
     GC.start
 
-    assert_equal(aa.destroyed?, true)
+    assert_equal(aa._destroyed?, true)
 
   end
 
@@ -207,7 +207,7 @@ class QtBinding_TestClass < TestBase
     assert_equal(aa != nil, true)
     assert_equal(aa.class.to_s, "RBA::QAction")
     assert_equal(aa.text, "aatext")
-    assert_equal(aa.destroyed?, false)
+    assert_equal(aa._destroyed?, false)
 
   end
 
@@ -569,7 +569,7 @@ class QtBinding_TestClass < TestBase
     child = parent.viewport
 
     # ensure parent and child are working
-    assert_equal(child.destroyed?, false)
+    assert_equal(child._destroyed?, false)
 
     parent.resize(200, 200)
     assert_equal(child.width() > 100, true)
@@ -582,8 +582,8 @@ class QtBinding_TestClass < TestBase
     # now if we delete the parent, the child needs to become disconnected
 
     parent._destroy()
-    assert_equal(parent.destroyed?, true)
-    assert_equal(child.destroyed?, true)
+    assert_equal(parent._destroyed?, true)
+    assert_equal(child._destroyed?, true)
 
   end
 

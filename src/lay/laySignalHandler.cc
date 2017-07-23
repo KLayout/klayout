@@ -43,6 +43,7 @@
 #endif
 
 #include <signal.h>
+#include <QFileInfo>
 
 namespace lay
 {
@@ -234,7 +235,7 @@ static void handle_signal (int signo)
   RaiseException(signo + user_base, 0, 0, NULL);
 }
 
-static void install_signal_handlers ()
+void install_signal_handlers ()
 {
   //  disable any signal handlers that Ruby might have installed.
   signal (SIGSEGV, SIG_DFL);

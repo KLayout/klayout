@@ -88,6 +88,15 @@ def find_layer(ly, lp):
   return None
 
 
+def nh(h):
+  """
+  Returns a normalized hash representation
+  """
+  v = []
+  for k in sorted(h):
+    v.append(repr(k) + ": " + repr(h[k]))
+  return "{" + (", ".join(v)) + "}"
+
 class DBPCellTests(unittest.TestCase):
 
   def test_1(self):
@@ -132,12 +141,12 @@ class DBPCellTests(unittest.TestCase):
     self.assertEqual(pcell_var.pcell_id(), pcell_decl_id)
     self.assertEqual(pcell_var.pcell_library().__repr__(), lib.__repr__())
     self.assertEqual(pcell_var.pcell_parameters().__repr__(), "[<1/0>, 1.0, 1.0]")
-    self.assertEqual(pcell_var.pcell_parameters_by_name().__repr__(), "{'h': 1.0, 'l': <1/0>, 'w': 1.0}")
+    self.assertEqual(nh(pcell_var.pcell_parameters_by_name()), "{'h': 1.0, 'l': <1/0>, 'w': 1.0}")
     self.assertEqual(pcell_var.pcell_parameter("h").__repr__(), "1.0")
     self.assertEqual(c1.pcell_parameters(pcell_inst).__repr__(), "[<1/0>, 1.0, 1.0]")
-    self.assertEqual(c1.pcell_parameters_by_name(pcell_inst).__repr__(), "{'h': 1.0, 'l': <1/0>, 'w': 1.0}")
+    self.assertEqual(nh(c1.pcell_parameters_by_name(pcell_inst)), "{'h': 1.0, 'l': <1/0>, 'w': 1.0}")
     self.assertEqual(c1.pcell_parameter(pcell_inst, "h").__repr__(), "1.0")
-    self.assertEqual(pcell_inst.pcell_parameters_by_name().__repr__(), "{'h': 1.0, 'l': <1/0>, 'w': 1.0}")
+    self.assertEqual(nh(pcell_inst.pcell_parameters_by_name()), "{'h': 1.0, 'l': <1/0>, 'w': 1.0}")
     self.assertEqual(pcell_inst["h"].__repr__(), "1.0")
     self.assertEqual(pcell_inst["i"].__repr__(), "None")
     self.assertEqual(pcell_inst.pcell_parameter("h").__repr__(), "1.0")
@@ -146,7 +155,7 @@ class DBPCellTests(unittest.TestCase):
     self.assertEqual(pcell_inst.pcell_declaration().__repr__(), pcell_decl.__repr__())
 
     pcell_inst.change_pcell_parameter("h", 2.0)
-    self.assertEqual(pcell_inst.pcell_parameters_by_name().__repr__(), "{'h': 2.0, 'l': <1/0>, 'w': 1.0}")
+    self.assertEqual(nh(pcell_inst.pcell_parameters_by_name()), "{'h': 2.0, 'l': <1/0>, 'w': 1.0}")
     pcell_inst.set_property("abc", "a property")
     self.assertEqual(pcell_inst.property("abc").__repr__(), "'a property'")
 

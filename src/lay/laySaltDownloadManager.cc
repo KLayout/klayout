@@ -28,6 +28,7 @@
 #include <memory>
 #include <QTreeWidgetItem>
 #include <QMessageBox>
+#include <QVariant>
 
 namespace lay
 {
@@ -65,7 +66,7 @@ ConfirmationDialog::add_info (const std::string &name, bool update, const std::s
   item->setText (3, tl::to_qstring (url));
 
   for (int column = 0; column < list->colorCount (); ++column) {
-    item->setData (column, Qt::ForegroundRole, update ? Qt::blue : Qt::black);
+    item->setData (column, Qt::ForegroundRole, QVariant (QBrush (update ? Qt::blue : Qt::black)));
   }
 }
 

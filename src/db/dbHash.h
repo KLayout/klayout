@@ -62,7 +62,7 @@ namespace DB_HASH_NAMESPACE
 {
 #if defined(_WIN64)
   /**
-   *  @brief Specialization missing for size_t on WIN32
+   *  @brief Specialization missing for size_t on WIN64
    */
   template<>
   struct hash<size_t>
@@ -70,6 +70,32 @@ namespace DB_HASH_NAMESPACE
     size_t operator()(size_t __x) const
     {
       return __x;
+    }
+  };
+#endif
+
+#if defined(_WIN64)
+  /**
+   *  @brief Specialization missing for long long on WIN64
+   */
+  template<>
+  struct hash<long long>
+  {
+    size_t operator()(long long __x) const
+    {
+      return size_t (__x);
+    }
+  };
+#elif defined(_WIN32)
+  /**
+   *  @brief Specialization missing for long long (64 bit) on WIN32
+   */
+  template<>
+  struct hash<long long>
+  {
+    size_t operator()(long long __x) const
+    {
+      return size_t (__x ^ (__x >> 32));
     }
   };
 #endif

@@ -69,68 +69,44 @@ public:
   /**
    *  @brief Constructor
    */
-  Inspector ()
-  {
-    //  .. the base class implementation does nothing ..
-  }
+  Inspector ();
 
   /**
    *  @brief Destructor
    */
-  virtual ~Inspector ()
-  {
-    //  .. the base class implementation does nothing ..
-  }
+  virtual ~Inspector ();
 
   /**
    *  @brief Returns a text describing the namespace the inspector will deliver
    *  This method will be used to label the node if "has_children" is true.
    */
-  virtual std::string description () const
-  {
-    return std::string ();
-  }
+  virtual std::string description () const;
 
   /**
    *  @brief Returns true if the inspector does not deliver keys but indexes only
    */
-  virtual bool has_keys () const
-  {
-    return true;
-  }
+  virtual bool has_keys () const;
 
   /**
    *  @brief Gets the key (name) of the element given by the index
    */
-  virtual std::string key (size_t /*index*/) const
-  {
-    return std::string ();
-  }
+  virtual std::string key (size_t /*index*/) const;
   
   /**
    *  @brief Gets the key (name) of the element given by the index as a tl::Variant
    *  If the string key returns an empty value, the evaluation will fall back to the tl::Variant.
    */
-  virtual tl::Variant keyv (size_t /*index*/) const
-  {
-    return tl::Variant ();
-  }
+  virtual tl::Variant keyv (size_t /*index*/) const;
 
   /**
    *  @brief Gets the value indicating the type of the entry
    */
-  virtual std::string type (size_t /*index*/) const
-  {
-    return std::string ();
-  }
+  virtual std::string type (size_t /*index*/) const;
 
   /**
    *  @brief Gets the value indicating the visibility of the entry
    */
-  virtual Visibility visibility (size_t /*index*/) const
-  {
-    return Always;
-  }
+  virtual Visibility visibility (size_t /*index*/) const;
 
   /**
    *  @brief Gets the value for the element given by the index
@@ -138,48 +114,33 @@ public:
    *  This method needs to deliver a value when the node is a leaf
    *  node (i.e. has_children is false).
    */
-  virtual tl::Variant value (size_t /*index*/) const
-  {
-    return tl::Variant ();
-  }
+  virtual tl::Variant value (size_t /*index*/) const;
 
   /**
    *  @brief Returns the number of elements this inspector can deliver
    *
    *  The index values for the methods of the inspector must be between 0 and count-1.
    */
-  virtual size_t count () const
-  {
-    return 0;
-  }
+  virtual size_t count () const;
 
   /**
    *  @brief Returns a value indicating whether the given element has children
    */
-  virtual bool has_children (size_t /*index*/) const
-  {
-    return false;
-  }
+  virtual bool has_children (size_t /*index*/) const;
 
   /**
    *  @brief Returns an inspector object for the children of the element given by index
    *  The child inspector is used if has_children is true.
    *  The returned object must be deleted by the caller.
    */
-  virtual Inspector *child_inspector (size_t /*index*/) const
-  {
-    return 0;
-  }
+  virtual Inspector *child_inspector (size_t /*index*/) const;
 
   /**
    *  @brief Returns a value indicating whether the inspectors are equivalent
    *  The system uses this information to determine whether to update the full variable
    *  list or just the changed information.
    */
-  virtual bool equiv (const gsi::Inspector * /*other*/) const
-  {
-    return false;
-  }
+  virtual bool equiv (const gsi::Inspector * /*other*/) const;
 };
 
 }

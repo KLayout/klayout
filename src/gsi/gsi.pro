@@ -18,6 +18,7 @@ SOURCES = \
   gsiExternalMain.cc \
   gsiInterpreter.cc \
   gsiMethods.cc \
+  gsiInspector.cc \
   gsiObject.cc \
   gsiSerialisation.cc \
   gsiTypes.cc \

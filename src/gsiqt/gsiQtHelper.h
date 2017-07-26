@@ -32,23 +32,6 @@ namespace qt_gsi
 
 gsi::ObjectBase *get_watcher_object (QObject *qobject, bool required);
 
-/**
- *  @brief A tiny watcher object linking QObject and gsi::ObjectBase
- *  This object is hooked into the watched object's child list to watch it's lifetime.
- */
-class QtWatcherObject
-  : public QObject, public gsi::ObjectBase
-{
-Q_OBJECT
-
-public:
-  QtWatcherObject (QObject *parent)
-    : QObject (parent), gsi::ObjectBase ()
-  {
-    //  .. nothing yet ..
-  }
-};
-
 }
 
 #endif

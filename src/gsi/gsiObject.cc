@@ -91,7 +91,7 @@ Proxy::destroy ()
 void
 Proxy::detach ()
 {
-  if (m_cls_decl && m_cls_decl->is_managed ()) {
+  if (! m_destroyed && m_cls_decl && m_cls_decl->is_managed ()) {
     gsi::ObjectBase *gsi_object = m_cls_decl->gsi_object (m_obj, false);
     if (gsi_object) {
       gsi_object->status_changed_event ().remove (this, &Proxy::object_status_changed);
@@ -217,6 +217,7 @@ void
 Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
 {
   if (type == gsi::ObjectBase::ObjectDestroyed) {
+    m_destroyed = true;  //  NOTE: must be set before detach and indicates that the object was destroyed externally.
     detach ();
   } else if (type == gsi::ObjectBase::ObjectKeep) {
     m_owned = false;

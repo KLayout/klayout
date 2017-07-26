@@ -347,6 +347,7 @@ PYAObjectBase::~PYAObjectBase ()
   } catch (...) {
     tl::warn << "Caught unspecified exception in object destructor";
   }
+
   m_destroyed = true;
 }
 
@@ -362,8 +363,9 @@ PYAObjectBase::object_status_changed (gsi::ObjectBase::StatusEventType type)
 
       bool prev_owner = m_owned;
 
+      m_destroyed = true;  // NOTE: must be set before detach!
+
       detach ();
-      m_destroyed = true;
 
       //  NOTE: this may delete "this"!
       if (!prev_owner) {
@@ -432,7 +434,7 @@ PYAObjectBase::detach ()
 
     const gsi::ClassBase *cls = cls_decl ();
 
-    if (cls && cls->is_managed ()) {
+    if (! m_destroyed && cls && cls->is_managed ()) {
       gsi::ObjectBase *gsi_object = cls->gsi_object (m_obj, false);
       if (gsi_object) {
         gsi_object->status_changed_event ().remove (&m_listener, &StatusChangedListener::object_status_changed);

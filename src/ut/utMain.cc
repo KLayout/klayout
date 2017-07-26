@@ -1144,7 +1144,7 @@ main_cont (int argc, char **argv)
           tl::warn << replicate (" ", console.indent ()) << (*f)->name ();
         }
       }
-      tl::warn << tl::to_string (result) << " test(s) skipped";
+      tl::warn << tl::to_string (skipped_e + skipped_ne) << " test(s) skipped";
     }
 
     result = failed_e + failed_ne;

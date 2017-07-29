@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>About Packages</title>
+  <keyword>Packages Manager</keyword>
+  <keyword>Packages</keyword>
+  <keyword>Salt</keyword>
+
+  <p>
+  "Salt" is KLayout's package manager which allows selecting and installing packages from a global repository. 
+  Packages make KLayout more tasty. Packages (the "grains") may cover a variety of features:
+  </p>
+
+  <ul>
+    <li>Ruby or Python macros</li>
+    <li>DRC runsets</li>
+    <li>Technologies</li>
+    <li>Fonts for the Basic.TEXT PCell</li>
+    <li>Static layout libraries</li>
+    <li>PCell libraries</li>
+    <li>Code libraries for Ruby and Python</li>
+    <li>Binary extensions</li>
+  </ul>
+
+  <p>
+  Packages can depend on other packages - these are installed automatically if a package requires them and they are not installed yet.
+  </p>
+
+  <p>
+  Packages are identified by name. A package name needs to be unique in the package universe. 
+  You can use a prefixed name like "www.mydomain.org/nameofpackage" to create a non-ambiguous name. 
+  The choice of the prefix is entirely up to you. You can use a domain name that is owned by 
+  yourself for example.
+  </p>
+
+  <p>
+  Packages also come with version information, so KLayout can check for updates and install 
+  them if required. KLayout will assume strict upward compatibility. This specifically 
+  applies to packages that other packages are depending on (such as code libraries). 
+  If you need to change them in a non-backward compatible way, you'd need to provide 
+  a new package with a different name.
+  </p>
+
+  <p>
+  Packages come with some meta data such as authoring information, an optional icon and 
+  screen shot image, license information and more. The more information you provide, the 
+  more useful a package will become.
+  </p>
+
+  <p>
+  The key component for the package repository is the "Salt.Mine" package repository 
+  service (sami.klayout.org). It is a web service that maintains a package list. It 
+  does not host the packages, but stores links to the actual hosting site. In order 
+  to author a package, you need to upload the package to one of the supported host 
+  sites and register your package on the Salt.Mine page. Registration is a simple 
+  process and the only information required is the link to your host site and a mail 
+  account for confirmation.
+  </p>
+
+  <p>
+  Currently, GitHub is supported as a host site. As a package author you'll need a GitHub 
+  account and open a project for your package there. GitHub acts both as a code repository 
+  for your development and as a deployment platform. KLayout can download packages directly 
+  from your GitHub project's master or a release tag.
+  </p>
+
+  <h2>The DNA</h2>
+
+  <p>
+  Technically, packages are folders stored below the "salt" folder within KLayout's home 
+  path. Prefixed packages are kept in sub-folders named after the prefix. Each package 
+  directory contains a description file called "grain.xml" and the files that make up the 
+  package. For Ruby macros, for example, the package folder will contain a "macros" 
+  sub-folder. Basically, packages do not require to be of a specific kind - they can 
+  provide technology information, DRC scripts and macros in the same package. In this 
+  example, the will be a "tech", "drc" and "macros" sub-folder with the corresponding 
+  files. KLayout will scan the package folders for useful files and load them automatically.
+  </p>
+
+  <p>
+  Packages are published on the Salt.Mine server. This is a web service that delivers a 
+  complete list of packages plus a little meta data such as current version, the icon 
+  and a brief description. KLayout will download this list from 
+  "http://sami.klayout.org/repository.xml" by default. You can set the KLAYOUT_SALT_MINE 
+  environment variable to a different URL which makes KLayout use another repository 
+  service, i.e. one inside your own organisation. This service can be any HTTP server 
+  that delivers a package list in the same format than the Salt.Mine package service.
+  </p>
+
+  <p>
+  When installing a package, KLayout will simply download the files from the URL given 
+  in the package list. KLayout employs the WebDAV protocol to download the files. 
+  This protocol is spoken by Subversion and GitHub with the subversion bridge. The 
+  latter requires a simple translation of the original Git URL's to obtain the 
+  subversion equivalent.
+  </p>
+
+  <p>
+  For package development you utilize KLayout to initialize and edit the files inside 
+  the package folder or populate the folder manually.
+  </p>
+
+</doc>

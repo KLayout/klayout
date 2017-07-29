@@ -59,8 +59,10 @@
   </ul>
 
   <p>
-  Libraries are loaded on startup and reside in memory while KLayout is running. Therefore, in 
-  order to update a library when the content has changed, KLayout must be restarted.
+  Starting with version 0.25, libraries can be provides through packages. This means, they can be downloaded from some
+  repository and can be managed within the package manager. Library installation is very simple
+  this way. Library deinstallation too. See <link href="/about/packages.xml"/> for details
+  about packages.
   </p>
 
 </doc>

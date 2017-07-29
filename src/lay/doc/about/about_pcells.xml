@@ -60,10 +60,14 @@
   <p>
   PCell's are usually packed in libraries. PCell libraries can be provided as
   shared objects/DLL's (in C++) or as Ruby scripts. Because PCell code is only executed if
-  required, performance is not absolutely mandatory. A Ruby implementation
+  required, performance usally is not the main objective. A Ruby implementation
   will therefore be sufficient in most cases and
-  is a much easier to provide. The Ruby approach also benefits from KLayout's integrated development
+  is a much easier to maintain. The Ruby approach also benefits from KLayout's integrated development
   environment.
+  </p>
+
+  <p>
+  For an introduction into PCell programming with Ruby, see <link href="/programming/ruby_pcells.xml"/>.
   </p>
 
 </doc>

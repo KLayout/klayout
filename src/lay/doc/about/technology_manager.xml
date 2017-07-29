@@ -94,9 +94,8 @@
   </p>
 
   <p>
-  Macros and DRC scripts associated with a technology are shown in the technology manager, but
-  cannot be edited there. The right place to edit, run or debug macros or DRC script is the 
-  macro development environment. To open the macro development environment choose "Macros/Macro Development".
+  Macros and DRC scripts associated with a technology are shown in the technology manager. To edit
+  or debug scripts of macros, use the macro development environment ("Macros/Macro Development").
   If a technology has a macros or DRC scripts folder, the macro or DRC scripts tree in the
   development environment will show a corresponding top-level branch for that technology.
   </p>

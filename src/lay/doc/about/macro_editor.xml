@@ -31,6 +31,12 @@
   </p>
 
   <p>
+  Macros can be technology specific. This means, they are packaged with a technology and are associated
+  with the technology in the user interface: if they provide a menu item, this item will only become 
+  visible when the respective technology is active.
+  </p>
+
+  <p>
   KLayout also offers an integrated development environment (IDE) that allows editing 
   and debugging of Ruby and Python scripts. It offers a simple debugger with the ability to set breakpoints and 
   to interact with the current context while in a breakpoint. An interactive "console" allows entering and
@@ -71,16 +77,30 @@
       This is the "local" repository. Any user can store his or her own macros here.
     </li>
     <li>
+      Plain Ruby or Python files can be kept inside "ruby" and "python" directories next to "macros" and "pymacros". In 
+      contrast to "macros" and "pymacros", the locations of "ruby" and "python" paths are added to the Ruby or Python
+      search paths. This makes those folders useful for keeping plain Ruby or Python libraries. Generic ".lym" files cannot 
+      reside there and those locations are not scanned for autorun macros.
+    </li>
+    <li>
       In addition, further repositories can be given on the command line with the "-j" option. This allows
       adding development repositories which are under configuration management and contain the latest code
       for the macros. Those repositories are called "project" repositories.
+    </li>
+    <li>
+      Technology folders: each technology folder can carry a "macros" or "pymacros" subfolder where technology-specific
+      macros are kept. See <link href="/about/technology-manager.xml"/> for details about technologies.
+    </li>
+    <li>
+      Macros can be kept in packages and installed from a remote repository. See <link href="/about/packages.xml"/> for 
+      details about packages.
     </li>
   </ul>
 
   <p>
   The macro IDE will store Python and Ruby macros separately in "macros" and "pymacros" for easier management, 
   but technically these folders are equivalent. KLayout will automatically derive the interpreter 
-  from the context stored in ".lym" files or the file extension (".rb" or ".py").
+  from the context stored in ".lym" files or the file extension (".rb" or ".py"). 
   </p>
 
   <p>

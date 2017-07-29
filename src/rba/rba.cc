@@ -1904,12 +1904,14 @@ RubyInterpreter::load_file (const std::string &filename_utf8)
 void
 RubyInterpreter::eval_string (const char *expr, const char *file, int line, int context)
 {
+  d->file_id_map.clear ();
   rba_eval_string_in_context (expr, file, line, context);
 }
 
 tl::Variant
 RubyInterpreter::eval_expr (const char *expr, const char *file, int line, int context)
 {
+  d->file_id_map.clear ();
   VALUE res = rba_eval_string_in_context (expr, file, line, context);
   if (res != Qnil) {
     return ruby2c<tl::Variant> (res);
@@ -1921,6 +1923,7 @@ RubyInterpreter::eval_expr (const char *expr, const char *file, int line, int co
 void
 RubyInterpreter::eval_string_and_print (const char *expr, const char *file, int line, int context)
 {
+  d->file_id_map.clear ();
   VALUE res = rba_eval_string_in_context (expr, file, line, context);
   if (current_console () && res != Qnil) {
     VALUE res_s = rba_safe_obj_as_string (res);

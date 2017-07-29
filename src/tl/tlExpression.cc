@@ -2041,10 +2041,10 @@ public:
     } else if (v->is_user ()) {
       c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object) - value is %1").arg (tl::to_qstring (v->to_parsable_string ()))), m_context);
       }
     } else {
-      throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (wrong type)")), m_context);
+      throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (wrong type) - value is %1").arg (tl::to_qstring (v->to_parsable_string ()))), m_context);
     }
 
     tl::Variant o;

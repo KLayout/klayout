@@ -63,7 +63,7 @@ record PROPERTY
 uint 17         ;# PLACEMENT (no mag, manhattan angles)
   bits 00110000 ;# CNXYRAAF
   int 0         ;# placement-x
-  int 400       ;# placement-y
+  int 200       ;# placement-y
 
 record PROPERTY 
   bits 11110001 ;# property info byte UUUUVCNS

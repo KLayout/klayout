@@ -12,6 +12,7 @@
 #     begin_lib 0.001
 #     begin_cell {ABC}
 #     text 1 2 0 0 {100 -200} {B}
+#     text 2 1 0 0 {200 -400} {A}
 #     text 2 1 0 0 {300 -400} {A}
 #     text 2 1 0 0 {300 -300} {A}
 #     text 2 1 0 0 {300 -500} {B}
@@ -56,12 +57,11 @@
 #     text 2 1 0 0 {300 -1700} {B}
 #     text 2 1 0 0 {300 -1690} {B}
 #     text 2 1 0 0 {300 -1679} {B}
+#     text 2 1 0 0 {300 -1900} {B}
 #     text 2 1 0 0 {300 -1890} {B}
 #     text 2 1 0 0 {300 -1875} {B}
-#     text 2 1 0 0 {200 -400} {A}
-#     text 2 1 0 0 {267 -2136} {B}
-#     text 2 1 0 0 {270 -2270} {B}
-#     text 2 1 0 0 {270 -2670} {B}
+#     text 2 1 0 0 {300 -2100} {B}
+#     text 2 1 0 0 {310 -2100} {B}
 #     text 2 1 0 0 {320 -2100} {B}
 #     text 2 1 0 0 {289 -2112} {B}
 #     text 2 1 0 0 {299 -2112} {B}
@@ -69,7 +69,7 @@
 #     text 2 1 0 0 {278 -2124} {B}
 #     text 2 1 0 0 {288 -2124} {B}
 #     text 2 1 0 0 {298 -2124} {B}
-#     text 2 1 0 0 {300 -1900} {B}
+#     text 2 1 0 0 {267 -2136} {B}
 #     text 2 1 0 0 {277 -2136} {B}
 #     text 2 1 0 0 {287 -2136} {B}
 #     text 2 1 0 0 {300 -2300} {B}
@@ -81,7 +81,7 @@
 #     text 2 1 0 0 {280 -2280} {B}
 #     text 2 1 0 0 {291 -2268} {B}
 #     text 2 1 0 0 {302 -2256} {B}
-#     text 2 1 0 0 {300 -2100} {B}
+#     text 2 1 0 0 {270 -2270} {B}
 #     text 2 1 0 0 {281 -2258} {B}
 #     text 2 1 0 0 {292 -2246} {B}
 #     text 2 1 0 0 {300 -2500} {B}
@@ -90,16 +90,16 @@
 #     text 2 1 0 0 {300 -2700} {B}
 #     text 2 1 0 0 {290 -2690} {B}
 #     text 2 1 0 0 {280 -2680} {B}
-#     text 2 1 0 0 {310 -2100} {B}
+#     text 2 1 0 0 {270 -2670} {B}
 #     text 2 1 0 0 {300 -2900} {B}
 #     text 2 1 0 0 {310 -2900} {B}
 #     text 2 1 0 0 {310 -2890} {B}
 #     text 2 1 0 0 {300 -2890} {B}
-#     text 2 1 0 0 {300 -2900} {B}
-#     text 2 1 0 0 {310 -2890} {B}
-#     text 2 1 0 0 {300 -2880} {B}
-#     text 2 1 0 0 {290 -2890} {B}
-#     text 2 1 0 0 {300 -2900} {B}
+#     text 2 1 0 0 {300 -2930} {B}
+#     text 2 1 0 0 {310 -2920} {B}
+#     text 2 1 0 0 {300 -2910} {B}
+#     text 2 1 0 0 {290 -2920} {B}
+#     text 2 1 0 0 {310 -2940} {B}
 #     text 2 1 0 0 {300 -3100} {B}
 #     text 2 1 0 0 {289 -3088} {B}
 #     text 2 1 0 0 {299 -3098} {B}
@@ -107,11 +107,11 @@
 #     text 2 1 0 0 {310 -3300} {B}
 #     text 2 1 0 0 {310 -3290} {B}
 #     text 2 1 0 0 {300 -3290} {B}
-#     text 2 1 0 0 {300 -3300} {B}
-#     text 2 1 0 0 {310 -3290} {B}
-#     text 2 1 0 0 {300 -3280} {B}
-#     text 2 1 0 0 {290 -3290} {B}
-#     text 2 1 0 0 {300 -3300} {B}
+#     text 2 1 0 0 {300 -3330} {B}
+#     text 2 1 0 0 {310 -3320} {B}
+#     text 2 1 0 0 {300 -3310} {B}
+#     text 2 1 0 0 {290 -3320} {B}
+#     text 2 1 0 0 {310 -3340} {B}
 #     text 2 1 0 0 {300 -3500} {B}
 #     text 2 1 0 0 {288 -3488} {B}
 #     text 2 1 0 0 {297 -3497} {B}
@@ -275,11 +275,11 @@ record TEXT
     uint [ expr 16*10+0 ]    ;# n-displacement (g-delta: 10-east=10,0)
     uint [ expr 16*10+2 ]    ;# n-displacement (g-delta: 10-north=0,10)
     uint [ expr 16*10+4 ]    ;# n-displacement (g-delta: 10-west=-10,0)
-    uint [ expr 16*10+6 ]    ;# n-displacement (g-delta: 10-south=0,-10)
+    uint [ expr 16*40+6 ]    ;# n-displacement (g-delta: 10-south=0,-40)
     uint [ expr 16*10+8 ]    ;# n-displacement (g-delta: 10-northeast=10,10)
     uint [ expr 16*10+10 ]   ;# n-displacement (g-delta: 10-northwest=-10,10)
     uint [ expr 16*10+12 ]   ;# n-displacement (g-delta: 10-southwest=-10,-10)
-    uint [ expr 16*10+14 ]   ;# n-displacement (g-delta: 10-southeast=10,-10)
+    uint [ expr 16*20+14 ]   ;# n-displacement (g-delta: 10-southeast=20,-20)
 
 record TEXT
   bits 00001100 ;# 0CNXYRTL
@@ -299,11 +299,11 @@ record TEXT
     uint [ expr 16*5+0 ]    ;# n-displacement (g-delta: 10-east=10,0)
     uint [ expr 16*5+2 ]    ;# n-displacement (g-delta: 10-north=0,10)
     uint [ expr 16*5+4 ]    ;# n-displacement (g-delta: 10-west=-10,0)
-    uint [ expr 16*5+6 ]    ;# n-displacement (g-delta: 10-south=0,-10)
+    uint [ expr 16*20+6 ]   ;# n-displacement (g-delta: 10-south=0,-40)
     uint [ expr 16*5+8 ]    ;# n-displacement (g-delta: 10-northeast=10,10)
     uint [ expr 16*5+10 ]   ;# n-displacement (g-delta: 10-northwest=-10,10)
     uint [ expr 16*5+12 ]   ;# n-displacement (g-delta: 10-southwest=-10,-10)
-    uint [ expr 16*5+14 ]   ;# n-displacement (g-delta: 10-southeast=10,-10)
+    uint [ expr 16*10+14 ]  ;# n-displacement (g-delta: 10-southeast=20,-20)
 
 record TEXT
   bits 00001100 ;# 0CNXYRTL

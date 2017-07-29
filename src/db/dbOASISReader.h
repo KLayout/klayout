@@ -189,6 +189,8 @@ public:
 private:
   friend class OASISReaderLayerMapping;
 
+  typedef db::coord_traits<db::Coord>::distance_type distance_type;
+
   enum TableMode
   {
     NotInTable,
@@ -233,15 +235,15 @@ private:
   modal_variable<unsigned int> mm_text_string_id;
   modal_variable<db::Coord> mm_geometry_x;
   modal_variable<db::Coord> mm_geometry_y;
-  modal_variable<db::Coord> mm_geometry_w;
-  modal_variable<db::Coord> mm_geometry_h;
+  modal_variable<distance_type> mm_geometry_w;
+  modal_variable<distance_type> mm_geometry_h;
   modal_variable< std::vector<db::Point> > mm_polygon_point_list;
-  modal_variable<db::Coord> mm_path_halfwidth;
+  modal_variable<distance_type> mm_path_halfwidth;
   modal_variable<db::Coord> mm_path_start_extension;
   modal_variable<db::Coord> mm_path_end_extension;
   modal_variable< std::vector<db::Point> > mm_path_point_list;
   modal_variable<unsigned int> mm_ctrapezoid_type;
-  modal_variable<db::Coord> mm_circle_radius;
+  modal_variable<distance_type> mm_circle_radius;
   modal_variable<db::property_names_id_type> mm_last_property_name;
   modal_variable<bool> mm_last_property_is_sprop;
   modal_variable<property_value_list> mm_last_value_list;
@@ -362,6 +364,7 @@ private:
   db::Vector get_2delta (long grid = 1);
   db::Coord get_coord (long grid = 1);
   db::Coord get_ucoord (unsigned long grid = 1);
+  distance_type get_ucoord_as_distance (unsigned long grid = 1);
 
   std::pair <bool, unsigned int> open_dl (db::Layout &layout, const LDPair &dl, bool create);
 };

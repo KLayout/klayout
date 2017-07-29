@@ -367,6 +367,18 @@ OASISReader::get_ucoord (unsigned long grid)
   return db::Coord (lx);
 }
 
+OASISReader::distance_type
+OASISReader::get_ucoord_as_distance (unsigned long grid)
+{
+  unsigned long long lx = 0;
+  get (lx);
+  lx *= grid;
+  if (lx > (unsigned long long) (std::numeric_limits <distance_type>::max ())) {
+    error (tl::to_string (QObject::tr ("Coordinate value overflow")));
+  }
+  return distance_type (lx);
+}
+
 db::Coord
 OASISReader::get_coord (long grid)
 {
@@ -1707,7 +1719,7 @@ OASISReader::read_repetition ()
     db::Coord dx = get_ucoord ();
     db::Coord dy = get_ucoord ();
 
-    mm_repetition = new RegularRepetition (db::Vector (dx, 0), db::Vector (0, dy), nx + 2, ny + 2);
+    mm_repetition = new RegularRepetition (db::Vector (dx, 0), db::Vector (0, dy), dx == 0 ? 1 : nx + 2, dy == 0 ? 1 : ny + 2);
 
   } else if (type == 2) {
 
@@ -1716,7 +1728,7 @@ OASISReader::read_repetition ()
 
     db::Coord dx = get_ucoord ();
 
-    mm_repetition = new RegularRepetition (db::Vector (dx, 0), db::Vector (0, 0), nx + 2, 1);
+    mm_repetition = new RegularRepetition (db::Vector (dx, 0), db::Vector (0, 0), dx == 0 ? 1 : nx + 2, 1);
 
   } else if (type == 3) {
 
@@ -1725,7 +1737,7 @@ OASISReader::read_repetition ()
 
     db::Coord dy = get_ucoord ();
 
-    mm_repetition = new RegularRepetition (db::Vector (0, 0), db::Vector (0, dy), 1, ny + 2);
+    mm_repetition = new RegularRepetition (db::Vector (0, 0), db::Vector (0, dy), 1, dy == 0 ? 1 : ny + 2);
 
   } else if (type == 4 || type == 5) {
     
@@ -1744,8 +1756,11 @@ OASISReader::read_repetition ()
 
     db::Coord x = 0;
     for (unsigned long i = 0; i <= n; ++i) {
-      x += get_ucoord (lgrid);
-      rep->push_back (db::Vector (x, 0));
+      db::Coord d = get_ucoord (lgrid);
+      if (d != 0) {
+        x += d;
+        rep->push_back (db::Vector (x, 0));
+      }
     }
 
   } else if (type == 6 || type == 7) {
@@ -1763,10 +1778,13 @@ OASISReader::read_repetition ()
 
     rep->reserve (n + 1);
 
-    db::Coord x = 0;
+    db::Coord y = 0;
     for (unsigned long i = 0; i <= n; ++i) {
-      x += get_ucoord (lgrid);
-      rep->push_back (db::Vector (0, x));
+      db::Coord d = get_ucoord (lgrid);
+      if (d != 0) {
+        y += d;
+        rep->push_back (db::Vector (0, y));
+      }
     }
 
   } else if (type == 8) {
@@ -1778,7 +1796,7 @@ OASISReader::read_repetition ()
     db::Vector dn = get_gdelta ();
     db::Vector dm = get_gdelta ();
 
-    mm_repetition = new RegularRepetition (dn, dm, n + 2, m + 2);
+    mm_repetition = new RegularRepetition (dn, dm, dn == db::Vector () ? 1 : n + 2, dm == db::Vector () ? 1 : m + 2);
 
   } else if (type == 9) {
 
@@ -1786,9 +1804,9 @@ OASISReader::read_repetition ()
     get (n); 
     db::Vector dn = get_gdelta ();
 
-    mm_repetition = new RegularRepetition (dn, db::Vector (0, 0), n + 2, 1);
+    mm_repetition = new RegularRepetition (dn, db::Vector (0, 0), dn == db::Vector () ? 1 : n + 2, 1);
 
-  } else if (type == 10) {
+  } else if (type == 10 || type == 11) {
 
     IrregularRepetition *rep = new IrregularRepetition ();
     mm_repetition = rep;
@@ -1796,31 +1814,20 @@ OASISReader::read_repetition ()
     unsigned long n = 0;
     get (n);
 
-    rep->reserve (n + 1);
-
-    db::Vector p;
-    for (unsigned long i = 0; i <= n; ++i) {
-      p += get_gdelta ();
-      rep->push_back (p);
+    unsigned long grid = 1;
+    if (type == 11) {
+      get (grid);
     }
 
-  } else if (type == 11) {
-
-    IrregularRepetition *rep = new IrregularRepetition ();
-    mm_repetition = rep;
-
-    unsigned long n = 0;
-    get (n);
-
-    unsigned long grid = 0;
-    get (grid);
-
     rep->reserve (n + 1);
 
     db::Vector p;
     for (unsigned long i = 0; i <= n; ++i) {
-      p += get_gdelta (grid);
-      rep->push_back (db::Vector (p.x (), p.y ()));
+      db::Vector d = get_gdelta (grid);
+      if (d != db::Vector ()) {
+        p += d;
+        rep->push_back (p);
+      }
     }
 
   } else {
@@ -2236,13 +2243,13 @@ OASISReader::do_read_rectangle (bool xy_absolute,
   }
 
   if (m & 0x40) {
-    mm_geometry_w = get_ucoord ();
+    mm_geometry_w = get_ucoord_as_distance ();
   } 
   if (m & 0x80) {
     mm_geometry_h = mm_geometry_w; // TODO: really?
   } else {
     if (m & 0x20) {
-      mm_geometry_h = get_ucoord ();
+      mm_geometry_h = get_ucoord_as_distance ();
     } 
   }
 
@@ -2505,7 +2512,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
   }
 
   if (m & 0x40) {
-    mm_path_halfwidth = get_ucoord ();
+    mm_path_halfwidth = get_ucoord_as_distance ();
   }
 
   if (m & 0x80) {
@@ -2678,11 +2685,11 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
   }
 
   if (m & 0x40) {
-    mm_geometry_w = get_ucoord ();
+    mm_geometry_w = get_ucoord_as_distance ();
   }
 
   if (m & 0x20) {
-    mm_geometry_h = get_ucoord ();
+    mm_geometry_h = get_ucoord_as_distance ();
   }
 
   db::Coord delta_a = 0, delta_b = 0;
@@ -2843,11 +2850,11 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
   }
 
   if (m & 0x40) {
-    mm_geometry_w = get_ucoord ();
+    mm_geometry_w = get_ucoord_as_distance ();
   }
 
   if (m & 0x20) {
-    mm_geometry_h = get_ucoord ();
+    mm_geometry_h = get_ucoord_as_distance ();
   }
 
   if (m & 0x10) {
@@ -3200,7 +3207,7 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
   }
 
   if (m & 0x20) {
-    mm_circle_radius = get_ucoord ();
+    mm_circle_radius = get_ucoord_as_distance ();
   }
 
   if (m & 0x10) {

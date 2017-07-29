@@ -1022,6 +1022,9 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
     int cols = get_ushort ();
     int rows = get_ushort ();
 
+    cols = std::max (1, cols);
+    rows = std::max (1, rows);
+
     //  Array reference
     if (get_record () != sXY) {
       error (tl::to_string (QObject::tr ("XY record expected")));
@@ -1041,6 +1044,15 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
     db::Vector c = v_conv (xy_data [1]) - xy;
     db::Vector r = v_conv (xy_data [2]) - xy;
 
+    //  Reduce axes with no displacement to dimension 1 - such
+    //  axes only produce overlapping instances.
+    if (c == db::Vector ()) {
+      cols = 1;
+    }
+    if (r == db::Vector ()) {
+      rows = 1;
+    }
+
     std::pair<bool, db::properties_id_type> pp = finish_element (layout.properties_repository ());
 
     bool split_cols = false, split_rows = false;
@@ -1055,9 +1067,6 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
     }
 
     if (split_cols || split_rows) {
-
-      cols = std::max (1, cols);
-      rows = std::max (1, rows);
 
       db::DVector cd (db::DVector (c) * (1.0 / double (cols)));
       db::DVector rd (db::DVector (r) * (1.0 / double (rows)));

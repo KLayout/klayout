@@ -285,7 +285,14 @@ TechSaveOptionsEditorPage::setup ()
 {
   for (std::vector< std::pair<StreamWriterOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
     if (page->first) {
-      page->first->setup (tech ()->save_layout_options ().get_options (page->second), tech ());
+      const db::FormatSpecificWriterOptions *specific_options = tech ()->save_layout_options ().get_options (page->second);
+      std::auto_ptr<db::FormatSpecificWriterOptions> default_options;
+      if (! specific_options) {
+        //  In case there is no option object yet, create a first one for initialization
+        default_options.reset (StreamWriterPluginDeclaration::plugin_for_format (page->second)->create_specific_options ());
+        specific_options = default_options.get ();
+      }
+      page->first->setup (specific_options, tech ());
     }
   }
 }
@@ -299,6 +306,7 @@ TechSaveOptionsEditorPage::commit ()
     if (page->first) {
       db::FormatSpecificWriterOptions *specific_options = options.get_options (page->second);
       if (! specific_options) {
+        //  Create a container for the options unless there is one already
         specific_options = StreamWriterPluginDeclaration::plugin_for_format (page->second)->create_specific_options ();
         options.set_options (specific_options);
       }

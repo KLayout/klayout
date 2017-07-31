@@ -128,12 +128,11 @@ public:
 
   void closeEvent (QCloseEvent * /*event*/)
   {
-#if 0
-    //  NOTE: We don't kill on close for now. This creates a too easy way to scrap results.
     if (mp_pr) {
-      mp_pr->signal_break ();
+      //  NOTE: We don't kill on close for now. This creates a too easy way to scrap results.
+      //    mp_pr->signal_break ();
+      //  TODO: there should be a warning saying some jobs are pending.
     }
-#endif
   }
 
   void set_can_cancel (bool f)
@@ -1054,6 +1053,11 @@ MainWindow::dock_widget_visibility_changed (bool /*visible*/)
 void
 MainWindow::file_changed_timer ()
 {
+  //  Prevent recursive signals
+  m_file_changed_timer.blockSignals (true);
+
+  std::set<QString> reloaded_files;
+
 BEGIN_PROTECTED
 
   //  Make the names unique
@@ -1085,6 +1089,8 @@ BEGIN_PROTECTED
 
   if (QMessageBox::question (this, tr ("Reload Files"), msg, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
 
+    m_file_changed_timer.blockSignals (false);
+
     std::map<QString, std::pair<lay::LayoutView *, int> > views_per_file;
 
     for (std::vector<lay::LayoutView *>::iterator v = mp_views.begin (); v != mp_views.end (); ++v) {
@@ -1097,12 +1103,37 @@ BEGIN_PROTECTED
       std::map<QString, std::pair<lay::LayoutView *, int> >::const_iterator v = views_per_file.find (*f);
       if (v != views_per_file.end ()) {
         v->second.first->reload_layout (v->second.second);
+        reloaded_files.insert (*f);
       }
     }
 
   }
 
 END_PROTECTED
+
+  m_file_changed_timer.blockSignals (false);
+
+  //  While the message box was open, new request might have collected - remove
+  //  the ones we just reloaded and restart the timer
+  if (! m_changed_files.empty ()) {
+
+    std::vector<QString> changed_files;
+    changed_files.swap (m_changed_files);
+    for (std::vector<QString>::const_iterator f = changed_files.begin (); f != changed_files.end (); ++f) {
+      if (reloaded_files.find (*f) == reloaded_files.end ()) {
+        m_changed_files.push_back (*f);
+      }
+    }
+
+    if (! m_changed_files.empty ()) {
+
+      //  Wait a little to let more to allow for more reload requests to collect
+      m_file_changed_timer.setInterval (300);
+      m_file_changed_timer.start ();
+
+    }
+
+  }
 }
 
 void

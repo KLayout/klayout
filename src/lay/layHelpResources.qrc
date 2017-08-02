@@ -178,6 +178,7 @@
         <file alias="hiding.xml">doc/manual/hiding.xml</file>
         <file alias="hier_ops.xml">doc/manual/hier_ops.xml</file>
         <file alias="hier.xml">doc/manual/hier.xml</file>
+        <file alias="hierarchy_panel.png">doc/manual/hierarchy_panel.png</file>
         <file alias="images.xml">doc/manual/images.xml</file>
         <file alias="index.xml">doc/manual/index.xml</file>
         <file alias="landmarks.xml">doc/manual/landmarks.xml</file>
@@ -200,12 +201,14 @@
         <file alias="loading.xml">doc/manual/loading.xml</file>
         <file alias="load_save_layers.xml">doc/manual/load_save_layers.xml</file>
         <file alias="main_window.xml">doc/manual/main_window.xml</file>
+        <file alias="main_window.png">doc/manual/main_window.png</file>
         <file alias="marker_browser.xml">doc/manual/marker_browser.xml</file>
         <file alias="max_coherence.png">doc/manual/max_coherence.png</file>
         <file alias="measure.xml">doc/manual/measure.xml</file>
         <file alias="min_coherence.png">doc/manual/min_coherence.png</file>
         <file alias="move_layer_sel.xml">doc/manual/move_layer_sel.xml</file>
         <file alias="move_sel.xml">doc/manual/move_sel.xml</file>
+        <file alias="navigator.png">doc/manual/navigator.png</file>
         <file alias="object_align.xml">doc/manual/object_align.xml</file>
         <file alias="panels.xml">doc/manual/panels.xml</file>
         <file alias="partial_vs_full.xml">doc/manual/partial_vs_full.xml</file>

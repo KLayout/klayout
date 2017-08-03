@@ -33,14 +33,15 @@
 
   <p>
   The Python macro folder is in the "sys.path" search path so it is possible to install modules
-  there. To install libraries globally use "%INST_PATH%/lib/python/Lib" and "%INST_PATH%/lib/python/DLLs" on 
-  Windows. %INST_PATH% is the installation path (where klayout.exe is located). On Linux, the 
+  there. To install libraries globally use "<i>inst_path</i>/lib/python/Lib" and "<i>inst_path</i>/lib/python/DLLs" on 
+  Windows. <i>inst_path</i> is the installation path (where klayout.exe is located). On Linux, the 
   installation will share the Python interpreter with the system and modules installed there
   will be available for KLayout too.
   </p>
 
   <p>
-  "$PYTHONPATH" is supported in the usual way.
+  "$PYTHONHOME" is not supported to prevent interference with other Python consumers. Instead, KLayout will
+  read the Python path from "$KLAYOUT_PYTHONPATH" (for Python >= 3.x).
   </p>
 
   <h2>Writing Macros in Python</h2>
@@ -101,14 +102,13 @@ layout.write("t.gds")
   <p>
   There is no clear advantage of one language over the other. The Python community
   is somewhat stronger, but performance-wise, Ruby is better.
-  In KLayout, the debugger support for Python is a little better, since the guts
-  of the interpreter are well documented in Python. For example, it is possible
-  to evaluate expressions in the context of the current stack frame. 
+  In KLayout, the debugger support for Python is slighly better, since the guts
+  of the interpreter are better documented for Python.
   </p>
 
   <p>
-  Apart from that, Python and Ruby coexist remarkably well and it was amazing, how easy it
-  was to extend the interfaces from Ruby to Python: not counting the different memory 
+  Apart from that, Python and Ruby coexist remarkably well and it is amazing, how easy it
+  it to extend the interfaces from Ruby to Python: not counting the different in the memory 
   management model (mark and sweep garbage collector in Ruby, reference counting in Python),
   the concepts are very similar. 
   </p>
@@ -118,7 +118,7 @@ layout.write("t.gds")
   considered when going from Ruby to Python.
   </p>
 
-  <h2>Python PCell's</h2>
+  <h2>Python PCells</h2>
 
   <p>
   Please have a look at the PCell sample available in the templates. Pick the PCell sample
@@ -127,6 +127,12 @@ layout.write("t.gds")
 
   <p>
   PCell implementation in Python is very similar to Ruby. 
+  </p>
+
+  <p>
+  Python macros are ".lym" files that are placed into the "pymacro" subfolder in the KLayout path.
+  Python libraries can be put into the "python" subfolder. This subfolder is included into the 
+  "sys.path" variable, so macros can load libraries simply by using "import".
   </p>
 
   <h2>Python Implementation Notes</h2>
@@ -209,7 +215,7 @@ for edge in edges:
 </pre>
     </li>
 
-    <li><b>Standard protcols:</b>
+    <li><b>Standard protocols:</b>
 
     <p>"x.to_s()" is available as "str(x)" too.</p>
 
@@ -277,11 +283,11 @@ action.on_triggered(f)
 
     <li><p><b>Tips when developing own modules:</b></p>
       <ul>
-        <li>The macro paths are added to sys.path, so modules can be put as plain .py files
-        into the "pymacros" folder and imported with "import module".</li>
-        <li>Or: modules can be put into folders using an "__init__.py" file to indicate
-        the folder is a module.</li>
-        <li>Use "reload(module)" on the console to refresh module cache if changes have been applied.</li>
+        <li>The "python" subfolders of the KLayout path are added to sys.path, so modules can be put as plain .py files
+          and imported with "import module".</li>
+        <li>Or: modules can be put into folders inside "python" using an "__init__.py" file to indicate
+          the folder is a module.</li>
+        <li>Use "reload(module)" on the console to refresh the module cache if changes have been applied.</li>
       </ul>
     </li>
 

@@ -23,11 +23,13 @@
   </p>
   <p>
   The program will automatically determine the type of the file. Currently,
-  OASIS and GDS2 are supported.
+  OASIS, GDS2, DXF, CIF, LEF/DEF and a text version of GDS2 are supported.
+  Gerber PCB data can be read with some preparations too (see <link href="/manual/import_gerber.xml"/>). 
+  If the file is gzip/zlib compressed, it will be uncompressed automatically.
   </p>
 
   <p>
-  Certain options can be specified for the file loader with the 
+  Certain options can be specified for the file loader using the 
   reader option pages. To open the reader options dialog, choose
   "Reader Options" from the "File" menu. This dialog allows specification of
   certain options for all "Open" actions, for example:
@@ -35,12 +37,45 @@
 
   <ul>
     <li>Confine the reader to a certain set of layers. All other layers are not read.</li>
-    <li>Disable reading of text objects. Disable reading of text objects to reduce the memory consumption if you are interested 
-        in pure geometrical information.</li>
-    <li>Disable reading of properties. If properties are not required, the memory consumption can be reduced by disabling 
-        the properties.</li>
+    <li>Disable reading of text objects. Text objects don't carry geometrical information 
+        for masks and can be discarded this way.</li>
+    <li>Disable reading of user properties. If properties are not required, the memory consumption can be reduced by disabling 
+        properties.</li>
     <li>Certain GDS specific options which mainly control the level of compatibility with other tools.</li>
+    <li>Other formats may offer other options too. Specifically rich formats such as DXF or LEF/DEF can 
+        be configured in manifold ways. Different tabs show options for different formats or format groups.</li>
   </ul>
+  
+  <p>
+  Using "File/Reload", the currently loaded file can be re-read from disk. 
+  Usually this is not required, because KLayout will automatically check whether
+  the file has changed and offer to load it.
+  </p>
+
+  <p>
+  By picking a file from the "Open Recent" list in the "File" menu, a previous
+  file can be loaded again. 
+  </p>
+
+  <p>
+  Files can be given to KLayout on the command line and are loaded 
+  automatically. Multiple files can be specified. They are shown in different
+  pages by default. To load multiple files into the same page, add a "-s" option
+  to the command line. "http:" or "https:" can be specified on the command line
+  as well. In this case, KLayout will download the files from the given URL.
+  </p>
+
+  <p>
+  Files and URL's can be dragged and dropped on the KLayout main window. 
+  KLayout will then load and show these files.
+  </p>
+
+  <p>
+  Layout files can be associated with technologies. Technologies allow 
+  associating a layout with additional data, such as libraries, macros,
+  net tracer settings, layer properties etc.
+  Read <link href="/about/technology_manager.xml"/> for details.
+  </p>
 
 </doc>
 

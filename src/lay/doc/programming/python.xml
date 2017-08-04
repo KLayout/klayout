@@ -195,6 +195,8 @@ box.right = box.right + 100
     Protected methods are not supported - methods are public always.
     </li>
 
+    <li><b>"nil" value:</b> The Python equivalent to Ruby's "nil" is "None".</li>
+
     <li><b>Iterators:</b>
     Iterator binding:
 

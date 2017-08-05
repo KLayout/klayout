@@ -35,6 +35,35 @@
   methods. The <b>*</b> operator used with a factor as the second operand will scale both the x and y coordinates.
   </p>
 
+  <h2>Points and vectors</h2>
+
+  <keyword name="Point"/>
+  <p>
+  Next to points there is a corresponding vector class (<class_doc href="Vector"/>). 
+  A vector is basically the difference between two points.
+  It is meant to describe the distance and direction between two points.
+  The following rules therefore apply:
+  </p>
+
+  <ul>
+    <li>Subtracting a point from a point renders a vector</li>
+    <li>Adding a vector to a point renders a point</li>
+  </ul>
+
+  <p>
+  As points, vectors have an x and a y component which can be accessed with <class_doc href="Vector#x"/> and <class_doc href="Vector#y"/>.
+  Vectors offer two functions to compute the vector product (<class_doc href="Vector#vprod"/>) and the scalar product
+  (<class_doc href="Vector#sprod"/>). For some applications it's sufficient to know the sign of the product. You can 
+  get that with <class_doc href="Vector#vprod_sign"/> and <class_doc href="Vector#sprod_sign"/> respectively.
+  </p>
+
+  <p>
+  Vectors don't transform the same way than points. On transformation, only rotation, mirror and scaling (if applicable) 
+  is applied. Displacement is not applied. This way, the following two forms are equivalent:
+  </p>
+
+  <pre>(p1 - p2).transformed(t) == p1.transformed(t) - p2.transformed(t)</pre>
+
   <h2>The Box class</h2>
 
   <keyword name="Box"/>
@@ -105,11 +134,11 @@
 
     <pre># Wrong result
 box = RBA::Box::new(0, 0, 100, 200)
-transformed_box = box.transformed_cplx(RBA::ICplxTrans::new(1, 45, false, RBA::Point::new))
+transformed_box = box.transformed_cplx(RBA::ICplxTrans::new(1, 45, false, RBA::Vector::new))
 # -&gt; (-141,0;71,212)
 
 # Correct result
-transformed_box_as_polygon = RBA::Polygon::new(box).transformed_cplx(RBA::ICplxTrans::new(1, 45, false, RBA::Point::new))
+transformed_box_as_polygon = RBA::Polygon::new(box).transformed_cplx(RBA::ICplxTrans::new(1, 45, false, RBA::Vector::new))
 # -&gt; (0,0;-141,141;-71,212;71,71)</pre>
     </li>
 
@@ -119,9 +148,16 @@ transformed_box_as_polygon = RBA::Polygon::new(box).transformed_cplx(RBA::ICplxT
 
   </ul>
 
-  <p>The class method <class_doc href="Box#from_dbox"/> creates a integer-coordinate type Box object from a floating-point coordinate type DBox
-  object (see below). The floating-point coordinates are rounded to the nearest integer coordinates.
+  <p>A box object can be constructed from a floating-point object (for floating-point objects see below). 
+  Lacking a database unit, no conversion from micrometer units
+  to database units is performed. Instead, the floating-point coordinates are rounded to the nearest integer coordinates:
   </p>
+
+  <pre>dbox = RBA::DBox::new(2.1, 3.1, 10.7, 11.8)
+box = RBA::Box::new(dbox)
+# -&gt; (2,3;11,12)</pre>
+
+  <p>An integer box can be turned into a floating-point unit box using <class_doc href="Box#to_dtype"/></p>
   
   <h2>The SimplePolygon class</h2>
   
@@ -389,22 +425,28 @@ a == b
 # -&gt; 0.0999999999999999916733</pre>
  
   <p>
-  Because of that, operations that depend on the equality of coordinates (like "box.touches(other_box)") may not work as
-  expected unless the coordinates can be expressed precisely.
-  For the same reason, some operations which are implemented on integer coordinates (like the removal of holes in polygons)
+  Because of that, direct comparison of coordinate values should be avoided.
+  The internal precision used is 0.00001. By convention, floating-point type objects are supposed to 
+  be used for micrometer-unit objects, hence this precision corresponds to 0.01 nm which corresponds to 
+  the tenth of an atom and should be well below physical tolerances. 
+  </p>
+
+  <p>
+  Some operations which are implemented on integer coordinates (like the removal of holes in polygons)
   are not available for the floating-point type objects.
   </p>
 
   <p>
-  All floating-point type objects have class methods like "from_i.." (i.e. <class_doc href="DBox#from_ibox"/>) which convert integer-coordinate
-  type objects to floating-point type ones without loss of precision. The reverse path is opened by using the "from_d.." class
-  methods of the integer-type objects (i.e. <class_doc href="Box#from_dbox"/>). These methods however require some rounding and are therefore
-  responsible for a potential distortion of the geometry of the object.
+  All floating-point type objects have a "to_itype" method (i.e. <class_doc href="DBox#to_itype"/>) which convert the floating-point 
+  type object to the integer-coordinate type object. This method can be given a database unit for scaling from micrometer units. 
+  Integer-coordinate type objects can be converted to floating-point type objects the same way through the "to_dtype" method (i.e.
+  <class_doc href="Box#to_dtype"/>. A database unit can be passed to this method too for conversion to micrometer units.
+  These methods however require some rounding and are therefore responsible for a potential distortion of the geometry of the object.
   </p>
 
   <p>
-  For the point object there is also a floating-point equivalent (DPoint, see <class_doc href="DPoint"/>). Is behaves like
-  the integer-coordinate point.
+  For the point and vector object there is also a floating-point equivalent (<class_doc href="DPoint"/> and <class_doc href="DVector"/>). 
+  Both behaves like their integer-coordinate equivalent.
   </p>
 
   <h2>Transformations</h2>
@@ -414,20 +456,23 @@ a == b
   <keyword name="DCplxTrans"/>
   <keyword name="CplxTrans"/>
   <keyword name="ICplxTrans"/>
+  <keyword name="VCplxTrans"/>
+
   <p>
-  Transformations in KLayout are restricted affine transformations which lack shear transformations and the ability to apply
-  an anisotropic scaling. A transformation in KLayout follows the conventions implied by the GDS2 and OASIS formats and include in that order:
+  Transformations in KLayout are restricted affine transformations. Shear transformations and anisotropic scaling is not
+  supported.
+  All transformation in KLayout follows the conventions implied by the GDS2 and OASIS formats and include in that order:
   </p>
 
   <ul>
-    <li>Mirroring around the x axis</li>
+    <li>Mirroring around the x axis (optional)</li>
     <li>Rotation</li>
     <li>Scaling</li>
     <li>Displacement</li>
   </ul>
 
   <p>
-  For memory performance, unless necessary a restricted version of that transformation is used. In that restricted version, the
+  For memory performance, a restricted version of that transformation is used if possible. In that restricted version, the
   rotation angles are confined to a multiple of 90 degree and scaling is not supported. This restricted affine transformation
   is provided through the <class_doc href="Trans"/> class. The 8 possible rotation/mirror variants can be coded in 
   a single rotation/mirror code which is used frequently throughout KLayout (see <link href="/about/transformations.xml"/>).
@@ -435,29 +480,61 @@ a == b
 
   <p>
   For transforming floating-point coordinates, the <class_doc href="DTrans"/> object is provided. The basic difference 
-  is that the displacement uses floating-point coordinates (by employing a DPoint object).
+  is that the displacement uses floating-point coordinates (by employing a DVector object).
   </p>
 
   <p>
   To support more complex affine transformations include arbitrary-angle rotations and scaling, the complex transformation objects
-  are provided. The precise representation of a coordinate transformed with such a transformation requires floating-point 
-  precision. Since that is not practical, different versions of transformations exists which render different output types and 
-  work on different input types:
+  are provided. In addition, the complex transformation object can translate between integer and floating-point coordinate types.
   </p>
 
   <ul>
     <li><class_doc href="CplxTrans"/>: takes integer coordinates and delivers floating-point coordinates. 
-    Therefore it uses a DPoint for the displacement.
+    Therefore it uses a DVector for the displacement. The inverse of this transformation is a VCplxTrans
+    class (see below).
     </li>
     <li><class_doc href="DCplxTrans"/>: takes floating-point coordinates and delivers floating-point coordinates. 
-    Therefore it also uses a DPoint for the displacement.
+    Therefore it also uses a DVector for the displacement.
     </li>
     <li><class_doc href="ICplxTrans"/>: takes integer coordinates and delivers integer coordinates. 
-    Therefore it uses a Point for the displacement. This transformation is convenient to provide complex transformations
+    Therefore it uses a Vector for the displacement. This transformation is convenient to provide complex transformations
     for database operations but implies rounding errors due to rounding to integer coordinates on output. It is safe to use however
     for integer-factor scaling operations for example.
     </li>
+    <li><class_doc href="VCplxTrans"/>: takes floating-point coordinates and integer coordinates. 
+    Therefore it also uses a Vector for the displacement. The inverse of this transformation is a 
+    CplxTrans object.
+    </li>
   </ul>
+
+  <p>
+  Multiplication of a transformation with an object renders the transformed object:
+  </p>
+
+  <pre>t = ... # a transformation
+p = ... # some point
+
+# compute the transformed point:
+q = t * p</pre>
+
+  <p>
+  Multiplication of two transformations corresponds to concatenation of two transformations:
+  </p>
+
+  <pre>t1 = ... # a transformation
+t2 = ... # another transformation
+
+# Multiplication of t2 and t1 renders an equivalent transformation
+# that corresponds to "apply t1 first and then t2":
+(t2 * t1) * p == t2 * (t1 * p)</pre>
+
+  <p>
+  When multiplying two complex transformations, the resulting transformation type will 
+  have the corresponding input and output types. For example when multiplying a VCplxTrans with 
+  a CplxTrans, a ICplxTrans object will be created. This is because the first transformation
+  takes integers and the second one delivers integers. Hence the resulting transformation
+  is ICplxTrans.
+  </p>
 
   <h2>The Region class</h2>
 

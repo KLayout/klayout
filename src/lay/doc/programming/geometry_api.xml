@@ -24,6 +24,11 @@
   for geometrical algorithms like boolean operations and DRC checks.
   </p>
 
+  <p>
+  Most classes of the geometry API provide a hash value so they can be used as keys in Ruby 
+  hashes.
+  </p>
+
   <h2>The Point class</h2>
 
   <keyword name="Point"/>

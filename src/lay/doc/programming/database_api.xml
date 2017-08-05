@@ -990,7 +990,7 @@ shapes.each(RBA::Shapes::SBoxes | RBA::Shapes::SPolygons) { |s| ... }</pre>
   </p>
 
   <p>
-  Shapes can be replaced by other primitives using one of the <p>replace</p> methods.
+  Shapes can be replaced by other primitives using one of the <k>replace</k> methods.
   Please note that using "replace" inside an iterator loop may lead to unexpected 
   behavior of the iterator, so modifying a shape inside an iterator loop should be
   avoided. Here is an example:

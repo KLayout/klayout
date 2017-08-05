@@ -14,7 +14,7 @@
   <p>
   In some places, the API requires to attach code to an event. An event could be a menu item which is selected
   or a change of some status which might require some action. The API allows implementation of specific code which is
-  called in that case. This enables us to implement initialisation functionality for example or the functionality
+  called in that case. This enables us to implement the functionality
   behind a menu item. In this text we will refer to such functionality by the general term "callback". In general
   a callback is custom code that is called from the API in contrast to API code that is called from the custom code.
   </p>
@@ -24,7 +24,7 @@
   </p>
 
   <ul>
-    <li><b>Reimplementation (Strategy Pattern)</b>: some API classes provide "virtual" methods. "virtual" is a C++ term and 
+    <li><b>Reimplementation</b>: some API classes provide "virtual" methods. "virtual" is a C++ term and 
     means a method that can be overridden in a derived class. This technique is employed for example in the
     "Strategy" design pattern. In strictly typed C++ this is quite a common pattern which allows definition of interfaces 
     and concrete implementations based on those interfaces. Ruby as a dynamic language doesn't care much about
@@ -42,6 +42,11 @@
     binding (<link href="/programming/qt_binding.xml"/>).
     </li>
   </ul>
+
+  <p>
+  The "Observer" class which was there prior to KLayout 0.25 has been dropped in favour of the more
+  flexible events. It is no longer supported.
+  </p>
 
   <h2>Reimplementation (Strategy Pattern)</h2>
 
@@ -98,65 +103,10 @@ end</pre>
 
 end</pre>
 
-  <h2>Observer</h2>
-
-  <p>
-  Using the Observer pattern requires an additional object. Again reimplementation
-  allows attaching custom functionality to the callback. In contrast to the Strategy pattern,
-  the interface is very generic and can supply only few parameters, if there are parameters
-  at all.
-  </p>
-
-  <p>
-  An observer is an object of a class derived from the Observer class (<class_doc href="Observer"/>). 
-  An example for a use case for the Observer is the LayoutView class (<class_doc href="LayoutView"/>). This class
-  offers multiple events that indicate certain conditions. Here is some code:
-  </p>
-
-  <pre>module MyMacro
-  
-  include RBA
-  
-  class MyObserver &lt; Observer
-    def signal 
-      Application::instance.main_window.message("Selection changed", 1000)
-    end
-  end
-  
-  observer = MyObserver::new
-  Application::instance.main_window.current_view.add_selection_changed_observer(observer)  
-  
-end</pre>
-
-  <p>
-  In this example, an observer is created and attached to the "selection_changed" event of
-  LayoutView using "add_selection_changed_observer". When the selection changes, the "signal"
-  method of the observer is called. By reimplementing that method we show a short message
-  in the MainWindow's status bar.
-  </p>
-
-  <p>
-  Because Ruby is a dynamic language and allows overriding of methods per instance, we can simplify
-  the example further which avoids having to create a new class:
-  </p>
-
-  <pre>module MyMacro
-  
-  include RBA
-  
-  observer = MyObserver::new
-  def observer.signal
-    Application::instance.main_window.message("Selection changed", 1000)
-  end
-
-  Application::instance.main_window.current_view.add_selection_changed_observer(observer)  
-  
-end</pre>
-  
   <h2>Events</h2>
 
   <p>
-  Events are the callback variant that is the easiest one to use. Using an event it is possible
+  Events are the callback variant which is the easiest one to use. Using an event it is possible
   to directly attach a block of code to a callback. An event has a specific signature, i.e. 
   the parameters it provides. The block can obtain this parameters by listing them in it's argument list.
   </p>
@@ -211,7 +161,7 @@ end</pre>
 
   <p>
   If the Qt binding is available (see <link href="/programming/qt_binding.xml"/>), Qt signals
-  are available as events which simplifies the implementation of a Qt dialog. In this example,
+  are implemented as events. This way it's very simple to create a Qt dialog. In following example,
   the "textChanged" signal of QLineEdit is attached a code block which copies the text of the 
   input field to the label below:
   </p>
@@ -230,12 +180,34 @@ end</pre>
   # implement the textChanged signal as event:
   input.textChanged { |text| label.text = text }
 
+  dialog.exec
+
 end</pre>
 
   <p>
-  Please note that unlike Qt signal/slots, this technique does not allow to attach multiple
-  handlers to one event/signal.
+  Using the += operator on the event, multiple handlers can be added to a signal:
   </p>
+
+  <pre>module MyMacro
+  
+  include RBA
+  
+  dialog = QDialog::new(Application::instance.main_window)
+  layout = QVBoxLayout::new(dialog)
+  input = QLineEdit::new(dialog)
+  label1 = QLabel::new(dialog)
+  label2 = QLabel::new(dialog)
+  layout.addWidget(input)
+  layout.addWidget(label1)
+  layout.addWidget(label2)
+
+  # two signal consumers:
+  input.textChanged += lambda { |text| label1.text = text }
+  input.textChanged += lambda { |text| label2.text = text.reverse }
+  
+  dialog.exec
+
+end</pre>
 
 </doc>
 

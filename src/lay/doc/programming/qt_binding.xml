@@ -18,17 +18,21 @@
   <pre>build.sh -with-qtbinding ...</pre>
 
   <p>
-  The API provided covers the functionality of Qt 4.6. To build KLayout with Qt binding, 
-  at least Qt version 4.6.2 is required. The API covers the following Qt modules:
+  The API provided covers the functionality of a certain Qt version. Currently this is Qt 4.6 and Qt 5.5. 
+  The API covers the following Qt 4 and Qt 5 modules:
   </p>
 
   <ul>
     <li>QtCore: the basic Qt API</li>
     <li>QtGui: the user interface widgets and supporting classes</li>
     <li>QtXml: support for XML</li>
+    <li>QtXmlPatterns (Qt5): XML schema and queries</li>
     <li>QtSql: database support</li>
     <li>QtNetwork: various network protocols and supporting classes</li>
     <li>QtDesigner: dynamically load designer files (.ui)</li>
+    <li>QtMultimedia (Qt5): multimedia support</li>
+    <li>QtPrintSupport (Qt5): print support</li>
+    <li>QtSvg (Qt5): SVG implementation</li>
   </ul>
 
   <p>

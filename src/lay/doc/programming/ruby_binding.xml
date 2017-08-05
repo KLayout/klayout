@@ -79,8 +79,8 @@
 
   <p>
   RBA/GSI follows a simple principle that significantly simplifies the implementation: who created
-  an object is responsible for cleaning it up. In different words: a reference is not transferred between C++ and Ruby space. 
-  Thus we have to consider two cases: The 
+  an object is responsible for cleaning it up. In other words: a ownership of an object is usually 
+  not transferred between C++ and Ruby space.  Thus we have to consider two cases: The 
   object is created in Ruby or the object is created in C++ code. Literally the object "lives" in Ruby
   space or in C++ space. In both cases, there is a pair of objects, but one of them is controlling
   the other.
@@ -121,12 +121,13 @@ cell.shapes(layer).insert(box)</pre>
   Ruby to C++. RBA handles that case by explicitly transferring control when a QObject or one of the
   derived objects is created with a parent reference in Ruby code. Qt implements it's own mechanism of controlling
   the lifetime which includes monitoring of the lifetime of child objects. This feature makes transferring the
-  control feasible for these kind of objects.
+  control feasible for these kind of objects. For some Qt methods which are know to transfer the ownership 
+  of an object, the ownership is transferred explicitly.
   </p>
 
   <p>
   An object living in Ruby space can be explicitly deleted to free resources for example. For this, the 
-  "destroy" method is provided. This method will only deleted the C++ object and not the Ruby object. However,
+  "_destroy" method is provided. This method will only deleted the C++ object and not the Ruby object. However,
   the Ruby object will become invalid and calling a method on such an object will result in an error.
   </p>
   
@@ -137,36 +138,12 @@ cell.shapes(layer).insert(box)</pre>
   Ruby object is still alive but the C++ object is deleted. In that case, the flavor of the link between
   the Ruby proxy and C++ object is important: if the link is bidirectional, the C++ object will inform the
   Ruby proxy that the reference will become invalid. The Ruby proxy will mark itself as being invalid and
-  will block further calls to methods. If the link is unidirectional that is not possible and this situation
-  bears the danger of invalid references with fatal consequences if an attempt is made to call a method 
-  then.
+  will block further calls to methods. Object supporting this reference binding are the API classes
+  and "bigger" database objects such as Cell or Layout.
   </p>
 
   <p>
-  Fortunately that case is rare. A situation frequently encountered is that:
-  </p>
-
-  <pre>//  C++:
-const Box &amp;Polygon::bounding_box() const { return m_bounding_box; }
-
-# Ruby:
-polygon = RBA::Polygon::new
-...
-box = polygon.bounding_box
-polygon = nil
-... after some time the polygon is deleted and if box was a reference this would crash:
-puts box.width</pre>
-
-  <p>
-  From that example we learn that we shall be careful by exposing aggregations 
-  through references. The solution is to create a copy from a 
-  const reference. The copy then lives in Ruby space and is basically detached from the
-  C++ object.
-  </p>
-
-  <p>
-  If copying is not an option because the object is too heavy, a bidirectional link will be used
-  in most cases. For example:
+  For example:
   </p>
 
   <pre>main_window = ... # the RBA::MainWindow object
@@ -176,10 +153,19 @@ view = main_window.current_view
 main_window.close_all 
 # this will fail, because the view is a Ruby proxy that knows that the C++ object 
 # has been deleted:
-view.load_layout(...)</pre>
+view.load_layout(...)
+# You can check this by asking "_destroyed?". This will return "true":
+view._destroyed?</pre>
 
   <p>
-  Calling "destroy" on an object living in C++ space is not safe in general. In some cases, this can have
+  For "lightweight" objects such as the geometry primitives (Box, Polygon etc.), the link is unidirectional 
+  and lifetime monitoring is not possible. This situation
+  bears the danger of invalid references with fatal consequences if an attempt is made to call a method 
+  then. Fortunately this case is rare and usually mitigated by providing an object clone.
+  </p>
+
+  <p>
+  Calling "_destroy" on an object living in C++ space is not safe in general. In some cases, this can have
   fatal consequences (i.e. destroying the MainWindow object). An exception from that rule are Qt objects
   because Qt does lifetime monitoring internally and destroying an object from the outside (Ruby) is 
   a valid operation in most cases (although there are exceptions).
@@ -388,8 +374,10 @@ A::new.f(x)
   <h3>Hash arguments and return values</h3>
 
   <p>
-  Some functions support hashes for arguments and return types. Unlike Ruby, C++ hashes
-  (maps) are strictly typed, so it's important to provide the right key and value pairs.
+  Associative containers (std::map, QHash etc.) are mapped to Ruby hashes. 
+  Unlike Ruby, C++ associative containers are strictly typed, so it's important to provide the right key and value pairs.
+  </p>
+
   </p>
 
   <h3>Default arguments</h3>

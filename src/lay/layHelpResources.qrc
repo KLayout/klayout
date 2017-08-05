@@ -271,7 +271,6 @@
     <qresource prefix="/help/programming">
         <file alias="introduction.xml">doc/programming/introduction.xml</file>
         <file alias="python.xml">doc/programming/python.xml</file>
-        <file alias="traditional.xml">doc/programming/traditional.xml</file>
         <file alias="index.xml">doc/programming/index.xml</file>
         <file alias="application_api.xml">doc/programming/application_api.xml</file>
         <file alias="database_api.xml">doc/programming/database_api.xml</file>

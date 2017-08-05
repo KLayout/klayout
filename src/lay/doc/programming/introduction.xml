@@ -36,7 +36,6 @@
       <b>Scripts</b> are simple text files which are prepared externally and KLayout acts as an interpreter for these scripts.
       A special case of scripts is included code, while is loaded into other scripts or macros using "require" on Ruby
       or "import" on Python. Scripts have been the only way to code Ruby functionality in version 0.21 and earlier.
-      That way is still supported, but deprecated (See <link href="/programming/traditional.xml"/>).
     </li>
     <li>
       <b>Macros</b> are special XML files which contain Ruby code plus some additional information required to  

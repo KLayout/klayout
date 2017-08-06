@@ -32,6 +32,8 @@
 #include "tlAssert.h"
 #include "tlLog.h"
 #include "tlTimer.h"
+#include "tlExpression.h"
+#include "tlSystemPaths.h"
 
 #include "rba.h"
 #include "rbaInspector.h"
@@ -50,6 +52,8 @@
 #include <QString>
 #include <QByteArray>
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
 
 #if !defined(HAVE_RUBY_VERSION_CODE)
 #  define HAVE_RUBY_VERSION_CODE 10901
@@ -1428,6 +1432,15 @@ struct RubyConstDescriptor
 extern "C" void ruby_prog_init();
 
 static void
+rba_add_path (const std::string &path)
+{
+  VALUE pv = rb_gv_get ("$:");
+  if (pv != Qnil && TYPE (pv) == T_ARRAY) {
+    rb_ary_push (pv, rb_str_new (path.c_str (), path.size ()));
+  }
+}
+
+static void
 rba_init (RubyInterpreterPrivateData *d)
 {
   VALUE module = rb_define_module ("RBA");
@@ -1778,6 +1791,45 @@ RubyInterpreter::initialize (int main_argc, char **main_argv, int (*main_func) (
       ruby_init ();
       signal (SIGINT, org_sigint);
 
+#if defined(_WIN32)
+
+      //  On Windows we derive additional path components from a file called ".ruby-paths.txt" 
+      //  inside the installation directory. This way, the installer can copy the deployment-time
+      //  installation easier.
+
+      try {
+
+        QDir inst_dir (tl::to_qstring (tl::get_inst_path ()));
+        QFileInfo fi (inst_dir.absoluteFilePath (tl::to_qstring(".ruby-paths.txt")));
+        if (fi.exists ()) {
+
+          tl::log << tl::to_string (QObject::tr ("Reading Ruby path from ")) << tl::to_string (fi.filePath ());
+
+          QFile paths_txt (fi.filePath ());
+          paths_txt.open (QIODevice::ReadOnly);
+
+          tl::Eval eval;
+          eval.set_global_var ("inst_path", tl::Variant (tl::to_string (inst_dir.absolutePath ())));
+          tl::Expression ex;
+          eval.parse (ex, paths_txt.readAll ().constData ());
+          tl::Variant v = ex.execute ();
+
+          if (v.is_list ()) {
+            for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
+              rba_add_path (i->to_string ());
+            }
+          }
+
+        }
+
+      } catch (tl::Exception &ex) {
+        tl::error << tl::to_string (QObject::tr ("Evaluation of Ruby path expression failed")) << ": " << ex.msg (); 
+      } catch (...) {
+        tl::error << tl::to_string (QObject::tr ("Evaluation of Ruby path expression failed"));
+      }
+
+#endif
+
       //  Remove setters for $0 and $PROGRAM_NAME (still both are linked) because
       //  the setter does strange things with the process and the argv, specifically argv[0] above.
       static VALUE argv0 = Qnil;
@@ -1856,10 +1908,7 @@ RubyInterpreter::remove_package_location (const std::string & /*package_path*/)
 void
 RubyInterpreter::add_path (const std::string &path)
 {
-  VALUE pv = rb_gv_get ("$:");
-  if (pv != Qnil && TYPE (pv) == T_ARRAY) {
-    rb_ary_push (pv, rb_str_new (path.c_str (), path.size ()));
-  }
+  rba_add_path (path);
 }
 
 void

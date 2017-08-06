@@ -25,6 +25,7 @@
 #include "tlString.h"
 
 #include <QDir>
+#include <QFileInfo>
 #include <QCoreApplication>
 
 #ifdef _WIN32
@@ -66,10 +67,42 @@ get_appdata_path ()
   return tl::to_string (appdata_klayout_path);
 }
 
+static std::string 
+get_inst_path_internal ()
+{
+  //  Note: the QCoreApplication::applicationDirPath cannot be used before
+  //  a QApplication object is instantiated. Hence this custom implementation.
+#ifdef _WIN32
+
+  wchar_t buffer[MAX_PATH]; 
+  int len;
+  if ((len = GetModuleFileName(NULL, buffer, MAX_PATH)) > 0) {
+    QFileInfo fi (QString::fromUtf16 ((const ushort *) buffer, len));
+    return tl::to_string (fi.absolutePath ());
+  } 
+
+#else 
+    
+  QFileInfo proc_exe (tl::sprintf ("/proc/%d/exe"), getpid ());
+  if (proc_exe.exists () && proc_exe.isSymLink ()) {
+    return QFileInfo (proc_exe.canonicalFilePath ()).absolutePath ();
+  }
+
+#endif
+
+  //  As a fallback use QCoreApplication::applicationDirPath, which however it not 
+  //  available before QCoreApplication is initialized
+  return tl::to_string (QCoreApplication::applicationDirPath ());
+}
+
 std::string 
 get_inst_path ()
 {
-  return tl::to_string (QCoreApplication::applicationDirPath ());
+  static std::string s_inst_path;
+  if (s_inst_path.empty ()) {
+    s_inst_path = get_inst_path_internal ();
+  }
+  return s_inst_path;
 }
 
 #ifdef _WIN32

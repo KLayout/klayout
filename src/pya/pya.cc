@@ -38,6 +38,7 @@
 #include "tlLog.h"
 #include "tlStream.h"
 #include "tlTimer.h"
+#include "tlExpression.h"
 
 #include <cctype>
 #include <cstdio>
@@ -47,6 +48,8 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QVector>
+#include <QFile>
+#include <QFileInfo>
 
 namespace pya
 {
@@ -2252,29 +2255,55 @@ PythonInterpreter::PythonInterpreter ()
 
   const wchar_t *python_path = _wgetenv (L"KLAYOUT_PYTHONPATH");
   if (python_path) {
+
     Py_SetPath (python_path);
+
   } else {
 
-    //  by default take the installation path + "/lib/python"
-    //  and inside this path take "DLLs", "Lib" and "Lib/site-packages".
-    //  This is compatible with the installation.
-    QDir inst_dir (QCoreApplication::applicationDirPath ());
-    inst_dir = inst_dir.filePath (tl::to_qstring ("lib"));
-    inst_dir = inst_dir.filePath (tl::to_qstring ("python"));
+    //  If present, read the paths from a file in INST_PATH/.python-paths.txt.
+    //  The content of this file is evaluated as an expression and the result
+    //  is placed inside the Python path.
+    
+    try {
 
-    QDir inst_dir_lib = inst_dir.filePath (tl::to_qstring ("Lib"));
+      QString path;
 
-    QString path = inst_dir.absoluteFilePath (tl::to_qstring ("DLLs")) 
-                     + tl::to_qstring (";") 
-                     + inst_dir_lib.absolutePath ()
-                     + tl::to_qstring (";") 
-                     + inst_dir_lib.absoluteFilePath (tl::to_qstring ("site-packages"))
-                   ;
+      QDir inst_dir (QCoreApplication::applicationDirPath ());
+      QFileInfo fi (inst_dir.absoluteFilePath (tl::to_qstring(".python-paths.txt")));
+      if (fi.exists ()) {
 
-    //  note: this is a hack, but linking with toWCharArray fails since wchar_t is treated
-    //  as a built-in type in our build
-    Py_SetPath ((const wchar_t *) path.utf16 ());
+        tl::log << tl::to_string (QObject::tr ("Reading Python path from ")) << tl::to_string (fi.filePath ());
 
+        QFile paths_txt (fi.filePath ());
+        paths_txt.open (QIODevice::ReadOnly);
+
+        tl::Eval eval;
+        eval.set_global_var ("inst_path", tl::Variant (tl::to_string (inst_dir.absolutePath ())));
+        tl::Expression ex;
+        eval.parse (ex, paths_txt.readAll ().constData ());
+        tl::Variant v = ex.execute ();
+
+        if (v.is_list ()) {
+          for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
+            if (! path.isEmpty ()) {
+              path += tl::to_qstring (";");
+            }
+            path += tl::to_qstring (i->to_string ());
+          }
+        }
+
+      }
+
+      //  note: this is a hack, but linking with toWCharArray fails since wchar_t is treated
+      //  as a built-in type in our build
+      Py_SetPath ((const wchar_t *) path.utf16 ());
+
+    } catch (tl::Exception &ex) {
+      tl::error << tl::to_string (QObject::tr ("Evaluation of Python path expression failed")) << ": " << ex.msg (); 
+    } catch (...) {
+      tl::error << tl::to_string (QObject::tr ("Evaluation of Python path expression failed"));
+    }
+   
   }
 
 # else
@@ -2301,6 +2330,45 @@ PythonInterpreter::PythonInterpreter ()
   Py_SetProgramName (make_string (app_path));
 
   Py_InitializeEx (0 /*don't set signals*/);
+
+  if (add_path_from_file) {
+
+    //  If present, read the paths from a file in INST_PATH/.python-paths.txt.
+    //  The content of this file is evaluated as an expression and the result
+    //  is placed inside the Python path.
+    
+    try {
+
+      QDir inst_dir (QCoreApplication::applicationDirPath ());
+      QFileInfo fi (inst_dir.absoluteFilePath (tl::to_qstring(".python-paths.txt")));
+      if (fi.exists ()) {
+
+        tl::log << tl::to_string (QObject::tr ("Reading Python path from ")) << tl::to_string (fi.filePath ());
+
+        QFile paths_txt (fi.filePath ());
+        paths_txt.open (QIODevice::ReadOnly);
+
+        tl::Eval eval;
+        eval.set_global_var ("inst_path", tl::Variant (tl::to_string (inst_dir.absolutePath ())));
+        tl::Expression ex;
+        eval.parse (ex, paths_txt.readAll ().constData ());
+        tl::Variant v = ex.execute ();
+
+        if (v.is_list ()) {
+          for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
+            add_path (i->to_string ());
+          }
+        }
+
+      }
+
+    } catch (tl::Exception &ex) {
+      tl::error << tl::to_string (QObject::tr ("Evaluation of Python path expression failed")) << ": " << ex.msg (); 
+    } catch (...) {
+      tl::error << tl::to_string (QObject::tr ("Evaluation of Python path expression failed"));
+    }
+
+  }
 
   //  Set dummy argv[]
   //  TODO: more?

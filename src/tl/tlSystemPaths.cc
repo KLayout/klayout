@@ -30,6 +30,8 @@
 
 #ifdef _WIN32
 #  include <windows.h>
+#else
+#  include <unistd.h>
 #endif
 
 #include <cstdlib>
@@ -83,14 +85,14 @@ get_inst_path_internal ()
 
 #else 
     
-  QFileInfo proc_exe (tl::sprintf ("/proc/%d/exe"), getpid ());
+  QFileInfo proc_exe (tl::to_qstring (tl::sprintf ("/proc/%d/exe", getpid ())));
   if (proc_exe.exists () && proc_exe.isSymLink ()) {
-    return QFileInfo (proc_exe.canonicalFilePath ()).absolutePath ();
+    return tl::to_string (QFileInfo (proc_exe.canonicalFilePath ()).absolutePath ());
   }
 
 #endif
 
-  //  As a fallback use QCoreApplication::applicationDirPath, which however it not 
+  //  As a fallback use QCoreApplication::applicationDirPath, which however is not
   //  available before QCoreApplication is initialized
   return tl::to_string (QCoreApplication::applicationDirPath ());
 }

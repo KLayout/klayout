@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "klayout_doc.dtd">
+
+<doc>
+
+  <title>Choosing A Line Style</title>
+  <keyword name="Layer display"/>
+  <keyword name="Line Style"/>
+  <keyword name="Display specification"/>
+  <keyword name="Layer properties"/>
+
+  <p>
+  Line styles control how the outline of the shapes is drawn. 
+  The default is a solid line. Available line styles are dotted lines,
+  dashes lines and custom styles.
+  To choose a certain line style, select the layer or the layers for which to
+  change the style and choose the line style from the "Style"
+  panel.
+  </p>
+
+  <p>
+  New styles can be created with the "Custom Style" button. A line style editor
+  will come up that allows creating and editing of new styles. The predefined
+  pattern cannot be changed. To apply a new style, select "More" from the
+  style selection panel and choose the new style from the list.
+  The custom styles are saved with the layer display properties.
+  </p>
+
+</doc>
+

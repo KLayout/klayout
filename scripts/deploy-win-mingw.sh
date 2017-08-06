@@ -184,3 +184,20 @@ cp $scripts/klayout-inst.nsis $target
 cd $target
 NSIS_VERSION=$KLAYOUT_VERSION NSIS_ARCH=$arch "$makensis" klayout-inst.nsis
 
+# ----------------------------------------------------------
+# Produce the .zip file
+
+zipname="klayout-$KLAYOUT_VERSION-$arch"
+
+echo "Making .zip file $zipname.zip .."
+
+rm -rf $zipname $zipname.zip
+mkdir $zipname
+cp -Rv *.dll .*-paths.txt imageformats lib $zipname | sed -u 's/.*/echo -n ./' | sh
+cp klayout.exe $zipname/klayout_app.exe
+cp klayout.exe $zipname/klayout_vo_app.exe
+echo ""
+
+zip -r $zipname.zip $zipname
+rm -rf $zipname
+

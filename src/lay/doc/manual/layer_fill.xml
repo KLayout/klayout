@@ -16,11 +16,11 @@
   panel.
   </p>
   <p>
-  New pattern can be created with the "Edit" button. A pattern editor
+  New pattern can be created with the "Custom Pattern" button. A pattern editor
   will come up that allows creating and editing of new pattern. The predefined
-  pattern cannot be changed. To select a new pattern, select "More" from the
+  pattern cannot be changed. To apply a new pattern, select "More" from the
   pattern selection panel and choose the new pattern from the list.
-  The new pattern is saved with the layer display properties.
+  The custom pattern are saved with the layer display properties.
   </p>
 
 </doc>

@@ -25,7 +25,8 @@
     <topic href="/manual/descend.xml"/>
     <topic href="/manual/layer_color.xml"/>
     <topic href="/manual/layer_content.xml"/>
-    <topic href="/manual/layer_fill.xml"/>
+    <topic href="/manual/layer_content.xml"/>
+    <topic href="/manual/line_style.xml"/>
     <topic href="/manual/layer_animation.xml"/>
     <topic href="/manual/layer_style.xml"/>
     <topic href="/manual/layer_visibility.xml"/>

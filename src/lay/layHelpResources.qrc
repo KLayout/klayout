@@ -187,6 +187,7 @@
         <file alias="layer_color.xml">doc/manual/layer_color.xml</file>
         <file alias="layer_content.xml">doc/manual/layer_content.xml</file>
         <file alias="layer_fill.xml">doc/manual/layer_fill.xml</file>
+        <file alias="line_style.xml">doc/manual/line_style.xml</file>
         <file alias="layer_hier.xml">doc/manual/layer_hier.xml</file>
         <file alias="layer_ops.xml">doc/manual/layer_ops.xml</file>
         <file alias="layer_order.xml">doc/manual/layer_order.xml</file>

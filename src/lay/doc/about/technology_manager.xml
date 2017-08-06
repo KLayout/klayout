@@ -32,12 +32,24 @@
       are bound to a menu entry. Otherwise they will be invisible.
     </li>
     <li>DRC scripts: in the same way, DRC scripts can be associated with a technology.</li>
+    <li>Libraries: if a library is associated with a technology, it is shown in the list
+      of available libraries when an instance is created. Library association cannot be
+      edited. Instead, a library installed in the system comes with a technology 
+      association itself.</li>
+    <li>File format options: technology specific file reader or writer options can be
+      given. When a layout is saved, it will use the writer options from it's technology.
+      When loading a layout, the reader options from the active technology will be used.</li>
   </ul>
 
   <p>
   In the future, more aspects may be added to the technology definition.
   </p>
 
+  <p>
+  There is always one "Default" technology that is used when no technology is 
+  specified.
+  </p>
+  
   <h2>Setting up technologies</h2>
 
   <p>
@@ -105,56 +117,28 @@
   or DRC scripts between technologies.
   </p>
 
-  <h2>Importing and exporting technologies</h2>
+  <h2>Managing technologies</h2>
 
   <p>
-  Technologies can be imported and exported to technology files (suffix ".lyt"). There is
-  one file per technology. To import or export a technology, choose "Import" or "Export" from
-  the technology tree's context menu (right mouse click). This way, technologies can be 
-  shared between users.
+  Technologies can be imported and exported to technology files (suffix ".lyt"). This is mainly
+  useful to exchange technology settings between users or technologies.
   </p>
 
   <p>
-  When importing or exporting a technology, the associated files (i.e. scripts, layer properties
-  files etc.) are not exported. They have to be transferred manually. However, if no base path
-  is specified in the technology file, KLayout will use the location of the ".lyt" file as the
-  future base path. That way, a technology plus related files can be made into a self-contained 
-  package using the following recipe:
-  </p>
-
-  <ul>
-    <li>Create any directory where you develop the technology. This will be the workspace.</li>
-    <li>Develop a technology with the technology manager. Enter the workspace path into the base path of the technology. 
-      In the workspace you store all the required additional files.</li>
-    <li>If you want to include DRC scripts or macros, create a "drc" or "macros" folder in the 
-      workspace. Store DRC scripts in the "drc" folder and macros in the macros folder.</li>
-    <li>If you need other files, store them in the workspace or in any sub-folder of the base 
-      path. Other files are layer properties file or LEF files for example. Use relative paths to specify
-      those files or simply use the file name.</li>
-    <li>Export the technology as ".lyt" file into the workspace.</li>
-    <li>Open the ".lyt" file in an text editor and remove the line containing the base path. This
-      line is at the beginning of the file and uses the XML element "base-path". For example: "&lt;base-path&gt;/home/matthias/tech_devel&lt;/base-path&gt;".</li>
-    <li>The workspace with the ".lyt" can now be packaged (tar or zip for example) and send elsewhere. To 
-      install, unpack the package and import the technology file from there. Since no base path
-      is specified, KLayout will set the default path to the ".lyt" file's location and 
-      look for all the additional files from there.</li>
-  </ul>
-
-  <h2>Auto-import feature</h2>
-
-  <p>
-  KLayout offers an additional feature useful for the distribution or central installation
-  of a technology: On startup, KLayout will look for directories called "tech" in KLayout's
-  search path. If such an directory is found, KLayout will scan that directory recursively 
-  for ".lyt" files and automatically import them. It will apply the same rules as for the
-  manual import and the imported technology will also show up in the technology manager, but
-  it cannot be edited.
+  Except for the default technology, technologies are kept in 
+  technology folders in KLayout's application path. They are read from 
+  subfolders from the "tech" directories. The technology definition itself
+  is held in a file with extension ".lyt". The technology folder may have
+  subfolders to hold library files, macros, DRC runsets, LEF files and
+  other pieces of the technology package. 
   </p>
 
   <p>
-  Because the search path includes the application's installation path, this scheme
-  allows for a central installation of technology files plus the associated macros and DRC 
-  scripts, by providing them together with the application binary on some network share.
+  Technologies can be managed using packages. Packages are a convenient way to share
+  add-ons between users. Packages can be installed from a common repository
+  and allow easy addition and removal of components. Technologies are one aspect
+  of packages, so it's possible to create packages that contribute one or more
+  technologies. See <link href="/about/packages.xml"/> for more details.
   </p>
 
 </doc>

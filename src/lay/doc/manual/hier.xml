@@ -9,24 +9,30 @@
 
   <p>
   By default, only the bounding box of the cell selected is shown. This
-  corresponds to zero hierarchy levels being shown. 
+  corresponds to zero hierarchy levels being shown. If you select one more
+  level of hierarchy (Levels 0 to 1), this content of the child cells of
+  the current cell are drawn, but grandchildren (children of child cells)
+  are drawn as boxes. Increasing the hierarchy levels will draw more 
+  and more details of child cells until all cells below the current 
+  cell are drawn in detail.
   </p>
+
   <p>
-  To select more hierarchy levels, choose
+  To select more hierarchy levels
   </p>
 
   <ul>
-    <li>"Full Hierarchy" from the "Display" menu or press the "*" key to
+    <li>Select "Full Hierarchy" from the "Display" menu or press the "*" key to
   show all hierarchy levels</li>
-    <li>"Box Only" from the "Display" menu or press the "0" key to show
+    <li>Select "Box Only" from the "Display" menu or press the "0" key to show
         only the bounding box (the default)</li>
-    <li>"Top Level Only" from the "Display" menu or press the "1" key to
+    <li>Select "Top Level Only" from the "Display" menu or press the "1" key to
         show the top level elements</li>
-    <li>"Increment Hierarchy" from the "Display" menu or press the "+"
+    <li>Select "Increment Hierarchy" from the "Display" menu or press the "+"
         key to show one more hierarchy level</li>
-    <li>"Decrement Hierarchy" from the "Display" menu or press the "-"
+    <li>Select "Decrement Hierarchy" from the "Display" menu or press the "-"
         key to show one hierarchy level less</li>
-    <li>the hierarchy level entry fields below the cell list to change the
+    <li>Use the hierarchy level entry fields below the cell list to change the
         current minimum or maximum level</li>
   </ul>
 

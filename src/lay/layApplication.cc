@@ -265,7 +265,7 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
 #else
   //  determine viewer-only mode from executable name. "klayout_vo*" will enable
   //  viewer-only mode
-  std::string vo_exe_name ("klayout_vo");
+  std::string vo_exe_name (std::string (lay::Version::exe_name ()) + "_vo");
   if (! args.empty () && std::string (tl::to_string (QFileInfo (tl::to_qstring (args.front ())).fileName ()), 0, vo_exe_name.size ()) == vo_exe_name) {
     m_vo_mode = true;
   }

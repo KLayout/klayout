@@ -94,14 +94,10 @@ if ! [ -e $target/klayout.exe ]; then
 fi
 
 # ----------------------------------------------------------
-# Binary dependencies
+# Image formats
 
-libs=$(ldd $target/klayout.exe | grep $mingw_inst | sed 's/ *=>.*//' | sort)
-
-for l in $libs; do
-  echo "Copying binary installation partial $mingw_inst/$l -> $target/$l .."
-  cp $mingw_inst/bin/$l $target/$l
-done
+echo "Installing image format plugins .."
+cp -R $mingw_inst/share/qt5/plugins/imageformats $target
 
 # ----------------------------------------------------------
 # Ruby dependencies
@@ -137,12 +133,6 @@ echo '' >>$target/.ruby-paths.txt
 echo ']' >>$target/.ruby-paths.txt
 
 # ----------------------------------------------------------
-# Image formats
-
-echo "Installing image format plugins .."
-cp -R $mingw_inst/share/qt5/plugins/imageformats $target
-
-# ----------------------------------------------------------
 # Python dependencies
 
 rm -rf $target/.python-paths.txt
@@ -174,6 +164,19 @@ done
 
 echo '' >>$target/.python-paths.txt
 echo ']' >>$target/.python-paths.txt
+
+# ----------------------------------------------------------
+# Binary dependencies
+
+# Analyze the dependencies of our components and add the corresponding libraries from $mingw_inst/bin
+libs=$(find $target \( -name "*.dll" -or -name "*.so" \) -exec objdump -p "{}" ";" | grep "DLL Name:" | sort -u | sed 's/.*DLL Name: *//')
+
+for l in $libs; do
+  if [ -e $mingw_inst/bin/$l ]; then
+    echo "Copying binary installation partial $mingw_inst/bin/$l -> $target/$l .."
+    cp $mingw_inst/bin/$l $target/$l
+  fi  
+done
 
 # ----------------------------------------------------------
 # Run NSIS

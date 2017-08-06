@@ -1,0 +1,177 @@
+
+# ---------------------------------------------------------------------------
+# NSIS installer script 
+# 
+# for NSIS v 2.38
+# compile with: makensis.exe klayout-inst.nsis
+# ---------------------------------------------------------------------------
+
+!define NAME "KLayout"
+!define DISPNAME "Klayout - Layout Viewer And Editor"
+!define EXEBASE "klayout"
+!define EXENAME "klayout_app"
+!define EXENAME_VO "klayout_vo_app"
+!define VERSION "$%NSIS_VERSION%"
+
+Name "${NAME} v${VERSION}"
+
+# request normal user rights, but switch to "all" mode if the user has admin rights
+RequestExecutionLevel user
+
+# define installer name
+outFile "${EXEBASE}-${VERSION}-$%NSIS_ARCH%-install.exe"
+ 
+# set Program Files or Application Data as install directory depending on the
+# installer's permissions
+Function .onInit
+  UserInfo::GetAccountType
+  Pop $0
+  StrCmp $0 "Admin" 0 +3
+    StrCpy $InstDir "$PROGRAMFILES\${NAME}"
+  Goto +2
+    StrCpy $InstDir "$APPDATA\${NAME}"
+FunctionEnd
+
+InstProgressFlags smooth
+
+# detect installation path from uninstall string if available
+InstallDirRegKey HKLM \
+          "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" \
+          "UninstallString"
+
+# The text to prompt the user to enter a directory
+DirText "Please select your ${NAME} installation path below:"
+ 
+# automatically close the installer when done.
+AutoCloseWindow true
+ 
+# adds xp style support
+XPStyle on
+
+# Pages
+Page directory
+Page instfiles
+
+ 
+# default section start
+section
+ 
+  UserInfo::GetAccountType
+  Pop $0
+  StrCmp $0 "Admin" 0 +2
+    SetShellVarContext all
+ 
+  # define output path
+  setOutPath $INSTDIR
+ 
+  # specify files to go in output path
+  # not installed because of disk space:
+  # file strm2gds.exe
+  # file strm2oas.exe
+  # file strmclip.exe
+  # file strmcmp.exe
+  file *.dll
+  file .*-paths.txt
+  file /r imageformats
+  file /r lib
+  file /oname=${EXENAME}.exe ${EXEBASE}.exe
+  file /oname=${EXENAME_VO}.exe ${EXEBASE}.exe
+
+  # create a shortcut
+  createDirectory "$SMPROGRAMS\${NAME}"
+  createShortCut "$SMPROGRAMS\${NAME}\${NAME} (Default).lnk" "$INSTDIR\${EXENAME}.exe" 
+  createShortCut "$SMPROGRAMS\${NAME}\${NAME} (Editor).lnk" "$INSTDIR\${EXENAME}.exe" "-e" 
+  createShortCut "$SMPROGRAMS\${NAME}\${NAME} (Viewer).lnk" "$INSTDIR\${EXENAME}.exe" "-ne" 
+
+  # define uninstaller name
+  writeUninstaller $INSTDIR\${EXEBASE}-uninstall.exe
+ 
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" \
+                    "DisplayName" "${DISPNAME}"
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" \
+                    "DisplayVersion" "${VERSION}"
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" \
+                    "Publisher" "Matthias Koefferlein"
+  WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" \
+                    "UninstallString" "$INSTDIR\${EXEBASE}-uninstall.exe"
+
+  WriteRegStr SHCTX "Software\Classes\${NAME}.Application\DefaultIcon" \
+                    "" "$INSTDIR\${EXENAME}.exe"
+  WriteRegStr SHCTX "Software\Classes\${NAME}.Application\Document.1\DefaultIcon" \
+                    "" "$INSTDIR\${EXENAME}.exe"
+  WriteRegStr SHCTX "Software\Classes\${NAME}.Application\Document.1\Shell\Open\Command" \
+                    "" "$INSTDIR\${EXENAME}.exe $\"%1$\""
+  WriteRegStr SHCTX "Software\Classes\${NAME}.Application\Document.2\DefaultIcon" \
+                    "" "$INSTDIR\${EXENAME}.exe"
+  WriteRegStr SHCTX "Software\Classes\${NAME}.Application\Document.2\Shell\Open\Command" \
+                    "" "$INSTDIR\${EXENAME}.exe $\"%1$\""
+  WriteRegStr SHCTX "Software\Classes\${NAME}.Application\Document.3\DefaultIcon" \
+                    "" "$INSTDIR\${EXENAME}.exe"
+  WriteRegStr SHCTX "Software\Classes\${NAME}.Application\Document.3\Shell\Open\Command" \
+                    "" "$INSTDIR\${EXENAME}.exe -rm $\"%1$\""
+  WriteRegStr SHCTX "Software\Classes\${NAME}.Application\Document.4\DefaultIcon" \
+                    "" "$INSTDIR\${EXENAME}.exe"
+  WriteRegStr SHCTX "Software\Classes\${NAME}.Application\Document.4\Shell\Open\Command" \
+                    "" "$INSTDIR\${EXENAME}.exe -u $\"%1$\""
+  WriteRegStr SHCTX "Software\Classes\${NAME}.Application\Document.5\DefaultIcon" \
+                    "" "$INSTDIR\${EXENAME}.exe"
+  WriteRegStr SHCTX "Software\Classes\${NAME}.Application\Document.5\Shell\Open\Command" \
+                    "" "$INSTDIR\${EXENAME}.exe -r $\"%1$\""
+  WriteRegStr SHCTX "Software\Classes\.gds" \
+                    "" "${NAME}.Application\Document.1"
+  WriteRegStr SHCTX "Software\Classes\.oas" \
+                    "" "${NAME}.Application\Document.2"
+  WriteRegStr SHCTX "Software\Classes\.rba" \
+                    "" "${NAME}.Application\Document.3"
+  WriteRegStr SHCTX "Software\Classes\.rbm" \
+                    "" "${NAME}.Application\Document.3"
+  WriteRegStr SHCTX "Software\Classes\.lys" \
+                    "" "${NAME}.Application\Document.4"
+  WriteRegStr SHCTX "Software\Classes\.lym" \
+                    "" "${NAME}.Application\Document.5"
+
+# default section end
+sectionEnd
+ 
+# create a section to define what the uninstaller does.
+# the section will always be named "Uninstall"
+section "Uninstall"
+ 
+  # determine, if the user has admin rights and use "all" context in this case
+  UserInfo::GetAccountType
+  Pop $0
+  StrCmp $0 "Admin" 0 +2
+    SetShellVarContext all 
+ 
+  # Always delete uninstaller first
+  delete $INSTDIR\${EXEBASE}-uninstall.exe
+ 
+  # now delete installed files
+  rmDir /r "$INSTDIR"
+
+  # create a shortcut 
+  rmDir /r "$SMPROGRAMS\${NAME}"
+ 
+  DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}"
+  
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application\DefaultIcon"
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application\Document.1\DefaultIcon"
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application\Document.1\Shell\Open\Command"
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application\Document.2\DefaultIcon"
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application\Document.2\Shell\Open\Command"
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application\Document.3\DefaultIcon"
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application\Document.3\Shell\Open\Command"
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application\Document.4\DefaultIcon"
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application\Document.4\Shell\Open\Command"
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application\Document.5\DefaultIcon"
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application\Document.5\Shell\Open\Command"
+  DeleteRegKey SHCTX "Software\Classes\${NAME}.Application"
+  
+  DeleteRegKey SHCTX "Software\Classes\.gds"
+  DeleteRegKey SHCTX "Software\Classes\.oas"
+  DeleteRegKey SHCTX "Software\Classes\.rba"
+  DeleteRegKey SHCTX "Software\Classes\.rbm"
+  DeleteRegKey SHCTX "Software\Classes\.lys"
+  DeleteRegKey SHCTX "Software\Classes\.lym"
+
+sectionEnd

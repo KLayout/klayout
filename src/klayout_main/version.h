@@ -36,7 +36,7 @@ const char *prg_about_text =
   "For feedback and bug reports mail to: contact@klayout.de\n"
   "\n"
   "\n"
-  "Copyright (C) 2006-2016 Matthias K\303\266fferlein\n"
+  "Copyright (C) 2006-2017 Matthias K\303\266fferlein\n"
   "\n"
   "This program is free software; you can redistribute it and/or modify\n"
   "it under the terms of the GNU General Public License as published by\n"

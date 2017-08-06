@@ -7,20 +7,30 @@
   <keyword name="Rulers"/>
 
   <p>
-  A measurement can be performed by choosing "Ruler" mode in the toolbar and 
-  left-clicking a point in the layout
-  and left-clicking another point. A ruler will be shown that indicates
+  A measurement can be performed by clicking on the ruler icon in the 
+  toolbar and selecting "Ruler" from the drop-down options.
+  Left-click on a point in the layout and then left-click again to 
+  specify the second point. A ruler will be shown that indicates
   the distance measured. 
   </p>
+
   <p>
-  Various options can be specified for the rulers using the setup dialog.
-  To show the setup dialog, choose "Setup" from the "File" menu.
+  A more convenient way is provided with the single-click measurement
+  ruler. Select "Measure" from the drop-down options of the ruler symbol.
+  In this mode, a single click will set a ruler to the specified 
+  position. This feature will look for edges in the vicinity of the 
+  ruler and set the ruler to connect the neighboring edges. The ruler
+  is attached perpendicular to the edge next to the initial point.
   </p>
+
   <p>
-  On the "Rulers" tab, different options can be selected. A ruler can be
+  Rulers can be configured in manifold ways. Use "Rulers And Annotations Setup" 
+  in the "Edit" menu to open the ruler configuration dialog. 
+  A ruler can be
   made to snap to edges of objects by selecting "Snap to edge/vertex".
   Ruler orientations can be constrained by using the "Angle Constraint"
-  options. 
+  options. The number of rulers can be limited using the "Limit 
+  number of annotations" setting.
   </p>
 
   <p>
@@ -31,26 +41,26 @@
   </p>
 
   <p>
-  The number of rulers can be limited. If the number of rulers specified
-  is two for example, only the last two rulers are shown. 
-  </p>
-  <p>
   All rulers can be cleared using the "Clear all rulers" function from the
   "Edit" menu.
   </p>
+
   <p>
   Ruler dragging can be canceled with the "Esc" key or using the "Cancel"
   function from the "Edit" menu.
   </p>
+
   <p>
   Rulers can be moved by selecting "Move" mode with the speedbar buttons
   in the toolbar or "Move" from the "Mode" submenu in the "Edit" menu. Then
   left-click and drag the ruler or the ruler end point that should be changed.
   </p>
+
   <p>
   Rulers can be deleted selectively by selecting a ruler in "Select" mode and
   pressing "Delete".
   </p>
+
   <p> 
   Rulers can be modified in a variety of ways. For example, rulers can be shown
   as arrows. To edit the properties of a ruler, double-click the ruler or 
@@ -58,11 +68,13 @@
   See <link href="/manual/ruler_properties.xml"/> for a description of the 
   properties.
   </p>
+
   <p> 
-  Multiple templates can be configured to be available for rulers. If multiple
-  templates are available, the "Ruler" mode toolbar button will show a drop-down
-  menu which allows selecting of one template to be used. Templates can be edited in the 
-  ruler setup page ("Setup" from the "File" menu) or "Ruler Setup" from the "Edit" menu.
+  Multiple templates can be configured to be available for rulers. Each template defined
+  will be shown in the "Ruler" mode toolbar button's drop-down menu.
+  If a template is selected, new rulers produced from this template will inherit
+  the template's properties. Templates are managed in the 
+  ruler setup page ("Setup" from the "File" menu) or "Ruler And Annotation Setup" from the "Edit" menu.
   </p>
 
 </doc>

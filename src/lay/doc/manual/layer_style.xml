@@ -14,11 +14,19 @@
   the change on. "0px" removes the line, "1px" draws a single-pixel wide
   line (the default), "2px" a somewhat thicker line and so on. 
   </p>
+
   <p>
   "Simple" is the normal draw mode while "Marked" draws a cross on each
   vertex of the element. The cross size is constant so the shapes stay
   visible even on large scale where the elements would otherwise become
   single pixels.
+  </p>
+
+  <p>
+  A layer can be configured to draw a diagonal cross on rectangles. 
+  To enable this style, select "Cross" from 
+  the "Styles" toolbox. To disable it, choose "No Cross". The cross 
+  drawing will add to the fill pattern and applies to rectangles only.
   </p>
 
 </doc>

@@ -15,13 +15,18 @@
       Each label can be configure individually to either show a text or the measurement 
       values. The main label is always present, X and Y labels are only present, if the ruler
       has an explicit vertical or horizontal component (all outline styles except "diagonal").
+      For the main label the position of the label can be specified ("P" setting): the label
+      can be made to appear on the first or the second point or in the middle of the ruler.
+      The Alignment of the labels can be specified too: whether the appear left or right-aligned
+      or centered.
     </li>
     <li><b>Style:</b> the style determines how the ruler or it's components are drawn. This can be
-      "ruler-like" (with ticks), arrow style or a plain line.
+      "ruler-like" (with ticks), arrow style, a plain line or with cross markers at the end.
     </li>
     <li><b>Outline:</b> the outline determines how the two points forming the ruler are connected
       to render the ruler shape. This is either just one line ("diagonal"), a horizontal and a vertical line
       (in some outline styles combined with the diagonal line) or a box given by the two points of the 
+      ruler. A special outline is the ellipse which draws an ellipse inside the box defined by the
       ruler.
     </li>
     <li><b>Angle constraint:</b> the orientation of the ruler can be restricted in several ways, i.e. 
@@ -31,10 +36,15 @@
     <li><b>Object snapping:</b> each ruler can be configure to snap to the closest object edge or vertex.
       By default, the rulers use the global setting. It may be disabled however for each ruler.
     </li>
+    <li><b>Mode:</b> in normal mode, two clicks are required to define a ruler: to set the first
+      point and to set the second one. In "Single click" mode, a single click will set both 
+      points to the same. In "Auto measure" mode, the points will be determined by looking
+      for edges in the vicinity of the click point and adjusting the points accordingly.
+    </li>
   </ul>
 
   <p>
-  The label format is an arbitrary text with embedded expressions that may represent a measurement
+  The "Label format" is an arbitrary text with embedded expressions that may represent a measurement
   value. Each such expression starts with a dollar sign, followed by the expression string. The expression 
   syntax supportis the basic operations ("*", "/", "+", "-" ..), bitwise operations ("|", "&amp;", ..), 
   the conditional operator ("x:y?z") as well as some functions, i.e. "abs", "sqrt", "exp". It includes a "sprintf" 

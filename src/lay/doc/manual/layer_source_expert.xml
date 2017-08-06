@@ -18,7 +18,7 @@
   <p>
   A geometrical transformation is specified by appending a transformation in 
   round brackets to the layer/datatype source specification. The format of this
-  transformation is (not necessarily in this order):
+  transformation is (in any order):
   </p>
 
   <p class="indent">
@@ -33,7 +33,7 @@
   </p>
 
   <p>
-  A comprehensive explanation of the transformation syntax can be found in <link href="/about/transformations.xml"/>.
+  A detailed explanation of the transformation syntax can be found in <link href="/about/transformations.xml"/>.
   </p>
 
   <p>

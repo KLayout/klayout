@@ -182,8 +182,21 @@ klayout_main_cont (int argc, char **argv)
   lay::Version::set_exe_name (prg_exe_name);
   lay::Version::set_name (prg_name);
   lay::Version::set_version (prg_version);
-  lay::Version::set_subversion (prg_subversion);
-  lay::Version::set_about_text (prg_about_text);
+
+  std::string subversion (prg_date);
+  subversion += " r";
+  subversion += prg_rev;
+  lay::Version::set_subversion (subversion.c_str ());
+
+  std::string about_text (prg_author);
+  about_text += "\n";
+  about_text += prg_date;
+  about_text += " r";
+  about_text += prg_rev;
+  about_text += "\n";
+  about_text += "\n";
+  about_text += prg_about_text;
+  lay::Version::set_about_text (about_text.c_str ());
 
 #if QT_VERSION >= 0x050000
   qInstallMessageHandler (myMessageOutput);

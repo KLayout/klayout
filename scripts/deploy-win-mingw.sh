@@ -1,5 +1,57 @@
 #!/bin/sh -e
 
+# Specify the Python interpreter to use.
+# This is the command executed for the Python interpreter that is going
+# to be included in KLayout.
+
+python="python3.5m"
+
+# Specify the Ruby interpreter to use.
+# This is the command executed for the Ruby interpreter that is going
+# to be included in KLayout.
+
+ruby="ruby"
+
+# Specify the path to the NSIS compiler
+
+makensis=/c/Program\ Files\ \(x86\)/NSIS/makensis.exe
+
+# ---------------------------------------------------
+# General initialization
+
+if ! [ -e ./build.sh ]; then
+  echo "ERROR: build script not found (not in the main directory?)"
+  exit 1
+fi
+
+# source the versions
+. ./version.sh
+
+pwd=$(pwd)
+
+# ---------------------------------------------------
+# Bootstrap script
+# This branch will fork to the actual builds for win32 and win64
+
+if [ "$KLAYOUT_BUILD_IN_PROGRESS" == "" ]; then
+
+  self=$(which $0)
+
+  export KLAYOUT_BUILD_IN_PROGRESS=1
+
+  # Run ourself in MINGW32 system for the win32 build
+  MSYSTEM=MINGW32 bash --login -c "cd $pwd ; $self"
+
+  # Run ourself in MINGW64 system for the win64 build
+  MSYSTEM=MINGW64 bash --login -c "cd $pwd ; $self"
+
+  exit 0
+
+fi
+
+# ---------------------------------------------------
+# Actual build branch
+
 if [ "$MSYSTEM" == "MINGW32" ]; then
   arch=win32
   mingw_inst=/mingw32
@@ -10,20 +62,24 @@ else
   echo "ERROR: not in mingw32 or mingw64 system."
 fi
 
-pwd=$(pwd)
 target=$pwd/bin-release-$arch
 build=$pwd/build-release-$arch
 src=$pwd/src
 scripts=$pwd/scripts
-python="python3.5m"
-ruby="ruby"
 
-makensis=/c/Program\ Files\ \(x86\)/NSIS/makensis.exe
+echo "------------------------------------------------------------------"
+echo "Running build for architecture $arch .."
+echo ""
+echo "  target = $target"
+echo "  build = $build"
+echo "  version = $KLAYOUT_VERSION"
+echo "  date = $KLAYOUT_VERSION_DATE"
+echo "  rev = $KLAYOUT_VERSION_REV"
+echo ""
 
-version=$(cat $src/klayout_main/version.h | grep prg_version | sed 's/.*"\(.*\)".*/\1/')
-echo "Version is $version"
+# Force a minimum rebuild for the version update
+touch src/klayout_main/version.h
 
-echo "Running build .."
 rm -rf $target
 ./build.sh -python $python -ruby $ruby -bin $target -build $build -j2
 
@@ -126,5 +182,5 @@ echo ']' >>$target/.python-paths.txt
 # longer require the copy
 cp $scripts/klayout-inst.nsis $target
 cd $target
-NSIS_VERSION=$version NSIS_ARCH=$arch "$makensis" klayout-inst.nsis
+NSIS_VERSION=$KLAYOUT_VERSION NSIS_ARCH=$arch "$makensis" klayout-inst.nsis
 

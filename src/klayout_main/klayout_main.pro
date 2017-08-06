@@ -16,6 +16,11 @@ SOURCES = \
 
 RESOURCES = \
 
+DEFINES += \
+  KLAYOUT_VERSION=$$KLAYOUT_VERSION \
+  KLAYOUT_VERSION_REV=$$KLAYOUT_VERSION_REV \
+  KLAYOUT_VERSION_DATE=$$KLAYOUT_VERSION_DATE \
+
 INCLUDEPATH += ../tl ../gsi ../db ../rdb ../laybasic ../lay ../ext ../img ../ant ../lib
 DEPENDPATH += ../tl ../gsi ../db ../rdb ../laybasic ../lay ../ext ../img ../ant ../lib
 LIBS += $$PYTHONLIBFILE $$RUBYLIBFILE -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_laybasic -lklayout_lay -lklayout_ant -lklayout_img -lklayout_edt -lklayout_ext -lklayout_lib

@@ -414,6 +414,9 @@ fi
 
 mkdir -p $BUILD
 
+# source the version script
+. $(dirname $(which $0))/version.sh
+
 # qmake needs absolute paths, so we get them now:
 BUILD=`readlink -f $BUILD`
 BIN=`readlink -f $BIN`

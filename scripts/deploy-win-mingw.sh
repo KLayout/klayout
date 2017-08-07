@@ -170,14 +170,24 @@ echo ']' >>$target/.python-paths.txt
 # ----------------------------------------------------------
 # Binary dependencies
 
-# Analyze the dependencies of our components and add the corresponding libraries from $mingw_inst/bin
-libs=$(find $target \( -name "*.dll" -or -name "*.so" \) -exec objdump -p "{}" ";" | grep "DLL Name:" | sort -u | sed 's/.*DLL Name: *//')
+new_libs=$(find $target -name "*.dll" -or -name "*.so")
 
-for l in $libs; do
-  if [ -e $mingw_inst/bin/$l ]; then
-    echo "Copying binary installation partial $mingw_inst/bin/$l -> $target/$l .."
-    cp $mingw_inst/bin/$l $target/$l
-  fi  
+while [ "$new_libs" != "" ]; do
+
+  echo "Analyzing dependencies of $new_libs .."
+
+  # Analyze the dependencies of our components and add the corresponding libraries from $mingw_inst/bin
+  libs=$(objdump -p $new_libs | grep "DLL Name:" | sort -u | sed 's/.*DLL Name: *//')
+  new_libs=""
+
+  for l in $libs; do
+    if [ -e $mingw_inst/bin/$l ] && ! [ -e $target/$l ]; then
+      echo "Copying binary installation partial $mingw_inst/bin/$l -> $target/$l .."
+      cp $mingw_inst/bin/$l $target/$l
+      new_libs="$new_libs $target/$l"
+    fi  
+  done
+
 done
 
 # ----------------------------------------------------------

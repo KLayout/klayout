@@ -98,6 +98,8 @@ fi
 
 echo "Installing image format plugins .."
 cp -R $mingw_inst/share/qt5/plugins/imageformats $target
+# remove the debug versions - otherwise they pull in the debug Qt libs
+rm $target/imageformats/*d.dll
 
 # ----------------------------------------------------------
 # Ruby dependencies

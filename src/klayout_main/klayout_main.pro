@@ -25,6 +25,19 @@ INCLUDEPATH += ../tl ../gsi ../db ../rdb ../laybasic ../lay ../ext ../img ../ant
 DEPENDPATH += ../tl ../gsi ../db ../rdb ../laybasic ../lay ../ext ../img ../ant ../lib
 LIBS += $$PYTHONLIBFILE $$RUBYLIBFILE -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_laybasic -lklayout_lay -lklayout_ant -lklayout_img -lklayout_edt -lklayout_ext -lklayout_lib
 
+win32 {
+
+  windres.target = klayout_rc.o
+  windres.depends = $$PWD/klayout.rc
+  windres.commands = windres $$windres.depends $$windres.target
+
+  PRE_TARGETDEPS += klayout_rc.o
+  QMAKE_EXTRA_TARGETS += windres
+
+  LIBS += $$windres.target
+
+}
+
 # Note: this accounts for UI-generated headers placed into the output folders in
 # shadow builds:
 INCLUDEPATH += $$DESTDIR/laybasic $$OUT_PWD/../lay

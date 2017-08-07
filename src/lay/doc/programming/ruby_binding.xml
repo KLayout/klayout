@@ -378,8 +378,6 @@ A::new.f(x)
   Unlike Ruby, C++ associative containers are strictly typed, so it's important to provide the right key and value pairs.
   </p>
 
-  </p>
-
   <h3>Default arguments</h3>
 
   <p>

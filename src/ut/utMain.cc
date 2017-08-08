@@ -490,6 +490,20 @@ private:
   bool m_with_xml;
 };
 
+std::string
+noquotes (const std::string &s)
+{
+  std::string res;
+  for (const char *cp = s.c_str (); *cp; ++cp) {
+    if (*cp == '\"') {
+      res += "&quot;";
+    } else {
+      res += *cp;
+    }
+  }
+  return res;
+}
+
 tl::LogTee noctrl (new CtrlChannel (false), true);
 tl::LogTee ctrl (new CtrlChannel (true), true);
 
@@ -518,43 +532,54 @@ TestBase::TestBase (const std::string &file, const std::string &name)
 
 bool TestBase::do_test (const std::string & /*mode*/)
 {
-  //  Ensures the test temp directory is present
-  QDir dir (testtmp ());
-  QDir tmpdir (dir.absoluteFilePath (tl::to_qstring (m_testdir)));
-  if (tmpdir.exists () && ! tl::rm_dir_recursive (tmpdir.absolutePath ())) {
-    throw tl::Exception ("Unable to clean temporary dir: " + tl::to_string (tmpdir.absolutePath ()));
+  ut::ctrl << "<system-out>";
+
+  try {
+
+    //  Ensures the test temp directory is present
+    QDir dir (testtmp ());
+    QDir tmpdir (dir.absoluteFilePath (tl::to_qstring (m_testdir)));
+    if (tmpdir.exists () && ! tl::rm_dir_recursive (tmpdir.absolutePath ())) {
+      throw tl::Exception ("Unable to clean temporary dir: " + tl::to_string (tmpdir.absolutePath ()));
+    }
+    if (! dir.mkpath (tl::to_qstring (m_testdir))) {
+      throw tl::Exception ("Unable to create path for temporary files: " + tl::to_string (tmpdir.absolutePath ()));
+    }
+    dir.cd (tl::to_qstring (m_testdir));
+
+    m_testtmp = dir.absolutePath ();
+
+    static std::string testname_value;
+    static std::string testtmp_value;
+
+    putenv (const_cast<char *> ("TESTNAME="));
+    testname_value = std::string ("TESTNAME=") + m_test;
+    putenv (const_cast<char *> (testname_value.c_str ()));
+
+    putenv (const_cast<char *> ("TESTTMP_WITH_NAME="));
+    testtmp_value = std::string ("TESTTMP_WITH_NAME=") + m_testtmp.toUtf8().constData();
+    putenv (const_cast<char *> (testtmp_value.c_str ()));
+
+    reset_checkpoint ();
+
+    tl::Timer timer;
+    timer.start();
+
+    execute (this);
+
+    timer.stop();
+
+    m_testtmp.clear ();
+
+    ut::ctrl << "</system-out>";
+
+    ut::noctrl << "Time: " << timer.sec_wall () << "s (wall) " << timer.sec_user () << "s (user) " << timer.sec_sys () << "s (sys)";
+    ut::ctrl << "<x-testcase-times wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
+
+  } catch (...) {
+    ut::ctrl << "</system-out>";
+    throw;
   }
-  if (! dir.mkpath (tl::to_qstring (m_testdir))) {
-    throw tl::Exception ("Unable to create path for temporary files: " + tl::to_string (tmpdir.absolutePath ()));
-  }
-  dir.cd (tl::to_qstring (m_testdir));
-
-  m_testtmp = dir.absolutePath ();
-
-  static std::string testname_value;
-  static std::string testtmp_value;
-
-  putenv (const_cast<char *> ("TESTNAME="));
-  testname_value = std::string ("TESTNAME=") + m_test;
-  putenv (const_cast<char *> (testname_value.c_str ()));
-
-  putenv (const_cast<char *> ("TESTTMP_WITH_NAME="));
-  testtmp_value = std::string ("TESTTMP_WITH_NAME=") + m_testtmp.toUtf8().constData();
-  putenv (const_cast<char *> (testtmp_value.c_str ()));
-
-  reset_checkpoint ();
-
-  tl::Timer timer;
-  timer.start();
-
-  execute (this);
-
-  timer.stop();
-
-  m_testtmp.clear ();
-
-  ut::noctrl << "Time: " << timer.sec_wall () << "s (wall) " << timer.sec_user () << "s (user) " << timer.sec_sys () << "s (sys)";
-  ut::ctrl << "<test-sub-times wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
 
   return (!m_any_failed);
 }
@@ -906,7 +931,8 @@ main_cont (int argc, char **argv)
       ut::sp_python_interpreter->push_console (&console);
     }
 
-    ut::ctrl << "<tests>";
+    ut::ctrl << "<testsuite>";
+    ut::ctrl << "<system-out>";
 
     ut::noctrl << replicate ("=", console.real_columns ());
     ut::noctrl << "Entering KLayout test suite";
@@ -947,6 +973,8 @@ main_cont (int argc, char **argv)
       selected_tests = &ut::Registrar::instance()->tests ();
     }
 
+    ut::ctrl << "</system-out>";
+
     ut::s_verbose_flag = false;
     int failed_ne = 0, failed_e = 0;
     std::vector <ut::TestBase *> failed_tests_e, failed_tests_ne;
@@ -985,7 +1013,7 @@ main_cont (int argc, char **argv)
 
           for (std::vector <ut::TestBase *>::const_iterator t = selected_tests->begin (); t != selected_tests->end (); ++t) {
 
-            ut::ctrl << "<test-sub name=\"" << (*t)->name () << "\" mode=\"" << mode << "\">";
+            ut::ctrl << "<testcase name=\"" << (*t)->name () << "-" << mode << "\">";
 
             ut::noctrl << replicate ("-", TestConsole::instance ()->real_columns ());
             ut::noctrl << "Running " << (*t)->name ();
@@ -994,20 +1022,17 @@ main_cont (int argc, char **argv)
 
               if (! (*t)->do_test (mode)) {
 
-                ut::ctrl << "<test-sub-result status=\"error\">";
+                ut::ctrl << "<error message=\"" << "Test " << noquotes ((*t)->name ()) << " failed (continued mode - see previous messages)" << "\"/>";
                 tl::error << "Test " << (*t)->name () << " failed (continued mode - see previous messages)";
-                ut::ctrl << "</test-sub-result>";
 
                 failed_tests.push_back (*t);
                 ++failed;
 
-              } else {
-                ut::ctrl << "<test-sub-result status=\"success\"/>";
               }
 
             } catch (tl::CancelException &) {
 
-              ut::ctrl << "<test-sub-result status=\"skipped\"/>";
+              ut::ctrl << "<skipped/>";
               tl::error << "Test " << (*t)->name () << " skipped";
 
               skipped_tests.push_back (*t);
@@ -1015,17 +1040,16 @@ main_cont (int argc, char **argv)
 
             } catch (tl::Exception &ex) {
 
-              ut::ctrl << "<test-sub-result status=\"error\">";
+              ut::ctrl << "<failure message=\"" << noquotes (ex.msg ()) << "\"/>";
               tl::error << "Test " << (*t)->name () << " failed:";
               tl::info << ex.msg ();
-              ut::ctrl << "</test-sub-result>";
 
               failed_tests.push_back (*t);
               ++failed;
 
             }
 
-            ut::ctrl << "</test-sub>";
+            ut::ctrl << "</testcase>";
 
           }
 
@@ -1042,7 +1066,7 @@ main_cont (int argc, char **argv)
 
         timer.stop ();
 
-        ut::ctrl << "<summary mode=\"" << mode << "\">";
+        ut::ctrl << "<x-summary mode=\"" << mode << "\">";
 
         ut::noctrl << replicate ("=", console.real_columns ());
         ut::noctrl << "Summary";
@@ -1071,10 +1095,10 @@ main_cont (int argc, char **argv)
           tl::info << "All tests passed in " << mode << " mode.";
         }
 
-        ut::ctrl << "</summary>";
+        ut::ctrl << "</x-summary>";
 
         ut::noctrl << "Total time: " << timer.sec_wall () << "s (wall) " << timer.sec_user () << "s (user) " << timer.sec_sys () << "s (sys)";
-        ut::ctrl << "<summary-times mode=\"" << mode << "\" wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
+        ut::ctrl << "<x-summary-times mode=\"" << mode << "\" wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
 
       }
 
@@ -1088,7 +1112,7 @@ main_cont (int argc, char **argv)
       ut::noctrl << replicate ("=", console.real_columns ());
       ut::noctrl << "GSI coverage test";
 
-      ut::ctrl << "<gsi-coverage>";
+      ut::ctrl << "<x-gsi-coverage>";
 
       bool first = true;
       for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
@@ -1122,14 +1146,14 @@ main_cont (int argc, char **argv)
         tl::info << "GSI coverage test passed.";
       }
 
-      ut::ctrl << "</gsi-coverage>";
+      ut::ctrl << "</x-gsi-coverage>";
 
     }
 
     ut::noctrl << ut::replicate ("=", console.real_columns ());
     ut::noctrl << "Grand Summary";
 
-    ut::ctrl << "<grand-summary>";
+    ut::ctrl << "<x-grand-summary>";
 
     if (skipped_e + skipped_ne > 0) {
       if (non_editable) {
@@ -1166,10 +1190,10 @@ main_cont (int argc, char **argv)
       tl::info << "All tests passed.";
     }
 
-    ut::ctrl << "</grand-summary>";
+    ut::ctrl << "</x-grand-summary>";
 
     ut::noctrl << "Grand total time: " << grand_timer.sec_wall () << "s (wall) " << grand_timer.sec_user () << "s (user) " << grand_timer.sec_sys () << "s (sys)";
-    ut::ctrl << "<grand-summary-times wall=\"" << grand_timer.sec_wall () << "\" user=\"" << grand_timer.sec_user () << "\" sys=\"" << grand_timer.sec_sys () << "\"/>";
+    ut::ctrl << "<x-grand-summary-times wall=\"" << grand_timer.sec_wall () << "\" user=\"" << grand_timer.sec_user () << "\" sys=\"" << grand_timer.sec_sys () << "\"/>";
 
     if (ut::sp_ruby_interpreter) {
       ut::sp_ruby_interpreter->remove_console (&console);
@@ -1189,7 +1213,7 @@ main_cont (int argc, char **argv)
     result = -1;
   }
 
-  ut::ctrl << "</tests>";
+  ut::ctrl << "</testsuite>";
 
   return result;
 }

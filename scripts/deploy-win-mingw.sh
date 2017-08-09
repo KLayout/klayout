@@ -83,6 +83,8 @@ touch src/klayout_main/version.h
 rm -rf $target
 ./build.sh -python $python -ruby $ruby -bin $target -build $build -j2
 
+TESTSRC=. TESTTMP=$build/testtmp $bin/ut_runner -a >$build/ut_runner.xml
+
 if ! [ -e $target ]; then
   echo "ERROR: Target directory $target not found"
   exit 1

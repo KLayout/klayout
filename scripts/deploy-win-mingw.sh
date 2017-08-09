@@ -194,7 +194,8 @@ done
 # Run Tests
 
 set +e
-TESTSRC=. TESTTMP=$build/testtmp $target/ut_runner -a >$build/ut_runner.xml
+echo "Running unit tests .."
+TESTSRC=. TESTTMP=$build/testtmp $target/ut_runner -a | tee $build/ut_runner.xml
 set -e
 
 # ----------------------------------------------------------

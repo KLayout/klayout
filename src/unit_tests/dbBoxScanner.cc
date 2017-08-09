@@ -233,16 +233,16 @@ void run_test2 (ut::TestBase *_this, size_t n, double ff, db::Coord spread, bool
   }
 
   if (interactions != tr.interactions) {
-    std::cerr << "Interactions in 'brute force' but not in 'box-scanner':" << std::endl;
+    tl::info << "Interactions in 'brute force' but not in 'box-scanner':";
     for (std::set<std::pair<size_t, size_t> >::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
       if (tr.interactions.find (*i) == tr.interactions.end ()) {
-        std::cerr << "   " << i->first << "-" << i->second << std::endl;
+        tl::info << "   " << i->first << "-" << i->second;
       }
     }
-    std::cerr << "Interactions in 'box-scanner' but not in 'brute force':" << std::endl;
+    tl::info << "Interactions in 'box-scanner' but not in 'brute force':";
     for (std::set<std::pair<size_t, size_t> >::const_iterator i = tr.interactions.begin (); i != tr.interactions.end (); ++i) {
       if (interactions.find (*i) == interactions.end ()) {
-        std::cerr << "   " << i->first << "-" << i->second << std::endl;
+        tl::info << "   " << i->first << "-" << i->second;
       }
     }
   }
@@ -528,16 +528,16 @@ void run_test11 (ut::TestBase *_this, size_t n, double ff, db::Coord spread, boo
   }
 
   if (clusters != bf_clusters) {
-    std::cerr << "Clusters in 'brute force' but not in 'box-scanner':" << std::endl;
+    tl::info << "Clusters in 'brute force' but not in 'box-scanner':";
     for (std::set<std::set<size_t > >::const_iterator i = bf_clusters.begin (); i != bf_clusters.end (); ++i) {
       if (clusters.find (*i) == clusters.end ()) {
-        std::cerr << "   " << c2s (*i) << std::endl;
+        tl::info << "   " << c2s (*i);
       }
     }
-    std::cerr << "Clusters in 'box-scanner' but not in 'brute force':" << std::endl;
+    tl::info << "Clusters in 'box-scanner' but not in 'brute force':";
     for (std::set<std::set<size_t > >::const_iterator i = clusters.begin (); i != clusters.end (); ++i) {
       if (bf_clusters.find (*i) == bf_clusters.end ()) {
-        std::cerr << "   " << c2s (*i) << std::endl;
+        tl::info << "   " << c2s (*i);
       }
     }
   }

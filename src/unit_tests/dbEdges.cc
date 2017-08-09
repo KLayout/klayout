@@ -404,7 +404,6 @@ TEST(9)
       ea.insert (*i);
     }
 
-    // std::cerr << "Interacting edges: " << ea.size () << std::endl;
     EXPECT_NE (ea.size (), size_t (0));
 
     //  brute force
@@ -417,16 +416,16 @@ TEST(9)
     }
 
     if (ea != eb) {
-      std::cerr << "In implementation but not in brute-force:" << std::endl;
+      tl::info << "In implementation but not in brute-force:";
       for (std::set<db::Edge>::const_iterator i = ea.begin (); i != ea.end (); ++i) {
         if (eb.find (*i) == eb.end ()) {
-          std::cerr << "  " << i->to_string () << std::endl;
+          tl::info << "  " << i->to_string ();
         }
       }
-      std::cerr << "In brute-force but not in implementation:" << std::endl;
+      tl::info << "In brute-force but not in implementation:";
       for (std::set<db::Edge>::const_iterator i = eb.begin (); i != eb.end (); ++i) {
         if (ea.find (*i) == ea.end ()) {
-          std::cerr << "  " << i->to_string () << std::endl;
+          tl::info << "  " << i->to_string ();
         }
       }
       EXPECT_EQ (true, false);
@@ -465,7 +464,6 @@ TEST(10)
       ea.insert (*i);
     }
 
-    // std::cerr << "Interacting edges: " << ea.size () << std::endl;
     EXPECT_NE (ea.size (), size_t (0));
 
     //  brute force
@@ -479,20 +477,20 @@ TEST(10)
     }
 
     if (ea != eb) {
-      std::cerr << "Boxes:" << std::endl;
+      tl::info << "Boxes:";
       for (db::Region::const_iterator j = r.begin (); ! j.at_end (); ++j) {
-        std::cerr << "  " << j->to_string () << std::endl;
+        tl::info << "  " << j->to_string ();
       }
-      std::cerr << "In implementation but not in brute-force:" << std::endl;
+      tl::info << "In implementation but not in brute-force:";
       for (std::set<db::Edge>::const_iterator i = ea.begin (); i != ea.end (); ++i) {
         if (eb.find (*i) == eb.end ()) {
-          std::cerr << "  " << i->to_string () << std::endl;
+          tl::info << "  " << i->to_string ();
         }
       }
-      std::cerr << "In brute-force but not in implementation:" << std::endl;
+      tl::info << "In brute-force but not in implementation:";
       for (std::set<db::Edge>::const_iterator i = eb.begin (); i != eb.end (); ++i) {
         if (ea.find (*i) == ea.end ()) {
-          std::cerr << "  " << i->to_string () << std::endl;
+          tl::info << "  " << i->to_string ();
         }
       }
       EXPECT_EQ (true, false);

@@ -200,53 +200,95 @@ private:
   iterator_type m_type;
 
   struct contour_f {
+
+    unsigned int operator() () const
+    {
+      return 0;
+    }
+
     template <class Iter>
     unsigned int operator() (const Iter &iter) const
     {
       return iter.contour ();
     } 
+
   };
 
   struct at_end_f {
+
+    bool operator() () const
+    {
+      return true;
+    }
+
     template <class Iter>
     bool operator() (const Iter &iter) const
     {
       return iter.at_end ();
     } 
+
   };
 
   struct inc_f {
+
+    bool operator() () const
+    {
+      return false;
+    }
+
     template <class Iter>
     bool operator() (Iter &iter) const
     {
       iter.operator++ ();
       return false;
-    } 
+    }
+
   };
 
   struct dec_f {
+
+    bool operator() () const
+    {
+      return false;
+    }
+
     template <class Iter>
     bool operator() (Iter &iter) const
     {
       iter.operator-- ();
       return false;
     } 
+
   };
 
   struct deref_f {
+
+    edge_type operator() () const
+    {
+      return edge_type ();
+    }
+
     template <class Iter>
     edge_type operator() (const Iter &iter) const
     {
       return iter.operator* ();
-    } 
+    }
+
   };
 
   struct at_begin_f {
+
+    bool operator() () const
+    {
+      return true;
+    }
+
     template <class Iter>
     bool operator() (const Iter &iter) const
     {
       return iter.at_begin ();
-    } 
+    }
+
   };
 
   template <class Ret, class Func>
@@ -259,8 +301,10 @@ private:
       return f (*((const polygon_ref_edge_iterator_type *) m_d.iter));
     } else if (m_type == SimplePolygon) {
       return f (*((const simple_polygon_edge_iterator_type *) m_d.iter));
-    } else {
+    } else if (m_type == SimplePolygonRef) {
       return f (*((const simple_polygon_ref_edge_iterator_type *) m_d.iter));
+    } else {
+      return f ();
     }
   }
 
@@ -274,8 +318,10 @@ private:
       return f (*((polygon_ref_edge_iterator_type *) m_d.iter));
     } else if (m_type == SimplePolygon) {
       return f (*((simple_polygon_edge_iterator_type *) m_d.iter));
-    } else {
+    } else if (m_type == SimplePolygonRef) {
       return f (*((simple_polygon_ref_edge_iterator_type *) m_d.iter));
+    } else {
+      return f ();
     }
   }
 };

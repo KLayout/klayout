@@ -49,10 +49,15 @@ GDS2WriterText::GDS2WriterText()
   mProgress.set_unit (1024 * 1024);
 }
 
+GDS2WriterText::~GDS2WriterText()
+{
+  // .. nothing yet ..
+}
+
 void 
 GDS2WriterText::write_byte (unsigned char b)
 {
-    ssFormattingStream<<b<<" ";
+  ssFormattingStream<<b<<" ";
 }
 
 void 

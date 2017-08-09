@@ -32,12 +32,13 @@ namespace db
 {
 
 
-class GDS2WriterText
+class DB_PUBLIC GDS2WriterText
   : public db::GDS2WriterBase
 {
 
 public:
   GDS2WriterText();
+  ~GDS2WriterText();
 
 protected:
   /**

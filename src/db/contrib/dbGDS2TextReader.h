@@ -34,7 +34,7 @@ namespace db
 /**
  *  @brief Generic base class of GDS2 Text reader exceptions
  */
-class GDS2ReaderTextException
+class DB_PUBLIC GDS2ReaderTextException
   : public ReaderException 
 {
 public:
@@ -46,7 +46,7 @@ public:
 /**
  *  @brief The GDS2 text format stream reader
  */
-class GDS2ReaderText
+class DB_PUBLIC GDS2ReaderText
   : public GDS2ReaderBase
 {
 

@@ -26,6 +26,9 @@ fi
 
 # source the versions
 . ./version.sh
+export KLAYOUT_VERSION
+export KLAYOUT_VERSION_REV
+export KLAYOUT_VERSION_DATE
 
 pwd=$(pwd)
 
@@ -98,7 +101,7 @@ fi
 # ----------------------------------------------------------
 # Plugins
 
-echo "Installing image format plugins .."
+echo "Installing plugins .."
 for p in $plugins; do
   cp -R $mingw_inst/share/qt5/plugins/$p $target
   # remove the debug versions - otherwise they pull in the debug Qt libs

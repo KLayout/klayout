@@ -67,7 +67,7 @@ build=$pwd/build-release-$arch
 src=$pwd/src
 scripts=$pwd/scripts
 # Update in NSIS script too:
-plugins=audio generic iconengines imageformats platforms printsupport sqldrivers
+plugins="audio generic iconengines imageformats platforms printsupport sqldrivers"
 
 echo "------------------------------------------------------------------"
 echo "Running build for architecture $arch .."

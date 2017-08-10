@@ -66,6 +66,8 @@ target=$pwd/bin-release-$arch
 build=$pwd/build-release-$arch
 src=$pwd/src
 scripts=$pwd/scripts
+# Update in NSIS script too:
+plugins=audio generic iconengines imageformats platforms printsupport sqldrivers
 
 echo "------------------------------------------------------------------"
 echo "Running build for architecture $arch .."
@@ -94,12 +96,14 @@ if ! [ -e $target/klayout.exe ]; then
 fi
 
 # ----------------------------------------------------------
-# Image formats
+# Plugins
 
 echo "Installing image format plugins .."
-cp -R $mingw_inst/share/qt5/plugins/imageformats $target
-# remove the debug versions - otherwise they pull in the debug Qt libs
-rm $target/imageformats/*d.dll
+for p in $plugins; do
+  cp -R $mingw_inst/share/qt5/plugins/$p $target
+  # remove the debug versions - otherwise they pull in the debug Qt libs
+  rm $target/$p/*d.dll
+done
 
 # ----------------------------------------------------------
 # Ruby dependencies
@@ -191,14 +195,6 @@ while [ "$new_libs" != "" ]; do
 done
 
 # ----------------------------------------------------------
-# Run Tests
-
-set +e
-echo "Running unit tests .."
-TESTSRC=. TESTTMP=$build/testtmp $target/ut_runner -a | tee $build/ut_runner.xml
-set -e
-
-# ----------------------------------------------------------
 # Run NSIS
 
 # TODO: NSIS now supports /nocd with which we would no
@@ -216,7 +212,7 @@ echo "Making .zip file $zipname.zip .."
 
 rm -rf $zipname $zipname.zip
 mkdir $zipname
-cp -Rv *.dll .*-paths.txt imageformats lib $zipname | sed -u 's/.*/echo -n ./' | sh
+cp -Rv *.dll .*-paths.txt $plugins lib $zipname | sed -u 's/.*/echo -n ./' | sh
 cp klayout.exe $zipname/klayout_app.exe
 cp klayout.exe $zipname/klayout_vo_app.exe
 echo ""

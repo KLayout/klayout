@@ -491,12 +491,18 @@ private:
 };
 
 std::string
-noquotes (const std::string &s)
+escape_xml (const std::string &s)
 {
   std::string res;
   for (const char *cp = s.c_str (); *cp; ++cp) {
     if (*cp == '\"') {
       res += "&quot;";
+    } else if (*cp == '<') {
+      res += "&lt;";
+    } else if (*cp == '>') {
+      res += "&gt;";
+    } else if (*cp == '&') {
+      res += "&amp;";
     } else {
       res += *cp;
     }
@@ -931,8 +937,8 @@ main_cont (int argc, char **argv)
       ut::sp_python_interpreter->push_console (&console);
     }
 
-    ut::ctrl << "<testsuite>";
-    ut::ctrl << "<system-out>";
+    ut::ctrl << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
+    ut::ctrl << "<testsuites>";
 
     ut::noctrl << replicate ("=", console.real_columns ());
     ut::noctrl << "Entering KLayout test suite";
@@ -973,8 +979,6 @@ main_cont (int argc, char **argv)
       selected_tests = &ut::Registrar::instance()->tests ();
     }
 
-    ut::ctrl << "</system-out>";
-
     ut::s_verbose_flag = false;
     int failed_ne = 0, failed_e = 0;
     std::vector <ut::TestBase *> failed_tests_e, failed_tests_ne;
@@ -986,6 +990,7 @@ main_cont (int argc, char **argv)
       if ((non_editable && e == 0) || (editable && e == 1)) {
 
         std::string mode (e == 0 ? "non-editable" : "editable");
+        ut::ctrl << "<testsuite name=\"ut-runner-" << mode << "\">";
 
         ut::noctrl << replicate ("=", console.real_columns ());
         ut::noctrl << "Running tests in " << mode << " mode ...";
@@ -1022,7 +1027,7 @@ main_cont (int argc, char **argv)
 
               if (! (*t)->do_test (mode)) {
 
-                ut::ctrl << "<error message=\"" << "Test " << noquotes ((*t)->name ()) << " failed (continued mode - see previous messages)" << "\"/>";
+                ut::ctrl << "<error message=\"" << "Test " << escape_xml ((*t)->name ()) << " failed (continued mode - see previous messages)" << "\"/>";
                 tl::error << "Test " << (*t)->name () << " failed (continued mode - see previous messages)";
 
                 failed_tests.push_back (*t);
@@ -1040,7 +1045,7 @@ main_cont (int argc, char **argv)
 
             } catch (tl::Exception &ex) {
 
-              ut::ctrl << "<failure message=\"" << noquotes (ex.msg ()) << "\"/>";
+              ut::ctrl << "<failure message=\"" << escape_xml (ex.msg ()) << "\"/>";
               tl::error << "Test " << (*t)->name () << " failed:";
               tl::info << ex.msg ();
 
@@ -1099,6 +1104,8 @@ main_cont (int argc, char **argv)
 
         ut::noctrl << "Total time: " << timer.sec_wall () << "s (wall) " << timer.sec_user () << "s (user) " << timer.sec_sys () << "s (sys)";
         ut::ctrl << "<x-summary-times mode=\"" << mode << "\" wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
+
+        ut::ctrl << "</testsuite>";
 
       }
 
@@ -1213,7 +1220,7 @@ main_cont (int argc, char **argv)
     result = -1;
   }
 
-  ut::ctrl << "</testsuite>";
+  ut::ctrl << "</testsuites>";
 
   return result;
 }

@@ -64,15 +64,16 @@ section
   # define output path
   setOutPath $INSTDIR
  
-  # specify files to go in output path
-  # not installed because of disk space:
-  # file strm2gds.exe
-  # file strm2oas.exe
-  # file strmclip.exe
-  # file strmcmp.exe
+  file strm*.exe
   file *.dll
   file .*-paths.txt
+  file /r audio
+  file /r generic
+  file /r iconengines
   file /r imageformats
+  file /r platforms
+  file /r printsupport
+  file /r sqldrivers
   file /r lib
   file /oname=${EXENAME}.exe ${EXEBASE}.exe
   file /oname=${EXENAME_VO}.exe ${EXEBASE}.exe

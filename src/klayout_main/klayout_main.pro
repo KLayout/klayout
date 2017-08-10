@@ -17,9 +17,9 @@ SOURCES = \
 RESOURCES = \
 
 DEFINES += \
-  KLAYOUT_VERSION=$$KLAYOUT_VERSION \
-  KLAYOUT_VERSION_REV=$$KLAYOUT_VERSION_REV \
-  KLAYOUT_VERSION_DATE=$$KLAYOUT_VERSION_DATE \
+  KLAYOUT_VERSION=$$(KLAYOUT_VERSION) \
+  KLAYOUT_VERSION_REV=$$(KLAYOUT_VERSION_REV) \
+  KLAYOUT_VERSION_DATE=$$(KLAYOUT_VERSION_DATE) \
 
 INCLUDEPATH += ../tl ../gsi ../db ../rdb ../laybasic ../lay ../ext ../img ../ant ../lib
 DEPENDPATH += ../tl ../gsi ../db ../rdb ../laybasic ../lay ../ext ../img ../ant ../lib

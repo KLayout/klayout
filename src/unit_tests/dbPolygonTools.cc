@@ -604,7 +604,7 @@ TEST(9d)
 
 TEST(10)
 {
-  //  Simple test for polygon-box interaction (integer coordinates)
+  //  Simple test for polygon-box/edge interaction (integer coordinates)
   db::Polygon poly;
   db::Point p[] = {
     db::Point (0, 100),
@@ -612,6 +612,21 @@ TEST(10)
     db::Point (0, 0)
   };
   poly.assign_hull (p, p + sizeof (p) / sizeof (p[0]));
+
+  EXPECT_EQ (interact (poly, db::Edge (-10, -10, -1, -1)), false);
+  EXPECT_EQ (interact (poly, db::Edge (-10, -10, 0, 0)), true);
+  EXPECT_EQ (interact (poly, db::Edge (-10, -10, 1, 1)), true);
+  EXPECT_EQ (interact (poly, db::Edge (-10, -10, 20, 10)), false);
+  EXPECT_EQ (interact (poly, db::Edge (-10, -10, 10, 20)), true);
+  EXPECT_EQ (interact (poly, db::Edge (10, 20, 20, 30)), true);
+  EXPECT_EQ (interact (poly, db::Edge (10, 20, 15, 25)), true);
+  EXPECT_EQ (interact (poly, db::Edge (30, 10, 40, 20)), false);
+  EXPECT_EQ (interact (poly, db::Edge (30, 20, 40, 50)), true);
+  EXPECT_EQ (interact (poly, db::Edge (-10, 20, 0, 30)), true);
+  EXPECT_EQ (interact (poly, db::Edge (-10, 20, -5, 30)), false);
+  EXPECT_EQ (interact (poly, db::Edge (-10, 100, -5, 110)), false);
+  EXPECT_EQ (interact (poly, db::Edge (-10, 100, 0, 110)), false);
+  EXPECT_EQ (interact (poly, db::Edge (-10, 100, 5, 100)), true);
 
   EXPECT_EQ (interact (db::Box (0, 0, 100, 100), db::Box (-10, 100, 5, 110)), true);
   EXPECT_EQ (interact (db::Box (0, 0, 100, 100), db::Box (-10, -10, 110, 110)), true);
@@ -677,7 +692,7 @@ TEST(10)
 
 TEST(11)
 {
-  //  Simple test for polygon-box interaction (integer coordinates)
+  //  Simple test for polygon-box interaction (double coordinates)
   db::DPolygon poly;
   db::DPoint p[] = {
     db::DPoint (0, 100),
@@ -685,6 +700,21 @@ TEST(11)
     db::DPoint (0, 0)
   };
   poly.assign_hull (p, p + sizeof (p) / sizeof (p[0]));
+
+  EXPECT_EQ (interact (poly, db::DEdge (-1.0, -1.0, -0.1, -0.1)), false);
+  EXPECT_EQ (interact (poly, db::DEdge (-10, -10, 0, 0)), true);
+  EXPECT_EQ (interact (poly, db::DEdge (-0.01, -0.01, 0.001, 0.001)), true);
+  EXPECT_EQ (interact (poly, db::DEdge (-10, -10, 20, 10)), false);
+  EXPECT_EQ (interact (poly, db::DEdge (-10, -10, 10, 20)), true);
+  EXPECT_EQ (interact (poly, db::DEdge (10, 20, 20, 30)), true);
+  EXPECT_EQ (interact (poly, db::DEdge (10, 20, 15, 25)), true);
+  EXPECT_EQ (interact (poly, db::DEdge (30, 10, 40, 20)), false);
+  EXPECT_EQ (interact (poly, db::DEdge (30, 20, 40, 50)), true);
+  EXPECT_EQ (interact (poly, db::DEdge (-10, 20, 0, 30)), true);
+  EXPECT_EQ (interact (poly, db::DEdge (-10, 20, -5, 30)), false);
+  EXPECT_EQ (interact (poly, db::DEdge (-10, 100, -5, 110)), false);
+  EXPECT_EQ (interact (poly, db::DEdge (-10.0, 100.0, 0.0, 100.5)), false);
+  EXPECT_EQ (interact (poly, db::DEdge (-10, 100, 5, 100)), true);
 
   EXPECT_EQ (interact (db::DBox (0, 0, 100, 100), db::DBox (-10, 100, 5, 110)), true);
   EXPECT_EQ (interact (db::DBox (0, 0, 100, 100), db::DBox (-10, -10, 110, 110)), true);

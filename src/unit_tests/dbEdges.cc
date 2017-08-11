@@ -24,6 +24,7 @@
 #include "utHead.h"
 
 #include "dbEdges.h"
+#include "dbPolygonTools.h"
 #include "dbRegion.h"
 
 #include <cstdlib>
@@ -378,57 +379,64 @@ TEST(8)
 
 TEST(9) 
 {
-  for (int pass = 0; pass < 10; ++pass) {
+  for (unsigned int seed = 1; seed < 20; ++seed) {
 
-    int d = pass >= 5 ? 10 : 1000;
+    srand(seed);
 
-    db::Edges e;
-    for (int i = 0; i < 100; ++i) {
-      e.insert (db::Edge (db::Point (abs (rand ()) % d, abs (rand ()) % d), db::Point (abs (rand ()) % d, abs (rand ()) % d)));
-      db::Point p (abs (rand ()) % d, abs (rand ()) % d);
-      e.insert (db::Edge (p, p));
-    }
+    for (int pass = 0; pass < 10; ++pass) {
 
-    db::Edges e2;
-    for (int i = 0; i < 2; ++i) {
-      e2.insert (db::Edge (db::Point (abs (rand ()) % d, abs (rand ()) % d), db::Point (abs (rand ()) % d, abs (rand ()) % d)));
-      db::Point p (abs (rand ()) % d, abs (rand ()) % d);
-      e2.insert (db::Edge (p, p));
-    }
+      int d = pass >= 5 ? 10 : 1000;
 
-    std::set<db::Edge> ea, eb;
+      db::Edges e;
+      for (int i = 0; i < 100; ++i) {
+        e.insert (db::Edge (db::Point (abs (rand ()) % d, abs (rand ()) % d), db::Point (abs (rand ()) % d, abs (rand ()) % d)));
+        db::Point p (abs (rand ()) % d, abs (rand ()) % d);
+        e.insert (db::Edge (p, p));
+      }
 
-    e.set_merged_semantics (false);
-    db::Edges ia = e.selected_interacting (e2);
-    for (db::Edges::const_iterator i = ia.begin (); ! i.at_end (); ++i) {
-      ea.insert (*i);
-    }
+      db::Edges e2;
+      for (int i = 0; i < 2; ++i) {
+        e2.insert (db::Edge (db::Point (abs (rand ()) % d, abs (rand ()) % d), db::Point (abs (rand ()) % d, abs (rand ()) % d)));
+        db::Point p (abs (rand ()) % d, abs (rand ()) % d);
+        e2.insert (db::Edge (p, p));
+      }
 
-    EXPECT_NE (ea.size (), size_t (0));
+      std::set<db::Edge> ea, eb;
 
-    //  brute force
-    for (db::Edges::const_iterator i = e.begin (); ! i.at_end (); ++i) {
-      for (db::Edges::const_iterator j = e2.begin (); ! j.at_end (); ++j) {
-        if (i->intersect (*j)) {
-          eb.insert (*i);
+      e.set_merged_semantics (false);
+      db::Edges ia = e.selected_interacting (e2);
+      for (db::Edges::const_iterator i = ia.begin (); ! i.at_end (); ++i) {
+        ea.insert (*i);
+      }
+
+      EXPECT_NE (ea.size (), size_t (0));
+
+      //  brute force
+      for (db::Edges::const_iterator i = e.begin (); ! i.at_end (); ++i) {
+        for (db::Edges::const_iterator j = e2.begin (); ! j.at_end (); ++j) {
+          if (i->intersect (*j)) {
+            eb.insert (*i);
+          }
         }
       }
-    }
 
-    if (ea != eb) {
-      tl::info << "In implementation but not in brute-force:";
-      for (std::set<db::Edge>::const_iterator i = ea.begin (); i != ea.end (); ++i) {
-        if (eb.find (*i) == eb.end ()) {
-          tl::info << "  " << i->to_string ();
+      if (ea != eb) {
+        tl::info << "Seed = " << seed;
+        tl::info << "In implementation but not in brute-force:";
+        for (std::set<db::Edge>::const_iterator i = ea.begin (); i != ea.end (); ++i) {
+          if (eb.find (*i) == eb.end ()) {
+            tl::info << "  " << i->to_string ();
+          }
         }
-      }
-      tl::info << "In brute-force but not in implementation:";
-      for (std::set<db::Edge>::const_iterator i = eb.begin (); i != eb.end (); ++i) {
-        if (ea.find (*i) == ea.end ()) {
-          tl::info << "  " << i->to_string ();
+        tl::info << "In brute-force but not in implementation:";
+        for (std::set<db::Edge>::const_iterator i = eb.begin (); i != eb.end (); ++i) {
+          if (ea.find (*i) == ea.end ()) {
+            tl::info << "  " << i->to_string ();
+          }
         }
+        EXPECT_EQ (true, false);
       }
-      EXPECT_EQ (true, false);
+
     }
 
   }
@@ -436,64 +444,70 @@ TEST(9)
 
 TEST(10) 
 {
-  for (int pass = 0; pass < 10; ++pass) {
+  for (unsigned int seed = 1; seed < 20; ++seed) {
 
-    int d = pass >= 5 ? 10 : 1000;
+    srand(seed);
 
-    db::Edges e;
-    for (int i = 0; i < 100; ++i) {
-      e.insert (db::Edge (db::Point (abs (rand ()) % d, abs (rand ()) % d), db::Point (abs (rand ()) % d, abs (rand ()) % d)));
-      db::Point p (abs (rand ()) % d, abs (rand ()) % d);
-      e.insert (db::Edge (p, p));
-    }
+    for (int pass = 0; pass < 10; ++pass) {
 
-    db::Region r;
-    for (int i = 0; i < 2; ++i) {
-      db::Box b;
-      do {
-        b = db::Box (db::Point (abs (rand ()) % d, abs (rand ()) % d), db::Point (abs (rand ()) % d, abs (rand ()) % d));
-      } while (b.width () == 0 || b.height () == 0);
-      r.insert (b);
-    }
+      int d = pass >= 5 ? 10 : 1000;
 
-    std::set<db::Edge> ea, eb;
+      db::Edges e;
+      for (int i = 0; i < 100; ++i) {
+        e.insert (db::Edge (db::Point (abs (rand ()) % d, abs (rand ()) % d), db::Point (abs (rand ()) % d, abs (rand ()) % d)));
+        db::Point p (abs (rand ()) % d, abs (rand ()) % d);
+        e.insert (db::Edge (p, p));
+      }
 
-    e.set_merged_semantics (false);
-    db::Edges ia = e.selected_interacting (r);
-    for (db::Edges::const_iterator i = ia.begin (); ! i.at_end (); ++i) {
-      ea.insert (*i);
-    }
+      db::Region r;
+      for (int i = 0; i < 2; ++i) {
+        db::Box b;
+        do {
+          b = db::Box (db::Point (abs (rand ()) % d, abs (rand ()) % d), db::Point (abs (rand ()) % d, abs (rand ()) % d));
+        } while (b.width () == 0 || b.height () == 0);
+        r.insert (b);
+      }
 
-    EXPECT_NE (ea.size (), size_t (0));
+      std::set<db::Edge> ea, eb;
 
-    //  brute force
-    for (db::Edges::const_iterator i = e.begin (); ! i.at_end (); ++i) {
-      for (db::Region::const_iterator j = r.begin (); ! j.at_end (); ++j) {
-        //  Use the enlarged edges and box to avoid rounding issues
-        if (i->transformed (db::ICplxTrans (10.0)).clipped (j->box ().transformed (db::ICplxTrans (10.0))).first) {
-          eb.insert (*i);
+      e.set_merged_semantics (false);
+      db::Edges ia = e.selected_interacting (r);
+      for (db::Edges::const_iterator i = ia.begin (); ! i.at_end (); ++i) {
+        ea.insert (*i);
+      }
+
+      EXPECT_NE (ea.size (), size_t (0));
+
+      //  brute force
+      for (db::Edges::const_iterator i = e.begin (); ! i.at_end (); ++i) {
+        for (db::Region::const_iterator j = r.begin (); ! j.at_end (); ++j) {
+          if (db::interact (*j, *i)) {
+            eb.insert (*i);
+          }
         }
       }
-    }
 
-    if (ea != eb) {
-      tl::info << "Boxes:";
-      for (db::Region::const_iterator j = r.begin (); ! j.at_end (); ++j) {
-        tl::info << "  " << j->to_string ();
-      }
-      tl::info << "In implementation but not in brute-force:";
-      for (std::set<db::Edge>::const_iterator i = ea.begin (); i != ea.end (); ++i) {
-        if (eb.find (*i) == eb.end ()) {
-          tl::info << "  " << i->to_string ();
+      if (ea != eb) {
+        tl::info << "Seed = " << seed;
+        tl::info << "Boxes:";
+        for (db::Region::const_iterator j = r.begin (); ! j.at_end (); ++j) {
+          tl::info << "  " << j->to_string ();
         }
-      }
-      tl::info << "In brute-force but not in implementation:";
-      for (std::set<db::Edge>::const_iterator i = eb.begin (); i != eb.end (); ++i) {
-        if (ea.find (*i) == ea.end ()) {
-          tl::info << "  " << i->to_string ();
+        tl::info << "In implementation but not in brute-force:";
+        for (std::set<db::Edge>::const_iterator i = ea.begin (); i != ea.end (); ++i) {
+          if (eb.find (*i) == eb.end ()) {
+            tl::info << "  " << i->to_string ();
+          }
         }
+        tl::info << "In brute-force but not in implementation:";
+        for (std::set<db::Edge>::const_iterator i = eb.begin (); i != eb.end (); ++i) {
+          if (ea.find (*i) == ea.end ()) {
+            tl::info << "  " << i->to_string ();
+          }
+        }
+        EXPECT_EQ (true, false);
       }
-      EXPECT_EQ (true, false);
+
     }
 
   }

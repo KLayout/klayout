@@ -1770,8 +1770,7 @@ public:
     if (fabs (m_cos - 1.0) > eps_f ()) {
       return false;
     }
-    return fabs (m_u.x ()) <= db::epsilon_f<F> () &&
-           fabs (m_u.y ()) <= db::epsilon_f<F> ();
+    return disp ().equal (displacement_type ());
   }
 
   /**

@@ -182,7 +182,7 @@ TEST(3)
   }
 
   //  make sure the events get processed
-  wait_for_ms (1100);
+  wait_for_ms (5000);
 
   //  should have modified the file
   EXPECT_EQ (changed_spy.count (), 0);
@@ -204,7 +204,7 @@ TEST(3)
   }
 
   //  make sure the events get processed
-  wait_for_ms (1100);
+  wait_for_ms (5000);
 
   //  should have modified the file
   EXPECT_EQ (changed_spy.count (), 50);

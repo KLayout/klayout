@@ -27,6 +27,7 @@
 #include "dbLayoutUtils.h"
 #include "dbBoxConvert.h"
 #include "dbBoxScanner.h"
+#include "dbPolygonTools.h"
 
 #include "tlIntervalMap.h"
 #include "tlVariant.h"
@@ -667,25 +668,10 @@ public:
     }
 
     if (e && p && m_seen.find (e) == m_seen.end ()) {
-
-      //  A polygon and an edge interact if the edge is either inside completely
-      //  of at least one edge of the polygon intersects with the edge
-      bool interacts = false;
-      if (p->box ().contains (e->p1 ()) && db::inside_poly (p->begin_edge (), e->p1 ()) >= 0) {
-        interacts = true;
-      } else {
-        for (db::Polygon::polygon_edge_iterator pe = p->begin_edge (); ! pe.at_end () && ! interacts; ++pe) {
-          if ((*pe).intersect (*e)) {
-            interacts = true;
-          }
-        }
-      }
-
-      if (interacts) {
+      if (db::interact (*p, *e)) {
         m_seen.insert (e);
         mp_output->insert (*e);
       }
-
     }
   }
 

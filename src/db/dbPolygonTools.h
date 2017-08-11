@@ -325,6 +325,27 @@ bool interact_pp (const Polygon1 &poly1, const Polygon2 &poly2)
   return false;
 }
 
+/**
+ *  @brief Determines whether a polygon and an edge share at least one common point.
+ */
+template <class Polygon, class Edge>
+bool interact_pe (const Polygon &poly, const Edge &edge)
+{
+  //  A polygon and an edge interact if the edge is either inside completely
+  //  of at least one edge of the polygon intersects with the edge
+  if (poly.box ().contains (edge.p1 ()) && db::inside_poly (poly.begin_edge (), edge.p1 ()) >= 0) {
+    return true;
+  } else {
+    for (typename Polygon::polygon_edge_iterator pe = poly.begin_edge (); ! pe.at_end (); ++pe) {
+      if ((*pe).intersect (edge)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 //  Some specializations that map all combinations to template versions
 inline bool interact (const db::Box &box1,              const db::Box &box2)                { return box1.touches (box2); }
 inline bool interact (const db::DBox &box1,             const db::DBox &box2)               { return box1.touches (box2); }
@@ -332,6 +353,10 @@ inline bool interact (const db::Polygon &poly,          const db::Box &box)     
 inline bool interact (const db::SimplePolygon &poly,    const db::Box &box)                 { return interact_pb (poly, box); }
 inline bool interact (const db::DPolygon &poly,         const db::DBox &box)                { return interact_pb (poly, box); }
 inline bool interact (const db::DSimplePolygon &poly,   const db::DBox &box)                { return interact_pb (poly, box); }
+inline bool interact (const db::Polygon &poly,          const db::Edge &edge)               { return interact_pe (poly, edge); }
+inline bool interact (const db::SimplePolygon &poly,    const db::Edge &edge)               { return interact_pe (poly, edge); }
+inline bool interact (const db::DPolygon &poly,         const db::DEdge &edge)              { return interact_pe (poly, edge); }
+inline bool interact (const db::DSimplePolygon &poly,   const db::DEdge &edge)              { return interact_pe (poly, edge); }
 inline bool interact (const db::Polygon &poly1,         const db::Polygon &poly2)           { return interact_pp (poly1, poly2); }
 inline bool interact (const db::SimplePolygon &poly1,   const db::Polygon &poly2)           { return interact_pp (poly1, poly2); }
 inline bool interact (const db::Polygon &poly1,         const db::SimplePolygon &poly2)     { return interact_pp (poly1, poly2); }

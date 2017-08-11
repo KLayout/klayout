@@ -1018,7 +1018,7 @@ main_cont (int argc, char **argv)
 
           for (std::vector <ut::TestBase *>::const_iterator t = selected_tests->begin (); t != selected_tests->end (); ++t) {
 
-            ut::ctrl << "<testcase name=\"" << (*t)->name () << "-" << mode << "\">";
+            ut::ctrl << "<testcase name=\"" << (*t)->name () << "\">";
 
             ut::noctrl << replicate ("-", TestConsole::instance ()->real_columns ());
             ut::noctrl << "Running " << (*t)->name ();

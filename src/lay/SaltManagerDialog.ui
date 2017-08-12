@@ -797,8 +797,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>537</width>
-                       <height>284</height>
+                       <width>343</width>
+                       <height>207</height>
                       </rect>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_2">
@@ -997,6 +997,10 @@
            <widget class="QPushButton" name="create_button">
             <property name="text">
              <string>Create Package</string>
+            </property>
+            <property name="icon">
+             <iconset resource="layResources.qrc">
+              <normaloff>:/add.png</normaloff>:/add.png</iconset>
             </property>
             <property name="autoDefault">
              <bool>false</bool>

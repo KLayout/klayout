@@ -260,7 +260,7 @@ TEST(2)
   chg.generate_hull (c1, hull);
   EXPECT_EQ (hull.size (), size_t (1));
   EXPECT_EQ (hull.front ().holes (), size_t (0));
-  EXPECT_EQ (hull.front ().hull ().size () <= 8, true);
+  EXPECT_EQ (hull.front ().hull ().size () <= 10, true);
   EXPECT_EQ (check_hull (hull, c1.shapes (l1)), true);
 }
 

@@ -465,7 +465,7 @@ qmake_cmd="$QMAKE $CURR_DIR/src/klayout.pro -recursive \
   HAVE_64BIT_COORD=$HAVE_64BIT_COORD \
   HAVE_QT5=$HAVE_QT5 \
   PREFIX=$BIN \
-  DESTDIR=$BUILD"
+"
 
 echo $qmake_cmd
 $qmake_cmd

@@ -44,10 +44,11 @@
 
 #include <cstdio>
 #include <unistd.h>
+
 #if !defined(_WIN32)
 #  include <sys/ioctl.h>
+#  include <dlfcn.h>
 #endif
-
 #if defined(_WIN32)
 #  include <Windows.h>
 #endif
@@ -798,6 +799,42 @@ main_cont (int argc, char **argv)
 {
   pya::PythonInterpreter::initialize ();
   gsi::initialize_external ();
+
+  //  Search and initialize plugin unit tests
+
+  QStringList name_filters;
+  name_filters << QString::fromUtf8 ("*.klp_ut");
+
+  QDir inst_dir (tl::to_qstring (tl::get_inst_path ()));
+  QStringList inst_modules = inst_dir.entryList (name_filters);
+  inst_modules.sort ();
+
+  for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
+
+    QFileInfo klp_file (inst_dir.path (), *im);
+    if (klp_file.exists () && klp_file.isReadable ()) {
+
+      std::string pp = tl::to_string (klp_file.absoluteFilePath ());
+      tl::log << "Loading plugin unit tests " << pp;
+
+      //  NOTE: since we are using a different suffix ("*.klp_ut"), we can't use QLibrary.
+#ifdef _WIN32
+      //  there is no "dlopen" on mingw, so we need to emulate it.
+      HINSTANCE handle = LoadLibraryW ((const wchar_t *) tl::to_qstring (pp).constData ());
+      if (! handle) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Unable to load plugin tests: %s with error message: %s ")), pp, GetLastError ());
+      }
+#else
+      void *handle;
+      handle = dlopen (tl::string_to_system (pp).c_str (), RTLD_LAZY);
+      if (! handle) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Unable to load plugin tests: %s")), pp);
+      }
+#endif
+
+    }
+
+  }
 
   //  No side effects
   tl::set_klayout_path (std::vector<std::string> ());

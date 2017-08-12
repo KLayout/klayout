@@ -36,7 +36,8 @@ mkqtdecl.tmp
 # private data
 private
 src/plugins/*
-!src/plugins/plugins.pro
+!src/plugins/*.pro
+!src/plugins/*.pri
 
 # QTCreator files
 src/klayout.pro.user

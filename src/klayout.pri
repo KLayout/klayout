@@ -53,3 +53,15 @@ win32 {
 } else {
   QMAKE_CXXFLAGS += -fvisibility=hidden
 }
+
+# define our own shared object extension since QMAKE_EXTENSION_SHLIB is blank on
+# Linux
+win32 {
+  SHLIB_EXT = dll
+  SHLIB_PREFIX =
+} else {
+  SHLIB_EXT = so
+  SHLIB_PREFIX = lib
+}
+export(SHLIB_EXT)
+export(SHLIB_PREFIX)

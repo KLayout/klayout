@@ -101,7 +101,8 @@ SOURCES = \
     tlFileUtils.cc \
     tlHttpStream.cc \
     tlWebDAV.cc \
-    laySnap.cc
+    laySnap.cc \
+    tlCommandLineParser.cc
 
 # main components:
 SOURCES += \

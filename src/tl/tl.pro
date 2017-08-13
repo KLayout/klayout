@@ -43,7 +43,8 @@ SOURCES = \
     tlFileSystemWatcher.cc \
     tlFileUtils.cc \
     tlWebDAV.cc \
-    tlArch.cc
+    tlArch.cc \
+    tlCommandLineParser.cc
 
 HEADERS = \
   tlAlgorithm.h \
@@ -90,7 +91,8 @@ HEADERS = \
     tlCpp.h \
     tlFileUtils.h \
     tlWebDAV.h \
-    tlArch.h
+    tlArch.h \
+    tlCommandLineParser.h
 
 INCLUDEPATH =
 DEPENDPATH =

@@ -1,0 +1,286 @@
+
+/*
+
+  KLayout Layout Viewer
+  Copyright (C) 2006-2017 Matthias Koefferlein
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+*/
+
+
+#include "tlCommandLineParser.h"
+#include "utHead.h"
+
+TEST(1)
+{
+  std::string a;
+  int b = 0;
+  bool c = false;
+  double d = 1;
+  bool e = false;
+  std::string f;
+
+  tl::CommandLineOptions cmd;
+  cmd << tl::arg ("a", &a, "")
+      << tl::arg ("?b", &b, "")
+      << tl::arg ("-c", &c, "")
+      << tl::arg ("--dlong|-d", &d, "")
+      << tl::arg ("--elong", &e, "")
+      << tl::arg ("-f|--flong=value", &f, "");
+
+  {
+    char *argv[] = { "x", "y" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (a, "y");
+  EXPECT_EQ (b, 0);
+
+  {
+    char *argv[] = { "x", "z", "17" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (a, "z");
+  EXPECT_EQ (b, 17);
+
+  b = 0;
+  {
+    char *argv[] = { "x", "u", "-c" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (a, "u");
+  EXPECT_EQ (b, 0);
+  EXPECT_EQ (c, true);
+
+  b = 0;
+  c = false;
+  {
+    char *argv[] = { "x", "u", "-c", "-d=21" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (a, "u");
+  EXPECT_EQ (b, 0);
+  EXPECT_EQ (c, true);
+  EXPECT_EQ (d, 21);
+
+  b = 0;
+  c = false;
+  {
+    char *argv[] = { "x", "u", "-d", "22", "-c" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (a, "u");
+  EXPECT_EQ (b, 0);
+  EXPECT_EQ (c, true);
+  EXPECT_EQ (d, 22);
+
+  e = false;
+  {
+    char *argv[] = { "x", "u", "--dlong", "23" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (a, "u");
+  EXPECT_EQ (d, 23);
+  EXPECT_EQ (e, false);
+
+  {
+    char *argv[] = { "x", "u", "--dlong=24", "--elong" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (a, "u");
+  EXPECT_EQ (d, 24);
+  EXPECT_EQ (e, true);
+
+  {
+    char *argv[] = { "x", "u", "-c", "-f=foo" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (a, "u");
+  EXPECT_EQ (f, "foo");
+
+  {
+    char *argv[] = { "x", "u", "--flong", "bar" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (a, "u");
+  EXPECT_EQ (f, "bar");
+}
+
+
+struct Values
+{
+  Values ()
+  {
+    b = 0;
+    d = 1;
+    c = e = false;
+  }
+
+  void set_a (const std::string &x) { a = x; }
+  void set_b (int x) { b = x; }
+  void set_c (bool x) { c = x; }
+  void set_d (const double &x) { d = x; }
+  void set_e (bool x) { e = x; }
+  void set_f (std::string x) { f = x; }
+
+  std::string a;
+  int b;
+  bool c;
+  double d;
+  bool e;
+  std::string f;
+};
+
+TEST(2)
+{
+  Values v;
+
+  tl::CommandLineOptions cmd;
+  cmd << tl::arg ("a", &v, &Values::set_a, "")
+      << tl::arg ("?b", &v, &Values::set_b, "")
+      << tl::arg ("-c", &v, &Values::set_c, "")
+      << tl::arg ("--dlong|-d", &v, &Values::set_d, "")
+      << tl::arg ("--elong", &v, &Values::set_e, "")
+      << tl::arg ("-f|--flong=value", &v, &Values::set_f, "");
+
+  {
+    char *argv[] = { "x", "y" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (v.a, "y");
+  EXPECT_EQ (v.b, 0);
+
+  {
+    char *argv[] = { "x", "z", "17" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (v.a, "z");
+  EXPECT_EQ (v.b, 17);
+
+  v.b = 0;
+  {
+    char *argv[] = { "x", "u", "-c" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (v.a, "u");
+  EXPECT_EQ (v.b, 0);
+  EXPECT_EQ (v.c, true);
+
+  v.b = 0;
+  v.c = false;
+  {
+    char *argv[] = { "x", "u", "-c", "-d=21" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (v.a, "u");
+  EXPECT_EQ (v.b, 0);
+  EXPECT_EQ (v.c, true);
+  EXPECT_EQ (v.d, 21);
+
+  v.b = 0;
+  v.c = false;
+  {
+    char *argv[] = { "x", "u", "-d", "22", "-c" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (v.a, "u");
+  EXPECT_EQ (v.b, 0);
+  EXPECT_EQ (v.c, true);
+  EXPECT_EQ (v.d, 22);
+
+  v.e = false;
+  {
+    char *argv[] = { "x", "u", "--dlong", "23" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (v.a, "u");
+  EXPECT_EQ (v.d, 23);
+  EXPECT_EQ (v.e, false);
+
+  {
+    char *argv[] = { "x", "u", "--dlong=24", "--elong" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (v.a, "u");
+  EXPECT_EQ (v.d, 24);
+  EXPECT_EQ (v.e, true);
+
+  {
+    char *argv[] = { "x", "u", "-c", "-f=foo" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (v.a, "u");
+  EXPECT_EQ (v.f, "foo");
+
+  {
+    char *argv[] = { "x", "u", "--flong", "bar" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (v.a, "u");
+  EXPECT_EQ (v.f, "bar");
+}
+
+TEST(3)
+{
+  std::vector<std::string> a;
+  std::vector<int> b;
+
+  tl::CommandLineOptions cmd;
+  cmd << tl::arg ("a", &a, "")
+      << tl::arg ("-b", &b, "");
+
+  {
+    char *argv[] = { "x", "r,u,v" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (int (a.size ()), 3);
+  EXPECT_EQ (a[0], "r");
+  EXPECT_EQ (a[1], "u");
+  EXPECT_EQ (a[2], "v");
+  EXPECT_EQ (b.empty (), true);
+
+  a.clear ();
+  {
+    char *argv[] = { "x", "\"r,u\",v" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (int (a.size ()), 2);
+  EXPECT_EQ (a[0], "r,u");
+  EXPECT_EQ (a[1], "v");
+  EXPECT_EQ (b.empty (), true);
+
+  a.clear ();
+  {
+    char *argv[] = { "x", "'\"'", "-b=1,5,-13" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (int (a.size ()), 1);
+  EXPECT_EQ (a[0], "\"");
+  EXPECT_EQ (int (b.size ()), 3);
+  EXPECT_EQ (b[0], 1);
+  EXPECT_EQ (b[1], 5);
+  EXPECT_EQ (b[2], -13);
+
+  a.clear ();
+  b.clear ();
+  {
+    char *argv[] = { "x", "", "-b", "-13,21" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (int (a.size ()), 0);
+  EXPECT_EQ (int (b.size ()), 2);
+  EXPECT_EQ (b[0], -13);
+  EXPECT_EQ (b[1], 21);
+}

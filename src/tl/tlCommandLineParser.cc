@@ -32,9 +32,14 @@ namespace tl
 //  ArgBase implementation
 
 ArgBase::ParsedOption::ParsedOption (const std::string &option)
-  : optional (false)
+  : optional (false), inverted (false)
 {
   tl::Extractor ex (option.c_str ());
+
+  if (ex.test ("!")) {
+    inverted = true;
+  }
+
   while (! ex.at_end ()) {
     if (ex.test ("--")) {
       optional = true;
@@ -322,7 +327,7 @@ CommandLineOptions::parse (int argc, char *argv[])
       if (ex.test ("=")) {
         arg->take_value (ex);
       } else {
-        arg->mark_present ();
+        arg->mark_present (arg->option ().inverted);
       }
     }
 

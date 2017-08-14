@@ -54,7 +54,7 @@ public:
      */
     ParsedOption (const std::string &option);
 
-    bool optional;
+    bool optional, inverted;
     std::string long_option, short_option, name;
   };
 
@@ -69,6 +69,7 @@ public:
    *    "name"                    - A mandatory input parameter with name "name"
    *    "?name"                   - An optional input parameter with name "name"
    *    "-o"                      - A short option without a parameter (boolean)
+   *    "!-o"                     - Sets the value to false if present
    *    "-o=value"                - A short option with a value named "value"
    *    "--long-option"           - A long option
    *    "--long-option=value"     - A long option with a value
@@ -122,7 +123,7 @@ public:
   /**
    *  @brief Marks an option to be present (for boolean options)
    */
-  virtual void mark_present ()
+  virtual void mark_present (bool)
   {
     //  .. nothing yet ..
   }
@@ -191,26 +192,26 @@ void extract (tl::Extractor &ex, std::vector<T> &t, bool /*for_list*/ = false)
  *  @brief A helper to mark "presence"
  */
 template <class T>
-void mark_presence (T &)
+void mark_presence (T &, bool)
 {
   //  .. the default implementation does nothing ..
 }
 
-void mark_presence (bool &t)
+void mark_presence (bool &t, bool invert)
 {
-  t = true;
+  t = !invert;
 }
 
 template <class C, class T>
-void mark_presence_setter (C *, void (C::*) (T))
+void mark_presence_setter (C *, void (C::*) (T), bool)
 {
   //  .. the default implementation does nothing ..
 }
 
 template <class C>
-void mark_presence_setter (C *c, void (C::*ptr) (bool))
+void mark_presence_setter (C *c, void (C::*ptr) (bool), bool invert)
 {
-  (c->*ptr) (true);
+  (c->*ptr) (!invert);
 }
 
 
@@ -263,9 +264,9 @@ public:
     extract (ex, *mp_value);
   }
 
-  virtual void mark_present ()
+  virtual void mark_present (bool inverted)
   {
-    mark_presence (*mp_value);
+    mark_presence (*mp_value, inverted);
   }
 
   virtual ArgBase *clone () const
@@ -304,9 +305,9 @@ public:
     (mp_object->*mp_setter) (t);
   }
 
-  virtual void mark_present ()
+  virtual void mark_present (bool inverted)
   {
-    mark_presence_setter (mp_object, mp_setter);
+    mark_presence_setter (mp_object, mp_setter, inverted);
   }
 
   virtual ArgBase *clone () const

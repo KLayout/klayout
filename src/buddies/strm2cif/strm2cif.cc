@@ -31,22 +31,29 @@
 int 
 main (int argc, char *argv [])
 {
+  db::SaveLayoutOptions save_options;
   db::CIFWriterOptions cif_options;
   std::string infile, outfile;
 
   tl::CommandLineOptions cmd;
 
-  cmd << tl::arg("-od|--dummy-calls",         &cif_options.dummy_calls,       "Produces dummy calls",
-                "If this option is given, the writer will produce dummy cell calls on global level for all top cells"
-              )
-      << tl::arg("-ob|--blank-separator",     &cif_options.blank_separator,   "Uses blanks as x/y separators",
-                "If this option is given, blank characters will be used to separate x and y values. "
-                "Otherwise comma characters will be used.\n"
-                "Use this option if your CIF consumer cannot read comma characters as x/y separators."
-              )
-      << tl::arg("input",                     &infile,                        "The input file (any format, may be gzip compressed)")
-      << tl::arg("output",                    &outfile,                       "The output file")
+  cmd << tl::arg ("-od|--dummy-calls",         &cif_options.dummy_calls,       "Produces dummy calls",
+                  "If this option is given, the writer will produce dummy cell calls on global level for all top cells"
+                 )
+      << tl::arg ("-ob|--blank-separator",     &cif_options.blank_separator,   "Uses blanks as x/y separators",
+                  "If this option is given, blank characters will be used to separate x and y values. "
+                  "Otherwise comma characters will be used.\n"
+                  "Use this option if your CIF consumer cannot read comma characters as x/y separators."
+                 )
+      << tl::arg ("-os|--scale-factor=factor", &save_options,  &db::SaveLayoutOptions::set_scale_factor,   "Scales the layout upon writing",
+                  "Specifies layout scaling. If given, the saved layout will be scaled by the "
+                  "given factor."
+                 )
+      << tl::arg ("input",                     &infile,                        "The input file (any format, may be gzip compressed)")
+      << tl::arg ("output",                    &outfile,                       "The output file")
     ;
+
+  save_options.set_options (cif_options);
 
   cmd.brief ("This program will convert the given file to a CIF file");
 
@@ -67,8 +74,6 @@ main (int argc, char *argv [])
     {
       tl::OutputStream stream (outfile);
       db::CIFWriter writer;
-      db::SaveLayoutOptions save_options;
-      save_options.set_options (cif_options);
       writer.write (layout, stream, save_options);
     }
 

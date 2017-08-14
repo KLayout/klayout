@@ -37,6 +37,7 @@ TEST(1)
   cmd << tl::arg ("a", &a, "")
       << tl::arg ("?b", &b, "")
       << tl::arg ("-c", &c, "")
+      << tl::arg ("!-cc", &c, "")
       << tl::arg ("--dlong|-d", &d, "")
       << tl::arg ("--elong", &e, "")
       << tl::arg ("-f|--flong=value", &f, "");
@@ -63,6 +64,22 @@ TEST(1)
   EXPECT_EQ (a, "u");
   EXPECT_EQ (b, 0);
   EXPECT_EQ (c, true);
+
+  b = 0;
+  c = true;
+  {
+    char *argv[] = { "x", "u", "-cc" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (a, "u");
+  EXPECT_EQ (b, 0);
+  EXPECT_EQ (c, false);
+
+  {
+    char *argv[] = { "x", "u", "-c", "-cc" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (c, false);
 
   b = 0;
   c = false;
@@ -151,6 +168,7 @@ TEST(2)
   cmd << tl::arg ("a", &v, &Values::set_a, "")
       << tl::arg ("?b", &v, &Values::set_b, "")
       << tl::arg ("-c", &v, &Values::set_c, "")
+      << tl::arg ("!-cc", &v, &Values::set_c, "")
       << tl::arg ("--dlong|-d", &v, &Values::set_d, "")
       << tl::arg ("--elong", &v, &Values::set_e, "")
       << tl::arg ("-f|--flong=value", &v, &Values::set_f, "");
@@ -177,6 +195,22 @@ TEST(2)
   EXPECT_EQ (v.a, "u");
   EXPECT_EQ (v.b, 0);
   EXPECT_EQ (v.c, true);
+
+  v.b = 0;
+  v.c = true;
+  {
+    char *argv[] = { "x", "u", "-cc" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (v.a, "u");
+  EXPECT_EQ (v.b, 0);
+  EXPECT_EQ (v.c, false);
+
+  {
+    char *argv[] = { "x", "u", "-c", "-cc" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (v.c, false);
 
   v.b = 0;
   v.c = false;

@@ -67,7 +67,7 @@ static void run_test (ut::TestBase *_this, const char *file, const char *file_au
     reader.read (layout, options);
   }
 
-  _this->compare_layouts (layout, ut::testsrc_private () + std::string ("/testdata/dxf/") + file_au);
+  _this->compare_layouts (layout, ut::testsrc_private () + std::string ("/testdata/dxf/") + file_au, ut::WriteGDS2, 1);
 }
 
 TEST(1a)

@@ -366,7 +366,7 @@ public:
 bool
 Salt::create_grain (const SaltGrain &templ, SaltGrain &target)
 {
-  tl_assert (!m_root.is_empty ());
+  tl_assert (m_root.begin_collections () != m_root.end_collections ());
 
   const SaltGrains *coll = m_root.begin_collections ().operator-> ();
 
@@ -407,8 +407,8 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target)
       if (subdir.exists () && ! subdir.isDir ()) {
         throw tl::Exception (tl::to_string (tr ("Unable to create target directory '%1' for installing package - is already a file").arg (subdir.path ())));
       } else if (! subdir.exists ()) {
-        if (! target_dir.mkdir (tl::to_qstring (*n))) {
-          throw tl::Exception (tl::to_string (tr ("Unable to create target directory '%1' for installing package").arg (subdir.path ())));
+        if (! target_dir.mkpath (tl::to_qstring (*n))) {
+          throw tl::Exception (tl::to_string (tr ("Unable to create target directory '%1' for installing package").arg (subdir.filePath ())));
         }
         if (! target_dir.cd (tl::to_qstring (*n))) {
           throw tl::Exception (tl::to_string (tr ("Unable to change to target directory '%1' for installing package").arg (subdir.path ())));

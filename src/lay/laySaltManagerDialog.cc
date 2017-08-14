@@ -454,7 +454,7 @@ SaltManagerDialog::update_apply_state ()
 
     apply_new_button->setEnabled (marked > 0);
     if (marked == 0) {
-      apply_label_new->setText (QString ());
+      apply_label_new->setText (tr ("Select at least one package for installation (check button)"));
     } else if (marked == 1) {
       apply_label_new->setText (tr ("One package selected"));
     } else if (marked > 1) {

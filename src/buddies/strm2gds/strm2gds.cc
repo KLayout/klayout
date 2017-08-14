@@ -34,17 +34,18 @@ main (int argc, char *argv [])
 
   tl::CommandLineOptions cmd;
 
-  cmd << tl::arg ("-ov|--max-vertex-count=count", &gds2_options.max_vertex_count, "Specify the maximum number of points per polygon",
+  cmd << tl::arg ("-ov|--max-vertex-count=count", &gds2_options.max_vertex_count, "Specifies the maximum number of points per polygon",
                   "If this number is given, polygons are cut into smaller parts if they have more "
                   "than the specified number of points. If not given, the maximum number of points will be used. "
                   "This is 8190 unless --multi-xy-records is given."
                  )
-      << tl::arg ("-om|--multi-xy-records",    &gds2_options.multi_xy_records, "Allow unlimited number of points",
+      << tl::arg ("-om|--multi-xy-records",    &gds2_options.multi_xy_records, "Allows unlimited number of points",
                   "If this option is given, multiple XY records will be written to accomodate an unlimited number "
                   "of points per polygon or path. However, such files may not be compatible with some consumers."
                  )
-      << tl::arg ("-oz|--no-zero-length-paths", &gds2_options.no_zero_length_paths, "Don't allow zero-length paths",
-                  "If this option is given, zero-length paths (such with one point) are not written."
+      << tl::arg ("-oz|--no-zero-length-paths", &gds2_options.no_zero_length_paths, "Converts zero-length paths to polygons",
+                  "If this option is given, zero-length paths (such with one point) are not written as paths "
+                  "but converted to polygons. This avoids compatibility issues with consumers of this layout file."
                  )
       << tl::arg ("-on|--cellname-length=length", &gds2_options.max_cellname_length, "Limits cell names to the given length",
                   "If this option is given, long cell names will truncated if their length exceeds the given length."
@@ -119,15 +120,16 @@ main (int argc, char *argv [])
       writer.write (layout, stream, save_options);
     }
 
+  } catch (tl::CancelException &ex) {
+    return 1;
   } catch (std::exception &ex) {
-    fprintf (stderr, "*** ERROR: %s\n", ex.what ());
+    tl::error << ex.what ();
     return 1;
   } catch (tl::Exception &ex) {
-    fprintf (stderr, "*** ERROR: %s\n", ex.msg ().c_str ());
+    tl::error << ex.msg ();
     return 1;
   } catch (...) {
-    fprintf (stderr, "*** ERROR: unspecific error\n");
-    return 1;
+    tl::error << "ERROR: unspecific error";
   }
 
   return 0;

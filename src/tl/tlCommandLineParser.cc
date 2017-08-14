@@ -168,7 +168,7 @@ CommandLineOptions::produce_help (const std::string &program_name)
   tl::info << "  "  << program_name << "  [options]" << tl::noendl;
 
   for (std::vector<ArgBase *>::const_iterator a = m_args.begin (); a != m_args.end (); ++a) {
-    if (! (*a)->option ().name.empty ()) {
+    if (! (*a)->is_option ()) {
       if ((*a)->option ().optional) {
         tl::info << "  [<" << (*a)->option ().name << ">]" << tl::noendl;
       } else {
@@ -213,6 +213,24 @@ CommandLineOptions::produce_help (const std::string &program_name)
   tl::info << "";
   tl::info << "Options:" << tl::endl;
 
+  print_string_formatted ("  ", columns,
+                          "Options can be specified in a short (with one dash) or a long form "
+                          "(with two dashes). If a value is required, it can be specified either "
+                          "as the following argument or added to the option with an equal sign (=).");
+
+  tl::info << tl::endl << "  Examples:" << tl::endl << tl::endl
+           << "    -a 1" << tl::endl
+           << "    -a=1" << tl::endl
+           << "    --long 1" << tl::endl
+           << "    --long=1" << tl::endl;
+
+  tl::info << "  List of options:" << tl::endl;
+
+  tl::info << "    "
+           << pad_string (short_option_width + 5, "Short") << " "
+           << pad_string (long_option_width + 5, "Long") << " "
+           << pad_string (name_width + 3, "Value") << " " << "Description" << tl::endl;
+
   for (std::vector<ArgBase *>::const_iterator a = m_args.begin (); a != m_args.end (); ++a) {
     if (! (*a)->is_option ()) {
       continue;
@@ -224,7 +242,7 @@ CommandLineOptions::produce_help (const std::string &program_name)
         name = "value";
       }
     }
-    tl::info << "  "
+    tl::info << "    "
              << pad_string (short_option_width + 5, (*a)->option ().short_option.empty () ? "" : "-" + (*a)->option ().short_option) << " "
              << pad_string (long_option_width + 5, (*a)->option ().long_option.empty () ? "" : "--" + (*a)->option ().long_option) << " "
              << pad_string (name_width + 3, name) << " "
@@ -232,7 +250,7 @@ CommandLineOptions::produce_help (const std::string &program_name)
     tl::info << "";
 
     if (! (*a)->long_doc ().empty ()) {
-      print_string_formatted ("    ", columns, (*a)->long_doc ());
+      print_string_formatted ("      ", columns, (*a)->long_doc ());
       tl::info << "";
     }
   }

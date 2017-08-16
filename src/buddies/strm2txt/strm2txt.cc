@@ -20,6 +20,7 @@
 
 */
 
+#include "bdInit.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbTextWriter.h"

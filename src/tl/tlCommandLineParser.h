@@ -31,6 +31,8 @@
 namespace tl
 {
 
+class CommandLineOptions;
+
 /**
  *  @brief A base class for argument getters
  *
@@ -146,6 +148,15 @@ public:
     return false;
   }
 
+  /**
+   *  @brief Performs the action this argument is associated with
+   *  This method is used to implement "active" arguments such as "-h" or "--version".
+   */
+  virtual void action (CommandLineOptions *) const
+  {
+    //  The default implementation does nothing
+  }
+
 private:
   ParsedOption m_option;
   std::string m_brief_doc;
@@ -156,7 +167,7 @@ private:
  *  @brief A helper for extracting values by type
  */
 template <class T>
-void extract (tl::Extractor &ex, T &t, bool /*for_list*/ = false)
+inline void extract (tl::Extractor &ex, T &t, bool /*for_list*/ = false)
 {
   ex.read (t);
 }
@@ -164,7 +175,7 @@ void extract (tl::Extractor &ex, T &t, bool /*for_list*/ = false)
 /**
  *  @brief A specialization for the string type
  */
-void extract (tl::Extractor &ex, std::string &t, bool for_list = false)
+inline void extract (tl::Extractor &ex, std::string &t, bool for_list = false)
 {
   if (*ex == '"' || *ex == '\'') {
     ex.read_quoted (t);
@@ -179,7 +190,7 @@ void extract (tl::Extractor &ex, std::string &t, bool for_list = false)
  *  @brief A specialization for a list of any type (vector)
  */
 template <class T>
-void extract (tl::Extractor &ex, std::vector<T> &t, bool /*for_list*/ = false)
+inline void extract (tl::Extractor &ex, std::vector<T> &t, bool /*for_list*/ = false)
 {
   while (! ex.at_end ()) {
     t.push_back (T ());
@@ -192,24 +203,24 @@ void extract (tl::Extractor &ex, std::vector<T> &t, bool /*for_list*/ = false)
  *  @brief A helper to mark "presence"
  */
 template <class T>
-void mark_presence (T &, bool)
+inline void mark_presence (T &, bool)
 {
   //  .. the default implementation does nothing ..
 }
 
-void mark_presence (bool &t, bool invert)
+inline void mark_presence (bool &t, bool invert)
 {
   t = !invert;
 }
 
 template <class C, class T>
-void mark_presence_setter (C *, void (C::*) (T), bool)
+inline void mark_presence_setter (C *, void (C::*) (T), bool)
 {
   //  .. the default implementation does nothing ..
 }
 
 template <class C>
-void mark_presence_setter (C *c, void (C::*ptr) (bool), bool invert)
+inline void mark_presence_setter (C *c, void (C::*ptr) (bool), bool invert)
 {
   (c->*ptr) (!invert);
 }
@@ -409,11 +420,56 @@ public:
    */
   void parse (int argc, char *argv[]);
 
+  /**
+   *  @brief Produces the help text
+   */
+  void produce_help (const std::string &program_name);
+
+  /**
+   *  @brief Produces the version text
+   */
+  void produce_version ();
+
+  /**
+   *  @brief Produces the license text
+   */
+  void produce_license ();
+
+  /**
+   *  @brief Gets the program name
+   *  This name is set by the "parse" method.
+   */
+  const std::string &program_name () const
+  {
+    return m_program_name;
+  }
+
+  /**
+   *  @brief Sets the version text
+   *
+   *  This text is printed with the --version option.
+   */
+  static void set_version (const std::string &text)
+  {
+    m_version = text;
+  }
+
+  /**
+   *  @brief Sets the license text
+   *
+   *  This text is printed with the --license option.
+   */
+  static void set_license (const std::string &text)
+  {
+    m_license = text;
+  }
+
 private:
   std::string m_brief;
   std::vector<ArgBase *> m_args;
-
-  void produce_help (const std::string &program_name);
+  std::string m_program_name;
+  static std::string m_version;
+  static std::string m_license;
 };
 
 }

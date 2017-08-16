@@ -79,12 +79,84 @@ ArgBase::is_option () const
 }
 
 // ------------------------------------------------------------------------
+//  Internal argument classes to implement info arguments
+
+class HelpArg
+  : public ArgBase
+{
+public:
+  HelpArg ()
+    : ArgBase ("-h|--help", "Shows the usage and exits", "")
+  {
+    //  .. nothing yet ..
+  }
+
+  ArgBase *clone () const
+  {
+    return new HelpArg ();
+  }
+
+  void action (CommandLineOptions *options) const
+  {
+    options->produce_help (options->program_name ());
+    throw tl::CancelException ();
+  }
+};
+
+class LicenseArg
+  : public ArgBase
+{
+public:
+  LicenseArg ()
+    : ArgBase ("--license", "Shows the license and exits", "")
+  {
+    //  .. nothing yet ..
+  }
+
+  ArgBase *clone () const
+  {
+    return new LicenseArg ();
+  }
+
+  void action (CommandLineOptions *options) const
+  {
+    options->produce_license ();
+    throw tl::CancelException ();
+  }
+};
+
+class VersionArg
+  : public ArgBase
+{
+public:
+  VersionArg ()
+    : ArgBase ("--version", "Produces the version and exits", "")
+  {
+    //  .. nothing yet ..
+  }
+
+  ArgBase *clone () const
+  {
+    return new VersionArg ();
+  }
+
+  void action (CommandLineOptions *options) const
+  {
+    options->produce_version ();
+    throw tl::CancelException ();
+  }
+};
+
+// ------------------------------------------------------------------------
 //  CommandLineOptions implementation
+
+std::string CommandLineOptions::m_version;
+std::string CommandLineOptions::m_license;
 
 CommandLineOptions::CommandLineOptions ()
 {
   //  Populate with the built-in options
-  *this << ArgBase ("-h|--help", "Shows the usage", "");
+  *this << HelpArg () << VersionArg () << LicenseArg ();
 }
 
 CommandLineOptions::~CommandLineOptions ()
@@ -119,11 +191,12 @@ print_string_formatted (const std::string &indent, unsigned int columns, const s
       if (c == columns && !at_beginning) {
         tl::info << "";
         tl::info << indent << tl::noendl;
-        c = 0;
+        c = (unsigned int) (t - tt);
       }
     }
 
     tl::info << std::string (tt, 0, t - tt) << tl::noendl;
+
     while (*t == ' ') {
       ++t;
     }
@@ -159,15 +232,38 @@ pad_string (unsigned int columns, const std::string &text)
   return s;
 }
 
+struct NameCompare
+{
+  bool operator() (ArgBase *a, ArgBase *b)
+  {
+    if (a->is_option () != b->is_option ()) {
+      return a->is_option () < b->is_option ();
+    }
+    if (! a->is_option ()) {
+      return false;
+    }
+    if (a->option ().short_option.empty () != b->option ().short_option.empty ()) {
+      return a->option ().short_option.empty () < b->option ().short_option.empty ();
+    }
+    if (a->option ().short_option != b->option ().short_option) {
+      return a->option ().short_option < b->option ().short_option;
+    }
+    return a->option ().long_option < b->option ().long_option;
+  }
+};
+
 void
 CommandLineOptions::produce_help (const std::string &program_name)
 {
-  int columns = 60;
+  int columns = 80;
 
   tl::info << "Usage:" << tl::endl;
   tl::info << "  "  << program_name << "  [options]" << tl::noendl;
 
-  for (std::vector<ArgBase *>::const_iterator a = m_args.begin (); a != m_args.end (); ++a) {
+  std::vector<ArgBase *> sorted_args = m_args;
+  std::stable_sort (sorted_args.begin (), sorted_args.end (), NameCompare ());
+
+  for (std::vector<ArgBase *>::const_iterator a = sorted_args.begin (); a != sorted_args.end (); ++a) {
     if (! (*a)->is_option ()) {
       if ((*a)->option ().optional) {
         tl::info << "  [<" << (*a)->option ().name << ">]" << tl::noendl;
@@ -185,7 +281,7 @@ CommandLineOptions::produce_help (const std::string &program_name)
   unsigned int long_option_width = 0;
   unsigned int name_width = 0;
 
-  for (std::vector<ArgBase *>::const_iterator a = m_args.begin (); a != m_args.end (); ++a) {
+  for (std::vector<ArgBase *>::const_iterator a = sorted_args.begin (); a != sorted_args.end (); ++a) {
     name_width = std::max (name_width, (unsigned int) (*a)->option ().name.size ());
     short_option_width = std::max (short_option_width, (unsigned int) (*a)->option ().short_option.size ());
     long_option_width = std::max (long_option_width, (unsigned int) (*a)->option ().long_option.size ());
@@ -193,7 +289,7 @@ CommandLineOptions::produce_help (const std::string &program_name)
 
   tl::info << "Arguments:" << tl::endl;
 
-  for (std::vector<ArgBase *>::const_iterator a = m_args.begin (); a != m_args.end (); ++a) {
+  for (std::vector<ArgBase *>::const_iterator a = sorted_args.begin (); a != sorted_args.end (); ++a) {
     if ((*a)->is_option ()) {
       continue;
     }
@@ -218,12 +314,6 @@ CommandLineOptions::produce_help (const std::string &program_name)
                           "(with two dashes). If a value is required, it can be specified either "
                           "as the following argument or added to the option with an equal sign (=).");
 
-  tl::info << tl::endl << "  Examples:" << tl::endl << tl::endl
-           << "    -a 1" << tl::endl
-           << "    -a=1" << tl::endl
-           << "    --long 1" << tl::endl
-           << "    --long=1" << tl::endl;
-
   tl::info << "  List of options:" << tl::endl;
 
   tl::info << "    "
@@ -231,7 +321,7 @@ CommandLineOptions::produce_help (const std::string &program_name)
            << pad_string (long_option_width + 5, "Long") << " "
            << pad_string (name_width + 3, "Value") << " " << "Description" << tl::endl;
 
-  for (std::vector<ArgBase *>::const_iterator a = m_args.begin (); a != m_args.end (); ++a) {
+  for (std::vector<ArgBase *>::const_iterator a = sorted_args.begin (); a != sorted_args.end (); ++a) {
     if (! (*a)->is_option ()) {
       continue;
     }
@@ -257,15 +347,21 @@ CommandLineOptions::produce_help (const std::string &program_name)
 }
 
 void
+CommandLineOptions::produce_license ()
+{
+  tl::info << m_license;
+}
+
+void
+CommandLineOptions::produce_version ()
+{
+  tl::info << m_version;
+}
+
+void
 CommandLineOptions::parse (int argc, char *argv[])
 {
-  for (int i = 0; i < argc; ++i) {
-    std::string arg_as_utf8 = tl::to_string (QString::fromLocal8Bit (argv [i]));
-    if (arg_as_utf8 == "-h" || arg_as_utf8 == "--help") {
-      produce_help (tl::to_string (QFileInfo (QString::fromLocal8Bit (argv [0])).fileName ()));
-      throw tl::CancelException ();
-    }
-  }
+  m_program_name = tl::to_string (QFileInfo (QString::fromLocal8Bit (argv [0])).fileName ());
 
   std::vector<ArgBase *>::const_iterator next_plain_arg = m_args.begin ();
   while (next_plain_arg != m_args.end () && (*next_plain_arg)->is_option ()) {
@@ -348,6 +444,9 @@ CommandLineOptions::parse (int argc, char *argv[])
         arg->mark_present (arg->option ().inverted);
       }
     }
+
+    //  Exection the action if there is one
+    arg->action (this);
 
   }
 

@@ -83,7 +83,7 @@ echo "  rev = $KLAYOUT_VERSION_REV"
 echo ""
 
 # Force a minimum rebuild for the version update
-touch src/klayout_main/version.h
+touch src/version/version.h
 
 rm -rf $target
 ./build.sh -python $python -ruby $ruby -bin $target -build $build -j2

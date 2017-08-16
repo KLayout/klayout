@@ -20,6 +20,7 @@
 
 */
 
+#include "bdInit.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbCIFWriter.h"
@@ -31,6 +32,8 @@
 int 
 main (int argc, char *argv [])
 {
+  bd::init ();
+
   db::SaveLayoutOptions save_options;
   db::CIFWriterOptions cif_options;
   std::string infile, outfile;

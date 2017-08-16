@@ -20,6 +20,8 @@
 
 */
 
+#include "bdInit.h"
+#include "bdWriterOptions.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbGDS2Writer.h"
@@ -28,8 +30,10 @@
 int
 main (int argc, char *argv [])
 {
-  db::SaveLayoutOptions save_options;
+  bd::init ();
+
   db::GDS2WriterOptions gds2_options;
+  bd::GenericWriterOptions generic_writer_options;
   std::string infile, outfile;
 
   tl::CommandLineOptions cmd;
@@ -54,10 +58,10 @@ main (int argc, char *argv [])
                   "This option can specify the GDS2 LIBNAME for the output file. By default, the original LIBNAME is "
                   "written."
                  )
-      << tl::arg ("-om|--user-units=unit",     &gds2_options.user_units, "Specifies the user unit to use",
+      << tl::arg ("-or|--user-units=unit",     &gds2_options.user_units, "Specifies the user unit to use",
                   "Specifies the GDS2 user unit. By default micrometers are used for the user unit."
                  )
-      << tl::arg ("!-ot|--no-timestamps",       &gds2_options.write_timestamps, "Don't write timestamps",
+      << tl::arg ("!-ot|--no-timestamps",      &gds2_options.write_timestamps, "Don't write timestamps",
                   "Writes a dummy time stamp instead of the actual time. With this option, GDS2 files become "
                   "bytewise indentical even if written at different times. This option is useful if binary "
                   "identity is important (i.e. in regression scenarios)."
@@ -70,33 +74,11 @@ main (int argc, char *argv [])
                   "This option enables a GDS2 extension that allows writing of file properties to GDS2 files. "
                   "Consumers that don't support this feature, may not be able to read such a GDS2 files."
                  )
-      << tl::arg ("-os|--scale-factor=factor", &save_options,  &db::SaveLayoutOptions::set_scale_factor, "Scales the layout upon writing",
-                  "Specifies layout scaling. If given, the saved layout will be scaled by the "
-                  "given factor."
-                 )
-      << tl::arg ("-ou|--dbu=dbu",             &save_options,  &db::SaveLayoutOptions::set_dbu, "Uses the specified database unit",
-                  "Specifies the database unit to save the layout in. The database unit is given "
-                  "in micron units. By default, the original unit is used. The layout will not "
-                  "change physically because internally, the coordinates are scaled to match the "
-                  "new database unit."
-                 )
-      << tl::arg ("-ox|--drop-empty-cells",    &save_options,  &db::SaveLayoutOptions::set_dont_write_empty_cells, "Drops empty cells",
-                  "If given, empty cells won't be written. See --keep-instances for more options."
-                 )
-      << tl::arg ("-ok|--keep-instances",      &save_options,  &db::SaveLayoutOptions::set_keep_instances, "Keeps instances of dropped cells",
-                  "If given, instances of dropped cell's won't be removed. Hence, ghost cells are "
-                  "produced. The resulting layout may not be readable by consumers that require "
-                  "all instantiated cells to be present as actual cells."
-                 )
-      << tl::arg ("-oc|--write-context-info",  &save_options,  &db::SaveLayoutOptions::set_write_context_info, "Writes context information",
-                  "Include context information for PCell instances and other information in a format-specific "
-                  "way. The resulting layout may show unexpected features for other consumers."
-                 )
       << tl::arg ("input",                     &infile,                        "The input file (any format, may be gzip compressed)")
       << tl::arg ("output",                    &outfile,                       "The output file")
     ;
 
-  save_options.set_options (gds2_options);
+  generic_writer_options.add_options (cmd, gds2_options.format_name ());
 
   cmd.brief ("This program will convert the given file to a GDS2 file");
 
@@ -115,6 +97,10 @@ main (int argc, char *argv [])
     }
 
     {
+      db::SaveLayoutOptions save_options;
+      save_options.set_options (gds2_options);
+      generic_writer_options.configure (save_options, layout);
+
       tl::OutputStream stream (outfile);
       db::GDS2Writer writer;
       writer.write (layout, stream, save_options);
@@ -134,5 +120,3 @@ main (int argc, char *argv [])
 
   return 0;
 }
-
-

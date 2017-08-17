@@ -169,7 +169,7 @@ void print_syntax ()
   printf ("  -z            gzip output\n");
   printf ("  -t 'cell'     use this cell from input (default: determine top cell automatically)\n");
   printf ("  -x 'name'     use this cell as top cell in output\n");
-  printf ("  -r 'l,b,r,t'  explicitly specify a clip retangle (can be present multiple times)\n");
+  printf ("  -r 'l,b,r,t'  explicitly specify a clip rectangle (can be present multiple times)\n");
 }
 
 int 

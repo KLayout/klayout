@@ -21,6 +21,7 @@
 */
 
 #include "bdInit.h"
+#include "bdReaderOptions.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbTextWriter.h"
@@ -31,9 +32,11 @@ main_func (int argc, char *argv [])
 {
   bd::init ();
 
+  bd::GenericReaderOptions generic_reader_options;
   std::string infile, outfile;
 
   tl::CommandLineOptions cmd;
+  generic_reader_options.add_options (cmd);
 
   cmd << tl::arg ("input",                     &infile,                        "The input file (any format, may be gzip compressed)")
       << tl::arg ("output",                    &outfile,                       "The output file")
@@ -48,9 +51,12 @@ main_func (int argc, char *argv [])
   db::LayerMap map;
 
   {
+    db::LoadLayoutOptions load_options;
+    generic_reader_options.configure (load_options);
+
     tl::InputStream stream (infile);
     db::Reader reader (stream);
-    map = reader.read (layout);
+    map = reader.read (layout, load_options);
   }
 
   {

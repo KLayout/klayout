@@ -39,13 +39,17 @@ GenericWriterOptions::GenericWriterOptions ()
 void
 GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::string &format)
 {
-  cmd << tl::arg ("-os|--scale-factor=factor", &scale_factor, "Scales the layout upon writing",
+  std::string group ("[Output options - General]");
+
+  cmd << tl::arg (group +
+                  "-os|--scale-factor=factor", &scale_factor, "Scales the layout upon writing",
                   "Specifies layout scaling. If given, the saved layout will be scaled by the "
                   "given factor."
                  );
 
   if (format == "GDS2" || format == "GDS2Text" || format == "OASIS") {
-    cmd << tl::arg ("-ou|--dbu=dbu",           &dbu, "Uses the specified database unit",
+    cmd << tl::arg (group +
+                    "-ou|--dbu=dbu",           &dbu, "Uses the specified database unit",
                     "Specifies the database unit to save the layout in. The database unit is given "
                     "in micron units. By default, the original unit is used. The layout will not "
                     "change physically because internally, the coordinates are scaled to match the "
@@ -53,35 +57,43 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                    );
   }
 
-  cmd << tl::arg ("-ox|--drop-empty-cells",    &dont_write_empty_cells, "Drops empty cells",
+  cmd << tl::arg (group +
+                  "#-ox|--drop-empty-cells",    &dont_write_empty_cells, "Drops empty cells",
                   "If given, empty cells won't be written. See --keep-instances for more options."
                  );
 
   if (format == "GDS2" || format == "GDS2Text") {
-    cmd << tl::arg ("-ok|--keep-instances",      &keep_instances, "Keeps instances of dropped cells",
+    cmd << tl::arg (group +
+                    "#-ok|--keep-instances",      &keep_instances, "Keeps instances of dropped cells",
                     "If given, instances of dropped cell's won't be removed. Hence, ghost cells are "
                     "produced. The resulting layout may not be readable by consumers that require "
-                    "all instantiated cells to be present as actual cells."
+                    "all instantiated cells to be present as actual cells.\n"
+                    "Dropped cells are those which are removed by a negative cell selection (see "
+                    "--write-cells) "
                    );
   }
 
   if (format == "GDS2" || format == "GDS2Text" || format == "OASIS") {
-    cmd << tl::arg ("-oc|--write-context-info",  &write_context_info, "Writes context information",
+    cmd << tl::arg (group +
+                    "#-oc|--write-context-info",  &write_context_info, "Writes context information",
                     "Include context information for PCell instances and other information in a format-specific "
                     "way. The resulting layout may show unexpected features for other consumers."
                    );
   }
 
-  cmd << tl::arg ("-ow|--write-cells=sel",       &cell_selection, "Specifies cells to write",
+  cmd << tl::arg (group +
+                  "#-ow|--write-cells=sel",       &cell_selection, "Specifies cells to write",
                   "This option specifies the cells to write. The value of this option is a sequence of "
-                  "select/unselect operations. A select operation is an optional plus sign (+), followed by "
-                  "a cell filter. An unselect operation is a minus sign (-) followed by a cell filter. "
-                  "A cell filter is a plain cell name, a glob pattern (using '*' and '?' for placeholders). "
-                  "If a cell filter is enclosed in round brackets, only this cell is specified. Otherwise "
-                  "the cell and it's children are specified.\n"
+                  "positive and negative cell select operations. "
+                  "A select operation is an optional plus (+) or minus sign (-), followed by "
+                  "a cell filter. By default a select operation is positive, with a minus sign, the "
+                  "select operation is negative and will unselect the matching cells."
+                  "A cell filter is a plain cell name or a glob pattern (using '*' and '?' for placeholders). "
+                  "If a cell filter is enclosed in round brackets, it will apply only to the matching cells. "
+                  "Otherwise it will apply to these cells plus their children.\n"
                   "\n"
-                  "Multiple operations can be specified by adding them with a comma separator. "
-                  "Cell selection and unselection happens in the order given. Hence it's possible "
+                  "Multiple operations can be specified by combining them with a comma. "
+                  "Positive and negative selection happens in the order given. Hence it's possible "
                   "to select a cell with it's children and then unselect some children of this cell.\n"
                   "\n"
                   "Examples:\n\n"

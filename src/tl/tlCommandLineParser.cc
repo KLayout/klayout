@@ -32,9 +32,28 @@ namespace tl
 //  ArgBase implementation
 
 ArgBase::ParsedOption::ParsedOption (const std::string &option)
-  : optional (false), inverted (false)
+  : optional (false), inverted (false), advanced (false), non_advanced (false)
 {
   tl::Extractor ex (option.c_str ());
+
+  while (! ex.at_end ()) {
+
+    if (ex.test ("#")) {
+      advanced = true;
+    } else if (ex.test ("/")) {
+      non_advanced = true;
+    } else if (ex.test ("[")) {
+      const char *t = ex.get ();
+      while (! ex.at_end () && *ex != ']') {
+        ++ex;
+      }
+      group += std::string (t, 0, ex.get () - t);
+      ex.test ("]");
+    } else {
+      break;
+    }
+
+  }
 
   if (ex.test ("!")) {
     inverted = true;
@@ -61,7 +80,7 @@ ArgBase::ParsedOption::ParsedOption (const std::string &option)
   }
 }
 
-ArgBase::ArgBase (const char *option, const char *brief_doc, const char *long_doc)
+ArgBase::ArgBase (const std::string &option, const std::string &brief_doc, const std::string &long_doc)
   : m_option (option), m_brief_doc (brief_doc), m_long_doc (long_doc)
 {
   //  .. nothing yet ..
@@ -98,7 +117,29 @@ public:
 
   void action (CommandLineOptions *options) const
   {
-    options->produce_help (options->program_name ());
+    options->produce_help (options->program_name (), false);
+    throw tl::CancelException ();
+  }
+};
+
+class AdvancedHelpArg
+  : public ArgBase
+{
+public:
+  AdvancedHelpArg ()
+    : ArgBase ("/--help-all", "Shows all options (including advanced) and exits", "")
+  {
+    //  .. nothing yet ..
+  }
+
+  ArgBase *clone () const
+  {
+    return new AdvancedHelpArg ();
+  }
+
+  void action (CommandLineOptions *options) const
+  {
+    options->produce_help (options->program_name (), true);
     throw tl::CancelException ();
   }
 };
@@ -130,7 +171,7 @@ class VersionArg
 {
 public:
   VersionArg ()
-    : ArgBase ("--version", "Produces the version and exits", "")
+    : ArgBase ("--version", "Shows the version and exits", "")
   {
     //  .. nothing yet ..
   }
@@ -147,6 +188,42 @@ public:
   }
 };
 
+class VerbosityArg
+  : public ArgBase
+{
+public:
+  VerbosityArg ()
+    : ArgBase ("-d|--debug-level", "Sets the verbosity level",
+               "The verbosity level is an integer. Typical values are:\n"
+               "* 0: silent\n"
+               "* 10: somewhat verbose\n"
+               "* 11: somewhat verbose plus timing information\n"
+               "* 20: verbose\n"
+               "* 21: verbose plus timing information\n"
+               "..."
+              )
+  {
+    //  .. nothing yet ..
+  }
+
+  ArgBase *clone () const
+  {
+    return new VerbosityArg ();
+  }
+
+  bool wants_value () const
+  {
+    return true;
+  }
+
+  void take_value (tl::Extractor &ex)
+  {
+    int d = 0;
+    ex.read (d);
+    tl::verbosity (d);
+  }
+};
+
 // ------------------------------------------------------------------------
 //  CommandLineOptions implementation
 
@@ -156,7 +233,7 @@ std::string CommandLineOptions::m_license;
 CommandLineOptions::CommandLineOptions ()
 {
   //  Populate with the built-in options
-  *this << HelpArg () << VersionArg () << LicenseArg ();
+  *this << HelpArg () << AdvancedHelpArg () << VersionArg () << LicenseArg () << VerbosityArg ();
 }
 
 CommandLineOptions::~CommandLineOptions ()
@@ -242,6 +319,9 @@ struct NameCompare
     if (! a->is_option ()) {
       return false;
     }
+    if (a->option ().group != b->option ().group) {
+      return a->option ().group < b->option ().group;
+    }
     if (a->option ().short_option.empty () != b->option ().short_option.empty ()) {
       return a->option ().short_option.empty () < b->option ().short_option.empty ();
     }
@@ -253,7 +333,7 @@ struct NameCompare
 };
 
 void
-CommandLineOptions::produce_help (const std::string &program_name)
+CommandLineOptions::produce_help (const std::string &program_name, bool advanced)
 {
   int columns = 80;
 
@@ -314,17 +394,34 @@ CommandLineOptions::produce_help (const std::string &program_name)
                           "(with two dashes). If a value is required, it can be specified either "
                           "as the following argument or added to the option with an equal sign (=).");
 
-  tl::info << "  List of options:" << tl::endl;
+  tl::info << tl::endl << "  List of options:" << tl::endl;
 
-  tl::info << "    "
-           << pad_string (short_option_width + 5, "Short") << " "
-           << pad_string (long_option_width + 5, "Long") << " "
-           << pad_string (name_width + 3, "Value") << " " << "Description" << tl::endl;
+  std::string header = pad_string (short_option_width + 5, "Short") + " "
+                        + pad_string (long_option_width + 5, "Long") + " "
+                        + pad_string (name_width + 3, "Value") + " " + "Description";
+
+  tl::info << "    " << header << tl::endl;
+
+  std::string prev_group;
+  bool hidden = false;
 
   for (std::vector<ArgBase *>::const_iterator a = sorted_args.begin (); a != sorted_args.end (); ++a) {
+
     if (! (*a)->is_option ()) {
       continue;
+    } else if ((*a)->option ().advanced && !advanced) {
+      hidden = true;
+      continue;
+    } else if ((*a)->option ().non_advanced && advanced) {
+      continue;
     }
+
+    if ((*a)->option ().group != prev_group) {
+      prev_group = (*a)->option ().group;
+      tl::info << tl::endl << "  " << prev_group << ":" << tl::endl;
+      tl::info << "    " << header << tl::endl;
+    }
+
     std::string name;
     if ((*a)->wants_value ()) {
       name = (*a)->option ().name;
@@ -332,6 +429,7 @@ CommandLineOptions::produce_help (const std::string &program_name)
         name = "value";
       }
     }
+
     tl::info << "    "
              << pad_string (short_option_width + 5, (*a)->option ().short_option.empty () ? "" : "-" + (*a)->option ().short_option) << " "
              << pad_string (long_option_width + 5, (*a)->option ().long_option.empty () ? "" : "--" + (*a)->option ().long_option) << " "
@@ -343,6 +441,11 @@ CommandLineOptions::produce_help (const std::string &program_name)
       print_string_formatted ("      ", columns, (*a)->long_doc ());
       tl::info << "";
     }
+
+  }
+
+  if (hidden) {
+    tl::info << tl::endl << "  See --help-all for more options." << tl::endl;
   }
 }
 
@@ -363,10 +466,23 @@ CommandLineOptions::parse (int argc, char *argv[])
 {
   m_program_name = tl::to_string (QFileInfo (QString::fromLocal8Bit (argv [0])).fileName ());
 
-  std::vector<ArgBase *>::const_iterator next_plain_arg = m_args.begin ();
-  while (next_plain_arg != m_args.end () && (*next_plain_arg)->is_option ()) {
-    ++next_plain_arg;
+  std::vector<ArgBase *> plain_args;
+  std::map<std::string, ArgBase *> arg_by_short_option, arg_by_long_option;
+
+  for (std::vector<ArgBase *>::const_iterator i = m_args.begin (); i != m_args.end (); ++i) {
+    if ((*i)->is_option ()) {
+      if (! (*i)->option ().short_option.empty ()) {
+        arg_by_short_option.insert (std::make_pair ((*i)->option ().short_option, *i));
+      }
+      if (! (*i)->option ().long_option.empty ()) {
+        arg_by_long_option.insert (std::make_pair ((*i)->option ().long_option, *i));
+      }
+    } else {
+      plain_args.push_back (*i);
+    }
   }
+
+  std::vector<ArgBase *>::const_iterator next_plain_arg = plain_args.begin ();
 
   for (int i = 1; i < argc; ++i) {
 
@@ -378,42 +494,30 @@ CommandLineOptions::parse (int argc, char *argv[])
     if (ex.test ("--")) {
 
       std::string n;
-      ex.read_word (n);
-      for (std::vector<ArgBase *>::const_iterator a = m_args.begin (); a != m_args.end () && !arg; ++a) {
-        if ((*a)->option ().long_option == n) {
-          arg = *a;
-        }
-      }
-
-      if (!arg) {
+      ex.read_word (n, "_-");
+      std::map<std::string, ArgBase *>::const_iterator a = arg_by_long_option.find (n);
+      if (a == arg_by_long_option.end ()) {
         throw tl::Exception (tl::to_string (QObject::tr ("Unknown command line option --%1 (use -h for help)").arg (tl::to_qstring (n))));
       }
+      arg = a->second;
 
     } else if (ex.test ("-")) {
 
       std::string n;
       ex.read_word (n);
-      for (std::vector<ArgBase *>::const_iterator a = m_args.begin (); a != m_args.end () && !arg; ++a) {
-        if ((*a)->option ().short_option == n) {
-          arg = *a;
-        }
+      std::map<std::string, ArgBase *>::const_iterator a = arg_by_short_option.find (n);
+      if (a == arg_by_short_option.end ()) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Unknown command line option --%1 (use -h for help)").arg (tl::to_qstring (n))));
       }
-
-      if (!arg) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Unknown command line option -%1 (use -h for help)").arg (tl::to_qstring (n))));
-      }
+      arg = a->second;
 
     } else {
 
-      if (next_plain_arg == m_args.end ()) {
+      if (next_plain_arg == plain_args.end ()) {
         throw tl::Exception (tl::to_string (QObject::tr ("Unknown command line component %1 - no further plain argument expected (use -h for help)").arg (tl::to_qstring (arg_as_utf8))));
       }
 
       arg = *next_plain_arg++;
-
-      while (next_plain_arg != m_args.end () && (*next_plain_arg)->is_option ()) {
-        ++next_plain_arg;
-      }
 
     }
 
@@ -438,11 +542,13 @@ CommandLineOptions::parse (int argc, char *argv[])
       }
 
     } else {
+
       if (ex.test ("=")) {
         arg->take_value (ex);
       } else {
         arg->mark_present (arg->option ().inverted);
       }
+
     }
 
     //  Exection the action if there is one
@@ -450,7 +556,7 @@ CommandLineOptions::parse (int argc, char *argv[])
 
   }
 
-  if (next_plain_arg != m_args.end () && !(*next_plain_arg)->option ().optional) {
+  if (next_plain_arg != plain_args.end () && !(*next_plain_arg)->option ().optional) {
     throw tl::Exception (tl::to_string (QObject::tr ("Additional arguments required (use -h for help)")));
   }
 }

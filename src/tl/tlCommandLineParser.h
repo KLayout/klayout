@@ -56,8 +56,9 @@ public:
      */
     ParsedOption (const std::string &option);
 
-    bool optional, inverted;
+    bool optional, inverted, advanced, non_advanced;
     std::string long_option, short_option, name;
+    std::string group;
   };
 
   /**
@@ -77,8 +78,11 @@ public:
    *    "--long-option=value"     - A long option with a value
    *    "-o|--long-option"        - A short/long option
    *    "-o|--long-option=value"  - A short/long option with a value
+   *    "[group]..."              - List the option under this group (group = group title)
+   *    "#..."                    - Advanced option - listed with --help-all only
+   *    "/..."                    - Non-ddvanced option - listed with -h|--help only
    */
-  ArgBase (const char *option, const char *brief_doc, const char *long_doc);
+  ArgBase (const std::string &option, const std::string &brief_doc, const std::string &long_doc);
 
   /**
    *  @brief Destructor
@@ -264,7 +268,7 @@ class arg_direct_setter
   : public ArgBase
 {
 public:
-  arg_direct_setter (const char *option, T *value, const char *brief_doc, const char *long_doc)
+  arg_direct_setter (const std::string &option, T *value, const std::string &brief_doc, const std::string &long_doc)
     : ArgBase (option, brief_doc, long_doc), mp_value (value)
   {
     //  .. nothing yet ..
@@ -302,7 +306,7 @@ class arg_method_setter
   : public ArgBase
 {
 public:
-  arg_method_setter (const char *option, C *object, void (C::*setter)(T), const char *brief_doc, const char *long_doc)
+  arg_method_setter (const std::string &option, C *object, void (C::*setter)(T), const std::string &brief_doc, const std::string &long_doc)
     : ArgBase (option, brief_doc, long_doc), mp_object (object), mp_setter (setter)
   {
     //  .. nothing yet ..
@@ -340,13 +344,13 @@ private:
  *  @brief Polymorphic production methods for the argument getters
  */
 template <class C, class T>
-arg_method_setter<C, T> arg (const char *option, C *object, void (C::*setter)(T), const char *brief_doc, const char *long_doc = "")
+arg_method_setter<C, T> arg (const std::string &option, C *object, void (C::*setter)(T), const std::string &brief_doc, const std::string &long_doc = "")
 {
   return arg_method_setter<C, T> (option, object, setter, brief_doc, long_doc);
 }
 
 template <class T>
-arg_direct_setter<T> arg (const char *option, T *value, const char *brief_doc, const char *long_doc = "")
+arg_direct_setter<T> arg (const std::string &option, T *value, const std::string &brief_doc, const std::string &long_doc = "")
 {
   return arg_direct_setter<T> (option, value, brief_doc, long_doc);
 }
@@ -423,7 +427,7 @@ public:
   /**
    *  @brief Produces the help text
    */
-  void produce_help (const std::string &program_name);
+  void produce_help (const std::string &program_name, bool advanced);
 
   /**
    *  @brief Produces the version text

@@ -21,66 +21,59 @@
 */
 
 #include "bdInit.h"
+#include "bdWriterOptions.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbCIFWriter.h"
-#include "tlLog.h"
 #include "tlCommandLineParser.h"
 
-#include <QFileInfo>
-
-int 
-main (int argc, char *argv [])
+int
+main_func (int argc, char *argv [])
 {
   bd::init ();
 
-  db::SaveLayoutOptions save_options;
-  db::CIFWriterOptions cif_options;
+  bd::GenericWriterOptions generic_writer_options;
   std::string infile, outfile;
 
   tl::CommandLineOptions cmd;
+  generic_writer_options.add_options_for_cif (cmd);
 
-  cmd << tl::arg ("-od|--dummy-calls",         &cif_options.dummy_calls,       "Produces dummy calls",
-                  "If this option is given, the writer will produce dummy cell calls on global level for all top cells"
-                 )
-      << tl::arg ("-ob|--blank-separator",     &cif_options.blank_separator,   "Uses blanks as x/y separators",
-                  "If this option is given, blank characters will be used to separate x and y values. "
-                  "Otherwise comma characters will be used.\n"
-                  "Use this option if your CIF consumer cannot read comma characters as x/y separators."
-                 )
-      << tl::arg ("-os|--scale-factor=factor", &save_options,  &db::SaveLayoutOptions::set_scale_factor,   "Scales the layout upon writing",
-                  "Specifies layout scaling. If given, the saved layout will be scaled by the "
-                  "given factor."
-                 )
-      << tl::arg ("input",                     &infile,                        "The input file (any format, may be gzip compressed)")
+  cmd << tl::arg ("input",                     &infile,                        "The input file (any format, may be gzip compressed)")
       << tl::arg ("output",                    &outfile,                       "The output file")
     ;
 
-  save_options.set_options (cif_options);
-
   cmd.brief ("This program will convert the given file to a CIF file");
 
+  cmd.parse (argc, argv);
+
+  db::Manager m;
+  db::Layout layout (&m);
+  db::LayerMap map;
+
+  {
+    tl::InputStream stream (infile);
+    db::Reader reader (stream);
+    map = reader.read (layout);
+  }
+
+  {
+    db::SaveLayoutOptions save_options;
+    generic_writer_options.configure (save_options, layout);
+
+    tl::OutputStream stream (outfile);
+    db::CIFWriter writer;
+    writer.write (layout, stream, save_options);
+  }
+
+  return 0;
+}
+
+int
+main (int argc, char *argv [])
+{
   try {
-
-    cmd.parse (argc, argv);
-
-    db::Manager m;
-    db::Layout layout (&m);
-    db::LayerMap map;
-
-    {
-      tl::InputStream stream (infile);
-      db::Reader reader (stream);
-      map = reader.read (layout);
-    }
-
-    {
-      tl::OutputStream stream (outfile);
-      db::CIFWriter writer;
-      writer.write (layout, stream, save_options);
-    }
-
-  } catch (tl::CancelException &ex) {
+    return main_func (argc, argv);
+  } catch (tl::CancelException & /*ex*/) {
     return 1;
   } catch (std::exception &ex) {
     tl::error << ex.what ();
@@ -91,8 +84,4 @@ main (int argc, char *argv [])
   } catch (...) {
     tl::error << "ERROR: unspecific error";
   }
-
-  return 0;
 }
-
-

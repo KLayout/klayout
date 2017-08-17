@@ -20,51 +20,68 @@
 
 */
 
+#include "bdInit.h"
+#include "bdWriterOptions.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "contrib/dbGDS2TextWriter.h"
+#include "tlCommandLineParser.h"
 
-int 
-main (int argc, char *argv [])
+int
+main_func (int argc, char *argv [])
 {
-  if (argc != 3) {
-    printf ("Syntax: strm2gdstxt <infile> <outfile>\n");
-    return 1;
+  bd::init ();
+
+  bd::GenericWriterOptions generic_writer_options;
+  std::string infile, outfile;
+
+  tl::CommandLineOptions cmd;
+  generic_writer_options.add_options_for_gds2 (cmd);
+
+  cmd << tl::arg ("input",                     &infile,                        "The input file (any format, may be gzip compressed)")
+      << tl::arg ("output",                    &outfile,                       "The output file")
+    ;
+
+  cmd.brief ("This program will convert the given file to a GDS2Text file");
+
+  cmd.parse (argc, argv);
+
+  db::Manager m;
+  db::Layout layout (&m);
+  db::LayerMap map;
+
+  {
+    tl::InputStream stream (infile);
+    db::Reader reader (stream);
+    map = reader.read (layout);
   }
 
-  std::string infile (argv[1]);
-  std::string outfile (argv[2]);
+  {
+    db::SaveLayoutOptions save_options;
+    generic_writer_options.configure (save_options, layout);
 
-  try {
-
-    db::Manager m;
-    db::Layout layout (&m);
-    db::LayerMap map;
-
-    {
-      tl::InputStream stream (infile);
-      db::Reader reader (stream);
-      map = reader.read (layout);
-    }
-
-    {
-      tl::OutputStream stream (outfile);
-      db::GDS2WriterText writer;
-      writer.write (layout, stream, db::SaveLayoutOptions ());
-    }
-
-  } catch (std::exception &ex) {
-    fprintf (stderr, "*** ERROR: %s\n", ex.what ());
-    return 1;
-  } catch (tl::Exception &ex) {
-    fprintf (stderr, "*** ERROR: %s\n", ex.msg ().c_str ());
-    return 1;
-  } catch (...) {
-    fprintf (stderr, "*** ERROR: unspecific error\n");
-    return 1;
+    tl::OutputStream stream (outfile);
+    db::GDS2WriterText writer;
+    writer.write (layout, stream, save_options);
   }
 
   return 0;
 }
 
-
+int
+main (int argc, char *argv [])
+{
+  try {
+    return main_func (argc, argv);
+  } catch (tl::CancelException & /*ex*/) {
+    return 1;
+  } catch (std::exception &ex) {
+    tl::error << ex.what ();
+    return 1;
+  } catch (tl::Exception &ex) {
+    tl::error << ex.msg ();
+    return 1;
+  } catch (...) {
+    tl::error << "ERROR: unspecific error";
+  }
+}

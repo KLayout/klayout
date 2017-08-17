@@ -38,7 +38,7 @@ TEST(1)
       << tl::arg ("?b", &b, "")
       << tl::arg ("-c", &c, "")
       << tl::arg ("!-cc", &c, "")
-      << tl::arg ("--dlong|-d", &d, "")
+      << tl::arg ("--plong|-p", &d, "")
       << tl::arg ("--elong", &e, "")
       << tl::arg ("-f|--flong=value", &f, "");
 
@@ -84,7 +84,7 @@ TEST(1)
   b = 0;
   c = false;
   {
-    char *argv[] = { "x", "u", "-c", "-d=21" };
+    char *argv[] = { "x", "u", "-c", "-p=21" };
     cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
   }
   EXPECT_EQ (a, "u");
@@ -95,7 +95,7 @@ TEST(1)
   b = 0;
   c = false;
   {
-    char *argv[] = { "x", "u", "-d", "22", "-c" };
+    char *argv[] = { "x", "u", "-p", "22", "-c" };
     cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
   }
   EXPECT_EQ (a, "u");
@@ -105,7 +105,7 @@ TEST(1)
 
   e = false;
   {
-    char *argv[] = { "x", "u", "--dlong", "23" };
+    char *argv[] = { "x", "u", "--plong", "23" };
     cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
   }
   EXPECT_EQ (a, "u");
@@ -113,7 +113,7 @@ TEST(1)
   EXPECT_EQ (e, false);
 
   {
-    char *argv[] = { "x", "u", "--dlong=24", "--elong" };
+    char *argv[] = { "x", "u", "--plong=24", "--elong" };
     cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
   }
   EXPECT_EQ (a, "u");
@@ -169,7 +169,7 @@ TEST(2)
       << tl::arg ("?b", &v, &Values::set_b, "")
       << tl::arg ("-c", &v, &Values::set_c, "")
       << tl::arg ("!-cc", &v, &Values::set_c, "")
-      << tl::arg ("--dlong|-d", &v, &Values::set_d, "")
+      << tl::arg ("--plong|-p", &v, &Values::set_d, "")
       << tl::arg ("--elong", &v, &Values::set_e, "")
       << tl::arg ("-f|--flong=value", &v, &Values::set_f, "");
 
@@ -215,7 +215,7 @@ TEST(2)
   v.b = 0;
   v.c = false;
   {
-    char *argv[] = { "x", "u", "-c", "-d=21" };
+    char *argv[] = { "x", "u", "-c", "-p=21" };
     cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
   }
   EXPECT_EQ (v.a, "u");
@@ -226,7 +226,7 @@ TEST(2)
   v.b = 0;
   v.c = false;
   {
-    char *argv[] = { "x", "u", "-d", "22", "-c" };
+    char *argv[] = { "x", "u", "-p", "22", "-c" };
     cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
   }
   EXPECT_EQ (v.a, "u");
@@ -236,7 +236,7 @@ TEST(2)
 
   v.e = false;
   {
-    char *argv[] = { "x", "u", "--dlong", "23" };
+    char *argv[] = { "x", "u", "--plong", "23" };
     cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
   }
   EXPECT_EQ (v.a, "u");
@@ -244,7 +244,7 @@ TEST(2)
   EXPECT_EQ (v.e, false);
 
   {
-    char *argv[] = { "x", "u", "--dlong=24", "--elong" };
+    char *argv[] = { "x", "u", "--plong=24", "--elong" };
     cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
   }
   EXPECT_EQ (v.a, "u");

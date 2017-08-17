@@ -932,13 +932,7 @@ OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode o
   : m_pos (0), mp_delegate (0), m_owns_delegate (false)
 {
   //  Determine output mode
-  if (om == OM_Auto) {
-    if (tl::match_filename_to_format (abstract_path, "(*.gz *.gzip *.GZ *.GZIP)")) {
-      om = OM_Zlib;
-    } else {
-      om = OM_Plain;
-    }
-  }
+  om = output_mode_from_filename (abstract_path, om);
 
   tl::Extractor ex (abstract_path.c_str ());
   if (ex.test ("http:") || ex.test ("https:")) {

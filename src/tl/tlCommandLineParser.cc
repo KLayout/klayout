@@ -472,9 +472,15 @@ CommandLineOptions::parse (int argc, char *argv[])
   for (std::vector<ArgBase *>::const_iterator i = m_args.begin (); i != m_args.end (); ++i) {
     if ((*i)->is_option ()) {
       if (! (*i)->option ().short_option.empty ()) {
+        if (arg_by_short_option.find ((*i)->option ().short_option) != arg_by_short_option.end ()) {
+          throw tl::Exception ("Command line parser setup: duplicate option -" + (*i)->option ().short_option);
+        }
         arg_by_short_option.insert (std::make_pair ((*i)->option ().short_option, *i));
       }
       if (! (*i)->option ().long_option.empty ()) {
+        if (arg_by_long_option.find ((*i)->option ().long_option) != arg_by_long_option.end ()) {
+          throw tl::Exception ("Command line parser setup: duplicate option --" + (*i)->option ().long_option);
+        }
         arg_by_long_option.insert (std::make_pair ((*i)->option ().long_option, *i));
       }
     } else {

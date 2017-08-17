@@ -24,6 +24,10 @@
 #define HDR_bdWriterOptions
 
 #include "bdCommon.h"
+#include "dbGDS2WriterBase.h"
+#include "dbOASISWriter.h"
+#include "dbDXFWriter.h"
+#include "dbCIFWriter.h"
 
 #include <string>
 
@@ -45,8 +49,9 @@ namespace bd
  *  @brief Generic writer options
  *  This class collects generic writer options and provides command line options for this
  */
-struct BD_PUBLIC GenericWriterOptions
+class BD_PUBLIC GenericWriterOptions
 {
+public:
   /**
    *  @brief Constructor
    */
@@ -60,17 +65,56 @@ struct BD_PUBLIC GenericWriterOptions
   void add_options (tl::CommandLineOptions &cmd, const std::string &format);
 
   /**
+   *  @brief Adds the generic options to the command line parser object for the GDS2 format
+   */
+  void add_options_for_gds2 (tl::CommandLineOptions &cmd)
+  {
+    add_options (cmd, m_gds2_writer_options.format_name ());
+  }
+
+  /**
+   *  @brief Adds the generic options to the command line parser object for the OASIS format
+   */
+  void add_options_for_oasis (tl::CommandLineOptions &cmd)
+  {
+    add_options (cmd, m_oasis_writer_options.format_name ());
+  }
+
+  /**
+   *  @brief Adds the generic options to the command line parser object for the CIF format
+   */
+  void add_options_for_cif (tl::CommandLineOptions &cmd)
+  {
+    add_options (cmd, m_cif_writer_options.format_name ());
+  }
+
+  /**
+   *  @brief Adds the generic options to the command line parser object for the DXF format
+   */
+  void add_options_for_dxf (tl::CommandLineOptions &cmd)
+  {
+    add_options (cmd, m_dxf_writer_options.format_name ());
+  }
+
+  /**
    *  @brief Configures the writer options object with the options stored in this object
    *  The layout is required in order to derive the cell and layer ID's.
    */
   void configure (db::SaveLayoutOptions &save_options, const db::Layout &layout);
 
-  double scale_factor;
-  double dbu;
-  bool dont_write_empty_cells;
-  bool keep_instances;
-  bool write_context_info;
-  std::string cell_selection;
+private:
+  double m_scale_factor;
+  double m_dbu;
+  bool m_dont_write_empty_cells;
+  bool m_keep_instances;
+  bool m_write_context_info;
+  std::string m_cell_selection;
+  db::GDS2WriterOptions m_gds2_writer_options;
+  db::OASISWriterOptions m_oasis_writer_options;
+  db::CIFWriterOptions m_cif_writer_options;
+  db::DXFWriterOptions m_dxf_writer_options;
+
+  void set_oasis_substitution_char (const std::string &text);
 };
 
 }

@@ -135,6 +135,10 @@ BD_MAIN_FUNC
 
   cmd.parse (argc, argv);
 
+  if (top_a.empty () != top_b.empty ()) {
+    throw tl::Exception ("Both --top-a and --top-b top cells must be given");
+  }
+
   db::Layout layout_a;
   db::Layout layout_b;
 
@@ -156,12 +160,67 @@ BD_MAIN_FUNC
     reader.read (layout_b, load_options);
   }
 
-  // @@@
-  if (! db::compare_layouts (layout_a, layout_b, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_no_text_orientation | db::layout_diff::f_verbose, 0 /*exact match*/)) {
-    throw tl::Exception ("layouts differ");
+  unsigned int flags = 0;
+  if (silent) {
+    flags |= db::layout_diff::f_silent;
+  }
+  if (no_text_orientation) {
+    flags |= db::layout_diff::f_no_text_orientation;
+  }
+  if (no_text_details) {
+    flags |= db::layout_diff::f_no_text_details;
+  }
+  if (no_properties) {
+    flags |= db::layout_diff::f_no_properties;
+  }
+  if (no_layer_names) {
+    flags |= db::layout_diff::f_no_layer_names;
+  }
+  if (verbose) {
+    flags |= db::layout_diff::f_verbose;
+  }
+  if (as_polygons || boxes_as_polygons) {
+    flags |= db::layout_diff::f_boxes_as_polygons;
+  }
+  if (as_polygons || paths_as_polygons) {
+    flags |= db::layout_diff::f_paths_as_polygons;
+  }
+  if (flatten_array_insts) {
+    flags |= db::layout_diff::f_flatten_array_insts;
+  }
+  if (smart_cell_mapping) {
+    flags |= db::layout_diff::f_smart_cell_mapping;
+  }
+  if (dont_summarize_missing_layers) {
+    flags |= db::layout_diff::f_dont_summarize_missing_layers;
   }
 
-  return 0;
+  db::Coord tolerance_dbu = db::coord_traits<db::Coord>::rounded (tolerance / std::min (layout_a.dbu (), layout_b.dbu ()));
+  bool result = false;
+
+  if (! top_a.empty ()) {
+
+    std::pair<bool, db::cell_index_type> index_a = layout_a.cell_by_name (top_a.c_str ());
+    std::pair<bool, db::cell_index_type> index_b = layout_b.cell_by_name (top_b.c_str ());
+
+    if (! index_a.first) {
+      throw tl::Exception ("'" + top_a + "' is not a valid cell name in first layout");
+    }
+    if (! index_b.first) {
+      throw tl::Exception ("'" + top_b + "' is not a valid cell name in second layout");
+    }
+
+    result = db::compare_layouts (layout_a, index_a.second, layout_b, index_b.second, flags, tolerance_dbu, max_count, print_properties);
+
+  } else {
+    result = db::compare_layouts (layout_a, layout_b, flags, tolerance_dbu, max_count, print_properties);
+  }
+
+  if (! result && ! silent) {
+    tl::error << "Layouts differ";
+  }
+
+  return result ? 0 : 1;
 }
 
 BD_MAIN

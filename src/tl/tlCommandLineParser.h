@@ -56,7 +56,7 @@ public:
      */
     ParsedOption (const std::string &option);
 
-    bool optional, inverted, advanced, non_advanced;
+    bool optional, inverted, advanced, non_advanced, repeated;
     std::string long_option, short_option, name;
     std::string group;
   };
@@ -80,7 +80,11 @@ public:
    *    "-o|--long-option=value"  - A short/long option with a value
    *    "[group]..."              - List the option under this group (group = group title)
    *    "#..."                    - Advanced option - listed with --help-all only
-   *    "/..."                    - Non-ddvanced option - listed with -h|--help only
+   *    "/..."                    - Non-advanced option - listed with -h|--help only
+   *    "*..."                    - Multiple occurances allowed - values needs to be
+   *                                an array and values are accumulated. Without *, the
+   *                                value string is evaluated to a comma-separated list.
+   *                                "*" means one occurance at least unless combined with "?".
    */
   ArgBase (const std::string &option, const std::string &brief_doc, const std::string &long_doc);
 
@@ -187,6 +191,11 @@ inline void extract (tl::Extractor &ex, std::string &t, bool for_list = false)
     ex.read (t, ",");
   } else {
     t = ex.get ();
+    //  TODO: there should be a tl::Extractor method either to
+    //  read all remaining text or to move the pointer to the end.
+    while (! ex.at_end ()) {
+      ++ex;
+    }
   }
 }
 
@@ -194,12 +203,14 @@ inline void extract (tl::Extractor &ex, std::string &t, bool for_list = false)
  *  @brief A specialization for a list of any type (vector)
  */
 template <class T>
-inline void extract (tl::Extractor &ex, std::vector<T> &t, bool /*for_list*/ = false)
+inline void extract (tl::Extractor &ex, std::vector<T> &t, bool for_list = false)
 {
   while (! ex.at_end ()) {
     t.push_back (T ());
-    extract (ex, t.back (), true);
-    ex.test (",");
+    extract (ex, t.back (), for_list);
+    if (for_list) {
+      ex.test (",");
+    }
   }
 }
 
@@ -276,7 +287,7 @@ public:
 
   virtual void take_value (tl::Extractor &ex)
   {
-    extract (ex, *mp_value);
+    extract (ex, *mp_value, !option ().repeated);
   }
 
   virtual void mark_present (bool inverted)
@@ -316,7 +327,7 @@ public:
   {
     typedef typename type_without_const_ref<T>::inner_type inner_type;
     inner_type t = inner_type ();
-    extract (ex, t);
+    extract (ex, t, !option ().repeated);
     (mp_object->*mp_setter) (t);
   }
 

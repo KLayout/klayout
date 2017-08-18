@@ -62,7 +62,7 @@ public:
    *  The format string gives a hint about the target format. Certain options will be
    *  suppressed if they are known to be unavailable for the given format.
    */
-  void add_options (tl::CommandLineOptions &cmd, const std::string &format);
+  void add_options (tl::CommandLineOptions &cmd, const std::string &format = std::string ());
 
   /**
    *  @brief Adds the generic options to the command line parser object for the GDS2 format
@@ -100,7 +100,7 @@ public:
    *  @brief Configures the writer options object with the options stored in this object
    *  The layout is required in order to derive the cell and layer ID's.
    */
-  void configure (db::SaveLayoutOptions &save_options, const db::Layout &layout);
+  void configure (db::SaveLayoutOptions &save_options, const db::Layout &layout) const;
 
 private:
   double m_scale_factor;

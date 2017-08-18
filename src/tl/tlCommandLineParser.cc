@@ -32,7 +32,7 @@ namespace tl
 //  ArgBase implementation
 
 ArgBase::ParsedOption::ParsedOption (const std::string &option)
-  : optional (false), inverted (false), advanced (false), non_advanced (false)
+  : optional (false), inverted (false), advanced (false), non_advanced (false), repeated (false)
 {
   tl::Extractor ex (option.c_str ());
 
@@ -42,6 +42,12 @@ ArgBase::ParsedOption::ParsedOption (const std::string &option)
       advanced = true;
     } else if (ex.test ("/")) {
       non_advanced = true;
+    } else if (ex.test ("*")) {
+      repeated = true;
+    } else if (ex.test ("!")) {
+      inverted = true;
+    } else if (ex.test ("?")) {
+      optional = true;
     } else if (ex.test ("[")) {
       const char *t = ex.get ();
       while (! ex.at_end () && *ex != ']') {
@@ -53,10 +59,6 @@ ArgBase::ParsedOption::ParsedOption (const std::string &option)
       break;
     }
 
-  }
-
-  if (ex.test ("!")) {
-    inverted = true;
   }
 
   while (! ex.at_end ()) {
@@ -73,7 +75,6 @@ ArgBase::ParsedOption::ParsedOption (const std::string &option)
         ex.read_word (name);
       }
     } else {
-      optional = ex.test ("?");
       ex.read_word (name);
     }
     ex.test("|");
@@ -523,13 +524,20 @@ CommandLineOptions::parse (int argc, char *argv[])
         throw tl::Exception (tl::to_string (QObject::tr ("Unknown command line component %1 - no further plain argument expected (use -h for help)").arg (tl::to_qstring (arg_as_utf8))));
       }
 
-      arg = *next_plain_arg++;
+      arg = *next_plain_arg;
+      if (! arg->option ().repeated) {
+        ++next_plain_arg;
+      }
 
     }
 
-    if (arg->wants_value ()) {
+    if (! arg->is_option ()) {
 
-      if (! arg->is_option () || ex.test ("=")) {
+      arg->take_value (ex);
+
+    } else if (arg->wants_value ()) {
+
+      if (ex.test ("=")) {
         arg->take_value (ex);
       } else {
 
@@ -557,7 +565,7 @@ CommandLineOptions::parse (int argc, char *argv[])
 
     }
 
-    //  Exection the action if there is one
+    //  Execute the action if there is one
     arg->action (this);
 
   }

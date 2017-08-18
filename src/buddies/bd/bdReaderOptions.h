@@ -65,7 +65,7 @@ public:
   /**
    *  @brief Configures the reader options object with the options stored in this object
    */
-  void configure (db::LoadLayoutOptions &load_options);
+  void configure (db::LoadLayoutOptions &load_options) const;
 
   /**
    *  @brief Sets the option prefix for the short option name

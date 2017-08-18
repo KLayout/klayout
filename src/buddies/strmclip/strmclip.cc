@@ -20,42 +20,62 @@
 
 */
 
+#include "bdInit.h"
+#include "bdReaderOptions.h"
+#include "bdWriterOptions.h"
 #include "dbClip.h"
 #include "dbLayout.h"
 #include "dbGDS2Writer.h"
 #include "dbOASISWriter.h"
 #include "dbReader.h"
 #include "tlLog.h"
+#include "tlCommandLineParser.h"
 
 
 struct ClipData
 {
   ClipData () 
-    : file_in (), file_out (), clip_layer (), 
-      oasis (false), gzip (false)
+    : file_in (), file_out (), clip_layer ()
   { }
 
+  bd::GenericReaderOptions reader_options;
+  bd::GenericWriterOptions writer_options;
   std::string file_in;
   std::string file_out;
   db::LayerProperties clip_layer;
-  bool oasis;
-  bool gzip;
   std::vector <db::DBox> clip_boxes;
   std::string result;
   std::string top;
+
+  void add_box (const std::string &spec)
+  {
+    tl::Extractor ex (spec.c_str ());
+    double l = 0.0, b = 0.0, r = 0.0, t = 0.0;
+    ex >> l >> "," >> b >> "," >> r >> "," >> t >> tl::Extractor::end ();
+    clip_boxes.push_back (db::DBox (l, b, r, t));
+  }
+
+  void set_clip_layer (const std::string &spec)
+  {
+    tl::Extractor ex (spec.c_str ());
+    clip_layer = db::LayerProperties ();
+    clip_layer.read (ex);
+  }
 };
 
 
 void clip (const ClipData &data)
 {
-  db::Manager m;
-  db::Layout layout (&m);
-  db::Layout target_layout (&m);
+  db::Layout layout;
+  db::Layout target_layout;
 
   {
+    db::LoadLayoutOptions load_options;
+    data.reader_options.configure (load_options);
+
     tl::InputStream stream (data.file_in);
     db::Reader reader (stream);
-    reader.read (layout);
+    reader.read (layout, load_options);
   }
 
   //  create the layers in the target layout as well
@@ -135,123 +155,61 @@ void clip (const ClipData &data)
   }
 
   //  write the layout
-  tl::OutputStreamBase *out_file = 0;
-  try {
 
-    tl::OutputStream stream (data.file_out, data.gzip ? tl::OutputStream::OM_Zlib : tl::OutputStream::OM_Plain);
+  db::SaveLayoutOptions save_options;
+  save_options.set_format_from_filename (data.file_out);
+  data.writer_options.configure (save_options, target_layout);
 
-    if (data.oasis) {
-      db::OASISWriter writer;
-      writer.write (target_layout, stream, db::SaveLayoutOptions ());
-    } else {
-      db::GDS2Writer writer;
-      writer.write (target_layout, stream, db::SaveLayoutOptions ());
-    }
-
-    delete out_file;
-
-  } catch (...) {
-    if (out_file) {
-      delete out_file;
-    }
-    throw;
-  }
+  tl::OutputStream stream (data.file_out);
+  db::Writer writer (save_options);
+  writer.write (target_layout, stream);
 }
 
-void print_syntax ()
+BD_MAIN_FUNC
 {
-  printf ("Syntax: strmclip [<options>] <infile> <outfile>\n");
-  printf ("\n");
-  printf ("Options are:\n");
-  printf ("  -l 'l/d'      take clip regions from layer l, datatype d\n");
-  printf ("  -o            produce oasis output\n");
-  printf ("  -g            produce gds output\n");
-  printf ("  -z            gzip output\n");
-  printf ("  -t 'cell'     use this cell from input (default: determine top cell automatically)\n");
-  printf ("  -x 'name'     use this cell as top cell in output\n");
-  printf ("  -r 'l,b,r,t'  explicitly specify a clip rectangle (can be present multiple times)\n");
-}
+  ClipData data;
 
-int 
-main (int argc, char *argv [])
-{
-  try {
+  bd::init ();
 
-    ClipData data;
+  tl::CommandLineOptions cmd;
+  data.reader_options.add_options (cmd);
+  data.writer_options.add_options (cmd);
 
-    for (int n = 1; n < argc; ++n) {
+  cmd << tl::arg ("input",                     &data.file_in, "The input file",
+                  "The input file can be any supported format. It can be gzip compressed and will "
+                  "be uncompressed automatically in this case."
+                 )
+      << tl::arg ("output",                    &data.file_out, "The output file",
+                  "The output format is determined from the suffix of the file. If the suffix indicates "
+                  "gzip compression, the file will be compressed on output. Examples for recognized suffixes are "
+                  "\".oas\", \".gds.gz\", \".dxf\" or \"gds2\"."
+                 )
+      << tl::arg ("-l|--clip-layer=spec",      &data, &ClipData::set_clip_layer, "Specifies a layer to take the clip regions from",
+                  "If this option is given, the clip rectangles are taken from the given layer."
+                  "The layer specification is of the \"layer/datatype\" form or a plain layer name if named layers "
+                  "are available."
+                 )
+      << tl::arg ("-t|--top-in=cellname",      &data.top, "Specifies the top cell for input",
+                  "If this option is given, it specifies the cell to use as top cell from the input."
+                 )
+      << tl::arg ("-x|--top-out=cellname",     &data.result, "Specifies the top cell for output",
+                  "If given, this name will be used as the top cell name in the output file. "
+                  "By default the output's top cell will be \"CLIPPED_\" plus the input's top cell name."
+                 )
+      << tl::arg ("*-r|--clip-box=l,b,r,t",      &data, &ClipData::add_box, "Specifies a clip box",
+                  "This option specifies the box to clip in micrometer units. The box is given "
+                  "by left, bottom, right and top coordinates. This option can be used multiple times "
+                  "to produce a clip covering more than one rectangle."
+                 )
+    ;
 
-      if (std::string (argv [n]) == "-h") {
-        print_syntax ();
-        return 0;
-      } else if (std::string (argv [n]) == "-o") {
-        data.oasis = true;
-      } else if (std::string (argv [n]) == "-g") {
-        data.oasis = false;
-      } else if (std::string (argv [n]) == "-z") {
-        data.gzip = true;
-      } else if (std::string (argv [n]) == "-x") {
-        if (n < argc + 1) {
-          ++n;
-          data.result = argv [n];
-        } 
-      } else if (std::string (argv [n]) == "-t") {
-        if (n < argc + 1) {
-          ++n;
-          data.top = argv [n];
-        } 
-      } else if (std::string (argv [n]) == "-r") {
-        if (n < argc + 1) {
-          ++n;
-          tl::Extractor ex (argv [n]);
-          double l = 0.0, b = 0.0, r = 0.0, t = 0.0;
-          ex.read (l); ex.expect (",");
-          ex.read (b); ex.expect (",");
-          ex.read (r); ex.expect (",");
-          ex.read (t); ex.expect_end ();
-          data.clip_boxes.push_back (db::DBox (l, b, r, t));
-        } 
-      } else if (std::string (argv [n]) == "-l") {
-        if (n < argc + 1) {
-          ++n;
-          tl::Extractor ex (argv[n]);
-          db::LayerProperties lp;
-          lp.read (ex);
-          data.clip_layer = lp;
-        } 
-      } else if (argv [n][0] == '-') {
-        print_syntax ();
-        throw tl::Exception ("Unknown option: " + std::string (argv [n]));
-      } else if (data.file_in.empty ()) {
-        data.file_in = argv [n];
-      } else if (data.file_out.empty ()) {
-        data.file_out = argv [n];
-      } else {
-        print_syntax ();
-        throw tl::Exception ("Superfluous command element: " + std::string (argv [n]));
-      }
+  cmd.brief ("This program will produce clips from an input layout and writes them to another layout");
 
-    }
+  cmd.parse (argc, argv);
 
-    if (data.file_in.empty () || data.file_out.empty ()) {
-      print_syntax ();
-      throw tl::Exception ("Input or output file name missing");
-    }
-
-    clip (data);
-
-  } catch (std::exception &ex) {
-    tl::error << ex.what ();
-    return 1;
-  } catch (tl::Exception &ex) {
-    tl::error << ex.msg ();
-    return 1;
-  } catch (...) {
-    tl::error << "unspecific error";
-    return 1;
-  }
+  clip (data);
 
   return 0;
 }
 
-
+BD_MAIN

@@ -266,6 +266,7 @@ TEST(2)
   EXPECT_EQ (v.f, "bar");
 }
 
+//  Array arguments
 TEST(3)
 {
   std::vector<std::string> a;
@@ -317,4 +318,79 @@ TEST(3)
   EXPECT_EQ (int (b.size ()), 2);
   EXPECT_EQ (b[0], -13);
   EXPECT_EQ (b[1], 21);
+}
+
+//  Repeated array arguments
+TEST(4)
+{
+  std::vector<std::string> a;
+  std::vector<int> b;
+
+  tl::CommandLineOptions cmd;
+  cmd << tl::arg ("*-a|--along", &a, "")
+      << tl::arg ("*-b|--blong", &b, "");
+
+  {
+    char *argv[] = { "x", "-a", "r,u,v" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (int (a.size ()), 1);
+  EXPECT_EQ (a[0], "r,u,v");
+  EXPECT_EQ (b.empty (), true);
+
+  a.clear ();
+  b.clear ();
+  {
+    char *argv[] = { "x", "-b", "1", "-a=r", "-a", "u", "--along=v", "--blong=2" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (int (a.size ()), 3);
+  EXPECT_EQ (int (b.size ()), 2);
+  EXPECT_EQ (a[0], "r");
+  EXPECT_EQ (a[1], "u");
+  EXPECT_EQ (a[2], "v");
+  EXPECT_EQ (b[0], 1);
+  EXPECT_EQ (b[1], 2);
+}
+
+//  Repeated and non-repeated plain arguments
+TEST(5)
+{
+  std::string a;
+  std::vector<std::string> b;
+  std::vector<std::string> c;
+
+  tl::CommandLineOptions cmd;
+  cmd << tl::arg ("a", &a, "")
+      << tl::arg ("b", &b, "")
+      << tl::arg ("?*c", &c, "");
+
+  {
+    char *argv[] = { "x", "y", "r,u,v" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (int (b.size ()), 3);
+  EXPECT_EQ (int (c.size ()), 0);
+  EXPECT_EQ (a, "y");
+  EXPECT_EQ (b[0], "r");
+  EXPECT_EQ (b[1], "u");
+  EXPECT_EQ (b[2], "v");
+
+  a.clear ();
+  b.clear ();
+  c.clear ();
+
+  {
+    char *argv[] = { "x", "y", "r,u,v", "a,b", "c", "d" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  }
+  EXPECT_EQ (int (b.size ()), 3);
+  EXPECT_EQ (int (c.size ()), 3);
+  EXPECT_EQ (a, "y");
+  EXPECT_EQ (b[0], "r");
+  EXPECT_EQ (b[1], "u");
+  EXPECT_EQ (b[2], "v");
+  EXPECT_EQ (c[0], "a,b");
+  EXPECT_EQ (c[1], "c");
+  EXPECT_EQ (c[2], "d");
 }

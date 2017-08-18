@@ -229,20 +229,25 @@ void GenericReaderOptions::set_dbu (double dbu)
 }
 
 void
-GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
+GenericReaderOptions::configure (db::LoadLayoutOptions &load_options) const
 {
-  m_common_reader_options.layer_map = m_layer_map;
-  m_common_reader_options.create_other_layers = m_create_other_layers;
-  m_dxf_reader_options.layer_map = m_layer_map;
-  m_dxf_reader_options.create_other_layers = m_create_other_layers;
-  m_cif_reader_options.layer_map = m_layer_map;
-  m_cif_reader_options.create_other_layers = m_create_other_layers;
+  db::CommonReaderOptions common_reader_options = m_common_reader_options;
+  common_reader_options.layer_map = m_layer_map;
+  common_reader_options.create_other_layers = m_create_other_layers;
 
-  load_options.set_options (m_common_reader_options);
+  db::DXFReaderOptions dxf_reader_options = m_dxf_reader_options;
+  dxf_reader_options.layer_map = m_layer_map;
+  dxf_reader_options.create_other_layers = m_create_other_layers;
+
+  db::CIFReaderOptions cif_reader_options = m_cif_reader_options;
+  cif_reader_options.layer_map = m_layer_map;
+  cif_reader_options.create_other_layers = m_create_other_layers;
+
+  load_options.set_options (common_reader_options);
   load_options.set_options (m_gds2_reader_options);
   load_options.set_options (m_oasis_reader_options);
-  load_options.set_options (m_cif_reader_options);
-  load_options.set_options (m_dxf_reader_options);
+  load_options.set_options (cif_reader_options);
+  load_options.set_options (dxf_reader_options);
 }
 
 }

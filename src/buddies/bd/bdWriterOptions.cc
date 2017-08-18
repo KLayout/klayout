@@ -53,7 +53,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                   "given factor."
                  );
 
-  if (format == gds2_format_name || format == gds2text_format_name || format == oasis_format_name) {
+  if (format.empty () || format == gds2_format_name || format == gds2text_format_name || format == oasis_format_name) {
     cmd << tl::arg (group +
                     "-od|--dbu-out=dbu",    &m_dbu, "Uses the specified database unit",
                     "Specifies the database unit to save the layout in. The database unit is given "
@@ -68,7 +68,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                   "If given, empty cells won't be written. See --keep-instances for more options."
                  );
 
-  if (format == gds2_format_name || format == gds2text_format_name) {
+  if (format.empty () || format == gds2_format_name || format == gds2text_format_name) {
     cmd << tl::arg (group +
                     "#--keep-instances",      &m_keep_instances, "Keeps instances of dropped cells",
                     "If given, instances of dropped cell's won't be removed. Hence, ghost cells are "
@@ -79,7 +79,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                    );
   }
 
-  if (format == gds2_format_name || format == gds2text_format_name || format == oasis_format_name) {
+  if (format.empty () || format == gds2_format_name || format == gds2text_format_name || format == oasis_format_name) {
     cmd << tl::arg (group +
                     "#--write-context-info",  &m_write_context_info, "Writes context information",
                     "Include context information for PCell instances and other information in a format-specific "
@@ -289,7 +289,7 @@ static void get_selected_cells (tl::Extractor &ex, const db::Layout &layout, std
 }
 
 void
-GenericWriterOptions::configure (db::SaveLayoutOptions &save_options, const db::Layout &layout)
+GenericWriterOptions::configure (db::SaveLayoutOptions &save_options, const db::Layout &layout) const
 {
   save_options.set_scale_factor (m_scale_factor);
   save_options.set_dbu (m_dbu);

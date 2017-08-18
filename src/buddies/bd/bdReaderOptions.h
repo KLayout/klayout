@@ -67,7 +67,38 @@ public:
    */
   void configure (db::LoadLayoutOptions &load_options);
 
+  /**
+   *  @brief Sets the option prefix for the short option name
+   *  By default, the prefix is set to "i", so the short options are
+   *  called "-is", "-id" etc.
+   */
+  void set_prefix (const std::string &s)
+  {
+    m_prefix = s;
+  }
+
+  /**
+   *  @brief Sets the option prefix for the long option name
+   *  The prefix is prepended to the name, so with "a-", the long names
+   *  are "--a-unit" etc. By default, this prefix is empty.
+   */
+  void set_long_prefix (const std::string &s)
+  {
+    m_long_prefix = s;
+  }
+
+  /**
+   *  @brief Sets the group name prefix
+   *  By default, this prefix is "Input", so the group names are
+   *  "Input options - GDS2" for example.
+   */
+  void set_group_prefix (const std::string &s)
+  {
+    m_group_prefix = s;
+  }
+
 private:
+  std::string m_prefix, m_long_prefix, m_group_prefix;
   db::LayerMap m_layer_map;
   bool m_create_other_layers;
   db::CommonReaderOptions m_common_reader_options;

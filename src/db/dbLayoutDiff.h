@@ -130,9 +130,9 @@ public:
  *  @brief Compare two layout objects
  *
  *  Compare layer definitions, cells, instances and shapes and properties. 
- *  Cells are identified by name. 
  *  Only layers with valid layer and datatype are compared.
  *  Several flags can be specified as a bitwise or combination of the layout_diff::f_xxx constants.
+ *  The results are printed to the info channel.
  *
  *  @param a The first input layout
  *  @param b The second input layout
@@ -147,6 +147,25 @@ public:
  *  @return True, if the layouts are identical
  */
 bool DB_PUBLIC compare_layouts (const db::Layout &a, const db::Layout &b, unsigned int flags, db::Coord tolerance, size_t max_count = 0, bool print_properties = false);
+
+/**
+ *  @brief Compare two layout objects
+ *
+ *  This is an extended version that allows specification of two top cells to compare.
+ *  It will print the results to the info channel.
+ *
+ *  @param a The first input layout
+ *  @param top_a The first top cell's index
+ *  @param b The second input layout
+ *  @param top_b The second top cell's index
+ *  @param flags Flags to use for the comparison
+ *  @param tolerance A coordinate tolerance to apply (0: exact match, 1: one DBU tolerance is allowed ...)
+ *  @param max_count The maximum number of lines printed to the logger - the compare result will reflect all differences however
+ *  @param print_properties If true, property differences are printed as well
+ *
+ *  @return True, if the layouts are identical
+ */
+bool DB_PUBLIC compare_layouts (const db::Layout &a, db::cell_index_type top_a, const db::Layout &b, db::cell_index_type top_b, unsigned int flags, db::Coord tolerance, size_t max_count = 0, bool print_properties = false);
 
 /**
  *  @brief Compare two layout objects with a custom receiver for the differences

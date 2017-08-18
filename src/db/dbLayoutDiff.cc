@@ -1580,5 +1580,14 @@ compare_layouts (const db::Layout &a, const db::Layout &b, unsigned int flags, d
   return compare_layouts (a, b, flags, tolerance, r);
 }
 
+bool
+compare_layouts (const db::Layout &a, db::cell_index_type top_a, const db::Layout &b, db::cell_index_type top_b, unsigned int flags, db::Coord tolerance, size_t max_count, bool print_properties)
+{
+  PrintingDifferenceReceiver r;
+  r.set_max_count (max_count);
+  r.set_print_properties (print_properties);
+  return compare_layouts (a, top_a, b, top_b, flags, tolerance, r);
+}
+
 }
 

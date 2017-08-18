@@ -28,11 +28,8 @@
 #include "contrib/dbGDS2TextWriter.h"
 #include "tlCommandLineParser.h"
 
-int
-main_func (int argc, char *argv [])
+BD_MAIN_FUNC
 {
-  bd::init ();
-
   bd::GenericWriterOptions generic_writer_options;
   bd::GenericReaderOptions generic_reader_options;
   std::string infile, outfile;
@@ -49,9 +46,7 @@ main_func (int argc, char *argv [])
 
   cmd.parse (argc, argv);
 
-  db::Manager m;
-  db::Layout layout (&m);
-  db::LayerMap map;
+  db::Layout layout;
 
   {
     db::LoadLayoutOptions load_options;
@@ -59,7 +54,7 @@ main_func (int argc, char *argv [])
 
     tl::InputStream stream (infile);
     db::Reader reader (stream);
-    map = reader.read (layout, load_options);
+    reader.read (layout, load_options);
   }
 
   {
@@ -74,20 +69,4 @@ main_func (int argc, char *argv [])
   return 0;
 }
 
-int
-main (int argc, char *argv [])
-{
-  try {
-    return main_func (argc, argv);
-  } catch (tl::CancelException & /*ex*/) {
-    return 1;
-  } catch (std::exception &ex) {
-    tl::error << ex.what ();
-    return 1;
-  } catch (tl::Exception &ex) {
-    tl::error << ex.msg ();
-    return 1;
-  } catch (...) {
-    tl::error << "ERROR: unspecific error";
-  }
-}
+BD_MAIN

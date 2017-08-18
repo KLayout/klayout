@@ -24,6 +24,7 @@
 #define HDR_bdInit
 
 #include "bdCommon.h"
+#include "tlLog.h"  //  because of BD_MAIN
 
 namespace bd
 {
@@ -33,6 +34,44 @@ namespace bd
  *  This function must be called at the very beginning of the main program.
  */
 void BD_PUBLIC init ();
+
+/**
+ *  @brief Provides a main () implementation
+ *
+ *  Use this macro like this:
+ *
+ *  @code
+ *  #include "bdInit.h"
+ *
+ *  BD_MAIN_FUNC
+ *  {
+ *    .. your code. Use argc and argv for the arguments.
+ *  }
+ *
+ *  BD_MAIN
+ */
+
+#define BD_MAIN \
+  int main (int argc, char *argv []) \
+  { \
+    try { \
+      bd::init (); \
+      return main_func (argc, argv); \
+    } catch (tl::CancelException & /*ex*/) { \
+      return 1; \
+    } catch (std::exception &ex) { \
+      tl::error << ex.what (); \
+      return 1; \
+    } catch (tl::Exception &ex) { \
+      tl::error << ex.msg (); \
+      return 1; \
+    } catch (...) { \
+      tl::error << "unspecific error"; \
+    } \
+  }
+
+#define BD_MAIN_FUNC \
+  int main_func (int argc, char *argv [])
 
 }
 

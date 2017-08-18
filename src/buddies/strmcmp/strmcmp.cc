@@ -21,55 +21,147 @@
 */
 
 #include "bdInit.h"
+#include "bdReaderOptions.h"
 #include "dbLayout.h"
 #include "dbLayoutDiff.h"
 #include "dbReader.h"
+#include "tlCommandLineParser.h"
 
-int 
-main (int argc, char *argv [])
+BD_MAIN_FUNC
 {
-  if (argc != 3) {
-    printf ("Syntax: strmcmp <infile-a> <infile-b>\n");
-    return 1;
+  bd::init ();
+
+  bd::GenericReaderOptions generic_reader_options_a;
+  generic_reader_options_a.set_prefix ("a");
+  generic_reader_options_a.set_long_prefix ("a-");
+  generic_reader_options_a.set_group_prefix ("Input A");
+
+  bd::GenericReaderOptions generic_reader_options_b;
+  generic_reader_options_a.set_prefix ("b");
+  generic_reader_options_a.set_long_prefix ("b-");
+  generic_reader_options_a.set_group_prefix ("Input B");
+
+  std::string infile_a, infile_b;
+  std::string top_a, top_b;
+  bool silent = false;
+  bool no_text_orientation = true;
+  bool no_text_details = true;
+  bool no_properties = false;
+  bool no_layer_names = false;
+  bool verbose = true;
+  bool as_polygons = false;
+  bool boxes_as_polygons = false;
+  bool flatten_array_insts = false;
+  bool smart_cell_mapping = false;
+  bool paths_as_polygons = false;
+  bool dont_summarize_missing_layers = false;
+  double tolerance = 0.0;
+  int max_count = 0;
+  bool print_properties = false;
+
+  tl::CommandLineOptions cmd;
+  generic_reader_options_a.add_options (cmd);
+  generic_reader_options_b.add_options (cmd);
+
+  cmd << tl::arg ("input_a",                   &infile_a,   "The first input file (any format, may be gzip compressed)")
+      << tl::arg ("input_b",                   &infile_b,   "The second input file (any format, may be gzip compressed)")
+      << tl::arg ("-ta|--top-a=name",          &top_a,      "Specifies the cell to take as top cell from the first layout",
+                  "Use this option to take a specific cell as the top cell from the first layout. All "
+                  "cells not called directly or indirectly from this cell are ignored. If you use this option, "
+                  "--top-b must be specified too and can be different from the first layout's top cell."
+                 )
+      << tl::arg ("-tb|--top-b=name",          &top_b,      "Specifies the cell to take as top cell from the second layout",
+                  "See --top-a for details."
+                 )
+      << tl::arg ("-s|--silent",               &silent,     "Enables silent mode",
+                  "In silent mode, no differences are printed, but the exit code indicates whether "
+                  "the layout are the same (0) or differences exist (> 0)."
+                 )
+      << tl::arg ("#!--with-text-orientation", &no_text_orientation, "Compares orientations for texts",
+                  "With this option, text orientation is compared too. The position of the "
+                  "text is always compared, but the rotation angle is compared only when this option "
+                  "is present."
+                 )
+      << tl::arg ("#!--with-text-details",     &no_text_details, "Compares font and alignment for texts",
+                  "With this option, text font and alignment is compared too."
+                 )
+      << tl::arg ("-np|--without-properties",  &no_properties, "Ignores properties",
+                  "With this option, shape, cell and file properties are not compared."
+                 )
+      << tl::arg ("-nl|--without-layer-names", &no_layer_names, "Ignores layer names",
+                  "With this option, layer names are not compared."
+                 )
+      << tl::arg ("!-u|--terse",               &verbose,    "Skips too many details",
+                  "With this option, no details about differences are printed."
+                 )
+      << tl::arg ("-r|--print-properties",     &print_properties, "Prints shape properties too",
+                  "This option, shape properties are printed too."
+                 )
+      << tl::arg ("-p|--as-polygons",          &as_polygons, "Compares shapes are polygons",
+                  "This option is equivalent to using --boxes-as-polygons and --paths-as-polygons."
+                 )
+      << tl::arg ("--boxes-as-polygons",       &boxes_as_polygons, "Turns boxes into polygons before compare",
+                  "With this option, boxes and equivalent polygons are treated identical."
+                 )
+      << tl::arg ("--paths-as-polygons",       &paths_as_polygons, "Turns paths into polygons before compare",
+                  "With this option, paths and equivalent polygons are treated identical."
+                 )
+      << tl::arg ("--expand-arrays",           &flatten_array_insts, "Expands array instances before compare",
+                  "With this option, arrays are equivalent single instances are treated identical."
+                 )
+      << tl::arg ("-l|--layer-details",        &dont_summarize_missing_layers, "Prints details about differences for missing layers",
+                  "With this option, missing layers are treated as \"empty\" and details about differences to "
+                  "other, non-empty layers are printed. Essentially the content of the non-empty counterpart "
+                  "is printed. Without this option, missing layers are treated as a single difference of type "
+                  "\"missing layer\"."
+                 )
+      << tl::arg ("-c|--cell-mapping",         &smart_cell_mapping, "Attempts to identify cells by their properties",
+                  "If this option is given, the algorithm will try to identify identical cells by their "
+                  "geometrical properties (placement, size etc.) instead of their name. This way, cell renaming can "
+                  "be detected"
+                 )
+      << tl::arg ("-t|--tolerance=value",      &tolerance, "Specifies a tolerance for geometry compare",
+                  "If this value is given, shape comparison allows for this tolerance when comparing "
+                  "coordinates. The tolerance value is given in micrometer units."
+                 )
+      << tl::arg ("-m|--max-count=value",      &max_count, "Specifies the maximum number of differences to report",
+                  "If the value is 1, only a warning saying that the log has been abbreviated is printed. "
+                  "If the value is >1, max-count-1 differences plus one warning about abbreviation is printed. "
+                  "A value of 0 means \"no limitation\". To suppress all output, use --silent."
+                 )
+    ;
+
+  cmd.brief ("This program will compare two layout files on a per-object basis");
+
+  cmd.parse (argc, argv);
+
+  db::Layout layout_a;
+  db::Layout layout_b;
+
+  {
+    db::LoadLayoutOptions load_options;
+    generic_reader_options_a.configure (load_options);
+
+    tl::InputStream stream (infile_a);
+    db::Reader reader (stream);
+    reader.read (layout_a, load_options);
   }
 
-  std::string infile_a (argv[1]);
-  std::string infile_b (argv[2]);
+  {
+    db::LoadLayoutOptions load_options;
+    generic_reader_options_b.configure (load_options);
 
-  try {
+    tl::InputStream stream (infile_a);
+    db::Reader reader (stream);
+    reader.read (layout_b, load_options);
+  }
 
-    db::Manager m;
-    db::Layout layout_a (false, &m);
-    db::Layout layout_b (false, &m);
-
-    {
-      tl::InputStream stream (infile_a);
-      db::Reader reader (stream);
-      reader.read (layout_a);
-    }
-
-    {
-      tl::InputStream stream (infile_b);
-      db::Reader reader (stream);
-      reader.read (layout_b);
-    }
-
-    if (! db::compare_layouts (layout_a, layout_b, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_no_text_orientation | db::layout_diff::f_verbose, 0 /*exact match*/)) {
-      throw tl::Exception ("layouts differ");
-    }
-
-  } catch (std::exception &ex) {
-    tl::error << ex.what ();
-    return 1;
-  } catch (tl::Exception &ex) {
-    tl::error << ex.msg ();
-    return 1;
-  } catch (...) {
-    tl::error << "unspecific error";
-    return 1;
+  // @@@
+  if (! db::compare_layouts (layout_a, layout_b, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_no_text_orientation | db::layout_diff::f_verbose, 0 /*exact match*/)) {
+    throw tl::Exception ("layouts differ");
   }
 
   return 0;
 }
 
-
+BD_MAIN

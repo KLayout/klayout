@@ -20,25 +20,10 @@
 
 */
 
-#ifndef HDR_bdInit
-#define HDR_bdInit
+#include "bdConverterMain.h"
+#include "dbDXFWriter.h"
 
-#include "bdCommon.h"
-
-namespace bd
+BD_PUBLIC int strm2dxf (int argc, char *argv[])
 {
-
-/**
- *  @brief Provides basic initialization
- *  This function must be called at the very beginning of the main program.
- */
-void BD_PUBLIC init ();
-
-/**
- *  @brief The main function implementation
- */
-int BD_PUBLIC _main_impl (int (*delegate) (int, char *[]), int argc, char *argv[]);
-
+  return bd::converter_main (argc, argv, db::DXFWriterOptions ().format_name ());
 }
-
-#endif

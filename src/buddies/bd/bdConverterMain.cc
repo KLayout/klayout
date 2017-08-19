@@ -20,29 +20,32 @@
 
 */
 
-#include "bdInit.h"
 #include "bdWriterOptions.h"
 #include "bdReaderOptions.h"
+#include "bdConverterMain.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbCIFWriter.h"
 #include "tlCommandLineParser.h"
 
-BD_MAIN_FUNC
+namespace bd
+{
+
+int converter_main (int argc, char *argv[], const std::string &format)
 {
   bd::GenericWriterOptions generic_writer_options;
   bd::GenericReaderOptions generic_reader_options;
   std::string infile, outfile;
 
   tl::CommandLineOptions cmd;
-  generic_writer_options.add_options_for_cif (cmd);
+  generic_writer_options.add_options (cmd, format);
   generic_reader_options.add_options (cmd);
 
-  cmd << tl::arg ("input",                     &infile,                        "The input file (any format, may be gzip compressed)")
-      << tl::arg ("output",                    &outfile,                       "The output file")
+  cmd << tl::arg ("input",  &infile,  "The input file (any format, may be gzip compressed)")
+      << tl::arg ("output", &outfile, tl::sprintf ("The output file (%s format)", format))
     ;
 
-  cmd.brief ("This program will convert the given file to a CIF file");
+  cmd.brief (tl::sprintf ("This program will convert the given file to a %s file", format));
 
   cmd.parse (argc, argv);
 
@@ -60,13 +63,14 @@ BD_MAIN_FUNC
   {
     db::SaveLayoutOptions save_options;
     generic_writer_options.configure (save_options, layout);
+    save_options.set_format (format);
 
     tl::OutputStream stream (outfile);
-    db::CIFWriter writer;
-    writer.write (layout, stream, save_options);
+    db::Writer writer (save_options);
+    writer.write (layout, stream);
   }
 
   return 0;
 }
 
-BD_MAIN
+}

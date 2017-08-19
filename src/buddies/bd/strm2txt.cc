@@ -20,29 +20,25 @@
 
 */
 
-#include "bdInit.h"
-#include "bdWriterOptions.h"
 #include "bdReaderOptions.h"
 #include "dbLayout.h"
 #include "dbReader.h"
-#include "dbDXFWriter.h"
+#include "dbTextWriter.h"
 #include "tlCommandLineParser.h"
 
-BD_MAIN_FUNC
+BD_PUBLIC int strm2txt (int argc, char *argv[])
 {
-  bd::GenericWriterOptions generic_writer_options;
   bd::GenericReaderOptions generic_reader_options;
   std::string infile, outfile;
 
   tl::CommandLineOptions cmd;
-  generic_writer_options.add_options_for_dxf (cmd);
   generic_reader_options.add_options (cmd);
 
-  cmd << tl::arg ("input",                     &infile,                        "The input file (any format, may be gzip compressed)")
-      << tl::arg ("output",                    &outfile,                       "The output file")
+  cmd << tl::arg ("input",  &infile,  "The input file (any format, may be gzip compressed)")
+      << tl::arg ("output", &outfile, "The output file (proprietary text format)")
     ;
 
-  cmd.brief ("This program will convert the given file to a DXF file");
+  cmd.brief ("This program will convert the given file to a proprietary text format file");
 
   cmd.parse (argc, argv);
 
@@ -58,15 +54,10 @@ BD_MAIN_FUNC
   }
 
   {
-    db::SaveLayoutOptions save_options;
-    generic_writer_options.configure (save_options, layout);
-
     tl::OutputStream stream (outfile);
-    db::DXFWriter writer;
-    writer.write (layout, stream, save_options);
+    db::TextWriter writer (stream);
+    writer.write (layout);
   }
 
   return 0;
 }
-
-BD_MAIN

@@ -20,24 +20,19 @@
 
 */
 
-#ifndef HDR_bdInit
-#define HDR_bdInit
+#ifndef HDR_bdConverterMain
+#define HDR_bdConverterMain
 
 #include "bdCommon.h"
+#include <string>
 
 namespace bd
 {
 
 /**
- *  @brief Provides basic initialization
- *  This function must be called at the very beginning of the main program.
+ *  @brief A common main() implementation for the "to" converters
  */
-void BD_PUBLIC init ();
-
-/**
- *  @brief The main function implementation
- */
-int BD_PUBLIC _main_impl (int (*delegate) (int, char *[]), int argc, char *argv[]);
+BD_PUBLIC int converter_main (int argc, char *argv[], const std::string &format);
 
 }
 

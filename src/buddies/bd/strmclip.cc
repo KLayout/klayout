@@ -20,7 +20,6 @@
 
 */
 
-#include "bdInit.h"
 #include "bdReaderOptions.h"
 #include "bdWriterOptions.h"
 #include "dbClip.h"
@@ -165,11 +164,9 @@ void clip (const ClipData &data)
   writer.write (target_layout, stream);
 }
 
-BD_MAIN_FUNC
+BD_PUBLIC int strmclip (int argc, char *argv[])
 {
   ClipData data;
-
-  bd::init ();
 
   tl::CommandLineOptions cmd;
   data.reader_options.add_options (cmd);
@@ -182,7 +179,7 @@ BD_MAIN_FUNC
       << tl::arg ("output",                    &data.file_out, "The output file",
                   "The output format is determined from the suffix of the file. If the suffix indicates "
                   "gzip compression, the file will be compressed on output. Examples for recognized suffixes are "
-                  "\".oas\", \".gds.gz\", \".dxf\" or \"gds2\"."
+                  "\".oas\", \".gds.gz\", \".dxf\" or \".gds2\"."
                  )
       << tl::arg ("-l|--clip-layer=spec",      &data, &ClipData::set_clip_layer, "Specifies a layer to take the clip regions from",
                   "If this option is given, the clip rectangles are taken from the given layer."
@@ -196,7 +193,7 @@ BD_MAIN_FUNC
                   "If given, this name will be used as the top cell name in the output file. "
                   "By default the output's top cell will be \"CLIPPED_\" plus the input's top cell name."
                  )
-      << tl::arg ("*-r|--clip-box=l,b,r,t",      &data, &ClipData::add_box, "Specifies a clip box",
+      << tl::arg ("*-r|--rect=\"l,b,r,t\"", &data, &ClipData::add_box, "Specifies a clip box",
                   "This option specifies the box to clip in micrometer units. The box is given "
                   "by left, bottom, right and top coordinates. This option can be used multiple times "
                   "to produce a clip covering more than one rectangle."
@@ -211,5 +208,3 @@ BD_MAIN_FUNC
 
   return 0;
 }
-
-BD_MAIN

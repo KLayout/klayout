@@ -47,4 +47,23 @@ void init ()
   tl::CommandLineOptions::set_license (license);
 }
 
+int _main_impl (int (*delegate) (int, char *[]), int argc, char *argv[])
+{
+  try {
+    init ();
+    return (*delegate) (argc, argv);
+  } catch (tl::CancelException & /*ex*/) {
+    return 1;
+  } catch (std::exception &ex) {
+    tl::error << ex.what ();
+    return 1;
+  } catch (tl::Exception &ex) {
+    tl::error << ex.msg ();
+    return 1;
+  } catch (...) {
+    tl::error << "unspecific error";
+    return 1;
+  }
+}
+
 }

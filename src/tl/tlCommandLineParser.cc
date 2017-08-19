@@ -66,16 +66,16 @@ ArgBase::ParsedOption::ParsedOption (const std::string &option)
       optional = true;
       ex.read_word (long_option, "_-");
       if (ex.test ("=")) {
-        ex.read_word (name);
+        ex.read_word_or_quoted (name);
       }
     } else if (ex.test ("-")) {
       optional = true;
       ex.read_word (short_option, "");
       if (ex.test ("=")) {
-        ex.read_word (name);
+        ex.read_word_or_quoted (name);
       }
     } else {
-      ex.read_word (name);
+      ex.read_word_or_quoted (name);
     }
     ex.test("|");
   }

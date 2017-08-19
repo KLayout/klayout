@@ -20,25 +20,20 @@
 
 */
 
-#ifndef HDR_bdInit
-#define HDR_bdInit
+#include "bdInit.h"
 
-#include "bdCommon.h"
+BD_PUBLIC int BD_TARGET (int argc, char *argv []);
 
-namespace bd
+/**
+ *  @brief Provides a main () implementation
+ *
+ *  NOTE:
+ *  This file is not part of the bd sources, but the template for the
+ *  main() function of the various applications. It's configured through the
+ *  BD_TARGET macro which is set to the application name in the app's .pro
+ *  files.
+ */
+int main (int argc, char *argv [])
 {
-
-/**
- *  @brief Provides basic initialization
- *  This function must be called at the very beginning of the main program.
- */
-void BD_PUBLIC init ();
-
-/**
- *  @brief The main function implementation
- */
-int BD_PUBLIC _main_impl (int (*delegate) (int, char *[]), int argc, char *argv[]);
-
+  return bd::_main_impl (&BD_TARGET, argc, argv);
 }
-
-#endif

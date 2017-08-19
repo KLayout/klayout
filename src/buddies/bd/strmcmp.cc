@@ -20,17 +20,14 @@
 
 */
 
-#include "bdInit.h"
 #include "bdReaderOptions.h"
 #include "dbLayout.h"
 #include "dbLayoutDiff.h"
 #include "dbReader.h"
 #include "tlCommandLineParser.h"
 
-BD_MAIN_FUNC
+BD_PUBLIC int strmcmp (int argc, char *argv[])
 {
-  bd::init ();
-
   bd::GenericReaderOptions generic_reader_options_a;
   generic_reader_options_a.set_prefix ("a");
   generic_reader_options_a.set_long_prefix ("a-");
@@ -222,5 +219,3 @@ BD_MAIN_FUNC
 
   return result ? 0 : 1;
 }
-
-BD_MAIN

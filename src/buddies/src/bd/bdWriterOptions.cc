@@ -31,7 +31,7 @@ namespace bd
 
 GenericWriterOptions::GenericWriterOptions ()
   : m_scale_factor (1.0), m_dbu (0.0),
-    m_dont_write_empty_cells (false), m_keep_instances (false), m_write_context_info (false)
+    m_dont_write_empty_cells (false), m_keep_instances (false), m_write_context_info (true)
 {
   //  .. nothing yet ..
 }
@@ -81,9 +81,11 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
 
   if (format.empty () || format == gds2_format_name || format == gds2text_format_name || format == oasis_format_name) {
     cmd << tl::arg (group +
-                    "#--write-context-info",  &m_write_context_info, "Writes context information",
-                    "Include context information for PCell instances and other information in a format-specific "
-                    "way. The resulting layout may show unexpected features for other consumers."
+                    "!#--no-context-info",    &m_write_context_info, "Does not write context information",
+                    "Context information is included to maintain PCell parameters and library connections. "
+                    "This information is kept inside the layout files in a proprietary way. This option disables "
+                    "this feature to maintain compatibility with other consumers of the file. If this option is "
+                    "used, PCell parameters and library links are lost."
                    );
   }
 
@@ -170,7 +172,8 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
     cmd << tl::arg (group +
                     "-ok|--compression-level=level", &m_oasis_writer_options.compression_level, "Specifies the OASIS compression level",
                     "This level describes how hard the OASIS writer will try to compress the shapes "
-                    "using shape arrays. Building shape arrays may take some time and requires some memory.\n"
+                    "using shape arrays. Building shape arrays may take some time and requires some memory. "
+                    "The default compression level is 2.\n"
                     "* 0 - no shape array building\n"
                     "* 1 - nearest neighbor shape array formation\n"
                     "* 2++ - enhanced shape array search algorithm using 2nd and further neighbor distances as well\n"
@@ -188,8 +191,8 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                    )
         << tl::arg (group +
                     "#--write-std-properties", &m_oasis_writer_options.write_std_properties, "Writes some global standard properties",
-                    "This is an integer describing what standard properties shall be written. 0 is \"none\" (the default), "
-                    "1 means \"global standard properties such as S_TOP_CELL\" are produced. With 2 also per-cell bounding "
+                    "This is an integer describing what standard properties shall be written. 0 is \"none\", "
+                    "1 means \"global standard properties such as S_TOP_CELL\" are produced (the default). With 2 also per-cell bounding "
                     "boxes are produced."
                    )
         << tl::arg (group +
@@ -209,7 +212,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
     cmd << tl::arg (group +
                     "-op|--polygon-mode=mode", &m_dxf_writer_options.polygon_mode, "Specifies how to write polygons",
                     "This option specifies how to write polygons:\n"
-                    "* 0: create POLYLINE\n"
+                    "* 0: create POLYLINE (default)\n"
                     "* 1: create LWPOLYLINE\n"
                     "* 2: decompose into SOLID\n"
                     "* 3: create HATCH"
@@ -255,7 +258,6 @@ static void get_selected_cells (tl::Extractor &ex, const db::Layout &layout, std
     bool without_children = ex.test ("(");
     std::string filter;
     ex.read_word_or_quoted (filter, "_-.*?{}$[]");
-
     if (without_children) {
       ex.expect (")");
     }
@@ -270,15 +272,17 @@ static void get_selected_cells (tl::Extractor &ex, const db::Layout &layout, std
       if (pat.match (layout.cell_name (c->cell_index ()))) {
 
         std::set<db::cell_index_type> cells;
-        cells.insert (c->cell_index ());
         if (! without_children) {
           c->collect_called_cells (cells);
         }
+        cells.insert (c->cell_index ());
 
         if (! remove) {
           selected.insert (cells.begin (), cells.end ());
         } else {
-          selected.erase (cells.begin (), cells.end ());
+          for (std::set<db::cell_index_type>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
+            selected.erase (*c);
+          }
         }
 
       }

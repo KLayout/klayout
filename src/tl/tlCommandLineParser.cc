@@ -98,6 +98,22 @@ ArgBase::is_option () const
   return !m_option.short_option.empty () || !m_option.long_option.empty ();
 }
 
+std::string
+ArgBase::option_desc () const
+{
+  std::string res;
+  if (! m_option.short_option.empty ()) {
+    res += "-" + m_option.short_option;
+  }
+  if (! m_option.long_option.empty ()) {
+    if (! res.empty ()) {
+      res += "|";
+    }
+    res += "--" + m_option.long_option;
+  }
+  return res;
+}
+
 // ------------------------------------------------------------------------
 //  Internal argument classes to implement info arguments
 
@@ -531,42 +547,60 @@ CommandLineOptions::parse (int argc, char *argv[])
 
     }
 
-    if (! arg->is_option ()) {
+    try {
 
-      arg->take_value (ex);
+      if (! arg->is_option ()) {
 
-    } else if (arg->wants_value ()) {
-
-      if (ex.test ("=")) {
         arg->take_value (ex);
+
+      } else if (arg->wants_value ()) {
+
+        if (ex.test ("=")) {
+          arg->take_value (ex);
+        } else {
+
+          ex.expect_end ();
+          ++i;
+          if (i == argc) {
+            throw tl::Exception (tl::to_string (QObject::tr ("Value missing")));
+          }
+
+          std::string arg_as_utf8 = tl::to_string (QString::fromLocal8Bit (argv [i]));
+          tl::Extractor ex_value (arg_as_utf8);
+          arg->take_value (ex_value);
+
+        }
+
       } else {
 
-        if (! ex.at_end ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Syntax error in argument at \"..%1\" (use -h for help)").arg (tl::to_qstring (ex.get ()))));
+        if (ex.test ("=")) {
+          arg->take_value (ex);
+        } else {
+          arg->mark_present (arg->option ().inverted);
         }
-        ++i;
-        if (i == argc) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Value missing for last argument (use -h for help)")));
-        }
-
-        std::string arg_as_utf8 = tl::to_string (QString::fromLocal8Bit (argv [i]));
-        tl::Extractor ex_value (arg_as_utf8);
-        arg->take_value (ex_value);
 
       }
 
-    } else {
+      //  Execute the action if there is one
+      arg->action (this);
 
-      if (ex.test ("=")) {
-        arg->take_value (ex);
+    } catch (tl::Exception &ex) {
+
+      std::string msg = "Parser error ";
+      if (i == argc) {
+        msg += "at end of argument list";
       } else {
-        arg->mark_present (arg->option ().inverted);
+        msg += "at argument #" + tl::to_string (i);
       }
+      if (! arg->is_option ()) {
+        msg += " (option " + arg->option_desc () + ")";
+      }
+      msg += ":";
+      msg += ex.msg ();
+
+      throw tl::Exception (msg);
 
     }
-
-    //  Execute the action if there is one
-    arg->action (this);
 
   }
 

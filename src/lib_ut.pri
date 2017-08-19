@@ -1,11 +1,11 @@
 
-DESTDIR_UT = $$OUT_PWD/../../..
+DESTDIR_UT = $$OUT_PWD/../..
 DESTDIR = $$OUT_PWD/..
 
 TEMPLATE = lib
 
-INCLUDEPATH += ../src ../../../db ../../../tl ../../../gsi ../../../laybasic ../../../lay ../../../ut
-DEPENDPATH += ../src ../../../db ../../../tl ../../../gsi ../../../laybasic ../../../lay ../../../ut
+INCLUDEPATH += ../src ../../db ../../tl ../../gsi ../../laybasic ../../lay ../../ut
+DEPENDPATH += ../src ../../db ../../tl ../../gsi ../../laybasic ../../lay ../../ut
 LIBS += -L$$DESTDIR_UT -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_lay -lklayout_ut
 
 QMAKE_RPATHDIR += $$DESTDIR

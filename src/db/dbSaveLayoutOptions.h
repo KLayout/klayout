@@ -265,7 +265,7 @@ public:
   template <class T>
   void set_options (const T &options)
   {
-    m_options.insert (std::make_pair (options.format_name (), options.clone ()));
+    set_options (options.clone ());
   }
 
   /**
@@ -280,7 +280,13 @@ public:
   template <class T>
   void set_options (T *options)
   {
-    m_options.insert (std::make_pair (options->format_name (), options));
+    std::map<std::string, FormatSpecificWriterOptions *>::iterator o = m_options.find (options->format_name ());
+    if (o != m_options.end ()) {
+      delete o->second;
+      o->second = options;
+    } else {
+      m_options.insert (std::make_pair (options->format_name (), options));
+    }
   }
 
   /**

@@ -123,6 +123,12 @@ public:
   bool is_option () const;
 
   /**
+   *  @brief Returns an option description string
+   *  This string is typically "-x|--xlong".
+   */
+  std::string option_desc () const;
+
+  /**
    *  @brief Gets a value from the extractor into the target of the argument
    */
   virtual void take_value (tl::Extractor & /*ex*/)
@@ -173,21 +179,30 @@ private:
 
 /**
  *  @brief A helper for extracting values by type
+ *
+ *  @param repeated_hint Is true, if the value is supposed to be repeated
+ *  @param enumerated Is true, if the value parser shall stop at a comma to allow for more entries in the next iteration
  */
 template <class T>
-inline void extract (tl::Extractor &ex, T &t, bool /*for_list*/ = false)
+inline void extract (tl::Extractor &ex, T &t, bool /*repeated_hint*/, bool enumerated = false)
 {
   ex.read (t);
+  if (! enumerated) {
+    ex.expect_end ();
+  }
 }
 
 /**
  *  @brief A specialization for the string type
  */
-inline void extract (tl::Extractor &ex, std::string &t, bool for_list = false)
+inline void extract (tl::Extractor &ex, std::string &t, bool /*repeated_hint*/, bool enumerated = false)
 {
   if (*ex == '"' || *ex == '\'') {
     ex.read_quoted (t);
-  } else if (for_list) {
+    if (! enumerated) {
+      ex.expect_end ();
+    }
+  } else if (enumerated) {
     ex.read (t, ",");
   } else {
     t = ex.get ();
@@ -203,13 +218,13 @@ inline void extract (tl::Extractor &ex, std::string &t, bool for_list = false)
  *  @brief A specialization for a list of any type (vector)
  */
 template <class T>
-inline void extract (tl::Extractor &ex, std::vector<T> &t, bool for_list = false)
+inline void extract (tl::Extractor &ex, std::vector<T> &t, bool repeated_hint, bool /*enumerated*/ = false)
 {
   while (! ex.at_end ()) {
     t.push_back (T ());
-    extract (ex, t.back (), for_list);
-    if (for_list) {
-      ex.test (",");
+    extract (ex, t.back (), false, ! repeated_hint);
+    if (! repeated_hint && ! ex.test (",")) {
+      ex.expect_end ();
     }
   }
 }
@@ -287,7 +302,7 @@ public:
 
   virtual void take_value (tl::Extractor &ex)
   {
-    extract (ex, *mp_value, !option ().repeated);
+    extract (ex, *mp_value, option ().repeated);
   }
 
   virtual void mark_present (bool inverted)
@@ -327,7 +342,7 @@ public:
   {
     typedef typename type_without_const_ref<T>::inner_type inner_type;
     inner_type t = inner_type ();
-    extract (ex, t, !option ().repeated);
+    extract (ex, t, option ().repeated);
     (mp_object->*mp_setter) (t);
   }
 

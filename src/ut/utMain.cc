@@ -803,7 +803,7 @@ main_cont (int argc, char **argv)
   //  Search and initialize plugin unit tests
 
   QStringList name_filters;
-  name_filters << QString::fromUtf8 ("*.klp_ut");
+  name_filters << QString::fromUtf8 ("*.ut");
 
   QDir inst_dir (tl::to_qstring (tl::get_inst_path ()));
   QStringList inst_modules = inst_dir.entryList (name_filters);
@@ -811,13 +811,13 @@ main_cont (int argc, char **argv)
 
   for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
 
-    QFileInfo klp_file (inst_dir.path (), *im);
-    if (klp_file.exists () && klp_file.isReadable ()) {
+    QFileInfo ut_file (inst_dir.path (), *im);
+    if (ut_file.exists () && ut_file.isReadable ()) {
 
-      std::string pp = tl::to_string (klp_file.absoluteFilePath ());
+      std::string pp = tl::to_string (ut_file.absoluteFilePath ());
       tl::log << "Loading plugin unit tests " << pp;
 
-      //  NOTE: since we are using a different suffix ("*.klp_ut"), we can't use QLibrary.
+      //  NOTE: since we are using a different suffix ("*.ut"), we can't use QLibrary.
 #ifdef _WIN32
       //  there is no "dlopen" on mingw, so we need to emulate it.
       HINSTANCE handle = LoadLibraryW ((const wchar_t *) tl::to_qstring (pp).constData ());
@@ -995,7 +995,7 @@ main_cont (int argc, char **argv)
         bool exclude = false;
         for (std::vector<std::string>::const_iterator m = exclude_test_list.begin (); m != exclude_test_list.end (); ++m) {
           QRegExp re (tl::to_qstring (*m), Qt::CaseInsensitive, QRegExp::Wildcard);
-          if (re.indexIn (tl::to_qstring ((*i)->name ())) >= 0) {
+          if (re.indexIn (tl::to_qstring ((*i)->name ())) == 0) {
             exclude = true;
             break;
           }
@@ -1003,7 +1003,7 @@ main_cont (int argc, char **argv)
 
         for (std::vector<std::string>::const_iterator m = test_list.begin (); !exclude && m != test_list.end (); ++m) {
           QRegExp re (tl::to_qstring (*m), Qt::CaseInsensitive, QRegExp::Wildcard);
-          if (re.indexIn (tl::to_qstring ((*i)->name ())) >= 0) {
+          if (re.indexIn (tl::to_qstring ((*i)->name ())) == 0) {
             tl::info << "  " << (*i)->name ();
             subset.push_back (*i);
             break;

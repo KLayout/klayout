@@ -592,10 +592,10 @@ CommandLineOptions::parse (int argc, char *argv[])
       } else {
         msg += "at argument #" + tl::to_string (i);
       }
-      if (! arg->is_option ()) {
+      if (arg->is_option ()) {
         msg += " (option " + arg->option_desc () + ")";
       }
-      msg += ":";
+      msg += ": ";
       msg += ex.msg ();
 
       throw tl::Exception (msg);

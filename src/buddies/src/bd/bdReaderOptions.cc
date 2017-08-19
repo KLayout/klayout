@@ -79,11 +79,11 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
     std::string group ("[" + m_group_prefix + " options - GDS2 and OASIS specific]");
 
     cmd << tl::arg (group +
-                    "#!--" + m_long_prefix + "disable-texts", &m_common_reader_options.enable_text_objects, "Skips text objects",
+                    "#!--" + m_long_prefix + "no-texts", &m_common_reader_options.enable_text_objects, "Skips text objects",
                     "With this option set, text objects won't be read."
                    )
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "disable-properties", &m_common_reader_options.enable_properties, "Skips properties",
+                    "#!--" + m_long_prefix + "no-properties", &m_common_reader_options.enable_properties, "Skips properties",
                     "With this option set, properties won't be read."
                    )
       ;
@@ -174,7 +174,7 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "#--" + m_long_prefix + "dxf-polyline-mode=mode", &m_dxf_reader_options.polyline_mode, "Specifies how POLYLINE records are handled",
                     "This value specifies how POLYLINE records are handled:\n"
                     "\n"
-                    "* 0: automatic mode\n"
+                    "* 0: automatic mode (default)\n"
                     "* 1: keep lines\n"
                     "* 2: create polygons from closed POLYLINE/LWPOLYLINE with width == 0\n"
                     "* 3: merge all lines (width width 0)\n"

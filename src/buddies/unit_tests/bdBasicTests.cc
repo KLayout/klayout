@@ -202,3 +202,91 @@ TEST(2)
 
   EXPECT_EQ (cells2string (layout, cells), "TOP,B,C,D");
 }
+
+//  Testing reader options
+TEST(10)
+{
+  bd::GenericReaderOptions opt;
+  tl::CommandLineOptions cmd;
+
+  opt.add_options (cmd);
+
+  char *argv[] = { "x",
+                   //  CIF and DXF
+                   "-id=0.125",
+                   //  CIF
+                   "-iw=1",
+                   //  DXF
+                   "-iu=2.5",
+                   "--dxf-circle-accuracy=0.5",
+                   "--dxf-circle-points=1000",
+                   "--dxf-keep-other-cells",
+                   "--dxf-polyline-mode=3",
+                   "--dxf-render-texts-as-polygons",
+                   "--dxf-text-scaling=75",
+                   //  GDS2 and OASIS
+                   "--no-properties",
+                   "--no-texts",
+                   //  GDS2
+                   "-ib=3",
+                   "--no-big-records",
+                   "--no-multi-xy-records",
+                   //  General
+                   "-im=1/0 3,4/0-255 A:17/0",
+                   "-is",
+                   //  OASIS
+                   "--expect-strict-mode=1"
+                 };
+
+  cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+
+  db::LoadLayoutOptions stream_opt;
+  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::CIFReaderOptions> ().dbu), "0.001");
+  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().wire_mode, (unsigned int) 0);
+  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().layer_map.to_string (), "layer_map()");
+  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().create_other_layers, true);
+  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::DXFReaderOptions> ().dbu), "0.001");
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().layer_map.to_string (), "layer_map()");
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().create_other_layers, true);
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().unit, 1.0);
+  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::DXFReaderOptions> ().circle_accuracy), "0");
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().circle_points, 100);
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().keep_other_cells, false);
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().polyline_mode, 0);
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().render_texts_as_polygons, false);
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().text_scaling, 100);
+  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().layer_map.to_string (), "layer_map()");
+  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().create_other_layers, true);
+  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().enable_properties, true);
+  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().enable_text_objects, true);
+  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().box_mode, (unsigned int) 1);
+  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().allow_big_records, true);
+  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().allow_multi_xy_records, true);
+  EXPECT_EQ (stream_opt.get_options<db::OASISReaderOptions> ().expect_strict_mode, -1);
+
+  opt.configure (stream_opt);
+
+  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::CIFReaderOptions> ().dbu), "0.125");
+  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().wire_mode, (unsigned int) 1);
+  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().layer_map.to_string (), "layer_map('1/0';'3-4/0-255';'A : 17/0')");
+  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().create_other_layers, false);
+  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::DXFReaderOptions> ().dbu), "0.125");
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().layer_map.to_string (), "layer_map('1/0';'3-4/0-255';'A : 17/0')");
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().create_other_layers, false);
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().unit, 2.5);
+  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::DXFReaderOptions> ().circle_accuracy), "0.5");
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().circle_points, 1000);
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().keep_other_cells, true);
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().polyline_mode, 3);
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().render_texts_as_polygons, true);
+  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().text_scaling, 75);
+  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().layer_map.to_string (), "layer_map('1/0';'3-4/0-255';'A : 17/0')");
+  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().create_other_layers, false);
+  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().enable_properties, false);
+  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().enable_text_objects, false);
+  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().box_mode, (unsigned int) 3);
+  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().allow_big_records, false);
+  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().allow_multi_xy_records, false);
+  EXPECT_EQ (stream_opt.get_options<db::OASISReaderOptions> ().expect_strict_mode, 1);
+}
+

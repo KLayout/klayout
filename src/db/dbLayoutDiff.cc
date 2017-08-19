@@ -747,10 +747,6 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
           common_cells.push_back (cb->first);
         } else {
           r.cell_name_differs (std::string (a.cell_name (cm.second)), cm.second, cb->first, cb->second);
-          differs = true;
-          if (flags & layout_diff::f_silent) {
-            return false;
-          }
           common_cells.push_back (a.cell_name (cm.second)); // use layout A cell name as reference
         }
 
@@ -1176,7 +1172,7 @@ PrintingDifferenceReceiver::enough (tl::Channel &ch)
   }
 
   if (m_count == m_max_count) {
-    enough (tl::warn) << "..." << tl::endl << "layout_diff: report is shortened after " << (m_max_count - 1) << " lines.";
+    tl::warn << "..." << tl::endl << "Report is shortened after " << (m_max_count - 1) << " lines.";
   }
   throw tl::CancelException ();
 }
@@ -1228,18 +1224,19 @@ PrintingDifferenceReceiver::print_diffs (const db::PropertiesRepository &pr, con
   for (typename std::vector <std::pair <SH, db::properties_id_type> >::const_iterator s = anotb.begin (); s != anotb.end (); ++s) {
     enough (tl::info) << "  " << s->first.to_string () << tl::noendl;
     if (s->second != 0) {
-      tl::info << " [" << s->second << "]";
       if (m_print_properties) {
         const db::PropertiesRepository::properties_set &props = pr.properties (s->second);
         for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
           const tl::Variant &name = pr.prop_name (p->first);
           if (name.is_long ()) {
-            tl::info << "  {" << int (name.to_long ()) << " {" << p->second.to_string () << "}}";
+            tl::info << " {" << int (name.to_long ()) << " {" << p->second.to_string () << "}}" << tl::noendl;
           } else {
-            tl::info << "  {{" << name.to_string () << "} {" << p->second.to_string () << "}}";
+            tl::info << " {{" << name.to_string () << "} {" << p->second.to_string () << "}}" << tl::noendl;
           }
         }
-        tl::info << "}";
+        tl::info << "";
+      } else {
+        tl::info << " [" << s->second << "]";
       }
     } else {
       tl::info << "";
@@ -1251,7 +1248,7 @@ void
 PrintingDifferenceReceiver::dbu_differs (double dbu_a, double dbu_b) 
 {
   try {
-    enough (tl::error) << "layout_diff: database units differ " << dbu_a << " vs. " << dbu_b;
+    enough (tl::error) << "Database units differ " << dbu_a << " vs. " << dbu_b;
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
@@ -1261,7 +1258,7 @@ void
 PrintingDifferenceReceiver::layer_in_a_only (const db::LayerProperties &la)
 {
   try {
-    enough (tl::error) << "layout_diff: layer " << la.to_string () << " is not present in layout b, but in a";
+    enough (tl::error) << "Layer " << la.to_string () << " is not present in layout b, but in a";
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
@@ -1271,7 +1268,7 @@ void
 PrintingDifferenceReceiver::layer_in_b_only (const db::LayerProperties &lb)
 {
   try {
-    enough (tl::error) << "layout_diff: layer " << lb.to_string () << " is not present in layout a, but in b";
+    enough (tl::error) << "Layer " << lb.to_string () << " is not present in layout a, but in b";
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
@@ -1281,7 +1278,7 @@ void
 PrintingDifferenceReceiver::layer_name_differs (const db::LayerProperties &la, const db::LayerProperties &lb)
 {
   try {
-    enough (tl::error) << "layout_diff: layer names differ between layout a and b for layer " << la.layer << "/" << la.datatype << ": "
+    enough (tl::error) << "Layer names differ between layout a and b for layer " << la.layer << "/" << la.datatype << ": "
                        << la.name << " vs. " << lb.name;
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
@@ -1292,7 +1289,7 @@ void
 PrintingDifferenceReceiver::cell_in_a_only (const std::string &cellname, db::cell_index_type /*ci*/)
 {
   try {
-    enough (tl::error) << "layout_diff: cell " << cellname << " is not present in layout b, but in a";
+    enough (tl::error) << "Cell " << cellname << " is not present in layout b, but in a";
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
@@ -1302,7 +1299,7 @@ void
 PrintingDifferenceReceiver::cell_in_b_only (const std::string &cellname, db::cell_index_type /*ci*/)
 {
   try {
-    enough (tl::error) << "layout_diff: cell " << cellname << " is not present in layout a, but in b";
+    enough (tl::error) << "Cell " << cellname << " is not present in layout a, but in b";
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
@@ -1312,7 +1309,7 @@ void
 PrintingDifferenceReceiver::cell_name_differs (const std::string &cellname_a, db::cell_index_type /*cia*/, const std::string &cellname_b, db::cell_index_type /*cib*/)
 {
   try {
-    enough (tl::error) << "layout_diff: cell " << cellname_a << " in a is renamed to " << cellname_b << " in b";
+    enough (tl::error) << "Cell " << cellname_a << " in a is renamed to " << cellname_b << " in b";
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
@@ -1322,7 +1319,7 @@ void
 PrintingDifferenceReceiver::bbox_differs (const db::Box &ba, const db::Box &bb)
 {
   try {
-    enough (tl::error) << "layout_diff: bounding boxes differ for cell " << m_cellname << ", " << ba.to_string () << " vs. " << bb.to_string ();
+    enough (tl::error) << "Bounding boxes differ for cell " << m_cellname << ", " << ba.to_string () << " vs. " << bb.to_string ();
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
@@ -1338,36 +1335,20 @@ void
 PrintingDifferenceReceiver::begin_inst_differences ()
 {
   try {
-    enough (tl::error) << "layout_diff: instances differ in cell " << m_cellname;
+    enough (tl::error) << "Instances differ in cell " << m_cellname;
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
 }
 
 void
-PrintingDifferenceReceiver::instances_in_a (const std::vector <db::CellInstArrayWithProperties> &insts_a, const std::vector <std::string> &cell_names, const db::PropertiesRepository & /*props*/)
+PrintingDifferenceReceiver::instances_in_a (const std::vector <db::CellInstArrayWithProperties> & /*insts_a*/, const std::vector <std::string> & /*cell_names*/, const db::PropertiesRepository & /*props*/)
 {
-  try {
-    enough (tl::info) << "list for a:";
-    for (std::vector <db::CellInstArrayWithProperties>::const_iterator s = insts_a.begin (); s != insts_a.end (); ++s) {
-      print_cell_inst (*s, cell_names);
-    }
-  } catch (tl::CancelException) {
-    //  ignore cancel exceptions
-  }
 }
 
 void
-PrintingDifferenceReceiver::instances_in_b (const std::vector <db::CellInstArrayWithProperties> &insts_b, const std::vector <std::string> &cell_names, const db::PropertiesRepository & /*props*/)
+PrintingDifferenceReceiver::instances_in_b (const std::vector <db::CellInstArrayWithProperties> & /*insts_b*/, const std::vector <std::string> & /*cell_names*/, const db::PropertiesRepository & /*props*/)
 {
-  try {
-    enough (tl::info) << "list for b:";
-    for (std::vector <db::CellInstArrayWithProperties>::const_iterator s = insts_b.begin (); s != insts_b.end (); ++s) {
-      print_cell_inst (*s, cell_names);
-    }
-  } catch (tl::CancelException) {
-    //  ignore cancel exceptions
-  }
 }
 
 void
@@ -1411,7 +1392,7 @@ void
 PrintingDifferenceReceiver::per_layer_bbox_differs (const db::Box &ba, const db::Box &bb)
 {
   try {
-    enough (tl::error) << "layout_diff: per-layer bounding boxes differ for cell " << m_cellname << ", layer (" << m_layer.to_string () << "), "
+    enough (tl::error) << "Per-layer bounding boxes differ for cell " << m_cellname << ", layer (" << m_layer.to_string () << "), "
                        << ba.to_string () << " vs. " << bb.to_string ();
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
@@ -1422,7 +1403,7 @@ void
 PrintingDifferenceReceiver::begin_polygon_differences ()
 {
   try {
-    enough (tl::error) << "layout_diff: polygons differ for layer " << m_layer.to_string () << " in cell " << m_cellname;
+    enough (tl::error) << "Polygons differ for layer " << m_layer.to_string () << " in cell " << m_cellname;
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
@@ -1450,7 +1431,7 @@ void
 PrintingDifferenceReceiver::begin_path_differences ()
 {
   try {
-    enough (tl::error) << "layout_diff: paths differ for layer " << m_layer.to_string () << " in cell " << m_cellname;
+    enough (tl::error) << "Paths differ for layer " << m_layer.to_string () << " in cell " << m_cellname;
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
@@ -1478,7 +1459,7 @@ void
 PrintingDifferenceReceiver::begin_box_differences ()
 {
   try {
-    enough (tl::error) << "layout_diff: boxes differ for layer " << m_layer.to_string () << " in cell " << m_cellname;
+    enough (tl::error) << "Boxes differ for layer " << m_layer.to_string () << " in cell " << m_cellname;
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
@@ -1506,7 +1487,7 @@ void
 PrintingDifferenceReceiver::begin_edge_differences ()
 {
   try {
-    enough (tl::error) << "layout_diff: edges differ for layer " << m_layer.to_string () << " in cell " << m_cellname;
+    enough (tl::error) << "Edges differ for layer " << m_layer.to_string () << " in cell " << m_cellname;
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }
@@ -1534,7 +1515,7 @@ void
 PrintingDifferenceReceiver::begin_text_differences ()
 {
   try {
-    enough (tl::error) << "layout_diff: texts differ for layer " << m_layer.to_string () << " in cell " << m_cellname;
+    enough (tl::error) << "Texts differ for layer " << m_layer.to_string () << " in cell " << m_cellname;
   } catch (tl::CancelException) {
     //  ignore cancel exceptions
   }

@@ -7,6 +7,9 @@ include($$PWD/../../lib_ut.pri)
 SOURCES = \
   bdBasicTests.cc \
   bdConverterTests.cc \
+    bdStrm2txtTests.cc \
+    bdStrmclipTests.cc \
+    bdStrmcmpTests.cc
 
 
 INCLUDEPATH += ../src/bd

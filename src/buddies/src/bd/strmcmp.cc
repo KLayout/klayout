@@ -34,9 +34,9 @@ BD_PUBLIC int strmcmp (int argc, char *argv[])
   generic_reader_options_a.set_group_prefix ("Input A");
 
   bd::GenericReaderOptions generic_reader_options_b;
-  generic_reader_options_a.set_prefix ("b");
-  generic_reader_options_a.set_long_prefix ("b-");
-  generic_reader_options_a.set_group_prefix ("Input B");
+  generic_reader_options_b.set_prefix ("b");
+  generic_reader_options_b.set_long_prefix ("b-");
+  generic_reader_options_b.set_group_prefix ("Input B");
 
   std::string infile_a, infile_b;
   std::string top_a, top_b;
@@ -133,7 +133,7 @@ BD_PUBLIC int strmcmp (int argc, char *argv[])
   cmd.parse (argc, argv);
 
   if (top_a.empty () != top_b.empty ()) {
-    throw tl::Exception ("Both --top-a and --top-b top cells must be given");
+    throw tl::Exception ("Both -ta|--top-a and -tb|--top-b top cells must be given");
   }
 
   db::Layout layout_a;
@@ -152,7 +152,7 @@ BD_PUBLIC int strmcmp (int argc, char *argv[])
     db::LoadLayoutOptions load_options;
     generic_reader_options_b.configure (load_options);
 
-    tl::InputStream stream (infile_a);
+    tl::InputStream stream (infile_b);
     db::Reader reader (stream);
     reader.read (layout_b, load_options);
   }
@@ -194,6 +194,30 @@ BD_PUBLIC int strmcmp (int argc, char *argv[])
 
   db::Coord tolerance_dbu = db::coord_traits<db::Coord>::rounded (tolerance / std::min (layout_a.dbu (), layout_b.dbu ()));
   bool result = false;
+
+  if (smart_cell_mapping && top_a.empty ()) {
+
+    db::Layout::top_down_const_iterator t;
+
+    t = layout_a.begin_top_down ();
+    if (t != layout_a.end_top_cells ()) {
+      top_a = layout_a.cell_name (*t);
+      ++t;
+      if (t != layout_a.end_top_cells ()) {
+        throw tl::Exception ("Top cell of first layout is not unique which is required for -c|--cell-mapping");
+      }
+    }
+
+    t = layout_b.begin_top_down ();
+    if (t != layout_b.end_top_cells ()) {
+      top_b = layout_b.cell_name (*t);
+      ++t;
+      if (t != layout_b.end_top_cells ()) {
+        throw tl::Exception ("Top cell of second layout is not unique which is required for -c|--cell-mapping");
+      }
+    }
+
+  }
 
   if (! top_a.empty ()) {
 

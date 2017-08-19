@@ -193,7 +193,7 @@ BD_PUBLIC int strmclip (int argc, char *argv[])
                   "If given, this name will be used as the top cell name in the output file. "
                   "By default the output's top cell will be \"CLIPPED_\" plus the input's top cell name."
                  )
-      << tl::arg ("*-r|--rect=\"l,b,r,t\"", &data, &ClipData::add_box, "Specifies a clip box",
+      << tl::arg ("*-r|--rect=\"l,b,r,t\"",    &data, &ClipData::add_box, "Specifies a clip box",
                   "This option specifies the box to clip in micrometer units. The box is given "
                   "by left, bottom, right and top coordinates. This option can be used multiple times "
                   "to produce a clip covering more than one rectangle."

@@ -776,9 +776,36 @@ void TestBase::compare_layouts (const db::Layout &layout, const std::string &au_
   }
 
   if (! equal) {
-    raise (tl::sprintf ("Compare failed - see %s vs %s\n", tmp_file, au_file + (n > 1 ? " and variants" : "")));
+    raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s%s",
+                        tl::to_string (QFileInfo (tl::to_qstring (tmp_file)).absoluteFilePath ()),
+                        tl::to_string (QFileInfo (tl::to_qstring (au_file)).absoluteFilePath ()),
+                        (n > 1 ? "\nand variants" : "")));
   }
 }
+
+static std::string read_file (const std::string &path)
+{
+  QFile file (tl::to_qstring (path));
+  if (! file.open (QIODevice::ReadOnly | QIODevice::Text)) {
+    tl::warn << tl::sprintf ("Unable to open file %s", path);
+  }
+
+  QByteArray ba = file.readAll ();
+  return std::string (ba.constData (), 0, ba.size ());
+}
+
+void TestBase::compare_text_files (const std::string &path_a, const std::string &path_b)
+{
+  std::string text_a = read_file (path_a);
+  std::string text_b = read_file (path_b);
+
+  if (text_a != text_b) {
+    raise (tl::sprintf ("Compare failed - see:\n  file 1: %s\n  file 2: %s",
+                        tl::to_string (QFileInfo (tl::to_qstring (path_a)).absoluteFilePath ()),
+                        tl::to_string (QFileInfo (tl::to_qstring (path_b)).absoluteFilePath ())));
+  }
+}
+
 
 static int main_cont (int argc, char **argv);
 

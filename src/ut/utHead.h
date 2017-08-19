@@ -197,6 +197,11 @@ struct UT_PUBLIC TestBase
   void compare_layouts (const db::Layout &layout, const std::string &au_file, const db::LayerMap &lmap, bool read_all_others, NormalizationMode norm = WriteGDS2, db::Coord tolerance = 0);
 
   /**
+   *  @brief Compares two text files
+   */
+  void compare_text_files (const std::string &path_a, const std::string &path_b);
+
+  /**
    *  @brief The test's name
    *  @return The name of the test
    */

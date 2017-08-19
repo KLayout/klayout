@@ -72,7 +72,7 @@ BD_PUBLIC int strmcmp (int argc, char *argv[])
                  )
       << tl::arg ("-s|--silent",               &silent,     "Enables silent mode",
                   "In silent mode, no differences are printed, but the exit code indicates whether "
-                  "the layout are the same (0) or differences exist (> 0)."
+                  "the layouts are the same (0) or differences exist (> 0)."
                  )
       << tl::arg ("#!--with-text-orientation", &no_text_orientation, "Compares orientations for texts",
                   "With this option, text orientation is compared too. The position of the "

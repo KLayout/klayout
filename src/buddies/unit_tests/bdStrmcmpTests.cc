@@ -533,3 +533,57 @@ TEST(8B)
     "Cell TRANS in a is renamed to SNART in b\n"
   );
 }
+
+TEST(9A)
+{
+  CaptureChannel cap;
+
+  tl::warn.add (&cap, false);
+  tl::info.add (&cap, false);
+  tl::error.add (&cap, false);
+
+  std::string input_a = ut::testsrc ();
+  input_a += "/testdata/bd/strmcmp_in.gds";
+
+  std::string input_b = ut::testsrc ();
+  input_b += "/testdata/bd/strmcmp_ref9.gds";
+
+  char *argv[] = { "x", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+
+  EXPECT_EQ (cap.captured_text (),
+    "Layer 8/1 is not present in layout b, but in a\n"
+    "Layouts differ\n"
+  );
+}
+
+TEST(9B)
+{
+  CaptureChannel cap;
+
+  tl::warn.add (&cap, false);
+  tl::info.add (&cap, false);
+  tl::error.add (&cap, false);
+
+  std::string input_a = ut::testsrc ();
+  input_a += "/testdata/bd/strmcmp_in.gds";
+
+  std::string input_b = ut::testsrc ();
+  input_b += "/testdata/bd/strmcmp_ref9.gds";
+
+  char *argv[] = { "x", "-l", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+
+  EXPECT_EQ (cap.captured_text (),
+    "Texts differ for layer 8/1 in cell RINGO\n"
+    "Not in b but in a:\n"
+    "  ('FB',r0 0,1800)\n"
+    "  ('OSC',r0 24560,1800)\n"
+    "  ('VDD',r0 0,2800)\n"
+    "  ('VSS',r0 0,0)\n"
+    "Not in a but in b:\n"
+    "Layouts differ\n"
+  );
+}

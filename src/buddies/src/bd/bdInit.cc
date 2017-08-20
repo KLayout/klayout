@@ -53,7 +53,7 @@ int _main_impl (int (*delegate) (int, char *[]), int argc, char *argv[])
     init ();
     return (*delegate) (argc, argv);
   } catch (tl::CancelException & /*ex*/) {
-    return 1;
+    return 0;
   } catch (std::exception &ex) {
     tl::error << ex.what ();
     return 1;

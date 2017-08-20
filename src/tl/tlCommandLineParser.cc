@@ -111,6 +111,12 @@ ArgBase::option_desc () const
     }
     res += "--" + m_option.long_option;
   }
+  if (! m_option.name.empty ()) {
+    if (! res.empty ()) {
+      res += "=";
+    }
+    res += m_option.name;
+  }
   return res;
 }
 
@@ -352,7 +358,7 @@ struct NameCompare
 void
 CommandLineOptions::produce_help (const std::string &program_name, bool advanced)
 {
-  int columns = 80;
+  int columns = 70;
 
   tl::info << "Usage:" << tl::endl;
   tl::info << "  "  << program_name << "  [options]" << tl::noendl;
@@ -374,14 +380,9 @@ CommandLineOptions::produce_help (const std::string &program_name, bool advanced
   print_string_formatted ("    ", columns, m_brief);
   tl::info << tl::endl;
 
-  unsigned int short_option_width = 0;
-  unsigned int long_option_width = 0;
-  unsigned int name_width = 0;
-
+  unsigned int arg_width = 0;
   for (std::vector<ArgBase *>::const_iterator a = sorted_args.begin (); a != sorted_args.end (); ++a) {
-    name_width = std::max (name_width, (unsigned int) (*a)->option ().name.size ());
-    short_option_width = std::max (short_option_width, (unsigned int) (*a)->option ().short_option.size ());
-    long_option_width = std::max (long_option_width, (unsigned int) (*a)->option ().long_option.size ());
+    arg_width = std::max (arg_width, (unsigned int) (*a)->option_desc ().size ());
   }
 
   tl::info << "Arguments:" << tl::endl;
@@ -390,15 +391,15 @@ CommandLineOptions::produce_help (const std::string &program_name, bool advanced
     if ((*a)->is_option ()) {
       continue;
     }
-    std::string n = "<" + (*a)->option ().name + ">";
+    std::string n = "<" + (*a)->option_desc () + ">";
     if ((*a)->option ().optional) {
       n += " (optional)";
     }
-    tl::info << "  " << pad_string (name_width + 13, n) << (*a)->brief_doc ();
+    tl::info << "  " << pad_string (arg_width + 4, n) << (*a)->brief_doc ();
     tl::info << "";
 
     if (! (*a)->long_doc ().empty ()) {
-      print_string_formatted ("    ", columns, (*a)->long_doc ());
+      print_string_formatted ("        ", columns, (*a)->long_doc ());
       tl::info << "";
     }
   }
@@ -412,12 +413,6 @@ CommandLineOptions::produce_help (const std::string &program_name, bool advanced
                           "as the following argument or added to the option with an equal sign (=).");
 
   tl::info << tl::endl << "  List of options:" << tl::endl;
-
-  std::string header = pad_string (short_option_width + 5, "Short") + " "
-                        + pad_string (long_option_width + 5, "Long") + " "
-                        + pad_string (name_width + 3, "Value") + " " + "Description";
-
-  tl::info << "    " << header << tl::endl;
 
   std::string prev_group;
   bool hidden = false;
@@ -436,7 +431,6 @@ CommandLineOptions::produce_help (const std::string &program_name, bool advanced
     if ((*a)->option ().group != prev_group) {
       prev_group = (*a)->option ().group;
       tl::info << tl::endl << "  " << prev_group << ":" << tl::endl;
-      tl::info << "    " << header << tl::endl;
     }
 
     std::string name;
@@ -448,14 +442,12 @@ CommandLineOptions::produce_help (const std::string &program_name, bool advanced
     }
 
     tl::info << "    "
-             << pad_string (short_option_width + 5, (*a)->option ().short_option.empty () ? "" : "-" + (*a)->option ().short_option) << " "
-             << pad_string (long_option_width + 5, (*a)->option ().long_option.empty () ? "" : "--" + (*a)->option ().long_option) << " "
-             << pad_string (name_width + 3, name) << " "
+             << pad_string (arg_width + 4, (*a)->option_desc ())
              << (*a)->brief_doc ();
     tl::info << "";
 
     if (! (*a)->long_doc ().empty ()) {
-      print_string_formatted ("      ", columns, (*a)->long_doc ());
+      print_string_formatted ("          ", columns, (*a)->long_doc ());
       tl::info << "";
     }
 
@@ -584,9 +576,11 @@ CommandLineOptions::parse (int argc, char *argv[])
       //  Execute the action if there is one
       arg->action (this);
 
+    } catch (tl::CancelException &) {
+      throw;
     } catch (tl::Exception &ex) {
 
-      std::string msg = "Parser error ";
+      std::string msg = "Error ";
       if (i == argc) {
         msg += "at end of argument list";
       } else {

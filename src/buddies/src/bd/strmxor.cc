@@ -62,23 +62,24 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
                   "This argument is optional. If not given, the exit status alone will indicate whether the layouts "
                   "are identical or not."
                  )
-      << tl::arg ("-ta|--top-a=name",          &top_a,      "Specifies the cell to take as top cell from the first layout",
+      << tl::arg ("-ta|--top-a=name",          &top_a,      "Specifies the top cell for the first layout",
                   "Use this option to take a specific cell as the top cell from the first layout. All "
                   "cells not called directly or indirectly from this cell are ignored. If you use this option, "
                   "--top-b must be specified too and can be different from the first layout's top cell."
                  )
-      << tl::arg ("-tb|--top-b=name",          &top_b,      "Specifies the cell to take as top cell from the second layout",
+      << tl::arg ("-tb|--top-b=name",          &top_b,      "Specifies the top cell for the second layout",
                   "See --top-a for details."
                  )
       << tl::arg ("-s|--silent",               &silent,     "Silent mode",
                   "In silent mode, no summary is printed, but the exit code indicates whether "
                   "the layouts are the same (0) or differences exist (> 0)."
                  )
-      << tl::arg ("-l|--layer-details",        &dont_summarize_missing_layers, "Output details about differences for missing layers",
+      << tl::arg ("-l|--layer-details",        &dont_summarize_missing_layers, "Treats missing layers as empty",
                   "With this option, missing layers are treated as \"empty\" and the whole layer of the other "
-                  "layout is output. Without this option, a message is printed for missing layers instead."
+                  "layout is output. Without this option, a message is printed for missing layers instead and the "
+                  "layer from the other layout is ignored."
                  )
-      << tl::arg ("-t|--tolerance=values",     &tolerances, "Specifies tolerances for the geometry compare",
+      << tl::arg ("-t|--tolerances=values",     &tolerances, "Specifies tolerances for the geometry compare",
                   "This option can take multiple tolerance values. The values are given in micrometer units and "
                   "are separated by a comma. If a tolerance is given, XOR differences are "
                   "only reported when they are larger than the tolerance value. Tolerance values must be given in "

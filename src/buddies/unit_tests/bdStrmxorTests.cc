@@ -44,9 +44,9 @@ TEST(1)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  char *argv[] = { "x", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", input_a.c_str (), input_b.c_str (), output.c_str () };
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -77,9 +77,9 @@ TEST(2)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  char *argv[] = { "x", "-l", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", "-l", input_a.c_str (), input_b.c_str (), output.c_str () };
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -110,9 +110,9 @@ TEST(3)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  char *argv[] = { "x", "-p=1.0", "-n=4", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", "-p=1.0", "-n=4", input_a.c_str (), input_b.c_str (), output.c_str () };
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -143,9 +143,9 @@ TEST(4)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  char *argv[] = { "x", "-p=1.0", "-n=4", "-t=0.0,0.005,0.01,0.02,0.09,0.1", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", "-p=1.0", "-n=4", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -176,9 +176,9 @@ TEST(5)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  char *argv[] = { "x", "-b=1000", "-t=0.0,0.005,0.01,0.02,0.09,0.1", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", "-b=1000", "-t=0.0,0.005,0.01,0.02,0.09,0.1", input_a.c_str (), input_b.c_str (), output.c_str () };
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   db::Layout layout;
 
@@ -209,9 +209,9 @@ TEST(6)
 
   std::string output = this->tmp_file ("tmp.oas");
 
-  char *argv[] = { "x", "-ta=INV2", "-tb=2VNI", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", "-ta=INV2", "-tb=2VNI", input_a.c_str (), input_b.c_str (), output.c_str () };
 
-  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmxor (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   db::Layout layout;
 

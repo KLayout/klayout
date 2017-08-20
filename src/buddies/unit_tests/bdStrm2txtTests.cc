@@ -35,9 +35,9 @@ TEST(1)
 
   std::string output = this->tmp_file ();
 
-  char *argv[] = { "x", const_cast<char *> (input.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", input.c_str (), output.c_str () };
 
-  EXPECT_EQ (strm2txt (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strm2txt (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 
   this->compare_text_files (output, au);
 }

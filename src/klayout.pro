@@ -45,7 +45,7 @@ ant.depends += laybasic
 img.depends += laybasic
 edt.depends += laybasic
 
-buddies.depends += db tl gsi
+buddies.depends += db tl gsi ut
 
 lay.depends += laybasic ant img edt
 equals(HAVE_RUBY, "1") {

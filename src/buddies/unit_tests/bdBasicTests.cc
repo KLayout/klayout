@@ -158,10 +158,10 @@ TEST(2)
   db::SaveLayoutOptions stream_opt;
 
   {
-    char *argv[] = { "x",
-                     "--write-cells=A,-C,(C)",
-                   };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x",
+                           "--write-cells=A,-C,(C)",
+                         };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
 
   opt.configure (stream_opt, layout);
@@ -173,10 +173,10 @@ TEST(2)
   EXPECT_EQ (cells2string (layout, cells), "A,B,C");
 
   {
-    char *argv[] = { "x",
-                     "--write-cells=(C),(TOP)",
-                   };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x",
+                           "--write-cells=(C),(TOP)",
+                         };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
 
   opt.configure (stream_opt, layout);
@@ -188,10 +188,10 @@ TEST(2)
   EXPECT_EQ (cells2string (layout, cells), "TOP,C");
 
   {
-    char *argv[] = { "x",
-                     "--write-cells=(TOP),+B",
-                   };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x",
+                           "--write-cells=(TOP),+B",
+                         };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
 
   opt.configure (stream_opt, layout);
@@ -211,34 +211,34 @@ TEST(10)
 
   opt.add_options (cmd);
 
-  char *argv[] = { "x",
-                   //  CIF and DXF
-                   "-id=0.125",
-                   //  CIF
-                   "-iw=1",
-                   //  DXF
-                   "-iu=2.5",
-                   "--dxf-circle-accuracy=0.5",
-                   "--dxf-circle-points=1000",
-                   "--dxf-keep-other-cells",
-                   "--dxf-polyline-mode=3",
-                   "--dxf-render-texts-as-polygons",
-                   "--dxf-text-scaling=75",
-                   //  GDS2 and OASIS
-                   "--no-properties",
-                   "--no-texts",
-                   //  GDS2
-                   "-ib=3",
-                   "--no-big-records",
-                   "--no-multi-xy-records",
-                   //  General
-                   "-im=1/0 3,4/0-255 A:17/0",
-                   "-is",
-                   //  OASIS
-                   "--expect-strict-mode=1"
-                 };
+  const char *argv[] = { "x",
+                         //  CIF and DXF
+                         "-id=0.125",
+                         //  CIF
+                         "-iw=1",
+                         //  DXF
+                         "-iu=2.5",
+                         "--dxf-circle-accuracy=0.5",
+                         "--dxf-circle-points=1000",
+                         "--dxf-keep-other-cells",
+                         "--dxf-polyline-mode=3",
+                         "--dxf-render-texts-as-polygons",
+                         "--dxf-text-scaling=75",
+                         //  GDS2 and OASIS
+                         "--no-properties",
+                         "--no-texts",
+                         //  GDS2
+                         "-ib=3",
+                         "--no-big-records",
+                         "--no-multi-xy-records",
+                         //  General
+                         "-im=1/0 3,4/0-255 A:17/0",
+                         "-is",
+                         //  OASIS
+                         "--expect-strict-mode=1"
+                       };
 
-  cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
 
   db::LoadLayoutOptions stream_opt;
   EXPECT_EQ (tl::to_string (stream_opt.get_options<db::CIFReaderOptions> ().dbu), "0.001");

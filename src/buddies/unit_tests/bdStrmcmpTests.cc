@@ -45,9 +45,9 @@ TEST(1)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref1.gds";
 
-  char *argv[] = { "x", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 
   EXPECT_EQ (cap.captured_text (), "");
 }
@@ -62,9 +62,9 @@ TEST(2A)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
-  char *argv[] = { "x", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "Boxes differ for layer 8/0 in cell RINGO\n"
@@ -91,9 +91,9 @@ TEST(2B)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
-  char *argv[] = { "x", "-s", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-s", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (), "");
 }
@@ -108,9 +108,9 @@ TEST(2C)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
-  char *argv[] = { "x", "-am=8/0", "-as", "-bm=8/0", "-bs", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-am=8/0", "-as", "-bm=8/0", "-bs", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "Boxes differ for layer 8/0 in cell RINGO\n"
@@ -132,9 +132,9 @@ TEST(2D)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
-  char *argv[] = { "x", "-m=1", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-m=1", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "...\n"
@@ -153,9 +153,9 @@ TEST(2E)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
-  char *argv[] = { "x", "-ta=INV2", "-tb=INV2", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-ta=INV2", "-tb=INV2", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 }
 
 TEST(2F)
@@ -168,9 +168,9 @@ TEST(2F)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
-  char *argv[] = { "x", "-u", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-u", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "Bounding boxes differ for cell RINGO, (-1720,-800;25160,3800) vs. (-1700,-800;25160,3800)\n"
@@ -191,9 +191,9 @@ TEST(3A)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref3.gds";
 
-  char *argv[] = { "x", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "Boxes differ for layer 8/0 in cell RINGO\n"
@@ -215,9 +215,9 @@ TEST(3B)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref3.gds";
 
-  char *argv[] = { "x", "-t=0.001", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-t=0.001", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 }
 
 TEST(4A)
@@ -230,9 +230,9 @@ TEST(4A)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref4.gds";
 
-  char *argv[] = { "x", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "Paths differ for layer 3/0 in cell TRANS\n"
@@ -257,9 +257,9 @@ TEST(4B)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref4.gds";
 
-  char *argv[] = { "x", "-p", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-p", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 }
 
 TEST(5A)
@@ -272,9 +272,9 @@ TEST(5A)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref5.gds";
 
-  char *argv[] = { "x", "-u", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-u", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "Instances differ in cell RINGO\n"
@@ -292,9 +292,9 @@ TEST(5B)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref5.gds";
 
-  char *argv[] = { "x", "--expand-arrays", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "--expand-arrays", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 }
 
 TEST(6A)
@@ -307,9 +307,9 @@ TEST(6A)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref6.gds";
 
-  char *argv[] = { "x", "-r", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-r", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "Boxes differ for layer 8/0 in cell RINGO\n"
@@ -331,9 +331,9 @@ TEST(6B)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref6.gds";
 
-  char *argv[] = { "x", "-np", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-np", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 }
 
 TEST(7A)
@@ -346,9 +346,9 @@ TEST(7A)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref7.oas";
 
-  char *argv[] = { "x", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "Layer names differ between layout a and b for layer 3/0:  vs. NAME\n"
@@ -366,9 +366,9 @@ TEST(7B)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref7.oas";
 
-  char *argv[] = { "x", "-nl", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-nl", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 }
 
 TEST(8A)
@@ -381,9 +381,9 @@ TEST(8A)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref8.gds";
 
-  char *argv[] = { "x", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "Cell TRANS is not present in layout b, but in a\n"
@@ -413,9 +413,9 @@ TEST(8B)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref8.gds";
 
-  char *argv[] = { "x", "-c", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-c", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 
   EXPECT_EQ (cap.captured_text (),
     "Cell TRANS in a is renamed to SNART in b\n"
@@ -432,9 +432,9 @@ TEST(9A)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref9.gds";
 
-  char *argv[] = { "x", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "Layer 8/1 is not present in layout b, but in a\n"
@@ -452,9 +452,9 @@ TEST(9B)
   std::string input_b = ut::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref9.gds";
 
-  char *argv[] = { "x", "-l", const_cast<char *> (input_a.c_str ()), const_cast<char *> (input_b.c_str ()) };
+  const char *argv[] = { "x", "-l", input_a.c_str (), input_b.c_str () };
 
-  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), argv), 1);
+  EXPECT_EQ (strmcmp (sizeof (argv) / sizeof (argv[0]), (char **) argv), 1);
 
   EXPECT_EQ (cap.captured_text (),
     "Texts differ for layer 8/1 in cell RINGO\n"

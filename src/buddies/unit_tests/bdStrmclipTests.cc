@@ -36,9 +36,9 @@ TEST(1A)
 
   std::string output = this->tmp_file ();
 
-  char *argv[] = { "x", const_cast<char *> (input.c_str ()), const_cast<char *> (output.c_str ()), "-r=0,-2,9,5", "-r=13,-2,16,3", "-r=13,5,16,7" };
+  const char *argv[] = { "x", input.c_str (), output.c_str (), "-r=0,-2,9,5", "-r=13,-2,16,3", "-r=13,5,16,7" };
 
-  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 
   db::Layout layout;
 
@@ -61,9 +61,9 @@ TEST(1B)
 
   std::string output = this->tmp_file ();
 
-  char *argv[] = { "x", const_cast<char *> (input.c_str ()), const_cast<char *> (output.c_str ()), "-l=100/0" };
+  const char *argv[] = { "x", input.c_str (), output.c_str (), "-l=100/0" };
 
-  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 
   db::Layout layout;
 
@@ -86,9 +86,9 @@ TEST(2)
 
   std::string output = this->tmp_file ();
 
-  char *argv[] = { "x", const_cast<char *> (input.c_str ()), const_cast<char *> (output.c_str ()), "-r=0,-2,9,5", "-t", "INV2", "-x=CLIP_OUT" };
+  const char *argv[] = { "x", input.c_str (), output.c_str (), "-r=0,-2,9,5", "-t", "INV2", "-x=CLIP_OUT" };
 
-  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv[0]), argv), 0);
+  EXPECT_EQ (strmclip (sizeof (argv) / sizeof (argv[0]), (char **) argv), 0);
 
   db::Layout layout;
 

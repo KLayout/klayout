@@ -36,9 +36,9 @@ TEST(1)
 
   std::string output = this->tmp_file ();
 
-  char *argv[] = { "x", const_cast<char *> (input.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", input.c_str (), output.c_str () };
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), argv, db::CIFReaderOptions ().format_name ()), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, db::CIFReaderOptions ().format_name ()), 0);
 
   db::Layout layout;
 
@@ -59,9 +59,9 @@ TEST(2)
 
   std::string output = this->tmp_file ();
 
-  char *argv[] = { "x", const_cast<char *> (input.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", input.c_str (), output.c_str () };
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), argv, db::DXFReaderOptions ().format_name ()), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, db::DXFReaderOptions ().format_name ()), 0);
 
   db::Layout layout;
 
@@ -88,9 +88,9 @@ TEST(3)
 
   std::string output = this->tmp_file ();
 
-  char *argv[] = { "x", const_cast<char *> (input.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", input.c_str (), output.c_str () };
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), argv, db::GDS2ReaderOptions ().format_name ()), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, db::GDS2ReaderOptions ().format_name ()), 0);
 
   db::Layout layout;
 
@@ -111,9 +111,9 @@ TEST(4)
 
   std::string output = this->tmp_file ();
 
-  char *argv[] = { "x", const_cast<char *> (input.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", input.c_str (), output.c_str () };
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), argv, db::GDS2ReaderOptions ().format_name () + "Text"), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, db::GDS2ReaderOptions ().format_name () + "Text"), 0);
 
   db::Layout layout;
 
@@ -134,9 +134,9 @@ TEST(5)
 
   std::string output = this->tmp_file ();
 
-  char *argv[] = { "x", const_cast<char *> (input.c_str ()), const_cast<char *> (output.c_str ()) };
+  const char *argv[] = { "x", input.c_str (), output.c_str () };
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), argv, db::OASISReaderOptions ().format_name ()), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, db::OASISReaderOptions ().format_name ()), 0);
 
   db::Layout layout;
 

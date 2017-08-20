@@ -532,3 +532,37 @@ TEST(8)
   v = e.parse ("var l = Layout.new(); l.create_cell('TOP'); var c = l.top_cell; l._destroy; c._destroyed").execute ();
   EXPECT_EQ (v.to_string (), std::string ("true"));
 }
+
+namespace
+{
+
+class CollectFunction
+  : public tl::EvalFunction
+{
+public:
+  virtual void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, const std::vector<tl::Variant> &args) const
+  {
+    out = tl::Variant ();
+    if (args.size () > 0) {
+      values.push_back (args.front ().to_double ());
+    }
+  }
+
+  mutable std::vector<double> values;
+};
+
+}
+
+TEST(9)
+{
+  tl::Eval e;
+  CollectFunction *collect_func = new CollectFunction ();
+  e.define_function ("put", collect_func);
+
+  tl::Variant v;
+  v = e.parse ("var x=Region.new(Box.new(0,0,100,100)); put(x.area); x=x.sized(10); put(x.area); x=x.sized(10); put(x.area);").execute ();
+  EXPECT_EQ (collect_func->values.size (), size_t (3));
+  EXPECT_EQ (collect_func->values[0], 10000);
+  EXPECT_EQ (collect_func->values[1], 14400);
+  EXPECT_EQ (collect_func->values[2], 19600);
+}

@@ -9,7 +9,8 @@ SOURCES = \
   bdConverterTests.cc \
     bdStrm2txtTests.cc \
     bdStrmclipTests.cc \
-    bdStrmcmpTests.cc
+    bdStrmcmpTests.cc \
+    bdStrmxorTests.cc \
 
 
 INCLUDEPATH += ../src/bd

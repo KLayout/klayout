@@ -26,10 +26,13 @@
 #include "dbReader.h"
 #include "dbWriter.h"
 #include "dbSaveLayoutOptions.h"
+#include "gsiExpression.h"
 #include "tlCommandLineParser.h"
 
 BD_PUBLIC int strmxor (int argc, char *argv[])
 {
+  gsi::initialize_expressions ();
+
   bd::GenericReaderOptions generic_reader_options_a;
   generic_reader_options_a.set_prefix ("a");
   generic_reader_options_a.set_long_prefix ("a-");
@@ -56,7 +59,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   cmd << tl::arg ("input_a",                   &infile_a,   "The first input file (any format, may be gzip compressed)")
       << tl::arg ("input_b",                   &infile_b,   "The second input file (any format, may be gzip compressed)")
       << tl::arg ("?output",                   &output,     "The output file to which the XOR differences are written",
-                  "This argument is optional. If not given, the exit status along indicates whether the layouts "
+                  "This argument is optional. If not given, the exit status alone will indicate whether the layouts "
                   "are identical or not."
                  )
       << tl::arg ("-ta|--top-a=name",          &top_a,      "Specifies the cell to take as top cell from the first layout",
@@ -67,7 +70,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
       << tl::arg ("-tb|--top-b=name",          &top_b,      "Specifies the cell to take as top cell from the second layout",
                   "See --top-a for details."
                  )
-      << tl::arg ("-s|--silent",               &silent,     "Enables silent mode",
+      << tl::arg ("-s|--silent",               &silent,     "Silent mode",
                   "In silent mode, no summary is printed, but the exit code indicates whether "
                   "the layouts are the same (0) or differences exist (> 0)."
                  )
@@ -185,9 +188,22 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   proc.set_dbu (std::min (layout_a.dbu (), layout_b.dbu ()));
   proc.set_threads (std::max (1, threads));
   if (tile_size > db::epsilon) {
+    if (tl::verbosity () >= 20) {
+      tl::log << "Tile size: " << tile_size;
+    }
     proc.tile_size (tile_size, tile_size);
   }
+
   proc.tile_border (tolerances.back () * 2.0, tolerances.back () * 2.0);
+  if (tl::verbosity () >= 20) {
+    tl::log << "Tile border: " << tolerances.back () * 2.0;
+  }
+
+  if (tl::verbosity () >= 20) {
+    tl::log << "Database unit: " << proc.dbu ();
+    tl::log << "Threads: " << threads;
+    tl::log << "Layer bump for tolerance: " << tolerance_bump;
+  }
 
   db::Layout output_layout;
   output_layout.dbu (proc.dbu ());
@@ -246,12 +262,17 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
         proc.output (out, output_layout, output_top, output_layer);
 
         if (*t > db::epsilon) {
-          expr += "x=x.sized(-int(" + tl::to_string (*t) + "/_dbu)/2).sized(int(" + tl::to_string (*t) + "/_dbu)/2); ";
+          expr += "x=x.sized(-round(" + tl::to_string (*t) + "/_dbu)/2).sized(round(" + tl::to_string (*t) + "/_dbu)/2); ";
         }
         expr += "_output(" + out + ",x); ";
 
+        ++tol_index;
+
       }
 
+      if (tl::verbosity () >= 20) {
+        tl::log << "Running expression: '" << expr << "' for layer " << ll->first;
+      }
       proc.queue (expr);
 
     }

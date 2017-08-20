@@ -35,6 +35,13 @@ namespace gsi
 void GSI_PUBLIC 
 initialize ()
 {
+  //  Allow duplicate initialization without any effect
+  static bool s_is_initialized = false;
+  if (s_is_initialized) {
+    return;
+  }
+  s_is_initialized = true;
+
   tl::SelfTimer timer (tl::verbosity () >= 21, "Initializing script environment");
 
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {

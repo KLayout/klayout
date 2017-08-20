@@ -29,50 +29,10 @@
 
 BD_PUBLIC int strmcmp (int argc, char *argv[]);
 
-class CaptureChannel : public tl::Channel
-{
-public:
-  CaptureChannel ()
-  {
-    //  .. nothing yet ..
-  }
-
-  std::string captured_text () const
-  {
-    return m_text.str ();
-  }
-
-  void clear ()
-  {
-    m_text.str (std::string ());
-  }
-
-protected:
-  virtual void puts (const char *s)
-  {
-    m_text << s;
-  }
-
-  virtual void endl ()
-  {
-    m_text << "\n";
-  }
-
-  virtual void end () { }
-  virtual void begin () { }
-
-private:
-  std::ostringstream m_text;
-};
-
 
 TEST(1)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   tl::info << "Self test";
   EXPECT_EQ (cap.captured_text (), "Self test\n");
@@ -94,11 +54,7 @@ TEST(1)
 
 TEST(2A)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -127,11 +83,7 @@ TEST(2A)
 
 TEST(2B)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -148,11 +100,7 @@ TEST(2B)
 
 TEST(2C)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -176,11 +124,7 @@ TEST(2C)
 
 TEST(2D)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -201,11 +145,7 @@ TEST(2D)
 
 TEST(2E)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -220,11 +160,7 @@ TEST(2E)
 
 TEST(2F)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -247,11 +183,7 @@ TEST(2F)
 
 TEST(3A)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -275,11 +207,7 @@ TEST(3A)
 
 TEST(3B)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -294,11 +222,7 @@ TEST(3B)
 
 TEST(4A)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -325,11 +249,7 @@ TEST(4A)
 
 TEST(4B)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -344,11 +264,7 @@ TEST(4B)
 
 TEST(5A)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -368,11 +284,7 @@ TEST(5A)
 
 TEST(5B)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -387,11 +299,7 @@ TEST(5B)
 
 TEST(6A)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -415,11 +323,7 @@ TEST(6A)
 
 TEST(6B)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -434,11 +338,7 @@ TEST(6B)
 
 TEST(7A)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -458,11 +358,7 @@ TEST(7A)
 
 TEST(7B)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -477,11 +373,7 @@ TEST(7B)
 
 TEST(8A)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -513,11 +405,7 @@ TEST(8A)
 
 TEST(8B)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -536,11 +424,7 @@ TEST(8B)
 
 TEST(9A)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
@@ -560,11 +444,7 @@ TEST(9A)
 
 TEST(9B)
 {
-  CaptureChannel cap;
-
-  tl::warn.add (&cap, false);
-  tl::info.add (&cap, false);
-  tl::error.add (&cap, false);
+  ut::CaptureChannel cap;
 
   std::string input_a = ut::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";

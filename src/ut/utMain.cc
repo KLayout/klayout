@@ -140,6 +140,36 @@ void print_error (const std::string &s)
 }
 
 // ------------------------------------------------
+//  CaptureChannel implementation
+
+CaptureChannel::CaptureChannel ()
+{
+  tl::info.add (this, false);
+  tl::error.add (this, false);
+  tl::warn.add (this, false);
+}
+
+void CaptureChannel::puts (const char *s)
+{
+  m_text << s;
+}
+
+void CaptureChannel::endl ()
+{
+  m_text << "\n";
+}
+
+void CaptureChannel::end ()
+{
+  //  .. nothing yet ..
+}
+
+void CaptureChannel::begin ()
+{
+  //  .. nothing yet ..
+}
+
+// ------------------------------------------------
 //  tl::Channel implementations for redirecting the log output
 
 const char *ANSI_RED = "\033[31;1m";
@@ -842,7 +872,7 @@ main_cont (int argc, char **argv)
     if (ut_file.exists () && ut_file.isReadable ()) {
 
       std::string pp = tl::to_string (ut_file.absoluteFilePath ());
-      tl::log << "Loading plugin unit tests " << pp;
+      tl::log << "Loading unit tests " << pp;
 
       //  NOTE: since we are using a different suffix ("*.ut"), we can't use QLibrary.
 #ifdef _WIN32

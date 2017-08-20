@@ -133,6 +133,102 @@ struct Exception
 };
 
 /**
+ *  @brief A utility class to capture the warning, error and info channels
+ *
+ *  Instantiate this class inside a test. Then run the test and finally
+ *  obtain the collected output with CaptureChannel::captured_text().
+ */
+class UT_PUBLIC CaptureChannel : public tl::Channel
+{
+public:
+  CaptureChannel ();
+
+  std::string captured_text () const
+  {
+    return m_text.str ();
+  }
+
+  void clear ()
+  {
+    m_text.str (std::string ());
+  }
+
+protected:
+  virtual void puts (const char *s);
+  virtual void endl ();
+  virtual void end ();
+  virtual void begin ();
+
+private:
+  std::ostringstream m_text;
+};
+
+/**
+ *  @brief A generic compare operator
+ */
+template <class X, class Y>
+inline bool equals (const X &a, const Y &b)
+{
+  return a == b;
+}
+
+/**
+ *  @brief A specialization of the compare operator for doubles
+ */
+UT_PUBLIC bool equals (double a, double b);
+
+/**
+ *  @brief Specialization of comparison of pointers vs. integers (specifically "0")
+ */
+template <class X>
+inline bool equals (X *a, int b)
+{
+  return a == (X *) size_t (b);
+}
+
+/**
+ *  @brief A specialization of comparison of double vs "anything"
+ */
+template <class Y>
+inline bool equals (double a, const Y &b)
+{
+  return equals (a, double (b));
+}
+
+/**
+ *  @brief A specialization of comparison of "anything" vs. double
+ */
+template <class X>
+inline bool equals (const X &a, double b)
+{
+  return equals (double (a), b);
+}
+
+/**
+ *  @brief A specialization of the compare operator for const char *
+ */
+inline bool equals (const char *a, const char *b)
+{
+  return equals (std::string (a), std::string (b));
+}
+
+/**
+ *  @brief A specialization of the compare operator for std::string vs. const char *
+ */
+inline bool equals (const std::string &a, const char *b)
+{
+  return equals (a, std::string (b));
+}
+
+/**
+ *  @brief A specialization of the compare operator for std::string vs. const char *
+ */
+inline bool equals (const char *a, const std::string &b)
+{
+  return equals (std::string (a), b);
+}
+
+/**
  *  @brief The base class for tests
  */
 struct UT_PUBLIC TestBase
@@ -348,6 +444,19 @@ struct UT_PUBLIC TestBase
     diff (file, line, msg, std::string (subject), std::string (ref));
   }
 
+  /**
+   *  @brief Main entry point for the compare feature (EXPECT_EQ and EXPECT_NE)
+   */
+  template <class T1, class T2>
+  void eq_helper (bool eq, const T1 &a, const T2 &b, const char *what_expr, const char *equals_expr, const char *file, int line)
+  {
+    if (ut::equals (a, b) != eq) {
+      std::ostringstream sstr;
+      sstr << what_expr << " does not equal " << equals_expr;
+      diff (file, line, sstr.str (), a, b);
+    }
+  }
+
 private:
   virtual void execute (ut::TestBase *_this) throw (tl::Exception) = 0;
 
@@ -391,71 +500,6 @@ private:
   std::vector <ut::TestBase *> m_tests;
 };
 
-/**
- *  @brief A generic compare operator
- */
-template <class X, class Y>
-inline bool equals (const X &a, const Y &b)
-{
-  return a == b;
-}
-
-/**
- *  @brief A specialization of the compare operator for doubles
- */
-UT_PUBLIC bool equals (double a, double b);
-
-/**
- *  @brief Specialization of comparison of pointers vs. integers (specifically "0")
- */
-template <class X>
-inline bool equals (X *a, int b)
-{
-  return a == (X *) size_t (b);
-}
-
-/**
- *  @brief A specialization of comparison of double vs "anything"
- */
-template <class Y>
-inline bool equals (double a, const Y &b)
-{
-  return equals (a, double (b));
-}
-
-/**
- *  @brief A specialization of comparison of "anything" vs. double
- */
-template <class X>
-inline bool equals (const X &a, double b)
-{
-  return equals (double (a), b);
-}
-
-/**
- *  @brief A specialization of the compare operator for const char *
- */
-inline bool equals (const char *a, const char *b)
-{
-  return equals (std::string (a), std::string (b));
-}
-
-/**
- *  @brief A specialization of the compare operator for std::string vs. const char *
- */
-inline bool equals (const std::string &a, const char *b)
-{
-  return equals (a, std::string (b));
-}
-
-/**
- *  @brief A specialization of the compare operator for std::string vs. const char *
- */
-inline bool equals (const char *a, const std::string &b)
-{
-  return equals (std::string (a), b);
-}
-
 } // namespace ut
 
 #define TEST(NAME) \
@@ -472,19 +516,11 @@ struct TestImpl##NAME \
 
 #define EXPECT_EQ(WHAT,EQUALS) \
   _this->checkpoint (__FILE__, __LINE__); \
-  if (! ut::equals ((WHAT), (EQUALS))) { \
-    std::ostringstream sstr; \
-    sstr << #WHAT << " does not equal " << #EQUALS; \
-    _this->diff (__FILE__, __LINE__, sstr.str (), (WHAT), (EQUALS)); \
-  } 
+  _this->eq_helper (true, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
 
 #define EXPECT_NE(WHAT,EQUALS) \
   _this->checkpoint (__FILE__, __LINE__); \
-  if (ut::equals ((WHAT), (EQUALS))) { \
-    std::ostringstream sstr; \
-    sstr << #WHAT << " equals " << #EQUALS; \
-    _this->raise (__FILE__, __LINE__, sstr.str ()); \
-  } 
+  _this->eq_helper (false, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
 
 #define EXPECT(WHAT) \
   _this->checkpoint (__FILE__, __LINE__); \

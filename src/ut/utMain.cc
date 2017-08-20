@@ -879,13 +879,15 @@ main_cont (int argc, char **argv)
       //  there is no "dlopen" on mingw, so we need to emulate it.
       HINSTANCE handle = LoadLibraryW ((const wchar_t *) tl::to_qstring (pp).constData ());
       if (! handle) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Unable to load plugin tests: %s with error message: %s ")), pp, GetLastError ());
+        std::cerr << tl::sprintf ("Unable to load plugin tests: %s with error message: %s", pp.c_str (), GetLastError ()) << std::endl;
+        exit (1);
       }
 #else
       void *handle;
       handle = dlopen (tl::string_to_system (pp).c_str (), RTLD_LAZY);
       if (! handle) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Unable to load plugin tests: %s")), pp);
+        std::cerr << tl::sprintf ("Unable to load plugin tests: %s", pp.c_str ()) << std::endl;
+        exit (1);
       }
 #endif
 

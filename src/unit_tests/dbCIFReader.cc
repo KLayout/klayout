@@ -128,12 +128,12 @@ static void run_test (ut::TestBase *_this, const char *file, const char *file_au
     reader.read (layout_au);
   }
 
-  bool equal = db::compare_layouts (layout2, layout_au, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 0);
+  bool equal = db::compare_layouts (layout2, layout_au, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 1);
   if (! equal) {
     _this->raise (tl::sprintf ("Compare failed after reading - see %s vs %s\n", tmp_gds_file, file_au));
   }
 
-  equal = db::compare_layouts (layout, layout2_cif, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 0);
+  equal = db::compare_layouts (layout, layout2_cif, db::layout_diff::f_boxes_as_polygons | db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 1);
   if (! equal) {
     _this->raise (tl::sprintf ("Compare failed after writing - see %s vs %s\n", file, tmp_cif_file));
   }

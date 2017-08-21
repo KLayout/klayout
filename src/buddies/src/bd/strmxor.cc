@@ -29,6 +29,98 @@
 #include "gsiExpression.h"
 #include "tlCommandLineParser.h"
 
+class CountingInserter
+{
+public:
+  CountingInserter ()
+    : m_count (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  template <class T>
+  void operator() (const T & /*t*/)
+  {
+    m_count += 1;
+  }
+
+  size_t count () const
+  {
+    return m_count;
+  }
+
+private:
+  size_t m_count;
+};
+
+class CountingReceiver
+  : public db::TileOutputReceiver
+{
+public:
+  CountingReceiver ()
+    : m_count (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void put (size_t /*ix*/, size_t /*iy*/, const db::Box &tile, size_t /*id*/, const tl::Variant &obj, double /*dbu*/, const db::ICplxTrans & /*trans*/, bool clip)
+  {
+    CountingInserter inserter;
+    db::insert_var (inserter, obj, tile, clip);
+    m_count += inserter.count ();
+  }
+
+  size_t count () const
+  {
+    return m_count;
+  }
+
+private:
+  size_t m_count;
+};
+
+struct ResultDescriptor
+{
+  ResultDescriptor ()
+    : layer_a (-1), layer_b (-1), layer_output (-1), layout (0), top_cell (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  tl::shared_ptr<CountingReceiver> counter;
+  int layer_a;
+  int layer_b;
+  int layer_output;
+  db::Layout *layout;
+  db::cell_index_type top_cell;
+
+  size_t count () const
+  {
+    if (layout && layer_output >= 0) {
+      //  NOTE: this assumes the output is flat
+      tl_assert (layout->cells () == 1);
+      return layout->cell (top_cell).shapes (layer_output).size ();
+    } else if (counter) {
+      return counter->count ();
+    } else {
+      return 0;
+    }
+  }
+
+  bool is_empty () const
+  {
+    if (layout && layer_output >= 0) {
+      //  NOTE: this assumes the output is flat
+      tl_assert (layout->cells () == 1);
+      return layout->cell (top_cell).shapes (layer_output).empty ();
+    } else if (counter) {
+      return counter->count () == 0;
+    } else {
+      return true;
+    }
+  }
+};
+
 BD_PUBLIC int strmxor (int argc, char *argv[])
 {
   gsi::initialize_expressions ();
@@ -47,6 +139,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
   std::string top_a, top_b;
   bool dont_summarize_missing_layers = false;
   bool silent = false;
+  bool no_summary = false;
   std::vector<double> tolerances;
   int tolerance_bump = 10000;
   int threads = 1;
@@ -74,6 +167,7 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
                   "In silent mode, no summary is printed, but the exit code indicates whether "
                   "the layouts are the same (0) or differences exist (> 0)."
                  )
+      << tl::arg ("#--no-summary",             &no_summary, "Don't print a summary")
       << tl::arg ("-l|--layer-details",        &dont_summarize_missing_layers, "Treats missing layers as empty",
                   "With this option, missing layers are treated as \"empty\" and the whole layer of the other "
                   "layout is output. Without this option, a message is printed for missing layers instead and the "
@@ -183,8 +277,6 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
     l2l_map.insert (std::make_pair (*(*l).second, std::make_pair (-1, -1))).first->second.second = (*l).first;
   }
 
-  bool result = true;
-
   db::TilingProcessor proc;
   proc.set_dbu (std::min (layout_a.dbu (), layout_b.dbu ()));
   proc.set_threads (std::max (1, threads));
@@ -206,26 +298,45 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
     tl::log << "Layer bump for tolerance: " << tolerance_bump;
   }
 
-  db::Layout output_layout;
-  output_layout.dbu (proc.dbu ());
+  std::auto_ptr<db::Layout> output_layout;
+  db::cell_index_type output_top = 0;
 
-  db::cell_index_type output_top = output_layout.add_cell ("XOR");
+  if (! output.empty ()) {
+    output_layout.reset (new db::Layout ());
+    output_layout->dbu (proc.dbu ());
+    output_top = output_layout->add_cell ("XOR");
+  }
 
-  std::vector<unsigned int> output_layers;
+  std::map<std::pair<int, db::LayerProperties>, ResultDescriptor> results;
+
+  bool result = true;
 
   int index = 1;
 
   for (std::map<db::LayerProperties, std::pair<int, int> >::const_iterator ll = l2l_map.begin (); ll != l2l_map.end (); ++ll) {
 
-    if (ll->second.first < 0 && ! dont_summarize_missing_layers) {
+    if ((ll->second.first < 0 || ll->second.second < 0) && ! dont_summarize_missing_layers) {
 
-      tl::warn << "Layer " << ll->first.to_string () << " is not present in first layout, but in second";
+      if (ll->second.first < 0) {
+        (silent ? tl::log : tl::warn) << "Layer " << ll->first.to_string () << " is not present in first layout, but in second";
+      } else {
+        (silent ? tl::log : tl::warn) << "Layer " << ll->first.to_string () << " is not present in second layout, but in first";
+      }
+
       result = false;
 
-    } else if (ll->second.second < 0 && ! dont_summarize_missing_layers) {
+      int tol_index = 0;
+      for (std::vector<double>::const_iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
 
-      tl::warn << "Layer " << ll->first.to_string () << " is not present in second layout, but in first";
-      result = false;
+        ResultDescriptor &result = results.insert (std::make_pair (std::make_pair (tol_index, ll->first), ResultDescriptor ())).first->second;
+        result.layer_a = ll->second.first;
+        result.layer_b = ll->second.second;
+        result.layout = output_layout.get ();
+        result.top_cell = output_top;
+
+        ++tol_index;
+
+      }
 
     } else {
 
@@ -246,21 +357,30 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
       std::string expr = "var x=" + in_a + "^" + in_b + "; ";
 
-      int tol_index = 1;
+      int tol_index = 0;
       for (std::vector<double>::const_iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
 
-        std::string out = "o" + tl::to_string (index) + "_" + tl::to_string (tol_index);
+        std::string out = "o" + tl::to_string (index) + "_" + tl::to_string (tol_index + 1);
 
         db::LayerProperties lp = ll->first;
         if (lp.layer >= 0) {
-          lp.layer += (tol_index - 1) * tolerance_bump;
+          lp.layer += tol_index * tolerance_bump;
         }
 
-        unsigned int output_layer = output_layout.insert_layer (lp);
-        output_layers.push_back (output_layer);
+        ResultDescriptor &result = results.insert (std::make_pair (std::make_pair (tol_index, ll->first), ResultDescriptor ())).first->second;
+        result.layer_a = ll->second.first;
+        result.layer_b = ll->second.second;
+        result.layout = output_layout.get ();
+        result.top_cell = output_top;
 
-        // @@@ TODO: silent mode
-        proc.output (out, output_layout, output_top, output_layer);
+        if (result.layout) {
+          result.layer_output = result.layout->insert_layer (lp);
+          proc.output (out, *result.layout, result.top_cell, result.layer_output);
+        } else {
+          CountingReceiver *counter = new CountingReceiver ();
+          result.counter = counter;
+          proc.output (out, 0, counter, db::ICplxTrans ());
+        }
 
         if (*t > db::epsilon) {
           expr += "x=x.sized(-round(" + tl::to_string (*t) + "/_dbu)/2).sized(round(" + tl::to_string (*t) + "/_dbu)/2); ";
@@ -284,28 +404,66 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
 
   //  Runs the processor
 
-  proc.execute ("Running XOR");
+  if ((! silent && ! no_summary) || result || output_layout.get ()) {
+    proc.execute ("Running XOR");
+  }
 
-  //  Write the output layout
+  //  Writes the output layout
 
-  if (! output.empty()) {
+  if (output_layout.get ()) {
 
     db::SaveLayoutOptions save_options;
     save_options.set_format_from_filename (output);
 
     tl::OutputStream stream (output);
     db::Writer writer (save_options);
-    writer.write (output_layout, stream);
+    writer.write (*output_layout, stream);
 
   }
 
-  //  Determine the output status based on the output top cell's emptyness
-
-  for (std::vector<unsigned int>::const_iterator l = output_layers.begin (); l != output_layers.end () && result; ++l) {
-    result = output_layout.cell (output_top).bbox (*l).empty ();
+  //  Determines the output status
+  for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = results.begin (); r != results.end () && result; ++r) {
+    result = r->second.is_empty ();
   }
 
-  //  @@@ TODO: print a nice summary unless "silent" is set
+  if (! silent && ! no_summary) {
+
+    if (result) {
+      tl::info << "No differences found";
+    } else {
+
+      const char *line_format = "  %-10s %s";
+      const char *sep = "  -------------------------------------------------------";
+
+      tl::info << "Result summary (layers without differences are not shown):" << tl::endl;
+      tl::info << tl::sprintf (line_format, "Layer", "Differences (shape count)") << tl::endl << sep;
+
+      int ti = -1;
+      for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = results.begin (); r != results.end (); ++r) {
+
+        if (r->first.first != ti) {
+          ti = r->first.first;
+          if (tolerances[ti] > db::epsilon) {
+            tl::info << tl::endl << "Tolerance " << tl::micron_to_string (tolerances[ti]) << ":" << tl::endl;
+            tl::info << tl::sprintf (line_format, "Layer", "Differences (shape count)") << tl::endl << sep;
+          }
+        }
+
+        if (r->second.layer_a < 0 && ! dont_summarize_missing_layers) {
+          tl::info << tl::sprintf (line_format, r->first.second.to_string (), "(no such layer in first layout)");
+        } else if (r->second.layer_b < 0 && ! dont_summarize_missing_layers) {
+          tl::info << tl::sprintf (line_format, r->first.second.to_string (), "(no such layer in second layout)");
+        } else if (! r->second.is_empty ()) {
+          tl::info << tl::sprintf (line_format, r->first.second.to_string (), tl::to_string (r->second.count ()));
+        }
+
+      }
+
+      tl::info << "";
+
+    }
+
+  }
 
   return result ? 0 : 1;
 }

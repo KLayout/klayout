@@ -66,6 +66,7 @@ section
  
   file strm*.exe
   file *.dll
+  file strm*.exe
   file .*-paths.txt
   file /r audio
   file /r generic

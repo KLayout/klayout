@@ -44,9 +44,6 @@ equals(HAVE_QT5, "1") {
   CONFIG += designer 
 }
 
-target.path = $$PREFIX
-INSTALLS += target
-
 # only support the required symbols for shared object load performance
 win32 {
   QMAKE_LFLAGS += -Wl,--exclude-all-symbols

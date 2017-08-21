@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_rba
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_RBA_LIBRARY
-
-TEMPLATE = lib
 
 SOURCES = rba.cc \
     rbaConvert.cc \

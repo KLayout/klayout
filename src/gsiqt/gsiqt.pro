@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_gsiqt
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_GSIQT_LIBRARY
-
-TEMPLATE = lib
 
 # NOTE: db is required since some bridges to db are provided (i.e db::Polygon)
 INCLUDEPATH += ../tl ../gsi ../db ../gsiqt

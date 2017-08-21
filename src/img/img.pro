@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_img
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_IMG_LIBRARY
-
-TEMPLATE = lib
 
 HEADERS = \
   imgLandmarksDialog.h \

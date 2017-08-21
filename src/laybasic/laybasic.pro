@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_laybasic
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_LAYBASIC_LIBRARY
-
-TEMPLATE = lib
 
 FORMS = \
   AlignCellOptionsDialog.ui \

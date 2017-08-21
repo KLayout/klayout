@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_rdb
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_RDB_LIBRARY
-
-TEMPLATE = lib
 
 FORMS = \
 

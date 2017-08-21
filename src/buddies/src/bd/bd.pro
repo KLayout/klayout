@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/../../..
 TARGET = klayout_bd
 
 include($$PWD/../../../klayout.pri)
+include($$PWD/../../../lib.pri)
 
 DEFINES += MAKE_BD_LIBRARY
-
-TEMPLATE = lib
 
 SOURCES = \
   bdInit.cc \

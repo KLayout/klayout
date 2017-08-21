@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_rbastub
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_RBA_LIBRARY
-
-TEMPLATE = lib
 
 HEADERS = rbaCommon.h
 

@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_pya
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_PYA_LIBRARY
-
-TEMPLATE = lib
 
 SOURCES = \
   pya.cc \

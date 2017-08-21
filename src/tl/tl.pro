@@ -3,12 +3,11 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_tl
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_TL_LIBRARY
 
 LIBS += -lz
-
-TEMPLATE = lib
 
 FORMS = \
   PasswordDialog.ui

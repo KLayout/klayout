@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_lib
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_LIB_LIBRARY
-
-TEMPLATE = lib
 
 HEADERS = \
   libBasicArc.h \

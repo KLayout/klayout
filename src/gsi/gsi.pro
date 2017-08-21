@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_gsi
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_GSI_LIBRARY
-
-TEMPLATE = lib
 
 SOURCES = \
   gsi.cc \

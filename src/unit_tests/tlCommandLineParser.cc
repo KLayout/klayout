@@ -43,23 +43,23 @@ TEST(1)
       << tl::arg ("-f|--flong=value", &f, "");
 
   {
-    char *argv[] = { "x", "y" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "y" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (a, "y");
   EXPECT_EQ (b, 0);
 
   {
-    char *argv[] = { "x", "z", "17" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "z", "17" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (a, "z");
   EXPECT_EQ (b, 17);
 
   b = 0;
   {
-    char *argv[] = { "x", "u", "-c" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-c" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (a, "u");
   EXPECT_EQ (b, 0);
@@ -68,24 +68,24 @@ TEST(1)
   b = 0;
   c = true;
   {
-    char *argv[] = { "x", "u", "-cc" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-cc" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (a, "u");
   EXPECT_EQ (b, 0);
   EXPECT_EQ (c, false);
 
   {
-    char *argv[] = { "x", "u", "-c", "-cc" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-c", "-cc" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (c, false);
 
   b = 0;
   c = false;
   {
-    char *argv[] = { "x", "u", "-c", "-p=21" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-c", "-p=21" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (a, "u");
   EXPECT_EQ (b, 0);
@@ -95,8 +95,8 @@ TEST(1)
   b = 0;
   c = false;
   {
-    char *argv[] = { "x", "u", "-p", "22", "-c" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-p", "22", "-c" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (a, "u");
   EXPECT_EQ (b, 0);
@@ -105,31 +105,31 @@ TEST(1)
 
   e = false;
   {
-    char *argv[] = { "x", "u", "--plong", "23" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "--plong", "23" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (a, "u");
   EXPECT_EQ (d, 23);
   EXPECT_EQ (e, false);
 
   {
-    char *argv[] = { "x", "u", "--plong=24", "--elong" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "--plong=24", "--elong" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (a, "u");
   EXPECT_EQ (d, 24);
   EXPECT_EQ (e, true);
 
   {
-    char *argv[] = { "x", "u", "-c", "-f=foo" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-c", "-f=foo" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (a, "u");
   EXPECT_EQ (f, "foo");
 
   {
-    char *argv[] = { "x", "u", "--flong", "bar" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "--flong", "bar" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (a, "u");
   EXPECT_EQ (f, "bar");
@@ -174,23 +174,23 @@ TEST(2)
       << tl::arg ("-f|--flong=value", &v, &Values::set_f, "");
 
   {
-    char *argv[] = { "x", "y" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "y" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (v.a, "y");
   EXPECT_EQ (v.b, 0);
 
   {
-    char *argv[] = { "x", "z", "17" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "z", "17" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (v.a, "z");
   EXPECT_EQ (v.b, 17);
 
   v.b = 0;
   {
-    char *argv[] = { "x", "u", "-c" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-c" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (v.a, "u");
   EXPECT_EQ (v.b, 0);
@@ -199,24 +199,24 @@ TEST(2)
   v.b = 0;
   v.c = true;
   {
-    char *argv[] = { "x", "u", "-cc" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-cc" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (v.a, "u");
   EXPECT_EQ (v.b, 0);
   EXPECT_EQ (v.c, false);
 
   {
-    char *argv[] = { "x", "u", "-c", "-cc" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-c", "-cc" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (v.c, false);
 
   v.b = 0;
   v.c = false;
   {
-    char *argv[] = { "x", "u", "-c", "-p=21" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-c", "-p=21" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (v.a, "u");
   EXPECT_EQ (v.b, 0);
@@ -226,8 +226,8 @@ TEST(2)
   v.b = 0;
   v.c = false;
   {
-    char *argv[] = { "x", "u", "-p", "22", "-c" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-p", "22", "-c" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (v.a, "u");
   EXPECT_EQ (v.b, 0);
@@ -236,31 +236,31 @@ TEST(2)
 
   v.e = false;
   {
-    char *argv[] = { "x", "u", "--plong", "23" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "--plong", "23" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (v.a, "u");
   EXPECT_EQ (v.d, 23);
   EXPECT_EQ (v.e, false);
 
   {
-    char *argv[] = { "x", "u", "--plong=24", "--elong" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "--plong=24", "--elong" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (v.a, "u");
   EXPECT_EQ (v.d, 24);
   EXPECT_EQ (v.e, true);
 
   {
-    char *argv[] = { "x", "u", "-c", "-f=foo" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "-c", "-f=foo" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (v.a, "u");
   EXPECT_EQ (v.f, "foo");
 
   {
-    char *argv[] = { "x", "u", "--flong", "bar" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "u", "--flong", "bar" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (v.a, "u");
   EXPECT_EQ (v.f, "bar");
@@ -277,8 +277,8 @@ TEST(3)
       << tl::arg ("-b", &b, "");
 
   {
-    char *argv[] = { "x", "r,u,v" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "r,u,v" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (int (a.size ()), 3);
   EXPECT_EQ (a[0], "r");
@@ -288,8 +288,8 @@ TEST(3)
 
   a.clear ();
   {
-    char *argv[] = { "x", "\"r,u\",v" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "\"r,u\",v" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (int (a.size ()), 2);
   EXPECT_EQ (a[0], "r,u");
@@ -298,8 +298,8 @@ TEST(3)
 
   a.clear ();
   {
-    char *argv[] = { "x", "'\"'", "-b=1,5,-13" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "'\"'", "-b=1,5,-13" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (int (a.size ()), 1);
   EXPECT_EQ (a[0], "\"");
@@ -311,8 +311,8 @@ TEST(3)
   a.clear ();
   b.clear ();
   {
-    char *argv[] = { "x", "", "-b", "-13,21" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "", "-b", "-13,21" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (int (a.size ()), 0);
   EXPECT_EQ (int (b.size ()), 2);
@@ -331,8 +331,8 @@ TEST(4)
       << tl::arg ("*-b|--blong", &b, "");
 
   {
-    char *argv[] = { "x", "-a", "r,u,v" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "-a", "r,u,v" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (int (a.size ()), 1);
   EXPECT_EQ (a[0], "r,u,v");
@@ -341,8 +341,8 @@ TEST(4)
   a.clear ();
   b.clear ();
   {
-    char *argv[] = { "x", "-b", "1", "-a=r", "-a", "u", "--along=v", "--blong=2" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "-b", "1", "-a=r", "-a", "u", "--along=v", "--blong=2" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (int (a.size ()), 3);
   EXPECT_EQ (int (b.size ()), 2);
@@ -366,8 +366,8 @@ TEST(5)
       << tl::arg ("?*c", &c, "");
 
   {
-    char *argv[] = { "x", "y", "r,u,v" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "y", "r,u,v" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (int (b.size ()), 3);
   EXPECT_EQ (int (c.size ()), 0);
@@ -381,8 +381,8 @@ TEST(5)
   c.clear ();
 
   {
-    char *argv[] = { "x", "y", "r,u,v", "a,b", "c", "d" };
-    cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+    const char *argv[] = { "x", "y", "r,u,v", "a,b", "c", "d" };
+    cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
   }
   EXPECT_EQ (int (b.size ()), 3);
   EXPECT_EQ (int (c.size ()), 3);

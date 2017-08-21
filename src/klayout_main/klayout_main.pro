@@ -3,9 +3,9 @@ DESTDIR = $$OUT_PWD/..
 
 include($$PWD/../klayout.pri)
 
-TEMPLATE = app
-
 TARGET = klayout
+
+include($$PWD/../app.pri)
 
 HEADERS = \
 

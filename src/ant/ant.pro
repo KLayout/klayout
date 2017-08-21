@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_ant
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_ANT_LIBRARY
-
-TEMPLATE = lib
 
 HEADERS = \
   antConfig.h \

@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_ext
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_EXT_LIBRARY
-
-TEMPLATE = lib
 
 HEADERS += \
   extBooleanOperationsDialogs.h \

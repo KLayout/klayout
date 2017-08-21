@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_lay
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_LAY_LIBRARY
-
-TEMPLATE = lib
 
 HEADERS = \
     layApplication.h \

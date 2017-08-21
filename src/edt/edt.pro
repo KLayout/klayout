@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_edt
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_EDT_LIBRARY
-
-TEMPLATE = lib
 
 HEADERS = \
   edtConfig.h \

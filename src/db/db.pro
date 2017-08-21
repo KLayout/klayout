@@ -3,10 +3,9 @@ DESTDIR = $$OUT_PWD/..
 TARGET = klayout_db
 
 include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_DB_LIBRARY
-
-TEMPLATE = lib
 
 SOURCES = \
   dbArray.cc \

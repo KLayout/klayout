@@ -46,7 +46,7 @@ class TilingProcessor;
  *  @brief A receiver for the output data 
  */
 class DB_PUBLIC TileOutputReceiver
-  : public gsi::ObjectBase
+  : public gsi::ObjectBase, public tl::Object
 {
 public:
   /**
@@ -623,6 +623,7 @@ private:
 
   struct InputSpec
   {
+    InputSpec () : region (false), merged_semantics (false) { }
     std::string name;
     db::RecursiveShapeIterator iter;
     db::ICplxTrans trans;
@@ -632,9 +633,10 @@ private:
 
   struct OutputSpec
   {
+    OutputSpec () : id (0) { }
     std::string name;
     size_t id;
-    db::TileOutputReceiver *receiver;
+    tl::shared_ptr<db::TileOutputReceiver> receiver;
     db::ICplxTrans trans;
   };
 

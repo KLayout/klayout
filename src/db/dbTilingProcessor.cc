@@ -573,9 +573,6 @@ TilingProcessor::input (const std::string &name, const db::RecursiveShapeIterato
 
 TilingProcessor::~TilingProcessor ()
 {
-  for (std::vector<OutputSpec>::const_iterator o = m_outputs.begin (); o != m_outputs.end (); ++o) {
-    delete o->receiver;
-  }
   m_outputs.clear ();
 }
 
@@ -727,7 +724,7 @@ TilingProcessor::receiver (const std::vector<tl::Variant> &args)
 
   //  Create another variable with a reference to the receiver object
   const tl::VariantUserClassBase *var_cls = gsi::cls_decl<TileOutputReceiver> ()->var_cls (true /*const*/);
-  return tl::Variant (m_outputs[index].receiver, var_cls, false);
+  return tl::Variant (m_outputs[index].receiver.get (), var_cls, false);
 }
 
 void 
@@ -869,9 +866,11 @@ TilingProcessor::execute (const std::string &desc)
 
     try {
 
-      for (std::vector<OutputSpec>::const_iterator o = m_outputs.begin (); o != m_outputs.end (); ++o) {
-        o->receiver->set_processor (this);
-        o->receiver->begin (ntiles_w, ntiles_h, db::DPoint (l, b), tile_width, tile_height, frame);
+      for (std::vector<OutputSpec>::iterator o = m_outputs.begin (); o != m_outputs.end (); ++o) {
+        if (o->receiver) {
+          o->receiver->set_processor (this);
+          o->receiver->begin (ntiles_w, ntiles_h, db::DPoint (l, b), tile_width, tile_height, frame);
+        }
       }
 
       job.start ();
@@ -881,15 +880,19 @@ TilingProcessor::execute (const std::string &desc)
         job.wait (100);
       }
 
-      for (std::vector<OutputSpec>::const_iterator o = m_outputs.begin (); o != m_outputs.end (); ++o) {
-        o->receiver->finish (!job.has_error ());
-        o->receiver->set_processor (0);
+      for (std::vector<OutputSpec>::iterator o = m_outputs.begin (); o != m_outputs.end (); ++o) {
+        if (o->receiver) {
+          o->receiver->finish (!job.has_error ());
+          o->receiver->set_processor (0);
+        }
       }
 
     } catch (...) {
-      for (std::vector<OutputSpec>::const_iterator o = m_outputs.begin (); o != m_outputs.end (); ++o) {
-        o->receiver->finish (false);
-        o->receiver->set_processor (0);
+      for (std::vector<OutputSpec>::iterator o = m_outputs.begin (); o != m_outputs.end (); ++o) {
+        if (o->receiver) {
+          o->receiver->finish (false);
+          o->receiver->set_processor (0);
+        }
       }
       throw;
     }

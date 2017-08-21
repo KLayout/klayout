@@ -228,7 +228,7 @@ gsi::Class<TileOutputReceiver_Impl> decl_TileOutputReceiver (decl_TileOutputRece
 
 static void tp_output (db::TilingProcessor *proc, const std::string &name, db::TileOutputReceiver *rec)
 {
-  rec->keep ();
+  rec->gsi::ObjectBase::keep ();
   proc->output (name, 0, rec, db::ICplxTrans ());
 }
 

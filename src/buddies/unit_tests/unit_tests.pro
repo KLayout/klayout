@@ -19,5 +19,4 @@ SOURCES = \
 INCLUDEPATH += ../src/bd ../../db ../../tl ../../gsi ../../laybasic ../../lay ../../ut
 DEPENDPATH += ../src/bd ../../db ../../tl ../../gsi ../../laybasic ../../lay ../../ut
 
-LIBS += -L$$DESTDIR_UT -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_lay -lklayout_ut
-LIBS += -L$$DESTDIR -lklayout_bd
+LIBS += -L$$DESTDIR_UT -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_lay -lklayout_ut

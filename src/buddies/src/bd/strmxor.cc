@@ -432,11 +432,11 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
       tl::info << "No differences found";
     } else {
 
-      const char *line_format = "  %-10s %s";
+      const char *line_format = "  %-10s %-12s %s";
       const char *sep = "  -------------------------------------------------------";
 
       tl::info << "Result summary (layers without differences are not shown):" << tl::endl;
-      tl::info << tl::sprintf (line_format, "Layer", "Differences (shape count)") << tl::endl << sep;
+      tl::info << tl::sprintf (line_format, "Layer", "Output", "Differences (shape count)") << tl::endl << sep;
 
       int ti = -1;
       for (std::map<std::pair<int, db::LayerProperties>, ResultDescriptor>::const_iterator r = results.begin (); r != results.end (); ++r) {
@@ -445,16 +445,24 @@ BD_PUBLIC int strmxor (int argc, char *argv[])
           ti = r->first.first;
           if (tolerances[ti] > db::epsilon) {
             tl::info << tl::endl << "Tolerance " << tl::micron_to_string (tolerances[ti]) << ":" << tl::endl;
-            tl::info << tl::sprintf (line_format, "Layer", "Differences (shape count)") << tl::endl << sep;
+            tl::info << tl::sprintf (line_format, "Layer", "Output", "Differences (shape count)") << tl::endl << sep;
           }
         }
 
+        std::string out ("-");
+        std::string value;
         if (r->second.layer_a < 0 && ! dont_summarize_missing_layers) {
-          tl::info << tl::sprintf (line_format, r->first.second.to_string (), "(no such layer in first layout)");
+          value = "(no such layer in first layout)";
         } else if (r->second.layer_b < 0 && ! dont_summarize_missing_layers) {
-          tl::info << tl::sprintf (line_format, r->first.second.to_string (), "(no such layer in second layout)");
+          value = "(no such layer in second layout)";
         } else if (! r->second.is_empty ()) {
-          tl::info << tl::sprintf (line_format, r->first.second.to_string (), tl::to_string (r->second.count ()));
+          if (r->second.layer_output >= 0 && r->second.layout) {
+            out = r->second.layout->get_properties (r->second.layer_output).to_string ();
+          }
+          value = tl::to_string (r->second.count ());
+        }
+        if (! value.empty ()) {
+          tl::info << tl::sprintf (line_format, r->first.second.to_string (), out, value);
         }
 
       }

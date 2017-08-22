@@ -21,26 +21,26 @@
 */
 
 
-#include "layMacroInterpreter.h"
-#include "layMacro.h"
+#include "lymMacroInterpreter.h"
+#include "lymMacro.h"
 
 #include "tlInternational.h"
 #include "tlException.h"
 #include "tlClassRegistry.h"
 
-namespace lay
+namespace lym
 {
 
 void 
-MacroInterpreter::execute (const lay::Macro *) const
+MacroInterpreter::execute (const lym::Macro *) const
 {
   throw tl::Exception (tl::to_string (QObject::tr ("execute() implementation missing for DSL interpreter")));
 }
 
 bool 
-MacroInterpreter::can_run (const lay::Macro *macro)
+MacroInterpreter::can_run (const lym::Macro *macro)
 {
-  for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+  for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
     if (cls.current_name () == macro->dsl_interpreter ()) {
       return true;
     }
@@ -49,9 +49,9 @@ MacroInterpreter::can_run (const lay::Macro *macro)
 }
 
 void 
-MacroInterpreter::execute_macro (const lay::Macro *macro)
+MacroInterpreter::execute_macro (const lym::Macro *macro)
 {
-  for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+  for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
     if (cls.current_name () == macro->dsl_interpreter ()) {
       cls->execute (macro);
       return;
@@ -64,7 +64,7 @@ MacroInterpreter::execute_macro (const lay::Macro *macro)
 std::string 
 MacroInterpreter::syntax_scheme (const std::string &dsl_name)
 {
-  for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+  for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
     if (cls.current_name () == dsl_name) {
       return cls->syntax_scheme ();
     }
@@ -76,7 +76,7 @@ MacroInterpreter::syntax_scheme (const std::string &dsl_name)
 Macro::Format
 MacroInterpreter::storage_scheme (const std::string &dsl_name)
 {
-  for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+  for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
     if (cls.current_name () == dsl_name) {
       return cls->storage_scheme ();
     }
@@ -88,7 +88,7 @@ MacroInterpreter::storage_scheme (const std::string &dsl_name)
 Macro::Interpreter
 MacroInterpreter::debugger_scheme (const std::string &dsl_name)
 {
-  for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+  for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
     if (cls.current_name () == dsl_name) {
       return cls->debugger_scheme ();
     }
@@ -100,7 +100,7 @@ MacroInterpreter::debugger_scheme (const std::string &dsl_name)
 std::string 
 MacroInterpreter::description (const std::string &dsl_name)
 {
-  for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+  for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
     if (cls.current_name () == dsl_name) {
       return cls->description ();
     }
@@ -112,7 +112,7 @@ MacroInterpreter::description (const std::string &dsl_name)
 std::string 
 MacroInterpreter::suffix (const std::string &dsl_name)
 {
-  for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+  for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
     if (cls.current_name () == dsl_name) {
       return cls->suffix ();
     }
@@ -125,6 +125,6 @@ MacroInterpreter::suffix (const std::string &dsl_name)
 
 namespace tl
 {
-  template<> tl::Registrar<lay::MacroInterpreter> *Registrar<lay::MacroInterpreter>::instance = 0;
-  template class LAY_PUBLIC tl::RegisteredClass<lay::MacroInterpreter>;
+  template<> LYM_PUBLIC tl::Registrar<lym::MacroInterpreter> *Registrar<lym::MacroInterpreter>::instance = 0;
+  template class LYM_PUBLIC tl::RegisteredClass<lym::MacroInterpreter>;
 }

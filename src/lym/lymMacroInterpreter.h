@@ -21,20 +21,20 @@
 */
 
 
-#ifndef HDR_layMacroInterpreter
-#define HDR_layMacroInterpreter
+#ifndef HDR_lymMacroInterpreter
+#define HDR_lymMacroInterpreter
 
-#include "layCommon.h"
+#include "lymCommon.h"
 
 #include "gsiObject.h"
 #include "tlClassRegistry.h"
 
-#include "layMacro.h"
+#include "lymMacro.h"
 
 #include <string>
 #include <vector>
 
-namespace lay
+namespace lym
 {
 
 /**
@@ -50,7 +50,7 @@ namespace lay
  *  tl::RegisteredClass.
  */
 
-class LAY_PUBLIC MacroInterpreter
+class LYM_PUBLIC MacroInterpreter
   : public gsi::ObjectBase
 {
 public:
@@ -67,7 +67,7 @@ public:
    *
    *  This method must be reimplemented to provide the actual execution of the macro.
    */
-  virtual void execute (const lay::Macro *macro) const;
+  virtual void execute (const lym::Macro *macro) const;
 
   /**
    *  @brief Returns the storage scheme
@@ -75,7 +75,7 @@ public:
    *  The storage scheme is used to determine how the macro's text shall be stored.
    *  The scheme can be MacroFormat for the macro XML format or PlainTextFormat for plain text.
    */
-  virtual lay::Macro::Format storage_scheme () const
+  virtual lym::Macro::Format storage_scheme () const
   {
     return Macro::PlainTextFormat;
   }
@@ -133,7 +133,7 @@ public:
    *  new macros. The template objects must be new'd and added to the templates vector by the
    *  implementation of this method. These objects then will be deleted by the caller.
    */
-  virtual void get_templates (std::vector<lay::Macro *> & /*templates*/) const
+  virtual void get_templates (std::vector<lym::Macro *> & /*templates*/) const
   {
     //  .. nothing yet ..
   }
@@ -144,12 +144,12 @@ public:
    *  This method locates the DSL interpreter with the given name and 
    *  runs the script on it.
    */
-  static void execute_macro (const lay::Macro *macro);
+  static void execute_macro (const lym::Macro *macro);
 
   /**
    *  @brief Returns true, if a DSL interpreter is registered for the given macro
    */
-  static bool can_run (const lay::Macro *macro);
+  static bool can_run (const lym::Macro *macro);
 
   /**
    *  @brief Gets the syntax scheme for the given DSL name

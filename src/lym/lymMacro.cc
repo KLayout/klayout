@@ -21,19 +21,20 @@
 */
 
 
-#include "layMacro.h"
-#include "layMacroInterpreter.h"
-#include "layMainWindow.h"
-#include "layAbstractMenu.h"
-#include "layApplication.h"
+#include "lymMacro.h"
+#include "lymMacroInterpreter.h"
 #include "tlExceptions.h"
 #include "gsiDecl.h"
 #include "gsiInterpreter.h"
 
 #include "tlString.h"
+#include "tlStableVector.h"
 #include "tlClassRegistry.h"
 #include "tlLog.h"
 #include "tlXMLParser.h"
+
+#include "rba.h"
+#include "pya.h"
 
 #include <QFile>
 #include <QDir>
@@ -43,7 +44,7 @@
 #include <fstream>
 #include <memory>
 
-namespace lay
+namespace lym
 {
 
 // ----------------------------------------------------------------------
@@ -68,7 +69,7 @@ void Macro::on_changed ()
   }
 }
 
-void Macro::assign (const lay::Macro &other)
+void Macro::assign (const lym::Macro &other)
 {
   m_description = other.m_description;
   m_version = other.m_version;
@@ -169,7 +170,7 @@ struct Interpreter2s
 /**
  *  @brief Declaration of the XML structure of a macro
  */
-static tl::XMLStruct<lay::Macro> xml_struct ("klayout-macro", 
+static tl::XMLStruct<lym::Macro> xml_struct ("klayout-macro", 
   tl::make_member (&Macro::description, &Macro::set_description, "description") +
   tl::make_member (&Macro::version, &Macro::set_version, "version") +
   tl::make_member (&Macro::category, &Macro::set_category, "category") +
@@ -330,7 +331,7 @@ Macro::format_from_suffix (const std::string &fn, Macro::Interpreter &interprete
   } else if (!suffix.empty ()) {
 
     //  locate the suffix in the DSL interpreter declarations
-    for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+    for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
 
       if (cls->suffix () == suffix) {
 
@@ -523,23 +524,23 @@ const std::string &Macro::text () const
 struct PropertyField
 {
   const char *name;
-  const std::string &(lay::Macro::*string_getter) () const;
-  void (lay::Macro::*string_setter) (const std::string &);
-  bool (lay::Macro::*bool_getter) () const;
-  void (lay::Macro::*bool_setter) (bool);
+  const std::string &(lym::Macro::*string_getter) () const;
+  void (lym::Macro::*string_setter) (const std::string &);
+  bool (lym::Macro::*bool_getter) () const;
+  void (lym::Macro::*bool_setter) (bool);
 };
 
 static PropertyField property_fields[] = {
-  { "description",    &lay::Macro::description, &lay::Macro::set_description,   0, 0 }, 
-  { "prolog",         &lay::Macro::prolog, &lay::Macro::set_prolog,             0, 0 }, 
-  { "epilog",         &lay::Macro::epilog, &lay::Macro::set_epilog,             0, 0 }, 
-  { "version",        &lay::Macro::version, &lay::Macro::set_version,           0, 0 }, 
-  { "autorun",        0, 0,                                                     &lay::Macro::is_autorun, &lay::Macro::set_autorun },
-  { "autorun-early",  0, 0,                                                     &lay::Macro::is_autorun_early, &lay::Macro::set_autorun_early},
-  { "show-in-menu",   0, 0,                                                     &lay::Macro::show_in_menu, &lay::Macro::set_show_in_menu },
-  { "group-name",     &lay::Macro::group_name, &lay::Macro::set_group_name,     0, 0 }, 
-  { "menu-path",      &lay::Macro::menu_path, &lay::Macro::set_menu_path,       0, 0 }, 
-  { "shortcut",       &lay::Macro::shortcut, &lay::Macro::set_shortcut,         0, 0 } 
+  { "description",    &lym::Macro::description, &lym::Macro::set_description,   0, 0 }, 
+  { "prolog",         &lym::Macro::prolog, &lym::Macro::set_prolog,             0, 0 }, 
+  { "epilog",         &lym::Macro::epilog, &lym::Macro::set_epilog,             0, 0 }, 
+  { "version",        &lym::Macro::version, &lym::Macro::set_version,           0, 0 }, 
+  { "autorun",        0, 0,                                                     &lym::Macro::is_autorun, &lym::Macro::set_autorun },
+  { "autorun-early",  0, 0,                                                     &lym::Macro::is_autorun_early, &lym::Macro::set_autorun_early},
+  { "show-in-menu",   0, 0,                                                     &lym::Macro::show_in_menu, &lym::Macro::set_show_in_menu },
+  { "group-name",     &lym::Macro::group_name, &lym::Macro::set_group_name,     0, 0 }, 
+  { "menu-path",      &lym::Macro::menu_path, &lym::Macro::set_menu_path,       0, 0 }, 
+  { "shortcut",       &lym::Macro::shortcut, &lym::Macro::set_shortcut,         0, 0 } 
 };
 
 static std::string escape_pta_string (const char *cp) 
@@ -942,14 +943,27 @@ void Macro::install_doc () const
   }
 }
 
+static gsi::Interpreter *script_interpreter (lym::Macro::Interpreter lang)
+{
+  gsi::Interpreter *ip = 0;
+
+  //  This
+  if (lang == lym::Macro::Ruby) {
+    ip = rba::RubyInterpreter::instance ();
+  } else if (lang == lym::Macro::Python) {
+    ip = pya::PythonInterpreter::instance ();
+  }
+
+  return (ip && ip->available() ? ip : 0);
+}
+
 bool Macro::can_run () const
 {
-  if (interpreter () == lay::Macro::Ruby) {
-    return (lay::Application::instance ()->ruby_interpreter ().available ());
-  } else if (interpreter () == lay::Macro::Python) {
-    return (lay::Application::instance ()->python_interpreter ().available ());
-  } else if (interpreter () == lay::Macro::DSLInterpreter) {
-    return lay::MacroInterpreter::can_run (this);
+  gsi::Interpreter *ip = script_interpreter (interpreter ());
+  if (ip) {
+    return true;
+  } else if (interpreter () == lym::Macro::DSLInterpreter) {
+    return lym::MacroInterpreter::can_run (this);
   } else {
     return false;
   }
@@ -962,24 +976,17 @@ int Macro::run () const
   }
 
   try {
-    if (interpreter () == lay::Macro::Ruby) {
+    gsi::Interpreter *ip = script_interpreter (interpreter ());
+    if (ip) {
       if (! prolog ().empty ()) {
-        lay::Application::instance ()->ruby_interpreter ().eval_string (prolog ().c_str ());
+        ip->eval_string (prolog ().c_str ());
       }
-      lay::Application::instance ()->ruby_interpreter ().eval_string (text ().c_str (), path ().c_str (), 1);
+      ip->eval_string (text ().c_str (), path ().c_str (), 1);
       if (! epilog ().empty ()) {
-        lay::Application::instance ()->ruby_interpreter ().eval_string (epilog ().c_str ());
+        ip->eval_string (epilog ().c_str ());
       }
-    } else if (interpreter () == lay::Macro::Python) {
-      if (! prolog ().empty ()) {
-        lay::Application::instance ()->python_interpreter ().eval_string (prolog ().c_str ());
-      }
-      lay::Application::instance ()->python_interpreter ().eval_string (text ().c_str (), path ().c_str (), 1);
-      if (! epilog ().empty ()) {
-        lay::Application::instance ()->python_interpreter ().eval_string (epilog ().c_str ());
-      }
-    } else if (interpreter () == lay::Macro::DSLInterpreter) {
-      lay::MacroInterpreter::execute_macro (this);
+    } else if (interpreter () == lym::Macro::DSLInterpreter) {
+      lym::MacroInterpreter::execute_macro (this);
     }
   } catch (tl::ExitException &ex) {
     return ex.status ();
@@ -1356,7 +1363,7 @@ void MacroCollection::scan (const std::string &path)
     filters << QString::fromUtf8 ("*.py");
 
     //  add the suffixes in the DSL interpreter declarations
-    for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+    for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
       if (! cls->suffix ().empty ()) {
         filters << tl::to_qstring ("*." + cls->suffix ());
       }
@@ -1365,7 +1372,7 @@ void MacroCollection::scan (const std::string &path)
     QStringList files = dir.entryList (filters, QDir::Files);
     for (QStringList::ConstIterator f = files.begin (); f != files.end (); ++f) {
 
-      std::auto_ptr<lay::Macro> new_macro;
+      std::auto_ptr<lym::Macro> new_macro;
 
       try {
 
@@ -1440,7 +1447,7 @@ void MacroCollection::scan (const std::string &path)
   }
 }
 
-void MacroCollection::erase (lay::Macro *mp)
+void MacroCollection::erase (lym::Macro *mp)
 {
   for (iterator m = m_macros.begin (); m != m_macros.end (); ++m) {
     if (m->second == mp) {
@@ -1454,7 +1461,7 @@ void MacroCollection::erase (lay::Macro *mp)
   }
 }
 
-void MacroCollection::erase (lay::MacroCollection *mp)
+void MacroCollection::erase (lym::MacroCollection *mp)
 {
   for (child_iterator f = m_folders.begin (); f != m_folders.end (); ++f) {
     if (f->second == mp) {
@@ -1520,7 +1527,7 @@ bool MacroCollection::rename (const std::string &n)
   }
 }
 
-lay::MacroCollection *MacroCollection::create_folder (const char *prefix, bool mkdir)
+lym::MacroCollection *MacroCollection::create_folder (const char *prefix, bool mkdir)
 {
   std::string name;
   int n = 0;
@@ -1541,7 +1548,7 @@ lay::MacroCollection *MacroCollection::create_folder (const char *prefix, bool m
 
   begin_changes ();
 
-  lay::MacroCollection *m = m_folders.insert (std::make_pair (name, new lay::MacroCollection ())).first->second; 
+  lym::MacroCollection *m = m_folders.insert (std::make_pair (name, new lym::MacroCollection ())).first->second; 
   m->set_virtual_mode (NotVirtual);
   m->set_name (name);
   m->set_parent (this);
@@ -1551,7 +1558,7 @@ lay::MacroCollection *MacroCollection::create_folder (const char *prefix, bool m
   return m;
 }
 
-lay::Macro *MacroCollection::create (const char *prefix, Macro::Format format)
+lym::Macro *MacroCollection::create (const char *prefix, Macro::Format format)
 {
   std::string name;
   int n = 0;
@@ -1568,7 +1575,7 @@ lay::Macro *MacroCollection::create (const char *prefix, Macro::Format format)
 
   begin_changes ();
 
-  lay::Macro *m = m_macros.insert (std::make_pair (name, new lay::Macro ()))->second; 
+  lym::Macro *m = m_macros.insert (std::make_pair (name, new lym::Macro ()))->second; 
   m->set_name (name);
   m->set_parent (this);
 
@@ -1577,7 +1584,7 @@ lay::Macro *MacroCollection::create (const char *prefix, Macro::Format format)
   return m;
 }
 
-void MacroCollection::add_unspecific (lay::Macro *m)
+void MacroCollection::add_unspecific (lym::Macro *m)
 {
   begin_changes ();
   m_macros.insert (std::make_pair (m->name (), m));
@@ -1585,7 +1592,7 @@ void MacroCollection::add_unspecific (lay::Macro *m)
   on_changed ();
 }
 
-bool MacroCollection::add (lay::Macro *m)
+bool MacroCollection::add (lym::Macro *m)
 {
   QDir d (tl::to_qstring (path ()));
   QDir dd = QFileInfo (tl::to_qstring (m->path ())).dir ();
@@ -1618,7 +1625,7 @@ bool MacroCollection::add (lay::Macro *m)
 
       if (dm == d) {
         begin_changes ();
-        lay::MacroCollection *mc = m_folders.insert (std::make_pair (folder_name, new MacroCollection ())).first->second;
+        lym::MacroCollection *mc = m_folders.insert (std::make_pair (folder_name, new MacroCollection ())).first->second;
         mc->set_virtual_mode (NotVirtual);
         mc->set_parent (this);
         on_changed ();
@@ -1653,7 +1660,7 @@ void MacroCollection::rename_macro (Macro *macro, const std::string &new_name)
   }
 }
 
-lay::Macro *MacroCollection::find_macro (const std::string &path)
+lym::Macro *MacroCollection::find_macro (const std::string &path)
 {
   for (iterator m = begin (); m != end (); ++m) {
     if (m->second->path () == path) {
@@ -1662,7 +1669,7 @@ lay::Macro *MacroCollection::find_macro (const std::string &path)
   }
 
   for (child_iterator mc = begin_children (); mc != end_children (); ++mc) {
-    lay::Macro *macro = mc->second->find_macro (path);
+    lym::Macro *macro = mc->second->find_macro (path);
     if (macro) {
       return macro;
     }
@@ -1676,7 +1683,7 @@ MacroCollection &MacroCollection::root ()
   return ms_root;
 }
 
-static bool sync_macros (lay::MacroCollection *current, lay::MacroCollection *actual)
+static bool sync_macros (lym::MacroCollection *current, lym::MacroCollection *actual)
 {
   bool ret = false;
 
@@ -1684,18 +1691,18 @@ static bool sync_macros (lay::MacroCollection *current, lay::MacroCollection *ac
     current->make_readonly (actual->is_readonly ());
   }
 
-  std::vector<lay::MacroCollection *> folders_to_delete;
+  std::vector<lym::MacroCollection *> folders_to_delete;
 
-  for (lay::MacroCollection::child_iterator m = current->begin_children (); m != current->end_children (); ++m) {
-    lay::MacroCollection *cm = actual ? actual->folder_by_name (m->first) : 0;
+  for (lym::MacroCollection::child_iterator m = current->begin_children (); m != current->end_children (); ++m) {
+    lym::MacroCollection *cm = actual ? actual->folder_by_name (m->first) : 0;
     if (! cm) {
       folders_to_delete.push_back (m->second);
     }
   }
 
   if (actual) {
-    for (lay::MacroCollection::child_iterator m = actual->begin_children (); m != actual->end_children (); ++m) {
-      lay::MacroCollection *cm = current->folder_by_name (m->first);
+    for (lym::MacroCollection::child_iterator m = actual->begin_children (); m != actual->end_children (); ++m) {
+      lym::MacroCollection *cm = current->folder_by_name (m->first);
       if (! cm) {
         cm = current->create_folder (m->first.c_str (), false);
         ret = true;
@@ -1707,24 +1714,24 @@ static bool sync_macros (lay::MacroCollection *current, lay::MacroCollection *ac
   }
 
   //  delete folders which do no longer exist
-  for (std::vector<lay::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
+  for (std::vector<lym::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
     ret = true;
     sync_macros (*m, 0);
     current->erase (*m);
   }
 
-  std::vector<lay::Macro *> macros_to_delete;
+  std::vector<lym::Macro *> macros_to_delete;
 
-  for (lay::MacroCollection::iterator m = current->begin (); m != current->end (); ++m) {
-    lay::Macro *cm = actual ? actual->macro_by_name (m->first, m->second->format ()) : 0;
+  for (lym::MacroCollection::iterator m = current->begin (); m != current->end (); ++m) {
+    lym::Macro *cm = actual ? actual->macro_by_name (m->first, m->second->format ()) : 0;
     if (! cm) {
       macros_to_delete.push_back (m->second);
     }
   }
 
   if (actual) {
-    for (lay::MacroCollection::iterator m = actual->begin (); m != actual->end (); ++m) {
-      lay::Macro *cm = current->macro_by_name (m->first, m->second->format ());
+    for (lym::MacroCollection::iterator m = actual->begin (); m != actual->end (); ++m) {
+      lym::Macro *cm = current->macro_by_name (m->first, m->second->format ());
       if (cm) {
         if (*cm != *m->second) {
           cm->assign (*m->second);
@@ -1740,7 +1747,7 @@ static bool sync_macros (lay::MacroCollection *current, lay::MacroCollection *ac
   }
 
   //  erase macros from collection which are no longer used
-  for (std::vector<lay::Macro *>::const_iterator m = macros_to_delete.begin (); m != macros_to_delete.end (); ++m) {
+  for (std::vector<lym::Macro *>::const_iterator m = macros_to_delete.begin (); m != macros_to_delete.end (); ++m) {
     current->erase (*m);
     ret = true;
   }
@@ -1752,8 +1759,8 @@ void MacroCollection::reload ()
 {
   //  create a new collection and synchronize
 
-  lay::MacroCollection new_collection;
-  for (lay::MacroCollection::child_iterator c = begin_children (); c != end_children (); ++c) {
+  lym::MacroCollection new_collection;
+  for (lym::MacroCollection::child_iterator c = begin_children (); c != end_children (); ++c) {
     new_collection.add_folder (c->second->description (), c->second->path (), c->second->category (), c->second->is_readonly (), false /* don't force to create */);
   }
 
@@ -1761,15 +1768,15 @@ void MacroCollection::reload ()
   sync_macros (this, &new_collection);
 }
 
-static bool has_autorun_for (const lay::MacroCollection &collection, bool early)
+static bool has_autorun_for (const lym::MacroCollection &collection, bool early)
 {
-  for (lay::MacroCollection::const_child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
+  for (lym::MacroCollection::const_child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
     if (has_autorun_for (*c->second, early)) {
       return true;
     }
   }
 
-  for (lay::MacroCollection::const_iterator c = collection.begin (); c != collection.end (); ++c) {
+  for (lym::MacroCollection::const_iterator c = collection.begin (); c != collection.end (); ++c) {
     if ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ())) {
       return true;
     }
@@ -1783,13 +1790,13 @@ bool MacroCollection::has_autorun () const
   return has_autorun_for (*this, false);
 }
 
-static void autorun_for (lay::MacroCollection &collection, bool early)
+static void autorun_for (lym::MacroCollection &collection, bool early)
 {
-  for (lay::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
+  for (lym::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
     autorun_for (*c->second, early);
   }
 
-  for (lay::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
+  for (lym::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
     if (((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ())) && c->second->can_run ()) {
       BEGIN_PROTECTED_SILENT
         c->second->install_doc ();

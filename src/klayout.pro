@@ -10,6 +10,7 @@ SUBDIRS = \
   gsi \
   db \
   rdb \
+  lym \
   laybasic \
   lay \
   ant \
@@ -45,22 +46,22 @@ ant.depends += laybasic
 img.depends += laybasic
 edt.depends += laybasic
 
-buddies.depends += db tl gsi ut
-
-lay.depends += laybasic ant img edt
+lym.depends += tl gsi
 equals(HAVE_RUBY, "1") {
-  lay.depends += rba
+  lym.depends += rba
 } else {
-  lay.depends += rbastub
+  lym.depends += rbastub
 }
-
 equals(HAVE_PYTHON, "1") {
-  lay.depends += pya
+  lym.depends += pya
 } else {
-  lay.depends += pyastub
+  lym.depends += pyastub
 }
 
+lay.depends += laybasic ant img edt lym
 lib.depends += db
+
+buddies.depends += db tl gsi ut
 
 equals(HAVE_QTBINDINGS, "1") {
   SUBDIRS += gsiqt

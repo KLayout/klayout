@@ -2,7 +2,7 @@
 DESTDIR=$$OUT_PWD/..
 
 include($$PWD/../klayout.pri)
-include($$PWD/../unit_tests.pri)
+include($$PWD/../with_all_libs.pri)
 
 TEMPLATE = app
 

@@ -22,7 +22,7 @@
 
 
 #include "layMacroEditorPage.h"
-#include "layMacroInterpreter.h"
+#include "lymMacroInterpreter.h"
 #include "tlExceptions.h"
 #include "tlString.h"
 
@@ -94,7 +94,7 @@ MacroEditorHighlighters::MacroEditorHighlighters (QObject *parent)
 }
 
 QSyntaxHighlighter *
-MacroEditorHighlighters::highlighter_for (QObject *parent, lay::Macro::Interpreter lang, const std::string &dsl_name)
+MacroEditorHighlighters::highlighter_for (QObject *parent, lym::Macro::Interpreter lang, const std::string &dsl_name)
 {
   std::string scheme = scheme_for (lang, dsl_name);
 
@@ -127,7 +127,7 @@ MacroEditorHighlighters::highlighter_for_scheme (QObject *parent, const std::str
 }
 
 GenericSyntaxHighlighterAttributes *
-MacroEditorHighlighters::attributes_for (lay::Macro::Interpreter lang, const std::string &dsl_name)
+MacroEditorHighlighters::attributes_for (lym::Macro::Interpreter lang, const std::string &dsl_name)
 {
   std::string scheme = scheme_for (lang, dsl_name);
 
@@ -195,14 +195,14 @@ MacroEditorHighlighters::load (const std::string &s)
 }
 
 std::string 
-MacroEditorHighlighters::scheme_for (lay::Macro::Interpreter lang, const std::string &dsl_name)
+MacroEditorHighlighters::scheme_for (lym::Macro::Interpreter lang, const std::string &dsl_name)
 {
-  if (lang == Macro::Ruby) {
+  if (lang == lym::Macro::Ruby) {
     return "ruby";
-  } else if (lang == Macro::Python) {
+  } else if (lang == lym::Macro::Python) {
     return "python";
-  } else if (lang == Macro::DSLInterpreter) {
-    return MacroInterpreter::syntax_scheme (dsl_name);
+  } else if (lang == lym::Macro::DSLInterpreter) {
+    return lym::MacroInterpreter::syntax_scheme (dsl_name);
   } else {
     return std::string ();
   }
@@ -212,22 +212,22 @@ MacroEditorHighlighters::scheme_for (lay::Macro::Interpreter lang, const std::st
 //  MacroEditorExecutionModel implementation
 
 MacroEditorExecutionModel::MacroEditorExecutionModel (QObject * /*parent*/)
-  : m_current_line (-1), m_run_mode (false), m_interpreter (Macro::None)
+  : m_current_line (-1), m_run_mode (false), m_interpreter (lym::Macro::None)
 {
   // .. nothing yet ..
 }
 
-void MacroEditorExecutionModel::set_interpreter (Macro::Interpreter lang)
+void MacroEditorExecutionModel::set_interpreter (lym::Macro::Interpreter lang)
 {
   m_interpreter = lang;
-  if (lang == Macro::None) {
+  if (lang == lym::Macro::None) {
     set_breakpoints (std::set<int> ());
   }
 }
 
 void MacroEditorExecutionModel::set_breakpoints (const std::set<int> &b)
 {
-  if (m_interpreter == Macro::None) {
+  if (m_interpreter == lym::Macro::None) {
     return;
   }
 
@@ -239,7 +239,7 @@ void MacroEditorExecutionModel::set_breakpoints (const std::set<int> &b)
 
 void MacroEditorExecutionModel::toggle_breakpoint (int line)
 {
-  if (m_interpreter == Macro::None) {
+  if (m_interpreter == lym::Macro::None) {
     return;
   }
 
@@ -253,7 +253,7 @@ void MacroEditorExecutionModel::toggle_breakpoint (int line)
 
 void MacroEditorExecutionModel::set_breakpoint (int line)
 {
-  if (m_interpreter == Macro::None) {
+  if (m_interpreter == lym::Macro::None) {
     return;
   }
 
@@ -265,7 +265,7 @@ void MacroEditorExecutionModel::set_breakpoint (int line)
 
 void MacroEditorExecutionModel::remove_breakpoint (int line)
 {
-  if (m_interpreter == Macro::None) {
+  if (m_interpreter == lym::Macro::None) {
     return;
   }
 
@@ -277,7 +277,7 @@ void MacroEditorExecutionModel::remove_breakpoint (int line)
 
 void MacroEditorExecutionModel::set_current_line (int line, bool force_event)
 {
-  if (m_interpreter == Macro::None) {
+  if (m_interpreter == lym::Macro::None) {
     return;
   }
 
@@ -289,7 +289,7 @@ void MacroEditorExecutionModel::set_current_line (int line, bool force_event)
 
 void MacroEditorExecutionModel::set_run_mode (bool run_mode)
 {
-  if (m_interpreter == Macro::None) {
+  if (m_interpreter == lym::Macro::None) {
     return;
   }
 
@@ -803,7 +803,7 @@ void MacroEditorPage::apply_attributes ()
   }
 }
 
-void MacroEditorPage::connect_macro (Macro *macro)
+void MacroEditorPage::connect_macro (lym::Macro *macro)
 {
   if (mp_macro != macro) {
 
@@ -822,9 +822,9 @@ void MacroEditorPage::connect_macro (Macro *macro)
 
       connect (mp_macro, SIGNAL (changed ()), this, SLOT (update ()));
 
-      Macro::Interpreter lang = macro->interpreter ();
-      if (lang == Macro::DSLInterpreter) {
-        lang = MacroInterpreter::debugger_scheme (macro->dsl_interpreter ());
+      lym::Macro::Interpreter lang = macro->interpreter ();
+      if (lang == lym::Macro::DSLInterpreter) {
+        lang = lym::MacroInterpreter::debugger_scheme (macro->dsl_interpreter ());
       }
 
       mp_exec_model->set_interpreter (lang);
@@ -842,7 +842,7 @@ void MacroEditorPage::connect_macro (Macro *macro)
       m_is_modified = false;
 
     } else {
-      mp_exec_model->set_interpreter (Macro::None);
+      mp_exec_model->set_interpreter (lym::Macro::None);
     }
 
     mp_side_panel->set_watermark (mp_macro ? tl::to_qstring (mp_macro->interpreter_name ()) : QString ());

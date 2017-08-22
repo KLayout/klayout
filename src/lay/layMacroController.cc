@@ -24,11 +24,12 @@
 #include "layTechnologyController.h"
 #include "laySaltController.h"
 #include "layMacroEditorDialog.h"
-#include "layMacroInterpreter.h"
 #include "layMainWindow.h"
 #include "layMainConfigPages.h"
 #include "layConfig.h"
 #include "layApplication.h"
+#include "lymMacroInterpreter.h"
+#include "lymMacro.h"
 
 #include <QDir>
 #include <QUrl>
@@ -45,7 +46,7 @@ MacroController::MacroController ()
     dm_sync_files (this, &MacroController::sync_files)
 {
   connect (&m_temp_macros, SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
-  connect (&m_temp_macros, SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (macro_collection_changed ()));
+  connect (&m_temp_macros, SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
 }
 
 void
@@ -54,8 +55,8 @@ MacroController::load ()
   //  Scan built-in macros
   //  These macros are always taken, even if there are no macros requested (they are required to
   //  fully form the API).
-  lay::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
-  lay::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
+  lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
+  lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
 
   //  TODO: consider adding "drc" dynamically and allow more dynamic categories
   m_macro_categories.push_back (std::pair<std::string, std::string> ("macros", tl::to_string (QObject::tr ("Ruby"))));
@@ -68,7 +69,7 @@ MacroController::load ()
     for (size_t c = 0; c < m_macro_categories.size (); ++c) {
       if (p->cat.empty () || p->cat == m_macro_categories [c].first) {
         std::string mp = tl::to_string (QDir (tl::to_qstring (p->path)).absoluteFilePath (tl::to_qstring (m_macro_categories [c].first)));
-        lay::MacroCollection::root ().add_folder (p->description, mp, m_macro_categories [c].first, p->readonly);
+        lym::MacroCollection::root ().add_folder (p->description, mp, m_macro_categories [c].first, p->readonly);
       }
     }
 
@@ -84,7 +85,7 @@ MacroController::initialized (lay::PluginRoot *root)
 {
   mp_mw = dynamic_cast <lay::MainWindow *> (root);
   if (mp_mw) {
-    mp_macro_editor = new lay::MacroEditorDialog (mp_mw, &lay::MacroCollection::root ());
+    mp_macro_editor = new lay::MacroEditorDialog (mp_mw, &lym::MacroCollection::root ());
     mp_macro_editor->setModal (false);
   }
 
@@ -94,8 +95,8 @@ MacroController::initialized (lay::PluginRoot *root)
     connect (m_file_watcher, SIGNAL (fileRemoved (const QString &)), this, SLOT (file_watcher_triggered ()));
   }
 
-  connect (&lay::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
-  connect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (macro_collection_changed ()));
+  connect (&lym::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
+  connect (&lym::MacroCollection::root (), SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
   if (lay::TechnologyController::instance ()) {
     connect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (macro_collection_changed ()));
     connect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (sync_with_external_sources ()));
@@ -115,8 +116,8 @@ MacroController::initialized (lay::PluginRoot *root)
 void
 MacroController::uninitialize (lay::PluginRoot * /*root*/)
 {
-  disconnect (&lay::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
-  disconnect (&lay::MacroCollection::root (), SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (macro_collection_changed ()));
+  disconnect (&lym::MacroCollection::root (), SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
+  disconnect (&lym::MacroCollection::root (), SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
   if (lay::TechnologyController::instance ()) {
     disconnect (lay::TechnologyController::instance (), SIGNAL (active_technology_changed ()), this, SLOT (macro_collection_changed ()));
     disconnect (lay::TechnologyController::instance (), SIGNAL (technologies_edited ()), this, SLOT (sync_with_external_sources ()));
@@ -188,7 +189,7 @@ MacroController::accepts_drop (const std::string &path_or_url) const
   }
 
   //  check the suffixes in the DSL interpreter declarations
-  for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+  for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
     if (suffix == tl::to_qstring (cls->suffix ())) {
       return true;
     }
@@ -211,7 +212,7 @@ MacroController::drop_url (const std::string &path_or_url)
   }
 
   //  load and run macro
-  std::auto_ptr<lay::Macro> macro (new lay::Macro ());
+  std::auto_ptr<lym::Macro> macro (new lym::Macro ());
   macro->load_from (path);
   macro->set_file_path (path);
 
@@ -349,7 +350,7 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
           }
         }
 
-        external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lay::MacroCollection::TechFolder, readonly_paths.find (t->first) != readonly_paths.end ()));
+        external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lym::MacroCollection::TechFolder, readonly_paths.find (t->first) != readonly_paths.end ()));
 
       }
 
@@ -376,7 +377,7 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
         if (macro_dir.exists ()) {
 
           std::string description = tl::to_string (tr ("Package %1").arg (tl::to_qstring (g->name ())));
-          external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lay::MacroCollection::SaltFolder, g->is_readonly ()));
+          external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lym::MacroCollection::SaltFolder, g->is_readonly ()));
 
         }
 
@@ -388,7 +389,7 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
 
   //  delete macro collections which are no longer required or update description
 
-  std::vector<lay::MacroCollection *> folders_to_delete;
+  std::vector<lym::MacroCollection *> folders_to_delete;
 
   //  determine the paths that will be in use
   std::map<std::string, const ExternalPathDescriptor *> new_folders_by_path;
@@ -402,11 +403,11 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
     prev_folders_by_path.insert (std::make_pair (p->path, p.operator-> ()));
   }
 
-  lay::MacroCollection *root = &lay::MacroCollection::root ();
+  lym::MacroCollection *root = &lym::MacroCollection::root ();
 
-  for (lay::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
-    if (m->second->virtual_mode () == lay::MacroCollection::TechFolder ||
-        m->second->virtual_mode () == lay::MacroCollection::SaltFolder) {
+  for (lym::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
+    if (m->second->virtual_mode () == lym::MacroCollection::TechFolder ||
+        m->second->virtual_mode () == lym::MacroCollection::SaltFolder) {
       std::map<std::string, const ExternalPathDescriptor *>::const_iterator u = new_folders_by_path.find (m->second->path ());
       if (u == new_folders_by_path.end ()) {
         //  no longer used
@@ -417,7 +418,7 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
     }
   }
 
-  for (std::vector<lay::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
+  for (std::vector<lym::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
     if (tl::verbosity () >= 20) {
       tl::info << "Removing macro folder " << (*m)->path () << ", category '" << (*m)->category () << "' because no longer in use";
     }
@@ -446,7 +447,7 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
 
   //  add new folders
 
-  std::vector<lay::MacroCollection *> new_folders;
+  std::vector<lym::MacroCollection *> new_folders;
 
   for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
 
@@ -463,7 +464,7 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
     //  In that case, the add_folder method will return 0.
 
     //  TODO: is it wise to make this writeable?
-    lay::MacroCollection *mc = lay::MacroCollection::root ().add_folder (p->description, p->path, p->cat, p->readonly);
+    lym::MacroCollection *mc = lym::MacroCollection::root ().add_folder (p->description, p->path, p->cat, p->readonly);
     if (mc) {
       mc->set_virtual_mode (p->type);
       new_folders.push_back (mc);
@@ -477,13 +478,13 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
     tl::NoDeferredMethods silent;
 
     bool has_autorun = false;
-    for (std::vector<lay::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end () && ! has_autorun; ++m) {
+    for (std::vector<lym::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end () && ! has_autorun; ++m) {
       has_autorun = (*m)->has_autorun ();
     }
 
     if (has_autorun) {
       if (! ask_before_autorun || QMessageBox::question (mp_mw, QObject::tr ("Run Macros"), QObject::tr ("Some macros associated with new items are configured to run automatically.\n\nChoose 'Yes' to run these macros now. Choose 'No' to not run them."), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-        for (std::vector<lay::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end (); ++m) {
+        for (std::vector<lym::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end (); ++m) {
           (*m)->autorun ();
         }
       }
@@ -499,19 +500,19 @@ MacroController::add_path (const std::string &path, const std::string &descripti
 }
 
 void
-MacroController::add_temp_macro (lay::Macro *m)
+MacroController::add_temp_macro (lym::Macro *m)
 {
   m_temp_macros.add_unspecific (m);
 }
 
 void
-MacroController::add_macro_items_to_menu (lay::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings)
+MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings)
 {
-  for (lay::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
+  for (lym::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
 
     //  check whether the macro collection is associated with the selected technology (if there is one)
     bool consider = false;
-    if (! tech || c->second->virtual_mode () != lay::MacroCollection::TechFolder) {
+    if (! tech || c->second->virtual_mode () != lym::MacroCollection::TechFolder) {
       consider = true;
     } else {
       const std::vector<std::pair<std::string, std::string> > &mc = macro_categories ();
@@ -526,7 +527,7 @@ MacroController::add_macro_items_to_menu (lay::MacroCollection &collection, int 
 
   }
 
-  for (lay::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
+  for (lym::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
 
     std::string sc = tl::trim (c->second->shortcut ());
 
@@ -558,7 +559,7 @@ MacroController::add_macro_items_to_menu (lay::MacroCollection &collection, int 
 
       m_action_to_macro.insert (std::make_pair (a.qaction (), c->second));
 
-      MacroSignalAdaptor *adaptor = new MacroSignalAdaptor (a.qaction (), c->second);
+      lym::MacroSignalAdaptor *adaptor = new lym::MacroSignalAdaptor (a.qaction (), c->second);
       QObject::connect (a.qaction (), SIGNAL (triggered ()), adaptor, SLOT (run ()));
 
       //  store the key bindings in the array
@@ -581,7 +582,7 @@ MacroController::add_macro_items_to_menu (lay::MacroCollection &collection, int 
       m_macro_actions.push_back (a);
 
       mp_mw->addAction (a.qaction ());
-      MacroSignalAdaptor *adaptor = new MacroSignalAdaptor (a.qaction (), c->second);
+      lym::MacroSignalAdaptor *adaptor = new lym::MacroSignalAdaptor (a.qaction (), c->second);
       QObject::connect (a.qaction (), SIGNAL (triggered ()), adaptor, SLOT (run ()));
 
     }
@@ -649,7 +650,7 @@ MacroController::do_update_menu_with_macros ()
   int n = 1;
   std::set<std::string> groups;
   add_macro_items_to_menu (m_temp_macros, n, groups, tech, 0);
-  add_macro_items_to_menu (lay::MacroCollection::root (), n, groups, tech, &new_key_bindings);
+  add_macro_items_to_menu (lym::MacroCollection::root (), n, groups, tech, &new_key_bindings);
 
   //  update the key bindings if required
   std::sort (new_key_bindings.begin (), new_key_bindings.end ());
@@ -665,9 +666,9 @@ MacroController::file_watcher_triggered ()
 }
 
 static void
-add_collections_to_file_watcher (const lay::MacroCollection &collection, tl::FileSystemWatcher *watcher)
+add_collections_to_file_watcher (const lym::MacroCollection &collection, tl::FileSystemWatcher *watcher)
 {
-  for (lay::MacroCollection::const_child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
+  for (lym::MacroCollection::const_child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
     if (! c->second->path ().empty () && c->second->path ()[0] != ':') {
       watcher->add_file (c->second->path ());
       add_collections_to_file_watcher (*c->second, watcher);
@@ -680,7 +681,7 @@ MacroController::sync_file_watcher ()
 {
   m_file_watcher->clear ();
   m_file_watcher->enable (false);
-  add_collections_to_file_watcher (lay::MacroCollection::root (), m_file_watcher);
+  add_collections_to_file_watcher (lym::MacroCollection::root (), m_file_watcher);
   m_file_watcher->enable (true);
 }
 
@@ -688,7 +689,7 @@ void
 MacroController::sync_files ()
 {
   tl::log << tl::to_string (tr ("Detected file system change in macro folders - updating"));
-  lay::MacroCollection::root ().reload ();
+  lym::MacroCollection::root ().reload ();
 }
 
 MacroController *

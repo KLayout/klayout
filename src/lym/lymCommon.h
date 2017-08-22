@@ -21,39 +21,28 @@
 */
 
 
-#ifndef HDR_layMacroPropertiesDialog
-#define HDR_layMacroPropertiesDialog
+#if !defined(HDR_lymCommon_h)
+# define HDR_lymCommon_h
 
-#include "layCommon.h"
+# if defined _WIN32 || defined __CYGWIN__
 
-#include "ui_MacroPropertiesDialog.h"
-#include "lymMacro.h"
+#   ifdef MAKE_LYM_LIBRARY
+#     define LYM_PUBLIC __declspec(dllexport)
+#   else
+#     define LYM_PUBLIC __declspec(dllimport)
+#   endif
+#   define LYM_LOCAL
 
-namespace lay
-{
+# else
 
-/**
- *  @brief A dialog to edit the properties of a macro
- */
-class MacroPropertiesDialog
-  : public QDialog, private Ui::MacroPropertiesDialog
-{
-Q_OBJECT
+#   if __GNUC__ >= 4
+#     define LYM_PUBLIC __attribute__ ((visibility ("default")))
+#     define LYM_LOCAL  __attribute__ ((visibility ("hidden")))
+#   else
+#     define LYM_PUBLIC
+#     define LYM_LOCAL
+#   endif
 
-public:
-  MacroPropertiesDialog (QWidget *parent);
-
-  int exec_dialog (lym::Macro *macro);
-
-public slots:
-  void shortcut_edited ();
-
-private:
-  void update (const lym::Macro *macro);
-  void commit (lym::Macro *macro);
-};
-
-}
+# endif
 
 #endif
-

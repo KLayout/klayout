@@ -50,6 +50,11 @@ namespace tl
   class DeferredMethodScheduler;
 }
 
+namespace lym
+{
+  class MacroCollection;
+}
+
 namespace lay
 {
 
@@ -57,7 +62,6 @@ class MainWindow;
 class PluginRoot;
 class ProgressReporter;
 class ProgressBar;
-class MacroCollection;
 
 /**
  *  @brief A tiny struct describing a native plugin
@@ -285,7 +289,7 @@ public:
    *
    *  Returns a vector of new macro folders.
    */
-  std::vector<lay::MacroCollection *> sync_tech_macro_locations ();
+  std::vector<lym::MacroCollection *> sync_tech_macro_locations ();
 
   /**
    *  @brief Obtain the KLayout installation path

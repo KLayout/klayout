@@ -36,7 +36,6 @@ namespace lay
 
 class TechSetupDialog;
 class MainWindow;
-class MacroCollection;
 
 /**
  *  @brief A "controller" for the technologies

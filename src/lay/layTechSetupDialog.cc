@@ -30,9 +30,9 @@
 #include "layMainWindow.h"
 #include "layApplication.h"
 #include "layMacroEditorTree.h"
-#include "layMacro.h"
 #include "layMacroController.h"
 #include "layTechnologyController.h"
+#include "lymMacro.h"
 #include "tlAssert.h"
 #include "tlStream.h"
 #include "dbStream.h"
@@ -362,17 +362,17 @@ TechMacrosPage::setup ()
   QString cp = macro_dir.canonicalPath ();
 
   //  if a macro collection already exists, show a readonly copy of this one
-  const lay::MacroCollection *original = 0;
-  const lay::MacroCollection *root = &lay::MacroCollection::root ();
-  for (lay::MacroCollection::const_child_iterator m = root->begin_children (); m != root->end_children () && ! original; ++m) {
-    if (m->second->virtual_mode () == lay::MacroCollection::TechFolder && m->second->category () == m_cat && QDir (tl::to_qstring (m->second->path ())).canonicalPath () == cp) {
+  const lym::MacroCollection *original = 0;
+  const lym::MacroCollection *root = &lym::MacroCollection::root ();
+  for (lym::MacroCollection::const_child_iterator m = root->begin_children (); m != root->end_children () && ! original; ++m) {
+    if (m->second->virtual_mode () == lym::MacroCollection::TechFolder && m->second->category () == m_cat && QDir (tl::to_qstring (m->second->path ())).canonicalPath () == cp) {
       original = m->second;
     }
   }
 
-  const lay::MacroCollection *alt = 0;
-  for (lay::MacroCollection::const_child_iterator m = root->begin_children (); m != root->end_children () && ! alt; ++m) {
-    if (m->second->virtual_mode () != lay::MacroCollection::TechFolder && QDir (tl::to_qstring (m->second->path ())).canonicalPath () == cp) {
+  const lym::MacroCollection *alt = 0;
+  for (lym::MacroCollection::const_child_iterator m = root->begin_children (); m != root->end_children () && ! alt; ++m) {
+    if (m->second->virtual_mode () != lym::MacroCollection::TechFolder && QDir (tl::to_qstring (m->second->path ())).canonicalPath () == cp) {
       alt = m->second;
     }
   }
@@ -435,7 +435,7 @@ TechMacrosPage::setup ()
             desc = tl::to_string (QObject::tr ("Technology")) + " - " + tech ()->name ();
           }
 
-          lay::MacroCollection *mc = new lay::MacroCollection ();
+          lym::MacroCollection *mc = new lym::MacroCollection ();
           mp_collection.reset (mc);
           mc->add_folder (desc, mp, m_cat, true);
           m_current_path = mp;
@@ -469,10 +469,10 @@ END_PROTECTED
 void
 TechMacrosPage::macro_selected (const QModelIndex &index)
 {
-  const lay::Macro *m = 0;
+  const lym::Macro *m = 0;
   lay::MacroTreeModel *model = dynamic_cast<lay::MacroTreeModel *> (folder_tree->model ());
   if (model && model->is_valid_pointer (index.internalPointer ())) {
-    m = dynamic_cast <lay::Macro *> ((QObject *) index.internalPointer ());
+    m = dynamic_cast <lym::Macro *> ((QObject *) index.internalPointer ());
   }
 
   if (! m) {

@@ -40,7 +40,6 @@
 #include "dbLoadLayoutOptions.h"
 #include "layAbstractMenu.h"
 #include "layAbstractMenuProvider.h"
-#include "layMacro.h"
 #include "layLayoutView.h"
 #include "layPlugin.h"
 #include "layProgress.h"

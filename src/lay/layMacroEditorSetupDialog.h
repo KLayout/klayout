@@ -24,8 +24,8 @@
 #ifndef HDR_layMacroEditorSetupDialog
 #define HDR_layMacroEditorSetupDialog
 
-#include "layMacro.h"
 #include "layGenericSyntaxHighlighter.h"
+#include "lymMacro.h"
 #include "ui_MacroEditorSetupDialog.h"
 
 #include <QDialog>

@@ -27,7 +27,7 @@
 
 #include "layCommon.h"
 
-#include "layMacro.h"
+#include "lymMacro.h"
 #include "layGenericSyntaxHighlighter.h"
 
 #include <QDialog>
@@ -49,9 +49,6 @@ class QSyntaxHighlighter;
 namespace lay
 {
 
-class Macro;
-class MacroCollection;
-
 /**
  *  @brief A collection of highlighters 
  */
@@ -60,9 +57,9 @@ class MacroEditorHighlighters
 public:
   MacroEditorHighlighters (QObject *parent);
 
-  QSyntaxHighlighter *highlighter_for (QObject *parent, lay::Macro::Interpreter lang, const std::string &dsl_name);
+  QSyntaxHighlighter *highlighter_for (QObject *parent, lym::Macro::Interpreter lang, const std::string &dsl_name);
 
-  GenericSyntaxHighlighterAttributes *attributes_for (lay::Macro::Interpreter lang, const std::string &dsl_name);
+  GenericSyntaxHighlighterAttributes *attributes_for (lym::Macro::Interpreter lang, const std::string &dsl_name);
   GenericSyntaxHighlighterAttributes *basic_attributes ();
 
   std::string to_string () const;
@@ -96,7 +93,7 @@ private:
   GenericSyntaxHighlighterAttributes m_basic_attributes;
 
   lay::GenericSyntaxHighlighter *highlighter_for_scheme (QObject *parent, const std::string &scheme, GenericSyntaxHighlighterAttributes *attributes);
-  std::string scheme_for (lay::Macro::Interpreter lang, const std::string &dsl_name);
+  std::string scheme_for (lym::Macro::Interpreter lang, const std::string &dsl_name);
 };
 
 /**
@@ -123,7 +120,7 @@ public:
     return m_breakpoints.find (line) != m_breakpoints.end ();
   }
 
-  void set_interpreter (Macro::Interpreter lang);
+  void set_interpreter (lym::Macro::Interpreter lang);
 
   void set_breakpoints (const std::set<int> &b);
 
@@ -156,7 +153,7 @@ private:
   std::set<int> m_breakpoints;
   int m_current_line;
   bool m_run_mode;
-  Macro::Interpreter m_interpreter;
+  lym::Macro::Interpreter m_interpreter;
 };
 
 /**
@@ -218,9 +215,9 @@ Q_OBJECT
 public:
   MacroEditorPage (QWidget *parent, MacroEditorHighlighters *highlighters);
 
-  void connect_macro (Macro *macro);
+  void connect_macro (lym::Macro *macro);
 
-  Macro *macro () const
+  lym::Macro *macro () const
   {
     return mp_macro;
   }
@@ -285,7 +282,7 @@ protected slots:
   void run_mode_changed ();
 
 private:
-  Macro *mp_macro;
+  lym::Macro *mp_macro;
   MacroEditorExecutionModel *mp_exec_model;
   MacroEditorTextWidget *mp_text;
   MacroEditorSidePanel *mp_side_panel;

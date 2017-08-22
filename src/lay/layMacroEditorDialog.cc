@@ -27,7 +27,6 @@
 #include "layMacroEditorDialog.h"
 #include "layMacroEditorSetupDialog.h"
 #include "layMacroPropertiesDialog.h"
-#include "layMacroInterpreter.h"
 #include "layFileDialog.h"
 #include "layMainWindow.h"
 #include "layHelpDialog.h"
@@ -39,6 +38,7 @@
 #include "layConfig.h"
 #include "layWidgets.h"
 #include "layProgress.h"
+#include "lymMacroInterpreter.h"
 #include "tlString.h"
 #include "tlClassRegistry.h"
 #include "tlExceptions.h"
@@ -85,7 +85,7 @@ class MacroTemplateSelectionDialog
   : public QDialog, private Ui::MacroTemplateSelectionDialog
 {
 public:
-  MacroTemplateSelectionDialog (QWidget *parent, const std::vector<lay::Macro *> &templates, const std::string &cat)
+  MacroTemplateSelectionDialog (QWidget *parent, const std::vector<lym::Macro *> &templates, const std::string &cat)
     : QDialog (parent)
   {
     setupUi (this);
@@ -101,7 +101,7 @@ public:
     //  Build a tree from the templates. Groups are formed by prepending a group title in the description
     //  separated from the actual description by ";;"
     int index = 0;
-    for (std::vector<lay::Macro *>::const_iterator t = templates.begin (); t != templates.end (); ++t, ++index) {
+    for (std::vector<lym::Macro *>::const_iterator t = templates.begin (); t != templates.end (); ++t, ++index) {
 
       const std::string &c = (*t)->category ();
 
@@ -225,7 +225,7 @@ public:
 
 static lay::MacroEditorDialog *s_macro_editor_instance = 0;
 
-MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection *root)
+MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lym::MacroCollection *root)
   : QDialog (0 /*show as individual top widget*/, Qt::Window),
     mp_root (root),
     m_first_show (true), m_in_processing (false), m_debugging_on (true),
@@ -262,10 +262,10 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
 
   Ui::MacroEditorDialog::setupUi (this);
 
-  connect (mp_root, SIGNAL (macro_changed (Macro *)), this, SLOT (macro_changed (Macro *)));
-  connect (mp_root, SIGNAL (macro_deleted (Macro *)), this, SLOT (macro_deleted (Macro *)));
-  connect (mp_root, SIGNAL (macro_collection_deleted (MacroCollection *)), this, SLOT (macro_collection_deleted (MacroCollection *)));
-  connect (mp_root, SIGNAL (macro_collection_changed (MacroCollection *)), this, SLOT (macro_collection_changed (MacroCollection *)));
+  connect (mp_root, SIGNAL (macro_changed (lym::Macro *)), this, SLOT (macro_changed (lym::Macro *)));
+  connect (mp_root, SIGNAL (macro_deleted (lym::Macro *)), this, SLOT (macro_deleted (lym::Macro *)));
+  connect (mp_root, SIGNAL (macro_collection_deleted (lym::MacroCollection *)), this, SLOT (macro_collection_deleted (lym::MacroCollection *)));
+  connect (mp_root, SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed (lym::MacroCollection *)));
 
   m_categories = lay::MacroController::instance ()->macro_categories ();
 
@@ -313,11 +313,11 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
 
     macro_tree->setItemDelegate (new EditRoleDelegate (macro_tree));
 
-    connect (macro_tree, SIGNAL (macro_double_clicked (lay::Macro *)), this, SLOT (item_double_clicked (lay::Macro *)));
-    connect (macro_tree, SIGNAL (move_macro (lay::Macro *, lay::MacroCollection *)), this, SLOT (move_macro (lay::Macro *, lay::MacroCollection *)));
-    connect (macro_tree, SIGNAL (move_folder (lay::MacroCollection *, lay::MacroCollection *)), this, SLOT (move_folder (lay::MacroCollection *, lay::MacroCollection *)));
-    connect (macro_tree, SIGNAL (folder_renamed (lay::MacroCollection *)), this, SLOT (folder_renamed (lay::MacroCollection *)));
-    connect (macro_tree, SIGNAL (macro_renamed (lay::Macro *)), this, SLOT (macro_renamed (lay::Macro *)));
+    connect (macro_tree, SIGNAL (macro_double_clicked (lym::Macro *)), this, SLOT (item_double_clicked (lym::Macro *)));
+    connect (macro_tree, SIGNAL (move_macro (lym::Macro *, lym::MacroCollection *)), this, SLOT (move_macro (lym::Macro *, lym::MacroCollection *)));
+    connect (macro_tree, SIGNAL (move_folder (lym::MacroCollection *, lym::MacroCollection *)), this, SLOT (move_folder (lym::MacroCollection *, lym::MacroCollection *)));
+    connect (macro_tree, SIGNAL (folder_renamed (lym::MacroCollection *)), this, SLOT (folder_renamed (lym::MacroCollection *)));
+    connect (macro_tree, SIGNAL (macro_renamed (lym::Macro *)), this, SLOT (macro_renamed (lym::Macro *)));
 
   }
 
@@ -492,7 +492,7 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
             data = QByteArray ((const char *)res.data (), (int)res.size ());
           }
 
-          Macro *m = new Macro ();
+          lym::Macro *m = new lym::Macro ();
           try {
 
             m->rename (tl::to_string (QFileInfo (QUrl (tl::to_qstring (url)).path ()).baseName ()));
@@ -538,7 +538,7 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
     filters << QString::fromUtf8 ("*.py");
 
     //  add the suffixes in the DSL interpreter declarations
-    for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+    for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
       if (! cls->suffix ().empty ()) {
         filters << tl::to_qstring ("*." + cls->suffix ());
       }
@@ -547,7 +547,7 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
     QStringList files = dir.entryList (filters, QDir::Files);
     for (QStringList::ConstIterator f = files.begin (); f != files.end (); ++f) {
 
-      Macro *m = new Macro ();
+      lym::Macro *m = new lym::Macro ();
       try {
 
         m->rename (tl::to_string (QFileInfo (*f).baseName ()));
@@ -567,11 +567,11 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lay::MacroCollection
   }
 
   //  finally fetch the templates of the DSL interpreters
-  for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+  for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
     size_t n = m_macro_templates.size ();
     cls->get_templates (m_macro_templates);
     if (tl::verbosity () >= 20) {
-      for (std::vector<lay::Macro *>::const_iterator t = m_macro_templates.begin () + n; t != m_macro_templates.end (); ++t) {
+      for (std::vector<lym::Macro *>::const_iterator t = m_macro_templates.begin () + n; t != m_macro_templates.end (); ++t) {
         tl::info << "Using DSL macro template for " << (*t)->dsl_interpreter () << " with name " << (*t)->name ();
       }
     }
@@ -606,7 +606,7 @@ MacroEditorDialog::~MacroEditorDialog ()
     s_macro_editor_instance = 0;
   }
 
-  for (std::vector<lay::Macro *>::iterator t = m_macro_templates.begin (); t != m_macro_templates.end (); ++t) {
+  for (std::vector<lym::Macro *>::iterator t = m_macro_templates.begin (); t != m_macro_templates.end (); ++t) {
     delete *t;
   }
   m_macro_templates.clear ();
@@ -658,11 +658,11 @@ BEGIN_PROTECTED
     }
 
     lay::MacroEditorTree *ct = current_macro_tree ();
-    MacroCollection *collection = ct->current_macro_collection ();
+    lym::MacroCollection *collection = ct->current_macro_collection ();
 
     //  Select the first writeable collection if none is selected
     if (! collection || collection->is_readonly ()) {
-      for (lay::MacroCollection::const_child_iterator c = mp_root->begin_children (); c != mp_root->end_children (); ++c) {
+      for (lym::MacroCollection::const_child_iterator c = mp_root->begin_children (); c != mp_root->end_children (); ++c) {
         if (c->second->category () == ct->category () && ! c->second->is_readonly ()) {
           ct->set_current (c->second);
           collection = c->second;
@@ -672,7 +672,7 @@ BEGIN_PROTECTED
     }
 
     if (collection && (force_add || (collection->begin () == collection->end () && collection->begin_children () == collection->end_children ()))) {
-      lay::Macro *m = new_macro ();
+      lym::Macro *m = new_macro ();
       if (force_add && m) {
         set_run_macro (m);
       }
@@ -696,7 +696,7 @@ BEGIN_PROTECTED
       select_category (cat);
     }
 
-    lay::Macro *m = new_macro ();
+    lym::Macro *m = new_macro ();
     if (force_add && m) {
       set_run_macro (m);
     }
@@ -820,7 +820,7 @@ MacroEditorDialog::showEvent (QShowEvent *)
   std::string am;
   MainWindow::instance ()->config_get (cfg_macro_editor_active_macro, am);
   if (! am.empty ()) {
-    lay::Macro *macro = mp_root->find_macro (am);
+    lym::Macro *macro = mp_root->find_macro (am);
     if (macro) {
       set_run_macro (macro);
     }
@@ -835,7 +835,7 @@ MacroEditorDialog::showEvent (QShowEvent *)
     editor_for_file (cm);
   }
 
-  for (std::map <Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
+  for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
     page->second->set_debugging_on (m_debugging_on);
   }
 
@@ -945,7 +945,7 @@ MacroEditorDialog::set_debugging_on (bool on)
 
     m_debugging_on = on;
 
-    for (std::map <Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
+    for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
       page->second->set_debugging_on (m_debugging_on);
     }
 
@@ -976,14 +976,14 @@ MacroEditorDialog::process_events (QEventLoop::ProcessEventsFlags flags)
 }
 
 static bool  
-any_modified(MacroCollection *parent)
+any_modified(lym::MacroCollection *parent)
 {
-  for (MacroCollection::child_iterator c = parent->begin_children (); c != parent->end_children (); ++c) {
+  for (lym::MacroCollection::child_iterator c = parent->begin_children (); c != parent->end_children (); ++c) {
     if (any_modified (c->second)) {
       return true;
     }
   }
-  for (MacroCollection::iterator c = parent->begin (); c != parent->end (); ++c) {
+  for (lym::MacroCollection::iterator c = parent->begin (); c != parent->end (); ++c) {
     if (c->second->is_modified ()) {
       return true;
     }
@@ -1529,7 +1529,7 @@ MacroEditorDialog::update_console_text ()
 void
 MacroEditorDialog::commit ()
 {
-  for (std::map <Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
+  for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator page = m_tab_widgets.begin (); page != m_tab_widgets.end (); ++page) {
     if (page->second->is_modified ()) {
       page->second->commit ();
     }
@@ -1537,20 +1537,20 @@ MacroEditorDialog::commit ()
 }
 
 void
-MacroEditorDialog::macro_collection_deleted (lay::MacroCollection *collection)
+MacroEditorDialog::macro_collection_deleted (lym::MacroCollection *collection)
 {
   //  close the tab pages related to the collection we want to delete
-  std::set <lay::Macro *> used_macros;
-  std::set <lay::MacroCollection *> used_collections;
+  std::set <lym::Macro *> used_macros;
+  std::set <lym::MacroCollection *> used_collections;
   collection->collect_used_nodes (used_macros, used_collections);
 
-  for (std::set <lay::Macro *>::iterator mc = used_macros.begin (); mc != used_macros.end (); ++mc) {
+  for (std::set <lym::Macro *>::iterator mc = used_macros.begin (); mc != used_macros.end (); ++mc) {
 
     if (mp_run_macro == *mc) {
       mp_run_macro = 0;
     }
 
-    std::map <Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.find (*mc);
+    std::map <lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.find (*mc);
     if (p != m_tab_widgets.end ()) {
       //  disable the macro on the page - we'll ask for updates when the file
       //  watcher becomes active. So long, the macro is "zombie".
@@ -1565,13 +1565,13 @@ MacroEditorDialog::macro_collection_deleted (lay::MacroCollection *collection)
 }
 
 void
-MacroEditorDialog::macro_deleted (lay::Macro *macro)
+MacroEditorDialog::macro_deleted (lym::Macro *macro)
 {
   if (mp_run_macro == macro) {
     mp_run_macro = 0;
   }
 
-  std::map <Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
+  std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
   if (page != m_tab_widgets.end ()) {
     //  disable the macro on the page - we'll ask for updates when the file
     //  watcher becomes active. So long, the macro is "zombie".
@@ -1584,15 +1584,15 @@ MacroEditorDialog::macro_deleted (lay::Macro *macro)
 }
 
 void
-MacroEditorDialog::macro_collection_changed (lay::MacroCollection * /*collection*/)
+MacroEditorDialog::macro_collection_changed (lym::MacroCollection * /*collection*/)
 {
   refresh_file_watcher ();
 }
 
 void
-MacroEditorDialog::macro_changed (lay::Macro *macro)
+MacroEditorDialog::macro_changed (lym::Macro *macro)
 {
-  std::map <Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
+  std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
   if (page != m_tab_widgets.end ()) {
     int index = tabWidget->indexOf (page->second);
     QString tt = tl::to_qstring (macro->summary ());
@@ -1629,12 +1629,12 @@ MacroEditorDialog::current_tab_changed (int index)
   do_update_ui_to_run_mode ();
 }
 
-lay::Macro *MacroEditorDialog::create_macro_here (const char *prefix)
+lym::Macro *MacroEditorDialog::create_macro_here (const char *prefix)
 {
   lay::MacroEditorTree *mt = current_macro_tree ();
-  MacroCollection *collection = mt->current_macro_collection ();
+  lym::MacroCollection *collection = mt->current_macro_collection ();
   if (! collection) {
-    Macro *m = mt->current_macro ();
+    lym::Macro *m = mt->current_macro ();
     if (m) {
       collection = m->parent ();
     }
@@ -1648,19 +1648,19 @@ lay::Macro *MacroEditorDialog::create_macro_here (const char *prefix)
 }
 
 void
-MacroEditorDialog::macro_renamed (lay::Macro * /*macro*/)
+MacroEditorDialog::macro_renamed (lym::Macro * /*macro*/)
 {
   refresh_file_watcher ();
 }
 
 void
-MacroEditorDialog::folder_renamed (lay::MacroCollection * /*mc*/)
+MacroEditorDialog::folder_renamed (lym::MacroCollection * /*mc*/)
 {
   refresh_file_watcher ();
 }
 
 void
-MacroEditorDialog::move_macro (lay::Macro *source, lay::MacroCollection *target)
+MacroEditorDialog::move_macro (lym::Macro *source, lym::MacroCollection *target)
 {
   if (m_in_exec) {
     return;
@@ -1670,12 +1670,12 @@ BEGIN_PROTECTED
 
   if (source->parent () != target) {
 
-    lay::Macro *m = target->create (source->name ().c_str (), source->format ());
+    lym::Macro *m = target->create (source->name ().c_str (), source->format ());
     m->assign (*source);
     m->set_readonly (false);
     m->save ();
 
-    std::map <Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (source);
+    std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (source);
     if (page != m_tab_widgets.end ()) {
       MacroEditorPage *w = page->second;
       w->connect_macro (m);
@@ -1686,7 +1686,7 @@ BEGIN_PROTECTED
     }
 
     if (! source->is_readonly ()) {
-      MacroCollection *collection = source->parent ();
+      lym::MacroCollection *collection = source->parent ();
       if (collection && ! collection->is_readonly ()) {
         if (source->del ()) {
           collection->erase (source);
@@ -1706,18 +1706,18 @@ END_PROTECTED
 }
 
 void  
-MacroEditorDialog::move_subfolder (lay::MacroCollection *source, lay::MacroCollection *target)
+MacroEditorDialog::move_subfolder (lym::MacroCollection *source, lym::MacroCollection *target)
 {
-  lay::MacroCollection *mt = target->create_folder (source->name ().c_str ());
+  lym::MacroCollection *mt = target->create_folder (source->name ().c_str ());
   if (! mt) {
     return;
   }
 
-  std::vector <MacroCollection::iterator> m_del;
+  std::vector <lym::MacroCollection::iterator> m_del;
 
-  for (MacroCollection::iterator mm = source->begin (); mm != source->end (); ++mm) {
+  for (lym::MacroCollection::iterator mm = source->begin (); mm != source->end (); ++mm) {
 
-    lay::Macro *m = mt->create (mm->second->name ().c_str ());
+    lym::Macro *m = mt->create (mm->second->name ().c_str ());
     if (!m) {
       continue;
     }
@@ -1726,7 +1726,7 @@ MacroEditorDialog::move_subfolder (lay::MacroCollection *source, lay::MacroColle
     m->set_readonly (false);
     m->save ();
 
-    std::map <Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (mm->second);
+    std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (mm->second);
     if (page != m_tab_widgets.end ()) {
       MacroEditorPage *w = page->second;
       w->connect_macro (m);
@@ -1743,13 +1743,13 @@ MacroEditorDialog::move_subfolder (lay::MacroCollection *source, lay::MacroColle
     }
   }
 
-  for (std::vector <MacroCollection::iterator>::const_iterator d = m_del.begin (); d != m_del.end (); ++d) {
+  for (std::vector <lym::MacroCollection::iterator>::const_iterator d = m_del.begin (); d != m_del.end (); ++d) {
     source->erase (*d);
   }
 
-  std::vector <MacroCollection::child_iterator> mc_del;
+  std::vector <lym::MacroCollection::child_iterator> mc_del;
 
-  for (MacroCollection::child_iterator m = source->begin_children (); m != source->end_children (); ++m) {
+  for (lym::MacroCollection::child_iterator m = source->begin_children (); m != source->end_children (); ++m) {
     move_subfolder (m->second, mt);
     if (! m->second->is_readonly ()) {
       if (m->second->del ()) {
@@ -1758,13 +1758,13 @@ MacroEditorDialog::move_subfolder (lay::MacroCollection *source, lay::MacroColle
     }
   }
 
-  for (std::vector <MacroCollection::child_iterator>::const_iterator d = mc_del.begin (); d != mc_del.end (); ++d) {
+  for (std::vector <lym::MacroCollection::child_iterator>::const_iterator d = mc_del.begin (); d != mc_del.end (); ++d) {
     source->erase (*d);
   }
 }
 
 void 
-MacroEditorDialog::move_folder (lay::MacroCollection *source, lay::MacroCollection *target)
+MacroEditorDialog::move_folder (lym::MacroCollection *source, lym::MacroCollection *target)
 {
   if (m_in_exec) {
     return;
@@ -1893,7 +1893,7 @@ MacroEditorDialog::save_button_clicked ()
 
 BEGIN_PROTECTED
 
-  Macro *m = current_macro_tree ()->current_macro ();
+  lym::Macro *m = current_macro_tree ()->current_macro ();
   if (m) {
     m->save ();
   } else if (tabWidget->currentWidget ()) {
@@ -2003,8 +2003,8 @@ BEGIN_PROTECTED
     return;
   }
 
-  Macro *macro = page->macro ();
-  if (macro->format () == lay::Macro::PlainTextWithHashAnnotationsFormat) {
+  lym::Macro *macro = page->macro ();
+  if (macro->format () == lym::Macro::PlainTextWithHashAnnotationsFormat) {
     page->commit ();
   }
 
@@ -2037,7 +2037,7 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
-lay::Macro *
+lym::Macro *
 MacroEditorDialog::new_macro()
 {
   ensure_writeable_collection_selected ();
@@ -2059,7 +2059,7 @@ MacroEditorDialog::new_macro()
     return 0;
   }
 
-  Macro *m = create_macro_here (m_macro_templates [template_index]->name ().c_str ());
+  lym::Macro *m = create_macro_here (m_macro_templates [template_index]->name ().c_str ());
   m->assign (*m_macro_templates [template_index]);
   m->set_readonly (false);
   //  we don't want to keep the template's description
@@ -2103,7 +2103,7 @@ BEGIN_PROTECTED
     return;
   }
 
-  for (std::map <Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
+  for (std::map <lym::Macro *, MacroEditorPage *>::iterator p = m_tab_widgets.begin (); p != m_tab_widgets.end (); ++p) {
     if (p->second == page) {
       m_tab_widgets.erase (p);
       break;
@@ -2135,8 +2135,8 @@ BEGIN_PROTECTED
 
   lay::MacroEditorTree *ct = current_macro_tree ();
 
-  MacroCollection *collection = ct->current_macro_collection ();
-  Macro *m = ct->current_macro ();
+  lym::MacroCollection *collection = ct->current_macro_collection ();
+  lym::Macro *m = ct->current_macro ();
 
   if (collection) {
 
@@ -2150,7 +2150,7 @@ BEGIN_PROTECTED
       throw tl::Exception ("Can't delete this folder - it is not empty");
     }
 
-    MacroCollection *p = collection->parent ();
+    lym::MacroCollection *p = collection->parent ();
 
     if (p) {
 
@@ -2171,7 +2171,7 @@ BEGIN_PROTECTED
 
  } else if (m) {
 
-    MacroCollection *collection = m->parent ();
+    lym::MacroCollection *collection = m->parent ();
     if (m->is_readonly ()) {
       throw tl::Exception ("Can't delete this macro - it is readonly");
     }
@@ -2226,9 +2226,9 @@ void
 MacroEditorDialog::ensure_writeable_collection_selected ()
 {
   lay::MacroEditorTree *ct = current_macro_tree ();
-  MacroCollection *collection = ct->current_macro_collection ();
+  lym::MacroCollection *collection = ct->current_macro_collection ();
   if (! collection) {
-    Macro *macro = ct->current_macro ();
+    lym::Macro *macro = ct->current_macro ();
     if (macro) {
       collection = macro->parent ();
     }
@@ -2236,7 +2236,7 @@ MacroEditorDialog::ensure_writeable_collection_selected ()
 
   //  Select the first writeable collection if none is selected
   if (! collection || collection->is_readonly ()) {
-    for (lay::MacroCollection::const_child_iterator c = mp_root->begin_children (); c != mp_root->end_children (); ++c) {
+    for (lym::MacroCollection::const_child_iterator c = mp_root->begin_children (); c != mp_root->end_children (); ++c) {
       if (c->second->category () == ct->category () && ! c->second->is_readonly ()) {
         ct->set_current (c->second);
         collection = c->second;
@@ -2317,7 +2317,7 @@ BEGIN_PROTECTED
   }
 
   std::set<std::string> modified_files;
-  for (std::map <Macro *, MacroEditorPage *>::const_iterator m = m_tab_widgets.begin (); m != m_tab_widgets.end (); ++m) {
+  for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator m = m_tab_widgets.begin (); m != m_tab_widgets.end (); ++m) {
     if (m->first->is_modified ()) {
       modified_files.insert (m->first->path ());
     }
@@ -2400,7 +2400,7 @@ MacroEditorDialog::file_removed (const QString &path)
 }
 
 void
-MacroEditorDialog::sync_file_watcher (lay::MacroCollection * /*collection*/)
+MacroEditorDialog::sync_file_watcher (lym::MacroCollection * /*collection*/)
 {
 #if 0
   //  this would monitor the whole tree - but it's a little too deep. This
@@ -2410,7 +2410,7 @@ MacroEditorDialog::sync_file_watcher (lay::MacroCollection * /*collection*/)
 
     m_file_watcher->add_file (collection->path ());
 
-    for (lay::MacroCollection::iterator m = collection->begin (); m != collection->end (); ++m) {
+    for (lym::MacroCollection::iterator m = collection->begin (); m != collection->end (); ++m) {
       if (m->second->is_file ()) {
         m_file_watcher->add_file (m->second->path());
       }
@@ -2418,12 +2418,12 @@ MacroEditorDialog::sync_file_watcher (lay::MacroCollection * /*collection*/)
 
   }
 
-  for (lay::MacroCollection::child_iterator m = collection->begin_children (); m != collection->end_children (); ++m) {
+  for (lym::MacroCollection::child_iterator m = collection->begin_children (); m != collection->end_children (); ++m) {
     sync_file_watcher (m->second);
   }
 #else
   //  This solution monitors the open files only
-  for (std::map <Macro *, MacroEditorPage *>::const_iterator m = m_tab_widgets.begin (); m != m_tab_widgets.end (); ++m) {
+  for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator m = m_tab_widgets.begin (); m != m_tab_widgets.end (); ++m) {
     m_file_watcher->add_file (m->first->path ());
   }
 #endif
@@ -2499,7 +2499,7 @@ BEGIN_PROTECTED
   std::string new_path = tl::to_string (QFileInfo (new_dir).absoluteFilePath ());
   paths.push_back (std::make_pair (new_path, cat));
 
-  lay::MacroCollection *c = mp_root->add_folder (tl::to_string (QObject::tr ("Project")) + " - " + new_path, new_path, cat, false);
+  lym::MacroCollection *c = mp_root->add_folder (tl::to_string (QObject::tr ("Project")) + " - " + new_path, new_path, cat, false);
   if (!c) {
     throw tl::Exception (tl::to_string (QObject::tr ("The selected directory is already installed as custom location")));
   }
@@ -2527,9 +2527,9 @@ MacroEditorDialog::remove_location ()
 BEGIN_PROTECTED
 
   lay::MacroEditorTree *ct = current_macro_tree ();
-  MacroCollection *collection = ct->current_macro_collection ();
+  lym::MacroCollection *collection = ct->current_macro_collection ();
   if (! collection) {
-    Macro *m = ct->current_macro ();
+    lym::Macro *m = ct->current_macro ();
     if (m) {
       collection = m->parent ();
     }
@@ -2589,7 +2589,7 @@ BEGIN_PROTECTED
     std::string filters = tl::to_string (QObject::tr ("All files (*);;KLayout macro files (*.lym);;Ruby files (*.rb);;Python files (*.py)"));
 
     //  add the suffixes in the DSL interpreter declarations
-    for (tl::Registrar<lay::MacroInterpreter>::iterator cls = tl::Registrar<lay::MacroInterpreter>::begin (); cls != tl::Registrar<lay::MacroInterpreter>::end (); ++cls) {
+    for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
       if (! cls->suffix ().empty ()) {
         filters += ";;";
         if (! cls->description ().empty ()) {
@@ -2609,7 +2609,7 @@ BEGIN_PROTECTED
   if (file_dialog->get_open (fn)) {
 
     //  create a new macro and use the new name as the base name
-    Macro *m = create_macro_here (tl::to_string (QFileInfo (tl::to_qstring (fn)).baseName ()).c_str ());
+    lym::Macro *m = create_macro_here (tl::to_string (QFileInfo (tl::to_qstring (fn)).baseName ()).c_str ());
 
     try {
       m->load_from (fn);
@@ -2642,9 +2642,9 @@ BEGIN_PROTECTED
   ensure_writeable_collection_selected ();
 
   lay::MacroEditorTree *ct = current_macro_tree ();
-  MacroCollection *collection = ct->current_macro_collection ();
+  lym::MacroCollection *collection = ct->current_macro_collection ();
   if (! collection) {
-    Macro *m = ct->current_macro ();
+    lym::Macro *m = ct->current_macro ();
     if (m) {
       collection = m->parent ();
     }
@@ -2654,7 +2654,7 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot create a folder here")));
   } 
 
-  MacroCollection *mm = collection->create_folder ();
+  lym::MacroCollection *mm = collection->create_folder ();
   if (! mm) {
     throw tl::Exception (tl::to_string (QObject::tr ("Failed to create the folder here")));
   }
@@ -2687,11 +2687,11 @@ END_PROTECTED
 }
 
 void 
-MacroEditorDialog::item_double_clicked(lay::Macro *m)
+MacroEditorDialog::item_double_clicked(lym::Macro *m)
 {
 BEGIN_PROTECTED
 
-  std::map <Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (m);
+  std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (m);
   if (page == m_tab_widgets.end ()) {
 
     MacroEditorPage *page = create_page (m);
@@ -2730,7 +2730,7 @@ MacroEditorDialog::start_exec (gsi::Interpreter *ec)
   m_current_stack_depth = -1;
   m_process_events_interval = 0.05;
 
-  for (std::map<Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
+  for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
     f->second->exec_model ()->set_current_line (-1);
     f->second->exec_model ()->set_run_mode (true);
   }
@@ -2756,7 +2756,7 @@ MacroEditorDialog::end_exec (gsi::Interpreter *ec)
   m_continue = false;
   m_current_stack_depth = -1;
 
-  for (std::map<Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
+  for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
     f->second->exec_model ()->set_run_mode (false);
   }
 
@@ -2767,14 +2767,14 @@ MacroEditorDialog::end_exec (gsi::Interpreter *ec)
 size_t   
 MacroEditorDialog::id_for_path (gsi::Interpreter *, const std::string &path)
 {
-  for (std::map <Macro *, MacroEditorPage *>::const_iterator m = m_tab_widgets.begin (); m != m_tab_widgets.end (); ++m) {
+  for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator m = m_tab_widgets.begin (); m != m_tab_widgets.end (); ++m) {
     if (m->first->path () == path) {
       m_file_to_widget.push_back (*m);
       return m_file_to_widget.size ();
     }
   }
 
-  lay::Macro *macro = mp_root->find_macro (path);
+  lym::Macro *macro = mp_root->find_macro (path);
   if (macro) {
     m_file_to_widget.push_back (std::make_pair (macro, (MacroEditorPage *) 0));
     return m_file_to_widget.size ();
@@ -3002,8 +3002,8 @@ MacroEditorDialog::do_update_ui_to_run_mode ()
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
 
   dbgOn->setEnabled (! m_in_exec);
-  runButton->setEnabled ((! m_in_exec && (mp_run_macro || (page && page->macro () && page->macro ()->interpreter () != lay::Macro::None))) || m_in_breakpoint);
-  runThisButton->setEnabled ((! m_in_exec && page && page->macro () && page->macro ()->interpreter () != lay::Macro::None) || m_in_breakpoint);
+  runButton->setEnabled ((! m_in_exec && (mp_run_macro || (page && page->macro () && page->macro ()->interpreter () != lym::Macro::None))) || m_in_breakpoint);
+  runThisButton->setEnabled ((! m_in_exec && page && page->macro () && page->macro ()->interpreter () != lym::Macro::None) || m_in_breakpoint);
   singleStepButton->setEnabled (! m_in_exec || m_in_breakpoint);
   nextStepButton->setEnabled (! m_in_exec || m_in_breakpoint);
   stopButton->setEnabled (m_in_exec);
@@ -3033,7 +3033,7 @@ MacroEditorDialog::do_update_ui_to_run_mode ()
   actionRefresh->setEnabled (! m_in_exec);
   actionAddLocation->setEnabled (! m_in_exec);
   actionRemoveLocation->setEnabled (! m_in_exec);
-  propertiesButton->setEnabled (! m_in_exec && page && page->macro () && (page->macro ()->format () == Macro::MacroFormat || page->macro ()->format () == Macro::PlainTextWithHashAnnotationsFormat));
+  propertiesButton->setEnabled (! m_in_exec && page && page->macro () && (page->macro ()->format () == lym::Macro::MacroFormat || page->macro ()->format () == lym::Macro::PlainTextWithHashAnnotationsFormat));
   setupButton->setEnabled (! m_in_exec);
   langSelFrame->setEnabled (! m_in_exec);
 
@@ -3085,7 +3085,7 @@ MacroEditorDialog::do_update_ui_to_run_mode ()
   variableList->setPalette (p);
   watchList->setPalette (p);
 
-  std::map <Macro *, MacroEditorPage *>::const_iterator t = m_tab_widgets.find (mp_run_macro);
+  std::map <lym::Macro *, MacroEditorPage *>::const_iterator t = m_tab_widgets.find (mp_run_macro);
   if (t != m_tab_widgets.end ()) {
     int index = tabWidget->indexOf (t->second);
     if (index >= 0) {
@@ -3106,7 +3106,7 @@ MacroEditorDialog::stack_element_double_clicked (QListWidgetItem *item)
 }
 
 MacroEditorPage *
-MacroEditorDialog::create_page (Macro *macro)
+MacroEditorDialog::create_page (lym::Macro *macro)
 {
   std::auto_ptr<MacroEditorPage> editor (new MacroEditorPage (this, &m_highlighters));
   editor->set_ntab (m_ntab);
@@ -3120,7 +3120,7 @@ MacroEditorDialog::create_page (Macro *macro)
 }
 
 MacroEditorPage *
-MacroEditorDialog::editor_for_macro (Macro *macro)
+MacroEditorDialog::editor_for_macro (lym::Macro *macro)
 {
   for (std::vector<lay::MacroEditorTree *>::const_iterator mt = m_macro_trees.begin (); mt != m_macro_trees.end (); ++mt) {
     (*mt)->set_current (macro); 
@@ -3128,7 +3128,7 @@ MacroEditorDialog::editor_for_macro (Macro *macro)
 
   MacroEditorPage *editor = 0;
 
-  std::map <Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
+  std::map <lym::Macro *, MacroEditorPage *>::iterator page = m_tab_widgets.find (macro);
   if (page == m_tab_widgets.end ()) {
 
     editor = create_page (macro);
@@ -3142,7 +3142,7 @@ MacroEditorDialog::editor_for_macro (Macro *macro)
 
     refresh_file_watcher ();
 
-    for (std::vector <std::pair<Macro *, MacroEditorPage *> >::iterator f = m_file_to_widget.begin (); f != m_file_to_widget.end (); ++f) {
+    for (std::vector <std::pair<lym::Macro *, MacroEditorPage *> >::iterator f = m_file_to_widget.begin (); f != m_file_to_widget.end (); ++f) {
       if (f->first == macro) {
         f->second = editor;
         break;
@@ -3160,7 +3160,7 @@ MacroEditorDialog::editor_for_macro (Macro *macro)
 MacroEditorPage *
 MacroEditorDialog::editor_for_file (const std::string &path)
 {
-  lay::Macro *macro = mp_root->find_macro (path);
+  lym::Macro *macro = mp_root->find_macro (path);
   if (macro) {
     return editor_for_macro (macro);
   } else {
@@ -3176,7 +3176,7 @@ MacroEditorDialog::set_exec_point (const std::string *file, int line, int eval_c
     editor = editor_for_file (*file);
   }
 
-  for (std::map<Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
+  for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
     f->second->exec_model ()->set_current_line (f->second == editor ? line : -1, true);
   }
 
@@ -3207,7 +3207,7 @@ MacroEditorDialog::breakpoint_button_clicked ()
 void 
 MacroEditorDialog::clear_breakpoints_button_clicked ()
 {
-  for (std::map<Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
+  for (std::map<lym::Macro *, MacroEditorPage *>::const_iterator f = m_tab_widgets.begin (); f != m_tab_widgets.end (); ++f) {
     f->second->exec_model ()->set_breakpoints (std::set <int> ());
   }
 }
@@ -3262,14 +3262,14 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
-lay::Macro *
+lym::Macro *
 MacroEditorDialog::current_run_macro ()
 {
   //  validate the current run macro against the macros present in the collection and
   //  return 0 if invalid (that takes the current one)
 
-  std::set<lay::Macro *> macros;
-  std::set<lay::MacroCollection *> macro_collections;
+  std::set<lym::Macro *> macros;
+  std::set<lym::MacroCollection *> macro_collections;
   mp_root->collect_used_nodes (macros, macro_collections);
 
   if (macros.find (mp_run_macro) != macros.end ()) {
@@ -3280,7 +3280,7 @@ MacroEditorDialog::current_run_macro ()
 }
 
 void   
-MacroEditorDialog::run (int stop_stack_depth, lay::Macro *macro)
+MacroEditorDialog::run (int stop_stack_depth, lym::Macro *macro)
 {
   m_stop_stack_depth = stop_stack_depth;
   m_continue = true;
@@ -3364,11 +3364,11 @@ MacroEditorDialog::run (int stop_stack_depth, lay::Macro *macro)
 }
 
 void
-MacroEditorDialog::set_run_macro (lay::Macro *m)
+MacroEditorDialog::set_run_macro (lym::Macro *m)
 {
   if (m != mp_run_macro) {
 
-    std::map <Macro *, MacroEditorPage *>::const_iterator t = m_tab_widgets.find (mp_run_macro);
+    std::map <lym::Macro *, MacroEditorPage *>::const_iterator t = m_tab_widgets.find (mp_run_macro);
     if (t != m_tab_widgets.end ()) {
       int index = tabWidget->indexOf (t->second);
       if (index >= 0) {

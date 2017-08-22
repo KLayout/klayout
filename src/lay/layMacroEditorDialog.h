@@ -32,7 +32,7 @@
 #include "tlTimer.h"
 #include "tlFileSystemWatcher.h"
 #include "tlDeferredExecution.h"
-#include "layMacro.h"
+#include "lymMacro.h"
 #include "gsiInterpreter.h"
 #include "tlScriptError.h"
 
@@ -49,8 +49,6 @@ class QTreeWidgetItem;
 namespace lay
 {
 
-class Macro;
-class MacroCollection;
 class MacroEditorTree;
 class BrowserPanel;
 
@@ -75,7 +73,7 @@ public:
   /**
    *  @brief Constructor
    */
-  MacroEditorDialog (QWidget *parent, lay::MacroCollection *root);
+  MacroEditorDialog (QWidget *parent, lym::MacroCollection *root);
 
   /**
    *  @brief Destructor
@@ -129,7 +127,7 @@ public:
   /**
    *  @brief Gets the macro which is run
    */
-  lay::Macro *run_macro () const
+  lym::Macro *run_macro () const
   {
     return mp_run_macro;
   }
@@ -175,11 +173,11 @@ private slots:
   void add_location ();
   void remove_location ();
   void clear_breakpoints_button_clicked ();
-  void item_double_clicked (lay::Macro *macro);
-  void move_macro (lay::Macro *source, lay::MacroCollection *target);
-  void move_folder (lay::MacroCollection *source, lay::MacroCollection *target);
-  void macro_renamed (lay::Macro *macro);
-  void folder_renamed (lay::MacroCollection *mc);
+  void item_double_clicked (lym::Macro *macro);
+  void move_macro (lym::Macro *source, lym::MacroCollection *target);
+  void move_folder (lym::MacroCollection *source, lym::MacroCollection *target);
+  void macro_renamed (lym::Macro *macro);
+  void folder_renamed (lym::MacroCollection *mc);
   void current_tab_changed (int index);
   void commit ();
   void stack_element_double_clicked (QListWidgetItem *item);
@@ -190,10 +188,10 @@ private slots:
   void replace_all_button_clicked ();
   void find_next_button_clicked ();
   void help_requested (const QString &s);
-  void macro_changed (Macro *macro);
-  void macro_deleted (Macro *macro);
-  void macro_collection_deleted (MacroCollection *collection);
-  void macro_collection_changed (MacroCollection *collection);
+  void macro_changed (lym::Macro *macro);
+  void macro_deleted (lym::Macro *macro);
+  void macro_collection_deleted (lym::MacroCollection *collection);
+  void macro_collection_changed (lym::MacroCollection *collection);
   void add_watch ();
   void edit_watch ();
   void del_watches ();
@@ -229,9 +227,9 @@ protected:
 
 private:
   lay::MacroEditorTree *current_macro_tree ();
-  lay::Macro *create_macro_here(const char *name = 0);
-  void move_subfolder (lay::MacroCollection *source, lay::MacroCollection *target);
-  lay::MacroEditorPage *create_page (lay::Macro *macro);
+  lym::Macro *create_macro_here(const char *name = 0);
+  void move_subfolder (lym::MacroCollection *source, lym::MacroCollection *target);
+  lay::MacroEditorPage *create_page (lym::Macro *macro);
   void ensure_writeable_collection_selected ();
   void update_console_text ();
   void start_exec (gsi::Interpreter *interpreter);
@@ -246,34 +244,34 @@ private:
   void handle_error (tl::ScriptError &re);
   void set_exec_point (const std::string *file, int line, int eval_context);
   MacroEditorPage *editor_for_file (const std::string &path);
-  MacroEditorPage *editor_for_macro (lay::Macro *macro);
-  void run (int stop_stack_depth, lay::Macro *macro);
-  lay::Macro *current_run_macro ();
+  MacroEditorPage *editor_for_macro (lym::Macro *macro);
+  void run (int stop_stack_depth, lym::Macro *macro);
+  lym::Macro *current_run_macro ();
   void update_ui_to_run_mode ();
   void do_update_ui_to_run_mode ();
-  void set_run_macro (lay::Macro *m);
+  void set_run_macro (lym::Macro *m);
   void apply_search (bool if_needed);
   void process_events (QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents);
-  void sync_file_watcher (lay::MacroCollection *current);
+  void sync_file_watcher (lym::MacroCollection *current);
   void do_refresh_file_watcher ();
   void refresh_file_watcher ();
   void reload_macros ();
   void update_inspected ();
   void update_watches ();
-  lay::Macro *new_macro ();
+  lym::Macro *new_macro ();
   void do_search_edited ();
   void select_trace (size_t index);
 
-  lay::MacroCollection *mp_root;
+  lym::MacroCollection *mp_root;
   bool m_first_show;
   bool m_in_processing;
   bool m_debugging_on;
-  lay::Macro *mp_run_macro;
-  std::vector<lay::Macro *> m_macro_templates;
+  lym::Macro *mp_run_macro;
+  std::vector<lym::Macro *> m_macro_templates;
   tl::DeferredMethod<MacroEditorDialog> md_update_console_text;
   tl::DeferredMethod<MacroEditorDialog> md_search_edited;
   TextEditWidget *mp_console_text;
-  std::map <Macro *, MacroEditorPage *> m_tab_widgets;
+  std::map <lym::Macro *, MacroEditorPage *> m_tab_widgets;
   int m_history_index;
   bool m_in_event_handler;
   QString m_edit_text;
@@ -283,7 +281,7 @@ private:
   QTextCharFormat m_echo_format;
   QTextCharFormat m_stderr_format;
   MacroEditorHighlighters m_highlighters;
-  std::vector<std::pair<Macro *, MacroEditorPage *> > m_file_to_widget;
+  std::vector<std::pair<lym::Macro *, MacroEditorPage *> > m_file_to_widget;
   std::vector<lay::MacroEditorTree *> m_macro_trees;
   bool m_in_exec, m_in_breakpoint;
   gsi::Interpreter *mp_exec_controller, *mp_current_interpreter;

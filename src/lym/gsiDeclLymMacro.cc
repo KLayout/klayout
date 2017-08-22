@@ -24,9 +24,9 @@
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
 #include "gsiInterpreter.h"
-#include "layMacroInterpreter.h"
-#include "layMacro.h"
-#include "layApplication.h"
+#include "lymMacroInterpreter.h"
+#include "lymMacro.h"
+#include "rba.h"
 
 #include "tlClassRegistry.h"
 
@@ -37,7 +37,7 @@ namespace tl
 
 //  type traits for BrowserDialog_Stub
 template <> 
-struct type_traits<lay::Macro> : public type_traits<void> {
+struct type_traits<lym::Macro> : public type_traits<void> {
   typedef tl::false_tag has_copy_constructor;
 };
 
@@ -51,17 +51,23 @@ class MacroExecutionContext
 public:
   static void set_debugger_scope (const std::string &filename)
   {
-    lay::Application::instance ()->ruby_interpreter ().set_debugger_scope (filename);
+    if (rba::RubyInterpreter::instance ()) {
+      rba::RubyInterpreter::instance ()->set_debugger_scope (filename);
+    }
   }
 
   static void remove_debugger_scope ()
   {
-    lay::Application::instance ()->ruby_interpreter ().remove_debugger_scope ();
+    if (rba::RubyInterpreter::instance ()) {
+      rba::RubyInterpreter::instance ()->remove_debugger_scope ();
+    }
   }
 
   static void ignore_next_exception ()
   {
-    lay::Application::instance ()->ruby_interpreter ().ignore_next_exception ();
+    if (rba::RubyInterpreter::instance ()) {
+      rba::RubyInterpreter::instance ()->ignore_next_exception ();
+    }
   }
 };
 
@@ -90,25 +96,25 @@ Class<gsi::MacroExecutionContext> decl_MacroExecutionContext ("MacroExecutionCon
 );
 
 class MacroInterpreter
-  : public lay::MacroInterpreter
+  : public lym::MacroInterpreter
 {
 public:
   MacroInterpreter ()
-    : lay::MacroInterpreter (), 
+    : lym::MacroInterpreter (), 
       mp_registration (0) 
   {
-    m_suffix = lay::MacroInterpreter::suffix ();
-    m_description = lay::MacroInterpreter::description ();
-    m_storage_scheme = lay::MacroInterpreter::storage_scheme ();
-    m_syntax_scheme = lay::MacroInterpreter::syntax_scheme ();
-    m_debugger_scheme = lay::MacroInterpreter::debugger_scheme ();
+    m_suffix = lym::MacroInterpreter::suffix ();
+    m_description = lym::MacroInterpreter::description ();
+    m_storage_scheme = lym::MacroInterpreter::storage_scheme ();
+    m_syntax_scheme = lym::MacroInterpreter::syntax_scheme ();
+    m_debugger_scheme = lym::MacroInterpreter::debugger_scheme ();
   }
 
   ~MacroInterpreter ()
   {
     delete mp_registration;
     mp_registration = 0;
-    for (std::vector<lay::Macro *>::const_iterator t = m_templates.begin (); t != m_templates.end (); ++t) {
+    for (std::vector<lym::Macro *>::const_iterator t = m_templates.begin (); t != m_templates.end (); ++t) {
       delete *t;
     }
     m_templates.clear ();
@@ -121,34 +127,34 @@ public:
 
     //  cancel any previous registration and register (again)
     delete mp_registration;
-    mp_registration = new tl::RegisteredClass<lay::MacroInterpreter> (this, 0 /*position*/, name, false /*does not own object*/);
+    mp_registration = new tl::RegisteredClass<lym::MacroInterpreter> (this, 0 /*position*/, name, false /*does not own object*/);
 
     m_name = name;
   }
 
-  virtual void execute (const lay::Macro *macro) const
+  virtual void execute (const lym::Macro *macro) const
   {
     if (f_execute.can_issue ()) {
-      f_execute.issue<MacroInterpreter, const lay::Macro *> (&MacroInterpreter::execute, macro);
+      f_execute.issue<MacroInterpreter, const lym::Macro *> (&MacroInterpreter::execute, macro);
     }
   }
 
   void set_storage_scheme (int scheme)
   {
-    m_storage_scheme = lay::Macro::Format (scheme);
+    m_storage_scheme = lym::Macro::Format (scheme);
   }
 
-  virtual lay::Macro::Format storage_scheme () const
+  virtual lym::Macro::Format storage_scheme () const
   {
     return m_storage_scheme;
   }
 
   void set_debugger_scheme (int scheme)
   {
-    m_debugger_scheme = lay::Macro::Interpreter (scheme);
+    m_debugger_scheme = lym::Macro::Interpreter (scheme);
   }
 
-  virtual lay::Macro::Interpreter debugger_scheme () const
+  virtual lym::Macro::Interpreter debugger_scheme () const
   {
     return m_debugger_scheme;
   }
@@ -183,28 +189,28 @@ public:
     return m_suffix;
   }
 
-  lay::Macro *create_template (const std::string &name) 
+  lym::Macro *create_template (const std::string &name) 
   {
     if (! mp_registration) {
       throw std::runtime_error (tl::to_string (QObject::tr ("MacroInterpreter::create_template must be called after register")));
     }
 
-    lay::Macro *m = new lay::Macro ();
+    lym::Macro *m = new lym::Macro ();
 
     m->rename (name);
     m->set_readonly (true);
     m->set_dsl_interpreter (m_name);
-    m->set_interpreter (lay::Macro::DSLInterpreter);
+    m->set_interpreter (lym::Macro::DSLInterpreter);
     m->set_format (storage_scheme ());
 
     m_templates.push_back (m);
     return m;
   }
 
-  virtual void get_templates (std::vector<lay::Macro *> &tt) const
+  virtual void get_templates (std::vector<lym::Macro *> &tt) const
   {
-    for (std::vector<lay::Macro *>::const_iterator t = m_templates.begin  (); t != m_templates.end (); ++t) {
-      tt.push_back (new lay::Macro ());
+    for (std::vector<lym::Macro *>::const_iterator t = m_templates.begin  (); t != m_templates.end (); ++t) {
+      tt.push_back (new lym::Macro ());
       tt.back ()->rename ((*t)->name ());
       tt.back ()->assign (**t);
     }
@@ -213,39 +219,39 @@ public:
   gsi::Callback f_execute;
 
 private:
-  tl::RegisteredClass <lay::MacroInterpreter> *mp_registration;
+  tl::RegisteredClass <lym::MacroInterpreter> *mp_registration;
   std::string m_name;
-  std::vector<lay::Macro *> m_templates;
+  std::vector<lym::Macro *> m_templates;
   std::string m_syntax_scheme;
-  lay::Macro::Format m_storage_scheme;
-  lay::Macro::Interpreter m_debugger_scheme;
+  lym::Macro::Format m_storage_scheme;
+  lym::Macro::Interpreter m_debugger_scheme;
   std::string m_suffix;
   std::string m_description;
 };
 
 int const_PlainTextFormat ()
 {
-  return int (lay::Macro::PlainTextFormat);
+  return int (lym::Macro::PlainTextFormat);
 }
 
 int const_PlainTextWithHashAnnotationsFormat ()
 {
-  return int (lay::Macro::PlainTextWithHashAnnotationsFormat);
+  return int (lym::Macro::PlainTextWithHashAnnotationsFormat);
 }
 
 int const_MacroFormat ()
 {
-  return int (lay::Macro::MacroFormat);
+  return int (lym::Macro::MacroFormat);
 }
 
 int const_RubyDebugger ()
 {
-  return int (lay::Macro::Ruby);
+  return int (lym::Macro::Ruby);
 }
 
 int const_NoDebugger ()
 {
-  return int (lay::Macro::None);
+  return int (lym::Macro::None);
 }
 
 Class<gsi::MacroInterpreter> decl_MacroInterpreter ("MacroInterpreter", 
@@ -414,95 +420,95 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("MacroInterpreter",
   "This class has been introduced in version 0.23.\n"
 );
 
-Class<lay::Macro> decl_Macro ("Macro", 
-  gsi::method ("path", &lay::Macro::path,
+Class<lym::Macro> decl_Macro ("Macro", 
+  gsi::method ("path", &lym::Macro::path,
     "@brief Gets the path of the macro\n"
     "\n"
     "The path is the path where the macro is stored, starting with an abstract group identifier. "
     "The path is used to identify the macro in the debugger for example."
   ) + 
-  gsi::method ("description", &lay::Macro::description,
+  gsi::method ("description", &lym::Macro::description,
     "@brief Gets the description text\n"
     "\n"
     "The description text of a macro will appear in the macro list. If used as a macro template, "
     "the description text can have the format \"Group;;Description\". In that case, the macro "
     "will appear in a group with title \"Group\"."
   ) + 
-  gsi::method ("description=", &lay::Macro::set_description,
+  gsi::method ("description=", &lym::Macro::set_description,
     "@brief Sets the description text\n"
     "@args description\n"
     "@param description The description text.\n"
     "See \\description for details.\n"
   ) +
-  gsi::method ("prolog", &lay::Macro::prolog,
+  gsi::method ("prolog", &lym::Macro::prolog,
     "@brief Gets the prolog code\n"
     "\n"
     "The prolog is executed before the actual code is executed. Interpretation depends on the "
     "implementation of the DSL interpreter for DSL macros."
   ) + 
-  gsi::method ("prolog=", &lay::Macro::set_prolog,
+  gsi::method ("prolog=", &lym::Macro::set_prolog,
     "@brief Sets the prolog\n"
     "@args string\n"
     "See \\prolog for details.\n"
   ) +
-  gsi::method ("epilog", &lay::Macro::epilog,
+  gsi::method ("epilog", &lym::Macro::epilog,
     "@brief Gets the epilog code\n"
     "\n"
     "The epilog is executed after the actual code is executed. Interpretation depends on the "
     "implementation of the DSL interpreter for DSL macros."
   ) + 
-  gsi::method ("epilog=", &lay::Macro::set_epilog,
+  gsi::method ("epilog=", &lym::Macro::set_epilog,
     "@brief Sets the epilog\n"
     "@args string\n"
     "See \\epilog for details.\n"
   ) +
-  gsi::method ("category", &lay::Macro::category,
+  gsi::method ("category", &lym::Macro::category,
     "@brief Gets the category tags\n"
     "\n"
     "The category tags string indicates to which categories a macro will belong to. This string "
     "is only used for templates currently and is a comma-separated list of category names."
   ) + 
-  gsi::method ("category=", &lay::Macro::set_category,
+  gsi::method ("category=", &lym::Macro::set_category,
     "@brief Sets the category tags string\n"
     "@args string\n"
     "See \\category for details.\n"
   ) +
-  gsi::method ("text", &lay::Macro::text,
+  gsi::method ("text", &lym::Macro::text,
     "@brief Gets the macro text\n"
     "\n"
     "The text is the code executed by the macro interpreter. "
     "Depending on the DSL interpreter, the text can be any kind of code."
   ) + 
-  gsi::method ("text=", &lay::Macro::set_text,
+  gsi::method ("text=", &lym::Macro::set_text,
     "@brief Sets the macro text\n"
     "@args string\n"
     "See \\text for details.\n"
   ) +
-  gsi::method ("show_in_menu?", &lay::Macro::show_in_menu,
+  gsi::method ("show_in_menu?", &lym::Macro::show_in_menu,
     "@brief Gets a value indicating whether the macro shall be shown in the menu\n"
   ) + 
-  gsi::method ("show_in_menu=", &lay::Macro::set_show_in_menu,
+  gsi::method ("show_in_menu=", &lym::Macro::set_show_in_menu,
     "@brief Sets a value indicating whether the macro shall be shown in the menu\n"
     "@args flag\n"
   ) +
-  gsi::method ("group_name", &lay::Macro::group_name,
+  gsi::method ("group_name", &lym::Macro::group_name,
     "@brief Gets the menu group name\n"
     "\n"
     "If a group name is specified and \\show_in_menu? is true, the macro will appear in "
     "a separate group (separated by a separator) together with other macros sharing the same group."
   ) + 
-  gsi::method ("group_name=", &lay::Macro::set_group_name,
+  gsi::method ("group_name=", &lym::Macro::set_group_name,
     "@brief Sets the menu group name\n"
     "@args string\n"
     "See \\group_name for details.\n"
   ) +
-  gsi::method ("menu_path", &lay::Macro::menu_path,
+  gsi::method ("menu_path", &lym::Macro::menu_path,
     "@brief Gets the menu path\n"
     "\n"
     "If a menu path is specified and \\show_in_menu? is true, the macro will appear in "
     "the menu at the specified position."
   ) + 
-  gsi::method ("menu_path=", &lay::Macro::set_menu_path,
+  gsi::method ("menu_path=", &lym::Macro::set_menu_path,
     "@brief Sets the menu path\n"
     "@args string\n"
     "See \\menu_path for details.\n"

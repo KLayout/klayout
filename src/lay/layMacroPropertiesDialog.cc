@@ -23,7 +23,7 @@
 
 #include "layMacroPropertiesDialog.h"
 #include "layMainWindow.h"
-#include "layMacroInterpreter.h"
+#include "lymMacroInterpreter.h"
 #include "tlString.h"
 
 #include <QKeySequence>
@@ -41,7 +41,7 @@ MacroPropertiesDialog::MacroPropertiesDialog (QWidget *parent)
 }
 
 int 
-MacroPropertiesDialog::exec_dialog (lay::Macro *macro)
+MacroPropertiesDialog::exec_dialog (lym::Macro *macro)
 {
   update (macro);
   int ret = QDialog::exec ();
@@ -59,15 +59,15 @@ MacroPropertiesDialog::shortcut_edited ()
 }
 
 void 
-MacroPropertiesDialog::update (const lay::Macro *macro)
+MacroPropertiesDialog::update (const lym::Macro *macro)
 {
   std::string ip = "-";
-  if (macro->interpreter () == lay::Macro::Ruby) {
+  if (macro->interpreter () == lym::Macro::Ruby) {
     ip = "Ruby";
-  } else if (macro->interpreter () == lay::Macro::Python) {
+  } else if (macro->interpreter () == lym::Macro::Python) {
     ip = "Python";
-  } else if (macro->interpreter () == lay::Macro::DSLInterpreter) {
-    ip = lay::MacroInterpreter::description (macro->dsl_interpreter ());
+  } else if (macro->interpreter () == lym::Macro::DSLInterpreter) {
+    ip = lym::MacroInterpreter::description (macro->dsl_interpreter ());
   } 
   interpreterLabel->setText (tl::to_qstring (ip));
 
@@ -85,7 +85,7 @@ MacroPropertiesDialog::update (const lay::Macro *macro)
 }
 
 void 
-MacroPropertiesDialog::commit (lay::Macro *macro)
+MacroPropertiesDialog::commit (lym::Macro *macro)
 {
   macro->set_description (tl::to_string (description->text ()));
   macro->set_version (tl::to_string (version->text ()));

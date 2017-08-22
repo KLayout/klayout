@@ -38,12 +38,17 @@
 
 #include <memory>
 
+namespace lym
+{
+  class Macro;
+  class MacroCollection;
+}
+
 namespace lay
 {
 
 class TechnologyComponentEditor;
 class Technology;
-class MacroCollection;
 
 class TechBaseEditorPage
   : public TechnologyComponentEditor,
@@ -78,7 +83,7 @@ public:
 private:
   std::string m_cat, m_cat_desc;
   std::vector<std::pair<QLabel *, QString> > m_original_labels;
-  std::auto_ptr<lay::MacroCollection> mp_collection;
+  std::auto_ptr<lym::MacroCollection> mp_collection;
   std::string m_current_path;
 
 private slots:

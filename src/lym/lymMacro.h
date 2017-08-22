@@ -21,10 +21,10 @@
 */
 
 
-#ifndef HDR_layMacro
-#define HDR_layMacro
+#ifndef HDR_lymMacro
+#define HDR_lymMacro
 
-#include "layCommon.h"
+#include "lymCommon.h"
 
 #include <string>
 #include <map>
@@ -32,7 +32,7 @@
 
 #include <QObject>
 
-namespace lay
+namespace lym
 {
 
 class MacroCollection;
@@ -54,7 +54,7 @@ class MacroCollection;
  *  a macro can be bound to an arbitrary interpreter and decides
  *  by itself which interpreter to use.
  */
-class LAY_PUBLIC Macro
+class LYM_PUBLIC Macro
   : public QObject
 {
 Q_OBJECT 
@@ -132,14 +132,14 @@ public:
    *  This will assign the definition of the macro but keep the name.
    *  It will also not modify the parent nor the readonly flag.
    */
-  void assign (const lay::Macro &other);
+  void assign (const lym::Macro &other);
 
   /**
    *  @brief Returns the parent of the macro collection 
    *
    *  Returns 0, if there is no parent of this collection (this is the root)
    */
-  lay::MacroCollection *parent ()
+  lym::MacroCollection *parent ()
   {
     return mp_parent;
   }
@@ -149,7 +149,7 @@ public:
    *
    *  Returns 0, if there is no parent of this collection (this is the root)
    */
-  const lay::MacroCollection *parent () const
+  const lym::MacroCollection *parent () const
   {
     return mp_parent;
   }
@@ -594,7 +594,7 @@ private:
   std::string m_menu_path;
   std::string m_shortcut;
   bool m_is_file;
-  lay::MacroCollection *mp_parent;
+  lym::MacroCollection *mp_parent;
   Interpreter m_interpreter;
   std::string m_dsl_interpreter;
   Format m_format;
@@ -613,7 +613,7 @@ private:
     m_name = name;
   }
 
-  void set_parent (lay::MacroCollection *parent)
+  void set_parent (lym::MacroCollection *parent)
   {
     mp_parent = parent;
   }
@@ -629,7 +629,7 @@ private:
  *  A collection is representing a set of macros, usually associated with 
  *  a folder containing *.lym, *.rb or other script files.
  */
-class LAY_PUBLIC MacroCollection
+class LYM_PUBLIC MacroCollection
   : public QObject
 {
 Q_OBJECT 
@@ -732,7 +732,7 @@ public:
    *
    *  Returns 0, if there is no parent of this collection (this is the root)
    */
-  lay::MacroCollection *parent ()
+  lym::MacroCollection *parent ()
   {
     return mp_parent;
   }
@@ -742,7 +742,7 @@ public:
    *
    *  Returns 0, if there is no parent of this collection (this is the root)
    */
-  const lay::MacroCollection *parent () const
+  const lym::MacroCollection *parent () const
   {
     return mp_parent;
   }
@@ -825,7 +825,7 @@ public:
    *
    *  @return true, if the macro could be added sucessfully.
    */
-  bool add (lay::Macro *m);
+  bool add (lym::Macro *m);
 
   /**
    *  @brief Adds a macro in an unspecific way
@@ -835,7 +835,7 @@ public:
    *  This is a way to build macro collections without connection
    *  to some file system point.
    */
-  void add_unspecific (lay::Macro *m);
+  void add_unspecific (lym::Macro *m);
 
   /**
    *  @brief Erases the given macro from the list
@@ -843,7 +843,7 @@ public:
    *  This does not remove the file but just remove the macro object.
    *  This will also delete the macro object.
    */
-  void erase (lay::Macro *m);
+  void erase (lym::Macro *m);
 
   /**
    *  @brief Erases the entry with the given iterator
@@ -856,7 +856,7 @@ public:
    *  This does not remove the directory but just removes the macro collection object.
    *  This will also delete the macro collection object.
    */
-  void erase (lay::MacroCollection *m);
+  void erase (lym::MacroCollection *m);
 
   /**
    *  @brief Erases the folder with the given iterator
@@ -868,7 +868,7 @@ public:
    * 
    *  If a name is given, it is used as a prefix to create a unique name for a macro with that format.
    */
-  lay::Macro *create (const char *name = 0, Macro::Format format = Macro::NoFormat);
+  lym::Macro *create (const char *name = 0, Macro::Format format = Macro::NoFormat);
 
   /**
    *  @brief Creates a new macro collection in that collection (with a new name)
@@ -877,7 +877,7 @@ public:
    *  This method will also create the directory for this folder.
    *  If not sucessful, it will return 0.
    */
-  lay::MacroCollection *create_folder (const char *name = 0, bool mkdir = true);
+  lym::MacroCollection *create_folder (const char *name = 0, bool mkdir = true);
 
   /**
    *  @brief Gets the begin iterator of the macros
@@ -977,7 +977,7 @@ public:
    *  This method is called from the root collection and delivers the macro which
    *  matches the given path or 0.
    */
-  lay::Macro *find_macro (const std::string &path);
+  lym::Macro *find_macro (const std::string &path);
 
   /**
    *  @brief Returns true, if the collection has an autorun macro
@@ -1027,22 +1027,22 @@ signals:
   /**
    *  @brief This signal is sent by collection when a child collection is deleted in this collection
    */
-  void child_deleted (MacroCollection *);
+  void child_deleted (lym::MacroCollection *);
   
   /**
    *  @brief This signal is sent by the root object when a macro collection is deleted
    */
-  void macro_collection_deleted (MacroCollection *);
+  void macro_collection_deleted (lym::MacroCollection *);
   
   /**
    *  @brief This signal is sent by collection when a macro is deleted in this collection
    */
-  void macro_deleted_here (Macro *);
+  void macro_deleted_here (lym::Macro *);
   
   /**
    *  @brief This signal is sent by the root object when a macro is deleted
    */
-  void macro_deleted (Macro *);
+  void macro_deleted (lym::Macro *);
   
   /**
    *  @brief This signal is sent by the root object when a macro changes
@@ -1050,7 +1050,7 @@ signals:
    *  This signal is only emitted by the root, but it may originate from a 
    *  macro inside the tree.
    */
-  void macro_changed (Macro *);
+  void macro_changed (lym::Macro *);
   
   /**
    *  @brief This signal is sent by the root object when a macro collection changes
@@ -1058,7 +1058,7 @@ signals:
    *  This signal is only emitted by the root, but it may originate from a 
    *  macro collection inside the tree.
    */
-  void macro_collection_changed (MacroCollection *);
+  void macro_collection_changed (lym::MacroCollection *);
 
   /**
    *  @brief This signal is sent by the root object befor the macro collection changes
@@ -1078,7 +1078,7 @@ private:
   std::string m_category;
   std::multimap <std::string, Macro *> m_macros;
   std::map <std::string, MacroCollection *> m_folders;
-  lay::MacroCollection *mp_parent;
+  lym::MacroCollection *mp_parent;
   int m_virtual_mode;
   bool m_readonly;
 
@@ -1105,7 +1105,7 @@ private:
     m_path = n;
   }
 
-  void set_parent (lay::MacroCollection *parent)
+  void set_parent (lym::MacroCollection *parent)
   {
     mp_parent = parent;
   }
@@ -1125,7 +1125,7 @@ private:
  *
  *  This class allows to call a macro from a signal
  */
-class MacroSignalAdaptor
+class LYM_PUBLIC MacroSignalAdaptor
   : public QObject
 {
 Q_OBJECT 

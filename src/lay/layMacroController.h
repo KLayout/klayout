@@ -26,7 +26,7 @@
 
 #include "layCommon.h"
 #include "layPlugin.h"
-#include "layMacro.h"
+#include "lymMacro.h"
 #include "tlObject.h"
 #include "tlDeferredExecution.h"
 #include "tlFileSystemWatcher.h"
@@ -142,7 +142,7 @@ public:
    *  menu building. Hence they are stored temporarily.
    *  The MainWindow object will become owner of the macro object.
    */
-  void add_temp_macro (lay::Macro *m);
+  void add_temp_macro (lym::Macro *m);
 
   /**
    *  @brief Obtain the list of macro categories
@@ -180,7 +180,7 @@ private:
    */
   struct ExternalPathDescriptor
   {
-    ExternalPathDescriptor (const std::string &_path, const std::string &_description, const std::string &_cat, lay::MacroCollection::FolderType _type, bool _readonly)
+    ExternalPathDescriptor (const std::string &_path, const std::string &_description, const std::string &_cat, lym::MacroCollection::FolderType _type, bool _readonly)
       : path (_path), description (_description), cat (_cat), type (_type), readonly (_readonly)
     {
       //  .. nothing yet ..
@@ -189,7 +189,7 @@ private:
     std::string path;
     std::string description;
     std::string cat;
-    lay::MacroCollection::FolderType type;
+    lym::MacroCollection::FolderType type;
     bool readonly;
   };
 
@@ -214,8 +214,8 @@ private:
   lay::MainWindow *mp_mw;
   bool m_no_implicit_macros;
   std::vector<lay::Action> m_macro_actions;
-  std::map<QAction *, lay::Macro *> m_action_to_macro;
-  lay::MacroCollection m_temp_macros;
+  std::map<QAction *, lym::Macro *> m_action_to_macro;
+  lym::MacroCollection m_temp_macros;
   std::vector< std::pair<std::string, std::string> > m_macro_categories;
   std::vector<InternalPathDescriptor> m_internal_paths;
   std::vector<ExternalPathDescriptor> m_external_paths;
@@ -227,7 +227,7 @@ private:
   tl::DeferredMethod<MacroController> dm_sync_files;
 
   void sync_implicit_macros (bool ask_before_autorun);
-  void add_macro_items_to_menu (lay::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings);
+  void add_macro_items_to_menu (lym::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings);
   void do_update_menu_with_macros ();
   void do_sync_with_external_sources ();
   void sync_file_watcher ();

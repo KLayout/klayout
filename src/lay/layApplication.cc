@@ -29,7 +29,6 @@
 #include "layMacroEditorDialog.h"
 #include "layNativePlugin.h"
 #include "layVersion.h"
-#include "layMacro.h"
 #include "laySignalHandler.h"
 #include "layRuntimeErrorForm.h"
 #include "layProgress.h"
@@ -38,6 +37,7 @@
 #include "layMacroController.h"
 #include "layTechnologyController.h"
 #include "laySaltController.h"
+#include "lymMacro.h"
 #include "gtf.h"
 #include "gsiDecl.h"
 #include "gsiInterpreter.h"
@@ -795,11 +795,11 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   }
 
   //  run all early autorun macros
-  lay::MacroCollection::root ().autorun_early ();
+  lym::MacroCollection::root ().autorun_early ();
 
   //  rescan the folders because early autorun macros might have added 
   //  suffixes through the MacroInterpreter interface.
-  lay::MacroCollection::root ().rescan ();
+  lym::MacroCollection::root ().rescan ();
 
   if (mp_qapp_gui) {
     mp_mw = new lay::MainWindow (mp_qapp_gui, "main_window");
@@ -1119,7 +1119,7 @@ Application::run ()
 
     BEGIN_PROTECTED 
 
-      std::auto_ptr<lay::Macro> macro (new lay::Macro ());
+      std::auto_ptr<lym::Macro> macro (new lym::Macro ());
       macro->load_from (*m);
       macro->set_file_path (*m);
       if (macro->show_in_menu ()) {
@@ -1147,7 +1147,7 @@ Application::run ()
   }
 
   //  run all autorun macros
-  lay::MacroCollection::root ().autorun ();
+  lym::MacroCollection::root ().autorun ();
 
   if (mp_mw) {
 
@@ -1236,7 +1236,7 @@ Application::run ()
   if (! m_run_macro.empty ()) {
 
     tl::log << "Run macro '" << m_run_macro << "'";
-    lay::Macro macro;
+    lym::Macro macro;
     macro.load_from (m_run_macro);
     macro.set_file_path (m_run_macro);
     result = macro.run ();

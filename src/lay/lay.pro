@@ -19,12 +19,10 @@ HEADERS = \
     layHelpSource.h \
     layLayoutStatisticsForm.h \
     layLogViewerDialog.h \
-    layMacro.h \
     layMacroEditorDialog.h \
     layMacroEditorPage.h \
     layMacroEditorSetupDialog.h \
     layMacroEditorTree.h \
-    layMacroInterpreter.h \
     layMacroPropertiesDialog.h \
     layMacroVariableView.h \
     layMainConfigPages.h \
@@ -113,7 +111,6 @@ FORMS = \
 SOURCES = \
     gsiDeclLayApplication.cc \
     gsiDeclLayHelpDialog.cc \
-    gsiDeclLayMacro.cc \
     gsiDeclLayMainWindow.cc \
     layApplication.cc \
     layClipDialog.cc \
@@ -126,12 +123,10 @@ SOURCES = \
     layHelpSource.cc \
     layLayoutStatisticsForm.cc \
     layLogViewerDialog.cc \
-    layMacro.cc \
     layMacroEditorDialog.cc \
     layMacroEditorPage.cc \
     layMacroEditorSetupDialog.cc \
     layMacroEditorTree.cc \
-    layMacroInterpreter.cc \
     layMacroPropertiesDialog.cc \
     layMacroVariableView.cc \
     layMainConfigPages.cc \
@@ -174,9 +169,9 @@ RESOURCES = layBuildInMacros.qrc \
     layResources.qrc \
     laySaltTemplates.qrc
 
-INCLUDEPATH += ../tl ../gsi ../db ../rdb ../laybasic ../ant ../img ../edt
-DEPENDPATH += ../tl ../gsi ../db ../rdb ../laybasic ../ant ../img ../edt
-LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_laybasic -lklayout_ant -lklayout_img -lklayout_edt
+INCLUDEPATH += ../tl ../gsi ../db ../rdb ../lym ../laybasic ../ant ../img ../edt
+DEPENDPATH += ../tl ../gsi ../db ../rdb ../lym ../laybasic ../ant ../img ../edt
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_lym -lklayout_laybasic -lklayout_ant -lklayout_img -lklayout_edt
 
 win32 {
   # for stack trace support:

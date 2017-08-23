@@ -23,9 +23,6 @@
 
 #ifdef HAVE_PYTHON
 
-//  For PY_MAJOR_VERSION
-#include <Python.h>
-
 #include "pya.h"
 #include "gsiTest.h"
 
@@ -47,11 +44,7 @@ TEST (1)
     ut::python_interpreter ()->eval_string ("raise Exception(\"an error\")");
   } catch (tl::ScriptError &ex) {
     EXPECT_EQ (ex.basic_msg (), std::string ("an error"));
-#if PY_MAJOR_VERSION < 3
-    EXPECT_EQ (ex.cls (), std::string ("exceptions.Exception"));
-#else
-    EXPECT_EQ (ex.cls (), std::string ("Exception"));
-#endif
+    EXPECT_EQ (ex.cls () == std::string ("exceptions.Exception") || ex.cls () == std::string ("Exception"), true);
     err = true;
   }
 
@@ -62,11 +55,7 @@ TEST (1)
     ut::python_interpreter ()->eval_string ("Quatsch");
   } catch (tl::ScriptError &ex) {
     EXPECT_EQ (ex.basic_msg (), std::string ("name 'Quatsch' is not defined"));
-#if PY_MAJOR_VERSION < 3
-    EXPECT_EQ (ex.cls (), std::string ("exceptions.NameError"));
-#else
-    EXPECT_EQ (ex.cls (), std::string ("NameError"));
-#endif
+    EXPECT_EQ (ex.cls () == std::string ("exceptions.NameError") || ex.cls () == std::string ("NameError"), true);
     err = true;
   }
 

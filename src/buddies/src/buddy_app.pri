@@ -13,6 +13,6 @@ SOURCES = $$PWD/bd/main.cc
 
 INCLUDEPATH += ../bd
 DEPENDPATH += ../bd 
-LIBS += -L$$DESTDIR -lklayout_bd 
+LIBS += -L$$DESTDIR -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi
 
 DEFINES += BD_TARGET=$$TARGET

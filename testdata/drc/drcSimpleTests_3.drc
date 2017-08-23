@@ -1,0 +1,19 @@
+
+# Foreign cell test
+
+source($drc_test_source, "TOPTOP")
+target($drc_test_target)
+
+cell("TOP")
+
+a1 = input(1)
+b1 = input(2)
+
+output_cell("NEW")
+
+a1.and(b1).output(1000, 0)
+
+cell("TOPTOP")
+
+a1.and(b1).output(1001, 0)
+

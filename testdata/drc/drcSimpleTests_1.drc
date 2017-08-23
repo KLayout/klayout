@@ -1,0 +1,21 @@
+
+dbu 0.001
+
+target($drc_test_target, "TOP")
+
+x = polygon_layer
+x.is_empty? == true || raise("unexpected value")
+x.is_box? == false || raise("unexpected value")
+x.insert(box(4.0, 0, 4.7, 0.7))
+x.is_empty? == false || raise("unexpected value")
+x.is_box? == true || raise("unexpected value")
+x.insert(polygon([ p(0, 0), p(2.0, 0), p(1.0, 1.0) ]))
+x.insert(polygon([ p(0, -5.0), p(2.0, -5.0), p(1.0, -6.0) ]))
+x.insert(path([ p(0, -2), p(2.0, -2) ], 0.2))
+x.is_box? == false || raise("unexpected value")
+x.output(10, 0)
+
+y = polygon_layer
+y.insert(polygon([ p(0, 0), p(0, 1.0), p(2.0, 1.0), p(2.0, 2.0), p(1.0, 2.0), p(1.0, 0) ]))
+y.output(11, 0)
+

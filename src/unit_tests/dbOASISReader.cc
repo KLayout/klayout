@@ -47,7 +47,7 @@ TEST(1_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -78,7 +78,7 @@ TEST(1_2)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -109,7 +109,7 @@ TEST(1_3)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -140,7 +140,7 @@ TEST(1_4)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -171,7 +171,7 @@ TEST(1_5)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -229,7 +229,7 @@ TEST(10_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -295,7 +295,7 @@ TEST(11_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -526,7 +526,7 @@ TEST(11_2)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -592,7 +592,7 @@ TEST(11_3)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -692,7 +692,7 @@ TEST(11_4)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -923,7 +923,7 @@ TEST(11_5)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1024,7 +1024,7 @@ TEST(11_6)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1067,7 +1067,7 @@ TEST(11_7)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1161,7 +1161,7 @@ TEST(12_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1211,7 +1211,7 @@ TEST(13_1)
     db::LayerMap map = reader.read (layout);
     EXPECT_EQ (map.to_string (), "layer_map('1/2 : \\'AA;L5A\\' (1/2)';'1/5 : \\'AA;L5A\\' (1/5)';'1/6 : \\'AA;L5A\\' (1/6)';'1/8 : \\'AA;L5A\\' (1/8)';'5/2 : \\'AA;L5A;H5A;E5A;I56A;E5L4\\' (5/2)';'5/5 : \\'AA;L5A;H5A;E5A;I56A;E5H4;E5I47\\' (5/5)';'5/6 : \\'AA;L5A;H5A;E5A;I56A;E5H4;E5I47\\' (5/6)';'5/8 : \\'AA;L5A;H5A;E5A;I56A;E5H4\\' (5/8)';'6/2 : \\'AA;H5A;I56A\\' (6/2)';'6/5 : \\'AA;H5A;I56A\\' (6/5)';'6/6 : \\'AA;H5A;I56A\\' (6/6)';'6/8 : \\'AA;H5A;I56A\\' (6/8)';'7/2 : \\'AA;H5A\\' (7/2)';'7/5 : \\'AA;H5A\\' (7/5)';'7/6 : \\'AA;H5A\\' (7/6)';'7/8 : \\'AA;H5A\\' (7/8)')")
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1261,7 +1261,7 @@ TEST(13_2)
     db::LayerMap map = reader.read (layout);
     EXPECT_EQ (map.to_string (), "layer_map('1/2 : \\'AA;L5A\\' (1/2)';'1/5 : \\'AA;L5A\\' (1/5)';'1/6 : \\'AA;L5A\\' (1/6)';'1/8 : \\'AA;L5A\\' (1/8)';'5/2 : \\'AA;L5A;H5A;E5A;I56A\\' (5/2)';'5/5 : \\'AA;L5A;H5A;E5A;I56A\\' (5/5)';'5/6 : \\'AA;L5A;H5A;E5A;I56A\\' (5/6)';'5/8 : \\'AA;L5A;H5A;E5A;I56A\\' (5/8)';'6/2 : \\'AA;H5A;I56A\\' (6/2)';'6/5 : \\'AA;H5A;I56A\\' (6/5)';'6/6 : \\'AA;H5A;I56A\\' (6/6)';'6/8 : \\'AA;H5A;I56A\\' (6/8)';'7/2 : \\'AA;H5A\\' (7/2)';'7/5 : \\'AA;H5A\\' (7/5)';'7/6 : \\'AA;H5A\\' (7/6)';'7/8 : \\'AA;H5A\\' (7/8)')");
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1327,7 +1327,7 @@ TEST(13_3)
     db::LayerMap map = reader.read (layout);
     EXPECT_EQ (map.to_string (), "layer_map('1/2 : \\'TAA;TL5A;AA;L5A\\' (1/2)';'1/5 : \\'TAA;TL5A;AA;L5A\\' (1/5)';'1/6 : \\'TAA;TL5A;AA;L5A\\' (1/6)';'1/8 : \\'TAA;TL5A;AA;L5A\\' (1/8)';'5/2 : \\'TAA;TL5A;TH5A;TE5A;TI56A;AA;L5A;H5A;E5A;I56A\\' (5/2)';'5/5 : \\'TAA;TL5A;TH5A;TE5A;TI56A;AA;L5A;H5A;E5A;I56A\\' (5/5)';'5/6 : \\'TAA;TL5A;TH5A;TE5A;TI56A;AA;L5A;H5A;E5A;I56A\\' (5/6)';'5/8 : \\'TAA;TL5A;TH5A;TE5A;TI56A;AA;L5A;H5A;E5A;I56A\\' (5/8)';'6/2 : \\'TAA;TH5A;TI56A;AA;H5A;I56A\\' (6/2)';'6/5 : \\'TAA;TH5A;TI56A;AA;H5A;I56A\\' (6/5)';'6/6 : \\'TAA;TH5A;TI56A;AA;H5A;I56A\\' (6/6)';'6/8 : \\'TAA;TH5A;TI56A;AA;H5A;I56A\\' (6/8)';'7/2 : \\'TAA;TH5A;AA;H5A\\' (7/2)';'7/5 : \\'TAA;TH5A;AA;H5A\\' (7/5)';'7/6 : \\'TAA;TH5A;AA;H5A\\' (7/6)';'7/8 : \\'TAA;TH5A;AA;H5A\\' (7/8)')");
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1393,7 +1393,7 @@ TEST(13_4)
     db::LayerMap map = reader.read (layout);
     EXPECT_EQ (map.to_string (), "layer_map('1/2 : \\'TAA;TL5A;AA;L5A\\' (1/2)';'1/5 : \\'TAA;TL5A;AA;L5A\\' (1/5)';'1/6 : \\'TAA;TL5A;AA;L5A\\' (1/6)';'1/8 : \\'TAA;TL5A;AA;L5A\\' (1/8)';'5/2 : \\'TAA;TL5A;TH5A;TE5A;TI56A;AA;L5A;H5A;E5A;I56A\\' (5/2)';'5/5 : \\'TAA;TL5A;TH5A;TE5A;TI56A;AA;L5A;H5A;E5A;I56A\\' (5/5)';'5/6 : \\'TAA;TL5A;TH5A;TE5A;TI56A;AA;L5A;H5A;E5A;I56A\\' (5/6)';'5/8 : \\'TAA;TL5A;TH5A;TE5A;TI56A;AA;L5A;H5A;E5A;I56A\\' (5/8)';'6/2 : \\'TAA;TH5A;TI56A;AA;H5A;I56A\\' (6/2)';'6/5 : \\'TAA;TH5A;TI56A;AA;H5A;I56A\\' (6/5)';'6/6 : \\'TAA;TH5A;TI56A;AA;H5A;I56A\\' (6/6)';'6/8 : \\'TAA;TH5A;TI56A;AA;H5A;I56A\\' (6/8)';'7/2 : \\'TAA;TH5A;AA;H5A\\' (7/2)';'7/5 : \\'TAA;TH5A;AA;H5A\\' (7/5)';'7/6 : \\'TAA;TH5A;AA;H5A\\' (7/6)';'7/8 : \\'TAA;TH5A;AA;H5A\\' (7/8)')");
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1436,7 +1436,7 @@ TEST(14_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1469,7 +1469,7 @@ TEST(2_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1504,7 +1504,7 @@ TEST(2_2)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1561,7 +1561,7 @@ TEST(2_4)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1618,7 +1618,7 @@ TEST(2_6)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1869,7 +1869,7 @@ TEST(3_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -1903,7 +1903,7 @@ TEST(3_10)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -2176,7 +2176,7 @@ TEST(3_12)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -2427,7 +2427,7 @@ TEST(3_2)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -2722,7 +2722,7 @@ TEST(3_5)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -2822,7 +2822,7 @@ TEST(3_9)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -2879,7 +2879,7 @@ TEST(4_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3008,7 +3008,7 @@ TEST(4_2)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3077,7 +3077,7 @@ TEST(5_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3113,7 +3113,7 @@ TEST(5_2)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3291,7 +3291,7 @@ TEST(5_3)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3354,7 +3354,7 @@ TEST(6_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3488,7 +3488,7 @@ TEST(7_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3540,7 +3540,7 @@ TEST(8_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3583,7 +3583,7 @@ TEST(8_2)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3626,7 +3626,7 @@ TEST(8_3)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3669,7 +3669,7 @@ TEST(8_4)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3712,7 +3712,7 @@ TEST(8_5)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3759,7 +3759,7 @@ TEST(8_6)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3802,7 +3802,7 @@ TEST(8_7)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3845,7 +3845,7 @@ TEST(8_8)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3945,7 +3945,7 @@ TEST(9_1)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -3984,7 +3984,7 @@ TEST(9_2)
   try {
     db::LayerMap map = reader.read (layout);
   } catch (tl::Exception &ex) {
-    ut::print_error (ex.msg ());
+    tl::error << ex.msg ();
     error = true;
   }
   EXPECT_EQ (error, false)
@@ -4036,7 +4036,7 @@ TEST(99)
     try {
       db::LayerMap map = reader.read (layout);
     } catch (tl::Exception &ex) {
-      ut::print_error (ex.msg ());
+      tl::error << ex.msg ();
       error = true;
     }
     EXPECT_EQ (error, false)
@@ -4053,7 +4053,7 @@ TEST(99)
     try {
       db::LayerMap map = reader.read (layout);
     } catch (tl::Exception &ex) {
-      ut::print_error (ex.msg ());
+      tl::error << ex.msg ();
       error = true;
     }
     EXPECT_EQ (error, false)

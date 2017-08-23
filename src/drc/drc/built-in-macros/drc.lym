@@ -4181,14 +4181,14 @@ CODE
           @output_layout_file = nil
         else
           @output_layout = RBA::Layout::new
-          @output_cell = @output_layout.create_cell(cellname.to_s || "TOP")
+          @output_cell = cellname &amp;&amp; @output_layout.create_cell(cellname.to_s)
           @output_layout_file = arg
         end
         
       elsif arg.is_a?(RBA::Layout)
       
         @output_layout = arg
-        @output_cell = @output_layout.create_cell(cellname.to_s || "TOP")
+        @output_cell = cellname &amp;&amp; (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s))
         @output_layout_file = nil
         
       elsif arg.is_a?(RBA::Cell)

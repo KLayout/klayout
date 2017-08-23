@@ -24,6 +24,7 @@
 #include "tlEvents.h"
 
 #include "utHead.h"
+#include <memory>
 
 //  Object with event
 class Observed

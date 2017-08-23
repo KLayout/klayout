@@ -11,10 +11,14 @@ TEMPLATE = lib
 # Input
 HEADERS = \
   utHead.h \
-    utCommon.h
+  utTestBase.h \
+  utTestConsole.h \
+  utCommon.h
 
 SOURCES = \
   utMain.cc \
+  utTestConsole.cc \
+  utTestBase.cc \
 
 INCLUDEPATH = ../tl ../db ../gsi ../lay ../ext ../lib
 DEPENDPATH = ../tl ../db ../gsi ../lay ../ext ../lib

@@ -14,6 +14,7 @@ RESOURCES = \
 SOURCES = \
   gsiDeclRdb.cc \
   rdb.cc \
+  rdbForceLink.cc \
   rdbFile.cc \
   rdbReader.cc \
   rdbRVEReader.cc \
@@ -22,6 +23,7 @@ SOURCES = \
 
 HEADERS = \
   rdb.h \
+  rdbForceLink.h \
   rdbReader.h \
   rdbTiledRdbOutputReceiver.h \
   rdbUtils.h \

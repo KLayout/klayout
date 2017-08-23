@@ -1,4 +1,0 @@
-# Build-in macros list
-pcell_declaration_helper.lym
-qt_helper.lym
-

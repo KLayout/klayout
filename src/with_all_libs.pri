@@ -1,8 +1,8 @@
 
-INCLUDEPATH += $$PYTHONINCLUDE $$PWD/tl $$PWD/gsi $$PWD/db $$PWD/rdb $$PWD/lym $$PWD/laybasic $$PWD/lay $$PWD/ant $$PWD/img $$PWD/edt $$PWD/ext $$PWD/lib $$PWD/common $$PWD/ut $$PWD/version
-DEPENDPATH += $$PYTHONINCLUDE $$PWD/tl $$PWD/gsi $$PWD/db $$PWD/rdb $$PWD/lym $$PWD/laybasic $$PWD/lay $$PWD/ant $$PWD/img $$PWD/edt $$PWD/ext $$PWD/lib $$PWD/commo $$PWD/ut $$PWD/version
+INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC $$LAYBASIC_INC $$LAY_INC $$ANT_INC $$IMG_INC $$EDT_INC $$DRC_INC $$EXT_INC $$LIB_INC $$UT_INC $$RBA_INC $$PYA_INC $$VERSION_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC $$LAYBASIC_INC $$LAY_INC $$ANT_INC $$IMG_INC $$EDT_INC $$DRC_INC $$EXT_INC $$LIB_INC $$UT_INC $$RBA_INC $$PYA_INC $$VERSION_INC
 
-LIBS += $$PYTHONLIBFILE $$RUBYLIBFILE -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_lym -lklayout_laybasic -lklayout_lay -lklayout_ant -lklayout_img -lklayout_edt -lklayout_ext -lklayout_lib -lklayout_ut
+LIBS += $$PYTHONLIBFILE $$RUBYLIBFILE -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_lym -lklayout_laybasic -lklayout_lay -lklayout_ant -lklayout_img -lklayout_edt -lklayout_drc -lklayout_ext -lklayout_lib -lklayout_ut
 
 # Note: this accounts for UI-generated headers placed into the output folders in
 # shadow builds:
@@ -16,21 +16,13 @@ equals(HAVE_QTBINDINGS, "1") {
 }
 
 equals(HAVE_RUBY, "1") {
-  INCLUDEPATH += $$PWD/rba
-  DEPENDPATH += $$PWD/rba
   LIBS += -lklayout_rba
 } else {
-  INCLUDEPATH += $$PWD/rbastub
-  DEPENDPATH += $$PWD/rbastub
   LIBS += -lklayout_rbastub
 }
 
 equals(HAVE_PYTHON, "1") {
-  INCLUDEPATH += $$PWD/pya
-  DEPENDPATH += $$PWD/pya
   LIBS += -lklayout_pya
 } else {
-  INCLUDEPATH += $$PWD/pyastub
-  DEPENDPATH += $$PWD/pyastub
   LIBS += -lklayout_pyastub
 }

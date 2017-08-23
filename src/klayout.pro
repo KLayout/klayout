@@ -21,6 +21,7 @@ SUBDIRS = \
   ut \
   plugins \
   buddies \
+  drc \
 
 equals(HAVE_RUBY, "1") {
   SUBDIRS += rba
@@ -45,6 +46,7 @@ laybasic.depends += db rdb
 ant.depends += laybasic
 img.depends += laybasic
 edt.depends += laybasic
+drc.depends += db rdb lym
 
 lym.depends += tl gsi
 equals(HAVE_RUBY, "1") {

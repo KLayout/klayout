@@ -1265,6 +1265,21 @@ void MacroCollection::rescan ()
   }
 }
 
+namespace {
+
+  /**
+   *  @brief A QResource variant that allows access to the children
+   */
+  class ResourceWithChildren
+    : public QResource
+  {
+  public:
+    ResourceWithChildren (const QString &path) : QResource (path) { }
+    using QResource::children;
+  };
+
+}
+
 void MacroCollection::scan (const std::string &path)
 {
   if (tl::verbosity () >= 20) {
@@ -1273,78 +1288,62 @@ void MacroCollection::scan (const std::string &path)
 
   if (! path.empty () && path[0] == ':') {
 
-    //  look for an index file
-    QResource res (tl::to_qstring (path + "/index.txt"));
-    QByteArray data;
-    if (res.isCompressed ()) {
-      data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
-    } else {
-      data = QByteArray ((const char *)res.data (), (int)res.size ());
-    }
+    ResourceWithChildren res (tl::to_qstring (path));
+    QStringList children = res.children ();
 
-    //  Read index file
-    std::vector<std::string> lines = tl::split (std::string (data.constData (), data.size ()), "\n");
-    std::string description_prefix;
-    for (std::vector<std::string>::const_iterator l = lines.begin (); l != lines.end (); ++l) {
+    for (QStringList::const_iterator c = children.begin (); c != children.end (); ++c) {
 
-      std::string ll = tl::trim (*l);
-      if (! ll.empty () && ll [0] != '#') {
+      std::string url = path + "/" + tl::to_string (*c);
+      QResource res (tl::to_qstring (url));
+      if (res.size () > 0) {
 
-        std::string url = path + "/" + ll;
-        QResource res (tl::to_qstring (url));
-        if (res.size () > 0) {
+        QByteArray data;
+        if (res.isCompressed ()) {
+          data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
+        } else {
+          data = QByteArray ((const char *)res.data (), (int)res.size ());
+        }
 
-          QByteArray data;
-          if (res.isCompressed ()) {
-            data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
-          } else {
-            data = QByteArray ((const char *)res.data (), (int)res.size ());
-          }
+        try {
 
-          try {
+          Macro::Format format = Macro::NoFormat;
+          Macro::Interpreter interpreter = Macro::None;
+          std::string dsl_name;
+          bool autorun = false;
 
-            Macro::Format format = Macro::NoFormat;
-            Macro::Interpreter interpreter = Macro::None;
-            std::string dsl_name;
-            bool autorun = false;
+          if (Macro::format_from_suffix (tl::to_string (*c), interpreter, dsl_name, autorun, format)) {
 
-            if (Macro::format_from_suffix (ll, interpreter, dsl_name, autorun, format)) {
+            std::string n = tl::to_string (QFileInfo (*c).baseName ());
 
-              std::string n = tl::to_string (QFileInfo (tl::to_qstring (ll)).baseName ());
-
-              iterator mm = m_macros.find (n);
-              bool found = false;
-              while (mm != m_macros.end () && mm->first == n && ! found) {
-                if ((interpreter == Macro::None || mm->second->interpreter () == interpreter) &&
-                    (dsl_name.empty () || mm->second->dsl_interpreter () == dsl_name) && 
-                    mm->second->format () == format) {
-                  found = true;
-                }
-                ++mm;
+            iterator mm = m_macros.find (n);
+            bool found = false;
+            while (mm != m_macros.end () && mm->first == n && ! found) {
+              if ((interpreter == Macro::None || mm->second->interpreter () == interpreter) &&
+                  (dsl_name.empty () || mm->second->dsl_interpreter () == dsl_name) &&
+                  mm->second->format () == format) {
+                found = true;
               }
-              if (! found) {
-                Macro *m = m_macros.insert (std::make_pair (n, new Macro ()))->second;
-                m->set_parent (this);
-                m->set_interpreter (interpreter);
-                m->set_autorun_default (autorun);
-                m->set_autorun (autorun);
-                m->set_dsl_interpreter (dsl_name);
-                m->set_format (format);
-                m->set_name (n);
-                m->load_from_string (std::string (data.constData (), data.size ()), url);
-                m->set_readonly (m_readonly);
-                m->reset_modified ();
-                m->set_is_file ();
-              }
-
+              ++mm;
+            }
+            if (! found) {
+              Macro *m = m_macros.insert (std::make_pair (n, new Macro ()))->second;
+              m->set_parent (this);
+              m->set_interpreter (interpreter);
+              m->set_autorun_default (autorun);
+              m->set_autorun (autorun);
+              m->set_dsl_interpreter (dsl_name);
+              m->set_format (format);
+              m->set_name (n);
+              m->load_from_string (std::string (data.constData (), data.size ()), url);
+              m->set_readonly (m_readonly);
+              m->reset_modified ();
+              m->set_is_file ();
             }
 
-          } catch (tl::Exception &ex) {
-            tl::error << "Reading " << url << ": " << ex.msg ();
           }
 
-        } else {
-          tl::error << "Resource " << url << " not found";
+        } catch (tl::Exception &ex) {
+          tl::error << "Reading " << url << ": " << ex.msg ();
         }
 
       }

@@ -40,6 +40,7 @@
 #include "libForceLink.h"
 #include "antForceLink.h"
 #include "imgForceLink.h"
+#include "drcForceLink.h"
 
 #include <QTranslator>
 #include <QLocale>

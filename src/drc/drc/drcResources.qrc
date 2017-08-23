@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/built-in-macros">
+        <file alias="drc.lym">built-in-macros/drc.lym</file>
+        <file alias="drc_interpreters.lym">built-in-macros/drc_interpreters.lym</file>
+    </qresource>
+</RCC>

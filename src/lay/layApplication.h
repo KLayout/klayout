@@ -143,6 +143,11 @@ public:
   }
 
   /**
+   *  @brief Runs plugin and macro specific initializations
+   */
+  void autorun ();
+
+  /**
    *  @brief Run the application
    *
    *  This method issues all the lower level methods required in order to perform the

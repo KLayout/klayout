@@ -905,6 +905,7 @@ main_cont (int argc, char **argv)
   static char av3[] = "-rx";  //  No mplicit macros
   char *av[] = { av0, av1, av2, av3, 0 };
   lay::Application app (ac, av, false);
+  app.autorun ();
 
 #if QT_VERSION < 0x050000
   QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));

@@ -21,10 +21,45 @@
 */
 
 #include "utHead.h"
-#include "rdbForceLink.h"
+#include "dbReader.h"
+#include "lymMacro.h"
 
 TEST(1)
 {
-  //  @@@ TODO: add tests ..
+  std::string input = ut::testsrc ();
+  input += "/testdata/drc/drctest.gds";
+  std::string au = ut::testsrc ();
+  au += "/testdata/drc/drcBasicTests_au.gds";
+
+  std::string output = this->tmp_file ("tmp.gds");
+
+  lym::Macro drc;
+  drc.set_text (tl::sprintf (
+      "source(\"%s\", \"TOP\")\n"
+      "target(\"%s\", \"TOP\")\n"
+      "l1 = input(1, 0)\n"
+      "l2 = input(2, 0)\n"
+      "l3 = input(3, 0)\n"
+      "l1.output(1, 0)\n"
+      "l2.output(2, 0)\n"
+      "l3.output(3, 0)\n"
+      "l1.space(0.5, projection).output(10, 0)\n"
+      "(l2 & l3).output(11, 0)\n"
+    , input, output)
+  );
+  drc.set_interpreter (lym::Macro::DSLInterpreter);
+  drc.set_dsl_interpreter ("drc-dsl");
+
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  this->compare_layouts (layout, au, ut::NoNormalization);
 }
 

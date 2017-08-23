@@ -1139,15 +1139,8 @@ Application::run ()
 
   }
 
-  //  call "autorun" on all plugins that wish so
-  for (std::vector <lay::PluginDescriptor>::const_iterator p = m_native_plugins.begin (); p != m_native_plugins.end (); ++p) {
-    if (p->autorun) {
-      (*p->autorun) ();
-    }
-  }
-
-  //  run all autorun macros
-  lym::MacroCollection::root ().autorun ();
+  //  Run plugin and macro specific initializations
+  autorun ();
 
   if (mp_mw) {
 
@@ -1248,6 +1241,20 @@ Application::run ()
   finish ();
 
   return result;
+}
+
+void
+Application::autorun ()
+{
+  //  call "autorun" on all plugins that wish so
+  for (std::vector <lay::PluginDescriptor>::const_iterator p = m_native_plugins.begin (); p != m_native_plugins.end (); ++p) {
+    if (p->autorun) {
+      (*p->autorun) ();
+    }
+  }
+
+  //  run all autorun macros
+  lym::MacroCollection::root ().autorun ();
 }
 
 void

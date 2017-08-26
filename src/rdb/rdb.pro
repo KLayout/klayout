@@ -2,7 +2,6 @@
 DESTDIR = $$OUT_PWD/..
 TARGET = klayout_rdb
 
-include($$PWD/../klayout.pri)
 include($$PWD/../lib.pri)
 
 DEFINES += MAKE_RDB_LIBRARY
@@ -29,7 +28,7 @@ HEADERS = \
   rdbUtils.h \
     rdbCommon.h
 
-INCLUDEPATH += ../tl ../gsi ../db
-DEPENDPATH += ../tl ../gsi ../db
+INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db
 

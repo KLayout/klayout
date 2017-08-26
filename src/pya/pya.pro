@@ -2,7 +2,6 @@
 DESTDIR = $$OUT_PWD/..
 TARGET = klayout_pya
 
-include($$PWD/../klayout.pri)
 include($$PWD/../lib.pri)
 
 DEFINES += MAKE_PYA_LIBRARY
@@ -17,8 +16,8 @@ SOURCES = \
   pyaRefs.cc \
   pyaUtils.cc \
 
-INCLUDEPATH += $$PYTHONINCLUDE ../tl ../gsi
-DEPENDPATH += $$PYTHONINCLUDE ../tl ../gsi
+INCLUDEPATH += $$PYTHONINCLUDE $$TL_INC $$GSI_INC
+DEPENDPATH += $$PYTHONINCLUDE $$TL_INC $$GSI_INC
 LIBS += $$PYTHONLIBFILE -L$$DESTDIR -lklayout_tl -lklayout_gsi
 
 # Python is somewhat sloppy and relies on the compiler initializing fields 

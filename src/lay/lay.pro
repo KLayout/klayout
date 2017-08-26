@@ -2,7 +2,6 @@
 DESTDIR = $$OUT_PWD/..
 TARGET = klayout_lay
 
-include($$PWD/../klayout.pri)
 include($$PWD/../lib.pri)
 
 DEFINES += MAKE_LAY_LIBRARY
@@ -169,8 +168,8 @@ RESOURCES = layBuildInMacros.qrc \
     layResources.qrc \
     laySaltTemplates.qrc
 
-INCLUDEPATH += ../tl ../gsi ../db ../rdb ../lym ../laybasic ../ant ../img ../edt
-DEPENDPATH += ../tl ../gsi ../db ../rdb ../lym ../laybasic ../ant ../img ../edt
+INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LAYBASIC_INC $$ANT_INC $$IMG_INC $$EDT_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LAYBASIC_INC $$ANT_INC $$IMG_INC $$EDT_INC
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_lym -lklayout_laybasic -lklayout_ant -lklayout_img -lklayout_edt
 
 win32 {
@@ -185,30 +184,28 @@ win32 {
 INCLUDEPATH += $$DESTDIR/laybasic
 DEPENDPATH += $$DESTDIR/laybasic
 
-INCLUDEPATH += ../gsiqt
-DEPENDPATH += ../gsiqt
+INCLUDEPATH += $$GSIQT_INC
+DEPENDPATH += $$GSIQT_INC
 
 equals(HAVE_QTBINDINGS, "1") {
   LIBS += -lklayout_gsiqt
 }
 
+INCLUDEPATH += $$RBA_INC
+DEPENDPATH += $$RBA_INC
+
 equals(HAVE_RUBY, "1") {
-  INCLUDEPATH += ../rba
-  DEPENDPATH += ../rba
   LIBS += -lklayout_rba
 } else {
-  INCLUDEPATH += ../rbastub
-  DEPENDPATH += ../rbastub
   LIBS += -lklayout_rbastub
 }
 
+INCLUDEPATH += $$PYA_INC
+DEPENDPATH += $$PYA_INC
+
 equals(HAVE_PYTHON, "1") {
-  INCLUDEPATH += ../pya
-  DEPENDPATH += ../pya
   LIBS += -lklayout_pya
 } else {
-  INCLUDEPATH += ../pyastub
-  DEPENDPATH += ../pyastub
   LIBS += -lklayout_pyastub
 }
 

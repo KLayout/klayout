@@ -2,7 +2,6 @@
 DESTDIR = $$OUT_PWD/..
 TARGET = klayout_lym
 
-include($$PWD/../klayout.pri)
 include($$PWD/../lib.pri)
 
 DEFINES += MAKE_LYM_LIBRARY
@@ -17,7 +16,25 @@ HEADERS = \
   lymMacroInterpreter.h \
   lymMacro.h \
 
-INCLUDEPATH += ../tl ../gsi ../rba ../pya
-DEPENDPATH += ../tl ../gsi ../rba ../pya
-LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_rba -lklayout_pya
+INCLUDEPATH += $$TL_INC $$GSI_INC
+DEPENDPATH += $$TL_INC $$GSI_INC
 
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi
+
+INCLUDEPATH += $$RBA_INC
+DEPENDPATH += $$RBA_INC
+
+equals(HAVE_RUBY, "1") {
+  LIBS += -lklayout_rba
+} else {
+  LIBS += -lklayout_rbastub
+}
+
+INCLUDEPATH += $$PYA_INC
+DEPENDPATH += $$PYA_INC
+
+equals(HAVE_PYTHON, "1") {
+  LIBS += -lklayout_pya
+} else {
+  LIBS += -lklayout_pyastub
+}

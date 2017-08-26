@@ -2,7 +2,6 @@
 DESTDIR = $$OUT_PWD/..
 TARGET = klayout_img
 
-include($$PWD/../klayout.pri)
 include($$PWD/../lib.pri)
 
 DEFINES += MAKE_IMG_LIBRARY
@@ -34,7 +33,7 @@ SOURCES = \
   imgWidgets.cc \
     imgForceLink.cc
 
-INCLUDEPATH += ../tl ../gsi ../laybasic ../db
-DEPENDPATH += ../tl ../gsi ../laybasic ../db
+INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_db
 

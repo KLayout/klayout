@@ -4,7 +4,6 @@ DESTDIR = $$OUT_PWD/..
 
 TARGET = drc_tests
 
-include($$PWD/../../klayout.pri)
 include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
@@ -12,7 +11,7 @@ SOURCES = \
   drcSimpleTests.cc \
   drcSuiteTests.cc \
 
-INCLUDEPATH += ../drc ../../rdb ../../db ../../tl ../../gsi ../../lym ../../ut
-DEPENDPATH += ../drc ../../rdb ../../db ../../tl ../../gsi ../../lym ../../ut
+INCLUDEPATH += $$DRC_INC $$TL_INC $$RDB_INC $$DB_INC $$GSI_INC $$LYM_INC $$UT_INC
+DEPENDPATH += $$DRC_INC $$TL_INC $$RDB_INC $$DB_INC $$GSI_INC $$LYM_INC $$UT_INC
 
 LIBS += -L$$DESTDIR_UT -lklayout_drc -lklayout_rdb -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_lym -lklayout_ut

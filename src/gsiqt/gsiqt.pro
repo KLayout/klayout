@@ -2,14 +2,13 @@
 DESTDIR = $$OUT_PWD/..
 TARGET = klayout_gsiqt
 
-include($$PWD/../klayout.pri)
 include($$PWD/../lib.pri)
 
 DEFINES += MAKE_GSIQT_LIBRARY
 
 # NOTE: db is required since some bridges to db are provided (i.e db::Polygon)
-INCLUDEPATH += ../tl ../gsi ../db ../gsiqt
-DEPENDPATH += ../tl ../gsi ../db ../gsiqt
+INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$GSIQT_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$GSIQT_INC
 
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db
 

@@ -2,7 +2,6 @@
 DESTDIR = $$OUT_PWD/../../..
 TARGET = klayout_bd
 
-include($$PWD/../../../klayout.pri)
 include($$PWD/../../../lib.pri)
 
 DEFINES += MAKE_BD_LIBRARY
@@ -31,7 +30,7 @@ HEADERS = \
 
 RESOURCES = \
 
-INCLUDEPATH += ../../../tl ../../../db ../../../gsi ../../../version
-DEPENDPATH += ../../../tl ../../../db ../../../gsi ../../../version
+INCLUDEPATH += $$TL_INC $$GSI_INC $$VERSION_INC $$DB_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$VERSION_INC $$DB_INC
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_db -lklayout_gsi
 

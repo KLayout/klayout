@@ -322,16 +322,6 @@ print_string_formatted (const std::string &indent, unsigned int columns, const s
   tl::info << "";
 }
 
-static std::string
-pad_string (unsigned int columns, const std::string &text)
-{
-  std::string s = text;
-  while (s.size () < size_t (columns)) {
-    s += " ";
-  }
-  return s;
-}
-
 struct NameCompare
 {
   bool operator() (ArgBase *a, ArgBase *b)
@@ -395,7 +385,7 @@ CommandLineOptions::produce_help (const std::string &program_name, bool advanced
     if ((*a)->option ().optional) {
       n += " (optional)";
     }
-    tl::info << "  " << pad_string (arg_width + 4, n) << (*a)->brief_doc ();
+    tl::info << "  " << pad_string_right (arg_width + 4, n) << (*a)->brief_doc ();
     tl::info << "";
 
     if (! (*a)->long_doc ().empty ()) {
@@ -442,7 +432,7 @@ CommandLineOptions::produce_help (const std::string &program_name, bool advanced
     }
 
     tl::info << "    "
-             << pad_string (arg_width + 4, (*a)->option_desc ())
+             << pad_string_right (arg_width + 4, (*a)->option_desc ())
              << (*a)->brief_doc ();
     tl::info << "";
 

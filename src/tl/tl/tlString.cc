@@ -423,6 +423,8 @@ tl::escape_to_html (std::string &out, const std::string &in, bool replace_newlin
       out += "&gt;";
     } else if (*cp == '&') {
       out += "&amp;";
+    } else if (*cp == '\"') {
+      out += "&quot;";
     } else if (replace_newlines && *cp == '\n') {
       out += "<br/>";
     } else {
@@ -436,6 +438,71 @@ tl::escaped_to_html (const std::string &in, bool replace_newlines)
 {
   std::string s;
   escape_to_html (s, in, replace_newlines);
+  return s;
+}
+
+std::string
+tl::replicate (const std::string &s, unsigned int n)
+{
+  if (n == 0) {
+    return std::string ();
+  }
+
+  std::string res;
+  res.reserve (s.size () * n);
+  while (n > 0) {
+    res += s;
+    --n;
+  }
+  return res;
+}
+
+std::string
+tl::pad_string_right (unsigned int columns, const std::string &text)
+{
+  std::string s = text;
+  s.reserve (columns);
+  while (s.size () < size_t (columns)) {
+    s += " ";
+  }
+  return s;
+}
+
+std::string
+tl::pad_string_left (unsigned int columns, const std::string &text)
+{
+  std::string s;
+  s.reserve (columns);
+  while (s.size () + text.size () < size_t (columns)) {
+    s += " ";
+  }
+  s += text;
+  return s;
+}
+
+std::string
+tl::replaced (const std::string &subject, const std::string &before, const std::string &after)
+{
+  if (before.empty ()) {
+    return subject;
+  }
+
+  std::string s;
+
+  std::string::size_type pos;
+  std::string::size_type last = 0;
+  while ((pos = subject.find (before, last)) != std::string::npos) {
+    if (pos > last) {
+       s += std::string (subject, last, pos - last);
+    }
+    s += after;
+    last = pos + before.size ();
+  }
+
+  if (last < subject.size ()) {
+    s += std::string (subject, last, subject.size () - last);
+  }
+
   return s;
 }
 

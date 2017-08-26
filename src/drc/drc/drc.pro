@@ -2,7 +2,6 @@
 DESTDIR = $$OUT_PWD/../..
 TARGET = klayout_drc
 
-include($$PWD/../../klayout.pri)
 include($$PWD/../../lib.pri)
 
 DEFINES += MAKE_DRC_LIBRARY

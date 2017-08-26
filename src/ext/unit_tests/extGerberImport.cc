@@ -52,6 +52,7 @@ static void run_test (ut::TestBase *_this, const char *dir)
 
 TEST(1)
 {
+  test_is_long_runner ();
   run_test (_this, "microchip-1");
 }
 

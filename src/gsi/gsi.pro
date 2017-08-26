@@ -2,7 +2,6 @@
 DESTDIR = $$OUT_PWD/..
 TARGET = klayout_gsi
 
-include($$PWD/../klayout.pri)
 include($$PWD/../lib.pri)
 
 DEFINES += MAKE_GSI_LIBRARY
@@ -49,7 +48,7 @@ HEADERS = \
 # since gsi is dependent on tl
 SOURCES += gsiDeclTl.cc 
 
-INCLUDEPATH += ../tl
-DEPENDPATH += ../tl
+INCLUDEPATH += $$TL_INC
+DEPENDPATH += $$TL_INC
 LIBS += -L$$DESTDIR -lklayout_tl
 

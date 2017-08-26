@@ -2,7 +2,6 @@
 DESTDIR = $$OUT_PWD/..
 TARGET = klayout_laybasic
 
-include($$PWD/../klayout.pri)
 include($$PWD/../lib.pri)
 
 DEFINES += MAKE_LAYBASIC_LIBRARY
@@ -274,12 +273,12 @@ HEADERS = \
     laybasicConfig.h \
     layBackgroundAwareTreeStyle.h
 
-INCLUDEPATH += ../tl ../gsi ../db ../rdb
-DEPENDPATH += ../tl ../gsi ../db ../rdb
+INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb
 
-INCLUDEPATH += ../gsiqt
-DEPENDPATH += ../gsiqt
+INCLUDEPATH += $GSIQT_INC
+DEPENDPATH += $GSIQT_INC
 
 equals(HAVE_QTBINDINGS, "1") {
   LIBS += -lklayout_gsiqt

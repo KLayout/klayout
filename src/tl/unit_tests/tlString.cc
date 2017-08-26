@@ -436,7 +436,46 @@ TEST(11)
   s = std::string ();
   tl::escape_to_html (s, "a\nb", false);
   EXPECT_EQ (s, "a\nb");
-  EXPECT_EQ (tl::escaped_to_html ("x<&>"), "x&lt;&amp;&gt;");
+  EXPECT_EQ (tl::escaped_to_html ("x<&>\""), "x&lt;&amp;&gt;&quot;");
   EXPECT_EQ (tl::escaped_to_html ("a\nb"), "a<br/>b");
   EXPECT_EQ (tl::escaped_to_html ("a\nb", false), "a\nb");
+}
+
+TEST(12)
+{
+  EXPECT_EQ (replaced ("abc", "b", "xy"), "axyc");
+  EXPECT_EQ (replaced ("ab", "b", "xy"), "axy");
+  EXPECT_EQ (replaced ("bc", "b", "xy"), "xyc");
+  EXPECT_EQ (replaced ("b", "b", "xy"), "xy");
+  EXPECT_EQ (replaced ("bbbb", "b", "xy"), "xyxyxyxy");
+  EXPECT_EQ (replaced ("", "b", "xy"), "");
+  EXPECT_EQ (replaced ("ac", "b", "xy"), "ac");
+  EXPECT_EQ (replaced ("abc", "b", ""), "ac");
+  EXPECT_EQ (replaced ("bb", "b", ""), "");
+  EXPECT_EQ (replaced ("bb", "bbb", ""), "bb");
+  EXPECT_EQ (replaced ("abbbc", "bbb", "xy"), "axyc");
+  EXPECT_EQ (replaced ("abbbbbbc", "bbb", "xy"), "axyxyc");
+  EXPECT_EQ (replaced ("abbbbbbbc", "bbb", "xy"), "axyxybc");
+}
+
+TEST(13)
+{
+  EXPECT_EQ (replicate ("abc", 0), "");
+  EXPECT_EQ (replicate ("abc", 1), "abc");
+  EXPECT_EQ (replicate ("abc", 2), "abcabc");
+  EXPECT_EQ (replicate ("", 2), "");
+}
+
+TEST(14)
+{
+  EXPECT_EQ (pad_string_right (0, "abc"), "abc");
+  EXPECT_EQ (pad_string_right (2, "abc"), "abc");
+  EXPECT_EQ (pad_string_right (4, "abc"), "abc ");
+  EXPECT_EQ (pad_string_right (6, "abc"), "abc   ");
+  EXPECT_EQ (pad_string_right (4, ""), "    ");
+  EXPECT_EQ (pad_string_left (0, "abc"), "abc");
+  EXPECT_EQ (pad_string_left (2, "abc"), "abc");
+  EXPECT_EQ (pad_string_left (4, "abc"), " abc");
+  EXPECT_EQ (pad_string_left (6, "abc"), "   abc");
+  EXPECT_EQ (pad_string_left (4, ""), "    ");
 }

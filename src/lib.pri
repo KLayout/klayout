@@ -1,4 +1,6 @@
 
+include($$PWD/klayout.pri)
+
 TEMPLATE = lib
 
 inst_target.path = $$PREFIX

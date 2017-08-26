@@ -16,7 +16,7 @@ SOURCES = \
     bdStrmxorTests.cc \
 
 
-INCLUDEPATH += ../src/bd ../../db ../../tl ../../gsi ../../laybasic ../../lay ../../ut
-DEPENDPATH += ../src/bd ../../db ../../tl ../../gsi ../../laybasic ../../lay ../../ut
+INCLUDEPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC $$LAYBASIC_INC $$LAY_INC $$UT_INC
+DEPENDPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC $$LAYBASIC_INC $$LAY_INC $$UT_INC
 
 LIBS += -L$$DESTDIR_UT -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_lay -lklayout_ut

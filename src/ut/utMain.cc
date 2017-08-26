@@ -45,39 +45,6 @@
 namespace ut 
 {
 
-//  TODO: move this to tlString.h
-static std::string replicate (const char *s, size_t n)
-{
-  std::string res;
-  res.reserve (strlen (s) * n);
-  while (n > 0) {
-    res += s;
-    --n;
-  }
-  return res;
-}
-
-//  TODO: move this to tlString.h
-static std::string
-escape_xml (const std::string &s)
-{
-  std::string res;
-  for (const char *cp = s.c_str (); *cp; ++cp) {
-    if (*cp == '\"') {
-      res += "&quot;";
-    } else if (*cp == '<') {
-      res += "&lt;";
-    } else if (*cp == '>') {
-      res += "&gt;";
-    } else if (*cp == '&') {
-      res += "&amp;";
-    } else {
-      res += *cp;
-    }
-  }
-  return res;
-}
-
 static int main_cont (int argc, char **argv);
 
 int
@@ -148,7 +115,7 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
 
             if (! (*t)->do_test (e != 0, slow)) {
 
-              ut::ctrl << "<error message=\"" << "Test " << escape_xml ((*t)->name ()) << " failed (continued mode - see previous messages)" << "\"/>";
+              ut::ctrl << "<error message=\"" << "Test " << escaped_to_html ((*t)->name ()) << " failed (continued mode - see previous messages)" << "\"/>";
               tl::error << "Test " << (*t)->name () << " failed (continued mode - see previous messages)";
 
               failed_tests.push_back (*t);
@@ -166,7 +133,7 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
 
           } catch (tl::Exception &ex) {
 
-            ut::ctrl << "<failure message=\"" << escape_xml (ex.msg ()) << "\"/>";
+            ut::ctrl << "<failure message=\"" << escaped_to_html (ex.msg ()) << "\"/>";
             tl::error << "Test " << (*t)->name () << " failed:";
             tl::info << ex.msg ();
 

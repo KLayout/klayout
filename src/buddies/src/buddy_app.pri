@@ -11,8 +11,8 @@ include($$PWD/../../app.pri)
 # place - it's not part of the bd sources.
 SOURCES = $$PWD/bd/main.cc
 
-INCLUDEPATH += ../bd
-DEPENDPATH += ../bd 
+INCLUDEPATH += $$BD_INC
+DEPENDPATH += $$BD_INC
 LIBS += -L$$DESTDIR -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi
 
 DEFINES += BD_TARGET=$$TARGET

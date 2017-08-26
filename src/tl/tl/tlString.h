@@ -334,9 +334,32 @@ TL_PUBLIC void escape_to_html (std::string &out, const std::string &in, bool rep
 
 /**
  *  @brief Escapes HTML (or XML) characters from in and returns the resulting string
+ *  Double quotes are substituted by "&quot;" which makes the resulting string usable for
+ *  attributes (in double quotes) too.
  *  If "replace_newlines" is true, "\n" will be replaced by "<br/>".
  */
 TL_PUBLIC std::string escaped_to_html (const std::string &in, bool replace_newlines = true);
+
+/**
+ *  @brief Replaces the "before" string by "after" in the "subject" string and returns the new string
+ *  All occurances are replaced.
+ */
+TL_PUBLIC std::string replaced (const std::string &subject, const std::string &before, const std::string &after);
+
+/**
+ *  @brief Replicates the given string n times
+ */
+TL_PUBLIC std::string replicate (const std::string &s, unsigned int n);
+
+/**
+ *  @brief Fills the string (to the right) with blanks until the desired length is reached
+ */
+TL_PUBLIC std::string pad_string_right (unsigned int n, const std::string &s);
+
+/**
+ *  @brief Fills the string (to the left) with blanks until the desired length is reached
+ */
+TL_PUBLIC std::string pad_string_left (unsigned int n, const std::string &s);
 
 /**
  *  @brief Set the number of digits resolution for a micron display

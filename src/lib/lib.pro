@@ -2,7 +2,6 @@
 DESTDIR = $$OUT_PWD/..
 TARGET = klayout_lib
 
-include($$PWD/../klayout.pri)
 include($$PWD/../lib.pri)
 
 DEFINES += MAKE_LIB_LIBRARY
@@ -35,7 +34,7 @@ SOURCES = \
 RESOURCES = \
   libResources.qrc
 
-INCLUDEPATH += ../gsi ../tl ../db
-DEPENDPATH += ../gsi ../tl ../db
+INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC
 LIBS += -L$$DESTDIR -lklayout_gsi -lklayout_tl -lklayout_db
 

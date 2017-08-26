@@ -1,10 +1,10 @@
 
-ANT_INC = $$PWD/ant
+ANT_INC = $$PWD/ant/ant
 BD_INC = $$PWD/buddies/src/bd
-DB_INC = $$PWD/db
+DB_INC = $$PWD/db/db
 DRC_INC = $$PWD/drc/drc
-EDT_INC = $$PWD/edt
-EXT_INC = $$PWD/ext
+EDT_INC = $$PWD/edt/edt
+EXT_INC = $$PWD/ext/ext
 GSI_INC = $$PWD/gsi
 GSIQT_INC = $$PWD/gsiqt
 IMG_INC = $$PWD/img
@@ -13,7 +13,7 @@ LAY_INC = $$PWD/lay
 LAYBASIC_INC = $$PWD/laybasic
 LYM_INC = $$PWD/lym
 RDB_INC = $$PWD/rdb
-TL_INC = $$PWD/tl
+TL_INC = $$PWD/tl/tl
 UT_INC = $$PWD/ut
 VERSION_INC = $$PWD/version
 

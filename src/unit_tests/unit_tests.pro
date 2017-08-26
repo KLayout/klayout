@@ -8,12 +8,7 @@ TEMPLATE = app
 
 TARGET = ut_runner
 
-HEADERS = \
-  gsiTest.h
-
 SOURCES = \
-  gsiExpression.cc \
-  gsiTest.cc \
   imgObject.cc \
   layAnnotationShapes.cc \
   layBitmap.cc \
@@ -36,4 +31,9 @@ equals(HAVE_QT5, "1") {
 } else {
   CONFIG += qtestlib
 }
+
+# TODO: remove later
+INCLUDEPATH += $$GSI_TEST_INC
+DEPENDPATH += $$GSI_TEST_INC
+LIBS += -L$$DESTDIR -lgsi_test
 

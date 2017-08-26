@@ -23,6 +23,7 @@
 
 #include "gsiExpression.h"
 #include "gsiDecl.h"
+#include "gsiTest.h"
 #include "dbBox.h"
 #include "dbEdge.h"
 

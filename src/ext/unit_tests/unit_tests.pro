@@ -2,7 +2,7 @@
 DESTDIR_UT = $$OUT_PWD/../..
 DESTDIR = $$OUT_PWD/..
 
-TARGET = ant_tests
+TARGET = ext_tests
 
 include($$PWD/../../lib_ut.pri)
 

@@ -83,16 +83,19 @@ TEST(6)
 
 TEST(7)
 {
+  test_is_long_runner ();
   run_test (_this, "pcb-1");
 }
 
 TEST(8)
 {
+  test_is_long_runner ();
   run_test (_this, "microchip-2");
 }
 
 TEST(9)
 {
+  test_is_long_runner ();
   run_test (_this, "microchip-3");
 }
 
@@ -118,6 +121,7 @@ TEST(13)
 
 TEST(14)
 {
+  test_is_long_runner ();
   run_test (_this, "gerbv_examples/amacro-ref");
 }
 
@@ -128,6 +132,7 @@ TEST(15)
 
 TEST(16)
 {
+  test_is_long_runner ();
   run_test (_this, "gerbv_examples/protel-pnp");
 }
 
@@ -168,16 +173,19 @@ TEST(23)
 
 TEST(24)
 {
+  test_is_long_runner ();
   run_test (_this, "sr-sample");
 }
 
 TEST(25)
 {
+  test_is_long_runner ();
   run_test (_this, "sr-sample2");
 }
 
 TEST(26)
 {
+  test_is_long_runner ();
   run_test (_this, "pos-neg");
 }
 

@@ -277,8 +277,8 @@ INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb
 
-INCLUDEPATH += $GSIQT_INC
-DEPENDPATH += $GSIQT_INC
+INCLUDEPATH += $$GSIQT_INC
+DEPENDPATH += $$GSIQT_INC
 
 equals(HAVE_QTBINDINGS, "1") {
   LIBS += -lklayout_gsiqt

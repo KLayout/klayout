@@ -80,7 +80,7 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
       std::string mode (e == 0 ? "non-editable" : "editable");
       ut::ctrl << "<testsuite name=\"ut-runner-" << mode << "\">";
 
-      ut::noctrl << replicate ("=", TestConsole::instance ()->real_columns ());
+      ut::noctrl << tl::replicate ("=", TestConsole::instance ()->real_columns ());
       ut::noctrl << "Running tests in " << mode << " mode ...";
       app.set_editable (e != 0);
 
@@ -108,14 +108,14 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
 
           ut::ctrl << "<testcase name=\"" << (*t)->name () << "\">";
 
-          ut::noctrl << replicate ("-", TestConsole::instance ()->real_columns ());
+          ut::noctrl << tl::replicate ("-", TestConsole::instance ()->real_columns ());
           ut::noctrl << "Running " << (*t)->name ();
 
           try {
 
             if (! (*t)->do_test (e != 0, slow)) {
 
-              ut::ctrl << "<error message=\"" << "Test " << escaped_to_html ((*t)->name ()) << " failed (continued mode - see previous messages)" << "\"/>";
+              ut::ctrl << "<error message=\"" << "Test " << tl::escaped_to_html ((*t)->name ()) << " failed (continued mode - see previous messages)" << "\"/>";
               tl::error << "Test " << (*t)->name () << " failed (continued mode - see previous messages)";
 
               failed_tests.push_back (*t);
@@ -133,7 +133,7 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
 
           } catch (tl::Exception &ex) {
 
-            ut::ctrl << "<failure message=\"" << escaped_to_html (ex.msg ()) << "\"/>";
+            ut::ctrl << "<failure message=\"" << tl::escaped_to_html (ex.msg ()) << "\"/>";
             tl::error << "Test " << (*t)->name () << " failed:";
             tl::info << ex.msg ();
 
@@ -161,7 +161,7 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
 
       ut::ctrl << "<x-summary mode=\"" << mode << "\">";
 
-      ut::noctrl << replicate ("=", TestConsole::instance ()->real_columns ());
+      ut::noctrl << tl::replicate ("=", TestConsole::instance ()->real_columns ());
       ut::noctrl << "Summary";
 
       if (skipped > 0) {
@@ -204,7 +204,7 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
   //  GSI diagnostics: print all methods that have not been called
   if (gsi_coverage) {
 
-    ut::noctrl << replicate ("=", TestConsole::instance ()->real_columns ());
+    ut::noctrl << tl::replicate ("=", TestConsole::instance ()->real_columns ());
     ut::noctrl << "GSI coverage test";
 
     ut::ctrl << "<x-gsi-coverage>";
@@ -226,10 +226,10 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
             tl::warn << "GSI coverage test failed - the following methods were not called:";
           }
           if (first_of_class) {
-            tl::warn << replicate (" ", TestConsole::instance ()->indent ()) << "Class " << c->name ();
+            tl::warn << tl::replicate (" ", TestConsole::instance ()->indent ()) << "Class " << c->name ();
             first_of_class = false;
           }
-          tl::warn << replicate (" ", TestConsole::instance ()->indent () * 2) << (*m)->to_string ();
+          tl::warn << tl::replicate (" ", TestConsole::instance ()->indent () * 2) << (*m)->to_string ();
 
         }
 
@@ -245,7 +245,7 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
 
   }
 
-  ut::noctrl << ut::replicate ("=", TestConsole::instance ()->real_columns ());
+  ut::noctrl << tl::replicate ("=", TestConsole::instance ()->real_columns ());
   ut::noctrl << "Grand Summary";
 
   ut::ctrl << "<x-grand-summary>";
@@ -254,13 +254,13 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
     if (non_editable) {
       tl::warn << "Skipped in non-editable mode";
       for (std::vector <ut::TestBase *>::const_iterator f = skipped_tests_ne.begin (); f != skipped_tests_ne.end (); ++f) {
-        tl::warn << replicate (" ", TestConsole::instance ()->indent ()) << (*f)->name ();
+        tl::warn << tl::replicate (" ", TestConsole::instance ()->indent ()) << (*f)->name ();
       }
     }
     if (editable) {
       tl::warn << "Skipped in editable mode";
       for (std::vector <ut::TestBase *>::const_iterator f = skipped_tests_e.begin (); f != skipped_tests_e.end (); ++f) {
-        tl::warn << replicate (" ", TestConsole::instance ()->indent ()) << (*f)->name ();
+        tl::warn << tl::replicate (" ", TestConsole::instance ()->indent ()) << (*f)->name ();
       }
     }
     tl::warn << tl::to_string (skipped_e + skipped_ne) << " test(s) skipped";
@@ -271,13 +271,13 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
     if (non_editable) {
       tl::warn << "Failed in non-editable mode";
       for (std::vector <ut::TestBase *>::const_iterator f = failed_tests_ne.begin (); f != failed_tests_ne.end (); ++f) {
-        tl::warn << replicate (" ", TestConsole::instance ()->indent ()) << (*f)->name ();
+        tl::warn << tl::replicate (" ", TestConsole::instance ()->indent ()) << (*f)->name ();
       }
     }
     if (editable) {
       tl::warn << "Failed in editable mode";
       for (std::vector <ut::TestBase *>::const_iterator f = failed_tests_e.begin (); f != failed_tests_e.end (); ++f) {
-        tl::warn << replicate (" ", TestConsole::instance ()->indent ()) << (*f)->name ();
+        tl::warn << tl::replicate (" ", TestConsole::instance ()->indent ()) << (*f)->name ();
       }
     }
     tl::warn << tl::to_string (result) << " test(s) failed";
@@ -419,7 +419,7 @@ main_cont (int argc, char **argv)
 
     ut::TestConsole console (stdout, xml_format);
 
-    ut::noctrl << replicate ("=", console.real_columns ());
+    ut::noctrl << tl::replicate ("=", console.real_columns ());
     ut::noctrl << "Entering KLayout test suite";
 
     tl::info << "TESTSRC=" << ut::testsrc ();

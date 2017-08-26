@@ -20,28 +20,26 @@ SOURCES = \
   utTestConsole.cc \
   utTestBase.cc \
 
-INCLUDEPATH = ../tl ../db ../gsi ../lay ../ext ../lib
-DEPENDPATH = ../tl ../db ../gsi ../lay ../ext ../lib
+INCLUDEPATH = $$TL_INC $$DB_INC $$GSI_INC $$LAY_INC $$EXT_INC $$LIB_INC
+DEPENDPATH = $$TL_INC $$DB_INC $$GSI_INC $$LAY_INC $$EXT_INC $$LIB_INC
 
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_db -lklayout_gsi -lklayout_lay -lklayout_ext -lklayout_lib
 
+INCLUDEPATH += $$RBA_INC
+DEPENDPATH += $$RBA_INC
+
 equals(HAVE_RUBY, "1") {
-  INCLUDEPATH += ../rba
-  DEPENDPATH += ../rba
   LIBS += -lklayout_rba
 } else {
-  INCLUDEPATH += ../rbastub
-  DEPENDPATH += ../rbastub
   LIBS += -lklayout_rbastub
 }
 
+INCLUDEPATH += $$PYA_INC
+DEPENDPATH += $$PYA_INC
+
 equals(HAVE_PYTHON, "1") {
-  INCLUDEPATH += ../pya
-  DEPENDPATH += ../pya
   LIBS += -lklayout_pya
 } else {
-  INCLUDEPATH += ../pyastub
-  DEPENDPATH += ../pyastub
   LIBS += -lklayout_pyastub
 }
 

@@ -446,6 +446,23 @@ struct UT_PUBLIC TestBase
     }
   }
 
+protected:
+  /**
+   *  @brief Returns a value indicating whether the test runs in editable mode
+   */
+  bool is_editable () const
+  {
+    return m_editable;
+  }
+
+  /**
+   *  @brief Returns a value indicating whether the test runs in slow mode
+   */
+  bool is_slow () const
+  {
+    return m_slow;
+  }
+
 private:
   virtual void execute (ut::TestBase *_this) throw (tl::Exception) = 0;
 

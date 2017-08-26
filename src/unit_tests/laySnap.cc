@@ -22,15 +22,13 @@
 
 #include "laySnap.h"
 #include "layLayoutView.h"
-#include "layApplication.h"
-#include "layMainWindow.h"
 
 #include "utHead.h"
 
 TEST(1)
 {
   db::Manager mgr;
-  lay::LayoutView view (&mgr, lay::Application::instance ()->is_editable (), lay::MainWindow::instance ());
+  lay::LayoutView view (&mgr, is_editable (), 0);
 
   int cv1 = view.create_layout ("", true, false);
   db::Layout &ly1 = view.cellview (cv1)->layout ();

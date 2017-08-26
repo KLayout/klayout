@@ -18,8 +18,6 @@ SOURCES = \
   layRenderer.cc \
   laySalt.cc \
   laySnap.cc \
-  pya.cc \
-  rba.cc \
   rdb.cc \
 
 # main components:
@@ -31,9 +29,4 @@ equals(HAVE_QT5, "1") {
 } else {
   CONFIG += qtestlib
 }
-
-# TODO: remove later
-INCLUDEPATH += $$GSI_TEST_INC
-DEPENDPATH += $$GSI_TEST_INC
-LIBS += -L$$DESTDIR -lgsi_test
 

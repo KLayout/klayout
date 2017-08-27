@@ -722,9 +722,12 @@ TilingProcessor::receiver (const std::vector<tl::Variant> &args)
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid handle in _rec function call")));
   }
 
-  //  Create another variable with a reference to the receiver object
-  const tl::VariantUserClassBase *var_cls = gsi::cls_decl<TileOutputReceiver> ()->var_cls (true /*const*/);
-  return tl::Variant (m_outputs[index].receiver.get (), var_cls, false);
+  gsi::Proxy *proxy = new gsi::Proxy (gsi::cls_decl<TileOutputReceiver> ());
+  proxy->set (m_outputs[index].receiver.get (), false, false, false);
+
+  //  gsi::Object based objects are managed through a Proxy and
+  //  shared pointers within tl::Variant. That means: copy by reference.
+  return tl::Variant (proxy, gsi::cls_decl<TileOutputReceiver> ()->var_cls (true /*const*/), true);
 }
 
 void 

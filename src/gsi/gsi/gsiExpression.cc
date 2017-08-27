@@ -1259,7 +1259,7 @@ VariantUserClassImpl::execute (const tl::ExpressionParserContext &context, tl::V
         proxy->set (obj, true, false, true);
 
         //  gsi::Object based objects are managed through a Proxy and
-        //  shared pointers within tl::Variant. That mean: copy by reference.
+        //  shared pointers within tl::Variant. That means: copy by reference.
         out.set_user_ref (proxy, mp_object_cls, true);
 
       } else {

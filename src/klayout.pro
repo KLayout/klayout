@@ -81,8 +81,8 @@ db-unit_tests.depends += ut
 
 plugins.depends += lay ext lib ut
 
-klayout_main.depends += lay ext lib plugins
-unit_tests.depends += ut lay ext lib
+klayout_main.depends += plugins drc
+unit_tests.depends += plugins drc
 
 RESOURCES += \
     laybasic/layResources.qrc \

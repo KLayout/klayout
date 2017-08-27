@@ -31,7 +31,7 @@ LANG_DEPENDS =
 
 equals(HAVE_RUBY, "1") {
   SUBDIRS += rba/rba rba/unit_tests
-  rba.depends += gsi/gsi
+  rba-rba.depends += gsi/gsi
   LANG_DEPENDS += rba/rba
   rba-unit_tests.depends += ut gsi/gsi_test
 } else {
@@ -42,7 +42,7 @@ equals(HAVE_RUBY, "1") {
 
 equals(HAVE_PYTHON, "1") {
   SUBDIRS += pya/pya pya/unit_tests
-  pya.depends += gsi/gsi
+  pya-pya.depends += gsi/gsi
   LANG_DEPENDS += pya/pya
   pya-unit_tests.depends += ut gsi/gsi_test
 } else {

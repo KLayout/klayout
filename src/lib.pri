@@ -3,16 +3,10 @@ include($$PWD/klayout.pri)
 
 TEMPLATE = lib
 
-inst_target.path = $$PREFIX
 win32 {
-
-  inst_target.files = $(DESTDIR_TARGET)
-
+  dlltarget.path = $$PREFIX
+  INSTALLS += dlltarget
 } else {
-
-  inst_target.files = $$DESTDIR/$(TARGET)
-  inst_target.extra = ln -s $(TARGET) $(TARGET0) && ln -s $(TARGET) $(TARGET1) && ln -s $(TARGET) $(TARGET2)
-
+  target.path = $$PREFIX
+  INSTALLS += target
 }
-
-INSTALLS = inst_target

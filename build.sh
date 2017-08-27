@@ -183,6 +183,15 @@ done
 echo "Scanning installation .."
 echo ""
 
+# Import version info 
+. ./version.sh
+
+echo "Version Info:"
+echo "  version = $KLAYOUT_VERSION"
+echo "  date = $KLAYOUT_VERSION_DATE"
+echo "  rev = $KLAYOUT_VERSION_REV"
+echo ""
+
 # if not given, try to detect the qt major version to use
 if [ "$HAVE_QT5" = "" ]; then
   qt_major=`$QMAKE -v | grep 'Using Qt version' | sed 's/.*version  *\([0-9][0-9]*\).*/\1/'`
@@ -451,6 +460,9 @@ fi
 
 $QMAKE -v
 
+# Force a minimum rebuild because of version info
+touch src/version/version.h
+
 qmake_cmd="$QMAKE $CURR_DIR/src/klayout.pro -recursive \
   CONFIG+=$CONFIG \
   RUBYLIBFILE=$RUBYLIBFILE \
@@ -465,6 +477,9 @@ qmake_cmd="$QMAKE $CURR_DIR/src/klayout.pro -recursive \
   HAVE_64BIT_COORD=$HAVE_64BIT_COORD \
   HAVE_QT5=$HAVE_QT5 \
   PREFIX=$BIN \
+  KLAYOUT_VERSION=$KLAYOUT_VERSION \
+  KLAYOUT_VERSION_DATE=$KLAYOUT_VERSION_DATE \
+  KLAYOUT_VERSION_REV=$KLAYOUT_VERSION_REV \
 "
 
 echo $qmake_cmd

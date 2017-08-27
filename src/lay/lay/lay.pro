@@ -181,8 +181,8 @@ win32 {
 
 # Note: this accounts for UI-generated headers placed into the output folders in
 # shadow builds:
-INCLUDEPATH += $$DESTDIR/laybasic
-DEPENDPATH += $$DESTDIR/laybasic
+INCLUDEPATH += $$DESTDIR/laybasic/laybasic
+DEPENDPATH += $$DESTDIR/laybasic/laybasic
 
 INCLUDEPATH += $$GSIQT_INC
 DEPENDPATH += $$GSIQT_INC

@@ -63,8 +63,8 @@ DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$DB_INC
 
 # Note: this accounts for UI-generated headers placed into the output folders in
 # shadow builds:
-INCLUDEPATH += $$DESTDIR/laybasic
-DEPENDPATH += $$DESTDIR/laybasic
+INCLUDEPATH += $$DESTDIR/laybasic/laybasic
+DEPENDPATH += $$DESTDIR/laybasic/laybasic
 
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_db
 

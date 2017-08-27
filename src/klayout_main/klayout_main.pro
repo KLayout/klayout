@@ -18,14 +18,5 @@ SOURCES = \
 RESOURCES = \
 
 win32 {
-
-  windres.target = klayout_rc.o
-  windres.depends = $$PWD/klayout.rc
-  windres.commands = windres $$windres.depends $$windres.target
-
-  PRE_TARGETDEPS += klayout_rc.o
-  QMAKE_EXTRA_TARGETS += windres
-
-  LIBS += $$windres.target
-
+  RC_FILE = $$PWD/klayout.rc
 }

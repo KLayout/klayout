@@ -10,13 +10,13 @@ include($$PWD/../../lib_ut.pri)
 SOURCES = \
   bdBasicTests.cc \
   bdConverterTests.cc \
-    bdStrm2txtTests.cc \
-    bdStrmclipTests.cc \
-    bdStrmcmpTests.cc \
-    bdStrmxorTests.cc \
+  bdStrm2txtTests.cc \
+  bdStrmclipTests.cc \
+  bdStrmcmpTests.cc \
+  bdStrmxorTests.cc \
 
 
-INCLUDEPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC $$LAYBASIC_INC $$LAY_INC $$UT_INC
-DEPENDPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC $$LAYBASIC_INC $$LAY_INC $$UT_INC
+INCLUDEPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC $$UT_INC
+DEPENDPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC $$UT_INC
 
-LIBS += -L$$DESTDIR_UT -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_lay -lklayout_ut
+LIBS += -L$$DESTDIR_UT -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_ut

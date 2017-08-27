@@ -44,8 +44,8 @@ equals(HAVE_PYTHON, "1") {
 
 gsi-gsi.depends += tl/tl
 db-db.depends += gsi/gsi
-rdb.depends += db/db
-laybasic.depends += db/db rdb
+rdb.depends += db/db ut
+laybasic.depends += rdb
 ant.depends += laybasic
 img.depends += laybasic
 edt.depends += laybasic

@@ -74,8 +74,9 @@ equals(HAVE_QTBINDINGS, "1") {
 }
 
 ext.depends += lay
-ut.depends += tl/tl db gsi
-tl/unit_tests.depends += ut
+ut.depends += db gsi
+# YES. It's tl-unit_tests (for tl/unit_tests)
+tl-unit_tests.depends += ut
 
 plugins.depends += lay ext lib ut
 

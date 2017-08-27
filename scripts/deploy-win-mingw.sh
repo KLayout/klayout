@@ -24,12 +24,6 @@ if ! [ -e ./build.sh ]; then
   exit 1
 fi
 
-# source the versions
-. ./version.sh
-export KLAYOUT_VERSION
-export KLAYOUT_VERSION_REV
-export KLAYOUT_VERSION_DATE
-
 pwd=$(pwd)
 
 # ---------------------------------------------------
@@ -77,13 +71,7 @@ echo "Running build for architecture $arch .."
 echo ""
 echo "  target = $target"
 echo "  build = $build"
-echo "  version = $KLAYOUT_VERSION"
-echo "  date = $KLAYOUT_VERSION_DATE"
-echo "  rev = $KLAYOUT_VERSION_REV"
 echo ""
-
-# Force a minimum rebuild for the version update
-touch src/version/version.h
 
 rm -rf $target
 ./build.sh -python $python -ruby $ruby -bin $target -build $build -j2

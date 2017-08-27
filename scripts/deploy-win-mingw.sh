@@ -66,11 +66,15 @@ scripts=$pwd/scripts
 # Update in NSIS script too:
 plugins="audio generic iconengines imageformats platforms printsupport sqldrivers"
 
+# read the current version
+. ./version.sh
+
 echo "------------------------------------------------------------------"
 echo "Running build for architecture $arch .."
 echo ""
 echo "  target = $target"
 echo "  build = $build"
+echo "  version = $KLAYOUT_VERSION"
 echo ""
 
 rm -rf $target

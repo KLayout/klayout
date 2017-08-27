@@ -4,6 +4,9 @@ TARGET = gsi_test
 
 include($$PWD/../../lib.pri)
 
+# don't install this test library
+INSTALLS =
+
 DEFINES += MAKE_GSI_LIBRARY
 
 SOURCES = \

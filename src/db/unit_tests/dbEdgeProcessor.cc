@@ -393,6 +393,7 @@ TEST(1special)
 
 TEST(2special) 
 {
+  test_is_long_runner ();
   tl::SelfTimer timer ("special2 test");
   run_test_bool (_this, "special2.oas", db::BooleanOp::Xor, true, "special2_au1.oas", 0, "special2_au1_tz.oas");
   run_test_bool (_this, "special2.oas", db::BooleanOp::And, true, "special2_au2.oas", 0, "special2_au2_tz.oas");
@@ -403,6 +404,7 @@ TEST(2special)
 
 TEST(3special) 
 {
+  test_is_long_runner ();
   tl::SelfTimer timer ("special3 test");
   run_test_bool (_this, "special3.oas", db::BooleanOp::Xor, true, "special3_au1.oas");
   run_test_bool (_this, "special3.oas", db::BooleanOp::And, true, "special3_au2.oas");

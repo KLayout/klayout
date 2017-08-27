@@ -30,13 +30,8 @@
 
 namespace ut {
 
-extern tl::LogTee ctrl;
-extern tl::LogTee noctrl;
-
-/**
- *  @brief The unit test execution function
- */
-UT_PUBLIC int main (int argc, char **argv);
+extern UT_PUBLIC tl::LogTee ctrl;
+extern UT_PUBLIC tl::LogTee noctrl;
 
 } // namespace ut
 

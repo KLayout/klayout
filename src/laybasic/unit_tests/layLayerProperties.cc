@@ -24,8 +24,6 @@
 
 #include "layLayerProperties.h"
 #include "layLayoutView.h"
-#include "layMainWindow.h"
-#include "layApplication.h"
 #include "tlXMLParser.h"
 #include "dbLayout.h"
 
@@ -234,6 +232,7 @@ TEST (2a)
   EXPECT_EQ (compare_real (flat_ref, list), true);
 }
 
+//  Testing correctness of compare_real implementation (hence compare vs. false)
 TEST (2b)
 {
   tl::XMLStringSource s (
@@ -303,6 +302,7 @@ TEST (2b)
   EXPECT_EQ (compare_real (flat_ref, list), false);
 }
 
+//  Testing correctness of compare_real implementation (hence compare vs. false)
 TEST (2c)
 {
   tl::XMLStringSource s (
@@ -375,6 +375,7 @@ TEST (2c)
   EXPECT_EQ (compare_real (flat_ref, list), false);
 }
 
+//  Testing correctness of compare_real implementation (hence compare vs. false)
 TEST (2d)
 {
   tl::XMLStringSource s (
@@ -1304,7 +1305,7 @@ TEST (16)
   lay::LayerPropertiesList list;
 
   db::Manager mgr;
-  lay::LayoutView view (&mgr, lay::Application::instance ()->is_editable (), lay::MainWindow::instance ());
+  lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);
@@ -1356,7 +1357,7 @@ TEST (17)
   lay::LayerPropertiesList list;
 
   db::Manager mgr;
-  lay::LayoutView view (&mgr, lay::Application::instance ()->is_editable (), lay::MainWindow::instance ());
+  lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);
@@ -1423,7 +1424,7 @@ TEST (18)
   lay::LayerPropertiesList list;
 
   db::Manager mgr;
-  lay::LayoutView view (&mgr, lay::Application::instance ()->is_editable (), lay::MainWindow::instance ());
+  lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);
@@ -1491,7 +1492,7 @@ TEST (19)
   lay::LayerPropertiesList list;
 
   db::Manager mgr;
-  lay::LayoutView view (&mgr, lay::Application::instance ()->is_editable (), lay::MainWindow::instance ());
+  lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);
@@ -1560,7 +1561,7 @@ TEST (20)
   lay::LayerPropertiesList list;
 
   db::Manager mgr;
-  lay::LayoutView view (&mgr, lay::Application::instance ()->is_editable (), lay::MainWindow::instance ());
+  lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);
@@ -1632,7 +1633,7 @@ TEST (21)
   lay::LayerPropertiesList list;
 
   db::Manager mgr;
-  lay::LayoutView view (&mgr, lay::Application::instance ()->is_editable (), lay::MainWindow::instance ());
+  lay::LayoutView view (&mgr, is_editable (), 0);
   list.attach_view (&view, 0);
 
   int cv1 = view.create_layout ("", true, false);

@@ -481,7 +481,7 @@ private:
 /**
  *  @brief The registration facility for tests
  */
-struct Registrar
+struct UT_PUBLIC Registrar
 {
   static void reg (ut::TestBase *t)
   {

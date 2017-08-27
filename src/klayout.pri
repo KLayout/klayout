@@ -6,12 +6,12 @@ EDT_INC = $$PWD/edt/edt
 EXT_INC = $$PWD/ext/ext
 GSI_INC = $$PWD/gsi/gsi
 ANT_INC = $$PWD/ant/ant
-IMG_INC = $$PWD/img
-LIB_INC = $$PWD/lib
-LAY_INC = $$PWD/lay
-LAYBASIC_INC = $$PWD/laybasic
-LYM_INC = $$PWD/lym
-RDB_INC = $$PWD/rdb
+RDB_INC = $$PWD/rdb/rdb
+IMG_INC = $$PWD/img/img
+LYM_INC = $$PWD/lym/lym
+LIB_INC = $$PWD/lib/lib
+LAY_INC = $$PWD/lay/lay
+LAYBASIC_INC = $$PWD/laybasic/laybasic
 
 GSIQT_INC = $$PWD/gsiqt
 

@@ -68,7 +68,7 @@ private:
 /**
  *  @brief Redirects the interpreter output and serves as a general output device
  */
-class TestConsole
+class UT_PUBLIC TestConsole
   : public gsi::Console
 {
 public:

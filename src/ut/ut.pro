@@ -2,11 +2,9 @@
 DESTDIR = $$OUT_PWD/..
 TARGET = klayout_ut
 
-include($$PWD/../klayout.pri)
+include($$PWD/../lib.pri)
 
 DEFINES += MAKE_UT_LIBRARY
-
-TEMPLATE = lib
 
 # Input
 HEADERS = \
@@ -16,14 +14,13 @@ HEADERS = \
   utCommon.h
 
 SOURCES = \
-  utMain.cc \
   utTestConsole.cc \
   utTestBase.cc \
 
-INCLUDEPATH = $$TL_INC $$DB_INC $$GSI_INC $$LAY_INC $$EXT_INC $$LIB_INC
-DEPENDPATH = $$TL_INC $$DB_INC $$GSI_INC $$LAY_INC $$EXT_INC $$LIB_INC
+INCLUDEPATH = $$TL_INC $$DB_INC $$GSI_INC
+DEPENDPATH = $$TL_INC $$DB_INC $$GSI_INC
 
-LIBS += -L$$DESTDIR -lklayout_tl -lklayout_db -lklayout_gsi -lklayout_lay -lklayout_ext -lklayout_lib
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_db -lklayout_gsi
 
 INCLUDEPATH += $$RBA_INC
 DEPENDPATH += $$RBA_INC

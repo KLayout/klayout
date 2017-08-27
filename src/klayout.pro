@@ -73,12 +73,12 @@ equals(HAVE_QTBINDINGS, "1") {
 }
 
 ext.depends += lay
-ut.depends += lay ext lib
+ut.depends += tl db gsi
 
 plugins.depends += lay ext lib ut
 
 klayout_main.depends += lay ext lib plugins
-unit_tests.depends += ut plugins
+unit_tests.depends += ut lay ext lib
 
 RESOURCES += \
     laybasic/layResources.qrc \

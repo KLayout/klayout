@@ -13,5 +13,6 @@ DEPENDPATH += $$TL_INC $$GSI_INC
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi
 
 HEADERS += \
-    pyaCommon.h
+    pyaCommon.h \
+    pya.h
 

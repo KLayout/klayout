@@ -31,14 +31,23 @@ static void fail (const char *file, int line)
   throw tl::ScriptError (tl::to_string (QObject::tr ("Python support not compiled in")).c_str (), file, line, "missing_feature", std::vector<tl::BacktraceElement> ());
 }
 
-PythonInterpreter::PythonInterpreter () 
-{ 
-  // .. nothing ..
+static PythonInterpreter *sp_pya_interpreter = 0;
+
+PythonInterpreter::PythonInterpreter ()
+{
+  tl_assert (! sp_pya_interpreter);
+  sp_pya_interpreter = this;
 }
 
-PythonInterpreter::~PythonInterpreter () 
+PythonInterpreter::~PythonInterpreter ()
 {
-  // .. nothing ..
+  //  This prevents reinitialization
+  sp_pya_interpreter = reinterpret_cast<PythonInterpreter *> (1);
+}
+
+PythonInterpreter *PythonInterpreter::instance ()
+{
+  return sp_pya_interpreter;
 }
 
 void 
@@ -160,12 +169,6 @@ PythonInterpreter::eval_expr (const char *, const char *file, int line, int)
 {
   fail (file, line);
   return tl::Variant ();
-}
-
-PythonInterpreter *
-PythonInterpreter::instance ()
-{
-  return 0;
 }
 
 }

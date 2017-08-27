@@ -30,14 +30,23 @@ static void fail (const char *file, int line)
   throw tl::ScriptError (tl::to_string (QObject::tr ("Ruby support not compiled in")).c_str (), file, line, "missing_feature", std::vector<tl::BacktraceElement> ());
 }
 
-RubyInterpreter::RubyInterpreter () 
-{ 
-  // .. nothing ..
+static RubyInterpreter *sp_rba_interpreter = 0;
+
+RubyInterpreter::RubyInterpreter ()
+{
+  tl_assert (! sp_rba_interpreter);
+  sp_rba_interpreter = this;
 }
 
-RubyInterpreter::~RubyInterpreter () 
+RubyInterpreter::~RubyInterpreter ()
 {
-  // .. nothing ..
+  //  This prevents reinitialization
+  sp_rba_interpreter = reinterpret_cast<RubyInterpreter *> (1);
+}
+
+RubyInterpreter *RubyInterpreter::instance ()
+{
+  return sp_rba_interpreter;
 }
 
 void

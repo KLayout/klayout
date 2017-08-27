@@ -6,7 +6,7 @@ include($$PWD/../lib.pri)
 
 DEFINES += MAKE_RBA_LIBRARY
 
-HEADERS = rbaCommon.h
+HEADERS = rbaCommon.h rba.h
 
 SOURCES = rba.cc
 

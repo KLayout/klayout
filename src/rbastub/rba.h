@@ -151,6 +151,11 @@ public:
   std::string version () const;
 
   /**
+   *  @brief The instance of the Ruby interpreter
+   */
+  static RubyInterpreter *instance ();
+
+  /**
    *  @brief Provide a first (basic) initialization and continue with the "main_cont" function internally
    */
   static int initialize (int argc, char **argv, int (*main_cont)(int, char **));

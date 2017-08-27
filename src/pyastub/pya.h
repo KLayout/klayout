@@ -168,10 +168,9 @@ public:
   static void initialize ();
 
   /**
-   *  @brief Always returns 0 
+   *  @brief Returns the singleton reference
    */
   static PythonInterpreter *instance ();
-
 };
 
 }

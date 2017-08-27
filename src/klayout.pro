@@ -6,7 +6,8 @@ TEMPLATE = subdirs
 SUBDIRS = \
   klayout_main \
   unit_tests \
-  tl \
+  tl/tl \
+  tl/unit_tests \
   gsi \
   db \
   rdb \
@@ -25,7 +26,7 @@ SUBDIRS = \
 
 equals(HAVE_RUBY, "1") {
   SUBDIRS += rba
-  rba.depends += gsi
+  rba.depends += gsi ut
 } else {
   SUBDIRS += rbastub
   rbastub.depends += gsi
@@ -33,13 +34,13 @@ equals(HAVE_RUBY, "1") {
 
 equals(HAVE_PYTHON, "1") {
   SUBDIRS += pya
-  pya.depends += gsi
+  pya.depends += gsi ut
 } else {
   SUBDIRS += pyastub
   pyastub.depends += gsi
 }
 
-gsi.depends += tl
+gsi.depends += tl/tl
 db.depends += gsi
 rdb.depends += db
 laybasic.depends += db rdb
@@ -48,7 +49,7 @@ img.depends += laybasic
 edt.depends += laybasic
 drc.depends += db rdb lym
 
-lym.depends += tl gsi
+lym.depends += gsi
 equals(HAVE_RUBY, "1") {
   lym.depends += rba
 } else {
@@ -63,7 +64,7 @@ equals(HAVE_PYTHON, "1") {
 lay.depends += laybasic ant img edt lym
 lib.depends += db
 
-buddies.depends += db tl gsi ut
+buddies.depends += db gsi ut
 
 equals(HAVE_QTBINDINGS, "1") {
   SUBDIRS += gsiqt
@@ -73,7 +74,8 @@ equals(HAVE_QTBINDINGS, "1") {
 }
 
 ext.depends += lay
-ut.depends += tl db gsi
+ut.depends += tl/tl db gsi
+tl/unit_tests.depends += ut
 
 plugins.depends += lay ext lib ut
 

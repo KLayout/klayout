@@ -45,9 +45,10 @@
 #  include <Windows.h>
 #endif
 
-//  required to force linking of the "ext" and "lib" module
+//  required to force linking of the "ext", "lib" and "drc" module
 #include "extForceLink.h"
 #include "libForceLink.h"
+#include "drcForceLink.h"
 
 static int main_cont (int argc, char **argv);
 
@@ -119,7 +120,7 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
 
             if (! (*t)->do_test (e != 0, slow)) {
 
-              ut::ctrl << "<error message=\"" << "Test " << tl::escaped_to_html ((*t)->name ()) << " failed (continued mode - see previous messages)" << "\"/>";
+              ut::ctrl << "<error message=\"" << "Test " << tl::escaped_to_html ((*t)->name (), false) << " failed (continued mode - see previous messages)" << "\"/>";
               tl::error << "Test " << (*t)->name () << " failed (continued mode - see previous messages)";
 
               failed_tests.push_back (*t);
@@ -137,7 +138,7 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
 
           } catch (tl::Exception &ex) {
 
-            ut::ctrl << "<failure message=\"" << tl::escaped_to_html (ex.msg ()) << "\"/>";
+            ut::ctrl << "<failure message=\"" << tl::escaped_to_html (ex.msg (), false) << "\"/>";
             tl::error << "Test " << (*t)->name () << " failed:";
             tl::info << ex.msg ();
 
@@ -361,9 +362,9 @@ main_cont (int argc, char **argv)
 
     app.autorun ();
 
-  #if QT_VERSION < 0x050000
+#if QT_VERSION < 0x050000
     QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
-  #endif
+#endif
 
     bool editable = false, non_editable = false;
     bool gsi_coverage = false;

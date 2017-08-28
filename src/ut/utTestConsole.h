@@ -78,7 +78,7 @@ public:
     return ms_instance;
   }
 
-  TestConsole (FILE *file, bool xml_format);
+  TestConsole (FILE *file);
   ~TestConsole ();
 
   int indent () const
@@ -86,20 +86,11 @@ public:
     return m_indent;
   }
 
-  bool xml_format () const
-  {
-    return m_xml_format;
-  }
-
   void write_str (const char *text, output_stream os);
   void raw_write (const char *text);
   virtual void flush ();
 
-  virtual bool is_tty ()
-  {
-    //  NOTE: this assumes we are delivering to stdout
-    return m_is_tty;
-  }
+  virtual bool is_tty ();
 
   virtual int columns ()
   {
@@ -124,11 +115,10 @@ public:
 
 private:
   FILE *m_file;
-  bool m_xml_format;
   int m_col;
   int m_max_col;
   int m_columns, m_rows;
-  bool m_is_tty;
+  bool m_file_is_tty;
   int m_indent;
   static TestConsole *ms_instance;
 

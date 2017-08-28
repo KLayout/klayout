@@ -302,6 +302,8 @@ main_cont (int argc, char **argv)
 {
   int result = 0;
 
+  ut::TestConsole console (stdout);
+
   try {
 
     pya::PythonInterpreter::initialize ();
@@ -353,6 +355,10 @@ main_cont (int argc, char **argv)
     static char av3[] = "-rx";  //  No mplicit macros
     char *av[] = { av0, av1, av2, av3, 0 };
     lay::Application app (ac, av, false);
+
+    app.ruby_interpreter ().push_console (&console);
+    app.python_interpreter ().push_console (&console);
+
     app.autorun ();
 
   #if QT_VERSION < 0x050000
@@ -418,54 +424,53 @@ main_cont (int argc, char **argv)
     }
 
     ut::set_verbose (verbose);
+    ut::set_xml_format (xml_format);
     ut::set_continue_flag (continue_flag);
     ut::set_debug_mode (debug_mode);
-
-    ut::TestConsole console (stdout, xml_format);
-
-    ut::noctrl << tl::replicate ("=", console.real_columns ());
-    ut::noctrl << "Entering KLayout test suite";
-
-    tl::info << "TESTSRC=" << ut::testsrc ();
-    tl::info << "TESTTMP=" << tl::to_string (QDir (tl::to_qstring (ut::testtmp ())).absolutePath ());
-
-    const std::vector<ut::TestBase *> *selected_tests = 0;
-    std::vector<ut::TestBase *> subset;
-    if (! test_list.empty ()) {
-
-      selected_tests = &subset;
-      tl::info << "Selected tests:";
-
-      for (std::vector<ut::TestBase *>::const_iterator i = ut::Registrar::instance()->tests ().begin (); i != ut::Registrar::instance()->tests ().end (); ++i) {
-
-        bool exclude = false;
-
-        for (std::vector<std::string>::const_iterator m = exclude_test_list.begin (); m != exclude_test_list.end () && !exclude; ++m) {
-          QRegExp re (tl::to_qstring (*m), Qt::CaseInsensitive, QRegExp::Wildcard);
-          if (re.indexIn (tl::to_qstring ((*i)->name ())) == 0) {
-            exclude = true;
-          }
-        }
-
-        for (std::vector<std::string>::const_iterator m = test_list.begin (); !exclude && m != test_list.end (); ++m) {
-          QRegExp re (tl::to_qstring (*m), Qt::CaseInsensitive, QRegExp::Wildcard);
-          if (re.indexIn (tl::to_qstring ((*i)->name ())) == 0) {
-            tl::info << "  " << (*i)->name ();
-            subset.push_back (*i);
-            break;
-          }
-        }
-
-      }
-
-    } else {
-      selected_tests = &ut::Registrar::instance()->tests ();
-    }
 
     try {
 
       ut::ctrl << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
       ut::ctrl << "<testsuites>";
+
+      ut::noctrl << tl::replicate ("=", console.real_columns ());
+      ut::noctrl << "Entering KLayout test suite";
+
+      ut::noctrl << "TESTSRC=" << ut::testsrc ();
+      ut::noctrl << "TESTTMP=" << tl::to_string (QDir (tl::to_qstring (ut::testtmp ())).absolutePath ());
+
+      const std::vector<ut::TestBase *> *selected_tests = 0;
+      std::vector<ut::TestBase *> subset;
+      if (! test_list.empty ()) {
+
+        selected_tests = &subset;
+        ut::noctrl << "Selected tests:";
+
+        for (std::vector<ut::TestBase *>::const_iterator i = ut::Registrar::instance()->tests ().begin (); i != ut::Registrar::instance()->tests ().end (); ++i) {
+
+          bool exclude = false;
+
+          for (std::vector<std::string>::const_iterator m = exclude_test_list.begin (); m != exclude_test_list.end () && !exclude; ++m) {
+            QRegExp re (tl::to_qstring (*m), Qt::CaseInsensitive, QRegExp::Wildcard);
+            if (re.indexIn (tl::to_qstring ((*i)->name ())) == 0) {
+              exclude = true;
+            }
+          }
+
+          for (std::vector<std::string>::const_iterator m = test_list.begin (); !exclude && m != test_list.end (); ++m) {
+            QRegExp re (tl::to_qstring (*m), Qt::CaseInsensitive, QRegExp::Wildcard);
+            if (re.indexIn (tl::to_qstring ((*i)->name ())) == 0) {
+              ut::noctrl << "  " << (*i)->name ();
+              subset.push_back (*i);
+              break;
+            }
+          }
+
+        }
+
+      } else {
+        selected_tests = &ut::Registrar::instance()->tests ();
+      }
 
       result = run_tests (*selected_tests, editable, non_editable, slow, app, gsi_coverage, class_names);
 

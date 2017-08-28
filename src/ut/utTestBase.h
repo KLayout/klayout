@@ -65,6 +65,16 @@ UT_PUBLIC bool verbose ();
 UT_PUBLIC void set_verbose (bool v);
 
 /**
+ *  @brief Returns true if XML output is enabled (JUnit format)
+ */
+UT_PUBLIC bool xml_format ();
+
+/**
+ *  @brief Sets XML format
+ */
+UT_PUBLIC void set_xml_format (bool x);
+
+/**
  *  @brief Enables or disables "continue" mode
  *  In continue mode, the execution will proceed even in case of an error.
  */

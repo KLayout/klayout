@@ -45,6 +45,7 @@ namespace ut
 // --------------------------------------------------------------------------------------
 
 static bool s_verbose_flag = false;
+static bool s_xml_format = false;
 static bool s_debug_mode = false;
 static bool s_continue_flag = false;
 
@@ -56,6 +57,16 @@ bool verbose ()
 void set_verbose (bool f)
 {
   s_verbose_flag = f;
+}
+
+bool xml_format ()
+{
+  return s_xml_format;
+}
+
+void set_xml_format (bool f)
+{
+  s_xml_format = f;
 }
 
 void set_continue_flag (bool f)

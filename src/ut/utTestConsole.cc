@@ -184,21 +184,21 @@ public:
 protected:
   virtual void puts (const char *s)
   {
-    if (m_with_xml == TestConsole::instance ()->xml_format ()) {
+    if (m_with_xml == ut::xml_format ()) {
       TestConsole::instance ()->raw_write (s);
     }
   }
 
   virtual void endl ()
   {
-    if (m_with_xml == TestConsole::instance ()->xml_format ()) {
+    if (m_with_xml == ut::xml_format ()) {
       TestConsole::instance ()->raw_write ("\n");
     }
   }
 
   virtual void end ()
   {
-    if (m_with_xml == TestConsole::instance ()->xml_format ()) {
+    if (m_with_xml == ut::xml_format ()) {
       TestConsole::instance ()->end ();
       TestConsole::instance ()->flush ();
     }
@@ -206,7 +206,7 @@ protected:
 
   virtual void begin ()
   {
-    if (m_with_xml == TestConsole::instance ()->xml_format ()) {
+    if (m_with_xml == ut::xml_format ()) {
       TestConsole::instance ()->begin_info ();
     }
   }
@@ -223,16 +223,16 @@ const char *ANSI_BLUE = "\033[34m";
 const char *ANSI_GREEN = "\033[32m";
 const char *ANSI_RESET = "\033[0m";
 
-TestConsole::TestConsole (FILE *file, bool xml_format)
-  : m_file (file), m_xml_format (xml_format), m_col (0), m_max_col (250), m_columns (50), m_rows (0), m_is_tty (false)
+TestConsole::TestConsole (FILE *file)
+  : m_file (file), m_col (0), m_max_col (250), m_columns (50), m_rows (0), m_file_is_tty (false)
 {
   ms_instance = this;
   m_indent = 4;
 
-  m_is_tty = isatty (fileno (file)) && ! xml_format;
+  m_file_is_tty = isatty (fileno (file));
 
 #if !defined(_WIN32)
-  if (m_is_tty) {
+  if (m_file_is_tty) {
     struct winsize ws;
     ioctl (fileno (stdout), TIOCGWINSZ, &ws);
     m_columns = std::max (0, (int) ws.ws_col);
@@ -276,10 +276,17 @@ TestConsole::flush ()
   fflush (m_file);
 }
 
+bool
+TestConsole::is_tty ()
+{
+  //  NOTE: this assumes we are delivering to stdout
+  return m_file_is_tty && ! ut::xml_format ();
+}
+
 void
 TestConsole::begin_error ()
 {
-  if (m_is_tty) {
+  if (is_tty ()) {
     fputs (ANSI_RED, m_file);
   }
 }
@@ -287,7 +294,7 @@ TestConsole::begin_error ()
 void
 TestConsole::begin_info ()
 {
-  if (m_is_tty) {
+  if (is_tty ()) {
     fputs (ANSI_GREEN, m_file);
   }
 }
@@ -295,7 +302,7 @@ TestConsole::begin_info ()
 void
 TestConsole::begin_warn ()
 {
-  if (m_is_tty) {
+  if (is_tty ()) {
     fputs (ANSI_BLUE, m_file);
   }
 }
@@ -303,7 +310,7 @@ TestConsole::begin_warn ()
 void
 TestConsole::end ()
 {
-  if (m_is_tty) {
+  if (is_tty ()) {
     fputs (ANSI_RESET, m_file);
   }
 }
@@ -311,7 +318,7 @@ TestConsole::end ()
 void
 TestConsole::basic_write (const char *s)
 {
-  if (m_xml_format) {
+  if (ut::xml_format ()) {
 
     for (const char *cp = s; *cp; ++cp) {
       if (*cp == '&') {
@@ -384,9 +391,6 @@ TestConsole::redirect ()
   tl::log.add (new ut::InfoChannel (10), true);
   tl::error.clear ();
   tl::error.add (new ut::ErrorChannel (), true);
-
-  ut::ruby_interpreter ()->push_console (this);
-  ut::python_interpreter ()->push_console (this);
 }
 
 void
@@ -397,9 +401,6 @@ TestConsole::restore ()
   tl::info.clear ();
   tl::log.clear ();
   tl::error.clear ();
-
-  ut::ruby_interpreter ()->remove_console (this);
-  ut::python_interpreter ()->remove_console (this);
 }
 
 TestConsole *TestConsole::ms_instance = 0;

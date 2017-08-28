@@ -104,9 +104,8 @@ done
 # Ruby dependencies
 
 rm -rf $target/.ruby-paths.txt
-echo '# Builds the Python paths.' >$target/.ruby-paths.txt
-echo '# KLayout will load the paths listed in this file into sys.path' >>$target/.ruby-paths.txt
-echo '# unless $KLAYOUT_PYTHONHOME ist set.' >>$target/.ruby-paths.txt
+echo '# Builds the Ruby paths.' >$target/.ruby-paths.txt
+echo '# KLayout will load the paths listed in this file into $0' >>$target/.ruby-paths.txt
 echo '# Use KLayout EXPRESSIONS syntax to specify a list of file paths.' >>$target/.ruby-paths.txt
 echo '[' >>$target/.ruby-paths.txt
 

@@ -384,6 +384,7 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   m_drop_small_cells_value = 10;
   m_drop_small_cells_cond = DSC_Max;
   m_draw_array_border_instances = false;
+  m_dirty = false;
   m_activated = true;
   m_animated = false;
   m_phase = 0;
@@ -776,6 +777,12 @@ LayoutView::set_synchronous (bool s)
   m_synchronous = s;
 }
 
+bool
+LayoutView::is_dirty () const
+{
+  return m_dirty;
+}
+
 std::string
 LayoutView::title () const
 {
@@ -784,11 +791,29 @@ LayoutView::title () const
   } else if (cellviews () == 0) {
     return tl::to_string (QObject::tr ("<empty>"));
   } else {
-    std::string t (cellview (0)->name ());
+
+    int cv_index = active_cellview_index ();
+    if (cv_index < 0 || cv_index >= int (cellviews ())) {
+      cv_index = 0;
+    }
+
+    const lay::CellView &cv0 = cellview (cv_index);
+
+    std::string t;
+
+    t += cv0->name ();
+    if (cv0->layout ().is_valid_cell_index (cv0.cell_index ())) {
+      t += " [";
+      t += cv0->layout ().cell_name (cv0.cell_index ());
+      t += "]";
+    }
+
     if (cellviews () > 1) {
       t += " ...";
     }
+
     return t;
+
   }
 }
 
@@ -1897,12 +1922,7 @@ LayoutView::save_as (unsigned int index, const std::string &filename, tl::Output
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Saving")));
   cellview (index)->save_as (filename, om, options, update);
 
-  //  because the file name for the cellviews has changed we issue that event:
-  cellview_changed_event (index);
-
-  if (m_title.empty ()) {
-    emit title_changed ();
-  }
+  cellview_changed (index);
 }
 
 void
@@ -3316,6 +3336,16 @@ LayoutView::box () const
 void
 LayoutView::timer ()
 {
+  bool dirty = false;
+  for (std::list<lay::CellView>::const_iterator i = m_cellviews.begin (); i != m_cellviews.end () && ! dirty; ++i) {
+    dirty = (*i)->layout ().is_editable () && (*i)->is_dirty ();
+  }
+
+  if (dirty != m_dirty) {
+    m_dirty = dirty;
+    emit dirty_changed ();
+  }
+
   if (m_animated) {
     set_view_ops ();
     if (mp_control_panel) {
@@ -3324,7 +3354,7 @@ LayoutView::timer ()
     if (m_animated) {
       ++m_phase;
     }
-  }  
+  }
 }
 
 bool
@@ -4317,7 +4347,7 @@ LayoutView::select_cellviews_fit (const std::list <CellView> &cvs)
     finish_cellviews_changed ();
 
     for (int index = 0; index < int (m_cellviews.size ()); ++index) {
-      cellview_changed_event (index);
+      cellview_changed (index);
     }
 
     update_content ();
@@ -4331,8 +4361,25 @@ void
 LayoutView::active_cellview_changed (int index)
 {
   if (m_active_cellview_changed_event_enabled) {
+
     active_cellview_changed_event ();
     active_cellview_changed_with_index_event (index);
+
+    //  Because the title reflects the active one, emit a title changed event
+    if (m_title.empty ()) {
+      emit title_changed ();
+    }
+
+  }
+}
+
+void
+LayoutView::cellview_changed (unsigned int index)
+{
+  cellview_changed_event (index);
+
+  if (m_title.empty ()) {
+    emit title_changed ();
   }
 }
 
@@ -4376,7 +4423,7 @@ LayoutView::select_cell_fit (const cell_path_type &path, int index)
     redraw ();
     zoom_fit ();
 
-    cellview_changed_event (index);
+    cellview_changed (index);
 
     update_content ();
 
@@ -4397,7 +4444,7 @@ LayoutView::select_cell_fit (cell_index_type cell_index, int index)
     redraw ();
     zoom_fit ();
 
-    cellview_changed_event (index);
+    cellview_changed (index);
 
     update_content ();
 
@@ -4421,7 +4468,7 @@ LayoutView::select_cellviews (const std::list <CellView> &cvs)
 
     cellviews_changed_event ();
     for (int index = 0; index < int (m_cellviews.size ()); ++index) {
-      cellview_changed_event (index);
+      cellview_changed (index);
     }
 
     update_content ();
@@ -4444,7 +4491,7 @@ LayoutView::select_cellview (int index, const CellView &cv)
     *cellview_iter (index) = cv;
     redraw ();
 
-    cellview_changed_event (index);
+    cellview_changed (index);
 
     update_content ();
 
@@ -4464,7 +4511,7 @@ LayoutView::select_cell (const cell_path_type &path, int index)
     set_active_cellview_index (index);
     redraw ();
 
-    cellview_changed_event (index);
+    cellview_changed (index);
 
     update_content ();
 
@@ -4484,7 +4531,7 @@ LayoutView::select_cell (cell_index_type cell_index, int index)
     set_active_cellview_index (index);
     redraw ();
 
-    cellview_changed_event (index);
+    cellview_changed (index);
 
     update_content ();
 
@@ -6161,7 +6208,7 @@ LayoutView::ascend (int index)
     store_state ();
     redraw ();
 
-    cellview_changed_event (index);
+    cellview_changed (index);
 
     update_content ();
 
@@ -6186,7 +6233,7 @@ LayoutView::descend (const std::vector<db::InstElement> &path, int index)
     store_state ();
     redraw ();
 
-    cellview_changed_event (index);
+    cellview_changed (index);
 
     update_content ();
 

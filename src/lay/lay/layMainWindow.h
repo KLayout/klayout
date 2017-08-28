@@ -921,6 +921,9 @@ private:
   void close_view (int index);
   void interactive_close_view (int index, bool all_cellviews);
   void call_on_current_view (void (lay::LayoutView::*func) (), const std::string &op_desc);
+  void current_view_changed ();
+  void update_window_title ();
+  void update_tab_title (int i);
 
   bool can_close ();
   lay::CellViewRef create_or_load_layout (const std::string *filename, const db::LoadLayoutOptions *options, const std::string &tech, const int mode);

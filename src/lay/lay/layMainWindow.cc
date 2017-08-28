@@ -1160,8 +1160,7 @@ MainWindow::close_all ()
   //  try a smooth shutdown of the current view
   lay::LayoutView::set_current (0);
 
-  current_view_changed_event ();
-  //  TODO: required?  current_view_changed_event (int (view_index_org));
+  current_view_changed ();
 
   for (unsigned int i = 0; i < mp_views.size (); ++i) {
     mp_views [i]->stop ();
@@ -3231,8 +3230,7 @@ MainWindow::select_view (int index)
 
     }
 
-    current_view_changed_event ();
-    //  TODO: required?  current_view_changed_event (int (view_index_org));
+    current_view_changed ();
 
     clear_current_pos ();
     edits_enabled_changed ();
@@ -3613,6 +3611,7 @@ MainWindow::clone_current_view ()
   //  create a new view
   view = new lay::LayoutView (current_view (), &m_manager, lay::Application::instance ()->is_editable (), this, mp_view_stack);
   connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
+  connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
   connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
   connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
@@ -3908,7 +3907,7 @@ MainWindow::close_view (int index)
         //  last view closed
 
         mp_layer_toolbox->set_view (0);
-        current_view_changed_event ();
+        current_view_changed ();
 
         clear_current_pos ();
         edits_enabled_changed ();
@@ -4217,6 +4216,7 @@ MainWindow::do_create_view ()
   lay::LayoutView *view = new lay::LayoutView (&m_manager, lay::Application::instance ()->is_editable (), this, mp_view_stack);
 
   connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
+  connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
   connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
   connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
@@ -4318,15 +4318,14 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
 
       bool f = m_disable_tab_selected;
       m_disable_tab_selected = true;
-      int index = mp_tab_bar->insertTab (-1, tl::to_qstring (current_view ()->title ()));
+      int index = mp_tab_bar->insertTab (-1, QString ());
+      update_tab_title (index);
       m_disable_tab_selected = f;
       view_created_event (index);
       select_view (index);
 
-    } else if (mode == 0) {
-      mp_tab_bar->setTabText (index_of (current_view ()), tl::to_qstring (current_view ()->title ()));
-    } else if (mode == 2) {
-      mp_tab_bar->setTabText (index_of (current_view ()), tl::to_qstring (current_view ()->title ()));
+    } else if (mode == 0 || mode == 2) {
+      update_tab_title (index_of (current_view ()));
     }
 
     update_dock_widget_state ();
@@ -4346,16 +4345,74 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
   return vw->cellview_ref (cv_index);
 }
 
+void
+MainWindow::update_tab_title (int i)
+{
+  std::string title;
+
+  lay::LayoutView *v = view (i);
+  if (v) {
+    if (v->is_dirty ()) {
+      title += "[+] ";
+    }
+    title += v->title ();
+  }
+
+  if (tl::to_string (mp_tab_bar->tabText (i)) != title) {
+    mp_tab_bar->setTabText (i, tl::to_qstring (title));
+  }
+
+  if (v) {
+    std::string files;
+    for (unsigned int cv = 0; cv < v->cellviews (); ++cv) {
+      if (! files.empty ()) {
+        files += "\n";
+      }
+      if (! v->cellview (cv)->filename ().empty ()) {
+        files += v->cellview (cv)->filename ();
+      } else {
+        files += tl::to_string (tr ("(not saved)"));
+      }
+    }
+    if (tl::to_string (mp_tab_bar->tabToolTip (i)) != files) {
+      mp_tab_bar->setTabToolTip (i, tl::to_qstring (files));
+    }
+  }
+}
+
 void 
 MainWindow::view_title_changed ()
 {
-  //  transfer the current view's text into the tab bar
-  unsigned int tabs = mp_tab_bar->count ();
-  for (unsigned int i = 0; i < tabs && i < views (); ++i) {
-    if (tl::to_string (mp_tab_bar->tabText (i)) != view (i)->title ()) {
-      mp_tab_bar->setTabText (i, tl::to_qstring (view (i)->title ()));
-    }
+  int i = index_of (dynamic_cast<const lay::LayoutView *> (sender ()));
+  if (i >= 0) {
+    update_tab_title (i);
   }
+
+  if (sender () == current_view ()) {
+    update_window_title ();
+  }
+}
+
+void
+MainWindow::update_window_title ()
+{
+  if (current_view ()) {
+    std::string sep = " - ";
+    if (current_view ()->is_dirty ()) {
+      sep += "[+] ";
+    }
+    setWindowTitle (tl::to_qstring (lay::Application::instance ()->version () + sep + current_view ()->title ()));
+  } else {
+    setWindowTitle (tl::to_qstring (lay::Application::instance ()->version ()));
+  }
+}
+
+void
+MainWindow::current_view_changed ()
+{
+  update_window_title ();
+  current_view_changed_event ();
+  //  TODO: required?  current_view_changed_event (int (view_index_org));
 }
 
 double

@@ -286,6 +286,13 @@ public:
   void reset_title ();
 
   /**
+   *  @brief The "dirty" flag indicates that one of the layout has been modified
+   *
+   *  A signal is provided on a change of this flag (dirty_changed).
+   */
+  bool is_dirty () const;
+
+  /**
    *  @brief Fill the layer properties for a new layer
    *
    *  The layer's source must be set already to allow to compute the initial color.
@@ -2387,13 +2394,6 @@ public slots:
   void select_cell_dispatch (const cell_path_type &path, int cellview_index);
 
   /**
-   *  @brief The active cellview has changed
-   *
-   *  This signal is forwarded to the active_cellview_changed event
-   */
-  void active_cellview_changed (int index);
-
-  /**
    *  @brief Gets the full field box
    *
    *  This is the box to which the view will zoom on zoom_fit().
@@ -2509,11 +2509,19 @@ public slots:
   void signal_plugin_enabled_changed ();
   void signal_apply_technology (lay::LayoutHandle *layout_handle);
 
+private slots:
+  void active_cellview_changed (int index);
+
 signals:
   /**
    *  @brief This signal is emitted when the title changes
    */
   void title_changed ();
+
+  /**
+   *  @brief This signal is emitted when the "dirty" flag changes
+   */
+  void dirty_changed ();
 
   /**
    *  @brief This signal is emitted when the view wants to show a message for the given time (of infinitely for ms == 0)
@@ -2642,6 +2650,7 @@ private:
   bool m_dbu_coordinates;
   bool m_absolute_coordinates;
 
+  bool m_dirty;
   bool m_activated;
   bool m_animated;
   unsigned int m_phase;
@@ -2709,6 +2718,7 @@ private:
 
   void update_event_handlers ();
   void viewport_changed ();
+  void cellview_changed (unsigned int index);
 
   bool configure (const std::string &name, const std::string &value);
 

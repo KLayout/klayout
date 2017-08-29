@@ -126,6 +126,40 @@ PropertyMapper::operator() (db::Layout::properties_id_type source_id)
 // ------------------------------------------------------------------------------------
 //  merge_layouts implementation
 
+static void
+collect_cells_to_copy (const db::Layout &source,
+                       const std::vector<db::cell_index_type> &source_cells,
+                       const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
+                       std::set<db::cell_index_type> &all_top_level_cells,
+                       std::set<db::cell_index_type> &all_cells_to_copy)
+{
+  std::vector<db::cell_index_type> dropped_cells;
+
+  for (std::map<db::cell_index_type, db::cell_index_type>::const_iterator m = cell_mapping.begin (); m != cell_mapping.end (); ++m) {
+    if (m->second == DropCell) {
+      dropped_cells.push_back (m->first);
+    }
+  }
+
+  for (std::vector<db::cell_index_type>::const_iterator src = source_cells.begin (); src != source_cells.end (); ++src) {
+
+    all_cells_to_copy.insert (*src);
+    all_top_level_cells.insert (*src);
+
+    //  feed the excluded cells into the "all_cells_to_copy" cache. This will make "collect_called_cells" not
+    //  dive into their hierarchy. We will later delete them there.
+    all_cells_to_copy.insert (dropped_cells.begin (), dropped_cells.end ());
+
+    source.cell (*src).collect_called_cells (all_cells_to_copy);
+
+    for (std::vector<db::cell_index_type>::const_iterator i = dropped_cells.begin (); i != dropped_cells.end (); ++i) {
+      all_cells_to_copy.erase (*i);
+      all_top_level_cells.erase (*i);
+    }
+
+  }
+}
+
 void 
 merge_layouts (db::Layout &target, 
                const db::Layout &source, 
@@ -135,19 +169,11 @@ merge_layouts (db::Layout &target,
                const std::map<unsigned int, unsigned int> &layer_mapping,
                std::map<db::cell_index_type, db::cell_index_type> *final_cell_mapping)
 {
-  if (final_cell_mapping) {
-    final_cell_mapping->insert (cell_mapping.begin (), cell_mapping.end ());
-  }
-
   //  collect all called cells and all top level cells
   std::set<db::cell_index_type> all_top_level_cells;
   std::set<db::cell_index_type> all_cells_to_copy;
 
-  for (std::vector<db::cell_index_type>::const_iterator src = source_cells.begin (); src != source_cells.end (); ++src) {
-    all_cells_to_copy.insert (*src);
-    all_top_level_cells.insert (*src);
-    source.cell (*src).collect_called_cells (all_cells_to_copy);
-  }
+  collect_cells_to_copy (source, source_cells, cell_mapping, all_top_level_cells, all_cells_to_copy);
 
   //  identify all new cells and create new ones
   std::map<db::cell_index_type, db::cell_index_type> new_cell_mapping;
@@ -158,6 +184,11 @@ merge_layouts (db::Layout &target,
   }
 
   if (final_cell_mapping) {
+    for (std::map<db::cell_index_type, db::cell_index_type>::const_iterator m = cell_mapping.begin (); m != cell_mapping.end (); ++m) {
+      if (m->second != DropCell) {
+        final_cell_mapping->insert (*m);
+      }
+    }
     final_cell_mapping->insert (new_cell_mapping.begin (), new_cell_mapping.end ());
   }
 
@@ -248,7 +279,7 @@ copy_or_propagate_shapes (db::Layout &target,
 
     }
 
-  } else {
+  } else if (cm->second != DropCell) {
 
     db::Cell &target_cell = target.cell (cm->second);
     target_cell.shapes (target_layer).insert_transformed (source_cell.shapes (source_layer), trans * propagate_trans, pm);
@@ -256,23 +287,20 @@ copy_or_propagate_shapes (db::Layout &target,
   }
 }
 
-void 
-copy_shapes (db::Layout &target, 
-             const db::Layout &source, 
-             const db::ICplxTrans &trans,
-             const std::vector<db::cell_index_type> &source_cells, 
-             const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
-             const std::map<unsigned int, unsigned int> &layer_mapping)
+static void
+copy_or_move_shapes (db::Layout &target,
+                     db::Layout &source,
+                     const db::ICplxTrans &trans,
+                     const std::vector<db::cell_index_type> &source_cells,
+                     const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
+                     const std::map<unsigned int, unsigned int> &layer_mapping,
+                     bool move)
 {
   //  collect all called cells and all top level cells
   std::set<db::cell_index_type> all_top_level_cells;
   std::set<db::cell_index_type> all_cells_to_copy;
 
-  for (std::vector<db::cell_index_type>::const_iterator src = source_cells.begin (); src != source_cells.end (); ++src) {
-    all_cells_to_copy.insert (*src);
-    all_top_level_cells.insert (*src);
-    source.cell (*src).collect_called_cells (all_cells_to_copy);
-  }
+  collect_cells_to_copy (source, source_cells, cell_mapping, all_top_level_cells, all_cells_to_copy);
 
   //  provide the property mapper
   db::PropertyMapper pm (target, source);
@@ -284,8 +312,22 @@ copy_shapes (db::Layout &target,
     for (std::map<unsigned int, unsigned int>::const_iterator lm = layer_mapping.begin (); lm != layer_mapping.end (); ++lm) {
       ++progress;
       copy_or_propagate_shapes (target, source, trans, db::ICplxTrans (), pm, *c, *c, lm->second, lm->first, all_cells_to_copy, cell_mapping);
+      if (move) {
+        source.cell (*c).shapes (lm->first).clear ();
+      }
     }
   }
+}
+
+void
+copy_shapes (db::Layout &target, 
+             const db::Layout &source, 
+             const db::ICplxTrans &trans,
+             const std::vector<db::cell_index_type> &source_cells, 
+             const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
+             const std::map<unsigned int, unsigned int> &layer_mapping)
+{
+  copy_or_move_shapes (target, const_cast<db::Layout &> (source), trans, source_cells, cell_mapping, layer_mapping, false);
 }
 
 void 
@@ -296,29 +338,7 @@ move_shapes (db::Layout &target,
              const std::map<db::cell_index_type, db::cell_index_type> &cell_mapping,
              const std::map<unsigned int, unsigned int> &layer_mapping)
 {
-  //  collect all called cells and all top level cells
-  std::set<db::cell_index_type> all_top_level_cells;
-  std::set<db::cell_index_type> all_cells_to_copy;
-
-  for (std::vector<db::cell_index_type>::const_iterator src = source_cells.begin (); src != source_cells.end (); ++src) {
-    all_cells_to_copy.insert (*src);
-    all_top_level_cells.insert (*src);
-    source.cell (*src).collect_called_cells (all_cells_to_copy);
-  }
-
-  //  provide the property mapper
-  db::PropertyMapper pm (target, source);
-
-  tl::RelativeProgress progress (tl::to_string (QObject::tr ("Merge cells")), all_cells_to_copy.size () * layer_mapping.size (), 1);
-
-  //  and copy
-  for (std::set<db::cell_index_type>::const_iterator c = all_cells_to_copy.begin (); c != all_cells_to_copy.end (); ++c) {
-    for (std::map<unsigned int, unsigned int>::const_iterator lm = layer_mapping.begin (); lm != layer_mapping.end (); ++lm) {
-      ++progress;
-      copy_or_propagate_shapes (target, source, trans, db::ICplxTrans (), pm, *c, *c, lm->second, lm->first, all_cells_to_copy, cell_mapping);
-      source.cell (*c).shapes (lm->first).clear ();
-    }
-  }
+  copy_or_move_shapes (target, source, trans, source_cells, cell_mapping, layer_mapping, true);
 }
 
 // ------------------------------------------------------------

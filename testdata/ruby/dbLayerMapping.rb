@@ -50,6 +50,8 @@ class DBLayerMapping_TestClass < TestBase
     assert_equal(mp.has_mapping?(1), false)
     mp.map(1, 2)
     assert_equal(mp.layer_mapping(1), 2)
+    mp.map(1, 3)
+    assert_equal(mp.layer_mapping(1), 3)
 
     ly1 = RBA::Layout::new
 

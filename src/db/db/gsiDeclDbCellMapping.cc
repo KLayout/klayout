@@ -23,6 +23,7 @@
 
 #include "gsiDecl.h"
 #include "dbCellMapping.h"
+#include "dbLayoutUtils.h"
 #include "dbLayout.h"
 
 #include <memory>
@@ -30,9 +31,25 @@
 namespace gsi
 {
 
+static db::cell_index_type drop_cell_const ()
+{
+  return db::DropCell;
+}
+
 Class<db::CellMapping> decl_CellMapping ("CellMapping", 
+  gsi::method ("DropCell", &drop_cell_const,
+    "@brief A constant indicating the reques to drop a cell\n"
+    "\n"
+    "If used as a pseudo-target for the cell mapping, this index indicates "
+    "that the cell shall be dropped rather than created on the target side "
+    "or skipped by flattening. Instead, all shapes of this cell are discarded "
+    "and it's children are not translated unless explicitly requested or "
+    "if required are children for other cells.\n"
+    "\n"
+    "This constant has been introduced in version 0.25."
+  ) +
   gsi::method ("for_single_cell", &db::CellMapping::create_single_mapping, 
-    "@brief Initialize the cell mapping for top-level identity\n"
+    "@brief Initializes the cell mapping for top-level identity\n"
     "\n"
     "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
@@ -42,13 +59,15 @@ Class<db::CellMapping> decl_CellMapping ("CellMapping",
     "\n"
     "The cell mapping is created for cell_b to cell_a in the respective layouts. "
     "This method clears the mapping and creates one for the single cell pair. "
-    "In addition, this method completes the mapping by adding all the child cells "
-    "of cell_b to layout_a and creating the proper instances. "
+    "If used for \\Cell#copy_tree or \\Cell#move_tree, this cell mapping will essentially "
+    "flatten the cell.\n"
+    "\n"
+    "This method is equivalent to \\clear, followed by \\map(cell_index_a, cell_index_b).\n"
     "\n"
     "This method has been introduced in version 0.23."
   ) +
   gsi::method ("for_single_cell_full", &db::CellMapping::create_single_mapping_full, 
-    "@brief Initialize the cell mapping for top-level identity\n"
+    "@brief Initializes the cell mapping for top-level identity\n"
     "\n"
     "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
@@ -58,11 +77,13 @@ Class<db::CellMapping> decl_CellMapping ("CellMapping",
     "\n"
     "The cell mapping is created for cell_b to cell_a in the respective layouts. "
     "This method clears the mapping and creates one for the single cell pair. "
+    "In addition and in contrast to \\for_single_cell, this method completes the mapping by adding all the child cells "
+    "of cell_b to layout_a and creating the proper instances. "
     "\n"
     "This method has been introduced in version 0.23."
   ) +
   gsi::method ("from_geometry_full", &db::CellMapping::create_from_geometry_full, 
-    "@brief Initialize the cell mapping using the geometrical identity in full mapping mode\n"
+    "@brief Initializes the cell mapping using the geometrical identity in full mapping mode\n"
     "\n"
     "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
@@ -83,7 +104,7 @@ Class<db::CellMapping> decl_CellMapping ("CellMapping",
     "This method has been introduced in version 0.23."
   ) +
   gsi::method ("from_geometry", &db::CellMapping::create_from_geometry, 
-    "@brief Initialize the cell mapping using the geometrical identity\n"
+    "@brief Initializes the cell mapping using the geometrical identity\n"
     "\n"
     "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
@@ -99,7 +120,7 @@ Class<db::CellMapping> decl_CellMapping ("CellMapping",
     "This method has been introduced in version 0.23."
   ) +
   gsi::method ("from_names", &db::CellMapping::create_from_names, 
-    "@brief Initialize the cell mapping using the name identity\n"
+    "@brief Initializes the cell mapping using the name identity\n"
     "\n"
     "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
@@ -114,7 +135,7 @@ Class<db::CellMapping> decl_CellMapping ("CellMapping",
     "This method has been introduced in version 0.23."
   ) +
   gsi::method ("from_names_full", &db::CellMapping::create_from_names_full, 
-    "@brief Initialize the cell mapping using the name identity in full mapping mode\n"
+    "@brief Initializes the cell mapping using the name identity in full mapping mode\n"
     "\n"
     "@args layout_a, cell_index_a, layout_b, cell_index_b\n"
     "@param layout_a The target layout.\n"
@@ -139,12 +160,12 @@ Class<db::CellMapping> decl_CellMapping ("CellMapping",
     "This method has been introduced in version 0.23."
   ) +
   gsi::method ("map", &db::CellMapping::map, 
-    "@brief Explicitly specify a mapping.\n"
+    "@brief Explicitly specifies a mapping.\n"
     "\n"
     "@args cell_index_b, cell_index_a\n"
     "\n"
     "@param cell_index_b The index of the cell in layout B (the \"source\")\n"
-    "@param cell_index_a The index of the cell in layout A (the \"target\")\n"
+    "@param cell_index_a The index of the cell in layout A (the \"target\") - this index can be \\DropCell\n"
     "\n"
     "Beside using the mapping generator algorithms provided through \\from_names and \\from_geometry, "
     "it is possible to explicitly specify cell mappings using this method.\n"
@@ -152,20 +173,25 @@ Class<db::CellMapping> decl_CellMapping ("CellMapping",
     "This method has been introduced in version 0.23."
   ) +
   gsi::method ("has_mapping?", &db::CellMapping::has_mapping, 
-    "@brief Determine if a cell of layout_b has a mapping to a layout_a cell.\n"
+    "@brief Returns as value indicating whether a cell of layout_b has a mapping to a layout_a cell.\n"
     "\n"
     "@args cell_index_b\n"
     "\n"
     "@param cell_index_b The index of the cell in layout_b whose mapping is requested.\n"
     "@return true, if the cell has a mapping\n"
+    "\n"
+    "Note that if the cell is supposed to be dropped (see \\DropCell), the respective "
+    "source cell will also be regarded \"mapped\", so has_mapping? will return true in this case.\n"
   ) +
   gsi::method ("cell_mapping", &db::CellMapping::cell_mapping, 
-    "@brief Determine cell mapping of a layout_b cell to the corresponding layout_a cell.\n"
+    "@brief Determines cell mapping of a layout_b cell to the corresponding layout_a cell.\n"
     "\n"
     "@args cell_index_b\n"
     "\n"
     "@param cell_index_b The index of the cell in layout_b whose mapping is requested.\n"
     "@return The cell index in layout_a.\n"
+    "\n"
+    "Note that the returned index can be \\DropCell to indicate the cell shall be dropped."
   ),
   "@brief A cell mapping (source to target layout)\n"
   "\n"

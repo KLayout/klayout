@@ -144,7 +144,7 @@ public:
    */
   void map (db::cell_index_type cell_index_b, db::cell_index_type cell_index_a)
   {
-    m_b2a_mapping.insert (std::make_pair (cell_index_b, cell_index_a));
+    m_b2a_mapping.insert (std::make_pair (cell_index_b, 0)).first->second = cell_index_a;
   }
 
   /**

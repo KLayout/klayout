@@ -102,7 +102,7 @@ public:
    */
   void map (unsigned int layer_b, unsigned int layer_a)
   {
-    m_b2a_mapping.insert (std::make_pair (layer_b, layer_a));
+    m_b2a_mapping.insert (std::make_pair (layer_b, 0)).first->second = layer_a;
   }
 
   /**

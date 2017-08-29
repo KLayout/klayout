@@ -31,6 +31,7 @@ SOURCES = \
   dbLayerMapping.cc \
   dbLayout.cc \
   dbLayoutDiff.cc \
+  dbLayoutUtils.cc \
   dbLayoutQuery.cc \
   dbLibraries.cc \
   dbMatrix.cc \

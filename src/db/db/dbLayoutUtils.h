@@ -32,6 +32,7 @@
 
 #include <map>
 #include <vector>
+#include <limits>
 
 namespace db
 {
@@ -109,6 +110,14 @@ private:
   const db::Layout *mp_source;
   std::map <db::Layout::properties_id_type, db::Layout::properties_id_type> m_prop_id_map;
 };
+
+/**
+ *  @brief A constant describing "drop cell" mapping
+ *
+ *  If used as the target cell index, this constant means "drop the cell".
+ *  This cell and it's children will be dropped unless the children are used by other cells.
+ */
+const db::cell_index_type DropCell = std::numeric_limits<db::cell_index_type>::max ();
 
 /**
  *  @brief Merge one layout into another

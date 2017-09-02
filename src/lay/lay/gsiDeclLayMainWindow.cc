@@ -476,8 +476,8 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "MainWind
   gsi::method ("cm_max_hier_1", &lay::MainWindow::cm_max_hier_1,
     "@brief 'cm_max_hier_1' action (bound to a menu)"
   ) +
-  gsi::method ("cm_last_display_state", &lay::MainWindow::cm_last_display_state,
-    "@brief 'cm_last_display_state' action (bound to a menu)"
+  gsi::method ("cm_prev_display_state|#cm_last_display_state", &lay::MainWindow::cm_prev_display_state,
+    "@brief 'cm_prev_display_state' action (bound to a menu)"
   ) +
   gsi::method ("cm_next_display_state", &lay::MainWindow::cm_next_display_state,
     "@brief 'cm_next_display_state' action (bound to a menu)"

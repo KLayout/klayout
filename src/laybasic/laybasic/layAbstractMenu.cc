@@ -1198,7 +1198,11 @@ AbstractMenu::transfer (const MenuLayoutEntry *layout, AbstractMenuItem &item)
       a = lay::Action (new ActionHandle (mp_provider->menu_parent_widget ()));
     }
 
-    if (! layout->title.empty ()) {
+    if (layout->title == "-") {
+
+      //  reuse title from other entry
+
+    } else if (! layout->title.empty ()) {
 
       std::string title;
       std::string shortcut;

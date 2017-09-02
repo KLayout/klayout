@@ -904,8 +904,8 @@ MainWindow::init_menu ()
     MenuLayoutEntry::separator ("redraw_group"),
     MenuLayoutEntry ("redraw",                          tl::to_string (QObject::tr ("Redraw")),                           SLOT (cm_redraw ())),
     MenuLayoutEntry::separator ("state_group"),
-    MenuLayoutEntry ("last_display_state",              tl::to_string (QObject::tr ("Previous State(Shift+Tab)")),        SLOT (cm_last_display_state ())),
-    MenuLayoutEntry ("next_display_state",              tl::to_string (QObject::tr ("Next State(Tab)")),                  SLOT (cm_next_display_state ())),
+    MenuLayoutEntry ("prev_display_state",              tl::to_string (QObject::tr ("Back(Shift+Tab)<:/back.png>")),      SLOT (cm_prev_display_state ())),
+    MenuLayoutEntry ("next_display_state",              tl::to_string (QObject::tr ("Forward(Tab)<:/forward.png>")),      SLOT (cm_next_display_state ())),
     MenuLayoutEntry::separator ("select_group"),
     MenuLayoutEntry ("select_cell:edit",                tl::to_string (QObject::tr ("Select Cell")),                      SLOT (cm_select_cell ())),
     MenuLayoutEntry ("select_current_cell",             tl::to_string (QObject::tr ("Show As New Top(Ctrl+S)")),          SLOT (cm_select_current_cell ())),
@@ -943,6 +943,13 @@ MainWindow::init_menu ()
     MenuLayoutEntry::last ()
   };
 
+  MenuLayoutEntry toolbar_entries [] = {
+    MenuLayoutEntry ("prev_display_state",              "-",                                                              SLOT (cm_prev_display_state ())),
+    MenuLayoutEntry ("next_display_state",              "-",                                                              SLOT (cm_next_display_state ())),
+    MenuLayoutEntry::separator ("toolbar_post_navigation_group"),
+    MenuLayoutEntry::last ()
+  };
+
   MenuLayoutEntry main_menu [] = {
     MenuLayoutEntry ("file_menu",                       tl::to_string (QObject::tr ("&File")),                            file_menu),
     MenuLayoutEntry ("edit_menu",                       tl::to_string (QObject::tr ("&Edit")),                            edit_menu),
@@ -953,7 +960,7 @@ MainWindow::init_menu ()
     MenuLayoutEntry ("macros_menu",                     tl::to_string (QObject::tr ("&Macros")),                          macros_menu),
     MenuLayoutEntry::separator ("help_group"),
     MenuLayoutEntry ("help_menu",                       tl::to_string (QObject::tr ("&Help")),                            help_menu),
-    MenuLayoutEntry ("@toolbar",                        "",                                                 empty_menu),
+    MenuLayoutEntry ("@toolbar",                        "",                                                               toolbar_entries),
     MenuLayoutEntry::last ()
   };
 
@@ -2643,9 +2650,9 @@ MainWindow::update_action_states ()
       next_display_state_action.set_enabled (has_next_display_state ());
     }
 
-    if (mp_menu->is_valid ("zoom_menu.last_display_state")) {
-      Action last_display_state_action = mp_menu->action ("zoom_menu.last_display_state");
-      last_display_state_action.set_enabled (has_last_display_state ());
+    if (mp_menu->is_valid ("zoom_menu.prev_display_state")) {
+      Action prev_display_state_action = mp_menu->action ("zoom_menu.prev_display_state");
+      prev_display_state_action.set_enabled (has_prev_display_state ());
     }
 
   } catch (...) {
@@ -3370,8 +3377,7 @@ MainWindow::cm_new_layout ()
     db::cell_index_type new_ci = cellview->layout ().add_cell (m_new_cell_cell_name.empty () ? 0 : m_new_cell_cell_name.c_str ());
     cellview.set_cell (new_ci);
 
-    current_view ()->zoom_box (db::DBox (-0.5 * m_new_cell_window_size, -0.5 * m_new_cell_window_size, 0.5 * m_new_cell_window_size, 0.5 * m_new_cell_window_size));
-    current_view ()->set_hier_levels (std::make_pair (0, 1));
+    current_view ()->zoom_box_and_set_hier_levels (db::DBox (-0.5 * m_new_cell_window_size, -0.5 * m_new_cell_window_size, 0.5 * m_new_cell_window_size, 0.5 * m_new_cell_window_size), std::make_pair (0, 1));
 
   }
 
@@ -3416,10 +3422,12 @@ MainWindow::cm_new_cell ()
 
     db::cell_index_type new_ci = curr->new_cell (curr->active_cellview_index (), m_new_cell_cell_name.c_str ());
     curr->select_cell (new_ci, curr->active_cellview_index ());
-    curr->zoom_box (db::DBox (-0.5 * m_new_cell_window_size, -0.5 * m_new_cell_window_size, 0.5 * m_new_cell_window_size, 0.5 * m_new_cell_window_size));
 
+    db::DBox zoom_box = db::DBox (-0.5 * m_new_cell_window_size, -0.5 * m_new_cell_window_size, 0.5 * m_new_cell_window_size, 0.5 * m_new_cell_window_size);
     if (curr->get_max_hier_levels () < 1 || curr->get_min_hier_levels () > 0) {
-      curr->set_hier_levels (std::make_pair (0, 1));
+      curr->zoom_box_and_set_hier_levels (zoom_box, std::make_pair (0, 1));
+    } else {
+      curr->zoom_box (zoom_box);
     }
 
   }
@@ -3629,9 +3637,14 @@ MainWindow::clone_current_view ()
   //  select the current mode and select the enabled editables
   view->mode (m_mode);
 
+  //  copy the state
   lay::DisplayState state;
   current_view ()->save_view (state);
   view->goto_view (state);
+
+  //  initialize the state stack
+  view->clear_states ();
+  view->store_state ();
 
   view->update_content ();
 
@@ -4239,6 +4252,10 @@ MainWindow::do_create_view ()
   //  select the current mode and select the enabled editables
   view->mode (m_mode);
 
+  //  initialize the state stack
+  view->clear_states ();
+  view->store_state ();
+
   return int (mp_views.size () - 1);
 }
 
@@ -4290,6 +4307,8 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
       int tl = 0;
       config_get (cfg_initial_hier_depth, tl);
       vw->set_hier_levels (std::make_pair (0, tl));
+      vw->clear_states ();
+      vw->store_state ();
     }
   }
 
@@ -4474,10 +4493,8 @@ MainWindow::cm_max_hier_1 ()
 void 
 MainWindow::set_hier_levels (std::pair<int, int> l)
 {
-  if (l != get_hier_levels ()) {
-    if (current_view ()) {
-      current_view ()->set_hier_levels (l);
-    }
+  if (current_view () && l != get_hier_levels ()) {
+    current_view ()->set_hier_levels (l);
   } 
 }
 
@@ -4494,22 +4511,22 @@ MainWindow::get_hier_levels () const
 }
 
 void 
-MainWindow::cm_last_display_state ()
+MainWindow::cm_prev_display_state ()
 {
   BEGIN_PROTECTED 
 
-  if (has_last_display_state ()) {
-    current_view ()->last_display_state ();
+  if (has_prev_display_state ()) {
+    current_view ()->prev_display_state ();
   }
 
   END_PROTECTED
 }
 
 bool 
-MainWindow::has_last_display_state ()
+MainWindow::has_prev_display_state ()
 {
   if (current_view ()) {
-    return current_view ()->has_last_display_state ();
+    return current_view ()->has_prev_display_state ();
   } else {
     return false;
   }

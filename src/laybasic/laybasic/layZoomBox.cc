@@ -68,14 +68,19 @@ ZoomService::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, bo
   if (prio) {
 
     if (mp_box) {
+
       m_p2 = p;
       mp_box->set_points (m_p1, m_p2);
-    } else if (mp_view) {
-      m_vp.move (m_p1 - p);
-      mp_view->zoom_box (m_vp);
-    }
 
-    mp_view->message ("w: " + tl::micron_to_string (fabs (m_p2.x () - m_p1.x ())) + "  h: " + tl::micron_to_string (fabs (m_p2.y () - m_p1.y ())));
+      mp_view->message ("w: " + tl::micron_to_string (fabs (m_p2.x () - m_p1.x ())) + "  h: " + tl::micron_to_string (fabs (m_p2.y () - m_p1.y ())));
+
+    } else if (mp_view) {
+
+      m_vp.move (m_p1 - p);
+      mp_view->pop_state ();  //  we will overwrite the previous state so we don't collect tiny move events
+      mp_view->zoom_box (m_vp);
+
+    }
 
     return true;
 
@@ -256,6 +261,9 @@ ZoomService::begin_pan (const db::DPoint &pos)
 
   m_p1 = pos;
   m_vp = widget ()->mouse_event_viewport ();
+
+  //  store one state which we are going to update
+  mp_view->zoom_box (m_vp);
 
   widget ()->grab_mouse (this, true);
 }

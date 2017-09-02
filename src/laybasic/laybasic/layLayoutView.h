@@ -909,7 +909,7 @@ public:
   /**
    *  @brief Return true, if there is a "last" display state
    */
-  bool has_last_display_state ();
+  bool has_prev_display_state ();
 
   /**
    *  @brief Return true, if there is a "next" display state
@@ -2302,9 +2302,24 @@ public:
   }
 
   /**
+   *  @brief Removes the previous state from the stack
+   */
+  void pop_state ();
+
+  /**
+   *  @brief Clears the state stack
+   */
+  void clear_states ();
+
+  /**
    *  @brief Zoom the given box into view
    */
   void zoom_box (const db::DBox &b);
+
+  /**
+   *  @brief Zoom the given box into view and select hierarchy levels
+   */
+  void zoom_box_and_set_hier_levels (const db::DBox &b, const std::pair<int, int> &levels);
 
   /**
    *  @brief Specify the transformation explicitly
@@ -2341,7 +2356,7 @@ public:
 
 public slots:
   /**
-   *  @brief Store the current state on the "last states" stack
+   *  @brief Store the current state on the "previous states" stack
    */
   void store_state ();
 
@@ -2373,7 +2388,7 @@ public slots:
   /** 
    *  @brief Select last display state
    */
-  void last_display_state ();
+  void prev_display_state ();
 
   /** 
    *  @brief Select next display state
@@ -2715,6 +2730,7 @@ private:
   void abstract_mode_enabled (bool e);
   bool has_max_hier () const;
   int max_hier_level () const;
+  bool set_hier_levels_basic (std::pair<int, int> l);
 
   void update_event_handlers ();
   void viewport_changed ();

@@ -2371,8 +2371,7 @@ LayoutView::set_layout (const lay::CellView &cv, unsigned int cvindex)
   *cellview_iter (cvindex) = cv;
 
   //  clear the history, store path and zoom box
-  m_display_states.clear ();
-  m_display_state_ptr = 0;
+  clear_states ();
 
   finish_cellviews_changed ();
 
@@ -3313,6 +3312,22 @@ LayoutView::merge_layer_props (const std::vector<lay::LayerPropertiesList> &prop
 }
 
 void
+LayoutView::pop_state ()
+{
+  if (m_display_state_ptr > 0) {
+    m_display_states.erase (m_display_states.begin () + m_display_state_ptr, m_display_states.end ());
+    --m_display_state_ptr;
+  }
+}
+
+void
+LayoutView::clear_states ()
+{
+  m_display_states.clear ();
+  m_display_state_ptr = 0;
+}
+
+void
 LayoutView::store_state ()
 {
   //  erase all states after the current position
@@ -3438,6 +3453,14 @@ LayoutView::ensure_visible (const db::DBox &bbox)
 {
   db::DBox new_box = bbox + viewport ().box ();
   mp_canvas->zoom_box (new_box);
+  store_state ();
+}
+
+void
+LayoutView::zoom_box_and_set_hier_levels (const db::DBox &bbox, const std::pair<int, int> &levels)
+{
+  mp_canvas->zoom_box (bbox);
+  set_hier_levels_basic (levels);
   store_state ();
 }
 
@@ -3631,7 +3654,7 @@ LayoutView::goto_view (const DisplayState &state)
   select_cellviews (cellviews);
 
   if (state.min_hier () <= state.max_hier ()) {
-    set_hier_levels (std::make_pair (state.min_hier (), state.max_hier ()));
+    set_hier_levels_basic (std::make_pair (state.min_hier (), state.max_hier ()));
   }
 
   update_content ();
@@ -4078,18 +4101,23 @@ LayoutView::cell_box_text_font (unsigned int f)
   } 
 }
 
-void 
-LayoutView::set_hier_levels (std::pair<int, int> l)
+bool
+LayoutView::set_hier_levels_basic (std::pair<int, int> l)
 {
   if (l != get_hier_levels ()) {
 
     if (mp_min_hier_spbx) {
+      mp_min_hier_spbx->blockSignals (true);
       mp_min_hier_spbx->setValue (l.first);
       mp_min_hier_spbx->setMaximum (l.second);
+      mp_min_hier_spbx->blockSignals (false);
     }
+
     if (mp_max_hier_spbx) {
+      mp_max_hier_spbx->blockSignals (true);
       mp_max_hier_spbx->setValue (l.second);
       mp_max_hier_spbx->setMinimum (l.first);
+      mp_max_hier_spbx->blockSignals (false);
     }
 
     m_from_level = l.first;
@@ -4100,6 +4128,18 @@ LayoutView::set_hier_levels (std::pair<int, int> l)
 
     redraw ();
 
+    return true;
+
+  } else {
+    return false;
+  }
+}
+
+void 
+LayoutView::set_hier_levels (std::pair<int, int> l)
+{
+  if (set_hier_levels_basic (l)) {
+    store_state ();
   } 
 }
 
@@ -5893,7 +5933,7 @@ LayoutView::remove_unused_layers ()
 }
 
 void 
-LayoutView::last_display_state ()
+LayoutView::prev_display_state ()
 {
   if (m_display_state_ptr > 0) {
     m_display_state_ptr--;
@@ -5902,7 +5942,7 @@ LayoutView::last_display_state ()
 }
 
 bool 
-LayoutView::has_last_display_state ()
+LayoutView::has_prev_display_state ()
 {
   return m_display_state_ptr > 0;
 }

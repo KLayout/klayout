@@ -349,7 +349,7 @@ public:
   /**
    *  @brief Return true, if there is a "last" display state
    */
-  bool has_last_display_state ();
+  bool has_prev_display_state ();
 
   /**
    *  @brief Return true, if there is a "next" display state
@@ -696,7 +696,7 @@ public slots:
   void cm_max_hier ();
   void cm_max_hier_0 ();
   void cm_max_hier_1 ();
-  void cm_last_display_state ();
+  void cm_prev_display_state ();
   void cm_next_display_state ();
   void cm_cancel ();
   void cm_redraw ();

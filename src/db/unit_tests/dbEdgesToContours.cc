@@ -22,7 +22,7 @@
 
 
 #include "dbEdgesToContours.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 static std::string c2s (const std::vector <db::Point> &c) 
 {

@@ -20,17 +20,17 @@
 
 */
 
-#include "utHead.h"
+#include "tlUnitTest.h"
 #include "bdCommon.h"
 
 BD_PUBLIC int strm2txt (int argc, char *argv[]);
 
 TEST(1)
 {
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/gds/t10.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/bd/strm2txt_au.txt";
 
   std::string output = this->tmp_file ();

@@ -25,7 +25,7 @@
 #include "dbOASISWriter.h"
 #include "dbShapeProcessor.h"
 
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <stdlib.h>
 #include <QDir>
@@ -38,7 +38,7 @@ TEST(1)
   db::Manager m;
   db::Layout layout_org (&m);
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/other/d1.oas.gz";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -52,7 +52,7 @@ TEST(1)
     }
   }
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_OASISWriter2.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_OASISWriter2.gds");
 
   {
     tl::OutputStream stream (tmp_file);

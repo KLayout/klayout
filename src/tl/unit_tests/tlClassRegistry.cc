@@ -22,7 +22,7 @@
 
  
 #include "tlClassRegistry.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 //  This namespace separates the test structs from other objects
 namespace class_registry_test 

@@ -20,10 +20,11 @@
 
 */
 
-#include "utHead.h"
 #include "bdCommon.h"
 #include "dbReader.h"
+#include "dbTestSupport.h"
 #include "tlLog.h"
+#include "tlUnitTest.h"
 
 #include <sstream>
 
@@ -31,12 +32,12 @@ BD_PUBLIC int strmxor (int argc, char *argv[]);
 
 TEST(0)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmxor_in1.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmxor_in1.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
@@ -52,15 +53,15 @@ TEST(0)
 
 TEST(1A)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmxor_in1.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmxor_in2.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/bd/strmxor_au1.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
@@ -77,7 +78,7 @@ TEST(1A)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NoNormalization);
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
     "Result summary (layers without differences are not shown):\n"
@@ -94,12 +95,12 @@ TEST(1A)
 
 TEST(1B)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmxor_in1.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmxor_in2.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
@@ -124,12 +125,12 @@ TEST(1B)
 
 TEST(1C)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmxor_in1.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmxor_in2.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
@@ -145,12 +146,12 @@ TEST(1C)
 
 TEST(1D)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmxor_in1.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmxor_in2.gds";
 
   std::string output = this->tmp_file ("tmp.oas");
@@ -163,15 +164,15 @@ TEST(1D)
 
 TEST(2)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmxor_in1.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmxor_in2.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/bd/strmxor_au2.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
@@ -188,7 +189,7 @@ TEST(2)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NoNormalization);
   EXPECT_EQ (cap.captured_text (),
     ""
   );
@@ -196,15 +197,15 @@ TEST(2)
 
 TEST(3)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmxor_in1.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmxor_in2.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/bd/strmxor_au3.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
@@ -221,7 +222,7 @@ TEST(3)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NoNormalization);
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -229,15 +230,15 @@ TEST(3)
 
 TEST(4)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmxor_in1.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmxor_in2.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/bd/strmxor_au4.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
@@ -254,7 +255,7 @@ TEST(4)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NoNormalization);
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -262,15 +263,15 @@ TEST(4)
 
 TEST(5)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmxor_in1.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmxor_in2.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/bd/strmxor_au5.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
@@ -287,7 +288,7 @@ TEST(5)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NoNormalization);
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -295,15 +296,15 @@ TEST(5)
 
 TEST(6)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmxor_in1.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmxor_in2.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/bd/strmxor_au6.oas";
 
   std::string output = this->tmp_file ("tmp.oas");
@@ -320,7 +321,7 @@ TEST(6)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NoNormalization);
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );

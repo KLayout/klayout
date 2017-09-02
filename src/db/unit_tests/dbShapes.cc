@@ -24,7 +24,7 @@
 
 #include "dbLayout.h"
 #include "tlTimer.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 #include "dbOASISReader.h"
 #include "dbStatic.h"
 
@@ -111,7 +111,7 @@ TEST(1b)
   EXPECT_EQ (s2.bbox (), db::Box (-100, -200, 1000, 1200));
 }
 
-std::string shapes_to_string_norm (ut::TestBase *_this, const db::Shapes &shapes, const db::ICplxTrans &trans)
+std::string shapes_to_string_norm (tl::TestBase *_this, const db::Shapes &shapes, const db::ICplxTrans &trans)
 {
   std::vector<std::string> strings;
   for (db::Shapes::shape_iterator shape = shapes.begin (db::Shapes::shape_iterator::All); ! shape.at_end (); ++shape) {
@@ -155,7 +155,7 @@ std::string shapes_to_string_norm (ut::TestBase *_this, const db::Shapes &shapes
   return r;
 }
 
-std::string shapes_to_string_norm (ut::TestBase *_this, const db::Shapes &shapes)
+std::string shapes_to_string_norm (tl::TestBase *_this, const db::Shapes &shapes)
 {
   std::vector<std::string> strings;
   for (db::Shapes::shape_iterator shape = shapes.begin (db::Shapes::shape_iterator::All); ! shape.at_end (); ++shape) {
@@ -199,7 +199,7 @@ std::string shapes_to_string_norm (ut::TestBase *_this, const db::Shapes &shapes
   return r;
 }
 
-std::string shapes_to_string (ut::TestBase *_this, const db::Shapes &shapes)
+std::string shapes_to_string (tl::TestBase *_this, const db::Shapes &shapes)
 {
   std::string r;
   for (db::Shapes::shape_iterator shape = shapes.begin (db::Shapes::shape_iterator::All); ! shape.at_end (); ++shape) {

@@ -10,6 +10,10 @@ TARGET = ut_runner
 
 SOURCES = \
   unit_test_main.cc \
+  utTestConsole.cc \
+
+HEADERS += \
+  utTestConsole.h \
 
 !win32 {
   LIBS += -ldl

@@ -23,7 +23,7 @@
 
 #include "tlStream.h"
 #include "tlDeflate.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include "zlib.h"
 

@@ -20,19 +20,20 @@
 
 */
 
-#include "utHead.h"
+#include "tlUnitTest.h"
 #include "dbReader.h"
+#include "dbTestSupport.h"
 #include "lymMacro.h"
 
-void runtest (ut::TestBase *_this, int mode)
+void runtest (tl::TestBase *_this, int mode)
 {
-  std::string rs = ut::testsrc ();
+  std::string rs = tl::testsrc ();
   rs += "/testdata/drc/drcSuiteTests.drc";
 
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/drc/drctest.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/drc/drcSuiteTests_au";
   au += tl::to_string (mode);
   au += ".gds";
@@ -64,7 +65,7 @@ void runtest (ut::TestBase *_this, int mode)
     reader.read (layout);
   }
 
-  _this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
 TEST(1)

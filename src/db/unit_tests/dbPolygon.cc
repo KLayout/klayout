@@ -29,7 +29,7 @@
 #include "dbText.h"
 #include "dbShapeRepository.h"
 #include "tlReuseVector.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <vector>
 

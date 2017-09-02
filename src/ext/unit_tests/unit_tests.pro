@@ -11,15 +11,15 @@ SOURCES = \
   extLEFDEFImport.cc \
   extNetTracer.cc \
 
-INCLUDEPATH += $$EXT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$UT_INC
-DEPENDPATH += $$EXT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$UT_INC
+INCLUDEPATH += $$EXT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC
+DEPENDPATH += $$EXT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC
 
 # Note: this accounts for UI-generated headers placed into the output folders in
 # shadow builds:
 INCLUDEPATH += $$DESTDIR_UT/ext/ext $$DESTDIR_UT/laybasic/laybasic
 DEPENDPATH += $$DESTDIR_UT/ext/ext $$DESTDIR_UT/laybasic/laybasic
 
-LIBS += -L$$DESTDIR_UT -lklayout_ext -lklayout_laybasic -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_ut
+LIBS += -L$$DESTDIR_UT -lklayout_ext -lklayout_laybasic -lklayout_db -lklayout_tl -lklayout_gsi
 
 # TODO: ideally this should not be there:
 INCLUDEPATH += $$DESTDIR_UT/lay/lay

@@ -24,7 +24,7 @@
 #include "dbOASISReader.h"
 #include "dbTextWriter.h"
 #include "tlLog.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <stdlib.h>
 
@@ -37,7 +37,7 @@ TEST(1_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t1.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -68,7 +68,7 @@ TEST(1_2)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t1.2.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -99,7 +99,7 @@ TEST(1_3)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t1.3.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -130,7 +130,7 @@ TEST(1_4)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t1.4.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -161,7 +161,7 @@ TEST(1_5)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t1.5.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -219,7 +219,7 @@ TEST(10_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t10.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -285,7 +285,7 @@ TEST(11_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t11.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -516,7 +516,7 @@ TEST(11_2)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t11.2.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -582,7 +582,7 @@ TEST(11_3)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t11.3.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -682,7 +682,7 @@ TEST(11_4)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t11.4.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -913,7 +913,7 @@ TEST(11_5)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t11.5.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1014,7 +1014,7 @@ TEST(11_6)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t11.6.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1057,7 +1057,7 @@ TEST(11_7)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t11.7.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1083,7 +1083,7 @@ TEST(11_8)
 {
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t11.8.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1105,7 +1105,7 @@ TEST(11_9)
 {
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t11.9.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1151,7 +1151,7 @@ TEST(12_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t12.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1200,7 +1200,7 @@ TEST(13_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t13.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1250,7 +1250,7 @@ TEST(13_2)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t13.2.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1316,7 +1316,7 @@ TEST(13_3)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t13.3.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1382,7 +1382,7 @@ TEST(13_4)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t13.4.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1426,7 +1426,7 @@ TEST(14_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t14.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1459,7 +1459,7 @@ TEST(2_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t2.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1494,7 +1494,7 @@ TEST(2_2)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t2.2.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1520,7 +1520,7 @@ TEST(2_3)
 {
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t2.3.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1551,7 +1551,7 @@ TEST(2_4)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t2.4.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1577,7 +1577,7 @@ TEST(2_5)
 {
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t2.5.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1608,7 +1608,7 @@ TEST(2_6)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t2.6.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1859,7 +1859,7 @@ TEST(3_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1893,7 +1893,7 @@ TEST(3_10)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.10.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -1919,7 +1919,7 @@ TEST(3_11)
 {
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.11.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -2166,7 +2166,7 @@ TEST(3_12)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.12.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -2417,7 +2417,7 @@ TEST(3_2)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.2.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -2443,7 +2443,7 @@ TEST(3_3)
 {
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.3.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -2465,7 +2465,7 @@ TEST(3_4)
 {
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.4.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -2712,7 +2712,7 @@ TEST(3_5)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.5.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -2738,7 +2738,7 @@ TEST(3_6)
 {
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.6.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -2760,7 +2760,7 @@ TEST(3_7)
 {
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.7.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -2782,7 +2782,7 @@ TEST(3_8)
 {
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.8.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -2812,7 +2812,7 @@ TEST(3_9)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t3.9.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -2869,7 +2869,7 @@ TEST(4_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t4.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -2998,7 +2998,7 @@ TEST(4_2)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t4.2.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3067,7 +3067,7 @@ TEST(5_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t5.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3103,7 +3103,7 @@ TEST(5_2)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t5.2.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3281,7 +3281,7 @@ TEST(5_3)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t5.3.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3344,7 +3344,7 @@ TEST(6_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t6.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3478,7 +3478,7 @@ TEST(7_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t7.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3530,7 +3530,7 @@ TEST(8_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t8.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3573,7 +3573,7 @@ TEST(8_2)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t8.2.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3616,7 +3616,7 @@ TEST(8_3)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t8.3.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3659,7 +3659,7 @@ TEST(8_4)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t8.4.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3702,7 +3702,7 @@ TEST(8_5)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t8.5.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3749,7 +3749,7 @@ TEST(8_6)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t8.6.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3792,7 +3792,7 @@ TEST(8_7)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t8.7.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3835,7 +3835,7 @@ TEST(8_8)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t8.8.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3935,7 +3935,7 @@ TEST(9_1)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t9.1.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -3974,7 +3974,7 @@ TEST(9_2)
 
   db::Manager m;
   db::Layout layout (&m);
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/oasis/t9.2.oas";
   tl::InputStream stream (fn);
   db::Reader reader (stream);
@@ -4026,7 +4026,7 @@ TEST(99)
   db::Layout layout (&m);
 
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/t9.2.oas";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -4043,7 +4043,7 @@ TEST(99)
   }
 
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/t8.7.oas";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -4109,7 +4109,7 @@ TEST(100)
   db::Layout layout (&m);
 
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/xgeometry_test.oas";
     tl::InputStream stream (fn);
     db::Reader reader (stream);

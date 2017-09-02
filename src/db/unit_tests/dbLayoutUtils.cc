@@ -23,9 +23,10 @@
 #include "dbLayoutUtils.h"
 #include "dbLayerMapping.h"
 #include "dbCellMapping.h"
+#include "dbTestSupport.h"
 #include "dbReader.h"
 #include "tlString.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 unsigned int find_layer (const db::Layout &l, int ly, int dt)
 {
@@ -41,7 +42,7 @@ TEST(1)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -50,7 +51,7 @@ TEST(1)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -96,7 +97,7 @@ TEST(2)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -105,7 +106,7 @@ TEST(2)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -128,7 +129,7 @@ TEST(2)
   db::merge_layouts (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table (), &fm);
 
   CHECKPOINT();
-  compare_layouts (l2, ut::testsrc () + "/testdata/algo/layout_utils_au2.gds");
+  db::compare_layouts (_this, l2, tl::testsrc () + "/testdata/algo/layout_utils_au2.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
   EXPECT_EQ (l2.cell_name (fm.find (l1.cell_by_name ("TOP").second)->second), "TOP$1");
@@ -145,7 +146,7 @@ TEST(3)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -154,7 +155,7 @@ TEST(3)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -178,7 +179,7 @@ TEST(3)
   db::merge_layouts (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table (), &fm);
 
   CHECKPOINT();
-  compare_layouts (l2, ut::testsrc () + "/testdata/algo/layout_utils_au3.gds");
+  db::compare_layouts (_this, l2, tl::testsrc () + "/testdata/algo/layout_utils_au3.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
   EXPECT_EQ (l2.cell_name (fm.find (l1.cell_by_name ("TOP").second)->second), "TOPTOP");
@@ -195,7 +196,7 @@ TEST(4)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -204,7 +205,7 @@ TEST(4)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -228,7 +229,7 @@ TEST(4)
   db::merge_layouts (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table (), &fm);
 
   CHECKPOINT();
-  compare_layouts (l2, ut::testsrc () + "/testdata/algo/layout_utils_au4.gds");
+  db::compare_layouts (_this, l2, tl::testsrc () + "/testdata/algo/layout_utils_au4.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
   EXPECT_EQ (l2.cell_name (fm.find (l1.cell_by_name ("TOP").second)->second), "TOP");
@@ -245,7 +246,7 @@ TEST(5)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -254,7 +255,7 @@ TEST(5)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -278,7 +279,7 @@ TEST(5)
   db::merge_layouts (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table (), &fm);
 
   CHECKPOINT();
-  compare_layouts (l2, ut::testsrc () + "/testdata/algo/layout_utils_au5.gds");
+  db::compare_layouts (_this, l2, tl::testsrc () + "/testdata/algo/layout_utils_au5.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
   EXPECT_EQ (l2.cell_name (fm.find (l1.cell_by_name ("TOP").second)->second), "TOP");
@@ -295,7 +296,7 @@ TEST(6)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -304,7 +305,7 @@ TEST(6)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -331,7 +332,7 @@ TEST(6)
   db::merge_layouts (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table (), &fm);
 
   CHECKPOINT();
-  compare_layouts (l2, ut::testsrc () + "/testdata/algo/layout_utils_au6.gds");
+  db::compare_layouts (_this, l2, tl::testsrc () + "/testdata/algo/layout_utils_au6.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
   EXPECT_EQ (l2.cell_name (fm.find (l1.cell_by_name ("TOP").second)->second), "TOP");
@@ -347,7 +348,7 @@ TEST(7)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -356,7 +357,7 @@ TEST(7)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l3.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -383,7 +384,7 @@ TEST(7)
   db::merge_layouts (l2, l1, db::ICplxTrans (4.0), src, cm.table (), lm.table (), &fm);
 
   CHECKPOINT();
-  compare_layouts (l2, ut::testsrc () + "/testdata/algo/layout_utils_au7.gds");
+  db::compare_layouts (_this, l2, tl::testsrc () + "/testdata/algo/layout_utils_au7.gds");
 
   EXPECT_EQ (fm.find (l1.cell_by_name ("TOP").second) != fm.end (), true);
   EXPECT_EQ (l2.cell_name (fm.find (l1.cell_by_name ("TOP").second)->second), "TOP");
@@ -398,7 +399,7 @@ TEST(7)
   db::merge_layouts (l2copy, l1, db::ICplxTrans (4.0), src, cm.table (), lm.table ());
 
   CHECKPOINT();
-  compare_layouts (l2copy, ut::testsrc () + "/testdata/algo/layout_utils_au7.gds");
+  db::compare_layouts (_this, l2copy, tl::testsrc () + "/testdata/algo/layout_utils_au7.gds");
 }
 
 //  Tests copy_shapes with no specific mapping (flattening)
@@ -406,7 +407,7 @@ TEST(12)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -415,7 +416,7 @@ TEST(12)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -439,7 +440,7 @@ TEST(12)
   db::copy_shapes (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table ());
 
   CHECKPOINT();
-  compare_layouts (l2, ut::testsrc () + "/testdata/algo/layout_utils_au12.gds");
+  db::compare_layouts (_this, l2, tl::testsrc () + "/testdata/algo/layout_utils_au12.gds");
 }
 
 //  Tests copy_shapes with full name mapping
@@ -447,7 +448,7 @@ TEST(13)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -456,7 +457,7 @@ TEST(13)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -479,7 +480,7 @@ TEST(13)
   db::copy_shapes (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table ());
 
   CHECKPOINT();
-  compare_layouts (l2, ut::testsrc () + "/testdata/algo/layout_utils_au13.gds");
+  db::compare_layouts (_this, l2, tl::testsrc () + "/testdata/algo/layout_utils_au13.gds");
 }
 
 //  Tests copy_shapes with geo mapping
@@ -487,7 +488,7 @@ TEST(14)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -496,7 +497,7 @@ TEST(14)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -519,7 +520,7 @@ TEST(14)
   db::copy_shapes (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table ());
 
   CHECKPOINT();
-  compare_layouts (l2, ut::testsrc () + "/testdata/algo/layout_utils_au14.gds");
+  db::compare_layouts (_this, l2, tl::testsrc () + "/testdata/algo/layout_utils_au14.gds");
 }
 
 //  Tests copy_shapes with flattening minus one cell
@@ -527,7 +528,7 @@ TEST(15)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -536,7 +537,7 @@ TEST(15)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l2.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -560,7 +561,7 @@ TEST(15)
   db::copy_shapes (l2, l1, db::ICplxTrans (), src, cm.table (), lm.table ());
 
   CHECKPOINT();
-  compare_layouts (l2, ut::testsrc () + "/testdata/algo/layout_utils_au15.gds");
+  db::compare_layouts (_this, l2, tl::testsrc () + "/testdata/algo/layout_utils_au15.gds");
 }
 
 //  Tests copy_shapes/move_shapes with no specific mapping (flattening)
@@ -568,7 +569,7 @@ TEST(16)
 {
   db::Layout l1;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l1.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -577,7 +578,7 @@ TEST(16)
 
   db::Layout l2;
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/algo/layout_utils_l3.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -603,14 +604,14 @@ TEST(16)
   db::copy_shapes (l2, l1, db::ICplxTrans (4.0), src, cm.table (), lm.table ());
 
   CHECKPOINT();
-  compare_layouts (l2, ut::testsrc () + "/testdata/algo/layout_utils_au16.gds");
+  db::compare_layouts (_this, l2, tl::testsrc () + "/testdata/algo/layout_utils_au16.gds");
 
   //  ... and one test for move:
   db::move_shapes (l2copy, l1, db::ICplxTrans (4.0), src, cm.table (), lm.table ());
 
   CHECKPOINT();
-  compare_layouts (l2copy, ut::testsrc () + "/testdata/algo/layout_utils_au16.gds");
-  compare_layouts (l1, ut::testsrc () + "/testdata/algo/layout_utils_au16b.gds");
+  db::compare_layouts (_this, l2copy, tl::testsrc () + "/testdata/algo/layout_utils_au16.gds");
+  db::compare_layouts (_this, l1, tl::testsrc () + "/testdata/algo/layout_utils_au16b.gds");
 
 }
 

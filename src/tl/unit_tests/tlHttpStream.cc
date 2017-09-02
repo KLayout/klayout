@@ -22,7 +22,7 @@
 
 
 #include "tlHttpStream.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
 static std::string test_url2 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1");

@@ -22,7 +22,7 @@
 
 
 #include "tlKDTree.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <iostream>
 #include <set>
@@ -87,9 +87,9 @@ typedef tl::kd_tree_it <TestTree, TestSearch> TestTreeIt;
 
 
 template <class Tree, class Picker, class Search>
-static void test_tree (ut::TestBase *_this, const Tree &t, const Picker &p, const Search &s)
+static void test_tree (tl::TestBase *_this, const Tree &t, const Picker &p, const Search &s)
 {
-  if (ut::verbose ()) {
+  if (tl::verbose ()) {
     std::cout << "Testing vs. " << s.to_string () << std::endl;
   }
 
@@ -100,7 +100,7 @@ static void test_tree (ut::TestBase *_this, const Tree &t, const Picker &p, cons
     }
   }
   
-  if (ut::verbose ()) {
+  if (tl::verbose ()) {
     for (typename Tree::size_type i = 0; i < t.size (); ++i) {
       std::cout << i << " b=" << t.bounds() [i] << ", v=" << p (0, t.objects() [i]) << "," << p (1, t.objects() [i]) << std::endl;
     }
@@ -113,7 +113,7 @@ static void test_tree (ut::TestBase *_this, const Tree &t, const Picker &p, cons
     } else {
       good_idx.erase (i);
     }
-    if (ut::verbose ()) {
+    if (tl::verbose ()) {
       std::cout << p(0, *i) << "," << p(1, *i) << std::endl;
     }
     ++i;

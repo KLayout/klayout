@@ -22,12 +22,12 @@
 
 
 #include "dbDXFReader.h"
-
-#include <utHead.h>
+#include "dbTestSupport.h"
+#include "tlUnitTest.h"
 
 #include <stdlib.h>
 
-static void run_test (ut::TestBase *_this, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001, double dxf_unit = 1, int mode = 0, int ncircle = 100, double acircle = 0.0)
+static void run_test (tl::TestBase *_this, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001, double dxf_unit = 1, int mode = 0, int ncircle = 100, double acircle = 0.0)
 {
   db::DXFReaderOptions *opt = new db::DXFReaderOptions();
   opt->dbu = dbu;
@@ -59,7 +59,7 @@ static void run_test (ut::TestBase *_this, const char *file, const char *file_au
   db::Layout layout;
 
   {
-    std::string fn (ut::testsrc_private ());
+    std::string fn (tl::testsrc_private ());
     fn += "/testdata/dxf/";
     fn += file;
     tl::InputStream stream (fn);
@@ -67,7 +67,7 @@ static void run_test (ut::TestBase *_this, const char *file, const char *file_au
     reader.read (layout, options);
   }
 
-  _this->compare_layouts (layout, ut::testsrc_private () + std::string ("/testdata/dxf/") + file_au, ut::WriteGDS2, 1);
+  db::compare_layouts (_this, layout, tl::testsrc_private () + std::string ("/testdata/dxf/") + file_au, db::WriteGDS2, 1);
 }
 
 TEST(1a)

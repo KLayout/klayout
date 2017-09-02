@@ -9,8 +9,8 @@ include($$PWD/../../lib_ut.pri)
 SOURCES = \
   edtBasicTests.cc \
 
-INCLUDEPATH += $$EDT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$UT_INC
-DEPENDPATH += $$EDT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$UT_INC
+INCLUDEPATH += $$EDT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC
+DEPENDPATH += $$EDT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC
 
-LIBS += -L$$DESTDIR_UT -lklayout_edt -lklayout_laybasic -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_ut
+LIBS += -L$$DESTDIR_UT -lklayout_edt -lklayout_laybasic -lklayout_db -lklayout_tl -lklayout_gsi
 

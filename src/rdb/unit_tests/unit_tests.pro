@@ -9,8 +9,8 @@ include($$PWD/../../lib_ut.pri)
 SOURCES = \
   rdb.cc \
 
-INCLUDEPATH += $$RDB_INC $$TL_INC $$DB_INC $$GSI_INC $$UT_INC
-DEPENDPATH += $$RDB_INC $$TL_INC $$DB_INC $$GSI_INC $$UT_INC
+INCLUDEPATH += $$RDB_INC $$TL_INC $$DB_INC $$GSI_INC
+DEPENDPATH += $$RDB_INC $$TL_INC $$DB_INC $$GSI_INC
 
-LIBS += -L$$DESTDIR_UT -lklayout_rdb -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_ut
+LIBS += -L$$DESTDIR_UT -lklayout_rdb -lklayout_db -lklayout_tl -lklayout_gsi
 

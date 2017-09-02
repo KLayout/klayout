@@ -24,7 +24,7 @@
 
 #include "dbLayout.h"
 #include "tlString.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 std::string set2string (const std::set<db::cell_index_type> &set)
 {

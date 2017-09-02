@@ -25,7 +25,7 @@
 #include "dbLayout.h"
 #include "dbCellMapping.h"
 #include "tlString.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 std::string nc2s (const std::vector<db::cell_index_type> &nc, const db::Layout &a)
 {

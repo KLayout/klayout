@@ -27,17 +27,17 @@
 #include "dbShapeProcessor.h"
 #include "dbWriter.h"
 #include "dbTextWriter.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <QDir>
 #include <stdlib.h>
 
-void run_test (ut::TestBase *_this, const char *file, const char *file_ref)
+void run_test (tl::TestBase *_this, const char *file, const char *file_ref)
 {
   db::Manager m;
   db::Layout layout_org (&m);
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/gds/";
     fn += file;
     tl::InputStream stream (fn);
@@ -47,7 +47,7 @@ void run_test (ut::TestBase *_this, const char *file, const char *file_ref)
 
   db::Layout layout_ref (&m);
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/gds/";
     fn += file_ref;
     tl::InputStream stream (fn);
@@ -103,7 +103,7 @@ TEST(2)
   poly.assign_hull (pts.begin (), pts.end ());
   layout_org.cell (cid).shapes (lid).insert (poly);
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_2.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_2.gds");
 
   {
     tl::OutputStream stream (tmp_file);
@@ -133,14 +133,14 @@ TEST(3)
   db::Manager m;
   db::Layout layout_org (&m);
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/other/d1.oas.gz";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (layout_org);
   }
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_3.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_3.gds");
 
   {
     tl::OutputStream stream (tmp_file);
@@ -192,7 +192,7 @@ TEST(4)
   db::Manager m;
   db::Layout layout_org (&m);
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/other/d1.oas.gz";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -206,7 +206,7 @@ TEST(4)
     }
   }
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_4.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_4.gds");
 
   {
     tl::OutputStream stream (tmp_file);
@@ -285,7 +285,7 @@ TEST(100)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_100.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_100.gds");
 
   {
     tl::OutputStream out (tmp_file);
@@ -367,7 +367,7 @@ TEST(101)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_101.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_101.gds");
 
   {
     tl::OutputStream out (tmp_file);
@@ -439,7 +439,7 @@ TEST(102)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_102.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_102.gds");
 
   {
     tl::OutputStream out (tmp_file);
@@ -519,7 +519,7 @@ TEST(103)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_103.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_103.gds");
 
   {
     tl::OutputStream out (tmp_file);
@@ -592,7 +592,7 @@ TEST(110)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_110.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_110.gds");
 
   {
     tl::OutputStream out (tmp_file);
@@ -668,7 +668,7 @@ TEST(111)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_111.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_111.gds");
 
   {
     tl::OutputStream out (tmp_file);
@@ -741,7 +741,7 @@ TEST(112)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_112.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_112.gds");
 
   {
     tl::OutputStream out (tmp_file);
@@ -818,7 +818,7 @@ TEST(113)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_113.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_113.gds");
 
   {
     tl::OutputStream out (tmp_file);
@@ -872,7 +872,7 @@ TEST(114)
   c1.shapes (0).insert (db::Text (db::Trans (1, false, db::Vector (100, 200)), 1000, db::Font (7), db::HAlignCenter, db::VAlignBottom));
   c1.shapes (0).insert (db::Text (db::Trans (1, false, db::Vector (100, 200)), 1000, db::Font (7), db::HAlignLeft, db::VAlignCenter));
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_114.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_114.gds");
 
   {
     tl::OutputStream out (tmp_file);
@@ -974,7 +974,7 @@ TEST(115)
   ps.transform (db::FTrans (db::FTrans::r90), false);
   c1.shapes (0).insert (ps);
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_GDS2Writer_115.gds");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_115.gds");
 
   {
     tl::OutputStream out (tmp_file);

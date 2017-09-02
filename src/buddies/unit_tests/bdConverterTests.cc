@@ -20,18 +20,19 @@
 
 */
 
-#include "utHead.h"
 #include "bdConverterMain.h"
 #include "dbCIFReader.h"
 #include "dbDXFReader.h"
 #include "dbOASISReader.h"
 #include "dbGDS2Reader.h"
+#include "dbTestSupport.h"
 #include "contrib/dbGDS2TextReader.h"
+#include "tlUnitTest.h"
 
 //  Testing the converter main implementation (CIF)
 TEST(1)
 {
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/gds/t10.gds";
 
   std::string output = this->tmp_file ();
@@ -48,13 +49,13 @@ TEST(1)
     reader.read (layout, db::LoadLayoutOptions ());
   }
 
-  this->compare_layouts (layout, input, ut::NoNormalization);
+  db::compare_layouts (this, layout, input, db::NoNormalization);
 }
 
 //  Testing the converter main implementation (DXF)
 TEST(2)
 {
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/gds/t10.gds";
 
   std::string output = this->tmp_file ();
@@ -77,13 +78,13 @@ TEST(2)
   layout.rename_cell (top.second, "RINGO");
 
   //  Use GDS2 normalization to solve the box vs. polygon issue
-  this->compare_layouts (layout, input, ut::WriteGDS2);
+  db::compare_layouts (this, layout, input, db::WriteGDS2);
 }
 
 //  Testing the converter main implementation (GDS2)
 TEST(3)
 {
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/gds/t10.gds";
 
   std::string output = this->tmp_file ();
@@ -100,13 +101,13 @@ TEST(3)
     reader.read (layout, db::LoadLayoutOptions ());
   }
 
-  this->compare_layouts (layout, input, ut::NoNormalization);
+  db::compare_layouts (this, layout, input, db::NoNormalization);
 }
 
 //  Testing the converter main implementation (GDS2Text)
 TEST(4)
 {
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/gds/t10.gds";
 
   std::string output = this->tmp_file ();
@@ -123,13 +124,13 @@ TEST(4)
     reader.read (layout, db::LoadLayoutOptions ());
   }
 
-  this->compare_layouts (layout, input, ut::NoNormalization);
+  db::compare_layouts (this, layout, input, db::NoNormalization);
 }
 
 //  Testing the converter main implementation (OASIS)
 TEST(5)
 {
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/gds/t10.gds";
 
   std::string output = this->tmp_file ();
@@ -146,6 +147,6 @@ TEST(5)
     reader.read (layout, db::LoadLayoutOptions ());
   }
 
-  this->compare_layouts (layout, input, ut::NoNormalization);
+  db::compare_layouts (this, layout, input, db::NoNormalization);
 }
 

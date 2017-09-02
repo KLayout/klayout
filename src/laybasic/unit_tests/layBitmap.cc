@@ -24,7 +24,7 @@
 
 
 #include "layBitmap.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 static std::string 
 to_string (const lay::Bitmap &bm)

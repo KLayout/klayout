@@ -25,7 +25,7 @@
 
 #include "tlIntervalSet.h"
 #include "tlString.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 typedef tl::interval_set<int> is_t;
 

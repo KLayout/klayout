@@ -26,10 +26,10 @@
 #include "tlVariantUserClasses.h"
 #include "tlObject.h"
 #include "tlTypeTraits.h"
+#include "tlUnitTest.h"
 #include "gsiDecl.h"
 #include "dbBox.h"
 #include "dbLayerProperties.h"
-#include "utHead.h"
 #include <cstdio>
 
 struct A 

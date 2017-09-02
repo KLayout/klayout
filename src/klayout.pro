@@ -6,13 +6,11 @@ TEMPLATE = subdirs
 SUBDIRS = \
   klayout_main \
   unit_tests \
-  tl/tl \
-  tl/unit_tests \
+  tl \
   gsi/gsi \
   gsi/gsi_test \
   gsi/unit_tests \
-  db/db \
-  db/unit_tests \
+  db \
   rdb \
   lym \
   laybasic \
@@ -22,7 +20,6 @@ SUBDIRS = \
   edt \
   ext \
   lib \
-  ut \
   plugins \
   buddies \
   drc \
@@ -30,10 +27,9 @@ SUBDIRS = \
 LANG_DEPENDS =
 
 equals(HAVE_RUBY, "1") {
-  SUBDIRS += rba/rba rba/unit_tests
-  rba-rba.depends += gsi/gsi
-  LANG_DEPENDS += rba/rba
-  rba-unit_tests.depends += ut gsi/gsi_test
+  SUBDIRS += rba
+  LANG_DEPENDS += rba
+  rba.depends += gsi/gsi gsi/gsi_test
 } else {
   SUBDIRS += rbastub
   rbastub.depends += gsi/gsi
@@ -41,32 +37,30 @@ equals(HAVE_RUBY, "1") {
 }
 
 equals(HAVE_PYTHON, "1") {
-  SUBDIRS += pya/pya pya/unit_tests
-  pya-pya.depends += gsi/gsi
-  LANG_DEPENDS += pya/pya
-  pya-unit_tests.depends += ut gsi/gsi_test
+  SUBDIRS += pya
+  LANG_DEPENDS += pya
+  pya-unit_tests.depends += gsi/gsi gsi/gsi_test
 } else {
   SUBDIRS += pyastub
   pyastub.depends += gsi/gsi
   LANG_DEPENDS += pyastub
 }
 
-gsi-gsi.depends += tl/tl
-gsi-gsi_test.depends += tl/tl gsi/gsi
-db-db.depends += gsi/gsi
-rdb.depends += db/db ut
+gsi-gsi.depends += tl
+gsi-gsi_test.depends += tl gsi/gsi
+db.depends += gsi/gsi
+rdb.depends += db
 laybasic.depends += rdb
 ant.depends += laybasic
 img.depends += laybasic
 edt.depends += laybasic
 drc.depends += rdb lym
 
-lym.depends += gsi/gsi ut $$LANG_DEPENDS
+lym.depends += gsi/gsi $$LANG_DEPENDS
 lay.depends += laybasic ant img edt lym
 ext.depends += lay
-lib.depends += db/db ut
-buddies.depends += db/db ut
-ut.depends += db/db $$LANG_DEPENDS
+lib.depends += db
+buddies.depends += db
 
 equals(HAVE_QTBINDINGS, "1") {
   SUBDIRS += gsiqt
@@ -74,12 +68,10 @@ equals(HAVE_QTBINDINGS, "1") {
   laybasic.depends += gsiqt
 }
 
-# YES. It's tl-unit_tests (for tl/unit_tests)
-tl-unit_tests.depends += ut
-gsi-unit_tests.depends += ut gsi/gsi_test
-db-unit_tests.depends += ut
+# YES. It's gsi-unit_tests (for gsi/unit_tests)
+gsi-unit_tests.depends += gsi/gsi_test
 
-plugins.depends += lay ext lib ut
+plugins.depends += lay ext lib
 
 klayout_main.depends += plugins drc
 unit_tests.depends += plugins drc
@@ -87,4 +79,3 @@ unit_tests.depends += plugins drc
 RESOURCES += \
     laybasic/layResources.qrc \
     ant/layResources.qrc
-

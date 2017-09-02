@@ -20,15 +20,16 @@
 
 */
 
-#include "utHead.h"
+#include "tlUnitTest.h"
 #include "dbReader.h"
+#include "dbTestSupport.h"
 #include "lymMacro.h"
 
 TEST(1)
 {
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/drc/drctest.gds";
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/drc/drcBasicTests_au.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
@@ -60,7 +61,7 @@ TEST(1)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
 TEST(2)

@@ -24,7 +24,7 @@
 
 #include "dbClip.h"
 #include "dbEdgeProcessor.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 #include "tlTimer.h"
 
 TEST(1) 

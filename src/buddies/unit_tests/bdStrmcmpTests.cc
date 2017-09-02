@@ -20,9 +20,9 @@
 
 */
 
-#include "utHead.h"
 #include "bdCommon.h"
 #include "dbReader.h"
+#include "tlUnitTest.h"
 #include "tlLog.h"
 
 #include <sstream>
@@ -32,17 +32,17 @@ BD_PUBLIC int strmcmp (int argc, char *argv[]);
 
 TEST(1)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
   tl::info << "Self test";
   EXPECT_EQ (cap.captured_text (), "Self test\n");
   cap.clear ();
   EXPECT_EQ (cap.captured_text (), "");
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref1.gds";
 
   const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
@@ -54,12 +54,12 @@ TEST(1)
 
 TEST(2A)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
   const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
@@ -83,12 +83,12 @@ TEST(2A)
 
 TEST(2B)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
   const char *argv[] = { "x", "-s", input_a.c_str (), input_b.c_str () };
@@ -100,12 +100,12 @@ TEST(2B)
 
 TEST(2C)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
   const char *argv[] = { "x", "-am=8/0", "-as", "-bm=8/0", "-bs", input_a.c_str (), input_b.c_str () };
@@ -124,12 +124,12 @@ TEST(2C)
 
 TEST(2D)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
   const char *argv[] = { "x", "-m=1", input_a.c_str (), input_b.c_str () };
@@ -145,12 +145,12 @@ TEST(2D)
 
 TEST(2E)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
   const char *argv[] = { "x", "-ta=INV2", "-tb=INV2", input_a.c_str (), input_b.c_str () };
@@ -160,12 +160,12 @@ TEST(2E)
 
 TEST(2F)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref2.gds";
 
   const char *argv[] = { "x", "-u", input_a.c_str (), input_b.c_str () };
@@ -183,12 +183,12 @@ TEST(2F)
 
 TEST(3A)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref3.gds";
 
   const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
@@ -207,12 +207,12 @@ TEST(3A)
 
 TEST(3B)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref3.gds";
 
   const char *argv[] = { "x", "-t=0.001", input_a.c_str (), input_b.c_str () };
@@ -222,12 +222,12 @@ TEST(3B)
 
 TEST(4A)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref4.gds";
 
   const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
@@ -249,12 +249,12 @@ TEST(4A)
 
 TEST(4B)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref4.gds";
 
   const char *argv[] = { "x", "-p", input_a.c_str (), input_b.c_str () };
@@ -264,12 +264,12 @@ TEST(4B)
 
 TEST(5A)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref5.gds";
 
   const char *argv[] = { "x", "-u", input_a.c_str (), input_b.c_str () };
@@ -284,12 +284,12 @@ TEST(5A)
 
 TEST(5B)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref5.gds";
 
   const char *argv[] = { "x", "--expand-arrays", input_a.c_str (), input_b.c_str () };
@@ -299,12 +299,12 @@ TEST(5B)
 
 TEST(6A)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref6.gds";
 
   const char *argv[] = { "x", "-r", input_a.c_str (), input_b.c_str () };
@@ -323,12 +323,12 @@ TEST(6A)
 
 TEST(6B)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref6.gds";
 
   const char *argv[] = { "x", "-np", input_a.c_str (), input_b.c_str () };
@@ -338,12 +338,12 @@ TEST(6B)
 
 TEST(7A)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref7.oas";
 
   const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
@@ -358,12 +358,12 @@ TEST(7A)
 
 TEST(7B)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref7.oas";
 
   const char *argv[] = { "x", "-nl", input_a.c_str (), input_b.c_str () };
@@ -373,12 +373,12 @@ TEST(7B)
 
 TEST(8A)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref8.gds";
 
   const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
@@ -405,12 +405,12 @@ TEST(8A)
 
 TEST(8B)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref8.gds";
 
   const char *argv[] = { "x", "-c", input_a.c_str (), input_b.c_str () };
@@ -424,12 +424,12 @@ TEST(8B)
 
 TEST(9A)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref9.gds";
 
   const char *argv[] = { "x", input_a.c_str (), input_b.c_str () };
@@ -444,12 +444,12 @@ TEST(9A)
 
 TEST(9B)
 {
-  ut::CaptureChannel cap;
+  tl::CaptureChannel cap;
 
-  std::string input_a = ut::testsrc ();
+  std::string input_a = tl::testsrc ();
   input_a += "/testdata/bd/strmcmp_in.gds";
 
-  std::string input_b = ut::testsrc ();
+  std::string input_b = tl::testsrc ();
   input_b += "/testdata/bd/strmcmp_ref9.gds";
 
   const char *argv[] = { "x", "-l", input_a.c_str (), input_b.c_str () };

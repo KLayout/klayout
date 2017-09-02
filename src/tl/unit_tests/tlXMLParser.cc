@@ -23,7 +23,7 @@
 
 
 #include "tlXMLParser.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <sstream>
 #include <cmath>
@@ -333,7 +333,7 @@ TEST (6)
 
 TEST (7)
 {
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_tlXMLParser_7.xml");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_tlXMLParser_7.xml");
 
   FILE *f = fopen (tmp_file.c_str (), "w");
   tl_assert (f != NULL);
@@ -389,7 +389,7 @@ TEST (7)
 
 TEST (7a)
 {
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_tlXMLParser_7a.xml");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_tlXMLParser_7a.xml");
 
   FILE *f = fopen (tmp_file.c_str (), "w");
   tl_assert (f != NULL);
@@ -445,7 +445,7 @@ TEST (7a)
 
 TEST (8)
 {
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_tlXMLParser_8.xml");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_tlXMLParser_8.xml");
 
   FILE *f = fopen (tmp_file.c_str (), "w");
   tl_assert (f != NULL);
@@ -519,7 +519,7 @@ TEST (8)
 
 TEST (8a)
 {
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_tlXMLParser_8a.xml");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_tlXMLParser_8a.xml");
 
   FILE *f = fopen (tmp_file.c_str (), "w");
   tl_assert (f != NULL);

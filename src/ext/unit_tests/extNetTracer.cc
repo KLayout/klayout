@@ -21,13 +21,14 @@
 */
 
 
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include "extNetTracerDialog.h"
 #include "extNetTracerIO.h"
 #include "extNetTracer.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbLayoutDiff.h"
+#include "dbTestSupport.h"
 #include "dbWriter.h"
 
 static ext::NetTracerConnectionInfo connection (const std::string &a, const std::string &v, const std::string &b)
@@ -89,13 +90,13 @@ static ext::Net trace (ext::NetTracer &tracer, const db::Layout &layout, const d
   return ext::Net (tracer, db::ICplxTrans (), layout, cell.cell_index (), std::string (), std::string (), tracer_data);
 }
 
-void run_test (ut::TestBase *_this, const std::string &file, const ext::NetTracerTechnologyComponent &tc, const db::LayerProperties &lp_start, const db::Point &p_start, const std::string &file_au, const char *net_name = 0)
+void run_test (tl::TestBase *_this, const std::string &file, const ext::NetTracerTechnologyComponent &tc, const db::LayerProperties &lp_start, const db::Point &p_start, const std::string &file_au, const char *net_name = 0)
 {
   db::Manager m;
 
   db::Layout layout_org (&m);
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/net_tracer/";
     fn += file;
     tl::InputStream stream (fn);
@@ -115,21 +116,21 @@ void run_test (ut::TestBase *_this, const std::string &file, const ext::NetTrace
   db::Layout layout_net;
   net.export_net (layout_net, layout_net.cell (layout_net.add_cell ("NET")));
 
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/net_tracer/";
   fn += file_au;
 
   CHECKPOINT ();
-  _this->compare_layouts (layout_net, fn, ut::WriteOAS);
+  db::compare_layouts (_this, layout_net, fn, db::WriteOAS);
 }
 
-void run_test2 (ut::TestBase *_this, const std::string &file, const ext::NetTracerTechnologyComponent &tc, const db::LayerProperties &lp_start, const db::Point &p_start, const db::LayerProperties &lp_stop, const db::Point &p_stop, const std::string &file_au, const char *net_name = 0)
+void run_test2 (tl::TestBase *_this, const std::string &file, const ext::NetTracerTechnologyComponent &tc, const db::LayerProperties &lp_start, const db::Point &p_start, const db::LayerProperties &lp_stop, const db::Point &p_stop, const std::string &file_au, const char *net_name = 0)
 {
   db::Manager m;
 
   db::Layout layout_org (&m);
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/net_tracer/";
     fn += file;
     tl::InputStream stream (fn);
@@ -149,12 +150,12 @@ void run_test2 (ut::TestBase *_this, const std::string &file, const ext::NetTrac
   db::Layout layout_net;
   net.export_net (layout_net, layout_net.cell (layout_net.add_cell ("NET")));
 
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/net_tracer/";
   fn += file_au;
 
   CHECKPOINT ();
-  _this->compare_layouts (layout_net, fn, ut::WriteOAS);
+  db::compare_layouts (_this, layout_net, fn, db::WriteOAS);
 }
 
 TEST(1) 

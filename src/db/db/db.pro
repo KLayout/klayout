@@ -85,6 +85,7 @@ SOURCES = \
   dbStatic.cc \
   dbStream.cc \
   dbStreamLayers.cc \
+  dbTestSupport.cc \
   dbText.cc \
   dbTextWriter.cc \
   dbTilingProcessor.cc \
@@ -211,6 +212,7 @@ HEADERS = \
   dbStatic.h \
   dbStream.h \
   dbStreamLayers.h \
+  dbTestSupport.h \
   dbText.h \
   dbTextWriter.h \
   dbTilingProcessor.h \

@@ -26,7 +26,7 @@
 #include "dbPolygonTools.h"
 #include "dbEdgeProcessor.h"
 #include "dbPolygonGenerators.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 TEST(1) 
 {

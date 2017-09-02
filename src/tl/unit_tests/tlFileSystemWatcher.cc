@@ -24,7 +24,7 @@
 #include "tlFileSystemWatcher.h"
 #include "tlString.h"
 #include "tlTimer.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <QFileInfo>
 #include <QSignalSpy>

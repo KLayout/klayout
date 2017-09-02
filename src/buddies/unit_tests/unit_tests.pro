@@ -16,7 +16,7 @@ SOURCES = \
   bdStrmxorTests.cc \
 
 
-INCLUDEPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC $$UT_INC
-DEPENDPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC $$UT_INC
+INCLUDEPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC
+DEPENDPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC
 
-LIBS += -L$$DESTDIR_UT -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_ut
+LIBS += -L$$DESTDIR_UT -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi

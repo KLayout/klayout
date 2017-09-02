@@ -28,12 +28,12 @@
 #include "extDEFImporter.h"
 #include "extLEFImporter.h"
 
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <cstdlib>
 #include <QDir>
 
-static void run_test (ut::TestBase *_this, const char *lef_dir, const char *filename, const char *au)
+static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au)
 {
   ext::LEFDEFReaderOptions tc;
   tc.set_via_geometry_datatype (0);
@@ -63,7 +63,7 @@ static void run_test (ut::TestBase *_this, const char *lef_dir, const char *file
 
     if (ex.test ("def:")) {
 
-      std::string fn (ut::testsrc_private ());
+      std::string fn (tl::testsrc_private ());
       fn += "/testdata/lefdef/";
       fn += lef_dir;
       fn += "/";
@@ -76,7 +76,7 @@ static void run_test (ut::TestBase *_this, const char *lef_dir, const char *file
 
     } else if (ex.test ("lef:")) {
 
-      std::string fn (ut::testsrc_private ());
+      std::string fn (tl::testsrc_private ());
       fn += "/testdata/lefdef/";
       fn += lef_dir;
       fn += "/";
@@ -120,7 +120,7 @@ static void run_test (ut::TestBase *_this, const char *lef_dir, const char *file
 
   if (au) {
 
-    std::string fn (ut::testsrc_private ());
+    std::string fn (tl::testsrc_private ());
     fn += "/testdata/lefdef/";
     fn += lef_dir;
     fn += "/";

@@ -24,7 +24,6 @@
 #ifndef HDR_utTestConsole
 #define HDR_utTestConsole
 
-#include "utCommon.h"
 #include "tlLog.h"
 #include "gsiInterpreter.h"
 
@@ -34,41 +33,13 @@
 namespace ut
 {
 
-/**
- *  @brief A utility class to capture the warning, error and info channels
- *
- *  Instantiate this class inside a test. Then run the test and finally
- *  obtain the collected output with CaptureChannel::captured_text().
- */
-class UT_PUBLIC CaptureChannel : public tl::Channel
-{
-public:
-  CaptureChannel ();
-
-  std::string captured_text () const
-  {
-    return m_text.str ();
-  }
-
-  void clear ()
-  {
-    m_text.str (std::string ());
-  }
-
-protected:
-  virtual void puts (const char *s);
-  virtual void endl ();
-  virtual void end ();
-  virtual void begin ();
-
-private:
-  std::ostringstream m_text;
-};
+extern tl::LogTee ctrl;
+extern tl::LogTee noctrl;
 
 /**
  *  @brief Redirects the interpreter output and serves as a general output device
  */
-class UT_PUBLIC TestConsole
+class TestConsole
   : public gsi::Console
 {
 public:
@@ -81,21 +52,12 @@ public:
   TestConsole (FILE *file);
   ~TestConsole ();
 
-  int indent () const
-  {
-    return m_indent;
-  }
-
   void write_str (const char *text, output_stream os);
   void raw_write (const char *text);
   virtual void flush ();
 
   virtual bool is_tty ();
-
-  virtual int columns ()
-  {
-    return std::max (m_columns - m_indent, 0);
-  }
+  virtual int columns ();
 
   virtual int rows ()
   {
@@ -119,7 +81,6 @@ private:
   int m_max_col;
   int m_columns, m_rows;
   bool m_file_is_tty;
-  int m_indent;
   static TestConsole *ms_instance;
 
   void redirect ();

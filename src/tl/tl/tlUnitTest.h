@@ -20,12 +20,11 @@
 
 */
 
+#ifndef HDR_tlUnitTest
+#define HDR_tlUnitTest
 
-#ifndef HDR_utTestBase
-#define HDR_utTestBase
-
-#include "utCommon.h"
-#include "dbTypes.h"
+#include "tlCommon.h"
+#include "tlLog.h"
 #include "tlException.h"
 #include "tlString.h"
 
@@ -34,61 +33,44 @@
 #include <sstream>
 #include <QString>
 
-namespace db
-{
-  class Layout;
-  class LayerMap;
-}
-
-namespace rba
-{
-  class RubyInterpreter;
-}
-
-namespace pya
-{
-  class PythonInterpreter;
-}
-
-namespace ut
-{
+namespace tl {
 
 /**
  *  @brief Returns true, if the test is run in verbose mode
  *  Verbose mode is enabled through the "-v" option
  */
-UT_PUBLIC bool verbose ();
+TL_PUBLIC bool verbose ();
 
 /**
  *  @brief Sets verbose mode
  */
-UT_PUBLIC void set_verbose (bool v);
+TL_PUBLIC void set_verbose (bool v);
+
+/**
+ *  @brief Gets the indent for the test output
+ */
+TL_PUBLIC int indent ();
+
+/**
+ *  @brief Sets the indent for the test output
+ */
+TL_PUBLIC void set_indent (int i);
 
 /**
  *  @brief Returns true if XML output is enabled (JUnit format)
  */
-UT_PUBLIC bool xml_format ();
+TL_PUBLIC bool xml_format ();
 
 /**
  *  @brief Sets XML format
  */
-UT_PUBLIC void set_xml_format (bool x);
+TL_PUBLIC void set_xml_format (bool x);
 
 /**
  *  @brief Enables or disables "continue" mode
  *  In continue mode, the execution will proceed even in case of an error.
  */
-UT_PUBLIC void set_continue_flag (bool f);
-
-/**
- *  @brief Returns the Ruby interpreter
- */
-UT_PUBLIC rba::RubyInterpreter *ruby_interpreter ();
-
-/**
- *  @brief Returns the Python interpreter
- */
-UT_PUBLIC pya::PythonInterpreter *python_interpreter ();
+TL_PUBLIC void set_continue_flag (bool f);
 
 /**
  *  @brief Returns true, if the unit test is run in debug mode
@@ -96,18 +78,18 @@ UT_PUBLIC pya::PythonInterpreter *python_interpreter ();
  *  test. Specifically if layout compare is involved, it shall display the golden
  *  file name and the actual one and terminate to allow updating the files.
  */
-UT_PUBLIC bool is_debug_mode ();
+TL_PUBLIC bool is_debug_mode ();
 
 /**
  *  @brief Enables or disables debug mode
  */
-UT_PUBLIC void set_debug_mode (bool f);
+TL_PUBLIC void set_debug_mode (bool f);
 
 /**
  *  @brief Gets the path of the test data
  *  This path is specified through the environment variable $TESTSRC
  */
-UT_PUBLIC std::string testsrc ();
+TL_PUBLIC std::string testsrc ();
 
 /**
  *  @brief Gets the path of the private test data
@@ -115,33 +97,23 @@ UT_PUBLIC std::string testsrc ();
  *  private testdata directory. If no private test data is available, this
  *  method will throw a CancelException which makes the test skipped.
  */
-UT_PUBLIC std::string testsrc_private ();
+TL_PUBLIC std::string testsrc_private ();
 
 /**
  *  @brief Gets the path to the temporary data
  *  This path is specified through the environment variable $TESTTMP
  */
-UT_PUBLIC std::string testtmp ();
+TL_PUBLIC std::string testtmp ();
 
 /**
  *  @brief A basic exception for the unit test framework
  */
-struct Exception
+struct TestException
   : public tl::Exception
 {
-  Exception (const std::string &msg)
+  TestException (const std::string &msg)
     : tl::Exception (msg)
   { }
-};
-
-/**
- *  @brief Specifies the normalization mode for compare_layouts
- */
-enum NormalizationMode
-{
-  NoNormalization,        //  no normalization - take the test subject as it is
-  WriteGDS2,              //  normalize subject by writing to GDS2 and reading back
-  WriteOAS                //  normalize subject by writing to OASIS and reading back
 };
 
 /**
@@ -156,7 +128,7 @@ inline bool equals (const X &a, const Y &b)
 /**
  *  @brief A specialization of the compare operator for doubles
  */
-UT_PUBLIC bool equals (double a, double b);
+TL_PUBLIC bool equals (double a, double b);
 
 /**
  *  @brief Specialization of comparison of pointers vs. integers (specifically "0")
@@ -210,10 +182,42 @@ inline bool equals (const char *a, const std::string &b)
 }
 
 /**
+ *  @brief A utility class to capture the warning, error and info channels
+ *
+ *  Instantiate this class inside a test. Then run the test and finally
+ *  obtain the collected output with CaptureChannel::captured_text().
+ */
+class TL_PUBLIC CaptureChannel : public tl::Channel
+{
+public:
+  CaptureChannel ();
+
+  std::string captured_text () const
+  {
+    return m_text.str ();
+  }
+
+  void clear ()
+  {
+    m_text.str (std::string ());
+  }
+
+protected:
+  virtual void puts (const char *s);
+  virtual void endl ();
+  virtual void end ();
+  virtual void begin ();
+
+private:
+  std::ostringstream m_text;
+};
+
+/**
  *  @brief The base class for tests
  */
-struct UT_PUBLIC TestBase
+class TL_PUBLIC TestBase
 {
+public:
   /**
    *  @brief Constructor
    */
@@ -268,28 +272,6 @@ struct UT_PUBLIC TestBase
    *  @brief Resets the checkpoints set
    */
   void reset_checkpoint ();
-
-  /**
-   *  @brief Compares a layout with a golden layout file
-   *  @param layout The layout to compare
-   *  @param au_file The golden file path
-   *  @param norm The normalization mode (see NormalizationMode)
-   *  @param tolerance A tolerance applied when comparing shapes in database units
-   *  The layout is normalized by writing to a file and reading back
-   */
-  void compare_layouts (const db::Layout &layout, const std::string &au_file, NormalizationMode norm = WriteGDS2, db::Coord tolerance = 0);
-
-  /**
-   *  @brief Compares a layout with a golden layout file with layer mapping
-   *  @param layout The layout to compare
-   *  @param au_file The golden file path
-   *  @param lmap The layer mapping object
-   *  @param read_all_others If true, all other layers will be read too
-   *  @param norm The normalization mode (see NormalizationMode)
-   *  @param tolerance A tolerance applied when comparing shapes in database units
-   *  The layout is normalized by writing to a file and reading back
-   */
-  void compare_layouts (const db::Layout &layout, const std::string &au_file, const db::LayerMap &lmap, bool read_all_others, NormalizationMode norm = WriteGDS2, db::Coord tolerance = 0);
 
   /**
    *  @brief Compares two text files
@@ -449,7 +431,7 @@ struct UT_PUBLIC TestBase
   template <class T1, class T2>
   void eq_helper (bool eq, const T1 &a, const T2 &b, const char *what_expr, const char *equals_expr, const char *file, int line)
   {
-    if (ut::equals (a, b) != eq) {
+    if (tl::equals (a, b) != eq) {
       std::ostringstream sstr;
       sstr << what_expr << " does not equal " << equals_expr;
       diff (file, line, sstr.str (), a, b);
@@ -474,7 +456,7 @@ protected:
   }
 
 private:
-  virtual void execute (ut::TestBase *_this) throw (tl::Exception) = 0;
+  virtual void execute (tl::TestBase *_this) throw (tl::Exception) = 0;
 
   void write_detailed_diff (std::ostream &os, const std::string &subject, const std::string &ref);
 
@@ -491,35 +473,59 @@ private:
 /**
  *  @brief The registration facility for tests
  */
-struct UT_PUBLIC Registrar
+class TL_PUBLIC TestRegistrar
 {
-  static void reg (ut::TestBase *t)
-  {
-    if (! ms_instance) {
-      ms_instance = new Registrar ();
-    }
-    ms_instance->m_tests.push_back (t);
-  }
-
-  static Registrar *instance ()
-  {
-    return ms_instance;
-  }
-
-  const std::vector <ut::TestBase *> &tests () const
-  {
-    return m_tests;
-  }
+public:
+  static void reg (tl::TestBase *t);
+  static TestRegistrar *instance ();
+  const std::vector <tl::TestBase *> &tests () const;
 
 private:
-  static Registrar *ms_instance;
+  static TestRegistrar *ms_instance;
 
-  Registrar () : m_tests () { }
+  TestRegistrar ();
 
-  std::vector <ut::TestBase *> m_tests;
+  std::vector <tl::TestBase *> m_tests;
 };
 
-}
+} // namespace tl
+
+#define TEST(NAME) \
+  namespace {\
+struct TestImpl##NAME \
+      : public tl::TestBase \
+    { \
+      TestImpl##NAME () : TestBase (__FILE__, #NAME) { } \
+      virtual void execute (tl::TestBase *_this) throw (tl::Exception); \
+    }; \
+    static TestImpl##NAME TestImpl_Inst##NAME; \
+  } \
+  void TestImpl##NAME::execute (tl::TestBase *_this) throw (tl::Exception)
+
+#define EXPECT_EQ(WHAT,EQUALS) \
+  _this->checkpoint (__FILE__, __LINE__); \
+  _this->eq_helper (true, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
+
+#define EXPECT_NE(WHAT,EQUALS) \
+  _this->checkpoint (__FILE__, __LINE__); \
+  _this->eq_helper (false, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
+
+#define EXPECT(WHAT) \
+  _this->checkpoint (__FILE__, __LINE__); \
+  if (!(WHAT)) { \
+    std::ostringstream sstr; \
+    sstr << #WHAT << " is not true"; \
+    _this->raise (__FILE__, __LINE__, sstr.str ()); \
+  }
+
+#define CHECKPOINT() \
+  _this->checkpoint (__FILE__, __LINE__);
+
+#define FAIL_ARG(MSG,WHAT) \
+  { \
+    std::ostringstream sstr; \
+    sstr << MSG << ", value is " << (WHAT); \
+    _this->raise (__FILE__, __LINE__, sstr.str ()); \
+  }
 
 #endif
-

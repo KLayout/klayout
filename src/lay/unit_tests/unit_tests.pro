@@ -9,8 +9,8 @@ include($$PWD/../../lib_ut.pri)
 SOURCES = \
   laySalt.cc \
 
-INCLUDEPATH += $$LAY_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$UT_INC
-DEPENDPATH += $$LAY_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$UT_INC
+INCLUDEPATH += $$LAY_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC
+DEPENDPATH += $$LAY_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC
 
-LIBS += -L$$DESTDIR_UT -lklayout_lay -lklayout_laybasic -lklayout_db -lklayout_tl -lklayout_gsi -lklayout_ut
+LIBS += -L$$DESTDIR_UT -lklayout_lay -lklayout_laybasic -lklayout_db -lklayout_tl -lklayout_gsi
 

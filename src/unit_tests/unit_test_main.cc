@@ -22,8 +22,9 @@
 */
 
 
-#include "utHead.h"
+#include "utTestConsole.h"
 
+#include "tlUnitTest.h"
 #include "tlStaticObjects.h"
 #include "tlTimer.h"
 #include "tlSystemPaths.h"
@@ -65,7 +66,7 @@ main (int argc, char **argv)
 }
 
 static int
-run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, bool non_editable, bool slow, lay::Application &app, bool gsi_coverage, const std::vector<std::string> &class_names_vector)
+run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, bool non_editable, bool slow, lay::Application &app, bool gsi_coverage, const std::vector<std::string> &class_names_vector)
 {
   std::set<std::string> class_names;
   class_names.insert (class_names_vector.begin (), class_names_vector.end ());
@@ -74,9 +75,9 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
   grand_timer.start ();
 
   int failed_ne = 0, failed_e = 0;
-  std::vector <ut::TestBase *> failed_tests_e, failed_tests_ne;
+  std::vector <tl::TestBase *> failed_tests_e, failed_tests_ne;
   int skipped_ne = 0, skipped_e = 0;
-  std::vector <ut::TestBase *> skipped_tests_e, skipped_tests_ne;
+  std::vector <tl::TestBase *> skipped_tests_e, skipped_tests_ne;
 
   for (int e = 0; e < 2; ++e) {
 
@@ -90,9 +91,9 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
       app.set_editable (e != 0);
 
       int failed = 0;
-      std::vector <ut::TestBase *> failed_tests;
+      std::vector <tl::TestBase *> failed_tests;
       int skipped = 0;
-      std::vector <ut::TestBase *> skipped_tests;
+      std::vector <tl::TestBase *> skipped_tests;
 
       tl::Timer timer;
 
@@ -105,11 +106,11 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
         skipped = 0;
         skipped_tests.clear ();
 
-        for (std::vector <ut::TestBase *>::const_iterator t = selected_tests.begin (); t != selected_tests.end (); ++t) {
+        for (std::vector <tl::TestBase *>::const_iterator t = selected_tests.begin (); t != selected_tests.end (); ++t) {
           (*t)->remove_tmp_folder ();
         }
 
-        for (std::vector <ut::TestBase *>::const_iterator t = selected_tests.begin (); t != selected_tests.end (); ++t) {
+        for (std::vector <tl::TestBase *>::const_iterator t = selected_tests.begin (); t != selected_tests.end (); ++t) {
 
           ut::ctrl << "<testcase name=\"" << (*t)->name () << "\">";
 
@@ -118,7 +119,16 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
 
           try {
 
+            ut::ctrl << "<system-out>";
+
+            tl::Timer timer;
+            timer.start();
+
             if (! (*t)->do_test (e != 0, slow)) {
+
+              timer.stop();
+
+              ut::ctrl << "</system-out>";
 
               ut::ctrl << "<error message=\"" << "Test " << tl::escaped_to_html ((*t)->name (), false) << " failed (continued mode - see previous messages)" << "\"/>";
               tl::error << "Test " << (*t)->name () << " failed (continued mode - see previous messages)";
@@ -126,10 +136,16 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
               failed_tests.push_back (*t);
               ++failed;
 
+            } else {
+              ut::ctrl << "</system-out>";
             }
+
+            ut::noctrl << "Time: " << timer.sec_wall () << "s (wall) " << timer.sec_user () << "s (user) " << timer.sec_sys () << "s (sys)";
+            ut::ctrl << "<x-testcase-times wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";
 
           } catch (tl::CancelException &) {
 
+            ut::ctrl << "</system-out>";
             ut::ctrl << "<skipped/>";
             tl::error << "Test " << (*t)->name () << " skipped";
 
@@ -138,6 +154,7 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
 
           } catch (tl::Exception &ex) {
 
+            ut::ctrl << "</system-out>";
             ut::ctrl << "<failure message=\"" << tl::escaped_to_html (ex.msg (), false) << "\"/>";
             tl::error << "Test " << (*t)->name () << " failed:";
             tl::info << ex.msg ();
@@ -231,10 +248,10 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
             tl::warn << "GSI coverage test failed - the following methods were not called:";
           }
           if (first_of_class) {
-            tl::warn << tl::replicate (" ", ut::TestConsole::instance ()->indent ()) << "Class " << c->name ();
+            tl::warn << tl::replicate (" ", tl::indent ()) << "Class " << c->name ();
             first_of_class = false;
           }
-          tl::warn << tl::replicate (" ", ut::TestConsole::instance ()->indent () * 2) << (*m)->to_string ();
+          tl::warn << tl::replicate (" ", tl::indent () * 2) << (*m)->to_string ();
 
         }
 
@@ -258,14 +275,14 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
   if (skipped_e + skipped_ne > 0) {
     if (non_editable) {
       tl::warn << "Skipped in non-editable mode";
-      for (std::vector <ut::TestBase *>::const_iterator f = skipped_tests_ne.begin (); f != skipped_tests_ne.end (); ++f) {
-        tl::warn << tl::replicate (" ", ut::TestConsole::instance ()->indent ()) << (*f)->name ();
+      for (std::vector <tl::TestBase *>::const_iterator f = skipped_tests_ne.begin (); f != skipped_tests_ne.end (); ++f) {
+        tl::warn << tl::replicate (" ", tl::indent ()) << (*f)->name ();
       }
     }
     if (editable) {
       tl::warn << "Skipped in editable mode";
-      for (std::vector <ut::TestBase *>::const_iterator f = skipped_tests_e.begin (); f != skipped_tests_e.end (); ++f) {
-        tl::warn << tl::replicate (" ", ut::TestConsole::instance ()->indent ()) << (*f)->name ();
+      for (std::vector <tl::TestBase *>::const_iterator f = skipped_tests_e.begin (); f != skipped_tests_e.end (); ++f) {
+        tl::warn << tl::replicate (" ", tl::indent ()) << (*f)->name ();
       }
     }
     tl::warn << tl::to_string (skipped_e + skipped_ne) << " test(s) skipped";
@@ -275,14 +292,14 @@ run_tests (const std::vector<ut::TestBase *> &selected_tests, bool editable, boo
   if (result > 0) {
     if (non_editable) {
       tl::warn << "Failed in non-editable mode";
-      for (std::vector <ut::TestBase *>::const_iterator f = failed_tests_ne.begin (); f != failed_tests_ne.end (); ++f) {
-        tl::warn << tl::replicate (" ", ut::TestConsole::instance ()->indent ()) << (*f)->name ();
+      for (std::vector <tl::TestBase *>::const_iterator f = failed_tests_ne.begin (); f != failed_tests_ne.end (); ++f) {
+        tl::warn << tl::replicate (" ", tl::indent ()) << (*f)->name ();
       }
     }
     if (editable) {
       tl::warn << "Failed in editable mode";
-      for (std::vector <ut::TestBase *>::const_iterator f = failed_tests_e.begin (); f != failed_tests_e.end (); ++f) {
-        tl::warn << tl::replicate (" ", ut::TestConsole::instance ()->indent ()) << (*f)->name ();
+      for (std::vector <tl::TestBase *>::const_iterator f = failed_tests_e.begin (); f != failed_tests_e.end (); ++f) {
+        tl::warn << tl::replicate (" ", tl::indent ()) << (*f)->name ();
       }
     }
     tl::warn << tl::to_string (result) << " test(s) failed";
@@ -418,16 +435,16 @@ main_cont (int argc, char **argv)
 
     if (list_tests) {
       tl::info << "List of installed tests:";
-      for (std::vector<ut::TestBase *>::const_iterator i = ut::Registrar::instance()->tests ().begin (); i != ut::Registrar::instance()->tests ().end (); ++i) {
+      for (std::vector<tl::TestBase *>::const_iterator i = tl::TestRegistrar::instance()->tests ().begin (); i != tl::TestRegistrar::instance()->tests ().end (); ++i) {
         tl::info << "  " << (*i)->name ();
       }
       throw tl::CancelException ();
     }
 
-    ut::set_verbose (verbose);
-    ut::set_xml_format (xml_format);
-    ut::set_continue_flag (continue_flag);
-    ut::set_debug_mode (debug_mode);
+    tl::set_verbose (verbose);
+    tl::set_xml_format (xml_format);
+    tl::set_continue_flag (continue_flag);
+    tl::set_debug_mode (debug_mode);
 
     try {
 
@@ -437,17 +454,17 @@ main_cont (int argc, char **argv)
       ut::noctrl << tl::replicate ("=", console.real_columns ());
       ut::noctrl << "Entering KLayout test suite";
 
-      ut::noctrl << "TESTSRC=" << ut::testsrc ();
-      ut::noctrl << "TESTTMP=" << tl::to_string (QDir (tl::to_qstring (ut::testtmp ())).absolutePath ());
+      ut::noctrl << "TESTSRC=" << tl::testsrc ();
+      ut::noctrl << "TESTTMP=" << tl::to_string (QDir (tl::to_qstring (tl::testtmp ())).absolutePath ());
 
-      const std::vector<ut::TestBase *> *selected_tests = 0;
-      std::vector<ut::TestBase *> subset;
+      const std::vector<tl::TestBase *> *selected_tests = 0;
+      std::vector<tl::TestBase *> subset;
       if (! test_list.empty ()) {
 
         selected_tests = &subset;
         ut::noctrl << "Selected tests:";
 
-        for (std::vector<ut::TestBase *>::const_iterator i = ut::Registrar::instance()->tests ().begin (); i != ut::Registrar::instance()->tests ().end (); ++i) {
+        for (std::vector<tl::TestBase *>::const_iterator i = tl::TestRegistrar::instance()->tests ().begin (); i != tl::TestRegistrar::instance()->tests ().end (); ++i) {
 
           bool exclude = false;
 
@@ -470,7 +487,7 @@ main_cont (int argc, char **argv)
         }
 
       } else {
-        selected_tests = &ut::Registrar::instance()->tests ();
+        selected_tests = &tl::TestRegistrar::instance()->tests ();
       }
 
       result = run_tests (*selected_tests, editable, non_editable, slow, app, gsi_coverage, class_names);

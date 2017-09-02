@@ -33,7 +33,7 @@
 #include "dbLayoutDiff.h"
 #include "tlStream.h"
 #include "tlStaticObjects.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <QDir>
 #include <memory>
@@ -100,7 +100,7 @@ class LIBT_L
   : public db::Library
 {
 public:
-  LIBT_L (ut::TestBase *_this)
+  LIBT_L (tl::TestBase *_this)
     : Library () 
   {
     set_name("L");
@@ -227,11 +227,11 @@ public:
   }
 };
 
-static bool compare_vs_au (const ut::TestBase *tb, const db::Layout &layout, const std::string &filename)
+static bool compare_vs_au (const tl::TestBase *tb, const db::Layout &layout, const std::string &filename)
 {
   db::Layout layout_au;
 
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/gds/";
   fn += filename;
   tl::InputStream stream (fn);
@@ -491,7 +491,7 @@ TEST(2)
     EXPECT_EQ (layout.basic_name (lp2), "PD");
     EXPECT_EQ (layout.display_name (lp2), "L.PD*");
 
-    std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbLibraries2.gds"));
+    std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbLibraries2.gds"));
 
     {
       tl::OutputStream stream (tmp_file);
@@ -582,7 +582,7 @@ TEST(3)
     db::cell_index_type lp = layout.get_lib_proxy (lib_b, lib_bb);
     db::Instance i1 = top.insert (db::CellInstArray (db::CellInst (lp), db::Trans (db::Vector (0, 0))));
 
-    std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbLibraries3.gds"));
+    std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbLibraries3.gds"));
 
     {
       db::Writer writer = db::Writer (db::SaveLayoutOptions ());

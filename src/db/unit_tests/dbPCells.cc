@@ -28,8 +28,9 @@
 #include "dbWriter.h"
 #include "dbReader.h"
 #include "dbLayoutDiff.h"
+#include "dbTestSupport.h"
 #include "tlStream.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <QDir>
 
@@ -102,7 +103,7 @@ TEST(0)
   //  Note: this sample requires the BASIC lib
 
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/gds/pcell_test_0.gds";
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -110,7 +111,7 @@ TEST(0)
   }
 
   CHECKPOINT ();
-  _this->compare_layouts (layout, ut::testsrc () + "/testdata/gds/pcell_test_0_au.gds", ut::NoNormalization);
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/gds/pcell_test_0_au.gds", db::NoNormalization);
 }
 
 TEST(1) 
@@ -174,7 +175,7 @@ TEST(1)
   EXPECT_EQ (layout.get_properties(2).to_string (), "24/0");
 
   CHECKPOINT ();
-  _this->compare_layouts (layout, ut::testsrc () + "/testdata/gds/pcell_test.gds", ut::NoNormalization);
+  db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/gds/pcell_test.gds", db::NoNormalization);
 
   // if not in editable mode, we could have lost the reference to the second instance
   if (db::default_editable_mode ()) {
@@ -186,7 +187,7 @@ TEST(1)
     EXPECT_NE (i2.cell_index (), pd1);
     
     CHECKPOINT ();
-    _this->compare_layouts (layout, ut::testsrc () + "/testdata/gds/pcell_test2.gds", ut::NoNormalization);
+    db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/gds/pcell_test2.gds", db::NoNormalization);
 
     width = 1.0; 
     i1 = top.change_pcell_parameters (i1, parameters);
@@ -194,34 +195,34 @@ TEST(1)
     EXPECT_NE (i1.cell_index (), pd1);
     
     CHECKPOINT ();
-    _this->compare_layouts (layout, ut::testsrc () + "/testdata/gds/pcell_test3.gds", ut::WriteGDS2);
+    db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/gds/pcell_test3.gds", db::WriteGDS2);
     CHECKPOINT ();
-    _this->compare_layouts (layout, ut::testsrc () + "/testdata/gds/pcell_test3.gds", ut::WriteOAS);
+    db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/gds/pcell_test3.gds", db::WriteOAS);
 
     m.commit ();
 
     m.undo ();
 
     CHECKPOINT ();
-    _this->compare_layouts (layout, ut::testsrc () + "/testdata/gds/pcell_test.gds", ut::NoNormalization);
+    db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/gds/pcell_test.gds", db::NoNormalization);
 
     m.redo ();
 
     CHECKPOINT ();
-    _this->compare_layouts (layout, ut::testsrc () + "/testdata/gds/pcell_test3.gds", ut::WriteGDS2);
+    db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/gds/pcell_test3.gds", db::WriteGDS2);
     CHECKPOINT ();
-    _this->compare_layouts (layout, ut::testsrc () + "/testdata/gds/pcell_test3.gds", ut::WriteOAS);
+    db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/gds/pcell_test3.gds", db::WriteOAS);
 
     m.undo (); // test the ability to destroy things stored in the transaction
 
     CHECKPOINT ();
-    _this->compare_layouts (layout, ut::testsrc () + "/testdata/gds/pcell_test.gds", ut::NoNormalization);
+    db::compare_layouts (_this, layout, tl::testsrc () + "/testdata/gds/pcell_test.gds", db::NoNormalization);
 
     //  Test the ability to copy things and change PCell parameters then
     db::Layout copy (layout);
 
     CHECKPOINT ();
-    _this->compare_layouts (copy, ut::testsrc () + "/testdata/gds/pcell_test.gds", ut::NoNormalization);
+    db::compare_layouts (_this, copy, tl::testsrc () + "/testdata/gds/pcell_test.gds", db::NoNormalization);
 
     db::Cell &copy_top = copy.cell (top.cell_index ());
 
@@ -246,9 +247,9 @@ TEST(1)
     i1_copy = copy_top.change_pcell_parameters (i1_copy, parameters);
     
     CHECKPOINT ();
-    _this->compare_layouts (copy, ut::testsrc () + "/testdata/gds/pcell_test4.gds", ut::WriteGDS2);
+    db::compare_layouts (_this, copy, tl::testsrc () + "/testdata/gds/pcell_test4.gds", db::WriteGDS2);
     CHECKPOINT ();
-    _this->compare_layouts (copy, ut::testsrc () + "/testdata/gds/pcell_test4.gds", ut::WriteOAS);
+    db::compare_layouts (_this, copy, tl::testsrc () + "/testdata/gds/pcell_test4.gds", db::WriteOAS);
 
   }
 }

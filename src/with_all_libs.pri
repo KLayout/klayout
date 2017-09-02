@@ -1,8 +1,8 @@
 
-INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC $$LAYBASIC_INC $$LAY_INC $$ANT_INC $$IMG_INC $$EDT_INC $$DRC_INC $$EXT_INC $$LIB_INC $$UT_INC $$RBA_INC $$PYA_INC $$VERSION_INC
-DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC $$LAYBASIC_INC $$LAY_INC $$ANT_INC $$IMG_INC $$EDT_INC $$DRC_INC $$EXT_INC $$LIB_INC $$UT_INC $$RBA_INC $$PYA_INC $$VERSION_INC
+INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC $$LAYBASIC_INC $$LAY_INC $$ANT_INC $$IMG_INC $$EDT_INC $$DRC_INC $$EXT_INC $$LIB_INC $$RBA_INC $$PYA_INC $$VERSION_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC $$LYM_INC $$LAYBASIC_INC $$LAY_INC $$ANT_INC $$IMG_INC $$EDT_INC $$DRC_INC $$EXT_INC $$LIB_INC $$RBA_INC $$PYA_INC $$VERSION_INC
 
-LIBS += $$PYTHONLIBFILE $$RUBYLIBFILE -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_lym -lklayout_laybasic -lklayout_lay -lklayout_ant -lklayout_img -lklayout_edt -lklayout_drc -lklayout_ext -lklayout_lib -lklayout_ut
+LIBS += $$PYTHONLIBFILE $$RUBYLIBFILE -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb -lklayout_lym -lklayout_laybasic -lklayout_lay -lklayout_ant -lklayout_img -lklayout_edt -lklayout_drc -lklayout_ext -lklayout_lib
 
 # Note: this accounts for UI-generated headers placed into the output folders in
 # shadow builds:

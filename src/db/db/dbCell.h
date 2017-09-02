@@ -20,8 +20,6 @@
 
 */
 
-
-
 #ifndef HDR_dbCell
 #define HDR_dbCell
 

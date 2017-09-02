@@ -26,12 +26,12 @@
 #include "dbWriter.h"
 #include "dbCIFWriter.h"
 #include "dbGDS2Writer.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <QDir>
 #include <stdlib.h>
 
-static void run_test (ut::TestBase *_this, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001, bool dummy_calls = false, bool blank_sep = false)
+static void run_test (tl::TestBase *_this, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001, bool dummy_calls = false, bool blank_sep = false)
 {
   db::CIFReaderOptions *opt = new db::CIFReaderOptions();
   opt->dbu = dbu;
@@ -60,7 +60,7 @@ static void run_test (ut::TestBase *_this, const char *file, const char *file_au
   db::Layout layout (&m), layout2 (&m), layout2_cif (&m), layout_au (&m);
 
   {
-    std::string fn (ut::testsrc_private ());
+    std::string fn (tl::testsrc_private ());
     fn += "/testdata/cif/";
     fn += file;
     tl::InputStream stream (fn);
@@ -120,7 +120,7 @@ static void run_test (ut::TestBase *_this, const char *file, const char *file_au
   }
 
   {
-    std::string fn (ut::testsrc_private ());
+    std::string fn (tl::testsrc_private ());
     fn += "/testdata/cif/";
     fn += file_au;
     tl::InputStream stream (fn);

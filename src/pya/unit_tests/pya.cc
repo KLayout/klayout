@@ -26,9 +26,9 @@
 #include "pya.h"
 #include "gsiTest.h"
 
-#include "utHead.h"
+#include "tlUnitTest.h"
 
-static void run_pythontest (ut::TestBase *_this, const std::string &fn);
+static void run_pythontest (tl::TestBase *_this, const std::string &fn);
 
 TEST (1)
 {
@@ -39,9 +39,11 @@ TEST (1)
   EXPECT_EQ (gsi::has_class ("QApplication"), true);
 #endif
 
+  tl_assert (pya::PythonInterpreter::instance ());
+
   bool err = false;
   try {
-    ut::python_interpreter ()->eval_string ("raise Exception(\"an error\")");
+    pya::PythonInterpreter::instance ()->eval_string ("raise Exception(\"an error\")");
   } catch (tl::ScriptError &ex) {
     EXPECT_EQ (ex.basic_msg (), std::string ("an error"));
     EXPECT_EQ (ex.cls () == std::string ("exceptions.Exception") || ex.cls () == std::string ("Exception"), true);
@@ -52,7 +54,7 @@ TEST (1)
 
   err = false;
   try {
-    ut::python_interpreter ()->eval_string ("Quatsch");
+    pya::PythonInterpreter::instance ()->eval_string ("Quatsch");
   } catch (tl::ScriptError &ex) {
     EXPECT_EQ (ex.basic_msg (), std::string ("name 'Quatsch' is not defined"));
     EXPECT_EQ (ex.cls () == std::string ("exceptions.NameError") || ex.cls () == std::string ("NameError"), true);
@@ -61,10 +63,10 @@ TEST (1)
 
   EXPECT_EQ (err, true);
 
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/python/basic.py";
   try {
-    ut::python_interpreter ()->load_file (fn.c_str ());
+    pya::PythonInterpreter::instance ()->load_file (fn.c_str ());
     gsi_test::E::reset_inst ();
   } catch (tl::ExitException &ex) {
     gsi_test::E::reset_inst ();
@@ -75,13 +77,15 @@ TEST (1)
   }
 }
 
-void run_pythontest (ut::TestBase *_this, const std::string &fn)
+void run_pythontest (tl::TestBase *_this, const std::string &fn)
 {
-  std::string fp (ut::testsrc ());
+  tl_assert (pya::PythonInterpreter::instance ());
+
+  std::string fp (tl::testsrc ());
   fp += "/testdata/python/";
   fp += fn;
   try {
-    ut::python_interpreter ()->load_file (fp.c_str ());
+    pya::PythonInterpreter::instance ()->load_file (fp.c_str ());
   } catch (tl::ExitException &ex) {
     EXPECT_EQ (ex.status (), 0);
   } catch (...) {

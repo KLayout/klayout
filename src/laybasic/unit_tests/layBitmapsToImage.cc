@@ -25,12 +25,11 @@
 #include "layBitmap.h"
 #include "layDitherPattern.h"
 #include "layLineStyles.h"
+#include "tlUnitTest.h"
 
 #include <QImage>
 #include <QColor>
 #include <QMutex>
-
-#include <utHead.h>
 
 std::string
 to_string (const QImage &img, unsigned int mask)

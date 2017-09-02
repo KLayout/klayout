@@ -21,8 +21,7 @@
 */
 
 
-#include "utHead.h"
-
+#include "tlUnitTest.h"
 #include "tlReuseVector.h"
 
 #include <string>
@@ -45,7 +44,7 @@ std::string to_string (const tl::reuse_vector<std::string> &x)
 }
 
 tl::reuse_vector<std::string>::iterator 
-test_insert (ut::TestBase *_this, tl::reuse_vector<std::string> &rv, const std::string &s)
+test_insert (tl::TestBase *_this, tl::reuse_vector<std::string> &rv, const std::string &s)
 {
   tl::reuse_vector<std::string>::iterator si = rv.insert (s);
   EXPECT_EQ (*si, s);

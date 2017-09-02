@@ -29,17 +29,17 @@
 #include "dbWriter.h"
 #include "dbTextWriter.h"
 
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <cstdlib>
 #include <QDir>
 
-void run_test (ut::TestBase *_this, const char *file, bool scaling_test, int compr, bool recompress)
+void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int compr, bool recompress)
 {
   {
     db::Manager m;
     db::Layout layout_org (&m);
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/";
     fn += file;
     tl::InputStream stream (fn);
@@ -84,7 +84,7 @@ void run_test (ut::TestBase *_this, const char *file, bool scaling_test, int com
   {
     db::Manager m;
     db::Layout layout_org (&m);
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/";
     fn += file;
     tl::InputStream stream (fn);
@@ -140,7 +140,7 @@ void run_test (ut::TestBase *_this, const char *file, bool scaling_test, int com
   {
     db::Manager m;
     db::Layout layout_org (&m);
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/";
     fn += file;
     tl::InputStream stream (fn);
@@ -189,7 +189,7 @@ void run_test (ut::TestBase *_this, const char *file, bool scaling_test, int com
   {
     db::Manager m;
     db::Layout layout_org (&m);
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/";
     fn += file;
     tl::InputStream stream (fn);
@@ -240,7 +240,7 @@ void run_test (ut::TestBase *_this, const char *file, bool scaling_test, int com
 
     db::Manager m;
     db::Layout layout (&m);
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/oasis/";
     fn += file;
     tl::InputStream stream (fn);
@@ -299,7 +299,7 @@ void run_test (ut::TestBase *_this, const char *file, bool scaling_test, int com
   }
 }
 
-void run_test (ut::TestBase *_this, const char *file, bool scaling_test = true)
+void run_test (tl::TestBase *_this, const char *file, bool scaling_test = true)
 {
   for (int recompress = 0; recompress < 2; ++recompress) {
     run_test (_this, file, scaling_test, 0, recompress);
@@ -551,7 +551,7 @@ TEST(100)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter100.gds"));
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter100.gds"));
 
   {
     tl::OutputStream out (tmp_file);
@@ -634,7 +634,7 @@ TEST(101)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter101.gds"));
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter101.gds"));
 
   {
     tl::OutputStream out (tmp_file);
@@ -707,7 +707,7 @@ TEST(102)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter102.gds"));
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter102.gds"));
 
   {
     tl::OutputStream out (tmp_file);
@@ -788,7 +788,7 @@ TEST(103)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter103.gds"));
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter103.gds"));
 
   {
     tl::OutputStream out (tmp_file);
@@ -862,7 +862,7 @@ TEST(110)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter110.gds"));
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter110.gds"));
 
   {
     tl::OutputStream out (tmp_file);
@@ -939,7 +939,7 @@ TEST(111)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter111.gds"));
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter111.gds"));
 
   {
     tl::OutputStream out (tmp_file);
@@ -1013,7 +1013,7 @@ TEST(112)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter112.gds"));
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter112.gds"));
 
   {
     tl::OutputStream out (tmp_file);
@@ -1091,7 +1091,7 @@ TEST(113)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
   c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
 
-  std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter113.gds"));
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter113.gds"));
 
   {
     tl::OutputStream out (tmp_file);
@@ -1146,7 +1146,7 @@ TEST(114)
   db::Edge e3 (0, 1200, 1000, 1200);
   c1.shapes (1).insert (e3);
 
-  std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter114.gds"));
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter114.gds"));
 
   {
     tl::OutputStream out (tmp_file);
@@ -1219,7 +1219,7 @@ TEST(115)
   db::Edge e3 (0, 1200, 1000, 1200);
   c1.shapes (1).insert (e3);
 
-  std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter115.gds"));
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter115.gds"));
 
   {
     tl::OutputStream out (tmp_file);
@@ -1279,7 +1279,7 @@ TEST(118)
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), db::Trans (), db::Vector (0, 1), db::Vector (1, 0), 1, 1));
   c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), db::Trans (db::Vector (17, -42)), db::Vector (0, 1), db::Vector (1, 0), 1, 1));
 
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp.oas");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp.oas");
 
   {
     tl::OutputStream out (tmp_file);
@@ -1351,7 +1351,7 @@ TEST(116)
   db::Cell &c2 (g.cell (g.add_cell ()));
 
   {
-    std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter116a.gds"));
+    std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter116a.gds"));
 
     {
       tl::OutputStream out (tmp_file);
@@ -1400,7 +1400,7 @@ TEST(116)
   }
 
   {
-    std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter116b.gds"));
+    std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter116b.gds"));
 
     {
       tl::OutputStream out (tmp_file);
@@ -1449,7 +1449,7 @@ TEST(116)
   }
 
   {
-    std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter116c.gds"));
+    std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter116c.gds"));
 
     {
       tl::OutputStream out (tmp_file);
@@ -1507,7 +1507,7 @@ TEST(116)
   }
 
   {
-    std::string tmp_file = ut::TestBase::tmp_file ("tmp_dbOASISWriter116d.gds");
+    std::string tmp_file = tl::TestBase::tmp_file ("tmp_dbOASISWriter116d.gds");
 
     {
       tl::OutputStream out (tmp_file);
@@ -1570,7 +1570,7 @@ TEST(116)
   c1.insert (db::CellInstArray (c2.cell_index (), db::Trans ()));
 
   {
-    std::string tmp_file = ut::TestBase::tmp_file ("tmp_dbOASISWriter116e.gds");
+    std::string tmp_file = tl::TestBase::tmp_file ("tmp_dbOASISWriter116e.gds");
 
     {
       tl::OutputStream out (tmp_file);
@@ -1619,7 +1619,7 @@ TEST(116)
   }
 
   {
-    std::string tmp_file = ut::TestBase::tmp_file ("tmp_dbOASISWriter116f.gds");
+    std::string tmp_file = tl::TestBase::tmp_file ("tmp_dbOASISWriter116f.gds");
 
     {
       tl::OutputStream out (tmp_file);
@@ -1695,7 +1695,7 @@ TEST(117)
   ps.transform (db::FTrans (db::FTrans::r90), false);
   c1.shapes (0).insert (ps);
 
-  std::string tmp_file = ut::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter117.gds"));
+  std::string tmp_file = tl::TestBase::tmp_file (tl::sprintf ("tmp_dbOASISWriter117.gds"));
 
   {
     tl::OutputStream out (tmp_file);

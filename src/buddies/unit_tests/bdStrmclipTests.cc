@@ -20,18 +20,19 @@
 
 */
 
-#include "utHead.h"
 #include "bdCommon.h"
 #include "dbReader.h"
+#include "dbTestSupport.h"
+#include "tlUnitTest.h"
 
 BD_PUBLIC int strmclip (int argc, char *argv[]);
 
 TEST(1A)
 {
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/bd/strm2clip_in.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/bd/strm2clip_au1.gds";
 
   std::string output = this->tmp_file ();
@@ -48,15 +49,15 @@ TEST(1A)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NoNormalization);
 }
 
 TEST(1B)
 {
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/bd/strm2clip_in.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/bd/strm2clip_au1.gds";
 
   std::string output = this->tmp_file ();
@@ -73,15 +74,15 @@ TEST(1B)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NoNormalization);
 }
 
 TEST(2)
 {
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/bd/strm2clip_in.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/bd/strm2clip_au2.gds";
 
   std::string output = this->tmp_file ();
@@ -98,6 +99,6 @@ TEST(2)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NoNormalization);
 }
 

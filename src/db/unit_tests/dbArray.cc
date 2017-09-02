@@ -23,7 +23,7 @@
 
 #include "dbArray.h"
 #include "dbBoxConvert.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 typedef db::array <db::Box, db::Trans> BoxArray;
 

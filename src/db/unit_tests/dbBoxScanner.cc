@@ -24,7 +24,7 @@
 #include "dbBoxScanner.h"
 #include "dbShapeProcessor.h"
 #include "dbRecursiveShapeIterator.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include "tlTimer.h"
 #include "tlLog.h"
@@ -196,7 +196,7 @@ TEST(1f)
   EXPECT_EQ (tr.str, "");
 }
 
-void run_test2 (ut::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)
+void run_test2 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)
 {
   std::vector<db::Box> bb;
   for (size_t i = 0; i < n; ++i) {
@@ -469,7 +469,7 @@ TEST(10e)
   EXPECT_EQ (cl2s (clusters), "(0,1)");
 }
 
-void run_test11 (ut::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)
+void run_test11 (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)
 {
   std::vector<db::Box> bb;
   for (size_t i = 0; i < n; ++i) {
@@ -678,7 +678,7 @@ struct BooleanAndInteractionClusterCollector
 
 TEST(100)
 {
-  std::string fn (ut::testsrc_private ());
+  std::string fn (tl::testsrc_private ());
   fn += "/testdata/other/";
   fn += "bs100.oas.gz";
 

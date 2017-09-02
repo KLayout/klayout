@@ -24,7 +24,7 @@
 
 #include "tlIntervalMap.h"
 #include "tlString.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <algorithm>
 

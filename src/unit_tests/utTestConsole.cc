@@ -21,10 +21,7 @@
 */
 
 #include "utTestConsole.h"
-#include "utHead.h"
-
-#include "rba.h"
-#include "pya.h"
+#include "tlUnitTest.h"
 
 #include <unistd.h>
 
@@ -38,36 +35,6 @@
 
 namespace ut
 {
-
-// ------------------------------------------------
-//  CaptureChannel implementation
-
-CaptureChannel::CaptureChannel ()
-{
-  tl::info.add (this, false);
-  tl::error.add (this, false);
-  tl::warn.add (this, false);
-}
-
-void CaptureChannel::puts (const char *s)
-{
-  m_text << s;
-}
-
-void CaptureChannel::endl ()
-{
-  m_text << "\n";
-}
-
-void CaptureChannel::end ()
-{
-  //  .. nothing yet ..
-}
-
-void CaptureChannel::begin ()
-{
-  //  .. nothing yet ..
-}
 
 // ------------------------------------------------
 //  tl::Channel implementations for redirecting the log output
@@ -184,21 +151,21 @@ public:
 protected:
   virtual void puts (const char *s)
   {
-    if (m_with_xml == ut::xml_format ()) {
+    if (m_with_xml == tl::xml_format ()) {
       TestConsole::instance ()->raw_write (s);
     }
   }
 
   virtual void endl ()
   {
-    if (m_with_xml == ut::xml_format ()) {
+    if (m_with_xml == tl::xml_format ()) {
       TestConsole::instance ()->raw_write ("\n");
     }
   }
 
   virtual void end ()
   {
-    if (m_with_xml == ut::xml_format ()) {
+    if (m_with_xml == tl::xml_format ()) {
       TestConsole::instance ()->end ();
       TestConsole::instance ()->flush ();
     }
@@ -206,7 +173,7 @@ protected:
 
   virtual void begin ()
   {
-    if (m_with_xml == ut::xml_format ()) {
+    if (m_with_xml == tl::xml_format ()) {
       TestConsole::instance ()->begin_info ();
     }
   }
@@ -227,7 +194,6 @@ TestConsole::TestConsole (FILE *file)
   : m_file (file), m_col (0), m_max_col (250), m_columns (50), m_rows (0), m_file_is_tty (false)
 {
   ms_instance = this;
-  m_indent = 4;
 
   m_file_is_tty = isatty (fileno (file));
 
@@ -250,6 +216,12 @@ TestConsole::~TestConsole ()
   if (ms_instance == this) {
     ms_instance = 0;
   }
+}
+
+int
+TestConsole::columns ()
+{
+  return std::max (m_columns - tl::indent (), 0);
 }
 
 void
@@ -280,7 +252,7 @@ bool
 TestConsole::is_tty ()
 {
   //  NOTE: this assumes we are delivering to stdout
-  return m_file_is_tty && ! ut::xml_format ();
+  return m_file_is_tty && ! tl::xml_format ();
 }
 
 void
@@ -318,7 +290,7 @@ TestConsole::end ()
 void
 TestConsole::basic_write (const char *s)
 {
-  if (ut::xml_format ()) {
+  if (tl::xml_format ()) {
 
     for (const char *cp = s; *cp; ++cp) {
       if (*cp == '&') {
@@ -343,10 +315,10 @@ TestConsole::basic_write (const char *s)
         fputc (*cp, m_file);
       } else {
         if (m_col == 0) {
-          for (int i = 0; i < m_indent; ++i) {
+          for (int i = 0; i < tl::indent (); ++i) {
             fputc (' ', m_file);
           }
-          m_col = m_indent;
+          m_col = tl::indent ();
         }
         if (m_col > m_max_col) {
           //  ignore char
@@ -407,7 +379,6 @@ TestConsole *TestConsole::ms_instance = 0;
 
 tl::LogTee noctrl (new CtrlChannel (false), true);
 tl::LogTee ctrl (new CtrlChannel (true), true);
-
 
 
 }

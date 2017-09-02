@@ -20,16 +20,17 @@
 
 */
 
-#include "utHead.h"
+#include "tlUnitTest.h"
 #include "dbReader.h"
+#include "dbTestSupport.h"
 #include "lymMacro.h"
 
 TEST(1)
 {
-  std::string rs = ut::testsrc ();
+  std::string rs = tl::testsrc ();
   rs += "/testdata/drc/drcSimpleTests_1.drc";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/drc/drcSimpleTests_au1.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
@@ -58,18 +59,18 @@ TEST(1)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
 TEST(2)
 {
-  std::string rs = ut::testsrc ();
+  std::string rs = tl::testsrc ();
   rs += "/testdata/drc/drcSimpleTests_2.drc";
 
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/drc/drctest.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/drc/drcSimpleTests_au2.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
@@ -98,18 +99,18 @@ TEST(2)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
 }
 
 TEST(3)
 {
-  std::string rs = ut::testsrc ();
+  std::string rs = tl::testsrc ();
   rs += "/testdata/drc/drcSimpleTests_3.drc";
 
-  std::string input = ut::testsrc ();
+  std::string input = tl::testsrc ();
   input += "/testdata/drc/drctest.gds";
 
-  std::string au = ut::testsrc ();
+  std::string au = tl::testsrc ();
   au += "/testdata/drc/drcSimpleTests_au3.gds";
 
   std::string output = this->tmp_file ("tmp.gds");
@@ -138,5 +139,5 @@ TEST(3)
     reader.read (layout);
   }
 
-  this->compare_layouts (layout, au, ut::NoNormalization);
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
 }

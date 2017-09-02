@@ -34,6 +34,7 @@
 #include "dbLayoutStateModel.h"
 #include "dbLayerProperties.h"
 #include "dbMetaInfo.h"
+#include "dbCellInst.h"
 #include "tlException.h"
 #include "tlVector.h"
 #include "tlString.h"

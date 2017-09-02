@@ -23,7 +23,7 @@
 
 #include "dbBoxTree.h"
 #include "dbBoxConvert.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 #include "tlTimer.h"
 #include "tlLog.h"
 
@@ -148,11 +148,11 @@ typedef db::unstable_box_tree<db::Box, db::Box, Box2Box> UnstableTestTreeL;
 typedef db::unstable_box_tree<db::Box, db::Box, Box2BoxCmplx> UnstableTestTreeCmplxL;
 
 template <class Tree, class Box, class BoxConv>
-static void test_tree_overlap (ut::TestBase *_this, const Tree &t, const Box &b, BoxConv conv)
+static void test_tree_overlap (tl::TestBase *_this, const Tree &t, const Box &b, BoxConv conv)
 {
   typedef typename Tree::object_type value_type; 
 
-  if (ut::verbose ()) {
+  if (tl::verbose ()) {
     std::cout << "Testing vs. " << b << " overlapping" << std::endl;
   }
 
@@ -163,7 +163,7 @@ static void test_tree_overlap (ut::TestBase *_this, const Tree &t, const Box &b,
     }
   }
   
-  if (ut::verbose ()) {
+  if (tl::verbose ()) {
     for (typename Tree::const_iterator e = t.begin (); e != t.end (); ++e) {
       std::cout << " v=" << *e << std::endl;
     }
@@ -176,7 +176,7 @@ static void test_tree_overlap (ut::TestBase *_this, const Tree &t, const Box &b,
     } else {
       good_idx.erase (&*i);
     }
-    if (ut::verbose ()) {
+    if (tl::verbose ()) {
       std::cout << *i << std::endl;
     }
     ++i;
@@ -186,11 +186,11 @@ static void test_tree_overlap (ut::TestBase *_this, const Tree &t, const Box &b,
 }
 
 template <class Tree, class Box, class BoxConv>
-static void test_tree_touching (ut::TestBase *_this, const Tree &t, const Box &b, BoxConv conv)
+static void test_tree_touching (tl::TestBase *_this, const Tree &t, const Box &b, BoxConv conv)
 {
   typedef typename Tree::object_type value_type; 
 
-  if (ut::verbose ()) {
+  if (tl::verbose ()) {
     std::cout << "Testing vs. " << b << " touching" << std::endl;
   }
 
@@ -201,7 +201,7 @@ static void test_tree_touching (ut::TestBase *_this, const Tree &t, const Box &b
     }
   }
   
-  if (ut::verbose ()) {
+  if (tl::verbose ()) {
     for (typename Tree::const_iterator e = t.begin (); e != t.end (); ++e) {
       std::cout << " v=" << *e << std::endl;
     }
@@ -214,7 +214,7 @@ static void test_tree_touching (ut::TestBase *_this, const Tree &t, const Box &b
     } else {
       good_idx.erase (&*i);
     }
-    if (ut::verbose ()) {
+    if (tl::verbose ()) {
       std::cout << *i << std::endl;
     }
     ++i;

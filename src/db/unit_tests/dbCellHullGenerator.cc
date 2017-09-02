@@ -24,7 +24,7 @@
 #include "dbCellHullGenerator.h"
 #include "dbEdgeProcessor.h"
 #include "tlString.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 static std::string h2s (const std::vector<db::Polygon> &hull)
 {

@@ -21,7 +21,7 @@
 */
 
 
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include "dbShapeProcessor.h"
 #include "dbPolygon.h"
@@ -31,6 +31,7 @@
 #include "dbLayoutDiff.h"
 #include "dbGDS2Writer.h"
 #include "dbGDS2Writer.h"
+#include "dbTestSupport.h"
 #include "tlStream.h"
 #include "tlTimer.h"
 
@@ -39,12 +40,12 @@
 
 #include <stdlib.h>
 
-void run_test_bool (ut::TestBase *_this, const char *file, int mode, bool min_coherence = true, const char *au_file1 = 0, const char *au_file2 = 0, const char *au_file3 = 0)
+void run_test_bool (tl::TestBase *_this, const char *file, int mode, bool min_coherence = true, const char *au_file1 = 0, const char *au_file2 = 0, const char *au_file3 = 0)
 {
   db::Layout layout_org;
 
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/bool/";
     fn += file;
     tl::InputStream stream (fn);
@@ -75,11 +76,11 @@ void run_test_bool (ut::TestBase *_this, const char *file, int mode, bool min_co
     reader.read (layout_org, options);
   }
 
-  std::string au_fn1 (ut::testsrc ());
+  std::string au_fn1 (tl::testsrc ());
   au_fn1 += "/testdata/bool/";
   au_fn1 += au_file1 ? au_file1 : file;
 
-  std::string au_fn2 (ut::testsrc ());
+  std::string au_fn2 (tl::testsrc ());
   au_fn2 += "/testdata/bool/";
   au_fn2 += au_file2 ? au_file2 : (au_file1 ? au_file1 : file);
 
@@ -146,7 +147,7 @@ void run_test_bool (ut::TestBase *_this, const char *file, int mode, bool min_co
   lmap.map (db::LDPair (2, 0), 1001);
   lmap.map (db::LDPair (100, 0), 1002);
 
-  _this->compare_layouts (layout_org, au_fn1, lmap, false /*skip other layers*/, ut::WriteOAS);
+  db::compare_layouts (_this, layout_org, au_fn1, lmap, false /*skip other layers*/, db::WriteOAS);
 
   layout_org.cell (*layout_org.begin_top_down ()).shapes (lr).clear ();
 
@@ -161,12 +162,12 @@ void run_test_bool (ut::TestBase *_this, const char *file, int mode, bool min_co
   proc.merge (layout_org, layout_org.cell (*layout_org.begin_top_down ()), lr2,
               layout_org.cell (*layout_org.begin_top_down ()).shapes (lr), true /*hierarchical*/, 0 /*all polygons*/, true /*resolve holes*/, min_coherence);
 
-  _this->compare_layouts (layout_org, au_fn2, lmap, false /*skip other layers*/, ut::WriteOAS);
+  db::compare_layouts (_this, layout_org, au_fn2, lmap, false /*skip other layers*/, db::WriteOAS);
 
   //  Use this opportunity to test trapezoid decomposition
   if (au_file3) {
 
-    std::string au_fn3 (ut::testsrc ());
+    std::string au_fn3 (tl::testsrc ());
     au_fn3 += "/testdata/bool/";
     au_fn3 += au_file3;
 
@@ -181,7 +182,7 @@ void run_test_bool (ut::TestBase *_this, const char *file, int mode, bool min_co
     db::TrapezoidGenerator out (sg);
     ep.process (out, op);
 
-    _this->compare_layouts (layout_org, au_fn3, lmap, false /*skip other layers*/, ut::WriteOAS);
+    db::compare_layouts (_this, layout_org, au_fn3, lmap, false /*skip other layers*/, db::WriteOAS);
 
   }
 }
@@ -413,7 +414,7 @@ TEST(3special)
   run_test_bool (_this, "special3.oas", db::BooleanOp::Or, true, "special3_au5.oas");
 }
 
-void run_test_size (ut::TestBase *_this, const char *file, const char *au_file, int mode, db::Coord dx, db::Coord dy, bool min_coherence = true, bool flat = true)
+void run_test_size (tl::TestBase *_this, const char *file, const char *au_file, int mode, db::Coord dx, db::Coord dy, bool min_coherence = true, bool flat = true)
 {
   db::Manager m;
 
@@ -421,7 +422,7 @@ void run_test_size (ut::TestBase *_this, const char *file, const char *au_file, 
   db::Layout layout_au (&m);
 
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/bool/";
     fn += file;
     tl::InputStream stream (fn);
@@ -447,7 +448,7 @@ void run_test_size (ut::TestBase *_this, const char *file, const char *au_file, 
     reader.read (layout_org, options);
   }
 
-  std::string au_fn (ut::testsrc ());
+  std::string au_fn (tl::testsrc ());
   au_fn += "/testdata/bool/";
   au_fn += au_file;
 
@@ -494,7 +495,7 @@ void run_test_size (ut::TestBase *_this, const char *file, const char *au_file, 
   lmap.map (db::LDPair (1, 0), 1);
   lmap.map (db::LDPair (100, 0), 2);
 
-  _this->compare_layouts (layout_org, au_fn, lmap, false /*skip other layers*/, ut::WriteOAS);
+  db::compare_layouts (_this, layout_org, au_fn, lmap, false /*skip other layers*/, db::WriteOAS);
 }
 
 
@@ -2137,7 +2138,7 @@ TEST(100)
   unsigned int l2_l1d0 = 0, l2_l2d0 = 0;
 
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/bool/";
     fn += "sp1.gds";
     tl::InputStream stream (fn);
@@ -2163,7 +2164,7 @@ TEST(100)
   }
 
   {
-    std::string fn (ut::testsrc ());
+    std::string fn (tl::testsrc ());
     fn += "/testdata/bool/";
     fn += "sp2.gds";
     tl::InputStream stream (fn);
@@ -2236,10 +2237,10 @@ TEST(100)
   proc.merge (layout_1, layout_1.cell (*layout_1.begin_top_down ()), l1_l1d0, 
               lr_top->shapes (lr_l123d0), false /*hierarchical*/, 1, true /*resolve holes*/, true /*min coherence*/);
 
-  std::string au_fn (ut::testsrc ());
+  std::string au_fn (tl::testsrc ());
   au_fn += "/testdata/bool/";
   au_fn += "sp_au.gds";
 
-  _this->compare_layouts (lr, au_fn);
+  db::compare_layouts (_this, lr, au_fn);
 }
 

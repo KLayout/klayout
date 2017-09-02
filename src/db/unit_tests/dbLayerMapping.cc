@@ -24,7 +24,7 @@
 #include "dbLayout.h"
 #include "dbLayerMapping.h"
 #include "tlString.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 std::string nl2s (const std::vector<unsigned int> &nl, const db::Layout &a)
 {

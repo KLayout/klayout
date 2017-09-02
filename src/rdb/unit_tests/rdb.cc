@@ -23,7 +23,7 @@
 
 
 #include "rdb.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 #include "dbBox.h"
 #include "dbEdge.h"
 
@@ -217,7 +217,7 @@ TEST(4)
 
 TEST(5) 
 {
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_5.lyrdb");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_5.lyrdb");
 
   {
     rdb::Database db;
@@ -360,7 +360,7 @@ TEST(5)
 
 TEST(5a) 
 {
-  std::string tmp_file = ut::TestBase::tmp_file ("tmp_5a.lyrdb");
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_5a.lyrdb");
 
   {
     rdb::Database db;

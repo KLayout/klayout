@@ -26,19 +26,20 @@
 #include "dbOASISWriter.h"
 #include "dbLoadLayoutOptions.h"
 #include "dbReader.h"
+#include "dbTestSupport.h"
 
-#include <utHead.h>
+#include "tlUnitTest.h"
 
 #include <stdlib.h>
 
-static void run_test (ut::TestBase *_this, const char *dir)
+static void run_test (tl::TestBase *_this, const char *dir)
 {
   db::LoadLayoutOptions options;
 
   db::Layout layout;
 
   {
-    std::string fn (ut::testsrc_private ());
+    std::string fn (tl::testsrc_private ());
     fn += "/testdata/pcb/";
     fn += dir;
     fn += "/import.pcb";
@@ -47,7 +48,7 @@ static void run_test (ut::TestBase *_this, const char *dir)
     reader.read (layout, options);
   }
 
-  _this->compare_layouts (layout, ut::testsrc_private () + "/testdata/pcb/" + dir + "/au.oas.gz", ut::WriteOAS, 1);
+  db::compare_layouts (_this, layout, tl::testsrc_private () + "/testdata/pcb/" + dir + "/au.oas.gz", db::WriteOAS, 1);
 }
 
 TEST(1)

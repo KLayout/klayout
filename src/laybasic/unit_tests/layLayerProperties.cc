@@ -25,9 +25,8 @@
 #include "layLayerProperties.h"
 #include "layLayoutView.h"
 #include "tlXMLParser.h"
+#include "tlUnitTest.h"
 #include "dbLayout.h"
-
-#include <utHead.h>
 
 #include <iostream>
 #include <sstream>
@@ -1070,7 +1069,7 @@ TEST (11)
 }
 
 void
-test_list (ut::TestBase *_this, lay::LayerPropertiesConstIterator &iter)
+test_list (tl::TestBase *_this, lay::LayerPropertiesConstIterator &iter)
 {
   lay::LayerPropertiesConstIterator i0 (iter);
   size_t nc = 0;

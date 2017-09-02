@@ -25,7 +25,7 @@
 #include "laySaltGrains.h"
 #include "laySalt.h"
 #include "tlFileUtils.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 #include <QDir>
 #include <QSignalSpy>

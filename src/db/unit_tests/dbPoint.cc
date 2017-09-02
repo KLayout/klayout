@@ -24,7 +24,7 @@
 #include "dbPoint.h"
 #include "dbVector.h"
 #include "tlString.h"
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 TEST(1) 
 {

@@ -28,7 +28,7 @@
 
 // On Windows, ruby.h is not compatible with windows.h which is included by utHead - at least not if 
 // windows.h is included before ruby.h ...
-#include "utHead.h"
+#include "tlUnitTest.h"
 
 TEST (1)
 {
@@ -39,9 +39,11 @@ TEST (1)
   EXPECT_EQ (gsi::has_class ("QApplication"), true);
 #endif
 
+  tl_assert (rba::RubyInterpreter::instance ());
+
   bool err = false;
   try {
-    ut::ruby_interpreter ()->eval_string ("raise \"an error\"");
+    rba::RubyInterpreter::instance ()->eval_string ("raise \"an error\"");
   } catch (tl::Exception &ex) {
     EXPECT_EQ (std::string (ex.msg (), 0, 8), std::string ("an error"));
     err = true;
@@ -49,10 +51,10 @@ TEST (1)
 
   EXPECT_EQ (err, true);
 
-  ut::ruby_interpreter ()->eval_string ("puts 'Special chars: <&>'");
+  rba::RubyInterpreter::instance ()->eval_string ("puts 'Special chars: <&>'");
   err = false;
   try {
-    ut::ruby_interpreter ()->eval_string ("Quatsch");
+    rba::RubyInterpreter::instance ()->eval_string ("Quatsch");
   } catch (tl::Exception &ex) {
     EXPECT_EQ (std::string (ex.msg (), 0, 30) == std::string ("uninitialized constant Quatsch") ||
                std::string (ex.msg (), 0, 38) == std::string ("uninitialized constant Object::Quatsch"),
@@ -62,10 +64,10 @@ TEST (1)
 
   EXPECT_EQ (err, true);
 
-  std::string fn (ut::testsrc ());
+  std::string fn (tl::testsrc ());
   fn += "/testdata/ruby/basic.rb";
   try {
-    ut::ruby_interpreter ()->load_file (fn.c_str ());
+    rba::RubyInterpreter::instance ()->load_file (fn.c_str ());
     gsi_test::E::reset_inst ();
   } catch (tl::ExitException &ex) {
     gsi_test::E::reset_inst ();
@@ -76,12 +78,14 @@ TEST (1)
   }
 }
 
-void run_rubytest (ut::TestBase * /*_this*/, const std::string &fn)
+void run_rubytest (tl::TestBase * /*_this*/, const std::string &fn)
 {
-  std::string fp (ut::testsrc ());
+  tl_assert (rba::RubyInterpreter::instance ());
+
+  std::string fp (tl::testsrc ());
   fp += "/testdata/ruby/";
   fp += fn;
-  ut::ruby_interpreter ()->load_file (fp.c_str ());
+  rba::RubyInterpreter::instance ()->load_file (fp.c_str ());
 }
 
 #define RUBYTEST(n, file) \

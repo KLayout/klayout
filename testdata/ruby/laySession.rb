@@ -89,13 +89,13 @@ class LAYSession_TestClass < TestBase
     assert_equal(2, mw.views);
 
     cv = mw.current_view
-    assert_equal( cv.title, "t11.gds" )
+    assert_equal( cv.title, "t11.gds [TOPTOP]" )
     assert_equal( lnodes_str( "", cv.begin_layers ), "*/*@*\n  1/0@1\n" )
 
     mw.select_view(1)
 
     cv = mw.current_view
-    assert_equal( cv.title, "t10.gds" )
+    assert_equal( cv.title, "t10.gds [RINGO]" )
     assert_equal( lnodes_str( "", cv.begin_layers ), "1/0@1\n2/0@1\n3/0@1\n3/1@1\n" )
 
   end

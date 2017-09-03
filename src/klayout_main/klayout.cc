@@ -40,7 +40,9 @@
 #include "libForceLink.h"
 #include "antForceLink.h"
 #include "imgForceLink.h"
+#ifdef HAVE_RUBY
 #include "drcForceLink.h"
+#endif
 
 #include <QTranslator>
 #include <QLocale>

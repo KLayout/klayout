@@ -49,7 +49,9 @@
 //  required to force linking of the "ext", "lib" and "drc" module
 #include "extForceLink.h"
 #include "libForceLink.h"
+#if defined(HAVE_RUBY)
 #include "drcForceLink.h"
+#endif
 
 static int main_cont (int argc, char **argv);
 

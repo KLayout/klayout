@@ -489,46 +489,109 @@ ClassBase::add_method (MethodBase *method, bool /*base_class*/)
   m_methods.add_method (method);
 }
 
+//  TODO: thread-safe? Unlikely that multiple threads access this member -
+//  we do a initial scan and after this no more write access here.
+static std::map<std::string, const ClassBase *> s_name_to_class;
+
+const ClassBase *class_by_name_no_assert (const std::string &name)
+{
+  if (s_name_to_class.empty ()) {
+
+    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+
+      if (c->declaration () != c.operator-> ()) {
+        continue;
+      }
+
+      if (!s_name_to_class.insert (std::make_pair (c->name (), c.operator-> ())).second) {
+        //  Duplicate registration of this class
+        tl::error << "Duplicate registration of class " << c->name ();
+        tl_assert (false);
+      }
+
+    }
+
+  }
+
+  std::map<std::string, const ClassBase *>::const_iterator c = s_name_to_class.find (name);
+  if (c != s_name_to_class.end ()) {
+    return c->second;
+  } else {
+    return 0;
+  }
+}
+
 const ClassBase *class_by_name (const std::string &name)
 {
-  for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-    if (c->declaration () == &*c && c->name () == name) {
-      return &*c;
-    }
-  }
-  //  No class with that name
-  tl_assert (false);
+  const ClassBase *cd = class_by_name_no_assert (name);
+  tl_assert (cd != 0);
+  return cd;
 }
 
 bool has_class (const std::string &name)
 {
-  for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-    if (c->declaration () == &*c && c->name () == name) {
-      return true;
-    }
+  return class_by_name (name) != 0;
+}
+
+namespace
+{
+
+struct type_info_compare
+{
+  bool operator() (const std::type_info *a, const std::type_info *b) const
+  {
+    return a->before (*b);
   }
-  return false;
+};
+
+}
+
+//  TODO: thread-safe? Unlikely that multiple threads access this member -
+//  we do a initial scan and after this no more write access here.
+static std::map<const std::type_info *, const ClassBase *, type_info_compare> s_ti_to_class;
+
+const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti)
+{
+  if (s_ti_to_class.empty ()) {
+
+    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+
+      if (c->declaration () != c.operator-> ()) {
+        continue;
+      }
+
+      const std::type_info *ti = c->adapted_type_info ();
+      if (! ti) {
+        ti = &c->type ();
+      }
+      if (ti && c->is_of_type (*ti) && !s_ti_to_class.insert (std::make_pair (ti, c.operator-> ())).second) {
+        //  Duplicate registration of this class
+        tl::error << "Duplicate registration of class " << c->name () << " (type " << ti->name () << ")";
+        tl_assert (false);
+      }
+
+    }
+
+  }
+
+  std::map<const std::type_info *, const ClassBase *, type_info_compare>::const_iterator c = s_ti_to_class.find (&ti);
+  if (c != s_ti_to_class.end ()) {
+    return c->second;
+  } else {
+    return 0;
+  }
 }
 
 const ClassBase *class_by_typeinfo (const std::type_info &ti)
 {
-  for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-    if (c->declaration () == &*c && c->is_of_type (ti)) {
-      return &*c;
-    }
-  }
-  //  No class with that type
-  tl_assert (false);
+  const ClassBase *cd = class_by_typeinfo_no_assert (ti);
+  tl_assert (cd != 0);
+  return cd;
 }
 
 bool has_class (const std::type_info &ti)
 {
-  for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-    if (c->declaration () == &*c && c->is_of_type (ti)) {
-      return true;
-    }
-  }
-  return false;
+  return class_by_typeinfo_no_assert (ti) != 0;
 }
 
 }

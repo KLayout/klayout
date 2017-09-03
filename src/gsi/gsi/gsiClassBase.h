@@ -585,6 +585,14 @@ private:
 GSI_PUBLIC const ClassBase *class_by_name (const std::string &name);
 
 /**
+ *  @brief Accessor to a declaration through name
+ *
+ *  This version won't assert when there is no such class and
+ *  return 0 instead.
+ */
+GSI_PUBLIC const ClassBase *class_by_name_no_assert (const std::string &name);
+
+/**
  *  @brief Returns true if there is a class with the given name
  */
 GSI_PUBLIC bool has_class (const std::string &name);
@@ -593,6 +601,14 @@ GSI_PUBLIC bool has_class (const std::string &name);
  *  @brief Find a class declaration through the type info 
  */
 GSI_PUBLIC const ClassBase *class_by_typeinfo (const std::type_info &ti);
+
+/**
+ *  @brief Find a class declaration through the type info
+ *
+ *  This version won't assert when there is no such class and
+ *  return 0 instead.
+ */
+GSI_PUBLIC const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti);
 
 /**
  *  @brief Returns true if there is a class with the given type info

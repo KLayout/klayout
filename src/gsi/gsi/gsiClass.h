@@ -1018,13 +1018,7 @@ const ClassBase *cls_decl ()
   //  piece of code at the same time and they interfere when storing the results.
   static const ClassBase *cd = 0;
   if (! cd) {
-    for (ClassBase::class_iterator c = ClassBase::begin_classes (); c != ClassBase::end_classes (); ++c) {
-      if (c->declaration () == &*c && c->is_of_type (typeid (X))) {
-        //  assert: duplicate declaration objects for that class
-        tl_assert (cd == 0);
-        cd = &*c;
-      }
-    }
+    cd = class_by_typeinfo_no_assert (typeid (X));
     if (!cd) {
       cd = fallback_cls_decl (typeid (X));
     }

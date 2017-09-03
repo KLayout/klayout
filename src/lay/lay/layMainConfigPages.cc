@@ -420,6 +420,10 @@ KeyBindingsConfigPage::reset_clicked ()
 void 
 KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::string> > &key_bindings)
 {
+  //  build the path to item table and the alias table
+  m_item_for_path.clear ();
+  m_paths_for_action.clear ();
+
   //  get the current bindings
   m_current_bindings.clear ();
   fill_paths (*lay::MainWindow::instance ()->menu (), std::string (), m_current_bindings);
@@ -463,10 +467,15 @@ KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::stri
 
       if (t->first == tl_menu) {
         QTreeWidgetItem *item = new QTreeWidgetItem (top_level_item);
+        lay::Action action = lay::MainWindow::instance ()->menu ()->action (cb->first);
         item->setData (0, Qt::DisplayRole, tl::to_qstring (rem_path));
-        item->setData (1, Qt::DisplayRole, tl::to_qstring (lay::MainWindow::instance ()->menu ()->action (cb->first).get_title ()));
+        item->setData (1, Qt::DisplayRole, tl::to_qstring (action.get_title ()));
         item->setData (2, Qt::DisplayRole, tl::to_qstring (cb->second));
         item->setData (0, Qt::UserRole, tl::to_qstring (path));
+        m_item_for_path[path] = item;
+        if (action.qaction ()) {
+          m_paths_for_action[action.qaction ()].push_back (path);
+        }
       }
     }
 
@@ -534,6 +543,22 @@ KeyBindingsConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetIte
     std::string shortcut = tl::to_string (previous->data (2, Qt::DisplayRole).toString ());
 
     m_current_bindings[path] = shortcut;
+
+    //  Set the aliases too
+    const lay::AbstractMenu &menu = *lay::MainWindow::instance ()->menu ();
+    if (menu.is_valid (path)) {
+      QAction *qaction = menu.action (path).qaction ();
+      std::map<QAction *, std::vector<std::string> >::const_iterator a = m_paths_for_action.find (qaction);
+      if (a != m_paths_for_action.end ()) {
+        for (std::vector<std::string>::const_iterator p = a->second.begin (); p != a->second.end (); ++p) {
+          m_current_bindings[*p] = shortcut;
+          std::map<std::string, QTreeWidgetItem *>::const_iterator i = m_item_for_path.find (*p);
+          if (i != m_item_for_path.end ()) {
+            i->second->setData (2, Qt::DisplayRole, tl::to_qstring (shortcut));
+          }
+        }
+      }
+    }
 
   }
 

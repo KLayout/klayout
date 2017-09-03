@@ -43,6 +43,7 @@ namespace Ui {
 }
 
 class QTreeWidgetItem;
+class QAction;
 
 namespace lay
 {
@@ -192,6 +193,8 @@ public slots:
 private:
   Ui::KeyBindingsConfigPage *mp_ui;
   std::map<std::string, std::string> m_current_bindings;
+  std::map<std::string, QTreeWidgetItem *> m_item_for_path;
+  std::map<QAction *, std::vector<std::string> > m_paths_for_action;
   bool m_enable_event;
   static std::vector<std::pair<std::string, std::string> > m_default_bindings;
 

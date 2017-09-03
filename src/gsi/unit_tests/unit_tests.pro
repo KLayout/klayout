@@ -8,9 +8,13 @@ include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
   gsiExpression.cc \
+  gsiTest.cc \
 
-INCLUDEPATH += $$TL_INC $$GSI_INC $$GSI_TEST_INC $$DB_INC
-DEPENDPATH += $$TL_INC $$GSI_INC $$GSI_TEST_INC $$DB_INC
+HEADERS += \
+  gsiTest.h \
 
-LIBS += -L$$DESTDIR_UT -lklayout_tl -lklayout_gsi -lgsi_test -lklayout_db
+INCLUDEPATH += $$TL_INC $$GSI_INC
+DEPENDPATH += $$TL_INC $$GSI_INC
+
+LIBS += -L$$DESTDIR_UT -lklayout_tl -lklayout_gsi
 

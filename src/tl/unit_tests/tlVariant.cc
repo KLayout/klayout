@@ -27,10 +27,8 @@
 #include "tlObject.h"
 #include "tlTypeTraits.h"
 #include "tlUnitTest.h"
-#include "gsiDecl.h"
-#include "dbBox.h"
-#include "dbLayerProperties.h"
 #include <cstdio>
+#include <memory>
 
 struct A 
 {
@@ -793,89 +791,6 @@ TEST(2)
 }
 
 TEST(3)
-{
-  tl::Variant v;
-  v = tl::Variant::make_variant (db::Box (db::Point (0, 10), db::Point (20, 30)));
-  EXPECT_EQ (v.is_user<db::Box> (), true)
-  EXPECT_EQ (v.to_parsable_string (), "[box:(0,10;20,30)]");
-
-  std::string s = v.to_parsable_string () + "," + tl::Variant (15.0).to_parsable_string ();
-  tl::Variant vv;
-  tl::Extractor ex (s.c_str ());
-  ex.read (vv);
-  ex.test (",");
-  ex.read (v);
-  EXPECT_EQ (vv.is_user<db::Box> (), true)
-  EXPECT_EQ (vv.to_parsable_string (), "[box:(0,10;20,30)]");
-  EXPECT_EQ ((int)v.type_code (), (int)tl::Variant::t_double);
-  EXPECT_EQ (std::string(v.to_string()), "15");
-}
-
-TEST(4)
-{
-  //  backward compatibility check
-  std::string s = "[box:(0,10;20,30)],##15";
-  tl::Variant vv;
-  tl::Variant v;
-  tl::Extractor ex (s.c_str ());
-  ex.read (vv);
-  ex.test (",");
-  ex.read (v);
-  EXPECT_EQ (vv.is_user<db::Box> (), true)
-  EXPECT_EQ (vv.to_parsable_string (), "[box:(0,10;20,30)]");
-  EXPECT_EQ ((int)v.type_code (), (int)tl::Variant::t_double);
-  EXPECT_EQ (std::string(v.to_string()), "15");
-}
-
-TEST(5)
-{
-  //  backward compatibility check
-  std::string s = "[Box:(0,10;20,30)],##15";
-  tl::Variant vv;
-  tl::Variant v;
-  tl::Extractor ex (s.c_str ());
-  ex.read (vv);
-  ex.test (",");
-  ex.read (v);
-  EXPECT_EQ (vv.is_user<db::Box> (), true)
-  EXPECT_EQ (vv.to_parsable_string (), "[box:(0,10;20,30)]");
-  EXPECT_EQ ((int)v.type_code (), (int)tl::Variant::t_double);
-  EXPECT_EQ (std::string(v.to_string()), "15");
-}
-
-TEST(6)
-{
-  //  backward compatibility check
-  std::string s = "[layer:1/0],##15";
-  tl::Variant vv;
-  tl::Variant v;
-  tl::Extractor ex (s.c_str ());
-  ex.read (vv);
-  ex.test (",");
-  ex.read (v);
-  EXPECT_EQ (vv.is_user<db::LayerProperties> (), true)
-  EXPECT_EQ (vv.to_parsable_string (), "[layer:1/0]");
-  EXPECT_EQ ((int)v.type_code (), (int)tl::Variant::t_double);
-  EXPECT_EQ (std::string(v.to_string()), "15");
-}
-
-TEST(7)
-{
-  //  backward compatibility check
-  std::string s = "[LayerInfo:1/0],##15";
-  tl::Variant vv;
-  tl::Variant v;
-  tl::Extractor ex (s.c_str ());
-  ex.read (vv);
-  ex.test (",");
-  ex.read (v);
-  EXPECT_EQ (vv.is_user<db::LayerProperties> (), true)
-  EXPECT_EQ (vv.to_parsable_string (), "[layer:1/0]");
-  EXPECT_EQ ((int)v.type_code (), (int)tl::Variant::t_double);
-  EXPECT_EQ (std::string(v.to_string()), "15");
-}
-
-TEST(8)
 {
   std::string s = "'1',#1";
   tl::Variant v1;

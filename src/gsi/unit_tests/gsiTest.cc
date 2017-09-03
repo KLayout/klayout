@@ -1050,7 +1050,8 @@ static gsi::Class<E> decl_e ("E",
   gsi::method ("x=", &E::set_x) +
   gsi::method ("x", &E::get_x) +
   gsi::method ("bindme", &E::bindme) +
-  gsi::method ("inst_count", &E::inst_count) 
+  gsi::method ("inst_count", &E::inst_count) +
+  gsi::method ("reset_inst", &E::reset_inst)
 );
 
 static gsi::Class<F> decl_f ("F",

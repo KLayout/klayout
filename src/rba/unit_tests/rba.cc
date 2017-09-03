@@ -24,7 +24,7 @@
 #ifdef HAVE_RUBY
 
 #include "rba.h"
-#include "gsiTest.h"
+#include "gsiDecl.h"
 
 // On Windows, ruby.h is not compatible with windows.h which is included by utHead - at least not if 
 // windows.h is included before ruby.h ...
@@ -68,12 +68,12 @@ TEST (1)
   fn += "/testdata/ruby/basic.rb";
   try {
     rba::RubyInterpreter::instance ()->load_file (fn.c_str ());
-    gsi_test::E::reset_inst ();
+    rba::RubyInterpreter::instance ()->eval_string ("RBA::E.reset_inst");
   } catch (tl::ExitException &ex) {
-    gsi_test::E::reset_inst ();
+    rba::RubyInterpreter::instance ()->eval_string ("RBA::E.reset_inst");
     EXPECT_EQ (ex.status (), 0);
   } catch (...) {
-    gsi_test::E::reset_inst ();
+    rba::RubyInterpreter::instance ()->eval_string ("RBA::E.reset_inst");
     throw;
   }
 }

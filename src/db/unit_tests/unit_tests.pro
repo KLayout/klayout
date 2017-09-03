@@ -18,6 +18,7 @@ SOURCES = \
   dbCIFReader.cc \
   dbClip.cc \
   dbDXFReader.cc \
+  dbExpression.cc \
   dbEdge.cc \
   dbEdgePair.cc \
   dbEdgePairRelations.cc \

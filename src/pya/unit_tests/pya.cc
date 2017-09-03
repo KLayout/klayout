@@ -24,7 +24,7 @@
 #ifdef HAVE_PYTHON
 
 #include "pya.h"
-#include "gsiTest.h"
+#include "gsiDecl.h"
 
 #include "tlUnitTest.h"
 
@@ -67,12 +67,12 @@ TEST (1)
   fn += "/testdata/python/basic.py";
   try {
     pya::PythonInterpreter::instance ()->load_file (fn.c_str ());
-    gsi_test::E::reset_inst ();
+    pya::PythonInterpreter::instance ()->eval_string ("pya.E.reset_inst()");
   } catch (tl::ExitException &ex) {
-    gsi_test::E::reset_inst ();
+    pya::PythonInterpreter::instance ()->eval_string ("pya.E.reset_inst()");
     EXPECT_EQ (ex.status (), 0);
   } catch (...) {
-    gsi_test::E::reset_inst ();
+    pya::PythonInterpreter::instance ()->eval_string ("pya.E.reset_inst()");
     throw;
   }
 }

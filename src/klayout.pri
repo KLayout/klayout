@@ -15,9 +15,6 @@ LAYBASIC_INC = $$PWD/laybasic/laybasic
 
 GSIQT_INC = $$PWD/gsiqt
 
-GSI_TEST_INC = $$PWD/gsi/gsi_test
-UT_INC = $$PWD/ut
-
 BD_INC = $$PWD/buddies/src/bd
 
 VERSION_INC = $$PWD/version

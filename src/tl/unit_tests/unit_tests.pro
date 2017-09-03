@@ -33,12 +33,8 @@ SOURCES = \
   tlWebDAV.cc \
   tlXMLParser.cc \
 
-INCLUDEPATH += $$TL_INC $$GSI_INC
-DEPENDPATH += $$TL_INC $$GSI_INC
+INCLUDEPATH += $$TL_INC
+DEPENDPATH += $$TL_INC
 
-# because of db types support in ut:
-INCLUDEPATH += $$DB_INC
-DEPENDPATH += $$DB_INC
-
-LIBS += -L$$DESTDIR_UT -lklayout_db -lklayout_tl -lklayout_gsi
+LIBS += -L$$DESTDIR_UT -lklayout_tl
 

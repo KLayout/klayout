@@ -9,8 +9,8 @@ include($$PWD/../../lib_ut.pri)
 SOURCES = \
   pya.cc
 
-INCLUDEPATH += $$GSI_TEST_INC $$PYA_INC $$DB_INC $$TL_INC $$GSI_INC
-DEPENDPATH += $$GSI_TEST_INC $$PYA_INC $$DB_INC $$TL_INC $$GSI_INC
+INCLUDEPATH += $$PYA_INC $$DB_INC $$TL_INC $$GSI_INC
+DEPENDPATH += $$PYA_INC $$DB_INC $$TL_INC $$GSI_INC
 
-LIBS += -L$$DESTDIR_UT -lgsi_test -lklayout_db -lklayout_tl -lklayout_gsi
+LIBS += -L$$DESTDIR_UT -lklayout_db -lklayout_tl -lklayout_gsi
 

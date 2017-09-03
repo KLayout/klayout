@@ -24,10 +24,6 @@
 #include "tlExpression.h"
 #include "tlVariantUserClasses.h"
 #include "tlUnitTest.h"
-#include "dbBox.h"
-#include "dbEdge.h"
-#include "dbLayout.h"
-#include "dbLayoutContextHandler.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -317,6 +313,134 @@ TEST(1)
   EXPECT_EQ (v.to_string (), std::string ("aaaa"));
 }
 
+class Point
+{
+public:
+  Point () : m_x (0), m_y (0) { }
+
+  Point (int x, int y) : m_x (x), m_y (y) { }
+
+  int x () const { return m_x; }
+  int y () const { return m_y; }
+
+  std::string
+  to_string () const
+  {
+    return tl::db_to_string (m_x) + "," + tl::db_to_string (m_y);
+  }
+
+private:
+  int m_x, m_y;
+};
+
+class Box
+{
+public:
+  Box (int x1, int y1, int x2, int y2)
+    : m_p1 (x1 < x2 ? x1 : x2, y1 < y2 ? y1 : y2),
+      m_p2 (x2 > x1 ? x2 : x1, y2 > y1 ? y2 : y1)
+  {
+    //  .. nothing else ..
+  }
+
+  Box ()
+    : m_p1 (1, 1), m_p2 (-1, -1)
+  {
+    //  .. nothing else ..
+  }
+
+  inline Box &operator&= (const Box &b)
+  {
+    if (b.empty ()) {
+      *this = Box ();
+    } else if (! empty ()) {
+      Point p1 (m_p1.x () > b.m_p1.x () ? m_p1.x () : b.m_p1.x (),
+                m_p1.y () > b.m_p1.y () ? m_p1.y () : b.m_p1.y ());
+      Point p2 (m_p2.x () < b.m_p2.x () ? m_p2.x () : b.m_p2.x (),
+                m_p2.y () < b.m_p2.y () ? m_p2.y () : b.m_p2.y ());
+      m_p1 = p1;
+      m_p2 = p2;
+    }
+    return *this;
+  }
+
+  Box operator& (const Box &b) const
+  {
+    Box r (*this);
+    r &= b;
+    return r;
+  }
+
+  int width () const
+  {
+    return m_p2.x () - m_p1.x ();
+  }
+
+  int height () const
+  {
+    return m_p2.y () - m_p1.y ();
+  }
+
+  bool empty () const
+  {
+    return m_p1.x () > m_p2.x ();
+  }
+
+  std::string to_string () const
+  {
+    if (empty ()) {
+      return "()";
+    } else {
+      return "(" + m_p1.to_string () + ";" + m_p2.to_string () + ")";
+    }
+  }
+
+private:
+  Point m_p1, m_p2;
+};
+
+class Edge
+{
+public:
+  Edge ()
+    : m_p1 (0, 0), m_p2 (0, 0)
+  {
+    //  .. nothing else ..
+  }
+
+  Edge (int x1, int y1, int x2, int y2)
+    : m_p1 (x1, y1), m_p2 (x2, y2)
+  {
+    //  .. nothing else ..
+  }
+
+  Edge operator* (double s) const
+  {
+    return Edge (int (floor (m_p1.x () * s + 0.5)),
+                 int (floor (m_p1.y () * s + 0.5)),
+                 int (floor (m_p2.x () * s + 0.5)),
+                 int (floor (m_p2.y () * s + 0.5)));
+  }
+
+  int dx () const
+  {
+    return m_p2.x () - m_p1.x ();
+  }
+
+  int dy () const
+  {
+    return m_p2.y () - m_p1.y ();
+  }
+
+  std::string to_string () const
+  {
+    return "(" + m_p1.to_string () + ";" + m_p2.to_string () + ")";
+  }
+
+private:
+  Point m_p1, m_p2;
+};
+
 class BoxClassClass : public tl::VariantUserClassBase, private tl::EvalClass
 {
 public:
@@ -342,7 +466,7 @@ public:
 
 BoxClassClass BoxClassClass::instance;
 
-class BoxClass : public tl::VariantUserClassImpl<db::Box>, private tl::EvalClass
+class BoxClass : public tl::VariantUserClassImpl<Box>, private tl::EvalClass
 {
 public:
   virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const;
@@ -356,14 +480,14 @@ BoxClass BoxClass::instance;
 void BoxClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const 
 {
   if (method == "width") {
-    out = object.to_user<db::Box> ().width ();
+    out = object.to_user<Box> ().width ();
   } else if (method == "height") {
-    out = object.to_user<db::Box> ().height ();
+    out = object.to_user<Box> ().height ();
   } else if (method == "&") {
     tl_assert (args.size () == 1);
-    out = tl::Variant (new db::Box (object.to_user<db::Box> () & args[0].to_user<db::Box> ()), &BoxClass::instance, true);
+    out = tl::Variant (new Box (object.to_user<Box> () & args[0].to_user<Box> ()), &BoxClass::instance, true);
   } else if (method == "to_s") {
-    out = object.to_user<db::Box> ().to_string ();
+    out = object.to_user<Box> ().to_string ();
   } else if (method == "is_box") {
     out = true;
   } else if (method == "is_edge") {
@@ -376,7 +500,7 @@ void BoxClass::execute (const tl::ExpressionParserContext &context, tl::Variant 
 void BoxClassClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant & /*object*/, const std::string &method, const std::vector<tl::Variant> &args) const 
 {
   if (method == "new") {
-    out = tl::Variant (new db::Box (args[0].to_long(), args[1].to_long(), args[2].to_long(), args[3].to_long()), &BoxClass::instance, true);
+    out = tl::Variant (new Box (args[0].to_long(), args[1].to_long(), args[2].to_long(), args[3].to_long()), &BoxClass::instance, true);
   } else {
     throw tl::NoMethodError("Box", method, context);
   }
@@ -407,23 +531,23 @@ public:
 
 EdgeClassClass EdgeClassClass::instance;
 
-class EdgeClass : public tl::VariantUserClassImpl<db::Edge>,  private tl::EvalClass
+class EdgeClass : public tl::VariantUserClassImpl<Edge>,  private tl::EvalClass
 {
 public:
   virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const 
   {
     if (method == "dx") {
-      out = object.to_user<db::Edge> ().dx ();
+      out = object.to_user<Edge> ().dx ();
     } else if (method == "dy") {
-      out = object.to_user<db::Edge> ().dy ();
+      out = object.to_user<Edge> ().dy ();
     } else if (method == "to_s") {
-      out = object.to_user<db::Edge> ().to_string ();
+      out = object.to_user<Edge> ().to_string ();
     } else if (method == "is_box") {
       out = false;
     } else if (method == "is_edge") {
       out = true;
     } else if (method == "*") {
-      out.set_user (new db::Edge (object.to_user<db::Edge> () * args [0].to_double ()), object.user_cls (), true);
+      out.set_user (new Edge (object.to_user<Edge> () * args [0].to_double ()), object.user_cls (), true);
     } else {
       throw tl::NoMethodError("Edge", method, context);
     }
@@ -438,10 +562,29 @@ void
 EdgeClassClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant & /*object*/, const std::string &method, const std::vector<tl::Variant> &args) const 
 {
   if (method == "new") {
-    out = tl::Variant (new db::Edge (args[0].to_long(), args[1].to_long(), args[2].to_long(), args[3].to_long()), &EdgeClass::instance, true);
+    out = tl::Variant (new Edge (args[0].to_long(), args[1].to_long(), args[2].to_long(), args[3].to_long()), &EdgeClass::instance, true);
   } else {
     throw tl::NoMethodError("Edge", method, context);
   }
+}
+
+namespace tl
+{
+
+template <>
+struct type_traits <Box> : public type_traits<void>
+{
+  typedef trivial_relocate_required relocate_requirements;
+  typedef true_tag supports_to_string;
+};
+
+template <>
+struct type_traits <Edge> : public type_traits<void>
+{
+  typedef trivial_relocate_required relocate_requirements;
+  typedef true_tag supports_to_string;
+};
+
 }
 
 // basics: custom objects
@@ -450,10 +593,10 @@ TEST(1b)
   tl::Eval e;
   tl::Variant v;
 
-  e.set_var ("XBox", tl::Variant ((db::Box *) 0, &BoxClassClass::instance, false));
-  e.set_var ("XEdge", tl::Variant ((db::Edge *) 0, &EdgeClassClass::instance, false));
-  e.set_var ("b", tl::Variant (new db::Box (0, 10, 20, 40), &BoxClass::instance, true));
-  e.set_var ("e", tl::Variant (new db::Edge (0, 10, 20, 40), &EdgeClass::instance, true));
+  e.set_var ("XBox", tl::Variant ((Box *) 0, &BoxClassClass::instance, false));
+  e.set_var ("XEdge", tl::Variant ((Edge *) 0, &EdgeClassClass::instance, false));
+  e.set_var ("b", tl::Variant (new Box (0, 10, 20, 40), &BoxClass::instance, true));
+  e.set_var ("e", tl::Variant (new Edge (0, 10, 20, 40), &EdgeClass::instance, true));
 
   v = e.parse ("b.width").execute ();
   EXPECT_EQ (v.to_string (), std::string ("20"));
@@ -1012,101 +1155,6 @@ TEST(16)
   EXPECT_EQ (v.to_string (), std::string ("false"));
   v = e.parse ("'abc' !~ 'b*'").execute ();
   EXPECT_EQ (v.to_string (), std::string ("true"));
-}
-
-// ref layout
-TEST(17) 
-{
-  db::Layout l;
-  l.dbu (0.05);
-  l.insert_layer (db::LayerProperties (1, 15));
-  l.insert_layer (db::LayerProperties ("name"));
-  l.add_cell ("c1");
-  l.add_cell ("c2");
-
-  tl::Eval e, ee;
-  db::LayoutContextHandler ctx (&l);
-  e.set_ctx_handler (&ctx);
-  tl::Variant v;
-
-  bool error = false;
-
-  v = e.parse ("1um").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("20"));
-  v = e.parse ("1um2").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("400"));
-  v = e.parse ("1micron").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("20"));
-  v = e.parse ("1micron2").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("400"));
-  v = e.parse ("1mic").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("20"));
-  v = e.parse ("1mic2").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("400"));
-  v = e.parse ("1m").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("20000000"));
-  v = e.parse ("1m2/1e14").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("4"));
-  v = e.parse ("1mm").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("20000"));
-  v = e.parse ("1mm2").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("400000000"));
-  v = e.parse ("50nm").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1"));
-  v = e.parse ("<1/15>").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("0"));
-  v = e.parse ("<   name >").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1"));
-  v = e.parse ("<'n' + 'ame'>").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1"));
-  v = e.parse ("<<c1>>").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("0"));
-  v = e.parse ("<<  c2   >>").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1"));
-  v = e.parse ("<<'c' + '2'>>").execute ();
-  EXPECT_EQ (v.to_string (), std::string ("1"));
-
-  error = true;
-  try {
-    v = e.parse ("60nm").execute (); // not a multiple of DBU
-    error = false;
-  } catch (...) { }
-  EXPECT_EQ (error, true);
-
-  error = true;
-  try {
-    v = ee.parse ("1 um").execute ();
-    error = false;
-  } catch (...) { }
-  EXPECT_EQ (error, true);
-
-  error = true;
-  try {
-    v = e.parse ("<1/1>").execute ();
-    error = false;
-  } catch (...) { }
-  EXPECT_EQ (error, true);
-
-  error = true;
-  try {
-    v = ee.parse ("<1/15>").execute ();
-    error = false;
-  } catch (...) { }
-  EXPECT_EQ (error, true);
-
-  error = true;
-  try {
-    v = ee.parse ("<<c1>>").execute ();
-    error = false;
-  } catch (...) { }
-  EXPECT_EQ (error, true);
-
-  error = true;
-  try {
-    v = e.parse ("<<c3>>").execute ();
-    error = false;
-  } catch (...) { }
-  EXPECT_EQ (error, true);
 }
 
 // polymorphic functions

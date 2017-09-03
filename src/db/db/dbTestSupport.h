@@ -58,7 +58,7 @@ enum NormalizationMode
  *  @param tolerance A tolerance applied when comparing shapes in database units
  *  The layout is normalized by writing to a file and reading back
  */
-void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::string &au_file, NormalizationMode norm = WriteGDS2, db::Coord tolerance = 0);
+void DB_PUBLIC compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::string &au_file, NormalizationMode norm = WriteGDS2, db::Coord tolerance = 0);
 
 /**
  *  @brief Compares a layout with a golden layout file with layer mapping
@@ -70,7 +70,7 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
  *  @param tolerance A tolerance applied when comparing shapes in database units
  *  The layout is normalized by writing to a file and reading back
  */
-void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::string &au_file, const db::LayerMap &lmap, bool read_all_others, NormalizationMode norm = WriteGDS2, db::Coord tolerance = 0);
+void DB_PUBLIC compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::string &au_file, const db::LayerMap &lmap, bool read_all_others, NormalizationMode norm = WriteGDS2, db::Coord tolerance = 0);
 
 }
 

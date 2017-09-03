@@ -524,13 +524,16 @@ const ClassBase *class_by_name_no_assert (const std::string &name)
 const ClassBase *class_by_name (const std::string &name)
 {
   const ClassBase *cd = class_by_name_no_assert (name);
-  tl_assert (cd != 0);
+  if (! cd) {
+    tl::error << "No class with name " << name;
+    tl_assert (false);
+  }
   return cd;
 }
 
 bool has_class (const std::string &name)
 {
-  return class_by_name (name) != 0;
+  return class_by_name_no_assert (name) != 0;
 }
 
 namespace
@@ -585,7 +588,10 @@ const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti)
 const ClassBase *class_by_typeinfo (const std::type_info &ti)
 {
   const ClassBase *cd = class_by_typeinfo_no_assert (ti);
-  tl_assert (cd != 0);
+  if (! cd) {
+    tl::error << "No class with type " << ti.name ();
+    tl_assert (false);
+  }
   return cd;
 }
 

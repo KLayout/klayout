@@ -20,9 +20,9 @@ SUBDIRS = \
   lib \
   plugins \
   buddies \
-  drc \
 
 LANG_DEPENDS =
+MAIN_DEPENDS =
 
 equals(HAVE_RUBY, "1") {
   SUBDIRS += rba
@@ -51,7 +51,12 @@ laybasic.depends += rdb
 ant.depends += laybasic
 img.depends += laybasic
 edt.depends += laybasic
-drc.depends += rdb lym
+
+equals(HAVE_RUBY, "1") {
+  SUBDIRS += drc
+  MAIN_DEPENDS += drc
+  drc.depends += rdb lym
+}
 
 lym.depends += gsi $$LANG_DEPENDS
 lay.depends += laybasic ant img edt lym
@@ -67,8 +72,8 @@ equals(HAVE_QTBINDINGS, "1") {
 
 plugins.depends += lay ext lib
 
-klayout_main.depends += plugins drc
-unit_tests.depends += plugins drc
+klayout_main.depends += plugins $$MAIN_DEPENDS
+unit_tests.depends += plugins $$MAIN_DEPENDS
 
 RESOURCES += \
     laybasic/layResources.qrc \

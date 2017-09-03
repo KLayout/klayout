@@ -108,6 +108,7 @@ private:
   bool m_allow_multi_xy_records;
   unsigned int m_box_mode;
   std::map <tl::string, std::vector<std::string> > m_context_info;
+  std::vector <db::Point> m_all_points;
 
   void read_context_info_cell ();
   void read_boundary (db::Layout &layout, db::Cell &cell, bool from_box_record);

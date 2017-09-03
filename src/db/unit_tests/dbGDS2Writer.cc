@@ -1007,4 +1007,123 @@ TEST(115)
   EXPECT_EQ (std::string (os.string ()), std::string (expected))
 }
 
+TEST(116)
+{
+  //  big paths with multi-xy
 
+  db::Manager m;
+  db::Layout g (&m);
+
+  db::LayerProperties lp1;
+  lp1.layer = 1;
+  lp1.datatype = 0;
+
+  g.insert_layer (0, lp1);
+
+  db::Cell &c1 (g.cell (g.add_cell ("TOP")));
+
+  db::Path path;
+  path.width (100);
+  std::vector<db::Point> pts;
+  for (int i = 0; i < 10000; ++i) {
+    pts.push_back (db::Point (i * 10, (i % 10) * 1000));
+  }
+  path.assign (pts.begin (), pts.end ());
+  c1.shapes (0).insert (path);
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_116.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    db::GDS2WriterOptions gds2_options;
+    gds2_options.multi_xy_records = true;
+    options.set_format ("GDS2");
+    options.set_options (gds2_options);
+    db::Writer writer (options);
+    writer.write (g, out);
+  }
+
+  db::Layout gg;
+
+  {
+    db::LoadLayoutOptions options;
+    db::GDS2ReaderOptions gds2_options;
+    gds2_options.allow_multi_xy_records = true;
+    options.set_options (gds2_options);
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (gg);
+  }
+
+  EXPECT_EQ (gg.cell_by_name ("TOP").first, true);
+  const db::Cell &cc1 (gg.cell (gg.cell_by_name ("TOP").second));
+
+  EXPECT_EQ (gg.get_properties (0) == lp1, true);
+  EXPECT_EQ (cc1.shapes (0).size (), size_t (1));
+
+  db::Shape s1 = *cc1.shapes (0).begin (db::ShapeIterator::All);
+  db::Path pp;
+  s1.path (pp);
+  EXPECT_EQ (pp == path, true);
+}
+
+TEST(117)
+{
+  //  big polygons with multi-xy
+
+  db::Manager m;
+  db::Layout g (&m);
+
+  db::LayerProperties lp1;
+  lp1.layer = 1;
+  lp1.datatype = 0;
+
+  g.insert_layer (0, lp1);
+
+  db::Cell &c1 (g.cell (g.add_cell ("TOP")));
+
+  db::Polygon poly;
+  std::vector<db::Point> pts;
+  for (int i = 0; i < 10000; ++i) {
+    pts.push_back (db::Point (i * 10, (i % 10) * 1000));
+  }
+  poly.assign_hull (pts.begin (), pts.end ());
+  c1.shapes (0).insert (poly);
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_117.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    db::GDS2WriterOptions gds2_options;
+    gds2_options.multi_xy_records = true;
+    options.set_format ("GDS2");
+    options.set_options (gds2_options);
+    db::Writer writer (options);
+    writer.write (g, out);
+  }
+
+  db::Layout gg;
+
+  {
+    db::LoadLayoutOptions options;
+    db::GDS2ReaderOptions gds2_options;
+    gds2_options.allow_multi_xy_records = true;
+    options.set_options (gds2_options);
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (gg);
+  }
+
+  EXPECT_EQ (gg.cell_by_name ("TOP").first, true);
+  const db::Cell &cc1 (gg.cell (gg.cell_by_name ("TOP").second));
+
+  EXPECT_EQ (gg.get_properties (0) == lp1, true);
+  EXPECT_EQ (cc1.shapes (0).size (), size_t (1));
+
+  db::Shape s1 = *cc1.shapes (0).begin (db::ShapeIterator::All);
+  db::Polygon pp;
+  s1.polygon (pp);
+  EXPECT_EQ (pp == poly, true);
+}

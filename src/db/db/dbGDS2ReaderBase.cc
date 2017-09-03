@@ -604,13 +604,13 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
       //  Try to detect Multi-XY records. A good indication may be a huge point count.
       if (xy_length > 2000) {
 
-        std::vector<db::Point> all_points;
-        all_points.reserve (xy_length * 2); // allocate some (hopefully enough) elements
+        m_all_points.clear ();
+        m_all_points.reserve (xy_length * 2); // allocate some (hopefully enough) elements
 
         while (true) {
 
           for (GDS2XY *xy = xy_data; xy < xy_data + xy_length; ++xy) {
-            all_points.push_back (pt_conv (*xy));
+            m_all_points.push_back (pt_conv (*xy));
           }
 
           if ((rec_id = get_record ()) == sXY) {
@@ -626,11 +626,11 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
         } 
 
         //  remove redundant start and endpoint
-        if (! all_points.empty () && all_points.back () == all_points.front ()) {
-          all_points.pop_back ();
+        if (! m_all_points.empty () && m_all_points.back () == m_all_points.front ()) {
+          m_all_points.pop_back ();
         }
 
-        poly.assign_hull (all_points.begin (), all_points.end (), false /*no compression*/);
+        poly.assign_hull (m_all_points.begin (), m_all_points.end (), false /*no compression*/);
 
       } else {
 
@@ -662,6 +662,9 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
 
     while ((rec_id = get_record ()) == sXY) { 
       // read over multi-XY records
+      if (! m_allow_multi_xy_records) {
+        error (tl::to_string (QObject::tr ("Multiple XY records detected on BOUNDARY element (reader is configured not to allow this)")));
+      }
     }
     unget_record (rec_id);
 
@@ -740,9 +743,39 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
 
     //  this will copy the path:
     db::Path path;
+
+    //  Try to detect Multi-XY records. A good indication may be a huge point count.
+    if (xy_length > 2000) {
+
+      m_all_points.clear ();
+      m_all_points.reserve (xy_length * 2); // allocate some (hopefully enough) elements
+
+      while (true) {
+
+        for (GDS2XY *xy = xy_data; xy < xy_data + xy_length; ++xy) {
+          m_all_points.push_back (pt_conv (*xy));
+        }
+
+        if ((rec_id = get_record ()) == sXY) {
+          xy_data = get_xy_data (xy_length);
+          if (! m_allow_multi_xy_records) {
+            error (tl::to_string (QObject::tr ("Multiple XY records detected on PATH element (reader is configured not to allow this)")));
+          }
+        } else {
+          unget_record (rec_id);
+          break;
+        }
+
+      }
+
+      path.assign (m_all_points.begin (), m_all_points.end ());
+
+    } else {
+      path.assign (xy_data, xy_data + xy_length, pt_conv);
+    }
+
     path.width (w);
     path.extensions (bgn_ext, end_ext);
-    path.assign (xy_data, xy_data + xy_length, pt_conv);
     path.round (type == 1);
 
     if (path.points () < 1) {
@@ -761,7 +794,17 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
     }
 
   } else {
+
+    while ((rec_id = get_record ()) == sXY) {
+      // read over multi-XY records
+      if (! m_allow_multi_xy_records) {
+        error (tl::to_string (QObject::tr ("Multiple XY records detected on PATH element (reader is configured not to allow this)")));
+      }
+    }
+    unget_record (rec_id);
+
     finish_element ();
+
   }
 }
 

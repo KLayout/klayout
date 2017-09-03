@@ -313,7 +313,7 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
                 shape->polygon (poly);
                 write_polygon (layer, datatype, sf, poly, multi_xy, max_vertex_count, layout, shape->prop_id (), false);
               } else {
-                write_path (layer, datatype, sf, *shape, layout, shape->prop_id ());
+                write_path (layer, datatype, sf, *shape, multi_xy, layout, shape->prop_id ());
               }
             } else if (shape->is_box ()) {
               write_box (layer, datatype, sf, *shape, layout, shape->prop_id ());
@@ -499,7 +499,7 @@ GDS2WriterBase::write_box (int layer, int datatype, double sf, const db::Shape &
 }
 
 void
-GDS2WriterBase::write_path (int layer, int datatype, double sf, const db::Shape &shape, const db::Layout &layout, db::properties_id_type prop_id)
+GDS2WriterBase::write_path (int layer, int datatype, double sf, const db::Shape &shape, bool multi_xy, const db::Layout &layout, db::properties_id_type prop_id)
 {
   //  instantiate the path and draw
   db::Path path;
@@ -549,11 +549,28 @@ GDS2WriterBase::write_path (int layer, int datatype, double sf, const db::Shape 
 
   }
 
-  write_record_size (4 + int16_t (path.points ()) * 2 * 4);
-  write_record (sXY);
-  for (db::Path::iterator p = path.begin (); p != path.end (); ++p) {
-    write_int (scale (sf, (*p).x ()));
-    write_int (scale (sf, (*p).y ()));
+  size_t n = path.points ();
+
+  db::Path::iterator p = path.begin ();
+  while (n > 0) {
+
+    //  determine number of points to write (all or slice for multi XY mode)
+    size_t nxy = n;
+    if (n > 8100 && multi_xy) {
+      nxy = 8000;
+    }
+
+    write_record_size (4 + int16_t (nxy) * 2 * 4);
+    write_record (sXY);
+
+    //  write path ..
+    for ( ; p != path.end () && nxy > 0; ++p) {
+      write_int (scale (sf, (*p).x ()));
+      write_int (scale (sf, (*p).y ()));
+      --nxy;
+      --n;
+    }
+
   }
 
   finish (layout, prop_id);

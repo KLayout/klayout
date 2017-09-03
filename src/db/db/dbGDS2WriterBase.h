@@ -242,7 +242,7 @@ protected:
   /**
    *  @brief Write a shape as path
    */
-  void write_path (int layer, int datatype, double sf, const db::Shape &shape, const db::Layout &layout, db::properties_id_type prop_id);
+  void write_path (int layer, int datatype, double sf, const db::Shape &shape, bool multi_xy, const db::Layout &layout, db::properties_id_type prop_id);
 
   /**
    *  @brief Write a shape as text

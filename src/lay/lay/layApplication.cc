@@ -671,11 +671,9 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
 
   }
 
-  if (! m_no_gui) {
-    //  Install the signal handlers after the interpreters, so we can be sure we
-    //  installed our handler. 
-    install_signal_handlers ();
-  }
+  //  Install the signal handlers after the interpreters, so we can be sure we
+  //  installed our handler.
+  install_signal_handlers ();
 
   lay::SaltController *sc = lay::SaltController::instance ();
   lay::TechnologyController *tc = lay::TechnologyController::instance ();

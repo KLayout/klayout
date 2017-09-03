@@ -28,16 +28,39 @@
 namespace lay
 {
 
-CrashMessage::CrashMessage (QWidget *parent, bool can_resume, const QString &stack_trace)
+CrashMessage::CrashMessage (QWidget *parent, bool can_resume, const QString &t)
   : QDialog (parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
 {
   setupUi (this);
+  m_cancel_pressed = false;
 
-  text->setPlainText (stack_trace);
+  text->setPlainText (t);
+  set_can_resume (can_resume);
 
-  if (! can_resume) {
-    buttonBox->removeButton (buttonBox->button (QDialogButtonBox::Ok));
-  }
+  connect (buttonBox->button (QDialogButtonBox::Cancel), SIGNAL (pressed ()), this, SLOT (cancel_pressed ()));
+}
+
+CrashMessage::~CrashMessage ()
+{
+  //  .. nothing yet ..
+}
+
+void
+CrashMessage::set_can_resume (bool f)
+{
+  buttonBox->button (QDialogButtonBox::Ok)->setVisible (f);
+}
+
+void
+CrashMessage::set_text (const QString &t)
+{
+  text->setPlainText (t);
+}
+
+void
+CrashMessage::cancel_pressed ()
+{
+  m_cancel_pressed = true;
 }
 
 }

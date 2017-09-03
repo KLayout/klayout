@@ -128,8 +128,6 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
 
             if (! (*t)->do_test (e != 0, slow)) {
 
-              timer.stop();
-
               ut::ctrl << "</system-out>";
 
               ut::ctrl << "<error message=\"" << "Test " << tl::escaped_to_html ((*t)->name (), false) << " failed (continued mode - see previous messages)" << "\"/>";
@@ -141,6 +139,8 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
             } else {
               ut::ctrl << "</system-out>";
             }
+
+            timer.stop();
 
             ut::noctrl << "Time: " << timer.sec_wall () << "s (wall) " << timer.sec_user () << "s (user) " << timer.sec_sys () << "s (sys)";
             ut::ctrl << "<x-testcase-times wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\"/>";

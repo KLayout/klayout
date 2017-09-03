@@ -12,5 +12,5 @@ SOURCES = \
 INCLUDEPATH += $$RBA_INC $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$RBA_INC $$TL_INC $$DB_INC $$GSI_INC
 
-LIBS += -L$$DESTDIR_UT -lklayout_tl -lklayout_db -lklayout_gsi
+LIBS += -L$$DESTDIR_UT -lklayout_rba -lklayout_tl -lklayout_db -lklayout_gsi
 

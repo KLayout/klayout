@@ -12,5 +12,5 @@ SOURCES = \
 INCLUDEPATH += $$PYA_INC $$DB_INC $$TL_INC $$GSI_INC
 DEPENDPATH += $$PYA_INC $$DB_INC $$TL_INC $$GSI_INC
 
-LIBS += -L$$DESTDIR_UT -lklayout_db -lklayout_tl -lklayout_gsi
+LIBS += -L$$DESTDIR_UT -lklayout_pya -lklayout_db -lklayout_tl -lklayout_gsi
 

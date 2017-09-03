@@ -37,7 +37,7 @@ equals(HAVE_RUBY, "1") {
 equals(HAVE_PYTHON, "1") {
   SUBDIRS += pya
   LANG_DEPENDS += pya
-  pya-unit_tests.depends += gsi
+  pya.depends += gsi
 } else {
   SUBDIRS += pyastub
   pyastub.depends += gsi

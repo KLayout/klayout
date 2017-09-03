@@ -58,7 +58,7 @@ enum Enum
  *  It provides instance counting and tracking of one instance.
  *  It provides copy semantics.
  */
-struct GSI_PUBLIC A
+struct A
   : public gsi::ObjectBase
 {
   /**
@@ -239,7 +239,7 @@ struct GSI_PUBLIC A
 };
 
 
-struct GSI_PUBLIC A_NC
+struct A_NC
   : public A
 {
   A_NC () : A () { }
@@ -253,7 +253,7 @@ private:
 };
 
 template<class Iter>
-struct GSI_PUBLIC ValueIter
+struct ValueIter
 {
 public:
   typedef typename std::iterator_traits<Iter> it_traits;
@@ -286,7 +286,7 @@ private:
 };
 
 template<class Iter>
-struct GSI_PUBLIC FreeIter
+struct FreeIter
 {
 public:
   typedef typename std::iterator_traits<Iter> it_traits;
@@ -362,7 +362,7 @@ private:
 };
 
 template<class Iter>
-struct GSI_PUBLIC FreeIterUsePtr
+struct FreeIterUsePtr
 {
 public:
   typedef typename std::iterator_traits<Iter> it_traits;
@@ -399,7 +399,7 @@ private:
   Iter mb, me;
 };
 
-struct GSI_PUBLIC B
+struct B
 {
   B (); 
   B (const B &d);
@@ -825,7 +825,7 @@ struct GSI_PUBLIC B
   static B *b_inst;
 };
 
-class GSI_PUBLIC C
+class C
 {
 public:
   virtual ~C () { }
@@ -850,7 +850,7 @@ public:
   static std::vector<int> m_v;
 };
 
-class GSI_PUBLIC C_P
+class C_P
   : public C
 {
 public:
@@ -862,7 +862,7 @@ public:
   gsi::Callback f_cb;
 };
 
-struct GSI_PUBLIC E
+struct E
   : public gsi::ObjectBase
 {
   E ();
@@ -897,7 +897,7 @@ private:
 };
 
 //  Same as "E", but not based on ObjectBase
-struct GSI_PUBLIC F
+struct F
 {
   F() : x(0) { }
   static const F *ic();
@@ -911,7 +911,7 @@ struct GSI_PUBLIC F
   static std::auto_ptr<F> f_inst;
 };
 
-struct GSI_PUBLIC G
+struct G
 {
   G () : m_iv (0) { }
   int iv() const { return m_iv; }
@@ -926,7 +926,7 @@ struct GSI_PUBLIC G
   std::string m_sv;
 };
 
-class GSI_PUBLIC X
+class X
   : public gsi::ObjectBase
 {
 public:
@@ -957,7 +957,7 @@ private:
   static std::auto_ptr<X> sp_a, sp_b;
 };
 
-class GSI_PUBLIC Y
+class Y
   : public X
 {
 public:
@@ -988,27 +988,27 @@ private:
   Y *mp_c;
 };
 
-class GSI_PUBLIC Y2
+class Y2
   : public X
 {
 public:
   int x1 () const { return 2; }
 };
 
-class GSI_PUBLIC Y3
+class Y3
   : public X
 {
 public:
   int x1 () const { return 3; }
 };
 
-class GSI_PUBLIC Y4
+class Y4
 {
 public:
   int x1 () const { return 4; }
 };
 
-class GSI_PUBLIC YY : public Y
+class YY : public Y
 {
 public:
   YY ();
@@ -1016,7 +1016,7 @@ public:
   virtual QString cls_name() const;
 };
 
-class GSI_PUBLIC Z
+class Z
 {
 public:
   Z ();
@@ -1031,7 +1031,7 @@ private:
   X *mp_x;
 };
     
-class GSI_PUBLIC Z_P
+class Z_P
   : public Z
 {
 public:
@@ -1044,7 +1044,7 @@ public:
   gsi::Callback f_cb;
 };
 
-class GSI_PUBLIC SQ
+class SQ
   : public QObject
 {
 Q_OBJECT
@@ -1070,7 +1070,7 @@ private:
   int m_tag;
 };
 
-class GSI_PUBLIC SE
+class SE
   : public tl::Object
 {
 public:

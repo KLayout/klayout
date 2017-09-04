@@ -42,10 +42,14 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_dbu (0.001), 
     m_produce_net_names (true),
     m_net_property_name (1),
+    m_produce_inst_names (true),
+    m_inst_property_name (1),
     m_produce_cell_outlines (true),
     m_cell_outline_layer ("OUTLINE"),
     m_produce_placement_blockages (true),
     m_placement_blockage_layer ("PLACEMENT_BLK"),
+    m_produce_regions (true),
+    m_region_layer ("REGIONS"),
     m_produce_via_geometry (true),
     m_via_geometry_suffix (""),
     m_via_geometry_datatype (0),
@@ -74,10 +78,14 @@ LEFDEFReaderOptions::LEFDEFReaderOptions (const LEFDEFReaderOptions &d)
     m_dbu (d.m_dbu),
     m_produce_net_names (d.m_produce_net_names),
     m_net_property_name (d.m_net_property_name),
+    m_produce_inst_names (d.m_produce_inst_names),
+    m_inst_property_name (d.m_inst_property_name),
     m_produce_cell_outlines (d.m_produce_cell_outlines),
     m_cell_outline_layer (d.m_cell_outline_layer),
     m_produce_placement_blockages (d.m_produce_placement_blockages),
     m_placement_blockage_layer (d.m_placement_blockage_layer),
+    m_produce_regions (d.m_produce_regions),
+    m_region_layer (d.m_region_layer),
     m_produce_via_geometry (d.m_produce_via_geometry),
     m_via_geometry_suffix (d.m_via_geometry_suffix),
     m_via_geometry_datatype (d.m_via_geometry_datatype),
@@ -136,7 +144,7 @@ LEFDEFLayerDelegate::register_layer (const std::string &ln)
 std::pair <bool, unsigned int> 
 LEFDEFLayerDelegate::open_layer (db::Layout &layout, const std::string &n, LayerPurpose purpose) 
 {
-  if (purpose == Outline || purpose == PlacementBlockage) {
+  if (purpose == Outline || purpose == PlacementBlockage || purpose == Region) {
 
     std::string ld;
     bool produce;
@@ -144,6 +152,9 @@ LEFDEFLayerDelegate::open_layer (db::Layout &layout, const std::string &n, Layer
     if (purpose == Outline) {
       produce = mp_tech_comp->produce_cell_outlines ();
       ld = mp_tech_comp->cell_outline_layer ();
+    } else if (purpose == Region) {
+      produce = mp_tech_comp->produce_regions ();
+      ld = mp_tech_comp->region_layer ();
     } else {
       produce = mp_tech_comp->produce_placement_blockages ();
       ld = mp_tech_comp->placement_blockage_layer ();
@@ -348,7 +359,8 @@ LEFDEFLayerDelegate::finish (db::Layout &layout)
 
 LEFDEFImporter::LEFDEFImporter ()
   : mp_progress (0), mp_stream (0), mp_layer_delegate (0),
-    m_produce_net_props (false), m_net_prop_name_id (0)
+    m_produce_net_props (false), m_net_prop_name_id (0),
+    m_produce_inst_props (false), m_inst_prop_name_id (0)
 {
   //  .. nothing yet ..
 }
@@ -374,6 +386,14 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerDe
   if (ld.tech_comp () && ld.tech_comp ()->produce_net_names ()) {
     m_produce_net_props = true;
     m_net_prop_name_id = layout.properties_repository ().prop_name_id (ld.tech_comp ()->net_property_name ());
+  }
+
+  m_produce_inst_props = false;
+  m_inst_prop_name_id = 0;
+
+  if (ld.tech_comp () && ld.tech_comp ()->produce_inst_names ()) {
+    m_produce_inst_props = true;
+    m_inst_prop_name_id = layout.properties_repository ().prop_name_id (ld.tech_comp ()->inst_property_name ());
   }
 
   try {

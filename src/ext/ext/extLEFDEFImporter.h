@@ -126,6 +126,26 @@ public:
     m_net_property_name = s;
   }
 
+  bool produce_inst_names () const
+  {
+    return m_produce_inst_names;
+  }
+
+  void set_produce_inst_names (bool f)
+  {
+    m_produce_inst_names = f;
+  }
+
+  const tl::Variant &inst_property_name () const
+  {
+    return m_inst_property_name;
+  }
+
+  void set_inst_property_name (const tl::Variant &s)
+  {
+    m_inst_property_name = s;
+  }
+
   bool produce_cell_outlines () const
   {
     return m_produce_cell_outlines;
@@ -164,6 +184,26 @@ public:
   void set_placement_blockage_layer (const std::string &s) 
   {
     m_placement_blockage_layer = s;
+  }
+
+  bool produce_regions () const
+  {
+    return m_produce_regions;
+  }
+
+  void set_produce_regions (bool f)
+  {
+    m_produce_regions = f;
+  }
+
+  const std::string &region_layer () const
+  {
+    return m_region_layer;
+  }
+
+  void set_region_layer (const std::string &s)
+  {
+    m_region_layer = s;
   }
 
   bool produce_via_geometry () const
@@ -382,10 +422,14 @@ private:
   double m_dbu;
   bool m_produce_net_names;
   tl::Variant m_net_property_name;
+  bool m_produce_inst_names;
+  tl::Variant m_inst_property_name;
   bool m_produce_cell_outlines;
   std::string m_cell_outline_layer;
   bool m_produce_placement_blockages;
   std::string m_placement_blockage_layer;
+  bool m_produce_regions;
+  std::string m_region_layer;
   bool m_produce_via_geometry;
   std::string m_via_geometry_suffix;
   int m_via_geometry_datatype;
@@ -419,7 +463,8 @@ enum LayerPurpose
   Obstructions = 4,
   Outline = 5,
   Blockage = 6,
-  PlacementBlockage = 7
+  PlacementBlockage = 7,
+  Region = 8
 };
 
 /**
@@ -618,6 +663,22 @@ protected:
     return m_net_prop_name_id;
   }
 
+  /**
+   *  @brief Gets a flag indicating whether instance names shall be produced as properties
+   */
+  bool produce_inst_props () const
+  {
+    return m_produce_inst_props;
+  }
+
+  /**
+   *  @brief Gets the property name id of the instance name property
+   */
+  db::property_names_id_type inst_prop_name_id () const
+  {
+    return m_inst_prop_name_id;
+  }
+
 protected:
   void create_generated_via (std::vector<db::Polygon> &bottom,
                              std::vector<db::Polygon> &cut,
@@ -637,8 +698,10 @@ private:
   std::string m_cellname;
   std::string m_fn;
   std::string m_last_token;
-  db::property_names_id_type m_produce_net_props;
+  bool m_produce_net_props;
   db::property_names_id_type m_net_prop_name_id;
+  bool m_produce_inst_props;
+  db::property_names_id_type m_inst_prop_name_id;
 
   const std::string &next ();
 };

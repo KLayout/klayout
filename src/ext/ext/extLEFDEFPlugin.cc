@@ -267,10 +267,14 @@ public:
       tl::make_member (&LEFDEFReaderOptions::dbu, &LEFDEFReaderOptions::set_dbu, "dbu") +
       tl::make_member (&LEFDEFReaderOptions::produce_net_names, &LEFDEFReaderOptions::set_produce_net_names, "produce-net-names") +
       tl::make_member (&LEFDEFReaderOptions::net_property_name, &LEFDEFReaderOptions::set_net_property_name, "net-property-name") +
+      tl::make_member (&LEFDEFReaderOptions::produce_inst_names, &LEFDEFReaderOptions::set_produce_inst_names, "produce-inst-names") +
+      tl::make_member (&LEFDEFReaderOptions::inst_property_name, &LEFDEFReaderOptions::set_inst_property_name, "inst-property-name") +
       tl::make_member (&LEFDEFReaderOptions::produce_cell_outlines, &LEFDEFReaderOptions::set_produce_cell_outlines, "produce-cell-outlines") +
       tl::make_member (&LEFDEFReaderOptions::cell_outline_layer, &LEFDEFReaderOptions::set_cell_outline_layer, "cell-outline-layer") +
       tl::make_member (&LEFDEFReaderOptions::produce_placement_blockages, &LEFDEFReaderOptions::set_produce_placement_blockages, "produce-placement-blockages") +
       tl::make_member (&LEFDEFReaderOptions::placement_blockage_layer, &LEFDEFReaderOptions::set_placement_blockage_layer, "placement-blockage-layer") +
+      tl::make_member (&LEFDEFReaderOptions::produce_regions, &LEFDEFReaderOptions::set_produce_regions, "produce-regions") +
+      tl::make_member (&LEFDEFReaderOptions::region_layer, &LEFDEFReaderOptions::set_region_layer, "region-layer") +
       tl::make_member (&LEFDEFReaderOptions::produce_via_geometry, &LEFDEFReaderOptions::set_produce_via_geometry, "produce-via-geometry") +
       tl::make_member (&LEFDEFReaderOptions::via_geometry_suffix, &LEFDEFReaderOptions::set_via_geometry_suffix, "via-geometry-suffix") +
       tl::make_member (&LEFDEFReaderOptions::via_geometry_datatype, &LEFDEFReaderOptions::set_via_geometry_datatype, "via-geometry-datatype") +

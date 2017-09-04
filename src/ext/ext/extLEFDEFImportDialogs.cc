@@ -345,8 +345,10 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
   setupUi (this);
 
   connect (produce_net_names, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
+  connect (produce_inst_names, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_outlines, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_placement_blockages, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
+  connect (produce_regions, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_via_geometry, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_pins, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
   connect (produce_obstructions, SIGNAL (stateChanged (int)), this, SLOT (checkbox_changed ()));
@@ -372,6 +374,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_read_all_layers (read_all_cbx->isChecked ());
   data->set_layer_map (layer_map->get_layer_map ());
   data->set_produce_net_names (produce_net_names->isChecked ());
+  data->set_produce_inst_names (produce_inst_names->isChecked ());
 
   double dbu_value = 0.0;
   tl::from_string (tl::to_string (dbu->text ()), dbu_value);
@@ -390,8 +393,20 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
     data->set_net_property_name (v);
   }
 
+  //  parse the inst property name (may throw an exception)
+  {
+    std::string np = tl::to_string (inst_prop_name->text ());
+    tl::Extractor ex (np.c_str ());
+    tl::Variant v;
+    ex.read (v);
+    ex.expect_end ();
+    data->set_inst_property_name (v);
+  }
+
   data->set_produce_cell_outlines (produce_outlines->isChecked ());
   data->set_cell_outline_layer (tl::to_string (outline_layer->text ()));
+  data->set_produce_regions (produce_regions->isChecked ());
+  data->set_region_layer (tl::to_string (region_layer->text ()));
   data->set_produce_placement_blockages (produce_placement_blockages->isChecked ());
   data->set_placement_blockage_layer (tl::to_string (placement_blockage_layer->text ()));
   data->set_produce_via_geometry (produce_via_geometry->isChecked ());
@@ -436,8 +451,12 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   layer_map->set_layer_map (data->layer_map ());
   produce_net_names->setChecked (data->produce_net_names ());
   net_prop_name->setText (tl::to_qstring (data->net_property_name ().to_parsable_string ()));
+  produce_inst_names->setChecked (data->produce_inst_names ());
+  inst_prop_name->setText (tl::to_qstring (data->inst_property_name ().to_parsable_string ()));
   produce_outlines->setChecked (data->produce_cell_outlines ());
   outline_layer->setText (tl::to_qstring (data->cell_outline_layer ()));
+  produce_regions->setChecked (data->produce_regions ());
+  region_layer->setText (tl::to_qstring (data->region_layer ()));
   produce_placement_blockages->setChecked (data->produce_placement_blockages ());
   placement_blockage_layer->setText (tl::to_qstring (data->placement_blockage_layer ()));
   produce_via_geometry->setChecked (data->produce_via_geometry ());
@@ -478,7 +497,9 @@ void
 LEFDEFReaderOptionsEditor::checkbox_changed ()
 {
   net_prop_name->setEnabled (produce_net_names->isChecked ());
+  inst_prop_name->setEnabled (produce_inst_names->isChecked ());
   outline_layer->setEnabled (produce_outlines->isChecked ());
+  region_layer->setEnabled (produce_regions->isChecked ());
   placement_blockage_layer->setEnabled (produce_placement_blockages->isChecked ());
   suffix_via_geometry->setEnabled (produce_via_geometry->isChecked ());
   suffix_pins->setEnabled (produce_pins->isChecked ());

@@ -23,6 +23,7 @@
 
 #include "extDEFImporter.h"
 #include "dbPolygonTools.h"
+#include "tlGlobPattern.h"
 
 #include <cmath>
 
@@ -124,6 +125,28 @@ DEFImporter::read_rect (db::Polygon &poly, double scale)
   poly = db::Polygon (db::Box (pt1, pt2));
 }
 
+struct Group
+{
+  Group (const std::string &n, const std::string &rn, const std::vector<tl::GlobPattern> &m)
+    : name (n), region_name (rn), comp_match (m)
+  {
+    //  .. nothing yet ..
+  }
+
+  bool comp_matches (const std::string &name) const
+  {
+    for (std::vector<tl::GlobPattern>::const_iterator m = comp_match.begin (); m != comp_match.end (); ++m) {
+      if (m->match (name)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  std::string name, region_name;
+  std::vector<tl::GlobPattern> comp_match;
+};
+
 void 
 DEFImporter::do_read (db::Layout &layout)
 {
@@ -131,6 +154,9 @@ DEFImporter::do_read (db::Layout &layout)
   double scale = 1.0 / (dbu_mic * layout.dbu ());
   std::map<int, db::Polygon> styles;
   std::map<std::string, ViaDesc> via_desc;
+  std::map<std::string, std::vector<db::Polygon> > regions;
+  std::list<Group> groups;
+  std::list<std::pair<std::string, db::CellInstArray> > instances;
 
   db::Cell &design = layout.cell (layout.add_cell ("TOP"));
 
@@ -241,10 +267,43 @@ DEFImporter::do_read (db::Layout &layout)
       test ("NONDEFAULTRULES");
 
     } else if (test ("REGIONS")) {
-      //  read over REGIONS statements 
-      while (! test ("END") || ! test ("REGIONS")) {
-        take ();
+
+      //  Read REGION statements
+      get_long ();
+      expect (";");
+
+      while (test ("-")) {
+
+        std::string n = get ();
+        std::vector<db::Polygon> &polygons = regions [n];
+
+        while (! peek (";")) {
+
+          if (test ("+")) {
+
+            //  ignore other options for now
+            while (! peek (";")) {
+              take ();
+            }
+            break;
+
+          } else {
+
+            db::Polygon box;
+            read_rect (box, scale);
+            polygons.push_back (box);
+
+          }
+
+        }
+
+        test (";");
+
       }
+
+      test ("END");
+      test ("REGIONS");
+
     } else if (test ("PINPROPERTIES")) {
       //  read over PINPROPERTIES statements 
       while (! test ("END") || ! test ("PINPROPERTIES")) {
@@ -266,10 +325,49 @@ DEFImporter::do_read (db::Layout &layout)
         take ();
       }
     } else if (test ("GROUPS")) {
-      //  read over GROUPS statements 
-      while (! test ("END") || ! test ("GROUPS")) {
-        take ();
+
+      //  Read GROUPS statements
+      get_long ();
+      expect (";");
+
+      while (test ("-")) {
+
+        std::string n = get ();
+        std::string rn;
+        std::vector<tl::GlobPattern> match;
+
+        while (! peek (";")) {
+
+          if (test ("+")) {
+
+            //  gets the region name if there is one
+            if (test ("REGION")) {
+              rn = get ();
+            }
+
+            //  ignore the reset for now
+            while (! peek (";")) {
+              take ();
+            }
+            break;
+
+          } else {
+
+            match.push_back (tl::GlobPattern (get ()));
+
+          }
+
+        }
+
+        groups.push_back (Group (n, rn, match));
+
+        test (";");
+
       }
+
+      test ("END");
+      test ("GROUPS");
+
     } else if (test ("BEGINEXT")) {
       //  read over BEGINEXT sections
       while (! test ("ENDEXT")) {
@@ -896,7 +994,7 @@ DEFImporter::do_read (db::Layout &layout)
 
       while (test ("-")) {
 
-        take (); // instance name
+        std::string inst_name = get ();
         std::string model = get ();
 
         db::Cell *cell = m_lef_importer.macro_by_name (model);
@@ -915,9 +1013,10 @@ DEFImporter::do_read (db::Layout &layout)
             db::Vector d = pt - m_lef_importer.macro_bbox_by_name (model).transformed (ft).lower_left ();
 
             if (cell) {
-                design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), d)));
+              db::CellInstArray inst (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), d));
+              instances.push_back (std::make_pair (inst_name, inst));
             } else {
-                warn (tl::to_string (QObject::tr ("Macro not found in LEF file: ")) + model);
+              warn (tl::to_string (QObject::tr ("Macro not found in LEF file: ")) + model);
             }
 
           } else {
@@ -1083,6 +1182,82 @@ DEFImporter::do_read (db::Layout &layout)
       while (! test (";")) {
         take ();
       }
+    }
+
+  }
+
+  //  now we have collected the groups, regions and instances we create new subcells for each group
+  //  and put the instances for this group there
+
+  db::Cell *others_cell = &design;
+
+  if (! groups.empty ()) {
+
+    others_cell = &layout.cell (layout.add_cell ("NOGROUP"));
+    design.insert (db::CellInstArray (others_cell->cell_index (), db::Trans ()));
+
+    //  Walk through the groups, create a group container cell and put all instances
+    //  that match the group match string there. Then delete these cells (spec says "do not assign any component to more than one group").
+
+    for (std::list<Group>::const_iterator g = groups.begin (); g != groups.end (); ++g) {
+
+      db::Cell *group_cell = &layout.cell (layout.add_cell (("GROUP_" + g->name).c_str ()));
+      design.insert (db::CellInstArray (group_cell->cell_index (), db::Trans ()));
+
+      if (! g->region_name.empty ()) {
+
+        std::map<std::string, std::vector<db::Polygon> >::const_iterator r = regions.find (g->region_name);
+        if (r == regions.end ()) {
+          warn (tl::to_string (QObject::tr ("Not a valid region name: %1 in group %2").arg (tl::to_qstring (g->region_name).arg (tl::to_qstring (g->name)))));
+        } else {
+          std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Region);
+          if (dl.first) {
+            for (std::vector<db::Polygon>::const_iterator p = r->second.begin (); p != r->second.end (); ++p) {
+              group_cell->shapes (dl.second).insert (*p);
+            }
+          }
+        }
+
+      }
+
+      if (! g->comp_match.empty ()) {
+
+        for (std::list<std::pair<std::string, db::CellInstArray> >::iterator i = instances.begin (); i != instances.end (); ) {
+
+          std::list<std::pair<std::string, db::CellInstArray> >::iterator ii = i++;
+          if (g->comp_matches (ii->first)) {
+
+            if (produce_inst_props ()) {
+              db::PropertiesRepository::properties_set props;
+              props.insert (std::make_pair (inst_prop_name_id (), tl::Variant (ii->first)));
+              group_cell->insert (db::CellInstArrayWithProperties (ii->second, layout.properties_repository ().properties_id (props)));
+            } else {
+              group_cell->insert (ii->second);
+            }
+
+            instances.erase (ii);
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+  //  treat all remaining cells and put them into the "others_cell" which is the top cell
+  //  if there are no groups.
+
+  for (std::list<std::pair<std::string, db::CellInstArray> >::iterator ii = instances.begin (); ii != instances.end (); ++ii) {
+
+    if (produce_inst_props ()) {
+      db::PropertiesRepository::properties_set props;
+      props.insert (std::make_pair (inst_prop_name_id (), tl::Variant (ii->first)));
+      others_cell->insert (db::CellInstArrayWithProperties (ii->second, layout.properties_repository ().properties_id (props)));
+    } else {
+      others_cell->insert (ii->second);
     }
 
   }

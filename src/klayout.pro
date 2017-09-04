@@ -77,4 +77,5 @@ unit_tests.depends += plugins $$MAIN_DEPENDS
 
 RESOURCES += \
     laybasic/layResources.qrc \
-    ant/layResources.qrc
+    ant/layResources.qrc \
+    ext/lay/layResources.qrc

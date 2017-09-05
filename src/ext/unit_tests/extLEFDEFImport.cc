@@ -125,9 +125,15 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
     fn += lef_dir;
     fn += "/";
     fn += au;
-    tl::InputStream stream (fn);
-    db::Reader reader (stream);
-    reader.read (layout_au);
+
+    try {
+      tl::InputStream stream (fn);
+      db::Reader reader (stream);
+      reader.read (layout_au);
+    } catch (...) {
+      _this->raise (tl::sprintf ("Compare failed - see %s vs %s (not existing or not readable)\n", tmp_file, fn));
+      throw;
+    }
 
     bool equal = db::compare_layouts (layout2, layout_au, db::layout_diff::f_verbose | db::layout_diff::f_flatten_array_insts, 0);
     if (! equal) {
@@ -218,3 +224,14 @@ TEST(17)
 {
   run_test (_this, "def8", "lef:tech.lef+def:in.def", "au.oas.gz");
 }
+
+TEST(18)
+{
+  run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au.oas.gz");
+}
+
+TEST(19)
+{
+  run_test (_this, "def10", "def:in.def", "au.oas.gz");
+}
+

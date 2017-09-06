@@ -378,16 +378,28 @@ LayoutCanvas::~LayoutCanvas ()
 }
 
 void
-LayoutCanvas::key_event (unsigned int key, unsigned int /*buttons*/)
+LayoutCanvas::key_event (unsigned int key, unsigned int buttons)
 {
-  if (int (key) == Qt::Key_Down) {
-    emit down_arrow_key_pressed ();
-  } else if (int (key) == Qt::Key_Up) {
-    emit up_arrow_key_pressed ();
-  } else if (int (key) == Qt::Key_Left) {
-    emit left_arrow_key_pressed ();
-  } else if (int (key) == Qt::Key_Right) {
-    emit right_arrow_key_pressed ();
+  if (! (buttons & lay::ShiftButton)) {
+    if (int (key) == Qt::Key_Down) {
+      emit down_arrow_key_pressed ();
+    } else if (int (key) == Qt::Key_Up) {
+      emit up_arrow_key_pressed ();
+    } else if (int (key) == Qt::Key_Left) {
+      emit left_arrow_key_pressed ();
+    } else if (int (key) == Qt::Key_Right) {
+      emit right_arrow_key_pressed ();
+    }
+  } else {
+    if (int (key) == Qt::Key_Down) {
+      emit down_arrow_key_pressed_with_shift ();
+    } else if (int (key) == Qt::Key_Up) {
+      emit up_arrow_key_pressed_with_shift ();
+    } else if (int (key) == Qt::Key_Left) {
+      emit left_arrow_key_pressed_with_shift ();
+    } else if (int (key) == Qt::Key_Right) {
+      emit right_arrow_key_pressed_with_shift ();
+    }
   }
 }
 

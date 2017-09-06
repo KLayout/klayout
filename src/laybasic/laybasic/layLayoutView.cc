@@ -83,6 +83,9 @@ namespace lay
 //  factor for "zoom in & out"
 const double zoom_factor = 0.7;
 
+//  factor by which panning is faster in "fast" (+Shift) mode
+const double fast_factor = 3.0;
+
 // -------------------------------------------------------------
 
 struct OpHideShowCell 
@@ -482,6 +485,10 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   connect (mp_canvas, SIGNAL (up_arrow_key_pressed ()), this, SLOT (pan_up ()));
   connect (mp_canvas, SIGNAL (right_arrow_key_pressed ()), this, SLOT (pan_right ()));
   connect (mp_canvas, SIGNAL (down_arrow_key_pressed ()), this, SLOT (pan_down ()));
+  connect (mp_canvas, SIGNAL (left_arrow_key_pressed_with_shift ()), this, SLOT (pan_left_fast ()));
+  connect (mp_canvas, SIGNAL (up_arrow_key_pressed_with_shift ()), this, SLOT (pan_up_fast ()));
+  connect (mp_canvas, SIGNAL (right_arrow_key_pressed_with_shift ()), this, SLOT (pan_right_fast ()));
+  connect (mp_canvas, SIGNAL (down_arrow_key_pressed_with_shift ()), this, SLOT (pan_down_fast ()));
 
   //  occupy services and editables:
   //  these services get deleted by the canvas destructor automatically:
@@ -3507,6 +3514,30 @@ void
 LayoutView::pan_down ()
 {
   shift_window (1.0, 0.0, -m_pan_distance);
+}
+
+void
+LayoutView::pan_left_fast ()
+{
+  shift_window (1.0, -m_pan_distance * fast_factor, 0.0);
+}
+
+void
+LayoutView::pan_right_fast ()
+{
+  shift_window (1.0, m_pan_distance * fast_factor, 0.0);
+}
+
+void
+LayoutView::pan_up_fast ()
+{
+  shift_window (1.0, 0.0, m_pan_distance * fast_factor);
+}
+
+void
+LayoutView::pan_down_fast ()
+{
+  shift_window (1.0, 0.0, -m_pan_distance * fast_factor);
 }
 
 void

@@ -2425,6 +2425,10 @@ public slots:
   void pan_up ();
   void pan_right ();
   void pan_down ();
+  void pan_left_fast ();
+  void pan_up_fast ();
+  void pan_right_fast ();
+  void pan_down_fast ();
 
   //  menu callbacks
   void cm_new_layer ();

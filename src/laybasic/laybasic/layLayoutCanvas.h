@@ -348,6 +348,10 @@ signals:
   void up_arrow_key_pressed ();
   void right_arrow_key_pressed ();
   void down_arrow_key_pressed ();
+  void left_arrow_key_pressed_with_shift ();
+  void up_arrow_key_pressed_with_shift ();
+  void right_arrow_key_pressed_with_shift ();
+  void down_arrow_key_pressed_with_shift ();
 
 private:
   lay::LayoutView *mp_view;

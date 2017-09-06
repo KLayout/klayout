@@ -175,6 +175,13 @@ static int viewport_height (const lay::LayoutView *view)
   return view->viewport ().height ();
 }
 
+static std::vector<lay::LayoutView::cell_path_type> selected_cells_paths (const lay::LayoutView *view, int cv_index)
+{
+  std::vector<lay::LayoutView::cell_path_type> p;
+  view->selected_cells_paths (cv_index, p);
+  return p;
+}
+
 static unsigned int create_rdb (lay::LayoutView *view, const std::string &name)
 {
   rdb::Database *db = new rdb::Database ();
@@ -663,6 +670,19 @@ Class<lay::LayoutView> decl_LayoutView ("LayoutView",
     "\n"
     "This method has been renamed from set_active_cellview_index to active_cellview_index= in version 0.25. "
     "The original name is still available, but is deprecated."
+  ) +
+  gsi::method_ext ("selected_cells_paths", &selected_cells_paths,
+    "@brief Gets the paths of the selected cells\n"
+    "\n"
+    "@args cv_index\n"
+    "\n"
+    "Gets a list of cell paths to the cells selected in the cellview given by \\cv_index. "
+    "The \"selected cells\" are the ones selected in the cell list or cell tree. This is not the \"current cell\" "
+    "which is the one that is shown in the layout window.\n"
+    "\n"
+    "The cell paths are arrays of cell indexes where the last element is the actual cell selected.\n"
+    "\n"
+    "This method has be introduced in version 0.25.\n"
   ) +
   gsi::method ("#get_current_cell_path", &lay::LayoutView::get_current_cell_path,
     "@brief Gets the cell path of the current cell\n"

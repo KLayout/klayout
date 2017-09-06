@@ -100,13 +100,7 @@ public:
    *  If the index is std::numeric_limits<unsigned int>::max, this method
    *  applies to all layers.
    */
-  void invalidate_bboxes (unsigned int index)
-  {
-    if (! m_bboxes_dirty || m_busy) {
-      do_invalidate_bboxes (index);  //  must be called before the bboxes are invalidated (stopping of redraw thread requires this)
-      m_bboxes_dirty = true;
-    }
-  }
+  void invalidate_bboxes (unsigned int index);
 
   /**
    *  @brief Signal that the database unit has changed
@@ -121,14 +115,7 @@ public:
    *
    *  This method will call do_update if necessary and reset the invalid flags. 
    */
-  void update ()
-  {
-    if (m_bboxes_dirty || m_hier_dirty) {
-      do_update ();
-      m_bboxes_dirty = false;
-      m_hier_dirty = false;
-    }
-  }
+  void update ();
 
   /**
    *  @brief The "dirty hierarchy" attribute
@@ -145,10 +132,7 @@ public:
    *
    *  This attribute is true, if the bounding boxes have changed since the last "update" call
    */
-  bool bboxes_dirty () const
-  {
-    return m_bboxes_dirty;
-  }
+  bool bboxes_dirty () const;
 
   /**
    *  @brief Sets or resets busy mode
@@ -211,7 +195,8 @@ public:
 
 private:
   bool m_hier_dirty;
-  bool m_bboxes_dirty;
+  std::vector<bool> m_bboxes_dirty;
+  bool m_all_bboxes_dirty;
   bool m_busy;
 
   void do_invalidate_hier ();

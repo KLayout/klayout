@@ -2126,7 +2126,7 @@ LayoutView::signal_bboxes_from_layer_changed (unsigned int cv_index, unsigned in
 
     //  redraw only the layers required for redrawing
     for (std::vector<lay::RedrawLayerInfo>::const_iterator l = mp_canvas->get_redraw_layers ().begin (); l != mp_canvas->get_redraw_layers ().end (); ++l) {
-      if (l->cellview_index == int (cv_index) && (layer_index == std::numeric_limits<unsigned int>::max () || l->layer_index == int (layer_index))) {
+      if (l->cellview_index == int (cv_index) && l->layer_index == int (layer_index)) {
         redraw_layer ((unsigned int) (l - mp_canvas->get_redraw_layers ().begin ()));
       }
     }

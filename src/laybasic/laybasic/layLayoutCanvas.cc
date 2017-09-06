@@ -40,6 +40,7 @@
 #include "layBitmapsToImage.h"
 
 #include <sstream>
+#include <algorithm>
 
 namespace lay
 {
@@ -1149,7 +1150,9 @@ LayoutCanvas::redraw_selected (const std::vector<int> &layers)
   }
 
   m_need_redraw = true;
-  m_need_redraw_layer = layers;
+  m_need_redraw_layer.insert (m_need_redraw_layer.end (), layers.begin (), layers.end ());
+  std::sort (m_need_redraw_layer.begin (), m_need_redraw_layer.end ());
+  m_need_redraw_layer.erase (std::unique (m_need_redraw_layer.begin (), m_need_redraw_layer.end ()), m_need_redraw_layer.end ());
   m_redraw_force_update = true;
 
   update (); // produces a paintEvent()
@@ -1166,7 +1169,6 @@ LayoutCanvas::change_visibility (const std::vector <bool> &visible)
 
   if (! m_need_redraw) {
     m_redraw_clearing = false;
-    m_need_redraw_layer.clear ();
   }
 
   m_need_redraw = true;

@@ -817,6 +817,7 @@ MainWindow::init_menu ()
     MenuLayoutEntry ("show_layer_panel",                tl::to_string (QObject::tr ("Layers")),                           std::make_pair (cfg_show_layer_panel, "?")),
     MenuLayoutEntry ("show_layer_toolbox",              tl::to_string (QObject::tr ("Layer Toolbox")),                    std::make_pair (cfg_show_layer_toolbox, "?")),
     MenuLayoutEntry ("show_hierarchy_panel",            tl::to_string (QObject::tr ("Cells")),                            std::make_pair (cfg_show_hierarchy_panel, "?")),
+    MenuLayoutEntry ("reset_window_state",              tl::to_string (QObject::tr ("Restore Window")),                   SLOT (cm_reset_window_state ())),
     MenuLayoutEntry::separator ("selection_group"),
     MenuLayoutEntry ("transient_selection",             tl::to_string (QObject::tr ("Highlight Object Under Mouse")),     std::make_pair (cfg_sel_transient_mode, "?")),
     MenuLayoutEntry::last ()
@@ -1157,6 +1158,14 @@ void
 MainWindow::file_removed (const QString & /*path*/)
 {
   // .. nothing yet ..
+}
+
+void
+MainWindow::show ()
+{
+  QMainWindow::show ();
+  m_default_window_state = saveState ();
+  m_default_window_geometry = saveGeometry ();
 }
 
 void
@@ -2261,7 +2270,14 @@ MainWindow::cm_unselect_all ()
   END_PROTECTED
 }
 
-void 
+void
+MainWindow::cm_reset_window_state ()
+{
+  restoreState (m_default_window_state);
+  restoreGeometry (m_default_window_geometry);
+}
+
+void
 MainWindow::cm_select_all ()
 {
   BEGIN_PROTECTED

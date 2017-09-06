@@ -32,6 +32,7 @@
 #include <QPrinter>
 #include <QDialog>
 #include <QTimer>
+#include <QByteArray>
 
 #include <vector>
 #include <memory>
@@ -150,6 +151,14 @@ public:
   {
     return mp_menu;
   }
+
+  /**
+   *  @brief Shows the window
+   *
+   *  This is the function that is called after the application has set up the window but
+   *  before the window is populated and configured
+   */
+  void show ();
 
   /**
    *  @brief Close all views
@@ -661,6 +670,7 @@ public slots:
   void view_title_changed ();
 
   //  menu callbacks for main window
+  void cm_reset_window_state ();
   void cm_select_all ();
   void cm_unselect_all ();
   void cm_undo ();
@@ -880,6 +890,8 @@ private:
   QTimer m_file_changed_timer;
   QTimer m_menu_update_timer;
   std::string m_config_window_state;
+  QByteArray m_default_window_state;
+  QByteArray m_default_window_geometry;
 
   std::string m_initial_technology;
   double m_grid_micron;

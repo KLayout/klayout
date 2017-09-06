@@ -366,6 +366,11 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "MainWind
     "\n"
     "This event has been added in version 0.25.\n"
   ) +
+  gsi::method ("cm_reset_window_state", &lay::MainWindow::cm_reset_window_state,
+    "@brief 'cm_reset_window_state' action (bound to a menu)"
+    "\n"
+    "This method has been added in version 0.25.\n"
+  ) +
   gsi::method ("cm_select_all", &lay::MainWindow::cm_select_all,
     "@brief 'cm_select_all' action (bound to a menu)"
     "\n"

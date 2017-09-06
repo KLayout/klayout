@@ -230,6 +230,7 @@ public:
     menu_entries.push_back (lay::MenuEntry ("edt::sel_union", "union:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Merge Shapes"))));
     menu_entries.push_back (lay::MenuEntry ("edt::sel_intersection", "intersection:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Intersection - Others With First"))));
     menu_entries.push_back (lay::MenuEntry ("edt::sel_difference", "difference:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Subtraction - Others From First"))));
+    menu_entries.push_back (lay::MenuEntry ("edt::sel_separate", "separate:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Separate - First into Inside/Outside Others"))));
     menu_entries.push_back (lay::MenuEntry ("hier_group:edit_mode", "edit_menu.selection_menu.end"));
     menu_entries.push_back (lay::MenuEntry ("edt::sel_flatten_insts", "flatten_insts:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Flatten Instances"))));
     menu_entries.push_back (lay::MenuEntry ("edt::sel_resolve_arefs", "resolve_arefs:edit_mode", "edit_menu.selection_menu.end", tl::to_string (QObject::tr ("Resolve Arrays"))));

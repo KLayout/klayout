@@ -95,6 +95,8 @@ MainService::menu_activated (const std::string &symbol)
     cm_union ();
   } else if (symbol == "edt::sel_intersection") {
     cm_intersection ();
+  } else if (symbol == "edt::sel_separate") {
+    cm_separate ();
   } else if (symbol == "edt::sel_difference") {
     cm_difference ();
   } else if (symbol == "edt::sel_change_layer") {
@@ -1554,15 +1556,24 @@ MainService::boolean_op (int mode)
 
   std::vector <db::Polygon> out;
   db::EdgeProcessor ep;
-  ep.boolean (primary, secondary, out, mode);
+
+  if (mode == -1 /*== separate*/) {
+    ep.boolean (primary, secondary, out, db::BooleanOp::And);
+    ep.boolean (primary, secondary, out, db::BooleanOp::ANotB);
+  } else {
+    ep.boolean (primary, secondary, out, mode);
+  }
 
   view ()->cancel_edits ();
   manager ()->transaction (tl::to_string (QObject::tr ("Boolean operation on selection")));
 
   //  Delete the current selection
+  //  NOTE: we delete only those shapes from the primary layer and keep shapes from other layers.
+  //  Let's see whether this heuristics is more accepted.
+
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
     for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
-      if (! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
+      if (int (s->layer ()) == layer_index && ! s->is_cell_inst () && (s->shape ().is_polygon () || s->shape ().is_path () || s->shape ().is_box ())) {
         db::Cell &cell = view ()->cellview (s->cv_index ())->layout ().cell (s->cell_index ());
         if (cell.shapes (s->layer ()).is_valid (s->shape ())) {
           cell.shapes (s->layer ()).erase_shape (s->shape ());
@@ -1612,13 +1623,19 @@ MainService::cm_intersection ()
   boolean_op (db::BooleanOp::And);
 }
 
-void 
+void
 MainService::cm_difference ()
 {
   boolean_op (db::BooleanOp::ANotB);
 }
 
-static 
+void
+MainService::cm_separate ()
+{
+  boolean_op (-1); // == separate (And + ANotB)
+}
+
+static
 db::DVector compute_alignment_vector (const db::DBox &prim_box, const db::DBox &box, int hmode, int vmode)
 {
   double dx = 0.0;

@@ -129,6 +129,11 @@ public:
   void cm_intersection ();
 
   /**
+   *  @brief Separation of shapes
+   */
+  void cm_separate ();
+
+  /**
    *  @brief Difference of shapes
    */
   void cm_difference ();

@@ -718,12 +718,18 @@ static void add_value (rdb::Item *item, const rdb::ValueWrapper &value)
   item->values ().add (value);
 }
 
+template <class T>
+static void add_value_t (rdb::Item *item, const T &value)
+{
+  add_value (item, rdb::ValueWrapper (new rdb::Value<T> (value)));
+}
+
 static void clear_values (rdb::Item *item)
 {
   item->set_values (rdb::Values ());
 }
 
-Class<rdb::Item> decl_RdbItem ("RdbItem", 
+Class<rdb::Item> decl_RdbItem ("RdbItem",
   gsi::method ("database", (const rdb::Database *(rdb::Item::*)() const) &rdb::Item::database,
     "@brief Gets the database object that item is associated with\n"
     "\n"
@@ -794,6 +800,42 @@ Class<rdb::Item> decl_RdbItem ("RdbItem",
     "@brief Adds a value object to the values of this item\n"
     "@args value\n"
     "@param value The value to add.\n"
+  ) +
+  gsi::method_ext ("add_value", &add_value_t<db::DPolygon>,
+    "@brief Adds a polygon object to the values of this item\n"
+    "@args value\n"
+    "@param value The polygon to add.\n"
+    "This method has been introduced in version 0.25 as a convenience method."
+  ) +
+  gsi::method_ext ("add_value", &add_value_t<db::DBox>,
+    "@brief Adds a box object to the values of this item\n"
+    "@args value\n"
+    "@param value The box to add.\n"
+    "This method has been introduced in version 0.25 as a convenience method."
+  ) +
+  gsi::method_ext ("add_value", &add_value_t<db::DEdge>,
+    "@brief Adds an edge object to the values of this item\n"
+    "@args value\n"
+    "@param value The edge to add.\n"
+    "This method has been introduced in version 0.25 as a convenience method."
+  ) +
+  gsi::method_ext ("add_value", &add_value_t<db::DEdgePair>,
+    "@brief Adds an edge pair object to the values of this item\n"
+    "@args value\n"
+    "@param value The edge pair to add.\n"
+    "This method has been introduced in version 0.25 as a convenience method."
+  ) +
+  gsi::method_ext ("add_value", &add_value_t<std::string>,
+    "@brief Adds a string object to the values of this item\n"
+    "@args value\n"
+    "@param value The string to add.\n"
+    "This method has been introduced in version 0.25 as a convenience method."
+  ) +
+  gsi::method_ext ("add_value", &add_value_t<double>,
+    "@brief Adds a numeric value to the values of this item\n"
+    "@args value\n"
+    "@param value The value to add.\n"
+    "This method has been introduced in version 0.25 as a convenience method."
   ) +
   gsi::method_ext ("clear_values", &clear_values,
     "@brief Removes all values from this item\n"
@@ -960,6 +1002,26 @@ void create_items_from_edge_pair_array (rdb::Database *db, rdb::id_type cell_id,
   for (iter o = collection.begin (); o != collection.end (); ++o) {
     rdb::Item *item = db->create_item (cell_id, cat_id);
     item->values ().add (new rdb::Value <db::DEdgePair> (o->transformed (trans)));
+  }
+}
+
+static rdb::Item *create_item (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id)
+{
+  if (! db->cell_by_id (cell_id)) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell ID: %1").arg (cell_id)));
+  }
+  if (! db->category_by_id (cat_id)) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid category ID: %1").arg (cat_id)));
+  }
+  return db->create_item (cell_id, cat_id);
+}
+
+static rdb::Item *create_item_from_objects (rdb::Database *db, rdb::Cell *cell, rdb::Category *cat)
+{
+  if (cell && cat) {
+    return db->create_item (cell->id (), cat->id ());
+  } else {
+    return 0;
   }
 }
 
@@ -1147,11 +1209,22 @@ Class<rdb::Database> decl_ReportDatabase ("ReportDatabase",
     "@param category_id The ID of the category for which to retrieve the number\n"
     "@return The total number of items visited for the given cell and the given category\n"
   ) +
-  gsi::method ("create_item", &rdb::Database::create_item,
+  gsi::method_ext ("create_item", &create_item,
     "@brief Creates a new item for the given cell/category combination\n"
     "@args cell_id, category_id\n"
     "@param cell_id The ID of the cell to which the item is associated\n"
     "@param category_id The ID of the category to which the item is associated\n"
+    "\n"
+    "A more convenient method that takes cell and category objects instead of ID's is the "
+    "other version of \\create_item.\n"
+  ) +
+  gsi::method_ext ("create_item", &create_item_from_objects,
+    "@brief Creates a new item for the given cell/category combination\n"
+    "@args cell, category\n"
+    "@param cell The cell to which the item is associated\n"
+    "@param category The category to which the item is associated\n"
+    "\n"
+    "This convenience method has been added in version 0.25.\n"
   ) +
   gsi::method_ext ("create_items", &create_items_from_region,
     "@brief Creates new polygon items for the given cell/category combination\n"

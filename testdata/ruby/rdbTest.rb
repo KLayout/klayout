@@ -138,7 +138,21 @@ class RDB_TestClass < TestBase
     assert_equal(cat.num_items_visited, 0)
     assert_equal(cats.num_items_visited, 0)
 
-    item2 = db.create_item(cell2.rdb_id, cats.rdb_id)
+    begin
+      item = db.create_item(1000, cat.rdb_id)
+      assert_equal(false, true)
+    rescue => ex
+      assert_equal(ex.to_s, "Not a valid cell ID: 1000 in ReportDatabase::create_item")
+    end
+
+    begin
+      item = db.create_item(cell.rdb_id, 1001)
+      assert_equal(false, true)
+    rescue => ex
+      assert_equal(ex.to_s, "Not a valid category ID: 1001 in ReportDatabase::create_item")
+    end
+
+    item2 = db.create_item(cell2, cats)
     assert_equal(db.num_items, 2)
     assert_equal(db.num_items_visited, 0)
     assert_equal(db.num_items(cell2.rdb_id, cats.rdb_id), 1)
@@ -428,6 +442,23 @@ class RDB_TestClass < TestBase
     vv=[]
     item.each_value { |v| vv.push(v) }
     assert_equal(vv.size, 0)
+
+    item.clear_values
+    item.add_value(1.0)
+    item.add_value("hello")
+    item.add_value(RBA::DPolygon::new(RBA::DBox::new(1, 2, 3, 4)))
+    item.add_value(RBA::DBox::new(11, 12, 13, 14))
+    item.add_value(RBA::DEdge::new(21, 22, 23, 24))
+    item.add_value(RBA::DEdgePair::new(RBA::DEdge::new(31, 32, 33, 34), RBA::DEdge::new(41, 42, 43, 44)))
+    vv=[]
+    item.each_value { |v| vv.push(v) }
+    assert_equal(vv.size, 6)
+    assert_equal(vv[0].to_s, "float: 1")
+    assert_equal(vv[1].to_s, "text: hello")
+    assert_equal(vv[2].to_s, "polygon: (1,2;1,4;3,4;3,2)")
+    assert_equal(vv[3].to_s, "box: (11,12;13,14)")
+    assert_equal(vv[4].to_s, "edge: (21,22;23,24)")
+    assert_equal(vv[5].to_s, "edge-pair: (31,32;33,34)/(41,42;43,44)")
 
   end
 

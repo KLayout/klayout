@@ -195,6 +195,7 @@ static QString class_doc_element = QString::fromUtf8 ("class_doc");
 static QString doc_element = QString::fromUtf8 ("doc");
 static QString h2_element = QString::fromUtf8 ("h2");
 static QString h2_index_element = QString::fromUtf8 ("h2-index");
+static QString h3_element = QString::fromUtf8 ("h3");
 static QString href_attribute = QString::fromUtf8 ("href");
 static QString name_attribute = QString::fromUtf8 ("name");
 static QString title_attribute = QString::fromUtf8 ("title");
@@ -541,10 +542,19 @@ HelpSource::get_css (const std::string &u)
 std::string 
 HelpSource::get (const std::string &u)
 {
-  return process (get_dom (u), u);
+  BrowserOutline ol;
+  return process (get_dom (u), u, ol);
 }
 
-std::string  
+BrowserOutline
+HelpSource::get_outline (const std::string &u)
+{
+  BrowserOutline ol;
+  process (get_dom (u), u, ol);
+  return ol;
+}
+
+std::string
 HelpSource::next_topic (const std::string &url)
 {
   std::string u = tl::to_string (QUrl::fromEncoded (url.c_str ()).path ());
@@ -724,7 +734,7 @@ HelpSource::parent_of (const std::string &path)
 }
 
 std::string  
-HelpSource::process (const QDomDocument &doc, const std::string &path)
+HelpSource::process (const QDomDocument &doc, const std::string &path, BrowserOutline &ol)
 {
   QBuffer output;
   output.open (QIODevice::WriteOnly);
@@ -733,7 +743,7 @@ HelpSource::process (const QDomDocument &doc, const std::string &path)
 
   QXmlStreamWriter writer (&output);
   writer.writeStartDocument (QString::fromUtf8 ("1.0"));
-  process (doc.documentElement (), path, writer);
+  process (doc.documentElement (), path, writer, ol);
   writer.writeEndDocument ();
 
   output.close ();
@@ -742,7 +752,7 @@ HelpSource::process (const QDomDocument &doc, const std::string &path)
 }
 
 void
-HelpSource::process_child_nodes (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer) 
+HelpSource::process_child_nodes (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &ol)
 {
   if (element.isNull ()) {
     return;
@@ -750,7 +760,7 @@ HelpSource::process_child_nodes (const QDomElement &element, const std::string &
 
   for (QDomNode n = element.firstChild (); ! n.isNull (); n = n.nextSibling ()) {
     if (n.isElement ()) {
-      process (n.toElement (), path, writer);
+      process (n.toElement (), path, writer, ol);
     } else if (n.isComment ()) {
       //  ignore
     } else if (n.isCDATASection ()) {
@@ -762,7 +772,7 @@ HelpSource::process_child_nodes (const QDomElement &element, const std::string &
 }
 
 void
-HelpSource::writeElement (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer)
+HelpSource::writeElement (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &ol)
 {
   //  simply pass all other elements
   writer.writeStartElement (element.nodeName ());
@@ -778,13 +788,26 @@ HelpSource::writeElement (const QDomElement &element, const std::string &path, Q
     }
   }
 
-  process_child_nodes (element, path, writer);
+  process_child_nodes (element, path, writer, ol);
 
   writer.writeEndElement ();
 }
 
+static void
+add_outline_at_level (int i, BrowserOutline &ol, const BrowserOutline &child)
+{
+  if (i == 0) {
+    ol.add_child (child);
+  } else if (ol.begin () != ol.end ()) {
+    add_outline_at_level (i - 1, *(--ol.end ()), child);
+  } else {
+    ol.add_child (BrowserOutline (tl::to_string (QObject::tr ("(empty")), std::string ()));
+    add_outline_at_level (i - 1, *(--ol.end ()), child);
+  }
+}
+
 void
-HelpSource::process (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer) 
+HelpSource::process (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &ol)
 {
   if (element.localName () == keyword_element) {
 
@@ -805,7 +828,7 @@ HelpSource::process (const QDomElement &element, const std::string &path, QXmlSt
     writer.writeEndElement ();
 
     //  replace <k>..</k> by content
-    process_child_nodes (element, path, writer);
+    process_child_nodes (element, path, writer, ol);
 
   } else if (element.localName () == h2_index_element) {
 
@@ -822,21 +845,36 @@ HelpSource::process (const QDomElement &element, const std::string &path, QXmlSt
     }
     writer.writeEndElement ();
 
-  } else if (element.localName () == h2_element) {
+  } else if (element.localName () == h2_element || element.localName () == h3_element) {
 
-    //  replace "h2" by "<a name='h2-line-no'/><h2>"
+    int level = (element.localName () == h2_element ? 1 : 2);
+
+    QString name = element.localName () + QString::fromUtf8 ("-") + QString::number (element.lineNumber ());
+    QString title = element.text ();
+
+    std::string path_wo_anchor = path;
+    std::string::size_type n;
+    if ((n = path.rfind ("#")) != std::string::npos) {
+      path_wo_anchor = std::string (path, 0, n);
+    }
+
+    add_outline_at_level (level, ol, BrowserOutline (tl::to_string (title), path_wo_anchor + "#" + tl::to_string (name)));
+
+    //  replace "h2"/"h3" by "<a name='hx-line-no'/><h2>"
     writer.writeStartElement (QString::fromUtf8 ("a"));
-    writer.writeAttribute (QString::fromUtf8 ("name"), element.localName () + QString::fromUtf8 ("-") + QString::number (element.lineNumber ()));
+    writer.writeAttribute (QString::fromUtf8 ("name"), name);
     writer.writeEndElement ();
     writer.writeStartElement (element.localName ());
-    process_child_nodes (element, path, writer);
+    process_child_nodes (element, path, writer, ol);
     writer.writeEndElement ();
 
   } else if (element.localName () == title_element) {
 
+    add_outline_at_level (0, ol, BrowserOutline (tl::to_string (element.text ()), path));
+
     //  replace "title" by "h1"
     writer.writeStartElement (QString::fromUtf8 ("h1"));
-    process_child_nodes (element, path, writer);
+    process_child_nodes (element, path, writer, ol);
     writer.writeEndElement ();
 
   } else if (element.localName () == doc_element) {
@@ -887,7 +925,7 @@ HelpSource::process (const QDomElement &element, const std::string &path, QXmlSt
       }
     }
     writer.writeEndElement ();
-    process_child_nodes (element, path, writer);
+    process_child_nodes (element, path, writer, ol);
     writer.writeEndElement ();
     writer.writeEndElement ();
 
@@ -895,7 +933,7 @@ HelpSource::process (const QDomElement &element, const std::string &path, QXmlSt
 
     //  replace "topics" by "ul"
     writer.writeStartElement (QString::fromUtf8 ("ul"));
-    process_child_nodes (element, path, writer);
+    process_child_nodes (element, path, writer, ol);
     writer.writeEndElement ();
 
   } else if (element.localName () == topic_ref_element) {
@@ -929,7 +967,7 @@ HelpSource::process (const QDomElement &element, const std::string &path, QXmlSt
     if (new_el.hasAttribute (href_attribute)) {
       new_el.setAttribute (href_attribute, relative_url (path, new_el.attribute (href_attribute)));
     }
-    writeElement (new_el, path, writer);
+    writeElement (new_el, path, writer, ol);
 
   } else if (element.localName () == img_element) {
 
@@ -937,7 +975,7 @@ HelpSource::process (const QDomElement &element, const std::string &path, QXmlSt
     if (new_el.hasAttribute (src_attribute)) {
       new_el.setAttribute (src_attribute, relative_url (path, new_el.attribute (src_attribute)));
     }
-    writeElement (new_el, path, writer);
+    writeElement (new_el, path, writer, ol);
 
   } else if (element.localName () == class_doc_element) {
 
@@ -970,7 +1008,7 @@ HelpSource::process (const QDomElement &element, const std::string &path, QXmlSt
   } else {
 
     //  simply pass all other elements
-    writeElement (element, path, writer);
+    writeElement (element, path, writer, ol);
 
   }
 }

@@ -78,6 +78,7 @@ public:
   ~HelpSource();
 
   virtual std::string get (const std::string &url);
+  virtual BrowserOutline get_outline (const std::string &url);
   virtual QImage get_image (const std::string &url);
   virtual std::string get_css (const std::string &url);
 
@@ -163,11 +164,11 @@ private:
   QDomDocument produce_main_index ();
   void produce_index_file (const std::string &path);
   void initialize_index ();
-  std::string process (const QDomDocument &doc, const std::string &path);
-  void process_child_nodes (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer);
-  void process (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer);
+  std::string process (const QDomDocument &doc, const std::string &path, BrowserOutline &ol);
+  void process_child_nodes (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &old);
+  void process (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &ol);
   std::string read (const std::string &u);
-  void writeElement (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer);
+  void writeElement (const QDomElement &element, const std::string &path, QXmlStreamWriter &writer, BrowserOutline &ol);
   void scan (const std::string &path, tl::AbsoluteProgress &progress);
   void scan_child_nodes (const QDomElement &element, const std::string &path, std::vector<std::string> &subtopics, std::string &title, std::string &section);
   void scan (const QDomElement &element, const std::string &path, std::vector<std::string> &subtopics, std::string &title, std::string &section);

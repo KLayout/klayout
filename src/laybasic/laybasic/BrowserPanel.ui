@@ -1,162 +1,257 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>BrowserPanel</class>
- <widget class="QWidget" name="BrowserPanel" >
-  <property name="geometry" >
+ <widget class="QWidget" name="BrowserPanel">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>482</width>
-    <height>414</height>
+    <width>826</width>
+    <height>580</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="leftMargin">
     <number>0</number>
    </property>
-   <property name="spacing" >
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
     <number>2</number>
    </property>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>TextLabel</string>
+   <item row="0" column="1">
+    <spacer>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>6</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="7">
+    <widget class="QToolButton" name="next_topic_pb">
+     <property name="toolTip">
+      <string>Next Topic</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../lay/lay/layResources.qrc">
+       <normaloff>:/next_topic.png</normaloff>:/next_topic.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
+     </property>
+     <property name="autoRaise">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="0" column="9" >
-    <widget class="QLineEdit" name="searchEdit" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>0</vsizetype>
+   <item row="1" column="0" colspan="10">
+    <widget class="QFrame" name="frame">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QSplitter" name="splitter">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <widget class="QTreeWidget" name="outline_tree">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="baseSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="rootIsDecorated">
+          <bool>false</bool>
+         </property>
+         <property name="itemsExpandable">
+          <bool>true</bool>
+         </property>
+         <property name="expandsOnDoubleClick">
+          <bool>false</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string notr="true">1</string>
+          </property>
+         </column>
+        </widget>
+        <widget class="lay::BrowserTextWidget" name="browser">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>4</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="9">
+    <widget class="QLineEdit" name="searchEdit">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
     </widget>
    </item>
-   <item row="0" column="6" >
-    <widget class="QToolButton" name="prev_topic_pb" >
-     <property name="toolTip" >
-      <string>Previous Topic</string>
-     </property>
-     <property name="text" >
-      <string>...</string>
-     </property>
-     <property name="icon" >
-      <iconset resource="layResources.qrc" >:/prev_topic.png</iconset>
-     </property>
-     <property name="iconSize" >
-      <size>
-       <width>24</width>
-       <height>24</height>
-      </size>
-     </property>
-     <property name="autoRaise" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="7" >
-    <widget class="QToolButton" name="next_topic_pb" >
-     <property name="toolTip" >
-      <string>Next Topic</string>
-     </property>
-     <property name="text" >
-      <string>...</string>
-     </property>
-     <property name="icon" >
-      <iconset resource="layResources.qrc" >:/next_topic.png</iconset>
-     </property>
-     <property name="iconSize" >
-      <size>
-       <width>24</width>
-       <height>24</height>
-      </size>
-     </property>
-     <property name="autoRaise" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2" >
-    <widget class="QToolButton" name="back_pb" >
-     <property name="toolTip" >
+   <item row="0" column="2">
+    <widget class="QToolButton" name="back_pb">
+     <property name="toolTip">
       <string>Back</string>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>...</string>
      </property>
-     <property name="icon" >
-      <iconset resource="layResources.qrc" >:/back.png</iconset>
+     <property name="icon">
+      <iconset resource="../../lay/lay/layResources.qrc">
+       <normaloff>:/back.png</normaloff>:/back.png</iconset>
      </property>
-     <property name="iconSize" >
+     <property name="iconSize">
       <size>
        <width>24</width>
        <height>24</height>
       </size>
      </property>
-     <property name="autoRaise" >
+     <property name="autoRaise">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="0" column="3" >
-    <widget class="QToolButton" name="forward_pb" >
-     <property name="toolTip" >
-      <string>Forward</string>
-     </property>
-     <property name="text" >
-      <string>...</string>
-     </property>
-     <property name="icon" >
-      <iconset resource="layResources.qrc" >:/forward.png</iconset>
-     </property>
-     <property name="iconSize" >
-      <size>
-       <width>24</width>
-       <height>24</height>
-      </size>
-     </property>
-     <property name="autoRaise" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="4" >
-    <widget class="QToolButton" name="home_pb" >
-     <property name="toolTip" >
+   <item row="0" column="4">
+    <widget class="QToolButton" name="home_pb">
+     <property name="toolTip">
       <string>Home</string>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>...</string>
      </property>
-     <property name="icon" >
-      <iconset resource="layResources.qrc" >:/home.png</iconset>
+     <property name="icon">
+      <iconset resource="../../lay/lay/layResources.qrc">
+       <normaloff>:/home.png</normaloff>:/home.png</iconset>
      </property>
-     <property name="iconSize" >
+     <property name="iconSize">
       <size>
        <width>24</width>
        <height>24</height>
       </size>
      </property>
-     <property name="autoRaise" >
+     <property name="autoRaise">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="0" column="8" >
+   <item row="0" column="6">
+    <widget class="QToolButton" name="prev_topic_pb">
+     <property name="toolTip">
+      <string>Previous Topic</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../lay/lay/layResources.qrc">
+       <normaloff>:/prev_topic.png</normaloff>:/prev_topic.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
+     </property>
+     <property name="autoRaise">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QToolButton" name="forward_pb">
+     <property name="toolTip">
+      <string>Forward</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../lay/lay/layResources.qrc">
+       <normaloff>:/forward.png</normaloff>:/forward.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
+     </property>
+     <property name="autoRaise">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="8">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::MinimumExpanding</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>20</height>
@@ -164,40 +259,28 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="1" >
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>6</width>
        <height>20</height>
       </size>
      </property>
     </spacer>
-   </item>
-   <item row="0" column="5" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType" >
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>6</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="0" colspan="10" >
-    <widget class="lay::BrowserTextWidget" name="browser" />
    </item>
   </layout>
  </widget>
@@ -213,10 +296,9 @@
   <tabstop>back_pb</tabstop>
   <tabstop>forward_pb</tabstop>
   <tabstop>home_pb</tabstop>
-  <tabstop>browser</tabstop>
  </tabstops>
  <resources>
-  <include location="layResources.qrc" />
+  <include location="../../lay/lay/layResources.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -33,6 +33,8 @@
 #  include <QUrlQuery>
 #endif
 
+#include <QTreeWidgetItem>
+
 namespace lay
 {
 
@@ -80,6 +82,7 @@ BrowserPanel::init ()
   connect (mp_ui->browser, SIGNAL (textChanged ()), this, SLOT (text_changed ()));
   connect (mp_ui->browser, SIGNAL (backwardAvailable (bool)), mp_ui->back_pb, SLOT (setEnabled (bool)));
   connect (mp_ui->browser, SIGNAL (forwardAvailable (bool)), mp_ui->forward_pb, SLOT (setEnabled (bool)));
+  connect (mp_ui->outline_tree, SIGNAL (itemActivated (QTreeWidgetItem *, int)), this, SLOT (outline_item_clicked (QTreeWidgetItem *)));
 
   mp_ui->searchEdit->hide ();
 
@@ -114,6 +117,15 @@ BrowserPanel::text_changed ()
   if (title != m_current_title) {
     m_current_title = title;
     emit title_changed (title);
+  }
+}
+
+void
+BrowserPanel::outline_item_clicked (QTreeWidgetItem *item)
+{
+  QString url = item->data (0, Qt::UserRole).toString ();
+  if (! url.isEmpty ()) {
+    load (tl::to_string (url));
   }
 }
 
@@ -157,6 +169,17 @@ BrowserPanel::set_home (const std::string &url)
 {
   m_home = url;
   home ();
+
+  //  NOTE: we take this call as a hint that the panel is set up and about to be
+  //  shown. We use this opportunity to resize the outline pane.
+  mp_ui->outline_tree->header ()->hide ();
+  QList<int> sizes = mp_ui->splitter->sizes ();
+  if (sizes.size () >= 2) {
+    int size_outline = 150;
+    sizes[1] += sizes[0] - size_outline;
+    sizes[0] = size_outline;
+  }
+  mp_ui->splitter->setSizes (sizes);
 }
 
 void 
@@ -212,7 +235,7 @@ BrowserPanel::home ()
 QSize  
 BrowserPanel::sizeHint () const
 {
-  return QSize (600, 400);
+  return QSize (800, 600);
 }
 
 void
@@ -266,6 +289,54 @@ BrowserPanel::set_label (const std::string &text)
   mp_ui->label->setVisible (! text.empty ());
 }
 
+static void
+update_item_with_outline (const BrowserOutline &ol, QTreeWidgetItem *item)
+{
+  item->setData (0, Qt::UserRole, tl::to_qstring (ol.url ()));
+  item->setData (0, Qt::DisplayRole, tl::to_qstring (ol.title ()));
+  item->setData (0, Qt::ToolTipRole, tl::to_qstring (ol.title ()));
+
+  int i = 0;
+  for (BrowserOutline::const_child_iterator c = ol.begin (); c != ol.end (); ++c, ++i) {
+    if (item->childCount () <= i) {
+      new QTreeWidgetItem (item);
+    }
+    update_item_with_outline (*c, item->child (i));
+  }
+
+  while (item->childCount () > i) {
+    delete item->child (i);
+  }
+}
+
+void
+BrowserPanel::set_outline (const BrowserOutline &ol)
+{
+  if (ol.begin () == ol.end ()) {
+
+    mp_ui->outline_tree->hide ();
+
+  } else {
+
+    mp_ui->outline_tree->show ();
+
+    int i = 0;
+    for (BrowserOutline::const_child_iterator c = ol.begin (); c != ol.end (); ++c, ++i) {
+      if (mp_ui->outline_tree->topLevelItemCount () <= i) {
+        new QTreeWidgetItem (mp_ui->outline_tree);
+      }
+      update_item_with_outline (*c, mp_ui->outline_tree->topLevelItem (i));
+    }
+
+    while (mp_ui->outline_tree->topLevelItemCount () > i) {
+      delete mp_ui->outline_tree->topLevelItem (i);
+    }
+
+    mp_ui->outline_tree->expandAll ();
+
+  }
+}
+
 QVariant 
 BrowserPanel::loadResource (int type, const QUrl &url)
 {
@@ -309,14 +380,17 @@ BrowserPanel::loadResource (int type, const QUrl &url)
       std::string u = tl::to_string (url.toString ());
       std::string s;
       std::string nu, pu;
+      BrowserOutline ol;
       if (u == m_cached_url) {
         s = m_cached_text;
         nu = m_cached_next_url;
         pu = m_cached_prev_url;
+        ol = m_cached_outline;
       } else {
         s = mp_source->get (u);
         nu = mp_source->next_topic (u);
         pu = mp_source->prev_topic (u);
+        ol = mp_source->get_outline (u);
       }
       if (s.empty ()) {
         s = " "; // QTextBrowser needs at least something
@@ -332,6 +406,7 @@ BrowserPanel::loadResource (int type, const QUrl &url)
         m_cached_url = u;
         m_cached_next_url = nu;
         m_cached_prev_url = pu;
+        m_cached_outline = ol;
       }
 
       ret = QVariant (tl::to_qstring (s));
@@ -345,6 +420,9 @@ BrowserPanel::loadResource (int type, const QUrl &url)
         mp_ui->next_topic_pb->show ();
         mp_ui->next_topic_pb->setEnabled (! nu.empty ());
       }
+
+      //  push the outline
+      set_outline (ol);
 
     END_PROTECTED
 
@@ -388,6 +466,12 @@ QImage
 BrowserSource::get_image (const std::string & /*url*/) 
 {
   return QImage ();
+}
+
+BrowserOutline
+BrowserSource::get_outline (const std::string & /*url*/)
+{
+  return BrowserOutline ();
 }
 
 std::string 

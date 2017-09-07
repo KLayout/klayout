@@ -32,7 +32,10 @@
 #include <QTextBrowser>
 
 #include <string>
+#include <list>
 #include <set>
+
+class QTreeWidgetItem;
 
 namespace Ui
 {
@@ -43,6 +46,121 @@ namespace lay
 {
 
 class BrowserPanel;
+
+/**
+ *  @brief Specifies the outline of the document
+ *
+ *  The outline is a hierarchical tree of items. Each node has a title, a URL to navigate to and
+ *  optional child items.
+ */
+class LAYBASIC_PUBLIC BrowserOutline
+{
+public:
+  typedef std::list<BrowserOutline>::const_iterator const_child_iterator;
+  typedef std::list<BrowserOutline>::iterator child_iterator;
+
+  /**
+   *  @brief Default constructor: creates an empty browser outline
+   */
+  BrowserOutline ()
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Default constructor: creates a single entry with title and URL
+   */
+  BrowserOutline (const std::string &title, const std::string &url)
+    : m_title (title), m_url (url)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Gets the title
+   */
+  const std::string &title () const
+  {
+    return m_title;
+  }
+
+  /**
+   *  @brief Sets the title
+   */
+  void set_title (const std::string &t)
+  {
+    m_title = t;
+  }
+
+  /**
+   *  @brief Gets the URL
+   */
+  const std::string &url () const
+  {
+    return m_url;
+  }
+
+  /**
+   *  @brief Sets the URL
+   */
+  void set_url (const std::string &u)
+  {
+    m_url = u;
+  }
+
+  /**
+   *  @brief Returns the begin iterator for the children
+   */
+  const_child_iterator begin () const
+  {
+    return m_children.begin ();
+  }
+
+  /**
+   *  @brief Returns the end iterator for the children
+   */
+  const_child_iterator end () const
+  {
+    return m_children.end ();
+  }
+
+  /**
+   *  @brief Returns the non-const begin iterator for the children
+   */
+  child_iterator begin ()
+  {
+    return m_children.begin ();
+  }
+
+  /**
+   *  @brief Returns the non-const end iterator for the children
+   */
+  child_iterator end ()
+  {
+    return m_children.end ();
+  }
+
+  /**
+   *  @brief Adds a child entry at the end of the list
+   */
+  void add_child (const BrowserOutline &ol)
+  {
+    m_children.push_back (ol);
+  }
+
+  /**
+   *  @brief Clears the child list of the node
+   */
+  void clear_children ()
+  {
+    m_children.clear ();
+  }
+
+private:
+  std::string m_title;
+  std::string m_url;
+  std::list<BrowserOutline> m_children;
+};
 
 /**
  *  @brief The source for BrowserDialog's "int" URL's
@@ -75,6 +193,16 @@ public:
    *  a new location. This allows to implement any functionality behind such links.
    */
   virtual std::string get (const std::string &url);
+
+  /**
+   *  @brief Gets the outline object if the source provides one
+   *
+   *  The outline is a dictionary of item and subitems, each with a title and a
+   *  URL to navigate to if selected.
+   *
+   *  If an empty outline is returned, no outline is shown.
+   */
+  virtual BrowserOutline get_outline (const std::string &url);
 
   /**
    *  @brief Get the image for a given "int" URL in an image
@@ -206,6 +334,11 @@ public:
   void set_label (const std::string &text);
 
   /**
+   *  @brief Sets the outline
+   */
+  void set_outline (const BrowserOutline &ol);
+
+  /**
    *  @brief Enables the search bx and sets the Url and query item name for the search
    */
   void set_search_url (const std::string &url, const std::string &query_item);
@@ -255,6 +388,7 @@ public slots:
 protected slots:
   void search_edited ();
   void text_changed ();
+  void outline_item_clicked (QTreeWidgetItem *item);
 
 protected:
   virtual QVariant loadResource (int type, const QUrl &url);
@@ -268,6 +402,7 @@ private:
   std::string m_cached_text;
   std::string m_cached_next_url;
   std::string m_cached_prev_url;
+  BrowserOutline m_cached_outline;
   Ui::BrowserPanel *mp_ui;
   bool m_schedule_back;
   tl::DeferredMethod<BrowserPanel> m_back_dm;

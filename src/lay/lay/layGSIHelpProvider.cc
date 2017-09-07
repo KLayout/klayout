@@ -1186,6 +1186,10 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
 
   os << "<a name=\"detailed\"/><h2>" << tl::to_string (QObject::tr ("Detailed description")) << "</h2>" << std::endl;
 
+  std::string prev_title;
+
+  os << "<table>";
+
   for (std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::const_iterator i = mm.begin (); i != mm.end (); ++i, ++n) {
 
     const gsi::MethodBase::MethodSynonym &syn = i->second.first->begin_synonyms () [i->second.second];
@@ -1195,14 +1199,23 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     os << "<a name=\"method" << n << "\"/>"
        << "<a name=\"m_" << escape_xml (i->first) << "\"/>"
        << "<keyword title=\"" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls) << ", " << tl::to_string (QObject::tr ("Method")) << " " << escape_xml (i->first) <<  "\" name=\"" << escape_xml (cls) << "#" << escape_xml (i->first) << "\"/>" << std::endl;
-    
-    os << "<h3>";
+
+    os << "<tr><td>";
+    if (i->first != prev_title) {
+      os << "<h3>" << escape_xml (i->first) << "</h3>" << std::endl;
+      prev_title = i->first;
+    }
+    os << "</td><td style=\"padding-bottom: 16px\">";
+
+    os << "<p><b>" << tl::to_string (QObject::tr ("Signature")) << "</b>: ";
     std::string attr = method_attributes (i->second.first, method_doc);
     if (! attr.empty ()) {
       os << "<i>[" << escape_xml (attr) << "] </i>";
     }
-    os << method_return (i->second.first, method_doc, true) << " " << escape_xml (i->first) << method_arguments (i->second.first, cls_obj, method_doc, true, "");
-    os << "</h3>" << std::endl;
+    os << method_return (i->second.first, method_doc, true) << " <b> " << escape_xml (i->first) << " </b> " << method_arguments (i->second.first, cls_obj, method_doc, true, "");
+    os << "</p>" << std::endl;
+
+    os << "<div style=\"margin-left: 10px\">";
 
     os << "<p><b>" << tl::to_string (QObject::tr ("Description")) << "</b>: " << replace_references (escape_xml (method_doc.brief_doc), cls_obj) << "</p>" << std::endl;
 
@@ -1237,7 +1250,12 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       }
     }
 
+    os << "</div>";
+    os << "</td></tr>";
+
   }
+
+  os << "</table>";
 
   os << "</doc>" << std::endl;
   return os.str ();

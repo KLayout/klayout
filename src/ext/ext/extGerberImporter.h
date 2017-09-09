@@ -50,6 +50,104 @@ namespace ext
 {
 
 /**
+ *  @brief A structure holding the meta data for a Gerber (X2) file
+ */
+struct GerberMetaData
+{
+  /**
+   *  @brief Identfies the function of the layer
+   */
+  enum Function
+  {
+    NoFunction = 0,
+    Copper,
+    Hole,
+    PlatedHole,
+    NonPlatedHole,
+    Profile,
+    SolderMask,
+    Legend,
+    Other
+  };
+
+  /**
+   *  @brief Identfies the position of the layer
+   */
+  enum Position
+  {
+    NoPosition = 0,
+    Bottom,
+    Inner,
+    Top
+  };
+
+  /**
+   *  @brief Constructor
+   */
+  GerberMetaData ()
+    : function (NoFunction),
+      cu_layer_number (0),
+      from_cu (0),
+      to_cu (0),
+      position (NoPosition)
+  { }
+
+  /**
+   *  @brief The project name or an empty string if none is given
+   */
+  std::string project_id;
+
+  /**
+   *  @brief The creation date or an empty string if none is given
+   */
+  std::string creation_date;
+
+  /**
+   *  @brief The generation software or an empty string if none is given
+   */
+  std::string generation_software;
+
+  /**
+   *  @brief The function of the layer
+   */
+  Function function;
+
+  /**
+   *  @brief The copper layer number
+   *
+   *  This is a number identifying the layer in the copper stack.
+   *  The topmost layer is 1, the bottom layer 2 or larger.
+   *  This value is 0 if no layer is specified.
+   */
+  int cu_layer_number;
+
+  /**
+   *  @brief The drill hole start copper layer
+   *
+   *  This is number of the copper layer that the drill hole connects (upper layer).
+   *  This number is applicable only if the function is PlatedHole or NonPlatedHole.
+   *  It is a value > 0.
+   */
+  int from_cu;
+
+  /**
+   *  @brief The drill hole end copper layer
+   *
+   *  This is number of the copper layer that the drill hole connects (lower layer).
+   *  This number is applicable only if the function is PlatedHole or NonPlatedHole.
+   *  It is a value > 0.
+   */
+  int to_cu;
+
+  /**
+   *  @brief This is the position of the layer in the stack
+   *
+   *  This value is applicable for Copper, SolderMask and Legend.
+   */
+  Position position;
+};
+
+/**
  *  @brief A class holding the graphics state of the reader
  */
 struct GraphicsState
@@ -83,6 +181,7 @@ struct GraphicsState
  *  @brief The base class for all readers
  */
 class GerberFileReader
+  : public tl::Object
 {
 public:
   /**
@@ -109,6 +208,11 @@ public:
    *  provided by the "targets" parameter.
    */
   void read (tl::TextInputStream &stream, db::Layout &layout, db::Cell &cell, const std::vector <unsigned int> &targets);
+
+  /**
+   *  @brief Scans the stream and extracts the metadata
+   */
+  GerberMetaData scan (tl::TextInputStream &stream);
 
   /**
    *  @brief Sets the number of points for a circle interpolation
@@ -290,6 +394,11 @@ protected:
    *  The implementation must use "produce_polygons" to produce the output.
    */
   virtual void do_read () = 0;
+
+  /**
+   *  @brief Scans the stream and returns the metadata
+   */
+  virtual GerberMetaData do_scan () = 0;
 
   /**
    *  @brief Returns true, if the reader accepts the stream
@@ -670,6 +779,16 @@ public:
    *  @brief Default constructor
    */
   GerberImporter ();
+
+  /**
+   *  @brief Scans the given file and extracts the metadata from it
+   */
+  static GerberMetaData scan (const std::string &fn);
+
+  /**
+   *  @brief Scans the given stream and extracts the metadata from it
+   */
+  static GerberMetaData scan (tl::TextInputStream &stream);
 
   /**
    *  @brief Load the project file from the given stream

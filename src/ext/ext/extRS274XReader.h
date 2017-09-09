@@ -60,6 +60,7 @@ public:
 
 protected:
   virtual void do_read ();
+  GerberMetaData do_scan ();
 
 private:
   bool m_clear;

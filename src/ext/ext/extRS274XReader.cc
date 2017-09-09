@@ -89,6 +89,129 @@ RS274XReader::init ()
   m_current_aperture = 0;
 }
 
+static GerberMetaData::Position
+parse_position (tl::Extractor &ex)
+{
+  if (ex.test ("Bot")) {
+    return GerberMetaData::Bottom;
+  } else if (ex.test ("Top")) {
+    return GerberMetaData::Top;
+  } else if (ex.test ("Inr")) {
+    return GerberMetaData::Inner;
+  } else {
+    return GerberMetaData::NoPosition;
+  }
+}
+
+
+GerberMetaData
+RS274XReader::do_scan ()
+{
+  GerberMetaData data;
+
+  char c;
+
+  //  Actually read:
+  while ((c = stream ().skip ()) != 0 && !stream ().at_end ()) {
+
+    if (c == '%') {
+
+      stream ().get_char ();
+
+      while (! stream ().at_end () && (c = stream ().skip ()) != '%') {
+
+        std::string param;
+        param += stream ().get_char ();
+        if (! stream ().at_end ()) {
+          param += stream ().get_char ();
+        }
+
+        std::string bl = get_block ();
+
+        if (param == "TF") {
+
+          //  Extract information
+          tl::Extractor ex (bl);
+
+          if (ex.test (".ProjectId")) {
+
+            ex.test (",");
+            data.project_id = ex.get ();
+
+          } else if (ex.test (".CreationDate")) {
+
+            ex.test (",");
+            data.creation_date = ex.get ();
+
+          } else if (ex.test (".GenerationSoftware")) {
+
+            ex.test (",");
+            data.generation_software = ex.get ();
+
+          } else if (ex.test (".FileFunction")) {
+
+            ex.test (",");
+            bool plated = false;
+
+            if (ex.test ("Copper")) {
+
+              data.function = GerberMetaData::Copper;
+
+              ex.test (",");
+              ex.test ("L");
+              ex.read (data.cu_layer_number);
+              ex.test (",");
+              data.position = parse_position (ex);
+
+            } else if (ex.test ("Profile")) {
+
+              data.function = GerberMetaData::Profile;
+
+            } else if (ex.test ("Soldermask")) {
+
+              data.function = GerberMetaData::SolderMask;
+              ex.test (",");
+              data.position = parse_position (ex);
+
+            } else if (ex.test ("Legend")) {
+
+              data.function = GerberMetaData::Legend;
+              ex.test (",");
+              data.position = parse_position (ex);
+
+            } else if ((plated = ex.test ("Plated")) || ex.test ("NonPlated")) {
+
+              data.function = plated ? GerberMetaData::PlatedHole : GerberMetaData::NonPlatedHole;
+
+              ex.test (",");
+              ex.read (data.from_cu);
+              ex.test (",");
+              ex.read (data.to_cu);
+
+            } else {
+              data.function = GerberMetaData::NoFunction;
+            }
+
+          }
+
+        }
+
+      }
+
+      //  eat trailing '%'
+      if (! stream ().at_end ()) {
+        stream ().get_char ();
+      }
+
+    } else {
+      get_block ();
+    }
+
+  }
+
+  return data;
+}
+
 void
 RS274XReader::do_read ()
 {

@@ -130,7 +130,28 @@ GerberFileReader::accepts (tl::TextInputStream &stream)
   return result;
 }
 
-void 
+GerberMetaData
+GerberFileReader::scan (tl::TextInputStream &stream)
+{
+  mp_stream = &stream;
+  mp_layout = 0;
+  mp_top_cell = 0;
+  m_target_layers.clear ();
+
+  GerberMetaData meta_data;
+
+  try {
+    meta_data = do_scan();
+  } catch (tl::Exception &ex) {
+    throw tl::Exception (ex.msg () + tl::to_string (QObject::tr (" in line ")) + tl::to_string (stream.line_number ()));
+  }
+
+  mp_stream = 0;
+
+  return meta_data;
+}
+
+void
 GerberFileReader::read (tl::TextInputStream &stream, db::Layout &layout, db::Cell &cell, const std::vector <unsigned int> &targets)
 {
   GraphicsState state;
@@ -495,6 +516,15 @@ GerberFile::layers_string () const
 // ---------------------------------------------------------------------------------------
 //  Implementation of GerberImporter
 
+//  TODO: generalize this:
+std::vector <tl::shared_ptr<ext::GerberFileReader> > get_readers ()
+{
+  std::vector <tl::shared_ptr<ext::GerberFileReader> > readers;
+  readers.push_back (new ext::GerberDrillFileReader ());
+  readers.push_back (new ext::RS274XReader ());
+  return readers;
+}
+
 GerberImporter::GerberImporter ()
   : m_cell_name ("PCB"), m_dbu (0.001), m_merge (false), 
     m_invert_negative_layers (false), m_border (5000), 
@@ -524,6 +554,37 @@ GerberImporter::load_project (tl::TextInputStream &stream)
   } catch (tl::Exception &ex) {
     throw tl::Exception (ex.msg () + tl::to_string (QObject::tr (" in line ")) + tl::to_string (stream.line_number ()));
   }
+}
+
+GerberMetaData
+GerberImporter::scan (const std::string &fn)
+{
+  tl::InputStream stream (fn);
+  tl::TextInputStream text_stream (stream);
+
+  return scan (text_stream);
+}
+
+GerberMetaData
+GerberImporter::scan (tl::TextInputStream &stream)
+{
+  try {
+
+    std::vector <tl::shared_ptr<ext::GerberFileReader> > readers = get_readers ();
+
+    //  determine the reader to use:
+    for (std::vector <tl::shared_ptr<ext::GerberFileReader> >::iterator r = readers.begin (); r != readers.end (); ++r) {
+      stream.reset ();
+      if ((*r)->accepts (stream)) {
+        return (*r)->scan (stream);
+      }
+    }
+
+  } catch (tl::Exception &ex) {
+    tl::warn << ex.msg ();
+  }
+
+  return GerberMetaData ();
 }
 
 static void read_ref_point_spec (tl::Extractor &l, std::vector<std::pair<db::DBox, db::DBox> > &ref_points, size_t n, bool pcb)
@@ -926,20 +987,14 @@ GerberImporter::do_read (db::Layout &layout, db::cell_index_type cell_index)
       tl::InputStream input_file (tl::to_string (fi.absoluteFilePath ()));
       tl::TextInputStream stream (input_file);
 
-      //  TODO: generalize this:
-      ext::RS274XReader rs274x_reader;
-      ext::GerberDrillFileReader drill_file_reader;
-
-      std::vector <ext::GerberFileReader *> readers;
-      readers.push_back (&drill_file_reader);
-      readers.push_back (&rs274x_reader);
+      std::vector <tl::shared_ptr<ext::GerberFileReader> > readers = get_readers ();
 
       //  determine the reader to use:
       ext::GerberFileReader *reader = 0;
-      for (std::vector <ext::GerberFileReader *>::const_iterator r = readers.begin (); r != readers.end (); ++r) {
+      for (std::vector <tl::shared_ptr<ext::GerberFileReader> >::iterator r = readers.begin (); r != readers.end (); ++r) {
         stream.reset ();
         if ((*r)->accepts (stream)) {
-          reader = *r;
+          reader = r->operator-> ();
           break;
         }
       }

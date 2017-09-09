@@ -69,6 +69,7 @@ public:
 
 protected:
   virtual void do_read ();
+  GerberMetaData do_scan ();
 
 private:
   std::string m_buffer;

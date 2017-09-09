@@ -35,6 +35,7 @@
 #include <QFileDialog>
 #include <QItemDelegate>
 #include <QHeaderView>
+#include <QMessageBox>
 
 #include <fstream>
 
@@ -1340,10 +1341,134 @@ GerberImportDialog::layout_layer_double_clicked (QTreeWidgetItem *, int)
   }
 }
 
+struct FilePositionCompare
+{
+  bool operator() (const std::pair<ext::GerberMetaData, std::string> &a, const std::pair<ext::GerberMetaData, std::string> &b)
+  {
+    if ((a.first.cu_layer_number == 0) != (b.first.cu_layer_number == 0)) {
+      return (a.first.cu_layer_number == 0) < (b.first.cu_layer_number == 0);
+    }
+    if (a.first.cu_layer_number != b.first.cu_layer_number) {
+      return a.first.cu_layer_number < b.first.cu_layer_number;
+    }
+    if ((a.first.from_cu == 0) != (b.first.from_cu == 0)) {
+      return (a.first.from_cu == 0) < (b.first.from_cu == 0);
+    }
+    if (a.first.from_cu != b.first.from_cu) {
+      return a.first.from_cu < b.first.from_cu;
+    }
+    return a.second < b.second;
+  }
+};
+
 void
 GerberImportDialog::enter_page ()
 {
-  // .. nothing yet ..
+  int page = mp_ui->central_stack->currentIndex ();
+
+  if (page == 5) {
+
+    //  --- Free Files page
+
+    if (mp_data->free_files.empty ()) {
+
+      //  scan the files in the directory and populate the file list
+
+      QDir dir (tl::to_qstring (mp_data->base_dir));
+      if (dir.exists ()) {
+
+        QStringList filters;
+        filters << tl::to_qstring ("*.gbr");
+        filters << tl::to_qstring ("*.GBR");
+
+        std::vector<std::pair<ext::GerberMetaData, std::string> > files;
+
+        QStringList entries = dir.entryList (filters);
+        for (QStringList::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+          ext::GerberMetaData data = ext::GerberImporter::scan (tl::to_string (dir.filePath (*e)));
+          files.push_back (std::make_pair (data, tl::to_string (*e)));
+        }
+
+        std::sort (files.begin (), files.end (), FilePositionCompare ());
+
+        if (files.empty ()) {
+          return;
+        }
+        if (QMessageBox::question (this, tr ("Populate Project"), tr ("Some files have been found in the specified base directory.\nIf these files contain file attributes, the project can be initialized properly.\n\nPopulate project from these files?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) {
+          return;
+        }
+
+        mp_data->layout_layers.clear ();
+
+        int min_layer = 0, max_layer = 0;
+        for (std::vector<std::pair<ext::GerberMetaData, std::string> >::const_iterator f = files.begin (); f != files.end (); ++f) {
+          if (f->first.cu_layer_number > 0) {
+            if (min_layer == 0 || min_layer > f->first.cu_layer_number) {
+              min_layer = f->first.cu_layer_number;
+            }
+            if (max_layer == 0 || max_layer < f->first.cu_layer_number) {
+              max_layer = f->first.cu_layer_number;
+            }
+          }
+        }
+
+        std::map<int, int> l2l;
+        std::map<int, int> l2v;
+
+        if (min_layer > 0) {
+          for (int l = min_layer; l <= max_layer; ++l) {
+            l2l.insert (std::make_pair (l, int (mp_data->layout_layers.size ())));
+            mp_data->layout_layers.push_back (db::LayerProperties (l * 2, 0, "Cu" + tl::to_string (l)));
+            if (l < max_layer) {
+              l2v.insert (std::make_pair (l, int (mp_data->layout_layers.size ())));
+              mp_data->layout_layers.push_back (db::LayerProperties (l * 2 + 1, 0, "Via" + tl::to_string (l)));
+            }
+          }
+        }
+
+        int next_layer = max_layer * 2;
+        int hole_num = 0, profile_num = 0, legend_num = 0, solder_num = 0;
+
+        for (std::vector<std::pair<ext::GerberMetaData, std::string> >::const_iterator f = files.begin (); f != files.end (); ++f) {
+
+          mp_data->free_files.push_back (GerberFreeFileDescriptor ());
+          mp_data->free_files.back ().filename = tl::to_string (f->second);
+
+          std::vector<int> layers;
+
+          if (f->first.function == ext::GerberMetaData::Copper) {
+            if (l2l.find (f->first.cu_layer_number) != l2l.end ()) {
+              layers.push_back (l2l [f->first.cu_layer_number]);
+            }
+          } else if (f->first.function == ext::GerberMetaData::PlatedHole) {
+            for (int l = std::min (f->first.from_cu, f->first.to_cu); l < std::max (f->first.from_cu, f->first.to_cu); ++l) {
+              if (l2v.find (l) != l2v.end ()) {
+                layers.push_back (l2v [l]);
+              }
+            }
+          } else if (f->first.function == ext::GerberMetaData::NonPlatedHole || f->first.function == ext::GerberMetaData::NonPlatedHole) {
+            layers.push_back (int (mp_data->layout_layers.size ()));
+            mp_data->layout_layers.push_back (db::LayerProperties (++next_layer, 0, "Hole" + tl::to_string (++hole_num)));
+          } else if (f->first.function == ext::GerberMetaData::Profile) {
+            layers.push_back (int (mp_data->layout_layers.size ()));
+            mp_data->layout_layers.push_back (db::LayerProperties (++next_layer, 0, "Profile" + tl::to_string (++profile_num)));
+          } else if (f->first.function == ext::GerberMetaData::Legend) {
+            layers.push_back (int (mp_data->layout_layers.size ()));
+            mp_data->layout_layers.push_back (db::LayerProperties (++next_layer, 0, "Legend" + tl::to_string (++legend_num)));
+          } else if (f->first.function == ext::GerberMetaData::SolderMask) {
+            layers.push_back (int (mp_data->layout_layers.size ()));
+            mp_data->layout_layers.push_back (db::LayerProperties (++next_layer, 0, "SolderMask" + tl::to_string (++solder_num)));
+          }
+
+          mp_data->free_files.back ().layout_layers = layers;
+
+        }
+
+      }
+
+    }
+
+  }
 }
 
 void 
@@ -1499,19 +1624,27 @@ GerberImportDialog::commit_page ()
     */
 
     //  add layers for all free files if no layer is defined yet. Add additional layers. Try to find some useful numbering scheme.
-    if (mp_data->layout_layers.size () < mp_data->free_files.size ()) {
 
-      int max_layer = 0;
-      for (std::vector <db::LayerProperties>::const_iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l) {
-        max_layer = std::max (max_layer, l->layer);
+    int max_layer = 0;
+    for (std::vector <db::LayerProperties>::const_iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l) {
+      max_layer = std::max (max_layer, l->layer);
+    }
+
+    for (size_t i = 0; i < mp_data->free_files.size (); ++i) {
+
+      std::vector<int> valid_layers;
+      for (std::vector<int>::const_iterator l = mp_data->free_files[i].layout_layers.begin (); l != mp_data->free_files[i].layout_layers.end (); ++l) {
+        if (*l >= 0 && *l < int (mp_data->layout_layers.size ())) {
+          valid_layers.push_back (*l);
+        }
       }
 
-      while (mp_data->layout_layers.size () < mp_data->free_files.size ()) {
+      mp_data->free_files[i].layout_layers = valid_layers;
 
-        //  Add a stupid 1:1 mapping if no layers are mapped for the next file.
-        if (mp_data->free_files[mp_data->layout_layers.size ()].layout_layers.empty ()) {
-          mp_data->free_files[mp_data->layout_layers.size ()].layout_layers.push_back (int (mp_data->layout_layers.size ()));
-        }
+      //  Add a stupid 1:1 mapping if no layers are mapped for the next file.
+      if (valid_layers.empty ()) {
+
+        mp_data->free_files[i].layout_layers.push_back (int (mp_data->layout_layers.size ()));
 
         mp_data->layout_layers.push_back (db::LayerProperties ());
         mp_data->layout_layers.back ().layer = ++max_layer;
@@ -1927,6 +2060,7 @@ GerberImportDialog::update ()
     if (! l->filename.empty ()) {
 
       item->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (l->filename)));
+      item->setData (0, Qt::ToolTipRole, QVariant (tl::to_qstring (l->filename)));
 
       QFileInfo file_info (tl::to_qstring (l->filename));
       if (! mp_data->base_dir.empty () && ! file_info.isAbsolute ()) {
@@ -1972,15 +2106,20 @@ GerberImportDialog::update ()
   for (std::vector <db::LayerProperties>::const_iterator l = mp_data->layout_layers.begin (); l != mp_data->layout_layers.end (); ++l, ++n) {
 
     QString hdr_label;
-    QString text = tl::to_qstring (l->to_string ());
-    for (const QChar *c = text.constData (); !c->isNull (); ++c) {
-      if (!hdr_label.isEmpty ()) {
-        hdr_label += QString::fromUtf8 ("\n");
-      }
-      hdr_label += *c;
+
+    db::LayerProperties ll = *l;
+    ll.name.clear ();
+    hdr_label = tl::to_qstring (ll.to_string ());
+    hdr_label += QString::fromUtf8 ("\n");
+
+    if (l->name.size () > 4) {
+      hdr_label += tl::to_qstring (std::string (l->name, 0, 4) + "...");
+    } else {
+      hdr_label += tl::to_qstring (l->name);
     }
       
     mp_ui->free_layer_mapping_tree->headerItem ()->setData (n + 1, Qt::DisplayRole, QVariant (hdr_label));
+    mp_ui->free_layer_mapping_tree->headerItem ()->setData (n + 1, Qt::ToolTipRole, QVariant (tl::to_qstring (l->to_string ())));
 
     if (mp_ui->free_layer_mapping_tree->itemDelegateForColumn (n + 1) == 0) {
       mp_ui->free_layer_mapping_tree->setItemDelegateForColumn (n + 1, new GerberImportDialogNoEditDelegate (mp_ui->free_layer_mapping_tree));

@@ -88,6 +88,14 @@ GerberDrillFileReader::init ()
   m_format_set = false;
 }
 
+GerberMetaData
+GerberDrillFileReader::do_scan ()
+{
+  GerberMetaData data;
+  data.function = GerberMetaData::Hole;
+  return data;
+}
+
 void
 GerberDrillFileReader::do_read ()
 {

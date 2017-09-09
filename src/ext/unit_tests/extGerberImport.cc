@@ -27,6 +27,7 @@
 #include "dbLoadLayoutOptions.h"
 #include "dbReader.h"
 #include "dbTestSupport.h"
+#include "extGerberImporter.h"
 
 #include "tlUnitTest.h"
 
@@ -49,6 +50,109 @@ static void run_test (tl::TestBase *_this, const char *dir)
   }
 
   db::compare_layouts (_this, layout, tl::testsrc_private () + "/testdata/pcb/" + dir + "/au.oas.gz", db::WriteOAS, 1);
+}
+
+TEST(0_Metadata)
+{
+  ext::GerberMetaData data;
+
+  std::string fn;
+
+  fn = tl::testsrc_private ();
+  fn += "/testdata/pcb/metadata/1.gbr";
+  data = ext::GerberImporter::scan (fn);
+
+  EXPECT_EQ (data.creation_date, "2017-09-07T21:37;00+01:00");
+  EXPECT_EQ (data.generation_software, "KLayout,0.25");
+  EXPECT_EQ (data.function, ext::GerberMetaData::Copper);
+  EXPECT_EQ (data.position, ext::GerberMetaData::Top);
+  EXPECT_EQ (data.from_cu, 0);
+  EXPECT_EQ (data.to_cu, 0);
+  EXPECT_EQ (data.cu_layer_number, 1);
+
+  fn = tl::testsrc_private ();
+  fn += "/testdata/pcb/metadata/2.gbr";
+  data = ext::GerberImporter::scan (fn);
+
+  EXPECT_EQ (data.creation_date, "2017-09-07T21:37;00+01:00");
+  EXPECT_EQ (data.generation_software, "KLayout,0.25");
+  EXPECT_EQ (data.function, ext::GerberMetaData::Copper);
+  EXPECT_EQ (data.position, ext::GerberMetaData::Bottom);
+  EXPECT_EQ (data.from_cu, 0);
+  EXPECT_EQ (data.to_cu, 0);
+  EXPECT_EQ (data.cu_layer_number, 4);
+
+  fn = tl::testsrc_private ();
+  fn += "/testdata/pcb/metadata/3.gbr";
+  data = ext::GerberImporter::scan (fn);
+
+  EXPECT_EQ (data.creation_date, "2017-09-07T21:37;00+01:00");
+  EXPECT_EQ (data.generation_software, "KLayout,0.25");
+  EXPECT_EQ (data.function, ext::GerberMetaData::Copper);
+  EXPECT_EQ (data.position, ext::GerberMetaData::Inner);
+  EXPECT_EQ (data.from_cu, 0);
+  EXPECT_EQ (data.to_cu, 0);
+  EXPECT_EQ (data.cu_layer_number, 2);
+
+  fn = tl::testsrc_private ();
+  fn += "/testdata/pcb/metadata/10.gbr";
+  data = ext::GerberImporter::scan (fn);
+
+  EXPECT_EQ (data.creation_date, "2017-09-07T21:37;00+01:00");
+  EXPECT_EQ (data.generation_software, "KLayout,0.25");
+  EXPECT_EQ (data.function, ext::GerberMetaData::Legend);
+  EXPECT_EQ (data.position, ext::GerberMetaData::Top);
+  EXPECT_EQ (data.from_cu, 0);
+  EXPECT_EQ (data.to_cu, 0);
+  EXPECT_EQ (data.cu_layer_number, 0);
+
+  fn = tl::testsrc_private ();
+  fn += "/testdata/pcb/metadata/11.gbr";
+  data = ext::GerberImporter::scan (fn);
+
+  EXPECT_EQ (data.creation_date, "2017-09-07T21:37;00+01:00");
+  EXPECT_EQ (data.generation_software, "KLayout,0.25");
+  EXPECT_EQ (data.function, ext::GerberMetaData::SolderMask);
+  EXPECT_EQ (data.position, ext::GerberMetaData::Top);
+  EXPECT_EQ (data.from_cu, 0);
+  EXPECT_EQ (data.to_cu, 0);
+  EXPECT_EQ (data.cu_layer_number, 0);
+
+  fn = tl::testsrc_private ();
+  fn += "/testdata/pcb/metadata/12.gbr";
+  data = ext::GerberImporter::scan (fn);
+
+  EXPECT_EQ (data.creation_date, "2017-09-07T21:37;00+01:00");
+  EXPECT_EQ (data.generation_software, "KLayout,0.25");
+  EXPECT_EQ (data.function, ext::GerberMetaData::PlatedHole);
+  EXPECT_EQ (data.position, ext::GerberMetaData::NoPosition);
+  EXPECT_EQ (data.from_cu, 1);
+  EXPECT_EQ (data.to_cu, 4);
+  EXPECT_EQ (data.cu_layer_number, 0);
+
+  fn = tl::testsrc_private ();
+  fn += "/testdata/pcb/metadata/13.gbr";
+  data = ext::GerberImporter::scan (fn);
+
+  EXPECT_EQ (data.creation_date, "2017-09-07T21:37;00+01:00");
+  EXPECT_EQ (data.generation_software, "KLayout,0.25");
+  EXPECT_EQ (data.function, ext::GerberMetaData::NonPlatedHole);
+  EXPECT_EQ (data.position, ext::GerberMetaData::NoPosition);
+  EXPECT_EQ (data.from_cu, 1);
+  EXPECT_EQ (data.to_cu, 4);
+  EXPECT_EQ (data.cu_layer_number, 0);
+
+  fn = tl::testsrc_private ();
+  fn += "/testdata/pcb/metadata/20.drl";
+  data = ext::GerberImporter::scan (fn);
+
+  EXPECT_EQ (data.creation_date, "");
+  EXPECT_EQ (data.generation_software, "");
+  EXPECT_EQ (data.function, ext::GerberMetaData::Hole);
+  EXPECT_EQ (data.position, ext::GerberMetaData::NoPosition);
+  EXPECT_EQ (data.from_cu, 0);
+  EXPECT_EQ (data.to_cu, 0);
+  EXPECT_EQ (data.cu_layer_number, 0);
 }
 
 TEST(1)

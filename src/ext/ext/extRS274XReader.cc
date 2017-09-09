@@ -140,6 +140,11 @@ RS274XReader::do_read ()
           read_pf_parameter (get_block ());
         } else if (param == "AD") {
           read_ad_parameter (get_block ());
+        } else if (param == "TA" || param == "TD" || param == "TF") {
+
+          //  TA, TD and TF paramters are skipped for layout
+          get_block ();
+
         } else if (param == "AB") {
 
           std::string dcode = get_block ();

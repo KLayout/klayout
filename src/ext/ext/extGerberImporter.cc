@@ -134,6 +134,7 @@ void
 GerberFileReader::read (tl::TextInputStream &stream, db::Layout &layout, db::Cell &cell, const std::vector <unsigned int> &targets)
 {
   GraphicsState state;
+  state.global_trans = m_global_trans;
   swap_graphics_state (state);
 
   mp_stream = &stream;

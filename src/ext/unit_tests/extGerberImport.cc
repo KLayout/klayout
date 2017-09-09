@@ -180,7 +180,6 @@ TEST(24)
 
 TEST(25)
 {
-  test_is_long_runner ();
   run_test (_this, "sr-sample2");
 }
 
@@ -190,3 +189,72 @@ TEST(26)
   run_test (_this, "pos-neg");
 }
 
+TEST(X2_1)
+{
+  run_test (_this, "x2-1");
+}
+
+TEST(X2_2a)
+{
+  run_test (_this, "x2-2a");
+}
+
+TEST(X2_2b)
+{
+  run_test (_this, "x2-2b");
+}
+
+TEST(X2_2c)
+{
+  run_test (_this, "x2-2c");
+}
+
+TEST(X2_2d)
+{
+  run_test (_this, "x2-2d");
+}
+
+TEST(X2_2e)
+{
+  run_test (_this, "x2-2e");
+}
+
+TEST(X2_2f)
+{
+  run_test (_this, "x2-2f");
+}
+
+TEST(X2_2g)
+{
+  run_test (_this, "x2-2g");
+}
+
+TEST(X2_2h)
+{
+  run_test (_this, "x2-2h");
+}
+
+TEST(X2_2i)
+{
+  run_test (_this, "x2-2i");
+}
+
+TEST(X2_2j)
+{
+  run_test (_this, "x2-2j");
+}
+
+TEST(X2_2k)
+{
+  run_test (_this, "x2-2k");
+}
+
+TEST(X2_3)
+{
+  run_test (_this, "x2-3");
+}
+
+TEST(X2_4)
+{
+  run_test (_this, "x2-4");
+}

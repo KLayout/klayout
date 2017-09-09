@@ -213,10 +213,10 @@ struct EventListener
       bboxes_dirty (false),
       bboxes_all_dirty (false),
       hier_dirty (false),
-      dbu_dirty (true),
-      cell_name_dirty (true),
-      property_ids_dirty (true),
-      layer_properties_dirty (true)
+      dbu_dirty (false),
+      cell_name_dirty (false),
+      property_ids_dirty (false),
+      layer_properties_dirty (false)
   { }
 
   void reset () { *this = EventListener (); }

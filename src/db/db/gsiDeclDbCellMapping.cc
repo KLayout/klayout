@@ -159,7 +159,15 @@ Class<db::CellMapping> decl_CellMapping ("CellMapping",
     "\n"
     "This method has been introduced in version 0.23."
   ) +
-  gsi::method ("map", &db::CellMapping::map, 
+  gsi::method ("table", &db::CellMapping::table,
+    "@brief Returns the mapping table.\n"
+    "\n"
+    "The mapping table is a dictionary where the keys are source layout cell indexes and the values are the target layout cell indexes.\n"
+    "Note that the target cell index can be \\DropCell to indicate that a cell is supposed to be dropped.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  gsi::method ("map", &db::CellMapping::map,
     "@brief Explicitly specifies a mapping.\n"
     "\n"
     "@args cell_index_b, cell_index_a\n"

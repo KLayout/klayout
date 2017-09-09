@@ -36,6 +36,20 @@ def mapping_to_s(ly1, ly2, lm)
   r
 end
 
+def mapping_to_s_from_table(ly1, ly2, lm)
+  r = ""
+  table = lm.table
+  ly1.layer_indices.each do |li|
+    s = ly1.get_info(li).to_s
+    if table[li]
+      s += "=>" + ly2.get_info(table[li]).to_s
+    end
+    r == "" || (r += ";")
+    r += s
+  end
+  r
+end
+
 class DBLayerMapping_TestClass < TestBase
 
   def test_1
@@ -60,6 +74,8 @@ class DBLayerMapping_TestClass < TestBase
     a3 = ly1.insert_layer(RBA::LayerInfo::new("A"))
 
     ly2 = RBA::Layout::new
+    assert_equal(mapping_to_s(ly2, ly1, mp), "")
+    assert_equal(mapping_to_s_from_table(ly2, ly1, mp), "")
 
     b1 = ly2.insert_layer(RBA::LayerInfo::new("A"))
     b2 = ly2.insert_layer(RBA::LayerInfo::new(3, 0))
@@ -68,10 +84,12 @@ class DBLayerMapping_TestClass < TestBase
     mp = RBA::LayerMapping::new
     mp.create(ly1, ly2)
     assert_equal(mapping_to_s(ly2, ly1, mp), "A=>A;3/0;2/0=>2/0")
+    assert_equal(mapping_to_s_from_table(ly2, ly1, mp), "A=>A;3/0;2/0=>2/0")
 
     mp = RBA::LayerMapping::new
     nl = mp.create_full(ly1, ly2)
     assert_equal(mapping_to_s(ly2, ly1, mp), "A=>A;3/0=>3/0;2/0=>2/0")
+    assert_equal(mapping_to_s_from_table(ly2, ly1, mp), "A=>A;3/0=>3/0;2/0=>2/0")
     assert_equal(nl.inspect, "[3]")
 
   end

@@ -70,7 +70,14 @@ Class<db::LayerMapping> decl_LayerMapping ("LayerMapping",
     "Beside using the mapping generator algorithms provided through \\create and \\create_full, "
     "it is possible to explicitly specify layer mappings using this method.\n"
   ) +
-  gsi::method ("has_mapping?", &db::LayerMapping::has_mapping, 
+  gsi::method ("table", &db::LayerMapping::table,
+    "@brief Returns the mapping table.\n"
+    "\n"
+    "The mapping table is a dictionary where the keys are source layout layer indexes and the values are the target layout layer indexes.\n"
+    "\n"
+    "This method has been introduced in version 0.25."
+  ) +
+  gsi::method ("has_mapping?", &db::LayerMapping::has_mapping,
     "@brief Determine if a layer in layout_b has a mapping to a layout_a layer.\n"
     "\n"
     "@args layer_index_b\n"

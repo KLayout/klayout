@@ -41,6 +41,25 @@ def mapping_to_s(ly1, ly2, cm)
   r
 end
 
+def mapping_to_s_from_table(ly1, ly2, cm)
+  table = cm.table
+  r = ""
+  ly1.each_cell_top_down do |c|
+    s = ly1.cell(c).name
+    if table[c]
+      t = table[c]
+      if t == RBA::CellMapping::DropCell
+        s += "=>(0)"
+      else
+        s += "=>" + ly2.cell(t).name
+      end
+    end
+    r == "" || (r += ";")
+    r += s
+  end
+  r
+end
+
 class DBCellMapping_TestClass < TestBase
 
   def test_1
@@ -102,6 +121,7 @@ class DBCellMapping_TestClass < TestBase
     mp = RBA::CellMapping::new
     mp.from_names(ly1, top1, ly2, top2)
     assert_equal(mapping_to_s(ly2, ly1, mp), "c0;c2=>c2;c1=>c1;c3=>c3")
+    assert_equal(mapping_to_s_from_table(ly2, ly1, mp), "c0;c2=>c2;c1=>c1;c3=>c3")
 
     mp = RBA::CellMapping::new
     mp.from_geometry(ly1, top1, ly2, top2)
@@ -181,6 +201,7 @@ class DBCellMapping_TestClass < TestBase
     mp.from_geometry(ly1, top1, ly2, top2)
     mp.map(ci2, RBA::CellMapping::DropCell)
     assert_equal(mapping_to_s(ly2, ly1, mp), "c0;c2=>(0);c1=>c1;c3")
+    assert_equal(mapping_to_s_from_table(ly2, ly1, mp), "c0;c2=>(0);c1=>c1;c3")
 
   end
 

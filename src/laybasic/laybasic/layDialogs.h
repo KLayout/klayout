@@ -261,7 +261,7 @@ public:
    *
    *  The mode is either 0 (for locally), 1 (for hierarchically) and 2 (for all)
    */
-  bool exec_dialog (int &clear_mode, const lay::CellView &cv);
+  bool exec_dialog (int &clear_mode);
 };
 
 /**

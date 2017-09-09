@@ -638,7 +638,7 @@ ClearLayerModeDialog::~ClearLayerModeDialog ()
 }
 
 bool 
-ClearLayerModeDialog::exec_dialog (int &clear_mode, const lay::CellView & /*cv*/)
+ClearLayerModeDialog::exec_dialog (int &clear_mode)
 {
   QRadioButton *buttons [3] = { local_rb, hierarchically_rb, layout_rb };
 

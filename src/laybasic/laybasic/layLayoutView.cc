@@ -6930,46 +6930,46 @@ LayoutView::cm_delete_layer ()
 void
 LayoutView::cm_clear_layer () 
 {
-  int layer_index = -1;
-  int cv_index = -1;
-
-  lay::LayerPropertiesConstIterator sel = current_layer ();
-  if (! sel.is_null ()) {
-    if (!sel->has_children () && sel->layer_index () >= 0 && cellview (sel->cellview_index ()).is_valid ()) {
-      layer_index = int (sel->layer_index ());
-      cv_index = int (sel->cellview_index ());
-    }
-  }
-
-  const lay::CellView &cv = cellview (cv_index);
-  if (! cv.is_valid ()) {
-    return;
+  std::vector<lay::LayerPropertiesConstIterator> sel = selected_layers ();
+  if (sel.empty ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("No layer selected for clearing")));
   }
 
   lay::ClearLayerModeDialog mode_dialog (this);
-  if (mode_dialog.exec_dialog (m_layer_hier_mode, cv)) {
+  if (mode_dialog.exec_dialog (m_layer_hier_mode)) {
 
     cancel_edits ();
     clear_selection ();
 
     if (manager ()) {
-      manager ()->transaction (tl::to_string (QObject::tr ("Clear layer"))); 
+      manager ()->transaction (tl::to_string (QObject::tr ("Clear layer")));
     }
 
-    if (m_layer_hier_mode == 0) {
-      cv.cell ()->clear ((unsigned int) layer_index);
-    } else if (m_layer_hier_mode == 1) {
+    for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator si = sel.begin (); si != sel.end (); ++si) {
 
-      cv.cell ()->clear ((unsigned int) layer_index);
+      if (! (*si)->has_children () && (*si)->layer_index () >= 0 && cellview ((*si)->cellview_index ()).is_valid ()) {
 
-      std::set <db::cell_index_type> called_cells;
-      cv.cell ()->collect_called_cells (called_cells);
-      for (std::set <db::cell_index_type>::const_iterator cc = called_cells.begin (); cc != called_cells.end (); ++cc) {
-        cv->layout ().cell (*cc).clear ((unsigned int) layer_index);
+        int layer_index = (*si)->layer_index ();
+        const lay::CellView &cv = cellview ((*si)->cellview_index ());
+
+        if (m_layer_hier_mode == 0) {
+          cv.cell ()->clear ((unsigned int) layer_index);
+        } else if (m_layer_hier_mode == 1) {
+
+          cv.cell ()->clear ((unsigned int) layer_index);
+
+          std::set <db::cell_index_type> called_cells;
+          cv.cell ()->collect_called_cells (called_cells);
+          for (std::set <db::cell_index_type>::const_iterator cc = called_cells.begin (); cc != called_cells.end (); ++cc) {
+            cv->layout ().cell (*cc).clear ((unsigned int) layer_index);
+          }
+
+        } else {
+          cv->layout ().clear_layer ((unsigned int) layer_index);
+        }
+
       }
 
-    } else {
-      cv->layout ().clear_layer ((unsigned int) layer_index);
     }
 
     if (manager ()) {

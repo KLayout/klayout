@@ -108,7 +108,12 @@ static std::string format_to_string (int l, int t, bool tz)
 
 GerberFileReader::GerberFileReader ()
   : m_circle_points (64), m_digits_before (-1), m_digits_after (-1), m_omit_leading_zeroes (true),
-    m_merge (false), m_inverse (false), m_dbu (0.001), m_unit (1000.0), m_ep (true /*report progress*/), 
+    m_merge (false), m_inverse (false),
+    m_dbu (0.001), m_unit (1000.0),
+    m_rot (0.0), m_s (1.0), m_ox (0.0), m_oy (0.0),
+    m_mx (false), m_my (false),
+    m_orot (0.0), m_os (1.0), m_omx (false), m_omy (false),
+    m_ep (true /*report progress*/),
     mp_layout (0), mp_top_cell (0), mp_stream (0),
     m_progress (tl::to_string (QObject::tr ("Reading Gerber file")), 10000)
 {
@@ -128,18 +133,13 @@ GerberFileReader::accepts (tl::TextInputStream &stream)
 void 
 GerberFileReader::read (tl::TextInputStream &stream, db::Layout &layout, db::Cell &cell, const std::vector <unsigned int> &targets)
 {
-  reset_step_and_repeat ();
+  GraphicsState state;
+  swap_graphics_state (state);
 
-  m_inverse = false;
   mp_stream = &stream;
   mp_layout = &layout;
   mp_top_cell = &cell;
   m_target_layers = targets;
-
-  m_polygons.clear ();
-  m_lines.clear ();
-  m_clear_polygons.clear ();
-  m_local_trans = db::DCplxTrans ();
 
   try {
     do_read ();
@@ -236,10 +236,89 @@ GerberFileReader::read_coord (tl::Extractor &ex)
   return number * m_unit * sign;
 }
 
-void 
+void
+GerberFileReader::swap_graphics_state (GraphicsState &state)
+{
+  std::swap (m_merge, state.merge);
+  std::swap (m_inverse, state.inverse);
+  std::swap (m_global_trans, state.global_trans);
+  std::swap (m_s, state.m_s);
+  std::swap (m_mx, state.m_mx);
+  std::swap (m_my, state.m_my);
+  std::swap (m_ox, state.m_ox);
+  std::swap (m_oy, state.m_oy);
+  std::swap (m_rot, state.m_rot);
+  std::swap (m_os, state.m_os);
+  std::swap (m_omx, state.m_omx);
+  std::swap (m_omy, state.m_omy);
+  std::swap (m_orot, state.m_orot);
+  std::swap (m_lines, state.lines);
+  std::swap (m_polygons, state.polygons);
+  std::swap (m_clear_polygons, state.clear_polygons);
+  std::swap (m_displacements, state.displacements);
+}
+
+void
+GerberFileReader::push_state (const std::string &token)
+{
+  m_graphics_stack.push_back (GraphicsState ());
+  swap_graphics_state (m_graphics_stack.back ());
+  m_graphics_stack.back ().token = token;
+}
+
+std::string
+GerberFileReader::pop_state ()
+{
+  std::string token;
+
+  if (! m_graphics_stack.empty ()) {
+    swap_graphics_state (m_graphics_stack.back ());
+    token = m_graphics_stack.back ().token;
+  }
+
+  m_graphics_stack.pop_back ();
+  return token;
+}
+
+bool
+GerberFileReader::graphics_stack_empty () const
+{
+  return m_graphics_stack.empty ();
+}
+
+db::DCplxTrans
+GerberFileReader::local_trans () const
+{
+  // TODO: is this order correct?
+  db::DCplxTrans lt = db::DCplxTrans (m_s, m_rot, false, db::DVector (m_ox, m_oy));
+  if (m_mx) {
+    lt *= db::DCplxTrans (db::DTrans (db::FTrans::m0));
+  }
+  if (m_my) {
+    lt *= db::DCplxTrans (db::DTrans (db::FTrans::m90));
+  }
+
+  return lt;
+}
+
+db::DCplxTrans
+GerberFileReader::object_trans () const
+{
+  db::DCplxTrans ot = db::DCplxTrans (m_os, m_orot, false, db::DVector ());
+  if (m_omx) {
+    ot *= db::DCplxTrans (db::DTrans (db::FTrans::m0));
+  }
+  if (m_omy) {
+    ot *= db::DCplxTrans (db::DTrans (db::FTrans::m90));
+  }
+
+  return ot;
+}
+
+void
 GerberFileReader::produce_line (const db::DPath &p, bool clear)
 {
-  db::DCplxTrans t = m_global_trans * db::DCplxTrans (1.0 / dbu ()) * m_local_trans; 
+  db::DCplxTrans t = global_trans () * db::DCplxTrans (1.0 / dbu ()) * local_trans ();
 
   //  Ignore clear paths for now - they cannot be subtracted from anything.
   //  Clear is just provided for completeness.
@@ -258,7 +337,7 @@ GerberFileReader::produce_line (const db::DPath &p, bool clear)
 void 
 GerberFileReader::produce_polygon (const db::DPolygon &p, bool clear)
 {
-  db::DCplxTrans t = m_global_trans * db::DCplxTrans (1.0 / dbu ()) * m_local_trans; 
+  db::DCplxTrans t = global_trans () * db::DCplxTrans (1.0 / dbu ()) * local_trans ();
 
   if (! clear) {
     process_clear_polygons ();
@@ -288,7 +367,29 @@ GerberFileReader::process_clear_polygons ()
   }
 }
 
-void 
+void
+GerberFileReader::collect (db::Region &region)
+{
+  process_clear_polygons ();
+
+  if (m_merge) {
+    std::vector<db::Polygon> merged_polygons;
+    m_ep.merge (m_polygons, merged_polygons, 0, false /*don't resolve holes*/);
+    m_polygons.swap (merged_polygons);
+  }
+
+  for (std::vector<db::Polygon>::const_iterator p = m_polygons.begin (); p != m_polygons.end (); ++p) {
+    region.insert (*p);
+  }
+  for (std::vector<db::Path>::const_iterator p = m_lines.begin (); p != m_lines.end (); ++p) {
+    region.insert (*p);
+  }
+
+  m_polygons.clear ();
+  m_lines.clear ();
+}
+
+void
 GerberFileReader::flush ()
 {
   process_clear_polygons ();

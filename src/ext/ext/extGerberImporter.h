@@ -30,6 +30,7 @@
 #include "dbLayout.h"
 #include "dbTrans.h"
 #include "dbEdgeProcessor.h"
+#include "dbRegion.h"
 #include "tlStream.h"
 #include "tlProgress.h"
 
@@ -47,6 +48,36 @@ namespace lay
 
 namespace ext
 {
+
+/**
+ *  @brief A class holding the graphics state of the reader
+ */
+struct GraphicsState
+{
+  GraphicsState ()
+    : merge (false), inverse (false),
+      m_rot (0.0), m_s (1.0), m_ox (false), m_oy (false), m_mx (false), m_my (false),
+      m_orot (0.0), m_os (1.0), m_omx (false), m_omy (false)
+  {
+    displacements.push_back (db::DVector ());
+  }
+
+  bool merge;
+  bool inverse;
+  db::DCplxTrans global_trans;
+  double m_rot;
+  double m_s;
+  double m_ox, m_oy;
+  bool m_mx, m_my;
+  double m_orot;
+  double m_os;
+  bool m_omx, m_omy;
+  std::vector<db::Path> lines;
+  std::vector<db::Polygon> polygons;
+  std::vector<db::Polygon> clear_polygons;
+  std::vector<db::DVector> displacements;
+  std::string token;
+};
 
 /**
  *  @brief The base class for all readers
@@ -283,14 +314,14 @@ protected:
   void fatal (const std::string &error);
 
   /**
-   *  @brief Set the local transformation
-   *
-   *  The global transformation is applied before the global transformation
+   *  @brief Gets the local transformation
    */
-  void set_local_trans (const db::DCplxTrans &trans)
-  {
-    m_local_trans = trans;
-  }
+  db::DCplxTrans local_trans () const;
+
+  /**
+   *  @brief Gets the local transformation
+   */
+  db::DCplxTrans object_trans () const;
 
   /**
    *  @brief Read a coordinate from the extractor using the format and unit
@@ -306,8 +337,31 @@ protected:
 
   /**
    *  @brief Flush the stored data to the output
+   *  This method is similar to collect(), but writes the data to the layout.
    */
   void flush ();
+
+  /**
+   *  @brief Collects the data taken so far into the given region
+   *  This method is similar to flush(), but will return a Region object.
+   */
+  void collect (db::Region &region);
+
+  /**
+   *  @brief Pushes the graphics state
+   */
+  void push_state (const std::string &token);
+
+  /**
+   *  @brief Pops the graphics state
+   *  Returns the token given in "push_state"
+   */
+  std::string pop_state ();
+
+  /**
+   *  @brief Returns true if the graphics stack is empty
+   */
+  bool graphics_stack_empty () const;
 
   /**
    *  @brief Access to the edge processor
@@ -353,6 +407,62 @@ protected:
     return *mp_stream;
   }
 
+  /**
+   *  @brief Updates the local mirror flags
+   */
+  void update_local_mirror (bool mx, bool my)
+  {
+    m_mx = mx; m_my = my;
+  }
+
+  /**
+   *  @brief Updates the local orientation
+   */
+  void update_local_angle (double rot)
+  {
+    m_rot = rot;
+  }
+
+  /**
+   *  @brief Updates the local scale factor
+   */
+  void update_local_scale (double s)
+  {
+    m_s = s;
+  }
+
+  /**
+   *  @brief Updates the local offset
+   */
+  void update_local_offset (double x, double y)
+  {
+    m_ox = x; m_oy = y;
+  }
+
+  /**
+   *  @brief Updates the object mirror flags
+   */
+  void update_object_mirror (bool mx, bool my)
+  {
+    m_omx = mx; m_omy = my;
+  }
+
+  /**
+   *  @brief Updates the object orientation
+   */
+  void update_object_angle (double rot)
+  {
+    m_orot = rot;
+  }
+
+  /**
+   *  @brief Updates the object scale factor
+   */
+  void update_object_scale (double s)
+  {
+    m_os = s;
+  }
+
 private:
   int m_circle_points;
   int m_digits_before;
@@ -362,8 +472,14 @@ private:
   bool m_inverse;
   double m_dbu;
   double m_unit;
-  db::DCplxTrans m_global_trans, m_local_trans;
-  std::vector<db::DPoint> m_polygon_points;
+  db::DCplxTrans m_global_trans;
+  double m_rot;
+  double m_s;
+  double m_ox, m_oy;
+  bool m_mx, m_my;
+  double m_orot;
+  double m_os;
+  bool m_omx, m_omy;
   std::vector<db::Path> m_lines;
   std::vector<db::Polygon> m_polygons;
   std::vector<db::Polygon> m_clear_polygons;
@@ -374,8 +490,10 @@ private:
   db::Cell *mp_top_cell;
   tl::TextInputStream *mp_stream;
   tl::AbsoluteProgress m_progress;
+  std::list<GraphicsState> m_graphics_stack;
 
   void process_clear_polygons ();
+  void swap_graphics_state (GraphicsState &state);
 };
 
 /**

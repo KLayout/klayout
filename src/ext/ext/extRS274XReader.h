@@ -66,10 +66,6 @@ private:
   bool m_guess_polarity;
   bool m_neg_polarity;
   bool m_360deg_circular;
-  double m_sx, m_sy;
-  double m_rot;
-  bool m_mx, m_my;
-  double m_ox, m_oy;
   double m_x, m_y;
   bool m_relative;
   std::string m_buffer;
@@ -99,13 +95,16 @@ private:
   void read_ad_parameter (const std::string &block);
   void read_am_parameter (const std::string &block);
   void read_ko_parameter (const std::string &block);
+  void read_lm_parameter (const std::string &block);
+  void read_lr_parameter (const std::string &block);
+  void read_ls_parameter (const std::string &block);
   void read_ln_parameter (const std::string &block);
   void read_lp_parameter (const std::string &block);
   void read_sr_parameter (const std::string &block);
   void read_if_parameter (const std::string &block);
+  void install_block_aperture (const std::string &dcode, const db::Region &region);
   void process_mcode (int mcode);
   const std::string &get_block ();
-  void update_trans ();
   bool is_clear_polarity ();
   void init ();
 };

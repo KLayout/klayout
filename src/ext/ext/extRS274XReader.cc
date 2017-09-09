@@ -79,12 +79,6 @@ RS274XReader::init ()
   m_buffer.clear ();
   m_polygon_points.clear ();
 
-  m_ox = m_oy = 0.0;
-  m_sx = m_sy = 1.0;
-  m_mx = m_my = false;
-  m_rot = 0.0;
-  update_trans ();
-
   for (std::vector<RS274XApertureBase *>::const_iterator a = m_apertures.begin (); a != m_apertures.end (); ++a) {
     if (*a) {
       delete *a;
@@ -146,6 +140,26 @@ RS274XReader::do_read ()
           read_pf_parameter (get_block ());
         } else if (param == "AD") {
           read_ad_parameter (get_block ());
+        } else if (param == "AB") {
+
+          std::string dcode = get_block ();
+          if (dcode.empty ()) {
+
+            if (graphics_stack_empty ()) {
+              throw tl::Exception (tl::to_string (QObject::tr ("AB closed without initial opening AB command")));
+            } else {
+              db::Region region;
+              collect (region);
+              std::string ap = pop_state ();
+              install_block_aperture (ap, region);
+            }
+
+          } else if (m_polygon_mode) {
+            warn (tl::to_string (QObject::tr ("AB command inside polygon sequence (G36/G37) - polygon ignored")));
+          } else {
+            push_state (dcode);
+          }
+
         } else if (param == "AM") {
 
           //  AM parameters can span multiple data blocks, so collect them
@@ -164,6 +178,12 @@ RS274XReader::do_read ()
           read_ln_parameter (get_block ());
         } else if (param == "LP") {
           read_lp_parameter (get_block ());
+        } else if (param == "LM") {
+          read_lm_parameter (get_block ());
+        } else if (param == "LR") {
+          read_lr_parameter (get_block ());
+        } else if (param == "LS") {
+          read_ls_parameter (get_block ());
         } else if (param == "SR") {
           read_sr_parameter (get_block ());
         } else if (param == "IF") {
@@ -385,7 +405,7 @@ RS274XReader::do_read ()
           if (m_polygon_mode) {
             warn (tl::to_string (QObject::tr ("D03 blocks are ignored in polygon mode")));
           } else {
-            m_current_aperture->produce_flash (db::DVector (x, y), *this, ep (), is_clear_polarity ());
+            m_current_aperture->produce_flash (db::DCplxTrans (db::DVector (x, y)) * object_trans (), *this, ep (), is_clear_polarity ());
           }
 
         } else { // only if m_current_dcode == 1?
@@ -479,7 +499,7 @@ RS274XReader::do_read ()
                       throw tl::Exception (tl::to_string (QObject::tr ("No aperture defined (missing G54 block)")));
                     }
 
-                    m_current_aperture->produce_linear (db::DPoint (m_x, m_y), pe, *this, ep (), is_clear_polarity ());
+                    m_current_aperture->produce_linear (db::DCplxTrans (db::DVector (m_x, m_y)) * object_trans (), pe - db::DPoint (m_x, m_y), *this, ep (), is_clear_polarity ());
 
                   }
 
@@ -508,7 +528,7 @@ RS274XReader::do_read ()
                 throw tl::Exception (tl::to_string (QObject::tr ("No aperture defined (missing G54 block)")));
               }
 
-              m_current_aperture->produce_linear (db::DPoint (m_x, m_y), db::DPoint (x, y), *this, ep (), is_clear_polarity ());
+              m_current_aperture->produce_linear (db::DCplxTrans (db::DVector (m_x, m_y)) * object_trans (), db::DPoint (x, y) - db::DPoint (m_x, m_y), *this, ep (), is_clear_polarity ());
 
             }
 
@@ -527,6 +547,9 @@ RS274XReader::do_read ()
 
   }
 
+  if (! graphics_stack_empty ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("AB block not closed")));
+  }
 }
 
 void
@@ -548,25 +571,6 @@ RS274XReader::get_block ()
   }
 
   return m_buffer;
-}
-
-void
-RS274XReader::update_trans ()
-{
-  if (fabs (m_sx - m_sy) > 1e-6) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Different scalings for x and y axis is not supported currently.")));
-  }
-
-  // TODO: is this order correct?
-  db::DCplxTrans lt = db::DCplxTrans (m_sx, m_rot, false, db::DVector (m_ox, m_oy));
-  if (m_mx) {
-    lt *= db::DCplxTrans (db::DTrans (db::FTrans::m0));
-  }
-  if (m_my) {
-    lt *= db::DCplxTrans (db::DTrans (db::FTrans::m90));
-  }
-
-  set_local_trans (lt);
 }
 
 void
@@ -648,14 +652,14 @@ RS274XReader::read_mi_parameter (const std::string &block)
   ex.read (mb);
   ex.expect_end ();
 
-  m_mx = (ma != 0);
-  m_my = (mb != 0);
+  bool mx = (ma != 0);
+  bool my = (mb != 0);
 
   if (m_axis_mapping != ab_xy) {
-    std::swap (m_mx, m_my);
+    std::swap (mx, my);
   }
 
-  update_trans ();
+  update_local_mirror (mx, my);
 }
 
 void
@@ -686,14 +690,14 @@ RS274XReader::read_of_parameter (const std::string &block)
   bo *= unit ();
   ex.expect_end ();
 
-  m_ox = ao;
-  m_oy = bo;
+  double ox = ao;
+  double oy = bo;
 
   if (m_axis_mapping != ab_xy) {
-    std::swap (m_ox, m_oy);
+    std::swap (ox, oy);
   }
 
-  update_trans ();
+  update_local_offset (ox, oy);
 }
 
 void
@@ -702,18 +706,63 @@ RS274XReader::read_sf_parameter (const std::string &block)
   tl::Extractor ex (block.c_str ());
 
   ex.expect ("A");
-  m_sx = 1.0;
-  ex.read (m_sx);
+  double sx = 1.0;
+  ex.read (sx);
   ex.expect ("B");
-  m_sy = 1.0;
-  ex.read (m_sy);
+  double sy = 1.0;
+  ex.read (sy);
   ex.expect_end ();
 
   if (m_axis_mapping != ab_xy) {
-    std::swap (m_sx, m_sy);
+    std::swap (sx, sy);
   }
 
-  update_trans ();
+  if (fabs (sx - sy) > 1e-6) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Different scalings for x and y axis is not supported currently.")));
+  }
+
+  update_local_scale (sx);
+}
+
+void
+RS274XReader::read_ls_parameter (const std::string &block)
+{
+  tl::Extractor ex (block.c_str ());
+
+  double s = 1.0;
+  ex.read (s);
+
+  update_object_scale (s);
+}
+
+void
+RS274XReader::read_lr_parameter (const std::string &block)
+{
+  tl::Extractor ex (block.c_str ());
+
+  double a = 0.0;
+  ex.read (a);
+
+  update_object_angle (a);
+}
+
+void
+RS274XReader::read_lm_parameter (const std::string &block)
+{
+  tl::Extractor ex (block.c_str ());
+
+  bool omx = false, omy = false;
+  while (! ex.at_end ()) {
+    if (ex.test ("X")) {
+      omy = true;  //  "my == mirror at y axis" is "X == mirror along x axis"
+    } else if (ex.test ("Y")) {
+      omx = true;  //  "mx == mirror at x axis" is "Y == mirror along y axis"
+    } else {
+      break;
+    }
+  }
+
+  update_object_mirror (omx, omy);
 }
 
 void
@@ -744,14 +793,14 @@ RS274XReader::read_io_parameter (const std::string &block)
   bo *= unit ();
   ex.expect_end ();
 
-  m_ox = ao;
-  m_oy = bo;
+  double ox = ao;
+  double oy = bo;
 
   if (m_axis_mapping != ab_xy) {
-    std::swap (m_ox, m_oy);
+    std::swap (ox, oy);
   }
 
-  update_trans ();
+  update_local_offset (ox, oy);
 }
 
 void
@@ -773,9 +822,9 @@ RS274XReader::read_ir_parameter (const std::string &block)
 {
   tl::Extractor ex (block.c_str ());
 
-  m_rot = 0.0;
-  ex.read (m_rot);
-  ex.expect_end ();
+  double rot = 0.0;
+  ex.read (rot);
+  update_local_angle (rot);
 }
 
 void
@@ -825,6 +874,31 @@ RS274XReader::read_ad_parameter (const std::string &block)
   } else {
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid aperture name '%s' (not a macro name and not a standard aperture) for AD parameter")), name);
   }
+}
+
+void
+RS274XReader::install_block_aperture (const std::string &d, const db::Region &region)
+{
+  int dcode = 0;
+
+  try {
+    tl::Extractor ex (d.c_str ());
+    ex.expect ("D");
+    ex.read (dcode);
+    ex.expect_end ();
+  } catch (...) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Invalid aperture code string for AB command")));
+  }
+
+  if (dcode < 0) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Invalid D code for AB command")));
+  }
+
+  while (int (m_apertures.size ()) <= dcode) {
+    m_apertures.push_back (0);
+  }
+
+  m_apertures[dcode] = new RS274XRegionAperture (region);
 }
 
 void

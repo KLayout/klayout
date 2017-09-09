@@ -28,6 +28,7 @@
 #include "dbPath.h"
 #include "dbPolygon.h"
 #include "dbTrans.h"
+#include "dbRegion.h"
 #include "tlStream.h"
 
 #include <vector>
@@ -48,13 +49,14 @@ public:
   RS274XApertureBase ();
   virtual ~RS274XApertureBase () { }
 
-  void produce_flash (const db::DVector &d, RS274XReader &reader, db::EdgeProcessor &ep, bool clear);
-  void produce_linear (const db::DPoint &from, const db::DPoint &to, RS274XReader &reader, db::EdgeProcessor &ep, bool clear);
+  void produce_flash (const db::DCplxTrans &d, RS274XReader &reader, db::EdgeProcessor &ep, bool clear);
+  void produce_linear (const db::DCplxTrans &d, const db::DVector &dist, RS274XReader &reader, db::EdgeProcessor &ep, bool clear);
 
 protected:
   void clear_points ();
   void add_point (double x, double y);
   void add_point (const db::DPoint &d);
+  void add_point (const db::Point &d);
   void produce_circle (double cx, double cy, double r, bool clear);
   void produce_polygon (bool clear);
   void produce_line ();
@@ -135,7 +137,20 @@ private:
   double m_hx, m_hy;
 };
 
-class RS274XMacroAperture 
+class RS274XRegionAperture
+  : public RS274XApertureBase
+{
+public:
+  RS274XRegionAperture (const db::Region &region);
+
+  virtual void do_produce_flash ();
+  virtual bool do_produce_linear (const db::DPoint &from, const db::DPoint &to);
+
+private:
+  db::Region m_region;
+};
+
+class RS274XMacroAperture
   : public RS274XApertureBase
 {
 public:

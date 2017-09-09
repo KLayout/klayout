@@ -37,8 +37,8 @@ RS274XApertureBase::RS274XApertureBase ()
   // .. nothing yet ..
 }
 
-void 
-RS274XApertureBase::produce_flash (const db::DVector &d, RS274XReader &reader, db::EdgeProcessor &ep, bool clear)
+void
+RS274XApertureBase::produce_flash (const db::DCplxTrans &d, RS274XReader &reader, db::EdgeProcessor &ep, bool clear)
 {
   if (m_needs_update) {
 
@@ -65,18 +65,18 @@ RS274XApertureBase::produce_flash (const db::DVector &d, RS274XReader &reader, d
 
   }
 
-  db::CplxTrans trans = db::CplxTrans (reader.dbu ());
+  db::CplxTrans trans = d * db::CplxTrans (reader.dbu ());
 
   for (std::vector <db::Polygon>::const_iterator p = m_polygons.begin (); p != m_polygons.end (); ++p) {
-    reader.produce_polygon (p->transformed (trans).moved (d), clear);
+    reader.produce_polygon (p->transformed (trans), clear);
   }
   for (std::vector <db::Path>::const_iterator p = m_lines.begin (); p != m_lines.end (); ++p) {
-    reader.produce_line (p->transformed (trans).moved (d), clear);
+    reader.produce_line (p->transformed (trans), clear);
   }
 }
 
 void 
-RS274XApertureBase::produce_linear (const db::DPoint &from, const db::DPoint &to, RS274XReader &reader, db::EdgeProcessor &ep, bool clear) 
+RS274XApertureBase::produce_linear (const db::DCplxTrans &d, const db::DVector &dist, RS274XReader &reader, db::EdgeProcessor &ep, bool clear)
 {
   mp_reader = &reader;
   mp_ep = &ep;
@@ -87,6 +87,9 @@ RS274XApertureBase::produce_linear (const db::DPoint &from, const db::DPoint &to
   l.swap (m_lines);
   p.swap (m_polygons);
   cp.swap (m_clear_polygons);
+
+  db::DPoint from;
+  db::DPoint to = from + d.inverted () * dist;
 
   if (! do_produce_linear (from, to)) {
 
@@ -120,7 +123,7 @@ RS274XApertureBase::produce_linear (const db::DPoint &from, const db::DPoint &to
     m_clear_polygons.clear ();
   }
 
-  db::CplxTrans trans = db::CplxTrans (mp_reader->dbu ());
+  db::CplxTrans trans = d * db::CplxTrans (mp_reader->dbu ());
 
   for (std::vector <db::Polygon>::const_iterator p = m_polygons.begin (); p != m_polygons.end (); ++p) {
     mp_reader->produce_polygon (p->transformed (trans), clear);
@@ -157,7 +160,13 @@ RS274XApertureBase::add_point (const db::DPoint &d)
   m_points.push_back (db::Point (db::coord_traits<db::Coord>::rounded (d.x () / dbu), db::coord_traits<db::Coord>::rounded (d.y () / dbu)));
 }
 
-void 
+void
+RS274XApertureBase::add_point (const db::Point &p)
+{
+  m_points.push_back (p);
+}
+
+void
 RS274XApertureBase::produce_circle (double cx, double cy, double r, bool clear)
 {
   clear_points ();
@@ -532,6 +541,44 @@ RS274XRegularAperture::do_produce_linear (const db::DPoint & /*from*/, const db:
 }
 
 // -----------------------------------------------------------------------------
+//  RS274XRegionAperture implementation
+
+RS274XRegionAperture::RS274XRegionAperture (const db::Region &region)
+  : m_region (region)
+{
+  //  .. nothing yet ..
+}
+
+void RS274XRegionAperture::do_produce_flash ()
+{
+  for (db::Region::const_iterator p = m_region.begin (); ! p.at_end (); ++p) {
+
+    db::Polygon poly = *p;
+
+    clear_points ();
+    for (db::Polygon::polygon_contour_iterator pt = poly.begin_hull (); pt != poly.end_hull (); ++pt) {
+      add_point (*pt);
+    }
+    produce_polygon (false);
+
+    for (size_t h = 0; h < poly.holes (); ++h) {
+      clear_points ();
+      for (db::Polygon::polygon_contour_iterator pt = poly.begin_hole (h); pt != poly.end_hole (h); ++pt) {
+        add_point (*pt);
+      }
+      produce_polygon (true);
+    }
+
+  }
+}
+
+bool
+RS274XRegionAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DPoint & /*to*/)
+{
+  return false;
+}
+
+// -----------------------------------------------------------------------------
 //  RS274XMacroAperture implementation
 
 RS274XMacroAperture::RS274XMacroAperture (ext::RS274XReader &reader, const std::string &name, const std::string &def, tl::Extractor &ex)
@@ -592,9 +639,8 @@ RS274XMacroAperture::do_produce_flash_internal ()
 
       if (code == 1) {
 
-        int pol = 0;
         ex.expect (",");
-        ex.read (pol);
+        int pol = (read_expr (ex) > 0.5);
 
         if (pol == 0) {
           clear = true;
@@ -613,13 +659,18 @@ RS274XMacroAperture::do_produce_flash_internal ()
         ex.expect (",");
         double cy = read_expr (ex, true);
 
-        produce_circle (cx, cy, d * 0.5, clear);
+        double a = 0.0;
+        if (ex.test (",")) {
+          a = read_expr (ex);
+        }
+
+        db::DVector c = db::DCplxTrans (1.0, a, false, db::DVector ()) * db::DVector (cx, cy);
+        produce_circle (c.x (), c.y (), d * 0.5, clear);
 
       } else if (code == 2 || code == 20) {
 
-        int pol = 0;
         ex.expect (",");
-        ex.read (pol);
+        int pol = (read_expr (ex) > 0.5);
 
         if (pol == 0) {
           clear = true;
@@ -671,9 +722,8 @@ RS274XMacroAperture::do_produce_flash_internal ()
 
       } else if (code == 21 || code == 22) {
 
-        int pol = 0;
         ex.expect (",");
-        ex.read (pol);
+        int pol = (read_expr (ex) > 0.5);
 
         if (pol == 0) {
           clear = true;
@@ -715,9 +765,8 @@ RS274XMacroAperture::do_produce_flash_internal ()
 
       } else if (code == 4) {
 
-        int pol = 0;
         ex.expect (",");
-        ex.read (pol);
+        int pol = (read_expr (ex) > 0.5);
 
         if (pol == 0) {
           clear = true;
@@ -804,9 +853,8 @@ RS274XMacroAperture::do_produce_flash_internal ()
 
       } else if (code == 5) {
 
-        int pol = 0;
         ex.expect (",");
-        ex.read (pol);
+        int pol = (read_expr (ex) > 0.5);
 
         if (pol == 0) {
           clear = true;
@@ -945,24 +993,28 @@ RS274XMacroAperture::do_produce_linear (const db::DPoint & /*from*/, const db::D
 double 
 RS274XMacroAperture::read_atom (tl::Extractor &ex)
 {
+  double fac = 1.0;
+  if (ex.test ("-")) {
+    fac = -1.0;
+  }
+
+  double d = 0.0;
+
   if (ex.test ("$")) {
     int nvar = 0;
     ex.read (nvar);
     nvar -= 1;
     if (nvar >= 0 && nvar < int (m_parameters.size ())) {
-      return m_parameters[nvar];
-    } else {
-      return 0.0;
+      d = m_parameters[nvar];
     }
   } else if (ex.test ("(")) {
-    double d = read_expr (ex);
+    d = read_expr (ex);
     ex.expect (")");
-    return d;
   } else {
-    double d = 0.0;
     ex.read (d);
-    return d;
   }
+
+  return fac * d;
 }
 
 double 

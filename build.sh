@@ -39,6 +39,7 @@ RUBY=""
 PYTHON=""
 BUILD=""
 BIN=""
+RPATH=""
 
 MAKE_OPT=""
 
@@ -124,6 +125,10 @@ while [ "$*" != "" ]; do
     BIN="$1"
     shift
     ;;
+  -rpath)
+    RPATH="$1"
+    shift
+    ;;
   -qt4)
     HAVE_QT5=0
     ;;
@@ -150,6 +155,7 @@ while [ "$*" != "" ]; do
     echo "  -python <prog>        Use Python interpreter 'prog'"
     echo "  -build <path>         Directory where to do the build"
     echo "  -bin|-prefix <path>   Directory where to install the binary"
+    echo "  -rpath <rpath>        Specifies the RPATH to use (default: same as -bin)"
     echo "  -option <option>      'make' options (i.e. -j2)"
     echo ""
     echo "  -with-qtbinding       Create Qt bindings for ruby scripts [default]"
@@ -366,6 +372,12 @@ fi
 if [ $HAVE_64BIT_COORD != 0 ]; then
   echo "    64 bit coordinates enabled"
 fi
+if [ "$RPATH" = "" ]; then
+  RPATH="$BIN"
+fi
+
+echo "    Installation target is $BIN"
+echo "    Build directory is $BUILD"
 
 # Check Ruby installation
 if [ "$RUBYINCLUDE" != "" ]; then
@@ -476,7 +488,8 @@ qmake_cmd="$QMAKE $CURR_DIR/src/klayout.pro -recursive \
   HAVE_QTBINDINGS=$HAVE_QTBINDINGS \
   HAVE_64BIT_COORD=$HAVE_64BIT_COORD \
   HAVE_QT5=$HAVE_QT5 \
-  PREFIX=$BIN \
+  PREFIX='$BIN' \
+  RPATH='$RPATH' \
   KLAYOUT_VERSION=$KLAYOUT_VERSION \
   KLAYOUT_VERSION_DATE=$KLAYOUT_VERSION_DATE \
   KLAYOUT_VERSION_REV=$KLAYOUT_VERSION_REV \
@@ -507,7 +520,8 @@ cd $BUILD
 $MAKE_PRG install
 cd $CURR_DIR
 echo ""
-echo "Build done."
+echo "Build successfully done."
+echo "Artefacts were installed to $BIN"
 
 exit 0
 

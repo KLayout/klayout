@@ -49,7 +49,9 @@ equals(HAVE_RUBY, "1") {
     HAVE_RUBY_VERSION_CODE=$$RUBYVERSIONCODE 
 }
 
-QMAKE_RPATHDIR += $$PREFIX
+!isEmpty(RPATH) {
+  QMAKE_RPATHDIR += $$RPATH
+}
 
 QMAKE_CXXFLAGS_WARN_ON += \
     -pedantic \

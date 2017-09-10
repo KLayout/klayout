@@ -1,0 +1,11 @@
+Package: klayout
+Version: %VERSION%-1
+Architecture: %ARCH%
+Maintainer: Matthias Köfferlein <matthias@koefferlein.de>
+Installed-Size: %SIZE%
+Depends: %DEPENDS%
+Section: contrib/misc
+Priority: optional
+Description: Chip mask layout review and edit utility
+ Klayout is a graphical viewer for a.o. GDSII and CIF files.
+ Its features include net highlighting and XOR-ing of two layouts.

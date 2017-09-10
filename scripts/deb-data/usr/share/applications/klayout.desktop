@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Klayout, viewer and editor of mask layouts.
+GenericName=layout viewer
+Comment=Klayout is a viewer (and editor) of mask layout in a.o. GDSII and CIF format.
+Exec=klayout
+Icon=klayout
+Type=Application
+Categories=Development;Engineering;Electronics;
+

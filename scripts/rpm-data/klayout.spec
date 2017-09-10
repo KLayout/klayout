@@ -25,8 +25,11 @@ Url:            http://www.klayout.de
 %if "%{git_source}" == ""
 Source0:        http://www.klayout.de/downloads/%{name}-%{version}.tar.gz
 %endif
-
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+# Disable auto-detection of dependencies (to prevent including the
+# so's of klayout itself)
+AutoReqProv: 	no
 
 %description
 Mask layout viewer and editor for the chip design engineer.
@@ -68,6 +71,9 @@ cd %{_sourcedir}
            -qmake $QMAKE \
            -without-qtbinding
 
+cp -p LICENSE Changelog CONTRIB %{_builddir}
+strip %{_builddir}/bin.$TARGET/*
+
 %install
 
 %ifarch %ix86
@@ -78,17 +84,21 @@ TARGET="linux-64-gcc-release"
 
 mkdir -p %{buildroot}%{_libdir}/klayout
 mkdir -p %{buildroot}%{_bindir}
-install -Dm644 %{_builddir}/bin.$TARGET/lib*.so* %{buildroot}%{_libdir}/klayout
-install -Dm644 %{_builddir}/bin.$TARGET/klayout %{_builddir}/bin.$TARGET/strm* %{buildroot}%{_bindir}
+cp -pd %{_builddir}/bin.$TARGET/lib*.so* %{buildroot}%{_libdir}/klayout
+chmod 644 %{buildroot}%{_libdir}/klayout/*
+cp -pd %{_builddir}/bin.$TARGET/klayout %{_builddir}/bin.$TARGET/strm* %{buildroot}%{_bindir}
+chmod 755 %{buildroot}%{_bindir}/*
 install -Dm644 %{_sourcedir}/etc/%{name}.desktop %{buildroot}%{_datadir}/applications/%{name}.desktop
-install -Dm644 %{_sourcedir}/src/lay/lay/images/logo.png %{buildroot}%{_datadir}/pixmaps/%{name}.png
+install -Dm644 %{_sourcedir}/etc/logo.png %{buildroot}%{_datadir}/pixmaps/%{name}.png
 %if 0%{?suse_version}%{?sles_version}
 %suse_update_desktop_file -n %{name}
 %endif
 
 %files
 %defattr(-,root,root)
-%doc %{_sourcedir}/LICENSE %{_sourcedir}/Changelog %{_sourcedir}/CONTRIB
+%doc LICENSE
+%doc Changelog
+%doc CONTRIB
 %{_bindir}/klayout
 %{_bindir}/strm*
 %{_libdir}/klayout/*

@@ -27,7 +27,7 @@ MAIN_DEPENDS =
 equals(HAVE_RUBY, "1") {
   SUBDIRS += rba
   LANG_DEPENDS += rba
-  rba.depends += gsi
+  rba.depends += gsi db
 } else {
   SUBDIRS += rbastub
   rbastub.depends += gsi
@@ -37,7 +37,7 @@ equals(HAVE_RUBY, "1") {
 equals(HAVE_PYTHON, "1") {
   SUBDIRS += pya
   LANG_DEPENDS += pya
-  pya.depends += gsi
+  pya.depends += gsi db
 } else {
   SUBDIRS += pyastub
   pyastub.depends += gsi

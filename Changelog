@@ -1,0 +1,1794 @@
+0.25            (2017-09-10):
+* Enhancements: Major overhaul of the build environment
+      - Qt5 supported now
+      - Employs qmake as build system
+      - Reorganisation of the sources
+      - Continuous integration enabled (unit tests
+        integrated in .pro files, JUnit output etc.)
+      - Compatible with the clang compiler
+* Enhancements: Buddy tools: KLayout now comes with a set of 
+      additional executables that provide some functionality
+      subset in a lean way. These binaries are named "strm..."
+      and are installed along with KLayout. 
+      - strm2cif: converts any format to CIF
+      - strm2dxf: converts any format to DXF
+      - strm2gds: converts any format to GDS2
+      - strm2gdstxt: converts any format to GDS2/text
+      - strm2oas: converts any format to OASIS
+      - strm2txt: converts any format to plain text (internally)
+      - strmclip: creates a clip from a file
+      - strmcmp: compares two files (logically)
+      - strmxor: compares two files (geometrically)
+      For more information, use the "-h" or "--help" option.
+* Enhancements: HTTPS support for loading files from URL's directly
+* Enhancements: Numerous enhancements and optimizations in the RBA/pya
+      area and in the debugger.
+* Enhancements: KLayout notifies the user when a file was changed and 
+      asks whether to reload.
+* Enhancements: "File cell or layer": type into the cell or layer list to jump to the 
+      cell name typed.
+* Enhancements: Advanced search features in the filter entry box 
+      for the cell selection form: Case sensitive/insensitive, 
+      glob pattern, clear button.
+* Enhancements: Tree expansion icons have a better contrast now on Windows
+      with dark background.
+* Enhancements: Forward and backward navigation buttons in the main window.
+      These buttons jump to the previous or next display state:
+      zoom window, hierarchy depth, etc..
+* Enhancements: A Package manager is provided. Packages are add-ons for
+      KLayout and can include macros, script libraries, fonts
+      for the TEXT PCell, technologies, DRC scripts etc.
+      Packages can be published on GitHub or any server 
+      supporting WebDAV. After registering a package, users
+      can install or update packages with a few clicks.
+      For more information see https://github.com/klayoutmatthias/klayout/wiki
+      or "About Packages" in the "Various Topics" area of the main 
+      documentation. The package manager is found in the "Tools"
+      menu under "Manage Packages".
+* Enhancements: LEF/DEF reader:
+       - Compatibility fixes with version 5.8
+       - Regions and Groups are supported now
+       - LEF/DEF is a standare format now and 
+         can be used with "File/Open" for example.
+* Enhancements: Libraries can be associated with a technology. Only libraries
+      associated with the selected technology are shown in the selection
+      dialog. 
+* Enhancements: Overlapping instances are easier to select now (instance 
+      selection cycling).
+* Enhancements: Many more methods in RBA/pya. For example:
+       - Ability to directly insert "D" types (such as DBox
+         into layouts and cells.
+       - RBA::RecursiveShapeIterator now supports complex (non-rectangular)
+         search regions
+       - A more consistent type framework (consistent complex transformation
+         types, vectors)
+       - More intuitive interface in certain objects (i.e. CellView,
+         LayerPropertiesNode, Annotation etc.). Changing an attribute 
+         usually has an immediate effect on the respective property now
+         ("live objects")
+       - Hash functions for certain objects - Box, Edge, Trans, Polygon,
+         and other objects can be used as dictionary keys now.
+       - New import methods for Region, EdgePairs and Edges
+       - New features for LayerMapping and CellMapping
+       - Multiple selected cells in LayoutView
+       - RBA::TextGenerator to supply the Basic.TEXT PCell's 
+         functionality as static feature
+       - Receivers can be added to signals and removed from 
+         signals now.
+       - Individual instance iterator for CellInstArray
+       - ...
+* Enhancements: Enhanced layout statistics form with detailed shape 
+      statistics.
+* Enhancements: Line styles (dashed, dotted etc.) available now.
+      Works best with manhattan layouts.
+* Enhancements: "Marked box mode": boxes are drawn with a cross.
+* Enhancements: Arbitrary pattern size for custom fill pattern (no 
+      limited to multiples of 8). Max size is 32x32.
+      Enhanced annotations: 
+       - Ellipses
+       - Position markers
+       - Text alignment
+       - "Auto measure" rulers (place a ruler measuring the 
+         distances between adjacent objects with a single 
+         click)
+* Enhancements: DRC enhancements:
+       - Text support
+       - "smoothed" function
+       - "layers" function delivers all layers read
+       - Polygon with edge interactions
+       - middle and extent_refs methods for center point and other
+         references
+       - "corners" function
+       - "collect...", "select" and "each" methods
+* Enhancements: GDS2 paths can now use the MultiXY extension too.
+* Enhancements: X2 Support for Gerber import.
+* Enhancements: A function to reset the window state after the
+      window has been misconfigured (i.e. detaching or closing
+      the dockable windows). This feature is found in 
+      View/Restore Window.
+
+0.24.10         (2016-04-01):
+* Enhancements: New method CellView#is_dirty?
+       This method indicates that a cell view needs saving
+* Bugfix: DEF reader was not able to read routing 
+       Routed segments with vias plus continued wiring 
+       were not read. Instead an error message was shown
+       saying "Invalid orientation specification"
+* Bugfix: Setting "technology-data" configuration property did not work
+       Reading or writing the "technology-data" configuration
+       property is the only way to access technology data from
+       a script. Hence it's important that this property can
+       be set. With this patch, "technology-data" can be set
+       to an XML string which has the same format than the 
+       one stored within the configuration file.
+* Bugfix: Reader issues with some RVE files
+       The RVE reader could not read files with cell names
+       containing hyphens (like "A-B").
+* Bugfix: Inplace operators are now working in Python too
+       For example "r1 += r2" was not working where r1 and r2
+       were pya.Region objects.
+
+0.24.9          (2016-11-28):
+* Enhancements: The RBA::Region#smooth function was enhanced to 
+       give somewhat better results
+* Enhancements: DXF's circle approximation can now also specified 
+       through an "accuracy" parameter: if less than the number of 
+       specified points is required to achieve the given accuracy, the
+       number is reduced accordingly. This also applies to the polygon
+       interpolation of spline and arc curves.
+* Enhancement: RBA integration now is compatible with Ruby 2.3 
+       which allows building on Ubuntu 16 as well.
+* Enhancement: OASIS files with instance angles >360 were rejected
+       before. Now, this has turned into a warning.
+* Bugfix: DEF reader was failing to read MASK/via combinations.
+* Bugfix: The marker browser's "show only rules with errors" option
+       was enabled again on sorting of errors.
+* Bugfix: Using Layout objects for inputs didn't work
+* Bugfix: Copying Hierarchy treets containing PCell's made the 
+       PCell's being turned into static cells.
+
+0.24.8          (2016-06-19):
+* Bugfix: XOR and different or big database units:
+       With tiling, XOR between two layouts with different database
+       units was still not working correctly. Also, when the database unit
+       was larger than 1nm, the XOR feature was dropping results sometimes
+       when tiling was on.
+* Enhancements: progress bar shown also for "-z" mode scripts:
+       The solution of 0.24.7 has been modified to avoid annoying
+       progress bar windows popping up in background-window mode:
+       Now, progress bar windows will only pop up if an active main
+       window is present. This will enable progress bars for scripts that
+       open their own main windows but still keep the application GUI-less
+       when the script does not do so.
+* Bugfix: Crash on empty panel:
+       When "New/Panel" is used a view without a layout is created.
+       An attempt to create layout on such panels crashed the application.
+* Bugfix: LEF reader now can read PIN statements including VIA
+* Bugfix: Polygon smoothing was not working properly in some cases
+       Previously the smoothing function was sometimes dropping vertexes
+       from the polygons.
+       Smoothing now does also guarantee not to exceed the given 
+       distance.
+* Bugfix: Sorting cells by area now sorts cells by name as second choice
+       In the previous version, cells with identical area were 
+       grouped but the order was arbitrary. Now the name is used as
+       the second-level sorting criterion which keeps such cells
+       sorted by name.
+
+0.24.7          (2016-05-01):
+* Bugfix: XOR and different database units:
+       With tiling, XOR between two layouts with different database
+       units was not working correctly.
+* Enhancements: progress bar shown also for "-z" mode scripts:
+       Scripts running in KLayout with the "-z" option (don't
+       show main window) were not experiencing progress reporting
+       before. Now a small modal window is shown during long-running
+       operations that indicates the progress and provides a Cancel
+       button to abort the operation.
+* Bugfix: Crash on using "Edit/Make cell":
+       This happened sometimes if the selected objects contained
+       instances.
+* Bugfix: Invalid behavior of paths with reflecting segments:
+       For example a path made of the points (0, 0), (0, 1000)
+       and (0, 0) had a reflecting segment which cause some 
+       computations (for example the bounding box) to return
+       invalid results.
+
+0.24.6          (2016-03-22):
+* Bugfix: Early delete of plugin object when returning a new object
+       from PluginFactory#create_plugin. The returned object was 
+       not held, so in Ruby the GC could destroy the object. This 
+       could lead to crashes in applications employing the Plugin API.
+* Bugfix: It was possible to edit read-only macros. 
+       For example, it was possible to enter new lines in macros 
+       marked as read-only. However, these changes were not saved.
+* Bugfix: Shift+Tab not working in macro editor. 
+       On some platforms, Shift+Tab was not working as expected. 
+       This key combinations was supposed to left-shift a selected
+       block an undo indents.
+* Bugfix: Wrong scaling of layers when doing XOR's with layouts
+       with different database units.
+       This happened when the layouts had different layers and 
+       "summarize missing layers" was disabled.
+* Bugfix: "Search & Replace" was not working properly if named 
+       layers were present. Specifically the shape search was not
+       working due to an incorrectly formed query.       
+* Bugfix: Sizing produced incorrect results in case of slowly
+       varying polygon contours. The effect was a contour with 
+       spiky distortions where two "almost parallel" edges 
+       connected.
+* Bugfix: The diff tool was not reporting differences correctly when
+       layers were present in one layout while they were not present
+       in the other. This happened specficially when "Summarize 
+       missing layers" was disabled.
+* Enhancement: New context mode in marker browser: "Current or Any".
+       In this mode, the markers are displayed in the context of the
+       current cell. If that is not possible because the markers are
+       given for cells outside the cell tree of the current cell, the
+       fallback is to show the markers in the current cell as in "Any"
+       mode.
+* Enhancement: More consistent behaviour of cell and category filters
+       in the marker browser. For example, the category filter is 
+       now also applied when selecting a node for a certain cell in 
+       the cell branch and if nested categories are present, the 
+       category filter is applied smarter - not just on each category.
+
+0.24.5          (2016-02-26):
+* Bugfix: Instance browser was messing up array instances sometimes.
+       After browsing instances, in some cases array instances got
+       messed up. This specifically happened with OASIS files.
+* Enhancement: Diff tool does not care about text alignment and
+       font properties unless in "exact" mode. Previously alignment
+       flags and font properties were compared in non-exact mode too
+       causing some confusion for example when comparing OASIS vs. 
+       GDS.
+* Enhancement: XOR on layouts with different database units.
+       Previously, the XOR tool refused to run on layouts with
+       different database units.
+* Bugfix: The OASIS writer's S_TOP_CELL standard property now will 
+       correctly use an "n-string" value in strict mode.
+* Bugfix: The OASIS writer bailed out on 1x1 cell arrays.
+       Now these pseudo arrays are written as single instances.
+* Bugfix: GUI type support for QVariant.
+       RBA/pya did not provide constructors for QVariant from 
+       GUI types like QColor and QFont. These have been added now.
+       The corresponding conversion functions to QColor, QFont etc.
+       are provided as well.
+* Bugfix: Problems with QVariant constructor: some feature were not
+       usable. For example, a double value could not be passed to
+       the constructor. Disambiguators have been provided to solve
+       these issues.
+* Enhancement: Cell/Category filter for marker browser. The marker
+       browser now has a filter entry box to select specific cells
+       or categories.
+* Enhancement: Images are cached now for faster image update. 
+       Specifically the "fit" image will be cached and if "fit" is 
+       selected again, the image is restored rather quickly (provided
+       the window is not resized). The cache depth can be configured 
+       in "Setup/Display/Optimization".
+* Bugfix: "Read all other layers" option in LEF/DEF reader was
+       potentially assigning GDS layers which have been defined in
+       the layer mapping. Now, layers used in the layer map for 
+       targets are blocked and not used for automatic assignment.
+* Enhancement: The database unit can be configured now in LEF/DEF
+       import options. Previously it was fixed to 1 nm.
+* Bugfix: RBA::LayerProperties#id was not always unique as stated
+       by the documentation. Specifically not after a file was loaded.
+
+0.24.4          (2015-12-17):
+* Enhancement: Layer colors are iterated for named layers without
+       layer numbers as well. Such layers are created when reading
+       DXF files for example and all layers had the same color 
+       initially. Now, these layers will be assigned different colors.
+* Bugfix: RBA::TilingProcess#threads was not working properly 
+       when assigning a value of 1.
+* Bugfix: The perimeter computation now has changed to 64 bit numerics
+       reducing the risk of numerical overflow. In earlier versions, 
+       the perimeter computation of integer type shapes (polygons, 
+       boxes, regions) was performed with 32 bit length which is 
+       not sufficient to represent total perimeters of full layouts.
+* Bugfix: The OASIS writer's S_TOP_CELL standard property now is 
+       set to the correct value when using "Save cell as".
+* Bugfix: Some patches are provided for enhanced compatibility with
+       MacOS. One MacOS-only bug was related to a crash when re-registering
+       of PCell's while developing then.
+* Bugfix: PCell guiding shape parts could not be selected in partial
+       editing mode using a drawn selection box.
+* Enhancement: The color of the guiding shapes can now be configured
+       individually.
+* Bugfix: OASIS reader was not properly associating CELLNAME properties 
+       with cells as the standard requires. Instead CELLNAME properties were
+       ignored. 
+* Bugfix: Strict mode compatibility issues in OASIS writer:
+       File level PROPERTY records were not put right at the beginning of the file, 
+       empty tables were not listed with 0 position, property value strings were
+       not referenced by ID and the property modal variables were referenced 
+       sometimes after name records (specifically CELLNAME with standard 
+       properties enabled). According to the specification, the name records 
+       reset these variables so this is not correct. Other readers may report 
+       errors for such files.
+* Enhancement: OASIS writer file size reduction. Now, the OASIS writer
+       will opimize the arrangement of cell array instances so that 
+       modal variables can be used for a better compaction.
+* Enhancement: During script debugging now the Assistant window is active
+       even while the debugger is executing a script. The main window is
+       still inactive however to avoid fatal cross-interactions between 
+       the debugger and the user interface.
+* Bugfix: The Python PCell sample was broken.
+* Bugfix: slowly bending paths have not been displayed correctly.
+* Bugfix: coordinates might have been swapped in the box properties
+       page when switching from local to absolute coordinates and 
+       back.
+* Bugfix: certain ruler styles with independent x and y axis have not
+       been displayed properly when using a global transformation.
+* Enhancement: the performance of "Flatten cell" is enhanced significantly
+       in cases of many instances. 
+* Bugfix: DRC output was producing new layers with an empty layer name
+       selector (no major issue, but confusing).
+
+0.24.3          (2015-11-05):
+* Enhancement: PYTHONPATH does not mess up the Windows installation any
+       longer. If you want to set the PYTHONPATH for KLayout, use 
+       KLAYOUT_PYTHONPATH. 
+* Bugfix: The oasis_write_std_properties attribute of RBA::SaveLayoutOptions
+       did not work as described. To maintain backward compatibility and
+       enable the cell bounding box feature, a new attribute called 
+       oasis_write_cell_bounding_boxes was introduced.
+* Bugfix: "Hide all" only hides the top level layer properties, not the
+       members of layer groups.
+* Bugfix: S_BOUNDING_BOX standard properties now appear after CELLNAME
+       records in OASIS files as required by the OASIS specification.
+* Bugfix: The unintuitive behavior of the "Writer Options" has been changed.
+       Now, the writer options are applied to the saved layout always, not
+       just on the first save. Previously, the program remembered the options
+       and reused the previous options on following saves. This was quite
+       unintuitive since changing the properties did not necessarily affect 
+       the way files were written.
+* Enhancement: The starting directory for files dialogs is the "Documents"
+       folder on Windows now. Not the current directory which is the 
+       installation directory usually.
+* Bugfix: Signal names are property set for RBA::QListWidget and other 
+       objects. This enables the use of "indexesChanged" signals and eliminates
+       Qt runtime warnings.
+* Bugfix: Library cells were not properly loaded again after reloading
+       a layout which used libraries which itself referred to other libraries.
+* Bugfix: The program crashed sometimes when using report databases with
+       properties.
+* Bugfix: Layers with a single box rendered wrong results in the DRC's 
+       size function with strong undersize. The boxes did not vanish as
+       expected but instead were inverted.
+* Enhancement: The build now is compatible with Python 2.6.
+* Bugfix: Reading OASIS files in strict mode with cell names consisting
+       of a "$" character followed by an integer number (like "$1") sometimes
+       messed up the cells.
+* Bugfix: RBA::TilingProcessor could not be used both with tile size and
+       tile count set since setting the tile size was resetting the tile
+       count and vice versa.
+
+0.24.2          (2015-10-02):
+* Bugfix: Flip and Rotate function did not work as expected when the view 
+       was descended into the hierarchy.
+* Enhancement: RBA::BrowserDialog now also accepts a parent parameter
+       which are important to better integrate such dialogs into the
+       application.
+* Bugfix/enhancement: "klayout_vo.exe" now is a pure viewer application
+       again. By calling this executable, the edit functions cannot be
+       enabled and the save functions are disabled as well. Under Linux,
+       renaming the binary to "klayout_vo" switches KLayout into this
+       mode as well.
+* Bugfix: The zoom and selection rectangle can now be dragged outside the
+       visible area and still define the zoom or selection rectangle.
+* Bugfix: expressions were not coercing floating-point values consistently:
+       The expression "to_i(2)+1.4" rendered 3 instead of 3.4 as expected.
+       The sum was treated as an integer sum because the first operand is
+       an integer. Now the integer is converted into a floating-point value
+       as expected.
+
+0.24.1          (2015-08-26):
+* Enhancement: switched to -O2 instead of -O3 to avoid issues with certain
+       gcc versions for which -O3 appears to be broken.
+* Bugfix: fixed a backward compatibility issue in scripting. Specifically
+       "view.each_object_selected { |s| s.shape }" will work again.
+* Bugfix: the layer matching algorithm in the .lyp file layer assignment
+       is compatible with the previous version again. This specifically applies
+       to "wildcard" specifications. In 0.24, named and unnamed layers were 
+       considered different even if GDS layer and datatype numbers were identical.
+       The effect was that if a named layer was present, a .lyp file specification
+       without that name was not matching the named layer and with "add other layers"
+       the named layer was produced again.
+* Enhancement: "Apply all" in the object properties dialog behaves somewhat
+       more intuitive now. Specifically changing the path endcap styles now
+       works as expected. For the other properties, a choice was provided 
+       between applying changes in a relative or absolute way. For example,
+       when the left edge of a box is changed, the left edges of all selected
+       boxes are shifted by the same amount in relative mode. In absolute mode,
+       the left edge will be set to the specified position for all selected boxes.
+* Bugfix: Python iterators will keep a reference to the source object now. 
+       This avoids problems when fetching iterated properties (typically "each..." methods)
+       from short-living objects.
+* Bugfix: Python's StopIteration exception does no longer appear in the debugger 
+       now. This is an exception used internally to mark the end of an iteration 
+       sequence.
+* Bugfix: "Path#width=" does no longer reset the round end flag.
+* Enhancement: the "Show All" mode of the marker browser is persisted now. 
+
+0.24            (2015-07-25):
+* Enhancement: Python support: Scripts and PCells can now be coded in Python as well. Python and Ruby
+       scripts may coexist in the same application and they can be debugged together. The macro
+       IDE features a Python tab in which Python scripts can be managed. 
+       The language features of Python and Ruby are very similar, so the features of the 
+       integration are highly comparable and easy to translate. The Python module 
+       name is "pya".
+* Bugfix: When using a layer with special hierarchy level settings (i.e. #*), the ruler did not snap to that shapes.
+* Bugfix: Qt item ownership is now transferred on some methods. For example, "QTreeWidget#insertItem" now will 
+       transfer ownership of the item to the tree widget. Hence, when the variable holding the item goes out of scope,
+       the tree item will not be destroyed.
+* Enhancement: The shape selection can now be manipulated through scripts (new LayoutView methods "object_selection=",
+       "select_object" etc.)
+* Enhancement: New edge vs. region operations are supported (edge AND region and edge MINUS region)
+* Enhancement: RBA/pya objects now in general feature a "_manage" and "_unmanage" method will allows releasing
+       the ownership over an object in cases where object lifetime control is important (specifically when passing
+       objects around in Qt applications).
+* Enhancement: Many new RBA methods, i.e. 
+       Annotation#id
+       Cell#change_pcell_parameters
+       Cell#pcell_parameters_by_name
+       DPolygon#assign_hull (raw argument)
+       DPolygon#assign_hole (raw argument)
+       DPolygon#each_edge (with contour argument)
+       DPolygon#insert_hole (raw argument)
+       DPolygon#transform 
+       DSimplePolygon#initialize (raw parameter) 
+       DSimplePolygon#initialize (raw parameter) 
+       DSimplePolygon#set_points
+       DSimplePolygon#transform 
+       EdgePairs#+ 
+       Edges#& (with Region)
+       Edges#&= (with Region)
+       Edges#- (with Region)
+       Edges#-= (with Region)
+       Edges#inside_part
+       Edges#select_inside_part
+       Edges#outside_part
+       Edges#select_outside_part
+       Instance#change_pcell_parameter
+       Instance#change_pcell_parameters
+       Instance#convert_to_static
+       Instance#flatten
+       Instance#is_pcell?
+       Instance#pcell_declaration
+       Instance#pcell_parameters
+       Instance#pcell_parameters_by_name
+       Layout#begin_shapes (with cell ref)
+       Layout#begin_shapes_overlapping (with cell ref)
+       Layout#begin_shapes_touching (with cell ref)
+       Layout#create_cell (with PCell parameters and/or lib name)
+       Layout#delete_property
+       Layout#flatten_into
+       Layout#has_prop_id?
+       Layout#pcell_ids
+       Layout#pcell_names
+       Layout#prop_id
+       Layout#prop_id=
+       LayoutView#clear_object_selection
+       LayoutView#object_selection
+       LayoutView#object_selection=
+       LayoutView#replace_annotation
+       LayoutView#select_object
+       LayoutView#unselect_object
+       MainWindow#cm_close_all
+       MainWindow#cm_save_all
+       MainWindow#cm_sel_move_to
+       MainWindow#instance
+       MainWindow#manager
+       ObjectInstPath#==
+       ObjectInstPath#!=
+       ObjectInstPath#<
+       ObjectInstPath#append_path
+       ObjectInstPath#clear_path
+       ObjectInstPath#cv_index=
+       ObjectInstPath#layer=
+       ObjectInstPath#seq=
+       ObjectInstPath#shape=
+       ObjectInstPath#top
+       ObjectInstPath#top=
+       RdbItemValue#initialize (with float argument)
+       RdbItemValue#float
+       RdbItemValue#is_float?
+       RdbItemValue#tag_id
+       RdbItemValue#tag_id=
+       SaveLayoutOptions#gds_write_file_properties
+       SaveLayoutOptions#gds_write_file_properties=
+       SaveLayoutOptions#oasis_write_std_properties
+       SaveLayoutOptions#oasis_write_std_properties=
+       Shape#each_edge (with contour argument)
+* Enhancement: Qt API is aligned better with C++ Qt notation. Several bug fixes, new features and stability enhancements.
+       For example:
+         New: RBA::Qt::white or RBA::Qt::GlobalColor::white
+         Old: RBA::Qt_GlobalColor::white
+* Enhancement: the debugger can now be disabled in the macro editor IDE for enhanced 
+       script execution performance with IDE window open and less interactions between
+       Qt code and Macro IDE
+* Bugfix: DRC crashed when outputting shapes to a layer that was used as an input
+       in further parts of the script but has been declared as input befor the layer
+       was output.
+* Bugfix: ".lyp wildcard replacement" now honors transformations as well
+* Bugfix: Gerber import issues fixed: Zero-diameter circular apertures moves are translated into lines,
+       Zero-length moves must not be clear for G1 and circular apertures.
+* Bugfix: The technology button now applies the technology even if the technology did not change.
+* Enhancement: Polygons with holes are better supported now (for example in partial editing). Such
+       polygons cannot be written to GDS or OASIS (they will be converted to ones without holes), but
+       they may be created in DRC scripts.
+* Bugfix: "Reload layout" now doesn't forget the technology that was attached to a layout.
+* Bugfix: Box side setters now behave more consistently in scripting. Before this fix, it was not possible to
+       assign the sides of a box this way: "b = Box::new; b.left = 100; b.right = 300".
+* Bugfix: recursive library references (library referencing itself indirectly) made the application
+       crash.
+* Bugfix: Subclass mapping sometimes failed in certain cases. This was particular annoying in Qt's event
+       handlers since "QKeyEvent" (or similar classes) only showed up "QEvent".
+* Enhancement: "Move selection to" function available in "Edit/Selection/Move To". With this function, 
+       the selection (shapes are instances) can be moved to a specific position. You can specify the 
+       reference point to use. For example the center of the bounding box.
+* Bugfix: Menu icon assignment was not working in some cases within scripts.
+* Bugfix: Readonly (global) macros could be edited but not saved.
+* Bugfix: Instances could be selected even if they had only invalid layers.
+* Enhancement: The application now features a crash handler. This handler gives some debugging information
+       about the crash which you can send together with a bug report. In some cases, the crash handler will 
+       allow continuing to work with the application although it's highly advisable to save and close.
+* Bugfix: Registering plugins through the script's plugin API sometimes disabled view features.
+* Bugfix: The macro IDE is not automatically put in the foreground any more. This sometimes interfered with
+       modal dialogs shown from a macro.
+* Enhancement: The macro IDE now features watch expressions which are automatically evaluated when in a
+       breakpoint.
+* Enhancements: The "Save Layout" options are now separated from the save function. That means they can 
+       be configured once and the dialog will not pop up always when saving. This way, "Save All" is provided
+       which will save all open files with the current options.
+* Enhancement: A "Close All" function to close all open layouts.
+* Enhancement: In scripted layout loads, multiple files can be loaded into the same layout object. In that
+       case, the content of the files are merged. This worked so far with GDS. Now this also works with OASIS.
+* Bugfix: OASIS int-typed properties now as written as such. Before, they have been written as strings.
+* Enhancement: sizing code and path to polygon translation now will better maintain 45-degree edges.
+* Enhancement: DRC support for edge/polygon booleans ("edges AND polygons" will select the edges inside the polygons,
+       "edges MINUS polygons" will remove the edges inside the polygons)
+* Enhancement: Global layout properties supported as well. Layout properties can be edited by selecting
+       "User Properties" in "File/Layout Properties". They are written to OASIS. Writing to GDS2 is optional since
+       that may create compatibility issues with other tools.
+* Enhancement: The OASIS writer will now produce some standard properties: "S_TOP_CELL", "S_BOUNDING_BOX",
+       "S_CELL_OFFSET", "S_MAX_SIGNED_INTEGER_WIDTH", "S_MAX_UNSIGNED_INTEGER_WIDTH" and "S_BOUNDING_BOXES_AVAILABLE".
+* Enhancement: User properties of cells are available in cell context menu too: this way there can be 
+       browsed in non-editable mode too. 
+* Enhancement: "Degenerated" polygons (one or two points) can be created in scripts now when using "raw" mode.
+       Such polygons are useful in the context of Minkowsky sums for example.
+* Bugfix: The application crashed when the macro currently running was deleted.
+* Enhancement: "Search & replace" now is available in viewer mode too, but without the ability to replace or
+       delete.
+* Enhancement: In menu paths, appending a "+" to the path means to add something after that item.
+* Bugfix: Guiding shapes are only selected if the PCell corresponding to them is visible.
+* Enhancement: there is a clearer indication now that 'Show layers without fill' is on.
+* Enhancement: a new mode is available in which PCell content can be selected too. When editing things inside
+       PCells however, PCell recomputation may revert these edits.
+       The mode is found in "File/Setup", "Application/Selection" page.
+* Enhancement: Edge set boolean operations have been too selective with respect to almost-parallel edges. 
+       Now a tolerance is applied allowing edges to deviate by ~1 dbu.
+* Enhancement: Search & replace: texts, paths and boxes are exported into report databases. 
+       Shapes and instances are shown in micron coordinates and as seen in top.
+* Enhancement: "Apply all" in properties dialogs: with this function, a specific change is applied to 
+       all shapes or instances of the same class. For example a path width change is applied to all other selected 
+       paths. The change will be applied smartly (hopefully), so that the intention of the change is preserved.
+       For example a left edge shift for a box will be turned into the same shift for all other selected boxes.
+* Enhancement: multiple categories can be selected in the marker browser now.
+* Enhancement: the instance properties page now shows the cell dimensions (which are not editable of course).
+* Enhancement: box property editing is less tedious - the left and right coordinates will now swap if the order
+       changes and the mode (width/center or coordinates) is maintained.
+* Enhancement: Report databases now support "tagged values" (values with a name) which are shown in the marker 
+       list. The markers can be sorted by these values, provided they are string or numerical values. 
+       RVE properties are read as tagged values.
+
+0.23.11         (2015-05-23):
+* Bugfix: partial edit mode - a cell could be selected even if not visible
+       With the new version, the selection behavior of normal selection
+       and partial selection are somewhat more consistent.
+* Bugfix: The CIF reader was not able to read CIF files with line breaks
+       Commands with line breaks separating arguments were not read
+       correctly.
+* Bugfix: Printout now considers global transformation correctly
+       Previously, the global transformation was ignored on printout
+       and for screenshots.
+* Enhancement: Partial edit mode now also supports polygons with holes
+       Polygons with holes are rare since they cannot be represented
+       in GDS or OASIS files. But they can be generated in DRC scripts.
+       Now, such polygons can be edited in partial edit mode too.
+* Bugfix: LEF/DEF reader now correctly uses half the path width for path extension
+       Previously the default value was 0.
+* Bugfix: Library update was not working properly for OASIS reader
+       OASIS files with library references had as issue when updating
+       the library cells: cell deleted in the library were not deleted
+       in the layout.
+* Enhancement: Warning, when drawing on invisible layers
+       Previously there was not feedback: the shape was drawn, but not
+       visible. Now, a warning pops up when trying to draw on invisible
+       layers. This warning can be disabled.
+
+0.23.10         (2015-03-07):
+* Bugfix/Enhancement: CIF compatibility. The reader was not fully 
+       compatible with the specification. For example, lower-case
+       characters have not been ignored as specified. This has been
+       fixed among other compatibility issues.
+* Enhancement: The CIF writer now has an option to use blank characters
+       as x/y separator. Some tools apparently don't like comma
+       characters for separators (that is still the default).
+* Enhancement: The CIF writer now has an option to emit dummy cell
+       calls on top level to reference the top cells. The top-level
+       entity is unnamed and does not correspond to a cell. Despite
+       that some tools require these entities not to be empty and
+       hold dummy references to the real top cells at least.
+* Bugfix: Key bindings to default grid menu entries were not working
+* Bugfix: When a layer was deleted and a shape on that layer was 
+       selected, the application crashed
+* Bugfix: Search and replace sometimes gave an internal error, for
+       example with the following query:
+       'with * do cell.name = "A" + cell.name'
+* Bugfix: Search and replace was crashing when trying to delete 
+       instances.
+* Bugfix: Net tracer bug: the first selected shape was always taken as
+       a whole even if parts were disabled through boolean NOT 
+       operations.
+* Bugfix: Net tracer was using the wrong origin when working in 
+       "descend" mode.
+* Bugfix/Enhancement: The technology setup now features "read all" and
+       "add other layers" flags for the reader mapping table and 
+       the layer properties. Before, the global flags were used
+       causing some confusion. With the new options the behavior
+       can be configured consistently.
+* Enhancement: The file dialogs now remember the file type chosen.
+* Bugfix: The application issues a error message when trying to 
+       write very big images instead of crashing
+* Enhancement: Two new Ruby methods to write image files. These new
+       methods are LayoutView#save_image_with_options and LayoutView#
+       get_image_with_options. These methods allow configuration of
+       more features for the image generation like box to draw, 
+       oversampling etc.
+* Enhancement: DXF reader now converts ATTDEF entities to texts too.
+* Bugfix: The application crashed when the top cell was deleted.
+
+0.23.9          (2014-12-28):
+* Bugfix: DEF reader: E and W pin orientation was swapped.
+* Bugfix: DEF reader: PIN definitions are read correctly even if
+       the PLACED statement comes before the LAYER statement.
+* Enhancement: LEF reader: deprecated keyword TOPOPSTACKONLY is 
+       ignored for VIA statements now instead of giving an error.
+* Enhancement: DEF reader: the reader now is able to read BLOCKAGE
+       definitions. Currently, routing and placement blockages are
+       supported. The layers they appear on can be configured the 
+       in the same fashion than for the other elements.
+* Bugfix: Typing in the Macro Editor was slow if many macros were
+       bound to menus.
+* Enhancement: GDS AREF's with pitches not a multiple of the database
+       unit are split into individual arrays rather than simply 
+       rounding the pitch. The disadvantage of the rounding solution
+       was an accumulation of rounding errors over the array instances
+       leading to a substantial deviation from the target location.
+* Bugfix: Paths have sometimes not been displayed properly, 
+       specifically paths with a small segment length and sharp bends.
+* Bugfix: DXF reader: bulges have not been ignored on the last vertex
+       of a non-closed POLYLINE as they should.
+
+0.23.8          (2014-11-15):
+* Bugfix: DRC: "inside", "not_inside", "outside" and "not_outside" were
+       broken
+* Bugfix: LEF/DEF reader: VIA PATTERN support was broken
+* Enhancement: LEF/DEF reader: Support for LEF/DEF Version 5.8 syntax
+* Bugfix: The Tab order of certain dialogs was weired
+* Bugfix: Multi-layout layer properties files in technology setups behaved
+       strangely. Now, the behavior of layout properties files (.lyp) is
+       the same in the technology context and the usual application context.
+
+0.23.7          (2014-10-11):
+* Bugfix: DRC was crashing on second run if it was overwriting an input file.
+* Bugfix: RBA::InputDialog::ask_double was not accepting negative numbers.
+* Bugfix: With a net highlighted in the net tracer, so view zoomed to show
+       the whole net if a layer was shown or hidden.
+* Bugfix: Ruler snapping was disabled for moderately complex hierarchies.
+       The threshold has been increased. Now snapping of the ruler to objects
+       also works for denser and more complex layouts.
+* Bugfix: Some signals were not available to Ruby (i.e. QIODevice signals).
+* Enhancement: When using "Hide empty layers", the layer list will scroll to 
+       keep the selected layer visible (unless it is empty and hidden therefore).
+* Enhancement: A "split view" for the cell trees. When multiple layouts are 
+       loaded in a panel, you can choose split view (right mouse in cell list,
+       check "Split View"). In split view, up to 5 cell trees are shown at the
+       same time.
+
+0.23.6          (2014-08-20):
+* Bugfix: A DRC issue was fixed. Sometimes errors were reported too many times.
+       This happened for big polygons wrapping smaller ones.
+* Enhancement: Now, macro key bindings can be edited on the key binding page 
+       of the setup dialog too if the macros are shown in the menu.
+       Before, those changes were reset when the program was closed.
+* Enhancement: The DXF reader now also considers thin (width = 0) POLYLINES 
+       as mergable edge contributions in the "merge edge" modes if the 
+       POLYLINES are closed ones too.
+* Bugfix: The float function in the OASIS writer was fixed.
+       This is a code cleanup, and did not have effect on functionality (yet).
+
+0.23.5          (2014-07-04):
+     * Bugfix: DXF polyline mode could not be set in reader options in Ruby. 
+               A value of 3 and 4 was not allowed.
+     * Enhancement: CIRCLE AND ELLIPSE objects are treated as thin lines in DXF reader's
+               "merge edges" mode. Hence they participate in region formation.
+     * Enhancement: A warning is displayed when an ambiguous keyboard shortcut is triggered
+     * Bugfix: An assertion in the boolean processor was fixed.
+     * Bugfix: The following command caused the program to crash on the Ruby console:
+               "require 'net/http'; uri = URI('xyz')".
+     * Bugfix: The "cell" function in DRC scripts was creating a new cell if is was not existing
+               yet. In general, the DRC function is not supposed to change the layout's hierarchy.
+     * Bugfix: The macro editor now can distinguish between the same file with different suffixes.
+               Before, "test.rb" and "test.lym" were not presented as different files.
+     * Enhancement: The marker browser now indicates if the number of markers exceeds the
+               specified maximum and the list is shortened.
+     * Bugfix: The "browser.rb" sample was not working any longer because of a backward
+               compatibility issue.
+
+0.23.4          (2014-03-15):
+     * Bugfix: UTF8 encoding in XML was ignored - special characters have not been
+               read properly. This in particular caused issues in the .lym macro files
+               when UTF8 characters are employed.
+     * Bugfix: Backward compatiblity issue: layout files with PCells written with 0.23
+               could not be read with 0.22 and vice versa.
+     * Bugfix: Label text centering and right-alignment was not working propertly
+               with the default font.
+     * Bugfix: A segmentation fault occuring when rerunning a PCell macro has been 
+               fixed.
+     * Bugfix: PCell layer parameters can be set to "no layer" now. This was possible
+               before, but caused some issues - i.e. creation of dead layers.
+
+0.23.3          (2014-02-23):
+     * Bugfix: DRC bug fixed: "@x" notation was not working for layout, source and 
+               target.
+     * Bugfix: A boolean processor bug was fixed that cause an internal error in 
+               some rare cases with certain edge configurations.
+     * Bugfix: Image documentation was wrong about the offset meaning: it's the center,
+               not the lower left corner.
+     * Bugfix: Layer table tab names were lost when sorting or regrouping a layer 
+               list.
+     * Enhancement: The net tracer now can be configured to auto-color the nets with
+               a set of predefined colors. 8 colors can be configured in the 
+               configuration dialog or the net tracer setup page in the setup dialog.
+     * Enhancement: The net tracer now has a "Redo" button which will trace all 
+               nets in the list again using the original start and stop (for path
+               tracing) locations.
+
+0.23.2          (2014-01-26):
+     * Bugfix: Build issues fixed for MacOS and some Qt versions.
+     * Bugfix: DRC log to file was not working.
+     * Bugfix: Ruby script was crashing when using ruby-implemented tiling
+               processor receiver and multi-threaded tiling.
+     * Bugfix: Layout move function was using database units instead of micron.
+     * Bugfix: Search & replace markes where not shown in a reasonable context
+               for search in "All cells", instance markers are not shown
+               correctly.
+     * Bugfix: DRC now also handles the case of different database units for
+               multiple inputs. The database unit of output files is now taken
+               from the input.
+     * Enhancement: Search & replace layer selection combo boxes now show display
+               string
+     * Enhancement: Unexpected elements are ignored in XML files.
+     * Enhancement: Options are provided for making boolean operations not
+               optimize the "single empty input" case for XOR tool 
+               and DRC (strict handling mode).
+
+0.23.1          (2013-12-07):
+     * Bugfix: RBA SimplePolygon#inside? and Polygon#inside? now work as expected
+     * Bugfix: DRC output to marker browser now works as expected
+     * Bugfix: HTTP URL's now are written as such into the MRU list
+     * Bugfix: A net tracer crash was fixed
+     * Bugfix: Net tracer connectivity setup: the move buttons now work as expected
+     * Bugfix: a DRC issue was fixed when assigning the output of modifying operations (i.e. 
+        "layer=layer.move(...)".
+     * Enhancement: compatibility with clang 3.3 was established as well as compatibility
+        with Ruby 2.0.
+     * Bugfix: some memory and static code analysis issues have been fixed after
+        analysis with valgrind, clang and Coverity.
+
+0.23            (2013-11-24):
+     * Enhancement: Net tracer: Nets can now be colored individually.
+     * Enhancement: The OASIS writer now uses CBLOCK compression also for tables.
+     * Enhancement: Transparency is now supported for images (as a mask only - not a real  
+        alpha channel, but close to).
+     * Enhancement: The layer/datatype assignment for purely named layers originating from 
+        DXF or CIF has changed. It's now no longer done when reading DXF or CIF but when 
+        writing the file. This solution is more general and allows some level of control, 
+        i.e. by scripts.
+     * Enhancement: "http:..." URLs are now allowed as file names - such files are loaded 
+        from the URL instead. Such URL's can be used from the command line or within scripts 
+        for example. Drag and drop of HTTP URLs is also support. This allows dropping of 
+        URLs from the browser into KLayout.
+     * Enhancement: Menus have been rearranged: 
+        The "Tools" menu was split into "Tools" and "Macros", "Verification" menu has been 
+        resolved into the "Tools" menu.
+     * Enhancement: New command line options are available:
+        "-nn" to load .lyt (technology file) on command line. "-b" for batch mode (implies some
+        batch-mode specific options), "-zz" for display-less applications.
+     * Enhancement: "Adjust cell origin" now adjusts the cell in their parents as well (optional).
+     * Enhancement: Cells can have properties now: Cells can now have user properties as well. 
+        However, writing these properties to files is subject to some constraints. Cell
+        properties are fully supported on OASIS and optionally supported on GDS using
+        an extension feature.
+     * Enhancement: Transformations are now available for whole layout (applied to all cells).
+        This is specifically useful for scaling layouts.
+     * Enhancement: A function now is available to convert PCell's to normal (static) cells.
+     * Enhancement: The printout now has a header and footer.
+     * Enhancement: The XOR can now be confined to a region.
+     * Enhancement: There is an option now to hide guiding shapes for PCell instances.
+     * Enhancement: New option to pan/zoom or do nothing on paste - Option is in "Navigation/Zoom 
+        and Pan" in setup dialog.
+     * Enhancement: Cells can now be copied in "shallow copy" mode without creating copies of the 
+        child cells.
+     * Enhancement: A "Tap" function is provided now. The tap function selectes and changes to the 
+        layer of the currently selected shape. New shapes will be put on that layer.
+     * Enhancement: There now is a function to convert instance arrays to single instances.
+     * Enhancement: The instantiation path of an object is now shown in the status bar.
+     * Enhancement: An option is now provided for configuring the replacement character for 
+        OASIS and GDS. The replacement character is used instead of illegal characters.
+     * Enhancement: Some unicode support for texts in default font ("µ" now is available).
+     * Enhancement: There is a GDS2 writer option now to eliminate zero-length paths.
+     * Enhancement: There are new save options: disable or enable writing of PCell and library cell 
+        contexts, drop hidden cells, keep instances even if cells are dropped.
+     * Enhancement: Layers can now be made invalid. Invalid layers don't participate in selection or 
+        snapping.
+     * Enhancement: Multi-selection on 'open layout' allows to open many files at once.
+     * Enhancement: DRC functionality: a rich DRC engine was integrated in the tool. The 
+        implementation is flat, so performance is limited compared to hierarchical tools. A tiling 
+        approach is available to distribute tasks on multiple CPU's to somewhat mitigate that issue.
+     * Enhancement: Search and replace feature plus custom queries: the search & replace functionality 
+        is just the tip of the iceberg. "custom queries" are a powerful feature to perform 
+        queries and modifications using a SQL-like language.
+     * Enhancement: Some enhancements on LEF/DEF import: i.e. proper default routing rule with octagon 
+        ends implementedin DEF, NONDEFAULTRULES for LEF reader
+     * Enhancement: Auto-import feature for technologies: technologies can now be imported from 
+        the installation folder automatically.
+     * Enhancement: RBA enhancements: Tiling processor, fill tool bindings, regions, edge collections, 
+        edge pairs and edge pair collections, numerous new methods and classes.
+     * Enhancement: More configuration options for macro IDE: stop on exception will ask whether to stop 
+        in the debugger when an exception is thrown. The editor font can now be configured.
+     * Enhancement: The diff tool now has an option to disable smart cell matching and enable
+        name-only cell matching.
+     * Enhancement: cells can now be dragged and dropped from the cell list to the canvas.
+     * Bugfix: Layout diff reported texts as different which are not.
+     * Bugfix: Instance editor options problem fixed: magnification could not be edited in some cases.
+     * Bugfix: DXF reader: anisotropic scaling of block deletes subcells of that block, error messages 
+        on coordinate overflow.
+     * Bugfix: OASIS output files were corrupt when edge objects were written.
+     * Bugfix: Problems with boxes having odd width are solved now.
+     * Bugfix: Close function - "Cancel" now works properly on the "which view to close" dialog.
+     * Bugfix: Closing the main window while layouts are loaded crashed the application.
+     * Bugfix: Net tracer did not work properly with OASIS in viewer mode.
+     * Bugfix: Diff tool was not matching cells propertly in some cases
+
+0.22.9          (2013-09-19):
+      * Bugfixes: LEF/DEF reader: NONDEFAULTRULES, TAPERRULE implemented now, 
+        correct octagon style for default rules for non-rectangular routing, 
+        POLYGON and RECT implemented for routing. 
+      * Bugfix: DXF reader crash fixed for ARC objects with identical start and end angle,
+                polygons have not been read in some cases.
+      * Bugfix: It is possible again to use "Show as new top" after "Descend/Ascend hierarchy"
+                without clicking at the cell list.
+
+0.22.8          (2013-06-21):
+      * Enhancement: "gds2" now is recognized as extension of GDS files.
+      * Bugfix: CIF reader was broken in some cases. Layers have not been assigned properly
+        and sometimes, identical or no GDS layers were assigned. 
+      * Bugfix: RecursiveShapeIterator (RBA) had an issue when iterating shape arrays.
+        This was the case when working on OASIS files in viewer mode for example.
+      * Bugfix: DEF reader had some issues (TAPER and RESISTANCE keywords have not been 
+        supported properly).
+
+0.22.7          (2013-03-22):
+      * Bugfix: The output mode in the XOR tool dialog was not shown properly. Instead of
+        "Report database", "Other layout" was shown etc.
+      * Bugfix: When creating a third layout for output of the XOR tool, the database unit
+        was not set to the input layout's database unit.
+      * Bugfix: Layout numbering was not done correctly when multiple layouts were loaded
+        with the same file name.
+      * Bugfix: In viewer mode sometimes it was not possible to move to the next selected
+        item in the shape properties dialog. A message appeared saying "Shape array members
+        cannot be modified."
+      * Enhancement: OASIS writer performance is significantly better now in cases where
+        shape compression is relevant. Also, shape arrays are maintained as such which 
+        avoids repeated compression.
+      * Bugfix: A drawing bug was fixed which caused shape arrays to disappear on certain 
+        zoom levels.
+      * Bugfix: "Add missing layers" now adds all existing layers, not just the ones 
+        present in the currently selected cell also in viewer mode.
+
+0.22.6          (2013-03-03):
+      * Bugfix: It was possible for example to add shapes to a PCell. This feature does
+        not make sense since PCell's are updated when required. In that case, changes
+        are lost. This feature has been disabled for PCell's.
+      * Bugfix: RBA::Application#get_config was crashing in some cases (i.e. in -zz mode)
+      * Bugfix: The "create cell variants" function was not working properly if a single
+        instance array was present for a cell.
+      * Bugfix: The radius was limited too strictly for end segments for the ROUND_PATH
+        PCell of the Basic library.
+      * Enhancement: Some additional RBA methods have been enabled which disambiguate
+        various constructors for Qt objects (i.e RBA::QVariant#new_i allows to create
+        a variant with "int" type)
+      * Bugfix: the Ruby-less build was broken.
+      * Bugfix: Copy & paste was not working for the layer list. This is an effect of the
+        modified key handling in KLayout 0.22. New menu functions are provided in the layer
+        list's context menu to resolve the ambiguities involved in that feature.
+        These menu functions allow to copy, cut and paste parts of the layer list to other
+        windows or tabs.
+      * Bugfix: PCell's are now cleared before the production method is called. 
+      * Enhancement: OASIS layer names are also recognized if the LAYERNAME record
+        appears after the layout's body.
+      * Bugfix: in previous versions it could happen that the layout panels got 
+        locked and it was no longer possible to switch between different tabs.
+      * Bugfix: a potential crash in the drawing engine was fixed.
+
+0.22.5          (2013-02-02):
+      * Bugfix: Layer properties file in technology definitions can be given as relative path 
+        in which case KLayout uses the base path
+      * Enhancement: Windows installer now provides a useful default installation path when 
+        started as non-administrator.
+      * Bugfix: GDS reader: a false warning was issued sometimes indicating that an 
+        AREF might be off-grid.
+      * Bugfix: Fixed build for MacOS and some Linux distributions.
+      * Bugfix: Fixed a crash that happened when KLayout was closed while a instance 
+        property form was still open.
+      * Enhancement: PCell names are now shown in the status bar
+      * Bugfix: Fixed a crash that happened when a macro was run that was already closed.
+      * Bugfix: MRU list for macro editor's console was getting huge when the macro editor
+        was closed and opened again in the same session.
+      * RBA bugfixes: "destroyed?" was not working properly in some cases. Infinite 
+        recursion happened for for PCell implementation without "get_layers".
+      * Enhancement: Better error messages for RBA including class and method names.
+      * Bugfix: PCell implementation issue. Some methods were passed a deep copy 
+        of the layout object which first created a potential performance issue and 
+        second made it impossible to modify the layout.
+      * Enhancement: DXF writer now provides a header which enables some tools to 
+        read the generated DXF files.
+      * Bugfix: DXF reader: degenerated polygons for HATCH objects don't cause an 
+        assertion now.
+
+0.22.4          (2012-12-30):
+     * Bugfix: a drawing problem was fixed which created invalid images in certain 
+       cases.
+     * Bugfix: multi-tab .lyp files could not be used correctly as default layer
+       properties files.
+     * Bugfix: the macro IDE crashed sometimes when adding a new location.
+     * Bugfix: the application crashed when the net tracer window was open and a new
+       layout was loaded into the same panel.
+     * Bugfix: a memory leak was happening when a boolean operation (in particular
+       inside the XOR tool) was cancelled.
+     * Bugfix: when inserting an instance using the lower left corner of the bounding
+       box as the reference point, rotations have not been handled correctly.
+     * Enhancement: the "detailed" view of a net's properties in the net tracer now
+       reports area and perimeter of the net's shapes (only available for nets up to 
+       ~2000 shapes to avoid timeouts on computation). Thanks to Peter for providing 
+       the raw version of that code.
+     * DXF reader enhancements: 
+       Support for "999" comment records. DIMENSION and SPLINE entities are supported
+       now to some extent. "fit" formatting of TEXT objects supported now. 
+       Holes are correctly formed now from multiple POLYLINE/LINE items when combining
+       them into polygons.
+     * DXF writer: HATCH entries are written in a compatible way now. Text formatting
+       flags are fixed (top and bottom formatting was swapped).
+
+0.22.3          (2012-11-25):
+     * Bugfix: a segmentation fault sometimes happened in the drawing engine
+     * DXF reader enhancements: 
+       Anisotropic scaling of instances is supported. LWPOLYLINES with both common and 
+       variable width are handled more gracefully. Closed polylines produce closed shapes
+       now, not closed paths.
+     * Selecting of instances with non-orthogonal transformations is easier now
+     * The local config files now override the global one again like this was in 0.21.x.
+     * A compile problem with older gcc's (namely gcc 4.4) was fixed.
+     * Selection of cells in the cell tree now has been fixed (before that sometimes 
+       cells were selected in addition to current ones instead of being the only
+       one selected).
+     * The RVE DB reader was enhanced to read error waivers and certain new forms of the
+       RVE file.
+     * The align operation now works also if there is not a primary and secondary
+       selection (i.e. selection by box)
+     * "Layer pollution" does not happen when instantiating a PCell or library cell 
+       which is instantiated in another panel
+     * PCell layer parameters now can be set to any layer which is present in the 
+       layer list, not just the ones which are created already in the database
+     * The round corners function has been fixed for certain cases. In particular 
+       the limitations are less strict (for example it is possible now to create 
+       a donut from a square with a hole). Changing of the radius later now works
+       more reliably.
+     * "Shallow copy mode" now works again for copy & paste of instances. Previously
+       instances were always copies in deep copy mode which creates new cells.
+     * Move of partial selection now works like the move function for other objects: 
+       select a subset of edges, click on them to start dragging and click again to
+       drop them.
+     * Arrow keys don't interfere with move by mouse mode any longer. Previously using
+       the arrow keys while moving objects with the mouse had strange effects.
+
+0.22.2          (2012-11-01):
+     * Copy & and paste of PCell or library instances across layouts did not work
+       Instead, the cell was duplicated, but it's no longer a PCell or library cell.
+     * "klayout -v" was segmentation faults
+       The -v option is supposed to print the version number. After printing it, 
+       the executable terminates with a segmentation fault.
+     * 'Real' unicode file names could not be used
+       Using Unicode filenames (i.e. Chinese) file names did not work properly. 
+       In particular these files were not opened on Windows. Unicode file names were 
+       not recorded properly in the "recently used" list.
+       In version 0.22.2, unicode files names can be used in all places on Windows
+       and Linux.
+     * Some LEF import issues solved
+       The outline layer was not always generated correctly. Pin labels were not generated 
+       on pin shapes for LEF import.
+     * KLayout was crashing on exit when the clipboard contained something
+       The application issued a segmentation fault on exit (or "is not working" on Windows) 
+       when the clipboard contained data.
+     * Ruby debugger crashed in some cases
+       In some cases (i.e. breakpoint in a widget callback) the debugger crashed with a 
+       "Stack level too deep" message.
+     * Instances of leaf cells were always copied "flat" to another layout
+       There was no way to copy the instance plus cells before this was fixed.
+     * Sometimes PCell variants remain as top level cells
+       If the Instance function was cancelled and a PCell was active, a new top cell remained
+       which held the PCell that was about to be placed. These cells could be deleted manually, 
+       but that may be annoying.
+     * Help index cache was growing large in some cases
+       When switching between versions, the help index that KLayout creates once grew larger 
+       every time a new program version was used. This increased startup times of the program.
+     * An "abs" function was missing expressions
+     * Experimental support for 64bit coordinates is provided.
+       To enable 64bit coordinates, use "-with-64bit-coord" on the build script. This feature
+       requires gcc >= 4.4 and a 64bit platform. 64bit coordinate support is "experimental" 
+       because of some known issues (i.e. it is possible to write corrupt GDS files with such large
+       coordinates). OASIS on the other hand supports 64bit coordinates.
+
+0.22.1          (2012-10-09):
+     * Edit/Select/Disable All was not working
+       This function was supposed to disable all selectable items. Instead, an internal 
+       error message was issued.
+     * Build problems with gcc 4.0 were solved
+     * GDS text size as based on micron instead of user units
+       Because of this the text object size were not be correct if the user unit was not micron.
+     * Arrow keys behaved differently
+       This had annoying effects if one was used to a particular behavior. The operation of the 
+       arrow keys was restored in some places but still moving with the keys in move mode is
+       possible.
+     * -z option worked differently
+       "-z" is not a true "non-GUI" mode, in which no XServer connection is made on 
+       Linux. The advantage of this is that KLayout can be used as a engine on display-less 
+       servers. In 0.22, some user-interface related objects were not available in Ruby code.
+       Some scripts depending on MainWindow or LayoutView objects were not working
+       because these objects are no longer available. In 0.22.1 the original behavior of "-z" 
+       was restored and instead, "-zz" was implemented as a different, true display-less mode 
+     * KLayout was crashing when using custom key bindings on some platforms
+       On some platforms, apparently Linux and recent Qt versions, KLayout crashed when 
+       custom key bindings are defined and the respective key is pressed.
+     * Some issues with the macro tree solved
+       Drag & drop was not working correctly within the macro tree on Windows. KLayout 
+       crashed when trying to open a macro file that is not writable.
+
+0.22            (2012-09-19):
+     New available features:
+     * A script (macro) development environment is now integrated into KLayout.
+       It features a simple debugger, a syntax highlighting editor. For details
+       see About Macro Development at http://www.klayout.de/doc/about/macro_editor.html.
+     * KLayout now features an integrated help system (available through the "Help/Assistant" menu entry).
+     * Support for libraries. See About Libraries for details.
+       http://www.klayout.de/doc/about/about_libraries.html
+     * KLayout now supports parametrized cells (PCells).
+       There is a cool feature called "guiding shapes". Learn more about that here:
+       About PCell's (http://www.klayout.de/doc/about/about_pcells.html).
+     * A basic library is provided adding text generation for example to KLayout.
+       See About The Basic Library for details.
+     * The net tracer now allows to use layer combinations (derived by boolean operations)
+       for the conductive and via layers. See The Net Tracing Feature for details.
+     * A technology management is integrated into Klayout.
+       That allows to switch various settings depending on the choosen technology.
+       See About Technology Management for details about this feature.
+     * The drawing can now be rotated or flipped without having to modify the layout.
+       This function can be found in the "Display" menu under "Global Transformation".
+     * The "background" combination mode allows to erase parts of existing shapes or
+       add new parts to existing shapes. The background combination mode is available
+       as a new drop-down button in the toolbar.
+     * A "cell variant" generation function simplifies hiearchical editing.
+       See Create Cell Variants for details about this feature. 
+     * General performance improvement of the render.
+       This has been achieved by bitmap caching of cells and various optimisation measures.
+     * Images now can be aligned with a layout using landmark points.
+       The possible image transformations now include shear and perspective distortions.
+       See Using Landmarks To Align Images
+     * Images can now be stacked and moved to the bottom and to the top.
+       The configuration now is stored along with additional configuration data
+       (i.e. libraries) in a per-user directory in "~/.klayout" on Linux and in the application
+       data path on Windows. The configuration file now is found there and is called "klayoutrc".
+       New locations can be added using $KLAYOUT_PATH.
+     * The database unit of the layout can be changed now in the layout properties page
+       (menu: "File/Layout Properties"). 
+     * Most numeric input boxes now accept formulas,
+       i.e. "1254+3221" instead of a single value.
+     * By clicking a on single point multiple times you can now cycle the selection through all objects below the point.
+     * Layers can be copied (menu: "Edit/Layer/Copy Layer").
+     * The selection can be duplicated (menu: "Edit/Duplicate" or Ctrl+B).
+     * The size of the default font can now be adjusted (choose between small (current),
+       medium and large on the Display/General page of the setup dialog).
+     * The number of points used for circle interpolation can now be adjusted
+       on the Application/Circles page of the setup dialog.
+     * Some changes to make the user interface more consistent, i.e. "Synchonized views"
+       has been moved to "Display" where most users where expecting it to be.
+     * The selection now can be moved with the cursor keys in move mode.
+     * The cell selection dialog allows to specify glob pattern wildcards in the filter box now.
+     * OASIS CBLOCK compression and strict mode writing is supported now.
+     * Multiple cells now can be selected in the cell tree. Some functions operate on that set (i.e. delete, copy, hide).
+     * KLayout now has a LEF/Def import feature. See About LEF/DEF Import for details.
+     * This feature is somewhat experimental. Feedback is welcome about that feature.
+
+    Solved bugs:
+     * Edit/Select/Disable All not working
+       This function is supposed to disable all selectable items. Instead, an internal error message is issued.
+     * Build problems with gcc 4.0
+     * GDS text size is based on micron instead of user units
+       Because of this the text object size may not be correct if the user unit is not micron.
+     * Arrow keys may behave differently
+       This can be annoying effects if you are used to a particular behavior. On the other hand, moving with
+       the arrow keys now is possible in move mode.
+     * -z option works differently
+       "-z" not is a true "non-GUI" mode, in which no XServer connection is made on Linux. The advantage of this
+       is that KLayout can be used as a engine on display-less servers. But some scripts depending on MainWindow or
+       LayoutView objects will not work because these objects are no longer available. The solution will be to
+       restore the original behavior of "-z" and implement a different, true display-less mode (i.e. "-zz").
+     * Crash when using custom key bindings on some platforms
+       On some platforms, apparently Linux and recent Qt versions, KLayout crashes when custom key bindings
+       are defined and the respective key is pressed.
+     * Issues with the macro tree
+       Drag & drop does not work correctly within the macro tree on Windows. KLayout crashes when trying to
+       open a macro file that is not writable.
+
+0.21.19         (2012-06-19):
+     * Gerber file reader enhancements: Negative contrast layers supported now
+       with an option to provide a background and 'real' inversion.
+     * Gerber reader bugfix: SR command implemented correctly now also for
+       negative contrast.
+     * Enhancement: transient selection markers are drawn over other markers
+       for better visibility.
+     * Bugfix: XOR tool can be canceled without crash.
+     * Fixed build problems with gcc 4.7.0.
+     * Fixed a layout import bug (cells have been deleted which should have been kept).
+     * OASIS writer bugfixes: don't accumulate rounding errors when writing type 0
+       or type 1 pointlists. Avoid writing invalid type 0 and 1 pointlists in certain
+       cases.
+
+0.21.18         (2012-05-14):
+     * Gerber file reader enhancements: SR (step-and-repeat) is supported now.
+     * Gerber reader bugfix: AM macro expansion was not done correctly sometimes.
+     * Gerber reader enhancements: removed some superfluous warnings.
+     * CIF writer: convert OASIS circles correctly to "R" round flash primitives.
+     * Bugfix: copy & paste of layers in the layers tree now works and the copied
+       layers are pasted to the current position.
+
+0.21.17         (2012-04-12):
+     * The memory footprint of 8-bit images has been reduced significantly.
+     * The "Save current cell as" bug (see here) has been fixed: this function now works as expected.
+
+0.21.16         (2012-03-05):
+     * GDS format readers and writers now support time stamps: by default, the
+       current time is written to the files. This option can be turned off in the
+       "Save Layout Options" to simplify comparison of binary files for example.
+       In addition, the timestamp of the BGNLIB record is read and displayed in the
+       "Layout Properties" page.
+     * The GDS reader now is somewhat less strict and also accepts certain broken versions
+       (i.e. missing ENDEL records).
+     * Several bug fixes related to scripting applications: Proc objects are held by the
+       application now, Application does not abort in non-GUI mode in operations that take
+       some time and try to display a progress bar.
+     * DXF bugfix: layer names now do no longer contain blanks which made files unreadable
+       by other tools like AutoCad.
+     * Bugfix: foreground objects (i.e. rulers) are now correctly rendered in printout.
+
+0.21.15         (2012-01-22):
+     * Bugfix: the correct initial cell now is selected. Formerly, the largest
+       cell was selected even it is was not a top cell.
+     * "Show only selected" in the layer panel does not clear the selection any longer.
+     * GDS reader now is less strict with respect to record order of STRANS, MAG and ANGLE.
+     * Excellon drill file reader is now conforming to the specification in many respects.
+     * Instances are not selected if the cell does not contain shapes in visible layers.
+     * Marker browser does now work correctly when layer view transformations are present.
+     * DXF reader enhancements: read LAYER table and assign GDS layers in that order,
+       except for layer which got a layer name through their name (i.e. L1D100).
+       Bugfix: don't suppress INSERT's if the layer is not mapped. Write TEXT and
+       MTEXT correctly (multi-line support, small chunks for MTEXT, character alignment).
+       New option: keep all cells for DXF reader. Added elliptic interpolation edge type
+       (not really tested yet). HATCH objects with bulges and various edge types are
+       implemented now. MTEXT supported now. New option: convert text to polygon for
+       unicode support.
+     * Changed default sorting of layers: always sort by layer number first, even if there
+       is a name. If there is no layer number, sort by name.
+
+0.21.14         (2011-11-28):
+     * "Synchonized views" and "Select top level only" configuration shortcuts
+       added to the "Views" menu.
+     * Gerber reader bugfixes and enhancements: less strict parsing of aperture
+       definitions, rotation of aperture macro elements is not considered
+       correctly. Enhanced drill file reader.
+     * Disabled cell copy & paste in viewer mode (was not working correctly).
+     * Bugfix: it was possible to create an invalid configuration when removing
+       all default stipples (lead to a crash on the next KLayout start).
+     * Bugfix: an error appeared when switching the tabs in the layer panel in
+       certain configuration involving groups.
+     * Correct initialization of ruby interpreter to support Ruby 1.9.2 and
+       later.
+     * Bugfix: marker browser was only partially reporting collected markers
+       for certain categories.
+     * XOR now has an option to make use of multiple cores using a configurable
+       number of threads.
+     * Bugfix: reset of configuration required a restart.
+     * Bugfix: OASIS reader now is more robust against overflow for g-deltas.
+     * GDS reader enhancement: An invalid angle (outside the range of -360 to
+       360 degree) now is no longer an error and the angle is automatically
+       restricted to the valid range.
+
+0.21.13 	(2011-09-19):
+     * A bug in the clip function was fixed which was related to empty cells
+       (reported in the forum)
+     * By default, the first level of hierarchy is shown now if a new layout
+       is opened. That feature can be adjusted using the "Default levels of
+       hierarchy" setting on the "General" page in the setup dialog.
+     * For multiple top cells, the cell with the larges footprint is selected
+       initially.
+     * A simple print function (available in the "File" menu)
+     * Support for command 93 in CIF (AREF)
+     * Improved handling of single point paths. In particular with round ends.
+       They now render a circle in OASIS. In reverse, OASIS circles now render
+       single-point paths with round ends in GDS.
+     * Ruby scripts now work more reliably under ruby 1.9 (i.e. Windows binary).
+       Formerly, some operations failed due to improper initialization of the
+       encoding system (i.e. Dir.glob).
+     * Clean uninstaller under Windows (removes all registry entries).
+
+0.21.12         (2011-07-29):
+     * Bugfix: GDS2Text format was not recognized correctly in some cases.
+     * Texts: strings with line breaks can be edited now (line breaks are shown
+       as \n). Text size is shown more realistic now. Alignment flags are
+       supported in GDS2 and can be edited now.
+     * Layer and datatype is shown in addition to OASIS layer names in the layer
+       list. The old behaviour can be configured by unchecking the "Always show
+       layer and datatype" checkbox on the "Layers" page in the setup dialog.
+     * For most file dialogs, the specific filter is the default now (i.e. 
+       "*.lyp" is default instead of "All files" for the layer properties file
+       dialogs.)
+     * There is a "all layout files" filter for the layout file selection dialogs.
+
+0.21.11 	(2011-06-26):
+     * Bugfix: command line option -p was not working correctly.
+     * Bugfix: writing layouts with large coordinates was producing invalid OASIS
+       files in some cases.
+     * The tarkit now contains the files necessary for a build with Visual Studio
+       on Windows.
+
+0.21.10 	(2011-05-07):
+     * Bugfix: content of cell was not shown correctly when the cell was moved.
+     * Bugfix: PCB import was not working properly (Bottom mounting mode was
+       broken, top cell and dbu were not set correctly when a PCB project file
+       was imported directly).
+     * Bugfix: RVE reader was not correctly handling check names with a dot.
+
+0.21.9		(2011-04-20):
+     * Bugfix: Loading of layer files with tabs was not working properly: the
+       first tab's name was discarded.
+
+0.21.8 		(2011-04-06):
+     * Bugfix: navigator was broken. It was not functional if KLayout was closed
+       with the navigator open.
+
+0.21.7 		(2011-03-24):
+     * DXF bugfixes (arc interpolation of polylines).
+     * Performance enhancement of "test for shapes in view" feature of layer list.
+
+0.21.6 		(2011-02-20):
+     * DXF enhancements (support for bulges for polylines).
+     * Bugfix: RBA::Edge.intersect? reports intersections correctly also if edges
+       are collinear.
+     * Performance bugfix: selection was slow for certain cases of hierarchy.
+
+0.21.5 		(2011-02-03):
+     * DXF enhancements (some polylines now have the correct width).
+     * An option to select how instances are placed (at origin or lower left
+       corner of bounding box).
+     * Bugfix: when placing an instance at the lower left bounding box corner,
+       it is guaranteed that the origin is on grid.
+     * Stable operation on UTF-8 filesystems and with non-english locales on
+       Linux (i.e. consistent use of dot as decimal point). However, UTF-8 file
+       names are not correctly displayed although the file is opened correctly.
+       This will be fixed in the next major release.
+
+0.21.4 		(2011-01-19):
+     * Correct installation of the image reader plugins for the Windows packages.
+     * Bugfix: rotate counterclockwise was clockwise and vice versa.
+     * Bugfix: "draw border instances of arrays" feature was broken.
+     * Fixed a ruby crash on some systems (related to an initial 'require' on a
+       ruby module loaded with -rm).
+     * CIF reader enhancement: "DS" statements are now accepted with a single
+       value also.
+     * The Windows installation now also includes the standard Ruby modules.
+
+0.21.3 		(2010-12-27):
+     * DXF reader and writer enhancements. The reader now allows to specify how
+       POLYLINE entities are read. In most cases, the "Automatic" mode will be
+       appropriate. The writer was enhanced by providing an option which
+       determines how to write polygons. The default method is POLYLINE. A
+       comprehensive description of the DXF format, as KLayout understands it,
+       together with a description of the modes, is given here.
+
+0.21.2 		(2010-12-19):
+     * RBA bugfix: RdbItem.each_value was not working on const references.
+     * DXF reader and writer enhancements for improved interoperability with
+       other tools.
+     * Unit option for DXF input (to specify the units of the drawing).
+     * Bugfix: layer mapping was not working correctly for DXF and CIF output.
+
+0.21.1 		(2010-12-06):
+     * Added cell margins for fill utility.
+     * A couple of bugs fixed (related to Diff tool, marker database reader,
+       Ruby scripting).
+     * Source is compatible with earlier versions of Qt now (down to 4.2.3).
+     * Bugfix: persistency of reader options was broken.
+     * Enhanced DXF and CIF reader and writer functionality with improved
+       compatibility with other systems.
+
+0.21 		(2010-11-28):
+     * Support for DXF format (reading and writing).
+       ASCII and binary format are supported. There is an open issue how to
+       represent layouts with multiple top cells. Currently, the ENTITY section
+       is always empty and all cells are put into BLOCKS sections. DXF units
+       will be micron and the database unit must be selected manually when
+       layouts are read.
+     * Support for CIF format (reading and writing).
+       There is an open issue how to deal with paths. By default, CIF states
+       that paths are supposed to have round ends. Obviously that interpretation
+       is not commonly used. Options are provided which control how path objects
+       are read and written.
+     * Tabs for the layer panel. This feature is explained here.
+     * Flat cell list and cell list sorting modes. The feature is explained here.
+     * Dockable tool boxes.
+       Layer list, cell list, layer toolbox and navigator are now dockable and
+       can be dragged to another location, torn off the main window or closed
+       with Qt's standard dockable window controls. The position and the state
+       of the dockable windows is saved in the settings and session files.
+     * A ruler embedded in the background image.
+       Now, a small ruler is embedded into the background which shows the
+       dimension scale similar to a map. It can be disabled in the setup dialog
+       on the "Display/Background" page.
+     * Image quality enhancement by oversampling. The feature is explained here.
+     * The "Diff" tool. The Diff tool produces a marker database containing a
+       description of the differences. A detailed description can be found here.
+     * Snapping to objects is provided as an option for edit mode. In this mode,
+       the mouse snaps to vertices and edges of visible objects. This mode can
+       be enabled with the "Objects" checkbox on the "Editor Options" page (F3
+       key or "Edit/Editor Options" menu).
+     * The reference point for the placement of instances now is the lower left
+       point of the placed cell's bounding box, not the origin.
+     * Dialog geometry persistent now.
+       Marker, shape and instance browsers now save their geometries and
+       splitter pane configurations when the application exits.
+     * Instance placement now uses bbox origin, not cell origin.
+       This simplifies placement of cells with their origin not aligned with
+       the content.
+     * Fill (tiling) tool. The tool is found in "Edit/Utilities/Fill Tool". A 
+       detailed description can be found here.
+     * In some places, particular in the ruler display string, expressions can
+       be used. For rulers, the previous display string placeholder scheme is
+       replaced by the more powerful expression expansion scheme (see Ruler
+       properties for details).
+     * Build support for VC++ and Visual Studio 2010. The Windows 64bit build
+       now is based on that environment. Note: Visual Studio 2010 no longer
+       supports Windows 2000. To use KLayout on Windows 2000, a legacy build
+       based on MinGW is provided.
+
+0.20.2 		(2010-05-25):
+     * Bugfix: marker browser crashed when opened from menu and the maximum
+       number of markers was set differently from default.
+
+0.20.1 		(2010-05-23):
+     * Navigator now allows to drag a zoom box in the usual way.
+     * Paths with odd width (in database units) are shown correctly.
+     * Some bugfixes (for a list of fixed bugs see Known bugs in version 0.20)
+       concerning the net tracer and the Gerber import feature.
+     * Support for Ruby 1.9 (experimental).
+     * Support for 64 bit Windows (experimental).
+
+0.20 		(2010-05-01):
+     * Import option for Gerber PCB data ("File/Import" menu entry). Details
+       about this function can be found in the Importing Gerber PCB files
+       section in the advanced features manual.
+     * A function to import another stream file into the current file.
+       This avoids having to use copy & paste and provides a couple of nice
+       options. Details about this function can be found in the Importing other
+       layout files section in the advanced features manual.
+     * A simple XOR tool providing a flat XOR between two layouts. A tolerance
+       can be set to suppress small deviations. A tiling option is provided to
+       reduce memory requirements for large layouts. The flat approach probably
+       limits the application to "almost flat", small to medium sized layouts.
+       Details about this function can be found in the The XOR tool section in
+       the advanced features manual.
+     * A net tracing tool to trace single nets of conductive layers connected
+       through via shapes. The function is intended for extracting single small
+       nets and it's not performance optimized for the case of huge power nets.
+       Details about this function can be found in the The net tracing feature
+       section in the advanced features manual.
+     * A navigator window that shows current view's rectangle and allows to
+       control the rectangle by dragging or resizing it.
+     * Multi threading support for drawing increases the drawing performance on
+       multi-core CPU's by rendering different layers on different CPU's. The
+       number of threads to use can be set in the setup dialog in the "Display"
+       group under "Optimizations". By default, a single thread is used.
+     * "Make array" method ("Edit/Selection" menu) to multiply the selection
+       into an array arrangement.
+     * A function to add a layout already loaded to a view ("File/Pull In
+       Other Layout").
+     * A function to scan a layer's geometry and create a marker database from
+       that. The menu function is found in the "Tools/Verification" menu. It
+       will scan all selected layers either flat or hierarchical and create a
+       marker database containing the shapes as markers.
+     * Layer mapping on input: the reader options now allow to specify a
+       mapping together with a layer specification. In addition to specifying
+       the layers to read, a target can be given which specifies which layer
+       the shapes will be stored under (See "Reader Options" dialog found in
+       the "File" menu).
+     * A couple of new display options:
+         o Abstract mode (shows only the outer interfacing shapes of child cells.
+         o Child hierarchy level layout can be configured to be shown in different
+           brightness, hollow fill or static neutral color to differentiate top
+           level from bottom level layout.
+         o Enhancements for the hierarchy level specifications in the layer source
+           notation.
+     * A log viewer is provided to catch warning messages. The menu entry to open
+       the log viewer is found in the "File" menu.
+     * The setup dialog has been reorganized to make room for more property pages.
+     * Instances now show the cell's content when being moved instead just a
+       rectangle. This feature can be disabled.
+     * Various usability enhancements (i.e. mouse cursor now shows activity,
+       status bar shows short shape statistics etc.).
+     * An option to not write empty cells.
+     * Support for missing cells in the input layout: those cells get marked and
+       are not produced in the output unless they have received content. That
+       allows to load and save layouts with missing cells without producing empty
+       cells for those missing cells.
+     * Some new functions in the layer list context menu ("Show All", "Hide All",
+       "Show Only Selected").
+     * Various bug fixes (i.e. for clip function).
+     * A couple of new RBA methods.
+
+0.19.3 		(2009-12-17):
+     * Some bugfixes (for a list of fixed bugs see Known bugs in version 0.19.2).
+     * To specify the installation path (where the ".rbm" files are looked up),
+       a new environment variable "KLAYOUT_PATH" is provided. This variable
+       currently supports a single entry only. In that sense it's not a "path"
+       right now.
+
+0.19.2	 	(2009-12-05):
+     * Some bugfixes (for a list of fixed bugs see Known bugs in version 0.19.1).
+
+0.19.1 		(2009-11-30):
+     * Some bugfixes (for a list of fixed bugs see Known bugs in version 0.19).
+
+0.19 		(2009-11-21):
+     * Images: it is possible now to load image files (JPG, GIF, TIFF etc.) and
+       display them below the drawn layout. The display of the images can be
+       adjusted in many ways, i.e. placement, scaling, rotation, mirroring,
+       color/contrast/brightness adjustments and false color mapping for gray
+       level images. Images are fully supported by RBA. The feature is described
+       in detail in Adding images.
+     * Marker browser: the marker browser is based on the report database (RDB).
+       This is a new concept that has been introduced as a container for report
+       items, in particular marker objects but also for a number of additional
+       annotations including screenshots for documentation. An import of Calibre
+       DRC databases is provided. The RDB is fully supported by RBA.
+       The feature is described in detail in The marker browser.
+     * Some enhancements for the layer views: invisible layers are now shown
+       differently in a "collapsed" way. Thus, the layer's colors and styles are
+       still recognizable. The new features are described in detail in Telling
+       used from unused layers.
+     * In the layer list, unused layers can now be hidden and layers without
+       shapes in view can be marked unused or hidden. The normal mode of marking
+       layers unused when the cell does not contain any shapes at all is still
+       available. Both modes are available as checkable items in the layer list's
+       context menu.
+     * A "View" menu has been added with fast access to certain display options,
+       i.e. turn grid on an off. A number of default grids can be defined for
+       quick selection in the "View" menu. On request, the tool bar can now be
+       hidden as well as the layer and hierarchy lists.
+     * A key binding editor is provided. This way, all menu functions can be
+       assigned arbitrary key shortcuts in a more comfortable ways.
+     * The mid mouse button can be used to pan (drag) the view window now.
+     * Various RBA enhancements, i.e. a method to compute the intersection point
+       between edges.
+
+0.18.2 		(2009-11-05):
+     * Enhancements for building with gcc 4.4.x and Qt 4.5.x.
+     * OASIS reader now also supports text objects with forward references to
+       text string definitions.
+
+0.18.1 		(2009-08-02):
+    * Some bugfixes (for a list of fixed bugs see Known bugs in version 0.18)
+      in particular for MacOS users.
+
+0.18 		(2009-07-07):
+     * Some bugfixes (for a list of fixed bugs see Known bugs in version 0.17.2).
+     * Added support for the GDS2 text format. This is a contribution by
+       Romain Gauci from Oscillated Recall Technology (http://www.or-tech.co.jp).
+     * Session persistence: sessions (files, layers, bookmarks, setup) can be
+       saved and restored. Details for this feature can be found here.
+     * Reader options can be specified in a dialog now (File menu). Some GDS2
+       specific reader options are available: allow multi XY, allow big records
+       and several box record handling modes. Details for this feature can be
+       found here.
+     * GDS2 specific writer options (max vertex option, multi XY record option,
+       max cell name length).
+     * The stipple palette now is editable. A corresponding page has been added
+       in the setup dialog.
+     * Flatten cell function. A cell can be flattened which will remove the cell
+       and all the subcells unless not specified otherwise. This function can be
+       found in the cell's context menu. Details for this feature can be found
+       here.
+     * The 'Make Cell' operation provides a nice origin now. Before, the origin
+       of the new cell was far off sometimes.
+     * Accept drag & drop of .lyb, .lys, .lyp, .rb, .rbm and layout files.
+     * Switched to standard file dialogs where this has not been the case yet.
+       In particular on the Windows platform, the application will behave somewhat
+       more consistent.
+     * Added an option to draw only border instances of arrays. This option can be
+       found on the 'Misc.' tab of the setup dialog.
+     * Added the capability to define global ruby modules using the ".rbm"
+       extension and putting them into the installation directory.
+     * Full cell copy & paste functions can now be found in hierarchy panel
+       context menu.
+     * Enhancement of grid snapping in partial mode. Before, a offgrid vertex could
+       not be brought on-grid because movement was confined to grid steps.
+     * Number of points for polygons is shown now in the polygon property dialog.
+     * Hole resolution for GDS2 and OASIS writer. Before, polygons with holes
+       (which can be produced by scripts) were rejected.
+     * Some bugfixes for clip, using booleans for clip to overcome some problems
+       with hole connectors and spikes - slow but safe..
+     * '#' character is not longer used when creating cell variants - instead '$'
+       is used to enhance the compatibility with other tools which do not allow
+       the "#" character as part of cell names.
+     * On paste, a 'fit selection' is done to show what has been pasted.
+     * Mouse wheel mode is configurable now (shift/ctrl modifier behaviour).
+       The 'alternative mode' can be found on the 'Misc.' tab in the setup dialog.
+     * Option to clear all rulers when cell is changed. This option can be found
+       on the 'Misc.' tab in the setup dialog in the 'On Cell Change' group.
+
+     RBA enhancements:
+     * A new class: ICplxTrans and related functions.
+     * A recursive shape iterator simplifies hierarchical region queries and
+       "as if flat" traversal of cells.
+     * Polygon: hull and hole can be assigned now, compress method, point accessors.
+     * The installation path now is available.
+     * Added a method which allows to display a message in the status bar.
+     * The transient selection now is available for RBA procedures.
+     * New events are generated if selection and transient selection changes.
+     * Added a generic assign method for copyable objects.
+     * Added new classes 'LayerMap' and 'LoadLayoutOptions'.
+     * Added two 'read' methods to Layout class.
+     * Added a couple of methods to 'LayerInfo' (constructors, compare, ...).
+     * Added a 'load_layout' method to LayoutView.
+     * Added more cm_* methods to MainWindow.
+
+0.17.2 		(2009-04-20):
+     * Some bugs are fixed now (for a list of fixed bugs see Known bugs in
+       version 0.17.1).
+     * The GDS2 writer now normalizes AREF records. This way compatibility with
+       other EDA systems is enhanced.
+
+0.17.1 		(2009-03-27):
+     * The display freezing bug on Windows is fixed now (i.e. see Known bugs
+       in version 0.17).
+
+0.17 		(2009-03-23):
+     * Various layer operations are now available: boolean operations (AND, XOR,
+       NOT), layer merge and sizing. For a detailed description see Layer boolean
+       operations and Layer sizing. These operations are also available in RBA
+       (see RBA::EdgeProcessor and RBA::ShapeProcessor).
+     * Boolean and sizing operations are also available Shapewise boolean
+       operations and Shapewise sizing.
+     * Objects can now be aligned. For a detailed description of the alignment
+       function see Object alignment.
+     * The cell origin can be adjusted relative to the cell's bounding box.
+       For a detailed description see Cell origin adjustment.
+     * A 'corner rounding' function has been implemented to support
+       soft-cornered layout which is common in power applications. For a detailed
+       description see Corner rounding.
+     * Various layer operations are now implemented in edit mode: clear layer,
+       delete layer and edit layer properties. For a detailed description see
+       Layer operations: clear, delete, edit specification.
+     * The selection can now be scaled (The "Scale" function is available in the
+       "Selection" submenu of the "Edit" menu).
+     * An option is available that allows to select all hierarchy levels
+       automatically when a cell is opened (found in the "Misc." tab of the setup
+       dialog: "Select all hierarchy levels" must be checked).
+     * Various bug fixes (i.e. see Known bugs in version 0.16.1).
+
+0.16.1 		(2009-01-07):
+     * Various bug fixes (i.e. see Known bugs in version 0.16).
+
+0.16 		(2008-12-27):
+     * Some new editing capabilities: flatten, make cell, clear layer and a clip
+       function.
+     * Some RBA extensions, in particular the ability to modify layout by deleting
+       shapes and instances, replacing and transforming them, changing property
+       handles etc.
+     * Support for global preset of configuration (through a file called "layviewrc"
+       beside the executable binary) and a global RBA initialisation file (a file
+       called "rbainit" beside the executable binary).
+     * Transient selection: indicates by a faint selection marker what object is
+       below the mouse (can be disabled).
+     * The layer specification (layer, datatype, name) can be now be edited which
+       allows to move a complete layer to a different one.
+     * Undo buffering can now be disabled on the command line with the '-i' option.
+       This saves the memory otherwise required for storing the replay information.
+     * Directional constraints can be modified by using the Shift and Ctrl modifiers
+       on various operations such as rulers, movement, drawing etc.
+     * Now there is a 'most recently used' list ("Open Recent" in the "File" menu)
+       which shows the last layouts opened for easy re-opening.
+     * Reduced memory requirements for particular OASIS constructs (random repetitions)
+     * The instance browser now has a "Choose cell" button where the cell can be
+       chosen whose instances will be presented.
+     * For most editing operations, the status bar will now indicate more detailed
+       informations such as move distance.
+     * Pasted shapes and instances now are selected initially.
+     * Enhanced OASIS compression mode (can be chosen from the options dialog on
+       saving). Reduces file size considerably by creating regular shape arrays if
+       possible at the cost of higher memory consumption and longer writing times.
+     * Various bug fixes (i.e. see Known bugs in version 0.15).
+
+0.15 		(2008-08-16):
+     * Editing capabilities. "klayout" in it's basic form still operates as pure
+       viewer. However, a mode is available that enables editing capabilities.
+       See Editor mode quickstart manual for a more detailed description
+     * Some RBA extensions: i.e. conversion from "double" type polygons to "integer"
+       type ones.
+     * A default layer table can be configured in the "Application" tab of the
+       setup dialog. This table will be loaded whenever a layout is opened or
+       created.
+     * A installer for Windows is provided now.
+     * Properties are supported on instances now as well.
+     * Code is compatible with gcc 4.3.0 now.
+     * Enhanced compatibility with SunStudio 11 compiler (in particular in RBA).
+     * Various bug fixes (i.e. in GDS reader and OASIS writer).
+
+0.14 		(2008-04-04):
+     * Several RBA extensions: i.e. alternative methods replacing different 'new'
+       variants by one 'new'. Markers now can be filled.
+     * Fixes for the bugs mentioned in the issues list.
+     * OASIS and GDS writing capabilities. Menu functions are provided to save a
+       layout and single cells as well as RBA extensions that allow to write a
+       layout. See Saving a layout or parts of it for details.
+     * Rulers and markers are drawn with a thin halo in background color to
+       enhance their visibility. This can be switched off in the setup dialog if
+       this is not desired. The screenshots illustrate the differences.
+
+0.13 		(2008-01-16):
+     * A couple of RBA extensions: API's for shape properties, rulers and geometry
+       selections.
+     * A bugfix for the OASIS reader (sometimes crashing the reader on
+       CBLOCK-compressed input)
+     * A function to descend into a cell in the hierarchy but keeping the context,
+       which is shown in dimmed colors. This function can be found in the "Display"
+       menu and is called "Descend". To use this function, select a shape or instance
+       inside the cell into which to descend. "Descend" then enters the next cell
+       along the path that leads to the selected shape or instance.
+     * The mouse wheel can be used to zoom in and out.
+     * Shift+right mouse button pressed now allows to "drag" layout in a "Google maps" fashion.
+     * Copy & paste now is available for layers as well.
+     * A ruby console is provided where ruby commands can be executed interactively.
+     * The way how the selection is displayed can be configured now (color, line width
+       and vertex size).
+     * The interrupt signal now is enabled again even if Ruby is activated (Ctrl+C
+       now works again).
+
+0.12 		(2007-11-02):
+     * Support for arbitrary angles on cell instances.
+     * A bugfix for the OASIS reader (CTRAPEZOIDS have not been read in some
+       cases). The OASIS reader now uses shape arrays to achieve are smaller
+       memory footprint in some cases.
+     * Multiple transformations are now allowed on layer source expressions
+       (see Transforming views and property selectors for a detailed description).
+     * Rulers now are configurable to a large extent. Multiple ruler templates may
+       be defined from which a certain ruler type can be chosen. Some of the new
+       ruler styles are no longer "rulers" but rather "annotations". See Ruler
+       properties for a description of that feature.
+     * Last, but not least: KLayout now can be scripted to some extend using Ruby
+       as the scripting language. For more information about this feature, see
+       RBA introduction.
+
+0.11 		(2007-06-26):
+     * Some bugs were fixed in the OASIS implementation. CBLOCK compression now
+       is supported. Forward cell name references (numerical ID is used before
+       being associated with a string) are supported as now. File global properties
+       are now read correctly. A bug reading certain CTRAPEZOID objects was fixed.
+       (Still, forward references are not allowed for text/property strings or
+       property names).
+     * A layout properties dialog has been added that shows basic properties of
+       the layout such as top cells, layers and others.
+     * The "Select Cell" dialog has been enhanced with the capability to hide
+       and show multiple cells in the cell list.
+     * A "zoom fit" mouse gesture was implemented: moving the mouse up and right
+       with the right mouse button pressed now fits the current cell into the window.
+       Moving up and left still zooms out.
+     * A bug in the GDS2 reader, dropping polygon points in rare cases, was fixed
+
+0.10 		(2007-05):
+     * The build script has been enhanced and supports Qt installations with
+       different locations for binaries, libraries and headers. See the Build
+       section for details about this.
+     * OASIS files can be read as well now. The reader automatically determines
+       the kind of file. OASIS layer names are supported. Due to the complexity
+       of the OASIS specification, or more precisely the effort required to test
+       a reader for meeting the specification, OASIS support currently is regarded
+       to be in "beta" state.
+     * Layers can now be organized hierarchically. Layers can be grouped which
+       allows to control visibility and other properties for the group as a whole.
+       Layers can be removed from the layer view list or new layer views can be created.
+     * The layout can be transformed (rotated, shifted, mirrored) now. This
+       transformation is specified in the layer panel as a part of the layer
+       source specification. An optional transformation can be applied per layer
+       or layer group. This way for example, different layouts can be aligned
+       over each other.
+     * Shape properties now are supported. Each shape may carry optional
+       properties that are read from GDS or OASIS files. A property selector
+       can be applied per layer view, so that a layer only shows these shapes
+       that match the given property selection. 
+     * As an experimental feature, the inverse layout tree can be visualised
+       by allowing the minimum hierarchy level to go into the negative range.
+       The effect of this is, that a cell is shown in the context of all of
+       it's direct parents, if the first hierarchy level is set to -1. If set
+       to -2, the cell is shown in the context of all of it's parents and
+       grandparents and so on. Since there is no particular optimization for
+       this feature, performance may be poor, if a cell must be painted in a
+       huge number of contexts. In addition, the context displayed does not
+       participate in selection or ruler snapping.
+
+0.9 		(2006-04):
+     * This was the first official release
+
+
+Other contributions and 3rd Party Sources
+
+1.) contrib/gds2_txt
+
+    The original version of the code for the GDS2 text format reader and writer has been contributed 
+    by Romain Gauci from Oscillated Recall Technology (http://www.or-tech.co.jp).
+
+2.) contrib/zlib 
+
+    ZLIB 1.2.5
+    See license terms and conditions in zlib.h
+
+    Copyright (C) 1995-2010 Jean-loup Gailly and Mark Adler
+
+    Jean-loup Gailly        Mark Adler
+    jloup@gzip.org          madler@alumni.caltech.edu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

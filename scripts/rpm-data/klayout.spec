@@ -15,60 +15,80 @@
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
 
-%ifarch %ix86
-TARGET="linux-32-gcc-release"
-%else
-TARGET="linux-64-gcc-release"
-%endif
-VERSION="%VERSION%"
-
 Name:           klayout
-Version:        $VERSION
+Version:        %{git_version}
 Release:        0
 Summary:        KLayout, viewer and editor for mask layouts
 License:        GPL-2.0+
 Group:          Productivity/Scientific/Electronics
 Url:            http://www.klayout.de
+%if "%{git_source}" == ""
 Source0:        http://www.klayout.de/downloads/%{name}-%{version}.tar.gz
-Source1:        %{name}.desktop
+%endif
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
 Mask layout viewer and editor for the chip design engineer.
 
-Highlights are:
-* Efficient viewing in viewer mode
-* Advanced editing features in editor mode (such as 
-  parametrized cells)
-* Scripting capability (Ruby and Python)
-* Net tracing
-* DRC functionality
-* Clip feature
-* XOR feature
+For details see README.md
 
 %prep
-%setup -q
+
+%if "%{git_source}" != ""
+  mkdir -p %{_sourcedir}
+  cp -pr %{git_source}/* %{_sourcedir}
+%else
+  %setup -q	
+%endif
 
 %build
 
-./build.sh -rpath ${_libdir}/klayout \
-           -bin `pwd`/bin.$TARGET \
-           -build `pwd`/build.$TARGET \
+%ifarch %ix86
+TARGET="linux-32-gcc-release"
+%else
+TARGET="linux-64-gcc-release"
+%endif
+
+QMAKE=qmake-does-not-exist
+if which qmake; then
+  QMAKE=qmake
+elif which qmake-qt4; then
+  QMAKE=qmake-qt4
+elif which qmake-qt5; then
+  QMAKE=qmake-qt5
+fi
+
+# TODO: remove -without-qtbinding
+cd %{_sourcedir}
+./build.sh -rpath %{_libdir}/klayout \
+           -bin %{_builddir}/bin.$TARGET \
+           -build %{_builddir}/build.$TARGET \
            -j4 \
+           -qmake $QMAKE \
+           -without-qtbinding
 
 %install
-install -Dm644 `pwd`/bin.$TARGET/lib*.so* %{buildroot}%{_libdir}/klayout
-install -Dm644 `pwd`/bin.$TARGET/klayout `pwd`/bin.$TARGET/strm* %{buildroot}%{_bindir}
-install -Dm644 %{SOURCE1} %{buildroot}%{_datadir}/applications/%{name}.desktop
-install -Dm644 src/images/logo.png %{buildroot}%{_datadir}/pixmaps/%{name}.png
+
+%ifarch %ix86
+TARGET="linux-32-gcc-release"
+%else
+TARGET="linux-64-gcc-release"
+%endif
+
+mkdir -p %{buildroot}%{_libdir}/klayout
+mkdir -p %{buildroot}%{_bindir}
+install -Dm644 %{_builddir}/bin.$TARGET/lib*.so* %{buildroot}%{_libdir}/klayout
+install -Dm644 %{_builddir}/bin.$TARGET/klayout %{_builddir}/bin.$TARGET/strm* %{buildroot}%{_bindir}
+install -Dm644 %{_sourcedir}/etc/%{name}.desktop %{buildroot}%{_datadir}/applications/%{name}.desktop
+install -Dm644 %{_sourcedir}/src/lay/lay/images/logo.png %{buildroot}%{_datadir}/pixmaps/%{name}.png
 %if 0%{?suse_version}%{?sles_version}
 %suse_update_desktop_file -n %{name}
 %endif
 
 %files
 %defattr(-,root,root)
-%doc LICENSE Changelog
+%doc %{_sourcedir}/LICENSE %{_sourcedir}/Changelog %{_sourcedir}/CONTRIB
 %{_bindir}/klayout
 %{_bindir}/strm*
 %{_libdir}/klayout/*
@@ -76,4 +96,3 @@ install -Dm644 src/images/logo.png %{buildroot}%{_datadir}/pixmaps/%{name}.png
 %{_datadir}/pixmaps/%{name}.png
 
 %changelog
-See Changelog file

@@ -75,7 +75,12 @@ elif which qmake-qt5; then
 fi
 
 # TODO: remove -without-qtbinding
+%if "%{git_source}" != ""
+# build from git sources if possible
+cd %{git_source}
+%else
 cd %{_sourcedir}
+%endif
 ./build.sh -rpath %{_libdir}/klayout \
            -bin %{_builddir}/bin.$TARGET \
            -build %{_builddir}/build.$TARGET \

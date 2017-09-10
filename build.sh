@@ -473,7 +473,7 @@ fi
 $QMAKE -v
 
 # Force a minimum rebuild because of version info
-touch src/version/version.h
+touch $CURR_DIR/src/version/version.h
 
 qmake_cmd="$QMAKE $CURR_DIR/src/klayout.pro -recursive \
   CONFIG+=$CONFIG \

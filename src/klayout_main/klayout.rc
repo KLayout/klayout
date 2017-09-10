@@ -1,8 +1,27 @@
+/**
+ *  Resource file for the main application
+ *
+ *  This file takes the version definitions from these macros
+ *  externally defined:
+ *
+ *    KLAYOUT_VERSION
+ *    KLAYOUT_VERSION_REV
+ *    KLAYOUT_VERSION_DATE
+ *    KLAYOUT_MAJOR_VERSION
+ *    KLAYOUT_MINOR_VERSION
+ *    KLAYOUT_TINY_VERSION
+ */
+
+# if defined(UNDER_CE)
+#  include <winbase.h>
+# else
+#  include <windows.h>
+# endif
 
 #define STRINGIFY_(x) #x
 #define STRINGIFY(x) STRINGIFY_(x)
 
-#define NULL \\0
+#define ZERO \\0
 #define SPACE \040
 
 #define DESCRIPTION_STRING KLayout Application
@@ -10,9 +29,14 @@
 #define COPYRIGHT_STRING GPL 2.0 (or later) by Matthias Koefferlein
 #define COMMENT_STRING DESCRIPTION_STRING##SPACE##KLAYOUT_VERSION##SPACE##KLAYOUT_VERSION_DATE##SPACE##KLAYOUT_VERSION_REV
 
-//  The application logo
+/**
+ *  The application logo
+ */
 0 ICON "logo.ico"
 
+/**
+ *  Version information
+ */
 VS_VERSION_INFO VERSIONINFO
         FILEVERSION KLAYOUT_MAJOR_VERSION,KLAYOUT_MINOR_VERSION,KLAYOUT_TINY_VERSION,0
         PRODUCTVERSION KLAYOUT_MAJOR_VERSION,KLAYOUT_MINOR_VERSION,KLAYOUT_TINY_VERSION,0
@@ -31,13 +55,13 @@ VS_VERSION_INFO VERSIONINFO
                         BLOCK "040904b0"
                         BEGIN
                                 VALUE "CompanyName", "\0"
-                                VALUE "Comments", STRINGIFY(COMMENT_STRING##NULL)
-                                VALUE "FileDescription", STRINGIFY(DESCRIPTION_STRING##NULL)
-                                VALUE "FileVersion", STRINGIFY(KLAYOUT_VERSION##NULL)
-                                VALUE "LegalCopyright", STRINGIFY(COPYRIGHT_STRING##NULL)
+                                VALUE "Comments", STRINGIFY(COMMENT_STRING##ZERO)
+                                VALUE "FileDescription", STRINGIFY(DESCRIPTION_STRING##ZERO)
+                                VALUE "FileVersion", STRINGIFY(KLAYOUT_VERSION##ZERO)
+                                VALUE "LegalCopyright", STRINGIFY(COPYRIGHT_STRING##ZERO)
                                 VALUE "OriginalFilename", "klayout.exe\0"
-                                VALUE "ProductName", STRINGIFY(PRODUCTNAME_STRING##NULL)
-                                VALUE "ProductVersion", STRINGIFY(KLAYOUT_VERSION##NULL)
+                                VALUE "ProductName", STRINGIFY(PRODUCTNAME_STRING##ZERO)
+                                VALUE "ProductVersion", STRINGIFY(KLAYOUT_VERSION##ZERO)
                         END
                 END
                 BLOCK "VarFileInfo"
@@ -45,5 +69,4 @@ VS_VERSION_INFO VERSIONINFO
                         VALUE "Translation", 0x0409, 1200
                 END
         END
-/* End of Version info */
 

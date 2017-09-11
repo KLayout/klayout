@@ -59,11 +59,7 @@ For details see README.md
 
 %build
 
-%ifarch %ix86
-TARGET="linux-32-gcc-release"
-%else
-TARGET="linux-64-gcc-release"
-%endif
+TARGET="linux-release"
 
 QMAKE=qmake-does-not-exist
 if which qmake; then
@@ -93,11 +89,7 @@ strip %{_builddir}/bin.$TARGET/*
 
 %install
 
-%ifarch %ix86
-TARGET="linux-32-gcc-release"
-%else
-TARGET="linux-64-gcc-release"
-%endif
+TARGET="linux-release"
 
 mkdir -p %{buildroot}%{_libdir}/klayout
 mkdir -p %{buildroot}%{_bindir}

@@ -51,8 +51,8 @@ For details see README.md
 %prep
 
 %if "%{git_source}" != ""
-  mkdir -p %{_sourcedir}
-  cp -pr %{git_source}/* %{_sourcedir}
+  rm -rf %{_sourcedir}
+  ln -s %{git_source} %{_sourcedir}
 %else
   %setup -q	
 %endif

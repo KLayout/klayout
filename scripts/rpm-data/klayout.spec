@@ -25,7 +25,7 @@ Url:            http://www.klayout.de
 %if "%{git_source}" == ""
 Source0:        http://www.klayout.de/downloads/%{name}-%{version}.tar.gz
 %endif
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+# BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 # Disable auto-detection of dependencies (to prevent including the
 # so's of klayout itself)

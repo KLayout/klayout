@@ -40,7 +40,7 @@ echo "Checking $bits installation"
 echo "----------------------------------------"
 
 bindir="bin.linux.release" 
-builddir="bin.linux.release" 
+builddir="build.linux.release" 
 libdir="/usr/lib/klayout"
 
 ./build.sh -j4 \

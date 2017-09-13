@@ -35,11 +35,21 @@ AutoReqProv: 	no
 %if "%{target_system}" == "centos7"
 Requires:	ruby >= 2.0.0
 Requires:	python >= 2.7.5
-Requires:       qt >= 4.8.5
+Requires: qt >= 4.8.5
 %endif
 
 %if "%{target_system}" == "centos6"
 # CentOS6 requirements
+# ...
+%endif
+
+%if "%{target_system}" == "opensuse42_2"
+# OpenSuSE 42.2 requirements
+# ...
+%endif
+
+%if "%{target_system}" == "opensuse42_3"
+# OpenSuSE 42.3 requirements
 # ...
 %endif
 

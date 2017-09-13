@@ -7,5 +7,7 @@ Depends: %DEPENDS%
 Section: contrib/misc
 Priority: optional
 Description: Chip mask layout review and edit utility
- Klayout is a graphical viewer for a.o. GDSII and CIF files.
- Its features include net highlighting and XOR-ing of two layouts.
+ Klayout is a graphical viewer and editor for a.o. GDSII, OASIS, CIF 
+ and other files.
+ Its features include net highlighting and XOR-ing of two layouts,
+ scripting capabilities in Ruby and Python and much more.

@@ -128,9 +128,11 @@ cp -pd %{_builddir}/bin.$TARGET/klayout %{_builddir}/bin.$TARGET/strm* %{buildro
 chmod 755 %{buildroot}%{_bindir}/*
 install -Dm644 %{_sourcedir}/etc/%{name}.desktop %{buildroot}%{_datadir}/applications/%{name}.desktop
 install -Dm644 %{_sourcedir}/etc/logo.png %{buildroot}%{_datadir}/pixmaps/%{name}.png
-%if 0%{?suse_version}%{?sles_version}
-%suse_update_desktop_file -n %{name}
-%endif
+
+# TODO: remove this? This macro does not expand to anything in SuSE 42.x
+#%if 0%{?suse_version}%{?sles_version}
+#%suse_update_desktop_file -n %{name}
+#%endif
 
 %files
 %defattr(-,root,root)

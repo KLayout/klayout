@@ -36,6 +36,7 @@ AutoReqProv: 	no
 Requires:	ruby >= 2.0.0
 Requires:	python >= 2.7.5
 Requires: qt >= 4.8.5
+Requires: qt-x11 >= 4.8.5
 %endif
 
 %if "%{target_system}" == "centos6"
@@ -71,13 +72,29 @@ For details see README.md
 
 TARGET="linux-release"
 
-QMAKE=qmake-does-not-exist
-if which qmake; then
-  QMAKE=qmake
+QMAKE=qmake
+if which qmake-qt5; then
+  QMAKE=qmake-qt5
 elif which qmake-qt4; then
   QMAKE=qmake-qt4
-elif which qmake-qt5; then
-  QMAKE=qmake-qt5
+elif which qmake; then
+  QMAKE=qmake
+fi
+
+PYTHON=python
+if which python3; then
+  PYTHON=python3
+elif which python2; then
+  PYTHON=python2
+elif which python; then
+  PYTHON=python
+fi
+
+RUBY=ruby
+if which ruby2; then
+  RUBY=ruby2
+elif which ruby; then
+  RUBY=ruby
 fi
 
 # TODO: remove -without-qtbinding
@@ -92,6 +109,8 @@ cd %{_sourcedir}
            -build %{_builddir}/build.$TARGET \
            -j4 \
            -qmake $QMAKE \
+           -ruby $RUBY \
+           -python $PYTHON \
            -without-qtbinding
 
 cp -p LICENSE Changelog CONTRIB %{_builddir}

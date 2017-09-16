@@ -74,8 +74,7 @@ fi
            -ruby $ruby \
            -bin $bindir \
            -build $builddir \
-           -rpath $libdir \
-           -without-qtbinding
+           -rpath $libdir 
 
 if [ "$bits" = "32" ]; then
   arch="i386"

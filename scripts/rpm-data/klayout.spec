@@ -120,8 +120,7 @@ cd %{_sourcedir}
            -j4 \
            -qmake $QMAKE \
            -ruby $RUBY \
-           -python $PYTHON \
-           -without-qtbinding
+           -python $PYTHON 
 
 cp -p LICENSE Changelog CONTRIB %{_builddir}
 strip %{_builddir}/bin.$TARGET/*

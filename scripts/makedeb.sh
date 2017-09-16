@@ -19,7 +19,7 @@ fi
 # TODO: derive this list automatically?
 case $target in
 ubuntu16)
-  depends="libqt4-designer (>= 4.8.6), libqt4-xml (>= 4.8.6), libqt4-sql (>= 4.8.6), libqt4-network (>= 4.8.6), libqtcore4 (>= 4.8.6), libqtgui4 (>= 4.8.6), zlib1g (>= 1.2.8), libruby2.3 (>= 2.3.1), libpython3 (>= 3.5.1), libstdc++6 (>= 4.6.3), libc6 (>= 2.15)"
+  depends="libqt4-designer (>= 4.8.6), libqt4-xml (>= 4.8.6), libqt4-sql (>= 4.8.6), libqt4-network (>= 4.8.6), libqtcore4 (>= 4.8.6), libqtgui4 (>= 4.8.6), zlib1g (>= 1.2.8), libruby2.3 (>= 2.3.1), libpython3.5 (>= 3.5.1), libstdc++6 (>= 4.6.3), libc6 (>= 2.15)"
   ;;
 *)
   echo "Unknown target '$target' (given as first argument)"

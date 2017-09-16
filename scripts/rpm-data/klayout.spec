@@ -45,14 +45,14 @@ Requires: qt-x11 >= 4.8.5
 
 %if "%{target_system}" == "opensuse42_2"
 # OpenSuSE 42.2 requirements
-Requires:	ruby >= 2.1.0
+Requires:	ruby2.3 >= 2.3.1
 Requires:	python >= 3.4.6
 Requires: libqt4 >= 4.8.6
 %endif
 
 %if "%{target_system}" == "opensuse42_3"
 # OpenSuSE 42.3 requirements
-Requires:	ruby >= 2.1.0
+Requires:	ruby2.3 >= 2.3.1
 Requires:	python >= 3.4.6
 Requires: libqt4 >= 4.8.6
 # ...
@@ -95,7 +95,13 @@ elif which python; then
 fi
 
 RUBY=ruby
-if which ruby2; then
+if which ruby2.3; then
+  RUBY=ruby2.3
+elif which ruby2.2; then
+  RUBY=ruby2.2
+elif which ruby2.1; then
+  RUBY=ruby2.1
+elif which ruby2; then
   RUBY=ruby2
 elif which ruby; then
   RUBY=ruby

@@ -47,14 +47,14 @@ Requires: qt-x11 >= 4.8.5
 # OpenSuSE 42.2 requirements
 Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
-Requires: libqt4 >= 4.8.6
+Requires: libqt4-x11 >= 4.8.6
 %endif
 
 %if "%{target_system}" == "opensuse42_3"
 # OpenSuSE 42.3 requirements
 Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
-Requires: libqt4 >= 4.8.6
+Requires: libqt4-x11 >= 4.8.6
 # ...
 %endif
 

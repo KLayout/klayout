@@ -43,35 +43,7 @@ bindir="bin.linux.release"
 builddir="build.linux.release" 
 libdir="/usr/lib/klayout"
 
-qmake="qmake"
-if which qmake-qt5; then
-  qmake="qmake-qt5"
-elif which qmake-qt4; then
-  qmake="qmake-qt4"
-elif which qmake; then
-  qmake="qmake"
-fi
-
-ruby="ruby"
-if which ruby2; then
-  ruby="ruby2"
-elif which ruby; then
-  ruby="ruby"
-fi
-
-python="python"
-if which python3; then
-  python="python3"
-elif which python2; then
-  python="python2"
-elif which python; then
-  python="python"
-fi
-
 ./build.sh -j4 \
-           -qmake $qmake \
-           -python $python \
-           -ruby $ruby \
            -bin $bindir \
            -build $builddir \
            -rpath $libdir 

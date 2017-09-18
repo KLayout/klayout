@@ -34,7 +34,7 @@ RUBYVERSIONCODE=""
 PYTHONINCLUDE=""
 PYTHONLIBFILE=""
 
-QMAKE="qmake"
+QMAKE=""
 RUBY=""
 PYTHON=""
 BUILD=""
@@ -193,31 +193,48 @@ echo ""
 . ./version.sh
 
 echo "Version Info:"
-echo "  version = $KLAYOUT_VERSION"
-echo "  date = $KLAYOUT_VERSION_DATE"
-echo "  rev = $KLAYOUT_VERSION_REV"
+echo "    Version: $KLAYOUT_VERSION"
+echo "    Date: $KLAYOUT_VERSION_DATE"
+echo "    Revision: $KLAYOUT_VERSION_REV"
 echo ""
+
+# if not given, try to detect the qmake binary
+if [ "$QMAKE" = "" ]; then
+  for qmake in "qmake5" "qmake-qt5" "qmake4" "qmake-qt4" "qmake"; do
+    if [ "$QMAKE" = "" ] && [ "`$qmake -v 2>/dev/null`" != "" ]; then 
+      QMAKE="$qmake" 
+    fi
+  done
+fi
+if [ "$QMAKE" = "" ]; then
+  echo "*** ERROR: unable to find qmake tool in path"
+  exit 1
+fi
 
 # if not given, try to detect the qt major version to use
 if [ "$HAVE_QT5" = "" ]; then
   qt_major=`$QMAKE -v | grep 'Using Qt version' | sed 's/.*version  *\([0-9][0-9]*\).*/\1/'`
   if [ "$qt_major" = "4" ]; then
     HAVE_QT5=0
-    echo "Using Qt 4 API"
-    echo ""
   elif [ "$qt_major" = "5" ]; then
     HAVE_QT5=1
-    echo "Using Qt 5 API"
-    echo ""
   else
     echo "*** ERROR: could not determine Qt version from '$QMAKE -v'"
     exit 1
   fi
 fi
 
+echo "Using qmake: $QMAKE"
+if [ "$HAVE_QT5" != "0" ]; then
+  echo "    Using Qt 5 API"
+else
+  echo "    Using Qt 4 API"
+fi
+echo ""
+
 # if not given, locate ruby interpreter (prefer 1.9, then default, finally 1.8 as fallback)
 if [ "$RUBY" != "-" ]; then
-  for ruby in "ruby1.9" "ruby" "ruby1.8"; do
+  for ruby in "ruby2.4" "ruby2.3" "ruby2.2" "ruby2.1" "ruby2" "ruby1.9" "ruby" "ruby1.8"; do
     if [ "$RUBY" = "" ] && [ "`$ruby -v 2>/dev/null`" != "" ]; then 
       RUBY="$ruby" 
     fi
@@ -303,7 +320,7 @@ fi
 
 # if not given, locate Python interpreter 
 if [ "$PYTHON" != "-" ]; then
-  for python in "python"; do
+  for python in "python3.5" "python3.4" "python3.3" "python3.2" "python3.1" "python3" "python2.8" "python2.7" "python2" "python"; do
     if [ "$PYTHON" = "" ] && [ "`$python -V 2>&1`" != "" ]; then 
       PYTHON="$python" 
     fi
@@ -366,6 +383,7 @@ if [ "$PYTHON" != "" ] && [ "$PYTHON" != "-" ]; then
 
 fi
 
+echo "Features:"
 if [ $HAVE_QTBINDINGS != 0 ]; then
   echo "    Qt bindings enabled"
 fi
@@ -375,9 +393,6 @@ fi
 if [ "$RPATH" = "" ]; then
   RPATH="$BIN"
 fi
-
-echo "    Installation target is $BIN"
-echo "    Build directory is $BUILD"
 
 # Check Ruby installation
 if [ "$RUBYINCLUDE" != "" ]; then
@@ -433,6 +448,9 @@ if [ "$BIN" = "" ]; then
   BIN=$CURR_DIR/bin-$CONFIG
 fi
 
+echo "    Installation target: $BIN"
+echo "    Build directory: $BUILD"
+
 mkdir -p $BUILD
 
 # source the version script
@@ -452,7 +470,7 @@ PLUGINS=""
 cd $CURR_DIR/src/plugins
 for plugin in `echo *`; do
   if [ -e $plugin/$plugin.pro ]; then
-    PLUGINS="$PLUGINS $plugin"
+    PLUGINS="$PLUGINS$plugin "
   fi
 done
 cd $CURR_DIR

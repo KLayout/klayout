@@ -76,37 +76,6 @@ For details see README.md
 
 TARGET="linux-release"
 
-QMAKE=qmake
-if which qmake-qt5; then
-  QMAKE=qmake-qt5
-elif which qmake-qt4; then
-  QMAKE=qmake-qt4
-elif which qmake; then
-  QMAKE=qmake
-fi
-
-PYTHON=python
-if which python3; then
-  PYTHON=python3
-elif which python2; then
-  PYTHON=python2
-elif which python; then
-  PYTHON=python
-fi
-
-RUBY=ruby
-if which ruby2.3; then
-  RUBY=ruby2.3
-elif which ruby2.2; then
-  RUBY=ruby2.2
-elif which ruby2.1; then
-  RUBY=ruby2.1
-elif which ruby2; then
-  RUBY=ruby2
-elif which ruby; then
-  RUBY=ruby
-fi
-
 # TODO: remove -without-qtbinding
 %if "%{git_source}" != ""
 # build from git sources if possible
@@ -117,10 +86,7 @@ cd %{_sourcedir}
 ./build.sh -rpath %{_libdir}/klayout \
            -bin %{_builddir}/bin.$TARGET \
            -build %{_builddir}/build.$TARGET \
-           -j4 \
-           -qmake $QMAKE \
-           -ruby $RUBY \
-           -python $PYTHON 
+           -j2 
 
 cp -p LICENSE Changelog CONTRIB %{_builddir}
 strip %{_builddir}/bin.$TARGET/*

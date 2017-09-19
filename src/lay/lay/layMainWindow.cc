@@ -150,6 +150,21 @@ public:
     mp_progress_widget->set_value (v, value);
   }
 
+  void add_widget (QWidget *widget)
+  {
+    mp_progress_widget->add_widget (widget);
+  }
+
+  void remove_widget ()
+  {
+    mp_progress_widget->remove_widget ();
+  }
+
+  QWidget *get_widget () const
+  {
+    return mp_progress_widget->get_widget ();
+  }
+
 private:
   lay::ProgressWidget *mp_progress_widget;
   lay::ProgressReporter *mp_pr;
@@ -388,6 +403,30 @@ void TextProgressDelegate::show_progress_bar (bool show)
 {
   if (!mp_mw->show_progress_bar (show)) {
     lay::TextProgress::show_progress_bar (show);
+  }
+}
+
+bool TextProgressDelegate::progress_wants_widget () const
+{
+  return mp_mw != 0 && mp_mw->progress_wants_widget ();
+}
+
+void TextProgressDelegate::progress_add_widget (QWidget *widget)
+{
+  if (mp_mw) {
+    mp_mw->progress_add_widget (widget);
+  }
+}
+
+QWidget *TextProgressDelegate::progress_get_widget () const
+{
+  return mp_mw ? mp_mw->progress_get_widget () : 0;
+}
+
+void TextProgressDelegate::progress_remove_widget ()
+{
+  if (mp_mw) {
+    mp_mw->progress_remove_widget ();
   }
 }
 
@@ -4593,6 +4632,18 @@ MainWindow::clear_current_pos ()
   mp_cpy_label->setText (QString ());
 }
 
+QWidget *
+MainWindow::progress_get_widget () const
+{
+  if (mp_progress_dialog) {
+    return mp_progress_dialog->get_widget ();
+  } else if ( mp_progress_widget) {
+    return mp_progress_widget->get_widget ();
+  } else {
+    return 0;
+  }
+}
+
 bool
 MainWindow::set_progress_can_cancel (bool f)
 {
@@ -4632,6 +4683,32 @@ MainWindow::set_progress_value (double v, const std::string &value)
     return true;
   } else {
     return false;
+  }
+}
+
+bool
+MainWindow::progress_wants_widget () const
+{
+  return true;
+}
+
+void
+MainWindow::progress_add_widget (QWidget *widget)
+{
+  if (mp_progress_dialog) {
+    mp_progress_dialog->add_widget (widget);
+  } else if (mp_progress_widget) {
+    mp_progress_widget->add_widget (widget);
+  }
+}
+
+void
+MainWindow::progress_remove_widget ()
+{
+  if (mp_progress_dialog) {
+    mp_progress_dialog->remove_widget ();
+  } else if (mp_progress_widget) {
+    mp_progress_widget->remove_widget ();
   }
 }
 

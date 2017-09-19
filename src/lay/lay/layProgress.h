@@ -50,6 +50,10 @@ public:
   virtual void set_progress_can_cancel (bool f) = 0;
   virtual void set_progress_text (const std::string &text) = 0;
   virtual void set_progress_value (double v, const std::string &value) = 0;
+  virtual bool progress_wants_widget () const { return false; }
+  virtual void progress_add_widget (QWidget * /*widget*/) { }
+  virtual void progress_remove_widget () { }
+  virtual QWidget *progress_get_widget () const { return 0; }
   virtual void show_progress_bar (bool show) = 0;
 };
 

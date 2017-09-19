@@ -108,6 +108,10 @@ public:
   virtual void set_progress_text (const std::string &text);
   virtual void set_progress_value (double v, const std::string &value);
   virtual void show_progress_bar (bool show);
+  virtual bool progress_wants_widget () const;
+  virtual void progress_add_widget (QWidget *widget);
+  virtual QWidget *progress_get_widget () const;
+  virtual void progress_remove_widget ();
 
 private:
   MainWindow *mp_mw;
@@ -387,6 +391,26 @@ public:
    *  @brief Implementation of the lay::ProgressBar interface: set the value to display
    */
   bool set_progress_value (double v, const std::string &value);
+
+  /**
+   *  @brief Implementation of the lay::ProgressBar interface: Returns a value indicating whether a progress widget is wanted
+   */
+  bool progress_wants_widget () const;
+
+  /**
+   *  @brief Implementation of the lay::ProgressBar interface: adds a progress widget
+   */
+  void progress_add_widget (QWidget *widget);
+
+  /**
+   *  @brief Implementation of the lay::ProgressBar interface: gets the progress widget
+   */
+  QWidget *progress_get_widget () const;
+
+  /**
+   *  @brief Implementation of the lay::ProgressBar interface: removes a progress widget
+   */
+  void progress_remove_widget ();
 
   /**
    *  @brief Implementation of the lay::ProgressBar interface: Make the progress widget visible or invisible

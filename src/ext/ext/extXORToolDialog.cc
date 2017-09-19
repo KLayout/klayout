@@ -42,6 +42,8 @@
 #include <stdio.h>
 
 #include <QMessageBox>
+#include <QImage>
+#include <QPainter>
 
 namespace ext
 {
@@ -155,6 +157,297 @@ struct RegionModeConverter
       t = RMRulers;
     }
   }
+};
+
+struct CounterCompare
+{
+  typedef std::pair<db::LayerProperties, size_t> value_type;
+  bool operator() (const value_type &a, const value_type &b) const
+  {
+    if (a.second != b.second) {
+      return a.second > b.second;
+    }
+    return a.first < b.first;
+  }
+};
+
+const size_t missing_in_a = std::numeric_limits<size_t>::max ();
+const size_t missing_in_b = std::numeric_limits<size_t>::max () - 1;
+
+class XORProgressWidget
+  : public QWidget
+{
+public:
+  XORProgressWidget ()
+    : QWidget (0)
+  {
+    m_pixmap_size = 24;
+    m_max_lines = 5;
+    m_spacing = 2;
+
+    QFontMetrics fm (font ());
+    m_line_height = std::max (fm.height (), m_pixmap_size + 4);
+    m_font_height = fm.height () * 3 / 2;
+    m_first_column_width = fm.width (QString::fromUtf8 ("LAYERNAME"));
+    m_column_width = m_pixmap_size + 4 + m_spacing + fm.width (QString::fromUtf8 ("1.00G "));
+
+    m_ellipsis = false;
+  }
+
+  QSize sizeHint () const
+  {
+    return QSize (0, (m_line_height + m_spacing) * m_max_lines + m_font_height * 2 + m_spacing);
+  }
+
+  void set_results (double dbu, int nx, int ny, const std::map<std::pair<size_t, size_t>, std::map<std::pair<db::LayerProperties, db::Coord>, size_t> > &results, const std::map<db::LayerProperties, size_t> &count_per_layer, const std::vector<db::Coord> &tolerances)
+  {
+    m_labels.clear ();
+    m_layer_labels.clear ();
+    m_ellipsis = false;
+    m_red_images.clear ();
+    m_green_images.clear ();
+    m_blue_images.clear ();
+    m_yellow_images.clear ();
+    m_labels.clear ();
+
+    m_tolerance_labels.clear ();
+    for (std::vector<db::Coord>::const_iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
+      m_tolerance_labels << tl::to_qstring (tl::sprintf ("%.12g", *t * dbu));
+    }
+
+    std::vector<std::pair<db::LayerProperties, size_t> > counters;
+    counters.insert (counters.end (), count_per_layer.begin (), count_per_layer.end ());
+    std::sort (counters.begin (), counters.end (), CounterCompare ());
+
+    for (std::vector<std::pair<db::LayerProperties, size_t> >::const_iterator c = counters.begin (); c != counters.end (); ++c) {
+
+      if (m_layer_labels.size () == m_max_lines) {
+        m_ellipsis = true;
+        break;
+      }
+
+      m_layer_labels << tl::to_qstring (c->first.to_string ());
+
+      m_labels.push_back (QStringList ());
+      m_red_images.push_back (std::vector<QImage> ());
+      m_green_images.push_back (std::vector<QImage> ());
+      m_blue_images.push_back (std::vector<QImage> ());
+      m_yellow_images.push_back (std::vector<QImage> ());
+
+      for (std::vector<db::Coord>::const_iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
+
+        m_labels.back ().push_back (QString ());
+        m_red_images.back ().push_back (QImage (m_pixmap_size, m_pixmap_size, QImage::Format_MonoLSB));
+        m_green_images.back ().push_back (QImage (m_pixmap_size, m_pixmap_size, QImage::Format_MonoLSB));
+        m_blue_images.back ().push_back (QImage (m_pixmap_size, m_pixmap_size, QImage::Format_MonoLSB));
+        m_yellow_images.back ().push_back (QImage (m_pixmap_size, m_pixmap_size, QImage::Format_MonoLSB));
+
+        m_red_images.back ().back ().fill (Qt::black);
+        m_green_images.back ().back ().fill (Qt::black);
+        m_blue_images.back ().back ().fill (Qt::black);
+        m_yellow_images.back ().back ().fill (Qt::black);
+
+        size_t tot_count = 0;
+
+        for (std::map<std::pair<size_t, size_t>, std::map<std::pair<db::LayerProperties, db::Coord>, size_t> >::const_iterator r = results.begin (); r != results.end (); ++r) {
+
+          const std::map<std::pair<db::LayerProperties, db::Coord>, size_t> &rm = r->second;
+
+          std::map<std::pair<db::LayerProperties, db::Coord>, size_t>::const_iterator rl = rm.find (std::make_pair (c->first, *t));
+          if (rl != rm.end ()) {
+
+            tot_count += rl->second;
+
+            QImage *img = 0;
+            if (rl->second == 0) {
+              img = &m_green_images.back ().back ();
+            } else if (rl->second == missing_in_a) {
+              m_blue_images.back ().back ().fill (Qt::white);
+            } else if (rl->second == missing_in_b) {
+              m_yellow_images.back ().back ().fill (Qt::white);
+            } else {
+              img = &m_red_images.back ().back ();
+            }
+
+            if (img) {
+              if (nx == 0 || ny == 0) {
+                img->fill (Qt::white);
+              } else {
+
+                int ix = r->first.first;
+                int iy = r->first.second;
+
+                int y2 = m_pixmap_size - 1 - (iy * m_pixmap_size + m_pixmap_size / 2) / ny;
+                int y1 = m_pixmap_size - 1 - ((iy + 1) * m_pixmap_size + m_pixmap_size / 2) / ny;
+                int x1 = (ix * m_pixmap_size + m_pixmap_size / 2) / nx;
+                int x2 = ((ix + 1) * m_pixmap_size + m_pixmap_size / 2) / nx;
+
+                //  "draw" the field
+                for (int y = y1; y <= y2 && y >= 0 && y < m_pixmap_size; ++y) {
+                  *((uint32_t *) img->scanLine (y)) &= (((1 << x1) - 1) | ~((1 << (x2 + 1)) - 1));
+                }
+
+              }
+            }
+
+          }
+
+        }
+
+        QString text;
+        if (tot_count == missing_in_a) {
+          text = QString::fromUtf8 ("B");
+        } else if (tot_count == missing_in_b) {
+          text = QString::fromUtf8 ("A");
+        } else if (tot_count > 1000000000) {
+          text = QString::fromUtf8 ("%1G").arg (tot_count * 1e-9, 0, 'f', 2);
+        } else if (tot_count > 100000000) {
+          text = QString::fromUtf8 ("%1M").arg (tot_count * 1e-6, 0, 'f', 0);
+        } else if (tot_count > 10000000) {
+          text = QString::fromUtf8 ("%1M").arg (tot_count * 1e-6, 0, 'f', 1);
+        } else if (tot_count > 1000000) {
+          text = QString::fromUtf8 ("%1M").arg (tot_count * 1e-6, 0, 'f', 2);
+        } else if (tot_count > 100000) {
+          text = QString::fromUtf8 ("%1k").arg (tot_count * 1e-3, 0, 'f', 0);
+        } else if (tot_count > 10000) {
+          text = QString::fromUtf8 ("%1k").arg (tot_count * 1e-3, 0, 'f', 1);
+        } else if (tot_count > 1000) {
+          text = QString::fromUtf8 ("%1k").arg (tot_count * 1e-3, 0, 'f', 2);
+        } else {
+          text = QString::fromUtf8 ("%1").arg (tot_count);
+        }
+        m_labels.back ().back () = text;
+
+      }
+
+    }
+
+    update ();
+  }
+
+  void paintEvent (QPaintEvent * /*ev*/)
+  {
+    QPainter painter (this);
+
+    painter.drawText (QRect (QPoint (0, 0), QSize (m_first_column_width, m_font_height)),
+                      tr ("Lay/Tol."),
+                      QTextOption (Qt::AlignLeft | Qt::AlignTop));
+
+    for (int t = 0; t < m_tolerance_labels.size (); ++t) {
+      painter.drawText (QRect (QPoint (m_first_column_width + m_spacing + t * (m_column_width + m_spacing), 0), QSize (m_column_width, m_font_height)),
+                        m_tolerance_labels [t],
+                        QTextOption (Qt::AlignLeft | Qt::AlignTop));
+    }
+
+    for (int l = 0; l < m_layer_labels.size (); ++l) {
+
+      painter.drawText (QRect (QPoint (0, m_font_height + m_spacing + l * (m_line_height + m_spacing)), QSize (m_first_column_width, m_line_height)),
+                        m_layer_labels [l],
+                        QTextOption (Qt::AlignLeft | Qt::AlignVCenter));
+
+      for (int t = 0; t < m_tolerance_labels.size (); ++t) {
+
+        int x = m_first_column_width + m_spacing + t * (m_column_width + m_spacing);
+        int y = m_font_height + m_spacing + l * (m_line_height + m_spacing);
+
+        painter.drawText (QRect (QPoint (x + m_pixmap_size + 4 + m_spacing, y), QSize (m_column_width, m_line_height)),
+                          m_labels [l][t],
+                          QTextOption (Qt::AlignLeft | Qt::AlignVCenter));
+
+        painter.save ();
+
+        QLinearGradient grad (QPointF (0, 0), QPointF (1.0, 1.0));
+        grad.setCoordinateMode (QGradient::ObjectBoundingMode);
+        grad.setColorAt (0.0, QColor (248, 248, 248));
+        grad.setColorAt (1.0, QColor (224, 224, 224));
+        painter.setBrush (QBrush (grad));
+        painter.setPen (QPen (Qt::black));
+        painter.drawRect (QRect (QPoint (x - 2, y - 2), QSize (m_pixmap_size + 3, m_pixmap_size + 3)));
+
+        painter.setBackgroundMode (Qt::TransparentMode);
+        painter.setPen (QColor (128, 255, 128));
+        painter.drawPixmap (x, y, QBitmap::fromImage (m_green_images [l][t]));
+        painter.setPen (QColor (255, 128, 128));
+        painter.drawPixmap (x, y, QBitmap::fromImage (m_red_images [l][t]));
+        painter.setPen (QColor (128, 128, 255));
+        painter.drawPixmap (x, y, QBitmap::fromImage (m_blue_images [l][t]));
+        painter.setPen (QColor (255, 255, 128));
+        painter.drawPixmap (x, y, QBitmap::fromImage (m_yellow_images [l][t]));
+        painter.restore ();
+
+      }
+
+    }
+
+    if (m_ellipsis) {
+      painter.drawText (QRect (QPoint (0, m_font_height + m_spacing + m_max_lines * (m_line_height + m_spacing)), QSize (m_first_column_width, m_font_height)),
+                        QString::fromUtf8 ("..."),
+                        QTextOption (Qt::AlignLeft | Qt::AlignTop));
+    }
+
+  }
+
+private:
+  int m_pixmap_size;
+  int m_line_height;
+  int m_font_height;
+  int m_max_lines;
+  int m_spacing;
+  int m_column_width;
+  int m_first_column_width;
+  QStringList m_tolerance_labels;
+  QStringList m_layer_labels;
+  std::vector<QStringList> m_labels;
+  std::vector<std::vector<QImage> > m_green_images;
+  std::vector<std::vector<QImage> > m_red_images;
+  std::vector<std::vector<QImage> > m_yellow_images;
+  std::vector<std::vector<QImage> > m_blue_images;
+  bool m_ellipsis;
+};
+
+class XORProgress
+  : public tl::RelativeProgress
+{
+public:
+  XORProgress (const std::string &title, size_t max_count, size_t yield_interval)
+    : tl::RelativeProgress (title, max_count, yield_interval), m_needs_update (true), m_dbu (1.0), m_nx (0), m_ny (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual QWidget *progress_widget () const
+  {
+    return new XORProgressWidget ();
+  }
+
+  virtual void render_progress (QWidget *widget) const
+  {
+    XORProgressWidget *pw = dynamic_cast<XORProgressWidget *> (widget);
+    if (pw) {
+      pw->set_results (m_dbu, m_nx, m_ny, m_results, m_count_per_layer, m_tolerances);
+    }
+  }
+
+  void set_results (double dbu, int nx, int ny, const std::map<std::pair<size_t, size_t>, std::map<std::pair<db::LayerProperties, db::Coord>, size_t> > &results, const std::map<db::LayerProperties, size_t> &count_per_layer, const std::vector<db::Coord> &tol)
+  {
+    if (m_count_per_layer != count_per_layer) {
+      m_dbu = dbu;
+      m_nx = nx;
+      m_ny = ny;
+      m_results = results;
+      m_tolerances = tol;
+      m_count_per_layer = count_per_layer;
+      m_needs_update = true;
+    }
+  }
+
+private:
+  std::map<std::pair<size_t, size_t>, std::map<std::pair<db::LayerProperties, db::Coord>, size_t> > m_results;
+  std::map<db::LayerProperties, size_t> m_count_per_layer;
+  std::vector<db::Coord> m_tolerances;
+  bool m_needs_update;
+  double m_dbu;
+  int m_nx, m_ny;
 };
 
 XORToolDialog::XORToolDialog (QWidget *parent)
@@ -348,6 +641,7 @@ XORToolDialog::output_changed (int index)
   mp_ui->layer_offset_le->setEnabled (enabled);
 }
 
+
 class XORJob
   : public tl::JobBase
 {
@@ -387,7 +681,9 @@ public:
       m_sub_output_layers (sub_output_layers),
       m_rdb (rdb),
       m_rdb_cell (rdb_cell),
-      m_progress (0)
+      m_progress (0),
+      m_update_results (false),
+      m_nx (0), m_ny (0)
   {
     //  .. nothing yet ..
   }
@@ -412,9 +708,11 @@ public:
     return m_has_tiles;
   }
 
-  void has_tiles (bool ht) 
+  void has_tiles (bool ht, int nx, int ny)
   {
     m_has_tiles = ht;
+    m_nx = ht ? nx : 0;
+    m_ny = ht ? ny : 0;
   }
 
   double dbu () const
@@ -448,13 +746,32 @@ public:
     ++m_progress;
   }
 
-  void update_progress (tl::RelativeProgress &progress) 
+  void add_results (const db::LayerProperties &lp, db::Coord tol, size_t n, size_t ix, size_t iy)
+  {
+    QMutexLocker locker (&m_mutex);
+    if (n == missing_in_a || n == missing_in_b) {
+      m_results [std::make_pair (ix, iy)][std::make_pair (lp, tol)] = n;
+      m_count_per_layer [lp] = n;
+    } else {
+      //  NOTE: we will not get a "normal" n after missing_in_a or missing_in_b
+      m_results [std::make_pair (ix, iy)][std::make_pair (lp, tol)] += n;
+      m_count_per_layer [lp] += n;
+    }
+
+    m_update_results = true;
+  }
+
+  void update_progress (XORProgress &progress)
   {
     unsigned int p;
     {
       QMutexLocker locker (&m_mutex);
       p = m_progress;
-    }
+      if (m_update_results) {
+        progress.set_results (m_dbu, m_nx, m_ny, m_results, m_count_per_layer, m_tolerances);
+        m_update_results = false;
+      }
+    }    
 
     progress.set (p, true /*force yield*/);
   }
@@ -524,14 +841,19 @@ private:
   rdb::Cell *m_rdb_cell;
   unsigned int m_progress;
   QMutex m_mutex;
+  std::string m_result_string;
+  bool m_update_results;
+  size_t m_nx, m_ny;
+  std::map<std::pair<size_t, size_t>, std::map<std::pair<db::LayerProperties, db::Coord>, size_t> > m_results;
+  std::map<db::LayerProperties, size_t> m_count_per_layer;
 };
 
 class XORTask
   : public tl::Task
 {
 public:
-  XORTask (const std::string &tile_desc, const db::Box &clip_box, const db::Box &region_a, const db::Box &region_b, unsigned int layer_index, const db::LayerProperties &lp, const std::vector<unsigned int> &la, const std::vector<unsigned int> &lb)
-    : m_tile_desc (tile_desc), m_clip_box (clip_box), m_region_a (region_a), m_region_b (region_b), m_layer_index (layer_index), m_lp (lp), m_la (la), m_lb (lb)
+  XORTask (const std::string &tile_desc, const db::Box &clip_box, const db::Box &region_a, const db::Box &region_b, unsigned int layer_index, const db::LayerProperties &lp, const std::vector<unsigned int> &la, const std::vector<unsigned int> &lb, int ix, int iy)
+    : m_tile_desc (tile_desc), m_clip_box (clip_box), m_region_a (region_a), m_region_b (region_b), m_layer_index (layer_index), m_lp (lp), m_la (la), m_lb (lb), m_ix (ix), m_iy (iy)
   {
     //  .. nothing yet ..
   }
@@ -576,12 +898,23 @@ public:
     return m_lp;
   }
 
+  int ix () const
+  {
+    return m_ix;
+  }
+
+  int iy () const
+  {
+    return m_iy;
+  }
+
 private:
   std::string m_tile_desc;
   db::Box m_clip_box, m_region_a, m_region_b;
   unsigned int m_layer_index;
   db::LayerProperties m_lp;
   std::vector<unsigned int> m_la, m_lb;
+  int m_ix, m_iy;
 };
 
 class XORWorker
@@ -789,6 +1122,8 @@ XORWorker::do_perform (const XORTask *xor_task)
 
       db::CplxTrans trans = db::CplxTrans (mp_job->dbu ());
 
+      size_t n = 0;
+
       for (db::Shapes::shape_iterator s = xor_results_cell.shapes (0).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
 
         if (mp_job->has_tiles ()) {
@@ -798,13 +1133,17 @@ XORWorker::do_perform (const XORTask *xor_task)
 
           for (std::vector <db::Polygon>::const_iterator cp = clipped_poly.begin (); cp != clipped_poly.end (); ++cp) {
             mp_job->issue_polygon (tol_index, xor_task->layer_index (), *cp, trans);
+            ++n;
           }
         
         } else {
           mp_job->issue_polygon (tol_index, xor_task->layer_index (), s->polygon (), trans);
+          ++n;
         }
 
       }
+
+      mp_job->add_results (xor_task->lp (), *t, n, xor_task->ix (), xor_task->iy ());
 
     } else if (mp_job->op () == db::BooleanOp::Xor || 
                (mp_job->op () == db::BooleanOp::ANotB && !la.empty ()) ||
@@ -812,10 +1151,12 @@ XORWorker::do_perform (const XORTask *xor_task)
 
       if (!la.empty ()) {
         mp_job->issue_string (tol_index, xor_task->layer_index (), tl::to_string (QObject::tr ("Layer not present at all in layout B")));
+        mp_job->add_results (xor_task->lp (), *t, missing_in_b, 0, 0);
       }
 
       if (!lb.empty ()) {
         mp_job->issue_string (tol_index, xor_task->layer_index (), tl::to_string (QObject::tr ("Layer not present at all in layout A")));
+        mp_job->add_results (xor_task->lp (), *t, missing_in_a, 0, 0);
       }
 
     }
@@ -1249,7 +1590,7 @@ XORToolDialog::run_xor ()
       db::Coord tile_enlargement_b = db::coord_traits<db::Coord>::rounded_up (tile_enlargement * dbu / cvb->layout ().dbu ());
 
       if (ntiles_w > 1 || ntiles_h > 1 || region_mode != RMAll /*enforces clip*/) {
-        job.has_tiles (true);
+        job.has_tiles (true, ntiles_w, ntiles_h);
       }
 
       //  create the XOR tasks
@@ -1279,7 +1620,7 @@ XORToolDialog::run_xor ()
 
           unsigned int layer_index = 0;
           for (std::map<db::LayerProperties, std::pair<std::vector<unsigned int>, std::vector<unsigned int> >, db::LPLogicalLessFunc>::const_iterator l = layers.begin (); l != layers.end (); ++l, ++layer_index) {
-            job.schedule (new XORTask (tile_desc, clip_box, region_a, region_b, layer_index, l->first, l->second.first, l->second.second));
+            job.schedule (new XORTask (tile_desc, clip_box, region_a, region_b, layer_index, l->first, l->second.first, l->second.second, nw, nh));
           }
 
         }
@@ -1298,7 +1639,7 @@ XORToolDialog::run_xor ()
 
       //  TODO: there should be a general scheme of how thread-specific progress is merged
       //  into a global one ..
-      tl::RelativeProgress progress (tl::to_string (QObject::tr ("Performing ")) + op_name, todo_count, 1);
+      XORProgress progress (tl::to_string (QObject::tr ("Performing ")) + op_name, todo_count, 1);
 
       //  We need to lock the layouts during the processing - in OMNewLayerA and OMNewLayerB mode
       //  we actually modify the layout we iterate over

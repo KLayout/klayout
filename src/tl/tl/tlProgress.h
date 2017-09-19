@@ -30,6 +30,8 @@
 #include "tlException.h"
 #include "tlTimer.h"
 
+class QWidget;
+
 namespace tl
 {
 
@@ -119,6 +121,19 @@ public:
    *  values >= 100.
    */
   virtual double value () const = 0;
+
+  /**
+   *  @brief Creates a widget that renders the progress graphically
+   *
+   *  The widget is not the progress bar - the progress bar is always shown.
+   *  This method returns 0 if no graphical representation is required.
+   */
+  virtual QWidget *progress_widget () const { return 0; }
+
+  /**
+   *  @brief Renders the progress on the widget that was created by progress_widget
+   */
+  virtual void render_progress (QWidget * /*widget*/) const { }
 
   /**
    *  @brief Set a value indicating whether the operation can be cancelled

@@ -26,6 +26,7 @@
 #include <math.h>
 
 #include <QFrame>
+#include <QGridLayout>
 
 namespace lay
 {
@@ -127,7 +128,7 @@ ProgressBarWidget::resizeEvent (QResizeEvent *)
 
 ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full_width)
   : QFrame (parent),
-    mp_pr (pr)
+    mp_widget (0), mp_pr (pr)
 {
   QVBoxLayout *top_layout = new QVBoxLayout (this);
   top_layout->addStretch (1);
@@ -140,24 +141,30 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full
   //  this does not allow the label to control the overall size, so a long string does not hurt:
   bar_frame->setSizePolicy (QSizePolicy::Ignored, QSizePolicy::Preferred);
 
-  QHBoxLayout *layout = new QHBoxLayout (bar_frame);
+  QGridLayout *layout = new QGridLayout (bar_frame);
+  mp_layout = layout;
 
   layout->setSpacing (4);
   layout->setMargin (0);
 
+  int col = 0;
+
   if (! full_width) {
-    layout->addStretch (1);
+    layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, col, 1, 1);
+    layout->setColumnStretch (col++, 1);
   }
 
   mp_label = new QLabel (bar_frame);
-  layout->addWidget (mp_label);
+  layout->addWidget (mp_label, 0, col++, 1, 1);
 
-  layout->addSpacing (8);
+  layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, col++, 1, 1);
 
   QFrame *progress_bar_frame = new QFrame (bar_frame);
   progress_bar_frame->setFrameStyle (QFrame::Box | QFrame::Plain);
   progress_bar_frame->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
-  layout->addWidget (progress_bar_frame, 2);
+  layout->addWidget (progress_bar_frame, 0, col, 1, 1);
+  m_widget_col = col;
+  layout->setColumnStretch(col++, 2);
 
   QHBoxLayout *pbf_layout = new QHBoxLayout (progress_bar_frame);
   progress_bar_frame->setLayout (pbf_layout);
@@ -166,17 +173,45 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full
   mp_progress_bar = new ProgressBarWidget (progress_bar_frame);
   pbf_layout->addWidget (mp_progress_bar);
 
-  layout->addSpacing (8);
+  layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, col++, 1, 1);
 
   mp_cancel_button = new QToolButton (bar_frame);
   mp_cancel_button->setText (QObject::tr ("Cancel"));
-  layout->addWidget (mp_cancel_button);
+  layout->addWidget (mp_cancel_button, 0, col++, 1, 1);
 
   if (! full_width) {
-    layout->addStretch (1);
+    layout->addItem (new QSpacerItem (8, 8, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, col, 1, 1);
+    layout->setColumnStretch (col++, 1);
   }
 
   connect (mp_cancel_button, SIGNAL (clicked ()), this, SLOT (signal_break ()));
+}
+
+QWidget *
+ProgressWidget::get_widget () const
+{
+  return mp_widget;
+}
+
+void
+ProgressWidget::add_widget (QWidget *widget)
+{
+  remove_widget ();
+
+  if (widget) {
+    mp_widget = widget;
+    widget->setParent(this);
+    mp_layout->addWidget (widget, 1, m_widget_col, 1, 1);
+  }
+}
+
+void
+ProgressWidget::remove_widget ()
+{
+  if (mp_widget) {
+    delete mp_widget;
+    mp_widget = 0;
+  }
 }
 
 void

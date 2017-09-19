@@ -35,6 +35,7 @@
 class QToolButton;
 class QLabel;
 class QToolButton;
+class QGridLayout;
 
 namespace lay
 {
@@ -52,6 +53,9 @@ public:
   void set_text (const std::string &text);
   void set_value (double v, const std::string &value);
   void set_can_cancel (bool f);
+  void add_widget (QWidget *widget);
+  void remove_widget ();
+  QWidget *get_widget () const;
 
   QSize sizeHint () const;
 
@@ -61,6 +65,9 @@ public slots:
 private:
   QLabel *mp_label;
   ProgressBarWidget *mp_progress_bar;
+  QWidget *mp_widget;
+  int m_widget_col;
+  QGridLayout *mp_layout;
   QToolButton *mp_cancel_button;
   ProgressReporter *mp_pr;
 };

@@ -168,6 +168,10 @@ ProgressReporter::update_and_yield ()
       mp_pb->set_progress_can_cancel (mp_objects.front ()->can_cancel ());
       mp_pb->set_progress_text (mp_objects.front ()->desc ());
       mp_pb->set_progress_value (mp_objects.front ()->value (), mp_objects.front ()->formatted_value ());
+      QWidget *w = mp_pb->progress_get_widget ();
+      if (w) {
+        mp_objects.front ()->render_progress (w);
+      }
     }
     process_events (); // Qt4 seems to need this
   }
@@ -189,12 +193,20 @@ ProgressReporter::set_visible (bool vis)
   }
 
   if (vis != m_pw_visible) {
+
     //  prevent deferred method execution inside progress events - this might interfere with the
     //  actual operation
     tl::DeferredMethodScheduler::enable (!vis);
-  }
 
-  m_pw_visible = vis;
+    if (!vis) {
+      mp_pb->progress_remove_widget ();
+    } else if (mp_pb->progress_wants_widget () && mp_objects.front ()) {
+      mp_pb->progress_add_widget (mp_objects.front ()->progress_widget ());
+    }
+
+    m_pw_visible = vis;
+
+  }
 
   if (QApplication::instance()) {
     if (vis) {

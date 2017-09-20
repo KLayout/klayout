@@ -26,7 +26,8 @@ HEADERS += \
   extStreamImporter.h \
   extXORToolDialog.h \
     extCommon.h \
-    extForceLink.h
+    extForceLink.h \
+    extXORProgress.h
 
 FORMS += \ 
   BooleanOptionsDialog.ui \
@@ -68,7 +69,8 @@ SOURCES += \
   extStreamImporter.cc \
   extXORPlugin.cc \
   extXORToolDialog.cc \
-    extLEFDEFPlugin.cc
+    extLEFDEFPlugin.cc \
+    extXORProgress.cc
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$LAY_INC $$DB_INC $$RDB_INC $$ANT_INC $$EDT_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$LAYBASIC_INC $$LAY_INC $$DB_INC $$RDB_INC $$ANT_INC $$EDT_INC

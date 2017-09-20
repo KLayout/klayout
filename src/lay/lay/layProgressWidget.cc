@@ -163,7 +163,6 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full
   progress_bar_frame->setFrameStyle (QFrame::Box | QFrame::Plain);
   progress_bar_frame->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
   layout->addWidget (progress_bar_frame, 0, col, 1, 1);
-  m_widget_col = col;
   layout->setColumnStretch(col++, 2);
 
   QHBoxLayout *pbf_layout = new QHBoxLayout (progress_bar_frame);
@@ -184,6 +183,10 @@ ProgressWidget::ProgressWidget (ProgressReporter *pr, QWidget *parent, bool full
     layout->setColumnStretch (col++, 1);
   }
 
+  layout->addItem (new QSpacerItem (10, 10, QSizePolicy::Fixed, QSizePolicy::Fixed), 1, 0, 1, col);
+
+  m_widget_col = col;
+
   connect (mp_cancel_button, SIGNAL (clicked ()), this, SLOT (signal_break ()));
 }
 
@@ -201,7 +204,7 @@ ProgressWidget::add_widget (QWidget *widget)
   if (widget) {
     mp_widget = widget;
     widget->setParent(this);
-    mp_layout->addWidget (widget, 1, m_widget_col, 1, 1);
+    mp_layout->addWidget (widget, 2, 0, 1, m_widget_col);
   }
 }
 

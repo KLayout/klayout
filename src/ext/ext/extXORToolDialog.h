@@ -20,8 +20,6 @@
 
 */
 
-
-
 #ifndef HDR_extXORToolDialog
 #define HDR_extXORToolDialog
 

@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>LayoutStatisticsForm</class>
- <widget class="QDialog" name="LayoutStatisticsForm" >
-  <property name="geometry" >
+ <widget class="QDialog" name="LayoutStatisticsForm">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,47 +10,65 @@
     <height>546</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Layout Statistics</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="leftMargin">
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
+   <property name="spacing">
     <number>6</number>
    </property>
-   <item row="1" column="0" colspan="2" >
-    <widget class="Line" name="line_2" >
-     <property name="orientation" >
+   <item row="1" column="0" colspan="2">
+    <widget class="Line" name="line_2">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2" >
-    <widget class="QFrame" name="frame5" >
-     <property name="frameShape" >
+   <item row="4" column="0" colspan="2">
+    <widget class="QFrame" name="frame5">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
        <number>0</number>
       </property>
-      <property name="spacing" >
-       <number>6</number>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
       </property>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Expanding</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>81</width>
           <height>31</height>
@@ -58,11 +77,11 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="ok_button" >
-        <property name="text" >
+       <widget class="QPushButton" name="ok_button">
+        <property name="text">
          <string>Close</string>
         </property>
-        <property name="default" >
+        <property name="default">
          <bool>true</bool>
         </property>
        </widget>
@@ -70,47 +89,43 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2" >
-    <widget class="Line" name="line" >
-     <property name="orientation" >
+   <item row="3" column="0" colspan="2">
+    <widget class="Line" name="line">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
       <string>Show properties of ...</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1" >
-    <widget class="QComboBox" name="layout_cbx" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>0</vsizetype>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="layout_cbx">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2" >
-    <widget class="lay::BrowserPanel" native="1" name="browser" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>13</hsizetype>
-       <vsizetype>13</vsizetype>
+   <item row="2" column="0" colspan="2">
+    <widget class="lay::BrowserPanel" name="browser" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
        <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
+       <verstretch>1</verstretch>
       </sizepolicy>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>lay::BrowserPanel</class>
@@ -126,11 +141,11 @@
    <receiver>LayoutStatisticsForm</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>182</x>
      <y>334</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>163</x>
      <y>178</y>
     </hint>

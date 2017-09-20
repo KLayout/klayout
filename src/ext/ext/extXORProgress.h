@@ -54,10 +54,12 @@ public:
 
   virtual QWidget *progress_widget () const;
   virtual void render_progress (QWidget *widget) const;
-  void set_results (double dbu, int nx, int ny, const std::map<std::pair<size_t, size_t>, std::map<std::pair<db::LayerProperties, db::Coord>, size_t> > &results, const std::map<db::LayerProperties, size_t> &count_per_layer, const std::vector<db::Coord> &tol);
+
+  void configure (double dbu, int nx, int ny, const std::vector<db::Coord> &tol);
+  void merge_results (std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > &results);
 
 private:
-  std::map<std::pair<size_t, size_t>, std::map<std::pair<db::LayerProperties, db::Coord>, size_t> > m_results;
+  std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > m_results;
   std::map<db::LayerProperties, size_t> m_count_per_layer;
   std::vector<db::Coord> m_tolerances;
   bool m_needs_update;

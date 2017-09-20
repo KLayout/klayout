@@ -390,10 +390,8 @@ public:
       m_rdb (rdb),
       m_rdb_cell (rdb_cell),
       m_progress (0),
-      m_update_results (false),
       m_nx (0), m_ny (0)
   {
-    //  .. nothing yet ..
   }
 
   output_mode_t output_mode () const
@@ -457,16 +455,21 @@ public:
   void add_results (const db::LayerProperties &lp, db::Coord tol, size_t n, size_t ix, size_t iy)
   {
     QMutexLocker locker (&m_mutex);
-    if (n == missing_in_a || n == missing_in_b) {
-      m_results [std::make_pair (ix, iy)][std::make_pair (lp, tol)] = n;
-      m_count_per_layer [lp] = n;
-    } else {
-      //  NOTE: we will not get a "normal" n after missing_in_a or missing_in_b
-      m_results [std::make_pair (ix, iy)][std::make_pair (lp, tol)] += n;
-      m_count_per_layer [lp] += n;
+
+    std::vector<std::vector<size_t> > &cc = m_results [std::make_pair (lp, tol)];
+    if (cc.size () <= ix) {
+      cc.resize (ix + 1, std::vector<size_t> ());
+    }
+    if (cc [ix].size () <= iy) {
+      cc [ix].resize (iy + 1, 0);
     }
 
-    m_update_results = true;
+    if (n == missing_in_a || n == missing_in_b) {
+      cc[ix][iy] = n;
+    } else {
+      //  NOTE: we will not get a "normal" n after missing_in_a or missing_in_b
+      cc[ix][iy] += n;
+    }
   }
 
   void update_progress (XORProgress &progress)
@@ -475,10 +478,8 @@ public:
     {
       QMutexLocker locker (&m_mutex);
       p = m_progress;
-      if (m_update_results) {
-        progress.set_results (m_dbu, m_nx, m_ny, m_results, m_count_per_layer, m_tolerances);
-        m_update_results = false;
-      }
+      progress.configure (m_dbu, m_nx, m_ny, m_tolerances);
+      progress.merge_results (m_results);
     }    
 
     progress.set (p, true /*force yield*/);
@@ -550,10 +551,8 @@ private:
   unsigned int m_progress;
   QMutex m_mutex;
   std::string m_result_string;
-  bool m_update_results;
   size_t m_nx, m_ny;
-  std::map<std::pair<size_t, size_t>, std::map<std::pair<db::LayerProperties, db::Coord>, size_t> > m_results;
-  std::map<db::LayerProperties, size_t> m_count_per_layer;
+  std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > m_results;
 };
 
 class XORTask

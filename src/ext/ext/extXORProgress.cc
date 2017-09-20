@@ -32,6 +32,46 @@
 namespace ext
 {
 
+static inline void merge (size_t &a, size_t b)
+{
+  if (a == missing_in_a || a == missing_in_a) {
+    //  leave a
+  } else if (b == missing_in_a || b == missing_in_a) {
+    a = b;
+  } else {
+    a += b;
+  }
+}
+
+static void merge (std::vector<std::vector<size_t> > &a, const std::vector<std::vector<size_t> > &b)
+{
+  if (a.size () < b.size ()) {
+    a.resize (b.size (), std::vector<size_t> ());
+  }
+
+  std::vector<std::vector<size_t> >::iterator ia = a.begin ();
+  for (std::vector<std::vector<size_t> >::const_iterator ib = b.begin (); ib != b.end (); ++ib, ++ia) {
+    if (ia->size () < ib->size ()) {
+      ia->resize (ib->size (), 0);
+    }
+    std::vector<size_t>::iterator ja = ia->begin ();
+    for (std::vector<size_t>::const_iterator jb = ib->begin (); jb != ib->end (); ++jb, ++ja) {
+      merge (*ja, *jb);
+    }
+  }
+}
+
+static size_t sum (const std::vector<std::vector<size_t> > &b)
+{
+  size_t n = 0;
+  for (std::vector<std::vector<size_t> >::const_iterator i = b.begin (); i != b.end (); ++i) {
+    for (std::vector<size_t>::const_iterator j = i->begin (); j != i->end (); ++j) {
+      n += *j;
+    }
+  }
+  return n;
+}
+
 // --------------------------------------------------------------------------------------------------
 //  The progress widget class
 
@@ -78,7 +118,7 @@ public:
     return QSize (int (m_tolerance_labels.size ()) * (m_column_width + m_spacing) + m_first_column_width, (m_line_height + m_spacing) * m_max_lines + m_font_height * 2 + m_spacing);
   }
 
-  void set_results (double dbu, int nx, int ny, const std::map<std::pair<size_t, size_t>, std::map<std::pair<db::LayerProperties, db::Coord>, size_t> > &results, const std::map<db::LayerProperties, size_t> &count_per_layer, const std::vector<db::Coord> &tolerances)
+  void set_results (double dbu, int nx, int ny, const std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > &results, const std::map<db::LayerProperties, size_t> &count_per_layer, const std::vector<db::Coord> &tolerances)
   {
     m_labels.clear ();
     m_layer_labels.clear ();
@@ -135,45 +175,51 @@ public:
 
         size_t tot_count = 0;
 
-        for (std::map<std::pair<size_t, size_t>, std::map<std::pair<db::LayerProperties, db::Coord>, size_t> >::const_iterator r = results.begin (); r != results.end (); ++r) {
+        std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > >::const_iterator rm = results.find (std::make_pair (c->first, *t));
+        if (rm != results.end ()) {
 
-          const std::map<std::pair<db::LayerProperties, db::Coord>, size_t> &rm = r->second;
+          const std::vector<std::vector<size_t> > &counts = rm->second;
+          tot_count = sum (counts);
 
-          std::map<std::pair<db::LayerProperties, db::Coord>, size_t>::const_iterator rl = rm.find (std::make_pair (c->first, *t));
-          if (rl != rm.end ()) {
+          int ix = 0;
+          for (std::vector<std::vector<size_t> >::const_iterator c = counts.begin (); c != counts.end (); ++c, ++ix) {
 
-            tot_count += rl->second;
+            int iy = 0;
+            for (std::vector<size_t>::const_iterator cc = c->begin (); cc != c->end (); ++cc, ++iy) {
 
-            QImage *img = 0;
-            if (rl->second == 0) {
-              img = &m_green_images.back ().back ();
-            } else if (rl->second == missing_in_a) {
-              m_blue_images.back ().back ().fill (Qt::white);
-            } else if (rl->second == missing_in_b) {
-              m_yellow_images.back ().back ().fill (Qt::white);
-            } else {
-              img = &m_red_images.back ().back ();
-            }
-
-            if (img) {
-              if (nx == 0 || ny == 0) {
-                img->fill (Qt::white);
+              QImage *img = 0;
+              if (*cc == 0) {
+                img = &m_green_images.back ().back ();
+              } else if (*cc == missing_in_a) {
+                m_blue_images.back ().back ().fill (Qt::white);
+              } else if (*cc == missing_in_b) {
+                m_yellow_images.back ().back ().fill (Qt::white);
               } else {
+                img = &m_red_images.back ().back ();
+              }
 
-                int ix = r->first.first;
-                int iy = r->first.second;
+              if (img) {
 
-                int y2 = m_pixmap_size - 1 - (iy * m_pixmap_size + m_pixmap_size / 2) / ny;
-                int y1 = m_pixmap_size - 1 - ((iy + 1) * m_pixmap_size + m_pixmap_size / 2) / ny;
-                int x1 = (ix * m_pixmap_size + m_pixmap_size / 2) / nx;
-                int x2 = ((ix + 1) * m_pixmap_size + m_pixmap_size / 2) / nx;
+                if (nx == 0 || ny == 0) {
 
-                //  "draw" the field
-                for (int y = y1; y <= y2 && y >= 0 && y < m_pixmap_size; ++y) {
-                  *((uint32_t *) img->scanLine (y)) &= (((1 << x1) - 1) | ~((1 << (x2 + 1)) - 1));
+                  img->fill (Qt::white);
+
+                } else {
+
+                  int y2 = m_pixmap_size - 1 - (iy * m_pixmap_size + m_pixmap_size / 2) / ny;
+                  int y1 = m_pixmap_size - 1 - ((iy + 1) * m_pixmap_size + m_pixmap_size / 2) / ny;
+                  int x1 = (ix * m_pixmap_size + m_pixmap_size / 2) / nx;
+                  int x2 = ((ix + 1) * m_pixmap_size + m_pixmap_size / 2) / nx;
+
+                  //  "draw" the field
+                  for (int y = y1; y <= y2 && y >= 0 && y < m_pixmap_size; ++y) {
+                    *((uint32_t *) img->scanLine (y)) &= (((1 << x1) - 1) | ~((1 << (x2 + 1)) - 1));
+                  }
+
                 }
 
               }
+
             }
 
           }
@@ -333,17 +379,26 @@ void XORProgress::render_progress (QWidget *widget) const
   }
 }
 
-void XORProgress::set_results (double dbu, int nx, int ny, const std::map<std::pair<size_t, size_t>, std::map<std::pair<db::LayerProperties, db::Coord>, size_t> > &results, const std::map<db::LayerProperties, size_t> &count_per_layer, const std::vector<db::Coord> &tol)
+void XORProgress::configure (double dbu, int nx, int ny, const std::vector<db::Coord> &tol)
 {
-  if (m_count_per_layer != count_per_layer) {
+  if (m_tolerances != tol || fabs (m_dbu - dbu) > 1e-6 || m_nx != nx || m_ny != ny) {
     m_dbu = dbu;
     m_nx = nx;
     m_ny = ny;
-    m_results = results;
     m_tolerances = tol;
-    m_count_per_layer = count_per_layer;
     m_needs_update = true;
   }
+}
+
+void XORProgress::merge_results (std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > &results)
+{
+  for (std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > >::const_iterator r = results.begin (); r != results.end (); ++r) {
+    m_needs_update = true;
+    merge (m_results [r->first], r->second);
+    merge (m_count_per_layer [r->first.first], sum (r->second));
+  }
+
+  results.clear ();
 }
 
 }

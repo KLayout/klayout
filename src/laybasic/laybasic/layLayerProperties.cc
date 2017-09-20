@@ -303,7 +303,7 @@ LayerProperties::merge_visual (const LayerProperties *d) const
 
   m_valid_real = m_valid && (!d || d->m_valid_real);
   m_visible_real = m_visible && (!d || d->m_visible_real);
-  m_xfill_real = m_xfill && (!d || d->m_xfill_real);
+  m_xfill_real = m_xfill || (d && d->m_xfill_real);
   m_transparent_real = m_transparent || (d && d->m_transparent_real);
   m_marked_real = m_marked || (d && d->m_marked_real);
 

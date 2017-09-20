@@ -1256,6 +1256,32 @@ MainWindow::about_to_exec ()
 {
   bool f;
 
+  f = false;
+  config_get (cfg_full_hier_new_cell, f);
+  if (!f) {
+    TipDialog td (this,
+                  tl::to_string (QObject::tr ("With the current settings, only the top cell's boundary is shown initially.\n"
+                                              "\n"
+                                              "This can be confusing, since the layout itself becomes visible only after selecting "
+                                              "all hierarchy levels manually.\n"
+                                              "\n"
+                                              "This setting can be changed now. It can also be changed any time later using \"File/Setup\", \"Navigation/New Cell\": "
+                                              "\"Select all hierarchy levels\".\n"
+                                              "\n"
+                                              "Press 'Yes' to switch to 'show full hierarchy by default' mode.\n"
+                                              "With 'No', the behaviour will remain 'cell boundary only'.")),
+                  "only-top-level-shown-by-default",
+                  lay::TipDialog::yesnocancel_buttons);
+    lay::TipDialog::button_type button = lay::TipDialog::null_button;
+    td.exec_dialog (button);
+    if (button == lay::TipDialog::yes_button) {
+      config_set (cfg_full_hier_new_cell, true);
+    } else if (button == lay::TipDialog::cancel_button) {
+      //  Don't bother the user with more dialogs.
+      return;
+    }
+  }
+
   //  TODO: later, each view may get it's own editable flag
   if (lay::Application::instance () && !lay::Application::instance ()->is_editable ()) {
     TipDialog td (this, 

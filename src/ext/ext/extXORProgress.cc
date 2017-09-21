@@ -104,28 +104,26 @@ public:
     : QWidget (0)
   {
     m_pixmap_size = 24;
-    m_max_lines = 1;
-    m_spacing = 2;
+    m_spacing = 4;
 
     QFontMetrics fm (font ());
     m_line_height = std::max (fm.height (), m_pixmap_size + 4);
     m_font_height = fm.height () * 3 / 2;
     m_first_column_width = fm.width (QString::fromUtf8 ("LAYERNAME"));
     m_column_width = m_pixmap_size + 4 + m_spacing + fm.width (QString::fromUtf8 ("1.00G "));
-
-    m_ellipsis = false;
   }
 
   QSize sizeHint () const
   {
-    return QSize (int (m_tolerance_labels.size ()) * (m_column_width + m_spacing) + m_first_column_width, (m_line_height + m_spacing) * m_max_lines + m_font_height * 2 + m_spacing);
+    int w = int (m_tolerance_labels.size ()) * (m_column_width + m_spacing) + m_first_column_width;
+    int col = std::max (1, width () / w);
+    return QSize (w * col, (m_line_height + m_spacing) * ((int (m_layer_labels.size ()) + col - 1) / col) + m_font_height * 2 + m_spacing);
   }
 
   void set_results (double dbu, int nx, int ny, const std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > &results, const std::map<db::LayerProperties, size_t> &count_per_layer, const std::vector<db::Coord> &tolerances)
   {
     m_labels.clear ();
     m_layer_labels.clear ();
-    m_ellipsis = false;
     m_red_images.clear ();
     m_green_images.clear ();
     m_blue_images.clear ();
@@ -136,24 +134,14 @@ public:
 
     m_tolerance_labels.clear ();
     for (std::vector<db::Coord>::const_iterator t = tolerances.begin (); t != tolerances.end (); ++t) {
-      m_tolerance_labels << tl::to_qstring (tl::sprintf ("%.12g", *t * dbu));
+      m_tolerance_labels << tl::to_qstring (tl::sprintf ("%.12g µm", *t * dbu));
     }
 
     std::vector<std::pair<db::LayerProperties, size_t> > counters;
     counters.insert (counters.end (), count_per_layer.begin (), count_per_layer.end ());
     std::sort (counters.begin (), counters.end (), CounterCompare ());
 
-    m_max_lines = int (counters.size ());
-    m_ellipsis = false;
-
-    int visible_lines = std::max (0, (height () - m_font_height * 2 - m_spacing) / (m_line_height + m_spacing));
-
     for (std::vector<std::pair<db::LayerProperties, size_t> >::const_iterator c = counters.begin (); c != counters.end (); ++c) {
-
-      if (m_layer_labels.size () == visible_lines) {
-        m_ellipsis = true;
-        break;
-      }
 
       m_layer_labels << tl::to_qstring (c->first.to_string ());
 
@@ -268,31 +256,52 @@ public:
   {
     QPainter painter (this);
 
-    int x0 = std::max (0, (width () - sizeHint ().width ()) / 2);
+    QSize szh = QSize (int (m_tolerance_labels.size ()) * (m_column_width + m_spacing) + m_first_column_width, (m_line_height + m_spacing) * int (m_layer_labels.size ()) + m_font_height * 2 + m_spacing + 10);
+
+    bool ellipsis = false;
+
+    int visible_lines = std::max (1, (height () - m_font_height * 2 - m_spacing) / (m_line_height + m_spacing));
+    int columns = std::max (1, width () / std::max (1, szh.width ()));
+
+    int x0 = std::max (0, (width () - szh.width () * columns) / 2);
     int visible_columns = std::max (0, (width () - m_first_column_width + 20) / (m_column_width + m_spacing));
 
-    painter.drawText (QRect (QPoint (x0, 0), QSize (m_first_column_width, m_font_height)),
-                      tr ("Lay/Tol."),
-                      QTextOption (Qt::AlignLeft | Qt::AlignTop));
+    for (int c = 0; c < columns; ++c) {
 
+      painter.drawText (QRect (QPoint (x0 + c * szh.width (), 0), QSize (m_first_column_width, m_font_height)),
+                        tr ("Lay/Tol."),
+                        QTextOption (Qt::AlignRight | Qt::AlignTop));
 
+      for (int t = 0; t < m_tolerance_labels.size () && t < visible_columns; ++t) {
+        painter.drawText (QRect (QPoint (x0 + c * szh.width () + m_first_column_width + m_spacing + t * (m_column_width + m_spacing), 0), QSize (m_column_width, m_font_height)),
+                          m_tolerance_labels [t],
+                          QTextOption (Qt::AlignLeft | Qt::AlignTop));
+      }
 
-    for (int t = 0; t < m_tolerance_labels.size () && t < visible_columns; ++t) {
-      painter.drawText (QRect (QPoint (x0 + m_first_column_width + m_spacing + t * (m_column_width + m_spacing), 0), QSize (m_column_width, m_font_height)),
-                        m_tolerance_labels [t],
-                        QTextOption (Qt::AlignLeft | Qt::AlignTop));
     }
 
-    for (int l = 0; l < m_layer_labels.size (); ++l) {
+    int c = 0;
+    int r = 0;
 
-      painter.drawText (QRect (QPoint (x0, m_font_height + m_spacing + l * (m_line_height + m_spacing)), QSize (m_first_column_width, m_line_height)),
+    for (int l = 0; l < m_layer_labels.size (); ++l, ++c) {
+
+      if (c == columns) {
+        c = 0;
+        ++r;
+        if (r == visible_lines) {
+          ellipsis = true;
+          break;
+        }
+      }
+
+      painter.drawText (QRect (QPoint (x0 + c * szh.width (), m_font_height + m_spacing + r * (m_line_height + m_spacing)), QSize (m_first_column_width, m_line_height)),
                         m_layer_labels [l],
-                        QTextOption (Qt::AlignLeft | Qt::AlignVCenter));
+                        QTextOption (Qt::AlignRight | Qt::AlignVCenter));
 
       for (int t = 0; t < m_tolerance_labels.size () && t < visible_columns; ++t) {
 
-        int x = x0 + m_first_column_width + m_spacing + t * (m_column_width + m_spacing);
-        int y = m_font_height + m_spacing + l * (m_line_height + m_spacing);
+        int x = x0 + c * szh.width () + m_first_column_width + m_spacing + t * (m_column_width + m_spacing);
+        int y = m_font_height + m_spacing + r * (m_line_height + m_spacing);
 
         painter.drawText (QRect (QPoint (x + m_pixmap_size + 4 + m_spacing, y), QSize (m_column_width, m_line_height)),
                           m_labels [l][t],
@@ -306,17 +315,17 @@ public:
         grad.setColorAt (1.0, QColor (224, 224, 224));
         painter.setBrush (QBrush (grad));
         painter.setPen (QPen (Qt::black));
-        painter.drawRect (QRect (QPoint (x - 2, y - 2), QSize (m_pixmap_size + 3, m_pixmap_size + 3)));
+        painter.drawRect (QRect (QPoint (x, y - 2), QSize (m_pixmap_size + 3, m_pixmap_size + 3)));
 
         painter.setBackgroundMode (Qt::TransparentMode);
         painter.setPen (QColor (128, 255, 128));
-        painter.drawPixmap (x, y, QBitmap::fromImage (m_green_images [l][t]));
+        painter.drawPixmap (x + 2, y, QBitmap::fromImage (m_green_images [l][t]));
         painter.setPen (QColor (255, 128, 128));
-        painter.drawPixmap (x, y, QBitmap::fromImage (m_red_images [l][t]));
+        painter.drawPixmap (x + 2, y, QBitmap::fromImage (m_red_images [l][t]));
         painter.setPen (QColor (128, 128, 255));
-        painter.drawPixmap (x, y, QBitmap::fromImage (m_blue_images [l][t]));
+        painter.drawPixmap (x + 2, y, QBitmap::fromImage (m_blue_images [l][t]));
         painter.setPen (QColor (255, 255, 128));
-        painter.drawPixmap (x, y, QBitmap::fromImage (m_yellow_images [l][t]));
+        painter.drawPixmap (x + 2, y, QBitmap::fromImage (m_yellow_images [l][t]));
         painter.restore ();
 
       }
@@ -334,10 +343,10 @@ public:
 
     }
 
-    if (m_ellipsis) {
-      painter.drawText (QRect (QPoint (x0, m_font_height + m_spacing + int (m_layer_labels.size ()) * (m_line_height + m_spacing)), QSize (m_first_column_width, m_font_height)),
+    if (ellipsis) {
+      painter.drawText (QRect (QPoint (x0 + c * szh.width (), m_font_height + m_spacing + r * (m_line_height + m_spacing)), QSize (m_first_column_width, m_font_height)),
                         QString::fromUtf8 ("..."),
-                        QTextOption (Qt::AlignLeft | Qt::AlignTop));
+                        QTextOption (Qt::AlignRight | Qt::AlignTop));
     }
 
   }
@@ -346,7 +355,6 @@ private:
   int m_pixmap_size;
   int m_line_height;
   int m_font_height;
-  int m_max_lines;
   int m_spacing;
   int m_column_width;
   int m_first_column_width;
@@ -357,7 +365,6 @@ private:
   std::vector<std::vector<QImage> > m_red_images;
   std::vector<std::vector<QImage> > m_yellow_images;
   std::vector<std::vector<QImage> > m_blue_images;
-  bool m_ellipsis;
 };
 
 // --------------------------------------------------------------------------------------------------

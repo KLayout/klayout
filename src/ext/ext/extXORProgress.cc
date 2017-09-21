@@ -34,9 +34,9 @@ namespace ext
 
 static inline void merge (size_t &a, size_t b)
 {
-  if (a == missing_in_a || a == missing_in_a) {
+  if (a == missing_in_a || a == missing_in_b) {
     //  leave a
-  } else if (b == missing_in_a || b == missing_in_a) {
+  } else if (b == missing_in_a || b == missing_in_b) {
     a = b;
   } else {
     a += b;
@@ -66,7 +66,10 @@ static size_t sum (const std::vector<std::vector<size_t> > &b)
   size_t n = 0;
   for (std::vector<std::vector<size_t> >::const_iterator i = b.begin (); i != b.end (); ++i) {
     for (std::vector<size_t>::const_iterator j = i->begin (); j != i->end (); ++j) {
-      n += *j;
+      merge (n, *j);
+    }
+    if (n == missing_in_a || n == missing_in_b) {
+      break;
     }
   }
   return n;

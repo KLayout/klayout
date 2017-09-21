@@ -86,6 +86,12 @@ ProgressReporter::set_progress_bar (lay::ProgressBar *pb)
 void 
 ProgressReporter::register_object (tl::Progress *progress)
 {
+  if (mp_objects.empty ()) {
+    //  to avoid recursions of any kind, disallow any user interaction except
+    //  cancelling the operation
+    QApplication::instance ()->installEventFilter (this);
+  }
+
   mp_objects.push_back (progress); // this keeps the outmost one visible. push_front would make the latest one visible.
   // mp_objects.push_front (progress);
 
@@ -119,10 +125,14 @@ ProgressReporter::unregister_object (tl::Progress *progress)
       } 
       
       update_and_yield ();
-      return;
+      break;
 
     }
 
+  }
+
+  if (mp_objects.empty ()) {
+    QApplication::instance ()->removeEventFilter (this);
   }
 }
 
@@ -206,16 +216,6 @@ ProgressReporter::set_visible (bool vis)
 
     m_pw_visible = vis;
 
-  }
-
-  if (QApplication::instance()) {
-    if (vis) {
-      //  to avoid recursions of any kind, disallow any user interaction except
-      //  cancelling the operation
-      QApplication::instance ()->installEventFilter (this);
-    } else {
-      QApplication::instance ()->removeEventFilter (this);
-    }
   }
 }
 

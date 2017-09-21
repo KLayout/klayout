@@ -73,6 +73,11 @@ public:
   void signal_break ();
   void set_progress_bar (lay::ProgressBar *pb);
 
+  bool is_busy () const
+  {
+    return !mp_objects.empty ();
+  }
+
 private:
   std::list <tl::Progress *> mp_objects;
   tl::Clock m_start_time;

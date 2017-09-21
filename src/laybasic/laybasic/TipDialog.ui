@@ -1,58 +1,77 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>TipDialog</class>
- <widget class="QDialog" name="TipDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="TipDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>549</width>
-    <height>291</height>
+    <height>334</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Tip</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="leftMargin">
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
+   <property name="spacing">
     <number>6</number>
    </property>
-   <item row="1" column="1" >
-    <widget class="QFrame" name="frame_2" >
-     <property name="frameShape" >
+   <item row="1" column="1">
+    <widget class="QFrame" name="frame_2">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QVBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
       <item>
-       <widget class="QLabel" name="tip_text" >
-        <property name="text" >
+       <widget class="QLabel" name="tip_text">
+        <property name="text">
          <string>TextLabel</string>
         </property>
-        <property name="wordWrap" >
+        <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Expanding</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>391</width>
           <height>91</height>
@@ -63,30 +82,39 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2" >
-    <widget class="QFrame" name="frame" >
-     <property name="frameShape" >
+   <item row="4" column="0" colspan="2">
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
        <number>0</number>
       </property>
-      <property name="spacing" >
-       <number>6</number>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
       </property>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Expanding</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>381</width>
           <height>31</height>
@@ -95,42 +123,42 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="yes_button" >
-        <property name="text" >
+       <widget class="QPushButton" name="yes_button">
+        <property name="text">
          <string>Yes</string>
         </property>
-        <property name="default" >
+        <property name="default">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="no_button" >
-        <property name="text" >
+       <widget class="QPushButton" name="no_button">
+        <property name="text">
          <string>No</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="ok_button" >
-        <property name="text" >
+       <widget class="QPushButton" name="ok_button">
+        <property name="text">
          <string>Ok</string>
         </property>
-        <property name="default" >
+        <property name="default">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="cancel_button" >
-        <property name="text" >
+       <widget class="QPushButton" name="cancel_button">
+        <property name="text">
          <string>Cancel</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="close_button" >
-        <property name="text" >
+       <widget class="QPushButton" name="close_button">
+        <property name="text">
          <string>Close</string>
         </property>
        </widget>
@@ -138,45 +166,52 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QFrame" name="frame_3" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>0</hsizetype>
-       <vsizetype>5</vsizetype>
+   <item row="1" column="0">
+    <widget class="QFrame" name="frame_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape" >
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QVBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
       <item>
-       <widget class="QLabel" name="label" >
-        <property name="text" >
+       <widget class="QLabel" name="label">
+        <property name="text">
          <string/>
         </property>
-        <property name="pixmap" >
-         <pixmap resource="layResources.qrc" >:/bulb.png</pixmap>
+        <property name="pixmap">
+         <pixmap resource="../../lay/lay/layResources.qrc">:/bulb.png</pixmap>
         </property>
        </widget>
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>40</height>
@@ -187,15 +222,15 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2" >
+   <item row="3" column="0" colspan="2">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>531</width>
        <height>20</height>
@@ -203,15 +238,15 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="0" colspan="2" >
+   <item row="0" column="0" colspan="2">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>481</width>
        <height>24</height>
@@ -219,30 +254,39 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="0" colspan="2" >
-    <widget class="QFrame" name="frame_4" >
-     <property name="frameShape" >
+   <item row="2" column="0" colspan="2">
+    <widget class="QFrame" name="frame_4">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
        <number>0</number>
       </property>
-      <property name="spacing" >
-       <number>6</number>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
       </property>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>15</width>
           <height>20</height>
@@ -251,17 +295,15 @@
        </spacer>
       </item>
       <item>
-       <widget class="QCheckBox" name="dont_show_cbx" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+       <widget class="QCheckBox" name="dont_show_cbx">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
-         <string>Don't show this window again (use "Help/Show All Tips" to show it again)</string>
+        <property name="text">
+         <string>Don't show this window again (use &quot;Help/Show All Tips&quot; to show it again)</string>
         </property>
        </widget>
       </item>
@@ -271,7 +313,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="layResources.qrc" />
+  <include location="../../lay/lay/layResources.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -280,11 +322,11 @@
    <receiver>TipDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>489</x>
      <y>278</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>267</x>
      <y>149</y>
     </hint>

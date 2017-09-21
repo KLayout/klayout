@@ -1100,6 +1100,18 @@ MainWindow::dock_widget_visibility_changed (bool /*visible*/)
 void
 MainWindow::file_changed_timer ()
 {
+  //  Don't evaluate file changed notifications while an operation is busy -
+  //  otherwise we'd interfere with such operations.
+  if (mp_pr->is_busy ()) {
+
+    //  Restart the timer to get notified again
+    m_file_changed_timer.setInterval (200);
+    m_file_changed_timer.start ();
+
+    return;
+
+  }
+
   //  Prevent recursive signals
   m_file_changed_timer.blockSignals (true);
 
@@ -1260,23 +1272,24 @@ MainWindow::about_to_exec ()
   config_get (cfg_full_hier_new_cell, f);
   if (!f) {
     TipDialog td (this,
-                  tl::to_string (QObject::tr ("With the current settings, only the top cell's boundary is shown initially.\n"
-                                              "\n"
-                                              "This can be confusing, since the layout itself becomes visible only after selecting "
-                                              "all hierarchy levels manually.\n"
-                                              "\n"
-                                              "This setting can be changed now. It can also be changed any time later using \"File/Setup\", \"Navigation/New Cell\": "
-                                              "\"Select all hierarchy levels\".\n"
-                                              "\n"
-                                              "Press 'Yes' to switch to 'show full hierarchy by default' mode.\n"
-                                              "With 'No', the behaviour will remain 'cell boundary only'.")),
+                  tl::to_string (QObject::tr ("<html><body>"
+                                              "<p>With the current settings, only the top cell's content is shown initially, but the child cells are not drawn.</p>"
+                                              "<p>This can be confusing, since the full layout becomes visible only after selecting "
+                                              "all hierarchy levels manually.</p>"
+                                              "<p>This setting can be changed now. It can also be changed any time later using \"File/Setup\", \"Navigation/New Cell\": "
+                                              "\"Select all hierarchy levels\".</p>"
+                                              "<ul>"
+                                              "<li>Press <b>Yes</b> to enable <b>Show full hierarchy</b> mode now.</li>\n"
+                                              "<li>With <b>No</b>, the mode will remain <b>Show top level only</b>.</li>"
+                                              "</ul>"
+                                              "</body></html>")),
                   "only-top-level-shown-by-default",
-                  lay::TipDialog::yesnocancel_buttons);
+                  lay::TipDialog::yesno_buttons);
     lay::TipDialog::button_type button = lay::TipDialog::null_button;
-    td.exec_dialog (button);
-    if (button == lay::TipDialog::yes_button) {
-      config_set (cfg_full_hier_new_cell, true);
-    } else if (button == lay::TipDialog::cancel_button) {
+    if (td.exec_dialog (button)) {
+      if (button == lay::TipDialog::yes_button) {
+        config_set (cfg_full_hier_new_cell, true);
+      }
       //  Don't bother the user with more dialogs.
       return;
     }

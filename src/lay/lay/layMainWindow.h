@@ -49,6 +49,7 @@
 #include "tlException.h"
 #include "tlDeferredExecution.h"
 #include "tlObjectCollection.h"
+#include "tlDeferredExecution.h"
 #include "gsi.h"
 
 class QTabBar;
@@ -910,6 +911,7 @@ private:
   bool m_disable_tab_selected;
   bool m_exited;
   tl::DeferredMethod<MainWindow> dm_do_update_menu;
+  tl::DeferredMethod<MainWindow> dm_exit;
   QTimer m_message_timer;
   QTimer m_file_changed_timer;
   QTimer m_menu_update_timer;

@@ -117,7 +117,7 @@ public:
   {
     int w = int (m_tolerance_labels.size ()) * (m_column_width + m_spacing) + m_first_column_width;
     int col = std::max (1, width () / w);
-    return QSize (w * col, (m_line_height + m_spacing) * ((int (m_layer_labels.size ()) + col - 1) / col) + m_font_height * 2 + m_spacing);
+    return QSize (w * std::min (int (m_layer_labels.size ()), col), (m_line_height + m_spacing) * ((int (m_layer_labels.size ()) + col - 1) / col) + m_font_height * 2 + m_spacing);
   }
 
   void set_results (double dbu, int nx, int ny, const std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > &results, const std::map<db::LayerProperties, size_t> &count_per_layer, const std::vector<db::Coord> &tolerances)
@@ -261,7 +261,7 @@ public:
     bool ellipsis = false;
 
     int visible_lines = std::max (1, (height () - m_font_height * 2 - m_spacing) / (m_line_height + m_spacing));
-    int columns = std::max (1, width () / std::max (1, szh.width ()));
+    int columns = std::min (std::max (1, width () / std::max (1, szh.width ())), int (m_layer_labels.size ()));
 
     int x0 = std::max (0, (width () - szh.width () * columns) / 2);
     int visible_columns = std::max (0, (width () - m_first_column_width + 20) / (m_column_width + m_spacing));

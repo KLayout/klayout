@@ -37,6 +37,7 @@
 #include "layCellView.h"
 #include "layLayoutView.h"
 #include "layApplication.h"
+#include "layMainWindow.h"
 
 #include "ui_XORToolDialog.h"
 
@@ -1371,7 +1372,7 @@ XORToolDialog::run_xor ()
       }
 
       if (job.has_error ()) {
-        if (output_mode == OMMarkerDatabase) {
+        if (mp_view && output_mode == OMMarkerDatabase) {
           mp_view->remove_rdb (rdb_index);
         }
         throw tl::Exception (tl::to_string (QObject::tr ("Errors occured during processing. First error message says:\n")) + job.error_messages ().front ());
@@ -1382,26 +1383,34 @@ XORToolDialog::run_xor ()
     if (was_cancelled && output_mode == OMMarkerDatabase) {
       //  If the output mode is database, ask whether to keep the data collected so far.
       //  If the answer is yes, remove the RDB.
-      QMessageBox msgbox (QMessageBox::Question, 
-                          QObject::tr ("Keep Data For Cancelled Job"),
-                          QObject::tr ("The job has been cancelled. Keep the data collected so far?"),
-                          QMessageBox::Yes | QMessageBox::No);
-      if (msgbox.exec () == QMessageBox::No) {
-        mp_view->remove_rdb (rdb_index);
-        output_mode = OMNone;
-      } 
+      //  Don't ask if the application has exit (window was closed)
+      if (lay::Application::instance ()->main_window () && !lay::Application::instance ()->main_window ()->exited ()) {
+        QMessageBox msgbox (QMessageBox::Question,
+                            QObject::tr ("Keep Data For Cancelled Job"),
+                            QObject::tr ("The job has been cancelled. Keep the data collected so far?"),
+                            QMessageBox::Yes | QMessageBox::No);
+        if (msgbox.exec () == QMessageBox::No) {
+          if (mp_view) {
+            mp_view->remove_rdb (rdb_index);
+          }
+          output_mode = OMNone;
+        }
+      }
     }
 
   }
 
-  if (output_mode == OMMarkerDatabase) {
-    mp_view->open_rdb_browser (rdb_index, cv_index_a);
-  }
+  if (mp_view) {
 
-  mp_view->update_content ();
+    if (output_mode == OMMarkerDatabase) {
+      mp_view->open_rdb_browser (rdb_index, cv_index_a);
+    }
 
-  if (output_mode == OMNewLayout && output_cell != 0 && output_cv >= 0) {
-    mp_view->select_cell (output_cell->cell_index (), output_cv);
+    mp_view->update_content ();
+
+    if (output_mode == OMNewLayout && output_cell != 0 && output_cv >= 0) {
+      mp_view->select_cell (output_cell->cell_index (), output_cv);
+    }
   }
 }
 

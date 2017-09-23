@@ -48,7 +48,6 @@
 #include "tlTimer.h"
 #include "tlLog.h"
 #include "tlAssert.h"
-#include "tlDeferredExecution.h"
 #include "tlStream.h"
 #include "tlExceptions.h"
 #include "dbMemStatistics.h"
@@ -451,7 +450,8 @@ MainWindow::MainWindow (QApplication *app, const char *name)
       m_disable_tab_selected (false),
       m_exited (false),
       dm_do_update_menu (this, &MainWindow::do_update_menu),
-      m_grid_micron (0.001), 
+      dm_exit (this, &MainWindow::exit),
+      m_grid_micron (0.001),
       m_default_grids_updated (true),
       m_new_cell_window_size (2.0),
       m_new_layout_current_panel (false),
@@ -691,7 +691,7 @@ MainWindow::MainWindow (QApplication *app, const char *name)
   connect (&m_file_changed_timer, SIGNAL (timeout ()), this, SLOT (file_changed_timer()));
   m_file_changed_timer.setSingleShot (true);
 
-  //  install timer for menu update
+  //  install timer for menu update a
   connect (&m_menu_update_timer, SIGNAL (timeout ()), this, SLOT (update_action_states ()));
   m_menu_update_timer.setSingleShot (false);
   m_menu_update_timer.start (200);
@@ -1837,8 +1837,30 @@ void
 MainWindow::exit ()
 {
   m_exited = true;
-  do_close ();
-  QMainWindow::close ();
+
+  //  If there is a operation ongoing, request a break and delay execution of the exit operation.
+  if (mp_pr && mp_pr->is_busy ()) {
+    mp_pr->signal_break ();
+    dm_exit ();
+    return;
+  }
+
+  //  We also don't exit if a dialog is shown (deferred execution may be called from
+  //  the dialog's exec loop).
+  if (QApplication::activeModalWidget ()) {
+    dm_exit ();
+    return;
+  }
+
+  //  Only after other operation has finished we ask whether to save and close eventually
+  if (can_close ()) {
+
+    do_close ();
+    QMainWindow::close ();
+
+    emit closed ();
+
+  }
 }
 
 int 
@@ -1950,23 +1972,12 @@ void
 MainWindow::closeEvent (QCloseEvent *event)
 {
   if (! m_exited) {
-
     BEGIN_PROTECTED
-
-    if (mp_pr) {
-      mp_pr->signal_break ();
-    }
-
-    if (! can_close ()) {
-      event->ignore ();
-    } else {
-      do_close ();
-      emit closed ();
-    }
-
+    exit ();
     END_PROTECTED
-
   }
+
+  event->ignore ();
 }
 
 void
@@ -2074,10 +2085,7 @@ void
 MainWindow::cm_exit ()
 {
   BEGIN_PROTECTED
-  if (can_close ()) {
-    //  actually exit.
-    exit ();
-  }
+  exit ();
   END_PROTECTED
 }
 

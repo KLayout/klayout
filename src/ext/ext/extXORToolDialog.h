@@ -25,6 +25,8 @@
 
 #include <QDialog>
 
+#include "tlObject.h"
+
 namespace Ui
 {
   class XORToolDialog;
@@ -71,7 +73,7 @@ protected slots:
 
 private:
   Ui::XORToolDialog *mp_ui;
-  lay::LayoutView *mp_view;
+  tl::weak_ptr<lay::LayoutView> mp_view;
 };
 
 }

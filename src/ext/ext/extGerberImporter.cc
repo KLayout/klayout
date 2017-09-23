@@ -165,6 +165,8 @@ GerberFileReader::read (tl::TextInputStream &stream, db::Layout &layout, db::Cel
 
   try {
     do_read ();
+  } catch (tl::BreakException &) {
+    throw;
   } catch (tl::Exception &ex) {
     throw tl::Exception (ex.msg () + tl::to_string (QObject::tr (" in line ")) + tl::to_string (stream.line_number ()));
   }
@@ -1019,6 +1021,8 @@ GerberImporter::do_read (db::Layout &layout, db::cell_index_type cell_index)
       try {
         tl::log << "Reading PCB file '" << file->filename () << "' with format '" << file->format_string () << "'";
         reader->read (stream, layout, layout.cell (cell_index), targets);
+      } catch (tl::BreakException &) {
+        throw;
       } catch (tl::Exception &ex) {
         throw tl::Exception (ex.msg () + ", reading file " + file->filename ());
       }

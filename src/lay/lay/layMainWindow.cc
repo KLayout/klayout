@@ -1860,6 +1860,8 @@ MainWindow::exit ()
 
     emit closed ();
 
+  } else {
+    m_exited = false;
   }
 }
 

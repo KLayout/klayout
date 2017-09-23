@@ -93,10 +93,12 @@ static void ui_exception_handler_tl (const tl::Exception &ex, QWidget *parent)
   }
 
   const tl::ExitException *gsi_exit = dynamic_cast <const tl::ExitException *> (&ex);
+  const tl::BreakException *gsi_break = dynamic_cast <const tl::BreakException *> (&ex);
   const tl::ScriptError *gsi_excpt = dynamic_cast <const tl::ScriptError *> (&ex);
 
-  if (gsi_exit) {
-    //  exit exceptions are not shown - they are issued when a script is aborted
+  if (gsi_exit || gsi_break) {
+    //  exit and break exceptions are not shown - they are issued when a script is aborted or
+    //  an operation is cancelled
   } else if (gsi_excpt) {
 
     //  show and GSI errors in the context of the macro editor if that is open

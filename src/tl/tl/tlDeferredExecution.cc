@@ -152,8 +152,8 @@ DeferredMethodScheduler::do_execute ()
   //  do the execution outside the locked range to avoid deadlocks if the method's execution
   //  schedules another call.
   for (std::list<DeferredMethodBase *>::iterator m = methods.begin (); m != methods.end (); ++m) {
-    (*m)->execute ();
     (*m)->m_scheduled = false;
+    (*m)->execute ();
   }
 }
 

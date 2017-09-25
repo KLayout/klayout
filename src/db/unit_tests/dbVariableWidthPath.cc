@@ -26,19 +26,19 @@
 
 TEST(EmptyVP)
 {
-  db::Point pts[] = { };
-  std::pair<size_t, db::Coord> widths[] = { };
+  db::Point pts[] = { db::Point (0, 0) };  //  should be { }, but zero-size arrays are non-standard
+  std::pair<size_t, db::Coord> widths[] = { std::make_pair (size_t (0), 0) };  //  should be { }, but zero-size arrays are non-standard
 
-  db::VariableWidthPath vp (&pts[0], &pts[sizeof (pts) / sizeof (pts[0])], &widths[0], &widths[sizeof (widths) / sizeof (widths[0])]);
+  db::VariableWidthPath vp (&pts[0], &pts[0], &widths[0], &widths[0]);
   EXPECT_EQ (vp.to_poly ().to_string (), "()");
 }
 
 TEST(VP1Point)
 {
-  db::Point pts[] = { db::Point (0, 0) };
-  std::pair<size_t, db::Coord> widths[] = { };
+  db::Point pts[] = { db::Point (0, 0) };  //  should be { }, but zero-size arrays are non-standard
+  std::pair<size_t, db::Coord> widths[] = { std::make_pair (size_t (0), 0) };
 
-  db::VariableWidthPath vp (&pts[0], &pts[sizeof (pts) / sizeof (pts[0])], &widths[0], &widths[sizeof (widths) / sizeof (widths[0])]);
+  db::VariableWidthPath vp (&pts[0], &pts[sizeof (pts) / sizeof (pts[0])], &widths[0], &widths[0]);
   EXPECT_EQ (vp.to_poly ().to_string (), "()");
 }
 

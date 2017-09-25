@@ -233,9 +233,9 @@ fi
 echo ""
 
 # if not given, locate ruby interpreter (prefer 1.9, then default, finally 1.8 as fallback)
-if [ "$RUBY" != "-" ]; then
+if [ "$RUBY" = "" ]; then
   for ruby in "ruby2.4" "ruby2.3" "ruby2.2" "ruby2.1" "ruby2" "ruby1.9" "ruby" "ruby1.8"; do
-    if [ "$RUBY" = "" ] && [ "`$ruby -v 2>/dev/null`" != "" ]; then 
+    if [ "$RUBY" = "" ] && [ "`$ruby -e 'puts 1' 2>/dev/null`" = "1" ]; then 
       RUBY="$ruby" 
     fi
   done
@@ -319,9 +319,9 @@ if [ "$RUBY" != "" ] && [ "$RUBY" != "-" ]; then
 fi
 
 # if not given, locate Python interpreter 
-if [ "$PYTHON" != "-" ]; then
+if [ "$PYTHON" = "" ]; then
   for python in "python3.5" "python3.4" "python3.3" "python3.2" "python3.1" "python3" "python2.8" "python2.7" "python2" "python"; do
-    if [ "$PYTHON" = "" ] && [ "`$python -V 2>&1`" != "" ]; then 
+    if [ "$PYTHON" = "" ] && [ "`$python -c 'print(1)' 2>/dev/null`" = "1" ]; then 
       PYTHON="$python" 
     fi
   done

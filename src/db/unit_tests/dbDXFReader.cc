@@ -290,3 +290,8 @@ TEST(29d)
   run_test (_this, "t29.dxf.gz", "t29d_au.gds.gz", 0, 0.001, 1, 4, 1000, 0.001);
 }
 
+TEST(30)
+{
+  run_test (_this, "t30.dxf.gz", "t30d_au.gds.gz", 0, 0.001, 1000, 4, 1000, 0.001);
+}
+

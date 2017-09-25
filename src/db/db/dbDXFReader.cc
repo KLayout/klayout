@@ -30,6 +30,7 @@
 #include "dbRecursiveShapeIterator.h"
 #include "dbEdgeProcessor.h"
 #include "dbEdgesToContours.h"
+#include "dbVariableWidthPath.h"
 
 #include "tlException.h"
 #include "tlString.h"
@@ -1574,17 +1575,15 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
     } else if (entity_code == "LWPOLYLINE" || entity_code == "POLYLINE") {
 
       std::vector<db::DPoint> points;
+      std::vector<std::pair<size_t, double> > widths;
 
       std::string layer;
       int flags = 0;
-      double width = 0.0;
-      bool width_set = false;
+      double width1 = 0.0, width2 = 0.0;
       unsigned int got_width = 0;
-      double common_width = 0.0;
+      double common_width1 = 0.0, common_width2 = 0.0;
       unsigned int common_width_set = 0;
       double ex = 0.0, ey = 0.0, ez = 1.0;
-      size_t points_with_width = 0;
-      size_t points_with_one_width = 0;
       size_t tot_points = 0;
       double b = 0.0;
 
@@ -1610,20 +1609,23 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             }
 
             if (xy_flags == 3) {
+
+              size_t seg_start = std::max (size_t (1), points.size ()) - 1;
               add_bulge_segment (points, db::DPoint (x, y), b);
               ++tot_points;
               b = 0.0;
               xy_flags = 0;
+
+              if (got_width == 3) {
+                widths.push_back (std::make_pair (seg_start, width1));
+                widths.push_back (std::make_pair (points.size () - 1, width2));
+                got_width = 0;
+              }
+
+              got_width = 0;
+
             }
 
-            if (got_width == 3) {
-              ++points_with_width;
-            } else if (got_width > 0) {
-              ++points_with_one_width;
-            }
-
-            got_width = 0;
-            
           } else if (g == 210) {
             ex = read_double ();
           } else if (g == 220) {
@@ -1632,7 +1634,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             ez = read_double ();
           } else if (g == 43) {
 
-            common_width = read_double ();
+            common_width1 = common_width2 = read_double ();
             common_width_set = 3;
 
           } else if (g == 42) {
@@ -1641,18 +1643,10 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
             if (g == 41) {
               got_width |= 2;
+              width2 = read_double ();
             } else {
               got_width |= 1;
-            }
-
-            if (!width_set) {
-              width = read_double ();
-              width_set = true;
-            } else {
-              double w = read_double ();
-              if (fabs (w - width) > 1e-6) {
-                warn ("Non-uniform width encountered on LWPOLYLINE");
-              }
+              width1 = read_double ();
             }
 
           } else {
@@ -1677,18 +1671,11 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             ez = read_double ();
           } else if (g == 40 || g == 41) {
 
-            if (common_width_set == 0) {
-              common_width = read_double ();
-            } else {
-              double w = read_double ();
-              if (fabs (w - common_width) > 1e-6) {
-                warn ("Different start and end width encountered on POLYLINE");
-              }
-            }
-
             if (g == 40) {
+              common_width1 = read_double ();
               common_width_set |= 1;
             } else {
+              common_width2 = read_double ();
               common_width_set |= 2;
             }
 
@@ -1702,12 +1689,6 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
           const std::string &e = read_string (true);
           if (e == "VERTEX") {
-
-            if (got_width == 3) {
-              ++points_with_width;
-            } else if (got_width > 0) {
-              ++points_with_one_width;
-            }
 
             got_width = 0;
             
@@ -1725,18 +1706,10 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
                 if (g == 41) {
                   got_width |= 2;
+                  width2 = read_double ();
                 } else {
                   got_width |= 1;
-                }
-
-                if (!width_set) {
-                  width = read_double ();
-                  width_set = true;
-                } else {
-                  double w = read_double ();
-                  if (fabs (w - width) > 1e-6) {
-                    warn ("Non-uniform width encountered on POLYLINE");
-                  }
+                  width1 = read_double ();
                 }
 
               } else {
@@ -1744,9 +1717,16 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
               }
             }
 
+            size_t seg_start = std::max (size_t (1), points.size ()) - 1;
             add_bulge_segment (points, db::DPoint (x, y), b);
             ++tot_points;
             b = bnew;
+
+            if (got_width == 3) {
+              widths.push_back (std::make_pair (seg_start, width1));
+              widths.push_back (std::make_pair (points.size () - 1, width2));
+              got_width = 0;
+            }
 
           } else if (e == "SEQEND") {
             while ((g = read_group_code ()) != 0) {
@@ -1763,10 +1743,19 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
       }
 
-      if (got_width == 3) {
-        ++points_with_width;
-      } else if (got_width > 0) {
-        ++points_with_one_width;
+      //  Adds the common width if given
+      if (common_width_set > 0 && ! points.empty ()) {
+        if (widths.empty ()) {
+          widths.insert (widths.begin (), std::make_pair (size_t (0), common_width1));
+          widths.push_back (std::make_pair (points.size () - 1, common_width2));
+        } else {
+          if (widths.front ().first != 0) {
+            widths.insert (widths.begin (), std::make_pair (size_t (0), common_width1));
+          }
+          if (widths.back ().first != points.size () - 1) {
+            widths.push_back (std::make_pair (points.size () - 1, common_width2));
+          }
+        }
       }
 
       //  Create a closing arc if a bulge was specified on the last point and the polygon is 
@@ -1775,24 +1764,21 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         //  Hint: needs a copy, since points may be altered by add_bulge_segment
         db::DPoint p0 (points [0]);
         add_bulge_segment (points, p0, b);
+        if (! widths.empty ()) {
+          widths.push_back (std::make_pair (points.size () - 1, widths.front ().second));
+        }
       }
 
-      //  Let the per-vertex width override the common width 
-      //  TODO: this scheme just covers the case if all or no vertex has width
-      //  specifications. 
-      if (! width_set || fabs (width) < 1e-6) {
-        width = common_width;
-      }
-
-      //  issue a warning if there are vertices without a width specification
-      if (points_with_width > 0 && points_with_width < tot_points) {
-        warn ("Mixed width specification encountered on LWPOLYLINE or POLYLINE - uniform width supported only");
-      }
-      if (points_with_one_width > 0) {
-        warn ("Single width specification encountered on LWPOLYLINE or POLYLINE vertex - full and uniform specification supported only");
-      }
-      if (common_width_set > 0 && common_width_set < 3) {
-        warn ("Either both start and end width must be specified on POLYLINE or none of them");
+      //  check whether there is a common width and create a path if there is one
+      bool width_set = false;
+      double width = 0.0;
+      for (std::vector<std::pair<size_t, double> >::const_iterator w = widths.begin (); w != widths.end (); ++w) {
+        if (! width_set) {
+          width = w->second;
+          width_set = true;
+        } else if (width > -1e-6 && fabs (width - w->second) > 1e-6) {
+          width = -1.0;
+        }
       }
 
       std::pair <bool, unsigned int> ll = open_layer (layout, layer);
@@ -1803,7 +1789,12 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         //  create the polygon or path for width = 0: in mode 2, the polygon is always created, in modes 3 and 4
         //  the polygon is split into edges and joined with other edges later (this will resolve holes formed by
         //  other polygons)
-        if (width < 1e-6 && (flags & 1) != 0 && m_polyline_mode == 2) {
+        if (width < -1e-6) {
+
+          db::DVariableWidthPath vp (points.begin (), points.end (), widths.begin (), widths.end (), tt);
+          cell.shapes(ll.second).insert (safe_from_double (vp.to_poly ()));
+
+        } else if (width < 1e-6 && (flags & 1) != 0 && m_polyline_mode == 2) {
 
           db::DPolygon p;
           p.assign_hull (points.begin (), points.end (), tt);

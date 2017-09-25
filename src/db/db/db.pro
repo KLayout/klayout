@@ -129,6 +129,7 @@ SOURCES = \
   gsiDeclDbVector.cc \
   gsiDeclDbLayoutDiff.cc \
   gsiDeclDbGlyphs.cc \
+    dbVariableWidthPath.cc
 
 HEADERS = \
   dbArray.h \
@@ -228,7 +229,8 @@ HEADERS = \
   contrib/dbGDS2TextWriter.h \
     dbCommonReader.h \
     dbGlyphs.h \
-    dbCommon.h
+    dbCommon.h \
+    dbVariableWidthPath.h
 
 RESOURCES = \
   dbResources.qrc

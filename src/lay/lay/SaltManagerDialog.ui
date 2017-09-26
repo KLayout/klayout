@@ -35,6 +35,9 @@
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
+         <property name="childrenCollapsible">
+          <bool>false</bool>
+         </property>
          <widget class="QWidget" name="layoutWidget_2">
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <property name="rightMargin">
@@ -325,6 +328,9 @@
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
+         <property name="childrenCollapsible">
+          <bool>false</bool>
+         </property>
          <widget class="QWidget" name="layoutWidget_3">
           <layout class="QVBoxLayout" name="verticalLayout_11">
            <property name="rightMargin">
@@ -601,7 +607,7 @@
      </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Current Packages</string>
+       <string>Installed Packages</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -614,6 +620,9 @@
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="childrenCollapsible">
+          <bool>false</bool>
          </property>
          <widget class="QWidget" name="layoutWidget">
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -650,26 +659,6 @@
               <property name="bottomMargin">
                <number>0</number>
               </property>
-              <item>
-               <widget class="QToolButton" name="delete_button">
-                <property name="focusPolicy">
-                 <enum>Qt::NoFocus</enum>
-                </property>
-                <property name="toolTip">
-                 <string>Uninstall Package</string>
-                </property>
-                <property name="text">
-                 <string>...</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="layResources.qrc">
-                  <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
-                </property>
-                <property name="autoRaise">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
               <item>
                <spacer name="horizontalSpacer">
                 <property name="orientation">
@@ -797,8 +786,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>343</width>
-                       <height>207</height>
+                       <width>537</width>
+                       <height>284</height>
                       </rect>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_2">
@@ -994,16 +983,19 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QPushButton" name="create_button">
+           <widget class="QPushButton" name="delete_button">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Uninstall Package</string>
+            </property>
             <property name="text">
-             <string>Create Package</string>
+             <string>Remove Package</string>
             </property>
             <property name="icon">
              <iconset resource="layResources.qrc">
-              <normaloff>:/add.png</normaloff>:/add.png</iconset>
-            </property>
-            <property name="autoDefault">
-             <bool>false</bool>
+              <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
             </property>
            </widget>
           </item>
@@ -1019,6 +1011,20 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="create_button">
+            <property name="text">
+             <string>Create (Edit) Package</string>
+            </property>
+            <property name="icon">
+             <iconset resource="layResources.qrc">
+              <normaloff>:/add.png</normaloff>:/add.png</iconset>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -1053,10 +1059,10 @@
      <normaloff>:/clear.png</normaloff>:/clear.png</iconset>
    </property>
    <property name="text">
-    <string>Delete</string>
+    <string>Remove Package</string>
    </property>
    <property name="toolTip">
-    <string>Delete package</string>
+    <string>Remove package</string>
    </property>
   </action>
   <action name="actionUnmarkAllNew">
@@ -1108,8 +1114,12 @@
    </property>
   </action>
   <action name="actionCreatePackage">
+   <property name="icon">
+    <iconset resource="layResources.qrc">
+     <normaloff>:/add.png</normaloff>:/add.png</iconset>
+   </property>
    <property name="text">
-    <string>Create package</string>
+    <string>Create (edit) package</string>
    </property>
   </action>
   <action name="actionMarkAllUpdate">

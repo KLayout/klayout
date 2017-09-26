@@ -118,10 +118,6 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
   Ui::SaltManagerDialog::setupUi (this);
   mp_properties_dialog = new lay::SaltGrainPropertiesDialog (this);
 
-  //  TODO: clarify where the delete button should go ... currently it's too easy to
-  //  mistake add and delete buttons
-  delete_button->hide ();
-
   connect (edit_button, SIGNAL (clicked ()), this, SLOT (edit_properties ()));
   connect (create_button, SIGNAL (clicked ()), this, SLOT (create_grain ()));
   connect (delete_button, SIGNAL (clicked ()), this, SLOT (delete_grain ()));
@@ -130,6 +126,7 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
 
   mp_salt = salt;
 
+  QApplication::setOverrideCursor (Qt::WaitCursor);
   try {
     if (! m_salt_mine_url.empty ()) {
       tl::log << tl::to_string (tr ("Downloading package repository from %1").arg (tl::to_qstring (m_salt_mine_url)));
@@ -138,6 +135,7 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
   } catch (tl::Exception &ex) {
     tl::error << ex.msg ();
   }
+  QApplication::restoreOverrideCursor ();
 
   SaltModel *model = new SaltModel (this, mp_salt);
   model->set_empty_explanation (tr ("No packages are present on this system"));
@@ -258,7 +256,7 @@ SaltManagerDialog::mode_changed ()
   }
 
   //  keeps the splitters in sync
-  if (!sizes.empty ()) {
+  if (sizes.size () == 2 && sizes[1] > 0 /*visible*/) {
     splitter_new->setSizes (sizes);
     splitter_update->setSizes (sizes);
     splitter->setSizes (sizes);
@@ -661,9 +659,20 @@ BEGIN_PROTECTED
 
     tl::log << tl::to_string (tr ("Downloading package repository from %1").arg (tl::to_qstring (m_salt_mine_url)));
 
-    lay::Salt new_mine;
-    new_mine.load (m_salt_mine_url);
-    m_salt_mine = new_mine;
+    try {
+
+      QApplication::setOverrideCursor (Qt::WaitCursor);
+
+      lay::Salt new_mine;
+      new_mine.load (m_salt_mine_url);
+      m_salt_mine = new_mine;
+
+      QApplication::restoreOverrideCursor ();
+
+    } catch (...) {
+      QApplication::restoreOverrideCursor ();
+      throw;
+    }
 
     salt_mine_changed ();
 
@@ -870,6 +879,8 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
   //  Download actual grain definition file
   try {
 
+    QApplication::setOverrideCursor (Qt::WaitCursor);
+
     if (g->url ().empty ()) {
       throw tl::Exception (tl::to_string (tr ("No download link available")));
     }
@@ -901,7 +912,11 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
 
     details->set_grain (remote_grain.get ());
 
+    QApplication::restoreOverrideCursor ();
+
   } catch (tl::Exception &ex) {
+
+    QApplication::restoreOverrideCursor ();
 
     remote_grain.reset (0);
 

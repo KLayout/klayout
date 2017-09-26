@@ -189,9 +189,9 @@ InputHttpStream::read (char *b, size_t n)
     issue_request (QUrl (tl::to_qstring (m_url)));
   }
 
-  //  @@@ TODO: progress, timeout
+  //  TODO: progress, timeout
   while (mp_reply == 0) {
-    QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents, 100);
+    QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
   }
 
   if (mp_reply->error () != QNetworkReply::NoError) {

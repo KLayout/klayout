@@ -25,6 +25,7 @@
 #include "tlXMLParser.h"
 #include "tlHttpStream.h"
 #include "tlWebDAV.h"
+#include "tlFileUtils.h"
 
 #include <memory>
 #include <QDir>
@@ -124,24 +125,29 @@ SaltGrain::eff_doc_url () const
     return m_doc_url;
   }
 
-  if (! path ().empty ()) {
+  QString p = tl::to_qstring (path ());
+  if (! p.isEmpty ()) {
 
     //  if the URL is a relative URL, make it absolute relative to the grain's installation directory
     QFileInfo fi (url.toLocalFile ());
     if (! fi.isAbsolute ()) {
-      url = QUrl::fromLocalFile (QDir (tl::to_qstring (path ())).absoluteFilePath (fi.filePath ()));
+      fi = QFileInfo (QDir (p).absoluteFilePath (fi.filePath ()));
     }
-    url.setScheme (tl::to_qstring ("file"));
-    return tl::to_string (url.toString ());
 
-  } else {
-
-    //  base the documentation URL on the download URL
-    QUrl eff_url = QUrl (tl::to_qstring (m_url));
-    eff_url.setPath (eff_url.path () + QString::fromUtf8 ("/") + url.path ());
-    return tl::to_string (eff_url.toString ());
+    //  if the resulting path is inside the downloaded package, use this path
+    QString dp = fi.canonicalFilePath ();
+    if (!dp.isEmpty () && tl::is_parent_path (p, dp)) {
+      url = QUrl::fromLocalFile (dp);
+      url.setScheme (tl::to_qstring ("file"));
+      return tl::to_string (url.toString ());
+    }
 
   }
+
+  //  base the documentation URL on the download URL
+  QUrl eff_url = QUrl (tl::to_qstring (m_url));
+  eff_url.setPath (eff_url.path () + QString::fromUtf8 ("/") + url.path ());
+  return tl::to_string (eff_url.toString ());
 }
 
 void

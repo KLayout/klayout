@@ -34,13 +34,18 @@ bool
 is_parent_path (const QString &parent, const QString &path)
 {
   QFileInfo parent_info (parent);
+  if (! parent_info.exists ()) {
+    //  If the parent path does not exist, we always return false. This cannot be a parent.
+    return false;
+  }
+
   QFileInfo path_info (path);
 
   while (parent_info != path_info) {
-    path_info = path_info.path ();
     if (path_info.isRoot ()) {
       return false;
     }
+    path_info = path_info.path ();
   }
 
   return true;

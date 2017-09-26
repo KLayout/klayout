@@ -30,11 +30,19 @@
 
 TEST (1)
 {
-  EXPECT_EQ (tl::is_parent_path (std::string ("/home"), "/home/matthias"), true);
-  EXPECT_EQ (tl::is_parent_path (std::string ("/home"), "/home"), true);
-  EXPECT_EQ (tl::is_parent_path (std::string (""), ""), true);
-  EXPECT_EQ (tl::is_parent_path (std::string ("/opt/klayout"), "/home/matthias"), false);
-  EXPECT_EQ (tl::is_parent_path (std::string ("/home/klayout"), "/home/matthias"), false);
+  EXPECT_EQ (tl::is_parent_path (std::string ("."), "./doesnotexist"), true);
+  EXPECT_EQ (tl::is_parent_path (std::string ("./doesnotexist"), "./alsodoesnotexist"), false);
+  EXPECT_EQ (tl::is_parent_path (std::string ("."), "."), true);
+
+  QString p = QFileInfo (tl::to_qstring (tmp_file ())).path ();
+  QDir (p).mkdir (QString::fromUtf8 ("x"));
+  QDir (p).mkdir (QString::fromUtf8 ("y"));
+  EXPECT_EQ (tl::is_parent_path (tl::to_string (p), tl::to_string (p)), true);
+  EXPECT_EQ (tl::is_parent_path (tl::to_string (p), tl::to_string (p) + "/x"), true);
+  EXPECT_EQ (tl::is_parent_path (tl::to_string (p) + "/x", tl::to_string (p) + "/x"), true);
+  EXPECT_EQ (tl::is_parent_path (tl::to_string (p) + "/x", tl::to_string (p) + "/y"), false);
+  EXPECT_EQ (tl::is_parent_path (tl::to_string (QDir::root ().absolutePath ()), tl::to_string (p) + "/y"), true);
+  EXPECT_EQ (tl::is_parent_path (tl::to_string (QDir::root ().absolutePath ()), tl::to_string (p)), true);
 }
 
 TEST (2)

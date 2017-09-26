@@ -1,4 +1,4 @@
-0.25            (2017-09-10):
+0.25            (2017-09-25):
 * Enhancements: Major overhaul of the build environment
       - Qt5 supported now
       - Employs qmake as build system
@@ -50,6 +50,8 @@
        - Regions and Groups are supported now
        - LEF/DEF is a standare format now and 
          can be used with "File/Open" for example.
+* Enhancement: DXR reader supports variable path widths now
+* Enhancement: XOR provides graphical progress
 * Enhancements: Libraries can be associated with a technology. Only libraries
       associated with the selected technology are shown in the selection
       dialog. 

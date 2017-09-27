@@ -125,6 +125,9 @@ SaltGrain::eff_doc_url () const
     return m_doc_url;
   }
 
+  //  force this to become a "file" (for Qt5)
+  url.setScheme (QString::fromUtf8 ("file"));
+
   QString p = tl::to_qstring (path ());
   if (! p.isEmpty ()) {
 

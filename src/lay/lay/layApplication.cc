@@ -386,8 +386,12 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
           std::string m = tl::to_string (klp_file.absoluteFilePath ());
           std::string mn = tl::to_string (klp_file.fileName ());
           if (modules.find (mn) == modules.end ()) {
-            m_native_plugins.push_back (load_plugin (m));
-            modules.insert (mn);
+            try {
+              m_native_plugins.push_back (load_plugin (m));
+              modules.insert (mn);
+            } catch (tl::Exception &ex) {
+              tl::error << tl::to_string (tr ("Unable to load plugin %1: %2").arg (tl::to_qstring (m)).arg (tl::to_qstring (ex.msg ())));
+            }
           }
         }
       }
@@ -894,7 +898,7 @@ Application::scan_global_modules ()
       if (rbm_file.exists () && rbm_file.isReadable ()) {
         std::string m = tl::to_string (rbm_file.absoluteFilePath ());
         if (modules.find (m) == modules.end ()) {
-          tl::warn << tl::to_string (tr ("Global modules are deprecated. Turn '%1'' into an autorun macro instead and put it into 'macros' or 'pymacros'.").arg (tl::to_qstring (m)));
+          tl::warn << tl::to_string (tr ("Global modules are deprecated. Turn '%1' into an autorun macro instead and put it into 'macros' or 'pymacros'.").arg (tl::to_qstring (m)));
           global_modules.push_back (m);
           modules.insert (m);
         }

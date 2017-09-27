@@ -19,15 +19,12 @@
 # endif
 
 #define STRINGIFY_(x) #x
-#define STRINGIFY(x) STRINGIFY_(x)
-
-#define ZERO \\0
-#define SPACE \040
+#define STRINGIFY(x) STRINGIFY_(x\0)
 
 #define DESCRIPTION_STRING KLayout Application
 #define PRODUCTNAME_STRING KLayout
 #define COPYRIGHT_STRING GPL 2.0 (or later) by Matthias Koefferlein
-#define COMMENT_STRING DESCRIPTION_STRING##SPACE##KLAYOUT_VERSION##SPACE##KLAYOUT_VERSION_DATE##SPACE##KLAYOUT_VERSION_REV
+#define COMMENT_STRING DESCRIPTION_STRING KLAYOUT_VERSION KLAYOUT_VERSION_DATE KLAYOUT_VERSION_REV
 
 /**
  *  The application logo
@@ -55,13 +52,13 @@ VS_VERSION_INFO VERSIONINFO
                         BLOCK "040904b0"
                         BEGIN
                                 VALUE "CompanyName", "\0"
-                                VALUE "Comments", STRINGIFY(COMMENT_STRING##ZERO)
-                                VALUE "FileDescription", STRINGIFY(DESCRIPTION_STRING##ZERO)
-                                VALUE "FileVersion", STRINGIFY(KLAYOUT_VERSION##ZERO)
-                                VALUE "LegalCopyright", STRINGIFY(COPYRIGHT_STRING##ZERO)
+                                VALUE "Comments", STRINGIFY(COMMENT_STRING)
+                                VALUE "FileDescription", STRINGIFY(DESCRIPTION_STRING)
+                                VALUE "FileVersion", STRINGIFY(KLAYOUT_VERSION)
+                                VALUE "LegalCopyright", STRINGIFY(COPYRIGHT_STRING)
                                 VALUE "OriginalFilename", "klayout.exe\0"
-                                VALUE "ProductName", STRINGIFY(PRODUCTNAME_STRING##ZERO)
-                                VALUE "ProductVersion", STRINGIFY(KLAYOUT_VERSION##ZERO)
+                                VALUE "ProductName", STRINGIFY(PRODUCTNAME_STRING)
+                                VALUE "ProductVersion", STRINGIFY(KLAYOUT_VERSION)
                         END
                 END
                 BLOCK "VarFileInfo"

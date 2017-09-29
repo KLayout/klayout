@@ -126,6 +126,10 @@ private:
   const db::LayerMap &read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &options, bool import_lef) throw (tl::Exception)
   {
     const ext::LEFDEFReaderOptions *lefdef_options = dynamic_cast<const ext::LEFDEFReaderOptions *> (options.get_options (format ()));
+    static ext::LEFDEFReaderOptions default_options;
+    if (! lefdef_options) {
+      lefdef_options = &default_options;
+    }
 
     //  Take the layer map and the "read all layers" flag from the reader options - hence we override the
     ext::LEFDEFLayerDelegate layers (lefdef_options);

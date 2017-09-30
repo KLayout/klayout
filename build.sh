@@ -44,6 +44,7 @@ RPATH=""
 MAKE_OPT=""
 
 CONFIG="release"
+BUILD_EXPERT=0
 
 # Check, whether build.sh is run from the top level folder
 if ! [ -e src ] || ! [ -e src/klayout.pro ]; then
@@ -74,6 +75,9 @@ while [ "$*" != "" ]; do
     ;;
   -debug)
     CONFIG="debug"
+    ;;
+  -expert)
+    BUILD_EXPERT=1
     ;;
   -python)
     PYTHON="$1"
@@ -520,6 +524,30 @@ qmake_options=(
   KLAYOUT_VERSION_DATE="$KLAYOUT_VERSION_DATE"
   KLAYOUT_VERSION_REV="$KLAYOUT_VERSION_REV"
 )
+
+if [ $BUILD_EXPERT = 1 ]; then
+  qmake_options+=(
+    QMAKE_AR="$AR cqs"
+    QMAKE_LINK_C="$CC"
+    QMAKE_LINK_C_SHLIB="$CC"
+    QMAKE_LINK="$CXX"
+    QMAKE_LINK_SHLIB="$CXX"
+    QMAKE_OBJCOPY="$OBJCOPY"
+    QMAKE_RANLIB=
+    QMAKE_STRIP=
+    QMAKE_CC="$CC"
+    QMAKE_CXX="$CXX"
+    QMAKE_CFLAGS="$CFLAGS"
+    QMAKE_CFLAGS_RELEASE=
+    QMAKE_CFLAGS_DEBUG=
+    QMAKE_CXXFLAGS="$CXXFLAGS"
+    QMAKE_CXXFLAGS_RELEASE=
+    QMAKE_CXXFLAGS_DEBUG=
+    QMAKE_LFLAGS="$LDFLAGS"
+    QMAKE_LFLAGS_RELEASE=
+    QMAKE_LFLAGS_DEBUG=
+  )
+fi
 
 echo $QMAKE "$CURR_DIR/src/klayout.pro" "${qmake_options[@]}"
 $QMAKE "$CURR_DIR/src/klayout.pro" "${qmake_options[@]}"

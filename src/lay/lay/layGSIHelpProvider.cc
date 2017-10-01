@@ -143,15 +143,6 @@ struct DocumentationParser
   DocumentationParser (const gsi::MethodBase *method)
   {
     std::string doc = method->doc ();
-    if (pya::PythonInterpreter::instance ()) {
-      std::string pydoc = pya::PythonInterpreter::instance ()->python_doc (method);
-      if (! pydoc.empty ()) {
-        doc += "\n@<h4>\n";
-        doc += tl::to_string (QObject::tr ("Python specific notes:\n"));
-        doc += "@</h4>\n\n";
-        doc += pydoc;
-      }
-    }
     parse_doc (doc);
   }
 
@@ -1195,17 +1186,27 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     const gsi::MethodBase::MethodSynonym &syn = i->second.first->begin_synonyms () [i->second.second];
 
     DocumentationParser method_doc (i->second.first);
+    std::string pydoc;
+    if (pya::PythonInterpreter::instance ()) {
+      pydoc = pya::PythonInterpreter::instance ()->python_doc (i->second.first);
+    }
 
     os << "<a name=\"method" << n << "\"/>"
        << "<a name=\"m_" << escape_xml (i->first) << "\"/>"
        << "<keyword title=\"" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls) << ", " << tl::to_string (QObject::tr ("Method")) << " " << escape_xml (i->first) <<  "\" name=\"" << escape_xml (cls) << "#" << escape_xml (i->first) << "\"/>" << std::endl;
 
-    os << "<tr><td>";
+    os << "<tr>";
     if (i->first != prev_title) {
+      int rows = 0;
+      for (std::multimap <std::string, std::pair<const gsi::MethodBase *, size_t> >::const_iterator j = i; j != mm.end () && j->first == i->first; ++j) {
+        ++rows;
+      }
+      os << "<td rowspan=\"" << rows << "\">";
       os << "<h3>" << escape_xml (i->first) << "</h3>" << std::endl;
       prev_title = i->first;
+      os << "</td>";
     }
-    os << "</td><td style=\"padding-bottom: 16px\">";
+    os << "<td style=\"padding-bottom: 16px\">";
 
     os << "<p><b>" << tl::to_string (QObject::tr ("Signature")) << "</b>: ";
     std::string attr = method_attributes (i->second.first, method_doc);
@@ -1214,8 +1215,6 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     }
     os << method_return (i->second.first, method_doc, true) << " <b> " << escape_xml (i->first) << " </b> " << method_arguments (i->second.first, cls_obj, method_doc, true, "");
     os << "</p>" << std::endl;
-
-    os << "<div style=\"margin-left: 10px\">";
 
     os << "<p><b>" << tl::to_string (QObject::tr ("Description")) << "</b>: " << replace_references (escape_xml (method_doc.brief_doc), cls_obj) << "</p>" << std::endl;
 
@@ -1250,7 +1249,12 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       }
     }
 
-    os << "</div>";
+    if (! pydoc.empty ()) {
+      os << "<p><b>";
+      os << tl::to_string (QObject::tr ("Python specific notes:"));
+      os << "</b><br/>" << escape_xml (pydoc) << "</p>" << std::endl;
+    }
+
     os << "</td></tr>";
 
   }

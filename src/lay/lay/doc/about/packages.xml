@@ -4,9 +4,9 @@
 <doc>
 
   <title>About Packages</title>
-  <keyword>Packages Manager</keyword>
-  <keyword>Packages</keyword>
-  <keyword>Salt</keyword>
+  <keyword name="Package Manager"/>
+  <keyword name="Packages"/>
+  <keyword name="Salt"/>
 
   <p>
   "Salt" is KLayout's package manager which allows selecting and installing packages from a global repository. 
@@ -30,7 +30,7 @@
 
   <p>
   Packages are identified by name. A package name needs to be unique in the package universe. 
-  You can use a prefixed name like "www.mydomain.org/nameofpackage" to create a non-ambiguous name. 
+  You can use a prefixed name like <tt>www.mydomain.org/nameofpackage</tt> to create a non-ambiguous name. 
   The choice of the prefix is entirely up to you. You can use a domain name that is owned by 
   yourself for example.
   </p>
@@ -51,7 +51,7 @@
 
   <p>
   The key component for the package repository is the "Salt.Mine" package repository 
-  service (sami.klayout.org). It is a web service that maintains a package list. It 
+  service (<tt>sami.klayout.org</tt>). It is a web service that maintains a package list. It 
   does not host the packages, but stores links to the actual hosting site. In order 
   to author a package, you need to upload the package to one of the supported host 
   sites and register your package on the Salt.Mine page. Registration is a simple 
@@ -83,7 +83,7 @@
   Packages are published on the Salt.Mine server. This is a web service that delivers a 
   complete list of packages plus a little meta data such as current version, the icon 
   and a brief description. KLayout will download this list from 
-  "http://sami.klayout.org/repository.xml" by default. You can set the KLAYOUT_SALT_MINE 
+  <tt>http://sami.klayout.org/repository.xml</tt> by default. You can set the <tt>KLAYOUT_SALT_MINE</tt>
   environment variable to a different URL which makes KLayout use another repository 
   service, i.e. one inside your own organisation. This service can be any HTTP server 
   that delivers a package list in the same format than the Salt.Mine package service.

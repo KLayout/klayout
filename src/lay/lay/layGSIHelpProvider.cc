@@ -1219,7 +1219,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     os << "<p><b>" << tl::to_string (QObject::tr ("Description")) << "</b>: " << replace_references (escape_xml (method_doc.brief_doc), cls_obj) << "</p>" << std::endl;
 
     if (! method_doc.params.empty () || ! method_doc.ret_val.empty ()) {
-      os << "<table>" << std::endl;
+      os << "<table class=\"layout-table\">" << std::endl;
       for (std::vector<std::pair <std::string, std::string> >::const_iterator p = method_doc.params.begin (); p != method_doc.params.end (); ++p) {
         os << "<tr><td><b>" << escape_xml (p->first) << "</b>:</td><td>" << replace_references (escape_xml (p->second), cls_obj) << "</td></tr>" << std::endl;
       }

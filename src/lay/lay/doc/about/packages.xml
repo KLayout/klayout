@@ -145,7 +145,7 @@
   </p>
 
   <p>
-  For public deployment, the <a href="http://sami.klayout.org">Salt.Mine Service</a> is used to register 
+  For public deployment, the Salt.Mine service (<tt>http://sami.klayout.org</tt>) is used to register 
   new packages in the package index. By default, KLayout loads the package index from that service, so
   once your package is registered there, everyone using KLayout will see it.
   </p>
@@ -153,6 +153,52 @@
   <p>
   There is separate documentation provided for details about the development and deployment
   process.
+  </p>
+
+  <h2>The Package Index</h2>
+
+  <p>
+  Packages are published on the Salt.Mine server. This is a web service that delivers a 
+  packages index with some meta data such as current version, the icon 
+  and a brief description. KLayout uses this list to inform users of packages available
+  for installation and available updates. The package index can be served by other
+  ways too. The only requirement is to be accessible by a http, https or file URL.
+  </p>
+
+  <p>
+  The basic format of the index is XML with this structure:
+  </p>
+
+  <pre>&lt;salt-mine&gt;
+  &lt;salt-grain&gt;
+    &lt;name&gt;name&lt;/name&gt;
+    &lt;version&gt;Version&lt;/version&gt;
+    &lt;title&gt;Title of the package&lt;/title&gt;
+    &lt;doc&gt;A brief description&lt;/doc&gt;
+    &lt;doc_url&gt;Documentation URL&lt;/doc_url&gt;
+    &lt;url&gt;Download URL&lt;/url&gt;
+    &lt;license&gt;License model&lt;/license&gt;
+    &lt;icon&gt;Icon image: base64-encoded, 64x64 max, PNG preferred&lt;/icon&gt;
+  &lt;/salt-grain&gt;
+  ...
+&lt;/salt-mine&gt;</pre>
+
+  <p>
+  When the package manager is opened, KLayout will download the index from 
+  <tt>http://sami.klayout.org/repository.xml</tt>. You can set the <tt>KLAYOUT_SALT_MINE</tt>
+  environment variable to a different URL which makes KLayout use another dictionary
+  service, i.e. one inside your own organisation. This service can be any HTTP server 
+  that delivers a package list in the same format than the Salt.Mine package service.
+  The URL can also be a "file:" scheme URL. In this case, KLayout will download the 
+  list from the given file location.
+  </p>
+
+  <p>
+  When installing a package, KLayout will simply download the files from the URL given 
+  in the package list. KLayout employs the WebDAV protocol to download the files. 
+  This protocol is spoken by Subversion and GitHub with the subversion bridge. The 
+  latter requires a simple translation of the original Git URL's to obtain the 
+  subversion equivalent.
   </p>
 
 </doc>

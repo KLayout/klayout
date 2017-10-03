@@ -109,6 +109,13 @@ public:
   void set_path (const std::string &p);
 
   /**
+   *  @brief Includes a list from an external source into this list
+   *  This method reads the other list from the source (an URL) and
+   *  merges it into this.
+   */
+  void include (const std::string &src);
+
+  /**
    *  @brief Gets the collections which are members of this collection (begin iterator)
    */
   collection_iterator begin_collections () const

@@ -59,14 +59,16 @@ class StreamIODevice
 public:
   StreamIODevice (tl::InputStream &stream)
     : m_stream (stream),
-      mp_progress (0)
+      mp_progress (0),
+      m_has_error (false)
   {
     open (QIODevice::ReadOnly);
   }
 
   StreamIODevice (tl::InputStream &stream, const std::string &progress_message)
     : m_stream (stream),
-      mp_progress (new AbsoluteProgress (progress_message, 100))
+      mp_progress (new AbsoluteProgress (progress_message, 100)),
+      m_has_error (false)
   {
     mp_progress->set_format (tl::to_string (QObject::tr ("%.0f MB")));
     mp_progress->set_unit (1024 * 1024);
@@ -106,16 +108,49 @@ public:
 
       return n0 - n;
 
-    } catch (tl::Exception &) {
-      //  TODO: is there another way of reporting errors? This reports an "unexpected EOF" when the "Cancel" button is pressed.
-      //  However, throwing a simple tl::Exception does not pass through the Qt library.
-      return 0;
+    } catch (tl::Exception &ex) {
+      setErrorString (tl::to_qstring (ex.msg ()));
+      m_has_error = true;
+      return -1;
     }
+  }
+
+  bool has_error () const
+  {
+    return m_has_error;
   }
 
 private:
   tl::InputStream &m_stream;
   tl::AbsoluteProgress *mp_progress;
+  bool m_has_error;
+};
+
+// --------------------------------------------------------------------
+//  ErrorAwareQXmlInputSource definition and implementation
+
+class ErrorAwareQXmlInputSource
+  : public QXmlInputSource
+{
+public:
+  ErrorAwareQXmlInputSource (StreamIODevice *dev)
+    : QXmlInputSource (dev), mp_dev (dev)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void fetchData ()
+  {
+    QXmlInputSource::fetchData ();
+
+    //  This feature is actually missing in the original implementation: throw an exception on error
+    if (mp_dev->has_error ()) {
+      throw tl::Exception (tl::to_string (mp_dev->errorString ()));
+    }
+  }
+
+private:
+  StreamIODevice *mp_dev;
 };
 
 // --------------------------------------------------------------------
@@ -124,15 +159,17 @@ private:
 XMLFileSource::XMLFileSource (const std::string &path, const std::string &progress_message)
   : mp_source (0), mp_io (0), m_stream (path)
 {
-  mp_io = new StreamIODevice (m_stream, progress_message);
-  mp_source = new QXmlInputSource (mp_io);
+  StreamIODevice *io = new StreamIODevice (m_stream, progress_message);
+  mp_io = io;
+  mp_source = new ErrorAwareQXmlInputSource (io);
 }
 
 XMLFileSource::XMLFileSource (const std::string &path)
   : mp_source (0), mp_io (0), m_stream (path)
 {
-  mp_io = new StreamIODevice (m_stream);
-  mp_source = new QXmlInputSource (mp_io);
+  StreamIODevice *io = new StreamIODevice (m_stream);
+  mp_io = io;
+  mp_source = new ErrorAwareQXmlInputSource (io);
 }
 
 XMLFileSource::~XMLFileSource ()
@@ -148,14 +185,16 @@ XMLFileSource::~XMLFileSource ()
 
 XMLStreamSource::XMLStreamSource (tl::InputStream &s, const std::string &progress_message)
 {
-  mp_io = new StreamIODevice (s, progress_message);
-  mp_source = new QXmlInputSource (mp_io);
+  StreamIODevice *io = new StreamIODevice (s, progress_message);
+  mp_io = io;
+  mp_source = new ErrorAwareQXmlInputSource (io);
 }
 
 XMLStreamSource::XMLStreamSource (tl::InputStream &s)
 {
-  mp_io = new StreamIODevice (s);
-  mp_source = new QXmlInputSource (mp_io);
+  StreamIODevice *io = new StreamIODevice (s);
+  mp_io = io;
+  mp_source = new ErrorAwareQXmlInputSource (io);
 }
 
 XMLStreamSource::~XMLStreamSource ()

@@ -511,7 +511,8 @@ BEGIN_PROTECTED
       --i;
       QModelIndex index = model->index (i, 0, QModelIndex ());
       SaltGrain *g = model->grain_from_index (index);
-      if (g && model->is_marked (g->name ())) {
+      //  NOTE: checking for valid_name prevents bad entries inside the download list
+      if (g && model->is_marked (g->name ()) && SaltGrain::valid_name (g->name ())) {
         manager.register_download (g->name (), g->url (), g->version ());
         any = true;
       }

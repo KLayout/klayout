@@ -27,9 +27,9 @@
 #include "tlUnitTest.h"
 #include "tlStaticObjects.h"
 #include "tlTimer.h"
-#include "tlSystemPaths.h"
 #include "tlCommandLineParser.h"
 #include "layApplication.h"
+#include "laySystemPaths.h"
 #include "rba.h"
 #include "pya.h"
 #include "gsiDecl.h"
@@ -334,7 +334,7 @@ main_cont (int argc, char **argv)
     QStringList name_filters;
     name_filters << QString::fromUtf8 ("*.ut");
 
-    QDir inst_dir (tl::to_qstring (tl::get_inst_path ()));
+    QDir inst_dir (tl::to_qstring (lay::get_inst_path ()));
     QStringList inst_modules = inst_dir.entryList (name_filters);
     inst_modules.sort ();
 
@@ -366,7 +366,7 @@ main_cont (int argc, char **argv)
     }
 
     //  No side effects
-    tl::set_klayout_path (std::vector<std::string> ());
+    lay::set_klayout_path (std::vector<std::string> ());
 
     int ac = 2;
     static char av0[] = "unit_test";

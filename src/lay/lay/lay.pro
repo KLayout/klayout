@@ -56,7 +56,8 @@ HEADERS = \
     laySignalHandler.h \
     layLibraryController.h \
     layFontController.h \
-    layNativePlugin.h
+    layNativePlugin.h \
+    laySystemPaths.h
 
 FORMS = \
     ClipDialog.ui \
@@ -159,7 +160,8 @@ SOURCES = \
     laySignalHandler.cc \
     layLibraryController.cc \
     layFontController.cc \
-    layNativePlugin.cc
+    layNativePlugin.cc \
+    laySystemPaths.cc
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \

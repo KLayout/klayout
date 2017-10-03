@@ -33,7 +33,6 @@
 #include "tlLog.h"
 #include "tlTimer.h"
 #include "tlExpression.h"
-#include "tlSystemPaths.h"
 
 #include "rba.h"
 #include "rbaInspector.h"

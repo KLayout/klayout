@@ -21,7 +21,7 @@
 */
 
 
-#include "tlSystemPaths.h"
+#include "laySystemPaths.h"
 #include "tlString.h"
 
 #include <QDir>
@@ -36,12 +36,24 @@
 
 #include <cstdlib>
 
-namespace tl
+namespace lay
 {
 
 std::string 
 get_appdata_path ()
 {
+#ifdef _WIN32
+  wchar_t *env = _wgetenv (L"KLAYOUT_HOME");
+  if (env) {
+    return tl::to_string (QString ((const QChar *) env));
+  }
+#else
+  char *env = getenv ("KLAYOUT_HOME");
+  if (env) {
+    return (tl::system_to_string (env));
+  }
+#endif
+
   QDir appdata_dir = QDir::homePath ();
   QString appdata_folder;
 #ifdef _WIN32
@@ -50,23 +62,7 @@ get_appdata_path ()
   appdata_folder = QString::fromUtf8 (".klayout");
 #endif
 
-  //  create the basic folder hierarchy
-  if (! appdata_dir.exists (appdata_folder)) {
-    appdata_dir.mkdir (appdata_folder);
-  }
-
-  QString appdata_klayout_path = appdata_dir.absoluteFilePath (appdata_folder);
-  QDir appdata_klayout_dir (appdata_klayout_path);
-
-  const char *folders[] = { "macros", "drc", "libraries", "tech" };
-  for (size_t i = 0; i < sizeof (folders) / sizeof (folders [0]); ++i) {
-    QString folder = QString::fromUtf8 (folders [i]);
-    if (! appdata_klayout_dir.exists (folder)) {
-      appdata_klayout_dir.mkdir (folder);
-    }
-  }
-
-  return tl::to_string (appdata_klayout_path);
+  return tl::to_string (appdata_dir.absoluteFilePath (appdata_folder));
 }
 
 static std::string 

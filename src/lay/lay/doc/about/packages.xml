@@ -30,9 +30,12 @@
 
   <p>
   Packages are identified by name. A package name needs to be unique in the package universe. 
-  You can use a prefixed name like <tt>www.mydomain.org/nameofpackage</tt> to create a non-ambiguous name. 
-  The choice of the prefix is entirely up to you. You can use a domain name that is owned by 
-  yourself for example.
+  You can use a prefixed name like <tt>www.mydomain.org/nameofpackage</tt> to create a non-ambiguous name.
+  Use a slash to separate the prefix from the actual package name.
+  The choice of the prefix is entirely up to you as long as it contains letters, digits, underscores, hypthens or dots. 
+  You can use a domain name that is owned by 
+  yourself for example. You can use multiple prefixes to further differentiate the packages
+  inside your namespace.
   </p>
 
   <p>

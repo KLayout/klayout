@@ -22,6 +22,7 @@
 
 #include "laySaltController.h"
 #include "laySaltManagerDialog.h"
+#include "laySaltDownloadManager.h"
 #include "layConfig.h"
 #include "layMainWindow.h"
 #include "layQtTools.h"
@@ -152,12 +153,14 @@ SaltController::show_editor ()
 void
 SaltController::sync_file_watcher ()
 {
-  m_file_watcher->clear ();
-  m_file_watcher->enable (false);
-  for (lay::Salt::flat_iterator g = m_salt.begin_flat (); g != m_salt.end_flat (); ++g) {
-    m_file_watcher->add_file ((*g)->path ());
+  if (m_file_watcher) {
+    m_file_watcher->clear ();
+    m_file_watcher->enable (false);
+    for (lay::Salt::flat_iterator g = m_salt.begin_flat (); g != m_salt.end_flat (); ++g) {
+      m_file_watcher->add_file ((*g)->path ());
+    }
+    m_file_watcher->enable (true);
   }
-  m_file_watcher->enable (true);
 }
 
 void
@@ -165,6 +168,54 @@ SaltController::sync_files ()
 {
   tl::log << tl::to_string (tr ("Detected file system change in packages - updating"));
   emit salt_changed ();
+}
+
+bool
+SaltController::install_packages (const std::vector<std::string> &packages, bool with_dep)
+{
+  lay::SaltDownloadManager manager;
+
+  lay::Salt salt_mine;
+  if (! m_salt_mine_url.empty ()) {
+    tl::log << tl::to_string (tr ("Downloading package repository from %1").arg (tl::to_qstring (m_salt_mine_url)));
+    salt_mine.load (m_salt_mine_url);
+  }
+
+  for (std::vector<std::string>::const_iterator p = packages.begin (); p != packages.end (); ++p) {
+
+    if (p->empty ()) {
+      continue;
+    }
+
+    std::string v, n = *p;
+
+    size_t br = p->find ("(");
+    if (br != std::string::npos) {
+      n = std::string (*p, 0, br);
+      v = std::string (*p, br + 1);
+      size_t brr = v.find (")");
+      if (brr != std::string::npos) {
+        v = std::string (v, 0, brr);
+      }
+    }
+
+    if (n.find ("http:") == 0 || n.find ("https:") == 0 || n.find ("file:") == 0 || n[0] == '/' || n[0] == '\\') {
+      //  it's a URL
+      manager.register_download (std::string (), n, v);
+    } else {
+      //  it's a plain name
+      manager.register_download (n, std::string (), v);
+    }
+
+  }
+
+  if (with_dep) {
+    manager.compute_dependencies (m_salt, salt_mine);
+  } else {
+    manager.compute_packages (m_salt, salt_mine);
+  }
+
+  return manager.execute (0, m_salt);
 }
 
 void

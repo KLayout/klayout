@@ -111,34 +111,66 @@ public:
   void compute_dependencies (const lay::Salt &salt, const Salt &salt_mine);
 
   /**
+   *  @brief Computes the list of packages after all required packages have been registered
+   *
+   *  This method will removes packages that are already installed and satisfy the version requirements.
+   *  Packages not present in the list of packages ("salt" argument), will be scheduled for download too.
+   *  No dependencies are checked in this version.
+   */
+  void compute_packages (const lay::Salt &salt, const Salt &salt_mine);
+
+  /**
    *  @brief Actually execute the downloads
    *
-   *  This method will show a confirmation dialog and start installation
-   *  if this dialog is confirmed. It will return false if
-   *  the dialog was cancelled and an exception if something goes
-   *  wrong.
-   *  It will return true if the packages were installed successfully.
+   *  If parent is non-null, this method will show a confirmation dialog and start installation
+   *  if this dialog is confirmed. It will return false if the dialog was cancelled and an exception
+   *  if something goes wrong.
+   *
+   *  If parent is null, no confirmation dialog will be shown and installation happens in non-GUI
+   *  mode.
+   *
+   *  The return value will be true if the packages were installed successfully.
    */
   bool execute (QWidget *parent, lay::Salt &salt);
 
 private:
   struct Descriptor
   {
-    Descriptor (const std::string &_url, const std::string &_version)
-      : url (_url), version (_version), downloaded (false)
+    Descriptor (const std::string &_name, const std::string &_url, const std::string &_version)
+      : name (_name), url (_url), version (_version), downloaded (false)
     { }
 
+    bool operator< (const Descriptor &other) const
+    {
+      if (name != other.name) {
+        return name < other.name;
+      } else {
+        return lay::SaltGrain::compare_versions (version, other.version) < 0;
+      }
+    }
+
+    bool operator== (const Descriptor &other) const
+    {
+      if (name != other.name) {
+        return false;
+      } else {
+        return lay::SaltGrain::compare_versions (version, other.version) == 0;
+      }
+    }
+
+    std::string name;
     std::string url;
     std::string version;
     bool downloaded;
     lay::SaltGrain grain;
   };
 
-  std::map<std::string, Descriptor> m_registry;
+  std::vector<Descriptor> m_registry;
 
   bool needs_iteration ();
-  void fetch_missing (const lay::Salt &salt_mine, tl::AbsoluteProgress &progress);
+  void fetch_missing (const lay::Salt &salt, const lay::Salt &salt_mine, tl::AbsoluteProgress &progress);
   lay::ConfirmationDialog *make_confirmation_dialog (QWidget *parent, const lay::Salt &salt);
+  void compute_list (const lay::Salt &salt, const lay::Salt &salt_mine, bool with_dep);
 };
 
 }

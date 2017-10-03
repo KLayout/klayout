@@ -121,47 +121,65 @@ SaltDownloadManager::SaltDownloadManager ()
 void
 SaltDownloadManager::register_download (const std::string &name, const std::string &url, const std::string &version)
 {
-  m_registry.insert (std::make_pair (name, Descriptor (url, version)));
+  m_registry.push_back (Descriptor (name, url, version));
 }
 
 void
 SaltDownloadManager::compute_dependencies (const lay::Salt &salt, const lay::Salt &salt_mine)
 {
+  compute_list (salt, salt_mine, true);
+}
+
+void
+SaltDownloadManager::compute_packages (const lay::Salt &salt, const lay::Salt &salt_mine)
+{
+  compute_list (salt, salt_mine, false);
+}
+
+void
+SaltDownloadManager::compute_list (const lay::Salt &salt, const lay::Salt &salt_mine, bool with_dep)
+{
   tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Computing package dependencies ..")));
-
-  std::map<std::string, Descriptor> registry;
-
-  //  remove those registered entries which don't need to be updated
-
-  registry = m_registry;
-  for (std::map<std::string, Descriptor>::const_iterator p = registry.begin (); p != registry.end (); ++p) {
-    const SaltGrain *g = salt.grain_by_name (p->first);
-    if (g && SaltGrain::compare_versions (p->second.version, g->version ()) == 0 && p->second.url == g->url ()) {
-      m_registry.erase (p->first);
-    }
-  }
 
   //  add further entries as derived from the dependencies
 
   while (needs_iteration ()) {
 
-    fetch_missing (salt_mine, progress);
+    fetch_missing (salt, salt_mine, progress);
 
-    registry = m_registry;
-    for (std::map<std::string, Descriptor>::const_iterator p = registry.begin (); p != registry.end (); ++p) {
+    if (! with_dep) {
+      break;
+    }
 
-      for (std::vector<SaltGrain::Dependency>::const_iterator d = p->second.grain.dependencies ().begin (); d != p->second.grain.dependencies ().end (); ++d) {
+    std::map<std::string, size_t> reg_by_name;
+    for (std::vector<Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
+      reg_by_name.insert (std::make_pair (p->name, p - m_registry.begin ()));
+    }
 
-        std::map<std::string, Descriptor>::iterator r = m_registry.find (d->name);
-        if (r != m_registry.end ()) {
+    size_t n = m_registry.size ();
+    for (size_t i = 0; i < n; ++i) {
 
-          if (SaltGrain::compare_versions (r->second.version, d->version) < 0) {
+      const Descriptor &p = m_registry [i];
+
+      for (std::vector<SaltGrain::Dependency>::const_iterator d = p.grain.dependencies ().begin (); d != p.grain.dependencies ().end (); ++d) {
+
+        std::map<std::string, size_t>::iterator r = reg_by_name.find (d->name);
+        if (r != reg_by_name.end ()) {
+
+          //  Dependency is already scheduled for installation - check if we need a newer package
+
+          Descriptor &pd = m_registry [r->second];
+
+          if (SaltGrain::compare_versions (pd.version, d->version) < 0) {
 
             //  Grain is present, but too old -> update version and reload in the next iteration
-            r->second.downloaded = false;
-            r->second.version = d->version;
-            r->second.url = d->url;
-            r->second.downloaded = false;
+            if (tl::verbosity() >= 20) {
+              tl::log << "Upgrading installation request as required by package " << p.name << ": " << d->name << " (" << d->version << ") with URL " << d->url;
+            }
+
+            pd.downloaded = false;
+            pd.version = d->version;
+            pd.url = d->url;
 
           }
 
@@ -172,11 +190,25 @@ SaltDownloadManager::compute_dependencies (const lay::Salt &salt, const lay::Sal
 
             //  Grain is installed already, but too old -> register for update
             if (SaltGrain::compare_versions (g->version (), d->version) < 0) {
-              register_download (d->name, d->url, d->version);
+
+              if (tl::verbosity() >= 20) {
+                tl::log << "Considering for update as dependency: " << d->name << " (" << d->version << ") with URL " << d->url;
+              }
+              m_registry.push_back (Descriptor (d->name, d->url, d->version));
+
+            } else {
+              if (tl::verbosity() >= 20) {
+                tl::log << "Dependency already satisfied: " << d->name << "(" << d->version << ")";
+              }
             }
 
           } else {
-            register_download (d->name, d->url, d->version);
+
+            if (tl::verbosity() >= 20) {
+              tl::log << "Considering for download as dependency: " << d->name << " (" << d->version << ") with URL " << d->url;
+            }
+            m_registry.push_back (Descriptor (d->name, d->url, d->version));
+
           }
 
         }
@@ -191,8 +223,8 @@ SaltDownloadManager::compute_dependencies (const lay::Salt &salt, const lay::Sal
 bool
 SaltDownloadManager::needs_iteration ()
 {
-  for (std::map<std::string, Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
-    if (! p->second.downloaded) {
+  for (std::vector<Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
+    if (! p->downloaded) {
       return true;
     }
   }
@@ -200,34 +232,94 @@ SaltDownloadManager::needs_iteration ()
 }
 
 void
-SaltDownloadManager::fetch_missing (const lay::Salt &salt_mine, tl::AbsoluteProgress &progress)
+SaltDownloadManager::fetch_missing (const lay::Salt &salt, const lay::Salt &salt_mine, tl::AbsoluteProgress &progress)
 {
-  for (std::map<std::string, Descriptor>::iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
+  std::vector<Descriptor> registry;
 
-    if (! p->second.downloaded) {
+  //  drop entries with same name but lower version
+
+  registry.swap (m_registry);
+  std::sort (registry.begin (), registry.end ());
+
+  for (std::vector<Descriptor>::const_iterator p = registry.begin (); p != registry.end (); ++p) {
+    if (p + 1 != registry.end ()) {
+      if (p->name != p[1].name) {
+        m_registry.push_back (*p);
+      }
+    } else {
+      m_registry.push_back (*p);
+    }
+  }
+
+  //  download the items that need to be downloaded
+
+  for (std::vector<Descriptor>::iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
+
+    if (! p->downloaded) {
 
       ++progress;
 
       //  If no URL is given, utilize the salt mine to fetch it
-      if (p->second.url.empty ()) {
-        const lay::SaltGrain *g = salt_mine.grain_by_name (p->first);
-        if (SaltGrain::compare_versions (g->version (), p->second.version) < 0) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Package '%1': package in repository is too old (%2) to satisfy requirements (%3)").arg (tl::to_qstring (p->first)).arg (tl::to_qstring (g->version ())).arg (tl::to_qstring (p->second.version))));
+      if (p->url.empty ()) {
+
+        tl_assert (! p->name.empty ());
+
+        const lay::SaltGrain *g = salt_mine.grain_by_name (p->name);
+        if (! g) {
+          throw tl::Exception (tl::to_string (QObject::tr ("Package '%1' not found in index - cannot resolve download URL").arg (tl::to_qstring (p->name))));
         }
-        p->second.version = g->version ();
-        p->second.url = g->url ();
+
+        if (tl::verbosity() >= 20) {
+          tl::log << "Resolved package URL for package " << p->name << ": " << g->url ();
+        }
+
+        p->url = g->url ();
+
       }
 
       try {
-        p->second.grain = SaltGrain::from_url (p->second.url);
+        p->grain = SaltGrain::from_url (p->url);
       } catch (tl::Exception &ex) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Error fetching spec file for package '%1': %2").arg (tl::to_qstring (p->first)).arg (tl::to_qstring (ex.msg ()))));
+        throw tl::Exception (tl::to_string (QObject::tr ("Error fetching spec file for package '%1': %2").arg (tl::to_qstring (p->name)).arg (tl::to_qstring (ex.msg ()))));
       }
 
-      p->second.downloaded = true;
+      if (p->version.empty ()) {
+        p->version = p->grain.version ();
+      }
+
+      p->name = p->grain.name ();
+      p->downloaded = true;
+
+      if (SaltGrain::compare_versions (p->grain.version (), p->version) < 0) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Package '%1': package in repository is too old (%2) to satisfy requirements (%3)").arg (tl::to_qstring (p->name)).arg (tl::to_qstring (p->grain.version ())).arg (tl::to_qstring (p->version))));
+      }
 
     }
 
+  }
+
+  //  remove those registered entries which don't need to be updated (we do this after download since now the
+  //  names should be known when only the URL is given)
+
+  registry.clear ();
+  registry.swap (m_registry);
+
+  for (std::vector<Descriptor>::const_iterator p = registry.begin (); p != registry.end (); ++p) {
+    const SaltGrain *g = salt.grain_by_name (p->name);
+    if (g) {
+      if (SaltGrain::compare_versions (p->version, g->version ()) <= 0 && p->url == g->url ()) {
+        if (tl::verbosity() >= 20) {
+          tl::log << "Package already present with sufficient version - not installed again: " << p->name << " (" << p->version << ")";
+        }
+      } else {
+        if (tl::verbosity() >= 20) {
+          tl::log << "Considering package for upgrade or URL switch: " << p->name << ", from " << g->url () << "(" << g->version () << ") to " << p->url << "(" << p->version << ")";
+        }
+        m_registry.push_back (*p);
+      }
+    } else {
+      m_registry.push_back (*p);
+    }
   }
 }
 
@@ -236,20 +328,22 @@ SaltDownloadManager::make_confirmation_dialog (QWidget *parent, const lay::Salt 
 {
   lay::ConfirmationDialog *dialog = new lay::ConfirmationDialog (parent);
 
+  std::sort (m_registry.begin (), m_registry.end ());
+
   //  First the packages to update
-  for (std::map<std::string, Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
-    const lay::SaltGrain *g = salt.grain_by_name (p->first);
+  for (std::vector<Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
+    const lay::SaltGrain *g = salt.grain_by_name (p->name);
     if (g) {
       //  \342\206\222 is UTF-8 "right arrow"
-      dialog->add_info (p->first, true, g->version () + " \342\206\222 " + p->second.version, p->second.url);
+      dialog->add_info (p->name, true, g->version () + " \342\206\222 " + p->version, p->url);
     }
   }
 
   //  Then the packages to install
-  for (std::map<std::string, Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
-    const lay::SaltGrain *g = salt.grain_by_name (p->first);
+  for (std::vector<Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
+    const lay::SaltGrain *g = salt.grain_by_name (p->name);
     if (!g) {
-      dialog->add_info (p->first, false, p->second.version, p->second.url);
+      dialog->add_info (p->name, false, p->version, p->url);
     }
   }
 
@@ -259,52 +353,78 @@ SaltDownloadManager::make_confirmation_dialog (QWidget *parent, const lay::Salt 
 bool
 SaltDownloadManager::execute (QWidget *parent, lay::Salt &salt)
 {
-  //  Stop with a warning if there is nothing to do
-  if (m_registry.empty()) {
-    QMessageBox::warning (parent, tr ("Nothing to do"), tr ("No packages need update or are marked for installation"));
-    return true;
-  }
-
-  std::auto_ptr<lay::ConfirmationDialog> dialog (make_confirmation_dialog (parent, salt));
-
-  dialog->setModal (true);
-  dialog->show ();
-
-  while (! dialog->is_confirmed ()) {
-    QCoreApplication::processEvents (QEventLoop::AllEvents | QEventLoop::WaitForMoreEvents, 100);
-    if (dialog->is_cancelled () || ! dialog->isVisible ()) {
-      return false;
-    }
-  }
-
-  dialog->start ();
-
   bool result = true;
 
-  for (std::map<std::string, Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
+  if (parent) {
 
-    lay::SaltGrain target;
-    target.set_name (p->first);
-    lay::SaltGrain *g = salt.grain_by_name (p->first);
-    if (g) {
-      target.set_path (g->path ());
+    //  Stop with a warning if there is nothing to do
+    if (m_registry.empty()) {
+      QMessageBox::warning (parent, tr ("Nothing to do"), tr ("No packages need update or are marked for installation"));
+      return true;
     }
 
-    if (! salt.create_grain (p->second.grain, target)) {
-      dialog->mark_error (p->first);
-      result = false;
-    } else {
-      dialog->mark_success (p->first);
+    std::auto_ptr<lay::ConfirmationDialog> dialog (make_confirmation_dialog (parent, salt));
+
+    dialog->setModal (true);
+    dialog->show ();
+
+    while (! dialog->is_confirmed ()) {
+      QCoreApplication::processEvents (QEventLoop::AllEvents | QEventLoop::WaitForMoreEvents, 100);
+      if (dialog->is_cancelled () || ! dialog->isVisible ()) {
+        return false;
+      }
     }
 
-    dialog->separator ();
+    dialog->start ();
 
-  }
+    std::sort (m_registry.begin (), m_registry.end ());
 
-  dialog->finish ();
+    for (std::vector<Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
 
-  while (! dialog->is_closed () && dialog->isVisible ()) {
-    QCoreApplication::processEvents (QEventLoop::AllEvents | QEventLoop::WaitForMoreEvents, 100);
+      lay::SaltGrain target;
+      target.set_name (p->name);
+      lay::SaltGrain *g = salt.grain_by_name (p->name);
+      if (g) {
+        target.set_path (g->path ());
+      }
+
+      if (! salt.create_grain (p->grain, target)) {
+        dialog->mark_error (p->name);
+        result = false;
+      } else {
+        dialog->mark_success (p->name);
+      }
+
+      dialog->separator ();
+
+    }
+
+    dialog->finish ();
+
+    while (! dialog->is_closed () && dialog->isVisible ()) {
+      QCoreApplication::processEvents (QEventLoop::AllEvents | QEventLoop::WaitForMoreEvents, 100);
+    }
+
+  } else {
+
+    for (std::vector<Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
+
+      lay::SaltGrain target;
+      target.set_name (p->name);
+      lay::SaltGrain *g = salt.grain_by_name (p->name);
+      if (g) {
+        target.set_path (g->path ());
+      }
+
+      if (! salt.create_grain (p->grain, target)) {
+        tl::error << tl::to_string (QObject::tr ("Installation failed for package %1").arg (tl::to_qstring (target.name ())));
+        result = false;
+      } else {
+        tl::log << tl::to_string (QObject::tr ("Package %1 installed successfully").arg (tl::to_qstring (target.name ())));
+      }
+
+    }
+
   }
 
   return result;

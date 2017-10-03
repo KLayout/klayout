@@ -21,6 +21,7 @@
 */
 
 #include "laySaltGrain.h"
+#include "laySaltController.h"
 #include "tlString.h"
 #include "tlXMLParser.h"
 #include "tlHttpStream.h"
@@ -259,6 +260,11 @@ SaltGrain::valid_name (const std::string &n)
 
   tl::Extractor ex (n);
 
+  //  a package name must not start with a dot.
+  if (ex.test (".")) {
+    return false;
+  }
+
   std::string s;
   if (! ex.try_read_word (s, "_.")) {
     return false;
@@ -267,6 +273,10 @@ SaltGrain::valid_name (const std::string &n)
 
   while (! ex.at_end ()) {
     if (! ex.test ("/")) {
+      return false;
+    }
+    //  a prefix must not start with a dot.
+    if (ex.test (".")) {
       return false;
     }
     if (! ex.try_read_word (s, "_.")) {
@@ -463,6 +473,11 @@ SaltGrain::from_url (const std::string &url)
 
   std::auto_ptr<tl::InputStream> stream;
   std::string spec_url = SaltGrain::spec_url (url);
+
+  //  base relative URL's on the salt mine URL
+  if (spec_url.find ("http:") != 0 && spec_url.find ("https:") != 0 && spec_url.find ("file:") != 0 && !spec_url.empty() && spec_url[0] != '/' && spec_url[0] != '\\' && lay::SaltController::instance ()) {
+    spec_url = lay::SaltController::instance ()->salt_mine_url () + "/" + spec_url;
+  }
 
   if (spec_url.find ("http:") == 0 || spec_url.find ("https:") == 0) {
     stream.reset (tl::WebDAVObject::download_item (spec_url));

@@ -122,9 +122,33 @@ public:
   void add_path (const std::string &path);
 
   /**
+   *  @brief Installs the packages from the given list
+   *
+   *  The list is a list of names or URL's, optionally with a version in round brackets.
+   *  If a package with the given name or URL is installed already, it is skipped.
+   *  Otherwise, it's downloaded and installed. If URL's are given, the URL is
+   *  used for download. If names are given, the URL's are taken from the
+   *  salt mine index.
+   *
+   *  If "with_dep" is used, dependencies are also installed as taken from the
+   *  salt mine index.
+   *
+   *  The method returns true if all packages could be installed successfully.
+   */
+  bool install_packages (const std::vector<std::string> &packages, bool with_dep);
+
+  /**
    *  @brief Specifies the salt mine (package repository) URL
    */
   void set_salt_mine_url (const std::string &url);
+
+  /**
+   *  @brief Gets the salt mine (package repository) URL
+   */
+  const std::string &salt_mine_url () const
+  {
+    return m_salt_mine_url;
+  }
 
   /**
    *  @brief Gets the salt
@@ -163,7 +187,7 @@ private:
   lay::SaltManagerDialog *mp_salt_dialog;
   lay::MainWindow *mp_mw;
   std::string m_salt_mine_url;
-  lay::Salt m_salt, m_salt_mine;
+  lay::Salt m_salt;
   tl::FileSystemWatcher *m_file_watcher;
   tl::DeferredMethod<SaltController> dm_sync_file_watcher;
   tl::DeferredMethod<SaltController> dm_sync_files;

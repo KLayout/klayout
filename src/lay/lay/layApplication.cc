@@ -37,6 +37,7 @@
 #include "layMacroController.h"
 #include "layTechnologyController.h"
 #include "laySaltController.h"
+#include "laySystemPaths.h"
 #include "lymMacro.h"
 #include "gtf.h"
 #include "gsiDecl.h"
@@ -52,7 +53,6 @@
 #include "tlAssert.h"
 #include "tlLog.h"
 #include "tlString.h"
-#include "tlSystemPaths.h"
 #include "tlExpression.h"
 #include "tlExceptions.h"
 #include "tlInternational.h"
@@ -280,13 +280,13 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   bool gtf_save_incremental = false;
 
   //  get and create the klayout appdata folder if required
-  m_appdata_path = tl::get_appdata_path ();
+  m_appdata_path = lay::get_appdata_path ();
 
   //  get the installation path
-  m_inst_path = tl::get_inst_path ();
+  m_inst_path = lay::get_inst_path ();
 
   //  get the KLayout path
-  m_klayout_path = tl::get_klayout_path ();
+  m_klayout_path = lay::get_klayout_path ();
 
   if (mp_qapp_gui) {
 
@@ -407,6 +407,9 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   bool tech_set = true; 
   std::string tech;
   std::string tech_file;
+
+  std::vector <std::string> package_inst;
+  bool packages_with_dep = false;
 
   bool editable_set = false;
 
@@ -593,7 +596,15 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
     } else if (a == "-x") {
 
       m_sync_mode = true;
-      
+
+    } else if (a == "-y" && (i + 1) < argc) {
+
+      package_inst.push_back (args [++i]);
+
+    } else if (a == "-yd") {
+
+      packages_with_dep = true;
+
     } else if (a == "-v") {
 
       tl::info << lay::Version::name () << " " << lay::Version::version ();
@@ -692,7 +703,16 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
       sc->add_path (*p);
     }
 
-    sc->set_salt_mine_url (tl::salt_mine_url ());
+    sc->set_salt_mine_url (lay::salt_mine_url ());
+
+    //  Do package installation if requested.
+    if (!package_inst.empty ()) {
+      if (! sc->install_packages (package_inst, packages_with_dep)) {
+        exit (1);
+      } else {
+        exit (0);
+      }
+    }
 
   }
 
@@ -1065,8 +1085,11 @@ Application::usage ()
   r += tl::to_string (QObject::tr ("  -v                  Print program version and exit")) + "\n";
   r += tl::to_string (QObject::tr ("  -wd <name>=<value>  Define a variable within expressions")) + "\n";
   r += tl::to_string (QObject::tr ("  -x                  Synchronous drawing mode")) + "\n";
-  r += tl::to_string (QObject::tr ("  -zz                 Non-GUI mode (database only, implies -nc)")) + "\n";
+  r += tl::to_string (QObject::tr ("  -y <package>        Package installation: install package(s) and exit - can be used more than once")) + "\n";
+  r += tl::to_string (QObject::tr ("                      ('package' is a name, an URL and optionally a version in round brackets)")) + "\n";
+  r += tl::to_string (QObject::tr ("  -yd                 With -y: include dependencies")) + "\n";
   r += tl::to_string (QObject::tr ("  -z                  Non-GUI mode (hidden views)")) + "\n";
+  r += tl::to_string (QObject::tr ("  -zz                 Non-GUI mode (database only, implies -nc)")) + "\n";
   return r;
 }
 

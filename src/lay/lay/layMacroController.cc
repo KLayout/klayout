@@ -59,6 +59,8 @@ MacroController::load ()
   lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
 
   //  TODO: consider adding "drc" dynamically and allow more dynamic categories
+  //  We can do so if we first load the macros with the initial interpreters, then do autorun (which creates DSL interpreters) and then
+  //  register the remaining categories.
   m_macro_categories.push_back (std::pair<std::string, std::string> ("macros", tl::to_string (QObject::tr ("Ruby"))));
   m_macro_categories.push_back (std::pair<std::string, std::string> ("pymacros", tl::to_string (QObject::tr ("Python"))));
   m_macro_categories.push_back (std::pair<std::string, std::string> ("drc", tl::to_string (QObject::tr ("DRC"))));
@@ -78,8 +80,12 @@ MacroController::load ()
       }
     }
 
-    for (tl::Registrar<gsi::Interpreter>::iterator i = gsi::interpreters.begin (); i != gsi::interpreters.end (); ++i) {
-      i->add_package_location (p->path);
+    //  Add the unspecific paths as "package locations", so we get "ruby", "python" and similar folders as
+    //  path components inside the interpreters.
+    if (p->cat.empty ()) {
+      for (tl::Registrar<gsi::Interpreter>::iterator i = gsi::interpreters.begin (); i != gsi::interpreters.end (); ++i) {
+        i->add_package_location (p->path);
+      }
     }
 
   }

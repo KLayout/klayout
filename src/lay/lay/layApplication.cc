@@ -560,7 +560,7 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
       
     } else if (a == "-j" && (i + 1) < argc) {
 
-      custom_macro_paths.push_back (std::pair<std::string, std::string> (args [++i], "macros"));
+      custom_macro_paths.push_back (std::pair<std::string, std::string> (args [++i], std::string ()));
       
     } else if (a == "-nt") {
 
@@ -678,7 +678,7 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
       while (! ex.at_end ()) {
         std::string p;
         ex.read_word_or_quoted (p);
-        custom_macro_paths.push_back (std::pair<std::string, std::string> (p, "macros"));
+        custom_macro_paths.push_back (std::pair<std::string, std::string> (p, std::string ()));
         if (ex.test (":")) {
           ex.read_word (custom_macro_paths.back ().second);
         }

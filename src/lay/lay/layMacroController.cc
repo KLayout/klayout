@@ -68,7 +68,12 @@ MacroController::load ()
 
     for (size_t c = 0; c < m_macro_categories.size (); ++c) {
       if (p->cat.empty () || p->cat == m_macro_categories [c].first) {
-        std::string mp = tl::to_string (QDir (tl::to_qstring (p->path)).absoluteFilePath (tl::to_qstring (m_macro_categories [c].first)));
+        std::string mp;
+        if (p->cat.empty ()) {
+          mp = tl::to_string (QDir (tl::to_qstring (p->path)).absoluteFilePath (tl::to_qstring (m_macro_categories [c].first)));
+        } else {
+          mp = p->path;
+        }
         lym::MacroCollection::root ().add_folder (p->description, mp, m_macro_categories [c].first, p->readonly);
       }
     }

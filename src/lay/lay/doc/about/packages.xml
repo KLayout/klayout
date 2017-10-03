@@ -184,7 +184,14 @@
     &lt;icon&gt;Icon image: base64-encoded, 64x64 max, PNG preferred&lt;/icon&gt;
   &lt;/salt-grain&gt;
   ...
+  &lt;include&gt;URL to include other index files into this one&lt;/include&gt;
+  ...
 &lt;/salt-mine&gt;</pre>
+
+  <p>
+  You can include other repositories - specifically the default one - into a 
+  custom XML file. This allows extending the public index with local packages.
+  </p>
 
   <p>
   When the package manager is opened, KLayout will download the index from 

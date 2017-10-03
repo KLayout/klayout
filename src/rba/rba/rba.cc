@@ -58,6 +58,11 @@
 #  define HAVE_RUBY_VERSION_CODE 10901
 #endif
 
+//  For the installation path
+#ifdef _WIN32
+#  include <windows.h>
+#endif
+
 // -------------------------------------------------------------------
 //  This part is available only if Ruby is enabled
 
@@ -1798,25 +1803,31 @@ RubyInterpreter::initialize (int main_argc, char **main_argv, int (*main_func) (
 
       try {
 
-        QDir inst_dir (tl::to_qstring (tl::get_inst_path ()));
-        QFileInfo fi (inst_dir.absoluteFilePath (tl::to_qstring(".ruby-paths.txt")));
-        if (fi.exists ()) {
+        wchar_t buffer[MAX_PATH];
+        int len;
+        if ((len = GetModuleFileName(NULL, buffer, MAX_PATH)) > 0) {
 
-          tl::log << tl::to_string (QObject::tr ("Reading Ruby path from ")) << tl::to_string (fi.filePath ());
+          QDir inst_dir (QString::fromUtf16 ((const ushort *) buffer, len));
+          QFileInfo fi (inst_dir.absoluteFilePath (tl::to_qstring(".ruby-paths.txt")));
+          if (fi.exists ()) {
 
-          QFile paths_txt (fi.filePath ());
-          paths_txt.open (QIODevice::ReadOnly);
+            tl::log << tl::to_string (QObject::tr ("Reading Ruby path from ")) << tl::to_string (fi.filePath ());
 
-          tl::Eval eval;
-          eval.set_global_var ("inst_path", tl::Variant (tl::to_string (inst_dir.absolutePath ())));
-          tl::Expression ex;
-          eval.parse (ex, paths_txt.readAll ().constData ());
-          tl::Variant v = ex.execute ();
+            QFile paths_txt (fi.filePath ());
+            paths_txt.open (QIODevice::ReadOnly);
 
-          if (v.is_list ()) {
-            for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
-              rba_add_path (i->to_string ());
+            tl::Eval eval;
+            eval.set_global_var ("inst_path", tl::Variant (tl::to_string (inst_dir.absolutePath ())));
+            tl::Expression ex;
+            eval.parse (ex, paths_txt.readAll ().constData ());
+            tl::Variant v = ex.execute ();
+
+            if (v.is_list ()) {
+              for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
+                rba_add_path (i->to_string ());
+              }
             }
+
           }
 
         }

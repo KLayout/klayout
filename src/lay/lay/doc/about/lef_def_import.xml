@@ -141,13 +141,28 @@
       variant notation (see <link href="about/variant_notation.xml"/>) to specify
       value and type of the property name.
     </li>
-    <li><b>Produce outline shapes:</b> If this option is checked, outline shapes are
+    <li><b>Produce inst names:</b> Check this option to assign user properties with the
+      instance name to the component instances created by DEF import.
+      The user property name used for the instance name
+      can be specified in the edit box below the check box. Use KLayout's 
+      variant notation (see <link href="about/variant_notation.xml"/>) to specify
+      value and type of the property name.
+    </li>
+    <li><b>Produce cell outlines:</b> If this option is checked, outline shapes are
       produced for the macros and the design (for DEF import). The layer to be used can 
       be specified in the edit box below. You can use KLayout's usual layer specification
       notation, i.e. "OUTLINE" for a named layer without GDS layer/datatype value, 
       "10/0" for GDS layer 10, datatype 0 without a name or "OUTLINE (10/0)" for a 
       combination of both. The outline layer is subject to layer mapping as well, so 
       the layer map can be used alternatively to assign GDS layer/datatype numbers.
+    </li>
+    <li><b>Produce blockages:</b> If this option is checked, placement blockages
+      are produced as polygons on the layer given right of the check box. Use KLayout's layer
+      notation to specify the layer (see "Produce cell outlines").
+    </li>
+    <li><b>Produce regions:</b> If this option is checked, regions
+      are produced as polygons on the layer given right of the check box. Use KLayout's layer
+      notation to specify the layer (see "Produce cell outlines").
     </li>
   </ul>
   
@@ -168,6 +183,7 @@
     <li><b>Obstructions:</b> generated for obstruction area markers.</li>
     <li><b>Routing:</b> generated for routing geometry.</li>
     <li><b>Pin labels:</b> generated for pin labels.</li>
+    <li><b>Blockages:</b> generated for (component) blockages.</li>
   </ul>  
 
   <p><b>Note:</b> if the suffix of two purposes is identical, the default GDS datatype should

@@ -320,6 +320,7 @@ SpecificLoadLayoutOptionsDialog::SpecificLoadLayoutOptionsDialog (QWidget *paren
       layout->setMargin (0);
       content_frame->setLayout (layout);
 
+      mp_editor->show ();
       mp_editor->setup (specific_options, 0);
 
     }

@@ -129,6 +129,8 @@
   folder with other files use your favorite editor of KLayout itself for layout files.
   </p>
 
+  <h2>Deployment inside your organisation</h2>
+
   <p>
   Once a package is finished, it needs to be deployed to make it available to other
   users. Deployment basically means to put it on some public place where others
@@ -136,7 +138,8 @@
   this can be a web server or a folder on 
   a file server. KLayout talks WebDAV, so the web server needs to offer WebDAV 
   access. A subversion (SVN) server provides WebDAV by default, so this is a good
-  choice. For public open source deployment, only certain providers are supported.
+  choice. Git can be used too, but you'll need to mirror the Git repository to 
+  a file system or WebDAV share.
   </p>
 
   <p>
@@ -153,18 +156,13 @@
   once your package is registered there, everyone using KLayout will see it.
   </p>
 
-  <p>
-  There is separate documentation provided for details about the development and deployment
-  process.
-  </p>
-
   <h2>The Package Index</h2>
 
   <p>
-  Packages are published on the Salt.Mine server. This is a web service that delivers a 
+  Public Packages are published on the Salt.Mine server. This is a web service that delivers a 
   packages index with some meta data such as current version, the icon 
   and a brief description. KLayout uses this list to inform users of packages available
-  for installation and available updates. The package index can be served by other
+  for installation and available updates. For local deployment, the package index can be served by other
   ways too. The only requirement is to be accessible by a http, https or file URL.
   </p>
 

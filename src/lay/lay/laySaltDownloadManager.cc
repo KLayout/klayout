@@ -37,7 +37,7 @@ namespace lay
 // ----------------------------------------------------------------------------------
 
 ConfirmationDialog::ConfirmationDialog (QWidget *parent)
-  : QDialog (parent), m_confirmed (false), m_cancelled (false), m_closed (false), m_file (50000, true)
+  : QDialog (parent), m_confirmed (false), m_cancelled (false), m_file (50000, true)
 {
   Ui::SaltManagerInstallConfirmationDialog::setupUi (this);
 
@@ -419,9 +419,8 @@ SaltDownloadManager::execute (lay::SaltManagerDialog *parent, lay::Salt &salt)
 
     dialog->finish ();
 
-    while (! dialog->is_closed () && dialog->isVisible ()) {
-      QCoreApplication::processEvents (QEventLoop::AllEvents | QEventLoop::WaitForMoreEvents, 100);
-    }
+    //  Show the dialog until it's closed
+    dialog->exec ();
 
   } else {
 

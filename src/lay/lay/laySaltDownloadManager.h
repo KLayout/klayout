@@ -52,7 +52,6 @@ public:
 
   bool is_confirmed () const  { return m_confirmed; }
   bool is_cancelled () const  { return m_cancelled; }
-  bool is_closed () const     { return m_closed; }
 
   void start ();
   void separator ();
@@ -64,10 +63,10 @@ public:
 private slots:
   void confirm_pressed ()     { m_confirmed = true; }
   void cancel_pressed ()      { m_cancelled = true; }
-  void close_pressed ()       { m_closed = true; }
+  void close_pressed ()       { hide (); }
 
 private:
-  bool m_confirmed, m_cancelled, m_closed;
+  bool m_confirmed, m_cancelled;
   lay::LogFile m_file;
   std::map<std::string, QTreeWidgetItem *> m_items_by_name;
 

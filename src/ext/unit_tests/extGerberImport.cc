@@ -362,3 +362,13 @@ TEST(X2_4)
 {
   run_test (_this, "x2-4");
 }
+
+TEST(X2_5a)
+{
+  run_test (_this, "x2-5a");
+}
+
+TEST(X2_5b)
+{
+  run_test (_this, "x2-5b");
+}

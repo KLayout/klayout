@@ -153,14 +153,13 @@ struct GerberMetaData
 struct GraphicsState
 {
   GraphicsState ()
-    : merge (false), inverse (false),
+    : inverse (false),
       m_rot (0.0), m_s (1.0), m_ox (false), m_oy (false), m_mx (false), m_my (false),
       m_orot (0.0), m_os (1.0), m_omx (false), m_omy (false)
   {
     displacements.push_back (db::DVector ());
   }
 
-  bool merge;
   bool inverse;
   db::DCplxTrans global_trans;
   double m_rot;

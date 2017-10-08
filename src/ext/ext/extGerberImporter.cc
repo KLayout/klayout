@@ -263,7 +263,6 @@ GerberFileReader::read_coord (tl::Extractor &ex)
 void
 GerberFileReader::swap_graphics_state (GraphicsState &state)
 {
-  std::swap (m_merge, state.merge);
   std::swap (m_inverse, state.inverse);
   std::swap (m_global_trans, state.global_trans);
   std::swap (m_s, state.m_s);

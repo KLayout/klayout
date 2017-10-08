@@ -21,6 +21,7 @@
 */
 
 #include "laySaltDownloadManager.h"
+#include "laySaltManagerDialog.h"
 #include "laySalt.h"
 #include "tlFileUtils.h"
 #include "tlWebDAV.h"
@@ -119,9 +120,9 @@ SaltDownloadManager::SaltDownloadManager ()
 }
 
 void
-SaltDownloadManager::register_download (const std::string &name, const std::string &url, const std::string &version)
+SaltDownloadManager::register_download (const std::string &name, const std::string &token, const std::string &url, const std::string &version)
 {
-  m_registry.push_back (Descriptor (name, url, version));
+  m_registry.push_back (Descriptor (name, token, url, version));
 }
 
 void
@@ -194,7 +195,7 @@ SaltDownloadManager::compute_list (const lay::Salt &salt, const lay::Salt &salt_
               if (tl::verbosity() >= 20) {
                 tl::log << "Considering for update as dependency: " << d->name << " (" << d->version << ") with URL " << d->url;
               }
-              m_registry.push_back (Descriptor (d->name, d->url, d->version));
+              m_registry.push_back (Descriptor (d->name, std::string (), d->url, d->version));
 
             } else {
               if (tl::verbosity() >= 20) {
@@ -207,7 +208,7 @@ SaltDownloadManager::compute_list (const lay::Salt &salt, const lay::Salt &salt_
             if (tl::verbosity() >= 20) {
               tl::log << "Considering for download as dependency: " << d->name << " (" << d->version << ") with URL " << d->url;
             }
-            m_registry.push_back (Descriptor (d->name, d->url, d->version));
+            m_registry.push_back (Descriptor (d->name, std::string (), d->url, d->version));
 
           }
 
@@ -259,21 +260,23 @@ SaltDownloadManager::fetch_missing (const lay::Salt &salt, const lay::Salt &salt
 
       ++progress;
 
-      //  If no URL is given, utilize the salt mine to fetch it
-      if (p->url.empty ()) {
-
-        tl_assert (! p->name.empty ());
+      //  Add URL and token from the package index
+      if (! p->name.empty ()) {
 
         const lay::SaltGrain *g = salt_mine.grain_by_name (p->name);
         if (! g) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Package '%1' not found in index - cannot resolve download URL").arg (tl::to_qstring (p->name))));
+          if (p->url.empty ()) {
+            throw tl::Exception (tl::to_string (QObject::tr ("Package '%1' not found in index - cannot resolve download URL").arg (tl::to_qstring (p->name))));
+          }
+        } else {
+          if (p->url.empty ()) {
+            if (tl::verbosity() >= 20) {
+              tl::log << "Resolved package URL for package " << p->name << ": " << g->url ();
+            }
+            p->url = g->url ();
+          }
+          p->token = g->token ();
         }
-
-        if (tl::verbosity() >= 20) {
-          tl::log << "Resolved package URL for package " << p->name << ": " << g->url ();
-        }
-
-        p->url = g->url ();
 
       }
 
@@ -351,7 +354,7 @@ SaltDownloadManager::make_confirmation_dialog (QWidget *parent, const lay::Salt 
 }
 
 bool
-SaltDownloadManager::execute (QWidget *parent, lay::Salt &salt)
+SaltDownloadManager::execute (lay::SaltManagerDialog *parent, lay::Salt &salt)
 {
   bool result = true;
 
@@ -388,11 +391,26 @@ SaltDownloadManager::execute (QWidget *parent, lay::Salt &salt)
         target.set_path (g->path ());
       }
 
+      int status = 1;
       if (! salt.create_grain (p->grain, target)) {
         dialog->mark_error (p->name);
         result = false;
+        status = 0;
       } else {
         dialog->mark_success (p->name);
+      }
+
+      try {
+        //  try to give feedback about successful installations
+        if (! p->token.empty ()) {
+          std::string fb_url = parent->salt_mine_url () + "?token=" + p->token + "&status=" + tl::to_string (status);
+          if (fb_url.find ("http:") == 0 || fb_url.find ("https:") == 0) {
+            tl::InputStream fb (fb_url);
+            fb.read_all ();
+          }
+        }
+      } catch (tl::Exception &ex) {
+        tl::error << ex.msg ();
       }
 
       dialog->separator ();

@@ -100,6 +100,24 @@ public:
   void set_name (const std::string &p);
 
   /**
+   *  @brief Gets the token of the grain
+   *
+   *  The grain's token is a unique identifier by which external systems can
+   *  identify the package - for example for package voting.
+   *  A token is not part of the package's identity. It's intended as a
+   *  package identification safe against forgery.
+   */
+  const std::string &token () const
+  {
+    return m_token;
+  }
+
+  /**
+   *  @brief Sets the token of the grain
+   */
+  void set_token (const std::string &t);
+
+  /**
    *  @brief Gets the title of the grain
    *
    *  The title is a brief description that is shown in the title of the
@@ -427,6 +445,7 @@ public:
 
 private:
   std::string m_name;
+  std::string m_token;
   std::string m_version;
   std::string m_api_version;
   std::string m_path;

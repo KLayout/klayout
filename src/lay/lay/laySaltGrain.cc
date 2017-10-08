@@ -73,6 +73,12 @@ SaltGrain::set_name (const std::string &n)
 }
 
 void
+SaltGrain::set_token (const std::string &t)
+{
+  m_token = t;
+}
+
+void
 SaltGrain::set_version (const std::string &v)
 {
   m_version = v;
@@ -367,6 +373,7 @@ SaltGrain::xml_elements ()
   if (! sp_xml_elements) {
     sp_xml_elements = new tl::XMLElementList (
       tl::make_member (&SaltGrain::name, &SaltGrain::set_name, "name") +
+      tl::make_member (&SaltGrain::token, &SaltGrain::set_token, "token") +
       tl::make_member (&SaltGrain::version, &SaltGrain::set_version, "version") +
       tl::make_member (&SaltGrain::api_version, &SaltGrain::set_api_version, "api-version") +
       tl::make_member (&SaltGrain::title, &SaltGrain::set_title, "title") +

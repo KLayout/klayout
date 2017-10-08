@@ -38,6 +38,7 @@ namespace lay
 {
 
 class Salt;
+class SaltManagerDialog;
 
 class ConfirmationDialog
   : public QDialog, private Ui::SaltManagerInstallConfirmationDialog
@@ -99,7 +100,7 @@ public:
    *
    *  The target directory can be empty. In this case, the downloader will pick an approriate one.
    */
-  void register_download (const std::string &name, const std::string &url, const std::string &version);
+  void register_download (const std::string &name, const std::string &token, const std::string &url, const std::string &version);
 
   /**
    *  @brief Computes the dependencies after all required packages have been registered
@@ -126,18 +127,18 @@ public:
    *  if this dialog is confirmed. It will return false if the dialog was cancelled and an exception
    *  if something goes wrong.
    *
-   *  If parent is null, no confirmation dialog will be shown and installation happens in non-GUI
+   *  If dialog is null, no confirmation dialog will be shown and installation happens in non-GUI
    *  mode.
    *
    *  The return value will be true if the packages were installed successfully.
    */
-  bool execute (QWidget *parent, lay::Salt &salt);
+  bool execute (lay::SaltManagerDialog *dialog, lay::Salt &salt);
 
 private:
   struct Descriptor
   {
-    Descriptor (const std::string &_name, const std::string &_url, const std::string &_version)
-      : name (_name), url (_url), version (_version), downloaded (false)
+    Descriptor (const std::string &_name, const std::string &_token, const std::string &_url, const std::string &_version)
+      : name (_name), token (_token), url (_url), version (_version), downloaded (false)
     { }
 
     bool operator< (const Descriptor &other) const
@@ -159,6 +160,7 @@ private:
     }
 
     std::string name;
+    std::string token;
     std::string url;
     std::string version;
     bool downloaded;

@@ -49,6 +49,14 @@ public:
    */
   SaltManagerDialog (QWidget *parent, lay::Salt *salt, const std::string &salt_mine_url);
 
+  /**
+   *  @brief Gets the URL for the package index
+   */
+  const std::string &salt_mine_url () const
+  {
+    return m_salt_mine_url;
+  }
+
 private slots:
   /**
    *  @brief Called when the list of packages (grains) is about to change

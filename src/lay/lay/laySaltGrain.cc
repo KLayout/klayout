@@ -483,7 +483,17 @@ SaltGrain::from_url (const std::string &url)
 
   //  base relative URL's on the salt mine URL
   if (spec_url.find ("http:") != 0 && spec_url.find ("https:") != 0 && spec_url.find ("file:") != 0 && !spec_url.empty() && spec_url[0] != '/' && spec_url[0] != '\\' && lay::SaltController::instance ()) {
-    spec_url = lay::SaltController::instance ()->salt_mine_url () + "/" + spec_url;
+
+    //  replace the last component ("repository.xml") by the given path
+    QUrl sami_url (tl::to_qstring (lay::SaltController::instance ()->salt_mine_url ()));
+    QStringList path_comp = sami_url.path ().split (QString::fromUtf8 ("/"));
+    if (!path_comp.isEmpty ()) {
+      path_comp.back () = tl::to_qstring (spec_url);
+    }
+    sami_url.setPath (path_comp.join (QString::fromUtf8 ("/")));
+
+    spec_url = tl::to_string (sami_url.toString ());
+
   }
 
   if (spec_url.find ("http:") == 0 || spec_url.find ("https:") == 0) {

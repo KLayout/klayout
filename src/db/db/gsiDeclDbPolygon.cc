@@ -412,7 +412,7 @@ struct simple_polygon_defs
       "\n"
       "@return The transformed simple polygon.\n"
     ) +
-    method_ext ("transformed", &transformed_cplx,
+    method_ext ("transformed|#transformed_cplx", &transformed_cplx,
       "@brief Transforms the simple polygon.\n"
       "@args t\n"
       "\n"
@@ -422,6 +422,9 @@ struct simple_polygon_defs
       "@param t The transformation to apply.\n"
       "\n"
       "@return The transformed simple polygon.\n"
+      "\n"
+      "With version 0.25, the original 'transformed_cplx' method is deprecated and "
+      "'transformed' takes both simple and complex transformations."
     ) +
     constructor ("from_s", &from_string,
       "@brief Creates an object from a string\n"
@@ -1355,7 +1358,7 @@ struct polygon_defs
       "\n"
       "@return The transformed polygon.\n"
     ) +
-    method_ext ("transformed", &transformed_cplx,
+    method_ext ("transformed|#transformed_cplx", &transformed_cplx,
       "@brief Transforms the polygon with a complex transformation\n"
       "@args t\n"
       "\n"
@@ -1365,6 +1368,9 @@ struct polygon_defs
       "@param t The transformation to apply.\n"
       "\n"
       "@return The transformed polygon.\n"
+      "\n"
+      "With version 0.25, the original 'transformed_cplx' method is deprecated and "
+      "'transformed' takes both simple and complex transformations."
     ) +
     constructor ("from_s", &from_string,
       "@brief Creates an object from a string\n"

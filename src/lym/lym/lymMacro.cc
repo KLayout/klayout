@@ -1375,7 +1375,7 @@ void MacroCollection::scan (const std::string &path)
 
       try {
 
-        std::string n = tl::to_string (QFileInfo (*f).baseName ());
+        std::string n = tl::to_string (QFileInfo (*f).completeBaseName ());
 
         Macro::Format format = Macro::NoFormat;
         Macro::Interpreter interpreter = Macro::None;

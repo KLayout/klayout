@@ -406,14 +406,14 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
     "The flags must be specified before the shapes are being retrieved.\n"
     "Settings the shapes flags will reset the iterator.\n"
   ) +
-  gsi::method ("trans", &db::RecursiveShapeIterator::trans, 
+  gsi::method ("trans|#itrans", &db::RecursiveShapeIterator::trans,
     "@brief Gets the current transformation by which the shapes must be transformed into the initial cell\n"
     "\n"
     "The shapes delivered are not transformed. Instead, this transformation must be applied to \n"
     "get the shape in the coordinate system of the top cell.\n"
     "\n"
-    "Starting with version 0.25, this transformation is a int-to-int transformation and there "
-    "no longer is a 'itrans' method."
+    "Starting with version 0.25, this transformation is a int-to-int transformation the 'itrans' method "
+    "which was providing this transformation before is deprecated."
   ) +
   gsi::method ("shape", &db::RecursiveShapeIterator::shape, 
     "@brief Gets the current shape\n"

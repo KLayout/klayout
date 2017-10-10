@@ -23,6 +23,7 @@
 
 #include "tlHttpStream.h"
 #include "tlStaticObjects.h"
+#include "tlDeferredExecution.h"
 
 #include "ui_PasswordDialog.h"
 
@@ -185,6 +186,9 @@ InputHttpStream::issue_request (const QUrl &url)
 size_t 
 InputHttpStream::read (char *b, size_t n)
 {
+  //  Prevents deferred methods to be executed during the processEvents below (undesired side effects)
+  tl::NoDeferredMethods silent;
+
   if (mp_reply == 0) {
     issue_request (QUrl (tl::to_qstring (m_url)));
   }

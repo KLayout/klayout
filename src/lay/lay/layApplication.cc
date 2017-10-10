@@ -1371,7 +1371,11 @@ Application::process_events (QEventLoop::ProcessEventsFlags flags, bool silent)
 #endif
 
     mp_mw->enter_busy_mode (true);
-    QApplication::processEvents (flags);
+    try {
+      QApplication::processEvents (flags);
+    } catch (...) {
+      //  ignore exceptions
+    }
     mp_mw->enter_busy_mode (false);
 
     if (silent) {

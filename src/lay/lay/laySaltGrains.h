@@ -210,6 +210,7 @@ private:
   std::string m_path;
   collections_type m_collections;
   grains_type m_grains;
+  std::string m_url;
 };
 
 }

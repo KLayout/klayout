@@ -371,6 +371,7 @@ SaltDownloadManager::execute (lay::SaltManagerDialog *parent, lay::Salt &salt)
     dialog->setModal (true);
     dialog->show ();
 
+    //  TODO: should not waste CPU time in processEvents loop.
     while (! dialog->is_confirmed ()) {
       QCoreApplication::processEvents (QEventLoop::AllEvents | QEventLoop::WaitForMoreEvents, 100);
       if (dialog->is_cancelled () || ! dialog->isVisible ()) {

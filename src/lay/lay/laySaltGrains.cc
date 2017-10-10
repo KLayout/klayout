@@ -28,6 +28,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QResource>
+#include <QUrl>
 
 namespace lay
 {
@@ -245,6 +246,8 @@ static tl::XMLStruct<lay::SaltGrains> s_xml_struct ("salt-mine", s_group_struct)
 void
 SaltGrains::load (const std::string &p)
 {
+  m_url = p;
+
   tl::XMLFileSource source (p);
   s_xml_struct.parse (source, *this);
 }
@@ -252,14 +255,33 @@ SaltGrains::load (const std::string &p)
 void
 SaltGrains::load (tl::InputStream &p)
 {
+  m_url.clear ();
+
   tl::XMLStreamSource source (p);
   s_xml_struct.parse (source, *this);
 }
 
 void
-SaltGrains::include (const std::string &src)
+SaltGrains::include (const std::string &src_in)
 {
-  if (! src.empty ()) {
+  if (! src_in.empty ()) {
+
+    std::string src = src_in;
+
+    //  base relative URL's on the parent URL
+    if (!m_url.empty () && src.find ("http:") != 0 && src.find ("https:") != 0 && src.find ("file:") != 0 && !src.empty() && src[0] != '/' && src[0] != '\\') {
+
+      //  replace the last component ("repository.xml") by the given path
+      QUrl url (tl::to_qstring (m_url));
+      QStringList path_comp = url.path ().split (QString::fromUtf8 ("/"));
+      if (!path_comp.isEmpty ()) {
+        path_comp.back () = tl::to_qstring (src);
+      }
+      url.setPath (path_comp.join (QString::fromUtf8 ("/")));
+
+      src = tl::to_string (url.toString ());
+
+    }
 
     if (tl::verbosity () >= 20) {
       tl::log << "Including package index from " << src;

@@ -22,6 +22,7 @@
 
 
 #include "tlHttpStream.h"
+#include "tlLog.h"
 #include "tlStaticObjects.h"
 #include "tlDeferredExecution.h"
 
@@ -159,6 +160,9 @@ InputHttpStream::finished (QNetworkReply *reply)
   QVariant redirect_target = reply->attribute (QNetworkRequest::RedirectionTargetAttribute);
   if (reply->error () == QNetworkReply::NoError && ! redirect_target.isNull ()) {
     m_url = tl::to_string (redirect_target.toString ());
+    if (tl::verbosity() >= 30) {
+      tl::info << "HTTP redirect to: " << m_url;
+    }
     issue_request (QUrl (redirect_target.toString ()));
   } else {
     mp_reply = reply;
@@ -172,12 +176,21 @@ InputHttpStream::issue_request (const QUrl &url)
   mp_buffer = 0;
 
   QNetworkRequest request (url);
+  if (tl::verbosity() >= 30) {
+    tl::info << "HTTP request URL: " << url.toString ().toUtf8 ().constData ();
+  }
   for (std::map<std::string, std::string>::const_iterator h = m_headers.begin (); h != m_headers.end (); ++h) {
+    if (tl::verbosity() >= 40) {
+      tl::info << "HTTP request header: " << h->first << ": " << h->second;
+    }
     request.setRawHeader (QByteArray (h->first.c_str ()), QByteArray (h->second.c_str ()));
   }
   if (m_data.isEmpty ()) {
     mp_active_reply.reset (s_network_manager->sendCustomRequest (request, m_request));
   } else {
+    if (tl::verbosity() >= 40) {
+      tl::info << "HTTP request data: " << m_data.constData ();
+    }
     mp_buffer = new QBuffer (&m_data);
     mp_active_reply.reset (s_network_manager->sendCustomRequest (request, m_request, mp_buffer));
   }
@@ -201,6 +214,9 @@ InputHttpStream::read (char *b, size_t n)
   if (mp_reply->error () != QNetworkReply::NoError) {
     //  throw an error 
     std::string em = tl::to_string (mp_reply->attribute (QNetworkRequest::HttpReasonPhraseAttribute).toString ());
+    if (tl::verbosity() >= 30) {
+      tl::info << "HTTP response error: " << em;
+    }
     int ec = mp_reply->attribute (QNetworkRequest::HttpStatusCodeAttribute).toInt ();
     if (ec == 0) {
       ec = int (mp_reply->error ());
@@ -211,6 +227,9 @@ InputHttpStream::read (char *b, size_t n)
 
   QByteArray data = mp_reply->read (n);
   memcpy (b, data.constData (), data.size ());
+  if (tl::verbosity() >= 40) {
+    tl::info << "HTTP reponse data read: " << data.constData ();
+  }
   return data.size ();
 }
 

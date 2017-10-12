@@ -472,30 +472,31 @@ SaltGrain::from_path (const std::string &path)
 }
 
 SaltGrain
-SaltGrain::from_url (const std::string &url)
+SaltGrain::from_url (const std::string &url_in)
 {
-  if (url.empty ()) {
+  if (url_in.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No download link available")));
   }
 
+  std::string url = url_in;
   std::auto_ptr<tl::InputStream> stream;
-  std::string spec_url = SaltGrain::spec_url (url);
 
   //  base relative URL's on the salt mine URL
-  if (spec_url.find ("http:") != 0 && spec_url.find ("https:") != 0 && spec_url.find ("file:") != 0 && !spec_url.empty() && spec_url[0] != '/' && spec_url[0] != '\\' && lay::SaltController::instance ()) {
+  if (url.find ("http:") != 0 && url.find ("https:") != 0 && url.find ("file:") != 0 && !url.empty() && url[0] != '/' && url[0] != '\\' && lay::SaltController::instance ()) {
 
     //  replace the last component ("repository.xml") by the given path
     QUrl sami_url (tl::to_qstring (lay::SaltController::instance ()->salt_mine_url ()));
     QStringList path_comp = sami_url.path ().split (QString::fromUtf8 ("/"));
     if (!path_comp.isEmpty ()) {
-      path_comp.back () = tl::to_qstring (spec_url);
+      path_comp.back () = tl::to_qstring (url);
     }
     sami_url.setPath (path_comp.join (QString::fromUtf8 ("/")));
 
-    spec_url = tl::to_string (sami_url.toString ());
+    url = tl::to_string (sami_url.toString ());
 
   }
 
+  std::string spec_url = SaltGrain::spec_url (url);
   if (spec_url.find ("http:") == 0 || spec_url.find ("https:") == 0) {
     stream.reset (tl::WebDAVObject::download_item (spec_url));
   } else {

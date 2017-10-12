@@ -1,4 +1,9 @@
 0.25            (2017-09-25):
+* Enhancement: KLAYOUT_HOME environment variable to 
+      control the location of the application folder.
+      The application folder is the place where KLayout
+      keeps the configuration, macros, packages and
+      other things.
 * Enhancements: Major overhaul of the build environment
       - Qt5 supported now
       - Employs qmake as build system
@@ -432,78 +437,78 @@
        the ownership over an object in cases where object lifetime control is important (specifically when passing
        objects around in Qt applications).
 * Enhancement: Many new RBA methods, i.e. 
-       Annotation#id
-       Cell#change_pcell_parameters
-       Cell#pcell_parameters_by_name
-       DPolygon#assign_hull (raw argument)
-       DPolygon#assign_hole (raw argument)
-       DPolygon#each_edge (with contour argument)
-       DPolygon#insert_hole (raw argument)
-       DPolygon#transform 
-       DSimplePolygon#initialize (raw parameter) 
-       DSimplePolygon#initialize (raw parameter) 
-       DSimplePolygon#set_points
-       DSimplePolygon#transform 
-       EdgePairs#+ 
-       Edges#& (with Region)
-       Edges#&= (with Region)
-       Edges#- (with Region)
-       Edges#-= (with Region)
-       Edges#inside_part
-       Edges#select_inside_part
-       Edges#outside_part
-       Edges#select_outside_part
-       Instance#change_pcell_parameter
-       Instance#change_pcell_parameters
-       Instance#convert_to_static
-       Instance#flatten
-       Instance#is_pcell?
-       Instance#pcell_declaration
-       Instance#pcell_parameters
-       Instance#pcell_parameters_by_name
-       Layout#begin_shapes (with cell ref)
-       Layout#begin_shapes_overlapping (with cell ref)
-       Layout#begin_shapes_touching (with cell ref)
-       Layout#create_cell (with PCell parameters and/or lib name)
-       Layout#delete_property
-       Layout#flatten_into
-       Layout#has_prop_id?
-       Layout#pcell_ids
-       Layout#pcell_names
-       Layout#prop_id
-       Layout#prop_id=
-       LayoutView#clear_object_selection
-       LayoutView#object_selection
-       LayoutView#object_selection=
-       LayoutView#replace_annotation
-       LayoutView#select_object
-       LayoutView#unselect_object
-       MainWindow#cm_close_all
-       MainWindow#cm_save_all
-       MainWindow#cm_sel_move_to
-       MainWindow#instance
-       MainWindow#manager
-       ObjectInstPath#==
-       ObjectInstPath#!=
-       ObjectInstPath#<
-       ObjectInstPath#append_path
-       ObjectInstPath#clear_path
-       ObjectInstPath#cv_index=
-       ObjectInstPath#layer=
-       ObjectInstPath#seq=
-       ObjectInstPath#shape=
-       ObjectInstPath#top
-       ObjectInstPath#top=
-       RdbItemValue#initialize (with float argument)
-       RdbItemValue#float
-       RdbItemValue#is_float?
-       RdbItemValue#tag_id
-       RdbItemValue#tag_id=
-       SaveLayoutOptions#gds_write_file_properties
-       SaveLayoutOptions#gds_write_file_properties=
-       SaveLayoutOptions#oasis_write_std_properties
-       SaveLayoutOptions#oasis_write_std_properties=
-       Shape#each_edge (with contour argument)
+       - Annotation#id
+       - Cell#change_pcell_parameters
+       - Cell#pcell_parameters_by_name
+       - DPolygon#assign_hull (raw argument)
+       - DPolygon#assign_hole (raw argument)
+       - DPolygon#each_edge (with contour argument)
+       - DPolygon#insert_hole (raw argument)
+       - DPolygon#transform 
+       - DSimplePolygon#initialize (raw parameter) 
+       - DSimplePolygon#initialize (raw parameter) 
+       - DSimplePolygon#set_points
+       - DSimplePolygon#transform 
+       - EdgePairs#+ 
+       - Edges#& (with Region)
+       - Edges#&= (with Region)
+       - Edges#- (with Region)
+       - Edges#-= (with Region)
+       - Edges#inside_part
+       - Edges#select_inside_part
+       - Edges#outside_part
+       - Edges#select_outside_part
+       - Instance#change_pcell_parameter
+       - Instance#change_pcell_parameters
+       - Instance#convert_to_static
+       - Instance#flatten
+       - Instance#is_pcell?
+       - Instance#pcell_declaration
+       - Instance#pcell_parameters
+       - Instance#pcell_parameters_by_name
+       - Layout#begin_shapes (with cell ref)
+       - Layout#begin_shapes_overlapping (with cell ref)
+       - Layout#begin_shapes_touching (with cell ref)
+       - Layout#create_cell (with PCell parameters and/or lib name)
+       - Layout#delete_property
+       - Layout#flatten_into
+       - Layout#has_prop_id?
+       - Layout#pcell_ids
+       - Layout#pcell_names
+       - Layout#prop_id
+       - Layout#prop_id=
+       - LayoutView#clear_object_selection
+       - LayoutView#object_selection
+       - LayoutView#object_selection=
+       - LayoutView#replace_annotation
+       - LayoutView#select_object
+       - LayoutView#unselect_object
+       - MainWindow#cm_close_all
+       - MainWindow#cm_save_all
+       - MainWindow#cm_sel_move_to
+       - MainWindow#instance
+       - MainWindow#manager
+       - ObjectInstPath#==
+       - ObjectInstPath#!=
+       - ObjectInstPath#<
+       - ObjectInstPath#append_path
+       - ObjectInstPath#clear_path
+       - ObjectInstPath#cv_index=
+       - ObjectInstPath#layer=
+       - ObjectInstPath#seq=
+       - ObjectInstPath#shape=
+       - ObjectInstPath#top
+       - ObjectInstPath#top=
+       - RdbItemValue#initialize (with float argument)
+       - RdbItemValue#float
+       - RdbItemValue#is_float?
+       - RdbItemValue#tag_id
+       - RdbItemValue#tag_id=
+       - SaveLayoutOptions#gds_write_file_properties
+       - SaveLayoutOptions#gds_write_file_properties=
+       - SaveLayoutOptions#oasis_write_std_properties
+       - SaveLayoutOptions#oasis_write_std_properties=
+       - Shape#each_edge (with contour argument)
 * Enhancement: Qt API is aligned better with C++ Qt notation. Several bug fixes, new features and stability enhancements.
        For example:
          New: RBA::Qt::white or RBA::Qt::GlobalColor::white
@@ -1753,44 +1758,4 @@
 
 0.9 		(2006-04):
      * This was the first official release
-
-
-Other contributions and 3rd Party Sources
-
-1.) contrib/gds2_txt
-
-    The original version of the code for the GDS2 text format reader and writer has been contributed 
-    by Romain Gauci from Oscillated Recall Technology (http://www.or-tech.co.jp).
-
-2.) contrib/zlib 
-
-    ZLIB 1.2.5
-    See license terms and conditions in zlib.h
-
-    Copyright (C) 1995-2010 Jean-loup Gailly and Mark Adler
-
-    Jean-loup Gailly        Mark Adler
-    jloup@gzip.org          madler@alumni.caltech.edu
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

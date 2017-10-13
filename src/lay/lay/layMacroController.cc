@@ -50,13 +50,15 @@ MacroController::MacroController ()
 }
 
 void
-MacroController::load ()
+MacroController::finish (bool load)
 {
   //  Scan built-in macros
   //  These macros are always taken, even if there are no macros requested (they are required to
   //  fully form the API).
-  lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
-  lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
+  if (load) {
+    lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
+    lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
+  }
 
   //  TODO: consider adding "drc" dynamically and allow more dynamic categories
   //  We can do so if we first load the macros with the initial interpreters, then do autorun (which creates DSL interpreters) and then
@@ -68,15 +70,17 @@ MacroController::load ()
   //  Scan for macros and set interpreter path
   for (std::vector <InternalPathDescriptor>::const_iterator p = m_internal_paths.begin (); p != m_internal_paths.end (); ++p) {
 
-    for (size_t c = 0; c < m_macro_categories.size (); ++c) {
-      if (p->cat.empty () || p->cat == m_macro_categories [c].first) {
-        std::string mp;
-        if (p->cat.empty ()) {
-          mp = tl::to_string (QDir (tl::to_qstring (p->path)).absoluteFilePath (tl::to_qstring (m_macro_categories [c].first)));
-        } else {
-          mp = p->path;
+    if (load) {
+      for (size_t c = 0; c < m_macro_categories.size (); ++c) {
+        if (p->cat.empty () || p->cat == m_macro_categories [c].first) {
+          std::string mp;
+          if (p->cat.empty ()) {
+            mp = tl::to_string (QDir (tl::to_qstring (p->path)).absoluteFilePath (tl::to_qstring (m_macro_categories [c].first)));
+          } else {
+            mp = p->path;
+          }
+          lym::MacroCollection::root ().add_folder (p->description, mp, m_macro_categories [c].first, p->readonly);
         }
-        lym::MacroCollection::root ().add_folder (p->description, mp, m_macro_categories [c].first, p->readonly);
       }
     }
 
@@ -305,14 +309,45 @@ MacroController::enable_implicit_macros (bool enable)
 }
 
 void
+MacroController::sync_package_paths ()
+{
+  std::vector<std::string> package_locations;
+
+  lay::SaltController *sc = lay::SaltController::instance ();
+  if (sc) {
+    lay::Salt &salt = sc->salt ();
+    for (lay::Salt::flat_iterator i = salt.begin_flat (); i != salt.end_flat (); ++i) {
+      package_locations.push_back ((*i)->path ());
+    }
+  }
+
+  //  refresh the package locations by first removing the package locations and then rebuilding
+  //  TODO: maybe that is a performance bottleneck, but right now, remove_package_location doesn't do a lot.
+
+  for (std::vector<std::string>::const_iterator p = m_package_locations.begin (); p != m_package_locations.end (); ++p) {
+    for (tl::Registrar<gsi::Interpreter>::iterator i = gsi::interpreters.begin (); i != gsi::interpreters.end (); ++i) {
+      i->remove_package_location (*p);
+    }
+  }
+  
+  m_package_locations = package_locations;
+  
+  for (std::vector<std::string>::const_iterator p = m_package_locations.begin (); p != m_package_locations.end (); ++p) {
+    for (tl::Registrar<gsi::Interpreter>::iterator i = gsi::interpreters.begin (); i != gsi::interpreters.end (); ++i) {
+      i->add_package_location (*p);
+    }
+  }
+}
+
+void
 MacroController::sync_implicit_macros (bool ask_before_autorun)
 {
   if (m_no_implicit_macros) {
+    sync_package_paths ();
     return;
   }
 
   std::vector<ExternalPathDescriptor> external_paths;
-  std::vector<std::string> package_locations;
 
   //  Add additional places where the technologies define some macros
 
@@ -379,8 +414,6 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
 
       const lay::SaltGrain *g = *i;
 
-      package_locations.push_back (g->path ());
-
       for (size_t c = 0; c < macro_categories ().size (); ++c) {
 
         QDir base_dir (tl::to_qstring (g->path ()));
@@ -436,22 +469,8 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
     root->erase (*m);
   }
 
-  //  refresh the package locations by first removing the package locations and then rebuilding
-  //  TODO: maybe that is a performance bottleneck, but right now, remove_package_location doesn't do a lot.
-
-  for (std::vector<std::string>::const_iterator p = m_package_locations.begin (); p != m_package_locations.end (); ++p) {
-    for (tl::Registrar<gsi::Interpreter>::iterator i = gsi::interpreters.begin (); i != gsi::interpreters.end (); ++i) {
-      i->remove_package_location (*p);
-    }
-  }
-
-  m_package_locations = package_locations;
-
-  for (std::vector<std::string>::const_iterator p = m_package_locations.begin (); p != m_package_locations.end (); ++p) {
-    for (tl::Registrar<gsi::Interpreter>::iterator i = gsi::interpreters.begin (); i != gsi::interpreters.end (); ++i) {
-      i->add_package_location (*p);
-    }
-  }
+  //  sync the search paths with the packages 
+  sync_package_paths ();
 
   //  store new paths
   m_external_paths = external_paths;

@@ -123,15 +123,18 @@ public:
 
   /**
    *  @brief Adds a search path to the macros
-   *  After adding the paths, "load" needs to be called to actually load the macros.
+   *  After adding the paths, "finish" needs to be called to actually load the macros and establish the
+   *  library search paths..
    */
   void add_path (const std::string &path, const std::string &description, const std::string &category, bool readonly);
 
   /**
-   *  @brief Loads the macros from the predefined paths
+   *  @brief Loads the macros from the predefined paths and establishes the search paths
    *  This method will also establish the macro categories.
+   *  If "load" is false, only the search path will be set. The macros themselves are not
+   *  loaded into memory.
    */
-  void load ();
+  void finish (bool load);
 
   /**
    *  @brief Adds a temporary macro
@@ -232,6 +235,7 @@ private:
   void do_sync_with_external_sources ();
   void sync_file_watcher ();
   void sync_files ();
+  void sync_package_paths ();
 };
 
 }

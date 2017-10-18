@@ -186,6 +186,13 @@ public:
   bool create_grain (const SaltGrain &templ, SaltGrain &target);
 
   /**
+   *  @brief Removes redundant entries with same names
+   *
+   *  This method will keep the first entry or the one with the higher version.
+   */
+  void consolidate ();
+
+  /**
    *  @brief Gets the root collection
    *
    *  This method is provided for test purposes mainly.

@@ -327,6 +327,22 @@ public:
   void set_url (const std::string &u);
 
   /**
+   *  @brief Gets a value indicating whether the grain is hidden
+   *  A grain can be hidden (in Salt.Mine) if it's a pure dependency package
+   *  which is only there because others need it. Such packages are listed
+   *  as dependencies, but they are not shown by default.
+   */
+  bool is_hidden () const
+  {
+    return m_hidden;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether the grain is hidden
+   */
+  void set_hidden (bool f);
+
+  /**
    *  @brief Gets the dependencies of the grain
    *  Grains this grain depends on are installed automatically when the grain
    *  is installed.
@@ -455,6 +471,7 @@ private:
   std::string m_author;
   std::string m_author_contact;
   std::string m_license;
+  bool m_hidden;
   QDateTime m_authored_time, m_installed_time;
   QImage m_icon, m_screenshot;
   std::vector<Dependency> m_dependencies;

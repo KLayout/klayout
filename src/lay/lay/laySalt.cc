@@ -172,7 +172,12 @@ struct NameAndTopoIndexCompare
       }
     }
 
-    //  TODO: UTF-8 support?
+    //  The hidden after non-hidden
+    if (a->is_hidden () != b->is_hidden ()) {
+      return a->is_hidden () < b->is_hidden ();
+    }
+
+    //  Finally the name (TODO: UTF-8 support?)
     return a->name () < b->name ();
   }
 
@@ -240,6 +245,12 @@ Salt::invalidate ()
   emit collections_changed ();
 }
 
+void
+Salt::consolidate ()
+{
+  m_root.consolidate ();
+  invalidate ();
+}
 
 static
 bool remove_from_collection (SaltGrains &collection, const std::string &name)

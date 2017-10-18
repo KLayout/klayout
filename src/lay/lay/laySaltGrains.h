@@ -172,6 +172,19 @@ public:
   bool remove_grain (grain_iterator iter, bool with_files = false);
 
   /**
+   *  @brief Merges the other collection into this one
+   *  This method will apply the rules of "consolidate" for grains and will merge
+   *  grain collections with the same name into one.
+   */
+  void merge_with (const lay::SaltGrains &other);
+
+  /**
+   *  @brief Removes redundant entries with same names
+   *  This method will keep the first entry or the one with the higher version.
+   */
+  void consolidate ();
+
+  /**
    *  @brief Gets a value indicating whether the collection is empty
    */
   bool is_empty () const;

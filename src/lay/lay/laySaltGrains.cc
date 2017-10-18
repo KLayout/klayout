@@ -235,6 +235,71 @@ SaltGrains::from_path (const std::string &path, const std::string &prefix)
   return grains;
 }
 
+void
+SaltGrains::merge_with (const lay::SaltGrains &other)
+{
+  for (lay::SaltGrains::collection_iterator c = other.begin_collections (); c != other.end_collections (); ++c) {
+    add_collection (*c);
+  }
+  for (lay::SaltGrains::grain_iterator g = other.begin_grains (); g != other.end_grains (); ++g) {
+    add_grain (*g);
+  }
+  consolidate ();
+}
+
+void
+SaltGrains::consolidate ()
+{
+  std::vector<collections_type::iterator> collection_to_delete;
+
+  std::map<std::string, collections_type::iterator> collection_by_name;
+  for (collections_type::iterator c = m_collections.begin (); c != m_collections.end (); ++c) {
+
+    std::map<std::string, collections_type::iterator>::iterator cn = collection_by_name.find (c->name ());
+    if (cn != collection_by_name.end ()) {
+      cn->second->merge_with (*c);
+      collection_to_delete.push_back (c);
+    } else {
+      c->consolidate ();
+      collection_by_name.insert (std::make_pair (c->name (), c));
+    }
+
+  }
+
+  //  actually delete the additional collections
+  for (std::vector<collections_type::iterator>::reverse_iterator i = collection_to_delete.rbegin (); i != collection_to_delete.rend (); ++i) {
+    remove_collection (*i);
+  }
+
+
+  std::vector<lay::SaltGrains::grain_iterator> to_delete;
+
+  std::map<std::string, lay::SaltGrains::grain_iterator> grain_by_name;
+  for (lay::SaltGrains::grain_iterator g = begin_grains (); g != end_grains (); ++g) {
+
+    std::map<std::string, lay::SaltGrains::grain_iterator>::iterator gn = grain_by_name.find (g->name ());
+    if (gn != grain_by_name.end ()) {
+
+      //  take the one with the higher version. On equal version use the first one.
+      if (lay::SaltGrain::compare_versions (gn->second->version (), g->version ()) < 0) {
+        to_delete.push_back (gn->second);
+        gn->second = g;
+      } else {
+        to_delete.push_back (g);
+      }
+
+    } else {
+      grain_by_name.insert (std::make_pair (g->name (), g));
+    }
+
+  }
+
+  //  actually delete the additional elements
+  for (std::vector<lay::SaltGrains::grain_iterator>::reverse_iterator i = to_delete.rbegin (); i != to_delete.rend (); ++i) {
+    remove_grain (*i);
+  }
+}
+
 static tl::XMLElementList s_group_struct =
   tl::make_member (&SaltGrains::name, &SaltGrains::set_name, "name") +
   tl::make_member (&SaltGrains::include, "include") +

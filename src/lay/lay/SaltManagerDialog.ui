@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="mode_tab">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -143,8 +143,14 @@
               </property>
               <item>
                <widget class="QListView" name="salt_mine_view_new">
+                <property name="focusPolicy">
+                 <enum>Qt::WheelFocus</enum>
+                </property>
                 <property name="alternatingRowColors">
                  <bool>true</bool>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::ExtendedSelection</enum>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -436,8 +442,14 @@
               </property>
               <item>
                <widget class="QListView" name="salt_mine_view_update">
+                <property name="focusPolicy">
+                 <enum>Qt::WheelFocus</enum>
+                </property>
                 <property name="alternatingRowColors">
                  <bool>true</bool>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::ExtendedSelection</enum>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -722,8 +734,14 @@
                </property>
                <item>
                 <widget class="QListView" name="salt_view">
+                 <property name="focusPolicy">
+                  <enum>Qt::WheelFocus</enum>
+                 </property>
                  <property name="alternatingRowColors">
                   <bool>true</bool>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::ExtendedSelection</enum>
                  </property>
                  <property name="iconSize">
                   <size>
@@ -786,8 +804,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>343</width>
-                       <height>207</height>
+                       <width>537</width>
+                       <height>284</height>
                       </rect>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_2">

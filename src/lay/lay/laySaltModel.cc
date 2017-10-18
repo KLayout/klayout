@@ -135,10 +135,16 @@ SaltModel::data (const QModelIndex &index, int role) const
     }
 
     bool en = is_enabled (g->name ());
+    bool hidden = g->is_hidden ();
 
     std::string text = "<html><body>";
-    if (! en) {
+    if (! en || hidden) {
       text += "<font color=\"#c0c0c0\">";
+    } else {
+      text += "<font color=\"#303030\">";
+    }
+    if (hidden) {
+      text += "<i>";
     }
     text += "<h4>";
     text += tl::escaped_to_html (g->name ());
@@ -168,9 +174,12 @@ SaltModel::data (const QModelIndex &index, int role) const
       }
     }
 
-    if (! en) {
-      text += "</font>";
+    if (hidden) {
+      text += "<p>";
+      text += tl::to_string (tr ("This package is an auxiliary package for use with other packages."));
+      text += "</p></i>";
     }
+    text += "</font>";
     text += "</body></html>";
 
     return tl::to_qstring (text);

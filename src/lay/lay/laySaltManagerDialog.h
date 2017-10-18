@@ -29,6 +29,7 @@
 
 #include <QDialog>
 #include <memory>
+#include <vector>
 
 namespace lay
 {
@@ -81,17 +82,17 @@ private slots:
   /**
    *  @brief Called when the currently selected package (grain) has changed
    */
-  void current_changed ();
+  void selected_changed ();
 
   /**
    *  @brief Called when the currently selected package from the update page has changed
    */
-  void mine_update_current_changed ();
+  void mine_update_selected_changed ();
 
   /**
    *  @brief Called when the currently selected package from the new installation page has changed
    */
-  void mine_new_current_changed ();
+  void mine_new_selected_changed ();
 
   /**
    *  @brief Called when the "edit" button is pressed
@@ -172,10 +173,12 @@ private:
   int m_current_tab;
 
   SaltGrain *current_grain ();
+  std::vector<lay::SaltGrain *> current_grains ();
   void set_current_grain_by_name (const std::string &current);
   void update_models ();
   void update_apply_state ();
   void get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details);
+  void consolidate_salt_mine_entries ();
 };
 
 }

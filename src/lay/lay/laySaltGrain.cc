@@ -41,6 +41,7 @@ namespace lay
 static const std::string grain_filename = "grain.xml";
 
 SaltGrain::SaltGrain ()
+  : m_hidden (false)
 {
   //  .. nothing yet ..
 }
@@ -62,6 +63,7 @@ SaltGrain::operator== (const SaltGrain &other) const
          m_author == other.m_author &&
          m_author_contact == other.m_author_contact &&
          m_license == other.m_license &&
+         m_hidden == other.m_hidden &&
          m_authored_time == other.m_authored_time &&
          m_installed_time == other.m_installed_time;
 }
@@ -76,6 +78,12 @@ void
 SaltGrain::set_token (const std::string &t)
 {
   m_token = t;
+}
+
+void
+SaltGrain::set_hidden (bool f)
+{
+  m_hidden = f;
 }
 
 void
@@ -374,6 +382,7 @@ SaltGrain::xml_elements ()
     sp_xml_elements = new tl::XMLElementList (
       tl::make_member (&SaltGrain::name, &SaltGrain::set_name, "name") +
       tl::make_member (&SaltGrain::token, &SaltGrain::set_token, "token") +
+      tl::make_member (&SaltGrain::is_hidden, &SaltGrain::set_hidden, "hidden") +
       tl::make_member (&SaltGrain::version, &SaltGrain::set_version, "version") +
       tl::make_member (&SaltGrain::api_version, &SaltGrain::set_api_version, "api-version") +
       tl::make_member (&SaltGrain::title, &SaltGrain::set_title, "title") +

@@ -30,7 +30,7 @@
 #include <QDir>
 #include <QSignalSpy>
 
-static std::string grains_to_string (const lay::SaltGrains &gg)
+static std::string grains_to_string (const lay::SaltGrains &gg, bool with_version = false)
 {
   std::string res;
   res += "[";
@@ -41,6 +41,15 @@ static std::string grains_to_string (const lay::SaltGrains &gg)
     }
     first = false;
     res += g->name ();
+    if (with_version) {
+      res += "(";
+      res += g->version ();
+      if (!g->url ().empty ()) {
+        res += ":";
+        res += g->url ();
+      }
+      res += ")";
+    }
   }
   for (lay::SaltGrains::collection_iterator gc = gg.begin_collections (); gc != gg.end_collections (); ++gc) {
     if (! first) {
@@ -48,7 +57,7 @@ static std::string grains_to_string (const lay::SaltGrains &gg)
     }
     first = false;
     res += gc->name ();
-    res += grains_to_string (*gc);
+    res += grains_to_string (*gc, with_version);
   }
   res += "]";
   return res;
@@ -402,4 +411,164 @@ TEST (5)
   }
 
   EXPECT_EQ (tl::join (names, ","), "g3,g2,g1,g4");
+}
+
+TEST (6)
+{
+  lay::SaltGrains gg1;
+  lay::SaltGrains gg2;
+
+  lay::SaltGrain ga1;
+  ga1.set_name ("a");
+  ga1.set_url ("url1");
+  ga1.set_version ("1.0");
+
+  lay::SaltGrain ga2;
+  ga2.set_name ("a");
+  ga2.set_url ("url2");
+  ga2.set_version ("1.1");
+
+  lay::SaltGrain gb;
+  gb.set_name ("b");
+
+  lay::SaltGrain gc;
+  gc.set_name ("c");
+
+  gg1.add_grain (ga1);
+  gg1.add_grain (gb);
+
+  gg2.add_grain (gc);
+  gg2.add_grain (ga2);
+
+  //  higher version wins
+  gg1.merge_with (gg2);
+  EXPECT_EQ (grains_to_string (gg1, true), "[b(),c(),a(1.1:url2)]");
+
+  gg1 = lay::SaltGrains ();
+  gg2 = lay::SaltGrains ();
+
+  gg2.add_grain (gc);
+  gg1.add_grain (ga2);
+  gg1.add_grain (gb);
+
+  gg2.add_grain (ga1);
+
+  //  higher version wins - also in different order
+  gg1.merge_with (gg2);
+  EXPECT_EQ (grains_to_string (gg1, true), "[a(1.1:url2),b(),c()]");
+
+  gg1 = lay::SaltGrains ();
+  gg2 = lay::SaltGrains ();
+
+  gg2.add_grain (gc);
+  ga2.set_version ("1.0");
+  gg1.add_grain (ga2);
+  gg1.add_grain (gb);
+
+  gg2.add_grain (ga1);
+
+  //  first one wins on same version
+  gg1.merge_with (gg2);
+  EXPECT_EQ (grains_to_string (gg1, true), "[a(1.0:url2),b(),c()]");
+
+  gg1 = lay::SaltGrains ();
+
+  gg1.add_grain (gc);
+  gg1.add_grain (ga2);
+  gg1.add_grain (ga1);
+  gg1.add_grain (gb);
+
+  //  consolidate does the same on one list
+  gg1.consolidate ();
+  EXPECT_EQ (grains_to_string (gg1, true), "[c(),a(1.0:url2),b()]");
+
+  gg1 = lay::SaltGrains ();
+
+  gg1.add_grain (ga1);
+  gg1.add_grain (ga2);
+  gg1.add_grain (gb);
+  gg1.add_grain (gc);
+
+  //  consolidate does the same on one list
+  gg1.consolidate ();
+  EXPECT_EQ (grains_to_string (gg1, true), "[a(1.0:url1),b(),c()]");
+
+  gg1 = lay::SaltGrains ();
+
+  ga1.set_version ("1.1");
+  gg1.add_grain (ga1);
+  gg1.add_grain (ga2);
+  gg1.add_grain (gb);
+
+  //  consolidate does the same on one list
+  gg1.consolidate ();
+  EXPECT_EQ (grains_to_string (gg1, true), "[a(1.1:url1),b()]");
+
+
+  //  merging of sub-collections
+
+  gg1 = lay::SaltGrains ();
+  gg2 = lay::SaltGrains ();
+
+  lay::SaltGrains gga1;
+  gga1.set_name ("a");
+
+  {
+    lay::SaltGrain g;
+    g.set_name ("a");
+    g.set_version ("1.0");
+    g.set_url ("url1");
+    gga1.add_grain (g);
+  }
+
+  {
+    lay::SaltGrain g;
+    g.set_name ("b");
+    gga1.add_grain (g);
+  }
+
+  lay::SaltGrains ggb;
+  ggb.set_name ("b");
+
+  {
+    lay::SaltGrain g;
+    g.set_name ("x");
+    ggb.add_grain (g);
+  }
+
+  gg1.add_collection (gga1);
+  gg1.add_collection (ggb);
+
+  lay::SaltGrains gga2;
+  gga2.set_name ("a");
+
+  {
+    lay::SaltGrain g;
+    g.set_name ("a");
+    g.set_version ("1.1");
+    g.set_url ("url2");
+    gga2.add_grain (g);
+  }
+
+  {
+    lay::SaltGrain g;
+    g.set_name ("c");
+    gga2.add_grain (g);
+  }
+
+  lay::SaltGrains ggc;
+  ggc.set_name ("c");
+
+  {
+    lay::SaltGrain g;
+    g.set_name ("y");
+    ggc.add_grain (g);
+  }
+
+  gg2.add_collection (gga2);
+  gg2.add_collection (ggc);
+
+  //  gg2:a collection is merged into gg1:a, gg2:c is copied.
+  gg1.merge_with (gg2);
+  EXPECT_EQ (grains_to_string (gg1, true), "[a[b(),a(1.1:url2),c()],b[x()],c[y()]]");
 }

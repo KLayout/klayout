@@ -1,4 +1,4 @@
-0.25            (2017-09-25):
+0.25            (2017-10-19):
 * Enhancement: KLAYOUT_HOME environment variable to 
       control the location of the application folder.
       The application folder is the place where KLayout

@@ -26,6 +26,34 @@ fi
 
 pwd=$(pwd)
 
+enable32bit=1
+enable64bit=1
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+  echo "Runs the Windows build include installer generation."
+  echo ""
+  echo "Run this script from the root directory."
+  echo ""
+  echo "Usage:"
+  echo "  scripts/deploy-win-mingw.sh <options>"
+  echo ""
+  echo "Options:"
+  echo "  -32     Run 32 bit build only"
+  echo "  -64     Run 64 bit build only"
+  echo ""
+  echo "By default, both 32 and 64 bit builds are performed"
+  exit 0
+elif [ "$1" = "-32" ]; then
+  enable64bit=0
+  enable32bit=1
+elif [ "$1" = "-64" ]; then
+  enable64bit=1
+  enable32bit=0
+elif [ "$1" != "" ]; then
+  echo "ERROR: invalid option $1 (use -h for details)"
+  exit 1
+fi
+
 # ---------------------------------------------------
 # Bootstrap script
 # This branch will fork to the actual builds for win32 and win64
@@ -37,10 +65,14 @@ if [ "$KLAYOUT_BUILD_IN_PROGRESS" == "" ]; then
   export KLAYOUT_BUILD_IN_PROGRESS=1
 
   # Run ourself in MINGW32 system for the win32 build
-  MSYSTEM=MINGW32 bash --login -c "cd $pwd ; $self"
+  if [ "$enable32bit" != "0" ]; then
+    MSYSTEM=MINGW32 bash --login -c "cd $pwd ; $self"
+  fi
 
   # Run ourself in MINGW64 system for the win64 build
-  MSYSTEM=MINGW64 bash --login -c "cd $pwd ; $self"
+  if [ "$enable64bit" != "0" ]; then
+    MSYSTEM=MINGW64 bash --login -c "cd $pwd ; $self"
+  fi
 
   exit 0
 

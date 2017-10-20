@@ -167,12 +167,10 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
   connect (&m_salt_mine, SIGNAL (collections_changed ()), this, SLOT (salt_mine_changed ()));
   connect (&m_salt_mine, SIGNAL (collections_about_to_change ()), this, SLOT (salt_mine_about_to_change ()));
 
-  update_models ();
-
   connect (salt_view->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (selected_changed ()));
   connect (salt_view, SIGNAL (doubleClicked (const QModelIndex &)), this, SLOT (edit_properties ()));
-  connect (salt_mine_view_new->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (mine_new_selected_changed ()), Qt::QueuedConnection);
-  connect (salt_mine_view_update->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (mine_update_selected_changed ()), Qt::QueuedConnection);
+  connect (salt_mine_view_new->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (mine_new_selected_changed ()));
+  connect (salt_mine_view_update->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (mine_update_selected_changed ()));
   connect (salt_mine_view_new, SIGNAL (doubleClicked (const QModelIndex &)), this, SLOT (mark_clicked ()));
   connect (salt_mine_view_update, SIGNAL (doubleClicked (const QModelIndex &)), this, SLOT (mark_clicked ()));
 
@@ -236,9 +234,7 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
   connect (actionMarkForUpdate, SIGNAL (triggered ()), this, SLOT (mark_clicked ()));
   connect (actionUnmarkForUpdate, SIGNAL (triggered ()), this, SLOT (mark_clicked ()));
 
-  mine_update_selected_changed ();
-  mine_new_selected_changed ();
-  selected_changed ();
+  update_models ();
 }
 
 void
@@ -797,8 +793,10 @@ SaltManagerDialog::update_models ()
 
   //  select the first grain
   if (mine_model->rowCount (QModelIndex ()) > 0) {
+    salt_mine_view_update->selectionModel ()->blockSignals (true);
     salt_mine_view_update->clearSelection ();
     salt_mine_view_update->setCurrentIndex (mine_model->index (0, 0, QModelIndex ()));
+    salt_mine_view_update->selectionModel ()->blockSignals (false);
   }
 
   mine_model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
@@ -820,8 +818,10 @@ SaltManagerDialog::update_models ()
 
   //  select the first grain
   if (mine_model->rowCount (QModelIndex ()) > 0) {
+    salt_mine_view_new->selectionModel ()->blockSignals (true);
     salt_mine_view_new->clearSelection ();
     salt_mine_view_new->setCurrentIndex (mine_model->index (0, 0, QModelIndex ()));
+    salt_mine_view_new->selectionModel ()->blockSignals (false);
   }
 
   mine_new_selected_changed ();

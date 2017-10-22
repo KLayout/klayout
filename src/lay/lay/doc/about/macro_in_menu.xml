@@ -19,15 +19,49 @@
 
   <p>
   The menu path specifies the position where the macro shall be put. A macro path is a 
-  sequence of symbolic names separated by a dot. For example "edit_menu.end" is the end
-  of the "Edit" menu and "edit_menu.undo" is the "Undo" entry in the "Edit" menu. To obtain
-  a list of the paths available, have a look at the "Key Bindings" page in the "Application"
-  section of the setup dialog ("File/Setup"). The pseudo element "end" denotes the position
-  after the last entry. The same way "begin" indicates the first entry in the menu.
-  The macro will be inserted before the entry indicated by the path. Hence the if a 
-  path of "edit_menu.end" is given, the macro will be inserted at the end of the 
-  "Edit" menu and "edit_menu.undo" will insert the macro before the "Undo" entry.
+  sequence of symbolic names separated by a dot. For example:
   </p>
+  
+  <li>
+    <ul><tt>edit_menu.end</tt> is the end of the "Edit" menu </ul>
+    <ul><tt>edit_menu.undo</tt> is the "Undo" entry in the "Edit" menu</ul>
+  </li>
+  
+  <p>To obtain
+  a list of the paths available, have a look at the "Key Bindings" page in the "Application"
+  section of the setup dialog ("File/Setup").
+  </p>
+  
+  <p>
+  The pseudo element "end" denotes the position
+  after the last entry. The same way "begin" indicates the first entry in the menu.
+  The macro will be inserted before the entry indicated by the path. Hence:
+  </p>
+
+  <ul>
+    <li><tt>edit_menu.end</tt>: the macro will be inserted at the end of the "Edit" menu</li>
+    <li><tt>edit_menu.undo</tt>: the macro will be inserted before the "Undo" entry.</li>
+  </ul>
+  
+  <p>
+  If a plus sign follows the macro path element, the new element is inserted <b>after</b>
+  this element. For example:
+  </p>
+  
+  <ul>
+    <li><tt>edit_menu.undo+</tt>: the macro will be inserted after the "Undo" menu item.</li>
+  </ul>
+
+  <p>
+  A special form can be used to generate new groups: if the given element does not exist,
+  the menu generator can be instructed to create it by appending the insert point plus
+  the new text string to the element after a ">" character. For example:
+  </p>
+  
+  <ul>
+    <li><tt>edit_menu.my_group>end("My Edit Functions").end</tt>: will look for "my_group" and add the new element at the end of this group. If no such
+  group exists, it will be created at the end of the "Edit" menu with the title "My Edit Functions".</li>
+  </ul>
 
   <p>
   If no macro path is specified, the macro is inserted in the "Macros" menu.

@@ -505,11 +505,19 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
     return m_has_submenu;
   }
 
+  void set_remove_on_empty ();
+
+  bool remove_on_empty () const
+  {
+    return m_remove_on_empty;
+  }
+
   std::list <AbstractMenuItem> children;
 
 private:
   QMenu *mp_menu;
   bool m_has_submenu;
+  bool m_remove_on_empty;
   Action m_action;
   std::string m_name;
   std::string m_basename;
@@ -750,6 +758,14 @@ public:
    */
   QActionGroup *make_exclusive_group (const std::string &name);
 
+  /**
+   *  @brief Gets the root node of the menu
+   */
+  const AbstractMenuItem &root () const
+  {
+    return m_root;
+  }
+
 signals:
   /**
    *  @brief this signal is emitted whenever something changes on the menu
@@ -757,7 +773,7 @@ signals:
   void changed ();
 
 private:  
-  std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> find_item (const std::string &path);
+  std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> > find_item (const std::string &path);
   const AbstractMenuItem *find_item_exact (const std::string &path) const;
   AbstractMenuItem *find_item_exact (const std::string &path);
   void transfer (const MenuLayoutEntry *layout, AbstractMenuItem &item);

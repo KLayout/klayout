@@ -101,13 +101,13 @@ parse_menu_title (const std::string &s, std::string &title, std::string &shortcu
 //  AbstractMenuItem implementation
 
 AbstractMenuItem::AbstractMenuItem () 
-  : mp_menu (0), m_has_submenu (false)
+  : mp_menu (0), m_has_submenu (false), m_remove_on_empty (false)
 {
   //  ... nothing yet ..
 }
 
 AbstractMenuItem::AbstractMenuItem (const AbstractMenuItem &) 
-  : mp_menu (0), m_has_submenu (false)
+  : mp_menu (0), m_has_submenu (false), m_remove_on_empty (false)
 { 
   //  ... nothing yet ..
 }
@@ -173,7 +173,13 @@ AbstractMenuItem::set_has_submenu ()
   m_has_submenu = true;
 }
 
-void  
+void
+AbstractMenuItem::set_remove_on_empty ()
+{
+  m_remove_on_empty = true;
+}
+
+void
 AbstractMenuItem::set_menu (QMenu *menu)
 {
   mp_menu = menu;
@@ -708,7 +714,7 @@ AbstractMenu::create_action (const std::string &s)
 AbstractMenu::AbstractMenu (AbstractMenuProvider *provider)
   : mp_provider (provider)
 {
-  tl_assert (mp_provider != 0);
+  //  .. nothing yet ..
 }
 
 AbstractMenu::~AbstractMenu ()
@@ -777,6 +783,8 @@ AbstractMenu::build_detached (const std::string &name, QMenuBar *mbar)
 void 
 AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
 {
+  tl_assert (mp_provider != 0);
+
   m_helper_menu_items.clear ();
   mbar->clear ();
   tbar->clear ();
@@ -942,23 +950,27 @@ AbstractMenu::items (const std::string &path) const
 }
 
 void 
-AbstractMenu::insert_item (const std::string &path, const std::string &name, const Action &action)
+AbstractMenu::insert_item (const std::string &p, const std::string &name, const Action &action)
 {
-  std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > ins = find_item (path);
-  if (ins.first) {
+  typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
+  path_type path = find_item (p);
+  if (! path.empty ()) {
+
+    AbstractMenuItem *parent = path.back ().first;
+    std::list<AbstractMenuItem>::iterator iter = path.back ().second;
 
     //  insert the new item
-    ins.first->children.insert (ins.second, AbstractMenuItem ());
-    --ins.second;
+    parent->children.insert (iter, AbstractMenuItem ());
+    --iter;
 
-    ins.second->setup_item (ins.first->name (), name, action);
+    iter->setup_item (parent->name (), name, action);
 
-    //  find an item with the same name and remove it
-    for (std::list<AbstractMenuItem>::iterator existing = ins.first->children.begin (); existing != ins.first->children.end (); ) {
+    //  find any items with the same name and remove them
+    for (std::list<AbstractMenuItem>::iterator existing = parent->children.begin (); existing != parent->children.end (); ) {
       std::list<AbstractMenuItem>::iterator existing_next = existing;
       ++existing_next;
-      if (existing->name () == ins.second->name () && &*existing != &*ins.second) {
-        ins.first->children.erase (existing);
+      if (existing->name () == iter->name () && existing != iter) {
+        parent->children.erase (existing);
       }
       existing = existing_next;
     }
@@ -969,29 +981,55 @@ AbstractMenu::insert_item (const std::string &path, const std::string &name, con
 }
 
 void 
-AbstractMenu::insert_separator (const std::string &path, const std::string &name)
+AbstractMenu::insert_separator (const std::string &p, const std::string &name)
 {
-  std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > ins = find_item (path);
-  if (ins.first) {
-    ins.first->children.insert (ins.second, AbstractMenuItem ());
-    --ins.second;
+  tl_assert (mp_provider != 0);   //  required to get the parent for the new QAction (via ActionHandle)
+
+  typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
+  path_type path = find_item (p);
+  if (! path.empty ()) {
+
+    AbstractMenuItem *parent = path.back ().first;
+    std::list<AbstractMenuItem>::iterator iter = path.back ().second;
+
+    parent->children.insert (iter, AbstractMenuItem ());
+    --iter;
     Action action (new ActionHandle (mp_provider->menu_parent_widget ()));
     action.set_separator (true);
-    ins.second->setup_item (ins.first->name (), name, action);
+    iter->setup_item (parent->name (), name, action);
+
   }
+
   emit changed ();
 }
 
 void 
-AbstractMenu::insert_menu (const std::string &path, const std::string &name, const Action &action)
+AbstractMenu::insert_menu (const std::string &p, const std::string &name, const Action &action)
 {
-  std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > ins = find_item (path);
-  if (ins.first) {
-    ins.first->children.insert (ins.second, AbstractMenuItem ());
-    --ins.second;
-    ins.second->setup_item (ins.first->name (), name, action);
-    ins.second->set_has_submenu ();
+  typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
+  path_type path = find_item (p);
+  if (! path.empty ()) {
+
+    AbstractMenuItem *parent = path.back ().first;
+    std::list<AbstractMenuItem>::iterator iter = path.back ().second;
+
+    parent->children.insert (iter, AbstractMenuItem ());
+    --iter;
+    iter->setup_item (parent->name (), name, action);
+    iter->set_has_submenu ();
+
+    //  find any items with the same name and remove them
+    for (std::list<AbstractMenuItem>::iterator existing = parent->children.begin (); existing != parent->children.end (); ) {
+      std::list<AbstractMenuItem>::iterator existing_next = existing;
+      ++existing_next;
+      if (existing->name () == iter->name () && existing != iter) {
+        parent->children.erase (existing);
+      }
+      existing = existing_next;
+    }
+
   }
+
   emit changed ();
 }
 
@@ -1002,28 +1040,43 @@ AbstractMenu::insert_menu (const std::string &path, const std::string &name, con
 }
 
 void 
-AbstractMenu::delete_item (const std::string &path)
+AbstractMenu::delete_item (const std::string &p)
 {
-  std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > ins = find_item (path);
-  if (ins.first) {
-    if (ins.second == ins.first->children.end ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("delete_item cannot delete past-the-end item")));
+  typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
+  path_type path = find_item (p);
+  if (! path.empty ()) {
+
+    for (path_type::const_reverse_iterator p = path.rbegin (); p != path.rend (); ++p) {
+
+      if (p->second == p->first->children.end ()) {
+        break;
+      } else if (p != path.rbegin () && (! p->second->remove_on_empty () || ! p->second->children.empty ())) {
+        //  stop on non-empty parent menues
+        break;
+      }
+
+      reset_menu_objects (*p->second);
+      p->first->children.erase (p->second);
+
     }
-    reset_menu_objects (*ins.second);
-    ins.first->children.erase (ins.second);
+
   }
+
   emit changed ();
 }
 
-static void do_delete_items (std::list<AbstractMenuItem> &list, const Action &action)
+static void do_delete_items (AbstractMenuItem &parent, const Action &action)
 {
-  for (std::list<AbstractMenuItem>::iterator l = list.begin (); l != list.end (); ) {
+  for (std::list<AbstractMenuItem>::iterator l = parent.children.begin (); l != parent.children.end (); ) {
     std::list<AbstractMenuItem>::iterator ll = l;
     ++ll;
     if (l->action () == action) {
-      list.erase (l);
+      parent.children.erase (l);
     } else {
-      do_delete_items (l->children, action);
+      do_delete_items (*l, action);
+      if (l->remove_on_empty () && l->children.empty ()) {
+        parent.children.erase (l);
+      }
     }
     l = ll;
   }
@@ -1032,7 +1085,7 @@ static void do_delete_items (std::list<AbstractMenuItem> &list, const Action &ac
 void
 AbstractMenu::delete_items (const Action &action)
 {
-  do_delete_items (m_root.children, action);
+  do_delete_items (m_root, action);
   emit changed ();
 }
 
@@ -1099,14 +1152,17 @@ AbstractMenu::find_item_exact (const std::string &path)
   return item;
 }
 
-std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> 
-AbstractMenu::find_item (const std::string &path) 
+std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> >
+AbstractMenu::find_item (const std::string &p)
 {
-  tl::Extractor extr (path.c_str ());
+  typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> > path_type;
+  path_type path;
+
+  tl::Extractor extr (p.c_str ());
   AbstractMenuItem *parent = &m_root;
   std::list<AbstractMenuItem>::iterator iter = m_root.children.end ();
 
-  while (true) {
+  while (parent && ! extr.at_end ()) {
 
     if (extr.test ("#")) {
 
@@ -1118,70 +1174,119 @@ AbstractMenu::find_item (const std::string &path)
         ++iter;
       }
       if (n > 0) {
-        return std::make_pair ((AbstractMenuItem *) 0, m_root.children.end ());
+        return path_type ();
       }
+
+    } else if (extr.test ("begin")) {
+
+      iter = parent->children.begin ();
+
+    } else if (extr.test ("end")) {
+
+      iter = parent->children.end ();
 
     } else {
 
-      std::string n;
-      extr.read (n, ".+");
+      std::string n, nn;
 
-      if (n == "begin") {
-        return std::make_pair (parent, parent->children.begin ());
-      } else if (n == "end") {
-        return std::make_pair (parent, parent->children.end ());
+      extr.read (n, ".+>(");
+
+      if (extr.test (">")) {
+        extr.read (nn, ".+>(");
       }
 
       std::string name (parent->name ());
       if (! name.empty ()) {
         name += ".";
       }
+
+      std::string nname;
+      nname = name + nn;
       name += n;
 
       bool after = extr.test ("+");
 
+      std::string ndesc;
+      if (! nn.empty () && extr.test ("(")) {
+        extr.read_word_or_quoted (ndesc, " _.$");
+        extr.test (")");
+      }
+
       AbstractMenuItem *p = parent;
       parent = 0;
+
+      //  Look for the next path item
       for (std::list<AbstractMenuItem>::iterator c = p->children.begin (); c != p->children.end (); ++c) {
-
         if (c->name () == name) {
-
-          if (after) {
+          if (after && nn.empty ()) {
             ++c;
-            if (c == p->children.end ()) {
-              return std::make_pair (parent, parent->children.end ());
-            }
           }
-
           parent = p;
           iter = c;
           break;
+        }
+      }
 
+      //  If that's not found, check whether we are supposed to create one:
+      //  identify the insert position and create a new entry there.
+      if (! parent && ! nn.empty ()) {
+
+        if (nn == "begin") {
+          parent = p;
+          iter = parent->children.begin ();
+        } else if (nn == "end") {
+          parent = p;
+          iter = parent->children.end ();
+        } else {
+          for (std::list<AbstractMenuItem>::iterator c = p->children.begin (); c != p->children.end (); ++c) {
+            if (c->name () == nname) {
+              if (after) {
+                ++c;
+              }
+              parent = p;
+              iter = c;
+              break;
+            }
+          }
+        }
+
+        if (parent) {
+          parent->children.insert (iter, AbstractMenuItem ());
+          --iter;
+          iter->setup_item (parent->name (), n, Action ());
+          iter->set_has_submenu ();
+          iter->set_remove_on_empty ();
+          iter->set_action_title (ndesc.empty () ? n : ndesc);
         }
 
       }
 
       if (! parent) {
-        return std::make_pair ((AbstractMenuItem *) 0, m_root.children.end ());
+        return path_type ();
       }
 
     }
 
-    if (extr.at_end ()) {
-      return std::make_pair (parent, iter);
-    }
+    path.push_back (std::make_pair (parent, iter));
 
     extr.test (".");
 
-    parent = &*iter;
+    if (iter == parent->children.end ()) {
+      parent = 0;
+    } else {
+      parent = iter.operator-> ();
+    }
 
   }
 
+  return path;
 }
 
 void 
 AbstractMenu::transfer (const MenuLayoutEntry *layout, AbstractMenuItem &item)
 {
+  tl_assert (mp_provider != 0);
+
   while (layout->name) {
 
     item.children.push_back (AbstractMenuItem ());

@@ -14,6 +14,7 @@ SOURCES = \
   layParsedLayerSource.cc \
   layRenderer.cc \
   laySnap.cc \
+    layAbstractMenu.cc
 
 INCLUDEPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC

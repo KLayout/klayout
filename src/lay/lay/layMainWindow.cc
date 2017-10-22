@@ -4853,14 +4853,7 @@ MainWindow::cm_show_assistant ()
 void 
 MainWindow::show_help (const QString &url)
 {
-  QWidget *parent = dynamic_cast<QWidget *> (sender ());
-  if (! parent) {
-    parent = this;
-  }
-
-  lay::HelpDialog dialog (parent, true);
-  dialog.load (tl::to_string (url));
-  dialog.exec ();
+  show_assistant_url (tl::to_string (url), true);
 }
 
 void 
@@ -4868,7 +4861,8 @@ MainWindow::show_assistant_url (const std::string &url, bool modal)
 {
   if (modal) {
 
-    lay::HelpDialog dialog (this, true);
+    lay::HelpDialog dialog (QApplication::activeWindow () ? QApplication::activeWindow () : this, true);
+    dialog.show ();   //  TODO: this is required to establish a proper geometry. Without this, the splitter is not set up correctly.
     dialog.load (url);
     dialog.exec ();
 

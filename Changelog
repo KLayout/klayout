@@ -1,4 +1,6 @@
-0.25            (2017-10-19):
+0.25            (2017-10-22):
+* Enhancement: Using a special menu path, macros can be
+      configured to appear in submenus now.
 * Enhancement: KLAYOUT_HOME environment variable to 
       control the location of the application folder.
       The application folder is the place where KLayout

@@ -273,16 +273,16 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lym::MacroCollection
 
   for (size_t i = 0; i < m_categories.size (); ++i) {
 
-    lay::MacroEditorTree *macro_tree = new lay::MacroEditorTree (treeTab, m_categories [i].first);
+    lay::MacroEditorTree *macro_tree = new lay::MacroEditorTree (treeTab, m_categories [i].name);
     m_macro_trees.push_back (macro_tree);
 
-    treeTab->addTab(macro_tree, tl::to_qstring (m_categories [i].second));
+    treeTab->addTab(macro_tree, tl::to_qstring (m_categories [i].description));
 
     macro_tree->setup (this);
 
     macro_tree->setSortingEnabled (true);
     macro_tree->sortByColumn (0, Qt::AscendingOrder);
-    macro_tree->setObjectName (tl::to_qstring (m_categories [i].first) + QString::fromUtf8 ("_tree"));
+    macro_tree->setObjectName (tl::to_qstring (m_categories [i].name) + QString::fromUtf8 ("_tree"));
 
     macro_tree->setContextMenuPolicy (Qt::ActionsContextMenu);
 
@@ -622,7 +622,7 @@ void
 MacroEditorDialog::select_category (const std::string &cat)
 {
   for (size_t i = 0; i < m_categories.size (); ++i) {
-    if (m_categories [i].first == cat) {
+    if (m_categories [i].name == cat) {
       treeTab->setCurrentIndex (int (i));
     }
   }
@@ -2051,7 +2051,7 @@ MacroEditorDialog::new_macro()
   //  ask for a template
   std::string cat;
   if (treeTab->currentIndex () < int (m_categories.size ())) {
-    cat = m_categories [treeTab->currentIndex ()].first;
+    cat = m_categories [treeTab->currentIndex ()].name;
   }
   lay::MacroTemplateSelectionDialog template_dialog (this, m_macro_templates, cat);
   int template_index = template_dialog.exec_dialog ();

@@ -65,6 +65,18 @@ Q_OBJECT
 
 public:
   /**
+   *  @brief A structure describing a macro category
+   */
+  struct MacroCategory
+  {
+    MacroCategory () { }
+
+    std::string name;
+    std::string description;
+    std::vector<std::string> folders;
+  };
+
+  /**
    *  @brief Default constructor
    */
   MacroController ();
@@ -150,7 +162,7 @@ public:
   /**
    *  @brief Obtain the list of macro categories
    */
-  const std::vector< std::pair<std::string, std::string> > &macro_categories () const
+  const std::vector<MacroCategory> &macro_categories () const
   {
     return m_macro_categories;
   }
@@ -219,7 +231,7 @@ private:
   std::vector<lay::Action> m_macro_actions;
   std::map<QAction *, lym::Macro *> m_action_to_macro;
   lym::MacroCollection m_temp_macros;
-  std::vector< std::pair<std::string, std::string> > m_macro_categories;
+  std::vector<MacroCategory> m_macro_categories;
   std::vector<InternalPathDescriptor> m_internal_paths;
   std::vector<ExternalPathDescriptor> m_external_paths;
   std::vector<std::string> m_package_locations;

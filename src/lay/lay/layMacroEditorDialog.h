@@ -28,13 +28,14 @@
 
 #include "ui_MacroEditorDialog.h"
 #include "layMacroEditorPage.h"
+#include "layMacroController.h"
 #include "tlDeferredExecution.h"
 #include "tlTimer.h"
 #include "tlFileSystemWatcher.h"
 #include "tlDeferredExecution.h"
+#include "tlScriptError.h"
 #include "lymMacro.h"
 #include "gsiInterpreter.h"
-#include "tlScriptError.h"
 
 #include <QDialog>
 #include <QTextCharFormat>
@@ -300,7 +301,7 @@ private:
   bool m_file_watcher_enabled;
   std::string m_font_family;
   int m_font_size;
-  std::vector<std::pair<std::string, std::string> > m_categories;
+  std::vector<lay::MacroController::MacroCategory> m_categories;
   std::vector<std::pair<gsi::Interpreter *, std::string> > m_watch_expressions;
   std::vector<EditTrace> m_edit_trace;
   size_t m_edit_trace_index;

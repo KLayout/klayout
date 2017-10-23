@@ -903,11 +903,11 @@ TechSetupDialog::update_tech_tree ()
     tci->setData (0, Qt::FontRole, QVariant (f));
 
     if (lay::MacroController::instance ()) {
-      const std::vector<std::pair<std::string, std::string> > &mc = lay::MacroController::instance ()->macro_categories ();
-      for (std::vector<std::pair<std::string, std::string> >::const_iterator c = mc.begin (); c != mc.end (); ++c) {
+      const std::vector<lay::MacroController::MacroCategory> &mc = lay::MacroController::instance ()->macro_categories ();
+      for (std::vector<lay::MacroController::MacroCategory>::const_iterator c = mc.begin (); c != mc.end (); ++c) {
         tci = new QTreeWidgetItem (ti);
-        tci->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (c->second)));
-        tci->setData (0, Qt::UserRole + 1, QVariant (tl::to_qstring (std::string ("_macros_") + c->first)));
+        tci->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (c->description)));
+        tci->setData (0, Qt::UserRole + 1, QVariant (tl::to_qstring (std::string ("_macros_") + c->name)));
         tci->setData (0, Qt::FontRole, QVariant (f));
       }
     }
@@ -942,13 +942,13 @@ TechSetupDialog::update_tech (lay::Technology *t)
     m_component_editors.insert (std::make_pair (std::string ("_general"), tce_widget));
 
     if (lay::MacroController::instance ()) {
-      const std::vector<std::pair<std::string, std::string> > &mc = lay::MacroController::instance ()->macro_categories ();
-      for (std::vector<std::pair<std::string, std::string> >::const_iterator c = mc.begin (); c != mc.end (); ++c) {
-        tce_widget = new TechMacrosPage (this, c->first, c->second);
+      const std::vector<lay::MacroController::MacroCategory> &mc = lay::MacroController::instance ()->macro_categories ();
+      for (std::vector<lay::MacroController::MacroCategory>::const_iterator c = mc.begin (); c != mc.end (); ++c) {
+        tce_widget = new TechMacrosPage (this, c->name, c->description);
         tce_widget->setEnabled (!t->is_readonly ());
         tce_widget->set_technology (t, 0);
         tc_stack->addWidget (tce_widget);
-        m_component_editors.insert (std::make_pair (std::string ("_macros_") + c->first, tce_widget));
+        m_component_editors.insert (std::make_pair (std::string ("_macros_") + c->name, tce_widget));
       }
     }
 

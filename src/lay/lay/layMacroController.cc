@@ -49,6 +49,35 @@ MacroController::MacroController ()
   connect (&m_temp_macros, SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
 }
 
+static lay::MacroController::MacroCategory ruby_cat ()
+{
+  lay::MacroController::MacroCategory cat;
+  cat.name = "macros";
+  cat.description = tl::to_string (QObject::tr ("Ruby"));
+  cat.folders.push_back ("macros");
+  cat.folders.push_back ("ruby");
+  return cat;
+}
+
+static lay::MacroController::MacroCategory python_cat ()
+{
+  lay::MacroController::MacroCategory cat;
+  cat.name = "pymacros";
+  cat.description = tl::to_string (QObject::tr ("Python"));
+  cat.folders.push_back ("pymacros");
+  cat.folders.push_back ("python");
+  return cat;
+}
+
+static lay::MacroController::MacroCategory drc_cat ()
+{
+  lay::MacroController::MacroCategory cat;
+  cat.name = "drc";
+  cat.description = tl::to_string (QObject::tr ("DRC"));
+  cat.folders.push_back ("drc");
+  return cat;
+}
+
 void
 MacroController::finish (bool load)
 {
@@ -63,25 +92,41 @@ MacroController::finish (bool load)
   //  TODO: consider adding "drc" dynamically and allow more dynamic categories
   //  We can do so if we first load the macros with the initial interpreters, then do autorun (which creates DSL interpreters) and then
   //  register the remaining categories.
-  m_macro_categories.push_back (std::pair<std::string, std::string> ("macros", tl::to_string (QObject::tr ("Ruby"))));
-  m_macro_categories.push_back (std::pair<std::string, std::string> ("pymacros", tl::to_string (QObject::tr ("Python"))));
-  m_macro_categories.push_back (std::pair<std::string, std::string> ("drc", tl::to_string (QObject::tr ("DRC"))));
+
+  m_macro_categories.push_back (ruby_cat ());
+  m_macro_categories.push_back (python_cat ());
+  m_macro_categories.push_back (drc_cat ());
 
   //  Scan for macros and set interpreter path
   for (std::vector <InternalPathDescriptor>::const_iterator p = m_internal_paths.begin (); p != m_internal_paths.end (); ++p) {
 
     if (load) {
+
       for (size_t c = 0; c < m_macro_categories.size (); ++c) {
-        if (p->cat.empty () || p->cat == m_macro_categories [c].first) {
-          std::string mp;
-          if (p->cat.empty ()) {
-            mp = tl::to_string (QDir (tl::to_qstring (p->path)).absoluteFilePath (tl::to_qstring (m_macro_categories [c].first)));
-          } else {
-            mp = p->path;
+
+        if (p->cat.empty ()) {
+
+          for (std::vector<std::string>::const_iterator f = m_macro_categories[c].folders.begin (); f != m_macro_categories[c].folders.end (); ++f) {
+
+            std::string mp = tl::to_string (QDir (tl::to_qstring (p->path)).absoluteFilePath (tl::to_qstring (*f)));
+
+            std::string description = p->description;
+            if (*f != m_macro_categories[c].name) {
+              description += " - " + tl::to_string (tr ("%1 branch").arg (tl::to_qstring (*f)));
+            }
+
+            lym::MacroCollection::root ().add_folder (description, mp, m_macro_categories[c].name, p->readonly);
+
           }
-          lym::MacroCollection::root ().add_folder (p->description, mp, m_macro_categories [c].first, p->readonly);
+
+        } else if (p->cat == m_macro_categories[c].name) {
+
+          lym::MacroCollection::root ().add_folder (p->description, p->path, m_macro_categories[c].name, p->readonly);
+
         }
+
       }
+
     }
 
     //  Add the unspecific paths as "package locations", so we get "ruby", "python" and similar folders as
@@ -375,28 +420,36 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
 
     for (size_t c = 0; c < macro_categories ().size (); ++c) {
 
-      QDir base_dir (tl::to_qstring (t->first));
-      QDir macro_dir (base_dir.filePath (tl::to_qstring (macro_categories () [c].first)));
-      if (macro_dir.exists ()) {
+      for (std::vector<std::string>::const_iterator f = macro_categories () [c].folders.begin (); f != macro_categories () [c].folders.end (); ++f) {
 
-        std::string description;
-        if (t->second.size () == 1) {
-          description = tl::to_string (tr ("Technology %1").arg (tl::to_qstring (t->second.front ())));
-        } else {
-          description = tl::to_string (tr ("Technologies %1").arg (tl::to_qstring (tl::join (t->second, ","))));
-        }
+        QDir base_dir (tl::to_qstring (t->first));
+        QDir macro_dir (base_dir.filePath (tl::to_qstring (*f)));
+        if (macro_dir.exists ()) {
 
-        std::map<std::string, std::vector<std::string> >::const_iterator gn = grain_names_by_path.find (t->first);
-        if (gn != grain_names_by_path.end ()) {
-          description += " - ";
-          if (gn->second.size () == 1) {
-            description += tl::to_string (tr ("Package %1").arg (tl::to_qstring (gn->second.front ())));
+          std::string description;
+          if (t->second.size () == 1) {
+            description = tl::to_string (tr ("Technology %1").arg (tl::to_qstring (t->second.front ())));
           } else {
-            description += tl::to_string (tr ("Packages %1").arg (tl::to_qstring (tl::join (gn->second, ","))));
+            description = tl::to_string (tr ("Technologies %1").arg (tl::to_qstring (tl::join (t->second, ","))));
           }
-        }
 
-        external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lym::MacroCollection::TechFolder, readonly_paths.find (t->first) != readonly_paths.end ()));
+          std::map<std::string, std::vector<std::string> >::const_iterator gn = grain_names_by_path.find (t->first);
+          if (gn != grain_names_by_path.end ()) {
+            description += " - ";
+            if (gn->second.size () == 1) {
+              description += tl::to_string (tr ("Package %1").arg (tl::to_qstring (gn->second.front ())));
+            } else {
+              description += tl::to_string (tr ("Packages %1").arg (tl::to_qstring (tl::join (gn->second, ","))));
+            }
+          }
+
+          if (*f != macro_categories () [c].name) {
+            description += " - " + tl::to_string (tr ("%1 branch").arg (tl::to_qstring (*f)));
+          }
+
+          external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].name, lym::MacroCollection::TechFolder, readonly_paths.find (t->first) != readonly_paths.end ()));
+
+        }
 
       }
 
@@ -416,12 +469,19 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
 
       for (size_t c = 0; c < macro_categories ().size (); ++c) {
 
-        QDir base_dir (tl::to_qstring (g->path ()));
-        QDir macro_dir (base_dir.filePath (tl::to_qstring (macro_categories () [c].first)));
-        if (macro_dir.exists ()) {
+        for (std::vector<std::string>::const_iterator f = macro_categories () [c].folders.begin (); f != macro_categories () [c].folders.end (); ++f) {
 
-          std::string description = tl::to_string (tr ("Package %1").arg (tl::to_qstring (g->name ())));
-          external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].first, lym::MacroCollection::SaltFolder, g->is_readonly ()));
+          QDir base_dir (tl::to_qstring (g->path ()));
+          QDir macro_dir (base_dir.filePath (tl::to_qstring (*f)));
+          if (macro_dir.exists ()) {
+
+            std::string description = tl::to_string (tr ("Package %1").arg (tl::to_qstring (g->name ())));
+            if (*f != macro_categories () [c].name) {
+              description += " - " + tl::to_string (tr ("%1 branch").arg (tl::to_qstring (*f)));
+            }
+            external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].name, lym::MacroCollection::SaltFolder, g->is_readonly ()));
+
+          }
 
         }
 
@@ -545,9 +605,9 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, int 
     if (! tech || c->second->virtual_mode () != lym::MacroCollection::TechFolder) {
       consider = true;
     } else {
-      const std::vector<std::pair<std::string, std::string> > &mc = macro_categories ();
-      for (std::vector<std::pair<std::string, std::string> >::const_iterator cc = mc.begin (); cc != mc.end () && !consider; ++cc) {
-        consider = (c->second->path () == tl::to_string (QDir (tl::to_qstring (tech->base_path ())).filePath (tl::to_qstring (cc->first))));
+      const std::vector<lay::MacroController::MacroCategory> &mc = macro_categories ();
+      for (std::vector<lay::MacroController::MacroCategory>::const_iterator cc = mc.begin (); cc != mc.end () && !consider; ++cc) {
+        consider = (c->second->path () == tl::to_string (QDir (tl::to_qstring (tech->base_path ())).filePath (tl::to_qstring (cc->name))));
       }
     }
 

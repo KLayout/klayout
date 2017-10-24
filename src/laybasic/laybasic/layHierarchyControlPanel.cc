@@ -339,10 +339,6 @@ HierarchyControlPanel::HierarchyControlPanel (lay::LayoutView *view, QWidget *pa
   mp_view->cellviews_changed_event.add (this, &HierarchyControlPanel::update_required);
   mp_view->hier_changed_event.add (this, &HierarchyControlPanel::update_required);
 
-  /* @@@
-  mp_tree_style.reset (new BackgroundAwareTreeStyle (style ()));
-  @@@ */
-
   do_update_content ();
 }
 
@@ -976,26 +972,11 @@ HierarchyControlPanel::do_update_content (int cv_index)
 
         m_force_close [i] = false;
 
-        mp_cell_lists [i]->collapse (mp_cell_lists [i]->rootIndex ());
-        
-        CellTreeModel *old_model = dynamic_cast <CellTreeModel *> (mp_cell_lists [i]->model ());
-        mp_cell_lists [i]->setModel (new CellTreeModel (mp_cell_lists [i], mp_view, i, m_flat ? CellTreeModel::Flat : 0, 0, m_sorting));
-        if (old_model) {
-          delete old_model;
+        CellTreeModel *model = dynamic_cast <CellTreeModel *> (mp_cell_lists [i]->model ());
+        if (model) {
+          model->configure (mp_view, i, m_flat ? CellTreeModel::Flat : 0, 0, m_sorting);
         }
 
-      }
-
-      //  enable root decoration
-      mp_cell_lists [i]->setRootIsDecorated (! m_flat);
-
-      //  locate the item and make selected
-      mp_cell_lists [i]->clearSelection ();
-
-      QModelIndex index = index_from_path (m_cellviews [i].combined_unspecific_path (), i);
-      if (index.isValid ()) {
-        mp_cell_lists [i]->scrollTo (index);
-        mp_cell_lists [i]->setCurrentIndex (index);
       }
 
       m_needs_update [i] = false;

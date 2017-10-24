@@ -281,6 +281,124 @@ CellTreeModel::~CellTreeModel ()
   clear_top_level ();
 }
 
+void
+CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flags, const db::Cell *base, Sorting sorting)
+{
+  bool flat = ((flags & Flat) != 0) && ((flags & TopCells) == 0);
+  db::Layout *layout = & view->cellview (cv_index)->layout ();
+
+  bool need_reset = false;
+  if (flat != m_flat || layout != mp_layout || sorting != m_sorting || view != mp_view) {
+
+    need_reset = true;
+    beginResetModel ();
+
+  }
+
+  std::vector<lay::CellTreeItem *> old_toplevel_items;
+  old_toplevel_items.swap (m_toplevel);
+
+  if (view != mp_view) {
+
+    mp_view->cell_visibility_changed_event.remove (this, &CellTreeModel::signal_data_changed);
+    mp_view->cellview_changed_event.remove (this, &CellTreeModel::signal_data_changed_with_int);
+
+    mp_view = view;
+
+    mp_view->cell_visibility_changed_event.add (this, &CellTreeModel::signal_data_changed);
+    mp_view->cellview_changed_event.add (this, &CellTreeModel::signal_data_changed_with_int);
+
+  }
+
+  m_cv_index = cv_index;
+  m_flags = flags;
+  mp_base = base;
+  m_selected_indexes.clear ();
+  m_current_index = m_selected_indexes.begin ();
+
+  m_sorting = sorting;
+  m_flat = flat;
+  m_pad = ((flags & NoPadding) == 0);
+
+  mp_layout = layout;
+  tl_assert (! mp_layout->under_construction () && ! (mp_layout->manager () && mp_layout->manager ()->transacting ()));
+
+  build_top_level ();
+
+  if (need_reset) {
+
+    endResetModel ();
+
+  } else {
+
+    //  Translate persistent indexes: translation happens according to the path given by
+    //  a sequence of cell indexes.
+
+    QModelIndexList indexes = persistentIndexList ();
+    QModelIndexList new_indexes;
+
+    for (QModelIndexList::const_iterator index = indexes.begin (); index != indexes.end (); ++index) {
+
+      std::vector<db::cell_index_type> path;
+      CellTreeItem *item = (CellTreeItem *) index->internalPointer ();
+      while (item) {
+        path.push_back (item->cell_index ());
+        item = item->parent ();
+      }
+
+      CellTreeItem *parent = 0;
+
+      if (! path.empty ()) {
+
+        //  because we push_back'd on our way up:
+        std::reverse (path.begin (), path.end ());
+
+        for (std::vector<db::cell_index_type>::const_iterator ci = path.begin (); ci != path.end (); ++ci) {
+
+          CellTreeItem *new_parent = 0;
+
+          if (! layout->is_valid_cell_index (*ci)) {
+            //  can't translate this index
+          } else if (parent == 0) {
+            for (int i = 0; i < int (m_toplevel.size ()) && !new_parent; ++i) {
+              if (m_toplevel [i]->cell_index () == *ci) {
+                new_parent = m_toplevel [i];
+              }
+            }
+          } else {
+            for (int i = 0; i < parent->children () && !new_parent; ++i) {
+              if (parent->child (i)->cell_index () == *ci) {
+                new_parent = parent->child (i);
+              }
+            }
+          }
+
+          parent = new_parent;
+
+        }
+
+      }
+
+      if (parent) {
+        new_indexes << createIndex (index->row (), index->column (), (void *) parent);
+      } else {
+        new_indexes << QModelIndex ();
+      }
+
+    }
+
+    changePersistentIndexList (indexes, new_indexes);
+
+  }
+
+  signal_data_changed ();
+
+  //  TODO: harden against exceptions
+  for (std::vector<lay::CellTreeItem *>::iterator t = old_toplevel_items.begin (); t != old_toplevel_items.end (); ++t) {
+    delete *t;
+  }
+}
+
 void 
 CellTreeModel::set_sorting (Sorting s)
 {
@@ -297,6 +415,12 @@ CellTreeModel::set_sorting (Sorting s)
     signal_data_changed ();
 
   }
+}
+
+void
+CellTreeModel::signal_data_changed ()
+{
+  emit layoutChanged ();
 }
 
 void 
@@ -541,6 +665,19 @@ QVariant
 CellTreeModel::headerData (int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
 {
   return QVariant ();
+}
+
+bool searchItemPtr(CellTreeItem *parent, CellTreeItem *search)
+{
+  if (parent == search) {
+    return true;
+  }
+  for (int i = 0; i < parent->children(); ++i) {
+    if (searchItemPtr(parent->child(i), search)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 int 

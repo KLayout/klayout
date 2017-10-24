@@ -104,6 +104,11 @@ public:
   virtual QMimeData *mimeData (const QModelIndexList &indexes) const;
 
   /**
+   *  @brief Reconfigures the model
+   */
+  void configure (lay::LayoutView *view, int cv_index, unsigned int flags = 0, const db::Cell *base = 0, Sorting sorting = ByName);
+
+  /**
    *  @brief Gets the layout this model is connected to
    */
   const db::Layout *layout () const
@@ -208,10 +213,7 @@ public:
    *  something changed. However, in our current architecture, it does not. So we
    *  need to tell the model that something has changed.
    */
-  void signal_data_changed ()
-  {
-    emit dataChanged (topLeft (), bottomRight ());
-  }
+  void signal_data_changed ();
 
   /**
    *  @brief Signal to the owner of the model that the data has changed (with an int parameter)

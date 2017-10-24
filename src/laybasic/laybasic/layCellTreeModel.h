@@ -117,16 +117,6 @@ public:
   }
 
   /**
-   *  @brief Return the QModelIndex of the topLeft item
-   */
-  QModelIndex topLeft () const;
-
-  /**
-   *  @brief Return the QModelIndex of the bottomRight item
-   */
-  QModelIndex bottomRight () const;
-
-  /**
    *  @brief Return the number of top level items
    */
   int toplevel_items () const;

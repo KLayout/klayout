@@ -288,7 +288,7 @@ CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flag
   db::Layout *layout = & view->cellview (cv_index)->layout ();
 
   bool need_reset = false;
-  if (flat != m_flat || layout != mp_layout || sorting != m_sorting || view != mp_view) {
+  if (flat != m_flat || layout != mp_layout || view != mp_view) {
 
     need_reset = true;
     beginResetModel ();
@@ -347,6 +347,7 @@ CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flag
       }
 
       CellTreeItem *parent = 0;
+      int row = index->row ();
 
       if (! path.empty ()) {
 
@@ -363,12 +364,14 @@ CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flag
             for (int i = 0; i < int (m_toplevel.size ()) && !new_parent; ++i) {
               if (m_toplevel [i]->cell_index () == *ci) {
                 new_parent = m_toplevel [i];
+                row = i;
               }
             }
           } else {
             for (int i = 0; i < parent->children () && !new_parent; ++i) {
               if (parent->child (i)->cell_index () == *ci) {
                 new_parent = parent->child (i);
+                row = i;
               }
             }
           }
@@ -380,7 +383,7 @@ CellTreeModel::configure (lay::LayoutView *view, int cv_index, unsigned int flag
       }
 
       if (parent) {
-        new_indexes << createIndex (index->row (), index->column (), (void *) parent);
+        new_indexes << createIndex (row, index->column (), (void *) parent);
       } else {
         new_indexes << QModelIndex ();
       }
@@ -403,17 +406,7 @@ void
 CellTreeModel::set_sorting (Sorting s)
 {
   if (s != m_sorting) {
-
-    m_sorting = s;
-
-    //  Important: reset here, since otherwise QModelIndex objects with the wrong internalPointer will exist inside the view.
-    beginResetModel ();
-    clear_top_level ();
-    build_top_level ();
-    endResetModel ();
-
-    signal_data_changed ();
-
+    configure (mp_view, m_cv_index, m_flags, mp_base, s);
   }
 }
 
@@ -926,31 +919,6 @@ CellTreeModel::locate (const char *name, bool glob_pattern, bool case_sensitive,
     return QModelIndex (); 
   } else {
     return *m_current_index;
-  }
-}
-
-QModelIndex 
-CellTreeModel::topLeft () const
-{
-  if (m_toplevel.empty () || mp_layout->under_construction () || (mp_layout->manager () && mp_layout->manager ()->transacting ())) {
-    return QModelIndex ();
-  } else {
-    return model_index (m_toplevel.front ());
-  }
-}
-
-QModelIndex 
-CellTreeModel::bottomRight () const
-{
-  if (m_toplevel.empty () || mp_layout->under_construction () || (mp_layout->manager () && mp_layout->manager ()->transacting ())) {
-    return QModelIndex ();
-  } else {
-    QModelIndex p = model_index (m_toplevel.back ());
-    int nr = 0;
-    while (p.isValid () && (nr = rowCount (p)) > 0) {
-      p = index (nr - 1, 0, p);
-    }
-    return p;
   }
 }
 

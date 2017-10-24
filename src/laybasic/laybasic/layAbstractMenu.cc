@@ -1177,92 +1177,96 @@ AbstractMenu::find_item (const std::string &p)
         return path_type ();
       }
 
-    } else if (extr.test ("begin")) {
-
-      iter = parent->children.begin ();
-
-    } else if (extr.test ("end")) {
-
-      iter = parent->children.end ();
-
     } else {
 
-      std::string n, nn;
-
+      std::string n;
       extr.read (n, ".+>(");
 
-      if (extr.test (">")) {
-        extr.read (nn, ".+>(");
-      }
+      if (n == "begin") {
 
-      std::string name (parent->name ());
-      if (! name.empty ()) {
-        name += ".";
-      }
+        iter = parent->children.begin ();
 
-      std::string nname;
-      nname = name + nn;
-      name += n;
+      } else if (n == "end") {
 
-      bool after = extr.test ("+");
+        iter = parent->children.end ();
 
-      std::string ndesc;
-      if (! nn.empty () && extr.test ("(")) {
-        extr.read_word_or_quoted (ndesc, " _.$");
-        extr.test (")");
-      }
+      } else {
 
-      AbstractMenuItem *p = parent;
-      parent = 0;
-
-      //  Look for the next path item
-      for (std::list<AbstractMenuItem>::iterator c = p->children.begin (); c != p->children.end (); ++c) {
-        if (c->name () == name) {
-          if (after && nn.empty ()) {
-            ++c;
-          }
-          parent = p;
-          iter = c;
-          break;
+        std::string nn;
+        if (extr.test (">")) {
+          extr.read (nn, ".+>(");
         }
-      }
 
-      //  If that's not found, check whether we are supposed to create one:
-      //  identify the insert position and create a new entry there.
-      if (! parent && ! nn.empty ()) {
+        std::string name (parent->name ());
+        if (! name.empty ()) {
+          name += ".";
+        }
 
-        if (nn == "begin") {
-          parent = p;
-          iter = parent->children.begin ();
-        } else if (nn == "end") {
-          parent = p;
-          iter = parent->children.end ();
-        } else {
-          for (std::list<AbstractMenuItem>::iterator c = p->children.begin (); c != p->children.end (); ++c) {
-            if (c->name () == nname) {
-              if (after) {
-                ++c;
+        std::string nname;
+        nname = name + nn;
+        name += n;
+
+        bool after = extr.test ("+");
+
+        std::string ndesc;
+        if (! nn.empty () && extr.test ("(")) {
+          extr.read_word_or_quoted (ndesc, " _.$");
+          extr.test (")");
+        }
+
+        AbstractMenuItem *p = parent;
+        parent = 0;
+
+        //  Look for the next path item
+        for (std::list<AbstractMenuItem>::iterator c = p->children.begin (); c != p->children.end (); ++c) {
+          if (c->name () == name) {
+            if (after && nn.empty ()) {
+              ++c;
+            }
+            parent = p;
+            iter = c;
+            break;
+          }
+        }
+
+        //  If that's not found, check whether we are supposed to create one:
+        //  identify the insert position and create a new entry there.
+        if (! parent && ! nn.empty ()) {
+
+          if (nn == "begin") {
+            parent = p;
+            iter = parent->children.begin ();
+          } else if (nn == "end") {
+            parent = p;
+            iter = parent->children.end ();
+          } else {
+            for (std::list<AbstractMenuItem>::iterator c = p->children.begin (); c != p->children.end (); ++c) {
+              if (c->name () == nname) {
+                if (after) {
+                  ++c;
+                }
+                parent = p;
+                iter = c;
+                break;
               }
-              parent = p;
-              iter = c;
-              break;
             }
           }
+
+          if (parent) {
+            parent->children.insert (iter, AbstractMenuItem ());
+            --iter;
+            iter->setup_item (parent->name (), n, Action ());
+            iter->set_has_submenu ();
+            iter->set_remove_on_empty ();
+            iter->set_action_title (ndesc.empty () ? n : ndesc);
+          }
+
         }
 
-        if (parent) {
-          parent->children.insert (iter, AbstractMenuItem ());
-          --iter;
-          iter->setup_item (parent->name (), n, Action ());
-          iter->set_has_submenu ();
-          iter->set_remove_on_empty ();
-          iter->set_action_title (ndesc.empty () ? n : ndesc);
+        if (! parent) {
+          return path_type ();
         }
 
-      }
-
-      if (! parent) {
-        return path_type ();
       }
 
     }

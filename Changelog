@@ -1,4 +1,6 @@
-0.25            (2017-10-22):
+0.25            (2017-10-25):
+* Enhancement: The cell tree is longer collapsed on edits
+      or when the sorting order changes.
 * Enhancement: Using a special menu path, macros can be
       configured to appear in submenus now.
 * Enhancement: KLAYOUT_HOME environment variable to 

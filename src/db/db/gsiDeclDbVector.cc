@@ -100,6 +100,11 @@ struct vector_defs
     return std_ext::hfunc (*v);
   }
 
+  static db::point<coord_type> add_with_point (const C *v, const db::point<coord_type> &p)
+  {
+    return p + *v;
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -120,6 +125,7 @@ struct vector_defs
     method_ext ("to_p", &to_point,
       "@brief Turns the vector into a point\n"
       "This method returns the point resulting from adding the vector to (0,0)."
+      "\n"
       "This method has been introduced in version 0.25."
     ) +
     method_ext ("-@", &negate,
@@ -135,6 +141,13 @@ struct vector_defs
       "@args v\n"
       "\n"
       "Adds vector v to self by adding the coordinates.\n"
+    ) +
+    method_ext ("+", &add_with_point,
+      "@brief Adds a vector and a point\n"
+      "\n"
+      "@args p\n"
+      "\n"
+      "Returns the point p shifted by the vector.\n"
     ) +
     method ("-", (C (C::*) (const C &) const) &C::subtract,
       "@brief Subtract two vectors\n"

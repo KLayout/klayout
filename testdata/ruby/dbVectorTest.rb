@@ -55,6 +55,11 @@ class DBVector_TestClass < TestBase
     b.y = a.y
     assert_equal( a, b )
 
+    assert_equal( c.to_p.class == RBA::DPoint, true )
+    assert_equal( c.class == RBA::DVector, true )
+    assert_equal( (c + RBA::DPoint::new(1, 2)).class == RBA::DPoint, true )
+    assert_equal( (c + RBA::DPoint::new(1, 2)).to_s, "6,13" )
+
   end
 
   # Transforming DVector
@@ -100,6 +105,11 @@ class DBVector_TestClass < TestBase
     b.x = a.x
     b.y = a.y
     assert_equal( a, b )
+
+    assert_equal( c.to_p.class == RBA::Point, true )
+    assert_equal( c.class == RBA::Vector, true )
+    assert_equal( (c + RBA::Point::new(1, 2)).class == RBA::Point, true )
+    assert_equal( (c + RBA::Point::new(1, 2)).to_s, "6,13" )
 
   end
 

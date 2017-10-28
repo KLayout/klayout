@@ -362,12 +362,25 @@ static LayerPropertiesConstIteratorWrapper each_layer2 (lay::LayoutView *view, u
   return LayerPropertiesConstIteratorWrapper (view->begin_layers (list_index));
 }
 
+static lay::LayoutView *new_view ()
+{
+  return new lay::LayoutView (0, false, 0);
+}
+
 Class<lay::LayoutView> decl_LayoutView ("LayoutView",
+  gsi::constructor ("new", &new_view,
+    "@brief Creates a standalone view\n"
+    "\n"
+    "This constructor is for special purposes only. To create a view in the context of a main window, "
+    "use \\MainWindow#create_view and related methods.\n"
+    "\n"
+    "This constructor has been introduced in version 0.25.\n"
+  ) +
   gsi::method ("current", &lay::LayoutView::current,
     "@brief Returns the current view\n"
     "The current view is the one that is shown in the current tab. Returns nil if no layout is loaded.\n"
     "\n"
-    "This method has been introduce in version 0.23.\n"
+    "This method has been introduced in version 0.23.\n"
   ) +
   gsi::method ("stop_redraw", &lay::LayoutView::stop_redraw,
     "@brief Stops the redraw thread\n"

@@ -1433,10 +1433,7 @@ MacroEditorDialog::eventFilter (QObject *obj, QEvent *event)
 void
 MacroEditorDialog::flush ()
 {
-  if (! m_new_line) {
-    //  insert a new line if the stream changes ..
-    write_str ("\n", m_os);
-  }
+  //  .. no specific implementation required for flush() ..
 }
 
 bool
@@ -1481,9 +1478,9 @@ MacroEditorDialog::write_str (const char *text, output_stream os)
     mp_console_text->setTextCursor (c);
   }
 
-  if (m_os != OS_none && os != m_os) {
-    //  flush if the stream changes ..
-    flush ();
+  if (m_os != OS_none && os != m_os && ! m_new_line) {
+    //  insert a new line if the stream changes ..
+    write_str ("\n", m_os);
   }
 
   if (m_os != os) {

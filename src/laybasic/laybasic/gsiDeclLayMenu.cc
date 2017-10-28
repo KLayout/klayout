@@ -164,21 +164,28 @@ Class<lay::Action> decl_ActionBase ("ActionBase",
     "@brief Get the keyboard shortcut\n"
     "@return The keyboard shortcut as a string\n"
   ) +
+  method ("is_separator?", &lay::Action::is_separator,
+    "@brief Gets a value indicating whether the item is a separator\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
   method ("is_checkable?", &lay::Action::is_checkable,
-    "@brief \"is_checkable\" attribute\n"
-    "@return true, if the item is checkable\n"
+    "@brief Gets a value indicating whether the item is checkable\n"
   ) +
   method ("is_checked?", &lay::Action::is_checked,
-    "@brief \"is_checked\" attribute\n"
-    "@return true, if the item is checked\n"
+    "@brief Gets a value indicating whether the item is checked\n"
   ) +
   method ("is_enabled?", &lay::Action::is_enabled,
-    "@brief \"is_enabled\" attribute\n"
-    "@return true, if the item is enabled\n"
+    "@brief Gets a value indicating whether the item is enabled\n"
   ) +
   method ("is_visible?", &lay::Action::is_visible,
-    "@brief \"is_visible\" attribute\n"
-    "@return true, if the item is visible\n"
+    "@brief Gets a value indicating whether the item is visible\n"
+  ) +
+  method ("separator=", &lay::Action::set_separator,
+    "@brief Makes an item a separator or not\n"
+    "@args separator\n"
+    "\n"
+    "@param separator true to make the item a separator\n"
+    "This method has been introduced in version 0.25.\n"
   ) +
   method ("checkable=", &lay::Action::set_checkable,
     "@brief Make the item(s) checkable or not\n"

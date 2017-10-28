@@ -1682,7 +1682,7 @@ MacroCollection &MacroCollection::root ()
   return ms_root;
 }
 
-static bool sync_macros (lym::MacroCollection *current, lym::MacroCollection *actual)
+static bool sync_macros (lym::MacroCollection *current, lym::MacroCollection *actual, bool safe)
 {
   bool ret = false;
 
@@ -1706,7 +1706,7 @@ static bool sync_macros (lym::MacroCollection *current, lym::MacroCollection *ac
         cm = current->create_folder (m->first.c_str (), false);
         ret = true;
       }
-      if (sync_macros(cm, m->second)) {
+      if (sync_macros(cm, m->second, safe)) {
         ret = true;
       }
     }
@@ -1715,7 +1715,7 @@ static bool sync_macros (lym::MacroCollection *current, lym::MacroCollection *ac
   //  delete folders which do no longer exist
   for (std::vector<lym::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
     ret = true;
-    sync_macros (*m, 0);
+    sync_macros (*m, 0, safe);
     current->erase (*m);
   }
 
@@ -1732,7 +1732,7 @@ static bool sync_macros (lym::MacroCollection *current, lym::MacroCollection *ac
     for (lym::MacroCollection::iterator m = actual->begin (); m != actual->end (); ++m) {
       lym::Macro *cm = current->macro_by_name (m->first, m->second->format ());
       if (cm) {
-        if (*cm != *m->second) {
+        if (*cm != *m->second && (! safe || ! cm->is_modified ())) {
           cm->assign (*m->second);
         }
         cm->set_readonly (m->second->is_readonly ());
@@ -1754,7 +1754,7 @@ static bool sync_macros (lym::MacroCollection *current, lym::MacroCollection *ac
   return ret;
 }
 
-void MacroCollection::reload ()
+void MacroCollection::reload (bool safe)
 {
   //  create a new collection and synchronize
 
@@ -1764,7 +1764,7 @@ void MacroCollection::reload ()
   }
 
   //  and synchronize current with the actual one
-  sync_macros (this, &new_collection);
+  sync_macros (this, &new_collection, safe);
 }
 
 static bool has_autorun_for (const lym::MacroCollection &collection, bool early)

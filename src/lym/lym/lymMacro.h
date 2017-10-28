@@ -1005,8 +1005,9 @@ public:
    *  @brief Reloads the macro collection
    *
    *  This method is similar to rescan, but it will also remove folders and macros.
+   *  In safe mode (safe = true), modified macros won't be overwritten.
    */
-  void reload ();
+  void reload (bool safe);
 
   /**
    *  @brief Gets the root of the macro hierarchy corresponding to the configuration space

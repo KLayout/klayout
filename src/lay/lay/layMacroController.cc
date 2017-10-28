@@ -779,7 +779,7 @@ void
 MacroController::sync_files ()
 {
   tl::log << tl::to_string (tr ("Detected file system change in macro folders - updating"));
-  lym::MacroCollection::root ().reload ();
+  lym::MacroCollection::root ().reload (true /*safe*/);
 }
 
 MacroController *

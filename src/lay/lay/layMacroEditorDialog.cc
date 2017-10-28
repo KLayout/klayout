@@ -2454,7 +2454,7 @@ MacroEditorDialog::reload_macros ()
 {
   m_file_watcher->clear ();
   try {
-    mp_root->reload ();
+    mp_root->reload (false);
     refresh_file_watcher ();
   } catch (...) {
     refresh_file_watcher ();

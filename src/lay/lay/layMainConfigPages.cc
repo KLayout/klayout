@@ -369,6 +369,8 @@ KeyBindingsConfigPage::KeyBindingsConfigPage (QWidget *parent)
   connect (mp_ui->reset_pb, SIGNAL (clicked ()), this, SLOT (reset_clicked ()));
 
   mp_ui->binding_le->setEnabled (false);
+  mp_ui->binding_le->set_clear_button_enabled (true);
+  connect (mp_ui->binding_le, SIGNAL (textChanged (QString)), this, SLOT (text_changed ()));
 }
 
 KeyBindingsConfigPage::~KeyBindingsConfigPage ()
@@ -377,43 +379,34 @@ KeyBindingsConfigPage::~KeyBindingsConfigPage ()
   mp_ui = 0;
 }
 
-static void fill_paths (const lay::AbstractMenu &menu, const std::string &root, std::map<std::string, std::string> &bindings)
+static void fill_paths (const lay::AbstractMenu &menu, const std::string &root, std::map<std::string, std::string> &bindings, bool with_defaults)
 {
   std::vector<std::string> items = menu.items (root);
   for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
     if (i->size () > 0) {
       if (menu.is_valid (*i) && menu.action (*i).is_visible ()) {
         if (menu.is_menu (*i)) {
-          fill_paths (menu, *i, bindings);
+          fill_paths (menu, *i, bindings, with_defaults);
         } else if (! menu.is_separator (*i)) {
-          bindings.insert (std::make_pair (*i, menu.action (*i).get_shortcut ()));
+          bindings.insert (std::make_pair (*i, with_defaults ? menu.action (*i).get_default_shortcut () : menu.action (*i).get_shortcut ()));
         }
       }
     }
   }
 }
 
-std::vector<std::pair<std::string, std::string> > KeyBindingsConfigPage::m_default_bindings;
-
-void
-KeyBindingsConfigPage::set_default ()
-{
-  std::map<std::string, std::string> bm;
-  fill_paths (*lay::MainWindow::instance ()->menu (), std::string (), bm);
-
-  m_default_bindings.clear ();
-  m_default_bindings.insert (m_default_bindings.begin (), bm.begin (), bm.end ());
-}
-
 void 
 KeyBindingsConfigPage::reset_clicked ()
 {
   if (QMessageBox::question (this, 
+
     QObject::tr ("Confirm Reset"),
     QObject::tr ("Are you sure to reset the key bindings?\nThis operation will clear all custom settings."),
     QMessageBox::Yes | QMessageBox::No,
     QMessageBox::No) == QMessageBox::Yes) { 
-    apply (m_default_bindings);
+
+    apply (std::vector<std::pair<std::string, std::string> > ());
+
   }
 }
 
@@ -426,15 +419,23 @@ KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::stri
 
   //  get the current bindings
   m_current_bindings.clear ();
-  fill_paths (*lay::MainWindow::instance ()->menu (), std::string (), m_current_bindings);
+  fill_paths (*lay::MainWindow::instance ()->menu (), std::string (), m_current_bindings, false);
+
+  //  get the default bindings
+  std::map<std::string, std::string> default_bindings;
+  fill_paths (*lay::MainWindow::instance ()->menu (), std::string (), default_bindings, true);
 
   m_enable_event = false;
 
-  //  overwrite with the given ones
-  for (std::vector<std::pair<std::string, std::string> >::const_iterator kb = key_bindings.begin (); kb != key_bindings.end (); ++kb) {
-    std::map<std::string, std::string>::iterator cb = m_current_bindings.find (kb->first);
-    if (cb != m_current_bindings.end ()) {
-      cb->second = kb->second;
+  //  clear bindings and initialize with the given ones
+  std::map<std::string, std::string> b;
+  b.insert (key_bindings.begin (), key_bindings.end ());
+  for (std::map<std::string, std::string>::iterator kb = m_current_bindings.begin (); kb != m_current_bindings.end (); ++kb) {
+    std::map<std::string, std::string>::iterator bb = b.find (kb->first);
+    if (bb != b.end ()) {
+      kb->second = bb->second;
+    } else {
+      kb->second.clear ();
     }
   }
 
@@ -454,9 +455,19 @@ KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::stri
 
     for (std::map<std::string, std::string>::const_iterator cb = m_current_bindings.begin (); cb != m_current_bindings.end (); ++cb) {
 
-      std::string tl_menu;
+      std::map<std::string, std::string>::const_iterator db = default_bindings.find (cb->first);
+      bool is_default = false;
+
+      std::string sc = cb->second;
+      if (sc.empty () && db != default_bindings.end ()) {
+        sc = db->second;
+        is_default = true;
+      }
+
       const std::string &path = cb->first;
-      std::string rem_path = path; 
+
+      std::string tl_menu;
+      std::string rem_path = path;
       if (path.find ("@") == 0) {
         size_t n = path.find (".");
         if (n != std::string::npos) {
@@ -470,7 +481,8 @@ KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::stri
         lay::Action action = lay::MainWindow::instance ()->menu ()->action (cb->first);
         item->setData (0, Qt::DisplayRole, tl::to_qstring (rem_path));
         item->setData (1, Qt::DisplayRole, tl::to_qstring (action.get_title ()));
-        item->setData (2, Qt::DisplayRole, tl::to_qstring (cb->second));
+        item->setData (2, Qt::DisplayRole, tl::to_qstring (sc));
+        item->setData (2, Qt::ForegroundRole, palette ().color (is_default ? QPalette::Disabled : QPalette::Normal, QPalette::Text));
         item->setData (0, Qt::UserRole, tl::to_qstring (path));
         m_item_for_path[path] = item;
         if (action.qaction ()) {
@@ -484,6 +496,7 @@ KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::stri
   }
 
   mp_ui->binding_le->setText (QString ());
+  mp_ui->binding_le->setPlaceholderText (QString ());
   mp_ui->binding_le->setEnabled (false);
 
   m_enable_event = true;
@@ -527,6 +540,54 @@ KeyBindingsConfigPage::commit (lay::PluginRoot *root)
   root->config_set (cfg_key_bindings, packed_key_bindings);
 }
 
+void
+KeyBindingsConfigPage::text_changed ()
+{
+  if (m_enable_event) {
+    update_list_item (mp_ui->bindings_list->currentItem ());
+  }
+}
+
+void
+KeyBindingsConfigPage::update_list_item (QTreeWidgetItem *item)
+{
+  if (! item || ! mp_ui->binding_le->isEnabled ()) {
+    return;
+  }
+
+  std::string path = tl::to_string (item->data (0, Qt::UserRole).toString ());
+  std::string shortcut = tl::to_string (mp_ui->binding_le->text ().simplified ());
+  m_current_bindings[path] = shortcut;
+
+  bool is_default = false;
+  std::string eff_shortcut = shortcut;
+  if (shortcut.empty ()) {
+    lay::Action a = lay::MainWindow::instance ()->menu ()->action (path);
+    eff_shortcut = a.get_default_shortcut ();
+    is_default = true;
+  }
+
+  item->setData (2, Qt::DisplayRole, tl::to_qstring (eff_shortcut));
+  item->setData (2, Qt::ForegroundRole, palette ().color (is_default ? QPalette::Disabled : QPalette::Normal, QPalette::Text));
+
+  //  Set the aliases too
+  const lay::AbstractMenu &menu = *lay::MainWindow::instance ()->menu ();
+  if (menu.is_valid (path)) {
+    QAction *qaction = menu.action (path).qaction ();
+    std::map<QAction *, std::vector<std::string> >::const_iterator a = m_paths_for_action.find (qaction);
+    if (a != m_paths_for_action.end ()) {
+      for (std::vector<std::string>::const_iterator p = a->second.begin (); p != a->second.end (); ++p) {
+        m_current_bindings[*p] = shortcut;
+        std::map<std::string, QTreeWidgetItem *>::const_iterator i = m_item_for_path.find (*p);
+        if (i != m_item_for_path.end ()) {
+          i->second->setData (2, Qt::DisplayRole, tl::to_qstring (eff_shortcut));
+          i->second->setData (2, Qt::ForegroundRole, palette ().color (is_default ? QPalette::Disabled : QPalette::Normal, QPalette::Text));
+        }
+      }
+    }
+  }
+}
+
 void 
 KeyBindingsConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous)
 {
@@ -534,41 +595,29 @@ KeyBindingsConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetIte
     return;
   }
 
-  if (previous && mp_ui->binding_le->isEnabled ()) {
+  update_list_item (previous);
 
-    QKeySequence key_sequence (mp_ui->binding_le->text ());
-    previous->setData (2, Qt::DisplayRole, key_sequence.toString ());
-
-    std::string path = tl::to_string (previous->data (0, Qt::UserRole).toString ());
-    std::string shortcut = tl::to_string (previous->data (2, Qt::DisplayRole).toString ());
-
-    m_current_bindings[path] = shortcut;
-
-    //  Set the aliases too
-    const lay::AbstractMenu &menu = *lay::MainWindow::instance ()->menu ();
-    if (menu.is_valid (path)) {
-      QAction *qaction = menu.action (path).qaction ();
-      std::map<QAction *, std::vector<std::string> >::const_iterator a = m_paths_for_action.find (qaction);
-      if (a != m_paths_for_action.end ()) {
-        for (std::vector<std::string>::const_iterator p = a->second.begin (); p != a->second.end (); ++p) {
-          m_current_bindings[*p] = shortcut;
-          std::map<std::string, QTreeWidgetItem *>::const_iterator i = m_item_for_path.find (*p);
-          if (i != m_item_for_path.end ()) {
-            i->second->setData (2, Qt::DisplayRole, tl::to_qstring (shortcut));
-          }
-        }
-      }
-    }
-
-  }
+  m_enable_event = false;
 
   if (current && !current->data (0, Qt::UserRole).isNull ()) {
-    mp_ui->binding_le->setText (current->data (2, Qt::DisplayRole).toString ());
+
+    std::string path = tl::to_string (current->data (0, Qt::UserRole).toString ());
+    std::string shortcut = m_current_bindings[path];
+
+    lay::Action a = lay::MainWindow::instance ()->menu ()->action (path);
+    std::string def_shortcut = a.get_default_shortcut ();
+
+    mp_ui->binding_le->setText (tl::to_qstring (shortcut));
+    mp_ui->binding_le->setPlaceholderText (tl::to_qstring (def_shortcut));
     mp_ui->binding_le->setEnabled (true);
+
   } else {
     mp_ui->binding_le->setText (QString ());
+    mp_ui->binding_le->setPlaceholderText (QString ());
     mp_ui->binding_le->setEnabled (false);
   }
+
+  m_enable_event = true;
 }
 
 }

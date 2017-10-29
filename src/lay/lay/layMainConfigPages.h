@@ -184,10 +184,9 @@ public:
   virtual void setup (lay::PluginRoot *root);
   virtual void commit (lay::PluginRoot *root);
 
-  static void set_default ();
-
-public slots:
+private slots:
   void current_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous);
+  void text_changed ();
   void reset_clicked ();
 
 private:
@@ -196,9 +195,9 @@ private:
   std::map<std::string, QTreeWidgetItem *> m_item_for_path;
   std::map<QAction *, std::vector<std::string> > m_paths_for_action;
   bool m_enable_event;
-  static std::vector<std::pair<std::string, std::string> > m_default_bindings;
 
   void apply (const std::vector<std::pair<std::string, std::string> > &bindings);
+  void update_list_item (QTreeWidgetItem *item);
 };
 
 }

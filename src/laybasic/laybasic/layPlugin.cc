@@ -139,7 +139,7 @@ PluginDeclaration::init_menu ()
       title = tab + 1;
     } 
 
-    m_editable_mode_action = AbstractMenu::create_action (title);
+    m_editable_mode_action = Action (title);
     gtf::action_connect (m_editable_mode_action.qaction (), SIGNAL (triggered ()), this, SLOT (toggle_editable_enabled ()));
     m_editable_mode_action.qaction ()->setData (id ());
     m_editable_mode_action.set_checkable (true);
@@ -163,7 +163,7 @@ PluginDeclaration::init_menu ()
         menu.insert_menu (m->insert_pos, m->menu_name, m->title);
       } else {
 
-        Action action (AbstractMenu::create_action (m->title));
+        Action action (m->title);
         action.qaction ()->setData (QVariant (tl::to_qstring (m->symbol)));
         gtf::action_connect (action.qaction (), SIGNAL (triggered ()), this, SLOT (generic_menu ()));
         menu.insert_item (m->insert_pos, m->menu_name, action);
@@ -189,7 +189,7 @@ PluginDeclaration::init_menu ()
       title = std::string (tab + 1);
     } 
 
-    m_mouse_mode_action = AbstractMenu::create_action (title);
+    m_mouse_mode_action = Action (title);
     m_mouse_mode_action.add_to_exclusive_group (&menu, "mouse_mode_exclusive_group");
 
     m_mouse_mode_action.set_checkable (true);

@@ -1032,7 +1032,7 @@ MainWindow::init_menu ()
         title = tab + 1;
       } 
 
-      Action action (AbstractMenu::create_action (title));
+      Action action (title);
       action.set_checkable (true);
       action.qaction ()->setData (QVariant (mode_id));
       action.add_to_exclusive_group (mp_menu, "mouse_mode_exclusive_group");
@@ -1078,9 +1078,6 @@ MainWindow::init_menu ()
   for (std::vector<std::string>::const_iterator g = view_mode_grp.begin (); g != view_mode_grp.end (); ++g) {
     mp_menu->action (*g).set_visible (view_mode);
   }
-
-  //  get and store the initial (default) key bindings for restore in the setup dialog
-  KeyBindingsConfigPage::set_default ();
 }
 
 void 
@@ -4930,7 +4927,7 @@ MainWindow::action_for_slot (const char *slot)
   if (a != m_actions_for_slot.end ()) {
     return a->second;
   } else {
-    Action a (new ActionHandle (this));
+    Action a = Action::create_free_action (this);
     gtf::action_connect (a.qaction (), SIGNAL (triggered ()), this, slot);
     return m_actions_for_slot.insert (std::make_pair (std::string (slot), a)).first->second;
   }

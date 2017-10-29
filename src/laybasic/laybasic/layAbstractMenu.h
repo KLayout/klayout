@@ -57,7 +57,7 @@ class PluginRoot;
 /**
  *  @brief A helper class that does reference counting for the QAction object
  */
-class LAYBASIC_PUBLIC ActionHandle
+class ActionHandle
   : public QObject
 {
 Q_OBJECT
@@ -70,6 +70,18 @@ public:
   void remove_ref ();
   QAction *ptr () const;
 
+  void set_visible (bool v);
+  void set_hidden (bool h);
+  bool is_visible () const;
+  bool is_hidden () const;
+  bool is_effective_visible () const;
+
+  void set_default_shortcut (const QKeySequence &sc);
+  void set_shortcut (const QKeySequence &sc);
+  const QKeySequence &get_default_shortcut () const;
+  const QKeySequence &get_shortcut () const;
+  QKeySequence get_effective_shortcut () const;
+
 protected slots:
   void destroyed (QObject *obj);
 
@@ -77,6 +89,10 @@ private:
   QAction *mp_action;
   int m_ref_count;
   bool m_owned;
+  bool m_visible;
+  bool m_hidden;
+  QKeySequence m_default_shortcut;
+  QKeySequence m_shortcut;
 
   //  no copying
   ActionHandle (const ActionHandle &);
@@ -126,18 +142,16 @@ public:
   Action (const std::string &title); 
 
   /**
+   *  @brief Creates a new free action
+   *  This constructor wil create a new action with it's own QAction object
+   *  under the given parent.
+   */
+  static Action create_free_action (QWidget *parent);
+
+  /**
    *  @brief Assignement
    */
   Action &operator= (const Action &action);
-
-  /**
-   *  @brief The proxy constructor
-   *
-   *  This constructor takes a QAction object that it will refer to.
-   *  If the Action is copied, the copy will refer to the same QAction. 
-   *  The QAction object is deleted if the last Action referring to QAction is deleted.
-   */
-  Action (ActionHandle *action); 
 
   /**
    *  @brief The destructor
@@ -155,19 +169,47 @@ public:
   std::string get_title () const;
 
   /**
-   *  @brief Set the keyboard shortcut (as a QKeySequence object)
+   *  @brief Sets the keyboard shortcut (as a QKeySequence object)
+   *  If no shortcut is set, the default shortcut will be taken.
    */
   void set_shortcut (const QKeySequence &s);
 
   /**
-   *  @brief Set the keyboard shortcut
+   *  @brief Sets the keyboard shortcut
+   *  If no shortcut is set, the default shortcut will be taken.
    */
   void set_shortcut (const std::string &s);
 
   /**
-   *  @brief Get the keyboard shortcut
+   *  @brief Gets the keyboard shortcut
+   *  To get the effective shortcut (combination of default shortcut and shortcut),
+   *  use "get_effective_shortcut".
    */
   std::string get_shortcut () const;
+
+  /**
+   *  @brief Sets the default keyboard shortcut (as a QKeySequence object)
+   *  This shortcut is used when no specific shortcut is set.
+   */
+  void set_default_shortcut (const QKeySequence &s);
+
+  /**
+   *  @brief Sets the default keyboard shortcut
+   *  This shortcut is used when no specific shortcut is set.
+   */
+  void set_default_shortcut (const std::string &s);
+
+  /**
+   *  @brief Gets the default keyboard shortcut
+   *  To get the effective shortcut (combination of default shortcut and shortcut),
+   *  use "get_effective_shortcut".
+   */
+  std::string get_default_shortcut () const;
+
+  /**
+   *  @brief Gets the effective shortcut
+   */
+  std::string get_effective_shortcut () const;
 
   /**
    *  @brief "is_checkable" attribute
@@ -190,6 +232,20 @@ public:
   bool is_visible () const;
 
   /**
+   *  @brief Gets a value indicating whether the action is intentionally hidden
+   *  This flag combines with the visibility. "is_effective_visible" is false
+   *  if hidden is true. This feature allows implementation of the menu configuration
+   *  feature where users can deliberately switch off and on menu items.
+   */
+  bool is_hidden () const;
+
+  /**
+   *  @brief Gets the effective visibility
+   *  See "is_hidden" for details.
+   */
+  bool is_effective_visible () const;
+
+  /**
    *  @brief "is_separator" attribute
    */
   bool is_separator () const;
@@ -203,6 +259,12 @@ public:
    *  @brief Show or hide
    */
   void set_visible (bool v);
+
+  /**
+   *  @brief Sets a value indicating whether the menu item is hidden
+   *  See "is_hidden" for details.
+   */
+  void set_hidden (bool h);
 
   /**
    *  @brief Make checkable or not
@@ -295,7 +357,18 @@ public slots:
   void triggered_slot ();
 
 private:
+  friend class AbstractMenu;
+
   ActionHandle *mp_handle;
+
+  /**
+   *  @brief The proxy constructor
+   *
+   *  This constructor takes a QAction object that it will refer to.
+   *  If the Action is copied, the copy will refer to the same QAction.
+   *  The QAction object is deleted if the last Action referring to QAction is deleted.
+   */
+  Action (ActionHandle *action);
 };
 
 /**
@@ -739,17 +812,6 @@ public:
   QMenu *detached_menu (const std::string &name);
 
   /**
-   *  @brief Create a action from a string 
-   *
-   *  The format of the string is: <text>["("shortcut")"]["<"icon-resource">"]
-   *
-   *  @param s The title, key and icon resource string in the format given above
-   *  @param parent The widget to which to attach the QAction object
-   *  @return The ActionHandle object created
-   */
-  static ActionHandle *create_action (const std::string &s);
-
-  /**
    *  @brief Creates a new exclusive action group
    *
    *  If a group with that name already exists, this method does nothing.
@@ -772,7 +834,9 @@ signals:
    */
   void changed ();
 
-private:  
+private:
+  friend class Action;
+
   std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator> > find_item (const std::string &path);
   const AbstractMenuItem *find_item_exact (const std::string &path) const;
   AbstractMenuItem *find_item_exact (const std::string &path);
@@ -781,6 +845,17 @@ private:
   void build (QToolBar *tbar, std::list<AbstractMenuItem> &items);
   void collect_group (std::vector<std::string> &grp, const std::string &name, const AbstractMenuItem &item) const;
   void reset_menu_objects (AbstractMenuItem &item);
+
+  /**
+   *  @brief Create a action from a string
+   *
+   *  The format of the string is: <text>["("shortcut")"]["<"icon-resource">"]
+   *
+   *  @param s The title, key and icon resource string in the format given above
+   *  @param parent The widget to which to attach the QAction object
+   *  @return The ActionHandle object created
+   */
+  static ActionHandle *create_action (const std::string &s);
 
   AbstractMenuProvider *mp_provider;
   AbstractMenuItem m_root;

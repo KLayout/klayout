@@ -202,21 +202,9 @@ MacroController::uninitialize (lay::PluginRoot * /*root*/)
 bool
 MacroController::configure (const std::string &key, const std::string &value)
 {
-  if (key == cfg_key_bindings && mp_mw) {
-
-    //  Update the shortcuts of the menu item if they have been edited in the configuration editor
-    std::vector<std::pair<std::string, std::string> > key_bindings = unpack_key_binding (value);
-    for (std::vector<std::pair<std::string, std::string> >::const_iterator kb = key_bindings.begin (); kb != key_bindings.end (); ++kb) {
-      if (mp_mw->menu ()->is_valid (kb->first)) {
-        lay::Action a = mp_mw->menu ()->action (kb->first);
-        if (m_action_to_macro.find (a.qaction ()) != m_action_to_macro.end ()) {
-          m_action_to_macro [a.qaction ()]->set_shortcut (kb->second);
-        }
-      }
-    }
-
+  if (key == cfg_key_bindings) {
+    m_key_bindings = unpack_key_binding (value);
   }
-
   return false;
 }
 
@@ -639,7 +627,7 @@ static std::string menu_name (std::set<std::string> &used_names, const std::stri
 }
 
 void
-MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std::set<std::string> &used_names, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings)
+MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std::set<std::string> &used_names, std::set<std::string> &groups, const lay::Technology *tech)
 {
   for (lym::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
 
@@ -655,7 +643,7 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std:
     }
 
     if (consider) {
-      add_macro_items_to_menu (*c->second, used_names, groups, 0 /*don't check 2nd level and below*/, key_bindings);
+      add_macro_items_to_menu (*c->second, used_names, groups, 0 /*don't check 2nd level and below*/);
     }
 
   }
@@ -686,7 +674,7 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std:
       } else {
         a.set_title (c->second->description ());
       }
-      a.set_shortcut (sc);
+      a.set_default_shortcut (sc);
       m_macro_actions.push_back (a);
       mp_mw->menu ()->insert_item (mp, menu_name (used_names, c->second->name ()), a);
 
@@ -694,11 +682,6 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std:
 
       lym::MacroSignalAdaptor *adaptor = new lym::MacroSignalAdaptor (a.qaction (), c->second);
       QObject::connect (a.qaction (), SIGNAL (triggered ()), adaptor, SLOT (run ()));
-
-      //  store the key bindings in the array
-      if (!sc.empty () && key_bindings) {
-        key_bindings->push_back (std::make_pair (mp, sc));
-      }
 
     } else if (! sc.empty ()) {
 
@@ -772,19 +755,6 @@ MacroController::do_update_menu_with_macros ()
     tech = lay::TechnologyController::instance ()->active_technology ();
   }
 
-  std::vector<std::pair<std::string, std::string> > key_bindings = unpack_key_binding (mp_mw->config_get (cfg_key_bindings));
-  std::sort (key_bindings.begin (), key_bindings.end ());
-
-  std::vector<std::pair<std::string, std::string> > new_key_bindings;
-  for (std::vector<std::pair<std::string, std::string> >::const_iterator kb = key_bindings.begin (); kb != key_bindings.end (); ++kb) {
-    if (mp_mw->menu ()->is_valid (kb->first)) {
-      lay::Action a = mp_mw->menu ()->action (kb->first);
-      if (m_action_to_macro.find (a.qaction ()) == m_action_to_macro.end ()) {
-        new_key_bindings.push_back (*kb);
-      }
-    }
-  }
-
   //  delete all existing items
   for (std::vector<lay::Action>::iterator a = m_macro_actions.begin (); a != m_macro_actions.end (); ++a) {
     mp_mw->menu ()->delete_items (*a);
@@ -794,13 +764,15 @@ MacroController::do_update_menu_with_macros ()
 
   std::set<std::string> groups;
   std::set<std::string> used_names;
-  add_macro_items_to_menu (m_temp_macros, used_names, groups, tech, 0);
-  add_macro_items_to_menu (lym::MacroCollection::root (), used_names, groups, tech, &new_key_bindings);
+  add_macro_items_to_menu (m_temp_macros, used_names, groups, tech);
+  add_macro_items_to_menu (lym::MacroCollection::root (), used_names, groups, tech);
 
-  //  update the key bindings if required
-  std::sort (new_key_bindings.begin (), new_key_bindings.end ());
-  if (new_key_bindings != key_bindings) {
-    mp_mw->config_set (cfg_key_bindings, pack_key_binding (new_key_bindings));
+  //  apply the custom keyboard shortcuts
+  for (std::vector<std::pair<std::string, std::string> >::const_iterator kb = m_key_bindings.begin (); kb != m_key_bindings.end (); ++kb) {
+    if (mp_mw->menu ()->is_valid (kb->first)) {
+      lay::Action a = mp_mw->menu ()->action (kb->first);
+      a.set_shortcut (kb->second);
+    }
   }
 }
 

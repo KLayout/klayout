@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>KeyBindingsConfigPage</class>
- <widget class="QFrame" name="KeyBindingsConfigPage" >
-  <property name="geometry" >
+ <widget class="QFrame" name="KeyBindingsConfigPage">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,78 +10,92 @@
     <height>495</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy>
-    <hsizetype>5</hsizetype>
-    <vsizetype>7</vsizetype>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>1</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Settings</string>
   </property>
-  <layout class="QHBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QHBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QTreeWidget" name="bindings_list" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>7</vsizetype>
+    <widget class="QTreeWidget" name="bindings_list">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="rootIsDecorated" >
+     <property name="rootIsDecorated">
       <bool>true</bool>
      </property>
      <column>
-      <property name="text" >
+      <property name="text">
        <string>Path</string>
       </property>
      </column>
      <column>
-      <property name="text" >
+      <property name="text">
        <string>Title</string>
       </property>
      </column>
      <column>
-      <property name="text" >
+      <property name="text">
        <string>Shortcut</string>
       </property>
      </column>
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="frame" >
-     <property name="frameShape" >
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" >
-      <property name="margin" >
+     <layout class="QVBoxLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
        <number>9</number>
       </property>
-      <property name="spacing" >
-       <number>6</number>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
       </property>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>40</height>
@@ -89,24 +104,24 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label" >
-        <property name="text" >
+       <widget class="QLabel" name="label">
+        <property name="text">
          <string>Keyboard Shortcut</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="binding_le" />
+       <widget class="lay::DecoratedLineEdit" name="binding_le"/>
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>10</height>
@@ -115,30 +130,30 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
+       <widget class="QLabel" name="label_2">
+        <property name="text">
          <string>Examples:
- - "Ctrl+A"
- - "Shift+F2"
- - "M"
+ - &quot;Ctrl+A&quot;
+ - &quot;Shift+F2&quot;
+ - &quot;M&quot;
 
 For special keys:
- - "PgUp"
- - "Left"
- - "Enter"
- - "Esc" or "Escape"
- - "Ins" or "Insert"
- - "Backspace"
+ - &quot;PgUp&quot;
+ - &quot;Left&quot;
+ - &quot;Enter&quot;
+ - &quot;Esc&quot; or &quot;Escape&quot;
+ - &quot;Ins&quot; or &quot;Insert&quot;
+ - &quot;Backspace&quot;
 </string>
         </property>
        </widget>
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>40</height>
@@ -147,8 +162,8 @@ For special keys:
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="reset_pb" >
-        <property name="text" >
+       <widget class="QPushButton" name="reset_pb">
+        <property name="text">
          <string>Reset To Default</string>
         </property>
        </widget>
@@ -158,7 +173,14 @@ For special keys:
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>lay::DecoratedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>layWidgets.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

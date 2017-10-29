@@ -239,7 +239,9 @@ public:
 ActionHandle::ActionHandle (QWidget *parent)
   : mp_action (new ActionObject (parent)), 
     m_ref_count (0),
-    m_owned (true)
+    m_owned (true),
+    m_visible (true),
+    m_hidden (false)
 { 
   if (! sp_actionHandles) {
     sp_actionHandles = new std::set<ActionHandle *> ();
@@ -253,7 +255,9 @@ ActionHandle::ActionHandle (QWidget *parent)
 ActionHandle::ActionHandle (QAction *action, bool owned)
   : mp_action (action), 
     m_ref_count (0), 
-    m_owned (owned)
+    m_owned (owned),
+    m_visible (true),
+    m_hidden (false)
 { 
   if (! sp_actionHandles) {
     sp_actionHandles = new std::set<ActionHandle *> ();
@@ -310,6 +314,89 @@ ActionHandle::destroyed (QObject * /*obj*/)
   m_owned = false;
 }
 
+void
+ActionHandle::set_visible (bool v)
+{
+  if (m_visible != v) {
+    m_visible = v;
+    if (mp_action) {
+      mp_action->setVisible (is_effective_visible ());
+    }
+  }
+}
+
+void
+ActionHandle::set_hidden (bool h)
+{
+  if (m_hidden != h) {
+    m_hidden = h;
+    if (mp_action) {
+      mp_action->setVisible (is_effective_visible ());
+    }
+  }
+}
+
+bool
+ActionHandle::is_visible () const
+{
+  return m_visible;
+}
+
+bool
+ActionHandle::is_hidden () const
+{
+  return m_hidden;
+}
+
+bool
+ActionHandle::is_effective_visible () const
+{
+  return m_visible && !m_hidden;
+}
+
+void
+ActionHandle::set_default_shortcut (const QKeySequence &sc)
+{
+  if (m_default_shortcut != sc) {
+    m_default_shortcut = sc;
+    if (mp_action) {
+      mp_action->setShortcut (get_effective_shortcut ());
+    }
+  }
+}
+
+void
+ActionHandle::set_shortcut (const QKeySequence &sc)
+{
+  if (m_shortcut != sc) {
+    m_shortcut = sc;
+    if (mp_action) {
+      mp_action->setShortcut (get_effective_shortcut ());
+    }
+  }
+}
+
+const QKeySequence &
+ActionHandle::get_default_shortcut () const
+{
+  return m_default_shortcut;
+}
+
+const QKeySequence &
+ActionHandle::get_shortcut () const
+{
+  return m_shortcut;
+}
+
+QKeySequence
+ActionHandle::get_effective_shortcut () const
+{
+  if (m_shortcut.isEmpty ()) {
+    return m_default_shortcut;
+  } else {
+    return m_shortcut;
+  }
+}
 
 // ---------------------------------------------------------------
 //  Action implementation
@@ -336,6 +423,12 @@ Action::Action (ActionHandle *handle)
   mp_handle = handle;
   gtf::action_connect (mp_handle->ptr (), SIGNAL (triggered ()), this, SLOT (triggered_slot ()));
   mp_handle->add_ref ();
+}
+
+Action
+Action::create_free_action (QWidget *parent)
+{
+  return Action (new ActionHandle (parent));
 }
 
 Action::Action (const Action &action)
@@ -422,24 +515,56 @@ Action::get_title () const
 void 
 Action::set_shortcut (const QKeySequence &s)
 {
-  if (qaction ()) {
-    qaction ()->setShortcut (s);
+  if (mp_handle) {
+    mp_handle->set_shortcut (s);
   }
 }
 
-void 
+void
+Action::set_default_shortcut (const QKeySequence &s)
+{
+  if (mp_handle) {
+    mp_handle->set_default_shortcut (s);
+  }
+}
+
+void
 Action::set_shortcut (const std::string &s)
 {
-  if (qaction () && s != get_shortcut ()) {
-    qaction ()->setShortcut (QKeySequence (tl::to_qstring (s)));
+  set_shortcut (QKeySequence (tl::to_qstring (s)));
+}
+
+void
+Action::set_default_shortcut (const std::string &s)
+{
+  set_default_shortcut (QKeySequence (tl::to_qstring (s)));
+}
+
+std::string
+Action::get_effective_shortcut () const
+{
+  if (mp_handle) {
+    return tl::to_string (mp_handle->get_effective_shortcut ().toString ());
+  } else {
+    return std::string ();
   }
 }
 
-std::string 
+std::string
 Action::get_shortcut () const
 {
-  if (qaction ()) {
-    return tl::to_string (qaction ()->shortcut ().toString ());
+  if (mp_handle) {
+    return tl::to_string (mp_handle->get_shortcut ().toString ());
+  } else {
+    return std::string ();
+  }
+}
+
+std::string
+Action::get_default_shortcut () const
+{
+  if (mp_handle) {
+    return tl::to_string (mp_handle->get_default_shortcut ().toString ());
   } else {
     return std::string ();
   }
@@ -478,7 +603,19 @@ Action::is_enabled () const
 bool
 Action::is_visible () const
 {
-  return qaction () && qaction ()->isVisible ();
+  return mp_handle && mp_handle->is_visible ();
+}
+
+bool
+Action::is_hidden () const
+{
+  return mp_handle && mp_handle->is_hidden ();
+}
+
+bool
+Action::is_effective_visible () const
+{
+  return mp_handle && mp_handle->is_effective_visible ();
 }
 
 bool
@@ -498,8 +635,16 @@ Action::set_enabled (bool b)
 void
 Action::set_visible (bool v)
 {
-  if (qaction ()) {
-    qaction ()->setVisible (v);
+  if (mp_handle) {
+    mp_handle->set_visible (v);
+  }
+}
+
+void
+Action::set_hidden (bool h)
+{
+  if (mp_handle) {
+    mp_handle->set_hidden (h);
   }
 }
 
@@ -705,7 +850,7 @@ AbstractMenu::create_action (const std::string &s)
   }
 
   if (! shortcut.empty ()) {
-    ah->ptr ()->setShortcut (QKeySequence (tl::to_qstring (shortcut)));
+    ah->set_default_shortcut (QKeySequence (tl::to_qstring (shortcut)));
   }
 
   return ah;
@@ -1036,7 +1181,7 @@ AbstractMenu::insert_menu (const std::string &p, const std::string &name, const 
 void 
 AbstractMenu::insert_menu (const std::string &path, const std::string &name, const std::string &title)
 {
-  insert_menu (path, name, Action (create_action (title)));
+  insert_menu (path, name, create_action (title));
 }
 
 void 
@@ -1324,7 +1469,7 @@ AbstractMenu::transfer (const MenuLayoutEntry *layout, AbstractMenuItem &item)
       a.set_title (title);
 
       if (! shortcut.empty ()) {
-        a.set_shortcut (QKeySequence (tl::to_qstring (shortcut)));
+        a.set_default_shortcut (shortcut);
       }
 
       if (! tool_tip.empty ()) {

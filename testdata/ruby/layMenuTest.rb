@@ -25,6 +25,70 @@ load("test_prologue.rb")
 
 class LAYMenuTest_TestClass < TestBase
 
+  def test_0
+
+    a = RBA::Action::new
+    b = a.dup
+
+    a.shortcut = "Shift+F1"
+
+    assert_equal(a.shortcut, "Shift+F1")
+    assert_equal(a.effective_shortcut, "Shift+F1")
+    assert_equal(b.shortcut, "Shift+F1")
+    assert_equal(b.effective_shortcut, "Shift+F1")
+
+    a.default_shortcut = "X"
+
+    assert_equal(a.default_shortcut, "X")
+    assert_equal(a.shortcut, "Shift+F1")
+    assert_equal(a.effective_shortcut, "Shift+F1")
+    assert_equal(b.default_shortcut, "X")
+    assert_equal(b.shortcut, "Shift+F1")
+    assert_equal(b.effective_shortcut, "Shift+F1")
+
+    a.shortcut = ""
+
+    assert_equal(a.default_shortcut, "X")
+    assert_equal(a.shortcut, "")
+    assert_equal(a.effective_shortcut, "X")
+    assert_equal(b.default_shortcut, "X")
+    assert_equal(b.shortcut, "")
+    assert_equal(b.effective_shortcut, "X")
+
+    assert_equal(a.is_visible?, true)
+
+    a.hidden = false
+    a.visible = false
+
+    assert_equal(a.is_visible?, false)
+    assert_equal(a.is_hidden?, false)
+    assert_equal(a.is_effective_visible?, false)
+    assert_equal(b.is_visible?, false)
+    assert_equal(b.is_hidden?, false)
+    assert_equal(b.is_effective_visible?, false)
+
+    a.hidden = false
+    a.visible = true
+
+    assert_equal(a.is_visible?, true)
+    assert_equal(a.is_hidden?, false)
+    assert_equal(a.is_effective_visible?, true)
+    assert_equal(b.is_visible?, true)
+    assert_equal(b.is_hidden?, false)
+    assert_equal(b.is_effective_visible?, true)
+
+    a.hidden = true
+    a.visible = true
+
+    assert_equal(a.is_visible?, true)
+    assert_equal(a.is_hidden?, true)
+    assert_equal(a.is_effective_visible?, false)
+    assert_equal(b.is_visible?, true)
+    assert_equal(b.is_hidden?, true)
+    assert_equal(b.is_effective_visible?, false)
+
+  end
+
   def test_1
 
     app = RBA::Application.instance

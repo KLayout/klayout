@@ -144,25 +144,47 @@ Class<lay::AbstractMenu> decl_AbstractMenu ("AbstractMenu",
   
 Class<lay::Action> decl_ActionBase ("ActionBase", 
   method ("title=", &lay::Action::set_title,
-    "@brief Set the title\n"
+    "@brief Sets the title\n"
     "@args title\n"
     "\n"
     "@param title The title string to set (just the title)\n"
   ) +
   method ("title", &lay::Action::get_title,
-    "@brief Get the title\n"
+    "@brief Gets the title\n"
     "\n"
     "@return The current title string\n"
   ) +
   method ("shortcut=", (void (lay::Action::*)(const std::string &)) &lay::Action::set_shortcut,
-    "@brief Set the keyboard shortcut\n"
+    "@brief Sets the keyboard shortcut\n"
     "@args shortcut\n"
     "\n"
     "@param shortcut The keyboard shortcut (i.e. \"Ctrl+C\")\n"
   ) +
   method ("shortcut", &lay::Action::get_shortcut,
-    "@brief Get the keyboard shortcut\n"
+    "@brief Gets the keyboard shortcut\n"
     "@return The keyboard shortcut as a string\n"
+  ) +
+  method ("default_shortcut=", (void (lay::Action::*)(const std::string &)) &lay::Action::set_default_shortcut,
+    "@brief Sets the default keyboard shortcut\n"
+    "@args shortcut\n"
+    "\n"
+    "The default shortcut is used, if \\shortcut is empty.\n"
+    "\n"
+    "This attribute has been introduced in version 0.25.\n"
+  ) +
+  method ("default_shortcut", &lay::Action::get_default_shortcut,
+    "@brief Gets the default keyboard shortcut\n"
+    "@return The default keyboard shortcut as a string\n"
+    "\n"
+    "This attribute has been introduced in version 0.25.\n"
+  ) +
+  method ("effective_shortcut", &lay::Action::get_effective_shortcut,
+    "@brief Gets the effective keyboard shortcut\n"
+    "@return The effective keyboard shortcut as a string\n"
+    "\n"
+    "The effective shortcut is the one that is taken. It's either \\shortcut or \\default_shortcut.\n"
+    "\n"
+    "This attribute has been introduced in version 0.25.\n"
   ) +
   method ("is_separator?", &lay::Action::is_separator,
     "@brief Gets a value indicating whether the item is a separator\n"
@@ -179,6 +201,19 @@ Class<lay::Action> decl_ActionBase ("ActionBase",
   ) +
   method ("is_visible?", &lay::Action::is_visible,
     "@brief Gets a value indicating whether the item is visible\n"
+    "The visibility combines with \\is_hidden?. To get the true visiblity, use \\is_effective_visible?."
+  ) +
+  method ("is_hidden?", &lay::Action::is_hidden,
+    "@brief Gets a value indicating whether the item is hidden\n"
+    "If an item is hidden, it's always hidden and \\is_visible? does not have an effect."
+    "\n"
+    "This attribute has been introduced in version 0.25.\n"
+  ) +
+  method ("is_effective_visible?", &lay::Action::is_effective_visible,
+    "@brief Gets a value indicating whether the item is really visible\n"
+    "This is the combined visibility from \\is_visible? and \\is_hidden?."
+    "\n"
+    "This attribute has been introduced in version 0.25.\n"
   ) +
   method ("separator=", &lay::Action::set_separator,
     "@brief Makes an item a separator or not\n"
@@ -204,6 +239,13 @@ Class<lay::Action> decl_ActionBase ("ActionBase",
     "@args visible \n"
     "\n"
     "@param visible true to make the item visible\n"
+  ) +
+  method ("hidden=", &lay::Action::set_hidden,
+    "@brief Sets a value that makes the item hidden always\n"
+    "@args hidden\n"
+    "See \\is_hidden? for details.\n"
+    "\n"
+    "This attribute has been introduced in version 0.25\n"
   ) +
   method ("checked=", &lay::Action::set_checked,
     "@brief Check or uncheck\n"

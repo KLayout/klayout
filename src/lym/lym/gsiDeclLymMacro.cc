@@ -427,6 +427,11 @@ Class<lym::Macro> decl_Macro ("Macro",
     "The path is the path where the macro is stored, starting with an abstract group identifier. "
     "The path is used to identify the macro in the debugger for example."
   ) + 
+  gsi::method ("name", &lym::Macro::name,
+    "@brief Gets the name of the macro\n"
+    "\n"
+    "This attribute has been added in version 0.25."
+  ) +
   gsi::method ("description", &lym::Macro::description,
     "@brief Gets the description text\n"
     "\n"

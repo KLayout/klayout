@@ -30,6 +30,7 @@
 #include "layApplication.h"
 #include "lymMacroInterpreter.h"
 #include "lymMacro.h"
+#include "gsiDecl.h"
 
 #include <QDir>
 #include <QUrl>
@@ -680,6 +681,18 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, int 
   }
 }
 
+lym::Macro *
+MacroController::macro_for_action (const lay::Action *action)
+{
+  if (action) {
+    std::map<QAction *, lym::Macro *>::const_iterator a2m = m_action_to_macro.find (action->qaction ());
+    if (a2m != m_action_to_macro.end ()) {
+      return a2m->second;
+    }
+  }
+  return 0;
+}
+
 void
 MacroController::sync_with_external_sources ()
 {
@@ -796,6 +809,23 @@ MacroController::instance ()
 
 //  The singleton instance of the macro controller
 static tl::RegisteredClass<lay::PluginDeclaration> macro_controller_decl (new lay::MacroController (), 120, "MacroController");
+
+static lym::Macro *macro_for_action (const lay::Action *action)
+{
+  return MacroController::instance () ? MacroController::instance ()->macro_for_action (action) : 0;
+}
+
+//  extend lay::Action with the ability to associate a macro with it
+static
+gsi::ClassExt<lay::Action> decl_ext_action (
+  gsi::method_ext ("macro", &macro_for_action,
+    "@brief Gets the macro associated with the action\n"
+    "If the action is associated with a macro, this method returns a reference to the \\Macro object. "
+    "Otherwise, this method returns nil.\n"
+    "\n"
+    "\nThis method has been added in version 0.25.\n"
+  )
+);
 
 }
 

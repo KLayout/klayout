@@ -43,6 +43,7 @@ namespace lay
 class MacroEditorDialog;
 class MainWindow;
 class Technology;
+class Action;
 
 /**
  *  @brief A controller for the macro environment
@@ -158,6 +159,11 @@ public:
    *  The MainWindow object will become owner of the macro object.
    */
   void add_temp_macro (lym::Macro *m);
+
+  /**
+   *  @brief Gets the macro associated with an Action or nil if there is none
+   */
+  lym::Macro *macro_for_action (const lay::Action *action);
 
   /**
    *  @brief Obtain the list of macro categories

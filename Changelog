@@ -1,5 +1,9 @@
-0.25            (2017-10-25):
-* Enhancement: The cell tree is longer collapsed on edits
+0.25            (2017-10-31):
+* Enhancement: Menu items can be disabled or enabled
+      now. The former "Key Bindings" configuration page
+      has been turned into "Menu Customization". Check 
+      boxes allow enabling or disabling of menu items.
+* Enhancement: The cell tree no longer is collapsed on edits
       or when the sorting order changes.
 * Enhancement: Using a special menu path, macros can be
       configured to appear in submenus now.

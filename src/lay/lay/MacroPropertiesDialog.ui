@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MacroPropertiesDialog</class>
- <widget class="QDialog" name="MacroPropertiesDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="MacroPropertiesDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,116 +10,141 @@
     <height>573</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Macro Properties</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QFrame" name="propertiesFrame" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>1</hsizetype>
-       <vsizetype>1</vsizetype>
+    <widget class="QFrame" name="propertiesFrame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape" >
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>0</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QVBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QFrame" name="frame_2" >
-        <property name="minimumSize" >
+       <widget class="QFrame" name="frame_2">
+        <property name="minimumSize">
          <size>
           <width>0</width>
           <height>0</height>
          </size>
         </property>
-        <property name="frameShape" >
+        <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="frameShadow" >
+        <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QGridLayout" >
-         <property name="margin" >
+        <layout class="QGridLayout">
+         <property name="leftMargin">
           <number>0</number>
          </property>
-         <property name="spacing" >
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <property name="spacing">
           <number>6</number>
          </property>
-         <item row="3" column="2" >
-          <widget class="QLabel" name="label_8" >
-           <property name="text" >
+         <item row="3" column="2">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
             <string>(leave empty if no version is specified)</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" colspan="2" >
-          <widget class="QLabel" name="interpreterLabel" >
-           <property name="font" >
+         <item row="0" column="1" colspan="2">
+          <widget class="QLabel" name="interpreterLabel">
+           <property name="font">
             <font>
              <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
-           <property name="text" >
+           <property name="text">
             <string/>
            </property>
           </widget>
          </item>
-         <item row="0" column="0" >
-          <widget class="QLabel" name="label_9" >
-           <property name="text" >
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
             <string>Interpreter</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0" >
-          <widget class="QLabel" name="label_6" >
-           <property name="text" >
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
             <string>Description</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1" colspan="2" >
-          <widget class="QLineEdit" name="description" />
+         <item row="2" column="1" colspan="2">
+          <widget class="QLineEdit" name="description"/>
          </item>
-         <item row="3" column="1" >
-          <widget class="QLineEdit" name="version" />
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="version"/>
          </item>
-         <item row="3" column="0" >
-          <widget class="QLabel" name="label" >
-           <property name="text" >
+         <item row="3" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
             <string>Version</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0" colspan="3" >
+         <item row="1" column="0" colspan="3">
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
-           <property name="sizeType" >
+           <property name="sizeType">
             <enum>QSizePolicy::Fixed</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
              <height>10</height>
@@ -130,71 +156,89 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox" >
-        <property name="title" >
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
          <string>Execution</string>
         </property>
-        <property name="flat" >
+        <property name="flat">
          <bool>true</bool>
         </property>
-        <layout class="QVBoxLayout" >
-         <property name="margin" >
-          <number>9</number>
-         </property>
-         <property name="spacing" >
+        <layout class="QVBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>9</number>
+         </property>
+         <property name="rightMargin">
+          <number>9</number>
+         </property>
+         <property name="bottomMargin">
+          <number>9</number>
+         </property>
          <item>
-          <widget class="QCheckBox" name="autorun" >
-           <property name="text" >
+          <widget class="QCheckBox" name="autorun">
+           <property name="text">
             <string>Run on startup</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="autorunEarly" >
-           <property name="text" >
+          <widget class="QCheckBox" name="autorunEarly">
+           <property name="text">
             <string>Run early on startup (before main window is created)</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="frame" >
-           <property name="minimumSize" >
+          <widget class="QFrame" name="frame">
+           <property name="minimumSize">
             <size>
              <width>0</width>
              <height>0</height>
             </size>
            </property>
-           <property name="frameShape" >
+           <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
            </property>
-           <property name="frameShadow" >
+           <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
-           <layout class="QGridLayout" >
-            <property name="margin" >
+           <layout class="QGridLayout">
+            <property name="leftMargin">
              <number>0</number>
             </property>
-            <property name="spacing" >
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="spacing">
              <number>6</number>
             </property>
-            <item row="0" column="0" >
-             <widget class="QLabel" name="label_10" >
-              <property name="text" >
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
                <string>Prolog</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="1" >
-             <widget class="QLineEdit" name="prolog" />
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="prolog"/>
             </item>
-            <item row="1" column="1" >
-             <widget class="QLineEdit" name="epilog" />
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="epilog"/>
             </item>
-            <item row="1" column="0" >
-             <widget class="QLabel" name="label_7" >
-              <property name="text" >
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_7">
+              <property name="text">
                <string>Epilog</string>
               </property>
              </widget>
@@ -206,70 +250,88 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_2" >
-        <property name="title" >
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
          <string>User interface binding</string>
         </property>
-        <property name="flat" >
+        <property name="flat">
          <bool>true</bool>
         </property>
-        <layout class="QGridLayout" >
-         <property name="margin" >
+        <layout class="QGridLayout">
+         <property name="leftMargin">
           <number>9</number>
          </property>
-         <property name="spacing" >
+         <property name="topMargin">
+          <number>9</number>
+         </property>
+         <property name="rightMargin">
+          <number>9</number>
+         </property>
+         <property name="bottomMargin">
+          <number>9</number>
+         </property>
+         <property name="spacing">
           <number>6</number>
          </property>
-         <item row="2" column="1" >
-          <widget class="QLineEdit" name="shortcut" />
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="shortcut"/>
          </item>
-         <item row="1" column="0" colspan="2" >
-          <widget class="QGroupBox" name="showmenu" >
-           <property name="minimumSize" >
+         <item row="1" column="0" colspan="2">
+          <widget class="QGroupBox" name="showmenu">
+           <property name="minimumSize">
             <size>
              <width>0</width>
              <height>0</height>
             </size>
            </property>
-           <property name="title" >
-            <string>Show in menu</string>
+           <property name="title">
+            <string>Show in &amp;menu</string>
            </property>
-           <property name="checkable" >
+           <property name="checkable">
             <bool>true</bool>
            </property>
-           <layout class="QGridLayout" >
-            <property name="margin" >
+           <layout class="QGridLayout">
+            <property name="leftMargin">
              <number>9</number>
             </property>
-            <property name="spacing" >
+            <property name="topMargin">
+             <number>9</number>
+            </property>
+            <property name="rightMargin">
+             <number>9</number>
+            </property>
+            <property name="bottomMargin">
+             <number>9</number>
+            </property>
+            <property name="spacing">
              <number>6</number>
             </property>
-            <item row="2" column="0" >
-             <widget class="QLabel" name="label_4" >
-              <property name="text" >
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
                <string>Group name</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="0" >
-             <widget class="QLabel" name="label_3" >
-              <property name="text" >
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
                <string>Menu path</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="1" >
-             <widget class="QLineEdit" name="groupName" />
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="groupName"/>
             </item>
-            <item row="0" column="1" >
-             <widget class="QLineEdit" name="menuPath" />
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="menuPath"/>
             </item>
-            <item row="3" column="1" >
-             <widget class="QLabel" name="helpLabel" >
-              <property name="text" >
-               <string>&lt;html>Leave empty to show the macro in "Tools/Macros".&lt;br/>&lt;a href="int:/about/macro_in_menu.xml">Read more about menu paths and groups&lt;/a>&lt;/p>&lt;/html></string>
+            <item row="3" column="1">
+             <widget class="QLabel" name="helpLabel">
+              <property name="text">
+               <string>&lt;html&gt;Leave empty to show the macro in &quot;Tools/Macros&quot;.&lt;br/&gt;&lt;a href=&quot;int:/about/macro_in_menu.xml&quot;&gt;Read more about menu paths and groups&lt;/a&gt;&lt;/p&gt;&lt;/html&gt;</string>
               </property>
-              <property name="wordWrap" >
+              <property name="wordWrap">
                <bool>true</bool>
               </property>
              </widget>
@@ -277,16 +339,16 @@
            </layout>
           </widget>
          </item>
-         <item row="2" column="0" >
-          <widget class="QLabel" name="label_2" >
-           <property name="text" >
-            <string>Keyboard shortcut</string>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Default keyboard shortcut</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1" >
-          <widget class="QLabel" name="label_5" >
-           <property name="text" >
+         <item row="3" column="1">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
             <string>Leave empty for none</string>
            </property>
           </widget>
@@ -296,10 +358,10 @@
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>0</width>
           <height>0</height>
@@ -311,19 +373,19 @@
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line" >
-     <property name="orientation" >
+    <widget class="Line" name="line">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="orientation" >
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -349,11 +411,11 @@
    <receiver>MacroPropertiesDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -365,11 +427,11 @@
    <receiver>MacroPropertiesDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

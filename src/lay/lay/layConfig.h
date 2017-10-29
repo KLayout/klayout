@@ -38,10 +38,11 @@ static const std::string cfg_default_grids ("default-grids");
 static const std::string cfg_circle_points ("circle-points");
 static const std::string cfg_synchronized_views ("synchronized-views");
 static const std::string cfg_edit_mode ("edit-mode");
-static const std::string cfg_custom_macro_paths ("custom-macro-paths"); // new key for 0.22
+static const std::string cfg_custom_macro_paths ("custom-macro-paths");
 static const std::string cfg_mru ("mru");
-static const std::string cfg_technologies ("technology-data"); // new key for 0.22
+static const std::string cfg_technologies ("technology-data");
 static const std::string cfg_key_bindings ("key-bindings");
+static const std::string cfg_menu_items_hidden ("menu-items-hidden");
 static const std::string cfg_show_toolbar ("show-toolbar");
 static const std::string cfg_show_navigator ("show-navigator");
 static const std::string cfg_navigator_all_hier_levels ("navigator-show-all-hier-levels");

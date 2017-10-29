@@ -39,7 +39,7 @@ namespace Ui {
   class MainConfigPage5;
   class MainConfigPage6;
   class MainConfigPage7;
-  class KeyBindingsConfigPage;
+  class CustomizeMenuConfigPage;
 }
 
 class QTreeWidgetItem;
@@ -57,6 +57,17 @@ std::vector<std::pair<std::string, std::string> > unpack_key_binding (const std:
  *  @brief A utility function to convert the key binding (as path/shortcut pair vector) to a packed string for cfg_key_bindings
  */
 std::string pack_key_binding (const std::vector<std::pair<std::string, std::string> > &unpacked);
+
+/**
+ *  @brief A utility function to convert the packed hidden flags in the cfg_menu_items_hidden string to a vector
+ */
+std::vector<std::pair<std::string, bool> > unpack_menu_items_hidden (const std::string &packed);
+
+/**
+ *  @brief A utility function to convert the hidde flags (as path/bool pair vector) to a packed string for cfg_menu_items_hidden
+ */
+std::string pack_menu_items_hidden (const std::vector<std::pair<std::string, bool> > &unpacked);
+
 
 class ColorButton;
 
@@ -172,31 +183,33 @@ private:
   Ui::MainConfigPage7 *mp_ui;
 };
 
-class KeyBindingsConfigPage
+class CustomizeMenuConfigPage
   : public lay::ConfigPage
 {
 Q_OBJECT
 
 public:
-  KeyBindingsConfigPage (QWidget *parent);
-  ~KeyBindingsConfigPage ();
+  CustomizeMenuConfigPage (QWidget *parent);
+  ~CustomizeMenuConfigPage ();
 
   virtual void setup (lay::PluginRoot *root);
   virtual void commit (lay::PluginRoot *root);
 
 private slots:
   void current_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous);
+  void item_changed (QTreeWidgetItem *, int);
   void text_changed ();
   void reset_clicked ();
 
 private:
-  Ui::KeyBindingsConfigPage *mp_ui;
+  Ui::CustomizeMenuConfigPage *mp_ui;
   std::map<std::string, std::string> m_current_bindings;
+  std::map<std::string, bool> m_hidden_flags;
   std::map<std::string, QTreeWidgetItem *> m_item_for_path;
   std::map<QAction *, std::vector<std::string> > m_paths_for_action;
   bool m_enable_event;
 
-  void apply (const std::vector<std::pair<std::string, std::string> > &bindings);
+  void apply (const std::vector<std::pair<std::string, std::string> > &bindings, const std::vector<std::pair<std::__cxx11::string, bool> > &menu_items_hidden);
   void update_list_item (QTreeWidgetItem *item);
 };
 

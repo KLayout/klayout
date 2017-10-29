@@ -66,7 +66,6 @@ FORMS = \
     DeleteModeDialog.ui \
     FillDialog.ui \
     HelpAboutDialog.ui \
-    KeyBindingsConfigPage.ui \
     LayoutStatistics.ui \
     LogViewerDialog.ui \
     MacroEditorDialog.ui \
@@ -106,7 +105,8 @@ FORMS = \
     SaltManagerDialog.ui \
     SaltGrainPropertiesDialog.ui \
     SaltGrainTemplateSelectionDialog.ui \
-    SaltManagerInstallConfirmationDialog.ui
+    SaltManagerInstallConfirmationDialog.ui \
+    CustomizeMenuConfigPage.ui
 
 SOURCES = \
     gsiDeclLayApplication.cc \

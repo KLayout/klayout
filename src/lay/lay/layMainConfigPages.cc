@@ -34,7 +34,7 @@
 #include "ui_MainConfigPage5.h"
 #include "ui_MainConfigPage6.h"
 #include "ui_MainConfigPage7.h"
-#include "ui_KeyBindingsConfigPage.h"
+#include "ui_CustomizeMenuConfigPage.h"
 
 #include <QMessageBox>
 
@@ -73,6 +73,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_window_state, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_window_geometry, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_key_bindings, ""));
+    options.push_back (std::pair<std::string, std::string> (cfg_menu_items_hidden, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_tip_window_hidden, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_micron_digits, "5"));
     options.push_back (std::pair<std::string, std::string> (cfg_dbu_digits, "2"));
@@ -86,7 +87,7 @@ public:
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Editing Mode")), new MainConfigPage4 (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Grid")), new MainConfigPage (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Default Grids")), new MainConfigPage3 (parent)));
-    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Key Bindings")), new KeyBindingsConfigPage (parent)));
+    pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Customize Menu")), new CustomizeMenuConfigPage (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Units")), new MainConfigPage5 (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Application|Circles")), new MainConfigPage6 (parent)));
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Display|Synchronized Views")), new MainConfigPage2 (parent)));
@@ -360,12 +361,48 @@ pack_key_binding (const std::vector<std::pair<std::string, std::string> > &unpac
   return packed;
 }
 
-KeyBindingsConfigPage::KeyBindingsConfigPage (QWidget *parent)
+std::vector<std::pair<std::string, bool> >
+unpack_menu_items_hidden (const std::string &packed)
+{
+  tl::Extractor ex (packed.c_str ());
+
+  std::vector<std::pair<std::string, bool> > hidden;
+
+  while (! ex.at_end ()) {
+    ex.test(";");
+    hidden.push_back (std::make_pair (std::string (), false));
+    ex.read_word_or_quoted (hidden.back ().first);
+    ex.test(":");
+    ex.read (hidden.back ().second);
+  }
+
+  return hidden;
+}
+
+std::string
+pack_menu_items_hidden (const std::vector<std::pair<std::string, bool> > &unpacked)
+{
+  std::string packed;
+
+  for (std::vector<std::pair<std::string, bool> >::const_iterator p = unpacked.begin (); p != unpacked.end (); ++p) {
+    if (! packed.empty ()) {
+      packed += ";";
+    }
+    packed += tl::to_word_or_quoted_string (p->first);
+    packed += ":";
+    packed += tl::to_string (p->second);
+  }
+
+  return packed;
+}
+
+CustomizeMenuConfigPage::CustomizeMenuConfigPage (QWidget *parent)
   : lay::ConfigPage (parent), m_enable_event (true)
 {
-  mp_ui = new Ui::KeyBindingsConfigPage ();
+  mp_ui = new Ui::CustomizeMenuConfigPage ();
   mp_ui->setupUi (this);
-  connect (mp_ui->bindings_list, SIGNAL (currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT (current_changed (QTreeWidgetItem *, QTreeWidgetItem *)));
+  connect (mp_ui->bindings_list, SIGNAL (currentItemChanged (QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT (current_changed (QTreeWidgetItem *, QTreeWidgetItem *)));
+  connect (mp_ui->bindings_list, SIGNAL (itemChanged (QTreeWidgetItem *, int)), this, SLOT (item_changed (QTreeWidgetItem *, int)));
   connect (mp_ui->reset_pb, SIGNAL (clicked ()), this, SLOT (reset_clicked ()));
 
   mp_ui->binding_le->setEnabled (false);
@@ -373,20 +410,25 @@ KeyBindingsConfigPage::KeyBindingsConfigPage (QWidget *parent)
   connect (mp_ui->binding_le, SIGNAL (textChanged (QString)), this, SLOT (text_changed ()));
 }
 
-KeyBindingsConfigPage::~KeyBindingsConfigPage ()
+CustomizeMenuConfigPage::~CustomizeMenuConfigPage ()
 {
   delete mp_ui;
   mp_ui = 0;
 }
 
-static void fill_paths (const lay::AbstractMenu &menu, const std::string &root, std::map<std::string, std::string> &bindings, bool with_defaults)
+static void get_shortcuts (const lay::AbstractMenu &menu, const std::string &root, std::map<std::string, std::string> &bindings, bool with_defaults)
 {
   std::vector<std::string> items = menu.items (root);
   for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
     if (i->size () > 0) {
       if (menu.is_valid (*i) && menu.action (*i).is_visible ()) {
         if (menu.is_menu (*i)) {
-          fill_paths (menu, *i, bindings, with_defaults);
+          //  a menu must be listed (so it can be hidden), but does not have a shortcut
+          //  but we don't include special menus
+          if (i->at (0) != '@') {
+            bindings.insert (std::make_pair (*i, std::string ()));
+          }
+          get_shortcuts (menu, *i, bindings, with_defaults);
         } else if (! menu.is_separator (*i)) {
           bindings.insert (std::make_pair (*i, with_defaults ? menu.action (*i).get_default_shortcut () : menu.action (*i).get_shortcut ()));
         }
@@ -395,8 +437,8 @@ static void fill_paths (const lay::AbstractMenu &menu, const std::string &root, 
   }
 }
 
-void 
-KeyBindingsConfigPage::reset_clicked ()
+void
+CustomizeMenuConfigPage::reset_clicked ()
 {
   if (QMessageBox::question (this, 
 
@@ -405,13 +447,13 @@ KeyBindingsConfigPage::reset_clicked ()
     QMessageBox::Yes | QMessageBox::No,
     QMessageBox::No) == QMessageBox::Yes) { 
 
-    apply (std::vector<std::pair<std::string, std::string> > ());
+    apply (std::vector<std::pair<std::string, std::string> > (), std::vector<std::pair<std::string, bool> > ());
 
   }
 }
 
 void 
-KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::string> > &key_bindings)
+CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::string> > &key_bindings, const std::vector<std::pair<std::string, bool> > &hidden)
 {
   //  build the path to item table and the alias table
   m_item_for_path.clear ();
@@ -419,11 +461,11 @@ KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::stri
 
   //  get the current bindings
   m_current_bindings.clear ();
-  fill_paths (*lay::MainWindow::instance ()->menu (), std::string (), m_current_bindings, false);
+  get_shortcuts (*lay::MainWindow::instance ()->menu (), std::string (), m_current_bindings, false);
 
   //  get the default bindings
   std::map<std::string, std::string> default_bindings;
-  fill_paths (*lay::MainWindow::instance ()->menu (), std::string (), default_bindings, true);
+  get_shortcuts (*lay::MainWindow::instance ()->menu (), std::string (), default_bindings, true);
 
   m_enable_event = false;
 
@@ -437,6 +479,15 @@ KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::stri
     } else {
       kb->second.clear ();
     }
+  }
+
+  //  clear hidden flags and initialize with the given ones
+  std::map<std::string, bool> h;
+  h.insert (hidden.begin (), hidden.end ());
+  m_hidden_flags.clear ();
+  for (std::map<std::string, std::string>::iterator kb = m_current_bindings.begin (); kb != m_current_bindings.end (); ++kb) {
+    std::map<std::string, bool>::iterator hh = h.find (kb->first);
+    m_hidden_flags.insert (std::make_pair (kb->first, hh != h.end () && hh->second));
   }
 
   //  extract the top level menues
@@ -454,6 +505,8 @@ KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::stri
     top_level_item->setData (0, Qt::DisplayRole, tl::to_qstring (t->second));
 
     for (std::map<std::string, std::string>::const_iterator cb = m_current_bindings.begin (); cb != m_current_bindings.end (); ++cb) {
+
+      bool hidden = m_hidden_flags[cb->first];
 
       std::map<std::string, std::string>::const_iterator db = default_bindings.find (cb->first);
       bool is_default = false;
@@ -484,6 +537,8 @@ KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::stri
         item->setData (2, Qt::DisplayRole, tl::to_qstring (sc));
         item->setData (2, Qt::ForegroundRole, palette ().color (is_default ? QPalette::Disabled : QPalette::Normal, QPalette::Text));
         item->setData (0, Qt::UserRole, tl::to_qstring (path));
+        item->setFlags (item->flags () | Qt::ItemIsUserCheckable);
+        item->setCheckState (0, hidden ? Qt::Unchecked : Qt::Checked);
         m_item_for_path[path] = item;
         if (action.qaction ()) {
           m_paths_for_action[action.qaction ()].push_back (path);
@@ -503,22 +558,26 @@ KeyBindingsConfigPage::apply (const std::vector<std::pair<std::string, std::stri
 }
 
 void 
-KeyBindingsConfigPage::setup (lay::PluginRoot *root)
+CustomizeMenuConfigPage::setup (lay::PluginRoot *root)
 {
   std::string packed_key_bindings;
   root->config_get (cfg_key_bindings, packed_key_bindings);
   std::vector<std::pair<std::string, std::string> > key_bindings = unpack_key_binding (packed_key_bindings);
 
-  apply (key_bindings);
+  std::string packed_menu_items_hidden;
+  root->config_get (cfg_menu_items_hidden, packed_menu_items_hidden);
+  std::vector<std::pair<std::string, bool> > menu_items_hidden = unpack_menu_items_hidden (packed_menu_items_hidden);
+
+  apply (key_bindings, menu_items_hidden);
 }
 
 void 
-KeyBindingsConfigPage::commit (lay::PluginRoot *root)
+CustomizeMenuConfigPage::commit (lay::PluginRoot *root)
 {
   current_changed (0, mp_ui->bindings_list->currentItem ());
 
-  //  Because the available key bindings change in edit and viewer mode, we always extend the key bindings but never 
-  //  reduce them.
+  //  Because the available menu items change in edit and viewer mode, we always extend the key bindings/hidden flags
+  //  but never reduce them.
 
   std::string packed_key_bindings;
   root->config_get (cfg_key_bindings, packed_key_bindings);
@@ -538,10 +597,29 @@ KeyBindingsConfigPage::commit (lay::PluginRoot *root)
 
   packed_key_bindings = pack_key_binding (key_bindings);
   root->config_set (cfg_key_bindings, packed_key_bindings);
+
+  std::string packed_hidden_flags;
+  root->config_get (cfg_menu_items_hidden, packed_hidden_flags);
+  std::vector<std::pair<std::string, bool> > hidden = unpack_menu_items_hidden (packed_hidden_flags);
+
+  for (std::vector<std::pair<std::string, bool> >::iterator hf = hidden.begin (); hf != hidden.end (); ++hf) {
+    std::map<std::string, bool>::iterator h = m_hidden_flags.find (hf->first);
+    if (h != m_hidden_flags.end ()) {
+      hf->second = h->second;
+      m_hidden_flags.erase (h);
+    }
+  }
+
+  for (std::map<std::string, bool>::const_iterator hf = m_hidden_flags.begin (); hf != m_hidden_flags.end (); ++hf) {
+    hidden.push_back (*hf);
+  }
+
+  packed_hidden_flags = pack_menu_items_hidden (hidden);
+  root->config_set (cfg_menu_items_hidden, packed_hidden_flags);
 }
 
 void
-KeyBindingsConfigPage::text_changed ()
+CustomizeMenuConfigPage::text_changed ()
 {
   if (m_enable_event) {
     update_list_item (mp_ui->bindings_list->currentItem ());
@@ -549,7 +627,7 @@ KeyBindingsConfigPage::text_changed ()
 }
 
 void
-KeyBindingsConfigPage::update_list_item (QTreeWidgetItem *item)
+CustomizeMenuConfigPage::update_list_item (QTreeWidgetItem *item)
 {
   if (! item || ! mp_ui->binding_le->isEnabled ()) {
     return;
@@ -588,33 +666,60 @@ KeyBindingsConfigPage::update_list_item (QTreeWidgetItem *item)
   }
 }
 
-void 
-KeyBindingsConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous)
+void
+CustomizeMenuConfigPage::item_changed (QTreeWidgetItem *current, int)
 {
   if (! m_enable_event) {
     return;
   }
 
-  update_list_item (previous);
+  //  handles check state changes
+  if (current && !current->data (0, Qt::UserRole).isNull ()) {
+    std::string path = tl::to_string (current->data (0, Qt::UserRole).toString ());
+    m_hidden_flags[path] = (current->checkState (0) != Qt::Checked);
+  }
+}
+
+void 
+CustomizeMenuConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous)
+{
+  if (! m_enable_event) {
+    return;
+  }
 
   m_enable_event = false;
+
+  update_list_item (previous);
 
   if (current && !current->data (0, Qt::UserRole).isNull ()) {
 
     std::string path = tl::to_string (current->data (0, Qt::UserRole).toString ());
-    std::string shortcut = m_current_bindings[path];
+    if (lay::MainWindow::instance ()->menu ()->is_menu (path)) {
 
-    lay::Action a = lay::MainWindow::instance ()->menu ()->action (path);
-    std::string def_shortcut = a.get_default_shortcut ();
+      mp_ui->binding_le->setText (QString ());
+      mp_ui->binding_le->setPlaceholderText (QString ());
+      mp_ui->binding_le->setEnabled (false);
 
-    mp_ui->binding_le->setText (tl::to_qstring (shortcut));
-    mp_ui->binding_le->setPlaceholderText (tl::to_qstring (def_shortcut));
-    mp_ui->binding_le->setEnabled (true);
+    } else {
+
+      std::string shortcut = m_current_bindings[path];
+
+      lay::Action a = lay::MainWindow::instance ()->menu ()->action (path);
+
+      std::string def_shortcut = a.get_default_shortcut ();
+
+      mp_ui->binding_le->setText (tl::to_qstring (shortcut));
+      mp_ui->binding_le->setPlaceholderText (tl::to_qstring (def_shortcut));
+      mp_ui->binding_le->setEnabled (true);
+
+    }
 
   } else {
+
     mp_ui->binding_le->setText (QString ());
     mp_ui->binding_le->setPlaceholderText (QString ());
     mp_ui->binding_le->setEnabled (false);
+
   }
 
   m_enable_event = true;

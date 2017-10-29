@@ -321,6 +321,7 @@ ActionHandle::set_visible (bool v)
     m_visible = v;
     if (mp_action) {
       mp_action->setVisible (is_effective_visible ());
+      mp_action->setShortcut (get_effective_shortcut ());
     }
   }
 }
@@ -332,6 +333,7 @@ ActionHandle::set_hidden (bool h)
     m_hidden = h;
     if (mp_action) {
       mp_action->setVisible (is_effective_visible ());
+      mp_action->setShortcut (get_effective_shortcut ());
     }
   }
 }
@@ -391,7 +393,10 @@ ActionHandle::get_shortcut () const
 QKeySequence
 ActionHandle::get_effective_shortcut () const
 {
-  if (m_shortcut.isEmpty ()) {
+  if (m_hidden) {
+    //  A hidden menu item does not have a key sequence too.
+    return QKeySequence ();
+  } else if (m_shortcut.isEmpty ()) {
     return m_default_shortcut;
   } else {
     return m_shortcut;

@@ -1729,6 +1729,12 @@ MainWindow::configure (const std::string &name, const std::string &value)
     apply_key_bindings ();
     return true;
 
+  } else if (name == cfg_menu_items_hidden) {
+
+    std::vector<std::pair<std::string, bool> > hidden = unpack_menu_items_hidden (value);
+    apply_hidden (hidden);
+    return true;
+
   } else if (name == cfg_background_color) {
 
     if (mp_navigator) {
@@ -1749,6 +1755,17 @@ MainWindow::configure (const std::string &name, const std::string &value)
     return false;
   }
 
+}
+
+void
+MainWindow::apply_hidden (const std::vector<std::pair<std::string, bool> > &hidden)
+{
+  for (std::vector<std::pair<std::string, bool> >::const_iterator hf = hidden.begin (); hf != hidden.end (); ++hf) {
+    if (menu ()->is_valid (hf->first)) {
+      lay::Action a = menu ()->action (hf->first);
+      a.set_hidden (hf->second);
+    }
+  }
 }
 
 void

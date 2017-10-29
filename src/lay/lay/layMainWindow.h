@@ -978,6 +978,7 @@ private:
 
   void libraries_changed ();
   void apply_key_bindings ();
+  void apply_hidden (const std::vector<std::pair <std::string, bool> > &hidden);
 };
 
 }

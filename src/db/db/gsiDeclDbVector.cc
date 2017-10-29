@@ -230,11 +230,13 @@ struct vector_defs
       "\n"
       "@return 1 if the scalar product is positive, 0 if it is zero and -1 if it is negative.\n"
     ) +
-    method ("length", (double (C::*) () const) &C::double_length,
+    method ("length|abs", (double (C::*) () const) &C::double_length,
       "@brief Returns the length of the vector\n"
+      "'abs' is an alias provided for compatibility with the former point type."
     ) +
-    method ("sq_length", (double (C::*) () const) &C::sq_double_length,
+    method ("sq_length|sq_abs", (double (C::*) () const) &C::sq_double_length,
       "@brief The square length of the vector\n"
+      "'sq_abs' is an alias provided for compatibility with the former point type."
     ) +
     constructor ("from_s", &from_string,
       "@brief Creates an object from a string\n"

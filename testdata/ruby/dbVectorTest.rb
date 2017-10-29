@@ -50,6 +50,9 @@ class DBVector_TestClass < TestBase
     assert_equal( a.y.to_s, "-17.0" )
 
     assert_equal( (a.length - Math::sqrt(17 * 17 + 1 * 1)).abs < 1e-12, true )
+    assert_equal( (a.sq_length - (17 * 17 + 1 * 1)).abs < 1e-12, true )
+    assert_equal( (a.abs - Math::sqrt(17 * 17 + 1 * 1)).abs < 1e-12, true )
+    assert_equal( (a.sq_abs - (17 * 17 + 1 * 1)).abs < 1e-12, true )
 
     b.x = a.x
     b.y = a.y
@@ -101,6 +104,9 @@ class DBVector_TestClass < TestBase
     assert_equal( a.y.to_s, "-17" )
 
     assert_equal( (a.length - Math::sqrt(17 * 17 + 1 * 1)).abs < 1e-12, true )
+    assert_equal( (a.sq_length - (17 * 17 + 1 * 1)).abs < 1e-12, true )
+    assert_equal( (a.abs - Math::sqrt(17 * 17 + 1 * 1)).abs < 1e-12, true )
+    assert_equal( (a.sq_abs - (17 * 17 + 1 * 1)).abs < 1e-12, true )
 
     b.x = a.x
     b.y = a.y

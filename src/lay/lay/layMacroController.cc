@@ -596,8 +596,50 @@ MacroController::add_temp_macro (lym::Macro *m)
   m_temp_macros.add_unspecific (m);
 }
 
+static std::string menu_name (std::set<std::string> &used_names, const std::string &org_name)
+{
+  std::string name;
+
+  if (org_name.empty ()) {
+
+    for (int i = 1; true; ++i) {
+      name = "macro_in_menu_" + tl::to_string (i);
+      if (used_names.find (name) == used_names.end ()) {
+        break;
+      }
+    }
+
+  } else {
+
+    //  replace special characters with "_" (specifically ".")
+    std::string good_name = "macro_in_menu_";
+    for (const char *cp = org_name.c_str (); *cp; ++cp) {
+      if (isalnum (*cp) || *cp == '_') {
+        good_name += *cp;
+      } else {
+        good_name += "_";
+      }
+    }
+
+    if (used_names.find (good_name) == used_names.end ()) {
+      name = good_name;
+    } else {
+      for (int i = 1; true; ++i) {
+        name = good_name + "_" + tl::to_string (i);
+        if (used_names.find (name) == used_names.end ()) {
+          break;
+        }
+      }
+    }
+
+  }
+
+  used_names.insert (name);
+  return name;
+}
+
 void
-MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, int &n, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings)
+MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std::set<std::string> &used_names, std::set<std::string> &groups, const lay::Technology *tech, std::vector<std::pair<std::string, std::string> > *key_bindings)
 {
   for (lym::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
 
@@ -613,7 +655,7 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, int 
     }
 
     if (consider) {
-      add_macro_items_to_menu (*c->second, n, groups, 0 /*don't check 2nd level and below*/, key_bindings);
+      add_macro_items_to_menu (*c->second, used_names, groups, 0 /*don't check 2nd level and below*/, key_bindings);
     }
 
   }
@@ -635,7 +677,7 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, int 
         lay::Action as;
         as.set_separator (true);
         m_macro_actions.push_back (as);
-        mp_mw->menu ()->insert_item (mp, "macro_in_menu_" + tl::to_string (n++), as);
+        mp_mw->menu ()->insert_item (mp, menu_name (used_names, std::string ()), as);
       }
 
       lay::Action a;
@@ -646,7 +688,7 @@ MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, int 
       }
       a.set_shortcut (sc);
       m_macro_actions.push_back (a);
-      mp_mw->menu ()->insert_item (mp, "macro_in_menu_" + tl::to_string (n++), a);
+      mp_mw->menu ()->insert_item (mp, menu_name (used_names, c->second->name ()), a);
 
       m_action_to_macro.insert (std::make_pair (a.qaction (), c->second));
 
@@ -750,10 +792,10 @@ MacroController::do_update_menu_with_macros ()
   m_macro_actions.clear ();
   m_action_to_macro.clear ();
 
-  int n = 1;
   std::set<std::string> groups;
-  add_macro_items_to_menu (m_temp_macros, n, groups, tech, 0);
-  add_macro_items_to_menu (lym::MacroCollection::root (), n, groups, tech, &new_key_bindings);
+  std::set<std::string> used_names;
+  add_macro_items_to_menu (m_temp_macros, used_names, groups, tech, 0);
+  add_macro_items_to_menu (lym::MacroCollection::root (), used_names, groups, tech, &new_key_bindings);
 
   //  update the key bindings if required
   std::sort (new_key_bindings.begin (), new_key_bindings.end ());

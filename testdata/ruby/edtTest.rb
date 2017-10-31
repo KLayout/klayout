@@ -158,6 +158,11 @@ class EDT_TestClass < TestBase
     lv.each_object_selected { |o| sel << o }
     assert_equal(sel.size, 1)
     assert_equal(sel[0] == p2, true)
+    assert_equal(sel[0].layout.object_id, ly.object_id)
+    assert_equal(sel[0].trans.to_s, "r0 *1 10,20")
+    assert_equal(sel[0].dtrans.to_s, "r0 *1 0.01,0.02")
+    assert_equal(sel[0].source_trans.to_s, "r0 *1 10,20")
+    assert_equal(sel[0].source_dtrans.to_s, "r0 *1 0.01,0.02")
 
     # without a mouse pointer we can't test more than this:
     assert_equal(lv.has_transient_object_selection?, false)

@@ -740,6 +740,11 @@ Class<lay::LayoutView> decl_LayoutView ("LayoutView",
   gsi::method ("zoom_fit", &lay::LayoutView::zoom_fit,
     "@brief Fits the contents of the current view into the window"
   ) +
+  gsi::method ("zoom_fit_sel", &lay::LayoutView::zoom_fit_sel,
+    "@brief Fits the contents of the current selection into the window\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
   gsi::method ("zoom_box", &lay::LayoutView::zoom_box,
     "@brief Sets the viewport to the given box\n"
     "\n"

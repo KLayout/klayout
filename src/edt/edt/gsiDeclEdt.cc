@@ -53,7 +53,48 @@ static const db::InstElement &path_nth (const lay::ObjectInstPath *p, unsigned i
   return *e;
 }
 
-gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("ObjectInstPath", 
+static db::Layout *layout_from_inst_path (const lay::ObjectInstPath *p)
+{
+  db::Cell *cell = 0;
+
+  if (p->is_cell_inst ()) {
+    db::Instances *instances = p->back ().inst_ptr.instances ();
+    if (instances) {
+      cell = instances->cell ();
+    }
+  } else {
+    const db::Shapes *shapes = p->shape ().shapes ();
+    if (shapes) {
+      cell = shapes->cell ();
+    }
+  }
+
+  return cell ? cell->layout () : 0;
+}
+
+static db::DCplxTrans source_dtrans (const lay::ObjectInstPath *p)
+{
+  const db::Layout *layout = layout_from_inst_path (p);
+  if (layout) {
+    double dbu = layout->dbu ();
+    return db::CplxTrans (dbu) * p->trans () * db::VCplxTrans (1.0 / dbu);
+  } else {
+    return db::DCplxTrans ();
+  }
+}
+
+static db::DCplxTrans dtrans (const lay::ObjectInstPath *p)
+{
+  const db::Layout *layout = layout_from_inst_path (p);
+  if (layout) {
+    double dbu = layout->dbu ();
+    return db::CplxTrans (dbu) * p->trans_tot () * db::VCplxTrans (1.0 / dbu);
+  } else {
+    return db::DCplxTrans ();
+  }
+}
+
+gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("ObjectInstPath",
   gsi::method ("<", &lay::ObjectInstPath::operator<,
     "@brief Provides an order criterion for two ObjectInstPath objects\n"
     "@args b\n"
@@ -108,6 +149,14 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("ObjectInstPath",
     "This property is set implicitly by setting the top cell and adding elements to the instantiation path.\n"
     "To obtain the index of the container cell, use \\source.\n"
   ) + 
+  gsi::method_ext ("layout", &layout_from_inst_path,
+    "@brief Gets the Layout object the selected object lives in.\n"
+    "\n"
+    "This method returns the \\Layout object that the selected object lives in. This method may return nil, if "
+    "the selection does not point to a valid object.\n"
+    "\n"
+    "This method has been introduced in version 0.25.\n"
+  ) +
   gsi::method ("source", &lay::ObjectInstPath::cell_index, 
     "@brief Returns to the cell index of the cell that the selected element resides inside.\n"
     "\n"
@@ -118,7 +167,7 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("ObjectInstPath",
     "\n"
     "This method has been added in version 0.16."
   ) + 
-  gsi::method ("trans", &lay::ObjectInstPath::trans_tot, 
+  gsi::method ("trans", &lay::ObjectInstPath::trans_tot,
     "@brief Gets the transformation applicable for the shape.\n"
     "\n"
     "If this object represents a shape, this transformation describes how the selected shape is transformed into the current cell of the cell view.\n"
@@ -127,7 +176,21 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("ObjectInstPath",
     "This property is set implicitly by setting the top cell and adding elements to the instantiation path.\n"
     "This method is not applicable for instance selections. A more generic attribute is \\source_trans.\n"
   ) + 
-  gsi::method ("source_trans", &lay::ObjectInstPath::trans, 
+  gsi::method_ext ("dtrans", &dtrans,
+    "@brief Gets the transformation applicable for the shape in micron space.\n"
+    "\n"
+    "This method returns the same transformation than \\trans, but applicable to objects in micrometer units:\n"
+    "\n"
+    "@code\n"
+    "# renders the micrometer-unit polygon in top cell coordinates:\n"
+    "dpolygon_in_top = sel.dtrans * sel.shape.dpolygon\n"
+    "@/code\n"
+    "\n"
+    "This method is not applicable to instance selections. A more generic attribute is \\source_dtrans.\n"
+    "\n"
+    "The method has been introduced in version 0.25.\n"
+  ) +
+  gsi::method ("source_trans", &lay::ObjectInstPath::trans,
     "@brief Gets the transformation applicable for an instance and shape.\n"
     "\n"
     "If this object represents a shape, this transformation describes how the selected shape is transformed into the current cell of the cell view.\n"
@@ -139,7 +202,19 @@ gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("ObjectInstPath",
     "\n"
     "This method has been added in version 0.16."
   ) + 
-  gsi::method ("layer", &lay::ObjectInstPath::layer, 
+  gsi::method_ext ("source_dtrans", &source_dtrans,
+    "@brief Gets the transformation applicable for an instance and shape in micron space.\n"
+    "\n"
+    "This method returns the same transformation than \\source_trans, but applicable to objects in micrometer units:\n"
+    "\n"
+    "@code\n"
+    "# renders the cell instance as seen from top level:\n"
+    "dcell_inst_in_top = sel.source_dtrans * sel.inst.dcell_inst\n"
+    "@/code\n"
+    "\n"
+    "The method has been introduced in version 0.25.\n"
+  ) +
+  gsi::method ("layer", &lay::ObjectInstPath::layer,
     "@brief Gets the layer index that describes which layer the selected shape is on\n"
     "\n"
     "This method delivers valid results only for object selections that represent shapes, i.e for "

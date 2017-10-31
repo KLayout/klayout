@@ -209,7 +209,7 @@ private:
   std::map<QAction *, std::vector<std::string> > m_paths_for_action;
   bool m_enable_event;
 
-  void apply (const std::vector<std::pair<std::string, std::string> > &bindings, const std::vector<std::pair<std::__cxx11::string, bool> > &menu_items_hidden);
+  void apply (const std::vector<std::pair<std::string, std::string> > &bindings, const std::vector<std::pair<std::string, bool> > &menu_items_hidden);
   void update_list_item (QTreeWidgetItem *item);
 };
 

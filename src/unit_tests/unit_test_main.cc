@@ -368,12 +368,12 @@ main_cont (int argc, char **argv)
     //  No side effects
     lay::set_klayout_path (std::vector<std::string> ());
 
-    int ac = 2;
     static char av0[] = "unit_test";
     static char av1[] = "-z";   //  don't show main window
     static char av2[] = "-nc";  //  No configuration file
     static char av3[] = "-rx";  //  No mplicit macros
     char *av[] = { av0, av1, av2, av3, 0 };
+    int ac = sizeof (av) / sizeof (av[0]) - 1;
     lay::Application app (ac, av, false);
 
     app.ruby_interpreter ().push_console (&console);

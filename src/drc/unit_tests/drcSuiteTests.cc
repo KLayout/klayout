@@ -65,7 +65,11 @@ void runtest (tl::TestBase *_this, int mode)
     reader.read (layout);
   }
 
-  db::compare_layouts (_this, layout, au, db::NoNormalization);
+  //  NOTE: WriteOAS normalization will remove shape duplicates. For TEST(3)
+  //  shape duplicates are produced because we use a rather small tile size
+  //  and clipping of error shapes does not happen. This normalization removes
+  //  these redundancies.
+  db::compare_layouts (_this, layout, au, db::WriteOAS);
 }
 
 TEST(1)

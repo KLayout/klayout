@@ -465,8 +465,9 @@ public:
    */
   const std::string &parameter_name (size_t index)
   {
-    if (index < parameter_declarations ().size ()) {
-      return parameter_declarations () [index].get_name ();
+    const std::vector<db::PCellParameterDeclaration> &pcp = parameter_declarations ();
+    if (index < pcp.size ()) {
+      return pcp [index].get_name ();
     } else {
       static std::string empty;
       return empty;

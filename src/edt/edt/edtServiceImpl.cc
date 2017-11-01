@@ -1311,7 +1311,8 @@ InstService::make_cell (const lay::CellView &cv)
           ex.test (";");
         }
 
-        for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pc_decl->parameter_declarations ().begin (); pd != pc_decl->parameter_declarations ().end (); ++pd) {
+        const std::vector<db::PCellParameterDeclaration> &pcp = pc_decl->parameter_declarations ();
+        for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
           std::map<std::string, tl::Variant>::const_iterator p = parameters.find (pd->get_name ());
           if (p != parameters.end ()) {
             pv.push_back (p->second);

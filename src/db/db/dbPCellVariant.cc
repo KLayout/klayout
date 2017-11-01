@@ -108,7 +108,8 @@ PCellVariant::parameter_by_name (const std::string &name) const
   if (header && header->declaration ()) {
 
     db::pcell_parameters_type::const_iterator pp = parameters ().begin ();
-    for (std::vector<PCellParameterDeclaration>::const_iterator pd = header->declaration ()->parameter_declarations ().begin (); pd != header->declaration ()->parameter_declarations ().end () && pp != parameters ().end (); ++pd, ++pp) {
+    const std::vector<db::PCellParameterDeclaration> &pcp = header->declaration ()->parameter_declarations ();
+    for (std::vector<PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end () && pp != parameters ().end (); ++pd, ++pp) {
       if (pd->get_name () == name) {
         return *pp;
       }
@@ -128,7 +129,8 @@ PCellVariant::parameters_by_name () const
   if (header && header->declaration ()) {
 
     db::pcell_parameters_type::const_iterator pp = parameters ().begin ();
-    for (std::vector<PCellParameterDeclaration>::const_iterator pd = header->declaration ()->parameter_declarations ().begin (); pd != header->declaration ()->parameter_declarations ().end () && pp != parameters ().end (); ++pd, ++pp) {
+    const std::vector<db::PCellParameterDeclaration> &pcp = header->declaration ()->parameter_declarations ();
+    for (std::vector<PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end () && pp != parameters ().end (); ++pd, ++pp) {
       param_by_name.insert (std::make_pair (pd->get_name (), *pp));
     }
 
@@ -167,7 +169,8 @@ PCellVariant::update (ImportLayerMapping *layer_mapping)
 
     //  produce the shape parameters on the guiding shape layer so they can be edited
     size_t i = 0;
-    for (std::vector<db::PCellParameterDeclaration>::const_iterator p = header->declaration ()->parameter_declarations ().begin (); p != header->declaration ()->parameter_declarations ().end (); ++p, ++i) {
+    const std::vector<db::PCellParameterDeclaration> &pcp = header->declaration ()->parameter_declarations ();
+    for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++i) {
 
       if (i < m_parameters.size () && p->get_type () == db::PCellParameterDeclaration::t_shape && ! p->is_hidden ()) {
 

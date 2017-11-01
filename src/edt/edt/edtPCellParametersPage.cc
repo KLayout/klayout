@@ -147,7 +147,8 @@ PCellParametersPage::PCellParametersPage (QWidget *parent, const db::Layout *lay
   std::string group_title;
 
   int r = 0;
-  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcell_decl->parameter_declarations ().begin (); p != pcell_decl->parameter_declarations ().end (); ++p, ++r) {
+  const std::vector<db::PCellParameterDeclaration> &pcp = pcell_decl->parameter_declarations ();
+  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++r) {
 
     if (p->is_hidden () || p->get_type () == db::PCellParameterDeclaration::t_shape) {
       m_widgets.push_back (0);
@@ -321,7 +322,8 @@ PCellParametersPage::get_parameters ()
   std::vector<tl::Variant> parameters;
 
   int r = 0;
-  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = mp_pcell_decl->parameter_declarations ().begin (); p != mp_pcell_decl->parameter_declarations ().end (); ++p, ++r) {
+  const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
+  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++r) {
 
     if (p->is_hidden () || p->get_type () == db::PCellParameterDeclaration::t_shape) {
 
@@ -427,7 +429,8 @@ PCellParametersPage::set_parameters (const  std::vector<tl::Variant> &parameters
 {
   //  write the changed value back
   size_t r = 0;
-  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = mp_pcell_decl->parameter_declarations ().begin (); p != mp_pcell_decl->parameter_declarations ().end (); ++p, ++r) {
+  const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
+  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++r) {
     if (r < parameters.size () && m_widgets [r]) {
       set_value (*p, mp_layout, m_widgets [r], parameters [r]);
     }

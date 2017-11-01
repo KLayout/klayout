@@ -125,12 +125,13 @@ get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index
   //  convert the guiding shapes to parameters
   parameters_for_pcell = def_layout->get_pcell_parameters (lc.second);
   const db::PCellDeclaration *pcell_decl = def_layout->pcell_declaration (lpc.second);
+  const std::vector<db::PCellParameterDeclaration> &pcp = pcell_decl->parameter_declarations ();
 
   db::pcell_parameters_type org_parameters = parameters_for_pcell;
 
   std::map <std::string, size_t> pname_map;
-  for (size_t i = 0; i < pcell_decl->parameter_declarations ().size () && i < parameters_for_pcell.size (); ++i) {
-    pname_map.insert (std::make_pair (pcell_decl->parameter_declarations () [i].get_name (), i));
+  for (size_t i = 0; i < pcp.size () && i < parameters_for_pcell.size (); ++i) {
+    pname_map.insert (std::make_pair (pcp [i].get_name (), i));
   }
 
   db::property_names_id_type pn = layout->properties_repository ().prop_name_id ("name");
@@ -180,9 +181,9 @@ get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index
   //  create a variant in the calling code we have to revert the shapes back to their initial state which
   //  is consistent with the parameters.
   guiding_shapes.clear ();
-  for (size_t i = 0; i < pcell_decl->parameter_declarations ().size () && i < org_parameters.size (); ++i) {
+  for (size_t i = 0; i < pcp.size () && i < org_parameters.size (); ++i) {
 
-    const db::PCellParameterDeclaration &pd = pcell_decl->parameter_declarations () [i];
+    const db::PCellParameterDeclaration &pd = pcp [i];
 
     if (pd.get_type () == db::PCellParameterDeclaration::t_shape && ! pd.is_hidden ()) {
 

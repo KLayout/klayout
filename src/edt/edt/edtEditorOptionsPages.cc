@@ -635,8 +635,9 @@ EditorOptionsInst::apply (lay::Plugin *root)
       const db::PCellDeclaration *pc_decl = layout->pcell_declaration (pc.second);
       if (pc_decl) {
         std::vector<tl::Variant> pv = mp_pcell_parameters->get_parameters ();
-        for (size_t i = 0; i < std::min (pv.size (), pc_decl->parameter_declarations ().size ()); ++i) {
-          param += tl::to_word_or_quoted_string (pc_decl->parameter_declarations () [i].get_name ()) + ":";
+        const std::vector<db::PCellParameterDeclaration> &pcp = pc_decl->parameter_declarations ();
+        for (size_t i = 0; i < std::min (pv.size (), pcp.size ()); ++i) {
+          param += tl::to_word_or_quoted_string (pcp [i].get_name ()) + ":";
           param += pv [i].to_parsable_string ();
           param += ";";
         }
@@ -741,7 +742,8 @@ EditorOptionsInst::setup (lay::Plugin *root)
           }
         } catch (...) { }
 
-        for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pc_decl->parameter_declarations ().begin (); pd != pc_decl->parameter_declarations ().end (); ++pd) {
+        const std::vector<db::PCellParameterDeclaration> &pcp = pc_decl->parameter_declarations ();
+        for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
           std::map<std::string, tl::Variant>::const_iterator p = parameters.find (pd->get_name ());
           if (p != parameters.end ()) {
             pv.push_back (p->second);

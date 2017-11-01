@@ -1628,20 +1628,22 @@ Layout::reserve_layers (unsigned int n)
 
 static const std::vector<tl::Variant> &gauge_parameters (const std::vector<tl::Variant> &p, const db::PCellDeclaration *pcell_decl, std::vector<tl::Variant> &buffer)
 {
-  if (pcell_decl->parameter_declarations ().size () > p.size ()) {
+  const std::vector<db::PCellParameterDeclaration> &pcp = pcell_decl->parameter_declarations ();
+
+  if (pcp.size () > p.size ()) {
 
     buffer.clear ();
-    buffer.resize (pcell_decl->parameter_declarations ().size ());
+    buffer.resize (pcp.size ());
     buffer = p;
-    for (std::vector<PCellParameterDeclaration>::const_iterator i = pcell_decl->parameter_declarations ().begin () + p.size (); i != pcell_decl->parameter_declarations ().end (); ++i) {
+    for (std::vector<PCellParameterDeclaration>::const_iterator i = pcp.begin () + p.size (); i != pcp.end (); ++i) {
       buffer.push_back (i->get_default ());
     }
     return buffer;
 
-  } else if (pcell_decl->parameter_declarations ().size () < p.size ()) {
+  } else if (pcp.size () < p.size ()) {
 
     buffer.clear ();
-    buffer.insert (buffer.end (), p.begin (), p.begin () + pcell_decl->parameter_declarations ().size ());
+    buffer.insert (buffer.end (), p.begin (), p.begin () + pcp.size ());
     return buffer;
 
   } else {
@@ -1683,8 +1685,9 @@ Layout::get_pcell_variant_dict (pcell_id_type pcell_id, const std::map<std::stri
   tl_assert (header != 0);
 
   std::vector<tl::Variant> parameters;
-  parameters.reserve (header->declaration ()->parameter_declarations ().size ());
-  for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = header->declaration ()->parameter_declarations ().begin (); pd != header->declaration ()->parameter_declarations ().end(); ++pd) {
+  const std::vector<db::PCellParameterDeclaration> &pcp = header->declaration ()->parameter_declarations ();
+  parameters.reserve (pcp.size ());
+  for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end(); ++pd) {
     std::map<std::string, tl::Variant>::const_iterator pp = p.find (pd->get_name ());
     if (pp == p.end ()) {
       parameters.push_back (pd->get_default ());
@@ -2024,8 +2027,9 @@ Layout::get_context_info (cell_index_type cell_index, std::vector <std::string> 
     
     const db::PCellDeclaration *pcell_decl = ly->pcell_declaration (pcell_variant->pcell_id ());
 
-    std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcell_decl->parameter_declarations ().begin ();
-    for (std::vector<tl::Variant>::const_iterator p = pcell_variant->parameters ().begin (); p != pcell_variant->parameters ().end () && pd != pcell_decl->parameter_declarations ().end (); ++p, ++pd) {
+    const std::vector<db::PCellParameterDeclaration> &pcp = pcell_decl->parameter_declarations ();
+    std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin ();
+    for (std::vector<tl::Variant>::const_iterator p = pcell_variant->parameters ().begin (); p != pcell_variant->parameters ().end () && pd != pcp.end (); ++p, ++pd) {
       context_info.push_back ("P(" + tl::to_word_or_quoted_string (pd->get_name ()) + ")=" + p->to_parsable_string ());
     }
 

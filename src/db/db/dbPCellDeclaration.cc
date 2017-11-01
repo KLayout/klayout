@@ -53,7 +53,8 @@ PCellDeclaration::map_parameters (const std::map<size_t, tl::Variant> &param_by_
 {
   db::pcell_parameters_type new_param;
   size_t i = 0;
-  for (std::vector<PCellParameterDeclaration>::const_iterator pd = parameter_declarations ().begin (); pd != parameter_declarations ().end (); ++pd, ++i) {
+  const std::vector<db::PCellParameterDeclaration> &pcp = parameter_declarations ();
+  for (std::vector<PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd, ++i) {
     std::map<size_t, tl::Variant>::const_iterator p = param_by_name.find (i);
     if (p != param_by_name.end ()) {
       new_param.push_back (p->second);
@@ -69,7 +70,8 @@ pcell_parameters_type
 PCellDeclaration::map_parameters (const std::map<std::string, tl::Variant> &param_by_name) const
 {
   db::pcell_parameters_type new_param;
-  for (std::vector<PCellParameterDeclaration>::const_iterator pd = parameter_declarations ().begin (); pd != parameter_declarations ().end (); ++pd) {
+  const std::vector<db::PCellParameterDeclaration> &pcp = parameter_declarations ();
+  for (std::vector<PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {
     std::map<std::string, tl::Variant>::const_iterator p = param_by_name.find (pd->get_name ());
     if (p != param_by_name.end ()) {
       new_param.push_back (p->second);

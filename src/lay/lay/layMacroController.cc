@@ -85,10 +85,8 @@ MacroController::finish (bool load)
   //  Scan built-in macros
   //  These macros are always taken, even if there are no macros requested (they are required to
   //  fully form the API).
-  if (load) {
-    lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
-    lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
-  }
+  lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
+  lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
 
   //  TODO: consider adding "drc" dynamically and allow more dynamic categories
   //  We can do so if we first load the macros with the initial interpreters, then do autorun (which creates DSL interpreters) and then

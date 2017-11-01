@@ -216,20 +216,30 @@ LONG WINAPI ExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
 
   SymCleanup (process);
 
-  //  YES! I! KNOW!
-  //  In a signal handler you shall not do fancy stuff (in particular not
-  //  open dialogs) nor shall you throw exceptions! But that scheme appears to
-  //  be working since in most cases the signal is raised from our code (hence
-  //  from our stack frames) and everything is better than just showing
-  //  the "application stopped working" dialog.
-  //  Isn't it?
+  bool has_gui = lay::Application::instance () && lay::Application::instance ()->has_gui ();
+  if (has_gui) {
 
-  CrashMessage msg (0, true, text);
-  if (! msg.exec ()) {
-    //  terminate unconditionally
-    return EXCEPTION_EXECUTE_HANDLER;
+    //  YES! I! KNOW!
+    //  In a signal handler you shall not do fancy stuff (in particular not
+    //  open dialogs) nor shall you throw exceptions! But that scheme appears to
+    //  be working since in most cases the signal is raised from our code (hence
+    //  from our stack frames) and everything is better than just showing
+    //  the "application stopped working" dialog.
+    //  Isn't it?
+
+    CrashMessage msg (0, true, text);
+    if (! msg.exec ()) {
+      //  terminate unconditionally
+      return EXCEPTION_EXECUTE_HANDLER;
+    } else {
+      throw tl::CancelException ();
+    }
+
   } else {
-    throw tl::CancelException ();
+
+    tl::error << text << tl::noendl;
+    return EXCEPTION_EXECUTE_HANDLER;
+
   }
 }
 

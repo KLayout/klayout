@@ -266,6 +266,22 @@ public:
     m_choice_descriptions = choice_descriptions;
   }
 
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const db::PCellParameterDeclaration &d) const
+  {
+    return m_choices == d.m_choices &&
+           m_choice_descriptions == d.m_choice_descriptions &&
+           m_default == d.m_default &&
+           m_hidden == d.m_hidden &&
+           m_readonly == d.m_readonly &&
+           m_type == d.m_type &&
+           m_name == d.m_name &&
+           m_description == d.m_description &&
+           m_unit == d.m_unit;
+  }
+
 private:
   std::vector<tl::Variant> m_choices;
   std::vector<std::string> m_choice_descriptions;
@@ -451,28 +467,12 @@ public:
    *  the cached declarations and therefore is much faster, in particular if the actual
    *  implementation is done in a script.
    */
-  const std::vector<PCellParameterDeclaration> &parameter_declarations () const
-  {
-    if (! m_has_parameter_declarations || ! wants_parameter_declaration_caching ()) {
-      m_parameter_declarations = get_parameter_declarations ();
-      m_has_parameter_declarations = true;
-    }
-    return m_parameter_declarations;
-  }
+  const std::vector<PCellParameterDeclaration> &parameter_declarations () const;
 
   /**
    *  @brief Gets the parameter name for the given parameter index
    */
-  const std::string &parameter_name (size_t index)
-  {
-    const std::vector<db::PCellParameterDeclaration> &pcp = parameter_declarations ();
-    if (index < pcp.size ()) {
-      return pcp [index].get_name ();
-    } else {
-      static std::string empty;
-      return empty;
-    }
-  }
+  const std::string &parameter_name (size_t index);
 
   /**
    *  @brief Return the parameter declarations

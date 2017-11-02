@@ -48,6 +48,34 @@ PCellDeclaration::release_ref ()
   }
 }
 
+const std::vector<PCellParameterDeclaration> &
+PCellDeclaration::parameter_declarations () const
+{
+  if (! m_has_parameter_declarations || ! wants_parameter_declaration_caching ()) {
+    std::vector<PCellParameterDeclaration> pcp = get_parameter_declarations ();
+    //  NOTE: this ensures that reallocation of the vector only happens if the parameters
+    //  change. This makes the returned reference more stable and iterators over this reference
+    //  don't get invalidated so easily if wants_parameter_declaration_caching is false.
+    if (m_parameter_declarations != pcp) {
+      m_parameter_declarations = pcp;
+    }
+    m_has_parameter_declarations = true;
+  }
+  return m_parameter_declarations;
+}
+
+const std::string &
+PCellDeclaration::parameter_name (size_t index)
+{
+  const std::vector<db::PCellParameterDeclaration> &pcp = parameter_declarations ();
+  if (index < pcp.size ()) {
+    return pcp [index].get_name ();
+  } else {
+    static std::string empty;
+    return empty;
+  }
+}
+
 pcell_parameters_type
 PCellDeclaration::map_parameters (const std::map<size_t, tl::Variant> &param_by_name) const
 {

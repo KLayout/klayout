@@ -408,6 +408,9 @@ CustomizeMenuConfigPage::CustomizeMenuConfigPage (QWidget *parent)
   mp_ui->binding_le->setEnabled (false);
   mp_ui->binding_le->set_clear_button_enabled (true);
   connect (mp_ui->binding_le, SIGNAL (textChanged (QString)), this, SLOT (text_changed ()));
+
+  mp_ui->filter->set_clear_button_enabled (true);
+  connect (mp_ui->filter, SIGNAL (textChanged (QString)), this, SLOT (filter_changed ()));
 }
 
 CustomizeMenuConfigPage::~CustomizeMenuConfigPage ()
@@ -455,6 +458,11 @@ CustomizeMenuConfigPage::reset_clicked ()
 void 
 CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::string> > &key_bindings, const std::vector<std::pair<std::string, bool> > &hidden)
 {
+  //  clears the filter
+  mp_ui->filter->blockSignals (true);
+  mp_ui->filter->clear ();
+  mp_ui->filter->blockSignals (false);
+
   //  build the path to item table and the alias table
   m_item_for_path.clear ();
   m_paths_for_action.clear ();
@@ -532,13 +540,16 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
       if (t->first == tl_menu) {
         QTreeWidgetItem *item = new QTreeWidgetItem (top_level_item);
         lay::Action action = lay::MainWindow::instance ()->menu ()->action (cb->first);
+        item->setData (0, Qt::ToolTipRole, tl::to_qstring (rem_path));
         item->setData (0, Qt::DisplayRole, tl::to_qstring (rem_path));
+        item->setData (1, Qt::ToolTipRole, tl::to_qstring (action.get_title ()));
         item->setData (1, Qt::DisplayRole, tl::to_qstring (action.get_title ()));
         item->setData (2, Qt::DisplayRole, tl::to_qstring (sc));
         item->setData (2, Qt::ForegroundRole, palette ().color (is_default ? QPalette::Disabled : QPalette::Normal, QPalette::Text));
         item->setData (0, Qt::UserRole, tl::to_qstring (path));
         item->setFlags (item->flags () | Qt::ItemIsUserCheckable);
         item->setCheckState (0, hidden ? Qt::Unchecked : Qt::Checked);
+        item->setHidden (false);
         m_item_for_path[path] = item;
         if (action.qaction ()) {
           m_paths_for_action[action.qaction ()].push_back (path);
@@ -623,6 +634,31 @@ CustomizeMenuConfigPage::text_changed ()
 {
   if (m_enable_event) {
     update_list_item (mp_ui->bindings_list->currentItem ());
+  }
+}
+
+void
+CustomizeMenuConfigPage::filter_changed ()
+{
+  mp_ui->bindings_list->clearSelection ();
+  current_changed (0, mp_ui->bindings_list->currentItem ());
+
+  QString filter = mp_ui->filter->text ();
+
+  for (int i = 0; i < mp_ui->bindings_list->topLevelItemCount (); ++i) {
+    QTreeWidgetItem *tl_item = mp_ui->bindings_list->topLevelItem (i);
+    bool any = false;
+    for (int j = 0; j < tl_item->childCount (); ++j) {
+      QTreeWidgetItem *item = tl_item->child (j);
+      QString path = item->data (0, Qt::DisplayRole).toString ();
+      QString title = item->data (1, Qt::DisplayRole).toString ();
+      bool matches = path.indexOf (filter, 0, Qt::CaseInsensitive) >= 0 || title.indexOf (filter, 0, Qt::CaseInsensitive) >= 0;
+      item->setHidden (!matches);
+      if (matches) {
+        any = true;
+      }
+    }
+    tl_item->setHidden (!any);
   }
 }
 

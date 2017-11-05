@@ -171,6 +171,9 @@ PluginDeclaration::config_finalize ()
 void 
 PluginDeclaration::initialized (lay::PluginRoot *)
 {
+  ant::Template ruler_template (tl::to_string (QObject::tr ("Ruler")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_ruler");
+  register_annotation_template (ruler_template);
+
   ant::Template pos_template (tl::to_string (QObject::tr ("Cross")), "", "", "$U,$V", ant::Object::STY_cross_both, ant::Object::OL_diag, true, lay::AC_Global, "_cross");
   pos_template.set_mode (ant::Template::RulerSingleClick);
   register_annotation_template (pos_template);
@@ -178,6 +181,8 @@ PluginDeclaration::initialized (lay::PluginRoot *)
   ant::Template auto_template (tl::to_string (QObject::tr ("Measure")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_measure");
   auto_template.set_mode (ant::Template::RulerAutoMetric);
   register_annotation_template (auto_template);
+
+  update_menu ();
 }
 
 void 
@@ -217,18 +222,16 @@ PluginDeclaration::update_menu ()
 {
   lay::AbstractMenuProvider *mp = lay::AbstractMenuProvider::instance ();
 
-  if (m_templates.empty ()) {
-    m_templates.push_back (Template ());
-  }
-
   if (m_current_template < 0 || m_current_template >= int (m_templates.size ())) {
     m_current_template = 0;
   }
     
-  std::vector<std::string> menu_entries = mp->menu ()->group ("ruler_mode_group");
-  for (std::vector<std::string>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
-    lay::Action action = mp->menu ()->action (*m);
-    action.set_title (m_templates [m_current_template].title ());
+  if (m_current_template >= 0 && m_current_template < int (m_templates.size ())) {
+    std::vector<std::string> menu_entries = mp->menu ()->group ("ruler_mode_group");
+    for (std::vector<std::string>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
+      lay::Action action = mp->menu ()->action (*m);
+      action.set_title (m_templates [m_current_template].title ());
+    }
   }
   
   std::vector<std::string> tmpl_group = mp->menu ()->group ("ruler_templates_group");

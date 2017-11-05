@@ -29,6 +29,7 @@
 #include "antConfig.h"
 #include "layConverters.h"
 #include "layQtTools.h"
+#include "tlExceptions.h"
 
 #include <QInputDialog>
 
@@ -254,6 +255,7 @@ ConfigPage4::add_clicked ()
   } else {
     new_one = m_ruler_templates [m_current_template];
   }
+  new_one.category (std::string ());
   m_ruler_templates.insert (m_ruler_templates.begin () + m_current_template, new_one);
   m_ruler_templates [m_current_template].title (tl::to_string (QObject::tr ("New Ruler")));
   update_list ();
@@ -264,7 +266,12 @@ ConfigPage4::add_clicked ()
 void  
 ConfigPage4::del_clicked ()
 {
+BEGIN_PROTECTED
+
   if (m_current_template >= 0 && m_current_template < int (m_ruler_templates.size ())) {
+    if (! m_ruler_templates [m_current_template].category ().empty ()) {
+      throw tl::Exception (tl::to_string (tr ("This ruler is a built-in template and cannot be deleted")));
+    }
     m_ruler_templates.erase (m_ruler_templates.begin () + m_current_template);
     if (m_current_template > 0) {
       --m_current_template;
@@ -276,6 +283,8 @@ ConfigPage4::del_clicked ()
     update_list ();
     show ();
   }
+
+END_PROTECTED
 }
 
 void  
@@ -309,6 +318,12 @@ ConfigPage4::update_list ()
   mp_ui->template_list->clear ();
   for (std::vector <ant::Template>::const_iterator t = m_ruler_templates.begin (); t != m_ruler_templates.end (); ++t) {
     mp_ui->template_list->addItem (tl::to_qstring (t->title ()));
+    if (! t->category ().empty ()) {
+      QListWidgetItem *item = mp_ui->template_list->item (int (t - m_ruler_templates.begin ()));
+      QFont font = item->font ();
+      font.setItalic (true);
+      item->setFont (font);
+    }
   }
   mp_ui->template_list->setCurrentRow (m_current_template);
   m_current_changed_enabled = true;

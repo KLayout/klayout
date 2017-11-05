@@ -1,8 +1,12 @@
-0.25            (2017-10-31):
-* Enhancement: Menu items can be disabled or enabled
-      now. The former "Key Bindings" configuration page
-      has been turned into "Menu Customization". Check 
-      boxes allow enabling or disabling of menu items.
+0.25            (2017-11-04):
+* Enhancement: Menu customization
+      Menu items can be disabled or enabled now. The former 
+      "Key Bindings" configuration page has been turned into 
+      "Menu Customization". Check boxes allow enabling or 
+      disabling of menu items. Disabled menu items are not
+      shown.
+      A search filter allows quick selection of menu items
+      by title or path.
 * Enhancement: The cell tree no longer is collapsed on edits
       or when the sorting order changes.
 * Enhancement: Using a special menu path, macros can be

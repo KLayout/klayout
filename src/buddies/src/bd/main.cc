@@ -21,8 +21,21 @@
 */
 
 #include "bdInit.h"
+#include "tlStaticObjects.h"
+#include "rba.h"
+
+#include <QCoreApplication>
 
 BD_PUBLIC int BD_TARGET (int argc, char *argv []);
+
+/**
+ *  @brief The continuation function to support Ruby's special top-level hook
+ */
+static int main_cont (int argc, char **argv)
+{
+  QCoreApplication app (argc, argv);
+  return bd::_main_impl (&BD_TARGET, argc, argv);
+}
 
 /**
  *  @brief Provides a main () implementation
@@ -35,5 +48,13 @@ BD_PUBLIC int BD_TARGET (int argc, char *argv []);
  */
 int main (int argc, char *argv [])
 {
-  return bd::_main_impl (&BD_TARGET, argc, argv);
+  //  This special initialization is required by the Ruby interpreter because it wants to mark the stack
+  int ret = rba::RubyInterpreter::initialize (argc, argv, &main_cont);
+
+  //  clean up all static data now, since we don't trust the static destructors.
+  //  NOTE: this needs to happen after the Ruby interpreter went down since otherwise the GC will
+  //  access objects that are already cleaned up.
+  tl::StaticObjects::cleanup ();
+
+  return ret;
 }

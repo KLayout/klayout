@@ -12,6 +12,7 @@ SUBDIRS = \
   strmclip \
   strmcmp \
   strmxor \
+  strmrun \
 
 strm2cif.depends += bd
 strm2dxf.depends += bd
@@ -22,3 +23,4 @@ strm2txt.depends += bd
 strmclip.depends += bd
 strmcmp.depends += bd
 strmxor.depends += bd
+strmrun.depends += bd

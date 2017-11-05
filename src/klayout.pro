@@ -62,7 +62,7 @@ lym.depends += gsi $$LANG_DEPENDS
 lay.depends += laybasic ant img edt lym
 ext.depends += lay
 lib.depends += db
-buddies.depends += db
+buddies.depends += rdb lib rba pya
 
 equals(HAVE_QTBINDINGS, "1") {
   SUBDIRS += gsiqt

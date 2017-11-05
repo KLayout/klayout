@@ -20,6 +20,7 @@ SOURCES = \
   strm2txt.cc \
   strmcmp.cc \
   strmxor.cc \
+  strmrun.cc \
 
 HEADERS = \
   bdCommon.h \
@@ -30,7 +31,7 @@ HEADERS = \
 
 RESOURCES = \
 
-INCLUDEPATH += $$TL_INC $$GSI_INC $$VERSION_INC $$DB_INC
-DEPENDPATH += $$TL_INC $$GSI_INC $$VERSION_INC $$DB_INC
-LIBS += -L$$DESTDIR -lklayout_tl -lklayout_db -lklayout_gsi
+INCLUDEPATH += $$TL_INC $$GSI_INC $$VERSION_INC $$DB_INC $$RBA_INC $$PYA_INC $$LIB_INC $$RDB_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$VERSION_INC $$DB_INC $$RBA_INC $$PYA_INC $$LIB_INC $$RDB_INC
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_db -lklayout_gsi -lklayout_rba -lklayout_pya -lklayout_lib -lklayout_rdb
 

@@ -171,18 +171,37 @@ PluginDeclaration::config_finalize ()
 void 
 PluginDeclaration::initialized (lay::PluginRoot *)
 {
-  ant::Template ruler_template (tl::to_string (QObject::tr ("Ruler")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_ruler");
-  register_annotation_template (ruler_template);
+  //  Check if we already have templates (initial setup)
+  bool any_templates = false;
+  for (std::vector<ant::Template>::iterator i = m_templates.begin (); ! any_templates && i != m_templates.end (); ++i) {
+    any_templates = ! i->category ().empty ();
+  }
 
-  ant::Template pos_template (tl::to_string (QObject::tr ("Cross")), "", "", "$U,$V", ant::Object::STY_cross_both, ant::Object::OL_diag, true, lay::AC_Global, "_cross");
-  pos_template.set_mode (ant::Template::RulerSingleClick);
-  register_annotation_template (pos_template);
+  if (! any_templates) {
 
-  ant::Template auto_template (tl::to_string (QObject::tr ("Measure")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_measure");
-  auto_template.set_mode (ant::Template::RulerAutoMetric);
-  register_annotation_template (auto_template);
+    //  This is the migration path from <= 0.24 to 0.25: clear all templates unless we
+    //  have categorized ones there. Those can't be deleted, so we know we have a 0.25
+    //  setup if there are some
+    m_templates.clear ();
 
-  update_menu ();
+    //  Set up the templates we want to see (plus some non-categorized templates)
+
+    m_templates.push_back (ant::Template (tl::to_string (QObject::tr ("Ruler")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_ruler"));
+
+    m_templates.push_back (ant::Template (tl::to_string (QObject::tr ("Cross")), "", "", "$U,$V", ant::Object::STY_cross_both, ant::Object::OL_diag, true, lay::AC_Global, "_cross"));
+    m_templates.back ().set_mode (ant::Template::RulerSingleClick);
+
+    m_templates.push_back (ant::Template (tl::to_string (QObject::tr ("Measure")), "$X", "$Y", "$D", ant::Object::STY_ruler, ant::Object::OL_diag, true, lay::AC_Global, "_measure"));
+    m_templates.back ().set_mode (ant::Template::RulerAutoMetric);
+
+    m_templates.push_back (ant::Template (tl::to_string (QObject::tr ("Ellipse")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_ellipse, true, lay::AC_Global, std::string ()));
+
+    m_templates.push_back (ant::Template (tl::to_string (QObject::tr ("Box")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_box, true, lay::AC_Global, std::string ()));
+
+    lay::PluginRoot::instance ()->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
+    lay::PluginRoot::instance ()->config_end ();
+
+  }
 }
 
 void 

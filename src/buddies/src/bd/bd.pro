@@ -31,7 +31,26 @@ HEADERS = \
 
 RESOURCES = \
 
-INCLUDEPATH += $$TL_INC $$GSI_INC $$VERSION_INC $$DB_INC $$RBA_INC $$PYA_INC $$LIB_INC $$RDB_INC
-DEPENDPATH += $$TL_INC $$GSI_INC $$VERSION_INC $$DB_INC $$RBA_INC $$PYA_INC $$LIB_INC $$RDB_INC
-LIBS += -L$$DESTDIR -lklayout_tl -lklayout_db -lklayout_gsi -lklayout_rba -lklayout_pya -lklayout_lib -lklayout_rdb
+INCLUDEPATH += $$TL_INC $$GSI_INC $$VERSION_INC $$DB_INC $$LIB_INC $$RDB_INC
+DEPENDPATH += $$TL_INC $$GSI_INC $$VERSION_INC $$DB_INC $$LIB_INC $$RDB_INC
+LIBS += -L$$DESTDIR -lklayout_tl -lklayout_db -lklayout_gsi -lklayout_lib -lklayout_rdb
+
+INCLUDEPATH += $$RBA_INC
+DEPENDPATH += $$RBA_INC
+
+equals(HAVE_RUBY, "1") {
+  LIBS += -lklayout_rba
+} else {
+  LIBS += -lklayout_rbastub
+}
+
+INCLUDEPATH += $$PYA_INC
+DEPENDPATH += $$PYA_INC
+
+equals(HAVE_PYTHON, "1") {
+  LIBS += -lklayout_pya
+} else {
+  LIBS += -lklayout_pyastub
+}
+
 

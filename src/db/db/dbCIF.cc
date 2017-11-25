@@ -98,7 +98,7 @@ public:
         } else if (*ex=='D') {
           //  first command must be "DS num", or "L"
           ++ex;
-          while (! ex.at_end () && (*ex != ';') && (*ex != '-') && (*ex !='(') && (*ex != ')') && (!isdigit(*ex))) {
+          while (! ex.at_end () && (*ex != ';') && (*ex != '-') && (*ex !='(') && (*ex != ')') && (!isdigit(*ex)) && (!isalpha(*ex))) {
               ++ex;
           }
           if (*ex!='S') {
@@ -107,7 +107,7 @@ public:
           while (! ex.at_end () && (*ex != ';') && (*ex != '-') && (*ex !='(') && (*ex != ')') && (!isdigit(*ex))) {
               ++ex;
           }
-          if (ex.try_read (n))) {
+          if (ex.try_read (n)) {
               return true;
           }
 

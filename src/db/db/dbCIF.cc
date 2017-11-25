@@ -90,10 +90,26 @@ public:
 
           //  ignore ;
 
-        } else if ((ex.test ("DS ") && ex.try_read (n)) || ex.test ("L ")) {
+        } else if (ex.test ("L ")) {
 
-          //  first command must be "DS num", "L"
+          //  first command must be "DS num", or "L"
           return true;
+
+        } else if (*ex=='D') {
+          //  first command must be "DS num", or "L"
+          ++ex;
+          while (! ex.at_end () && (*ex != ';') && (*ex != '-') && (*ex !='(') && (*ex != ')') && (!isdigit(*ex))) {
+              ++ex;
+          }
+          if (*ex!='S') {
+              break; // not "D<sep>S"
+          }
+          while (! ex.at_end () && (*ex != ';') && (*ex != '-') && (*ex !='(') && (*ex != ')') && (!isdigit(*ex))) {
+              ++ex;
+          }
+          if (ex.try_read (n))) {
+              return true;
+          }
 
         } else if (ex.test ("9")) {
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 
+#
 # KLayout Layout Viewer
 # Copyright (C) 2006-2017 Matthias Koefferlein
 #
@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-# 
+#
 
 CURR_DIR=`pwd`
 RUN_MAKE=1
+IS_MAC="no"
 
 HAVE_QTBINDINGS=1
 HAVE_64BIT_COORD=0
@@ -45,6 +46,16 @@ MAKE_OPT=""
 
 CONFIG="release"
 BUILD_EXPERT=0
+
+# Check if building on Mac OSX Darwin family
+case `uname` in
+    Darwin*)
+        IS_MAC="yes"
+        ;;
+    *)
+        IS_MAC="no"
+        ;;
+esac
 
 # Check, whether build.sh is run from the top level folder
 if ! [ -e src ] || ! [ -e src/klayout.pro ]; then
@@ -200,7 +211,7 @@ done
 echo "Scanning installation .."
 echo ""
 
-# Import version info 
+# Import version info
 . ./version.sh
 
 echo "Version Info:"
@@ -212,8 +223,8 @@ echo ""
 # if not given, try to detect the qmake binary
 if [ "$QMAKE" = "" ]; then
   for qmake in "qmake5" "qmake-qt5" "qmake4" "qmake-qt4" "qmake"; do
-    if [ "$QMAKE" = "" ] && [ "`$qmake -v 2>/dev/null`" != "" ]; then 
-      QMAKE="$qmake" 
+    if [ "$QMAKE" = "" ] && [ "`$qmake -v 2>/dev/null`" != "" ]; then
+      QMAKE="$qmake"
     fi
   done
 fi
@@ -246,8 +257,8 @@ echo ""
 # if not given, locate ruby interpreter (prefer 1.9, then default, finally 1.8 as fallback)
 if [ "$RUBY" = "" ]; then
   for ruby in "ruby2.4" "ruby2.3" "ruby2.2" "ruby2.1" "ruby2" "ruby1.9" "ruby" "ruby1.8"; do
-    if [ "$RUBY" = "" ] && [ "`$ruby -e 'puts 1' 2>/dev/null`" = "1" ]; then 
-      RUBY="$ruby" 
+    if [ "$RUBY" = "" ] && [ "`$ruby -e 'puts 1' 2>/dev/null`" = "1" ]; then
+      RUBY="$ruby"
     fi
   done
 fi
@@ -314,7 +325,7 @@ if [ "$RUBY" != "" ] && [ "$RUBY" != "-" ]; then
         RUBYINCLUDE2=`$RUBY -rrbconfig -e "puts (RbConfig::CONFIG['rubyarchhdrdir'] || '')"`
       fi
       if [ "$RUBYINCLUDE2" = "" ]; then
-        RUBYINCLUDE2="$RUBYHDRDIR"/`$RUBY -rrbconfig -e "puts (RbConfig::CONFIG['arch'] || '')"`        
+        RUBYINCLUDE2="$RUBYHDRDIR"/`$RUBY -rrbconfig -e "puts (RbConfig::CONFIG['arch'] || '')"`
       fi
       echo "    Ruby headers found: $RUBYINCLUDE and $RUBYINCLUDE2"
     fi
@@ -329,11 +340,11 @@ if [ "$RUBY" != "" ] && [ "$RUBY" != "-" ]; then
 
 fi
 
-# if not given, locate Python interpreter 
+# if not given, locate Python interpreter
 if [ "$PYTHON" = "" ]; then
   for python in "python3.5" "python3.4" "python3.3" "python3.2" "python3.1" "python3" "python2.8" "python2.7" "python2" "python"; do
-    if [ "$PYTHON" = "" ] && [ "`$python -c 'print(1)' 2>/dev/null`" = "1" ]; then 
-      PYTHON="$python" 
+    if [ "$PYTHON" = "" ] && [ "`$python -c 'print(1)' 2>/dev/null`" = "1" ]; then
+      PYTHON="$python"
     fi
   done
 fi
@@ -468,11 +479,21 @@ mkdir -p $BUILD
 . $(dirname $(which $0))/version.sh
 
 # qmake needs absolute paths, so we get them now:
-BUILD=`readlink -f $BUILD`
-BIN=`readlink -f $BIN`
+#   OSX does not have `readlink -f` command. Use equivalent Perl script.
+if [ "$IS_MAC" = "no" ]; then
+  BUILD=`readlink -f $BUILD`
+  BIN=`readlink -f $BIN`
+else
+  BUILD=`perl -MCwd -le 'print Cwd::abs_path(shift)' $BUILD`
+  BIN=`perl -MCwd -le 'print Cwd::abs_path(shift)' $BIN`
+fi
 
-if ( gmake -v >/dev/null 2>/dev/null ); then
-  MAKE_PRG=gmake
+if [ "$IS_MAC" = "no" ]; then
+  if ( gmake -v >/dev/null 2>/dev/null ); then
+    MAKE_PRG=gmake
+  else
+    MAKE_PRG=make
+  fi
 else
   MAKE_PRG=make
 fi

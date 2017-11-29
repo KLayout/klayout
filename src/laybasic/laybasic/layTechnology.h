@@ -158,6 +158,15 @@ public:
   void end_updates_no_event ();
 
   /**
+   *  @brief Notifies the system of changes in technologies
+   *  For performance reasons, changes inside a technology are not propagated to
+   *  the system directly. Only bulk changes (such as adding or removing technologies
+   *  are). To inform the system of individual technology updates, call this method
+   *  after a technology or multiple technologies have been changed.
+   */
+  void notify_technologies_changed ();
+
+  /**
    *  @brief Checks, if a technology with the given name exists
    */
   bool has_technology (const std::string &name) const;

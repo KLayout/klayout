@@ -185,6 +185,12 @@ Technologies::end_updates ()
 }
 
 void
+Technologies::notify_technologies_changed ()
+{
+  technologies_changed ();
+}
+
+void
 Technologies::end_updates_no_event ()
 {
   m_in_update = false;

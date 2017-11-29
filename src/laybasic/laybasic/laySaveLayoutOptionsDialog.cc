@@ -191,9 +191,20 @@ SaveLayoutOptionsDialog::commit ()
 
   //  create the particular options for all formats
   for (std::vector< std::pair<StreamWriterOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
+
     if (page->first) {
-      page->first->commit (m_opt_array [m_technology_index].get_options (page->second), m_tech_array [m_technology_index], false);
+
+      db::FormatSpecificWriterOptions *specific_options = m_opt_array [m_technology_index].get_options (page->second);
+      if (! specific_options) {
+        //  Create a container for the options unless there is one already
+        specific_options = StreamWriterPluginDeclaration::plugin_for_format (page->second)->create_specific_options ();
+        m_opt_array [m_technology_index].set_options (specific_options);
+      }
+
+      page->first->commit (specific_options, m_tech_array [m_technology_index], false);
+
     }
+
   }
 }
 
@@ -206,7 +217,14 @@ SaveLayoutOptionsDialog::update ()
 
   for (std::vector< std::pair<StreamWriterOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
     if (page->first) {
-      page->first->setup (m_opt_array [m_technology_index].get_options (page->second), m_tech_array [m_technology_index]);
+      db::FormatSpecificWriterOptions *specific_options = m_opt_array [m_technology_index].get_options (page->second);
+      if (! specific_options) {
+        //  Create a container for the options unless there is one already
+        std::auto_ptr<db::FormatSpecificWriterOptions> new_options (StreamWriterPluginDeclaration::plugin_for_format (page->second)->create_specific_options ());
+        page->first->setup (new_options.get (), m_tech_array [m_technology_index]);
+      } else {
+        page->first->setup (specific_options, m_tech_array [m_technology_index]);
+      }
     }
   }
 }
@@ -255,6 +273,10 @@ SaveLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
     for (lay::Technologies::iterator t = technologies->begin (); t != technologies->end () && i < m_opt_array.size (); ++t, ++i) {
       technologies->begin ()[i].set_save_layout_options (m_opt_array [i]);
     }
+
+    //  TODO: this call is required currently because otherwise the technology
+    //  management subsystem does not notice the changes of technologies.
+    technologies->notify_technologies_changed ();
 
     return true;
 

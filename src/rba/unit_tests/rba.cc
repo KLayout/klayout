@@ -129,6 +129,7 @@ RUBYTEST (layMarkers, "layMarkers.rb")
 RUBYTEST (layMenuTest, "layMenuTest.rb")
 RUBYTEST (laySession, "laySession.rb")
 RUBYTEST (layTechnologies, "layTechnologies.rb")
+RUBYTEST (laySaveLayoutOptions, "laySaveLayoutOptions.rb")
 #if defined(HAVE_QTBINDINGS)
 RUBYTEST (qtbinding, "qtbinding.rb")
 #endif

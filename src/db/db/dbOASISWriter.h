@@ -57,7 +57,7 @@ public:
    *  @brief The constructor
    */
   OASISWriterOptions ()
-    : compression_level (2), write_cblocks (false), strict_mode (false), recompress (false), write_std_properties (1), subst_char ("*")
+    : compression_level (2), write_cblocks (false), strict_mode (false), recompress (false), permissive (false), write_std_properties (1), subst_char ("*")
   {
     //  .. nothing yet ..
   }
@@ -94,6 +94,16 @@ public:
    *  put into the compressor again (may take longer).
    */
   bool recompress;
+
+  /**
+   *  @brief Permissive mode
+   *
+   *  In permissive mode, a warning is issued for certain cases rather than
+   *  an error:
+   *  - Polygons with less than three points (omitted)
+   *  - Paths/circles with odd diameter (rounded)
+   */
+  bool permissive;
 
   /**
    *  @brief Write global standard properties

@@ -2362,7 +2362,13 @@ OASISWriter::write (const db::SimplePolygon &polygon, db::properties_id_type pro
   }
 
   if (m_pointlist.size () < 2) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Polygons with less than three points cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)");
+    std::string msg = tl::to_string (QObject::tr ("Polygons with less than three points cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
+    if (m_options.permissive) {
+      tl::warn << msg;
+      return;
+    } else {
+      throw tl::Exception (msg);
+    }
   }
 
   unsigned char info = 0x00;
@@ -2457,7 +2463,13 @@ OASISWriter::write (const db::Polygon &polygon, db::properties_id_type prop_id, 
     }
 
     if (m_pointlist.size () < 2) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Polygons with less than three points cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)");
+      std::string msg = tl::to_string (QObject::tr ("Polygons with less than three points cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
+      if (m_options.permissive) {
+        tl::warn << msg;
+        return;
+      } else {
+        throw tl::Exception (msg);
+      }
     }
 
     unsigned char info = 0x00;
@@ -2594,6 +2606,8 @@ OASISWriter::write (const db::Box &box, db::properties_id_type prop_id, const db
 void 
 OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const db::Repetition &rep)
 {
+  typedef db::coord_traits<db::Coord>::distance_type ucoord;
+
   //  don't write empty paths
   if (path.begin () == path.end ()) {
     return;
@@ -2605,6 +2619,9 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
   //  for round paths, circles are placed to mimic the extensions
   if (! path.round ()) {
     ext = path.extensions ();
+    //  Because we scale the width already, we also need to scale the extensions for comparing them
+    ext.first = safe_scale (m_sf, ext.first);
+    ext.second = safe_scale (m_sf, ext.second);
   }
 
   db::Path::iterator e = path.begin ();
@@ -2615,14 +2632,20 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
     m_pointlist.push_back (*e - start);
   }
 
-  db::Coord hw = path.width () / 2;
-  if (hw * 2 != path.width ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Paths with odd width cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)");
-  }
-
   if (m_pointlist.empty ()) {
 
     if (path.round ()) {
+
+      db::Coord w = safe_scale (m_sf, path.width ());
+      db::Coord hw = w / 2;
+      if (hw * 2 != w) {
+        std::string msg = tl::to_string (QObject::tr ("Circles with odd diameter cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
+        if (m_options.permissive) {
+          tl::warn << msg << " - " << tl::to_string (QObject::tr ("circle diameter is rounded"));
+        } else {
+          throw tl::Exception (msg);
+        }
+      }
 
       unsigned char info = 0;
       if (mm_layer != m_layer) {
@@ -2658,7 +2681,8 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
       }
       if (info & 0x20) {
         mm_circle_radius = hw;
-        write_ucoord (hw);
+        //  NOTE: the radius has already been scaled, so we don't use write_ucoord here
+        write ((ucoord) hw);
       }
       if (info & 0x10) {
         mm_geometry_x = start.x ();
@@ -2678,16 +2702,24 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
       }
 
     } else {
+      //  Single-point paths are translated into polygons
       write (path.polygon (), prop_id, rep);
     }
 
   } else {
 
-    db::Point end = start + m_pointlist.back ();
-
-    if (m_pointlist.size () < 1) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Paths with less than two points cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)");
+    db::Coord w = safe_scale (m_sf, path.width ());
+    db::Coord hw = w / 2;
+    if (hw * 2 != w) {
+      std::string msg = tl::to_string (QObject::tr ("Paths with odd width cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
+      if (m_options.permissive) {
+        tl::warn << msg << " - " << tl::to_string (QObject::tr ("path diameter is rounded"));
+      } else {
+        throw tl::Exception (msg);
+      }
     }
+
+    db::Point end = start + m_pointlist.back ();
 
     unsigned char info = 0x00;
 
@@ -2730,7 +2762,8 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
     }
     if (info & 0x40) {
       mm_path_halfwidth = hw;
-      write_ucoord (hw);
+      //  NOTE: the half-width has already been scaled, so we don't use write_ucoord here
+      write ((ucoord) hw);
     }
 
     if (info & 0x80) {
@@ -2758,10 +2791,12 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
       write_byte (ext_scheme);
 
       if ((ext_scheme & 0x0c) == 0x0c) {
-        write_coord (ext.first);
+        //  NOTE: ext.first is already scaled, so we don't use write_coord
+        write (ext.first);
       }
       if ((ext_scheme & 0x03) == 0x03) {
-        write_coord (ext.second);
+        //  NOTE: ext.second is already scaled, so we don't use write_coord
+        write (ext.second);
       }
 
       mm_path_start_extension = ext.first;
@@ -2814,7 +2849,8 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
 
       if (info & 0x20) {
         mm_circle_radius = hw;
-        write_ucoord (hw);
+        //  NOTE: the half-width has already been scaled, so we don't use write_ucoord here
+        write ((ucoord) hw);
       }
       if (info & 0x10) {
         mm_geometry_x = start.x ();

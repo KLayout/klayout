@@ -138,10 +138,11 @@ gsi::ClassExt<db::SaveLayoutOptions> cif_writer_options (
     "This option is useful for enhanced compatibility with other tools.\n"
     "\nThis property has been added in version 0.23.10.\n"
   ) +
-  gsi::method_ext ("cif_dummy_calls", &get_cif_dummy_calls,
+  gsi::method_ext ("cif_dummy_calls?|#cif_dummy_calls", &get_cif_dummy_calls,
     "@brief Gets a flag indicating whether dummy calls shall be written\n"
     "See \\cif_dummy_calls= method for a description of that property."
     "\nThis property has been added in version 0.23.10.\n"
+    "\nThe predicate version (cif_blank_separator?) has been added in version 0.25.1.\n"
   ) +
   gsi::method_ext ("cif_blank_separator=", &set_cif_blank_separator,
     "@brief Sets a flag indicating whether blanks shall be used as x/y separator characters\n"
@@ -149,10 +150,11 @@ gsi::ClassExt<db::SaveLayoutOptions> cif_writer_options (
     "rather than comma characters."
     "\nThis property has been added in version 0.23.10.\n"
   ) +
-  gsi::method_ext ("cif_blank_separator", &get_cif_blank_separator,
+  gsi::method_ext ("cif_blank_separator?|#cif_blank_separator", &get_cif_blank_separator,
     "@brief Gets a flag indicating whether blanks shall be used as x/y separator characters\n"
     "See \\cif_blank_separator= method for a description of that property."
     "\nThis property has been added in version 0.23.10.\n"
+    "\nThe predicate version (cif_blank_separator?) has been added in version 0.25.1.\n"
   ),
   ""
 );

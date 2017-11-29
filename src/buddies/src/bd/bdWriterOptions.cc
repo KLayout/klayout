@@ -190,6 +190,11 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                     "compression ratio, but at the cost of slower execution."
                    )
         << tl::arg (group +
+                    "#--permissive", &m_oasis_writer_options.permissive, "Permissive mode",
+                    "In permissive mode, certain forbidden objects are reported as warnings, not as errors: "
+                    "paths with odd width, polygons with less than three points etc."
+                   )
+        << tl::arg (group +
                     "#--write-std-properties", &m_oasis_writer_options.write_std_properties, "Writes some global standard properties",
                     "This is an integer describing what standard properties shall be written. 0 is \"none\", "
                     "1 means \"global standard properties such as S_TOP_CELL\" are produced (the default). With 2 also per-cell bounding "

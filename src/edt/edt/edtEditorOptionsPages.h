@@ -101,6 +101,7 @@ public:
 public slots:
   void apply ();
   void setup ();
+  void accept ();
 
 private:
   std::vector <edt::EditorOptionsPage *> m_pages;

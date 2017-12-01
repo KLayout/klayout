@@ -208,6 +208,15 @@ BEGIN_PROTECTED
 END_PROTECTED_W (this)
 }
 
+void
+EditorOptionsPages::accept ()
+{
+BEGIN_PROTECTED
+  do_apply ();
+  QDialog::accept ();
+END_PROTECTED_W (this)
+}
+
 // ------------------------------------------------------------------
 //  EditorOptionsGeneric implementation
 

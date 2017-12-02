@@ -619,11 +619,50 @@ private:
 };
 
 // -------------------------------------------------------------------
+//  Ruby interpreter private data
+
+struct RubyInterpreterPrivateData
+{
+  RubyInterpreterPrivateData ()
+  {
+    saved_stderr = Qnil;
+    saved_stdout = Qnil;
+    stdout_klass = Qnil;
+    stderr_klass = Qnil;
+    current_console = 0;
+    current_exec_handler = 0;
+    current_exec_level = 0;
+    in_trace = false;
+    exit_on_next = false;
+    block_exceptions = false;
+    ignore_next_exception = false;
+  }
+
+  VALUE saved_stderr;
+  VALUE saved_stdout;
+  VALUE stdout_klass;
+  VALUE stderr_klass;
+  gsi::Console *current_console;
+  std::vector<gsi::Console *> consoles;
+  gsi::ExecutionHandler *current_exec_handler;
+  int current_exec_level;
+  bool in_trace;
+  bool exit_on_next;
+  bool block_exceptions;
+  bool ignore_next_exception;
+  std::string debugger_scope;
+  std::map<const char *, size_t> file_id_map;
+  std::vector<gsi::ExecutionHandler *> exec_handlers;
+  std::set<std::string> package_paths;
+};
+
+// -------------------------------------------------------------------
 //  Ruby API 
 
 #define RBA_TRY \
   VALUE __error_msg = Qnil; \
   int __estatus = 0; \
+  VALUE __exc = Qnil; \
   VALUE __eclass = Qnil; \
   { \
     try { 
@@ -636,6 +675,9 @@ private:
       __estatus = ex.status (); \
       __eclass = rb_eSystemExit; \
       __error_msg = rb_str_new2 ((ex.msg () + tl::to_string (QObject::tr (" in ")) + (where)).c_str ()); \
+    } catch (rba::RubyError &ex) { \
+      __eclass = rb_eRuntimeError; \
+      __exc = ex.exc (); \
     } catch (tl::Exception &ex) { \
       __eclass = rb_eRuntimeError; \
       __error_msg = rb_str_new2 ((ex.msg () + tl::to_string (QObject::tr (" in ")) + (where)).c_str ()); \
@@ -644,14 +686,19 @@ private:
       __error_msg = rb_str_new2 ((tl::to_string (QObject::tr ("Unspecific exception in ")) + (where)).c_str ()); \
     } \
   } \
-  if (__eclass == rb_eSystemExit) { \
-    /*  HINT: we do the rb_raise outside any destructor code - sometimes this longjmp seems not to work properly */ \
+  if (__exc != Qnil) { \
+    /* Reraise the exception without blocking in the debugger */ \
+    /* TODO: should not access private data */ \
+    RubyInterpreter::instance ()->d->block_exceptions = true; \
+    rb_exc_raise (__exc); \
+  } else if (__eclass == rb_eSystemExit) { \
+    /* HINT: we do the rb_raise outside any destructor code - sometimes this longjmp seems not to work properly */ \
     VALUE args [2]; \
     args [0] = INT2NUM (__estatus); \
     args [1] = __error_msg; \
     rb_exc_raise (rb_class_new_instance(2, args, __eclass)); \
   } else if (__eclass != Qnil) { \
-    /*  HINT: we do the rb_raise outside any destructor code - sometimes this longjmp seems not to work properly */ \
+    /* HINT: we do the rb_raise outside any destructor code - sometimes this longjmp seems not to work properly */ \
     VALUE args [1]; \
     args [0] = __error_msg; \
     rb_exc_raise (rb_class_new_instance(1, args, __eclass)); \
@@ -1388,41 +1435,6 @@ stderr_winsize (VALUE self)
 
 // --------------------------------------------------------------------------
 //  RubyInterpreter implementation
-
-struct RubyInterpreterPrivateData
-{
-  RubyInterpreterPrivateData ()
-  {
-    saved_stderr = Qnil;
-    saved_stdout = Qnil;
-    stdout_klass = Qnil;
-    stderr_klass = Qnil;
-    current_console = 0;
-    current_exec_handler = 0;
-    current_exec_level = 0;
-    in_trace = false;
-    exit_on_next = false;
-    block_exceptions = false;
-    ignore_next_exception = false;
-  }
-
-  VALUE saved_stderr;
-  VALUE saved_stdout;
-  VALUE stdout_klass;
-  VALUE stderr_klass;
-  gsi::Console *current_console;
-  std::vector<gsi::Console *> consoles;
-  gsi::ExecutionHandler *current_exec_handler;
-  int current_exec_level;
-  bool in_trace;
-  bool exit_on_next;
-  bool block_exceptions;
-  bool ignore_next_exception;
-  std::string debugger_scope;
-  std::map<const char *, size_t> file_id_map;
-  std::vector<gsi::ExecutionHandler *> exec_handlers;
-  std::set<std::string> package_paths;
-};
 
 static RubyInterpreter *sp_rba_interpreter = 0;
 

@@ -25,6 +25,7 @@
 
 #include "rba.h"
 #include "rbaUtils.h"
+#include "rbaInternal.h"
 
 #if HAVE_RUBY_VERSION_CODE >= 20200
 #  include <ruby/debug.h>
@@ -168,9 +169,9 @@ rba_check_error ()
   }
 
   if (info.line > 0) {
-    throw RubyError (emsg.c_str (), info.file.c_str (), info.line, eclass.c_str (), bt);
+    throw RubyError (lasterr, emsg.c_str (), info.file.c_str (), info.line, eclass.c_str (), bt);
   } else {
-    throw RubyError (emsg.c_str (), eclass.c_str (), bt);
+    throw RubyError (lasterr, emsg.c_str (), eclass.c_str (), bt);
   }
 }
 

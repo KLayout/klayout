@@ -31,6 +31,12 @@ private
 
 end
 
+class MyException < RuntimeError
+  def initialize(s)
+    super(s)
+  end
+end
+    
 class XEdge < RBA::Edge
   def initialize
     super(RBA::Point.new(1,2), RBA::Point.new(3,4))
@@ -2601,4 +2607,30 @@ class Basic_TestClass < TestBase
 
   end
   
+  def test_73
+
+    begin
+
+      poly = RBA::Polygon::new(RBA::Box::new(0, 0, 100, 100))
+      
+      # passing exceptions over iterators is critical because it involves
+      # a Ruby/C++ and C++/Ruby transition
+      poly.each_edge do |e|
+        raise MyException::new("some exception")
+      end
+
+    rescue => ex
+      assert_equal(ex.class.to_s, "MyException")
+      assert_equal(ex.to_s, "some exception")
+    end
+
+    begin
+      raise MyException::new("another exception")
+    rescue => ex
+      assert_equal(ex.class.to_s, "MyException")
+      assert_equal(ex.to_s, "another exception")
+    end
+
+  end
+
 end

@@ -32,26 +32,6 @@
 namespace rba
 {
 
-/**
- *  @brief A class encapsulating a ruby exception
- */
-class RBA_PUBLIC RubyError
-  : public tl::ScriptError
-{
-public:
-  RubyError (const char *msg, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
-    : tl::ScriptError (msg, cls, backtrace)
-  { }
-
-  RubyError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
-    : tl::ScriptError (msg, sourcefile, line, cls, backtrace)
-  { }
-
-  RubyError (const RubyError &d)
-    : tl::ScriptError (d)
-  { }
-};
-
 struct RubyInterpreterPrivateData;
 
 /**

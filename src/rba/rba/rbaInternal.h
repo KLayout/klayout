@@ -30,11 +30,40 @@
 #include "gsiMethods.h"
 #include "gsiSignals.h"
 #include "tlObject.h"
+#include "tlScriptError.h"
 
 #include <ruby.h>
 
 namespace rba
 {
+
+/**
+ *  @brief A class encapsulating a ruby exception
+ */
+class RubyError
+  : public tl::ScriptError
+{
+public:
+  RubyError (VALUE exc, const char *msg, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
+    : tl::ScriptError (msg, cls, backtrace), m_exc (exc)
+  { }
+
+  RubyError (VALUE exc, const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
+    : tl::ScriptError (msg, sourcefile, line, cls, backtrace), m_exc (exc)
+  { }
+
+  RubyError (const RubyError &d)
+    : tl::ScriptError (d), m_exc (d.m_exc)
+  { }
+
+  VALUE exc () const
+  {
+    return m_exc;
+  }
+
+private:
+  VALUE m_exc;
+};
 
 /**
  *  @brief The proxy object that represents the C++ object on the Ruby side

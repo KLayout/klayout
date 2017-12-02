@@ -773,7 +773,7 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
     }
 
     //  Actually load the macros and/or establish the search path
-    mc->finish (! m_no_macros);
+    mc->finish ();
 
   }
 

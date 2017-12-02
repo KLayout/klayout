@@ -990,6 +990,11 @@ public:
   void autorun ();
 
   /**
+   *  @brief Returns true, if the collection has an early autorun macro
+   */
+  bool has_autorun_early () const;
+
+  /**
    *  @brief Runs all macros marked with early auto-run
    */
   void autorun_early ();

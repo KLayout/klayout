@@ -1789,6 +1789,11 @@ bool MacroCollection::has_autorun () const
   return has_autorun_for (*this, false);
 }
 
+bool MacroCollection::has_autorun_early () const
+{
+  return has_autorun_for (*this, true);
+}
+
 static void autorun_for (lym::MacroCollection &collection, bool early)
 {
   for (lym::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {

@@ -144,10 +144,8 @@ public:
   /**
    *  @brief Loads the macros from the predefined paths and establishes the search paths
    *  This method will also establish the macro categories.
-   *  If "load" is false, only the search path will be set. The macros themselves are not
-   *  loaded into memory.
    */
-  void finish (bool load);
+  void finish ();
 
   /**
    *  @brief Adds a temporary macro
@@ -256,6 +254,7 @@ private:
   void sync_file_watcher ();
   void sync_files ();
   void sync_package_paths ();
+  void sync_macro_sources ();
 };
 
 }

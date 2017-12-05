@@ -27,6 +27,7 @@
 #define HDR_extDiffToolDialog
 
 #include <QDialog>
+#include <string>
 
 namespace Ui
 {

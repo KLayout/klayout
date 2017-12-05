@@ -30,6 +30,7 @@
 #include <QObject>
 
 #include <string>
+#include <vector>
 
 namespace lay
 {

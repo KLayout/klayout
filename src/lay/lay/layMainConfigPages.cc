@@ -562,7 +562,9 @@ CustomizeMenuConfigPage::apply (const std::vector<std::pair<std::string, std::st
   }
 
   mp_ui->binding_le->setText (QString ());
+#if QT_VERSION >= 0x40700
   mp_ui->binding_le->setPlaceholderText (QString ());
+#endif
   mp_ui->binding_le->setEnabled (false);
 
   m_enable_event = true;
@@ -733,7 +735,9 @@ CustomizeMenuConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetI
     if (lay::MainWindow::instance ()->menu ()->is_menu (path)) {
 
       mp_ui->binding_le->setText (QString ());
+#if QT_VERSION >= 0x40700
       mp_ui->binding_le->setPlaceholderText (QString ());
+#endif
       mp_ui->binding_le->setEnabled (false);
 
     } else {
@@ -745,7 +749,9 @@ CustomizeMenuConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetI
       std::string def_shortcut = a.get_default_shortcut ();
 
       mp_ui->binding_le->setText (tl::to_qstring (shortcut));
+#if QT_VERSION >= 0x40700
       mp_ui->binding_le->setPlaceholderText (tl::to_qstring (def_shortcut));
+#endif
       mp_ui->binding_le->setEnabled (true);
 
     }
@@ -753,7 +759,9 @@ CustomizeMenuConfigPage::current_changed (QTreeWidgetItem *current, QTreeWidgetI
   } else {
 
     mp_ui->binding_le->setText (QString ());
+#if QT_VERSION >= 0x40700
     mp_ui->binding_le->setPlaceholderText (QString ());
+#endif
     mp_ui->binding_le->setEnabled (false);
 
   }

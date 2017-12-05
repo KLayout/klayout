@@ -27,6 +27,7 @@
 
 #include <QObject>
 #include <QWidget>
+#include <vector>
 
 class QMouseEvent;
 class QKeyEvent;

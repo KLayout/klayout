@@ -78,7 +78,11 @@ SaltGrainDetailsTextWidget::loadResource (int type, const QUrl &url)
         img = img.scaled (QSize (icon_dim, icon_dim), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
         QImage final_img (icon_dim, icon_dim, QImage::Format_ARGB32);
+#if QT_VERSION >= 0x40700
         final_img.fill (QColor (0, 0, 0, 0));
+#else
+        final_img.fill (0);
+#endif
         QPainter painter (&final_img);
         painter.drawImage ((icon_dim - img.width ()) / 2, (icon_dim - img.height ()) / 2, img);
 
@@ -95,7 +99,11 @@ SaltGrainDetailsTextWidget::loadResource (int type, const QUrl &url)
     QImage s = mp_grain->screenshot ().convertToFormat (QImage::Format_ARGB32_Premultiplied);
 
     QImage smask (s.size (), QImage::Format_ARGB32_Premultiplied);
+#if QT_VERSION >= 0x40700
     smask.fill (QColor (0, 0, 0, 0));
+#else
+    smask.fill (0);
+#endif
     {
       int border = 0;
       int radius = 6;

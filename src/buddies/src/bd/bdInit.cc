@@ -25,6 +25,8 @@
 #include "tlProgress.h"
 #include "version.h"
 
+#include <list>
+
 namespace bd
 {
 

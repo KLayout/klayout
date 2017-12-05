@@ -29,6 +29,7 @@
 #include <QDialog>
 
 #include <memory>
+#include <string>
 
 namespace lay
 {

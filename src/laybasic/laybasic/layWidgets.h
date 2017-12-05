@@ -31,6 +31,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QProxyStyle>
+#include <string>
 
 namespace db
 {

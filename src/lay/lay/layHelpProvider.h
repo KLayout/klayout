@@ -25,6 +25,7 @@
 #define HDR_layHelpProvider
 
 #include <QDomDocument>
+#include <string>
 
 namespace lay
 {

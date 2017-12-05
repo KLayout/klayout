@@ -27,6 +27,7 @@
 
 #include <QFileInfo>
 #include <QTimer>
+#include <list>
 
 namespace tl
 {

@@ -185,6 +185,14 @@ InputHttpStream::issue_request (const QUrl &url)
     }
     request.setRawHeader (QByteArray (h->first.c_str ()), QByteArray (h->second.c_str ()));
   }
+
+#if QT_VERSION < 0x40700
+  if (m_request == "GET" && m_data.isEmpty ()) {
+    mp_active_reply.reset (s_network_manager->get (request));
+  } else {
+    throw tl::Exception (tl::to_string (QObject::tr ("Custom HTTP requests are not supported in this build (verb is %1)").arg (QString::fromUtf8 (m_request))));
+  }
+#else
   if (m_data.isEmpty ()) {
     mp_active_reply.reset (s_network_manager->sendCustomRequest (request, m_request));
   } else {
@@ -194,6 +202,7 @@ InputHttpStream::issue_request (const QUrl &url)
     mp_buffer = new QBuffer (&m_data);
     mp_active_reply.reset (s_network_manager->sendCustomRequest (request, m_request, mp_buffer));
   }
+#endif
 }
 
 size_t 

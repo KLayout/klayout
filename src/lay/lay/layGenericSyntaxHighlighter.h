@@ -32,6 +32,7 @@
 #include <set>
 #include <map>
 #include <vector>
+#include <list>
 
 namespace lay
 {

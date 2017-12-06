@@ -231,6 +231,32 @@ tl::to_string (const unsigned long long &d)
   return os.str ();
 }
 
+#if defined(HAVE_64BIT_COORD)
+template <>
+std::string
+tl::to_string (const __int128 &d)
+{
+  if (d < 0 ) {
+    return "-" + tl::to_string(static_cast<unsigned __int128>(-d));
+  } else {
+    return tl::to_string(static_cast<unsigned __int128>(d));
+  }
+}
+
+template <>
+std::string
+tl::to_string (const unsigned __int128 &d)
+{
+  if (static_cast<uint64_t>(d) == d) {
+    return tl::to_string(static_cast<uint64_t>(d));
+  }
+  std::ostringstream os;
+  os.imbue (c_locale);
+  os << "0x" << std::hex << static_cast<uint64_t> (d>>64) << static_cast<uint64_t> (d);  
+  return os.str ();
+}
+#endif
+
 template <>
 std::string
 tl::to_string (char * const &cp)

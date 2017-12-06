@@ -2189,7 +2189,7 @@ QVariant Variant::to_qvariant () const
 #if defined(HAVE_64BIT_COORD)
   case t_int128:
     //  TODO: support for int128 in QVariant?
-    return QVariant ((double) m_var.m_m128);
+    return QVariant ((double) m_var.m_int128);
 #endif
   case t_bool:
     return QVariant (m_var.m_bool);

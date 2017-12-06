@@ -271,6 +271,10 @@ template <> TL_PUBLIC std::string to_string (const long &d);
 template <> TL_PUBLIC std::string to_string (const unsigned long &d);
 template <> TL_PUBLIC std::string to_string (const long long &d);
 template <> TL_PUBLIC std::string to_string (const unsigned long long &d);
+#if defined(HAVE_64BIT_COORD)
+template <> TL_PUBLIC std::string to_string (const __int128 &d);
+template <> TL_PUBLIC std::string to_string (const unsigned __int128 &d);
+#endif
 template <> TL_PUBLIC std::string to_string (const char * const &cp);
 template <> TL_PUBLIC std::string to_string (char * const &cp);
 template <> TL_PUBLIC std::string to_string (const unsigned char * const &cp);

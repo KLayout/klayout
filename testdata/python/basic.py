@@ -92,6 +92,22 @@ def ph(x):
   else:
     return x.replace("X", "")
     
+class PyGObject(pya.GObject):
+  z = -1
+  def __init__(self, z):
+    super(PyGObject, self).__init__()
+    self.z = z
+  # reimplementation of "virtual int g()"
+  def g(self):
+    return self.z*2
+
+class PyGFactory(pya.GFactory):
+  def __init__(self):
+    super(PyGFactory, self).__init__()
+  # reimplementation of "virtual GObject *f(int)"
+  def f(self, z):
+    return PyGObject(z)
+
 class BasicTest(unittest.TestCase):
 
   def test_00(self):
@@ -2692,6 +2708,17 @@ class BasicTest(unittest.TestCase):
     se.trigger_s0()
     self.assertEqual(sc.got_s0a, 0)
     self.assertEqual(sc.got_s0b, 0)
+
+  # Custom factory implemented in Python
+  def test_80(self):
+    gc = pya.GObject.g_inst_count()
+    gf = PyGFactory()
+    go = pya.GFactory.create_f(gf, 17)
+    self.assertEqual(go.g_virtual(), 34)
+    self.assertEqual(go.g_org(), 0)
+    self.assertEqual(pya.GObject.g_inst_count(), gc + 1)
+    go = None
+    self.assertEqual(pya.GObject.g_inst_count(), gc)
 
 # run unit tests
 if __name__ == '__main__':

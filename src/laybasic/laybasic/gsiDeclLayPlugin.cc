@@ -509,7 +509,7 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("PluginFactory",
     "@args root\n"
     "@param root The reference to the \\MainWindow object\n"
   ) +
-  callback ("create_plugin", &gsi::PluginFactoryBase::create_plugin_gsi, &gsi::PluginFactoryBase::f_create_plugin,
+  factory_callback ("create_plugin", &gsi::PluginFactoryBase::create_plugin_gsi, &gsi::PluginFactoryBase::f_create_plugin,
     "@brief Creates the plugin\n"
     "This is the basic functionality that the factory must provide. This method must create a plugin of the "
     "specific type.\n"

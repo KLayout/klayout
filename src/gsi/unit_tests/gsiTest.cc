@@ -1158,5 +1158,86 @@ gsi::Class<SE> decl_se ("SE",
   gsi::event ("s2", &SE::s2)
 );
 
+// ------------------------------------------------------------------
+//  G and GFactory implementation and GSI declarations
+
+GObject::GObject ()
+{
+  ++s_g_inst_count;
+}
+
+GObject::~GObject ()
+{
+  --s_g_inst_count;
+}
+
+size_t GObject::s_g_inst_count = 0;
+
+GObject_P::GObject_P ()
+  : GObject ()
+{
+  //  .. nothing yet ..
+}
+
+int GObject_P::g ()
+{
+  return g_cb.can_issue () ? g_cb.issue<GObject, int> (&GObject::g) : GObject::g ();
+}
+
+GFactory::GFactory ()
+{
+  //  .. nothing yet ..
+}
+
+GFactory::~GFactory ()
+{
+  //  .. nothing yet ..
+}
+
+GFactory_P::GFactory_P ()
+{
+  //  .. nothing yet ..
+}
+
+GObject *GFactory_P::f (int z)
+{
+  return f_cb.can_issue () ? f_cb.issue<GFactory, GObject *, int> (&GFactory::f, z) : GFactory::f (z);
+}
+
+int g_org (GObject_P *go)
+{
+  return go->GObject::g ();
+}
+
+int g_virtual (GObject *go)
+{
+  return go->g ();
+}
+
+static gsi::Class<GObject> decl_gobject_base ("GObjectBase",
+  gsi::method_ext ("g_virtual", &g_virtual) +
+  gsi::Methods()
+);
+
+static gsi::Class<GObject_P> decl_gobject (decl_gobject_base, "GObject",
+  gsi::method_ext ("g_org", &g_org) +
+  gsi::callback ("g", &GObject_P::g, &GObject_P::g_cb) +
+  gsi::method ("g_inst_count", &GObject::g_inst_count)
+);
+
+GObject *f_org (GFactory_P *fo, int z)
+{
+  return fo->GFactory::f (z);
+}
+
+static gsi::Class<GFactory> decl_gfactory_base ("GFactoryBase",
+  gsi::factory ("create_f", &GFactory::create_f)
+);
+
+static gsi::Class<GFactory_P> decl_gfactory (decl_gfactory_base, "GFactory",
+  gsi::method_ext ("f", &f_org) +
+  gsi::factory_callback ("f", &GFactory_P::f, &GFactory_P::f_cb)
+);
+
 }
 

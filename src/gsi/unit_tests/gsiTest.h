@@ -1044,6 +1044,54 @@ public:
   gsi::Callback f_cb;
 };
 
+//  An object that is produced by a factory
+class GObject
+{
+public:
+  GObject ();
+  virtual ~GObject ();
+  virtual int g () { return 0; }
+  static size_t g_inst_count ()
+  {
+    return s_g_inst_count;
+  }
+
+private:
+  static size_t s_g_inst_count;
+};
+
+class GObject_P : public GObject
+{
+public:
+  GObject_P ();
+  virtual int g ();
+
+  gsi::Callback g_cb;
+};
+
+//  This is the factory for G
+class GFactory
+{
+public:
+  GFactory ();
+  virtual ~GFactory ();
+
+  virtual GObject *f (int /*z*/) { return 0; }
+  static GObject *create_f (GFactory *g_factory, int z)
+  {
+    return g_factory->f (z);
+  }
+};
+
+class GFactory_P : public GFactory
+{
+public:
+  GFactory_P ();
+  virtual GObject *f (int z);
+
+  gsi::Callback f_cb;
+};
+
 class SQ
   : public QObject
 {

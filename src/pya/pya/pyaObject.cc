@@ -173,7 +173,7 @@ Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
         }
 
         tl::Heap heap;
-        push_arg (meth->ret_type (), ret, result.get (), heap);
+        push_arg (meth->ret_type (), ret, meth->ret_type().pass_obj() ? result.release() : result.get (), heap);
 
         
         //  a Python callback must not leave temporary objects

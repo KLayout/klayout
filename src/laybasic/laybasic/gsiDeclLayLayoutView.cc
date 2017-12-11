@@ -320,7 +320,7 @@ namespace {
     typedef lay::LayerPropertiesNodeRef value_type;
     typedef lay::LayerPropertiesNodeRef reference;
     //  Dummy declarations required for std::iterator_traits
-    typedef void iterator_category;
+    typedef std::forward_iterator_tag iterator_category;
     typedef void difference_type;
     typedef void pointer;
 

@@ -1208,7 +1208,7 @@ struct array_iterator
   typedef void pointer_type;
   typedef void difference_type;
   typedef void pointer;
-  typedef void iterator_category;
+  typedef std::forward_iterator_tag iterator_category;
 
   /**
    *  @brief The default constructor

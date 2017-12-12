@@ -28,6 +28,8 @@
 #include "tlTypeTraits.h"
 #include "gsiSerialisation.h"
 
+#include <iterator>
+
 //  For a comprehensive documentation see gsi.h
 
 namespace gsi

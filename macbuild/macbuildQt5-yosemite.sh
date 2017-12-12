@@ -1,21 +1,115 @@
 #!/bin/bash
-
+#------------------------------------------------------------------------------
 # Using Qt 5.8.0 from Mac Ports.
 #
 # Ruby: OSX native
 # Python: OSX native
-./build.sh \
-    -release \
-    -qmake          /opt/local/libexec/qt5/bin/qmake \
-    -build          ./qt5.build.macos-yosemite \
-    -bin            ./qt5.bin.macos-yosemite \
-    -option         -j4 \
-    -with-qtbinding \
-    -qt5 \
-    -ruby           /System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/bin/ruby \
-    -python         /System/Library/Frameworks/Python.framework/Versions/2.7/bin/python \
-    -rbinc          /System/Library/Frameworks/Ruby.framework/Headers \
-    -rblib          /System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/lib/libruby.dylib \
-    -pyinc          /System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 \
-    -pylib          /System/Library/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib 2>&1 \
-    | tee macbuildQt5.log
+#------------------------------------------------------------------------------
+MacRuby=/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/bin/ruby
+MacRubyInc=/System/Library/Frameworks/Ruby.framework/Headers
+MacRubyLib=/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/lib/libruby.dylib
+
+MacPython=/System/Library/Frameworks/Python.framework/Versions/2.7/bin/python
+MacPythonInc=/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7
+MacPythonLib=/System/Library/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib
+
+MacQMake=/opt/local/libexec/qt5/bin/qmake
+MacBinDir=./qt5.build.macos-yosemite
+MacBuildDir=./qt5.bin.macos-yosemite
+MacBuildLog=macbuildQt5-yosemite.log
+#------------------------------------------------------------------------------
+function WithRubyPython() {
+  ./build.sh                    \
+    -release                    \
+    -qmake      $MacQMake       \
+    -build      $MacBinDir      \
+    -bin        $MacBuildDir    \
+    -option     -j4             \
+    -with-qtbinding             \
+    -qt5                        \
+    -ruby       $MacRuby        \
+    -rbinc      $MacRubyInc     \
+    -rblib      $MacRubyLib     \
+    -python     $MacPython      \
+    -pyinc      $MacPythonInc   \
+    -pylib      $MacPythonLib 2>&1 | tee $MacBuildLog
+}
+#------------------------------------------------------------------------------
+function WithRuby() {
+  ./build.sh                    \
+    -release                    \
+    -qmake      $MacQMake       \
+    -build      $MacBinDir      \
+    -bin        $MacBuildDir    \
+    -option     -j4             \
+    -with-qtbinding             \
+    -qt5                        \
+    -ruby       $MacRuby        \
+    -rbinc      $MacRubyInc     \
+    -rblib      $MacRubyLib     \
+    -nopython   2>&1 | tee $MacBuildLog
+}
+#------------------------------------------------------------------------------
+function WithPython() {
+  ./build.sh                    \
+    -release                    \
+    -qmake      $MacQMake       \
+    -build      $MacBinDir      \
+    -bin        $MacBuildDir    \
+    -option     -j4             \
+    -with-qtbinding             \
+    -qt5                        \
+    -noruby                     \
+    -python     $MacPython      \
+    -pyinc      $MacPythonInc   \
+    -pylib      $MacPythonLib 2>&1 | tee $MacBuildLog
+}
+#------------------------------------------------------------------------------
+function WithoutRubytPython() {
+  ./build.sh                    \
+    -release                    \
+    -qmake      $MacQMake       \
+    -build      $MacBinDir      \
+    -bin        $MacBuildDir    \
+    -option     -j4             \
+    -with-qtbinding             \
+    -qt5                        \
+    -noruby                     \
+    -nopython   2>&1 | tee $MacBuildLog
+}
+#------------------------------------------------------------------------------
+function Usage() {
+    echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo "This script is for building KLayout for Mac OSX Yosemite"
+    echo " with Qt 5.8.0 from MacPorts"
+    echo ""
+    echo "USAGE:"
+    echo "  $0  < 0 | 1 | 2 | 3 >"
+    echo "        0: support neither Ruby nor Python"
+    echo "        1: support both Ruby and Python"
+    echo "        2: support Ruby only"
+    echo "        3: support Python only"
+    echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo ""
+}
+#------------------------------------------------------------------------------
+if [ $# -ne 1 ]; then
+    Usage
+    exit
+else
+    if [ "$1" = "0" ]; then
+        WithoutRubytPython
+    elif [ "$1" = "1" ]; then
+        WithRubyPython
+    elif [ "$1" = "2" ]; then
+        WithRuby
+    elif [ "$1" = "3" ]; then
+        WithPython
+    else
+        Usage
+        exit
+    fi
+fi
+#----------
+# EOF
+#----------

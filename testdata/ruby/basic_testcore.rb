@@ -53,6 +53,27 @@ class RBA::E
   @m = nil
 end
 
+class RBAGObject < RBA::GObject
+  def initialize(z)
+    super()
+    @z = z
+  end
+  # reimplementation of "virtual int g()"
+  def g
+    return @z*2
+  end
+end
+
+class RBAGFactory < RBA::GFactory
+  def initialize
+    super()
+  end
+  # reimplementation of "virtual GObject *f(int)"
+  def f(z)
+    return RBAGObject::new(z)
+  end
+end
+
 class Basic_TestClass < TestBase
 
   def test_FIRST
@@ -2630,6 +2651,21 @@ class Basic_TestClass < TestBase
       assert_equal(ex.class.to_s, "MyException")
       assert_equal(ex.to_s, "another exception")
     end
+
+  end
+
+  # Custom factory implemented in Ruby
+  def test_80
+
+    gc = RBA::GObject.g_inst_count
+    gf = RBAGFactory::new
+    go = RBA::GFactory.create_f(gf, 17)
+    assert_equal(go.g_virtual, 34)
+    assert_equal(go.g_org, 0)
+    assert_equal(RBA::GObject.g_inst_count, gc + 1)
+    go = nil
+    GC.start
+    assert_equal(RBA::GObject.g_inst_count, gc)
 
   end
 

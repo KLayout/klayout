@@ -45,34 +45,34 @@ GDS2Writer::GDS2Writer ()
   m_progress.set_unit (1024 * 1024);
 }
 
-inline void 
+void 
 GDS2Writer::write_byte (unsigned char b)
 {
   mp_stream->put ((const char *) &b, 1);
 }
 
-inline void 
+void 
 GDS2Writer::write_record_size (int16_t i)
 {
   gds2h (i);
   mp_stream->put ( (char*)(&i), sizeof (i));
 }
 
-inline void 
+void 
 GDS2Writer::write_record (int16_t i)
 {
   gds2h (i);
   mp_stream->put ( (char*)(&i), sizeof (i));
 }
 
-inline void 
+void 
 GDS2Writer::write_short (int16_t i)
 {
   gds2h (i);
   mp_stream->put ( (char*)(&i), sizeof (i));
 }
 
-inline void 
+void 
 GDS2Writer::write_int (int32_t l)
 {
   gds2h (l);

@@ -362,7 +362,8 @@ def Run():
   #-----------------------------------------------------
   # [2] Make the consolidated command line
   #-----------------------------------------------------
-  command  = "%s \\\n" % BuildBash
+  command  = "time"
+  command += " \\\n  %s" % BuildBash
   command += parameters
   command += "  2>&1 | tee %s" % MacBuildLog
   if CheckComOnly:

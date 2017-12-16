@@ -4,7 +4,7 @@
 #===============================================================================
 # File: "macbuild/build4mac.py"
 #
-#  The main script for building KLayout (http://www.klayout.de/index.php)
+#  The top script for building KLayout (http://www.klayout.de/index.php)
 #  version 0.25 or later on different Apple Mac OSX platforms.
 #===============================================================================
 from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
@@ -372,6 +372,21 @@ def Run():
   #-----------------------------------------------------
   # [3] Invoke the main Bash script
   #-----------------------------------------------------
+  myscript = "build4mac.py"
+  if subprocess.call( command, shell=True ) != 0:
+    print("")
+    print( "-------------------------------------------------------------" )
+    print( "!!! <%s>: failed to build KLayout" % myscript, file=sys.stderr )
+    print( "-------------------------------------------------------------" )
+    print("")
+    sys.exit(1)
+  else:
+    print("")
+    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
+    print( "### <%s>: successfully built KLayout" % myscript, file=sys.stderr )
+    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
+    print("")
+    sys.exit(0)
 
 #------------------------------------------------------------------------------
 ## The main function

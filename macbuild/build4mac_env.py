@@ -5,10 +5,10 @@
 # File: "macbuild/build4mac_env.py"
 #
 # Dictionaries
-# of different modules for building KLayout (http://www.klayout.de/index.php)
-# version 0.25 or later on different Apple Mac OSX platforms.
+#  of different modules for building KLayout (http://www.klayout.de/index.php)
+#  version 0.25 or later on different Apple Mac OSX platforms.
 #
-# This file is imported by 'build4mac.py' main script.
+# This file is imported by 'build4mac.py' script.
 #===============================================================================
 
 #-----------------------------------------------------
@@ -71,7 +71,7 @@ Ruby24SrcBuild  = { 'exe': '$HOME/Ruby24/bin/ruby',
                     'lib': '$HOME/Ruby24/lib/libruby.2.4.dylib'
                   }
 
-# Consolidated dictionary for Ruby
+# Consolidated dictionary kit for Ruby
 RubyDictionary  = { 'nil'           : None,
                     'RubyYosemite'  : RubyYosemite,
                     'RubyElCapitan' : RubyElCapitan,
@@ -129,7 +129,7 @@ Anaconda36      = { 'exe': '$HOME/anaconda/envs/py36klayout/bin/python3.6' ,
                     'lib': '$HOME/anaconda/envs/py36klayout/lib/libpython3.6m.dylib'
                   }
 
-# Consolidated dictionary for Python
+# Consolidated dictionary kit for Python
 PythonDictionary= { 'nil'             : None,
                     'PythonYosemite'  : PythonYosemite,
                     'PythonElCapitan' : PythonElCapitan,

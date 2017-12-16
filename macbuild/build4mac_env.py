@@ -4,8 +4,8 @@
 #===============================================================================
 # File: "macbuild/build4mac_env.py"
 #
-# Dictionaries
-#  of different modules for building KLayout (http://www.klayout.de/index.php)
+# Here are dictionaries of ...
+#  different modules for building KLayout (http://www.klayout.de/index.php)
 #  version 0.25 or later on different Apple Mac OSX platforms.
 #
 # This file is imported by 'build4mac.py' script.

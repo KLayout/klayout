@@ -4,7 +4,7 @@
 #===============================================================================
 # File: "macbuild/build4mac.py"
 #
-#  The top script for building KLayout (http://www.klayout.de/index.php)
+#  The top Python script for building KLayout (http://www.klayout.de/index.php)
 #  version 0.25 or later on different Apple Mac OSX platforms.
 #===============================================================================
 from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
@@ -343,7 +343,7 @@ def Run():
   if not MakeOptions == "":
     parameters += " \\\n  -option %s" % MakeOptions
 
-  # (F) about Ruby
+  # (E) about Ruby
   if ModuleRuby == "nil":
     parameters += " \\\n  -noruby"
   else:
@@ -351,7 +351,7 @@ def Run():
     parameters += " \\\n  -rbinc  %s" % RubyDictionary[ModuleRuby]['inc']
     parameters += " \\\n  -rblib  %s" % RubyDictionary[ModuleRuby]['lib']
 
-  # (G) about Python
+  # (F) about Python
   if ModulePython == "nil":
     parameters += " \\\n  -nopython"
   else:

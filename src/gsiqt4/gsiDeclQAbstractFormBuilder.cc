@@ -97,7 +97,7 @@ static void _init_f_load_2654 (qt_gsi::GenericMethod *decl)
   decl->add_arg<QIODevice * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("parentWidget", true, "0");
   decl->add_arg<QWidget * > (argspec_1);
-  decl->set_return<QWidget * > ();
+  decl->set_return_new<QWidget * > ();
 }
 
 static void _call_f_load_2654 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 

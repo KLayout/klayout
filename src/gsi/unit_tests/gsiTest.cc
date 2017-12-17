@@ -60,10 +60,18 @@ A::A (const A &a)
   : gsi::ObjectBase (a)
 {
   ++a_count;
-  e = a.e;
-  m_d = a.m_d;
-  n = a.n;
-  f = a.f;
+  operator= (a);
+}
+
+A &A::operator= (const A &a)
+{
+  if (this != &a) {
+    e = a.e;
+    m_d = a.m_d;
+    n = a.n;
+    f = a.f;
+  }
+  return *this;
 }
 
 int A::a0 ()

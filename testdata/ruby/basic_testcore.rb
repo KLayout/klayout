@@ -3,7 +3,10 @@
 # extend A
 class RBA::A 
 
-  def initialize
+  alias_method :org_initialize, :initialize
+
+  def initialize(*args)
+    org_initialize(*args)
     @offset = nil
   end
   def s( o )
@@ -89,6 +92,11 @@ class Basic_TestClass < TestBase
 
     a = RBA::A.new_a(100)
     assert_equal( RBA::A::a0, ac0 + 1 )
+
+    a = RBA::A.new
+    assert_equal(a.a1, 17)
+    a.assign(RBA::A.new(110))
+    assert_equal(a.a1, 110)
 
     a = nil
     GC.start

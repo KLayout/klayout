@@ -118,6 +118,11 @@ class BasicTest(unittest.TestCase):
     a = pya.A.new_a(100)
     self.assertEqual( pya.A.a0(), ac0 + 1 )
 
+    a = pya.A()
+    self.assertEqual(a.a1(), 17)
+    a.assign(pya.A(110))
+    self.assertEqual(a.a1(), 110)
+
     a = None
     self.assertEqual( pya.A.a0(), ac0 )
 

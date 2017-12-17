@@ -764,7 +764,7 @@ object_assign (PyObject *self, PyObject *args)
   tl_assert (cls_decl_self != 0);
 
   PyObject *src = NULL;
-  if (! PyArg_ParseTuple (args, "o", &src)) {
+  if (! PyArg_ParseTuple (args, "O", &src)) {
     return NULL;
   }
 
@@ -778,7 +778,7 @@ object_assign (PyObject *self, PyObject *args)
     throw tl::Exception (tl::to_string (QObject::tr ("No assignment provided for class '%s'")), cls_decl_self->name ());
   }
 
-  cls_decl_self->assign (((PYAObjectBase *) self)->obj (), ((PYAObjectBase *) args)->obj ());
+  cls_decl_self->assign (((PYAObjectBase *) self)->obj (), ((PYAObjectBase *) src)->obj ());
 
   Py_INCREF (self);
   return self;

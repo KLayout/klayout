@@ -82,6 +82,11 @@ struct A
   ~A ();
 
   /**
+   *  @brief Assignment
+   */
+  A &operator= (const A &a);
+
+  /**
    *  @brief A static method
    */
   static const char *a_static ();

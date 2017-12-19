@@ -52,12 +52,6 @@ public:
     //  .. nothing yet ..
   }
 
-  event_function (const event_function &other)
-    : m_m (other.m_m)
-  {
-    //  .. nothing yet ..
-  }
-
   virtual void call (_JOIN(tl::Object *object, _CALLARGLIST))
   {
     T *t = dynamic_cast<T *> (object);
@@ -83,12 +77,6 @@ class event_function_with_data<T, D, _TMPLARGLISTP>
 public:
   event_function_with_data (void (T::*m) (_JOIN(D, _TMPLARGLIST)), D d)
     : m_m (m), m_d (d)
-  {
-    //  .. nothing yet ..
-  }
-
-  event_function_with_data (const event_function_with_data &other)
-    : m_m (other.m_m), m_d (other.m_d)
   {
     //  .. nothing yet ..
   }
@@ -123,12 +111,6 @@ public:
     //  .. nothing yet ..
   }
 
-  generic_event_function (const generic_event_function &other)
-    : m_m (other.m_m)
-  {
-    //  .. nothing yet ..
-  }
-
   virtual void call (_JOIN(tl::Object *object, _CALLARGLIST))
   {
     T *t = dynamic_cast<T *> (object);
@@ -155,12 +137,6 @@ class generic_event_function_with_data<T, D, _TMPLARGLISTP>
 public:
   generic_event_function_with_data (void (T::*m) (D, int, void **), D d)
     : m_m (m), m_d (d)
-  {
-    //  .. nothing yet ..
-  }
-
-  generic_event_function_with_data (const generic_event_function_with_data &other)
-    : m_m (other.m_m), m_d (other.m_d)
   {
     //  .. nothing yet ..
   }

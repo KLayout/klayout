@@ -33,10 +33,14 @@
 namespace rba
 {
 
+class Proxy;
+
 /**
  *  @brief Pops an argument from the call or return stack
+ *
+ *  "self" is a reference to the object that the method is called on or 0 if there is no such object.
  */
-VALUE pop_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, tl::Heap &heap);
+VALUE pop_arg (const gsi::ArgType &atype, Proxy *self, gsi::SerialArgs &aserial, tl::Heap &heap);
 
 /**
  *  @brief Pushes an argument on the call or return stack

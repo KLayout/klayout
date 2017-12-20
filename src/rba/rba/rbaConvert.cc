@@ -126,7 +126,7 @@ tl::Variant ruby2c<tl::Variant> (VALUE rval)
   }
 }
 
-VALUE object_to_ruby (void *obj, const gsi::ArgType &atype)
+VALUE object_to_ruby (void *obj, Proxy *self, const gsi::ArgType &atype)
 {
   const gsi::ClassBase *cls = atype.cls()->subclass_decl (obj);
 
@@ -136,7 +136,7 @@ VALUE object_to_ruby (void *obj, const gsi::ArgType &atype)
   bool prefer_copy = atype.is_cref ();
   bool can_destroy = prefer_copy || atype.is_ptr ();
 
-  return object_to_ruby (obj, cls, pass_obj, is_const, prefer_copy, can_destroy);
+  return object_to_ruby (obj, self, cls, pass_obj, is_const, prefer_copy, can_destroy);
 }
 
 /**
@@ -156,7 +156,7 @@ static void correct_constness (Proxy *p, bool const_required)
 }
 
 VALUE
-object_to_ruby (void *obj, const gsi::ClassBase *cls, bool pass_obj, bool is_const, bool prefer_copy, bool can_destroy)
+object_to_ruby (void *obj, Proxy *self, const gsi::ClassBase *cls, bool pass_obj, bool is_const, bool prefer_copy, bool can_destroy)
 {
   VALUE ret = Qnil;
   if (! obj || ! cls) {
@@ -170,7 +170,12 @@ object_to_ruby (void *obj, const gsi::ClassBase *cls, bool pass_obj, bool is_con
 
   //  Derive a Proxy reference if the object is already bound
   Proxy *rba_data = 0;
-  if (! clsact->adapted_type_info () && clsact->is_managed ()) {
+  if (self && self->obj () == obj) {
+
+    //  reuse "self" if the object to convert is self.
+    rba_data = self;
+
+  } else if (! clsact->adapted_type_info () && clsact->is_managed ()) {
 
     rba_data = clsact->gsi_object (obj)->find_client<Proxy> ();
     if (rba_data) {
@@ -281,7 +286,7 @@ VALUE c2ruby<tl::Variant> (const tl::Variant &c)
     const gsi::ClassBase *cls = c.gsi_cls ();
     if (cls) {
       void *obj = const_cast<void *> (c.to_user ());
-      return object_to_ruby (obj, c.user_cls ()->gsi_cls (), false, false, true, false);
+      return object_to_ruby (obj, 0, c.user_cls ()->gsi_cls (), false, false, true, false);
     } else {
       //  not a known type -> return nil
       return Qnil;

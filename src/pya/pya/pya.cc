@@ -1021,7 +1021,7 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
         //  In case of an error upon write, pop the arguments to clean them up.
         //  Without this, there is a risk to keep dead objects on the stack.
         for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-          pop_arg (*a, arglist, NULL, heap);
+          pop_arg (*a, arglist, 0, heap);
         }
 
         throw;
@@ -1572,7 +1572,7 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
         //  In case of an error upon write, pop the arguments to clean them up.
         //  Without this, there is a risk to keep dead objects on the stack.
         for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-          pop_arg (*a, arglist, NULL, heap);
+          pop_arg (*a, arglist, 0, heap);
         }
 
         throw;

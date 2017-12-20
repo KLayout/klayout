@@ -720,6 +720,17 @@ class DBPolygon_TestClass < TestBase
 
   end
 
+  def test_selfRef
+
+    # p1 is a reference to the new'd object:
+    p1 = RBA::Polygon::new(RBA::Box::new(10, 20, 30, 40)).move(10, 20)
+    assert_equal(p1.to_s, "(20,40;20,60;40,60;40,40)")
+    GC.start
+    # after the GC cleaned up the new'd object, the reference still needs to be valid
+    assert_equal(p1.to_s, "(20,40;20,60;40,60;40,40)")
+
+  end
+
 end
 
 load("test_epilogue.rb")

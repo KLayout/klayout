@@ -522,7 +522,7 @@ struct reader<void *>
 template <> 
 struct reader<gsi::StringType>
 {
-  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PyObject * /*self*/, const gsi::ArgType &, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase * /*self*/, const gsi::ArgType &, tl::Heap *heap)
   {
     std::auto_ptr<gsi::StringAdaptor> a ((gsi::StringAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
@@ -534,7 +534,7 @@ struct reader<gsi::StringType>
 };
 
 static
-PyObject *object_from_variant (const tl::Variant &var, const gsi::ArgType &atype)
+PyObject *object_from_variant (const tl::Variant &var, PYAObjectBase *self, const gsi::ArgType &atype)
 {
   if (var.is_user()) {
 
@@ -579,7 +579,7 @@ PyObject *object_from_variant (const tl::Variant &var, const gsi::ArgType &atype
 
     }
 
-    return object_to_python ((void *) var.to_user (), var.user_cls ()->gsi_cls (), pass_obj, is_const, prefer_copy, can_destroy);
+    return object_to_python ((void *) var.to_user (), self, var.user_cls ()->gsi_cls (), pass_obj, is_const, prefer_copy, can_destroy);
 
   } else {
     return c2python<tl::Variant> (var);
@@ -592,7 +592,7 @@ PyObject *object_from_variant (const tl::Variant &var, const gsi::ArgType &atype
 template <> 
 struct reader<gsi::VariantType>
 {
-  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PyObject * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase *self, const gsi::ArgType &atype, tl::Heap *heap)
   {
     std::auto_ptr<gsi::VariantAdaptor> a ((gsi::VariantAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
@@ -601,9 +601,9 @@ struct reader<gsi::VariantType>
       gsi::VariantAdaptorImpl<tl::Variant> *aa = dynamic_cast<gsi::VariantAdaptorImpl<tl::Variant> *> (a.get ());
       if (aa) {
         //  A small optimization that saves one variant copy
-        *ret = object_from_variant (aa->var_ref (), atype);
+        *ret = object_from_variant (aa->var_ref (), self, atype);
       } else {
-        *ret = object_from_variant (a->var (), atype);
+        *ret = object_from_variant (a->var (), self, atype);
       }
     }
   }
@@ -615,7 +615,7 @@ struct reader<gsi::VariantType>
 template <> 
 struct reader<gsi::VectorType>
 {
-  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PyObject * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
   {
     std::auto_ptr<gsi::VectorAdaptor> a ((gsi::VectorAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
@@ -635,7 +635,7 @@ struct reader<gsi::VectorType>
 template <> 
 struct reader<gsi::MapType>
 {
-  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PyObject * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
   {
     std::auto_ptr<gsi::MapAdaptor> a ((gsi::MapAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
@@ -656,13 +656,13 @@ struct reader<gsi::MapType>
 template <> 
 struct reader<gsi::ObjectType>
 {
-  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PyObject * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase *self, const gsi::ArgType &atype, tl::Heap *heap)
   {
     void *obj = rr->read<void *> (*heap);
     if (! obj) {
       *ret = PythonRef (Py_None, false /*borrowed*/);
     } else {
-      *ret = object_to_python (obj, atype);
+      *ret = object_to_python (obj, self, atype);
     }
   }
 };
@@ -673,14 +673,14 @@ struct reader<gsi::ObjectType>
 template <> 
 struct reader<gsi::VoidType>
 {
-  void operator() (gsi::SerialArgs *, PythonRef *, PyObject *, const gsi::ArgType &, tl::Heap *)
+  void operator() (gsi::SerialArgs *, PythonRef *, PYAObjectBase *, const gsi::ArgType &, tl::Heap *)
   {
     //  .. nothing: void is not serialized
   }
 };
 
 PythonRef 
-pop_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PyObject *self, tl::Heap &heap)
+pop_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PYAObjectBase *self, tl::Heap &heap)
 {
   PythonRef ret;
   gsi::do_on_type<reader> () (atype.type (), &aserial, &ret, self, atype, &heap);
@@ -754,7 +754,7 @@ void PythonBasedVectorAdaptor::push (gsi::SerialArgs &r, tl::Heap &heap)
 {
   if (PyList_Check (m_array.get ())) {
     PythonRef member;
-    gsi::do_on_type<reader> () (mp_ainner->type (), &r, &member, (PyObject *) NULL, *mp_ainner, &heap);
+    gsi::do_on_type<reader> () (mp_ainner->type (), &r, &member, (PYAObjectBase *) 0, *mp_ainner, &heap);
     PyList_Append (m_array.get (), member.get ());
   } else if (PyTuple_Check (m_array.get ())) {
     throw tl::Exception (tl::to_string (QObject::tr ("Tuples cannot be modified and cannot be used as out parameters")));
@@ -825,8 +825,8 @@ gsi::MapAdaptorIterator *PythonBasedMapAdaptor::create_iterator () const
 void PythonBasedMapAdaptor::insert (gsi::SerialArgs &r, tl::Heap &heap) 
 {
   PythonRef k, v;
-  gsi::do_on_type<reader> () (mp_ainner_k->type (), &r, &k, (PyObject *) NULL, *mp_ainner_k, &heap);
-  gsi::do_on_type<reader> () (mp_ainner->type (), &r, &v, (PyObject *) NULL, *mp_ainner, &heap);
+  gsi::do_on_type<reader> () (mp_ainner_k->type (), &r, &k, (PYAObjectBase *) 0, *mp_ainner_k, &heap);
+  gsi::do_on_type<reader> () (mp_ainner->type (), &r, &v, (PYAObjectBase *) 0, *mp_ainner, &heap);
   PyDict_SetItem (m_hash.get (), k.get (), v.get ());
 }
 

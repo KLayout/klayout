@@ -366,7 +366,7 @@ pya_plain_iterator_next (PyObject *self)
 
   gsi::SerialArgs args (iter->iter->serial_size ());
   iter->iter->get (args);
-  PythonRef obj = pop_arg (*iter->value_type, args, NULL, heap);
+  PythonRef obj = pop_arg (*iter->value_type, args, 0, heap);
 
   iter->iter->inc ();
 

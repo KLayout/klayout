@@ -977,7 +977,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
           //  In case of an error upon write, pop the arguments to clean them up.
           //  Without this, there is a risk to keep dead objects on the stack.
           for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-            pop_arg (*a, arglist, heap);
+            pop_arg (*a, 0, arglist, heap);
           }
 
           throw;
@@ -1020,7 +1020,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
           //  In case of an error upon write, pop the arguments to clean them up.
           //  Without this, there is a risk to keep dead objects on the stack.
           for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-            pop_arg (*a, arglist, heap);
+            pop_arg (*a, 0, arglist, heap);
           }
 
           throw;
@@ -1046,7 +1046,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
               rr.reset ();
               iter->get (rr);
 
-              VALUE value = pop_arg (meth->ret_type (), rr, heap);
+              VALUE value = pop_arg (meth->ret_type (), p, rr, heap);
               rba_yield_checked (value);
 
               iter->inc ();
@@ -1060,7 +1060,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
         }
 
       } else {
-        ret = pop_arg (meth->ret_type (), retlist, heap);
+        ret = pop_arg (meth->ret_type (), p, retlist, heap);
       }
 
     }
@@ -1679,7 +1679,7 @@ rba_init (RubyInterpreterPrivateData *d)
       gsi::SerialArgs arglist (c->meth->argsize ());
       c->meth->call (0, arglist, retlist);
       tl::Heap heap;
-      VALUE ret = pop_arg (c->meth->ret_type (), retlist, heap);
+      VALUE ret = pop_arg (c->meth->ret_type (), 0, retlist, heap);
       rb_define_const (c->klass, c->name.c_str (), ret);
 
     } catch (tl::Exception &ex) {

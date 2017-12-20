@@ -514,7 +514,7 @@ struct simple_polygon_defs
     ) +
     method_ext ("touches?", &touches_edge, gsi::arg ("edge"),
       "@brief Returns true, if the polygon touches the given edge.\n"
-      "The box and the polygon touch if they overlap or the edge shares at least one point with the polygon's contour.\n"
+      "The edge and the polygon touch if they overlap or the edge shares at least one point with the polygon's contour.\n"
       "\n"
       "This method was introduced in version 0.25.1.\n"
     ) +
@@ -1509,7 +1509,7 @@ struct polygon_defs
     ) +
     method_ext ("touches?", &touches_edge, gsi::arg ("edge"),
       "@brief Returns true, if the polygon touches the given edge.\n"
-      "The box and the polygon touch if they overlap or the edge shares at least one point with the polygon's contour.\n"
+      "The edge and the polygon touch if they overlap or the edge shares at least one point with the polygon's contour.\n"
       "\n"
       "This method was introduced in version 0.25.1.\n"
     ) +

@@ -43,12 +43,15 @@ namespace gsi
 namespace pya
 {
 
+class PYAObjectBase;
+
 // -------------------------------------------------------------------
 //  Conversion of a generic object to a Python object
 
 /**
  *  @brief Translates an object to a Python object (PyObject)
  *  @param obj The generic object pointer
+ *  @param self If there is an object where the returned object may be a member of or 0 if there isn't
  *  @param cls The class of the object
  *  @param pass_obj If true, the Python object will own the original object which gets destroyed when the Ruby object is finalized
  *  @param is_const If true, the Python object will be a const one unless the original object is already bound in a non-const way
@@ -57,14 +60,14 @@ namespace pya
  *  @return The Python object
  */
 PyObject *
-object_to_python (void *obj, const gsi::ClassBase *cls, bool pass_obj, bool is_const, bool prefer_copy, bool can_destroy);
+object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, bool pass_obj, bool is_const, bool prefer_copy, bool can_destroy);
 
 /**
  *  @brief Translates an object to a Python object (PyObject)
  *  This version takes it's flags from the atype given.
  */
 PyObject *
-object_to_python (void *obj, const gsi::ArgType &atype);
+object_to_python (void *obj, PYAObjectBase *self, const gsi::ArgType &atype);
 
 // -------------------------------------------------------------------
 //  Type checks 

@@ -2,7 +2,7 @@
 # This script is sourced to define the main version parameters
 
 # The main version
-KLAYOUT_VERSION="0.25"
+KLAYOUT_VERSION="0.25.1"
 
 # The build date
 KLAYOUT_VERSION_DATE=$(date --iso-8601)

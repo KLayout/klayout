@@ -659,6 +659,67 @@ class DBPolygon_TestClass < TestBase
 
   end
 
+  # touches predicate
+  def test_touches
+
+    p1 = RBA::Polygon::new(RBA::Box::new(10, 20, 30, 40))
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::Box::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Box::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::Box::new(29, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Edge::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Edge::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::Edge::new(29, 20, 40, 50)), true)
+
+    p1 = RBA::SimplePolygon::new(RBA::Box::new(10, 20, 30, 40))
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::Box::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Box::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::Box::new(29, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Edge::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Edge::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::Edge::new(29, 20, 40, 50)), true)
+
+    p1 = RBA::DPolygon::new(RBA::DBox::new(10, 20, 30, 40))
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DBox::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DBox::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::DBox::new(29, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DEdge::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DEdge::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::DEdge::new(29, 20, 40, 50)), true)
+
+    p1 = RBA::DSimplePolygon::new(RBA::DBox::new(10, 20, 30, 40))
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DBox::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DBox::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::DBox::new(29, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DEdge::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DEdge::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::DEdge::new(29, 20, 40, 50)), true)
+
+  end
+
 end
 
 load("test_epilogue.rb")

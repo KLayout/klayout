@@ -51,7 +51,7 @@
 #include <iostream>
 #include <cstdlib>
 
-int klayout_main (int argc, char **argv);
+int klayout_main (int &argc, char **argv);
 
 #ifdef _WIN32 // for VC++
 
@@ -67,25 +67,25 @@ WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*prevInstance*/, LPSTR /*lpCmdLine*/
 
   //  fail safe behaviour
   if (!szArgList) {
-	  MessageBox(NULL, L"Unable to parse command line", L"Error", MB_OK);
-	  return 10;
+    MessageBox(NULL, L"Unable to parse command line", L"Error", MB_OK);
+    return 10;
   }
 
   char **argv = new char *[argCount];
   for (int i = 0; i < argCount; i++) {
-	  QString a;
-	  for (WCHAR *wc = szArgList [i]; *wc; ++wc) {
+    QString a;
+    for (WCHAR *wc = szArgList [i]; *wc; ++wc) {
       a += QChar ((unsigned int) *wc);
-	  }
-	  QByteArray aa = a.toUtf8 ();
-	  argv [i] = new char [aa.size () + 1];
-	  strcpy (argv [i], aa.constData ());
+    }
+    QByteArray aa = a.toUtf8 ();
+    argv [i] = new char [aa.size () + 1];
+    strcpy (argv [i], aa.constData ());
   }
 
   int ret = klayout_main (argCount, argv);
 
   for (int i = 0; i < argCount; i++) {
-	  delete[] argv [i];
+    delete[] argv [i];
   }
   delete[] argv;
 
@@ -100,15 +100,15 @@ main(int a_argc, const char **a_argv)
 {
   char **argv = new char *[a_argc];
   for (int i = 0; i < a_argc; i++) {
-	  tl::string aa = tl::system_to_string (a_argv[i]);
+    tl::string aa = tl::system_to_string (a_argv[i]);
     argv [i] = new char [aa.size () + 1];
-	  strcpy (argv [i], aa.c_str ());
+    strcpy (argv [i], aa.c_str ());
   }
 
   int ret = klayout_main (a_argc, argv);
 
   for (int i = 0; i < a_argc; i++) {
-	  delete[] argv [i];
+    delete[] argv [i];
   }
   delete[] argv;
 
@@ -158,14 +158,14 @@ void myMessageOutput(QtMsgType type, const char *msg)
 }
 #endif
 
-static int klayout_main_cont (int argc, char **argv);
+static int klayout_main_cont (int &argc, char **argv);
 
 /**
  *  @brief The basic entry point
  *  Note that by definition, klayout_main receives arguments in UTF-8
  */
 int
-klayout_main (int argc, char **argv)
+klayout_main (int &argc, char **argv)
 {
   //  This special initialization is required by the Ruby interpreter because it wants to mark the stack
   int ret = rba::RubyInterpreter::initialize (argc, argv, &klayout_main_cont);
@@ -179,7 +179,7 @@ klayout_main (int argc, char **argv)
 }
 
 int 
-klayout_main_cont (int argc, char **argv)
+klayout_main_cont (int &argc, char **argv)
 {
   //  install the version strings
   lay::Version::set_exe_name (prg_exe_name);

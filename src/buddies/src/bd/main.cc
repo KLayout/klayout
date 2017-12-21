@@ -31,7 +31,7 @@ BD_PUBLIC int BD_TARGET (int argc, char *argv []);
 /**
  *  @brief The continuation function to support Ruby's special top-level hook
  */
-static int main_cont (int argc, char **argv)
+static int main_cont (int &argc, char **argv)
 {
   QCoreApplication app (argc, argv);
   return bd::_main_impl (&BD_TARGET, argc, argv);

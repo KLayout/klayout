@@ -127,7 +127,7 @@ RubyInterpreter::available () const
 }
 
 int
-RubyInterpreter::initialize (int argc, char **argv, int (*main_cont)(int, char **))
+RubyInterpreter::initialize (int &argc, char **argv, int (*main_cont)(int &, char **))
 {
   return (*main_cont) (argc, argv);
 }

@@ -53,7 +53,7 @@
 #include "drcForceLink.h"
 #endif
 
-static int main_cont (int argc, char **argv);
+static int main_cont (int &argc, char **argv);
 
 int
 main (int argc, char **argv)
@@ -318,7 +318,7 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
 }
 
 static int
-main_cont (int argc, char **argv)
+main_cont (int &argc, char **argv)
 {
   int result = 0;
 

@@ -1751,16 +1751,16 @@ RubyInterpreter::version () const
   }
 }
 
-static int s_argc = 0;
+static int *s_argc = 0;
 static char **s_argv = 0;
-static int (*s_main_func) (int, char **) = 0;
+static int (*s_main_func) (int &, char **) = 0;
 
 static VALUE run_app_func (VALUE)
 {
   int res = 0;
 
-  if (s_main_func && s_argv && s_argc > 0) {
-    res = (*s_main_func) (s_argc, s_argv);
+  if (s_main_func && s_argv && s_argc && *s_argc > 0) {
+    res = (*s_main_func) (*s_argc, s_argv);
   }
 
   if (res) {
@@ -1771,7 +1771,7 @@ static VALUE run_app_func (VALUE)
 }
 
 int
-RubyInterpreter::initialize (int main_argc, char **main_argv, int (*main_func) (int, char **))
+RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) (int &, char **))
 {
   int argc = 3;
   char *argv[3];
@@ -1861,7 +1861,7 @@ RubyInterpreter::initialize (int main_argc, char **main_argv, int (*main_func) (
 
       rb_define_global_function("__run_app__", (VALUE (*)(...)) run_app_func, 0);
 
-      s_argc = main_argc;
+      s_argc = &main_argc;
       s_argv = main_argv;
       s_main_func = main_func;
 
@@ -1879,6 +1879,7 @@ RubyInterpreter::initialize (int main_argc, char **main_argv, int (*main_func) (
       int res = ruby_run_node (ruby_options (argc, argv));
 #endif
 
+      s_argc = 0;
       return res;
 
     }

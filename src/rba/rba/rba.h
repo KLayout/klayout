@@ -203,7 +203,7 @@ public:
    *  }
    *  @endcode
    */
-  static int initialize (int argc, char **argv, int (*main_func) (int, char **));
+  static int initialize (int &argc, char **argv, int (*main_func) (int &, char **));
 
   /**
    *  @brief The instance of the Ruby interpreter of 0 if there is none.

@@ -158,7 +158,7 @@ public:
   /**
    *  @brief Provide a first (basic) initialization and continue with the "main_cont" function internally
    */
-  static int initialize (int argc, char **argv, int (*main_cont)(int, char **));
+  static int initialize (int &argc, char **argv, int (*main_cont)(int &, char **));
 };
 
 }

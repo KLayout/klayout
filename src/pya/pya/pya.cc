@@ -1550,7 +1550,7 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
       p->destroy ();
     }
 
-    const gsi::MethodBase *meth = match_method (mid, self, args, ! p->cls_decl ()->can_default_create ());
+    const gsi::MethodBase *meth = match_method (mid, self, args, PyTuple_Size (args) > 0 || ! p->cls_decl ()->can_default_create ());
 
     if (meth && meth->smt () == gsi::MethodBase::None) {
 

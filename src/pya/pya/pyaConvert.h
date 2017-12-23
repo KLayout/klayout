@@ -88,15 +88,23 @@ bool test_type (PyObject * /*rval*/, bool /*loose*/)
 }
 
 template <>
-inline bool test_type<bool> (PyObject * /*rval*/, bool /*loose*/)
+inline bool test_type<bool> (PyObject *rval, bool loose)
 {
-  return true;  // everything can be converted to bool
+  if (loose) {
+    return true;  // everything can be converted to bool
+  } else {
+    return PyBool_Check (rval) || rval == Py_None;
+  }
 }
 
 //  used for other integer types as well:
 template <>
 inline bool test_type<int> (PyObject *rval, bool loose)
 {
+  //  bool values don't count as int in strict mode
+  if (!loose && PyBool_Check (rval)) {
+    return false;
+  }
 #if PY_MAJOR_VERSION < 3
   return PyInt_Check (rval) || PyLong_Check (rval) || (PyFloat_Check (rval) && loose);
 #else
@@ -175,6 +183,10 @@ inline bool test_type<__int128> (PyObject *rval, bool loose)
 template <>
 inline bool test_type<double> (PyObject *rval, bool loose)
 {
+  //  bool values don't count as int in strict mode
+  if (!loose && PyBool_Check (rval)) {
+    return false;
+  }
 #if PY_MAJOR_VERSION < 3
   return PyFloat_Check (rval) || (PyInt_Check (rval) && loose) || (PyLong_Check (rval) && loose);
 #else

@@ -292,12 +292,12 @@ void signal_handler (int signo, siginfo_t *si, void *)
 
   std::auto_ptr<CrashMessage> msg;
 
-  bool has_gui = lay::Application::instance () && lay::Application::instance ()->has_gui ();
+  bool has_gui = lay::ApplicationBase::instance () && lay::ApplicationBase::instance ()->has_gui ();
 
   if (has_gui) {
     msg.reset (new CrashMessage (0, false, tl::to_qstring (text) + QObject::tr ("\nCollecting backtrace ..")));
     msg->show ();
-    lay::Application::instance ()->setOverrideCursor (Qt::WaitCursor);
+    lay::ApplicationBase::instance ()->qapp_gui ()->setOverrideCursor (Qt::WaitCursor);
   }
 
   text += std::string ("\nBacktrace:\n");
@@ -326,7 +326,7 @@ void signal_handler (int signo, siginfo_t *si, void *)
   for (size_t i = 0; i < nptrs; ++i) {
 
     if (has_gui) {
-      lay::Application::instance ()->processEvents ();
+      lay::ApplicationBase::instance ()->qapp_gui ()->processEvents ();
       if (msg->is_cancel_pressed ()) {
         text += "...\n";
         break;
@@ -402,7 +402,7 @@ void signal_handler (int signo, siginfo_t *si, void *)
 
   if (has_gui) {
 
-    lay::Application::instance ()->setOverrideCursor (QCursor ());
+    lay::ApplicationBase::instance ()->qapp_gui ()->setOverrideCursor (QCursor ());
 
     //  YES! I! KNOW!
     //  In a signal handler you shall not do fancy stuff (in particular not

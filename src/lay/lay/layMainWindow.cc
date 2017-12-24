@@ -1058,7 +1058,7 @@ MainWindow::init_menu ()
   }
 
   //  if in "viewer-only mode", hide all entries in the "hide_vo" group
-  if ((lay::Application::instance () && lay::Application::instance ()->is_vo_mode ())) {
+  if ((lay::ApplicationBase::instance () && lay::ApplicationBase::instance ()->is_vo_mode ())) {
     std::vector<std::string> hide_vo_grp = mp_menu->group ("hide_vo");
     for (std::vector<std::string>::const_iterator g = hide_vo_grp.begin (); g != hide_vo_grp.end (); ++g) {
       mp_menu->action (*g).set_visible (false);
@@ -1067,7 +1067,7 @@ MainWindow::init_menu ()
 
   //  if not in editable mode, hide all entries from "edit_mode" group
   //  TODO: later do this on each change of the view - each view might get it's own editable mode
-  bool view_mode = (lay::Application::instance () && !lay::Application::instance ()->is_editable ());
+  bool view_mode = (lay::ApplicationBase::instance () && !lay::ApplicationBase::instance ()->is_editable ());
 
   std::vector<std::string> edit_mode_grp = mp_menu->group ("edit_mode");
   for (std::vector<std::string>::const_iterator g = edit_mode_grp.begin (); g != edit_mode_grp.end (); ++g) {
@@ -1293,7 +1293,7 @@ MainWindow::about_to_exec ()
   }
 
   //  TODO: later, each view may get it's own editable flag
-  if (lay::Application::instance () && !lay::Application::instance ()->is_editable ()) {
+  if (lay::ApplicationBase::instance () && !lay::ApplicationBase::instance ()->is_editable ()) {
     TipDialog td (this, 
                   tl::to_string (QObject::tr ("KLayout has been started in viewer mode. In this mode, editor functions are not available.\n\nTo enable these functions, start KLayout in editor mode by using the \"-e\" command line switch or select it as the default mode in the setup dialog. Choose \"Setup\" in the \"File\" menu and check \"Use editing mode by default\" on the \"Editing Mode\" page in the \"Application\" section.")), 
                   "editor-mode");
@@ -1329,7 +1329,7 @@ MainWindow::about_to_exec ()
 
   edt::combine_mode_type cm = edt::CM_Add;
   config_get (edt::cfg_edit_combine_mode, cm, edt::CMConverter ());
-  if (lay::Application::instance ()->is_editable () && cm != edt::CM_Add) {
+  if (lay::ApplicationBase::instance ()->is_editable () && cm != edt::CM_Add) {
     lay::TipDialog td (QApplication::activeWindow (), 
                   tl::to_string (QObject::tr ("The background combination mode of the shape editor is set to some other mode than 'Add'.\n"
                                               "This can be confusing, because a shape may not be drawn as expected.\n\nTo switch back to normal mode, choose 'Add' for the background combination mode in the toolbar.")), 
@@ -3735,7 +3735,7 @@ MainWindow::clone_current_view ()
   }
 
   //  create a new view
-  view = new lay::LayoutView (current_view (), &m_manager, lay::Application::instance ()->is_editable (), this, mp_view_stack);
+  view = new lay::LayoutView (current_view (), &m_manager, lay::ApplicationBase::instance ()->is_editable (), this, mp_view_stack);
   connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
@@ -4344,7 +4344,7 @@ int
 MainWindow::do_create_view ()
 {
   //  create a new view
-  lay::LayoutView *view = new lay::LayoutView (&m_manager, lay::Application::instance ()->is_editable (), this, mp_view_stack);
+  lay::LayoutView *view = new lay::LayoutView (&m_manager, lay::ApplicationBase::instance ()->is_editable (), this, mp_view_stack);
 
   connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
@@ -4538,9 +4538,9 @@ MainWindow::update_window_title ()
     if (current_view ()->is_dirty ()) {
       sep += "[+] ";
     }
-    setWindowTitle (tl::to_qstring (lay::Application::instance ()->version () + sep + current_view ()->title ()));
+    setWindowTitle (tl::to_qstring (lay::ApplicationBase::instance ()->version () + sep + current_view ()->title ()));
   } else {
-    setWindowTitle (tl::to_qstring (lay::Application::instance ()->version ()));
+    setWindowTitle (tl::to_qstring (lay::ApplicationBase::instance ()->version ()));
   }
 }
 
@@ -5681,11 +5681,11 @@ HelpAboutDialog::HelpAboutDialog (QWidget *parent)
   mp_ui->setupUi (this);
 
   std::vector<std::string> build_options;
-  if (lay::Application::instance ()->ruby_interpreter ().available ()) {
-    build_options.push_back (tl::to_string (tr ("Ruby interpreter ")) + lay::Application::instance ()->ruby_interpreter ().version ());
+  if (lay::ApplicationBase::instance ()->ruby_interpreter ().available ()) {
+    build_options.push_back (tl::to_string (tr ("Ruby interpreter ")) + lay::ApplicationBase::instance ()->ruby_interpreter ().version ());
   }
-  if (lay::Application::instance ()->python_interpreter ().available ()) {
-    build_options.push_back (tl::to_string (tr ("Python interpreter ")) + lay::Application::instance ()->python_interpreter ().version ());
+  if (lay::ApplicationBase::instance ()->python_interpreter ().available ()) {
+    build_options.push_back (tl::to_string (tr ("Python interpreter ")) + lay::ApplicationBase::instance ()->python_interpreter ().version ());
   }
 #if defined(HAVE_QTBINDINGS)
   build_options.push_back (tl::to_string (tr ("Qt bindings for scripts")));
@@ -5720,12 +5720,12 @@ HelpAboutDialog::HelpAboutDialog (QWidget *parent)
     s += "</ul>";
   }
 
-  if (! lay::Application::instance ()->native_plugins ().empty ()) {
+  if (! lay::ApplicationBase::instance ()->native_plugins ().empty ()) {
     s += "<p>";
     s += "<h4>";
     s += escape_xml (tl::to_string (QObject::tr ("Binary extensions:")));
     s += "</h4><ul>";
-    for (std::vector<lay::PluginDescriptor>::const_iterator pd = lay::Application::instance ()->native_plugins ().begin (); pd != lay::Application::instance ()->native_plugins ().end (); ++pd) {
+    for (std::vector<lay::PluginDescriptor>::const_iterator pd = lay::ApplicationBase::instance ()->native_plugins ().begin (); pd != lay::ApplicationBase::instance ()->native_plugins ().end (); ++pd) {
       s += "<li>";
       if (! pd->description.empty ()) {
         s += escape_xml (pd->description);

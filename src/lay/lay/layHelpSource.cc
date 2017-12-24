@@ -270,12 +270,12 @@ HelpSource::initialize_index ()
     bool ok = false;
 
     const QString help_index_cache_file = QString::fromUtf8 ("help-index.xml");
-    std::string per_user_cache_file = tl::to_string (QDir (tl::to_qstring (lay::Application::instance ()->appdata_path ())).absoluteFilePath (help_index_cache_file));
+    std::string per_user_cache_file = tl::to_string (QDir (tl::to_qstring (lay::ApplicationBase::instance ()->appdata_path ())).absoluteFilePath (help_index_cache_file));
 
     //  Try to obtain the help index from the installation or application path
 
     std::vector<std::string> cache_files;
-    cache_files.push_back (tl::to_string (QDir (tl::to_qstring (lay::Application::instance ()->inst_path ())).absoluteFilePath (help_index_cache_file)));
+    cache_files.push_back (tl::to_string (QDir (tl::to_qstring (lay::ApplicationBase::instance ()->inst_path ())).absoluteFilePath (help_index_cache_file)));
     cache_files.push_back (per_user_cache_file);
 
     for (std::vector<std::string>::const_iterator c = cache_files.begin (); ! ok && c != cache_files.end (); ++c) {
@@ -283,7 +283,7 @@ HelpSource::initialize_index ()
       try {
         tl::XMLFileSource in (*c);
         help_index_structure.parse (in, *this);
-        if (m_klayout_version == lay::Application::instance ()->version ()) {
+        if (m_klayout_version == lay::ApplicationBase::instance ()->version ()) {
           ok = true;
         }
       } catch (tl::Exception &ex) {
@@ -353,7 +353,7 @@ HelpSource::create_index_file (const std::string &path)
 std::string
 HelpSource::klayout_version () const
 {
-  return lay::Application::instance ()->version ();
+  return lay::ApplicationBase::instance ()->version ();
 }
 
 void
@@ -513,7 +513,7 @@ HelpSource::get_image (const std::string &u)
 std::string 
 HelpSource::get_css (const std::string &u)
 {
-  std::ifstream t (tl::to_string (QDir (tl::to_qstring (lay::Application::instance()->inst_path ())).absoluteFilePath (QString::fromUtf8 ("help_format.css"))).c_str ());
+  std::ifstream t (tl::to_string (QDir (tl::to_qstring (lay::ApplicationBase::instance()->inst_path ())).absoluteFilePath (QString::fromUtf8 ("help_format.css"))).c_str ());
   if (t.good ()) {
     std::string c;
     while (t.good ()) {

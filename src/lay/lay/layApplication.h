@@ -82,33 +82,33 @@ struct PluginDescriptor
 };
 
 /**
- *  @brief The basic application object
+ *  @brief The application base class
  *
- *  This object encapsulates command line parsing, creation of the main window
- *  widget and the basic execution loop.
+ *  This is the basic functionality for the application class.
+ *  Two specializations exist: one for the GUI-less version (derived from QCoreApplication)
+ *  and one for the GUI version (derived from QApplication).
  */
-class LAY_PUBLIC Application
-  : public QApplication, public gsi::ObjectBase
+class LAY_PUBLIC ApplicationBase
+  : public gsi::ObjectBase
 {
 public:
   /**
-   *  @brief The application constructor 
+   *  @brief The application constructor
    *
    *  @param argc The number of external command-line arguments passed.
    *  @param argv The external command-line arguments.
-   *  @param non_ui_mode True, if the UI shall not be enabled
    */
-  Application (int &argc, char **argv, bool non_ui_mode);
+  ApplicationBase ();
 
   /**
    *  @brief Destructor
    */
-  ~Application ();
+  virtual ~ApplicationBase ();
 
   /**
    *  @brief The singleton instance
    */
-  static Application *instance ();
+  static ApplicationBase *instance ();
 
   /**
    *  @brief Exit the application
@@ -118,17 +118,12 @@ public:
   void exit (int result);
 
   /**
-   *  @brief Reimplementation of notify from QApplication
-   */
-  bool notify (QObject *receiver, QEvent *e);
-
-  /**
-   *  @brief Return the program's version 
+   *  @brief Return the program's version
    */
   std::string version () const;
 
   /**
-   *  @brief Return the program's usage string 
+   *  @brief Return the program's usage string
    */
   std::string usage ();
 
@@ -152,13 +147,15 @@ public:
    *
    *  This method issues all the lower level methods required in order to perform the
    *  applications main code.
+   *  Depending on the arguments and UI capabilities, this method will
+   *  either execute the command line macros for open the main window.
    */
   int run ();
 
   /**
-   *  @brief Execute the GUI main loop
+   *  @brief Executes the UI loop if GUI is enabled
    */
-  int exec ();
+  virtual int exec () = 0;
 
   /**
    *  @brief Process pending events
@@ -221,9 +218,9 @@ public:
 
   /**
    *  @brief Gets a value indicating whether the give special application flag is set
-   *  
+   *
    *  Special application flags are ways to introduce debug or flags for special
-   *  use cases. Such flags have a name and currently are controlled externally by 
+   *  use cases. Such flags have a name and currently are controlled externally by
    *  an environment variable called "KLAYOUT_x" where x is the name. If that
    *  variable is set and the value is non-empty, the flag is regarded set.
    */
@@ -232,7 +229,7 @@ public:
   /**
    *  @brief Return a reference to the Ruby interpreter
    */
-  gsi::Interpreter &ruby_interpreter () 
+  gsi::Interpreter &ruby_interpreter ()
   {
     return *mp_ruby_interpreter;
   }
@@ -240,7 +237,7 @@ public:
   /**
    *  @brief Return a reference to the Ruby interpreter
    */
-  gsi::Interpreter &python_interpreter () 
+  gsi::Interpreter &python_interpreter ()
   {
     return *mp_python_interpreter;
   }
@@ -287,7 +284,7 @@ public:
   /**
    *  @brief Reset config to global configuration
    */
-  void reset_config (); 
+  void reset_config ();
 
   /**
    *  @brief Synchronize macro collections with technology-specific macros
@@ -328,6 +325,20 @@ public:
     return m_native_plugins;
   }
 
+  /**
+   *  @brief Gets the QCoreApplication object
+   */
+  virtual QCoreApplication *qapp () { return 0; }
+
+  /**
+   *  @brief Gets the QApplication object
+   *  This method will return non-null only if a GUI-enabled application is present.
+   */
+  virtual QApplication *qapp_gui () { return 0; }
+
+protected:
+  void init_app (int &argc, char **argv, bool non_ui_mode);
+
 private:
   void shutdown ();
   void finish ();
@@ -366,8 +377,6 @@ private:
   bool m_vo_mode;
   bool m_editable;
   bool m_enable_undo;
-  QCoreApplication *mp_qapp;
-  QApplication *mp_qapp_gui;
   std::auto_ptr<tl::DeferredMethodScheduler> mp_dm_scheduler;
   //  HINT: the ruby interpreter must be destroyed before MainWindow
   //  in order to maintain a valid MainWindow reference for ruby scripts and Ruby's GC all the time.
@@ -381,13 +390,93 @@ private:
   std::vector<PluginDescriptor> m_native_plugins;
 };
 
+/**
+ *  @brief The GUI-enabled application class
+ */
+class LAY_PUBLIC GuiApplication
+  : public QApplication, public ApplicationBase
+{
+public:
+  GuiApplication (int &argc, char **argv);
+
+  QApplication *qapp_gui () { return this; }
+  QCoreApplication *qapp () { return this; }
+
+  /**
+   *  @brief Reimplementation of notify from QApplication
+   */
+  bool notify (QObject *receiver, QEvent *e);
+
+  /**
+   *  @brief Gets the application instance, cast to this class
+   */
+  static GuiApplication *instance ()
+  {
+    return dynamic_cast<GuiApplication *> (ApplicationBase::instance ());
+  }
+
+  /**
+   *  @brief Specialization of exec
+   */
+  int exec ();
+
+  /**
+   *  @brief Hides QCoreApplication::exit
+   */
+  void exit (int result)
+  {
+    ApplicationBase::exit (result);
+  }
+};
+
+/**
+ *  @brief The non-GUI-enabled application class
+ */
+class LAY_PUBLIC NonGuiApplication
+  : public QCoreApplication, public ApplicationBase
+{
+public:
+  NonGuiApplication (int &argc, char **argv);
+
+  QApplication *qapp_gui () { return 0; }
+  QCoreApplication *qapp () { return this; }
+
+  /**
+   *  @brief Gets the application instance, cast to this class
+   */
+  static NonGuiApplication *instance ()
+  {
+    return dynamic_cast<NonGuiApplication *> (ApplicationBase::instance ());
+  }
+
+  /**
+   *  @brief Specialization of exec
+   */
+  int exec ();
+
+  /**
+   *  @brief Hides QCoreApplication::exit
+   */
+  void exit (int result)
+  {
+    ApplicationBase::exit (result);
+  }
+};
+
 } // namespace lay
 
 namespace tl {
-  template <> struct type_traits<lay::Application> : public type_traits<void> {
+
+  template <> struct type_traits<lay::GuiApplication> : public type_traits<void> {
     typedef tl::false_tag has_copy_constructor;
     typedef tl::false_tag has_default_constructor;
   };
+
+  template <> struct type_traits<lay::NonGuiApplication> : public type_traits<void> {
+    typedef tl::false_tag has_copy_constructor;
+    typedef tl::false_tag has_default_constructor;
+  };
+
 }
 
 #endif

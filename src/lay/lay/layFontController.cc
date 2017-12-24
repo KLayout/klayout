@@ -119,7 +119,7 @@ FontController::sync_dirs ()
   m_file_watcher->clear ();
   m_file_watcher->enable (false);
 
-  std::vector<std::string> paths = lay::Application::instance ()->klayout_path ();
+  std::vector<std::string> paths = lay::ApplicationBase::instance ()->klayout_path ();
 
   //  add the salt grains as potential sources for library definitions
 

@@ -75,6 +75,11 @@
 #  include <dlfcn.h>
 #endif
 
+namespace gsi
+{
+  void make_application_decl (bool non_gui_mode);
+}
+
 namespace lay
 {
 
@@ -165,7 +170,7 @@ static void ui_exception_handler_def (QWidget *parent)
 
 // --------------------------------------------------------------------------------
 
-static Application *ms_instance = 0;
+static ApplicationBase *ms_instance = 0;
 
 static PluginDescriptor load_plugin (const std::string &pp)
 {
@@ -210,8 +215,11 @@ static PluginDescriptor load_plugin (const std::string &pp)
   return desc;
 }
 
-Application::Application (int &argc, char **argv, bool non_ui_mode)
-  : QApplication (argc, argv, !non_ui_mode),
+// --------------------------------------------------------------------------------
+//  ApplicationBase implementation
+
+ApplicationBase::ApplicationBase ()
+  : gsi::ObjectBase (),
     m_lyp_map_all_cvs (true), 
     m_lyp_add_default (false),
     m_write_config_file (true),
@@ -224,8 +232,6 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
     m_vo_mode (false),
     m_editable (false),
     m_enable_undo (true),
-    mp_qapp (0),
-    mp_qapp_gui (0),
     mp_ruby_interpreter (0),
     mp_python_interpreter (0),
     mp_mw (0),
@@ -234,20 +240,27 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
     mp_plugin_root (0),
     mp_recorder (0)
 {
+  //  nothing yet - see init
+}
+
+void
+ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
+{
+  m_no_gui = non_ui_mode;
+
+  gsi::make_application_decl (non_ui_mode);
+
   // TODO: offer a strict mode for exception handling where this takes place:
-  // lay::Application::instance ()->exit (1);
+  // lay::ApplicationBase::instance ()->exit (1);
   if (! non_ui_mode) {
     tl::set_ui_exception_handlers (ui_exception_handler_tl, ui_exception_handler_std, ui_exception_handler_def);
   }
 
-  mp_qapp = this;
-  mp_qapp_gui = (non_ui_mode ? 0 : this);
-
   mp_dm_scheduler.reset (new tl::DeferredMethodScheduler ());
 
   //  install a special style proxy to overcome the issue of black-on-black tree expanders
-  if (mp_qapp_gui) {
-    mp_qapp_gui->setStyle (new lay::BackgroundAwareTreeStyle (0));
+  if (qapp_gui ()) {
+    qapp_gui ()->setStyle (new lay::BackgroundAwareTreeStyle (0));
   }
   
   //  initialize the system codecs (Hint: this must be done after the QApplication is initialized because
@@ -288,7 +301,7 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   //  get the KLayout path
   m_klayout_path = lay::get_klayout_path ();
 
-  if (mp_qapp_gui) {
+  if (qapp_gui ()) {
 
     //  create the configuration files paths and collect the initialization config files
     //  (the ones used for reset) into m_initial_config_files.
@@ -390,7 +403,7 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
               m_native_plugins.push_back (load_plugin (m));
               modules.insert (mn);
             } catch (tl::Exception &ex) {
-              tl::error << tl::to_string (tr ("Unable to load plugin %1: %2").arg (tl::to_qstring (m)).arg (tl::to_qstring (ex.msg ())));
+              tl::error << tl::to_string (QObject::tr ("Unable to load plugin %1: %2").arg (tl::to_qstring (m)).arg (tl::to_qstring (ex.msg ())));
             }
           }
         }
@@ -787,17 +800,17 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   db::set_default_editable_mode (m_editable);
   db::enable_transactions (m_enable_undo);
 
-  if (mp_qapp_gui) {
-    mp_qapp_gui->setWindowIcon (QIcon (QString::fromUtf8 (":/logo.png")));
+  if (qapp_gui ()) {
+    qapp_gui ()->setWindowIcon (QIcon (QString::fromUtf8 (":/logo.png")));
 #if QT_VERSION >= 0x040500
-    mp_qapp_gui->setAttribute (Qt::AA_DontShowIconsInMenus, false);
+    qapp_gui ()->setAttribute (Qt::AA_DontShowIconsInMenus, false);
 #endif
   }
 
-  if (mp_qapp_gui && ! gtf_record.empty ()) {
+  if (qapp_gui () && ! gtf_record.empty ()) {
     //  since the recorder tracks QAction connections etc., it must be instantiated before every other 
     //  object performing a gtf::action_connect for example
-    mp_recorder = new gtf::Recorder (mp_qapp_gui, gtf_record);
+    mp_recorder = new gtf::Recorder (qapp_gui (), gtf_record);
     mp_recorder->save_incremental (gtf_save_incremental);
   }
 
@@ -821,9 +834,9 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   //  suffixes through the MacroInterpreter interface.
   lym::MacroCollection::root ().rescan ();
 
-  if (mp_qapp_gui) {
-    mp_mw = new lay::MainWindow (mp_qapp_gui, "main_window");
-    QObject::connect (mp_mw, SIGNAL (closed ()), mp_qapp_gui, SLOT (quit ()));
+  if (qapp_gui ()) {
+    mp_mw = new lay::MainWindow (qapp_gui (), "main_window");
+    QObject::connect (mp_mw, SIGNAL (closed ()), qapp_gui (), SLOT (quit ()));
     mp_plugin_root = mp_mw;
   } else {
     mp_pr = new lay::ProgressReporter ();
@@ -863,7 +876,7 @@ Application::Application (int &argc, char **argv, bool non_ui_mode)
   }
 }
 
-Application::~Application () 
+ApplicationBase::~ApplicationBase ()
 {
   tl::set_ui_exception_handlers (0, 0, 0);
 
@@ -875,7 +888,7 @@ Application::~Application ()
 }
 
 std::vector<std::string>
-Application::scan_global_modules ()
+ApplicationBase::scan_global_modules ()
 {
   //  NOTE:
   //  this is deprecated functionality - for backward compatibility, global "*.rbm" and "*.pym" modules
@@ -914,7 +927,7 @@ Application::scan_global_modules ()
       if (rbm_file.exists () && rbm_file.isReadable ()) {
         std::string m = tl::to_string (rbm_file.absoluteFilePath ());
         if (modules.find (m) == modules.end ()) {
-          tl::warn << tl::to_string (tr ("Global modules are deprecated. Turn '%1' into an autorun macro instead and put it into 'macros' or 'pymacros'.").arg (tl::to_qstring (m)));
+          tl::warn << tl::to_string (QObject::tr ("Global modules are deprecated. Turn '%1' into an autorun macro instead and put it into 'macros' or 'pymacros'.").arg (tl::to_qstring (m)));
           global_modules.push_back (m);
           modules.insert (m);
         }
@@ -926,22 +939,8 @@ Application::scan_global_modules ()
   return global_modules;
 }
 
-bool 
-Application::notify (QObject *receiver, QEvent *e)
-{
-  //  Note: due to a bug in some Qt versions (i.e. 4.8.3) throwing exceptions across 
-  //  signals may not be safe. Hence the local BEGIN_PROTECTED .. END_PROTECTED approach
-  //  is still preferred over the global solution through "notify"
-  
-  bool ret = true;
-  BEGIN_PROTECTED
-    ret = QApplication::notify (receiver, e);
-  END_PROTECTED
-  return ret;
-}
-
 void
-Application::exit (int result)
+ApplicationBase::exit (int result)
 {
   if (! result) {
     finish ();
@@ -951,7 +950,7 @@ Application::exit (int result)
 }
 
 void 
-Application::finish ()
+ApplicationBase::finish ()
 {
   //  save the recorded test events
   if (mp_mw && mp_recorder && mp_recorder->recording ()) {
@@ -978,7 +977,7 @@ Application::finish ()
 }
 
 void
-Application::shutdown ()
+ApplicationBase::shutdown ()
 {
   //  uninitialize the plugins
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
@@ -996,7 +995,10 @@ Application::shutdown ()
   }
 
   //  delete all other top level widgets for safety - we don't want Ruby clean them up for us
-  QWidgetList tl_widgets = topLevelWidgets ();
+  QWidgetList tl_widgets;
+  if (qapp_gui ()) {
+    tl_widgets = qapp_gui ()->topLevelWidgets ();
+  }
   for (QWidgetList::iterator w = tl_widgets.begin (); w != tl_widgets.end (); ++w) {
     delete *w;
   }
@@ -1026,25 +1028,23 @@ Application::shutdown ()
     mp_python_interpreter = 0;
   }
 
-  mp_qapp = 0;
-  mp_qapp_gui = 0;
   ms_instance = 0;
 }
 
-Application *
-Application::instance () 
+ApplicationBase *
+ApplicationBase::instance ()
 {
   return ms_instance;
 }
 
 std::string
-Application::version () const
+ApplicationBase::version () const
 {
   return std::string (lay::Version::name ()) + " " + lay::Version::version ();
 }
       
 std::string 
-Application::usage () 
+ApplicationBase::usage ()
 {
   std::string r;
   r = std::string (lay::Version::exe_name ()) + " [<options>] [<file>] ..\n";
@@ -1090,7 +1090,7 @@ Application::usage ()
 }
 
 int
-Application::run ()
+ApplicationBase::run ()
 {
   gtf::Player player (0);
 
@@ -1267,7 +1267,7 @@ Application::run ()
 }
 
 void
-Application::autorun ()
+ApplicationBase::autorun ()
 {
   //  call "autorun" on all plugins that wish so
   for (std::vector <lay::PluginDescriptor>::const_iterator p = m_native_plugins.begin (); p != m_native_plugins.end (); ++p) {
@@ -1281,7 +1281,7 @@ Application::autorun ()
 }
 
 void
-Application::set_editable (bool e)
+ApplicationBase::set_editable (bool e)
 {
   if (m_editable != e) {
     m_editable = e;
@@ -1310,51 +1310,8 @@ dump_children (QObject *obj, int level = 0)
   }
 }
 
-int 
-Application::exec ()
-{
-  if (m_no_gui) {
-    return 0;
-  } else {
-
-    //  if requested, dump the widgets
-    if (tl::verbosity () >= 40) {
-
-      QWidgetList tl_widgets = QApplication::topLevelWidgets (); 
-
-      tl::info << tl::to_string (QObject::tr ("Widget tree:"));
-      for (QWidgetList::const_iterator tl = tl_widgets.begin (); tl != tl_widgets.end (); ++tl) { 
-        if (! (*tl)->objectName ().isEmpty ()) {
-          dump_children (*tl); 
-        }
-      }
-      tl::info << "";
-
-      tl::info << tl::to_string (QObject::tr ("Actions list:"));
-      for (QWidgetList::const_iterator tl = tl_widgets.begin (); tl != tl_widgets.end (); ++tl) { 
-        if (! (*tl)->objectName ().isEmpty ()) {
-          QList<QAction *> actions = (*tl)->findChildren<QAction *> ();
-          if (! actions.isEmpty ()) {
-            tl::info << tl::to_string ((*tl)->objectName ()) << ":";
-            for (QList<QAction *>::const_iterator a = actions.begin (); a != actions.end (); ++a) {
-              if (! (*a)->objectName ().isEmpty ()) {
-                tl::info << "  " << tl::to_string ((*a)->objectName ());
-              }
-            }
-          }
-        }
-      }
-      tl::info << "";
-
-    }
-
-    return mp_qapp_gui->exec ();
-
-  }
-}
-
 void
-Application::process_events (QEventLoop::ProcessEventsFlags flags, bool silent)
+ApplicationBase::process_events (QEventLoop::ProcessEventsFlags flags, bool silent)
 {
   if (mp_mw) {
 
@@ -1382,13 +1339,13 @@ Application::process_events (QEventLoop::ProcessEventsFlags flags, bool silent)
 }
 
 bool 
-Application::write_config (const std::string &config_file)
+ApplicationBase::write_config (const std::string &config_file)
 {
   return mp_plugin_root ? mp_plugin_root->write_config (config_file) : 0;
 }
 
 void 
-Application::reset_config ()
+ApplicationBase::reset_config ()
 {
   clear_config ();
   for (std::vector <std::string>::const_iterator c = m_initial_config_files.begin (); c != m_initial_config_files.end (); ++c) {
@@ -1399,7 +1356,7 @@ Application::reset_config ()
 }
 
 void 
-Application::clear_config ()
+ApplicationBase::clear_config ()
 {
   if (mp_plugin_root) {
     mp_plugin_root->clear_config ();
@@ -1407,13 +1364,13 @@ Application::clear_config ()
 }
 
 bool 
-Application::read_config (const std::string &config_file)
+ApplicationBase::read_config (const std::string &config_file)
 {
   return mp_plugin_root ? mp_plugin_root->read_config (config_file) : true;
 }
 
 void 
-Application::set_config (const std::string &name, const std::string &value)
+ApplicationBase::set_config (const std::string &name, const std::string &value)
 {
   if (mp_plugin_root) {
     mp_plugin_root->config_set (name, value);
@@ -1421,7 +1378,7 @@ Application::set_config (const std::string &name, const std::string &value)
 }
 
 void 
-Application::config_end ()
+ApplicationBase::config_end ()
 {
   if (mp_plugin_root) {
     mp_plugin_root->config_end ();
@@ -1429,7 +1386,7 @@ Application::config_end ()
 }
 
 std::string 
-Application::get_config (const std::string &name) const
+ApplicationBase::get_config (const std::string &name) const
 {
   if (mp_plugin_root) {
     return mp_plugin_root->config_get (name);
@@ -1439,7 +1396,7 @@ Application::get_config (const std::string &name) const
 }
 
 std::vector<std::string> 
-Application::get_config_names () const
+ApplicationBase::get_config_names () const
 {
   std::vector<std::string> names;
   if (mp_plugin_root) {
@@ -1449,11 +1406,87 @@ Application::get_config_names () const
 }
 
 bool
-Application::special_app_flag (const std::string &name)
+ApplicationBase::special_app_flag (const std::string &name)
 {
   // TODO: some more elaborate scheme?
   const char *env = getenv (("KLAYOUT_" + name).c_str ());
   return (env && *env);
+}
+
+// --------------------------------------------------------------------------------
+//  GuiApplication implementation
+
+GuiApplication::GuiApplication (int &argc, char **argv)
+  : QApplication (argc, argv), ApplicationBase ()
+{
+  init_app (argc, argv, false);
+}
+
+bool
+GuiApplication::notify (QObject *receiver, QEvent *e)
+{
+  //  Note: due to a bug in some Qt versions (i.e. 4.8.3) throwing exceptions across
+  //  signals may not be safe. Hence the local BEGIN_PROTECTED .. END_PROTECTED approach
+  //  is still preferred over the global solution through "notify"
+
+  bool ret = true;
+  BEGIN_PROTECTED
+    ret = QApplication::notify (receiver, e);
+  END_PROTECTED
+  return ret;
+}
+
+int
+GuiApplication::exec ()
+{
+  //  if requested, dump the widgets
+  if (tl::verbosity () >= 40) {
+
+    QWidgetList tl_widgets = QApplication::topLevelWidgets ();
+
+    tl::info << tl::to_string (QObject::tr ("Widget tree:"));
+    for (QWidgetList::const_iterator tl = tl_widgets.begin (); tl != tl_widgets.end (); ++tl) {
+      if (! (*tl)->objectName ().isEmpty ()) {
+        dump_children (*tl);
+      }
+    }
+    tl::info << "";
+
+    tl::info << tl::to_string (QObject::tr ("Actions list:"));
+    for (QWidgetList::const_iterator tl = tl_widgets.begin (); tl != tl_widgets.end (); ++tl) {
+      if (! (*tl)->objectName ().isEmpty ()) {
+        QList<QAction *> actions = (*tl)->findChildren<QAction *> ();
+        if (! actions.isEmpty ()) {
+          tl::info << tl::to_string ((*tl)->objectName ()) << ":";
+          for (QList<QAction *>::const_iterator a = actions.begin (); a != actions.end (); ++a) {
+            if (! (*a)->objectName ().isEmpty ()) {
+              tl::info << "  " << tl::to_string ((*a)->objectName ());
+            }
+          }
+        }
+      }
+    }
+    tl::info << "";
+
+  }
+
+  return QApplication::exec ();
+}
+
+// --------------------------------------------------------------------------------
+//  NonGuiApplication implementation
+
+NonGuiApplication::NonGuiApplication (int &argc, char **argv)
+  : QCoreApplication (argc, argv), ApplicationBase ()
+{
+  init_app (argc, argv, true);
+}
+
+int
+NonGuiApplication::exec ()
+{
+  //  A non-GUI application does nothing on exec
+  return 0;
 }
 
 }

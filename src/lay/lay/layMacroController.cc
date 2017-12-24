@@ -292,7 +292,7 @@ MacroController::drop_url (const std::string &path_or_url)
                                QMessageBox::No) == QMessageBox::Yes) {
 
       //  Use the application data folder
-      QDir folder (tl::to_qstring (lay::Application::instance ()->appdata_path ()));
+      QDir folder (tl::to_qstring (lay::ApplicationBase::instance ()->appdata_path ()));
 
       std::string cat = "macros";
       if (! macro->category ().empty ()) {
@@ -300,7 +300,7 @@ MacroController::drop_url (const std::string &path_or_url)
       }
 
       if (! folder.cd (tl::to_qstring (cat))) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Folder '%s' does not exists in installation path '%s' - cannot install")).c_str (), cat, lay::Application::instance ()->appdata_path ());
+        throw tl::Exception (tl::to_string (QObject::tr ("Folder '%s' does not exists in installation path '%s' - cannot install")).c_str (), cat, lay::ApplicationBase::instance ()->appdata_path ());
       }
 
       QFileInfo target (folder, file_name);

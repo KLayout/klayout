@@ -61,167 +61,207 @@ void crash_me (int reason)
   }
 }
 
-static std::string arch (lay::Application *)
+template <class C>
+static std::string arch (C *)
 {
   return tl::arch_string ();
 }
 
-Class<lay::Application> decl_Application (QT_EXTERNAL_BASE (QApplication) "Application",
-  
-  method ("instance", &lay::Application::instance, 
-    "@brief Return the singleton instance of the application\n"
-    "\n"
-    "There is exactly one instance of the application. This instance can be obtained with this "
-    "method."
-  ) +
-  method ("crash_me", &crash_me, "@hide") +
-  method ("symname", &lay::get_symbol_name_from_address, "@hide") +
-  method ("is_editable?", &lay::Application::is_editable, 
-    "@brief Returns true if the application is in editable mode\n"
-  ) +
-  //  TODO: basically this method belongs to PluginRoot (aka MainWindow). 
-  //  There is separate declaration for PluginRoot which we have to synchronize
-  //  with this method.
-  method ("get_config", &lay::Application::get_config,
-    "@brief Gets the value for a configuration parameter\n"
-    "\n"
-    "@args name\n"
-    "@param name The name of the configuration parameter whose value shall be obtained (a string)\n"
-    "\n"
-    "@return The value of the parameter\n"
-    "\n"
-    "This method returns the value of the given configuration parameter. If the parameter is not "
-    "known, an exception will be thrown. Use \\get_config_names to obtain a list of all configuration "
-    "parameter names available.\n"
-    "\n"
-    "Configuration parameters are always stored as strings. The actual format of this string is specific "
-    "to the configuration parameter. The values delivered by this method correspond to the values stored "
-    "in the configuration file "
-  ) +
-  //  TODO: basically this method belongs to PluginRoot (aka MainWindow). 
-  //  There is separate declaration for PluginRoot which we have to synchronize
-  //  with this method.
-  method ("get_config_names", &lay::Application::get_config_names,
-    "@brief Gets the configuration parameter names\n"
-    "\n"
-    "@return A list of configuration parameter names\n"
-    "\n"
-    "This method returns the names of all known configuration parameters. These names can be used to "
-    "get and set configuration parameter values."
-  ) +
-  //  TODO: basically this method belongs to PluginRoot (aka MainWindow). 
-  //  There is separate declaration for PluginRoot which we have to synchronize
-  //  with this method.
-  method ("set_config", &lay::Application::set_config,
-    "@brief Sets a configuration parameter with the given name to the given value\n"
-    "\n"
-    "@args name, value\n"
-    "@param name The name of the configuration parameter to set\n"
-    "@param value The value to which to set the configuration parameter\n"
-    "\n"
-    "This method sets the configuration parameter with the given name to the given value. "
-    "Values can only be strings. Numerical values have to be converted into strings first. "
-    "The actual format of the value depends on the configuration parameter. The name must "
-    "be one of the names returned by \\get_config_names."
-    "\n"
-    "It is possible to write an arbitrary name/value pair into the configuration database which then is "
-    "written to the configuration file."
-  ) +
-  //  TODO: basically this method belongs to PluginRoot (aka MainWindow). 
-  //  There is separate declaration for PluginRoot which we have to synchronize
-  //  with this method.
-  method ("commit_config", &lay::Application::config_end,
-    "@brief Commits the configuration settings\n"
-    "\n"
-    "Some configuration options are queued for performance reasons and become active only after 'commit_config' has been called. "
-    "After a sequence of \\set_config calls, this method should be called to activate the "
-    "settings made by these calls.\n"
-    "\n"
-    "This method has been introduced in version 0.25.\n"
-  ) + 
-  //  TODO: basically this method belongs to PluginRoot (aka MainWindow). 
-  //  There is separate declaration for PluginRoot which we have to synchronize
-  //  with this method.
-  method ("write_config", &lay::Application::write_config,
-    "@brief Writes configuration to a file\n"
-    "@args file_name\n"
-    "@return A value indicating whether the operation was successful\n"
-    "\n"
-    "If the configuration file cannot be written, \n"
-    "is returned but no exception is thrown.\n"
-  ) +
-  //  TODO: basically this method belongs to PluginRoot (aka MainWindow). 
-  //  There is separate declaration for PluginRoot which we have to synchronize
-  //  with this method.
-  method ("read_config", &lay::Application::read_config,
-    "@brief Reads the configuration from a file\n"
-    "@args file_name\n"
-    "@return A value indicating whether the operation was successful\n"
-    "\n"
-    "This method siletly does nothing, if the config file does not\n"
-    "exist. If it does and an error occured, the error message is printed\n"
-    "on stderr. In both cases, false is returned.\n"
-  ) +
-  method ("main_window", &lay::Application::main_window,
-    "@brief Returns a reference to the main window\n"
-    "\n"
-    "@return A object reference to the main window object."
-  ) +
-  method ("execute|#exec", &lay::Application::exec,
-    "@brief Executes the application's main loop\n"
-    "\n"
-    "This method must be called in order to execute the application in the main "
-    "script if a script is provided."
-  ) +
-  method ("process_events", (void (lay::Application::*)()) &lay::Application::process_events,
-    "@brief Processes pending events\n"
-    "\n"
-    "This method processes pending events and dispatches them internally. Calling this "
-    "method periodically during a long operation keeps the application 'alive'"
-  ) + 
-  method ("application_data_path", &lay::Application::appdata_path,
-    "@brief Returns the application's data path (where the configuration file is stored for example)\n"
-    "\n"
-    "This method has been added in version 0.22."
-  ) +
-  method ("inst_path", &lay::Application::inst_path,
-    "@brief Returns the application's installation path (where the executable is located)\n"
-    "\n"
-    "This method has been added in version 0.18. Version 0.22 offers the method \\klayout_path which "
-    "delivers all components of the search path."
-  ) +
-  method ("klayout_path", &lay::Application::klayout_path,
-    "@brief Returns the KLayout path (search path for KLayout components)\n"
-    "\n"
-    "The result is an array containing the components of the path.\n"
-    "\n"
-    "This method has been added in version 0.22."
-  ) +
-  method ("exit", &lay::Application::exit,
-    "@args result\n"
-    "@brief Ends the application with the given exit status\n"
-    "\n"
-    "This method should be called instead of simply shutting down the process. It performs some "
-    "important cleanup without which the process might crash. If the result code is 0 (success), "
-    "the configuration file will be updated unless that has been disabled by the -nc command line switch."
-    "\n"
-    "This method has been added in version 0.22."
-  ) + 
-  method ("version", &lay::Application::version,
-    "@brief Returns the application's version string\n"
-  ) +
-  method_ext ("arch", &arch,
-    "@brief Returns the architecture string\n"
-    "This method has been introduced in version 0.25."
-  )
-  ,
+template <class C>
+static gsi::Methods application_methods ()
+{
+  return
+    method<int> ("crash_me", &crash_me, "@hide") +
+    method<QString, const QString &, size_t> ("symname", &lay::get_symbol_name_from_address, "@hide") +
+    method<C, bool> ("is_editable?", &C::is_editable,
+      "@brief Returns true if the application is in editable mode\n"
+    ) +
+    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
+    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  with this method.
+    method<C, std::string, const std::string &> ("get_config", &C::get_config,
+      "@brief Gets the value for a configuration parameter\n"
+      "\n"
+      "@args name\n"
+      "@param name The name of the configuration parameter whose value shall be obtained (a string)\n"
+      "\n"
+      "@return The value of the parameter\n"
+      "\n"
+      "This method returns the value of the given configuration parameter. If the parameter is not "
+      "known, an exception will be thrown. Use \\get_config_names to obtain a list of all configuration "
+      "parameter names available.\n"
+      "\n"
+      "Configuration parameters are always stored as strings. The actual format of this string is specific "
+      "to the configuration parameter. The values delivered by this method correspond to the values stored "
+      "in the configuration file "
+    ) +
+    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
+    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  with this method.
+    method<C, std::vector<std::string> > ("get_config_names", &C::get_config_names,
+      "@brief Gets the configuration parameter names\n"
+      "\n"
+      "@return A list of configuration parameter names\n"
+      "\n"
+      "This method returns the names of all known configuration parameters. These names can be used to "
+      "get and set configuration parameter values."
+    ) +
+    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
+    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  with this method.
+    method<C, const std::string &, const std::string &> ("set_config", &C::set_config,
+      "@brief Sets a configuration parameter with the given name to the given value\n"
+      "\n"
+      "@args name, value\n"
+      "@param name The name of the configuration parameter to set\n"
+      "@param value The value to which to set the configuration parameter\n"
+      "\n"
+      "This method sets the configuration parameter with the given name to the given value. "
+      "Values can only be strings. Numerical values have to be converted into strings first. "
+      "The actual format of the value depends on the configuration parameter. The name must "
+      "be one of the names returned by \\get_config_names."
+      "\n"
+      "It is possible to write an arbitrary name/value pair into the configuration database which then is "
+      "written to the configuration file."
+    ) +
+    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
+    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  with this method.
+    method<C> ("commit_config", &C::config_end,
+      "@brief Commits the configuration settings\n"
+      "\n"
+      "Some configuration options are queued for performance reasons and become active only after 'commit_config' has been called. "
+      "After a sequence of \\set_config calls, this method should be called to activate the "
+      "settings made by these calls.\n"
+      "\n"
+      "This method has been introduced in version 0.25.\n"
+    ) +
+    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
+    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  with this method.
+    method<C, bool, const std::string &> ("write_config", &C::write_config,
+      "@brief Writes configuration to a file\n"
+      "@args file_name\n"
+      "@return A value indicating whether the operation was successful\n"
+      "\n"
+      "If the configuration file cannot be written, \n"
+      "is returned but no exception is thrown.\n"
+    ) +
+    //  TODO: basically this method belongs to PluginRoot (aka MainWindow).
+    //  There is separate declaration for PluginRoot which we have to synchronize
+    //  with this method.
+    method<C, bool, const std::string &> ("read_config", &C::read_config,
+      "@brief Reads the configuration from a file\n"
+      "@args file_name\n"
+      "@return A value indicating whether the operation was successful\n"
+      "\n"
+      "This method siletly does nothing, if the config file does not\n"
+      "exist. If it does and an error occured, the error message is printed\n"
+      "on stderr. In both cases, false is returned.\n"
+    ) +
+    method<C, lay::MainWindow *> ("main_window", &C::main_window,
+      "@brief Returns a reference to the main window\n"
+      "\n"
+      "@return A object reference to the main window object."
+    ) +
+    method<C> ("execute|#exec", &C::exec,
+      "@brief Executes the application's main loop\n"
+      "\n"
+      "This method must be called in order to execute the application in the main "
+      "script if a script is provided."
+    ) +
+    method<C> ("process_events", (void (C::*)()) &C::process_events,
+      "@brief Processes pending events\n"
+      "\n"
+      "This method processes pending events and dispatches them internally. Calling this "
+      "method periodically during a long operation keeps the application 'alive'"
+    ) +
+    method<C, const std::string &> ("application_data_path", &C::appdata_path,
+      "@brief Returns the application's data path (where the configuration file is stored for example)\n"
+      "\n"
+      "This method has been added in version 0.22."
+    ) +
+    method<C, const std::string &> ("inst_path", &C::inst_path,
+      "@brief Returns the application's installation path (where the executable is located)\n"
+      "\n"
+      "This method has been added in version 0.18. Version 0.22 offers the method \\klayout_path which "
+      "delivers all components of the search path."
+    ) +
+    method<C, const std::vector<std::string> &> ("klayout_path", &C::klayout_path,
+      "@brief Returns the KLayout path (search path for KLayout components)\n"
+      "\n"
+      "The result is an array containing the components of the path.\n"
+      "\n"
+      "This method has been added in version 0.22."
+    ) +
+    method<C, int> ("exit", &C::exit,
+      "@args result\n"
+      "@brief Ends the application with the given exit status\n"
+      "\n"
+      "This method should be called instead of simply shutting down the process. It performs some "
+      "important cleanup without which the process might crash. If the result code is 0 (success), "
+      "the configuration file will be updated unless that has been disabled by the -nc command line switch."
+      "\n"
+      "This method has been added in version 0.22."
+    ) +
+    method<C, std::string> ("version", &C::version,
+      "@brief Returns the application's version string\n"
+    ) +
+    method_ext<C, std::string> ("arch", &arch<C>,
+      "@brief Returns the architecture string\n"
+      "This method has been introduced in version 0.25."
+    ) +
+    method<C *> ("instance", &C::instance,
+      "@brief Return the singleton instance of the application\n"
+      "\n"
+      "There is exactly one instance of the application. This instance can be obtained with this "
+      "method."
+    )
+  ;
+}
 
-  "@brief The application object\n"
-  "\n"
-  "The application object is the main port from which to access all the internals "
-  "of the application, in particular the main window."
+static std::string application_doc ()
+{
+  return
+    "@brief The application object\n"
+    "\n"
+    "The application object is the main port from which to access all the internals "
+    "of the application, in particular the main window."
+  ;
+}
 
-);
+/**
+ *  @brief Creates the right application object declaration depending on the mode
+ *
+ *  This declaration factory will register a GuiApplication declaration (derived from QApplication)
+ *  if in GUI mode and a NonGuiApplication declaration (derived from QCoreApplication).
+ */
+void
+LAY_PUBLIC make_application_decl (bool non_gui_mode)
+{
+  static std::auto_ptr<Class<lay::GuiApplication> > gui_app_decl;
+  static std::auto_ptr<Class<lay::NonGuiApplication> > non_gui_app_decl;
+
+  if (non_gui_mode) {
+
+    non_gui_app_decl.reset (
+      new Class<lay::NonGuiApplication> (QT_EXTERNAL_BASE (QCoreApplication) "Application",
+        application_methods<lay::NonGuiApplication> (),
+        application_doc ()
+      )
+    );
+
+  } else {
+
+    gui_app_decl.reset (
+      new Class<lay::GuiApplication> (QT_EXTERNAL_BASE (QApplication) "Application",
+        application_methods<lay::GuiApplication> (),
+        application_doc ()
+      )
+    );
+
+  }
+}
 
 }
 

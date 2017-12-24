@@ -68,7 +68,7 @@ main (int argc, char **argv)
 }
 
 static int
-run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, bool non_editable, bool slow, lay::Application &app, bool gsi_coverage, const std::vector<std::string> &class_names_vector)
+run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, bool non_editable, bool slow, lay::ApplicationBase &app, bool gsi_coverage, const std::vector<std::string> &class_names_vector)
 {
   std::set<std::string> class_names;
   class_names.insert (class_names_vector.begin (), class_names_vector.end ());
@@ -374,7 +374,7 @@ main_cont (int &argc, char **argv)
     static char av3[] = "-rx";  //  No mplicit macros
     char *av[] = { av0, av1, av2, av3, 0 };
     int ac = sizeof (av) / sizeof (av[0]) - 1;
-    lay::Application app (ac, av, false);
+    lay::GuiApplication app (ac, av);
 
     app.ruby_interpreter ().push_console (&console);
     app.python_interpreter ().push_console (&console);

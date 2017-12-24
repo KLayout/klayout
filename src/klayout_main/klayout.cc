@@ -227,14 +227,19 @@ klayout_main_cont (int &argc, char **argv)
       }
     }
 
-    lay::Application app (argc, argv, non_ui_mode);
+    std::auto_ptr<lay::ApplicationBase> app;
+    if (non_ui_mode) {
+      app.reset (new lay::NonGuiApplication (argc, argv));
+    } else {
+      app.reset (new lay::GuiApplication (argc, argv));
+    }
 
     QString locale = QLocale::system ().name ();
 
     /* TODO: this kills valgrind
     QTranslator translator;
-    if (translator.load (QString::fromUtf8 ("klayout_") + locale)) {
-      app.installTranslator (&translator);
+    if (app->qapp () && translator.load (QString::fromUtf8 ("klayout_") + locale)) {
+      app->qapp ()->installTranslator (&translator);
     }
     */
 
@@ -242,18 +247,18 @@ klayout_main_cont (int &argc, char **argv)
     QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
 #endif
 
-    if (app.has_gui ()) {
+    if (app->has_gui ()) {
 
       BEGIN_PROTECTED_CLEANUP
 
-      result = app.run ();
+      result = app->run ();
 
       END_PROTECTED_CLEANUP {
         result = 1;
       }
 
     } else {
-      result = app.run ();
+      result = app->run ();
     }
 
   } catch (tl::ExitException &ex) {

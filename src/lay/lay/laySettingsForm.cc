@@ -272,7 +272,7 @@ SettingsForm::reset_clicked ()
 
     BEGIN_PROTECTED
 
-    lay::Application::instance ()->reset_config ();
+    lay::ApplicationBase::instance ()->reset_config ();
     setup ();
 
     END_PROTECTED

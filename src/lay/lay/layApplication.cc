@@ -225,6 +225,8 @@ ApplicationBase::ApplicationBase ()
     m_write_config_file (true),
     m_gtf_replay_rate (0),
     m_gtf_replay_stop (-1),
+    m_gtf_record (),
+    m_gtf_save_incremental (false),
     m_no_macros (false),
     m_same_view (false),
     m_sync_mode (false),
@@ -233,12 +235,7 @@ ApplicationBase::ApplicationBase ()
     m_editable (false),
     m_enable_undo (true),
     mp_ruby_interpreter (0),
-    mp_python_interpreter (0),
-    mp_mw (0),
-    mp_pr (0),
-    mp_pb (0),
-    mp_plugin_root (0),
-    mp_recorder (0)
+    mp_python_interpreter (0)
 {
   //  nothing yet - see init
 }
@@ -255,8 +252,6 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
   if (! non_ui_mode) {
     tl::set_ui_exception_handlers (ui_exception_handler_tl, ui_exception_handler_std, ui_exception_handler_def);
   }
-
-  mp_dm_scheduler.reset (new tl::DeferredMethodScheduler ());
 
   //  initialize the system codecs (Hint: this must be done after the QApplication is initialized because
   //  it will call setlocale)
@@ -283,9 +278,6 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
 
   tl_assert (ms_instance == 0);
   ms_instance = this;
-
-  std::string gtf_record;
-  bool gtf_save_incremental = false;
 
   //  get and create the klayout appdata folder if required
   m_appdata_path = lay::get_appdata_path ();
@@ -491,11 +483,11 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
 
     } else if (a == "-gr" && (i + 1) < argc) {
 
-      gtf_record = args [++i];
+      m_gtf_record = args [++i];
 
     } else if (a == "-gi") {
 
-      gtf_save_incremental = true;
+      m_gtf_save_incremental = true;
 
     } else if (a == "-gp" && (i + 1) < argc) {
 
@@ -795,11 +787,10 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
   db::set_default_editable_mode (m_editable);
   db::enable_transactions (m_enable_undo);
 
-  if (qapp_gui () && ! gtf_record.empty ()) {
-    //  since the recorder tracks QAction connections etc., it must be instantiated before every other 
+  if (! m_gtf_record.empty ()) {
+    //  since the recorder tracks QAction connections etc., it must be instantiated before every other
     //  object performing a gtf::action_connect for example
-    mp_recorder = new gtf::Recorder (qapp_gui (), gtf_record);
-    mp_recorder->save_incremental (gtf_save_incremental);
+    prepare_recording (m_gtf_record, m_gtf_save_incremental);
   }
 
   tl::Eval::set_global_var ("appdata_path", tl::Variant (m_appdata_path));
@@ -822,16 +813,8 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
   //  suffixes through the MacroInterpreter interface.
   lym::MacroCollection::root ().rescan ();
 
-  if (qapp_gui ()) {
-    mp_mw = new lay::MainWindow (qapp_gui (), "main_window");
-    QObject::connect (mp_mw, SIGNAL (closed ()), qapp_gui (), SLOT (quit ()));
-    mp_plugin_root = mp_mw;
-  } else {
-    mp_pr = new lay::ProgressReporter ();
-    mp_pb = new TextProgress (10 /*verbosity level*/);
-    mp_pr->set_progress_bar (mp_pb);
-    mp_plugin_root = new lay::PluginRoot ();
-  }
+  //  creates the main window or plugin root as required
+  setup ();
 
   //  initialize the plugins for the first time
   if (tl::verbosity () >= 20) {
@@ -842,11 +825,11 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
     if (tl::verbosity () >= 20) {
       tl::info << "  " << cls.current_name () << " [" << cls.current_position () << "]";
     }
-    pd->initialize (mp_plugin_root);
+    pd->initialize (plugin_root ());
   }
 
   //  establish the configuration
-  mp_plugin_root->config_setup ();
+  plugin_root ()->config_setup ();
 
   //  Some info output 
   if (tl::verbosity () >= 20) {
@@ -868,11 +851,8 @@ ApplicationBase::~ApplicationBase ()
 {
   tl::set_ui_exception_handlers (0, 0, 0);
 
-  if (! ms_instance) {
-    return;
-  }
-
-  shutdown ();
+  //  check whether shutdown was called
+  tl_assert (ms_instance == 0);
 }
 
 std::vector<std::string>
@@ -933,26 +913,28 @@ ApplicationBase::exit (int result)
   if (! result) {
     finish ();
   }
+
+  //  uninitialize the plugins
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+    lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
+    pd->uninitialize (plugin_root ());
+  }
+
   shutdown ();
+
   ::exit (result);
 }
 
 void 
 ApplicationBase::finish ()
 {
-  //  save the recorded test events
-  if (mp_mw && mp_recorder && mp_recorder->recording ()) {
-    mp_recorder->stop ();
-    mp_recorder->save ();
-  }
-
-  if (mp_plugin_root && m_write_config_file) {
+  if (plugin_root () && m_write_config_file) {
 
     if (! m_config_file_to_write.empty ()) {
       if (tl::verbosity () >= 20) {
         tl::info << tl::to_string (QObject::tr ("Updating configuration file ")) << m_config_file_to_write;
       }
-      mp_plugin_root->write_config (m_config_file_to_write);
+      plugin_root ()->write_config (m_config_file_to_write);
     }
     if (! m_config_file_to_delete.empty () && m_config_file_to_delete != m_config_file_to_write) {
       if (tl::verbosity () >= 20) {
@@ -965,47 +947,20 @@ ApplicationBase::finish ()
 }
 
 void
+ApplicationBase::prepare_recording (const std::string & /*gtf_record*/, bool /*gtf_record_incremental*/)
+{
+  //  the base class does nothing
+}
+
+void
+ApplicationBase::start_recording ()
+{
+  //  the base class does nothing
+}
+
+void
 ApplicationBase::shutdown ()
 {
-  //  uninitialize the plugins
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-    pd->uninitialize (mp_plugin_root);
-  }
-
-  if (mp_mw) {
-    delete mp_mw;
-    mp_mw = 0;
-    mp_plugin_root = 0;
-  } else if (mp_plugin_root) {
-    delete mp_plugin_root;
-    mp_plugin_root = 0;
-  }
-
-  //  delete all other top level widgets for safety - we don't want Ruby clean them up for us
-  QWidgetList tl_widgets;
-  if (qapp_gui ()) {
-    tl_widgets = qapp_gui ()->topLevelWidgets ();
-  }
-  for (QWidgetList::iterator w = tl_widgets.begin (); w != tl_widgets.end (); ++w) {
-    delete *w;
-  }
-
-  if (mp_pr) {
-    delete mp_pr;
-    mp_pr = 0;
-  }
-
-  if (mp_pb) {
-    delete mp_pb;
-    mp_pb = 0;
-  }
-
-  if (mp_recorder) {
-    delete mp_recorder;
-    mp_recorder = 0;
-  }
-
   if (mp_ruby_interpreter) {
     delete mp_ruby_interpreter;
     mp_ruby_interpreter = 0;
@@ -1080,25 +1035,24 @@ ApplicationBase::usage ()
 int
 ApplicationBase::run ()
 {
+  lay::MainWindow *mw = main_window ();
   gtf::Player player (0);
 
-  if (mp_mw) {
+  if (mw) {
 
-    mp_mw->set_synchronous (m_sync_mode);
+    (mw)->set_synchronous (m_sync_mode);
 
     if (! m_no_gui) {
-      mp_mw->setWindowTitle (tl::to_qstring (version ()));
-      mp_mw->resize (800, 600);
-      mp_mw->show ();
+      (mw)->setWindowTitle (tl::to_qstring (version ()));
+      (mw)->resize (800, 600);
+      (mw)->show ();
     }
 
     if (! m_gtf_replay.empty ()) {
       player.load (m_gtf_replay);
     }
 
-    if (mp_recorder) {
-      mp_recorder->start ();
-    }
+    start_recording ();
 
   }
 
@@ -1108,7 +1062,7 @@ ApplicationBase::run ()
 
   for (std::vector <std::string>::const_iterator c = m_config_files.begin (); c != m_config_files.end (); ++c) {
     BEGIN_PROTECTED_CLEANUP
-      mp_plugin_root->read_config (*c);
+      plugin_root ()->read_config (*c);
       //  if the last config was read successfully no reset will happen:
       config_failed = false;
     END_PROTECTED_CLEANUP {
@@ -1153,7 +1107,7 @@ ApplicationBase::run ()
   //  Run plugin and macro specific initializations
   autorun ();
 
-  if (mp_mw) {
+  if (mw) {
 
     for (std::vector <std::pair<file_type, std::pair<std::string, std::string> > >::const_iterator f = m_files.begin (); f != m_files.end (); ++f) {
 
@@ -1162,29 +1116,29 @@ ApplicationBase::run ()
         std::string filename = f->second.first;
 
         if (f->first != layout_file_with_tech) {
-          mp_mw->add_mru (f->second.first);
-          mp_mw->load_layout (f->second.first, m_same_view ? 2 /*same view*/ : 1 /*new view*/);
+          mw->add_mru (f->second.first);
+          mw->load_layout (f->second.first, m_same_view ? 2 /*same view*/ : 1 /*new view*/);
         } else {
-          mp_mw->add_mru (f->second.first, f->second.second);
-          mp_mw->load_layout (f->second.first, f->second.second, m_same_view ? 2 /*same view*/ : 1 /*new view*/);
+          mw->add_mru (f->second.first, f->second.second);
+          mw->load_layout (f->second.first, f->second.second, m_same_view ? 2 /*same view*/ : 1 /*new view*/);
         }
 
         //  Make the first one loaded the active one.
-        if (mp_mw->current_view ()) {
-          mp_mw->current_view ()->set_active_cellview_index (0);
+        if (mw->current_view ()) {
+          mw->current_view ()->set_active_cellview_index (0);
         }
 
       } else {
 
-        if (mp_mw->current_view () == 0) {
-          mp_mw->create_view ();
+        if (mw->current_view () == 0) {
+          mw->create_view ();
         }
 
-        if (mp_mw->current_view () != 0) {
+        if (mw->current_view () != 0) {
           std::auto_ptr <rdb::Database> db (new rdb::Database ());
           db->load (f->second.first);
-          int rdb_index = mp_mw->current_view ()->add_rdb (db.release ());
-          mp_mw->current_view ()->open_rdb_browser (rdb_index, mp_mw->current_view ()->active_cellview_index ());
+          int rdb_index = mw->current_view ()->add_rdb (db.release ());
+          mw->current_view ()->open_rdb_browser (rdb_index, mw->current_view ()->active_cellview_index ());
         }
 
       }
@@ -1192,23 +1146,23 @@ ApplicationBase::run ()
 
     if (! m_layer_props_file.empty ()) {
 
-      if (m_lyp_map_all_cvs && mp_mw->is_single_cv_layer_properties_file (m_layer_props_file)) {
-        mp_mw->load_layer_properties (m_layer_props_file, -1, true /*all views*/, m_lyp_add_default);
+      if (m_lyp_map_all_cvs && mw->is_single_cv_layer_properties_file (m_layer_props_file)) {
+        mw->load_layer_properties (m_layer_props_file, -1, true /*all views*/, m_lyp_add_default);
       } else {
-        mp_mw->load_layer_properties (m_layer_props_file, true /*all views*/, m_lyp_add_default);
+        mw->load_layer_properties (m_layer_props_file, true /*all views*/, m_lyp_add_default);
       }
 
       tl::log << "Layer properties loaded '" << m_layer_props_file << "'";
 
       //  because the layer may carry transformations, we need to refit the cellviews.
-      for (unsigned int v = 0; v != mp_mw->views (); ++v) {
-        mp_mw->view (v)->zoom_fit ();
+      for (unsigned int v = 0; v != mw->views (); ++v) {
+        mw->view (v)->zoom_fit ();
       }
 
     }
 
     if (! m_session_file.empty ()) {
-      mp_mw->restore_session (m_session_file);
+      mw->restore_session (m_session_file);
       tl::log << "Session restored '" << m_session_file << "'";
     }
 
@@ -1219,20 +1173,20 @@ ApplicationBase::run ()
     //  Give the plugins a change to do some last-minute initialisation and checks
     for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
       lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-      pd->initialized (mp_mw);
+      pd->initialized (mw);
     }
 
-    if (! m_no_gui && m_gtf_replay.empty () && ! mp_recorder) {
+    if (! m_no_gui && m_gtf_replay.empty () && m_gtf_record.empty ()) {
       //  Show initial tip window if required
-      mp_mw->about_to_exec ();
+      mw->about_to_exec ();
     }
 
-  } else if (mp_plugin_root) {
+  } else if (plugin_root ()) {
 
     //  Give the plugins a change to do some last-minute initialisation and checks
     for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
       lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-      pd->initialized (mp_plugin_root);
+      pd->initialized (plugin_root ());
     }
 
   }
@@ -1299,37 +1253,15 @@ dump_children (QObject *obj, int level = 0)
 }
 
 void
-ApplicationBase::process_events (QEventLoop::ProcessEventsFlags flags, bool silent)
+ApplicationBase::process_events (QEventLoop::ProcessEventsFlags /*flags*/, bool /*silent*/)
 {
-  if (mp_mw) {
-
-    if (silent) {
-      mp_dm_scheduler->enable (false);
-    }
-
-#if QT_VERSION < 0x050000
-    QApplication::syncX ();
-#endif
-
-    mp_mw->enter_busy_mode (true);
-    try {
-      QApplication::processEvents (flags);
-    } catch (...) {
-      //  ignore exceptions
-    }
-    mp_mw->enter_busy_mode (false);
-
-    if (silent) {
-      mp_dm_scheduler->enable (true);
-    }
-
-  }
+  //  The base class implementation does nothing ..
 }
 
 bool 
 ApplicationBase::write_config (const std::string &config_file)
 {
-  return mp_plugin_root ? mp_plugin_root->write_config (config_file) : 0;
+  return plugin_root () ? plugin_root ()->write_config (config_file) : 0;
 }
 
 void 
@@ -1346,38 +1278,38 @@ ApplicationBase::reset_config ()
 void 
 ApplicationBase::clear_config ()
 {
-  if (mp_plugin_root) {
-    mp_plugin_root->clear_config ();
+  if (plugin_root ()) {
+    plugin_root ()->clear_config ();
   }
 }
 
 bool 
 ApplicationBase::read_config (const std::string &config_file)
 {
-  return mp_plugin_root ? mp_plugin_root->read_config (config_file) : true;
+  return plugin_root () ? plugin_root ()->read_config (config_file) : true;
 }
 
 void 
 ApplicationBase::set_config (const std::string &name, const std::string &value)
 {
-  if (mp_plugin_root) {
-    mp_plugin_root->config_set (name, value);
+  if (plugin_root ()) {
+    plugin_root ()->config_set (name, value);
   }
 }
 
 void 
 ApplicationBase::config_end ()
 {
-  if (mp_plugin_root) {
-    mp_plugin_root->config_end ();
+  if (plugin_root ()) {
+    plugin_root ()->config_end ();
   }
 }
 
 std::string 
 ApplicationBase::get_config (const std::string &name) const
 {
-  if (mp_plugin_root) {
-    return mp_plugin_root->config_get (name);
+  if (plugin_root ()) {
+    return plugin_root ()->config_get (name);
   } else {
     return std::string ();
   }
@@ -1387,8 +1319,8 @@ std::vector<std::string>
 ApplicationBase::get_config_names () const
 {
   std::vector<std::string> names;
-  if (mp_plugin_root) {
-    mp_plugin_root->get_config_names (names);
+  if (plugin_root ()) {
+    plugin_root ()->get_config_names (names);
   }
   return names;
 }
@@ -1405,7 +1337,9 @@ ApplicationBase::special_app_flag (const std::string &name)
 //  GuiApplication implementation
 
 GuiApplication::GuiApplication (int &argc, char **argv)
-  : QApplication (argc, argv), ApplicationBase ()
+  : QApplication (argc, argv), ApplicationBase (),
+    mp_mw (0),
+    mp_recorder (0)
 {
   //  install a special style proxy to overcome the issue of black-on-black tree expanders
   setStyle (new lay::BackgroundAwareTreeStyle (0));
@@ -1415,7 +1349,22 @@ GuiApplication::GuiApplication (int &argc, char **argv)
   setAttribute (Qt::AA_DontShowIconsInMenus, false);
 #endif
 
+  //  only a GUI-enabled application runs an event loop and can have a deferred
+  //  method scheduler therefore.
+  mp_dm_scheduler.reset (new tl::DeferredMethodScheduler ());
+
   init_app (argc, argv, false);
+}
+
+GuiApplication::~GuiApplication ()
+{
+  //  uninitialize the plugins
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+    lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
+    pd->uninitialize (plugin_root ());
+  }
+
+  shutdown ();
 }
 
 bool
@@ -1469,13 +1418,123 @@ GuiApplication::exec ()
   return QApplication::exec ();
 }
 
+void
+GuiApplication::shutdown ()
+{
+  if (mp_mw) {
+    delete mp_mw;
+    mp_mw = 0;
+  }
+
+  //  delete all other top level widgets for safety - we don't want Ruby clean them up for us
+  QWidgetList tl_widgets = topLevelWidgets ();
+  for (QWidgetList::iterator w = tl_widgets.begin (); w != tl_widgets.end (); ++w) {
+    delete *w;
+  }
+
+  if (mp_recorder) {
+    delete mp_recorder;
+    mp_recorder = 0;
+  }
+
+  ApplicationBase::shutdown ();
+}
+
+void
+GuiApplication::finish ()
+{
+  //  save the recorded test events
+  if (mp_recorder && mp_recorder->recording ()) {
+    mp_recorder->stop ();
+    mp_recorder->save ();
+  }
+
+  ApplicationBase::finish ();
+}
+
+void
+GuiApplication::prepare_recording (const std::string &gtf_record, bool gtf_save_incremental)
+{
+  tl_assert (mp_recorder == 0);
+
+  //  since the recorder tracks QAction connections etc., it must be instantiated before every other
+  //  object performing a gtf::action_connect for example
+  mp_recorder = new gtf::Recorder (this, gtf_record);
+  mp_recorder->save_incremental (gtf_save_incremental);
+}
+
+void
+GuiApplication::start_recording ()
+{
+  if (mp_recorder) {
+    mp_recorder->start ();
+  }
+}
+
+lay::PluginRoot *
+GuiApplication::plugin_root () const
+{
+  return mp_mw;
+}
+
+void
+GuiApplication::setup ()
+{
+  tl_assert (mp_mw == 0);
+
+  mp_mw = new lay::MainWindow (this, "main_window");
+  QObject::connect (mp_mw, SIGNAL (closed ()), this, SLOT (quit ()));
+}
+
+void
+GuiApplication::process_events (QEventLoop::ProcessEventsFlags flags, bool silent)
+{
+  if (mp_mw) {
+
+    if (silent) {
+      mp_dm_scheduler->enable (false);
+    }
+
+#if QT_VERSION < 0x050000
+    QApplication::syncX ();
+#endif
+
+    mp_mw->enter_busy_mode (true);
+    try {
+      QApplication::processEvents (flags);
+    } catch (...) {
+      //  ignore exceptions
+    }
+    mp_mw->enter_busy_mode (false);
+
+    if (silent) {
+      mp_dm_scheduler->enable (true);
+    }
+
+  }
+}
+
 // --------------------------------------------------------------------------------
 //  NonGuiApplication implementation
 
 NonGuiApplication::NonGuiApplication (int &argc, char **argv)
-  : QCoreApplication (argc, argv), ApplicationBase ()
+  : QCoreApplication (argc, argv), ApplicationBase (),
+    mp_pr (0),
+    mp_pb (0),
+    mp_plugin_root (0)
 {
   init_app (argc, argv, true);
+}
+
+NonGuiApplication::~NonGuiApplication ()
+{
+  //  uninitialize the plugins
+  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
+    lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
+    pd->uninitialize (plugin_root ());
+  }
+
+  shutdown ();
 }
 
 int
@@ -1483,6 +1542,36 @@ NonGuiApplication::exec ()
 {
   //  A non-GUI application does nothing on exec
   return 0;
+}
+
+void
+NonGuiApplication::shutdown ()
+{
+  if (mp_plugin_root) {
+    delete mp_plugin_root;
+    mp_plugin_root = 0;
+  }
+
+  if (mp_pr) {
+    delete mp_pr;
+    mp_pr = 0;
+  }
+
+  if (mp_pb) {
+    delete mp_pb;
+    mp_pb = 0;
+  }
+
+  ApplicationBase::shutdown ();
+}
+
+void
+NonGuiApplication::setup ()
+{
+  mp_pr = new lay::ProgressReporter ();
+  mp_pb = new TextProgress (10 /*verbosity level*/);
+  mp_pr->set_progress_bar (mp_pb);
+  mp_plugin_root = new lay::PluginRoot ();
 }
 
 }

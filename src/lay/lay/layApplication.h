@@ -128,14 +128,12 @@ public:
   std::string usage ();
 
   /**
-   *  @brief Return the main window's reference
+   *  @brief Returns the main window's reference
    *
-   *  If the application has not been initialized properly, this pointer is 0.
+   *  If the application has not been initialized properly or does not support GUI,
+   *  this pointer is 0.
    */
-  MainWindow *main_window () const
-  {
-    return mp_mw;
-  }
+  virtual MainWindow *main_window () const = 0;
 
   /**
    *  @brief Runs plugin and macro specific initializations
@@ -164,7 +162,7 @@ public:
    *  handling for the "close application window" case and a "silent" mode. In that mode, processing
    *  of deferred methods is disabled.
    */
-  void process_events (QEventLoop::ProcessEventsFlags flags, bool silent = false);
+  virtual void process_events (QEventLoop::ProcessEventsFlags flags, bool silent = false);
 
   /**
    *  @brief A shortcut for the default process_events
@@ -326,11 +324,6 @@ public:
   }
 
   /**
-   *  @brief Gets the QCoreApplication object
-   */
-  virtual QCoreApplication *qapp () { return 0; }
-
-  /**
    *  @brief Gets the QApplication object
    *  This method will return non-null only if a GUI-enabled application is present.
    */
@@ -338,10 +331,14 @@ public:
 
 protected:
   void init_app (int &argc, char **argv, bool non_ui_mode);
+  virtual void setup () = 0;
+  virtual void shutdown ();
+  virtual void prepare_recording (const std::string &gtf_record, bool gtf_record_incremental);
+  virtual void start_recording ();
+  virtual lay::PluginRoot *plugin_root () const = 0;
+  virtual void finish ();
 
 private:
-  void shutdown ();
-  void finish ();
   std::vector<std::string> scan_global_modules ();
 
   enum file_type {
@@ -366,10 +363,11 @@ private:
   std::vector<std::string> m_klayout_path;
   std::string m_inst_path;
   std::string m_appdata_path;
-  std::vector< std::pair<std::string, std::string> > m_macro_categories;
   bool m_write_config_file;
   std::vector< std::pair<std::string, std::string> > m_variables;
   int m_gtf_replay_rate, m_gtf_replay_stop;
+  std::string m_gtf_record;
+  bool m_gtf_save_incremental;
   bool m_no_macros;
   bool m_same_view;
   bool m_sync_mode;
@@ -377,16 +375,10 @@ private:
   bool m_vo_mode;
   bool m_editable;
   bool m_enable_undo;
-  std::auto_ptr<tl::DeferredMethodScheduler> mp_dm_scheduler;
   //  HINT: the ruby interpreter must be destroyed before MainWindow
   //  in order to maintain a valid MainWindow reference for ruby scripts and Ruby's GC all the time.
   gsi::Interpreter *mp_ruby_interpreter;
   gsi::Interpreter *mp_python_interpreter;
-  MainWindow *mp_mw;
-  lay::ProgressReporter *mp_pr;
-  lay::ProgressBar *mp_pb;
-  lay::PluginRoot *mp_plugin_root;
-  gtf::Recorder *mp_recorder;
   std::vector<PluginDescriptor> m_native_plugins;
 };
 
@@ -398,9 +390,9 @@ class LAY_PUBLIC GuiApplication
 {
 public:
   GuiApplication (int &argc, char **argv);
+  ~GuiApplication ();
 
   QApplication *qapp_gui () { return this; }
-  QCoreApplication *qapp () { return this; }
 
   /**
    *  @brief Reimplementation of notify from QApplication
@@ -427,6 +419,33 @@ public:
   {
     ApplicationBase::exit (result);
   }
+
+  /**
+   *  @brief Returns the main window's reference
+   */
+  virtual MainWindow *main_window () const
+  {
+    return mp_mw;
+  }
+
+  /**
+   *  @brief Reimplementation of ApplicationBase interface
+   */
+  virtual void process_events (QEventLoop::ProcessEventsFlags flags, bool silent);
+
+protected:
+  virtual void setup ();
+  virtual void shutdown ();
+  virtual void finish ();
+  virtual void prepare_recording (const std::string &gtf_record, bool gtf_save_incremental);
+  virtual void start_recording ();
+
+  virtual lay::PluginRoot *plugin_root () const;
+
+private:
+  MainWindow *mp_mw;
+  gtf::Recorder *mp_recorder;
+  std::auto_ptr<tl::DeferredMethodScheduler> mp_dm_scheduler;
 };
 
 /**
@@ -437,9 +456,7 @@ class LAY_PUBLIC NonGuiApplication
 {
 public:
   NonGuiApplication (int &argc, char **argv);
-
-  QApplication *qapp_gui () { return 0; }
-  QCoreApplication *qapp () { return this; }
+  ~NonGuiApplication ();
 
   /**
    *  @brief Gets the application instance, cast to this class
@@ -461,6 +478,29 @@ public:
   {
     ApplicationBase::exit (result);
   }
+
+  /**
+   *  @brief Returns the main window's reference
+   *  This incarnation returns 0 since no GUI is supported.
+   */
+  virtual MainWindow *main_window () const
+  {
+    return 0;
+  }
+
+protected:
+  virtual void setup ();
+  virtual void shutdown ();
+
+  virtual lay::PluginRoot *plugin_root () const
+  {
+    return mp_plugin_root;
+  }
+
+private:
+  lay::ProgressReporter *mp_pr;
+  lay::ProgressBar *mp_pb;
+  lay::PluginRoot *mp_plugin_root;
 };
 
 } // namespace lay

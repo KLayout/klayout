@@ -258,11 +258,6 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
 
   mp_dm_scheduler.reset (new tl::DeferredMethodScheduler ());
 
-  //  install a special style proxy to overcome the issue of black-on-black tree expanders
-  if (qapp_gui ()) {
-    qapp_gui ()->setStyle (new lay::BackgroundAwareTreeStyle (0));
-  }
-  
   //  initialize the system codecs (Hint: this must be done after the QApplication is initialized because
   //  it will call setlocale)
   tl::initialize_codecs ();
@@ -301,7 +296,7 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
   //  get the KLayout path
   m_klayout_path = lay::get_klayout_path ();
 
-  if (qapp_gui ()) {
+  if (! non_ui_mode) {
 
     //  create the configuration files paths and collect the initialization config files
     //  (the ones used for reset) into m_initial_config_files.
@@ -799,13 +794,6 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
 
   db::set_default_editable_mode (m_editable);
   db::enable_transactions (m_enable_undo);
-
-  if (qapp_gui ()) {
-    qapp_gui ()->setWindowIcon (QIcon (QString::fromUtf8 (":/logo.png")));
-#if QT_VERSION >= 0x040500
-    qapp_gui ()->setAttribute (Qt::AA_DontShowIconsInMenus, false);
-#endif
-  }
 
   if (qapp_gui () && ! gtf_record.empty ()) {
     //  since the recorder tracks QAction connections etc., it must be instantiated before every other 
@@ -1419,6 +1407,14 @@ ApplicationBase::special_app_flag (const std::string &name)
 GuiApplication::GuiApplication (int &argc, char **argv)
   : QApplication (argc, argv), ApplicationBase ()
 {
+  //  install a special style proxy to overcome the issue of black-on-black tree expanders
+  setStyle (new lay::BackgroundAwareTreeStyle (0));
+
+  setWindowIcon (QIcon (QString::fromUtf8 (":/logo.png")));
+#if QT_VERSION >= 0x040500
+  setAttribute (Qt::AA_DontShowIconsInMenus, false);
+#endif
+
   init_app (argc, argv, false);
 }
 

@@ -7,6 +7,12 @@ DESTDIR = $$OUT_PWD/../../..
 
 include($$PWD/../../app.pri)
 
+# On Mac OSX, these buddy tools have to be built as ordinary command line tools;
+# not as bundles (*.app)
+mac {
+	CONFIG -= app_bundle
+}
+
 # Since the main function is entirely unspecific, we can put it into a common
 # place - it's not part of the bd sources.
 SOURCES = $$PWD/bd/main.cc

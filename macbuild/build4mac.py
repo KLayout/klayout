@@ -10,6 +10,8 @@
 from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
 import sys
 import os
+import shutil
+import glob
 import platform
 import optparse
 import subprocess
@@ -19,13 +21,14 @@ import subprocess
 #-------------------------------------------------------------------------------
 mydir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append( mydir + "/macbuild" )
-from build4mac_env import *
+from build4mac_env  import *
+from build4mac_util import *
 
 #-------------------------------------------------------------------------------
 ## To set global variables including present directory and platform info.
 #-------------------------------------------------------------------------------
 def SetGlobals():
-  global PresentDir         # present directory
+  global ProjectDir         # project directory where "build.sh" exists
   global Usage              # string on usage
   global BuildBash          # the main build Bash script
   global Platform           # platform
@@ -35,7 +38,8 @@ def SetGlobals():
   global NoQtBindings       # True if not creating Qt bindings for Ruby scripts
   global MakeOptions        # options passed to `make`
   global DebugMode          # True if debug mode build
-  global CheckComOnly       # True if check the command line only
+  global CheckComOnly       # True if only for checking the command line parameters to "build.sh"
+  global Deployment         # True if deploying the binaries for a package
   # auxiliary variables on platform
   global System             # 6-tuple from platform.uname()
   global Node               # - do -
@@ -63,10 +67,15 @@ def SetGlobals():
   Usage += "   [-m|--make <option>] : option passed to 'make'                         | -j4 \n"
   Usage += "   [-d|--debug]         : enable debug mode build                         | disabled \n"
   Usage += "   [-c|--checkcom]      : check command line and exit without building    | disabled \n"
-  Usage += "   [-?|--?]             : print this usage and exit                       | disabled\n"
+  Usage += "   [-y|--deploy]        : deploy built binaries with depending libraries  | disabled \n"
+  Usage += "                        : ! After confirmation of successful build of     | \n"
+  Usage += "                        :   KLayout, rerun this script with BOTH:         | \n"
+  Usage += "                        :     1) the same options used for building AND   | \n"
+  Usage += "                        :     2) [-y|--deploy]                            | \n"
+  Usage += "   [-?|--?]             : print this usage and exit                       | disabled \n"
   Usage += "---------------------------------------------------------------------------------------------\n"
 
-  PresentDir = os.getcwd()
+  ProjectDir = os.getcwd()
   BuildBash  = "./build.sh"
   (System, Node, Release, Version, Machine, Processor) = platform.uname()
 
@@ -120,6 +129,7 @@ def SetGlobals():
   MakeOptions  = "-j4"
   DebugMode    = False
   CheckComOnly = False
+  Deployment   = False
 
 #------------------------------------------------------------------------------
 ## To get command line parameters
@@ -134,6 +144,7 @@ def ParseCommandLineArguments():
   global MakeOptions
   global DebugMode
   global CheckComOnly
+  global Deployment
 
   p = optparse.OptionParser( usage=Usage )
   p.add_option( '-q', '--qt',
@@ -170,6 +181,12 @@ def ParseCommandLineArguments():
                 default=False,
                 help="check command line and exit without building" )
 
+  p.add_option( '-y', '--deploy',
+                action='store_true',
+                dest='deploy_bins',
+                default=False,
+                help="deploy built binaries" )
+
   p.add_option( '-?', '--??',
                 action='store_true',
                 dest='checkusage',
@@ -183,6 +200,7 @@ def ParseCommandLineArguments():
                   make_option   = "-j4",
                   debug_build   = False,
                   check_command = False,
+                  deploy_bins   = False,
                   checkusage    = False )
 
   opt, args = p.parse_args()
@@ -278,17 +296,22 @@ def ParseCommandLineArguments():
   MakeOptions  = opt.make_option
   DebugMode    = opt.debug_build
   CheckComOnly = opt.check_command
+  Deployment   = opt.deploy_bins
 
-  target  = "%s %s %s" % (Platform, Release, Machine)
-  modules = "Qt=%s, Ruby=%s, Python=%s" % (ModuleQt, ModuleRuby, ModulePython)
-  message = "### You are going to build KLayout\n    for  <%s>\n    with <%s>...\n"
-  print("")
-  print( message % (target, modules) )
+  if not Deployment:
+    target  = "%s %s %s" % (Platform, Release, Machine)
+    modules = "Qt=%s, Ruby=%s, Python=%s" % (ModuleQt, ModuleRuby, ModulePython)
+    message = "### You are going to build KLayout\n    for  <%s>\n    with <%s>...\n"
+    print("")
+    print( message % (target, modules) )
 
 #------------------------------------------------------------------------------
-## To run the main Bash script with appropriate options
+## To run the main Bash script "build.sh" with appropriate options
+#
+# @return 0 on success; non-zero on failure
 #------------------------------------------------------------------------------
-def Run():
+def RunMainBuildBash():
+  global ProjectDir
   global Platform
   global BuildBash
   global ModuleQt
@@ -298,9 +321,15 @@ def Run():
   global MakeOptions
   global DebugMode
   global CheckComOnly
-  global MacBinDir    # binary directory
-  global MacBuildDir  # build directory
-  global MacBuildLog  # build log file
+  global Deployment
+  global MacPkgDir       # relative path to package directory
+  global MacBinDir       # relative path to binary directory
+  global MacBuildDir     # relative path to build directory
+  global MacBuildLog     # relative path to build log file
+  global AbsMacPkgDir    # absolute path to package directory
+  global AbsMacBinDir    # absolute path to binary directory
+  global AbsMacBuildDir  # absolute path to build directory
+  global AbsMacBuildLog  # absolute path to build log file
 
   #-----------------------------------------------------
   # [1] Set parameters passed to the main Bash script
@@ -317,21 +346,31 @@ def Run():
 
   # (B) Qt4 or Qt5
   if ModuleQt == 'Qt4MacPorts':
-    parameters += " \\\n  -qt4"
-    parameters += " \\\n  -qmake  %s" % Qt4MacPorts['qmake']
-    MacBinDir   = "./qt4.bin.macos-%s-%s"       % (Platform, mode)
-    MacBuildDir = "./qt4.build.macos-%s-%s"     % (Platform, mode)
-    MacBuildLog = "./qt4.build.macos-%s-%s.log" % (Platform, mode)
-    parameters += " \\\n  -bin    %s" % MacBinDir
-    parameters += " \\\n  -build  %s" % MacBuildDir
+    parameters    += " \\\n  -qt4"
+    parameters    += " \\\n  -qmake  %s" % Qt4MacPorts['qmake']
+    MacPkgDir      = "./qt4.pkg.macos-%s-%s/"       % (Platform, mode)
+    MacBinDir      = "./qt4.bin.macos-%s-%s/"       % (Platform, mode)
+    MacBuildDir    = "./qt4.build.macos-%s-%s/"     % (Platform, mode)
+    MacBuildLog    = "./qt4.build.macos-%s-%s.log"  % (Platform, mode)
+    AbsMacPkgDir   = "%s/qt4.pkg.macos-%s-%s/"      % (ProjectDir, Platform, mode)
+    AbsMacBinDir   = "%s/qt4.bin.macos-%s-%s/"      % (ProjectDir, Platform, mode)
+    AbsMacBuildDir = "%s/qt4.build.macos-%s-%s/"    % (ProjectDir, Platform, mode)
+    AbsMacBuildLog = "%s/qt4.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
+    parameters    += " \\\n  -bin    %s" % MacBinDir
+    parameters    += " \\\n  -build  %s" % MacBuildDir
   elif ModuleQt == 'Qt5MacPorts':
-    parameters += " \\\n  -qt5"
-    parameters += " \\\n  -qmake  %s" % Qt5MacPorts['qmake']
-    MacBinDir   = "./qt5.bin.macos-%s-%s"       % (Platform, mode)
-    MacBuildDir = "./qt5.build.macos-%s-%s"     % (Platform, mode)
-    MacBuildLog = "./qt5.build.macos-%s-%s.log" % (Platform, mode)
-    parameters += " \\\n  -bin    %s" % MacBinDir
-    parameters += " \\\n  -build  %s" % MacBuildDir
+    parameters    += " \\\n  -qt5"
+    parameters    += " \\\n  -qmake  %s" % Qt5MacPorts['qmake']
+    MacPkgDir      = "./qt5.pkg.macos-%s-%s/"       % (Platform, mode)
+    MacBinDir      = "./qt5.bin.macos-%s-%s/"       % (Platform, mode)
+    MacBuildDir    = "./qt5.build.macos-%s-%s/"     % (Platform, mode)
+    MacBuildLog    = "./qt5.build.macos-%s-%s.log"  % (Platform, mode)
+    AbsMacPkgDir   = "%s/qt5.pkg.macos-%s-%s/"      % (ProjectDir, Platform, mode)
+    AbsMacBinDir   = "%s/qt5.bin.macos-%s-%s/"      % (ProjectDir, Platform, mode)
+    AbsMacBuildDir = "%s/qt5.build.macos-%s-%s/"    % (ProjectDir, Platform, mode)
+    AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
+    parameters    += " \\\n  -bin    %s" % MacBinDir
+    parameters    += " \\\n  -build  %s" % MacBuildDir
 
   # (C) want Qt bindings with Ruby scripts?
   if NoQtBindings:
@@ -373,21 +412,220 @@ def Run():
   #-----------------------------------------------------
   # [3] Invoke the main Bash script
   #-----------------------------------------------------
-  myscript = "build4mac.py"
-  if subprocess.call( command, shell=True ) != 0:
-    print("")
-    print( "-------------------------------------------------------------" )
-    print( "!!! <%s>: failed to build KLayout" % myscript, file=sys.stderr )
-    print( "-------------------------------------------------------------" )
-    print("")
-    sys.exit(1)
+  if Deployment:
+    return(0)
   else:
-    print("")
-    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
-    print( "### <%s>: successfully built KLayout" % myscript, file=sys.stderr )
-    print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
-    print("")
-    sys.exit(0)
+    myscript = "build4mac.py"
+    if subprocess.call( command, shell=True ) != 0:
+      print("")
+      print( "-------------------------------------------------------------" )
+      print( "!!! <%s>: failed to build KLayout" % myscript, file=sys.stderr )
+      print( "-------------------------------------------------------------" )
+      print("")
+      return(1)
+    else:
+      print("")
+      print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
+      print( "### <%s>: successfully built KLayout" % myscript, file=sys.stderr )
+      print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
+      print("")
+      return(0)
+
+#------------------------------------------------------------------------------
+## To deploy built binaries and depending libraries for making a bundle
+#
+# Reference: "Deploying an Application on Mac OS X" of Qt Assistant.
+#
+# @return 0 on success; non-zero on failure
+#------------------------------------------------------------------------------
+def DeployBinariesForBundle():
+  global ProjectDir
+  global ModuleQt
+  global Deployment
+  global MacPkgDir
+  global MacBinDir
+  global MacBuildDir
+  global MacBuildLog
+  global AbsMacPkgDir
+  global AbsMacBinDir
+  global AbsMacBuildDir
+  global AbsMacBuildLog
+
+  #-------------------------------------------------------------
+  # [1] Check the status of working directory
+  #-------------------------------------------------------------
+  os.chdir(ProjectDir)
+  if not Deployment:
+    return(1)
+  if not os.path.isfile(MacBuildLog):
+    print( "!!! Build log file <%s> does not present !!!" % MacBuildLog, file=sys.stderr )
+    return(1)
+  if not os.path.isdir(MacBuildDir):
+    print( "!!! Build directory <%s> does not present !!!" % MacBuildDir, file=sys.stderr )
+    return(1)
+  if not os.path.isdir(MacBinDir):
+    print( "!!! Binary directory <%s> does not present !!!" % MacBinDir, file=sys.stderr )
+    return(1)
+
+  #-------------------------------------------------------------
+  # [2] Create a new empty directory for deploying binaries
+  #-------------------------------------------------------------
+  os.chdir(ProjectDir)
+  if os.path.isfile(MacPkgDir):
+    os.remove(MacPkgDir)
+  if os.path.isdir(MacPkgDir):
+    shutil.rmtree(MacPkgDir)
+  os.mkdir(MacPkgDir)
+
+  #-------------------------------------------------------------
+  # [3] Create the directory skeleton for "klayout.app" bundle
+  #     and command line buddy tools such as "strm2cif"
+  #     that should look like...
+  #
+  #    klayout.app/+
+  #                +-- Contents/+
+  #                             +-- Info.plist
+  #                             +-- MacOS/+
+  #                                       +-- 'klayout'
+  #                             +-- PkgInfo
+  #                             +-- Resources/
+  #                             +-- Frameworks/
+  #                             +-- buddy_tool/+
+  #                                            +-- 'strm2cif'
+  #                                            +-- 'strm2dxf'
+  #                                            :
+  #                                            +-- 'strmxor'
+  #-------------------------------------------------------------
+  targetDir0 = "%s/klayout.app/Contents/" % AbsMacPkgDir
+  targetDir1 = targetDir0 + "MacOS/"
+  targetDir2 = targetDir0 + "Resources/"
+  targetDir3 = targetDir0 + "Frameworks/"
+  targetDir4 = targetDir0 + "buddy_tool/"
+  os.makedirs(targetDir1)
+  os.makedirs(targetDir2)
+  os.makedirs(targetDir3)
+  os.makedirs(targetDir4)
+
+  #-------------------------------------------------------------
+  # [4] Copy KLayout's dynamic link libraries to "Frameworks/"
+  #     and create two library dependency dictionaries.
+  #     Do this job in "Frameworks/"
+  #-------------------------------------------------------------
+  os.chdir( targetDir3 )
+  dylibs     = glob.glob( AbsMacBinDir + "*.dylib" )
+  depDicReal = {} # library dependency dictionary for "real file"
+  depDicLink = {} # library dependency dictionary for "symbolic link"
+  for item in dylibs:
+    #-------------------------------------------------------------------
+    # (A) Copy an ordinary *.dylib file here and set its mode to 0755
+    #     then get inter-library dependencies
+    #-------------------------------------------------------------------
+    if os.path.isfile(item) and not os.path.islink(item):
+      nameReal = os.path.basename(item)
+      shutil.copy2( item, "./" )
+      os.chmod( nameReal, 0755 )
+      otoolCm   = "otool -L %s | grep libklayout" % nameReal
+      otoolOut  = os.popen( otoolCm ).read()
+      dependDic = DecomposeLibraryDependency(otoolOut)
+      depDicReal.update(dependDic)
+    #-------------------------------------------------------------------
+    # (B) Recreate a symbolic link
+    #     then get inter-library dependencies
+    #-------------------------------------------------------------------
+    elif os.path.isfile(item) and os.path.islink(item):
+      nameLink = os.path.basename(item)
+      nameReal = os.path.basename( os.path.realpath(item) )
+      os.symlink( nameReal, nameLink )
+      otoolCm   = "otool -L %s | grep libklayout" % nameLink
+      otoolOut  = os.popen( otoolCm ).read()
+      dependDic = DecomposeLibraryDependency(otoolOut)
+      depDicLink.update(dependDic)
+  '''
+  PrintLibraryDependencyDictionary( depDicReal, "Ordinary/Real" )
+  PrintLibraryDependencyDictionary( depDicLink, "Symbolic Link")
+  quit()
+  '''
+
+  #-------------------------------------------------------------
+  # [5] Set the identification names for KLayout's libraries
+  #     and make the library aware of the locations of libraries
+  #     on which it depends; that is, inter-library dependency
+  #-------------------------------------------------------------
+
+
+  #-------------------------------------------------------------
+  # [6] Copy known some files in source directories to
+  #     relevant target directories
+  #-------------------------------------------------------------
+  os.chdir(ProjectDir)
+  sourceDir0 = "%s/klayout.app/Contents/" % MacBinDir
+  sourceDir1 = sourceDir0 + "MacOS/"
+  sourceDir2 = "%s/etc/" % ProjectDir
+  sourceDir3 = "%s/src/klayout_main/" % ProjectDir
+  sourceDir4 = "%s" % MacBinDir
+
+  shutil.copy2( sourceDir0 + "Info.plist", targetDir0 )
+  shutil.copy2( sourceDir1 + "klayout",    targetDir1 )
+  shutil.copy2( sourceDir2 + "logo.png",   targetDir2 )
+  shutil.copy2( sourceDir3 + "logo.ico",   targetDir2 )
+
+  os.chmod( targetDir0 + "Info.plist", 0644 )
+  os.chmod( targetDir1 + "klayout",    0755 )
+  os.chmod( targetDir2 + "logo.png",   0644 )
+  os.chmod( targetDir2 + "logo.ico",   0644 )
+
+  buddies = glob.glob( sourceDir4 + "strm*" )
+  for item in buddies:
+    shutil.copy2( item, targetDir4 )
+    buddy = os.path.basename(item)
+    os.chmod( targetDir4 + buddy, 0755 )
+
+  #-------------------------------------------------------------
+  # [7] Set and change the library identification name(s) of
+  #     different executables
+  #-------------------------------------------------------------
+  os.chdir(ProjectDir)
+  os.chdir(MacPkgDir)
+  klayoutexec = "klayout.app/Contents/MacOS/klayout"
+  ret = SetChangeLibIdentificationName( klayoutexec, "../Frameworks" )
+  if not ret == 0:
+    os.chdir(ProjectDir)
+    print( "!!! Failed to set/change library identification name for <%s> !!!" % klayoutexec, \
+           file=sys.stderr )
+    return(1)
+
+  buddies = glob.glob( "klayout.app/Contents/buddy_tool/strm*" )
+  for buddy in buddies:
+    ret = SetChangeLibIdentificationName( buddy, "../Frameworks" )
+    if not ret == 0:
+      os.chdir(ProjectDir)
+      print( "!!! Failed to set/change library identification name for <%s> !!!" % buddy, \
+             file=sys.stderr )
+      return(1)
+
+  #-------------------------------------------------------------
+  # [8] Deploying Applications on OS X including Qt frameworks
+  #-------------------------------------------------------------
+  if ModuleQt == 'Qt4MacPorts':
+    deploytool = Qt4MacPorts['deploy']
+    app_bundle = "klayout.app"
+    options    = "-libpath=klayout.app/Contents/Frameworks"
+  elif ModuleQt == 'Qt5MacPorts':
+    deploytool = Qt5MacPorts['deploy']
+    app_bundle = "klayout.app"
+    options    = "-libpath=klayout.app/Contents/Frameworks"
+
+  os.chdir(ProjectDir)
+  os.chdir(MacPkgDir)
+  command = "%s %s %s" % ( deploytool, app_bundle, options )
+  if subprocess.call( command, shell=True ) != 0:
+    print( "!!! Failed to deploy applications on OSX !!!", file=sys.stderr )
+    os.chdir(ProjectDir)
+    return(1)
+  else:
+    print( "### Deployed applications on OS X ###", file=sys.stderr )
+    os.chdir(ProjectDir)
+    return(0)
 
 #------------------------------------------------------------------------------
 ## The main function
@@ -395,7 +633,15 @@ def Run():
 def main():
   SetGlobals()
   ParseCommandLineArguments()
-  Run()
+  ret = RunMainBuildBash()
+  if not Deployment:
+    if ret == 0:
+      sys.exit(0)
+    else:
+      sys.exit(1)
+  else:
+    ret = DeployBinariesForBundle()
+    sys.exit(ret)
 
 #===================================================================================
 if __name__ == "__main__":

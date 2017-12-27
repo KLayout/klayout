@@ -348,26 +348,26 @@ def RunMainBuildBash():
   if ModuleQt == 'Qt4MacPorts':
     parameters    += " \\\n  -qt4"
     parameters    += " \\\n  -qmake  %s" % Qt4MacPorts['qmake']
-    MacPkgDir      = "./qt4.pkg.macos-%s-%s/"       % (Platform, mode)
-    MacBinDir      = "./qt4.bin.macos-%s-%s/"       % (Platform, mode)
-    MacBuildDir    = "./qt4.build.macos-%s-%s/"     % (Platform, mode)
+    MacPkgDir      = "./qt4.pkg.macos-%s-%s"        % (Platform, mode)
+    MacBinDir      = "./qt4.bin.macos-%s-%s"        % (Platform, mode)
+    MacBuildDir    = "./qt4.build.macos-%s-%s"      % (Platform, mode)
     MacBuildLog    = "./qt4.build.macos-%s-%s.log"  % (Platform, mode)
-    AbsMacPkgDir   = "%s/qt4.pkg.macos-%s-%s/"      % (ProjectDir, Platform, mode)
-    AbsMacBinDir   = "%s/qt4.bin.macos-%s-%s/"      % (ProjectDir, Platform, mode)
-    AbsMacBuildDir = "%s/qt4.build.macos-%s-%s/"    % (ProjectDir, Platform, mode)
+    AbsMacPkgDir   = "%s/qt4.pkg.macos-%s-%s"       % (ProjectDir, Platform, mode)
+    AbsMacBinDir   = "%s/qt4.bin.macos-%s-%s"       % (ProjectDir, Platform, mode)
+    AbsMacBuildDir = "%s/qt4.build.macos-%s-%s"     % (ProjectDir, Platform, mode)
     AbsMacBuildLog = "%s/qt4.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
     parameters    += " \\\n  -bin    %s" % MacBinDir
     parameters    += " \\\n  -build  %s" % MacBuildDir
   elif ModuleQt == 'Qt5MacPorts':
     parameters    += " \\\n  -qt5"
     parameters    += " \\\n  -qmake  %s" % Qt5MacPorts['qmake']
-    MacPkgDir      = "./qt5.pkg.macos-%s-%s/"       % (Platform, mode)
-    MacBinDir      = "./qt5.bin.macos-%s-%s/"       % (Platform, mode)
-    MacBuildDir    = "./qt5.build.macos-%s-%s/"     % (Platform, mode)
+    MacPkgDir      = "./qt5.pkg.macos-%s-%s"        % (Platform, mode)
+    MacBinDir      = "./qt5.bin.macos-%s-%s"        % (Platform, mode)
+    MacBuildDir    = "./qt5.build.macos-%s-%s"      % (Platform, mode)
     MacBuildLog    = "./qt5.build.macos-%s-%s.log"  % (Platform, mode)
-    AbsMacPkgDir   = "%s/qt5.pkg.macos-%s-%s/"      % (ProjectDir, Platform, mode)
-    AbsMacBinDir   = "%s/qt5.bin.macos-%s-%s/"      % (ProjectDir, Platform, mode)
-    AbsMacBuildDir = "%s/qt5.build.macos-%s-%s/"    % (ProjectDir, Platform, mode)
+    AbsMacPkgDir   = "%s/qt5.pkg.macos-%s-%s"       % (ProjectDir, Platform, mode)
+    AbsMacBinDir   = "%s/qt5.bin.macos-%s-%s"       % (ProjectDir, Platform, mode)
+    AbsMacBuildDir = "%s/qt5.build.macos-%s-%s"     % (ProjectDir, Platform, mode)
     AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
     parameters    += " \\\n  -bin    %s" % MacBinDir
     parameters    += " \\\n  -build  %s" % MacBuildDir
@@ -506,45 +506,63 @@ def DeployBinariesForBundle():
   os.makedirs(targetDir3)
   os.makedirs(targetDir4)
 
-  #-------------------------------------------------------------
-  # [4] Copy KLayout's dynamic link libraries to "Frameworks/"
-  #     and create two library dependency dictionaries.
-  #     Do this job in "Frameworks/"
-  #-------------------------------------------------------------
+  #-------------------------------------------------------------------------------
+  # [4] Copy KLayout's dynamic link libraries to "Frameworks/" and create
+  #     the library dependency dictionary.
+  #     <<< Do this job in "Frameworks/" >>>
+  #
+  # Note:
+  #     A dynamic link library is built as below:
+  #       (1) libklayout_lay.0.25.0.dylib
+  #       (2) libklayout_lay.0.25.dylib -> libklayout_lay.0.25.0.dylib
+  #       (3) libklayout_lay.0.dylib -> libklayout_lay.0.25.0.dylib
+  #       (4) libklayout_lay.dylib -> libklayout_lay.0.25.0.dylib
+  #     where,
+  #       (1) is an ordinary file with full version number 'major.minor.teeny'
+  #           between "library_name."='libklayout_lay.' and '.dylib'
+  #       (2) is a symbolic link with 'major.minor' version number
+  #       (3) is a symbolic link with 'major' version number
+  #       (4) is a symbolic link without version number number
+  #
+  #     The dynamic linker tries to find a library name in style (3) as shown
+  #     in the example below.
+  #
+  # Example:
+  #   MacBookPro(1)$ otool -L klayout
+  #   klayout:
+  #       :
+  #       :
+  #     libklayout_tl.0.dylib (compatibility version 0.25.0, current version 0.25.0)
+  #     libklayout_gsi.0.dylib (compatibility version 0.25.0, current version 0.25.0)
+  #     libklayout_db.0.dylib (compatibility version 0.25.0, current version 0.25.0)
+  #       :
+  #-------------------------------------------------------------------------------
   os.chdir( targetDir3 )
-  dylibs     = glob.glob( AbsMacBinDir + "*.dylib" )
-  depDicReal = {} # library dependency dictionary for "real file"
-  depDicLink = {} # library dependency dictionary for "symbolic link"
-  for item in dylibs:
-    #-------------------------------------------------------------------
-    # (A) Copy an ordinary *.dylib file here and set its mode to 0755
-    #     then get inter-library dependencies
-    #-------------------------------------------------------------------
+  dynamicLinkLibs = glob.glob( AbsMacBinDir + "/*.dylib" )
+  depDicOrdinary  = {} # inter-library dependency dictionary
+  for item in dynamicLinkLibs:
     if os.path.isfile(item) and not os.path.islink(item):
-      nameReal = os.path.basename(item)
-      shutil.copy2( item, "./" )
-      os.chmod( nameReal, 0755 )
-      otoolCm   = "otool -L %s | grep libklayout" % nameReal
+      #-------------------------------------------------------------------
+      # (A) Copy an ordinary *.dylib file here by changing the name
+      #     to style (3) and set its mode to 0755 (sanity check).
+      #-------------------------------------------------------------------
+      fullName = os.path.basename(item).split('.')
+      # e.g. [ 'libklayout_lay', '0', '25', '0', 'dylib' ]
+      nameStyle3 = fullName[0] + "." + fullName[1] + ".dylib"
+      shutil.copy2( item, nameStyle3 )
+      os.chmod( nameStyle3, 0755 )
+      #-------------------------------------------------------------------
+      # (B) Then get inter-library dependencies
+      #-------------------------------------------------------------------
+      otoolCm   = "otool -L %s | grep libklayout" % nameStyle3
       otoolOut  = os.popen( otoolCm ).read()
       dependDic = DecomposeLibraryDependency(otoolOut)
-      depDicReal.update(dependDic)
-    #-------------------------------------------------------------------
-    # (B) Recreate a symbolic link
-    #     then get inter-library dependencies
-    #-------------------------------------------------------------------
-    elif os.path.isfile(item) and os.path.islink(item):
-      nameLink = os.path.basename(item)
-      nameReal = os.path.basename( os.path.realpath(item) )
-      os.symlink( nameReal, nameLink )
-      otoolCm   = "otool -L %s | grep libklayout" % nameLink
-      otoolOut  = os.popen( otoolCm ).read()
-      dependDic = DecomposeLibraryDependency(otoolOut)
-      depDicLink.update(dependDic)
+      depDicOrdinary.update(dependDic)
   '''
-  PrintLibraryDependencyDictionary( depDicReal, "Ordinary/Real" )
-  PrintLibraryDependencyDictionary( depDicLink, "Symbolic Link")
+  PrintLibraryDependencyDictionary( depDicOrdinary, "Style (3)" )
   quit()
   '''
+
 
   #-------------------------------------------------------------
   # [5] Set the identification names for KLayout's libraries
@@ -558,23 +576,23 @@ def DeployBinariesForBundle():
   #     relevant target directories
   #-------------------------------------------------------------
   os.chdir(ProjectDir)
-  sourceDir0 = "%s/klayout.app/Contents/" % MacBinDir
-  sourceDir1 = sourceDir0 + "MacOS/"
-  sourceDir2 = "%s/etc/" % ProjectDir
-  sourceDir3 = "%s/src/klayout_main/" % ProjectDir
+  sourceDir0 = "%s/klayout.app/Contents" % MacBinDir
+  sourceDir1 = sourceDir0 + "/MacOS"
+  sourceDir2 = "%s/etc" % ProjectDir
+  sourceDir3 = "%s/src/klayout_main" % ProjectDir
   sourceDir4 = "%s" % MacBinDir
 
-  shutil.copy2( sourceDir0 + "Info.plist", targetDir0 )
-  shutil.copy2( sourceDir1 + "klayout",    targetDir1 )
-  shutil.copy2( sourceDir2 + "logo.png",   targetDir2 )
-  shutil.copy2( sourceDir3 + "logo.ico",   targetDir2 )
+  shutil.copy2( sourceDir0 + "/Info.plist", targetDir0 )
+  shutil.copy2( sourceDir1 + "/klayout",    targetDir1 )
+  shutil.copy2( sourceDir2 + "/logo.png",   targetDir2 )
+  shutil.copy2( sourceDir3 + "/logo.ico",   targetDir2 )
 
-  os.chmod( targetDir0 + "Info.plist", 0644 )
-  os.chmod( targetDir1 + "klayout",    0755 )
-  os.chmod( targetDir2 + "logo.png",   0644 )
-  os.chmod( targetDir2 + "logo.ico",   0644 )
+  os.chmod( targetDir0 + "/Info.plist", 0644 )
+  os.chmod( targetDir1 + "/klayout",    0755 )
+  os.chmod( targetDir2 + "/logo.png",   0644 )
+  os.chmod( targetDir2 + "/logo.ico",   0644 )
 
-  buddies = glob.glob( sourceDir4 + "strm*" )
+  buddies = glob.glob( sourceDir4 + "/strm*" )
   for item in buddies:
     shutil.copy2( item, targetDir4 )
     buddy = os.path.basename(item)

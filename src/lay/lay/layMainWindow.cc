@@ -2327,7 +2327,7 @@ MainWindow::select_mode (int m)
     std::vector<std::string> items = menu ()->items ("@toolbar");
     for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
       Action a = menu ()->action (*i);
-      if (a.qaction ()->data ().toInt () == m_mode) {
+      if (a.qaction ()->isCheckable() && a.qaction ()->data ().toInt () == m_mode) {
         a.set_checked (true);
         break;
       }

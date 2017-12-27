@@ -162,14 +162,17 @@ public:
    *  handling for the "close application window" case and a "silent" mode. In that mode, processing
    *  of deferred methods is disabled.
    */
-  virtual void process_events (QEventLoop::ProcessEventsFlags flags, bool silent = false);
+  void process_events (QEventLoop::ProcessEventsFlags flags, bool silent = false)
+  {
+    process_events_impl (flags, silent);
+  }
 
   /**
    *  @brief A shortcut for the default process_events
    */
   void process_events ()
   {
-    process_events (QEventLoop::AllEvents);
+    process_events_impl (QEventLoop::AllEvents);
   }
 
   /**
@@ -337,6 +340,7 @@ protected:
   virtual void start_recording ();
   virtual lay::PluginRoot *plugin_root () const = 0;
   virtual void finish ();
+  virtual void process_events_impl (QEventLoop::ProcessEventsFlags flags, bool silent = false);
 
 private:
   std::vector<std::string> scan_global_modules ();
@@ -428,17 +432,13 @@ public:
     return mp_mw;
   }
 
-  /**
-   *  @brief Reimplementation of ApplicationBase interface
-   */
-  virtual void process_events (QEventLoop::ProcessEventsFlags flags, bool silent);
-
 protected:
   virtual void setup ();
   virtual void shutdown ();
   virtual void finish ();
   virtual void prepare_recording (const std::string &gtf_record, bool gtf_save_incremental);
   virtual void start_recording ();
+  virtual void process_events_impl (QEventLoop::ProcessEventsFlags flags, bool silent);
 
   virtual lay::PluginRoot *plugin_root () const;
 

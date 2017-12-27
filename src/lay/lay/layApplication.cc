@@ -1252,7 +1252,7 @@ dump_children (QObject *obj, int level = 0)
 }
 
 void
-ApplicationBase::process_events (QEventLoop::ProcessEventsFlags /*flags*/, bool /*silent*/)
+ApplicationBase::process_events_impl (QEventLoop::ProcessEventsFlags /*flags*/, bool /*silent*/)
 {
   //  The base class implementation does nothing ..
 }
@@ -1486,7 +1486,7 @@ GuiApplication::setup ()
 }
 
 void
-GuiApplication::process_events (QEventLoop::ProcessEventsFlags flags, bool silent)
+GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool silent)
 {
   if (mp_mw) {
 

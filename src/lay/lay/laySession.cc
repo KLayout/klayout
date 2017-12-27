@@ -34,6 +34,7 @@
 
 #include <fstream>
 #include <QFileInfo>
+#include <QDir>
 
 namespace lay
 {
@@ -161,10 +162,16 @@ Session::restore (lay::MainWindow &mw)
 
         std::map <std::string, const SessionLayoutDescriptor *>::const_iterator ld = ld_by_name.find (cvd->layout_name);
 
+        std::string fp = ld->second->file_path;
+        QFileInfo fi (tl::to_qstring (fp));
+        if (! m_base_dir.empty () && fi.isRelative ()) {
+          fp = tl::to_string (QDir (tl::to_qstring (m_base_dir)).filePath (tl::to_qstring (ld->second->file_path)));
+        }
+
         bool ok = false;
         if (ld != ld_by_name.end ()) {
           try {
-            cv = view->load_layout (ld->second->file_path, ld->second->load_options, cvd->tech_name, true /*add*/);
+            cv = view->load_layout (fp, ld->second->load_options, cvd->tech_name, true /*add*/);
             view->cellview (cv)->set_save_options (ld->second->save_options, ld->second->save_options_valid);
             ok = true;
           } catch (...) { }
@@ -297,6 +304,9 @@ session_structure ("session",
 void 
 Session::load (const std::string &fn)
 {
+  //  Take the path to the file as the base directory
+  m_base_dir = tl::to_string (QFileInfo (tl::to_qstring (fn)).absolutePath ());
+
   tl::XMLFileSource in (fn);
 
   session_structure.parse (in, *this); 

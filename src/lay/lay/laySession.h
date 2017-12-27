@@ -173,6 +173,7 @@ private:
   int m_current_view;
   std::string m_window_state;
   std::string m_window_geometry;
+  std::string m_base_dir;
 };
 
 }

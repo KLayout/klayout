@@ -442,7 +442,6 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
 
     } else if (a == "-wd" && (i + 1) < argc) {
 
-      std::string v;
       const char *p = args [++i].c_str ();
       const char *n0 = p;
       while (*p && *p != '=') {
@@ -450,7 +449,7 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
       }
       std::string n (n0, p - n0);
       if (*p == '=') {
-        tl::Eval::set_global_var (n, tl::Variant (v));
+        tl::Eval::set_global_var (n, tl::Variant (p + 1));
       } else {
         tl::Eval::set_global_var (n, tl::Variant (true));
       }

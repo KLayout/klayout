@@ -30,10 +30,13 @@
 #include "tlCommandLineParser.h"
 #include "layApplication.h"
 #include "laySystemPaths.h"
+#include "layVersion.h"
 #include "rba.h"
 #include "pya.h"
 #include "gsiDecl.h"
 #include "gsiExternalMain.h"
+
+#include "version.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -320,6 +323,16 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
 static int
 main_cont (int &argc, char **argv)
 {
+  //  install the version strings
+  lay::Version::set_exe_name (prg_exe_name);
+  lay::Version::set_name (prg_name);
+  lay::Version::set_version (prg_version);
+
+  std::string subversion (prg_date);
+  subversion += " r";
+  subversion += prg_rev;
+  lay::Version::set_subversion (subversion.c_str ());
+
   int result = 0;
 
   ut::TestConsole console (stdout);

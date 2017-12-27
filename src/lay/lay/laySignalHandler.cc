@@ -216,7 +216,7 @@ LONG WINAPI ExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
 
   SymCleanup (process);
 
-  bool has_gui = lay::Application::instance () && lay::Application::instance ()->has_gui ();
+  bool has_gui = lay::ApplicationBase::instance () && lay::ApplicationBase::instance ()->has_gui ();
   if (has_gui) {
 
     //  YES! I! KNOW!

@@ -527,7 +527,7 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lym::MacroCollection
   }
 
   //  scan macro templates
-  for (std::vector<std::string>::const_iterator p = lay::Application::instance ()->klayout_path ().begin (); p != lay::Application::instance ()->klayout_path ().end (); ++p) {
+  for (std::vector<std::string>::const_iterator p = lay::ApplicationBase::instance ()->klayout_path ().begin (); p != lay::ApplicationBase::instance ()->klayout_path ().end (); ++p) {
 
     QDir dir (QDir (tl::to_qstring (*p)).filePath (tl::to_qstring ("macro-templates")));
 
@@ -760,13 +760,13 @@ MacroEditorDialog::showEvent (QShowEvent *)
   m_history_index = -1;
   input_field->clearEditText ();
 
-  lay::Application::instance ()->ruby_interpreter ().push_console (this);
+  lay::ApplicationBase::instance ()->ruby_interpreter ().push_console (this);
   if (m_debugging_on) {
-    lay::Application::instance ()->ruby_interpreter ().push_exec_handler (this);
+    lay::ApplicationBase::instance ()->ruby_interpreter ().push_exec_handler (this);
   }
-  lay::Application::instance ()->python_interpreter ().push_console (this);
+  lay::ApplicationBase::instance ()->python_interpreter ().push_console (this);
   if (m_debugging_on) {
-    lay::Application::instance ()->python_interpreter ().push_exec_handler (this);
+    lay::ApplicationBase::instance ()->python_interpreter ().push_exec_handler (this);
   }
 
   std::string ci;
@@ -795,9 +795,9 @@ MacroEditorDialog::showEvent (QShowEvent *)
       ex.test (";");
 
       if (ip == "ruby") {
-        m_watch_expressions.push_back (std::make_pair (&lay::Application::instance ()->ruby_interpreter (), expr));
+        m_watch_expressions.push_back (std::make_pair (&lay::ApplicationBase::instance ()->ruby_interpreter (), expr));
       } else if (ip == "python") {
-        m_watch_expressions.push_back (std::make_pair (&lay::Application::instance ()->python_interpreter (), expr));
+        m_watch_expressions.push_back (std::make_pair (&lay::ApplicationBase::instance ()->python_interpreter (), expr));
       }
 
     }
@@ -900,9 +900,9 @@ MacroEditorDialog::closeEvent (QCloseEvent *)
     if (! om.empty ()) {
       om += ";";
     }
-    if (i->first == &lay::Application::instance ()->ruby_interpreter ()) {
+    if (i->first == &lay::ApplicationBase::instance ()->ruby_interpreter ()) {
       we += "ruby";
-    } else if (i->first == &lay::Application::instance ()->python_interpreter ()) {
+    } else if (i->first == &lay::ApplicationBase::instance ()->python_interpreter ()) {
       we += "python";
     }
     we += ":";
@@ -932,10 +932,10 @@ MacroEditorDialog::closeEvent (QCloseEvent *)
   m_continue = false;
   m_window_closed = true;
 
-  lay::Application::instance ()->ruby_interpreter ().remove_console (this);
-  lay::Application::instance ()->ruby_interpreter ().remove_exec_handler (this);
-  lay::Application::instance ()->python_interpreter ().remove_console (this);
-  lay::Application::instance ()->python_interpreter ().remove_exec_handler (this);
+  lay::ApplicationBase::instance ()->ruby_interpreter ().remove_console (this);
+  lay::ApplicationBase::instance ()->ruby_interpreter ().remove_exec_handler (this);
+  lay::ApplicationBase::instance ()->python_interpreter ().remove_console (this);
+  lay::ApplicationBase::instance ()->python_interpreter ().remove_exec_handler (this);
 }
 
 void 
@@ -951,11 +951,11 @@ MacroEditorDialog::set_debugging_on (bool on)
 
     if (isVisible ()) {
       if (on) {
-        lay::Application::instance ()->ruby_interpreter ().push_exec_handler (this);
-        lay::Application::instance ()->python_interpreter ().push_exec_handler (this);
+        lay::ApplicationBase::instance ()->ruby_interpreter ().push_exec_handler (this);
+        lay::ApplicationBase::instance ()->python_interpreter ().push_exec_handler (this);
       } else {
-        lay::Application::instance ()->ruby_interpreter ().remove_exec_handler (this);
-        lay::Application::instance ()->python_interpreter ().remove_exec_handler (this);
+        lay::ApplicationBase::instance ()->ruby_interpreter ().remove_exec_handler (this);
+        lay::ApplicationBase::instance ()->python_interpreter ().remove_exec_handler (this);
       }
     }
 
@@ -965,12 +965,12 @@ MacroEditorDialog::set_debugging_on (bool on)
 void
 MacroEditorDialog::process_events (QEventLoop::ProcessEventsFlags flags)
 {
-  if (lay::Application::instance ()) {
+  if (lay::ApplicationBase::instance ()) {
     //  disable execution of deferred methods to avoid undesired execution of 
     //  code while we are inside a Ruby callback through the silent mode
     bool last_processing = m_in_processing;
     m_in_processing = true;
-    lay::Application::instance ()->process_events (flags, true /*silent*/);
+    lay::ApplicationBase::instance ()->process_events (flags, true /*silent*/);
     m_in_processing = last_processing;
   }
 }
@@ -1132,9 +1132,9 @@ MacroEditorDialog::execute (const QString &cmd)
 
     gsi::Interpreter *interpreter = 0;
     if (rubyLangSel->isChecked ()) {
-      interpreter = &lay::Application::instance ()->ruby_interpreter ();
+      interpreter = &lay::ApplicationBase::instance ()->ruby_interpreter ();
     } else if (pythonLangSel->isChecked ()) {
-      interpreter = &lay::Application::instance ()->python_interpreter ();
+      interpreter = &lay::ApplicationBase::instance ()->python_interpreter ();
     }
 
     if (interpreter) {
@@ -3036,7 +3036,7 @@ MacroEditorDialog::do_update_ui_to_run_mode ()
 
   //  Force language type to match the current execution context
   if (m_in_breakpoint && mp_current_interpreter) {
-    if (mp_current_interpreter == &lay::Application::instance ()->python_interpreter ()) {
+    if (mp_current_interpreter == &lay::ApplicationBase::instance ()->python_interpreter ()) {
       pythonLangSel->setChecked (true);
       rubyLangSel->setChecked (false);
     } else {

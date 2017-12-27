@@ -901,7 +901,7 @@ XORToolDialog::run_xor ()
 
   bool summarize = mp_ui->summarize_cb->isChecked ();
   //  TODO: make this a user interface feature later
-  bool process_el = lay::Application::instance ()->special_app_flag ("ALWAYS_DO_XOR");
+  bool process_el = lay::ApplicationBase::instance ()->special_app_flag ("ALWAYS_DO_XOR");
 
   int cv_index_a = mp_ui->layouta->current_cv_index ();
   int cv_index_b = mp_ui->layoutb->current_cv_index ();
@@ -1384,7 +1384,7 @@ XORToolDialog::run_xor ()
       //  If the output mode is database, ask whether to keep the data collected so far.
       //  If the answer is yes, remove the RDB.
       //  Don't ask if the application has exit (window was closed)
-      if (lay::Application::instance ()->main_window () && !lay::Application::instance ()->main_window ()->exited ()) {
+      if (lay::ApplicationBase::instance ()->main_window () && !lay::ApplicationBase::instance ()->main_window ()->exited ()) {
         QMessageBox msgbox (QMessageBox::Question,
                             QObject::tr ("Keep Data For Cancelled Job"),
                             QObject::tr ("The job has been cancelled. Keep the data collected so far?"),

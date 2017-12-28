@@ -453,7 +453,7 @@ def DeployBinariesForBundle():
 
   print("")
   print( "##### Start deploying libraries and executables #####" )
-  print( "[1] Checking the status of working directory ..." )
+  print( " [1] Checking the status of working directory ..." )
   #-------------------------------------------------------------
   # [1] Check the status of working directory
   #-------------------------------------------------------------
@@ -471,7 +471,7 @@ def DeployBinariesForBundle():
     return(1)
 
 
-  print( "[2] Creating a new empty directory for deployment ..." )
+  print( " [2] Creating a new empty directory <%s> for deployment ..." % MacPkgDir )
   #-------------------------------------------------------------
   # [2] Create a new empty directory for deploying binaries
   #-------------------------------------------------------------
@@ -483,7 +483,7 @@ def DeployBinariesForBundle():
   os.mkdir(MacPkgDir)
 
 
-  print( "[3] Creating the standard directory structure for a bundle ..." )
+  print( " [3] Creating the standard directory structure for a bundle ..." )
   #-------------------------------------------------------------
   # [3] Create the directory skeleton for "klayout.app" bundle
   #     and command line buddy tools such as "strm2cif".
@@ -514,7 +514,7 @@ def DeployBinariesForBundle():
   os.makedirs(targetDirB)
 
 
-  print( "[4] Copying KLayout's dynamic link libraries to 'Frameworks' ..." )
+  print( " [4] Copying KLayout's dynamic link libraries to 'Frameworks' ..." )
   #-------------------------------------------------------------------------------
   # [4] Copy KLayout's dynamic link libraries to "Frameworks/" and create
   #     the library dependency dictionary.
@@ -572,7 +572,7 @@ def DeployBinariesForBundle():
   quit()
   '''
 
-  print( "[5] Setting and changing the identification names among KLayout's libraries ..." )
+  print( " [5] Setting and changing the identification names among KLayout's libraries ..." )
   #-------------------------------------------------------------
   # [5] Set the identification names for KLayout's libraries
   #     and make the library aware of the locations of libraries
@@ -585,7 +585,7 @@ def DeployBinariesForBundle():
     return(1)
 
 
-  print( "[6] Copying built executables and resource files ..." )
+  print( " [6] Copying built executables and resource files ..." )
   #-------------------------------------------------------------
   # [6] Copy some known files in source directories to
   #     relevant target directories
@@ -614,7 +614,7 @@ def DeployBinariesForBundle():
     os.chmod( targetDirB + "/" + buddy, 0755 )
 
 
-  print( "[7] Setting and changing the identification names of KLayout's libraries in each executable ..." )
+  print( " [7] Setting and changing the identification names of KLayout's libraries in each executable ..." )
   #-------------------------------------------------------------
   # [7] Set and change the library identification name(s) of
   #     different executables
@@ -641,7 +641,7 @@ def DeployBinariesForBundle():
       return(1)
 
 
-  print( "[8] Finally, deploying Qt's frameworks ..." )
+  print( " [8] Finally, deploying Qt's frameworks ..." )
   #-------------------------------------------------------------
   # [8] Deploy Qt frameworks
   #-------------------------------------------------------------

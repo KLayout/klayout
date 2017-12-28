@@ -28,7 +28,7 @@ from build4mac_env  import *
 #
 # @param[in] depstr   strings that tell dependency such as:
 #
-#  libklayout_edt.0.25.0.dylib: <=== key
+#  libklayout_edt.0.dylib:
 #    libklayout_edt.0.dylib (compatibility version 0.25.0, current version 0.25.0)
 #    libklayout_tl.0.dylib (compatibility version 0.25.0, current version 0.25.0)
 #    libklayout_gsi.0.dylib (compatibility version 0.25.0, current version 0.25.0)
@@ -65,6 +65,45 @@ def PrintLibraryDependencyDictionary( depdic, namedic ):
       print( "    %s" % item )
 
 #------------------------------------------------------------------------------
+## To set and change identification name of dylib
+#
+# @param[in] libdic  inter-library dependency dictionary
+#
+# @return 0 on success; non-zero on failure
+#------------------------------------------------------------------------------
+def SetChangeIdentificationNameOfDyLib( libdic ):
+  cmdNameId     = XcodeToolChain['nameID']
+  cmdNameChg    = XcodeToolChain['nameCH']
+  dependentLibs = libdic.keys()
+
+  for lib in dependentLibs:
+    #-----------------------------------------------------------
+    # [1] Set the identification name of each dependent library
+    #-----------------------------------------------------------
+    nameOld = "%s" % lib
+    nameNew = "@executable_path/../Frameworks/%s" % lib
+    command = "%s %s %s" % ( cmdNameId, nameNew, nameOld )
+    if subprocess.call( command, shell=True ) != 0:
+      msg = "!!! Failed to set the new identification name to <%s> !!!"
+      print( msg % lib, file=sys.stderr )
+      return(1)
+
+    #-------------------------------------------------------------------------
+    # [2] Make the library aware of the new identifications of all supporters
+    #-------------------------------------------------------------------------
+    supporters = libdic[lib]
+    for sup in supporters:
+      nameOld = "%s" % sup
+      nameNew = "@executable_path/../Frameworks/%s" % sup
+      command = "%s %s %s %s" % ( cmdNameChg, nameOld, nameNew, lib )
+      if subprocess.call( command, shell=True ) != 0:
+        msg = "!!! Failed to make the library aware of the new identification name <%s> of supporter <%s> !!!"
+        print( msg % (nameNew, sup), file=sys.stderr )
+        return(1)
+  # for-lib
+  return(0)
+
+#------------------------------------------------------------------------------
 ## To set the identification names of KLayout's libraries to an executable
 #     and make the application aware of the library locations
 #
@@ -77,16 +116,16 @@ def PrintLibraryDependencyDictionary( depdic, namedic ):
 #    klayout.app/+
 #                +-- Contents/+
 #                             +-- Info.plist
-#                             +-- MacOS/+
-#                                       +-- 'klayout'
 #                             +-- PkgInfo
 #                             +-- Resources/
 #                             +-- Frameworks/
-#                             +-- buddy_tool/+
-#                                            +-- 'strm2cif'
-#                                            +-- 'strm2dxf'
-#                                            :
-#                                            +-- 'strmxor'
+#                             +-- MacOS/+
+#                             |         +-- 'klayout'
+#                             +-- Buddy/+
+#                                       +-- 'strm2cif'
+#                                       +-- 'strm2dxf'
+#                                       :
+#                                       +-- 'strmxor'
 #
 # @return 0 on success; non-zero on failure
 #------------------------------------------------------------------------------
@@ -98,28 +137,30 @@ def SetChangeLibIdentificationName( executable, relativedir ):
   exedepdic  = DecomposeLibraryDependency( executable + ":\n" + otoolOut )
   keys       = exedepdic.keys()
   deplibs    = exedepdic[ keys[0] ]
+
   for lib in deplibs:
     #-----------------------------------------------------------
-    # (A) Set the identification names for the library
+    # [1] Set the identification names for the library
     #-----------------------------------------------------------
     nameOld = "klayout.app/Contents/Frameworks/%s" % lib
     nameNew = "@executable_path/%s/%s"  % ( relativedir, lib )
     command = "%s %s %s" % ( cmdNameId, nameNew, nameOld )
     if subprocess.call( command, shell=True ) != 0:
-      print( "!!! Failed to set the new identification name to <%s> !!!" % lib, \
-             file=sys.stderr )
+      msg = "!!! Failed to set the new identification name to <%s> !!!"
+      print( msg % lib, file=sys.stderr )
       return(1)
+
     #-----------------------------------------------------------
-    # (B) Make the application aware of the new identification
+    # [2] Make the application aware of the new identification
     #-----------------------------------------------------------
     nameOld = "%s" % lib
     nameNew = "@executable_path/%s/%s"  % ( relativedir, lib )
     command = "%s %s %s %s" % ( cmdNameChg, nameOld, nameNew, executable )
     if subprocess.call( command, shell=True ) != 0:
-      print( "!!! Failed to make the application aware of the new identification name <%s> !!!" % nameNew, \
-             file=sys.stderr )
+      msg = "!!! Failed to make the application aware of the new identification name <%s> !!!"
+      print( msg % nameNew, file=sys.stderr )
       return(1)
-
+  # for-lib
   return(0)
 
 #----------------

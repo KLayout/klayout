@@ -451,6 +451,9 @@ def DeployBinariesForBundle():
   global AbsMacBuildDir
   global AbsMacBuildLog
 
+  print("")
+  print( "##### Start deploying libraries and executables #####" )
+  print( "[1] Checking the status of working directory ..." )
   #-------------------------------------------------------------
   # [1] Check the status of working directory
   #-------------------------------------------------------------
@@ -467,6 +470,8 @@ def DeployBinariesForBundle():
     print( "!!! Binary directory <%s> does not present !!!" % MacBinDir, file=sys.stderr )
     return(1)
 
+
+  print( "[2] Creating a new empty directory for deployment ..." )
   #-------------------------------------------------------------
   # [2] Create a new empty directory for deploying binaries
   #-------------------------------------------------------------
@@ -477,42 +482,46 @@ def DeployBinariesForBundle():
     shutil.rmtree(MacPkgDir)
   os.mkdir(MacPkgDir)
 
+
+  print( "[3] Creating the standard directory structure for a bundle ..." )
   #-------------------------------------------------------------
   # [3] Create the directory skeleton for "klayout.app" bundle
-  #     and command line buddy tools such as "strm2cif"
-  #     that should look like...
+  #     and command line buddy tools such as "strm2cif".
+  #     They should be stored in a directory structure like...
   #
   #    klayout.app/+
   #                +-- Contents/+
   #                             +-- Info.plist
-  #                             +-- MacOS/+
-  #                                       +-- 'klayout'
   #                             +-- PkgInfo
   #                             +-- Resources/
   #                             +-- Frameworks/
-  #                             +-- buddy_tool/+
-  #                                            +-- 'strm2cif'
-  #                                            +-- 'strm2dxf'
-  #                                            :
-  #                                            +-- 'strmxor'
+  #                             +-- MacOS/+
+  #                             |         +-- 'klayout'
+  #                             +-- Buddy/+
+  #                                       +-- 'strm2cif'
+  #                                       +-- 'strm2dxf'
+  #                                       :
+  #                                       +-- 'strmxor'
   #-------------------------------------------------------------
-  targetDir0 = "%s/klayout.app/Contents/" % AbsMacPkgDir
-  targetDir1 = targetDir0 + "MacOS/"
-  targetDir2 = targetDir0 + "Resources/"
-  targetDir3 = targetDir0 + "Frameworks/"
-  targetDir4 = targetDir0 + "buddy_tool/"
-  os.makedirs(targetDir1)
-  os.makedirs(targetDir2)
-  os.makedirs(targetDir3)
-  os.makedirs(targetDir4)
+  targetDir0 = "%s/klayout.app/Contents" % AbsMacPkgDir
+  targetDirR = targetDir0 + "/Resources"
+  targetDirF = targetDir0 + "/Frameworks"
+  targetDirM = targetDir0 + "/MacOS"
+  targetDirB = targetDir0 + "/Buddy"
+  os.makedirs(targetDirR)
+  os.makedirs(targetDirF)
+  os.makedirs(targetDirM)
+  os.makedirs(targetDirB)
 
+
+  print( "[4] Copying KLayout's dynamic link libraries to 'Frameworks' ..." )
   #-------------------------------------------------------------------------------
   # [4] Copy KLayout's dynamic link libraries to "Frameworks/" and create
   #     the library dependency dictionary.
   #     <<< Do this job in "Frameworks/" >>>
   #
   # Note:
-  #     A dynamic link library is built as below:
+  #     KLayout's dynamic link library is built as below:
   #       (1) libklayout_lay.0.25.0.dylib
   #       (2) libklayout_lay.0.25.dylib -> libklayout_lay.0.25.0.dylib
   #       (3) libklayout_lay.0.dylib -> libklayout_lay.0.25.0.dylib
@@ -537,7 +546,7 @@ def DeployBinariesForBundle():
   #     libklayout_db.0.dylib (compatibility version 0.25.0, current version 0.25.0)
   #       :
   #-------------------------------------------------------------------------------
-  os.chdir( targetDir3 )
+  os.chdir( targetDirF )
   dynamicLinkLibs = glob.glob( AbsMacBinDir + "/*.dylib" )
   depDicOrdinary  = {} # inter-library dependency dictionary
   for item in dynamicLinkLibs:
@@ -563,16 +572,22 @@ def DeployBinariesForBundle():
   quit()
   '''
 
-
+  print( "[5] Setting and changing the identification names among KLayout's libraries ..." )
   #-------------------------------------------------------------
   # [5] Set the identification names for KLayout's libraries
   #     and make the library aware of the locations of libraries
   #     on which it depends; that is, inter-library dependency
   #-------------------------------------------------------------
+  ret = SetChangeIdentificationNameOfDyLib( depDicOrdinary )
+  if not ret == 0:
+    msg = "!!! Failed to set and change to new identification names !!!"
+    print(msg)
+    return(1)
 
 
+  print( "[6] Copying built executables and resource files ..." )
   #-------------------------------------------------------------
-  # [6] Copy known some files in source directories to
+  # [6] Copy some known files in source directories to
   #     relevant target directories
   #-------------------------------------------------------------
   os.chdir(ProjectDir)
@@ -583,21 +598,23 @@ def DeployBinariesForBundle():
   sourceDir4 = "%s" % MacBinDir
 
   shutil.copy2( sourceDir0 + "/Info.plist", targetDir0 )
-  shutil.copy2( sourceDir1 + "/klayout",    targetDir1 )
-  shutil.copy2( sourceDir2 + "/logo.png",   targetDir2 )
-  shutil.copy2( sourceDir3 + "/logo.ico",   targetDir2 )
+  shutil.copy2( sourceDir1 + "/klayout",    targetDirM )
+  shutil.copy2( sourceDir2 + "/logo.png",   targetDirR )
+  shutil.copy2( sourceDir3 + "/logo.ico",   targetDirR )
 
   os.chmod( targetDir0 + "/Info.plist", 0644 )
-  os.chmod( targetDir1 + "/klayout",    0755 )
-  os.chmod( targetDir2 + "/logo.png",   0644 )
-  os.chmod( targetDir2 + "/logo.ico",   0644 )
+  os.chmod( targetDirM + "/klayout",    0755 )
+  os.chmod( targetDirR + "/logo.png",   0644 )
+  os.chmod( targetDirR + "/logo.ico",   0644 )
 
   buddies = glob.glob( sourceDir4 + "/strm*" )
   for item in buddies:
-    shutil.copy2( item, targetDir4 )
+    shutil.copy2( item, targetDirB )
     buddy = os.path.basename(item)
-    os.chmod( targetDir4 + buddy, 0755 )
+    os.chmod( targetDirB + "/" + buddy, 0755 )
 
+
+  print( "[7] Setting and changing the identification names of KLayout's libraries in each executable ..." )
   #-------------------------------------------------------------
   # [7] Set and change the library identification name(s) of
   #     different executables
@@ -608,40 +625,48 @@ def DeployBinariesForBundle():
   ret = SetChangeLibIdentificationName( klayoutexec, "../Frameworks" )
   if not ret == 0:
     os.chdir(ProjectDir)
-    print( "!!! Failed to set/change library identification name for <%s> !!!" % klayoutexec, \
-           file=sys.stderr )
+    msg = "!!! Failed to set/change library identification name for <%s> !!!"
+    print( msg % klayoutexec, file=sys.stderr )
     return(1)
 
-  buddies = glob.glob( "klayout.app/Contents/buddy_tool/strm*" )
+  buddies     = glob.glob( "klayout.app/Contents/Buddy/strm*" )
+  macdepQtOpt = ""
   for buddy in buddies:
+    macdepQtOpt += "-executable=%s " % buddy
     ret = SetChangeLibIdentificationName( buddy, "../Frameworks" )
     if not ret == 0:
       os.chdir(ProjectDir)
-      print( "!!! Failed to set/change library identification name for <%s> !!!" % buddy, \
-             file=sys.stderr )
+      msg = "!!! Failed to set/change library identification name for <%s> !!!"
+      print( msg % buddy, file=sys.stderr )
       return(1)
 
+
+  print( "[8] Finally, deploying Qt's frameworks ..." )
   #-------------------------------------------------------------
-  # [8] Deploying Applications on OS X including Qt frameworks
+  # [8] Deploy Qt frameworks
   #-------------------------------------------------------------
   if ModuleQt == 'Qt4MacPorts':
     deploytool = Qt4MacPorts['deploy']
     app_bundle = "klayout.app"
-    options    = "-libpath=klayout.app/Contents/Frameworks"
+    options    = macdepQtOpt
   elif ModuleQt == 'Qt5MacPorts':
     deploytool = Qt5MacPorts['deploy']
     app_bundle = "klayout.app"
-    options    = "-libpath=klayout.app/Contents/Frameworks"
+    options    = macdepQtOpt
 
   os.chdir(ProjectDir)
   os.chdir(MacPkgDir)
   command = "%s %s %s" % ( deploytool, app_bundle, options )
   if subprocess.call( command, shell=True ) != 0:
-    print( "!!! Failed to deploy applications on OSX !!!", file=sys.stderr )
+    msg = "!!! Failed to deploy applications on OSX !!!"
+    print( msg, file=sys.stderr )
+    print("")
     os.chdir(ProjectDir)
     return(1)
   else:
-    print( "### Deployed applications on OS X ###", file=sys.stderr )
+    msg = "### Deployed applications on OS X ###"
+    print( msg, file=sys.stderr )
+    print("")
     os.chdir(ProjectDir)
     return(0)
 

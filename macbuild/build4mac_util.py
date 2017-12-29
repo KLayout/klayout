@@ -24,7 +24,7 @@ from build4mac_env  import *
 
 #------------------------------------------------------------------------------
 ## To decompose strings obtained by 'otool -L <*.dylib>' command and to
-#  generate a dictionary of library dependency.
+#  generate a dictionary of KLayout's inter-library dependency.
 #
 # @param[in] depstr   strings that tell dependency such as:
 #
@@ -34,6 +34,8 @@ from build4mac_env  import *
 #    libklayout_gsi.0.dylib (compatibility version 0.25.0, current version 0.25.0)
 #    libklayout_laybasic.0.dylib (compatibility version 0.25.0, current version 0.25.0)
 #    libklayout_db.0.dylib (compatibility version 0.25.0, current version 0.25.0)
+#      :
+#      :
 #
 # @return a dictionary
 #------------------------------------------------------------------------------
@@ -65,7 +67,7 @@ def PrintLibraryDependencyDictionary( depdic, namedic ):
       print( "    %s" % item )
 
 #------------------------------------------------------------------------------
-## To set and change identification name of dylib
+## To set and change identification name of KLayout's dylib
 #
 # @param[in] libdic  inter-library dependency dictionary
 #

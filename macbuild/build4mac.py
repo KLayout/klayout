@@ -432,7 +432,8 @@ def RunMainBuildBash():
       return(0)
 
 #------------------------------------------------------------------------------
-## To deploy built binaries and depending libraries for making a bundle
+## To deploy built binaries and libraries on which those binaries depend
+#  for making a bundle (klayout.app)
 #
 # Reference: "Deploying an Application on Mac OS X" of Qt Assistant.
 #
@@ -483,11 +484,11 @@ def DeployBinariesForBundle():
   os.mkdir(MacPkgDir)
 
 
-  print( " [3] Creating the standard directory structure for a bundle ..." )
+  print( " [3] Creating the standard directory structure for 'klayout.app' bundle ..." )
   #-------------------------------------------------------------
   # [3] Create the directory skeleton for "klayout.app" bundle
   #     and command line buddy tools such as "strm2cif".
-  #     They should be stored in a directory structure like...
+  #     They are stored in the directory structure below.
   #
   #    klayout.app/+
   #                +-- Contents/+
@@ -641,7 +642,7 @@ def DeployBinariesForBundle():
       return(1)
 
 
-  print( " [8] Finally, deploying Qt's frameworks ..." )
+  print( " [8] Finally, deploying Qt's Frameworks ..." )
   #-------------------------------------------------------------
   # [8] Deploy Qt frameworks
   #-------------------------------------------------------------

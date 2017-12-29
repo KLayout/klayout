@@ -1,7 +1,7 @@
 << Draft Version 0.002>>
 
 1. Introduction:
-    This directory "macbuild" contains different files required to build KLayout
+    This directory "macbuild" contains different files required for building KLayout
     version 0.25 or later for different Max OSX including:
         * Yosemite    (10.10)
         * El Capitan  (10.11)
@@ -16,7 +16,7 @@
     standard ones bundled with the OS.
     However, you are able to choose other options like Python from Anaconda.
         :
-        :
+        : (to be updated)
         :
         :
 
@@ -26,13 +26,13 @@
         'build4mac.py', that is,
             build4mac.py -> macbuild/build4mac.py
 
-    (2) Build KLayout by appropriate options, for example, for debug-build:
+    (2) Invoke 'build4mac.py' with appropriate options, for example, for debug-build:
             $ cd /where/'build.sh'/exists
             $ ./build4mac.py -d
 
     (3) Confirm successful build.
 
-    (4) Run 'build4mac.py' again with the same options used in (2) with "-y"
+    (4) Run 'build4mac.py' again with the same options used in (2) PLUS "-y"
         to deploy executables and libraries under "klayout.app" bundle.
             $ ./build4mac.py -d -y
 

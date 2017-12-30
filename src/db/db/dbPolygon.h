@@ -1364,7 +1364,7 @@ private:
  */
 
 template <class C>
-class polygon
+class DB_PUBLIC polygon
 {
 public:
   typedef C coord_type;
@@ -2324,7 +2324,7 @@ private:
  */
 
 template <class C>
-class simple_polygon
+class DB_PUBLIC simple_polygon
 {
 public:
   typedef C coord_type;

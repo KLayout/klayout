@@ -34,9 +34,9 @@
 namespace gsi 
 {
 
-class ClassBase;
+class GSI_PUBLIC ClassBase;
 struct NoAdaptorTag;
-template <class T, class A> class Class;
+template <class T, class A> class GSI_PUBLIC Class;
 
 /**
  *  @brief The implementation delegate for the VariantUserClass<T>

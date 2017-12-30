@@ -35,7 +35,7 @@
 
 # else
 
-#   if __GNUC__ >= 4
+#   if __GNUC__ >= 4 || defined(__clang__)
 #     define ANT_PUBLIC __attribute__ ((visibility ("default")))
 #     define ANT_LOCAL  __attribute__ ((visibility ("hidden")))
 #   else

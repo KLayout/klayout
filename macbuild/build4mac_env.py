@@ -12,6 +12,13 @@
 #===============================================================================
 
 #-----------------------------------------------------
+# [0] Xcode's tools
+#-----------------------------------------------------
+XcodeToolChain = { 'nameID': '/usr/bin/install_name_tool -id ',
+                   'nameCH': '/usr/bin/install_name_tool -change '
+                 }
+
+#-----------------------------------------------------
 # [1] Qt
 #-----------------------------------------------------
 Qts = [ 'Qt4MacPorts', 'Qt5MacPorts' ]
@@ -20,14 +27,16 @@ Qts = [ 'Qt4MacPorts', 'Qt5MacPorts' ]
 # Whereabout of different components of Qt4
 #-----------------------------------------------------
 # Qt4 from MacPorts (https://www.macports.org/)
-Qt4MacPorts = { 'qmake': '/opt/local/libexec/qt4/bin/qmake'
+Qt4MacPorts = { 'qmake' : '/opt/local/libexec/qt4/bin/qmake',
+                'deploy': '/opt/local/libexec/qt4/bin/macdeployqt'
               }
 
 #-----------------------------------------------------
 # Whereabout of different components of Qt5
 #-----------------------------------------------------
 # Qt5 from MacPorts (https://www.macports.org/)
-Qt5MacPorts = { 'qmake': '/opt/local/libexec/qt5/bin/qmake'
+Qt5MacPorts = { 'qmake' : '/opt/local/libexec/qt5/bin/qmake',
+                'deploy': '/opt/local/libexec/qt5/bin/macdeployqt'
               }
 
 #-----------------------------------------------------
@@ -138,6 +147,14 @@ PythonDictionary= { 'nil'             : None,
                     'Anaconda27'      : Anaconda27,
                     'Anaconda36'      : Anaconda36
                   }
+
+#-----------------------------------------------------
+# [4] KLayout executables
+#-----------------------------------------------------
+KLayoutExecs  = ['klayout']
+KLayoutExecs += ['strm2cif', 'strm2dxf', 'strm2gds', 'strm2gdstxt', 'strm2oas']
+KLayoutExecs += ['strm2txt', 'strmclip', 'strmcmp',  'strmrun',     'strmxor']
+
 #----------------
 # End of File
 #----------------

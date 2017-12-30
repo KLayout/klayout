@@ -35,7 +35,7 @@
 
 # else
 
-#   if __GNUC__ >= 4
+#   if __GNUC__ >= 4 || defined(__clang__)
 #     define EXT_PUBLIC __attribute__ ((visibility ("default")))
 #     define EXT_LOCAL  __attribute__ ((visibility ("hidden")))
 #   else

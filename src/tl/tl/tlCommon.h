@@ -35,12 +35,36 @@
 
 # else
 
-#   if __GNUC__ >= 4
+#   if __GNUC__ >= 4 || defined(__clang__)
 #     define TL_PUBLIC __attribute__ ((visibility ("default")))
 #     define TL_LOCAL  __attribute__ ((visibility ("hidden")))
 #   else
 #     define TL_PUBLIC
 #     define TL_LOCAL
+#   endif
+
+# endif
+
+//  NOTE: this is required because we have some forward declarations to
+//  gsi::Class and gsi::ClassBase in tlVariant.h.
+//  TODO: there should not be any dependency of tl on gsi.
+# if defined _WIN32 || defined __CYGWIN__
+
+#   ifdef MAKE_GSI_LIBRARY
+#     define GSI_PUBLIC __declspec(dllexport)
+#   else
+#     define GSI_PUBLIC __declspec(dllimport)
+#   endif
+#   define GSI_LOCAL
+
+# else
+
+#   if __GNUC__ >= 4 || defined(__clang__)
+#     define GSI_PUBLIC __attribute__ ((visibility ("default")))
+#     define GSI_LOCAL  __attribute__ ((visibility ("hidden")))
+#   else
+#     define GSI_PUBLIC
+#     define GSI_LOCAL
 #   endif
 
 # endif

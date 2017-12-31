@@ -36,8 +36,8 @@
 
 namespace gsi
 {
-  class ClassBase;
-  class ArgType;
+  class GSI_PUBLIC ClassBase;
+  class GSI_PUBLIC ArgType;
 }
 
 namespace pya

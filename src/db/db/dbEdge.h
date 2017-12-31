@@ -42,7 +42,7 @@ template <class C> class generic_repository;
 class ArrayRepository;
 
 template <class C>
-class edge
+class DB_PUBLIC edge
 {
 public:
   typedef C coord_type;

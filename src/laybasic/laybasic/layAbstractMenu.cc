@@ -37,6 +37,7 @@
 #include <QToolButton>
 #include <QApplication>
 #include <QMessageBox>
+#include <QHBoxLayout>
 
 #include <ctype.h>
 
@@ -903,31 +904,61 @@ AbstractMenu::make_exclusive_group (const std::string &name)
 }
 
 void 
-AbstractMenu::build_detached (const std::string &name, QMenuBar *mbar)
+AbstractMenu::build_detached (const std::string &name, QFrame *mbar)
 {
+  //  Clean up the menu bar before rebuilding
+  if (mbar->layout ()) {
+    delete mbar->layout ();
+  }
+  QObjectList children = mbar->children ();
+  for (QObjectList::const_iterator c = children.begin (); c != children.end (); ++c) {
+    if (dynamic_cast<QToolButton *> (*c)) {
+      delete *c;
+    }
+  }
+
+  QHBoxLayout *menu_layout = new QHBoxLayout (mbar);
+  menu_layout->setMargin (0);
+  mbar->setLayout (menu_layout);
+
   AbstractMenuItem *item = find_item_exact ("@@" + name);
   tl_assert (item != 0);
-
-  mbar->clear ();
 
   for (std::list<AbstractMenuItem>::iterator c = item->children.begin (); c != item->children.end (); ++c) {
 
     if (c->has_submenu ()) {
 
+      QToolButton *menu_button = new QToolButton (mbar);
+      menu_layout->addWidget (menu_button);
+      menu_button->setAutoRaise (true);
+      menu_button->setPopupMode (QToolButton::MenuButtonPopup);
+      menu_button->setText (tl::to_qstring (c->action ().get_title ()));
+
       if (c->menu () == 0) {
-        c->set_menu (mbar->addMenu (tl::to_qstring (c->action ().get_title ())));
-        c->set_action (Action (new ActionHandle (c->menu ()->menuAction (), false)), true);
+        QMenu *menu = new QMenu (mbar);
+        menu_button->setMenu (menu);
+        c->set_menu (menu);
+        c->set_action (Action (new ActionHandle (menu->menuAction (), false)), true);
       } else {
-        mbar->addMenu (c->menu ());
+        menu_button->setMenu (c->menu ());
       }
 
       build (c->menu (), c->children);
 
     } else {
-      mbar->addAction (c->action ().qaction ());
+
+      QAction *action = c->action ().qaction ();
+
+      QToolButton *menu_button = new QToolButton (mbar);
+      menu_layout->addWidget (menu_button);
+      menu_button->setAutoRaise (true);
+      menu_button->setDefaultAction (action);
+
     }
 
   }
+
+  menu_layout->addStretch (1);
 }
 
 void 
@@ -1521,4 +1552,3 @@ AbstractMenu::collect_group (std::vector<std::string> &grp, const std::string &n
 }
 
 }
-

@@ -35,7 +35,7 @@
 
 # else
 
-#   if __GNUC__ >= 4
+#   if __GNUC__ >= 4 || defined(__clang__)
 #     define GSI_PUBLIC __attribute__ ((visibility ("default")))
 #     define GSI_LOCAL  __attribute__ ((visibility ("hidden")))
 #   else

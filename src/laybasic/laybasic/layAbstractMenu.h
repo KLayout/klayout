@@ -42,6 +42,7 @@
 #include "tlObject.h"
 #include "laybasicCommon.h"
 
+class QFrame;
 class QMenuBar;
 class QToolBar;
 class QMenu;
@@ -681,7 +682,7 @@ public:
    *  @param name The name of the detached menu, without the "@"
    *  @param mbar The menu bar into which to build the menu
    */
-  void build_detached (const std::string &name, QMenuBar *mbar);
+  void build_detached (const std::string &name, QFrame *mbar);
 
   /**
    *  @brief Get the reference to a QMenu object

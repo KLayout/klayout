@@ -57,7 +57,7 @@ class ArrayRepository;
  */
 
 template <class C, class R = C>
-struct box
+struct DB_PUBLIC box
 {
   typedef C coord_type;
   typedef box<C, R> box_type;

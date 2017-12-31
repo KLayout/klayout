@@ -30,6 +30,9 @@
 
 #ifdef _WIN32
 #  include <windows.h>
+#elif __APPLE__
+#  include <libproc.h>
+#  include <unistd.h>
 #else
 #  include <unistd.h>
 #endif
@@ -78,6 +81,15 @@ get_inst_path_internal ()
     QFileInfo fi (QString::fromUtf16 ((const ushort *) buffer, len));
     return tl::to_string (fi.absolutePath ());
   } 
+
+#elif __APPLE__
+
+  char buffer[PROC_PIDPATHINFO_MAXSIZE];
+  int ret = proc_pidpath (getpid (), buffer, sizeof (buffer));
+  if (ret > 0) {
+    //  TODO: does this correctly translate paths? (MacOS uses UTF-8 encoding with D-like normalization)
+    return tl::to_string (QFileInfo (QString::fromUtf8 (buffer)).absolutePath ());
+  }
 
 #else 
     

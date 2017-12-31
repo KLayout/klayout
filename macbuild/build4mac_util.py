@@ -13,6 +13,8 @@
 from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
 import sys
 import os
+import re
+import string
 import subprocess
 
 #-------------------------------------------------------------------------------
@@ -164,6 +166,62 @@ def SetChangeLibIdentificationName( executable, relativedir ):
       return(1)
   # for-lib
   return(0)
+
+#------------------------------------------------------------------------------
+## To get KLayout's version from a file like 'version.sh'
+#
+# @param[in] verfile   version file from which version is retrieved
+#
+# @return version string
+#------------------------------------------------------------------------------
+def GetKLayoutVersionFrom( verfile='version.h' ):
+  version = "?.?.?"
+  try:
+    fd = open( verfile, "r" )
+    contents = fd.readlines()
+    fd.close()
+  except Exception as e:
+    return version
+
+  verReg = re.compile( u'(KLAYOUT_VERSION=\")([0-9A-Z_a-z\.]+)(\")' )
+  for line in contents:
+    m = verReg.match(line)
+    if m:
+      # print(m.group(0)) # KLAYOUT_VERSION="0.25"
+      # print(m.group(1)) # KLAYOUT_VERSION="
+      # print(m.group(2)) # 0.25
+      # print(m.group(3)) # "
+      version = m.group(2)
+      return version
+  return version
+
+#------------------------------------------------------------------------------
+## To generate the contents of "Info.plist" file from a template
+#
+# @param[in]  keydic    dictionary of four key words ['exe', 'icon', 'bname', 'ver']
+# @param[in]  templfile template file
+#
+# @return generated strings
+#------------------------------------------------------------------------------
+def GenerateInfoPlist( keydic, templfile ):
+  val_exe   = keydic['exe']
+  val_icon  = keydic['icon']
+  val_bname = keydic['bname']
+  val_ver   = keydic['ver']
+
+  try:
+    fd = open( templfile, "r" )
+    template = fd.read()
+    fd.close()
+  except Exception as e:
+    return "???"
+
+  t = string.Template(template)
+  s = t.substitute( EXECUTABLE = val_exe,
+                    ICONFILE   = val_icon,
+                    BUNDLENAME = val_bname,
+                    VERSION    = val_ver)
+  return s
 
 #----------------
 # End of File

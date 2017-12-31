@@ -90,7 +90,7 @@ def SetChangeIdentificationNameOfDyLib( libdic ):
     if subprocess.call( command, shell=True ) != 0:
       msg = "!!! Failed to set the new identification name to <%s> !!!"
       print( msg % lib, file=sys.stderr )
-      return(1)
+      return 1
 
     #-------------------------------------------------------------------------
     # [2] Make the library aware of the new identifications of all supporters
@@ -103,9 +103,9 @@ def SetChangeIdentificationNameOfDyLib( libdic ):
       if subprocess.call( command, shell=True ) != 0:
         msg = "!!! Failed to make the library aware of the new identification name <%s> of supporter <%s> !!!"
         print( msg % (nameNew, sup), file=sys.stderr )
-        return(1)
+        return 1
   # for-lib
-  return(0)
+  return 0
 
 #------------------------------------------------------------------------------
 ## To set the identification names of KLayout's libraries to an executable
@@ -152,7 +152,7 @@ def SetChangeLibIdentificationName( executable, relativedir ):
     if subprocess.call( command, shell=True ) != 0:
       msg = "!!! Failed to set the new identification name to <%s> !!!"
       print( msg % lib, file=sys.stderr )
-      return(1)
+      return 1
 
     #-----------------------------------------------------------
     # [2] Make the application aware of the new identification
@@ -163,12 +163,12 @@ def SetChangeLibIdentificationName( executable, relativedir ):
     if subprocess.call( command, shell=True ) != 0:
       msg = "!!! Failed to make the application aware of the new identification name <%s> !!!"
       print( msg % nameNew, file=sys.stderr )
-      return(1)
+      return 1
   # for-lib
-  return(0)
+  return 0
 
 #------------------------------------------------------------------------------
-## To get KLayout's version from a file like 'version.sh'
+## To get KLayout's version from a file; most likely from 'version.sh'
 #
 # @param[in] verfile   version file from which version is retrieved
 #
@@ -199,7 +199,7 @@ def GetKLayoutVersionFrom( verfile='version.h' ):
 ## To generate the contents of "Info.plist" file from a template
 #
 # @param[in]  keydic    dictionary of four key words ['exe', 'icon', 'bname', 'ver']
-# @param[in]  templfile template file
+# @param[in]  templfile template file ("macbuild/Resources/Info.plist.template")
 #
 # @return generated strings
 #------------------------------------------------------------------------------

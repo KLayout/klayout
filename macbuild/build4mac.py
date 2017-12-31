@@ -415,7 +415,7 @@ def RunMainBuildBash():
   # [3] Invoke the main Bash script
   #-----------------------------------------------------
   if Deployment:
-    return(0)
+    return 0
   else:
     myscript = "build4mac.py"
     if subprocess.call( command, shell=True ) != 0:
@@ -424,14 +424,14 @@ def RunMainBuildBash():
       print( "!!! <%s>: failed to build KLayout" % myscript, file=sys.stderr )
       print( "-------------------------------------------------------------" )
       print("")
-      return(1)
+      return 1
     else:
       print("")
       print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
       print( "### <%s>: successfully built KLayout" % myscript, file=sys.stderr )
       print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
       print("")
-      return(0)
+      return 0
 
 #------------------------------------------------------------------------------
 ## To deploy built binaries and libraries on which those binaries depend
@@ -463,16 +463,16 @@ def DeployBinariesForBundle():
   #-------------------------------------------------------------
   os.chdir(ProjectDir)
   if not Deployment:
-    return(1)
+    return 1
   if not os.path.isfile(MacBuildLog):
     print( "!!! Build log file <%s> does not present !!!" % MacBuildLog, file=sys.stderr )
-    return(1)
+    return 1
   if not os.path.isdir(MacBuildDir):
     print( "!!! Build directory <%s> does not present !!!" % MacBuildDir, file=sys.stderr )
-    return(1)
+    return 1
   if not os.path.isdir(MacBinDir):
     print( "!!! Binary directory <%s> does not present !!!" % MacBinDir, file=sys.stderr )
-    return(1)
+    return 1
 
 
   print( " [2] Creating a new empty directory <%s> for deployment ..." % MacPkgDir )
@@ -586,7 +586,7 @@ def DeployBinariesForBundle():
   if not ret == 0:
     msg = "!!! Failed to set and change to new identification names !!!"
     print(msg)
-    return(1)
+    return 1
 
 
   print( " [6] Copying built executables and resource files ..." )
@@ -601,15 +601,17 @@ def DeployBinariesForBundle():
   sourceDir3 = "%s" % MacBinDir
 
   tmpfileM = ProjectDir + "/macbuild/Resources/Info.plist.template"
-  keydicM  = { 'exe': 'klayout', 'icon': 'klayout.icns', 'bname': 'klayout.main', 'ver': Version }
+  keydicM  = { 'exe': 'klayout', 'icon': 'klayout.icns', 'bname': 'klayout', 'ver': Version }
   plistM   = GenerateInfoPlist( keydicM, tmpfileM )
   file     = open( targetDir0 + "/Info.plist", "w" )
   file.write(plistM)
   file.close()
 
+  shutil.copy2( sourceDir0 + "/PkgInfo",      targetDir0 ) # this file is not mandatory
   shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
   shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
 
+  os.chmod( targetDir0 + "/PkgInfo",      0644 )
   os.chmod( targetDir0 + "/Info.plist",   0644 )
   os.chmod( targetDirM + "/klayout",      0755 )
   os.chmod( targetDirR + "/klayout.icns", 0644 )
@@ -634,7 +636,7 @@ def DeployBinariesForBundle():
     os.chdir(ProjectDir)
     msg = "!!! Failed to set/change library identification name for <%s> !!!"
     print( msg % klayoutexec, file=sys.stderr )
-    return(1)
+    return 1
 
   buddies     = glob.glob( "klayout.app/Contents/Buddy/strm*" )
   macdepQtOpt = ""
@@ -645,7 +647,7 @@ def DeployBinariesForBundle():
       os.chdir(ProjectDir)
       msg = "!!! Failed to set/change library identification name for <%s> !!!"
       print( msg % buddy, file=sys.stderr )
-      return(1)
+      return 1
 
 
   print( " [8] Finally, deploying Qt's Frameworks ..." )
@@ -669,12 +671,12 @@ def DeployBinariesForBundle():
     print( msg, file=sys.stderr )
     print("")
     os.chdir(ProjectDir)
-    return(1)
+    return 1
   else:
     print( "##### Finished deploying libraries and executables for <klayout.app> #####" )
     print("")
     os.chdir(ProjectDir)
-    return(0)
+    return 0
 
 #------------------------------------------------------------------------------
 ## To deploy script bundles that invoke the main bundle (klayout.app) in
@@ -696,7 +698,7 @@ def DeployScriptBundles():
   os.chdir(ProjectDir)
   if not os.path.isdir(MacPkgDir):
     print( "!!! Package directory <%s> does not present !!!" % MacPkgDir, file=sys.stderr )
-    return(1)
+    return 1
 
 
   print( " [2] Creating a new empty directory <%s> for deployment ..." % (MacPkgDir + "/klayout.scripts") )
@@ -763,14 +765,14 @@ def DeployScriptBundles():
   os.chmod( targetDirRV + "/klayout-blue.icns", 0644 )
 
   tmpfileE = ProjectDir + "/macbuild/Resources/Info.plist.template"
-  keydicE  = { 'exe': 'KLayoutEditor.sh', 'icon': 'klayout-red.icns',  'bname': 'klayout.editor', 'ver': Version }
+  keydicE  = { 'exe': 'KLayoutEditor.sh', 'icon': 'klayout-red.icns',  'bname': 'klayout', 'ver': Version }
   plistE   = GenerateInfoPlist( keydicE, tmpfileE )
   fileE    = open( targetDir0E + "/Info.plist", "w" )
   fileE.write(plistE)
   fileE.close()
 
   tmpfileV = ProjectDir + "/macbuild/Resources/Info.plist.template"
-  keydicV  = { 'exe': 'KLayoutViewer.sh', 'icon': 'klayout-blue.icns', 'bname': 'klayout.viewer', 'ver': Version }
+  keydicV  = { 'exe': 'KLayoutViewer.sh', 'icon': 'klayout-blue.icns', 'bname': 'klayout', 'ver': Version }
   plistV   = GenerateInfoPlist( keydicV, tmpfileV )
   fileV    = open( targetDir0V + "/Info.plist", "w" )
   fileV.write(plistV)
@@ -778,7 +780,7 @@ def DeployScriptBundles():
   print( "##### Finished deploying files for <KLayoutEditor.app> and <KLayoutViewer.app> #####" )
   print("")
   os.chdir(ProjectDir)
-  return(0)
+  return 0
 
 #------------------------------------------------------------------------------
 ## The main function

@@ -34,7 +34,7 @@ namespace gsi
  *
  *  This class is specialized to implement the actual call process later.
  */
-struct Callee
+struct GSI_PUBLIC Callee
   : public tl::Object
 {
   Callee () { }
@@ -49,7 +49,7 @@ struct Callee
  *  This object holds informations about the actual implementation of the callback 
  *  on the scripting client's side.
  */
-struct Callback 
+struct Callback
 {
   Callback () 
     : id (-1), callee (0), argsize (0), retsize (0)

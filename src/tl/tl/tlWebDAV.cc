@@ -111,7 +111,7 @@ struct MultiStatus
 
 }
 
-tl::XMLStruct<MultiStatus> xml_struct ("multistatus",
+TL_PUBLIC tl::XMLStruct<MultiStatus> xml_struct ("multistatus",
   tl::make_element (&MultiStatus::begin, &MultiStatus::end, &MultiStatus::add, "response",
     tl::make_member (&Response::href, "href") +
     tl::make_element (&Response::propstat, "propstat",

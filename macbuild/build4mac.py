@@ -40,6 +40,7 @@ def SetGlobals():
   global DebugMode          # True if debug mode build
   global CheckComOnly       # True if only for checking the command line parameters to "build.sh"
   global Deployment         # True if deploying the binaries for a package
+  global Version            # KLayout's version
   # auxiliary variables on platform
   global System             # 6-tuple from platform.uname()
   global Node               # - do -
@@ -130,6 +131,7 @@ def SetGlobals():
   DebugMode    = False
   CheckComOnly = False
   Deployment   = False
+  Version      = GetKLayoutVersionFrom( "./version.sh" )
 
 #------------------------------------------------------------------------------
 ## To get command line parameters
@@ -413,7 +415,7 @@ def RunMainBuildBash():
   # [3] Invoke the main Bash script
   #-----------------------------------------------------
   if Deployment:
-    return(0)
+    return 0
   else:
     myscript = "build4mac.py"
     if subprocess.call( command, shell=True ) != 0:
@@ -422,14 +424,14 @@ def RunMainBuildBash():
       print( "!!! <%s>: failed to build KLayout" % myscript, file=sys.stderr )
       print( "-------------------------------------------------------------" )
       print("")
-      return(1)
+      return 1
     else:
       print("")
       print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
       print( "### <%s>: successfully built KLayout" % myscript, file=sys.stderr )
       print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
       print("")
-      return(0)
+      return 0
 
 #------------------------------------------------------------------------------
 ## To deploy built binaries and libraries on which those binaries depend
@@ -451,25 +453,26 @@ def DeployBinariesForBundle():
   global AbsMacBinDir
   global AbsMacBuildDir
   global AbsMacBuildLog
+  global Version
 
   print("")
-  print( "##### Start deploying libraries and executables #####" )
+  print( "##### Started deploying libraries and executables for <klayout.app> #####" )
   print( " [1] Checking the status of working directory ..." )
   #-------------------------------------------------------------
   # [1] Check the status of working directory
   #-------------------------------------------------------------
   os.chdir(ProjectDir)
   if not Deployment:
-    return(1)
+    return 1
   if not os.path.isfile(MacBuildLog):
     print( "!!! Build log file <%s> does not present !!!" % MacBuildLog, file=sys.stderr )
-    return(1)
+    return 1
   if not os.path.isdir(MacBuildDir):
     print( "!!! Build directory <%s> does not present !!!" % MacBuildDir, file=sys.stderr )
-    return(1)
+    return 1
   if not os.path.isdir(MacBinDir):
     print( "!!! Binary directory <%s> does not present !!!" % MacBinDir, file=sys.stderr )
-    return(1)
+    return 1
 
 
   print( " [2] Creating a new empty directory <%s> for deployment ..." % MacPkgDir )
@@ -583,7 +586,7 @@ def DeployBinariesForBundle():
   if not ret == 0:
     msg = "!!! Failed to set and change to new identification names !!!"
     print(msg)
-    return(1)
+    return 1
 
 
   print( " [6] Copying built executables and resource files ..." )
@@ -594,21 +597,26 @@ def DeployBinariesForBundle():
   os.chdir(ProjectDir)
   sourceDir0 = "%s/klayout.app/Contents" % MacBinDir
   sourceDir1 = sourceDir0 + "/MacOS"
-  sourceDir2 = "%s/etc" % ProjectDir
-  sourceDir3 = "%s/src/klayout_main" % ProjectDir
-  sourceDir4 = "%s" % MacBinDir
+  sourceDir2 = "%s/macbuild/Resources" % ProjectDir
+  sourceDir3 = "%s" % MacBinDir
 
-  shutil.copy2( sourceDir0 + "/Info.plist", targetDir0 )
-  shutil.copy2( sourceDir1 + "/klayout",    targetDirM )
-  shutil.copy2( sourceDir2 + "/logo.png",   targetDirR )
-  shutil.copy2( sourceDir3 + "/logo.ico",   targetDirR )
+  tmpfileM = ProjectDir + "/macbuild/Resources/Info.plist.template"
+  keydicM  = { 'exe': 'klayout', 'icon': 'klayout.icns', 'bname': 'klayout', 'ver': Version }
+  plistM   = GenerateInfoPlist( keydicM, tmpfileM )
+  file     = open( targetDir0 + "/Info.plist", "w" )
+  file.write(plistM)
+  file.close()
 
-  os.chmod( targetDir0 + "/Info.plist", 0644 )
-  os.chmod( targetDirM + "/klayout",    0755 )
-  os.chmod( targetDirR + "/logo.png",   0644 )
-  os.chmod( targetDirR + "/logo.ico",   0644 )
+  shutil.copy2( sourceDir0 + "/PkgInfo",      targetDir0 ) # this file is not mandatory
+  shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
+  shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
 
-  buddies = glob.glob( sourceDir4 + "/strm*" )
+  os.chmod( targetDir0 + "/PkgInfo",      0644 )
+  os.chmod( targetDir0 + "/Info.plist",   0644 )
+  os.chmod( targetDirM + "/klayout",      0755 )
+  os.chmod( targetDirR + "/klayout.icns", 0644 )
+
+  buddies = glob.glob( sourceDir3 + "/strm*" )
   for item in buddies:
     shutil.copy2( item, targetDirB )
     buddy = os.path.basename(item)
@@ -628,7 +636,7 @@ def DeployBinariesForBundle():
     os.chdir(ProjectDir)
     msg = "!!! Failed to set/change library identification name for <%s> !!!"
     print( msg % klayoutexec, file=sys.stderr )
-    return(1)
+    return 1
 
   buddies     = glob.glob( "klayout.app/Contents/Buddy/strm*" )
   macdepQtOpt = ""
@@ -639,7 +647,7 @@ def DeployBinariesForBundle():
       os.chdir(ProjectDir)
       msg = "!!! Failed to set/change library identification name for <%s> !!!"
       print( msg % buddy, file=sys.stderr )
-      return(1)
+      return 1
 
 
   print( " [8] Finally, deploying Qt's Frameworks ..." )
@@ -663,13 +671,116 @@ def DeployBinariesForBundle():
     print( msg, file=sys.stderr )
     print("")
     os.chdir(ProjectDir)
-    return(1)
+    return 1
   else:
-    msg = "### Deployed applications on OS X ###"
-    print( msg, file=sys.stderr )
+    print( "##### Finished deploying libraries and executables for <klayout.app> #####" )
     print("")
     os.chdir(ProjectDir)
-    return(0)
+    return 0
+
+#------------------------------------------------------------------------------
+## To deploy script bundles that invoke the main bundle (klayout.app) in
+#  editor mode or viewer mode
+#
+# @return 0 on success; non-zero on failure
+#------------------------------------------------------------------------------
+def DeployScriptBundles():
+  global ProjectDir
+  global MacPkgDir
+  global AbsMacPkgDir
+
+  print("")
+  print( "##### Started deploying files for <KLayoutEditor.app> and <KLayoutViewer.app> #####" )
+  print( " [1] Checking the status of working directory ..." )
+  #-------------------------------------------------------------
+  # [1] Check the status of working directory
+  #-------------------------------------------------------------
+  os.chdir(ProjectDir)
+  if not os.path.isdir(MacPkgDir):
+    print( "!!! Package directory <%s> does not present !!!" % MacPkgDir, file=sys.stderr )
+    return 1
+
+
+  print( " [2] Creating a new empty directory <%s> for deployment ..." % (MacPkgDir + "/klayout.scripts") )
+  #-------------------------------------------------------------
+  # [2] Create a new empty directory for deploying binaries
+  #-------------------------------------------------------------
+  os.chdir(MacPkgDir)
+  scriptDir = "klayout.scripts"
+  if os.path.isfile(scriptDir):
+    os.remove(scriptDir)
+  if os.path.isdir(scriptDir):
+    shutil.rmtree(scriptDir)
+  os.mkdir(scriptDir)
+
+
+  print( " [3] Creating the standard directory structure for the script bundles ..." )
+  #-------------------------------------------------------------
+  # [3] Create the directory skeleton for the two script bundles.
+  #
+  #  klayout.scripts/+
+  #                  +-- KLayoutEditor.app/+
+  #                  |                     +-- Contents/+
+  #                  |                                  +-- Info.plist
+  #                  |                                  +-- Resources/
+  #                  |                                  +-- MacOS/+
+  #                  |                                            +-- 'KLayoutEditor.sh'
+  #                  +-- KLayoutViewer.app/+
+  #                                        +-- Contents/+
+  #                                                     +-- Info.plist
+  #                                                     +-- Resources/
+  #                                                     +-- MacOS/+
+  #                                                               +-- 'KLayoutViewer.sh'
+  #-------------------------------------------------------------
+  os.chdir(ProjectDir)
+  targetDir0E = "%s/%s/KLayoutEditor.app/Contents" % ( AbsMacPkgDir, scriptDir )
+  targetDir0V = "%s/%s/KLayoutViewer.app/Contents" % ( AbsMacPkgDir, scriptDir )
+
+  targetDirME = targetDir0E + "/MacOS"
+  targetDirMV = targetDir0V + "/MacOS"
+  targetDirRE = targetDir0E + "/Resources"
+  targetDirRV = targetDir0V + "/Resources"
+
+  os.makedirs(targetDirME)
+  os.makedirs(targetDirMV)
+  os.makedirs(targetDirRE)
+  os.makedirs(targetDirRV)
+
+
+  print( " [4] Copying script files and icon files ..." )
+  #-------------------------------------------------------------------------------
+  # [4] Copy different script files icon files
+  #-------------------------------------------------------------------------------
+  os.chdir(ProjectDir)
+  resourceDir = "macbuild/Resources"
+
+  shutil.copy2( resourceDir + "/KLayoutEditor.sh",  targetDirME )
+  shutil.copy2( resourceDir + "/KLayoutViewer.sh",  targetDirMV )
+  shutil.copy2( resourceDir + "/klayout-red.icns",  targetDirRE )
+  shutil.copy2( resourceDir + "/klayout-blue.icns", targetDirRV )
+
+  os.chmod( targetDirME + "/KLayoutEditor.sh",  0755 )
+  os.chmod( targetDirMV + "/KLayoutViewer.sh",  0755 )
+  os.chmod( targetDirRE + "/klayout-red.icns",  0644 )
+  os.chmod( targetDirRV + "/klayout-blue.icns", 0644 )
+
+  tmpfileE = ProjectDir + "/macbuild/Resources/Info.plist.template"
+  keydicE  = { 'exe': 'KLayoutEditor.sh', 'icon': 'klayout-red.icns',  'bname': 'klayout', 'ver': Version }
+  plistE   = GenerateInfoPlist( keydicE, tmpfileE )
+  fileE    = open( targetDir0E + "/Info.plist", "w" )
+  fileE.write(plistE)
+  fileE.close()
+
+  tmpfileV = ProjectDir + "/macbuild/Resources/Info.plist.template"
+  keydicV  = { 'exe': 'KLayoutViewer.sh', 'icon': 'klayout-blue.icns', 'bname': 'klayout', 'ver': Version }
+  plistV   = GenerateInfoPlist( keydicV, tmpfileV )
+  fileV    = open( targetDir0V + "/Info.plist", "w" )
+  fileV.write(plistV)
+  fileV.close()
+  print( "##### Finished deploying files for <KLayoutEditor.app> and <KLayoutViewer.app> #####" )
+  print("")
+  os.chdir(ProjectDir)
+  return 0
 
 #------------------------------------------------------------------------------
 ## The main function
@@ -684,8 +795,12 @@ def main():
     else:
       sys.exit(1)
   else:
-    ret = DeployBinariesForBundle()
-    sys.exit(ret)
+    ret1 = DeployBinariesForBundle()
+    ret2 = DeployScriptBundles()
+    if not (ret1 == 0 and ret2 == 0):
+      sys.exit(1)
+    else:
+      sys.exit(0)
 
 #===================================================================================
 if __name__ == "__main__":

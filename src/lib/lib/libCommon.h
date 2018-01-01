@@ -32,14 +32,17 @@
 #     define LIB_PUBLIC __declspec(dllimport)
 #   endif
 #   define LIB_LOCAL
+#   define LIB_PUBLIC_TEMPLATE
 
 # else
 
-#   if __GNUC__ >= 4
+#   if __GNUC__ >= 4 || defined(__clang__)
 #     define LIB_PUBLIC __attribute__ ((visibility ("default")))
+#     define LIB_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
 #     define LIB_LOCAL  __attribute__ ((visibility ("hidden")))
 #   else
 #     define LIB_PUBLIC
+#     define LIB_PUBLIC_TEMPLATE
 #     define LIB_LOCAL
 #   endif
 

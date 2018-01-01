@@ -222,7 +222,7 @@ private:
  */
 
 template <class C>
-class DB_PUBLIC text
+class DB_PUBLIC_TEMPLATE text
 {
 public:
   typedef C coord_type;

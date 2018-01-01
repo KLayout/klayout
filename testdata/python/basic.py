@@ -92,6 +92,28 @@ def ph(x):
   else:
     return x.replace("X", "")
     
+def map2str(dict):
+  # A helper function to product a "canonical" (i.e. sorted-keys) string
+  # representation of a dict
+  keys = list(dict)
+
+  for k in keys:
+    if type(k) is str:
+      strKeys = []
+      strDict = {}
+      for x in keys:
+        strKeys.append(str(x))
+        strDict[str(x)] = dict[x]
+      strings = []
+      for x in sorted(strKeys):
+        strings.append(str(x) + ": " + str(strDict[x]))
+      return "{" + ", ".join(strings) + "}"
+
+  strings = []
+  for x in sorted(keys):
+    strings.append(str(x) + ": " + str(dict[x]))
+  return "{" + ", ".join(strings) + "}"
+  
 class BasicTest(unittest.TestCase):
 
   def test_00(self):
@@ -2066,44 +2088,27 @@ class BasicTest(unittest.TestCase):
 
   def test_41(self):
 
-    v3 = sys.version_info >= (3, 0)
-
     # maps 
     b = pya.B()
 
     b.insert_map1(1, "hello")
-    if v3:
-      self.assertEqual(repr(b.map1), "{1: 'hello'}")
-    else:
-      self.assertEqual(repr(b.map1), "{1L: 'hello'}")
+    self.assertEqual(map2str(b.map1), "{1: hello}")
 
     b.map1 = {}
     b.insert_map1(2, "hello")
-    if v3:
-      self.assertEqual(repr(b.map1_cref()), "{2: 'hello'}")
-    else:
-      self.assertEqual(repr(b.map1_cref()), "{2L: 'hello'}")
+    self.assertEqual(map2str(b.map1_cref()), "{2: hello}")
 
     b.map1 = {}
     b.insert_map1(3, "hello")
-    if v3:
-      self.assertEqual(repr(b.map1_cptr()), "{3: 'hello'}")
-    else:
-      self.assertEqual(repr(b.map1_cptr()), "{3L: 'hello'}")
+    self.assertEqual(map2str(b.map1_cptr()), "{3: hello}")
 
     b.map1 = {}
     b.insert_map1(4, "hello")
-    if v3:
-      self.assertEqual(repr(b.map1_ref()), "{4: 'hello'}")
-    else:
-      self.assertEqual(repr(b.map1_ref()), "{4L: 'hello'}")
+    self.assertEqual(map2str(b.map1_ref()), "{4: hello}")
 
     b.map1 = {}
     b.insert_map1(5, "hello")
-    if v3:
-      self.assertEqual(repr(b.map1_ptr()), "{5: 'hello'}")
-    else:
-      self.assertEqual(repr(b.map1_ptr()), "{5L: 'hello'}")
+    self.assertEqual(map2str(b.map1_ptr()), "{5: hello}")
 
     self.assertEqual(b.map1_cptr_null() == None, True);
     self.assertEqual(b.map1_ptr_null() == None, True);
@@ -2117,52 +2122,28 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(error_caught, True)
 
     b.map1 = { 42: "1", -17: "True" }
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '1', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '1', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 1}")
 
     b.set_map1_cref({ 42: "2", -17: "True" })
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '2', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '2', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 2}")
 
     b.set_map1_cptr({ 42: "3", -17: "True" })
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '3', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '3', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 3}")
 
     b.set_map1_cptr(None)
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '3', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '3', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 3}")
 
     b.set_map1_ref({ 42: "4", -17: "True" })
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '4', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '4', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 4}")
 
     b.set_map1_ptr({ 42: "5", -17: "True" })
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '5', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '5', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 5}")
 
     b.set_map1_ptr(None)
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '5', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '5', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 5}")
 
     b.map2 = { 'xy': 1, -17: True }
-    if v3:
-      self.assertEqual(repr(b.map2), "{'xy': 1, -17: True}")
-    else:
-      self.assertEqual(repr(b.map2), "{'xy': 1L, -17L: True}")
+    self.assertEqual(map2str(b.map2), "{-17: True, xy: 1}")
 
     self.assertEqual(b.map2_null(), None)
 

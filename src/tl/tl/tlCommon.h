@@ -32,14 +32,17 @@
 #     define TL_PUBLIC __declspec(dllimport)
 #   endif
 #   define TL_LOCAL
+#   define TL_PUBLIC_TEMPLATE
 
 # else
 
 #   if __GNUC__ >= 4 || defined(__clang__)
 #     define TL_PUBLIC __attribute__ ((visibility ("default")))
+#     define TL_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
 #     define TL_LOCAL  __attribute__ ((visibility ("hidden")))
 #   else
 #     define TL_PUBLIC
+#     define TL_PUBLIC_TEMPLATE
 #     define TL_LOCAL
 #   endif
 
@@ -56,14 +59,17 @@
 #     define GSI_PUBLIC __declspec(dllimport)
 #   endif
 #   define GSI_LOCAL
+#   define GSI_PUBLIC_TEMPLATE
 
 # else
 
 #   if __GNUC__ >= 4 || defined(__clang__)
 #     define GSI_PUBLIC __attribute__ ((visibility ("default")))
+#     define GSI_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
 #     define GSI_LOCAL  __attribute__ ((visibility ("hidden")))
 #   else
 #     define GSI_PUBLIC
+#     define GSI_PUBLIC_TEMPLATE
 #     define GSI_LOCAL
 #   endif
 

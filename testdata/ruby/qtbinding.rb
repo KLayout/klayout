@@ -576,8 +576,8 @@ class QtBinding_TestClass < TestBase
     assert_equal(child.height() > 100, true)
     
     parent.resize(100, 100)
-    assert_equal(child.width() < 100, true)
-    assert_equal(child.height() < 100, true)
+    assert_equal(child.width() <= 100, true)
+    assert_equal(child.height() <= 100, true)
 
     # now if we delete the parent, the child needs to become disconnected
 

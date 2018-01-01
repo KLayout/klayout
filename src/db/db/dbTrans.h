@@ -42,10 +42,10 @@ namespace tl {
 
 namespace db {
 
-template <class I, class F, class R = double> class DB_PUBLIC complex_trans;
-template <class C> class DB_PUBLIC simple_trans;
-template <class C> class disp_trans;
-template <class C> class fixpoint_trans;
+template <class I, class F, class R = double> class DB_PUBLIC_TEMPLATE complex_trans;
+template <class C> class DB_PUBLIC_TEMPLATE simple_trans;
+template <class C> class DB_PUBLIC_TEMPLATE disp_trans;
+template <class C> class DB_PUBLIC_TEMPLATE fixpoint_trans;
 
 /**
  *  @brief Provide the default predicates and properties for transformations for the coordinate type C
@@ -1035,7 +1035,7 @@ operator<< (std::ostream &os, const disp_trans<C> &t)
  */
 
 template <class C>
-class DB_PUBLIC simple_trans
+class DB_PUBLIC_TEMPLATE simple_trans
   : public fixpoint_trans<C>
 {
 public:
@@ -1439,7 +1439,7 @@ operator<< (std::ostream &os, const simple_trans<C> &t)
  *  type used internally for representing the floating-point members).
  */
 template <class I, class F, class R>
-class DB_PUBLIC complex_trans
+class DB_PUBLIC_TEMPLATE complex_trans
 {
 public:
   typedef I coord_type;

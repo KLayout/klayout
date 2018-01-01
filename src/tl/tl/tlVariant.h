@@ -44,7 +44,7 @@ namespace gsi
 {
   class GSI_PUBLIC ClassBase;
   struct NoAdaptorTag;
-  template <class T, class A> class GSI_PUBLIC Class;
+  template <class T, class A> class GSI_PUBLIC_TEMPLATE Class;
   template <class X> const ClassBase *cls_decl ();
 }
 
@@ -102,7 +102,7 @@ protected:
  *  We will employ RTTI to identify a type through that base class.
  */
 template <class T>
-class TL_PUBLIC VariantUserClass
+class TL_PUBLIC_TEMPLATE VariantUserClass
   : public VariantUserClassBase
 {
 public:

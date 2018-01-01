@@ -650,7 +650,7 @@ public:
  *  @brief Generic string adaptor implementation
  */
 template <class X> 
-class GSI_PUBLIC StringAdaptorImpl
+class GSI_PUBLIC_TEMPLATE StringAdaptorImpl
   : public StringAdaptor
 {
 };
@@ -945,7 +945,7 @@ private:
  *  @brief Specialization for const unsigned char *
  */
 template <class CP>
-class GSI_PUBLIC StringAdaptorImplCCP
+class GSI_PUBLIC_TEMPLATE StringAdaptorImplCCP
   : public StringAdaptor
 {
 public:
@@ -1103,7 +1103,7 @@ public:
  *  @brief Generic string adaptor implementation
  */
 template <class X> 
-class GSI_PUBLIC VariantAdaptorImpl
+class GSI_PUBLIC_TEMPLATE VariantAdaptorImpl
   : public VariantAdaptor
 {
 };
@@ -1359,7 +1359,7 @@ public:
  *  @brief Implementation of the generic iterator adaptor for a specific container
  */
 template <class Cont>
-class GSI_PUBLIC VectorAdaptorIteratorImpl
+class GSI_PUBLIC_TEMPLATE VectorAdaptorIteratorImpl
   : public VectorAdaptorIterator
 {
 public:
@@ -1434,7 +1434,7 @@ void push_vector (QSet<X> &v, const X &x)
  *  @brief Implementation of the generic adaptor for a specific container
  */
 template <class Cont>
-class GSI_PUBLIC VectorAdaptorImpl
+class GSI_PUBLIC_TEMPLATE VectorAdaptorImpl
   : public VectorAdaptor
 {
 public:
@@ -1709,7 +1709,7 @@ struct map_access<QHash<X, Y> >
  *  @brief Implementation of the generic iterator adaptor for a specific container
  */
 template <class Cont>
-class GSI_PUBLIC MapAdaptorIteratorImpl
+class GSI_PUBLIC_TEMPLATE MapAdaptorIteratorImpl
   : public MapAdaptorIterator
 {
 public:
@@ -1745,7 +1745,7 @@ private:
  *  @brief Implementation of the generic adaptor for a specific container
  */
 template <class Cont>
-class GSI_PUBLIC MapAdaptorImpl
+class GSI_PUBLIC_TEMPLATE MapAdaptorImpl
   : public MapAdaptor
 {
 public:

@@ -50,7 +50,7 @@ namespace
 /**
  *  @brief A dummy "DOM" for the WebDAV reply
  */
-struct ResourceType
+struct TL_PUBLIC ResourceType
 {
   ResourceType () : is_collection (false) { }
 
@@ -71,7 +71,7 @@ struct ResourceType
 /**
  *  @brief A dummy "DOM" for the WebDAV reply
  */
-struct Prop
+struct TL_PUBLIC Prop
 {
   ResourceType resourcetype;
 };
@@ -79,7 +79,7 @@ struct Prop
 /**
  *  @brief A dummy "DOM" for the WebDAV reply
  */
-struct PropStat
+struct TL_PUBLIC PropStat
 {
   std::string status;
   Prop prop;
@@ -88,7 +88,7 @@ struct PropStat
 /**
  *  @brief A dummy "DOM" for the WebDAV reply
  */
-struct Response
+struct TL_PUBLIC Response
 {
   std::string href;
   PropStat propstat;
@@ -97,7 +97,7 @@ struct Response
 /**
  *  @brief A dummy "DOM" for the WebDAV reply
  */
-struct MultiStatus
+struct TL_PUBLIC MultiStatus
 {
   typedef std::list<Response> container;
   typedef container::const_iterator iterator;

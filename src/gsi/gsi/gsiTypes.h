@@ -62,12 +62,12 @@ class GSI_PUBLIC StringAdaptor;
 class GSI_PUBLIC VariantAdaptor;
 class GSI_PUBLIC ClassBase;
 struct NoAdaptorTag;
-template <class X, class A> class GSI_PUBLIC Class;
+template <class X, class A> class GSI_PUBLIC_TEMPLATE Class;
 template <class X> struct ClassTag;
-template <class I> class GSI_PUBLIC IterAdaptor;
-template <class V> class GSI_PUBLIC IterPtrAdaptor;
-template <class V> class GSI_PUBLIC ConstIterPtrAdaptor;
-template <class I> class GSI_PUBLIC FreeIterAdaptor;
+template <class I> class GSI_PUBLIC_TEMPLATE IterAdaptor;
+template <class V> class GSI_PUBLIC_TEMPLATE IterPtrAdaptor;
+template <class V> class GSI_PUBLIC_TEMPLATE ConstIterPtrAdaptor;
+template <class I> class GSI_PUBLIC_TEMPLATE FreeIterAdaptor;
 template <class X> const ClassBase *cls_decl ();
 
 /**

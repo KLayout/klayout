@@ -116,7 +116,7 @@ void _var_user_read_impl (T * /*a*/, tl::Extractor & /*ex*/, tl::false_tag)
  *  @brief A VariantUserClassBase specialization that links GSI classes and Variant classes
  */
 template <class T>
-class GSI_PUBLIC VariantUserClass
+class GSI_PUBLIC_TEMPLATE VariantUserClass
   : public tl::VariantUserClass<T>, private VariantUserClassImpl
 {
 public:
@@ -551,7 +551,7 @@ public:
  *  the given methods.
  */
 template <class X>
-class GSI_PUBLIC ClassExt
+class GSI_PUBLIC_TEMPLATE ClassExt
   : public ClassBase
 {
 public:
@@ -708,7 +708,7 @@ struct adaptor_type_info<X, NoAdaptorTag>
  *  or to call it's methods in some generic way.
  */
 template <class X, class Adapted = NoAdaptorTag>
-class GSI_PUBLIC Class
+class GSI_PUBLIC_TEMPLATE Class
   : public ClassBase
 {
 public:
@@ -937,7 +937,7 @@ public:
  *  a subclass of the parent.
  */
 template <class P, class X, class Adapted = NoAdaptorTag>
-class GSI_PUBLIC ChildClass
+class GSI_PUBLIC_TEMPLATE ChildClass
   : public Class<X, Adapted>
 {
 public:
@@ -970,7 +970,7 @@ public:
  *  a subclass of the parent.
  */
 template <class P, class X, class B, class Adapted = NoAdaptorTag>
-class GSI_PUBLIC ChildSubClass
+class GSI_PUBLIC_TEMPLATE ChildSubClass
   : public SubClass<X, B, Adapted>
 {
 public:

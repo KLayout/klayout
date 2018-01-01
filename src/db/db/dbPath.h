@@ -207,6 +207,8 @@ private:
  *  The path can be converted to a polygon.
  */
 
+//  NOTE: we do explicit instantiation, so the exposure is declared
+//  as DB_PUBLIC - as if it wasn't a template
 template <class C>
 class DB_PUBLIC path
 {

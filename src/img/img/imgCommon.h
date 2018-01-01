@@ -32,14 +32,17 @@
 #     define IMG_PUBLIC __declspec(dllimport)
 #   endif
 #   define IMG_LOCAL
+#   define IMG_PUBLIC_TEMPLATE
 
 # else
 
 #   if __GNUC__ >= 4 || defined(__clang__)
 #     define IMG_PUBLIC __attribute__ ((visibility ("default")))
+#     define IMG_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
 #     define IMG_LOCAL  __attribute__ ((visibility ("hidden")))
 #   else
 #     define IMG_PUBLIC
+#     define IMG_PUBLIC_TEMPLATE
 #     define IMG_LOCAL
 #   endif
 

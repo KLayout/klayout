@@ -40,7 +40,7 @@
 namespace db {
 
 template <class C>
-class DB_PUBLIC edge_pair
+class DB_PUBLIC_TEMPLATE edge_pair
 {
 public:
   typedef C coord_type;

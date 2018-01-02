@@ -376,9 +376,9 @@ def RunMainBuildBash():
 
   # (C) want Qt bindings with Ruby scripts?
   if NoQtBindings:
-    parameters += "\\\n  -without-qtbinding"
+    parameters += " \\\n  -without-qtbinding"
   else:
-    parameters += "\\\n  -with-qtbinding"
+    parameters += " \\\n  -with-qtbinding"
 
   # (D) options to `make` tool
   if not MakeOptions == "":

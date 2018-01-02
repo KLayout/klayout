@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -164,7 +164,7 @@ Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 
         //  TODO: callbacks with default arguments?
         for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
-          PyTuple_SetItem (argv.get (), arg4self + (a - meth->begin_arguments ()), pop_arg (*a, args, NULL, heap).release ());
+          PyTuple_SetItem (argv.get (), arg4self + (a - meth->begin_arguments ()), pop_arg (*a, args, 0, heap).release ());
         }
 
         PythonRef result (PyObject_CallObject (callable.get (), argv.get ()));
@@ -173,7 +173,7 @@ Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
         }
 
         tl::Heap heap;
-        push_arg (meth->ret_type (), ret, result.get (), heap);
+        push_arg (meth->ret_type (), ret, meth->ret_type().pass_obj() ? result.release() : result.get (), heap);
 
         
         //  a Python callback must not leave temporary objects
@@ -218,22 +218,31 @@ void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gs
     int args_avail = int (std::distance (meth->begin_arguments (), meth->end_arguments ()));
     PythonRef argv (PyTuple_New (args_avail));
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
-      PyTuple_SetItem (argv.get (), int (a - meth->begin_arguments ()), pop_arg (*a, args, NULL, heap).release ());
+      PyTuple_SetItem (argv.get (), int (a - meth->begin_arguments ()), pop_arg (*a, args, 0, heap).release ());
+    }
+
+    //  NOTE: in case one event handler deletes the object, it's safer to first collect the handlers and
+    //  then call them.
+    std::vector<PythonRef> callables;
+    callables.reserve (m_cbfuncs.size ());
+    for (std::vector<CallbackFunction>::const_iterator c = m_cbfuncs.begin (); c != m_cbfuncs.end (); ++c) {
+      callables.push_back (c->callable ());
     }
 
     PythonRef result;
-    for (std::vector<CallbackFunction>::const_iterator c = m_cbfuncs.begin (); c != m_cbfuncs.end (); ++c) {
+
+    for (std::vector<PythonRef>::const_iterator c = callables.begin (); c != callables.end (); ++c) {
 
       //  determine the number of arguments required
       int arg_count = args_avail;
       if (args_avail > 0) {
 
-        PythonRef fc (PyObject_GetAttrString (c->callable ().get (), "__code__"));
+        PythonRef fc (PyObject_GetAttrString (c->get (), "__code__"));
         if (fc) {
           PythonRef ac (PyObject_GetAttrString (fc.get (), "co_argcount"));
           if (ac) {
             arg_count = python2c<int> (ac.get ());
-            if (PyObject_HasAttrString (c->callable ().get (), "__self__")) {
+            if (PyObject_HasAttrString (c->get (), "__self__")) {
               arg_count -= 1;
             }
           }
@@ -243,12 +252,12 @@ void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gs
 
       //  use less arguments if applicable
       if (arg_count == 0) {
-        result = PythonRef (PyObject_CallObject (c->callable ().get (), NULL));
+        result = PythonRef (PyObject_CallObject (c->get (), NULL));
       } else if (arg_count < args_avail) {
         PythonRef argv_less (PyTuple_GetSlice (argv.get (), 0, arg_count));
-        result = PythonRef (PyObject_CallObject (c->callable ().get (), argv_less.get ()));
+        result = PythonRef (PyObject_CallObject (c->get (), argv_less.get ()));
       } else {
-        result = PythonRef (PyObject_CallObject (c->callable ().get (), argv.get ()));
+        result = PythonRef (PyObject_CallObject (c->get (), argv.get ()));
       }
 
       if (! result) {

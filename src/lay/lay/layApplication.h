@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -82,33 +82,33 @@ struct PluginDescriptor
 };
 
 /**
- *  @brief The basic application object
+ *  @brief The application base class
  *
- *  This object encapsulates command line parsing, creation of the main window
- *  widget and the basic execution loop.
+ *  This is the basic functionality for the application class.
+ *  Two specializations exist: one for the GUI-less version (derived from QCoreApplication)
+ *  and one for the GUI version (derived from QApplication).
  */
-class LAY_PUBLIC Application
-  : public QApplication, public gsi::ObjectBase
+class LAY_PUBLIC ApplicationBase
+  : public gsi::ObjectBase
 {
 public:
   /**
-   *  @brief The application constructor 
+   *  @brief The application constructor
    *
    *  @param argc The number of external command-line arguments passed.
    *  @param argv The external command-line arguments.
-   *  @param non_ui_mode True, if the UI shall not be enabled
    */
-  Application (int &argc, char **argv, bool non_ui_mode);
+  ApplicationBase ();
 
   /**
    *  @brief Destructor
    */
-  ~Application ();
+  virtual ~ApplicationBase ();
 
   /**
    *  @brief The singleton instance
    */
-  static Application *instance ();
+  static ApplicationBase *instance ();
 
   /**
    *  @brief Exit the application
@@ -118,29 +118,22 @@ public:
   void exit (int result);
 
   /**
-   *  @brief Reimplementation of notify from QApplication
-   */
-  bool notify (QObject *receiver, QEvent *e);
-
-  /**
-   *  @brief Return the program's version 
+   *  @brief Return the program's version
    */
   std::string version () const;
 
   /**
-   *  @brief Return the program's usage string 
+   *  @brief Return the program's usage string
    */
   std::string usage ();
 
   /**
-   *  @brief Return the main window's reference
+   *  @brief Returns the main window's reference
    *
-   *  If the application has not been initialized properly, this pointer is 0.
+   *  If the application has not been initialized properly or does not support GUI,
+   *  this pointer is 0.
    */
-  MainWindow *main_window () const
-  {
-    return mp_mw;
-  }
+  virtual MainWindow *main_window () const = 0;
 
   /**
    *  @brief Runs plugin and macro specific initializations
@@ -152,13 +145,15 @@ public:
    *
    *  This method issues all the lower level methods required in order to perform the
    *  applications main code.
+   *  Depending on the arguments and UI capabilities, this method will
+   *  either execute the command line macros for open the main window.
    */
   int run ();
 
   /**
-   *  @brief Execute the GUI main loop
+   *  @brief Executes the UI loop if GUI is enabled
    */
-  int exec ();
+  virtual int exec () = 0;
 
   /**
    *  @brief Process pending events
@@ -167,14 +162,17 @@ public:
    *  handling for the "close application window" case and a "silent" mode. In that mode, processing
    *  of deferred methods is disabled.
    */
-  void process_events (QEventLoop::ProcessEventsFlags flags, bool silent = false);
+  void process_events (QEventLoop::ProcessEventsFlags flags, bool silent = false)
+  {
+    process_events_impl (flags, silent);
+  }
 
   /**
    *  @brief A shortcut for the default process_events
    */
   void process_events ()
   {
-    process_events (QEventLoop::AllEvents);
+    process_events_impl (QEventLoop::AllEvents);
   }
 
   /**
@@ -221,9 +219,9 @@ public:
 
   /**
    *  @brief Gets a value indicating whether the give special application flag is set
-   *  
+   *
    *  Special application flags are ways to introduce debug or flags for special
-   *  use cases. Such flags have a name and currently are controlled externally by 
+   *  use cases. Such flags have a name and currently are controlled externally by
    *  an environment variable called "KLAYOUT_x" where x is the name. If that
    *  variable is set and the value is non-empty, the flag is regarded set.
    */
@@ -232,7 +230,7 @@ public:
   /**
    *  @brief Return a reference to the Ruby interpreter
    */
-  gsi::Interpreter &ruby_interpreter () 
+  gsi::Interpreter &ruby_interpreter ()
   {
     return *mp_ruby_interpreter;
   }
@@ -240,7 +238,7 @@ public:
   /**
    *  @brief Return a reference to the Ruby interpreter
    */
-  gsi::Interpreter &python_interpreter () 
+  gsi::Interpreter &python_interpreter ()
   {
     return *mp_python_interpreter;
   }
@@ -287,7 +285,7 @@ public:
   /**
    *  @brief Reset config to global configuration
    */
-  void reset_config (); 
+  void reset_config ();
 
   /**
    *  @brief Synchronize macro collections with technology-specific macros
@@ -328,9 +326,23 @@ public:
     return m_native_plugins;
   }
 
+  /**
+   *  @brief Gets the QApplication object
+   *  This method will return non-null only if a GUI-enabled application is present.
+   */
+  virtual QApplication *qapp_gui () { return 0; }
+
+protected:
+  void init_app (int &argc, char **argv, bool non_ui_mode);
+  virtual void setup () = 0;
+  virtual void shutdown ();
+  virtual void prepare_recording (const std::string &gtf_record, bool gtf_record_incremental);
+  virtual void start_recording ();
+  virtual lay::PluginRoot *plugin_root () const = 0;
+  virtual void finish ();
+  virtual void process_events_impl (QEventLoop::ProcessEventsFlags flags, bool silent = false);
+
 private:
-  void shutdown ();
-  void finish ();
   std::vector<std::string> scan_global_modules ();
 
   enum file_type {
@@ -355,10 +367,11 @@ private:
   std::vector<std::string> m_klayout_path;
   std::string m_inst_path;
   std::string m_appdata_path;
-  std::vector< std::pair<std::string, std::string> > m_macro_categories;
   bool m_write_config_file;
   std::vector< std::pair<std::string, std::string> > m_variables;
   int m_gtf_replay_rate, m_gtf_replay_stop;
+  std::string m_gtf_record;
+  bool m_gtf_save_incremental;
   bool m_no_macros;
   bool m_same_view;
   bool m_sync_mode;
@@ -366,28 +379,144 @@ private:
   bool m_vo_mode;
   bool m_editable;
   bool m_enable_undo;
-  QCoreApplication *mp_qapp;
-  QApplication *mp_qapp_gui;
-  std::auto_ptr<tl::DeferredMethodScheduler> mp_dm_scheduler;
   //  HINT: the ruby interpreter must be destroyed before MainWindow
   //  in order to maintain a valid MainWindow reference for ruby scripts and Ruby's GC all the time.
   gsi::Interpreter *mp_ruby_interpreter;
   gsi::Interpreter *mp_python_interpreter;
+  std::vector<PluginDescriptor> m_native_plugins;
+};
+
+/**
+ *  @brief The GUI-enabled application class
+ */
+class LAY_PUBLIC GuiApplication
+  : public QApplication, public ApplicationBase
+{
+public:
+  GuiApplication (int &argc, char **argv);
+  ~GuiApplication ();
+
+  QApplication *qapp_gui () { return this; }
+
+  /**
+   *  @brief Reimplementation of notify from QApplication
+   */
+  bool notify (QObject *receiver, QEvent *e);
+
+  /**
+   *  @brief Gets the application instance, cast to this class
+   */
+  static GuiApplication *instance ()
+  {
+    return dynamic_cast<GuiApplication *> (ApplicationBase::instance ());
+  }
+
+  /**
+   *  @brief Specialization of exec
+   */
+  int exec ();
+
+  /**
+   *  @brief Hides QCoreApplication::exit
+   */
+  void exit (int result)
+  {
+    ApplicationBase::exit (result);
+  }
+
+  /**
+   *  @brief Returns the main window's reference
+   */
+  virtual MainWindow *main_window () const
+  {
+    return mp_mw;
+  }
+
+protected:
+  virtual void setup ();
+  virtual void shutdown ();
+  virtual void finish ();
+  virtual void prepare_recording (const std::string &gtf_record, bool gtf_save_incremental);
+  virtual void start_recording ();
+  virtual void process_events_impl (QEventLoop::ProcessEventsFlags flags, bool silent);
+
+  virtual lay::PluginRoot *plugin_root () const;
+
+private:
   MainWindow *mp_mw;
+  gtf::Recorder *mp_recorder;
+  std::auto_ptr<tl::DeferredMethodScheduler> mp_dm_scheduler;
+};
+
+/**
+ *  @brief The non-GUI-enabled application class
+ */
+class LAY_PUBLIC NonGuiApplication
+  : public QCoreApplication, public ApplicationBase
+{
+public:
+  NonGuiApplication (int &argc, char **argv);
+  ~NonGuiApplication ();
+
+  /**
+   *  @brief Gets the application instance, cast to this class
+   */
+  static NonGuiApplication *instance ()
+  {
+    return dynamic_cast<NonGuiApplication *> (ApplicationBase::instance ());
+  }
+
+  /**
+   *  @brief Specialization of exec
+   */
+  int exec ();
+
+  /**
+   *  @brief Hides QCoreApplication::exit
+   */
+  void exit (int result)
+  {
+    ApplicationBase::exit (result);
+  }
+
+  /**
+   *  @brief Returns the main window's reference
+   *  This incarnation returns 0 since no GUI is supported.
+   */
+  virtual MainWindow *main_window () const
+  {
+    return 0;
+  }
+
+protected:
+  virtual void setup ();
+  virtual void shutdown ();
+
+  virtual lay::PluginRoot *plugin_root () const
+  {
+    return mp_plugin_root;
+  }
+
+private:
   lay::ProgressReporter *mp_pr;
   lay::ProgressBar *mp_pb;
   lay::PluginRoot *mp_plugin_root;
-  gtf::Recorder *mp_recorder;
-  std::vector<PluginDescriptor> m_native_plugins;
 };
 
 } // namespace lay
 
 namespace tl {
-  template <> struct type_traits<lay::Application> : public type_traits<void> {
+
+  template <> struct type_traits<lay::GuiApplication> : public type_traits<void> {
     typedef tl::false_tag has_copy_constructor;
     typedef tl::false_tag has_default_constructor;
   };
+
+  template <> struct type_traits<lay::NonGuiApplication> : public type_traits<void> {
+    typedef tl::false_tag has_copy_constructor;
+    typedef tl::false_tag has_default_constructor;
+  };
+
 }
 
 #endif

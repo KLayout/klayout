@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -118,12 +118,14 @@ TEST (1)
   EXPECT_EQ (g.license (), "free");
   g.set_authored_time (QDateTime ());
   EXPECT_EQ (g.authored_time ().isNull (), true);
+#if QT_VERSION >= 0x40700
   g.set_authored_time (QDateTime::fromMSecsSinceEpoch (1000000000));
   EXPECT_EQ (QDateTime::fromMSecsSinceEpoch (0).msecsTo (g.authored_time ()), 1000000000);
   g.set_installed_time (QDateTime ());
   EXPECT_EQ (g.installed_time ().isNull (), true);
   g.set_installed_time (QDateTime::fromMSecsSinceEpoch (2000000000));
   EXPECT_EQ (QDateTime::fromMSecsSinceEpoch (0).msecsTo (g.installed_time ()), 2000000000);
+#endif
 
   g.add_dependency (lay::SaltGrain::Dependency ());
   g.dependencies ().back ().name = "depname";

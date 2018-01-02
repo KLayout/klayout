@@ -3,7 +3,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,10 +30,13 @@
 #include "tlCommandLineParser.h"
 #include "layApplication.h"
 #include "laySystemPaths.h"
+#include "layVersion.h"
 #include "rba.h"
 #include "pya.h"
 #include "gsiDecl.h"
 #include "gsiExternalMain.h"
+
+#include "version.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -53,7 +56,7 @@
 #include "drcForceLink.h"
 #endif
 
-static int main_cont (int argc, char **argv);
+static int main_cont (int &argc, char **argv);
 
 int
 main (int argc, char **argv)
@@ -68,7 +71,7 @@ main (int argc, char **argv)
 }
 
 static int
-run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, bool non_editable, bool slow, lay::Application &app, bool gsi_coverage, const std::vector<std::string> &class_names_vector)
+run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, bool non_editable, bool slow, lay::ApplicationBase &app, bool gsi_coverage, const std::vector<std::string> &class_names_vector)
 {
   std::set<std::string> class_names;
   class_names.insert (class_names_vector.begin (), class_names_vector.end ());
@@ -318,8 +321,18 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
 }
 
 static int
-main_cont (int argc, char **argv)
+main_cont (int &argc, char **argv)
 {
+  //  install the version strings
+  lay::Version::set_exe_name (prg_exe_name);
+  lay::Version::set_name (prg_name);
+  lay::Version::set_version (prg_version);
+
+  std::string subversion (prg_date);
+  subversion += " r";
+  subversion += prg_rev;
+  lay::Version::set_subversion (subversion.c_str ());
+
   int result = 0;
 
   ut::TestConsole console (stdout);
@@ -378,7 +391,7 @@ main_cont (int argc, char **argv)
     static char av3[] = "-rx";  //  No mplicit macros
     char *av[] = { av0, av1, av2, av3, 0 };
     int ac = sizeof (av) / sizeof (av[0]) - 1;
-    lay::Application app (ac, av, false);
+    lay::GuiApplication app (ac, av);
 
     app.ruby_interpreter ().push_console (&console);
     app.python_interpreter ().push_console (&console);

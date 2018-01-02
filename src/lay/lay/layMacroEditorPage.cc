@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -613,7 +613,11 @@ void MacroEditorPage::cursor_position_changed ()
     //  elements not being comment or string. So we need to iterate over elements
     //  and over characters inside these elements.
 
+#if QT_VERSION < 0x40700
+    size_t pos = size_t (cursor.position() - cursor.block().position());
+#else
     size_t pos = size_t (cursor.positionInBlock ());
+#endif
 
     std::vector<SyntaxHighlighterElement>::const_iterator e;
     for (e = user_data->elements ().begin (); e != user_data->elements ().end (); ++e) {

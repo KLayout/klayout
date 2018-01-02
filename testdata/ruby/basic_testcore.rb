@@ -1,51 +1,8 @@
 # encoding: UTF-8
 
-# extend A
-class RBA::A 
-
-  def initialize
-    @offset = nil
-  end
-  def s( o )
-    @offset = o
-  end
-  def g
-    return @offset
-  end
-  def m
-    return @offset+a1
-  end
-  def call_a10_prot(f)
-    a10_prot(f)
-  end
-  def inspect
-    if @offset 
-      @offset.to_s
-    else
-      "a1=" + self.a1.to_s
-    end 
-  end
-
-private
-  @offset
-
-end
-
-class XEdge < RBA::Edge
-  def initialize
-    super(RBA::Point.new(1,2), RBA::Point.new(3,4))
-  end
-end
-
-class RBA::E
-  def m 
-    @m
-  end
-  def m=(x)
-    @m = x
-  end
-  @m = nil
-end
+# NOTE: we need to do a "require" here since basic_testcore_defs.rb is not
+# safe in multiple inclusions
+require File.expand_path('../basic_testcore_defs', __FILE__)
 
 class Basic_TestClass < TestBase
 
@@ -62,6 +19,11 @@ class Basic_TestClass < TestBase
 
     a = RBA::A.new_a(100)
     assert_equal( RBA::A::a0, ac0 + 1 )
+
+    a = RBA::A.new
+    assert_equal(a.a1, 17)
+    a.assign(RBA::A.new(110))
+    assert_equal(a.a1, 110)
 
     a = nil
     GC.start
@@ -2601,4 +2563,45 @@ class Basic_TestClass < TestBase
 
   end
   
+  def test_73
+
+    begin
+
+      poly = RBA::Polygon::new(RBA::Box::new(0, 0, 100, 100))
+      
+      # passing exceptions over iterators is critical because it involves
+      # a Ruby/C++ and C++/Ruby transition
+      poly.each_edge do |e|
+        raise MyException::new("some exception")
+      end
+
+    rescue => ex
+      assert_equal(ex.class.to_s, "MyException")
+      assert_equal(ex.to_s, "some exception")
+    end
+
+    begin
+      raise MyException::new("another exception")
+    rescue => ex
+      assert_equal(ex.class.to_s, "MyException")
+      assert_equal(ex.to_s, "another exception")
+    end
+
+  end
+
+  # Custom factory implemented in Ruby
+  def test_80
+
+    gc = RBA::GObject.g_inst_count
+    gf = RBAGFactory::new
+    go = RBA::GFactory.create_f(gf, 17)
+    assert_equal(go.g_virtual, 34)
+    assert_equal(go.g_org, 0)
+    assert_equal(RBA::GObject.g_inst_count, gc + 1)
+    go = nil
+    GC.start
+    assert_equal(RBA::GObject.g_inst_count, gc)
+
+  end
+
 end

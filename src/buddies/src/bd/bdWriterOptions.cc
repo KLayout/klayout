@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -188,6 +188,11 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                     "#--recompress", &m_oasis_writer_options.recompress, "Compresses shape arrays again",
                     "With this option, shape arrays will be expanded and recompressed. This may result in a better "
                     "compression ratio, but at the cost of slower execution."
+                   )
+        << tl::arg (group +
+                    "#--permissive", &m_oasis_writer_options.permissive, "Permissive mode",
+                    "In permissive mode, certain forbidden objects are reported as warnings, not as errors: "
+                    "paths with odd width, polygons with less than three points etc."
                    )
         << tl::arg (group +
                     "#--write-std-properties", &m_oasis_writer_options.write_std_properties, "Writes some global standard properties",

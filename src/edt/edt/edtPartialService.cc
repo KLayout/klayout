@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -2495,7 +2495,7 @@ PartialService::selection_to_view ()
     } else {
 
       //  compute the global transformation including movement, context and explicit transformation
-      db::ICplxTrans gt = db::VCplxTrans (cv->layout ().dbu ()) * db::DCplxTrans (move_trans) * db::CplxTrans (cv->layout ().dbu ());
+      db::ICplxTrans gt = db::VCplxTrans (1.0 / cv->layout ().dbu ()) * db::DCplxTrans (move_trans) * db::CplxTrans (cv->layout ().dbu ());
       gt *= (cv.context_trans () * r->first.trans ());
 
       const std::vector<db::DCplxTrans> *tv_list = tv.per_cv (r->first.cv_index ());

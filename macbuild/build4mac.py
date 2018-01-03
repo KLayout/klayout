@@ -61,9 +61,10 @@ def SetGlobals():
   Usage += "                        : * key type names below are case insensitive *   | \n"
   Usage += "                        :   'nil' = not to support the script language    | \n"
   Usage += "                        :   'Sys' = using the OS standard script language | \n"
+  Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details| \n"
   Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts']             | qt5macports \n"
-  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'RubySource']               | sys \n"
-  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Anaconda27', 'Anaconda36'] | sys \n"
+  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24']            | sys \n"
+  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36']   | sys \n"
   Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts       | disabled \n"
   Usage += "   [-m|--make <option>] : option passed to 'make'                         | -j4 \n"
   Usage += "   [-d|--debug]         : enable debug mode build                         | disabled \n"
@@ -155,11 +156,11 @@ def ParseCommandLineArguments():
 
   p.add_option( '-r', '--ruby',
                 dest='type_ruby',
-                help="Ruby type=['nil', 'Sys', 'RubySource']" )
+                help="Ruby type=['nil', 'Sys', 'Src24', 'MP24']" )
 
   p.add_option( '-p', '--python',
                 dest='type_python',
-                help="Python type=['nil', 'Sys', 'Anaconda27', 'Anaconda36']" )
+                help="Python type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36']" )
 
   p.add_option( '-n', '--noqtbinding',
                 action='store_true',
@@ -231,7 +232,7 @@ def ParseCommandLineArguments():
     quit()
 
   # Determine Ruby type
-  candidates = [ i.upper() for i in ['nil', 'Sys', 'RubySource'] ]
+  candidates = [ i.upper() for i in ['nil', 'Sys', 'Src24', 'MP24'] ]
   ModuleRuby = ""
   index      = 0
   for item in candidates:
@@ -253,6 +254,8 @@ def ParseCommandLineArguments():
         break
       elif index == 2:
         ModuleRuby = 'Ruby24SrcBuild'
+      elif index == 3:
+        ModuleRuby = 'Ruby24MacPorts'
     else:
       index += 1
   if ModuleRuby == "":
@@ -262,9 +265,9 @@ def ParseCommandLineArguments():
     quit()
 
   # Determine Python type
-  candidates = [ i.upper() for i in ['nil', 'Sys', 'Anaconda27', 'Anaconda36'] ]
+  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36'] ]
   ModulePython = ""
-  index      = 0
+  index        = 0
   for item in candidates:
     if opt.type_python.upper() == item:
       if index == 0:
@@ -286,6 +289,8 @@ def ParseCommandLineArguments():
         ModulePython = 'Anaconda27'
       elif index == 3:
         ModulePython = 'Anaconda36'
+      elif index == 4:
+        ModulePython = 'Python36MacPorts'
     else:
       index += 1
   if ModulePython == "":
@@ -488,7 +493,7 @@ def DeployBinariesForBundle():
 
 
   print( " [3] Creating the standard directory structure for 'klayout.app' bundle ..." )
-  #-------------------------------------------------------------
+  #-----------------------------------------------------------------
   # [3] Create the directory skeleton for "klayout.app" bundle
   #     and command line buddy tools such as "strm2cif".
   #     They are stored in the directory structure below.
@@ -497,8 +502,11 @@ def DeployBinariesForBundle():
   #                +-- Contents/+
   #                             +-- Info.plist
   #                             +-- PkgInfo
-  #                             +-- Resources/
-  #                             +-- Frameworks/
+  #                             +-- Resources/+
+  #                             |             +-- 'klayout.icns'
+  #                             +-- Frameworks/+
+  #                             |              +-- '*.framework'
+  #                             |              +-- '*.dylib'
   #                             +-- MacOS/+
   #                             |         +-- 'klayout'
   #                             +-- Buddy/+
@@ -506,7 +514,7 @@ def DeployBinariesForBundle():
   #                                       +-- 'strm2dxf'
   #                                       :
   #                                       +-- 'strmxor'
-  #-------------------------------------------------------------
+  #-----------------------------------------------------------------
   targetDir0 = "%s/klayout.app/Contents" % AbsMacPkgDir
   targetDirR = targetDir0 + "/Resources"
   targetDirF = targetDir0 + "/Frameworks"
@@ -715,23 +723,25 @@ def DeployScriptBundles():
 
 
   print( " [3] Creating the standard directory structure for the script bundles ..." )
-  #-------------------------------------------------------------
+  #--------------------------------------------------------------------------------------------
   # [3] Create the directory skeleton for the two script bundles.
   #
   #  klayout.scripts/+
   #                  +-- KLayoutEditor.app/+
   #                  |                     +-- Contents/+
   #                  |                                  +-- Info.plist
-  #                  |                                  +-- Resources/
+  #                  |                                  +-- Resources/+
+  #                  |                                  |             +-- 'klayout-red.icns'
   #                  |                                  +-- MacOS/+
   #                  |                                            +-- 'KLayoutEditor.sh'
   #                  +-- KLayoutViewer.app/+
   #                                        +-- Contents/+
   #                                                     +-- Info.plist
-  #                                                     +-- Resources/
+  #                                                     +-- Resources/+
+  #                                                     |             +-- 'klayout-blue.icns'
   #                                                     +-- MacOS/+
   #                                                               +-- 'KLayoutViewer.sh'
-  #-------------------------------------------------------------
+  #--------------------------------------------------------------------------------------------
   os.chdir(ProjectDir)
   targetDir0E = "%s/%s/KLayoutEditor.app/Contents" % ( AbsMacPkgDir, scriptDir )
   targetDir0V = "%s/%s/KLayoutViewer.app/Contents" % ( AbsMacPkgDir, scriptDir )

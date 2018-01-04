@@ -40,6 +40,7 @@ def SetGlobals():
   global DebugMode          # True if debug mode build
   global CheckComOnly       # True if only for checking the command line parameters to "build.sh"
   global Deployment         # True if deploying the binaries for a package
+  global DeployVerbose      # -verbose=<0-3> level passed to 'macdeployqt' tool
   global Version            # KLayout's version
   # auxiliary variables on platform
   global System             # 6-tuple from platform.uname()
@@ -61,9 +62,10 @@ def SetGlobals():
   Usage += "                        : * key type names below are case insensitive *   | \n"
   Usage += "                        :   'nil' = not to support the script language    | \n"
   Usage += "                        :   'Sys' = using the OS standard script language | \n"
+  Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details| \n"
   Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts']             | qt5macports \n"
-  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'RubySource']               | sys \n"
-  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Anaconda27', 'Anaconda36'] | sys \n"
+  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24']            | sys \n"
+  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36']   | sys \n"
   Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts       | disabled \n"
   Usage += "   [-m|--make <option>] : option passed to 'make'                         | -j4 \n"
   Usage += "   [-d|--debug]         : enable debug mode build                         | disabled \n"
@@ -72,7 +74,11 @@ def SetGlobals():
   Usage += "                        : ! After confirmation of successful build of     | \n"
   Usage += "                        :   KLayout, rerun this script with BOTH:         | \n"
   Usage += "                        :     1) the same options used for building AND   | \n"
-  Usage += "                        :     2) [-y|--deploy]                            | \n"
+  Usage += "                        :     2) <-y|--deploy>                            | \n"
+  Usage += "                        :   optionally with [-v|--verbose <0-3>]          | \n"
+  Usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt'                  | 1 \n"
+  Usage += "                        : 0 = no output, 1 = error/warning (default),     | \n"
+  Usage += "                        : 2 = normal,    3 = debug                        | \n"
   Usage += "   [-?|--?]             : print this usage and exit                       | disabled \n"
   Usage += "---------------------------------------------------------------------------------------------\n"
 
@@ -126,12 +132,13 @@ def SetGlobals():
     ModuleRuby   = "nil"
     ModulePython = "nil"
 
-  NoQtBindings = False
-  MakeOptions  = "-j4"
-  DebugMode    = False
-  CheckComOnly = False
-  Deployment   = False
-  Version      = GetKLayoutVersionFrom( "./version.sh" )
+  NoQtBindings  = False
+  MakeOptions   = "-j4"
+  DebugMode     = False
+  CheckComOnly  = False
+  Deployment    = False
+  DeployVerbose = 1
+  Version       = GetKLayoutVersionFrom( "./version.sh" )
 
 #------------------------------------------------------------------------------
 ## To get command line parameters
@@ -147,6 +154,7 @@ def ParseCommandLineArguments():
   global DebugMode
   global CheckComOnly
   global Deployment
+  global DeployVerbose
 
   p = optparse.OptionParser( usage=Usage )
   p.add_option( '-q', '--qt',
@@ -155,11 +163,11 @@ def ParseCommandLineArguments():
 
   p.add_option( '-r', '--ruby',
                 dest='type_ruby',
-                help="Ruby type=['nil', 'Sys', 'RubySource']" )
+                help="Ruby type=['nil', 'Sys', 'Src24', 'MP24']" )
 
   p.add_option( '-p', '--python',
                 dest='type_python',
-                help="Python type=['nil', 'Sys', 'Anaconda27', 'Anaconda36']" )
+                help="Python type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36']" )
 
   p.add_option( '-n', '--noqtbinding',
                 action='store_true',
@@ -189,21 +197,26 @@ def ParseCommandLineArguments():
                 default=False,
                 help="deploy built binaries" )
 
+  p.add_option( '-v', '--verbose',
+                dest='deploy_verbose',
+                help="verbose level of `macdeployqt` tool" )
+
   p.add_option( '-?', '--??',
                 action='store_true',
                 dest='checkusage',
                 default=False,
                 help='check usage' )
 
-  p.set_defaults( type_qt       = "qt5macports",
-                  type_ruby     = "sys",
-                  type_python   = "sys",
-                  no_qt_binding = False,
-                  make_option   = "-j4",
-                  debug_build   = False,
-                  check_command = False,
-                  deploy_bins   = False,
-                  checkusage    = False )
+  p.set_defaults( type_qt        = "qt5macports",
+                  type_ruby      = "sys",
+                  type_python    = "sys",
+                  no_qt_binding  = False,
+                  make_option    = "-j4",
+                  debug_build    = False,
+                  check_command  = False,
+                  deploy_bins    = False,
+                  deploy_verbose = "1",
+                  checkusage     = False )
 
   opt, args = p.parse_args()
   if (opt.checkusage):
@@ -231,7 +244,7 @@ def ParseCommandLineArguments():
     quit()
 
   # Determine Ruby type
-  candidates = [ i.upper() for i in ['nil', 'Sys', 'RubySource'] ]
+  candidates = [ i.upper() for i in ['nil', 'Sys', 'Src24', 'MP24'] ]
   ModuleRuby = ""
   index      = 0
   for item in candidates:
@@ -253,6 +266,8 @@ def ParseCommandLineArguments():
         break
       elif index == 2:
         ModuleRuby = 'Ruby24SrcBuild'
+      elif index == 3:
+        ModuleRuby = 'Ruby24MacPorts'
     else:
       index += 1
   if ModuleRuby == "":
@@ -262,9 +277,9 @@ def ParseCommandLineArguments():
     quit()
 
   # Determine Python type
-  candidates = [ i.upper() for i in ['nil', 'Sys', 'Anaconda27', 'Anaconda36'] ]
+  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36'] ]
   ModulePython = ""
-  index      = 0
+  index        = 0
   for item in candidates:
     if opt.type_python.upper() == item:
       if index == 0:
@@ -286,6 +301,8 @@ def ParseCommandLineArguments():
         ModulePython = 'Anaconda27'
       elif index == 3:
         ModulePython = 'Anaconda36'
+      elif index == 4:
+        ModulePython = 'Python36MacPorts'
     else:
       index += 1
   if ModulePython == "":
@@ -294,11 +311,17 @@ def ParseCommandLineArguments():
     print(Usage)
     quit()
 
-  NoQtBindings = opt.no_qt_binding
-  MakeOptions  = opt.make_option
-  DebugMode    = opt.debug_build
-  CheckComOnly = opt.check_command
-  Deployment   = opt.deploy_bins
+  NoQtBindings  = opt.no_qt_binding
+  MakeOptions   = opt.make_option
+  DebugMode     = opt.debug_build
+  CheckComOnly  = opt.check_command
+  Deployment    = opt.deploy_bins
+  DeployVerbose = int(opt.deploy_verbose)
+  if not DeployVerbose in [0, 1, 2, 3]:
+    print("")
+    print( "!!! Unsupported verbose level passed to `macdeployqt` tool", file=sys.stderr )
+    print(Usage)
+    quit()
 
   if not Deployment:
     target  = "%s %s %s" % (Platform, Release, Machine)
@@ -376,9 +399,9 @@ def RunMainBuildBash():
 
   # (C) want Qt bindings with Ruby scripts?
   if NoQtBindings:
-    parameters += "\\\n  -without-qtbinding"
+    parameters += " \\\n  -without-qtbinding"
   else:
-    parameters += "\\\n  -with-qtbinding"
+    parameters += " \\\n  -with-qtbinding"
 
   # (D) options to `make` tool
   if not MakeOptions == "":
@@ -454,6 +477,7 @@ def DeployBinariesForBundle():
   global AbsMacBuildDir
   global AbsMacBuildLog
   global Version
+  global DeployVerbose
 
   print("")
   print( "##### Started deploying libraries and executables for <klayout.app> #####" )
@@ -488,7 +512,7 @@ def DeployBinariesForBundle():
 
 
   print( " [3] Creating the standard directory structure for 'klayout.app' bundle ..." )
-  #-------------------------------------------------------------
+  #-----------------------------------------------------------------
   # [3] Create the directory skeleton for "klayout.app" bundle
   #     and command line buddy tools such as "strm2cif".
   #     They are stored in the directory structure below.
@@ -497,8 +521,11 @@ def DeployBinariesForBundle():
   #                +-- Contents/+
   #                             +-- Info.plist
   #                             +-- PkgInfo
-  #                             +-- Resources/
-  #                             +-- Frameworks/
+  #                             +-- Resources/+
+  #                             |             +-- 'klayout.icns'
+  #                             +-- Frameworks/+
+  #                             |              +-- '*.framework'
+  #                             |              +-- '*.dylib'
   #                             +-- MacOS/+
   #                             |         +-- 'klayout'
   #                             +-- Buddy/+
@@ -506,7 +533,7 @@ def DeployBinariesForBundle():
   #                                       +-- 'strm2dxf'
   #                                       :
   #                                       +-- 'strmxor'
-  #-------------------------------------------------------------
+  #-----------------------------------------------------------------
   targetDir0 = "%s/klayout.app/Contents" % AbsMacPkgDir
   targetDirR = targetDir0 + "/Resources"
   targetDirF = targetDir0 + "/Frameworks"
@@ -654,14 +681,15 @@ def DeployBinariesForBundle():
   #-------------------------------------------------------------
   # [8] Deploy Qt frameworks
   #-------------------------------------------------------------
+  verbose = " -verbose=%d" % DeployVerbose
   if ModuleQt == 'Qt4MacPorts':
     deploytool = Qt4MacPorts['deploy']
     app_bundle = "klayout.app"
-    options    = macdepQtOpt
+    options    = macdepQtOpt + verbose
   elif ModuleQt == 'Qt5MacPorts':
     deploytool = Qt5MacPorts['deploy']
     app_bundle = "klayout.app"
-    options    = macdepQtOpt
+    options    = macdepQtOpt + verbose
 
   os.chdir(ProjectDir)
   os.chdir(MacPkgDir)
@@ -715,23 +743,25 @@ def DeployScriptBundles():
 
 
   print( " [3] Creating the standard directory structure for the script bundles ..." )
-  #-------------------------------------------------------------
+  #--------------------------------------------------------------------------------------------
   # [3] Create the directory skeleton for the two script bundles.
   #
   #  klayout.scripts/+
   #                  +-- KLayoutEditor.app/+
   #                  |                     +-- Contents/+
   #                  |                                  +-- Info.plist
-  #                  |                                  +-- Resources/
+  #                  |                                  +-- Resources/+
+  #                  |                                  |             +-- 'klayout-red.icns'
   #                  |                                  +-- MacOS/+
   #                  |                                            +-- 'KLayoutEditor.sh'
   #                  +-- KLayoutViewer.app/+
   #                                        +-- Contents/+
   #                                                     +-- Info.plist
-  #                                                     +-- Resources/
+  #                                                     +-- Resources/+
+  #                                                     |             +-- 'klayout-blue.icns'
   #                                                     +-- MacOS/+
   #                                                               +-- 'KLayoutViewer.sh'
-  #-------------------------------------------------------------
+  #--------------------------------------------------------------------------------------------
   os.chdir(ProjectDir)
   targetDir0E = "%s/%s/KLayoutEditor.app/Contents" % ( AbsMacPkgDir, scriptDir )
   targetDir0V = "%s/%s/KLayoutViewer.app/Contents" % ( AbsMacPkgDir, scriptDir )

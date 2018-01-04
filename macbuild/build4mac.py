@@ -40,6 +40,7 @@ def SetGlobals():
   global DebugMode          # True if debug mode build
   global CheckComOnly       # True if only for checking the command line parameters to "build.sh"
   global Deployment         # True if deploying the binaries for a package
+  global DeployVerbose      # -verbose=<0-3> level passed to 'macdeployqt' tool
   global Version            # KLayout's version
   # auxiliary variables on platform
   global System             # 6-tuple from platform.uname()
@@ -73,7 +74,11 @@ def SetGlobals():
   Usage += "                        : ! After confirmation of successful build of     | \n"
   Usage += "                        :   KLayout, rerun this script with BOTH:         | \n"
   Usage += "                        :     1) the same options used for building AND   | \n"
-  Usage += "                        :     2) [-y|--deploy]                            | \n"
+  Usage += "                        :     2) <-y|--deploy>                            | \n"
+  Usage += "                        :   optionally with [-v|--verbose <0-3>]          | \n"
+  Usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt'                  | 1 \n"
+  Usage += "                        : 0 = no output, 1 = error/warning (default),     | \n"
+  Usage += "                        : 2 = normal,    3 = debug                        | \n"
   Usage += "   [-?|--?]             : print this usage and exit                       | disabled \n"
   Usage += "---------------------------------------------------------------------------------------------\n"
 
@@ -127,12 +132,13 @@ def SetGlobals():
     ModuleRuby   = "nil"
     ModulePython = "nil"
 
-  NoQtBindings = False
-  MakeOptions  = "-j4"
-  DebugMode    = False
-  CheckComOnly = False
-  Deployment   = False
-  Version      = GetKLayoutVersionFrom( "./version.sh" )
+  NoQtBindings  = False
+  MakeOptions   = "-j4"
+  DebugMode     = False
+  CheckComOnly  = False
+  Deployment    = False
+  DeployVerbose = 1
+  Version       = GetKLayoutVersionFrom( "./version.sh" )
 
 #------------------------------------------------------------------------------
 ## To get command line parameters
@@ -148,6 +154,7 @@ def ParseCommandLineArguments():
   global DebugMode
   global CheckComOnly
   global Deployment
+  global DeployVerbose
 
   p = optparse.OptionParser( usage=Usage )
   p.add_option( '-q', '--qt',
@@ -190,21 +197,26 @@ def ParseCommandLineArguments():
                 default=False,
                 help="deploy built binaries" )
 
+  p.add_option( '-v', '--verbose',
+                dest='deploy_verbose',
+                help="verbose level of `macdeployqt` tool" )
+
   p.add_option( '-?', '--??',
                 action='store_true',
                 dest='checkusage',
                 default=False,
                 help='check usage' )
 
-  p.set_defaults( type_qt       = "qt5macports",
-                  type_ruby     = "sys",
-                  type_python   = "sys",
-                  no_qt_binding = False,
-                  make_option   = "-j4",
-                  debug_build   = False,
-                  check_command = False,
-                  deploy_bins   = False,
-                  checkusage    = False )
+  p.set_defaults( type_qt        = "qt5macports",
+                  type_ruby      = "sys",
+                  type_python    = "sys",
+                  no_qt_binding  = False,
+                  make_option    = "-j4",
+                  debug_build    = False,
+                  check_command  = False,
+                  deploy_bins    = False,
+                  deploy_verbose = "1",
+                  checkusage     = False )
 
   opt, args = p.parse_args()
   if (opt.checkusage):
@@ -299,11 +311,17 @@ def ParseCommandLineArguments():
     print(Usage)
     quit()
 
-  NoQtBindings = opt.no_qt_binding
-  MakeOptions  = opt.make_option
-  DebugMode    = opt.debug_build
-  CheckComOnly = opt.check_command
-  Deployment   = opt.deploy_bins
+  NoQtBindings  = opt.no_qt_binding
+  MakeOptions   = opt.make_option
+  DebugMode     = opt.debug_build
+  CheckComOnly  = opt.check_command
+  Deployment    = opt.deploy_bins
+  DeployVerbose = int(opt.deploy_verbose)
+  if not DeployVerbose in [0, 1, 2, 3]:
+    print("")
+    print( "!!! Unsupported verbose level passed to `macdeployqt` tool", file=sys.stderr )
+    print(Usage)
+    quit()
 
   if not Deployment:
     target  = "%s %s %s" % (Platform, Release, Machine)
@@ -459,6 +477,7 @@ def DeployBinariesForBundle():
   global AbsMacBuildDir
   global AbsMacBuildLog
   global Version
+  global DeployVerbose
 
   print("")
   print( "##### Started deploying libraries and executables for <klayout.app> #####" )
@@ -662,14 +681,15 @@ def DeployBinariesForBundle():
   #-------------------------------------------------------------
   # [8] Deploy Qt frameworks
   #-------------------------------------------------------------
+  verbose = " -verbose=%d" % DeployVerbose
   if ModuleQt == 'Qt4MacPorts':
     deploytool = Qt4MacPorts['deploy']
     app_bundle = "klayout.app"
-    options    = macdepQtOpt
+    options    = macdepQtOpt + verbose
   elif ModuleQt == 'Qt5MacPorts':
     deploytool = Qt5MacPorts['deploy']
     app_bundle = "klayout.app"
-    options    = macdepQtOpt
+    options    = macdepQtOpt + verbose
 
   os.chdir(ProjectDir)
   os.chdir(MacPkgDir)

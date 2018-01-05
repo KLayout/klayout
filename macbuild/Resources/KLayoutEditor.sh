@@ -3,7 +3,7 @@
 # File: KLayoutEditor.sh
 #
 # Descriptions:
-#  This is to invoke "klayout" distributed as a binary package for Mac
+#  This is to invoke "klayout" with Qt5 distributed as a binary package for Mac
 #  in "editor" mode.
 #
 #  You may specify style and other options as you like by setting
@@ -19,7 +19,7 @@ myKLayout="open -n -a /Applications/klayout.app --args "
 # Pass command line parameters to klayout
 # vvvvvvvvvv You may edit the block below vvvvvvvvvv
 opt_mode="-e"
-opt_style="-style=cleanlooks"
+opt_style="-style=fusion"
 opt_others=""
 # ^^^^^^^^^^ You may edit the block above ^^^^^^^^^^
 #===================================================

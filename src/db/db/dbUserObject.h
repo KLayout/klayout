@@ -54,7 +54,7 @@ DB_PUBLIC unsigned int get_unique_user_object_class_id ();
  *  in order to be able to be put into a user_object<C>.
  */
 template <class C>
-class user_object_base 
+class DB_PUBLIC_TEMPLATE user_object_base
 {
 public:
   typedef C coord_type;
@@ -399,7 +399,7 @@ typedef user_object<db::DCoord> DUserObject;
  *  @brief The base object of a factory-instantiable object
  */
 template <class C>
-class user_object_factory_base 
+class DB_PUBLIC_TEMPLATE user_object_factory_base
 {
 public:
   user_object_factory_base () { }
@@ -414,7 +414,7 @@ public:
  *  This implements a factory for objects of class X with coordinate base type C.
  */
 template <class X, class C>
-class user_object_factory_impl 
+class DB_PUBLIC_TEMPLATE user_object_factory_impl
   : public user_object_factory_base <C>
 {
 public:

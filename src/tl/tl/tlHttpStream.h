@@ -25,6 +25,7 @@
 #define HDR_tlHttpStream
 
 #include "tlStream.h"
+#include "tlEvents.h"
 
 #include <QObject>
 #include <QBuffer>
@@ -85,6 +86,19 @@ public:
   virtual ~InputHttpStream ();
 
   /**
+   *  @brief Sends the request for data
+   *  To ensure prompt delivery of data, this method can be used prior to
+   *  "read" to trigger the download from the given URL.
+   *  This method will return immediately. When the reply is available,
+   *  the "ready" event will be triggered. "read" can then be used to
+   *  read the data or - in case of an error - throw an exception.
+   *  If "send" is not used before "read", "read" will block until data
+   *  is available.
+   *  If a request has already been sent, this method will do nothing.
+   */
+  void send ();
+
+  /**
    *  @brief Sets the request verb
    *  The default verb is "GET"
    */
@@ -115,6 +129,23 @@ public:
    */
   virtual size_t read (char *b, size_t n);
 
+  /**
+   *  @brief Gets the "ready" event
+   *  Connect to this event for the asynchroneous interface.
+   */
+  tl::Event &ready ()
+  {
+    return m_ready;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether data is available
+   */
+  bool data_available ()
+  {
+    return mp_reply != 0;
+  }
+
   virtual void reset ();  
 
   virtual std::string source () const
@@ -140,6 +171,7 @@ private:
   QByteArray m_data;
   QBuffer *mp_buffer;
   std::map<std::string, std::string> m_headers;
+  tl::Event m_ready;
 
   void issue_request (const QUrl &url);
 };

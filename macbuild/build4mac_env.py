@@ -141,26 +141,26 @@ PythonHighSierra= { 'exe': '/System/Library/Frameworks/Python.framework/Versions
                     'lib': '/System/Library/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib'
                   }
 
-# Using anaconda (https://www.anaconda.com/download/#macos): *+*+*+ EXPERIMENTAL *+*+*+
-#   If the path to your `conda` command is '$HOME/anaconda/bin/conda'
+# Using anaconda2 (https://www.anaconda.com/download/#macos) 5.0.1: *+*+*+ EXPERIMENTAL *+*+*+
+#   If the path to your `conda` command is '$HOME/anaconda2/bin/conda'
 #   and your Python environment was prepared by: $ conda create -n py27klayout python=2.7
 #
 #   No additional modules are added in the beginning.
 # [Key Type Name] = 'Ana27'
-Anaconda27      = { 'exe': '$HOME/anaconda/envs/py27klayout/bin/python2.7' ,
-                    'inc': '$HOME/anaconda/envs/py27klayout/include/python2.7',
-                    'lib': '$HOME/anaconda/envs/py27klayout/lib/libpython2.7.dylib'
+Anaconda27      = { 'exe': '$HOME/anaconda2/envs/py27klayout/bin/python2.7' ,
+                    'inc': '$HOME/anaconda2/envs/py27klayout/include/python2.7',
+                    'lib': '$HOME/anaconda2/envs/py27klayout/lib/libpython2.7.dylib'
                   }
 
-# Using anaconda (https://www.anaconda.com/download/#macos): *+*+*+ EXPERIMENTAL *+*+*+
-#   If the path to your `conda` command is '$HOME/anaconda/bin/conda'
+# Using anaconda2 (https://www.anaconda.com/download/#macos) 5.0.1l: *+*+*+ EXPERIMENTAL *+*+*+
+#   If the path to your `conda` command is '$HOME/anaconda2/bin/conda'
 #   and your Python environment was prepared by: $ conda create -n py36klayout python=3.6
 #
 #   No additional modules are added in the beginning.
 # [Key Type Name] = 'Ana36'
-Anaconda36      = { 'exe': '$HOME/anaconda/envs/py36klayout/bin/python3.6' ,
-                    'inc': '$HOME/anaconda/envs/py36klayout/include/python3.6m',
-                    'lib': '$HOME/anaconda/envs/py36klayout/lib/libpython3.6m.dylib'
+Anaconda36      = { 'exe': '$HOME/anaconda2/envs/py36klayout/bin/python3.6' ,
+                    'inc': '$HOME/anaconda2/envs/py36klayout/include/python3.6m',
+                    'lib': '$HOME/anaconda2/envs/py36klayout/lib/libpython3.6m.dylib'
                   }
 
 # Python 3.6 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+

@@ -26,6 +26,8 @@
 #include "ui_SaltManagerDialog.h"
 #include "laySalt.h"
 #include "tlDeferredExecution.h"
+#include "tlHttpStream.h"
+#include "tlException.h"
 
 #include <QDialog>
 #include <memory>
@@ -40,7 +42,7 @@ class SaltGrainPropertiesDialog;
  *  @brief The dialog for managing the Salt ("Packages")
  */
 class SaltManagerDialog
-  : public QDialog, private Ui::SaltManagerDialog
+  : public QDialog, private Ui::SaltManagerDialog, public tl::Object
 {
 Q_OBJECT
 
@@ -57,6 +59,17 @@ public:
   {
     return m_salt_mine_url;
   }
+
+private:
+  /**
+   *  @brief Called when data is available from the grain downloader
+   */
+  void data_ready ();
+
+  /**
+   *  @brief Called when data is available from the salt mine downloader
+   */
+  void salt_mine_data_ready ();
 
 private slots:
   /**
@@ -171,6 +184,10 @@ private:
   SaltGrainPropertiesDialog *mp_properties_dialog;
   tl::DeferredMethod<SaltManagerDialog> dm_update_models;
   int m_current_tab;
+  std::auto_ptr<tl::InputStream> m_downloaded_grain_reader;
+  std::auto_ptr<lay::SaltGrain> m_downloaded_grain, m_salt_mine_grain;
+  SaltGrainDetailsTextWidget *mp_downloaded_target;
+  std::auto_ptr<tl::InputStream> m_salt_mine_reader;
 
   SaltGrain *current_grain ();
   std::vector<lay::SaltGrain *> current_grains ();
@@ -179,6 +196,9 @@ private:
   void update_apply_state ();
   void get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details);
   void consolidate_salt_mine_entries ();
+  void show_error (tl::Exception &ex);
+  void salt_mine_download_started ();
+  void salt_mine_download_finished ();
 };
 
 }

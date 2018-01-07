@@ -172,10 +172,15 @@ class TL_PUBLIC InputStream
 public:
   /**
    *  @brief Default constructor
-   *
-   *  This constructor takes a delegate object. 
+   *  This constructor takes a delegate object, but does not take ownership.
    */
   InputStream (InputStreamBase &delegate);
+
+  /**
+   *  @brief Default constructor
+   *  This constructor takes a delegate object, and takes ownership.
+   */
+  InputStream (InputStreamBase *delegate);
 
   /**
    *  @brief Opens a stream from a abstract path
@@ -305,6 +310,14 @@ public:
    *  @brief Gets the absolute path for a given URL
    */
   static std::string absolute_path (const std::string &path);
+
+  /**
+   *  @brief Gets the base reader (delegate)
+   */
+  InputStreamBase *base ()
+  {
+    return mp_delegate;
+  }
     
 protected:
   void reset_pos ()

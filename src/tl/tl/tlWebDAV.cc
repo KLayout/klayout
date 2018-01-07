@@ -256,7 +256,7 @@ WebDAVObject::download_item (const std::string &url)
   tl::InputHttpStream *http = new tl::InputHttpStream (url);
   //  This trick allows accessing GitHub repos through their SVN API
   http->add_header ("User-Agent", "SVN");
-  return new tl::InputStream (*http);
+  return new tl::InputStream (http);
 }
 
 bool

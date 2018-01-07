@@ -480,15 +480,14 @@ SaltGrain::from_path (const std::string &path)
   return g;
 }
 
-SaltGrain
-SaltGrain::from_url (const std::string &url_in)
+tl::InputStream *
+SaltGrain::stream_from_url (std::string &url_in)
 {
   if (url_in.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No download link available")));
   }
 
   std::string url = url_in;
-  std::auto_ptr<tl::InputStream> stream;
 
   //  base relative URL's on the salt mine URL
   if (url.find ("http:") != 0 && url.find ("https:") != 0 && url.find ("file:") != 0 && !url.empty() && url[0] != '/' && url[0] != '\\' && lay::SaltController::instance ()) {
@@ -501,16 +500,23 @@ SaltGrain::from_url (const std::string &url_in)
     }
     sami_url.setPath (path_comp.join (QString::fromUtf8 ("/")));
 
-    url = tl::to_string (sami_url.toString ());
+    url_in = tl::to_string (sami_url.toString ());
 
   }
 
   std::string spec_url = SaltGrain::spec_url (url);
   if (spec_url.find ("http:") == 0 || spec_url.find ("https:") == 0) {
-    stream.reset (tl::WebDAVObject::download_item (spec_url));
+    return tl::WebDAVObject::download_item (spec_url);
   } else {
-    stream.reset (new tl::InputStream (spec_url));
+    return new tl::InputStream (spec_url);
   }
+}
+
+SaltGrain
+SaltGrain::from_url (const std::string &url_in)
+{
+  std::string url = url_in;
+  std::auto_ptr<tl::InputStream> stream (stream_from_url (url));
 
   SaltGrain g;
   g.load (*stream);

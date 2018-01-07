@@ -24,6 +24,8 @@
 #include "tlHttpStream.h"
 #include "tlUnitTest.h"
 
+#include <QCoreApplication>
+
 static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
 static std::string test_url2 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1");
 
@@ -72,4 +74,39 @@ TEST(2)
     "</D:response>\n"
     "</D:multistatus>\n"
   );
+}
+
+namespace
+{
+
+class Receiver : public tl::Object
+{
+public:
+  Receiver () : flag (false) { }
+  void handle () { flag = true; }
+  bool flag;
+};
+
+}
+
+//  async mode
+TEST(3)
+{
+  tl::InputHttpStream stream (test_url1);
+
+  Receiver r;
+  stream.ready ().add (&r, &Receiver::handle);
+
+  stream.send ();
+  EXPECT_EQ (stream.data_available (), false);
+
+  while (! stream.data_available ()) {
+    QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
+  }
+  EXPECT_EQ (r.flag, true);
+
+  char b[100];
+  size_t n = stream.read (b, sizeof (b));
+  std::string res (b, n);
+  EXPECT_EQ (res, "hello, world.\n");
 }

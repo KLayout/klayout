@@ -123,7 +123,7 @@ InputHttpStream::InputHttpStream (const std::string &url)
 
 InputHttpStream::~InputHttpStream ()
 {
-  //  .. nothing yet ..
+  // .. nothing yet ..
 }
 
 void
@@ -166,6 +166,7 @@ InputHttpStream::finished (QNetworkReply *reply)
     issue_request (QUrl (redirect_target.toString ()));
   } else {
     mp_reply = reply;
+    m_ready ();
   }
 }
 
@@ -203,6 +204,14 @@ InputHttpStream::issue_request (const QUrl &url)
     mp_active_reply.reset (s_network_manager->sendCustomRequest (request, m_request, mp_buffer));
   }
 #endif
+}
+
+void
+InputHttpStream::send ()
+{
+  if (mp_reply == 0) {
+    issue_request (QUrl (tl::to_qstring (m_url)));
+  }
 }
 
 size_t 

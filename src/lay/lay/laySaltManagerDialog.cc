@@ -113,7 +113,8 @@ private:
 SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const std::string &salt_mine_url)
   : QDialog (parent),
     m_salt_mine_url (salt_mine_url),
-    dm_update_models (this, &SaltManagerDialog::update_models), m_current_tab (-1)
+    dm_update_models (this, &SaltManagerDialog::update_models), m_current_tab (-1),
+    mp_downloaded_target (0)
 {
   Ui::SaltManagerDialog::setupUi (this);
   mp_properties_dialog = new lay::SaltGrainPropertiesDialog (this);
@@ -125,18 +126,6 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
   connect (apply_update_button, SIGNAL (clicked ()), this, SLOT (apply ()));
 
   mp_salt = salt;
-
-  QApplication::setOverrideCursor (Qt::WaitCursor);
-  try {
-    if (! m_salt_mine_url.empty ()) {
-      tl::log << tl::to_string (tr ("Downloading package repository from %1").arg (tl::to_qstring (m_salt_mine_url)));
-      m_salt_mine.load (m_salt_mine_url);
-    }
-    m_salt_mine.consolidate ();
-  } catch (tl::Exception &ex) {
-    tl::error << ex.msg ();
-  }
-  QApplication::restoreOverrideCursor ();
 
   SaltModel *model = new SaltModel (this, mp_salt);
   model->set_empty_explanation (tr ("No packages are present on this system"));
@@ -234,7 +223,7 @@ SaltManagerDialog::SaltManagerDialog (QWidget *parent, lay::Salt *salt, const st
   connect (actionMarkForUpdate, SIGNAL (triggered ()), this, SLOT (mark_clicked ()));
   connect (actionUnmarkForUpdate, SIGNAL (triggered ()), this, SLOT (mark_clicked ()));
 
-  update_models ();
+  refresh ();
 }
 
 void
@@ -245,10 +234,13 @@ SaltManagerDialog::mode_changed ()
 
   QList<int> sizes;
   if (m_current_tab == 2) {
+    selected_changed ();
     sizes = splitter->sizes ();
   } else if (m_current_tab == 1) {
+    mine_update_selected_changed ();
     sizes = splitter_update->sizes ();
   } else if (m_current_tab == 0) {
+    mine_new_selected_changed ();
     sizes = splitter_new->sizes ();
   }
 
@@ -268,6 +260,7 @@ SaltManagerDialog::mode_changed ()
   }
 
   m_current_tab = mode_tab->currentIndex ();
+  update_apply_state ();
 }
 
 void
@@ -437,7 +430,7 @@ SaltManagerDialog::update_apply_state ()
 {
   SaltModel *model;
 
-  model  = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
+  model = dynamic_cast <SaltModel *> (salt_mine_view_new->model ());
   if (model) {
 
     int marked = 0;
@@ -665,30 +658,61 @@ SaltManagerDialog::salt_mine_about_to_change ()
 void
 SaltManagerDialog::refresh ()
 {
-BEGIN_PROTECTED
-
   if (! m_salt_mine_url.empty ()) {
 
     tl::log << tl::to_string (tr ("Downloading package repository from %1").arg (tl::to_qstring (m_salt_mine_url)));
 
-    try {
+    m_salt_mine_reader.reset (new tl::InputStream (m_salt_mine_url));
+    salt_mine_download_started ();
 
-      QApplication::setOverrideCursor (Qt::WaitCursor);
-
-      lay::Salt new_mine;
-      new_mine.load (m_salt_mine_url);
-      m_salt_mine = new_mine;
-
-      QApplication::restoreOverrideCursor ();
-
-    } catch (...) {
-      QApplication::restoreOverrideCursor ();
-      throw;
+    tl::InputHttpStream *http = dynamic_cast<tl::InputHttpStream *> (m_salt_mine_reader->base ());
+    if (http) {
+      //  async reading on HTTP
+      http->ready ().add (this, &SaltManagerDialog::salt_mine_data_ready);
+      http->send ();
+    } else {
+      salt_mine_data_ready ();
     }
 
-    salt_mine_changed ();
-
   }
+}
+
+void
+SaltManagerDialog::salt_mine_download_started ()
+{
+  QApplication::setOverrideCursor (Qt::WaitCursor);
+}
+
+void
+SaltManagerDialog::salt_mine_download_finished ()
+{
+  QApplication::restoreOverrideCursor ();
+  m_salt_mine_reader.reset (0);
+}
+
+void
+SaltManagerDialog::salt_mine_data_ready ()
+{
+BEGIN_PROTECTED
+
+  try {
+
+    if (m_salt_mine_reader.get ()) {
+
+      lay::Salt new_mine;
+      new_mine.load (*m_salt_mine_reader);
+      m_salt_mine = new_mine;
+
+    }
+
+    salt_mine_download_finished ();
+
+  } catch (...) {
+    salt_mine_download_finished ();
+    throw;
+  }
+
+  salt_mine_changed ();
 
 END_PROTECTED
 }
@@ -824,10 +848,7 @@ SaltManagerDialog::update_models ()
     salt_mine_view_new->selectionModel ()->blockSignals (false);
   }
 
-  mine_new_selected_changed ();
-  mine_update_selected_changed ();
-  selected_changed ();
-  update_apply_state ();
+  mode_changed ();
 }
 
 void
@@ -929,12 +950,13 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
     return;
   }
 
-  std::auto_ptr<lay::SaltGrain> remote_grain;
+  m_downloaded_grain.reset (0);
+  m_downloaded_grain_reader.reset (0);
+  mp_downloaded_target = details;
+  m_salt_mine_grain.reset (new lay::SaltGrain (*g));
 
   //  Download actual grain definition file
   try {
-
-    QApplication::setOverrideCursor (Qt::WaitCursor);
 
     if (g->url ().empty ()) {
       throw tl::Exception (tl::to_string (tr ("No download link available")));
@@ -954,44 +976,75 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
 
     details->setHtml (html);
 
-    QApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
+    std::string url = g->url ();
+    m_downloaded_grain_reader.reset (SaltGrain::stream_from_url (url));
+    m_downloaded_grain.reset (new SaltGrain ());
+    m_downloaded_grain->set_url (url);
 
-    remote_grain.reset (new SaltGrain (SaltGrain::from_url (g->url ())));
-
-    if (g->name () != remote_grain->name ()) {
-      throw tl::Exception (tl::to_string (tr ("Name mismatch between repository and actual package (repository: %1, package: %2)").arg (tl::to_qstring (g->name ())).arg (tl::to_qstring (remote_grain->name ()))));
+    tl::InputHttpStream *http = dynamic_cast<tl::InputHttpStream *> (m_downloaded_grain_reader->base ());
+    if (http) {
+      //  async reading on HTTP
+      http->ready ().add (this, &SaltManagerDialog::data_ready);
+      http->send ();
+    } else {
+      data_ready ();
     }
-    if (SaltGrain::compare_versions (g->version (), remote_grain->version ()) != 0) {
-      throw tl::Exception (tl::to_string (tr ("Version mismatch between repository and actual package (repository: %1, package: %2)").arg (tl::to_qstring (g->version ())).arg (tl::to_qstring (remote_grain->version ()))));
-    }
-
-    details->set_grain (remote_grain.get ());
-
-    QApplication::restoreOverrideCursor ();
 
   } catch (tl::Exception &ex) {
-
-    QApplication::restoreOverrideCursor ();
-
-    remote_grain.reset (0);
-
-    QString html = tr (
-      "<html>"
-        "<body>"
-          "<font color=\"#ff0000\">"
-            "<h2>Error Fetching Package Definition</h2>"
-            "<p><b>URL</b>: %1</p>"
-            "<p><b>Error</b>: %2</p>"
-          "</font>"
-        "</body>"
-      "</html>"
-    )
-    .arg (tl::to_qstring (SaltGrain::spec_url (g->url ())))
-    .arg (tl::to_qstring (tl::escaped_to_html (ex.msg ())));
-
-    details->setHtml (html);
-
+    show_error (ex);
   }
+}
+
+void
+SaltManagerDialog::data_ready ()
+{
+  if (! m_salt_mine_grain.get () || ! m_downloaded_grain.get () || ! m_downloaded_grain_reader.get () || ! mp_downloaded_target) {
+    return;
+  }
+
+  m_downloaded_grain->load (*m_downloaded_grain_reader);
+
+  try {
+
+    if (m_salt_mine_grain->name () != m_downloaded_grain->name ()) {
+      throw tl::Exception (tl::to_string (tr ("Name mismatch between repository and actual package (repository: %1, package: %2)").arg (tl::to_qstring (m_salt_mine_grain->name ())).arg (tl::to_qstring (m_downloaded_grain->name ()))));
+    }
+    if (SaltGrain::compare_versions (m_salt_mine_grain->version (), m_downloaded_grain->version ()) != 0) {
+      throw tl::Exception (tl::to_string (tr ("Version mismatch between repository and actual package (repository: %1, package: %2)").arg (tl::to_qstring (m_salt_mine_grain->version ())).arg (tl::to_qstring (m_downloaded_grain->version ()))));
+    }
+
+    mp_downloaded_target->set_grain (m_downloaded_grain.get ());
+
+    m_downloaded_grain.reset (0);
+    m_downloaded_grain_reader.reset (0);
+    m_salt_mine_grain.reset (0);
+
+  } catch (tl::Exception &ex) {
+    show_error (ex);
+  }
+}
+
+void
+SaltManagerDialog::show_error (tl::Exception &ex)
+{
+  QString html = tr (
+    "<html>"
+      "<body>"
+        "<font color=\"#ff0000\">"
+          "<h2>Error Fetching Package Definition</h2>"
+          "<p><b>URL</b>: %1</p>"
+          "<p><b>Error</b>: %2</p>"
+        "</font>"
+      "</body>"
+    "</html>"
+  )
+  .arg (tl::to_qstring (m_downloaded_grain->url ()))
+  .arg (tl::to_qstring (tl::escaped_to_html (ex.msg ())));
+  mp_downloaded_target->setHtml (html);
+
+  m_downloaded_grain.reset (0);
+  m_downloaded_grain_reader.reset (0);
+  m_salt_mine_grain.reset (0);
 }
 
 }

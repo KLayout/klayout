@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ static lay::MacroController::MacroCategory drc_cat ()
 }
 
 void
-MacroController::finish (bool load)
+MacroController::finish ()
 {
   //  Scan built-in macros
   //  These macros are always taken, even if there are no macros requested (they are required to
@@ -96,10 +96,14 @@ MacroController::finish (bool load)
   m_macro_categories.push_back (python_cat ());
   m_macro_categories.push_back (drc_cat ());
 
+  //  scans the macros from techs and packages (this will allow autorun-early on them)
+  //  and updates m_external_paths
+  sync_macro_sources ();
+
   //  Scan for macros and set interpreter path
   for (std::vector <InternalPathDescriptor>::const_iterator p = m_internal_paths.begin (); p != m_internal_paths.end (); ++p) {
 
-    if (load) {
+    if (! m_no_implicit_macros) {
 
       for (size_t c = 0; c < m_macro_categories.size (); ++c) {
 
@@ -137,6 +141,19 @@ MacroController::finish (bool load)
     }
 
   }
+
+
+  //  Scan for macros in packages and techs
+
+  if (! m_no_implicit_macros) {
+    for (std::vector <ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
+      lym::MacroCollection::root ().add_folder (p->description, p->path, p->cat, p->readonly);
+    }
+  }
+
+  //  Set the interpreter path to packages too
+
+  sync_package_paths ();
 }
 
 void
@@ -275,7 +292,7 @@ MacroController::drop_url (const std::string &path_or_url)
                                QMessageBox::No) == QMessageBox::Yes) {
 
       //  Use the application data folder
-      QDir folder (tl::to_qstring (lay::Application::instance ()->appdata_path ()));
+      QDir folder (tl::to_qstring (lay::ApplicationBase::instance ()->appdata_path ()));
 
       std::string cat = "macros";
       if (! macro->category ().empty ()) {
@@ -283,7 +300,7 @@ MacroController::drop_url (const std::string &path_or_url)
       }
 
       if (! folder.cd (tl::to_qstring (cat))) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Folder '%s' does not exists in installation path '%s' - cannot install")).c_str (), cat, lay::Application::instance ()->appdata_path ());
+        throw tl::Exception (tl::to_string (QObject::tr ("Folder '%s' does not exists in installation path '%s' - cannot install")).c_str (), cat, lay::ApplicationBase::instance ()->appdata_path ());
       }
 
       QFileInfo target (folder, file_name);
@@ -377,10 +394,106 @@ void
 MacroController::sync_implicit_macros (bool ask_before_autorun)
 {
   if (m_no_implicit_macros) {
-    sync_package_paths ();
-    return;
-  }
 
+    sync_macro_sources ();
+    sync_package_paths ();
+
+  } else {
+
+    //  determine the paths currently in use
+    std::map<std::string, const ExternalPathDescriptor *> prev_folders_by_path;
+    for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
+      prev_folders_by_path.insert (std::make_pair (p->path, p.operator-> ()));
+    }
+
+    //  gets the external paths (tech, packages) into m_external_paths
+    sync_macro_sources ();
+
+    //  delete macro collections which are no longer required or update description
+
+    std::vector<lym::MacroCollection *> folders_to_delete;
+
+    //  determine the paths that will be in use
+    std::map<std::string, const ExternalPathDescriptor *> new_folders_by_path;
+    for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
+      new_folders_by_path.insert (std::make_pair (p->path, p.operator-> ()));
+    }
+
+    lym::MacroCollection *root = &lym::MacroCollection::root ();
+
+    for (lym::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
+      if (m->second->virtual_mode () == lym::MacroCollection::TechFolder ||
+          m->second->virtual_mode () == lym::MacroCollection::SaltFolder) {
+        std::map<std::string, const ExternalPathDescriptor *>::const_iterator u = new_folders_by_path.find (m->second->path ());
+        if (u == new_folders_by_path.end ()) {
+          //  no longer used
+          folders_to_delete.push_back (m->second);
+        } else {
+          m->second->set_description (u->second->description);
+        }
+      }
+    }
+
+    for (std::vector<lym::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
+      if (tl::verbosity () >= 20) {
+        tl::info << "Removing macro folder " << (*m)->path () << ", category '" << (*m)->category () << "' because no longer in use";
+      }
+      root->erase (*m);
+    }
+
+    //  sync the search paths with the packages
+    sync_package_paths ();
+
+    //  add new folders
+    std::vector<lym::MacroCollection *> new_folders;
+
+    for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
+
+      if (prev_folders_by_path.find (p->path) != prev_folders_by_path.end ()) {
+        continue;
+      }
+
+      if (tl::verbosity () >= 20) {
+        tl::info << "Adding macro folder " << p->path << ", category '" << p->cat << "' for '" << p->description << "'";
+      }
+
+      //  Add the folder. Note: it may happen that a macro folder for the tech specific macros already exists in
+      //  a non-tech context.
+      //  In that case, the add_folder method will return 0.
+
+      //  TODO: is it wise to make this writeable?
+      lym::MacroCollection *mc = lym::MacroCollection::root ().add_folder (p->description, p->path, p->cat, p->readonly);
+      if (mc) {
+        mc->set_virtual_mode (p->type);
+        new_folders.push_back (mc);
+      }
+
+    }
+
+    {
+      //  This prevents the message dialog below to issue deferred methods
+      tl::NoDeferredMethods silent;
+
+      bool has_autorun = false;
+      for (std::vector<lym::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end () && ! has_autorun; ++m) {
+        has_autorun = (*m)->has_autorun ();
+      }
+
+      if (has_autorun) {
+        if (! ask_before_autorun || QMessageBox::question (mp_mw, QObject::tr ("Run Macros"), QObject::tr ("Some macros associated with new items are configured to run automatically.\n\nChoose 'Yes' to run these macros now. Choose 'No' to not run them."), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+          for (std::vector<lym::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end (); ++m) {
+            (*m)->autorun ();
+          }
+        }
+      }
+    }
+
+  }
+}
+
+void
+MacroController::sync_macro_sources ()
+{
   std::vector<ExternalPathDescriptor> external_paths;
 
   //  Add additional places where the technologies define some macros
@@ -480,96 +593,8 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
 
   }
 
-  //  delete macro collections which are no longer required or update description
-
-  std::vector<lym::MacroCollection *> folders_to_delete;
-
-  //  determine the paths that will be in use
-  std::map<std::string, const ExternalPathDescriptor *> new_folders_by_path;
-  for (std::vector<ExternalPathDescriptor>::const_iterator p = external_paths.begin (); p != external_paths.end (); ++p) {
-    new_folders_by_path.insert (std::make_pair (p->path, p.operator-> ()));
-  }
-
-  //  determine the paths currently in use
-  std::map<std::string, const ExternalPathDescriptor *> prev_folders_by_path;
-  for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
-    prev_folders_by_path.insert (std::make_pair (p->path, p.operator-> ()));
-  }
-
-  lym::MacroCollection *root = &lym::MacroCollection::root ();
-
-  for (lym::MacroCollection::child_iterator m = root->begin_children (); m != root->end_children (); ++m) {
-    if (m->second->virtual_mode () == lym::MacroCollection::TechFolder ||
-        m->second->virtual_mode () == lym::MacroCollection::SaltFolder) {
-      std::map<std::string, const ExternalPathDescriptor *>::const_iterator u = new_folders_by_path.find (m->second->path ());
-      if (u == new_folders_by_path.end ()) {
-        //  no longer used
-        folders_to_delete.push_back (m->second);
-      } else {
-        m->second->set_description (u->second->description);
-      }
-    }
-  }
-
-  for (std::vector<lym::MacroCollection *>::iterator m = folders_to_delete.begin (); m != folders_to_delete.end (); ++m) {
-    if (tl::verbosity () >= 20) {
-      tl::info << "Removing macro folder " << (*m)->path () << ", category '" << (*m)->category () << "' because no longer in use";
-    }
-    root->erase (*m);
-  }
-
-  //  sync the search paths with the packages 
-  sync_package_paths ();
-
   //  store new paths
   m_external_paths = external_paths;
-
-  //  add new folders
-
-  std::vector<lym::MacroCollection *> new_folders;
-
-  for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
-
-    if (prev_folders_by_path.find (p->path) != prev_folders_by_path.end ()) {
-      continue;
-    }
-
-    if (tl::verbosity () >= 20) {
-      tl::info << "Adding macro folder " << p->path << ", category '" << p->cat << "' for '" << p->description << "'";
-    }
-
-    //  Add the folder. Note: it may happen that a macro folder for the tech specific macros already exists in
-    //  a non-tech context.
-    //  In that case, the add_folder method will return 0.
-
-    //  TODO: is it wise to make this writeable?
-    lym::MacroCollection *mc = lym::MacroCollection::root ().add_folder (p->description, p->path, p->cat, p->readonly);
-    if (mc) {
-      mc->set_virtual_mode (p->type);
-      new_folders.push_back (mc);
-    }
-
-  }
-
-  {
-
-    //  This prevents the message dialog below to issue deferred methods
-    tl::NoDeferredMethods silent;
-
-    bool has_autorun = false;
-    for (std::vector<lym::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end () && ! has_autorun; ++m) {
-      has_autorun = (*m)->has_autorun ();
-    }
-
-    if (has_autorun) {
-      if (! ask_before_autorun || QMessageBox::question (mp_mw, QObject::tr ("Run Macros"), QObject::tr ("Some macros associated with new items are configured to run automatically.\n\nChoose 'Yes' to run these macros now. Choose 'No' to not run them."), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-        for (std::vector<lym::MacroCollection *>::const_iterator m = new_folders.begin (); m != new_folders.end (); ++m) {
-          (*m)->autorun ();
-        }
-      }
-    }
-
-  }
 }
 
 void

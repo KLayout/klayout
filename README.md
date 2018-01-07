@@ -9,14 +9,10 @@ For more details see http://www.klayout.org.
 
 ## Building requirements
 
-* Qt 4.8 or later (4.6 with some restrictions)
-* gcc 4.x or later
+* Qt 4.7 or later (4.6 with some restrictions) or Qt 5
+* gcc 4.6 or later or clang 3.8 or later
 
-Here is a list of packages required for various Linux flavors:
-
-* CentOS (6, 7): gcc gcc-c++ make qt qt-devel ruby ruby-devel python python-devel
-* OpenSuSE: (13.2, 41.1): gcc gcc-c++ make libqt4 libqt4-devel ruby ruby-devel python3 python3-devel 
-* Ubuntu (14.04, 16.10): gcc g++ make libz-dev libqt4-dev-bin libqt4-dev ruby ruby-dev python3 python3-dev
+For more build instructions see http://www.klayout.de/build.html.
 
 ## Build options
 

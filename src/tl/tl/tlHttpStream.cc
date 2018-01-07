@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ InputHttpStream::InputHttpStream (const std::string &url)
 
 InputHttpStream::~InputHttpStream ()
 {
-  //  .. nothing yet ..
+  // .. nothing yet ..
 }
 
 void
@@ -166,6 +166,7 @@ InputHttpStream::finished (QNetworkReply *reply)
     issue_request (QUrl (redirect_target.toString ()));
   } else {
     mp_reply = reply;
+    m_ready ();
   }
 }
 
@@ -185,6 +186,14 @@ InputHttpStream::issue_request (const QUrl &url)
     }
     request.setRawHeader (QByteArray (h->first.c_str ()), QByteArray (h->second.c_str ()));
   }
+
+#if QT_VERSION < 0x40700
+  if (m_request == "GET" && m_data.isEmpty ()) {
+    mp_active_reply.reset (s_network_manager->get (request));
+  } else {
+    throw tl::Exception (tl::to_string (QObject::tr ("Custom HTTP requests are not supported in this build (verb is %1)").arg (QString::fromUtf8 (m_request))));
+  }
+#else
   if (m_data.isEmpty ()) {
     mp_active_reply.reset (s_network_manager->sendCustomRequest (request, m_request));
   } else {
@@ -193,6 +202,15 @@ InputHttpStream::issue_request (const QUrl &url)
     }
     mp_buffer = new QBuffer (&m_data);
     mp_active_reply.reset (s_network_manager->sendCustomRequest (request, m_request, mp_buffer));
+  }
+#endif
+}
+
+void
+InputHttpStream::send ()
+{
+  if (mp_reply == 0) {
+    issue_request (QUrl (tl::to_qstring (m_url)));
   }
 }
 

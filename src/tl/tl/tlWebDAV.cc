@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -256,7 +256,7 @@ WebDAVObject::download_item (const std::string &url)
   tl::InputHttpStream *http = new tl::InputHttpStream (url);
   //  This trick allows accessing GitHub repos through their SVN API
   http->add_header ("User-Agent", "SVN");
-  return new tl::InputStream (*http);
+  return new tl::InputStream (http);
 }
 
 bool

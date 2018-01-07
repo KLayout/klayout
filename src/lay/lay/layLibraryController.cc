@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ LibraryController::sync_files ()
   //  build a list of paths vs. technology
   std::vector<std::pair<std::string, std::string> > paths;
 
-  std::vector<std::string> klayout_path = lay::Application::instance ()->klayout_path ();
+  std::vector<std::string> klayout_path = lay::ApplicationBase::instance ()->klayout_path ();
   for (std::vector<std::string>::const_iterator p = klayout_path.begin (); p != klayout_path.end (); ++p) {
     paths.push_back (std::make_pair (*p, std::string ()));
   }

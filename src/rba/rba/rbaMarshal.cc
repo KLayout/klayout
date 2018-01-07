@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -481,7 +481,7 @@ push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, VALUE arg, tl::He
 template <class R>
 struct reader
 {
-  void operator() (gsi::SerialArgs *rr, VALUE *ret, const gsi::ArgType &arg, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &arg, tl::Heap *heap)
   {
     if (arg.is_ref ()) {
       *ret = c2ruby<R> (rr->template read<R &> (*heap));
@@ -516,7 +516,7 @@ struct reader
 template <>
 struct reader<void *>
 {
-  void operator() (gsi::SerialArgs *rr, VALUE *ret, const gsi::ArgType &arg, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &arg, tl::Heap *heap)
   {
     tl_assert (! arg.is_cref ());
     tl_assert (! arg.is_ref ());
@@ -532,7 +532,7 @@ struct reader<void *>
 template <>
 struct reader<gsi::StringType>
 {
-  void operator() (gsi::SerialArgs *rr, VALUE *ret, const gsi::ArgType &, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &, tl::Heap *heap)
   {
     std::auto_ptr<gsi::StringAdaptor> a ((gsi::StringAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
@@ -543,7 +543,7 @@ struct reader<gsi::StringType>
   }
 };
 
-static VALUE object_from_variant (const tl::Variant &var, const gsi::ArgType &atype)
+static VALUE object_from_variant (const tl::Variant &var, Proxy *self, const gsi::ArgType &atype)
 {
   if (var.is_user()) {
 
@@ -588,7 +588,7 @@ static VALUE object_from_variant (const tl::Variant &var, const gsi::ArgType &at
 
     }
 
-    return object_to_ruby ((void *) var.to_user (), var.user_cls ()->gsi_cls (), pass_obj, is_const, prefer_copy, can_destroy);
+    return object_to_ruby ((void *) var.to_user (), self, var.user_cls ()->gsi_cls (), pass_obj, is_const, prefer_copy, can_destroy);
 
   } else {
     return c2ruby<tl::Variant> (var);
@@ -601,7 +601,7 @@ static VALUE object_from_variant (const tl::Variant &var, const gsi::ArgType &at
 template <>
 struct reader<gsi::VariantType>
 {
-  void operator() (gsi::SerialArgs *rr, VALUE *ret, const gsi::ArgType &atype, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy *self, const gsi::ArgType &atype, tl::Heap *heap)
   {
     std::auto_ptr<gsi::VariantAdaptor> a ((gsi::VariantAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
@@ -610,9 +610,9 @@ struct reader<gsi::VariantType>
       gsi::VariantAdaptorImpl<tl::Variant> *aa = dynamic_cast<gsi::VariantAdaptorImpl<tl::Variant> *> (a.get ());
       if (aa) {
         //  A small optimization that saves one variant copy
-        *ret = object_from_variant (aa->var_ref (), atype);
+        *ret = object_from_variant (aa->var_ref (), self, atype);
       } else {
-        *ret = object_from_variant (a->var (), atype);
+        *ret = object_from_variant (a->var (), self, atype);
       }
     }
   }
@@ -624,7 +624,7 @@ struct reader<gsi::VariantType>
 template <>
 struct reader<gsi::VectorType>
 {
-  void operator() (gsi::SerialArgs *rr, VALUE *ret, const gsi::ArgType &atype, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
   {
     std::auto_ptr<gsi::VectorAdaptor> a ((gsi::VectorAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
@@ -644,7 +644,7 @@ struct reader<gsi::VectorType>
 template <>
 struct reader<gsi::MapType>
 {
-  void operator() (gsi::SerialArgs *rr, VALUE *ret, const gsi::ArgType &atype, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
   {
     std::auto_ptr<gsi::MapAdaptor> a ((gsi::MapAdaptor *) rr->read<void *>(*heap));
     if (!a.get ()) {
@@ -665,13 +665,13 @@ struct reader<gsi::MapType>
 template <>
 struct reader<gsi::ObjectType>
 {
-  void operator() (gsi::SerialArgs *rr, VALUE *ret, const gsi::ArgType &atype, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, VALUE *ret, Proxy *self, const gsi::ArgType &atype, tl::Heap *heap)
   {
     void *obj = rr->read<void *> (*heap);
     if (! obj) {
       *ret = Qnil;
     } else {
-      *ret = object_to_ruby (obj, atype);
+      *ret = object_to_ruby (obj, self, atype);
     }
   }
 };
@@ -679,7 +679,7 @@ struct reader<gsi::ObjectType>
 template <>
 struct reader<gsi::VoidType>
 {
-  void operator() (gsi::SerialArgs * /*rr*/, VALUE * /*ret*/, const gsi::ArgType & /*atype*/, tl::Heap * /*heap*/)
+  void operator() (gsi::SerialArgs * /*rr*/, VALUE * /*ret*/, Proxy * /*self*/, const gsi::ArgType & /*atype*/, tl::Heap * /*heap*/)
   {
     //  .. nothing: void is not serialized
   }
@@ -755,7 +755,7 @@ gsi::VectorAdaptorIterator *RubyBasedVectorAdaptor::create_iterator () const
 void RubyBasedVectorAdaptor::push (gsi::SerialArgs &r, tl::Heap &heap)
 {
   VALUE member;
-  gsi::do_on_type<reader> () (mp_ainner->type (), &r, &member, *mp_ainner, &heap);
+  gsi::do_on_type<reader> () (mp_ainner->type (), &r, &member, (Proxy *) 0, *mp_ainner, &heap);
   rb_ary_push (m_array, member);
 }
 
@@ -831,8 +831,8 @@ gsi::MapAdaptorIterator *RubyBasedMapAdaptor::create_iterator () const
 void RubyBasedMapAdaptor::insert (gsi::SerialArgs &r, tl::Heap &heap)
 {
   VALUE k, v;
-  gsi::do_on_type<reader> () (mp_ainner_k->type (), &r, &k, *mp_ainner_k, &heap);
-  gsi::do_on_type<reader> () (mp_ainner->type (), &r, &v, *mp_ainner, &heap);
+  gsi::do_on_type<reader> () (mp_ainner_k->type (), &r, &k, (Proxy *) 0, *mp_ainner_k, &heap);
+  gsi::do_on_type<reader> () (mp_ainner->type (), &r, &v, (Proxy *) 0, *mp_ainner, &heap);
   rb_hash_aset (m_hash, k, v);
 }
 
@@ -855,10 +855,10 @@ size_t RubyBasedMapAdaptor::serial_size () const
 //  Pops an argument from the call or return stack
 
 VALUE
-pop_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, tl::Heap &heap)
+pop_arg (const gsi::ArgType &atype, Proxy *self, gsi::SerialArgs &aserial, tl::Heap &heap)
 {
   VALUE ret = Qnil;
-  gsi::do_on_type<reader> () (atype.type (), &aserial, &ret, atype, &heap);
+  gsi::do_on_type<reader> () (atype.type (), &aserial, &ret, self, atype, &heap);
   return ret;
 }
 

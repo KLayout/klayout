@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -359,7 +359,7 @@ tl::Variant python2c<tl::Variant> (PyObject *rval, tl::Heap *heap)
 }
 
 PyObject *
-object_to_python (void *obj, const gsi::ArgType &atype)
+object_to_python (void *obj, PYAObjectBase *self, const gsi::ArgType &atype)
 {
   const gsi::ClassBase *cls = atype.cls()->subclass_decl (obj);
 
@@ -369,7 +369,7 @@ object_to_python (void *obj, const gsi::ArgType &atype)
   bool prefer_copy = atype.is_cref ();
   bool can_destroy = prefer_copy || atype.is_ptr ();
 
-  return object_to_python (obj, cls, pass_obj, is_const, prefer_copy, can_destroy);
+  return object_to_python (obj, self, cls, pass_obj, is_const, prefer_copy, can_destroy);
 }
 
 /**
@@ -390,7 +390,7 @@ void correct_constness (PyObject *obj, bool const_required)
 }
 
 PyObject *
-object_to_python (void *obj, const gsi::ClassBase *cls, bool pass_obj, bool is_const, bool prefer_copy, bool can_destroy)
+object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, bool pass_obj, bool is_const, bool prefer_copy, bool can_destroy)
 {
   if (! obj || ! cls) {
     Py_RETURN_NONE;
@@ -402,7 +402,13 @@ object_to_python (void *obj, const gsi::ClassBase *cls, bool pass_obj, bool is_c
   }
 
   PYAObjectBase *pya_object = 0;
-  if (! clsact->adapted_type_info () && clsact->is_managed ()) {
+
+  if (self && self->obj () == obj) {
+
+    //  reuse self if the object to be converted is self
+    pya_object = self;
+
+  } else if (! clsact->adapted_type_info () && clsact->is_managed ()) {
 
     StatusChangedListener *client = clsact->gsi_object (obj)->find_client<StatusChangedListener> ();
     if (client) {
@@ -504,7 +510,7 @@ PyObject *c2python<tl::Variant> (const tl::Variant &c)
     const gsi::ClassBase *cls = c.gsi_cls ();
     if (cls) {
       void *obj = const_cast<void *> (c.to_user ());
-      return object_to_python (obj, c.user_cls ()->gsi_cls (), false, false, true, false);
+      return object_to_python (obj, 0, c.user_cls ()->gsi_cls (), false, false, true, false);
     } else {
       //  not a known type -> return nil
       Py_RETURN_NONE;

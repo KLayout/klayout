@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -600,10 +600,10 @@ db::Instance ChangeInstanceTransApplicator::do_apply_inst (db::Cell &cell, const
     db::Vector disp = tr.disp ();
 
     if (fabs (m_disp.x () - m_org_disp.x ()) > 1e-6) {
-      disp.set_x (m_disp.x () / dbu);
+      disp.set_x (db::coord_traits<db::Coord>::rounded (m_disp.x () / dbu));
     }
     if (fabs (m_disp.y () - m_org_disp.y ()) > 1e-6) {
-      disp.set_y (m_disp.y () / dbu);
+      disp.set_y (db::coord_traits<db::Coord>::rounded (m_disp.y () / dbu));
     }
 
     double mag = fabs (m_mag - m_org_mag) > 1e-6 ? m_mag : tr.mag ();

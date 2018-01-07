@@ -131,7 +131,7 @@
 
     <li>
     <p>
-    <b>transformed_cplx(ICplxTrans)</b>: returns the box transformed with the given complex, integer-based transformation (see <class_doc href="ICplxTrans"/>). 
+    <b>transformed(ICplxTrans)</b>: returns the box transformed with the given complex, integer-based transformation (see <class_doc href="ICplxTrans"/>). 
     Note, that if the complex transformation includes a rotation by a non-90-degree angle (for example 45 degree), this operation
     does not return a rotated box, because by definition a box has edges which are parallel to the axes. Hence the general 
     solution is to convert the box to a polygon:
@@ -139,15 +139,15 @@
 
     <pre># Wrong result
 box = RBA::Box::new(0, 0, 100, 200)
-transformed_box = box.transformed_cplx(RBA::ICplxTrans::new(1, 45, false, RBA::Vector::new))
+transformed_box = box.transformed(RBA::ICplxTrans::new(1, 45, false, RBA::Vector::new))
 # -&gt; (-141,0;71,212)
 
 # Correct result
-transformed_box_as_polygon = RBA::Polygon::new(box).transformed_cplx(RBA::ICplxTrans::new(1, 45, false, RBA::Vector::new))
+transformed_box_as_polygon = RBA::Polygon::new(box).transformed(RBA::ICplxTrans::new(1, 45, false, RBA::Vector::new))
 # -&gt; (0,0;-141,141;-71,212;71,71)</pre>
     </li>
 
-    <li><b>transformed_cplx(CplxTrans)</b>: behaves like the previous "transformed_cplx" method but returns a 
+    <li><b>transformed(CplxTrans)</b>: behaves like the previous "transformed" method but returns a 
     floating-point coordinate object which is the target coordinate type of the CplxTrans object (see <class_doc href="CplxTrans"/>).
     </li>
 
@@ -163,6 +163,10 @@ box = RBA::Box::new(dbox)
 # -&gt; (2,3;11,12)</pre>
 
   <p>An integer box can be turned into a floating-point unit box using <class_doc href="Box#to_dtype"/></p>
+
+  <p>Floating-point boxes can be transformed using the <class_doc href="DTrans"/>, the <class_doc href="DCplxTrans"/> or the <class_doc href="VCplxTrans"/>
+  transformations. The latter delivers an integer-type box and provides the reverse flavour transformation to "CplxTrans".
+  </p>
   
   <h2>The SimplePolygon class</h2>
   
@@ -197,7 +201,7 @@ box = RBA::Box::new(dbox)
   reflecting edges (spikes) as well. <class_doc href="SimplePolygon#inside?"/> returns true, if a given point is inside the polygon. <class_doc href="SimplePolygon#minkowsky_sum"/>
   computes the Minkowsky sum between a polygon and another object in various flavors. <class_doc href="SimplePolygon#move"/> will displace the polygon
   by the distance given by the Point argument. <class_doc href="SimplePolygon#moved"/> will return the moved polygon without modifying the 
-  polygon it is called on (out-of-place operation). <class_doc href="SimplePolygon#transformed"/> and <class_doc href="SimplePolygon#transformed_cplx"/> will return the 
+  polygon it is called on (out-of-place operation). <class_doc href="SimplePolygon#transformed"/> will return the 
   transformed polygon, either with a simple or a complex transformation (see the description of the Box object and the
   section about transformations below for a discussion of transformations). Finally, <class_doc href="SimplePolygon#round_corners"/> will apply a
   corner rounding to a copy of the polygon and return that copy without modifying the polygon.
@@ -293,7 +297,7 @@ box = RBA::Box::new(dbox)
 
   <p>
   <class_doc href="Path#polygon"/> returns the polygon representing the path's hull. <class_doc href="Path#simple_polygon"/> returns a SimplePolygon
-  object that represents the hull. <class_doc href="Path#move"/>, <class_doc href="Path#moved"/>, <class_doc href="Path#transformed"/> and <class_doc href="Path#transformed_cplx"/> basically work
+  object that represents the hull. <class_doc href="Path#move"/>, <class_doc href="Path#moved"/> and <class_doc href="Path#transformed"/> basically work
   like for the other objects.
   </p>
 
@@ -332,7 +336,7 @@ box = RBA::Box::new(dbox)
   </p>
 
   <p>
-  <class_doc href="Text#move"/>, <class_doc href="Text#moved"/>, <class_doc href="Text#transformed"/> and <class_doc href="Text#transformed_cplx"/> basically work
+  <class_doc href="Text#move"/>, <class_doc href="Text#moved"/> and <class_doc href="Text#transformed"/> basically work
   like for the other objects.
   The class method <class_doc href="Text#from_dtext"/> creates a integer-coordinate type Text object from a floating-point coordinate type DText
   object (see below). The floating-point coordinates are rounded to the nearest integer coordinates.
@@ -371,7 +375,7 @@ box = RBA::Box::new(dbox)
   </p>
 
   <p>
-  <class_doc href="Edge#move"/>, <class_doc href="Edge#moved"/>, <class_doc href="Edge#transformed"/> and <class_doc href="Edge#transformed_cplx"/> basically work
+  <class_doc href="Edge#move"/>, <class_doc href="Edge#moved"/> and <class_doc href="Edge#transformed"/> basically work
   like for the other objects.
   The class method <class_doc href="Edge#from_dedge"/> creates a integer-coordinate type Edge object from a floating-point coordinate type DEdge
   object (see below). The floating-point coordinates are rounded to the nearest integer coordinates.

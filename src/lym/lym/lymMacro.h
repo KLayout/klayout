@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -988,6 +988,11 @@ public:
    *  @brief Runs all macros marked with auto-run
    */
   void autorun ();
+
+  /**
+   *  @brief Returns true, if the collection has an early autorun macro
+   */
+  bool has_autorun_early () const;
 
   /**
    *  @brief Runs all macros marked with early auto-run

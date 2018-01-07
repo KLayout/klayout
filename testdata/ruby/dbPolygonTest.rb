@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2017 Matthias Koefferlein
+# Copyright (C) 2006-2018 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -656,6 +656,78 @@ class DBPolygon_TestClass < TestBase
     assert_equal(h[p4b], "p4b")
     assert_equal(h[p4c], "p4c")
     assert_equal(h[p4d], "p4d")
+
+  end
+
+  # touches predicate
+  def test_touches
+
+    p1 = RBA::Polygon::new(RBA::Box::new(10, 20, 30, 40))
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::Box::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Box::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::Box::new(29, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Edge::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Edge::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::Edge::new(29, 20, 40, 50)), true)
+
+    p1 = RBA::SimplePolygon::new(RBA::Box::new(10, 20, 30, 40))
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::Polygon::new(RBA::Box::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::SimplePolygon::new(RBA::Box::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::Box::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Box::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::Box::new(29, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Edge::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::Edge::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::Edge::new(29, 20, 40, 50)), true)
+
+    p1 = RBA::DPolygon::new(RBA::DBox::new(10, 20, 30, 40))
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DBox::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DBox::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::DBox::new(29, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DEdge::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DEdge::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::DEdge::new(29, 20, 40, 50)), true)
+
+    p1 = RBA::DSimplePolygon::new(RBA::DBox::new(10, 20, 30, 40))
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::DPolygon::new(RBA::DBox::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(30, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(31, 20, 40, 50))), false)
+    assert_equal(p1.touches?(RBA::DSimplePolygon::new(RBA::DBox::new(29, 20, 40, 50))), true)
+    assert_equal(p1.touches?(RBA::DBox::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DBox::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::DBox::new(29, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DEdge::new(30, 20, 40, 50)), true)
+    assert_equal(p1.touches?(RBA::DEdge::new(31, 20, 40, 50)), false)
+    assert_equal(p1.touches?(RBA::DEdge::new(29, 20, 40, 50)), true)
+
+  end
+
+  def test_selfRef
+
+    # p1 is a reference to the new'd object:
+    p1 = RBA::Polygon::new(RBA::Box::new(10, 20, 30, 40)).move(10, 20)
+    assert_equal(p1.to_s, "(20,40;20,60;40,60;40,40)")
+    GC.start
+    # after the GC cleaned up the new'd object, the reference still needs to be valid
+    assert_equal(p1.to_s, "(20,40;20,60;40,60;40,40)")
 
   end
 

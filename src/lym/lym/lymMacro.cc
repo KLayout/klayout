@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1787,6 +1787,11 @@ static bool has_autorun_for (const lym::MacroCollection &collection, bool early)
 bool MacroCollection::has_autorun () const
 {
   return has_autorun_for (*this, false);
+}
+
+bool MacroCollection::has_autorun_early () const
+{
+  return has_autorun_for (*this, true);
 }
 
 static void autorun_for (lym::MacroCollection &collection, bool early)

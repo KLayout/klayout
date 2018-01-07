@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -129,6 +129,7 @@ RUBYTEST (layMarkers, "layMarkers.rb")
 RUBYTEST (layMenuTest, "layMenuTest.rb")
 RUBYTEST (laySession, "laySession.rb")
 RUBYTEST (layTechnologies, "layTechnologies.rb")
+RUBYTEST (laySaveLayoutOptions, "laySaveLayoutOptions.rb")
 #if defined(HAVE_QTBINDINGS)
 RUBYTEST (qtbinding, "qtbinding.rb")
 #endif

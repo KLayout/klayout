@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -127,7 +127,7 @@ RubyInterpreter::available () const
 }
 
 int
-RubyInterpreter::initialize (int argc, char **argv, int (*main_cont)(int, char **))
+RubyInterpreter::initialize (int &argc, char **argv, int (*main_cont)(int &, char **))
 {
   return (*main_cont) (argc, argv);
 }

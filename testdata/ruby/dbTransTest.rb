@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2017 Matthias Koefferlein
+# Copyright (C) 2006-2018 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,6 +88,27 @@ class DBTrans_TestClass < TestBase
     assert_equal( ( e * RBA::Polygon::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, -3), RBA::Point::new(4, 5) ] ) ).to_s, "(-5,-4;-1,0;3,-2)" )
     assert_equal( e.trans( RBA::Path::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, 3) ], 10 ) ).to_s, "(-1,0;-3,-2) w=10 bx=0 ex=0 r=false" )
     assert_equal( ( e * RBA::Path::new( [ RBA::Point::new(0, 1), RBA::Point::new(2, 3) ], 10 ) ).to_s, "(-1,0;-3,-2) w=10 bx=0 ex=0 r=false" )
+
+    # Constructor variations
+    assert_equal( RBA::Trans::new().to_s, "r0 0,0" )
+    assert_equal( RBA::Trans::new(1).to_s, "r90 0,0" )
+    assert_equal( RBA::Trans::new(2, true).to_s, "m90 0,0" )
+    assert_equal( RBA::Trans::new(2, true, RBA::Vector::new(100, 200)).to_s, "m90 100,200" )
+    assert_equal( RBA::Trans::new(2, true, 100, 200).to_s, "m90 100,200" )
+    assert_equal( RBA::Trans::new(RBA::Vector::new(100, 200)).to_s, "r0 100,200" )
+    assert_equal( RBA::Trans::new(100, 200).to_s, "r0 100,200" )
+    assert_equal( RBA::Trans::new(RBA::Trans::new(100, 200), 10, 20).to_s, "r0 110,220" )
+    assert_equal( RBA::Trans::new(RBA::Trans::new(100, 200), RBA::Vector::new(10, 20)).to_s, "r0 110,220" )
+
+    assert_equal( RBA::DTrans::new().to_s, "r0 0,0" )
+    assert_equal( RBA::DTrans::new(1).to_s, "r90 0,0" )
+    assert_equal( RBA::DTrans::new(2, true).to_s, "m90 0,0" )
+    assert_equal( RBA::DTrans::new(2, true, RBA::DVector::new(0.1, 0.2)).to_s, "m90 0.1,0.2" )
+    assert_equal( RBA::DTrans::new(2, true, 0.1, 0.2).to_s, "m90 0.1,0.2" )
+    assert_equal( RBA::DTrans::new(RBA::DVector::new(0.1, 0.2)).to_s, "r0 0.1,0.2" )
+    assert_equal( RBA::DTrans::new(0.1, 0.2).to_s, "r0 0.1,0.2" )
+    assert_equal( RBA::DTrans::new(RBA::DTrans::new(0.1, 0.2), 0.01, 0.02).to_s, "r0 0.11,0.22" )
+    assert_equal( RBA::DTrans::new(RBA::DTrans::new(0.1, 0.2), RBA::DVector::new(0.01, 0.02)).to_s, "r0 0.11,0.22" )
 
   end
 
@@ -343,6 +364,33 @@ class DBTrans_TestClass < TestBase
     c.angle = 60
     assert_equal( c.to_s, "r60 *1.5 -1,5.5" )
     assert_equal( sprintf("%g",c.angle), "60" )
+
+    # Constructor variations
+    assert_equal( RBA::ICplxTrans::new().to_s, "r0 *1 0,0" )
+    assert_equal( RBA::ICplxTrans::new(1.5).to_s, "r0 *1.5 0,0" )
+    assert_equal( RBA::ICplxTrans::new(RBA::Trans::new(1, false, 10, 20), 1.5).to_s, "r90 *1.5 10,20" )
+    assert_equal( RBA::ICplxTrans::new(RBA::Trans::new(1, false, 10, 20)).to_s, "r90 *1 10,20" )
+    assert_equal( RBA::ICplxTrans::new(1.5, 80, true, RBA::Vector::new(100, 200)).to_s, "m40 *1.5 100,200" )
+    assert_equal( RBA::ICplxTrans::new(1.5, 80, true, 100, 200).to_s, "m40 *1.5 100,200" )
+    assert_equal( RBA::ICplxTrans::new(RBA::Vector::new(100, 200)).to_s, "r0 *1 100,200" )
+    assert_equal( RBA::ICplxTrans::new(100, 200).to_s, "r0 *1 100,200" )
+    assert_equal( RBA::ICplxTrans::new(RBA::ICplxTrans::new(100, 200)).to_s, "r0 *1 100,200" )
+    assert_equal( RBA::ICplxTrans::new(RBA::ICplxTrans::new(100, 200), 1.5).to_s, "r0 *1.5 150,300" )
+    assert_equal( RBA::ICplxTrans::new(RBA::ICplxTrans::new(100, 200), 1.5, RBA::Vector::new(10, 20)).to_s, "r0 *1.5 160,320" )
+    assert_equal( RBA::ICplxTrans::new(RBA::ICplxTrans::new(100, 200), 1.5, 10, 20).to_s, "r0 *1.5 160,320" )
+
+    assert_equal( RBA::DCplxTrans::new().to_s, "r0 *1 0,0" )
+    assert_equal( RBA::DCplxTrans::new(1.5).to_s, "r0 *1.5 0,0" )
+    assert_equal( RBA::DCplxTrans::new(RBA::DTrans::new(1, false, 0.01, 0.02), 1.5).to_s, "r90 *1.5 0.01,0.02" )
+    assert_equal( RBA::DCplxTrans::new(RBA::DTrans::new(1, false, 0.01, 0.02)).to_s, "r90 *1 0.01,0.02" )
+    assert_equal( RBA::DCplxTrans::new(1.5, 80, true, RBA::DVector::new(0.1, 0.2)).to_s, "m40 *1.5 0.1,0.2" )
+    assert_equal( RBA::DCplxTrans::new(1.5, 80, true, 0.1, 0.2).to_s, "m40 *1.5 0.1,0.2" )
+    assert_equal( RBA::DCplxTrans::new(RBA::DVector::new(0.1, 0.2)).to_s, "r0 *1 0.1,0.2" )
+    assert_equal( RBA::DCplxTrans::new(0.1, 0.2).to_s, "r0 *1 0.1,0.2" )
+    assert_equal( RBA::DCplxTrans::new(RBA::DCplxTrans::new(0.1, 0.2)).to_s, "r0 *1 0.1,0.2" )
+    assert_equal( RBA::DCplxTrans::new(RBA::DCplxTrans::new(0.1, 0.2), 1.5).to_s, "r0 *1.5 0.15,0.3" )
+    assert_equal( RBA::DCplxTrans::new(RBA::DCplxTrans::new(0.1, 0.2), 1.5, RBA::DVector::new(0.01, 0.02)).to_s, "r0 *1.5 0.16,0.32" )
+    assert_equal( RBA::DCplxTrans::new(RBA::DCplxTrans::new(0.1, 0.2), 1.5, 0.01, 0.02).to_s, "r0 *1.5 0.16,0.32" )
 
   end
 

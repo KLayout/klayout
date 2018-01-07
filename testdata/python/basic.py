@@ -1,5 +1,5 @@
 # KLayout Layout Viewer
-# Copyright (C) 2006-2017 Matthias Koefferlein
+# Copyright (C) 2006-2018 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -114,6 +114,22 @@ def map2str(dict):
     strings.append(str(x) + ": " + str(dict[x]))
   return "{" + ", ".join(strings) + "}"
   
+class PyGObject(pya.GObject):
+  z = -1
+  def __init__(self, z):
+    super(PyGObject, self).__init__()
+    self.z = z
+  # reimplementation of "virtual int g()"
+  def g(self):
+    return self.z*2
+
+class PyGFactory(pya.GFactory):
+  def __init__(self):
+    super(PyGFactory, self).__init__()
+  # reimplementation of "virtual GObject *f(int)"
+  def f(self, z):
+    return PyGObject(z)
+
 class BasicTest(unittest.TestCase):
 
   def test_00(self):
@@ -123,6 +139,11 @@ class BasicTest(unittest.TestCase):
 
     a = pya.A.new_a(100)
     self.assertEqual( pya.A.a0(), ac0 + 1 )
+
+    a = pya.A()
+    self.assertEqual(a.a1(), 17)
+    a.assign(pya.A(110))
+    self.assertEqual(a.a1(), 110)
 
     a = None
     self.assertEqual( pya.A.a0(), ac0 )
@@ -2673,6 +2694,17 @@ class BasicTest(unittest.TestCase):
     se.trigger_s0()
     self.assertEqual(sc.got_s0a, 0)
     self.assertEqual(sc.got_s0b, 0)
+
+  # Custom factory implemented in Python
+  def test_80(self):
+    gc = pya.GObject.g_inst_count()
+    gf = PyGFactory()
+    go = pya.GFactory.create_f(gf, 17)
+    self.assertEqual(go.g_virtual(), 34)
+    self.assertEqual(go.g_org(), 0)
+    self.assertEqual(pya.GObject.g_inst_count(), gc + 1)
+    go = None
+    self.assertEqual(pya.GObject.g_inst_count(), gc)
 
 # run unit tests
 if __name__ == '__main__':

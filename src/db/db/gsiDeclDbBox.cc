@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -105,10 +105,14 @@ struct box_defs
   {
     return
     constructor ("new", &new_v, 
-      "@brief Default constructor: creates an empty (invalid) box"
+      "@brief Creates an empty (invalid) box\n"
+      "\n"
+      "Empty boxes don't modify a box when joined with it. The intersection between an empty and any other "
+      "box is also an empty box. The width, height, p1 and p2 attributes of an empty box are undefined. "
+      "Use \\empty? to get a value indicating whether the box is empty.\n"
     ) +
     constructor ("new", &new_lbrt,
-      "@brief Constructor with four coordinates\n"
+      "@brief Creates a box with four coordinates\n"
       "\n"
       "@args left, bottom, right, top\n"
       "\n"
@@ -117,63 +121,63 @@ struct box_defs
       "swapped."
     ) +
     constructor ("new", &new_pp,
-      "@brief Constructor with two points\n"
+      "@brief Creates a box from two points\n"
       "\n"
       "@args lower_left, upper_right\n"
       "\n"
-      "Two points are given to create a new box.  If the coordinates "
+      "Two points are given to create a new box. If the coordinates "
       "are not provided in the correct order (i.e. right < left), these are "
       "swapped."
     ) +
     method ("p1", &C::p1,
-      "@brief The lower left point of the box\n"
+      "@brief Gets the lower left point of the box\n"
     ) +
     method ("p2", &C::p2,
-      "@brief The upper right point of the box\n"
+      "@brief Gets the upper right point of the box\n"
     ) +
     method ("center", &C::center,
-      "@brief The center of the box\n"
+      "@brief Gets the center of the box\n"
     ) +
     method ("left", &C::left,
-      "@brief The left coordinate of the box\n"
+      "@brief Gets the left coordinate of the box\n"
     ) +
     method ("right", &C::right,
-      "@brief The right coordinate of the box\n"
+      "@brief Gets the right coordinate of the box\n"
     ) +
     method ("bottom", &C::bottom,
-      "@brief The bottom coordinate of the box\n"
+      "@brief Gets the bottom coordinate of the box\n"
     ) +
     method ("top", &C::top,
-      "@brief The top coordinate of the box\n"
+      "@brief Gets the top coordinate of the box\n"
     ) +
     method ("width", &C::width,
-      "@brief The width of the box\n"
+      "@brief Gets the width of the box\n"
     ) +
     method ("height", &C::height,
-      "@brief The height of the box\n"
+      "@brief Gets the height of the box\n"
     ) +
     method ("left=", &C::set_left,
-      "@brief Set the left coordinate of the box\n"
+      "@brief Sets the left coordinate of the box\n"
       "@args c\n"
     ) +
     method ("right=", &C::set_right,
-      "@brief Set the right coordinate of the box\n"
+      "@brief Sets the right coordinate of the box\n"
       "@args c\n"
     ) +
     method ("bottom=", &C::set_bottom,
-      "@brief Set the bottom coordinate of the box\n"
+      "@brief Sets the bottom coordinate of the box\n"
       "@args c\n"
     ) +
     method ("top=", &C::set_top,
-      "@brief Set the top coordinate of the box\n"
+      "@brief Sets the top coordinate of the box\n"
       "@args c\n"
     ) +
     method ("p1=", &C::set_p1,
-      "@brief Set the lower left point of the box\n"
+      "@brief Sets the lower left point of the box\n"
       "@args p\n"
     ) +
     method ("p2=", &C::set_p2,
-      "@brief Set the upper right point of the box\n"
+      "@brief Sets the upper right point of the box\n"
       "@args p\n"
     ) +
     method_ext ("contains?", &box_defs<C>::contains,
@@ -199,40 +203,41 @@ struct box_defs
       "@return true if the point is inside the box.\n"
     ) +
     method ("empty?", &C::empty,
-      "@brief Empty predicate\n"
+      "@brief Returns a value indicating whether the box is empty\n"
       "\n"
       "An empty box may be created with the default constructor for example. "
       "Such a box is neutral when combining it with other boxes and renders empty boxes "
       "if used in box intersections and false in geometrical relationship tests. "
     ) +
     method ("inside?", &C::inside,
-      "@brief Test if this box is inside the argument box\n"
+      "@brief Tests if this box is inside the argument box\n"
       "\n"
       "@args box\n"
       "\n"
       "Returns true, if this box is inside the given box, i.e. the box intersection renders this box"
     ) +
     method ("touches?", &C::touches,
-      "@brief Test if this box touches the argument box\n"
+      "@brief Tests if this box touches the argument box\n"
       "\n"
       "@args box\n"
       "\n"
-      "Returns true, if this box has at least one point common with the argument box"
+      "Two boxes touch if they overlap or their boundaries share at least one common point. "
+      "Touching is equivalent to a non-empty intersection ('!(b1 & b2).empty?')."
     ) +
     method ("overlaps?", &C::overlaps,
-      "@brief Test if this box overlaps the argument box\n"
+      "@brief Tests if this box overlaps the argument box\n"
       "\n"
       "@args box\n"
       "\n"
       "Returns true, if the intersection box of this box with the argument box exists and has a non-vanishing area"
     ) +
     method ("area", &C::double_area,
-      "@brief Compute the box area\n"
+      "@brief Computes the box area\n"
       "\n"
       "Returns the box area or 0 if the box is empty"
     ) +
     method ("is_point?", &C::is_point,
-      "@brief Return true, if the box is a single point\n"
+      "@brief Returns true, if the box is a single point\n"
     ) +
     method ("perimeter", &C::perimeter,
       "@brief Returns the perimeter of the box\n"
@@ -242,7 +247,7 @@ struct box_defs
       "This method has been introduced in version 0.23."
     ) + 
     method_ext ("+", &box_defs<C>::join_with_point,
-      "@brief Join box with a point\n"
+      "@brief Joins box with a point\n"
       "\n"
       "@args point\n"
       "\n"
@@ -254,7 +259,7 @@ struct box_defs
       "@return The box joined with the point\n"
     ) +
     method ("+", &C::joined,
-      "@brief Joining of boxes\n"
+      "@brief Joins two boxes\n"
       "\n"
       "@args box\n"
       "\n"
@@ -269,7 +274,7 @@ struct box_defs
       "@return The joined box\n"
     ) +
     method ("&", &C::intersection,
-      "@brief Intersection of boxes\n"
+      "@brief Returns the intersection of this box with another box\n"
       "\n"
       "@args box\n"
       "\n"
@@ -285,7 +290,7 @@ struct box_defs
       "@return The intersection box\n"
     ) +
     method ("*", &C::convolved,
-      "@brief Convolve boxes\n"
+      "@brief Returns the convolution product from this box with another box\n"
       "\n"
       "@args box\n"
       "\n"
@@ -300,7 +305,7 @@ struct box_defs
       "@return The convolved box\n"
     ) +
     method ("*", &C::scaled,
-      "@brief Scale box\n"
+      "@brief Returns the scaled box\n"
       "\n"
       "@args scale_factor\n"
       "\n"
@@ -396,7 +401,7 @@ struct box_defs
       "@return A reference to this box.\n"
     ) +
     method ("enlarged", &C::enlarged,
-      "@brief Enlarges the box by a certain amount.\n"
+      "@brief Returns the enlarged box.\n"
       "\n"
       "@args enlargement\n"
       "\n"
@@ -414,7 +419,7 @@ struct box_defs
       "@return The enlarged box.\n"
     ) +
     method ("transformed", &C::template transformed<simple_trans_type>,
-      "@brief Transforms the box with the given simple transformation\n"
+      "@brief Returns the box transformed with the given simple transformation\n"
       "\n"
       "@args t\n"
       "\n"
@@ -422,7 +427,7 @@ struct box_defs
       "@return The transformed box\n"
     ) +
     method ("transformed", &C::template transformed<complex_trans_type>,
-      "@brief Transforms the box with the given complex transformation\n"
+      "@brief Returns the box transformed with the given complex transformation\n"
       "\n"
       "@args t\n"
       "\n"
@@ -430,17 +435,17 @@ struct box_defs
       "@return The transformed box (a DBox now)\n"
     ) +
     method ("<", &C::less,
-      "@brief Less operator\n"
+      "@brief Returns true if this box is 'less' than another box\n"
       "@args box\n"
       "Returns true, if this box is 'less' with respect to first and second point (in this order)"
     ) +
     method ("==", &C::equal,
-      "@brief Equality\n"
+      "@brief Returns true if this box is equal to the other box\n"
       "@args box\n"
       "Returns true, if this box and the given box are equal "
     ) +
     method ("!=", &C::not_equal,
-      "@brief Inequality\n"
+      "@brief Returns true if this box is not equal to the other box\n"
       "@args box\n"
       "Returns true, if this box and the given box are not equal "
     ) +
@@ -451,14 +456,16 @@ struct box_defs
       "This method has been introduced in version 0.25.\n"
     ) +
     constructor ("from_s", &from_string,
-      "@brief Creates an object from a string\n"
+      "@brief Creates a box object from a string\n"
       "@args s\n"
       "Creates the object from a string representation (as returned by \\to_s)\n"
       "\n"
       "This method has been added in version 0.23.\n"
     ) +
     method ("to_s", (std::string (C::*) () const) &C::to_string,
-      "@brief Convert to a string\n"
+      "@brief Returns a string representing this box\n"
+      "\n"
+      "This string can be turned into a box again by using \\from_s\n"
     );
   }
 };

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -320,12 +320,20 @@ Proxy::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 
     //  TODO: callbacks with default arguments?
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
-      rb_ary_push (argv, pop_arg (*a, args, heap));
+      rb_ary_push (argv, pop_arg (*a, 0, args, heap));
     }
 
     VALUE rb_ret = rba_funcall2_checked (m_self, mid, RARRAY_LEN (argv), RARRAY_PTR (argv));
 
     push_arg (meth->ret_type (), ret, rb_ret, heap);
+
+    if (meth->ret_type ().pass_obj ()) {
+      //  In factory callbacks, make sure the returned object is not deleted by
+      //  anyone except the caller.
+      Proxy *p = 0;
+      Data_Get_Struct (rb_ret, Proxy, p);
+      p->keep ();
+    }
 
     //  a Ruby callback must not leave temporary objects
     tl_assert (heap.empty ());
@@ -883,7 +891,7 @@ void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gs
 
   //  TODO: signals with default arguments?
   for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
-    rb_ary_push (argv, pop_arg (*a, args, heap));
+    rb_ary_push (argv, pop_arg (*a, 0, args, heap));
   }
 
   //  call the signal handlers ... the last one will deliver the return value

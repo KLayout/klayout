@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -205,7 +205,11 @@ SaltModel::data (const QModelIndex &index, int role) const
       QImage scaled = img.scaled (QSize (icon_dim, icon_dim), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
       img = QImage (icon_dim, icon_dim, QImage::Format_ARGB32);
+#if QT_VERSION >= 0x40700
       img.fill (QColor (0, 0, 0, 0));
+#else
+      img.fill (0);
+#endif
       QPainter painter (&img);
       painter.drawImage ((icon_dim - scaled.width ()) / 2, (icon_dim - scaled.height ()) / 2, scaled);
 

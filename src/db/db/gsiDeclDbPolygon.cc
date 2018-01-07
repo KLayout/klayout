@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -208,6 +208,26 @@ struct simple_polygon_defs
   static size_t hash_value (const C *p)
   {
     return std_ext::hfunc (*p);
+  }
+
+  static bool touches_box (const C *p, const db::box<coord_type> &box)
+  {
+    return db::interact (*p, box);
+  }
+
+  static bool touches_edge (const C *p, const db::edge<coord_type> &edge)
+  {
+    return db::interact (*p, edge);
+  }
+
+  static bool touches_poly (const C *p, const db::polygon<coord_type> &poly)
+  {
+    return db::interact (*p, poly);
+  }
+
+  static bool touches_spoly (const C *p, const db::simple_polygon<coord_type> &spoly)
+  {
+    return db::interact (*p, spoly);
   }
 
   static gsi::Methods methods ()
@@ -485,7 +505,32 @@ struct simple_polygon_defs
     ) +
     method ("bbox", &C::box,
       "@brief Return the bounding box of the simple polygon"
-    );
+    ) +
+    method_ext ("touches?", &touches_box, gsi::arg ("box"),
+      "@brief Returns true, if the polygon touches the given box.\n"
+      "The box and the polygon touch if they overlap or their contours share at least one point.\n"
+      "\n"
+      "This method was introduced in version 0.25.1.\n"
+    ) +
+    method_ext ("touches?", &touches_edge, gsi::arg ("edge"),
+      "@brief Returns true, if the polygon touches the given edge.\n"
+      "The edge and the polygon touch if they overlap or the edge shares at least one point with the polygon's contour.\n"
+      "\n"
+      "This method was introduced in version 0.25.1.\n"
+    ) +
+    method_ext ("touches?", &touches_poly, gsi::arg ("polygon"),
+      "@brief Returns true, if the polygon touches the other polygon.\n"
+      "The polygons touch if they overlap or their contours share at least one point.\n"
+      "\n"
+      "This method was introduced in version 0.25.1.\n"
+    ) +
+    method_ext ("touches?", &touches_spoly, gsi::arg ("simple_polygon"),
+      "@brief Returns true, if the polygon touches the other polygon.\n"
+      "The polygons touch if they overlap or their contours share at least one point.\n"
+      "\n"
+      "This method was introduced in version 0.25.1.\n"
+    )
+    ;
   }
 };
 
@@ -993,6 +1038,26 @@ struct polygon_defs
     return std_ext::hfunc (*p);
   }
 
+  static bool touches_box (const C *p, const db::box<coord_type> &box)
+  {
+    return db::interact (*p, box);
+  }
+
+  static bool touches_edge (const C *p, const db::edge<coord_type> &edge)
+  {
+    return db::interact (*p, edge);
+  }
+
+  static bool touches_poly (const C *p, const db::polygon<coord_type> &poly)
+  {
+    return db::interact (*p, poly);
+  }
+
+  static bool touches_spoly (const C *p, const db::simple_polygon<coord_type> &spoly)
+  {
+    return db::interact (*p, spoly);
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -1435,7 +1500,32 @@ struct polygon_defs
     method ("bbox", &C::box,
       "@brief Return the bounding box of the polygon\n"
       "The bounding box is the box enclosing all points of the polygon.\n"
-    );
+    ) +
+    method_ext ("touches?", &touches_box, gsi::arg ("box"),
+      "@brief Returns true, if the polygon touches the given box.\n"
+      "The box and the polygon touch if they overlap or their contours share at least one point.\n"
+      "\n"
+      "This method was introduced in version 0.25.1.\n"
+    ) +
+    method_ext ("touches?", &touches_edge, gsi::arg ("edge"),
+      "@brief Returns true, if the polygon touches the given edge.\n"
+      "The edge and the polygon touch if they overlap or the edge shares at least one point with the polygon's contour.\n"
+      "\n"
+      "This method was introduced in version 0.25.1.\n"
+    ) +
+    method_ext ("touches?", &touches_poly, gsi::arg ("polygon"),
+      "@brief Returns true, if the polygon touches the other polygon.\n"
+      "The polygons touch if they overlap or their contours share at least one point.\n"
+      "\n"
+      "This method was introduced in version 0.25.1.\n"
+    ) +
+    method_ext ("touches?", &touches_spoly, gsi::arg ("simple_polygon"),
+      "@brief Returns true, if the polygon touches the other polygon.\n"
+      "The polygons touch if they overlap or their contours share at least one point.\n"
+      "\n"
+      "This method was introduced in version 0.25.1.\n"
+    )
+    ;
   }
 };
 

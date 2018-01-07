@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ FontController::sync_dirs ()
   m_file_watcher->clear ();
   m_file_watcher->enable (false);
 
-  std::vector<std::string> paths = lay::Application::instance ()->klayout_path ();
+  std::vector<std::string> paths = lay::ApplicationBase::instance ()->klayout_path ();
 
   //  add the salt grains as potential sources for library definitions
 

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -764,7 +764,7 @@ object_assign (PyObject *self, PyObject *args)
   tl_assert (cls_decl_self != 0);
 
   PyObject *src = NULL;
-  if (! PyArg_ParseTuple (args, "o", &src)) {
+  if (! PyArg_ParseTuple (args, "O", &src)) {
     return NULL;
   }
 
@@ -778,7 +778,7 @@ object_assign (PyObject *self, PyObject *args)
     throw tl::Exception (tl::to_string (QObject::tr ("No assignment provided for class '%s'")), cls_decl_self->name ());
   }
 
-  cls_decl_self->assign (((PYAObjectBase *) self)->obj (), ((PYAObjectBase *) args)->obj ());
+  cls_decl_self->assign (((PYAObjectBase *) self)->obj (), ((PYAObjectBase *) src)->obj ());
 
   Py_INCREF (self);
   return self;
@@ -1021,7 +1021,7 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
         //  In case of an error upon write, pop the arguments to clean them up.
         //  Without this, there is a risk to keep dead objects on the stack.
         for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-          pop_arg (*a, arglist, NULL, heap);
+          pop_arg (*a, arglist, 0, heap);
         }
 
         throw;
@@ -1550,7 +1550,7 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
       p->destroy ();
     }
 
-    const gsi::MethodBase *meth = match_method (mid, self, args, ! p->cls_decl ()->can_default_create ());
+    const gsi::MethodBase *meth = match_method (mid, self, args, PyTuple_Size (args) > 0 || ! p->cls_decl ()->can_default_create ());
 
     if (meth && meth->smt () == gsi::MethodBase::None) {
 
@@ -1572,7 +1572,7 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
         //  In case of an error upon write, pop the arguments to clean them up.
         //  Without this, there is a risk to keep dead objects on the stack.
         for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-          pop_arg (*a, arglist, NULL, heap);
+          pop_arg (*a, arglist, 0, heap);
         }
 
         throw;

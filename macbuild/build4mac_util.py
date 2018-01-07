@@ -121,8 +121,11 @@ def SetChangeIdentificationNameOfDyLib( libdic ):
 #                +-- Contents/+
 #                             +-- Info.plist
 #                             +-- PkgInfo
-#                             +-- Resources/
-#                             +-- Frameworks/
+#                             +-- Resources/+
+#                             |             +-- 'klayout.icns'
+#                             +-- Frameworks/+
+#                             |              +-- '*.framework'
+#                             |              +-- '*.dylib'
 #                             +-- MacOS/+
 #                             |         +-- 'klayout'
 #                             +-- Buddy/+

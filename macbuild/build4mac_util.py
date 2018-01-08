@@ -190,9 +190,9 @@ def GetKLayoutVersionFrom( verfile='version.h' ):
   for line in contents:
     m = verReg.match(line)
     if m:
-      # print(m.group(0)) # KLAYOUT_VERSION="0.25"
+      # print(m.group(0)) # KLAYOUT_VERSION="0.25.1"
       # print(m.group(1)) # KLAYOUT_VERSION="
-      # print(m.group(2)) # 0.25
+      # print(m.group(2)) # 0.25.1
       # print(m.group(3)) # "
       version = m.group(2)
       return version

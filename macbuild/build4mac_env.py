@@ -145,18 +145,18 @@ PythonHighSierra= { 'exe': '/System/Library/Frameworks/Python.framework/Versions
 #   If the path to your `conda` command is '$HOME/anaconda2/bin/conda'
 #   and your Python environment was prepared by: $ conda create -n py27klayout python=2.7
 #
-#   No additional modules are added in the beginning.
+#   No additional modules are installed in the experiment.
 # [Key Type Name] = 'Ana27'
 Anaconda27      = { 'exe': '$HOME/anaconda2/envs/py27klayout/bin/python2.7' ,
                     'inc': '$HOME/anaconda2/envs/py27klayout/include/python2.7',
                     'lib': '$HOME/anaconda2/envs/py27klayout/lib/libpython2.7.dylib'
                   }
 
-# Using anaconda2 (https://www.anaconda.com/download/#macos) 5.0.1l: *+*+*+ EXPERIMENTAL *+*+*+
+# Using anaconda2 (https://www.anaconda.com/download/#macos) 5.0.1: *+*+*+ EXPERIMENTAL *+*+*+
 #   If the path to your `conda` command is '$HOME/anaconda2/bin/conda'
 #   and your Python environment was prepared by: $ conda create -n py36klayout python=3.6
 #
-#   No additional modules are added in the beginning.
+#   No additional modules are installed in the experiment.
 # [Key Type Name] = 'Ana36'
 Anaconda36      = { 'exe': '$HOME/anaconda2/envs/py36klayout/bin/python3.6' ,
                     'inc': '$HOME/anaconda2/envs/py36klayout/include/python3.6m',
@@ -182,7 +182,7 @@ PythonDictionary= { 'nil'             : None,
                   }
 
 #-----------------------------------------------------
-# [4] KLayout executables
+# [4] KLayout executables including buddy tools
 #-----------------------------------------------------
 KLayoutExecs  = ['klayout']
 KLayoutExecs += ['strm2cif', 'strm2dxf', 'strm2gds', 'strm2gdstxt', 'strm2oas']

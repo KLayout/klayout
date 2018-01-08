@@ -17,7 +17,7 @@ import optparse
 import subprocess
 
 #-------------------------------------------------------------------------------
-## To import global dictionaries of different modules
+## To import global dictionaries of different modules and utility functions
 #-------------------------------------------------------------------------------
 mydir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append( mydir + "/macbuild" )
@@ -35,11 +35,13 @@ def SetGlobals():
   global ModuleQt           # Qt module to be used
   global ModuleRuby         # Ruby module to be used
   global ModulePython       # Python module to be used
+  global NonOSStdLang       # True if non-OS-standard language is chosen
   global NoQtBindings       # True if not creating Qt bindings for Ruby scripts
   global MakeOptions        # options passed to `make`
   global DebugMode          # True if debug mode build
   global CheckComOnly       # True if only for checking the command line parameters to "build.sh"
-  global Deployment         # True if deploying the binaries for a package
+  global DeploymentF        # True if fully (including Qt's Frameworks) deploy the binaries for bundles
+  global DeploymentP        # True if partially deploy the binaries excluding Qt's Frameworks
   global DeployVerbose      # -verbose=<0-3> level passed to 'macdeployqt' tool
   global Version            # KLayout's version
   # auxiliary variables on platform
@@ -52,35 +54,37 @@ def SetGlobals():
   global Bit                # machine bit-size
 
   Usage  = "\n"
-  Usage += "---------------------------------------------------------------------------------------------\n"
+  Usage += "--------------------------------------------------------------------------------------------------------\n"
   Usage += "<< Usage of 'build4mac.py' >>\n"
   Usage += "       for building KLayout 0.25 or later on different Apple Mac OSX platforms.\n"
   Usage += "\n"
-  Usage += "$ [python] build4mac.py \n"
-  Usage += "   option & argument    : comment on option if any                        | default value\n"
-  Usage += "   -----------------------------------------------------------------------+---------------\n"
-  Usage += "                        : * key type names below are case insensitive *   | \n"
-  Usage += "                        :   'nil' = not to support the script language    | \n"
-  Usage += "                        :   'Sys' = using the OS standard script language | \n"
-  Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details| \n"
-  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts']             | qt5macports \n"
-  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24']            | sys \n"
-  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36']   | sys \n"
-  Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts       | disabled \n"
-  Usage += "   [-m|--make <option>] : option passed to 'make'                         | -j4 \n"
-  Usage += "   [-d|--debug]         : enable debug mode build                         | disabled \n"
-  Usage += "   [-c|--checkcom]      : check command line and exit without building    | disabled \n"
-  Usage += "   [-y|--deploy]        : deploy built binaries with depending libraries  | disabled \n"
-  Usage += "                        : ! After confirmation of successful build of     | \n"
-  Usage += "                        :   KLayout, rerun this script with BOTH:         | \n"
-  Usage += "                        :     1) the same options used for building AND   | \n"
-  Usage += "                        :     2) <-y|--deploy>                            | \n"
-  Usage += "                        :   optionally with [-v|--verbose <0-3>]          | \n"
-  Usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt'                  | 1 \n"
-  Usage += "                        : 0 = no output, 1 = error/warning (default),     | \n"
-  Usage += "                        : 2 = normal,    3 = debug                        | \n"
-  Usage += "   [-?|--?]             : print this usage and exit                       | disabled \n"
-  Usage += "---------------------------------------------------------------------------------------------\n"
+  Usage += "$ [python] ./build4mac.py \n"
+  Usage += "   option & argument    : descriptions                                               | default value\n"
+  Usage += "   ----------------------------------------------------------------------------------+---------------\n"
+  Usage += "                        : * key type names below are case insensitive *              | \n"
+  Usage += "                        :   'nil' = not to support the script language               | \n"
+  Usage += "                        :   'Sys' = using the OS standard script language            | \n"
+  Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details           | \n"
+  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts']                        | qt5macports \n"
+  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24']                       | sys \n"
+  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36']              | sys \n"
+  Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                  | disabled \n"
+  Usage += "   [-m|--make <option>] : option passed to 'make'                                    | -j4 \n"
+  Usage += "   [-d|--debug]         : enable debug mode build                                    | disabled \n"
+  Usage += "   [-c|--checkcom]      : check command line and exit without building               | disabled \n"
+  Usage += "   [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks    | disabled \n"
+  Usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout  | disabled \n"
+  Usage += "                        : from the source code and use the tools in the same machine | \n"
+  Usage += "                        : ! After confirmation of successful build of                | \n"
+  Usage += "                        :   KLayout, rerun this script with BOTH:                    | \n"
+  Usage += "                        :     1) the same options used for building AND              | \n"
+  Usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                      | \n"
+  Usage += "                        :   optionally with [-v|--verbose <0-3>]                     | \n"
+  Usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt' (effective with -y only)    | 1 \n"
+  Usage += "                        : 0 = no output, 1 = error/warning (default),                | \n"
+  Usage += "                        : 2 = normal,    3 = debug                                   | \n"
+  Usage += "   [-?|--?]             : print this usage and exit                                  | disabled \n"
+  Usage += "--------------------------------------------------------------------------------------------------------\n"
 
   ProjectDir = os.getcwd()
   BuildBash  = "./build.sh"
@@ -132,11 +136,13 @@ def SetGlobals():
     ModuleRuby   = "nil"
     ModulePython = "nil"
 
+  NonOSStdLang  = False
   NoQtBindings  = False
   MakeOptions   = "-j4"
   DebugMode     = False
   CheckComOnly  = False
-  Deployment    = False
+  DeploymentF   = False
+  DeploymentP   = False
   DeployVerbose = 1
   Version       = GetKLayoutVersionFrom( "./version.sh" )
 
@@ -149,11 +155,13 @@ def ParseCommandLineArguments():
   global ModuleQt
   global ModuleRuby
   global ModulePython
+  global NonOSStdLang
   global NoQtBindings
   global MakeOptions
   global DebugMode
   global CheckComOnly
-  global Deployment
+  global DeploymentF
+  global DeploymentP
   global DeployVerbose
 
   p = optparse.OptionParser( usage=Usage )
@@ -193,9 +201,15 @@ def ParseCommandLineArguments():
 
   p.add_option( '-y', '--deploy',
                 action='store_true',
-                dest='deploy_bins',
+                dest='deploy_full',
                 default=False,
-                help="deploy built binaries" )
+                help="fully deploy built binaries" )
+
+  p.add_option( '-Y', '--DEPLOY',
+                action='store_true',
+                dest='deploy_partial',
+                default=False,
+                help="deploy built binaries when non-OS-standard script language is chosen" )
 
   p.add_option( '-v', '--verbose',
                 dest='deploy_verbose',
@@ -214,7 +228,8 @@ def ParseCommandLineArguments():
                   make_option    = "-j4",
                   debug_build    = False,
                   check_command  = False,
-                  deploy_bins    = False,
+                  deploy_full    = False,
+                  deploy_partial = False,
                   deploy_verbose = "1",
                   checkusage     = False )
 
@@ -243,6 +258,9 @@ def ParseCommandLineArguments():
     print(Usage)
     quit()
 
+  # By default, OS-standard script languages (Ruby and Python) are used
+  NonOSStdLang = False
+
   # Determine Ruby type
   candidates = [ i.upper() for i in ['nil', 'Sys', 'Src24', 'MP24'] ]
   ModuleRuby = ""
@@ -265,9 +283,11 @@ def ParseCommandLineArguments():
           ModuleRuby = ''
         break
       elif index == 2:
-        ModuleRuby = 'Ruby24SrcBuild'
+        ModuleRuby   = 'Ruby24SrcBuild'
+        NonOSStdLang = True
       elif index == 3:
-        ModuleRuby = 'Ruby24MacPorts'
+        ModuleRuby   = 'Ruby24MacPorts'
+        NonOSStdLang = True
     else:
       index += 1
   if ModuleRuby == "":
@@ -299,10 +319,13 @@ def ParseCommandLineArguments():
         break
       elif index == 2:
         ModulePython = 'Anaconda27'
+        NonOSStdLang = True
       elif index == 3:
         ModulePython = 'Anaconda36'
+        NonOSStdLang = True
       elif index == 4:
         ModulePython = 'Python36MacPorts'
+        NonOSStdLang = True
     else:
       index += 1
   if ModulePython == "":
@@ -315,7 +338,15 @@ def ParseCommandLineArguments():
   MakeOptions   = opt.make_option
   DebugMode     = opt.debug_build
   CheckComOnly  = opt.check_command
-  Deployment    = opt.deploy_bins
+  DeploymentF   = opt.deploy_full
+  DeploymentP   = opt.deploy_partial
+
+  if DeploymentF and DeploymentP:
+    print("")
+    print( "!!! Choose either [-y|--deploy] or [-Y|--DEPLOY]", file=sys.stderr )
+    print(Usage)
+    quit()
+
   DeployVerbose = int(opt.deploy_verbose)
   if not DeployVerbose in [0, 1, 2, 3]:
     print("")
@@ -323,7 +354,7 @@ def ParseCommandLineArguments():
     print(Usage)
     quit()
 
-  if not Deployment:
+  if not DeploymentF and not DeploymentP:
     target  = "%s %s %s" % (Platform, Release, Machine)
     modules = "Qt=%s, Ruby=%s, Python=%s" % (ModuleQt, ModuleRuby, ModulePython)
     message = "### You are going to build KLayout\n    for  <%s>\n    with <%s>...\n"
@@ -346,7 +377,7 @@ def RunMainBuildBash():
   global MakeOptions
   global DebugMode
   global CheckComOnly
-  global Deployment
+  global DeploymentF
   global MacPkgDir       # relative path to package directory
   global MacBinDir       # relative path to binary directory
   global MacBuildDir     # relative path to build directory
@@ -435,30 +466,32 @@ def RunMainBuildBash():
     quit()
 
   #-----------------------------------------------------
-  # [3] Invoke the main Bash script
+  # [3] Invoke the main Bash script; takes time:-)
   #-----------------------------------------------------
-  if Deployment:
+  if DeploymentF:
+    return 0
+  elif DeploymentP:
     return 0
   else:
     myscript = "build4mac.py"
     if subprocess.call( command, shell=True ) != 0:
-      print("")
-      print( "-------------------------------------------------------------" )
+      print( "", file=sys.stderr )
+      print( "-------------------------------------------------------------", file=sys.stderr )
       print( "!!! <%s>: failed to build KLayout" % myscript, file=sys.stderr )
-      print( "-------------------------------------------------------------" )
-      print("")
+      print( "-------------------------------------------------------------", file=sys.stderr )
+      print( "", file=sys.stderr )
       return 1
     else:
-      print("")
-      print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
+      print( "", file=sys.stderr )
+      print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
       print( "### <%s>: successfully built KLayout" % myscript, file=sys.stderr )
-      print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" )
-      print("")
+      print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
+      print( "", file=sys.stderr )
       return 0
 
 #------------------------------------------------------------------------------
-## To deploy built binaries and libraries on which those binaries depend
-#  for making a bundle (klayout.app)
+## For making a bundle (klayout.app), deploy built binaries and libraries
+#  on which those binaries depend.
 #
 # Reference: "Deploying an Application on Mac OS X" of Qt Assistant.
 #
@@ -467,7 +500,9 @@ def RunMainBuildBash():
 def DeployBinariesForBundle():
   global ProjectDir
   global ModuleQt
-  global Deployment
+  global NonOSStdLang
+  global DeploymentF
+  global DeploymentP
   global MacPkgDir
   global MacBinDir
   global MacBuildDir
@@ -486,7 +521,11 @@ def DeployBinariesForBundle():
   # [1] Check the status of working directory
   #-------------------------------------------------------------
   os.chdir(ProjectDir)
-  if not Deployment:
+  if not DeploymentF and not DeploymentP:
+    return 1
+  if DeploymentF and NonOSStdLang:
+    print( "!!! You chose <-y|--deploy> while using non-OS-standard script language.", file=sys.stderr )
+    print( "    Use <-Y|--DEPLOY> instead", file=sys.stderr )
     return 1
   if not os.path.isfile(MacBuildLog):
     print( "!!! Build log file <%s> does not present !!!" % MacBuildLog, file=sys.stderr )
@@ -676,31 +715,37 @@ def DeployBinariesForBundle():
       print( msg % buddy, file=sys.stderr )
       return 1
 
+  if DeploymentF:
+    print( " [8] Finally, deploying Qt's Frameworks ..." )
+    #-------------------------------------------------------------
+    # [8] Deploy Qt Frameworks
+    #-------------------------------------------------------------
+    verbose = " -verbose=%d" % DeployVerbose
+    if ModuleQt == 'Qt4MacPorts':
+      deploytool = Qt4MacPorts['deploy']
+      app_bundle = "klayout.app"
+      options    = macdepQtOpt + verbose
+    elif ModuleQt == 'Qt5MacPorts':
+      deploytool = Qt5MacPorts['deploy']
+      app_bundle = "klayout.app"
+      options    = macdepQtOpt + verbose
 
-  print( " [8] Finally, deploying Qt's Frameworks ..." )
-  #-------------------------------------------------------------
-  # [8] Deploy Qt frameworks
-  #-------------------------------------------------------------
-  verbose = " -verbose=%d" % DeployVerbose
-  if ModuleQt == 'Qt4MacPorts':
-    deploytool = Qt4MacPorts['deploy']
-    app_bundle = "klayout.app"
-    options    = macdepQtOpt + verbose
-  elif ModuleQt == 'Qt5MacPorts':
-    deploytool = Qt5MacPorts['deploy']
-    app_bundle = "klayout.app"
-    options    = macdepQtOpt + verbose
-
-  os.chdir(ProjectDir)
-  os.chdir(MacPkgDir)
-  command = "%s %s %s" % ( deploytool, app_bundle, options )
-  if subprocess.call( command, shell=True ) != 0:
-    msg = "!!! Failed to deploy applications on OSX !!!"
-    print( msg, file=sys.stderr )
-    print("")
     os.chdir(ProjectDir)
-    return 1
+    os.chdir(MacPkgDir)
+    command = "%s %s %s" % ( deploytool, app_bundle, options )
+    if subprocess.call( command, shell=True ) != 0:
+      msg = "!!! Failed to deploy applications on OSX !!!"
+      print( msg, file=sys.stderr )
+      print("")
+      os.chdir(ProjectDir)
+      return 1
+    else:
+      print( "##### Finished deploying libraries and executables for <klayout.app> #####" )
+      print("")
+      os.chdir(ProjectDir)
+      return 0
   else:
+    print( " [8] Skipped deploying Qt's Frameworks ..." )
     print( "##### Finished deploying libraries and executables for <klayout.app> #####" )
     print("")
     os.chdir(ProjectDir)
@@ -818,16 +863,31 @@ def DeployScriptBundles():
 def main():
   SetGlobals()
   ParseCommandLineArguments()
+  #----------------------------------------------------------
+  # [The main build stage]
+  #----------------------------------------------------------
   ret = RunMainBuildBash()
-  if not Deployment:
+  if not DeploymentF and not DeploymentP:
     if ret == 0:
       sys.exit(0)
     else:
       sys.exit(1)
   else:
+    #----------------------------------------------------------
+    # [Deployment stage-1]
+    #   Deployment of dynamic link libraries, executables and
+    #   resources to make the main "klayout.app" bundle
+    #----------------------------------------------------------
     ret1 = DeployBinariesForBundle()
+    if not ret1 == 0:
+      sys.exit(1)
+    #----------------------------------------------------------
+    # [Deployment stage-2]
+    #   Deployment of wrapper Bash scripts and resources
+    #   to make "KLayoutEditor.app" and "KLayoutViewer.app"
+    #----------------------------------------------------------
     ret2 = DeployScriptBundles()
-    if not (ret1 == 0 and ret2 == 0):
+    if ret2 == 0:
       sys.exit(1)
     else:
       sys.exit(0)

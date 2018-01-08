@@ -41,7 +41,7 @@ def SetGlobals():
   global DebugMode          # True if debug mode build
   global CheckComOnly       # True if only for checking the command line parameters to "build.sh"
   global DeploymentF        # True if fully (including Qt's Frameworks) deploy the binaries for bundles
-  global DeploymentP        # True if partially deploy the binaries for non-OS-standard script language user
+  global DeploymentP        # True if partially deploy the binaries excluding Qt's Frameworks
   global DeployVerbose      # -verbose=<0-3> level passed to 'macdeployqt' tool
   global Version            # KLayout's version
   # auxiliary variables on platform
@@ -74,8 +74,7 @@ def SetGlobals():
   Usage += "   [-c|--checkcom]      : check command line and exit without building               | disabled \n"
   Usage += "   [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks    | disabled \n"
   Usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout  | disabled \n"
-  Usage += "                        : from source code choosing non-OS-standard script language  | \n"
-  Usage += "                        : such as Python 3.6 from Anaconda2                          | \n"
+  Usage += "                        : from the source code and use the tools in the same machine | \n"
   Usage += "                        : ! After confirmation of successful build of                | \n"
   Usage += "                        :   KLayout, rerun this script with BOTH:                    | \n"
   Usage += "                        :     1) the same options used for building AND              | \n"
@@ -864,6 +863,9 @@ def DeployScriptBundles():
 def main():
   SetGlobals()
   ParseCommandLineArguments()
+  #----------------------------------------------------------
+  # [The main build stage]
+  #----------------------------------------------------------
   ret = RunMainBuildBash()
   if not DeploymentF and not DeploymentP:
     if ret == 0:
@@ -872,15 +874,17 @@ def main():
       sys.exit(1)
   else:
     #----------------------------------------------------------
-    # [Stage-1] Deployment of executables and bundles to make
-    #           the main "klayout.app" bundle
+    # [Deployment stage-1]
+    #   Deployment of dynamic link libraries, executables and
+    #   resources to make the main "klayout.app" bundle
     #----------------------------------------------------------
     ret1 = DeployBinariesForBundle()
     if not ret1 == 0:
       sys.exit(1)
     #----------------------------------------------------------
-    # [Stage-2] Deployment of wrapper Bash scripts to make
-    #           "KLayoutEditor.app" and "KLayoutViewer.app"
+    # [Deployment stage-2]
+    #   Deployment of wrapper Bash scripts and resources
+    #   to make "KLayoutEditor.app" and "KLayoutViewer.app"
     #----------------------------------------------------------
     ret2 = DeployScriptBundles()
     if ret2 == 0:

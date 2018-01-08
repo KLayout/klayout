@@ -2,8 +2,8 @@
 Relevant KLayout version: 0.25.1
 
 1. Introduction:
-    This directory "macbuild" contains different files required for building KLayout
-    version 0.25 or later for different Max OSX including:
+    This directory "macbuild" contains different files required for building KLayout (http://www.klayout.de/)
+    version 0.25 or later for different Mac OSXs including:
         * Yosemite    (10.10)
         * El Capitan  (10.11)
         * Sierra      (10.12)
@@ -14,7 +14,7 @@ Relevant KLayout version: 0.25.1
        /opt/local/libexec/qt5/
 
     <IMPORTANT>
-     * Please DO NOT USE "5.10.x" which is problematic in showing your design in the main canvas.
+     * Please DO NOT USE "5.10.0" which is problematic in showing your design in the main canvas.
      * Please USE "5.9.x" instead.
      * Building with Qt4 will lead to some compile errors.
 
@@ -24,8 +24,8 @@ Relevant KLayout version: 0.25.1
 
 2. Non-OS-standard script language support
     You may want to use a non-OS-standard script language such as Python 3.6 from
-    Aanaconda2 (https://www.anaconda.com/download/#macos) in combination with KLayout.
-    Since Anacoda(2) is a popular Python development environment, this is worth trying.
+    Anaconda2 (https://www.anaconda.com/download/#macos) in combination with KLayout.
+    Since Anaconda2 is a popular Python development environment, this is worth trying.
     Unfortunately, however, some dynamic linkage problems are observed as of today.
 
     On the other hand, Python 3.6 provided by Mac Ports is usable.
@@ -41,7 +41,7 @@ Relevant KLayout version: 0.25.1
             $ ./build4mac.py -d
     (3) Confirm successful build.
     (4) Run 'build4mac.py' again with the same options used in (2) PLUS "-y"
-        to deploy executables and libraries under "klayout.app" bundle.
+        to deploy executables and libraries (including Qt's frameworks) under "klayout.app" bundle.
             $ ./build4mac.py -d -y
     (5) Copy/move generated bundles ("klayout.app" and "klayout.scripts/") to your
         "/Applications" directory for installation.
@@ -59,10 +59,11 @@ Relevant KLayout version: 0.25.1
         to deploy executables and libraries under "klayout.app" bundle.
             $ ./build4mac.py -r mp24 -p mp36 -Y
       * [-Y|--DEPOLY] option deploys KLayout's dylibs and executables only.
-        That is, paths to other modules (Ruby, Python, and Qt5 Frameworks) are
-        remained unchanged (absolute paths in your development environment).
+        That is, paths to other modules (Ruby, Python, and Qt5 Frameworks)
+        remain unchanged (absolute paths in your development environment).
     (5) Copy/move generated bundles ("klayout.app" and "klayout.scripts/") to your
-        "/Applications" directory.
+        "/Applications" directory for installation.
 
 By: Kazzz (January 08, 2018)
+
 [End of File]

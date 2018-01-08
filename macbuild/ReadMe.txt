@@ -13,7 +13,7 @@ Relevant KLayout version: 0.25.1
     usually located under:
        /opt/local/libexec/qt5/
 
-    <IMPORTANT>
+    <IMPORTANT>:
      * Please DO NOT USE "5.10.0" which is problematic in showing your design in the main canvas.
      * Please USE "5.9.x" instead.
      * Building with Qt4 will lead to some compile errors.
@@ -22,7 +22,7 @@ Relevant KLayout version: 0.25.1
     standard ones bundled with the OS.
 
 
-2. Non-OS-standard script language support
+2. Non-OS-standard script language support:
     You may want to use a non-OS-standard script language such as Python 3.6 from
     Anaconda2 (https://www.anaconda.com/download/#macos) in combination with KLayout.
     Since Anaconda2 is a popular Python development environment, this is worth trying.
@@ -31,7 +31,7 @@ Relevant KLayout version: 0.25.1
     On the other hand, Python 3.6 provided by Mac Ports is usable.
     Please try this (refer to 3B below) if you feel it's useful.
 
-3. Use-cases
+3. Use-cases:
 3A. Debug build using the OS-standard script languages:
     (1) Make a symbolic link from the parent directory (where 'build.sh' exists) to
         'build4mac.py', that is,

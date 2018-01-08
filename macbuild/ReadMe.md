@@ -1,6 +1,6 @@
 << Draft Version 0.003>>  Relevant KLayout version: 0.25.1
 
-# 1. Introduction:
+# 1. Introduction
 This directory "macbuild" contains different files required for building KLayout (http://www.klayout.de/) version 0.25 or later for different Mac OSXs including:
 * Yosemite    (10.10)
 * El Capitan  (10.11)
@@ -12,7 +12,7 @@ By default, Qt framework is "Qt5" from Mac Ports (https://www.macports.org/) whi
 /opt/local/libexec/qt5/
 ```
 
-### IMPORTANT:
+### IMPORTANT
 ```
 * Please DO NOT USE "Qt 5.10.0" which is problematic in showing your design in the main canvas.
 * Please USE "Qt 5.9.x" instead.
@@ -28,8 +28,8 @@ Unfortunately, however, some dynamic linkage problems are observed as of today.
 On the other hand, Python 3.6 provided by Mac Ports is usable.
 Please try this (refer to 3B below) if you feel it's useful.
 
-# 3. Use-cases:
-### 3A. Debug build using the OS-standard script languages:
+# 3. Use-cases
+### 3A. Debug build using the OS-standard script languages
 1. Make a symbolic link from the parent directory (where 'build.sh' exists) to
  'build4mac.py', that is,
 ```
@@ -47,7 +47,7 @@ $ ./build4mac.py -d -y
 ```
 5. Copy/move generated bundles ("klayout.app" and "klayout.scripts/") to your "/Applications" directory for installation.
 
-### 3B. Release build using the non-OS-standard Ruby 2.4 and Python 3.6 both from MacPorts:
+### 3B. Release build using the non-OS-standard Ruby 2.4 and Python 3.6 both from MacPorts
 1. Make a symbolic link from the parent directory (where 'build.sh' exists) to 'build4mac.py', that is,
 ```
 build4mac.py -> macbuild/build4mac.py

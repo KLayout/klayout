@@ -113,7 +113,7 @@ bool euclidian_near_part_of_edge (bool include_zero, db::Coord d, const db::Edge
 
   //  handle the parallel case
   if (e.parallel (g)) {
-    if (abs (e.distance (g.p1 ())) >= d) {
+    if (std::abs (e.distance (g.p1 ())) >= d) {
       return false;
     }
   } else {
@@ -243,7 +243,7 @@ static bool var_near_part_of_edge (bool include_zero, db::Coord d, db::Coord dd,
 
   //  handle the parallel case
   if (e.parallel (g)) {
-    if (abs (e.distance (g.p1 ())) >= d) {
+    if (std::abs (e.distance (g.p1 ())) >= d) {
       return false;
     }
   } else {

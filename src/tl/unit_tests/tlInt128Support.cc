@@ -29,19 +29,34 @@
 
 TEST(1) 
 {
-  EXPECT_EQ (tl::int128_to_string (__int128 (0)), "0");
-  EXPECT_EQ (tl::int128_to_string (__int128 (42)), "42");
-  EXPECT_EQ (tl::int128_to_string (__int128 (-42)), "-42");
+  EXPECT_EQ (tl::to_string (__int128 (0)), "0");
+  EXPECT_EQ (tl::to_string (__int128 (42)), "42");
+  EXPECT_EQ (tl::to_string (__int128 (-42)), "-42");
 
   __int128 x = 1;
   for (int i = 0; i < 30; ++i) {
      x *= 10;
   }
 
-  EXPECT_EQ (tl::int128_to_string (x), "1000000000000000000000000000000");
-  EXPECT_EQ (tl::int128_to_string (-x), "-1000000000000000000000000000000");
-  EXPECT_EQ (tl::int128_to_string (x + 1), "1000000000000000000000000000001");
-  EXPECT_EQ (tl::int128_to_string (x - 1), "999999999999999999999999999999");
+  EXPECT_EQ (tl::to_string (x), "1000000000000000000000000000000");
+  EXPECT_EQ (tl::to_string (-x), "-1000000000000000000000000000000");
+  EXPECT_EQ (tl::to_string (x + 1), "1000000000000000000000000000001");
+  EXPECT_EQ (tl::to_string (x - 1), "999999999999999999999999999999");
+}
+
+TEST(2)
+{
+  EXPECT_EQ (tl::to_string ((unsigned __int128) 0), "0");
+  EXPECT_EQ (tl::to_string ((unsigned __int128) 42), "42");
+
+  unsigned __int128 x = 1;
+  for (int i = 0; i < 30; ++i) {
+     x *= 10;
+  }
+
+  EXPECT_EQ (tl::to_string (x), "1000000000000000000000000000000");
+  EXPECT_EQ (tl::to_string (x + 1), "1000000000000000000000000000001");
+  EXPECT_EQ (tl::to_string (x - 1), "999999999999999999999999999999");
 }
 
 #endif

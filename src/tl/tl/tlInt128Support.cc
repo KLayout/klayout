@@ -24,44 +24,6 @@
 
 #include "tlInt128Support.h"
 
-namespace tl
-{
-
-std::string
-int128_to_string (__int128 x)
-{
-  std::string r;
-
-  //  this is the max. power of 10 that can be represented with __int128
-  __int128 m = (unsigned long long) 0x4b3b4ca85a86c47a;
-  m <<= 64;
-  m |= (unsigned long long) 0x98a224000000000;
-
-  if (x < 0) {
-    r = "-";
-    x = -x;
-  } else if (x == 0) {
-    return "0";
-  }
-
-  bool first = true;
-  while (m > 1) {
-    int d = 0;
-    while (x >= m) {
-      d += 1;
-      x -= m;
-    }
-    if (d > 0 || !first) {
-      r += char ('0' + d);
-      first = false;
-    }
-    m /= 10;
-  }
-
-  r += char('0' + int(x));
-  return r;
-}
-
-}
+//  .. nothing yet ..
 
 #endif

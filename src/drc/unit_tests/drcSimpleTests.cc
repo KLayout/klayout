@@ -31,7 +31,7 @@ TEST(1)
   rs += "/testdata/drc/drcSimpleTests_1.drc";
 
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au1.gds";
+  au += "/testdata/drc/drcSimpleTests_au1.oas";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -71,7 +71,7 @@ TEST(2)
   input += "/testdata/drc/drctest.gds";
 
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au2.gds";
+  au += "/testdata/drc/drcSimpleTests_au2.oas";
 
   std::string output = this->tmp_file ("tmp.gds");
 
@@ -111,7 +111,7 @@ TEST(3)
   input += "/testdata/drc/drctest.gds";
 
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcSimpleTests_au3.gds";
+  au += "/testdata/drc/drcSimpleTests_au3.oas";
 
   std::string output = this->tmp_file ("tmp.gds");
 

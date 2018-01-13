@@ -145,6 +145,10 @@ LayoutHandle::rename (const std::string &name, bool force) throw (tl::Exception)
       tl::info << "Renamed layout from " << m_name << " to " << n;
     }
 
+    if (find (m_name) == this) {
+      ms_dict.erase (m_name);
+    }
+
     m_name = n;
     ms_dict.insert (std::make_pair (n, this));
     return;

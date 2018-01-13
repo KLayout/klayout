@@ -31,6 +31,7 @@ from build4mac_util import *
 def SetGlobals():
   global ProjectDir         # project directory where "build.sh" exists
   global Usage              # string on usage
+  global GenOSName          # generic OS name
   global Platform           # platform
   global PkgDir             # the package directory where "klayout.app" and "klayout.scripts" exist
   global OpClean            # 'clean' operation
@@ -38,6 +39,7 @@ def SetGlobals():
   global DMGSerialNum       # the DMG serial number
   global QtIndification     # Qt identification
   global Version            # KLayout's version
+  global OccupiedDS         # approx. occupied dist space
   global TargetDMG          # name of the target DMG file
   # Work directories and files
   global TemplateDMG        # unpacked template DMG file
@@ -82,13 +84,17 @@ def SetGlobals():
 
   release = int( Release.split(".")[0] ) # take the first of ['14', '5', '0']
   if release == 14:
-    Platform = "Yosemite"
+    GenOSName = "MacOSX"
+    Platform  = "Yosemite"
   elif release == 15:
-    Platform = "ElCapitan"
+    GenOSName = "MacOSX"
+    Platform  = "ElCapitan"
   elif release == 16:
-    Platform = "Sierra"
+    GenOSName = "macOS"
+    Platform  = "Sierra"
   elif release == 17:
-    Platform = "HighSierra"
+    GenOSName = "macOS"
+    Platform  = "HighSierra"
   else:
     Platform = ""
     print("")
@@ -112,6 +118,7 @@ def SetGlobals():
   TargetDMG      = ""
 
   # Work directories and files
+  OccupiedDS       = -1
   TemplateDMG      = "klayout.dmg"    # unpacked template DMG file
                                       # initially stored as 'macbuild/Resouces/klayout.dmg.bz2'
   WorkDir          = "work"           # work directory created under PkgDir/
@@ -121,48 +128,53 @@ def SetGlobals():
 #------------------------------------------------------------------------------
 ## To check the contents of the package directory
 #
-# @return True on success; False on failure
+# @return on success, positive integer in [MB] of approx. occupied disc space;
+#         on failure, -1
 #------------------------------------------------------------------------------
 def CheckPkgDirectory():
 
   if PkgDir == "":
     print( "! Package directory is not specified", file=sys.stderr )
     print(Usage)
-    return False
+    return -1
 
   if not os.path.isdir(PkgDir):
     print( "! Specified package directory <%s> does not exist" % PkgDir, file=sys.stderr )
     print( "" )
-    return False
+    return -1
 
   os.chdir(PkgDir)
   if not os.path.isdir( "klayout.app" ):
     print( "! The package directory <%s> does not hold <klayout.app> bundle" % PkgDir, file=sys.stderr )
     print( "" )
     os.chdir(ProjectDir)
-    return False
+    return -1
 
   if not os.path.isdir( "klayout.scripts" ):
     print( "! The package directory <%s> does not hold <klayout.scripts> subdirectory" % PkgDir, file=sys.stderr )
     print( "" )
     os.chdir(ProjectDir)
-    return False
+    return -1
 
   os.chdir( "klayout.scripts" )
   if not os.path.isdir( "KLayoutEditor.app" ):
     print( "! The package directory <%s> does not hold <KLayoutEditor.app> bundle" % PkgDir, file=sys.stderr )
     print( "" )
     os.chdir(ProjectDir)
-    return False
+    return -1
 
   if not os.path.isdir( "KLayoutViewer.app" ):
     print( "! The package directory <%s> does not hold <KLayoutViewer.app> bundle" % PkgDir, file=sys.stderr )
     print( "" )
     os.chdir(ProjectDir)
-    return False
+    return -1
 
   os.chdir(ProjectDir)
-  return True
+  os.chdir(PkgDir)
+  size1 = int( os.popen( "du -sm klayout.app" )    .read().strip("\n").split("\t")[0] )
+  size2 = int( os.popen( "du -sm klayout.scripts" ).read().strip("\n").split("\t")[0] )
+  os.chdir(ProjectDir)
+  return size1+size2
 
 #------------------------------------------------------------------------------
 ## To get command line parameters
@@ -170,6 +182,7 @@ def CheckPkgDirectory():
 def ParseCommandLineArguments():
   global ProjectDir
   global Usage
+  global GenOSName
   global Platform
   global PkgDir
   global OpClean
@@ -177,6 +190,7 @@ def ParseCommandLineArguments():
   global DMGSerialNum
   global QtIndification
   global Version
+  global OccupiedDS
   global TargetDMG
 
   p = optparse.OptionParser( usage=Usage )
@@ -227,9 +241,10 @@ def ParseCommandLineArguments():
   OpMake         = opt.operation_make
   QtIndification = opt.qt_identification
   DMGSerialNum   = int(opt.dmg_serial)
-  TargetDMG      = "klayout-%s-%s-%d-%s.dmg" % (Version, Platform, DMGSerialNum, QtIndification)
+  TargetDMG      = "klayout-%s-%s-%s-%d-%s.dmg" % (Version, GenOSName, Platform, DMGSerialNum, QtIndification)
 
-  if not CheckPkgDirectory():
+  OccupiedDS = CheckPkgDirectory()
+  if not OccupiedDS > 0:
     quit()
 
   if (OpClean and OpMake) or (not OpClean and not OpMake):
@@ -342,6 +357,7 @@ def Main():
   if OpMake:
     print( "" )
     print( "  ### You are going to make <%s> from <%s>" % (TargetDMG, PkgDir) )
+    print( "      KLayout bundles occupy about <%d> [MB] of disc space." % OccupiedDS )
     ok = MakeTargetDMGFile()
     if not ok:
       print( "  !!! Failed to make the target DMG <%s> ..." % TargetDMG, file=sys.stderr )

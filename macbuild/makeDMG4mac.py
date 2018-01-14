@@ -6,8 +6,10 @@
 #
 #  Python script for making a DMG file of KLayout (http://www.klayout.de/index.php) bundles.
 #
+#  This is a derivative work of Ref. 2) below. Refer to "macbuild/LICENSE" file.
 #  Ref.
 #   1) https://el-tramo.be/guides/fancy-dmg/
+#   2) https://github.com/andreyvit/create-dmg.git
 #=============================================================================================
 from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
 import sys
@@ -17,6 +19,7 @@ import glob
 import platform
 import optparse
 import subprocess
+import hashlib
 
 #-------------------------------------------------------------------------------
 ## To import global dictionaries of different modules and utility functions
@@ -40,12 +43,10 @@ def SetGlobals():
   global QtIndification     # Qt identification
   global Version            # KLayout's version
   global OccupiedDS         # approx. occupied dist space
-  global TargetDMG          # name of the target DMG file
+  global AppleScriptDMG     # the AppleScript for KLayout DMG
+  global WorkDMG            # work DMG file deployed under ProjectDir/
   global VolumeDMG          # the volume name of DMG
-  # Work directories and files
-  global TemplateDMG        # unpacked template DMG file
-  global WorkDir            # work directory created under PkgDir/
-  global WorkDMG            # work DMG file deployed under PkgDir/
+  global TargetDMG          # name of the target DMG file
   global RootApplications   # reserved directory name for applications
   # auxiliary variables on platform
   global System             # 6-tuple from platform.uname()
@@ -109,28 +110,23 @@ def SetGlobals():
     print(Usage)
     quit()
 
-  PkgDir         = ""
-  OpClean        = False
-  OpMake         = False
-  DMGSerialNum   = 1
-  QtIndification = "Qt593mp"
-  CheckComOnly   = False
-  Version        = GetKLayoutVersionFrom( "./version.sh" )
-  TargetDMG      = ""
-  VolumeDMG      = "KLayout"
-
-  # Work directories and files
+  PkgDir           = ""
+  OpClean          = False
+  OpMake           = False
+  DMGSerialNum     = 1
+  QtIndification   = "Qt593mp"
+  Version          = GetKLayoutVersionFrom( "./version.sh" )
   OccupiedDS       = -1
-  TemplateDMG      = "klayout.dmg"    # unpacked template DMG file
-                                      # initially stored as 'macbuild/Resouces/klayout.dmg.bz2'
-  WorkDir          = "work"           # work directory created under PkgDir/
-  WorkDMG          = "work.dmg"       # work DMG file deployed under PkgDir/
+  AppleScriptDMG   = "macbuild/Resources/KLayoutDMG.applescript"
+  WorkDMG          = "work-KLayout.dmg"
+  VolumeDMG        = "KLayout"
+  TargetDMG        = ""
   RootApplications = "/Applications"  # reserved directory name for applications
 
 #------------------------------------------------------------------------------
 ## To check the contents of the package directory
 #
-# @return on success, positive integer in [MB] of approx. occupied disc space;
+# @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
 #------------------------------------------------------------------------------
 def CheckPkgDirectory():
@@ -146,6 +142,13 @@ def CheckPkgDirectory():
     return -1
 
   os.chdir(PkgDir)
+  items = glob.glob( "*" ) # must be ['klayout.app', 'klayout.scripts']
+  if not len(items) == 2:
+    print( "! The package directory <%s> must have just <2> directories ['klayout.app', 'klayout.scripts']" % PkgDir, file=sys.stderr )
+    print( "" )
+    os.chdir(ProjectDir)
+    return -1
+
   if not os.path.isdir( "klayout.app" ):
     print( "! The package directory <%s> does not hold <klayout.app> bundle" % PkgDir, file=sys.stderr )
     print( "" )
@@ -262,6 +265,12 @@ def ParseCommandLineArguments():
 # @return True on success; False on failure
 #------------------------------------------------------------------------------
 def MakeTargetDMGFile(msg=""):
+  #-----------------------------------------------------------------------
+  # The work DMG is mounted like:
+  #   /dev/disk6s1 248Mi 228Mi 20Mi 93% 58449 5027 92% /Volumes/KLayout
+  #-----------------------------------------------------------------------
+  global MountDir   # the mound directory: /Volumes/KLayout
+  global WorkDev    # the file system    : /dev/disk6s1
 
   #----------------------------------------------------
   # [1] Print message
@@ -269,18 +278,26 @@ def MakeTargetDMGFile(msg=""):
   if not msg == "":
     print(msg)
 
+  #----------------------------------------------------
+  # [2] Do the following jobs sequentially
+  #----------------------------------------------------
   #--------------------------------------------------------
-  # [2] Read the AppleScript template file and generate
-  #     an actual one to execute
+  # (0) Cleanup ProjectDir/
+  #--------------------------------------------------------
+  CleanUp()
+
+  #--------------------------------------------------------
+  # (1) Read the AppleScript template file and generate
+  #     an actual one to execute later
   #--------------------------------------------------------
   os.chdir(ProjectDir)
-  print( ">>> (1) Preparing AppleScript to execute..." )
+  print( ">>> (1) Preparing AppleScript to execute later..." )
   try:
     fd = open( "macbuild/Resources/template-KLayoutDMG.applescript", "r" )
     tmpl = fd.read()
     fd.close()
   except Exception as e:
-    print( "! Failed to read 'template-KLayoutDMG.applescript'", file=sys.stderr )
+    print( "        ! Failed to read <template-KLayoutDMG.applescript>", file=sys.stderr )
     return False
   else:
     t = string.Template(tmpl)
@@ -293,85 +310,154 @@ def MakeTargetDMGFile(msg=""):
                                 ITEM_3='Applications',    X3='790', Y3='140',
                                 CHECK_BASH='[ -f " & dotDSStore & " ]; echo $?'
                               )
+  try:
     # print(applescript)
+    fd = open( AppleScriptDMG, "w" )
+    fd.write(applescript)
+    fd.close()
+  except Exception as e:
+    print( "! Failed to write <%s>" % AppleScriptDMG, file=sys.stderr )
+    return False
+  else:
+    print( "        saved <%s>" % AppleScriptDMG )
 
   #----------------------------------------------------
-  # [3] Prepare empty work directory under PkgDir/ and
-  #     create a disk image
+  # (2) Create a work disk image under ProjectDir/
   #----------------------------------------------------
-  os.chdir(PkgDir)
-  if os.path.exists(WorkDir):
-    shutil.rmtree(WorkDir)
-  os.mkdir(WorkDir)
   if os.path.exists(WorkDMG):
     os.remove(WorkDMG)
-  dmgsize  = OccupiedDS + 20 # approx. occupied size plus 20MB
+  dmgsize  = OccupiedDS + 20 # approx. occupied size plus 20[MB]
   cmdline  = 'hdiutil create -srcfolder %s -volname %s -fs HFS+ -fsargs "-c c=64,a=16,e=16" '
-  cmdline += '-format UDRW -size %sm %s'
-  command  = cmdline % (".", VolumeDMG, dmgsize, WorkDMG)
-  print( ">>> (2) Creating a work DMG file <%s> of <%d>MB" % (WorkDMG, dmgsize) )
+  cmdline += '-format UDRW -size %sm  %s'
+  command  = cmdline % (PkgDir, VolumeDMG, dmgsize, WorkDMG)
+  print( ">>> (2) Creating a work DMG file <%s> of <%d> [MB] with the volume name of <%s>..." % (WorkDMG, dmgsize, VolumeDMG) )
+  os.system(command)
+  MountDir = "/Volumes/%s" % VolumeDMG
+
+  #--------------------------------------------------------
+  # (3) Check if the mount point 'MountDir' already exists
+  #     If so, unmount it.
+  #--------------------------------------------------------
+  command1 = "hdiutil info | grep %s | grep \"/dev/\" | awk '{print $1}'" % VolumeDMG
+  print ( ">>> (3) Checking if the mount point <%s> already exists..." % MountDir)
+  WorkDev = os.popen(command1).read().strip('\n')
+  if os.path.isdir(MountDir) and not WorkDev == "":
+    command2 = "hdiutil detach %s" % WorkDev
+    os.system(command2)
+    print( "        Mount directory <%s> was detached" % MountDir )
+  else:
+    print( "        Mount directory <%s> does not exist; nothing to do" % MountDir )
+
+  #--------------------------------------------------------
+  # (4) Mount the DMG
+  #--------------------------------------------------------
+  print( ">>> (4) Mounting <%s> to <%s>" % (WorkDMG, MountDir ) )
+  command1 = "hdiutil attach %s -readwrite -noverify -noautoopen -quiet" % WorkDMG
+  os.system(command1)
+
+  command2 = "hdiutil info | grep %s | grep \"/dev/\" | awk '{print $1}'" % VolumeDMG
+  WorkDev  = os.popen(command2).read().strip('\n')
+  if WorkDev == "":
+    print( "! Failed to identify the file system on which <%s> is mounted" % VolumeDMG )
+    return False
+  else:
+    print( "        Work Device = %s" % WorkDev )
+
+  #--------------------------------------------------------
+  # (5) Copy the background image and the volume icon
+  #--------------------------------------------------------
+  print( ">>> (5) Copying the background image and the volume icon..." )
+  resBackPng = "KLayoutDMG-Back.png"
+  imageSrc   = "macbuild/Resources/%s" % resBackPng
+  imageDest  = "%s/.background" % MountDir
+  if not os.path.isdir(imageDest):
+    os.mkdir(imageDest)
+  command1 = "cp -p %s %s/%s" % (imageSrc, imageDest, resBackPng)
+  os.system(command1)
+
+  resVolIcns = "KLayoutHDD.icns"
+  iconsSrc   = "macbuild/Resources/%s" % resVolIcns
+  iconsDest  = "%s/.VolumeIcon.icns" % MountDir
+  command2   = "cp -p %s %s" % (iconsSrc, iconsDest)
+  command3   = "SetFile -c icnC %s" % iconsDest
+  os.system(command2)
+  os.system(command3)
+
+  #--------------------------------------------------------
+  # (6) Create a symbolic link to /Applications
+  #--------------------------------------------------------
+  print( ">>> (6) Creating a symbolic link to /Applications..." )
+  command = "ln -s %s %s/%s" % (RootApplications, MountDir, RootApplications)
   os.system(command)
 
   #--------------------------------------------------------
-  # [4] Attach the work directory to the work DMG
+  # (7) Run the AppleScript
   #--------------------------------------------------------
-  print( ">>> (3) Mounting <%s> to <%s>" % (WorkDir, WorkDMG) )
-  command = "hdiutil attach %s -readwrite -noverify -noautoopen -quiet -mountpoint %s" % (WorkDMG, WorkDir)
+  print( ">>> (7) Running the AppleScript..." )
+  command = "/usr/bin/osascript %s %s" % (AppleScriptDMG, VolumeDMG)
+  process = subprocess.Popen( command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True )
+  output, error = process.communicate()
+  if not output == "":
+    print( "        STDOUT: %s" % output )
+  if not error == "":
+    print( "        STDERR: %s" % error )
+
+  #--------------------------------------------------------
+  # (8) Change the permission
+  #--------------------------------------------------------
+  print( ">>> (8) Changing permission to 755..." )
+  command = "chmod -Rf 755 %s &> /dev/null" % MountDir
   os.system(command)
 
-  command = "hdiutil info | grep %s | grep \"/dev/\" | awk '{print $1}'" % WorkDir
-  workDev = os.popen( command ).read().strip('\n')
-  if workDev == "":
-    print( "! Failed to identify the file system on which <%s> is mounted" % WorkDir )
-    return False
-  else:
-    print( "        Work Device = %s" % workDev )
-  quit()
+  #--------------------------------------------------------
+  # (9) Set volume bootability and startup disk options
+  #--------------------------------------------------------
+  print( ">>> (8) Setting volume bootability and startup disk options..." )
+  command = "bless --folder %s --openfolder %s" % (MountDir, MountDir)
+  os.system(command)
 
   #--------------------------------------------------------
-  # [2] Deploy unpacked template DMG under PkgDir/
+  # (9) Set attributes of files and directories
   #--------------------------------------------------------
-  os.chdir(ProjectDir)
-  tmplDMGbz2 = "macbuild/Resources/%s.bz2" % TemplateDMG
-  srcDMG     = "macbuild/Resources/%s"     % TemplateDMG
-  destDMG    = "%s/%s" % (PkgDir, WorkDMG)
-  os.system( "%s -k %s" % ("bunzip2", tmplDMGbz2))
-  shutil.copy2( srcDMG, destDMG )
-  os.remove( srcDMG )
-
-
-
-
+  print( ">>> (9) Setting attributes of files and directories..." )
+  command = "SetFile -a C %s" % MountDir # Custom icon (allowed on folders)
+  os.system(command)
 
   #--------------------------------------------------------
-  # [5] Populate the work directory
+  # (10) Unmount the disk image
   #--------------------------------------------------------
-  os.system( "%s %s %s" % ("cp -Rp", "klayout.app",     WorkDir) )
-  os.system( "%s %s %s" % ("cp -Rp", "klayout.scripts", WorkDir) )
-  os.symlink( RootApplications, WorkDir + RootApplications )
+  print( ">>> (10) Unmounting the disk image..." )
+  command = "hdiutil detach %s" % WorkDev
+  os.system(command)
 
   #--------------------------------------------------------
-  # [6] Detach the work directory
-  #
-  #     wordDev = /dev/disk10s1 (for example)
+  # (11) Compress the disk image
   #--------------------------------------------------------
-  command = "hdiutil info | grep %s | grep \"/dev/\" | awk '{print $1}'" % WorkDir
-  wordDev = os.popen( command ).read().strip('\n')
-  if wordDev == "":
-    print( "! Failed to identify the file system on which <%s> is mounted" % WorkDir )
-    return False
-  else:
-    os.system( "hdiutil detach %s  -quiet -force" % wordDev )
+  print( "" )
+  print( ">>> (11) Compressing the disk image..." )
+  command = "hdiutil convert %s -format UDZO -imagekey zlib-level=9 -o %s" % (WorkDMG, TargetDMG)
+  os.system(command)
+  os.remove(WorkDMG)
+  print( "" )
+  print( "        generated compressed DMG <%s>" % TargetDMG )
 
   #--------------------------------------------------------
-  # [7]　Finish up
+  # (12) Compute MD5 checksum
   #--------------------------------------------------------
-  os.system( "rm -Rf %s" % TargetDMG )
-  os.system( "hdiutil convert -quiet -format UDRW -imagekey zlib-level=9 -o %s %s" % (TargetDMG, WorkDMG) )
-  os.system( "rm -Rf %s" % WorkDir )
-  os.system( "rm -Rf %s" % WorkDMG )
-  os.system( "rm -Rf %s" % TemplateDMG )
-  os.chdir(ProjectDir)
+  print( "" )
+  print( ">>> (12) Computing MD5 checksum..." )
+  with open( TargetDMG, "rb" ) as f:
+    data = f.read()
+    md5  = hashlib.md5(data).hexdigest()
+    md5 += " *%s\n" % TargetDMG
+  f.close()
+  path, ext    = os.path.splitext( os.path.basename(TargetDMG) )
+  md5TargetDMG = path + ".dmg.md5"
+  with open( md5TargetDMG, "w" ) as f:
+    f.write(md5)
+  f.close()
+  print( "        generated MD5 checksum file <%s>" % md5TargetDMG )
+  print( "" )
 
   return True
 
@@ -390,15 +476,18 @@ def CleanUp(msg=""):
     print(msg)
 
   #----------------------------------------------------
-  # [2] Clean up
+  # [2] Clean up *.dmg*
   #----------------------------------------------------
   os.chdir(ProjectDir)
-  os.chdir(PkgDir)
-  dmgs = glob.glob( "*.dmg" )
+  dmgs = glob.glob( "*.dmg*" )
   for item in dmgs:
     os.system( "rm -Rf %s" % item )
-  os.system( "rm -Rf %s" % WorkDir )
-  os.chdir(ProjectDir)
+
+  #----------------------------------------------------
+  # [3] Clean up AppleScript if any
+  #----------------------------------------------------
+  if os.path.exists(AppleScriptDMG) and os.path.isfile(AppleScriptDMG):
+    os.remove(AppleScriptDMG)
 
 #------------------------------------------------------------------------------
 ## The main function
@@ -419,7 +508,7 @@ def Main():
       print( "" )
   else:
     print( "" )
-    print( "  ### You are going to clean up <%s> directory" % PkgDir )
+    print( "  ### You are going to clean up <%s> directory" % ProjectDir )
     CleanUp()
     print( "  ### Done" )
     print( "" )

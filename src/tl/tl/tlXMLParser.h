@@ -150,7 +150,7 @@ public:
  */
 
 template <class Obj>
-class XMLReaderProxy
+class TL_PUBLIC_TEMPLATE XMLReaderProxy
   : public XMLReaderProxyBase
 {
 public:
@@ -412,7 +412,7 @@ private:
 // -----------------------------------------------------------------
 //  The C++ structure definition interface (for use cases see tlXMLParser.ut)
 
-class XMLElementBase;
+class TL_PUBLIC XMLElementBase;
 
 struct pass_by_value_tag { 
   pass_by_value_tag () { } 
@@ -714,7 +714,7 @@ private:
  */
 
 template <class Obj, class Parent, class Read, class Write>
-class XMLElement 
+class TL_PUBLIC_TEMPLATE XMLElement
   : public XMLElementBase
 {
 public:
@@ -819,7 +819,7 @@ private:
  */
 
 template <class Obj, class Parent, class Read, class Write>
-class XMLElementWithParentRef 
+class TL_PUBLIC_TEMPLATE XMLElementWithParentRef
   : public XMLElementBase
 {
 public:
@@ -933,7 +933,7 @@ private:
  */
 
 template <class Value, class Parent, class Read, class Write, class Converter>
-class XMLMember 
+class TL_PUBLIC_TEMPLATE XMLMember
   : public XMLElementBase
 {
 public:
@@ -1024,7 +1024,7 @@ private:
  */
 
 template <class Value, class Parent, class Write, class Converter>
-class XMLWildcardMember 
+class TL_PUBLIC_TEMPLATE XMLWildcardMember
   : public XMLElementBase
 {
 public:
@@ -1092,7 +1092,7 @@ private:
  */
 
 template <class Obj>
-class XMLStruct 
+class TL_PUBLIC_TEMPLATE XMLStruct
   : public XMLElementBase
 {
 public:

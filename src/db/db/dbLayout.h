@@ -69,7 +69,7 @@ typedef generic_repository<db::Coord> GenericRepository;
  *  Since we are using a custom cell list, we have to provide our own iterator
  */
 template <class C>
-class DB_PUBLIC cell_list_iterator
+class DB_PUBLIC_TEMPLATE cell_list_iterator
 {
 public:
   typedef C cell_type;

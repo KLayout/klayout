@@ -1593,7 +1593,7 @@ public:
  *  into the db::Object manager's undo/redo queue.
  */
 template <class Sh, class StableTag>
-class DB_PUBLIC layer_op
+class DB_PUBLIC_TEMPLATE layer_op
   : public LayerOpBase
 {
 public:

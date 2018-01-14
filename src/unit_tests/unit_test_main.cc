@@ -378,6 +378,10 @@ main_cont (int &argc, char **argv)
 
     }
 
+    if (! tl::TestRegistrar::instance()) {
+      throw tl::Exception ("No test libraries found - make sure, the *.ut files are next to the ut_runner executable.");
+    }
+
     //  No side effects
     lay::set_klayout_path (std::vector<std::string> ());
 

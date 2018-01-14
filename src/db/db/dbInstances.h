@@ -509,6 +509,8 @@ private:
  *  determines how to initialize the iterators and what types to use.
  */
 
+//  NOTE: we do explicit instantiation, so the exposure is declared
+//  as DB_PUBLIC - as if it wasn't a template
 template <class IterTraits>
 class DB_PUBLIC instance_iterator
 {

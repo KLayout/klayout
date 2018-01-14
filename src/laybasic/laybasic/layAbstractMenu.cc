@@ -37,11 +37,33 @@
 #include <QToolButton>
 #include <QApplication>
 #include <QMessageBox>
+#include <QHBoxLayout>
 
 #include <ctype.h>
 
 namespace lay
 {
+
+// ---------------------------------------------------------------
+
+#if defined(__APPLE__)
+
+//  On MacOS, the main menu bar and it's decendent children
+//  can't be modified using "removeAction", followrd by "addAction"
+//  to achieve a move operation.If we try to do so, segmentation faults happen
+//  in the timer event that presumably tries to merge the menu bar
+//  with the application menu.
+//  The fallback is to only allow add/delete, not move operations on the
+//  menu. In effect, the order of the menu items may not be the one desired
+//  if menus are dynamically created. However, this will only happen when
+//  new packages or macros are installed.
+static const bool s_can_move_menu = false;
+
+#else
+
+static const bool s_can_move_menu = true;
+
+#endif
 
 // ---------------------------------------------------------------
 //  Helper function to parse a title with potential shortcut and 
@@ -101,13 +123,13 @@ parse_menu_title (const std::string &s, std::string &title, std::string &shortcu
 //  AbstractMenuItem implementation
 
 AbstractMenuItem::AbstractMenuItem () 
-  : mp_menu (0), m_has_submenu (false), m_remove_on_empty (false)
+  : m_has_submenu (false), m_remove_on_empty (false)
 {
   //  ... nothing yet ..
 }
 
 AbstractMenuItem::AbstractMenuItem (const AbstractMenuItem &) 
-  : mp_menu (0), m_has_submenu (false), m_remove_on_empty (false)
+  : m_has_submenu (false), m_remove_on_empty (false)
 { 
   //  ... nothing yet ..
 }
@@ -159,6 +181,10 @@ AbstractMenuItem::set_action (const Action &a, bool copy_properties)
   m_action.set_visible (visible);
 
   m_action.set_object_name (m_basename);
+
+  if (m_action.menu ()) {
+    m_action.menu ()->setObjectName (tl::to_qstring (m_basename));
+  }
 }
 
 void 
@@ -177,15 +203,6 @@ void
 AbstractMenuItem::set_remove_on_empty ()
 {
   m_remove_on_empty = true;
-}
-
-void
-AbstractMenuItem::set_menu (QMenu *menu)
-{
-  mp_menu = menu;
-  if (mp_menu) {
-    mp_menu->setObjectName (tl::to_qstring (m_basename));
-  }
 }
 
 // ---------------------------------------------------------------
@@ -237,7 +254,8 @@ public:
 };
 
 ActionHandle::ActionHandle (QWidget *parent)
-  : mp_action (new ActionObject (parent)), 
+  : mp_menu (0),
+    mp_action (new ActionObject (parent)),
     m_ref_count (0),
     m_owned (true),
     m_visible (true),
@@ -253,12 +271,30 @@ ActionHandle::ActionHandle (QWidget *parent)
 }
 
 ActionHandle::ActionHandle (QAction *action, bool owned)
-  : mp_action (action), 
+  : mp_menu (0),
+    mp_action (action),
     m_ref_count (0), 
     m_owned (owned),
     m_visible (true),
     m_hidden (false)
 { 
+  if (! sp_actionHandles) {
+    sp_actionHandles = new std::set<ActionHandle *> ();
+  }
+  sp_actionHandles->insert (this);
+
+  //  catch the destroyed signal to tell if the QAction object is deleted.
+  connect (mp_action, SIGNAL (destroyed (QObject *)), this, SLOT (destroyed (QObject *)));
+}
+
+ActionHandle::ActionHandle (QMenu *menu, bool owned)
+  : mp_menu (menu),
+    mp_action (menu->menuAction ()),
+    m_ref_count (0),
+    m_owned (owned),
+    m_visible (true),
+    m_hidden (false)
+{
   if (! sp_actionHandles) {
     sp_actionHandles = new std::set<ActionHandle *> ();
   }
@@ -278,7 +314,14 @@ ActionHandle::~ActionHandle ()
     }
   }
 
-  if (mp_action) {
+  if (mp_menu) {
+    if (m_owned) {
+      delete mp_menu;
+      m_owned = false;
+    }
+    mp_menu = 0;
+    mp_action = 0;
+  } else if (mp_action) {
     if (m_owned) {
       delete mp_action;
       m_owned = false;
@@ -305,6 +348,12 @@ QAction *
 ActionHandle::ptr () const
 {
   return mp_action;
+}
+
+QMenu *
+ActionHandle::menu () const
+{
+  return mp_menu;
 }
 
 void 
@@ -579,6 +628,12 @@ QAction *
 Action::qaction () const
 {
   return mp_handle ? mp_handle->ptr () : 0;
+}
+
+QMenu *
+Action::menu () const
+{
+  return mp_handle ? mp_handle->menu () : 0;
 }
 
 void
@@ -869,7 +924,7 @@ AbstractMenu::AbstractMenu (AbstractMenuProvider *provider)
 
 AbstractMenu::~AbstractMenu ()
 {
-  reset_menu_objects (m_root);
+  //  .. nothing yet ..
 }
 
 void 
@@ -877,15 +932,6 @@ AbstractMenu::init (const MenuLayoutEntry *layout)
 {
   m_root.set_has_submenu ();
   transfer (layout, m_root);
-}
-
-void 
-AbstractMenu::reset_menu_objects (AbstractMenuItem &item)
-{
-  for (std::list<AbstractMenuItem>::iterator c = item.children.begin (); c != item.children.end (); ++c) {
-    reset_menu_objects (*c);
-  }
-  item.set_menu (0);
 }
 
 QActionGroup *
@@ -903,31 +949,60 @@ AbstractMenu::make_exclusive_group (const std::string &name)
 }
 
 void 
-AbstractMenu::build_detached (const std::string &name, QMenuBar *mbar)
+AbstractMenu::build_detached (const std::string &name, QFrame *mbar)
 {
+  //  Clean up the menu bar before rebuilding
+  if (mbar->layout ()) {
+    delete mbar->layout ();
+  }
+  QObjectList children = mbar->children ();
+  for (QObjectList::const_iterator c = children.begin (); c != children.end (); ++c) {
+    if (dynamic_cast<QToolButton *> (*c)) {
+      delete *c;
+    }
+  }
+
+  QHBoxLayout *menu_layout = new QHBoxLayout (mbar);
+  menu_layout->setMargin (0);
+  mbar->setLayout (menu_layout);
+
   AbstractMenuItem *item = find_item_exact ("@@" + name);
   tl_assert (item != 0);
-
-  mbar->clear ();
 
   for (std::list<AbstractMenuItem>::iterator c = item->children.begin (); c != item->children.end (); ++c) {
 
     if (c->has_submenu ()) {
 
+      QToolButton *menu_button = new QToolButton (mbar);
+      menu_layout->addWidget (menu_button);
+      menu_button->setAutoRaise (true);
+      menu_button->setPopupMode (QToolButton::MenuButtonPopup);
+      menu_button->setText (tl::to_qstring (c->action ().get_title ()));
+
       if (c->menu () == 0) {
-        c->set_menu (mbar->addMenu (tl::to_qstring (c->action ().get_title ())));
-        c->set_action (Action (new ActionHandle (c->menu ()->menuAction (), false)), true);
+        QMenu *menu = new QMenu ();
+        menu_button->setMenu (menu);
+        c->set_action (Action (new ActionHandle (menu)), true);
       } else {
-        mbar->addMenu (c->menu ());
+        menu_button->setMenu (c->menu ());
       }
 
       build (c->menu (), c->children);
 
     } else {
-      mbar->addAction (c->action ().qaction ());
+
+      QAction *action = c->action ().qaction ();
+
+      QToolButton *menu_button = new QToolButton (mbar);
+      menu_layout->addWidget (menu_button);
+      menu_button->setAutoRaise (true);
+      menu_button->setDefaultAction (action);
+
     }
 
   }
+
+  menu_layout->addStretch (1);
 }
 
 void 
@@ -936,8 +1011,11 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
   tl_assert (mp_provider != 0);
 
   m_helper_menu_items.clear ();
-  mbar->clear ();
   tbar->clear ();
+
+  std::set<QAction *> present_actions;
+  QList<QAction *> a = mbar->actions ();
+  present_actions.insert (a.begin (), a.end ());
 
   for (std::list<AbstractMenuItem>::iterator c = m_root.children.begin (); c != m_root.children.end (); ++c) {
 
@@ -954,14 +1032,13 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
       } else if (c->name ().find ("@") == 0) {
 
         if (c->menu () == 0) {
-          QMenu *menu = new QMenu (tl::to_qstring (c->action ().get_title ()), mp_provider->menu_parent_widget ());
+          QMenu *menu = new QMenu (tl::to_qstring (c->action ().get_title ()));
           // HINT: it is necessary to add the menu action to a widget below the main window.
           // Otherwise, the keyboard shortcuts do not work for menu items inside such a
           // popup menu. It seems not to have a negative effect to add the menu to the 
           // main widget.
           mp_provider->menu_parent_widget ()->addAction (menu->menuAction ()); 
-          c->set_menu (menu);
-          c->set_action (Action (new ActionHandle (c->menu ()->menuAction (), false)), true);
+          c->set_action (Action (new ActionHandle (menu)), true);
         }
 
         //  prepare a detached menu which can be used as context menues
@@ -970,10 +1047,22 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
       } else {
 
         if (c->menu () == 0) {
-          c->set_menu (mbar->addMenu (tl::to_qstring (c->action ().get_title ())));
-          c->set_action (Action (new ActionHandle (c->menu ()->menuAction (), false)), true);
+          QMenu *menu = new QMenu ();
+          menu->setTitle (tl::to_qstring (c->action ().get_title ()));
+          mbar->addMenu (menu);
+          c->set_action (Action (new ActionHandle (menu)), true);
         } else {
-          mbar->addMenu (c->menu ());
+          //  Move the action to the end if present in the menu already
+          std::set<QAction *>::iterator a = present_actions.find (c->menu ()->menuAction ());
+          if (a != present_actions.end ()) {
+            if (s_can_move_menu) {
+              mbar->removeAction (*a);
+              mbar->addMenu (c->menu ());
+            }
+            present_actions.erase (*a);
+          } else {
+            mbar->addMenu (c->menu ());
+          }
         }
 
         build (c->menu (), c->children);
@@ -981,29 +1070,81 @@ AbstractMenu::build (QMenuBar *mbar, QToolBar *tbar)
       }
 
     } else {
-      mbar->addAction (c->action ().qaction ());
+      //  Move the action to the end if present in the menu already
+      std::set<QAction *>::iterator a = present_actions.find (c->action ().qaction ());
+      if (a != present_actions.end ()) {
+        if (s_can_move_menu) {
+          mbar->removeAction (*a);
+          mbar->addAction (c->action ().qaction ());
+        }
+        present_actions.erase (*a);
+      } else {
+        mbar->addAction (c->action ().qaction ());
+      }
     }
 
+  }
+
+  //  Remove all actions that have vanished
+  for (std::set<QAction *>::iterator a = present_actions.begin (); a != present_actions.end (); ++a) {
+    mbar->removeAction (*a);
   }
 }
 
 void 
 AbstractMenu::build (QMenu *m, std::list<AbstractMenuItem> &items)
 {
-  m->clear (); 
+  std::set<QAction *> present_actions;
+  QList<QAction *> a = m->actions ();
+  present_actions.insert (a.begin (), a.end ());
 
   for (std::list<AbstractMenuItem>::iterator c = items.begin (); c != items.end (); ++c) {
+
     if (c->has_submenu ()) {
-      //  HINT: the action acts as a container for the title. Unfortunately, we cannot create a 
-      //  menu with a given action. The action is provided by addMenu instead.
-      QMenu *menu = m->addMenu (tl::to_qstring (c->action ().get_title ()));
-      c->set_action (Action (new ActionHandle (menu->menuAction (), false)), true);
-      //  HINT: build must be done before set_menu because set_menu might delete all child QAction's ..
-      build (menu, c->children);
-      c->set_menu (menu);
+
+      if (! c->menu ()) {
+        //  HINT: the action acts as a container for the title. Unfortunately, we cannot create a
+        //  menu with a given action. The action is provided by addMenu instead.
+        QMenu *menu = new QMenu ();
+        menu->setTitle (tl::to_qstring (c->action ().get_title ()));
+        m->addMenu (menu);
+        c->set_action (Action (new ActionHandle (menu)), true);
+      } else {
+        //  Move the action to the end if present in the menu already
+        std::set<QAction *>::iterator a = present_actions.find (c->menu ()->menuAction ());
+        if (a != present_actions.end ()) {
+          if (s_can_move_menu) {
+            m->removeAction (*a);
+            m->addMenu (c->menu ());
+          }
+          present_actions.erase (*a);
+        } else {
+          m->addMenu (c->menu ());
+        }
+      }
+
+      build (c->menu (), c->children);
+
     } else {
-      m->addAction (c->action ().qaction ());
+
+      //  Move the action to the end if present in the menu already
+      std::set<QAction *>::iterator a = present_actions.find (c->action ().qaction ());
+      if (a != present_actions.end ()) {
+        if (s_can_move_menu) {
+          m->removeAction (*a);
+          m->addAction (c->action ().qaction ());
+        }
+        present_actions.erase (*a);
+      } else {
+        m->addAction (c->action ().qaction ());
+      }
+
     }
+  }
+
+  //  Remove all actions that have vanished
+  for (std::set<QAction *>::iterator a = present_actions.begin (); a != present_actions.end (); ++a) {
+    m->removeAction (*a);
   }
 }
 
@@ -1205,7 +1346,6 @@ AbstractMenu::delete_item (const std::string &p)
         break;
       }
 
-      reset_menu_objects (*p->second);
       p->first->children.erase (p->second);
 
     }
@@ -1521,4 +1661,3 @@ AbstractMenu::collect_group (std::vector<std::string> &grp, const std::string &n
 }
 
 }
-

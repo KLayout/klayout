@@ -191,7 +191,7 @@ class DBTrans_TestClass < TestBase
     assert_equal( c.is_mag?, true )
     assert_equal( c.rot, RBA::DCplxTrans::M0.rot )
     assert_equal( c.s_trans.to_s, "m0 2.5,-12.5" )
-    assert_equal( c.angle, 45 )
+    assert_equal( (c.angle - 45).abs < 1e-10, true )
 
     assert_equal( c.ctrans( 5 ).to_s, "3.75" )
     assert_equal( c.trans( RBA::DPoint::new( 12, 16 ) ).to_s, "17.3492424049,-14.6213203436" )
@@ -345,7 +345,7 @@ class DBTrans_TestClass < TestBase
     assert_equal( c.is_mag?, true )
     assert_equal( c.rot, RBA::CplxTrans::M0.rot )
     assert_equal( c.s_trans.to_s, "m0 3,-13" )
-    assert_equal( c.angle, 45 )
+    assert_equal( (c.angle - 45).abs < 1e-10, true )
 
     assert_equal( c.ctrans( 5 ).to_s, "3.75" )
     assert_equal( c.trans( RBA::Point::new( 12, 16 ) ).to_s, "17.3492424049,-14.6213203436" )

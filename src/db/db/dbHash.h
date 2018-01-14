@@ -74,7 +74,7 @@ namespace DB_HASH_NAMESPACE
   };
 #endif
 
-#if defined(_WIN64)
+#if defined(_WIN64) || defined(__APPLE__)
   /**
    *  @brief Specialization missing for long long on WIN64
    */

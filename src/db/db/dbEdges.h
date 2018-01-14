@@ -229,8 +229,11 @@ private:
    *  @brief ctor from a recursive shape iterator
    */
   EdgesIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
-    : m_rec_iter (iter), m_iter_trans (trans)
-  { 
+    : m_rec_iter (iter), m_iter_trans (trans), m_from (), m_to ()
+  {
+    //  NOTE: the following initialization appears to be required on some compilers
+    //  (specifically MacOS/clang) to ensure the proper initialization of the iterators
+    m_from = m_to;
     set ();
   }
 

@@ -137,7 +137,7 @@ private:
  *  @brief A "neutral" exception thrown to terminate some operation
  *  This exception is not shown.
  */
-struct CancelException
+struct TL_PUBLIC CancelException
   : public Exception
 {
   CancelException ()
@@ -148,7 +148,7 @@ struct CancelException
 /**
  *  @brief A special "internal" exception class used by tl_assert
  */
-struct InternalException
+struct TL_PUBLIC InternalException
   : public Exception
 {
   InternalException (const char *file, int line, const char *cond)

@@ -3418,6 +3418,7 @@ template <> struct type_traits<QIconEngine> : public type_traits<void> {
 class QIconEngine_Adaptor;
 namespace tl {
 template <> struct type_traits<QIconEngine_Adaptor> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
 };
 }
 

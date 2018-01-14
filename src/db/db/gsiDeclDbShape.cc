@@ -954,7 +954,7 @@ struct ConvertingIteratorWrapper
   typedef T value_type;
   typedef T reference;
   typedef void pointer;
-  typedef void iterator_category;
+  typedef std::forward_iterator_tag iterator_category;
 
   ConvertingIteratorWrapper (double dbu, const I &b, const I &e)
     : m_b (b), m_e (e), m_dbu (dbu)
@@ -989,7 +989,7 @@ struct ConvertingFreeIteratorWrapper
   typedef T value_type;
   typedef T reference;
   typedef void pointer;
-  typedef void iterator_category;
+  typedef std::forward_iterator_tag iterator_category;
 
   ConvertingFreeIteratorWrapper (double dbu, const I &b)
     : m_b (b), m_dbu (dbu)

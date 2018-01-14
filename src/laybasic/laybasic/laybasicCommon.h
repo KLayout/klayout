@@ -32,14 +32,17 @@
 #     define LAYBASIC_PUBLIC __declspec(dllimport)
 #   endif
 #   define LAYBASIC_LOCAL
+#   define LAYBASIC_PUBLIC_TEMPLATE
 
 # else
 
-#   if __GNUC__ >= 4
+#   if __GNUC__ >= 4 || defined(__clang__)
 #     define LAYBASIC_PUBLIC __attribute__ ((visibility ("default")))
+#     define LAYBASIC_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
 #     define LAYBASIC_LOCAL  __attribute__ ((visibility ("hidden")))
 #   else
 #     define LAYBASIC_PUBLIC
+#     define LAYBASIC_PUBLIC_TEMPLATE
 #     define LAYBASIC_LOCAL
 #   endif
 

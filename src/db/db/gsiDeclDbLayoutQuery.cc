@@ -70,7 +70,7 @@ struct LayoutQueryIteratorWrapper
 {
   typedef db::LayoutQueryIterator &reference;
   //  Dummy declarations
-  typedef void iterator_category;
+  typedef std::forward_iterator_tag iterator_category;
   typedef void value_type;
   typedef void difference_type;
   typedef void pointer;

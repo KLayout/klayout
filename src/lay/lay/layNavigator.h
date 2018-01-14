@@ -33,7 +33,7 @@
 
 class QCloseEvent;
 class QShowEvent;
-class QMenuBar;
+class QFrame;
 class QLabel;
 
 namespace lay
@@ -102,7 +102,7 @@ private:
   MainWindow *mp_main_window;  
   LayoutView *mp_view;  
   QLabel *mp_placeholder_label;  
-  QMenuBar *mp_menu_bar;
+  QFrame *mp_menu_bar;
   LayoutView *mp_source_view;
   NavigatorService *mp_service;
   tl::DeferredMethod<Navigator> m_do_view_changed;

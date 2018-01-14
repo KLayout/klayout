@@ -153,9 +153,7 @@ static gsi::Enum<Qt::WindowType> decl_Qt_WindowType_Enum ("Qt_WindowType",
     gsi::enum_const ("MacWindowToolBarButtonHint", Qt::MacWindowToolBarButtonHint, "@brief Enum constant Qt::MacWindowToolBarButtonHint") +
     gsi::enum_const ("BypassGraphicsProxyWidget", Qt::BypassGraphicsProxyWidget, "@brief Enum constant Qt::BypassGraphicsProxyWidget") +
     gsi::enum_const ("NoDropShadowWindowHint", Qt::NoDropShadowWindowHint, "@brief Enum constant Qt::NoDropShadowWindowHint") +
-    gsi::enum_const ("WindowFullscreenButtonHint", Qt::WindowFullscreenButtonHint, "@brief Enum constant Qt::WindowFullscreenButtonHint") +
-    gsi::enum_const ("WindowOkButtonHint", Qt::WindowOkButtonHint, "@brief Enum constant Qt::WindowOkButtonHint") +
-    gsi::enum_const ("WindowCancelButtonHint", Qt::WindowCancelButtonHint, "@brief Enum constant Qt::WindowCancelButtonHint"),
+    gsi::enum_const ("WindowFullscreenButtonHint", Qt::WindowFullscreenButtonHint, "@brief Enum constant Qt::WindowFullscreenButtonHint"),
   "@qt\n@brief This class represents the Qt::WindowType enum");
 
 static gsi::QFlagsClass<Qt::WindowType > decl_Qt_WindowType_Enums ("Qt_QFlags_WindowType",

@@ -37,7 +37,7 @@ namespace gsi
 /**
  *  @brief Provides a basic implementation for a "boxed" plain value using a Variant as the basic type
  */
-class Value
+class GSI_PUBLIC Value
 {
 public:
   /**

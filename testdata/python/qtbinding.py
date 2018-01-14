@@ -77,6 +77,28 @@ class MyObject(pya.QObject):
   def on_event_filter(self, ef):
     self.ef = ef
   
+def map2str(dict):
+  # A helper function to product a "canonical" (i.e. sorted-keys) string
+  # representation of a dict
+  keys = list(dict)
+
+  for k in keys:
+    if type(k) is str:
+      strKeys = []
+      strDict = {}
+      for x in keys:
+        strKeys.append(str(x))
+        strDict[str(x)] = dict[x]
+      strings = []
+      for x in sorted(strKeys):
+        strings.append(str(x) + ": " + str(strDict[x]))
+      return "{" + ", ".join(strings) + "}"
+
+  strings = []
+  for x in sorted(keys):
+    strings.append(str(x) + ": " + str(dict[x]))
+  return "{" + ", ".join(strings) + "}"
+  
 # The Qt binding tests
 
 class QtBindingTest(unittest.TestCase):
@@ -462,15 +484,13 @@ class QtBindingTest(unittest.TestCase):
     # QHash bindings 
 
     slm = MyStandardItemModel()
-    r1 = "{0: \'display\', 1: \'decoration\', 2: \'edit\', 3: \'toolTip\', 4: \'statusTip\', 5: \'whatsThis\'}"
-    r2 = "{0L: \'display\', 1L: \'decoration\', 2L: \'edit\', 3L: \'toolTip\', 4L: \'statusTip\', 5L: \'whatsThis\'}"
-    self.assertEqual(str(slm.roleNames()) == r1 or str(slm.roleNames()) == r2, True)
     rn = slm.roleNames()
-    rn[7] = "blabla"
-    slm.srn(rn)
-    r1 = "{0: \'display\', 1: \'decoration\', 2: \'edit\', 3: \'toolTip\', 4: \'statusTip\', 5: \'whatsThis\', 7: \'blabla\'}"
-    r2 = "{0L: \'display\', 1L: \'decoration\', 2L: \'edit\', 3L: \'toolTip\', 4L: \'statusTip\', 5L: \'whatsThis\', 7L: \'blabla\'}"
-    self.assertEqual(str(slm.roleNames()) == r1 or str(slm.roleNames()) == r2, True)
+    self.assertEqual(map2str(rn), "{0: display, 1: decoration, 2: edit, 3: toolTip, 4: statusTip, 5: whatsThis}")
+    rnNew = slm.roleNames()
+    rnNew[7] = "blabla"
+    slm.srn(rnNew)
+    rn = slm.roleNames()
+    self.assertEqual(map2str(rn), "{0: display, 1: decoration, 2: edit, 3: toolTip, 4: statusTip, 5: whatsThis, 7: blabla}")
 
   def test_44(self):
 
@@ -488,8 +508,8 @@ class QtBindingTest(unittest.TestCase):
     self.assertEqual(child.height > 100, True)
     
     parent.resize(100, 100)
-    self.assertEqual(child.width < 100, True)
-    self.assertEqual(child.height < 100, True)
+    self.assertEqual(child.width <= 100, True)
+    self.assertEqual(child.height <= 100, True)
 
     # now if we delete the parent, the child needs to become disconnected
 

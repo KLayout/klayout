@@ -30,7 +30,7 @@
 namespace gsi
 {
 
-class ClassBase;
+class GSI_PUBLIC ClassBase;
 
 /**
  *  @brief Implements an object holder

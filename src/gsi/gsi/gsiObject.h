@@ -35,7 +35,7 @@
 namespace gsi
 {
 
-class ClassBase;
+class GSI_PUBLIC ClassBase;
 
 /**
  *  @brief Definition of the client indexes

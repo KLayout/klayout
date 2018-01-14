@@ -43,7 +43,7 @@ template <class C> class vector;
  */
 
 template <class C>
-class point 
+class DB_PUBLIC_TEMPLATE point
 {
 public:
   typedef C coord_type;

@@ -32,14 +32,17 @@
 #     define EXT_PUBLIC __declspec(dllimport)
 #   endif
 #   define EXT_LOCAL
+#   define EXT_PUBLIC_TEMPLATE
 
 # else
 
-#   if __GNUC__ >= 4
+#   if __GNUC__ >= 4 || defined(__clang__)
 #     define EXT_PUBLIC __attribute__ ((visibility ("default")))
+#     define EXT_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
 #     define EXT_LOCAL  __attribute__ ((visibility ("hidden")))
 #   else
 #     define EXT_PUBLIC
+#     define EXT_PUBLIC_TEMPLATE
 #     define EXT_LOCAL
 #   endif
 

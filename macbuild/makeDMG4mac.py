@@ -41,6 +41,7 @@ def SetGlobals():
   global Version            # KLayout's version
   global OccupiedDS         # approx. occupied dist space
   global TargetDMG          # name of the target DMG file
+  global VolumeDMG          # the volume name of DMG
   # Work directories and files
   global TemplateDMG        # unpacked template DMG file
   global WorkDir            # work directory created under PkgDir/
@@ -116,6 +117,7 @@ def SetGlobals():
   CheckComOnly   = False
   Version        = GetKLayoutVersionFrom( "./version.sh" )
   TargetDMG      = ""
+  VolumeDMG      = "KLayout"
 
   # Work directories and files
   OccupiedDS       = -1
@@ -268,6 +270,65 @@ def MakeTargetDMGFile(msg=""):
     print(msg)
 
   #--------------------------------------------------------
+  # [2] Read the AppleScript template file and generate
+  #     an actual one to execute
+  #--------------------------------------------------------
+  os.chdir(ProjectDir)
+  print( ">>> (1) Preparing AppleScript to execute..." )
+  try:
+    fd = open( "macbuild/Resources/template-KLayoutDMG.applescript", "r" )
+    tmpl = fd.read()
+    fd.close()
+  except Exception as e:
+    print( "! Failed to read 'template-KLayoutDMG.applescript'", file=sys.stderr )
+    return False
+  else:
+    t = string.Template(tmpl)
+    applescript = t.substitute( ORGX='50', ORGY='100',
+                                WIN_WIDTH='1000', WIN_HEIGHT='700',
+                                FULL_PATH_DS_STORE='/Volumes/%s/.DS_Store' % VolumeDMG,
+                                BACKGROUND_PNG_FILE='KLayoutDMG-Back.png',
+                                ITEM_1='klayout.app',     X1='960', Y1='140',
+                                ITEM_2='klayout.scripts', X2='610', Y2='140',
+                                ITEM_3='Applications',    X3='790', Y3='140',
+                                CHECK_BASH='[ -f " & dotDSStore & " ]; echo $?'
+                              )
+    # print(applescript)
+
+  #----------------------------------------------------
+  # [3] Prepare empty work directory under PkgDir/ and
+  #     create a disk image
+  #----------------------------------------------------
+  os.chdir(PkgDir)
+  if os.path.exists(WorkDir):
+    shutil.rmtree(WorkDir)
+  os.mkdir(WorkDir)
+  if os.path.exists(WorkDMG):
+    os.remove(WorkDMG)
+  dmgsize  = OccupiedDS + 20 # approx. occupied size plus 20MB
+  cmdline  = 'hdiutil create -srcfolder %s -volname %s -fs HFS+ -fsargs "-c c=64,a=16,e=16" '
+  cmdline += '-format UDRW -size %sm %s'
+  command  = cmdline % (".", VolumeDMG, dmgsize, WorkDMG)
+  print( ">>> (2) Creating a work DMG file <%s> of <%d>MB" % (WorkDMG, dmgsize) )
+  os.system(command)
+
+  #--------------------------------------------------------
+  # [4] Attach the work directory to the work DMG
+  #--------------------------------------------------------
+  print( ">>> (3) Mounting <%s> to <%s>" % (WorkDir, WorkDMG) )
+  command = "hdiutil attach %s -readwrite -noverify -noautoopen -quiet -mountpoint %s" % (WorkDMG, WorkDir)
+  os.system(command)
+
+  command = "hdiutil info | grep %s | grep \"/dev/\" | awk '{print $1}'" % WorkDir
+  workDev = os.popen( command ).read().strip('\n')
+  if workDev == "":
+    print( "! Failed to identify the file system on which <%s> is mounted" % WorkDir )
+    return False
+  else:
+    print( "        Work Device = %s" % workDev )
+  quit()
+
+  #--------------------------------------------------------
   # [2] Deploy unpacked template DMG under PkgDir/
   #--------------------------------------------------------
   os.chdir(ProjectDir)
@@ -278,18 +339,9 @@ def MakeTargetDMGFile(msg=""):
   shutil.copy2( srcDMG, destDMG )
   os.remove( srcDMG )
 
-  #----------------------------------------------------
-  # [3] Prepare empty work directory under PkgDir/
-  #----------------------------------------------------
-  os.chdir(PkgDir)
-  if os.path.exists(WorkDir):
-    shutil.rmtree(WorkDir)
-  os.mkdir(WorkDir)
 
-  #--------------------------------------------------------
-  # [4] Attach the work directory to the work DMG
-  #--------------------------------------------------------
-  os.system( "hdiutil attach %s -noautoopen -quiet -mountpoint %s" % (WorkDMG, WorkDir) )
+
+
 
   #--------------------------------------------------------
   # [5] Populate the work directory

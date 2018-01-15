@@ -41,7 +41,7 @@ def SetGlobals():
   global OpClean            # 'clean' operation
   global OpMake             # 'make' operation
   global DMGSerialNum       # the DMG serial number
-  global QtIndification     # Qt identification
+  global QtIdentification   # Qt identification
   global Version            # KLayout's version
   global OccupiedDS         # approx. occupied dist space
   global BackgroundPNG      # the background PNG image file
@@ -117,7 +117,7 @@ def SetGlobals():
   OpClean          = False
   OpMake           = False
   DMGSerialNum     = 1
-  QtIndification   = "Qt593mp"
+  QtIdentification = "Qt593mp"
   Version          = GetKLayoutVersionFrom( "./version.sh" )
   OccupiedDS       = -1
   BackgroundPNG    = "KLayoutDMG-Back.png"
@@ -198,7 +198,7 @@ def ParseCommandLineArguments():
   global OpClean
   global OpMake
   global DMGSerialNum
-  global QtIndification
+  global QtIdentification
   global Version
   global OccupiedDS
   global TargetDMG
@@ -246,12 +246,12 @@ def ParseCommandLineArguments():
     print(Usage)
     quit()
 
-  PkgDir         = opt.pkg_dir
-  OpClean        = opt.operation_clean
-  OpMake         = opt.operation_make
-  QtIndification = opt.qt_identification
-  DMGSerialNum   = int(opt.dmg_serial)
-  TargetDMG      = "klayout-%s-%s-%s-%d-%s.dmg" % (Version, GenOSName, Platform, DMGSerialNum, QtIndification)
+  PkgDir           = opt.pkg_dir
+  OpClean          = opt.operation_clean
+  OpMake           = opt.operation_make
+  QtIdentification = opt.qt_identification
+  DMGSerialNum     = int(opt.dmg_serial)
+  TargetDMG        = "klayout-%s-%s-%s-%d-%s.dmg" % (Version, GenOSName, Platform, DMGSerialNum, QtIdentification)
 
   OccupiedDS = CheckPkgDirectory()
   if not OccupiedDS > 0:

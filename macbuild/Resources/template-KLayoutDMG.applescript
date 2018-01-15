@@ -3,14 +3,14 @@
  * Template File:
  *  macbuild/Resources/template-KLayoutDMG.applescript
  *
- * AppleScrip File:
+ * Actual AppleScrip File to be generated:
  *  macbuild/Resources/KLayoutDMG.applescript
  *
  * Description:
  *  A template AppleScript to make a fancy DMG installer of KLayout
  *  (http://www.klayout.de/index.php) bundles.
- *  "makeDMG4mac.py" will read this template and generate an actual AppleScript to execute.
- *  Values to be found and replaced by "makeDMG4mac.py" are shown in [] or {}.
+ *  "makeDMG4mac.py" will read this template and generate the actual AppleScript to execute.
+ *  Values to be found and replaced by "makeDMG4mac.py" are marked by ${KEYWORD}.
  *
  *  The background image was designed using Logoist2 (http://www.syniumsoftware.com/en/logoist)
  *  and exported to a PNG file of 1000 x 700 pix size.

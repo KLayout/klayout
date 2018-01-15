@@ -12,6 +12,7 @@
 #   2) https://github.com/andreyvit/create-dmg.git
 #=============================================================================================
 from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
+from time import sleep
 import sys
 import os
 import shutil
@@ -43,6 +44,8 @@ def SetGlobals():
   global QtIndification     # Qt identification
   global Version            # KLayout's version
   global OccupiedDS         # approx. occupied dist space
+  global BackgroundPNG      # the background PNG image file
+  global VolumeIcons        # the volume icon file
   global AppleScriptDMG     # the AppleScript for KLayout DMG
   global WorkDMG            # work DMG file deployed under ProjectDir/
   global VolumeDMG          # the volume name of DMG
@@ -68,7 +71,7 @@ def SetGlobals():
   Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | `` \n"
   Usage += "                        : like 'qt5.pkg.macos-HighSierra-release'                    | \n"
   Usage += "   <-c|--clean>         : clean the work directory                                   | disabled \n"
-  Usage += "   <-m|--make>          : make a DMG file                                            | disabled \n"
+  Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled \n"
   Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
   Usage += "   [-q|--qt <ID>]       : ID name of deployed Qt                                     | Qt593mp \n"
   Usage += "   [-s|--serial <num>]  : DMG serial number                                          | 1 \n"
@@ -117,6 +120,8 @@ def SetGlobals():
   QtIndification   = "Qt593mp"
   Version          = GetKLayoutVersionFrom( "./version.sh" )
   OccupiedDS       = -1
+  BackgroundPNG    = "KLayoutDMG-Back.png"
+  VolumeIcons      = "KLayoutHDD.icns"
   AppleScriptDMG   = "macbuild/Resources/KLayoutDMG.applescript"
   WorkDMG          = "work-KLayout.dmg"
   VolumeDMG        = "KLayout"
@@ -163,13 +168,13 @@ def CheckPkgDirectory():
 
   os.chdir( "klayout.scripts" )
   if not os.path.isdir( "KLayoutEditor.app" ):
-    print( "! The package directory <%s> does not hold <KLayoutEditor.app> bundle" % PkgDir, file=sys.stderr )
+    print( "! The package directory <%s> does not hold <KLayoutEditor.app> bundle under 'klayout.scripts/'" % PkgDir, file=sys.stderr )
     print( "" )
     os.chdir(ProjectDir)
     return -1
 
   if not os.path.isdir( "KLayoutViewer.app" ):
-    print( "! The package directory <%s> does not hold <KLayoutViewer.app> bundle" % PkgDir, file=sys.stderr )
+    print( "! The package directory <%s> does not hold <KLayoutViewer.app> bundle under 'klayout.scripts/'" % PkgDir, file=sys.stderr )
     print( "" )
     os.chdir(ProjectDir)
     return -1
@@ -269,8 +274,8 @@ def MakeTargetDMGFile(msg=""):
   # The work DMG is mounted like:
   #   /dev/disk6s1 248Mi 228Mi 20Mi 93% 58449 5027 92% /Volumes/KLayout
   #-----------------------------------------------------------------------
-  global MountDir   # the mound directory: /Volumes/KLayout
-  global WorkDev    # the file system    : /dev/disk6s1
+  global MountDir   # the mount directory: eg. /Volumes/KLayout
+  global WorkDev    # the file system    : eg. /dev/disk6s1
 
   #----------------------------------------------------
   # [1] Print message
@@ -304,7 +309,7 @@ def MakeTargetDMGFile(msg=""):
     applescript = t.substitute( ORGX='50', ORGY='100',
                                 WIN_WIDTH='1000', WIN_HEIGHT='700',
                                 FULL_PATH_DS_STORE='/Volumes/%s/.DS_Store' % VolumeDMG,
-                                BACKGROUND_PNG_FILE='KLayoutDMG-Back.png',
+                                BACKGROUND_PNG_FILE=BackgroundPNG,
                                 ITEM_1='klayout.app',     X1='960', Y1='140',
                                 ITEM_2='klayout.scripts', X2='610', Y2='140',
                                 ITEM_3='Applications',    X3='790', Y3='140',
@@ -335,7 +340,7 @@ def MakeTargetDMGFile(msg=""):
   MountDir = "/Volumes/%s" % VolumeDMG
 
   #--------------------------------------------------------
-  # (3) Check if the mount point 'MountDir' already exists
+  # (3) Check if the mount point 'MountDir' already exists.
   #     If so, unmount it.
   #--------------------------------------------------------
   command1 = "hdiutil info | grep %s | grep \"/dev/\" | awk '{print $1}'" % VolumeDMG
@@ -363,25 +368,41 @@ def MakeTargetDMGFile(msg=""):
   else:
     print( "        Work Device = %s" % WorkDev )
 
-  #--------------------------------------------------------
+  #---------------------------------------------------------------------------------------
   # (5) Copy the background image and the volume icon
-  #--------------------------------------------------------
+  #
+  #     ! Setting the custom volume icon may fail in macOS High Sierra!
+  #     Refer to: https://github.com/javafx-maven-plugin/javafx-maven-plugin/issues/312
+  #---------------------------------------------------------------------------------------
   print( ">>> (5) Copying the background image and the volume icon..." )
-  resBackPng = "KLayoutDMG-Back.png"
-  imageSrc   = "macbuild/Resources/%s" % resBackPng
-  imageDest  = "%s/.background" % MountDir
+  imageSrc  = "macbuild/Resources/%s" % BackgroundPNG
+  imageDest = "%s/.background" % MountDir
   if not os.path.isdir(imageDest):
     os.mkdir(imageDest)
-  command1 = "cp -p %s %s/%s" % (imageSrc, imageDest, resBackPng)
+  command1 = "cp -p %s %s/%s" % (imageSrc, imageDest, BackgroundPNG)
   os.system(command1)
 
-  resVolIcns = "KLayoutHDD.icns"
-  iconsSrc   = "macbuild/Resources/%s" % resVolIcns
-  iconsDest  = "%s/.VolumeIcon.icns" % MountDir
-  command2   = "cp -p %s %s" % (iconsSrc, iconsDest)
-  command3   = "SetFile -c icnC %s" % iconsDest
+  iconsSrc  = "macbuild/Resources/%s" % VolumeIcons
+  iconsDest = "%s/.VolumeIcon.icns" % MountDir
+  command2  = "cp -p %s %s" % (iconsSrc, iconsDest)
+  command3  = "SetFile -c icnC %s" % iconsDest
   os.system(command2)
-  os.system(command3)
+  if os.system(command3) == 0:
+    okVolIcon = True
+  else:
+    okVolIcon = False
+  if not okVolIcon:
+    msgSF  = "\n"
+    msgSF += "!!! You are working on <%s> and failed to set a custom volume icon.\n"
+    msgSF += "    This looks a bug of underlying JavaFX Packager.\n"
+    msgSF += "    As a workaround, manually set the custom volume icon.\n"
+    msgSF += "    To do so, this Python script is going to skip...\n"
+    msgSF += "        >>> (8) Changing permission to 755...\n"
+    msgSF += "        >>> (13) Computing MD5 checksum...\n"
+    msgSF += "    After manually setting <%s> to <%s>, \n"
+    msgSF += "    compute MD5 checksum with an independent tool, if necessary.\n"
+    msgSF += "\n"
+    print( msgSF % (Platform, VolumeIcons, TargetDMG) )
 
   #--------------------------------------------------------
   # (6) Create a symbolic link to /Applications
@@ -397,6 +418,7 @@ def MakeTargetDMGFile(msg=""):
   command = "/usr/bin/osascript %s %s" % (AppleScriptDMG, VolumeDMG)
   process = subprocess.Popen( command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True )
   output, error = process.communicate()
+  sleep(4)
   if not output == "":
     print( "        STDOUT: %s" % output )
   if not error == "":
@@ -405,36 +427,37 @@ def MakeTargetDMGFile(msg=""):
   #--------------------------------------------------------
   # (8) Change the permission
   #--------------------------------------------------------
-  print( ">>> (8) Changing permission to 755..." )
-  command = "chmod -Rf 755 %s &> /dev/null" % MountDir
-  os.system(command)
+  if okVolIcon:
+    print( ">>> (8) Changing permission to 755..." )
+    command = "chmod -Rf 755 %s &> /dev/null" % MountDir
+    os.system(command)
 
   #--------------------------------------------------------
   # (9) Set volume bootability and startup disk options
   #--------------------------------------------------------
-  print( ">>> (8) Setting volume bootability and startup disk options..." )
+  print( ">>> (9) Setting volume bootability and startup disk options..." )
   command = "bless --folder %s --openfolder %s" % (MountDir, MountDir)
   os.system(command)
 
   #--------------------------------------------------------
-  # (9) Set attributes of files and directories
+  # (10) Set attributes of files and directories
   #--------------------------------------------------------
-  print( ">>> (9) Setting attributes of files and directories..." )
+  print( ">>> (10) Setting attributes of files and directories..." )
   command = "SetFile -a C %s" % MountDir # Custom icon (allowed on folders)
   os.system(command)
 
   #--------------------------------------------------------
-  # (10) Unmount the disk image
+  # (11) Unmount the disk image
   #--------------------------------------------------------
-  print( ">>> (10) Unmounting the disk image..." )
+  print( ">>> (11) Unmounting the disk image..." )
   command = "hdiutil detach %s" % WorkDev
   os.system(command)
 
   #--------------------------------------------------------
-  # (11) Compress the disk image
+  # (12) Compress the disk image
   #--------------------------------------------------------
   print( "" )
-  print( ">>> (11) Compressing the disk image..." )
+  print( ">>> (12) Compressing the disk image..." )
   command = "hdiutil convert %s -format UDZO -imagekey zlib-level=9 -o %s" % (WorkDMG, TargetDMG)
   os.system(command)
   os.remove(WorkDMG)
@@ -442,22 +465,23 @@ def MakeTargetDMGFile(msg=""):
   print( "        generated compressed DMG <%s>" % TargetDMG )
 
   #--------------------------------------------------------
-  # (12) Compute MD5 checksum
+  # (13) Compute MD5 checksum
   #--------------------------------------------------------
-  print( "" )
-  print( ">>> (12) Computing MD5 checksum..." )
-  with open( TargetDMG, "rb" ) as f:
-    data = f.read()
-    md5  = hashlib.md5(data).hexdigest()
-    md5 += " *%s\n" % TargetDMG
-  f.close()
-  path, ext    = os.path.splitext( os.path.basename(TargetDMG) )
-  md5TargetDMG = path + ".dmg.md5"
-  with open( md5TargetDMG, "w" ) as f:
-    f.write(md5)
-  f.close()
-  print( "        generated MD5 checksum file <%s>" % md5TargetDMG )
-  print( "" )
+  if okVolIcon:
+    print( "" )
+    print( ">>> (13) Computing MD5 checksum..." )
+    with open( TargetDMG, "rb" ) as f:
+      data = f.read()
+      md5  = hashlib.md5(data).hexdigest()
+      md5 += " *%s\n" % TargetDMG
+    f.close()
+    path, ext    = os.path.splitext( os.path.basename(TargetDMG) )
+    md5TargetDMG = path + ".dmg.md5"
+    with open( md5TargetDMG, "w" ) as f:
+      f.write(md5)
+    f.close()
+    print( "        generated MD5 checksum file <%s>" % md5TargetDMG )
+    print( "" )
 
   return True
 
@@ -504,13 +528,13 @@ def Main():
       print( "  !!! Failed to make the target DMG <%s> ..." % TargetDMG, file=sys.stderr )
       print( "", file=sys.stderr )
     else:
-      print( "  ### Done" )
+      print( "  ### Done making the target DMG" )
       print( "" )
   else:
     print( "" )
     print( "  ### You are going to clean up <%s> directory" % ProjectDir )
     CleanUp()
-    print( "  ### Done" )
+    print( "  ### Done cleaning up" )
     print( "" )
 
 #===================================================================================

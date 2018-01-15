@@ -369,41 +369,16 @@ def MakeTargetDMGFile(msg=""):
   else:
     print( "        Work Device = %s" % WorkDev )
 
-  #---------------------------------------------------------------------------------------
-  # (5) Copy the background image and the volume icon
-  #
-  #     ! Setting the custom volume icon may fail in macOS High Sierra!
-  #     Refer to: https://github.com/javafx-maven-plugin/javafx-maven-plugin/issues/312
-  #---------------------------------------------------------------------------------------
+  #--------------------------------------------------------
+  # (5) Copy the background image
+  #--------------------------------------------------------
   print( ">>> (5) Copying the background image and the volume icon..." )
   imageSrc  = "macbuild/Resources/%s" % BackgroundPNG
   imageDest = "%s/.background" % MountDir
   if not os.path.isdir(imageDest):
     os.mkdir(imageDest)
-  command1 = "cp -p %s %s/%s" % (imageSrc, imageDest, BackgroundPNG)
-  os.system(command1)
-
-  iconsSrc  = "macbuild/Resources/%s" % VolumeIcons
-  iconsDest = "%s/.VolumeIcon.icns" % MountDir
-  command2  = "cp -p %s %s" % (iconsSrc, iconsDest)
-  command3  = "SetFile -c icnC %s" % iconsDest
-  os.system(command2)
-  if os.system(command3) == 0:
-    okVolIcon = True
-  else:
-    okVolIcon = False
-  if not okVolIcon:
-    msgSF  = "\n"
-    msgSF += "!!! You are working on <%s> and failed to set a custom volume icon.\n"
-    msgSF += "    This looks a bug of underlying JavaFX Packager.\n"
-    msgSF += "    As a workaround, manually set the custom volume icon.\n"
-    msgSF += "    To enable your work, this Python script is going to skip...\n"
-    msgSF += "        >>> (8) Changing permission to 755...\n"
-    msgSF += "        >>> (13) Computing MD5 checksum...\n"
-    msgSF += "    After manually setting <%s> to <%s>, \n"
-    msgSF += "    compute MD5 checksum with an independent tool, if necessary.\n"
-    msgSF += "\n"
-    print( msgSF % (Platform, VolumeIcons, TargetDMG) )
+  command = "cp -p %s %s/%s" % (imageSrc, imageDest, BackgroundPNG)
+  os.system(command)
 
   #--------------------------------------------------------
   # (6) Create a symbolic link to /Applications
@@ -426,39 +401,49 @@ def MakeTargetDMGFile(msg=""):
     print( "        STDERR: %s" % error )
 
   #--------------------------------------------------------
-  # (8) Change the permission
+  # (8) Copy the custom volume icon
   #--------------------------------------------------------
-  if okVolIcon:
-    print( ">>> (8) Changing permission to 755..." )
-    command = "chmod -Rf 755 %s &> /dev/null" % MountDir
-    os.system(command)
+  print( ">>> (8) Copying the volume icon..." )
+  iconsSrc  = "macbuild/Resources/%s" % VolumeIcons
+  iconsDest = "%s/.VolumeIcon.icns" % MountDir
+  command1  = "cp -p %s %s" % (iconsSrc, iconsDest)
+  command2  = "SetFile -c icnC %s" % iconsDest
+  os.system(command1)
+  os.system(command2)
 
   #--------------------------------------------------------
-  # (9) Set volume bootability and startup disk options
+  # (9) Change the permission
   #--------------------------------------------------------
-  print( ">>> (9) Setting volume bootability and startup disk options..." )
+  print( ">>> (9) Changing permission to 755..." )
+  command = "chmod -Rf 755 %s &> /dev/null" % MountDir
+  os.system(command)
+
+  #--------------------------------------------------------
+  # (10) Set volume bootability and startup disk options
+  #--------------------------------------------------------
+  print( ">>> (10) Setting volume bootability and startup disk options..." )
   command = "bless --folder %s --openfolder %s" % (MountDir, MountDir)
   os.system(command)
 
   #--------------------------------------------------------
-  # (10) Set attributes of files and directories
+  # (11) Set attributes of files and directories
   #--------------------------------------------------------
-  print( ">>> (10) Setting attributes of files and directories..." )
+  print( ">>> (11) Setting attributes of files and directories..." )
   command = "SetFile -a C %s" % MountDir # Custom icon (allowed on folders)
   os.system(command)
 
   #--------------------------------------------------------
-  # (11) Unmount the disk image
+  # (12) Unmount the disk image
   #--------------------------------------------------------
-  print( ">>> (11) Unmounting the disk image..." )
+  print( ">>> (12) Unmounting the disk image..." )
   command = "hdiutil detach %s" % WorkDev
   os.system(command)
 
   #--------------------------------------------------------
-  # (12) Compress the disk image
+  # (13) Compress the disk image
   #--------------------------------------------------------
   print( "" )
-  print( ">>> (12) Compressing the disk image..." )
+  print( ">>> (13) Compressing the disk image..." )
   command = "hdiutil convert %s -format UDZO -imagekey zlib-level=9 -o %s" % (WorkDMG, TargetDMG)
   os.system(command)
   os.remove(WorkDMG)
@@ -466,23 +451,22 @@ def MakeTargetDMGFile(msg=""):
   print( "        generated compressed DMG <%s>" % TargetDMG )
 
   #--------------------------------------------------------
-  # (13) Compute MD5 checksum
+  # (14) Compute MD5 checksum
   #--------------------------------------------------------
-  if okVolIcon:
-    print( "" )
-    print( ">>> (13) Computing MD5 checksum..." )
-    with open( TargetDMG, "rb" ) as f:
-      data = f.read()
-      md5  = hashlib.md5(data).hexdigest()
-      md5 += " *%s\n" % TargetDMG
-    f.close()
-    path, ext    = os.path.splitext( os.path.basename(TargetDMG) )
-    md5TargetDMG = path + ".dmg.md5"
-    with open( md5TargetDMG, "w" ) as f:
-      f.write(md5)
-    f.close()
-    print( "        generated MD5 checksum file <%s>" % md5TargetDMG )
-    print( "" )
+  print( "" )
+  print( ">>> (14) Computing MD5 checksum..." )
+  with open( TargetDMG, "rb" ) as f:
+    data = f.read()
+    md5  = hashlib.md5(data).hexdigest()
+    md5 += " *%s\n" % TargetDMG
+  f.close()
+  path, ext    = os.path.splitext( os.path.basename(TargetDMG) )
+  md5TargetDMG = path + ".dmg.md5"
+  with open( md5TargetDMG, "w" ) as f:
+    f.write(md5)
+  f.close()
+  print( "        generated MD5 checksum file <%s>" % md5TargetDMG )
+  print( "" )
 
   return True
 

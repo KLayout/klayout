@@ -33,7 +33,7 @@ on run (volumeName) -- most likely, the volume name is "KLayout"
             --     ORGY       =  [100] pix
             --     WIN_WIDTH  = [1000] pix
             --     WIN_HEIGHT =  [700] pix
-            set posMargin   to 40
+            set posMargin   to 50
             set negMargin   to 10
             set theTopLeftX to ${ORGX}
             set theTopLeftY to ${ORGY}

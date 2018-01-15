@@ -306,15 +306,16 @@ def MakeTargetDMGFile(msg=""):
     return False
   else:
     t = string.Template(tmpl)
-    applescript = t.substitute( ORGX='50', ORGY='100',
-                                WIN_WIDTH='1000', WIN_HEIGHT='700',
-                                FULL_PATH_DS_STORE='/Volumes/%s/.DS_Store' % VolumeDMG,
-                                BACKGROUND_PNG_FILE=BackgroundPNG,
-                                ITEM_1='klayout.app',     X1='960', Y1='140',
-                                ITEM_2='klayout.scripts', X2='610', Y2='140',
-                                ITEM_3='Applications',    X3='790', Y3='140',
-                                CHECK_BASH='[ -f " & dotDSStore & " ]; echo $?'
-                              )
+    applescript = t.safe_substitute(
+                      ORGX='50', ORGY='100',
+                      WIN_WIDTH='1000', WIN_HEIGHT='700',
+                      FULL_PATH_DS_STORE='/Volumes/%s/.DS_Store' % VolumeDMG,
+                      BACKGROUND_PNG_FILE=BackgroundPNG,
+                      ITEM_1='klayout.app',     X1='960', Y1='140',
+                      ITEM_2='klayout.scripts', X2='610', Y2='140',
+                      ITEM_3='Applications',    X3='790', Y3='140',
+                      CHECK_BASH='[ -f " & dotDSStore & " ]; echo $?'
+                    )
   try:
     # print(applescript)
     fd = open( AppleScriptDMG, "w" )
@@ -396,7 +397,7 @@ def MakeTargetDMGFile(msg=""):
     msgSF += "!!! You are working on <%s> and failed to set a custom volume icon.\n"
     msgSF += "    This looks a bug of underlying JavaFX Packager.\n"
     msgSF += "    As a workaround, manually set the custom volume icon.\n"
-    msgSF += "    To do so, this Python script is going to skip...\n"
+    msgSF += "    To enable your work, this Python script is going to skip...\n"
     msgSF += "        >>> (8) Changing permission to 755...\n"
     msgSF += "        >>> (13) Computing MD5 checksum...\n"
     msgSF += "    After manually setting <%s> to <%s>, \n"

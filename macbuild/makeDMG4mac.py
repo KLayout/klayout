@@ -43,13 +43,13 @@ def SetGlobals():
   global DMGSerialNum       # the DMG serial number
   global QtIdentification   # Qt identification
   global Version            # KLayout's version
-  global OccupiedDS         # approx. occupied dist space
+  global OccupiedDS         # approx. occupied disc space
   global BackgroundPNG      # the background PNG image file
   global VolumeIcons        # the volume icon file
   global AppleScriptDMG     # the AppleScript for KLayout DMG
-  global WorkDMG            # work DMG file deployed under ProjectDir/
+  global WorkDMG            # work DMG file created under ProjectDir/
   global VolumeDMG          # the volume name of DMG
-  global TargetDMG          # name of the target DMG file
+  global TargetDMG          # the name of target DMG file
   global RootApplications   # reserved directory name for applications
   # auxiliary variables on platform
   global System             # 6-tuple from platform.uname()
@@ -126,7 +126,7 @@ def SetGlobals():
   WorkDMG          = "work-KLayout.dmg"
   VolumeDMG        = "KLayout"
   TargetDMG        = ""
-  RootApplications = "/Applications"  # reserved directory name for applications
+  RootApplications = "/Applications"
 
 #------------------------------------------------------------------------------
 ## To check the contents of the package directory
@@ -181,8 +181,8 @@ def CheckPkgDirectory():
 
   os.chdir(ProjectDir)
   os.chdir(PkgDir)
-  size1 = int( os.popen( "du -sm klayout.app" )    .read().strip("\n").split("\t")[0] )
-  size2 = int( os.popen( "du -sm klayout.scripts" ).read().strip("\n").split("\t")[0] )
+  size1 = int( os.popen( "\du -sm klayout.app" )    .read().strip("\n").split("\t")[0] )
+  size2 = int( os.popen( "\du -sm klayout.scripts" ).read().strip("\n").split("\t")[0] )
   os.chdir(ProjectDir)
   return size1+size2
 
@@ -275,17 +275,18 @@ def MakeTargetDMGFile(msg=""):
   #   /dev/disk6s1 248Mi 228Mi 20Mi 93% 58449 5027 92% /Volumes/KLayout
   #-----------------------------------------------------------------------
   global MountDir   # the mount directory: eg. /Volumes/KLayout
-  global WorkDev    # the file system    : eg. /dev/disk6s1
+  global FileSys    # the file system    : eg. /dev/disk6s1
 
-  #----------------------------------------------------
+  #-------------------------------------------------------------
   # [1] Print message
-  #----------------------------------------------------
+  #-------------------------------------------------------------
   if not msg == "":
     print(msg)
 
-  #----------------------------------------------------
-  # [2] Do the following jobs sequentially
-  #----------------------------------------------------
+  #-------------------------------------------------------------
+  # [2] Do the following jobs (0) through (14) sequentially
+  #-------------------------------------------------------------
+
   #--------------------------------------------------------
   # (0) Cleanup ProjectDir/
   #--------------------------------------------------------
@@ -293,19 +294,21 @@ def MakeTargetDMGFile(msg=""):
 
   #--------------------------------------------------------
   # (1) Read the AppleScript template file and generate
-  #     an actual one to execute later
+  #     the actual one to execute later
   #--------------------------------------------------------
   os.chdir(ProjectDir)
   print( ">>> (1) Preparing AppleScript to execute later..." )
+  tempScr = "macbuild/Resources/template-KLayoutDMG.applescript"
   try:
-    fd = open( "macbuild/Resources/template-KLayoutDMG.applescript", "r" )
+    fd   = open( tempScr, "r" )
     tmpl = fd.read()
     fd.close()
   except Exception as e:
-    print( "        ! Failed to read <template-KLayoutDMG.applescript>", file=sys.stderr )
+    print( "        ! Failed to read <%s>" tempScr % , file=sys.stderr )
     return False
   else:
     t = string.Template(tmpl)
+    # Figures below were determined by experiments for best fit
     applescript = t.safe_substitute(
                       ORGX='50', ORGY='100',
                       WIN_WIDTH='1000', WIN_HEIGHT='700',
@@ -334,7 +337,7 @@ def MakeTargetDMGFile(msg=""):
     os.remove(WorkDMG)
   dmgsize  = OccupiedDS + 20 # approx. occupied size plus 20[MB]
   cmdline  = 'hdiutil create -srcfolder %s -volname %s -fs HFS+ -fsargs "-c c=64,a=16,e=16" '
-  cmdline += '-format UDRW -size %sm  %s'
+  cmdline += '-format UDRW -size %dm  %s'
   command  = cmdline % (PkgDir, VolumeDMG, dmgsize, WorkDMG)
   print( ">>> (2) Creating a work DMG file <%s> of <%d> [MB] with the volume name of <%s>..." % (WorkDMG, dmgsize, VolumeDMG) )
   os.system(command)
@@ -342,13 +345,13 @@ def MakeTargetDMGFile(msg=""):
 
   #--------------------------------------------------------
   # (3) Check if the mount point 'MountDir' already exists.
-  #     If so, unmount it.
+  #     If so, unmount it first.
   #--------------------------------------------------------
   command1 = "hdiutil info | grep %s | grep \"/dev/\" | awk '{print $1}'" % VolumeDMG
   print ( ">>> (3) Checking if the mount point <%s> already exists..." % MountDir)
-  WorkDev = os.popen(command1).read().strip('\n')
-  if os.path.isdir(MountDir) and not WorkDev == "":
-    command2 = "hdiutil detach %s" % WorkDev
+  FileSys = os.popen(command1).read().strip('\n')
+  if os.path.isdir(MountDir) and not FileSys == "":
+    command2 = "hdiutil detach %s" % FileSys
     os.system(command2)
     print( "        Mount directory <%s> was detached" % MountDir )
   else:
@@ -362,29 +365,29 @@ def MakeTargetDMGFile(msg=""):
   os.system(command1)
 
   command2 = "hdiutil info | grep %s | grep \"/dev/\" | awk '{print $1}'" % VolumeDMG
-  WorkDev  = os.popen(command2).read().strip('\n')
-  if WorkDev == "":
+  FileSys  = os.popen(command2).read().strip('\n')
+  if FileSys == "":
     print( "! Failed to identify the file system on which <%s> is mounted" % VolumeDMG )
     return False
   else:
-    print( "        Work Device = %s" % WorkDev )
+    print( "        File System = %s" % FileSys )
 
   #--------------------------------------------------------
   # (5) Copy the background image
   #--------------------------------------------------------
-  print( ">>> (5) Copying the background image and the volume icon..." )
+  print( ">>> (5) Copying the background image..." )
   imageSrc  = "macbuild/Resources/%s" % BackgroundPNG
   imageDest = "%s/.background" % MountDir
   if not os.path.isdir(imageDest):
     os.mkdir(imageDest)
-  command = "cp -p %s %s/%s" % (imageSrc, imageDest, BackgroundPNG)
+  command = "\cp -p %s %s/%s" % (imageSrc, imageDest, BackgroundPNG)
   os.system(command)
 
   #--------------------------------------------------------
   # (6) Create a symbolic link to /Applications
   #--------------------------------------------------------
   print( ">>> (6) Creating a symbolic link to /Applications..." )
-  command = "ln -s %s %s/%s" % (RootApplications, MountDir, RootApplications)
+  command = "\ln -s %s %s/%s" % (RootApplications, MountDir, RootApplications)
   os.system(command)
 
   #--------------------------------------------------------
@@ -394,7 +397,6 @@ def MakeTargetDMGFile(msg=""):
   command = "/usr/bin/osascript %s %s" % (AppleScriptDMG, VolumeDMG)
   process = subprocess.Popen( command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True )
   output, error = process.communicate()
-  sleep(4)
   if not output == "":
     print( "        STDOUT: %s" % output )
   if not error == "":
@@ -403,27 +405,32 @@ def MakeTargetDMGFile(msg=""):
   #--------------------------------------------------------
   # (8) Copy the custom volume icon
   #--------------------------------------------------------
+  sleep(4)
   print( ">>> (8) Copying the volume icon..." )
   iconsSrc  = "macbuild/Resources/%s" % VolumeIcons
   iconsDest = "%s/.VolumeIcon.icns" % MountDir
-  command1  = "cp -p %s %s" % (iconsSrc, iconsDest)
+  command1  = "\cp -p %s %s" % (iconsSrc, iconsDest)
   command2  = "SetFile -c icnC %s" % iconsDest
   os.system(command1)
+  sleep(2)
   os.system(command2)
+  sleep(2)
 
   #--------------------------------------------------------
   # (9) Change the permission
   #--------------------------------------------------------
   print( ">>> (9) Changing permission to 755..." )
-  command = "chmod -Rf 755 %s &> /dev/null" % MountDir
+  command = "\chmod -Rf 755 %s &> /dev/null" % MountDir
   os.system(command)
 
   #--------------------------------------------------------
-  # (10) Set volume bootability and startup disk options
+  # (10) Set volume bootability and startup disk options.
+  #      The folder will open on mount.
   #--------------------------------------------------------
   print( ">>> (10) Setting volume bootability and startup disk options..." )
   command = "bless --folder %s --openfolder %s" % (MountDir, MountDir)
   os.system(command)
+  sleep(2)
 
   #--------------------------------------------------------
   # (11) Set attributes of files and directories
@@ -431,12 +438,13 @@ def MakeTargetDMGFile(msg=""):
   print( ">>> (11) Setting attributes of files and directories..." )
   command = "SetFile -a C %s" % MountDir # Custom icon (allowed on folders)
   os.system(command)
+  sleep(2)
 
   #--------------------------------------------------------
   # (12) Unmount the disk image
   #--------------------------------------------------------
   print( ">>> (12) Unmounting the disk image..." )
-  command = "hdiutil detach %s" % WorkDev
+  command = "hdiutil detach %s" % FileSys
   os.system(command)
 
   #--------------------------------------------------------
@@ -448,7 +456,7 @@ def MakeTargetDMGFile(msg=""):
   os.system(command)
   os.remove(WorkDMG)
   print( "" )
-  print( "        generated compressed DMG <%s>" % TargetDMG )
+  print( "        generated compressed target DMG <%s>" % TargetDMG )
 
   #--------------------------------------------------------
   # (14) Compute MD5 checksum
@@ -508,6 +516,7 @@ def Main():
     print( "" )
     print( "  ### You are going to make <%s> from <%s>" % (TargetDMG, PkgDir) )
     print( "      KLayout bundles occupy about <%d> [MB] of disc space." % OccupiedDS )
+    print( "" )
     ok = MakeTargetDMGFile()
     if not ok:
       print( "  !!! Failed to make the target DMG <%s> ..." % TargetDMG, file=sys.stderr )

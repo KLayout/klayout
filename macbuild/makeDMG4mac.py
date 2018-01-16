@@ -304,7 +304,7 @@ def MakeTargetDMGFile(msg=""):
     tmpl = fd.read()
     fd.close()
   except Exception as e:
-    print( "        ! Failed to read <%s>" tempScr % , file=sys.stderr )
+    print( "        ! Failed to read <%s>" % tempScr, file=sys.stderr )
     return False
   else:
     t = string.Template(tmpl)

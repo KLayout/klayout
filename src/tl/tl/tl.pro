@@ -42,7 +42,8 @@ SOURCES = \
     tlWebDAV.cc \
     tlArch.cc \
     tlCommandLineParser.cc \
-    tlUnitTest.cc
+    tlUnitTest.cc \
+    tlInt128Support.cc
 
 HEADERS = \
     tlAlgorithm.h \
@@ -90,7 +91,8 @@ HEADERS = \
     tlWebDAV.h \
     tlArch.h \
     tlCommandLineParser.h \
-    tlUnitTest.h
+    tlUnitTest.h \
+    tlInt128Support.h
 
 INCLUDEPATH =
 DEPENDPATH =

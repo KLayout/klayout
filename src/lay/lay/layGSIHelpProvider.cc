@@ -577,6 +577,10 @@ type_to_s (const gsi::ArgType &a, bool linked, bool for_return)
     s += "unsigned short"; break;
   case gsi::T_int:
     s += "int"; break;
+#if defined(HAVE_64BIT_COORD)
+  case gsi::T_int128:
+    s += "int128"; break;
+#endif
   case gsi::T_uint:
     s += "unsigned int"; break;
   case gsi::T_long:

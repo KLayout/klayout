@@ -36,7 +36,7 @@ void runtest (tl::TestBase *_this, int mode)
   std::string au = tl::testsrc ();
   au += "/testdata/drc/drcSuiteTests_au";
   au += tl::to_string (mode);
-  au += ".gds";
+  au += ".oas";
 
   std::string output = _this->tmp_file ("tmp.gds");
 

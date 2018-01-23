@@ -66,6 +66,10 @@ ArgType::to_string () const
     s += "long long"; break;
   case T_ulonglong:
     s += "unsigned long long"; break;
+#if defined(HAVE_64BIT_COORD)
+  case T_int128:
+    s += "int128"; break;
+#endif
   case T_double:
     s += "double"; break;
   case T_float:

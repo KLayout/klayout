@@ -27,6 +27,7 @@
 #include "tlLog.h"
 #include "tlException.h"
 #include "tlString.h"
+#include "tlInt128Support.h"
 
 #include <string>
 #include <vector>

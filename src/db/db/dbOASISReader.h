@@ -297,7 +297,7 @@ private:
   void mark_start_table ();
 
   void read_offset_table ();
-  void read_repetition ();
+  bool read_repetition ();
   void read_pointlist (modal_variable <std::vector <db::Point> > &pointlist, bool for_polygon);
   void read_properties (db::PropertiesRepository &rep);
   void store_last_properties (db::PropertiesRepository &rep, db::PropertiesRepository::properties_set &properties, bool ignore_special);

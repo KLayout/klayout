@@ -279,12 +279,13 @@ Salt::remove_grain (const SaltGrain &grain)
 {
   emit collections_about_to_change ();
 
-  tl::info << QObject::tr ("Removing package '%1' ..").arg (tl::to_qstring (grain.name ()));
+  QString name = tl::to_qstring (grain.name ());
+  tl::info << QObject::tr ("Removing package '%1' ..").arg (name);
   bool res = remove_from_collection (m_root, grain.name ());
   if (res) {
-    tl::info << QObject::tr ("Package '%1' removed.").arg (tl::to_qstring (grain.name ()));
+    tl::info << QObject::tr ("Package '%1' removed.").arg (name);
   } else {
-    tl::warn << QObject::tr ("Failed to remove package '%1'.").arg (tl::to_qstring (grain.name ()));
+    tl::warn << QObject::tr ("Failed to remove package '%1'.").arg (name);
   }
 
   invalidate ();

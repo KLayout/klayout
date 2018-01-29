@@ -748,6 +748,107 @@ TEST(18b)
   }
 }
 
+TEST(18c)
+{
+  //  GitHub issue #69
+
+  db::Region r;
+  r.insert (db::Box (db::Point (-120, 0), db::Point (-100, 20)));
+  r.insert (db::Box (db::Point (-20, 0), db::Point (0, 20)));
+  r.insert (db::Box (db::Point (0, 0), db::Point (20, 20)));
+  r.insert (db::Box (db::Point (100, 0), db::Point (120, 20)));
+
+  db::Region rr;
+  rr.insert (db::Box (db::Point (-100, -10), db::Point (0, 30)));
+  rr.insert (db::Box (db::Point (0, -10), db::Point (100, 30)));
+
+  EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_inside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+
+  EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_overlapping (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+
+  r.clear ();
+  r.insert (db::Box (db::Point (-120, 0), db::Point (-100, 20)));
+  r.insert (db::Box (db::Point (-20, 0), db::Point (20, 20)));
+  r.insert (db::Box (db::Point (100, 0), db::Point (120, 20)));
+
+  rr.clear ();
+  rr.insert (db::Box (db::Point (-100, -10), db::Point (0, 30)));
+  rr.insert (db::Box (db::Point (0, -10), db::Point (100, 30)));
+
+  EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_inside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+
+  EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_overlapping (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+
+  r.clear ();
+  r.insert (db::Box (db::Point (-120, 0), db::Point (-100, 20)));
+  r.insert (db::Box (db::Point (-20, 0), db::Point (20, 20)));
+  r.insert (db::Box (db::Point (100, 0), db::Point (120, 20)));
+
+  rr.clear ();
+  rr.insert (db::Box (db::Point (-100, -10), db::Point (100, 30)));
+
+  EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_inside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+
+  EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_overlapping (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+
+  r.clear ();
+  r.insert (db::Box (db::Point (-120, 0), db::Point (-100, 20)));
+  r.insert (db::Box (db::Point (-20, 0), db::Point (20, 20)));
+  r.insert (db::Box (db::Point (100, 0), db::Point (120, 20)));
+
+  rr.clear ();
+  rr.insert (db::Box (db::Point (-100, -10), db::Point (0, 30)));
+  rr.insert (db::Box (db::Point (1, -10), db::Point (100, 30)));
+
+  EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_inside (rr).to_string (), "");
+  EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+
+  EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_overlapping (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+
+  r.clear ();
+  r.insert (db::Box (db::Point (-100, 0), db::Point (-80, 20)));
+  r.insert (db::Box (db::Point (-20, 0), db::Point (0, 20)));
+  r.insert (db::Box (db::Point (0, 0), db::Point (20, 20)));
+  r.insert (db::Box (db::Point (80, 0), db::Point (100, 20)));
+
+  rr.clear ();
+  rr.insert (db::Box (db::Point (-100, -10), db::Point (0, 30)));
+  rr.insert (db::Box (db::Point (0, -10), db::Point (100, 30)));
+
+  EXPECT_EQ (r.selected_outside (rr).to_string (), "");
+  EXPECT_EQ (r.selected_inside (rr).to_string (), "(-100,0;-100,20;-80,20;-80,0);(-20,0;-20,20;20,20;20,0);(80,0;80,20;100,20;100,0)");
+  EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-100,0;-100,20;-80,20;-80,0);(-20,0;-20,20;20,20;20,0);(80,0;80,20;100,20;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,0;-100,20;-80,20;-80,0);(-20,0;-20,20;20,20;20,0);(80,0;80,20;100,20;100,0)");
+
+  EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-100,0;-100,20;-80,20;-80,0);(-20,0;-20,20;20,20;20,0);(80,0;80,20;100,20;100,0)");
+  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_overlapping (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+}
+
 TEST(19) 
 {
   db::Region r1;

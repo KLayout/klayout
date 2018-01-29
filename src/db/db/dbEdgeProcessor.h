@@ -255,6 +255,7 @@ public:
    *  
    *  If this flag is set, the interaction will include "touching" interactions in mode 0, i.e.
    *  touching shapes will be counted as interacting.
+   *  In the other modes, this flag should be true (the default).
    */
   void set_include_touching (bool f) 
   {
@@ -299,7 +300,7 @@ public:
   virtual int edge (bool north, bool enter, property_type p);
   virtual int compare_ns () const;
   virtual bool is_reset () const { return m_inside.empty (); }
-  virtual bool prefer_touch () const { return m_mode == 0 && m_include_touching; }
+  virtual bool prefer_touch () const { return m_include_touching; }
 
 private:
   int m_mode;

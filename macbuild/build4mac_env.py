@@ -41,11 +41,17 @@ Qt5MacPorts = { 'qmake' : '/opt/local/libexec/qt5/bin/qmake',
                 'deploy': '/opt/local/libexec/qt5/bin/macdeployqt'
               }
 
+# # Qt5 from Brew
+# # [Key Type Name] = 'Qt5Brew'
+# Qt5Brew = { 'qmake' : '/usr/local/Cellar/qt5/5.10.0_1/bin/qmake',
+#             'deploy': '/usr/local/Cellar/qt5/5.10.0_1/bin/macdeployqt'
+#           }
+
 #-----------------------------------------------------
 # [2] Ruby
 #-----------------------------------------------------
 Rubies  = [ 'nil', 'RubyYosemite', 'RubyElCapitan', 'RubySierra', 'RubyHighSierra' ]
-Rubies += [ 'Ruby24SrcBuild', 'Ruby24MacPorts' ]
+Rubies += [ 'Ruby24SrcBuild', 'Ruby24MacPorts', 'Ruby24Brew' ]
 
 #-----------------------------------------------------
 # Whereabout of different components of Ruby
@@ -94,6 +100,13 @@ Ruby24MacPorts  = { 'exe': '/opt/local/bin/ruby2.4',
                     'lib': '/opt/local/lib/libruby.2.4.dylib'
                   }
 
+# Ruby 2.5 from Brew *+*+*+ EXPERIMENTAL *+*+*+
+# [Key Type Name] = 'Brew25'
+Ruby25Brew  = { 'exe': '/usr/local/bin/ruby',
+                'inc': '/usr/local/include/ruby-2.5.0',
+                'lib': '/usr/local/lib/libruby.2.5.0.dylib'
+              }
+
 # Consolidated dictionary kit for Ruby
 RubyDictionary  = { 'nil'           : None,
                     'RubyYosemite'  : RubyYosemite,
@@ -101,14 +114,15 @@ RubyDictionary  = { 'nil'           : None,
                     'RubySierra'    : RubySierra,
                     'RubyHighSierra': RubyHighSierra,
                     'Ruby24SrcBuild': Ruby24SrcBuild,
-                    'Ruby24MacPorts': Ruby24MacPorts
+                    'Ruby24MacPorts': Ruby24MacPorts,
+                    'Ruby25Brew'    : Ruby25Brew
                   }
 
 #-----------------------------------------------------
 # [3] Python
 #-----------------------------------------------------
 Pythons  = [ 'nil', 'PythonYosemite', 'PythonElCapitan', 'PythonSierra', 'PythonHighSierra' ]
-Pythons += [ 'Anaconda27', 'Anaconda36', 'Python36MacPorts' ]
+Pythons += [ 'Anaconda27', 'Anaconda36', 'Python36MacPorts', 'Python36Brew' ]
 
 #-----------------------------------------------------
 # Whereabout of different components of Python
@@ -170,6 +184,13 @@ Python36MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versi
                     'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.6/lib/libpython3.6m.dylib'
                   }
 
+# Python 3.6 from Brew *+*+*+ EXPERIMENTAL *+*+*+
+# [Key Type Name] = 'pybrew'
+Python36Brew= { 'exe': '/usr/local/Cellar/python3/3.6.4_2/Frameworks/Python.framework/Versions/3.6/bin/python3.6m' ,
+                'inc': '/usr/local/Cellar/python3/3.6.4_2/Frameworks/Python.framework/Versions/3.6/include/python3.6m',
+                'lib': '/usr/local/Cellar/python3/3.6.4_2/Frameworks/Python.framework/Versions/3.6/lib/libpython3.6m.dylib'
+              }
+
 # Consolidated dictionary kit for Python
 PythonDictionary= { 'nil'             : None,
                     'PythonYosemite'  : PythonYosemite,
@@ -178,7 +199,8 @@ PythonDictionary= { 'nil'             : None,
                     'PythonHighSierra': PythonHighSierra,
                     'Anaconda27'      : Anaconda27,
                     'Anaconda36'      : Anaconda36,
-                    'Python36MacPorts': Python36MacPorts
+                    'Python36MacPorts': Python36MacPorts,
+                    'Python36Brew'    : Python36Brew,
                   }
 
 #-----------------------------------------------------

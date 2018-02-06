@@ -66,8 +66,8 @@ def SetGlobals():
   Usage += "                        :   'Sys' = using the OS standard script language            | \n"
   Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details           | \n"
   Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts']                        | qt5macports \n"
-  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24']                       | sys \n"
-  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36']              | sys \n"
+  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24', 'B25']                | sys \n"
+  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B36']       | sys \n"
   Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                  | disabled \n"
   Usage += "   [-m|--make <option>] : option passed to 'make'                                    | -j4 \n"
   Usage += "   [-d|--debug]         : enable debug mode build                                    | disabled \n"
@@ -262,7 +262,7 @@ def ParseCommandLineArguments():
   NonOSStdLang = False
 
   # Determine Ruby type
-  candidates = [ i.upper() for i in ['nil', 'Sys', 'Src24', 'MP24'] ]
+  candidates = [ i.upper() for i in ['nil', 'Sys', 'Src24', 'MP24', 'B25'] ]
   ModuleRuby = ""
   index      = 0
   for item in candidates:
@@ -288,6 +288,9 @@ def ParseCommandLineArguments():
       elif index == 3:
         ModuleRuby   = 'Ruby24MacPorts'
         NonOSStdLang = True
+      elif index == 4:
+        ModuleRuby   = 'Ruby25Brew'
+        NonOSStdLang = True
     else:
       index += 1
   if ModuleRuby == "":
@@ -297,7 +300,7 @@ def ParseCommandLineArguments():
     quit()
 
   # Determine Python type
-  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36'] ]
+  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B36'] ]
   ModulePython = ""
   index        = 0
   for item in candidates:
@@ -325,6 +328,9 @@ def ParseCommandLineArguments():
         NonOSStdLang = True
       elif index == 4:
         ModulePython = 'Python36MacPorts'
+        NonOSStdLang = True
+      elif index == 5:
+        ModulePython = 'Python36Brew'
         NonOSStdLang = True
     else:
       index += 1
@@ -417,6 +423,19 @@ def RunMainBuildBash():
   elif ModuleQt == 'Qt5MacPorts':
     parameters    += " \\\n  -qt5"
     parameters    += " \\\n  -qmake  %s" % Qt5MacPorts['qmake']
+    MacPkgDir      = "./qt5.pkg.macos-%s-%s"        % (Platform, mode)
+    MacBinDir      = "./qt5.bin.macos-%s-%s"        % (Platform, mode)
+    MacBuildDir    = "./qt5.build.macos-%s-%s"      % (Platform, mode)
+    MacBuildLog    = "./qt5.build.macos-%s-%s.log"  % (Platform, mode)
+    AbsMacPkgDir   = "%s/qt5.pkg.macos-%s-%s"       % (ProjectDir, Platform, mode)
+    AbsMacBinDir   = "%s/qt5.bin.macos-%s-%s"       % (ProjectDir, Platform, mode)
+    AbsMacBuildDir = "%s/qt5.build.macos-%s-%s"     % (ProjectDir, Platform, mode)
+    AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
+    parameters    += " \\\n  -bin    %s" % MacBinDir
+    parameters    += " \\\n  -build  %s" % MacBuildDir
+  elif ModuleQt == 'Qt5Brew':
+    parameters    += " \\\n  -qt5"
+    parameters    += " \\\n  -qmake  %s" % Qt5Brew['qmake']
     MacPkgDir      = "./qt5.pkg.macos-%s-%s"        % (Platform, mode)
     MacBinDir      = "./qt5.bin.macos-%s-%s"        % (Platform, mode)
     MacBuildDir    = "./qt5.build.macos-%s-%s"      % (Platform, mode)

@@ -239,7 +239,7 @@ def ParseCommandLineArguments():
     quit()
 
   # Determine Qt type
-  candidates = [ i.upper() for i in ['Qt4MacPorts', 'Qt5MacPorts'] ]
+  candidates = [ i.upper() for i in ['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Custom'] ]
   ModuleQt   = ""
   index      = 0
   for item in candidates:
@@ -249,6 +249,9 @@ def ParseCommandLineArguments():
         break
       elif index == 1:
         ModuleQt = 'Qt5MacPorts'
+        break
+      elif index == 2:
+        ModuleQt = 'Qt5Custom'
         break
     else:
       index += 1
@@ -433,9 +436,9 @@ def RunMainBuildBash():
     AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
     parameters    += " \\\n  -bin    %s" % MacBinDir
     parameters    += " \\\n  -build  %s" % MacBuildDir
-  elif ModuleQt == 'Qt5Brew':
+  elif ModuleQt == 'Qt5Custom':
     parameters    += " \\\n  -qt5"
-    parameters    += " \\\n  -qmake  %s" % Qt5Brew['qmake']
+    parameters    += " \\\n  -qmake  %s" % Qt5Custom['qmake']
     MacPkgDir      = "./qt5.pkg.macos-%s-%s"        % (Platform, mode)
     MacBinDir      = "./qt5.bin.macos-%s-%s"        % (Platform, mode)
     MacBuildDir    = "./qt5.build.macos-%s-%s"      % (Platform, mode)
@@ -543,9 +546,9 @@ def DeployBinariesForBundle():
   if not DeploymentF and not DeploymentP:
     return 1
   if DeploymentF and NonOSStdLang:
-    print( "!!! You chose <-y|--deploy> while using non-OS-standard script language.", file=sys.stderr )
+    print( "WARNING!!! You chose <-y|--deploy> while using non-OS-standard script language.", file=sys.stderr )
     print( "    Use <-Y|--DEPLOY> instead", file=sys.stderr )
-    return 1
+    #return 1
   if not os.path.isfile(MacBuildLog):
     print( "!!! Build log file <%s> does not present !!!" % MacBuildLog, file=sys.stderr )
     return 1
@@ -746,6 +749,10 @@ def DeployBinariesForBundle():
       options    = macdepQtOpt + verbose
     elif ModuleQt == 'Qt5MacPorts':
       deploytool = Qt5MacPorts['deploy']
+      app_bundle = "klayout.app"
+      options    = macdepQtOpt + verbose
+    elif ModuleQt == 'Qt5Custom':
+      deploytool = Qt5Custom['deploy']
       app_bundle = "klayout.app"
       options    = macdepQtOpt + verbose
 

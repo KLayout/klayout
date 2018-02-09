@@ -1380,6 +1380,17 @@ GuiApplication::notify (QObject *receiver, QEvent *e)
   return ret;
 }
 
+void
+GuiApplication::force_update_app_menu ()
+{
+#if defined(__APPLE__)
+  //  This is a workaround for a bug in the MacOS native menu integration:
+  //  this signal forces the menu to become updated. Without this, any
+  //  new menu items stay disabled.
+  emit focusWindowChanged (focusWindow ());
+#endif
+}
+
 int
 GuiApplication::exec ()
 {

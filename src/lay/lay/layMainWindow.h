@@ -859,7 +859,6 @@ protected slots:
   void menu_changed ();
   void message_timer ();
   void bookmark_menu_show ();
-  void file_menu_show ();
   void edits_enabled_changed ();
   void file_changed_timer ();
   void file_changed (const QString &path);
@@ -868,6 +867,7 @@ protected slots:
 protected:
   void update_content ();
   void do_update_menu ();
+  void do_update_file_menu ();
 
 private:
   TextProgressDelegate m_text_progress;
@@ -911,6 +911,7 @@ private:
   bool m_disable_tab_selected;
   bool m_exited;
   tl::DeferredMethod<MainWindow> dm_do_update_menu;
+  tl::DeferredMethod<MainWindow> dm_do_update_file_menu;
   tl::DeferredMethod<MainWindow> dm_exit;
   QTimer m_message_timer;
   QTimer m_file_changed_timer;

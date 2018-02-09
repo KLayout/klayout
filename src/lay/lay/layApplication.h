@@ -432,6 +432,12 @@ public:
     return mp_mw;
   }
 
+  /**
+   *  @brief Forces update of the application menu
+   *  This function is used for work around a MacOS issue.
+   */
+  void force_update_app_menu ();
+
 protected:
   virtual void setup ();
   virtual void shutdown ();

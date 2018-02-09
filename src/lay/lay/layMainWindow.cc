@@ -450,6 +450,7 @@ MainWindow::MainWindow (QApplication *app, const char *name)
       m_disable_tab_selected (false),
       m_exited (false),
       dm_do_update_menu (this, &MainWindow::do_update_menu),
+      dm_do_update_file_menu (this, &MainWindow::do_update_file_menu),
       dm_exit (this, &MainWindow::exit),
       m_grid_micron (0.001),
       m_default_grids_updated (true),
@@ -612,10 +613,6 @@ MainWindow::MainWindow (QApplication *app, const char *name)
   QMenu *bookmark_menu = mp_menu->menu ("bookmark_menu");
   tl_assert (bookmark_menu != 0);
   connect (bookmark_menu, SIGNAL (aboutToShow ()), this, SLOT (bookmark_menu_show ()));
-
-  QMenu *file_menu = mp_menu->menu ("file_menu");
-  tl_assert (file_menu != 0);
-  connect (file_menu, SIGNAL (aboutToShow ()), this, SLOT (file_menu_show ()));
 
   //  select the default mode
   select_mode (lay::LayoutView::default_mode ());
@@ -1594,6 +1591,8 @@ MainWindow::configure (const std::string &name, const std::string &value)
         ex.read_quoted (m_mru.back ().second);
       }
     }
+
+    dm_do_update_file_menu ();
 
     return true;
 
@@ -4173,30 +4172,31 @@ MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
 }
 
 void
-MainWindow::file_menu_show ()
+MainWindow::do_update_file_menu ()
 {
-  if (mp_menu->is_valid ("file_menu.open_recent_menu")) {
+  std::string mru_menu = "file_menu.open_recent_menu";
 
-    Action open_recent_action = mp_menu->action ("file_menu.open_recent_menu");
+  if (mp_menu->is_valid (mru_menu)) {
+
+    Action open_recent_action = mp_menu->action (mru_menu);
+    open_recent_action.set_enabled (true);
 
     if (m_mru.size () > 0 && edits_enabled ()) {
 
-      open_recent_action.set_enabled (true);
+      //  rebuild MRU menu
+      std::vector<std::string> items = mp_menu->items (mru_menu);
+      for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
+          mp_menu->delete_item (mru_menu + "." + *i);
+      }
 
-      QMenu *open_recent_menu = open_recent_action.qaction ()->menu ();
-      if (open_recent_menu) {
-
-        open_recent_menu->clear ();
-
-        for (std::vector<std::pair<std::string, std::string> >::iterator mru = m_mru.end (); mru != m_mru.begin (); ) {
-          --mru;
-          unsigned int i = std::distance (m_mru.begin (), mru);
-          QAction *action = open_recent_menu->addAction (tl::to_qstring (mru->first));
-          action->setObjectName (tl::to_qstring (tl::sprintf ("open_recent_%d", i + 1)));
-          gtf::action_connect (action, SIGNAL (triggered ()), this, SLOT (open_recent ()));
-          action->setData (QVariant (int (i)));
-        }
-
+      for (std::vector<std::pair<std::string, std::string> >::iterator mru = m_mru.end (); mru != m_mru.begin (); ) {
+        --mru;
+        unsigned int i = std::distance (m_mru.begin (), mru);
+        Action action;
+        gtf::action_connect (action.qaction (), SIGNAL (triggered ()), this, SLOT (open_recent ()));
+        action.set_title (mru->first);
+        action.qaction ()->setData (QVariant (int (i)));
+        mp_menu->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
       }
 
     } else {
@@ -5016,6 +5016,10 @@ void
 MainWindow::do_update_menu ()
 {
   mp_menu->build (menuBar (), mp_tool_bar);
+  lay::GuiApplication *app = dynamic_cast<lay::GuiApplication *> (qApp);
+  if (app) {
+    app->force_update_app_menu ();
+  }
 }
 
 void

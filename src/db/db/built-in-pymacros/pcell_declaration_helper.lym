@@ -226,16 +226,27 @@ class _PCellDeclarationHelperLayerDescriptor(object):
 class _PCellDeclarationHelperParameterDescriptor(object):
   """
   A descriptor object which translates the PCell parameters into class attributes
+
+  In some cases (i.e. can_convert_from_shape), these placeholders are not 
+  connected to real parameters (obj._param_values is None). In this case,
+  the descriptor acts as a value holder (self.value)
   """
   
   def __init__(self, param_index):
     self.param_index = param_index
+    self.value = None
   
   def __get__(self, obj, type = None):
-    return obj._param_values[self.param_index]
+    if obj._param_values:
+      return obj._param_values[self.param_index]
+    else:
+      return self.value
     
   def __set__(self, obj, value):
-    obj._param_values[self.param_index] = value
+    if obj._param_values:
+      obj._param_values[self.param_index] = value
+    else:
+      self.value = value
 
 class _PCellDeclarationHelper(pya.PCellDeclaration):
   """  

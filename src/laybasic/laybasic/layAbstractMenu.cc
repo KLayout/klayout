@@ -1355,6 +1355,17 @@ AbstractMenu::insert_menu (const std::string &path, const std::string &name, con
 }
 
 void
+AbstractMenu::clear_menu (const std::string &p)
+{
+  typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;
+  path_type path = find_item (p);
+  if (! path.empty () && ! path.back ().second->children.empty ()) {
+    path.back ().second->children.clear ();
+    emit changed ();
+  }
+}
+
+void
 AbstractMenu::delete_item (const std::string &p)
 {
   typedef std::vector<std::pair<AbstractMenuItem *, std::list<AbstractMenuItem>::iterator > > path_type;

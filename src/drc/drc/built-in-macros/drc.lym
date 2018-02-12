@@ -3922,9 +3922,9 @@ CODE
             n = $1.to_i - 1
             view = RBA::LayoutView::current
             view || raise("No view open")
-            (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n}")
+            (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n + 1}")
             cv = view.cellview(n)
-            cv.is_valid? || raise("Invalid layout @#{n}")
+            cv.is_valid? || raise("Invalid layout @#{n + 1}")
             @def_source = make_source(cv.layout, cv.cell)
           else
             layout = RBA::Layout::new
@@ -4016,9 +4016,9 @@ CODE
             n = $1.to_i - 1
             view = RBA::LayoutView::current
             view || raise("No view open")
-            (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n}")
+            (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n + 1}")
             cv = view.cellview(n)
-            cv.is_valid? || raise("Invalid layout @#{n}")
+            cv.is_valid? || raise("Invalid layout @#{n + 1}")
             return make_source(cv.layout, cv.cell)
           else
             layout = RBA::Layout::new
@@ -4173,9 +4173,9 @@ CODE
           n = $1.to_i - 1
           view = RBA::LayoutView::current
           view || raise("No view open")
-          (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n}")
+          (n &gt;= 0 &amp;&amp; view.cellviews &gt; n) || raise("Invalid layout index @#{n + 1}")
           cv = view.cellview(n)
-          cv.is_valid? || raise("Invalid layout @#{n}")
+          cv.is_valid? || raise("Invalid layout @#{n + 1}")
           @output_layout = cv.layout
           @output_cell = cellname ? (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)) : cv.cell
           @output_layout_file = nil

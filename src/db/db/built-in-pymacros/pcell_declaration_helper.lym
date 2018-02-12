@@ -332,7 +332,38 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     gets the parameters
     """
     return self._param_decls
+
+  def get_values(self):
+    """
+    gets the temporary parameter values
+    """
+    v = self._param_values
+    self._param_values = None
+    return v
   
+  def init_values(self, values = None, layers = None):
+    """
+    initializes the temporary parameter values
+    "values" are the original values. If "None" is given, the
+    default values will be used. 
+    "layers" are the layer indexes corresponding to the layer
+    parameters.
+    """
+    if not values:
+      self._param_values = []
+      for pd in self._param_decls:
+        self._param_values.append(pd.default)
+    else:
+      self._param_values = values
+    self._layers = layers
+
+  def finish(self):
+    """
+    Needs to be called at the end of produce() after init_values was used
+    """
+    self._param_values = None
+    self._layers = None
+    
   def get_layers(self, parameters):
     """
     get the layer definitions
@@ -346,25 +377,23 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     """
     coerce parameters (make consistent)
     """
-    self._param_values = parameters
+    self.init_values(parameters)
     self.layout = layout
     self.coerce_parameters_impl()
     self.layout = None
-    return self._param_values
+    return self.get_values()
 
   def produce(self, layout, layers, parameters, cell):
     """
     coerce parameters (make consistent)
     """
-    self._layers = layers
+    self.init_values(parameters, layers)
     self.cell = cell
-    self._param_values = parameters
     self.layout = layout
     self.produce_impl()
-    self._layers = None
     self.cell = None
-    self._param_values = None
     self.layout = None
+    self.finish()
 
   def can_create_from_shape(self, layout, shape, layer):
     """
@@ -397,9 +426,7 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     produce a helper for parameters_from_shape
     with this helper, the implementation can use the parameter setters
     """
-    self._param_values = []
-    for pd in self._param_decls:
-      self._param_values.append(pd.default)
+    self.init_values()
     self.layout = layout
     self.shape = shape
     self.layer = layer
@@ -407,7 +434,7 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     self.layout = None
     self.shape = None
     self.layer = None
-    return self._param_values
+    return self.get_values()
   
   def display_text_impl(self):
     """

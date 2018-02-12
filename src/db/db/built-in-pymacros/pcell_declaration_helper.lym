@@ -443,7 +443,7 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     """
     default implementation
     """
-    return pya.Trans.new
+    return pya.Trans()
   
 # import the Type... constants from PCellParameterDeclaration
 for k in dir(pya.PCellParameterDeclaration):

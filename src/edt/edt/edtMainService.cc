@@ -1906,12 +1906,10 @@ MainService::cm_change_layer ()
   //  get (common) cellview index of the selected shapes
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
     for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
-      if (! s->is_cell_inst ()) {
-        if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Selections originate from different layouts - cannot switch layer in this case.")));
-        }
-        cv_index = int (s->cv_index ());
+      if (cv_index >= 0 && cv_index != int (s->cv_index ())) {
+        throw tl::Exception (tl::to_string (QObject::tr ("Selections originate from different layouts - cannot switch layer in this case.")));
       }
+      cv_index = int (s->cv_index ());
     }
   }
 
@@ -1975,17 +1973,58 @@ MainService::cm_change_layer ()
     //  Insert and delete the shape. This exploits the fact, that a shape can be erased multiple times -
     //  this is important since the selection potentially contains the same shape multiple times.
     for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+
       for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+
         if (!s->is_cell_inst () && int (s->layer ()) != layer) {
+
           db::Cell &cell = layout.cell (s->cell_index ());
           if (cell.shapes (s->layer ()).is_valid (s->shape ())) {
             cell.shapes (layer).insert (s->shape ());
             cell.shapes (s->layer ()).erase_shape (s->shape ());
           }
+
+        } else if (s->is_cell_inst ()) {
+
+          //  If the selected object is a PCell instance, and there is exactly one visible, writable layer type parameter, change this one
+
+          db::Instance inst = s->back ().inst_ptr;
+          db::Cell &cell = layout.cell (s->cell_index ());
+
+          if (cell.is_valid (inst)) {
+
+            const db::PCellDeclaration *pcell_decl = layout.pcell_declaration_for_pcell_variant (inst.cell_index ());
+            if (pcell_decl) {
+
+              size_t layer_par_index = 0;
+              int n_layer_par = 0;
+              for (std::vector<db::PCellParameterDeclaration>::const_iterator d = pcell_decl->parameter_declarations ().begin (); d != pcell_decl->parameter_declarations ().end () && n_layer_par < 2; ++d) {
+                if (d->get_type () == db::PCellParameterDeclaration::t_layer && !d->is_hidden () && !d->is_readonly ()) {
+                  ++n_layer_par;
+                  layer_par_index = size_t (d - pcell_decl->parameter_declarations ().begin ());
+                }
+              }
+
+              if (n_layer_par == 1) {
+                std::vector<tl::Variant> parameters = cell.get_pcell_parameters (inst);
+                tl_assert (layer_par_index < parameters.size ());
+                parameters [layer_par_index] = layout.get_properties (layer);
+                cell.change_pcell_parameters (inst, parameters);
+              }
+
+            }
+
+          }
+
         }
+
       }
+
     }
     
+    //  remove superfluous proxies
+    layout.cleanup ();
+
     //  The selection is no longer valid
     view ()->clear_selection ();
 

@@ -2244,3 +2244,54 @@ TEST(100)
   db::compare_layouts (_this, lr, au_fn);
 }
 
+//  #74 (GitHub)
+TEST(101)
+{
+  db::EdgeProcessor ep;
+
+  {
+    db::Point pts[] = {
+      db::Point (0, 0),
+      db::Point (0, 10),
+      db::Point (10, 10),
+      db::Point (10, 0)
+    };
+    db::Polygon p;
+    p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    ep.insert (p, 0);
+  }
+
+  {
+    db::Point pts[] = {
+      db::Point (-1, -1),
+      db::Point (-1, 8),
+      db::Point (2, 11),
+      db::Point (2, -1)
+    };
+    db::Polygon p;
+    p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    ep.insert (p, 1);
+  }
+
+  {
+    db::Point pts[] = {
+      db::Point (2, -1),
+      db::Point (2, 11),
+      db::Point (11, 11),
+      db::Point (11, -1)
+    };
+    db::Polygon p;
+    p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    ep.insert (p, 1);
+  }
+
+  std::vector<db::Polygon> out;
+  db::PolygonContainer pc (out);
+  db::PolygonGenerator pg (pc, false, true);
+  db::BooleanOp op (db::BooleanOp::And);
+
+  ep.process (pg, op);
+
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out[0].to_string (), "(0,0;0,9;1,10;10,10;10,0)");
+}

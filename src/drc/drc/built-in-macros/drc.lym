@@ -4694,11 +4694,20 @@ CODE
       
       else 
 
-        output = @output_layout || @def_layout
-        output || raise("No output layout specified")
-
-        output_cell = @output_cell || @def_cell
-        output_cell || raise("No output cell specified")
+        if @output_layout 
+          output = @output_layout
+          if @output_cell
+            output_cell = @output_cell
+          elsif @def_cell
+            output_cell = @output_layout.cell(@def_cell.name) || @output_layout.create_cell(@def_cell.name)
+          end
+          output_cell || raise("No output cell specified (see 'target' instruction)")
+        else
+          output = @def_layout
+          output || raise("No output layout specified")
+          output_cell = @output_cell || @def_cell
+          output_cell || raise("No output cell specified")
+        end
 
         info = nil
         if args.size == 1

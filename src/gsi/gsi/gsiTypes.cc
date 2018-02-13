@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -66,6 +66,10 @@ ArgType::to_string () const
     s += "long long"; break;
   case T_ulonglong:
     s += "unsigned long long"; break;
+#if defined(HAVE_64BIT_COORD)
+  case T_int128:
+    s += "int128"; break;
+#endif
   case T_double:
     s += "double"; break;
   case T_float:

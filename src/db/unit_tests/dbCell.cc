@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -570,13 +570,13 @@ TEST(2)
 
   }
 
-  c0.erase (i4);
-  EXPECT_EQ (c2s_unsorted(c0), "5[r0 *1 0,0]#2,3[r0 *1 0,0]#13");
-  EXPECT_EQ (c0.cell_instances (), size_t (2));
   c0.erase (i5);
+  EXPECT_EQ (c2s_unsorted(c0), "5[r0 *1 0,0]#2,1[r0 *1 0,0]#1");
+  EXPECT_EQ (c0.cell_instances (), size_t (2));
+  c0.erase (i4);
   EXPECT_EQ (c2s_unsorted(c0), "5[r0 *1 0,0]#2");
   EXPECT_EQ (c0.cell_instances (), size_t (1));
-  // not yet: EXPECT_EQ (c0.empty (), false);
+  //  Not yet: EXPECT_EQ (c0.empty (), false);
 
   //  note: double delete is not supported in non-editable mode 
   if (db::default_editable_mode ()) {
@@ -608,7 +608,7 @@ TEST(2)
   c0.erase (i3);
   EXPECT_EQ (c2s_unsorted(c0), "");
   EXPECT_EQ (c0.cell_instances (), size_t (0));
-  // not yet: EXPECT_EQ (c0.empty (), true);
+  //  Not yet: EXPECT_EQ (c0.empty (), true);
 }
 
 TEST(3) 

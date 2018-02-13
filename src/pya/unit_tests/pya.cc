@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -99,6 +99,8 @@ void run_pythontest (tl::TestBase *_this, const std::string &fn)
 PYTHONTEST (dbLayoutTest, "dbLayoutTest.py")
 PYTHONTEST (dbRegionTest, "dbRegionTest.py")
 PYTHONTEST (dbPCellsTest, "dbPCells.py")
+PYTHONTEST (dbPolygonTest, "dbPolygonTest.py")
+PYTHONTEST (dbTransTest, "dbTransTest.py")
 PYTHONTEST (tlTest, "tlTest.py")
 #if defined(HAVE_QTBINDINGS)
 PYTHONTEST (qtbinding, "qtbinding.py")

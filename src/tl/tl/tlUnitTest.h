@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "tlLog.h"
 #include "tlException.h"
 #include "tlString.h"
+#include "tlInt128Support.h"
 
 #include <string>
 #include <vector>

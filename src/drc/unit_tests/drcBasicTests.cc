@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ TEST(1)
   std::string input = tl::testsrc ();
   input += "/testdata/drc/drctest.gds";
   std::string au = tl::testsrc ();
-  au += "/testdata/drc/drcBasicTests_au.gds";
+  au += "/testdata/drc/drcBasicTests_au.oas";
 
   std::string output = this->tmp_file ("tmp.gds");
 

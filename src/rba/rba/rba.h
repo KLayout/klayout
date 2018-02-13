@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,26 +31,6 @@
 
 namespace rba
 {
-
-/**
- *  @brief A class encapsulating a ruby exception
- */
-class RBA_PUBLIC RubyError
-  : public tl::ScriptError
-{
-public:
-  RubyError (const char *msg, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
-    : tl::ScriptError (msg, cls, backtrace)
-  { }
-
-  RubyError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector <tl::BacktraceElement> &backtrace)
-    : tl::ScriptError (msg, sourcefile, line, cls, backtrace)
-  { }
-
-  RubyError (const RubyError &d)
-    : tl::ScriptError (d)
-  { }
-};
 
 struct RubyInterpreterPrivateData;
 
@@ -223,7 +203,7 @@ public:
    *  }
    *  @endcode
    */
-  static int initialize (int argc, char **argv, int (*main_func) (int, char **));
+  static int initialize (int &argc, char **argv, int (*main_func) (int &, char **));
 
   /**
    *  @brief The instance of the Ruby interpreter of 0 if there is none.

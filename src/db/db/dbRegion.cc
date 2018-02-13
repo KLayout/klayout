@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -828,8 +828,13 @@ Region::selected_interacting_generic (const Region &other, int mode, bool touchi
   db::EdgeProcessor ep (m_report_progress, m_progress_desc);
 
   //  shortcut
-  if (empty () || other.empty ()) {
-    if (mode <= 0) {
+  if (empty ()) {
+    return *this;
+  } else if (other.empty ()) {
+    //  clear, if b is empty and
+    //   * mode is inside or interacting and inverse is false ("inside" or "interacting")
+    //   * mode is outside and inverse is true ("not outside")
+    if ((mode <= 0) != inverse) {
       return Region ();
     } else {
       return *this;
@@ -879,8 +884,13 @@ void
 Region::select_interacting_generic (const Region &other, int mode, bool touching, bool inverse)
 {
   //  shortcut
-  if (empty () || other.empty ()) {
-    if (mode <= 0) {
+  if (empty ()) {
+    return;
+  } else if (other.empty ()) {
+    //  clear, if b is empty and
+    //   * mode is inside or interacting and inverse is false ("inside" or "interacting")
+    //   * mode is outside and inverse is true ("not outside")
+    if ((mode <= 0) != inverse) {
       clear ();
     }
     return;

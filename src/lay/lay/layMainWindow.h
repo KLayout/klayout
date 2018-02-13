@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -689,7 +689,6 @@ public slots:
   void tab_close_requested (int);
   void enable_all ();
   void disable_all ();
-  void goto_bookmark ();
   void open_recent ();
   void view_selected (int index);
   void view_title_changed ();
@@ -858,9 +857,9 @@ public slots:
 protected slots:
   void menu_changed ();
   void message_timer ();
-  void bookmark_menu_show ();
-  void file_menu_show ();
   void edits_enabled_changed ();
+  void menu_needs_update ();
+
   void file_changed_timer ();
   void file_changed (const QString &path);
   void file_removed (const QString &path);
@@ -868,13 +867,13 @@ protected slots:
 protected:
   void update_content ();
   void do_update_menu ();
+  void do_update_file_menu ();
 
 private:
   TextProgressDelegate m_text_progress;
 
   //  Main menu
   AbstractMenu *mp_menu;
-  QMenu *mp_goto_bookmark_menu;
   QTabBar *mp_tab_bar;
   QToolBar *mp_tool_bar;
   QDockWidget *mp_navigator_dock_widget;
@@ -911,6 +910,7 @@ private:
   bool m_disable_tab_selected;
   bool m_exited;
   tl::DeferredMethod<MainWindow> dm_do_update_menu;
+  tl::DeferredMethod<MainWindow> dm_do_update_file_menu;
   tl::DeferredMethod<MainWindow> dm_exit;
   QTimer m_message_timer;
   QTimer m_file_changed_timer;

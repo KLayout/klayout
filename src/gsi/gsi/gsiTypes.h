@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -55,19 +55,19 @@ namespace gsi
 // ---------------------------------------------------------------------------------
 //  Type system of GSI
 
-class SerialArgs;
-class VectorAdaptor;
-class MapAdaptor;
-class StringAdaptor;
-class VariantAdaptor;
-class ClassBase;
+class GSI_PUBLIC SerialArgs;
+class GSI_PUBLIC VectorAdaptor;
+class GSI_PUBLIC MapAdaptor;
+class GSI_PUBLIC StringAdaptor;
+class GSI_PUBLIC VariantAdaptor;
+class GSI_PUBLIC ClassBase;
 struct NoAdaptorTag;
-template <class X, class A> class Class;
+template <class X, class A> class GSI_PUBLIC_TEMPLATE Class;
 template <class X> struct ClassTag;
-template <class I> class IterAdaptor;
-template <class V> class IterPtrAdaptor;
-template <class V> class ConstIterPtrAdaptor;
-template <class I> class FreeIterAdaptor;
+template <class I> class GSI_PUBLIC_TEMPLATE IterAdaptor;
+template <class V> class GSI_PUBLIC_TEMPLATE IterPtrAdaptor;
+template <class V> class GSI_PUBLIC_TEMPLATE ConstIterPtrAdaptor;
+template <class I> class GSI_PUBLIC_TEMPLATE FreeIterAdaptor;
 template <class X> const ClassBase *cls_decl ();
 
 /**

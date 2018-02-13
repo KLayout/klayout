@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ typedef void (*klp_init_func_t) (void (**autorun) (), void (**autorun_early) (),
 # if defined _WIN32 || defined __CYGWIN__
 #   define KLP_PUBLIC __declspec(dllexport)
 # else
-#   if __GNUC__ >= 4
+#   if __GNUC__ >= 4 || defined(__clang__)
 #     define KLP_PUBLIC __attribute__ ((visibility ("default")))
 #   else
 #     define KLP_PUBLIC

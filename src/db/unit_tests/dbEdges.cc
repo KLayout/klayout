@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -818,5 +818,60 @@ TEST(22)
   ee.insert (db::Edge (4000,-2000,-2000,-2000));
 
   EXPECT_EQ ((e & ee).to_string (), "(400,0;-2000,0);(500,-174;400,0);(1000,0;900,-173);(4000,0;1000,0)");
+}
+
+//  GitHub issue #72 (Edges/Region NOT issue)
+TEST(23)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (0, 1000, 3000, 1000));
+  e.insert (db::Edge (3000, 1000, 3000, 0));
+  e.insert (db::Edge (3000, 0, 0, 0));
+
+  db::Region r;
+  r.insert (db::Box (1000, -1000, 2000, 0));
+  r.insert (db::Box (1000, 1000, 2000, 2000));
+
+  EXPECT_EQ ((e - r).to_string (), "(0,0;0,1000);(1000,0;0,0);(3000,0;2000,0);(3000,1000;3000,0);(0,1000;1000,1000);(2000,1000;3000,1000)");
+
+  r.clear ();
+  r.insert (db::Box (1000, -1000, 2000, 2000));
+
+  EXPECT_EQ ((e - r).to_string (), "(0,0;0,1000);(1000,0;0,0);(3000,0;2000,0);(3000,1000;3000,0);(0,1000;1000,1000);(2000,1000;3000,1000)");
+
+  e.clear ();
+  e.insert (db::Edge (0, 0, 100, 1000));
+  e.insert (db::Edge (100, 1000, 3100, 1000));
+  e.insert (db::Edge (3100, 1000, 3000, 0));
+  e.insert (db::Edge (3000, 0, 0, 0));
+
+  r.clear ();
+  r.insert (db::Box (1000, -1000, 2000, 0));
+  r.insert (db::Box (1000, 1000, 2000, 2000));
+
+  EXPECT_EQ ((e - r).to_string (), "(0,0;100,1000);(1000,0;0,0);(3000,0;2000,0);(3100,1000;3000,0);(100,1000;1000,1000);(2000,1000;3100,1000)");
+
+  r.clear ();
+  r.insert (db::Box (1000, -1000, 2000, 2000));
+
+  EXPECT_EQ ((e - r).to_string (), "(0,0;100,1000);(1000,0;0,0);(3000,0;2000,0);(3100,1000;3000,0);(100,1000;1000,1000);(2000,1000;3100,1000)");
+
+  e.clear ();
+  e.insert (db::Edge (0, 0, 1000, 0));
+  e.insert (db::Edge (1000, 0, 1000, 3000));
+  e.insert (db::Edge (1000, 3000, 0, 3000));
+  e.insert (db::Edge (0, 3000, 0, 0));
+
+  r.clear ();
+  r.insert (db::Box (-1000, 1000, 0, 2000));
+  r.insert (db::Box (1000, 1000, 2000, 2000));
+
+  EXPECT_EQ ((e - r).to_string (), "(0,1000;0,0);(0,0;1000,0);(1000,0;1000,1000);(0,3000;0,2000);(1000,2000;1000,3000);(1000,3000;0,3000)");
+
+  r.clear ();
+  r.insert (db::Box (-1000, 1000, 2000, 2000));
+
+  EXPECT_EQ ((e - r).to_string (), "(0,1000;0,0);(0,0;1000,0);(1000,0;1000,1000);(0,3000;0,2000);(1000,2000;1000,3000);(1000,3000;0,3000)");
 }
 

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1593,7 +1593,7 @@ public:
  *  into the db::Object manager's undo/redo queue.
  */
 template <class Sh, class StableTag>
-class DB_PUBLIC layer_op
+class DB_PUBLIC_TEMPLATE layer_op
   : public LayerOpBase
 {
 public:

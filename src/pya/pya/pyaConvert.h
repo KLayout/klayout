@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -36,12 +36,14 @@
 
 namespace gsi
 {
-  class ClassBase;
-  class ArgType;
+  class GSI_PUBLIC ClassBase;
+  class GSI_PUBLIC ArgType;
 }
 
 namespace pya
 {
+
+class PYAObjectBase;
 
 // -------------------------------------------------------------------
 //  Conversion of a generic object to a Python object
@@ -49,6 +51,7 @@ namespace pya
 /**
  *  @brief Translates an object to a Python object (PyObject)
  *  @param obj The generic object pointer
+ *  @param self If there is an object where the returned object may be a member of or 0 if there isn't
  *  @param cls The class of the object
  *  @param pass_obj If true, the Python object will own the original object which gets destroyed when the Ruby object is finalized
  *  @param is_const If true, the Python object will be a const one unless the original object is already bound in a non-const way
@@ -57,14 +60,14 @@ namespace pya
  *  @return The Python object
  */
 PyObject *
-object_to_python (void *obj, const gsi::ClassBase *cls, bool pass_obj, bool is_const, bool prefer_copy, bool can_destroy);
+object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, bool pass_obj, bool is_const, bool prefer_copy, bool can_destroy);
 
 /**
  *  @brief Translates an object to a Python object (PyObject)
  *  This version takes it's flags from the atype given.
  */
 PyObject *
-object_to_python (void *obj, const gsi::ArgType &atype);
+object_to_python (void *obj, PYAObjectBase *self, const gsi::ArgType &atype);
 
 // -------------------------------------------------------------------
 //  Type checks 
@@ -85,15 +88,23 @@ bool test_type (PyObject * /*rval*/, bool /*loose*/)
 }
 
 template <>
-inline bool test_type<bool> (PyObject * /*rval*/, bool /*loose*/)
+inline bool test_type<bool> (PyObject *rval, bool loose)
 {
-  return true;  // everything can be converted to bool
+  if (loose) {
+    return true;  // everything can be converted to bool
+  } else {
+    return PyBool_Check (rval) || rval == Py_None;
+  }
 }
 
 //  used for other integer types as well:
 template <>
 inline bool test_type<int> (PyObject *rval, bool loose)
 {
+  //  bool values don't count as int in strict mode
+  if (!loose && PyBool_Check (rval)) {
+    return false;
+  }
 #if PY_MAJOR_VERSION < 3
   return PyInt_Check (rval) || PyLong_Check (rval) || (PyFloat_Check (rval) && loose);
 #else
@@ -172,6 +183,10 @@ inline bool test_type<__int128> (PyObject *rval, bool loose)
 template <>
 inline bool test_type<double> (PyObject *rval, bool loose)
 {
+  //  bool values don't count as int in strict mode
+  if (!loose && PyBool_Check (rval)) {
+    return false;
+  }
 #if PY_MAJOR_VERSION < 3
   return PyFloat_Check (rval) || (PyInt_Check (rval) && loose) || (PyLong_Check (rval) && loose);
 #else

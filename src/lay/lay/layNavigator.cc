@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include "imgService.h"
 
 #include <QVBoxLayout>
-#include <QMenuBar>
+#include <QFrame>
 #include <QLabel>
 
 namespace lay
@@ -443,7 +443,8 @@ Navigator::Navigator (MainWindow *main_window)
 {
   setObjectName (QString::fromUtf8 ("navigator"));
 
-  mp_menu_bar = new QMenuBar (this);
+  mp_menu_bar = new QFrame (this);
+  mp_menu_bar->setFrameShape (QFrame::NoFrame);
   mp_menu_bar->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
 
   mp_view = new LayoutView (0, false, mp_main_window, this, "navigator", LayoutView::LV_Naked + LayoutView::LV_NoZoom + LayoutView::LV_NoServices + LayoutView::LV_NoGrid);

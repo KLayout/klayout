@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 #include <QUrl>
 #include <QMimeData>
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) && (QT_VERSION < 0x050401)
 // A workaround for the issue of Qt 4.8.x when handling "File Reference URL" in OSX
 // By Kazunari Sekigawa (November 12, 2015)
 // Search down for my name for more details!
@@ -106,7 +106,7 @@ const int max_dirty_files = 15;
 // -------------------------------------------------------------
 
 class ProgressDialog
-  : public QDialog, 
+  : public QDialog,
     public tl::Object
 {
 public:
@@ -171,7 +171,7 @@ private:
 
 // -------------------------------------------------------------
 
-class ControlWidgetStack 
+class ControlWidgetStack
   : public QFrame
 {
 public:
@@ -245,7 +245,7 @@ public:
       mp_bglabel->hide ();
     }
   }
-  
+
   QWidget *widget (size_t index)
   {
     if (index < m_widgets.size ()) {
@@ -268,7 +268,7 @@ protected:
 
   void resize_children ()
   {
-    //  set the geometry of all children 
+    //  set the geometry of all children
     for (std::vector <QWidget *>::iterator child = m_widgets.begin (); child != m_widgets.end (); ++child) {
       if (*child) {
         (*child)->setGeometry (0, 0, width (), height ());
@@ -283,7 +283,7 @@ protected:
 
 // -------------------------------------------------------------
 
-class ViewWidgetStack 
+class ViewWidgetStack
   : public QWidget
 {
 public:
@@ -335,7 +335,7 @@ public:
       }
     }
   }
-  
+
   LayoutView *widget (size_t index)
   {
     if (index < m_widgets.size ()) {
@@ -358,7 +358,7 @@ protected:
 
   void resize_children ()
   {
-    //  set the geometry of all children 
+    //  set the geometry of all children
     for (std::vector <LayoutView *>::iterator child = m_widgets.begin (); child != m_widgets.end (); ++child) {
       (*child)->setGeometry (0, 0, width (), height ());
     }
@@ -436,7 +436,7 @@ static MainWindow *mw_instance = 0;
 MainWindow *
 MainWindow::instance ()
 {
-  return mw_instance; 
+  return mw_instance;
 }
 
 // -----------------------------------
@@ -450,6 +450,7 @@ MainWindow::MainWindow (QApplication *app, const char *name)
       m_disable_tab_selected (false),
       m_exited (false),
       dm_do_update_menu (this, &MainWindow::do_update_menu),
+      dm_do_update_file_menu (this, &MainWindow::do_update_file_menu),
       dm_exit (this, &MainWindow::exit),
       m_grid_micron (0.001),
       m_default_grids_updated (true),
@@ -571,7 +572,7 @@ MainWindow::MainWindow (QApplication *app, const char *name)
   mp_tech_status_label = new QLabel (mp_status_bar);
   mp_tech_status_label->setObjectName (QString::fromUtf8 ("tech_status_label"));
   mp_tech_status_label->setMinimumSize (QSize (100, 0));
-  mp_tech_status_label->setToolTip (QObject::tr ("Current technology")); 
+  mp_tech_status_label->setToolTip (QObject::tr ("Current technology"));
   mp_status_bar->addWidget (mp_tech_status_label);
 
   QLabel *sel_status_icon = new QLabel (mp_status_bar);
@@ -580,7 +581,7 @@ MainWindow::MainWindow (QApplication *app, const char *name)
 
   mp_msg_label = new QLabel (mp_status_bar);
   mp_msg_label->setObjectName (QString::fromUtf8 ("msg_label"));
-  mp_msg_label->setToolTip (QObject::tr ("General status")); 
+  mp_msg_label->setToolTip (QObject::tr ("General status"));
   mp_status_bar->addWidget (mp_msg_label, 1);
 
   QLabel *xy_status_icon = new QLabel (mp_status_bar);
@@ -597,25 +598,16 @@ MainWindow::MainWindow (QApplication *app, const char *name)
   mp_cpx_label->setObjectName (QString::fromUtf8 ("cpx_label"));
   mp_cpx_label->setAlignment (Qt::AlignVCenter | Qt::AlignRight);
   mp_cpx_label->setMinimumSize (100, 0);
-  mp_cpx_label->setToolTip (QObject::tr ("Current cursor position (x)")); 
+  mp_cpx_label->setToolTip (QObject::tr ("Current cursor position (x)"));
   cp_frame_ly->addWidget (mp_cpx_label);
   cp_frame_ly->insertSpacing (-1, 6);
   mp_cpy_label = new QLabel (mp_cp_frame);
   mp_cpy_label->setObjectName (QString::fromUtf8 ("cpy_label"));
   mp_cpy_label->setAlignment (Qt::AlignVCenter | Qt::AlignRight);
   mp_cpy_label->setMinimumSize (100, 0);
-  mp_cpy_label->setToolTip (QObject::tr ("Current cursor position (y)")); 
+  mp_cpy_label->setToolTip (QObject::tr ("Current cursor position (y)"));
   cp_frame_ly->addWidget (mp_cpy_label);
   cp_frame_ly->insertSpacing (-1, 6);
-
-  //  connect to the menus to provide the dynamic parts
-  QMenu *bookmark_menu = mp_menu->menu ("bookmark_menu");
-  tl_assert (bookmark_menu != 0);
-  connect (bookmark_menu, SIGNAL (aboutToShow ()), this, SLOT (bookmark_menu_show ()));
-
-  QMenu *file_menu = mp_menu->menu ("file_menu");
-  tl_assert (file_menu != 0);
-  connect (file_menu, SIGNAL (aboutToShow ()), this, SLOT (file_menu_show ()));
 
   //  select the default mode
   select_mode (lay::LayoutView::default_mode ());
@@ -623,28 +615,28 @@ MainWindow::MainWindow (QApplication *app, const char *name)
   //  create file dialogs:
 
   //  session file dialog
-  mp_session_fdia = new lay::FileDialog (this, 
-                          tl::to_string (QObject::tr ("Session File")), 
-                          tl::to_string (QObject::tr ("Session files (*.lys);;All files (*)")), 
+  mp_session_fdia = new lay::FileDialog (this,
+                          tl::to_string (QObject::tr ("Session File")),
+                          tl::to_string (QObject::tr ("Session files (*.lys);;All files (*)")),
                           "lys");
 
   //  bookmarks file dialog
-  mp_bookmarks_fdia = new lay::FileDialog (this, 
-                            tl::to_string (QObject::tr ("Bookmarks File")), 
-                            tl::to_string (QObject::tr ("Bookmark files (*.lyb);;All files (*)")), 
+  mp_bookmarks_fdia = new lay::FileDialog (this,
+                            tl::to_string (QObject::tr ("Bookmarks File")),
+                            tl::to_string (QObject::tr ("Bookmark files (*.lyb);;All files (*)")),
                             "lyb");
   //  layer properties
-  mp_lprops_fdia = new lay::FileDialog (this, 
-                            tl::to_string (QObject::tr ("Layer Properties File")), 
-                            tl::to_string (QObject::tr ("Layer properties files (*.lyp);;All files (*)")), 
+  mp_lprops_fdia = new lay::FileDialog (this,
+                            tl::to_string (QObject::tr ("Layer Properties File")),
+                            tl::to_string (QObject::tr ("Layer properties files (*.lyp);;All files (*)")),
                             "lyp");
   //  screenshots
-  mp_screenshot_fdia = new lay::FileDialog (this, 
-                            tl::to_string (QObject::tr ("Screenshot")), 
-                            tl::to_string (QObject::tr ("PNG files (*.png);;All files (*)")), 
+  mp_screenshot_fdia = new lay::FileDialog (this,
+                            tl::to_string (QObject::tr ("Screenshot")),
+                            tl::to_string (QObject::tr ("PNG files (*.png);;All files (*)")),
                             "png");
 
-  
+
   //  layout file dialog
   std::string fmts = tl::to_string (QObject::tr ("All layout files ("));
   for (tl::Registrar<db::StreamFormatDeclaration>::iterator rdr = tl::Registrar<db::StreamFormatDeclaration>::begin (); rdr != tl::Registrar<db::StreamFormatDeclaration>::end (); ++rdr) {
@@ -737,11 +729,11 @@ MainWindow::~MainWindow ()
   mp_assistant = 0;
 }
 
-void 
+void
 MainWindow::init_menu ()
 {
   //  default menu layout
-  
+
   MenuLayoutEntry empty_menu [] = {
     MenuLayoutEntry::last ()
   };
@@ -1010,7 +1002,7 @@ MainWindow::init_menu ()
   lay::LayoutView::init_menu (*mp_menu);
   lay::Navigator::init_menu (*mp_menu);
 
-  //  Fill the mode menu file items from the intrinsic mouse modes 
+  //  Fill the mode menu file items from the intrinsic mouse modes
   //  TODO: map the intrinsic modes to standard plugins and remove this code along
   //  with related code in LayoutView. After this we can simplify the menu inititialization
   //  inside PluginDeclaration as well.
@@ -1030,7 +1022,7 @@ MainWindow::init_menu ()
       if (tab) {
         name = std::string (*t, 0, tab - t->c_str ());
         title = tab + 1;
-      } 
+      }
 
       Action action (title);
       action.set_checkable (true);
@@ -1058,7 +1050,7 @@ MainWindow::init_menu ()
   }
 
   //  if in "viewer-only mode", hide all entries in the "hide_vo" group
-  if ((lay::Application::instance () && lay::Application::instance ()->is_vo_mode ())) {
+  if ((lay::ApplicationBase::instance () && lay::ApplicationBase::instance ()->is_vo_mode ())) {
     std::vector<std::string> hide_vo_grp = mp_menu->group ("hide_vo");
     for (std::vector<std::string>::const_iterator g = hide_vo_grp.begin (); g != hide_vo_grp.end (); ++g) {
       mp_menu->action (*g).set_visible (false);
@@ -1067,20 +1059,20 @@ MainWindow::init_menu ()
 
   //  if not in editable mode, hide all entries from "edit_mode" group
   //  TODO: later do this on each change of the view - each view might get it's own editable mode
-  bool view_mode = (lay::Application::instance () && !lay::Application::instance ()->is_editable ());
+  bool view_mode = (lay::ApplicationBase::instance () && !lay::ApplicationBase::instance ()->is_editable ());
 
   std::vector<std::string> edit_mode_grp = mp_menu->group ("edit_mode");
   for (std::vector<std::string>::const_iterator g = edit_mode_grp.begin (); g != edit_mode_grp.end (); ++g) {
     mp_menu->action (*g).set_visible (! view_mode);
   }
- 
+
   std::vector<std::string> view_mode_grp = mp_menu->group ("view_mode");
   for (std::vector<std::string>::const_iterator g = view_mode_grp.begin (); g != view_mode_grp.end (); ++g) {
     mp_menu->action (*g).set_visible (view_mode);
   }
 }
 
-void 
+void
 MainWindow::dock_widget_visibility_changed (bool /*visible*/)
 {
   if (sender () == mp_lp_dock_widget) {
@@ -1293,7 +1285,7 @@ MainWindow::about_to_exec ()
   }
 
   //  TODO: later, each view may get it's own editable flag
-  if (lay::Application::instance () && !lay::Application::instance ()->is_editable ()) {
+  if (lay::ApplicationBase::instance () && !lay::ApplicationBase::instance ()->is_editable ()) {
     TipDialog td (this, 
                   tl::to_string (QObject::tr ("KLayout has been started in viewer mode. In this mode, editor functions are not available.\n\nTo enable these functions, start KLayout in editor mode by using the \"-e\" command line switch or select it as the default mode in the setup dialog. Choose \"Setup\" in the \"File\" menu and check \"Use editing mode by default\" on the \"Editing Mode\" page in the \"Application\" section.")), 
                   "editor-mode");
@@ -1306,8 +1298,8 @@ MainWindow::about_to_exec ()
   f = false;
   config_get (cfg_no_stipple, f);
   if (f) {
-    TipDialog td (this, 
-                  tl::to_string (QObject::tr ("Layers are shown without fill because fill has been intentionally turned off. This can be confusing since selecting a stipple does not have an effect in this case.\n\nTo turn this feature off, uncheck \"Show Layers Without Fill\" in the \"View\" menu.")), 
+    TipDialog td (this,
+                  tl::to_string (QObject::tr ("Layers are shown without fill because fill has been intentionally turned off. This can be confusing since selecting a stipple does not have an effect in this case.\n\nTo turn this feature off, uncheck \"Show Layers Without Fill\" in the \"View\" menu.")),
                   "no-stipple");
     if (td.exec_dialog ()) {
       //  Don't bother the user with more dialogs.
@@ -1318,8 +1310,8 @@ MainWindow::about_to_exec ()
   f = false;
   config_get (cfg_hide_empty_layers, f);
   if (f) {
-    TipDialog td (this, 
-                  tl::to_string (QObject::tr ("The \"Hide Empty Layers\" feature is enabled. This can be confusing, in particular in edit mode, because layers are not shown although they are actually present.\n\nTo disable this feature, uncheck \"Hide Empty Layers\" in the layer panel's context menu.")), 
+    TipDialog td (this,
+                  tl::to_string (QObject::tr ("The \"Hide Empty Layers\" feature is enabled. This can be confusing, in particular in edit mode, because layers are not shown although they are actually present.\n\nTo disable this feature, uncheck \"Hide Empty Layers\" in the layer panel's context menu.")),
                   "hide-empty-layers");
     if (td.exec_dialog ()) {
       //  Don't bother the user with more dialogs.
@@ -1329,10 +1321,10 @@ MainWindow::about_to_exec ()
 
   edt::combine_mode_type cm = edt::CM_Add;
   config_get (edt::cfg_edit_combine_mode, cm, edt::CMConverter ());
-  if (lay::Application::instance ()->is_editable () && cm != edt::CM_Add) {
+  if (lay::ApplicationBase::instance ()->is_editable () && cm != edt::CM_Add) {
     lay::TipDialog td (QApplication::activeWindow (), 
                   tl::to_string (QObject::tr ("The background combination mode of the shape editor is set to some other mode than 'Add'.\n"
-                                              "This can be confusing, because a shape may not be drawn as expected.\n\nTo switch back to normal mode, choose 'Add' for the background combination mode in the toolbar.")), 
+                                              "This can be confusing, because a shape may not be drawn as expected.\n\nTo switch back to normal mode, choose 'Add' for the background combination mode in the toolbar.")),
                   "has-non-add-edit-combine-mode");
     if (td.exec_dialog ()) {
       //  Don't bother the user with more dialogs.
@@ -1341,13 +1333,13 @@ MainWindow::about_to_exec ()
   }
 }
 
-void 
+void
 MainWindow::tech_message (const std::string &s)
 {
   mp_tech_status_label->setText(tl::to_qstring (s));
 }
 
-void 
+void
 MainWindow::format_message ()
 {
   QFontMetrics fm (mp_msg_label->font ());
@@ -1401,7 +1393,7 @@ MainWindow::format_message ()
   mp_msg_label->setToolTip (tl::to_qstring (full_message));
 }
 
-void 
+void
 MainWindow::message (const std::string &s, int ms)
 {
   m_message = s;
@@ -1416,7 +1408,7 @@ MainWindow::clear_message ()
   m_message_timer.start (0);
 }
 
-void 
+void
 MainWindow::message_timer ()
 {
   m_message.clear ();
@@ -1426,7 +1418,7 @@ MainWindow::message_timer ()
 void
 MainWindow::config_finalize ()
 {
-  // Not set the window state: this ensures we have handled cfg_window_geometry 
+  // Not set the window state: this ensures we have handled cfg_window_geometry
   // before we restore the state
   if (! m_config_window_state.empty ()) {
     QByteArray state = QByteArray::fromBase64 (m_config_window_state.c_str ());
@@ -1442,7 +1434,7 @@ MainWindow::config_finalize ()
     std::vector<std::string> group = menu ()->group ("default_grids_group");
 
     for (std::vector<std::string>::const_iterator t = group.begin (); t != group.end (); ++t) {
-      std::vector<std::string> items = menu ()->items (*t);        
+      std::vector<std::string> items = menu ()->items (*t);
       for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
         menu ()->delete_item (*i);
       }
@@ -1474,11 +1466,11 @@ MainWindow::config_finalize ()
 
   }
 
-  //  make the changes visible in the setup form if the form is visible 
+  //  make the changes visible in the setup form if the form is visible
   mp_setup_form->setup ();
 }
 
-bool 
+bool
 MainWindow::configure (const std::string &name, const std::string &value)
 {
   std::map<std::string, std::vector<lay::ConfigureAction *> >::iterator ca = m_configuration_actions.find (name);
@@ -1498,7 +1490,7 @@ MainWindow::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_circle_points) {
 
-    //  pseudo-configuration: set db::set_num_circle_points 
+    //  pseudo-configuration: set db::set_num_circle_points
     int cp = 16;
     tl::from_string (value, cp);
     if (cp != int (db::num_circle_points ())) {
@@ -1513,7 +1505,7 @@ MainWindow::configure (const std::string &name, const std::string &value)
     m_default_grids.clear ();
     m_default_grids_updated = true;
 
-    //  convert the list of grids to a list of doubles 
+    //  convert the list of grids to a list of doubles
     while (! ex.at_end ()) {
       double g = 0.0;
       if (! ex.try_read (g)) {
@@ -1535,7 +1527,7 @@ MainWindow::configure (const std::string &name, const std::string &value)
         palette.from_string (value);
       }
     } catch (...) {
-      //  ignore errors: just reset the palette 
+      //  ignore errors: just reset the palette
       palette = lay::StipplePalette::default_palette ();
     }
 
@@ -1573,7 +1565,7 @@ MainWindow::configure (const std::string &name, const std::string &value)
         palette.from_string (value);
       }
     } catch (...) {
-      //  ignore errors: just reset the palette 
+      //  ignore errors: just reset the palette
       palette = lay::ColorPalette::default_palette ();
     }
 
@@ -1595,6 +1587,8 @@ MainWindow::configure (const std::string &name, const std::string &value)
       }
     }
 
+    dm_do_update_file_menu ();
+
     return true;
 
   } else if (name == cfg_micron_digits) {
@@ -1615,7 +1609,7 @@ MainWindow::configure (const std::string &name, const std::string &value)
 
   } else if (name == cfg_window_state) {
 
-    //  restore the state on config_finalize to ensure we have handled it after 
+    //  restore the state on config_finalize to ensure we have handled it after
     //  restoring the geometry
     m_config_window_state = value;
     return true;
@@ -1788,7 +1782,7 @@ MainWindow::edits_enabled () const
   return !current_view () || current_view ()->edits_enabled ();
 }
 
-void 
+void
 MainWindow::edits_enabled_changed ()
 {
   bool enable = edits_enabled ();
@@ -1799,10 +1793,16 @@ MainWindow::edits_enabled_changed ()
   }
 }
 
-void 
+void
+MainWindow::menu_needs_update ()
+{
+  lay::LayoutView::update_menu (current_view (), *mp_menu);
+}
+
+void
 MainWindow::libraries_changed ()
 {
-  //  if the libraries have changed, remove all selections and cancel any operations to avoid 
+  //  if the libraries have changed, remove all selections and cancel any operations to avoid
   //  that the view refers to an invalid instance or shape
   for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
     (*vp)->clear_selection ();
@@ -1819,7 +1819,7 @@ MainWindow::read_dock_widget_state ()
   config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
 }
 
-void 
+void
 MainWindow::update_dock_widget_state ()
 {
   if (m_hp_visible) {
@@ -1879,7 +1879,7 @@ MainWindow::exit ()
   }
 }
 
-int 
+int
 MainWindow::dirty_files (std::string &dirty_files)
 {
   int dirty_layouts = 0;
@@ -1917,7 +1917,7 @@ MainWindow::can_close ()
 
     bool can_close = false;
 
-    can_close = (QMessageBox::warning (this, 
+    can_close = (QMessageBox::warning (this,
       QObject::tr ("Application Busy"),
       QObject::tr ("The application is busy.\nYou can close the application now, but any unsaved data will be lost.\n\nPress 'Yes' to end the application now."),
       QMessageBox::Yes | QMessageBox::No,
@@ -1972,7 +1972,7 @@ MainWindow::do_close ()
 void
 MainWindow::save_state_to_config ()
 {
-  //  save the dock widget state with all views closed (that state can be 
+  //  save the dock widget state with all views closed (that state can be
   //  used for staring klayout without any layout)
   config_set (cfg_window_geometry, (const char *) saveGeometry ().toBase64 ().data ());
   config_set (cfg_window_state, (const char *) saveState ().toBase64 ().data ());
@@ -1984,7 +1984,7 @@ MainWindow::resizeEvent (QResizeEvent *)
   format_message ();
 }
 
-void 
+void
 MainWindow::closeEvent (QCloseEvent *event)
 {
   if (! m_exited) {
@@ -2137,7 +2137,7 @@ MainWindow::index_of (const lay::LayoutView *view) const
   return -1;
 }
 
-int 
+int
 MainWindow::current_view_index () const
 {
   return index_of (current_view ());
@@ -2149,7 +2149,7 @@ MainWindow::current_view () const
   return lay::LayoutView::current ();
 }
 
-void 
+void
 MainWindow::cm_show_properties ()
 {
   if (current_view ()) {
@@ -2157,7 +2157,7 @@ MainWindow::cm_show_properties ()
   }
 }
 
-void 
+void
 MainWindow::cm_delete ()
 {
   BEGIN_PROTECTED
@@ -2172,7 +2172,7 @@ MainWindow::cm_delete ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_lv_paste ()
 {
   BEGIN_PROTECTED
@@ -2180,7 +2180,7 @@ MainWindow::cm_lv_paste ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_lv_cut ()
 {
   BEGIN_PROTECTED
@@ -2188,7 +2188,7 @@ MainWindow::cm_lv_cut ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_lv_copy ()
 {
   BEGIN_PROTECTED
@@ -2196,7 +2196,7 @@ MainWindow::cm_lv_copy ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_cell_paste ()
 {
   BEGIN_PROTECTED
@@ -2204,7 +2204,7 @@ MainWindow::cm_cell_paste ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_cell_cut ()
 {
   BEGIN_PROTECTED
@@ -2212,7 +2212,7 @@ MainWindow::cm_cell_cut ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_cell_copy ()
 {
   BEGIN_PROTECTED
@@ -2220,14 +2220,14 @@ MainWindow::cm_cell_copy ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_duplicate ()
 {
   BEGIN_PROTECTED
 
   if (current_view () && current_view ()->has_selection ()) {
 
-    //  Do duplicate simply by concatenating copy & paste currently. 
+    //  Do duplicate simply by concatenating copy & paste currently.
     //  Save the clipboard state before in order to preserve the current content
     db::Clipboard saved_clipboard;
     db::Clipboard::instance ().swap (saved_clipboard);
@@ -2248,7 +2248,7 @@ MainWindow::cm_duplicate ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_copy ()
 {
   BEGIN_PROTECTED
@@ -2261,7 +2261,7 @@ MainWindow::cm_copy ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_paste ()
 {
   BEGIN_PROTECTED
@@ -2275,7 +2275,7 @@ MainWindow::cm_paste ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_cut ()
 {
   BEGIN_PROTECTED
@@ -2289,7 +2289,7 @@ MainWindow::cm_cut ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::intrinsic_mode_triggered ()
 {
   BEGIN_PROTECTED
@@ -2322,12 +2322,12 @@ MainWindow::select_mode (int m)
 
     //  Update the actions by checking the one that is selected programmatically. Use the toolbar menu for reference.
     //  TODO: this code needs to be kept aligned with the implementation of PluginDeclaration::init_menu ()
-    //  It's not easy to move the functionality to PluginDeclaration because some of the modes are not mapped to 
+    //  It's not easy to move the functionality to PluginDeclaration because some of the modes are not mapped to
     //  Plugin's yet (selection, move).
     std::vector<std::string> items = menu ()->items ("@toolbar");
     for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
       Action a = menu ()->action (*i);
-      if (a.qaction ()->data ().toInt () == m_mode) {
+      if (a.qaction ()->isCheckable() && a.qaction ()->data ().toInt () == m_mode) {
         a.set_checked (true);
         break;
       }
@@ -2336,7 +2336,7 @@ MainWindow::select_mode (int m)
   }
 }
 
-void 
+void
 MainWindow::enable_all ()
 {
   BEGIN_PROTECTED
@@ -2348,7 +2348,7 @@ MainWindow::enable_all ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::disable_all ()
 {
   BEGIN_PROTECTED
@@ -2360,7 +2360,7 @@ MainWindow::disable_all ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_unselect_all ()
 {
   BEGIN_PROTECTED
@@ -2385,7 +2385,7 @@ MainWindow::cm_select_all ()
   BEGIN_PROTECTED
 
   if (current_view ()) {
-    //  TODO: "select all" with an empty box is not well implemented in most services. 
+    //  TODO: "select all" with an empty box is not well implemented in most services.
     //  Hence we use the overlapp box currently.
     current_view ()->select (current_view ()->full_box (), lay::Editable::Replace);
   }
@@ -2393,7 +2393,7 @@ MainWindow::cm_select_all ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_undo ()
 {
   BEGIN_PROTECTED
@@ -2422,57 +2422,6 @@ MainWindow::cm_redo ()
     }
     m_manager.redo ();
     current_view ()->update_content ();
-  }
-
-  END_PROTECTED
-}
-
-void 
-MainWindow::bookmark_menu_show ()
-{
-  if (mp_menu->is_valid ("bookmark_menu.goto_bookmark_menu")) {
-
-    Action goto_bookmark_action = mp_menu->action ("bookmark_menu.goto_bookmark_menu");
-    bool has_bookmarks = current_view () && current_view ()->bookmarks ().size () > 0;
-
-    if (has_bookmarks && edits_enabled ()) {
-
-      goto_bookmark_action.set_enabled (true);
-
-      QMenu *goto_bookmark_menu = goto_bookmark_action.qaction ()->menu ();
-      if (goto_bookmark_menu) {
-
-        goto_bookmark_menu->clear ();
-
-        if (current_view ()) {
-          const lay::BookmarkList &bookmarks = current_view ()->bookmarks ();
-          for (size_t i = 0; i < bookmarks.size (); ++i) {
-            QAction *action = goto_bookmark_menu->addAction (tl::to_qstring (bookmarks.name (i)));
-            action->setObjectName (tl::to_qstring (tl::sprintf ("bookmark_%d", i + 1)));
-            gtf::action_connect (action, SIGNAL (triggered ()), this, SLOT (goto_bookmark ()));
-            action->setData (QVariant (int (i))); 
-          }
-        }
-
-      }
-
-    } else {
-      goto_bookmark_action.set_enabled (false);
-    }
-
-  }
-}
-
-void
-MainWindow::goto_bookmark ()
-{
-  BEGIN_PROTECTED
-
-  QAction *action = dynamic_cast <QAction *> (sender ());
-  tl_assert (action);
-  size_t id = size_t (action->data ().toInt ());
-  if (current_view () && current_view ()->bookmarks ().size () > id) {
-    current_view ()->goto_view (current_view ()->bookmarks ().state (id));
   }
 
   END_PROTECTED
@@ -2581,19 +2530,7 @@ MainWindow::cm_bookmark_view ()
   BEGIN_PROTECTED
 
   if (current_view ()) {
-    while (true) {
-      bool ok = false;
-      QString text = QInputDialog::getText (this, QObject::tr ("Enter Bookmark Name"), QObject::tr ("Bookmark name"),
-                                            QLineEdit::Normal, QString::null, &ok);
-      if (! ok) {
-        break;
-      } else if (text.isEmpty ()) {
-        QMessageBox::critical (this, QObject::tr ("Error"), QObject::tr ("Enter a name for the bookmark"));
-      } else {
-        current_view ()->bookmark_view (tl::to_string (text));
-        break;
-      }
-    }
+    current_view ()->bookmark_current_view ();
   }
 
   END_PROTECTED
@@ -2708,7 +2645,7 @@ MainWindow::cm_zoom_out ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::update_action_states ()
 {
   try {
@@ -2781,7 +2718,7 @@ MainWindow::update_action_states ()
 void
 MainWindow::cm_redraw ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
   redraw ();
   END_PROTECTED
 }
@@ -2797,7 +2734,7 @@ MainWindow::redraw ()
 void
 MainWindow::cm_cancel ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
   cancel ();
   END_PROTECTED
 }
@@ -2862,10 +2799,10 @@ MainWindow::load_layer_properties (const std::string &fn, int cv_index, bool all
   }
 }
 
-bool 
+bool
 MainWindow::is_single_cv_layer_properties_file (const std::string &fn)
 {
-  //  If the file contains information for a single layout but we have multiple ones, 
+  //  If the file contains information for a single layout but we have multiple ones,
   //  show the dialog to determine what layout to apply the information to.
   std::vector<lay::LayerPropertiesList> props;
   try {
@@ -2878,7 +2815,7 @@ MainWindow::is_single_cv_layer_properties_file (const std::string &fn)
     lay::LayerPropertiesList::load (in, props);
   }
 
-  //  Collect all cv indices in the layer properties 
+  //  Collect all cv indices in the layer properties
   std::set <int> cv;
   for (std::vector<lay::LayerPropertiesList>::const_iterator p = props.begin (); p != props.end (); ++p) {
     for (lay::LayerPropertiesConstIterator lp = p->begin_const_recursive (); ! lp.at_end (); ++lp) {
@@ -2967,8 +2904,8 @@ MainWindow::cm_save_session ()
   std::string df_list;
   int dirty_layouts = dirty_files (df_list);
 
-  if (dirty_layouts == 0 || 
-    QMessageBox::warning (this, 
+  if (dirty_layouts == 0 ||
+    QMessageBox::warning (this,
       QObject::tr ("Save Needed For Some Layouts"),
       tl::to_qstring (tl::to_string (QObject::tr ("The following layouts need saving.\nThese layouts must be saved manually:\n\n")) + df_list + "\n\nPress 'Ok' to continue."),
       QMessageBox::Ok | QMessageBox::Cancel,
@@ -3092,9 +3029,9 @@ MainWindow::cm_select_cell ()
 
     CellSelectionForm form (0, current_view (), "cell_selection_form");
 
-    if (form.exec () == QDialog::Accepted && 
+    if (form.exec () == QDialog::Accepted &&
         form.selected_cellview_index () >= 0) {
-      current_view ()->select_cell (form.selected_cellview ().combined_unspecific_path (), form.selected_cellview_index ()); 
+      current_view ()->select_cell (form.selected_cellview ().combined_unspecific_path (), form.selected_cellview_index ());
       current_view ()->set_current_cell_path (form.selected_cellview_index (), form.selected_cellview ().combined_unspecific_path ());
       current_view ()->zoom_fit ();
     }
@@ -3360,6 +3297,7 @@ MainWindow::select_view (int index)
     clear_current_pos ();
     edits_enabled_changed ();
     clear_message ();
+    menu_needs_update ();
 
     m_disable_tab_selected = dis;
 
@@ -3369,25 +3307,25 @@ MainWindow::select_view (int index)
   }
 }
 
-void 
+void
 MainWindow::cm_open_too ()
 {
   open (2);
 }
 
-void 
+void
 MainWindow::cm_open_new_view ()
 {
   open (1);
 }
 
-void 
+void
 MainWindow::cm_open ()
 {
   open (0);
 }
 
-void 
+void
 MainWindow::cm_pull_in ()
 {
   BEGIN_PROTECTED
@@ -3469,13 +3407,13 @@ MainWindow::cm_writer_options ()
   mp_layout_save_options->edit_global_options (this, lay::Technologies::instance ());
 }
 
-void 
+void
 MainWindow::cm_new_panel ()
 {
   create_view ();
 }
 
-void 
+void
 MainWindow::cm_new_layout ()
 {
   BEGIN_PROTECTED
@@ -3517,13 +3455,13 @@ MainWindow::call_on_current_view (void (lay::LayoutView::*func) (), const std::s
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_adjust_origin ()
 {
   call_on_current_view (&lay::LayoutView::cm_align_cell_origin, tl::to_string (QObject::tr ("adjust cell origin")));
 }
 
-void 
+void
 MainWindow::cm_new_cell ()
 {
   //  TODO: move this function to lay::LayoutView
@@ -3535,7 +3473,7 @@ MainWindow::cm_new_cell ()
     throw tl::Exception (tl::to_string (QObject::tr ("No view open to create a new cell inside")));
   }
 
-  NewCellPropertiesDialog cell_prop_dia (this); 
+  NewCellPropertiesDialog cell_prop_dia (this);
   if (cell_prop_dia.exec_dialog (& curr->cellview (curr->active_cellview_index ())->layout (), m_new_cell_cell_name, m_new_cell_window_size)) {
 
     db::cell_index_type new_ci = curr->new_cell (curr->active_cellview_index (), m_new_cell_cell_name.c_str ());
@@ -3565,127 +3503,127 @@ MainWindow::cm_lay_convert_to_static ()
   call_on_current_view (&lay::LayoutView::cm_lay_convert_to_static, tl::to_string (QObject::tr ("convert all cells to static")));
 }
 
-void 
+void
 MainWindow::cm_lay_move ()
 {
   call_on_current_view (&lay::LayoutView::cm_lay_move, tl::to_string (QObject::tr ("move layout")));
 }
 
-void 
+void
 MainWindow::cm_lay_scale ()
 {
   call_on_current_view (&lay::LayoutView::cm_lay_scale, tl::to_string (QObject::tr ("scale layout")));
 }
 
-void 
+void
 MainWindow::cm_lay_free_rot ()
 {
   call_on_current_view (&lay::LayoutView::cm_lay_free_rot, tl::to_string (QObject::tr ("free rotation of layout")));
 }
 
-void 
+void
 MainWindow::cm_lay_rot_ccw ()
 {
   call_on_current_view (&lay::LayoutView::cm_lay_rot_ccw, tl::to_string (QObject::tr ("counter clockwise rotation of layout")));
 }
 
-void 
+void
 MainWindow::cm_lay_rot_cw ()
 {
   call_on_current_view (&lay::LayoutView::cm_lay_rot_cw, tl::to_string (QObject::tr ("clockwise rotation of layout")));
 }
 
-void 
+void
 MainWindow::cm_lay_flip_y ()
 {
   call_on_current_view (&lay::LayoutView::cm_lay_flip_y, tl::to_string (QObject::tr ("vertical flip of layout")));
 }
 
-void 
+void
 MainWindow::cm_lay_flip_x ()
 {
   call_on_current_view (&lay::LayoutView::cm_lay_flip_x, tl::to_string (QObject::tr ("horizontal flip of layout")));
 }
 
-void 
+void
 MainWindow::cm_sel_move ()
 {
   call_on_current_view (&lay::LayoutView::cm_sel_move, tl::to_string (QObject::tr ("move selection")));
 }
 
-void 
+void
 MainWindow::cm_sel_move_to ()
 {
   call_on_current_view (&lay::LayoutView::cm_sel_move_to, tl::to_string (QObject::tr ("move selection to position")));
 }
 
-void 
+void
 MainWindow::cm_sel_scale ()
 {
   call_on_current_view (&lay::LayoutView::cm_sel_scale, tl::to_string (QObject::tr ("scale selection")));
 }
 
-void 
+void
 MainWindow::cm_sel_free_rot ()
 {
   call_on_current_view (&lay::LayoutView::cm_sel_free_rot, tl::to_string (QObject::tr ("free rotation of selection")));
 }
 
-void 
+void
 MainWindow::cm_sel_rot_ccw ()
 {
   call_on_current_view (&lay::LayoutView::cm_sel_rot_ccw, tl::to_string (QObject::tr ("counter clockwise rotation of selection")));
 }
 
-void 
+void
 MainWindow::cm_sel_rot_cw ()
 {
   call_on_current_view (&lay::LayoutView::cm_sel_rot_cw, tl::to_string (QObject::tr ("clockwise rotation of selection")));
 }
 
-void 
+void
 MainWindow::cm_sel_flip_y ()
 {
   call_on_current_view (&lay::LayoutView::cm_sel_flip_y, tl::to_string (QObject::tr ("vertical flip of selection")));
 }
 
-void 
+void
 MainWindow::cm_sel_flip_x ()
 {
   call_on_current_view (&lay::LayoutView::cm_sel_flip_x, tl::to_string (QObject::tr ("horizontal flip of selection")));
 }
 
-void 
+void
 MainWindow::cm_edit_layer ()
 {
   call_on_current_view (&lay::LayoutView::cm_edit_layer, tl::to_string (QObject::tr ("edit a layer specification")));
 }
 
-void 
+void
 MainWindow::cm_delete_layer ()
 {
   call_on_current_view (&lay::LayoutView::cm_delete_layer, tl::to_string (QObject::tr ("delete a layer")));
 }
 
-void 
+void
 MainWindow::cm_clear_layer ()
 {
   call_on_current_view (&lay::LayoutView::cm_clear_layer, tl::to_string (QObject::tr ("clear a layer")));
 }
 
-void 
+void
 MainWindow::cm_copy_layer ()
 {
   call_on_current_view (&lay::LayoutView::cm_copy_layer, tl::to_string (QObject::tr ("copy layer")));
 }
 
-void 
+void
 MainWindow::cm_new_layer ()
 {
   call_on_current_view (&lay::LayoutView::cm_new_layer, tl::to_string (QObject::tr ("create a new layer")));
 }
 
-void 
+void
 MainWindow::cm_layout_props ()
 {
   BEGIN_PROTECTED
@@ -3701,7 +3639,7 @@ MainWindow::cm_layout_props ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_layout_stats ()
 {
   BEGIN_PROTECTED
@@ -3717,7 +3655,7 @@ MainWindow::cm_layout_stats ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_clone ()
 {
   BEGIN_PROTECTED
@@ -3735,16 +3673,17 @@ MainWindow::clone_current_view ()
   }
 
   //  create a new view
-  view = new lay::LayoutView (current_view (), &m_manager, lay::Application::instance ()->is_editable (), this, mp_view_stack);
+  view = new lay::LayoutView (current_view (), &m_manager, lay::ApplicationBase::instance ()->is_editable (), this, mp_view_stack);
   connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
+  connect (view, SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
   connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
   connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
   connect (view, SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
   mp_views.push_back (view);
 
-  //  we must resize the widget here to set the geometry properly. 
+  //  we must resize the widget here to set the geometry properly.
   //  This is required to make zoom_fit work.
   view->setGeometry (0, 0, mp_view_stack->width (), mp_view_stack->height ());
   view->show ();
@@ -3785,31 +3724,31 @@ MainWindow::clone_current_view ()
   update_dock_widget_state ();
 }
 
-void 
+void
 MainWindow::cm_close_all ()
 {
   interactive_close_view (-1, false);
 }
- 
-void 
+
+void
 MainWindow::cm_close ()
 {
   interactive_close_view (index_of (lay::LayoutView::current ()), false);
 }
- 
+
 void
 MainWindow::tab_close_requested (int index)
 {
   interactive_close_view (index, true);
 }
 
-void 
+void
 MainWindow::interactive_close_view (int index, bool all_cellviews)
 {
   if (index < 0) {
 
     //  close all views
-    
+
     bool can_close = true;
 
     int dirty_layouts = 0;
@@ -3886,7 +3825,7 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
 
         SelectCellViewForm form (0, view (index), tl::to_string (QObject::tr ("Select Layouts To Close")));
         form.set_selection (view (index)->active_cellview_index ());
-      
+
         if (form.exec () != QDialog::Accepted) {
           return;
         }
@@ -3897,7 +3836,7 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
         }
 
       }
-        
+
     } else if (view (index)->cellviews () > 0) {
       selected.push_back (0);
     }
@@ -3931,8 +3870,8 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
             }
           }
 
-          //  only report layouts as dirty which will vanish if we would close all layouts 
-          if (count <= 0) { 
+          //  only report layouts as dirty which will vanish if we would close all layouts
+          if (count <= 0) {
             ++dirty_layouts;
             if (dirty_layouts == max_dirty_files) {
               dirty_files += "\n...";
@@ -3993,13 +3932,13 @@ MainWindow::interactive_close_view (int index, bool all_cellviews)
 
 }
 
-void 
+void
 MainWindow::close_current_view ()
 {
   close_view (index_of (lay::LayoutView::current ()));
 }
 
-void 
+void
 MainWindow::close_view (int index)
 {
   if (view (index)) {
@@ -4042,6 +3981,7 @@ MainWindow::close_view (int index)
 
         clear_current_pos ();
         edits_enabled_changed ();
+        menu_needs_update ();
         clear_message ();
 
         update_dock_widget_state ();
@@ -4057,8 +3997,8 @@ MainWindow::close_view (int index)
 
 void
 MainWindow::cm_reload ()
-{    
-  BEGIN_PROTECTED 
+{
+  BEGIN_PROTECTED
 
   if (current_view ()) {
 
@@ -4068,11 +4008,11 @@ MainWindow::cm_reload ()
 
       SelectCellViewForm form (0, current_view (), tl::to_string (QObject::tr ("Select Layouts To Reload")));
       form.select_all ();
-    
+
       if (form.exec () == QDialog::Accepted) {
         selected = form.selected_cellviews ();
       }
-        
+
     } else if (current_view ()->cellviews () > 0) {
       selected.push_back (0);
     }
@@ -4172,31 +4112,29 @@ MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
   config_set (cfg_mru, config_str);
 }
 
-void 
-MainWindow::file_menu_show ()
+void
+MainWindow::do_update_file_menu ()
 {
-  if (mp_menu->is_valid ("file_menu.open_recent_menu")) {
+  std::string mru_menu = "file_menu.open_recent_menu";
 
-    Action open_recent_action = mp_menu->action ("file_menu.open_recent_menu");
+  if (mp_menu->is_valid (mru_menu)) {
+
+    Action open_recent_action = mp_menu->action (mru_menu);
+    open_recent_action.set_enabled (true);
 
     if (m_mru.size () > 0 && edits_enabled ()) {
 
-      open_recent_action.set_enabled (true);
+      //  rebuild MRU menu
+      mp_menu->clear_menu (mru_menu);
 
-      QMenu *open_recent_menu = open_recent_action.qaction ()->menu ();
-      if (open_recent_menu) {
-
-        open_recent_menu->clear ();
-
-        for (std::vector<std::pair<std::string, std::string> >::iterator mru = m_mru.end (); mru != m_mru.begin (); ) {
-          --mru;
-          unsigned int i = std::distance (m_mru.begin (), mru);
-          QAction *action = open_recent_menu->addAction (tl::to_qstring (mru->first));
-          action->setObjectName (tl::to_qstring (tl::sprintf ("open_recent_%d", i + 1)));
-          gtf::action_connect (action, SIGNAL (triggered ()), this, SLOT (open_recent ()));
-          action->setData (QVariant (int (i)));
-        }
-
+      for (std::vector<std::pair<std::string, std::string> >::iterator mru = m_mru.end (); mru != m_mru.begin (); ) {
+        --mru;
+        unsigned int i = std::distance (m_mru.begin (), mru);
+        Action action;
+        gtf::action_connect (action.qaction (), SIGNAL (triggered ()), this, SLOT (open_recent ()));
+        action.set_title (mru->first);
+        action.qaction ()->setData (QVariant (int (i)));
+        mp_menu->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
       }
 
     } else {
@@ -4263,10 +4201,10 @@ MainWindow::open_recent ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::open (int mode)
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   static std::vector<std::string> files;
   if (! mp_layout_fdia->get_open (files)) {
@@ -4340,22 +4278,23 @@ MainWindow::create_layout (const std::string &technology, int mode)
   return create_or_load_layout (0, 0, technology, mode);
 }
 
-int 
+int
 MainWindow::do_create_view ()
 {
   //  create a new view
-  lay::LayoutView *view = new lay::LayoutView (&m_manager, lay::Application::instance ()->is_editable (), this, mp_view_stack);
+  lay::LayoutView *view = new lay::LayoutView (&m_manager, lay::ApplicationBase::instance ()->is_editable (), this, mp_view_stack);
 
   connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
+  connect (view, SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
   connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
   connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
   connect (view, SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
 
   mp_views.push_back (view);
 
-  //  we must resize the widget here to set the geometry properly. 
+  //  we must resize the widget here to set the geometry properly.
   //  This is required to make zoom_fit work.
   view->setGeometry (0, 0, mp_view_stack->width (), mp_view_stack->height ());
   view->show ();
@@ -4430,7 +4369,7 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
     }
   }
 
-  unsigned int cv_index = 0; 
+  unsigned int cv_index = 0;
 
   try {
 
@@ -4517,7 +4456,7 @@ MainWindow::update_tab_title (int i)
   }
 }
 
-void 
+void
 MainWindow::view_title_changed ()
 {
   int i = index_of (dynamic_cast<const lay::LayoutView *> (sender ()));
@@ -4538,9 +4477,9 @@ MainWindow::update_window_title ()
     if (current_view ()->is_dirty ()) {
       sep += "[+] ";
     }
-    setWindowTitle (tl::to_qstring (lay::Application::instance ()->version () + sep + current_view ()->title ()));
+    setWindowTitle (tl::to_qstring (lay::ApplicationBase::instance ()->version () + sep + current_view ()->title ()));
   } else {
-    setWindowTitle (tl::to_qstring (lay::Application::instance ()->version ()));
+    setWindowTitle (tl::to_qstring (lay::ApplicationBase::instance ()->version ()));
   }
 }
 
@@ -4558,10 +4497,10 @@ MainWindow::grid_micron () const
   return m_grid_micron;
 }
 
-void 
+void
 MainWindow::cm_inc_max_hier ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   int new_to = get_max_hier_levels () + 1;
   set_hier_levels (std::make_pair (get_min_hier_levels (), new_to));
@@ -4569,10 +4508,10 @@ MainWindow::cm_inc_max_hier ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_dec_max_hier ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   int new_to = get_max_hier_levels () > 0 ? get_max_hier_levels () - 1 : 0;
   set_hier_levels (std::make_pair (std::min (get_min_hier_levels (), new_to), new_to));
@@ -4580,10 +4519,10 @@ MainWindow::cm_dec_max_hier ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_max_hier ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->max_hier ();
@@ -4592,31 +4531,31 @@ MainWindow::cm_max_hier ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_max_hier_0 ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
   set_hier_levels (std::make_pair (std::min (get_min_hier_levels (), 0), 0));
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::cm_max_hier_1 ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
   set_hier_levels (std::make_pair (std::min (get_min_hier_levels (), 0), 1));
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::set_hier_levels (std::pair<int, int> l)
 {
   if (current_view () && l != get_hier_levels ()) {
     current_view ()->set_hier_levels (l);
-  } 
+  }
 }
 
-std::pair<int, int> 
+std::pair<int, int>
 MainWindow::get_hier_levels () const
 {
   if (current_view ()) {
@@ -4628,10 +4567,10 @@ MainWindow::get_hier_levels () const
   }
 }
 
-void 
+void
 MainWindow::cm_prev_display_state ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (has_prev_display_state ()) {
     current_view ()->prev_display_state ();
@@ -4640,7 +4579,7 @@ MainWindow::cm_prev_display_state ()
   END_PROTECTED
 }
 
-bool 
+bool
 MainWindow::has_prev_display_state ()
 {
   if (current_view ()) {
@@ -4650,10 +4589,10 @@ MainWindow::has_prev_display_state ()
   }
 }
 
-void 
+void
 MainWindow::cm_next_display_state ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (has_next_display_state ()) {
     current_view ()->next_display_state ();
@@ -4662,7 +4601,7 @@ MainWindow::cm_next_display_state ()
   END_PROTECTED
 }
 
-bool 
+bool
 MainWindow::has_next_display_state ()
 {
   if (current_view ()) {
@@ -4672,7 +4611,7 @@ MainWindow::has_next_display_state ()
   }
 }
 
-void 
+void
 MainWindow::set_synchronous (bool sync_mode)
 {
   m_synchronous = sync_mode;
@@ -4682,7 +4621,7 @@ MainWindow::set_synchronous (bool sync_mode)
 }
 
 void
-MainWindow::current_pos (double x, double y, bool dbu_units) 
+MainWindow::current_pos (double x, double y, bool dbu_units)
 {
   mp_cpx_label->setText (tl::to_qstring (dbu_units ? tl::db_to_string (x) : tl::micron_to_string (x)));
   mp_cpy_label->setText (tl::to_qstring (dbu_units ? tl::db_to_string (y) : tl::micron_to_string (y)));
@@ -4822,7 +4761,7 @@ MainWindow::cm_technologies ()
   }
 }
 
-void 
+void
 MainWindow::show_macro_editor (const std::string &cat, bool add)
 {
   lay::MacroController *mc = lay::MacroController::instance ();
@@ -4864,14 +4803,14 @@ MainWindow::cm_show_assistant ()
   mp_assistant->raise ();
 }
 
-void 
+void
 MainWindow::show_help (const QString &url)
 {
   show_assistant_url (tl::to_string (url), true);
 }
 
-void 
-MainWindow::show_assistant_url (const std::string &url, bool modal) 
+void
+MainWindow::show_assistant_url (const std::string &url, bool modal)
 {
   if (modal) {
 
@@ -4894,8 +4833,8 @@ MainWindow::show_assistant_url (const std::string &url, bool modal)
   }
 }
 
-void 
-MainWindow::show_assistant_topic (const std::string &s, bool modal) 
+void
+MainWindow::show_assistant_topic (const std::string &s, bool modal)
 {
   if (modal) {
 
@@ -4966,7 +4905,7 @@ MainWindow::create_config_action (const std::string &cname, const std::string &c
   return ca;
 }
 
-void 
+void
 MainWindow::register_config_action (const std::string &name, lay::ConfigureAction *action)
 {
   std::map<std::string, std::vector<lay::ConfigureAction *> >::iterator ca = m_configuration_actions.insert (std::make_pair (name, std::vector<lay::ConfigureAction *> ())).first;
@@ -4978,8 +4917,8 @@ MainWindow::register_config_action (const std::string &name, lay::ConfigureActio
 
   ca->second.push_back (action);
 }
-  
-void 
+
+void
 MainWindow::unregister_config_action (const std::string &name, lay::ConfigureAction *action)
 {
   std::map<std::string, std::vector<lay::ConfigureAction *> >::iterator ca = m_configuration_actions.find (name);
@@ -4993,10 +4932,10 @@ MainWindow::unregister_config_action (const std::string &name, lay::ConfigureAct
   }
 }
 
-void 
+void
 MainWindow::menu_activated (const std::string &symbol)
 {
-  //  TODO: this can be part of the Plugin scheme, but the plugin root has no idea which is the active 
+  //  TODO: this can be part of the Plugin scheme, but the plugin root has no idea which is the active
   //  view.
   if (current_view ()) {
     current_view ()->menu_activated (symbol);
@@ -5016,6 +4955,10 @@ void
 MainWindow::do_update_menu ()
 {
   mp_menu->build (menuBar (), mp_tool_bar);
+  lay::GuiApplication *app = dynamic_cast<lay::GuiApplication *> (qApp);
+  if (app) {
+    app->force_update_app_menu ();
+  }
 }
 
 void
@@ -5027,7 +4970,7 @@ MainWindow::cm_cell_user_properties ()
 void
 MainWindow::cm_cell_delete ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_cell_delete ();
@@ -5039,7 +4982,7 @@ MainWindow::cm_cell_delete ()
 void
 MainWindow::cm_cell_replace ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_cell_replace ();
@@ -5051,7 +4994,7 @@ MainWindow::cm_cell_replace ()
 void
 MainWindow::cm_cell_rename ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_cell_rename ();
@@ -5063,7 +5006,7 @@ MainWindow::cm_cell_rename ()
 void
 MainWindow::cm_cell_flatten ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_cell_flatten ();
@@ -5075,7 +5018,7 @@ MainWindow::cm_cell_flatten ()
 void
 MainWindow::cm_cell_select ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_cell_select ();
@@ -5087,7 +5030,7 @@ MainWindow::cm_cell_select ()
 void
 MainWindow::cm_cell_hide ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_cell_hide ();
@@ -5099,7 +5042,7 @@ MainWindow::cm_cell_hide ()
 void
 MainWindow::cm_cell_show ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_cell_show ();
@@ -5111,7 +5054,7 @@ MainWindow::cm_cell_show ()
 void
 MainWindow::cm_cell_show_all ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_cell_show_all ();
@@ -5123,7 +5066,7 @@ MainWindow::cm_cell_show_all ()
 void
 MainWindow::cm_lv_select_all ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_select_all ();
@@ -5135,7 +5078,7 @@ MainWindow::cm_lv_select_all ()
 void
 MainWindow::cm_lv_new_tab ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_new_tab ();
@@ -5147,7 +5090,7 @@ MainWindow::cm_lv_new_tab ()
 void
 MainWindow::cm_lv_rename_tab ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_rename_tab ();
@@ -5159,7 +5102,7 @@ MainWindow::cm_lv_rename_tab ()
 void
 MainWindow::cm_lv_remove_tab ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_remove_tab ();
@@ -5171,7 +5114,7 @@ MainWindow::cm_lv_remove_tab ()
 void
 MainWindow::cm_lv_make_invalid ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_make_invalid ();
@@ -5183,7 +5126,7 @@ MainWindow::cm_lv_make_invalid ()
 void
 MainWindow::cm_lv_make_valid ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_make_valid ();
@@ -5195,7 +5138,7 @@ MainWindow::cm_lv_make_valid ()
 void
 MainWindow::cm_lv_hide_all ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_hide_all ();
@@ -5207,7 +5150,7 @@ MainWindow::cm_lv_hide_all ()
 void
 MainWindow::cm_lv_hide ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_hide ();
@@ -5219,7 +5162,7 @@ MainWindow::cm_lv_hide ()
 void
 MainWindow::cm_lv_show_only ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_show_only ();
@@ -5231,7 +5174,7 @@ MainWindow::cm_lv_show_only ()
 void
 MainWindow::cm_lv_show_all ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_show_all ();
@@ -5243,7 +5186,7 @@ MainWindow::cm_lv_show_all ()
 void
 MainWindow::cm_lv_show ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_show ();
@@ -5255,7 +5198,7 @@ MainWindow::cm_lv_show ()
 void
 MainWindow::cm_lv_rename ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_rename ();
@@ -5267,7 +5210,7 @@ MainWindow::cm_lv_rename ()
 void
 MainWindow::cm_lv_delete ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_delete ();
@@ -5279,7 +5222,7 @@ MainWindow::cm_lv_delete ()
 void
 MainWindow::cm_lv_insert ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_insert ();
@@ -5291,7 +5234,7 @@ MainWindow::cm_lv_insert ()
 void
 MainWindow::cm_lv_group ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_group ();
@@ -5303,7 +5246,7 @@ MainWindow::cm_lv_group ()
 void
 MainWindow::cm_lv_ungroup ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_ungroup ();
@@ -5315,7 +5258,7 @@ MainWindow::cm_lv_ungroup ()
 void
 MainWindow::cm_lv_source ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_source ();
@@ -5327,7 +5270,7 @@ MainWindow::cm_lv_source ()
 void
 MainWindow::cm_lv_sort_by_name ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_sort_by_name ();
@@ -5339,7 +5282,7 @@ MainWindow::cm_lv_sort_by_name ()
 void
 MainWindow::cm_lv_sort_by_ild ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_sort_by_ild ();
@@ -5351,7 +5294,7 @@ MainWindow::cm_lv_sort_by_ild ()
 void
 MainWindow::cm_lv_sort_by_idl ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_sort_by_idl ();
@@ -5363,7 +5306,7 @@ MainWindow::cm_lv_sort_by_idl ()
 void
 MainWindow::cm_lv_sort_by_ldi ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_sort_by_ldi ();
@@ -5375,7 +5318,7 @@ MainWindow::cm_lv_sort_by_ldi ()
 void
 MainWindow::cm_lv_sort_by_dli ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_sort_by_dli ();
@@ -5387,7 +5330,7 @@ MainWindow::cm_lv_sort_by_dli ()
 void
 MainWindow::cm_lv_regroup_by_index ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_regroup_by_index ();
@@ -5399,7 +5342,7 @@ MainWindow::cm_lv_regroup_by_index ()
 void
 MainWindow::cm_lv_regroup_by_datatype ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_regroup_by_datatype ();
@@ -5411,7 +5354,7 @@ MainWindow::cm_lv_regroup_by_datatype ()
 void
 MainWindow::cm_lv_regroup_by_layer ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_regroup_by_layer ();
@@ -5423,7 +5366,7 @@ MainWindow::cm_lv_regroup_by_layer ()
 void
 MainWindow::cm_lv_regroup_flatten ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_regroup_flatten ();
@@ -5435,7 +5378,7 @@ MainWindow::cm_lv_regroup_flatten ()
 void
 MainWindow::cm_lv_expand_all ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_expand_all ();
@@ -5447,7 +5390,7 @@ MainWindow::cm_lv_expand_all ()
 void
 MainWindow::cm_lv_add_missing ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_add_missing ();
@@ -5459,7 +5402,7 @@ MainWindow::cm_lv_add_missing ()
 void
 MainWindow::cm_lv_remove_unused ()
 {
-  BEGIN_PROTECTED 
+  BEGIN_PROTECTED
 
   if (current_view ()) {
     current_view ()->cm_remove_unused ();
@@ -5468,7 +5411,7 @@ MainWindow::cm_lv_remove_unused ()
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
   if (event->mimeData () && event->mimeData ()->hasUrls () && event->mimeData ()->urls ().size () >= 1) {
@@ -5476,7 +5419,7 @@ MainWindow::dragEnterEvent(QDragEnterEvent *event)
   }
 }
 
-void 
+void
 MainWindow::dropEvent(QDropEvent *event)
 {
   BEGIN_PROTECTED
@@ -5492,12 +5435,12 @@ MainWindow::dropEvent(QDropEvent *event)
       if (eff_url.scheme () == QString::fromUtf8 ("file")) {
         path = url->toLocalFile ();
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) && (QT_VERSION < 0x050401)
         //----------------------------------------------------------------------------------------
         // By Kazunari Sekigawa (November 12, 2015)
         //
         // [Issue]
-        //   When drag & dropping an GDS2/OASIS file from Finder, an error like below flags on:
+        //   When drag & dropping a GDS2/OASIS file from Finder, an error like below flags on:
         //     Unable to open file: /.file/id=6571367.1783076 (errno=20)
         //   http://klayout.de/forum/comments.php?DiscussionID=733&page=1#Item_0
         //
@@ -5508,6 +5451,11 @@ MainWindow::dropEvent(QDropEvent *event)
         // [Refs for workaround]
         //   https://bugreports.qt.io/browse/QTBUG-40449
         //   Sub: OS X Yosemite drag and drop file QUrl in this format: "file:///.file/id=......"
+        //----------------------------------------------------------------------------------------
+        // By Kazunari Sekigawa (December 12, 2017)
+        //
+        // This bug has been fixed in Qt 5.4.1.
+        // When KLayout 0.25 is built with Qt 5.8.0 or later, this workaround is not required.
         //----------------------------------------------------------------------------------------
         QString keystring = QString::fromUtf8("/.file/id=");
 
@@ -5640,7 +5588,7 @@ MainWindow::dropEvent(QDropEvent *event)
   END_PROTECTED
 }
 
-void 
+void
 MainWindow::plugin_registered (lay::PluginDeclaration *cls)
 {
   //  store current state in configuration
@@ -5657,7 +5605,7 @@ MainWindow::plugin_registered (lay::PluginDeclaration *cls)
   config_setup ();
 }
 
-void 
+void
 MainWindow::plugin_removed (lay::PluginDeclaration *cls)
 {
   cls->remove_menu_items ();
@@ -5681,11 +5629,11 @@ HelpAboutDialog::HelpAboutDialog (QWidget *parent)
   mp_ui->setupUi (this);
 
   std::vector<std::string> build_options;
-  if (lay::Application::instance ()->ruby_interpreter ().available ()) {
-    build_options.push_back (tl::to_string (tr ("Ruby interpreter ")) + lay::Application::instance ()->ruby_interpreter ().version ());
+  if (lay::ApplicationBase::instance ()->ruby_interpreter ().available ()) {
+    build_options.push_back (tl::to_string (tr ("Ruby interpreter ")) + lay::ApplicationBase::instance ()->ruby_interpreter ().version ());
   }
-  if (lay::Application::instance ()->python_interpreter ().available ()) {
-    build_options.push_back (tl::to_string (tr ("Python interpreter ")) + lay::Application::instance ()->python_interpreter ().version ());
+  if (lay::ApplicationBase::instance ()->python_interpreter ().available ()) {
+    build_options.push_back (tl::to_string (tr ("Python interpreter ")) + lay::ApplicationBase::instance ()->python_interpreter ().version ());
   }
 #if defined(HAVE_QTBINDINGS)
   build_options.push_back (tl::to_string (tr ("Qt bindings for scripts")));
@@ -5720,12 +5668,12 @@ HelpAboutDialog::HelpAboutDialog (QWidget *parent)
     s += "</ul>";
   }
 
-  if (! lay::Application::instance ()->native_plugins ().empty ()) {
+  if (! lay::ApplicationBase::instance ()->native_plugins ().empty ()) {
     s += "<p>";
     s += "<h4>";
     s += escape_xml (tl::to_string (QObject::tr ("Binary extensions:")));
     s += "</h4><ul>";
-    for (std::vector<lay::PluginDescriptor>::const_iterator pd = lay::Application::instance ()->native_plugins ().begin (); pd != lay::Application::instance ()->native_plugins ().end (); ++pd) {
+    for (std::vector<lay::PluginDescriptor>::const_iterator pd = lay::ApplicationBase::instance ()->native_plugins ().begin (); pd != lay::ApplicationBase::instance ()->native_plugins ().end (); ++pd) {
       s += "<li>";
       if (! pd->description.empty ()) {
         s += escape_xml (pd->description);

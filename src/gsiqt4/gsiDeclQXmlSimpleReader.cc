@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -190,25 +190,6 @@ static void _call_f_lexicalHandler_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QXmlLexicalHandler * > ((QXmlLexicalHandler *)((QXmlSimpleReader *)cls)->lexicalHandler ());
-}
-
-
-// (const QXmlInputSource &)
-
-
-static void _init_f_parse_2852 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("input");
-  decl->add_arg<const QXmlInputSource & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_parse_2852 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QXmlInputSource &arg1 = args.read<const QXmlInputSource & > (heap);
-  ret.write<bool > ((bool)((QXmlSimpleReader *)cls)->parse (arg1));
 }
 
 
@@ -470,7 +451,6 @@ static gsi::Methods methods_QXmlSimpleReader () {
   methods += new qt_gsi::GenericMethod ("hasFeature", "@brief Method (const QString &) const\nThis is a reimplementation of QXmlReader::hasFeature", true, &_init_f_hasFeature_c2025, &_call_f_hasFeature_c2025);
   methods += new qt_gsi::GenericMethod ("hasProperty", "@brief Method (const QString &) const\nThis is a reimplementation of QXmlReader::hasProperty", true, &_init_f_hasProperty_c2025, &_call_f_hasProperty_c2025);
   methods += new qt_gsi::GenericMethod (":lexicalHandler", "@brief Method () const\nThis is a reimplementation of QXmlReader::lexicalHandler", true, &_init_f_lexicalHandler_c0, &_call_f_lexicalHandler_c0);
-  methods += new qt_gsi::GenericMethod ("parse", "@brief Method (const QXmlInputSource &)\nThis is a reimplementation of QXmlReader::parse", false, &_init_f_parse_2852, &_call_f_parse_2852);
   methods += new qt_gsi::GenericMethod ("parse", "@brief Method (const QXmlInputSource *)\nThis is a reimplementation of QXmlReader::parse", false, &_init_f_parse_2856, &_call_f_parse_2856);
   methods += new qt_gsi::GenericMethod ("parse", "@brief Method (const QXmlInputSource *, bool)\n", false, &_init_f_parse_3612, &_call_f_parse_3612);
   methods += new qt_gsi::GenericMethod ("parseContinue", "@brief Method bool QXmlSimpleReader::parseContinue()\n", false, &_init_f_parseContinue_0, &_call_f_parseContinue_0);
@@ -641,21 +621,6 @@ public:
       return cb_lexicalHandler_c0_0.issue<QXmlSimpleReader_Adaptor, QXmlLexicalHandler *>(&QXmlSimpleReader_Adaptor::cbs_lexicalHandler_c0_0);
     } else {
       return QXmlSimpleReader::lexicalHandler();
-    }
-  }
-
-  //  [adaptor impl] bool QXmlSimpleReader::parse(const QXmlInputSource &input)
-  bool cbs_parse_2852_0(const QXmlInputSource &input)
-  {
-    return QXmlSimpleReader::parse(input);
-  }
-
-  virtual bool parse(const QXmlInputSource &input)
-  {
-    if (cb_parse_2852_0.can_issue()) {
-      return cb_parse_2852_0.issue<QXmlSimpleReader_Adaptor, bool, const QXmlInputSource &>(&QXmlSimpleReader_Adaptor::cbs_parse_2852_0, input);
-    } else {
-      return QXmlSimpleReader::parse(input);
     }
   }
 
@@ -848,7 +813,6 @@ public:
   gsi::Callback cb_hasFeature_c2025_0;
   gsi::Callback cb_hasProperty_c2025_0;
   gsi::Callback cb_lexicalHandler_c0_0;
-  gsi::Callback cb_parse_2852_0;
   gsi::Callback cb_parse_2856_0;
   gsi::Callback cb_parse_3612_0;
   gsi::Callback cb_parseContinue_0_0;
@@ -1062,29 +1026,6 @@ static void _call_cbs_lexicalHandler_c0_0 (const qt_gsi::GenericMethod * /*decl*
 static void _set_callback_cbs_lexicalHandler_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QXmlSimpleReader_Adaptor *)cls)->cb_lexicalHandler_c0_0 = cb;
-}
-
-
-// bool QXmlSimpleReader::parse(const QXmlInputSource &input)
-
-static void _init_cbs_parse_2852_0 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("input");
-  decl->add_arg<const QXmlInputSource & > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_cbs_parse_2852_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QXmlInputSource &arg1 = args.read<const QXmlInputSource & > (heap);
-  ret.write<bool > ((bool)((QXmlSimpleReader_Adaptor *)cls)->cbs_parse_2852_0 (arg1));
-}
-
-static void _set_callback_cbs_parse_2852_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QXmlSimpleReader_Adaptor *)cls)->cb_parse_2852_0 = cb;
 }
 
 
@@ -1406,8 +1347,6 @@ static gsi::Methods methods_QXmlSimpleReader_Adaptor () {
   methods += new qt_gsi::GenericMethod ("hasProperty", "@brief Virtual method bool QXmlSimpleReader::hasProperty(const QString &name)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasProperty_c2025_0, &_call_cbs_hasProperty_c2025_0, &_set_callback_cbs_hasProperty_c2025_0);
   methods += new qt_gsi::GenericMethod ("lexicalHandler", "@hide", true, &_init_cbs_lexicalHandler_c0_0, &_call_cbs_lexicalHandler_c0_0);
   methods += new qt_gsi::GenericMethod ("lexicalHandler", "@brief Virtual method QXmlLexicalHandler *QXmlSimpleReader::lexicalHandler()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_lexicalHandler_c0_0, &_call_cbs_lexicalHandler_c0_0, &_set_callback_cbs_lexicalHandler_c0_0);
-  methods += new qt_gsi::GenericMethod ("parse", "@hide", false, &_init_cbs_parse_2852_0, &_call_cbs_parse_2852_0);
-  methods += new qt_gsi::GenericMethod ("parse", "@brief Virtual method bool QXmlSimpleReader::parse(const QXmlInputSource &input)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_parse_2852_0, &_call_cbs_parse_2852_0, &_set_callback_cbs_parse_2852_0);
   methods += new qt_gsi::GenericMethod ("parse", "@hide", false, &_init_cbs_parse_2856_0, &_call_cbs_parse_2856_0);
   methods += new qt_gsi::GenericMethod ("parse", "@brief Virtual method bool QXmlSimpleReader::parse(const QXmlInputSource *input)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_parse_2856_0, &_call_cbs_parse_2856_0, &_set_callback_cbs_parse_2856_0);
   methods += new qt_gsi::GenericMethod ("parse", "@hide", false, &_init_cbs_parse_3612_0, &_call_cbs_parse_3612_0);

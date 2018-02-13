@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ TEST(1)
 
   r.set_merged_semantics (false);
   EXPECT_EQ (r.sized (10).to_string (), "(-10,-10;-10,60;60,60;60,-10);(40,40;40,110;110,110;110,40)");
-  EXPECT_EQ (r.sized (10, 20).to_string (), "(-10,-20;-10,70;60,70;60,-20);(40,30;40,120;110,120;110,30)");
+  EXPECT_EQ (r.sized (db::Coord (10), db::Coord (20)).to_string (), "(-10,-20;-10,70;60,70;60,-20);(40,30;40,120;110,120;110,30)");
   EXPECT_EQ (r.sized (10, 20, 0).to_string (), "(0,-20;-10,0;-10,50;0,70;50,70;60,50;60,0;50,-20);(50,30;40,50;40,100;50,120;100,120;110,100;110,50;100,30)");
   r.size (10, 20, 2);
   EXPECT_EQ (r.to_string (), "(-10,-20;-10,70;60,70;60,-20);(40,30;40,120;110,120;110,30)");
@@ -289,13 +289,13 @@ TEST(8)
   EXPECT_EQ (r.sized (10).to_string (), "(-10,-10;-10,210;110,210;110,-10)");
   EXPECT_EQ (r.sized (10).is_box (), true);
   EXPECT_EQ (r.sized (10).is_merged (), true);
-  EXPECT_EQ (r.sized (10, 20).to_string (), "(-10,-20;-10,220;110,220;110,-20)");
-  EXPECT_EQ (r.sized (10, 20).is_box (), true);
-  EXPECT_EQ (r.sized (10, 20).is_merged (), true);
+  EXPECT_EQ (r.sized (db::Coord (10), db::Coord (20)).to_string (), "(-10,-20;-10,220;110,220;110,-20)");
+  EXPECT_EQ (r.sized (db::Coord (10), db::Coord (20)).is_box (), true);
+  EXPECT_EQ (r.sized (db::Coord (10), db::Coord (20)).is_merged (), true);
 
   r.size (10);
   EXPECT_EQ (r.to_string (), "(-10,-10;-10,210;110,210;110,-10)");
-  r.size (10, 20);
+  r.size (db::Coord (10), db::Coord (20));
   EXPECT_EQ (r.to_string (), "(-20,-30;-20,230;120,230;120,-30)");
 }
 
@@ -307,9 +307,9 @@ TEST(9)
   EXPECT_EQ (r.sized (10).to_string (), "(-110,-110;-110,410;210,410;210,-110)");
   EXPECT_EQ (r.sized (10).is_box (), true);
   EXPECT_EQ (r.sized (10).is_merged (), false);
-  EXPECT_EQ (r.sized (10, 20).to_string (), "(-110,-120;-110,420;210,420;210,-120)");
-  EXPECT_EQ (r.sized (10, 20).is_box (), true);
-  EXPECT_EQ (r.sized (10, 20).is_merged (), false);
+  EXPECT_EQ (r.sized (db::Coord (10), db::Coord (20)).to_string (), "(-110,-120;-110,420;210,420;210,-120)");
+  EXPECT_EQ (r.sized (db::Coord (10), db::Coord (20)).is_box (), true);
+  EXPECT_EQ (r.sized (db::Coord (10), db::Coord (20)).is_merged (), false);
 }
 
 TEST(10a) 
@@ -748,6 +748,107 @@ TEST(18b)
   }
 }
 
+TEST(18c)
+{
+  //  GitHub issue #69
+
+  db::Region r;
+  r.insert (db::Box (db::Point (-120, 0), db::Point (-100, 20)));
+  r.insert (db::Box (db::Point (-20, 0), db::Point (0, 20)));
+  r.insert (db::Box (db::Point (0, 0), db::Point (20, 20)));
+  r.insert (db::Box (db::Point (100, 0), db::Point (120, 20)));
+
+  db::Region rr;
+  rr.insert (db::Box (db::Point (-100, -10), db::Point (0, 30)));
+  rr.insert (db::Box (db::Point (0, -10), db::Point (100, 30)));
+
+  EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_inside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+
+  EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_overlapping (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+
+  r.clear ();
+  r.insert (db::Box (db::Point (-120, 0), db::Point (-100, 20)));
+  r.insert (db::Box (db::Point (-20, 0), db::Point (20, 20)));
+  r.insert (db::Box (db::Point (100, 0), db::Point (120, 20)));
+
+  rr.clear ();
+  rr.insert (db::Box (db::Point (-100, -10), db::Point (0, 30)));
+  rr.insert (db::Box (db::Point (0, -10), db::Point (100, 30)));
+
+  EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_inside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+
+  EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_overlapping (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+
+  r.clear ();
+  r.insert (db::Box (db::Point (-120, 0), db::Point (-100, 20)));
+  r.insert (db::Box (db::Point (-20, 0), db::Point (20, 20)));
+  r.insert (db::Box (db::Point (100, 0), db::Point (120, 20)));
+
+  rr.clear ();
+  rr.insert (db::Box (db::Point (-100, -10), db::Point (100, 30)));
+
+  EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_inside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+
+  EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_overlapping (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+
+  r.clear ();
+  r.insert (db::Box (db::Point (-120, 0), db::Point (-100, 20)));
+  r.insert (db::Box (db::Point (-20, 0), db::Point (20, 20)));
+  r.insert (db::Box (db::Point (100, 0), db::Point (120, 20)));
+
+  rr.clear ();
+  rr.insert (db::Box (db::Point (-100, -10), db::Point (0, 30)));
+  rr.insert (db::Box (db::Point (1, -10), db::Point (100, 30)));
+
+  EXPECT_EQ (r.selected_outside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_inside (rr).to_string (), "");
+  EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+
+  EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-20,0;-20,20;20,20;20,0)");
+  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(-20,0;-20,20;20,20;20,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_overlapping (rr).to_string (), "(-120,0;-120,20;-100,20;-100,0);(100,0;100,20;120,20;120,0)");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+
+  r.clear ();
+  r.insert (db::Box (db::Point (-100, 0), db::Point (-80, 20)));
+  r.insert (db::Box (db::Point (-20, 0), db::Point (0, 20)));
+  r.insert (db::Box (db::Point (0, 0), db::Point (20, 20)));
+  r.insert (db::Box (db::Point (80, 0), db::Point (100, 20)));
+
+  rr.clear ();
+  rr.insert (db::Box (db::Point (-100, -10), db::Point (0, 30)));
+  rr.insert (db::Box (db::Point (0, -10), db::Point (100, 30)));
+
+  EXPECT_EQ (r.selected_outside (rr).to_string (), "");
+  EXPECT_EQ (r.selected_inside (rr).to_string (), "(-100,0;-100,20;-80,20;-80,0);(-20,0;-20,20;20,20;20,0);(80,0;80,20;100,20;100,0)");
+  EXPECT_EQ (r.selected_overlapping (rr).to_string (), "(-100,0;-100,20;-80,20;-80,0);(-20,0;-20,20;20,20;20,0);(80,0;80,20;100,20;100,0)");
+  EXPECT_EQ (r.selected_interacting (rr).to_string (), "(-100,0;-100,20;-80,20;-80,0);(-20,0;-20,20;20,20;20,0);(80,0;80,20;100,20;100,0)");
+
+  EXPECT_EQ (r.selected_not_outside (rr).to_string (), "(-100,0;-100,20;-80,20;-80,0);(-20,0;-20,20;20,20;20,0);(80,0;80,20;100,20;100,0)");
+  EXPECT_EQ (r.selected_not_inside (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_overlapping (rr).to_string (), "");
+  EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
+}
+
 TEST(19) 
 {
   db::Region r1;
@@ -1141,12 +1242,12 @@ TEST(27)
   db::Region r;
   r.insert (db::Box (db::Point (0, 0), db::Point (100, 200)));
 
-  EXPECT_EQ (r.sized (-10, -20).to_string (), "(10,20;10,180;90,180;90,20)");
-  EXPECT_EQ (r.sized (-50, -20).to_string (), "");
-  EXPECT_EQ (r.sized (-50, -100).to_string (), "");
-  EXPECT_EQ (r.sized (-55, -20).to_string (), "");
-  EXPECT_EQ (r.sized (-10, -105).to_string (), "");
-  EXPECT_EQ (r.sized (-55, -105).to_string (), "");
+  EXPECT_EQ (r.sized (db::Coord (-10), db::Coord (-20)).to_string (), "(10,20;10,180;90,180;90,20)");
+  EXPECT_EQ (r.sized (db::Coord (-50), db::Coord (-20)).to_string (), "");
+  EXPECT_EQ (r.sized (db::Coord (-50), db::Coord (-100)).to_string (), "");
+  EXPECT_EQ (r.sized (db::Coord (-55), db::Coord (-20)).to_string (), "");
+  EXPECT_EQ (r.sized (db::Coord (-10), db::Coord (-105)).to_string (), "");
+  EXPECT_EQ (r.sized (db::Coord (-55), db::Coord (-105)).to_string (), "");
 }
 
 TEST(28) 
@@ -1159,7 +1260,7 @@ TEST(28)
   r2.insert (db::Box (db::Point (100, 100), db::Point (200, 300)));
 
   EXPECT_EQ ((r1 & r2).to_string (), "");
-  EXPECT_EQ ((r1 & r2.sized (5, 5)).to_string (), "(95,95;95,200;100,200;100,95)");
+  EXPECT_EQ ((r1 & r2.sized (db::Coord (5), db::Coord (5))).to_string (), "(95,95;95,200;100,200;100,95)");
 }
 
 TEST(29) 

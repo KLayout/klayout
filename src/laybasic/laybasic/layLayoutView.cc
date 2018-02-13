@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@
 #include "tlString.h"
 #include "tlLog.h"
 #include "tlAssert.h"
+#include "tlExceptions.h"
 #include "layLayoutView.h"
 #include "layViewOp.h"
 #include "layViewObject.h"
@@ -74,6 +75,7 @@
 #include "rdbMarkerBrowserDialog.h"
 #include "tlXMLParser.h"
 #include "gsi.h"
+#include "gtf.h"
 
 #include <limits>
 
@@ -770,6 +772,37 @@ LayoutView::init_menu (lay::AbstractMenu &menu)
 {
   lay::LayerControlPanel::init_menu (menu);
   lay::HierarchyControlPanel::init_menu (menu);
+}
+
+void
+LayoutView::update_menu (lay::LayoutView *view, lay::AbstractMenu &menu)
+{
+  std::string bm_menu = "bookmark_menu.goto_bookmark_menu";
+
+  if (menu.is_valid (bm_menu)) {
+
+    menu.clear_menu (bm_menu);
+
+    Action goto_bookmark_action = menu.action (bm_menu);
+
+    if (view && view->bookmarks ().size () > 0) {
+
+      goto_bookmark_action.set_enabled (true);
+
+      const lay::BookmarkList &bookmarks = view->bookmarks ();
+      for (size_t i = 0; i < bookmarks.size (); ++i) {
+        Action action;
+        gtf::action_connect (action.qaction (), SIGNAL (triggered ()), view, SLOT (goto_bookmark ()));
+        action.set_title (bookmarks.name (i));
+        action.qaction ()->setData (QVariant (int (i)));
+        menu.insert_item (bm_menu + ".end", tl::sprintf ("bookmark_%d", i + 1), action);
+      }
+
+    } else {
+      goto_bookmark_action.set_enabled (false);
+    }
+
+  }
 }
 
 void
@@ -3651,6 +3684,24 @@ LayoutView::cancel ()
 }
 
 void
+LayoutView::bookmark_current_view ()
+{
+  while (true) {
+    bool ok = false;
+    QString text = QInputDialog::getText (this, QObject::tr ("Enter Bookmark Name"), QObject::tr ("Bookmark name"),
+                                          QLineEdit::Normal, QString::null, &ok);
+    if (! ok) {
+      break;
+    } else if (text.isEmpty ()) {
+      QMessageBox::critical (this, QObject::tr ("Error"), QObject::tr ("Enter a name for the bookmark"));
+    } else {
+      bookmark_view (tl::to_string (text));
+      break;
+    }
+  }
+}
+
+void
 LayoutView::manage_bookmarks ()
 {
   BookmarkManagementForm dialog (this, "bookmark_form", bookmarks ());
@@ -3663,6 +3714,7 @@ void
 LayoutView::bookmarks (const BookmarkList &b)
 {
   m_bookmarks = b;
+  emit menu_needs_update ();
 }
 
 void
@@ -3670,6 +3722,22 @@ LayoutView::bookmark_view (const std::string &name)
 {
   DisplayState state (box (), get_min_hier_levels (), get_max_hier_levels (), m_cellviews);
   m_bookmarks.add (name, state);
+  emit menu_needs_update ();
+}
+
+void
+LayoutView::goto_bookmark ()
+{
+  BEGIN_PROTECTED
+
+  QAction *action = dynamic_cast <QAction *> (sender ());
+  tl_assert (action);
+  size_t id = size_t (action->data ().toInt ());
+  if (bookmarks ().size () > id) {
+    goto_view (bookmarks ().state (id));
+  }
+
+  END_PROTECTED
 }
 
 void

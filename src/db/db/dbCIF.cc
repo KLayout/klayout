@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -56,6 +56,14 @@ public:
   virtual std::string format_title () const { return "CIF (Caltech interchange format)"; }
   virtual std::string file_format () const { return "CIF files (*.CIF *.cif *.cif.gz *.CIF.gz)"; }
 
+  static tl::Extractor &skip_blanks (tl::Extractor &ex)
+  {
+    while (! ex.at_end () && *ex != ';' && *ex != '-' && *ex != '(' && *ex != ')' && !isalnum(*ex)) {
+      ++ex;
+    }
+    return ex;
+  }
+
   virtual bool detect (tl::InputStream &s) const 
   {
     try {
@@ -67,11 +75,12 @@ public:
       int n = 0;
 
       tl::Extractor ex (head.c_str ());
-      while (! ex.at_end ()) {
+      while (! skip_blanks (ex).at_end ()) {
 
-        if (ex.test ("(")) {
+        if (*ex == '(') {
 
           //  read over comments
+          ++ex;
           int bl = 0;
           while (! ex.at_end () && (*ex != ')' || bl > 0)) {
             //  check for nested comments (bl is the nesting level)
@@ -86,18 +95,36 @@ public:
             ++ex;
           }
 
-        } else if (ex.test (";")) {
+        } else if (*ex == ';') {
 
           //  ignore ;
+          ++ex;
 
-        } else if ((ex.test ("DS ") && ex.try_read (n)) || ex.test ("L ")) {
+        } else if (*ex == 'L') {
 
-          //  first command must be "DS num", "L"
-          return true;
+          //  first command must be "DS num", or "L shortname"
+          ++ex;
+          skip_blanks (ex);
+          return ! ex.at_end () && isalnum (*ex);
 
-        } else if (ex.test ("9")) {
+        } else if (*ex == 'D') {
+
+          //  first command must be "DS num", or "L"
+          ++ex;
+          skip_blanks (ex);
+          if (ex.at_end () || *ex != 'S') {
+            break;   // not "D<sep>S"
+          }
+          ++ex;
+          skip_blanks (ex);
+          if (ex.try_read (n)) {
+            return true;
+          }
+
+        } else if (*ex == '9') {
 
           //  read over 9...; commands
+          ++ex;
           while (! ex.at_end () && *ex != ';') {
             ++ex;
           }

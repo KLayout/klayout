@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -172,6 +172,11 @@ public:
   }
 
   /**
+   *  @brief Gets the number of elements in this repetition
+   */
+  size_t size () const;
+
+  /**
    *  @brief Check, if the repetition is an repetition at all 
    *
    *  This method returns true, if the repetition is not singular.
@@ -183,7 +188,7 @@ public:
   }
 
   /**
-   *  @brief Check, if the repetition is a regular one
+   *  @brief Checks, if the repetition is a regular one
    *
    *  This method returns true, if the repetition is regular. It 
    *  returns true, if the repetition can be represented as a 
@@ -251,6 +256,7 @@ public:
   virtual bool equals (const RepetitionBase *) const = 0;
   virtual bool less (const RepetitionBase *) const = 0;
   virtual bool is_regular (db::Vector &a, db::Vector &b, size_t &n, size_t &m) const = 0;
+  virtual size_t size () const = 0;
   virtual const std::vector<db::Vector> *is_iterated () const = 0;
   virtual unsigned int type () = 0;
 };
@@ -294,6 +300,7 @@ public:
   virtual bool is_regular (db::Vector &a, db::Vector &b, size_t &n, size_t &m) const;
   virtual const std::vector<db::Vector> *is_iterated () const;
   virtual unsigned int type () { return 1; }
+  virtual size_t size () const { return m_n * m_m; }
 
 private:
   friend class RegularRepetitionIterator;
@@ -336,6 +343,7 @@ public:
   virtual bool is_regular (db::Vector &a, db::Vector &b, size_t &n, size_t &m) const;
   virtual const std::vector<db::Vector> *is_iterated () const;
   virtual unsigned int type () { return 2; }
+  virtual size_t size () const { return m_points.size () + 1; }
 
   void reserve (size_t n) 
   {

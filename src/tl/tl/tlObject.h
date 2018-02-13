@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -240,7 +240,7 @@ private:
  *  This class represents a weak or shared pointer for the given type T.
  */
 template <class T, bool Shared>
-class weak_or_shared_ptr
+class TL_PUBLIC_TEMPLATE weak_or_shared_ptr
   : public WeakOrSharedPtr
 {
 public:
@@ -376,7 +376,7 @@ public:
  *  See description of tl::Object for details.
  */
 template <class T>
-class weak_ptr
+class TL_PUBLIC_TEMPLATE weak_ptr
   : public weak_or_shared_ptr<T, false>
 {
 public:
@@ -404,7 +404,7 @@ public:
  *  See description of tl::Object for details.
  */
 template <class T>
-class shared_ptr
+class TL_PUBLIC_TEMPLATE shared_ptr
   : public weak_or_shared_ptr<T, true>
 {
 public:

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -2189,7 +2189,7 @@ QVariant Variant::to_qvariant () const
 #if defined(HAVE_64BIT_COORD)
   case t_int128:
     //  TODO: support for int128 in QVariant?
-    return QVariant ((double) m_var.m_m128);
+    return QVariant ((double) m_var.m_int128);
 #endif
   case t_bool:
     return QVariant (m_var.m_bool);

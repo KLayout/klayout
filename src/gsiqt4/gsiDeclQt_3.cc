@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -453,9 +453,7 @@ static gsi::Enum<Qt::WindowType> decl_Qt_WindowType_Enum ("Qt_WindowType",
     gsi::enum_const ("WindowStaysOnBottomHint", Qt::WindowStaysOnBottomHint, "@brief Enum constant Qt::WindowStaysOnBottomHint") +
     gsi::enum_const ("WindowCloseButtonHint", Qt::WindowCloseButtonHint, "@brief Enum constant Qt::WindowCloseButtonHint") +
     gsi::enum_const ("MacWindowToolBarButtonHint", Qt::MacWindowToolBarButtonHint, "@brief Enum constant Qt::MacWindowToolBarButtonHint") +
-    gsi::enum_const ("BypassGraphicsProxyWidget", Qt::BypassGraphicsProxyWidget, "@brief Enum constant Qt::BypassGraphicsProxyWidget") +
-    gsi::enum_const ("WindowOkButtonHint", Qt::WindowOkButtonHint, "@brief Enum constant Qt::WindowOkButtonHint") +
-    gsi::enum_const ("WindowCancelButtonHint", Qt::WindowCancelButtonHint, "@brief Enum constant Qt::WindowCancelButtonHint"),
+    gsi::enum_const ("BypassGraphicsProxyWidget", Qt::BypassGraphicsProxyWidget, "@brief Enum constant Qt::BypassGraphicsProxyWidget"),
   "@qt\n@brief This class represents the Qt::WindowType enum");
 
 static gsi::QFlagsClass<Qt::WindowType > decl_Qt_WindowType_Enums ("Qt_QFlags_WindowType",

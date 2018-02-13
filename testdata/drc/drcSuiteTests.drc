@@ -13,6 +13,7 @@ def run_testsuite(dm, ic, tiled = false)
   c = input(3)
   x = input(10)
   y = input(11)
+  empty = input(1000)
 
   h = {}
   layers.each { |l| h[l] = true }
@@ -123,6 +124,9 @@ def run_testsuite(dm, ic, tiled = false)
   message "--- interacting, in, not_in #{lb}"
   
   b.interacting(a).output(lb, dm)
+  b.not_interacting(a).output(lb, dm + 1)
+  b.interacting(empty).output(lb, dm + 2)
+  b.not_interacting(empty).output(lb, dm + 3)
   b.interacting(a).in(b).output(lb + 1, dm)
   (b|a).not_in(b).output(lb + 2, dm)
   x.in(b).output(lb + 3, dm)
@@ -132,21 +136,73 @@ def run_testsuite(dm, ic, tiled = false)
   message "--- inside, outside, overlapping, interacting #{lb}"
   
   b.inside(c).output(lb, dm)
+  b.not_inside(c).output(lb, dm + 1)
+  b.inside(empty).output(lb, dm + 2)
+  b.not_inside(empty).output(lb, dm + 3)
   b.outside(c).output(lb + 1, dm)
+  b.not_outside(c).output(lb + 1, dm + 1)
+  b.outside(empty).output(lb + 1, dm + 2)
+  b.not_outside(empty).output(lb + 1, dm + 3)
   b.overlapping(c).output(lb + 2, dm)
+  b.not_overlapping(c).output(lb + 2, dm + 1)
+  b.overlapping(empty).output(lb + 2, dm + 2)
+  b.not_overlapping(empty).output(lb + 2, dm + 3)
   b.interacting(c).output(lb + 3, dm)
+  b.not_interacting(c).output(lb + 3, dm + 1)
+  b.interacting(empty).output(lb + 3, dm + 2)
+  b.not_interacting(empty).output(lb + 3, dm + 3)
   bdup = b.dup
   bdup.select_inside(c)
   bdup.xor(b.inside(c)).output(lb + 4, dm)
   bdup = b.dup
+  bdup.select_not_inside(c)
+  bdup.output(lb + 4, dm + 1)
+  bdup = b.dup
+  bdup.select_inside(empty)
+  bdup.output(lb + 4, dm + 2)
+  bdup = b.dup
+  bdup.select_not_inside(empty)
+  bdup.output(lb + 4, dm + 3)
+  bdup = b.dup
   bdup.select_outside(c)
   bdup.xor(b.outside(c)).output(lb + 5, dm)
+  bdup = b.dup
+  bdup.select_not_outside(c)
+  bdup.output(lb + 5, dm + 1)
+  bdup = b.dup
+  bdup.select_outside(empty)
+  bdup.output(lb + 5, dm + 2)
+  bdup = b.dup
+  bdup.select_not_outside(empty)
+  bdup.output(lb + 5, dm + 3)
   bdup = b.dup
   bdup.select_overlapping(c)
   bdup.xor(b.overlapping(c)).output(lb + 6, dm)
   bdup = b.dup
+  bdup.select_not_overlapping(c)
+  bdup.output(lb + 6, dm + 1)
+  bdup = b.dup
+  bdup.select_overlapping(empty)
+  bdup.output(lb + 6, dm + 2)
+  bdup = b.dup
+  bdup.select_not_overlapping(empty)
+  bdup.output(lb + 6, dm + 3)
+  bdup = b.dup
   bdup.select_interacting(c)
   bdup.xor(b.interacting(c)).output(lb + 7, dm)
+  bdup = b.dup
+  bdup.select_not_interacting(c)
+  bdup.output(lb + 7, dm + 1)
+  bdup = b.dup
+  bdup.select_interacting(empty)
+  bdup.output(lb + 7, dm + 2)
+  bdup = b.dup
+  bdup.select_not_interacting(empty)
+  bdup.output(lb + 7, dm + 3)
+  b.inside(empty).output(lb + 8, dm)
+  b.not_inside(empty).output(lb + 8, dm + 1)
+  b.outside(empty).output(lb + 9, dm)
+  b.not_outside(empty).output(lb + 9, dm + 1)
   
   lb += 10
   message "--- merge #{lb}"

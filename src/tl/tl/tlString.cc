@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -230,6 +230,55 @@ tl::to_string (const unsigned long long &d)
   os << d;
   return os.str ();
 }
+
+#if defined(HAVE_64BIT_COORD)
+
+template <>
+std::string
+tl::to_string (const __int128 &d)
+{
+  if (d < 0 ) {
+    return "-" + tl::to_string(static_cast<unsigned __int128> (-d));
+  } else {
+    return tl::to_string(static_cast<unsigned __int128> (d));
+  }
+}
+
+template <>
+std::string
+tl::to_string (const unsigned __int128 &_x)
+{
+  std::string r;
+  unsigned __int128 x = _x;
+
+  //  this is the max. power of 10 that can be represented with __int128
+  unsigned __int128 m = (unsigned long long) 0x4b3b4ca85a86c47a;
+  m <<= 64;
+  m |= (unsigned long long) 0x98a224000000000;
+
+  if (x == 0) {
+    return "0";
+  }
+
+  bool first = true;
+  while (m > 1) {
+    int d = 0;
+    while (x >= m) {
+      d += 1;
+      x -= m;
+    }
+    if (d > 0 || !first) {
+      r += char ('0' + d);
+      first = false;
+    }
+    m /= 10;
+  }
+
+  r += char('0' + int(x));
+  return r;
+}
+
+#endif
 
 template <>
 std::string

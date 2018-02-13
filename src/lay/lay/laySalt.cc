@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -279,12 +279,13 @@ Salt::remove_grain (const SaltGrain &grain)
 {
   emit collections_about_to_change ();
 
-  tl::info << QObject::tr ("Removing package '%1' ..").arg (tl::to_qstring (grain.name ()));
+  QString name = tl::to_qstring (grain.name ());
+  tl::info << QObject::tr ("Removing package '%1' ..").arg (name);
   bool res = remove_from_collection (m_root, grain.name ());
   if (res) {
-    tl::info << QObject::tr ("Package '%1' removed.").arg (tl::to_qstring (grain.name ()));
+    tl::info << QObject::tr ("Package '%1' removed.").arg (name);
   } else {
-    tl::warn << QObject::tr ("Failed to remove package '%1'.").arg (tl::to_qstring (grain.name ()));
+    tl::warn << QObject::tr ("Failed to remove package '%1'.").arg (name);
   }
 
   invalidate ();

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1026,19 +1026,19 @@ TEST(20)
   EXPECT_EQ (poly.to_string (), "(100,100;200,100;200,400;100,400;100,300;400,300;400,400;300,400;300,100;400,100;400,200;100,200)");
 
   poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
-  poly.size (100, 0);
+  poly.size (db::Coord (100), db::Coord (0));
   EXPECT_EQ (poly.to_string (), "(0,100;0,400;500,400;500,100)");
 
   poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
-  poly.size (0, 100);
+  poly.size (db::Coord (0), db::Coord (100));
   EXPECT_EQ (poly.to_string (), "(100,0;100,500;400,500;400,0)");
 
   poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
-  poly.size (-100, 0);
+  poly.size (db::Coord (-100), db::Coord (0));
   EXPECT_EQ (poly.to_string (), "(100,100;200,100;200,400;100,400;400,400;300,400;300,100;400,100)");
 
   poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));
-  poly.size (0, -100);
+  poly.size (db::Coord (0), db::Coord (-100));
   EXPECT_EQ (poly.to_string (), "(100,100;100,400;100,300;400,300;400,400;400,100;400,200;100,200)");
 
   poly.assign_hull (pts, pts + sizeof (pts) / sizeof (pts[0]));

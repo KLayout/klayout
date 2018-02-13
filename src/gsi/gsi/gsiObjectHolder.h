@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 namespace gsi
 {
 
-class ClassBase;
+class GSI_PUBLIC ClassBase;
 
 /**
  *  @brief Implements an object holder

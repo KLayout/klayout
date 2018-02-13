@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,14 +32,17 @@
 #     define BD_PUBLIC __declspec(dllimport)
 #   endif
 #   define BD_LOCAL
+#   define BD_PUBLIC_TEMPLATE
 
 # else
 
-#   if __GNUC__ >= 4
+#   if __GNUC__ >= 4 || defined(__clang__)
 #     define BD_PUBLIC __attribute__ ((visibility ("default")))
+#     define BD_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
 #     define BD_LOCAL  __attribute__ ((visibility ("hidden")))
 #   else
 #     define BD_PUBLIC
+#     define BD_PUBLIC_TEMPLATE
 #     define BD_LOCAL
 #   endif
 

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ namespace gsi
 // ------------------------------------------------------------
 //  SerialArgs definition
 
-class AdaptorBase;
+class GSI_PUBLIC AdaptorBase;
 
 /**
  *  @brief Copy the contents of adaptor-provided data to the given type X
@@ -650,7 +650,7 @@ public:
  *  @brief Generic string adaptor implementation
  */
 template <class X> 
-class StringAdaptorImpl 
+class GSI_PUBLIC_TEMPLATE StringAdaptorImpl
   : public StringAdaptor
 {
 };
@@ -659,7 +659,7 @@ class StringAdaptorImpl
  *  @brief Specialization for QByteArray
  */
 template <>
-class StringAdaptorImpl<QByteArray>
+class GSI_PUBLIC StringAdaptorImpl<QByteArray>
   : public StringAdaptor
 {
 public:
@@ -729,7 +729,7 @@ private:
  *  @brief Specialization for QString
  */
 template <>
-class StringAdaptorImpl<QString>
+class GSI_PUBLIC StringAdaptorImpl<QString>
   : public StringAdaptor
 {
 public:
@@ -801,7 +801,7 @@ private:
  *  @brief Specialization for QStringRef
  */
 template <>
-class StringAdaptorImpl<QStringRef>
+class GSI_PUBLIC StringAdaptorImpl<QStringRef>
   : public StringAdaptor
 {
 public:
@@ -875,7 +875,7 @@ private:
  *  @brief Specialization for std::string
  */
 template <>
-class StringAdaptorImpl<std::string>
+class GSI_PUBLIC StringAdaptorImpl<std::string>
   : public StringAdaptor
 {
 public:
@@ -945,7 +945,7 @@ private:
  *  @brief Specialization for const unsigned char *
  */
 template <class CP>
-class StringAdaptorImplCCP
+class GSI_PUBLIC_TEMPLATE StringAdaptorImplCCP
   : public StringAdaptor
 {
 public:
@@ -1019,7 +1019,7 @@ private:
  *  @brief Specialization for const char *
  */
 template <>
-class StringAdaptorImpl<const char *>
+class GSI_PUBLIC StringAdaptorImpl<const char *>
   : public StringAdaptorImplCCP<const char *>
 {
 public:
@@ -1033,7 +1033,7 @@ public:
  *  @brief Specialization for const unsigned char *
  */
 template <>
-class StringAdaptorImpl<const unsigned char *>
+class GSI_PUBLIC StringAdaptorImpl<const unsigned char *>
   : public StringAdaptorImplCCP<const unsigned char *>
 {
 public:
@@ -1047,7 +1047,7 @@ public:
  *  @brief Specialization for const signed char *
  */
 template <>
-class StringAdaptorImpl<const signed char *>
+class GSI_PUBLIC StringAdaptorImpl<const signed char *>
   : public StringAdaptorImplCCP<const signed char *>
 {
 public:
@@ -1103,7 +1103,7 @@ public:
  *  @brief Generic string adaptor implementation
  */
 template <class X> 
-class VariantAdaptorImpl 
+class GSI_PUBLIC_TEMPLATE VariantAdaptorImpl
   : public VariantAdaptor
 {
 };
@@ -1112,7 +1112,7 @@ class VariantAdaptorImpl
  *  @brief Specialization for QVariant
  */
 template <>
-class VariantAdaptorImpl<QVariant>
+class GSI_PUBLIC VariantAdaptorImpl<QVariant>
   : public VariantAdaptor
 {
 public:
@@ -1182,7 +1182,7 @@ private:
  *  @brief Specialization for tl::Variant
  */
 template <>
-class VariantAdaptorImpl<tl::Variant>
+class GSI_PUBLIC VariantAdaptorImpl<tl::Variant>
   : public VariantAdaptor
 {
 public:
@@ -1359,7 +1359,7 @@ public:
  *  @brief Implementation of the generic iterator adaptor for a specific container
  */
 template <class Cont>
-class VectorAdaptorIteratorImpl
+class GSI_PUBLIC_TEMPLATE VectorAdaptorIteratorImpl
   : public VectorAdaptorIterator
 {
 public:
@@ -1434,7 +1434,7 @@ void push_vector (QSet<X> &v, const X &x)
  *  @brief Implementation of the generic adaptor for a specific container
  */
 template <class Cont>
-class VectorAdaptorImpl 
+class GSI_PUBLIC_TEMPLATE VectorAdaptorImpl
   : public VectorAdaptor
 {
 public:
@@ -1709,7 +1709,7 @@ struct map_access<QHash<X, Y> >
  *  @brief Implementation of the generic iterator adaptor for a specific container
  */
 template <class Cont>
-class MapAdaptorIteratorImpl
+class GSI_PUBLIC_TEMPLATE MapAdaptorIteratorImpl
   : public MapAdaptorIterator
 {
 public:
@@ -1745,7 +1745,7 @@ private:
  *  @brief Implementation of the generic adaptor for a specific container
  */
 template <class Cont>
-class MapAdaptorImpl 
+class GSI_PUBLIC_TEMPLATE MapAdaptorImpl
   : public MapAdaptor
 {
 public:

@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2017 Matthias Koefferlein
+# Copyright (C) 2006-2018 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -576,8 +576,8 @@ class QtBinding_TestClass < TestBase
     assert_equal(child.height() > 100, true)
     
     parent.resize(100, 100)
-    assert_equal(child.width() < 100, true)
-    assert_equal(child.height() < 100, true)
+    assert_equal(child.width() <= 100, true)
+    assert_equal(child.height() <= 100, true)
 
     # now if we delete the parent, the child needs to become disconnected
 

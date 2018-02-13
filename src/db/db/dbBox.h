@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ class ArrayRepository;
  */
 
 template <class C, class R = C>
-struct box
+struct DB_PUBLIC_TEMPLATE box
 {
   typedef C coord_type;
   typedef box<C, R> box_type;

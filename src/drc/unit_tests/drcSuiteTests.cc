@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ void runtest (tl::TestBase *_this, int mode)
   std::string au = tl::testsrc ();
   au += "/testdata/drc/drcSuiteTests_au";
   au += tl::to_string (mode);
-  au += ".gds";
+  au += ".oas";
 
   std::string output = _this->tmp_file ("tmp.gds");
 

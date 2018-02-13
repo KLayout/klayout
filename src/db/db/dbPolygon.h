@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -83,6 +83,8 @@ inline bool default_compression<db::DCoord> ()
  *  hull and holes respectively.
  */
 
+//  NOTE: we do explicit instantiation, so the exposure is declared
+//  as DB_PUBLIC - as if it wasn't a template
 template <class C>
 class DB_PUBLIC polygon_contour
 {
@@ -1364,7 +1366,7 @@ private:
  */
 
 template <class C>
-class polygon
+class DB_PUBLIC_TEMPLATE polygon
 {
 public:
   typedef C coord_type;
@@ -2324,7 +2326,7 @@ private:
  */
 
 template <class C>
-class simple_polygon
+class DB_PUBLIC_TEMPLATE simple_polygon
 {
 public:
   typedef C coord_type;

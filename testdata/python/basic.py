@@ -1,5 +1,5 @@
 # KLayout Layout Viewer
-# Copyright (C) 2006-2017 Matthias Koefferlein
+# Copyright (C) 2006-2018 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -92,6 +92,44 @@ def ph(x):
   else:
     return x.replace("X", "")
     
+def map2str(dict):
+  # A helper function to product a "canonical" (i.e. sorted-keys) string
+  # representation of a dict
+  keys = list(dict)
+
+  for k in keys:
+    if type(k) is str:
+      strKeys = []
+      strDict = {}
+      for x in keys:
+        strKeys.append(str(x))
+        strDict[str(x)] = dict[x]
+      strings = []
+      for x in sorted(strKeys):
+        strings.append(str(x) + ": " + str(strDict[x]))
+      return "{" + ", ".join(strings) + "}"
+
+  strings = []
+  for x in sorted(keys):
+    strings.append(str(x) + ": " + str(dict[x]))
+  return "{" + ", ".join(strings) + "}"
+  
+class PyGObject(pya.GObject):
+  z = -1
+  def __init__(self, z):
+    super(PyGObject, self).__init__()
+    self.z = z
+  # reimplementation of "virtual int g()"
+  def g(self):
+    return self.z*2
+
+class PyGFactory(pya.GFactory):
+  def __init__(self):
+    super(PyGFactory, self).__init__()
+  # reimplementation of "virtual GObject *f(int)"
+  def f(self, z):
+    return PyGObject(z)
+
 class BasicTest(unittest.TestCase):
 
   def test_00(self):
@@ -101,6 +139,11 @@ class BasicTest(unittest.TestCase):
 
     a = pya.A.new_a(100)
     self.assertEqual( pya.A.a0(), ac0 + 1 )
+
+    a = pya.A()
+    self.assertEqual(a.a1(), 17)
+    a.assign(pya.A(110))
+    self.assertEqual(a.a1(), 110)
 
     a = None
     self.assertEqual( pya.A.a0(), ac0 )
@@ -2066,44 +2109,27 @@ class BasicTest(unittest.TestCase):
 
   def test_41(self):
 
-    v3 = sys.version_info >= (3, 0)
-
     # maps 
     b = pya.B()
 
     b.insert_map1(1, "hello")
-    if v3:
-      self.assertEqual(repr(b.map1), "{1: 'hello'}")
-    else:
-      self.assertEqual(repr(b.map1), "{1L: 'hello'}")
+    self.assertEqual(map2str(b.map1), "{1: hello}")
 
     b.map1 = {}
     b.insert_map1(2, "hello")
-    if v3:
-      self.assertEqual(repr(b.map1_cref()), "{2: 'hello'}")
-    else:
-      self.assertEqual(repr(b.map1_cref()), "{2L: 'hello'}")
+    self.assertEqual(map2str(b.map1_cref()), "{2: hello}")
 
     b.map1 = {}
     b.insert_map1(3, "hello")
-    if v3:
-      self.assertEqual(repr(b.map1_cptr()), "{3: 'hello'}")
-    else:
-      self.assertEqual(repr(b.map1_cptr()), "{3L: 'hello'}")
+    self.assertEqual(map2str(b.map1_cptr()), "{3: hello}")
 
     b.map1 = {}
     b.insert_map1(4, "hello")
-    if v3:
-      self.assertEqual(repr(b.map1_ref()), "{4: 'hello'}")
-    else:
-      self.assertEqual(repr(b.map1_ref()), "{4L: 'hello'}")
+    self.assertEqual(map2str(b.map1_ref()), "{4: hello}")
 
     b.map1 = {}
     b.insert_map1(5, "hello")
-    if v3:
-      self.assertEqual(repr(b.map1_ptr()), "{5: 'hello'}")
-    else:
-      self.assertEqual(repr(b.map1_ptr()), "{5L: 'hello'}")
+    self.assertEqual(map2str(b.map1_ptr()), "{5: hello}")
 
     self.assertEqual(b.map1_cptr_null() == None, True);
     self.assertEqual(b.map1_ptr_null() == None, True);
@@ -2117,52 +2143,28 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(error_caught, True)
 
     b.map1 = { 42: "1", -17: "True" }
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '1', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '1', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 1}")
 
     b.set_map1_cref({ 42: "2", -17: "True" })
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '2', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '2', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 2}")
 
     b.set_map1_cptr({ 42: "3", -17: "True" })
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '3', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '3', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 3}")
 
     b.set_map1_cptr(None)
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '3', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '3', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 3}")
 
     b.set_map1_ref({ 42: "4", -17: "True" })
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '4', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '4', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 4}")
 
     b.set_map1_ptr({ 42: "5", -17: "True" })
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '5', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '5', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 5}")
 
     b.set_map1_ptr(None)
-    if v3:
-      self.assertEqual(repr(b.map1), "{42: '5', -17: 'True'}")
-    else:
-      self.assertEqual(repr(b.map1), "{42L: '5', -17L: 'True'}")
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 5}")
 
     b.map2 = { 'xy': 1, -17: True }
-    if v3:
-      self.assertEqual(repr(b.map2), "{'xy': 1, -17: True}")
-    else:
-      self.assertEqual(repr(b.map2), "{'xy': 1L, -17L: True}")
+    self.assertEqual(map2str(b.map2), "{-17: True, xy: 1}")
 
     self.assertEqual(b.map2_null(), None)
 
@@ -2692,6 +2694,17 @@ class BasicTest(unittest.TestCase):
     se.trigger_s0()
     self.assertEqual(sc.got_s0a, 0)
     self.assertEqual(sc.got_s0b, 0)
+
+  # Custom factory implemented in Python
+  def test_80(self):
+    gc = pya.GObject.g_inst_count()
+    gf = PyGFactory()
+    go = pya.GFactory.create_f(gf, 17)
+    self.assertEqual(go.g_virtual(), 34)
+    self.assertEqual(go.g_org(), 0)
+    self.assertEqual(pya.GObject.g_inst_count(), gc + 1)
+    go = None
+    self.assertEqual(pya.GObject.g_inst_count(), gc)
 
 # run unit tests
 if __name__ == '__main__':

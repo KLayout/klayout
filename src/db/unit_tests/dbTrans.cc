@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -184,7 +184,7 @@ TEST(10)
   EXPECT_EQ (t.is_ortho (), true);
   EXPECT_EQ (t.to_string (), recomposed (t).to_string ());
 
-  t = db::DCplxTrans (db::ICplxTrans (db::disp_trans<int> (db::Vector (100, -256))));
+  t = db::DCplxTrans (db::ICplxTrans (db::disp_trans<db::Coord> (db::Vector (100, -256))));
   EXPECT_EQ (t.is_unity (), false);
   EXPECT_EQ (t.to_string (), "r0 *1 100,-256");
   EXPECT_EQ (t.is_ortho (), true);
@@ -202,7 +202,7 @@ TEST(10)
   EXPECT_EQ (t.to_string (), "r0 *1 -0.5,1.25");
   EXPECT_EQ (t.to_string (), recomposed (t).to_string ());
 
-  t = db::DCplxTrans (db::DTrans (db::simple_trans<int> (db::FTrans::m135, db::Vector (128, -256))));
+  t = db::DCplxTrans (db::DTrans (db::simple_trans<db::Coord> (db::FTrans::m135, db::Vector (128, -256))));
   EXPECT_EQ (t.is_unity (), false);
   EXPECT_EQ (t.to_string (), "m135 *1 128,-256");
   EXPECT_EQ (t.to_string (), recomposed (t).to_string ());

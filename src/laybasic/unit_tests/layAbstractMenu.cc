@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -124,5 +124,14 @@ TEST(1)
 
   menu.delete_item ("n1.c2");
   EXPECT_EQ (menu_to_string (menu), "(n2)");
-}
 
+  menu.clear_menu ("n1");
+  EXPECT_EQ (menu_to_string (menu), "(n2)");
+
+  menu.insert_menu ("end", "n1", lay::Action ("title:n1"));
+  menu.insert_item ("n1.begin", "c1", lay::Action ("title:c1"));
+  menu.insert_item ("n1.end", "c2", lay::Action ("title:c2"));
+  EXPECT_EQ (menu_to_string (menu), "(n2,n1(n1.c1,n1.c2))");
+  menu.clear_menu ("n1");
+  EXPECT_EQ (menu_to_string (menu), "(n2,n1)");
+}

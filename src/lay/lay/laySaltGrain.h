@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -448,6 +448,14 @@ public:
    *  exception if an error occurs during reading.
    */
   static SaltGrain from_url (const std::string &url);
+
+  /**
+   *  @brief Returns a stream prepared for downloading the grain
+   *  The stream is a new'd object and needs to be deleted by the caller.
+   *  "url" is the download URL on input and gets modified to match the
+   *  actual URL if it is a relative one.
+   */
+  static tl::InputStream *stream_from_url (std::string &url);
 
   /**
    *  @brief Forms the spec file download URL from a given download URL

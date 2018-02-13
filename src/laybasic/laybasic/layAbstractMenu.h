@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@
 #include "tlObject.h"
 #include "laybasicCommon.h"
 
+class QFrame;
 class QMenuBar;
 class QToolBar;
 class QMenu;
@@ -65,10 +66,12 @@ Q_OBJECT
 public:
   ActionHandle (QWidget *parent);
   ActionHandle (QAction *action, bool owned = true);
+  ActionHandle (QMenu *menu, bool owned = true);
   ~ActionHandle ();
   void add_ref ();
   void remove_ref ();
   QAction *ptr () const;
+  QMenu *menu () const;
 
   void set_visible (bool v);
   void set_hidden (bool h);
@@ -86,6 +89,7 @@ protected slots:
   void destroyed (QObject *obj);
 
 private:
+  QMenu *mp_menu;
   QAction *mp_action;
   int m_ref_count;
   bool m_owned;
@@ -344,6 +348,11 @@ public:
   QAction *qaction () const;
 
   /**
+   *  @brief Gets the QMenu object if the action is a menu action
+   */
+  QMenu *menu () const;
+
+  /**
    *  @brief Compares two action objects 
    *
    *  Two action objects are equal when they refer to the same ActionHandle.
@@ -564,11 +573,9 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
     return m_action;
   }
 
-  void set_menu (QMenu *menu);
-
   QMenu *menu () const
   {
-    return mp_menu;
+    return m_action.menu ();
   }
 
   void set_has_submenu ();
@@ -588,7 +595,6 @@ struct LAYBASIC_PUBLIC AbstractMenuItem
   std::list <AbstractMenuItem> children;
 
 private:
-  QMenu *mp_menu;
   bool m_has_submenu;
   bool m_remove_on_empty;
   Action m_action;
@@ -681,7 +687,7 @@ public:
    *  @param name The name of the detached menu, without the "@"
    *  @param mbar The menu bar into which to build the menu
    */
-  void build_detached (const std::string &name, QMenuBar *mbar);
+  void build_detached (const std::string &name, QFrame *mbar);
 
   /**
    *  @brief Get the reference to a QMenu object
@@ -779,6 +785,13 @@ public:
   void insert_menu (const std::string &path, const std::string &name, const std::string &title); 
 
   /**
+   *  @brief Deletes the children of the item with the given path
+   *
+   *  If the item does not exist or is not a menu, this method does nothing.
+   */
+  void clear_menu (const std::string &path);
+
+  /**
    *  @brief Delete the item given by the path
    *
    *  @param path The path to the item to delete
@@ -844,7 +857,6 @@ private:
   void build (QMenu *menu, std::list<AbstractMenuItem> &items);
   void build (QToolBar *tbar, std::list<AbstractMenuItem> &items);
   void collect_group (std::vector<std::string> &grp, const std::string &name, const AbstractMenuItem &item) const;
-  void reset_menu_objects (AbstractMenuItem &item);
 
   /**
    *  @brief Create a action from a string

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -311,6 +311,14 @@ InputStream::InputStream (InputStreamBase &delegate)
   mp_buffer = new char [m_bcap];
 }
 
+InputStream::InputStream (InputStreamBase *delegate)
+  : m_pos (0), mp_bptr (0), mp_delegate (delegate), m_owns_delegate (true), mp_inflate (0)
+{
+  m_bcap = 4096; // initial buffer capacity
+  m_blen = 0;
+  mp_buffer = new char [m_bcap];
+}
+
 InputStream::InputStream (const std::string &abstract_path)
   : m_pos (0), mp_bptr (0), mp_delegate (0), m_owns_delegate (false), mp_inflate (0)
 { 
@@ -357,7 +365,15 @@ std::string InputStream::absolute_path (const std::string &abstract_path)
 InputStream::~InputStream ()
 {
   if (mp_delegate && m_owns_delegate) {
-    delete mp_delegate;
+    //  NOTE: HTTP stream objects should not be deleted now, since events
+    //  may be pending that deliver the finished signal to the object.
+    tl::InputHttpStream *http = dynamic_cast<tl::InputHttpStream *>(mp_delegate);
+    if (http) {
+      http->ready ().clear ();  //  avoids events from deleted streams
+      http->deleteLater ();
+    } else {
+      delete mp_delegate;
+    }
     mp_delegate = 0;
   }
   if (mp_inflate) {

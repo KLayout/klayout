@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "dbPolygonTools.h"
 #include "dbPolygonGenerators.h"
 #include "tlLog.h"
+#include "tlInt128Support.h"
 
 #include <algorithm>
 #include <cmath>
@@ -706,7 +707,7 @@ smooth_contour (db::Polygon::polygon_contour_iterator from, db::Polygon::polygon
       }
 
       for (size_t j = pi0; can_drop; ) {
-        if (abs (db::Edge (p0, p2).distance (org_points [j])) > d) {
+        if (std::abs (db::Edge (p0, p2).distance (org_points [j])) > d) {
           can_drop = false;
         }
         if (j == pi2) {

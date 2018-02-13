@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -394,6 +394,12 @@ Repetition::set_base (RepetitionBase *base)
     delete mp_base;
   }
   mp_base = base;
+}
+
+size_t
+Repetition::size () const
+{
+  return mp_base ? mp_base->size () : 1;
 }
 
 bool 

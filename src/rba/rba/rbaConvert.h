@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,11 +34,14 @@
 namespace rba
 {
 
+class Proxy;
+
 // -------------------------------------------------------------------
 
 /**
  *  @brief Translates an object to a Ruby object (VALUE)
  *  @param obj The generic object pointer
+ *  @param self The object which the object is derived from (self in a method call) or 0 if there is no such object
  *  @param cls The class of the object
  *  @param pass_obj If true, the Ruby object will own the original object which gets destroyed when the Ruby object is finalized
  *  @param is_const If true, the Ruby object will be a const one unless the original object is already bound in a non-const way
@@ -46,13 +49,13 @@ namespace rba
  *  @param can_destroy If true, the Ruby object can be destroyed explicitly
  *  @return The Ruby object
  */
-VALUE object_to_ruby (void *obj, const gsi::ClassBase *cls, bool pass_obj, bool is_const, bool prefer_copy, bool can_destroy);
+VALUE object_to_ruby (void *obj, Proxy *self, const gsi::ClassBase *cls, bool pass_obj, bool is_const, bool prefer_copy, bool can_destroy);
 
 /**
  *  @brief Translates an object to a Ruby object (VALUE)
  *  This version takes it's flags from the atype given.
  */
-VALUE object_to_ruby (void *obj, const gsi::ArgType &atype);
+VALUE object_to_ruby (void *obj, Proxy *self, const gsi::ArgType &atype);
 
 // -------------------------------------------------------------------
 //  Type checks

@@ -1,22 +1,12 @@
 
-DESTDIR = $$OUT_PWD/..
+TEMPLATE = subdirs
+SUBDIRS = klayout_main
 
-include($$PWD/../klayout.pri)
+equals(HAVE_RUBY, "1") {
 
-TARGET = klayout
+  # klayout_main_tests requires Ruby to run, hence HAVE_RUBY
+  SUBDIRS += tests
+  tests.depends += klayout_main
 
-include($$PWD/../app.pri)
-include($$PWD/../with_all_libs.pri)
-
-HEADERS = \
-
-FORMS = \
-
-SOURCES = \
-  klayout.cc \
-
-RESOURCES = \
-
-win32 {
-  RC_FILE = $$PWD/klayout.rc
 }
+

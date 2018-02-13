@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -619,11 +619,50 @@ private:
 };
 
 // -------------------------------------------------------------------
+//  Ruby interpreter private data
+
+struct RubyInterpreterPrivateData
+{
+  RubyInterpreterPrivateData ()
+  {
+    saved_stderr = Qnil;
+    saved_stdout = Qnil;
+    stdout_klass = Qnil;
+    stderr_klass = Qnil;
+    current_console = 0;
+    current_exec_handler = 0;
+    current_exec_level = 0;
+    in_trace = false;
+    exit_on_next = false;
+    block_exceptions = false;
+    ignore_next_exception = false;
+  }
+
+  VALUE saved_stderr;
+  VALUE saved_stdout;
+  VALUE stdout_klass;
+  VALUE stderr_klass;
+  gsi::Console *current_console;
+  std::vector<gsi::Console *> consoles;
+  gsi::ExecutionHandler *current_exec_handler;
+  int current_exec_level;
+  bool in_trace;
+  bool exit_on_next;
+  bool block_exceptions;
+  bool ignore_next_exception;
+  std::string debugger_scope;
+  std::map<const char *, size_t> file_id_map;
+  std::vector<gsi::ExecutionHandler *> exec_handlers;
+  std::set<std::string> package_paths;
+};
+
+// -------------------------------------------------------------------
 //  Ruby API 
 
 #define RBA_TRY \
   VALUE __error_msg = Qnil; \
   int __estatus = 0; \
+  VALUE __exc = Qnil; \
   VALUE __eclass = Qnil; \
   { \
     try { 
@@ -636,6 +675,9 @@ private:
       __estatus = ex.status (); \
       __eclass = rb_eSystemExit; \
       __error_msg = rb_str_new2 ((ex.msg () + tl::to_string (QObject::tr (" in ")) + (where)).c_str ()); \
+    } catch (rba::RubyError &ex) { \
+      __eclass = rb_eRuntimeError; \
+      __exc = ex.exc (); \
     } catch (tl::Exception &ex) { \
       __eclass = rb_eRuntimeError; \
       __error_msg = rb_str_new2 ((ex.msg () + tl::to_string (QObject::tr (" in ")) + (where)).c_str ()); \
@@ -644,14 +686,19 @@ private:
       __error_msg = rb_str_new2 ((tl::to_string (QObject::tr ("Unspecific exception in ")) + (where)).c_str ()); \
     } \
   } \
-  if (__eclass == rb_eSystemExit) { \
-    /*  HINT: we do the rb_raise outside any destructor code - sometimes this longjmp seems not to work properly */ \
+  if (__exc != Qnil) { \
+    /* Reraise the exception without blocking in the debugger */ \
+    /* TODO: should not access private data */ \
+    RubyInterpreter::instance ()->d->block_exceptions = true; \
+    rb_exc_raise (__exc); \
+  } else if (__eclass == rb_eSystemExit) { \
+    /* HINT: we do the rb_raise outside any destructor code - sometimes this longjmp seems not to work properly */ \
     VALUE args [2]; \
     args [0] = INT2NUM (__estatus); \
     args [1] = __error_msg; \
     rb_exc_raise (rb_class_new_instance(2, args, __eclass)); \
   } else if (__eclass != Qnil) { \
-    /*  HINT: we do the rb_raise outside any destructor code - sometimes this longjmp seems not to work properly */ \
+    /* HINT: we do the rb_raise outside any destructor code - sometimes this longjmp seems not to work properly */ \
     VALUE args [1]; \
     args [0] = __error_msg; \
     rb_exc_raise (rb_class_new_instance(1, args, __eclass)); \
@@ -930,7 +977,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
           //  In case of an error upon write, pop the arguments to clean them up.
           //  Without this, there is a risk to keep dead objects on the stack.
           for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-            pop_arg (*a, arglist, heap);
+            pop_arg (*a, 0, arglist, heap);
           }
 
           throw;
@@ -973,7 +1020,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
           //  In case of an error upon write, pop the arguments to clean them up.
           //  Without this, there is a risk to keep dead objects on the stack.
           for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-            pop_arg (*a, arglist, heap);
+            pop_arg (*a, 0, arglist, heap);
           }
 
           throw;
@@ -999,7 +1046,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
               rr.reset ();
               iter->get (rr);
 
-              VALUE value = pop_arg (meth->ret_type (), rr, heap);
+              VALUE value = pop_arg (meth->ret_type (), p, rr, heap);
               rba_yield_checked (value);
 
               iter->inc ();
@@ -1013,7 +1060,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
         }
 
       } else {
-        ret = pop_arg (meth->ret_type (), retlist, heap);
+        ret = pop_arg (meth->ret_type (), p, retlist, heap);
       }
 
     }
@@ -1389,41 +1436,6 @@ stderr_winsize (VALUE self)
 // --------------------------------------------------------------------------
 //  RubyInterpreter implementation
 
-struct RubyInterpreterPrivateData
-{
-  RubyInterpreterPrivateData ()
-  {
-    saved_stderr = Qnil;
-    saved_stdout = Qnil;
-    stdout_klass = Qnil;
-    stderr_klass = Qnil;
-    current_console = 0;
-    current_exec_handler = 0;
-    current_exec_level = 0;
-    in_trace = false;
-    exit_on_next = false;
-    block_exceptions = false;
-    ignore_next_exception = false;
-  }
-
-  VALUE saved_stderr;
-  VALUE saved_stdout;
-  VALUE stdout_klass;
-  VALUE stderr_klass;
-  gsi::Console *current_console;
-  std::vector<gsi::Console *> consoles;
-  gsi::ExecutionHandler *current_exec_handler;
-  int current_exec_level;
-  bool in_trace;
-  bool exit_on_next;
-  bool block_exceptions;
-  bool ignore_next_exception;
-  std::string debugger_scope;
-  std::map<const char *, size_t> file_id_map;
-  std::vector<gsi::ExecutionHandler *> exec_handlers;
-  std::set<std::string> package_paths;
-};
-
 static RubyInterpreter *sp_rba_interpreter = 0;
 
 struct RubyConstDescriptor
@@ -1667,7 +1679,7 @@ rba_init (RubyInterpreterPrivateData *d)
       gsi::SerialArgs arglist (c->meth->argsize ());
       c->meth->call (0, arglist, retlist);
       tl::Heap heap;
-      VALUE ret = pop_arg (c->meth->ret_type (), retlist, heap);
+      VALUE ret = pop_arg (c->meth->ret_type (), 0, retlist, heap);
       rb_define_const (c->klass, c->name.c_str (), ret);
 
     } catch (tl::Exception &ex) {
@@ -1739,16 +1751,16 @@ RubyInterpreter::version () const
   }
 }
 
-static int s_argc = 0;
+static int *s_argc = 0;
 static char **s_argv = 0;
-static int (*s_main_func) (int, char **) = 0;
+static int (*s_main_func) (int &, char **) = 0;
 
 static VALUE run_app_func (VALUE)
 {
   int res = 0;
 
-  if (s_main_func && s_argv && s_argc > 0) {
-    res = (*s_main_func) (s_argc, s_argv);
+  if (s_main_func && s_argv && s_argc && *s_argc > 0) {
+    res = (*s_main_func) (*s_argc, s_argv);
   }
 
   if (res) {
@@ -1759,7 +1771,7 @@ static VALUE run_app_func (VALUE)
 }
 
 int
-RubyInterpreter::initialize (int main_argc, char **main_argv, int (*main_func) (int, char **))
+RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) (int &, char **))
 {
   int argc = 3;
   char *argv[3];
@@ -1849,7 +1861,7 @@ RubyInterpreter::initialize (int main_argc, char **main_argv, int (*main_func) (
 
       rb_define_global_function("__run_app__", (VALUE (*)(...)) run_app_func, 0);
 
-      s_argc = main_argc;
+      s_argc = &main_argc;
       s_argv = main_argv;
       s_main_func = main_func;
 
@@ -1867,6 +1879,7 @@ RubyInterpreter::initialize (int main_argc, char **main_argv, int (*main_func) (
       int res = ruby_run_node (ruby_options (argc, argv));
 #endif
 
+      s_argc = 0;
       return res;
 
     }
@@ -2257,6 +2270,7 @@ RubyInterpreter::begin_exec ()
 {
   d->exit_on_next = false;
   d->block_exceptions = false;
+  d->file_id_map.clear ();
   if (d->current_exec_level++ == 0 && d->current_exec_handler) {
     d->current_exec_handler->start_exec (this);
   }

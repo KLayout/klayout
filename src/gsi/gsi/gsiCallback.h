@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ namespace gsi
  *
  *  This class is specialized to implement the actual call process later.
  */
-struct Callee
+struct GSI_PUBLIC Callee
   : public tl::Object
 {
   Callee () { }
@@ -49,7 +49,7 @@ struct Callee
  *  This object holds informations about the actual implementation of the callback 
  *  on the scripting client's side.
  */
-struct Callback 
+struct Callback
 {
   Callback () 
     : id (-1), callee (0), argsize (0), retsize (0)

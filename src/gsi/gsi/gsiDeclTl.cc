@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -545,9 +545,7 @@ Class<ExpressionWrapper> decl_ExpressionWrapper ("Expression",
   "@brief Evaluation of Expressions\n"
   "\n"
   "This class allows evaluation of expressions. Expressions are used in many places throughout KLayout and "
-  "provide computation features for various applications.\n"
-  "\n"
-  "This class allows evaluation of expressions. Having a script language, there is no real use for expressions "
+  "provide computation features for various applications. Having a script language, there is no real use for expressions "
   "inside a script client. This class is provided mainly for testing purposes.\n"
   "\n"
   "An expression is 'compiled' into an Expression object and can be evaluated multiple times.\n"

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -176,7 +176,7 @@ TEST(3)
                       layout_read, top_read, j, 
                       top_org.shapes (xor_layer), db::BooleanOp::Xor, true, false); 
           EXPECT_EQ (top_org.shapes (xor_layer).size () > 210, true);
-          sp.size (layout_org, top_org, xor_layer, top_org.shapes (xor_layer), -1, -1);
+          sp.size (layout_org, top_org, xor_layer, top_org.shapes (xor_layer), db::Coord (-1), db::Coord (-1));
           EXPECT_EQ (top_org.shapes (xor_layer).size () == 0, true);
         }
       }
@@ -236,7 +236,7 @@ TEST(4)
           sp.boolean (layout_org, top_org, i, 
                       layout_read, top_read, j, 
                       top_org.shapes (xor_layer), db::BooleanOp::Xor, true, false); 
-          sp.size (layout_org, top_org, xor_layer, top_org.shapes (xor_layer), -1, -1);
+          sp.size (layout_org, top_org, xor_layer, top_org.shapes (xor_layer), db::Coord (-1), db::Coord (-1));
           EXPECT_EQ (top_org.shapes (xor_layer).size () == 0, true);
         }
       }

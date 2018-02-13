@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 #include <QDir>
 #include <stdlib.h>
 
-static void run_test (tl::TestBase *_this, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001, bool dummy_calls = false, bool blank_sep = false)
+static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001, bool dummy_calls = false, bool blank_sep = false)
 {
   db::CIFReaderOptions *opt = new db::CIFReaderOptions();
   opt->dbu = dbu;
@@ -60,7 +60,7 @@ static void run_test (tl::TestBase *_this, const char *file, const char *file_au
   db::Layout layout (&m), layout2 (&m), layout2_cif (&m), layout_au (&m);
 
   {
-    std::string fn (tl::testsrc_private ());
+    std::string fn (base);
     fn += "/testdata/cif/";
     fn += file;
     tl::InputStream stream (fn);
@@ -120,7 +120,7 @@ static void run_test (tl::TestBase *_this, const char *file, const char *file_au
   }
 
   {
-    std::string fn (tl::testsrc_private ());
+    std::string fn (base);
     fn += "/testdata/cif/";
     fn += file_au;
     tl::InputStream stream (fn);
@@ -141,46 +141,52 @@ static void run_test (tl::TestBase *_this, const char *file, const char *file_au
 
 TEST(1a)
 {
-  run_test (_this, "t1.cif.gz", "t1a_au.gds.gz");
+  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1a_au.gds.gz");
 }
 
 TEST(1b)
 {
-  run_test (_this, "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01);
+  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01);
 }
 
 TEST(1c)
 {
-  run_test (_this, "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, true);
+  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, true);
 }
 
 TEST(1d)
 {
-  run_test (_this, "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, false, true);
+  run_test (_this, tl::testsrc_private (), "t1.cif.gz", "t1b_au.gds.gz", 0, 0.01, false, true);
 }
 
 TEST(2)
 {
-  run_test (_this, "t2.cif.gz", "t2_au.gds.gz");
+  run_test (_this, tl::testsrc_private (), "t2.cif.gz", "t2_au.gds.gz");
 }
 
 TEST(3a)
 {
-  run_test (_this, "t3.cif.gz", "t3a_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26");
+  run_test (_this, tl::testsrc_private (), "t3.cif.gz", "t3a_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26");
 }
 
 TEST(3b)
 {
-  run_test (_this, "t3.cif.gz", "t3b_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26", 0.00012);
+  run_test (_this, tl::testsrc_private (), "t3.cif.gz", "t3b_au.gds.gz", "CAA:43,CCA:48,CCP:47,CMF:49,CMS:51,CPG:46,CSN:45,CSP:44,CVA:50,CWN:42,XP:26", 0.00012);
 }
 
 TEST(4)
 {
-  run_test (_this, "t4.cif.gz", "t4_au.gds.gz");
+  run_test (_this, tl::testsrc_private (), "t4.cif.gz", "t4_au.gds.gz");
 }
 
 TEST(5)
 {
-  run_test (_this, "t5.cif.gz", "t5_au.gds.gz");
+  run_test (_this, tl::testsrc_private (), "t5.cif.gz", "t5_au.gds.gz");
+}
+
+//  Issue #28
+TEST(lasi)
+{
+  run_test (_this, tl::testsrc (), "lasi.cif.gz", "lasi_au.gds.gz");
 }
 

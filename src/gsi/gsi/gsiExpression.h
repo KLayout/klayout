@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,9 +34,9 @@
 namespace gsi 
 {
 
-class ClassBase;
+class GSI_PUBLIC ClassBase;
 struct NoAdaptorTag;
-template <class T, class A> class Class;
+template <class T, class A> class GSI_PUBLIC_TEMPLATE Class;
 
 /**
  *  @brief The implementation delegate for the VariantUserClass<T>

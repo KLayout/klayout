@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -577,6 +577,10 @@ type_to_s (const gsi::ArgType &a, bool linked, bool for_return)
     s += "unsigned short"; break;
   case gsi::T_int:
     s += "int"; break;
+#if defined(HAVE_64BIT_COORD)
+  case gsi::T_int128:
+    s += "int128"; break;
+#endif
   case gsi::T_uint:
     s += "unsigned int"; break;
   case gsi::T_long:
@@ -1191,10 +1195,6 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       pydoc = pya::PythonInterpreter::instance ()->python_doc (i->second.first);
     }
 
-    os << "<a name=\"method" << n << "\"/>"
-       << "<a name=\"m_" << escape_xml (i->first) << "\"/>"
-       << "<keyword title=\"" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls) << ", " << tl::to_string (QObject::tr ("Method")) << " " << escape_xml (i->first) <<  "\" name=\"" << escape_xml (cls) << "#" << escape_xml (i->first) << "\"/>" << std::endl;
-
     os << "<tr>";
     if (i->first != prev_title) {
       int rows = 0;
@@ -1207,6 +1207,10 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       os << "</td>";
     }
     os << "<td style=\"padding-bottom: 16px\">";
+
+    os << "<a name=\"method" << n << "\"/>"
+       << "<a name=\"m_" << escape_xml (i->first) << "\"/>"
+       << "<keyword title=\"" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls) << ", " << tl::to_string (QObject::tr ("Method")) << " " << escape_xml (i->first) <<  "\" name=\"" << escape_xml (cls) << "#" << escape_xml (i->first) << "\"/>" << std::endl;
 
     os << "<p><b>" << tl::to_string (QObject::tr ("Signature")) << "</b>: ";
     std::string attr = method_attributes (i->second.first, method_doc);

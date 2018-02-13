@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -143,6 +143,10 @@ LayoutHandle::rename (const std::string &name, bool force) throw (tl::Exception)
 
     if (tl::verbosity () >= 40) {
       tl::info << "Renamed layout from " << m_name << " to " << n;
+    }
+
+    if (find (m_name) == this) {
+      ms_dict.erase (m_name);
     }
 
     m_name = n;

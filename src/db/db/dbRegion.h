@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2017 Matthias Koefferlein
+  Copyright (C) 2006-2018 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1273,7 +1273,7 @@ public:
    */
   Region selected_inside (const Region &other) const
   {
-    return selected_interacting_generic (other, -1, false, false);
+    return selected_interacting_generic (other, -1, true, false);
   }
 
   /**
@@ -1285,7 +1285,7 @@ public:
    */
   Region selected_not_inside (const Region &other) const
   {
-    return selected_interacting_generic (other, -1, false, true);
+    return selected_interacting_generic (other, -1, true, true);
   }
 
   /**

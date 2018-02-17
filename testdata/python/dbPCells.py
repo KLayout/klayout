@@ -52,11 +52,17 @@ class BoxPCell(pya.PCellDeclaration):
     
     # create the shape
     cell.shapes(layers[0]).insert(pya.Box(-w / 2, -h / 2, w / 2, h / 2))
+
+  def can_create_from_shape(self, layout, shape, layer):
+    return shape.is_box()
+
+  def transformation_from_shape(self, layout, shape, layer):
+    return pya.Trans(shape.box.center() - pya.Point())
+
+  def parameters_from_shape(self, layout, shape, layer):
+    return [ layout.get_info(layer), shape.box.width() * layout.dbu, shape.box.height() * layout.dbu ]
     
-
 class PCellTestLib(pya.Library):
-
-  boxpcell = None
 
   def __init__(self):  
   
@@ -64,8 +70,7 @@ class PCellTestLib(pya.Library):
     self.description = "PCell test lib"
     
     # create the PCell declarations
-    boxpcell = BoxPCell()
-    self.layout().register_pcell("Box", boxpcell)
+    self.layout().register_pcell("Box", BoxPCell())
 
     sb_index = self.layout().add_cell("StaticBox")
     l10 = self.layout().insert_layer(pya.LayerInfo(10, 0))
@@ -74,6 +79,60 @@ class PCellTestLib(pya.Library):
     
     # register us with the name "MyLib"
     self.register("PCellTestLib")
+
+
+# A PCell based on the declaration helper
+
+class BoxPCell2(pya.PCellDeclarationHelper):
+
+  def __init__(self):
+
+    super(BoxPCell2, self).__init__()
+  
+    self.param("layer", self.TypeLayer, "Layer", default = pya.LayerInfo(0, 0))
+    self.param("width", self.TypeDouble, "Width", default = 1.0)
+    self.param("height", self.TypeDouble, "Height", default = 1.0)
+    
+  def display_text_impl(self):
+    # provide a descriptive text for the cell
+    return "Box2(L=" + str(self.layer) + ",W=" + ('%.3f' % self.width) + ",H=" + ('%.3f' % self.height) + ")"
+  
+  def produce_impl(self):
+  
+    dbu = self.layout.dbu
+
+    # fetch the parameters
+    l = self.layer_layer
+    w = self.width / self.layout.dbu
+    h = self.height / self.layout.dbu
+    
+    # create the shape
+    self.cell.shapes(l).insert(pya.Box(-w / 2, -h / 2, w / 2, h / 2))
+    
+  def can_create_from_shape_impl(self):
+    return self.shape.is_box()
+
+  def transformation_from_shape_impl(self):
+    return pya.Trans(self.shape.box.center() - pya.Point())
+
+  def parameters_from_shape_impl(self):
+    self.layer = self.layout.get_info(self.layer)
+    self.width = self.shape.box.width() * self.layout.dbu
+    self.height = self.shape.box.height() * self.layout.dbu
+    
+class PCellTestLib2(pya.Library):
+
+  def __init__(self):  
+  
+    # set the description
+    self.description = "PCell test lib2"
+    
+    # create the PCell declarations
+    self.layout().register_pcell("Box2", BoxPCell2())
+
+    # register us with the name "MyLib"
+    self.register("PCellTestLib2")
+
 
 def inspect_LayerInfo(self):
     return "<" + str(self) + ">"
@@ -232,6 +291,75 @@ class DBPCellTests(unittest.TestCase):
     self.assertEqual(ly.begin_shapes(c1.cell_index(), li1).shape().__str__(), "box (-250,-250;250,250)")
     pcell_inst.cell_index = new_id
     self.assertEqual(ly.begin_shapes(c1.cell_index(), li1).shape().__str__(), "box (-500,-100;500,100)")
+
+    l10 = ly.layer(10, 0)
+    c1.shapes(l10).insert(pya.Box(0, 10, 100, 210))
+    l11 = ly.layer(11, 0)
+    c1.shapes(l11).insert(pya.Text("hello", pya.Trans()))
+    self.assertEqual(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l11).shape(), l10), False)
+    self.assertEqual(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10), True)
+    self.assertEqual(repr(pcell_decl.parameters_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10)), "[<10/0>, 1.0, 2.0]")
+    self.assertEqual(str(pcell_decl.transformation_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10)), "r0 50,110")
+
+
+  def test_1a(self):
+
+    # instantiate and register the library
+    tl = PCellTestLib2()
+
+    ly = pya.Layout(True)
+    ly.dbu = 0.01
+
+    li1 = find_layer(ly, "1/0")
+    self.assertEqual(li1 == None, True)
+
+    ci1 = ly.add_cell("c1")
+    c1 = ly.cell(ci1)
+
+    lib = pya.Library.library_by_name("PCellTestLib2")
+    self.assertEqual(lib != None, True)
+    pcell_decl = lib.layout().pcell_declaration("Box2")
+
+    param = [ pya.LayerInfo(1, 0) ]  # rest is filled with defaults
+    pcell_var_id = ly.add_pcell_variant(lib, pcell_decl.id(), param)
+    pcell_var = ly.cell(pcell_var_id)
+    pcell_inst = c1.insert(pya.CellInstArray(pcell_var_id, pya.Trans()))
+    self.assertEqual(pcell_var.basic_name(), "Box2")
+    self.assertEqual(pcell_var.pcell_parameters().__repr__(), "[<1/0>, 1.0, 1.0]")
+    self.assertEqual(pcell_var.display_title(), "PCellTestLib2.Box2(L=1/0,W=1.000,H=1.000)")
+    self.assertEqual(nh(pcell_var.pcell_parameters_by_name()), "{'height': 1.0, 'layer': <1/0>, 'width': 1.0}")
+    self.assertEqual(pcell_var.pcell_parameter("height").__repr__(), "1.0")
+    self.assertEqual(c1.pcell_parameters(pcell_inst).__repr__(), "[<1/0>, 1.0, 1.0]")
+    self.assertEqual(nh(c1.pcell_parameters_by_name(pcell_inst)), "{'height': 1.0, 'layer': <1/0>, 'width': 1.0}")
+    self.assertEqual(c1.pcell_parameter(pcell_inst, "height").__repr__(), "1.0")
+    self.assertEqual(nh(pcell_inst.pcell_parameters_by_name()), "{'height': 1.0, 'layer': <1/0>, 'width': 1.0}")
+    self.assertEqual(pcell_inst["height"].__repr__(), "1.0")
+    self.assertEqual(pcell_inst.pcell_parameter("height").__repr__(), "1.0")
+    self.assertEqual(pcell_var.pcell_declaration().__repr__(), pcell_decl.__repr__())
+    self.assertEqual(c1.pcell_declaration(pcell_inst).__repr__(), pcell_decl.__repr__())
+    self.assertEqual(pcell_inst.pcell_declaration().__repr__(), pcell_decl.__repr__())
+
+    li1 = find_layer(ly, "1/0")
+    self.assertEqual(li1 == None, False)
+    pcell_inst.change_pcell_parameter("height", 2.0)
+    self.assertEqual(nh(pcell_inst.pcell_parameters_by_name()), "{'height': 2.0, 'layer': <1/0>, 'width': 1.0}")
+
+    self.assertEqual(ly.begin_shapes(c1.cell_index(), li1).shape().__str__(), "box (-50,-100;50,100)")
+
+    param = { "layer": pya.LayerInfo(2, 0), "width": 2, "height": 1 }
+    li2 = ly.layer(2, 0)
+    c1.change_pcell_parameters(pcell_inst, param)
+    self.assertEqual(ly.begin_shapes(c1.cell_index(), li2).shape().__str__(), "box (-100,-50;100,50)")
+
+    l10 = ly.layer(10, 0)
+    c1.shapes(l10).insert(pya.Box(0, 10, 100, 210))
+    l11 = ly.layer(11, 0)
+    c1.shapes(l11).insert(pya.Text("hello", pya.Trans()))
+    self.assertEqual(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l11).shape(), l10), False)
+    self.assertEqual(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10), True)
+    self.assertEqual(repr(pcell_decl.parameters_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10)), "[<10/0>, 1.0, 2.0]")
+    self.assertEqual(str(pcell_decl.transformation_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10)), "r0 50,110")
+
 
   def test_2(self):
 

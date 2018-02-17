@@ -26,7 +26,7 @@ class MyPCell(pya.PCellDeclarationHelper):
   def __init__(self):
 
     # Important: initialize the super class
-    super(Circle, self).__init__()
+    super(MyPCell, self).__init__()
 
     # your initialization: add parameters with name, type, description and
     # optional other values
@@ -431,10 +431,11 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     self.shape = shape
     self.layer = layer
     self.parameters_from_shape_impl()
+    param = self.get_values()
     self.layout = None
     self.shape = None
     self.layer = None
-    return self.get_values()
+    return param
   
   def display_text_impl(self):
     """

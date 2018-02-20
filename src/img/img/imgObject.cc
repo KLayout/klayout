@@ -697,12 +697,14 @@ static size_t make_id ()
 Object::Object ()
   : m_trans (1.0), mp_data (0), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
 {
+  m_updates_enabled = false;
   mp_pixel_data = 0;
 }
 
 Object::Object (size_t w, size_t h, const db::DCplxTrans &trans, bool color)
   : m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
 {
+  m_updates_enabled = false;
   mp_pixel_data = 0;
 
   mp_data = new DataHeader (w, h, color, false);

@@ -1035,7 +1035,7 @@ public:
 
   value_type operator* () const
   {
-    return value_type (*(dynamic_cast<const ant::Object *> (m_iter->first->ptr ())), m_services[m_service]->view ());
+    return value_type (*(static_cast<const ant::Object *> (m_iter->first->ptr ())), m_services[m_service]->view ());
   }
 
 private:

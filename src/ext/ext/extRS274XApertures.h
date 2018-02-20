@@ -168,6 +168,7 @@ private:
   double read_atom (tl::Extractor &ex);
   double read_dot_expr (tl::Extractor &ex);
   double read_expr (tl::Extractor &ex, bool length = false);
+  void read_exposure (tl::Extractor &ex, bool &clear, bool &clear_set);
   void do_produce_flash_internal ();
 };
 

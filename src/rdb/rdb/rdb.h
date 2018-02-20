@@ -495,7 +495,7 @@ public:
 
   bool compare (const ValueBase *other) const 
   {
-    return m_value < dynamic_cast<const Value<C> *> (other)->m_value;
+    return m_value < static_cast<const Value<C> *> (other)->m_value;
   }
 
   std::string to_string () const;

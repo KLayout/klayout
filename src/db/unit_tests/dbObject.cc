@@ -58,6 +58,7 @@ struct A : public db::Object
   void redo (db::Op *op) throw ()
   {
     AO *aop = dynamic_cast<AO *> (op);
+    tl_assert (aop != 0);
     x += aop->d;
   }
 
@@ -162,6 +163,7 @@ struct B : public db::Object
   void redo (db::Op *op) throw ()
   {
     BO *bop = dynamic_cast<BO *> (op);
+    tl_assert (bop != 0);
     x += bop->d;
   }
 

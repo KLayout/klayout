@@ -61,6 +61,18 @@ class BoxPCell < RBA::PCellDeclaration
     
   end
 
+  def can_create_from_shape(layout, shape, layer)
+    return shape.is_box?
+  end
+
+  def transformation_from_shape(layout, shape, layer)
+    return RBA::Trans::new(shape.box.center - RBA::Point::new)
+  end
+
+  def parameters_from_shape(layout, shape, layer)
+    return [ layout.get_info(layer), shape.box.width * layout.dbu, shape.box.height * layout.dbu ]
+  end
+    
 end
 
 class PCellTestLib < RBA::Library
@@ -81,6 +93,72 @@ class PCellTestLib < RBA::Library
     # register us with the name "MyLib"
     register("PCellTestLib")
     
+  end
+
+end
+
+# A PCell based on the declaration helper
+
+class BoxPCell2 < RBA::PCellDeclarationHelper
+
+  def initialize
+
+    super()
+
+    param("layer", BoxPCell2::TypeLayer, "Layer", :default => RBA::LayerInfo::new(0, 0))
+    param("width", BoxPCell2::TypeDouble, "Width", :default => 1.0)
+    param("height", BoxPCell2::TypeDouble, "Height", :default => 1.0)
+
+  end
+    
+  def display_text_impl
+    # provide a descriptive text for the cell
+    return "Box2(L=" + layer.to_s + ",W=" + ('%.3f' % width) + ",H=" + ('%.3f' % height) + ")"
+  end
+  
+  def produce_impl
+  
+    # fetch the parameters
+    l = layer_layer
+    w = width / layout.dbu
+    h = height / layout.dbu
+    
+    # create the shape
+    cell.shapes(l).insert(RBA::Box::new(-w / 2, -h / 2, w / 2, h / 2))
+
+  end
+    
+  def can_create_from_shape_impl
+    return self.shape.is_box?
+  end
+
+  def transformation_from_shape_impl
+    return RBA::Trans::new(shape.box.center - RBA::Point::new)
+  end
+
+  def parameters_from_shape_impl
+    # NOTE: because there is one parameter called "layer" already, we need to use
+    # the "_layer" fallback to access the argument to this method
+    set_layer(_layout.get_info(_layer))
+    set_width(shape.box.width * _layout.dbu)
+    set_height(shape.box.height * _layout.dbu)
+  end
+    
+end
+
+class PCellTestLib2 < RBA::Library
+
+  def initialize  
+  
+    # set the description
+    description = "PCell test lib2"
+    
+    # create the PCell declarations
+    layout.register_pcell("Box2", BoxPCell2::new)
+
+    # register us with the name "MyLib"
+    self.register("PCellTestLib2")
+
   end
 
 end
@@ -115,8 +193,7 @@ class DBPCell_TestClass < TestBase
       ly = RBA::Layout::new(true)
       ly.dbu = 0.01
 
-      li1 = ly.layer_indices.find { |li| ly.get_info(li).to_s == "1/0" }
-      assert_equal(li1 == nil, true)
+      li1 = ly.layer(1, 0)
 
       ci1 = ly.add_cell("c1")
       c1 = ly.cell(ci1)
@@ -241,10 +318,84 @@ class DBPCell_TestClass < TestBase
       pcell_inst.cell_index = new_id
       assert_equal(ly.begin_shapes(c1.cell_index, li1).shape.to_s, "box (-500,-100;500,100)")
 
-#ly.destroy
+      l10 = ly.layer(10, 0)
+      c1.shapes(l10).insert(RBA::Box::new(0, 10, 100, 210))
+      l11 = ly.layer(11, 0)
+      c1.shapes(l11).insert(RBA::Text::new("hello", RBA::Trans::new))
+      assert_equal(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l11).shape(), l10), false)
+      assert_equal(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10), true)
+      assert_equal(pcell_decl.parameters_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10).inspect, "[<10/0>, 1.0, 2.0]")
+      assert_equal(pcell_decl.transformation_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10).to_s, "r0 50,110")
+
+      ly.destroy
 
     ensure
-#tl.delete
+      tl.delete
+    end
+    
+  end
+
+  def test_1a
+
+    # instantiate and register the library
+    tl = PCellTestLib2::new
+
+    begin
+
+      ly = RBA::Layout::new(true)
+      ly.dbu = 0.01
+
+      ci1 = ly.add_cell("c1")
+      c1 = ly.cell(ci1)
+
+      lib = RBA::Library.library_by_name("PCellTestLib2")
+      assert_equal(lib != nil, true)
+      pcell_decl = lib.layout().pcell_declaration("Box2")
+
+      param = [ RBA::LayerInfo::new(1, 0) ]  # rest is filled with defaults
+      pcell_var_id = ly.add_pcell_variant(lib, pcell_decl.id(), param)
+      pcell_var = ly.cell(pcell_var_id)
+      pcell_inst = c1.insert(RBA::CellInstArray::new(pcell_var_id, RBA::Trans::new))
+      assert_equal(pcell_var.basic_name, "Box2")
+      assert_equal(pcell_var.pcell_parameters().inspect, "[<1/0>, 1.0, 1.0]")
+      assert_equal(pcell_var.display_title(), "PCellTestLib2.Box2(L=1/0,W=1.000,H=1.000)")
+      assert_equal(norm_hash(pcell_var.pcell_parameters_by_name()), "{\"height\"=>1.0, \"layer\"=><1/0>, \"width\"=>1.0}")
+      assert_equal(pcell_var.pcell_parameter("height").inspect(), "1.0")
+      assert_equal(c1.pcell_parameters(pcell_inst).inspect(), "[<1/0>, 1.0, 1.0]")
+      assert_equal(norm_hash(c1.pcell_parameters_by_name(pcell_inst)), "{\"height\"=>1.0, \"layer\"=><1/0>, \"width\"=>1.0}")
+      assert_equal(c1.pcell_parameter(pcell_inst, "height").inspect(), "1.0")
+      assert_equal(norm_hash(pcell_inst.pcell_parameters_by_name()), "{\"height\"=>1.0, \"layer\"=><1/0>, \"width\"=>1.0}")
+      assert_equal(pcell_inst["height"].inspect(), "1.0")
+      assert_equal(pcell_inst.pcell_parameter("height").inspect(), "1.0")
+      assert_equal(pcell_var.pcell_declaration().inspect(), pcell_decl.inspect)
+      assert_equal(c1.pcell_declaration(pcell_inst).inspect(), pcell_decl.inspect)
+      assert_equal(pcell_inst.pcell_declaration().inspect(), pcell_decl.inspect)
+
+      li1 = ly.layer(1, 0)
+      assert_equal(li1 == nil, false)
+      pcell_inst.change_pcell_parameter("height", 2.0)
+      assert_equal(norm_hash(pcell_inst.pcell_parameters_by_name()), "{\"height\"=>2.0, \"layer\"=><1/0>, \"width\"=>1.0}")
+
+      assert_equal(ly.begin_shapes(c1.cell_index(), li1).shape().to_s, "box (-50,-100;50,100)")
+
+      param = { "layer" => RBA::LayerInfo::new(2, 0), "width" => 2, "height" => 1 }
+      li2 = ly.layer(2, 0)
+      c1.change_pcell_parameters(pcell_inst, param)
+      assert_equal(ly.begin_shapes(c1.cell_index(), li2).shape().to_s, "box (-100,-50;100,50)")
+
+      l10 = ly.layer(10, 0)
+      c1.shapes(l10).insert(RBA::Box::new(0, 10, 100, 210))
+      l11 = ly.layer(11, 0)
+      c1.shapes(l11).insert(RBA::Text::new("hello", RBA::Trans::new))
+      assert_equal(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l11).shape(), l10), false)
+      assert_equal(pcell_decl.can_create_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10), true)
+      assert_equal(pcell_decl.parameters_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10).inspect, "[<10/0>, 1.0, 2.0]")
+      assert_equal(pcell_decl.transformation_from_shape(ly, ly.begin_shapes(c1.cell_index(), l10).shape(), l10).to_s, "r0 50,110")
+
+      ly.destroy
+
+    ensure
+      tl.delete
     end
     
   end

@@ -211,10 +211,12 @@ ProgressReporter::set_visible (bool vis)
     //  actual operation
     tl::DeferredMethodScheduler::enable (!vis);
 
-    if (!vis) {
-      mp_pb->progress_remove_widget ();
-    } else if (mp_pb->progress_wants_widget () && mp_objects.front ()) {
-      mp_pb->progress_add_widget (mp_objects.front ()->progress_widget ());
+    if (mp_pb) {
+      if (!vis) {
+        mp_pb->progress_remove_widget ();
+      } else if (mp_pb->progress_wants_widget () && mp_objects.front ()) {
+        mp_pb->progress_add_widget (mp_objects.front ()->progress_widget ());
+      }
     }
 
     m_pw_visible = vis;

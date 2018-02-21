@@ -343,7 +343,6 @@ Object::class_name () const
 void 
 Object::from_string (const char *s)
 {
-printf("@@@ %s\n", s); fflush(stdout);
   tl::Extractor ex (s);
   while (! ex.at_end ()) {
 

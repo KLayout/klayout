@@ -607,11 +607,30 @@ RS274XMacroAperture::do_produce_flash ()
   }
 }
 
+void
+RS274XMacroAperture::read_exposure (tl::Extractor &ex, bool &clear, bool &clear_set)
+{
+  int pol = int (floor (read_expr (ex) + 0.5));
+
+  if (pol == 0) {
+    clear = true;
+  } else if (pol == 1) {
+    clear = false;
+  } else if (pol == 2) {
+    clear = !clear_set || !clear;
+  } else {
+    throw tl::Exception (tl::to_string (QObject::tr ("Invalid exposure code '%d'")), pol);
+  }
+
+  clear_set = true;
+}
+
 void 
 RS274XMacroAperture::do_produce_flash_internal ()
 {
   tl::Extractor ex (m_def.c_str ());
   bool clear = false;
+  bool clear_set = false;
 
   while (! ex.at_end ()) {
 
@@ -640,18 +659,7 @@ RS274XMacroAperture::do_produce_flash_internal ()
       if (code == 1) {
 
         ex.expect (",");
-        int pol = (read_expr (ex) > 0.5);
-
-        if (pol == 0) {
-          clear = true;
-        } else if (pol == 1) {
-          clear = false;
-        } else if (pol == 2) {
-          clear = !clear;
-        } else {
-          throw tl::Exception (tl::to_string (QObject::tr ("Invalid exposure code '%d'")), pol);
-        }
-
+        read_exposure (ex, clear, clear_set);
         ex.expect (",");
         double d = read_expr (ex, true);
         ex.expect (",");
@@ -670,18 +678,7 @@ RS274XMacroAperture::do_produce_flash_internal ()
       } else if (code == 2 || code == 20) {
 
         ex.expect (",");
-        int pol = (read_expr (ex) > 0.5);
-
-        if (pol == 0) {
-          clear = true;
-        } else if (pol == 1) {
-          clear = false;
-        } else if (pol == 2) {
-          clear = !clear;
-        } else {
-          throw tl::Exception (tl::to_string (QObject::tr ("Invalid exposure code '%d'")), pol);
-        }
-
+        read_exposure (ex, clear, clear_set);
         ex.expect (",");
         double w = read_expr (ex, true);
         ex.expect (",");
@@ -723,18 +720,7 @@ RS274XMacroAperture::do_produce_flash_internal ()
       } else if (code == 21 || code == 22) {
 
         ex.expect (",");
-        int pol = (read_expr (ex) > 0.5);
-
-        if (pol == 0) {
-          clear = true;
-        } else if (pol == 1) {
-          clear = false;
-        } else if (pol == 2) {
-          clear = !clear;
-        } else {
-          throw tl::Exception (tl::to_string (QObject::tr ("Invalid exposure code '%d'")), pol);
-        }
-
+        read_exposure (ex, clear, clear_set);
         ex.expect (",");
         double w = read_expr (ex, true);
         ex.expect (",");
@@ -766,18 +752,7 @@ RS274XMacroAperture::do_produce_flash_internal ()
       } else if (code == 4) {
 
         ex.expect (",");
-        int pol = (read_expr (ex) > 0.5);
-
-        if (pol == 0) {
-          clear = true;
-        } else if (pol == 1) {
-          clear = false;
-        } else if (pol == 2) {
-          clear = !clear;
-        } else {
-          throw tl::Exception (tl::to_string (QObject::tr ("Invalid exposure code '%d'")), pol);
-        }
-
+        read_exposure (ex, clear, clear_set);
         ex.expect (",");
         int n = int (read_expr (ex) + 0.5);
         if (n < 1) {
@@ -854,18 +829,7 @@ RS274XMacroAperture::do_produce_flash_internal ()
       } else if (code == 5) {
 
         ex.expect (",");
-        int pol = (read_expr (ex) > 0.5);
-
-        if (pol == 0) {
-          clear = true;
-        } else if (pol == 1) {
-          clear = false;
-        } else if (pol == 2) {
-          clear = !clear;
-        } else {
-          throw tl::Exception (tl::to_string (QObject::tr ("Invalid exposure code '%d'")), pol);
-        }
-
+        read_exposure (ex, clear, clear_set);
         ex.expect (",");
         int n = int (read_expr (ex) + 0.5);
         if (n < 3) {

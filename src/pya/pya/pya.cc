@@ -1945,7 +1945,11 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
 
   if (meth->is_signal ()) {
 
-    if (PyObject_IsInstance (value, (PyObject *) PYASignal::cls)) {
+    if (!p) {
+
+      //  TODO: Static signals?
+
+    } else if (PyObject_IsInstance (value, (PyObject *) PYASignal::cls)) {
 
       //  assigning a signal to a signal works if it applies to the same handler -
       //  this simplifies the implementation of += and -=.

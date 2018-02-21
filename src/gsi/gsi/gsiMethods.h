@@ -524,7 +524,6 @@ private:
   ArgType m_ret_type;
   bool m_const : 1;
   bool m_static : 1;
-  bool m_is_predicate : 1;
   bool m_protected : 1;
   unsigned int m_argsize;
   std::vector<MethodSynonym> m_method_synonyms;

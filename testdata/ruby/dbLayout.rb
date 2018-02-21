@@ -488,443 +488,415 @@ END
 
   def test_5a
 
-    if RBA::Application::instance.is_editable?
+    # delete_cell
+   
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
+    assert_equal(c0.is_empty?, true)
 
-      # delete_cell
-     
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
-      assert_equal(c0.is_empty?, true)
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(c0.is_empty?, false)
 
-      tt = RBA::Trans.new
-      c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
-      assert_equal(c0.is_empty?, false)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
+    c0_index = c0.cell_index
+    assert_equal(l.is_valid_cell_index?(c0_index), true)
+    l.delete_cell(c0.cell_index)
+    assert_equal(l.is_valid_cell_index?(c0_index), false)
 
-      c0_index = c0.cell_index
-      assert_equal(l.is_valid_cell_index?(c0_index), true)
-      l.delete_cell(c0.cell_index)
-      assert_equal(l.is_valid_cell_index?(c0_index), false)
+    assert_equal(collect_hier(l), "[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c2)(C=)");
+    assert_equal(c3.is_empty?, true)
 
-      assert_equal(collect_hier(l), "[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c2)(C=)");
-      assert_equal(c3.is_empty?, true)
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
+    assert_equal(c0.is_empty?, true)
 
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
-      assert_equal(c0.is_empty?, true)
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(c0.is_empty?, false)
 
-      tt = RBA::Trans.new
-      c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
-      assert_equal(c0.is_empty?, false)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
+    c0_index = c0.cell_index
+    assert_equal(l.is_valid_cell_index?(c0_index), true)
+    l.cell(c0_index).delete
+    assert_equal(l.is_valid_cell_index?(c0_index), false)
 
-      c0_index = c0.cell_index
-      assert_equal(l.is_valid_cell_index?(c0_index), true)
-      l.cell(c0_index).delete
-      assert_equal(l.is_valid_cell_index?(c0_index), false)
-
-      assert_equal(collect_hier(l), "[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c2)(C=)");
-      assert_equal(c3.is_empty?, true)
-
-    end
+    assert_equal(collect_hier(l), "[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c2)(C=)");
+    assert_equal(c3.is_empty?, true)
 
   end
 
   def test_5b
 
-    if RBA::Application::instance.is_editable?
+    # delete_cells
+   
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      # delete_cells
-     
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+    assert_equal(c0.is_empty?, false)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
-      assert_equal(c0.is_empty?, false)
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
+    c0_index = c0.cell_index
+    c2_index = c2.cell_index
 
-      c0_index = c0.cell_index
-      c2_index = c2.cell_index
+    ll = l.dup
 
-      ll = l.dup
+    l.delete_cells([c0_index, c2_index])
+    assert_equal(collect_hier(l), "[c1](P=)(C=)/[c3](P=)(C=)");
 
-      l.delete_cells([c0_index, c2_index])
-      assert_equal(collect_hier(l), "[c1](P=)(C=)/[c3](P=)(C=)");
-
-      l = ll
-      # Hint: even though we deleted c0 and c2, their indices are still valid
-      l.delete_cells([c2_index, c0_index])
-      assert_equal(collect_hier(l), "[c1](P=)(C=)/[c3](P=)(C=)");
-
-    end
+    l = ll
+    # Hint: even though we deleted c0 and c2, their indices are still valid
+    l.delete_cells([c2_index, c0_index])
+    assert_equal(collect_hier(l), "[c1](P=)(C=)/[c3](P=)(C=)");
 
   end
 
   def test_5d
 
-    # TODO: undo tests crashes in non-editable mode! Should be checked properly.
-    if RBA::Application::instance.is_editable?
+    # prune_cell
+   
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      # prune_cell
-     
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
+    c0_index = c0.cell_index
+    c2_index = c2.cell_index
 
-      c0_index = c0.cell_index
-      c2_index = c2.cell_index
+    ll = l.dup
 
-      ll = l.dup
+    l.prune_cell(c0_index, -1)
+    assert_equal(collect_hier(l), "");
 
-      l.prune_cell(c0_index, -1)
-      assert_equal(collect_hier(l), "");
+    l = ll
+    ll = l.dup
+    # Hint: even though we deleted c0 and c2, their indices are still valid
+    l.prune_cell(c2_index, -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c3)/[c1](P=c0)(C=)/[c3](P=c0)(C=)");
 
-      l = ll
-      ll = l.dup
-      # Hint: even though we deleted c0 and c2, their indices are still valid
-      l.prune_cell(c2_index, -1)
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c3)/[c1](P=c0)(C=)/[c3](P=c0)(C=)");
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
+    c0_index = c0.cell_index
+    c2_index = c2.cell_index
 
-      c0_index = c0.cell_index
-      c2_index = c2.cell_index
+    ll = l.dup
 
-      ll = l.dup
+    l.cell(c0_index).prune_cell
+    assert_equal(collect_hier(l), "");
 
-      l.cell(c0_index).prune_cell
-      assert_equal(collect_hier(l), "");
-
-      l = ll
-      ll = l.dup
-      # Hint: even though we deleted c0 and c2, their indices are still valid
-      l.cell(c2_index).prune_cell(-1)
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c3)/[c1](P=c0)(C=)/[c3](P=c0)(C=)");
-
-    end
+    l = ll
+    ll = l.dup
+    # Hint: even though we deleted c0 and c2, their indices are still valid
+    l.cell(c2_index).prune_cell(-1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c3)/[c1](P=c0)(C=)/[c3](P=c0)(C=)");
 
   end
 
   def test_5e
 
-    # TODO: undo tests crashes in non-editable mode! Should be checked properly.
-    if RBA::Application::instance.is_editable?
+    # delete_cell_rec
+   
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      # delete_cell_rec
-     
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
+    c0_index = c0.cell_index
+    c2_index = c2.cell_index
 
-      c0_index = c0.cell_index
-      c2_index = c2.cell_index
+    ll = l.dup
 
-      ll = l.dup
+    l.delete_cell_rec(c0_index)
+    assert_equal(collect_hier(l), "");
 
-      l.delete_cell_rec(c0_index)
-      assert_equal(collect_hier(l), "");
-
-      l = ll
-      ll = l.dup
-      # Hint: even though we deleted c0 and c2, their indices are still valid
-      l.delete_cell_rec(c2_index)
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1)/[c1](P=c0)(C=)");
-
-    end
+    l = ll
+    ll = l.dup
+    # Hint: even though we deleted c0 and c2, their indices are still valid
+    l.delete_cell_rec(c2_index)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1)/[c1](P=c0)(C=)");
 
   end
 
   def test_5f
 
-    # TODO: undo tests crashes in non-editable mode! Should be checked properly.
-    if RBA::Application::instance.is_editable?
+    # delete_cell_rec
+   
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      # delete_cell_rec
-     
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    c0_index = c0.cell_index
+    c2_index = c2.cell_index
 
-      c0_index = c0.cell_index
-      c2_index = c2.cell_index
+    ii = l.begin_shapes(c0_index, 0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)");
 
-      ii = l.begin_shapes(c0_index, 0);
-      assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)");
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
+    ll = l.dup
 
-      ll = l.dup
+    l.flatten(c0_index, -1, false)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)/[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c2)(C=)");
 
-      l.flatten(c0_index, -1, false)
-      assert_equal(collect_hier(l), "[c0](P=)(C=)/[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c2)(C=)");
+    ii = l.begin_shapes(c0_index, 0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](1200,0;2200,1100)/[c0](-1200,0;-100,1000)");
 
-      ii = l.begin_shapes(c0_index, 0);
-      assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](1200,0;2200,1100)/[c0](-1200,0;-100,1000)");
+    l = ll
+    ll = l.dup
+    l.flatten(c0_index, -1, true)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
 
-      l = ll
-      ll = l.dup
-      l.flatten(c0_index, -1, true)
-      assert_equal(collect_hier(l), "[c0](P=)(C=)");
+    ii = l.begin_shapes(c0_index, 0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](1200,0;2200,1100)/[c0](-1200,0;-100,1000)");
 
-      ii = l.begin_shapes(c0_index, 0);
-      assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](1200,0;2200,1100)/[c0](-1200,0;-100,1000)");
+    l = ll
+    ll = l.dup
+    l.flatten(c0_index, 0, false)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      l = ll
-      ll = l.dup
-      l.flatten(c0_index, 0, false)
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
+    ii = l.begin_shapes(c0_index, 0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)");
 
-      ii = l.begin_shapes(c0_index, 0);
-      assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)");
+    l = ll
+    ll = l.dup
+    l.flatten(c0_index, 1, false)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c3)/[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      l = ll
-      ll = l.dup
-      l.flatten(c0_index, 1, false)
-      assert_equal(collect_hier(l), "[c0](P=)(C=c3)/[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c0,c2)(C=)");
+    ii = l.begin_shapes(c0_index, 0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](-1200,0;-100,1000)/[c3](1200,0;2200,1100)");
 
-      ii = l.begin_shapes(c0_index, 0);
-      assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](-1200,0;-100,1000)/[c3](1200,0;2200,1100)");
+    l = ll
+    ll = l.dup
+    l.flatten(c0_index, 1, true)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c3)/[c3](P=c0)(C=)");
 
-      l = ll
-      ll = l.dup
-      l.flatten(c0_index, 1, true)
-      assert_equal(collect_hier(l), "[c0](P=)(C=c3)/[c3](P=c0)(C=)");
+    l = ll
+    ll = l.dup
 
-      l = ll
-      ll = l.dup
+    l.cell(c0_index).flatten(false)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)/[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c2)(C=)");
 
-      l.cell(c0_index).flatten(false)
-      assert_equal(collect_hier(l), "[c0](P=)(C=)/[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c2)(C=)");
+    ii = l.begin_shapes(c0_index, 0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](1200,0;2200,1100)/[c0](-1200,0;-100,1000)");
 
-      ii = l.begin_shapes(c0_index, 0);
-      assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](1200,0;2200,1100)/[c0](-1200,0;-100,1000)");
+    l = ll
+    ll = l.dup
+    l.cell(c0_index).flatten(true)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
 
-      l = ll
-      ll = l.dup
-      l.cell(c0_index).flatten(true)
-      assert_equal(collect_hier(l), "[c0](P=)(C=)");
+    ii = l.begin_shapes(c0_index, 0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](1200,0;2200,1100)/[c0](-1200,0;-100,1000)");
 
-      ii = l.begin_shapes(c0_index, 0);
-      assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](1200,0;2200,1100)/[c0](-1200,0;-100,1000)");
+    l = ll
+    ll = l.dup
+    l.cell(c0_index).flatten(0, false)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      l = ll
-      ll = l.dup
-      l.cell(c0_index).flatten(0, false)
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
+    ii = l.begin_shapes(c0_index, 0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)");
 
-      ii = l.begin_shapes(c0_index, 0);
-      assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)");
+    l = ll
+    ll = l.dup
+    l.cell(c0_index).flatten(1, false)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c3)/[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      l = ll
-      ll = l.dup
-      l.cell(c0_index).flatten(1, false)
-      assert_equal(collect_hier(l), "[c0](P=)(C=c3)/[c1](P=)(C=)/[c2](P=)(C=c3)/[c3](P=c0,c2)(C=)");
+    ii = l.begin_shapes(c0_index, 0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](-1200,0;-100,1000)/[c3](1200,0;2200,1100)");
 
-      ii = l.begin_shapes(c0_index, 0);
-      assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](-1200,0;-100,1000)/[c3](1200,0;2200,1100)");
+    l = ll
+    ll = l.dup
+    l.cell(c0_index).flatten(1, true)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c3)/[c3](P=c0)(C=)");
 
-      l = ll
-      ll = l.dup
-      l.cell(c0_index).flatten(1, true)
-      assert_equal(collect_hier(l), "[c0](P=)(C=c3)/[c3](P=c0)(C=)");
+    ii = l.cell(c0_index).begin_shapes_rec(0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](-1200,0;-100,1000)/[c3](1200,0;2200,1100)");
 
-      ii = l.cell(c0_index).begin_shapes_rec(0);
-      assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](-1200,0;-100,1000)/[c3](1200,0;2200,1100)");
-
-      ii = l.cell(c0_index).begin_shapes_rec(0);
-      assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](-1200,0;-100,1000)/[c3](1200,0;2200,1100)");
-
-    end
+    ii = l.cell(c0_index).begin_shapes_rec(0);
+    assert_equal(collect(ii, l), "[c0](0,100;1000,1200)/[c0](0,100;1000,1200)/[c0](100,0;1100,1100)/[c0](-1200,0;-100,1000)/[c3](1200,0;2200,1100)");
 
   end
 
   def test_5g
 
-    # TODO: undo tests crashes in non-editable mode! Should be checked properly.
-    if RBA::Application::instance.is_editable?
+    # prune_subcells
+   
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      # prune_subcells
-     
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
+    c0_index = c0.cell_index
+    c2_index = c2.cell_index
 
-      c0_index = c0.cell_index
-      c2_index = c2.cell_index
+    ll = l.dup
 
-      ll = l.dup
+    l.prune_subcells(c0_index, -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
 
-      l.prune_subcells(c0_index, -1)
-      assert_equal(collect_hier(l), "[c0](P=)(C=)");
+    l = ll
+    ll = l.dup
+    # Hint: even though we deleted c0 and c2, their indices are still valid
+    l.prune_subcells(c2_index, -1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=)/[c3](P=c0)(C=)");
 
-      l = ll
-      ll = l.dup
-      # Hint: even though we deleted c0 and c2, their indices are still valid
-      l.prune_subcells(c2_index, -1)
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=)/[c3](P=c0)(C=)");
+    l = ll
+    # Hint: even though we deleted c0 and c2, their indices are still valid
+    l.prune_subcells(c0_index, 1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
 
-      l = ll
-      # Hint: even though we deleted c0 and c2, their indices are still valid
-      l.prune_subcells(c0_index, 1)
-      assert_equal(collect_hier(l), "[c0](P=)(C=)");
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
 
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=c3)/[c3](P=c0,c2)(C=)");
+    c0_index = c0.cell_index
+    c2_index = c2.cell_index
 
-      c0_index = c0.cell_index
-      c2_index = c2.cell_index
+    ll = l.dup
 
-      ll = l.dup
+    l.cell(c0_index).prune_subcells
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
 
-      l.cell(c0_index).prune_subcells
-      assert_equal(collect_hier(l), "[c0](P=)(C=)");
+    l = ll
+    ll = l.dup
+    # Hint: even though we deleted c0 and c2, their indices are still valid
+    l.cell(c2_index).prune_subcells
+    assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=)/[c3](P=c0)(C=)");
 
-      l = ll
-      ll = l.dup
-      # Hint: even though we deleted c0 and c2, their indices are still valid
-      l.cell(c2_index).prune_subcells
-      assert_equal(collect_hier(l), "[c0](P=)(C=c1,c2,c3)/[c1](P=c0)(C=)/[c2](P=c0)(C=)/[c3](P=c0)(C=)");
-
-      l = ll
-      # Hint: even though we deleted c0 and c2, their indices are still valid
-      l.cell(c0_index).prune_subcells(1)
-      assert_equal(collect_hier(l), "[c0](P=)(C=)");
-
-    end
+    l = ll
+    # Hint: even though we deleted c0 and c2, their indices are still valid
+    l.cell(c0_index).prune_subcells(1)
+    assert_equal(collect_hier(l), "[c0](P=)(C=)");
 
   end
 
@@ -1218,84 +1190,80 @@ END
 
     # copy shapes between cells
    
-    if RBA::Application::instance.is_editable?
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+    b = RBA::Box.new(1, 101, 1001, 1201)
+    s = c0.shapes(1).insert(b)
+    s.set_property("p", 17)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
-      b = RBA::Box.new(1, 101, 1001, 1201)
-      s = c0.shapes(1).insert(b)
-      s.set_property("p", 17)
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
 
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
+    c0c = l.cell(l.add_cell("c0"))
+    c0c.copy_shapes(c0)
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)")
+    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
+    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+     
+    c0c.clear
+    lm = RBA::LayerMapping::new
+    lm.map(1, 0)
+    c0c.copy_shapes(c0, lm)
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
+    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
+    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
 
-      c0c = l.cell(l.add_cell("c0"))
-      c0c.copy_shapes(c0)
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)")
-      assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-      assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
-       
-      c0c.clear
-      lm = RBA::LayerMapping::new
-      lm.map(1, 0)
-      c0c.copy_shapes(c0, lm)
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
-      assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
-      assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
+    l2 = RBA::Layout::new
+    l2.dbu = 0.0005
+    c0c = l2.cell(l2.add_cell("c0"))
 
-      l2 = RBA::Layout::new
-      l2.dbu = 0.0005
-      c0c = l2.cell(l2.add_cell("c0"))
+    c0c.copy_shapes(c0)
+    layer1 = l2.find_layer(1, 0)
+    layer2 = l2.find_layer(2, 0)
+    assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
+    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
+    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
 
-      c0c.copy_shapes(c0)
-      layer1 = l2.find_layer(1, 0)
-      layer2 = l2.find_layer(2, 0)
-      assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
-      assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-      assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
+    l2 = RBA::Layout::new
+    l2.dbu = 0.0005
+    c0c = l2.cell(l2.add_cell("c0"))
 
-      l2 = RBA::Layout::new
-      l2.dbu = 0.0005
-      c0c = l2.cell(l2.add_cell("c0"))
+    lm = RBA::LayerMapping::new
+    lm.create(l2, l)
+    layer1 = l2.find_layer(1, 0)
+    assert_equal(layer1, nil)
+    layer2 = l2.find_layer(2, 0)
+    assert_equal(layer2, nil)
 
-      lm = RBA::LayerMapping::new
-      lm.create(l2, l)
-      layer1 = l2.find_layer(1, 0)
-      assert_equal(layer1, nil)
-      layer2 = l2.find_layer(2, 0)
-      assert_equal(layer2, nil)
+    lm.create_full(l2, l)
 
-      lm.create_full(l2, l)
-
-      c0c.copy_shapes(c0, lm)
-      layer1 = l2.find_layer(1, 0)
-      layer2 = l2.find_layer(2, 0)
-      assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
-      assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-      assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
-
-    end 
+    c0c.copy_shapes(c0, lm)
+    layer1 = l2.find_layer(1, 0)
+    layer2 = l2.find_layer(2, 0)
+    assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
+    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
+    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
 
   end
 
@@ -1303,104 +1271,100 @@ END
 
     # move shapes between cells
    
-    if RBA::Application::instance.is_editable?
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+    b = RBA::Box.new(1, 101, 1001, 1201)
+    s = c0.shapes(1).insert(b)
+    s.set_property("p", 17)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
-      b = RBA::Box.new(1, 101, 1001, 1201)
-      s = c0.shapes(1).insert(b)
-      s.set_property("p", 17)
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    ll = l.dup
 
-      ll = l.dup
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
 
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
+    c0c = l.cell(l.add_cell("c0"))
+    c0c.move_shapes(c0)
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "")
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)")
+    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
+    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+    c0.move_shapes(c0c)
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "")
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
+     
+    lm = RBA::LayerMapping::new
+    lm.map(1, 0)
+    c0c.move_shapes(c0, lm)
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "")
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
+    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
+    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
 
-      c0c = l.cell(l.add_cell("c0"))
-      c0c.move_shapes(c0)
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "")
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)")
-      assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-      assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
-      c0.move_shapes(c0c)
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "")
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
-       
-      lm = RBA::LayerMapping::new
-      lm.map(1, 0)
-      c0c.move_shapes(c0, lm)
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "")
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
-      assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
-      assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
+    l = ll.dup
+    c0 = l.cell("c0")
 
-      l = ll.dup
-      c0 = l.cell("c0")
+    l2 = RBA::Layout::new
+    l2.dbu = 0.0005
+    c0c = l2.cell(l2.add_cell("c0"))
 
-      l2 = RBA::Layout::new
-      l2.dbu = 0.0005
-      c0c = l2.cell(l2.add_cell("c0"))
+    c0c.move_shapes(c0)
+    layer1 = l2.find_layer(1, 0)
+    layer2 = l2.find_layer(2, 0)
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "")
+    assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
+    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
+    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
 
-      c0c.move_shapes(c0)
-      layer1 = l2.find_layer(1, 0)
-      layer2 = l2.find_layer(2, 0)
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "")
-      assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
-      assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-      assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
+    l = ll.dup
+    c0 = l.cell("c0")
 
-      l = ll.dup
-      c0 = l.cell("c0")
+    l2 = RBA::Layout::new
+    l2.dbu = 0.0005
+    c0c = l2.cell(l2.add_cell("c0"))
 
-      l2 = RBA::Layout::new
-      l2.dbu = 0.0005
-      c0c = l2.cell(l2.add_cell("c0"))
+    lm = RBA::LayerMapping::new
+    lm.create(l2, l)
+    layer1 = l2.find_layer(1, 0)
+    assert_equal(layer1, nil)
+    layer2 = l2.find_layer(2, 0)
+    assert_equal(layer2, nil)
 
-      lm = RBA::LayerMapping::new
-      lm.create(l2, l)
-      layer1 = l2.find_layer(1, 0)
-      assert_equal(layer1, nil)
-      layer2 = l2.find_layer(2, 0)
-      assert_equal(layer2, nil)
+    lm.create_full(l2, l)
 
-      lm.create_full(l2, l)
-
-      c0c.move_shapes(c0, lm)
-      layer1 = l2.find_layer(1, 0)
-      layer2 = l2.find_layer(2, 0)
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "")
-      assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
-      assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-      assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
-
-    end 
+    c0c.move_shapes(c0, lm)
+    layer1 = l2.find_layer(1, 0)
+    layer2 = l2.find_layer(2, 0)
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c1](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "")
+    assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)")
+    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
+    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
 
   end
 
@@ -1408,55 +1372,51 @@ END
 
     # copy instances between cells
    
-    if RBA::Application::instance.is_editable?
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+    b = RBA::Box.new(1, 101, 1001, 1201)
+    s = c0.shapes(1).insert(b)
+    s.set_property("p", 17)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
-      b = RBA::Box.new(1, 101, 1001, 1201)
-      s = c0.shapes(1).insert(b)
-      s.set_property("p", 17)
+    tt = RBA::Trans.new
+    i0 = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    i0.set_property("p", 17)
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      i0 = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      i0.set_property("p", 17)
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
 
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
+    c0c = l.cell(l.add_cell("c0"))
+    c0c.copy_instances(c0)
+    i0 = nil
+    c0c.each_inst { |i| i.cell_index == c1.cell_index && i0 = i }
+    assert_equal(i0.property("p"), 17)
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
 
-      c0c = l.cell(l.add_cell("c0"))
+    l2 = RBA::Layout::new
+    l2.dbu = 0.0005
+    c0c = l2.cell(l2.add_cell("c0"))
+    err = false
+    begin
       c0c.copy_instances(c0)
-      i0 = nil
-      c0c.each_inst { |i| i.cell_index == c1.cell_index && i0 = i }
-      assert_equal(i0.property("p"), 17)
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
-
-      l2 = RBA::Layout::new
-      l2.dbu = 0.0005
-      c0c = l2.cell(l2.add_cell("c0"))
-      err = false
-      begin
-        c0c.copy_instances(c0)
-      rescue => ex
-        err = true
-      end
-      assert_equal(err, true)
-
-    end 
+    rescue => ex
+      err = true
+    end
+    assert_equal(err, true)
 
   end
 
@@ -1464,57 +1424,53 @@ END
 
     # move instances between cells
    
-    if RBA::Application::instance.is_editable?
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+    b = RBA::Box.new(1, 101, 1001, 1201)
+    s = c0.shapes(1).insert(b)
+    s.set_property("p", 17)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
-      b = RBA::Box.new(1, 101, 1001, 1201)
-      s = c0.shapes(1).insert(b)
-      s.set_property("p", 17)
+    tt = RBA::Trans.new
+    i0 = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    i0.set_property("p", 17)
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      i0 = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      i0.set_property("p", 17)
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
 
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
+    c0c = l.cell(l.add_cell("c0"))
+    c0c.move_instances(c0)
+    i0 = nil
+    c0c.each_inst { |i| i.cell_index == c1.cell_index && i0 = i }
+    assert_equal(i0.property("p"), 17)
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
 
-      c0c = l.cell(l.add_cell("c0"))
-      c0c.move_instances(c0)
-      i0 = nil
-      c0c.each_inst { |i| i.cell_index == c1.cell_index && i0 = i }
-      assert_equal(i0.property("p"), 17)
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
-
-      l2 = RBA::Layout::new
-      l2.dbu = 0.0005
-      c0c = l2.cell(l2.add_cell("c0"))
-      err = false
-      begin
-        c0c.copy_instances(c0)
-      rescue => ex
-        err = true
-      end
-      assert_equal(err, true)
-
-    end 
+    l2 = RBA::Layout::new
+    l2.dbu = 0.0005
+    c0c = l2.cell(l2.add_cell("c0"))
+    err = false
+    begin
+      c0c.copy_instances(c0)
+    rescue => ex
+      err = true
+    end
+    assert_equal(err, true)
 
   end
 
@@ -1522,62 +1478,58 @@ END
 
     # copy cell tree
    
-    if RBA::Application::instance.is_editable?
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    s = c1.shapes(0).insert(b)
+    s.set_property("p", 17)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+    b = RBA::Box.new(1, 101, 1001, 1201)
+    c0.shapes(1).insert(b)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      s = c1.shapes(0).insert(b)
-      s.set_property("p", 17)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
-      b = RBA::Box.new(1, 101, 1001, 1201)
-      c0.shapes(1).insert(b)
+    tt = RBA::Trans.new
+    i0 = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    i0.set_property("p", 18)
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      i0 = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      i0.set_property("p", 18)
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
 
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
+    c0c = l.cell(l.add_cell("c0"))
+    c0c.copy_tree(c0)
 
-      c0c = l.cell(l.add_cell("c0"))
-      c0c.copy_tree(c0)
+    i0 = nil
+    c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
+    assert_equal(i0.property("p"), 18)
+    assert_equal(l.cell("c1$1").begin_shapes_rec(0).shape.property("p"), 17)
 
-      i0 = nil
-      c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
-      assert_equal(i0.property("p"), 18)
-      assert_equal(l.cell("c1$1").begin_shapes_rec(0).shape.property("p"), 17)
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
 
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
+    l2 = RBA::Layout::new
+    l2.dbu = 0.0005
+    c0c = l2.cell(l2.add_cell("c0"))
+    c0c.copy_tree(c0)
 
-      l2 = RBA::Layout::new
-      l2.dbu = 0.0005
-      c0c = l2.cell(l2.add_cell("c0"))
-      c0c.copy_tree(c0)
+    i0 = nil
+    c0c.each_inst { |i| i.cell_index == l2.cell("c1").cell_index && i0 = i }
+    assert_equal(i0.property("p"), 18)
 
-      i0 = nil
-      c0c.each_inst { |i| i.cell_index == l2.cell("c1").cell_index && i0 = i }
-      assert_equal(i0.property("p"), 18)
-
-      layer1 = l2.find_layer(1, 0)
-      layer2 = l2.find_layer(2, 0)
-      assert_equal(l2.cell("c1").begin_shapes_rec(layer1).shape.property("p"), 17)
-      assert_equal(collect(c0c.begin_shapes_rec(layer1), l2), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
-      assert_equal(collect(c0c.begin_shapes_rec(layer2), l2), "[c0](2,202;2002,2402)")
-
-    end 
+    layer1 = l2.find_layer(1, 0)
+    layer2 = l2.find_layer(2, 0)
+    assert_equal(l2.cell("c1").begin_shapes_rec(layer1).shape.property("p"), 17)
+    assert_equal(collect(c0c.begin_shapes_rec(layer1), l2), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
+    assert_equal(collect(c0c.begin_shapes_rec(layer2), l2), "[c0](2,202;2002,2402)")
 
   end
 
@@ -1585,80 +1537,76 @@ END
 
     # move cell tree
    
-    if RBA::Application::instance.is_editable?
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    s = c1.shapes(0).insert(b)
+    s.set_property("p", 17)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+    b = RBA::Box.new(1, 101, 1001, 1201)
+    c0.shapes(1).insert(b)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      s = c1.shapes(0).insert(b)
-      s.set_property("p", 17)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
-      b = RBA::Box.new(1, 101, 1001, 1201)
-      c0.shapes(1).insert(b)
+    tt = RBA::Trans.new
+    i0 = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    i0.set_property("p", 18)
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      i0 = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      i0.set_property("p", 18)
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    ll = l.dup
 
-      ll = l.dup
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
 
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
+    c0c = l.cell(l.add_cell("c0"))
+    c0c.move_tree(c0)
+    assert_equal(l.has_cell?("c0"), true)
+    assert_equal(l.has_cell?("c1"), false)
+    assert_equal(l.has_cell?("c2"), false)
+    assert_equal(l.has_cell?("c3"), false)
 
-      c0c = l.cell(l.add_cell("c0"))
-      c0c.move_tree(c0)
-      assert_equal(l.has_cell?("c0"), true)
-      assert_equal(l.has_cell?("c1"), false)
-      assert_equal(l.has_cell?("c2"), false)
-      assert_equal(l.has_cell?("c3"), false)
+    i0 = nil
+    c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
+    assert_equal(i0.property("p"), 18)
+    assert_equal(l.cell("c1$1").begin_shapes_rec(0).shape.property("p"), 17)
 
-      i0 = nil
-      c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
-      assert_equal(i0.property("p"), 18)
-      assert_equal(l.cell("c1$1").begin_shapes_rec(0).shape.property("p"), 17)
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "")
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
 
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "")
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
+    l = ll.dup
+    c0 = l.cell("c0")
 
-      l = ll.dup
-      c0 = l.cell("c0")
+    l2 = RBA::Layout::new
+    l2.dbu = 0.0005
+    c0c = l2.cell(l2.add_cell("c0"))
+    c0c.move_tree(c0)
 
-      l2 = RBA::Layout::new
-      l2.dbu = 0.0005
-      c0c = l2.cell(l2.add_cell("c0"))
-      c0c.move_tree(c0)
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "")
+    assert_equal(l.has_cell?("c0"), true)
+    assert_equal(l.has_cell?("c1"), false)
+    assert_equal(l.has_cell?("c2"), false)
+    assert_equal(l.has_cell?("c3"), false)
 
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "")
-      assert_equal(l.has_cell?("c0"), true)
-      assert_equal(l.has_cell?("c1"), false)
-      assert_equal(l.has_cell?("c2"), false)
-      assert_equal(l.has_cell?("c3"), false)
+    i0 = nil
+    c0c.each_inst { |i| i.cell_index == l2.cell("c1").cell_index && i0 = i }
+    assert_equal(i0.property("p"), 18)
 
-      i0 = nil
-      c0c.each_inst { |i| i.cell_index == l2.cell("c1").cell_index && i0 = i }
-      assert_equal(i0.property("p"), 18)
-
-      layer1 = l2.find_layer(1, 0)
-      layer2 = l2.find_layer(2, 0)
-      assert_equal(l2.cell("c1").begin_shapes_rec(layer1).shape.property("p"), 17)
-      assert_equal(collect(c0c.begin_shapes_rec(layer1), l2), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
-      assert_equal(collect(c0c.begin_shapes_rec(layer2), l2), "[c0](2,202;2002,2402)")
-
-    end 
+    layer1 = l2.find_layer(1, 0)
+    layer2 = l2.find_layer(2, 0)
+    assert_equal(l2.cell("c1").begin_shapes_rec(layer1).shape.property("p"), 17)
+    assert_equal(collect(c0c.begin_shapes_rec(layer1), l2), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
+    assert_equal(collect(c0c.begin_shapes_rec(layer2), l2), "[c0](2,202;2002,2402)")
 
   end
 
@@ -1666,83 +1614,79 @@ END
 
     # copy shapes between cell trees
    
-    if RBA::Application::instance.is_editable?
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+    b = RBA::Box.new(1, 101, 1001, 1201)
+    s = c0.shapes(1).insert(b)
+    s.set_property("p", 17)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
-      b = RBA::Box.new(1, 101, 1001, 1201)
-      s = c0.shapes(1).insert(b)
-      s.set_property("p", 17)
+    tt = RBA::Trans.new
+    s = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    s.set_property("p", 18)
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      s = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      s.set_property("p", 18)
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
 
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
+    c0c = l.cell(l.add_cell("c0"))
+    cm = RBA::CellMapping::new
+    cm.for_single_cell(l, c0c.cell_index, l, c0.cell_index)
+    c0c.copy_tree_shapes(c0, cm)
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c0$1](0,100;1000,1200)/[c0$1](100,0;1100,1100)/[c0$1](-1200,0;-100,1000)/[c0$1](1200,0;2200,1100)")
+    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
+    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+     
+    c0c.clear
+    lm = RBA::LayerMapping::new
+    lm.map(1, 0)
+    c0c.copy_tree_shapes(c0, cm, lm)
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
+    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
+    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
 
-      c0c = l.cell(l.add_cell("c0"))
-      cm = RBA::CellMapping::new
-      cm.for_single_cell(l, c0c.cell_index, l, c0.cell_index)
-      c0c.copy_tree_shapes(c0, cm)
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c0$1](0,100;1000,1200)/[c0$1](100,0;1100,1100)/[c0$1](-1200,0;-100,1000)/[c0$1](1200,0;2200,1100)")
-      assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-      assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
-       
-      c0c.clear
-      lm = RBA::LayerMapping::new
-      lm.map(1, 0)
-      c0c.copy_tree_shapes(c0, cm, lm)
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
-      assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
-      assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
+    c0c.clear
+    cm.for_single_cell_full(l, c0c.cell_index, l, c0.cell_index)
+    c0c.copy_tree_shapes(c0, cm)
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
+    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
+    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
 
-      c0c.clear
-      cm.for_single_cell_full(l, c0c.cell_index, l, c0.cell_index)
-      c0c.copy_tree_shapes(c0, cm)
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
-      assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-      assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+    i0 = nil
+    c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
+    assert_equal(i0.property("p"), 18)
 
-      i0 = nil
-      c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
-      assert_equal(i0.property("p"), 18)
+    l2 = RBA::Layout::new
+    l2.dbu = 0.0005
+    c0c = l2.cell(l2.add_cell("c0"))
 
-      l2 = RBA::Layout::new
-      l2.dbu = 0.0005
-      c0c = l2.cell(l2.add_cell("c0"))
+    cm.for_single_cell_full(l2, c0c.cell_index, l, c0.cell_index)
+    c0c.copy_tree_shapes(c0, cm)
+    layer1 = l2.find_layer(1, 0)
+    layer2 = l2.find_layer(2, 0)
+    assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
+    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
+    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
 
-      cm.for_single_cell_full(l2, c0c.cell_index, l, c0.cell_index)
-      c0c.copy_tree_shapes(c0, cm)
-      layer1 = l2.find_layer(1, 0)
-      layer2 = l2.find_layer(2, 0)
-      assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
-      assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-      assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
-
-      i0 = nil
-      c0c.each_inst { |i| i.cell_index == l2.cell("c1").cell_index && i0 = i }
-      assert_equal(i0.property("p"), 18)
-
-    end 
+    i0 = nil
+    c0c.each_inst { |i| i.cell_index == l2.cell("c1").cell_index && i0 = i }
+    assert_equal(i0.property("p"), 18)
 
   end
 
@@ -1750,114 +1694,106 @@ END
 
     # move shapes between cell trees
    
-    if RBA::Application::instance.is_editable?
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
 
-      l = RBA::Layout.new
-      l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
-      l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
-      c0 = l.cell(l.add_cell("c0"))
-      c1 = l.cell(l.add_cell("c1"))
-      c2 = l.cell(l.add_cell("c2"))
-      c3 = l.cell(l.add_cell("c3"))
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+    b = RBA::Box.new(1, 101, 1001, 1201)
+    s = c0.shapes(1).insert(b)
+    s.set_property("p", 17)
 
-      b = RBA::Box.new(0, 100, 1000, 1200)
-      c0.shapes(0).insert(b)
-      c1.shapes(0).insert(b)
-      c2.shapes(0).insert(b)
-      c3.shapes(0).insert(b)
-      b = RBA::Box.new(1, 101, 1001, 1201)
-      s = c0.shapes(1).insert(b)
-      s.set_property("p", 17)
+    tt = RBA::Trans.new
+    s = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    assert_equal(s.is_pcell?, false)
+    assert_equal(s.pcell_declaration, nil)
+    assert_equal(s.pcell_parameters, [])
+    assert_equal(s.pcell_parameters_by_name, {})
+    s.set_property("p", 18)
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-      tt = RBA::Trans.new
-      s = c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
-      assert_equal(s.is_pcell?, false)
-      assert_equal(s.pcell_declaration, nil)
-      assert_equal(s.pcell_parameters, [])
-      assert_equal(s.pcell_parameters_by_name, {})
-      s.set_property("p", 18)
-      c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
-      c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
-      c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+    ll = l.dup
 
-      ll = l.dup
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
 
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "[c0](1,101;1001,1201)")
+    c0c = l.cell(l.add_cell("c0"))
+    cm = RBA::CellMapping::new
+    cm.for_single_cell(l, c0c.cell_index, l, c0.cell_index)
+    c0c.move_tree_shapes(c0, cm)
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "")
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c0$1](0,100;1000,1200)/[c0$1](100,0;1100,1100)/[c0$1](-1200,0;-100,1000)/[c0$1](1200,0;2200,1100)")
+    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
+    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
 
-      c0c = l.cell(l.add_cell("c0"))
-      cm = RBA::CellMapping::new
-      cm.for_single_cell(l, c0c.cell_index, l, c0.cell_index)
-      c0c.move_tree_shapes(c0, cm)
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "")
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c0$1](0,100;1000,1200)/[c0$1](100,0;1100,1100)/[c0$1](-1200,0;-100,1000)/[c0$1](1200,0;2200,1100)")
-      assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-      assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+    l = ll.dup
+    c0 = l.cell("c0")
+    c0c = l.cell(l.add_cell("c0"))
+     
+    lm = RBA::LayerMapping::new
+    lm.map(1, 0)
+    c0c.move_tree_shapes(c0, cm, lm)
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "")
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
+    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
+    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
 
-      l = ll.dup
-      c0 = l.cell("c0")
-      c0c = l.cell(l.add_cell("c0"))
-       
-      lm = RBA::LayerMapping::new
-      lm.map(1, 0)
-      c0c.move_tree_shapes(c0, cm, lm)
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "[c0](0,100;1000,1200)/[c2](100,0;1100,1100)/[c3](1200,0;2200,1100)/[c3](-1200,0;-100,1000)/[c1](0,100;1000,1200)")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "")
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](1,101;1001,1201)")
-      assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), 17)
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "")
-      assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), nil)
+    l = ll.dup
+    c0 = l.cell("c0")
+    c0c = l.cell(l.add_cell("c0"))
+     
+    cm.for_single_cell_full(l, c0c.cell_index, l, c0.cell_index)
+    c0c.move_tree_shapes(c0, cm)
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "")
+    assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
+    assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
+    assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
 
-      l = ll.dup
-      c0 = l.cell("c0")
-      c0c = l.cell(l.add_cell("c0"))
-       
-      cm.for_single_cell_full(l, c0c.cell_index, l, c0.cell_index)
-      c0c.move_tree_shapes(c0, cm)
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "")
-      assert_equal(collect(c0c.begin_shapes_rec(0), l), "[c0$1](0,100;1000,1200)/[c2$1](100,0;1100,1100)/[c3$1](1200,0;2200,1100)/[c3$1](-1200,0;-100,1000)/[c1$1](0,100;1000,1200)")
-      assert_equal(c0c.begin_shapes_rec(0).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(1), l), "[c0$1](1,101;1001,1201)")
-      assert_equal(c0c.begin_shapes_rec(1).shape.property("p"), 17)
+    i0 = nil
+    c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
+    assert_equal(i0.property("p"), 18)
 
-      i0 = nil
-      c0c.each_inst { |i| i.cell_index == l.cell("c1$1").cell_index && i0 = i }
-      assert_equal(i0.property("p"), 18)
+    l = ll.dup
+    c0 = l.cell("c0")
+     
+    l2 = RBA::Layout::new
+    l2.dbu = 0.0005
+    c0c = l2.cell(l2.add_cell("c0"))
 
-      l = ll.dup
-      c0 = l.cell("c0")
-       
-      l2 = RBA::Layout::new
-      l2.dbu = 0.0005
-      c0c = l2.cell(l2.add_cell("c0"))
+    cm.for_single_cell_full(l2, c0c.cell_index, l, c0.cell_index)
+    c0c.move_tree_shapes(c0, cm)
+    assert_equal(collect(c0.begin_shapes_rec(0), l), "")
+    assert_equal(collect(c0.begin_shapes_rec(1), l), "")
+    layer1 = l2.find_layer(1, 0)
+    layer2 = l2.find_layer(2, 0)
+    assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
+    assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
+    assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
+    assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
 
-      cm.for_single_cell_full(l2, c0c.cell_index, l, c0.cell_index)
-      c0c.move_tree_shapes(c0, cm)
-      assert_equal(collect(c0.begin_shapes_rec(0), l), "")
-      assert_equal(collect(c0.begin_shapes_rec(1), l), "")
-      layer1 = l2.find_layer(1, 0)
-      layer2 = l2.find_layer(2, 0)
-      assert_equal(collect(c0c.begin_shapes_rec(layer1), l), "[c0](0,200;2000,2400)/[c2](200,0;2200,2200)/[c3](2400,0;4400,2200)/[c3](-2400,0;-200,2000)/[c1](0,200;2000,2400)")
-      assert_equal(c0c.begin_shapes_rec(layer1).shape.property("p"), nil)
-      assert_equal(collect(c0c.begin_shapes_rec(layer2), l), "[c0](2,202;2002,2402)")
-      assert_equal(c0c.begin_shapes_rec(layer2).shape.property("p"), 17)
-
-      i0 = nil
-      c0c.each_inst { |i| i.cell_index == l2.cell("c1").cell_index && i0 = i }
-      assert_equal(i0.property("p"), 18)
-
-    end 
+    i0 = nil
+    c0c.each_inst { |i| i.cell_index == l2.cell("c1").cell_index && i0 = i }
+    assert_equal(i0.property("p"), 18)
 
   end
 
   def test_16
-
-    if !RBA::Application::instance.is_editable?
-      return
-    end
 
     # fill tool
    
@@ -1980,9 +1916,6 @@ END
   def test_18
 
     ly = RBA::Layout::new
-    if !ly.is_editable?
-      return
-    end
 
     cell = ly.create_cell("X")
 

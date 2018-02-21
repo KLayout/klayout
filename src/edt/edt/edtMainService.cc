@@ -1084,23 +1084,29 @@ MainService::cm_convert_to_pcell ()
     db::Library *lib = db::LibraryManager::instance ().lib (l->second);
     for (db::Layout::pcell_iterator pc = lib->layout ().begin_pcells (); pc != lib->layout ().end_pcells (); ++pc) {
 
-      const db::PCellDeclaration *pc_decl = lib->layout ().pcell_declaration (pc->second);
-      size_t n = 1000; // 1000 tries max.
-      for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); n > 0 && pc_decl && es != edt_services.end (); ++es) {
-        for (edt::Service::obj_iterator s = (*es)->selection ().begin (); n > 0 && pc_decl && s != (*es)->selection ().end (); ++s) {
-          const lay::CellView &cv = view ()->cellview (s->cv_index ());
-          if (pc_decl->can_create_from_shape (cv->layout (), s->shape (), s->layer ())) {
-            --n;
-          } else {
-            pc_decl = 0; // stop
+      try {
+
+        const db::PCellDeclaration *pc_decl = lib->layout ().pcell_declaration (pc->second);
+        size_t n = 1000; // 1000 tries max.
+        for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); n > 0 && pc_decl && es != edt_services.end (); ++es) {
+          for (edt::Service::obj_iterator s = (*es)->selection ().begin (); n > 0 && pc_decl && s != (*es)->selection ().end (); ++s) {
+            const lay::CellView &cv = view ()->cellview (s->cv_index ());
+            if (pc_decl->can_create_from_shape (cv->layout (), s->shape (), s->layer ())) {
+              --n;
+            } else {
+              pc_decl = 0; // stop
+            }
           }
         }
-      }
 
-      //  We have positive hit
-      if (pc_decl) {
-        pcells.push_back (std::make_pair (lib, pc->second));
-        items.push_back (tl::to_qstring (lib->get_name () + "." + pc_decl->name ()));
+        //  We have positive hit
+        if (pc_decl) {
+          pcells.push_back (std::make_pair (lib, pc->second));
+          items.push_back (tl::to_qstring (lib->get_name () + "." + pc_decl->name ()));
+        }
+
+      } catch (...) {
+        //  ignore errors in can_create_from_shape
       }
 
     }

@@ -88,11 +88,13 @@ save_dialog_state (QWidget *w)
 
   }
 
-  for (QList<QObject *>::const_iterator c = w->children ().begin (); c != w->children ().end (); ++c) {
-    if (dynamic_cast <QWidget *> (*c)) {
-      std::string cs = save_dialog_state (dynamic_cast <QWidget *> (*c));
-      if (! cs.empty ()) {
-        s += cs;
+  if (w) {
+    for (QList<QObject *>::const_iterator c = w->children ().begin (); c != w->children ().end (); ++c) {
+      if (dynamic_cast <QWidget *> (*c)) {
+        std::string cs = save_dialog_state (dynamic_cast <QWidget *> (*c));
+        if (! cs.empty ()) {
+          s += cs;
+        }
       }
     }
   }

@@ -183,6 +183,13 @@ to create the \\LayerInfo object, i.e. like this:
 
 The default implementation does nothing. All parameters not set in this method will receive their default value.
 
+If you use a parameter called "layer" for example, the parameter getter will hide the
+"layer" argument. Use "_layer" for the argument in this case (same for "layout", "shape" or "cell):
+
+@code
+  set_layer layout.get_info(_layer)
+@/code
+
 @method transformation_from_shape_impl
 
 @brief Gets the initial PCell instance transformation when creating from a shape
@@ -230,6 +237,13 @@ module RBA
     
     # provide accessors for the current layout and cell (for prod)
     attr_reader :layout, :cell, :shape, :layer
+
+    # provide fallback accessors in case of a name clash with a 
+    # parameter
+    def _layer; @layer; end
+    def _layout; @layout; end
+    def _cell; @cell; end
+    def _shape; @shape; end
     
     # define a parameter
     #   name         -&gt; the short name of the parameter
@@ -246,6 +260,12 @@ module RBA
     #   set_{name}   -&gt; write accessor ({name}= does not work because the
     #                   Ruby confuses that method with variables)
     #   {name}_layer -&gt; read accessor for the layer index for TypeLayer parameters
+    # in addition, fallback accessors are defined which can be used if 
+    # the parameter's name clashes with another name:
+    #   param_{name}
+    #   set_param_{name}
+    #   param_{name}_layer
+
     def param(name, type, description, args = {})
     
       # create accessor methods for the parameters

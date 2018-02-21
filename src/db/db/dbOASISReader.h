@@ -318,6 +318,7 @@ private:
   unsigned long long get_ulong_long ();
   long get_long ();
   unsigned long get_ulong ();
+  unsigned long get_ulong_for_divider ();
   int get_int ();
   unsigned int get_uint ();
 

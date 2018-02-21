@@ -45,7 +45,7 @@ static lay::Technology *create_technology (const std::string &name)
 {
   lay::Technology *tech = new lay::Technology ();
   tech->set_name (name);
-  lay::Technologies::instance ()->add (tech);
+  lay::Technologies::instance ()->add_new (tech);
   return tech;
 }
 

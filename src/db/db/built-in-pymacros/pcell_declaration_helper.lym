@@ -26,7 +26,7 @@ class MyPCell(pya.PCellDeclarationHelper):
   def __init__(self):
 
     # Important: initialize the super class
-    super(Circle, self).__init__()
+    super(MyPCell, self).__init__()
 
     # your initialization: add parameters with name, type, description and
     # optional other values
@@ -226,16 +226,27 @@ class _PCellDeclarationHelperLayerDescriptor(object):
 class _PCellDeclarationHelperParameterDescriptor(object):
   """
   A descriptor object which translates the PCell parameters into class attributes
+
+  In some cases (i.e. can_convert_from_shape), these placeholders are not 
+  connected to real parameters (obj._param_values is None). In this case,
+  the descriptor acts as a value holder (self.value)
   """
   
   def __init__(self, param_index):
     self.param_index = param_index
+    self.value = None
   
   def __get__(self, obj, type = None):
-    return obj._param_values[self.param_index]
+    if obj._param_values:
+      return obj._param_values[self.param_index]
+    else:
+      return self.value
     
   def __set__(self, obj, value):
-    obj._param_values[self.param_index] = value
+    if obj._param_values:
+      obj._param_values[self.param_index] = value
+    else:
+      self.value = value
 
 class _PCellDeclarationHelper(pya.PCellDeclaration):
   """  
@@ -321,7 +332,38 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     gets the parameters
     """
     return self._param_decls
+
+  def get_values(self):
+    """
+    gets the temporary parameter values
+    """
+    v = self._param_values
+    self._param_values = None
+    return v
   
+  def init_values(self, values = None, layers = None):
+    """
+    initializes the temporary parameter values
+    "values" are the original values. If "None" is given, the
+    default values will be used. 
+    "layers" are the layer indexes corresponding to the layer
+    parameters.
+    """
+    if not values:
+      self._param_values = []
+      for pd in self._param_decls:
+        self._param_values.append(pd.default)
+    else:
+      self._param_values = values
+    self._layers = layers
+
+  def finish(self):
+    """
+    Needs to be called at the end of produce() after init_values was used
+    """
+    self._param_values = None
+    self._layers = None
+    
   def get_layers(self, parameters):
     """
     get the layer definitions
@@ -335,25 +377,23 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     """
     coerce parameters (make consistent)
     """
-    self._param_values = parameters
+    self.init_values(parameters)
     self.layout = layout
     self.coerce_parameters_impl()
     self.layout = None
-    return self._param_values
+    return self.get_values()
 
   def produce(self, layout, layers, parameters, cell):
     """
     coerce parameters (make consistent)
     """
-    self._layers = layers
+    self.init_values(parameters, layers)
     self.cell = cell
-    self._param_values = parameters
     self.layout = layout
     self.produce_impl()
-    self._layers = None
     self.cell = None
-    self._param_values = None
     self.layout = None
+    self.finish()
 
   def can_create_from_shape(self, layout, shape, layer):
     """
@@ -386,17 +426,16 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     produce a helper for parameters_from_shape
     with this helper, the implementation can use the parameter setters
     """
-    self._param_values = []
-    for pd in self._param_decls:
-      self._param_values.append(pd.default)
+    self.init_values()
     self.layout = layout
     self.shape = shape
     self.layer = layer
     self.parameters_from_shape_impl()
+    param = self.get_values()
     self.layout = None
     self.shape = None
     self.layer = None
-    return self._param_values
+    return param
   
   def display_text_impl(self):
     """
@@ -432,7 +471,7 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     """
     default implementation
     """
-    return pya.Trans.new
+    return pya.Trans()
   
 # import the Type... constants from PCellParameterDeclaration
 for k in dir(pya.PCellParameterDeclaration):

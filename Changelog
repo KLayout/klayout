@@ -1,4 +1,4 @@
-0.25.1          (2018-02-22):
+0.25.1          (2018-02-23):
 * Enhancements: build compatibility with MacOS, Qt 5.9.
       Qt 4.6+4.7 supported as well with restrictions:
       the package installation feature is not working.
@@ -36,6 +36,7 @@
        - https://github.com/klayoutmatthias/klayout/issues/73 (allow 'change layers' on PCells which support a single layer parameter)
        - https://github.com/klayoutmatthias/klayout/issues/74 (small-corner boolean issue)
        - https://github.com/klayoutmatthias/klayout/issues/75 (Python PCell issue when parameters are called 'layer')
+       - https://github.com/klayoutmatthias/klayout/issues/79 (Replace function enabled also for read-only macros)
 * Further enhancements: see links
        - https://github.com/klayoutmatthias/klayout/issues/29 (permissive mode for OASIS writer on odd-width paths)
        - https://github.com/klayoutmatthias/klayout/issues/66 (Authentication dialog indicates retry)

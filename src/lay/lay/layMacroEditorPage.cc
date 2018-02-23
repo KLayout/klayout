@@ -971,6 +971,10 @@ static QString interpolate_string (const QString &replace, const QRegExp &re)
 void 
 MacroEditorPage::replace_and_find_next (const QString &replace)
 {
+  if (! mp_macro || mp_macro->is_readonly ()) {
+    return;
+  }
+
   QTextCursor c = mp_text->textCursor ();
   if (c.hasSelection ()) {
     c.insertText (interpolate_string (replace, m_current_search));
@@ -982,6 +986,10 @@ MacroEditorPage::replace_and_find_next (const QString &replace)
 void 
 MacroEditorPage::replace_all (const QString &replace)
 {
+  if (! mp_macro || mp_macro->is_readonly ()) {
+    return;
+  }
+
   const QTextDocument *doc = mp_text->document ();
 
   QTextCursor c = mp_text->textCursor ();

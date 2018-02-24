@@ -1,8 +1,8 @@
 0.25.1          (2018-02-23):
-* Enhancements: build compatibility with MacOS, Qt 5.9.
-      Qt 4.6+4.7 supported as well with restrictions:
+* Enhancements: build compatibility with MacOS and Qt 5.9.
+      Qt 4.6 supported now as well with one restriction:
       the package installation feature is not working.
-* Bugfix: Package manager 
+* Bugfixs: Package manager 
        - Remove button wasn't enabled if multiple packages were selected
        - A potential crash ob removing packages was fixed
 * Enhancement: 64 bit coordinate support enabled on Windows builds

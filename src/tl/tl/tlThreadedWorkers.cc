@@ -424,17 +424,20 @@ JobBase::schedule (Task *task)
 {
   m_lock.lock ();
 
-  //  Don't allow tasks to be scheduled while stopping or exiting (waiting for m_queue_empty_condition)
   if (m_stopping) {
-    m_lock.unlock ();
-    throw TaskTerminatedException ();
-  }
 
-  //  Add the task to the task queue
-  m_task_list.put (task);
+    //  Don't allow tasks to be scheduled while stopping or exiting (waiting for m_queue_empty_condition)
+    delete task;
 
-  if (m_running) {
-    m_task_available_condition.wakeAll ();
+  } else {
+
+    //  Add the task to the task queue
+    m_task_list.put (task);
+
+    if (m_running) {
+      m_task_available_condition.wakeAll ();
+    }
+
   }
 
   m_lock.unlock ();

@@ -160,7 +160,7 @@ SaltDownloadManager::compute_list (const lay::Salt &salt, const lay::Salt &salt_
     size_t n = m_registry.size ();
     for (size_t i = 0; i < n; ++i) {
 
-      const Descriptor &p = m_registry [i];
+      Descriptor p = m_registry [i];
 
       for (std::vector<SaltGrain::Dependency>::const_iterator d = p.grain.dependencies ().begin (); d != p.grain.dependencies ().end (); ++d) {
 

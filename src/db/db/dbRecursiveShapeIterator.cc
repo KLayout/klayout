@@ -276,6 +276,8 @@ RecursiveShapeIterator::init ()
   m_shape_inv_prop_sel = false;
   m_inst_quad_id = 0;
   m_shape_quad_id = 0;
+  mp_cell = 0;
+  m_current_layer = 0;
 }
 
 void

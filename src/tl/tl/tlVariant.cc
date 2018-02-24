@@ -1298,7 +1298,7 @@ Variant::can_convert_to_long () const
   case t_double:
     return m_var.m_double <= std::numeric_limits<long>::max () && m_var.m_double >= std::numeric_limits<long>::min ();
   case t_float:
-    return m_var.m_float <= std::numeric_limits<long>::max () && m_var.m_float >= std::numeric_limits<long>::min ();
+    return m_var.m_float <= float (std::numeric_limits<long>::max ()) && m_var.m_float >= float (std::numeric_limits<long>::min ());
 #if defined(HAVE_64BIT_COORD)
   case t_int128:
     return m_var.m_int128 <= __int128 (std::numeric_limits<long>::max ()) && m_var.m_int128 >= __int128 (std::numeric_limits<long>::min ());

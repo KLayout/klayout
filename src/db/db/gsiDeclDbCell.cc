@@ -883,8 +883,6 @@ static bool cell_has_prop_id (const db::Cell *c)
 
 static void delete_cell_property (db::Cell *c, const tl::Variant &key)
 {
-  check_is_editable (c);
-
   db::properties_id_type id = c->prop_id ();
   if (id == 0) {
     return;
@@ -911,8 +909,6 @@ static void delete_cell_property (db::Cell *c, const tl::Variant &key)
 
 static void set_cell_property (db::Cell *c, const tl::Variant &key, const tl::Variant &value)
 {
-  check_is_editable (c);
-
   db::properties_id_type id = c->prop_id ();
 
   db::Layout *layout = c->layout ();
@@ -1110,13 +1106,11 @@ static void move_or_copy_from_other_cell (db::Cell *cell, db::Cell *src_cell, un
 
 static void move_from_other_cell (db::Cell *cell, db::Cell *src_cell, unsigned int src_layer, unsigned int dest_layer)
 {
-  check_is_editable (cell);
   move_or_copy_from_other_cell (cell, src_cell, src_layer, dest_layer, true);
 }
 
 static void copy_from_other_cell (db::Cell *cell, db::Cell *src_cell, unsigned int src_layer, unsigned int dest_layer)
 {
-  check_is_editable (cell);
   move_or_copy_from_other_cell (cell, src_cell, src_layer, dest_layer, false);
 }
 
@@ -1158,7 +1152,6 @@ write_options (const db::Cell *cell, const std::string &filename, const db::Save
 static void
 clear_all (db::Cell *cell)
 {
-  check_is_editable (cell);
   cell->clear_shapes ();
   cell->clear_insts ();
 }
@@ -1166,7 +1159,6 @@ clear_all (db::Cell *cell)
 static void 
 delete_cell (db::Cell *cell)
 {
-  check_is_editable (cell);
   db::Layout *layout = cell->layout ();
   if (layout) {
     layout->delete_cell (cell->cell_index ());
@@ -1176,7 +1168,6 @@ delete_cell (db::Cell *cell)
 static void 
 prune_subcells (db::Cell *cell, int levels)
 {
-  check_is_editable (cell);
   db::Layout *layout = cell->layout ();
   if (layout) {
     layout->prune_subcells (cell->cell_index (), levels);
@@ -1192,7 +1183,6 @@ prune_subcells0 (db::Cell *cell)
 static void 
 prune_cell (db::Cell *cell, int levels)
 {
-  check_is_editable (cell);
   db::Layout *layout = cell->layout ();
   if (layout) {
     layout->prune_cell (cell->cell_index (), levels);
@@ -1208,7 +1198,6 @@ prune_cell0 (db::Cell *cell)
 static void 
 flatten (db::Cell *cell, int levels, bool prune)
 {
-  check_is_editable (cell);
   db::Layout *layout = cell->layout ();
   if (layout) {
     layout->flatten (*cell, levels, prune);
@@ -1288,8 +1277,6 @@ begin_shapes_rec_overlapping_um (const db::Cell *cell, unsigned int layer, db::D
 
 static void copy_shapes2 (db::Cell *cell, const db::Cell &source_cell, const db::LayerMapping &layer_mapping)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy shapes within the same cell")));
   }
@@ -1318,8 +1305,6 @@ static void copy_shapes2 (db::Cell *cell, const db::Cell &source_cell, const db:
 
 static void copy_shapes1 (db::Cell *cell, const db::Cell &source_cell)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy shapes within the same cell")));
   }
@@ -1344,8 +1329,6 @@ static void copy_shapes1 (db::Cell *cell, const db::Cell &source_cell)
 
 static void copy_instances (db::Cell *cell, const db::Cell &source_cell)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy instances within the same cell")));
   }
@@ -1360,8 +1343,6 @@ static void copy_instances (db::Cell *cell, const db::Cell &source_cell)
 
 static std::vector<db::cell_index_type> copy_tree (db::Cell *cell, const db::Cell &source_cell)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy shapes within the same cell")));
   }
@@ -1393,8 +1374,6 @@ static std::vector<db::cell_index_type> copy_tree (db::Cell *cell, const db::Cel
 
 static void copy_tree_shapes2 (db::Cell *cell, const db::Cell &source_cell, const db::CellMapping &cm)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy shapes within the same cell")));
   }
@@ -1421,8 +1400,6 @@ static void copy_tree_shapes2 (db::Cell *cell, const db::Cell &source_cell, cons
 
 static void copy_tree_shapes3 (db::Cell *cell, const db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy shapes within the same cell")));
   }
@@ -1446,8 +1423,6 @@ static void copy_tree_shapes3 (db::Cell *cell, const db::Cell &source_cell, cons
 
 static void move_shapes2 (db::Cell *cell, db::Cell &source_cell, const db::LayerMapping &layer_mapping)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot move shapes within the same cell")));
   }
@@ -1478,8 +1453,6 @@ static void move_shapes2 (db::Cell *cell, db::Cell &source_cell, const db::Layer
 
 static void move_shapes1 (db::Cell *cell, db::Cell &source_cell)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot move shapes within the same cell")));
   }
@@ -1505,8 +1478,6 @@ static void move_shapes1 (db::Cell *cell, db::Cell &source_cell)
 
 static void move_instances (db::Cell *cell, db::Cell &source_cell)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot move instances within the same cell")));
   }
@@ -1523,8 +1494,6 @@ static void move_instances (db::Cell *cell, db::Cell &source_cell)
 
 static std::vector<db::cell_index_type> move_tree (db::Cell *cell, db::Cell &source_cell)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot move shapes within the same cell")));
   }
@@ -1558,8 +1527,6 @@ static std::vector<db::cell_index_type> move_tree (db::Cell *cell, db::Cell &sou
 
 static void move_tree_shapes2 (db::Cell *cell, db::Cell &source_cell, const db::CellMapping &cm)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot move shapes within the same cell")));
   }
@@ -1586,8 +1553,6 @@ static void move_tree_shapes2 (db::Cell *cell, db::Cell &source_cell, const db::
 
 static void move_tree_shapes3 (db::Cell *cell, db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm)
 {
-  check_is_editable (cell);
-
   if (cell == &source_cell) {
     throw tl::Exception (tl::to_string (QObject::tr ("Cannot move shapes within the same cell")));
   }
@@ -1612,8 +1577,6 @@ static void move_tree_shapes3 (db::Cell *cell, db::Cell &source_cell, const db::
 static void
 fill_region1 (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point *origin)
 {
-  check_is_editable (cell);
-
   if (fc_box.empty () || fc_box.width () == 0 || fc_box.height () == 0) {
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid fill cell footprint (empty or zero width/height)")));
   }
@@ -1624,8 +1587,6 @@ static void
 fill_region2 (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point *origin,
               db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons)
 {
-  check_is_editable (cell);
-
   if (fc_box.empty () || fc_box.width () == 0 || fc_box.height () == 0) {
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid fill cell footprint (empty or zero width/height)")));
   }

@@ -1273,7 +1273,7 @@ public:
    */
   Region selected_inside (const Region &other) const
   {
-    return selected_interacting_generic (other, -1, false, false);
+    return selected_interacting_generic (other, -1, true, false);
   }
 
   /**
@@ -1285,7 +1285,7 @@ public:
    */
   Region selected_not_inside (const Region &other) const
   {
-    return selected_interacting_generic (other, -1, false, true);
+    return selected_interacting_generic (other, -1, true, true);
   }
 
   /**

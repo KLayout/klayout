@@ -60,6 +60,10 @@ public:
 public slots:
   void authenticationRequired (QNetworkReply *, QAuthenticator *);
   void proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *);
+  void reset ();
+
+private:
+  int m_retry, m_proxy_retry;
 };
 
 /**

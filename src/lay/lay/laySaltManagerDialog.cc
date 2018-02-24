@@ -858,12 +858,12 @@ SaltManagerDialog::selected_changed ()
   details_text->set_grain (g);
   if (!g) {
     details_frame->setEnabled (false);
-    delete_button->setEnabled (false);
   } else {
     details_frame->setEnabled (true);
-    delete_button->setEnabled (true);
     edit_button->setEnabled (! g->is_readonly ());
   }
+
+  delete_button->setEnabled (! current_grains ().empty ());
 }
 
 lay::SaltGrain *

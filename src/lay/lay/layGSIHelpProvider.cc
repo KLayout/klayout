@@ -1195,10 +1195,6 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       pydoc = pya::PythonInterpreter::instance ()->python_doc (i->second.first);
     }
 
-    os << "<a name=\"method" << n << "\"/>"
-       << "<a name=\"m_" << escape_xml (i->first) << "\"/>"
-       << "<keyword title=\"" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls) << ", " << tl::to_string (QObject::tr ("Method")) << " " << escape_xml (i->first) <<  "\" name=\"" << escape_xml (cls) << "#" << escape_xml (i->first) << "\"/>" << std::endl;
-
     os << "<tr>";
     if (i->first != prev_title) {
       int rows = 0;
@@ -1211,6 +1207,10 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       os << "</td>";
     }
     os << "<td style=\"padding-bottom: 16px\">";
+
+    os << "<a name=\"method" << n << "\"/>"
+       << "<a name=\"m_" << escape_xml (i->first) << "\"/>"
+       << "<keyword title=\"" << tl::to_string (QObject::tr ("API reference - Class")) << " " << escape_xml (cls) << ", " << tl::to_string (QObject::tr ("Method")) << " " << escape_xml (i->first) <<  "\" name=\"" << escape_xml (cls) << "#" << escape_xml (i->first) << "\"/>" << std::endl;
 
     os << "<p><b>" << tl::to_string (QObject::tr ("Signature")) << "</b>: ";
     std::string attr = method_attributes (i->second.first, method_doc);

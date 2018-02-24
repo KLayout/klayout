@@ -110,6 +110,18 @@ OASISReader::OASISReader (tl::InputStream &s)
 {
   m_progress.set_format (tl::to_string (QObject::tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
+  m_first_cellname = 0;
+  m_first_propname = 0;
+  m_first_propstring = 0;
+  m_first_textstring = 0;
+  m_first_layername = 0;
+  m_in_table = NotInTable;
+  m_table_cellname = 0;
+  m_table_propname = 0;
+  m_table_propstring = 0;
+  m_table_textstring = 0;
+  m_table_layername = 0;
+  m_table_start = 0;
 }
 
 OASISReader::~OASISReader ()
@@ -195,6 +207,16 @@ OASISReader::get_long ()
   } else {
     return long (u >> 1);
   }
+}
+
+inline unsigned long
+OASISReader::get_ulong_for_divider ()
+{
+  unsigned long l = get_ulong ();
+  if (l == 0) {
+    error (tl::to_string (QObject::tr ("Divider must not be zero")));
+  }
+  return l;
 }
 
 inline unsigned long 
@@ -295,21 +317,21 @@ OASISReader::get_real ()
 
   } else if (t == 2) {
 
-    return 1.0 / double (get_ulong ()); 
+    return 1.0 / double (get_ulong_for_divider ());
 
   } else if (t == 3) {
 
-    return -1.0 / double (get_ulong ()); 
+    return -1.0 / double (get_ulong_for_divider ());
 
   } else if (t == 4) {
 
     double d = double (get_ulong ());
-    return d / double (get_ulong ()); 
+    return d / double (get_ulong_for_divider ());
 
   } else if (t == 5) {
 
     double d = double (get_ulong ());
-    return -d / double (get_ulong ()); 
+    return -d / double (get_ulong_for_divider ());
 
   } else if (t == 6) {
 
@@ -1702,7 +1724,7 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
   pointlist.set_initialized ();
 }
 
-void
+bool
 OASISReader::read_repetition ()
 {
   unsigned char type = get_uint ();
@@ -1834,6 +1856,7 @@ OASISReader::read_repetition ()
     error (tl::sprintf (tl::to_string (QObject::tr ("Invalid repetition type %d")), type));
   }
 
+  return mm_repetition.get ().size () > 1;
 }
 
 void 
@@ -1980,9 +2003,7 @@ OASISReader::do_read_placement (unsigned char r,
 
   db::Vector pos (mm_placement_x.get (), mm_placement_y.get ());
 
-  if (m & 0x8) {
-
-    read_repetition ();
+  if ((m & 0x8) && read_repetition ()) {
 
     std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
 
@@ -2135,9 +2156,7 @@ OASISReader::do_read_text (bool xy_absolute,
     ll = open_dl (layout, LDPair (mm_textlayer.get (), mm_texttype.get ()), m_create_layers);
   }
 
-  if (m & 0x4) {
-
-    read_repetition ();
+  if ((m & 0x4) && read_repetition ()) {
 
     //  TODO: should not read properties if layer is not enabled!
     std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
@@ -2278,9 +2297,7 @@ OASISReader::do_read_rectangle (bool xy_absolute,
 
   std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()), m_create_layers);
 
-  if (m & 0x4) {
-
-    read_repetition ();
+  if ((m & 0x4) && read_repetition ()) {
 
     std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
 
@@ -2394,9 +2411,7 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
 
   std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()), m_create_layers);
 
-  if (m & 0x4) {
-
-    read_repetition ();
+  if ((m & 0x4) && read_repetition ()) {
 
     std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
 
@@ -2563,9 +2578,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
 
   std::pair<bool, unsigned int> ll = open_dl (layout, LDPair (mm_layer.get (), mm_datatype.get ()), m_create_layers);
 
-  if (m & 0x4) {
-
-    read_repetition ();
+  if ((m & 0x4) && read_repetition ()) {
 
     std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
 
@@ -2740,9 +2753,7 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
     pts [3] = db::Point (-std::min (delta_a, db::Coord (0)), db::Coord (0));
   }
 
-  if (m & 0x4) {
-
-    read_repetition ();
+  if ((m & 0x4) && read_repetition ()) {
 
     std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
 
@@ -3102,9 +3113,7 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
     --npts;
   }
 
-  if (m & 0x4) {
-
-    read_repetition ();
+  if ((m & 0x4) && read_repetition ()) {
 
     std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
 
@@ -3239,9 +3248,7 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
     ll.first = false;
   }
 
-  if (m & 0x4) {
-
-    read_repetition ();
+  if ((m & 0x4) && read_repetition ()) {
 
     std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
 
@@ -3506,8 +3513,8 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
         }
       }
 
-      if (m & 0x4) {
-        read_repetition ();
+      if ((m & 0x4) && read_repetition ()) {
+        //  later: handle XGEOMETRY with repetition
       }
 
       read_element_properties (layout.properties_repository (), true);

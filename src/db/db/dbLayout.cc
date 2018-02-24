@@ -1884,6 +1884,26 @@ Layout::is_pcell_instance (cell_index_type cell_index) const
   }
 }
 
+const Layout::pcell_declaration_type *
+Layout::pcell_declaration_for_pcell_variant (cell_index_type variant_cell_index) const
+{
+  const Cell *variant_cell = &cell (variant_cell_index);
+
+  const LibraryProxy *lib_proxy = dynamic_cast<const LibraryProxy *> (variant_cell);
+  if (lib_proxy) {
+    Library *lib = LibraryManager::instance ().lib (lib_proxy->lib_id ());
+    tl_assert (lib != 0);
+    return lib->layout ().pcell_declaration_for_pcell_variant (lib_proxy->library_cell_index ());
+  }
+
+  const PCellVariant *pcell_variant = dynamic_cast<const PCellVariant *> (variant_cell);
+  if (pcell_variant) {
+    return pcell_declaration (pcell_variant->pcell_id ());
+  } else {
+    return 0;
+  }
+}
+
 std::pair<db::Library *, db::cell_index_type>
 Layout::defining_library (cell_index_type cell_index) const
 {

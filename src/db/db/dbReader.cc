@@ -62,7 +62,7 @@ Reader::Reader (tl::InputStream &stream)
   }
 
   if (! mp_actual_reader) {
-    throw db::ReaderException (tl::to_string (QObject::tr ("Stream has unknown format")));
+    throw db::ReaderException (tl::to_string (QObject::tr ("Stream has unknown format: ")) + stream.source ());
   }
 }
 

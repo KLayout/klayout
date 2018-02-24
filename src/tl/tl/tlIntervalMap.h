@@ -213,7 +213,7 @@ public:
         ++lb0;
       }
       --lb;
-      if (lb != m_index_map.end () && i2 < lb->first.second) {
+      if (i2 < lb->first.second) {
         //  the last one is overlapping above i2: cut it
         lb->first.first = i2; 
       } else {

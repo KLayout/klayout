@@ -396,6 +396,12 @@ Repetition::set_base (RepetitionBase *base)
   mp_base = base;
 }
 
+size_t
+Repetition::size () const
+{
+  return mp_base ? mp_base->size () : 1;
+}
+
 bool 
 Repetition::is_regular (db::Vector &a, db::Vector &b, size_t &n, size_t &m) const
 {

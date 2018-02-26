@@ -74,7 +74,7 @@ static bool
 run_test (tl::TestBase *t, bool editable, bool slow, int repeat)
 {
   for (int i = 0; i < repeat; ++i) {
-    if (repeat > 0) {
+    if (repeat > 1) {
       ut::noctrl << "Repeat iteration " << i + 1 << " of " << repeat;
     }
     if (! t->do_test (editable, slow)) {

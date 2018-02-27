@@ -1318,19 +1318,6 @@ MainWindow::about_to_exec ()
       return;
     }
   }
-
-  edt::combine_mode_type cm = edt::CM_Add;
-  config_get (edt::cfg_edit_combine_mode, cm, edt::CMConverter ());
-  if (lay::ApplicationBase::instance ()->is_editable () && cm != edt::CM_Add) {
-    lay::TipDialog td (QApplication::activeWindow (), 
-                  tl::to_string (QObject::tr ("The background combination mode of the shape editor is set to some other mode than 'Add'.\n"
-                                              "This can be confusing, because a shape may not be drawn as expected.\n\nTo switch back to normal mode, choose 'Add' for the background combination mode in the toolbar.")),
-                  "has-non-add-edit-combine-mode");
-    if (td.exec_dialog ()) {
-      //  Don't bother the user with more dialogs.
-      return;
-    }
-  }
 }
 
 void

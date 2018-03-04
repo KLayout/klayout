@@ -82,6 +82,27 @@ class PYAObjectBase;
  */
 PythonInterpreter *sp_interpreter = 0;
 
+// -------------------------------------------------------------------
+
+/**
+ *  @brief Normalizes the file path
+ *  This function normalizes the file path so it only contains one
+ *  kind of slashes on Windows.
+ */
+static
+std::string normalize_path (const std::string &p)
+{
+#if defined(__WIN32)
+  std::string np;
+  np.reserve (p.size ());
+  for (const char *c = p.c_str (); *c; ++c) {
+    np += (*c == '\\' ? '/' : *c);
+  }
+  return np;
+#else
+  return p;
+#endif
+}
 
 // -------------------------------------------------------------------
 //  The lookup table for the method overload resolution
@@ -438,7 +459,7 @@ public:
       int line = frame->f_lineno;
       std::string fn;
       if (test_type<std::string> (frame->f_code->co_filename, true)) {
-        fn = python2c<std::string> (frame->f_code->co_filename);
+        fn = normalize_path (python2c<std::string> (frame->f_code->co_filename));
       }
       m_stack_trace.push_back (tl::BacktraceElement (fn, line));
 
@@ -3225,7 +3246,7 @@ PythonInterpreter::prepare_trace (PyObject *fn_object)
 {
   std::map<PyObject *, size_t>::const_iterator f = m_file_id_map.find (fn_object);
   if (f == m_file_id_map.end ()) {
-    f = m_file_id_map.insert (std::make_pair (fn_object, mp_current_exec_handler->id_for_path (this, python2c<std::string> (fn_object)))).first;
+    f = m_file_id_map.insert (std::make_pair (fn_object, mp_current_exec_handler->id_for_path (this, normalize_path (python2c<std::string> (fn_object))))).first;
   } 
 
   return f->second;
@@ -3515,4 +3536,3 @@ PythonInterpreter *PythonInterpreter::instance ()
 }
 
 }
-

@@ -65,7 +65,7 @@ def SetGlobals():
   Usage += "                        :   'nil' = not to support the script language               | \n"
   Usage += "                        :   'Sys' = using the OS standard script language            | \n"
   Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details           | \n"
-  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts']                        | qt5macports \n"
+  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Custom']           | qt5macports \n"
   Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24', 'B25']                | sys \n"
   Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B36']       | sys \n"
   Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                  | disabled \n"
@@ -651,7 +651,7 @@ def DeployBinariesForBundle():
       # e.g. [ 'libklayout_lay', '0', '25', '0', 'dylib' ]
       nameStyle3 = fullName[0] + "." + fullName[1] + ".dylib"
       shutil.copy2( item, nameStyle3 )
-      os.chmod( nameStyle3, 0755 )
+      os.chmod( nameStyle3, 0o0755 )
       #-------------------------------------------------------------------
       # (B) Then get inter-library dependencies
       #-------------------------------------------------------------------
@@ -699,16 +699,16 @@ def DeployBinariesForBundle():
   shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
   shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
 
-  os.chmod( targetDir0 + "/PkgInfo",      0644 )
-  os.chmod( targetDir0 + "/Info.plist",   0644 )
-  os.chmod( targetDirM + "/klayout",      0755 )
-  os.chmod( targetDirR + "/klayout.icns", 0644 )
+  os.chmod( targetDir0 + "/PkgInfo",      0o0644 )
+  os.chmod( targetDir0 + "/Info.plist",   0o0644 )
+  os.chmod( targetDirM + "/klayout",      0o0755 )
+  os.chmod( targetDirR + "/klayout.icns", 0o0644 )
 
   buddies = glob.glob( sourceDir3 + "/strm*" )
   for item in buddies:
     shutil.copy2( item, targetDirB )
     buddy = os.path.basename(item)
-    os.chmod( targetDirB + "/" + buddy, 0755 )
+    os.chmod( targetDirB + "/" + buddy, 0o0755 )
 
 
   print( " [7] Setting and changing the identification names of KLayout's libraries in each executable ..." )
@@ -727,7 +727,7 @@ def DeployBinariesForBundle():
     return 1
 
   buddies     = glob.glob( "klayout.app/Contents/Buddy/strm*" )
-  macdepQtOpt = ""
+  macdepQtOpt = "-executable=%s " % klayoutexec
   for buddy in buddies:
     macdepQtOpt += "-executable=%s " % buddy
     ret = SetChangeLibIdentificationName( buddy, "../Frameworks" )
@@ -759,6 +759,7 @@ def DeployBinariesForBundle():
     os.chdir(ProjectDir)
     os.chdir(MacPkgDir)
     command = "%s %s %s" % ( deploytool, app_bundle, options )
+    print(command)
     if subprocess.call( command, shell=True ) != 0:
       msg = "!!! Failed to deploy applications on OSX !!!"
       print( msg, file=sys.stderr )
@@ -860,10 +861,10 @@ def DeployScriptBundles():
   shutil.copy2( resourceDir + "/klayout-red.icns",  targetDirRE )
   shutil.copy2( resourceDir + "/klayout-blue.icns", targetDirRV )
 
-  os.chmod( targetDirME + "/KLayoutEditor.sh",  0755 )
-  os.chmod( targetDirMV + "/KLayoutViewer.sh",  0755 )
-  os.chmod( targetDirRE + "/klayout-red.icns",  0644 )
-  os.chmod( targetDirRV + "/klayout-blue.icns", 0644 )
+  os.chmod( targetDirME + "/KLayoutEditor.sh",  0o0755 )
+  os.chmod( targetDirMV + "/KLayoutViewer.sh",  0o0755 )
+  os.chmod( targetDirRE + "/klayout-red.icns",  0o0644 )
+  os.chmod( targetDirRV + "/klayout-blue.icns", 0o0644 )
 
   tmpfileE = ProjectDir + "/macbuild/Resources/Info.plist.template"
   keydicE  = { 'exe': 'KLayoutEditor.sh', 'icon': 'klayout-red.icns',  'bname': 'klayout', 'ver': Version }

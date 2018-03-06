@@ -192,9 +192,9 @@ Python36MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versi
 
 # Python 3.6 from Brew *+*+*+ EXPERIMENTAL *+*+*+
 # [Key Type Name] = 'pybrew'
-Python36Brew= { 'exe': '/usr/local/Cellar/python3/3.6.4_2/Frameworks/Python.framework/Versions/3.6/bin/python3.6m' ,
-                'inc': '/usr/local/Cellar/python3/3.6.4_2/Frameworks/Python.framework/Versions/3.6/include/python3.6m',
-                'lib': '/usr/local/Cellar/python3/3.6.4_2/Frameworks/Python.framework/Versions/3.6/lib/libpython3.6m.dylib'
+Python36Brew= { 'exe': '/usr/local/Cellar/python3/3.6.4_3/Frameworks/Python.framework/Versions/3.6/bin/python3.6m' ,
+                'inc': '/usr/local/Cellar/python3/3.6.4_3/Frameworks/Python.framework/Versions/3.6/include/python3.6m',
+                'lib': '/usr/local/Cellar/python3/3.6.4_3/Frameworks/Python.framework/Versions/3.6/lib/libpython3.6m.dylib'
               }
 
 # Consolidated dictionary kit for Python

@@ -882,10 +882,21 @@ public:
   std::pair<db::Library *, db::cell_index_type> defining_library (cell_index_type cell_index) const;
 
   /**
+   *  @brief Gets the PCell declaration object for a PCell instance
+   *
+   *  This method determines the PCell declaration object for a given PCell variant cell.
+   *  Note, that the declaration may originate from a different layout than this, if the PCell
+   *  is imported from a library.
+   *
+   *  The cell given cell is not a PCell variant cell, 0 is returned.
+   */
+  const Layout::pcell_declaration_type *pcell_declaration_for_pcell_variant (cell_index_type cell_index) const;
+
+  /**
    *  @brief Get the PCell parameters of a PCell instance
    *
    *  For the order of the parameters, ask the PCell declaration (available trough Layout::pcell_declaration
-   *  from the PCell id).
+   *  from the PCell id or from Layout::pcell_declaration_for_pcell_variant from the cell_index).
    *
    *  @return A list of parameters in the order they are declared.
    */

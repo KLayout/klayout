@@ -126,7 +126,22 @@ public:
    *  The container becomes owner of the technology object.
    *  Replaces a technology with the name of the given technology.
    */
-  void add (Technology *technology);
+  void add (Technology *technology)
+  {
+    add_tech (technology, true /*replace*/);
+  }
+
+  /**
+   *  @brief Adds a technology with a new name
+   *
+   *  Like \add, but throws an exception if a technology with this name
+   *  already exists. Takes over ownership over the technology object.
+   *  The technology object is discarded if an exception is thrown.
+   */
+  void add_new (Technology *technology)
+  {
+    add_tech (technology, false /*throws exception on same name*/);
+  }
 
   /**
    *  @brief Remove a technology with the given name from the setup
@@ -233,6 +248,8 @@ private:
   tl::stable_vector<Technology> m_technologies;
   bool m_changed;
   bool m_in_update;
+
+  void add_tech (Technology *technology, bool replace_same);
 };
 
 /**

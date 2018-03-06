@@ -110,6 +110,18 @@ OASISReader::OASISReader (tl::InputStream &s)
 {
   m_progress.set_format (tl::to_string (QObject::tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
+  m_first_cellname = 0;
+  m_first_propname = 0;
+  m_first_propstring = 0;
+  m_first_textstring = 0;
+  m_first_layername = 0;
+  m_in_table = NotInTable;
+  m_table_cellname = 0;
+  m_table_propname = 0;
+  m_table_propstring = 0;
+  m_table_textstring = 0;
+  m_table_layername = 0;
+  m_table_start = 0;
 }
 
 OASISReader::~OASISReader ()
@@ -195,6 +207,16 @@ OASISReader::get_long ()
   } else {
     return long (u >> 1);
   }
+}
+
+inline unsigned long
+OASISReader::get_ulong_for_divider ()
+{
+  unsigned long l = get_ulong ();
+  if (l == 0) {
+    error (tl::to_string (QObject::tr ("Divider must not be zero")));
+  }
+  return l;
 }
 
 inline unsigned long 
@@ -295,21 +317,21 @@ OASISReader::get_real ()
 
   } else if (t == 2) {
 
-    return 1.0 / double (get_ulong ()); 
+    return 1.0 / double (get_ulong_for_divider ());
 
   } else if (t == 3) {
 
-    return -1.0 / double (get_ulong ()); 
+    return -1.0 / double (get_ulong_for_divider ());
 
   } else if (t == 4) {
 
     double d = double (get_ulong ());
-    return d / double (get_ulong ()); 
+    return d / double (get_ulong_for_divider ());
 
   } else if (t == 5) {
 
     double d = double (get_ulong ());
-    return -d / double (get_ulong ()); 
+    return -d / double (get_ulong_for_divider ());
 
   } else if (t == 6) {
 

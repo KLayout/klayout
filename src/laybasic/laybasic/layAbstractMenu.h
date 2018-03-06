@@ -785,6 +785,13 @@ public:
   void insert_menu (const std::string &path, const std::string &name, const std::string &title); 
 
   /**
+   *  @brief Deletes the children of the item with the given path
+   *
+   *  If the item does not exist or is not a menu, this method does nothing.
+   */
+  void clear_menu (const std::string &path);
+
+  /**
    *  @brief Delete the item given by the path
    *
    *  @param path The path to the item to delete

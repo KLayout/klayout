@@ -450,6 +450,7 @@ MainWindow::MainWindow (QApplication *app, const char *name)
       m_disable_tab_selected (false),
       m_exited (false),
       dm_do_update_menu (this, &MainWindow::do_update_menu),
+      dm_do_update_file_menu (this, &MainWindow::do_update_file_menu),
       dm_exit (this, &MainWindow::exit),
       m_grid_micron (0.001),
       m_default_grids_updated (true),
@@ -607,15 +608,6 @@ MainWindow::MainWindow (QApplication *app, const char *name)
   mp_cpy_label->setToolTip (QObject::tr ("Current cursor position (y)"));
   cp_frame_ly->addWidget (mp_cpy_label);
   cp_frame_ly->insertSpacing (-1, 6);
-
-  //  connect to the menus to provide the dynamic parts
-  QMenu *bookmark_menu = mp_menu->menu ("bookmark_menu");
-  tl_assert (bookmark_menu != 0);
-  connect (bookmark_menu, SIGNAL (aboutToShow ()), this, SLOT (bookmark_menu_show ()));
-
-  QMenu *file_menu = mp_menu->menu ("file_menu");
-  tl_assert (file_menu != 0);
-  connect (file_menu, SIGNAL (aboutToShow ()), this, SLOT (file_menu_show ()));
 
   //  select the default mode
   select_mode (lay::LayoutView::default_mode ());
@@ -1595,6 +1587,8 @@ MainWindow::configure (const std::string &name, const std::string &value)
       }
     }
 
+    dm_do_update_file_menu ();
+
     return true;
 
   } else if (name == cfg_micron_digits) {
@@ -1797,6 +1791,12 @@ MainWindow::edits_enabled_changed ()
   for (std::vector<std::string>::const_iterator g = edit_grp.begin (); g != edit_grp.end (); ++g) {
     mp_menu->action (*g).set_enabled (enable);
   }
+}
+
+void
+MainWindow::menu_needs_update ()
+{
+  lay::LayoutView::update_menu (current_view (), *mp_menu);
 }
 
 void
@@ -2428,57 +2428,6 @@ MainWindow::cm_redo ()
 }
 
 void
-MainWindow::bookmark_menu_show ()
-{
-  if (mp_menu->is_valid ("bookmark_menu.goto_bookmark_menu")) {
-
-    Action goto_bookmark_action = mp_menu->action ("bookmark_menu.goto_bookmark_menu");
-    bool has_bookmarks = current_view () && current_view ()->bookmarks ().size () > 0;
-
-    if (has_bookmarks && edits_enabled ()) {
-
-      goto_bookmark_action.set_enabled (true);
-
-      QMenu *goto_bookmark_menu = goto_bookmark_action.qaction ()->menu ();
-      if (goto_bookmark_menu) {
-
-        goto_bookmark_menu->clear ();
-
-        if (current_view ()) {
-          const lay::BookmarkList &bookmarks = current_view ()->bookmarks ();
-          for (size_t i = 0; i < bookmarks.size (); ++i) {
-            QAction *action = goto_bookmark_menu->addAction (tl::to_qstring (bookmarks.name (i)));
-            action->setObjectName (tl::to_qstring (tl::sprintf ("bookmark_%d", i + 1)));
-            gtf::action_connect (action, SIGNAL (triggered ()), this, SLOT (goto_bookmark ()));
-            action->setData (QVariant (int (i)));
-          }
-        }
-
-      }
-
-    } else {
-      goto_bookmark_action.set_enabled (false);
-    }
-
-  }
-}
-
-void
-MainWindow::goto_bookmark ()
-{
-  BEGIN_PROTECTED
-
-  QAction *action = dynamic_cast <QAction *> (sender ());
-  tl_assert (action);
-  size_t id = size_t (action->data ().toInt ());
-  if (current_view () && current_view ()->bookmarks ().size () > id) {
-    current_view ()->goto_view (current_view ()->bookmarks ().state (id));
-  }
-
-  END_PROTECTED
-}
-
-void
 MainWindow::cm_goto_position ()
 {
   BEGIN_PROTECTED
@@ -2581,19 +2530,7 @@ MainWindow::cm_bookmark_view ()
   BEGIN_PROTECTED
 
   if (current_view ()) {
-    while (true) {
-      bool ok = false;
-      QString text = QInputDialog::getText (this, QObject::tr ("Enter Bookmark Name"), QObject::tr ("Bookmark name"),
-                                            QLineEdit::Normal, QString::null, &ok);
-      if (! ok) {
-        break;
-      } else if (text.isEmpty ()) {
-        QMessageBox::critical (this, QObject::tr ("Error"), QObject::tr ("Enter a name for the bookmark"));
-      } else {
-        current_view ()->bookmark_view (tl::to_string (text));
-        break;
-      }
-    }
+    current_view ()->bookmark_current_view ();
   }
 
   END_PROTECTED
@@ -3360,6 +3297,7 @@ MainWindow::select_view (int index)
     clear_current_pos ();
     edits_enabled_changed ();
     clear_message ();
+    menu_needs_update ();
 
     m_disable_tab_selected = dis;
 
@@ -3739,6 +3677,7 @@ MainWindow::clone_current_view ()
   connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
+  connect (view, SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
   connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
   connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
   connect (view, SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
@@ -4042,6 +3981,7 @@ MainWindow::close_view (int index)
 
         clear_current_pos ();
         edits_enabled_changed ();
+        menu_needs_update ();
         clear_message ();
 
         update_dock_widget_state ();
@@ -4173,30 +4113,28 @@ MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
 }
 
 void
-MainWindow::file_menu_show ()
+MainWindow::do_update_file_menu ()
 {
-  if (mp_menu->is_valid ("file_menu.open_recent_menu")) {
+  std::string mru_menu = "file_menu.open_recent_menu";
 
-    Action open_recent_action = mp_menu->action ("file_menu.open_recent_menu");
+  if (mp_menu->is_valid (mru_menu)) {
+
+    Action open_recent_action = mp_menu->action (mru_menu);
+    open_recent_action.set_enabled (true);
 
     if (m_mru.size () > 0 && edits_enabled ()) {
 
-      open_recent_action.set_enabled (true);
+      //  rebuild MRU menu
+      mp_menu->clear_menu (mru_menu);
 
-      QMenu *open_recent_menu = open_recent_action.qaction ()->menu ();
-      if (open_recent_menu) {
-
-        open_recent_menu->clear ();
-
-        for (std::vector<std::pair<std::string, std::string> >::iterator mru = m_mru.end (); mru != m_mru.begin (); ) {
-          --mru;
-          unsigned int i = std::distance (m_mru.begin (), mru);
-          QAction *action = open_recent_menu->addAction (tl::to_qstring (mru->first));
-          action->setObjectName (tl::to_qstring (tl::sprintf ("open_recent_%d", i + 1)));
-          gtf::action_connect (action, SIGNAL (triggered ()), this, SLOT (open_recent ()));
-          action->setData (QVariant (int (i)));
-        }
-
+      for (std::vector<std::pair<std::string, std::string> >::iterator mru = m_mru.end (); mru != m_mru.begin (); ) {
+        --mru;
+        unsigned int i = std::distance (m_mru.begin (), mru);
+        Action action;
+        gtf::action_connect (action.qaction (), SIGNAL (triggered ()), this, SLOT (open_recent ()));
+        action.set_title (mru->first);
+        action.qaction ()->setData (QVariant (int (i)));
+        mp_menu->insert_item (mru_menu + ".end", tl::sprintf ("open_recent_%d", i + 1), action);
       }
 
     } else {
@@ -4349,6 +4287,7 @@ MainWindow::do_create_view ()
   connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
+  connect (view, SIGNAL (menu_needs_update ()), this, SLOT (menu_needs_update ()));
   connect (view, SIGNAL (show_message (const std::string &, int)), this, SLOT (message (const std::string &, int)));
   connect (view, SIGNAL (current_pos_changed (double, double, bool)), this, SLOT (current_pos (double, double, bool)));
   connect (view, SIGNAL (clear_current_pos ()), this, SLOT (clear_current_pos ()));
@@ -5016,6 +4955,10 @@ void
 MainWindow::do_update_menu ()
 {
   mp_menu->build (menuBar (), mp_tool_bar);
+  lay::GuiApplication *app = dynamic_cast<lay::GuiApplication *> (qApp);
+  if (app) {
+    app->force_update_app_menu ();
+  }
 }
 
 void

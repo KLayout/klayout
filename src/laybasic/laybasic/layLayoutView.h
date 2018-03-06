@@ -1558,6 +1558,11 @@ public:
   void bookmark_view (const std::string &name);
 
   /**
+   *  @brief Asks for a bookmark name and bookmark the current view under this name
+   */
+  void bookmark_current_view ();
+
+  /**
    *  @brief Show the bookmark management form
    */
   void manage_bookmarks ();
@@ -1602,6 +1607,12 @@ public:
    *  @brief Perform the layout view's initialisations on the main menu
    */
   static void init_menu (lay::AbstractMenu &menu);
+
+  /**
+   *  @brief Updates the menu for the given view
+   *  If the view is 0, the menu shall be updated to reflect "no view active"
+   */
+  static void update_menu (lay::LayoutView *view, lay::AbstractMenu &menu);
 
   /**
    *  @brief Query the default mode
@@ -2530,6 +2541,7 @@ public slots:
 
 private slots:
   void active_cellview_changed (int index);
+  void goto_bookmark ();
 
 signals:
   /**
@@ -2561,6 +2573,11 @@ signals:
    *  @brief This signal is sent when the "edits_enabled" state has changed
    */
   void edits_enabled_changed ();
+
+  /**
+   *  @brief This signal is sent when the view wants to update the menu
+   */
+  void menu_needs_update ();
 
 protected:
   /**

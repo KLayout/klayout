@@ -915,26 +915,28 @@ void Macro::install_doc () const
 
         if (cls == 0) {
           tl::error << tl::to_string (QObject::tr ("Reading class doc from ")) << path () << ": " << tl::to_string (QObject::tr ("@method without preceeding @class"));
-        }
+        } else {
 
-        std::string n;
-        ex.read_word_or_quoted (n);
+          std::string n;
+          ex.read_word_or_quoted (n);
 
-        std::string doc;
-        while (++i < lines.size ()) {
-          std::string l = tl::trim (lines [i]);
-          if (l.find ("@method") == 0 || l.find ("@static_method") == 0) {
-            break;
+          std::string doc;
+          while (++i < lines.size ()) {
+            std::string l = tl::trim (lines [i]);
+            if (l.find ("@method") == 0 || l.find ("@static_method") == 0) {
+              break;
+            }
+            if (! doc.empty ()) {
+              doc += "\n";
+            }
+            doc += lines [i];
           }
-          if (! doc.empty ()) {
-            doc += "\n";
-          }
-          doc += lines [i];
-        }
-        --i;
+          --i;
 
-        ExternalMethod *meth = new ExternalMethod (n, doc, false, st);
-        cls->add_method (meth);
+          ExternalMethod *meth = new ExternalMethod (n, doc, false, st);
+          cls->add_method (meth);
+
+        }
 
       }
 

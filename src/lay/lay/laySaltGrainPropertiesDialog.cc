@@ -259,7 +259,7 @@ SaltGrainPropertiesDialog::dependency_changed (QTreeWidgetItem *item, int column
   m_update_enabled = false;
 
   std::string name = tl::to_string (item->data (0, Qt::UserRole).toString ().simplified ());
-  SaltGrain *g = mp_salt->grain_by_name (name);
+  SaltGrain *g = mp_salt ? mp_salt->grain_by_name (name) : 0;
 
   if (column == 0 && mp_salt) {
 

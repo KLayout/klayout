@@ -1621,6 +1621,8 @@ MacroEditorDialog::current_tab_changed (int index)
 
   //  clear the search
   searchEditBox->clear ();
+  replaceFrame->setEnabled (page && page->macro () && !page->macro ()->is_readonly ());
+
   apply_search ();
 
   do_update_ui_to_run_mode ();

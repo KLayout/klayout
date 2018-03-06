@@ -1092,7 +1092,7 @@ Net::Net ()
 }
 
 Net::Net (const NetTracer &tracer, const db::ICplxTrans &trans, const db::Layout &layout, db::cell_index_type cell_index, const std::string &layout_filename, const std::string &layout_name, const NetTracerData &data)
-  : m_name (tracer.name ()), m_incomplete (tracer.incomplete ())
+  : m_name (tracer.name ()), m_incomplete (tracer.incomplete ()), m_trace_path (false)
 {
   m_dbu = layout.dbu ();
   m_top_cell_name = layout.cell_name (cell_index);

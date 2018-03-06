@@ -449,6 +449,7 @@ def RunMainBuildBash():
     AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
     parameters    += " \\\n  -bin    %s" % MacBinDir
     parameters    += " \\\n  -build  %s" % MacBuildDir
+  parameters    += " \\\n  -rpath    %s" % "@executable_path/../Frameworks"
 
   # (C) want Qt bindings with Ruby scripts?
   if NoQtBindings:
@@ -698,10 +699,13 @@ def DeployBinariesForBundle():
   shutil.copy2( sourceDir0 + "/PkgInfo",      targetDir0 ) # this file is not mandatory
   shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
   shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
+  shutil.copy2( sourceDir2 + "/qt.conf", targetDirM )
+
 
   os.chmod( targetDir0 + "/PkgInfo",      0o0644 )
   os.chmod( targetDir0 + "/Info.plist",   0o0644 )
   os.chmod( targetDirM + "/klayout",      0o0755 )
+  os.chmod( targetDirM + "/qt.conf",      0o0644 )
   os.chmod( targetDirR + "/klayout.icns", 0o0644 )
 
   buddies = glob.glob( sourceDir3 + "/strm*" )
@@ -727,7 +731,7 @@ def DeployBinariesForBundle():
     return 1
 
   buddies     = glob.glob( "klayout.app/Contents/Buddy/strm*" )
-  macdepQtOpt = "-executable=%s " % klayoutexec
+  macdepQtOpt = ""
   for buddy in buddies:
     macdepQtOpt += "-executable=%s " % buddy
     ret = SetChangeLibIdentificationName( buddy, "../Frameworks" )

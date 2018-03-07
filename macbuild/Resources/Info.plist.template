@@ -29,6 +29,8 @@
         </array>
         <key>CFBundleTypeRole</key>
         <string>Editor</string>
+        <key>CFBundleTypeIconFile</key>
+        <string>${ICONFILE}</string>
       </dict>
     </array>
     <key>CFBundleSignature</key>

@@ -75,6 +75,11 @@
 #  include <dlfcn.h>
 #endif
 
+#if defined(__APPLE__)
+#  include <QFileOpenEvent>
+#  include <QtDebug>
+#endif
+
 namespace gsi
 {
   void make_application_decl (bool non_gui_mode);
@@ -1390,6 +1395,20 @@ GuiApplication::force_update_app_menu ()
   emit focusWindowChanged (focusWindow ());
 #endif
 }
+
+#if defined(__APPLE__)
+bool
+GuiApplication::event(QEvent *event)
+{
+  if (event->type() == QEvent::FileOpen) {
+      QFileOpenEvent *openEvent = static_cast<QFileOpenEvent *>(event);
+      qDebug() << "Open file" << openEvent->file();
+  }
+
+  return QApplication::event(event);
+}
+#endif
+
 
 int
 GuiApplication::exec ()

@@ -62,6 +62,7 @@ QMAKE_CXXFLAGS_WARN_ON += \
     -Wno-long-long \
     -Wno-strict-aliasing \
     -Wno-deprecated-declarations \
+    -Wno-reserved-user-defined-literal \
 
 QT += network xml sql 
 

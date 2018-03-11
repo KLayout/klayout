@@ -60,7 +60,7 @@ Relevant KLayout version: 0.25.1
         to deploy executables and libraries under "klayout.app" bundle.
         The buddy command line tools (strm*) will also be deployed.
             $ ./build4mac.py -r mp24 -p mp36 -Y
-      * [-Y|--DEPOLY] option deploys KLayout's dylibs and executables only.
+      * [-Y|--DEPLOY] option deploys KLayout's dylibs and executables only.
         That is, paths to other modules (Ruby, Python, and Qt5 Frameworks)
         remain unchanged (absolute paths in your development environment).
     (5) Copy/move generated bundles ("klayout.app" and "klayout.scripts/") to your

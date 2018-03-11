@@ -143,7 +143,7 @@ def SetChangeLibIdentificationName( executable, relativedir ):
   otoolOut   = os.popen( otoolCm ).read()
   exedepdic  = DecomposeLibraryDependency( executable + ":\n" + otoolOut )
   keys       = exedepdic.keys()
-  deplibs    = exedepdic[ keys[0] ]
+  deplibs    = exedepdic[ list(keys)[0] ]
 
   for lib in deplibs:
     #-----------------------------------------------------------

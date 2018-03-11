@@ -28,6 +28,9 @@
 
 #include <QApplication>
 #include <QEventLoop>
+#ifdef __APPLE__
+#  include <QEvent>
+#endif
 
 #include "gsi.h"
 
@@ -437,6 +440,14 @@ public:
    *  This function is used for work around a MacOS issue.
    */
   void force_update_app_menu ();
+
+  /**
+   *  @brief Handles MacOS file open
+   *  This function is used to process the "Open With" event sent by MacOS.
+   */
+#ifdef __APPLE__
+  bool event (QEvent *event);
+#endif
 
 protected:
   virtual void setup ();

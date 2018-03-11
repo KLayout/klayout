@@ -21,60 +21,43 @@
 */
 
 
-#ifndef HDR_layMacroEditorSetupDialog
-#define HDR_layMacroEditorSetupDialog
+#ifndef HDR_layMacroEditorSetupPage
+#define HDR_layMacroEditorSetupPage
 
-#include "layGenericSyntaxHighlighter.h"
-#include "lymMacro.h"
-#include "ui_MacroEditorSetupDialog.h"
-
-#include <QDialog>
-
-#include <vector>
+#include "layPlugin.h"
+#include "ui_MacroEditorSetupPage.h"
 
 namespace lay
 {
 
-struct MacroEditorSetupDialogData
-{
-  MacroEditorSetupDialogData ()
-    : basic_attributes (0), tab_width (8), indent (2), save_all_on_run (true), stop_on_exception (true), file_watcher_enabled (true), font_size (0)
-  {
-  }
-
-  GenericSyntaxHighlighterAttributes basic_attributes;
-  std::vector <std::pair <std::string, GenericSyntaxHighlighterAttributes> > specific_attributes;
-  int tab_width;
-  int indent;
-  bool save_all_on_run;
-  bool stop_on_exception;
-  bool file_watcher_enabled;
-  std::string font_family;
-  int font_size;
-};
+struct MacroEditorSetupDialogData;
 
 /**
  *  @brief The dialog for editing the properties of the debugger/editor
  */
-class MacroEditorSetupDialog
-  : public QDialog, private Ui::MacroEditorSetupDialog
+class MacroEditorSetupPage
+  : public lay::ConfigPage, private Ui::MacroEditorSetupPage
 {
 Q_OBJECT
 
 public:
-  MacroEditorSetupDialog (QWidget *parent);
+  MacroEditorSetupPage (QWidget *parent);
+  ~MacroEditorSetupPage ();
 
-  int exec_dialog (MacroEditorSetupDialogData &data);
+  virtual void setup (PluginRoot *root);
+  virtual void commit (PluginRoot *root);
 
 protected slots:
   void current_attribute_changed (QListWidgetItem *current, QListWidgetItem *previous);
   void cb_changed (int n);
   void color_changed (QColor c);
   void update_font ();
+  void clear_exception_list ();
 
 private:
   void commit_attributes (QListWidgetItem *to_item);
   void update_attributes (QListWidgetItem *from_item);
+  void update_ignore_exception_list ();
 
   MacroEditorSetupDialogData *mp_data;
 };

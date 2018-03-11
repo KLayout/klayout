@@ -18,6 +18,21 @@
     <string>APPL</string>
     <key>CFBundleVersion</key>
     <string>${VERSION}</string>
+    <key>CFBundleShortVersionString</key>
+    <string>${VERSION}</string>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleTypeExtensions</key>
+        <array>
+          <string>gds</string>
+        </array>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleTypeIconFile</key>
+        <string>${ICONFILE}</string>
+      </dict>
+    </array>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>NSPrincipalClass</key>

@@ -1,0 +1,49 @@
+# qt app example with linux and mac: https://stackoverflow.com/questions/29721240/ci-for-qt-app-build-with-different-qt-versions
+
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode9.3beta
+      env:
+        - MATRIX_EVAL=""
+
+    # - os: osx
+    #   osx_image: xcode8
+    #   env:
+    #     - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+
+    # - os: osx
+    #   osx_image: xcode8
+    #   env:
+    #     - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
+
+    # - os: osx
+    #   osx_image: xcode8
+    #   env:
+    #     - MATRIX_EVAL="brew install gcc6 && CC=gcc-6 && CXX=g++-6"
+
+    # - os: osx
+    #   osx_image: xcode8
+    #   env:
+    #     - MATRIX_EVAL="brew install gcc && CC=gcc-7 && CXX=g++-7"
+
+before_install:
+    - eval "${MATRIX_EVAL}"
+    - brew update
+    - brew bundle
+
+install:
+  - git clone https://github.com/kristovatlas/osx-config-check
+  - cd osx-config-check ; python2.7 app.py --report-only --skip-sudo-checks ; cd ..
+
+script:
+  - python3 build4mac.py -p B36 -q Qt5Brew -c
+  - source filter-clang.sh; python3 build4mac.py -p B36 -q Qt5Brew | filter
+  - python3 build4mac.py -p B36 -q Qt5Brew -y
+  - qt5.pkg.macos-HighSierra-release/klayout.app/Contents/MacOS/klayout -b -r test-pylib-script.py
+  - cd qt5.build.macos-HighSierra-release
+  - ln -s klayout.app/Contents/MacOS/klayout klayout
+  - export TESTTMP=testtmp    # path to a directory that will hold temporary data (will be created)
+  - export TESTSRC=..         # path to the source directory
+  - ./ut_runner -h
+  - ./ut_runner -s

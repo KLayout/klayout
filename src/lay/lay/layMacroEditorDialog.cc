@@ -3475,7 +3475,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_save_all_on_run, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_debugging_enabled, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_file_watcher_enabled, "true"));
-    options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_font_size, ""));
+    options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_font_size, "0"));
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_font_family, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_stop_on_exception, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_tab_width, "8"));

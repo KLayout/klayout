@@ -20,7 +20,6 @@ HEADERS = \
     layLogViewerDialog.h \
     layMacroEditorDialog.h \
     layMacroEditorPage.h \
-    layMacroEditorSetupDialog.h \
     layMacroEditorTree.h \
     layMacroPropertiesDialog.h \
     layMacroVariableView.h \
@@ -57,7 +56,8 @@ HEADERS = \
     layLibraryController.h \
     layFontController.h \
     layNativePlugin.h \
-    laySystemPaths.h
+    laySystemPaths.h \
+    layMacroEditorSetupPage.h
 
 FORMS = \
     ClipDialog.ui \
@@ -69,7 +69,6 @@ FORMS = \
     LayoutStatistics.ui \
     LogViewerDialog.ui \
     MacroEditorDialog.ui \
-    MacroEditorSetupDialog.ui \
     MacroPropertiesDialog.ui \
     MacroTemplateSelectionDialog.ui \
     MainConfigPage.ui \
@@ -106,7 +105,8 @@ FORMS = \
     SaltGrainPropertiesDialog.ui \
     SaltGrainTemplateSelectionDialog.ui \
     SaltManagerInstallConfirmationDialog.ui \
-    CustomizeMenuConfigPage.ui
+    CustomizeMenuConfigPage.ui \
+    MacroEditorSetupPage.ui
 
 SOURCES = \
     gsiDeclLayApplication.cc \
@@ -125,7 +125,6 @@ SOURCES = \
     layLogViewerDialog.cc \
     layMacroEditorDialog.cc \
     layMacroEditorPage.cc \
-    layMacroEditorSetupDialog.cc \
     layMacroEditorTree.cc \
     layMacroPropertiesDialog.cc \
     layMacroVariableView.cc \
@@ -161,7 +160,8 @@ SOURCES = \
     layLibraryController.cc \
     layFontController.cc \
     layNativePlugin.cc \
-    laySystemPaths.cc
+    laySystemPaths.cc \
+    layMacroEditorSetupPage.cc
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \

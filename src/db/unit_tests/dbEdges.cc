@@ -311,7 +311,40 @@ TEST(6)
   EXPECT_EQ (r.to_string (), "(-20,-20;-20,220;120,220;120,-20/-10,-10;110,-10;110,210;-10,210)");
 }
 
-TEST(7) 
+TEST(6b)
+{
+  //  Ticket #90: order of edges as input to the edge collector should not matter
+
+  db::Edges e;
+  e.insert (db::Edge (db::Point (0, -200), db::Point (100, -200)));
+  e.insert (db::Edge (db::Point (250, -200), db::Point (300, 0)));
+  e.insert (db::Edge (db::Point (0, 0), db::Point (0, -200)));
+  e.insert (db::Edge (db::Point (200, 0), db::Point (250, -200)));
+
+  db::Region r;
+  e.extended (r, 0, 0, 20, 0, true);
+  EXPECT_EQ (r.to_string (), "(0,-200;0,0;20,0;20,-180;100,-180;100,-200);(250,-200;200,0;219,5;250,-118;281,5;300,0)");
+}
+
+TEST(6c)
+{
+  //  A more complex scenario with forks
+
+  db::Edges e;
+  e.insert (db::Edge (db::Point (0, -200), db::Point (100, -200)));
+  e.insert (db::Edge (db::Point (250, -200), db::Point (300, 0)));
+  e.insert (db::Edge (db::Point (0, 0), db::Point (0, -200)));
+  e.insert (db::Edge (db::Point (0, -100), db::Point (0, -200)));
+  e.insert (db::Edge (db::Point (200, 0), db::Point (250, -200)));
+  e.insert (db::Edge (db::Point (0, -200), db::Point (200, -200)));
+  e.insert (db::Edge (db::Point (250, -200), db::Point (350, 0)));
+
+  db::Region r;
+  e.extended (r, 0, 0, 20, 0, true);
+  EXPECT_EQ (r.to_string (), "(0,-200;0,0;20,0;20,-180;100,-180;100,-200);(0,-200;0,-100;20,-100;20,-180;200,-180;200,-200);(250,-200;200,0;219,5;250,-118;281,5;300,0);(250,-200;232,-191;332,9;350,0)");
+}
+
+TEST(7)
 {
   db::Edges e;
   e.insert (db::Edge (db::Point (0, 0), db::Point (0, 200)));

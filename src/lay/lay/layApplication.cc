@@ -1391,6 +1391,35 @@ GuiApplication::force_update_app_menu ()
 #endif
 }
 
+#if defined(__APPLE__)
+// By Thomas Lima (March 7, 2018)
+// 
+// This event interceptor catches MacOS "Open With" event, and KLayout should respond 
+// similarly to the Drop event in MainWindow::dropEvent.
+// 
+// This particular implementation always creates a new window.
+//
+// This was implemented with the inspiration of http://doc.qt.io/qt-5/qfileopenevent.html
+bool
+GuiApplication::event (QEvent *event)
+{
+  if (event->type() == QEvent::FileOpen) {
+      QFileOpenEvent *openEvent = static_cast<QFileOpenEvent *>(event);
+      if (mp_mw)
+      {
+        const std::string tech = mp_mw->initial_technology();
+        const std::string file = tl::to_string (openEvent->file());
+        const int mode = 1; // open in new window
+        mp_mw->load_layout (file, tech, mode);
+        mp_mw->add_mru (file, tech);
+      }
+  }
+
+  return QApplication::event(event);
+}
+#endif
+
+
 int
 GuiApplication::exec ()
 {

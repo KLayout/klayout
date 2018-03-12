@@ -65,9 +65,9 @@ def SetGlobals():
   Usage += "                        :   'nil' = not to support the script language               | \n"
   Usage += "                        :   'Sys' = using the OS standard script language            | \n"
   Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details           | \n"
-  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts']                        | qt5macports \n"
-  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24']                       | sys \n"
-  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36']              | sys \n"
+  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Custom']           | qt5macports \n"
+  Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24', 'B25']                | sys \n"
+  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B36']       | sys \n"
   Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                  | disabled \n"
   Usage += "   [-m|--make <option>] : option passed to 'make'                                    | -j4 \n"
   Usage += "   [-d|--debug]         : enable debug mode build                                    | disabled \n"
@@ -239,7 +239,7 @@ def ParseCommandLineArguments():
     quit()
 
   # Determine Qt type
-  candidates = [ i.upper() for i in ['Qt4MacPorts', 'Qt5MacPorts'] ]
+  candidates = [ i.upper() for i in ['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Custom'] ]
   ModuleQt   = ""
   index      = 0
   for item in candidates:
@@ -249,6 +249,9 @@ def ParseCommandLineArguments():
         break
       elif index == 1:
         ModuleQt = 'Qt5MacPorts'
+        break
+      elif index == 2:
+        ModuleQt = 'Qt5Custom'
         break
     else:
       index += 1
@@ -262,7 +265,7 @@ def ParseCommandLineArguments():
   NonOSStdLang = False
 
   # Determine Ruby type
-  candidates = [ i.upper() for i in ['nil', 'Sys', 'Src24', 'MP24'] ]
+  candidates = [ i.upper() for i in ['nil', 'Sys', 'Src24', 'MP24', 'B25'] ]
   ModuleRuby = ""
   index      = 0
   for item in candidates:
@@ -288,6 +291,9 @@ def ParseCommandLineArguments():
       elif index == 3:
         ModuleRuby   = 'Ruby24MacPorts'
         NonOSStdLang = True
+      elif index == 4:
+        ModuleRuby   = 'Ruby25Brew'
+        NonOSStdLang = True
     else:
       index += 1
   if ModuleRuby == "":
@@ -297,7 +303,7 @@ def ParseCommandLineArguments():
     quit()
 
   # Determine Python type
-  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36'] ]
+  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B36'] ]
   ModulePython = ""
   index        = 0
   for item in candidates:
@@ -325,6 +331,9 @@ def ParseCommandLineArguments():
         NonOSStdLang = True
       elif index == 4:
         ModulePython = 'Python36MacPorts'
+        NonOSStdLang = True
+      elif index == 5:
+        ModulePython = 'Python36Brew'
         NonOSStdLang = True
     else:
       index += 1
@@ -427,6 +436,20 @@ def RunMainBuildBash():
     AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
     parameters    += " \\\n  -bin    %s" % MacBinDir
     parameters    += " \\\n  -build  %s" % MacBuildDir
+  elif ModuleQt == 'Qt5Custom':
+    parameters    += " \\\n  -qt5"
+    parameters    += " \\\n  -qmake  %s" % Qt5Custom['qmake']
+    MacPkgDir      = "./qt5.pkg.macos-%s-%s"        % (Platform, mode)
+    MacBinDir      = "./qt5.bin.macos-%s-%s"        % (Platform, mode)
+    MacBuildDir    = "./qt5.build.macos-%s-%s"      % (Platform, mode)
+    MacBuildLog    = "./qt5.build.macos-%s-%s.log"  % (Platform, mode)
+    AbsMacPkgDir   = "%s/qt5.pkg.macos-%s-%s"       % (ProjectDir, Platform, mode)
+    AbsMacBinDir   = "%s/qt5.bin.macos-%s-%s"       % (ProjectDir, Platform, mode)
+    AbsMacBuildDir = "%s/qt5.build.macos-%s-%s"     % (ProjectDir, Platform, mode)
+    AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
+    parameters    += " \\\n  -bin    %s" % MacBinDir
+    parameters    += " \\\n  -build  %s" % MacBuildDir
+  parameters    += " \\\n  -rpath    %s" % "@executable_path/../Frameworks"
 
   # (C) want Qt bindings with Ruby scripts?
   if NoQtBindings:
@@ -524,9 +547,9 @@ def DeployBinariesForBundle():
   if not DeploymentF and not DeploymentP:
     return 1
   if DeploymentF and NonOSStdLang:
-    print( "!!! You chose <-y|--deploy> while using non-OS-standard script language.", file=sys.stderr )
+    print( "WARNING!!! You chose <-y|--deploy> while using non-OS-standard script language.", file=sys.stderr )
     print( "    Use <-Y|--DEPLOY> instead", file=sys.stderr )
-    return 1
+    #return 1
   if not os.path.isfile(MacBuildLog):
     print( "!!! Build log file <%s> does not present !!!" % MacBuildLog, file=sys.stderr )
     return 1
@@ -629,7 +652,7 @@ def DeployBinariesForBundle():
       # e.g. [ 'libklayout_lay', '0', '25', '0', 'dylib' ]
       nameStyle3 = fullName[0] + "." + fullName[1] + ".dylib"
       shutil.copy2( item, nameStyle3 )
-      os.chmod( nameStyle3, 0755 )
+      os.chmod( nameStyle3, 0o0755 )
       #-------------------------------------------------------------------
       # (B) Then get inter-library dependencies
       #-------------------------------------------------------------------
@@ -676,17 +699,20 @@ def DeployBinariesForBundle():
   shutil.copy2( sourceDir0 + "/PkgInfo",      targetDir0 ) # this file is not mandatory
   shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
   shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
+  shutil.copy2( sourceDir2 + "/qt.conf", targetDirM )
 
-  os.chmod( targetDir0 + "/PkgInfo",      0644 )
-  os.chmod( targetDir0 + "/Info.plist",   0644 )
-  os.chmod( targetDirM + "/klayout",      0755 )
-  os.chmod( targetDirR + "/klayout.icns", 0644 )
+
+  os.chmod( targetDir0 + "/PkgInfo",      0o0644 )
+  os.chmod( targetDir0 + "/Info.plist",   0o0644 )
+  os.chmod( targetDirM + "/klayout",      0o0755 )
+  os.chmod( targetDirM + "/qt.conf",      0o0644 )
+  os.chmod( targetDirR + "/klayout.icns", 0o0644 )
 
   buddies = glob.glob( sourceDir3 + "/strm*" )
   for item in buddies:
     shutil.copy2( item, targetDirB )
     buddy = os.path.basename(item)
-    os.chmod( targetDirB + "/" + buddy, 0755 )
+    os.chmod( targetDirB + "/" + buddy, 0o0755 )
 
 
   print( " [7] Setting and changing the identification names of KLayout's libraries in each executable ..." )
@@ -729,10 +755,15 @@ def DeployBinariesForBundle():
       deploytool = Qt5MacPorts['deploy']
       app_bundle = "klayout.app"
       options    = macdepQtOpt + verbose
+    elif ModuleQt == 'Qt5Custom':
+      deploytool = Qt5Custom['deploy']
+      app_bundle = "klayout.app"
+      options    = macdepQtOpt + verbose
 
     os.chdir(ProjectDir)
     os.chdir(MacPkgDir)
     command = "%s %s %s" % ( deploytool, app_bundle, options )
+    print(command)
     if subprocess.call( command, shell=True ) != 0:
       msg = "!!! Failed to deploy applications on OSX !!!"
       print( msg, file=sys.stderr )
@@ -834,10 +865,10 @@ def DeployScriptBundles():
   shutil.copy2( resourceDir + "/klayout-red.icns",  targetDirRE )
   shutil.copy2( resourceDir + "/klayout-blue.icns", targetDirRV )
 
-  os.chmod( targetDirME + "/KLayoutEditor.sh",  0755 )
-  os.chmod( targetDirMV + "/KLayoutViewer.sh",  0755 )
-  os.chmod( targetDirRE + "/klayout-red.icns",  0644 )
-  os.chmod( targetDirRV + "/klayout-blue.icns", 0644 )
+  os.chmod( targetDirME + "/KLayoutEditor.sh",  0o0755 )
+  os.chmod( targetDirMV + "/KLayoutViewer.sh",  0o0755 )
+  os.chmod( targetDirRE + "/klayout-red.icns",  0o0644 )
+  os.chmod( targetDirRV + "/klayout-blue.icns", 0o0644 )
 
   tmpfileE = ProjectDir + "/macbuild/Resources/Info.plist.template"
   keydicE  = { 'exe': 'KLayoutEditor.sh', 'icon': 'klayout-red.icns',  'bname': 'klayout', 'ver': Version }

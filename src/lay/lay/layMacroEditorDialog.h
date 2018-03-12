@@ -29,6 +29,7 @@
 #include "ui_MacroEditorDialog.h"
 #include "layMacroEditorPage.h"
 #include "layMacroController.h"
+#include "layPlugin.h"
 #include "tlDeferredExecution.h"
 #include "tlTimer.h"
 #include "tlFileSystemWatcher.h"
@@ -50,11 +51,34 @@ class QTreeWidgetItem;
 namespace lay
 {
 
+extern const std::string cfg_macro_editor_styles;
+extern const std::string cfg_macro_editor_save_all_on_run;
+extern const std::string cfg_macro_editor_stop_on_exception;
+extern const std::string cfg_macro_editor_file_watcher_enabled;
+extern const std::string cfg_macro_editor_font_family;
+extern const std::string cfg_macro_editor_font_size;
+extern const std::string cfg_macro_editor_tab_width;
+extern const std::string cfg_macro_editor_indent;
+extern const std::string cfg_macro_editor_window_state;
+extern const std::string cfg_macro_editor_console_mru;
+extern const std::string cfg_macro_editor_console_interpreter;
+extern const std::string cfg_macro_editor_open_macros;
+extern const std::string cfg_macro_editor_current_macro;
+extern const std::string cfg_macro_editor_active_macro;
+extern const std::string cfg_macro_editor_watch_expressions;
+extern const std::string cfg_macro_editor_debugging_enabled;
+extern const std::string cfg_macro_editor_ignore_exception_list;
+
 class MacroEditorTree;
 class BrowserPanel;
+class MainWindow;
 
 class MacroEditorDialog
-  : public QDialog, public gsi::Console, private Ui::MacroEditorDialog, public gsi::ExecutionHandler
+  : public QDialog,
+    public lay::Plugin,
+    public gsi::Console,
+    public gsi::ExecutionHandler,
+    private Ui::MacroEditorDialog
 {
   Q_OBJECT 
 
@@ -74,7 +98,7 @@ public:
   /**
    *  @brief Constructor
    */
-  MacroEditorDialog (QWidget *parent, lym::MacroCollection *root);
+  MacroEditorDialog (lay::MainWindow *parent, lym::MacroCollection *root);
 
   /**
    *  @brief Destructor
@@ -262,7 +286,10 @@ private:
   lym::Macro *new_macro ();
   void do_search_edited ();
   void select_trace (size_t index);
+  bool configure (const std::string &name, const std::string &value);
+  void config_finalize ();
 
+  lay::PluginRoot *mp_plugin_root;
   lym::MacroCollection *mp_root;
   bool m_first_show;
   bool m_in_processing;
@@ -294,10 +321,13 @@ private:
   double m_process_events_interval;
   tl::Clock m_last_process_events;
   bool m_window_closed;
+  bool m_needs_update;
+  std::string m_styles;
   int m_ntab;
   int m_nindent;
   bool m_save_all_on_run;
   bool m_stop_on_exception;
+  std::set<std::string> m_ignore_exception_list;
   bool m_file_watcher_enabled;
   std::string m_font_family;
   int m_font_size;

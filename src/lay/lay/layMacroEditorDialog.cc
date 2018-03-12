@@ -22,10 +22,11 @@
 
 
 #include "ui_MacroTemplateSelectionDialog.h"
+#include "layConfigurationDialog.h"
 #include "layMacroController.h"
 #include "layMacroEditorTree.h"
 #include "layMacroEditorDialog.h"
-#include "layMacroEditorSetupDialog.h"
+#include "layMacroEditorSetupPage.h"
 #include "layMacroPropertiesDialog.h"
 #include "layFileDialog.h"
 #include "layMainWindow.h"
@@ -58,6 +59,9 @@
 #include <QHeaderView>
 #include <QResource>
 
+namespace lay
+{
+
 const std::string cfg_macro_editor_styles ("macro-editor-styles");
 const std::string cfg_macro_editor_save_all_on_run ("macro-editor-save-all-on-run");
 const std::string cfg_macro_editor_stop_on_exception ("macro-editor-stop-on-exception");
@@ -74,9 +78,7 @@ const std::string cfg_macro_editor_current_macro ("macro-editor-current-macro");
 const std::string cfg_macro_editor_active_macro ("macro-editor-active-macro");
 const std::string cfg_macro_editor_watch_expressions ("macro-editor-watch-expressions");
 const std::string cfg_macro_editor_debugging_enabled ("macro-editor-debugging-enabled");
-
-namespace lay
-{
+const std::string cfg_macro_editor_ignore_exception_list ("macro-editor-ignore-exception-list");
 
 // -----------------------------------------------------------------------------------------
 //  Implementation of the macro template selection dialog
@@ -225,8 +227,10 @@ public:
 
 static lay::MacroEditorDialog *s_macro_editor_instance = 0;
 
-MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lym::MacroCollection *root)
+MacroEditorDialog::MacroEditorDialog (lay::MainWindow *mw, lym::MacroCollection *root)
   : QDialog (0 /*show as individual top widget*/, Qt::Window),
+    lay::Plugin (mw, true),
+    mp_plugin_root (mw),
     mp_root (root),
     m_first_show (true), m_in_processing (false), m_debugging_on (true),
     mp_run_macro (0),
@@ -245,6 +249,7 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lym::MacroCollection
     m_eval_context (-1),
     m_process_events_interval (0.0),
     m_window_closed (true),
+    m_needs_update (true),
     m_ntab (8),
     m_nindent (2),
     m_save_all_on_run (false),
@@ -598,6 +603,8 @@ MacroEditorDialog::MacroEditorDialog (QWidget * /*parent*/, lym::MacroCollection
   if (! s_macro_editor_instance) {
     s_macro_editor_instance = this;
   }
+
+  config_setup ();
 }
 
 MacroEditorDialog::~MacroEditorDialog ()
@@ -716,6 +723,113 @@ MacroEditorDialog::current_macro_tree ()
   return t;
 }
 
+void
+MacroEditorDialog::config_finalize ()
+{
+  if (m_needs_update) {
+
+    for (int i = 0; i < tabWidget->count (); ++i) {
+      MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->widget (i));
+      if (page) {
+        page->set_ntab (m_ntab);
+        page->set_nindent (m_nindent);
+        page->apply_attributes ();
+        page->set_font (m_font_family, m_font_size);
+      }
+    }
+
+    refresh_file_watcher ();
+
+    m_needs_update = false;
+
+  }
+}
+
+bool
+MacroEditorDialog::configure (const std::string &name, const std::string &value)
+{
+  //  Reads the dynamic configuration
+
+  if (name == cfg_macro_editor_styles) {
+
+    if (m_styles != value) {
+      m_styles = value;
+      m_needs_update = true;
+    }
+    m_highlighters.load (value);
+    return true;
+
+  } else if (name == cfg_macro_editor_save_all_on_run) {
+    tl::from_string (value, m_save_all_on_run);
+    return true;
+  } else if (name == cfg_macro_editor_stop_on_exception) {
+    tl::from_string (value, m_stop_on_exception);
+    return true;
+  } else if (name == cfg_macro_editor_file_watcher_enabled) {
+
+    bool en = m_file_watcher_enabled;
+    tl::from_string (value, en);
+    if (en != m_file_watcher_enabled) {
+      m_file_watcher_enabled = en;
+      m_needs_update = true;
+    }
+    return true;
+
+  } else if (name == cfg_macro_editor_font_family) {
+
+    if (m_font_family != value) {
+      m_font_family = value;
+      m_needs_update = true;
+    }
+    return true;
+
+  } else if (name == cfg_macro_editor_font_size) {
+
+    int v = m_font_size;
+    tl::from_string (value, v);
+    if (v != m_font_size) {
+      m_font_size = v;
+      m_needs_update = true;
+    }
+    return true;
+
+  } else if (name == cfg_macro_editor_tab_width) {
+
+    int v = m_ntab;
+    tl::from_string (value, v);
+    if (v != m_ntab) {
+      m_ntab = v;
+      m_needs_update = true;
+    }
+    return true;
+
+  } else if (name == cfg_macro_editor_indent) {
+
+    int v = m_nindent;
+    tl::from_string (value, v);
+    if (v != m_nindent) {
+      m_nindent = v;
+      m_needs_update = true;
+    }
+    return true;
+
+  } else if (name == cfg_macro_editor_ignore_exception_list) {
+
+    m_ignore_exception_list.clear ();
+    tl::Extractor ex (value.c_str ());
+    while (! ex.at_end ()) {
+      std::string f;
+      ex.read_word_or_quoted (f);
+      ex.test (";");
+      m_ignore_exception_list.insert (f);
+    }
+    return true;
+
+  } else {
+    return lay::Plugin::configure (name, value);
+  }
+}
+
 void 
 MacroEditorDialog::showEvent (QShowEvent *)
 {
@@ -726,29 +840,19 @@ MacroEditorDialog::showEvent (QShowEvent *)
 
   m_window_closed = false;
 
-  //  read configuration
-  std::string styles;
-  if (MainWindow::instance ()->config_get (cfg_macro_editor_styles, styles)) {
-    m_highlighters.load (styles);
-  }
-  MainWindow::instance ()->config_get (cfg_macro_editor_save_all_on_run, m_save_all_on_run);
-  MainWindow::instance ()->config_get (cfg_macro_editor_stop_on_exception, m_stop_on_exception);
-  MainWindow::instance ()->config_get (cfg_macro_editor_file_watcher_enabled, m_file_watcher_enabled);
-  MainWindow::instance ()->config_get (cfg_macro_editor_font_family, m_font_family);
-  MainWindow::instance ()->config_get (cfg_macro_editor_font_size, m_font_size);
-  MainWindow::instance ()->config_get (cfg_macro_editor_tab_width, m_ntab);
-  MainWindow::instance ()->config_get (cfg_macro_editor_indent, m_nindent);
-  MainWindow::instance ()->config_get (cfg_macro_editor_debugging_enabled, m_debugging_on);
+  //  read debugger environment from configuration
+
+  mp_plugin_root->config_get (cfg_macro_editor_debugging_enabled, m_debugging_on);
 
   std::string ws;
-  MainWindow::instance ()->config_get (cfg_macro_editor_window_state, ws);
+  mp_plugin_root->config_get (cfg_macro_editor_window_state, ws);
   lay::restore_dialog_state (this, ws);
 
   input_field->clear ();
 
   try {
     std::string hi;
-    MainWindow::instance ()->config_get (cfg_macro_editor_console_mru, hi);
+    mp_plugin_root->config_get (cfg_macro_editor_console_mru, hi);
     tl::Extractor ex (hi.c_str ());
     while (! ex.at_end ()) {
       std::string h;
@@ -770,7 +874,7 @@ MacroEditorDialog::showEvent (QShowEvent *)
   }
 
   std::string ci;
-  MainWindow::instance ()->config_get (cfg_macro_editor_console_interpreter, ci);
+  mp_plugin_root->config_get (cfg_macro_editor_console_interpreter, ci);
   if (ci == "ruby") {
     pythonLangSel->setChecked (false);
     rubyLangSel->setChecked (true);
@@ -784,7 +888,7 @@ MacroEditorDialog::showEvent (QShowEvent *)
     m_watch_expressions.clear ();
 
     std::string we;
-    MainWindow::instance ()->config_get (cfg_macro_editor_watch_expressions, we);
+    mp_plugin_root->config_get (cfg_macro_editor_watch_expressions, we);
     tl::Extractor ex (we.c_str ());
     while (! ex.at_end ()) {
 
@@ -806,7 +910,7 @@ MacroEditorDialog::showEvent (QShowEvent *)
 
   try {
     std::string om;
-    MainWindow::instance ()->config_get (cfg_macro_editor_open_macros, om);
+    mp_plugin_root->config_get (cfg_macro_editor_open_macros, om);
     tl::Extractor ex (om.c_str ());
     while (! ex.at_end ()) {
       std::string h;
@@ -818,7 +922,7 @@ MacroEditorDialog::showEvent (QShowEvent *)
   } catch (...) { }
 
   std::string am;
-  MainWindow::instance ()->config_get (cfg_macro_editor_active_macro, am);
+  mp_plugin_root->config_get (cfg_macro_editor_active_macro, am);
   if (! am.empty ()) {
     lym::Macro *macro = mp_root->find_macro (am);
     if (macro) {
@@ -829,7 +933,7 @@ MacroEditorDialog::showEvent (QShowEvent *)
   dbgOn->setChecked (m_debugging_on);
 
   std::string cm;
-  MainWindow::instance ()->config_get (cfg_macro_editor_current_macro, cm);
+  mp_plugin_root->config_get (cfg_macro_editor_current_macro, cm);
   if (! cm.empty ()) {
     //  this will make that macro the current one
     editor_for_file (cm);
@@ -866,10 +970,10 @@ void
 MacroEditorDialog::closeEvent (QCloseEvent *)
 {
   //  save the debugging enabled state
-  MainWindow::instance ()->config_set (cfg_macro_editor_debugging_enabled, m_debugging_on);
+  mp_plugin_root->config_set (cfg_macro_editor_debugging_enabled, m_debugging_on);
 
   //  save the window state
-  MainWindow::instance ()->config_set (cfg_macro_editor_window_state, lay::save_dialog_state (this));
+  mp_plugin_root->config_set (cfg_macro_editor_window_state, lay::save_dialog_state (this));
 
   //  save the console history (at maximum the last 200 entries)
   std::string hi;
@@ -879,7 +983,7 @@ MacroEditorDialog::closeEvent (QCloseEvent *)
     }
     hi += tl::to_quoted_string (tl::to_string (input_field->itemText (i)));
   }
-  MainWindow::instance ()->config_set (cfg_macro_editor_console_mru, hi);
+  mp_plugin_root->config_set (cfg_macro_editor_console_mru, hi);
 
   //  save the open macro list
   std::string om;
@@ -892,7 +996,7 @@ MacroEditorDialog::closeEvent (QCloseEvent *)
       om += tl::to_quoted_string (page->macro ()->path ());
     }
   }
-  MainWindow::instance ()->config_set (cfg_macro_editor_open_macros, om);
+  mp_plugin_root->config_set (cfg_macro_editor_open_macros, om);
 
   //  save the watch expressions
   std::string we;
@@ -908,15 +1012,15 @@ MacroEditorDialog::closeEvent (QCloseEvent *)
     we += ":";
     we += tl::to_quoted_string (i->second);
   }
-  MainWindow::instance ()->config_set (cfg_macro_editor_watch_expressions, we);
+  mp_plugin_root->config_set (cfg_macro_editor_watch_expressions, we);
 
   //  save the active (run) macro
-  MainWindow::instance ()->config_set (cfg_macro_editor_active_macro, mp_run_macro ? mp_run_macro->path () : std::string ());
+  mp_plugin_root->config_set (cfg_macro_editor_active_macro, mp_run_macro ? mp_run_macro->path () : std::string ());
 
   //  save the current macro
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   std::string cm = page && page->macro () ? page->macro ()->path () : std::string ();
-  MainWindow::instance ()->config_set (cfg_macro_editor_current_macro, cm);
+  mp_plugin_root->config_set (cfg_macro_editor_current_macro, cm);
 
   //  save the current interpreter in the console
   std::string ci;
@@ -925,7 +1029,7 @@ MacroEditorDialog::closeEvent (QCloseEvent *)
   } else if (pythonLangSel->isChecked ()) {
     ci = "python";
   }
-  MainWindow::instance ()->config_set (cfg_macro_editor_console_interpreter, ci);
+  mp_plugin_root->config_set (cfg_macro_editor_console_interpreter, ci);
 
   //  stop execution when the window is closed
   m_in_exec = false;
@@ -1914,73 +2018,9 @@ MacroEditorDialog::setup_button_clicked ()
     return;
   }
 
-  //  fill data
-
-  lay::MacroEditorSetupDialogData data;
-  data.tab_width = m_ntab;
-  data.indent = m_nindent;
-  data.save_all_on_run = m_save_all_on_run;
-  data.stop_on_exception = m_stop_on_exception;
-  data.file_watcher_enabled = m_file_watcher_enabled;
-  data.font_family = m_font_family;
-  data.font_size = m_font_size;
-
-  if (m_highlighters.basic_attributes ()) {
-    data.basic_attributes.assign (*m_highlighters.basic_attributes ());
-  }
-  for (MacroEditorHighlighters::const_iterator a = m_highlighters.begin (); a != m_highlighters.end (); ++a) {
-    data.specific_attributes.push_back (std::make_pair (a->first, GenericSyntaxHighlighterAttributes (& data.basic_attributes)));
-    data.specific_attributes.back ().second.assign (a->second);
-  }
-  
-  lay::MacroEditorSetupDialog dialog (this);
-  if (dialog.exec_dialog (data)) {
-
-    m_ntab = data.tab_width;
-    m_nindent = data.indent;
-    m_stop_on_exception = data.stop_on_exception;
-    m_file_watcher_enabled = data.file_watcher_enabled;
-    m_font_family = data.font_family;
-    m_font_size = data.font_size;
-
-    if (m_highlighters.basic_attributes ()) {
-      m_highlighters.basic_attributes ()->assign (data.basic_attributes);
-    }
-
-    for (MacroEditorHighlighters::iterator a = m_highlighters.begin (); a != m_highlighters.end (); ++a) {
-      for (std::vector< std::pair<std::string, GenericSyntaxHighlighterAttributes> >::const_iterator i = data.specific_attributes.begin (); i != data.specific_attributes.end (); ++i) {
-        if (i->first == a->first) {
-          a->second.assign (i->second);
-          break;
-        }
-      }
-    }
-
-    m_save_all_on_run = data.save_all_on_run;
-
-    for (int i = 0; i < tabWidget->count (); ++i) {
-      MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->widget (i));
-      if (page) {
-        page->set_ntab (m_ntab);
-        page->set_nindent (m_nindent);
-        page->apply_attributes ();
-        page->set_font (m_font_family, m_font_size);
-      }
-    }
-
-    //  write configuration
-    MainWindow::instance ()->config_set (cfg_macro_editor_styles, m_highlighters.to_string ());
-    MainWindow::instance ()->config_set (cfg_macro_editor_save_all_on_run, m_save_all_on_run);
-    MainWindow::instance ()->config_set (cfg_macro_editor_file_watcher_enabled, m_file_watcher_enabled);
-    MainWindow::instance ()->config_set (cfg_macro_editor_stop_on_exception, m_stop_on_exception);
-    MainWindow::instance ()->config_set (cfg_macro_editor_tab_width, m_ntab);
-    MainWindow::instance ()->config_set (cfg_macro_editor_indent, m_nindent);
-    MainWindow::instance ()->config_set (cfg_macro_editor_font_family, m_font_family);
-    MainWindow::instance ()->config_set (cfg_macro_editor_font_size, m_font_size);
-    MainWindow::instance ()->config_end ();
-
+  lay::ConfigurationDialog config_dialog (this, mp_plugin_root, "MacroEditor");
+  if (config_dialog.exec ()) {
     refresh_file_watcher ();
-
   }
 }
 
@@ -2253,12 +2293,12 @@ MacroEditorDialog::ensure_writeable_collection_selected ()
 }
 
 static std::vector<std::pair<std::string, std::string> > 
-get_custom_paths ()
+get_custom_paths (lay::PluginRoot *root)
 {
   std::vector <std::pair<std::string, std::string> > paths;
 
   std::string mp;
-  MainWindow::instance ()->config_get (cfg_custom_macro_paths, mp);
+  root->config_get (cfg_custom_macro_paths, mp);
 
   try {
 
@@ -2281,7 +2321,7 @@ get_custom_paths ()
 }
 
 static void
-set_custom_paths (const std::vector<std::pair<std::string, std::string> > &paths)
+set_custom_paths (lay::PluginRoot *root, const std::vector<std::pair<std::string, std::string> > &paths)
 {
   std::string mp;
 
@@ -2295,7 +2335,7 @@ set_custom_paths (const std::vector<std::pair<std::string, std::string> > &paths
     mp += p->second;
   }
 
-  MainWindow::instance ()->config_set (cfg_custom_macro_paths, mp);
+  root->config_set (cfg_custom_macro_paths, mp);
 }
 
 void
@@ -2494,7 +2534,7 @@ BEGIN_PROTECTED
 
   std::string cat = current_macro_tree ()->category ();
 
-  std::vector <std::pair<std::string, std::string> > paths = get_custom_paths ();
+  std::vector <std::pair<std::string, std::string> > paths = get_custom_paths (mp_plugin_root);
   std::string new_path = tl::to_string (QFileInfo (new_dir).absoluteFilePath ());
   paths.push_back (std::make_pair (new_path, cat));
 
@@ -2503,7 +2543,7 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::to_string (QObject::tr ("The selected directory is already installed as custom location")));
   }
 
-  set_custom_paths (paths);
+  set_custom_paths (mp_plugin_root, paths);
 
   if (c->has_autorun ()) {
     if (QMessageBox::question (this, QObject::tr ("Run Macros"), QObject::tr ("The selected folder has macros configured to run automatically.\n\nChoose 'Yes' to run these macros now. Choose 'No' to not run them."), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
@@ -2538,7 +2578,7 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::to_string (QObject::tr ("Select tree location to remove")));
   } 
 
-  std::vector <std::pair <std::string, std::string> > paths = get_custom_paths ();
+  std::vector <std::pair <std::string, std::string> > paths = get_custom_paths (mp_plugin_root);
 
   bool found = false;
 
@@ -2560,7 +2600,7 @@ BEGIN_PROTECTED
   mp_root->erase (collection);
 
   //  save the new paths
-  set_custom_paths (paths);
+  set_custom_paths (mp_plugin_root, paths);
 
 END_PROTECTED
 }
@@ -2809,10 +2849,34 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
       return;
     }
 
-    if (QMessageBox::critical (this, QObject::tr ("Exception Caught"), 
-                                     tl::to_qstring (tl::to_string (QObject::tr ("Caught the following exception:\n")) + emsg + " (Class " + eclass + ")\n\n" + tl::to_string (QObject::tr ("Press 'Ok' to continue and 'Cancel' to stop in the debugger"))),
-                                     QMessageBox::Cancel, QMessageBox::Ok) == QMessageBox::Ok) {
+    std::string p;
+    if (file_id > 0 && file_id <= m_file_to_widget.size () && m_file_to_widget [file_id - 1].first) {
+      p = m_file_to_widget [file_id - 1].first->path ();
+      if (m_ignore_exception_list.find (p) != m_ignore_exception_list.end ()) {
+        return;
+      }
+    }
+
+    int res = QMessageBox::critical (this, QObject::tr ("Exception Caught"),
+                                     tl::to_qstring (tl::to_string (QObject::tr ("Caught the following exception:\n")) + emsg + " (Class " + eclass + ")\n\n" + tl::to_string (QObject::tr ("Press 'Ok' to continue.\nPress 'Ignore' to ignore this and future exceptions from this file.\nPress 'Cancel' to stop in the debugger"))),
+                                     QMessageBox::Cancel | QMessageBox::Ok | QMessageBox::Ignore,
+                                     QMessageBox::Ok);
+
+    if (res == QMessageBox::Ok) {
+
       return;
+
+    } else if (res == QMessageBox::Ignore) {
+
+      std::string il;
+      il += tl::to_quoted_string (p);
+      for (std::set<std::string>::const_iterator i = m_ignore_exception_list.begin (); i != m_ignore_exception_list.end (); ++i) {
+        il += ";";
+        il += tl::to_quoted_string (*i);
+      }
+      mp_plugin_root->config_set (cfg_macro_editor_ignore_exception_list, il);
+      return;
+
     }
 
     write_str (emsg.c_str (), OS_stderr);
@@ -3399,6 +3463,12 @@ class MacroEditorPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
+  virtual lay::ConfigPage *config_page (QWidget *parent, std::string &title) const
+  {
+    title = tl::to_string (QObject::tr ("Application|Macro Development IDE"));
+    return new MacroEditorSetupPage (parent);
+  }
+
   virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_styles, ""));

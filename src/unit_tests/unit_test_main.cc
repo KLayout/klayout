@@ -70,8 +70,22 @@ main (int argc, char **argv)
   return ret;
 }
 
+static bool
+run_test (tl::TestBase *t, bool editable, bool slow, int repeat)
+{
+  for (int i = 0; i < repeat; ++i) {
+    if (repeat > 1) {
+      ut::noctrl << "Repeat iteration " << i + 1 << " of " << repeat;
+    }
+    if (! t->do_test (editable, slow)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 static int
-run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, bool non_editable, bool slow, lay::ApplicationBase &app, bool gsi_coverage, const std::vector<std::string> &class_names_vector)
+run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, bool non_editable, bool slow, int repeat, lay::ApplicationBase &app, bool gsi_coverage, const std::vector<std::string> &class_names_vector)
 {
   std::set<std::string> class_names;
   class_names.insert (class_names_vector.begin (), class_names_vector.end ());
@@ -129,7 +143,7 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
             tl::Timer timer;
             timer.start();
 
-            if (! (*t)->do_test (e != 0, slow)) {
+            if (! run_test (*t, e != 0, slow, repeat)) {
 
               ut::ctrl << "</system-out>";
 
@@ -414,6 +428,7 @@ main_cont (int &argc, char **argv)
     bool verbose = false;
     bool debug_mode = false;
     bool continue_flag = false;
+    int repeat = 1;
 
     tl::CommandLineOptions cmd;
     cmd << tl::arg ("-a", &xml_format, "Provide XML output format (JUnit format)")
@@ -428,11 +443,12 @@ main_cont (int &argc, char **argv)
         << tl::arg ("-s", &slow, "Includes slow (long runner) tests")
         << tl::arg ("-v", &verbose, "Provides verbose output")
         << tl::arg ("-g", &gsi_coverage, "Produces a GSI test coverage statistics")
-        << tl::arg ("*-gg=class", &class_names, "Produces a specific GDS coverage statistics"
+        << tl::arg ("-r=n", &repeat, "Repeat the tests n times each")
+        << tl::arg ("*-gg=class", &class_names, "Produces a specific GDS coverage statistics",
                     "With this specification, coverage will be printed for this specific class. "
                     "This option can be used multiple times to add more classes."
                    )
-        << tl::arg ("-x=test", &exclude_test_list, "Exclude the following tests"
+        << tl::arg ("-x=test", &exclude_test_list, "Exclude the following tests",
                     "This option can be given multiple times or with a comma-separated list "
                     "of pattern. Test tests matching one of the exclude pattern "
                     "are not executed."
@@ -509,7 +525,7 @@ main_cont (int &argc, char **argv)
         selected_tests = &tl::TestRegistrar::instance()->tests ();
       }
 
-      result = run_tests (*selected_tests, editable, non_editable, slow, app, gsi_coverage, class_names);
+      result = run_tests (*selected_tests, editable, non_editable, slow, repeat, app, gsi_coverage, class_names);
 
       ut::ctrl << "</testsuites>";
 

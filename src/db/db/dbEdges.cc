@@ -883,20 +883,31 @@ struct JoinEdgesCluster
   void finish ()
   {
     std::multimap<db::Point, iterator> objects_by_p1;
-    std::multiset<db::Point> p2;
+    std::multimap<db::Point, iterator> objects_by_p2;
     for (iterator o = begin (); o != end (); ++o) {
       if (o->first->p1 () != o->first->p2 ()) {
         objects_by_p1.insert (std::make_pair (o->first->p1 (), o));
-        p2.insert (o->first->p2 ());
+        objects_by_p2.insert (std::make_pair (o->first->p2 (), o));
       }
     }
 
-    while (! p2.empty ()) {
+    while (! objects_by_p2.empty ()) {
 
       tl_assert (! objects_by_p1.empty ());
 
       //  Find the beginning of a new sequence
-      std::multimap<db::Point, iterator>::iterator j = objects_by_p1.begin ();
+      std::multimap<db::Point, iterator>::iterator j0 = objects_by_p1.begin ();
+      std::multimap<db::Point, iterator>::iterator j = j0;
+      do {
+        std::multimap<db::Point, iterator>::iterator jj = objects_by_p2.find (j->first);
+        if (jj == objects_by_p2.end ()) {
+          break;
+        } else {
+          j = objects_by_p1.find (jj->second->first->p1 ());
+          tl_assert (j != objects_by_p1.end ());
+        }
+      } while (j != j0);
+
       iterator i = j->second;
 
       //  determine a sequence 
@@ -906,12 +917,22 @@ struct JoinEdgesCluster
 
       do {
 
+        //  record the next point
         pts.push_back (i->first->p2 ());
-        std::multiset<db::Point>::iterator ip2 = p2.find (i->first->p2 ());
-        tl_assert (ip2 != p2.end ());
-        p2.erase (ip2);
+
+        //  remove the edge as it's taken
+        std::multimap<db::Point, iterator>::iterator jj;
+        for (jj = objects_by_p2.find (i->first->p2 ()); jj != objects_by_p2.end () && jj->first == i->first->p2 (); ++jj) {
+          if (jj->second == i) {
+            break;
+          }
+        }
+        tl_assert (jj != objects_by_p2.end () && jj->second == i);
+        objects_by_p2.erase (jj);
         objects_by_p1.erase (j);
 
+        //  process along the edge to the next one
+        //  TODO: this chooses any solution in case of forks. Choose a specific one?
         j = objects_by_p1.find (i->first->p2 ());
         if (j != objects_by_p1.end ()) {
           i = j->second;

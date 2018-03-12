@@ -7,7 +7,7 @@
  <epilog/>
  <doc/>
  <autorun>true</autorun>
- <autorun-early>false</autorun-early>
+ <autorun-early>true</autorun-early>
  <shortcut/>
  <show-in-menu>false</show-in-menu>
  <group-name/>

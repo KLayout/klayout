@@ -26,6 +26,8 @@
         <key>CFBundleTypeExtensions</key>
         <array>
           <string>gds</string>
+          <string>gds2</string>
+          <string>oas</string>
         </array>
         <key>CFBundleTypeRole</key>
         <string>Editor</string>

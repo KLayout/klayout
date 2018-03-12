@@ -527,7 +527,8 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
     
     masks.erase (masks.begin (), masks.end ());
 
-    uint32_t needed_bits = 0xffffff; // alpha channel not needed
+    const uint32_t needed_bits = 0x00ffffff; // alpha channel not needed
+    const uint32_t fill_bits   = 0xff000000; // fill alpha value with ones
     uint32_t *dptr = buffer;
     uint32_t ne_mask = (1 << (y % slice));
     for (unsigned int i = 0; i < view_ops.size (); ++i) {
@@ -583,10 +584,10 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
       for (unsigned int x = 0; x < width; x += 32, ++i) {
 
         lay::color_t y[32] = {
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
+          fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits,
+          fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits,
+          fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits,
+          fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits,
         };
 
         lay::color_t z[32] = { 

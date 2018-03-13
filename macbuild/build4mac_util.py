@@ -237,7 +237,8 @@ def WalkDictTree(dependencyDict, visited_files):
           dependency_list.append(str(next(iter(deplib))))
           libNameChanges.extend(WalkDictTree(deplib, visited_files))
         else:
-          raise RuntimeError("Unexpected value: %s, %s" % (deplib, dependencies))
+          #raise RuntimeError("Unexpected value: %s" % deplib)
+          pass
     else:
       raise RuntimeError("Unexpected value: %s" % dependencies)
     if len(dependency_list) > 0:

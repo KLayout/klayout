@@ -179,7 +179,7 @@ def SetChangeLibIdentificationName( executable, relativedir ):
   return 0
 
 
-def WalkLibDependencyTree( dylibPath, depth=0, filter_regex=r'\t+/usr/local'):
+def WalkLibDependencyTree( dylibPath, depth=0, filter_regex=r'\t+/usr/local/opt'):
   NOTHINGTODO = []  # return empty list if nothing to do.
   dylibPath = str(Path(dylibPath))
   cmdNameId  = XcodeToolChain['nameID']

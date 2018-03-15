@@ -339,7 +339,7 @@ LayoutCanvas::LayoutCanvas (QWidget *parent, lay::LayoutView *view, const char *
 {
   //  some reasonable initializations for the size
   m_viewport.set_size (100, 100); 
-  m_viewport_l.set_size (m_viewport.width () * m_oversampling, m_viewport.height () * m_oversampling);  
+  m_viewport_l.set_size (m_viewport.width () * m_oversampling * 2, m_viewport.height () * m_oversampling * 2);  
 
   mp_redraw_thread = new lay::RedrawThread (this, view);
 
@@ -416,7 +416,7 @@ LayoutCanvas::set_oversampling (unsigned int os)
   if (os != m_oversampling) {
     m_image_cache.clear ();
     m_oversampling = os;
-    m_viewport_l.set_size (m_viewport.width () * m_oversampling, m_viewport.height () * m_oversampling);  
+    m_viewport_l.set_size (m_viewport.width () * m_oversampling * 2, m_viewport.height () * m_oversampling * 2);  
     do_redraw_all ();
   }
 }
@@ -478,6 +478,7 @@ LayoutCanvas::prepare_drawing ()
         delete mp_image;
       }
       mp_image = new QImage (m_viewport_l.width (), m_viewport_l.height (), QImage::Format_RGB32);
+      mp_image->setDevicePixelRatio(2.0);
       if (mp_pixmap) {
         delete mp_pixmap;
         mp_pixmap = 0;
@@ -677,7 +678,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
 
       } else {
 
-        QImage subsampled_image (m_viewport.width (), m_viewport.height (), mp_image->format ());
+        QImage subsampled_image (m_viewport.width () * 2, m_viewport.height () * 2, mp_image->format ());
         subsample (*mp_image, subsampled_image, m_oversampling);
         *mp_pixmap = QPixmap::fromImage (subsampled_image);
 
@@ -890,7 +891,7 @@ LayoutCanvas::image_with_options (unsigned int width, unsigned int height, int l
     linewidth = 1;
   }
   if (resolution <= 0.0) {
-    resolution = 1.0 / oversampling;
+    resolution = 2.0 / oversampling;
   }
   if (background == QColor ()) {
     background = background_color ();
@@ -1009,7 +1010,7 @@ LayoutCanvas::resizeEvent (QResizeEvent *)
 
   //  set the viewport to the new size
   m_viewport.set_size (width (), height ());
-  m_viewport_l.set_size (width () * m_oversampling, height () * m_oversampling);
+  m_viewport_l.set_size (width () * m_oversampling * 2, height () * m_oversampling * 2);
   mouse_event_trans (m_viewport.trans ());
   do_redraw_all (true);
   viewport_changed_event ();

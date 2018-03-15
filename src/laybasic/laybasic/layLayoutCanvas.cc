@@ -469,7 +469,7 @@ LayoutCanvas::prepare_drawing ()
 {
   if (m_need_redraw) {
 
-    BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling));
+    BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling) * 2);
 
     if (! mp_image ||
         (unsigned int) mp_image->width () != m_viewport_l.width () || 
@@ -506,7 +506,7 @@ LayoutCanvas::prepare_drawing ()
         ++c;
       }
 
-      mp_redraw_thread->commit (m_layers, m_viewport_l, 1.0 / double (m_oversampling));
+      mp_redraw_thread->commit (m_layers, m_viewport_l, 1.0 / double (m_oversampling) * 2);
 
       if (tl::verbosity () >= 20) {
         tl::info << "Restored image from cache";
@@ -556,7 +556,7 @@ LayoutCanvas::prepare_drawing ()
       }
 
       if (m_redraw_clearing) {
-        mp_redraw_thread->start (mp_view->synchronous () ? 0 : mp_view->drawing_workers (), m_layers, m_viewport_l, 1.0 / double (m_oversampling), m_redraw_force_update);
+        mp_redraw_thread->start (mp_view->synchronous () ? 0 : mp_view->drawing_workers (), m_layers, m_viewport_l, 1.0 / double (m_oversampling) * 2, m_redraw_force_update);
       } else {
         mp_redraw_thread->restart (m_need_redraw_layer);
       }
@@ -668,7 +668,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
         if (m_oversampling == 1) {
           *mp_pixmap = QPixmap::fromImage (full_image); // Qt 4.6.0 workaround
         } else {
-          QImage subsampled_image (m_viewport.width (), m_viewport.height (), mp_image->format ());
+          QImage subsampled_image (m_viewport.width () * 2, m_viewport.height () * 2, mp_image->format ());
           subsampled_image.setDevicePixelRatio(2.0);
           subsample (full_image, subsampled_image, m_oversampling);
           *mp_pixmap = QPixmap::fromImage (subsampled_image); // Qt 4.6.0 workaround
@@ -713,8 +713,9 @@ LayoutCanvas::paintEvent (QPaintEvent *)
       if (fg_bitmap (n) != 0) {
         memset (p_data, 0, nbytes);
         bitmap_to_bitmap (fg_style (n), *fg_bitmap (n), p_data, m_viewport_l.width (), m_viewport_l.height (), dither_pattern (), line_styles ());
-        subsample (p_data, m_viewport.width (), m_viewport.height (), m_oversampling);
+        subsample (p_data, m_viewport.width (), m_viewport.height (), m_oversampling * 2);
         QBitmap bitmap = QBitmap::fromData (QSize (m_viewport.width (), m_viewport.height ()), p_data);
+        bitmap.setDevicePixelRatio(2.0);
         painter.setPen (QRgb (fg_style (n).ormask ()));
         painter.drawPixmap (0, 0, bitmap);
       }
@@ -733,7 +734,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
     }
 
     //  invert and subsample the mask
-    subsample (p_data, m_viewport.width (), m_viewport.height (), m_oversampling);
+    subsample (p_data, m_viewport.width (), m_viewport.height (), m_oversampling * 2);
     invert (p_data, m_viewport.width (), m_viewport.height ());
 
     //  create the mask
@@ -753,7 +754,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
       if (fg_bitmap (n) != 0) {
         memset (p_data, 0, nbytes);
         bitmap_to_bitmap (fg_style (n), *fg_bitmap (n), p_data, m_viewport_l.width (), m_viewport_l.height (), dither_pattern ());
-        subsample (p_data, m_viewport.width (), m_viewport.height (), m_oversampling);
+        subsample (p_data, m_viewport.width (), m_viewport.height (), m_oversampling * 2);
         QBitmap bitmap = QBitmap::fromData (QSize (m_viewport.width (), m_viewport.height ()), p_data);
         painter.setPen (QRgb (fg_style (n).ormask ()));
         painter.drawPixmap (0, 0, bitmap);

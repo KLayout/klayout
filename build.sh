@@ -584,7 +584,7 @@ fi
 
 echo "Running build ($MAKE_PRG $MAKE_OPT all) .."
 cd $BUILD
-$MAKE_PRG $MAKE_OPT || exit
+$MAKE_PRG $MAKE_OPT || exit 1
 cd $CURR_DIR
 echo ""
 

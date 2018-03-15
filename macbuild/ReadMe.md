@@ -86,9 +86,9 @@ $ ./makeDMG4mac.py -p qt5.pkg.macos-HighSierra-release -m
 By: Kazzz (January 16, 2018)
 
 # 5. Alternative building options
-### 5.1 Python 3.6 from brew, Qt 5.9.4 from offline installer
+### 5.1 Python 3.6 from brew, Qt 5.10.1 from brew
 
-Homebrew's installation of python3 places a `Python.framework` in `/usr/local/opt/python/Frameworks/Python.framework/`, which you can use to build KLayout from. Qt can be downloaded for [offline installation](https://www1.qt.io/offline-installers/). You can place it in your home folder: e.g. `/home/username/Qt5.9.4/`. Given these two dependencies, you can successfully compile KLayout with the following commands:
+Homebrew's installation of python3 (`brew install python3`) places a `Python.framework` in `/usr/local/opt/python/Frameworks/Python.framework/`, which you can use to build KLayout from. Qt can also be downloaded from brew with `brew install qt`.
 
 ```
 # Build step
@@ -102,7 +102,5 @@ Homebrew's installation of python3 places a `Python.framework` in `/usr/local/op
 ./makeDMG4mac.py -p qt5.pkg.macos-HighSierra-release -m -q Qt594
 
 ```
-
-PS: If you get a syntax error in one of ruby's libraries because it is not compatible with C++11, do not fret. You only have to change one offending file.
 
 [End of File] 

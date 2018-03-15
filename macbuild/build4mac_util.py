@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #===============================================================================
@@ -21,7 +21,7 @@ try:
     from pathlib import Path
     Path().expanduser()
 except (ImportError,AttributeError):  # python2
-    from pathlib2 import Path
+    raise RuntimeError("Need python3 to run this script, for now...")
 
 #-------------------------------------------------------------------------------
 ## To import global dictionaries of different modules
@@ -204,8 +204,14 @@ def WalkLibDependencyTree( dylibPath, depth=0, filter_regex=r'\t+/usr/local/opt'
   else:
     raise RuntimeError("Exceeded maximum recursion depth.")
 
-def WalkFrameworkPaths(*frameworkPaths, filter_regex=r'\.(so|dylib)$'):
+def WalkFrameworkPaths(frameworkPaths, filter_regex=r'\.(so|dylib)$'):
+  try:
+    frameworkPathsIter = iter(frameworkPaths)
+  except TypeError:
+    frameworkPathsIter = [frameworkPaths]
+
   dependency_dict = dict()
+
   for frameworkPath in frameworkPaths:
     frameworkPath = str(Path(frameworkPath))
     find_grep_results = os.popen('find %s -type f | grep -E "%s"' % (frameworkPath, filter_regex)).read().split('\n')

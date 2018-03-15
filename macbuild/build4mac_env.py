@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #===============================================================================
@@ -189,10 +189,10 @@ Python36MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versi
                   }
 
 # Python 3.6 from Brew *+*+*+ EXPERIMENTAL *+*+*+
-# [Key Type Name] = 'pybrew'
-Python36Brew= { 'exe': '/usr/local/opt/python/libexec/bin/python' ,
-                'inc': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/3.6/Headers',
-                'lib': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/3.6/Python'
+# [Key Type Name] = 'B36'
+Python36Brew= { 'exe': '$(realpath /usr/local/opt/python/libexec/bin/python)' ,
+                'inc': '$(realpath /usr/local/opt/python3/Frameworks/Python.framework/Versions/3.6/Headers)',
+                'lib': '$(realpath /usr/local/opt/python3/Frameworks/Python.framework/Versions/3.6/Python)'
               }
 
 # Consolidated dictionary kit for Python

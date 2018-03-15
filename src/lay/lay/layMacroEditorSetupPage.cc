@@ -56,7 +56,7 @@ struct MacroEditorSetupDialogData
 
   void setup (lay::PluginRoot *root)
   {
-    lay::MacroEditorHighlighters highlighters (0);
+    lay::MacroEditorHighlighters highlighters (lay::MacroEditorDialog::instance ());
     std::string styles;
     root->config_get (cfg_macro_editor_styles, styles);
     highlighters.load (styles);
@@ -91,7 +91,7 @@ struct MacroEditorSetupDialogData
 
   void commit (lay::PluginRoot *root)
   {
-    lay::MacroEditorHighlighters highlighters (0);
+    lay::MacroEditorHighlighters highlighters (lay::MacroEditorDialog::instance ());
 
     if (highlighters.basic_attributes ()) {
       highlighters.basic_attributes ()->assign (basic_attributes);

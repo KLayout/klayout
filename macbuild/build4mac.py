@@ -699,13 +699,11 @@ def DeployBinariesForBundle():
   shutil.copy2( sourceDir0 + "/PkgInfo",      targetDir0 ) # this file is not mandatory
   shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
   shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
-  shutil.copy2( sourceDir2 + "/qt.conf", targetDirM )
 
 
   os.chmod( targetDir0 + "/PkgInfo",      0o0644 )
   os.chmod( targetDir0 + "/Info.plist",   0o0644 )
   os.chmod( targetDirM + "/klayout",      0o0755 )
-  os.chmod( targetDirM + "/qt.conf",      0o0644 )
   os.chmod( targetDirR + "/klayout.icns", 0o0644 )
 
   buddies = glob.glob( sourceDir3 + "/strm*" )
@@ -733,7 +731,7 @@ def DeployBinariesForBundle():
   buddies     = glob.glob( "klayout.app/Contents/Buddy/strm*" )
   macdepQtOpt = ""
   for buddy in buddies:
-    macdepQtOpt += "-executable=%s " % buddy
+    macdepQtOpt += " -executable=%s" % buddy
     ret = SetChangeLibIdentificationName( buddy, "../Frameworks" )
     if not ret == 0:
       os.chdir(ProjectDir)
@@ -759,6 +757,10 @@ def DeployBinariesForBundle():
       deploytool = Qt5Custom['deploy']
       app_bundle = "klayout.app"
       options    = macdepQtOpt + verbose
+
+    # Without the following, the plugin cocoa would not be found properly.
+    shutil.copy2( sourceDir2 + "/qt.conf", targetDirM )
+    os.chmod( targetDirM + "/qt.conf",      0o0644 )
 
     os.chdir(ProjectDir)
     os.chdir(MacPkgDir)

@@ -49,8 +49,8 @@ Qt5MacPorts = { 'qmake' : '/opt/local/libexec/qt5/bin/qmake',
 
 # Qt5 Custom (https://www1.qt.io/offline-installers/)
 # [Key Type Name] = 'Qt5Custom'
-Qt5Custom = { 'qmake' : '~/Qt5.9.4/5.9.4/clang_64/bin/qmake',
-              'deploy': '~/Qt5.9.4/5.9.4/clang_64/bin/macdeployqt'
+Qt5Custom = { 'qmake' : '/usr/local/opt/qt/bin/qmake',
+              'deploy': '/usr/local/opt/qt/bin/macdeployqt'
             }
 
 #-----------------------------------------------------
@@ -192,9 +192,9 @@ Python36MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versi
 
 # Python 3.6 from Brew *+*+*+ EXPERIMENTAL *+*+*+
 # [Key Type Name] = 'pybrew'
-Python36Brew= { 'exe': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/Current/bin/python3.6m' ,
-                'inc': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/Current/include/python3.6m',
-                'lib': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/Current/lib/libpython3.6m.dylib'
+Python36Brew= { 'exe': '/usr/local/opt/python/libexec/bin/python' ,
+                'inc': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/3.6/Headers',
+                'lib': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/3.6/Python'
               }
 
 # Consolidated dictionary kit for Python

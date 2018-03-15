@@ -661,6 +661,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
       if (fg_bitmaps () > 0) {
 
         QImage full_image (*mp_image);
+        full_image.setDevicePixelRatio(2.0);
         bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dither_pattern (), line_styles (), &full_image, m_viewport_l.width (), m_viewport_l.height (), false, &m_mutex);
 
         //  render the foreground parts ..
@@ -668,6 +669,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
           *mp_pixmap = QPixmap::fromImage (full_image); // Qt 4.6.0 workaround
         } else {
           QImage subsampled_image (m_viewport.width (), m_viewport.height (), mp_image->format ());
+          subsampled_image.setDevicePixelRatio(2.0);
           subsample (full_image, subsampled_image, m_oversampling);
           *mp_pixmap = QPixmap::fromImage (subsampled_image); // Qt 4.6.0 workaround
         }
@@ -679,6 +681,7 @@ LayoutCanvas::paintEvent (QPaintEvent *)
       } else {
 
         QImage subsampled_image (m_viewport.width () * 2, m_viewport.height () * 2, mp_image->format ());
+        subsampled_image.setDevicePixelRatio(2.0);
         subsample (*mp_image, subsampled_image, m_oversampling);
         *mp_pixmap = QPixmap::fromImage (subsampled_image);
 

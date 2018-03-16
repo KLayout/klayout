@@ -24,7 +24,7 @@ try:
     Path('~').expanduser()
     CAN_DEPLOY_PYTHON = True
 except (ImportError,AttributeError):  # python2
-    print("Cannot import pathlib, use python3")
+    print("Warning: Cannot import pathlib, use python3 if you need python deployment.")
 
 #-------------------------------------------------------------------------------
 ## To import global dictionaries of different modules

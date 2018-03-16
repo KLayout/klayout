@@ -21,7 +21,7 @@ XcodeToolChain = { 'nameID': '/usr/bin/install_name_tool -id ',
 #-----------------------------------------------------
 # [1] Qt
 #-----------------------------------------------------
-Qts = [ 'Qt4MacPorts', 'Qt5MacPorts', 'Qt5Custom' ]
+Qts = [ 'Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew' ]
 
 #-----------------------------------------------------
 # Whereabout of different components of Qt4
@@ -41,17 +41,15 @@ Qt5MacPorts = { 'qmake' : '/opt/local/libexec/qt5/bin/qmake',
                 'deploy': '/opt/local/libexec/qt5/bin/macdeployqt'
               }
 
-# # Qt5 from Brew
-# # [Key Type Name] = 'Qt5Brew'
-# Qt5Brew = { 'qmake' : '/usr/local/Cellar/qt5/5.10.0_1/bin/qmake',
-#             'deploy': '/usr/local/Cellar/qt5/5.10.0_1/bin/macdeployqt'
-#           }
+
+# Qt5 from MacPorts (https://brew.sh/)
+# install with 'brew install qt'
+# [Key Type Name] = 'Qt5Brew'
+Qt5Brew = { 'qmake' : '/usr/local/opt/qt/bin/qmake',
+            'deploy': '/usr/local/opt/qt/bin/macdeployqt'
+          }
 
 # Qt5 Custom (https://www1.qt.io/offline-installers/)
-# [Key Type Name] = 'Qt5Custom'
-Qt5Custom = { 'qmake' : '/usr/local/opt/qt/bin/qmake',
-              'deploy': '/usr/local/opt/qt/bin/macdeployqt'
-            }
 
 #-----------------------------------------------------
 # [2] Ruby

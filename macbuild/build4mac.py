@@ -764,6 +764,7 @@ def DeployBinariesForBundle():
       os.chdir(ProjectDir)
       return 1
 
+    deploymentPython = False
     if deploymentPython:
       # TODO Code incomplete! To be finished.
       from macbuild.build4mac_util import WalkFrameworkPaths, PerformChanges, DetectChanges

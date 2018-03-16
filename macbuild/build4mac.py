@@ -918,7 +918,7 @@ def main():
     #   to make "KLayoutEditor.app" and "KLayoutViewer.app"
     #----------------------------------------------------------
     ret2 = DeployScriptBundles()
-    if ret2 == 0:
+    if not ret2 == 0:
       sys.exit(1)
     else:
       sys.exit(0)

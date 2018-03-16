@@ -469,7 +469,7 @@ LayoutCanvas::prepare_drawing ()
 {
   if (m_need_redraw) {
 
-    BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling) * 2);
+    BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling) / 2);
 
     if (! mp_image ||
         (unsigned int) mp_image->width () != m_viewport_l.width () || 
@@ -506,7 +506,7 @@ LayoutCanvas::prepare_drawing ()
         ++c;
       }
 
-      mp_redraw_thread->commit (m_layers, m_viewport_l, 1.0 / double (m_oversampling) * 2);
+      mp_redraw_thread->commit (m_layers, m_viewport_l, 1.0 / double (m_oversampling) / 2);
 
       if (tl::verbosity () >= 20) {
         tl::info << "Restored image from cache";
@@ -556,7 +556,7 @@ LayoutCanvas::prepare_drawing ()
       }
 
       if (m_redraw_clearing) {
-        mp_redraw_thread->start (mp_view->synchronous () ? 0 : mp_view->drawing_workers (), m_layers, m_viewport_l, 1.0 / double (m_oversampling) * 2, m_redraw_force_update);
+        mp_redraw_thread->start (mp_view->synchronous () ? 0 : mp_view->drawing_workers (), m_layers, m_viewport_l, 1.0 / double (m_oversampling) / 2, m_redraw_force_update);
       } else {
         mp_redraw_thread->restart (m_need_redraw_layer);
       }
@@ -715,8 +715,9 @@ LayoutCanvas::paintEvent (QPaintEvent *)
         bitmap_to_bitmap (fg_style (n), *fg_bitmap (n), p_data, m_viewport_l.width (), m_viewport_l.height (), dither_pattern (), line_styles ());
         subsample (p_data, m_viewport.width (), m_viewport.height (), m_oversampling * 2);
         QBitmap bitmap = QBitmap::fromData (QSize (m_viewport.width (), m_viewport.height ()), p_data);
-        bitmap.setDevicePixelRatio(2.0);
-        painter.setPen (QRgb (fg_style (n).ormask ()));
+        QPen pen (QRgb (fg_style (n).ormask ()));
+        //pen.setWidthF(1.5);
+        painter.setPen (pen);
         painter.drawPixmap (0, 0, bitmap);
       }
     }
@@ -985,7 +986,7 @@ LayoutCanvas::screenshot ()
   QImage img (m_viewport.width (), m_viewport.height (), QImage::Format_RGB32);
   img.fill (m_background);
 
-  DetachedViewObjectCanvas vo_canvas (background_color (), foreground_color (), active_color (), m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling), &img);
+  DetachedViewObjectCanvas vo_canvas (background_color (), foreground_color (), active_color (), m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling) / 2, &img);
 
   //  and paint the background objects. It uses "img" to paint on.
   do_render_bg (m_viewport_l, vo_canvas);

@@ -42,7 +42,7 @@ Qt5MacPorts = { 'qmake' : '/opt/local/libexec/qt5/bin/qmake',
               }
 
 
-# Qt5 from MacPorts (https://brew.sh/)
+# Qt5 from Homebrew (https://brew.sh/)
 # install with 'brew install qt'
 # [Key Type Name] = 'Qt5Brew'
 Qt5Brew = { 'qmake' : '/usr/local/opt/qt/bin/qmake',

@@ -92,15 +92,19 @@ Homebrew's installation of python3 (`brew install python3`) places a `Python.fra
 
 ```
 # Build step
-./build4mac.py -p B36 -q Qt5Custom
+./build4mac.py -p B36 -q Qt5Brew
 
 # Deploy step
-./build4mac.py -p B36 -q Qt5Custom -y  # normal deploy
-./build4mac.py -p B36 -q Qt5Custom -y -v 3 2>&1 | tee qt5.pkg.macos-HighSierra-release.log  # deploy with debug options
+./build4mac.py -p B36 -q Qt5Brew -y  # normal deploy
+./build4mac.py -p B36 -q Qt5Brew -y -v 3 2>&1 | tee qt5.pkg.macos-HighSierra-release.log  # deploy with debug options
 
 # Packaging step
-./makeDMG4mac.py -p qt5.pkg.macos-HighSierra-release -m -q Qt594
+./makeDMG4mac.py -p qt5.pkg.macos-HighSierra-release -m -q Qt5101
 
 ```
+
+#### Known issues
+
+Because we link python to `/usr/local/opt/python/Frameworks/Python.framework/`, updating python from brew might break klayout if the new version is incompatible. To fix this, it is better to link python directly to `/usr/local/Cellar/python/3.6.4_4/Frameworks/Python.framework`, but that might complicate release builds, because that assumes users have the exact version of python installed by brew.
 
 [End of File] 

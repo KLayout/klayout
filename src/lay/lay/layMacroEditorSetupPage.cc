@@ -37,9 +37,11 @@ namespace lay
 {
 
 struct MacroEditorSetupDialogData
+  : public QObject
 {
-  MacroEditorSetupDialogData ()
-    : basic_attributes (0), tab_width (8), indent (2), save_all_on_run (true), stop_on_exception (true), file_watcher_enabled (true), font_size (0)
+  MacroEditorSetupDialogData (QObject *parent)
+    : QObject(parent),
+      basic_attributes (0), tab_width (8), indent (2), save_all_on_run (true), stop_on_exception (true), file_watcher_enabled (true), font_size (0)
   {
   }
 
@@ -56,7 +58,7 @@ struct MacroEditorSetupDialogData
 
   void setup (lay::PluginRoot *root)
   {
-    lay::MacroEditorHighlighters highlighters (0);
+    lay::MacroEditorHighlighters highlighters (this);
     std::string styles;
     root->config_get (cfg_macro_editor_styles, styles);
     highlighters.load (styles);
@@ -91,7 +93,7 @@ struct MacroEditorSetupDialogData
 
   void commit (lay::PluginRoot *root)
   {
-    lay::MacroEditorHighlighters highlighters (0);
+    lay::MacroEditorHighlighters highlighters (this);
 
     if (highlighters.basic_attributes ()) {
       highlighters.basic_attributes ()->assign (basic_attributes);
@@ -138,7 +140,8 @@ update_item (QListWidgetItem *item, QTextCharFormat format)
 }
 
 MacroEditorSetupPage::MacroEditorSetupPage (QWidget *parent)
-  : lay::ConfigPage (parent), mp_data (0)
+  : lay::ConfigPage (parent),
+    mp_data (new MacroEditorSetupDialogData (this))
 {
   setupUi (this);
 
@@ -156,8 +159,7 @@ MacroEditorSetupPage::MacroEditorSetupPage (QWidget *parent)
 
 MacroEditorSetupPage::~MacroEditorSetupPage ()
 {
-  delete mp_data;
-  mp_data = 0;
+  //  .. nothing yet ..
 }
 
 void 
@@ -175,20 +177,16 @@ MacroEditorSetupPage::cb_changed (int)
 void
 MacroEditorSetupPage::clear_exception_list ()
 {
-  if (mp_data) {
-    mp_data->ignore_exceptions_list.clear ();
-    update_ignore_exception_list ();
-  }
+  mp_data->ignore_exceptions_list.clear ();
+  update_ignore_exception_list ();
 }
 
 void
 MacroEditorSetupPage::update_ignore_exception_list ()
 {
-  if (mp_data) {
-    exception_list->clear ();
-    for (std::set<std::string>::const_iterator i = mp_data->ignore_exceptions_list.begin (); i != mp_data->ignore_exceptions_list.end (); ++i) {
-      exception_list->addItem (tl::to_qstring (*i));
-    }
+  exception_list->clear ();
+  for (std::set<std::string>::const_iterator i = mp_data->ignore_exceptions_list.begin (); i != mp_data->ignore_exceptions_list.end (); ++i) {
+    exception_list->addItem (tl::to_qstring (*i));
   }
 }
 
@@ -206,7 +204,7 @@ void
 MacroEditorSetupPage::setup (PluginRoot *root)
 {
   delete mp_data;
-  mp_data = new MacroEditorSetupDialogData ();
+  mp_data = new MacroEditorSetupDialogData (this);
   mp_data->setup (root);
 
   update_ignore_exception_list ();
@@ -276,19 +274,16 @@ MacroEditorSetupPage::commit (PluginRoot *root)
     commit_attributes (styles_list->currentItem ());
   }
 
-  if (mp_data) {
+  mp_data->tab_width = tab_width->value ();
+  mp_data->indent = indent->value ();
+  mp_data->save_all_on_run = save_all_cb->isChecked ();
+  mp_data->stop_on_exception = stop_on_exception->isChecked ();
+  mp_data->file_watcher_enabled = watch_files->isChecked ();
 
-    mp_data->tab_width = tab_width->value ();
-    mp_data->indent = indent->value ();
-    mp_data->save_all_on_run = save_all_cb->isChecked ();
-    mp_data->stop_on_exception = stop_on_exception->isChecked ();
-    mp_data->file_watcher_enabled = watch_files->isChecked ();
+  mp_data->font_family = tl::to_string (font_sel->currentFont ().family ());
+  mp_data->font_size = font_size->value ();
 
-    mp_data->font_family = tl::to_string (font_sel->currentFont ().family ());
-    mp_data->font_size = font_size->value ();
-
-    mp_data->commit (root);
-  }
+  mp_data->commit (root);
 }
 
 void 

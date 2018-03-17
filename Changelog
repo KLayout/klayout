@@ -1,3 +1,18 @@
+0.25.2          (2018-03-17):
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/90
+      DRC: "extended" was not working as expected with "joined = true"
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/89 
+      Display issue on MacOS fixed
+* Enhancement: https://github.com/klayoutmatthias/klayout/issues/85 
+      IDE debugger: files can be excluded from showing exceptions when 
+      they are thrown. To exclude a file press the new "Ignore" button 
+      when the debugger tells you an exception has been generated.
+      To re-able exception reporting, clear the list of the files
+      in the IDE settings ("Debugging" tab)
+      The macro IDE settings can now be edited in the File/Setup 
+      dialog.
+* Enhancements: build enhancements for MacOS
+      
 0.25.1          (2018-02-23):
 * Enhancements: build compatibility with MacOS and Qt 5.9.
       Qt 4.6 supported now as well with one restriction:

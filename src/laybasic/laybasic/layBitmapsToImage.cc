@@ -424,6 +424,7 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
                       const lay::LineStyles &ls,
                       QImage *pimage, unsigned int width, unsigned int height,
                       bool use_bitmap_index,
+                      bool transparent,
                       QMutex *mutex)
 {
   unsigned int n_in = view_ops_in.size ();
@@ -583,11 +584,15 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
       unsigned int i = 0;
       for (unsigned int x = 0; x < width; x += 32, ++i) {
 
-        lay::color_t y[32] = {
-          fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits,
-          fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits,
-          fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits,
-          fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits, fill_bits,
+        lay::color_t y[32];
+        if (transparent) {
+          for (int i = 0; i < 32; ++i) {
+            y[i] = 0;
+          }
+        } else {
+          for (int i = 0; i < 32; ++i) {
+            y[i] = fill_bits;
+          }
         };
 
         lay::color_t z[32] = { 
@@ -603,17 +608,32 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
 
         dptr = dptr_end - nwords + i;
         for (int j = masks.size () - 1; j >= 0; --j) {
+
           uint32_t d = *dptr;
           if (d != 0) {
-            uint32_t m = 1;
-            for (unsigned int k = 0; k < 32 && x + k < width; ++k, m <<= 1) {
-              if ((d & m) != 0) { 
-                y [k] |= masks [j].first & z [k];
-                z [k] &= masks [j].second;
+
+            if (transparent) {
+              uint32_t m = 1;
+              for (unsigned int k = 0; k < 32 && x + k < width; ++k, m <<= 1) {
+                if ((d & m) != 0) {
+                  y [k] |= (masks [j].first & z [k]) | fill_bits;
+                  z [k] &= masks [j].second;
+                }
+              }
+            } else {
+              uint32_t m = 1;
+              for (unsigned int k = 0; k < 32 && x + k < width; ++k, m <<= 1) {
+                if ((d & m) != 0) {
+                  y [k] |= masks [j].first & z [k];
+                  z [k] &= masks [j].second;
+                }
               }
             }
+
           }
+
           dptr -= nwords;
+
         }
 
         for (unsigned int k = 0; k < 32 && x + k < width; ++k) {
@@ -843,7 +863,8 @@ bitmaps_to_image (const std::vector<lay::ViewOp> &view_ops_in,
   if (pimage->depth () <= 1) {
     bitmaps_to_image_mono (view_ops_in, pbitmaps_in, dp, ls, pimage, width, height, use_bitmap_index, mutex);
   } else {
-    bitmaps_to_image_rgb (view_ops_in, pbitmaps_in, dp, ls, pimage, width, height, use_bitmap_index, mutex);
+    bool transparent = (pimage->format () == QImage::Format_ARGB32);
+    bitmaps_to_image_rgb (view_ops_in, pbitmaps_in, dp, ls, pimage, width, height, use_bitmap_index, transparent, mutex);
   }
 }
 

@@ -104,6 +104,8 @@ RecursiveShapeIterator::RecursiveShapeIterator ()
   mp_shape_prop_sel = 0;
   m_shape_inv_prop_sel = false;
   m_needs_reinit = false;
+  m_inst_quad_id = 0;
+  m_shape_quad_id = 0;
 }
 
 RecursiveShapeIterator::RecursiveShapeIterator (const shapes_type &shapes)

@@ -321,7 +321,7 @@ SaveLayoutOptionsDialog::get_options_internal ()
 //  SaveLayoutAsOptionsDialog implementation
 
 SaveLayoutAsOptionsDialog::SaveLayoutAsOptionsDialog (QWidget *parent, const std::string &title)
-  : QDialog (parent), Ui::SaveLayoutAsOptionsDialog ()
+  : QDialog (parent), Ui::SaveLayoutAsOptionsDialog (), mp_tech (0)
 {
   setObjectName (QString::fromUtf8 ("save_layout_options_dialog"));
 

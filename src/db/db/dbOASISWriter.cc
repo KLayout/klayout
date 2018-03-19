@@ -665,6 +665,9 @@ OASISWriter::OASISWriter ()
     mp_cell (0),
     m_layer (0), m_datatype (0),
     m_in_cblock (false),
+    m_propname_id (0),
+    m_propstring_id (0),
+    m_proptables_written (false),
     m_progress (tl::to_string (QObject::tr ("Writing OASIS file")), 10000)
 {
   m_progress.set_format (tl::to_string (QObject::tr ("%.0f MB")));

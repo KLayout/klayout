@@ -36,7 +36,8 @@ class LayoutDiff
 {
 public:
   LayoutDiff ()
-    : mp_layout_a (0), mp_layout_b (0)
+    : mp_layout_a (0), mp_cell_a (0), m_layer_index_a (0),
+      mp_layout_b (0), mp_cell_b (0), m_layer_index_b (0)
   {
     // .. nothing yet ..
   }

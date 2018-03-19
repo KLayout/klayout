@@ -1143,7 +1143,7 @@ static bool
 skip_quad (const db::Box &qb, const lay::Bitmap *vertex_bitmap, const db::CplxTrans &trans)
 {
   double threshold = 32 / trans.mag (); // don't check cells below 32x32 pixels
-  if (qb.empty () || qb.width () > threshold || qb.height () > threshold) {
+  if (qb.empty () || qb.width () > threshold || qb.height () > threshold || !vertex_bitmap) {
     return false;
   }
 

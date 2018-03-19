@@ -449,6 +449,9 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
         if (! test_semi ()) {
           denom = read_integer ();
           divider = read_integer ();
+          if (divider == 0) {
+            error ("'DS' command: divider cannot be zero");
+          }
         }
 
         expect_semi ();
@@ -476,7 +479,7 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
         // DF command:
         // "D" blank* "F"
         if (level == 0) {
-          error ("'DS' command must be inside a cell specification");
+          error ("'DF' command must be inside a cell specification");
         } 
 
         //  skip the rest of the command
@@ -490,7 +493,7 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
         //  "D" blank* "D" integer
 
         read_integer ();
-        warn ("DD command ignored");
+        warn ("'DD' command ignored");
         skip_to_end ();
 
       } else {

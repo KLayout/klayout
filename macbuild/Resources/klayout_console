@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+/Applications/klayout.app/Contents/MacOS/klayout -b -r /Applications/klayout.app/Contents/MacOS/start-console.py

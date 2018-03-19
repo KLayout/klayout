@@ -538,8 +538,8 @@ def DeployBinariesForBundle():
   if not DeploymentF and not DeploymentP:
     return 1
   if DeploymentF and NonOSStdLang:
-    print( "WARNING!!! You chose <-y|--deploy> while using non-OS-standard script language.", file=sys.stderr )
-    print( "    Use <-Y|--DEPLOY> instead", file=sys.stderr )
+    print( "     WARNING!!! You chose <-y|--deploy> while using non-OS-standard script language.", file=sys.stderr )
+    print( "         Consider using <-Y|--DEPLOY> instead", file=sys.stderr )
     #return 1
   if not os.path.isfile(MacBuildLog):
     print( "!!! Build log file <%s> does not present !!!" % MacBuildLog, file=sys.stderr )
@@ -791,6 +791,10 @@ def DeployBinariesForBundle():
           msg = "command failed: %s"
           print( msg % command, file=sys.stderr )
           exit(1)
+
+      shutil.copy2( sourceDir2 + "/start-console.py", targetDirM )
+      shutil.copy2( sourceDir2 + "/klayout_console", targetDirM )
+      os.chmod( targetDirM + "/klayout_console",      0o0755 )
 
       print("  [2] Relinking dylib dependencies inside Python.framework")
       depdict = WalkFrameworkPaths(pythonFrameworkPath)

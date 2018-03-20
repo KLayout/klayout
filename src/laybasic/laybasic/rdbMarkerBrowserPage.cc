@@ -401,7 +401,7 @@ public:
   bool cat_matches (const QModelIndex &index, const QString &filter) const
   {
     MarkerBrowserTreeViewModelCacheEntry *node = (MarkerBrowserTreeViewModelCacheEntry *)(index.internalPointer ());
-    if (node) {
+    if (node && mp_database) {
 
       rdb::id_type id = node->id ();
       const rdb::Category *category = mp_database->category_by_id (id);
@@ -418,7 +418,7 @@ public:
   bool cell_matches (const QModelIndex &index, const QString &filter) const
   {
     MarkerBrowserTreeViewModelCacheEntry *node = (MarkerBrowserTreeViewModelCacheEntry *)(index.internalPointer ());
-    if (node) {
+    if (node && mp_database) {
 
       rdb::id_type id = node->id ();
       const rdb::Cell *cell = mp_database->cell_by_id (id);
@@ -435,7 +435,7 @@ public:
   bool no_errors (const QModelIndex &index) const
   {
     MarkerBrowserTreeViewModelCacheEntry *node = (MarkerBrowserTreeViewModelCacheEntry *)(index.internalPointer ());
-    if (node) {
+    if (node && mp_database) {
 
       rdb::id_type id = node->id ();
       bool none = false;
@@ -638,6 +638,10 @@ public:
 
   QModelIndex next_index (QModelIndex current_index, bool up)
   {
+    if (!mp_database) {
+      return QModelIndex ();
+    }
+
     MarkerBrowserTreeViewModelCacheEntry *node = (MarkerBrowserTreeViewModelCacheEntry *) current_index.internalPointer ();
     
     rdb::id_type id = node->id ();

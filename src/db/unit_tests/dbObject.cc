@@ -49,13 +49,13 @@ struct A : public db::Object
     x += d;
   }
   
-  void undo (db::Op *op) throw ()
+  void undo (db::Op *op)
   {
     AO *aop = dynamic_cast<AO *> (op);
     x -= aop->d;
   }
 
-  void redo (db::Op *op) throw ()
+  void redo (db::Op *op)
   {
     AO *aop = dynamic_cast<AO *> (op);
     tl_assert (aop != 0);
@@ -154,13 +154,13 @@ struct B : public db::Object
     }
   }
   
-  void undo (db::Op *op) throw ()
+  void undo (db::Op *op)
   {
     BO *bop = dynamic_cast<BO *> (op);
     x -= bop->d;
   }
 
-  void redo (db::Op *op) throw ()
+  void redo (db::Op *op)
   {
     BO *bop = dynamic_cast<BO *> (op);
     tl_assert (bop != 0);

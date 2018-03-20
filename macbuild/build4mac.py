@@ -65,7 +65,7 @@ def SetGlobals():
   Usage += "                        :   'nil' = not to support the script language               | \n"
   Usage += "                        :   'Sys' = using the OS standard script language            | \n"
   Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details           | \n"
-  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Custom']           | qt5macports \n"
+  Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew']             | qt5macports \n"
   Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24', 'B25']                | sys \n"
   Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B36']       | sys \n"
   Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                  | disabled \n"
@@ -94,7 +94,7 @@ def SetGlobals():
     print("")
     print( "!!! Sorry. Your system <%s> looks like non-Mac" % System, file=sys.stderr )
     print(Usage)
-    quit()
+    exit()
 
   release = int( Release.split(".")[0] ) # take the first of ['14', '5', '0']
   if release == 14:
@@ -110,13 +110,13 @@ def SetGlobals():
     print("")
     print( "!!! Sorry. Unsupported major OS release <%d>" % release, file=sys.stderr )
     print(Usage)
-    quit()
+    exit()
 
   if not Machine == "x86_64":
     print("")
     print( "!!! Sorry. Only x86_64 architecture machine is supported but found <%s>" % Machine, file=sys.stderr )
     print(Usage)
-    quit()
+    exit()
 
   # default modules
   ModuleQt = "Qt5MacPorts"
@@ -236,30 +236,21 @@ def ParseCommandLineArguments():
   opt, args = p.parse_args()
   if (opt.checkusage):
     print(Usage)
-    quit()
+    exit()
 
   # Determine Qt type
-  candidates = [ i.upper() for i in ['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Custom'] ]
+  candidates = ['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew']
+  candidates_upper = [ i.upper() for i in candidates ]
   ModuleQt   = ""
   index      = 0
-  for item in candidates:
-    if opt.type_qt.upper() == item:
-      if index == 0:
-        ModuleQt = 'Qt4MacPorts'
-        break
-      elif index == 1:
-        ModuleQt = 'Qt5MacPorts'
-        break
-      elif index == 2:
-        ModuleQt = 'Qt5Custom'
-        break
-    else:
-      index += 1
-  if ModuleQt == "":
+  if opt.type_qt.upper() in candidates_upper:
+    idx = candidates_upper.index(opt.type_qt.upper())
+    ModuleQt = candidates[idx]
+  else:
     print("")
-    print( "!!! Unknown Qt type", file=sys.stderr )
+    print( "!!! Unknown Qt type %s. Candidates: %s" % (opt.type_qt, candidates), file=sys.stderr )
     print(Usage)
-    quit()
+    exit(1)
 
   # By default, OS-standard script languages (Ruby and Python) are used
   NonOSStdLang = False
@@ -300,7 +291,7 @@ def ParseCommandLineArguments():
     print("")
     print( "!!! Unknown Ruby type", file=sys.stderr )
     print(Usage)
-    quit()
+    exit()
 
   # Determine Python type
   candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B36'] ]
@@ -341,7 +332,7 @@ def ParseCommandLineArguments():
     print("")
     print( "!!! Unknown Python type", file=sys.stderr )
     print(Usage)
-    quit()
+    exit()
 
   NoQtBindings  = opt.no_qt_binding
   MakeOptions   = opt.make_option
@@ -354,14 +345,14 @@ def ParseCommandLineArguments():
     print("")
     print( "!!! Choose either [-y|--deploy] or [-Y|--DEPLOY]", file=sys.stderr )
     print(Usage)
-    quit()
+    exit()
 
   DeployVerbose = int(opt.deploy_verbose)
   if not DeployVerbose in [0, 1, 2, 3]:
     print("")
     print( "!!! Unsupported verbose level passed to `macdeployqt` tool", file=sys.stderr )
     print(Usage)
-    quit()
+    exit()
 
   if not DeploymentF and not DeploymentP:
     target  = "%s %s %s" % (Platform, Release, Machine)
@@ -436,9 +427,9 @@ def RunMainBuildBash():
     AbsMacBuildLog = "%s/qt5.build.macos-%s-%s.log" % (ProjectDir, Platform, mode)
     parameters    += " \\\n  -bin    %s" % MacBinDir
     parameters    += " \\\n  -build  %s" % MacBuildDir
-  elif ModuleQt == 'Qt5Custom':
+  elif ModuleQt == 'Qt5Brew':
     parameters    += " \\\n  -qt5"
-    parameters    += " \\\n  -qmake  %s" % Qt5Custom['qmake']
+    parameters    += " \\\n  -qmake  %s" % Qt5Brew['qmake']
     MacPkgDir      = "./qt5.pkg.macos-%s-%s"        % (Platform, mode)
     MacBinDir      = "./qt5.bin.macos-%s-%s"        % (Platform, mode)
     MacBuildDir    = "./qt5.build.macos-%s-%s"      % (Platform, mode)
@@ -486,7 +477,7 @@ def RunMainBuildBash():
   command += "  2>&1 | tee %s" % MacBuildLog
   if CheckComOnly:
     print(command)
-    quit()
+    exit()
 
   #-----------------------------------------------------
   # [3] Invoke the main Bash script; takes time:-)
@@ -662,7 +653,7 @@ def DeployBinariesForBundle():
       depDicOrdinary.update(dependDic)
   '''
   PrintLibraryDependencyDictionary( depDicOrdinary, "Style (3)" )
-  quit()
+  exit()
   '''
 
   print( " [5] Setting and changing the identification names among KLayout's libraries ..." )
@@ -699,13 +690,11 @@ def DeployBinariesForBundle():
   shutil.copy2( sourceDir0 + "/PkgInfo",      targetDir0 ) # this file is not mandatory
   shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
   shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
-  shutil.copy2( sourceDir2 + "/qt.conf", targetDirM )
 
 
   os.chmod( targetDir0 + "/PkgInfo",      0o0644 )
   os.chmod( targetDir0 + "/Info.plist",   0o0644 )
   os.chmod( targetDirM + "/klayout",      0o0755 )
-  os.chmod( targetDirM + "/qt.conf",      0o0644 )
   os.chmod( targetDirR + "/klayout.icns", 0o0644 )
 
   buddies = glob.glob( sourceDir3 + "/strm*" )
@@ -733,7 +722,7 @@ def DeployBinariesForBundle():
   buddies     = glob.glob( "klayout.app/Contents/Buddy/strm*" )
   macdepQtOpt = ""
   for buddy in buddies:
-    macdepQtOpt += "-executable=%s " % buddy
+    macdepQtOpt += " -executable=%s" % buddy
     ret = SetChangeLibIdentificationName( buddy, "../Frameworks" )
     if not ret == 0:
       os.chdir(ProjectDir)
@@ -755,10 +744,14 @@ def DeployBinariesForBundle():
       deploytool = Qt5MacPorts['deploy']
       app_bundle = "klayout.app"
       options    = macdepQtOpt + verbose
-    elif ModuleQt == 'Qt5Custom':
-      deploytool = Qt5Custom['deploy']
+    elif ModuleQt == 'Qt5Brew':
+      deploytool = Qt5Brew['deploy']
       app_bundle = "klayout.app"
       options    = macdepQtOpt + verbose
+
+    # Without the following, the plugin cocoa would not be found properly.
+    shutil.copy2( sourceDir2 + "/qt.conf", targetDirM )
+    os.chmod( targetDirM + "/qt.conf",      0o0644 )
 
     os.chdir(ProjectDir)
     os.chdir(MacPkgDir)
@@ -770,18 +763,51 @@ def DeployBinariesForBundle():
       print("")
       os.chdir(ProjectDir)
       return 1
-    else:
-      print( "##### Finished deploying libraries and executables for <klayout.app> #####" )
-      print("")
-      os.chdir(ProjectDir)
-      return 0
+
+    deploymentPython = False
+    if deploymentPython:
+      # TODO Code incomplete! To be finished.
+      from macbuild.build4mac_util import WalkFrameworkPaths, PerformChanges, DetectChanges
+
+      bundlePath = 'qt5.pkg.macos-HighSierra-release/klayout.app'
+      bundleExecPathAbs = os.getcwd() + '/%s/Contents/MacOS/' % bundlePath
+
+      # rsync -a --safe-links /usr/local/opt/python/Frameworks/Python.framework/ qt5.pkg.macos-HighSierra-release/klayout.app/Contents/Frameworks/Python.framework
+      # cp -RL /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages qt5.pkg.macos-HighSierra-release/klayout.app/Contents/Frameworks/Python.framework/Versions/3.6/lib/python3.6/
+      # rm -rf qt5.pkg.macos-HighSierra-release/klayout.app/Contents/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/test
+
+      pythonFrameworkPath = '%s/Contents/Frameworks/Python.framework' % bundlePath
+      depdict = WalkFrameworkPaths(pythonFrameworkPath)
+
+      pythonOriginalFrameworkPath = '/usr/local/opt/python/Frameworks/Python.framework'
+      appPythonFrameworkPath = '@executable_path/../Frameworks/Python.framework/'
+      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath)], bundleExecPathAbs)
+
+      klayoutPath = bundleExecPathAbs
+      depdict = WalkFrameworkPaths(klayoutPath, filter_regex=r'klayout$')
+      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath)], bundleExecPathAbs)
+
+      klayoutPath = bundleExecPathAbs + '../Frameworks'
+      depdict = WalkFrameworkPaths(klayoutPath, filter_regex=r'libklayout')
+      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath)], bundleExecPathAbs)
+
+
+      usrLocalPath = '/usr/local/opt/'
+      appUsrLocalPath = '@executable_path/../Frameworks/'
+      depdict = WalkFrameworkPaths(pythonFrameworkPath)
+      PerformChanges(depdict, [(usrLocalPath, appUsrLocalPath)], bundleExecPathAbs)
+
+      # usrLocalPath = '/usr/local/lib/'
+      # appUsrLocalPath = '@executable_path/../Frameworks/'
+      # depdict = WalkFrameworkPaths(pythonFrameworkPath)
+      # PerformChanges(depdict, [(usrLocalPath, appUsrLocalPath)], bundleExecPathAbs)
+
   else:
     print( " [8] Skipped deploying Qt's Frameworks ..." )
-    print( "##### Finished deploying libraries and executables for <klayout.app> #####" )
-    print("")
-    os.chdir(ProjectDir)
-    return 0
-
+  print( "##### Finished deploying libraries and executables for <klayout.app> #####" )
+  print("")
+  os.chdir(ProjectDir)
+  return 0
 #------------------------------------------------------------------------------
 ## To deploy script bundles that invoke the main bundle (klayout.app) in
 #  editor mode or viewer mode

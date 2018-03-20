@@ -41,7 +41,7 @@ inline void usleep(long us)
 class Sum
 {
 public:
-  Sum () : m_sum(0) { }
+  Sum () : m_sum(0), m_flag (false) { }
 
   void reset () { lock.lock (); m_sum = 0; lock.unlock (); m_flag = false; }
   void add(int n) { lock.lock (); m_sum += n; lock.unlock (); m_flag = true; }

@@ -703,7 +703,8 @@ SearchReplaceDialog::SearchReplaceDialog (lay::PluginRoot *root, lay::LayoutView
     m_current_mode (0),
     m_window (FitMarker),
     m_window_dim (0.0),
-    m_max_item_count (0)
+    m_max_item_count (0),
+    m_last_query_cv_index (0)
 {
   setObjectName (QString::fromUtf8 ("search_replace_dialog"));
 

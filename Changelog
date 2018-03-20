@@ -1,4 +1,4 @@
-0.25.2          (2018-03-17):
+0.25.2          (2018-03-20):
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/90
       DRC: "extended" was not working as expected with "joined = true"
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/89 
@@ -11,7 +11,10 @@
       in the IDE settings ("Debugging" tab)
       The macro IDE settings can now be edited in the File/Setup 
       dialog.
-* Enhancements: build enhancements for MacOS
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/94
+      Retina displays are support to some extend on MacOS. 
+      An open topic is the quality of the icons.
+* Enhancement: build system for MacOS
       
 0.25.1          (2018-02-23):
 * Enhancements: build compatibility with MacOS and Qt 5.9.

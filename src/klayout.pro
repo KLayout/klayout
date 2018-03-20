@@ -20,6 +20,7 @@ SUBDIRS = \
   lib \
   plugins \
   buddies \
+  fontgen \
 
 LANG_DEPENDS =
 MAIN_DEPENDS =

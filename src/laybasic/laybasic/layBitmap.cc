@@ -275,7 +275,7 @@ Bitmap::merge (const lay::Bitmap *from, int dx, int dy)
 }
 
 void 
-Bitmap::fill_pattern (int y, int x, const uint32_t *pp, unsigned int n)
+Bitmap::fill_pattern (int y, int x, const uint32_t *pp, unsigned int stride, unsigned int n)
 {
   if (x < int (m_width)) {
 
@@ -290,41 +290,44 @@ Bitmap::fill_pattern (int y, int x, const uint32_t *pp, unsigned int n)
 
     while (n > 0 && y >= 0) {
 
-      uint32_t p = *pp;
+      for (unsigned int s = 0; s < stride; ++s) {
 
-      int x1 = x;
+        int x1 = x + s * 32;
 
-      if (x1 < 0) {
-        if (x1 <= -32) {
-          return;
-        }
-        p >>= (unsigned int)-x1;
-        x1 = 0;
-      }
+        uint32_t p = *pp++;
 
-      if (p) {
-
-        unsigned int bx = ((unsigned int) x1) & ~(32 - 1);
-
-        uint32_t *sl = scanline (y);
-        sl += bx / 32;
-
-        *sl |= (p << ((unsigned int)x1 - bx));
-
-        if ((unsigned int)x1 > bx) {
-
-          bx += 32;
-          ++sl;
-
-          if (bx < m_width) {
-            *sl |= (p >> (bx - (unsigned int)x1));
+        if (x1 < 0) {
+          if (x1 <= -32) {
+            return;
           }
-            
+          p >>= (unsigned int)-x1;
+          x1 = 0;
+        }
+
+        if (p) {
+
+          unsigned int bx = ((unsigned int) x1) & ~(32 - 1);
+
+          uint32_t *sl = scanline (y);
+          sl += bx / 32;
+
+          *sl |= (p << ((unsigned int)x1 - bx));
+
+          if ((unsigned int)x1 > bx) {
+
+            bx += 32;
+            ++sl;
+
+            if (bx < m_width) {
+              *sl |= (p >> (bx - (unsigned int)x1));
+            }
+
+          }
+
         }
 
       }
 
-      ++pp;
       --n;
       --y;
 
@@ -851,7 +854,7 @@ Bitmap::render_text (const lay::RenderText &text)
           size_t cc = c; // to suppress a compiler warning ..
           if (c >= ff.first_char () && cc < size_t (ff.n_chars ()) + size_t (ff.first_char ())
               && xx > -100.0 && xx < double (width ())) {
-            fill_pattern (int (y + 0.5), int (floor (xx)), ff.data () + (c - ff.first_char ()) * ff.height (), ff.height ());
+            fill_pattern (int (y + 0.5), int (floor (xx)), ff.data () + (c - ff.first_char ()) * ff.height () * ff.stride (), ff.stride (), ff.height ());
           }
 
           xx += double (ff.width ());

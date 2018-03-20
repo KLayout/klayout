@@ -324,8 +324,10 @@ private:
    *  @param y The scanline
    *  @param x1 The start coordinate
    *  @param p The pattern to use
+   *  @param stride The number of words per line
+   *  @param n The height (number of lines)
    */
-  void fill_pattern (int y, int x, const uint32_t *p, unsigned int n);
+  void fill_pattern (int y, int x, const uint32_t *p, unsigned int stride, unsigned int n);
 };
 
 inline bool

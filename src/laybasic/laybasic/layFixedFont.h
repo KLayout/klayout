@@ -18,7 +18,7 @@ public:
   /**
    *  @brief ctor
    */
-  FixedFont (unsigned int h, unsigned int lh, unsigned int w, unsigned char c0, unsigned char nc, uint32_t *d);
+  FixedFont (unsigned int h, unsigned int lh, unsigned int w, unsigned char c0, unsigned char nc, uint32_t *d, unsigned int stride);
 
   /**
    *  @brief Factory
@@ -90,11 +90,20 @@ public:
     return mp_data;
   }
 
+  /**
+   *  @brief Gets the stride (number of words per line)
+   */
+  unsigned int stride () const
+  {
+    return m_stride;
+  }
+
 private:
   unsigned int m_height, m_line_height, m_width;
   unsigned char m_first_char;
   unsigned char m_n_chars;
   uint32_t *mp_data;
+  unsigned int m_stride;
   static int ms_default_font_size;
 };
 

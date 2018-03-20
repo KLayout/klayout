@@ -786,7 +786,9 @@ MacroEditorDialog::configure (const std::string &name, const std::string &value)
   } else if (name == cfg_macro_editor_font_size) {
 
     int v = m_font_size;
-    tl::from_string (value, v);
+    if (! value.empty ()) {
+      tl::from_string (value, v);
+    }
     if (v != m_font_size) {
       m_font_size = v;
       m_needs_update = true;
@@ -3475,7 +3477,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_save_all_on_run, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_debugging_enabled, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_file_watcher_enabled, "true"));
-    options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_font_size, "0"));
+    options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_font_size, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_font_family, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_stop_on_exception, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_macro_editor_tab_width, "8"));

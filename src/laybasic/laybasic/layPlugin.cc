@@ -27,6 +27,7 @@
 #include "tlException.h"
 #include "tlAssert.h"
 #include "tlXMLParser.h"
+#include "tlLog.h"
 
 #include "layPlugin.h"
 #include "tlExceptions.h"
@@ -37,6 +38,7 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <QObject>
 
 namespace lay
 {
@@ -293,8 +295,12 @@ Plugin::config_set (const std::string &name, const std::string &value)
   //  look for plugins that receive that configuration statically if the root is addressed
   if (! mp_parent && ! m_standalone) {
     for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-      if ((const_cast<lay::PluginDeclaration *> (&*cls))->configure (name, value)) {
-        return;
+      try {
+        if ((const_cast<lay::PluginDeclaration *> (&*cls))->configure (name, value)) {
+          return;
+        }
+      } catch (tl::Exception &ex) {
+        tl::error << tl::to_string (QObject::tr ("Error on configure")) << " " << name << "='" << value << "': " << ex.msg ();
       }
     }
   }
@@ -381,9 +387,13 @@ Plugin::do_config_end ()
 bool 
 Plugin::do_config_set (const std::string &name, const std::string &value)
 {
-  if (configure (name, value)) {
-    //  taken by us - don't propagate to the children
-    return true;
+  try {
+    if (configure (name, value)) {
+      //  taken by us - don't propagate to the children
+      return true;
+    }
+  } catch (tl::Exception &ex) {
+    tl::error << tl::to_string (QObject::tr ("Error on configure")) << " " << name << "='" << value << "': " << ex.msg ();
   }
 
   //  propagate to all children (not only the first that takes it!)

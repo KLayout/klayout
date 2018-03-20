@@ -20,11 +20,11 @@
 
 */
 
-#include <QtGui/QApplication>
-#include <QtGui/QFont>
-#include <QtGui/QBitmap>
-#include <QtGui/QPainter>
-#include <QtGui/QFontDialog>
+#include <QApplication>
+#include <QFont>
+#include <QBitmap>
+#include <QPainter>
+#include <QFontDialog>
 
 #include <stdio.h>
 
@@ -55,14 +55,14 @@ main (int argc, char *argv [])
       sprintf (b, "  FixedFont (ff%d_height, ff%d_line_height, ff%d_width, ff%d_first_char, sizeof (ff%d_data) / sizeof (uint32_t) / (ff%d_height * ff%d_stride), ff%d_data, ff%d_stride),\n", os, os, os, os, os, os, os, os, os);
       table += b;
 
-      QFont f (QString::fromAscii ("Liberation Mono"), r * sz[s]);
+      QFont f (QString::fromLatin1 ("Liberation Mono"), r * sz[s]);
       f.setStyleStrategy(QFont::StyleStrategy ((f.styleStrategy() & ~QFont::PreferAntialias) | QFont::NoAntialias));
 
       QFontMetrics fm (f);
 
-      int w = fm.width (QChar::fromAscii ('W'));
+      int w = fm.width (QChar::fromLatin1 ('W'));
 
-      printf ("\n// Font: %s\n", f.toString ().toAscii ().constData ());
+      printf ("\n// Font: %s\n", f.toString ().toLatin1 ().constData ());
       printf ("const unsigned int ff%d_height = %d;\nconst unsigned int ff%d_line_height = %d;\nconst unsigned int ff%d_width = %d;\nconst unsigned int ff%d_stride = %d;\n",
         os, fm.height (), os, fm.lineSpacing (), os, w, os, (w + 31) / 32);
 

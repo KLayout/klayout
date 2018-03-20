@@ -908,7 +908,7 @@ LayoutCanvas::resizeEvent (QResizeEvent *)
   //  set the viewport to the new size
   m_viewport.set_size (width () * m_dpr, height () * m_dpr);
   m_viewport_l.set_size (width () * m_oversampling * m_dpr, height () * m_oversampling * m_dpr);
-  mouse_event_trans (m_viewport.trans ());
+  mouse_event_trans (db::DCplxTrans (1.0 / double (m_dpr)) * m_viewport.trans ());
   do_redraw_all (true);
   viewport_changed_event ();
 }
@@ -916,7 +916,7 @@ LayoutCanvas::resizeEvent (QResizeEvent *)
 void 
 LayoutCanvas::update_viewport ()
 {
-  mouse_event_trans (m_viewport.trans ());
+  mouse_event_trans (db::DCplxTrans (1.0 / double (m_dpr)) * m_viewport.trans ());
   for (service_iterator svc = begin_services (); svc != end_services (); ++svc) {
     (*svc)->update ();
   }

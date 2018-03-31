@@ -50,6 +50,10 @@ HelpDialog::HelpDialog (QWidget *parent, bool modal)
   mp_browser_panel = new lay::BrowserPanel (this);
   help_layout->addWidget (mp_browser_panel);
 
+  QSizePolicy sp = mp_browser_panel->sizePolicy ();
+  sp.setVerticalStretch (1);
+  mp_browser_panel->setSizePolicy (sp);
+
   if (modal) {
     QFrame *button_frame = new QFrame (this);
     help_layout->addWidget (button_frame);

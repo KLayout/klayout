@@ -4793,7 +4793,7 @@ MainWindow::cm_show_assistant ()
 void
 MainWindow::show_help (const QString &url)
 {
-  show_assistant_url (tl::to_string (url), true);
+  show_assistant_url (tl::to_string (url), false);
 }
 
 void

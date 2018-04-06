@@ -113,7 +113,9 @@ TEST(1)
   EXPECT_EQ (v.is<long> (), false);
   EXPECT_EQ (v.is_char (), false);
   EXPECT_EQ (v.is_long (), false);
+  EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_ulong (), false);
+  EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_double (), false);
   EXPECT_EQ (v.to_parsable_string (), "nil");
   vv = v;
@@ -135,10 +137,13 @@ TEST(1)
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_id (), false);
   EXPECT_EQ (v.is_ulong (), true);
+  EXPECT_EQ (v.is_ulonglong (), true);
   EXPECT_EQ (v.is_long (), false);
+  EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_double (), false);
   EXPECT_EQ (v.to_parsable_string (), "#u1");
   EXPECT_EQ (v.to_long (), 1l);
+  EXPECT_EQ (v.to_longlong (), 1l);
   EXPECT_EQ (v.is<unsigned long> (), true);
   EXPECT_EQ (v.is<long> (), false);
   EXPECT_EQ (vv == v, false);
@@ -167,11 +172,14 @@ TEST(1)
   EXPECT_EQ (v.is<unsigned long> (), false);
   EXPECT_EQ (v.is<long> (), false);
   EXPECT_EQ (v.is_ulong (), true);
+  EXPECT_EQ (v.is_ulonglong (), true);
   EXPECT_EQ (v.is_long (), false);
+  EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_id (), false);
   EXPECT_EQ (v.is_double (), false);
   EXPECT_EQ (v.to_parsable_string (), "#u2");
   EXPECT_EQ (v.to_long (), 2l);
+  EXPECT_EQ (v.to_longlong (), 2l);
   EXPECT_EQ (vv == v, false);
   EXPECT_EQ (vv != v, true);
   vv = v;
@@ -194,7 +202,9 @@ TEST(1)
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_long (), true);
+  EXPECT_EQ (v.is_longlong (), true);
   EXPECT_EQ (v.is_ulong (), false);
+  EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is<long> (), false);
   EXPECT_EQ (v.is<unsigned long> (), false);
   EXPECT_EQ (v.is<int> (), true);
@@ -202,6 +212,7 @@ TEST(1)
   EXPECT_EQ (v.is_double (), false);
   EXPECT_EQ (v.to_parsable_string (), "#1");
   EXPECT_EQ (v.to_long (), 1l);
+  EXPECT_EQ (v.to_longlong (), 1l);
   EXPECT_EQ (vv == v, false);
   EXPECT_EQ (vv != v, true);
   vv = v;
@@ -239,6 +250,7 @@ TEST(1)
   EXPECT_EQ (v.is<signed char> (), false);
   EXPECT_EQ (v.to_parsable_string (), "#2");
   EXPECT_EQ (v.to_long (), 2l);
+  EXPECT_EQ (v.to_longlong (), 2l);
   EXPECT_EQ (v.to_double (), 2.0);
   EXPECT_EQ (v.to_float (), 2.0);
   EXPECT_EQ (vv == v, false);
@@ -261,7 +273,9 @@ TEST(1)
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_long (), false);
+  EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_ulong (), false);
+  EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_char (), false);
   EXPECT_EQ (v.is_double (), true);
   EXPECT_EQ (v.is<long> (), false);
@@ -278,6 +292,10 @@ TEST(1)
   EXPECT_EQ (v.to_parsable_string (), "##5");
   EXPECT_EQ (v.to_double (), 5.0);
   EXPECT_EQ (v.to_float (), 5.0);
+  EXPECT_EQ (v.to_long (), 5);
+  EXPECT_EQ (v.to_ulong (), 5u);
+  EXPECT_EQ (v.to_longlong (), 5);
+  EXPECT_EQ (v.to_ulonglong (), 5u);
   EXPECT_EQ (vv == v, false);
   EXPECT_EQ (vv != v, true);
   vv = v;
@@ -300,7 +318,9 @@ TEST(1)
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_long (), false);
+  EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_ulong (), false);
+  EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_double (), true);
   EXPECT_EQ (v.is<long> (), false);
   EXPECT_EQ (v.is<unsigned long> (), false);
@@ -317,6 +337,10 @@ TEST(1)
   EXPECT_EQ (v.is_id (), false);
   EXPECT_EQ (v.to_parsable_string (), "##5");
   EXPECT_EQ (v.to_double (), 5.0);
+  EXPECT_EQ (v.to_long (), 5);
+  EXPECT_EQ (v.to_longlong (), 5);
+  EXPECT_EQ (v.to_ulong (), 5u);
+  EXPECT_EQ (v.to_ulonglong (), 5u);
   EXPECT_EQ (*(double *)v.native_ptr (), 5.0);
   EXPECT_EQ (vv == v, true);
   EXPECT_EQ (vv != v, false);
@@ -365,6 +389,8 @@ TEST(1)
   EXPECT_EQ (v.is_char (), false);
   EXPECT_EQ (v.is_long (), true);
   EXPECT_EQ (v.is_ulong (), false);
+  EXPECT_EQ (v.is_longlong (), true);
+  EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_double (), false);
   EXPECT_EQ (v.to_parsable_string (), "#2");
   vv = v;
@@ -440,6 +466,8 @@ TEST(1)
   EXPECT_EQ (v.is_cstring (), true);
   EXPECT_EQ (v.is_long (), false);
   EXPECT_EQ (v.is_ulong (), false);
+  EXPECT_EQ (v.is_longlong (), false);
+  EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_double (), false);
   EXPECT_EQ (v.is_id (), false);
   EXPECT_EQ (v.to_parsable_string (), "'hal\\'l\"o'");
@@ -470,6 +498,8 @@ TEST(1)
   EXPECT_EQ (v.is_stdstring (), false);
   EXPECT_EQ (v.is_long (), false);
   EXPECT_EQ (v.is_ulong (), false);
+  EXPECT_EQ (v.is_longlong (), false);
+  EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_double (), false);
   EXPECT_EQ (v.is_id (), false);
   EXPECT_EQ (std::string (v.to_string ()), "hal'l\"o");
@@ -808,6 +838,217 @@ TEST(3)
   EXPECT_EQ (v1 < v2, false);
   EXPECT_EQ (v1 < v1, false);
   EXPECT_EQ (v2 < v2, false);
+}
+
+//  can_convert_to
+TEST(4)
+{
+  tl::Variant v;
+  v = tl::Variant (1);
+  EXPECT_EQ (v.can_convert_to_char (), true);
+  EXPECT_EQ (v.can_convert_to_uchar (), true);
+  EXPECT_EQ (v.can_convert_to_double (), true);
+  EXPECT_EQ (v.can_convert_to_float (), true);
+  EXPECT_EQ (v.can_convert_to_short (), true);
+  EXPECT_EQ (v.can_convert_to_ushort (), true);
+  EXPECT_EQ (v.can_convert_to_int (), true);
+  EXPECT_EQ (v.can_convert_to_uint (), true);
+  EXPECT_EQ (v.can_convert_to_long (), true);
+  EXPECT_EQ (v.can_convert_to_ulong (), true);
+  EXPECT_EQ (v.can_convert_to_longlong (), true);
+  EXPECT_EQ (v.can_convert_to_ulonglong (), true);
+
+  v = tl::Variant (-1);
+  EXPECT_EQ (v.can_convert_to_char (), true);
+  EXPECT_EQ (v.can_convert_to_uchar (), false);
+  EXPECT_EQ (v.can_convert_to_double (), true);
+  EXPECT_EQ (v.can_convert_to_float (), true);
+  EXPECT_EQ (v.can_convert_to_short (), true);
+  EXPECT_EQ (v.can_convert_to_ushort (), false);
+  EXPECT_EQ (v.can_convert_to_int (), true);
+  EXPECT_EQ (v.can_convert_to_uint (), false);
+  EXPECT_EQ (v.can_convert_to_long (), true);
+  EXPECT_EQ (v.can_convert_to_ulong (), false);
+  EXPECT_EQ (v.can_convert_to_longlong (), true);
+  EXPECT_EQ (v.can_convert_to_ulonglong (), false);
+
+  v = tl::Variant (1000);
+  EXPECT_EQ (v.can_convert_to_char (), false);
+  EXPECT_EQ (v.can_convert_to_uchar (), false);
+  EXPECT_EQ (v.can_convert_to_double (), true);
+  EXPECT_EQ (v.can_convert_to_float (), true);
+  EXPECT_EQ (v.can_convert_to_short (), true);
+  EXPECT_EQ (v.can_convert_to_ushort (), true);
+  EXPECT_EQ (v.can_convert_to_int (), true);
+  EXPECT_EQ (v.can_convert_to_uint (), true);
+  EXPECT_EQ (v.can_convert_to_long (), true);
+  EXPECT_EQ (v.can_convert_to_ulong (), true);
+  EXPECT_EQ (v.can_convert_to_longlong (), true);
+  EXPECT_EQ (v.can_convert_to_ulonglong (), true);
+
+  v = tl::Variant ("1000");
+  EXPECT_EQ (v.can_convert_to_char (), false);
+  EXPECT_EQ (v.can_convert_to_uchar (), false);
+  EXPECT_EQ (v.can_convert_to_double (), true);
+  EXPECT_EQ (v.can_convert_to_float (), true);
+  EXPECT_EQ (v.can_convert_to_short (), true);
+  EXPECT_EQ (v.can_convert_to_ushort (), true);
+  EXPECT_EQ (v.can_convert_to_int (), true);
+  EXPECT_EQ (v.can_convert_to_uint (), true);
+  EXPECT_EQ (v.can_convert_to_long (), true);
+  EXPECT_EQ (v.can_convert_to_ulong (), true);
+  EXPECT_EQ (v.can_convert_to_longlong (), true);
+  EXPECT_EQ (v.can_convert_to_ulonglong (), true);
+
+  v = tl::Variant (100000);
+  EXPECT_EQ (v.can_convert_to_char (), false);
+  EXPECT_EQ (v.can_convert_to_uchar (), false);
+  EXPECT_EQ (v.can_convert_to_double (), true);
+  EXPECT_EQ (v.can_convert_to_float (), true);
+  EXPECT_EQ (v.can_convert_to_short (), false);
+  EXPECT_EQ (v.can_convert_to_ushort (), false);
+  EXPECT_EQ (v.can_convert_to_int (), true);
+  EXPECT_EQ (v.can_convert_to_uint (), true);
+  EXPECT_EQ (v.can_convert_to_long (), true);
+  EXPECT_EQ (v.can_convert_to_ulong (), true);
+  EXPECT_EQ (v.can_convert_to_longlong (), true);
+  EXPECT_EQ (v.can_convert_to_ulonglong (), true);
+
+  v = tl::Variant (10000000000ll);
+  EXPECT_EQ (v.can_convert_to_char (), false);
+  EXPECT_EQ (v.can_convert_to_uchar (), false);
+  EXPECT_EQ (v.can_convert_to_double (), true);
+  EXPECT_EQ (v.can_convert_to_float (), true);
+  EXPECT_EQ (v.can_convert_to_short (), false);
+  EXPECT_EQ (v.can_convert_to_ushort (), false);
+  EXPECT_EQ (v.can_convert_to_int (), false);
+  EXPECT_EQ (v.can_convert_to_uint (), false);
+  if (sizeof (long) == 4) {
+    EXPECT_EQ (v.can_convert_to_long (), false);
+    EXPECT_EQ (v.can_convert_to_ulong (), false);
+  } else {
+    EXPECT_EQ (v.can_convert_to_long (), true);
+    EXPECT_EQ (v.can_convert_to_ulong (), true);
+  }
+  EXPECT_EQ (v.can_convert_to_longlong (), true);
+  EXPECT_EQ (v.can_convert_to_ulonglong (), true);
+
+  v = tl::Variant (0.5);
+  EXPECT_EQ (v.can_convert_to_char (), true);
+  EXPECT_EQ (v.can_convert_to_uchar (), true);
+  EXPECT_EQ (v.can_convert_to_double (), true);
+  EXPECT_EQ (v.can_convert_to_float (), true);
+  EXPECT_EQ (v.can_convert_to_short (), true);
+  EXPECT_EQ (v.can_convert_to_ushort (), true);
+  EXPECT_EQ (v.can_convert_to_int (), true);
+  EXPECT_EQ (v.can_convert_to_uint (), true);
+  EXPECT_EQ (v.can_convert_to_long (), true);
+  EXPECT_EQ (v.can_convert_to_ulong (), true);
+  EXPECT_EQ (v.can_convert_to_longlong (), true);
+  EXPECT_EQ (v.can_convert_to_ulonglong (), true);
+
+  v = tl::Variant ("100000000000000000000");
+  EXPECT_EQ (v.can_convert_to_char (), false);
+  EXPECT_EQ (v.can_convert_to_uchar (), false);
+  EXPECT_EQ (v.can_convert_to_double (), true);
+  EXPECT_EQ (v.can_convert_to_float (), true);
+  EXPECT_EQ (v.can_convert_to_short (), false);
+  EXPECT_EQ (v.can_convert_to_ushort (), false);
+  EXPECT_EQ (v.can_convert_to_int (), false);
+  EXPECT_EQ (v.can_convert_to_uint (), false);
+  EXPECT_EQ (v.can_convert_to_long (), false);
+  EXPECT_EQ (v.can_convert_to_ulong (), false);
+  EXPECT_EQ (v.can_convert_to_longlong (), false);
+  EXPECT_EQ (v.can_convert_to_ulonglong (), false);
+
+  v = tl::Variant ("1000x");
+  EXPECT_EQ (v.can_convert_to_char (), false);
+  EXPECT_EQ (v.can_convert_to_uchar (), false);
+  EXPECT_EQ (v.can_convert_to_double (), false);
+  EXPECT_EQ (v.can_convert_to_float (), false);
+  EXPECT_EQ (v.can_convert_to_short (), false);
+  EXPECT_EQ (v.can_convert_to_ushort (), false);
+  EXPECT_EQ (v.can_convert_to_int (), false);
+  EXPECT_EQ (v.can_convert_to_uint (), false);
+  EXPECT_EQ (v.can_convert_to_long (), false);
+  EXPECT_EQ (v.can_convert_to_ulong (), false);
+  EXPECT_EQ (v.can_convert_to_longlong (), false);
+  EXPECT_EQ (v.can_convert_to_ulonglong (), false);
+
+  v = tl::Variant ("");
+  EXPECT_EQ (v.can_convert_to_char (), false);
+  EXPECT_EQ (v.can_convert_to_uchar (), false);
+  EXPECT_EQ (v.can_convert_to_double (), false);
+  EXPECT_EQ (v.can_convert_to_float (), false);
+  EXPECT_EQ (v.can_convert_to_short (), false);
+  EXPECT_EQ (v.can_convert_to_ushort (), false);
+  EXPECT_EQ (v.can_convert_to_int (), false);
+  EXPECT_EQ (v.can_convert_to_uint (), false);
+  EXPECT_EQ (v.can_convert_to_long (), false);
+  EXPECT_EQ (v.can_convert_to_ulong (), false);
+  EXPECT_EQ (v.can_convert_to_longlong (), false);
+  EXPECT_EQ (v.can_convert_to_ulonglong (), false);
+
+  v = tl::Variant ("x");
+  EXPECT_EQ (v.can_convert_to_char (), false);
+  EXPECT_EQ (v.can_convert_to_uchar (), false);
+  EXPECT_EQ (v.can_convert_to_double (), false);
+  EXPECT_EQ (v.can_convert_to_float (), false);
+  EXPECT_EQ (v.can_convert_to_short (), false);
+  EXPECT_EQ (v.can_convert_to_ushort (), false);
+  EXPECT_EQ (v.can_convert_to_int (), false);
+  EXPECT_EQ (v.can_convert_to_uint (), false);
+  EXPECT_EQ (v.can_convert_to_long (), false);
+  EXPECT_EQ (v.can_convert_to_ulong (), false);
+  EXPECT_EQ (v.can_convert_to_longlong (), false);
+  EXPECT_EQ (v.can_convert_to_ulonglong (), false);
+}
+
+//  Variants as key maps
+TEST(5)
+{
+  std::map<tl::Variant, int> m;
+
+  //  there are four categories which are separated:
+  //    int
+  //    unsigned int
+  //    float (downwards compatible with int and unsigned int)
+  //    string
+  m.insert (std::make_pair (tl::Variant (1), 17));
+  m.insert (std::make_pair (tl::Variant ((unsigned int) 2), 42));
+  m.insert (std::make_pair (tl::Variant ("3"), 41));
+  m.insert (std::make_pair (tl::Variant (2.5), -17));
+
+  //  int category
+  EXPECT_EQ (m [1], 17);
+  EXPECT_EQ (m [(char) 1], 17);
+  EXPECT_EQ (m [(short) 1], 17);
+  EXPECT_EQ (m [(int) 1], 17);
+  EXPECT_EQ (m [(long long) 1], 17);
+  EXPECT_EQ (m [1.0], 17);
+  //  non-members of that category
+  EXPECT_EQ (m [1.25], 0);
+  EXPECT_EQ (m [(unsigned int) 1], 0);
+  EXPECT_EQ (m ["1"], 0);
+
+  //  unsigned int category
+  EXPECT_EQ (m [(unsigned char) 2], 42);
+  EXPECT_EQ (m [(unsigned short) 2], 42);
+  EXPECT_EQ (m [(unsigned int) 2], 42);
+  EXPECT_EQ (m [(unsigned long long) 2], 42);
+  EXPECT_EQ (m [2.0], 42);
+  //  non-members of that category
+  EXPECT_EQ (m [2.25], 0);
+  EXPECT_EQ (m [2], 0);
+  EXPECT_EQ (m ["2"], 0);
+
+  //  float category
+  EXPECT_EQ (m [2.5], -17);
+  EXPECT_EQ (m [2.5001], 0);
+
+  //  string category
+  EXPECT_EQ (m ["3"], 41);
+  EXPECT_EQ (m [" 3"], 0);
 }
 
 }

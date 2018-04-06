@@ -894,18 +894,18 @@ normalized_type (Variant::type type)
   case Variant::t_short:
   case Variant::t_int:
   case Variant::t_long:
-    return Variant::t_long;
+  case Variant::t_longlong:
+    return Variant::t_longlong;
   case Variant::t_uchar:
   case Variant::t_ushort:
   case Variant::t_uint:
   case Variant::t_ulong:
-    return Variant::t_ulong;
+  case Variant::t_ulonglong:
+    return Variant::t_ulonglong;
   case Variant::t_stdstring:
   case Variant::t_string:
     return Variant::t_string;
   default:
-  case Variant::t_longlong:
-  case Variant::t_ulonglong:
 #if defined(HAVE_64BIT_COORD)
   case Variant::t_int128:
 #endif
@@ -1195,8 +1195,12 @@ Variant::can_convert_to_ulonglong () const
   case t_stdstring:
     {
       tl::Extractor ex (to_string ());
-      unsigned long long ll;
-      return ex.try_read (ll) && ex.at_end ();
+      try {
+        unsigned long long ll;
+        return ex.try_read (ll) && ex.at_end ();
+      } catch (...) {
+        return false;
+      }
     }
   default:
     return false;
@@ -1236,8 +1240,12 @@ Variant::can_convert_to_longlong () const
   case t_stdstring:
     {
       tl::Extractor ex (to_string ());
-      long long ll;
-      return ex.try_read (ll) && ex.at_end ();
+      try {
+        long long ll;
+        return ex.try_read (ll) && ex.at_end ();
+      } catch (...) {
+        return false;
+      }
     }
   default:
     return false;
@@ -1257,9 +1265,9 @@ Variant::can_convert_to_ulong () const
     return m_var.m_int128 <= __int128 (std::numeric_limits<unsigned long long>::max ()) && m_var.m_int128 >= __int128 (std::numeric_limits<unsigned long long>::min ());
 #endif
   case t_longlong:
-    return m_var.m_longlong >= 0 && m_var.m_longlong < (long long) std::numeric_limits<unsigned long>::max ();
+    return m_var.m_longlong >= 0 && (unsigned long long) m_var.m_longlong <= (unsigned long long) std::numeric_limits<unsigned long>::max ();
   case t_ulonglong:
-    return m_var.m_ulonglong < (unsigned long long) std::numeric_limits<unsigned long>::max ();
+    return m_var.m_ulonglong <= (unsigned long long) std::numeric_limits<unsigned long>::max ();
   case t_ulong:
   case t_bool:
   case t_uchar:
@@ -1283,8 +1291,12 @@ Variant::can_convert_to_ulong () const
   case t_stdstring:
     {
       tl::Extractor ex (to_string ());
-      unsigned long l;
-      return ex.try_read (l) && ex.at_end ();
+      try {
+        unsigned long l;
+        return ex.try_read (l) && ex.at_end ();
+      } catch (...) {
+        return false;
+      }
     }
   default:
     return false;
@@ -1326,8 +1338,12 @@ Variant::can_convert_to_long () const
   case t_stdstring:
     {
       tl::Extractor ex (to_string ());
-      long l;
-      return ex.try_read (l) && ex.at_end ();
+      try {
+        long l;
+        return ex.try_read (l) && ex.at_end ();
+      } catch (...) {
+        return false;
+      }
     }
   default:
     return false;
@@ -1371,8 +1387,12 @@ Variant::can_convert_to_int () const
   case t_stdstring:
     {
       tl::Extractor ex (to_string ());
-      long l;
-      return ex.try_read (l) && ex.at_end () && l >= (long) std::numeric_limits<int>::min () && l <= (long) std::numeric_limits<int>::max ();
+      try {
+        long l;
+        return ex.try_read (l) && ex.at_end () && l >= (long) std::numeric_limits<int>::min () && l <= (long) std::numeric_limits<int>::max ();
+      } catch (...) {
+        return false;
+      }
     }
   default:
     return false;
@@ -1416,8 +1436,12 @@ Variant::can_convert_to_uint () const
   case t_stdstring:
     {
       tl::Extractor ex (to_string ());
-      long l;
-      return ex.try_read (l) && ex.at_end () && l >= (long) std::numeric_limits<int>::min () && l <= (long) std::numeric_limits<int>::max ();
+      try {
+        long l;
+        return ex.try_read (l) && ex.at_end () && l >= (long) std::numeric_limits<int>::min () && l <= (long) std::numeric_limits<int>::max ();
+      } catch (...) {
+        return false;
+      }
     }
   default:
     return false;
@@ -1684,7 +1708,7 @@ Variant::to_ulonglong () const
     return m_var.m_long;
 #if defined(HAVE_64BIT_COORD)
   } else if (m_type == t_int128) {
-    return m_var.m_int128;
+    return (unsigned long long) m_var.m_int128;
 #endif
   } else if (m_type == t_ulonglong) {
     return m_var.m_ulonglong;
@@ -1738,7 +1762,7 @@ Variant::to_longlong () const
     return m_var.m_longlong;
 #if defined(HAVE_64BIT_COORD)
   } else if (m_type == t_int128) {
-    return m_var.m_int128;
+    return (long long) m_var.m_int128;
 #endif
   } else if (m_type == t_bool) {
     return m_var.m_bool;
@@ -1783,12 +1807,12 @@ Variant::to_ulong () const
   } else if (m_type == t_long) {
     return m_var.m_long;
   } else if (m_type == t_ulonglong) {
-    return m_var.m_ulonglong;
+    return (unsigned long) (m_var.m_ulonglong);
   } else if (m_type == t_longlong) {
-    return m_var.m_longlong;
+    return (unsigned long) (m_var.m_longlong);
 #if defined(HAVE_64BIT_COORD)
   } else if (m_type == t_int128) {
-    return m_var.m_int128;
+    return (unsigned long) (m_var.m_int128);
 #endif
   } else if (m_type == t_bool) {
     return m_var.m_bool;
@@ -1833,12 +1857,12 @@ Variant::to_long () const
   } else if (m_type == t_long) {
     return m_var.m_long;
   } else if (m_type == t_ulonglong) {
-    return m_var.m_ulonglong;
+    return long (m_var.m_ulonglong);
   } else if (m_type == t_longlong) {
-    return m_var.m_longlong;
+    return long (m_var.m_longlong);
 #if defined(HAVE_64BIT_COORD)
   } else if (m_type == t_int128) {
-    return m_var.m_int128;
+    return long (m_var.m_int128);
 #endif
   } else if (m_type == t_bool) {
     return m_var.m_bool;

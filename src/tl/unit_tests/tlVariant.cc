@@ -137,7 +137,7 @@ TEST(1)
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_id (), false);
   EXPECT_EQ (v.is_ulong (), true);
-  EXPECT_EQ (v.is_ulonglong (), true);
+  EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_long (), false);
   EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_double (), false);
@@ -172,7 +172,7 @@ TEST(1)
   EXPECT_EQ (v.is<unsigned long> (), false);
   EXPECT_EQ (v.is<long> (), false);
   EXPECT_EQ (v.is_ulong (), true);
-  EXPECT_EQ (v.is_ulonglong (), true);
+  EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_long (), false);
   EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_id (), false);
@@ -202,7 +202,7 @@ TEST(1)
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
   EXPECT_EQ (v.is_long (), true);
-  EXPECT_EQ (v.is_longlong (), true);
+  EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_ulong (), false);
   EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is<long> (), false);
@@ -389,7 +389,7 @@ TEST(1)
   EXPECT_EQ (v.is_char (), false);
   EXPECT_EQ (v.is_long (), true);
   EXPECT_EQ (v.is_ulong (), false);
-  EXPECT_EQ (v.is_longlong (), true);
+  EXPECT_EQ (v.is_longlong (), false);
   EXPECT_EQ (v.is_ulonglong (), false);
   EXPECT_EQ (v.is_double (), false);
   EXPECT_EQ (v.to_parsable_string (), "#2");

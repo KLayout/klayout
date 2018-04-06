@@ -831,186 +831,160 @@ tl::Extractor::read_quoted (std::string &value)
   return *this;
 }
 
-bool 
+namespace
+{
+  template <class T> struct overflow_msg_func;
+
+  template <> struct overflow_msg_func<long long>
+  {
+    std::string operator() () const
+    {
+      return tl::to_string (QObject::tr ("Range overflow on long long integer"));
+    }
+  };
+
+  template <> struct overflow_msg_func<unsigned long long>
+  {
+    std::string operator() () const
+    {
+      return tl::to_string (QObject::tr ("Range overflow on unsigned long long integer"));
+    }
+  };
+
+  template <> struct overflow_msg_func<long>
+  {
+    std::string operator() () const
+    {
+      return tl::to_string (QObject::tr ("Range overflow on long integer"));
+    }
+  };
+
+  template <> struct overflow_msg_func<unsigned long>
+  {
+    std::string operator() () const
+    {
+      return tl::to_string (QObject::tr ("Range overflow on unsigned long integer"));
+    }
+  };
+
+  template <> struct overflow_msg_func<int>
+  {
+    std::string operator() () const
+    {
+      return tl::to_string (QObject::tr ("Range overflow on integer"));
+    }
+  };
+
+  template <> struct overflow_msg_func<unsigned int>
+  {
+    std::string operator() () const
+    {
+      return tl::to_string (QObject::tr ("Range overflow on unsigned integer"));
+    }
+  };
+}
+
+template <class T> bool
+tl::Extractor::try_read_signed_int (T &value)
+{
+  if (! *skip ()) {
+    return false;
+  }
+
+  bool minus = false;
+  if (*m_cp == '-') {
+    minus = true;
+    ++m_cp;
+  } else if (*m_cp == '+') {
+    ++m_cp;
+  }
+
+  if (! isdigit (*m_cp)) {
+    return false;
+  }
+
+  value = 0;
+  while (isdigit (*m_cp)) {
+    if (value > std::numeric_limits<T>::max () / 10) {
+      throw tl::Exception (overflow_msg_func<T> () ());
+    }
+    value *= 10;
+    if (value > std::numeric_limits<T>::max () - (*m_cp - '0')) {
+      throw tl::Exception (overflow_msg_func<T> () ());
+    }
+    value += (*m_cp - '0');
+    ++m_cp;
+  }
+
+  if (minus) {
+    value = -value;
+  }
+
+  return true;
+}
+
+template <class T> bool
+tl::Extractor::try_read_unsigned_int (T &value)
+{
+  if (! *skip ()) {
+    return false;
+  }
+
+  if (! isdigit (*m_cp)) {
+    return false;
+  }
+
+  value = 0;
+  while (isdigit (*m_cp)) {
+    if (value > std::numeric_limits<T>::max () / 10) {
+      throw tl::Exception (overflow_msg_func<T> () ());
+    }
+    value *= 10;
+    if (value > std::numeric_limits<T>::max () - (*m_cp - '0')) {
+      throw tl::Exception (overflow_msg_func<T> () ());
+    }
+    value += (*m_cp - '0');
+    ++m_cp;
+  }
+
+  return true;
+}
+
+bool
 tl::Extractor::try_read (unsigned int &value)
 {
-  if (! *skip ()) {
-    return false;
-  } 
-
-  if (! isdigit (*m_cp)) {
-    return false;
-  } 
-
-  value = 0;
-  while (isdigit (*m_cp)) {
-    if ((value * 10) / 10 != value) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Range overflow on unsigned integer")));
-    }
-    value *= 10;
-    value += (*m_cp - '0');
-    ++m_cp;
-  }
-
-  return true;
+  return try_read_unsigned_int (value);
 }
 
-bool 
-tl::Extractor::try_read (int &value)
-{
-  if (! *skip ()) {
-    return false;
-  } 
-
-  bool minus = false;
-  if (*m_cp == '-') {
-    minus = true;
-    ++m_cp;
-  } else if (*m_cp == '+') {
-    ++m_cp;
-  }
-
-  if (! isdigit (*m_cp)) {
-    return false;
-  } 
-
-  value = 0;
-  while (isdigit (*m_cp)) {
-    if ((value * 10) / 10 != value) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Range overflow on integer")));
-    }
-    value *= 10;
-    value += (*m_cp - '0');
-    ++m_cp;
-  }
-
-  if (minus) {
-    value = -value;
-  }
-
-  return true;
-}
-
-bool 
+bool
 tl::Extractor::try_read (unsigned long &value)
 {
-  if (! *skip ()) {
-    return false;
-  } 
-
-  if (! isdigit (*m_cp)) {
-    return false;
-  } 
-
-  value = 0;
-  while (isdigit (*m_cp)) {
-    if ((value * 10) / 10 != value) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Range overflow on unsigned long integer")));
-    }
-    value *= 10;
-    value += (*m_cp - '0');
-    ++m_cp;
-  }
-
-  return true;
+  return try_read_unsigned_int (value);
 }
 
-bool 
+bool
 tl::Extractor::try_read (unsigned long long &value)
 {
-  if (! *skip ()) {
-    return false;
-  } 
-
-  if (! isdigit (*m_cp)) {
-    return false;
-  } 
-
-  value = 0;
-  while (isdigit (*m_cp)) {
-    if ((value * 10) / 10 != value) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Range overflow on unsigned long long integer")));
-    }
-    value *= 10;
-    value += (*m_cp - '0');
-    ++m_cp;
-  }
-
-  return true;
+  return try_read_unsigned_int (value);
 }
 
-bool 
+bool
+tl::Extractor::try_read (int &value)
+{
+  return try_read_signed_int (value);
+}
+
+bool
 tl::Extractor::try_read (long &value)
 {
-  if (! *skip ()) {
-    return false;
-  } 
-
-  bool minus = false;
-  if (*m_cp == '-') {
-    minus = true;
-    ++m_cp;
-  } else if (*m_cp == '+') {
-    ++m_cp;
-  }
-
-  if (! isdigit (*m_cp)) {
-    return false;
-  } 
-
-  value = 0;
-  while (isdigit (*m_cp)) {
-    if ((value * 10) / 10 != value) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Range overflow on long integer")));
-    }
-    value *= 10;
-    value += (*m_cp - '0');
-    ++m_cp;
-  }
-
-  if (minus) {
-    value = -value;
-  }
-
-  return true;
+  return try_read_signed_int (value);
 }
 
-bool 
+bool
 tl::Extractor::try_read (long long &value)
 {
-  if (! *skip ()) {
-    return false;
-  } 
-
-  bool minus = false;
-  if (*m_cp == '-') {
-    minus = true;
-    ++m_cp;
-  } else if (*m_cp == '+') {
-    ++m_cp;
-  }
-
-  if (! isdigit (*m_cp)) {
-    return false;
-  } 
-
-  value = 0;
-  while (isdigit (*m_cp)) {
-    if ((value * 10) / 10 != value) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Range overflow on long long integer")));
-    }
-    value *= 10;
-    value += (*m_cp - '0');
-    ++m_cp;
-  }
-
-  if (minus) {
-    value = -value;
-  }
-
-  return true;
+  return try_read_signed_int (value);
 }
-
 bool 
 tl::Extractor::try_read (double &value)
 {

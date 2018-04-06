@@ -1268,7 +1268,7 @@ public:
    */
   bool is_longlong () const
   {
-    return m_type == t_longlong || is_long ();
+    return m_type == t_longlong;
   }
 
   /**
@@ -1276,7 +1276,7 @@ public:
    */
   bool is_ulonglong () const
   {
-    return m_type == t_ulonglong || is_ulong ();
+    return m_type == t_ulonglong;
   }
 
 #if defined(HAVE_64BIT_COORD)

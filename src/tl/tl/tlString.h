@@ -732,6 +732,9 @@ public:
   }
 
 private:
+  template <class T> bool try_read_signed_int (T &value);
+  template <class T> bool try_read_unsigned_int (T &value);
+
   const char *m_cp;
   std::string m_str;
 };

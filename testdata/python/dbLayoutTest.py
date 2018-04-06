@@ -19,6 +19,7 @@
 import pya
 import unittest
 import sys
+import os
 
 class DBLayoutTest(unittest.TestCase):
 
@@ -1103,6 +1104,53 @@ class DBLayoutTest(unittest.TestCase):
       ix += 1
 
     ly._destroy()
+
+  # Bug #109
+  def test_bug109(self):
+
+    testtmp = os.getenv("TESTTMP_WITH_NAME", os.getenv("TESTTMP", "."))
+    
+    file_gds = os.path.join(testtmp, "bug109.gds")
+    file_oas = os.path.join(testtmp, "bug109.oas")
+
+    ly = pya.Layout()
+    top = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    shape = top.shapes(l1).insert(pya.Box(0, 10, 20, 30))
+    shape.set_property(2, "hello, world")
+    shape.set_property("42", "the answer")
+
+    ly.write(file_gds)
+    ly.write(file_oas)
+
+    ly2 = pya.Layout()
+    ly2.read(file_gds)
+    l2 = ly2.layer(1, 0)
+    shape = None
+    for s in ly2.top_cell().shapes(l2).each():
+      shape = s
+    self.assertEqual(shape.property(2), "hello, world")
+    self.assertEqual(shape.property("2"), None)
+    self.assertEqual(shape.property(2.0), "hello, world")
+    self.assertEqual(shape.property(22), None)
+    self.assertEqual(shape.property(42), "the answer")
+    self.assertEqual(shape.property("42"), None)
+    self.assertEqual(shape.property(42.0), "the answer")
+
+    ly2 = pya.Layout()
+    ly2.read(file_oas)
+    l2 = ly2.layer(1, 0)
+    shape = None
+    for s in ly2.top_cell().shapes(l2).each():
+      shape = s
+    self.assertEqual(shape.property(2), "hello, world")
+    self.assertEqual(shape.property("2"), None)
+    self.assertEqual(shape.property(2.0), "hello, world")
+    self.assertEqual(shape.property(22), None)
+    self.assertEqual(shape.property("42"), "the answer")
+    self.assertEqual(shape.property(42), None)
+    self.assertEqual(shape.property(42.0), None)
+
 
 # run unit tests
 if __name__ == '__main__':

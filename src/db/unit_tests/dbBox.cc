@@ -41,12 +41,19 @@ TEST(2)
 
   EXPECT_EQ (b.moved (db::Vector (10, 20)), db::Box (110, 20, 10, 220));
   EXPECT_EQ (b.enlarged (db::Vector (10, 20)), db::Box (-10, -20, 110, 220));
+  EXPECT_EQ (empty.moved (db::Vector (10, 20)).empty (), true);
+  EXPECT_EQ (empty.enlarged (db::Vector (10, 20)).empty (), true);
   EXPECT_EQ (b + db::Box (-10, 20, 100, 200), db::Box (-10, 0, 100, 200));
   EXPECT_EQ (b + db::Box (-10, -20, 100, -10), db::Box (-10, -20, 100, 200));
   EXPECT_EQ (b + db::Box (110, 220, 120, 250), db::Box (0, 0, 120, 250));
   EXPECT_EQ (b & db::Box (110, 220, 120, 250), empty);
   EXPECT_EQ (b & db::Box (50, 100, 120, 250), db::Box (50, 100, 100, 200));
   EXPECT_EQ (b & db::Box (50, 100, 60, 120), db::Box (50, 100, 60, 120));
+
+  empty.move (db::Vector (10, 20));
+  EXPECT_EQ (empty == db::Box (), true);
+  empty.enlarge (db::Vector (10, 20));
+  EXPECT_EQ (empty == db::Box (), true);
 }
 
 TEST(3) 

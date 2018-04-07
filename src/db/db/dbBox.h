@@ -860,8 +860,10 @@ template <class C, class R>
 inline box<C, R> &
 box<C, R>::move (const vector<C> &p)
 {
-  m_p1 += p;
-  m_p2 += p;
+  if (! empty ()) {
+    m_p1 += p;
+    m_p2 += p;
+  }
   return *this;
 }
 
@@ -869,8 +871,10 @@ template <class C, class R>
 inline box<C, R> &
 box<C, R>::enlarge (const vector<C> &p)
 {
-  m_p1 -= p;
-  m_p2 += p;
+  if (! empty ()) {
+    m_p1 -= p;
+    m_p2 += p;
+  }
   return *this;
 }
 

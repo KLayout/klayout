@@ -831,15 +831,8 @@ GDS2WriterBase::write_properties (const db::Layout &layout, db::properties_id_ty
     const tl::Variant &name = layout.properties_repository ().prop_name (p->first);
 
     long attr = -1;
-    if (name.is_long ()) {
+    if (name.can_convert_to_long ()) {
       attr = name.to_long ();
-    } else if (name.is_a_string ()) {
-      //  string names representing a number are converted to numeric property names
-      tl::Extractor ex (name.to_string ());
-      long a = 0;
-      if (ex.try_read (a) && ex.at_end ()) {
-        attr = a;
-      }
     }
 
     if (attr >= 0 && attr < 65535) {

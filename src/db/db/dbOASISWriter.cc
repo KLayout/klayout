@@ -55,7 +55,9 @@ make_gds_property (const tl::Variant &name)
 {
   //  We write S_GDS_PROPERTY properties, because that is the only way to write properties
   //  with numerical keys
-  return (name.is_long () && (name.to_long () < 0x8000 || name.to_long () >= 0)) ||
+  return (name.is_longlong () && name.to_longlong () < 0x8000 && name.to_longlong () >= 0) ||
+         (name.is_ulonglong () && name.to_ulonglong () < 0x8000) ||
+         (name.is_long () && name.to_long () < 0x8000 && name.to_long () >= 0) ||
          (name.is_ulong () && name.to_ulong () < 0x8000);
 }
 

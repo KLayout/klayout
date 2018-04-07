@@ -3264,3 +3264,30 @@ TEST(22)
   EXPECT_EQ (shapes.find (*s).to_string (), "null");
 }
 
+//  Bug #107
+TEST(100)
+{
+  db::Manager m;
+  db::Shapes shapes1 (&m, 0, true);
+
+  m.transaction ("y");
+  shapes1.insert (db::Box (200, -200, 100, -100));
+  m.commit ();
+
+  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
+    "box (100,-200;200,-100) #0\n"
+  );
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
+    ""
+  );
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
+    "box (100,-200;200,-100) #0\n"
+  );
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
+    ""
+  );
+}
+

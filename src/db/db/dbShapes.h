@@ -1576,7 +1576,7 @@ private:
  *
  *  This class is used for the Op classes for the undo/redo queuing mechanism.
  */
-class LayerOpBase
+class DB_PUBLIC LayerOpBase
   : public db::Op
 {
 public:

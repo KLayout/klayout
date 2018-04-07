@@ -234,9 +234,11 @@ klayout_main_cont (int &argc, char **argv)
       app.reset (new lay::GuiApplication (argc, argv));
     }
 
-    QString locale = QLocale::system ().name ();
+    app->parse_cmd (argc, argv);
+    app->init_app ();
 
     /* TODO: this kills valgrind
+    QString locale = QLocale::system ().name ();
     QTranslator translator;
     if (app->qapp () && translator.load (QString::fromUtf8 ("klayout_") + locale)) {
       app->qapp ()->installTranslator (&translator);

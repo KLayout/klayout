@@ -218,11 +218,12 @@ static PluginDescriptor load_plugin (const std::string &pp)
 // --------------------------------------------------------------------------------
 //  ApplicationBase implementation
 
-ApplicationBase::ApplicationBase ()
+ApplicationBase::ApplicationBase (bool non_ui_mode)
   : gsi::ObjectBase (),
     m_lyp_map_all_cvs (true), 
     m_lyp_add_default (false),
-    m_write_config_file (true),
+    m_packages_with_dep (false),
+    m_write_config_file (false),
     m_gtf_replay_rate (0),
     m_gtf_replay_stop (-1),
     m_gtf_record (),
@@ -230,51 +231,25 @@ ApplicationBase::ApplicationBase ()
     m_no_macros (false),
     m_same_view (false),
     m_sync_mode (false),
-    m_no_gui (false),
+    m_no_gui (non_ui_mode),
     m_vo_mode (false),
     m_editable (false),
+    m_editable_set (false),
     m_enable_undo (true),
     mp_ruby_interpreter (0),
     mp_python_interpreter (0)
 {
-  //  nothing yet - see init
-}
-
-void
-ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
-{
-  m_no_gui = non_ui_mode;
-
-  gsi::make_application_decl (non_ui_mode);
-
   // TODO: offer a strict mode for exception handling where this takes place:
   // lay::ApplicationBase::instance ()->exit (1);
-  if (! non_ui_mode) {
+  if (! m_no_gui) {
     tl::set_ui_exception_handlers (ui_exception_handler_tl, ui_exception_handler_std, ui_exception_handler_def);
   }
+
+  gsi::make_application_decl (m_no_gui);
 
   //  initialize the system codecs (Hint: this must be done after the QApplication is initialized because
   //  it will call setlocale)
   tl::initialize_codecs ();
-
-  //  transscribe the arguments to UTF8
-  std::vector<std::string> args;
-  args.reserve (argc);
-  for (int i = 0; i < argc; ++i) {
-    args.push_back (argv [i]);
-  }
-
-#if defined(KLAYOUT_VIEWER_ONLY)
-  //  viewer-only mode compiled in
-  m_vo_mode = true;
-#else
-  //  determine viewer-only mode from executable name. "klayout_vo*" will enable
-  //  viewer-only mode
-  std::string vo_exe_name (std::string (lay::Version::exe_name ()) + "_vo");
-  if (! args.empty () && std::string (tl::to_string (QFileInfo (tl::to_qstring (args.front ())).fileName ()), 0, vo_exe_name.size ()) == vo_exe_name) {
-    m_vo_mode = true;
-  }
-#endif
 
   tl_assert (ms_instance == 0);
   ms_instance = this;
@@ -284,11 +259,18 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
 
   //  get the installation path
   m_inst_path = lay::get_inst_path ();
+}
 
+void
+ApplicationBase::parse_cmd (int &argc, char **argv)
+{
   //  get the KLayout path
   m_klayout_path = lay::get_klayout_path ();
 
-  if (! non_ui_mode) {
+  //  by default write the configuration
+  m_write_config_file = true;
+
+  if (! m_no_gui) {
 
     //  create the configuration files paths and collect the initialization config files
     //  (the ones used for reset) into m_initial_config_files.
@@ -319,99 +301,31 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
 
   }
 
-  //  Try to locate the native plugins:
-  //  Native plugins are DLL's or SO's disguised as "*.klp" files.
-  //  The are installed either
-  //    - directly in one of the KLAYOUT_PATH directories
-  //    - in a folder named by the architecture (i.e. "i686-win32-mingw" or "x86_64-linux-gcc") below
-  //      one of these folders
-  //    - in one of the Salt packages
-  //    - in one of the Salt packages, in a folder named after the architecture
-
-  std::string version = lay::Version::version ();
-  std::vector<std::string> vv = tl::split (version, ".");
-
-  std::string arch_string = tl::arch_string ();
-  std::vector<std::string> as = tl::split (arch_string, "-");
-  if (as.size () > 2) {
-    as.resize (2);
-  }
-  std::string short_arch_string = tl::join (as, "-");
-
-  for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-
-    std::set<std::string> modules;
-
-    std::vector<QString> klp_paths;
-    klp_paths.push_back (tl::to_qstring (*p));
-    klp_paths.push_back (QDir (klp_paths.back ()).filePath (tl::to_qstring (tl::arch_string ())));
-
-    lay::Salt salt;
-    salt.add_location (tl::to_string (QDir (tl::to_qstring (*p)).filePath (QString::fromUtf8 ("salt"))));
-
-    //  Build the search path for the *.klp files. The search priority is for example:
-    //    salt/mypackage/x86_64-linux-gcc-0.25.1
-    //    salt/mypackage/x86_64-linux-gcc-0.25
-    //    salt/mypackage/x86_64-linux-gcc-0
-    //    salt/mypackage/x86_64-linux-gcc
-    //    salt/mypackage/x86_64-linux
-    //    salt/mypackage
-
-    for (lay::Salt::flat_iterator g = salt.begin_flat (); g != salt.end_flat (); ++g) {
-      QDir dir = QDir (tl::to_qstring ((*g)->path ()));
-      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + lay::Version::version())));
-      if (vv.size () >= 2) {
-        klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + vv[0] + "." + vv[1])));
-      }
-      if (vv.size () >= 1) {
-        klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + vv[0])));
-      }
-      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + tl::to_string (lay::Version::version ()))));
-      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string)));
-      klp_paths.push_back (dir.filePath (tl::to_qstring (short_arch_string)));
-      klp_paths.push_back (tl::to_qstring ((*g)->path ()));
-    }
-
-    QStringList name_filters;
-    name_filters << QString::fromUtf8 ("*.klp");
-
-    for (std::vector<QString>::const_iterator p = klp_paths.begin (); p != klp_paths.end (); ++p) {
-
-      QStringList inst_modules = QDir (*p).entryList (name_filters);
-      inst_modules.sort ();
-
-      for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
-        QFileInfo klp_file (*p, *im);
-        if (klp_file.exists () && klp_file.isReadable ()) {
-          std::string m = tl::to_string (klp_file.absoluteFilePath ());
-          std::string mn = tl::to_string (klp_file.fileName ());
-          if (modules.find (mn) == modules.end ()) {
-            try {
-              m_native_plugins.push_back (load_plugin (m));
-              modules.insert (mn);
-            } catch (tl::Exception &ex) {
-              tl::error << tl::to_string (QObject::tr ("Unable to load plugin %1: %2").arg (tl::to_qstring (m)).arg (tl::to_qstring (ex.msg ())));
-            }
-          }
-        }
-      }
-
-    }
-
+  //  transscribe the arguments to UTF8
+  std::vector<std::string> args;
+  args.reserve (argc);
+  for (int i = 0; i < argc; ++i) {
+    args.push_back (argv [i]);
   }
 
-  std::vector <std::pair<std::string, std::string> > custom_macro_paths;
+#if defined(KLAYOUT_VIEWER_ONLY)
+  //  viewer-only mode compiled in
+  m_vo_mode = true;
+#else
+  //  determine viewer-only mode from executable name. "klayout_vo*" will enable
+  //  viewer-only mode
+  std::string vo_exe_name (std::string (lay::Version::exe_name ()) + "_vo");
+  if (! args.empty () && std::string (tl::to_string (QFileInfo (tl::to_qstring (args.front ())).fileName ()), 0, vo_exe_name.size ()) == vo_exe_name) {
+    m_vo_mode = true;
+  }
+#endif
+
   m_no_macros = false;
 
   // currently: technology is always set to make "default" technology the default
-  bool tech_set = true; 
+  bool tech_set = true;
   std::string tech;
   std::string tech_file;
-
-  std::vector <std::string> package_inst;
-  bool packages_with_dep = false;
-
-  bool editable_set = false;
 
   for (int i = 1; i < argc; ++i) {
 
@@ -538,46 +452,46 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
     } else if (a == "-s") {
 
       m_same_view = true;
-      
+
     } else if (a == "-e") {
 
       m_editable = ! m_vo_mode;
-      editable_set = true;
-      
+      m_editable_set = true;
+
     } else if (a == "-ne") {
 
       m_editable = false;
-      editable_set = true;
-      
+      m_editable_set = true;
+
     } else if (a == "-i") {
 
       m_enable_undo = false;
-      
+
     } else if (a == "-ni") {
 
       m_enable_undo = true;
-      
+
     } else if (a == "-j" && (i + 1) < argc) {
 
-      custom_macro_paths.push_back (std::pair<std::string, std::string> (args [++i], std::string ()));
-      
+      m_custom_macro_paths.push_back (std::pair<std::string, std::string> (args [++i], std::string ()));
+
     } else if (a == "-nt") {
 
       m_write_config_file = true;
-      
+
     } else if (a == "-t") {
 
       m_write_config_file = false;
-      
+
     } else if (a == "-z") {
 
       m_no_gui = true;
-      
+
     } else if (a == "-zz") {
 
       m_no_gui = true;
       //  other consequences have been dealt with before
-      
+
     } else if (a == "-b") {
 
       //  -nc:
@@ -598,17 +512,17 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
 
     } else if (a == "-y" && (i + 1) < argc) {
 
-      package_inst.push_back (args [++i]);
+      m_package_inst.push_back (args [++i]);
 
     } else if (a == "-yd") {
 
-      packages_with_dep = true;
+      m_packages_with_dep = true;
 
     } else if (a == "-v") {
 
       tl::info << lay::Version::name () << " " << lay::Version::version ();
       exit (0);
-      
+
     } else if (a == "-h") {
 
       tl::info << usage () << tl::noendl;
@@ -635,6 +549,91 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
     } else {
 
       m_files.push_back (std::make_pair (layout_file, std::make_pair (a, std::string ())));
+
+    }
+
+  }
+}
+
+void
+ApplicationBase::init_app ()
+{
+  //  Try to locate the native plugins:
+  //  Native plugins are DLL's or SO's disguised as "*.klp" files.
+  //  The are installed either
+  //    - directly in one of the KLAYOUT_PATH directories
+  //    - in a folder named by the architecture (i.e. "i686-win32-mingw" or "x86_64-linux-gcc") below
+  //      one of these folders
+  //    - in one of the Salt packages
+  //    - in one of the Salt packages, in a folder named after the architecture
+
+  std::string version = lay::Version::version ();
+  std::vector<std::string> vv = tl::split (version, ".");
+
+  std::string arch_string = tl::arch_string ();
+  std::vector<std::string> as = tl::split (arch_string, "-");
+  if (as.size () > 2) {
+    as.resize (2);
+  }
+  std::string short_arch_string = tl::join (as, "-");
+
+  for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
+
+    std::set<std::string> modules;
+
+    std::vector<QString> klp_paths;
+    klp_paths.push_back (tl::to_qstring (*p));
+    klp_paths.push_back (QDir (klp_paths.back ()).filePath (tl::to_qstring (tl::arch_string ())));
+
+    lay::Salt salt;
+    salt.add_location (tl::to_string (QDir (tl::to_qstring (*p)).filePath (QString::fromUtf8 ("salt"))));
+
+    //  Build the search path for the *.klp files. The search priority is for example:
+    //    salt/mypackage/x86_64-linux-gcc-0.25.1
+    //    salt/mypackage/x86_64-linux-gcc-0.25
+    //    salt/mypackage/x86_64-linux-gcc-0
+    //    salt/mypackage/x86_64-linux-gcc
+    //    salt/mypackage/x86_64-linux
+    //    salt/mypackage
+
+    for (lay::Salt::flat_iterator g = salt.begin_flat (); g != salt.end_flat (); ++g) {
+      QDir dir = QDir (tl::to_qstring ((*g)->path ()));
+      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + lay::Version::version())));
+      if (vv.size () >= 2) {
+        klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + vv[0] + "." + vv[1])));
+      }
+      if (vv.size () >= 1) {
+        klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + vv[0])));
+      }
+      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + tl::to_string (lay::Version::version ()))));
+      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string)));
+      klp_paths.push_back (dir.filePath (tl::to_qstring (short_arch_string)));
+      klp_paths.push_back (tl::to_qstring ((*g)->path ()));
+    }
+
+    QStringList name_filters;
+    name_filters << QString::fromUtf8 ("*.klp");
+
+    for (std::vector<QString>::const_iterator p = klp_paths.begin (); p != klp_paths.end (); ++p) {
+
+      QStringList inst_modules = QDir (*p).entryList (name_filters);
+      inst_modules.sort ();
+
+      for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
+        QFileInfo klp_file (*p, *im);
+        if (klp_file.exists () && klp_file.isReadable ()) {
+          std::string m = tl::to_string (klp_file.absoluteFilePath ());
+          std::string mn = tl::to_string (klp_file.fileName ());
+          if (modules.find (mn) == modules.end ()) {
+            try {
+              m_native_plugins.push_back (load_plugin (m));
+              modules.insert (mn);
+            } catch (tl::Exception &ex) {
+              tl::error << tl::to_string (QObject::tr ("Unable to load plugin %1: %2").arg (tl::to_qstring (m)).arg (tl::to_qstring (ex.msg ())));
+            }
+          }
+        }
+      }
 
     }
 
@@ -677,9 +676,9 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
       while (! ex.at_end ()) {
         std::string p;
         ex.read_word_or_quoted (p);
-        custom_macro_paths.push_back (std::pair<std::string, std::string> (p, std::string ()));
+        m_custom_macro_paths.push_back (std::pair<std::string, std::string> (p, std::string ()));
         if (ex.test (":")) {
-          ex.read_word (custom_macro_paths.back ().second);
+          ex.read_word (m_custom_macro_paths.back ().second);
         }
         ex.test (";");
       }
@@ -705,8 +704,8 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
     sc->set_salt_mine_url (lay::salt_mine_url ());
 
     //  Do package installation if requested.
-    if (!package_inst.empty ()) {
-      if (! sc->install_packages (package_inst, packages_with_dep)) {
+    if (!m_package_inst.empty ()) {
+      if (! sc->install_packages (m_package_inst, m_packages_with_dep)) {
         exit (1);
       } else {
         exit (0);
@@ -767,7 +766,7 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
     }
 
     //  Install the custom folders
-    for (std::vector <std::pair<std::string, std::string> >::const_iterator p = custom_macro_paths.begin (); p != custom_macro_paths.end (); ++p) {
+    for (std::vector <std::pair<std::string, std::string> >::const_iterator p = m_custom_macro_paths.begin (); p != m_custom_macro_paths.end (); ++p) {
       mc->add_path (p->first, tl::to_string (QObject::tr ("Project")) + " - " + p->first, p->second, false);
     }
 
@@ -779,7 +778,7 @@ ApplicationBase::init_app (int &argc, char **argv, bool non_ui_mode)
   //  If the editable flag was not set, use it from the 
   //  configuration. Since it is too early now, we cannot use the
   //  configuration once it is read
-  if (! editable_set && ! m_vo_mode) {
+  if (! m_editable_set && ! m_vo_mode) {
     m_editable = editable_from_config;
   }
 
@@ -1336,7 +1335,7 @@ ApplicationBase::special_app_flag (const std::string &name)
 //  GuiApplication implementation
 
 GuiApplication::GuiApplication (int &argc, char **argv)
-  : QApplication (argc, argv), ApplicationBase (),
+  : QApplication (argc, argv), ApplicationBase (false),
     mp_mw (0),
     mp_recorder (0)
 {
@@ -1351,8 +1350,6 @@ GuiApplication::GuiApplication (int &argc, char **argv)
   //  only a GUI-enabled application runs an event loop and can have a deferred
   //  method scheduler therefore.
   mp_dm_scheduler.reset (new tl::DeferredMethodScheduler ());
-
-  init_app (argc, argv, false);
 }
 
 GuiApplication::~GuiApplication ()
@@ -1557,12 +1554,12 @@ GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool 
 //  NonGuiApplication implementation
 
 NonGuiApplication::NonGuiApplication (int &argc, char **argv)
-  : QCoreApplication (argc, argv), ApplicationBase (),
+  : QCoreApplication (argc, argv), ApplicationBase (true),
     mp_pr (0),
     mp_pb (0),
     mp_plugin_root (0)
 {
-  init_app (argc, argv, true);
+  //  .. nothing yet ..
 }
 
 NonGuiApplication::~NonGuiApplication ()

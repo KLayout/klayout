@@ -101,7 +101,7 @@ public:
    *  @param argc The number of external command-line arguments passed.
    *  @param argv The external command-line arguments.
    */
-  ApplicationBase ();
+  ApplicationBase (bool non_ui_mode);
 
   /**
    *  @brief Destructor
@@ -330,13 +330,23 @@ public:
   }
 
   /**
+   *  @brief Parses the given command line arguments and configures the application object accordingly.
+   */
+  void parse_cmd (int &argc, char **argv);
+
+  /**
+   *  @brief Initializes the application
+   *  This method needs to be called after "parse_cmd" and before the application is used.
+   */
+  void init_app ();
+
+  /**
    *  @brief Gets the QApplication object
    *  This method will return non-null only if a GUI-enabled application is present.
    */
   virtual QApplication *qapp_gui () { return 0; }
 
 protected:
-  void init_app (int &argc, char **argv, bool non_ui_mode);
   virtual void setup () = 0;
   virtual void shutdown ();
   virtual void prepare_recording (const std::string &gtf_record, bool gtf_record_incremental);
@@ -361,7 +371,10 @@ private:
   bool m_lyp_map_all_cvs, m_lyp_add_default;
   std::string m_session_file;
   std::string m_run_macro;
+  std::vector<std::pair<std::string, std::string> > m_custom_macro_paths;
   std::vector<std::string> m_load_macros;
+  std::vector <std::string> m_package_inst;
+  bool m_packages_with_dep;
   std::string m_gtf_replay;
   std::vector<std::string> m_config_files;
   std::vector<std::string> m_initial_config_files;
@@ -381,6 +394,7 @@ private:
   bool m_no_gui;
   bool m_vo_mode;
   bool m_editable;
+  bool m_editable_set;
   bool m_enable_undo;
   //  HINT: the ruby interpreter must be destroyed before MainWindow
   //  in order to maintain a valid MainWindow reference for ruby scripts and Ruby's GC all the time.

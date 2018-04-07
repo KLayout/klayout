@@ -396,16 +396,10 @@ main_cont (int &argc, char **argv)
       throw tl::Exception ("No test libraries found - make sure, the *.ut files are next to the ut_runner executable.");
     }
 
-    //  No side effects
-    lay::set_klayout_path (std::vector<std::string> ());
-
-    static char av0[] = "unit_test";
-    static char av1[] = "-z";   //  don't show main window
-    static char av2[] = "-nc";  //  No configuration file
-    static char av3[] = "-rx";  //  No mplicit macros
-    char *av[] = { av0, av1, av2, av3, 0 };
-    int ac = sizeof (av) / sizeof (av[0]) - 1;
-    lay::GuiApplication app (ac, av);
+    //  NOTE: we need an application object, but we don't call parse_cmd. This makes the object
+    //  behave neutral as far as possible.
+    lay::GuiApplication app (argc, argv);
+    app.init_app ();
 
     app.ruby_interpreter ().push_console (&console);
     app.python_interpreter ().push_console (&console);

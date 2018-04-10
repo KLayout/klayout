@@ -140,9 +140,9 @@ public:
   /**
    *  @brief Loads the salt from a "salt mine" stream
    */
-  void load (tl::InputStream &s)
+  void load (const std::string &p, tl::InputStream &s)
   {
-    m_root.load (s);
+    m_root.load (p, s);
   }
 
   /**

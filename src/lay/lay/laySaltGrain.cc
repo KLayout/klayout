@@ -481,13 +481,11 @@ SaltGrain::from_path (const std::string &path)
 }
 
 tl::InputStream *
-SaltGrain::stream_from_url (std::string &url_in)
+SaltGrain::stream_from_url (std::string &url)
 {
-  if (url_in.empty ()) {
+  if (url.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No download link available")));
   }
-
-  std::string url = url_in;
 
   //  base relative URL's on the salt mine URL
   if (url.find ("http:") != 0 && url.find ("https:") != 0 && url.find ("file:") != 0 && !url.empty() && url[0] != '/' && url[0] != '\\' && lay::SaltController::instance ()) {
@@ -500,7 +498,7 @@ SaltGrain::stream_from_url (std::string &url_in)
     }
     sami_url.setPath (path_comp.join (QString::fromUtf8 ("/")));
 
-    url_in = tl::to_string (sami_url.toString ());
+    url = tl::to_string (sami_url.toString ());
 
   }
 

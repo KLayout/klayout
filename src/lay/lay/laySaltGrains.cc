@@ -318,11 +318,11 @@ SaltGrains::load (const std::string &p)
 }
 
 void
-SaltGrains::load (tl::InputStream &p)
+SaltGrains::load (const std::string &p, tl::InputStream &s)
 {
-  m_url.clear ();
+  m_url = p;
 
-  tl::XMLStreamSource source (p);
+  tl::XMLStreamSource source (s);
   s_xml_struct.parse (source, *this);
 }
 

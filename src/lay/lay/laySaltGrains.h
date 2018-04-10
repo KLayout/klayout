@@ -201,8 +201,9 @@ public:
 
   /**
    *  @brief Loads the grain collection from the given input stream
+   *  "url" is used as the source URL.
    */
-  void load (tl::InputStream &p);
+  void load (const std::string &p, tl::InputStream &s);
 
   /**
    *  @brief Saves the grain collection to the given file

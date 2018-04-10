@@ -700,7 +700,7 @@ BEGIN_PROTECTED
     if (m_salt_mine_reader.get ()) {
 
       lay::Salt new_mine;
-      new_mine.load (*m_salt_mine_reader);
+      new_mine.load (m_salt_mine_url, *m_salt_mine_reader);
       m_salt_mine = new_mine;
 
     }
@@ -977,8 +977,11 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
     details->setHtml (html);
 
     std::string url = g->url ();
-    m_downloaded_grain_reader.reset (SaltGrain::stream_from_url (url));
     m_downloaded_grain.reset (new SaltGrain ());
+    m_downloaded_grain->set_url (url);
+
+    //  NOTE: stream_from_url may modify the URL, hence we set it again
+    m_downloaded_grain_reader.reset (SaltGrain::stream_from_url (url));
     m_downloaded_grain->set_url (url);
 
     tl::InputHttpStream *http = dynamic_cast<tl::InputHttpStream *> (m_downloaded_grain_reader->base ());
@@ -1038,7 +1041,7 @@ SaltManagerDialog::show_error (tl::Exception &ex)
       "</body>"
     "</html>"
   )
-  .arg (tl::to_qstring (m_downloaded_grain->url ()))
+  .arg (tl::to_qstring (m_downloaded_grain.get () ? m_downloaded_grain->url () : ""))
   .arg (tl::to_qstring (tl::escaped_to_html (ex.msg ())));
   mp_downloaded_target->setHtml (html);
 

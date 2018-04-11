@@ -2,6 +2,10 @@
 import readline
 import code
 import sys
+import os
+pwd = os.getcwd()
+sys.path.append(pwd)
+
 variables = globals().copy()
 variables.update(locals())
 shell = code.InteractiveConsole(variables)

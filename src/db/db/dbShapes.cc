@@ -120,7 +120,10 @@ Shapes::operator= (const Shapes &d)
 {
   if (&d != this) {
     clear ();
-    do_insert (d);
+    if (! d.empty()) {
+      invalidate_state ();
+      do_insert (d);
+    }
   }
 
   return *this;

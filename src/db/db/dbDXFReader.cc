@@ -764,7 +764,7 @@ DXFReader::read_cell (db::Layout &layout)
     //  create a first representative. Later, layer variants are built
     db::cell_index_type cell = layout.add_cell ();
     m_block_per_name.insert (std::make_pair (cell_name, cell));
-    m_template_cells.insert (cell);
+    m_template_cells.insert (std::make_pair (cell, cell_name));
     read_entities (layout, layout.cell (cell), db::DVector (-xoff, -yoff));
 
   } else {
@@ -782,7 +782,7 @@ DXFReader::read_cell (db::Layout &layout)
 }
 
 void 
-DXFReader::fill_layer_variant_cell (db::Layout &layout, const std::string &cellname, db::cell_index_type template_cell, db::cell_index_type var_cell, unsigned int layer, double sx, double sy)
+DXFReader::fill_layer_variant_cell (db::Layout &layout, const std::string & /*cellname*/, db::cell_index_type template_cell, db::cell_index_type var_cell, unsigned int layer, double sx, double sy)
 {
   m_used_template_cells.insert (template_cell);
 
@@ -796,13 +796,14 @@ DXFReader::fill_layer_variant_cell (db::Layout &layout, const std::string &celln
 
     // replace instances to template cells (those are not layer variants yet). This 
     // achieves a recursive variant building.
-    if (m_template_cells.find (cell_inst.object ().cell_index ()) != m_template_cells.end () || fabs (sx - 1.0) > 1e-6 || fabs (sy - 1.0) > 1e-6) {
+    std::map<db::cell_index_type, std::string>::const_iterator tc = m_template_cells.find (cell_inst.object ().cell_index ());
+    if (tc != m_template_cells.end () || fabs (sx - 1.0) > 1e-6 || fabs (sy - 1.0) > 1e-6) {
 
       db::Trans t = cell_inst.front ();
       t = db::Trans (t.rot (), db::Vector (t.disp ().x () * sx, t.disp ().y () * sy));
 
       bool swap_sxy = ((t.angle () % 2) != 0);
-      db::CellInst obj (make_layer_variant (layout, cellname, cell_inst.object ().cell_index (), layer, swap_sxy ? sy : sx, swap_sxy ? sx : sy));
+      db::CellInst obj (make_layer_variant (layout, tc->second, cell_inst.object ().cell_index (), layer, swap_sxy ? sy : sx, swap_sxy ? sx : sy));
 
       db::Vector a, b;
       unsigned long na = 0, nb = 0;
@@ -2779,7 +2780,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             //  create a first representative. Build variants and fill later when the cell is defined in a BLOCK statement.
             db::cell_index_type cell = layout.add_cell ();
             b = m_block_per_name.insert (std::make_pair (cellname, cell)).first;
-            m_template_cells.insert (cell);
+            m_template_cells.insert (std::make_pair (cell, cellname));
 
           } 
 
@@ -2857,7 +2858,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
           //  create a first representative. Build variants and fill later when the cell is defined in a BLOCK statement.
           db::cell_index_type cell = layout.add_cell ();
           b = m_block_per_name.insert (std::make_pair (cellname, cell)).first;
-          m_template_cells.insert (cell);
+          m_template_cells.insert (std::make_pair (cell, cellname));
 
         } 
 

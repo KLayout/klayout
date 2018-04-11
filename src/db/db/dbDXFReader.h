@@ -322,7 +322,7 @@ private:
   unsigned int m_zero_layer;
   unsigned int m_next_layer_index;
   std::map <std::string, unsigned int> m_new_layers;
-  std::set <db::cell_index_type> m_template_cells;
+  std::map <db::cell_index_type, std::string> m_template_cells;
   std::set <db::cell_index_type> m_used_template_cells;
   std::map <std::string, db::cell_index_type> m_block_per_name;
   std::map <VariantKey, db::cell_index_type> m_block_to_variant;

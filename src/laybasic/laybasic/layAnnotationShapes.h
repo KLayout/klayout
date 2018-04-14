@@ -347,7 +347,7 @@ public:
   /**
    *  @brief Collect memory usage
    */
-  void collect_mem_stat (db::MemStatistics &m) const;
+  void mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const;
 
 private:
   void invalidate_state ()
@@ -359,6 +359,15 @@ private:
 
   layer_type m_layer;
 };
+
+/**
+ *  @brief Collect memory usage
+ */
+inline void mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, const AnnotationShapes &x, bool no_self = false, void *parent = 0)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
+
 
 }
 

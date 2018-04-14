@@ -429,38 +429,38 @@ Layout::operator= (const Layout &d)
 }
 
 void
-Layout::collect_mem_stat (db::MemStatistics &m) const
+Layout::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
-  m.layout_info (*((db::LayoutStateModel *) this));
-  m.layout_info (m_cells_size);
-  m.layout_info (m_cell_ptrs);
-  m.layout_info (m_invalid);
-  m.layout_info (m_top_cells);
-  m.layout_info (m_top_down_list);
-  m.layout_info (m_free_indices);
-  m.layout_info (m_layer_states);
-  m.layout_info (m_lib_proxy_map);
-  m.layout_info (m_pcell_ids);
-  m.layout_info (m_pcells);
+  if (!no_self) {
+    stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+  }
 
-  //  this does not count the internal memory footprint of the cells
-  m.layout_info (m_cells);
+  db::mem_stat (stat, purpose, cat, m_cell_ptrs, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_free_cell_indices, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_top_down_list, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_free_indices, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_layer_states, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_cell_names, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_cell_map, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_layer_props, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_pcells, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_pcell_ids, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_lib_proxy_map, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_meta_info, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_string_repository, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_shape_repository, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_properties_repository, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_array_repository, true, (void *) this);
 
+  for (std::vector<const char *>::const_iterator i = m_cell_names.begin (); i != m_cell_names.end (); ++i) {
+    stat->add (typeid (char []), (void *) *i, strlen (*i) + 1, strlen (*i) + 1, (void *) this, purpose, cat);
+  }
   for (cell_list::const_iterator i = m_cells.begin (); i != m_cells.end (); ++i) {
-    i->collect_mem_stat (m);
+    db::mem_stat (stat, MemStatistics::CellInfo, int (i->id ()), *i, false, (void *) this);
   }
-
-  for (std::vector<const char *>::const_iterator p = m_cell_names.begin (); p != m_cell_names.end (); ++p) {
-    size_t l = strlen (*p) + 1;
-    m.layout_info (l, l);
+  for (std::vector<pcell_header_type *>::const_iterator i = m_pcells.begin (); i != m_pcells.end (); ++i) {
+    db::mem_stat (stat, MemStatistics::CellInfo, 0, **i, false, (void *) this);
   }
-  m.layout_info (m_cell_names);
-  m.layout_info (m_layer_props);
-  m.layout_info (m_cell_map);
-  m.layout_info (m_dbu);
-  m.shapes_cache (m_shape_repository);
-  m.shapes_cache (m_array_repository);
-  m.layout_info (m_meta_info);
 }
 
 void

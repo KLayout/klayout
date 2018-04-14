@@ -2547,16 +2547,6 @@ public:
     return m_trans < d.m_trans;
   }
 
-  size_t mem_used () const
-  {
-    return sizeof (*this);
-  }
-
-  size_t mem_reqd () const
-  {
-    return sizeof (*this);
-  }
-
   /** 
    *  @brief Convert to a string
    */
@@ -2619,18 +2609,6 @@ public:
   bool m_stable : 8;
   object_type m_type : 16;
 };
-
-template <class C>
-size_t mem_used (const Shape &s)
-{
-  return s.mem_used (); 
-}
-
-template <class C>
-size_t mem_reqd (const Shape &s)
-{
-  return s.mem_reqd (); 
-}
 
 }  // namespace db
   

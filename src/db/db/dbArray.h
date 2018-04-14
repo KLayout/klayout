@@ -102,12 +102,18 @@ struct ArrayBase
 
   virtual bool less (const ArrayBase *) const = 0;
 
-  virtual size_t mem_used () const = 0;
-
-  virtual size_t mem_reqd () const = 0;
+  virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const = 0;
 
   bool in_repository;
 };
+
+/**
+ *  @brief Memory statistics for ArrayBase
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const ArrayBase &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief The array base class (internal)
@@ -259,15 +265,22 @@ public:
     }
   }
 
-  size_t mem_used () const;
-
-  size_t mem_reqd () const;
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const;
 
 private:
   repositories m_reps;
 
   void clear ();
 };
+
+/**
+ *  @brief Collect memory statistics
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const ArrayRepository &x, bool no_self = false, void *parent = 0)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
+
 
 /**
  *  @brief The array iterator specialization for the regular case (internal)
@@ -534,14 +547,11 @@ struct regular_array
     return true;
   }
 
-  virtual size_t mem_used () const
+  virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    return sizeof (*this);
-  }
-
-  virtual size_t mem_reqd () const
-  {
-    return sizeof (*this);
+    if (!no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
   }
 
   virtual unsigned int type () const
@@ -650,6 +660,13 @@ struct regular_complex_array
       return m_mag < d->m_mag;
     }
     return regular_array<Coord>::less (b);
+  }
+
+  virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+  {
+    if (!no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
   }
 
   virtual complex_trans_type complex_trans (const simple_trans_type &s) const
@@ -909,14 +926,12 @@ struct iterated_array
     return false;
   }
 
-  virtual size_t mem_used () const
+  virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    return sizeof (*this) + db::mem_used (m_v) - sizeof (m_v);
-  }
-
-  virtual size_t mem_reqd () const
-  {
-    return sizeof (*this) + db::mem_reqd (m_v) - sizeof (m_v);
+    if (!no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+    db::mem_stat (stat, purpose, cat, m_v, true, (void *) this);
   }
 
   virtual unsigned int type () const
@@ -1133,14 +1148,11 @@ struct single_complex_inst
     return false;
   }
 
-  virtual size_t mem_used () const
+  virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    return sizeof (*this);
-  }
-
-  virtual size_t mem_reqd () const
-  {
-    return sizeof (*this);
+    if (!no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
   }
 
   virtual complex_trans_type complex_trans (const simple_trans_type &s) const
@@ -2072,22 +2084,6 @@ struct array
   }
 
   /**
-   *  @brief Collect memory usage statistics
-   */
-  size_t mem_used () const
-  {
-    return sizeof (m_trans) + sizeof (mp_base) + db::mem_used (m_obj) + (mp_base ? mp_base->mem_used () : 0);
-  }
-
-  /**
-   *  @brief Collect memory requirement statistics
-   */
-  size_t mem_reqd () const
-  {
-    return sizeof (m_trans) + sizeof (mp_base) + db::mem_reqd (m_obj) + (mp_base ? mp_base->mem_reqd () : 0);
-  }
-
-  /**
    *  @brief Swap with another object
    *
    *  This implementation does not require to reallocate the base pointer
@@ -2206,6 +2202,17 @@ struct array
     array a (*this);
     a.transform_into (tr, array_rep);
     return a;
+  }
+
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+  {
+    if (! no_self) {
+      stat->add (typeid (array<Obj, Trans>), (void *) this, sizeof (array<Obj, Trans>), sizeof (array<Obj, Trans>), parent, purpose, cat);
+    }
+    db::mem_stat (stat, purpose, cat, m_obj, true, (void *) this);
+    if (mp_base) {
+      db::mem_stat (stat, purpose, cat, *mp_base, false, (void *) this);
+    }
   }
 
 private:
@@ -2404,16 +2411,13 @@ private:
   }
 };
 
-template <class Obj>
-size_t mem_used (const array<Obj, Trans> &x)
+/**
+ *  @brief Collect memory statistics
+ */
+template <class Obj, class Trans>
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const array<Obj, Trans> &x, bool no_self = false, void *parent = 0)
 {
-  return x.mem_used ();
-}
-
-template <class Obj>
-size_t mem_reqd (const array<Obj, Trans> &x)
-{
-  return x.mem_reqd ();
+  x.mem_stat (stat, purpose, cat, no_self, parent);
 }
 
 }

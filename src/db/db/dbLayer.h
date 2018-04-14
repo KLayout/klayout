@@ -443,11 +443,12 @@ struct layer
     return m_box_tree.empty ();
   }
 
-  void
-  collect_mem_stat (db::MemStatistics &m) const
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    m.shapes_info (sizeof (*this), sizeof (*this));
-    m.shapes_info (db::mem_used (m_box_tree), db::mem_reqd (m_box_tree));
+    if (! no_self) {
+      stat->add (typeid (layer), (void *) this, sizeof (layer), sizeof (layer), parent, purpose, cat);
+    }
+    db::mem_stat (stat, purpose, cat, m_box_tree, true, (void *) this);
   }
 
 private:
@@ -456,6 +457,16 @@ private:
   bool m_bbox_dirty : 8;
   bool m_tree_dirty : 8;
 };
+
+/**
+ *  @brief Collect memory statistics
+ */
+template <class Sh, class StableTag>
+inline void
+mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const layer<Sh, StableTag> &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 }
 

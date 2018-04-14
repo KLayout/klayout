@@ -110,6 +110,14 @@ public:
     return mp_rep;
   }
 
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+    db::mem_stat (stat, purpose, cat, m_value, true, (void *) this);
+  }
+
 private:
   friend class StringRepository;
   StringRepository *mp_rep;
@@ -133,6 +141,14 @@ private:
   StringRef (const StringRef &d);
   StringRef operator= (const StringRef &d);
 };
+
+/**
+ *  @brief Collect memory usage
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const StringRef &x, bool no_self = false, void *parent = 0)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief A string repository class 
@@ -200,6 +216,17 @@ public:
     return m_string_refs.size ();
   }
 
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+    db::mem_stat (stat, purpose, cat, &m_string_refs, true, (void *) this);
+    for (std::set<StringRef *>::const_iterator r = m_string_refs.begin (); r != m_string_refs.end (); ++r) {
+      db::mem_stat (stat, purpose, cat, **r, true, parent);
+    }
+  }
+
 private:
   friend class StringRef;
 
@@ -212,6 +239,14 @@ private:
     }
   }
 };
+
+/**
+ *  @brief Collect memory statistics
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const StringRepository &x, bool no_self = false, void *parent = 0)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief A text object
@@ -733,19 +768,18 @@ public:
     //  .. nothing ..
   }
 
-  size_t mem_used () const
+  /**
+   *  @brief Collect memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
+    if (! no_self) {
+      stat->add (typeid (text<C>), (void *) this, sizeof (text<C>), sizeof (text<C>), parent, purpose, cat);
+    }
     size_t p = (size_t) mp_ptr;
     if (! (p & 1) && mp_ptr != 0) {
-      return sizeof (char *) + strlen (mp_ptr) + db::mem_used (m_trans) + db::mem_used (m_size) + db::mem_used (m_font);
-    } else {
-      return sizeof (char *) + db::mem_used (m_trans) + db::mem_used (m_size) + db::mem_used (m_font);
+      stat->add (typeid (char *), (void *) mp_ptr, strlen (mp_ptr) + 1, strlen (mp_ptr) + 1, (void *) this, purpose, cat);
     }
-  }
-
-  size_t mem_reqd () const
-  {
-    return mem_used ();
   }
 
 private:
@@ -1042,17 +1076,13 @@ typedef text_ref<Text, UnitTrans> TextPtr;
  */
 typedef text_ref<DText, DUnitTrans> DTextPtr;
 
-
+/**
+ *  @brief Collect memory usage
+ */
 template <class X>
-size_t mem_used (const text<X> &x)
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const text<X> &x, bool no_self = false, void *parent = 0)
 {
-  return x.mem_used ();
-}
-
-template <class X>
-size_t mem_reqd (const text<X> &x)
-{
-  return x.mem_reqd ();
+  x.mem_stat (stat, purpose, cat, no_self, parent);
 }
 
 } // namespace db

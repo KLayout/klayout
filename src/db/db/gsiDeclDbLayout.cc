@@ -253,10 +253,10 @@ Class<db::LayerProperties> decl_LayerInfo ("LayerInfo",
 // ---------------------------------------------------------------
 //  db::Layout binding
 
-static void dump_mem_statistics (const db::Layout *layout)
+static void dump_mem_statistics (const db::Layout *layout, bool detailed)
 {
-  db::MemStatistics ms;
-  layout->collect_mem_stat (ms);
+  db::MemStatisticsCollector ms (detailed);
+  layout->mem_stat (&ms, db::MemStatistics::LayoutInfo, 0 /*cat*/);
   ms.print ();
 }
 
@@ -1952,7 +1952,7 @@ Class<db::Layout> decl_Layout ("Layout",
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +
-  gsi::method_ext ("dump_mem_statistics", &dump_mem_statistics,
+  gsi::method_ext ("dump_mem_statistics", &dump_mem_statistics, gsi::arg<bool> ("detailed", false),
     "@hide"
   ),
   "@brief The layout object\n"

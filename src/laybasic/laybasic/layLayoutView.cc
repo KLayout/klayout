@@ -2883,8 +2883,8 @@ LayoutView::reload_layout (unsigned int cv_index)
 
     //  print the memory statistics now.
     if (tl::verbosity () >= 31) {
-      db::MemStatistics m;
-      cv->layout ().collect_mem_stat (m);
+      db::MemStatisticsCollector m (false);
+      cv->layout ().mem_stat (&m, db::MemStatistics::LayoutInfo, 0);
       m.print ();
     }
 
@@ -3120,8 +3120,8 @@ LayoutView::load_layout (const std::string &filename, const db::LoadLayoutOption
 
     //  print the memory statistics now.
     if (tl::verbosity () >= 31) {
-      db::MemStatistics m;
-      cv->layout ().collect_mem_stat (m);
+      db::MemStatisticsCollector m (false);
+      cv->layout ().mem_stat (&m, db::MemStatistics::LayoutInfo, 0);
       m.print ();
     }
 

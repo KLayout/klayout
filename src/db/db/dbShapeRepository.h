@@ -113,32 +113,23 @@ public:
     return m_set.end ();
   }
 
-  size_t mem_used () const
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    return db::mem_used (m_set);
-  }
-
-  size_t mem_reqd () const
-  {
-    return db::mem_reqd (m_set);
+    db::mem_stat (stat, purpose, cat, m_set, no_self, parent);
   }
 
 private:
   set_type m_set;
 };
 
+/**
+ *  @brief Collect memory statistics
+ */
 template <class Sh>
-size_t mem_used (const repository<Sh> &s)
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const repository<Sh> &x, bool no_self = false, void *parent = 0)
 {
-  return s.mem_used (); 
+  x.mem_stat (stat, purpose, cat, no_self, parent);
 }
-
-template <class Sh>
-size_t mem_reqd (const repository<Sh> &s)
-{
-  return s.mem_reqd (); 
-}
-
 
 /**
  *  @brief A repository for many shape types
@@ -185,20 +176,12 @@ public:
     return m_text_repository;
   }
 
-  size_t mem_used () const
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    return db::mem_used (m_polygon_repository) + 
-           db::mem_used (m_simple_polygon_repository) + 
-           db::mem_used (m_path_repository) + 
-           db::mem_used (m_text_repository);
-  }
-
-  size_t mem_reqd () const
-  {
-    return db::mem_reqd (m_polygon_repository) + 
-           db::mem_reqd (m_simple_polygon_repository) + 
-           db::mem_reqd (m_path_repository) + 
-           db::mem_reqd (m_text_repository);
+    db::mem_stat (stat, purpose, cat, m_polygon_repository, no_self, parent);
+    db::mem_stat (stat, purpose, cat, m_simple_polygon_repository, no_self, parent);
+    db::mem_stat (stat, purpose, cat, m_path_repository, no_self, parent);
+    db::mem_stat (stat, purpose, cat, m_text_repository, no_self, parent);
   }
 
 private:
@@ -208,18 +191,14 @@ private:
   db::repository< db::text<C> > m_text_repository;
 };
 
+/**
+ *  @brief Collect memory statistics
+ */
 template <class C>
-size_t mem_used (const generic_repository<C> &s)
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const generic_repository<C> &x, bool no_self = false, void *parent = 0)
 {
-  return s.mem_used (); 
+  x.mem_stat (stat, purpose, cat, no_self, parent);
 }
-
-template <class C>
-size_t mem_reqd (const generic_repository<C> &s)
-{
-  return s.mem_reqd (); 
-}
-
 
 /**
  *  @brief Standard repository typedef
@@ -459,14 +438,17 @@ struct shape_ref
     return obj ().to_string () + "->" + m_trans.to_string ();
   }
 
-  size_t mem_used () const
+  /**
+   *  @brief Collect memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    return sizeof (shape_ref) + (m_ptr ? db::mem_used (*m_ptr) : 0);
-  }
-
-  size_t mem_reqd () const
-  {
-    return sizeof (shape_ref) + (m_ptr ? db::mem_reqd (*m_ptr) : 0);
+    if (!no_self) {
+      stat->add (typeid (shape_ref<Sh, Trans>), (void *) this, sizeof (shape_ref<Sh, Trans>), sizeof (shape_ref<Sh, Trans>), parent, purpose, cat);
+    }
+    if (m_ptr) {
+      db::mem_stat (stat, purpose, cat, *m_ptr, false, (void *) this);
+    }
   }
 
 private:
@@ -474,16 +456,13 @@ private:
   trans_type m_trans;
 };
 
+/**
+ *  @brief Collect memory statistics
+ */
 template <class Sh, class Tr>
-size_t mem_used (const shape_ref<Sh, Tr> &s)
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const shape_ref<Sh, Tr> &x, bool no_self = false, void *parent = 0)
 {
-  return s.mem_used (); 
-}
-
-template <class Sh, class Tr>
-size_t mem_reqd (const shape_ref<Sh, Tr> &s)
-{
-  return s.mem_reqd (); 
+  x.mem_stat (stat, purpose, cat, no_self, parent);
 }
 
 /**

@@ -43,10 +43,10 @@ static double shapes_dbu (const db::Shapes *shapes)
   return shapes->layout ()->dbu ();
 }
 
-static void dump_mem_statistics (const db::Shapes *shapes)
+static void dump_mem_statistics (const db::Shapes *shapes, bool detailed)
 {
-  db::MemStatistics ms;
-  shapes->collect_mem_stat (ms);
+  db::MemStatisticsCollector ms (detailed);
+  shapes->mem_stat (&ms, db::MemStatistics::ShapesInfo, 0);
   ms.print ();
 }
 
@@ -1011,7 +1011,7 @@ Class<db::Shapes> decl_Shapes ("Shapes",
   gsi::method ("SProperties|#s_properties", &s_properties,
     "@brief Indicates that only shapes with properties shall be retrieved"
   ) +
-  gsi::method_ext ("dump_mem_statistics", &dump_mem_statistics,
+  gsi::method_ext ("dump_mem_statistics", &dump_mem_statistics, gsi::arg<bool> ("detailed", false),
     "@hide"
   ),
   "@brief A collection of shapes\n"

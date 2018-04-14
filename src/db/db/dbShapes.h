@@ -439,7 +439,8 @@ public:
   typedef db::Box box_type;
   typedef db::Coord coord_type;
 
-  virtual ~LayerBase () { }
+  LayerBase ();
+  virtual ~LayerBase ();
 
   virtual box_type bbox () const = 0;
   virtual void update_bbox () = 0;
@@ -463,7 +464,7 @@ public:
   virtual void deref_and_transform_into (Shapes *target, const ICplxTrans &trans, pm_delegate_type &pm) = 0;
   virtual unsigned int type_mask () const = 0;
 
-  virtual void collect_mem_stat (db::MemStatistics &m) const = 0;
+  virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const;
 };
 
 /**
@@ -1422,7 +1423,7 @@ public:
   /**
    *  @brief Collect memory usage
    */
-  void collect_mem_stat (db::MemStatistics &m) const;
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const;
 
 private:
   friend class ShapeIterator;
@@ -1585,6 +1586,14 @@ public:
   virtual void undo (Shapes *shapes) = 0;
   virtual void redo (Shapes *shapes) = 0;
 };
+
+/**
+ *  @brief Collect memory usage
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const db::Shapes &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief A undo/redo queue object for the layer

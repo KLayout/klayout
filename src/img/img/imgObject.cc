@@ -607,30 +607,31 @@ public:
     return true;
   }
 
-  size_t mem_used () const 
+  void mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    size_t data_size = 0;
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+
     size_t n = data_length ();
     for (unsigned int i = 0; i < 3; ++i) {
       if (mp_color_data[i]) {
-        data_size += n * sizeof (float);
+        stat->add (typeid (float []), (void *) mp_color_data[i], sizeof (n * sizeof (float)), sizeof (n * sizeof (float)), (void *) this, purpose, cat);
       }
       if (mp_color_byte_data[i]) {
-        data_size += n * sizeof (unsigned char);
+        stat->add (typeid (unsigned char []), (void *) mp_color_byte_data[i], sizeof (n * sizeof (unsigned char)), sizeof (n * sizeof (unsigned char)), (void *) this, purpose, cat);
       }
     }
 
     if (mp_mask) {
-      data_size += n * sizeof (unsigned char);
+      stat->add (typeid (unsigned char []), (void *) mp_mask, sizeof (n * sizeof (unsigned char)), sizeof (n * sizeof (unsigned char)), (void *) this, purpose, cat);
     }
     if (mp_data) {
-      data_size += n * sizeof (float);
+      stat->add (typeid (float []), (void *) mp_data, sizeof (n * sizeof (float)), sizeof (n * sizeof (float)), (void *) this, purpose, cat);
     }
     if (mp_byte_data) {
-      data_size += n * sizeof (unsigned char);
+      stat->add (typeid (unsigned char []), (void *) mp_byte_data, sizeof (n * sizeof (unsigned char)), sizeof (n * sizeof (unsigned char)), (void *) this, purpose, cat);
     }
-
-    return data_size;
   }
 
 private:
@@ -2180,10 +2181,15 @@ Object::is_valid_matrix (const db::Matrix3d &matrix)
   return true;
 }
 
-size_t 
-Object::mem_used () const 
+void
+Object::mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
-  return sizeof (*this) + (mp_data ? mp_data->mem_used () : 0);
+  if (! no_self) {
+    stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+  }
+  if (mp_data) {
+    mp_data->mem_stat (stat, purpose, cat, false, (void *) this);
+  }
 }
 
 const char *

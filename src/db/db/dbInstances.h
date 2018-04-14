@@ -1718,8 +1718,7 @@ public:
   /**
    *  @brief Collect memory usage statistics
    */
-  void
-  collect_mem_stat (db::MemStatistics &m) const;
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const;
 
   /**
    *  @brief Returns true, if this Instances container belongs to an editable cell
@@ -1906,6 +1905,15 @@ private:
   template <class ET>
   void clear_insts (ET editable_tag);
 };
+
+/**
+ *  @brief Collect memory statistics
+ */
+inline void
+mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const Instances &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 template <class Iter>
 inline NormalInstanceIteratorTraits::instance_type 

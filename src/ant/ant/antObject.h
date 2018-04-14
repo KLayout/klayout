@@ -688,22 +688,6 @@ public:
    */
   virtual std::string to_string () const;
 
-  /**
-   *  @brief Returns the memory used in bytes
-   */
-  virtual size_t mem_used () const 
-  {
-    return sizeof (*this);
-  }
-
-  /**
-   *  @brief Returns the memory required in bytes
-   */
-  virtual size_t mem_reqd () const 
-  {
-    return sizeof (*this);
-  }
-
 protected:
   /**
    *  @brief A notification method that is called when a property of the annotation has changed

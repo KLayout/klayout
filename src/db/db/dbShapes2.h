@@ -156,11 +156,9 @@ public:
   virtual void deref_and_transform_into (Shapes *target, const ICplxTrans &trans);
   virtual void deref_and_transform_into (Shapes *target, const ICplxTrans &trans, pm_delegate_type &pm);
 
-  virtual void
-  collect_mem_stat (db::MemStatistics &m) const
+  virtual void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    m.shapes_info ((const LayerBase &)(*this)); // base class contribution
-    m_layer.collect_mem_stat (m);
+    db::mem_stat (stat, purpose, cat, m_layer, no_self, parent);
   }
 
   unsigned int type_mask () const;
@@ -168,6 +166,12 @@ public:
 private:
   layer_type m_layer;
 };
+
+template <class Sh, class Stable>
+void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const layer_class<Sh, Stable> &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 }
 

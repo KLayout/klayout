@@ -175,9 +175,9 @@ AnnotationShapes::undo (db::Op *op)
 }
 
 void
-AnnotationShapes::collect_mem_stat (db::MemStatistics &m) const
+AnnotationShapes::mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
-  m_layer.collect_mem_stat (m);
+  m_layer.mem_stat (stat, purpose, cat, no_self, parent);
 }
 
 void

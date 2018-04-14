@@ -33,7 +33,35 @@
 
 #include <vector>
 
-TEST(1) 
+namespace
+{
+
+class TestMemStatistics
+  : public db::MemStatistics
+{
+public:
+  TestMemStatistics ()
+    : used (0), reqd (0)
+  { }
+
+  virtual void add (const std::type_info & /*ti*/, void * /*ptr*/, size_t r, size_t u, void * /*parent*/, purpose_t /*purpose*/ = None, int /*cat*/ = 0)
+  {
+    used += u;
+    reqd += r;
+  }
+
+  void clear ()
+  {
+    used = reqd = 0;
+  }
+
+public:
+  size_t used, reqd;
+};
+
+}
+
+TEST(1)
 {
   db::Polygon p;
   db::Polygon empty;
@@ -180,7 +208,6 @@ TEST(2)
   EXPECT_EQ (p, empty);
 }
 
-
 TEST(3) 
 {
   db::Point pts [] = {
@@ -207,9 +234,13 @@ TEST(3)
     }
     contour.assign (c1.begin (), c1.end (), false);
 
+    TestMemStatistics ms;
+
     EXPECT_EQ (contour.size (), size_t (6));
     EXPECT_EQ (contour.is_hole (), false);
-    EXPECT_EQ (contour.mem_used (), 3 * sizeof(db::Point) + sizeof(Ctr));
+    ms.clear ();
+    contour.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.used, 3 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (100,100));
     EXPECT_EQ (contour[1], db::Point (100,200));
     EXPECT_EQ (contour[2], db::Point (0,200));
@@ -221,7 +252,9 @@ TEST(3)
 
     EXPECT_EQ (contour.size (), size_t (6));
     EXPECT_EQ (contour.is_hole (), true);
-    EXPECT_EQ (contour.mem_used (), 3 * sizeof(db::Point) + sizeof(Ctr));
+    ms.clear ();
+    contour.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.used, 3 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (100,100));
     EXPECT_EQ (contour[1], db::Point (300,100));
     EXPECT_EQ (contour[2], db::Point (300,300));
@@ -240,7 +273,9 @@ TEST(3)
 
     EXPECT_EQ (contour2.size (), size_t (6));
     EXPECT_EQ (contour2.is_hole (), true);
-    EXPECT_EQ (contour2.mem_used (), 3 * sizeof(db::Point) + sizeof(Ctr));
+    ms.clear ();
+    contour.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.used, 3 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour2[0], db::Point (100,100));
     EXPECT_EQ (contour2[1], db::Point (300,100));
     EXPECT_EQ (contour2[2], db::Point (300,300));
@@ -254,6 +289,8 @@ TEST(3)
 
 TEST(4) 
 {
+  TestMemStatistics ms;
+
   db::Point pts [] = {
     db::Point (100, 150),
     db::Point (100, 200),
@@ -276,7 +313,9 @@ TEST(4)
 
     EXPECT_EQ (contour.size (), size_t (5));
     EXPECT_EQ (contour.is_hole (), false);
-    EXPECT_EQ (contour.mem_used (), 5 * sizeof(db::Point) + sizeof(Ctr));
+    ms.clear ();
+    contour.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.used, 5 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (100,100));
     EXPECT_EQ (contour[1], db::Point (100,200));
     EXPECT_EQ (contour[2], db::Point (0,300));
@@ -287,7 +326,9 @@ TEST(4)
 
     EXPECT_EQ (contour.size (), size_t (5));
     EXPECT_EQ (contour.is_hole (), true);
-    EXPECT_EQ (contour.mem_used (), 5 * sizeof(db::Point) + sizeof(Ctr));
+    ms.clear ();
+    contour.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.used, 5 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (100,100));
     EXPECT_EQ (contour[1], db::Point (300,100));
     EXPECT_EQ (contour[2], db::Point (300,300));
@@ -306,7 +347,9 @@ TEST(4)
 
     EXPECT_EQ (contour2.size (), size_t (5));
     EXPECT_EQ (contour2.is_hole (), true);
-    EXPECT_EQ (contour2.mem_used (), 5 * sizeof(db::Point) + sizeof(Ctr));
+    ms.clear ();
+    contour.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.used, 5 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour2[0], db::Point (100,100));
     EXPECT_EQ (contour2[1], db::Point (300,100));
     EXPECT_EQ (contour2[2], db::Point (300,300));
@@ -531,6 +574,8 @@ TEST(6)
 
 TEST(7) 
 {
+  TestMemStatistics ms;
+
   db::Point pts [] = {
     db::Point (0, 0),
     db::Point (0, 4),
@@ -553,7 +598,9 @@ TEST(7)
 
     EXPECT_EQ (contour.size (), size_t (6));
     EXPECT_EQ (contour.is_hole (), false);
-    EXPECT_EQ (contour.mem_used (), 6 * sizeof(db::Point) + sizeof(Ctr));
+    ms.clear ();
+    contour.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.used, 6 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (0,0));
     EXPECT_EQ (contour[1], db::Point (0,4));
     EXPECT_EQ (contour[2], db::Point (4,4));
@@ -565,7 +612,9 @@ TEST(7)
 
     EXPECT_EQ (contour.size (), size_t (6));
     EXPECT_EQ (contour.is_hole (), true);
-    EXPECT_EQ (contour.mem_used (), 6 * sizeof(db::Point) + sizeof(Ctr));
+    ms.clear ();
+    contour.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.used, 6 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour[0], db::Point (0,0));
     EXPECT_EQ (contour[1], db::Point (0,4));
     EXPECT_EQ (contour[2], db::Point (4,4));
@@ -584,7 +633,9 @@ TEST(7)
 
     EXPECT_EQ (contour2.size (), size_t (6));
     EXPECT_EQ (contour2.is_hole (), true);
-    EXPECT_EQ (contour2.mem_used (), 6 * sizeof(db::Point) + sizeof(Ctr));
+    ms.clear ();
+    contour.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.used, 6 * sizeof(db::Point) + sizeof(Ctr));
     EXPECT_EQ (contour2[0], db::Point (0,0));
     EXPECT_EQ (contour2[1], db::Point (0,4));
     EXPECT_EQ (contour2[2], db::Point (4,4));
@@ -1143,6 +1194,8 @@ TEST(20)
 
 TEST(21)
 {
+  TestMemStatistics ms;
+
   {
     db::Box box (0,0,2048,1536);
     db::Polygon poly (box);
@@ -1151,7 +1204,9 @@ TEST(21)
     poly.transform (t);
     EXPECT_EQ (poly.to_string (), "(123,-10152;-7480,-2549;2657,7588;10260,-15)");
 #if !defined(_MSC_VER)
-    EXPECT_EQ (poly.mem_reqd (), (sizeof(void *)-4)*5+68);
+    ms.clear ();
+    poly.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.reqd, (sizeof(void *)-4)*5+68);
 #endif
   }
 
@@ -1163,7 +1218,9 @@ TEST(21)
     poly.transform (t);
     EXPECT_EQ (poly.to_string (), "(123,-10152;123,600;14459,600;14459,-10152)");
 #if !defined(_MSC_VER)
-    EXPECT_EQ (poly.mem_reqd (), (sizeof(void *)-4)*5+52);
+    ms.clear ();
+    poly.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.reqd, (sizeof(void *)-4)*5+52);
 #endif
   }
   {
@@ -1176,7 +1233,9 @@ TEST(21)
     EXPECT_EQ (poly.is_box (), false);
     EXPECT_EQ (poly.to_string (), "(123.88147866,-10152.0640046;-7503.56940256,-2524.61312338;2666.36510573,7645.32138492;10293.815987,17.8705036972)");
 #if !defined(_MSC_VER)
-    EXPECT_EQ (poly.mem_reqd (), (sizeof(void *)-4)*5+116);
+    ms.clear ();
+    poly.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.reqd, (sizeof(void *)-4)*5+116);
 #endif
   }
 
@@ -1189,7 +1248,9 @@ TEST(21)
     poly.transform (t);
     EXPECT_EQ (poly.to_string (), "(123.88147866,-10152.0640046;123.88147866,634.78047796;14506.3407887,634.78047796;14506.3407887,-10152.0640046)");
 #if !defined(_MSC_VER)
-    EXPECT_EQ (poly.mem_reqd (), (sizeof(void *)-4)*5+116); // no compression for doubles!
+    ms.clear ();
+    poly.mem_stat (&ms, db::MemStatistics::None, 0);
+    EXPECT_EQ (ms.reqd, (sizeof(void *)-4)*5+116); // no compression for doubles!
 #endif
   }
 }

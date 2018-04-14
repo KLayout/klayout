@@ -575,7 +575,7 @@ public:
   /**
    *  @brief Collect memory statistics
    */
-  void collect_mem_stat (db::MemStatistics &m) const;
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const;
 
   /**
    *  @brief Sets the properties ID
@@ -1683,6 +1683,15 @@ private:
    */
   void do_prune_cells_or_subcells (const std::set<cell_index_type> &ids, int levels, bool subcells);
 };
+
+/**
+ *  @brief Collect memory statistics
+ */
+inline void
+mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const Layout &x, bool no_self, void *parent)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief A nice helper class that employs RAII for locking the layout against updates

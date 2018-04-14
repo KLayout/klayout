@@ -25,6 +25,7 @@
 #define HDR_dbMetaInfo
 
 #include "dbCommon.h"
+#include "dbMemStatistics.h"
 #include <string>
 
 namespace db
@@ -56,6 +57,16 @@ struct DB_PUBLIC MetaInfo
   std::string description;
   std::string value;
 };
+
+/**
+ *  @brief Collect memory statistics
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const MetaInfo &v, bool no_self, void *parent)
+{
+  db::mem_stat (stat, purpose, cat, v.name, no_self, parent);
+  db::mem_stat (stat, purpose, cat, v.description, no_self, parent);
+  db::mem_stat (stat, purpose, cat, v.value, no_self, parent);
+}
 
 }
 

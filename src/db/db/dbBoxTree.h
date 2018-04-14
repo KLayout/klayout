@@ -232,15 +232,16 @@ public:
     return (int)(size_t (mp_parent) & 3);
   }
 
-  size_t mem_used () const
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent)
   {
-    size_t m = sizeof (*this);
+    if (!no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
     for (int i = 0; i < 4; ++i) {
       if (mp_children [i]) {
-        m += mp_children [i]->mem_used ();
+        mp_children [i]->mem_stat (stat, purpose, cat, no_self, parent);
       }
     }
-    return m;
   }
 
   const point_type &center () const
@@ -1090,6 +1091,18 @@ public:
     return mp_root;
   }
 
+  /**
+   *  @brief Collect memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (!no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+    db::mem_stat (stat, purpose, cat, m_objects, true, (void *) this);
+    db::mem_stat (stat, purpose, cat, m_elements, true, (void *) this);
+  }
+
 private:
 
   /// The basic object and element vector
@@ -1238,23 +1251,13 @@ private:
 
 };
 
-template <class Box, class Obj, class BoxConv>
-size_t mem_used (const db::box_tree<Box, Obj, BoxConv> &bt)
+/**
+ *  @brief Collect memory statistics
+ */
+template <class Box, class Obj, class BoxConv, size_t min_bin, size_t min_quads>
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const box_tree<Box, Obj, BoxConv, min_bin, min_quads> &x, bool no_self = false, void *parent = 0)
 {
-  return mem_used (bt.elements ()) + 
-         mem_used (bt.objects ()) +
-         sizeof (void *) + 
-         (bt.root () ? bt.root ()->mem_used () : 0);
-}
-
-template <class Box, class Obj, class BoxConv>
-size_t mem_reqd (const db::box_tree<Box, Obj, BoxConv> &bt)
-{
-  return mem_reqd (bt.elements ()) + 
-         mem_reqd (bt.objects ()) +
-         sizeof (box_tree_node<db::box_tree<Box, Obj, BoxConv> > *) +
-         sizeof (void *) + 
-         (bt.root () ? bt.root ()->mem_used () : 0);
+  x.mem_stat (stat, purpose, cat, no_self, parent);
 }
 
 /**
@@ -2033,6 +2036,17 @@ public:
     return mp_root;
   }
 
+  /**
+   *  @brief Collect memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+    db::mem_stat (stat, purpose, cat, m_objects, true, (void *) this);
+  }
+
 private:
   /// The basic object and element vector
   obj_vector_type m_objects;
@@ -2171,23 +2185,14 @@ private:
 
 };
 
+/**
+ *  @brief Collect memory statistics
+ */
 template <class Box, class Obj, class BoxConv>
-size_t mem_used (const db::unstable_box_tree<Box, Obj, BoxConv> &bt)
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const db::unstable_box_tree<Box, Obj, BoxConv> &x, bool no_self = false, void *parent = 0)
 {
-  return mem_used (bt.objects ()) +
-         sizeof (void *) + 
-         (bt.root () ? bt.root ()->mem_used () : 0);
+  x.mem_stat (stat, purpose, cat, no_self, parent);
 }
-
-template <class Box, class Obj, class BoxConv>
-size_t mem_reqd (const db::unstable_box_tree<Box, Obj, BoxConv> &bt)
-{
-  return mem_reqd (bt.objects ()) +
-         sizeof (box_tree_node<db::box_tree<Box, Obj, BoxConv> > *) +
-         sizeof (void *) + 
-         (bt.root () ? bt.root ()->mem_used () : 0);
-}
-
 
 }
 

@@ -984,14 +984,15 @@ public:
     std::swap (mp_points, d.mp_points);
   }
 
-  size_t mem_used () const
+  /**
+   *  @brief Collect memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
   {
-    return sizeof (polygon_contour) + sizeof (point_type) * m_size;
-  }
-
-  size_t mem_reqd () const
-  {
-    return sizeof (polygon_contour) + sizeof (point_type) * m_size;
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+    stat->add (typeid (point_type []), (void *) mp_points, sizeof (point_type) * m_size, sizeof (point_type) * m_size, (void *) this, purpose, cat);
   }
 
 private:
@@ -2269,14 +2270,10 @@ public:
     return copy;
   }
 
-  size_t mem_used () const
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
   {
-    return sizeof (m_bbox) + db::mem_used (m_ctrs);
-  }
-
-  size_t mem_reqd () const
-  {
-    return sizeof (m_bbox) + db::mem_reqd (m_ctrs);
+    db::mem_stat (stat, purpose, cat, &m_ctrs, no_self, parent);
+    db::mem_stat (stat, purpose, cat, &m_bbox, no_self, parent);
   }
 
 private:
@@ -2935,14 +2932,10 @@ public:
     return m_hull.size ();
   }
 
-  size_t mem_used () const
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
   {
-    return sizeof (m_bbox) + db::mem_used (m_hull);
-  }
-
-  size_t mem_reqd () const
-  {
-    return sizeof (m_bbox) + db::mem_reqd (m_hull);
+    db::mem_stat (stat, purpose, cat, &m_hull, no_self, parent);
+    db::mem_stat (stat, purpose, cat, &m_bbox, no_self, parent);
   }
 
 private:
@@ -3344,41 +3337,31 @@ typedef polygon_ref<SimplePolygon, UnitTrans> SimplePolygonPtr;
  */
 typedef polygon_ref<DSimplePolygon, DUnitTrans> DSimplePolygonPtr;
 
-
+/**
+ *  @brief Collect memory statistics
+ */
 template <class X>
-size_t mem_used (const polygon_contour<X> &x)
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const polygon_contour<X> &x, bool no_self = false, void *parent = 0)
 {
-  return x.mem_used ();
+  x.mem_stat (stat, purpose, cat, no_self, parent);
 }
 
+/**
+ *  @brief Collect memory statistics
+ */
 template <class X>
-size_t mem_reqd (const polygon_contour<X> &x)
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const polygon<X> &x, bool no_self = false, void *parent = 0)
 {
-  return x.mem_reqd ();
+  x.mem_stat (stat, purpose, cat, no_self, parent);
 }
 
+/**
+ *  @brief Collect memory statistics
+ */
 template <class X>
-size_t mem_used (const polygon<X> &x)
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const simple_polygon<X> &x, bool no_self = false, void *parent = 0)
 {
-  return x.mem_used ();
-}
-
-template <class X>
-size_t mem_reqd (const polygon<X> &x)
-{
-  return x.mem_reqd ();
-}
-
-template <class X>
-size_t mem_used (const simple_polygon<X> &x)
-{
-  return x.mem_used ();
-}
-
-template <class X>
-size_t mem_reqd (const simple_polygon<X> &x)
-{
-  return x.mem_reqd ();
+  x.mem_stat (stat, purpose, cat, no_self, parent);
 }
 
 } // namespace db

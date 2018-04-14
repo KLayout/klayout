@@ -33,7 +33,26 @@
 
 namespace db
 {
-  
+
+// -------------------------------------------------------------------------------
+
+LayerBase::LayerBase ()
+{
+  //  .. nothing yet ..
+}
+
+//  instantiates the vtable
+LayerBase::~LayerBase ()
+{
+  //  .. nothing yet ..
+}
+
+void
+LayerBase::mem_stat (MemStatistics * /*stat*/, MemStatistics::purpose_t /*purpose*/, int /*cat*/, bool /*no_self*/, void * /*parent*/) const
+{
+  //  .. nothing yet ..
+}
+
 // -------------------------------------------------------------------------------
 //  some utilities
 
@@ -935,13 +954,15 @@ Shapes::undo (db::Op *op)
 }
 
 void
-Shapes::collect_mem_stat (db::MemStatistics &m) const
+Shapes::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
-  m.cell_info (m_layers);
-  m.cell_info (mp_cell);
-
+  if (! no_self) {
+    stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+  }
+  db::mem_stat (stat, purpose, cat, m_layers, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, mp_cell, true, (void *) this);
   for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-    (*l)->collect_mem_stat (m);
+    (*l)->mem_stat (stat, purpose, cat, false, (void *) this);
   }
 }
 

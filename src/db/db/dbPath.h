@@ -859,14 +859,12 @@ public:
     //  .. nothing ..
   }
 
-  size_t mem_used () const
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    return db::mem_used (m_width) + db::mem_used (m_bgn_ext) + db::mem_used (m_end_ext) + db::mem_used (m_points);
-  }
-
-  size_t mem_reqd () const
-  {
-    return db::mem_reqd (m_width) + db::mem_reqd (m_bgn_ext) + db::mem_reqd (m_end_ext) + db::mem_reqd (m_points);
+    if (!no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+    db::mem_stat (stat, purpose, cat, m_points, true, (void *) this);
   }
 
 private:
@@ -894,6 +892,15 @@ private:
   template <class Iter, class Inserter>
   void create_shifted_points (coord_type start, coord_type end, coord_type width, bool forward, Iter from, Iter to, int ncircle, Inserter pts) const;
 };
+
+/**
+ *  @brief Collect memory statistics
+ */
+template <class C>
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const path<C> &x, bool no_self = false, void *parent = 0)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 /**
  *  @brief Binary * operator (transformation)
@@ -947,18 +954,6 @@ typedef path<db::Coord> Path;
  *  @brief The double coordinate path typedef
  */
 typedef path<db::DCoord> DPath;
-
-template <class X>
-size_t mem_used (const path<X> &x)
-{
-  return x.mem_used ();
-}
-
-template <class X>
-size_t mem_reqd (const path<X> &x)
-{
-  return x.mem_reqd ();
-}
 
 /** 
  *  @brief A path reference

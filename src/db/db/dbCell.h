@@ -882,7 +882,7 @@ public:
   /**
    *  @brief Collect memory usage statistics
    */
-  virtual void collect_mem_stat (db::MemStatistics &m) const;
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const;
 
   /**
    *  @brief Sets the properties ID
@@ -1022,6 +1022,15 @@ private:
    */
   void sort_inst_tree ();
 };
+
+/**
+ *  @brief Collect memory statistics
+ */
+inline void
+mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const db::Cell &x, bool no_self = false, void *parent = 0)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 } // namespace db
 

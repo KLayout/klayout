@@ -32,6 +32,7 @@
 #include "dbTrans.h"
 #include "dbObjectTag.h"
 #include "dbBox.h"
+#include "dbMemStatistics.h"
 #include "tlClassRegistry.h"
 
 #include <string>
@@ -157,14 +158,9 @@ public:
   virtual std::string to_string () const { return std::string (); }
 
   /**
-   *  @brief Return the memory used in bytes
+   *  @brief Collect memory statistics
    */
-  virtual size_t mem_used () const = 0;
-
-  /**
-   *  @brief Return the memory required in bytes
-   */
-  virtual size_t mem_reqd () const = 0;
+  virtual void mem_stat (db::MemStatistics * /*stat*/, db::MemStatistics::purpose_t /*purpose*/, int /*cat*/, bool /*no_self*/, void * /*parent*/) const { }
 };
 
 template <class C>
@@ -361,14 +357,14 @@ public:
     std::swap (mp_obj, other.mp_obj);
   }
 
-  size_t mem_used () const
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
   {
-    return sizeof (user_object<C>) + mp_obj->mem_used ();
-  }
-
-  size_t mem_reqd () const
-  {
-    return sizeof (user_object<C>) + mp_obj->mem_reqd ();
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+    if (mp_obj) {
+      mp_obj->mem_stat (stat, purpose, cat, false, (void *) this);
+    }
   }
 
 private:
@@ -467,16 +463,13 @@ public:
   }
 };
 
+/**
+ *  @brief Collect memory statistics
+ */
 template <class X>
-size_t mem_used (const user_object<X> &x)
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const user_object<X> &x, bool no_self = false, void *parent = 0)
 {
-  return x.mem_used ();
-}
-
-template <class X>
-size_t mem_reqd (const user_object<X> &x)
-{
-  return x.mem_reqd ();
+  x.mem_stat (stat, purpose, cat, no_self, parent);
 }
 
 /**

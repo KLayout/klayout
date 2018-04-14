@@ -940,15 +940,7 @@ public:
   /**
    *  @brief Return the memory used in bytes
    */
-  virtual size_t mem_used () const;
-
-  /**
-   *  @brief Return the memory required in bytes
-   */
-  virtual size_t mem_reqd () const 
-  {
-    return mem_used ();
-  }
+  virtual void mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const;
 
 protected:
   /**

@@ -66,30 +66,15 @@ ArrayRepository::operator= (const ArrayRepository &d)
   return *this;
 }
 
-size_t 
-ArrayRepository::mem_used () const
+void
+ArrayRepository::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
-  size_t mem = 0;
+  db::mem_stat (stat, purpose, cat, m_reps, no_self, parent);
   for (repositories::const_iterator r = m_reps.begin (); r != m_reps.end (); ++r) {
-    mem += db::mem_used (*r);
     for (basic_repository::const_iterator rr = r->begin (); rr != r->end (); ++rr) {
-      mem += (*rr)->mem_used ();
+      db::mem_stat (stat, purpose, cat, *rr, false, (void *) this);
     }
   }
-  return mem + sizeof (*this);
-}
-
-size_t 
-ArrayRepository::mem_reqd () const
-{
-  size_t mem = 0;
-  for (repositories::const_iterator r = m_reps.begin (); r != m_reps.end (); ++r) {
-    mem += db::mem_reqd (*r);
-    for (basic_repository::const_iterator rr = r->begin (); rr != r->end (); ++rr) {
-      mem += (*rr)->mem_reqd ();
-    }
-  }
-  return mem + sizeof (*this);
 }
 
 }

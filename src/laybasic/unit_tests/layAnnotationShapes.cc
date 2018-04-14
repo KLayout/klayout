@@ -81,8 +81,13 @@ public:
 
   const Sh &shape () const { return m_shape; }
 
-  size_t mem_used () const { return 0; }
-  size_t mem_reqd () const { return 0; }
+  virtual void mem_stat (db::MemStatistics *stat, db::MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
+  {
+    if (! no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+    db::mem_stat (stat, purpose, cat, m_shape, true, (void *) this);
+  }
 
 private:
   Sh m_shape;

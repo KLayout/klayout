@@ -25,9 +25,10 @@
 #define HDR_dbPropertiesRepository
 
 #include "dbCommon.h"
+#include "dbTypes.h"
+#include "dbMemStatistics.h"
 
 #include "tlVariant.h"
-#include "dbTypes.h"
 
 #include <vector>
 #include <string>
@@ -206,6 +207,22 @@ public:
    */
   properties_id_type translate (const PropertiesRepository &rep, properties_id_type id);
 
+  /**
+   *  @brief Collect memory statistics
+   */
+  void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
+  {
+    if (!no_self) {
+      stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+    }
+
+    db::mem_stat (stat, purpose, cat, m_propnames_by_id, true, parent);
+    db::mem_stat (stat, purpose, cat, m_propname_ids_by_name, true, parent);
+    db::mem_stat (stat, purpose, cat, m_properties_by_id, true, parent);
+    db::mem_stat (stat, purpose, cat, m_properties_ids_by_set, true, parent);
+    db::mem_stat (stat, purpose, cat, m_properties_component_table, true, parent);
+  }
+
 private:
   std::map <property_names_id_type, tl::Variant> m_propnames_by_id;
   std::map <tl::Variant, property_names_id_type> m_propname_ids_by_name;
@@ -218,6 +235,14 @@ private:
 
   PropertiesRepository (const PropertiesRepository &d);
 };
+
+/**
+ *  @brief Collect memory statistics
+ */
+inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const PropertiesRepository &x, bool no_self = false, void *parent = 0)
+{
+  x.mem_stat (stat, purpose, cat, no_self, parent);
+}
 
 } // namespace db
 

@@ -1438,33 +1438,30 @@ Instances::cell_instances () const
 }
 
 void
-Instances::collect_mem_stat (db::MemStatistics &m) const
+Instances::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
-  m.cell_info (sizeof (mp_cell), sizeof (mp_cell));
-  m.cell_info (sizeof (m_parent_insts), sizeof (m_parent_insts));        //  need more: see below
-  m.cell_info (sizeof (m_generic), sizeof (m_generic));  //  need more: see below
-  m.cell_info (sizeof (m_generic_wp), sizeof (m_generic_wp));        //  need more: see below
-  m.cell_info (sizeof (m_insts_by_cell_index), sizeof (m_insts_by_cell_index));        //  need more: see below
+  if (!no_self) {
+    stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
+  }
+
+  db::mem_stat (stat, MemStatistics::Instances, cat, m_parent_insts, true, (void *) this);
+  db::mem_stat (stat, MemStatistics::Instances, cat, m_insts_by_cell_index, true, (void *) this);
 
   if (is_editable ()) {
     if (m_generic.stable_tree) {
-      m.inst_trees (*m_generic.stable_tree);
+      db::mem_stat (stat, MemStatistics::Instances, cat, *m_generic.stable_tree, true, (void *) this);
     }
     if (m_generic_wp.stable_tree) {
-      m.inst_trees (*m_generic_wp.stable_tree);
+      db::mem_stat (stat, MemStatistics::Instances, cat, *m_generic_wp.stable_tree, true, (void *) this);
     }
   } else {
     if (m_generic.unstable_tree) {
-      m.inst_trees (*m_generic.unstable_tree);
+      db::mem_stat (stat, MemStatistics::Instances, cat, *m_generic.unstable_tree, true, (void *) this);
     }
     if (m_generic_wp.unstable_tree) {
-      m.inst_trees (*m_generic_wp.unstable_tree);
+      db::mem_stat (stat, MemStatistics::Instances, cat, *m_generic_wp.unstable_tree, true, (void *) this);
     }
   }
-
-  m.instances (m_parent_insts);
-  m.instances (m_insts_by_cell_index);
-  m.instances (-sizeof (m_parent_insts), -sizeof (m_parent_insts));        //  the actual object is counted for cell, not for instances (see above)
 }
 
 Instances::instance_type 

@@ -588,21 +588,21 @@ Cell::undo (db::Op *op)
 }
 
 void
-Cell::collect_mem_stat (db::MemStatistics &m) const
+Cell::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const
 {
-  m.cell_info (m_cell_index);
-  m.cell_info (mp_layout);
-  m.cell_info (m_shapes_map);
-  m.cell_info (m_bbox);
-  m.cell_info (m_bboxes); 
-  m.cell_info (m_hier_levels);
-  m.cell_info (m_bbox_needs_update);
+  if (! no_self) {
+    stat->add (typeid (Cell), (void *) this, sizeof (Cell), sizeof (Cell), parent, purpose, cat);
+  }
+  db::mem_stat (stat, purpose, cat, m_bboxes, true, (void *) this);
+  db::mem_stat (stat, MemStatistics::Instances, cat, m_instances, true, (void *) this);
 
-  m_instances.collect_mem_stat (m);
-
-  for (shapes_map::const_iterator s = m_shapes_map.begin (); s != m_shapes_map.end (); ++s) {
-    m.cell_info (size_t (-sizeof(s->second)), size_t (-sizeof(s->second)));
-    s->second.collect_mem_stat (m);
+  //  iterate the shapes separately so we can use the layer for the category
+  for (shapes_map::const_iterator i = m_shapes_map.begin (); i != m_shapes_map.end (); ++i) {
+    db::mem_stat (stat, MemStatistics::ShapesInfo, (int) i->first, i->first, false, (void *) this);
+    db::mem_stat (stat, MemStatistics::ShapesInfo, (int) i->first, i->second, false, (void *) this);
+#ifdef __GNUCC__
+    stat->add (std::_Rb_tree_node_base, (void *) &i->first, sizeof (std::_Rb_tree_node_base), sizeof (std::_Rb_tree_node_base), (void *) &v, purpose, cat);
+#endif
   }
 }
 

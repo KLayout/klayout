@@ -1214,7 +1214,7 @@ public:
     : ArgSpecBase (name, true, init_doc), mp_init (new T (init))
   { }
 
-  ~ArgSpecImpl ()
+  virtual ~ArgSpecImpl ()
   {
     if (mp_init) {
       delete mp_init;

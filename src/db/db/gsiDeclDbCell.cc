@@ -704,10 +704,10 @@ static void check_is_editable (const db::Cell *cell)
 // ---------------------------------------------------------------
 //  db::Cell binding
 
-static void dump_mem_statistics (const db::Cell *cell)
+static void dump_mem_statistics (const db::Cell *cell, bool detailed)
 {
-  db::MemStatistics ms;
-  cell->collect_mem_stat (ms);
+  db::MemStatisticsCollector ms (detailed);
+  cell->mem_stat (&ms, db::MemStatistics::CellInfo, 0);
   ms.print ();
 }
 
@@ -3025,7 +3025,7 @@ Class<db::Cell> decl_Cell ("Cell",
     "\n"
     "This method has been introduced in version 0.20.\n"
   ) +
-  gsi::method_ext ("dump_mem_statistics", &dump_mem_statistics,
+  gsi::method_ext ("dump_mem_statistics", &dump_mem_statistics, gsi::arg<bool> ("detailed", false),
     "@hide"
   ),
   "@brief A cell\n"

@@ -887,14 +887,12 @@ public:
     init ();
   }
 
-  size_t mem_reqd () const
+  /**
+   *  @brief For diagnostics purposes only
+   */
+  ReuseData *reuse_data () const
   {
-    return (mp_capacity - mp_start) * sizeof (Value) + (mp_rdata != 0 ? mp_rdata->mem_reqd () : 0);
-  }
-
-  size_t mem_used () const
-  {
-    return (mp_finish - mp_start) * sizeof (Value) + (mp_rdata != 0 ? mp_rdata->mem_used () : 0);
+    return mp_rdata;
   }
 
 private:

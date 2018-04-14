@@ -249,6 +249,34 @@ inline db::Box rbox ()
   return db::Box (x, y, x + rvalue () % 200, y + rvalue () % 200);
 }
 
+namespace
+{
+
+class TestMemStatistics
+  : public db::MemStatistics
+{
+public:
+  TestMemStatistics ()
+    : used (0), reqd (0)
+  { }
+
+  virtual void add (const std::type_info & /*ti*/, void * /*ptr*/, size_t r, size_t u, void * /*parent*/, purpose_t /*purpose*/ = None, int /*cat*/ = 0)
+  {
+    used += u;
+    reqd += r;
+  }
+
+  void clear ()
+  {
+    used = reqd = 0;
+  }
+
+public:
+  size_t used, reqd;
+};
+
+}
+
 TEST(0)
 {
   Box2Box conv;
@@ -520,7 +548,9 @@ TEST(4)
     }
   }
 
-  tl::info << "Memory: " << db::mem_used (t);
+  TestMemStatistics ms;
+  t.mem_stat (&ms, db::MemStatistics::None, 0);
+  tl::info << "Memory: " << ms.used;
 }
 
 TEST(4A)
@@ -576,7 +606,9 @@ TEST(4A)
     }
   }
 
-  tl::info << "Memory: " << db::mem_used (t);
+  TestMemStatistics ms;
+  t.mem_stat (&ms, db::MemStatistics::None, 0);
+  tl::info << "Memory: " << ms.used;
 }
 
 TEST(4B)
@@ -632,7 +664,9 @@ TEST(4B)
     }
   }
 
-  tl::info << "Memory: " << db::mem_used (t);
+  TestMemStatistics ms;
+  t.mem_stat (&ms, db::MemStatistics::None, 0);
+  tl::info << "Memory: " << ms.used;
 }
 
 TEST(5)
@@ -663,7 +697,9 @@ TEST(5)
     EXPECT_EQ (n, t.size () * 10);
   }
 
-  tl::info << "Memory: " << db::mem_used (t);
+  TestMemStatistics ms;
+  t.mem_stat (&ms, db::MemStatistics::None, 0);
+  tl::info << "Memory: " << ms.used;
 }
 
 TEST(0U)
@@ -919,7 +955,9 @@ TEST(4U)
     }
   }
 
-  tl::info << "Memory: " << db::mem_used (t);
+  TestMemStatistics ms;
+  t.mem_stat (&ms, db::MemStatistics::None, 0);
+  tl::info << "Memory: " << ms.used;
 }
 
 TEST(5U)
@@ -950,7 +988,9 @@ TEST(5U)
     EXPECT_EQ (n, t.size () * 10);
   }
 
-  tl::info << "Memory: " << db::mem_used (t);
+  TestMemStatistics ms;
+  t.mem_stat (&ms, db::MemStatistics::None, 0);
+  tl::info << "Memory: " << ms.used;
 }
 
 TEST(6)

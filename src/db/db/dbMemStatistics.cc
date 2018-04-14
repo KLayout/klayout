@@ -24,6 +24,36 @@
 #include "dbMemStatistics.h"
 #include "tlLog.h"
 
+#ifdef __GNUG__
+#include <memory>
+#include <cstdlib>
+#include <cxxabi.h>
+
+/**
+ *  @brief Demangles symbol names for better readability
+ */
+static std::string demangle (const std::string &name)
+{
+  int status = 1;
+  char *dn = abi::__cxa_demangle(name.c_str (), 0, 0, &status);
+  if (status == 0) {
+    std::string res (dn);
+    std::free (dn);
+    return res;
+  } else {
+    return name;
+  }
+}
+
+#else
+
+static std::string demangle (const std::string &name)
+{
+  return name;
+}
+
+#endif
+
 namespace db 
 {
 
@@ -79,11 +109,11 @@ MemStatisticsCollector::print ()
   p2s[ShapesCache] = "Shapes cache   ";
   p2s[ShapeTrees]  = "Shape trees    ";
 
-  if (detailed) {
+  if (m_detailed) {
 
     tl::info << "Memory usage per type:";
     for (std::map<const std::type_info *, std::pair<size_t, size_t> >::const_iterator t = m_per_type.begin (); t != m_per_type.end (); ++t) {
-      tl::info << "  " << t->first->name () << ": " << t->second.first << " (used) " << t->second.second << " (reqd)";
+      tl::info << "  " << demangle (t->first->name ()) << ": " << t->second.first << " (used) " << t->second.second << " (reqd)";
     }
 
     tl::info << "Memory usage per category:";
@@ -94,10 +124,13 @@ MemStatisticsCollector::print ()
   }
 
   tl::info << "Memory usage per master category:";
+  std::pair<size_t, size_t> tot;
   for (std::map<purpose_t, std::pair<size_t, size_t> >::const_iterator t = m_per_purpose.begin (); t != m_per_purpose.end (); ++t) {
     tl::info << "  " << p2s[t->first] << ": " << t->second.first << " (used) " << t->second.second << " (reqd)";
+    tot.first += t->second.first;
+    tot.second += t->second.second;
   }
-  tl::info << tl::endl << "  Total          : " << tot.first << " (used) " << tot.second << " (reqd)";
+  tl::info << "  Total          : " << tot.first << " (used) " << tot.second << " (reqd)";
 }
 
 void

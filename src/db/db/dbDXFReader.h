@@ -62,9 +62,11 @@ public:
       polyline_mode (0),
       circle_points (100),
       circle_accuracy (0.0),
+      contour_accuracy (0.0),
       render_texts_as_polygons (false),
       keep_other_cells (false),
-      create_other_layers (true)
+      create_other_layers (true),
+      read_named_layers (false)
   {
     //  .. nothing yet ..
   }
@@ -129,6 +131,17 @@ public:
   double circle_accuracy;
 
   /**
+   *  @brief Accuracy for closing polylines
+   *
+   *  When polylines need to be connected or closed, this
+   *  value is used to indicate the accuracy. This is the value
+   *  by while points may be separated and still be considered
+   *  connected. The default is 0.0 which implies exact
+   *  (within one DBU) closing.
+   */
+  double contour_accuracy;
+
+  /**
    *  @brief If set to true, converts texts to polygons on read
    * 
    *  Converting texts avoids problems with UTF-8 character sets.
@@ -159,6 +172,14 @@ public:
    *  too.
    */
   bool create_other_layers;
+
+  /**
+   *  @brief A flag indicating whether the names of layers shall be read (maintained)
+   *
+   *  Name translation will try to extract GDS layer/datatype numbers from the
+   *  layer names. If this value is set to true, no name translation happens.
+   */
+  bool read_named_layers;
 
   /** 
    *  @brief Implementation of FormatSpecificReaderOptions
@@ -195,10 +216,110 @@ public:
 };
 
 /**
+ *  @brief A reader base class for streams with named-only layers
+ *
+ *  This class implements the layer name translation logic.
+ *  Specifically:
+ *    - a number is translated to the corresponding layer, datatype 0
+ *    - Lx            is translated to layer x, datatype 0
+ *    - Lx_SUFFIX     is translated to layer x, datatype 0, name "SUFFIX"
+ *    - LxDy          is translated to layer x, datatype y
+ *    - LxDy_SUFFIX   is translated to layer x, datatype y, name "SUFFIX"
+ *
+ *  Furthermore, the layer map and creation of new layers is handled in this
+ *  base class.
+ */
+class DB_PUBLIC NamedLayerReader
+  : public ReaderBase
+{
+public:
+  /**
+   *  @brief The constructor
+   */
+  NamedLayerReader ();
+
+  /**
+   *  @brief Sets a value indicating whether to create new layers
+   */
+  void set_create_layers (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether to create new layers
+   */
+  bool create_layers () const
+  {
+    return m_create_layers;
+  }
+
+  /**
+   *  @brief Sets the layer map
+   */
+  void set_layer_map (const LayerMap &lm);
+
+  /**
+   *  @brief Gets the layer map
+   */
+  const LayerMap &layer_map ()
+  {
+    return m_layer_map;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether layer names are kept
+   *  If set to true, no name translation is performed and layers are
+   *  always named only. If set the false (the default), layer names will
+   *  be translated to GDS layer/datatypes if possible.
+   */
+  void set_read_named_layers (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether layer names are kept
+   */
+  bool read_named_layers () const
+  {
+    return m_read_named_layers;
+  }
+
+protected:
+  /**
+   *  @brief Opens a new layer
+   *  This method will create or locate a layer for a given name.
+   *  The result's first attribute is true, if such a layer could be found
+   *  or created. In this case, the second attribute is the layer index.
+   */
+  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name);
+
+  /**
+   *  @brief Force mapping of a name to a layer index
+   */
+  void map_layer (const std::string &name, unsigned int layer);
+
+  /**
+   *  @brief Finish reading
+   *  This method must be called after the reading has been done.
+   *  It will finalize the layers.
+   */
+  void finish_layers (db::Layout &layout);
+
+  /**
+   *  @brief Prepares reading
+   *  This method must be called before the reading is done.
+   */
+  void prepare_layers ();
+
+private:
+  bool m_create_layers;
+  bool m_read_named_layers;
+  LayerMap m_layer_map;
+  unsigned int m_next_layer_index;
+  std::map <std::string, unsigned int> m_new_layers;
+};
+
+/**
  *  @brief The DXF format stream reader
  */
 class DB_PUBLIC DXFReader
-  : public ReaderBase, 
+  : public NamedLayerReader,
     public DXFDiagnostics
 {
 public: 
@@ -303,8 +424,6 @@ private:
   };
 
   tl::InputStream &m_stream;
-  bool m_create_layers;
-  LayerMap m_layer_map;
   tl::AbsoluteProgress m_progress;
   double m_dbu;
   double m_unit;
@@ -312,6 +431,7 @@ private:
   int m_polyline_mode;
   int m_circle_points;
   double m_circle_accuracy;
+  double m_contour_accuracy;
   std::string m_cellname;
   std::string m_line;
   bool m_ascii;
@@ -320,8 +440,6 @@ private:
   bool m_keep_other_cells;
   int m_line_number; 
   unsigned int m_zero_layer;
-  unsigned int m_next_layer_index;
-  std::map <std::string, unsigned int> m_new_layers;
   std::map <db::cell_index_type, std::string> m_template_cells;
   std::set <db::cell_index_type> m_used_template_cells;
   std::map <std::string, db::cell_index_type> m_block_per_name;
@@ -329,8 +447,8 @@ private:
 
   void do_read (db::Layout &layout, db::cell_index_type top);
 
-  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &name);
-  db::cell_index_type make_layer_variant (db::Layout &layout, const std::string &cellname, db::cell_index_type template_cell, unsigned int layer, double sx, double sy); 
+  std::pair <bool, unsigned int> open_layer (db::Layout &layout, const std::string &n);
+  db::cell_index_type make_layer_variant (db::Layout &layout, const std::string &cellname, db::cell_index_type template_cell, unsigned int layer, double sx, double sy);
   void cleanup (db::Layout &layout, db::cell_index_type top);
 
   int read_int16 ();

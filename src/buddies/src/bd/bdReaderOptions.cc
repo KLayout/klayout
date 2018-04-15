@@ -138,6 +138,11 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "This option specifies the database unit the resulting layer will have. "
                     "The value is given in micrometer units. The default value is 1nm (0.001)."
                    )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "keep-layer-names", &GenericReaderOptions::set_read_named_layers, "Keeps layer names",
+                    "If this option is used, layers names are kept as pure names and no attempt is made to\n"
+                    "translate them into GDS layer/datatypes."
+                   )
       ;
   }
 
@@ -198,6 +203,11 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "The value is given in the units of the DXF file."
                    )
         << tl::arg (group +
+                    "#--" + m_long_prefix + "dxf-contour-accuracy=value", &m_dxf_reader_options.contour_accuracy, "Specifies the point accuracy for contour closing",
+                    "This value specifies the distance (in units of the DXF file) by which points can be separated and still\n"
+                    "be considered to be connected. This value is effective in polyline mode 3 and 4.\n"
+                   )
+        << tl::arg (group +
                     "#--" + m_long_prefix + "dxf-render-texts-as-polygons", &m_dxf_reader_options.render_texts_as_polygons, "Renders texts as polygons",
                     "If this option is used, texts are converted to polygons instead of being converted to labels."
                    )
@@ -220,6 +230,12 @@ void GenericReaderOptions::set_layer_map (const std::string &lm)
     ex.test ("//");
     ++l;
   }
+}
+
+void GenericReaderOptions::set_read_named_layers (bool f)
+{
+  m_dxf_reader_options.read_named_layers = f;
+  m_cif_reader_options.read_named_layers = f;
 }
 
 void GenericReaderOptions::set_dbu (double dbu)

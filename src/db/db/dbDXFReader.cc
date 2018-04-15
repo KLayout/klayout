@@ -51,17 +51,247 @@ namespace db
 {
 
 // ---------------------------------------------------------------
+//  NamedLayerReader
+
+NamedLayerReader::NamedLayerReader ()
+  : m_create_layers (true), m_read_named_layers (false), m_next_layer_index (0)
+{
+  //  .. nothing yet ..
+}
+
+void
+NamedLayerReader::set_create_layers (bool f)
+{
+  m_create_layers = f;
+}
+
+void
+NamedLayerReader::set_read_named_layers (bool f)
+{
+  m_read_named_layers = f;
+}
+
+void NamedLayerReader::set_layer_map (const LayerMap &lm)
+{
+  m_layer_map = lm;
+}
+
+static bool
+extract_plain_layer (const char *s, int &l)
+{
+  l = 0;
+  if (! *s) {
+    return false;
+  }
+  while (*s && isdigit (*s)) {
+    l = l * 10 + (unsigned int) (*s - '0');
+    ++s;
+  }
+  return (*s == 0);
+}
+
+static bool
+extract_ld (const char *s, int &l, int &d, std::string &n)
+{
+  l = d = 0;
+
+  if (*s == 'L') {
+    ++s;
+  }
+
+  if (! *s || ! isdigit (*s)) {
+    return false;
+  }
+
+  while (*s && isdigit (*s)) {
+    l = l * 10 + (unsigned int) (*s - '0');
+    ++s;
+  }
+
+  if (*s == 'D' || *s == '.') {
+    ++s;
+    if (! *s || ! isdigit (*s)) {
+      return false;
+    }
+    while (*s && isdigit (*s)) {
+      d = d * 10 + (unsigned int) (*s - '0');
+      ++s;
+    }
+  }
+
+  if (*s && (isspace (*s) || *s == '_')) {
+    ++s;
+    n = s;
+    return true;
+  } else if (*s == 0) {
+    n.clear ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+std::pair <bool, unsigned int>
+NamedLayerReader::open_layer (db::Layout &layout, const std::string &n)
+{
+  int l = -1, d = -1;
+  std::string on;
+
+  std::pair<bool, unsigned int> ll (false, 0);
+
+  ll = m_layer_map.logical (n);
+  if (! ll.first && !m_read_named_layers) {
+
+    if (extract_plain_layer (n.c_str (), l)) {
+
+      db::LayerProperties lp;
+      lp.layer = l;
+      lp.datatype = 0;
+      ll = m_layer_map.logical (lp);
+
+    } else if (extract_ld (n.c_str (), l, d, on)) {
+
+      db::LayerProperties lp;
+      lp.layer = l;
+      lp.datatype = d;
+      lp.name = on;
+      ll = m_layer_map.logical (lp);
+
+    }
+
+  }
+
+  if (ll.first) {
+
+    //  create the layer if it is not part of the layout yet.
+    if (! layout.is_valid_layer (ll.second)) {
+      layout.insert_layer (ll.second, m_layer_map.mapping (ll.second));
+    }
+
+    return ll;
+
+  } else if (! m_create_layers) {
+
+    return std::pair<bool, unsigned int> (false, 0);
+
+  } else {
+
+    std::map <std::string, unsigned int>::const_iterator nl = m_new_layers.find (n);
+    if (nl == m_new_layers.end ()) {
+
+      unsigned int ll = m_next_layer_index++;
+
+      layout.insert_layer (ll, db::LayerProperties ());
+      m_new_layers.insert (std::make_pair (n, ll));
+
+      return std::pair<bool, unsigned int> (true, ll);
+
+    } else {
+      return std::pair<bool, unsigned int> (true, nl->second);
+    }
+
+  }
+}
+
+void
+NamedLayerReader::map_layer (const std::string &name, unsigned int layer)
+{
+  m_layer_map.map (name, layer);
+}
+
+void
+NamedLayerReader::prepare_layers ()
+{
+  m_new_layers.clear ();
+  m_next_layer_index = m_layer_map.next_index ();
+}
+
+void
+NamedLayerReader::finish_layers (db::Layout &layout)
+{
+  //  assign layer numbers to new layers
+  if (! m_new_layers.empty () && !m_read_named_layers) {
+
+    std::set<std::pair<int, int> > used_ld;
+    for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
+      used_ld.insert (std::make_pair((*l).second->layer, (*l).second->datatype));
+    }
+
+    //  assign fixed layer numbers for all layers whose name is a fixed number unless there is already a layer with that number
+    for (std::map<std::string, unsigned int>::iterator i = m_new_layers.begin (); i != m_new_layers.end (); ) {
+
+      std::map<std::string, unsigned int>::iterator ii = i;
+      ++ii;
+
+      int l = -1;
+      if (extract_plain_layer (i->first.c_str (), l) && used_ld.find (std::make_pair (l, 0)) == used_ld.end ()) {
+
+        used_ld.insert (std::make_pair (l, 0));
+
+        db::LayerProperties lp;
+        lp.layer = l;
+        lp.datatype = 0;
+        layout.set_properties (i->second, lp);
+        m_layer_map.map (lp, i->second);
+
+        m_new_layers.erase (i);
+
+      }
+
+      i = ii;
+
+    }
+
+    //  assign fixed layer numbers for all layers whose name is a LxDy or Lx notation unless there is already a layer with that layer/datatype
+    for (std::map<std::string, unsigned int>::iterator i = m_new_layers.begin (); i != m_new_layers.end (); ) {
+
+      std::map<std::string, unsigned int>::iterator ii = i;
+      ++ii;
+
+      int l = -1, d = -1;
+      std::string n;
+
+      if (extract_ld (i->first.c_str (), l, d, n) && used_ld.find (std::make_pair (l, d)) == used_ld.end ()) {
+
+        used_ld.insert (std::make_pair (l, d));
+
+        db::LayerProperties lp;
+        lp.layer = l;
+        lp.datatype = d;
+        lp.name = n;
+        layout.set_properties (i->second, lp);
+        m_layer_map.map (lp, i->second);
+
+        m_new_layers.erase (i);
+
+      }
+
+      i = ii;
+
+    }
+
+  }
+
+  //  insert the remaining ones
+  for (std::map<std::string, unsigned int>::const_iterator i = m_new_layers.begin (); i != m_new_layers.end (); ++i) {
+    db::LayerProperties lp;
+    lp.name = i->first;
+    layout.set_properties (i->second, lp);
+    m_layer_map.map (lp, i->second);
+  }
+}
+
+// ---------------------------------------------------------------
 //  DXFReader
 
 static std::string zero_layer_name ("0");
 
 DXFReader::DXFReader (tl::InputStream &s)
   : m_stream (s),
-    m_create_layers (true),
     m_progress (tl::to_string (QObject::tr ("Reading DXF file")), 1000),
-    m_dbu (0.001), m_unit (1.0), m_text_scaling (1.0), m_polyline_mode (0), m_circle_points (100), m_circle_accuracy (0.0),
+    m_dbu (0.001), m_unit (1.0), m_text_scaling (1.0), m_polyline_mode (0), m_circle_points (100), m_circle_accuracy (0.0), m_contour_accuracy (0.0),
     m_ascii (false), m_initial (true), m_render_texts_as_polygons (false), m_keep_other_cells (false), m_line_number (0),
-    m_zero_layer (0), m_next_layer_index (0)
+    m_zero_layer (0)
 {
   m_progress.set_format (tl::to_string (QObject::tr ("%.0fk lines")));
   m_progress.set_format_unit (1000.0);
@@ -301,6 +531,7 @@ DXFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   m_polyline_mode = specific_options.polyline_mode;
   m_circle_points = specific_options.circle_points;
   m_circle_accuracy = specific_options.circle_accuracy;
+  m_contour_accuracy = specific_options.contour_accuracy;
   m_render_texts_as_polygons = specific_options.render_texts_as_polygons;
   m_keep_other_cells = specific_options.keep_other_cells;
 
@@ -318,10 +549,11 @@ DXFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   m_stream.reset ();
   m_initial = true;
   m_line_number = 0;
-  m_layer_map = specific_options.layer_map;
-  m_layer_map.prepare (layout);
-  m_next_layer_index = 0;
-  m_create_layers = specific_options.create_other_layers;
+  db::LayerMap lm = specific_options.layer_map;
+  lm.prepare (layout);
+  set_layer_map (lm);
+  set_create_layers (specific_options.create_other_layers);
+  set_read_named_layers (specific_options.read_named_layers);
 
   db::cell_index_type top = layout.add_cell("TOP"); // TODO: make variable ..
 
@@ -329,7 +561,7 @@ DXFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   do_read (layout, top);
   cleanup (layout, top);
 
-  return m_layer_map;
+  return layer_map ();
 }
 
 const LayerMap &
@@ -365,144 +597,29 @@ DXFReader::warn (const std::string &msg)
   }
 }
 
-static bool 
-extract_plain_layer (const char *s, int &l)
-{
-  l = 0;
-  if (! *s) {
-    return false;
-  }
-  while (*s && isdigit (*s)) {
-    l = l * 10 + (unsigned int) (*s - '0');
-    ++s;
-  }
-  return (*s == 0);
-}
-
-static bool 
-extract_ld (const char *s, int &l, int &d, std::string &n)
-{
-  l = d = 0;
-
-  if (*s == 'L') {
-    ++s;
-  }
-
-  if (! *s || ! isdigit (*s)) {
-    return false;
-  }
-
-  while (*s && isdigit (*s)) {
-    l = l * 10 + (unsigned int) (*s - '0');
-    ++s;
-  }
-
-  if (*s == 'D' || *s == '.') {
-    ++s;
-    if (! *s || ! isdigit (*s)) {
-      return false;
-    }
-    while (*s && isdigit (*s)) {
-      d = d * 10 + (unsigned int) (*s - '0');
-      ++s;
-    }
-  }
-
-  if (*s && (isspace (*s) || *s == '_')) {
-    ++s;
-    n = s;
-    return true;
-  } else if (*s == 0) {
-    n.clear ();
-    return true;
-  } else {
-    return false;
-  }
-}
-
-std::pair <bool, unsigned int> 
+std::pair <bool, unsigned int>
 DXFReader::open_layer (db::Layout &layout, const std::string &n)
 {
-  std::string name (n);
-
-  int l = -1, d = -1;
-  std::string on;
-
-  std::pair<bool, unsigned int> ll (false, 0);
-
   if (n == zero_layer_name) {
     return std::make_pair (true, m_zero_layer);
-  }
-
-  ll = m_layer_map.logical (n);
-  if (! ll.first) {
-
-    if (extract_plain_layer (n.c_str (), l)) {
-
-      db::LayerProperties lp;
-      lp.layer = l;
-      lp.datatype = 0;
-      ll = m_layer_map.logical (lp);
-
-    } else if (extract_ld (n.c_str (), l, d, on)) {
-
-      db::LayerProperties lp;
-      lp.layer = l;
-      lp.datatype = d;
-      lp.name = on;
-      ll = m_layer_map.logical (lp);
-
-    }
-
-  }
-
-  if (ll.first) {
-
-    //  create the layer if it is not part of the layout yet.
-    if (! layout.is_valid_layer (ll.second)) {
-      layout.insert_layer (ll.second, m_layer_map.mapping (ll.second));
-    }
-
-    return ll;
-
-  } else if (! m_create_layers) {
-
-    return std::pair<bool, unsigned int> (false, 0);
-
   } else {
-
-    std::map <std::string, unsigned int>::const_iterator nl = m_new_layers.find (n);
-    if (nl == m_new_layers.end ()) {
-
-      unsigned int ll = m_next_layer_index++;
-
-      layout.insert_layer (ll, db::LayerProperties ());
-      m_new_layers.insert (std::make_pair (n, ll));
-
-      return std::pair<bool, unsigned int> (true, ll);
-
-    } else {
-      return std::pair<bool, unsigned int> (true, nl->second);
-    }
-
+    return NamedLayerReader::open_layer (layout, n);
   }
 }
 
-void 
+void
 DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, "File read");
 
-  m_new_layers.clear ();
-
   //  create the zero layer - this is not mapped to GDS but can be specified in the layer mapping as
   //  a layer named "0".
-  std::pair<bool, unsigned int> ll = m_layer_map.logical (zero_layer_name);
+  std::pair<bool, unsigned int> ll = layer_map ().logical (zero_layer_name);
   if (ll.first) {
 
     //  create the layer if it is not part of the layout yet.
     if (! layout.is_valid_layer (ll.second)) {
-      layout.insert_layer (ll.second, m_layer_map.mapping (ll.second));
+      layout.insert_layer (ll.second, layer_map ().mapping (ll.second));
     }
 
     m_zero_layer = ll.second;
@@ -510,13 +627,13 @@ DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
   } else {
 
     //  or explicitly create the layer:
-    m_zero_layer = m_layer_map.next_index ();
+    m_zero_layer = layer_map ().next_index ();
     layout.insert_layer (m_zero_layer, db::LayerProperties (0, 0, zero_layer_name));
-    m_layer_map.map (zero_layer_name, m_zero_layer);
+    map_layer (zero_layer_name, m_zero_layer);
 
   }
 
-  m_next_layer_index = m_layer_map.next_index ();
+  prepare_layers ();
 
   // Read sections
   int g;
@@ -630,76 +747,7 @@ DXFReader::do_read (db::Layout &layout, db::cell_index_type top)
 
   }
 
-  //  assign layer numbers to new layers
-  if (! m_new_layers.empty ()) {
-
-    std::set<std::pair<int, int> > used_ld;
-    for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
-      used_ld.insert (std::make_pair((*l).second->layer, (*l).second->datatype));
-    }
-
-    //  assign fixed layer numbers for all layers whose name is a fixed number unless there is already a layer with that number
-    for (std::map<std::string, unsigned int>::iterator i = m_new_layers.begin (); i != m_new_layers.end (); ) {
-
-      std::map<std::string, unsigned int>::iterator ii = i;
-      ++ii;
-
-      int l = -1;
-      if (extract_plain_layer (i->first.c_str (), l) && used_ld.find (std::make_pair (l, 0)) == used_ld.end ()) {
-
-        used_ld.insert (std::make_pair (l, 0));
-
-        db::LayerProperties lp;
-        lp.layer = l;
-        lp.datatype = 0;
-        layout.set_properties (i->second, lp);
-        m_layer_map.map (lp, i->second);
-
-        m_new_layers.erase (i);
-
-      }
-
-      i = ii;
-
-    }
-    
-    //  assign fixed layer numbers for all layers whose name is a LxDy or Lx notation unless there is already a layer with that layer/datatype
-    for (std::map<std::string, unsigned int>::iterator i = m_new_layers.begin (); i != m_new_layers.end (); ) {
-
-      std::map<std::string, unsigned int>::iterator ii = i;
-      ++ii;
-
-      int l = -1, d = -1;
-      std::string n;
-
-      if (extract_ld (i->first.c_str (), l, d, n) && used_ld.find (std::make_pair (l, d)) == used_ld.end ()) {
-
-        used_ld.insert (std::make_pair (l, d));
-
-        db::LayerProperties lp;
-        lp.layer = l;
-        lp.datatype = d;
-        lp.name = n;
-        layout.set_properties (i->second, lp);
-        m_layer_map.map (lp, i->second);
-
-        m_new_layers.erase (i);
-
-      }
-
-      i = ii;
-
-    }
-
-    //  insert the remaining ones
-    for (std::map<std::string, unsigned int>::const_iterator i = m_new_layers.begin (); i != m_new_layers.end (); ++i) {
-      db::LayerProperties lp;
-      lp.name = i->first;
-      layout.set_properties (i->second, lp);
-      m_layer_map.map (lp, i->second);
-    }
-
-  }
+  finish_layers (layout);
 }
 
 void

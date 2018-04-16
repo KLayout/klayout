@@ -1357,20 +1357,40 @@ expand_wildcard_layers (const LayerPropertiesNode &lp, const LayerPropertiesList
 void 
 LayerPropertiesList::append (const LayerPropertiesList &other)
 {
-  lay::DitherPattern dp (other.dither_pattern ());
+  {
+    lay::DitherPattern dp (other.dither_pattern ());
 
-  std::map <unsigned int, unsigned int> index_map;
-  dp.merge (dither_pattern (), index_map);
+    std::map <unsigned int, unsigned int> index_map;
+    dp.merge (dither_pattern (), index_map);
 
-  for (lay::LayerPropertiesIterator l = begin_recursive (); l != end_recursive (); ++l) {
-    int dpi = l->dither_pattern (false /*local*/);
-    std::map <unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) dpi);
-    if (m != index_map.end ()) {
-      l->set_dither_pattern (int (m->second));
+    for (lay::LayerPropertiesIterator l = begin_recursive (); l != end_recursive (); ++l) {
+      int dpi = l->dither_pattern (false /*local*/);
+      std::map <unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) dpi);
+      if (m != index_map.end ()) {
+        l->set_dither_pattern (int (m->second));
+      }
     }
+
+    set_dither_pattern (dp);
   }
 
-  set_dither_pattern (dp);
+  {
+    lay::LineStyles ls (other.line_styles ());
+
+    std::map <unsigned int, unsigned int> index_map;
+    ls.merge (line_styles (), index_map);
+
+    //  remap the dither pattern index
+    for (lay::LayerPropertiesIterator l = begin_recursive (); l != end_recursive (); ++l) {
+      int lsi = l->line_style (false /*local*/);
+      std::map <unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) lsi);
+      if (m != index_map.end ()) {
+        l->set_line_style (int (m->second));
+      }
+    }
+
+    set_line_styles (ls);
+  }
 
   for (lay::LayerPropertiesList::const_iterator l = other.begin_const (); l != other.end_const (); ++l) {
     push_back (*l);

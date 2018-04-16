@@ -1363,6 +1363,7 @@ LayerPropertiesList::append (const LayerPropertiesList &other)
     std::map <unsigned int, unsigned int> index_map;
     dp.merge (dither_pattern (), index_map);
 
+    //  remap the dither pattern index
     for (lay::LayerPropertiesIterator l = begin_recursive (); l != end_recursive (); ++l) {
       int dpi = l->dither_pattern (false /*local*/);
       std::map <unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) dpi);
@@ -1380,7 +1381,7 @@ LayerPropertiesList::append (const LayerPropertiesList &other)
     std::map <unsigned int, unsigned int> index_map;
     ls.merge (line_styles (), index_map);
 
-    //  remap the dither pattern index
+    //  remap the line style index
     for (lay::LayerPropertiesIterator l = begin_recursive (); l != end_recursive (); ++l) {
       int lsi = l->line_style (false /*local*/);
       std::map <unsigned int, unsigned int>::iterator m = index_map.find ((unsigned int) lsi);

@@ -166,7 +166,7 @@ gsi::ClassExt<db::LoadLayoutOptions> gds2_reader_options (
     "For strict compatibility with the standard, this property should be set to false. The default is true.\n"
     "\nThis property has been added in version 0.18.\n"
   ) +
-  gsi::method_ext ("gds2_allow_multi_xy_records", &get_gds2_allow_multi_xy_records,
+  gsi::method_ext ("gds2_allow_multi_xy_records?|#gds2_allow_multi_xy_records", &get_gds2_allow_multi_xy_records,
     "@brief Gets a value specifying whether to allow big polygons with multiple XY records.\n"
     "See \\gds2_allow_multi_xy_records= method for a description of this property."
     "\nThis property has been added in version 0.18.\n"
@@ -179,7 +179,7 @@ gsi::ClassExt<db::LoadLayoutOptions> gds2_reader_options (
     "For strict compatibility with the standard, this property should be set to false. The default is true.\n"
     "\nThis property has been added in version 0.18.\n"
   ) +
-  gsi::method_ext ("gds2_allow_big_records", &get_gds2_allow_big_records,
+  gsi::method_ext ("gds2_allow_big_records?|#gds2_allow_big_records", &get_gds2_allow_big_records,
     "@brief Gets a value specifying whether to allow big records with a length of 32768 to 65535 bytes.\n"
     "See \\gds2_allow_big_records= method for a description of this property."
     "\nThis property has been added in version 0.18.\n"

@@ -98,6 +98,7 @@ void run_pythontest (tl::TestBase *_this, const std::string &fn)
 
 PYTHONTEST (dbLayoutTest, "dbLayoutTest.py")
 PYTHONTEST (dbRegionTest, "dbRegionTest.py")
+PYTHONTEST (dbReaders, "dbReaders.py")
 PYTHONTEST (dbPCellsTest, "dbPCells.py")
 PYTHONTEST (dbPolygonTest, "dbPolygonTest.py")
 PYTHONTEST (dbTransTest, "dbTransTest.py")

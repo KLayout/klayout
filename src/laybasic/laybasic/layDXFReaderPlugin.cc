@@ -415,7 +415,7 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "@args value\n"
     "\nThis property has been added in version 0.21.15.\n"
   ) +
-  gsi::method_ext ("dxf_render_texts_as_polygons", &get_dxf_render_texts_as_polygons,
+  gsi::method_ext ("dxf_render_texts_as_polygons?|#dxf_render_texts_as_polygons", &get_dxf_render_texts_as_polygons,
     "@brief If this option is true, text objects are rendered as polygons\n"
     "\nThis property has been added in version 0.21.15.\n"
   ) +
@@ -442,7 +442,7 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "@args value\n"
     "\nThis property has been added in version 0.21.15.\n"
   ) +
-  gsi::method_ext ("dxf_keep_other_cells", &get_dxf_keep_other_cells,
+  gsi::method_ext ("dxf_keep_other_cells?|#dxf_keep_other_cells", &get_dxf_keep_other_cells,
     "@brief If this option is true, all cells are kept, not only the top cell and it's children\n"
     "\nThis property has been added in version 0.21.15.\n"
   ) +

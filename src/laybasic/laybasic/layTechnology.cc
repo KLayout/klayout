@@ -60,17 +60,24 @@ Technologies::operator= (const Technologies &other)
 {
   if (&other != this) {
     m_technologies = other.m_technologies;
-    technologies_changed_event ();
+    for (iterator i = begin (); i != end (); ++i) {
+      i->technology_changed_with_sender_event.add (this, &Technologies::technology_changed);
+    }
+    technologies_changed ();
   }
 
   return *this;
 }
 
+static std::auto_ptr<lay::Technologies> sp_technologies;
+
 lay::Technologies *
 Technologies::instance ()
 {
-  static lay::Technologies s_technologies;
-  return &s_technologies;
+  if (! sp_technologies.get ()) {
+    sp_technologies.reset (new lay::Technologies ());
+  }
+  return sp_technologies.get ();
 }
 
 static tl::XMLElementList xml_elements () 
@@ -164,6 +171,16 @@ Technologies::clear ()
   if (! m_technologies.empty ()) {
     m_technologies.clear ();
     technologies_changed ();
+  }
+}
+
+void
+Technologies::technology_changed (Technology *t)
+{
+  if (m_in_update) {
+    m_changed = true;
+  } else {
+    technology_changed_event (t);
   }
 }
 

@@ -214,7 +214,7 @@ TechnologyController::technologies_changed ()
 void
 TechnologyController::technology_changed (lay::Technology *)
 {
-  update_menu ();
+  technologies_changed ();
 }
 
 bool

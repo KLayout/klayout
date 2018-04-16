@@ -234,10 +234,7 @@ protected:
   /**
    *  @brief Forward the event from the individual technologies
    */
-  void technology_changed (Technology *t)
-  {
-    technology_changed_event (t);
-  }
+  void technology_changed (Technology *t);
 
   /**
    *  @brief Sends the technologies_changed event

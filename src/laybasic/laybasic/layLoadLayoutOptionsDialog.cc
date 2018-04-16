@@ -250,9 +250,11 @@ LoadLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
     config_root->config_set (cfg_reader_options_show_always, tl::to_string (m_show_always));
 
     i = 0;
+    technologies->begin_updates ();
     for (lay::Technologies::iterator t = technologies->begin (); t != technologies->end () && i < m_opt_array.size (); ++t, ++i) {
       technologies->begin ()[i].set_load_layout_options (m_opt_array [i]);
     }
+    technologies->end_updates ();
 
     return true;
 

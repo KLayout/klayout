@@ -195,7 +195,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Accuracy in DXF units</string>
+         <string>Interpolation accuracy in DXF units</string>
         </property>
        </widget>
       </item>
@@ -308,6 +308,16 @@
         </property>
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of points per full circle used for arc interpolation (the accuracy may reduce the number if less are required)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>

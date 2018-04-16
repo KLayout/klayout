@@ -101,7 +101,6 @@ private:
   std::string m_prefix, m_long_prefix, m_group_prefix;
   db::LayerMap m_layer_map;
   bool m_create_other_layers;
-  bool m_read_named_layers;
   db::CommonReaderOptions m_common_reader_options;
   db::GDS2ReaderOptions m_gds2_reader_options;
   db::OASISReaderOptions m_oasis_reader_options;

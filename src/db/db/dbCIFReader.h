@@ -30,8 +30,8 @@
 #include "tlProgress.h"
 #include "tlString.h"
 
+#include "dbNamedLayerReader.h"
 #include "dbLayout.h"
-#include "dbReader.h"
 #include "dbCIF.h"
 #include "tlStream.h"
 #include "dbStreamLayers.h"
@@ -56,7 +56,8 @@ public:
   CIFReaderOptions ()
     : wire_mode (0),
       dbu (0.001),
-      create_other_layers (true)
+      create_other_layers (true),
+      keep_layer_names (false)
   {
     //  .. nothing yet ..
   }
@@ -96,6 +97,16 @@ public:
    */
   bool create_other_layers;
 
+  /**
+   *  @brief A flag indicating whether the names of layers shall be kept as such
+   *
+   *  If this flag is set to false (the default), layer name translation happens.
+   *  If set to true, translation will not happen.
+   *  Name translation will try to extract GDS layer/datatype numbers from the
+   *  layer names. If this value is set to true, no name translation happens.
+   */
+  bool keep_layer_names;
+
   /** 
    *  @brief Implementation of FormatSpecificReaderOptions
    */
@@ -130,7 +141,7 @@ public:
  *  @brief The CIF format stream reader
  */
 class DB_PUBLIC CIFReader
-  : public ReaderBase, 
+  : public NamedLayerReader,
     public CIFDiagnostics
 {
 public: 
@@ -202,16 +213,12 @@ public:
 
 private:
   tl::TextInputStream m_stream;
-  bool m_create_layers;
-  LayerMap m_layer_map;
   tl::AbsoluteProgress m_progress;
   double m_dbu;
   unsigned int m_wire_mode;
   std::string m_cellname;
   std::string m_cmd_buffer;
   std::map <unsigned int, db::cell_index_type> m_cells_by_id;
-  unsigned int m_next_layer_index;
-  std::map <std::string, unsigned int> m_new_layers;
 
   void do_read (db::Layout &layout);
 

@@ -62,6 +62,7 @@ CIFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const lay:
   mp_ui->dbu_le->setText (tl::to_qstring (tl::to_string (options->dbu)));
   mp_ui->layer_map->set_layer_map (options->layer_map);
   mp_ui->read_all_cbx->setChecked (options->create_other_layers);
+  mp_ui->keep_names_cbx->setChecked (options->keep_layer_names);
   mp_ui->wire_mode_cb->setCurrentIndex (options->wire_mode);
 }
 
@@ -77,6 +78,7 @@ CIFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const lay::Tech
     options->wire_mode = mp_ui->wire_mode_cb->currentIndex ();
     options->layer_map = mp_ui->layer_map->get_layer_map ();
     options->create_other_layers = mp_ui->read_all_cbx->isChecked ();
+    options->keep_layer_names = mp_ui->keep_names_cbx->isChecked ();
   }
 }
 
@@ -109,7 +111,8 @@ public:
       tl::make_member (&db::CIFReaderOptions::wire_mode, "wire-mode") +
       tl::make_member (&db::CIFReaderOptions::dbu, "dbu") +
       tl::make_member (&db::CIFReaderOptions::layer_map, "layer-map") +
-      tl::make_member (&db::CIFReaderOptions::create_other_layers, "create-other-layers")
+      tl::make_member (&db::CIFReaderOptions::create_other_layers, "create-other-layers") +
+      tl::make_member (&db::CIFReaderOptions::keep_layer_names, "keep-layer-names")
     );
   }
 };
@@ -166,6 +169,16 @@ static void set_create_other_layers (db::LoadLayoutOptions *options, bool l)
   options->get_options<db::CIFReaderOptions> ().create_other_layers = l;
 }
 
+static bool keep_layer_names (const db::LoadLayoutOptions *options)
+{
+  return options->get_options<db::CIFReaderOptions> ().keep_layer_names;
+}
+
+static void set_keep_layer_names (db::LoadLayoutOptions *options, bool l)
+{
+  options->get_options<db::CIFReaderOptions> ().keep_layer_names = l;
+}
+
 //  extend lay::LoadLayoutOptions with the CIF options
 static
 gsi::ClassExt<db::LoadLayoutOptions> cif_reader_options (
@@ -208,6 +221,24 @@ gsi::ClassExt<db::LoadLayoutOptions> cif_reader_options (
       "\n"
       "This method has been added in version 0.25 and replaces the respective global option in \\LoadLayoutOptions "
       "in a format-specific fashion."
+    ) +
+    gsi::method_ext ("cif_keep_layer_names?", &keep_layer_names,
+      "@brief Gets a value indicating whether layer names are kept\n"
+      "@return True, if layer names are kept.\n"
+      "\n"
+      "When set to true, no attempt is made to translate "
+      "layer names to GDS layer/datatype numbers. If set to false (the default), a layer named \"L2D15\" will be translated "
+      "to GDS layer 2, datatype 15.\n"
+      "\n"
+      "This method has been added in version 0.25.3."
+    ) +
+    gsi::method_ext ("cif_keep_layer_names=", &set_keep_layer_names, gsi::arg ("keep"),
+      "@brief Gets a value indicating whether layer names are kept\n"
+      "@param keep True, if layer names are to be kept.\n"
+      "\n"
+      "See \\cif_keep_layer_names? for a description of this property.\n"
+      "\n"
+      "This method has been added in version 0.25.3."
     ) +
     gsi::method_ext ("cif_wire_mode=", &set_cif_wire_mode,
     "@brief How to read 'W' objects\n"

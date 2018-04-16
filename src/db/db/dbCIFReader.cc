@@ -43,9 +43,8 @@ namespace db
 
 CIFReader::CIFReader (tl::InputStream &s)
   : m_stream (s),
-    m_create_layers (true),
     m_progress (tl::to_string (QObject::tr ("Reading CIF file")), 1000),
-    m_dbu (0.001), m_wire_mode (0), m_next_layer_index (0)
+    m_dbu (0.001), m_wire_mode (0)
 {
   m_progress.set_format (tl::to_string (QObject::tr ("%.0fk lines")));
   m_progress.set_format_unit (1000.0);
@@ -60,19 +59,22 @@ CIFReader::~CIFReader ()
 const LayerMap &
 CIFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
-  m_dbu = 0.001;
-  m_wire_mode = 0;
-  m_next_layer_index = 0;
+  prepare_layers ();
 
   const db::CIFReaderOptions &specific_options = options.get_options<db::CIFReaderOptions> ();
   m_wire_mode = specific_options.wire_mode;
   m_dbu = specific_options.dbu;
 
-  m_layer_map = specific_options.layer_map;
-  m_layer_map.prepare (layout);
-  m_create_layers = specific_options.create_other_layers;
+  db::LayerMap lm = specific_options.layer_map;
+  lm.prepare (layout);
+  set_layer_map (lm);
+  set_create_layers (specific_options.create_other_layers);
+  set_keep_layer_names (specific_options.keep_layer_names);
+
   do_read (layout);
-  return m_layer_map;
+
+  finish_layers (layout);
+  return layer_map ();
 }
 
 const LayerMap &
@@ -342,61 +344,6 @@ CIFReader::read_double ()
   return v;
 }
 
-static bool 
-extract_plain_layer (const char *s, int &l)
-{
-  l = 0;
-  if (! *s) {
-    return false;
-  }
-  while (*s && isdigit (*s)) {
-    l = l * 10 + (unsigned int) (*s - '0');
-    ++s;
-  }
-  return (*s == 0);
-}
-
-static bool 
-extract_ld (const char *s, int &l, int &d, std::string &n)
-{
-  l = d = 0;
-
-  if (*s == 'L') {
-    ++s;
-  }
-
-  if (! *s || ! isdigit (*s)) {
-    return false;
-  }
-
-  while (*s && isdigit (*s)) {
-    l = l * 10 + (unsigned int) (*s - '0');
-    ++s;
-  }
-
-  if (*s == 'D' || *s == '.') {
-    ++s;
-    if (! *s || ! isdigit (*s)) {
-      return false;
-    }
-    while (*s && isdigit (*s)) {
-      d = d * 10 + (unsigned int) (*s - '0');
-      ++s;
-    }
-  }
-
-  if (*s && (isspace (*s) || *s == '_')) {
-    ++s;
-    n = s;
-    return true;
-  } else if (*s == 0) {
-    n.clear ();
-    return true;
-  } else {
-    return false;
-  }
-}
-
 bool
 CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
 {
@@ -598,60 +545,11 @@ CIFReader::read_cell (db::Layout &layout, db::Cell &cell, double sf, int level)
         error ("Missing layer name in 'L' command");
       }
 
-      std::pair<bool, unsigned int> ll = m_layer_map.logical (name);
+      std::pair<bool, unsigned int> ll = open_layer (layout, name);
       if (! ll.first) {
-
-        int l = -1, d = -1;
-        std::string on;
-
-        if (extract_plain_layer (name.c_str (), l)) {
-
-          db::LayerProperties lp;
-          lp.layer = l;
-          lp.datatype = 0;
-          ll = m_layer_map.logical (lp);
-
-        } else if (extract_ld (name.c_str (), l, d, on)) {
-
-          db::LayerProperties lp;
-          lp.layer = l;
-          lp.datatype = d;
-          lp.name = on;
-          ll = m_layer_map.logical (lp);
-
-        }
-
-      }
-
-      if (ll.first) {
-
-        //  create the layer if it is not part of the layout yet.
-        if (! layout.is_valid_layer (ll.second)) {
-          layout.insert_layer (ll.second, m_layer_map.mapping (ll.second));
-        }
-
-        layer = int (ll.second);
-
-      } else if (! m_create_layers) {
-
         layer = -1; // ignore geometric objects on this layer
-
       } else {
-
-        std::map <std::string, unsigned int>::const_iterator nl = m_new_layers.find (name);
-        if (nl == m_new_layers.end ()) {
-
-          unsigned int ll = m_next_layer_index++;
-
-          layout.insert_layer (ll, db::LayerProperties ());
-          m_new_layers.insert (std::make_pair (name, ll));
-
-          layer = int (ll);
-
-        } else {
-          layer = int (nl->second);
-        }
-
+        layer = int (ll.second);
       }
 
       expect_semi ();
@@ -928,8 +826,6 @@ CIFReader::do_read (db::Layout &layout)
     layout.dbu (m_dbu);
 
     m_cellname = "{CIF top level}";
-    m_next_layer_index = m_layer_map.next_index ();
-    m_new_layers.clear ();
 
     db::Cell &cell = layout.cell (layout.add_cell ());
 
@@ -946,76 +842,6 @@ CIFReader::do_read (db::Layout &layout)
 
     if (! m_stream.at_end ()) {
       warn ("E command is followed by more text");
-    }
-
-    //  assign layer numbers to new layers
-    if (! m_new_layers.empty ()) {
-
-      std::set<std::pair<int, int> > used_ld;
-      for (db::Layout::layer_iterator l = layout.begin_layers (); l != layout.end_layers (); ++l) {
-        used_ld.insert (std::make_pair((*l).second->layer, (*l).second->datatype));
-      }
-
-      //  assign fixed layer numbers for all layers whose name is a fixed number unless there is already a layer with that number
-      for (std::map<std::string, unsigned int>::iterator i = m_new_layers.begin (); i != m_new_layers.end (); ) {
-
-        std::map<std::string, unsigned int>::iterator ii = i;
-        ++ii;
-
-        int l = -1;
-        if (extract_plain_layer (i->first.c_str (), l) && used_ld.find (std::make_pair (l, 0)) == used_ld.end ()) {
-
-          used_ld.insert (std::make_pair (l, 0));
-
-          db::LayerProperties lp;
-          lp.layer = l;
-          lp.datatype = 0;
-          layout.set_properties (i->second, lp);
-          m_layer_map.map (lp, i->second);
-
-          m_new_layers.erase (i);
-
-        }
-
-        i = ii;
-
-      }
-      
-      //  assign fixed layer numbers for all layers whose name is a LxDy or Lx notation unless there is already a layer with that layer/datatype
-      for (std::map<std::string, unsigned int>::iterator i = m_new_layers.begin (); i != m_new_layers.end (); ) {
-
-        std::map<std::string, unsigned int>::iterator ii = i;
-        ++ii;
-
-        int l = -1, d = -1;
-        std::string n;
-
-        if (extract_ld (i->first.c_str (), l, d, n) && used_ld.find (std::make_pair (l, d)) == used_ld.end ()) {
-
-          used_ld.insert (std::make_pair (l, d));
-
-          db::LayerProperties lp;
-          lp.layer = l;
-          lp.datatype = d;
-          lp.name = n;
-          layout.set_properties (i->second, lp);
-          m_layer_map.map (lp, i->second);
-
-          m_new_layers.erase (i);
-
-        }
-
-        i = ii;
-
-      }
-
-      for (std::map<std::string, unsigned int>::const_iterator i = m_new_layers.begin (); i != m_new_layers.end (); ++i) {
-        db::LayerProperties lp;
-        lp.name = i->first;
-        layout.set_properties (i->second, lp);
-        m_layer_map.map (lp, i->second);
-      }
-
     }
 
   } catch (db::CIFReaderException &ex) {

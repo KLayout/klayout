@@ -64,11 +64,13 @@ DXFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const lay:
   mp_ui->text_scaling_le->setText (tl::to_qstring (tl::to_string (options->text_scaling)));
   mp_ui->circle_points_le->setText (tl::to_qstring (tl::to_string (options->circle_points)));
   mp_ui->circle_accuracy_le->setText (tl::to_qstring (tl::to_string (options->circle_accuracy)));
+  mp_ui->contour_accuracy_le->setText (tl::to_qstring (tl::to_string (options->contour_accuracy)));
   mp_ui->render_texts_as_polygons_cbx->setChecked (options->render_texts_as_polygons);
   mp_ui->keep_other_cells_cbx->setChecked (options->keep_other_cells);
   mp_ui->polyline2poly_cbx->setCurrentIndex (options->polyline_mode);
   mp_ui->layer_map->set_layer_map (options->layer_map);
   mp_ui->read_all_cbx->setChecked (options->create_other_layers);
+  mp_ui->keep_names_cbx->setChecked (options->keep_layer_names);
 }
 
 void 
@@ -93,11 +95,13 @@ DXFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const lay::Tech
       throw tl::Exception (tl::to_string (QObject::tr ("Invalid value for the number of points for arc interpolation")));
     }
     tl::from_string (tl::to_string(mp_ui->circle_accuracy_le->text ()), options->circle_accuracy);
+    tl::from_string (tl::to_string(mp_ui->contour_accuracy_le->text ()), options->contour_accuracy);
     options->polyline_mode = mp_ui->polyline2poly_cbx->currentIndex ();
     options->render_texts_as_polygons = mp_ui->render_texts_as_polygons_cbx->isChecked ();
     options->keep_other_cells = mp_ui->keep_other_cells_cbx->isChecked ();
     options->layer_map = mp_ui->layer_map->get_layer_map ();
     options->create_other_layers = mp_ui->read_all_cbx->isChecked ();
+    options->keep_layer_names = mp_ui->keep_names_cbx->isChecked ();
   }
 }
 
@@ -132,9 +136,11 @@ public:
       tl::make_member (&db::DXFReaderOptions::text_scaling, "text-scaling") +
       tl::make_member (&db::DXFReaderOptions::circle_points, "circle-points") +
       tl::make_member (&db::DXFReaderOptions::circle_accuracy, "circle-accuracy") +
+      tl::make_member (&db::DXFReaderOptions::contour_accuracy, "contour-accuracy") +
       tl::make_member (&db::DXFReaderOptions::polyline_mode, "polyline-mode") +
       tl::make_member (&db::DXFReaderOptions::render_texts_as_polygons, "render-texts-as-polygons") +
       tl::make_member (&db::DXFReaderOptions::keep_other_cells, "keep-other-cells") +
+      tl::make_member (&db::DXFReaderOptions::keep_layer_names, "keep-layer-names") +
       tl::make_member (&db::DXFReaderOptions::create_other_layers, "create-other-layers") +
       tl::make_member (&db::DXFReaderOptions::layer_map, "layer-map")
     );
@@ -216,6 +222,16 @@ static double get_dxf_circle_accuracy (const db::LoadLayoutOptions *options)
   return options->get_options<db::DXFReaderOptions> ().circle_accuracy;
 }
 
+static void set_dxf_contour_accuracy (db::LoadLayoutOptions *options, double contour_accuracy)
+{
+  options->get_options<db::DXFReaderOptions> ().contour_accuracy = contour_accuracy;
+}
+
+static double get_dxf_contour_accuracy (const db::LoadLayoutOptions *options)
+{
+  return options->get_options<db::DXFReaderOptions> ().contour_accuracy;
+}
+
 static void set_dxf_polyline_mode (db::LoadLayoutOptions *options, int mode)
 {
   if (mode < 0 || mode > 4) {
@@ -255,6 +271,16 @@ static bool create_other_layers (const db::LoadLayoutOptions *options)
 static void set_create_other_layers (db::LoadLayoutOptions *options, bool l)
 {
   options->get_options<db::DXFReaderOptions> ().create_other_layers = l;
+}
+
+static bool keep_layer_names (const db::LoadLayoutOptions *options)
+{
+  return options->get_options<db::DXFReaderOptions> ().keep_layer_names;
+}
+
+static void set_keep_layer_names (db::LoadLayoutOptions *options, bool l)
+{
+  options->get_options<db::DXFReaderOptions> ().keep_layer_names = l;
 }
 
 //  extend lay::LoadLayoutOptions with the DXF options
@@ -365,6 +391,25 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "@brief Gets the accuracy of the circle approximation\n"
     "\nThis property has been added in version 0.24.9.\n"
   ) +
+  gsi::method_ext ("dxf_contour_accuracy=", &set_dxf_contour_accuracy,
+    "@brief Specifies the accuracy for contour closing\n"
+    "@args accuracy\n"
+    "\n"
+    "When polylines need to be connected or closed, this\n"
+    "value is used to indicate the accuracy. This is the value (in DXF units)\n"
+    "by which points may be separated and still be considered\n"
+    "connected. The default is 0.0 which implies exact\n"
+    "(within one DBU) closing.\n"
+    "\n"
+    "This value is effective in polyline mode 3 and 4.\n"
+    "\n"
+    "\nThis property has been added in version 0.25.3.\n"
+  ) +
+  gsi::method_ext ("dxf_contour_accuracy", &get_dxf_contour_accuracy,
+    "@brief Gets the accuracy for contour closing\n"
+    "\n"
+    "\nThis property has been added in version 0.25.3.\n"
+  ) +
   gsi::method_ext ("dxf_render_texts_as_polygons=", &set_dxf_render_texts_as_polygons,
     "@brief If this option is set to true, text objects are rendered as polygons\n"
     "@args value\n"
@@ -373,6 +418,24 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
   gsi::method_ext ("dxf_render_texts_as_polygons", &get_dxf_render_texts_as_polygons,
     "@brief If this option is true, text objects are rendered as polygons\n"
     "\nThis property has been added in version 0.21.15.\n"
+  ) +
+  gsi::method_ext ("dxf_keep_layer_names?", &keep_layer_names,
+    "@brief Gets a value indicating whether layer names are kept\n"
+    "@return True, if layer names are kept.\n"
+    "\n"
+    "When set to true, no attempt is made to translate "
+    "layer names to GDS layer/datatype numbers. If set to false (the default), a layer named \"L2D15\" will be translated "
+    "to GDS layer 2, datatype 15.\n"
+    "\n"
+    "This method has been added in version 0.25.3."
+  ) +
+  gsi::method_ext ("dxf_keep_layer_names=", &set_keep_layer_names, gsi::arg ("keep"),
+    "@brief Gets a value indicating whether layer names are kept\n"
+    "@param keep True, if layer names are to be kept.\n"
+    "\n"
+    "See \\cif_keep_layer_names? for a description of this property.\n"
+    "\n"
+    "This method has been added in version 0.25.3."
   ) +
   gsi::method_ext ("dxf_keep_other_cells=", &set_dxf_keep_other_cells,
     "@brief If this option is set to true, all cells are kept, not only the top cell and it's children\n"

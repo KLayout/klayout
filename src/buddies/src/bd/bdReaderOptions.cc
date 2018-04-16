@@ -139,7 +139,7 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "The value is given in micrometer units. The default value is 1nm (0.001)."
                    )
         << tl::arg (group +
-                    "#--" + m_long_prefix + "keep-layer-names", &GenericReaderOptions::set_read_named_layers, "Keeps layer names",
+                    "#--" + m_long_prefix + "keep-layer-names", this, &GenericReaderOptions::set_read_named_layers, "Keeps layer names",
                     "If this option is used, layers names are kept as pure names and no attempt is made to\n"
                     "translate them into GDS layer/datatypes."
                    )
@@ -234,8 +234,8 @@ void GenericReaderOptions::set_layer_map (const std::string &lm)
 
 void GenericReaderOptions::set_read_named_layers (bool f)
 {
-  m_dxf_reader_options.read_named_layers = f;
-  m_cif_reader_options.read_named_layers = f;
+  m_dxf_reader_options.keep_layer_names = f;
+  m_cif_reader_options.keep_layer_names = f;
 }
 
 void GenericReaderOptions::set_dbu (double dbu)

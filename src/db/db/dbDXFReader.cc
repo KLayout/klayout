@@ -2743,6 +2743,8 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
     db::EdgesToContours e2c;
 
+    db::Coord accuracy = db::coord_traits<db::Coord>::rounded (m_contour_accuracy * m_unit / m_dbu);
+
     for (std::map <unsigned int, std::vector <db::Edge> >::iterator ce = collected_edges.begin (); ce != collected_edges.end (); ++ce) {
 
       std::vector <db::Edge> &edges = ce->second;
@@ -2750,20 +2752,18 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
         std::vector<db::Edge> cc_edges;
 
-        e2c.fill (edges.begin (), edges.end (), true /*unordered*/, &progress);
+        e2c.fill (edges.begin (), edges.end (), true /*unordered*/, accuracy, &progress);
 
         for (size_t c = 0; c < e2c.contours (); ++c) {
 
-          if (e2c.contour (c).back () == e2c.contour (c).front () || m_polyline_mode == 4 /*auto-close*/) {
+          if (e2c.contour_closed (c) || m_polyline_mode == 4 /*auto-close*/) {
 
             //  closed contour: store for later merging
             for (std::vector<db::Point>::const_iterator cc = e2c.contour (c).begin (); cc + 1 != e2c.contour (c).end (); ++cc) {
               cc_edges.push_back (db::Edge (cc[0], cc[1]));
             }
 
-            if (e2c.contour (c).back () != e2c.contour (c).front ()) {
-              cc_edges.push_back (db::Edge (e2c.contour (c).back (), e2c.contour (c).front ()));
-            }
+            cc_edges.push_back (db::Edge (e2c.contour (c).back (), e2c.contour (c).front ()));
 
           } else {
 

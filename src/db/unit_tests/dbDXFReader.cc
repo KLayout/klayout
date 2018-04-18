@@ -169,11 +169,6 @@ TEST(12)
   run_test (_this, "t12.dxf.gz", "t12_au.gds.gz");
 }
 
-TEST(13)
-{
-  run_test (_this, "t13.dxf.gz", "t13_au.gds.gz");
-}
-
 TEST(14)
 {
   db::DXFReaderOptions opt;
@@ -444,5 +439,25 @@ TEST(30)
   opt.circle_points = 1000;
   opt.circle_accuracy = 0.001;
   run_test (_this, "t30.dxf.gz", "t30d_au.gds.gz", opt);
+}
+
+//  accuracy
+TEST(31)
+{
+  db::DXFReaderOptions opt;
+  opt.dbu = 0.001;
+  opt.unit = 1000;
+
+  opt.contour_accuracy = 0;
+  run_test (_this, "t31.dxf.gz", "t31a_au.gds.gz", opt);
+
+  opt.contour_accuracy = 0.005;
+  run_test (_this, "t31.dxf.gz", "t31b_au.gds.gz", opt);
+
+  opt.contour_accuracy = 0.01;
+  run_test (_this, "t31.dxf.gz", "t31c_au.gds.gz", opt);
+
+  opt.contour_accuracy = 0.02;
+  run_test (_this, "t31.dxf.gz", "t31d_au.gds.gz", opt);
 }
 

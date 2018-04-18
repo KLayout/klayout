@@ -130,7 +130,8 @@ SOURCES = \
   gsiDeclDbLayoutDiff.cc \
   gsiDeclDbGlyphs.cc \
     dbVariableWidthPath.cc \
-    dbNamedLayerReader.cc
+    dbNamedLayerReader.cc \
+    dbEdgesToContours.cc
 
 HEADERS = \
   dbArray.h \

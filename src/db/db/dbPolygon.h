@@ -2272,8 +2272,8 @@ public:
 
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
   {
-    db::mem_stat (stat, purpose, cat, &m_ctrs, no_self, parent);
-    db::mem_stat (stat, purpose, cat, &m_bbox, no_self, parent);
+    db::mem_stat (stat, purpose, cat, m_ctrs, no_self, parent);
+    db::mem_stat (stat, purpose, cat, m_bbox, no_self, parent);
   }
 
 private:
@@ -2934,8 +2934,8 @@ public:
 
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const
   {
-    db::mem_stat (stat, purpose, cat, &m_hull, no_self, parent);
-    db::mem_stat (stat, purpose, cat, &m_bbox, no_self, parent);
+    db::mem_stat (stat, purpose, cat, m_hull, no_self, parent);
+    db::mem_stat (stat, purpose, cat, m_bbox, no_self, parent);
   }
 
 private:

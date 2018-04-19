@@ -24,6 +24,7 @@
 #include "layApplication.h"
 #include "layFileDialog.h"
 #include "layVersion.h"
+#include "laySignalHandler.h"
 #include "tlExceptions.h"
 #include "tlInternational.h"
 #include "tlException.h"
@@ -232,6 +233,7 @@ klayout_main_cont (int &argc, char **argv)
       app.reset (new lay::NonGuiApplication (argc, argv));
     } else {
       app.reset (new lay::GuiApplication (argc, argv));
+      lay::enable_signal_handler_gui (true);
     }
 
     app->parse_cmd (argc, argv);

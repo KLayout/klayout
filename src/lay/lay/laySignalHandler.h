@@ -24,6 +24,7 @@
 #define HDR_laySignalHandler
 
 #include <QString>
+#include "layCommon.h"
 
 namespace lay
 {
@@ -37,6 +38,11 @@ void install_signal_handlers ();
  *  @brief For debugging purposes: get the symbol name from a memory address
  */
 QString get_symbol_name_from_address (const QString &mod_name, size_t addr);
+
+/**
+ *  @brief Enables GUI support for signal handlers
+ */
+void LAY_PUBLIC enable_signal_handler_gui (bool en);
 
 }
 

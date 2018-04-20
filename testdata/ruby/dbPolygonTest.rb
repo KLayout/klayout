@@ -731,6 +731,36 @@ class DBPolygon_TestClass < TestBase
 
   end
 
+  def test_splitPolygon
+
+    pts = []
+    pts << RBA::Point::new(0, 0)
+    pts << RBA::Point::new(0, 1000)
+    pts << RBA::Point::new(100, 1000)
+    pts << RBA::Point::new(100, 100)
+    pts << RBA::Point::new(1000, 100)
+    pts << RBA::Point::new(1000, 0)
+    split = RBA::Polygon::new(pts).split
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+
+    split = RBA::SimplePolygon::new(pts).split
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+
+    pts = []
+    pts << RBA::DPoint::new(0, 0)
+    pts << RBA::DPoint::new(0, 1000)
+    pts << RBA::DPoint::new(100, 1000)
+    pts << RBA::DPoint::new(100, 100)
+    pts << RBA::DPoint::new(1000, 100)
+    pts << RBA::DPoint::new(1000, 0)
+    split = RBA::DPolygon::new(pts).split
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+
+    split = RBA::DSimplePolygon::new(pts).split
+    assert_equal(split.collect { |p| p.to_s }.join(";"), "(0,0;0,100;1000,100;1000,0);(0,100;0,1000;100,1000;100,100)")
+
+  end
+
 end
 
 load("test_epilogue.rb")

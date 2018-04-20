@@ -230,6 +230,13 @@ struct simple_polygon_defs
     return db::interact (*p, spoly);
   }
 
+  static std::vector<C> split_poly (const C *p)
+  {
+    std::vector<C> parts;
+    db::split_polygon (*p, parts);
+    return parts;
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -494,6 +501,19 @@ struct simple_polygon_defs
       "@/code\n"
       "\n"
       "This method was introduced in version 0.25.\n"
+    ) +
+    method_ext ("split", &split_poly,
+      "@brief Splits the polygon into two or more parts\n"
+      "This method will break the polygon into parts. The exact breaking algorithm is unspecified, the "
+      "result are smaller polygons of roughly equal number of points and 'less concave' nature. "
+      "Usually the returned polygon set consists of two polygons, but there can be more. "
+      "The merged region of the resulting polygons equals the original polygon with the exception of "
+      "small snapping effects at new vertexes.\n"
+      "\n"
+      "The intended use for this method is a iteratively split polygons until the satisfy some "
+      "maximum number of points limit.\n"
+      "\n"
+      "This method has been introduced in version 0.25.3."
     ) +
     method_ext ("area", &area,
       "@brief The area of the polygon\n"
@@ -1058,6 +1078,13 @@ struct polygon_defs
     return db::interact (*p, spoly);
   }
 
+  static std::vector<C> split_spoly (const C *p)
+  {
+    std::vector<C> parts;
+    db::split_polygon (*p, parts);
+    return parts;
+  }
+
   static gsi::Methods methods ()
   {
     return
@@ -1485,6 +1512,19 @@ struct polygon_defs
       "@/code\n"
       "\n"
       "This method was introduced in version 0.25.\n"
+    ) +
+    method_ext ("split", &split_spoly,
+      "@brief Splits the polygon into two or more parts\n"
+      "This method will break the polygon into parts. The exact breaking algorithm is unspecified, the "
+      "result are smaller polygons of roughly equal number of points and 'less concave' nature. "
+      "Usually the returned polygon set consists of two polygons, but there can be more. "
+      "The merged region of the resulting polygons equals the original polygon with the exception of "
+      "small snapping effects at new vertexes.\n"
+      "\n"
+      "The intended use for this method is a iteratively split polygons until the satisfy some "
+      "maximum number of points limit.\n"
+      "\n"
+      "This method has been introduced in version 0.25.3."
     ) +
     method_ext ("area", &area,
       "@brief The area of the polygon\n"

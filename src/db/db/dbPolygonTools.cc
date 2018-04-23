@@ -121,6 +121,11 @@ struct cut_polygon_edge
     : contour (c), index (n), projected (p), point (pt), last_point (lpt)
   { }
 
+  edge_type edge () const
+  {
+    return edge_type (last_point, point);
+  }
+
   int contour;
   unsigned int index;
   projection_type projected;
@@ -137,151 +142,55 @@ struct cut_polygon_segment
   CuttingEdgeType leave;
   CuttingEdgeType enter;
   int segment;
-  bool hole;
 
   cut_polygon_segment ()
-    : leave (), enter (), segment (-1), hole (false)
+    : leave (), enter (), segment (-1)
   {
     // .. nothing yet ..
   }
+};
 
-  bool operator< (const cut_polygon_segment &b) const
+template <class CuttingEdgeType>
+struct loose_end_struct
+{
+public:
+  typedef typename CuttingEdgeType::edge_type edge_type;
+  typedef typename CuttingEdgeType::projection_type projection_type;
+
+  loose_end_struct (bool _enter, typename std::vector<cut_polygon_segment<CuttingEdgeType> >::const_iterator _iter)
+    : enter (_enter), iter (_iter)
   {
-    projection_type amin = std::min (leave.projected, enter.projected);
-    projection_type bmin = std::min (b.leave.projected, b.enter.projected);
-
-    projection_type amax = std::max (leave.projected, enter.projected);
-    projection_type bmax = std::max (b.leave.projected, b.enter.projected);
-
-    if (amin != bmin) {
-      return amin < bmin;
-    } else {
-      int vs = db::vprod_sign (min_edge (), b.min_edge ());
-      if (vs != 0) {
-        return vs > 0;
-      } else if (amax == amin) {
-        return bmax != bmin;
-      } else if (bmax == bmin) {
-        return false;
-      } else {
-        return amax > bmax;
-      }
-    }
+    //  .. nothing yet ..
   }
 
-  bool after (const cut_polygon_segment &b) const
-  {
-    projection_type pb_max = std::max (b.leave.projected, b.enter.projected);
-    projection_type pa_min = std::min (leave.projected, enter.projected);
+  bool enter;
+  typename std::vector<cut_polygon_segment<CuttingEdgeType> >::const_iterator iter;
 
-    if (pb_max < pa_min) {
-      return true;
-    } else if (pb_max > pa_min) {
-      return false;
-    } else {
-      return db::vprod_sign (min_edge (), b.max_edge ()) <= 0;
-    }
+  edge_type edge () const
+  {
+    return enter ? iter->enter.edge () : iter->leave.edge ();
   }
 
-  edge_type max_edge () const
+  projection_type proj () const
   {
-    if (leave.projected > enter.projected) {
-      return edge_type (leave.last_point, leave.point);
-    } else if (leave.projected < enter.projected) {
-      return edge_type (enter.last_point, enter.point);
-    } else {
-      int vs = db::vprod_sign (leave.point - leave.last_point, enter.point - enter.last_point);
-      if (vs < 0) {
-        return edge_type (leave.last_point, leave.point);
-      } else {
-        return edge_type (enter.last_point, enter.point);
-      }
-    }
+    return enter ? iter->enter.projected : iter->leave.projected;
   }
 
-  edge_type min_edge () const
+  bool operator< (const loose_end_struct<CuttingEdgeType> &other) const
   {
-    if (leave.projected < enter.projected) {
-      return edge_type (leave.last_point, leave.point);
-    } else if (leave.projected > enter.projected) {
-      return edge_type (enter.last_point, enter.point);
+    if (proj () != other.proj ()) {
+      return proj () < other.proj ();
     } else {
-      int vs = db::vprod_sign (leave.point - leave.last_point, enter.point - enter.last_point);
-      if (vs > 0) {
-        return edge_type (leave.last_point, leave.point);
-      } else {
-        return edge_type (enter.last_point, enter.point);
-      }
+      return db::vprod_sign (edge (), other.edge ()) > 0;
     }
   }
 };
-
-template <class CuttingEdge, class CuttingEdgeSegment>
-static void cut_polygon_produce_cut_points (typename std::vector<CuttingEdgeSegment>::const_iterator from, typename std::vector<CuttingEdgeSegment>::const_iterator to, std::vector<CuttingEdge> &output, bool holes)
-{
-  typename std::vector<CuttingEdgeSegment>::const_iterator e = from;
-  while (e != to) {
-
-    //  collect "illegal" segments (i.e. holes not being bracketed by a contour
-    typename std::vector<CuttingEdgeSegment>::const_iterator e1 = e;
-    for ( ; e != to && e->hole != holes; ++e) {
-      ;
-    }
-
-    if (e == to) {
-      //  In this case we have only wrong typed segments within the wrong bracketing segment (i.e. holes inside a hole bracket) or on the outside. 
-      //  Sort the leaving and entering edges correctly.
-      for (typename std::vector<CuttingEdgeSegment>::const_iterator o = e1; o != e; ++o) {
-        if (! holes) {
-          output.push_back (o->leave);
-          output.push_back (o->enter);
-        } else {
-          output.push_back (o->enter);
-          output.push_back (o->leave);
-        }
-      }
-      return;
-    }
-
-    typename std::vector<CuttingEdgeSegment>::const_iterator ee = e + 1;
-    for ( ; ee != to; ++ee) {
-      if (e->hole == holes && ee->after (*e)) {
-        break;
-      }
-    }
-
-    if (e->hole) {
-      output.push_back (e->enter);
-    } else {
-      output.push_back (e->leave);
-    }
-
-    //  include all illegal segments into the first "good" segment, so we have a correct hierarchy at least.
-    if (e1 != e) {
-      cut_polygon_produce_cut_points<CuttingEdge, CuttingEdgeSegment> (e1, e, output, !holes);
-    } 
-
-    if (e + 1 != ee) {
-      cut_polygon_produce_cut_points<CuttingEdge, CuttingEdgeSegment> (e + 1, ee, output, !holes);
-    }
-
-    if (e->hole) {
-      output.push_back (e->leave);
-    } else {
-      output.push_back (e->enter);
-    }
-
-    e = ee;
-
-  }
-}
 
 template <class PolygonType, class Edge>
 void cut_polygon_internal (const PolygonType &input, const Edge &line, CutPolygonReceiverBase *right_of_line)
 {
   typedef typename PolygonType::point_type point_type;
   typedef typename PolygonType::coord_type coord_type;
-  typedef typename PolygonType::area_type area_type;
   typedef typename PolygonType::contour_type contour_type;
   typedef db::edge<coord_type> edge_type;
   typedef cut_polygon_edge<point_type> cut_polygon_edge_type;
@@ -352,34 +261,6 @@ void cut_polygon_internal (const PolygonType &input, const Edge &line, CutPolygo
         cutting_segments.pop_back ();
       }
 
-      //  assign hull/hole identities ..
-      for (typename std::vector<cutting_segment_type>::iterator c = cutting_segments.begin () + nfirst; c != cutting_segments.end (); ++c) {
-
-        unsigned int n = (unsigned int) contour.size ();
-        unsigned int n1 = c->enter.index;
-        unsigned int n2 = c->leave.index;
-
-        //  compute area of the segment and derive the hull part/hole part nature of the segment from the sign
-        area_type a = 0;
-        point_type pl = c->enter.point;
-        for (unsigned int i = n1; ; ) {
-          a += db::vprod (pl - point_type (), contour[i] - point_type ());
-          pl = contour[i];
-          if (i == n2) {
-            break;
-          }
-          ++i;
-          if (i == n) {
-            i = 0;
-          }
-        }
-        a += db::vprod (pl - point_type (), c->leave.point - point_type ());
-        a += db::vprod (c->leave.point - point_type (), c->enter.point - point_type ());
-
-        c->hole = (a > 0);
-
-      }
-
     } else if (line.side_of (contour[0]) < 0) {
 
       if (do_hole_assignment) {
@@ -403,12 +284,47 @@ void cut_polygon_internal (const PolygonType &input, const Edge &line, CutPolygo
 
   }
 
-  std::sort (cutting_segments.begin (), cutting_segments.end ());
+  //  build a table of the loose ends
+
+  std::vector<loose_end_struct<cut_polygon_edge_type> > loose_ends;
+  loose_ends.reserve (cutting_segments.size () * 2);
+
+  for (typename std::vector<cutting_segment_type>::const_iterator i = cutting_segments.begin (); i != cutting_segments.end (); ++i) {
+    loose_ends.push_back (loose_end_struct<cut_polygon_edge_type> (true, i));
+    loose_ends.push_back (loose_end_struct<cut_polygon_edge_type> (false, i));
+  }
+
+  std::stable_sort (loose_ends.begin (), loose_ends.end ());
+
+  //  bring the points in a strict enter/leave order if possible
+
+  bool enter = false;
+  for (typename std::vector<loose_end_struct<cut_polygon_edge_type> >::iterator i = loose_ends.begin (); i != loose_ends.end (); ++i) {
+    if (i->enter != enter) {
+      typename std::vector<loose_end_struct<cut_polygon_edge_type> >::iterator j = i + 1;
+      typename std::vector<loose_end_struct<cut_polygon_edge_type> >::iterator jj = loose_ends.end ();
+      for ( ; j != loose_ends.end () && !(*j < *i) && !(*i < *j); ++j) {
+        if (j->enter == enter) {
+          jj = j;
+          break;
+        }
+      }
+      if (jj == loose_ends.end ()) {
+        tl_assert (false); // @@@ cannot cut
+      }
+      std::swap (*jj, *i);
+    }
+    enter = !enter;
+  }
+
+  //  connect the segments a pair each
 
   std::vector<cut_polygon_edge_type> cutting_edges;
-  cutting_edges.reserve (cutting_segments.size () * 2);
+  cutting_edges.reserve (loose_ends.size ());
 
-  cut_polygon_produce_cut_points<cut_polygon_edge_type, cutting_segment_type> (typename std::vector<cutting_segment_type>::const_iterator (cutting_segments.begin ()), typename std::vector<cutting_segment_type>::const_iterator (cutting_segments.end ()), cutting_edges, false);
+  for (typename std::vector<loose_end_struct<cut_polygon_edge_type> >::iterator i = loose_ends.begin (); i != loose_ends.end (); ++i) {
+    cutting_edges.push_back (i->enter ? i->iter->enter : i->iter->leave);
+  }
 
   std::vector<point_type> contour_points;
   typedef std::map <std::pair<int, int>, std::pair<typename std::vector<cut_polygon_edge_type>::iterator, typename std::vector<cut_polygon_edge_type>::iterator> > cut_point_map_type;

@@ -731,8 +731,13 @@ PolygonGenerator::join_contours (db::Coord x)
         db::Coord xprev = db::coord_traits<db::Coord>::rounded (edge_xaty (eprev, m_y));
         db::Point pprev (xprev, m_y);
 
-        tl_assert (c1.size () >= 2);
+        //  remove collinear edges along the cut line
         cprev.back () = pprev;
+        while (cprev.size () > 1 && cprev.end ()[-2].y () == m_y && cprev.end ()[-1].y () == m_y) {
+          cprev.pop_back ();
+        }
+
+        tl_assert (c1.size () >= 2);
         if ((c1.begin () + 1)->y () == m_y) {
           cprev.insert (cprev.end (), c1.begin () + 1, c1.end ());
         } else {

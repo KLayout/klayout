@@ -2295,3 +2295,54 @@ TEST(101)
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out[0].to_string (), "(0,0;0,9;1,10;10,10;10,0)");
 }
+
+TEST(102)
+{
+  db::EdgeProcessor ep;
+
+  {
+    db::Point pts[] = {
+      db::Point (0, 0),
+      db::Point (0, 1000),
+      db::Point (1000, 1000),
+      db::Point (1000, 0)
+    };
+    db::Polygon p;
+    p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    ep.insert (p, 0);
+  }
+
+  {
+    db::Point pts[] = {
+      db::Point (100, 100),
+      db::Point (100, 200),
+      db::Point (200, 200),
+      db::Point (200, 100)
+    };
+    db::Polygon p;
+    p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    ep.insert (p, 1);
+  }
+
+  {
+    db::Point pts[] = {
+      db::Point (500, 100),
+      db::Point (500, 200),
+      db::Point (600, 200),
+      db::Point (600, 100)
+    };
+    db::Polygon p;
+    p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    ep.insert (p, 1);
+  }
+
+  std::vector<db::Polygon> out;
+  db::PolygonContainer pc (out);
+  db::PolygonGenerator pg (pc, true, true);
+  db::BooleanOp op (db::BooleanOp::ANotB);
+
+  ep.process (pg, op);
+
+  EXPECT_EQ (out.size (), size_t (1));
+  EXPECT_EQ (out[0].to_string (), "(0,0;0,200;100,200;100,100;200,100;200,200;500,200;500,100;600,100;600,200;0,200;0,1000;1000,1000;1000,0)");
+}

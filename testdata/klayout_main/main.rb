@@ -60,14 +60,25 @@ class KLayoutMain_TestClass < TestBase
   def test_4
 
     # Application class
+    if !RBA.constants.find { |x| x == :QDialog }
 
-    # QCoreApplication for (headless) mode
-    out = `./klayout -b -r #{File.join(File.dirname(__FILE__), "test_app.rb")}`
-    assert_equal(out, "RBA::Application superclass RBA::QCoreApplication_Native\nMainWindow is not there\n")
+      out = `./klayout -b -r #{File.join(File.dirname(__FILE__), "test_app.rb")}`
+      assert_equal(out, "RBA::Application superclass Object\nMainWindow is not there\n")
 
-    # QApplication for GUI mode
-    out = `./klayout -z -nc -rx -r #{File.join(File.dirname(__FILE__), "test_app.rb")}`
-    assert_equal(out, "RBA::Application superclass RBA::QApplication_Native\nMainWindow is there\n")
+      out = `./klayout -z -nc -rx -r #{File.join(File.dirname(__FILE__), "test_app.rb")}`
+      assert_equal(out, "RBA::Application superclass Object\nMainWindow is there\n")
+
+    else
+ 
+      # QCoreApplication for (headless) mode
+      out = `./klayout -b -r #{File.join(File.dirname(__FILE__), "test_app.rb")}`
+      assert_equal(out, "RBA::Application superclass RBA::QCoreApplication_Native\nMainWindow is not there\n")
+
+      # QApplication for GUI mode
+      out = `./klayout -z -nc -rx -r #{File.join(File.dirname(__FILE__), "test_app.rb")}`
+      assert_equal(out, "RBA::Application superclass RBA::QApplication_Native\nMainWindow is there\n")
+
+    end
 
   end
 

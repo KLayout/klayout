@@ -44,6 +44,8 @@ class DBTrans_TestClass < TestBase
     assert_equal( e.to_s, "m135 0,0" )
     assert_equal( e2.to_s, "m135 0,0" )
     assert_equal( f.to_s, "m135 17,5" )
+    assert_equal( RBA::DTrans::new( RBA::Trans::M135, RBA::DPoint::new( 1.2, 0.25 )).to_itype(0.001).to_s, "m135 1200,250" )
+    assert_equal( RBA::Trans::new( RBA::Trans::M135, RBA::Point::new( 1200, 250 )).to_dtype(0.001).to_s, "m135 1.2,0.25" )
     assert_equal( RBA::DTrans::from_s(f.to_s).to_s, f.to_s )
 
     assert_equal( b.trans( RBA::DPoint::new( 1, 0 )).to_s, "17,4" )

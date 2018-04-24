@@ -479,7 +479,7 @@ static db::DTrans *dtrans_from_itrans (const db::Trans &t)
 static db::Trans dtrans_to_trans (const db::DTrans *t, double dbu)
 {
   db::Trans f (*t);
-  f.disp (db::Trans::displacement_type (f.disp () * (1.0 / dbu)));
+  f.disp (db::Trans::displacement_type (t->disp () * (1.0 / dbu)));
   return f;
 }
 

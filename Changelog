@@ -1,3 +1,48 @@
+0.25.3
+
+* Enhancement: New "split" method for polygons
+       This method will fragment the polygons into two or more
+       smaller parts for reducing their vertex count.
+* Enhancement: DXF and CIF "keep layer names"
+       If this option is set in the reader options, layer names
+       are not translated into GDS layer/datatype pairs. 
+       Specifically a layer called "L5" for example is not
+       translated to 5/0 and to "L5D0" on output correspondingly.
+       The buddy script option is "--keep-layer-names".
+* Enhancement: DXF contour joining accuracy 
+       On the DXF reader's options, a contour joining accuracy
+       can be specified. Small gaps smaller than this accuracy
+       will be closed when forming joined contours from edges.
+       The buddy script option is --dxf-contour-accuracy=value.
+* Bugfix: DXF display issue
+       In some cases, DXF cell instances did not trigger bounding
+       box update and the cells only got visible after save and
+       load.
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/117
+       DTrans#itype was broken.
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/116
+       Fixed a polygon decomposition bug when writing GDS files
+       with big polygons with many holes. As a side effect, the
+       polygons with many holes computed by a NOT operation for
+       example are less complex and spikes in the cutlines are
+       avoided.
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/115
+       Reader options were not persisted.
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/114
+       Custom line styles not loaded from tech's layer properties
+       file.
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/112
+       Salt package repository relative paths have not been working.
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/109
+       Issues with Python 3 and shape properties - property
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/108
+       Bugfix on Box#enlarge and Box#moved for empty boxes.
+       keys generated with Python 3 could not be written to GDS2.
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/107
+       Undo not working with shapes.
+* Enhancement: https://github.com/klayoutmatthias/klayout/issues/106
+       Search & replace help page enhancements.
+
 0.25.2          (2018-03-20):
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/90
       DRC: "extended" was not working as expected with "joined = true"

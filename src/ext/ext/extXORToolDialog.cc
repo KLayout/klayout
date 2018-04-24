@@ -663,8 +663,6 @@ XORWorker::do_perform (const XORTask *xor_task)
   unsigned int tol_index = 0;
   for (std::vector <db::Coord>::const_iterator t = mp_job->tolerances ().begin (); t != mp_job->tolerances ().end (); ++t, ++tol_index) {
 
-    mp_job->next_progress ();
-
     const std::vector<unsigned int> &la = xor_task->la ();
     const std::vector<unsigned int> &lb = xor_task->lb ();
 
@@ -869,6 +867,8 @@ XORWorker::do_perform (const XORTask *xor_task)
 
     }
     
+    mp_job->next_progress ();
+
   }
 
 }

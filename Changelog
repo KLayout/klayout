@@ -18,6 +18,9 @@
        In some cases, DXF cell instances did not trigger bounding
        box update and the cells only got visible after save and
        load.
+* Bugfix: XOR progress is more realistic
+       The progress is updated after the layer has been computed,
+       not before.
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/117
        DTrans#itype was broken.
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/116

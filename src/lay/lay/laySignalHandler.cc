@@ -53,6 +53,13 @@
 namespace lay
 {
 
+static bool s_sh_has_gui = false;
+
+void enable_signal_handler_gui (bool en)
+{
+  s_sh_has_gui = en;
+}
+
 #if defined(WIN32)
 
 static QString
@@ -216,7 +223,7 @@ LONG WINAPI ExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
 
   SymCleanup (process);
 
-  bool has_gui = lay::ApplicationBase::instance () && lay::ApplicationBase::instance ()->has_gui ();
+  bool has_gui = s_sh_has_gui && lay::ApplicationBase::instance () && lay::ApplicationBase::instance ()->has_gui ();
   if (has_gui) {
 
     //  YES! I! KNOW!
@@ -273,13 +280,6 @@ void install_signal_handlers ()
 QString get_symbol_name_from_address (const QString &, size_t)
 {
   return QString::fromUtf8 ("n/a");
-}
-
-static bool s_sh_has_gui = false;
-
-void enable_signal_handler_gui (bool en)
-{
-  s_sh_has_gui = en;
 }
 
 void signal_handler (int signo, siginfo_t *si, void *)

@@ -32,27 +32,17 @@
 #include <QDir>
 #include <stdlib.h>
 
-void run_test (tl::TestBase *_this, const char *file, const char *file_ref)
+void run_test (tl::TestBase *_this, const char *file, const char *file_ref, bool priv = false, const db::GDS2WriterOptions &opt = db::GDS2WriterOptions ())
 {
   db::Manager m;
   db::Layout layout_org (&m);
   {
-    std::string fn (tl::testsrc ());
+    std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
     fn += "/testdata/gds/";
     fn += file;
     tl::InputStream stream (fn);
     db::Reader reader (stream);
     reader.read (layout_org);
-  }
-
-  db::Layout layout_ref (&m);
-  {
-    std::string fn (tl::testsrc ());
-    fn += "/testdata/gds/";
-    fn += file_ref;
-    tl::InputStream stream (fn);
-    db::Reader reader (stream);
-    reader.read (layout_ref);
   }
 
   std::string tmp_file = _this->tmp_file ("tmp.gds");
@@ -61,6 +51,7 @@ void run_test (tl::TestBase *_this, const char *file, const char *file_ref)
     tl::OutputStream stream (tmp_file);
     db::GDS2Writer writer;
     db::SaveLayoutOptions options;
+    options.set_options (new db::GDS2WriterOptions (opt));
     writer.write (layout_org, stream, options);
   }
 
@@ -69,6 +60,16 @@ void run_test (tl::TestBase *_this, const char *file, const char *file_ref)
     tl::InputStream file (tmp_file);
     db::Reader reader (file);
     reader.read (layout_read);
+  }
+
+  db::Layout layout_ref (&m);
+  {
+    std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
+    fn += "/testdata/gds/";
+    fn += file_ref;
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (layout_ref);
   }
 
   bool equal = db::compare_layouts (layout_read, layout_ref, db::layout_diff::f_verbose, 0);
@@ -1126,4 +1127,21 @@ TEST(117)
   db::Polygon pp;
   s1.polygon (pp);
   EXPECT_EQ (pp == poly, true);
+}
+
+//  Extreme fracturing by max. points
+TEST(120)
+{
+  db::GDS2WriterOptions opt;
+  opt.max_vertex_count = 4;
+  run_test (_this, "t120a.oas.gz", "t120a_au.gds.gz", true, opt);
+  run_test (_this, "t120b.oas.gz", "t120b_au.gds.gz", true, opt);
+}
+
+//  Extreme fracturing by max. points
+TEST(121)
+{
+  db::GDS2WriterOptions opt;
+  opt.max_vertex_count = 4;
+  run_test (_this, "t121.oas.gz", "t121_au.gds.gz", true, opt);
 }

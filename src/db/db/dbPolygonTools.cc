@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace db
 {
@@ -187,7 +188,7 @@ public:
 };
 
 template <class PolygonType, class Edge>
-void cut_polygon_internal (const PolygonType &input, const Edge &line, CutPolygonReceiverBase *right_of_line)
+static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, CutPolygonReceiverBase *right_of_line)
 {
   typedef typename PolygonType::point_type point_type;
   typedef typename PolygonType::coord_type coord_type;
@@ -268,7 +269,7 @@ void cut_polygon_internal (const PolygonType &input, const Edge &line, CutPolygo
         if (nc == 0) {
           //  the hull is fully on the right side -> just output the input polygon and that's it.
           right_of_line->put (&input);
-          return;
+          return true;
         } else {
           //  remember hole contours for later assignment
           hole_polygons.push_back (PolygonType ());
@@ -310,7 +311,7 @@ void cut_polygon_internal (const PolygonType &input, const Edge &line, CutPolygo
         }
       }
       if (jj == loose_ends.end ()) {
-        tl_assert (false); // @@@ cannot cut
+        return false; //  cannot cut (self-overlapping, self-intersecting)
       }
       std::swap (*jj, *i);
     }
@@ -454,12 +455,156 @@ void cut_polygon_internal (const PolygonType &input, const Edge &line, CutPolygo
       right_of_line->put (&*hole);
     }
   }
+
+  return true;
 }
 
-template DB_PUBLIC void cut_polygon_internal<> (const db::Polygon &polygon, const db::Polygon::edge_type &line, CutPolygonReceiverBase *right_of_line);
-template DB_PUBLIC void cut_polygon_internal<> (const db::SimplePolygon &polygon, const db::SimplePolygon::edge_type &line, CutPolygonReceiverBase *right_of_line);
-template DB_PUBLIC void cut_polygon_internal<> (const db::DPolygon &polygon, const db::DPolygon::edge_type &line, CutPolygonReceiverBase *right_of_line);
-template DB_PUBLIC void cut_polygon_internal<> (const db::DSimplePolygon &polygon, const db::DSimplePolygon::edge_type &line, CutPolygonReceiverBase *right_of_line);
+namespace
+{
+
+  template <class PolygonType>
+  struct get_sink_type;
+
+  template <>
+  struct get_sink_type<db::Polygon> { typedef db::PolygonSink result; };
+
+  template <>
+  struct get_sink_type<db::SimplePolygon> { typedef db::SimplePolygonSink result; };
+
+  /**
+   *  @brief A polygon sink for the edge processor that feeds the polygon into the cut algorithm
+   */
+  template <class Sink, class PolygonType, class Edge>
+  struct cut_polygon_sink
+    : public Sink
+  {
+    cut_polygon_sink (const Edge &_line, CutPolygonReceiverBase *_right_of_line)
+      : line (_line), right_of_line (_right_of_line)
+    {
+      //  .. nothing yet ..
+    }
+
+    virtual void put (const PolygonType &poly)
+    {
+      tl_assert (_cut_polygon_internal (poly, line, right_of_line));
+    }
+
+    Edge line;
+    CutPolygonReceiverBase *right_of_line;
+  };
+
+  /**
+   *  @brief The cut algorithm driver with fallback to polygon merging when the cut fails
+   *  TODO: this is kind of inefficient as we will first merge all and the cut just a half.
+   *  This means for producing both parts we do this twice. But remember, this is just a
+   *  fallback.
+   */
+  template <class PolygonType, class Edge>
+  void cut_polygon_internal_int (const PolygonType &input, const Edge &line, CutPolygonReceiverBase *right_of_line)
+  {
+    bool ok = _cut_polygon_internal (input, line, right_of_line);
+    if (! ok) {
+
+      //  If the cut operation fails on the plain input, merge the input polygon and try again
+
+      db::EdgeProcessor ep;
+      ep.insert_sequence (input.begin_edge ());
+      db::SimpleMerge op;
+
+      cut_polygon_sink<typename get_sink_type<PolygonType>::result, PolygonType, Edge> sink (line, right_of_line);
+      db::PolygonGenerator pg (sink);
+      ep.process (pg, op);
+
+    }
+
+  }
+
+  /**
+   *  A transforming receiver that is put between a int cut algorithm and the double output receiver
+   */
+  template <class PolygonType, class IPolygonType>
+  class cut_polygon_receiver_double_impl
+    : public CutPolygonReceiverBase
+  {
+  public:
+    cut_polygon_receiver_double_impl ()
+      : mp_next (0)
+    { }
+
+    void set_next (CutPolygonReceiverBase *next)
+    {
+      mp_next = next;
+    }
+
+    void set_trans (const db::CplxTrans &tr)
+    {
+      m_tr = tr;
+    }
+
+    virtual void put (const void *p)
+    {
+      PolygonType pp = ((const IPolygonType *) p)->transformed (m_tr, false);
+      mp_next->put ((void *) &pp);
+    }
+
+  private:
+    CutPolygonReceiverBase *mp_next;
+    db::CplxTrans m_tr;
+  };
+
+  template <class PolygonType>
+  class cut_polygon_receiver_double;
+
+  //  template specializations for the double types
+  template <> class cut_polygon_receiver_double<db::DPolygon>       : public cut_polygon_receiver_double_impl<db::DPolygon, db::Polygon> { };
+  template <> class cut_polygon_receiver_double<db::DSimplePolygon> : public cut_polygon_receiver_double_impl<db::DSimplePolygon, db::SimplePolygon> { };
+
+  /**
+   *  @brief The cut algorithm driver for double types
+   *  This driver will first try to guess a database unit (based on the bounding box) and then
+   *  transform the polygon to int. On output, the polygon is transformed back to double.
+   */
+  template <class PolygonType, class Edge>
+  void cut_polygon_internal_double (const PolygonType &input, const Edge &line, CutPolygonReceiverBase *right_of_line)
+  {
+    db::DBox bbox = input.box ();
+    bbox += db::DBox (0, 0, 0, 0);
+    bbox += line.bbox ();
+
+    //  guess DBU
+    double dbu = std::max (1e-10, std::max (bbox.width (), bbox.height ()) / (std::numeric_limits<db::Coord>::max () / 2));
+    dbu = pow (10.0, ceil (log10 (dbu)));
+
+    db::CplxTrans tr (dbu);
+    cut_polygon_receiver_double<PolygonType> rec;
+    rec.set_trans (tr);
+    rec.set_next (right_of_line);
+
+    cut_polygon_internal_int (input.transformed (tr.inverted (), false), line.transformed (tr.inverted ()), &rec);
+  }
+
+}
+
+template<> DB_PUBLIC void cut_polygon_internal (const db::Polygon &polygon, const db::Polygon::edge_type &line, CutPolygonReceiverBase *right_of_line)
+{
+  cut_polygon_internal_int (polygon, line, right_of_line);
+}
+
+template<> DB_PUBLIC void cut_polygon_internal (const db::SimplePolygon &polygon, const db::SimplePolygon::edge_type &line, CutPolygonReceiverBase *right_of_line)
+{
+  cut_polygon_internal_int (polygon, line, right_of_line);
+}
+
+template<> DB_PUBLIC void cut_polygon_internal (const db::DPolygon &polygon, const db::DPolygon::edge_type &line, CutPolygonReceiverBase *right_of_line)
+{
+  cut_polygon_internal_double (polygon, line, right_of_line);
+}
+
+template<> DB_PUBLIC void cut_polygon_internal (const db::DSimplePolygon &polygon, const db::DSimplePolygon::edge_type &line, CutPolygonReceiverBase *right_of_line)
+{
+  cut_polygon_internal_double (polygon, line, right_of_line);
+}
+
 
 // -------------------------------------------------------------------------
 //  Implementation of split_polygon

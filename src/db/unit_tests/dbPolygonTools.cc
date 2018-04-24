@@ -2069,3 +2069,175 @@ TEST(322)
   );
 }
 
+//  cut self-overlapping polygon
+TEST(400)
+{
+  std::vector <db::Point> c;
+  c.push_back (db::Point (0, 0));
+  c.push_back (db::Point (0, 100));
+  c.push_back (db::Point (1000, 100));
+  c.push_back (db::Point (1000, 1000));
+  c.push_back (db::Point (0, 1000));
+  c.push_back (db::Point (0, 900));
+  c.push_back (db::Point (900, 900));
+  c.push_back (db::Point (900, 0));
+
+  {
+    db::Polygon in;
+    in.assign_hull (c.begin (), c.end ());
+    std::vector<db::Polygon> right_of;
+
+    db::cut_polygon (in, db::Edge (db::Point (500, 0), db::Point (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (2));
+    EXPECT_EQ (right_of[0].to_string (), "(500,0;500,100;900,100;900,0)");
+    EXPECT_EQ (right_of[1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
+
+    right_of.clear ();
+    db::cut_polygon (in, db::Edge (db::Point (500, 1), db::Point (500, 0)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (2));
+    EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;500,100;500,0)");
+    EXPECT_EQ (right_of[1].to_string (), "(0,900;0,1000;500,1000;500,900)");
+  }
+
+  {
+    db::SimplePolygon in;
+    in.assign_hull (c.begin (), c.end ());
+    std::vector<db::SimplePolygon> right_of;
+
+    db::cut_polygon (in, db::Edge (db::Point (500, 0), db::Point (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (2));
+    EXPECT_EQ (right_of[0].to_string (), "(500,0;500,100;900,100;900,0)");
+    EXPECT_EQ (right_of[1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
+
+    right_of.clear ();
+    db::cut_polygon (in, db::Edge (db::Point (500, 1), db::Point (500, 0)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (2));
+    EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;500,100;500,0)");
+    EXPECT_EQ (right_of[1].to_string (), "(0,900;0,1000;500,1000;500,900)");
+  }
+}
+
+//  cut self-overlapping polygon (with double types)
+TEST(401)
+{
+  std::vector <db::DPoint> c;
+  c.push_back (db::DPoint (0, 0));
+  c.push_back (db::DPoint (0, 100));
+  c.push_back (db::DPoint (1000, 100));
+  c.push_back (db::DPoint (1000, 1000));
+  c.push_back (db::DPoint (0, 1000));
+  c.push_back (db::DPoint (0, 900));
+  c.push_back (db::DPoint (900, 900));
+  c.push_back (db::DPoint (900, 0));
+
+  {
+    db::DPolygon in;
+    in.assign_hull (c.begin (), c.end ());
+    std::vector<db::DPolygon> right_of;
+
+    db::cut_polygon (in, db::DEdge (db::DPoint (500, 0), db::DPoint (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (2));
+    EXPECT_EQ (right_of[0].to_string (), "(500,0;500,100;900,100;900,0)");
+    EXPECT_EQ (right_of[1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
+
+    right_of.clear ();
+    db::cut_polygon (in, db::DEdge (db::DPoint (500, 1), db::DPoint (500, 0)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (2));
+    EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;500,100;500,0)");
+    EXPECT_EQ (right_of[1].to_string (), "(0,900;0,1000;500,1000;500,900)");
+  }
+
+  {
+    db::DSimplePolygon in;
+    in.assign_hull (c.begin (), c.end ());
+    std::vector<db::DSimplePolygon> right_of;
+
+    db::cut_polygon (in, db::DEdge (db::DPoint (500, 0), db::DPoint (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (2));
+    EXPECT_EQ (right_of[0].to_string (), "(500,0;500,100;900,100;900,0)");
+    EXPECT_EQ (right_of[1].to_string (), "(900,100;900,900;500,900;500,1000;1000,1000;1000,100)");
+
+    right_of.clear ();
+    db::cut_polygon (in, db::DEdge (db::DPoint (500, 1), db::DPoint (500, 0)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (2));
+    EXPECT_EQ (right_of[0].to_string (), "(0,0;0,100;500,100;500,0)");
+    EXPECT_EQ (right_of[1].to_string (), "(0,900;0,1000;500,1000;500,900)");
+  }
+}
+
+//  cut empty polygons
+TEST(402)
+{
+  {
+    db::Polygon in;
+    std::vector<db::Polygon> right_of;
+    db::cut_polygon (in, db::Edge (db::Point (500, 0), db::Point (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (0));
+  }
+  {
+    db::SimplePolygon in;
+    std::vector<db::SimplePolygon> right_of;
+    db::cut_polygon (in, db::Edge (db::Point (500, 0), db::Point (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (0));
+  }
+  {
+    db::DPolygon in;
+    std::vector<db::DPolygon> right_of;
+    db::cut_polygon (in, db::DEdge (db::DPoint (500, 0), db::DPoint (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (0));
+  }
+  {
+    db::DSimplePolygon in;
+    std::vector<db::DSimplePolygon> right_of;
+    db::cut_polygon (in, db::DEdge (db::DPoint (500, 0), db::DPoint (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (0));
+  }
+}
+
+//  cut point-like polygons
+TEST(403)
+{
+  {
+    db::Polygon in (db::Box (1000, 0, 1000, 0));
+    std::vector<db::Polygon> right_of;
+    db::cut_polygon (in, db::Edge (db::Point (500, 0), db::Point (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (1));
+    EXPECT_EQ (right_of[0].to_string (), "()");  // bad, but no contour available :-(
+    right_of.clear ();
+    db::cut_polygon (in, db::Edge (db::Point (500, 1), db::Point (500, 0)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (0));
+  }
+
+  {
+    db::SimplePolygon in (db::Box (1000, 0, 1000, 0));
+    std::vector<db::SimplePolygon> right_of;
+    db::cut_polygon (in, db::Edge (db::Point (500, 0), db::Point (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (1));
+    EXPECT_EQ (right_of[0].to_string (), "()");  // bad, but no contour available :-(
+    right_of.clear ();
+    db::cut_polygon (in, db::Edge (db::Point (500, 1), db::Point (500, 0)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (0));
+  }
+
+  {
+    db::DPolygon in (db::DBox (1000, 0, 1000, 0));
+    std::vector<db::DPolygon> right_of;
+    db::cut_polygon (in, db::DEdge (db::DPoint (500, 0), db::DPoint (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (1));
+    EXPECT_EQ (right_of[0].to_string (), "()");  // bad, but no contour available :-(
+    right_of.clear ();
+    db::cut_polygon (in, db::DEdge (db::DPoint (500, 1), db::DPoint (500, 0)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (0));
+  }
+
+  {
+    db::DSimplePolygon in (db::DBox (1000, 0, 1000, 0));
+    std::vector<db::DSimplePolygon> right_of;
+    db::cut_polygon (in, db::DEdge (db::DPoint (500, 0), db::DPoint (500, 1)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (1));
+    EXPECT_EQ (right_of[0].to_string (), "()");  // bad, but no contour available :-(
+    right_of.clear ();
+    db::cut_polygon (in, db::DEdge (db::DPoint (500, 1), db::DPoint (500, 0)), std::back_inserter (right_of));
+    EXPECT_EQ (right_of.size (), size_t (0));
+  }
+}

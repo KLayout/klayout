@@ -463,7 +463,7 @@ Class<db::Shapes> decl_Shapes ("Shapes",
   gsi::method_ext ("insert", &insert_shapes_with_flags, gsi::arg ("shapes"), gsi::arg ("flags"),
     "@brief Inserts the shapes taken from another shape container\n"
     "@param shapes The other container from which to take the shapes from\n"
-    "@param flags The filter flags for taking the shapes from the input container\n"
+    "@param flags The filter flags for taking the shapes from the input container (see S... constants)\n"
     "\n"
     "This method takes all selected shapes from the given container and inserts them into this one.\n"
     "\n"
@@ -472,7 +472,7 @@ Class<db::Shapes> decl_Shapes ("Shapes",
   gsi::method_ext ("insert", &insert_shapes_with_flag_and_trans, gsi::arg ("shapes"), gsi::arg ("flags"), gsi::arg ("trans"),
     "@brief Inserts the shapes taken from another shape container with a transformation\n"
     "@param shapes The other container from which to take the shapes from\n"
-    "@param iter The other container from which to take the shapes from\n"
+    "@param flags The filter flags for taking the shapes from the input container (see S... constants)\n"
     "@param trans The transformation to apply\n"
     "\n"
     "This method takes all selected shapes from the given container and inserts them into this one "

@@ -263,6 +263,25 @@ class DBLayout_TestClass < TestBase
 
   end
 
+  def dcollect(s, l)
+
+    res = []
+    while !s.at_end?
+      r = "[#{l.cell_name(s.cell_index)}]"
+      if s.shape.is_box?
+        box = s.shape.dbox
+        r += box.transformed(s.dtrans).to_s
+      else 
+        r += "X";
+      end
+      s.next
+      res.push(r)
+    end
+
+    return res.join("/")
+
+  end
+
   def test_5
 
     # Recursive shape iterator tests
@@ -294,6 +313,8 @@ class DBLayout_TestClass < TestBase
     i1copy = i1.dup
     assert_equal(i1copy.overlapping?, false)
     assert_equal(collect(i1, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)")
+    i1.reset
+    assert_equal(dcollect(i1, l), "[c0](0,0.1;1,1.2)/[c1](0,0.1;1,1.2)/[c2](0.1,0;1.1,1.1)")
     assert_equal(collect(i1copy, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)")
 
     i1 = l.begin_shapes_touching(c0.cell_index, 0, RBA::DBox.new(0, 0, 0.100, 0.100))

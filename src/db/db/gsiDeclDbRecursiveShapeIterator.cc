@@ -63,6 +63,13 @@ static db::RecursiveShapeIterator *new_si4a (const db::Layout &layout, const db:
   return new db::RecursiveShapeIterator (layout, cell, layers, region, overlapping);
 }
 
+static db::DCplxTrans si_dtrans (const db::RecursiveShapeIterator *r)
+{
+  const db::Layout *ly = r->layout ();
+  tl_assert (ly != 0);
+  return db::CplxTrans (ly->dbu ()) * r->trans () * db::VCplxTrans (1.0 / ly->dbu ());
+}
+
 static void select_cells1 (db::RecursiveShapeIterator *r, const std::vector<db::cell_index_type> &cells)
 {
   std::set<db::cell_index_type> cc;
@@ -153,7 +160,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
     "\n"
     "The search is confined to the region given by the \"box\" parameter. If \"overlapping\" is true, shapes whose "
     "bounding box is overlapping the search region are reported. If \"overlapping\" is false, shapes whose "
-    "bounding box is touching the search region are reported.\n"
+    "bounding box touches the search region are reported.\n"
     "\n"
     "This constructor has been introduced in version 0.23.\n"
   ) +
@@ -172,7 +179,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
     "The search is confined to the region given by the \"region\" parameter. The region needs to be a rectilinear region.\n"
     "If \"overlapping\" is true, shapes whose "
     "bounding box is overlapping the search region are reported. If \"overlapping\" is false, shapes whose "
-    "bounding box is touching the search region are reported.\n"
+    "bounding box touches the search region are reported.\n"
     "\n"
     "This constructor has been introduced in version 0.25.\n"
   ) +
@@ -191,7 +198,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
     "\n"
     "The search is confined to the region given by the \"box\" parameter. If \"overlapping\" is true, shapes whose "
     "bounding box is overlapping the search region are reported. If \"overlapping\" is false, shapes whose "
-    "bounding box is touching the search region are reported.\n"
+    "bounding box touches the search region are reported.\n"
     "\n"
     "This constructor has been introduced in version 0.23.\n"
   ) +
@@ -211,7 +218,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
     "The search is confined to the region given by the \"region\" parameter. The region needs to be a rectilinear region.\n"
     "If \"overlapping\" is true, shapes whose "
     "bounding box is overlapping the search region are reported. If \"overlapping\" is false, shapes whose "
-    "bounding box is touching the search region are reported.\n"
+    "bounding box touches the search region are reported.\n"
     "\n"
     "This constructor has been introduced in version 0.23.\n"
   ) +
@@ -415,7 +422,15 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
     "Starting with version 0.25, this transformation is a int-to-int transformation the 'itrans' method "
     "which was providing this transformation before is deprecated."
   ) +
-  gsi::method ("shape", &db::RecursiveShapeIterator::shape, 
+  gsi::method_ext ("dtrans", &gsi::si_dtrans,
+    "@brief Gets transformation into the initial cell applicable to floating point types\n"
+    "\n"
+    "This transformation corresponds to the one deliverd by \\trans, but is applicable to "
+    "the floating-point shape types in micron unit space.\n"
+    "\n"
+    "This method has been introduced in version 0.25.3."
+  ) +
+  gsi::method ("shape", &db::RecursiveShapeIterator::shape,
     "@brief Gets the current shape\n"
     "\n"
     "Returns the shape currently referred to by the recursive iterator. \n"

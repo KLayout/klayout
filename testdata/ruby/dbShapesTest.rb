@@ -23,6 +23,11 @@ end
 
 load("test_prologue.rb")
 
+# cool stuff ...
+class RBA::Shapes
+  include Enumerable
+end
+
 class DBShapes_TestClass < TestBase
 
   # Shapes
@@ -1311,6 +1316,64 @@ class DBShapes_TestClass < TestBase
     es = []
     s.each_edge(1) { |e| es << e.to_s }
     assert_equal( es.join("/"), "" )
+
+  end
+
+  # Shapes (insert from recursive shape iterator and other shape container)
+  def test_9
+
+    l = RBA::Layout.new
+    l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+    c2 = l.cell(l.add_cell("c2"))
+    c3 = l.cell(l.add_cell("c3"))
+
+    tt = RBA::Trans.new
+    c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
+    c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
+    c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
+    c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
+
+    b = RBA::Box.new(0, 100, 1000, 1200)
+    c0.shapes(0).insert(b)
+    c1.shapes(0).insert(b)
+    c2.shapes(0).insert(b)
+    c3.shapes(0).insert(b)
+
+    shapes = RBA::Shapes::new
+    i1 = l.begin_shapes_touching(c0.cell_index, 0, RBA::Box.new(0, 0, 100, 100))
+    shapes.insert(i1)
+    assert_equal(shapes.collect { |s| s.to_s }.join(","), "box (0,100;1000,1200),box (0,100;1000,1200),box (100,0;1100,1100)")
+
+    shapes.clear
+    shapes.insert(i1, RBA::ICplxTrans::new(2.0))
+    assert_equal(shapes.collect { |s| s.to_s }.join(","), "box (0,200;2000,2400),box (0,200;2000,2400),box (200,0;2200,2200)")
+
+    shapes2 = RBA::Shapes::new
+    shapes2.insert(shapes)
+    assert_equal(shapes2.collect { |s| s.to_s }.join(","), "box (0,200;2000,2400),box (0,200;2000,2400),box (200,0;2200,2200)")
+
+    shapes2.clear
+    shapes2.insert(shapes, RBA::ICplxTrans::new(0.5))
+    assert_equal(shapes2.collect { |s| s.to_s }.join(","), "box (0,100;1000,1200),box (0,100;1000,1200),box (100,0;1100,1100)")
+
+    shapes2.clear
+    shapes2.insert(shapes, RBA::Shapes::SPolygons, RBA::ICplxTrans::new(0.5))
+    assert_equal(shapes2.collect { |s| s.to_s }.join(","), "")
+
+    shapes2.clear
+    shapes2.insert(shapes, RBA::Shapes::SAll, RBA::ICplxTrans::new(0.5))
+    assert_equal(shapes2.collect { |s| s.to_s }.join(","), "box (0,100;1000,1200),box (0,100;1000,1200),box (100,0;1100,1100)")
+
+    shapes2.clear
+    shapes2.insert(shapes, RBA::Shapes::SPolygons)
+    assert_equal(shapes2.collect { |s| s.to_s }.join(","), "")
+
+    shapes2.clear
+    shapes2.insert(shapes, RBA::Shapes::SAll)
+    assert_equal(shapes2.collect { |s| s.to_s }.join(","), "box (0,200;2000,2400),box (0,200;2000,2400),box (200,0;2200,2200)")
 
   end
 

@@ -205,6 +205,70 @@ static db::Shape insert_shape_with_dcplx_trans (db::Shapes *s, const db::Shape &
   return s->insert (shape, dbu_trans.inverted () * trans * dbu_trans, pm);
 }
 
+static void insert_iter (db::Shapes *sh, const db::RecursiveShapeIterator &r)
+{
+  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
+  //  lock the layout against updates while inserting
+  db::LayoutLocker locker (sh->layout ());
+  for (db::RecursiveShapeIterator i = r; !i.at_end (); ++i) {
+    tl::ident_map<db::properties_id_type> pm;
+    sh->insert (*i, i.trans (), pm);
+  }
+}
+
+static void insert_iter_with_trans (db::Shapes *sh, const db::RecursiveShapeIterator &r, const db::ICplxTrans &trans)
+{
+  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
+  //  lock the layout against updates while inserting
+  db::LayoutLocker locker (sh->layout ());
+  for (db::RecursiveShapeIterator i = r; !i.at_end (); ++i) {
+    tl::ident_map<db::properties_id_type> pm;
+    sh->insert (*i, trans * i.trans (), pm);
+  }
+}
+
+static void insert_shapes (db::Shapes *sh, const db::Shapes &s)
+{
+  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
+  //  lock the layout against updates while inserting
+  db::LayoutLocker locker (sh->layout ());
+  for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::All); !i.at_end(); ++i) {
+    sh->insert (*i);
+  }
+}
+
+static void insert_shapes_with_flags (db::Shapes *sh, const db::Shapes &s, unsigned int flags)
+{
+  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
+  //  lock the layout against updates while inserting
+  db::LayoutLocker locker (sh->layout ());
+  for (db::Shapes::shape_iterator i = s.begin (flags); !i.at_end(); ++i) {
+    sh->insert (*i);
+  }
+}
+
+static void insert_shapes_with_trans (db::Shapes *sh, const db::Shapes &s, const db::ICplxTrans &trans)
+{
+  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
+  //  lock the layout against updates while inserting
+  db::LayoutLocker locker (sh->layout ());
+  for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::All); !i.at_end(); ++i) {
+    tl::ident_map<db::properties_id_type> pm;
+    sh->insert (*i, trans, pm);
+  }
+}
+
+static void insert_shapes_with_flag_and_trans (db::Shapes *sh, const db::Shapes &s, unsigned int flags, const db::ICplxTrans &trans)
+{
+  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
+  //  lock the layout against updates while inserting
+  db::LayoutLocker locker (sh->layout ());
+  for (db::Shapes::shape_iterator i = s.begin (flags); !i.at_end(); ++i) {
+    tl::ident_map<db::properties_id_type> pm;
+    sh->insert (*i, trans, pm);
+  }
+}
+
 static void insert_region (db::Shapes *sh, const db::Region &r)
 {
   //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
@@ -359,6 +423,62 @@ Class<db::Shapes> decl_Shapes ("Shapes",
     "@param trans The transformation to apply before the shape is inserted (displacement in micrometer units)\n"
     "@return A reference (a \\Shape object) to the newly created shape\n"
     "This method has been introduced in version 0.25.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_iter, gsi::arg ("iter"),
+    "@brief Inserts the shapes taken from a recursive shape iterator\n"
+    "@param iter The iterator from which to take the shapes from\n"
+    "\n"
+    "This method iterates over all shapes from the iterator and inserts them into the container.\n"
+    "\n"
+    "This method has been introduced in version 0.25.3.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_iter_with_trans, gsi::arg ("iter"), gsi::arg ("trans"),
+    "@brief Inserts the shapes taken from a recursive shape iterator with a transformation\n"
+    "@param iter The iterator from which to take the shapes from\n"
+    "@param trans The transformation to apply\n"
+    "\n"
+    "This method iterates over all shapes from the iterator and inserts them into the container.\n"
+    "The given transformation is applied before the shapes are inserted.\n"
+    "\n"
+    "This method has been introduced in version 0.25.3.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_shapes, gsi::arg ("shapes"),
+    "@brief Inserts the shapes taken from another shape container\n"
+    "@param shapes The other container from which to take the shapes from\n"
+    "\n"
+    "This method takes all shapes from the given container and inserts them into this one.\n"
+    "\n"
+    "This method has been introduced in version 0.25.3.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_shapes_with_trans, gsi::arg ("shapes"), gsi::arg ("trans"),
+    "@brief Inserts the shapes taken from another shape container with a transformation\n"
+    "@param shapes The other container from which to take the shapes from\n"
+    "@param trans The transformation to apply\n"
+    "\n"
+    "This method takes all shapes from the given container and inserts them into this one "
+    "after applying the given transformation.\n"
+    "\n"
+    "This method has been introduced in version 0.25.3.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_shapes_with_flags, gsi::arg ("shapes"), gsi::arg ("flags"),
+    "@brief Inserts the shapes taken from another shape container\n"
+    "@param shapes The other container from which to take the shapes from\n"
+    "@param flags The filter flags for taking the shapes from the input container\n"
+    "\n"
+    "This method takes all selected shapes from the given container and inserts them into this one.\n"
+    "\n"
+    "This method has been introduced in version 0.25.3.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_shapes_with_flag_and_trans, gsi::arg ("shapes"), gsi::arg ("flags"), gsi::arg ("trans"),
+    "@brief Inserts the shapes taken from another shape container with a transformation\n"
+    "@param shapes The other container from which to take the shapes from\n"
+    "@param iter The other container from which to take the shapes from\n"
+    "@param trans The transformation to apply\n"
+    "\n"
+    "This method takes all selected shapes from the given container and inserts them into this one "
+    "after applying the given transformation.\n"
+    "\n"
+    "This method has been introduced in version 0.25.3.\n"
   ) +
   gsi::method_ext ("insert", &insert_region, gsi::arg ("region"),
     "@brief Inserts the polygons from the region into this shape container\n"

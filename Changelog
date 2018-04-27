@@ -3,6 +3,12 @@
 * Enhancement: New "split" method for polygons
        This method will fragment the polygons into two or more
        smaller parts for reducing their vertex count.
+* Enhancement: New "dtrans" method for RecursiveShapeIterator
+       This method delivers the transformation in micron unit space
+* Enhancement: New "insert" methods for Shapes
+       Shapes can now insert from another Shapes container and
+       from a RecursiveShapeIterator. Possible applications are
+       fast flattening and fast region selection.
 * Enhancement: DXF and CIF "keep layer names"
        If this option is set in the reader options, layer names
        are not translated into GDS layer/datatype pairs. 

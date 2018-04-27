@@ -423,9 +423,9 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
     "which was providing this transformation before is deprecated."
   ) +
   gsi::method_ext ("dtrans", &gsi::si_dtrans,
-    "@brief Gets transformation into the initial cell applicable to floating point types\n"
+    "@brief Gets the transformation into the initial cell applicable for floating point types\n"
     "\n"
-    "This transformation corresponds to the one deliverd by \\trans, but is applicable to "
+    "This transformation corresponds to the one deliverd by \\trans, but is applicable for "
     "the floating-point shape types in micron unit space.\n"
     "\n"
     "This method has been introduced in version 0.25.3."

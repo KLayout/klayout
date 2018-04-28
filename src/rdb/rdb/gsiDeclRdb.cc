@@ -978,7 +978,7 @@ void create_items_from_iterator (rdb::Database *db, rdb::id_type cell_id, rdb::i
   }
 }
 
-void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::Shapes &shapes, const db::CplxTrans &trans)
+void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shapes &shapes)
 {
   for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::All); !s.at_end (); ++s) {
     std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*s, trans));
@@ -989,7 +989,7 @@ void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_
   }
 }
 
-void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::Shape &shape, const db::CplxTrans &trans)
+void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shape &shape)
 {
   std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (shape, trans));
   if (value.get ()) {
@@ -1292,7 +1292,7 @@ Class<rdb::Database> decl_ReportDatabase ("ReportDatabase",
     "@param category_id The ID of the category to which the item is associated\n"
     "@param iter The iterator (a \\RecursiveShapeIterator object) from which to take the items\n"
   ) +
-  gsi::method_ext ("create_item", &create_item_from_shape, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("shape"), gsi::arg ("trans"),
+  gsi::method_ext ("create_item", &create_item_from_shape, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("shape"),
     "@brief Creates a new item from a single shape\n"
     "This method produces an item from the given shape.\n"
     "It accepts various kind of shapes, such as texts, polygons, boxes and paths and "
@@ -1306,7 +1306,7 @@ Class<rdb::Database> decl_ReportDatabase ("ReportDatabase",
     "@param shape The shape to take the geometrical object from\n"
     "@param trans The transformation to apply\n"
   ) +
-  gsi::method_ext ("create_items", &create_items_from_shapes, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("shapes"), gsi::arg ("trans"),
+  gsi::method_ext ("create_items", &create_items_from_shapes, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("trans"), gsi::arg ("shapes"),
     "@brief Creates new items from a shape container\n"
     "This method takes the shapes from the given container and produces items from them.\n"
     "It accepts various kind of shapes, such as texts, polygons, boxes and paths and "

@@ -36,6 +36,7 @@
 #include "dbBox.h"
 #include "dbPath.h"
 #include "dbText.h"
+#include "dbRecursiveShapeIterator.h"
 #include "dbTilingProcessor.h"
 
 namespace gsi
@@ -289,16 +290,17 @@ Class<rdb::Category> decl_RdbCategory ("RdbCategory",
     "This method has been introduced in version 0.23."
   ) +
   gsi::method_ext ("scan_shapes", &scan_shapes,
-    "@brief Scans the shapes from the shape iterator into the category\n"
+    "@brief Scans the polygon or edge shapes from the shape iterator into the category\n"
     "@args iter\n"
-    "Creates RDB items for each shape read from the iterator and puts them into this category.\n"
+    "Creates RDB items for each polygon or edge shape read from the iterator and puts them into this category.\n"
+    "A similar, but lower-level method is \\ReportDatabase#create_items with a \\RecursiveShapeIterator argument.\n"
     "\n"
     "This method has been introduced in version 0.23.\n"
   ) +
   gsi::method_ext ("scan_layer", &scan_layer1,
     "@brief Scans a layer from a layout into this category\n"
     "@args layout, layer\n"
-    "Creates RDB items for each shape read from the each cell in the layout on the given layer and puts them into this category.\n"
+    "Creates RDB items for each polygon or edge shape read from the each cell in the layout on the given layer and puts them into this category.\n"
     "New cells will be generated for every cell encountered in the layout.\n"
     "Other settings like database unit, description, top cell etc. are not made in the RDB.\n"
     "\n"
@@ -307,7 +309,7 @@ Class<rdb::Category> decl_RdbCategory ("RdbCategory",
   gsi::method_ext ("scan_layer", &scan_layer2,
     "@brief Scans a layer from a layout into this category, starting with a given cell\n"
     "@args layout, layer, cell\n"
-    "Creates RDB items for each shape read from the cell and it's children in the layout on the given layer and puts them into this category.\n"
+    "Creates RDB items for each polygon or edge shape read from the cell and it's children in the layout on the given layer and puts them into this category.\n"
     "New cells will be generated when required.\n"
     "Other settings like database unit, description, top cell etc. are not made in the RDB.\n"
     "\n"
@@ -316,7 +318,7 @@ Class<rdb::Category> decl_RdbCategory ("RdbCategory",
   gsi::method_ext ("scan_layer", &scan_layer3,
     "@brief Scans a layer from a layout into this category, starting with a given cell and a depth specification\n"
     "@args layout, layer, cell, levels\n"
-    "Creates RDB items for each shape read from the cell and it's children in the layout on the given layer and puts them into this category.\n"
+    "Creates RDB items for each polygon or edge shape read from the cell and it's children in the layout on the given layer and puts them into this category.\n"
     "New cells will be generated when required.\n"
     "\"levels\" is the number of hierarchy levels to take the child cells from. 0 means to use only \"cell\" and don't descend, -1 means \"all levels\".\n"  
     "Other settings like database unit, description, top cell etc. are not made in the RDB.\n"
@@ -713,6 +715,14 @@ static rdb::Values::const_iterator end_values (const rdb::Item *item)
   return item->values ().end ();
 }
 
+static void add_value_from_shape (rdb::Item *item, const db::Shape &shape, const db::CplxTrans &trans)
+{
+  rdb::ValueBase *value = rdb::ValueBase::create_from_shape (shape, trans);
+  if (value) {
+    item->values ().add (value);
+  }
+}
+
 static void add_value (rdb::Item *item, const rdb::ValueWrapper &value)
 {
   item->values ().add (value);
@@ -837,6 +847,15 @@ Class<rdb::Item> decl_RdbItem ("RdbItem",
     "@param value The value to add.\n"
     "This method has been introduced in version 0.25 as a convenience method."
   ) +
+  gsi::method_ext ("add_value", &add_value_from_shape, gsi::arg ("shape"), gsi::arg ("trans"),
+    "@brief Adds a geometrical value object from a shape\n"
+    "@param value The shape object from which to take the geometrical object.\n"
+    "@param trans The transformation to apply.\n"
+    "\n"
+    "The transformation can be used to convert database units to micron units.\n"
+    "\n"
+    "This method has been introduced in version 0.25.3."
+  ) +
   gsi::method_ext ("clear_values", &clear_values,
     "@brief Removes all values from this item\n"
   ) +
@@ -943,6 +962,40 @@ const std::string &database_tag_description (const rdb::Database *db, rdb::id_ty
 void database_set_tag_description (rdb::Database *db, rdb::id_type tag, const std::string &d)
 {
   db->set_tag_description (tag, d);
+}
+
+void create_items_from_iterator (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::RecursiveShapeIterator &iter)
+{
+  tl_assert (iter.layout ());
+  double dbu = iter.layout ()->dbu ();
+
+  for (db::RecursiveShapeIterator i = iter; !i.at_end (); ++i) {
+    std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*i, db::CplxTrans (dbu) * i.trans ()));
+    if (value.get ()) {
+      rdb::Item *item = db->create_item (cell_id, cat_id);
+      item->values ().add (value.release ());
+    }
+  }
+}
+
+void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::Shapes &shapes, const db::CplxTrans &trans)
+{
+  for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::All); !s.at_end (); ++s) {
+    std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*s, trans));
+    if (value.get ()) {
+      rdb::Item *item = db->create_item (cell_id, cat_id);
+      item->values ().add (value.release ());
+    }
+  }
+}
+
+void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::Shape &shape, const db::CplxTrans &trans)
+{
+  std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (shape, trans));
+  if (value.get ()) {
+    rdb::Item *item = db->create_item (cell_id, cat_id);
+    item->values ().add (value.release ());
+  }
 }
 
 void create_items_from_region (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Region &collection)
@@ -1225,6 +1278,47 @@ Class<rdb::Database> decl_ReportDatabase ("ReportDatabase",
     "@param category The category to which the item is associated\n"
     "\n"
     "This convenience method has been added in version 0.25.\n"
+  ) +
+  gsi::method_ext ("create_items", &create_items_from_iterator, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("iter"),
+    "@brief Creates new items from a shape iterator\n"
+    "This method takes the shapes from the given iterator and produces items from them.\n"
+    "It accepts various kind of shapes, such as texts, polygons, boxes and paths and "
+    "converts them to corresponding items. "
+    "A similar method, which is intended for production of polygon or edge error layers is \\RdbCategory#scan_shapes.\n"
+    "\n"
+    "This method has been introduced in version 0.25.3.\n"
+    "\n"
+    "@param cell_id The ID of the cell to which the item is associated\n"
+    "@param category_id The ID of the category to which the item is associated\n"
+    "@param iter The iterator (a \\RecursiveShapeIterator object) from which to take the items\n"
+  ) +
+  gsi::method_ext ("create_item", &create_item_from_shape, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("shape"), gsi::arg ("trans"),
+    "@brief Creates a new item from a single shape\n"
+    "This method produces an item from the given shape.\n"
+    "It accepts various kind of shapes, such as texts, polygons, boxes and paths and "
+    "converts them to a corresponding item. The transformation argument can be used to "
+    "supply the transformation that applies the database unit for example.\n"
+    "\n"
+    "This method has been introduced in version 0.25.3.\n"
+    "\n"
+    "@param cell_id The ID of the cell to which the item is associated\n"
+    "@param category_id The ID of the category to which the item is associated\n"
+    "@param shape The shape to take the geometrical object from\n"
+    "@param trans The transformation to apply\n"
+  ) +
+  gsi::method_ext ("create_items", &create_items_from_shapes, gsi::arg ("cell_id"), gsi::arg ("category_id"), gsi::arg ("shapes"), gsi::arg ("trans"),
+    "@brief Creates new items from a shape container\n"
+    "This method takes the shapes from the given container and produces items from them.\n"
+    "It accepts various kind of shapes, such as texts, polygons, boxes and paths and "
+    "converts them to corresponding items. The transformation argument can be used to "
+    "supply the transformation that applies the database unit for example.\n"
+    "\n"
+    "This method has been introduced in version 0.25.3.\n"
+    "\n"
+    "@param cell_id The ID of the cell to which the item is associated\n"
+    "@param category_id The ID of the category to which the item is associated\n"
+    "@param shapes The shape container from which to take the items\n"
+    "@param trans The transformation to apply\n"
   ) +
   gsi::method_ext ("create_items", &create_items_from_region,
     "@brief Creates new polygon items for the given cell/category combination\n"

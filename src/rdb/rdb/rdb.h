@@ -44,6 +44,11 @@ namespace tl
   class Extractor;
 }
 
+namespace db
+{
+  class Shape;
+}
+
 namespace rdb
 {
 
@@ -441,6 +446,8 @@ public:
   static ValueBase *create_from_string (const std::string &s);
 
   static ValueBase *create_from_string (tl::Extractor &ex);
+
+  static ValueBase *create_from_shape (const db::Shape &shape, const db::CplxTrans &trans);
 };
 
 /**

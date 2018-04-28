@@ -33,6 +33,7 @@
 #include "dbEdgePair.h"
 #include "dbPath.h"
 #include "dbText.h"
+#include "dbShape.h"
 
 #include <QFileInfo>
 #include <QByteArray>
@@ -247,6 +248,38 @@ ValueBase::create_from_string (tl::Extractor &ex)
 
   } else {
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid value string at '...%s'")), ex.skip ());
+  }
+}
+
+ValueBase *
+ValueBase::create_from_shape (const db::Shape &shape, const db::CplxTrans &trans)
+{
+  if (shape.is_polygon () || shape.is_box ()) {
+
+    db::Polygon poly;
+    shape.polygon (poly);
+    return new rdb::Value <db::DPolygon> (poly.transformed (trans));
+
+  } else if (shape.is_path ()) {
+
+    db::Path path;
+    shape.path (path);
+    return new rdb::Value <db::DPath> (path.transformed (trans));
+
+  } else if (shape.is_text ()) {
+
+    db::Text text;
+    shape.text (text);
+    return new rdb::Value <db::DText> (text.transformed (trans));
+
+  } else if (shape.is_edge ()) {
+
+    db::Edge edge;
+    shape.edge (edge);
+    return new rdb::Value <db::DEdge> (edge.transformed (trans));
+
+  } else {
+    return 0;
   }
 }
 

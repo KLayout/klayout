@@ -450,15 +450,22 @@ class RDB_TestClass < TestBase
     item.add_value(RBA::DBox::new(11, 12, 13, 14))
     item.add_value(RBA::DEdge::new(21, 22, 23, 24))
     item.add_value(RBA::DEdgePair::new(RBA::DEdge::new(31, 32, 33, 34), RBA::DEdge::new(41, 42, 43, 44)))
+    shapes = RBA::Shapes::new
+    pts = [ RBA::Point::new(0, 0), RBA::Point::new(50, 150) ]
+    shapes.insert(RBA::Path::new(pts, 100))
+    shapes.each do |s|
+      item.add_value(s, RBA::CplxTrans::new(0.001))
+    end
     vv=[]
     item.each_value { |v| vv.push(v) }
-    assert_equal(vv.size, 6)
+    assert_equal(vv.size, 7)
     assert_equal(vv[0].to_s, "float: 1")
     assert_equal(vv[1].to_s, "text: hello")
     assert_equal(vv[2].to_s, "polygon: (1,2;1,4;3,4;3,2)")
     assert_equal(vv[3].to_s, "box: (11,12;13,14)")
     assert_equal(vv[4].to_s, "edge: (21,22;23,24)")
     assert_equal(vv[5].to_s, "edge-pair: (31,32;33,34)/(41,42;43,44)")
+    assert_equal(vv[6].to_s, "path: (0,0;0.05,0.15) w=0.1 bx=0 ex=0 r=false")
 
   end
 
@@ -760,6 +767,64 @@ class RDB_TestClass < TestBase
     cn = []
     rdb.each_cell { |c| cn << c.to_s_items }
     assert_equal(cn.join(";"), "c1[polygon: (0,0.001;0,0.03;0.02,0.03;0.02,0.001),polygon: (0.01,0.021;0.01,0.051;0.031,0.051;0.031,0.021),polygon: (0.021,0.042;0.021,0.073;0.043,0.073;0.043,0.042)]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat = rdb.create_category("l1")
+    cat.scan_shapes(c1.begin_shapes_rec(l1))
+    assert_equal(cat.num_items, 3)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_test }
+    assert_equal(cn.join(";"), "c1[]")
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[polygon: (0,0.001;0,0.03;0.02,0.03;0.02,0.001),polygon: (0.01,0.021;0.01,0.051;0.031,0.051;0.031,0.021),polygon: (0.021,0.042;0.021,0.073;0.043,0.073;0.043,0.042)]")
+
+  end
+
+  # shape insertion from shape, shapes, recursive iterator
+  def test_12
+
+    ly = RBA::Layout::new
+    c0 = ly.create_cell("c0")
+    c1 = ly.create_cell("c1")
+    c2 = ly.create_cell("c2")
+    c3 = ly.create_cell("c3")
+    c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(10, 20)))
+    c2.insert(RBA::CellInstArray::new(c3.cell_index, RBA::Trans::new(11, 21)))
+    l1 = ly.insert_layer(RBA::LayerInfo::new(1, 0))
+    c0.shapes(l1).insert(RBA::Box::new(0, 1, 2, 3))
+    c1.shapes(l1).insert(RBA::Text::new("Hello, world!", RBA::Trans::new))
+    c2.shapes(l1).insert(RBA::Edge::new(0, 1, 21, 31))
+    c3.shapes(l1).insert(RBA::Polygon::new(RBA::Box::new(0, 1, 22, 32)))
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    c0.shapes(l1).each do |s|
+      rdb.create_item(cell1.rdb_id, cat1.rdb_id, s, RBA::CplxTrans::new(ly.dbu))
+    end
+    assert_equal(cat1.num_items, 1)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[polygon: (0,0.001;0,0.003;0.002,0.003;0.002,0.001)]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, c0.shapes(l1), RBA::CplxTrans::new(ly.dbu))
+    assert_equal(cat1.num_items, 1)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[polygon: (0,0.001;0,0.003;0.002,0.003;0.002,0.001)]")
+
+    rdb = RBA::ReportDatabase.new("neu")
+    cat1 = rdb.create_category("l1")
+    cell1 = rdb.create_cell("c1")
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, c1.begin_shapes_rec(l1))
+    assert_equal(cat1.num_items, 3)
+    cn = []
+    rdb.each_cell { |c| cn << c.to_s_items }
+    assert_equal(cn.join(";"), "c1[label: ('Hello, world!',r0 0,0),edge: (0.01,0.021;0.031,0.051),polygon: (0.021,0.042;0.021,0.073;0.043,0.073;0.043,0.042)]")
 
   end
 

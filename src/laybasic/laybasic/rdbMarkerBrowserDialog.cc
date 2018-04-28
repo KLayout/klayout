@@ -788,36 +788,12 @@ MarkerBrowserDialog::scan_layer ()
           
           for (db::ShapeIterator shape = cell.shapes ((*l)->layer_index ()).begin (db::ShapeIterator::All); ! shape.at_end (); ++shape) {
 
-            std::auto_ptr<rdb::ValueBase> value;
-
-            if (shape->is_polygon () || shape->is_box ()) {
-
-              db::Polygon poly;
-              shape->polygon (poly);
-              value.reset (new rdb::Value <db::DPolygon> (poly.transformed (db::CplxTrans (layout.dbu ()))));
-
-            } else if (shape->is_path ()) {
-
-              db::Path path;
-              shape->path (path);
-              value.reset (new rdb::Value <db::DPath> (path.transformed (db::CplxTrans (layout.dbu ()))));
-
-            } else if (shape->is_text ()) {
-
-              db::Text text;
-              shape->text (text);
-              value.reset (new rdb::Value <db::DText> (text.transformed (db::CplxTrans (layout.dbu ()))));
-
-            } else if (shape->is_edge ()) {
-
-              db::Edge edge;
-              shape->edge (edge);
-              value.reset (new rdb::Value <db::DEdge> (edge.transformed (db::CplxTrans (layout.dbu ()))));
-
+            std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*shape, db::CplxTrans (layout.dbu ())));
+            if (value.get ()) {
+              rdb::Item *item = rdb->create_item (rdb_cell->id (), cat->id ());
+              item->values ().add (value.release ());
             }
 
-            rdb::Item *item = rdb->create_item (rdb_cell->id (), cat->id ());
-            item->values ().add (value.release ());
             ++progress;
 
           }
@@ -891,36 +867,11 @@ MarkerBrowserDialog::scan_layer_flat ()
       db::RecursiveShapeIterator shape (layout, *cv.cell (), (*l)->layer_index ());
       while (! shape.at_end ()) {
 
-        std::auto_ptr<rdb::ValueBase> value;
-
-        if (shape->is_polygon () || shape->is_box ()) {
-
-          db::Polygon poly;
-          shape->polygon (poly);
-          value.reset (new rdb::Value <db::DPolygon> (poly.transformed (db::CplxTrans (layout.dbu ()) * shape.trans ())));
-
-        } else if (shape->is_path ()) {
-
-          db::Path path;
-          shape->path (path);
-          value.reset (new rdb::Value <db::DPath> (path.transformed (db::CplxTrans (layout.dbu ()) * shape.trans ())));
-
-        } else if (shape->is_text ()) {
-
-          db::Text text;
-          shape->text (text);
-          value.reset (new rdb::Value <db::DText> (text.transformed (db::CplxTrans (layout.dbu ()) * shape.trans ())));
-
-        } else if (shape->is_edge ()) {
-
-          db::Edge edge;
-          shape->edge (edge);
-          value.reset (new rdb::Value <db::DEdge> (edge.transformed (db::CplxTrans (layout.dbu ()) * shape.trans ())));
-
+        std::auto_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*shape, db::CplxTrans (layout.dbu ()) * shape.trans ()));
+        if (value.get ()) {
+          rdb::Item *item = rdb->create_item (rdb_top_cell->id (), cat->id ());
+          item->values ().add (value.release ());
         }
-
-        rdb::Item *item = rdb->create_item (rdb_top_cell->id (), cat->id ());
-        item->values ().add (value.release ());
 
         ++progress;
         ++shape;

@@ -9,6 +9,10 @@
        Shapes can now insert from another Shapes container and
        from a RecursiveShapeIterator. Possible applications are
        fast flattening and fast region selection.
+* Enhancement: New method to generate RDB items from shapes
+       RdbItem#add_value from a shape, RdbDatabase#create_items
+       from a shapes container or recursive shape iterator and
+       RdbDatabase#create_item from a shape.
 * Enhancement: DXF and CIF "keep layer names"
        If this option is set in the reader options, layer names
        are not translated into GDS layer/datatype pairs. 

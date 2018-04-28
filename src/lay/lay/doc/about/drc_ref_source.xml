@@ -95,6 +95,33 @@ Some filter expressions are:
 not have names)</li>
 </ul>
 </p>
+<h2>"labels" - Gets the labels (texts) from an input layer</h2>
+<keyword name="labels"/>
+<a name="labels"/><p>Usage:</p>
+<ul>
+<li><tt>source.labels(layer)</tt></li>
+<li><tt>source.labels(layer, datatype)</tt></li>
+<li><tt>source.labels(layer_into)</tt></li>
+<li><tt>source.labels(filter, ...)</tt></li>
+</ul>
+<p>
+Creates a layer with the labels from the given layer of the source.
+The layer can be specified by layer and optionally datatype, by a <class_doc href="LayerInfo">LayerInfo</class_doc>
+object or by a sequence of filters. 
+Filters are expressions describing ranges
+of layers and/or datatype numbers or layer names. Multiple filters
+can be given and all layers matching at least one of these filter
+expressions are joined to render the label collection. See "input" for
+more details about the input layer specification.
+</p><p>
+Label layers currently can only be passed to an output layer. 
+Processing of labels is not supported. See "texts" for a way to filter
+texts and use the text locations in geometrical operations.
+</p><p>
+<pre>
+labels(1, 0).output(100, 0)
+</pre>
+</p>
 <h2>"layers" - Gets the layers the source contains</h2>
 <keyword name="layers"/>
 <a name="layers"/><p>Usage:</p>

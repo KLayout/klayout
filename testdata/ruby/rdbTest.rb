@@ -801,7 +801,7 @@ class RDB_TestClass < TestBase
     cat1 = rdb.create_category("l1")
     cell1 = rdb.create_cell("c1")
     c0.shapes(l1).each do |s|
-      rdb.create_item(cell1.rdb_id, cat1.rdb_id, s, RBA::CplxTrans::new(ly.dbu))
+      rdb.create_item(cell1.rdb_id, cat1.rdb_id, RBA::CplxTrans::new(ly.dbu), s)
     end
     assert_equal(cat1.num_items, 1)
     cn = []
@@ -811,7 +811,7 @@ class RDB_TestClass < TestBase
     rdb = RBA::ReportDatabase.new("neu")
     cat1 = rdb.create_category("l1")
     cell1 = rdb.create_cell("c1")
-    rdb.create_items(cell1.rdb_id, cat1.rdb_id, c0.shapes(l1), RBA::CplxTrans::new(ly.dbu))
+    rdb.create_items(cell1.rdb_id, cat1.rdb_id, RBA::CplxTrans::new(ly.dbu), c0.shapes(l1))
     assert_equal(cat1.num_items, 1)
     cn = []
     rdb.each_cell { |c| cn << c.to_s_items }

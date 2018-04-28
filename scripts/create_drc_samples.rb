@@ -4,7 +4,7 @@
 
 def run_demo(gen, cmd, out)
 
-  img_path = "src/lay/doc/images"
+  img_path = "src/lay/lay/doc/images"
 
   mw = RBA::Application::instance::main_window
 

@@ -3,9 +3,9 @@
 $script_call = $0 + " " + ARGV.join(" ")
 
 $key="%DRC%"
-$infile="src/lay/built_in_macros/drc.lym" 
+$infile="src/drc/drc/built-in-macros/drc.lym" 
 $loc = "about/drc_ref"
-$outfiles="src/lay/doc"
+$outfiles="src/lay/lay/doc"
 $title="DRC Reference"
 
 def create_ref(s)

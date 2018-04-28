@@ -1,5 +1,8 @@
 0.25.3
 
+* Enhancement: Pass label (text) layers through DRC script
+       The "labels" method now allows copying labels from a layer
+       to the output.
 * Enhancement: New "split" method for polygons
        This method will fragment the polygons into two or more
        smaller parts for reducing their vertex count.

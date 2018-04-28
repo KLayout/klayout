@@ -152,6 +152,15 @@ See <a href="/about/drc_ref_source.xml#input">Source#input</a> for a description
 <ul>
 <li><tt>is_tiled?</tt></li>
 </ul>
+<h2>"labels" - Gets the labels (text) from an original layer</h2>
+<keyword name="labels"/>
+<a name="labels"/><p>Usage:</p>
+<ul>
+<li><tt>labels</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_source.xml#labels">Source#labels</a> for a description of that function.
+</p>
 <h2>"layers" - Gets the layers contained in the default source</h2>
 <keyword name="layers"/>
 <a name="layers"/><p>Usage:</p>

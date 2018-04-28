@@ -3469,7 +3469,68 @@ CODE
     # @/ul
     
     def input(*args)
+      layers = parse_input_layers(*args)
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, false))
+    end
+
+    # %DRC%
+    # @name labels
+    # @brief Gets the labels (texts) from an input layer
+    # @synopsis source.labels(layer)
+    # @synopsis source.labels(layer, datatype)
+    # @synopsis source.labels(layer_into)
+    # @synopsis source.labels(filter, ...)
+    # Creates a layer with the labels from the given layer of the source.
+    # The layer can be specified by layer and optionally datatype, by a RBA::LayerInfo
+    # object or by a sequence of filters. 
+    # Filters are expressions describing ranges
+    # of layers and/or datatype numbers or layer names. Multiple filters
+    # can be given and all layers matching at least one of these filter
+    # expressions are joined to render the label collection. See "input" for
+    # more details about the input layer specification.
+    #  
+    # Label layers currently can only be passed to an output layer. 
+    # Processing of labels is not supported. See "texts" for a way to filter
+    # texts and use the text locations in geometrical operations.
+    #
+    # @code
+    # labels(1, 0).output(100, 0)
+    # @/code
     
+    def labels(*args)
+      layers = parse_input_layers(*args)
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, true))
+    end
+
+    # %DRC%
+    # @name layers
+    # @brief Gets the layers the source contains
+    # @synopsis source.layers
+    # Delivers a list of RBA::LayerInfo objects representing the layers
+    # inside the source.
+    #
+    # One application is to read all layers from a source. In the following
+    # example, the "and" operation is used to perform a clip with the given
+    # rectangle. Note that this solution is not efficient - it's provided
+    # as an example only:
+    # 
+    # @code
+    # output_cell("Clipped")
+    # 
+    # clip_box = polygon_layer
+    # clip_box.insert(box(0.um, -4.um, 4.um, 0.um))
+    # 
+    # layers.each { |l| (input(l) &amp; clip_box).output(l) }
+    # @/code
+    
+    def layers
+      @layout.layer_indices.collect { |li| @layout.get_info(li) }
+    end
+     
+  private
+
+    def parse_input_layers(*args)
+
       layers = []
      
       if args.size == 0
@@ -3504,36 +3565,11 @@ CODE
         end
         
       end
-      
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping))
+
+      layers
 
     end
 
-    # %DRC%
-    # @name layers
-    # @brief Gets the layers the source contains
-    # @synopsis source.layers
-    # Delivers a list of RBA::LayerInfo objects representing the layers
-    # inside the source.
-    #
-    # One application is to read all layers from a source. In the following
-    # example, the "and" operation is used to perform a clip with the given
-    # rectangle. Note that this solution is not efficient - it's provided
-    # as an example only:
-    # 
-    # @code
-    # output_cell("Clipped")
-    # 
-    # clip_box = polygon_layer
-    # clip_box.insert(box(0.um, -4.um, 4.um, 0.um))
-    # 
-    # layers.each { |l| (input(l) &amp; clip_box).output(l) }
-    # @/code
-    
-    def layers
-      @layout.layer_indices.collect { |li| @layout.get_info(li) }
-    end
-     
   end
 
   # The DRC engine
@@ -4284,6 +4320,16 @@ CODE
     end
     
     # %DRC%
+    # @name labels 
+    # @brief Gets the labels (text) from an original layer
+    # @synopsis labels
+    # See \Source#labels for a description of that function.
+ 
+    def labels(*args)
+      layout.labels(*args)
+    end
+    
+    # %DRC%
     # @name output
     # @brief Outputs a layer to the report database or output layout
     # @synopsis output(layer, args)
@@ -4630,7 +4676,7 @@ CODE
       end
     end
 
-    def _input(layout, cell_index, layers, sel, box, clip, overlapping)
+    def _input(layout, cell_index, layers, sel, box, clip, overlapping, labels_only)
     
       if layers.empty?
         r = RBA::Region::new
@@ -4640,6 +4686,9 @@ CODE
           iter = RBA::RecursiveShapeIterator::new(layout, layout.cell(cell_index), layers, box, overlapping)
         else
           iter = RBA::RecursiveShapeIterator::new(layout, layout.cell(cell_index), layers)
+        end
+        if labels_only
+          iter.shape_flags = RBA::Shapes::STexts
         end
         
         sel.each do |s|
@@ -4657,17 +4706,26 @@ CODE
             iter.select_cells(s)
           end
         end
-        
-        sf = layout.dbu / self.dbu
-        if (sf - 1.0).abs &gt; 1e-6
-          r = RBA::Region::new(iter, RBA::ICplxTrans::new(sf.to_f))
+
+        if labels_only
+
+          # for labels layers, the iterator is the data (no region)
+          r = iter
+
         else
-          r = RBA::Region::new(iter)
-        end
         
-        # clip if a box is specified
-        if box &amp;&amp; clip
-          r &amp;= RBA::Region::new(box)
+          sf = layout.dbu / self.dbu
+          if (sf - 1.0).abs &gt; 1e-6
+            r = RBA::Region::new(iter, RBA::ICplxTrans::new(sf.to_f))
+          else
+            r = RBA::Region::new(iter)
+          end
+          
+          # clip if a box is specified
+          if box &amp;&amp; clip
+            r &amp;= RBA::Region::new(box)
+          end
+
         end
       
       end
@@ -4690,7 +4748,12 @@ CODE
 
         cat = @output_rdb.create_category(args[0].to_s)
         args[1] &amp;&amp; cat.description = args[1]
-        @output_rdb.create_items(@output_rdb_cell_id, cat.rdb_id, RBA::CplxTrans::new(self.dbu), data)
+
+        if data.is_a?(RBA::RecursiveShapeIterator)
+          @output_rdb.create_items(@output_rdb_cell_id, cat.rdb_id, data)
+        else
+          @output_rdb.create_items(@output_rdb_cell_id, cat.rdb_id, RBA::CplxTrans::new(self.dbu), data)
+        end
       
       else 
 

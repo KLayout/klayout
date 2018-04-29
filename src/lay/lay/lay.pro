@@ -57,7 +57,8 @@ HEADERS = \
     layFontController.h \
     layNativePlugin.h \
     laySystemPaths.h \
-    layMacroEditorSetupPage.h
+    layMacroEditorSetupPage.h \
+    layPasswordDialog.h
 
 FORMS = \
     ClipDialog.ui \
@@ -105,7 +106,8 @@ FORMS = \
     SaltGrainTemplateSelectionDialog.ui \
     SaltManagerInstallConfirmationDialog.ui \
     CustomizeMenuConfigPage.ui \
-    MacroEditorSetupPage.ui
+    MacroEditorSetupPage.ui \
+    PasswordDialog.ui
 
 SOURCES = \
     gsiDeclLayApplication.cc \
@@ -160,7 +162,8 @@ SOURCES = \
     layFontController.cc \
     layNativePlugin.cc \
     laySystemPaths.cc \
-    layMacroEditorSetupPage.cc
+    layMacroEditorSetupPage.cc \
+    layPasswordDialog.cc
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \

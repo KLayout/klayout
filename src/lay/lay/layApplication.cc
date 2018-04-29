@@ -38,6 +38,7 @@
 #include "layTechnologyController.h"
 #include "laySaltController.h"
 #include "laySystemPaths.h"
+#include "layPasswordDialog.h"
 #include "lymMacro.h"
 #include "gtf.h"
 #include "gsiDecl.h"
@@ -56,6 +57,7 @@
 #include "tlExpression.h"
 #include "tlExceptions.h"
 #include "tlInternational.h"
+#include "tlHttpStream.h"
 #include "tlArch.h"
 
 #include <QIcon>
@@ -1520,6 +1522,10 @@ GuiApplication::setup ()
 
   mp_mw = new lay::MainWindow (this, "main_window");
   QObject::connect (mp_mw, SIGNAL (closed ()), this, SLOT (quit ()));
+
+  //  create a password dialog for use with the HTTP streams
+  lay::PasswordDialog *pw_dialog = new lay::PasswordDialog (mp_mw);
+  tl::InputHttpStream::set_credential_provider (pw_dialog);
 }
 
 void

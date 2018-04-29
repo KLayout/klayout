@@ -8,8 +8,7 @@ DEFINES += MAKE_TL_LIBRARY
 
 LIBS += -lz
 
-FORMS = \
-    PasswordDialog.ui
+FORMS =
 
 SOURCES = \
     tlAssert.cc \
@@ -43,7 +42,9 @@ SOURCES = \
     tlArch.cc \
     tlCommandLineParser.cc \
     tlUnitTest.cc \
-    tlInt128Support.cc
+    tlInt128Support.cc \
+    tlHttpStreamCurl.cc \
+    tlHttpStreamQt.cc
 
 HEADERS = \
     tlAlgorithm.h \
@@ -92,7 +93,9 @@ HEADERS = \
     tlArch.h \
     tlCommandLineParser.h \
     tlUnitTest.h \
-    tlInt128Support.h
+    tlInt128Support.h \
+    tlHttpStreamCurl.h \
+    tlHttpStreamQt.h
 
 INCLUDEPATH =
 DEPENDPATH =

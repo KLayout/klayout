@@ -41,6 +41,7 @@ FORMS += \
   SizingOptionsDialog.ui \
   StreamImportDialog.ui \
   MergeOptionsDialog.ui \
+    XORToolDialog.ui
 
 SOURCES += \
   extBooleanOperationsDialogs.cc \

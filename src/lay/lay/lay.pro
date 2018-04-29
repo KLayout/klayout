@@ -97,7 +97,6 @@ FORMS = \
     TechLayerMappingEditorPage.ui \
     TechMacrosPage.ui \
     TechSetupDialog.ui \
-    XORToolDialog.ui \
     TechLoadOptionsEditorPage.ui \
     TechSaveOptionsEditorPage.ui \
     MainConfigPage7.ui \

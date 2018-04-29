@@ -29,6 +29,7 @@
 #include "dbRecursiveShapeIterator.h"
 #include "dbClip.h"
 #include "dbLayoutUtils.h"
+#include "dbRegion.h"
 #include "tlTimer.h"
 #include "tlProgress.h"
 #include "tlThreadedWorkers.h"
@@ -58,6 +59,7 @@ std::string cfg_xor_bnota ("xor-bnota");
 std::string cfg_xor_summarize ("xor-summarize");
 std::string cfg_xor_tolerances ("xor-tolerances");
 std::string cfg_xor_tiling ("xor-tiling");
+std::string cfg_xor_tiling_heal ("xor-tiling-heal");
 std::string cfg_xor_region_mode ("xor-region-mode");
 
 //  Note: this enum must match with the order of the combo box entries in the 
@@ -254,6 +256,11 @@ XORToolDialog::exec_dialog (lay::LayoutView *view)
     mp_ui->tiling->setText (tl::to_qstring (tiling));
   }
 
+  bool heal = false;
+  if (config_root->config_get (cfg_xor_tiling_heal, heal)) {
+    mp_ui->heal_cb->setChecked (heal);
+  }
+
   int ret = QDialog::exec ();
 
   if (ret) {
@@ -329,6 +336,7 @@ BEGIN_PROTECTED
   config_root->config_set (cfg_xor_summarize, mp_ui->summarize_cb->isChecked ());
   config_root->config_set (cfg_xor_tolerances, tl::to_string (mp_ui->tolerances->text ()));
   config_root->config_set (cfg_xor_tiling, tl::to_string (mp_ui->tiling->text ()));
+  config_root->config_set (cfg_xor_tiling_heal, mp_ui->heal_cb->isChecked ());
   config_root->config_end ();
 
   QDialog::accept ();
@@ -380,6 +388,7 @@ public:
       m_op (op),
       m_el_handling (el_handling),
       m_has_tiles (false),
+      m_tile_heal (false),
       m_dbu (dbu),
       m_cva (cva),
       m_cvb (cvb),
@@ -415,11 +424,12 @@ public:
     return m_has_tiles;
   }
 
-  void has_tiles (bool ht, int nx, int ny)
+  void set_tiles (bool ht, int nx, int ny, bool heal)
   {
     m_has_tiles = ht;
     m_nx = ht ? nx : 0;
     m_ny = ht ? ny : 0;
+    m_tile_heal = heal;
   }
 
   double dbu () const
@@ -500,11 +510,17 @@ public:
     }
   }
 
-  void issue_polygon (unsigned int tol_index, unsigned int layer_index, const db::Polygon &polygon, const db::CplxTrans &trans)
+  void issue_polygon (unsigned int tol_index, unsigned int layer_index, const db::Polygon &polygon, bool touches_border = false)
   {
     QMutexLocker locker (&m_mutex);
+    db::CplxTrans trans (dbu ());
 
-    if (m_output_mode == OMMarkerDatabase) {
+    if (m_tile_heal && touches_border) {
+
+      //  save for merging later
+      m_polygons_to_heal [std::make_pair (tol_index, layer_index)].insert (polygon);
+
+    } else if (m_output_mode == OMMarkerDatabase) {
 
       rdb::Category *layercat = m_layer_categories[tol_index][layer_index];
 
@@ -532,6 +548,16 @@ public:
     }
   }
 
+  void finish ()
+  {
+    //  merge the polygons to heal and re-issue (this time without healing)
+    for (std::map<std::pair<size_t, size_t>, db::Region>::iterator p = m_polygons_to_heal.begin (); p != m_polygons_to_heal.end (); ++p) {
+      for (db::Region::const_iterator mp = p->second.begin_merged (); !mp.at_end (); ++mp) {
+        issue_polygon (p->first.first, p->first.second, *mp, false);
+      }
+    }
+  }
+
   virtual tl::Worker *create_worker ();
 
 private:
@@ -539,6 +565,7 @@ private:
   db::BooleanOp::BoolOp m_op;
   EmptyLayerHandling m_el_handling;
   bool m_has_tiles;
+  bool m_tile_heal;
   double m_dbu;
   lay::CellView m_cva;
   lay::CellView m_cvb;
@@ -554,6 +581,7 @@ private:
   std::string m_result_string;
   size_t m_nx, m_ny;
   std::map<std::pair<db::LayerProperties, db::Coord>, std::vector<std::vector<size_t> > > m_results;
+  std::map<std::pair<size_t, size_t>, db::Region> m_polygons_to_heal;
 };
 
 class XORTask
@@ -826,8 +854,6 @@ XORWorker::do_perform (const XORTask *xor_task)
         sp.size (xor_results, xor_results_cell, 0, xor_results_cell.shapes (0), ((*t + 1) / 2), (unsigned int)2, false);
       }
 
-      db::CplxTrans trans = db::CplxTrans (mp_job->dbu ());
-
       size_t n = 0;
 
       for (db::Shapes::shape_iterator s = xor_results_cell.shapes (0).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
@@ -836,14 +862,16 @@ XORWorker::do_perform (const XORTask *xor_task)
 
           std::vector <db::Polygon> clipped_poly;
           clip_poly (s->polygon (), xor_task->clip_box (), clipped_poly, false /*don't resolve holes*/);
+          db::Box inner = xor_task->clip_box ().enlarged (db::Vector (-1, -1));
 
           for (std::vector <db::Polygon>::const_iterator cp = clipped_poly.begin (); cp != clipped_poly.end (); ++cp) {
-            mp_job->issue_polygon (tol_index, xor_task->layer_index (), *cp, trans);
+
+            mp_job->issue_polygon (tol_index, xor_task->layer_index (), *cp, !cp->box ().inside (inner));
             ++n;
           }
         
         } else {
-          mp_job->issue_polygon (tol_index, xor_task->layer_index (), s->polygon (), trans);
+          mp_job->issue_polygon (tol_index, xor_task->layer_index (), s->polygon ());
           ++n;
         }
 
@@ -988,6 +1016,7 @@ XORToolDialog::run_xor ()
   }
 
   double tile_size = 0; // in micron units
+  bool tile_heal = mp_ui->heal_cb->isChecked ();
 
   {
     std::string text (tl::to_string (mp_ui->tiling->text ()));
@@ -1298,7 +1327,7 @@ XORToolDialog::run_xor ()
       db::Coord tile_enlargement_b = db::coord_traits<db::Coord>::rounded_up (tile_enlargement * dbu / cvb->layout ().dbu ());
 
       if (ntiles_w > 1 || ntiles_h > 1 || region_mode != RMAll /*enforces clip*/) {
-        job.has_tiles (true, ntiles_w, ntiles_h);
+        job.set_tiles (true, ntiles_w, ntiles_h, tile_heal);
       }
 
       //  create the XOR tasks
@@ -1377,6 +1406,9 @@ XORToolDialog::run_xor ()
         }
         throw tl::Exception (tl::to_string (QObject::tr ("Errors occured during processing. First error message says:\n")) + job.error_messages ().front ());
       }
+
+      //  apply healing if required
+      job.finish ();
 
     }
 

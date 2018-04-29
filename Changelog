@@ -47,6 +47,10 @@
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/114
        Custom line styles not loaded from tech's layer properties
        file.
+* Enhancement: https://github.com/klayoutmatthias/klayout/issues/113
+       The XOR tool has an option now to heal result shapes which
+       cross tile boundaries. The result shape count of tiled 
+       and non-tiled mode should basically be the same then.
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/112
        Salt package repository relative paths have not been working.
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/109

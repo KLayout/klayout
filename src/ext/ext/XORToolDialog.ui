@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>XORToolDialog</class>
- <widget class="QDialog" name="XORToolDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="XORToolDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,87 +10,103 @@
     <height>649</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>XOR Tool</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Input</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="leftMargin">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="5" column="0" >
-       <widget class="QLabel" name="label_12" >
-        <property name="text" >
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
          <string>From region</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
          <string>Layout A</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="label_8" >
-        <property name="text" >
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
          <string>Use for input   </string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
          <string>Layout B</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1" >
-       <widget class="QComboBox" name="input_layers_cbx" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="input_layers_cbx">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>All Layers (different layouts)</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Visible layers (different layouts)</string>
          </property>
         </item>
        </widget>
       </item>
-      <item row="2" column="1" >
+      <item row="2" column="1">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>0</width>
           <height>10</height>
@@ -97,72 +114,66 @@
         </property>
        </spacer>
       </item>
-      <item row="5" column="1" >
-       <widget class="QComboBox" name="region_cbx" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="5" column="1">
+       <widget class="QComboBox" name="region_cbx">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>All</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Visible region</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Clipped to ruler</string>
          </property>
         </item>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="lay::CellViewSelectionComboBox" name="layoutb" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="1" column="1">
+       <widget class="lay::CellViewSelectionComboBox" name="layoutb">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="sizeAdjustPolicy" >
+        <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="lay::CellViewSelectionComboBox" name="layouta" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="0" column="1">
+       <widget class="lay::CellViewSelectionComboBox" name="layouta">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="sizeAdjustPolicy" >
+        <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
         </property>
        </widget>
       </item>
-      <item row="4" column="1" >
+      <item row="4" column="1">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>0</width>
           <height>10</height>
@@ -170,17 +181,15 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="2" >
-       <widget class="QLabel" name="label_13" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>7</hsizetype>
-          <vsizetype>5</vsizetype>
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_13">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string/>
         </property>
        </widget>
@@ -189,59 +198,64 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
       <string>Options</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="leftMargin">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="1" column="1" colspan="2" >
-       <widget class="QCheckBox" name="anotb_cb" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="1" column="1" colspan="2">
+       <widget class="QCheckBox" name="anotb_cb">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>A NOT B (In A but not in B)</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2" >
-       <widget class="QCheckBox" name="axorb_cb" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="0" column="1" colspan="2">
+       <widget class="QCheckBox" name="axorb_cb">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>A XOR B (differences)</string>
         </property>
-        <property name="checked" >
+        <property name="checked">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="3" >
+      <item row="3" column="0" colspan="3">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>0</width>
           <height>10</height>
@@ -249,72 +263,79 @@
         </property>
        </spacer>
       </item>
-      <item row="4" column="1" colspan="2" >
-       <widget class="QCheckBox" name="summarize_cb" >
-        <property name="text" >
+      <item row="4" column="1" colspan="2">
+       <widget class="QCheckBox" name="summarize_cb">
+        <property name="text">
          <string>Summarize missing layers</string>
         </property>
-        <property name="checked" >
+        <property name="checked">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="5" column="0" >
-       <widget class="QLabel" name="label_5" >
-        <property name="text" >
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
          <string>Tolerances</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
          <string>Compare modes   </string>
         </property>
        </widget>
       </item>
-      <item row="5" column="2" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
+      <item row="5" column="2">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
          <string>Tolerances (t1,t2,..) in micron</string>
         </property>
        </widget>
       </item>
-      <item row="7" column="0" >
-       <widget class="QLabel" name="label_10" >
-        <property name="text" >
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
          <string>Threads</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="0" >
-       <widget class="QLabel" name="label_7" >
-        <property name="text" >
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
          <string>Tiling</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="1" colspan="2" >
-       <widget class="QFrame" name="frame" >
-        <property name="frameShape" >
+      <item row="6" column="1" colspan="2">
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="frameShadow" >
+        <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QHBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
-          <widget class="QLineEdit" name="tiling" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>5</hsizetype>
-             <vsizetype>0</vsizetype>
+          <widget class="QLineEdit" name="tiling">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -322,56 +343,68 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_3" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>5</hsizetype>
-             <vsizetype>5</vsizetype>
+          <widget class="QLabel" name="label_3">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>1</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Tile size in micron</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="heal_cb">
+           <property name="text">
+            <string>Heal result shapes</string>
            </property>
           </widget>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="7" column="1" colspan="2" >
-       <widget class="QFrame" name="frame_2" >
-        <property name="frameShape" >
+      <item row="7" column="1" colspan="2">
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="frameShadow" >
+        <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QHBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
-          <widget class="QSpinBox" name="threads" >
-           <property name="minimum" >
+          <widget class="QSpinBox" name="threads">
+           <property name="minimum">
             <number>1</number>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_11" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>5</hsizetype>
-             <vsizetype>5</vsizetype>
+          <widget class="QLabel" name="label_11">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>1</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Used for tiles and layers</string>
            </property>
           </widget>
@@ -379,27 +412,23 @@
         </layout>
        </widget>
       </item>
-      <item row="2" column="1" colspan="2" >
-       <widget class="QCheckBox" name="bnota_cb" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="2" column="1" colspan="2">
+       <widget class="QCheckBox" name="bnota_cb">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>B NOT A (in B but not in A)</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="1" >
-       <widget class="QLineEdit" name="tolerances" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="tolerances">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -410,74 +439,79 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_4" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
       <string>Output</string>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
       <item>
-       <widget class="QLabel" name="label_9" >
-        <property name="text" >
+       <widget class="QLabel" name="label_9">
+        <property name="text">
          <string>Send output to   </string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="output_cbx" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>7</hsizetype>
-          <vsizetype>0</vsizetype>
+       <widget class="QComboBox" name="output_cbx">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Marker database</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Other layout</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>New layers in layout A ...</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>New layers in layout B ...</string>
          </property>
         </item>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="layer_offset_lbl" >
-        <property name="text" >
+       <widget class="QLabel" name="layer_offset_lbl">
+        <property name="text">
          <string>with offset</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="layer_offset_le" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+       <widget class="QLineEdit" name="layer_offset_le">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>1000/0</string>
         </property>
        </widget>
@@ -487,10 +521,10 @@
    </item>
    <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>0</width>
        <height>16</height>
@@ -499,12 +533,12 @@
     </spacer>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="orientation" >
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -541,11 +575,11 @@
    <receiver>XORToolDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -557,11 +591,11 @@
    <receiver>XORToolDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

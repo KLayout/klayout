@@ -26,7 +26,7 @@
 
 #include "tlCommon.h"
 
-#include <string> 
+#include <string>
 #include <stdint.h>
 
 class QDateTime;
@@ -50,6 +50,8 @@ TL_PUBLIC int64_t msecs_to (const QDateTime &from, const QDateTime &to);
 class TL_PUBLIC Timer
 {
 public:
+  typedef int64_t timer_t;
+
   Timer ();
   
   /** 
@@ -59,10 +61,16 @@ public:
 
   /** 
    *  @brief Stops the timer
+   *  Only after stop or take, the time can be read with sec_user etc.
    */
   void stop ();
 
-  /** 
+  /**
+   *  @brief Takes the time, but does not stop
+   */
+  void take ();
+
+  /**
    *  @brief Reports the time spent between start() and stop() in user space
    */
   double sec_user () const
@@ -87,8 +95,8 @@ public:
   }
 
 private:
-  long m_user_ms, m_sys_ms, m_wall_ms;
-  long m_user_ms_res, m_sys_ms_res, m_wall_ms_res;
+  timer_t m_user_ms, m_sys_ms, m_wall_ms;
+  timer_t m_user_ms_res, m_sys_ms_res, m_wall_ms_res;
 };
 
 /**
@@ -152,12 +160,14 @@ private:
 class TL_PUBLIC Clock 
 {
 public:
+  typedef int64_t timer_t;
+
   typedef unsigned long clock_value;
 
   /**
    *  @brief Default constructor: construct a clock object pointing to an arbitrary value
    */
-  Clock () : m_clock (0) 
+  Clock () : m_clock_ms (0)
   {
     // .. nothing yet ..
   }
@@ -171,7 +181,7 @@ public:
    *  @brief Copy constructor
    */
   Clock (const Clock &d)
-    : m_clock (d.m_clock)
+    : m_clock_ms (d.m_clock_ms)
   {
     //  .. nothing yet ..
   }
@@ -181,7 +191,7 @@ public:
    */
   Clock &operator= (Clock d)
   {
-    m_clock = d.m_clock;
+    m_clock_ms = d.m_clock_ms;
     return *this;
   }
 
@@ -190,7 +200,7 @@ public:
    */
   bool operator== (Clock d) const
   {
-    return m_clock == d.m_clock;
+    return m_clock_ms == d.m_clock_ms;
   }
 
   /**
@@ -206,8 +216,7 @@ public:
    */
   bool operator< (Clock d) const
   {
-    //  to account for wrap around, we do the comparison this way:
-    return long (m_clock) - long (d.m_clock) < 0;
+    return m_clock_ms < d.m_clock_ms;
   }
 
   /**
@@ -215,7 +224,7 @@ public:
    */
   Clock &operator-= (Clock d)
   {
-    m_clock -= d.m_clock;
+    m_clock_ms -= d.m_clock_ms;
     return *this;
   }
 
@@ -240,7 +249,7 @@ public:
   static Clock current ();
 
 private:
-  clock_value m_clock; 
+  timer_t m_clock_ms;
 };
 
 } // namespace tl

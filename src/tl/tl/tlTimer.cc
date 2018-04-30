@@ -32,7 +32,6 @@
 #endif
 
 #include <stdio.h>
-#include <time.h>
 
 #ifndef _MSC_VER // not available on MS VC++
 #  include <unistd.h>
@@ -67,7 +66,7 @@ void
 Timer::start ()
 {
 #ifdef _WIN32
-  long clks_ms = (long) ((double) clock () * (1000.0 / CLOCKS_PER_SEC) + 0.5);
+  timer_t clks_ms = (timer_t) ((double) clock () * (1000.0 / CLOCKS_PER_SEC) + 0.5);
   m_user_ms += clks_ms;
   //  no system time available ..
 #else
@@ -75,8 +74,8 @@ Timer::start ()
   times (&clks);
   const double clk2msec = 1000.0 / sysconf (_SC_CLK_TCK);
 
-  m_user_ms += (long) ((clks.tms_utime + clks.tms_cutime) * clk2msec + 0.5);
-  m_sys_ms += (long) ((clks.tms_stime + clks.tms_cstime) * clk2msec + 0.5);
+  m_user_ms += (timer_t) ((clks.tms_utime + clks.tms_cutime) * clk2msec + 0.5);
+  m_sys_ms += (timer_t) ((clks.tms_stime + clks.tms_cstime) * clk2msec + 0.5);
 #endif
   m_wall_ms += msecs_to (QDateTime::fromTime_t (0), QDateTime::currentDateTime ());
 }
@@ -95,6 +94,27 @@ Timer::stop ()
   m_user_ms = 0;
   m_sys_ms = 0;
   m_wall_ms = 0;
+}
+
+void
+Timer::take ()
+{
+  timer_t user_ms = m_user_ms;
+  timer_t sys_ms = m_sys_ms;
+  timer_t wall_ms = m_wall_ms;
+
+  m_user_ms = -m_user_ms;
+  m_sys_ms = -m_sys_ms;
+  m_wall_ms = -m_wall_ms;
+  start ();
+
+  m_user_ms_res = m_user_ms;
+  m_sys_ms_res = m_sys_ms;
+  m_wall_ms_res = m_wall_ms;
+
+  m_user_ms = user_ms;
+  m_sys_ms = sys_ms;
+  m_wall_ms = wall_ms;
 }
 
 void
@@ -168,20 +188,20 @@ SelfTimer::report () const
 
 Clock::Clock (double s)
 {
-  m_clock = clock_value (s * double (CLOCKS_PER_SEC));
+  m_clock_ms = s * 1000.0;
 }
 
 double 
 Clock::seconds () const
 {
-  return double (m_clock) / double (CLOCKS_PER_SEC);
+  return double (m_clock_ms) * 0.001;
 }
 
 Clock
 Clock::current ()
 {
   Clock c;
-  c.m_clock = clock ();
+  c.m_clock_ms += msecs_to (QDateTime::fromTime_t (0), QDateTime::currentDateTime ());
   return c;
 }
 

@@ -278,7 +278,7 @@ SaltGrainDetailsTextWidget::details_text ()
   if (! g->url ().empty ()) {
     stream << "<p><b>" << QObject::tr ("Download URL: ") << "</b>" << tl::to_qstring (tl::escaped_to_html (g->url ())) << "</p>";
   }
-  if (! g->installed_time ().isNull ()) {
+  if (! g->path ().empty () && ! g->installed_time ().isNull ()) {
     stream << "<p><b>" << QObject::tr ("Installed: ") << "</b>" << g->installed_time ().toString () << "</p>";
   }
   if (! g->dependencies ().empty ()) {

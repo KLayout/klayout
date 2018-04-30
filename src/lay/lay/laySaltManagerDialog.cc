@@ -1005,7 +1005,10 @@ SaltManagerDialog::data_ready ()
     return;
   }
 
+  //  Load the grain file (save URL as it is overwritten by the grain.xml content)
+  std::string url = m_downloaded_grain->url ();
   m_downloaded_grain->load (*m_downloaded_grain_reader);
+  m_downloaded_grain->set_url (url);
 
   try {
 

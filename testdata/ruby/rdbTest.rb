@@ -38,9 +38,9 @@ class RBA::RdbCell
     r = self.name
     r += "[";
     ai = []
-    self.each_item do |r|
+    self.each_item do |i|
       vv = []
-      r.each_value do |v|
+      i.each_value do |v|
         vv << v.to_s
       end
       ai << vv.join("/")

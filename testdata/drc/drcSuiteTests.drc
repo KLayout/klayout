@@ -91,11 +91,11 @@ def run_testsuite(dm, ic, tiled = false)
   lb += 10
   message "--- extended #{lb}"
   
-  a.edges.with_length(0.6).extended(begin: 0.1, end: 0.15, out: 0.1, in: -0.05).output(lb, dm)
-  a.edges.with_length(0.6).extended(out: 0.1, in: -0.05).output(lb + 1, dm)
-  a.edges.with_length(0..0.7).extended(out: 0.1, in: -0.05).output(lb + 2, dm)
-  a.edges.with_length(0..0.7).extended(out: 0.1, in: -0.05, joined: true).output(lb + 3, dm)
-  a.edges.with_length(0..0.7).extended(begin: 0.1, end: 0.15, out: 0.1, in: 0.05, joined: true).output(lb + 4, dm)
+  a.edges.with_length(0.6).extended(:begin => 0.1, :end => 0.15, :out => 0.1, :in => -0.05).output(lb, dm)
+  a.edges.with_length(0.6).extended(:out => 0.1, :in => -0.05).output(lb + 1, dm)
+  a.edges.with_length(0..0.7).extended(:out => 0.1, :in => -0.05).output(lb + 2, dm)
+  a.edges.with_length(0..0.7).extended(:out => 0.1, :in => -0.05, :joined => true).output(lb + 3, dm)
+  a.edges.with_length(0..0.7).extended(:begin => 0.1, :end => 0.15, :out => 0.1, :in => 0.05, :joined => true).output(lb + 4, dm)
   a.edges.with_length(0..0.7).extended(0.1, 0.15, 0.1, 0.05).output(lb + 5, dm)
   a.edges.with_length(0..0.7).extended(0.1, 0.15, 0.1, 0.05, true).output(lb + 6, dm)
   a.edges.with_length(0..0.7).extended_out(0.1).output(lb + 7, dm)

@@ -43,7 +43,7 @@ Requires: qt-x11 >= 4.8.5
 Requires: libcurl >= 7.19.7
 Requires: ruby >= 1.8.7
 Requires: python >= 2.6.6
-BUILDOPT="-libcurl"
+%define buildopt -libcurl
 %endif
 
 %if "%{target_system}" == "opensuse42_2"
@@ -89,7 +89,7 @@ cd %{_sourcedir}
 ./build.sh -rpath %{_libdir}/klayout \
            -bin %{_builddir}/bin.$TARGET \
            -build %{_builddir}/build.$TARGET \
-           $BUILDOPT \
+           %{buildopt} \
            -j2 
 
 cp -p LICENSE Changelog CONTRIB %{_builddir}

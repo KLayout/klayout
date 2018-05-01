@@ -161,6 +161,8 @@ public:
 
   virtual void reset ();
 
+  virtual void close ();
+
   virtual std::string source () const
   {
     return m_source;
@@ -203,18 +205,11 @@ public:
    */
   virtual ~InputFile ();
 
-  /**
-   *  @brief Read from a file 
-   *
-   *  Implements the basic read method. 
-   *  Will throw a FileReadErrorException if an error occurs.
-   */
   virtual size_t read (char *b, size_t n);
 
-  /**
-   *  @brief Reset to the beginning of the file
-   */
   virtual void reset ();
+
+  virtual void close ();
 
   virtual std::string source () const
   {
@@ -271,6 +266,11 @@ public:
    *  @brief Reset to the beginning of the file
    */
   virtual void reset ();
+
+  /**
+   *  @brief Closes the pipe
+   */
+  virtual void close ();
 
   /**
    *  @brief Get the source specification (the file name)
@@ -365,15 +365,7 @@ std::string InputStream::absolute_path (const std::string &abstract_path)
 InputStream::~InputStream ()
 {
   if (mp_delegate && m_owns_delegate) {
-    //  NOTE: HTTP stream objects should not be deleted now, since events
-    //  may be pending that deliver the finished signal to the object.
-    tl::InputHttpStream *http = dynamic_cast<tl::InputHttpStream *>(mp_delegate);
-    if (http) {
-      http->ready ().clear ();  //  avoids events from deleted streams
-      http->deleteLater ();
-    } else {
-      delete mp_delegate;
-    }
+    delete mp_delegate;
     mp_delegate = 0;
   }
   if (mp_inflate) {
@@ -500,6 +492,14 @@ InputStream::inflate ()
 {
   tl_assert (mp_inflate == 0);
   mp_inflate = new tl::InflateFilter (*this);
+}
+
+void
+InputStream::close ()
+{
+  if (mp_delegate) {
+    mp_delegate->close ();
+  }
 }
 
 void 
@@ -650,11 +650,17 @@ InputFile::InputFile (const std::string &path)
 
 InputFile::~InputFile ()
 {
+  close ();
+}
+
+void
+InputFile::close ()
+{
   if (m_fd >= 0) {
 #if defined(_WIN32)
     _close (m_fd);
 #else
-    close (m_fd);
+    ::close (m_fd);
 #endif
     m_fd = -1;
   }  
@@ -723,6 +729,12 @@ InputZLibFile::InputZLibFile (const std::string &path)
 }
 
 InputZLibFile::~InputZLibFile ()
+{
+  close ();
+}
+
+void
+InputZLibFile::close ()
 {
   if (m_zs != NULL) {
     gzclose (m_zs);
@@ -1172,10 +1184,16 @@ InputPipe::InputPipe (const std::string &path)
 
 InputPipe::~InputPipe ()
 {
+  close ();
+}
+
+void
+InputPipe::close ()
+{
   if (m_file != NULL) {
     fclose (m_file);
     m_file = NULL;
-  }  
+  }
 }
 
 size_t 

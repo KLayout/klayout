@@ -687,7 +687,10 @@ void
 SaltManagerDialog::salt_mine_download_finished ()
 {
   QApplication::restoreOverrideCursor ();
-  m_salt_mine_reader.reset (0);
+  if (m_salt_mine_reader.get ()) {
+    //  NOTE: don't delete the reader in the slot it triggered
+    m_salt_mine_reader->close ();
+  }
 }
 
 void
@@ -951,7 +954,10 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
   }
 
   m_downloaded_grain.reset (0);
-  m_downloaded_grain_reader.reset (0);
+  if (m_downloaded_grain_reader.get ()) {
+    //  NOTE: don't delete the reader in the slot it triggered
+    m_downloaded_grain_reader->close ();
+  }
   mp_downloaded_target = details;
   m_salt_mine_grain.reset (new lay::SaltGrain (*g));
 
@@ -1022,7 +1028,10 @@ SaltManagerDialog::data_ready ()
     mp_downloaded_target->set_grain (m_downloaded_grain.get ());
 
     m_downloaded_grain.reset (0);
-    m_downloaded_grain_reader.reset (0);
+    if (m_downloaded_grain_reader.get ()) {
+      //  NOTE: don't delete the reader in the slot it triggered
+      m_downloaded_grain_reader->close ();
+    }
     m_salt_mine_grain.reset (0);
 
   } catch (tl::Exception &ex) {
@@ -1049,7 +1058,10 @@ SaltManagerDialog::show_error (tl::Exception &ex)
   mp_downloaded_target->setHtml (html);
 
   m_downloaded_grain.reset (0);
-  m_downloaded_grain_reader.reset (0);
+  if (m_downloaded_grain_reader.get ()) {
+    //  NOTE: don't delete the reader in the slot it triggered
+    m_downloaded_grain_reader->close();
+  }
   m_salt_mine_grain.reset (0);
 }
 

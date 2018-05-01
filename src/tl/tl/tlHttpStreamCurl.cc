@@ -407,6 +407,11 @@ public:
   void send ();
 
   /**
+   *  @brief Closes this connection
+   */
+  void close ();
+
+  /**
    *  @brief Gets the HTTP status after the finished_event has been triggered
    */
   int http_status () const
@@ -568,6 +573,19 @@ CurlConnection::CurlConnection (const CurlConnection &other)
   init ();
 }
 
+void CurlConnection::close ()
+{
+  CurlNetworkManager::instance ()->release_connection (this);
+  curl_slist_free_all (mp_headers);
+
+  mp_handle = 0;
+  m_http_status = 0;
+  m_finished = false;
+  m_status = 0;
+  mp_headers = 0;
+  m_authenticated = 0;
+}
+
 void CurlConnection::init ()
 {
   m_http_status = 0;
@@ -584,8 +602,10 @@ CurlConnection::~CurlConnection ()
 #if defined(DEBUG_CURL)
   std::cerr << "~CurlConnection(" << (void *)mp_handle << ")" << std::endl;
 #endif
-  CurlNetworkManager::instance ()->release_connection (this);
-  curl_slist_free_all (mp_headers);
+  if (mp_handle) {
+    CurlNetworkManager::instance ()->release_connection (this);
+    curl_slist_free_all (mp_headers);
+  }
 }
 
 void CurlConnection::set_url (const char *url)
@@ -648,6 +668,8 @@ size_t CurlConnection::fetch_data (char *buffer, size_t nbytes)
 
 void CurlConnection::send ()
 {
+  tl_assert (mp_handle != 0);
+
   m_http_status = 0;
   m_status = 0;
   m_finished = false;
@@ -764,6 +786,8 @@ void CurlConnection::check () const
 
 void CurlConnection::finished (int status)
 {
+  tl_assert (mp_handle != 0);
+
   if (status != 0) {
     m_status = status;
     m_finished = true;
@@ -1058,10 +1082,12 @@ int CurlNetworkManager::tick ()
 InputHttpStream::InputHttpStream (const std::string &url)
 {
   m_sent = false;
+  m_ready = false;
 
   m_connection.reset (CurlNetworkManager::instance ()->create_connection ());
   m_connection->set_url (url.c_str ());
-  m_connection->finished_event.add (this, &InputHttpStream::finished);
+  m_connection->data_available_event.add (this, &InputHttpStream::on_data_available);
+  m_connection->finished_event.add (this, &InputHttpStream::on_finished);
 }
 
 InputHttpStream::~InputHttpStream ()
@@ -1100,44 +1126,77 @@ InputHttpStream::add_header (const std::string &name, const std::string &value)
 }
 
 void
-InputHttpStream::finished ()
+InputHttpStream::on_finished ()
 {
+  m_progress.reset (0);
   m_ready_event ();
+}
+
+void
+InputHttpStream::on_data_available ()
+{
+  //  send the ready event just once
+  if (! m_ready) {
+    m_data_ready_event ();
+    m_ready = true;
+  }
 }
 
 void
 InputHttpStream::send ()
 {
+  m_ready = false;
+  m_progress.reset (0);
   m_connection->send ();
   m_sent = true;
+}
+
+void
+InputHttpStream::check ()
+{
+  if (m_connection->finished ()) {
+    m_connection->check ();
+  }
 }
 
 size_t
 InputHttpStream::read (char *b, size_t n)
 {
   if (! m_sent) {
-
     send ();
+  }
 
+  //  block until enough data is available
+  {
     //  Prevents deferred methods to be executed during the processEvents below (undesired side effects)
     tl::NoDeferredMethods silent;
 
-    //  TODO: progress, timeout
-    tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Downloading")) + " " + m_connection->url (), 1);
-    while (! m_connection->finished () && CurlNetworkManager::instance ()->tick ()) {
-      ++progress;
+    if (! m_progress.get ()) {
+      m_progress.reset (new tl::AbsoluteProgress (tl::to_string (QObject::tr ("Downloading")) + " " + m_connection->url (), 1));
     }
 
-    tl_assert (m_connection->finished ());
+    while (n > m_connection->read_available () && ! m_connection->finished () && CurlNetworkManager::instance ()->tick ()) {
+      ++*m_progress;
+    }
+  }
+
+  if (m_connection->finished ()) {
     m_connection->check ();
-
-    if (tl::verbosity() >= 40) {
-      tl::info << "HTTP reponse data read: " << m_connection->read_data_to_string ();
-    }
-
+  } else if (tl::verbosity() >= 40) {
+    tl::info << "HTTP reponse data read: " << m_connection->read_data_to_string ();
   }
 
   return m_connection->fetch_read_data (b, n);
+}
+
+void
+InputHttpStream::close ()
+{
+  m_progress.reset (0);
+  if (m_connection.get ()) {
+    m_connection->close ();
+  }
+  m_sent = m_ready = false;
 }
 
 void

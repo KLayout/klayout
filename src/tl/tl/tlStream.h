@@ -84,6 +84,11 @@ public:
   virtual void reset () = 0;
 
   /**
+   *  @brief Closes the channel
+   */
+  virtual void close () = 0;
+
+  /**
    *  @brief Get the source specification (i.e. the file name)
    */
   virtual std::string source () const = 0;
@@ -134,6 +139,11 @@ public:
   virtual void reset ()
   {
     m_pos = 0;
+  }
+
+  virtual void close ()
+  {
+    //  .. nothing yet ..
   }
 
   virtual std::string source () const
@@ -305,6 +315,13 @@ public:
    *  @brief Reset to the initial position
    */
   virtual void reset ();
+
+  /**
+   *  @brief Closes the reader
+   *  This method will finish reading and free resources
+   *  associated with it. HTTP connections will be closed.
+   */
+  void close ();
 
   /**
    *  @brief Gets the absolute path for a given URL

@@ -28,6 +28,7 @@
 #include "tlStream.h"
 #include "tlEvents.h"
 #include "tlObject.h"
+#include "tlProgress.h"
 
 #include <memory>
 
@@ -43,8 +44,7 @@ class HttpCredentialProvider;
  *  Implements the reader from a server using the HTTP protocol
  */
 class TL_PUBLIC InputHttpStream
-  //  NOTE: QObject is required because we use "deleteLater"
-  : public QObject, public tl::Object, public InputStreamBase
+  : public tl::Object, public InputStreamBase
 {
 public:
   /**
@@ -111,6 +111,7 @@ public:
   /**
    *  @brief Gets the "ready" event
    *  Connect to this event for the asynchroneous interface.
+   *  This event is fired when the request has finished.
    */
   tl::Event &ready ()
   {
@@ -118,12 +119,32 @@ public:
   }
 
   /**
+   *  @brief Checks for errors
+   *  This method can be used after the ready event to check for errors.
+   *  It will throw an exception if errors occured.
+   *  read() will do the same.
+   */
+  void check ();
+
+  /**
+   *  @brief Gets the "data available" event
+   *  Connect to this event for the asynchroneous interface.
+   *  This event is fired when data becomes available for read.
+   *  It is just fired once.
+   */
+  tl::Event &data_ready ()
+  {
+    return m_data_ready_event;
+  }
+
+  /**
    *  @brief Gets a value indicating whether data is available
    */
   bool data_available ();
 
+  //  Basic interface
   virtual void reset ();
-
+  virtual void close ();
   virtual std::string source () const;
   virtual std::string absolute_path () const;
   virtual std::string filename () const;
@@ -131,9 +152,13 @@ public:
 private:
   std::auto_ptr<CurlConnection> m_connection;
   tl::Event m_ready_event;
+  tl::Event m_data_ready_event;
   bool m_sent;
+  bool m_ready;
+  std::auto_ptr<tl::AbsoluteProgress> m_progress;
 
-  void finished ();
+  void on_data_available ();
+  void on_finished ();
 };
 
 }

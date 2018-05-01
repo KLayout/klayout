@@ -103,6 +103,11 @@ public:
   void send ();
 
   /**
+   *  @brief Closes the connection
+   */
+  void close ();
+
+  /**
    *  @brief Sets the request verb
    *  The default verb is "GET"
    */
@@ -136,6 +141,8 @@ public:
   /**
    *  @brief Gets the "ready" event
    *  Connect to this event for the asynchroneous interface.
+   *  This event is fired when data becomes available or the
+   *  connection has terminated with an error.
    */
   tl::Event &ready ()
   {

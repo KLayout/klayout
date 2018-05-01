@@ -115,7 +115,17 @@ InputHttpStream::InputHttpStream (const std::string &url)
 
 InputHttpStream::~InputHttpStream ()
 {
-  // .. nothing yet ..
+  close ();
+}
+
+void
+InputHttpStream::close ()
+{
+  if (mp_active_reply.get ()) {
+    mp_active_reply->abort ();
+    mp_active_reply.release ()->deleteLater ();
+  }
+  mp_reply = 0;
 }
 
 void

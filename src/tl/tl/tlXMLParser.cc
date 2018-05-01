@@ -106,7 +106,11 @@ public:
         *data++ = *rd;
       }
 
-      return n0 - n;
+      if (n0 == n) {
+        return -1;
+      } else {
+        return n0 - n;
+      }
 
     } catch (tl::Exception &ex) {
       setErrorString (tl::to_qstring (ex.msg ()));

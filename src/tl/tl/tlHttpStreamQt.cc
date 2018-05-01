@@ -28,8 +28,6 @@
 #include "tlDeferredExecution.h"
 #include "tlObject.h"
 
-#include "ui_PasswordDialog.h"
-
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>

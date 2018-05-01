@@ -26,17 +26,17 @@ load("test_prologue.rb")
 class RBA::RdbCell
   def to_s_test
     r = self.name
-    r += "[";
+    r += "["
     refs = []
-    self.each_reference do |r|
-      refs << self.database.cell_by_id(r.parent_cell_id).name + "->" + r.trans.to_s
+    self.each_reference do |i|
+      refs << self.database.cell_by_id(i.parent_cell_id).name + "->" + i.trans.to_s
     end
     r += refs.join(",")
     r += "]"
   end
   def to_s_items
     r = self.name
-    r += "[";
+    r += "["
     ai = []
     self.each_item do |i|
       vv = []

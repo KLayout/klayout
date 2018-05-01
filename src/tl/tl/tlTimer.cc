@@ -32,6 +32,7 @@
 #endif
 
 #include <stdio.h>
+#include <time.h>
 
 #ifndef _MSC_VER // not available on MS VC++
 #  include <unistd.h>
@@ -53,7 +54,7 @@ int64_t msecs_to (const QDateTime &from, const QDateTime &to)
 }
 
 // -------------------------------------------------------------
-//  Implementation of timer
+//  Implementation of Timer
 
 Timer::Timer ()
     : m_user_ms (0), m_sys_ms (0), m_wall_ms (0),
@@ -184,7 +185,7 @@ SelfTimer::report () const
 }
 
 // -------------------------------------------------------------
-//  Implementation of timer
+//  Implementation of Clock
 
 Clock::Clock (double s)
 {

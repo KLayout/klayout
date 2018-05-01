@@ -149,13 +149,19 @@ private:
 };
 
 /**
- *  @brief An abstraction of the clock() function found in the POSIX API
+ *  @brief An abstraction for a time measurement feature
+ *  
+ *  This class can be used to take the current time and 
+ *  compute time differences. The clock represents real
+ *  time and can be used to time user interface actions.
  *
- *  The original clock function returns the number of ticks spent in the
- *  user process from start of the process. On some platforms this includes
- *  the child processes' time as well, on others (like Linux) is does not.
- *  In order to provide a equivalent implementation of this function for
- *  other platforms, this function is provided in this module.
+ *  @code
+ *  tl::Clock start = tl::Clock::current ();
+ *  ... do something
+ *  if ((tl::Clock::current () - start).second () > 2) {
+ *    ... took longer than 2 seconds
+ *  }
+ *  @/code
  */
 class TL_PUBLIC Clock 
 {

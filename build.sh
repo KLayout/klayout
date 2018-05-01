@@ -26,6 +26,7 @@ IS_MAC="no"
 HAVE_QTBINDINGS=1
 HAVE_64BIT_COORD=0
 HAVE_QT5=""
+HAVE_CURL=""
 
 RUBYINCLUDE=""
 RUBYINCLUDE2=""
@@ -153,6 +154,9 @@ while [ "$*" != "" ]; do
   -dry-run)
     RUN_MAKE=0
     ;;
+  -libcurl)
+    HAVE_CURL=1
+    ;;
   -option)
     MAKE_OPT="$MAKE_OPT $1"
     shift
@@ -198,6 +202,8 @@ while [ "$*" != "" ]; do
     echo ""
     echo "  -pylib <file>         Location of the .so/.dll to link for Python support"
     echo "  -pyinc <dir>          Location of the Python headers (in particular 'Python.h')"
+    echo ""
+    echo "  -libcurl              Use libcurl instead of QNetwork (for Qt<4.7)"
     echo ""
     exit 0
     ;;
@@ -539,6 +545,7 @@ qmake_options=(
   HAVE_QTBINDINGS="$HAVE_QTBINDINGS"
   HAVE_64BIT_COORD="$HAVE_64BIT_COORD"
   HAVE_QT5="$HAVE_QT5"
+  HAVE_CURL="$HAVE_CURL"
   PREFIX="$BIN"
   RPATH="$RPATH"
   KLAYOUT_VERSION="$KLAYOUT_VERSION"

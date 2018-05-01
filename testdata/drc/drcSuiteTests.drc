@@ -6,6 +6,8 @@ end
 
 def run_testsuite(dm, ic, tiled = false)
 
+  has_float_range = ((0..0.5).max != 0)
+
   lb = 100
   
   a = input(RBA::LayerInfo::new(1, 0))
@@ -65,7 +67,7 @@ def run_testsuite(dm, ic, tiled = false)
     c.bbox.to_s == "(-4,-5;0,-2)" || raise("unexpected value")
   end
   
-  lb += 10
+  lb += 10 #110
   message "--- centers, start_segments, end_segments #{lb}"
   
   a.edges.centers(0.1).extended_out(0.01).output(lb, dm)
@@ -88,7 +90,7 @@ def run_testsuite(dm, ic, tiled = false)
   a.space(0.5).polygons? == false || raise("unexpected value")
   a.space(0.5).edges? == false || raise("unexpected value")
   
-  lb += 10
+  lb += 10 #120
   message "--- extended #{lb}"
   
   a.edges.with_length(0.6).extended(:begin => 0.1, :end => 0.15, :out => 0.1, :in => -0.05).output(lb, dm)
@@ -101,26 +103,26 @@ def run_testsuite(dm, ic, tiled = false)
   a.edges.with_length(0..0.7).extended_out(0.1).output(lb + 7, dm)
   a.edges.with_length(0..0.7).extended_in(0.1).output(lb + 8, dm)
   
-  lb += 10
+  lb += 10 #130
   message "--- extents #{lb}"
   
   b.extents.output(lb, dm)
   
-  lb += 10
+  lb += 10 #140
   message "--- first_edges, second_edges, edges #{lb}"
   
   a.enclosing(b, 0.5, whole_edges).first_edges.extended_out(0.01).output(lb, dm)
   a.enclosing(b, 0.5, whole_edges).second_edges.extended_out(0.01).output(lb + 1, dm)
   a.enclosing(b, 0.5, whole_edges).edges.extended_out(0.01).output(lb + 2, dm)
   
-  lb += 10
+  lb += 10 #150
   message "--- hulls, holes #{lb}"
   
   c.xor(b).holes.output(lb, dm)
   c.xor(b).hulls.output(lb + 1, dm)
   c.xor(b).xor(c.xor(b).hulls - c.xor(b).holes).is_empty? || raise("xor not empty")
   
-  lb += 10
+  lb += 10 #160
   message "--- interacting, in, not_in #{lb}"
   
   b.interacting(a).output(lb, dm)
@@ -132,7 +134,7 @@ def run_testsuite(dm, ic, tiled = false)
   x.in(b).output(lb + 3, dm)
   b.sized(0.1).in(b).is_empty? == true || raise("unexpected value")
   
-  lb += 10
+  lb += 10 #170
   message "--- inside, outside, overlapping, interacting #{lb}"
   
   b.inside(c).output(lb, dm)
@@ -204,7 +206,7 @@ def run_testsuite(dm, ic, tiled = false)
   b.outside(empty).output(lb + 9, dm)
   b.not_outside(empty).output(lb + 9, dm + 1)
   
-  lb += 10
+  lb += 10 #180
   message "--- merge #{lb}"
   
   c.raw
@@ -222,7 +224,7 @@ def run_testsuite(dm, ic, tiled = false)
   cdup.merge(2).xor(c.merged(2)).output(lb + 5, dm)
   cdup.xor(c.merged(2)).output(lb + 6, dm)
   
-  lb += 10
+  lb += 10 #190
   message "--- move, transform, rotate, scale #{lb}"
   
   c.moved(0.2, -0.1).output(lb, dm)
@@ -243,7 +245,7 @@ def run_testsuite(dm, ic, tiled = false)
   cdup.rotate(45)
   cdup.xor(c.rotated(45)).is_empty? == true || raise("xor not empty")
   
-  lb += 10
+  lb += 10 #200
   message "--- rectangles, rectilinear #{lb}"
   
   a.rectangles.output(lb, dm)
@@ -255,7 +257,7 @@ def run_testsuite(dm, ic, tiled = false)
   c.clean
   c.rectangles.output(lb + 5, dm)
   
-  lb += 10
+  lb += 10 #210
   message "--- enclosing #{lb}"
   
   a.enclosing(b, 0.5).polygons.output(lb, dm)
@@ -266,9 +268,13 @@ def run_testsuite(dm, ic, tiled = false)
   a.enclosing(b, 0.5, euclidian, whole_edges).polygons.output(lb + 4, dm)
   a.enclosing(b, 0.5, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
   a.enclosing(b, 0.5, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  a.enclosing(b, 0.5, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  if has_float_range
+    a.enclosing(b, 0.5, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  else
+    a.enclosing(b, 0.5, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
+  end
   
-  lb += 10
+  lb += 10 #220
   message "--- enclosing (edges) #{lb}"
   
   ae = a.edges
@@ -281,9 +287,13 @@ def run_testsuite(dm, ic, tiled = false)
   ae.enclosing(be, 0.5, euclidian, whole_edges).polygons.output(lb + 4, dm)
   ae.enclosing(be, 0.5, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
   ae.enclosing(be, 0.5, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  ae.enclosing(be, 0.5, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  if has_float_range
+    ae.enclosing(be, 0.5, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  else
+    ae.enclosing(be, 0.5, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
+  end
   
-  lb += 10
+  lb += 10 #230
   message "--- isolated #{lb}"
   
   b.isolated(0.4).polygons.output(lb, dm)
@@ -294,9 +304,13 @@ def run_testsuite(dm, ic, tiled = false)
   b.isolated(0.4, euclidian, whole_edges).polygons.output(lb + 4, dm)
   b.isolated(0.4, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
   b.isolated(0.4, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  b.isolated(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  if has_float_range
+    b.isolated(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  else
+    b.isolated(0.4, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
+  end
   
-  lb += 10
+  lb += 10 #240
   message "--- notch #{lb}"
   
   b.notch(0.4).polygons.output(lb, dm)
@@ -306,9 +320,13 @@ def run_testsuite(dm, ic, tiled = false)
   b.notch(0.4, euclidian, whole_edges).polygons.output(lb + 4, dm)
   b.notch(0.4, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
   b.notch(0.4, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  b.notch(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  if has_float_range
+    b.notch(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  else
+    b.notch(0.4, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
+  end
   
-  lb += 10
+  lb += 10 #250
   message "--- overlap #{lb}"
   
   a.overlap(b, 0.5).polygons.output(lb, dm)
@@ -318,9 +336,13 @@ def run_testsuite(dm, ic, tiled = false)
   a.overlap(b, 0.5, euclidian, whole_edges).polygons.output(lb + 4, dm)
   a.overlap(b, 0.5, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
   a.overlap(b, 0.5, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  a.overlap(b, 0.5, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  if has_float_range
+    a.overlap(b, 0.5, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  else
+    a.overlap(b, 0.5, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
+  end
   
-  lb += 10
+  lb += 10 #260
   message "--- overlap (edges) #{lb}"
   
   ae = a.edges
@@ -332,9 +354,13 @@ def run_testsuite(dm, ic, tiled = false)
   ae.overlap(be, 0.5, euclidian, whole_edges).polygons.output(lb + 4, dm)
   ae.overlap(be, 0.5, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
   ae.overlap(be, 0.5, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  ae.overlap(be, 0.5, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  if has_float_range
+    ae.overlap(be, 0.5, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  else
+    ae.overlap(be, 0.5, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
+  end
   
-  lb += 10
+  lb += 10 #270
   message "--- separation #{lb}"
   
   a.separation(b, 0.4).polygons.output(lb, dm)
@@ -345,9 +371,13 @@ def run_testsuite(dm, ic, tiled = false)
   a.separation(b, 0.4, euclidian, whole_edges).polygons.output(lb + 4, dm)
   a.separation(b, 0.4, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
   a.separation(b, 0.4, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  a.separation(b, 0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  if has_float_range
+    a.separation(b, 0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  else
+    a.separation(b, 0.4, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
+  end
   
-  lb += 10
+  lb += 10 #280
   message "--- sized #{lb}"
   
   x.sized(0.1).output(lb, dm)
@@ -362,7 +392,7 @@ def run_testsuite(dm, ic, tiled = false)
   xdup.xor(x.sized(0.1, 0)).is_empty? == true || raise("xor not empty")
   a.sized(4.0, no_limit).output(lb + 7, dm)
   
-  lb += 10
+  lb += 10 #290
   message "--- space #{lb}"
   
   b.space(0.4).polygons.output(lb, dm)
@@ -372,9 +402,13 @@ def run_testsuite(dm, ic, tiled = false)
   b.space(0.4, euclidian, whole_edges).polygons.output(lb + 4, dm)
   b.space(0.4, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
   b.space(0.4, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  b.space(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  if has_float_range
+    b.space(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  else
+    b.space(0.4, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
+  end
   
-  lb += 10
+  lb += 10 #300
   message "--- space (edges) #{lb}"
   
   be = b.edges
@@ -385,9 +419,13 @@ def run_testsuite(dm, ic, tiled = false)
   be.space(0.4, euclidian, whole_edges).polygons.output(lb + 4, dm)
   be.space(0.4, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
   be.space(0.4, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  be.space(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  if has_float_range
+    be.space(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  else
+    be.space(0.4, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
+  end
   
-  lb += 10
+  lb += 10 #310
   message "--- width #{lb}"
   
   b.width(0.4).polygons.output(lb, dm)
@@ -397,9 +435,13 @@ def run_testsuite(dm, ic, tiled = false)
   b.width(0.4, euclidian, whole_edges).polygons.output(lb + 4, dm)
   b.width(0.4, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
   b.width(0.4, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  b.width(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  if has_float_range
+    b.width(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  else
+    b.width(0.4, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
+  end
   
-  lb += 10
+  lb += 10 #320
   message "--- width (edges) #{lb}"
   
   be = b.edges
@@ -410,9 +452,13 @@ def run_testsuite(dm, ic, tiled = false)
   be.width(0.4, euclidian, whole_edges).polygons.output(lb + 4, dm)
   be.width(0.4, euclidian, projection_limits(0.4, nil)).polygons.output(lb + 5, dm)
   be.width(0.4, euclidian, projection_limits(nil, 0.4)).polygons.output(lb + 6, dm)
-  be.width(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  if has_float_range
+    be.width(0.4, euclidian, projection_limits(0..0.4)).polygons.output(lb + 7, dm)
+  else
+    be.width(0.4, euclidian, projection_limits(0, 0.4)).polygons.output(lb + 7, dm)
+  end
   
-  lb += 10
+  lb += 10 #330
   message "--- with_angle #{lb}"
   
   a.edges.with_angle(90.degree).extended_out(0.01).output(lb, dm)
@@ -423,7 +469,7 @@ def run_testsuite(dm, ic, tiled = false)
   a.edges.without_angle(0, 45.1).extended_out(0.01).output(lb + 5, dm)
   a.with_angle(135).polygons.output(lb + 6, dm)
   
-  lb += 10
+  lb += 10 #340
   message "--- with_area #{lb}"
   
   b.with_area(0.49.um2).output(lb, dm)
@@ -433,7 +479,7 @@ def run_testsuite(dm, ic, tiled = false)
   b.without_area(nil, 0.5).output(lb + 4, dm)
   b.without_area(0.5, nil).output(lb + 5, dm)
   
-  lb += 10
+  lb += 10 #350
   message "--- with_perimeter #{lb}"
   
   b.with_perimeter(2.8.um).output(lb, dm)
@@ -443,7 +489,7 @@ def run_testsuite(dm, ic, tiled = false)
   b.without_perimeter(nil, 3.um).output(lb + 4, dm)
   b.without_perimeter(3.um, nil).output(lb + 5, dm)
   
-  lb += 10
+  lb += 10 #360
   message "--- with_bbox_height #{lb}"
   
   b.with_bbox_height(0.7.um).output(lb, dm)
@@ -453,7 +499,7 @@ def run_testsuite(dm, ic, tiled = false)
   b.without_bbox_height(nil, 0.7.um+1.dbu).output(lb + 4, dm)
   b.without_bbox_height(0.7.um, nil).output(lb + 5, dm)
   
-  lb += 10
+  lb += 10 #370
   message "--- with_bbox_width #{lb}"
   
   b.with_bbox_width(0.7.um).output(lb, dm)
@@ -463,7 +509,7 @@ def run_testsuite(dm, ic, tiled = false)
   b.without_bbox_width(nil, 0.7.um+1.dbu).output(lb + 4, dm)
   b.without_bbox_width(0.7.um, nil).output(lb + 5, dm)
   
-  lb += 10
+  lb += 10 #380
   message "--- with_bbox_min #{lb}"
   
   b.with_bbox_min(0.7.um).output(lb, dm)
@@ -473,7 +519,7 @@ def run_testsuite(dm, ic, tiled = false)
   b.without_bbox_min(nil, 0.7.um+1.dbu).output(lb + 4, dm)
   b.without_bbox_min(0.7.um, nil).output(lb + 5, dm)
   
-  lb += 10
+  lb += 10 #390
   message "--- with_bbox_max #{lb}"
   
   b.with_bbox_max(0.7.um).output(lb, dm)
@@ -483,7 +529,7 @@ def run_testsuite(dm, ic, tiled = false)
   b.without_bbox_max(nil, 0.7.um+1.dbu).output(lb + 4, dm)
   b.without_bbox_max(0.7.um, nil).output(lb + 5, dm)
   
-  lb += 10
+  lb += 10 #400
   message "--- with_length #{lb}"
   
   a.edges.with_length(0.6.um).extended_out(0.01).output(lb, dm)
@@ -493,7 +539,7 @@ def run_testsuite(dm, ic, tiled = false)
   a.edges.without_length(0 .. 0.6.um+1.dbu).extended_out(0.01).output(lb + 4, dm)
   a.edges.without_length(0.6, nil).extended_out(0.01).output(lb + 5, dm)
   
-  lb += 10
+  lb += 10 #410
   message "--- ongrid, snap #{lb}"
   
   a.ongrid(0.2).polygons(1.dbu).output(lb, dm)
@@ -504,7 +550,7 @@ def run_testsuite(dm, ic, tiled = false)
   adup.snap(0.2)
   adup.xor(a.snapped(0.2)).output(lb + 4, dm)
   
-  lb += 10
+  lb += 10 #420
   message "--- odd polygon check #{lb}"
   
   y.odd_polygons.output(lb, dm)

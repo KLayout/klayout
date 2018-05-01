@@ -31,13 +31,12 @@ Source0:        http://www.klayout.de/downloads/%{name}-%{version}.tar.gz
 # so's of klayout itself)
 AutoReqProv: 	no
 
-%define buildopt -j2
-
 # CentOS7 requirements
 %if "%{target_system}" == "centos7"
 Requires:	ruby >= 2.0.0
 Requires:	python >= 2.7.5
 Requires: qt-x11 >= 4.8.5
+%define buildopt -j2
 %endif
 
 %if "%{target_system}" == "centos6"
@@ -46,7 +45,7 @@ Requires: libcurl >= 7.19.7
 Requires: ruby >= 1.8.7
 Requires: python >= 2.6.6
 Requires: qt-x11 >= 4.6.2
-%define buildopt -libcurl %{buildopt}
+%define buildopt -libcurl -j2
 %endif
 
 %if "%{target_system}" == "opensuse42_2"
@@ -54,6 +53,7 @@ Requires: qt-x11 >= 4.6.2
 Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
+%define buildopt -j2
 %endif
 
 %if "%{target_system}" == "opensuse42_3"
@@ -61,7 +61,7 @@ Requires: libqt4-x11 >= 4.8.6
 Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
-# ...
+%define buildopt -j2
 %endif
 
 %description

@@ -1276,6 +1276,12 @@ InputPipe::reset ()
   throw tl::Exception (tl::to_string (QObject::tr ("pipeline input files not available on Windows")));
 }
 
+void
+InputPipe::close ()
+{
+  throw tl::Exception (tl::to_string (QObject::tr ("pipeline input files not available on Windows")));
+}
+
 // ---------------------------------------------------------------
 //  OutputPipe delegate implementation
 

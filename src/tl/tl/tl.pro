@@ -8,6 +8,13 @@ DEFINES += MAKE_TL_LIBRARY
 
 LIBS += -lz
 
+equals(HAVE_CURL, "1") {
+  LIBS += -lcurl
+  win32 {
+    LIBS += -lwsock32    # required because we do "select"
+  }
+}
+
 FORMS =
 
 SOURCES = \

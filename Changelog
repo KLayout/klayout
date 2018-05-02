@@ -1,5 +1,8 @@
 0.25.3
 
+* Enhancement: Compile option to use libcurl instead of QtNetwork
+       This workaround enables builds on the native CentOS6 
+       configuration with the package manager functional.
 * Enhancement: Pass label (text) layers through DRC script
        The "labels" method now allows copying labels from a layer
        to the output.

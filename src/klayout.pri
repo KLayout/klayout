@@ -45,7 +45,6 @@ equals(HAVE_PYTHON, "1") {
 
 equals(HAVE_CURL, "1") {
   DEFINES += HAVE_CURL
-  LIBS += -lcurl
 }
 
 equals(HAVE_RUBY, "1") {

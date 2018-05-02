@@ -483,17 +483,17 @@ class DBPolygon_TestClass < TestBase
 
     p = RBA::Polygon::from_s("(0,0;0,40;40,40;40,0/10,10;30,10;30,30;10,30)")
 
-    assert_equal(p.decompose_convex.to_s, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    assert_equal(p.decompose_convex(RBA::Polygon::PO_any).to_s, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    assert_equal(p.decompose_convex(RBA::Polygon::PO_horizontal).to_s, "[(0,10;0,30;10,30;10,10), (0,30;0,40;40,40;40,30), (30,10;30,30;40,30;40,10), (0,0;0,10;40,10;40,0)]")
-    assert_equal(p.decompose_convex(RBA::Polygon::PO_vertical).to_s, "[(10,0;10,10;30,10;30,0), (0,0;0,40;10,40;10,0), (10,30;10,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
-    assert_equal(p.decompose_convex(RBA::Polygon::PO_htrapezoids).to_s, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    assert_equal(p.decompose_convex(RBA::Polygon::PO_vtrapezoids).to_s, "[(10,0;10,10;30,10;30,0), (0,0;0,30;10,30;10,0), (0,30;0,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
+    assert_equal(p.decompose_convex.inspect, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
+    assert_equal(p.decompose_convex(RBA::Polygon::PO_any).inspect, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
+    assert_equal(p.decompose_convex(RBA::Polygon::PO_horizontal).inspect, "[(0,10;0,30;10,30;10,10), (0,30;0,40;40,40;40,30), (30,10;30,30;40,30;40,10), (0,0;0,10;40,10;40,0)]")
+    assert_equal(p.decompose_convex(RBA::Polygon::PO_vertical).inspect, "[(10,0;10,10;30,10;30,0), (0,0;0,40;10,40;10,0), (10,30;10,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
+    assert_equal(p.decompose_convex(RBA::Polygon::PO_htrapezoids).inspect, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
+    assert_equal(p.decompose_convex(RBA::Polygon::PO_vtrapezoids).inspect, "[(10,0;10,10;30,10;30,0), (0,0;0,30;10,30;10,0), (0,30;0,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
 
-    assert_equal(p.decompose_trapezoids.to_s, "[(0,0;0,10;40,10;40,0), (0,10;0,30;10,30;10,10), (30,10;30,30;40,30;40,10), (0,30;0,40;40,40;40,30)]")
-    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_simple).to_s, "[(0,0;0,10;40,10;40,0), (0,10;0,30;10,30;10,10), (30,10;30,30;40,30;40,10), (0,30;0,40;40,40;40,30)]")
-    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_htrapezoids).to_s, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
-    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_vtrapezoids).to_s, "[(10,0;10,10;30,10;30,0), (0,0;0,30;10,30;10,0), (0,30;0,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
+    assert_equal(p.decompose_trapezoids.inspect, "[(0,0;0,10;40,10;40,0), (0,10;0,30;10,30;10,10), (30,10;30,30;40,30;40,10), (0,30;0,40;40,40;40,30)]")
+    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_simple).inspect, "[(0,0;0,10;40,10;40,0), (0,10;0,30;10,30;10,10), (30,10;30,30;40,30;40,10), (0,30;0,40;40,40;40,30)]")
+    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_htrapezoids).inspect, "[(0,10;0,30;10,30;10,10), (0,30;0,40;30,40;30,30), (30,10;30,40;40,40;40,10), (0,0;0,10;40,10;40,0)]")
+    assert_equal(p.decompose_trapezoids(RBA::Polygon::TD_vtrapezoids).inspect, "[(10,0;10,10;30,10;30,0), (0,0;0,30;10,30;10,0), (0,30;0,40;30,40;30,30), (30,0;30,40;40,40;40,0)]")
 
   end
 

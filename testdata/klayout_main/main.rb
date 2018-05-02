@@ -60,7 +60,7 @@ class KLayoutMain_TestClass < TestBase
   def test_4
 
     # Application class
-    if !RBA.constants.find { |x| x == :QDialog }
+    if !RBA.constants.find { |x| x == :QDialog || x == "QDialog" }
 
       out = `./klayout -b -r #{File.join(File.dirname(__FILE__), "test_app.rb")}`
       assert_equal(out, "RBA::Application superclass Object\nMainWindow is not there\n")

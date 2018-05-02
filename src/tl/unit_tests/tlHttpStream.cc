@@ -23,6 +23,7 @@
 
 #include "tlHttpStream.h"
 #include "tlUnitTest.h"
+#include "tlTimer.h"
 
 #include <QCoreApplication>
 
@@ -100,10 +101,12 @@ TEST(3)
   stream.send ();
   EXPECT_EQ (stream.data_available (), false);
 
-  while (! stream.data_available ()) {
+  tl::Clock start = tl::Clock::current ();
+  while (! r.flag && (tl::Clock::current () - start).seconds () < 10) {
     QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
   }
   EXPECT_EQ (r.flag, true);
+  EXPECT_EQ (stream.data_available (), true);
 
   char b[100];
   size_t n = stream.read (b, sizeof (b));

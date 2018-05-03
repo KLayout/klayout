@@ -1,4 +1,4 @@
-0.25.3
+0.25.2          (2018-05-03):
 
 * Enhancement: Compile option to use libcurl instead of QtNetwork
        This workaround enables builds on the native CentOS6 

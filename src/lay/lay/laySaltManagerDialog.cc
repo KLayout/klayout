@@ -611,17 +611,29 @@ BEGIN_PROTECTED
     throw tl::Exception (tl::to_string (tr ("No package selected to delete")));
   }
 
+  std::vector <std::string> failed;
+
   if (gg.size () == 1) {
     SaltGrain *g = gg.front ();
     if (QMessageBox::question (this, tr ("Delete Package"), tr ("Are you sure to delete package '%1'?").arg (tl::to_qstring (g->name ())), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes) {
-      mp_salt->remove_grain (*g);
+      if (! mp_salt->remove_grain (*g)) {
+        failed.push_back (g->name ());
+      }
     }
   } else {
     if (QMessageBox::question (this, tr ("Delete Packages"), tr ("Are you sure to delete the selected %1 packages?").arg (int (gg.size ())), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes) {
       for (std::vector<SaltGrain *>::const_iterator i = gg.begin (); i != gg.end (); ++i) {
-        mp_salt->remove_grain (**i);
+        if (! mp_salt->remove_grain (**i)) {
+          failed.push_back ((*i)->name ());
+        }
       }
     }
+  }
+
+  if (failed.size () == 1) {
+    throw tl::Exception (tl::to_string (tr ("Failed to remove package %1 (no write permissions on directory?)").arg (tl::to_qstring (failed.front ()))));
+  } else if (failed.size () > 1) {
+    throw tl::Exception (tl::to_string (tr ("Failed to remove the following packages:\n  %1").arg (tl::to_qstring (tl::join (failed, "\n  ")))));
   }
 
 END_PROTECTED

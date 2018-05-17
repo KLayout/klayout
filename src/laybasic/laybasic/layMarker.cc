@@ -44,7 +44,7 @@ void render_cell_inst (const db::Layout &layout, const db::CellInstArray &inst, 
   bool render_origins = false;
 
   const db::Cell &cell = layout.cell (inst.object ().cell_index ());
-  std::string cell_name = layout.cell_name (inst.object ().cell_index ());
+  std::string cell_name = layout.display_name (inst.object ().cell_index ());
   db::Box cell_box = cell.bbox ();
 
   db::Vector a, b;

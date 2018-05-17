@@ -200,6 +200,10 @@ SaltModel::data (const QModelIndex &index, int role) const
       img = g->icon ();
     }
 
+    if (img.format () != QImage::Format_ARGB32) {
+      img = img.convertToFormat (QImage::Format_ARGB32);
+    }
+
     if (img.width () != icon_dim || img.height () != icon_dim) {
 
       QImage scaled = img.scaled (QSize (icon_dim, icon_dim), Qt::KeepAspectRatio, Qt::SmoothTransformation);

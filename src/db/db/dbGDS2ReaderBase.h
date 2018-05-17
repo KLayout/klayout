@@ -109,6 +109,7 @@ private:
   unsigned int m_box_mode;
   std::map <tl::string, std::vector<std::string> > m_context_info;
   std::vector <db::Point> m_all_points;
+  std::map <tl::string, tl::string> m_mapped_cellnames;
 
   void read_context_info_cell ();
   void read_boundary (db::Layout &layout, db::Cell &cell, bool from_box_record);
@@ -116,6 +117,7 @@ private:
   void read_text (db::Layout &layout, db::Cell &cell);
   void read_box (db::Layout &layout, db::Cell &cell);
   void read_ref (db::Layout &layout, db::Cell &cell, bool array, tl::vector<db::CellInstArray> &instances, tl::vector<db::CellInstArrayWithProperties> &insts_wp);
+  db::cell_index_type make_cell (db::Layout &layout, const char *cn, bool for_instance);
 
   void do_read (db::Layout &layout);
 

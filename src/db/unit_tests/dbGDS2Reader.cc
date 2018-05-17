@@ -24,7 +24,9 @@
 
 #include "dbGDS2Reader.h"
 #include "dbLayoutDiff.h"
+#include "dbTestSupport.h"
 #include "tlUnitTest.h"
+#include "tlStream.h"
 
 #include <iostream>
 
@@ -345,5 +347,49 @@ TEST(2)
     EXPECT_EQ (equal, true);
 
   }
+}
+
+//  Ability to merge GDS files with PCells
+
+TEST(Bug_121_1)
+{
+  db::Manager m;
+  db::Layout layout (&m);
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/bug_121a.gds");
+    db::GDS2Reader reader (file);
+    reader.read (layout);
+  }
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/bug_121b.gds");
+    db::GDS2Reader reader (file);
+    reader.read (layout);
+  }
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/bug_121_au1.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+}
+
+TEST(Bug_121_2)
+{
+  db::Manager m;
+  db::Layout layout (&m);
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/bug_121a.gds");
+    db::GDS2Reader reader (file);
+    reader.read (layout);
+  }
+
+  {
+    tl::InputStream file (tl::testsrc () + "/testdata/gds/bug_121c.gds");
+    db::GDS2Reader reader (file);
+    reader.read (layout);
+  }
+
+  std::string fn_au (tl::testsrc () + "/testdata/gds/bug_121_au2.gds");
+  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }
 

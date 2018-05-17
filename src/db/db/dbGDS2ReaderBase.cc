@@ -237,6 +237,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
   m_cellname = "";
   m_libname = "";
+  m_mapped_cellnames.clear ();
 
   //  read header
   if (get_record () != sHEADER) {
@@ -350,17 +351,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
     } else {
 
-      db::cell_index_type cell_index;
-
-      std::pair<bool, db::cell_index_type> c = layout.cell_by_name (m_cellname.c_str ()); 
-      if (c.first) {
-        //  cell already there: just add shapes (cell might have been created through forward reference)
-        cell_index = c.second;
-        //  remove "ghost cell" state
-        layout.cell (cell_index).set_ghost_cell (false);
-      } else {
-        cell_index = layout.add_cell (m_cellname.c_str ());
-      }
+      db::cell_index_type cell_index = make_cell (layout, m_cellname.c_str (), false);
 
       db::Cell *cell = &layout.cell (cell_index);
 
@@ -370,6 +361,8 @@ GDS2ReaderBase::do_read (db::Layout &layout)
         if (layout.recover_proxy_as (cell_index, ctx->second.begin (), ctx->second.end (), &layer_mapping)) {
           //  ignore everything in that cell since it is created by the import:
           cell = 0;
+          //  marks the cell for begin addressed by REF's despite being a proxy:
+          m_mapped_cellnames.insert (std::make_pair (m_cellname, m_cellname));
         }
       }
       
@@ -982,6 +975,54 @@ GDS2ReaderBase::read_box (db::Layout &layout, db::Cell &cell)
   }
 }
 
+db::cell_index_type
+GDS2ReaderBase::make_cell (db::Layout &layout, const char *cn, bool for_instance)
+{
+  db::cell_index_type ci = 0;
+
+  //  map to the real name which maybe a different one due to localization
+  //  of proxy cells (they are not to be reopened)
+  bool is_mapped = false;
+  if (! m_mapped_cellnames.empty ()) {
+    std::map<tl::string, tl::string>::const_iterator n = m_mapped_cellnames.find (cn);
+    if (n != m_mapped_cellnames.end ()) {
+      cn = n->second.c_str ();
+      is_mapped = true;
+    }
+  }
+
+  std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn);
+  if (c.first && (is_mapped || ! layout.cell (c.second).is_proxy ())) {
+
+    //  cell already there: just add instance (cell might have been created through forward reference)
+    //  NOTE: we don't address "reopened" proxies as proxies are always local to a layout
+
+    ci = c.second;
+
+    //  mark the cell as read
+    if (! for_instance) {
+      layout.cell (ci).set_ghost_cell (false);
+    }
+
+  } else {
+
+    ci = layout.add_cell (cn);
+
+    if (for_instance) {
+      //  mark this cell a "ghost cell" until it's actually read
+      layout.cell (ci).set_ghost_cell (true);
+    }
+
+    if (c.first) {
+      //  this cell has been given a new name: remember this name for localization
+      m_mapped_cellnames.insert (std::make_pair (cn, layout.cell_name (ci)));
+    }
+
+  }
+
+  return ci;
+}
+
 void 
 GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, tl::vector<db::CellInstArray> &instances, tl::vector<db::CellInstArrayWithProperties> &instances_with_props)
 {
@@ -994,22 +1035,7 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
     error (tl::to_string (QObject::tr ("SNAME record expected")));
   }
 
-  db::cell_index_type ci;
-
-  {
-    //  obtain cell or create new: "cn" is not valid beyond the 
-    //  scope of the get_string() call
-    const char *cn = get_string ();
-    std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn); 
-    if (c.first) {
-      //  cell already there: just add shapes (cell might have been created through forward reference)
-      ci = c.second;
-    } else {
-      ci = layout.add_cell (cn);
-      //  mark this cell a "ghost cell" until it's actually read
-      layout.cell (ci).set_ghost_cell (true);
-    }
-  }
+  db::cell_index_type ci = make_cell (layout, get_string (), true);
 
   bool mirror = false;
   int angle = 0;

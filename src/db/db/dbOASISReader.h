@@ -269,6 +269,7 @@ private:
 
   std::set <unsigned long> m_defined_cells_by_id;
   std::set <std::string> m_defined_cells_by_name;
+  std::map <tl::string, tl::string> m_mapped_cellnames;
 
   std::map <unsigned long, db::property_names_id_type> m_propname_forward_references;
   std::map <unsigned long, std::string> m_propvalue_forward_references;
@@ -291,6 +292,7 @@ private:
   void do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
   void do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
   void do_read_circle (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout);
+  db::cell_index_type make_cell (db::Layout &layout, const char *cn, bool for_instance);
 
   void reset_modal_variables ();
 

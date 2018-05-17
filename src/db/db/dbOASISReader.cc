@@ -770,6 +770,7 @@ OASISReader::do_read (db::Layout &layout)
   m_cells_by_name.clear ();
   m_defined_cells_by_id.clear ();
   m_defined_cells_by_name.clear ();
+  m_mapped_cellnames.clear ();
 
   m_instances.clear ();
   m_instances_with_props.clear ();
@@ -1174,14 +1175,7 @@ OASISReader::do_read (db::Layout &layout)
 
           } else {
 
-            std::pair<bool, db::cell_index_type> c = layout.cell_by_name (name->second.c_str ()); 
-            if (c.first) {
-              cell_index = c.second;
-              layout.cell (cell_index).set_ghost_cell (false);
-            } else {
-              cell_index = layout.add_cell (name->second.c_str ());
-            }
-
+            cell_index = make_cell (layout, name->second.c_str (), false);
             m_cells_by_name.insert (std::make_pair (name->second, cell_index));
 
           }
@@ -1209,14 +1203,7 @@ OASISReader::do_read (db::Layout &layout)
 
         } else {
 
-          std::pair<bool, db::cell_index_type> c = layout.cell_by_name (name.c_str ()); 
-          if (c.first) {
-            cell_index = c.second;
-            layout.cell (cell_index).set_ghost_cell (false);
-          } else {
-            cell_index = layout.add_cell (name.c_str ());
-          }
-
+          cell_index = make_cell (layout, name.c_str (), false);
           m_cells_by_name.insert (std::make_pair (name, cell_index));
 
         }
@@ -1859,6 +1846,54 @@ OASISReader::read_repetition ()
   return mm_repetition.get ().size () > 1;
 }
 
+db::cell_index_type
+OASISReader::make_cell (db::Layout &layout, const char *cn, bool for_instance)
+{
+  db::cell_index_type ci = 0;
+
+  //  map to the real name which maybe a different one due to localization
+  //  of proxy cells (they are not to be reopened)
+  bool is_mapped = false;
+  if (! m_mapped_cellnames.empty ()) {
+    std::map<tl::string, tl::string>::const_iterator n = m_mapped_cellnames.find (cn);
+    if (n != m_mapped_cellnames.end ()) {
+      cn = n->second.c_str ();
+      is_mapped = true;
+    }
+  }
+
+  std::pair<bool, db::cell_index_type> c = layout.cell_by_name (cn);
+  if (c.first && (is_mapped || ! layout.cell (c.second).is_proxy ())) {
+
+    //  cell already there: just add instance (cell might have been created through forward reference)
+    //  NOTE: we don't address "reopened" proxies as proxies are always local to a layout
+
+    ci = c.second;
+
+    //  mark the cell as read
+    if (! for_instance) {
+      layout.cell (ci).set_ghost_cell (false);
+    }
+
+  } else {
+
+    ci = layout.add_cell (cn);
+
+    if (for_instance) {
+      //  mark this cell a "ghost cell" until it's actually read
+      layout.cell (ci).set_ghost_cell (true);
+    }
+
+    if (c.first) {
+      //  this cell has been given a new name: remember this name for localization
+      m_mapped_cellnames.insert (std::make_pair (cn, layout.cell_name (ci)));
+    }
+
+  }
+
+  return ci;
+}
+
 void 
 OASISReader::do_read_placement (unsigned char r,
                                 bool xy_absolute,
@@ -1891,17 +1926,7 @@ OASISReader::do_read_placement (unsigned char r,
 
         } else {
 
-          std::pair<bool, db::cell_index_type> c = layout.cell_by_name (name->second.c_str ()); 
-          if (c.first) {
-            //  take existing cell
-            mm_placement_cell = c.second;
-          } else {
-            //  create the cell
-            mm_placement_cell = layout.add_cell (name->second.c_str ());
-            //  temporarily mark as "ghost cell"
-            layout.cell (mm_placement_cell.get ()).set_ghost_cell (true);
-          }
-
+          mm_placement_cell = make_cell (layout, name->second.c_str (), true);
           m_cells_by_name.insert (std::make_pair (name->second, mm_placement_cell.get ()));
          
         }
@@ -1921,17 +1946,7 @@ OASISReader::do_read_placement (unsigned char r,
       std::map <std::string, db::cell_index_type>::const_iterator cid = m_cells_by_name.find (name);
       if (cid == m_cells_by_name.end ()) {
 
-        std::pair<bool, db::cell_index_type> c = layout.cell_by_name (name.c_str ()); 
-        if (c.first) {
-          //  take existing cell
-          mm_placement_cell = c.second;
-        } else {
-          //  create the cell
-          mm_placement_cell = layout.add_cell (name.c_str ());
-          //  temporarily mark as "ghost cell"
-          layout.cell (mm_placement_cell.get ()).set_ghost_cell (true);
-        }
-
+        mm_placement_cell = make_cell (layout, name.c_str (), true);
         m_cells_by_name.insert (std::make_pair (name, mm_placement_cell.get ()));
 
       } else {

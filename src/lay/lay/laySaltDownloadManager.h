@@ -57,8 +57,10 @@ public:
   void separator ();
   void finish ();
 
+  void mark_fetching (const std::string &name);
   void mark_error (const std::string &name);
   void mark_success (const std::string &name);
+  void set_progress (const std::string &name, double progress);
 
 private slots:
   void confirm_pressed ()     { m_confirmed = true; }

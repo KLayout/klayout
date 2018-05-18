@@ -23,6 +23,7 @@
 #include "laySaltDownloadManager.h"
 #include "laySaltManagerDialog.h"
 #include "laySalt.h"
+#include "tlProgress.h"
 #include "tlFileUtils.h"
 #include "tlWebDAV.h"
 
@@ -78,15 +79,58 @@ ConfirmationDialog::separator ()
 }
 
 void
+ConfirmationDialog::mark_fetching (const std::string &name)
+{
+  std::map<std::string, QTreeWidgetItem *>::const_iterator i = m_items_by_name.find (name);
+  if (i != m_items_by_name.end ()) {
+    list->scrollToItem (i->second);
+    for (int c = 0; c < list->columnCount (); ++c) {
+      i->second->setData (c, Qt::BackgroundColorRole, QColor (224, 244, 244));
+      i->second->setData (c, Qt::TextColorRole, Qt::blue);
+    }
+    i->second->setData (1, Qt::DisplayRole, tr ("FETCHING"));
+  }
+}
+
+void
 ConfirmationDialog::mark_error (const std::string &name)
 {
   set_icon_for_name (name, QIcon (QString::fromUtf8 (":/error_16.png")));
+
+  std::map<std::string, QTreeWidgetItem *>::const_iterator i = m_items_by_name.find (name);
+  if (i != m_items_by_name.end ()) {
+    list->scrollToItem (i->second);
+    for (int c = 0; c < list->columnCount (); ++c) {
+      i->second->setData (c, Qt::BackgroundColorRole, QColor (255, 224, 244));
+      i->second->setData (c, Qt::TextColorRole, Qt::black);
+    }
+    i->second->setData (1, Qt::DisplayRole, tr ("ERROR"));
+  }
 }
 
 void
 ConfirmationDialog::mark_success (const std::string &name)
 {
   set_icon_for_name (name, QIcon (QString::fromUtf8 (":/marked_16.png")));
+
+  std::map<std::string, QTreeWidgetItem *>::const_iterator i = m_items_by_name.find (name);
+  if (i != m_items_by_name.end ()) {
+    list->scrollToItem (i->second);
+    for (int c = 0; c < list->columnCount (); ++c) {
+      i->second->setData (c, Qt::BackgroundColorRole, QColor (160, 255, 160));
+      i->second->setData (c, Qt::TextColorRole, Qt::black);
+    }
+    i->second->setData (1, Qt::DisplayRole, tr ("INSTALLED"));
+  }
+}
+
+void
+ConfirmationDialog::set_progress (const std::string &name, double progress)
+{
+  std::map<std::string, QTreeWidgetItem *>::const_iterator i = m_items_by_name.find (name);
+  if (i != m_items_by_name.end ()) {
+    i->second->setData (1, Qt::DisplayRole, tl::to_qstring (tl::sprintf ("%.1f%%", progress)));
+  }
 }
 
 void
@@ -353,6 +397,43 @@ SaltDownloadManager::make_confirmation_dialog (QWidget *parent, const lay::Salt 
   return dialog;
 }
 
+namespace
+{
+  class DownloadProgressAdaptor
+    : public tl::ProgressAdaptor
+  {
+  public:
+    DownloadProgressAdaptor (lay::ConfirmationDialog *dialog, const std::string &name)
+      : mp_dialog (dialog), m_name (name)
+    {
+      mp_dialog->mark_fetching (m_name);
+    }
+
+    virtual void register_object (tl::Progress * /*progress*/) { }
+    virtual void unregister_object (tl::Progress * /*progress*/) { }
+    virtual void yield (tl::Progress * /*progress*/) { }
+
+    virtual void trigger (tl::Progress *progress)
+    {
+      mp_dialog->set_progress (m_name, progress->value ());
+    }
+
+    void error ()
+    {
+      mp_dialog->mark_error (m_name);
+    }
+
+    void success ()
+    {
+      mp_dialog->mark_success (m_name);
+    }
+
+  private:
+    lay::ConfirmationDialog *mp_dialog;
+    std::string m_name;
+  };
+}
+
 bool
 SaltDownloadManager::execute (lay::SaltManagerDialog *parent, lay::Salt &salt)
 {
@@ -393,12 +474,16 @@ SaltDownloadManager::execute (lay::SaltManagerDialog *parent, lay::Salt &salt)
       }
 
       int status = 1;
-      if (! salt.create_grain (p->grain, target)) {
-        dialog->mark_error (p->name);
-        result = false;
-        status = 0;
-      } else {
-        dialog->mark_success (p->name);
+
+      {
+        DownloadProgressAdaptor pa (dialog.get (), p->name);
+        if (! salt.create_grain (p->grain, target)) {
+          pa.error ();
+          result = false;
+          status = 0;
+        } else {
+          pa.success ();
+        }
       }
 
       try {

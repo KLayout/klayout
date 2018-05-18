@@ -127,6 +127,7 @@ private slots:
 private:
   tl::stable_vector <lay::Action> m_tech_actions;
   std::string m_current_technology;
+  bool m_configure_enabled;
   bool m_current_technology_updated;
   bool m_technologies_configured;
   lay::TechSetupDialog *mp_editor;

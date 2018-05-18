@@ -52,6 +52,7 @@ std::string tech_string_from_name (const std::string &tn)
 TechnologyController::TechnologyController ()
   : PluginDeclaration (), mp_editor (0), mp_mw (0), mp_active_technology (0)
 {
+  m_configure_enabled = true;
   m_current_technology_updated = false;
   m_technologies_configured = false;
 }
@@ -204,7 +205,14 @@ TechnologyController::technologies_changed ()
   //  update the configuration to reflect the persisted technologies
   lay::PluginRoot *pr = mp_mw;
   if (pr) {
-    pr->config_set (cfg_technologies, lay::Technologies::instance ()->to_xml ());
+    m_configure_enabled = false;
+    try {
+      pr->config_set (cfg_technologies, lay::Technologies::instance ()->to_xml ());
+      m_configure_enabled = true;
+    } catch (...) {
+      m_configure_enabled = true;
+      throw;
+    }
   }
 
   update_menu ();
@@ -220,7 +228,11 @@ TechnologyController::technology_changed (lay::Technology *)
 bool
 TechnologyController::configure (const std::string &name, const std::string &value)
 {
-  if (name == cfg_initial_technology) {
+  if (! m_configure_enabled) {
+
+    //  ignore configuration request (prevent recursion
+
+  } else if (name == cfg_initial_technology) {
 
     if (value != m_current_technology) {
       m_current_technology = value;

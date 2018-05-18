@@ -38,6 +38,7 @@ namespace tl
 //  ProgressAdaptor implementation
 
 ProgressAdaptor::ProgressAdaptor ()
+  : mp_prev (0)
 {
   tl::Progress::register_adaptor (this);
 }
@@ -45,6 +46,18 @@ ProgressAdaptor::ProgressAdaptor ()
 ProgressAdaptor::~ProgressAdaptor ()
 {
   tl::Progress::register_adaptor (0);
+}
+
+void
+ProgressAdaptor::prev (ProgressAdaptor *pa)
+{
+  mp_prev = pa;
+}
+
+ProgressAdaptor *
+ProgressAdaptor::prev ()
+{
+  return mp_prev;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -79,7 +92,15 @@ Progress::~Progress ()
 void 
 Progress::register_adaptor (ProgressAdaptor *pa)
 {
-  tl_assert (adaptor () == 0 || pa == 0);
+  ProgressAdaptor *current_pa = adaptor ();
+  if (current_pa) {
+    if (! pa) {
+      pa = current_pa->prev ();
+    } else {
+      pa->prev (current_pa);
+    }
+  }
+
   s_thread_data.setLocalData (new (ProgressAdaptor *) (pa));
 }
 

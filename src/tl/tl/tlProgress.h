@@ -37,6 +37,14 @@ namespace tl
 
 class Progress;
 
+/**
+ *  @brief The receivers for progress reports
+ *
+ *  The progress adaptors form a thread-local stack of receivers. New receivers can override the
+ *  previous receivers. It is important that receivers are always created in a nested fashion inside
+ *  a single thread.
+ */
+
 class TL_PUBLIC ProgressAdaptor
 {
 public:  
@@ -47,6 +55,12 @@ public:
   virtual void unregister_object (Progress *progress) = 0;
   virtual void trigger (Progress *progress) = 0;
   virtual void yield (Progress *progress) = 0;
+
+  void prev (ProgressAdaptor *pa);
+  ProgressAdaptor *prev ();
+
+private:
+  ProgressAdaptor *mp_prev;
 };
 
 /**

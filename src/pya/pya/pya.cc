@@ -60,7 +60,7 @@ class PYAObjectBase;
 
 #define PYA_TRY \
   { \
-    try { 
+    try {
 
 #define PYA_CATCH(where) \
     } catch (tl::ExitException &ex) { \
@@ -75,8 +75,8 @@ class PYAObjectBase;
       std::string msg = tl::to_string (QObject::tr ("Unspecific exception in ")) + (where); \
       PyErr_SetString (PyExc_RuntimeError, msg.c_str ()); \
     } \
-  } 
-  
+  }
+
 /**
  *  @brief The python interpreter instance
  */
@@ -241,9 +241,9 @@ public:
   }
 
   /**
-   *  @brief Adds a method to the table 
+   *  @brief Adds a method to the table
    */
-  void add_method (const std::string &name, const gsi::MethodBase *mb) 
+  void add_method (const std::string &name, const gsi::MethodBase *mb)
   {
     bool st = mb->is_static ();
 
@@ -392,7 +392,7 @@ public:
    *  This method must be called after the add_method calls have been used
    *  to fill the table. It will remove duplicate entries and clean up memory.
    */
-  void finish () 
+  void finish ()
   {
     for (std::vector<MethodTableEntry>::iterator m = m_table.begin (); m != m_table.end (); ++m) {
       m->finish ();
@@ -429,12 +429,12 @@ private:
   /**
    *  @brief Constructor
    *  This constructor will create a method table for the given class and register
-   *  this table under this class. 
+   *  this table under this class.
    *  It is used by method_table_by_class only, hence it's private.
    */
   MethodTable (const gsi::ClassBase *cls_decl)
     : m_method_offset (0), m_property_offset (0), mp_cls_decl (cls_decl)
-  { 
+  {
     if (cls_decl->base ()) {
       const MethodTable *base_mt = method_table_by_class (cls_decl->base ());
       tl_assert (base_mt);
@@ -452,8 +452,8 @@ class PythonStackTraceProvider
 {
 public:
   PythonStackTraceProvider (PyFrameObject *frame, const std::string &scope)
-    : m_scope (scope) 
-  { 
+    : m_scope (scope)
+  {
     while (frame != NULL) {
 
       int line = frame->f_lineno;
@@ -468,7 +468,7 @@ public:
     }
   }
 
-  virtual std::vector<tl::BacktraceElement> stack_trace () const 
+  virtual std::vector<tl::BacktraceElement> stack_trace () const
   {
     return m_stack_trace;
   }
@@ -500,7 +500,7 @@ private:
 /**
  *  @brief Gets the method name from a method id
  */
-std::string 
+std::string
 method_name_from_id (int mid, PyObject *self)
 {
   const gsi::ClassBase *cls_decl = 0;
@@ -509,7 +509,7 @@ method_name_from_id (int mid, PyObject *self)
     PYAObjectBase *p = (PYAObjectBase *) self;
     cls_decl = p->cls_decl ();
   } else {
-    cls_decl = PythonInterpreter::instance ()->cls_for_type ((PyTypeObject *) self);
+    cls_decl = PythonModule::cls_for_type ((PyTypeObject *) self);
   }
 
   tl_assert (cls_decl != 0);
@@ -533,7 +533,7 @@ method_name_from_id (int mid, PyObject *self)
 /**
  *  @brief Gets the method name from a method id
  */
-std::string 
+std::string
 property_name_from_id (int mid, PyObject *self)
 {
   const gsi::ClassBase *cls_decl = 0;
@@ -542,7 +542,7 @@ property_name_from_id (int mid, PyObject *self)
     PYAObjectBase *p = (PYAObjectBase *) self;
     cls_decl = p->cls_decl ();
   } else {
-    cls_decl = PythonInterpreter::instance ()->cls_for_type ((PyTypeObject *) self);
+    cls_decl = PythonModule::cls_for_type ((PyTypeObject *) self);
   }
 
   tl_assert (cls_decl != 0);
@@ -563,7 +563,7 @@ property_name_from_id (int mid, PyObject *self)
   return cls_decl->name () + "." + mt->property_name (mid);
 }
 
-static PyObject * 
+static PyObject *
 get_return_value (PYAObjectBase *self, gsi::SerialArgs &retlist, const gsi::MethodBase *meth, tl::Heap &heap)
 {
   PyObject *ret = NULL;
@@ -603,7 +603,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
     p = (PYAObjectBase *) self;
     cls_decl = p->cls_decl ();
   } else {
-    cls_decl = PythonInterpreter::instance ()->cls_for_type ((PyTypeObject *) self);
+    cls_decl = PythonModule::cls_for_type ((PyTypeObject *) self);
   }
 
   tl_assert (cls_decl != 0);
@@ -632,7 +632,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
     if ((*m)->is_callback()) {
 
       //  ignore callbacks
-    
+
     } else if ((*m)->compatible_with_num_args (argc)) {
 
       ++candidates;
@@ -647,7 +647,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
 
     if (! strict) {
       return 0;
-    } 
+    }
 
     std::set<unsigned int> nargs;
     for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
@@ -756,7 +756,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
 static PyObject *
 object_dup (PyObject *self, PyObject *args)
 {
-  const gsi::ClassBase *cls_decl_self = PythonInterpreter::instance ()->cls_for_type (Py_TYPE (self));
+  const gsi::ClassBase *cls_decl_self = PythonModule::cls_for_type (Py_TYPE (self));
   tl_assert (cls_decl_self != 0);
 
   if (! PyArg_ParseTuple (args, "")) {
@@ -781,7 +781,7 @@ object_dup (PyObject *self, PyObject *args)
 static PyObject *
 object_assign (PyObject *self, PyObject *args)
 {
-  const gsi::ClassBase *cls_decl_self = PythonInterpreter::instance ()->cls_for_type (Py_TYPE (self));
+  const gsi::ClassBase *cls_decl_self = PythonModule::cls_for_type (Py_TYPE (self));
   tl_assert (cls_decl_self != 0);
 
   PyObject *src = NULL;
@@ -789,12 +789,12 @@ object_assign (PyObject *self, PyObject *args)
     return NULL;
   }
 
-  const gsi::ClassBase *cls_decl_src = PythonInterpreter::instance ()->cls_for_type (Py_TYPE (src));
+  const gsi::ClassBase *cls_decl_src = PythonModule::cls_for_type (Py_TYPE (src));
   tl_assert (cls_decl_src != 0);
 
   if (cls_decl_src != cls_decl_self) {
     throw tl::Exception (tl::to_string (QObject::tr ("Type is not identical on assign")));
-  } 
+  }
   if (! cls_decl_self->can_copy ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No assignment provided for class '%s'")), cls_decl_self->name ());
   }
@@ -858,7 +858,7 @@ object_default_le_impl (PyObject *self, PyObject *args)
   PythonRef lt_res (PyObject_Call (lt_method, args, NULL));
   if (! lt_res) {
     return NULL;
-  } 
+  }
   return c2python<bool> (python2c<bool> (eq_res.get ()) || python2c<bool> (lt_res.get ()));
 }
 
@@ -881,7 +881,7 @@ object_default_gt_impl (PyObject *self, PyObject *args)
   PythonRef lt_res (PyObject_Call (lt_method, args, NULL));
   if (! lt_res) {
     return NULL;
-  } 
+  }
   return c2python<bool> (! (python2c<bool> (eq_res.get ()) || python2c<bool> (lt_res.get ())));
 }
 
@@ -1032,7 +1032,7 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
 
       try {
 
-        int i = 0; 
+        int i = 0;
         for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); i < argc && a != meth->end_arguments (); ++a, ++i) {
           push_arg (*a, arglist, PyTuple_GetItem (args, i), heap);
         }
@@ -1065,7 +1065,7 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
   return ret;
 }
 
-template <int N> 
+template <int N>
 PyObject *method_adaptor (PyObject *self, PyObject *args)
 {
   return method_adaptor (N, self, args);
@@ -1256,7 +1256,7 @@ property_getter_adaptor (int mid, PyObject *self, PyObject *args)
   return ret;
 }
 
-template <int N> 
+template <int N>
 PyObject *property_getter_adaptor (PyObject *self, PyObject *args)
 {
   return property_getter_adaptor (N, self, args);
@@ -1418,7 +1418,7 @@ property_setter_adaptor (int mid, PyObject *self, PyObject *args)
   return ret;
 }
 
-template <int N> 
+template <int N>
 PyObject *property_setter_adaptor (PyObject *self, PyObject *args)
 {
   return property_setter_adaptor (N, self, args);
@@ -1582,7 +1582,7 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
 
       try {
 
-        int i = 0; 
+        int i = 0;
         int argc = args == NULL ? 0 : int (PyTuple_Size (args));
         for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); i < argc && a != meth->end_arguments (); ++a, ++i) {
           push_arg (*a, arglist, PyTuple_GetItem (args, i), heap);
@@ -1623,7 +1623,7 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
   return NULL;
 }
 
-template <int N> 
+template <int N>
 PyObject *method_init_adaptor (PyObject *self, PyObject *args)
 {
   return method_init_adaptor (N, self, args);
@@ -1789,7 +1789,7 @@ property_getter_impl (int mid, PyObject *self)
     p = (PYAObjectBase *) self;
     cls_decl = p->cls_decl ();
   } else {
-    cls_decl = PythonInterpreter::instance ()->cls_for_type ((PyTypeObject *) self);
+    cls_decl = PythonModule::cls_for_type ((PyTypeObject *) self);
   }
 
   const MethodTable *mt = MethodTable::method_table_by_class (cls_decl);
@@ -1860,7 +1860,7 @@ property_getter_func (PyObject *self, void *closure)
   return ret;
 }
 
-static PyObject * 
+static PyObject *
 property_setter_impl (int mid, PyObject *self, PyObject *value)
 {
   const gsi::ClassBase *cls_decl;
@@ -1870,7 +1870,7 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
     p = (PYAObjectBase *) self;
     cls_decl = p->cls_decl ();
   } else {
-    cls_decl = PythonInterpreter::instance ()->cls_for_type ((PyTypeObject *) self);
+    cls_decl = PythonModule::cls_for_type ((PyTypeObject *) self);
   }
 
   if (p && p->const_ref ()) {
@@ -2012,7 +2012,7 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
   }
 }
 
-static int 
+static int
 property_setter_func (PyObject *self, PyObject *value, void *closure)
 {
   int res = -1;
@@ -2052,7 +2052,7 @@ static int
 pya_object_init (PyObject * /*self*/, PyObject *args, PyObject *kwds)
 {
   //  no particular initialization
-  static char *kwlist[] = {NULL};  
+  static char *kwlist[] = {NULL};
   if (! PyArg_ParseTupleAndKeywords (args, kwds, "", kwlist)) {
     return -1;
   } else {
@@ -2061,14 +2061,14 @@ pya_object_init (PyObject * /*self*/, PyObject *args, PyObject *kwds)
 }
 
 /**
- *  @brief Factory for a base class object 
+ *  @brief Factory for a base class object
  */
 static PyObject *
 pya_object_new (PyTypeObject *type, PyObject * /*args*/, PyObject * /*kwds*/)
 {
   //  create the object
   PYAObjectBase *self = (PYAObjectBase *) type->tp_alloc (type, 0);
-  new (self) PYAObjectBase (PythonInterpreter::instance ()->cls_for_type (type));
+  new (self) PYAObjectBase (PythonModule::cls_for_type (type));
   return (PyObject *) self;
 }
 
@@ -2114,7 +2114,7 @@ static bool is_reserved_word (const std::string &name)
 }
 
 /**
- *  @brief Extracts the Python name from a generic name 
+ *  @brief Extracts the Python name from a generic name
  *
  *  Returns an empty string if no Python name could be generated.
  */
@@ -2221,228 +2221,175 @@ static std::string extract_python_name (const std::string &name)
     }
 
     return name;
-  
+
   }
 }
+
 
 // --------------------------------------------------------------------------
-//  The interpreter implementation
+//  The PythonModule implementation
 
-static const char *pya_module_name = "pya";
+std::map<const gsi::MethodBase *, std::string> PythonModule::m_python_doc;
+std::map <PyTypeObject *, const gsi::ClassBase *> PythonModule::m_cls_map;
+std::map <const gsi::ClassBase *, PyTypeObject *> PythonModule::m_rev_cls_map;
 
-#if PY_MAJOR_VERSION < 3
-
-static PyObject *
-init_pya_module ()
+PythonModule::PythonModule ()
+  : mp_mod_def (0)
 {
+  //  .. nothing yet ..
+}
+
+PythonModule::~PythonModule ()
+{
+  PYAObjectBase::clear_callbacks_cache ();
+
+  while (!m_methods_heap.empty ()) {
+    delete m_methods_heap.back ();
+    m_methods_heap.pop_back ();
+  }
+
+  while (!m_getseters_heap.empty ()) {
+    delete m_getseters_heap.back ();
+    m_getseters_heap.pop_back ();
+  }
+
+  m_string_heap.clear ();
+
+  if (mp_mod_def) {
+    delete[] mp_mod_def;
+    mp_mod_def = 0;
+  }
+}
+
+PyObject *
+PythonModule::module ()
+{
+  return mp_module.get ();
+}
+
+void
+PythonModule::init (const char *mod_name, const char *description)
+{
+  m_mod_name = mod_name;
+  m_mod_description = description;
+
   static PyMethodDef module_methods[] = {
-    {NULL}  // Sentinel 
+    {NULL}  // Sentinel
   };
-  return Py_InitModule3 (pya_module_name, module_methods, "KLayout Python API.");
-}
 
+  PyObject *module = 0;
+
+#if PY_MAJOR_VERSION < 3
+  module = Py_InitModule3 (m_mod_name.c_str (), module_methods, m_mod_description.c_str ());
 #else
 
-static PyObject *
-init_pya_module ()
+  static struct PyModuleDef mod_def = {
+     PyModuleDef_HEAD_INIT,
+     m_mod_name.c_str (),
+     NULL,     // module documentation
+     -1,       // size of per-interpreter state of the module,
+               // if the module keeps state in global variables.
+     module_methods
+  };
+
+  tl_assert (mp_mod_def == 0);
+
+  //  prepare a persistent structure with the module definition
+  //  and pass this one to PyModule_Create
+  mp_mod_def = new char[sizeof (PyModuleDef)];
+  memcpy ((void *) mp_mod_def, (const void *) &mod_def, sizeof (PyModuleDef));
+  module = PyModule_Create ((PyModuleDef *) mp_mod_def);
+
+#endif
+
+  mp_module = PythonRef (module);
+}
+
+void
+PythonModule::init (const char *mod_name, PyObject *module)
 {
-  static struct PyModuleDef moduledef = {
-    PyModuleDef_HEAD_INIT,
-    pya_module_name,        // m_name 
-    "KLayout Python API.",  // m_doc 
-    -1,                     // m_size 
-    NULL,                   // m_methods 
-    NULL,                   // m_reload 
-    NULL,                   // m_traverse 
-    NULL,                   // m_clear 
-    NULL,                   // m_free 
-  };
-  return PyModule_Create (&moduledef);
+  m_mod_name = mod_name;
+  mp_module = PythonRef (module);
 }
 
-#endif
+PyMethodDef *
+PythonModule::make_method_def ()
+{
+  static PyMethodDef md = { };
+  m_methods_heap.push_back (new PyMethodDef (md));
+  return m_methods_heap.back ();
+}
 
-PythonInterpreter::PythonInterpreter () 
-  : mp_current_console (0), mp_current_exec_handler (0), m_current_exec_level (0),
-    m_in_trace (false), m_block_exceptions (false), m_ignore_next_exception (false), 
-    mp_current_frame (NULL), mp_py3_app_name (0)
-{ 
-  tl::SelfTimer timer (tl::verbosity () >= 21, "Initializing Python");
+PyGetSetDef *
+PythonModule::make_getset_def ()
+{
+  static PyGetSetDef gsd = { };
+  m_getseters_heap.push_back (new PyGetSetDef (gsd));
+  return m_getseters_heap.back ();
+}
 
-  std::string app_path = tl::to_string (QCoreApplication::applicationFilePath ());
+char *
+PythonModule::make_string (const std::string &s)
+{
+  m_string_heap.push_back (s);
+  return const_cast<char *> (m_string_heap.back ().c_str ());
+}
 
-#if PY_MAJOR_VERSION >= 3
+void
+PythonModule::add_python_doc (const gsi::ClassBase & /*cls*/, const MethodTable *mt, int mid, const std::string &doc)
+{
+  for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
+    std::string &doc_string = m_python_doc [*m];
+    doc_string += doc;
+    doc_string += "\n\n";
+  }
+}
 
-  //  if set, use $KLAYOUT_PYTHONPATH to initialize the path
-# if defined(_WIN32)
-
-  tl_assert (sizeof (wchar_t) == 2);
-
-  const wchar_t *python_path = _wgetenv (L"KLAYOUT_PYTHONPATH");
-  if (python_path) {
-
-    Py_SetPath (python_path);
-
+std::string
+PythonModule::python_doc (const gsi::MethodBase *method)
+{
+  std::map<const gsi::MethodBase *, std::string>::const_iterator d = m_python_doc.find (method);
+  if (d != m_python_doc.end ()) {
+    return d->second;
   } else {
-
-    //  If present, read the paths from a file in INST_PATH/.python-paths.txt.
-    //  The content of this file is evaluated as an expression and the result
-    //  is placed inside the Python path.
-    
-    try {
-
-      QString path;
-
-      QDir inst_dir (QCoreApplication::applicationDirPath ());
-      QFileInfo fi (inst_dir.absoluteFilePath (tl::to_qstring(".python-paths.txt")));
-      if (fi.exists ()) {
-
-        tl::log << tl::to_string (QObject::tr ("Reading Python path from ")) << tl::to_string (fi.filePath ());
-
-        QFile paths_txt (fi.filePath ());
-        paths_txt.open (QIODevice::ReadOnly);
-
-        tl::Eval eval;
-        eval.set_global_var ("inst_path", tl::Variant (tl::to_string (inst_dir.absolutePath ())));
-        tl::Expression ex;
-        eval.parse (ex, paths_txt.readAll ().constData ());
-        tl::Variant v = ex.execute ();
-
-        if (v.is_list ()) {
-          for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
-            if (! path.isEmpty ()) {
-              path += tl::to_qstring (";");
-            }
-            path += tl::to_qstring (i->to_string ());
-          }
-        }
-
-      }
-
-      //  note: this is a hack, but linking with toWCharArray fails since wchar_t is treated
-      //  as a built-in type in our build
-      Py_SetPath ((const wchar_t *) path.utf16 ());
-
-    } catch (tl::Exception &ex) {
-      tl::error << tl::to_string (QObject::tr ("Evaluation of Python path expression failed")) << ": " << ex.msg (); 
-    } catch (...) {
-      tl::error << tl::to_string (QObject::tr ("Evaluation of Python path expression failed"));
-    }
-   
+    return std::string ();
   }
+}
 
-# else
+void
+PythonModule::make_classes ()
+{
+  PyObject *module = mp_module.get ();
 
-  const char *python_path = getenv ("KLAYOUT_PYTHONPATH");
-  if (python_path) {
+  //  Create a (built-in) base class for all objects exposed by this module
 
-    QString path = QString::fromLocal8Bit (python_path);
+  m_base_class_name = m_mod_name + ".__Base";
 
-    if (sizeof (wchar_t) == 4) {
-      Py_SetPath ((const wchar_t *) path.toUcs4 ().constData ());
-    } else if (sizeof (wchar_t) == 2) {
-      Py_SetPath ((const wchar_t *) path.utf16 ());
-    } 
+  PyTypeObject *base_class = (PyTypeObject *) PyType_Type.tp_alloc (&PyType_Type, sizeof (PyTypeObject));
+  tl_assert (base_class != NULL);
+  mp_base_class = PythonRef ((PyObject *) base_class);
 
-  } 
-
-# endif
-
-#endif
-
+  base_class->tp_base = &PyBaseObject_Type;
+  base_class->tp_name = m_base_class_name.c_str ();
+  base_class->tp_basicsize = sizeof (PYAObjectBase);
+  base_class->tp_init = &pya_object_init;
+  base_class->tp_new = &pya_object_new;
+  base_class->tp_dealloc = (destructor) &pya_object_deallocate;
+  base_class->tp_setattro = PyObject_GenericSetAttr;
+  base_class->tp_getattro = PyObject_GenericGetAttr;
 #if PY_MAJOR_VERSION < 3
-
-  Py_SetProgramName (make_string (app_path));
-
-  Py_InitializeEx (0 /*don't set signals*/);
-
-  //  Set dummy argv[]
-  //  TODO: more?
-  char *argv[1] = { make_string (app_path) };
-#if PY_MINOR_VERSION >= 7
-  PySys_SetArgvEx (1, argv, 0);
+  base_class->tp_flags = Py_TPFLAGS_HEAPTYPE | Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_CHECKTYPES;
 #else
-  PySys_SetArgv (1, argv);
+  base_class->tp_flags = Py_TPFLAGS_HEAPTYPE | Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE;
 #endif
 
-  PyObject *module = init_pya_module ();
-  if (module == NULL) {
+  if (PyType_Ready (base_class) < 0) {
     check_error ();
     return;
   }
 
-  PyImport_ImportModule (pya_module_name);
+  PyModule_AddObject (module, "__Base", (PyObject *) base_class);
 
-#else
-
-  //  Python 3 requires a unicode string for the application name
-  PyObject *an = c2python (app_path);
-  tl_assert (an != NULL);
-  mp_py3_app_name = PyUnicode_AsWideCharString (an, NULL);
-  tl_assert (mp_py3_app_name != NULL);
-  Py_DECREF (an);
-  Py_SetProgramName (mp_py3_app_name);
-
-  PyImport_AppendInittab (pya_module_name, &init_pya_module);
-  Py_InitializeEx (0 /*don't set signals*/);
-
-  //  Set dummy argv[]
-  //  TODO: more?
-  wchar_t *argv[1] = { mp_py3_app_name };
-  PySys_SetArgvEx (1, argv, 0);
-
-  //  Import the module
-  PyObject *module = PyImport_ImportModule (pya_module_name);
-  if (module == NULL) {
-    check_error ();
-    return;
-  }
-
-#endif
-
-  m_object_heap.push_back (PythonRef (module));
-
-
-  //  Create a (built-in) base class for all objects exposed by pya
-
-  static PyTypeObject base_class = {
-    PyVarObject_HEAD_INIT (&PyType_Type, 0)
-    "pya.__Base",               // tp_name
-    sizeof (PYAObjectBase)      // tp_size
-  };
-
-  m_object_heap.push_back (PythonRef ((PyObject *) &base_class));
-  base_class.tp_base = &PyBaseObject_Type;
-  base_class.tp_basicsize = sizeof (PYAObjectBase);
-  base_class.tp_init = &pya_object_init;
-  base_class.tp_new = &pya_object_new;
-  base_class.tp_dealloc = (destructor) &pya_object_deallocate;
-#if PY_MAJOR_VERSION < 3
-  base_class.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_CHECKTYPES;
-#else
-  base_class.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE;
-#endif
-  base_class.tp_setattro = PyObject_GenericSetAttr;
-  base_class.tp_getattro = PyObject_GenericGetAttr;
-
-  if (PyType_Ready (&base_class) < 0) {
-    check_error ();
-    return;
-  }
-
-  PyType_Ready (&base_class);
-  Py_INCREF (&base_class);
-
-  PyModule_AddObject (module, "__Base", (PyObject *) &base_class);
-
-
-  //  Build two objects that provide a way to redirect stdout, stderr
-  //  and instatiate them two times for stdout and stderr.
-  PYAChannelObject::make_class (module);
-  m_stdout_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stdout));
-  m_stdout = PythonPtr (m_stdout_channel.get ());
-  m_stderr_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stderr));
-  m_stderr = PythonPtr (m_stderr_channel.get ());
 
   //  Build a class for descriptors for static attributes
   PYAStaticAttributeDescriptorObject::make_class (module);
@@ -2493,17 +2440,17 @@ PythonInterpreter::PythonInterpreter ()
       //  Create the class as a heap object, since that way we can dynamically extend the objects
 
       PythonRef bases (PyTuple_New (1));
-      PyTypeObject *base = &base_class;
+      PyObject *base = mp_base_class.get ();
       if (c->base () != 0) {
         std::map <const gsi::ClassBase *, PyTypeObject *>::const_iterator cb = m_rev_cls_map.find (c->base ());
         tl_assert (cb != m_rev_cls_map.end ());
-        base = cb->second;
+        base = (PyObject *) cb->second;
       }
       Py_INCREF (base);
-      PyTuple_SetItem (bases.get (), 0, (PyObject *) base);
+      PyTuple_SetItem (bases.get (), 0, base);
 
       PythonRef dict (PyDict_New ());
-      PyDict_SetItemString (dict.get (), "__module__", PythonRef (c2python (pya_module_name)).get ());
+      PyDict_SetItemString (dict.get (), "__module__", PythonRef (c2python (m_mod_name)).get ());
       PyDict_SetItemString (dict.get (), "__doc__", PythonRef (c2python (c->doc ())).get ());
 
       PythonRef args (PyTuple_New (3));
@@ -2511,7 +2458,7 @@ PythonInterpreter::PythonInterpreter ()
       PyTuple_SetItem (args.get (), 1, bases.release ());
       PyTuple_SetItem (args.get (), 2, dict.release ());
 
-      PyTypeObject *type = (PyTypeObject *) PyObject_Call ((PyObject *) &PyType_Type, args.get (), NULL); 
+      PyTypeObject *type = (PyTypeObject *) PyObject_Call ((PyObject *) &PyType_Type, args.get (), NULL);
       tl_assert (type != NULL);
 
       PyModule_AddObject (module, c->name ().c_str (), (PyObject *) type);
@@ -2614,7 +2561,7 @@ PythonInterpreter::PythonInterpreter ()
         std::string doc;
 
         //  add getter and setter documentation, create specific Python documentation
-      
+
         for (MethodTableEntry::method_iterator m = begin_getters; m != end_getters; ++m) {
           if (! doc.empty ()) {
             doc += "\n\n";
@@ -2638,8 +2585,8 @@ PythonInterpreter::PythonInterpreter ()
           //  non-static attribute getters/setters
           PyGetSetDef *getset = make_getset_def ();
           getset->name = make_string (name);
-          getset->get = begin_getters != end_getters ? &property_getter_func : NULL; 
-          getset->set = begin_setters != end_setters ? &property_setter_func : NULL; 
+          getset->get = begin_getters != end_getters ? &property_getter_func : NULL;
+          getset->set = begin_setters != end_setters ? &property_setter_func : NULL;
           getset->doc = make_string (doc);
           getset->closure = make_closure (getter_mid, setter_mid);
 
@@ -2758,7 +2705,7 @@ PythonInterpreter::PythonInterpreter ()
 
             } else if (name == "size" && m_first->compatible_with_num_args (0)) {
 
-              //  The size method is also routed via the sequence methods protocol if there 
+              //  The size method is also routed via the sequence methods protocol if there
               //  is a [] function
               add_python_doc (*c, mt, mid, tl::to_string (QObject::tr ("This method is also available as 'len(object)'")));
               alt_names.push_back ("__len__");
@@ -2796,7 +2743,7 @@ PythonInterpreter::PythonInterpreter ()
             set_type_attr (type, name, attr);
 
           } else if (isupper (name [0]) || m_first->is_const ()) {
-            
+
             if ((mt->end (mid) - mt->begin (mid)) == 1 && m_first->begin_arguments () == m_first->end_arguments ()) {
 
               //  static methods without arguments which start with a capital letter are treated as constants
@@ -2849,13 +2796,13 @@ PythonInterpreter::PythonInterpreter ()
       //  Unlike Ruby, Python does not automatically implement != from == for example.
       //  We assume that "==" and "<" are the minimum requirements for full comparison
       //  and "==" is the minimum requirement for equality. Hence:
-      //    * If "==" is given, but no "!=", synthesize 
+      //    * If "==" is given, but no "!=", synthesize
       //        "a != b" by "!a == b"
       //    * If "==" and "<" are given, synthesize if required
       //        "a <= b" by "a < b || a == b"
       //        "a > b" by "!(a < b || a == b)"  (could be b < a, but this avoids having to switch arguments)
       //        "a >= b" by "!a < b"
-      
+
       bool has_eq = mt->find_method (false, "==").first;
       bool has_ne = mt->find_method (false, "!=").first;
       bool has_lt = mt->find_method (false, "<").first;
@@ -2951,33 +2898,228 @@ PythonInterpreter::PythonInterpreter ()
     }
 
   }
+}
+
+const gsi::ClassBase *PythonModule::cls_for_type (PyTypeObject *type)
+{
+  while (type) {
+    std::map <PyTypeObject *, const gsi::ClassBase *>::const_iterator t = m_cls_map.find (type);
+    if (t != m_cls_map.end ()) {
+      return t->second;
+    }
+    //  not found - try base class
+    type = type->tp_base;
+  }
+  return 0;
+}
+
+PyTypeObject *PythonModule::type_for_cls (const gsi::ClassBase *cls)
+{
+  std::map <const gsi::ClassBase *, PyTypeObject *>::const_iterator s = m_rev_cls_map.find (cls);
+  if (s == m_rev_cls_map.end ()) {
+    return NULL;
+  } else {
+    return s->second;
+  }
+}
+
+// --------------------------------------------------------------------------
+//  The interpreter implementation
+
+static const char *pya_module_name = "pya";
+
+#if PY_MAJOR_VERSION < 3
+
+static PyObject *
+init_pya_module ()
+{
+  static PyMethodDef module_methods[] = {
+    {NULL}  // Sentinel
+  };
+  return Py_InitModule3 (pya_module_name, module_methods, "KLayout Python API.");
+}
+
+#else
+
+static PyObject *
+init_pya_module ()
+{
+  static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,
+    pya_module_name,        // m_name
+    "KLayout Python API.",  // m_doc
+    -1,                     // m_size
+    NULL,                   // m_methods
+    NULL,                   // m_reload
+    NULL,                   // m_traverse
+    NULL,                   // m_clear
+    NULL,                   // m_free
+  };
+  return PyModule_Create (&moduledef);
+}
+
+#endif
+
+PythonInterpreter::PythonInterpreter ()
+  : mp_current_console (0), mp_current_exec_handler (0), m_current_exec_level (0),
+    m_in_trace (false), m_block_exceptions (false), m_ignore_next_exception (false),
+    mp_current_frame (NULL), mp_py3_app_name (0)
+{
+  tl::SelfTimer timer (tl::verbosity () >= 21, "Initializing Python");
+
+  std::string app_path = tl::to_string (QCoreApplication::applicationFilePath ());
+
+#if PY_MAJOR_VERSION >= 3
+
+  //  if set, use $KLAYOUT_PYTHONPATH to initialize the path
+# if defined(_WIN32)
+
+  tl_assert (sizeof (wchar_t) == 2);
+
+  const wchar_t *python_path = _wgetenv (L"KLAYOUT_PYTHONPATH");
+  if (python_path) {
+
+    Py_SetPath (python_path);
+
+  } else {
+
+    //  If present, read the paths from a file in INST_PATH/.python-paths.txt.
+    //  The content of this file is evaluated as an expression and the result
+    //  is placed inside the Python path.
+
+    try {
+
+      QString path;
+
+      QDir inst_dir (QCoreApplication::applicationDirPath ());
+      QFileInfo fi (inst_dir.absoluteFilePath (tl::to_qstring(".python-paths.txt")));
+      if (fi.exists ()) {
+
+        tl::log << tl::to_string (QObject::tr ("Reading Python path from ")) << tl::to_string (fi.filePath ());
+
+        QFile paths_txt (fi.filePath ());
+        paths_txt.open (QIODevice::ReadOnly);
+
+        tl::Eval eval;
+        eval.set_global_var ("inst_path", tl::Variant (tl::to_string (inst_dir.absolutePath ())));
+        tl::Expression ex;
+        eval.parse (ex, paths_txt.readAll ().constData ());
+        tl::Variant v = ex.execute ();
+
+        if (v.is_list ()) {
+          for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
+            if (! path.isEmpty ()) {
+              path += tl::to_qstring (";");
+            }
+            path += tl::to_qstring (i->to_string ());
+          }
+        }
+
+      }
+
+      //  note: this is a hack, but linking with toWCharArray fails since wchar_t is treated
+      //  as a built-in type in our build
+      Py_SetPath ((const wchar_t *) path.utf16 ());
+
+    } catch (tl::Exception &ex) {
+      tl::error << tl::to_string (QObject::tr ("Evaluation of Python path expression failed")) << ": " << ex.msg ();
+    } catch (...) {
+      tl::error << tl::to_string (QObject::tr ("Evaluation of Python path expression failed"));
+    }
+
+  }
+
+# else
+
+  const char *python_path = getenv ("KLAYOUT_PYTHONPATH");
+  if (python_path) {
+
+    QString path = QString::fromLocal8Bit (python_path);
+
+    if (sizeof (wchar_t) == 4) {
+      Py_SetPath ((const wchar_t *) path.toUcs4 ().constData ());
+    } else if (sizeof (wchar_t) == 2) {
+      Py_SetPath ((const wchar_t *) path.utf16 ());
+    }
+
+  }
+
+# endif
+
+#endif
+
+#if PY_MAJOR_VERSION < 3
+
+  Py_SetProgramName (make_string (app_path));
+
+  Py_InitializeEx (0 /*don't set signals*/);
+
+  //  Set dummy argv[]
+  //  TODO: more?
+  char *argv[1] = { make_string (app_path) };
+#if PY_MINOR_VERSION >= 7
+  PySys_SetArgvEx (1, argv, 0);
+#else
+  PySys_SetArgv (1, argv);
+#endif
+
+  PyObject *module = init_pya_module ();
+  if (module == NULL) {
+    check_error ();
+    return;
+  }
+
+  PyImport_ImportModule (pya_module_name);
+
+#else
+
+  //  Python 3 requires a unicode string for the application name
+  PyObject *an = c2python (app_path);
+  tl_assert (an != NULL);
+  mp_py3_app_name = PyUnicode_AsWideCharString (an, NULL);
+  tl_assert (mp_py3_app_name != NULL);
+  Py_DECREF (an);
+  Py_SetProgramName (mp_py3_app_name);
+
+  PyImport_AppendInittab (pya_module_name, &init_pya_module);
+  Py_InitializeEx (0 /*don't set signals*/);
+
+  //  Set dummy argv[]
+  //  TODO: more?
+  wchar_t *argv[1] = { mp_py3_app_name };
+  PySys_SetArgvEx (1, argv, 0);
+
+  //  Import the module
+  PyObject *module = PyImport_ImportModule (pya_module_name);
+  if (module == NULL) {
+    check_error ();
+    return;
+  }
+
+#endif
+
+  //  Build two objects that provide a way to redirect stdout, stderr
+  //  and instatiate them two times for stdout and stderr.
+  PYAChannelObject::make_class (module);
+  m_stdout_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stdout));
+  m_stdout = PythonPtr (m_stdout_channel.get ());
+  m_stderr_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stderr));
+  m_stderr = PythonPtr (m_stderr_channel.get ());
+
+  m_pya_module.init (pya_module_name, module);
+  m_pya_module.make_classes ();
 
   sp_interpreter = this;
 }
 
-PythonInterpreter::~PythonInterpreter () 
+PythonInterpreter::~PythonInterpreter ()
 {
-  m_object_heap.clear ();
-  PYAObjectBase::clear_callbacks_cache ();
-
-  while (!m_methods_heap.empty ()) {
-    delete m_methods_heap.back ();
-    m_methods_heap.pop_back ();
-  }
-
-  while (!m_getseters_heap.empty ()) {
-    delete m_getseters_heap.back ();
-    m_getseters_heap.pop_back ();
-  }
-
   m_stdout_channel = PythonRef ();
   m_stderr_channel = PythonRef ();
   m_stdout = PythonPtr ();
   m_stderr = PythonPtr ();
 
   Py_Finalize ();
-
-  m_string_heap.clear ();
 
   if (mp_py3_app_name) {
     PyMem_Free (mp_py3_app_name);
@@ -2987,40 +3129,7 @@ PythonInterpreter::~PythonInterpreter ()
   sp_interpreter = 0;
 }
 
-PyMethodDef * 
-PythonInterpreter::make_method_def ()
-{
-  static PyMethodDef md = { };
-  m_methods_heap.push_back (new PyMethodDef (md));
-  return m_methods_heap.back ();
-}
-
-PyGetSetDef * 
-PythonInterpreter::make_getset_def ()
-{
-  static PyGetSetDef gsd = { };
-  m_getseters_heap.push_back (new PyGetSetDef (gsd));
-  return m_getseters_heap.back ();
-}
-
-char * 
-PythonInterpreter::make_string (const std::string &s)
-{
-  m_string_heap.push_back (s);
-  return const_cast<char *> (m_string_heap.back ().c_str ());
-}
-
-void 
-PythonInterpreter::add_python_doc (const gsi::ClassBase & /*cls*/, const MethodTable *mt, int mid, const std::string &doc)
-{
-  for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-    std::string &doc_string = m_python_doc [*m];
-    doc_string += doc;
-    doc_string += "\n\n";
-  }
-}
-
-void 
+void
 PythonInterpreter::add_path (const std::string &p)
 {
   PyObject *path = PySys_GetObject ((char *) "path");
@@ -3052,19 +3161,19 @@ PythonInterpreter::require (const std::string & /*filename*/)
   throw tl::Exception (tl::to_string (QObject::tr ("'require' not implemented for Python interpreter")));
 }
 
-void 
+void
 PythonInterpreter::set_debugger_scope (const std::string &filename)
 {
   m_debugger_scope = filename;
 }
 
-void 
+void
 PythonInterpreter::remove_debugger_scope ()
 {
   m_debugger_scope.clear ();
 }
 
-void 
+void
 PythonInterpreter::ignore_next_exception ()
 {
   if (mp_current_exec_handler) {
@@ -3082,7 +3191,7 @@ PythonInterpreter::load_file (const std::string &filename)
 /**
  *  @brief Gets the global and local variable lists for a given context index
  */
-void 
+void
 PythonInterpreter::get_context (int context, PythonRef &globals, PythonRef &locals, const char *file)
 {
   globals = PythonRef ();
@@ -3113,7 +3222,7 @@ PythonInterpreter::get_context (int context, PythonRef &globals, PythonRef &loca
 
     globals = dict;
     locals = dict;
- 
+
     if (file) {
 
       PythonRef fn (c2python (file));
@@ -3154,7 +3263,7 @@ PythonInterpreter::eval_string (const char *expr, const char *file, int /*line*/
 /**
  *  @brief Evaluates the given expression or executes the given statement
  *  The expression is given int "string". If "eval_expr" is true, the string is evaluated as expression
- *  and the result is returned in the variant. If "eval_expr" is false, the string is evaluated, the 
+ *  and the result is returned in the variant. If "eval_expr" is false, the string is evaluated, the
  *  result is printed to the currently active console and a nil variant is returned.
  */
 tl::Variant
@@ -3235,7 +3344,7 @@ PythonInterpreter::available () const
   return true;
 }
 
-void 
+void
 PythonInterpreter::initialize ()
 {
   // .. no implementation required ..
@@ -3247,19 +3356,19 @@ PythonInterpreter::prepare_trace (PyObject *fn_object)
   std::map<PyObject *, size_t>::const_iterator f = m_file_id_map.find (fn_object);
   if (f == m_file_id_map.end ()) {
     f = m_file_id_map.insert (std::make_pair (fn_object, mp_current_exec_handler->id_for_path (this, normalize_path (python2c<std::string> (fn_object))))).first;
-  } 
+  }
 
   return f->second;
 }
 
 //  TODO: make the Python object the interpreter and don't use singleton instances (multi-threading support)
-static 
+static
 int pya_trace_func (PyObject * /*obj*/, PyFrameObject *frame, int event, PyObject *arg)
 {
   return PythonInterpreter::instance ()->trace_func (frame, event, arg);
 }
 
-int 
+int
 PythonInterpreter::trace_func (PyFrameObject *frame, int event, PyObject *arg)
 {
   if (! mp_current_exec_handler || m_in_trace) {
@@ -3333,8 +3442,8 @@ PythonInterpreter::trace_func (PyFrameObject *frame, int event, PyObject *arg)
         }
 
         //  TODO: really needed?
-        //  Ruby tends to call this callback twice - once from rb_f_raise and then 
-        //  from rb_exc_raise. We use the m_block_exceptions flag to suppress the 
+        //  Ruby tends to call this callback twice - once from rb_f_raise and then
+        //  from rb_exc_raise. We use the m_block_exceptions flag to suppress the
         //  second one
         m_block_exceptions = true;
 
@@ -3352,7 +3461,7 @@ PythonInterpreter::trace_func (PyFrameObject *frame, int event, PyObject *arg)
   return -1;
 }
 
-void 
+void
 PythonInterpreter::push_exec_handler (gsi::ExecutionHandler *exec_handler)
 {
   if (mp_current_exec_handler) {
@@ -3364,7 +3473,7 @@ PythonInterpreter::push_exec_handler (gsi::ExecutionHandler *exec_handler)
   mp_current_exec_handler = exec_handler;
   m_file_id_map.clear ();
 
-  //  if we happen to push the exec handler inside the execution, 
+  //  if we happen to push the exec handler inside the execution,
   //  signal start of execution
   if (m_current_exec_level > 0) {
     mp_current_exec_handler->start_exec (this);
@@ -3376,7 +3485,7 @@ PythonInterpreter::remove_exec_handler (gsi::ExecutionHandler *exec_handler)
 {
   if (mp_current_exec_handler == exec_handler) {
 
-    //  if we happen to remove the exec handler inside the execution, 
+    //  if we happen to remove the exec handler inside the execution,
     //  signal end of execution
     if (m_current_exec_level > 0) {
       mp_current_exec_handler->end_exec (this);
@@ -3402,10 +3511,10 @@ PythonInterpreter::remove_exec_handler (gsi::ExecutionHandler *exec_handler)
   }
 }
 
-void 
+void
 PythonInterpreter::push_console (gsi::Console *console)
 {
-  if (! mp_current_console) { 
+  if (! mp_current_console) {
 
     PythonPtr current_stdout (PySys_GetObject ((char *) "stdout"));
     std::swap (current_stdout, m_stdout);
@@ -3426,7 +3535,7 @@ PythonInterpreter::push_console (gsi::Console *console)
   mp_current_console = console;
 }
 
-void 
+void
 PythonInterpreter::remove_console (gsi::Console *console)
 {
   if (mp_current_console == console) {
@@ -3480,53 +3589,19 @@ gsi::Console *PythonInterpreter::current_console () const
   return mp_current_console;
 }
 
-const gsi::ClassBase *PythonInterpreter::cls_for_type (PyTypeObject *type) const
-{
-  while (type) {
-    std::map <PyTypeObject *, const gsi::ClassBase *>::const_iterator t = m_cls_map.find (type);
-    if (t != m_cls_map.end ()) {
-      return t->second;
-    }
-    //  not found - try base class
-    type = type->tp_base;
-  }
-  return 0;
-}
-
-PyTypeObject *PythonInterpreter::type_for_cls (const gsi::ClassBase *cls) const
-{
-  std::map <const gsi::ClassBase *, PyTypeObject *>::const_iterator s = m_rev_cls_map.find (cls);
-  if (s == m_rev_cls_map.end ()) {
-    return NULL;
-  } else {
-    return s->second;
-  }
-}
-
 void PythonInterpreter::begin_execution ()
 {
-  m_file_id_map.clear (); 
-  m_block_exceptions = false; 
-  if (m_current_exec_level++ == 0 && mp_current_exec_handler) { 
-    mp_current_exec_handler->start_exec (this); 
+  m_file_id_map.clear ();
+  m_block_exceptions = false;
+  if (m_current_exec_level++ == 0 && mp_current_exec_handler) {
+    mp_current_exec_handler->start_exec (this);
   }
 }
 
 void PythonInterpreter::end_execution ()
 {
-  if (m_current_exec_level > 0 && --m_current_exec_level == 0 && mp_current_exec_handler) { 
-    mp_current_exec_handler->end_exec (this); 
-  } 
-}
-
-std::string 
-PythonInterpreter::python_doc (const gsi::MethodBase *method) const
-{
-  std::map<const gsi::MethodBase *, std::string>::const_iterator d = m_python_doc.find (method);
-  if (d != m_python_doc.end ()) {
-    return d->second;
-  } else {
-    return std::string ();
+  if (m_current_exec_level > 0 && --m_current_exec_level == 0 && mp_current_exec_handler) {
+    mp_current_exec_handler->end_exec (this);
   }
 }
 

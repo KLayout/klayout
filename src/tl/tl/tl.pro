@@ -102,7 +102,8 @@ HEADERS = \
     tlUnitTest.h \
     tlInt128Support.h \
     tlHttpStreamCurl.h \
-    tlHttpStreamQt.h
+    tlHttpStreamQt.h \
+    tlDefs.h
 
 INCLUDEPATH =
 DEPENDPATH =

@@ -36,9 +36,9 @@ namespace pya
 //  Serialization adaptors for strings, variants, vectors and maps
 
 /**
- *  @brief An adaptor for a string from ruby objects 
+ *  @brief An adaptor for a string from ruby objects
  */
-class PythonBasedStringAdaptor   
+class PythonBasedStringAdaptor
   : public gsi::StringAdaptor
 {
 public:
@@ -69,9 +69,9 @@ private:
 };
 
 /**
- *  @brief An adaptor for a variant from ruby objects 
+ *  @brief An adaptor for a variant from ruby objects
  */
-class PythonBasedVariantAdaptor   
+class PythonBasedVariantAdaptor
   : public gsi::VariantAdaptor
 {
 public:
@@ -106,7 +106,7 @@ private:
 /**
  *  @brief An adaptor for a vector from Python objects
  */
-class PythonBasedVectorAdaptor   
+class PythonBasedVectorAdaptor
   : public gsi::VectorAdaptor
 {
 public:
@@ -132,7 +132,7 @@ class PythonBasedMapAdaptorIterator
 public:
   PythonBasedMapAdaptorIterator (const PythonPtr &hash, const gsi::ArgType *ainner, const gsi::ArgType *ainner_k);
 
-  virtual void get (gsi::SerialArgs &w, tl::Heap &heap) const; 
+  virtual void get (gsi::SerialArgs &w, tl::Heap &heap) const;
   virtual bool at_end () const;
   virtual void inc ();
 
@@ -147,7 +147,7 @@ private:
 /**
  *  @brief An adaptor for a map from Python objects
  */
-class PythonBasedMapAdaptor   
+class PythonBasedMapAdaptor
   : public gsi::MapAdaptor
 {
 public:
@@ -171,8 +171,8 @@ template <class R>
 struct get_boxed_value_func
 {
   void operator() (void **ret, PyObject *arg, tl::Heap *heap)
-  { 
-    const gsi::ClassBase *cls_decl = PythonInterpreter::instance ()->cls_for_type (Py_TYPE (arg));
+  {
+    const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
     if (! cls_decl) {
 
       R *v = new R (python2c<R> (arg, heap));
@@ -187,7 +187,7 @@ struct get_boxed_value_func
         throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Passing an object to pointer or reference requires a boxed type (pya.%s)")), bt->name ()));
       }
 
-      PYAObjectBase *p = (PYAObjectBase *) arg; 
+      PYAObjectBase *p = (PYAObjectBase *) arg;
       gsi::Value *bo = reinterpret_cast<gsi::Value *> (p->obj ());
       if (bo) {
         *ret = bo->value ().template morph<R> ().native_ptr ();
@@ -254,8 +254,8 @@ struct writer
   }
 };
 
-/** 
- *  @brief Serialization for strings 
+/**
+ *  @brief Serialization for strings
  */
 template <>
 struct writer<gsi::StringType>
@@ -362,7 +362,7 @@ struct writer<gsi::MapType>
 
 /**
  *  @brief A serialization wrapper (write mode)
- *  Specialisation for objects 
+ *  Specialisation for objects
  */
 template <>
 struct writer<gsi::ObjectType>
@@ -382,14 +382,14 @@ struct writer<gsi::ObjectType>
 
     if (atype.is_ptr () || atype.is_cptr () || atype.is_ref () || atype.is_cref ()) {
 
-      const gsi::ClassBase *cls_decl = PythonInterpreter::instance ()->cls_for_type (Py_TYPE (arg));
+      const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
       if (! cls_decl) {
         throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
       }
 
       if (cls_decl->is_derived_from (atype.cls ())) {
 
-        PYAObjectBase *p = (PYAObjectBase *) (arg); 
+        PYAObjectBase *p = (PYAObjectBase *) (arg);
 
         if (cls_decl->adapted_type_info ()) {
           //  resolved adapted type
@@ -400,7 +400,7 @@ struct writer<gsi::ObjectType>
 
       } else if (cls_decl->can_convert_to (atype.cls ())) {
 
-        PYAObjectBase *p = (PYAObjectBase *) (arg); 
+        PYAObjectBase *p = (PYAObjectBase *) (arg);
 
         //  We can convert objects for cref and cptr, but ownership over these objects is not transferred.
         //  Hence we have to keep them on the heap.
@@ -414,14 +414,14 @@ struct writer<gsi::ObjectType>
 
     } else {
 
-      const gsi::ClassBase *cls_decl = PythonInterpreter::instance ()->cls_for_type (Py_TYPE (arg));
+      const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
       if (! cls_decl) {
         throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
       }
 
       if (cls_decl->is_derived_from (atype.cls ())) {
 
-        PYAObjectBase *p = (PYAObjectBase *) (arg); 
+        PYAObjectBase *p = (PYAObjectBase *) (arg);
 
         if (cls_decl->adapted_type_info ()) {
           //  resolved adapted type
@@ -432,7 +432,7 @@ struct writer<gsi::ObjectType>
 
       } else if (cls_decl->can_convert_to (atype.cls ())) {
 
-        PYAObjectBase *p = (PYAObjectBase *) (arg); 
+        PYAObjectBase *p = (PYAObjectBase *) (arg);
         aa->write<void *> (atype.cls ()->create_obj_from (cls_decl, p->obj ()));
 
       } else {
@@ -446,7 +446,7 @@ struct writer<gsi::ObjectType>
 
 /**
  *  @brief A serialization wrapper (write mode)
- *  Specialisation for void 
+ *  Specialisation for void
  */
 template <>
 struct writer<gsi::VoidType>
@@ -464,11 +464,11 @@ push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PyObject *arg, tl
 }
 
 /**
- *  @brief Deseralisation wrapper 
+ *  @brief Deseralisation wrapper
  *
  *  The default implementation is for POD types, strings and variants
  */
-template <class R> 
+template <class R>
 struct reader
 {
   void operator() (gsi::SerialArgs *rr, PythonRef *ret, PyObject * /*self*/, const gsi::ArgType &arg, tl::Heap *heap)
@@ -503,7 +503,7 @@ struct reader
  *  Without that would would have to handle void *&, void * const &, ...
  *  TODO: right now these types are not supported.
  */
-template <> 
+template <>
 struct reader<void *>
 {
   void operator() (gsi::SerialArgs *rr, PythonRef *ret, PyObject * /*self*/, const gsi::ArgType &arg, tl::Heap *heap)
@@ -519,7 +519,7 @@ struct reader<void *>
 /**
  *  @brief Deseralisation wrapper: specialization for strings
  */
-template <> 
+template <>
 struct reader<gsi::StringType>
 {
   void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase * /*self*/, const gsi::ArgType &, tl::Heap *heap)
@@ -589,7 +589,7 @@ PyObject *object_from_variant (const tl::Variant &var, PYAObjectBase *self, cons
 /**
  *  @brief Deseralisation wrapper: specialization for variants
  */
-template <> 
+template <>
 struct reader<gsi::VariantType>
 {
   void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase *self, const gsi::ArgType &atype, tl::Heap *heap)
@@ -612,7 +612,7 @@ struct reader<gsi::VariantType>
 /**
  *  @brief Deseralisation wrapper: specialization for vectors
  */
-template <> 
+template <>
 struct reader<gsi::VectorType>
 {
   void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
@@ -624,7 +624,7 @@ struct reader<gsi::VectorType>
       *ret = PyList_New (0);
       tl_assert (atype.inner () != 0);
       PythonBasedVectorAdaptor t (*ret, atype.inner ());
-      a->copy_to (&t, *heap); 
+      a->copy_to (&t, *heap);
     }
   }
 };
@@ -632,7 +632,7 @@ struct reader<gsi::VectorType>
 /**
  *  @brief Deseralisation wrapper: specialization for maps
  */
-template <> 
+template <>
 struct reader<gsi::MapType>
 {
   void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase * /*self*/, const gsi::ArgType &atype, tl::Heap *heap)
@@ -651,9 +651,9 @@ struct reader<gsi::MapType>
 };
 
 /**
- *  @brief Deseralisation wrapper: specialization for object 
+ *  @brief Deseralisation wrapper: specialization for object
  */
-template <> 
+template <>
 struct reader<gsi::ObjectType>
 {
   void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase *self, const gsi::ArgType &atype, tl::Heap *heap)
@@ -670,7 +670,7 @@ struct reader<gsi::ObjectType>
 /**
  *  @brief Deseralisation wrapper: specialization for void
  */
-template <> 
+template <>
 struct reader<gsi::VoidType>
 {
   void operator() (gsi::SerialArgs *, PythonRef *, PYAObjectBase *, const gsi::ArgType &, tl::Heap *)
@@ -679,7 +679,7 @@ struct reader<gsi::VoidType>
   }
 };
 
-PythonRef 
+PythonRef
 pop_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PYAObjectBase *self, tl::Heap &heap)
 {
   PythonRef ret;
@@ -701,7 +701,7 @@ tl::Variant PythonBasedVariantAdaptor::var () const
   return python2c<tl::Variant> (m_var.get ());
 }
 
-void PythonBasedVariantAdaptor::set (const tl::Variant & /*v*/) 
+void PythonBasedVariantAdaptor::set (const tl::Variant & /*v*/)
 {
   //  TODO: is there a setter for a string?
 }
@@ -715,7 +715,7 @@ PythonBasedVectorAdaptorIterator::PythonBasedVectorAdaptorIterator (const Python
   //  .. nothing yet ..
 }
 
-void PythonBasedVectorAdaptorIterator::get (gsi::SerialArgs &w, tl::Heap &heap) const 
+void PythonBasedVectorAdaptorIterator::get (gsi::SerialArgs &w, tl::Heap &heap) const
 {
   PyObject *member = NULL;
   if (PyTuple_Check (m_array.get ())) {
@@ -726,12 +726,12 @@ void PythonBasedVectorAdaptorIterator::get (gsi::SerialArgs &w, tl::Heap &heap) 
   gsi::do_on_type<writer> () (mp_ainner->type (), &w, member, *mp_ainner, &heap);
 }
 
-bool PythonBasedVectorAdaptorIterator::at_end () const 
+bool PythonBasedVectorAdaptorIterator::at_end () const
 {
   return m_i == m_len;
 }
 
-void PythonBasedVectorAdaptorIterator::inc () 
+void PythonBasedVectorAdaptorIterator::inc ()
 {
   ++m_i;
 }
@@ -750,7 +750,7 @@ gsi::VectorAdaptorIterator *PythonBasedVectorAdaptor::create_iterator () const
   return new PythonBasedVectorAdaptorIterator (m_array, size (), mp_ainner);
 }
 
-void PythonBasedVectorAdaptor::push (gsi::SerialArgs &r, tl::Heap &heap) 
+void PythonBasedVectorAdaptor::push (gsi::SerialArgs &r, tl::Heap &heap)
 {
   if (PyList_Check (m_array.get ())) {
     PythonRef member;
@@ -761,7 +761,7 @@ void PythonBasedVectorAdaptor::push (gsi::SerialArgs &r, tl::Heap &heap)
   }
 }
 
-void PythonBasedVectorAdaptor::clear () 
+void PythonBasedVectorAdaptor::clear ()
 {
   if (PySequence_Check (m_array.get ())) {
     PySequence_DelSlice (m_array.get (), 0, PySequence_Length (m_array.get ()));
@@ -777,7 +777,7 @@ size_t PythonBasedVectorAdaptor::size () const
   }
 }
 
-size_t PythonBasedVectorAdaptor::serial_size () const 
+size_t PythonBasedVectorAdaptor::serial_size () const
 {
   return mp_ainner->size ();
 }
@@ -793,18 +793,18 @@ PythonBasedMapAdaptorIterator::PythonBasedMapAdaptorIterator (const PythonPtr &h
   inc ();
 }
 
-void PythonBasedMapAdaptorIterator::get (gsi::SerialArgs &w, tl::Heap &heap) const 
+void PythonBasedMapAdaptorIterator::get (gsi::SerialArgs &w, tl::Heap &heap) const
 {
   gsi::do_on_type<writer> () (mp_ainner_k->type (), &w, m_key, *mp_ainner_k, &heap);
   gsi::do_on_type<writer> () (mp_ainner->type (), &w, m_value, *mp_ainner, &heap);
 }
 
-bool PythonBasedMapAdaptorIterator::at_end () const 
+bool PythonBasedMapAdaptorIterator::at_end () const
 {
   return ! m_has_items;
 }
 
-void PythonBasedMapAdaptorIterator::inc () 
+void PythonBasedMapAdaptorIterator::inc ()
 {
   m_has_items = PyDict_Next(m_hash.get (), &m_pos, &m_key, &m_value);
 }
@@ -813,7 +813,7 @@ void PythonBasedMapAdaptorIterator::inc ()
 //  PythonBasedMapAdaptor implementation
 
 PythonBasedMapAdaptor::PythonBasedMapAdaptor (const PythonPtr &hash, const gsi::ArgType *ainner, const gsi::ArgType *ainner_k)
-  : mp_ainner (ainner), mp_ainner_k (ainner_k), m_hash (hash) 
+  : mp_ainner (ainner), mp_ainner_k (ainner_k), m_hash (hash)
 {
 }
 
@@ -822,7 +822,7 @@ gsi::MapAdaptorIterator *PythonBasedMapAdaptor::create_iterator () const
   return new PythonBasedMapAdaptorIterator (m_hash, mp_ainner, mp_ainner_k);
 }
 
-void PythonBasedMapAdaptor::insert (gsi::SerialArgs &r, tl::Heap &heap) 
+void PythonBasedMapAdaptor::insert (gsi::SerialArgs &r, tl::Heap &heap)
 {
   PythonRef k, v;
   gsi::do_on_type<reader> () (mp_ainner_k->type (), &r, &k, (PYAObjectBase *) 0, *mp_ainner_k, &heap);
@@ -830,7 +830,7 @@ void PythonBasedMapAdaptor::insert (gsi::SerialArgs &r, tl::Heap &heap)
   PyDict_SetItem (m_hash.get (), k.get (), v.get ());
 }
 
-void PythonBasedMapAdaptor::clear () 
+void PythonBasedMapAdaptor::clear ()
 {
   PyDict_Clear (m_hash.get ());
 }
@@ -840,7 +840,7 @@ size_t PythonBasedMapAdaptor::size () const
   return PyDict_Size (m_hash.get ());
 }
 
-size_t PythonBasedMapAdaptor::serial_size () const 
+size_t PythonBasedMapAdaptor::serial_size () const
 {
   return mp_ainner_k->size () + mp_ainner->size ();
 }
@@ -876,7 +876,7 @@ struct test_arg_func
       if (atype.is_ptr () || atype.is_ref ()) {
 
         //  check if we have a boxed type
-        const gsi::ClassBase *cls_decl = PythonInterpreter::instance ()->cls_for_type (Py_TYPE (arg));
+        const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
         if (cls_decl) {
           const gsi::ClassBase *bc = gsi::cls_decl <gsi::Value> ();
           if (cls_decl->is_derived_from (bc)) {
@@ -914,11 +914,11 @@ struct test_arg_func<gsi::StringType>
 #if PY_MAJOR_VERSION < 3
     if (PyString_Check (arg)) {
       *ret = true;
-    } else 
+    } else
 #else
     if (PyBytes_Check (arg)) {
       *ret = true;
-    } else 
+    } else
 #endif
     if (PyUnicode_Check (arg)) {
       *ret = true;
@@ -981,7 +981,7 @@ struct test_arg_func<gsi::MapType>
     const gsi::ArgType &ainner = *atype.inner ();
     const gsi::ArgType &ainner_k = *atype.inner ();
 
-    //  Note: we test key and value separately. That way we don't need to 
+    //  Note: we test key and value separately. That way we don't need to
     //  instantiate a 2d template with do_on_type2.
     *ret = true;
 
@@ -1010,7 +1010,7 @@ struct test_arg_func<gsi::ObjectType>
       return;
     }
 
-    const gsi::ClassBase *cls_decl = PythonInterpreter::instance ()->cls_for_type (Py_TYPE (arg));
+    const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
     if (! cls_decl) {
       *ret = false;
       return;
@@ -1037,6 +1037,5 @@ test_arg (const gsi::ArgType &atype, PyObject *arg, bool loose)
   gsi::do_on_type<test_arg_func> () (atype.type (), &ret, arg, atype, loose);
   return ret;
 }
-      
-}
 
+}

@@ -39,6 +39,8 @@ equals(HAVE_PYTHON, "1") {
   SUBDIRS += pya
   LANG_DEPENDS += pya
   pya.depends += gsi db
+  SUBDIRS += pymod
+  pymod.depends += pya
 } else {
   SUBDIRS += pyastub
   pyastub.depends += gsi

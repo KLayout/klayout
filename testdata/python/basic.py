@@ -25,6 +25,7 @@ import gc
 # Set this to True to disable some tests involving exceptions
 leak_check = "TEST_LEAK_CHECK" in os.environ
 
+print("@@@1")
 # see test_21
 class AEXT(pya.A):
   def __init__(self):
@@ -134,16 +135,23 @@ class BasicTest(unittest.TestCase):
 
   def test_00(self):
 
+    print("@@@00")
     # all references of PA are released now:
     ac0 = pya.A.a0()
 
+    print("@@@00-1")
     a = pya.A.new_a(100)
     self.assertEqual( pya.A.a0(), ac0 + 1 )
+    print("@@@00-2")
 
     a = pya.A()
+    print("@@@00-31")
     self.assertEqual(a.a1(), 17)
+    print("@@@00-32")
     a.assign(pya.A(110))
+    print("@@@00-33")
     self.assertEqual(a.a1(), 110)
+    print("@@@00-3")
 
     a = None
     self.assertEqual( pya.A.a0(), ac0 )
@@ -384,6 +392,7 @@ class BasicTest(unittest.TestCase):
 
   def test_12(self):
 
+    print("@@@12")
     a1 = pya.A()
     a1.a5( -15 )
     a2 = a1
@@ -584,6 +593,7 @@ class BasicTest(unittest.TestCase):
 
   def test_13(self):
 
+    print("@@@13")
     b = pya.B()
 
     if not leak_check:
@@ -810,6 +820,7 @@ class BasicTest(unittest.TestCase):
 
   def test_13b(self):
 
+    print("@@@13b")
     b = pya.B()
 
     bb = pya.B()
@@ -913,6 +924,7 @@ class BasicTest(unittest.TestCase):
 
   def test_14(self):
 
+    print("@@@14")
     a = pya.A()
     a.a5( 22 )
 
@@ -926,6 +938,7 @@ class BasicTest(unittest.TestCase):
 
   def test_15(self):
 
+    print("@@@15")
     a = pya.A_NC()
     self.assertEqual( True, isinstance(a, pya.A) )
     a.a5( 22 )
@@ -940,6 +953,7 @@ class BasicTest(unittest.TestCase):
 
   def test_16(self):
 
+    print("@@@16")
     if leak_check:
       return
 
@@ -966,6 +980,7 @@ class BasicTest(unittest.TestCase):
   
   def test_17(self):
 
+    print("@@@17")
     # test copies of objects being returned
 
     b = pya.B()
@@ -991,6 +1006,7 @@ class BasicTest(unittest.TestCase):
 
   def test_18(self):
 
+    print("@@@18")
     # Test references to objects (returned by b.b7)
 
     b = pya.B()
@@ -1017,6 +1033,7 @@ class BasicTest(unittest.TestCase):
 
   def test_19(self):
 
+    print("@@@19")
     c0 = pya.C()
     self.assertEqual( c0.g("x"), 1977 );
 
@@ -1062,6 +1079,7 @@ class BasicTest(unittest.TestCase):
 
   def test_20(self):
 
+    print("@@@20")
     b = pya.B()
 
     a1 = b.b14a( True )
@@ -1081,6 +1099,7 @@ class BasicTest(unittest.TestCase):
 
   def test_21(self):
 
+    print("@@@21")
     # Python does not allow extending built-in types - the following test
     # is taken from the Ruby binding. I don't know how to implement it for 
     # Python however.
@@ -1112,6 +1131,7 @@ class BasicTest(unittest.TestCase):
 
   def test_22(self):
 
+    print("@@@22")
     # test client data binding to C++ objects 
     
     b = pya.B()
@@ -1230,6 +1250,7 @@ class BasicTest(unittest.TestCase):
 
   def test_23(self):
 
+    print("@@@23")
     b = pya.B()
     a = pya.A()
 
@@ -1277,6 +1298,7 @@ class BasicTest(unittest.TestCase):
 
   def test_24(self):
 
+    print("@@@24")
     n = [ 0, 0 , "" ]
 
     # Events
@@ -1362,6 +1384,7 @@ class BasicTest(unittest.TestCase):
 
   def test_25(self):
 
+    print("@@@25")
     # destruction of an instance via c++
     pya.A.a20(None) 
     ac0 = pya.A.a0()
@@ -1414,6 +1437,7 @@ class BasicTest(unittest.TestCase):
 
   def test_26(self):
 
+    print("@@@26")
     # cyclic references - event bound to itself
 
     base_count = EEXT.inst_count() 
@@ -1457,6 +1481,7 @@ class BasicTest(unittest.TestCase):
 
   def test_27(self):
 
+    print("@@@27")
     # destruction of an instance via c++
     pya.A.a20(None)
     ac0 = pya.A.a0()
@@ -1493,6 +1518,7 @@ class BasicTest(unittest.TestCase):
 
   def test_28(self):
 
+    print("@@@28")
     self.assertEqual(pya.B.inst() == None, True)
     self.assertEqual(pya.B.has_inst(), False)
 
@@ -1528,6 +1554,7 @@ class BasicTest(unittest.TestCase):
 
   def test_30(self):
 
+    print("@@@30")
     # some basic tests for the *Value boxing classes
 
     val = pya.Value()
@@ -1704,6 +1731,7 @@ class BasicTest(unittest.TestCase):
 
   def test_31(self):
 
+    print("@@@31")
     # some basic tests with derived and base classes
 
     pya.X.init()
@@ -1760,6 +1788,7 @@ class BasicTest(unittest.TestCase):
 
   def test_32(self):
 
+    print("@@@32")
     # run test only if we have Qt bindings 
     if not "QStringPair" in pya.__dict__:
       return
@@ -1788,6 +1817,7 @@ class BasicTest(unittest.TestCase):
 
   def test_33(self):
   
+    print("@@@33")
     def str_from_bytearray(ba):
       if (sys.version_info > (3, 0)):
         return ba
@@ -1822,6 +1852,7 @@ class BasicTest(unittest.TestCase):
 
   def test_34(self):
 
+    print("@@@34")
     # run test only if we have Qt bindings 
     if not "QDialog" in pya.__dict__:
       return
@@ -1840,6 +1871,7 @@ class BasicTest(unittest.TestCase):
 
   def test_35(self):
 
+    print("@@@35")
     # vectors of pointers
 
     pya.X.init()
@@ -1940,12 +1972,14 @@ class BasicTest(unittest.TestCase):
 
   def test_36(self):
 
+    print("@@@36")
     x = XEdge()
     self.assertEqual("XEdge", type(x).__name__)
     self.assertEqual("(1,2;3,4)", str(x))
 
   def test_37(self):
 
+    print("@@@37")
     # This test is taken from the Ruby binding, but
     # Python does not have protected methods:
     return
@@ -1965,6 +1999,7 @@ class BasicTest(unittest.TestCase):
 
   def test_38(self):
 
+    print("@@@38")
     # mixed const / non-const reference and events
     ec = pya.E.ic()
     self.assertEqual(ec.is_const_object(), True)
@@ -1996,6 +2031,7 @@ class BasicTest(unittest.TestCase):
 
   def test_39(self):
 
+    print("@@@39")
     # mixed const / non-const reference and events
     fc = pya.F.ic()
     self.assertEqual(fc.is_const_object(), True)
@@ -2026,6 +2062,7 @@ class BasicTest(unittest.TestCase):
 
   def test_40(self):
 
+    print("@@@40")
     # optional arguments
     g = pya.G()
 
@@ -2109,6 +2146,7 @@ class BasicTest(unittest.TestCase):
 
   def test_41(self):
 
+    print("@@@41")
     # maps 
     b = pya.B()
 
@@ -2170,6 +2208,7 @@ class BasicTest(unittest.TestCase):
 
   def test_42(self):
 
+    print("@@@42")
     # virtual functions and sub-classes 
     z = pya.Z()
     self.assertEqual(z.f(None), "(nil)")
@@ -2198,6 +2237,7 @@ class BasicTest(unittest.TestCase):
 
   def test_50(self):
   
+    print("@@@50")
     # advanced containers and out parameters
 
     b = pya.B()
@@ -2372,6 +2412,7 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(b.qhash_is(), {})
 
   def test_51(self):
+    print("@@@51")
   
     # new subclass and child class declarations
     y2 = pya.Y2()
@@ -2389,6 +2430,7 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(isinstance(y4, pya.X), False)
 
   def test_60(self):
+    print("@@@60")
 
     class SignalCollector(object):
 
@@ -2482,6 +2524,7 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(sc.got_s2_2, None)
 
   def test_61(self):
+    print("@@@61")
   
     class SignalCollector(object):
 
@@ -2565,6 +2608,7 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(sc.got_s0b, 0)
 
   def test_70(self):
+    print("@@@70")
   
     class SignalCollector(object):
 
@@ -2613,6 +2657,7 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(sc.got_s2_2.tag, 111)
 
   def test_71(self):
+    print("@@@71")
   
     class SignalCollector(object):
 
@@ -2697,6 +2742,7 @@ class BasicTest(unittest.TestCase):
 
   # Custom factory implemented in Python
   def test_80(self):
+    print("@@@80")
     gc = pya.GObject.g_inst_count()
     gf = PyGFactory()
     go = pya.GFactory.create_f(gf, 17)
@@ -2706,6 +2752,7 @@ class BasicTest(unittest.TestCase):
     go = None
     self.assertEqual(pya.GObject.g_inst_count(), gc)
 
+print("@@@2")
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestSuite()
@@ -2715,4 +2762,5 @@ if __name__ == '__main__':
 
   if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
     sys.exit(1)
+print("@@@3")
 

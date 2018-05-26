@@ -309,7 +309,7 @@ tl::Variant python2c<tl::Variant> (PyObject *rval, tl::Heap *heap)
 
   } else {
     
-    const gsi::ClassBase *cls = PythonInterpreter::instance ()->cls_for_type (Py_TYPE (rval));
+    const gsi::ClassBase *cls = PythonModule::cls_for_type (Py_TYPE (rval));
     if (cls) {
 
       PYAObjectBase *p = (PYAObjectBase *) rval;
@@ -438,7 +438,7 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
     //  can't guarantee the lifetime of the container will exceed that
     //  of the exposed property. Hence copying is safer.
 
-    PyTypeObject *type = PythonInterpreter::instance ()->type_for_cls (clsact);
+    PyTypeObject *type = PythonModule::type_for_cls (clsact);
     tl_assert (type != NULL);
 
     //  create a instance and copy the value
@@ -459,7 +459,7 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
 
   } else {
 
-    PyTypeObject *type = PythonInterpreter::instance ()->type_for_cls (clsact);
+    PyTypeObject *type = PythonModule::type_for_cls (clsact);
     tl_assert (type != NULL);
 
     //  create a instance and copy the value

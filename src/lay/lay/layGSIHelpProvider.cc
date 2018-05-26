@@ -1190,10 +1190,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     const gsi::MethodBase::MethodSynonym &syn = i->second.first->begin_synonyms () [i->second.second];
 
     DocumentationParser method_doc (i->second.first);
-    std::string pydoc;
-    if (pya::PythonInterpreter::instance ()) {
-      pydoc = pya::PythonInterpreter::instance ()->python_doc (i->second.first);
-    }
+    std::string pydoc = pya::PythonModule::python_doc (i->second.first);
 
     os << "<tr>";
     if (i->first != prev_title) {

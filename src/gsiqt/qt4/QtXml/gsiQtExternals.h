@@ -27,8 +27,8 @@
   This file has been created automatically
 */
 
-#if !defined(HDR_gsiQtExternals)
-#define HDR_gsiQtExternals
+#if !defined(HDR_gsiQtXmlExternals)
+#define HDR_gsiQtXmlExternals
 
 #include "gsiClassBase.h"
 #include "gsiQtXmlCommon.h"

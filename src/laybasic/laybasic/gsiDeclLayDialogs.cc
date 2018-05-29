@@ -20,10 +20,9 @@
 
 */
 
-
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
-#include "gsiQtExternals.h"
+#include "gsiQtAllExternals.h"
 
 #include "layBrowserDialog.h"
 #include "layBrowserPanel.h"
@@ -267,7 +266,7 @@ BrowserDialog_Stub *new_browser_dialog_static_and_parent (QWidget *parent, const
 }
 #endif
 
-Class<BrowserDialog_Stub> decl_BrowserDialog (QT_EXTERNAL_BASE (QDialog) "BrowserDialog",
+Class<BrowserDialog_Stub> decl_BrowserDialog (QT_EXTERNAL_BASE (QDialog) "lay", "BrowserDialog",
   gsi::constructor ("new", &new_browser_dialog_with_source,
     "@brief Creates a HTML browser window with a \\BrowserSource as the source of HTML code\n"
     "@args source\n"
@@ -453,7 +452,7 @@ lay::BrowserPanel *new_browser_panel (QWidget *parent)
   return new lay::BrowserPanel (parent);
 }
 
-Class<lay::BrowserPanel> decl_BrowserPanel (QT_EXTERNAL_BASE (QWidget) "BrowserPanel",
+Class<lay::BrowserPanel> decl_BrowserPanel (QT_EXTERNAL_BASE (QWidget) "lay", "BrowserPanel",
   gsi::constructor ("new", &new_browser_panel_with_source,
     "@brief Creates a HTML browser widget with a \\BrowserSource as the source of HTML code\n"
     "@args parent, source\n"
@@ -1165,7 +1164,7 @@ static int warning (const std::string &title, const std::string &text, int butto
 
 struct MessageBox { };
 
-Class<MessageBox> decl_MessageBox (QT_EXTERNAL_BASE (QMainWindow) "MessageBox",
+Class<MessageBox> decl_MessageBox (QT_EXTERNAL_BASE (QMainWindow) "lay", "MessageBox",
   gsi::method ("Ok|#b_ok",               &b_ok,              "@brief A constant describing the 'Ok' button") +
   gsi::method ("Cancel|#b_cancel",       &b_cancel,          "@brief A constant describing the 'Cancel' button") +
   gsi::method ("Yes|#b_yes",             &b_yes,             "@brief A constant describing the 'Yes' button") +

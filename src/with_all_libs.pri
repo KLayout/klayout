@@ -10,9 +10,7 @@ INCLUDEPATH += $$DESTDIR/laybasic $$DESTDIR/lay $$DESTDIR/ext
 DEPENDPATH += $$DESTDIR/laybasic $$DESTDIR/lay $$DESTDIR/ext
 
 equals(HAVE_QTBINDINGS, "1") {
-  INCLUDEPATH += $$PWD/gsiqt
-  DEPENDPATH += $$PWD/gsiqt
-  LIBS += -lklayout_gsiqt
+  LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtCore
 }
 
 equals(HAVE_RUBY, "1") {

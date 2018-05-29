@@ -26,7 +26,7 @@
 #include "layMainWindow.h"
 #include "laybasicCommon.h"
 #include "gsiDecl.h"
-#include "gsiQtExternals.h"
+#include "gsiQtAllExternals.h"
 
 namespace tl
 {
@@ -53,7 +53,7 @@ lay::HelpDialog *new_help_dialog_with_parent (QWidget *parent, bool modal)
   return new lay::HelpDialog (parent, modal);
 }
 
-Class<lay::HelpDialog> decl_HelpDialog (QT_EXTERNAL_BASE (QDialog) "HelpDialog",
+Class<lay::HelpDialog> decl_HelpDialog (QT_EXTERNAL_BASE (QDialog) "lay", "HelpDialog",
   method ("new", new_help_dialog, 
     "@brief Creates a new help dialog\n"
     "@args modal\n"

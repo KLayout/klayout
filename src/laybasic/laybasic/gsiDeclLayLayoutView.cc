@@ -367,7 +367,7 @@ static lay::LayoutView *new_view ()
   return new lay::LayoutView (0, false, 0);
 }
 
-Class<lay::LayoutView> decl_LayoutView ("LayoutView",
+Class<lay::LayoutView> decl_LayoutView ("lay", "LayoutView",
   gsi::constructor ("new", &new_view,
     "@brief Creates a standalone view\n"
     "\n"
@@ -1766,7 +1766,7 @@ static void cv_show_all_cells (lay::CellViewRef *cv)
   }
 }
 
-Class<lay::CellViewRef> decl_CellView ("CellView",
+Class<lay::CellViewRef> decl_CellView ("lay", "CellView",
   method ("==", static_cast<bool (lay::CellViewRef::*) (const lay::CellViewRef &) const> (&lay::CellViewRef::operator==),
     "@brief Equality: indicates whether the cellviews refer to the same one\n"
     "@args other\n"

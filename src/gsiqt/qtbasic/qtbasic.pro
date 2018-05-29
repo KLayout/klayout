@@ -20,4 +20,5 @@ SOURCES += \
 
 HEADERS += \
   gsiQt.h \
-  gsiQtBasicCommon.h
+  gsiQtBasicCommon.h \
+    gsiQtAllExternals.h

@@ -188,11 +188,11 @@ win32 {
 INCLUDEPATH += $$DESTDIR/laybasic/laybasic
 DEPENDPATH += $$DESTDIR/laybasic/laybasic
 
-INCLUDEPATH += $$GSIQT_INC
-DEPENDPATH += $$GSIQT_INC
+INCLUDEPATH += $$QTBASIC_INC
+DEPENDPATH += $$QTBASIC_INC
 
 equals(HAVE_QTBINDINGS, "1") {
-  LIBS += -lklayout_gsiqt
+  LIBS += -lklayout_qtbasic -lklayout_QtGui
 }
 
 INCLUDEPATH += $$RBA_INC

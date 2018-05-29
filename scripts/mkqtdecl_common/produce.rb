@@ -3019,8 +3019,8 @@ END
       extfile.puts("*/")
       extfile.puts("")
 
-      extfile.puts("#if !defined(HDR_gsiQtExternals)")
-      extfile.puts("#define HDR_gsiQtExternals")
+      extfile.puts("#if !defined(HDR_gsi#{modn}Externals)")
+      extfile.puts("#define HDR_gsi#{modn}Externals")
       extfile.puts("")
 
       extfile.puts("#include \"gsiClassBase.h\"")

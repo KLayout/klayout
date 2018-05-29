@@ -277,10 +277,10 @@ INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$RDB_INC
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_rdb
 
-INCLUDEPATH += $$GSIQT_INC
-DEPENDPATH += $$GSIQT_INC
+INCLUDEPATH += $$QTBASIC_INC
+DEPENDPATH += $$QTBASIC_INC
 
 equals(HAVE_QTBINDINGS, "1") {
-  LIBS += -lklayout_gsiqt
+  LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtCore
 }
 

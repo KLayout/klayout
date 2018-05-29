@@ -20,12 +20,11 @@
 
 */
 
-
 #include "layApplication.h"
 #include "layMainWindow.h"
 #include "laySignalHandler.h"
 #include "gsiDecl.h"
-#include "gsiQtExternals.h"
+#include "gsiQtAllExternals.h"
 #include "tlArch.h"
 
 namespace gsi

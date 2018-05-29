@@ -35,7 +35,7 @@ namespace gsi
 //  The dummy class is just provided to avoid some assertions. 
 struct EmptyClass { };
 
-static gsi::Class<EmptyClass> default_cls ("EmptyClass", gsi::Methods ());
+static gsi::Class<EmptyClass> default_cls ("tl", "EmptyClass", gsi::Methods ());
 
 const ClassBase *fallback_cls_decl (const std::type_info &ti)
 {

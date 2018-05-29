@@ -47,11 +47,13 @@ inst_dir_common=`pwd`/scripts/mkqtdecl_common
 inst_dir4=`pwd`/scripts/mkqtdecl4
 inst_dir5=`pwd`/scripts/mkqtdecl5
 src_dir=`pwd`/src
-src_name4=gsiqt4
-src_name5=gsiqt5
+src_name4=gsiqt/qt4
+src_name5=gsiqt/qt5
 
 src_name=$src_name4
 inst_dir=$inst_dir4
+
+work_dir="mkqtdecl.tmp"
 
 while [ "$1" != "" ]; do
 
@@ -92,6 +94,7 @@ while [ "$1" != "" ]; do
     ;;
   -qt5)
     qt="$qt5"
+    work_dir="mkqtdecl5.tmp"
     inst_dir="$inst_dir5"
     src_name="$src_name5"
     ;;
@@ -144,8 +147,6 @@ if ! ruby -e "require 'treetop'" 2>&1; then
   exit 1
 fi
 
-work_dir="./mkqtdecl.tmp"
-
 if [ $update != 0 ]; then  
 
   if [ -e $work_dir ] && [ $reuse == 0 ]; then
@@ -155,71 +156,116 @@ if [ $update != 0 ]; then
   mkdir -p $work_dir
   cd $work_dir
 
-  cp $inst_dir/{allofqt.cpp,mkqtdecl.conf,mkqtdecl.properties,mkqtdecl.events} .
-  cp $inst_dir_common/{cpp_parser_classes.rb,cpp_classes.rb,c++.treetop,parse.rb,reader_ext.rb,produce.rb} .
+  cp -R $inst_dir/Qt* .
+  for d in Qt*; do
+    cd $d
+    cp $inst_dir/{mkqtdecl.conf,mkqtdecl.properties,mkqtdecl.events} .
+    cp $inst_dir_common/{cpp_parser_classes.rb,cpp_classes.rb,c++.treetop,parse.rb,reader_ext.rb,produce.rb} .
+    cd ..
+  done
 
   if [ $reuse == 0 ]; then
 
-    echo "Running gcc preprocessor .."
-    # By using -D_GCC_LIMITS_H_ we make the gcc not include constants such as ULONG_MAX which will 
-    # remain as such. This way the generated code is more generic.
-    gcc -I$qt -fPIC -D_GCC_LIMITS_H_ -E -o allofqt.x allofqt.cpp 
+    for d in Qt*; do
 
-    echo "Stripping hash lines .."
-    egrep -v '^#' <allofqt.x >allofqt.e
-    rm allofqt.x
+      echo "--------------------------------------------------------"
+      echo "Parsing $d ..."
+      echo ""
 
-    echo "Parsing and producing db .."
-    ./parse.rb -i allofqt.e -o allofqt.db
+      cd $d
+
+      echo "Running gcc preprocessor .."
+      # By using -D_GCC_LIMITS_H_ we make the gcc not include constants such as ULONG_MAX which will 
+      # remain as such. This way the generated code is more generic.
+      gcc -I$qt -fPIC -D_GCC_LIMITS_H_ -E -o allofqt.x allofqt.cpp 
+
+      echo "Stripping hash lines .."
+      egrep -v '^#' <allofqt.x >allofqt.e
+      rm allofqt.x
+
+      echo "Parsing and producing db .."
+      ./parse.rb -i allofqt.e -o allofqt.db
+
+      cd ..
+
+    done
 
   fi
 
-  mkdir -p generated
+  rm -f produced.txt
+  touch produced.txt
 
-  echo "Producing code .."
-  ./produce.rb -i allofqt.db
+  # Note the order of the modules is important: first modules get the 
+  # classes first
+  for d in QtCore QtGui QtDesigner QtNetwork QtSql QtXml; do
+
+    cd $d
+
+    mkdir -p generated
+
+    echo "Producing code .."
+    ./produce.rb -x ../produced.txt -i allofqt.db -m $d
+
+    # mark classes produced here as done
+    cat class_list.txt >>../produced.txt
+
+    cd ..
+
+  done
 
 else 
   cd $work_dir 
 fi  
 
-if [ ! -e generated ]; then
-  echo "*** ERROR: production output ("`pwd`"/generated) does not exist - production failed?"
-  exit 1
-fi
+for d in Qt*; do
 
-cd generated
+  echo "--------------------------------------------------------"
+  echo "Processing $d ..."
+  echo ""
 
-if [ $dry != 0 ]; then
-  echo "Synchronizing dry run .."
-else
-  echo "Synchronizing .."
-fi
+  cd $d
 
-count=0
-for f in {*.cc,*.h} qtdecl.pri; do
-  needs_update=0
-  if ! [ -e $src_dir/$src_name/$f ]; then
-    echo "# INFO: creating new file $src_dir/$src_name/$f"
-    needs_update=1
-  elif ! cmp -s $f $src_dir/$src_name/$f; then
-    echo "# INFO: out of date: syncing file $src_dir/$src_name/$f"
-    needs_update=1
+  if [ ! -e generated ]; then
+    echo "*** ERROR: production output ("`pwd`"/generated) does not exist - production failed?"
+    exit 1
   fi
-  if [ $needs_update != 0 ]; then
-    count=`expr $count + 1`
-    if [ $dry != 0 ]; then
-      echo cp $f $src_dir/$src_name/$f
-    else
-      echo === cp $f $src_dir/$src_name/$f
-      cp $f $src_dir/$src_name/$f
+
+  cd generated
+
+  if [ $dry != 0 ]; then
+    echo "Synchronizing dry run .."
+  else
+    echo "Synchronizing .."
+  fi
+
+  count=0
+  for f in {*.cc,*.h} $d.pri; do
+    needs_update=0
+    if ! [ -e $src_dir/$src_name/$d/$f ]; then
+      echo "# INFO: creating new file $src_dir/$src_name/$f"
+      needs_update=1
+    elif ! cmp -s $f $src_dir/$src_name/$d/$f; then
+      echo "# INFO: out of date: syncing file $src_dir/$src_name/$f"
+      needs_update=1
     fi
+    if [ $needs_update != 0 ]; then
+      count=`expr $count + 1`
+      if [ $dry != 0 ]; then
+        echo cp $f $src_dir/$src_name/$d/$f
+      else
+        echo === cp $f $src_dir/$src_name/$d/$f
+        cp $f $src_dir/$src_name/$d/$f
+      fi
+    fi
+  done
+
+  if [ $dry != 0 ]; then
+    echo "# INFO: $count files to synchronize"
+  else
+    echo "# INFO: $count files synchronized"
   fi
+
+  cd ..
+  cd ..
+
 done
-
-if [ $dry != 0 ]; then
-  echo "# INFO: $count files to synchronize"
-else
-  echo "# INFO: $count files synchronized"
-fi
-

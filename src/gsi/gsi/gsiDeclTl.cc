@@ -87,7 +87,7 @@ namespace tl {
 namespace gsi
 {
 
-Class<Logger> decl_Logger ("Logger",
+Class<Logger> decl_Logger ("tl", "Logger",
   gsi::method ("info", &Logger::info, 
     "@brief Writes the given string to the info channel\n"
     "@args msg\n"
@@ -155,7 +155,7 @@ static std::string timer_to_s (const tl::Timer *timer)
   return tl::sprintf ("%.12gs (user), %.12gs (kernel)", timer->sec_user (), timer->sec_sys ());
 }
 
-Class<tl::Timer> decl_Timer ("Timer",
+Class<tl::Timer> decl_Timer ("tl", "Timer",
   gsi::method ("user", &tl::Timer::sec_user, 
     "@brief Returns the elapsed CPU time in user mode from start to stop in seconds\n"
   ) +
@@ -217,7 +217,7 @@ namespace tl {
 namespace gsi 
 {
   
-Class<tl::Progress> decl_Progress ("Progress",
+Class<tl::Progress> decl_Progress ("tl", "Progress",
   gsi::method ("desc=", &tl::Progress::set_desc, 
     "@brief Sets the description text of the progress object\n"
     "@args desc\n"
@@ -263,7 +263,7 @@ static void rel_progress_set_2 (tl::RelativeProgress *progress, size_t value, bo
   progress->set (value, force_yield);
 }
 
-Class<tl::RelativeProgress> decl_RelativeProgress (decl_Progress, "RelativeProgress",
+Class<tl::RelativeProgress> decl_RelativeProgress (decl_Progress, "tl", "RelativeProgress",
   gsi::constructor ("new", &rel_progress_2,
     "@brief Creates a relative progress reporter with the given description and maximum value\n"
     "@args desc, max_value\n"
@@ -345,7 +345,7 @@ static void abs_progress_set_2 (tl::AbsoluteProgress *progress, size_t value, bo
   progress->set (value, force_yield);
 }
 
-Class<tl::AbsoluteProgress> decl_AbsoluteProgress (decl_Progress, "AbsoluteProgress", 
+Class<tl::AbsoluteProgress> decl_AbsoluteProgress (decl_Progress, "tl", "AbsoluteProgress",
   gsi::constructor ("new", &abs_progress_1,
     "@brief Creates an absolute progress reporter with the given description\n"
     "@args desc, max_value\n"
@@ -518,7 +518,7 @@ namespace tl {
 namespace gsi
 {
 
-Class<ExpressionWrapper> decl_ExpressionWrapper ("Expression",
+Class<ExpressionWrapper> decl_ExpressionWrapper ("tl", "Expression",
   gsi::constructor ("new", &new_expr1, gsi::arg ("expr"),
     "@brief Creates an expression evaluator\n"
   ) +

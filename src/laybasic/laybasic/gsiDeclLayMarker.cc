@@ -82,7 +82,7 @@ bool has_color (const lay::DMarker *marker)
   return marker->get_color ().isValid ();
 }
 
-Class<lay::DMarker> decl_Marker ("Marker", 
+Class<lay::DMarker> decl_Marker ("lay", "Marker",
   gsi::constructor ("new", &create_marker,
     "@brief Creates a marker\n"
     "@args view\n"

@@ -295,8 +295,8 @@ class Enum
   : public Class<EnumAdaptor<E>, E>
 {
 public:
-  Enum (const std::string &name, const EnumSpecs<E> &specs, const std::string &doc = std::string ())
-    : Class<EnumAdaptor<E>, E> (name, specs.methods (), doc), m_specs (specs)
+  Enum (const std::string &module, const std::string &name, const EnumSpecs<E> &specs, const std::string &doc = std::string ())
+    : Class<EnumAdaptor<E>, E> (module, name, specs.methods (), doc), m_specs (specs)
   {
   }
 
@@ -389,8 +389,8 @@ public:
   typedef int int_repr;
 #endif
 
-  QFlagsClass (const std::string &name, const std::string &doc = std::string ())
-    : Class<QFlagsAdaptor<E>, QFlags<E> > (name, methods (), doc),
+  QFlagsClass (const std::string &module, const std::string &name, const std::string &doc = std::string ())
+    : Class<QFlagsAdaptor<E>, QFlags<E> > (module, name, methods (), doc),
       m_enum_ext (ext_methods ())
   {
   }

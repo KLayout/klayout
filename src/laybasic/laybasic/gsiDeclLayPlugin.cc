@@ -440,7 +440,7 @@ private:
   tl::RegisteredClass <lay::PluginDeclaration> *mp_registration;
 };
 
-Class<gsi::PluginFactoryBase> decl_PluginFactory ("PluginFactory", 
+Class<gsi::PluginFactoryBase> decl_PluginFactory ("lay", "PluginFactory",
   method ("register", &PluginFactoryBase::register_gsi,
     "@brief Registers the plugin factory\n"
     "@args position, name, title\n"
@@ -639,7 +639,7 @@ Class<gsi::PluginFactoryBase> decl_PluginFactory ("PluginFactory",
   "This class has been introduced in version 0.22.\n"
 );
 
-Class<gsi::PluginBase> decl_Plugin ("Plugin", 
+Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
   callback ("menu_activated", &gsi::PluginBase::menu_activated, &gsi::PluginBase::f_menu_activated,
     "@brief Gets called when a custom menu item is selected\n"
     "@args symbol\n"
@@ -800,7 +800,7 @@ static int cursor_shape_busy () { return int (lay::Cursor::busy); }
 static int cursor_shape_open_hand () { return int (lay::Cursor::open_hand); }
 static int cursor_shape_closed_hand () { return int (lay::Cursor::closed_hand); }
 
-Class<gsi::CursorNamespace> decl_Cursor ("Cursor", 
+Class<gsi::CursorNamespace> decl_Cursor ("lay", "Cursor",
   method ("None", &cursor_shape_none, "@brief 'No cursor (default)' constant for \\set_cursor (resets cursor to default)") +
   method ("Arrow", &cursor_shape_arrow, "@brief 'Arrow cursor' constant") +
   method ("UpArrow", &cursor_shape_up_arrow, "@brief 'Upward arrow cursor' constant") +
@@ -836,7 +836,7 @@ static int const_LeftButton()       { return (int) lay::LeftButton; }
 static int const_MidButton()        { return (int) lay::MidButton; }
 static int const_RightButton()      { return (int) lay::RightButton; }
 
-Class<gsi::ButtonStateNamespace> decl_ButtonState ("ButtonState", 
+Class<gsi::ButtonStateNamespace> decl_ButtonState ("lay", "ButtonState",
   method ("ShiftKey", &const_ShiftButton, "@brief Indicates that the Shift key is pressed\nThis constant is combined with other constants within \\ButtonState") +
   method ("ControlKey", &const_ControlButton, "@brief Indicates that the Control key is pressed\nThis constant is combined with other constants within \\ButtonState") +
   method ("AltKey", &const_AltButton, "@brief Indicates that the Alt key is pressed\nThis constant is combined with other constants within \\ButtonState") +
@@ -874,7 +874,7 @@ lay::PluginRoot *config_root_instance ()
  *  This is intentional since we don't want to spend the only derivation path on this.
  *  Once there is a mixin concept, provide a path through that concept.
  */
-Class<lay::PluginRoot> decl_PluginRoot ("PluginRoot", 
+Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
   method ("clear_config", &lay::PluginRoot::clear_config,
     "@brief Clears the configuration parameters\n"
   ) +

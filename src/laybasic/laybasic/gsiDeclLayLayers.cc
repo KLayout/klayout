@@ -420,7 +420,7 @@ static std::string source_string_1 (const lay::LayerProperties *n)
   return n->source_string (true);
 }
 
-Class<lay::LayerProperties> decl_LayerProperties ("LayerProperties", 
+Class<lay::LayerProperties> decl_LayerProperties ("lay", "LayerProperties",
   method ("==", &lay::LayerProperties::operator==, 
     "@brief Equality \n"
     "@args other\n"
@@ -1239,7 +1239,7 @@ static void clear_children (lay::LayerPropertiesNode *node)
 
 Class<lay::LayerPropertiesNode> decl_LayerPropertiesNode (
   decl_LayerProperties, 
-  "LayerPropertiesNode", 
+  "lay", "LayerPropertiesNode",
   method ("==", &lay::LayerPropertiesNode::operator==, 
     "@brief Equality \n"
     "@args other\n"
@@ -1341,7 +1341,7 @@ static lay::LayerPropertiesNode lp_dup (const lay::LayerPropertiesNodeRef *ref)
 
 Class<lay::LayerPropertiesNodeRef> decl_LayerPropertiesNodeRef (
   decl_LayerPropertiesNode,
-  "LayerPropertiesNodeRef",
+  "lay", "LayerPropertiesNodeRef",
   method ("delete", &lay::LayerPropertiesNodeRef::erase,
     "@brief Erases the current node and all child nodes\n"
     "\n"
@@ -1394,7 +1394,7 @@ static lay::LayerPropertiesNodeRef current (lay::LayerPropertiesConstIterator *i
 }
 
 Class<lay::LayerPropertiesConstIterator> decl_LayerPropertiesIterator (
-  "LayerPropertiesIterator", 
+  "lay", "LayerPropertiesIterator",
   method ("!=", &lay::LayerPropertiesConstIterator::operator!=, 
     "@brief Inequality\n"
     "@args other\n"

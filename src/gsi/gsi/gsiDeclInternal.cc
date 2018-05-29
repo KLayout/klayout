@@ -91,7 +91,7 @@ static tl::Variant default_value (const ArgType *t)
   return t->spec () ? t->spec ()->default_value () : empty;
 }
 
-Class<ArgType> decl_ArgType ("ArgType", 
+Class<ArgType> decl_ArgType ("tl", "ArgType",
   gsi::method ("TypeVoid|#t_void", &t_void) +
   gsi::method ("TypeBool|#t_bool", &t_bool) +
   gsi::method ("TypeChar|#t_char", &t_char) +
@@ -201,7 +201,7 @@ static bool _syn_is_setter (const gsi::MethodBase::MethodSynonym *syn)
   return syn->is_setter;
 }
 
-Class<MethodBase::MethodSynonym> decl_MethodOverload ("MethodOverload", 
+Class<MethodBase::MethodSynonym> decl_MethodOverload ("tl", "MethodOverload",
   gsi::method_ext ("name", &_syn_name,
     "@brief The name of this overload\n"
     "This is the raw, unadorned name. I.e. no question mark suffix for predicates, no "
@@ -222,7 +222,7 @@ Class<MethodBase::MethodSynonym> decl_MethodOverload ("MethodOverload",
   "@hide"
 );
 
-Class<MethodBase> decl_Method ("Method", 
+Class<MethodBase> decl_Method ("tl", "Method",
   gsi::iterator ("each_argument", &MethodBase::begin_arguments, &MethodBase::end_arguments,
     "@brief Iterate over all arguments of this method\n"
   ) +
@@ -291,7 +291,7 @@ Class<MethodBase> decl_Method ("Method",
   "@hide"
 );
 
-Class<ClassBase> decl_Class ("Class", 
+Class<ClassBase> decl_Class ("tl", "Class",
   gsi::iterator ("each_class", &ClassBase::begin_classes, &ClassBase::end_classes,
     "@brief Iterate over all classes\n"
   ) +

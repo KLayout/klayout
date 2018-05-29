@@ -169,7 +169,7 @@ static void def_symbol (ext::NetTracerTechnologyComponent *tech, const std::stri
 
 gsi::Class<lay::TechnologyComponent> &decl_layTechnologyComponent ();
 
-gsi::Class<ext::NetTracerTechnologyComponent> decl_NetTracerTechnology (decl_layTechnologyComponent (), "NetTracerTechnology",
+gsi::Class<ext::NetTracerTechnologyComponent> decl_NetTracerTechnology (decl_layTechnologyComponent (), "lay", "NetTracerTechnology",
   gsi::method_ext ("connection", &def_connection2, gsi::arg("a"), gsi::arg("b"),
     "@brief Defines a connection between two materials\n"
     "See the class description for details about this method."
@@ -259,7 +259,7 @@ static void trace2_tn (ext::NetTracer *net_tracer, const std::string &tech, cons
   net_tracer->trace (layout, cell, start_point, start_layer, stop_point, stop_layer, tracer_data);
 }
 
-gsi::Class<ext::NetTracerShape> decl_NetElement ("NetElement",
+gsi::Class<ext::NetTracerShape> decl_NetElement ("lay", "NetElement",
   gsi::method ("trans", &ext::NetTracerShape::trans,
     "@brief Gets the transformation to apply for rendering the shape in the original top cell\n"
     "See the class description for more details about this attribute."
@@ -304,7 +304,7 @@ gsi::Class<ext::NetTracerShape> decl_NetElement ("NetElement",
   "This class has been introduced in version 0.25.\n"
 );
 
-gsi::Class<ext::NetTracer> decl_NetTracer ("NetTracer",
+gsi::Class<ext::NetTracer> decl_NetTracer ("lay", "NetTracer",
   gsi::method_ext ("trace", &trace1, gsi::arg ("tech"), gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("start_point"), gsi::arg ("start_layer"),
     "@brief Runs a net extraction\n"
     "\n"

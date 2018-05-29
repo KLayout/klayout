@@ -1,35 +1,12 @@
 
-DESTDIR = $$OUT_PWD/..
-TARGET = klayout_gsiqt
-
-include($$PWD/../lib.pri)
-
-DEFINES += MAKE_GSIQT_LIBRARY
-
-# NOTE: db is required since some bridges to db are provided (i.e db::Polygon)
-INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC $$GSIQT_INC
-DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC $$GSIQT_INC
-
-LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db
-
-SOURCES += \
-  gsiQt.cc \
-  gsiDeclQtBasic.cc \
-  gsiDeclQt5Basic.cc \
-  gsiQtHelper.cc
-
-HEADERS += \
-  gsiQt.h \
-  gsiQtCommon.h \
-  gsiQtHelper.h
+TEMPLATE = subdirs
+SUBDIRS = qtbasic 
 
 equals(HAVE_QT5, "1") {
-  include($$PWD/../gsiqt5/qtdecl.pri)
+  SUBDIRS += qt5
+  qt5.depends += qtbasic
 } else {
-  include($$PWD/../gsiqt4/qtdecl.pri)
+  SUBDIRS += qt4
+  qt4.depends += qtbasic
 }
-
-gsiqt.depends += gsi
-laybasic.depends += gsiqt
-lay.depends += gsiqt 
 

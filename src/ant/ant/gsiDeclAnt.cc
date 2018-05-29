@@ -421,9 +421,9 @@ static void register_annotation_template (const ant::Object &a, const std::strin
 }
 
 //  NOTE: ant::Object is available as "BasicAnnotation" to allow binding for other methods.
-gsi::Class<ant::Object> decl_BasicAnnotation ("BasicAnnotation", gsi::Methods (), "@hide\n@alias Annotation");
+gsi::Class<ant::Object> decl_BasicAnnotation ("lay", "BasicAnnotation", gsi::Methods (), "@hide\n@alias Annotation");
 
-gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "Annotation",
+gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotation",
   gsi::method ("register_template", &gsi::register_annotation_template,
     gsi::arg ("annotation"), gsi::arg ("title"), gsi::arg ("mode", ruler_mode_normal (), "\\RulerModeNormal"),
     "@brief Registers the given annotation as a template\n"

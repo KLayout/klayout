@@ -101,7 +101,7 @@ static std::vector<std::string> get_component_names (const lay::Technology *tech
   return tech->component_names ();
 }
 
-gsi::Class<lay::TechnologyComponent> technology_component_decl ("TechnologyComponent",
+gsi::Class<lay::TechnologyComponent> technology_component_decl ("lay", "TechnologyComponent",
   gsi::method ("name", &lay::TechnologyComponent::name,
     "@brief Gets the formal name of the technology component\n"
     "This is the name by which the component can be obtained from a technology using "
@@ -124,7 +124,7 @@ gsi::Class<lay::TechnologyComponent> technology_component_decl ("TechnologyCompo
 
 LAYBASIC_PUBLIC gsi::Class<lay::TechnologyComponent> &decl_layTechnologyComponent () { return technology_component_decl; }
 
-gsi::Class<lay::Technology> technology_decl ("Technology",
+gsi::Class<lay::Technology> technology_decl ("lay", "Technology",
   gsi::method ("name", &lay::Technology::name,
     "@brief Gets the name of the technology"
   ) +

@@ -41,7 +41,7 @@ static gsi::Value *new_vv0 ()
   return new gsi::Value ();
 }
 
-Class<Value> decl_Value ("Value", 
+Class<Value> decl_Value ("tl", "Value",
   gsi::constructor ("new", &new_vv0, 
     "@brief Constructs a nil object.\n"
   ) +

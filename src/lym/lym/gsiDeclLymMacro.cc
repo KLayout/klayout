@@ -71,7 +71,7 @@ public:
   }
 };
 
-Class<gsi::MacroExecutionContext> decl_MacroExecutionContext ("MacroExecutionContext", 
+Class<gsi::MacroExecutionContext> decl_MacroExecutionContext ("lay", "MacroExecutionContext",
   gsi::method ("set_debugger_scope", &gsi::MacroExecutionContext::set_debugger_scope,
     "@brief Sets a debugger scope (file level which shall appear in the debugger)\n"
     "@args filename\n"
@@ -254,7 +254,7 @@ int const_NoDebugger ()
   return int (lym::Macro::None);
 }
 
-Class<gsi::MacroInterpreter> decl_MacroInterpreter ("MacroInterpreter", 
+Class<gsi::MacroInterpreter> decl_MacroInterpreter ("lay", "MacroInterpreter",
   gsi::method ("PlainTextFormat", &const_PlainTextFormat,
     "@brief Indicates plain text format for \\storage_scheme\n"
   ) +
@@ -420,7 +420,7 @@ Class<gsi::MacroInterpreter> decl_MacroInterpreter ("MacroInterpreter",
   "This class has been introduced in version 0.23.\n"
 );
 
-Class<lym::Macro> decl_Macro ("Macro", 
+Class<lym::Macro> decl_Macro ("lay", "Macro",
   gsi::method ("path", &lym::Macro::path,
     "@brief Gets the path of the macro\n"
     "\n"

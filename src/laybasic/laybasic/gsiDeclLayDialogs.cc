@@ -120,7 +120,7 @@ struct DoubleValue
   bool has_value () const { return h; }
 };
 
-Class<DoubleValue> decl_DoubleValue ("DoubleValue", 
+Class<DoubleValue> decl_DoubleValue ("lay", "DoubleValue",
   gsi::method ("has_value?", &DoubleValue::has_value,
     "@brief True, if a value is present"
   ) +
@@ -149,7 +149,7 @@ struct IntValue
   bool has_value () const { return h; }
 };
 
-Class<IntValue> decl_IntValue ("IntValue", 
+Class<IntValue> decl_IntValue ("lay", "IntValue",
   gsi::method ("has_value?", &IntValue::has_value,
     "@brief True, if a value is present"
   ) +
@@ -178,7 +178,7 @@ struct StringValue
   bool has_value ()           const { return h; }
 };
 
-Class<StringValue> decl_StringValue ("StringValue", 
+Class<StringValue> decl_StringValue ("lay", "StringValue",
   gsi::method ("has_value?", &StringValue::has_value,
     "@brief True, if a value is present"
   ) +
@@ -207,7 +207,7 @@ struct StringListValue
   bool has_value () const                        { return h; }
 };
 
-Class<StringListValue> decl_StringListValue ("StringListValue", 
+Class<StringListValue> decl_StringListValue ("lay", "StringListValue",
   gsi::method ("has_value?", &StringListValue::has_value,
     "@brief True, if a value is present"
   ) +
@@ -404,7 +404,7 @@ static BrowserSource_Stub *new_html (const std::string &html)
   return new BrowserSource_Stub (html);
 }
 
-Class<lay::BrowserSource> decl_BrowserSource ("BrowserSource_Native",
+Class<lay::BrowserSource> decl_BrowserSource ("lay", "BrowserSource_Native",
   gsi::method ("get", &lay::BrowserSource::get),
   "@hide\n@alias BrowserSource"
 );
@@ -415,7 +415,7 @@ Class<lay::BrowserSource> &laybasicdecl_BrowserSource ()
   return decl_BrowserSource;
 }
 
-Class<BrowserSource_Stub> decl_BrowserSourceStub ("BrowserSource",
+Class<BrowserSource_Stub> decl_BrowserSourceStub ("lay", "BrowserSource",
   gsi::constructor ("new|#new_html", &new_html,
     "@brief construct a BrowserSource object with a default HTML string\n"
     "\n"
@@ -701,7 +701,7 @@ static tl::Variant ask_item (const std::string &title, const std::string &label,
 
 struct InputDialog { };
 
-Class<InputDialog> decl_InputDialog ("InputDialog", 
+Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
   gsi::method ("#get_string", &get_string,
     "@brief Open an input dialog requesting a string\n"
     "@args title, label, value\n"
@@ -958,7 +958,7 @@ static tl::Variant ask_save_file_name (const std::string &title, const std::stri
   }
 }
 
-Class<FileDialog> decl_FileDialog ("FileDialog", 
+Class<FileDialog> decl_FileDialog ("lay", "FileDialog",
   gsi::method ("#get_existing_dir", &get_existing_dir,
     "@brief Open a dialog to select a directory\n"
     "@args title, dir\n"

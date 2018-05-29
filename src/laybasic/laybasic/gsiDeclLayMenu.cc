@@ -28,7 +28,7 @@
 namespace gsi
 {
 
-Class<lay::AbstractMenu> decl_AbstractMenu ("AbstractMenu", 
+Class<lay::AbstractMenu> decl_AbstractMenu ("lay", "AbstractMenu",
   method ("action", &lay::AbstractMenu::action,
     "@brief Get the reference to a Action object associated with the given path\n"
     "@args path\n"
@@ -142,7 +142,7 @@ Class<lay::AbstractMenu> decl_AbstractMenu ("AbstractMenu",
   "with code. See the \\Action class description for further details.\n"
 );
   
-Class<lay::Action> decl_ActionBase ("ActionBase", 
+Class<lay::Action> decl_ActionBase ("lay", "ActionBase",
   method ("title=", &lay::Action::set_title,
     "@brief Sets the title\n"
     "@args title\n"
@@ -310,7 +310,7 @@ public:
   tl::Event on_triggered_event;
 };
 
-Class<ActionStub> decl_Action (decl_ActionBase, "Action",
+Class<ActionStub> decl_Action (decl_ActionBase, "lay", "Action",
   gsi::callback ("triggered", &ActionStub::triggered, &ActionStub::triggered_cb,
     "@brief This method is called if the menu item is selected"
   ) +

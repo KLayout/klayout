@@ -145,6 +145,14 @@ public:
   }
 
   /**
+   *  @brief Gets the module name
+   */
+  const std::string &module () const
+  {
+    return m_module;
+  }
+
+  /**
    *  @brief Gets the documentation string
    */
   const std::string &doc () const
@@ -559,6 +567,11 @@ protected:
     m_name = n;
   }
 
+  void set_module (const std::string &m)
+  {
+    m_module = m;
+  }
+
   void set_parent (const ClassBase *parent);
   void set_base (const ClassBase *base);
 
@@ -568,6 +581,7 @@ private:
   Methods m_methods;
   std::vector<MethodBase *> m_callbacks, m_constructors;
   std::string m_name;
+  std::string m_module;
   tl::weak_collection<ClassBase> m_child_classes, m_subclasses;
   mutable std::auto_ptr<PerClassClientSpecificData> mp_data[ClientIndex::MaxClientIndex];
 

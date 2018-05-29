@@ -94,7 +94,7 @@ static db::DCplxTrans dtrans (const lay::ObjectInstPath *p)
   }
 }
 
-gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("ObjectInstPath",
+gsi::Class<lay::ObjectInstPath> decl_ObjectInstPath ("lay", "ObjectInstPath",
   gsi::method ("<", &lay::ObjectInstPath::operator<,
     "@brief Provides an order criterion for two ObjectInstPath objects\n"
     "@args b\n"

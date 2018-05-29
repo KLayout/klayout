@@ -13,7 +13,7 @@ LIB_INC = $$PWD/lib/lib
 LAY_INC = $$PWD/lay/lay
 LAYBASIC_INC = $$PWD/laybasic/laybasic
 
-GSIQT_INC = $$PWD/gsiqt
+QTBASIC_INC = $$PWD/gsiqt/qtbasic
 
 BD_INC = $$PWD/buddies/src/bd
 

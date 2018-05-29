@@ -578,9 +578,10 @@ public:
    *  This feature is not quite useful usually and is reserved for special use cases
    *  such as including enums into a declaration namespace.
    */
-  ClassExt (const ClassBase &import, const std::string &name, const std::string &doc = std::string ())
+  ClassExt (const ClassBase &import, const std::string &module, const std::string &name, const std::string &doc = std::string ())
     : ClassBase (doc, Methods ()), mp_declaration (&import)
   {
+    set_module (module);
     set_name (name);
   }
 
@@ -716,30 +717,34 @@ public:
   typedef typename tl::type_traits<X>::has_default_constructor has_default_ctor;
   typedef typename tl::type_traits<X>::has_public_destructor has_public_dtor;
 
-  Class (const std::string &name, const Methods &mm, const std::string &doc = std::string (), bool do_register = true)
+  Class (const std::string &module, const std::string &name, const Methods &mm, const std::string &doc = std::string (), bool do_register = true)
     : ClassBase (doc, mm, do_register)
   {
+    set_module (module);
     set_name (name);
   }
 
   template <class B>
-  Class (const Class<B> &base, const std::string &name, const Methods &mm, const std::string &doc = std::string (), bool do_register = true)
+  Class (const Class<B> &base, const std::string &module, const std::string &name, const Methods &mm, const std::string &doc = std::string (), bool do_register = true)
     : ClassBase (doc, mm, do_register), m_subclass_tester (new SubClassTester<X, B, typename is_polymorphic<B>::value> ())
   {
+    set_module (module);
     set_name (name);
     set_base (&base);
   }
 
-  Class (const std::string &name, const std::string &doc = std::string (), bool do_register = true)
+  Class (const std::string &module, const std::string &name, const std::string &doc = std::string (), bool do_register = true)
     : ClassBase (doc, Methods (), do_register)
   {
+    set_module (module);
     set_name (name);
   }
 
   template <class B>
-  Class (const Class<B> &base, const std::string &name, const std::string &doc = std::string (), bool do_register = true)
+  Class (const Class<B> &base, const std::string &module, const std::string &name, const std::string &doc = std::string (), bool do_register = true)
     : ClassBase (doc, Methods (), do_register), m_subclass_tester (new SubClassTester<X, B, typename is_polymorphic<B>::value> ())
   {
+    set_module (module);
     set_name (name);
     set_base (&base);
   }
@@ -909,14 +914,14 @@ class SubClass
   : public Class<X, Adapted>
 {
 public:
-  SubClass (const std::string &name, const Methods &mm, const std::string &doc = std::string ())
-    : Class<X, Adapted> (name, mm, doc)
+  SubClass (const std::string &module, const std::string &name, const Methods &mm, const std::string &doc = std::string ())
+    : Class<X, Adapted> (module, name, mm, doc)
   {
     //  .. nothing yet ..
   }
 
-  SubClass (const std::string &name, const std::string &doc = std::string ())
-    : Class<X, Adapted> (name, doc)
+  SubClass (const std::string &module, const std::string &name, const std::string &doc = std::string ())
+    : Class<X, Adapted> (module, name, doc)
   {
     //  .. nothing yet ..
   }
@@ -941,14 +946,14 @@ class GSI_PUBLIC_TEMPLATE ChildClass
   : public Class<X, Adapted>
 {
 public:
-  ChildClass (const std::string &name, const Methods &mm, const std::string &doc = std::string ())
-    : Class<X, Adapted> (name, mm, doc)
+  ChildClass (const std::string &module, const std::string &name, const Methods &mm, const std::string &doc = std::string ())
+    : Class<X, Adapted> (module, name, mm, doc)
   {
     //  .. nothing yet ..
   }
 
-  ChildClass (const std::string &name, const std::string &doc = std::string ())
-    : Class<X, Adapted> (name, doc)
+  ChildClass (const std::string &module, const std::string &name, const std::string &doc = std::string ())
+    : Class<X, Adapted> (module, name, doc)
   {
     //  .. nothing yet ..
   }
@@ -974,14 +979,14 @@ class GSI_PUBLIC_TEMPLATE ChildSubClass
   : public SubClass<X, B, Adapted>
 {
 public:
-  ChildSubClass (const std::string &name, const Methods &mm, const std::string &doc = std::string ())
-    : SubClass<X, B, Adapted> (name, mm, doc)
+  ChildSubClass (const std::string &module, const std::string &name, const Methods &mm, const std::string &doc = std::string ())
+    : SubClass<X, B, Adapted> (module, name, mm, doc)
   {
     //  .. nothing yet ..
   }
 
-  ChildSubClass (const std::string &name, const std::string &doc = std::string ())
-    : SubClass<X, B, Adapted> (name, doc)
+  ChildSubClass (const std::string &module, const std::string &name, const std::string &doc = std::string ())
+    : SubClass<X, B, Adapted> (module, name, doc)
   {
     //  .. nothing yet ..
   }

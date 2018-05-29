@@ -245,7 +245,7 @@ LAY_PUBLIC make_application_decl (bool non_gui_mode)
   if (non_gui_mode) {
 
     non_gui_app_decl.reset (
-      new Class<lay::NonGuiApplication> (QT_EXTERNAL_BASE (QCoreApplication) "Application",
+      new Class<lay::NonGuiApplication> (QT_EXTERNAL_BASE (QCoreApplication) "lay", "Application",
         application_methods<lay::NonGuiApplication> (),
         application_doc ()
       )
@@ -254,7 +254,7 @@ LAY_PUBLIC make_application_decl (bool non_gui_mode)
   } else {
 
     gui_app_decl.reset (
-      new Class<lay::GuiApplication> (QT_EXTERNAL_BASE (QApplication) "Application",
+      new Class<lay::GuiApplication> (QT_EXTERNAL_BASE (QApplication) "lay", "Application",
         application_methods<lay::GuiApplication> (),
         application_doc ()
       )

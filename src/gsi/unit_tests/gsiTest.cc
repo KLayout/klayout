@@ -757,7 +757,7 @@ static gsi::Enum<Enum> decl_enum ("Enum",
 
 static gsi::QFlagsClass<Enum> decl_qflags_enum ("Enums");
 
-static gsi::Class<A> decl_a ("A", 
+static gsi::Class<A> decl_a ("", A",
   gsi::constructor ("new_a|new", &a_ctor) +
   gsi::method ("br", &A::br) +
   gsi::method ("get_e", &A::get_e) +
@@ -859,9 +859,9 @@ static gsi::Class<A> decl_a ("A",
   gsi::iterator ("a8", &A::a8b, &A::a8e)
 );
 
-static gsi::Class<A_NC> decl_a_nc (decl_a, "A_NC"); 
+static gsi::Class<A_NC> decl_a_nc (decl_a, "", "A_NC");
 
-static gsi::Class<B> decl_b ("B", 
+static gsi::Class<B> decl_b ("", "B",
   gsi::method ("inst", &B::inst) +
   gsi::method ("has_inst", &B::has_inst) +
   gsi::method ("set_inst", &B::set_inst) +
@@ -1028,7 +1028,7 @@ static gsi::ClassExt<B> b_ext (
 );
 
 
-static gsi::Class<C_P> decl_c ("C", 
+static gsi::Class<C_P> decl_c ("", "C",
   gsi::callback ("f", &C_P::f, &C_P::f_cb) +
   gsi::method ("g", &C_P::g) +
   gsi::method ("s1", &C::s1) +
@@ -1040,7 +1040,7 @@ static gsi::Class<C_P> decl_c ("C",
 
 tl::event<E *> &ev1_ext (E *e) { return e->ev1; }
 
-static gsi::Class<E> decl_e ("E",
+static gsi::Class<E> decl_e ("", "E",
   gsi::event ("e0", &E::ev0) +
   gsi::event_ext ("e1", &ev1_ext) +
   gsi::event ("e2", &E::ev2) +
@@ -1062,7 +1062,7 @@ static gsi::Class<E> decl_e ("E",
   gsi::method ("reset_inst", &E::reset_inst)
 );
 
-static gsi::Class<F> decl_f ("F",
+static gsi::Class<F> decl_f ("", "F",
   gsi::method ("ic", &F::ic) +
   gsi::method ("inc", &F::inc) +
   gsi::method ("icref", &F::icref) +
@@ -1071,7 +1071,7 @@ static gsi::Class<F> decl_f ("F",
   gsi::method ("x", &F::get_x) 
 );
 
-static gsi::Class<G> decl_g ("G",
+static gsi::Class<G> decl_g ("", "G",
   gsi::method ("iv", &G::iv) +
   gsi::method ("sv", &G::sv) +
   gsi::method ("set_iva", &G::set_iv, gsi::arg ()) +
@@ -1085,7 +1085,7 @@ static gsi::Class<G> decl_g ("G",
   gsi::method ("set_vvc", &G::set_vv, gsi::arg ("", 1), gsi::arg ("", "value")) 
 );
 
-static gsi::Class<X> decl_x ("X",
+static gsi::Class<X> decl_x ("", "X",
   gsi::constructor ("new", &make_x) + 
   gsi::method ("instances", &X::instances) +
   gsi::method ("x1", &X::x1) +
@@ -1102,7 +1102,7 @@ static gsi::Class<X> decl_x ("X",
   gsi::method ("s=", &X::set_si)
 );
 
-static gsi::Class<Y> decl_y (decl_x, "Y",
+static gsi::Class<Y> decl_y (decl_x, "", "Y",
   gsi::constructor ("new", &make_y) + 
   gsi::method ("x1", &Y::x1) +
   gsi::method ("y1", &Y::y1) +
@@ -1121,19 +1121,19 @@ static gsi::Class<Y> decl_y (decl_x, "Y",
   gsi::method ("vx_dyn", &Y::vx_dyn)
 );
 
-static gsi::SubClass<Y2, X> decl_y2 ("Y2",
+static gsi::SubClass<Y2, X> decl_y2 ("", "Y2",
   gsi::method ("x1", &Y2::x1)
 );
 
-static gsi::ChildSubClass<Z_P, Y3, X> decl_y3 ("Y3",
+static gsi::ChildSubClass<Z_P, Y3, X> decl_y3 ("", "Y3",
   gsi::method ("x1", &Y3::x1)
 );
 
-static gsi::ChildClass<Z_P, Y4> decl_y4 ("Y4",
+static gsi::ChildClass<Z_P, Y4> decl_y4 ("", "Y4",
   gsi::method ("x1", &Y4::x1)
 );
 
-gsi::Class<Z_P> decl_z ("Z",
+gsi::Class<Z_P> decl_z ("", "Z",
   gsi::method ("f", &Z_P::f_org) +
   gsi::callback ("f", &Z_P::f, &Z_P::f_cb) +
   gsi::method ("f_with_x", &Z_P::f_with_x) +
@@ -1144,7 +1144,7 @@ gsi::Class<Z_P> decl_z ("Z",
   gsi::method ("set_x_keep", &Z_P::set_x_keep)
 );
 
-gsi::Class<SQ> decl_sq ("SQ",
+gsi::Class<SQ> decl_sq ("", "SQ",
   gsi::method ("trigger_s0", &SQ::trigger_s0) +
   gsi::method ("trigger_s1", &SQ::trigger_s1) +
   gsi::method ("trigger_s2", &SQ::trigger_s2) +
@@ -1155,7 +1155,7 @@ gsi::Class<SQ> decl_sq ("SQ",
   gsi::qt_signal<const QString &, SQ *> ("s2(const QString &, SQ *)", "s2")
 );
 
-gsi::Class<SE> decl_se ("SE",
+gsi::Class<SE> decl_se ("", "SE",
   gsi::method ("trigger_s0", &SE::trigger_s0) +
   gsi::method ("trigger_s1", &SE::trigger_s1) +
   gsi::method ("trigger_s2", &SE::trigger_s2) +
@@ -1222,12 +1222,12 @@ int g_virtual (GObject *go)
   return go->g ();
 }
 
-static gsi::Class<GObject> decl_gobject_base ("GObjectBase",
+static gsi::Class<GObject> decl_gobject_base ("", "GObjectBase",
   gsi::method_ext ("g_virtual", &g_virtual) +
   gsi::Methods()
 );
 
-static gsi::Class<GObject_P> decl_gobject (decl_gobject_base, "GObject",
+static gsi::Class<GObject_P> decl_gobject (decl_gobject_base, "", "GObject",
   gsi::method_ext ("g_org", &g_org) +
   gsi::callback ("g", &GObject_P::g, &GObject_P::g_cb) +
   gsi::method ("g_inst_count", &GObject::g_inst_count)
@@ -1238,11 +1238,11 @@ GObject *f_org (GFactory_P *fo, int z)
   return fo->GFactory::f (z);
 }
 
-static gsi::Class<GFactory> decl_gfactory_base ("GFactoryBase",
+static gsi::Class<GFactory> decl_gfactory_base ("", "GFactoryBase",
   gsi::factory ("create_f", &GFactory::create_f)
 );
 
-static gsi::Class<GFactory_P> decl_gfactory (decl_gfactory_base, "GFactory",
+static gsi::Class<GFactory_P> decl_gfactory (decl_gfactory_base, "", "GFactory",
   gsi::method_ext ("f", &f_org) +
   gsi::factory_callback ("f", &GFactory_P::f, &GFactory_P::f_cb)
 );

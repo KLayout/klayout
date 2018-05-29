@@ -130,7 +130,7 @@ static double blue_gain (const img::DataMapping *dm)
   return dm->blue_gain;
 }
 
-gsi::Class<img::DataMapping> decl_ImageDataMapping ("ImageDataMapping", 
+gsi::Class<img::DataMapping> decl_ImageDataMapping ("lay", "ImageDataMapping",
   gsi::constructor ("new", &gsi::new_data_mapping,
     "@brief Create a new data mapping object with default settings"
   ) +
@@ -446,9 +446,9 @@ static void img_set_trans (ImageRef *obj, const db::DCplxTrans &t)
 }
 
 //  NOTE: img::Object is available as "BasicImage" to allow binding for other methods.
-gsi::Class<img::Object> decl_BasicImage ("BasicImage", gsi::Methods (), "@hide");
+gsi::Class<img::Object> decl_BasicImage ("lay", "BasicImage", gsi::Methods (), "@hide");
 
-gsi::Class<ImageRef> decl_Image (decl_BasicImage, "Image",
+gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
   gsi::constructor ("new", &gsi::new_image,
     "@brief Create a new image with the default attributes"
     "\n"

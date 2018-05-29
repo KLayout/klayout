@@ -29,7 +29,6 @@
 
 #include <QSslSocket>
 #include <QAuthenticator>
-#include <QChildEvent>
 #include <QEvent>
 #include <QHostAddress>
 #include <QNetworkProxy>
@@ -40,7 +39,6 @@
 #include <QSslError>
 #include <QSslKey>
 #include <QThread>
-#include <QTimerEvent>
 #include "gsiQt.h"
 #include "gsiQtNetworkCommon.h"
 #include "gsiDeclQtNetworkTypeTraits.h"

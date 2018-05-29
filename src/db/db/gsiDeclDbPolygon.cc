@@ -611,7 +611,7 @@ static db::DSimplePolygon spolygon_to_dspolygon (const db::SimplePolygon *p, dou
   return db::DSimplePolygon (*p * dbu, false);
 }
 
-Class<db::SimplePolygon> decl_SimplePolygon ("SimplePolygon",
+Class<db::SimplePolygon> decl_SimplePolygon ("db", "SimplePolygon",
   constructor ("new|#from_dpoly", &spolygon_from_dspolygon, gsi::arg ("dpolygon"),
     "@brief Creates an integer coordinate polygon from a floating-point coordinate polygon\n"
     "\n"
@@ -732,7 +732,7 @@ static db::SimplePolygon transformed_vplx_sp (const db::DSimplePolygon *p, const
   return p->transformed (t, false /*no compression*/);
 }
 
-Class<db::DSimplePolygon> decl_DSimplePolygon ("DSimplePolygon",
+Class<db::DSimplePolygon> decl_DSimplePolygon ("db", "DSimplePolygon",
   constructor ("new|#from_ipoly", &dspolygon_from_ispolygon, gsi::arg ("polygon"),
     "@brief Creates a floating-point coordinate polygon from an integer coordinate polygon"
     "\n"
@@ -1719,7 +1719,7 @@ static gsi::Methods make_td_constants ()
     );
 }
 
-Class<db::Polygon> decl_Polygon ("Polygon",
+Class<db::Polygon> decl_Polygon ("db", "Polygon",
   constructor ("new|#from_dpoly", &polygon_from_dpolygon, gsi::arg ("dpolygon"),
     "@brief Creates an integer coordinate polygon from a floating-point coordinate polygon\n"
     "\n"
@@ -1935,7 +1935,7 @@ static db::Polygon transformed_vcplx_dp (const db::DPolygon *p, const db::VCplxT
   return p->transformed (t, false /*don't compress*/);
 }
 
-Class<db::DPolygon> decl_DPolygon ("DPolygon",
+Class<db::DPolygon> decl_DPolygon ("db", "DPolygon",
   constructor ("new|#from_ipoly", &dpolygon_from_ipolygon, gsi::arg ("polygon"),
     "@brief Creates a floating-point coordinate polygon from an integer coordinate polygon\n"
     "\n"

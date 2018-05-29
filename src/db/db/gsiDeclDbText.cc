@@ -382,7 +382,7 @@ static db::DText text_to_dtext (const db::Text *t, double dbu)
   return db::DText (*t * dbu);
 }
 
-Class<db::Text> decl_Text ("Text",
+Class<db::Text> decl_Text ("db", "Text",
   constructor ("new", &text_from_dtext, gsi::arg ("dtext"),
     "@brief Creates an integer coordinate text from a floating-point coordinate text"
     "\n"
@@ -431,7 +431,7 @@ static db::Text dtext_to_text (const db::DText *t, double dbu)
   return db::Text (*t * (1.0 / dbu));
 }
 
-Class<db::DText> decl_DText ("DText",
+Class<db::DText> decl_DText ("db", "DText",
   constructor ("new", &dtext_from_itext, gsi::arg ("Text"),
     "@brief Creates a floating-point coordinate text from an integer coordinate text\n"
     "\n"

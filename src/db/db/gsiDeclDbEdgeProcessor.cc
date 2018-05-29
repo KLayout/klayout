@@ -182,7 +182,7 @@ static int mode_xor () { return int (db::BooleanOp::Xor); }
 static int mode_anotb () { return int (db::BooleanOp::ANotB); }
 static int mode_bnota () { return int (db::BooleanOp::BNotA); }
 
-Class<db::EdgeProcessor> decl_EdgeProcessor ("EdgeProcessor", 
+Class<db::EdgeProcessor> decl_EdgeProcessor ("db", "EdgeProcessor",
   method_ext ("simple_merge_p2e|#simple_merge", &gsi::simple_merge1,
     "@brief Merge the given polygons in a simple \"non-zero wrapcount\" fashion\n"
     "@args in\n"

@@ -1521,7 +1521,9 @@ END
           m.each do |bd|
 
             vis = bd.visibility
-            if vis == :public || (vis == :protected && needs_adaptor)
+            is_signal = conf.event_args(cls, bd.sig(cls))
+
+            if vis == :public || (vis == :protected && needs_adaptor) || is_signal
 
               # don't consider dropped methods
               conf.target_name(cls, bd, mn) || next

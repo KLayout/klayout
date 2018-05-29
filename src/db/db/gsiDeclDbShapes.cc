@@ -389,7 +389,7 @@ static unsigned int s_paths ()               { return db::ShapeIterator::Paths; 
 static unsigned int s_texts ()               { return db::ShapeIterator::Texts; }
 static unsigned int s_user_objects ()        { return db::ShapeIterator::UserObjects; }
 
-Class<db::Shapes> decl_Shapes ("Shapes", 
+Class<db::Shapes> decl_Shapes ("db", "Shapes",
   gsi::method ("insert", (db::Shape (db::Shapes::*)(const db::Shape &)) &db::Shapes::insert,
     "@brief Inserts a shape from a shape reference into the shapes list\n"
     "@args shape\n"

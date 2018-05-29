@@ -28,11 +28,9 @@
 */
 
 #include <QLocalSocket>
-#include <QChildEvent>
 #include <QEvent>
 #include <QObject>
 #include <QThread>
-#include <QTimerEvent>
 #include "gsiQt.h"
 #include "gsiQtNetworkCommon.h"
 #include "gsiDeclQtNetworkTypeTraits.h"

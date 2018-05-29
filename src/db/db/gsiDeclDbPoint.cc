@@ -227,7 +227,7 @@ static db::Point dpoint_to_point (const db::DPoint *p, double dbu)
   return db::Point (*p * (1.0 / dbu));
 }
 
-Class<db::DPoint> decl_DPoint ("DPoint",
+Class<db::DPoint> decl_DPoint ("db", "DPoint",
   constructor ("new|#from_ipoint", &dpoint_from_ipoint, gsi::arg ("point"),
     "@brief Creates a floating-point coordinate point from an integer coordinate point\n"
     "\n"
@@ -263,7 +263,7 @@ static db::DPoint point_to_dpoint (const db::Point *p, double dbu)
   return db::DPoint (*p * dbu);
 }
 
-Class<db::Point> decl_Point ("Point",
+Class<db::Point> decl_Point ("db", "Point",
   constructor ("new|#from_dpoint", &point_from_dpoint, gsi::arg ("dpoint"),
     "@brief Creates an integer coordinate point from a floating-point coordinate point\n"
     "\n"

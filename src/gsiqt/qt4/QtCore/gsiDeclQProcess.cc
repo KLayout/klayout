@@ -28,12 +28,10 @@
 */
 
 #include <QProcess>
-#include <QChildEvent>
 #include <QEvent>
 #include <QObject>
 #include <QProcessEnvironment>
 #include <QThread>
-#include <QTimerEvent>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include "gsiDeclQtCoreTypeTraits.h"

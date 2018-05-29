@@ -119,7 +119,7 @@ size_t hash_value (const db::LayerProperties *l)
 }
 
 //  since there already exists a "LayerProperties" object, we call this one "LayerInfo"
-Class<db::LayerProperties> decl_LayerInfo ("LayerInfo", 
+Class<db::LayerProperties> decl_LayerInfo ("db", "LayerInfo",
   gsi::constructor ("new", &ctor_layer_info_default, 
     "@brief The default constructor.\n"
     "Creates a default \\LayerInfo object.\n"
@@ -828,7 +828,7 @@ static const std::string &layout_meta_get_description (const db::MetaInfo *mi)
   return mi->description;
 }
 
-Class<db::MetaInfo> decl_LayoutMetaInfo ("LayoutMetaInfo",
+Class<db::MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
   gsi::constructor ("new", &layout_meta_info_ctor, gsi::arg ("name"), gsi::arg ("value"), gsi::arg ("description", std::string ()),
     "@brief Creates a layout meta info object\n"
     "@param name The name\n"
@@ -879,7 +879,7 @@ static void dtransform_cplx (db::Layout *layout, const db::DCplxTrans &trans)
   layout->transform (dbu_trans.inverted () * trans * dbu_trans);
 }
 
-Class<db::Layout> decl_Layout ("Layout",
+Class<db::Layout> decl_Layout ("db", "Layout",
   gsi::constructor ("new", &layout_ctor_with_manager,
     "@brief Creates a layout object attached to a manager\n"
     "@args manager\n"
@@ -2005,7 +2005,7 @@ static bool set_format_from_filename (db::SaveLayoutOptions *opt, const std::str
   return true;
 }
 
-Class<db::SaveLayoutOptions> decl_SaveLayoutOptions ("SaveLayoutOptions", 
+Class<db::SaveLayoutOptions> decl_SaveLayoutOptions ("db", "SaveLayoutOptions",
   gsi::constructor ("new", &new_v,
     "@brief Default constructor\n"
     "\n"

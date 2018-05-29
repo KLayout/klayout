@@ -480,7 +480,7 @@ static db::DBox box_to_dbox (const db::Box *b, double dbu)
   return db::DBox (*b) * dbu;
 }
 
-Class<db::Box> decl_Box ("Box", 
+Class<db::Box> decl_Box ("db", "Box",
   constructor ("new|#from_dbox", &box_from_dbox, gsi::arg ("dbox"),
     "@brief Creates an integer coordinate box from a floating-point coordinate box\n"
     "\n"
@@ -535,7 +535,7 @@ static db::Box dbox_to_box (const db::DBox *b, double dbu)
   return db::Box (*b * (1.0 / dbu));
 }
 
-Class<db::DBox> decl_DBox ("DBox",
+Class<db::DBox> decl_DBox ("db", "DBox",
   constructor ("new|#from_ibox", &dbox_from_ibox, gsi::arg ("box"),
     "@brief Creates a floating-point coordinate box from an integer coordinate box\n"
     "\n"

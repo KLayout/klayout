@@ -119,7 +119,7 @@ static db::Region complex_region (const db::RecursiveShapeIterator *iter)
   }
 }
 
-Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIterator", 
+Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveShapeIterator",
   gsi::constructor ("new", &new_si1, 
     "@brief Creates a recursive, single-layer shape iterator.\n"
     "@args layout, cell, layer\n"

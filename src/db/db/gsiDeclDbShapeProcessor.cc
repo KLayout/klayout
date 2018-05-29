@@ -175,7 +175,7 @@ size_to_polygon2n (db::ShapeProcessor *processor, const std::vector<db::Shape> &
 }
 
 
-Class<db::ShapeProcessor> decl_ShapeProcessor ("ShapeProcessor", 
+Class<db::ShapeProcessor> decl_ShapeProcessor ("db", "ShapeProcessor",
   method ("merge", (void (db::ShapeProcessor::*) (const db::Layout &, const db::Cell &, unsigned int, db::Shapes &, bool, unsigned int, bool, bool)) &db::ShapeProcessor::merge, 
     "@brief Merge the given shapes from a layout into a shapes container\n"
     "@args layout, cell, layer, out, hierarchical, min_wc, resolve_holes, min_coherence\n"

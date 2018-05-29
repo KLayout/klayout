@@ -597,7 +597,7 @@ static db::DEdge edge_to_dedge (const db::Edge *e, double dbu)
   return db::DEdge (*e * dbu);
 }
 
-Class<db::Edge> decl_Edge ("Edge", 
+Class<db::Edge> decl_Edge ("db", "Edge",
   constructor ("new|#from_dedge", &edge_from_dedge, gsi::arg ("dedge"),
     "@brief Creates an integer coordinate edge from a floating-point coordinate edge\n"
     "\n"
@@ -646,7 +646,7 @@ static db::Edge dedge_to_edge (const db::DEdge *e, double dbu)
   return db::Edge (*e * (1.0 / dbu));
 }
 
-Class<db::DEdge> decl_DEdge ("DEdge",
+Class<db::DEdge> decl_DEdge ("db", "DEdge",
   constructor ("new|#from_iedge", &dedge_from_iedge, gsi::arg ("edge"),
     "@brief Creates a floating-point coordinate edge from an integer coordinate edge\n"
     "\n"

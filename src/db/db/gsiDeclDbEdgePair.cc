@@ -201,7 +201,7 @@ static db::DEdgePair edge_pair_to_dedge_pair (const db::EdgePair *e, double dbu)
   return db::DEdgePair (*e * dbu);
 }
 
-Class<db::EdgePair> decl_EdgePair ("EdgePair",
+Class<db::EdgePair> decl_EdgePair ("db", "EdgePair",
   constructor ("new", &edge_pair_from_dedge_pair, gsi::arg ("dedge_pair"),
     "@brief Creates an integer coordinate edge pair from a floating-point coordinate edge pair\n"
     "\n"
@@ -250,7 +250,7 @@ static db::EdgePair dedge_pair_to_edge_pair (const db::DEdgePair *e, double dbu)
   return db::EdgePair (*e * (1.0 / dbu));
 }
 
-Class<db::DEdgePair> decl_DEdgePair ("DEdgePair",
+Class<db::DEdgePair> decl_DEdgePair ("db", "DEdgePair",
   constructor ("new", &dedge_pair_from_iedge_pair, gsi::arg ("edge_pair"),
     "@brief Creates a floating-point coordinate edge pair from an integer coordinate edge\n"
     "\n"

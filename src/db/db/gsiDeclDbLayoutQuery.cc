@@ -142,7 +142,7 @@ char parent_cell_query_property_name[]        = "parent_cell";
 char initial_cell_index_query_property_name[] = "initial_cell_index";
 char initial_cell_query_property_name[]       = "initial_cell";
 
-Class<db::LayoutQueryIterator> decl_LayoutQueryIterator ("LayoutQueryIterator",
+Class<db::LayoutQueryIterator> decl_LayoutQueryIterator ("db", "LayoutQueryIterator",
   gsi::method ("layout", &db::LayoutQueryIterator::layout,
     "@brief Gets the layout the query acts on\n"
   ) +
@@ -177,7 +177,7 @@ Class<db::LayoutQueryIterator> decl_LayoutQueryIterator ("LayoutQueryIterator",
   "The LayoutQueryIterator class has been introduced in version 0.25."
 );
 
-Class<db::LayoutQuery> decl_LayoutQuery ("LayoutQuery",
+Class<db::LayoutQuery> decl_LayoutQuery ("db", "LayoutQuery",
   gsi::constructor ("new", &new_query, gsi::arg ("query"),
     "@brief Creates a new query object from the given query string\n"
   ) +

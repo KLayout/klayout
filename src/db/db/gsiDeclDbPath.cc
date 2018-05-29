@@ -353,7 +353,7 @@ static db::Path path_round_corners (const db::Path *p, double radius, int npoint
   return db::round_path_corners (*p, radius, npoints);
 }
 
-Class<db::Path> decl_Path ("Path",
+Class<db::Path> decl_Path ("db", "Path",
   constructor ("new|#from_dpath", &path_from_dpath, gsi::arg ("dpath"),
     "@brief Creates an integer coordinate path from a floating-point coordinate path\n"
     "\n"
@@ -419,7 +419,7 @@ static db::DPath dpath_round_corners (const db::DPath *p, double radius, int npo
   return db::round_path_corners (*p, radius, npoints, accuracy);
 }
 
-Class<db::DPath> decl_DPath ("DPath",
+Class<db::DPath> decl_DPath ("db", "DPath",
   constructor ("new|#from_ipath", &dpath_from_ipath, gsi::arg ("path"),
     "@brief Creates a floating-point coordinate path from an integer coordinate path\n"
     "\n"

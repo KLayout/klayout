@@ -57,7 +57,7 @@ static db::Manager::transaction_id_t transaction2(db::Manager *manager, const st
   return manager->transaction (description, id);
 }
 
-Class<db::Manager> decl_Manager ("Manager", 
+Class<db::Manager> decl_Manager ("db", "Manager",
   gsi::method_ext ("transaction", &transaction1,
     "@brief Begin a transaction\n"
     "\n"

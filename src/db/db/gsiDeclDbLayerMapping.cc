@@ -30,7 +30,7 @@
 namespace gsi
 {
 
-Class<db::LayerMapping> decl_LayerMapping ("LayerMapping", 
+Class<db::LayerMapping> decl_LayerMapping ("db", "LayerMapping",
   gsi::method ("create", &db::LayerMapping::create, 
     "@brief Initialize the layer mapping from two layouts\n"
     "\n"

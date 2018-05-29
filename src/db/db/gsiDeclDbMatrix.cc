@@ -101,7 +101,7 @@ static double coeff_m (const db::Matrix2d *m, int i, int j)
   }
 }
 
-gsi::Class<db::Matrix2d> decl_Matrix2d ("Matrix2d", 
+gsi::Class<db::Matrix2d> decl_Matrix2d ("db", "Matrix2d",
   gsi::constructor ("new", &new_matrix2d,
     "@brief Create a new Matrix2d representing a unit transformation"
   ) +
@@ -369,7 +369,7 @@ static int adjust_all ()
   return db::MatrixAdjustFlags::All;
 }
 
-gsi::Class<db::Matrix3d> decl_Matrix3d ("Matrix3d", 
+gsi::Class<db::Matrix3d> decl_Matrix3d ("db", "Matrix3d",
   gsi::constructor ("new", &new_matrix3d,
     "@brief Create a new Matrix3d representing a unit transformation"
   ) +

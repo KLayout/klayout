@@ -28,14 +28,12 @@
 */
 
 #include <QClipboard>
-#include <QChildEvent>
 #include <QEvent>
 #include <QImage>
 #include <QMimeData>
 #include <QObject>
 #include <QPixmap>
 #include <QThread>
-#include <QTimerEvent>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
 #include "gsiDeclQtGuiTypeTraits.h"

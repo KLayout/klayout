@@ -68,7 +68,7 @@ static void delete_lib (db::Library *lib)
   db::LibraryManager::instance ().delete_lib (lib);
 }
 
-Class<db::Library> decl_Library ("Library", 
+Class<db::Library> decl_Library ("db", "Library",
   gsi::constructor ("new", &new_lib,
     "@brief Creates a new, empty library"
   ) +
@@ -168,7 +168,7 @@ static db::pcell_parameters_type coerce_parameters_native (const db::PCellDeclar
 }
 
 //  Provide a binding for db::PCellDeclaration for native PCell implementations
-Class<db::PCellDeclaration> decl_PCellDeclaration_Native ("PCellDeclaration_Native", 
+Class<db::PCellDeclaration> decl_PCellDeclaration_Native ("db", "PCellDeclaration_Native",
   gsi::method_ext ("get_layers", &get_layer_declarations_native) +
   gsi::method ("get_parameters", &db::PCellDeclaration::get_parameter_declarations) +
   gsi::method ("produce", &db::PCellDeclaration::produce) +
@@ -327,7 +327,7 @@ public:
   gsi::Callback cb_get_display_name;
 };
 
-Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native, "PCellDeclaration", 
+Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native, "db", "PCellDeclaration",
   //  fallback implementations to reroute Ruby calls to the base class:
   gsi::method ("get_parameters", &PCellDeclarationImpl::get_parameter_declarations_fb, "@hide") +
   gsi::method ("produce", &PCellDeclarationImpl::produce_fb, "@hide") +
@@ -538,7 +538,7 @@ db::PCellParameterDeclaration *ctor_pcell_parameter_3 (const std::string &name, 
   return pd;
 }
 
-Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("PCellParameterDeclaration", 
+Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCellParameterDeclaration",
   gsi::constructor ("new", &ctor_pcell_parameter, 
     "@brief Create a new parameter declaration with the given name and type\n"
     "@args name, type, description\n"

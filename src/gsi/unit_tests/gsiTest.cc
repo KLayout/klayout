@@ -749,15 +749,15 @@ void SE::trigger_s2 (const QString &s)
 // ----------------------------------------------------------------
 //  GSI declarations
 
-static gsi::Enum<Enum> decl_enum ("Enum", 
+static gsi::Enum<Enum> decl_enum ("", "Enum",
   gsi::enum_const ("a", Enum_a) +
   gsi::enum_const ("b", Enum_b) +
   gsi::enum_const ("c", Enum_c) 
 );
 
-static gsi::QFlagsClass<Enum> decl_qflags_enum ("Enums");
+static gsi::QFlagsClass<Enum> decl_qflags_enum ("", "Enums");
 
-static gsi::Class<A> decl_a ("", A",
+static gsi::Class<A> decl_a ("", "A",
   gsi::constructor ("new_a|new", &a_ctor) +
   gsi::method ("br", &A::br) +
   gsi::method ("get_e", &A::get_e) +

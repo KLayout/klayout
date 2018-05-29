@@ -301,6 +301,9 @@ Class<ClassBase> decl_Class ("tl", "Class",
   gsi::method ("name", &ClassBase::name,
     "@brief The name of the class\n"
   ) +
+  gsi::method ("module", &ClassBase::module,
+    "@brief The name of module where the class lives\n"
+  ) +
   gsi::method ("base", &ClassBase::base,
     "@brief The base class or nil if the class does not have a base class\n"
     "\n"

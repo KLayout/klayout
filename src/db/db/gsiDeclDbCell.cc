@@ -1701,7 +1701,7 @@ static db::Cell::touching_iterator cell_begin_touching_inst_um (const db::Cell *
   return cell->begin_touching (dbu_trans.inverted () * db);
 }
 
-Class<db::Cell> decl_Cell ("Cell",
+Class<db::Cell> decl_Cell ("db", "Cell",
   gsi::method ("name", &db::Cell::get_basic_name,
     "@brief Gets the cell's name\n"
     "\n"
@@ -3676,7 +3676,7 @@ db::DBox inst_dbbox_per_layer (const db::Instance *inst, unsigned int layer_inde
   return inst_bbox_per_layer (inst, layer_index) * inst_dbu (inst);
 }
 
-Class<db::Instance> decl_Instance ("Instance",
+Class<db::Instance> decl_Instance ("db", "Instance",
   method ("prop_id", &db::Instance::prop_id,
     "@brief Gets the properties ID associated with the instance\n"
   ) +
@@ -4219,7 +4219,7 @@ Class<db::Instance> decl_Instance ("Instance",
 // ---------------------------------------------------------------
 //  db::ParentInstRep binding (to "ParentInstArray")
 
-Class<db::ParentInstRep> decl_ParentInstArray ("ParentInstArray", 
+Class<db::ParentInstRep> decl_ParentInstArray ("db", "ParentInstArray",
   method ("parent_cell_index", &db::ParentInstRep::parent_cell_index,
     "@brief Gets the index of the parent cell\n"
   ) +
@@ -4262,7 +4262,7 @@ static db::CellInstArray::box_type cell_inst_array_bbox_per_layer (const db::Cel
   return a->bbox (bc);
 }
 
-Class<db::CellInstArray> decl_CellInstArray ("CellInstArray",
+Class<db::CellInstArray> decl_CellInstArray ("db", "CellInstArray",
   cell_inst_array_defs<db::CellInstArray>::methods (false /*old version*/) +
   gsi::method_ext ("bbox_per_layer", &cell_inst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the array with respect to one layer\n"
@@ -4324,7 +4324,7 @@ static db::DBox cell_dinst_array_bbox_per_layer (const db::DCellInstArray *a, co
   return a->bbox (bc);
 }
 
-Class<db::DCellInstArray> decl_DCellInstArray ("DCellInstArray",
+Class<db::DCellInstArray> decl_DCellInstArray ("db", "DCellInstArray",
   cell_inst_array_defs<db::DCellInstArray>::methods (true /*new version*/) +
   gsi::method_ext ("bbox_per_layer", &cell_dinst_array_bbox_per_layer, gsi::arg ("layout"), gsi::arg ("layer_index"),
     "@brief Gets the bounding box of the array with respect to one layer\n"

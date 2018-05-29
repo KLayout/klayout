@@ -433,7 +433,7 @@ static db::DTrans trans_to_dtrans (const db::Trans *t, double dbu)
   return f;
 }
 
-Class<db::Trans> decl_Trans ("Trans",
+Class<db::Trans> decl_Trans ("db", "Trans",
   constructor ("new|#from_dtrans", &trans_from_dtrans, gsi::arg ("dtrans"),
     "@brief Creates an integer coordinate transformation from a floating-point coordinate transformation\n"
     "\n"
@@ -483,7 +483,7 @@ static db::Trans dtrans_to_trans (const db::DTrans *t, double dbu)
   return f;
 }
 
-Class<db::DTrans> decl_DTrans ("DTrans",
+Class<db::DTrans> decl_DTrans ("db", "DTrans",
   constructor ("new|#from_itrans", &dtrans_from_itrans, gsi::arg ("trans"),
     "@brief Creates a floating-point coordinate transformation from an integer coordinate transformation\n"
     "\n"
@@ -989,7 +989,7 @@ static F cplxtrans_to_dcplxtrans (const I *t, double dbu)
   return f;
 }
 
-Class<db::DCplxTrans> decl_DCplxTrans ("DCplxTrans",
+Class<db::DCplxTrans> decl_DCplxTrans ("db", "DCplxTrans",
   constructor ("new|#from_itrans", &cplxtrans_from_cplxtrans<db::DCplxTrans, db::CplxTrans>, gsi::arg ("trans"),
     "@brief Creates a floating-point coordinate transformation from another coordinate flavour\n"
     "\n"
@@ -1069,7 +1069,7 @@ Class<db::DCplxTrans> decl_DCplxTrans ("DCplxTrans",
   "database objects."
 );
 
-Class<db::CplxTrans> decl_CplxTrans ("CplxTrans", 
+Class<db::CplxTrans> decl_CplxTrans ("db", "CplxTrans",
   constructor ("new|#from_dtrans", &cplxtrans_from_cplxtrans<db::CplxTrans, db::DCplxTrans>, gsi::arg ("trans"),
     "@brief Creates a floating-point coordinate transformation from another coordinate flavour\n"
     "\n"
@@ -1161,7 +1161,7 @@ Class<db::CplxTrans> decl_CplxTrans ("CplxTrans",
   "database objects."
 );
 
-Class<db::ICplxTrans> decl_ICplxTrans ("ICplxTrans", 
+Class<db::ICplxTrans> decl_ICplxTrans ("db", "ICplxTrans",
   constructor ("new|#from_dtrans", &cplxtrans_from_cplxtrans<db::ICplxTrans, db::DCplxTrans>, gsi::arg ("trans"),
     "@brief Creates a floating-point coordinate transformation from another coordinate flavour\n"
     "\n"
@@ -1240,7 +1240,7 @@ Class<db::ICplxTrans> decl_ICplxTrans ("ICplxTrans",
   "database objects."
 );
 
-Class<db::VCplxTrans> decl_VCplxTrans ("VCplxTrans",
+Class<db::VCplxTrans> decl_VCplxTrans ("db", "VCplxTrans",
   constructor ("new", &cplxtrans_from_cplxtrans<db::VCplxTrans, db::DCplxTrans>, gsi::arg ("trans"),
     "@brief Creates a floating-point coordinate transformation from another coordinate flavour\n"
   ) +

@@ -36,7 +36,7 @@ static db::cell_index_type drop_cell_const ()
   return db::DropCell;
 }
 
-Class<db::CellMapping> decl_CellMapping ("CellMapping", 
+Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
   gsi::method ("DropCell", &drop_cell_const,
     "@brief A constant indicating the reques to drop a cell\n"
     "\n"

@@ -712,7 +712,7 @@ static Container *decompose_trapezoids (const db::Region *r, int mode)
 int td_simple ();
 int po_any ();
 
-Class<db::Region> decl_Region ("Region", 
+Class<db::Region> decl_Region ("db", "Region",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
     "\n"

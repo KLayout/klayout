@@ -82,7 +82,7 @@ namespace gsi
     layer_map->map_expr (s, l);
   }
 
-  Class<db::LayerMap> decl_LayerMap ("LayerMap", 
+  Class<db::LayerMap> decl_LayerMap ("db", "LayerMap",
     gsi::method_ext ("is_mapped?", &lm_is_mapped, 
       "@brief Check, if a given physical layer is mapped\n"
       "@args layer\n"
@@ -234,7 +234,7 @@ namespace gsi
   );
 
   //  NOTE: the contribution comes from format specific extensions.
-  Class<db::LoadLayoutOptions> decl_LoadLayoutOptions ("LoadLayoutOptions", 
+  Class<db::LoadLayoutOptions> decl_LoadLayoutOptions ("db", "LoadLayoutOptions",
     gsi::Methods (),
     "@brief Layout reader options\n"
     "\n"

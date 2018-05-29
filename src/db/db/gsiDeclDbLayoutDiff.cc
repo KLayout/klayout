@@ -431,7 +431,7 @@ static unsigned int f_no_text_details () {
   return db::layout_diff::f_no_text_details;
 }
 
-gsi::Class<LayoutDiff> decl_LayoutDiff ("LayoutDiff",
+gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
   gsi::constant ("Silent", &f_silent,
     "@brief Silent compare - just report whether the layouts are identical\n"
     "Silent mode will not issue any signals, but instead the return value of the \\LayoutDiff#compare method "

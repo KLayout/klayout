@@ -88,7 +88,7 @@ static db::InstElement *new_iab (const db::Instance &i, unsigned long na, unsign
   }
 }
 
-Class<db::InstElement> decl_InstElement ("InstElement", 
+Class<db::InstElement> decl_InstElement ("db", "InstElement",
   gsi::constructor ("new", &new_v,
     "@brief Default constructor"
   ) +

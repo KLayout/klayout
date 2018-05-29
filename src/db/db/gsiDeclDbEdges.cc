@@ -362,7 +362,7 @@ static void insert_s (db::Edges *e, const db::Shapes &a)
   insert_st (e, a, db::UnitTrans ());
 }
 
-Class<db::Edges> dec_Edges ("Edges", 
+Class<db::Edges> dec_Edges ("db", "Edges",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
     "\n"

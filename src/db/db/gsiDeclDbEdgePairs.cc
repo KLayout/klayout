@@ -138,7 +138,7 @@ static void insert_e (db::EdgePairs *e, const db::EdgePairs &a)
   }
 }
 
-Class<db::EdgePairs> decl_EdgePairs ("EdgePairs", 
+Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
     "\n"

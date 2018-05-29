@@ -28,30 +28,8 @@
 */
 
 #include <QFormBuilder>
-#include <QAbstractButton>
-#include <QAbstractItemView>
-#include <QAction>
-#include <QActionGroup>
-#include <QBrush>
-#include <QButtonGroup>
-#include <QComboBox>
 #include <QDir>
-#include <QFormScriptRunner>
 #include <QIODevice>
-#include <QIcon>
-#include <QLayout>
-#include <QLayoutItem>
-#include <QListWidget>
-#include <QMetaEnum>
-#include <QMetaObject>
-#include <QObject>
-#include <QPalette>
-#include <QPixmap>
-#include <QResourceBuilder>
-#include <QSpacerItem>
-#include <QTableWidget>
-#include <QTextBuilder>
-#include <QTreeWidget>
 #include <QWidget>
 #include "gsiQt.h"
 #include "gsiQtDesignerCommon.h"

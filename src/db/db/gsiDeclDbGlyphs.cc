@@ -64,7 +64,7 @@ static std::vector<const db::TextGenerator *> generators ()
   return gg;
 }
 
-Class<db::TextGenerator> decl_TextGenerator ("TextGenerator",
+Class<db::TextGenerator> decl_TextGenerator ("db", "TextGenerator",
   method ("load_from_resource", &db::TextGenerator::load_from_resource, arg ("resource_path"),
     "@brief Loads the given resource data (as layout data) into the generator\n"
     "See the description of the class how the layout data is read."

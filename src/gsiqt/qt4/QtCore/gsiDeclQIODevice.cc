@@ -28,11 +28,9 @@
 */
 
 #include <QIODevice>
-#include <QChildEvent>
 #include <QEvent>
 #include <QObject>
 #include <QThread>
-#include <QTimerEvent>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include "gsiDeclQtCoreTypeTraits.h"

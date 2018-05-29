@@ -28,7 +28,6 @@
 */
 
 #include <QNetworkReply>
-#include <QChildEvent>
 #include <QEvent>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -36,7 +35,6 @@
 #include <QSslConfiguration>
 #include <QSslError>
 #include <QThread>
-#include <QTimerEvent>
 #include <QUrl>
 #include "gsiQt.h"
 #include "gsiQtNetworkCommon.h"

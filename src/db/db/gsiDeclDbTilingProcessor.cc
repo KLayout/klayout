@@ -153,7 +153,7 @@ private:
   bool m_mt_mode;
 };
 
-gsi::Class<db::TileOutputReceiver> decl_TileOutputReceiverBase ("TileOutputReceiverBase",
+gsi::Class<db::TileOutputReceiver> decl_TileOutputReceiverBase ("db", "TileOutputReceiverBase",
   gsi::method ("processor", &TileOutputReceiver_Impl::processor,
     "@brief Gets the processor the receiver is attached to\n"
     "\n"
@@ -171,7 +171,7 @@ gsi::Class<db::TileOutputReceiver> &dbdecl_TileOutputReceiverBase ()
   return decl_TileOutputReceiverBase;
 }
 
-gsi::Class<TileOutputReceiver_Impl> decl_TileOutputReceiver (decl_TileOutputReceiverBase, "TileOutputReceiver",
+gsi::Class<TileOutputReceiver_Impl> decl_TileOutputReceiver (decl_TileOutputReceiverBase, "db", "TileOutputReceiver",
   gsi::callback ("begin", &TileOutputReceiver_Impl::begin, &TileOutputReceiver_Impl::begin_cb,
     "@brief Initiates the delivery\n"
     "@args nx, ny, p0, dx, dy, frame\n"
@@ -334,7 +334,7 @@ static void tp_input11 (db::TilingProcessor *proc, const std::string &name, cons
   proc->input (name, it.first, trans * it.second, false /*not as polygons*/, edges.merged_semantics ());
 }
 
-Class<db::TilingProcessor> decl_TilingProcessor ("TilingProcessor", 
+Class<db::TilingProcessor> decl_TilingProcessor ("db", "TilingProcessor",
   method_ext ("input", &tp_input2,
     "@brief Specifies input for the tiling processor\n"
     "@args name, iter\n"

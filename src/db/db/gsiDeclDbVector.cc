@@ -260,7 +260,7 @@ static db::Vector dvector_to_vector (const db::DVector *v, double dbu)
   return db::Vector (*v * (1.0 / dbu));
 }
 
-Class<db::DVector> decl_DVector ("DVector",
+Class<db::DVector> decl_DVector ("db", "DVector",
   constructor ("new", &dvector_from_ivector, gsi::arg ("vector"),
     "@brief Creates a floating-point coordinate vector from an integer coordinate vector\n"
   ) +
@@ -296,7 +296,7 @@ static db::DVector vector_to_dvector (const db::Vector *v, double dbu)
   return db::DVector (*v * dbu);
 }
 
-Class<db::Vector> decl_Vector ("Vector",
+Class<db::Vector> decl_Vector ("db", "Vector",
   constructor ("new", &vector_from_dvector, gsi::arg ("dvector"),
     "@brief Creates an integer coordinate vector from a floating-point coordinate vector\n"
   ) +

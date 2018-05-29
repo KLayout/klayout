@@ -1103,7 +1103,7 @@ static int t_textPtrArray ()                { return db::Shape::TextPtrArray; }
 static int t_textPtrArrayMember ()          { return db::Shape::TextPtrArrayMember; }
 static int t_userObject ()                  { return db::Shape::UserObject; }
 
-Class<db::Shape> decl_Shape ("Shape", 
+Class<db::Shape> decl_Shape ("db", "Shape",
   gsi::method ("prop_id", (db::properties_id_type (db::Shape::*) () const) &db::Shape::prop_id,
     "@brief Gets the properties ID associated with the shape\n"
     "\n"

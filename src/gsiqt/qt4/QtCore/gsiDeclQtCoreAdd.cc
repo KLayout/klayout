@@ -30,6 +30,12 @@
 #include <QColor>
 #include <QSize>
 
+//  NOTE: this is required because HitTestAccuracy is defined here, but goes into Qt
+//  namespace which is in QtCore ... this introduces a dependency of QtCore GSI lib on QtGui.
+#include <QTextDocument>
+
+class Qt_Namespace { };
+
 namespace gsi_qt
 {
 
@@ -174,5 +180,22 @@ gsi::Class<QPair<double, QVariant> > decl_double_QVariant_QPair ("Qt", "QPair_do
   qt_gsi::pair_decl<double, QVariant>::methods (),
   "@qt\\n@brief Represents a QPair<double, QVariant>"
 );
+
+// ---------------------------------------------------------------------------
+//  Add declaration for HitTestAccuracy which would be in QtGui, but is in Qt namespace
+//  (hence QtCore)
+
+static gsi::Enum<Qt::HitTestAccuracy> decl_Qt_HitTestAccuracy_Enum ("QtCore", "Qt_HitTestAccuracy",
+    gsi::enum_const ("ExactHit", Qt::ExactHit, "@brief Enum constant Qt::ExactHit") +
+    gsi::enum_const ("FuzzyHit", Qt::FuzzyHit, "@brief Enum constant Qt::FuzzyHit"),
+  "@qt\n@brief This class represents the Qt::HitTestAccuracy enum");
+
+static gsi::QFlagsClass<Qt::HitTestAccuracy > decl_Qt_HitTestAccuracy_Enums ("QtCore", "Qt_QFlags_HitTestAccuracy",
+  "@qt\n@brief This class represents the QFlags<Qt::HitTestAccuracy> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<Qt_Namespace> inject_Qt_HitTestAccuracy_Enum_in_parent (decl_Qt_HitTestAccuracy_Enum.defs ());
+static gsi::ClassExt<Qt_Namespace> decl_Qt_HitTestAccuracy_Enum_as_child (decl_Qt_HitTestAccuracy_Enum, "QtCore", "HitTestAccuracy");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_HitTestAccuracy_Enums_as_child (decl_Qt_HitTestAccuracy_Enums, "QtCore", "QFlags_HitTestAccuracy");
 
 }

@@ -26,7 +26,9 @@
 #include "layMainWindow.h"
 #include "laybasicCommon.h"
 #include "gsiDecl.h"
-#include "gsiQtAllExternals.h"
+#include "gsiQtGuiExternals.h"
+
+FORCE_LINK_GSI_QTGUI
 
 namespace tl
 {

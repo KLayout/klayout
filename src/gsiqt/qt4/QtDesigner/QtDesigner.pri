@@ -6,5 +6,9 @@
 #
 
 SOURCES += \
+  gsiQtDesignerMain.cc \
   $$PWD/gsiDeclQAbstractFormBuilder.cc \
   $$PWD/gsiDeclQFormBuilder.cc
+
+HEADERS += gsiQtDesignerCommon.h
+

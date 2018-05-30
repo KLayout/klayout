@@ -22,9 +22,11 @@
 
 
 #include "gsiDecl.h"
-#include "gsiQtAllExternals.h"
 #include "gsiSignals.h"
+#include "gsiQtGuiExternals.h"
 #include "layMainWindow.h"
+
+FORCE_LINK_GSI_QTGUI
 
 namespace gsi
 {

@@ -419,9 +419,6 @@ public:
 };
 #endif
 
-std::vector<std::string> to_string_vector (const QStringList &sl);
-QStringList to_string_list (const std::vector<std::string> &sv);
-
 #ifdef _WIN32
 
 template <>
@@ -506,6 +503,70 @@ inline void qt_keep (const std::vector<T *> &list)
     qt_keep (*l);
   }
 }
+
+/**
+ *  @brief A helper to implement QPair bindings
+ */
+template <class A, class B>
+struct pair_decl
+{
+  static typename qt_gsi::Converter<A>::target_type pair_first(const QPair<A, B> *pair)
+  {
+    return qt_gsi::Converter<A>::toc (pair->first);
+  }
+
+  static typename qt_gsi::Converter<B>::target_type pair_second(const QPair<A, B> *pair)
+  {
+    return qt_gsi::Converter<B>::toc (pair->second);
+  }
+
+  static void pair_set_first(QPair<A, B> *pair, const typename qt_gsi::Converter<A>::target_type &s)
+  {
+    pair->first = qt_gsi::Converter<A>::toq (s);
+  }
+
+  static void pair_set_second(QPair<A, B> *pair, const typename qt_gsi::Converter<B>::target_type &s)
+  {
+    pair->second = qt_gsi::Converter<B>::toq (s);
+  }
+
+  static bool pair_equal(const QPair<A, B> *pair, const QPair<A, B> &other)
+  {
+    return *pair == other;
+  }
+
+  /* Not available for all types: (TODO: separate pair declaration for those types which do)
+  static bool pair_less(const QPair<A, B> *pair, const QPair<A, B> &other)
+  {
+    return *pair < other;
+  }
+  */
+
+  static QPair<A, B> *pair_default_ctor()
+  {
+    return new QPair<A, B>();
+  }
+
+  static QPair<A, B> *pair_ctor(const typename qt_gsi::Converter<A>::target_type &first, const typename qt_gsi::Converter<B>::target_type &second)
+  {
+    return new QPair<A, B>(qt_gsi::Converter<A>::toq (first), qt_gsi::Converter<B>::toq (second));
+  }
+
+  static gsi::Methods methods ()
+  {
+    return
+      gsi::constructor("new", &pair_default_ctor, "@brief Creates a new pair") +
+      gsi::constructor("new", &pair_ctor, "@brief Creates a new pair from the given arguments\n@args first, second") +
+      gsi::method_ext("first", &pair_first, "@brief Returns the first element of the pair\n") +
+      gsi::method_ext("first=", &pair_set_first, "@brief Sets the first element of the pair\n@args first") +
+      gsi::method_ext("second", &pair_second, "@brief Returns the second element of the pair\n") +
+      gsi::method_ext("second=", &pair_set_second, "@brief Sets the second element of the pair\n@args second") +
+      gsi::method_ext("==", &pair_equal, "@brief Returns true if self is equal to the other pair\n@args other")
+      // not available for all types: (TODO: separate pair declaration for those types which do)
+      // gsi::method_ext("<", &pair_less, "@brief Returns true if self is less than the other pair\n@args other")
+    ;
+  }
+};
 
 //  Using this macro on a variable will supress the "unused variable" or "unused argument"
 //  warning:

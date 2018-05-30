@@ -6,6 +6,7 @@
 #
 
 SOURCES += \
+  gsiQtSqlMain.cc \
   $$PWD/gsiDeclQSql.cc \
   $$PWD/gsiDeclQSqlDatabase.cc \
   $$PWD/gsiDeclQSqlDriver.cc \
@@ -20,3 +21,6 @@ SOURCES += \
   $$PWD/gsiDeclQSqlRelationalTableModel.cc \
   $$PWD/gsiDeclQSqlResult.cc \
   $$PWD/gsiDeclQSqlTableModel.cc
+
+HEADERS += gsiQtSqlCommon.h
+

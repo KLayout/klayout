@@ -20,23 +20,8 @@
 
 */
 
-
-#if !defined(HDR_gsiQtAllExternals_h)
-# define HDR_gsiQtAllExternals_h
-
 # if defined(HAVE_QT5)
-
-...
-
+#   include "../qt5/QtSql/gsiQtExternals.h"
 # else
-
-#   include "../qt4/QtCore/gsiQtExternals.h"
-#   include "../qt4/QtGui/gsiQtExternals.h"
-#   include "../qt4/QtXml/gsiQtExternals.h"
 #   include "../qt4/QtSql/gsiQtExternals.h"
-#   include "../qt4/QtNetwork/gsiQtExternals.h"
-#   include "../qt4/QtDesigner/gsiQtExternals.h"
-
 # endif
-
-#endif

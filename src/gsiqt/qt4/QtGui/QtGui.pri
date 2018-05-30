@@ -6,6 +6,7 @@
 #
 
 SOURCES += \
+  gsiQtGuiMain.cc \
   $$PWD/gsiDeclQAbstractButton.cc \
   $$PWD/gsiDeclQAbstractGraphicsShapeItem.cc \
   $$PWD/gsiDeclQAbstractItemDelegate.cc \
@@ -371,3 +372,6 @@ SOURCES += \
   $$PWD/gsiDeclQWindowsStyle.cc \
   $$PWD/gsiDeclQWizard.cc \
   $$PWD/gsiDeclQWizardPage.cc
+
+HEADERS += gsiQtGuiCommon.h
+

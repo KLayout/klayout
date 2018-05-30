@@ -6,6 +6,7 @@
 #
 
 SOURCES += \
+  gsiQtXmlMain.cc \
   $$PWD/gsiDeclQDomAttr.cc \
   $$PWD/gsiDeclQDomCDATASection.cc \
   $$PWD/gsiDeclQDomCharacterData.cc \
@@ -37,3 +38,6 @@ SOURCES += \
   $$PWD/gsiDeclQXmlParseException.cc \
   $$PWD/gsiDeclQXmlReader.cc \
   $$PWD/gsiDeclQXmlSimpleReader.cc
+
+HEADERS += gsiQtXmlCommon.h
+

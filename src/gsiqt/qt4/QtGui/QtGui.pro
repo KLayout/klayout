@@ -18,6 +18,7 @@ DEPENDPATH += $$DB_INC
 LIBS += -lklayout_db
 
 SOURCES += \
+  gsiDeclQtGuiAdd.cc
 
 HEADERS += \
 

@@ -6,6 +6,7 @@
 #
 
 SOURCES += \
+  gsiQtCoreMain.cc \
   $$PWD/gsiDeclQAbstractItemModel.cc \
   $$PWD/gsiDeclQAbstractListModel.cc \
   $$PWD/gsiDeclQAbstractTableModel.cc \
@@ -84,3 +85,6 @@ SOURCES += \
   $$PWD/gsiDeclQt_1.cc \
   $$PWD/gsiDeclQt_2.cc \
   $$PWD/gsiDeclQt_3.cc
+
+HEADERS += gsiQtCoreCommon.h
+

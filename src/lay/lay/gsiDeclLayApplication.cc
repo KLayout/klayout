@@ -24,8 +24,10 @@
 #include "layMainWindow.h"
 #include "laySignalHandler.h"
 #include "gsiDecl.h"
-#include "gsiQtAllExternals.h"
+#include "gsiQtGuiExternals.h"
 #include "tlArch.h"
+
+FORCE_LINK_GSI_QTGUI
 
 namespace gsi
 {

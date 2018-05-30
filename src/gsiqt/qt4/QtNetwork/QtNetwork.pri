@@ -6,6 +6,7 @@
 #
 
 SOURCES += \
+  gsiQtNetworkMain.cc \
   $$PWD/gsiDeclQAbstractNetworkCache.cc \
   $$PWD/gsiDeclQAbstractSocket.cc \
   $$PWD/gsiDeclQAuthenticator.cc \
@@ -38,3 +39,6 @@ SOURCES += \
   $$PWD/gsiDeclQTcpSocket.cc \
   $$PWD/gsiDeclQUdpSocket.cc \
   $$PWD/gsiDeclQUrlInfo.cc
+
+HEADERS += gsiQtNetworkCommon.h
+

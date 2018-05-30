@@ -14,11 +14,9 @@ LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_db
 
 SOURCES += \
   gsiQt.cc \
-  gsiDeclQtBasic.cc \
   gsiDeclQt5Basic.cc \
   gsiQtHelper.cc
 
 HEADERS += \
   gsiQt.h \
   gsiQtBasicCommon.h \
-    gsiQtAllExternals.h

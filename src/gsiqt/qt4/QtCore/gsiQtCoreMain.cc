@@ -5,5 +5,7 @@
  *  This file has been created automatically
  */
 
-int force_link_gsiQtCore = 0;
+#include "gsiQtCoreCommon.h"
+
+GSI_QTCORE_PUBLIC int force_link_gsiQtCore = 0;
 

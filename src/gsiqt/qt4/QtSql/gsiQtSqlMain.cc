@@ -5,5 +5,7 @@
  *  This file has been created automatically
  */
 
-int force_link_gsiQtSql = 0;
+#include "gsiQtSqlCommon.h"
+
+GSI_QTSQL_PUBLIC int force_link_gsiQtSql = 0;
 

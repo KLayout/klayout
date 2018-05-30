@@ -213,3 +213,6 @@ equals(HAVE_PYTHON, "1") {
   LIBS += -lklayout_pyastub
 }
 
+equals(HAVE_QTBINDINGS, "1") {
+  LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtCore -lklayout_QtXml
+}

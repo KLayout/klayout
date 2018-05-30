@@ -7,7 +7,7 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTSQL static void force_link_gsiQtSql_f () { extern int force_link_gsiQtSql; force_link_gsiQtSql = 0; }
+#define FORCE_LINK_GSI_QTSQL void force_link_gsiQtSql_f () { extern int force_link_gsiQtSql; force_link_gsiQtSql = 0; }
 
 #if !defined(HDR_gsiQtSqlCommon_h)
 # define HDR_gsiQtSqlCommon_h

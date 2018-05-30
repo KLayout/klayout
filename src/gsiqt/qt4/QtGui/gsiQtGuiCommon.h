@@ -7,7 +7,7 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTGUI static void force_link_gsiQtGui_f () { extern int force_link_gsiQtGui; force_link_gsiQtGui = 0; }
+#define FORCE_LINK_GSI_QTGUI void force_link_gsiQtGui_f () { extern int force_link_gsiQtGui; force_link_gsiQtGui = 0; }
 
 #if !defined(HDR_gsiQtGuiCommon_h)
 # define HDR_gsiQtGuiCommon_h

@@ -25,9 +25,15 @@
 #include "laySignalHandler.h"
 #include "gsiDecl.h"
 #include "gsiQtGuiExternals.h"
+#include "gsiQtCoreExternals.h"
+#include "gsiQtXmlExternals.h"
 #include "tlArch.h"
 
+//  this is here *once*
+FORCE_LINK_GSI_QTCORE
 FORCE_LINK_GSI_QTGUI
+//  required because the GSI bindings use QDomDocument
+FORCE_LINK_GSI_QTXML
 
 namespace gsi
 {

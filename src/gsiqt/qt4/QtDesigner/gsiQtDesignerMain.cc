@@ -5,5 +5,7 @@
  *  This file has been created automatically
  */
 
-int force_link_gsiQtDesigner = 0;
+#include "gsiQtDesignerCommon.h"
+
+GSI_QTDESIGNER_PUBLIC int force_link_gsiQtDesigner = 0;
 

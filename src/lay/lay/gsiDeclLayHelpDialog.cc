@@ -28,8 +28,6 @@
 #include "gsiDecl.h"
 #include "gsiQtGuiExternals.h"
 
-FORCE_LINK_GSI_QTGUI
-
 namespace tl
 {
 

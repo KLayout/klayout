@@ -5,5 +5,7 @@
  *  This file has been created automatically
  */
 
-int force_link_gsiQtNetwork = 0;
+#include "gsiQtNetworkCommon.h"
+
+GSI_QTNETWORK_PUBLIC int force_link_gsiQtNetwork = 0;
 

@@ -7,7 +7,7 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTDESIGNER static void force_link_gsiQtDesigner_f () { extern int force_link_gsiQtDesigner; force_link_gsiQtDesigner = 0; }
+#define FORCE_LINK_GSI_QTDESIGNER void force_link_gsiQtDesigner_f () { extern int force_link_gsiQtDesigner; force_link_gsiQtDesigner = 0; }
 
 #if !defined(HDR_gsiQtDesignerCommon_h)
 # define HDR_gsiQtDesignerCommon_h

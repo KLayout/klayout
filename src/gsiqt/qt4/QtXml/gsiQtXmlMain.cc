@@ -5,5 +5,7 @@
  *  This file has been created automatically
  */
 
-int force_link_gsiQtXml = 0;
+#include "gsiQtXmlCommon.h"
+
+GSI_QTXML_PUBLIC int force_link_gsiQtXml = 0;
 

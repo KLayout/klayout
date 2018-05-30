@@ -5,5 +5,7 @@
  *  This file has been created automatically
  */
 
-int force_link_gsiQtGui = 0;
+#include "gsiQtGuiCommon.h"
+
+GSI_QTGUI_PUBLIC int force_link_gsiQtGui = 0;
 

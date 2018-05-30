@@ -7,7 +7,7 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTXML static void force_link_gsiQtXml_f () { extern int force_link_gsiQtXml; force_link_gsiQtXml = 0; }
+#define FORCE_LINK_GSI_QTXML void force_link_gsiQtXml_f () { extern int force_link_gsiQtXml; force_link_gsiQtXml = 0; }
 
 #if !defined(HDR_gsiQtXmlCommon_h)
 # define HDR_gsiQtXmlCommon_h

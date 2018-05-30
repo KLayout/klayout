@@ -7,7 +7,7 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTCORE static void force_link_gsiQtCore_f () { extern int force_link_gsiQtCore; force_link_gsiQtCore = 0; }
+#define FORCE_LINK_GSI_QTCORE void force_link_gsiQtCore_f () { extern int force_link_gsiQtCore; force_link_gsiQtCore = 0; }
 
 #if !defined(HDR_gsiQtCoreCommon_h)
 # define HDR_gsiQtCoreCommon_h

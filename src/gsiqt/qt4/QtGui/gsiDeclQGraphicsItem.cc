@@ -5503,8 +5503,8 @@ static gsi::QFlagsClass<QGraphicsItem::CacheMode > decl_QGraphicsItem_CacheMode_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsItem> inject_QGraphicsItem_CacheMode_Enum_in_parent (decl_QGraphicsItem_CacheMode_Enum.defs ());
-static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_CacheMode_Enum_as_child (decl_QGraphicsItem_CacheMode_Enum, "QtGui", "CacheMode");
-static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_CacheMode_Enums_as_child (decl_QGraphicsItem_CacheMode_Enums, "QtGui", "QFlags_CacheMode");
+static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_CacheMode_Enum_as_child (decl_QGraphicsItem_CacheMode_Enum, "CacheMode");
+static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_CacheMode_Enums_as_child (decl_QGraphicsItem_CacheMode_Enums, "QFlags_CacheMode");
 
 }
 
@@ -5549,8 +5549,8 @@ static gsi::QFlagsClass<QGraphicsItem::GraphicsItemChange > decl_QGraphicsItem_G
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsItem> inject_QGraphicsItem_GraphicsItemChange_Enum_in_parent (decl_QGraphicsItem_GraphicsItemChange_Enum.defs ());
-static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_GraphicsItemChange_Enum_as_child (decl_QGraphicsItem_GraphicsItemChange_Enum, "QtGui", "GraphicsItemChange");
-static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_GraphicsItemChange_Enums_as_child (decl_QGraphicsItem_GraphicsItemChange_Enums, "QtGui", "QFlags_GraphicsItemChange");
+static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_GraphicsItemChange_Enum_as_child (decl_QGraphicsItem_GraphicsItemChange_Enum, "GraphicsItemChange");
+static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_GraphicsItemChange_Enums_as_child (decl_QGraphicsItem_GraphicsItemChange_Enums, "QFlags_GraphicsItemChange");
 
 }
 
@@ -5584,8 +5584,8 @@ static gsi::QFlagsClass<QGraphicsItem::GraphicsItemFlag > decl_QGraphicsItem_Gra
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsItem> inject_QGraphicsItem_GraphicsItemFlag_Enum_in_parent (decl_QGraphicsItem_GraphicsItemFlag_Enum.defs ());
-static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_GraphicsItemFlag_Enum_as_child (decl_QGraphicsItem_GraphicsItemFlag_Enum, "QtGui", "GraphicsItemFlag");
-static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_GraphicsItemFlag_Enums_as_child (decl_QGraphicsItem_GraphicsItemFlag_Enums, "QtGui", "QFlags_GraphicsItemFlag");
+static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_GraphicsItemFlag_Enum_as_child (decl_QGraphicsItem_GraphicsItemFlag_Enum, "GraphicsItemFlag");
+static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_GraphicsItemFlag_Enums_as_child (decl_QGraphicsItem_GraphicsItemFlag_Enums, "QFlags_GraphicsItemFlag");
 
 }
 
@@ -5605,8 +5605,8 @@ static gsi::QFlagsClass<QGraphicsItem::PanelModality > decl_QGraphicsItem_PanelM
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsItem> inject_QGraphicsItem_PanelModality_Enum_in_parent (decl_QGraphicsItem_PanelModality_Enum.defs ());
-static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_PanelModality_Enum_as_child (decl_QGraphicsItem_PanelModality_Enum, "QtGui", "PanelModality");
-static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_PanelModality_Enums_as_child (decl_QGraphicsItem_PanelModality_Enums, "QtGui", "QFlags_PanelModality");
+static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_PanelModality_Enum_as_child (decl_QGraphicsItem_PanelModality_Enum, "PanelModality");
+static gsi::ClassExt<QGraphicsItem> decl_QGraphicsItem_PanelModality_Enums_as_child (decl_QGraphicsItem_PanelModality_Enums, "QFlags_PanelModality");
 
 }
 

@@ -6465,8 +6465,8 @@ static gsi::QFlagsClass<QHeaderView::ResizeMode > decl_QHeaderView_ResizeMode_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QHeaderView> inject_QHeaderView_ResizeMode_Enum_in_parent (decl_QHeaderView_ResizeMode_Enum.defs ());
-static gsi::ClassExt<QHeaderView> decl_QHeaderView_ResizeMode_Enum_as_child (decl_QHeaderView_ResizeMode_Enum, "QtGui", "ResizeMode");
-static gsi::ClassExt<QHeaderView> decl_QHeaderView_ResizeMode_Enums_as_child (decl_QHeaderView_ResizeMode_Enums, "QtGui", "QFlags_ResizeMode");
+static gsi::ClassExt<QHeaderView> decl_QHeaderView_ResizeMode_Enum_as_child (decl_QHeaderView_ResizeMode_Enum, "ResizeMode");
+static gsi::ClassExt<QHeaderView> decl_QHeaderView_ResizeMode_Enums_as_child (decl_QHeaderView_ResizeMode_Enums, "QFlags_ResizeMode");
 
 }
 

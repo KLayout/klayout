@@ -2278,8 +2278,8 @@ static gsi::QFlagsClass<QLayout::SizeConstraint > decl_QLayout_SizeConstraint_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLayout> inject_QLayout_SizeConstraint_Enum_in_parent (decl_QLayout_SizeConstraint_Enum.defs ());
-static gsi::ClassExt<QLayout> decl_QLayout_SizeConstraint_Enum_as_child (decl_QLayout_SizeConstraint_Enum, "QtGui", "SizeConstraint");
-static gsi::ClassExt<QLayout> decl_QLayout_SizeConstraint_Enums_as_child (decl_QLayout_SizeConstraint_Enums, "QtGui", "QFlags_SizeConstraint");
+static gsi::ClassExt<QLayout> decl_QLayout_SizeConstraint_Enum_as_child (decl_QLayout_SizeConstraint_Enum, "SizeConstraint");
+static gsi::ClassExt<QLayout> decl_QLayout_SizeConstraint_Enums_as_child (decl_QLayout_SizeConstraint_Enums, "QFlags_SizeConstraint");
 
 }
 

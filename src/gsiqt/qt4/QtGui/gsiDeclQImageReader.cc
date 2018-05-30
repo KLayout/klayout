@@ -869,8 +869,8 @@ static gsi::QFlagsClass<QImageReader::ImageReaderError > decl_QImageReader_Image
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QImageReader> inject_QImageReader_ImageReaderError_Enum_in_parent (decl_QImageReader_ImageReaderError_Enum.defs ());
-static gsi::ClassExt<QImageReader> decl_QImageReader_ImageReaderError_Enum_as_child (decl_QImageReader_ImageReaderError_Enum, "QtGui", "ImageReaderError");
-static gsi::ClassExt<QImageReader> decl_QImageReader_ImageReaderError_Enums_as_child (decl_QImageReader_ImageReaderError_Enums, "QtGui", "QFlags_ImageReaderError");
+static gsi::ClassExt<QImageReader> decl_QImageReader_ImageReaderError_Enum_as_child (decl_QImageReader_ImageReaderError_Enum, "ImageReaderError");
+static gsi::ClassExt<QImageReader> decl_QImageReader_ImageReaderError_Enums_as_child (decl_QImageReader_ImageReaderError_Enums, "QFlags_ImageReaderError");
 
 }
 

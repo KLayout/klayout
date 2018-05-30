@@ -65,7 +65,7 @@ gsi::Class<QAbstractTextDocumentLayout::PaintContext> decl_QAbstractTextDocument
   methods_QAbstractTextDocumentLayout_PaintContext (),
   "@qt\n@brief Binding of QAbstractTextDocumentLayout::PaintContext");
 
-gsi::ClassExt<QAbstractTextDocumentLayout> decl_QAbstractTextDocumentLayout_PaintContext_as_child (decl_QAbstractTextDocumentLayout_PaintContext, "QtGui", "PaintContext");
+gsi::ClassExt<QAbstractTextDocumentLayout> decl_QAbstractTextDocumentLayout_PaintContext_as_child (decl_QAbstractTextDocumentLayout_PaintContext, "PaintContext");
 
 GSI_QTGUI_PUBLIC gsi::Class<QAbstractTextDocumentLayout::PaintContext> &qtdecl_QAbstractTextDocumentLayout_PaintContext () { return decl_QAbstractTextDocumentLayout_PaintContext; }
 

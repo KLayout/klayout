@@ -2820,8 +2820,8 @@ static gsi::QFlagsClass<QMdiSubWindow::SubWindowOption > decl_QMdiSubWindow_SubW
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMdiSubWindow> inject_QMdiSubWindow_SubWindowOption_Enum_in_parent (decl_QMdiSubWindow_SubWindowOption_Enum.defs ());
-static gsi::ClassExt<QMdiSubWindow> decl_QMdiSubWindow_SubWindowOption_Enum_as_child (decl_QMdiSubWindow_SubWindowOption_Enum, "QtGui", "SubWindowOption");
-static gsi::ClassExt<QMdiSubWindow> decl_QMdiSubWindow_SubWindowOption_Enums_as_child (decl_QMdiSubWindow_SubWindowOption_Enums, "QtGui", "QFlags_SubWindowOption");
+static gsi::ClassExt<QMdiSubWindow> decl_QMdiSubWindow_SubWindowOption_Enum_as_child (decl_QMdiSubWindow_SubWindowOption_Enum, "SubWindowOption");
+static gsi::ClassExt<QMdiSubWindow> decl_QMdiSubWindow_SubWindowOption_Enums_as_child (decl_QMdiSubWindow_SubWindowOption_Enums, "QFlags_SubWindowOption");
 
 }
 

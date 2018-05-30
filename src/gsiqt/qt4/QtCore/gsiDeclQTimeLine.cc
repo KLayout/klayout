@@ -1256,8 +1256,8 @@ static gsi::QFlagsClass<QTimeLine::CurveShape > decl_QTimeLine_CurveShape_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTimeLine> inject_QTimeLine_CurveShape_Enum_in_parent (decl_QTimeLine_CurveShape_Enum.defs ());
-static gsi::ClassExt<QTimeLine> decl_QTimeLine_CurveShape_Enum_as_child (decl_QTimeLine_CurveShape_Enum, "QtCore", "CurveShape");
-static gsi::ClassExt<QTimeLine> decl_QTimeLine_CurveShape_Enums_as_child (decl_QTimeLine_CurveShape_Enums, "QtCore", "QFlags_CurveShape");
+static gsi::ClassExt<QTimeLine> decl_QTimeLine_CurveShape_Enum_as_child (decl_QTimeLine_CurveShape_Enum, "CurveShape");
+static gsi::ClassExt<QTimeLine> decl_QTimeLine_CurveShape_Enums_as_child (decl_QTimeLine_CurveShape_Enums, "QFlags_CurveShape");
 
 }
 
@@ -1276,8 +1276,8 @@ static gsi::QFlagsClass<QTimeLine::Direction > decl_QTimeLine_Direction_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTimeLine> inject_QTimeLine_Direction_Enum_in_parent (decl_QTimeLine_Direction_Enum.defs ());
-static gsi::ClassExt<QTimeLine> decl_QTimeLine_Direction_Enum_as_child (decl_QTimeLine_Direction_Enum, "QtCore", "Direction");
-static gsi::ClassExt<QTimeLine> decl_QTimeLine_Direction_Enums_as_child (decl_QTimeLine_Direction_Enums, "QtCore", "QFlags_Direction");
+static gsi::ClassExt<QTimeLine> decl_QTimeLine_Direction_Enum_as_child (decl_QTimeLine_Direction_Enum, "Direction");
+static gsi::ClassExt<QTimeLine> decl_QTimeLine_Direction_Enums_as_child (decl_QTimeLine_Direction_Enums, "QFlags_Direction");
 
 }
 
@@ -1297,8 +1297,8 @@ static gsi::QFlagsClass<QTimeLine::State > decl_QTimeLine_State_Enums ("QtCore",
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTimeLine> inject_QTimeLine_State_Enum_in_parent (decl_QTimeLine_State_Enum.defs ());
-static gsi::ClassExt<QTimeLine> decl_QTimeLine_State_Enum_as_child (decl_QTimeLine_State_Enum, "QtCore", "State");
-static gsi::ClassExt<QTimeLine> decl_QTimeLine_State_Enums_as_child (decl_QTimeLine_State_Enums, "QtCore", "QFlags_State");
+static gsi::ClassExt<QTimeLine> decl_QTimeLine_State_Enum_as_child (decl_QTimeLine_State_Enum, "State");
+static gsi::ClassExt<QTimeLine> decl_QTimeLine_State_Enums_as_child (decl_QTimeLine_State_Enums, "QFlags_State");
 
 }
 

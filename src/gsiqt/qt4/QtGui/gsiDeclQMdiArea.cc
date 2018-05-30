@@ -3174,8 +3174,8 @@ static gsi::QFlagsClass<QMdiArea::AreaOption > decl_QMdiArea_AreaOption_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMdiArea> inject_QMdiArea_AreaOption_Enum_in_parent (decl_QMdiArea_AreaOption_Enum.defs ());
-static gsi::ClassExt<QMdiArea> decl_QMdiArea_AreaOption_Enum_as_child (decl_QMdiArea_AreaOption_Enum, "QtGui", "AreaOption");
-static gsi::ClassExt<QMdiArea> decl_QMdiArea_AreaOption_Enums_as_child (decl_QMdiArea_AreaOption_Enums, "QtGui", "QFlags_AreaOption");
+static gsi::ClassExt<QMdiArea> decl_QMdiArea_AreaOption_Enum_as_child (decl_QMdiArea_AreaOption_Enum, "AreaOption");
+static gsi::ClassExt<QMdiArea> decl_QMdiArea_AreaOption_Enums_as_child (decl_QMdiArea_AreaOption_Enums, "QFlags_AreaOption");
 
 }
 
@@ -3194,8 +3194,8 @@ static gsi::QFlagsClass<QMdiArea::ViewMode > decl_QMdiArea_ViewMode_Enums ("QtGu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMdiArea> inject_QMdiArea_ViewMode_Enum_in_parent (decl_QMdiArea_ViewMode_Enum.defs ());
-static gsi::ClassExt<QMdiArea> decl_QMdiArea_ViewMode_Enum_as_child (decl_QMdiArea_ViewMode_Enum, "QtGui", "ViewMode");
-static gsi::ClassExt<QMdiArea> decl_QMdiArea_ViewMode_Enums_as_child (decl_QMdiArea_ViewMode_Enums, "QtGui", "QFlags_ViewMode");
+static gsi::ClassExt<QMdiArea> decl_QMdiArea_ViewMode_Enum_as_child (decl_QMdiArea_ViewMode_Enum, "ViewMode");
+static gsi::ClassExt<QMdiArea> decl_QMdiArea_ViewMode_Enums_as_child (decl_QMdiArea_ViewMode_Enums, "QFlags_ViewMode");
 
 }
 
@@ -3215,8 +3215,8 @@ static gsi::QFlagsClass<QMdiArea::WindowOrder > decl_QMdiArea_WindowOrder_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMdiArea> inject_QMdiArea_WindowOrder_Enum_in_parent (decl_QMdiArea_WindowOrder_Enum.defs ());
-static gsi::ClassExt<QMdiArea> decl_QMdiArea_WindowOrder_Enum_as_child (decl_QMdiArea_WindowOrder_Enum, "QtGui", "WindowOrder");
-static gsi::ClassExt<QMdiArea> decl_QMdiArea_WindowOrder_Enums_as_child (decl_QMdiArea_WindowOrder_Enums, "QtGui", "QFlags_WindowOrder");
+static gsi::ClassExt<QMdiArea> decl_QMdiArea_WindowOrder_Enum_as_child (decl_QMdiArea_WindowOrder_Enum, "WindowOrder");
+static gsi::ClassExt<QMdiArea> decl_QMdiArea_WindowOrder_Enums_as_child (decl_QMdiArea_WindowOrder_Enums, "QFlags_WindowOrder");
 
 }
 

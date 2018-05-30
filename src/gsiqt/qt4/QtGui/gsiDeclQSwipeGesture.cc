@@ -640,8 +640,8 @@ static gsi::QFlagsClass<QSwipeGesture::SwipeDirection > decl_QSwipeGesture_Swipe
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSwipeGesture> inject_QSwipeGesture_SwipeDirection_Enum_in_parent (decl_QSwipeGesture_SwipeDirection_Enum.defs ());
-static gsi::ClassExt<QSwipeGesture> decl_QSwipeGesture_SwipeDirection_Enum_as_child (decl_QSwipeGesture_SwipeDirection_Enum, "QtGui", "SwipeDirection");
-static gsi::ClassExt<QSwipeGesture> decl_QSwipeGesture_SwipeDirection_Enums_as_child (decl_QSwipeGesture_SwipeDirection_Enums, "QtGui", "QFlags_SwipeDirection");
+static gsi::ClassExt<QSwipeGesture> decl_QSwipeGesture_SwipeDirection_Enum_as_child (decl_QSwipeGesture_SwipeDirection_Enum, "SwipeDirection");
+static gsi::ClassExt<QSwipeGesture> decl_QSwipeGesture_SwipeDirection_Enums_as_child (decl_QSwipeGesture_SwipeDirection_Enums, "QFlags_SwipeDirection");
 
 }
 

@@ -32,7 +32,7 @@ namespace gsi_qt
 // ------------------------------------------------------------
 //  Declarations for QPair<QAccessibleInterface*, QAccessible::Relation>
 
-gsi::Class<QPair<QAccessibleInterface*, QAccessible::Relation> > decl_QAccessibleInterfacePtr_Relation_QPair ("Qt", "QPair_QAccessibleInterfacePtr_QAccessible_Relation",
+gsi::Class<QPair<QAccessibleInterface*, QAccessible::Relation> > decl_QAccessibleInterfacePtr_Relation_QPair ("QtGui", "QPair_QAccessibleInterfacePtr_QAccessible_Relation",
   qt_gsi::pair_decl<QAccessibleInterface*, QAccessible::Relation>::methods (),
   "@qt\\n@brief Represents a QPair<QAccessibleInterface*, QAccessible::Relation> >"
 );

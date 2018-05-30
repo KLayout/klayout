@@ -1044,8 +1044,8 @@ static gsi::QFlagsClass<QPalette::ColorGroup > decl_QPalette_ColorGroup_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPalette> inject_QPalette_ColorGroup_Enum_in_parent (decl_QPalette_ColorGroup_Enum.defs ());
-static gsi::ClassExt<QPalette> decl_QPalette_ColorGroup_Enum_as_child (decl_QPalette_ColorGroup_Enum, "QtGui", "ColorGroup");
-static gsi::ClassExt<QPalette> decl_QPalette_ColorGroup_Enums_as_child (decl_QPalette_ColorGroup_Enums, "QtGui", "QFlags_ColorGroup");
+static gsi::ClassExt<QPalette> decl_QPalette_ColorGroup_Enum_as_child (decl_QPalette_ColorGroup_Enum, "ColorGroup");
+static gsi::ClassExt<QPalette> decl_QPalette_ColorGroup_Enums_as_child (decl_QPalette_ColorGroup_Enums, "QFlags_ColorGroup");
 
 }
 
@@ -1085,8 +1085,8 @@ static gsi::QFlagsClass<QPalette::ColorRole > decl_QPalette_ColorRole_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPalette> inject_QPalette_ColorRole_Enum_in_parent (decl_QPalette_ColorRole_Enum.defs ());
-static gsi::ClassExt<QPalette> decl_QPalette_ColorRole_Enum_as_child (decl_QPalette_ColorRole_Enum, "QtGui", "ColorRole");
-static gsi::ClassExt<QPalette> decl_QPalette_ColorRole_Enums_as_child (decl_QPalette_ColorRole_Enums, "QtGui", "QFlags_ColorRole");
+static gsi::ClassExt<QPalette> decl_QPalette_ColorRole_Enum_as_child (decl_QPalette_ColorRole_Enum, "ColorRole");
+static gsi::ClassExt<QPalette> decl_QPalette_ColorRole_Enums_as_child (decl_QPalette_ColorRole_Enums, "QFlags_ColorRole");
 
 }
 

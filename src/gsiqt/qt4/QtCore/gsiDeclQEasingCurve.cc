@@ -382,8 +382,8 @@ static gsi::QFlagsClass<QEasingCurve::Type > decl_QEasingCurve_Type_Enums ("QtCo
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QEasingCurve> inject_QEasingCurve_Type_Enum_in_parent (decl_QEasingCurve_Type_Enum.defs ());
-static gsi::ClassExt<QEasingCurve> decl_QEasingCurve_Type_Enum_as_child (decl_QEasingCurve_Type_Enum, "QtCore", "Type");
-static gsi::ClassExt<QEasingCurve> decl_QEasingCurve_Type_Enums_as_child (decl_QEasingCurve_Type_Enums, "QtCore", "QFlags_Type");
+static gsi::ClassExt<QEasingCurve> decl_QEasingCurve_Type_Enum_as_child (decl_QEasingCurve_Type_Enum, "Type");
+static gsi::ClassExt<QEasingCurve> decl_QEasingCurve_Type_Enums_as_child (decl_QEasingCurve_Type_Enums, "QFlags_Type");
 
 }
 

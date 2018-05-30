@@ -307,8 +307,8 @@ static gsi::QFlagsClass<QTouchEvent::DeviceType > decl_QTouchEvent_DeviceType_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTouchEvent> inject_QTouchEvent_DeviceType_Enum_in_parent (decl_QTouchEvent_DeviceType_Enum.defs ());
-static gsi::ClassExt<QTouchEvent> decl_QTouchEvent_DeviceType_Enum_as_child (decl_QTouchEvent_DeviceType_Enum, "QtGui", "DeviceType");
-static gsi::ClassExt<QTouchEvent> decl_QTouchEvent_DeviceType_Enums_as_child (decl_QTouchEvent_DeviceType_Enums, "QtGui", "QFlags_DeviceType");
+static gsi::ClassExt<QTouchEvent> decl_QTouchEvent_DeviceType_Enum_as_child (decl_QTouchEvent_DeviceType_Enum, "DeviceType");
+static gsi::ClassExt<QTouchEvent> decl_QTouchEvent_DeviceType_Enums_as_child (decl_QTouchEvent_DeviceType_Enums, "QFlags_DeviceType");
 
 }
 

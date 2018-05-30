@@ -761,8 +761,8 @@ static gsi::QFlagsClass<QImageIOPlugin::Capability > decl_QImageIOPlugin_Capabil
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QImageIOPlugin> inject_QImageIOPlugin_Capability_Enum_in_parent (decl_QImageIOPlugin_Capability_Enum.defs ());
-static gsi::ClassExt<QImageIOPlugin> decl_QImageIOPlugin_Capability_Enum_as_child (decl_QImageIOPlugin_Capability_Enum, "QtGui", "Capability");
-static gsi::ClassExt<QImageIOPlugin> decl_QImageIOPlugin_Capability_Enums_as_child (decl_QImageIOPlugin_Capability_Enums, "QtGui", "QFlags_Capability");
+static gsi::ClassExt<QImageIOPlugin> decl_QImageIOPlugin_Capability_Enum_as_child (decl_QImageIOPlugin_Capability_Enum, "Capability");
+static gsi::ClassExt<QImageIOPlugin> decl_QImageIOPlugin_Capability_Enums_as_child (decl_QImageIOPlugin_Capability_Enums, "QFlags_Capability");
 
 }
 

@@ -2402,8 +2402,8 @@ static gsi::QFlagsClass<QFormLayout::FieldGrowthPolicy > decl_QFormLayout_FieldG
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFormLayout> inject_QFormLayout_FieldGrowthPolicy_Enum_in_parent (decl_QFormLayout_FieldGrowthPolicy_Enum.defs ());
-static gsi::ClassExt<QFormLayout> decl_QFormLayout_FieldGrowthPolicy_Enum_as_child (decl_QFormLayout_FieldGrowthPolicy_Enum, "QtGui", "FieldGrowthPolicy");
-static gsi::ClassExt<QFormLayout> decl_QFormLayout_FieldGrowthPolicy_Enums_as_child (decl_QFormLayout_FieldGrowthPolicy_Enums, "QtGui", "QFlags_FieldGrowthPolicy");
+static gsi::ClassExt<QFormLayout> decl_QFormLayout_FieldGrowthPolicy_Enum_as_child (decl_QFormLayout_FieldGrowthPolicy_Enum, "FieldGrowthPolicy");
+static gsi::ClassExt<QFormLayout> decl_QFormLayout_FieldGrowthPolicy_Enums_as_child (decl_QFormLayout_FieldGrowthPolicy_Enums, "QFlags_FieldGrowthPolicy");
 
 }
 
@@ -2423,8 +2423,8 @@ static gsi::QFlagsClass<QFormLayout::ItemRole > decl_QFormLayout_ItemRole_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFormLayout> inject_QFormLayout_ItemRole_Enum_in_parent (decl_QFormLayout_ItemRole_Enum.defs ());
-static gsi::ClassExt<QFormLayout> decl_QFormLayout_ItemRole_Enum_as_child (decl_QFormLayout_ItemRole_Enum, "QtGui", "ItemRole");
-static gsi::ClassExt<QFormLayout> decl_QFormLayout_ItemRole_Enums_as_child (decl_QFormLayout_ItemRole_Enums, "QtGui", "QFlags_ItemRole");
+static gsi::ClassExt<QFormLayout> decl_QFormLayout_ItemRole_Enum_as_child (decl_QFormLayout_ItemRole_Enum, "ItemRole");
+static gsi::ClassExt<QFormLayout> decl_QFormLayout_ItemRole_Enums_as_child (decl_QFormLayout_ItemRole_Enums, "QFlags_ItemRole");
 
 }
 
@@ -2444,8 +2444,8 @@ static gsi::QFlagsClass<QFormLayout::RowWrapPolicy > decl_QFormLayout_RowWrapPol
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFormLayout> inject_QFormLayout_RowWrapPolicy_Enum_in_parent (decl_QFormLayout_RowWrapPolicy_Enum.defs ());
-static gsi::ClassExt<QFormLayout> decl_QFormLayout_RowWrapPolicy_Enum_as_child (decl_QFormLayout_RowWrapPolicy_Enum, "QtGui", "RowWrapPolicy");
-static gsi::ClassExt<QFormLayout> decl_QFormLayout_RowWrapPolicy_Enums_as_child (decl_QFormLayout_RowWrapPolicy_Enums, "QtGui", "QFlags_RowWrapPolicy");
+static gsi::ClassExt<QFormLayout> decl_QFormLayout_RowWrapPolicy_Enum_as_child (decl_QFormLayout_RowWrapPolicy_Enum, "RowWrapPolicy");
+static gsi::ClassExt<QFormLayout> decl_QFormLayout_RowWrapPolicy_Enums_as_child (decl_QFormLayout_RowWrapPolicy_Enums, "QFlags_RowWrapPolicy");
 
 }
 

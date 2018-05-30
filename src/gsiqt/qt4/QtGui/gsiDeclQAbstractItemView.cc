@@ -6020,8 +6020,8 @@ static gsi::QFlagsClass<QAbstractItemView::DragDropMode > decl_QAbstractItemView
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractItemView> inject_QAbstractItemView_DragDropMode_Enum_in_parent (decl_QAbstractItemView_DragDropMode_Enum.defs ());
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_DragDropMode_Enum_as_child (decl_QAbstractItemView_DragDropMode_Enum, "QtGui", "DragDropMode");
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_DragDropMode_Enums_as_child (decl_QAbstractItemView_DragDropMode_Enums, "QtGui", "QFlags_DragDropMode");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_DragDropMode_Enum_as_child (decl_QAbstractItemView_DragDropMode_Enum, "DragDropMode");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_DragDropMode_Enums_as_child (decl_QAbstractItemView_DragDropMode_Enums, "QFlags_DragDropMode");
 
 }
 
@@ -6045,8 +6045,8 @@ static gsi::QFlagsClass<QAbstractItemView::EditTrigger > decl_QAbstractItemView_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractItemView> inject_QAbstractItemView_EditTrigger_Enum_in_parent (decl_QAbstractItemView_EditTrigger_Enum.defs ());
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_EditTrigger_Enum_as_child (decl_QAbstractItemView_EditTrigger_Enum, "QtGui", "EditTrigger");
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_EditTrigger_Enums_as_child (decl_QAbstractItemView_EditTrigger_Enums, "QtGui", "QFlags_EditTrigger");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_EditTrigger_Enum_as_child (decl_QAbstractItemView_EditTrigger_Enum, "EditTrigger");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_EditTrigger_Enums_as_child (decl_QAbstractItemView_EditTrigger_Enums, "QFlags_EditTrigger");
 
 }
 
@@ -6067,8 +6067,8 @@ static gsi::QFlagsClass<QAbstractItemView::ScrollHint > decl_QAbstractItemView_S
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractItemView> inject_QAbstractItemView_ScrollHint_Enum_in_parent (decl_QAbstractItemView_ScrollHint_Enum.defs ());
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_ScrollHint_Enum_as_child (decl_QAbstractItemView_ScrollHint_Enum, "QtGui", "ScrollHint");
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_ScrollHint_Enums_as_child (decl_QAbstractItemView_ScrollHint_Enums, "QtGui", "QFlags_ScrollHint");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_ScrollHint_Enum_as_child (decl_QAbstractItemView_ScrollHint_Enum, "ScrollHint");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_ScrollHint_Enums_as_child (decl_QAbstractItemView_ScrollHint_Enums, "QFlags_ScrollHint");
 
 }
 
@@ -6087,8 +6087,8 @@ static gsi::QFlagsClass<QAbstractItemView::ScrollMode > decl_QAbstractItemView_S
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractItemView> inject_QAbstractItemView_ScrollMode_Enum_in_parent (decl_QAbstractItemView_ScrollMode_Enum.defs ());
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_ScrollMode_Enum_as_child (decl_QAbstractItemView_ScrollMode_Enum, "QtGui", "ScrollMode");
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_ScrollMode_Enums_as_child (decl_QAbstractItemView_ScrollMode_Enums, "QtGui", "QFlags_ScrollMode");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_ScrollMode_Enum_as_child (decl_QAbstractItemView_ScrollMode_Enum, "ScrollMode");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_ScrollMode_Enums_as_child (decl_QAbstractItemView_ScrollMode_Enums, "QFlags_ScrollMode");
 
 }
 
@@ -6108,8 +6108,8 @@ static gsi::QFlagsClass<QAbstractItemView::SelectionBehavior > decl_QAbstractIte
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractItemView> inject_QAbstractItemView_SelectionBehavior_Enum_in_parent (decl_QAbstractItemView_SelectionBehavior_Enum.defs ());
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_SelectionBehavior_Enum_as_child (decl_QAbstractItemView_SelectionBehavior_Enum, "QtGui", "SelectionBehavior");
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_SelectionBehavior_Enums_as_child (decl_QAbstractItemView_SelectionBehavior_Enums, "QtGui", "QFlags_SelectionBehavior");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_SelectionBehavior_Enum_as_child (decl_QAbstractItemView_SelectionBehavior_Enum, "SelectionBehavior");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_SelectionBehavior_Enums_as_child (decl_QAbstractItemView_SelectionBehavior_Enums, "QFlags_SelectionBehavior");
 
 }
 
@@ -6131,8 +6131,8 @@ static gsi::QFlagsClass<QAbstractItemView::SelectionMode > decl_QAbstractItemVie
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractItemView> inject_QAbstractItemView_SelectionMode_Enum_in_parent (decl_QAbstractItemView_SelectionMode_Enum.defs ());
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_SelectionMode_Enum_as_child (decl_QAbstractItemView_SelectionMode_Enum, "QtGui", "SelectionMode");
-static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_SelectionMode_Enums_as_child (decl_QAbstractItemView_SelectionMode_Enums, "QtGui", "QFlags_SelectionMode");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_SelectionMode_Enum_as_child (decl_QAbstractItemView_SelectionMode_Enum, "SelectionMode");
+static gsi::ClassExt<QAbstractItemView> decl_QAbstractItemView_SelectionMode_Enums_as_child (decl_QAbstractItemView_SelectionMode_Enums, "QFlags_SelectionMode");
 
 }
 

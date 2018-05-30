@@ -468,8 +468,8 @@ static gsi::QFlagsClass<QNetworkProxyQuery::QueryType > decl_QNetworkProxyQuery_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QNetworkProxyQuery> inject_QNetworkProxyQuery_QueryType_Enum_in_parent (decl_QNetworkProxyQuery_QueryType_Enum.defs ());
-static gsi::ClassExt<QNetworkProxyQuery> decl_QNetworkProxyQuery_QueryType_Enum_as_child (decl_QNetworkProxyQuery_QueryType_Enum, "QtNetwork", "QueryType");
-static gsi::ClassExt<QNetworkProxyQuery> decl_QNetworkProxyQuery_QueryType_Enums_as_child (decl_QNetworkProxyQuery_QueryType_Enums, "QtNetwork", "QFlags_QueryType");
+static gsi::ClassExt<QNetworkProxyQuery> decl_QNetworkProxyQuery_QueryType_Enum_as_child (decl_QNetworkProxyQuery_QueryType_Enum, "QueryType");
+static gsi::ClassExt<QNetworkProxyQuery> decl_QNetworkProxyQuery_QueryType_Enums_as_child (decl_QNetworkProxyQuery_QueryType_Enums, "QFlags_QueryType");
 
 }
 

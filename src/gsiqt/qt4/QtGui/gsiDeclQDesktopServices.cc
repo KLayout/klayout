@@ -204,8 +204,8 @@ static gsi::QFlagsClass<QDesktopServices::StandardLocation > decl_QDesktopServic
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDesktopServices> inject_QDesktopServices_StandardLocation_Enum_in_parent (decl_QDesktopServices_StandardLocation_Enum.defs ());
-static gsi::ClassExt<QDesktopServices> decl_QDesktopServices_StandardLocation_Enum_as_child (decl_QDesktopServices_StandardLocation_Enum, "QtGui", "StandardLocation");
-static gsi::ClassExt<QDesktopServices> decl_QDesktopServices_StandardLocation_Enums_as_child (decl_QDesktopServices_StandardLocation_Enums, "QtGui", "QFlags_StandardLocation");
+static gsi::ClassExt<QDesktopServices> decl_QDesktopServices_StandardLocation_Enum_as_child (decl_QDesktopServices_StandardLocation_Enum, "StandardLocation");
+static gsi::ClassExt<QDesktopServices> decl_QDesktopServices_StandardLocation_Enums_as_child (decl_QDesktopServices_StandardLocation_Enums, "QFlags_StandardLocation");
 
 }
 

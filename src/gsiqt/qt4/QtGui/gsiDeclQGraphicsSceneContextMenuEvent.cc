@@ -317,8 +317,8 @@ static gsi::QFlagsClass<QGraphicsSceneContextMenuEvent::Reason > decl_QGraphicsS
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsSceneContextMenuEvent> inject_QGraphicsSceneContextMenuEvent_Reason_Enum_in_parent (decl_QGraphicsSceneContextMenuEvent_Reason_Enum.defs ());
-static gsi::ClassExt<QGraphicsSceneContextMenuEvent> decl_QGraphicsSceneContextMenuEvent_Reason_Enum_as_child (decl_QGraphicsSceneContextMenuEvent_Reason_Enum, "QtGui", "Reason");
-static gsi::ClassExt<QGraphicsSceneContextMenuEvent> decl_QGraphicsSceneContextMenuEvent_Reason_Enums_as_child (decl_QGraphicsSceneContextMenuEvent_Reason_Enums, "QtGui", "QFlags_Reason");
+static gsi::ClassExt<QGraphicsSceneContextMenuEvent> decl_QGraphicsSceneContextMenuEvent_Reason_Enum_as_child (decl_QGraphicsSceneContextMenuEvent_Reason_Enum, "Reason");
+static gsi::ClassExt<QGraphicsSceneContextMenuEvent> decl_QGraphicsSceneContextMenuEvent_Reason_Enums_as_child (decl_QGraphicsSceneContextMenuEvent_Reason_Enums, "QFlags_Reason");
 
 }
 

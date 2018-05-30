@@ -442,8 +442,8 @@ static gsi::QFlagsClass<QSizePolicy::ControlType > decl_QSizePolicy_ControlType_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSizePolicy> inject_QSizePolicy_ControlType_Enum_in_parent (decl_QSizePolicy_ControlType_Enum.defs ());
-static gsi::ClassExt<QSizePolicy> decl_QSizePolicy_ControlType_Enum_as_child (decl_QSizePolicy_ControlType_Enum, "QtGui", "ControlType");
-static gsi::ClassExt<QSizePolicy> decl_QSizePolicy_ControlType_Enums_as_child (decl_QSizePolicy_ControlType_Enums, "QtGui", "QFlags_ControlType");
+static gsi::ClassExt<QSizePolicy> decl_QSizePolicy_ControlType_Enum_as_child (decl_QSizePolicy_ControlType_Enum, "ControlType");
+static gsi::ClassExt<QSizePolicy> decl_QSizePolicy_ControlType_Enums_as_child (decl_QSizePolicy_ControlType_Enums, "QFlags_ControlType");
 
 }
 
@@ -467,8 +467,8 @@ static gsi::QFlagsClass<QSizePolicy::Policy > decl_QSizePolicy_Policy_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSizePolicy> inject_QSizePolicy_Policy_Enum_in_parent (decl_QSizePolicy_Policy_Enum.defs ());
-static gsi::ClassExt<QSizePolicy> decl_QSizePolicy_Policy_Enum_as_child (decl_QSizePolicy_Policy_Enum, "QtGui", "Policy");
-static gsi::ClassExt<QSizePolicy> decl_QSizePolicy_Policy_Enums_as_child (decl_QSizePolicy_Policy_Enums, "QtGui", "QFlags_Policy");
+static gsi::ClassExt<QSizePolicy> decl_QSizePolicy_Policy_Enum_as_child (decl_QSizePolicy_Policy_Enum, "Policy");
+static gsi::ClassExt<QSizePolicy> decl_QSizePolicy_Policy_Enums_as_child (decl_QSizePolicy_Policy_Enums, "QFlags_Policy");
 
 }
 

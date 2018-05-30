@@ -593,8 +593,8 @@ static gsi::QFlagsClass<QNetworkReply::NetworkError > decl_QNetworkReply_Network
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QNetworkReply> inject_QNetworkReply_NetworkError_Enum_in_parent (decl_QNetworkReply_NetworkError_Enum.defs ());
-static gsi::ClassExt<QNetworkReply> decl_QNetworkReply_NetworkError_Enum_as_child (decl_QNetworkReply_NetworkError_Enum, "QtNetwork", "NetworkError");
-static gsi::ClassExt<QNetworkReply> decl_QNetworkReply_NetworkError_Enums_as_child (decl_QNetworkReply_NetworkError_Enums, "QtNetwork", "QFlags_NetworkError");
+static gsi::ClassExt<QNetworkReply> decl_QNetworkReply_NetworkError_Enum_as_child (decl_QNetworkReply_NetworkError_Enum, "NetworkError");
+static gsi::ClassExt<QNetworkReply> decl_QNetworkReply_NetworkError_Enums_as_child (decl_QNetworkReply_NetworkError_Enums, "QFlags_NetworkError");
 
 }
 

@@ -159,8 +159,8 @@ static gsi::QFlagsClass<QMutex::RecursionMode > decl_QMutex_RecursionMode_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMutex> inject_QMutex_RecursionMode_Enum_in_parent (decl_QMutex_RecursionMode_Enum.defs ());
-static gsi::ClassExt<QMutex> decl_QMutex_RecursionMode_Enum_as_child (decl_QMutex_RecursionMode_Enum, "QtCore", "RecursionMode");
-static gsi::ClassExt<QMutex> decl_QMutex_RecursionMode_Enums_as_child (decl_QMutex_RecursionMode_Enums, "QtCore", "QFlags_RecursionMode");
+static gsi::ClassExt<QMutex> decl_QMutex_RecursionMode_Enum_as_child (decl_QMutex_RecursionMode_Enum, "RecursionMode");
+static gsi::ClassExt<QMutex> decl_QMutex_RecursionMode_Enums_as_child (decl_QMutex_RecursionMode_Enums, "QFlags_RecursionMode");
 
 }
 

@@ -707,8 +707,8 @@ static gsi::QFlagsClass<QGesture::GestureCancelPolicy > decl_QGesture_GestureCan
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGesture> inject_QGesture_GestureCancelPolicy_Enum_in_parent (decl_QGesture_GestureCancelPolicy_Enum.defs ());
-static gsi::ClassExt<QGesture> decl_QGesture_GestureCancelPolicy_Enum_as_child (decl_QGesture_GestureCancelPolicy_Enum, "QtGui", "GestureCancelPolicy");
-static gsi::ClassExt<QGesture> decl_QGesture_GestureCancelPolicy_Enums_as_child (decl_QGesture_GestureCancelPolicy_Enums, "QtGui", "QFlags_GestureCancelPolicy");
+static gsi::ClassExt<QGesture> decl_QGesture_GestureCancelPolicy_Enum_as_child (decl_QGesture_GestureCancelPolicy_Enum, "GestureCancelPolicy");
+static gsi::ClassExt<QGesture> decl_QGesture_GestureCancelPolicy_Enums_as_child (decl_QGesture_GestureCancelPolicy_Enums, "QFlags_GestureCancelPolicy");
 
 }
 

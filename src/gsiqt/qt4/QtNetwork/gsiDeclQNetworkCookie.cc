@@ -488,8 +488,8 @@ static gsi::QFlagsClass<QNetworkCookie::RawForm > decl_QNetworkCookie_RawForm_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QNetworkCookie> inject_QNetworkCookie_RawForm_Enum_in_parent (decl_QNetworkCookie_RawForm_Enum.defs ());
-static gsi::ClassExt<QNetworkCookie> decl_QNetworkCookie_RawForm_Enum_as_child (decl_QNetworkCookie_RawForm_Enum, "QtNetwork", "RawForm");
-static gsi::ClassExt<QNetworkCookie> decl_QNetworkCookie_RawForm_Enums_as_child (decl_QNetworkCookie_RawForm_Enums, "QtNetwork", "QFlags_RawForm");
+static gsi::ClassExt<QNetworkCookie> decl_QNetworkCookie_RawForm_Enum_as_child (decl_QNetworkCookie_RawForm_Enum, "RawForm");
+static gsi::ClassExt<QNetworkCookie> decl_QNetworkCookie_RawForm_Enums_as_child (decl_QNetworkCookie_RawForm_Enums, "QFlags_RawForm");
 
 }
 

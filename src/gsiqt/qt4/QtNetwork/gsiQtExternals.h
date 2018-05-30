@@ -30,7 +30,7 @@
 #if !defined(HDR_gsiQtNetworkExternals)
 #define HDR_gsiQtNetworkExternals
 
-#include "gsiClassBase.h"
+#include "gsiClass.h"
 #include "gsiQtNetworkCommon.h"
 
 class QAbstractNetworkCache;

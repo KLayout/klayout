@@ -976,8 +976,8 @@ static gsi::QFlagsClass<QPinchGesture::ChangeFlag > decl_QPinchGesture_ChangeFla
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPinchGesture> inject_QPinchGesture_ChangeFlag_Enum_in_parent (decl_QPinchGesture_ChangeFlag_Enum.defs ());
-static gsi::ClassExt<QPinchGesture> decl_QPinchGesture_ChangeFlag_Enum_as_child (decl_QPinchGesture_ChangeFlag_Enum, "QtGui", "ChangeFlag");
-static gsi::ClassExt<QPinchGesture> decl_QPinchGesture_ChangeFlag_Enums_as_child (decl_QPinchGesture_ChangeFlag_Enums, "QtGui", "QFlags_ChangeFlag");
+static gsi::ClassExt<QPinchGesture> decl_QPinchGesture_ChangeFlag_Enum_as_child (decl_QPinchGesture_ChangeFlag_Enum, "ChangeFlag");
+static gsi::ClassExt<QPinchGesture> decl_QPinchGesture_ChangeFlag_Enums_as_child (decl_QPinchGesture_ChangeFlag_Enums, "QFlags_ChangeFlag");
 
 }
 

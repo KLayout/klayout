@@ -617,8 +617,8 @@ static gsi::QFlagsClass<QLocalSocket::LocalSocketError > decl_QLocalSocket_Local
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLocalSocket> inject_QLocalSocket_LocalSocketError_Enum_in_parent (decl_QLocalSocket_LocalSocketError_Enum.defs ());
-static gsi::ClassExt<QLocalSocket> decl_QLocalSocket_LocalSocketError_Enum_as_child (decl_QLocalSocket_LocalSocketError_Enum, "QtNetwork", "LocalSocketError");
-static gsi::ClassExt<QLocalSocket> decl_QLocalSocket_LocalSocketError_Enums_as_child (decl_QLocalSocket_LocalSocketError_Enums, "QtNetwork", "QFlags_LocalSocketError");
+static gsi::ClassExt<QLocalSocket> decl_QLocalSocket_LocalSocketError_Enum_as_child (decl_QLocalSocket_LocalSocketError_Enum, "LocalSocketError");
+static gsi::ClassExt<QLocalSocket> decl_QLocalSocket_LocalSocketError_Enums_as_child (decl_QLocalSocket_LocalSocketError_Enums, "QFlags_LocalSocketError");
 
 }
 
@@ -639,8 +639,8 @@ static gsi::QFlagsClass<QLocalSocket::LocalSocketState > decl_QLocalSocket_Local
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLocalSocket> inject_QLocalSocket_LocalSocketState_Enum_in_parent (decl_QLocalSocket_LocalSocketState_Enum.defs ());
-static gsi::ClassExt<QLocalSocket> decl_QLocalSocket_LocalSocketState_Enum_as_child (decl_QLocalSocket_LocalSocketState_Enum, "QtNetwork", "LocalSocketState");
-static gsi::ClassExt<QLocalSocket> decl_QLocalSocket_LocalSocketState_Enums_as_child (decl_QLocalSocket_LocalSocketState_Enums, "QtNetwork", "QFlags_LocalSocketState");
+static gsi::ClassExt<QLocalSocket> decl_QLocalSocket_LocalSocketState_Enum_as_child (decl_QLocalSocket_LocalSocketState_Enum, "LocalSocketState");
+static gsi::ClassExt<QLocalSocket> decl_QLocalSocket_LocalSocketState_Enums_as_child (decl_QLocalSocket_LocalSocketState_Enums, "QFlags_LocalSocketState");
 
 }
 

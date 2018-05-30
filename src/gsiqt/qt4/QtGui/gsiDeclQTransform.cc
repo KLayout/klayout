@@ -1386,8 +1386,8 @@ static gsi::QFlagsClass<QTransform::TransformationType > decl_QTransform_Transfo
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTransform> inject_QTransform_TransformationType_Enum_in_parent (decl_QTransform_TransformationType_Enum.defs ());
-static gsi::ClassExt<QTransform> decl_QTransform_TransformationType_Enum_as_child (decl_QTransform_TransformationType_Enum, "QtGui", "TransformationType");
-static gsi::ClassExt<QTransform> decl_QTransform_TransformationType_Enums_as_child (decl_QTransform_TransformationType_Enums, "QtGui", "QFlags_TransformationType");
+static gsi::ClassExt<QTransform> decl_QTransform_TransformationType_Enum_as_child (decl_QTransform_TransformationType_Enum, "TransformationType");
+static gsi::ClassExt<QTransform> decl_QTransform_TransformationType_Enums_as_child (decl_QTransform_TransformationType_Enums, "QFlags_TransformationType");
 
 }
 

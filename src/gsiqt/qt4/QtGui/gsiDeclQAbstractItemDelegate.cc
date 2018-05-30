@@ -1236,8 +1236,8 @@ static gsi::QFlagsClass<QAbstractItemDelegate::EndEditHint > decl_QAbstractItemD
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractItemDelegate> inject_QAbstractItemDelegate_EndEditHint_Enum_in_parent (decl_QAbstractItemDelegate_EndEditHint_Enum.defs ());
-static gsi::ClassExt<QAbstractItemDelegate> decl_QAbstractItemDelegate_EndEditHint_Enum_as_child (decl_QAbstractItemDelegate_EndEditHint_Enum, "QtGui", "EndEditHint");
-static gsi::ClassExt<QAbstractItemDelegate> decl_QAbstractItemDelegate_EndEditHint_Enums_as_child (decl_QAbstractItemDelegate_EndEditHint_Enums, "QtGui", "QFlags_EndEditHint");
+static gsi::ClassExt<QAbstractItemDelegate> decl_QAbstractItemDelegate_EndEditHint_Enum_as_child (decl_QAbstractItemDelegate_EndEditHint_Enum, "EndEditHint");
+static gsi::ClassExt<QAbstractItemDelegate> decl_QAbstractItemDelegate_EndEditHint_Enums_as_child (decl_QAbstractItemDelegate_EndEditHint_Enums, "QFlags_EndEditHint");
 
 }
 

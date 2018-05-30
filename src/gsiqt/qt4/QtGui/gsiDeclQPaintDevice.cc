@@ -410,8 +410,8 @@ static gsi::QFlagsClass<QPaintDevice::PaintDeviceMetric > decl_QPaintDevice_Pain
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPaintDevice> inject_QPaintDevice_PaintDeviceMetric_Enum_in_parent (decl_QPaintDevice_PaintDeviceMetric_Enum.defs ());
-static gsi::ClassExt<QPaintDevice> decl_QPaintDevice_PaintDeviceMetric_Enum_as_child (decl_QPaintDevice_PaintDeviceMetric_Enum, "QtGui", "PaintDeviceMetric");
-static gsi::ClassExt<QPaintDevice> decl_QPaintDevice_PaintDeviceMetric_Enums_as_child (decl_QPaintDevice_PaintDeviceMetric_Enums, "QtGui", "QFlags_PaintDeviceMetric");
+static gsi::ClassExt<QPaintDevice> decl_QPaintDevice_PaintDeviceMetric_Enum_as_child (decl_QPaintDevice_PaintDeviceMetric_Enum, "PaintDeviceMetric");
+static gsi::ClassExt<QPaintDevice> decl_QPaintDevice_PaintDeviceMetric_Enums_as_child (decl_QPaintDevice_PaintDeviceMetric_Enums, "QFlags_PaintDeviceMetric");
 
 }
 

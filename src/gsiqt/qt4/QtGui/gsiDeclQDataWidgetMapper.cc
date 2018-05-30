@@ -1132,8 +1132,8 @@ static gsi::QFlagsClass<QDataWidgetMapper::SubmitPolicy > decl_QDataWidgetMapper
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDataWidgetMapper> inject_QDataWidgetMapper_SubmitPolicy_Enum_in_parent (decl_QDataWidgetMapper_SubmitPolicy_Enum.defs ());
-static gsi::ClassExt<QDataWidgetMapper> decl_QDataWidgetMapper_SubmitPolicy_Enum_as_child (decl_QDataWidgetMapper_SubmitPolicy_Enum, "QtGui", "SubmitPolicy");
-static gsi::ClassExt<QDataWidgetMapper> decl_QDataWidgetMapper_SubmitPolicy_Enums_as_child (decl_QDataWidgetMapper_SubmitPolicy_Enums, "QtGui", "QFlags_SubmitPolicy");
+static gsi::ClassExt<QDataWidgetMapper> decl_QDataWidgetMapper_SubmitPolicy_Enum_as_child (decl_QDataWidgetMapper_SubmitPolicy_Enum, "SubmitPolicy");
+static gsi::ClassExt<QDataWidgetMapper> decl_QDataWidgetMapper_SubmitPolicy_Enums_as_child (decl_QDataWidgetMapper_SubmitPolicy_Enums, "QFlags_SubmitPolicy");
 
 }
 

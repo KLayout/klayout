@@ -2973,8 +2973,8 @@ static gsi::QFlagsClass<QToolButton::ToolButtonPopupMode > decl_QToolButton_Tool
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QToolButton> inject_QToolButton_ToolButtonPopupMode_Enum_in_parent (decl_QToolButton_ToolButtonPopupMode_Enum.defs ());
-static gsi::ClassExt<QToolButton> decl_QToolButton_ToolButtonPopupMode_Enum_as_child (decl_QToolButton_ToolButtonPopupMode_Enum, "QtGui", "ToolButtonPopupMode");
-static gsi::ClassExt<QToolButton> decl_QToolButton_ToolButtonPopupMode_Enums_as_child (decl_QToolButton_ToolButtonPopupMode_Enums, "QtGui", "QFlags_ToolButtonPopupMode");
+static gsi::ClassExt<QToolButton> decl_QToolButton_ToolButtonPopupMode_Enum_as_child (decl_QToolButton_ToolButtonPopupMode_Enum, "ToolButtonPopupMode");
+static gsi::ClassExt<QToolButton> decl_QToolButton_ToolButtonPopupMode_Enums_as_child (decl_QToolButton_ToolButtonPopupMode_Enums, "QFlags_ToolButtonPopupMode");
 
 }
 

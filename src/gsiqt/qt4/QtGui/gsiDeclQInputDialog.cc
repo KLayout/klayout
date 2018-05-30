@@ -3859,8 +3859,8 @@ static gsi::QFlagsClass<QInputDialog::InputDialogOption > decl_QInputDialog_Inpu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QInputDialog> inject_QInputDialog_InputDialogOption_Enum_in_parent (decl_QInputDialog_InputDialogOption_Enum.defs ());
-static gsi::ClassExt<QInputDialog> decl_QInputDialog_InputDialogOption_Enum_as_child (decl_QInputDialog_InputDialogOption_Enum, "QtGui", "InputDialogOption");
-static gsi::ClassExt<QInputDialog> decl_QInputDialog_InputDialogOption_Enums_as_child (decl_QInputDialog_InputDialogOption_Enums, "QtGui", "QFlags_InputDialogOption");
+static gsi::ClassExt<QInputDialog> decl_QInputDialog_InputDialogOption_Enum_as_child (decl_QInputDialog_InputDialogOption_Enum, "InputDialogOption");
+static gsi::ClassExt<QInputDialog> decl_QInputDialog_InputDialogOption_Enums_as_child (decl_QInputDialog_InputDialogOption_Enums, "QFlags_InputDialogOption");
 
 }
 
@@ -3880,8 +3880,8 @@ static gsi::QFlagsClass<QInputDialog::InputMode > decl_QInputDialog_InputMode_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QInputDialog> inject_QInputDialog_InputMode_Enum_in_parent (decl_QInputDialog_InputMode_Enum.defs ());
-static gsi::ClassExt<QInputDialog> decl_QInputDialog_InputMode_Enum_as_child (decl_QInputDialog_InputMode_Enum, "QtGui", "InputMode");
-static gsi::ClassExt<QInputDialog> decl_QInputDialog_InputMode_Enums_as_child (decl_QInputDialog_InputMode_Enums, "QtGui", "QFlags_InputMode");
+static gsi::ClassExt<QInputDialog> decl_QInputDialog_InputMode_Enum_as_child (decl_QInputDialog_InputMode_Enum, "InputMode");
+static gsi::ClassExt<QInputDialog> decl_QInputDialog_InputMode_Enums_as_child (decl_QInputDialog_InputMode_Enums, "QFlags_InputMode");
 
 }
 

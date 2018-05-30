@@ -699,8 +699,8 @@ static gsi::QFlagsClass<QIODevice::OpenModeFlag > decl_QIODevice_OpenModeFlag_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QIODevice> inject_QIODevice_OpenModeFlag_Enum_in_parent (decl_QIODevice_OpenModeFlag_Enum.defs ());
-static gsi::ClassExt<QIODevice> decl_QIODevice_OpenModeFlag_Enum_as_child (decl_QIODevice_OpenModeFlag_Enum, "QtCore", "OpenModeFlag");
-static gsi::ClassExt<QIODevice> decl_QIODevice_OpenModeFlag_Enums_as_child (decl_QIODevice_OpenModeFlag_Enums, "QtCore", "QFlags_OpenModeFlag");
+static gsi::ClassExt<QIODevice> decl_QIODevice_OpenModeFlag_Enum_as_child (decl_QIODevice_OpenModeFlag_Enum, "OpenModeFlag");
+static gsi::ClassExt<QIODevice> decl_QIODevice_OpenModeFlag_Enums_as_child (decl_QIODevice_OpenModeFlag_Enums, "QFlags_OpenModeFlag");
 
 }
 

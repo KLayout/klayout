@@ -1205,8 +1205,8 @@ static gsi::QFlagsClass<QPaintEngine::DirtyFlag > decl_QPaintEngine_DirtyFlag_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPaintEngine> inject_QPaintEngine_DirtyFlag_Enum_in_parent (decl_QPaintEngine_DirtyFlag_Enum.defs ());
-static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_DirtyFlag_Enum_as_child (decl_QPaintEngine_DirtyFlag_Enum, "QtGui", "DirtyFlag");
-static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_DirtyFlag_Enums_as_child (decl_QPaintEngine_DirtyFlag_Enums, "QtGui", "QFlags_DirtyFlag");
+static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_DirtyFlag_Enum_as_child (decl_QPaintEngine_DirtyFlag_Enum, "DirtyFlag");
+static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_DirtyFlag_Enums_as_child (decl_QPaintEngine_DirtyFlag_Enums, "QFlags_DirtyFlag");
 
 }
 
@@ -1243,8 +1243,8 @@ static gsi::QFlagsClass<QPaintEngine::PaintEngineFeature > decl_QPaintEngine_Pai
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPaintEngine> inject_QPaintEngine_PaintEngineFeature_Enum_in_parent (decl_QPaintEngine_PaintEngineFeature_Enum.defs ());
-static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_PaintEngineFeature_Enum_as_child (decl_QPaintEngine_PaintEngineFeature_Enum, "QtGui", "PaintEngineFeature");
-static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_PaintEngineFeature_Enums_as_child (decl_QPaintEngine_PaintEngineFeature_Enums, "QtGui", "QFlags_PaintEngineFeature");
+static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_PaintEngineFeature_Enum_as_child (decl_QPaintEngine_PaintEngineFeature_Enum, "PaintEngineFeature");
+static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_PaintEngineFeature_Enums_as_child (decl_QPaintEngine_PaintEngineFeature_Enums, "QFlags_PaintEngineFeature");
 
 }
 
@@ -1279,8 +1279,8 @@ static gsi::QFlagsClass<QPaintEngine::Type > decl_QPaintEngine_Type_Enums ("QtGu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPaintEngine> inject_QPaintEngine_Type_Enum_in_parent (decl_QPaintEngine_Type_Enum.defs ());
-static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_Type_Enum_as_child (decl_QPaintEngine_Type_Enum, "QtGui", "Type");
-static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_Type_Enums_as_child (decl_QPaintEngine_Type_Enums, "QtGui", "QFlags_Type");
+static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_Type_Enum_as_child (decl_QPaintEngine_Type_Enum, "Type");
+static gsi::ClassExt<QPaintEngine> decl_QPaintEngine_Type_Enums_as_child (decl_QPaintEngine_Type_Enums, "QFlags_Type");
 
 }
 

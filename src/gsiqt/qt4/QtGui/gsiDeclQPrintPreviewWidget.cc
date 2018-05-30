@@ -2969,8 +2969,8 @@ static gsi::QFlagsClass<QPrintPreviewWidget::ViewMode > decl_QPrintPreviewWidget
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrintPreviewWidget> inject_QPrintPreviewWidget_ViewMode_Enum_in_parent (decl_QPrintPreviewWidget_ViewMode_Enum.defs ());
-static gsi::ClassExt<QPrintPreviewWidget> decl_QPrintPreviewWidget_ViewMode_Enum_as_child (decl_QPrintPreviewWidget_ViewMode_Enum, "QtGui", "ViewMode");
-static gsi::ClassExt<QPrintPreviewWidget> decl_QPrintPreviewWidget_ViewMode_Enums_as_child (decl_QPrintPreviewWidget_ViewMode_Enums, "QtGui", "QFlags_ViewMode");
+static gsi::ClassExt<QPrintPreviewWidget> decl_QPrintPreviewWidget_ViewMode_Enum_as_child (decl_QPrintPreviewWidget_ViewMode_Enum, "ViewMode");
+static gsi::ClassExt<QPrintPreviewWidget> decl_QPrintPreviewWidget_ViewMode_Enums_as_child (decl_QPrintPreviewWidget_ViewMode_Enums, "QFlags_ViewMode");
 
 }
 
@@ -2990,8 +2990,8 @@ static gsi::QFlagsClass<QPrintPreviewWidget::ZoomMode > decl_QPrintPreviewWidget
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrintPreviewWidget> inject_QPrintPreviewWidget_ZoomMode_Enum_in_parent (decl_QPrintPreviewWidget_ZoomMode_Enum.defs ());
-static gsi::ClassExt<QPrintPreviewWidget> decl_QPrintPreviewWidget_ZoomMode_Enum_as_child (decl_QPrintPreviewWidget_ZoomMode_Enum, "QtGui", "ZoomMode");
-static gsi::ClassExt<QPrintPreviewWidget> decl_QPrintPreviewWidget_ZoomMode_Enums_as_child (decl_QPrintPreviewWidget_ZoomMode_Enums, "QtGui", "QFlags_ZoomMode");
+static gsi::ClassExt<QPrintPreviewWidget> decl_QPrintPreviewWidget_ZoomMode_Enum_as_child (decl_QPrintPreviewWidget_ZoomMode_Enum, "ZoomMode");
+static gsi::ClassExt<QPrintPreviewWidget> decl_QPrintPreviewWidget_ZoomMode_Enums_as_child (decl_QPrintPreviewWidget_ZoomMode_Enums, "QFlags_ZoomMode");
 
 }
 

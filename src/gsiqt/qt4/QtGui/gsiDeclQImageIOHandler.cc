@@ -1025,8 +1025,8 @@ static gsi::QFlagsClass<QImageIOHandler::ImageOption > decl_QImageIOHandler_Imag
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QImageIOHandler> inject_QImageIOHandler_ImageOption_Enum_in_parent (decl_QImageIOHandler_ImageOption_Enum.defs ());
-static gsi::ClassExt<QImageIOHandler> decl_QImageIOHandler_ImageOption_Enum_as_child (decl_QImageIOHandler_ImageOption_Enum, "QtGui", "ImageOption");
-static gsi::ClassExt<QImageIOHandler> decl_QImageIOHandler_ImageOption_Enums_as_child (decl_QImageIOHandler_ImageOption_Enums, "QtGui", "QFlags_ImageOption");
+static gsi::ClassExt<QImageIOHandler> decl_QImageIOHandler_ImageOption_Enum_as_child (decl_QImageIOHandler_ImageOption_Enum, "ImageOption");
+static gsi::ClassExt<QImageIOHandler> decl_QImageIOHandler_ImageOption_Enums_as_child (decl_QImageIOHandler_ImageOption_Enums, "QFlags_ImageOption");
 
 }
 

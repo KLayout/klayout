@@ -4566,8 +4566,8 @@ static gsi::QFlagsClass<QTextEdit::AutoFormattingFlag > decl_QTextEdit_AutoForma
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextEdit> inject_QTextEdit_AutoFormattingFlag_Enum_in_parent (decl_QTextEdit_AutoFormattingFlag_Enum.defs ());
-static gsi::ClassExt<QTextEdit> decl_QTextEdit_AutoFormattingFlag_Enum_as_child (decl_QTextEdit_AutoFormattingFlag_Enum, "QtGui", "AutoFormattingFlag");
-static gsi::ClassExt<QTextEdit> decl_QTextEdit_AutoFormattingFlag_Enums_as_child (decl_QTextEdit_AutoFormattingFlag_Enums, "QtGui", "QFlags_AutoFormattingFlag");
+static gsi::ClassExt<QTextEdit> decl_QTextEdit_AutoFormattingFlag_Enum_as_child (decl_QTextEdit_AutoFormattingFlag_Enum, "AutoFormattingFlag");
+static gsi::ClassExt<QTextEdit> decl_QTextEdit_AutoFormattingFlag_Enums_as_child (decl_QTextEdit_AutoFormattingFlag_Enums, "QFlags_AutoFormattingFlag");
 
 }
 
@@ -4588,8 +4588,8 @@ static gsi::QFlagsClass<QTextEdit::LineWrapMode > decl_QTextEdit_LineWrapMode_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextEdit> inject_QTextEdit_LineWrapMode_Enum_in_parent (decl_QTextEdit_LineWrapMode_Enum.defs ());
-static gsi::ClassExt<QTextEdit> decl_QTextEdit_LineWrapMode_Enum_as_child (decl_QTextEdit_LineWrapMode_Enum, "QtGui", "LineWrapMode");
-static gsi::ClassExt<QTextEdit> decl_QTextEdit_LineWrapMode_Enums_as_child (decl_QTextEdit_LineWrapMode_Enums, "QtGui", "QFlags_LineWrapMode");
+static gsi::ClassExt<QTextEdit> decl_QTextEdit_LineWrapMode_Enum_as_child (decl_QTextEdit_LineWrapMode_Enum, "LineWrapMode");
+static gsi::ClassExt<QTextEdit> decl_QTextEdit_LineWrapMode_Enums_as_child (decl_QTextEdit_LineWrapMode_Enums, "QFlags_LineWrapMode");
 
 }
 

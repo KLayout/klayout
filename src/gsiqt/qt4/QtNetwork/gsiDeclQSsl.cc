@@ -60,8 +60,8 @@ static gsi::QFlagsClass<QSsl::AlternateNameEntryType > decl_QSsl_AlternateNameEn
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSsl_Namespace> inject_QSsl_AlternateNameEntryType_Enum_in_parent (decl_QSsl_AlternateNameEntryType_Enum.defs ());
-static gsi::ClassExt<QSsl_Namespace> decl_QSsl_AlternateNameEntryType_Enum_as_child (decl_QSsl_AlternateNameEntryType_Enum, "QtNetwork", "AlternateNameEntryType");
-static gsi::ClassExt<QSsl_Namespace> decl_QSsl_AlternateNameEntryType_Enums_as_child (decl_QSsl_AlternateNameEntryType_Enums, "QtNetwork", "QFlags_AlternateNameEntryType");
+static gsi::ClassExt<QSsl_Namespace> decl_QSsl_AlternateNameEntryType_Enum_as_child (decl_QSsl_AlternateNameEntryType_Enum, "AlternateNameEntryType");
+static gsi::ClassExt<QSsl_Namespace> decl_QSsl_AlternateNameEntryType_Enums_as_child (decl_QSsl_AlternateNameEntryType_Enums, "QFlags_AlternateNameEntryType");
 
 }
 
@@ -80,8 +80,8 @@ static gsi::QFlagsClass<QSsl::EncodingFormat > decl_QSsl_EncodingFormat_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSsl_Namespace> inject_QSsl_EncodingFormat_Enum_in_parent (decl_QSsl_EncodingFormat_Enum.defs ());
-static gsi::ClassExt<QSsl_Namespace> decl_QSsl_EncodingFormat_Enum_as_child (decl_QSsl_EncodingFormat_Enum, "QtNetwork", "EncodingFormat");
-static gsi::ClassExt<QSsl_Namespace> decl_QSsl_EncodingFormat_Enums_as_child (decl_QSsl_EncodingFormat_Enums, "QtNetwork", "QFlags_EncodingFormat");
+static gsi::ClassExt<QSsl_Namespace> decl_QSsl_EncodingFormat_Enum_as_child (decl_QSsl_EncodingFormat_Enum, "EncodingFormat");
+static gsi::ClassExt<QSsl_Namespace> decl_QSsl_EncodingFormat_Enums_as_child (decl_QSsl_EncodingFormat_Enums, "QFlags_EncodingFormat");
 
 }
 
@@ -100,8 +100,8 @@ static gsi::QFlagsClass<QSsl::KeyAlgorithm > decl_QSsl_KeyAlgorithm_Enums ("QtNe
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSsl_Namespace> inject_QSsl_KeyAlgorithm_Enum_in_parent (decl_QSsl_KeyAlgorithm_Enum.defs ());
-static gsi::ClassExt<QSsl_Namespace> decl_QSsl_KeyAlgorithm_Enum_as_child (decl_QSsl_KeyAlgorithm_Enum, "QtNetwork", "KeyAlgorithm");
-static gsi::ClassExt<QSsl_Namespace> decl_QSsl_KeyAlgorithm_Enums_as_child (decl_QSsl_KeyAlgorithm_Enums, "QtNetwork", "QFlags_KeyAlgorithm");
+static gsi::ClassExt<QSsl_Namespace> decl_QSsl_KeyAlgorithm_Enum_as_child (decl_QSsl_KeyAlgorithm_Enum, "KeyAlgorithm");
+static gsi::ClassExt<QSsl_Namespace> decl_QSsl_KeyAlgorithm_Enums_as_child (decl_QSsl_KeyAlgorithm_Enums, "QFlags_KeyAlgorithm");
 
 }
 
@@ -120,8 +120,8 @@ static gsi::QFlagsClass<QSsl::KeyType > decl_QSsl_KeyType_Enums ("QtNetwork", "Q
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSsl_Namespace> inject_QSsl_KeyType_Enum_in_parent (decl_QSsl_KeyType_Enum.defs ());
-static gsi::ClassExt<QSsl_Namespace> decl_QSsl_KeyType_Enum_as_child (decl_QSsl_KeyType_Enum, "QtNetwork", "KeyType");
-static gsi::ClassExt<QSsl_Namespace> decl_QSsl_KeyType_Enums_as_child (decl_QSsl_KeyType_Enums, "QtNetwork", "QFlags_KeyType");
+static gsi::ClassExt<QSsl_Namespace> decl_QSsl_KeyType_Enum_as_child (decl_QSsl_KeyType_Enum, "KeyType");
+static gsi::ClassExt<QSsl_Namespace> decl_QSsl_KeyType_Enums_as_child (decl_QSsl_KeyType_Enums, "QFlags_KeyType");
 
 }
 
@@ -143,8 +143,8 @@ static gsi::QFlagsClass<QSsl::SslProtocol > decl_QSsl_SslProtocol_Enums ("QtNetw
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSsl_Namespace> inject_QSsl_SslProtocol_Enum_in_parent (decl_QSsl_SslProtocol_Enum.defs ());
-static gsi::ClassExt<QSsl_Namespace> decl_QSsl_SslProtocol_Enum_as_child (decl_QSsl_SslProtocol_Enum, "QtNetwork", "SslProtocol");
-static gsi::ClassExt<QSsl_Namespace> decl_QSsl_SslProtocol_Enums_as_child (decl_QSsl_SslProtocol_Enums, "QtNetwork", "QFlags_SslProtocol");
+static gsi::ClassExt<QSsl_Namespace> decl_QSsl_SslProtocol_Enum_as_child (decl_QSsl_SslProtocol_Enum, "SslProtocol");
+static gsi::ClassExt<QSsl_Namespace> decl_QSsl_SslProtocol_Enums_as_child (decl_QSsl_SslProtocol_Enums, "QFlags_SslProtocol");
 
 }
 

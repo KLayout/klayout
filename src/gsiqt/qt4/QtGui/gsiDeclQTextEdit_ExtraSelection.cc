@@ -65,7 +65,7 @@ gsi::Class<QTextEdit::ExtraSelection> decl_QTextEdit_ExtraSelection ("QtGui", "Q
   methods_QTextEdit_ExtraSelection (),
   "@qt\n@brief Binding of QTextEdit::ExtraSelection");
 
-gsi::ClassExt<QTextEdit> decl_QTextEdit_ExtraSelection_as_child (decl_QTextEdit_ExtraSelection, "QtGui", "ExtraSelection");
+gsi::ClassExt<QTextEdit> decl_QTextEdit_ExtraSelection_as_child (decl_QTextEdit_ExtraSelection, "ExtraSelection");
 
 GSI_QTGUI_PUBLIC gsi::Class<QTextEdit::ExtraSelection> &qtdecl_QTextEdit_ExtraSelection () { return decl_QTextEdit_ExtraSelection; }
 

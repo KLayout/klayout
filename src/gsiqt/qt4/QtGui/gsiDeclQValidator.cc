@@ -738,8 +738,8 @@ static gsi::QFlagsClass<QValidator::State > decl_QValidator_State_Enums ("QtGui"
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QValidator> inject_QValidator_State_Enum_in_parent (decl_QValidator_State_Enum.defs ());
-static gsi::ClassExt<QValidator> decl_QValidator_State_Enum_as_child (decl_QValidator_State_Enum, "QtGui", "State");
-static gsi::ClassExt<QValidator> decl_QValidator_State_Enums_as_child (decl_QValidator_State_Enums, "QtGui", "QFlags_State");
+static gsi::ClassExt<QValidator> decl_QValidator_State_Enum_as_child (decl_QValidator_State_Enum, "State");
+static gsi::ClassExt<QValidator> decl_QValidator_State_Enums_as_child (decl_QValidator_State_Enums, "QFlags_State");
 
 }
 

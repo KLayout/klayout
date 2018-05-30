@@ -240,8 +240,8 @@ static gsi::QFlagsClass<QInputMethodEvent::AttributeType > decl_QInputMethodEven
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QInputMethodEvent> inject_QInputMethodEvent_AttributeType_Enum_in_parent (decl_QInputMethodEvent_AttributeType_Enum.defs ());
-static gsi::ClassExt<QInputMethodEvent> decl_QInputMethodEvent_AttributeType_Enum_as_child (decl_QInputMethodEvent_AttributeType_Enum, "QtGui", "AttributeType");
-static gsi::ClassExt<QInputMethodEvent> decl_QInputMethodEvent_AttributeType_Enums_as_child (decl_QInputMethodEvent_AttributeType_Enums, "QtGui", "QFlags_AttributeType");
+static gsi::ClassExt<QInputMethodEvent> decl_QInputMethodEvent_AttributeType_Enum_as_child (decl_QInputMethodEvent_AttributeType_Enum, "AttributeType");
+static gsi::ClassExt<QInputMethodEvent> decl_QInputMethodEvent_AttributeType_Enums_as_child (decl_QInputMethodEvent_AttributeType_Enums, "QFlags_AttributeType");
 
 }
 

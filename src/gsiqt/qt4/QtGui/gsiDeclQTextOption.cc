@@ -444,8 +444,8 @@ static gsi::QFlagsClass<QTextOption::Flag > decl_QTextOption_Flag_Enums ("QtGui"
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextOption> inject_QTextOption_Flag_Enum_in_parent (decl_QTextOption_Flag_Enum.defs ());
-static gsi::ClassExt<QTextOption> decl_QTextOption_Flag_Enum_as_child (decl_QTextOption_Flag_Enum, "QtGui", "Flag");
-static gsi::ClassExt<QTextOption> decl_QTextOption_Flag_Enums_as_child (decl_QTextOption_Flag_Enums, "QtGui", "QFlags_Flag");
+static gsi::ClassExt<QTextOption> decl_QTextOption_Flag_Enum_as_child (decl_QTextOption_Flag_Enum, "Flag");
+static gsi::ClassExt<QTextOption> decl_QTextOption_Flag_Enums_as_child (decl_QTextOption_Flag_Enums, "QFlags_Flag");
 
 }
 
@@ -467,8 +467,8 @@ static gsi::QFlagsClass<QTextOption::WrapMode > decl_QTextOption_WrapMode_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextOption> inject_QTextOption_WrapMode_Enum_in_parent (decl_QTextOption_WrapMode_Enum.defs ());
-static gsi::ClassExt<QTextOption> decl_QTextOption_WrapMode_Enum_as_child (decl_QTextOption_WrapMode_Enum, "QtGui", "WrapMode");
-static gsi::ClassExt<QTextOption> decl_QTextOption_WrapMode_Enums_as_child (decl_QTextOption_WrapMode_Enums, "QtGui", "QFlags_WrapMode");
+static gsi::ClassExt<QTextOption> decl_QTextOption_WrapMode_Enum_as_child (decl_QTextOption_WrapMode_Enum, "WrapMode");
+static gsi::ClassExt<QTextOption> decl_QTextOption_WrapMode_Enums_as_child (decl_QTextOption_WrapMode_Enums, "QFlags_WrapMode");
 
 }
 

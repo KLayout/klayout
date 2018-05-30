@@ -2035,8 +2035,8 @@ static gsi::QFlagsClass<QGraphicsPixmapItem::ShapeMode > decl_QGraphicsPixmapIte
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsPixmapItem> inject_QGraphicsPixmapItem_ShapeMode_Enum_in_parent (decl_QGraphicsPixmapItem_ShapeMode_Enum.defs ());
-static gsi::ClassExt<QGraphicsPixmapItem> decl_QGraphicsPixmapItem_ShapeMode_Enum_as_child (decl_QGraphicsPixmapItem_ShapeMode_Enum, "QtGui", "ShapeMode");
-static gsi::ClassExt<QGraphicsPixmapItem> decl_QGraphicsPixmapItem_ShapeMode_Enums_as_child (decl_QGraphicsPixmapItem_ShapeMode_Enums, "QtGui", "QFlags_ShapeMode");
+static gsi::ClassExt<QGraphicsPixmapItem> decl_QGraphicsPixmapItem_ShapeMode_Enum_as_child (decl_QGraphicsPixmapItem_ShapeMode_Enum, "ShapeMode");
+static gsi::ClassExt<QGraphicsPixmapItem> decl_QGraphicsPixmapItem_ShapeMode_Enums_as_child (decl_QGraphicsPixmapItem_ShapeMode_Enums, "QFlags_ShapeMode");
 
 }
 

@@ -1359,8 +1359,8 @@ static gsi::QFlagsClass<QMovie::CacheMode > decl_QMovie_CacheMode_Enums ("QtGui"
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMovie> inject_QMovie_CacheMode_Enum_in_parent (decl_QMovie_CacheMode_Enum.defs ());
-static gsi::ClassExt<QMovie> decl_QMovie_CacheMode_Enum_as_child (decl_QMovie_CacheMode_Enum, "QtGui", "CacheMode");
-static gsi::ClassExt<QMovie> decl_QMovie_CacheMode_Enums_as_child (decl_QMovie_CacheMode_Enums, "QtGui", "QFlags_CacheMode");
+static gsi::ClassExt<QMovie> decl_QMovie_CacheMode_Enum_as_child (decl_QMovie_CacheMode_Enum, "CacheMode");
+static gsi::ClassExt<QMovie> decl_QMovie_CacheMode_Enums_as_child (decl_QMovie_CacheMode_Enums, "QFlags_CacheMode");
 
 }
 
@@ -1380,8 +1380,8 @@ static gsi::QFlagsClass<QMovie::MovieState > decl_QMovie_MovieState_Enums ("QtGu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMovie> inject_QMovie_MovieState_Enum_in_parent (decl_QMovie_MovieState_Enum.defs ());
-static gsi::ClassExt<QMovie> decl_QMovie_MovieState_Enum_as_child (decl_QMovie_MovieState_Enum, "QtGui", "MovieState");
-static gsi::ClassExt<QMovie> decl_QMovie_MovieState_Enums_as_child (decl_QMovie_MovieState_Enums, "QtGui", "QFlags_MovieState");
+static gsi::ClassExt<QMovie> decl_QMovie_MovieState_Enum_as_child (decl_QMovie_MovieState_Enum, "MovieState");
+static gsi::ClassExt<QMovie> decl_QMovie_MovieState_Enums_as_child (decl_QMovie_MovieState_Enums, "QFlags_MovieState");
 
 }
 

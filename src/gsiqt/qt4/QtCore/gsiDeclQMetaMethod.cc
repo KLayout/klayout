@@ -247,8 +247,8 @@ static gsi::QFlagsClass<QMetaMethod::Access > decl_QMetaMethod_Access_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMetaMethod> inject_QMetaMethod_Access_Enum_in_parent (decl_QMetaMethod_Access_Enum.defs ());
-static gsi::ClassExt<QMetaMethod> decl_QMetaMethod_Access_Enum_as_child (decl_QMetaMethod_Access_Enum, "QtCore", "Access");
-static gsi::ClassExt<QMetaMethod> decl_QMetaMethod_Access_Enums_as_child (decl_QMetaMethod_Access_Enums, "QtCore", "QFlags_Access");
+static gsi::ClassExt<QMetaMethod> decl_QMetaMethod_Access_Enum_as_child (decl_QMetaMethod_Access_Enum, "Access");
+static gsi::ClassExt<QMetaMethod> decl_QMetaMethod_Access_Enums_as_child (decl_QMetaMethod_Access_Enums, "QFlags_Access");
 
 }
 
@@ -269,8 +269,8 @@ static gsi::QFlagsClass<QMetaMethod::MethodType > decl_QMetaMethod_MethodType_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMetaMethod> inject_QMetaMethod_MethodType_Enum_in_parent (decl_QMetaMethod_MethodType_Enum.defs ());
-static gsi::ClassExt<QMetaMethod> decl_QMetaMethod_MethodType_Enum_as_child (decl_QMetaMethod_MethodType_Enum, "QtCore", "MethodType");
-static gsi::ClassExt<QMetaMethod> decl_QMetaMethod_MethodType_Enums_as_child (decl_QMetaMethod_MethodType_Enums, "QtCore", "QFlags_MethodType");
+static gsi::ClassExt<QMetaMethod> decl_QMetaMethod_MethodType_Enum_as_child (decl_QMetaMethod_MethodType_Enum, "MethodType");
+static gsi::ClassExt<QMetaMethod> decl_QMetaMethod_MethodType_Enums_as_child (decl_QMetaMethod_MethodType_Enums, "QFlags_MethodType");
 
 }
 

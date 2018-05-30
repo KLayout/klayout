@@ -1063,8 +1063,8 @@ static gsi::QFlagsClass<QThread::Priority > decl_QThread_Priority_Enums ("QtCore
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QThread> inject_QThread_Priority_Enum_in_parent (decl_QThread_Priority_Enum.defs ());
-static gsi::ClassExt<QThread> decl_QThread_Priority_Enum_as_child (decl_QThread_Priority_Enum, "QtCore", "Priority");
-static gsi::ClassExt<QThread> decl_QThread_Priority_Enums_as_child (decl_QThread_Priority_Enums, "QtCore", "QFlags_Priority");
+static gsi::ClassExt<QThread> decl_QThread_Priority_Enum_as_child (decl_QThread_Priority_Enum, "Priority");
+static gsi::ClassExt<QThread> decl_QThread_Priority_Enums_as_child (decl_QThread_Priority_Enums, "QFlags_Priority");
 
 }
 

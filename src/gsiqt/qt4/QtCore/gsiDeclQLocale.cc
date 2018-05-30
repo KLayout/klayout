@@ -1612,8 +1612,8 @@ static gsi::QFlagsClass<QLocale::Country > decl_QLocale_Country_Enums ("QtCore",
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLocale> inject_QLocale_Country_Enum_in_parent (decl_QLocale_Country_Enum.defs ());
-static gsi::ClassExt<QLocale> decl_QLocale_Country_Enum_as_child (decl_QLocale_Country_Enum, "QtCore", "Country");
-static gsi::ClassExt<QLocale> decl_QLocale_Country_Enums_as_child (decl_QLocale_Country_Enums, "QtCore", "QFlags_Country");
+static gsi::ClassExt<QLocale> decl_QLocale_Country_Enum_as_child (decl_QLocale_Country_Enum, "Country");
+static gsi::ClassExt<QLocale> decl_QLocale_Country_Enums_as_child (decl_QLocale_Country_Enums, "QFlags_Country");
 
 }
 
@@ -1633,8 +1633,8 @@ static gsi::QFlagsClass<QLocale::FormatType > decl_QLocale_FormatType_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLocale> inject_QLocale_FormatType_Enum_in_parent (decl_QLocale_FormatType_Enum.defs ());
-static gsi::ClassExt<QLocale> decl_QLocale_FormatType_Enum_as_child (decl_QLocale_FormatType_Enum, "QtCore", "FormatType");
-static gsi::ClassExt<QLocale> decl_QLocale_FormatType_Enums_as_child (decl_QLocale_FormatType_Enums, "QtCore", "QFlags_FormatType");
+static gsi::ClassExt<QLocale> decl_QLocale_FormatType_Enum_as_child (decl_QLocale_FormatType_Enum, "FormatType");
+static gsi::ClassExt<QLocale> decl_QLocale_FormatType_Enums_as_child (decl_QLocale_FormatType_Enums, "QFlags_FormatType");
 
 }
 
@@ -1819,8 +1819,8 @@ static gsi::QFlagsClass<QLocale::Language > decl_QLocale_Language_Enums ("QtCore
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLocale> inject_QLocale_Language_Enum_in_parent (decl_QLocale_Language_Enum.defs ());
-static gsi::ClassExt<QLocale> decl_QLocale_Language_Enum_as_child (decl_QLocale_Language_Enum, "QtCore", "Language");
-static gsi::ClassExt<QLocale> decl_QLocale_Language_Enums_as_child (decl_QLocale_Language_Enums, "QtCore", "QFlags_Language");
+static gsi::ClassExt<QLocale> decl_QLocale_Language_Enum_as_child (decl_QLocale_Language_Enum, "Language");
+static gsi::ClassExt<QLocale> decl_QLocale_Language_Enums_as_child (decl_QLocale_Language_Enums, "QFlags_Language");
 
 }
 
@@ -1839,8 +1839,8 @@ static gsi::QFlagsClass<QLocale::MeasurementSystem > decl_QLocale_MeasurementSys
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLocale> inject_QLocale_MeasurementSystem_Enum_in_parent (decl_QLocale_MeasurementSystem_Enum.defs ());
-static gsi::ClassExt<QLocale> decl_QLocale_MeasurementSystem_Enum_as_child (decl_QLocale_MeasurementSystem_Enum, "QtCore", "MeasurementSystem");
-static gsi::ClassExt<QLocale> decl_QLocale_MeasurementSystem_Enums_as_child (decl_QLocale_MeasurementSystem_Enums, "QtCore", "QFlags_MeasurementSystem");
+static gsi::ClassExt<QLocale> decl_QLocale_MeasurementSystem_Enum_as_child (decl_QLocale_MeasurementSystem_Enum, "MeasurementSystem");
+static gsi::ClassExt<QLocale> decl_QLocale_MeasurementSystem_Enums_as_child (decl_QLocale_MeasurementSystem_Enums, "QFlags_MeasurementSystem");
 
 }
 
@@ -1859,8 +1859,8 @@ static gsi::QFlagsClass<QLocale::NumberOption > decl_QLocale_NumberOption_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLocale> inject_QLocale_NumberOption_Enum_in_parent (decl_QLocale_NumberOption_Enum.defs ());
-static gsi::ClassExt<QLocale> decl_QLocale_NumberOption_Enum_as_child (decl_QLocale_NumberOption_Enum, "QtCore", "NumberOption");
-static gsi::ClassExt<QLocale> decl_QLocale_NumberOption_Enums_as_child (decl_QLocale_NumberOption_Enums, "QtCore", "QFlags_NumberOption");
+static gsi::ClassExt<QLocale> decl_QLocale_NumberOption_Enum_as_child (decl_QLocale_NumberOption_Enum, "NumberOption");
+static gsi::ClassExt<QLocale> decl_QLocale_NumberOption_Enums_as_child (decl_QLocale_NumberOption_Enums, "QFlags_NumberOption");
 
 }
 

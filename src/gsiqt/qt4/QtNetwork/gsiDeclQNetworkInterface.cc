@@ -315,8 +315,8 @@ static gsi::QFlagsClass<QNetworkInterface::InterfaceFlag > decl_QNetworkInterfac
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QNetworkInterface> inject_QNetworkInterface_InterfaceFlag_Enum_in_parent (decl_QNetworkInterface_InterfaceFlag_Enum.defs ());
-static gsi::ClassExt<QNetworkInterface> decl_QNetworkInterface_InterfaceFlag_Enum_as_child (decl_QNetworkInterface_InterfaceFlag_Enum, "QtNetwork", "InterfaceFlag");
-static gsi::ClassExt<QNetworkInterface> decl_QNetworkInterface_InterfaceFlag_Enums_as_child (decl_QNetworkInterface_InterfaceFlag_Enums, "QtNetwork", "QFlags_InterfaceFlag");
+static gsi::ClassExt<QNetworkInterface> decl_QNetworkInterface_InterfaceFlag_Enum_as_child (decl_QNetworkInterface_InterfaceFlag_Enum, "InterfaceFlag");
+static gsi::ClassExt<QNetworkInterface> decl_QNetworkInterface_InterfaceFlag_Enums_as_child (decl_QNetworkInterface_InterfaceFlag_Enums, "QFlags_InterfaceFlag");
 
 }
 

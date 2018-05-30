@@ -389,8 +389,8 @@ static gsi::QFlagsClass<QTabletEvent::PointerType > decl_QTabletEvent_PointerTyp
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTabletEvent> inject_QTabletEvent_PointerType_Enum_in_parent (decl_QTabletEvent_PointerType_Enum.defs ());
-static gsi::ClassExt<QTabletEvent> decl_QTabletEvent_PointerType_Enum_as_child (decl_QTabletEvent_PointerType_Enum, "QtGui", "PointerType");
-static gsi::ClassExt<QTabletEvent> decl_QTabletEvent_PointerType_Enums_as_child (decl_QTabletEvent_PointerType_Enums, "QtGui", "QFlags_PointerType");
+static gsi::ClassExt<QTabletEvent> decl_QTabletEvent_PointerType_Enum_as_child (decl_QTabletEvent_PointerType_Enum, "PointerType");
+static gsi::ClassExt<QTabletEvent> decl_QTabletEvent_PointerType_Enums_as_child (decl_QTabletEvent_PointerType_Enums, "QFlags_PointerType");
 
 }
 
@@ -414,8 +414,8 @@ static gsi::QFlagsClass<QTabletEvent::TabletDevice > decl_QTabletEvent_TabletDev
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTabletEvent> inject_QTabletEvent_TabletDevice_Enum_in_parent (decl_QTabletEvent_TabletDevice_Enum.defs ());
-static gsi::ClassExt<QTabletEvent> decl_QTabletEvent_TabletDevice_Enum_as_child (decl_QTabletEvent_TabletDevice_Enum, "QtGui", "TabletDevice");
-static gsi::ClassExt<QTabletEvent> decl_QTabletEvent_TabletDevice_Enums_as_child (decl_QTabletEvent_TabletDevice_Enums, "QtGui", "QFlags_TabletDevice");
+static gsi::ClassExt<QTabletEvent> decl_QTabletEvent_TabletDevice_Enum_as_child (decl_QTabletEvent_TabletDevice_Enum, "TabletDevice");
+static gsi::ClassExt<QTabletEvent> decl_QTabletEvent_TabletDevice_Enums_as_child (decl_QTabletEvent_TabletDevice_Enums, "QFlags_TabletDevice");
 
 }
 

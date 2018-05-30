@@ -335,8 +335,8 @@ static gsi::QFlagsClass<QGradient::CoordinateMode > decl_QGradient_CoordinateMod
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGradient> inject_QGradient_CoordinateMode_Enum_in_parent (decl_QGradient_CoordinateMode_Enum.defs ());
-static gsi::ClassExt<QGradient> decl_QGradient_CoordinateMode_Enum_as_child (decl_QGradient_CoordinateMode_Enum, "QtGui", "CoordinateMode");
-static gsi::ClassExt<QGradient> decl_QGradient_CoordinateMode_Enums_as_child (decl_QGradient_CoordinateMode_Enums, "QtGui", "QFlags_CoordinateMode");
+static gsi::ClassExt<QGradient> decl_QGradient_CoordinateMode_Enum_as_child (decl_QGradient_CoordinateMode_Enum, "CoordinateMode");
+static gsi::ClassExt<QGradient> decl_QGradient_CoordinateMode_Enums_as_child (decl_QGradient_CoordinateMode_Enums, "QFlags_CoordinateMode");
 
 }
 
@@ -355,8 +355,8 @@ static gsi::QFlagsClass<QGradient::InterpolationMode > decl_QGradient_Interpolat
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGradient> inject_QGradient_InterpolationMode_Enum_in_parent (decl_QGradient_InterpolationMode_Enum.defs ());
-static gsi::ClassExt<QGradient> decl_QGradient_InterpolationMode_Enum_as_child (decl_QGradient_InterpolationMode_Enum, "QtGui", "InterpolationMode");
-static gsi::ClassExt<QGradient> decl_QGradient_InterpolationMode_Enums_as_child (decl_QGradient_InterpolationMode_Enums, "QtGui", "QFlags_InterpolationMode");
+static gsi::ClassExt<QGradient> decl_QGradient_InterpolationMode_Enum_as_child (decl_QGradient_InterpolationMode_Enum, "InterpolationMode");
+static gsi::ClassExt<QGradient> decl_QGradient_InterpolationMode_Enums_as_child (decl_QGradient_InterpolationMode_Enums, "QFlags_InterpolationMode");
 
 }
 
@@ -376,8 +376,8 @@ static gsi::QFlagsClass<QGradient::Spread > decl_QGradient_Spread_Enums ("QtGui"
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGradient> inject_QGradient_Spread_Enum_in_parent (decl_QGradient_Spread_Enum.defs ());
-static gsi::ClassExt<QGradient> decl_QGradient_Spread_Enum_as_child (decl_QGradient_Spread_Enum, "QtGui", "Spread");
-static gsi::ClassExt<QGradient> decl_QGradient_Spread_Enums_as_child (decl_QGradient_Spread_Enums, "QtGui", "QFlags_Spread");
+static gsi::ClassExt<QGradient> decl_QGradient_Spread_Enum_as_child (decl_QGradient_Spread_Enum, "Spread");
+static gsi::ClassExt<QGradient> decl_QGradient_Spread_Enums_as_child (decl_QGradient_Spread_Enums, "QFlags_Spread");
 
 }
 
@@ -398,8 +398,8 @@ static gsi::QFlagsClass<QGradient::Type > decl_QGradient_Type_Enums ("QtGui", "Q
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGradient> inject_QGradient_Type_Enum_in_parent (decl_QGradient_Type_Enum.defs ());
-static gsi::ClassExt<QGradient> decl_QGradient_Type_Enum_as_child (decl_QGradient_Type_Enum, "QtGui", "Type");
-static gsi::ClassExt<QGradient> decl_QGradient_Type_Enums_as_child (decl_QGradient_Type_Enums, "QtGui", "QFlags_Type");
+static gsi::ClassExt<QGradient> decl_QGradient_Type_Enum_as_child (decl_QGradient_Type_Enum, "Type");
+static gsi::ClassExt<QGradient> decl_QGradient_Type_Enums_as_child (decl_QGradient_Type_Enums, "QFlags_Type");
 
 }
 

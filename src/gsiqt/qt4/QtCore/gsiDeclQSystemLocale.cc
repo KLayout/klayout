@@ -260,8 +260,8 @@ static gsi::QFlagsClass<QSystemLocale::QueryType > decl_QSystemLocale_QueryType_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSystemLocale> inject_QSystemLocale_QueryType_Enum_in_parent (decl_QSystemLocale_QueryType_Enum.defs ());
-static gsi::ClassExt<QSystemLocale> decl_QSystemLocale_QueryType_Enum_as_child (decl_QSystemLocale_QueryType_Enum, "QtCore", "QueryType");
-static gsi::ClassExt<QSystemLocale> decl_QSystemLocale_QueryType_Enums_as_child (decl_QSystemLocale_QueryType_Enums, "QtCore", "QFlags_QueryType");
+static gsi::ClassExt<QSystemLocale> decl_QSystemLocale_QueryType_Enum_as_child (decl_QSystemLocale_QueryType_Enum, "QueryType");
+static gsi::ClassExt<QSystemLocale> decl_QSystemLocale_QueryType_Enums_as_child (decl_QSystemLocale_QueryType_Enums, "QFlags_QueryType");
 
 }
 

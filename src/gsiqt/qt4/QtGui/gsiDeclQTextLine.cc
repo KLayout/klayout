@@ -548,8 +548,8 @@ static gsi::QFlagsClass<QTextLine::CursorPosition > decl_QTextLine_CursorPositio
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextLine> inject_QTextLine_CursorPosition_Enum_in_parent (decl_QTextLine_CursorPosition_Enum.defs ());
-static gsi::ClassExt<QTextLine> decl_QTextLine_CursorPosition_Enum_as_child (decl_QTextLine_CursorPosition_Enum, "QtGui", "CursorPosition");
-static gsi::ClassExt<QTextLine> decl_QTextLine_CursorPosition_Enums_as_child (decl_QTextLine_CursorPosition_Enums, "QtGui", "QFlags_CursorPosition");
+static gsi::ClassExt<QTextLine> decl_QTextLine_CursorPosition_Enum_as_child (decl_QTextLine_CursorPosition_Enum, "CursorPosition");
+static gsi::ClassExt<QTextLine> decl_QTextLine_CursorPosition_Enums_as_child (decl_QTextLine_CursorPosition_Enums, "QFlags_CursorPosition");
 
 }
 
@@ -568,8 +568,8 @@ static gsi::QFlagsClass<QTextLine::Edge > decl_QTextLine_Edge_Enums ("QtGui", "Q
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextLine> inject_QTextLine_Edge_Enum_in_parent (decl_QTextLine_Edge_Enum.defs ());
-static gsi::ClassExt<QTextLine> decl_QTextLine_Edge_Enum_as_child (decl_QTextLine_Edge_Enum, "QtGui", "Edge");
-static gsi::ClassExt<QTextLine> decl_QTextLine_Edge_Enums_as_child (decl_QTextLine_Edge_Enums, "QtGui", "QFlags_Edge");
+static gsi::ClassExt<QTextLine> decl_QTextLine_Edge_Enum_as_child (decl_QTextLine_Edge_Enum, "Edge");
+static gsi::ClassExt<QTextLine> decl_QTextLine_Edge_Enums_as_child (decl_QTextLine_Edge_Enums, "QFlags_Edge");
 
 }
 

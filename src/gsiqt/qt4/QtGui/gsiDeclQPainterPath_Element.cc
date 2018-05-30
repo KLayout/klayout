@@ -153,7 +153,7 @@ gsi::Class<QPainterPath::Element> decl_QPainterPath_Element ("QtGui", "QPainterP
   methods_QPainterPath_Element (),
   "@qt\n@brief Binding of QPainterPath::Element");
 
-gsi::ClassExt<QPainterPath> decl_QPainterPath_Element_as_child (decl_QPainterPath_Element, "QtGui", "Element");
+gsi::ClassExt<QPainterPath> decl_QPainterPath_Element_as_child (decl_QPainterPath_Element, "Element");
 
 GSI_QTGUI_PUBLIC gsi::Class<QPainterPath::Element> &qtdecl_QPainterPath_Element () { return decl_QPainterPath_Element; }
 

@@ -966,8 +966,8 @@ static gsi::QFlagsClass<QDate::MonthNameType > decl_QDate_MonthNameType_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDate> inject_QDate_MonthNameType_Enum_in_parent (decl_QDate_MonthNameType_Enum.defs ());
-static gsi::ClassExt<QDate> decl_QDate_MonthNameType_Enum_as_child (decl_QDate_MonthNameType_Enum, "QtCore", "MonthNameType");
-static gsi::ClassExt<QDate> decl_QDate_MonthNameType_Enums_as_child (decl_QDate_MonthNameType_Enums, "QtCore", "QFlags_MonthNameType");
+static gsi::ClassExt<QDate> decl_QDate_MonthNameType_Enum_as_child (decl_QDate_MonthNameType_Enum, "MonthNameType");
+static gsi::ClassExt<QDate> decl_QDate_MonthNameType_Enums_as_child (decl_QDate_MonthNameType_Enums, "QFlags_MonthNameType");
 
 }
 

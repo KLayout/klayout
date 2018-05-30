@@ -58,8 +58,8 @@ static gsi::QFlagsClass<Qt::ToolBarArea > decl_Qt_ToolBarArea_Enums ("QtCore", "
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_ToolBarArea_Enum_in_parent (decl_Qt_ToolBarArea_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarArea_Enum_as_child (decl_Qt_ToolBarArea_Enum, "QtCore", "ToolBarArea");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarArea_Enums_as_child (decl_Qt_ToolBarArea_Enums, "QtCore", "QFlags_ToolBarArea");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarArea_Enum_as_child (decl_Qt_ToolBarArea_Enum, "ToolBarArea");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarArea_Enums_as_child (decl_Qt_ToolBarArea_Enums, "QFlags_ToolBarArea");
 
 }
 
@@ -77,8 +77,8 @@ static gsi::QFlagsClass<Qt::ToolBarAreaSizes > decl_Qt_ToolBarAreaSizes_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_ToolBarAreaSizes_Enum_in_parent (decl_Qt_ToolBarAreaSizes_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarAreaSizes_Enum_as_child (decl_Qt_ToolBarAreaSizes_Enum, "QtCore", "ToolBarAreaSizes");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarAreaSizes_Enums_as_child (decl_Qt_ToolBarAreaSizes_Enums, "QtCore", "QFlags_ToolBarAreaSizes");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarAreaSizes_Enum_as_child (decl_Qt_ToolBarAreaSizes_Enum, "ToolBarAreaSizes");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolBarAreaSizes_Enums_as_child (decl_Qt_ToolBarAreaSizes_Enums, "QFlags_ToolBarAreaSizes");
 
 }
 
@@ -100,8 +100,8 @@ static gsi::QFlagsClass<Qt::ToolButtonStyle > decl_Qt_ToolButtonStyle_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_ToolButtonStyle_Enum_in_parent (decl_Qt_ToolButtonStyle_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolButtonStyle_Enum_as_child (decl_Qt_ToolButtonStyle_Enum, "QtCore", "ToolButtonStyle");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolButtonStyle_Enums_as_child (decl_Qt_ToolButtonStyle_Enums, "QtCore", "QFlags_ToolButtonStyle");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolButtonStyle_Enum_as_child (decl_Qt_ToolButtonStyle_Enum, "ToolButtonStyle");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ToolButtonStyle_Enums_as_child (decl_Qt_ToolButtonStyle_Enums, "QFlags_ToolButtonStyle");
 
 }
 
@@ -124,8 +124,8 @@ static gsi::QFlagsClass<Qt::TouchPointState > decl_Qt_TouchPointState_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_TouchPointState_Enum_in_parent (decl_Qt_TouchPointState_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TouchPointState_Enum_as_child (decl_Qt_TouchPointState_Enum, "QtCore", "TouchPointState");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TouchPointState_Enums_as_child (decl_Qt_TouchPointState_Enums, "QtCore", "QFlags_TouchPointState");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TouchPointState_Enum_as_child (decl_Qt_TouchPointState_Enum, "TouchPointState");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TouchPointState_Enums_as_child (decl_Qt_TouchPointState_Enums, "QFlags_TouchPointState");
 
 }
 
@@ -144,8 +144,8 @@ static gsi::QFlagsClass<Qt::TransformationMode > decl_Qt_TransformationMode_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_TransformationMode_Enum_in_parent (decl_Qt_TransformationMode_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TransformationMode_Enum_as_child (decl_Qt_TransformationMode_Enum, "QtCore", "TransformationMode");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TransformationMode_Enums_as_child (decl_Qt_TransformationMode_Enums, "QtCore", "QFlags_TransformationMode");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TransformationMode_Enum_as_child (decl_Qt_TransformationMode_Enum, "TransformationMode");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TransformationMode_Enums_as_child (decl_Qt_TransformationMode_Enums, "QFlags_TransformationMode");
 
 }
 
@@ -169,8 +169,8 @@ static gsi::QFlagsClass<Qt::UIEffect > decl_Qt_UIEffect_Enums ("QtCore", "Qt_QFl
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_UIEffect_Enum_in_parent (decl_Qt_UIEffect_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_UIEffect_Enum_as_child (decl_Qt_UIEffect_Enum, "QtCore", "UIEffect");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_UIEffect_Enums_as_child (decl_Qt_UIEffect_Enums, "QtCore", "QFlags_UIEffect");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_UIEffect_Enum_as_child (decl_Qt_UIEffect_Enum, "UIEffect");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_UIEffect_Enums_as_child (decl_Qt_UIEffect_Enums, "QFlags_UIEffect");
 
 }
 
@@ -299,8 +299,8 @@ static gsi::QFlagsClass<Qt::WidgetAttribute > decl_Qt_WidgetAttribute_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_WidgetAttribute_Enum_in_parent (decl_Qt_WidgetAttribute_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_WidgetAttribute_Enum_as_child (decl_Qt_WidgetAttribute_Enum, "QtCore", "WidgetAttribute");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_WidgetAttribute_Enums_as_child (decl_Qt_WidgetAttribute_Enums, "QtCore", "QFlags_WidgetAttribute");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_WidgetAttribute_Enum_as_child (decl_Qt_WidgetAttribute_Enum, "WidgetAttribute");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_WidgetAttribute_Enums_as_child (decl_Qt_WidgetAttribute_Enums, "QFlags_WidgetAttribute");
 
 }
 
@@ -327,8 +327,8 @@ static gsi::QFlagsClass<Qt::WindowFrameSection > decl_Qt_WindowFrameSection_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_WindowFrameSection_Enum_in_parent (decl_Qt_WindowFrameSection_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowFrameSection_Enum_as_child (decl_Qt_WindowFrameSection_Enum, "QtCore", "WindowFrameSection");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowFrameSection_Enums_as_child (decl_Qt_WindowFrameSection_Enums, "QtCore", "QFlags_WindowFrameSection");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowFrameSection_Enum_as_child (decl_Qt_WindowFrameSection_Enum, "WindowFrameSection");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowFrameSection_Enums_as_child (decl_Qt_WindowFrameSection_Enums, "QFlags_WindowFrameSection");
 
 }
 
@@ -348,8 +348,8 @@ static gsi::QFlagsClass<Qt::WindowModality > decl_Qt_WindowModality_Enums ("QtCo
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_WindowModality_Enum_in_parent (decl_Qt_WindowModality_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowModality_Enum_as_child (decl_Qt_WindowModality_Enum, "QtCore", "WindowModality");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowModality_Enums_as_child (decl_Qt_WindowModality_Enums, "QtCore", "QFlags_WindowModality");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowModality_Enum_as_child (decl_Qt_WindowModality_Enum, "WindowModality");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowModality_Enums_as_child (decl_Qt_WindowModality_Enums, "QFlags_WindowModality");
 
 }
 
@@ -371,8 +371,8 @@ static gsi::QFlagsClass<Qt::WindowState > decl_Qt_WindowState_Enums ("QtCore", "
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_WindowState_Enum_in_parent (decl_Qt_WindowState_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowState_Enum_as_child (decl_Qt_WindowState_Enum, "QtCore", "WindowState");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowState_Enums_as_child (decl_Qt_WindowState_Enums, "QtCore", "QFlags_WindowState");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowState_Enum_as_child (decl_Qt_WindowState_Enum, "WindowState");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowState_Enums_as_child (decl_Qt_WindowState_Enums, "QFlags_WindowState");
 
 }
 
@@ -418,8 +418,8 @@ static gsi::QFlagsClass<Qt::WindowType > decl_Qt_WindowType_Enums ("QtCore", "Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_WindowType_Enum_in_parent (decl_Qt_WindowType_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowType_Enum_as_child (decl_Qt_WindowType_Enum, "QtCore", "WindowType");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowType_Enums_as_child (decl_Qt_WindowType_Enums, "QtCore", "QFlags_WindowType");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowType_Enum_as_child (decl_Qt_WindowType_Enum, "WindowType");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_WindowType_Enums_as_child (decl_Qt_WindowType_Enums, "QFlags_WindowType");
 
 }
 

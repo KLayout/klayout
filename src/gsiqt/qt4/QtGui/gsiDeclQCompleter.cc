@@ -1395,8 +1395,8 @@ static gsi::QFlagsClass<QCompleter::CompletionMode > decl_QCompleter_CompletionM
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QCompleter> inject_QCompleter_CompletionMode_Enum_in_parent (decl_QCompleter_CompletionMode_Enum.defs ());
-static gsi::ClassExt<QCompleter> decl_QCompleter_CompletionMode_Enum_as_child (decl_QCompleter_CompletionMode_Enum, "QtGui", "CompletionMode");
-static gsi::ClassExt<QCompleter> decl_QCompleter_CompletionMode_Enums_as_child (decl_QCompleter_CompletionMode_Enums, "QtGui", "QFlags_CompletionMode");
+static gsi::ClassExt<QCompleter> decl_QCompleter_CompletionMode_Enum_as_child (decl_QCompleter_CompletionMode_Enum, "CompletionMode");
+static gsi::ClassExt<QCompleter> decl_QCompleter_CompletionMode_Enums_as_child (decl_QCompleter_CompletionMode_Enums, "QFlags_CompletionMode");
 
 }
 
@@ -1416,8 +1416,8 @@ static gsi::QFlagsClass<QCompleter::ModelSorting > decl_QCompleter_ModelSorting_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QCompleter> inject_QCompleter_ModelSorting_Enum_in_parent (decl_QCompleter_ModelSorting_Enum.defs ());
-static gsi::ClassExt<QCompleter> decl_QCompleter_ModelSorting_Enum_as_child (decl_QCompleter_ModelSorting_Enum, "QtGui", "ModelSorting");
-static gsi::ClassExt<QCompleter> decl_QCompleter_ModelSorting_Enums_as_child (decl_QCompleter_ModelSorting_Enums, "QtGui", "QFlags_ModelSorting");
+static gsi::ClassExt<QCompleter> decl_QCompleter_ModelSorting_Enum_as_child (decl_QCompleter_ModelSorting_Enum, "ModelSorting");
+static gsi::ClassExt<QCompleter> decl_QCompleter_ModelSorting_Enums_as_child (decl_QCompleter_ModelSorting_Enums, "QFlags_ModelSorting");
 
 }
 

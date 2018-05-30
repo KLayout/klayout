@@ -32,7 +32,7 @@ namespace gsi_qt
 // ------------------------------------------------------------
 //  Declarations for QPair<QHostAddress, int>
 
-gsi::Class<QPair<QHostAddress, int> > decl_QHostAddress_int_QPair ("Qt", "QPair_QHostAddress_int",
+gsi::Class<QPair<QHostAddress, int> > decl_QHostAddress_int_QPair ("QtNetwork", "QPair_QHostAddress_int",
   qt_gsi::pair_decl<QHostAddress, int>::methods (),
   "@qt\\n@brief Represents a QPair<QHostAddress, int>"
 );

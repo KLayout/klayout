@@ -163,8 +163,8 @@ static gsi::QFlagsClass<QLibraryInfo::LibraryLocation > decl_QLibraryInfo_Librar
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLibraryInfo> inject_QLibraryInfo_LibraryLocation_Enum_in_parent (decl_QLibraryInfo_LibraryLocation_Enum.defs ());
-static gsi::ClassExt<QLibraryInfo> decl_QLibraryInfo_LibraryLocation_Enum_as_child (decl_QLibraryInfo_LibraryLocation_Enum, "QtCore", "LibraryLocation");
-static gsi::ClassExt<QLibraryInfo> decl_QLibraryInfo_LibraryLocation_Enums_as_child (decl_QLibraryInfo_LibraryLocation_Enums, "QtCore", "QFlags_LibraryLocation");
+static gsi::ClassExt<QLibraryInfo> decl_QLibraryInfo_LibraryLocation_Enum_as_child (decl_QLibraryInfo_LibraryLocation_Enum, "LibraryLocation");
+static gsi::ClassExt<QLibraryInfo> decl_QLibraryInfo_LibraryLocation_Enums_as_child (decl_QLibraryInfo_LibraryLocation_Enums, "QFlags_LibraryLocation");
 
 }
 

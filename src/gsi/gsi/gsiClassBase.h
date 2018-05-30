@@ -33,7 +33,8 @@
 
 #include "gsiExpression.h"
 #include "gsiObject.h"
-#include "gsiSerialisation.h"
+#include "gsiIterators.h"
+#include "gsiCallback.h"
 #include "gsiMethods.h"
 
 #include <list>

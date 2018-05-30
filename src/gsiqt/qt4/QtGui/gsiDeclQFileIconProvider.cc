@@ -305,8 +305,8 @@ static gsi::QFlagsClass<QFileIconProvider::IconType > decl_QFileIconProvider_Ico
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFileIconProvider> inject_QFileIconProvider_IconType_Enum_in_parent (decl_QFileIconProvider_IconType_Enum.defs ());
-static gsi::ClassExt<QFileIconProvider> decl_QFileIconProvider_IconType_Enum_as_child (decl_QFileIconProvider_IconType_Enum, "QtGui", "IconType");
-static gsi::ClassExt<QFileIconProvider> decl_QFileIconProvider_IconType_Enums_as_child (decl_QFileIconProvider_IconType_Enums, "QtGui", "QFlags_IconType");
+static gsi::ClassExt<QFileIconProvider> decl_QFileIconProvider_IconType_Enum_as_child (decl_QFileIconProvider_IconType_Enum, "IconType");
+static gsi::ClassExt<QFileIconProvider> decl_QFileIconProvider_IconType_Enums_as_child (decl_QFileIconProvider_IconType_Enums, "QFlags_IconType");
 
 }
 

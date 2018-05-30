@@ -5543,8 +5543,8 @@ static gsi::QFlagsClass<QListView::Flow > decl_QListView_Flow_Enums ("QtGui", "Q
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QListView> inject_QListView_Flow_Enum_in_parent (decl_QListView_Flow_Enum.defs ());
-static gsi::ClassExt<QListView> decl_QListView_Flow_Enum_as_child (decl_QListView_Flow_Enum, "QtGui", "Flow");
-static gsi::ClassExt<QListView> decl_QListView_Flow_Enums_as_child (decl_QListView_Flow_Enums, "QtGui", "QFlags_Flow");
+static gsi::ClassExt<QListView> decl_QListView_Flow_Enum_as_child (decl_QListView_Flow_Enum, "Flow");
+static gsi::ClassExt<QListView> decl_QListView_Flow_Enums_as_child (decl_QListView_Flow_Enums, "QFlags_Flow");
 
 }
 
@@ -5563,8 +5563,8 @@ static gsi::QFlagsClass<QListView::LayoutMode > decl_QListView_LayoutMode_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QListView> inject_QListView_LayoutMode_Enum_in_parent (decl_QListView_LayoutMode_Enum.defs ());
-static gsi::ClassExt<QListView> decl_QListView_LayoutMode_Enum_as_child (decl_QListView_LayoutMode_Enum, "QtGui", "LayoutMode");
-static gsi::ClassExt<QListView> decl_QListView_LayoutMode_Enums_as_child (decl_QListView_LayoutMode_Enums, "QtGui", "QFlags_LayoutMode");
+static gsi::ClassExt<QListView> decl_QListView_LayoutMode_Enum_as_child (decl_QListView_LayoutMode_Enum, "LayoutMode");
+static gsi::ClassExt<QListView> decl_QListView_LayoutMode_Enums_as_child (decl_QListView_LayoutMode_Enums, "QFlags_LayoutMode");
 
 }
 
@@ -5584,8 +5584,8 @@ static gsi::QFlagsClass<QListView::Movement > decl_QListView_Movement_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QListView> inject_QListView_Movement_Enum_in_parent (decl_QListView_Movement_Enum.defs ());
-static gsi::ClassExt<QListView> decl_QListView_Movement_Enum_as_child (decl_QListView_Movement_Enum, "QtGui", "Movement");
-static gsi::ClassExt<QListView> decl_QListView_Movement_Enums_as_child (decl_QListView_Movement_Enums, "QtGui", "QFlags_Movement");
+static gsi::ClassExt<QListView> decl_QListView_Movement_Enum_as_child (decl_QListView_Movement_Enum, "Movement");
+static gsi::ClassExt<QListView> decl_QListView_Movement_Enums_as_child (decl_QListView_Movement_Enums, "QFlags_Movement");
 
 }
 
@@ -5604,8 +5604,8 @@ static gsi::QFlagsClass<QListView::ResizeMode > decl_QListView_ResizeMode_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QListView> inject_QListView_ResizeMode_Enum_in_parent (decl_QListView_ResizeMode_Enum.defs ());
-static gsi::ClassExt<QListView> decl_QListView_ResizeMode_Enum_as_child (decl_QListView_ResizeMode_Enum, "QtGui", "ResizeMode");
-static gsi::ClassExt<QListView> decl_QListView_ResizeMode_Enums_as_child (decl_QListView_ResizeMode_Enums, "QtGui", "QFlags_ResizeMode");
+static gsi::ClassExt<QListView> decl_QListView_ResizeMode_Enum_as_child (decl_QListView_ResizeMode_Enum, "ResizeMode");
+static gsi::ClassExt<QListView> decl_QListView_ResizeMode_Enums_as_child (decl_QListView_ResizeMode_Enums, "QFlags_ResizeMode");
 
 }
 
@@ -5624,8 +5624,8 @@ static gsi::QFlagsClass<QListView::ViewMode > decl_QListView_ViewMode_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QListView> inject_QListView_ViewMode_Enum_in_parent (decl_QListView_ViewMode_Enum.defs ());
-static gsi::ClassExt<QListView> decl_QListView_ViewMode_Enum_as_child (decl_QListView_ViewMode_Enum, "QtGui", "ViewMode");
-static gsi::ClassExt<QListView> decl_QListView_ViewMode_Enums_as_child (decl_QListView_ViewMode_Enums, "QtGui", "QFlags_ViewMode");
+static gsi::ClassExt<QListView> decl_QListView_ViewMode_Enum_as_child (decl_QListView_ViewMode_Enum, "ViewMode");
+static gsi::ClassExt<QListView> decl_QListView_ViewMode_Enums_as_child (decl_QListView_ViewMode_Enums, "QFlags_ViewMode");
 
 }
 

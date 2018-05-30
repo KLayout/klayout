@@ -30,7 +30,7 @@
 #if !defined(HDR_gsiQtXmlExternals)
 #define HDR_gsiQtXmlExternals
 
-#include "gsiClassBase.h"
+#include "gsiClass.h"
 #include "gsiQtXmlCommon.h"
 
 class QDomAttr;

@@ -496,8 +496,8 @@ static gsi::QFlagsClass<QClipboard::Mode > decl_QClipboard_Mode_Enums ("QtGui", 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QClipboard> inject_QClipboard_Mode_Enum_in_parent (decl_QClipboard_Mode_Enum.defs ());
-static gsi::ClassExt<QClipboard> decl_QClipboard_Mode_Enum_as_child (decl_QClipboard_Mode_Enum, "QtGui", "Mode");
-static gsi::ClassExt<QClipboard> decl_QClipboard_Mode_Enums_as_child (decl_QClipboard_Mode_Enums, "QtGui", "QFlags_Mode");
+static gsi::ClassExt<QClipboard> decl_QClipboard_Mode_Enum_as_child (decl_QClipboard_Mode_Enum, "Mode");
+static gsi::ClassExt<QClipboard> decl_QClipboard_Mode_Enums_as_child (decl_QClipboard_Mode_Enums, "QFlags_Mode");
 
 }
 

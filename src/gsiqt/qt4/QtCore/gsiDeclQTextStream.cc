@@ -1066,8 +1066,8 @@ static gsi::QFlagsClass<QTextStream::FieldAlignment > decl_QTextStream_FieldAlig
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextStream> inject_QTextStream_FieldAlignment_Enum_in_parent (decl_QTextStream_FieldAlignment_Enum.defs ());
-static gsi::ClassExt<QTextStream> decl_QTextStream_FieldAlignment_Enum_as_child (decl_QTextStream_FieldAlignment_Enum, "QtCore", "FieldAlignment");
-static gsi::ClassExt<QTextStream> decl_QTextStream_FieldAlignment_Enums_as_child (decl_QTextStream_FieldAlignment_Enums, "QtCore", "QFlags_FieldAlignment");
+static gsi::ClassExt<QTextStream> decl_QTextStream_FieldAlignment_Enum_as_child (decl_QTextStream_FieldAlignment_Enum, "FieldAlignment");
+static gsi::ClassExt<QTextStream> decl_QTextStream_FieldAlignment_Enums_as_child (decl_QTextStream_FieldAlignment_Enums, "QFlags_FieldAlignment");
 
 }
 
@@ -1089,8 +1089,8 @@ static gsi::QFlagsClass<QTextStream::NumberFlag > decl_QTextStream_NumberFlag_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextStream> inject_QTextStream_NumberFlag_Enum_in_parent (decl_QTextStream_NumberFlag_Enum.defs ());
-static gsi::ClassExt<QTextStream> decl_QTextStream_NumberFlag_Enum_as_child (decl_QTextStream_NumberFlag_Enum, "QtCore", "NumberFlag");
-static gsi::ClassExt<QTextStream> decl_QTextStream_NumberFlag_Enums_as_child (decl_QTextStream_NumberFlag_Enums, "QtCore", "QFlags_NumberFlag");
+static gsi::ClassExt<QTextStream> decl_QTextStream_NumberFlag_Enum_as_child (decl_QTextStream_NumberFlag_Enum, "NumberFlag");
+static gsi::ClassExt<QTextStream> decl_QTextStream_NumberFlag_Enums_as_child (decl_QTextStream_NumberFlag_Enums, "QFlags_NumberFlag");
 
 }
 
@@ -1110,8 +1110,8 @@ static gsi::QFlagsClass<QTextStream::RealNumberNotation > decl_QTextStream_RealN
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextStream> inject_QTextStream_RealNumberNotation_Enum_in_parent (decl_QTextStream_RealNumberNotation_Enum.defs ());
-static gsi::ClassExt<QTextStream> decl_QTextStream_RealNumberNotation_Enum_as_child (decl_QTextStream_RealNumberNotation_Enum, "QtCore", "RealNumberNotation");
-static gsi::ClassExt<QTextStream> decl_QTextStream_RealNumberNotation_Enums_as_child (decl_QTextStream_RealNumberNotation_Enums, "QtCore", "QFlags_RealNumberNotation");
+static gsi::ClassExt<QTextStream> decl_QTextStream_RealNumberNotation_Enum_as_child (decl_QTextStream_RealNumberNotation_Enum, "RealNumberNotation");
+static gsi::ClassExt<QTextStream> decl_QTextStream_RealNumberNotation_Enums_as_child (decl_QTextStream_RealNumberNotation_Enums, "QFlags_RealNumberNotation");
 
 }
 
@@ -1131,8 +1131,8 @@ static gsi::QFlagsClass<QTextStream::Status > decl_QTextStream_Status_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextStream> inject_QTextStream_Status_Enum_in_parent (decl_QTextStream_Status_Enum.defs ());
-static gsi::ClassExt<QTextStream> decl_QTextStream_Status_Enum_as_child (decl_QTextStream_Status_Enum, "QtCore", "Status");
-static gsi::ClassExt<QTextStream> decl_QTextStream_Status_Enums_as_child (decl_QTextStream_Status_Enums, "QtCore", "QFlags_Status");
+static gsi::ClassExt<QTextStream> decl_QTextStream_Status_Enum_as_child (decl_QTextStream_Status_Enum, "Status");
+static gsi::ClassExt<QTextStream> decl_QTextStream_Status_Enums_as_child (decl_QTextStream_Status_Enums, "QFlags_Status");
 
 }
 

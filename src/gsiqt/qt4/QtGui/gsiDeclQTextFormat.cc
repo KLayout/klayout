@@ -1014,8 +1014,8 @@ static gsi::QFlagsClass<QTextFormat::PageBreakFlag > decl_QTextFormat_PageBreakF
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextFormat> inject_QTextFormat_PageBreakFlag_Enum_in_parent (decl_QTextFormat_PageBreakFlag_Enum.defs ());
-static gsi::ClassExt<QTextFormat> decl_QTextFormat_PageBreakFlag_Enum_as_child (decl_QTextFormat_PageBreakFlag_Enum, "QtGui", "PageBreakFlag");
-static gsi::ClassExt<QTextFormat> decl_QTextFormat_PageBreakFlag_Enums_as_child (decl_QTextFormat_PageBreakFlag_Enums, "QtGui", "QFlags_PageBreakFlag");
+static gsi::ClassExt<QTextFormat> decl_QTextFormat_PageBreakFlag_Enum_as_child (decl_QTextFormat_PageBreakFlag_Enum, "PageBreakFlag");
+static gsi::ClassExt<QTextFormat> decl_QTextFormat_PageBreakFlag_Enums_as_child (decl_QTextFormat_PageBreakFlag_Enums, "QFlags_PageBreakFlag");
 
 }
 

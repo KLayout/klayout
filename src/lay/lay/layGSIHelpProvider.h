@@ -45,7 +45,7 @@ public:
 
 private:
   std::string produce_class_doc (const std::string &cls) const;
-  std::string produce_class_index () const;
+  std::string produce_class_index (const char *module_name) const;
 };
 
 }

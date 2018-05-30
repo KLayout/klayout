@@ -511,8 +511,8 @@ static gsi::QFlagsClass<QHostAddress::SpecialAddress > decl_QHostAddress_Special
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QHostAddress> inject_QHostAddress_SpecialAddress_Enum_in_parent (decl_QHostAddress_SpecialAddress_Enum.defs ());
-static gsi::ClassExt<QHostAddress> decl_QHostAddress_SpecialAddress_Enum_as_child (decl_QHostAddress_SpecialAddress_Enum, "QtNetwork", "SpecialAddress");
-static gsi::ClassExt<QHostAddress> decl_QHostAddress_SpecialAddress_Enums_as_child (decl_QHostAddress_SpecialAddress_Enums, "QtNetwork", "QFlags_SpecialAddress");
+static gsi::ClassExt<QHostAddress> decl_QHostAddress_SpecialAddress_Enum_as_child (decl_QHostAddress_SpecialAddress_Enum, "SpecialAddress");
+static gsi::ClassExt<QHostAddress> decl_QHostAddress_SpecialAddress_Enums_as_child (decl_QHostAddress_SpecialAddress_Enums, "QFlags_SpecialAddress");
 
 }
 

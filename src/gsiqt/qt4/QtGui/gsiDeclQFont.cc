@@ -1382,8 +1382,8 @@ static gsi::QFlagsClass<QFont::Capitalization > decl_QFont_Capitalization_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFont> inject_QFont_Capitalization_Enum_in_parent (decl_QFont_Capitalization_Enum.defs ());
-static gsi::ClassExt<QFont> decl_QFont_Capitalization_Enum_as_child (decl_QFont_Capitalization_Enum, "QtGui", "Capitalization");
-static gsi::ClassExt<QFont> decl_QFont_Capitalization_Enums_as_child (decl_QFont_Capitalization_Enums, "QtGui", "QFlags_Capitalization");
+static gsi::ClassExt<QFont> decl_QFont_Capitalization_Enum_as_child (decl_QFont_Capitalization_Enum, "Capitalization");
+static gsi::ClassExt<QFont> decl_QFont_Capitalization_Enums_as_child (decl_QFont_Capitalization_Enums, "QFlags_Capitalization");
 
 }
 
@@ -1402,8 +1402,8 @@ static gsi::QFlagsClass<QFont::SpacingType > decl_QFont_SpacingType_Enums ("QtGu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFont> inject_QFont_SpacingType_Enum_in_parent (decl_QFont_SpacingType_Enum.defs ());
-static gsi::ClassExt<QFont> decl_QFont_SpacingType_Enum_as_child (decl_QFont_SpacingType_Enum, "QtGui", "SpacingType");
-static gsi::ClassExt<QFont> decl_QFont_SpacingType_Enums_as_child (decl_QFont_SpacingType_Enums, "QtGui", "QFlags_SpacingType");
+static gsi::ClassExt<QFont> decl_QFont_SpacingType_Enum_as_child (decl_QFont_SpacingType_Enum, "SpacingType");
+static gsi::ClassExt<QFont> decl_QFont_SpacingType_Enums_as_child (decl_QFont_SpacingType_Enums, "QFlags_SpacingType");
 
 }
 
@@ -1423,8 +1423,8 @@ static gsi::QFlagsClass<QFont::Style > decl_QFont_Style_Enums ("QtGui", "QFont_Q
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFont> inject_QFont_Style_Enum_in_parent (decl_QFont_Style_Enum.defs ());
-static gsi::ClassExt<QFont> decl_QFont_Style_Enum_as_child (decl_QFont_Style_Enum, "QtGui", "Style");
-static gsi::ClassExt<QFont> decl_QFont_Style_Enums_as_child (decl_QFont_Style_Enums, "QtGui", "QFlags_Style");
+static gsi::ClassExt<QFont> decl_QFont_Style_Enum_as_child (decl_QFont_Style_Enum, "Style");
+static gsi::ClassExt<QFont> decl_QFont_Style_Enums_as_child (decl_QFont_Style_Enums, "QFlags_Style");
 
 }
 
@@ -1451,8 +1451,8 @@ static gsi::QFlagsClass<QFont::StyleHint > decl_QFont_StyleHint_Enums ("QtGui", 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFont> inject_QFont_StyleHint_Enum_in_parent (decl_QFont_StyleHint_Enum.defs ());
-static gsi::ClassExt<QFont> decl_QFont_StyleHint_Enum_as_child (decl_QFont_StyleHint_Enum, "QtGui", "StyleHint");
-static gsi::ClassExt<QFont> decl_QFont_StyleHint_Enums_as_child (decl_QFont_StyleHint_Enums, "QtGui", "QFlags_StyleHint");
+static gsi::ClassExt<QFont> decl_QFont_StyleHint_Enum_as_child (decl_QFont_StyleHint_Enum, "StyleHint");
+static gsi::ClassExt<QFont> decl_QFont_StyleHint_Enums_as_child (decl_QFont_StyleHint_Enums, "QFlags_StyleHint");
 
 }
 
@@ -1480,8 +1480,8 @@ static gsi::QFlagsClass<QFont::StyleStrategy > decl_QFont_StyleStrategy_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFont> inject_QFont_StyleStrategy_Enum_in_parent (decl_QFont_StyleStrategy_Enum.defs ());
-static gsi::ClassExt<QFont> decl_QFont_StyleStrategy_Enum_as_child (decl_QFont_StyleStrategy_Enum, "QtGui", "StyleStrategy");
-static gsi::ClassExt<QFont> decl_QFont_StyleStrategy_Enums_as_child (decl_QFont_StyleStrategy_Enums, "QtGui", "QFlags_StyleStrategy");
+static gsi::ClassExt<QFont> decl_QFont_StyleStrategy_Enum_as_child (decl_QFont_StyleStrategy_Enum, "StyleStrategy");
+static gsi::ClassExt<QFont> decl_QFont_StyleStrategy_Enums_as_child (decl_QFont_StyleStrategy_Enums, "QFlags_StyleStrategy");
 
 }
 

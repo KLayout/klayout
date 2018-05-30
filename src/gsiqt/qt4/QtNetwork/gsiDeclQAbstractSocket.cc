@@ -809,8 +809,8 @@ static gsi::QFlagsClass<QAbstractSocket::NetworkLayerProtocol > decl_QAbstractSo
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractSocket> inject_QAbstractSocket_NetworkLayerProtocol_Enum_in_parent (decl_QAbstractSocket_NetworkLayerProtocol_Enum.defs ());
-static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_NetworkLayerProtocol_Enum_as_child (decl_QAbstractSocket_NetworkLayerProtocol_Enum, "QtNetwork", "NetworkLayerProtocol");
-static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_NetworkLayerProtocol_Enums_as_child (decl_QAbstractSocket_NetworkLayerProtocol_Enums, "QtNetwork", "QFlags_NetworkLayerProtocol");
+static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_NetworkLayerProtocol_Enum_as_child (decl_QAbstractSocket_NetworkLayerProtocol_Enum, "NetworkLayerProtocol");
+static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_NetworkLayerProtocol_Enums_as_child (decl_QAbstractSocket_NetworkLayerProtocol_Enums, "QFlags_NetworkLayerProtocol");
 
 }
 
@@ -847,8 +847,8 @@ static gsi::QFlagsClass<QAbstractSocket::SocketError > decl_QAbstractSocket_Sock
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractSocket> inject_QAbstractSocket_SocketError_Enum_in_parent (decl_QAbstractSocket_SocketError_Enum.defs ());
-static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketError_Enum_as_child (decl_QAbstractSocket_SocketError_Enum, "QtNetwork", "SocketError");
-static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketError_Enums_as_child (decl_QAbstractSocket_SocketError_Enums, "QtNetwork", "QFlags_SocketError");
+static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketError_Enum_as_child (decl_QAbstractSocket_SocketError_Enum, "SocketError");
+static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketError_Enums_as_child (decl_QAbstractSocket_SocketError_Enums, "QFlags_SocketError");
 
 }
 
@@ -867,8 +867,8 @@ static gsi::QFlagsClass<QAbstractSocket::SocketOption > decl_QAbstractSocket_Soc
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractSocket> inject_QAbstractSocket_SocketOption_Enum_in_parent (decl_QAbstractSocket_SocketOption_Enum.defs ());
-static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketOption_Enum_as_child (decl_QAbstractSocket_SocketOption_Enum, "QtNetwork", "SocketOption");
-static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketOption_Enums_as_child (decl_QAbstractSocket_SocketOption_Enums, "QtNetwork", "QFlags_SocketOption");
+static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketOption_Enum_as_child (decl_QAbstractSocket_SocketOption_Enum, "SocketOption");
+static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketOption_Enums_as_child (decl_QAbstractSocket_SocketOption_Enums, "QFlags_SocketOption");
 
 }
 
@@ -892,8 +892,8 @@ static gsi::QFlagsClass<QAbstractSocket::SocketState > decl_QAbstractSocket_Sock
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractSocket> inject_QAbstractSocket_SocketState_Enum_in_parent (decl_QAbstractSocket_SocketState_Enum.defs ());
-static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketState_Enum_as_child (decl_QAbstractSocket_SocketState_Enum, "QtNetwork", "SocketState");
-static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketState_Enums_as_child (decl_QAbstractSocket_SocketState_Enums, "QtNetwork", "QFlags_SocketState");
+static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketState_Enum_as_child (decl_QAbstractSocket_SocketState_Enum, "SocketState");
+static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketState_Enums_as_child (decl_QAbstractSocket_SocketState_Enums, "QFlags_SocketState");
 
 }
 
@@ -913,8 +913,8 @@ static gsi::QFlagsClass<QAbstractSocket::SocketType > decl_QAbstractSocket_Socke
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractSocket> inject_QAbstractSocket_SocketType_Enum_in_parent (decl_QAbstractSocket_SocketType_Enum.defs ());
-static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketType_Enum_as_child (decl_QAbstractSocket_SocketType_Enum, "QtNetwork", "SocketType");
-static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketType_Enums_as_child (decl_QAbstractSocket_SocketType_Enums, "QtNetwork", "QFlags_SocketType");
+static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketType_Enum_as_child (decl_QAbstractSocket_SocketType_Enum, "SocketType");
+static gsi::ClassExt<QAbstractSocket> decl_QAbstractSocket_SocketType_Enums_as_child (decl_QAbstractSocket_SocketType_Enums, "QFlags_SocketType");
 
 }
 

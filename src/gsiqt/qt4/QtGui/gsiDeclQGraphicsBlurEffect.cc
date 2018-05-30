@@ -989,8 +989,8 @@ static gsi::QFlagsClass<QGraphicsBlurEffect::BlurHint > decl_QGraphicsBlurEffect
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsBlurEffect> inject_QGraphicsBlurEffect_BlurHint_Enum_in_parent (decl_QGraphicsBlurEffect_BlurHint_Enum.defs ());
-static gsi::ClassExt<QGraphicsBlurEffect> decl_QGraphicsBlurEffect_BlurHint_Enum_as_child (decl_QGraphicsBlurEffect_BlurHint_Enum, "QtGui", "BlurHint");
-static gsi::ClassExt<QGraphicsBlurEffect> decl_QGraphicsBlurEffect_BlurHint_Enums_as_child (decl_QGraphicsBlurEffect_BlurHint_Enums, "QtGui", "QFlags_BlurHint");
+static gsi::ClassExt<QGraphicsBlurEffect> decl_QGraphicsBlurEffect_BlurHint_Enum_as_child (decl_QGraphicsBlurEffect_BlurHint_Enum, "BlurHint");
+static gsi::ClassExt<QGraphicsBlurEffect> decl_QGraphicsBlurEffect_BlurHint_Enums_as_child (decl_QGraphicsBlurEffect_BlurHint_Enums, "QFlags_BlurHint");
 
 }
 

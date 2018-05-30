@@ -3790,8 +3790,8 @@ static gsi::QFlagsClass<QSqlTableModel::EditStrategy > decl_QSqlTableModel_EditS
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSqlTableModel> inject_QSqlTableModel_EditStrategy_Enum_in_parent (decl_QSqlTableModel_EditStrategy_Enum.defs ());
-static gsi::ClassExt<QSqlTableModel> decl_QSqlTableModel_EditStrategy_Enum_as_child (decl_QSqlTableModel_EditStrategy_Enum, "QtSql", "EditStrategy");
-static gsi::ClassExt<QSqlTableModel> decl_QSqlTableModel_EditStrategy_Enums_as_child (decl_QSqlTableModel_EditStrategy_Enums, "QtSql", "QFlags_EditStrategy");
+static gsi::ClassExt<QSqlTableModel> decl_QSqlTableModel_EditStrategy_Enum_as_child (decl_QSqlTableModel_EditStrategy_Enum, "EditStrategy");
+static gsi::ClassExt<QSqlTableModel> decl_QSqlTableModel_EditStrategy_Enums_as_child (decl_QSqlTableModel_EditStrategy_Enums, "QFlags_EditStrategy");
 
 }
 

@@ -521,8 +521,8 @@ static gsi::QFlagsClass<QImageWriter::ImageWriterError > decl_QImageWriter_Image
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QImageWriter> inject_QImageWriter_ImageWriterError_Enum_in_parent (decl_QImageWriter_ImageWriterError_Enum.defs ());
-static gsi::ClassExt<QImageWriter> decl_QImageWriter_ImageWriterError_Enum_as_child (decl_QImageWriter_ImageWriterError_Enum, "QtGui", "ImageWriterError");
-static gsi::ClassExt<QImageWriter> decl_QImageWriter_ImageWriterError_Enums_as_child (decl_QImageWriter_ImageWriterError_Enums, "QtGui", "QFlags_ImageWriterError");
+static gsi::ClassExt<QImageWriter> decl_QImageWriter_ImageWriterError_Enum_as_child (decl_QImageWriter_ImageWriterError_Enum, "ImageWriterError");
+static gsi::ClassExt<QImageWriter> decl_QImageWriter_ImageWriterError_Enums_as_child (decl_QImageWriter_ImageWriterError_Enums, "QFlags_ImageWriterError");
 
 }
 

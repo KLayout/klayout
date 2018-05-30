@@ -3136,8 +3136,8 @@ static gsi::QFlagsClass<QAbstractSlider::SliderAction > decl_QAbstractSlider_Sli
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractSlider> inject_QAbstractSlider_SliderAction_Enum_in_parent (decl_QAbstractSlider_SliderAction_Enum.defs ());
-static gsi::ClassExt<QAbstractSlider> decl_QAbstractSlider_SliderAction_Enum_as_child (decl_QAbstractSlider_SliderAction_Enum, "QtGui", "SliderAction");
-static gsi::ClassExt<QAbstractSlider> decl_QAbstractSlider_SliderAction_Enums_as_child (decl_QAbstractSlider_SliderAction_Enums, "QtGui", "QFlags_SliderAction");
+static gsi::ClassExt<QAbstractSlider> decl_QAbstractSlider_SliderAction_Enum_as_child (decl_QAbstractSlider_SliderAction_Enum, "SliderAction");
+static gsi::ClassExt<QAbstractSlider> decl_QAbstractSlider_SliderAction_Enums_as_child (decl_QAbstractSlider_SliderAction_Enums, "QFlags_SliderAction");
 
 }
 

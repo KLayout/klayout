@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <klayout-macro>
  <description/>
- <doc>@class PCellDeclarationHelper &lt; PCellDeclaration
+ <doc>@class [db] PCellDeclarationHelper &lt; PCellDeclaration
 @brief A helper class to simplify the declaration of a PCell (Ruby version)
 
 This class provides adds some convenience to the PCell declaration based

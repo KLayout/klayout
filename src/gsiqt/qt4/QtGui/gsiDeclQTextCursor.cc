@@ -1477,8 +1477,8 @@ static gsi::QFlagsClass<QTextCursor::MoveMode > decl_QTextCursor_MoveMode_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextCursor> inject_QTextCursor_MoveMode_Enum_in_parent (decl_QTextCursor_MoveMode_Enum.defs ());
-static gsi::ClassExt<QTextCursor> decl_QTextCursor_MoveMode_Enum_as_child (decl_QTextCursor_MoveMode_Enum, "QtGui", "MoveMode");
-static gsi::ClassExt<QTextCursor> decl_QTextCursor_MoveMode_Enums_as_child (decl_QTextCursor_MoveMode_Enums, "QtGui", "QFlags_MoveMode");
+static gsi::ClassExt<QTextCursor> decl_QTextCursor_MoveMode_Enum_as_child (decl_QTextCursor_MoveMode_Enum, "MoveMode");
+static gsi::ClassExt<QTextCursor> decl_QTextCursor_MoveMode_Enums_as_child (decl_QTextCursor_MoveMode_Enums, "QFlags_MoveMode");
 
 }
 
@@ -1520,8 +1520,8 @@ static gsi::QFlagsClass<QTextCursor::MoveOperation > decl_QTextCursor_MoveOperat
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextCursor> inject_QTextCursor_MoveOperation_Enum_in_parent (decl_QTextCursor_MoveOperation_Enum.defs ());
-static gsi::ClassExt<QTextCursor> decl_QTextCursor_MoveOperation_Enum_as_child (decl_QTextCursor_MoveOperation_Enum, "QtGui", "MoveOperation");
-static gsi::ClassExt<QTextCursor> decl_QTextCursor_MoveOperation_Enums_as_child (decl_QTextCursor_MoveOperation_Enums, "QtGui", "QFlags_MoveOperation");
+static gsi::ClassExt<QTextCursor> decl_QTextCursor_MoveOperation_Enum_as_child (decl_QTextCursor_MoveOperation_Enum, "MoveOperation");
+static gsi::ClassExt<QTextCursor> decl_QTextCursor_MoveOperation_Enums_as_child (decl_QTextCursor_MoveOperation_Enums, "QFlags_MoveOperation");
 
 }
 
@@ -1542,8 +1542,8 @@ static gsi::QFlagsClass<QTextCursor::SelectionType > decl_QTextCursor_SelectionT
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextCursor> inject_QTextCursor_SelectionType_Enum_in_parent (decl_QTextCursor_SelectionType_Enum.defs ());
-static gsi::ClassExt<QTextCursor> decl_QTextCursor_SelectionType_Enum_as_child (decl_QTextCursor_SelectionType_Enum, "QtGui", "SelectionType");
-static gsi::ClassExt<QTextCursor> decl_QTextCursor_SelectionType_Enums_as_child (decl_QTextCursor_SelectionType_Enums, "QtGui", "QFlags_SelectionType");
+static gsi::ClassExt<QTextCursor> decl_QTextCursor_SelectionType_Enum_as_child (decl_QTextCursor_SelectionType_Enum, "SelectionType");
+static gsi::ClassExt<QTextCursor> decl_QTextCursor_SelectionType_Enums_as_child (decl_QTextCursor_SelectionType_Enums, "QFlags_SelectionType");
 
 }
 

@@ -280,8 +280,8 @@ static gsi::QFlagsClass<QSslError::SslError > decl_QSslError_SslError_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSslError> inject_QSslError_SslError_Enum_in_parent (decl_QSslError_SslError_Enum.defs ());
-static gsi::ClassExt<QSslError> decl_QSslError_SslError_Enum_as_child (decl_QSslError_SslError_Enum, "QtNetwork", "SslError");
-static gsi::ClassExt<QSslError> decl_QSslError_SslError_Enums_as_child (decl_QSslError_SslError_Enums, "QtNetwork", "QFlags_SslError");
+static gsi::ClassExt<QSslError> decl_QSslError_SslError_Enum_as_child (decl_QSslError_SslError_Enum, "SslError");
+static gsi::ClassExt<QSslError> decl_QSslError_SslError_Enums_as_child (decl_QSslError_SslError_Enums, "QFlags_SslError");
 
 }
 

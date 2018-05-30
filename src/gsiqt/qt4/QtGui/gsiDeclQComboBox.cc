@@ -4025,8 +4025,8 @@ static gsi::QFlagsClass<QComboBox::InsertPolicy > decl_QComboBox_InsertPolicy_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QComboBox> inject_QComboBox_InsertPolicy_Enum_in_parent (decl_QComboBox_InsertPolicy_Enum.defs ());
-static gsi::ClassExt<QComboBox> decl_QComboBox_InsertPolicy_Enum_as_child (decl_QComboBox_InsertPolicy_Enum, "QtGui", "InsertPolicy");
-static gsi::ClassExt<QComboBox> decl_QComboBox_InsertPolicy_Enums_as_child (decl_QComboBox_InsertPolicy_Enums, "QtGui", "QFlags_InsertPolicy");
+static gsi::ClassExt<QComboBox> decl_QComboBox_InsertPolicy_Enum_as_child (decl_QComboBox_InsertPolicy_Enum, "InsertPolicy");
+static gsi::ClassExt<QComboBox> decl_QComboBox_InsertPolicy_Enums_as_child (decl_QComboBox_InsertPolicy_Enums, "QFlags_InsertPolicy");
 
 }
 
@@ -4047,8 +4047,8 @@ static gsi::QFlagsClass<QComboBox::SizeAdjustPolicy > decl_QComboBox_SizeAdjustP
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QComboBox> inject_QComboBox_SizeAdjustPolicy_Enum_in_parent (decl_QComboBox_SizeAdjustPolicy_Enum.defs ());
-static gsi::ClassExt<QComboBox> decl_QComboBox_SizeAdjustPolicy_Enum_as_child (decl_QComboBox_SizeAdjustPolicy_Enum, "QtGui", "SizeAdjustPolicy");
-static gsi::ClassExt<QComboBox> decl_QComboBox_SizeAdjustPolicy_Enums_as_child (decl_QComboBox_SizeAdjustPolicy_Enums, "QtGui", "QFlags_SizeAdjustPolicy");
+static gsi::ClassExt<QComboBox> decl_QComboBox_SizeAdjustPolicy_Enum_as_child (decl_QComboBox_SizeAdjustPolicy_Enum, "SizeAdjustPolicy");
+static gsi::ClassExt<QComboBox> decl_QComboBox_SizeAdjustPolicy_Enums_as_child (decl_QComboBox_SizeAdjustPolicy_Enums, "QFlags_SizeAdjustPolicy");
 
 }
 

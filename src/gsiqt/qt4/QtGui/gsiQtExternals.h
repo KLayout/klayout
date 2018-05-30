@@ -30,7 +30,7 @@
 #if !defined(HDR_gsiQtGuiExternals)
 #define HDR_gsiQtGuiExternals
 
-#include "gsiClassBase.h"
+#include "gsiClass.h"
 #include "gsiQtGuiCommon.h"
 
 class QAbstractButton;

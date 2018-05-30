@@ -2516,8 +2516,8 @@ static gsi::QFlagsClass<QStyle::ComplexControl > decl_QStyle_ComplexControl_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QStyle> inject_QStyle_ComplexControl_Enum_in_parent (decl_QStyle_ComplexControl_Enum.defs ());
-static gsi::ClassExt<QStyle> decl_QStyle_ComplexControl_Enum_as_child (decl_QStyle_ComplexControl_Enum, "QtGui", "ComplexControl");
-static gsi::ClassExt<QStyle> decl_QStyle_ComplexControl_Enums_as_child (decl_QStyle_ComplexControl_Enums, "QtGui", "QFlags_ComplexControl");
+static gsi::ClassExt<QStyle> decl_QStyle_ComplexControl_Enum_as_child (decl_QStyle_ComplexControl_Enum, "ComplexControl");
+static gsi::ClassExt<QStyle> decl_QStyle_ComplexControl_Enums_as_child (decl_QStyle_ComplexControl_Enums, "QFlags_ComplexControl");
 
 }
 
@@ -2560,8 +2560,8 @@ static gsi::QFlagsClass<QStyle::ContentsType > decl_QStyle_ContentsType_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QStyle> inject_QStyle_ContentsType_Enum_in_parent (decl_QStyle_ContentsType_Enum.defs ());
-static gsi::ClassExt<QStyle> decl_QStyle_ContentsType_Enum_as_child (decl_QStyle_ContentsType_Enum, "QtGui", "ContentsType");
-static gsi::ClassExt<QStyle> decl_QStyle_ContentsType_Enums_as_child (decl_QStyle_ContentsType_Enums, "QtGui", "QFlags_ContentsType");
+static gsi::ClassExt<QStyle> decl_QStyle_ContentsType_Enum_as_child (decl_QStyle_ContentsType_Enum, "ContentsType");
+static gsi::ClassExt<QStyle> decl_QStyle_ContentsType_Enums_as_child (decl_QStyle_ContentsType_Enums, "QFlags_ContentsType");
 
 }
 
@@ -2627,8 +2627,8 @@ static gsi::QFlagsClass<QStyle::ControlElement > decl_QStyle_ControlElement_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QStyle> inject_QStyle_ControlElement_Enum_in_parent (decl_QStyle_ControlElement_Enum.defs ());
-static gsi::ClassExt<QStyle> decl_QStyle_ControlElement_Enum_as_child (decl_QStyle_ControlElement_Enum, "QtGui", "ControlElement");
-static gsi::ClassExt<QStyle> decl_QStyle_ControlElement_Enums_as_child (decl_QStyle_ControlElement_Enums, "QtGui", "QFlags_ControlElement");
+static gsi::ClassExt<QStyle> decl_QStyle_ControlElement_Enum_as_child (decl_QStyle_ControlElement_Enum, "ControlElement");
+static gsi::ClassExt<QStyle> decl_QStyle_ControlElement_Enums_as_child (decl_QStyle_ControlElement_Enums, "QFlags_ControlElement");
 
 }
 
@@ -2740,8 +2740,8 @@ static gsi::QFlagsClass<QStyle::PixelMetric > decl_QStyle_PixelMetric_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QStyle> inject_QStyle_PixelMetric_Enum_in_parent (decl_QStyle_PixelMetric_Enum.defs ());
-static gsi::ClassExt<QStyle> decl_QStyle_PixelMetric_Enum_as_child (decl_QStyle_PixelMetric_Enum, "QtGui", "PixelMetric");
-static gsi::ClassExt<QStyle> decl_QStyle_PixelMetric_Enums_as_child (decl_QStyle_PixelMetric_Enums, "QtGui", "QFlags_PixelMetric");
+static gsi::ClassExt<QStyle> decl_QStyle_PixelMetric_Enum_as_child (decl_QStyle_PixelMetric_Enum, "PixelMetric");
+static gsi::ClassExt<QStyle> decl_QStyle_PixelMetric_Enums_as_child (decl_QStyle_PixelMetric_Enums, "QFlags_PixelMetric");
 
 }
 
@@ -2815,8 +2815,8 @@ static gsi::QFlagsClass<QStyle::PrimitiveElement > decl_QStyle_PrimitiveElement_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QStyle> inject_QStyle_PrimitiveElement_Enum_in_parent (decl_QStyle_PrimitiveElement_Enum.defs ());
-static gsi::ClassExt<QStyle> decl_QStyle_PrimitiveElement_Enum_as_child (decl_QStyle_PrimitiveElement_Enum, "QtGui", "PrimitiveElement");
-static gsi::ClassExt<QStyle> decl_QStyle_PrimitiveElement_Enums_as_child (decl_QStyle_PrimitiveElement_Enums, "QtGui", "QFlags_PrimitiveElement");
+static gsi::ClassExt<QStyle> decl_QStyle_PrimitiveElement_Enum_as_child (decl_QStyle_PrimitiveElement_Enum, "PrimitiveElement");
+static gsi::ClassExt<QStyle> decl_QStyle_PrimitiveElement_Enums_as_child (decl_QStyle_PrimitiveElement_Enums, "QFlags_PrimitiveElement");
 
 }
 
@@ -2903,8 +2903,8 @@ static gsi::QFlagsClass<QStyle::StandardPixmap > decl_QStyle_StandardPixmap_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QStyle> inject_QStyle_StandardPixmap_Enum_in_parent (decl_QStyle_StandardPixmap_Enum.defs ());
-static gsi::ClassExt<QStyle> decl_QStyle_StandardPixmap_Enum_as_child (decl_QStyle_StandardPixmap_Enum, "QtGui", "StandardPixmap");
-static gsi::ClassExt<QStyle> decl_QStyle_StandardPixmap_Enums_as_child (decl_QStyle_StandardPixmap_Enums, "QtGui", "QFlags_StandardPixmap");
+static gsi::ClassExt<QStyle> decl_QStyle_StandardPixmap_Enum_as_child (decl_QStyle_StandardPixmap_Enum, "StandardPixmap");
+static gsi::ClassExt<QStyle> decl_QStyle_StandardPixmap_Enums_as_child (decl_QStyle_StandardPixmap_Enums, "QFlags_StandardPixmap");
 
 }
 
@@ -3021,8 +3021,8 @@ static gsi::QFlagsClass<QStyle::StyleHint > decl_QStyle_StyleHint_Enums ("QtGui"
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QStyle> inject_QStyle_StyleHint_Enum_in_parent (decl_QStyle_StyleHint_Enum.defs ());
-static gsi::ClassExt<QStyle> decl_QStyle_StyleHint_Enum_as_child (decl_QStyle_StyleHint_Enum, "QtGui", "StyleHint");
-static gsi::ClassExt<QStyle> decl_QStyle_StyleHint_Enums_as_child (decl_QStyle_StyleHint_Enums, "QtGui", "QFlags_StyleHint");
+static gsi::ClassExt<QStyle> decl_QStyle_StyleHint_Enum_as_child (decl_QStyle_StyleHint_Enum, "StyleHint");
+static gsi::ClassExt<QStyle> decl_QStyle_StyleHint_Enums_as_child (decl_QStyle_StyleHint_Enums, "QFlags_StyleHint");
 
 }
 
@@ -3085,8 +3085,8 @@ static gsi::QFlagsClass<QStyle::SubControl > decl_QStyle_SubControl_Enums ("QtGu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QStyle> inject_QStyle_SubControl_Enum_in_parent (decl_QStyle_SubControl_Enum.defs ());
-static gsi::ClassExt<QStyle> decl_QStyle_SubControl_Enum_as_child (decl_QStyle_SubControl_Enum, "QtGui", "SubControl");
-static gsi::ClassExt<QStyle> decl_QStyle_SubControl_Enums_as_child (decl_QStyle_SubControl_Enums, "QtGui", "QFlags_SubControl");
+static gsi::ClassExt<QStyle> decl_QStyle_SubControl_Enum_as_child (decl_QStyle_SubControl_Enum, "SubControl");
+static gsi::ClassExt<QStyle> decl_QStyle_SubControl_Enums_as_child (decl_QStyle_SubControl_Enums, "QFlags_SubControl");
 
 }
 
@@ -3169,8 +3169,8 @@ static gsi::QFlagsClass<QStyle::SubElement > decl_QStyle_SubElement_Enums ("QtGu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QStyle> inject_QStyle_SubElement_Enum_in_parent (decl_QStyle_SubElement_Enum.defs ());
-static gsi::ClassExt<QStyle> decl_QStyle_SubElement_Enum_as_child (decl_QStyle_SubElement_Enum, "QtGui", "SubElement");
-static gsi::ClassExt<QStyle> decl_QStyle_SubElement_Enums_as_child (decl_QStyle_SubElement_Enums, "QtGui", "QFlags_SubElement");
+static gsi::ClassExt<QStyle> decl_QStyle_SubElement_Enum_as_child (decl_QStyle_SubElement_Enum, "SubElement");
+static gsi::ClassExt<QStyle> decl_QStyle_SubElement_Enums_as_child (decl_QStyle_SubElement_Enums, "QFlags_SubElement");
 
 }
 

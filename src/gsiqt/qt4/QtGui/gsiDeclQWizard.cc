@@ -3644,8 +3644,8 @@ static gsi::QFlagsClass<QWizard::WizardButton > decl_QWizard_WizardButton_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QWizard> inject_QWizard_WizardButton_Enum_in_parent (decl_QWizard_WizardButton_Enum.defs ());
-static gsi::ClassExt<QWizard> decl_QWizard_WizardButton_Enum_as_child (decl_QWizard_WizardButton_Enum, "QtGui", "WizardButton");
-static gsi::ClassExt<QWizard> decl_QWizard_WizardButton_Enums_as_child (decl_QWizard_WizardButton_Enums, "QtGui", "QFlags_WizardButton");
+static gsi::ClassExt<QWizard> decl_QWizard_WizardButton_Enum_as_child (decl_QWizard_WizardButton_Enum, "WizardButton");
+static gsi::ClassExt<QWizard> decl_QWizard_WizardButton_Enums_as_child (decl_QWizard_WizardButton_Enums, "QFlags_WizardButton");
 
 }
 
@@ -3678,8 +3678,8 @@ static gsi::QFlagsClass<QWizard::WizardOption > decl_QWizard_WizardOption_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QWizard> inject_QWizard_WizardOption_Enum_in_parent (decl_QWizard_WizardOption_Enum.defs ());
-static gsi::ClassExt<QWizard> decl_QWizard_WizardOption_Enum_as_child (decl_QWizard_WizardOption_Enum, "QtGui", "WizardOption");
-static gsi::ClassExt<QWizard> decl_QWizard_WizardOption_Enums_as_child (decl_QWizard_WizardOption_Enums, "QtGui", "QFlags_WizardOption");
+static gsi::ClassExt<QWizard> decl_QWizard_WizardOption_Enum_as_child (decl_QWizard_WizardOption_Enum, "WizardOption");
+static gsi::ClassExt<QWizard> decl_QWizard_WizardOption_Enums_as_child (decl_QWizard_WizardOption_Enums, "QFlags_WizardOption");
 
 }
 
@@ -3701,8 +3701,8 @@ static gsi::QFlagsClass<QWizard::WizardPixmap > decl_QWizard_WizardPixmap_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QWizard> inject_QWizard_WizardPixmap_Enum_in_parent (decl_QWizard_WizardPixmap_Enum.defs ());
-static gsi::ClassExt<QWizard> decl_QWizard_WizardPixmap_Enum_as_child (decl_QWizard_WizardPixmap_Enum, "QtGui", "WizardPixmap");
-static gsi::ClassExt<QWizard> decl_QWizard_WizardPixmap_Enums_as_child (decl_QWizard_WizardPixmap_Enums, "QtGui", "QFlags_WizardPixmap");
+static gsi::ClassExt<QWizard> decl_QWizard_WizardPixmap_Enum_as_child (decl_QWizard_WizardPixmap_Enum, "WizardPixmap");
+static gsi::ClassExt<QWizard> decl_QWizard_WizardPixmap_Enums_as_child (decl_QWizard_WizardPixmap_Enums, "QFlags_WizardPixmap");
 
 }
 
@@ -3724,8 +3724,8 @@ static gsi::QFlagsClass<QWizard::WizardStyle > decl_QWizard_WizardStyle_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QWizard> inject_QWizard_WizardStyle_Enum_in_parent (decl_QWizard_WizardStyle_Enum.defs ());
-static gsi::ClassExt<QWizard> decl_QWizard_WizardStyle_Enum_as_child (decl_QWizard_WizardStyle_Enum, "QtGui", "WizardStyle");
-static gsi::ClassExt<QWizard> decl_QWizard_WizardStyle_Enums_as_child (decl_QWizard_WizardStyle_Enums, "QtGui", "QFlags_WizardStyle");
+static gsi::ClassExt<QWizard> decl_QWizard_WizardStyle_Enum_as_child (decl_QWizard_WizardStyle_Enum, "WizardStyle");
+static gsi::ClassExt<QWizard> decl_QWizard_WizardStyle_Enums_as_child (decl_QWizard_WizardStyle_Enums, "QFlags_WizardStyle");
 
 }
 

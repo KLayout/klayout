@@ -185,8 +185,8 @@ static gsi::QFlagsClass<QTextItem::RenderFlag > decl_QTextItem_RenderFlag_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextItem> inject_QTextItem_RenderFlag_Enum_in_parent (decl_QTextItem_RenderFlag_Enum.defs ());
-static gsi::ClassExt<QTextItem> decl_QTextItem_RenderFlag_Enum_as_child (decl_QTextItem_RenderFlag_Enum, "QtGui", "RenderFlag");
-static gsi::ClassExt<QTextItem> decl_QTextItem_RenderFlag_Enums_as_child (decl_QTextItem_RenderFlag_Enums, "QtGui", "QFlags_RenderFlag");
+static gsi::ClassExt<QTextItem> decl_QTextItem_RenderFlag_Enum_as_child (decl_QTextItem_RenderFlag_Enum, "RenderFlag");
+static gsi::ClassExt<QTextItem> decl_QTextItem_RenderFlag_Enums_as_child (decl_QTextItem_RenderFlag_Enums, "QFlags_RenderFlag");
 
 }
 

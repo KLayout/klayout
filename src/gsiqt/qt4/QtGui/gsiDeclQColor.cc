@@ -2070,8 +2070,8 @@ static gsi::QFlagsClass<QColor::Spec > decl_QColor_Spec_Enums ("QtGui", "QColor_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QColor> inject_QColor_Spec_Enum_in_parent (decl_QColor_Spec_Enum.defs ());
-static gsi::ClassExt<QColor> decl_QColor_Spec_Enum_as_child (decl_QColor_Spec_Enum, "QtGui", "Spec");
-static gsi::ClassExt<QColor> decl_QColor_Spec_Enums_as_child (decl_QColor_Spec_Enums, "QtGui", "QFlags_Spec");
+static gsi::ClassExt<QColor> decl_QColor_Spec_Enum_as_child (decl_QColor_Spec_Enum, "Spec");
+static gsi::ClassExt<QColor> decl_QColor_Spec_Enums_as_child (decl_QColor_Spec_Enums, "QFlags_Spec");
 
 }
 

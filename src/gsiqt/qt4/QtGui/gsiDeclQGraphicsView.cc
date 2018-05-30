@@ -4451,8 +4451,8 @@ static gsi::QFlagsClass<QGraphicsView::CacheModeFlag > decl_QGraphicsView_CacheM
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsView> inject_QGraphicsView_CacheModeFlag_Enum_in_parent (decl_QGraphicsView_CacheModeFlag_Enum.defs ());
-static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_CacheModeFlag_Enum_as_child (decl_QGraphicsView_CacheModeFlag_Enum, "QtGui", "CacheModeFlag");
-static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_CacheModeFlag_Enums_as_child (decl_QGraphicsView_CacheModeFlag_Enums, "QtGui", "QFlags_CacheModeFlag");
+static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_CacheModeFlag_Enum_as_child (decl_QGraphicsView_CacheModeFlag_Enum, "CacheModeFlag");
+static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_CacheModeFlag_Enums_as_child (decl_QGraphicsView_CacheModeFlag_Enums, "QFlags_CacheModeFlag");
 
 }
 
@@ -4472,8 +4472,8 @@ static gsi::QFlagsClass<QGraphicsView::DragMode > decl_QGraphicsView_DragMode_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsView> inject_QGraphicsView_DragMode_Enum_in_parent (decl_QGraphicsView_DragMode_Enum.defs ());
-static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_DragMode_Enum_as_child (decl_QGraphicsView_DragMode_Enum, "QtGui", "DragMode");
-static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_DragMode_Enums_as_child (decl_QGraphicsView_DragMode_Enums, "QtGui", "QFlags_DragMode");
+static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_DragMode_Enum_as_child (decl_QGraphicsView_DragMode_Enum, "DragMode");
+static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_DragMode_Enums_as_child (decl_QGraphicsView_DragMode_Enums, "QFlags_DragMode");
 
 }
 
@@ -4494,8 +4494,8 @@ static gsi::QFlagsClass<QGraphicsView::OptimizationFlag > decl_QGraphicsView_Opt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsView> inject_QGraphicsView_OptimizationFlag_Enum_in_parent (decl_QGraphicsView_OptimizationFlag_Enum.defs ());
-static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_OptimizationFlag_Enum_as_child (decl_QGraphicsView_OptimizationFlag_Enum, "QtGui", "OptimizationFlag");
-static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_OptimizationFlag_Enums_as_child (decl_QGraphicsView_OptimizationFlag_Enums, "QtGui", "QFlags_OptimizationFlag");
+static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_OptimizationFlag_Enum_as_child (decl_QGraphicsView_OptimizationFlag_Enum, "OptimizationFlag");
+static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_OptimizationFlag_Enums_as_child (decl_QGraphicsView_OptimizationFlag_Enums, "QFlags_OptimizationFlag");
 
 }
 
@@ -4515,8 +4515,8 @@ static gsi::QFlagsClass<QGraphicsView::ViewportAnchor > decl_QGraphicsView_Viewp
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsView> inject_QGraphicsView_ViewportAnchor_Enum_in_parent (decl_QGraphicsView_ViewportAnchor_Enum.defs ());
-static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_ViewportAnchor_Enum_as_child (decl_QGraphicsView_ViewportAnchor_Enum, "QtGui", "ViewportAnchor");
-static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_ViewportAnchor_Enums_as_child (decl_QGraphicsView_ViewportAnchor_Enums, "QtGui", "QFlags_ViewportAnchor");
+static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_ViewportAnchor_Enum_as_child (decl_QGraphicsView_ViewportAnchor_Enum, "ViewportAnchor");
+static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_ViewportAnchor_Enums_as_child (decl_QGraphicsView_ViewportAnchor_Enums, "QFlags_ViewportAnchor");
 
 }
 
@@ -4538,8 +4538,8 @@ static gsi::QFlagsClass<QGraphicsView::ViewportUpdateMode > decl_QGraphicsView_V
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsView> inject_QGraphicsView_ViewportUpdateMode_Enum_in_parent (decl_QGraphicsView_ViewportUpdateMode_Enum.defs ());
-static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_ViewportUpdateMode_Enum_as_child (decl_QGraphicsView_ViewportUpdateMode_Enum, "QtGui", "ViewportUpdateMode");
-static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_ViewportUpdateMode_Enums_as_child (decl_QGraphicsView_ViewportUpdateMode_Enums, "QtGui", "QFlags_ViewportUpdateMode");
+static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_ViewportUpdateMode_Enum_as_child (decl_QGraphicsView_ViewportUpdateMode_Enum, "ViewportUpdateMode");
+static gsi::ClassExt<QGraphicsView> decl_QGraphicsView_ViewportUpdateMode_Enums_as_child (decl_QGraphicsView_ViewportUpdateMode_Enums, "QFlags_ViewportUpdateMode");
 
 }
 

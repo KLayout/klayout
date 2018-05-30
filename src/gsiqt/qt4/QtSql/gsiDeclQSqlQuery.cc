@@ -846,8 +846,8 @@ static gsi::QFlagsClass<QSqlQuery::BatchExecutionMode > decl_QSqlQuery_BatchExec
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSqlQuery> inject_QSqlQuery_BatchExecutionMode_Enum_in_parent (decl_QSqlQuery_BatchExecutionMode_Enum.defs ());
-static gsi::ClassExt<QSqlQuery> decl_QSqlQuery_BatchExecutionMode_Enum_as_child (decl_QSqlQuery_BatchExecutionMode_Enum, "QtSql", "BatchExecutionMode");
-static gsi::ClassExt<QSqlQuery> decl_QSqlQuery_BatchExecutionMode_Enums_as_child (decl_QSqlQuery_BatchExecutionMode_Enums, "QtSql", "QFlags_BatchExecutionMode");
+static gsi::ClassExt<QSqlQuery> decl_QSqlQuery_BatchExecutionMode_Enum_as_child (decl_QSqlQuery_BatchExecutionMode_Enum, "BatchExecutionMode");
+static gsi::ClassExt<QSqlQuery> decl_QSqlQuery_BatchExecutionMode_Enums_as_child (decl_QSqlQuery_BatchExecutionMode_Enums, "QFlags_BatchExecutionMode");
 
 }
 

@@ -1957,8 +1957,8 @@ static gsi::QFlagsClass<QSqlDriver::DriverFeature > decl_QSqlDriver_DriverFeatur
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSqlDriver> inject_QSqlDriver_DriverFeature_Enum_in_parent (decl_QSqlDriver_DriverFeature_Enum.defs ());
-static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_DriverFeature_Enum_as_child (decl_QSqlDriver_DriverFeature_Enum, "QtSql", "DriverFeature");
-static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_DriverFeature_Enums_as_child (decl_QSqlDriver_DriverFeature_Enums, "QtSql", "QFlags_DriverFeature");
+static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_DriverFeature_Enum_as_child (decl_QSqlDriver_DriverFeature_Enum, "DriverFeature");
+static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_DriverFeature_Enums_as_child (decl_QSqlDriver_DriverFeature_Enums, "QFlags_DriverFeature");
 
 }
 
@@ -1977,8 +1977,8 @@ static gsi::QFlagsClass<QSqlDriver::IdentifierType > decl_QSqlDriver_IdentifierT
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSqlDriver> inject_QSqlDriver_IdentifierType_Enum_in_parent (decl_QSqlDriver_IdentifierType_Enum.defs ());
-static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_IdentifierType_Enum_as_child (decl_QSqlDriver_IdentifierType_Enum, "QtSql", "IdentifierType");
-static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_IdentifierType_Enums_as_child (decl_QSqlDriver_IdentifierType_Enums, "QtSql", "QFlags_IdentifierType");
+static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_IdentifierType_Enum_as_child (decl_QSqlDriver_IdentifierType_Enum, "IdentifierType");
+static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_IdentifierType_Enums_as_child (decl_QSqlDriver_IdentifierType_Enums, "QFlags_IdentifierType");
 
 }
 
@@ -2000,8 +2000,8 @@ static gsi::QFlagsClass<QSqlDriver::StatementType > decl_QSqlDriver_StatementTyp
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSqlDriver> inject_QSqlDriver_StatementType_Enum_in_parent (decl_QSqlDriver_StatementType_Enum.defs ());
-static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_StatementType_Enum_as_child (decl_QSqlDriver_StatementType_Enum, "QtSql", "StatementType");
-static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_StatementType_Enums_as_child (decl_QSqlDriver_StatementType_Enums, "QtSql", "QFlags_StatementType");
+static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_StatementType_Enum_as_child (decl_QSqlDriver_StatementType_Enum, "StatementType");
+static gsi::ClassExt<QSqlDriver> decl_QSqlDriver_StatementType_Enums_as_child (decl_QSqlDriver_StatementType_Enums, "QFlags_StatementType");
 
 }
 

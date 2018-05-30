@@ -464,8 +464,8 @@ static gsi::QFlagsClass<QNetworkRequest::Attribute > decl_QNetworkRequest_Attrib
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QNetworkRequest> inject_QNetworkRequest_Attribute_Enum_in_parent (decl_QNetworkRequest_Attribute_Enum.defs ());
-static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_Attribute_Enum_as_child (decl_QNetworkRequest_Attribute_Enum, "QtNetwork", "Attribute");
-static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_Attribute_Enums_as_child (decl_QNetworkRequest_Attribute_Enums, "QtNetwork", "QFlags_Attribute");
+static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_Attribute_Enum_as_child (decl_QNetworkRequest_Attribute_Enum, "Attribute");
+static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_Attribute_Enums_as_child (decl_QNetworkRequest_Attribute_Enums, "QFlags_Attribute");
 
 }
 
@@ -488,8 +488,8 @@ static gsi::QFlagsClass<QNetworkRequest::KnownHeaders > decl_QNetworkRequest_Kno
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QNetworkRequest> inject_QNetworkRequest_KnownHeaders_Enum_in_parent (decl_QNetworkRequest_KnownHeaders_Enum.defs ());
-static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_KnownHeaders_Enum_as_child (decl_QNetworkRequest_KnownHeaders_Enum, "QtNetwork", "KnownHeaders");
-static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_KnownHeaders_Enums_as_child (decl_QNetworkRequest_KnownHeaders_Enums, "QtNetwork", "QFlags_KnownHeaders");
+static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_KnownHeaders_Enum_as_child (decl_QNetworkRequest_KnownHeaders_Enum, "KnownHeaders");
+static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_KnownHeaders_Enums_as_child (decl_QNetworkRequest_KnownHeaders_Enums, "QFlags_KnownHeaders");
 
 }
 

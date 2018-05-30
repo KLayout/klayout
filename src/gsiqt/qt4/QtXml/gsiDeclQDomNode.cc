@@ -1280,8 +1280,8 @@ static gsi::QFlagsClass<QDomNode::EncodingPolicy > decl_QDomNode_EncodingPolicy_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDomNode> inject_QDomNode_EncodingPolicy_Enum_in_parent (decl_QDomNode_EncodingPolicy_Enum.defs ());
-static gsi::ClassExt<QDomNode> decl_QDomNode_EncodingPolicy_Enum_as_child (decl_QDomNode_EncodingPolicy_Enum, "QtXml", "EncodingPolicy");
-static gsi::ClassExt<QDomNode> decl_QDomNode_EncodingPolicy_Enums_as_child (decl_QDomNode_EncodingPolicy_Enums, "QtXml", "QFlags_EncodingPolicy");
+static gsi::ClassExt<QDomNode> decl_QDomNode_EncodingPolicy_Enum_as_child (decl_QDomNode_EncodingPolicy_Enum, "EncodingPolicy");
+static gsi::ClassExt<QDomNode> decl_QDomNode_EncodingPolicy_Enums_as_child (decl_QDomNode_EncodingPolicy_Enums, "QFlags_EncodingPolicy");
 
 }
 
@@ -1312,8 +1312,8 @@ static gsi::QFlagsClass<QDomNode::NodeType > decl_QDomNode_NodeType_Enums ("QtXm
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDomNode> inject_QDomNode_NodeType_Enum_in_parent (decl_QDomNode_NodeType_Enum.defs ());
-static gsi::ClassExt<QDomNode> decl_QDomNode_NodeType_Enum_as_child (decl_QDomNode_NodeType_Enum, "QtXml", "NodeType");
-static gsi::ClassExt<QDomNode> decl_QDomNode_NodeType_Enums_as_child (decl_QDomNode_NodeType_Enums, "QtXml", "QFlags_NodeType");
+static gsi::ClassExt<QDomNode> decl_QDomNode_NodeType_Enum_as_child (decl_QDomNode_NodeType_Enum, "NodeType");
+static gsi::ClassExt<QDomNode> decl_QDomNode_NodeType_Enums_as_child (decl_QDomNode_NodeType_Enums, "QFlags_NodeType");
 
 }
 

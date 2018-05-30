@@ -977,8 +977,8 @@ static gsi::QFlagsClass<QLibrary::LoadHint > decl_QLibrary_LoadHint_Enums ("QtCo
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLibrary> inject_QLibrary_LoadHint_Enum_in_parent (decl_QLibrary_LoadHint_Enum.defs ());
-static gsi::ClassExt<QLibrary> decl_QLibrary_LoadHint_Enum_as_child (decl_QLibrary_LoadHint_Enum, "QtCore", "LoadHint");
-static gsi::ClassExt<QLibrary> decl_QLibrary_LoadHint_Enums_as_child (decl_QLibrary_LoadHint_Enums, "QtCore", "QFlags_LoadHint");
+static gsi::ClassExt<QLibrary> decl_QLibrary_LoadHint_Enum_as_child (decl_QLibrary_LoadHint_Enum, "LoadHint");
+static gsi::ClassExt<QLibrary> decl_QLibrary_LoadHint_Enums_as_child (decl_QLibrary_LoadHint_Enums, "QFlags_LoadHint");
 
 }
 

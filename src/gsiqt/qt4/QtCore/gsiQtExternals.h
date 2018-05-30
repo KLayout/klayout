@@ -30,7 +30,7 @@
 #if !defined(HDR_gsiQtCoreExternals)
 #define HDR_gsiQtCoreExternals
 
-#include "gsiClassBase.h"
+#include "gsiClass.h"
 #include "gsiQtCoreCommon.h"
 
 class QAbstractItemModel;

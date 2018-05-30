@@ -2881,8 +2881,8 @@ static gsi::QFlagsClass<QFontComboBox::FontFilter > decl_QFontComboBox_FontFilte
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFontComboBox> inject_QFontComboBox_FontFilter_Enum_in_parent (decl_QFontComboBox_FontFilter_Enum.defs ());
-static gsi::ClassExt<QFontComboBox> decl_QFontComboBox_FontFilter_Enum_as_child (decl_QFontComboBox_FontFilter_Enum, "QtGui", "FontFilter");
-static gsi::ClassExt<QFontComboBox> decl_QFontComboBox_FontFilter_Enums_as_child (decl_QFontComboBox_FontFilter_Enums, "QtGui", "QFlags_FontFilter");
+static gsi::ClassExt<QFontComboBox> decl_QFontComboBox_FontFilter_Enum_as_child (decl_QFontComboBox_FontFilter_Enum, "FontFilter");
+static gsi::ClassExt<QFontComboBox> decl_QFontComboBox_FontFilter_Enums_as_child (decl_QFontComboBox_FontFilter_Enums, "QFlags_FontFilter");
 
 }
 

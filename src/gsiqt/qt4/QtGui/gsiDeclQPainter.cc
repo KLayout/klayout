@@ -4576,8 +4576,8 @@ static gsi::QFlagsClass<QPainter::CompositionMode > decl_QPainter_CompositionMod
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPainter> inject_QPainter_CompositionMode_Enum_in_parent (decl_QPainter_CompositionMode_Enum.defs ());
-static gsi::ClassExt<QPainter> decl_QPainter_CompositionMode_Enum_as_child (decl_QPainter_CompositionMode_Enum, "QtGui", "CompositionMode");
-static gsi::ClassExt<QPainter> decl_QPainter_CompositionMode_Enums_as_child (decl_QPainter_CompositionMode_Enums, "QtGui", "QFlags_CompositionMode");
+static gsi::ClassExt<QPainter> decl_QPainter_CompositionMode_Enum_as_child (decl_QPainter_CompositionMode_Enum, "CompositionMode");
+static gsi::ClassExt<QPainter> decl_QPainter_CompositionMode_Enums_as_child (decl_QPainter_CompositionMode_Enums, "QFlags_CompositionMode");
 
 }
 
@@ -4599,8 +4599,8 @@ static gsi::QFlagsClass<QPainter::RenderHint > decl_QPainter_RenderHint_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPainter> inject_QPainter_RenderHint_Enum_in_parent (decl_QPainter_RenderHint_Enum.defs ());
-static gsi::ClassExt<QPainter> decl_QPainter_RenderHint_Enum_as_child (decl_QPainter_RenderHint_Enum, "QtGui", "RenderHint");
-static gsi::ClassExt<QPainter> decl_QPainter_RenderHint_Enums_as_child (decl_QPainter_RenderHint_Enums, "QtGui", "QFlags_RenderHint");
+static gsi::ClassExt<QPainter> decl_QPainter_RenderHint_Enum_as_child (decl_QPainter_RenderHint_Enum, "RenderHint");
+static gsi::ClassExt<QPainter> decl_QPainter_RenderHint_Enums_as_child (decl_QPainter_RenderHint_Enums, "QFlags_RenderHint");
 
 }
 

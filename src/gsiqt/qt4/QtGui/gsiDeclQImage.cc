@@ -2054,8 +2054,8 @@ static gsi::QFlagsClass<QImage::Format > decl_QImage_Format_Enums ("QtGui", "QIm
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QImage> inject_QImage_Format_Enum_in_parent (decl_QImage_Format_Enum.defs ());
-static gsi::ClassExt<QImage> decl_QImage_Format_Enum_as_child (decl_QImage_Format_Enum, "QtGui", "Format");
-static gsi::ClassExt<QImage> decl_QImage_Format_Enums_as_child (decl_QImage_Format_Enums, "QtGui", "QFlags_Format");
+static gsi::ClassExt<QImage> decl_QImage_Format_Enum_as_child (decl_QImage_Format_Enum, "Format");
+static gsi::ClassExt<QImage> decl_QImage_Format_Enums_as_child (decl_QImage_Format_Enums, "QFlags_Format");
 
 }
 
@@ -2074,8 +2074,8 @@ static gsi::QFlagsClass<QImage::InvertMode > decl_QImage_InvertMode_Enums ("QtGu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QImage> inject_QImage_InvertMode_Enum_in_parent (decl_QImage_InvertMode_Enum.defs ());
-static gsi::ClassExt<QImage> decl_QImage_InvertMode_Enum_as_child (decl_QImage_InvertMode_Enum, "QtGui", "InvertMode");
-static gsi::ClassExt<QImage> decl_QImage_InvertMode_Enums_as_child (decl_QImage_InvertMode_Enums, "QtGui", "QFlags_InvertMode");
+static gsi::ClassExt<QImage> decl_QImage_InvertMode_Enum_as_child (decl_QImage_InvertMode_Enum, "InvertMode");
+static gsi::ClassExt<QImage> decl_QImage_InvertMode_Enums_as_child (decl_QImage_InvertMode_Enums, "QFlags_InvertMode");
 
 }
 

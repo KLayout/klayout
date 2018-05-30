@@ -821,9 +821,10 @@ class ExternalClass
   : public gsi::ClassBase
 {
 public:
-  ExternalClass (const std::string &name, const std::string &category, const gsi::ClassBase *base, const std::string &doc, const gsi::Methods &mm)
+  ExternalClass (const std::string &module, const std::string &name, const std::string &category, const gsi::ClassBase *base, const std::string &doc, const gsi::Methods &mm)
     : gsi::ClassBase (doc, mm), m_category (category)
   {
+    set_module (module);
     set_name (name);
     set_base (base);
   }
@@ -855,6 +856,12 @@ void Macro::install_doc () const
       bool st = false;
       tl::Extractor ex (lines [i].c_str ());
       if (ex.test ("@class")) {
+
+        std::string module;
+        if (ex.test ("[")) {
+          ex.read_word_or_quoted (module);
+          ex.test ("]");
+        }
 
         std::string cls_name, super_cls_name;
         ex.read_word_or_quoted (cls_name);
@@ -906,7 +913,7 @@ void Macro::install_doc () const
         if (! cls) {
           //  create a new class declaration
           static tl::stable_vector<ExternalClass> ext_classes;
-          ExternalClass *ext_cls = new ExternalClass (cls_name, category (), super_cls, doc, gsi::Methods ()); 
+          ExternalClass *ext_cls = new ExternalClass (module, cls_name, category (), super_cls, doc, gsi::Methods ());
           ext_classes.push_back (ext_cls);
           cls = ext_cls;
         }

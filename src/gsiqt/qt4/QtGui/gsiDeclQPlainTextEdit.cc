@@ -4269,8 +4269,8 @@ static gsi::QFlagsClass<QPlainTextEdit::LineWrapMode > decl_QPlainTextEdit_LineW
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPlainTextEdit> inject_QPlainTextEdit_LineWrapMode_Enum_in_parent (decl_QPlainTextEdit_LineWrapMode_Enum.defs ());
-static gsi::ClassExt<QPlainTextEdit> decl_QPlainTextEdit_LineWrapMode_Enum_as_child (decl_QPlainTextEdit_LineWrapMode_Enum, "QtGui", "LineWrapMode");
-static gsi::ClassExt<QPlainTextEdit> decl_QPlainTextEdit_LineWrapMode_Enums_as_child (decl_QPlainTextEdit_LineWrapMode_Enums, "QtGui", "QFlags_LineWrapMode");
+static gsi::ClassExt<QPlainTextEdit> decl_QPlainTextEdit_LineWrapMode_Enum_as_child (decl_QPlainTextEdit_LineWrapMode_Enum, "LineWrapMode");
+static gsi::ClassExt<QPlainTextEdit> decl_QPlainTextEdit_LineWrapMode_Enums_as_child (decl_QPlainTextEdit_LineWrapMode_Enums, "QFlags_LineWrapMode");
 
 }
 

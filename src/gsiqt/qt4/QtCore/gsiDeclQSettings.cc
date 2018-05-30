@@ -1320,8 +1320,8 @@ static gsi::QFlagsClass<QSettings::Format > decl_QSettings_Format_Enums ("QtCore
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSettings> inject_QSettings_Format_Enum_in_parent (decl_QSettings_Format_Enum.defs ());
-static gsi::ClassExt<QSettings> decl_QSettings_Format_Enum_as_child (decl_QSettings_Format_Enum, "QtCore", "Format");
-static gsi::ClassExt<QSettings> decl_QSettings_Format_Enums_as_child (decl_QSettings_Format_Enums, "QtCore", "QFlags_Format");
+static gsi::ClassExt<QSettings> decl_QSettings_Format_Enum_as_child (decl_QSettings_Format_Enum, "Format");
+static gsi::ClassExt<QSettings> decl_QSettings_Format_Enums_as_child (decl_QSettings_Format_Enums, "QFlags_Format");
 
 }
 
@@ -1340,8 +1340,8 @@ static gsi::QFlagsClass<QSettings::Scope > decl_QSettings_Scope_Enums ("QtCore",
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSettings> inject_QSettings_Scope_Enum_in_parent (decl_QSettings_Scope_Enum.defs ());
-static gsi::ClassExt<QSettings> decl_QSettings_Scope_Enum_as_child (decl_QSettings_Scope_Enum, "QtCore", "Scope");
-static gsi::ClassExt<QSettings> decl_QSettings_Scope_Enums_as_child (decl_QSettings_Scope_Enums, "QtCore", "QFlags_Scope");
+static gsi::ClassExt<QSettings> decl_QSettings_Scope_Enum_as_child (decl_QSettings_Scope_Enum, "Scope");
+static gsi::ClassExt<QSettings> decl_QSettings_Scope_Enums_as_child (decl_QSettings_Scope_Enums, "QFlags_Scope");
 
 }
 
@@ -1361,8 +1361,8 @@ static gsi::QFlagsClass<QSettings::Status > decl_QSettings_Status_Enums ("QtCore
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSettings> inject_QSettings_Status_Enum_in_parent (decl_QSettings_Status_Enum.defs ());
-static gsi::ClassExt<QSettings> decl_QSettings_Status_Enum_as_child (decl_QSettings_Status_Enum, "QtCore", "Status");
-static gsi::ClassExt<QSettings> decl_QSettings_Status_Enums_as_child (decl_QSettings_Status_Enums, "QtCore", "QFlags_Status");
+static gsi::ClassExt<QSettings> decl_QSettings_Status_Enum_as_child (decl_QSettings_Status_Enum, "Status");
+static gsi::ClassExt<QSettings> decl_QSettings_Status_Enums_as_child (decl_QSettings_Status_Enums, "QFlags_Status");
 
 }
 

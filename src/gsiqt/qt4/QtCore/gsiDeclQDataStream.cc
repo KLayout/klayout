@@ -737,8 +737,8 @@ static gsi::QFlagsClass<QDataStream::ByteOrder > decl_QDataStream_ByteOrder_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDataStream> inject_QDataStream_ByteOrder_Enum_in_parent (decl_QDataStream_ByteOrder_Enum.defs ());
-static gsi::ClassExt<QDataStream> decl_QDataStream_ByteOrder_Enum_as_child (decl_QDataStream_ByteOrder_Enum, "QtCore", "ByteOrder");
-static gsi::ClassExt<QDataStream> decl_QDataStream_ByteOrder_Enums_as_child (decl_QDataStream_ByteOrder_Enums, "QtCore", "QFlags_ByteOrder");
+static gsi::ClassExt<QDataStream> decl_QDataStream_ByteOrder_Enum_as_child (decl_QDataStream_ByteOrder_Enum, "ByteOrder");
+static gsi::ClassExt<QDataStream> decl_QDataStream_ByteOrder_Enums_as_child (decl_QDataStream_ByteOrder_Enums, "QFlags_ByteOrder");
 
 }
 
@@ -757,8 +757,8 @@ static gsi::QFlagsClass<QDataStream::FloatingPointPrecision > decl_QDataStream_F
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDataStream> inject_QDataStream_FloatingPointPrecision_Enum_in_parent (decl_QDataStream_FloatingPointPrecision_Enum.defs ());
-static gsi::ClassExt<QDataStream> decl_QDataStream_FloatingPointPrecision_Enum_as_child (decl_QDataStream_FloatingPointPrecision_Enum, "QtCore", "FloatingPointPrecision");
-static gsi::ClassExt<QDataStream> decl_QDataStream_FloatingPointPrecision_Enums_as_child (decl_QDataStream_FloatingPointPrecision_Enums, "QtCore", "QFlags_FloatingPointPrecision");
+static gsi::ClassExt<QDataStream> decl_QDataStream_FloatingPointPrecision_Enum_as_child (decl_QDataStream_FloatingPointPrecision_Enum, "FloatingPointPrecision");
+static gsi::ClassExt<QDataStream> decl_QDataStream_FloatingPointPrecision_Enums_as_child (decl_QDataStream_FloatingPointPrecision_Enums, "QFlags_FloatingPointPrecision");
 
 }
 
@@ -778,8 +778,8 @@ static gsi::QFlagsClass<QDataStream::Status > decl_QDataStream_Status_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDataStream> inject_QDataStream_Status_Enum_in_parent (decl_QDataStream_Status_Enum.defs ());
-static gsi::ClassExt<QDataStream> decl_QDataStream_Status_Enum_as_child (decl_QDataStream_Status_Enum, "QtCore", "Status");
-static gsi::ClassExt<QDataStream> decl_QDataStream_Status_Enums_as_child (decl_QDataStream_Status_Enums, "QtCore", "QFlags_Status");
+static gsi::ClassExt<QDataStream> decl_QDataStream_Status_Enum_as_child (decl_QDataStream_Status_Enum, "Status");
+static gsi::ClassExt<QDataStream> decl_QDataStream_Status_Enums_as_child (decl_QDataStream_Status_Enums, "QFlags_Status");
 
 }
 

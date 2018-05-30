@@ -3093,8 +3093,8 @@ static gsi::QFlagsClass<QColorDialog::ColorDialogOption > decl_QColorDialog_Colo
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QColorDialog> inject_QColorDialog_ColorDialogOption_Enum_in_parent (decl_QColorDialog_ColorDialogOption_Enum.defs ());
-static gsi::ClassExt<QColorDialog> decl_QColorDialog_ColorDialogOption_Enum_as_child (decl_QColorDialog_ColorDialogOption_Enum, "QtGui", "ColorDialogOption");
-static gsi::ClassExt<QColorDialog> decl_QColorDialog_ColorDialogOption_Enums_as_child (decl_QColorDialog_ColorDialogOption_Enums, "QtGui", "QFlags_ColorDialogOption");
+static gsi::ClassExt<QColorDialog> decl_QColorDialog_ColorDialogOption_Enum_as_child (decl_QColorDialog_ColorDialogOption_Enum, "ColorDialogOption");
+static gsi::ClassExt<QColorDialog> decl_QColorDialog_ColorDialogOption_Enums_as_child (decl_QColorDialog_ColorDialogOption_Enums, "QFlags_ColorDialogOption");
 
 }
 

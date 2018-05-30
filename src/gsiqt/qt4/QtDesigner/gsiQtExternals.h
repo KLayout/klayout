@@ -30,7 +30,7 @@
 #if !defined(HDR_gsiQtDesignerExternals)
 #define HDR_gsiQtDesignerExternals
 
-#include "gsiClassBase.h"
+#include "gsiClass.h"
 #include "gsiQtDesignerCommon.h"
 
 class QAbstractFormBuilder;

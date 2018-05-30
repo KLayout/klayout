@@ -201,8 +201,8 @@ static gsi::QFlagsClass<QTextLength::Type > decl_QTextLength_Type_Enums ("QtGui"
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextLength> inject_QTextLength_Type_Enum_in_parent (decl_QTextLength_Type_Enum.defs ());
-static gsi::ClassExt<QTextLength> decl_QTextLength_Type_Enum_as_child (decl_QTextLength_Type_Enum, "QtGui", "Type");
-static gsi::ClassExt<QTextLength> decl_QTextLength_Type_Enums_as_child (decl_QTextLength_Type_Enums, "QtGui", "QFlags_Type");
+static gsi::ClassExt<QTextLength> decl_QTextLength_Type_Enum_as_child (decl_QTextLength_Type_Enum, "Type");
+static gsi::ClassExt<QTextLength> decl_QTextLength_Type_Enums_as_child (decl_QTextLength_Type_Enums, "QFlags_Type");
 
 }
 

@@ -1260,8 +1260,8 @@ static gsi::QFlagsClass<QInputContext::StandardFormat > decl_QInputContext_Stand
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QInputContext> inject_QInputContext_StandardFormat_Enum_in_parent (decl_QInputContext_StandardFormat_Enum.defs ());
-static gsi::ClassExt<QInputContext> decl_QInputContext_StandardFormat_Enum_as_child (decl_QInputContext_StandardFormat_Enum, "QtGui", "StandardFormat");
-static gsi::ClassExt<QInputContext> decl_QInputContext_StandardFormat_Enums_as_child (decl_QInputContext_StandardFormat_Enums, "QtGui", "QFlags_StandardFormat");
+static gsi::ClassExt<QInputContext> decl_QInputContext_StandardFormat_Enum_as_child (decl_QInputContext_StandardFormat_Enum, "StandardFormat");
+static gsi::ClassExt<QInputContext> decl_QInputContext_StandardFormat_Enums_as_child (decl_QInputContext_StandardFormat_Enums, "QFlags_StandardFormat");
 
 }
 

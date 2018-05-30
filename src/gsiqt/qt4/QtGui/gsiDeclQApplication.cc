@@ -2118,8 +2118,8 @@ static gsi::QFlagsClass<QApplication::Type > decl_QApplication_Type_Enums ("QtGu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QApplication> inject_QApplication_Type_Enum_in_parent (decl_QApplication_Type_Enum.defs ());
-static gsi::ClassExt<QApplication> decl_QApplication_Type_Enum_as_child (decl_QApplication_Type_Enum, "QtGui", "Type");
-static gsi::ClassExt<QApplication> decl_QApplication_Type_Enums_as_child (decl_QApplication_Type_Enums, "QtGui", "QFlags_Type");
+static gsi::ClassExt<QApplication> decl_QApplication_Type_Enum_as_child (decl_QApplication_Type_Enum, "Type");
+static gsi::ClassExt<QApplication> decl_QApplication_Type_Enums_as_child (decl_QApplication_Type_Enums, "QFlags_Type");
 
 }
 

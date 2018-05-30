@@ -46,11 +46,11 @@ namespace gsi_qt
 class QVariant_Namespace { };
 
 //  A dummy namespace "QVariant"
-gsi::Class<QVariant_Namespace> decl_QVariant_Namespace ("Qt", "QVariant",
+gsi::Class<QVariant_Namespace> decl_QVariant_Namespace ("QtCore", "QVariant",
   gsi::Methods(),
   "@qt\n@brief This class represents the QVariant namespace");
 
-static gsi::Enum<QVariant::Type> decl_QVariant_Type_Enum ("Qt", "QVariant_Type",
+static gsi::Enum<QVariant::Type> decl_QVariant_Type_Enum ("QtCore", "QVariant_Type",
     gsi::enum_const ("Invalid", QVariant::Invalid, "@brief Enum constant QVariant::Invalid") +
     gsi::enum_const ("Bool", QVariant::Bool, "@brief Enum constant QVariant::Bool") +
     gsi::enum_const ("Int", QVariant::Int, "@brief Enum constant QVariant::Int") +
@@ -109,18 +109,18 @@ static gsi::Enum<QVariant::Type> decl_QVariant_Type_Enum ("Qt", "QVariant_Type",
     gsi::enum_const ("LastType", QVariant::LastType, "@brief Enum constant QVariant::LastType"),
   "@qt\n@brief This class represents the QVariant::Type enum");
 
-static gsi::QFlagsClass<QVariant::Type> decl_QVariant_Type_Enums ("QVariant_QFlags_Type",
+static gsi::QFlagsClass<QVariant::Type> decl_QVariant_Type_Enums ("QtCore", "QVariant_QFlags_Type",
   "@qt\n@brief This class represents the QFlags<QVariant::Type> flag set");
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QVariant_Namespace> inject_QVariant_Type_Enum_in_parent (decl_QVariant_Type_Enum.defs ());
-static gsi::ClassExt<QVariant_Namespace> decl_QVariant_Type_Enum_as_child (decl_QVariant_Type_Enum, "Qt", "Type");
-static gsi::ClassExt<QVariant_Namespace> decl_QVariant_Type_Enums_as_child (decl_QVariant_Type_Enums, "Qt", "QFlags_Type");
+static gsi::ClassExt<QVariant_Namespace> decl_QVariant_Type_Enum_as_child (decl_QVariant_Type_Enum, "Type");
+static gsi::ClassExt<QVariant_Namespace> decl_QVariant_Type_Enums_as_child (decl_QVariant_Type_Enums, "QFlags_Type");
 
 // ------------------------------------------------------------
 //  Declarations for QPair<QString, QString>
 
-gsi::Class<QPair<QString, QString> > decl_QString_QPair ("Qt", "QPair_QString_QString",
+gsi::Class<QPair<QString, QString> > decl_QString_QPair ("QtCore", "QPair_QString_QString",
   qt_gsi::pair_decl<QString, QString>::methods (),
   "@qt\\n@brief Represents a QPair<QString, QString>"
 );
@@ -128,7 +128,7 @@ gsi::Class<QPair<QString, QString> > decl_QString_QPair ("Qt", "QPair_QString_QS
 // ------------------------------------------------------------
 //  Declarations for QPair<QByteArray, QByteArray>
 
-gsi::Class<QPair<QByteArray, QByteArray> > decl_QByteArray_QPair ("Qt", "QPair_QByteArray_QByteArray",
+gsi::Class<QPair<QByteArray, QByteArray> > decl_QByteArray_QPair ("QtCore", "QPair_QByteArray_QByteArray",
   qt_gsi::pair_decl<QByteArray, QByteArray>::methods (),
   "@qt\\n@brief Represents a QPair<QString, QString>"
 );
@@ -136,7 +136,7 @@ gsi::Class<QPair<QByteArray, QByteArray> > decl_QByteArray_QPair ("Qt", "QPair_Q
 // ------------------------------------------------------------
 //  Declarations for QPair<double, double>
 
-gsi::Class<QPair<double, double> > decl_double_QPair ("Qt", "QPair_double_double",
+gsi::Class<QPair<double, double> > decl_double_QPair ("QtCore", "QPair_double_double",
   qt_gsi::pair_decl<double, double>::methods (),
   "@qt\\n@brief Represents a QPair<double, double>"
 );
@@ -144,7 +144,7 @@ gsi::Class<QPair<double, double> > decl_double_QPair ("Qt", "QPair_double_double
 // ------------------------------------------------------------
 //  Declarations for QPair<double, QPointf>
 
-gsi::Class<QPair<double, QPointF> > decl_double_QPointF_QPair ("Qt", "QPair_double_QPointF",
+gsi::Class<QPair<double, QPointF> > decl_double_QPointF_QPair ("QtCore", "QPair_double_QPointF",
   qt_gsi::pair_decl<double, QPointF>::methods (),
   "@qt\\n@brief Represents a QPair<double, QPointF>"
 );
@@ -152,7 +152,7 @@ gsi::Class<QPair<double, QPointF> > decl_double_QPointF_QPair ("Qt", "QPair_doub
 // ------------------------------------------------------------
 //  Declarations for QPair<double, QColor>
 
-gsi::Class<QPair<double, QColor> > decl_double_QColor_QPair ("Qt", "QPair_double_QColor",
+gsi::Class<QPair<double, QColor> > decl_double_QColor_QPair ("QtCore", "QPair_double_QColor",
   qt_gsi::pair_decl<double, QColor>::methods (),
   "@qt\\n@brief Represents a QPair<double, QColor>"
 );
@@ -160,7 +160,7 @@ gsi::Class<QPair<double, QColor> > decl_double_QColor_QPair ("Qt", "QPair_double
 // ------------------------------------------------------------
 //  Declarations for QPair<int, int>
 
-gsi::Class<QPair<int, int> > decl_int_int_QPair ("Qt", "QPair_int_int",
+gsi::Class<QPair<int, int> > decl_int_int_QPair ("QtCore", "QPair_int_int",
   qt_gsi::pair_decl<int, int>::methods (),
   "@qt\\n@brief Represents a QPair<int, int>"
 );
@@ -168,7 +168,7 @@ gsi::Class<QPair<int, int> > decl_int_int_QPair ("Qt", "QPair_int_int",
 // ------------------------------------------------------------
 //  Declarations for QPair<QString, QSizeF>
 
-gsi::Class<QPair<QString, QSizeF> > decl_QString_QSizeF_QPair ("Qt", "QPair_QString_QSizeF",
+gsi::Class<QPair<QString, QSizeF> > decl_QString_QSizeF_QPair ("QtCore", "QPair_QString_QSizeF",
   qt_gsi::pair_decl<QString, QSizeF>::methods (),
   "@qt\\n@brief Represents a QPair<QString, QSizeF>"
 );
@@ -176,7 +176,7 @@ gsi::Class<QPair<QString, QSizeF> > decl_QString_QSizeF_QPair ("Qt", "QPair_QStr
 // ------------------------------------------------------------
 //  Declarations for QPair<double, QVariant>
 
-gsi::Class<QPair<double, QVariant> > decl_double_QVariant_QPair ("Qt", "QPair_double_QVariant",
+gsi::Class<QPair<double, QVariant> > decl_double_QVariant_QPair ("QtCore", "QPair_double_QVariant",
   qt_gsi::pair_decl<double, QVariant>::methods (),
   "@qt\\n@brief Represents a QPair<double, QVariant>"
 );
@@ -195,7 +195,7 @@ static gsi::QFlagsClass<Qt::HitTestAccuracy > decl_Qt_HitTestAccuracy_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_HitTestAccuracy_Enum_in_parent (decl_Qt_HitTestAccuracy_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_HitTestAccuracy_Enum_as_child (decl_Qt_HitTestAccuracy_Enum, "QtCore", "HitTestAccuracy");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_HitTestAccuracy_Enums_as_child (decl_Qt_HitTestAccuracy_Enums, "QtCore", "QFlags_HitTestAccuracy");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_HitTestAccuracy_Enum_as_child (decl_Qt_HitTestAccuracy_Enum, "HitTestAccuracy");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_HitTestAccuracy_Enums_as_child (decl_Qt_HitTestAccuracy_Enums, "QFlags_HitTestAccuracy");
 
 }

@@ -195,8 +195,8 @@ static gsi::QFlagsClass<QTextListFormat::Style > decl_QTextListFormat_Style_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextListFormat> inject_QTextListFormat_Style_Enum_in_parent (decl_QTextListFormat_Style_Enum.defs ());
-static gsi::ClassExt<QTextListFormat> decl_QTextListFormat_Style_Enum_as_child (decl_QTextListFormat_Style_Enum, "QtGui", "Style");
-static gsi::ClassExt<QTextListFormat> decl_QTextListFormat_Style_Enums_as_child (decl_QTextListFormat_Style_Enums, "QtGui", "QFlags_Style");
+static gsi::ClassExt<QTextListFormat> decl_QTextListFormat_Style_Enum_as_child (decl_QTextListFormat_Style_Enum, "Style");
+static gsi::ClassExt<QTextListFormat> decl_QTextListFormat_Style_Enums_as_child (decl_QTextListFormat_Style_Enums, "QFlags_Style");
 
 }
 

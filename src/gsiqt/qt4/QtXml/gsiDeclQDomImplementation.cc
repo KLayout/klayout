@@ -296,8 +296,8 @@ static gsi::QFlagsClass<QDomImplementation::InvalidDataPolicy > decl_QDomImpleme
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDomImplementation> inject_QDomImplementation_InvalidDataPolicy_Enum_in_parent (decl_QDomImplementation_InvalidDataPolicy_Enum.defs ());
-static gsi::ClassExt<QDomImplementation> decl_QDomImplementation_InvalidDataPolicy_Enum_as_child (decl_QDomImplementation_InvalidDataPolicy_Enum, "QtXml", "InvalidDataPolicy");
-static gsi::ClassExt<QDomImplementation> decl_QDomImplementation_InvalidDataPolicy_Enums_as_child (decl_QDomImplementation_InvalidDataPolicy_Enums, "QtXml", "QFlags_InvalidDataPolicy");
+static gsi::ClassExt<QDomImplementation> decl_QDomImplementation_InvalidDataPolicy_Enum_as_child (decl_QDomImplementation_InvalidDataPolicy_Enum, "InvalidDataPolicy");
+static gsi::ClassExt<QDomImplementation> decl_QDomImplementation_InvalidDataPolicy_Enums_as_child (decl_QDomImplementation_InvalidDataPolicy_Enums, "QFlags_InvalidDataPolicy");
 
 }
 

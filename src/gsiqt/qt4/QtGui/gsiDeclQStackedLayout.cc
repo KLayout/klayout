@@ -1820,8 +1820,8 @@ static gsi::QFlagsClass<QStackedLayout::StackingMode > decl_QStackedLayout_Stack
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QStackedLayout> inject_QStackedLayout_StackingMode_Enum_in_parent (decl_QStackedLayout_StackingMode_Enum.defs ());
-static gsi::ClassExt<QStackedLayout> decl_QStackedLayout_StackingMode_Enum_as_child (decl_QStackedLayout_StackingMode_Enum, "QtGui", "StackingMode");
-static gsi::ClassExt<QStackedLayout> decl_QStackedLayout_StackingMode_Enums_as_child (decl_QStackedLayout_StackingMode_Enums, "QtGui", "QFlags_StackingMode");
+static gsi::ClassExt<QStackedLayout> decl_QStackedLayout_StackingMode_Enum_as_child (decl_QStackedLayout_StackingMode_Enum, "StackingMode");
+static gsi::ClassExt<QStackedLayout> decl_QStackedLayout_StackingMode_Enums_as_child (decl_QStackedLayout_StackingMode_Enums, "QFlags_StackingMode");
 
 }
 

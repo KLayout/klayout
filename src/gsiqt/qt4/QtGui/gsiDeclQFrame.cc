@@ -2723,8 +2723,8 @@ static gsi::QFlagsClass<QFrame::Shadow > decl_QFrame_Shadow_Enums ("QtGui", "QFr
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFrame> inject_QFrame_Shadow_Enum_in_parent (decl_QFrame_Shadow_Enum.defs ());
-static gsi::ClassExt<QFrame> decl_QFrame_Shadow_Enum_as_child (decl_QFrame_Shadow_Enum, "QtGui", "Shadow");
-static gsi::ClassExt<QFrame> decl_QFrame_Shadow_Enums_as_child (decl_QFrame_Shadow_Enums, "QtGui", "QFlags_Shadow");
+static gsi::ClassExt<QFrame> decl_QFrame_Shadow_Enum_as_child (decl_QFrame_Shadow_Enum, "Shadow");
+static gsi::ClassExt<QFrame> decl_QFrame_Shadow_Enums_as_child (decl_QFrame_Shadow_Enums, "QFlags_Shadow");
 
 }
 
@@ -2748,8 +2748,8 @@ static gsi::QFlagsClass<QFrame::Shape > decl_QFrame_Shape_Enums ("QtGui", "QFram
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFrame> inject_QFrame_Shape_Enum_in_parent (decl_QFrame_Shape_Enum.defs ());
-static gsi::ClassExt<QFrame> decl_QFrame_Shape_Enum_as_child (decl_QFrame_Shape_Enum, "QtGui", "Shape");
-static gsi::ClassExt<QFrame> decl_QFrame_Shape_Enums_as_child (decl_QFrame_Shape_Enums, "QtGui", "QFlags_Shape");
+static gsi::ClassExt<QFrame> decl_QFrame_Shape_Enum_as_child (decl_QFrame_Shape_Enum, "Shape");
+static gsi::ClassExt<QFrame> decl_QFrame_Shape_Enums_as_child (decl_QFrame_Shape_Enums, "QFlags_Shape");
 
 }
 

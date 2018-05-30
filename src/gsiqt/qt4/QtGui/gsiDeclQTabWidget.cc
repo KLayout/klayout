@@ -3508,8 +3508,8 @@ static gsi::QFlagsClass<QTabWidget::TabPosition > decl_QTabWidget_TabPosition_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTabWidget> inject_QTabWidget_TabPosition_Enum_in_parent (decl_QTabWidget_TabPosition_Enum.defs ());
-static gsi::ClassExt<QTabWidget> decl_QTabWidget_TabPosition_Enum_as_child (decl_QTabWidget_TabPosition_Enum, "QtGui", "TabPosition");
-static gsi::ClassExt<QTabWidget> decl_QTabWidget_TabPosition_Enums_as_child (decl_QTabWidget_TabPosition_Enums, "QtGui", "QFlags_TabPosition");
+static gsi::ClassExt<QTabWidget> decl_QTabWidget_TabPosition_Enum_as_child (decl_QTabWidget_TabPosition_Enum, "TabPosition");
+static gsi::ClassExt<QTabWidget> decl_QTabWidget_TabPosition_Enums_as_child (decl_QTabWidget_TabPosition_Enums, "QFlags_TabPosition");
 
 }
 
@@ -3528,8 +3528,8 @@ static gsi::QFlagsClass<QTabWidget::TabShape > decl_QTabWidget_TabShape_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTabWidget> inject_QTabWidget_TabShape_Enum_in_parent (decl_QTabWidget_TabShape_Enum.defs ());
-static gsi::ClassExt<QTabWidget> decl_QTabWidget_TabShape_Enum_as_child (decl_QTabWidget_TabShape_Enum, "QtGui", "TabShape");
-static gsi::ClassExt<QTabWidget> decl_QTabWidget_TabShape_Enums_as_child (decl_QTabWidget_TabShape_Enums, "QtGui", "QFlags_TabShape");
+static gsi::ClassExt<QTabWidget> decl_QTabWidget_TabShape_Enum_as_child (decl_QTabWidget_TabShape_Enum, "TabShape");
+static gsi::ClassExt<QTabWidget> decl_QTabWidget_TabShape_Enums_as_child (decl_QTabWidget_TabShape_Enums, "QFlags_TabShape");
 
 }
 

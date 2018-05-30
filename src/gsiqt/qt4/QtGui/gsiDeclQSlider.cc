@@ -2868,8 +2868,8 @@ static gsi::QFlagsClass<QSlider::TickPosition > decl_QSlider_TickPosition_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSlider> inject_QSlider_TickPosition_Enum_in_parent (decl_QSlider_TickPosition_Enum.defs ());
-static gsi::ClassExt<QSlider> decl_QSlider_TickPosition_Enum_as_child (decl_QSlider_TickPosition_Enum, "QtGui", "TickPosition");
-static gsi::ClassExt<QSlider> decl_QSlider_TickPosition_Enums_as_child (decl_QSlider_TickPosition_Enums, "QtGui", "QFlags_TickPosition");
+static gsi::ClassExt<QSlider> decl_QSlider_TickPosition_Enum_as_child (decl_QSlider_TickPosition_Enum, "TickPosition");
+static gsi::ClassExt<QSlider> decl_QSlider_TickPosition_Enums_as_child (decl_QSlider_TickPosition_Enums, "QFlags_TickPosition");
 
 }
 

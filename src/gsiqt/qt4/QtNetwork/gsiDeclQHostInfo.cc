@@ -416,8 +416,8 @@ static gsi::QFlagsClass<QHostInfo::HostInfoError > decl_QHostInfo_HostInfoError_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QHostInfo> inject_QHostInfo_HostInfoError_Enum_in_parent (decl_QHostInfo_HostInfoError_Enum.defs ());
-static gsi::ClassExt<QHostInfo> decl_QHostInfo_HostInfoError_Enum_as_child (decl_QHostInfo_HostInfoError_Enum, "QtNetwork", "HostInfoError");
-static gsi::ClassExt<QHostInfo> decl_QHostInfo_HostInfoError_Enums_as_child (decl_QHostInfo_HostInfoError_Enums, "QtNetwork", "QFlags_HostInfoError");
+static gsi::ClassExt<QHostInfo> decl_QHostInfo_HostInfoError_Enum_as_child (decl_QHostInfo_HostInfoError_Enum, "HostInfoError");
+static gsi::ClassExt<QHostInfo> decl_QHostInfo_HostInfoError_Enums_as_child (decl_QHostInfo_HostInfoError_Enums, "QFlags_HostInfoError");
 
 }
 

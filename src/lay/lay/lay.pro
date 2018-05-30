@@ -192,7 +192,7 @@ INCLUDEPATH += $$QTBASIC_INC
 DEPENDPATH += $$QTBASIC_INC
 
 equals(HAVE_QTBINDINGS, "1") {
-  LIBS += -lklayout_qtbasic -lklayout_QtGui
+  LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtXml
 }
 
 INCLUDEPATH += $$RBA_INC
@@ -211,8 +211,4 @@ equals(HAVE_PYTHON, "1") {
   LIBS += -lklayout_pya
 } else {
   LIBS += -lklayout_pyastub
-}
-
-equals(HAVE_QTBINDINGS, "1") {
-  LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtCore -lklayout_QtXml
 }

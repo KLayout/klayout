@@ -69,7 +69,7 @@ gsi::Class<QTextCodec::ConverterState> decl_QTextCodec_ConverterState ("QtCore",
   methods_QTextCodec_ConverterState (),
   "@qt\n@brief Binding of QTextCodec::ConverterState");
 
-gsi::ClassExt<QTextCodec> decl_QTextCodec_ConverterState_as_child (decl_QTextCodec_ConverterState, "QtCore", "ConverterState");
+gsi::ClassExt<QTextCodec> decl_QTextCodec_ConverterState_as_child (decl_QTextCodec_ConverterState, "ConverterState");
 
 GSI_QTCORE_PUBLIC gsi::Class<QTextCodec::ConverterState> &qtdecl_QTextCodec_ConverterState () { return decl_QTextCodec_ConverterState; }
 

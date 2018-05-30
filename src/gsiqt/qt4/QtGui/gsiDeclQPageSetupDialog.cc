@@ -528,8 +528,8 @@ static gsi::QFlagsClass<QPageSetupDialog::PageSetupDialogOption > decl_QPageSetu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPageSetupDialog> inject_QPageSetupDialog_PageSetupDialogOption_Enum_in_parent (decl_QPageSetupDialog_PageSetupDialogOption_Enum.defs ());
-static gsi::ClassExt<QPageSetupDialog> decl_QPageSetupDialog_PageSetupDialogOption_Enum_as_child (decl_QPageSetupDialog_PageSetupDialogOption_Enum, "QtGui", "PageSetupDialogOption");
-static gsi::ClassExt<QPageSetupDialog> decl_QPageSetupDialog_PageSetupDialogOption_Enums_as_child (decl_QPageSetupDialog_PageSetupDialogOption_Enums, "QtGui", "QFlags_PageSetupDialogOption");
+static gsi::ClassExt<QPageSetupDialog> decl_QPageSetupDialog_PageSetupDialogOption_Enum_as_child (decl_QPageSetupDialog_PageSetupDialogOption_Enum, "PageSetupDialogOption");
+static gsi::ClassExt<QPageSetupDialog> decl_QPageSetupDialog_PageSetupDialogOption_Enums_as_child (decl_QPageSetupDialog_PageSetupDialogOption_Enums, "QFlags_PageSetupDialogOption");
 
 }
 

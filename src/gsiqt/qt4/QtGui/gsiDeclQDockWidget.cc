@@ -2869,8 +2869,8 @@ static gsi::QFlagsClass<QDockWidget::DockWidgetFeature > decl_QDockWidget_DockWi
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDockWidget> inject_QDockWidget_DockWidgetFeature_Enum_in_parent (decl_QDockWidget_DockWidgetFeature_Enum.defs ());
-static gsi::ClassExt<QDockWidget> decl_QDockWidget_DockWidgetFeature_Enum_as_child (decl_QDockWidget_DockWidgetFeature_Enum, "QtGui", "DockWidgetFeature");
-static gsi::ClassExt<QDockWidget> decl_QDockWidget_DockWidgetFeature_Enums_as_child (decl_QDockWidget_DockWidgetFeature_Enums, "QtGui", "QFlags_DockWidgetFeature");
+static gsi::ClassExt<QDockWidget> decl_QDockWidget_DockWidgetFeature_Enum_as_child (decl_QDockWidget_DockWidgetFeature_Enum, "DockWidgetFeature");
+static gsi::ClassExt<QDockWidget> decl_QDockWidget_DockWidgetFeature_Enums_as_child (decl_QDockWidget_DockWidgetFeature_Enums, "QFlags_DockWidgetFeature");
 
 }
 

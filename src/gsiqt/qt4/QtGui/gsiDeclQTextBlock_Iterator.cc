@@ -230,7 +230,7 @@ gsi::Class<QTextBlock::iterator> decl_QTextBlock_Iterator ("QtGui", "QTextBlock_
   methods_QTextBlock_Iterator (),
   "@qt\n@brief Binding of QTextBlock::iterator");
 
-gsi::ClassExt<QTextBlock> decl_QTextBlock_Iterator_as_child (decl_QTextBlock_Iterator, "QtGui", "Iterator");
+gsi::ClassExt<QTextBlock> decl_QTextBlock_Iterator_as_child (decl_QTextBlock_Iterator, "Iterator");
 
 GSI_QTGUI_PUBLIC gsi::Class<QTextBlock::iterator> &qtdecl_QTextBlock_Iterator () { return decl_QTextBlock_Iterator; }
 

@@ -252,8 +252,8 @@ static gsi::QFlagsClass<QColormap::Mode > decl_QColormap_Mode_Enums ("QtGui", "Q
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QColormap> inject_QColormap_Mode_Enum_in_parent (decl_QColormap_Mode_Enum.defs ());
-static gsi::ClassExt<QColormap> decl_QColormap_Mode_Enum_as_child (decl_QColormap_Mode_Enum, "QtGui", "Mode");
-static gsi::ClassExt<QColormap> decl_QColormap_Mode_Enums_as_child (decl_QColormap_Mode_Enums, "QtGui", "QFlags_Mode");
+static gsi::ClassExt<QColormap> decl_QColormap_Mode_Enum_as_child (decl_QColormap_Mode_Enum, "Mode");
+static gsi::ClassExt<QColormap> decl_QColormap_Mode_Enums_as_child (decl_QColormap_Mode_Enums, "QFlags_Mode");
 
 }
 

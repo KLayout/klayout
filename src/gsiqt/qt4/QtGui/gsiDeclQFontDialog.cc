@@ -2995,8 +2995,8 @@ static gsi::QFlagsClass<QFontDialog::FontDialogOption > decl_QFontDialog_FontDia
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFontDialog> inject_QFontDialog_FontDialogOption_Enum_in_parent (decl_QFontDialog_FontDialogOption_Enum.defs ());
-static gsi::ClassExt<QFontDialog> decl_QFontDialog_FontDialogOption_Enum_as_child (decl_QFontDialog_FontDialogOption_Enum, "QtGui", "FontDialogOption");
-static gsi::ClassExt<QFontDialog> decl_QFontDialog_FontDialogOption_Enums_as_child (decl_QFontDialog_FontDialogOption_Enums, "QtGui", "QFlags_FontDialogOption");
+static gsi::ClassExt<QFontDialog> decl_QFontDialog_FontDialogOption_Enum_as_child (decl_QFontDialog_FontDialogOption_Enum, "FontDialogOption");
+static gsi::ClassExt<QFontDialog> decl_QFontDialog_FontDialogOption_Enums_as_child (decl_QFontDialog_FontDialogOption_Enums, "QFlags_FontDialogOption");
 
 }
 

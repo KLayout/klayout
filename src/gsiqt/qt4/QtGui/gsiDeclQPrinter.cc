@@ -1379,8 +1379,8 @@ static gsi::QFlagsClass<QPrinter::ColorMode > decl_QPrinter_ColorMode_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrinter> inject_QPrinter_ColorMode_Enum_in_parent (decl_QPrinter_ColorMode_Enum.defs ());
-static gsi::ClassExt<QPrinter> decl_QPrinter_ColorMode_Enum_as_child (decl_QPrinter_ColorMode_Enum, "QtGui", "ColorMode");
-static gsi::ClassExt<QPrinter> decl_QPrinter_ColorMode_Enums_as_child (decl_QPrinter_ColorMode_Enums, "QtGui", "QFlags_ColorMode");
+static gsi::ClassExt<QPrinter> decl_QPrinter_ColorMode_Enum_as_child (decl_QPrinter_ColorMode_Enum, "ColorMode");
+static gsi::ClassExt<QPrinter> decl_QPrinter_ColorMode_Enums_as_child (decl_QPrinter_ColorMode_Enums, "QFlags_ColorMode");
 
 }
 
@@ -1401,8 +1401,8 @@ static gsi::QFlagsClass<QPrinter::DuplexMode > decl_QPrinter_DuplexMode_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrinter> inject_QPrinter_DuplexMode_Enum_in_parent (decl_QPrinter_DuplexMode_Enum.defs ());
-static gsi::ClassExt<QPrinter> decl_QPrinter_DuplexMode_Enum_as_child (decl_QPrinter_DuplexMode_Enum, "QtGui", "DuplexMode");
-static gsi::ClassExt<QPrinter> decl_QPrinter_DuplexMode_Enums_as_child (decl_QPrinter_DuplexMode_Enums, "QtGui", "QFlags_DuplexMode");
+static gsi::ClassExt<QPrinter> decl_QPrinter_DuplexMode_Enum_as_child (decl_QPrinter_DuplexMode_Enum, "DuplexMode");
+static gsi::ClassExt<QPrinter> decl_QPrinter_DuplexMode_Enums_as_child (decl_QPrinter_DuplexMode_Enums, "QFlags_DuplexMode");
 
 }
 
@@ -1421,8 +1421,8 @@ static gsi::QFlagsClass<QPrinter::Orientation > decl_QPrinter_Orientation_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrinter> inject_QPrinter_Orientation_Enum_in_parent (decl_QPrinter_Orientation_Enum.defs ());
-static gsi::ClassExt<QPrinter> decl_QPrinter_Orientation_Enum_as_child (decl_QPrinter_Orientation_Enum, "QtGui", "Orientation");
-static gsi::ClassExt<QPrinter> decl_QPrinter_Orientation_Enums_as_child (decl_QPrinter_Orientation_Enums, "QtGui", "QFlags_Orientation");
+static gsi::ClassExt<QPrinter> decl_QPrinter_Orientation_Enum_as_child (decl_QPrinter_Orientation_Enum, "Orientation");
+static gsi::ClassExt<QPrinter> decl_QPrinter_Orientation_Enums_as_child (decl_QPrinter_Orientation_Enums, "QFlags_Orientation");
 
 }
 
@@ -1442,8 +1442,8 @@ static gsi::QFlagsClass<QPrinter::OutputFormat > decl_QPrinter_OutputFormat_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrinter> inject_QPrinter_OutputFormat_Enum_in_parent (decl_QPrinter_OutputFormat_Enum.defs ());
-static gsi::ClassExt<QPrinter> decl_QPrinter_OutputFormat_Enum_as_child (decl_QPrinter_OutputFormat_Enum, "QtGui", "OutputFormat");
-static gsi::ClassExt<QPrinter> decl_QPrinter_OutputFormat_Enums_as_child (decl_QPrinter_OutputFormat_Enums, "QtGui", "QFlags_OutputFormat");
+static gsi::ClassExt<QPrinter> decl_QPrinter_OutputFormat_Enum_as_child (decl_QPrinter_OutputFormat_Enum, "OutputFormat");
+static gsi::ClassExt<QPrinter> decl_QPrinter_OutputFormat_Enums_as_child (decl_QPrinter_OutputFormat_Enums, "QFlags_OutputFormat");
 
 }
 
@@ -1462,8 +1462,8 @@ static gsi::QFlagsClass<QPrinter::PageOrder > decl_QPrinter_PageOrder_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrinter> inject_QPrinter_PageOrder_Enum_in_parent (decl_QPrinter_PageOrder_Enum.defs ());
-static gsi::ClassExt<QPrinter> decl_QPrinter_PageOrder_Enum_as_child (decl_QPrinter_PageOrder_Enum, "QtGui", "PageOrder");
-static gsi::ClassExt<QPrinter> decl_QPrinter_PageOrder_Enums_as_child (decl_QPrinter_PageOrder_Enums, "QtGui", "QFlags_PageOrder");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PageOrder_Enum_as_child (decl_QPrinter_PageOrder_Enum, "PageOrder");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PageOrder_Enums_as_child (decl_QPrinter_PageOrder_Enums, "QFlags_PageOrder");
 
 }
 
@@ -1513,8 +1513,8 @@ static gsi::QFlagsClass<QPrinter::PageSize > decl_QPrinter_PageSize_Enums ("QtGu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrinter> inject_QPrinter_PageSize_Enum_in_parent (decl_QPrinter_PageSize_Enum.defs ());
-static gsi::ClassExt<QPrinter> decl_QPrinter_PageSize_Enum_as_child (decl_QPrinter_PageSize_Enum, "QtGui", "PageSize");
-static gsi::ClassExt<QPrinter> decl_QPrinter_PageSize_Enums_as_child (decl_QPrinter_PageSize_Enums, "QtGui", "QFlags_PageSize");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PageSize_Enum_as_child (decl_QPrinter_PageSize_Enum, "PageSize");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PageSize_Enums_as_child (decl_QPrinter_PageSize_Enums, "QFlags_PageSize");
 
 }
 
@@ -1545,8 +1545,8 @@ static gsi::QFlagsClass<QPrinter::PaperSource > decl_QPrinter_PaperSource_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrinter> inject_QPrinter_PaperSource_Enum_in_parent (decl_QPrinter_PaperSource_Enum.defs ());
-static gsi::ClassExt<QPrinter> decl_QPrinter_PaperSource_Enum_as_child (decl_QPrinter_PaperSource_Enum, "QtGui", "PaperSource");
-static gsi::ClassExt<QPrinter> decl_QPrinter_PaperSource_Enums_as_child (decl_QPrinter_PaperSource_Enums, "QtGui", "QFlags_PaperSource");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PaperSource_Enum_as_child (decl_QPrinter_PaperSource_Enum, "PaperSource");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PaperSource_Enums_as_child (decl_QPrinter_PaperSource_Enums, "QFlags_PaperSource");
 
 }
 
@@ -1566,8 +1566,8 @@ static gsi::QFlagsClass<QPrinter::PrintRange > decl_QPrinter_PrintRange_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrinter> inject_QPrinter_PrintRange_Enum_in_parent (decl_QPrinter_PrintRange_Enum.defs ());
-static gsi::ClassExt<QPrinter> decl_QPrinter_PrintRange_Enum_as_child (decl_QPrinter_PrintRange_Enum, "QtGui", "PrintRange");
-static gsi::ClassExt<QPrinter> decl_QPrinter_PrintRange_Enums_as_child (decl_QPrinter_PrintRange_Enums, "QtGui", "QFlags_PrintRange");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PrintRange_Enum_as_child (decl_QPrinter_PrintRange_Enum, "PrintRange");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PrintRange_Enums_as_child (decl_QPrinter_PrintRange_Enums, "QFlags_PrintRange");
 
 }
 
@@ -1587,8 +1587,8 @@ static gsi::QFlagsClass<QPrinter::PrinterMode > decl_QPrinter_PrinterMode_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrinter> inject_QPrinter_PrinterMode_Enum_in_parent (decl_QPrinter_PrinterMode_Enum.defs ());
-static gsi::ClassExt<QPrinter> decl_QPrinter_PrinterMode_Enum_as_child (decl_QPrinter_PrinterMode_Enum, "QtGui", "PrinterMode");
-static gsi::ClassExt<QPrinter> decl_QPrinter_PrinterMode_Enums_as_child (decl_QPrinter_PrinterMode_Enums, "QtGui", "QFlags_PrinterMode");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PrinterMode_Enum_as_child (decl_QPrinter_PrinterMode_Enum, "PrinterMode");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PrinterMode_Enums_as_child (decl_QPrinter_PrinterMode_Enums, "QFlags_PrinterMode");
 
 }
 
@@ -1609,8 +1609,8 @@ static gsi::QFlagsClass<QPrinter::PrinterState > decl_QPrinter_PrinterState_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrinter> inject_QPrinter_PrinterState_Enum_in_parent (decl_QPrinter_PrinterState_Enum.defs ());
-static gsi::ClassExt<QPrinter> decl_QPrinter_PrinterState_Enum_as_child (decl_QPrinter_PrinterState_Enum, "QtGui", "PrinterState");
-static gsi::ClassExt<QPrinter> decl_QPrinter_PrinterState_Enums_as_child (decl_QPrinter_PrinterState_Enums, "QtGui", "QFlags_PrinterState");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PrinterState_Enum_as_child (decl_QPrinter_PrinterState_Enum, "PrinterState");
+static gsi::ClassExt<QPrinter> decl_QPrinter_PrinterState_Enums_as_child (decl_QPrinter_PrinterState_Enums, "QFlags_PrinterState");
 
 }
 
@@ -1634,8 +1634,8 @@ static gsi::QFlagsClass<QPrinter::Unit > decl_QPrinter_Unit_Enums ("QtGui", "QPr
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrinter> inject_QPrinter_Unit_Enum_in_parent (decl_QPrinter_Unit_Enum.defs ());
-static gsi::ClassExt<QPrinter> decl_QPrinter_Unit_Enum_as_child (decl_QPrinter_Unit_Enum, "QtGui", "Unit");
-static gsi::ClassExt<QPrinter> decl_QPrinter_Unit_Enums_as_child (decl_QPrinter_Unit_Enums, "QtGui", "QFlags_Unit");
+static gsi::ClassExt<QPrinter> decl_QPrinter_Unit_Enum_as_child (decl_QPrinter_Unit_Enum, "Unit");
+static gsi::ClassExt<QPrinter> decl_QPrinter_Unit_Enums_as_child (decl_QPrinter_Unit_Enums, "QFlags_Unit");
 
 }
 

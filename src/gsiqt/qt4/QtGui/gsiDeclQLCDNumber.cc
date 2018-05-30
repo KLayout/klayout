@@ -2921,8 +2921,8 @@ static gsi::QFlagsClass<QLCDNumber::Mode > decl_QLCDNumber_Mode_Enums ("QtGui", 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLCDNumber> inject_QLCDNumber_Mode_Enum_in_parent (decl_QLCDNumber_Mode_Enum.defs ());
-static gsi::ClassExt<QLCDNumber> decl_QLCDNumber_Mode_Enum_as_child (decl_QLCDNumber_Mode_Enum, "QtGui", "Mode");
-static gsi::ClassExt<QLCDNumber> decl_QLCDNumber_Mode_Enums_as_child (decl_QLCDNumber_Mode_Enums, "QtGui", "QFlags_Mode");
+static gsi::ClassExt<QLCDNumber> decl_QLCDNumber_Mode_Enum_as_child (decl_QLCDNumber_Mode_Enum, "Mode");
+static gsi::ClassExt<QLCDNumber> decl_QLCDNumber_Mode_Enums_as_child (decl_QLCDNumber_Mode_Enums, "QFlags_Mode");
 
 }
 
@@ -2942,8 +2942,8 @@ static gsi::QFlagsClass<QLCDNumber::SegmentStyle > decl_QLCDNumber_SegmentStyle_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLCDNumber> inject_QLCDNumber_SegmentStyle_Enum_in_parent (decl_QLCDNumber_SegmentStyle_Enum.defs ());
-static gsi::ClassExt<QLCDNumber> decl_QLCDNumber_SegmentStyle_Enum_as_child (decl_QLCDNumber_SegmentStyle_Enum, "QtGui", "SegmentStyle");
-static gsi::ClassExt<QLCDNumber> decl_QLCDNumber_SegmentStyle_Enums_as_child (decl_QLCDNumber_SegmentStyle_Enums, "QtGui", "QFlags_SegmentStyle");
+static gsi::ClassExt<QLCDNumber> decl_QLCDNumber_SegmentStyle_Enum_as_child (decl_QLCDNumber_SegmentStyle_Enum, "SegmentStyle");
+static gsi::ClassExt<QLCDNumber> decl_QLCDNumber_SegmentStyle_Enums_as_child (decl_QLCDNumber_SegmentStyle_Enums, "QFlags_SegmentStyle");
 
 }
 

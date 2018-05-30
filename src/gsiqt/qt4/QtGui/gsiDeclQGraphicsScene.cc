@@ -3411,8 +3411,8 @@ static gsi::QFlagsClass<QGraphicsScene::ItemIndexMethod > decl_QGraphicsScene_It
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsScene> inject_QGraphicsScene_ItemIndexMethod_Enum_in_parent (decl_QGraphicsScene_ItemIndexMethod_Enum.defs ());
-static gsi::ClassExt<QGraphicsScene> decl_QGraphicsScene_ItemIndexMethod_Enum_as_child (decl_QGraphicsScene_ItemIndexMethod_Enum, "QtGui", "ItemIndexMethod");
-static gsi::ClassExt<QGraphicsScene> decl_QGraphicsScene_ItemIndexMethod_Enums_as_child (decl_QGraphicsScene_ItemIndexMethod_Enums, "QtGui", "QFlags_ItemIndexMethod");
+static gsi::ClassExt<QGraphicsScene> decl_QGraphicsScene_ItemIndexMethod_Enum_as_child (decl_QGraphicsScene_ItemIndexMethod_Enum, "ItemIndexMethod");
+static gsi::ClassExt<QGraphicsScene> decl_QGraphicsScene_ItemIndexMethod_Enums_as_child (decl_QGraphicsScene_ItemIndexMethod_Enums, "QFlags_ItemIndexMethod");
 
 }
 
@@ -3433,8 +3433,8 @@ static gsi::QFlagsClass<QGraphicsScene::SceneLayer > decl_QGraphicsScene_SceneLa
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsScene> inject_QGraphicsScene_SceneLayer_Enum_in_parent (decl_QGraphicsScene_SceneLayer_Enum.defs ());
-static gsi::ClassExt<QGraphicsScene> decl_QGraphicsScene_SceneLayer_Enum_as_child (decl_QGraphicsScene_SceneLayer_Enum, "QtGui", "SceneLayer");
-static gsi::ClassExt<QGraphicsScene> decl_QGraphicsScene_SceneLayer_Enums_as_child (decl_QGraphicsScene_SceneLayer_Enums, "QtGui", "QFlags_SceneLayer");
+static gsi::ClassExt<QGraphicsScene> decl_QGraphicsScene_SceneLayer_Enum_as_child (decl_QGraphicsScene_SceneLayer_Enum, "SceneLayer");
+static gsi::ClassExt<QGraphicsScene> decl_QGraphicsScene_SceneLayer_Enums_as_child (decl_QGraphicsScene_SceneLayer_Enums, "QFlags_SceneLayer");
 
 }
 

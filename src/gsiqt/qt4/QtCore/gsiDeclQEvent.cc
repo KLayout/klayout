@@ -400,8 +400,8 @@ static gsi::QFlagsClass<QEvent::Type > decl_QEvent_Type_Enums ("QtCore", "QEvent
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QEvent> inject_QEvent_Type_Enum_in_parent (decl_QEvent_Type_Enum.defs ());
-static gsi::ClassExt<QEvent> decl_QEvent_Type_Enum_as_child (decl_QEvent_Type_Enum, "QtCore", "Type");
-static gsi::ClassExt<QEvent> decl_QEvent_Type_Enums_as_child (decl_QEvent_Type_Enums, "QtCore", "QFlags_Type");
+static gsi::ClassExt<QEvent> decl_QEvent_Type_Enum_as_child (decl_QEvent_Type_Enum, "Type");
+static gsi::ClassExt<QEvent> decl_QEvent_Type_Enums_as_child (decl_QEvent_Type_Enums, "QFlags_Type");
 
 }
 

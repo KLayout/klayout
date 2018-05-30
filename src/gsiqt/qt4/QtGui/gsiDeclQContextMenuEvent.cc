@@ -304,8 +304,8 @@ static gsi::QFlagsClass<QContextMenuEvent::Reason > decl_QContextMenuEvent_Reaso
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QContextMenuEvent> inject_QContextMenuEvent_Reason_Enum_in_parent (decl_QContextMenuEvent_Reason_Enum.defs ());
-static gsi::ClassExt<QContextMenuEvent> decl_QContextMenuEvent_Reason_Enum_as_child (decl_QContextMenuEvent_Reason_Enum, "QtGui", "Reason");
-static gsi::ClassExt<QContextMenuEvent> decl_QContextMenuEvent_Reason_Enums_as_child (decl_QContextMenuEvent_Reason_Enums, "QtGui", "QFlags_Reason");
+static gsi::ClassExt<QContextMenuEvent> decl_QContextMenuEvent_Reason_Enum_as_child (decl_QContextMenuEvent_Reason_Enum, "Reason");
+static gsi::ClassExt<QContextMenuEvent> decl_QContextMenuEvent_Reason_Enums_as_child (decl_QContextMenuEvent_Reason_Enums, "QFlags_Reason");
 
 }
 

@@ -34,6 +34,8 @@
 #include "pya.h"
 #include "gsiExternalMain.h"
 
+#include "tlArch.h"
+
 #include "version.h"
 
 //  required to force linking of the "ext" and "lib" module
@@ -44,6 +46,21 @@
 #ifdef HAVE_RUBY
 #include "drcForceLink.h"
 #endif
+
+//  pulls in the Qt GSI binding modules
+#include "gsiQtGuiExternals.h"
+#include "gsiQtCoreExternals.h"
+#include "gsiQtXmlExternals.h"
+#include "gsiQtSqlExternals.h"
+#include "gsiQtNetworkExternals.h"
+#include "gsiQtDesignerExternals.h"
+
+FORCE_LINK_GSI_QTCORE
+FORCE_LINK_GSI_QTGUI
+FORCE_LINK_GSI_QTXML
+FORCE_LINK_GSI_QTDESIGNER
+FORCE_LINK_GSI_QTNETWORK
+FORCE_LINK_GSI_QTSQL
 
 #include <QTranslator>
 #include <QLocale>

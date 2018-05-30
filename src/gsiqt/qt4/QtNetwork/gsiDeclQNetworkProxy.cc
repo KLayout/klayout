@@ -491,8 +491,8 @@ static gsi::QFlagsClass<QNetworkProxy::Capability > decl_QNetworkProxy_Capabilit
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QNetworkProxy> inject_QNetworkProxy_Capability_Enum_in_parent (decl_QNetworkProxy_Capability_Enum.defs ());
-static gsi::ClassExt<QNetworkProxy> decl_QNetworkProxy_Capability_Enum_as_child (decl_QNetworkProxy_Capability_Enum, "QtNetwork", "Capability");
-static gsi::ClassExt<QNetworkProxy> decl_QNetworkProxy_Capability_Enums_as_child (decl_QNetworkProxy_Capability_Enums, "QtNetwork", "QFlags_Capability");
+static gsi::ClassExt<QNetworkProxy> decl_QNetworkProxy_Capability_Enum_as_child (decl_QNetworkProxy_Capability_Enum, "Capability");
+static gsi::ClassExt<QNetworkProxy> decl_QNetworkProxy_Capability_Enums_as_child (decl_QNetworkProxy_Capability_Enums, "QFlags_Capability");
 
 }
 
@@ -515,8 +515,8 @@ static gsi::QFlagsClass<QNetworkProxy::ProxyType > decl_QNetworkProxy_ProxyType_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QNetworkProxy> inject_QNetworkProxy_ProxyType_Enum_in_parent (decl_QNetworkProxy_ProxyType_Enum.defs ());
-static gsi::ClassExt<QNetworkProxy> decl_QNetworkProxy_ProxyType_Enum_as_child (decl_QNetworkProxy_ProxyType_Enum, "QtNetwork", "ProxyType");
-static gsi::ClassExt<QNetworkProxy> decl_QNetworkProxy_ProxyType_Enums_as_child (decl_QNetworkProxy_ProxyType_Enums, "QtNetwork", "QFlags_ProxyType");
+static gsi::ClassExt<QNetworkProxy> decl_QNetworkProxy_ProxyType_Enum_as_child (decl_QNetworkProxy_ProxyType_Enum, "ProxyType");
+static gsi::ClassExt<QNetworkProxy> decl_QNetworkProxy_ProxyType_Enums_as_child (decl_QNetworkProxy_ProxyType_Enums, "QFlags_ProxyType");
 
 }
 

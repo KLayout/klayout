@@ -1423,8 +1423,8 @@ static gsi::QFlagsClass<QSslSocket::PeerVerifyMode > decl_QSslSocket_PeerVerifyM
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSslSocket> inject_QSslSocket_PeerVerifyMode_Enum_in_parent (decl_QSslSocket_PeerVerifyMode_Enum.defs ());
-static gsi::ClassExt<QSslSocket> decl_QSslSocket_PeerVerifyMode_Enum_as_child (decl_QSslSocket_PeerVerifyMode_Enum, "QtNetwork", "PeerVerifyMode");
-static gsi::ClassExt<QSslSocket> decl_QSslSocket_PeerVerifyMode_Enums_as_child (decl_QSslSocket_PeerVerifyMode_Enums, "QtNetwork", "QFlags_PeerVerifyMode");
+static gsi::ClassExt<QSslSocket> decl_QSslSocket_PeerVerifyMode_Enum_as_child (decl_QSslSocket_PeerVerifyMode_Enum, "PeerVerifyMode");
+static gsi::ClassExt<QSslSocket> decl_QSslSocket_PeerVerifyMode_Enums_as_child (decl_QSslSocket_PeerVerifyMode_Enums, "QFlags_PeerVerifyMode");
 
 }
 
@@ -1444,8 +1444,8 @@ static gsi::QFlagsClass<QSslSocket::SslMode > decl_QSslSocket_SslMode_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSslSocket> inject_QSslSocket_SslMode_Enum_in_parent (decl_QSslSocket_SslMode_Enum.defs ());
-static gsi::ClassExt<QSslSocket> decl_QSslSocket_SslMode_Enum_as_child (decl_QSslSocket_SslMode_Enum, "QtNetwork", "SslMode");
-static gsi::ClassExt<QSslSocket> decl_QSslSocket_SslMode_Enums_as_child (decl_QSslSocket_SslMode_Enums, "QtNetwork", "QFlags_SslMode");
+static gsi::ClassExt<QSslSocket> decl_QSslSocket_SslMode_Enum_as_child (decl_QSslSocket_SslMode_Enum, "SslMode");
+static gsi::ClassExt<QSslSocket> decl_QSslSocket_SslMode_Enums_as_child (decl_QSslSocket_SslMode_Enums, "QFlags_SslMode");
 
 }
 

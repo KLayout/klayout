@@ -303,8 +303,8 @@ static gsi::QFlagsClass<QTreeWidgetItemIterator::IteratorFlag > decl_QTreeWidget
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTreeWidgetItemIterator> inject_QTreeWidgetItemIterator_IteratorFlag_Enum_in_parent (decl_QTreeWidgetItemIterator_IteratorFlag_Enum.defs ());
-static gsi::ClassExt<QTreeWidgetItemIterator> decl_QTreeWidgetItemIterator_IteratorFlag_Enum_as_child (decl_QTreeWidgetItemIterator_IteratorFlag_Enum, "QtGui", "IteratorFlag");
-static gsi::ClassExt<QTreeWidgetItemIterator> decl_QTreeWidgetItemIterator_IteratorFlag_Enums_as_child (decl_QTreeWidgetItemIterator_IteratorFlag_Enums, "QtGui", "QFlags_IteratorFlag");
+static gsi::ClassExt<QTreeWidgetItemIterator> decl_QTreeWidgetItemIterator_IteratorFlag_Enum_as_child (decl_QTreeWidgetItemIterator_IteratorFlag_Enum, "IteratorFlag");
+static gsi::ClassExt<QTreeWidgetItemIterator> decl_QTreeWidgetItemIterator_IteratorFlag_Enums_as_child (decl_QTreeWidgetItemIterator_IteratorFlag_Enums, "QFlags_IteratorFlag");
 
 }
 

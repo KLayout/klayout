@@ -1660,8 +1660,8 @@ END
     end
 
     ofile.puts("static gsi::ClassExt<#{pname}> inject_#{clsn}_#{en}_Enum_in_parent (decl_#{clsn}_#{en}_Enum.defs ());")
-    ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enum_as_child (decl_#{clsn}_#{en}_Enum, \"#{modn}\", \"#{en}\");")
-    ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enums_as_child (decl_#{clsn}_#{en}_Enums, \"#{modn}\", \"QFlags_#{en}\");")
+    ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enum_as_child (decl_#{clsn}_#{en}_Enum, \"#{en}\");")
+    ofile.puts("static gsi::ClassExt<#{pname}> decl_#{clsn}_#{en}_Enums_as_child (decl_#{clsn}_#{en}_Enums, \"QFlags_#{en}\");")
 
     ofile.puts("")
     ofile.puts("}")
@@ -2299,7 +2299,7 @@ END
           pcls = o.myself + "::" + pcls
         end
 
-        ofile.puts("gsi::ClassExt<#{pcls}> decl_#{clsn}_as_child (decl_#{clsn}, \"#{modn}\", \"#{cclsn}\");")
+        ofile.puts("gsi::ClassExt<#{pcls}> decl_#{clsn}_as_child (decl_#{clsn}, \"#{cclsn}\");")
 
       end
 
@@ -2812,7 +2812,7 @@ END
           pcls = o.myself + "::" + pcls
         end
 
-        ofile.puts("gsi::ClassExt<#{pcls}> decl_#{clsn}_as_child (decl_#{clsn}_Adaptor, \"#{modn}\", \"#{cclsn}\");")
+        ofile.puts("gsi::ClassExt<#{pcls}> decl_#{clsn}_as_child (decl_#{clsn}_Adaptor, \"#{cclsn}\");")
 
       end
 
@@ -3023,7 +3023,7 @@ END
       extfile.puts("#define HDR_gsi#{modn}Externals")
       extfile.puts("")
 
-      extfile.puts("#include \"gsiClassBase.h\"")
+      extfile.puts("#include \"gsiClass.h\"")
       extfile.puts("#include \"gsi#{modn}Common.h\"")
       extfile.puts("")
 

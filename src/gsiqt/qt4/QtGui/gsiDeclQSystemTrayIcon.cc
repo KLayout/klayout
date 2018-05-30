@@ -915,8 +915,8 @@ static gsi::QFlagsClass<QSystemTrayIcon::ActivationReason > decl_QSystemTrayIcon
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSystemTrayIcon> inject_QSystemTrayIcon_ActivationReason_Enum_in_parent (decl_QSystemTrayIcon_ActivationReason_Enum.defs ());
-static gsi::ClassExt<QSystemTrayIcon> decl_QSystemTrayIcon_ActivationReason_Enum_as_child (decl_QSystemTrayIcon_ActivationReason_Enum, "QtGui", "ActivationReason");
-static gsi::ClassExt<QSystemTrayIcon> decl_QSystemTrayIcon_ActivationReason_Enums_as_child (decl_QSystemTrayIcon_ActivationReason_Enums, "QtGui", "QFlags_ActivationReason");
+static gsi::ClassExt<QSystemTrayIcon> decl_QSystemTrayIcon_ActivationReason_Enum_as_child (decl_QSystemTrayIcon_ActivationReason_Enum, "ActivationReason");
+static gsi::ClassExt<QSystemTrayIcon> decl_QSystemTrayIcon_ActivationReason_Enums_as_child (decl_QSystemTrayIcon_ActivationReason_Enums, "QFlags_ActivationReason");
 
 }
 
@@ -937,8 +937,8 @@ static gsi::QFlagsClass<QSystemTrayIcon::MessageIcon > decl_QSystemTrayIcon_Mess
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSystemTrayIcon> inject_QSystemTrayIcon_MessageIcon_Enum_in_parent (decl_QSystemTrayIcon_MessageIcon_Enum.defs ());
-static gsi::ClassExt<QSystemTrayIcon> decl_QSystemTrayIcon_MessageIcon_Enum_as_child (decl_QSystemTrayIcon_MessageIcon_Enum, "QtGui", "MessageIcon");
-static gsi::ClassExt<QSystemTrayIcon> decl_QSystemTrayIcon_MessageIcon_Enums_as_child (decl_QSystemTrayIcon_MessageIcon_Enums, "QtGui", "QFlags_MessageIcon");
+static gsi::ClassExt<QSystemTrayIcon> decl_QSystemTrayIcon_MessageIcon_Enum_as_child (decl_QSystemTrayIcon_MessageIcon_Enum, "MessageIcon");
+static gsi::ClassExt<QSystemTrayIcon> decl_QSystemTrayIcon_MessageIcon_Enums_as_child (decl_QSystemTrayIcon_MessageIcon_Enums, "QFlags_MessageIcon");
 
 }
 

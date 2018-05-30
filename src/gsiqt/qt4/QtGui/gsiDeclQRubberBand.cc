@@ -2620,8 +2620,8 @@ static gsi::QFlagsClass<QRubberBand::Shape > decl_QRubberBand_Shape_Enums ("QtGu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QRubberBand> inject_QRubberBand_Shape_Enum_in_parent (decl_QRubberBand_Shape_Enum.defs ());
-static gsi::ClassExt<QRubberBand> decl_QRubberBand_Shape_Enum_as_child (decl_QRubberBand_Shape_Enum, "QtGui", "Shape");
-static gsi::ClassExt<QRubberBand> decl_QRubberBand_Shape_Enums_as_child (decl_QRubberBand_Shape_Enums, "QtGui", "QFlags_Shape");
+static gsi::ClassExt<QRubberBand> decl_QRubberBand_Shape_Enum_as_child (decl_QRubberBand_Shape_Enum, "Shape");
+static gsi::ClassExt<QRubberBand> decl_QRubberBand_Shape_Enums_as_child (decl_QRubberBand_Shape_Enums, "QFlags_Shape");
 
 }
 

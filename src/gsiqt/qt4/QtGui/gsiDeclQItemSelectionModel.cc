@@ -1266,8 +1266,8 @@ static gsi::QFlagsClass<QItemSelectionModel::SelectionFlag > decl_QItemSelection
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QItemSelectionModel> inject_QItemSelectionModel_SelectionFlag_Enum_in_parent (decl_QItemSelectionModel_SelectionFlag_Enum.defs ());
-static gsi::ClassExt<QItemSelectionModel> decl_QItemSelectionModel_SelectionFlag_Enum_as_child (decl_QItemSelectionModel_SelectionFlag_Enum, "QtGui", "SelectionFlag");
-static gsi::ClassExt<QItemSelectionModel> decl_QItemSelectionModel_SelectionFlag_Enums_as_child (decl_QItemSelectionModel_SelectionFlag_Enums, "QtGui", "QFlags_SelectionFlag");
+static gsi::ClassExt<QItemSelectionModel> decl_QItemSelectionModel_SelectionFlag_Enum_as_child (decl_QItemSelectionModel_SelectionFlag_Enum, "SelectionFlag");
+static gsi::ClassExt<QItemSelectionModel> decl_QItemSelectionModel_SelectionFlag_Enums_as_child (decl_QItemSelectionModel_SelectionFlag_Enums, "QFlags_SelectionFlag");
 
 }
 

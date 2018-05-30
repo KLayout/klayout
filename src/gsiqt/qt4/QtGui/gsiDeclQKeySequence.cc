@@ -485,8 +485,8 @@ static gsi::QFlagsClass<QKeySequence::SequenceFormat > decl_QKeySequence_Sequenc
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QKeySequence> inject_QKeySequence_SequenceFormat_Enum_in_parent (decl_QKeySequence_SequenceFormat_Enum.defs ());
-static gsi::ClassExt<QKeySequence> decl_QKeySequence_SequenceFormat_Enum_as_child (decl_QKeySequence_SequenceFormat_Enum, "QtGui", "SequenceFormat");
-static gsi::ClassExt<QKeySequence> decl_QKeySequence_SequenceFormat_Enums_as_child (decl_QKeySequence_SequenceFormat_Enums, "QtGui", "QFlags_SequenceFormat");
+static gsi::ClassExt<QKeySequence> decl_QKeySequence_SequenceFormat_Enum_as_child (decl_QKeySequence_SequenceFormat_Enum, "SequenceFormat");
+static gsi::ClassExt<QKeySequence> decl_QKeySequence_SequenceFormat_Enums_as_child (decl_QKeySequence_SequenceFormat_Enums, "QFlags_SequenceFormat");
 
 }
 
@@ -506,8 +506,8 @@ static gsi::QFlagsClass<QKeySequence::SequenceMatch > decl_QKeySequence_Sequence
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QKeySequence> inject_QKeySequence_SequenceMatch_Enum_in_parent (decl_QKeySequence_SequenceMatch_Enum.defs ());
-static gsi::ClassExt<QKeySequence> decl_QKeySequence_SequenceMatch_Enum_as_child (decl_QKeySequence_SequenceMatch_Enum, "QtGui", "SequenceMatch");
-static gsi::ClassExt<QKeySequence> decl_QKeySequence_SequenceMatch_Enums_as_child (decl_QKeySequence_SequenceMatch_Enums, "QtGui", "QFlags_SequenceMatch");
+static gsi::ClassExt<QKeySequence> decl_QKeySequence_SequenceMatch_Enum_as_child (decl_QKeySequence_SequenceMatch_Enum, "SequenceMatch");
+static gsi::ClassExt<QKeySequence> decl_QKeySequence_SequenceMatch_Enums_as_child (decl_QKeySequence_SequenceMatch_Enums, "QFlags_SequenceMatch");
 
 }
 
@@ -590,8 +590,8 @@ static gsi::QFlagsClass<QKeySequence::StandardKey > decl_QKeySequence_StandardKe
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QKeySequence> inject_QKeySequence_StandardKey_Enum_in_parent (decl_QKeySequence_StandardKey_Enum.defs ());
-static gsi::ClassExt<QKeySequence> decl_QKeySequence_StandardKey_Enum_as_child (decl_QKeySequence_StandardKey_Enum, "QtGui", "StandardKey");
-static gsi::ClassExt<QKeySequence> decl_QKeySequence_StandardKey_Enums_as_child (decl_QKeySequence_StandardKey_Enums, "QtGui", "QFlags_StandardKey");
+static gsi::ClassExt<QKeySequence> decl_QKeySequence_StandardKey_Enum_as_child (decl_QKeySequence_StandardKey_Enum, "StandardKey");
+static gsi::ClassExt<QKeySequence> decl_QKeySequence_StandardKey_Enums_as_child (decl_QKeySequence_StandardKey_Enums, "QFlags_StandardKey");
 
 }
 

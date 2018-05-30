@@ -321,8 +321,8 @@ static gsi::QFlagsClass<QSqlError::ErrorType > decl_QSqlError_ErrorType_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSqlError> inject_QSqlError_ErrorType_Enum_in_parent (decl_QSqlError_ErrorType_Enum.defs ());
-static gsi::ClassExt<QSqlError> decl_QSqlError_ErrorType_Enum_as_child (decl_QSqlError_ErrorType_Enum, "QtSql", "ErrorType");
-static gsi::ClassExt<QSqlError> decl_QSqlError_ErrorType_Enums_as_child (decl_QSqlError_ErrorType_Enums, "QtSql", "QFlags_ErrorType");
+static gsi::ClassExt<QSqlError> decl_QSqlError_ErrorType_Enum_as_child (decl_QSqlError_ErrorType_Enum, "ErrorType");
+static gsi::ClassExt<QSqlError> decl_QSqlError_ErrorType_Enums_as_child (decl_QSqlError_ErrorType_Enums, "QFlags_ErrorType");
 
 }
 

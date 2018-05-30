@@ -494,8 +494,8 @@ static gsi::QFlagsClass<QPrintEngine::PrintEnginePropertyKey > decl_QPrintEngine
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QPrintEngine> inject_QPrintEngine_PrintEnginePropertyKey_Enum_in_parent (decl_QPrintEngine_PrintEnginePropertyKey_Enum.defs ());
-static gsi::ClassExt<QPrintEngine> decl_QPrintEngine_PrintEnginePropertyKey_Enum_as_child (decl_QPrintEngine_PrintEnginePropertyKey_Enum, "QtGui", "PrintEnginePropertyKey");
-static gsi::ClassExt<QPrintEngine> decl_QPrintEngine_PrintEnginePropertyKey_Enums_as_child (decl_QPrintEngine_PrintEnginePropertyKey_Enums, "QtGui", "QFlags_PrintEnginePropertyKey");
+static gsi::ClassExt<QPrintEngine> decl_QPrintEngine_PrintEnginePropertyKey_Enum_as_child (decl_QPrintEngine_PrintEnginePropertyKey_Enum, "PrintEnginePropertyKey");
+static gsi::ClassExt<QPrintEngine> decl_QPrintEngine_PrintEnginePropertyKey_Enums_as_child (decl_QPrintEngine_PrintEnginePropertyKey_Enums, "QFlags_PrintEnginePropertyKey");
 
 }
 

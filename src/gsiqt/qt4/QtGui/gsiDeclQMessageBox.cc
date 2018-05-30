@@ -3678,8 +3678,8 @@ static gsi::QFlagsClass<QMessageBox::ButtonRole > decl_QMessageBox_ButtonRole_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMessageBox> inject_QMessageBox_ButtonRole_Enum_in_parent (decl_QMessageBox_ButtonRole_Enum.defs ());
-static gsi::ClassExt<QMessageBox> decl_QMessageBox_ButtonRole_Enum_as_child (decl_QMessageBox_ButtonRole_Enum, "QtGui", "ButtonRole");
-static gsi::ClassExt<QMessageBox> decl_QMessageBox_ButtonRole_Enums_as_child (decl_QMessageBox_ButtonRole_Enums, "QtGui", "QFlags_ButtonRole");
+static gsi::ClassExt<QMessageBox> decl_QMessageBox_ButtonRole_Enum_as_child (decl_QMessageBox_ButtonRole_Enum, "ButtonRole");
+static gsi::ClassExt<QMessageBox> decl_QMessageBox_ButtonRole_Enums_as_child (decl_QMessageBox_ButtonRole_Enums, "QFlags_ButtonRole");
 
 }
 
@@ -3701,8 +3701,8 @@ static gsi::QFlagsClass<QMessageBox::Icon > decl_QMessageBox_Icon_Enums ("QtGui"
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMessageBox> inject_QMessageBox_Icon_Enum_in_parent (decl_QMessageBox_Icon_Enum.defs ());
-static gsi::ClassExt<QMessageBox> decl_QMessageBox_Icon_Enum_as_child (decl_QMessageBox_Icon_Enum, "QtGui", "Icon");
-static gsi::ClassExt<QMessageBox> decl_QMessageBox_Icon_Enums_as_child (decl_QMessageBox_Icon_Enums, "QtGui", "QFlags_Icon");
+static gsi::ClassExt<QMessageBox> decl_QMessageBox_Icon_Enum_as_child (decl_QMessageBox_Icon_Enum, "Icon");
+static gsi::ClassExt<QMessageBox> decl_QMessageBox_Icon_Enums_as_child (decl_QMessageBox_Icon_Enums, "QFlags_Icon");
 
 }
 
@@ -3746,8 +3746,8 @@ static gsi::QFlagsClass<QMessageBox::StandardButton > decl_QMessageBox_StandardB
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMessageBox> inject_QMessageBox_StandardButton_Enum_in_parent (decl_QMessageBox_StandardButton_Enum.defs ());
-static gsi::ClassExt<QMessageBox> decl_QMessageBox_StandardButton_Enum_as_child (decl_QMessageBox_StandardButton_Enum, "QtGui", "StandardButton");
-static gsi::ClassExt<QMessageBox> decl_QMessageBox_StandardButton_Enums_as_child (decl_QMessageBox_StandardButton_Enums, "QtGui", "QFlags_StandardButton");
+static gsi::ClassExt<QMessageBox> decl_QMessageBox_StandardButton_Enum_as_child (decl_QMessageBox_StandardButton_Enum, "StandardButton");
+static gsi::ClassExt<QMessageBox> decl_QMessageBox_StandardButton_Enums_as_child (decl_QMessageBox_StandardButton_Enums, "QFlags_StandardButton");
 
 }
 

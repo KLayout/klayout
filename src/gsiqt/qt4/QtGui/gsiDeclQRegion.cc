@@ -1055,8 +1055,8 @@ static gsi::QFlagsClass<QRegion::RegionType > decl_QRegion_RegionType_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QRegion> inject_QRegion_RegionType_Enum_in_parent (decl_QRegion_RegionType_Enum.defs ());
-static gsi::ClassExt<QRegion> decl_QRegion_RegionType_Enum_as_child (decl_QRegion_RegionType_Enum, "QtGui", "RegionType");
-static gsi::ClassExt<QRegion> decl_QRegion_RegionType_Enums_as_child (decl_QRegion_RegionType_Enums, "QtGui", "QFlags_RegionType");
+static gsi::ClassExt<QRegion> decl_QRegion_RegionType_Enum_as_child (decl_QRegion_RegionType_Enum, "RegionType");
+static gsi::ClassExt<QRegion> decl_QRegion_RegionType_Enums_as_child (decl_QRegion_RegionType_Enums, "QFlags_RegionType");
 
 }
 

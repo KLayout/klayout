@@ -3997,8 +3997,8 @@ static gsi::QFlagsClass<QFileDialog::AcceptMode > decl_QFileDialog_AcceptMode_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFileDialog> inject_QFileDialog_AcceptMode_Enum_in_parent (decl_QFileDialog_AcceptMode_Enum.defs ());
-static gsi::ClassExt<QFileDialog> decl_QFileDialog_AcceptMode_Enum_as_child (decl_QFileDialog_AcceptMode_Enum, "QtGui", "AcceptMode");
-static gsi::ClassExt<QFileDialog> decl_QFileDialog_AcceptMode_Enums_as_child (decl_QFileDialog_AcceptMode_Enums, "QtGui", "QFlags_AcceptMode");
+static gsi::ClassExt<QFileDialog> decl_QFileDialog_AcceptMode_Enum_as_child (decl_QFileDialog_AcceptMode_Enum, "AcceptMode");
+static gsi::ClassExt<QFileDialog> decl_QFileDialog_AcceptMode_Enums_as_child (decl_QFileDialog_AcceptMode_Enums, "QFlags_AcceptMode");
 
 }
 
@@ -4020,8 +4020,8 @@ static gsi::QFlagsClass<QFileDialog::DialogLabel > decl_QFileDialog_DialogLabel_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFileDialog> inject_QFileDialog_DialogLabel_Enum_in_parent (decl_QFileDialog_DialogLabel_Enum.defs ());
-static gsi::ClassExt<QFileDialog> decl_QFileDialog_DialogLabel_Enum_as_child (decl_QFileDialog_DialogLabel_Enum, "QtGui", "DialogLabel");
-static gsi::ClassExt<QFileDialog> decl_QFileDialog_DialogLabel_Enums_as_child (decl_QFileDialog_DialogLabel_Enums, "QtGui", "QFlags_DialogLabel");
+static gsi::ClassExt<QFileDialog> decl_QFileDialog_DialogLabel_Enum_as_child (decl_QFileDialog_DialogLabel_Enum, "DialogLabel");
+static gsi::ClassExt<QFileDialog> decl_QFileDialog_DialogLabel_Enums_as_child (decl_QFileDialog_DialogLabel_Enums, "QFlags_DialogLabel");
 
 }
 
@@ -4043,8 +4043,8 @@ static gsi::QFlagsClass<QFileDialog::FileMode > decl_QFileDialog_FileMode_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFileDialog> inject_QFileDialog_FileMode_Enum_in_parent (decl_QFileDialog_FileMode_Enum.defs ());
-static gsi::ClassExt<QFileDialog> decl_QFileDialog_FileMode_Enum_as_child (decl_QFileDialog_FileMode_Enum, "QtGui", "FileMode");
-static gsi::ClassExt<QFileDialog> decl_QFileDialog_FileMode_Enums_as_child (decl_QFileDialog_FileMode_Enums, "QtGui", "QFlags_FileMode");
+static gsi::ClassExt<QFileDialog> decl_QFileDialog_FileMode_Enum_as_child (decl_QFileDialog_FileMode_Enum, "FileMode");
+static gsi::ClassExt<QFileDialog> decl_QFileDialog_FileMode_Enums_as_child (decl_QFileDialog_FileMode_Enums, "QFlags_FileMode");
 
 }
 
@@ -4068,8 +4068,8 @@ static gsi::QFlagsClass<QFileDialog::Option > decl_QFileDialog_Option_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFileDialog> inject_QFileDialog_Option_Enum_in_parent (decl_QFileDialog_Option_Enum.defs ());
-static gsi::ClassExt<QFileDialog> decl_QFileDialog_Option_Enum_as_child (decl_QFileDialog_Option_Enum, "QtGui", "Option");
-static gsi::ClassExt<QFileDialog> decl_QFileDialog_Option_Enums_as_child (decl_QFileDialog_Option_Enums, "QtGui", "QFlags_Option");
+static gsi::ClassExt<QFileDialog> decl_QFileDialog_Option_Enum_as_child (decl_QFileDialog_Option_Enum, "Option");
+static gsi::ClassExt<QFileDialog> decl_QFileDialog_Option_Enums_as_child (decl_QFileDialog_Option_Enums, "QFlags_Option");
 
 }
 
@@ -4088,8 +4088,8 @@ static gsi::QFlagsClass<QFileDialog::ViewMode > decl_QFileDialog_ViewMode_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFileDialog> inject_QFileDialog_ViewMode_Enum_in_parent (decl_QFileDialog_ViewMode_Enum.defs ());
-static gsi::ClassExt<QFileDialog> decl_QFileDialog_ViewMode_Enum_as_child (decl_QFileDialog_ViewMode_Enum, "QtGui", "ViewMode");
-static gsi::ClassExt<QFileDialog> decl_QFileDialog_ViewMode_Enums_as_child (decl_QFileDialog_ViewMode_Enums, "QtGui", "QFlags_ViewMode");
+static gsi::ClassExt<QFileDialog> decl_QFileDialog_ViewMode_Enum_as_child (decl_QFileDialog_ViewMode_Enum, "ViewMode");
+static gsi::ClassExt<QFileDialog> decl_QFileDialog_ViewMode_Enums_as_child (decl_QFileDialog_ViewMode_Enums, "QFlags_ViewMode");
 
 }
 

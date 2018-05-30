@@ -65,7 +65,7 @@ gsi::Class<QAbstractTextDocumentLayout::Selection> decl_QAbstractTextDocumentLay
   methods_QAbstractTextDocumentLayout_Selection (),
   "@qt\n@brief Binding of QAbstractTextDocumentLayout::Selection");
 
-gsi::ClassExt<QAbstractTextDocumentLayout> decl_QAbstractTextDocumentLayout_Selection_as_child (decl_QAbstractTextDocumentLayout_Selection, "QtGui", "Selection");
+gsi::ClassExt<QAbstractTextDocumentLayout> decl_QAbstractTextDocumentLayout_Selection_as_child (decl_QAbstractTextDocumentLayout_Selection, "Selection");
 
 GSI_QTGUI_PUBLIC gsi::Class<QAbstractTextDocumentLayout::Selection> &qtdecl_QAbstractTextDocumentLayout_Selection () { return decl_QAbstractTextDocumentLayout_Selection; }
 

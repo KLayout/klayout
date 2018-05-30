@@ -793,7 +793,7 @@ gsi::Class<QTouchEvent::TouchPoint> decl_QTouchEvent_TouchPoint ("QtGui", "QTouc
   methods_QTouchEvent_TouchPoint (),
   "@qt\n@brief Binding of QTouchEvent::TouchPoint");
 
-gsi::ClassExt<QTouchEvent> decl_QTouchEvent_TouchPoint_as_child (decl_QTouchEvent_TouchPoint, "QtGui", "TouchPoint");
+gsi::ClassExt<QTouchEvent> decl_QTouchEvent_TouchPoint_as_child (decl_QTouchEvent_TouchPoint, "TouchPoint");
 
 GSI_QTGUI_PUBLIC gsi::Class<QTouchEvent::TouchPoint> &qtdecl_QTouchEvent_TouchPoint () { return decl_QTouchEvent_TouchPoint; }
 

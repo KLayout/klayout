@@ -2945,8 +2945,8 @@ static gsi::QFlagsClass<QProgressBar::Direction > decl_QProgressBar_Direction_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QProgressBar> inject_QProgressBar_Direction_Enum_in_parent (decl_QProgressBar_Direction_Enum.defs ());
-static gsi::ClassExt<QProgressBar> decl_QProgressBar_Direction_Enum_as_child (decl_QProgressBar_Direction_Enum, "QtGui", "Direction");
-static gsi::ClassExt<QProgressBar> decl_QProgressBar_Direction_Enums_as_child (decl_QProgressBar_Direction_Enums, "QtGui", "QFlags_Direction");
+static gsi::ClassExt<QProgressBar> decl_QProgressBar_Direction_Enum_as_child (decl_QProgressBar_Direction_Enum, "Direction");
+static gsi::ClassExt<QProgressBar> decl_QProgressBar_Direction_Enums_as_child (decl_QProgressBar_Direction_Enums, "QFlags_Direction");
 
 }
 

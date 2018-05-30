@@ -365,8 +365,8 @@ static gsi::QFlagsClass<QGestureRecognizer::ResultFlag > decl_QGestureRecognizer
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGestureRecognizer> inject_QGestureRecognizer_ResultFlag_Enum_in_parent (decl_QGestureRecognizer_ResultFlag_Enum.defs ());
-static gsi::ClassExt<QGestureRecognizer> decl_QGestureRecognizer_ResultFlag_Enum_as_child (decl_QGestureRecognizer_ResultFlag_Enum, "QtGui", "ResultFlag");
-static gsi::ClassExt<QGestureRecognizer> decl_QGestureRecognizer_ResultFlag_Enums_as_child (decl_QGestureRecognizer_ResultFlag_Enums, "QtGui", "QFlags_ResultFlag");
+static gsi::ClassExt<QGestureRecognizer> decl_QGestureRecognizer_ResultFlag_Enum_as_child (decl_QGestureRecognizer_ResultFlag_Enum, "ResultFlag");
+static gsi::ClassExt<QGestureRecognizer> decl_QGestureRecognizer_ResultFlag_Enums_as_child (decl_QGestureRecognizer_ResultFlag_Enums, "QFlags_ResultFlag");
 
 }
 

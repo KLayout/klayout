@@ -3902,8 +3902,8 @@ static gsi::QFlagsClass<QDateTimeEdit::Section > decl_QDateTimeEdit_Section_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDateTimeEdit> inject_QDateTimeEdit_Section_Enum_in_parent (decl_QDateTimeEdit_Section_Enum.defs ());
-static gsi::ClassExt<QDateTimeEdit> decl_QDateTimeEdit_Section_Enum_as_child (decl_QDateTimeEdit_Section_Enum, "QtGui", "Section");
-static gsi::ClassExt<QDateTimeEdit> decl_QDateTimeEdit_Section_Enums_as_child (decl_QDateTimeEdit_Section_Enums, "QtGui", "QFlags_Section");
+static gsi::ClassExt<QDateTimeEdit> decl_QDateTimeEdit_Section_Enum_as_child (decl_QDateTimeEdit_Section_Enum, "Section");
+static gsi::ClassExt<QDateTimeEdit> decl_QDateTimeEdit_Section_Enums_as_child (decl_QDateTimeEdit_Section_Enums, "QFlags_Section");
 
 }
 

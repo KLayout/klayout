@@ -3698,8 +3698,8 @@ static gsi::QFlagsClass<QTabBar::ButtonPosition > decl_QTabBar_ButtonPosition_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTabBar> inject_QTabBar_ButtonPosition_Enum_in_parent (decl_QTabBar_ButtonPosition_Enum.defs ());
-static gsi::ClassExt<QTabBar> decl_QTabBar_ButtonPosition_Enum_as_child (decl_QTabBar_ButtonPosition_Enum, "QtGui", "ButtonPosition");
-static gsi::ClassExt<QTabBar> decl_QTabBar_ButtonPosition_Enums_as_child (decl_QTabBar_ButtonPosition_Enums, "QtGui", "QFlags_ButtonPosition");
+static gsi::ClassExt<QTabBar> decl_QTabBar_ButtonPosition_Enum_as_child (decl_QTabBar_ButtonPosition_Enum, "ButtonPosition");
+static gsi::ClassExt<QTabBar> decl_QTabBar_ButtonPosition_Enums_as_child (decl_QTabBar_ButtonPosition_Enums, "QFlags_ButtonPosition");
 
 }
 
@@ -3719,8 +3719,8 @@ static gsi::QFlagsClass<QTabBar::SelectionBehavior > decl_QTabBar_SelectionBehav
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTabBar> inject_QTabBar_SelectionBehavior_Enum_in_parent (decl_QTabBar_SelectionBehavior_Enum.defs ());
-static gsi::ClassExt<QTabBar> decl_QTabBar_SelectionBehavior_Enum_as_child (decl_QTabBar_SelectionBehavior_Enum, "QtGui", "SelectionBehavior");
-static gsi::ClassExt<QTabBar> decl_QTabBar_SelectionBehavior_Enums_as_child (decl_QTabBar_SelectionBehavior_Enums, "QtGui", "QFlags_SelectionBehavior");
+static gsi::ClassExt<QTabBar> decl_QTabBar_SelectionBehavior_Enum_as_child (decl_QTabBar_SelectionBehavior_Enum, "SelectionBehavior");
+static gsi::ClassExt<QTabBar> decl_QTabBar_SelectionBehavior_Enums_as_child (decl_QTabBar_SelectionBehavior_Enums, "QFlags_SelectionBehavior");
 
 }
 
@@ -3745,8 +3745,8 @@ static gsi::QFlagsClass<QTabBar::Shape > decl_QTabBar_Shape_Enums ("QtGui", "QTa
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTabBar> inject_QTabBar_Shape_Enum_in_parent (decl_QTabBar_Shape_Enum.defs ());
-static gsi::ClassExt<QTabBar> decl_QTabBar_Shape_Enum_as_child (decl_QTabBar_Shape_Enum, "QtGui", "Shape");
-static gsi::ClassExt<QTabBar> decl_QTabBar_Shape_Enums_as_child (decl_QTabBar_Shape_Enums, "QtGui", "QFlags_Shape");
+static gsi::ClassExt<QTabBar> decl_QTabBar_Shape_Enum_as_child (decl_QTabBar_Shape_Enum, "Shape");
+static gsi::ClassExt<QTabBar> decl_QTabBar_Shape_Enums_as_child (decl_QTabBar_Shape_Enums, "QFlags_Shape");
 
 }
 

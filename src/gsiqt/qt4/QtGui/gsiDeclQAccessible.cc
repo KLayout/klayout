@@ -221,8 +221,8 @@ static gsi::QFlagsClass<QAccessible::Event > decl_QAccessible_Event_Enums ("QtGu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAccessible> inject_QAccessible_Event_Enum_in_parent (decl_QAccessible_Event_Enum.defs ());
-static gsi::ClassExt<QAccessible> decl_QAccessible_Event_Enum_as_child (decl_QAccessible_Event_Enum, "QtGui", "Event");
-static gsi::ClassExt<QAccessible> decl_QAccessible_Event_Enums_as_child (decl_QAccessible_Event_Enums, "QtGui", "QFlags_Event");
+static gsi::ClassExt<QAccessible> decl_QAccessible_Event_Enum_as_child (decl_QAccessible_Event_Enum, "Event");
+static gsi::ClassExt<QAccessible> decl_QAccessible_Event_Enums_as_child (decl_QAccessible_Event_Enums, "QFlags_Event");
 
 }
 
@@ -244,8 +244,8 @@ static gsi::QFlagsClass<QAccessible::Method > decl_QAccessible_Method_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAccessible> inject_QAccessible_Method_Enum_in_parent (decl_QAccessible_Method_Enum.defs ());
-static gsi::ClassExt<QAccessible> decl_QAccessible_Method_Enum_as_child (decl_QAccessible_Method_Enum, "QtGui", "Method");
-static gsi::ClassExt<QAccessible> decl_QAccessible_Method_Enums_as_child (decl_QAccessible_Method_Enums, "QtGui", "QFlags_Method");
+static gsi::ClassExt<QAccessible> decl_QAccessible_Method_Enum_as_child (decl_QAccessible_Method_Enum, "Method");
+static gsi::ClassExt<QAccessible> decl_QAccessible_Method_Enums_as_child (decl_QAccessible_Method_Enums, "QFlags_Method");
 
 }
 
@@ -282,8 +282,8 @@ static gsi::QFlagsClass<QAccessible::RelationFlag > decl_QAccessible_RelationFla
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAccessible> inject_QAccessible_RelationFlag_Enum_in_parent (decl_QAccessible_RelationFlag_Enum.defs ());
-static gsi::ClassExt<QAccessible> decl_QAccessible_RelationFlag_Enum_as_child (decl_QAccessible_RelationFlag_Enum, "QtGui", "RelationFlag");
-static gsi::ClassExt<QAccessible> decl_QAccessible_RelationFlag_Enums_as_child (decl_QAccessible_RelationFlag_Enums, "QtGui", "QFlags_RelationFlag");
+static gsi::ClassExt<QAccessible> decl_QAccessible_RelationFlag_Enum_as_child (decl_QAccessible_RelationFlag_Enum, "RelationFlag");
+static gsi::ClassExt<QAccessible> decl_QAccessible_RelationFlag_Enums_as_child (decl_QAccessible_RelationFlag_Enums, "QFlags_RelationFlag");
 
 }
 
@@ -364,8 +364,8 @@ static gsi::QFlagsClass<QAccessible::Role > decl_QAccessible_Role_Enums ("QtGui"
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAccessible> inject_QAccessible_Role_Enum_in_parent (decl_QAccessible_Role_Enum.defs ());
-static gsi::ClassExt<QAccessible> decl_QAccessible_Role_Enum_as_child (decl_QAccessible_Role_Enum, "QtGui", "Role");
-static gsi::ClassExt<QAccessible> decl_QAccessible_Role_Enums_as_child (decl_QAccessible_Role_Enums, "QtGui", "QFlags_Role");
+static gsi::ClassExt<QAccessible> decl_QAccessible_Role_Enum_as_child (decl_QAccessible_Role_Enum, "Role");
+static gsi::ClassExt<QAccessible> decl_QAccessible_Role_Enums_as_child (decl_QAccessible_Role_Enums, "QFlags_Role");
 
 }
 
@@ -412,8 +412,8 @@ static gsi::QFlagsClass<QAccessible::StateFlag > decl_QAccessible_StateFlag_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAccessible> inject_QAccessible_StateFlag_Enum_in_parent (decl_QAccessible_StateFlag_Enum.defs ());
-static gsi::ClassExt<QAccessible> decl_QAccessible_StateFlag_Enum_as_child (decl_QAccessible_StateFlag_Enum, "QtGui", "StateFlag");
-static gsi::ClassExt<QAccessible> decl_QAccessible_StateFlag_Enums_as_child (decl_QAccessible_StateFlag_Enums, "QtGui", "QFlags_StateFlag");
+static gsi::ClassExt<QAccessible> decl_QAccessible_StateFlag_Enum_as_child (decl_QAccessible_StateFlag_Enum, "StateFlag");
+static gsi::ClassExt<QAccessible> decl_QAccessible_StateFlag_Enums_as_child (decl_QAccessible_StateFlag_Enums, "QFlags_StateFlag");
 
 }
 
@@ -436,8 +436,8 @@ static gsi::QFlagsClass<QAccessible::Text > decl_QAccessible_Text_Enums ("QtGui"
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAccessible> inject_QAccessible_Text_Enum_in_parent (decl_QAccessible_Text_Enum.defs ());
-static gsi::ClassExt<QAccessible> decl_QAccessible_Text_Enum_as_child (decl_QAccessible_Text_Enum, "QtGui", "Text");
-static gsi::ClassExt<QAccessible> decl_QAccessible_Text_Enums_as_child (decl_QAccessible_Text_Enums, "QtGui", "QFlags_Text");
+static gsi::ClassExt<QAccessible> decl_QAccessible_Text_Enum_as_child (decl_QAccessible_Text_Enum, "Text");
+static gsi::ClassExt<QAccessible> decl_QAccessible_Text_Enums_as_child (decl_QAccessible_Text_Enums, "QFlags_Text");
 
 }
 

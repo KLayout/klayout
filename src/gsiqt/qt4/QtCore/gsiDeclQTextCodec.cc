@@ -785,8 +785,8 @@ static gsi::QFlagsClass<QTextCodec::ConversionFlag > decl_QTextCodec_ConversionF
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextCodec> inject_QTextCodec_ConversionFlag_Enum_in_parent (decl_QTextCodec_ConversionFlag_Enum.defs ());
-static gsi::ClassExt<QTextCodec> decl_QTextCodec_ConversionFlag_Enum_as_child (decl_QTextCodec_ConversionFlag_Enum, "QtCore", "ConversionFlag");
-static gsi::ClassExt<QTextCodec> decl_QTextCodec_ConversionFlag_Enums_as_child (decl_QTextCodec_ConversionFlag_Enums, "QtCore", "QFlags_ConversionFlag");
+static gsi::ClassExt<QTextCodec> decl_QTextCodec_ConversionFlag_Enum_as_child (decl_QTextCodec_ConversionFlag_Enum, "ConversionFlag");
+static gsi::ClassExt<QTextCodec> decl_QTextCodec_ConversionFlag_Enums_as_child (decl_QTextCodec_ConversionFlag_Enums, "QFlags_ConversionFlag");
 
 }
 

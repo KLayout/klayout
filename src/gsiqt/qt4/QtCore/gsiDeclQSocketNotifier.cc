@@ -669,8 +669,8 @@ static gsi::QFlagsClass<QSocketNotifier::Type > decl_QSocketNotifier_Type_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSocketNotifier> inject_QSocketNotifier_Type_Enum_in_parent (decl_QSocketNotifier_Type_Enum.defs ());
-static gsi::ClassExt<QSocketNotifier> decl_QSocketNotifier_Type_Enum_as_child (decl_QSocketNotifier_Type_Enum, "QtCore", "Type");
-static gsi::ClassExt<QSocketNotifier> decl_QSocketNotifier_Type_Enums_as_child (decl_QSocketNotifier_Type_Enums, "QtCore", "QFlags_Type");
+static gsi::ClassExt<QSocketNotifier> decl_QSocketNotifier_Type_Enum_as_child (decl_QSocketNotifier_Type_Enum, "Type");
+static gsi::ClassExt<QSocketNotifier> decl_QSocketNotifier_Type_Enums_as_child (decl_QSocketNotifier_Type_Enums, "QFlags_Type");
 
 }
 

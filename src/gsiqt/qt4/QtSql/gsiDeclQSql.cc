@@ -60,8 +60,8 @@ static gsi::QFlagsClass<QSql::Location > decl_QSql_Location_Enums ("QtSql", "QSq
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSql_Namespace> inject_QSql_Location_Enum_in_parent (decl_QSql_Location_Enum.defs ());
-static gsi::ClassExt<QSql_Namespace> decl_QSql_Location_Enum_as_child (decl_QSql_Location_Enum, "QtSql", "Location");
-static gsi::ClassExt<QSql_Namespace> decl_QSql_Location_Enums_as_child (decl_QSql_Location_Enums, "QtSql", "QFlags_Location");
+static gsi::ClassExt<QSql_Namespace> decl_QSql_Location_Enum_as_child (decl_QSql_Location_Enum, "Location");
+static gsi::ClassExt<QSql_Namespace> decl_QSql_Location_Enums_as_child (decl_QSql_Location_Enums, "QFlags_Location");
 
 }
 
@@ -82,8 +82,8 @@ static gsi::QFlagsClass<QSql::NumericalPrecisionPolicy > decl_QSql_NumericalPrec
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSql_Namespace> inject_QSql_NumericalPrecisionPolicy_Enum_in_parent (decl_QSql_NumericalPrecisionPolicy_Enum.defs ());
-static gsi::ClassExt<QSql_Namespace> decl_QSql_NumericalPrecisionPolicy_Enum_as_child (decl_QSql_NumericalPrecisionPolicy_Enum, "QtSql", "NumericalPrecisionPolicy");
-static gsi::ClassExt<QSql_Namespace> decl_QSql_NumericalPrecisionPolicy_Enums_as_child (decl_QSql_NumericalPrecisionPolicy_Enums, "QtSql", "QFlags_NumericalPrecisionPolicy");
+static gsi::ClassExt<QSql_Namespace> decl_QSql_NumericalPrecisionPolicy_Enum_as_child (decl_QSql_NumericalPrecisionPolicy_Enum, "NumericalPrecisionPolicy");
+static gsi::ClassExt<QSql_Namespace> decl_QSql_NumericalPrecisionPolicy_Enums_as_child (decl_QSql_NumericalPrecisionPolicy_Enums, "QFlags_NumericalPrecisionPolicy");
 
 }
 
@@ -104,8 +104,8 @@ static gsi::QFlagsClass<QSql::ParamTypeFlag > decl_QSql_ParamTypeFlag_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSql_Namespace> inject_QSql_ParamTypeFlag_Enum_in_parent (decl_QSql_ParamTypeFlag_Enum.defs ());
-static gsi::ClassExt<QSql_Namespace> decl_QSql_ParamTypeFlag_Enum_as_child (decl_QSql_ParamTypeFlag_Enum, "QtSql", "ParamTypeFlag");
-static gsi::ClassExt<QSql_Namespace> decl_QSql_ParamTypeFlag_Enums_as_child (decl_QSql_ParamTypeFlag_Enums, "QtSql", "QFlags_ParamTypeFlag");
+static gsi::ClassExt<QSql_Namespace> decl_QSql_ParamTypeFlag_Enum_as_child (decl_QSql_ParamTypeFlag_Enum, "ParamTypeFlag");
+static gsi::ClassExt<QSql_Namespace> decl_QSql_ParamTypeFlag_Enums_as_child (decl_QSql_ParamTypeFlag_Enums, "QFlags_ParamTypeFlag");
 
 }
 
@@ -126,8 +126,8 @@ static gsi::QFlagsClass<QSql::TableType > decl_QSql_TableType_Enums ("QtSql", "Q
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSql_Namespace> inject_QSql_TableType_Enum_in_parent (decl_QSql_TableType_Enum.defs ());
-static gsi::ClassExt<QSql_Namespace> decl_QSql_TableType_Enum_as_child (decl_QSql_TableType_Enum, "QtSql", "TableType");
-static gsi::ClassExt<QSql_Namespace> decl_QSql_TableType_Enums_as_child (decl_QSql_TableType_Enums, "QtSql", "QFlags_TableType");
+static gsi::ClassExt<QSql_Namespace> decl_QSql_TableType_Enum_as_child (decl_QSql_TableType_Enum, "TableType");
+static gsi::ClassExt<QSql_Namespace> decl_QSql_TableType_Enums_as_child (decl_QSql_TableType_Enums, "QFlags_TableType");
 
 }
 

@@ -928,8 +928,8 @@ static gsi::QFlagsClass<QDoubleValidator::Notation > decl_QDoubleValidator_Notat
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDoubleValidator> inject_QDoubleValidator_Notation_Enum_in_parent (decl_QDoubleValidator_Notation_Enum.defs ());
-static gsi::ClassExt<QDoubleValidator> decl_QDoubleValidator_Notation_Enum_as_child (decl_QDoubleValidator_Notation_Enum, "QtGui", "Notation");
-static gsi::ClassExt<QDoubleValidator> decl_QDoubleValidator_Notation_Enums_as_child (decl_QDoubleValidator_Notation_Enums, "QtGui", "QFlags_Notation");
+static gsi::ClassExt<QDoubleValidator> decl_QDoubleValidator_Notation_Enum_as_child (decl_QDoubleValidator_Notation_Enum, "Notation");
+static gsi::ClassExt<QDoubleValidator> decl_QDoubleValidator_Notation_Enums_as_child (decl_QDoubleValidator_Notation_Enums, "QFlags_Notation");
 
 }
 

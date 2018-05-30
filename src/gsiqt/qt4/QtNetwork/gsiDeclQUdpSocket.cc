@@ -401,8 +401,8 @@ static gsi::QFlagsClass<QUdpSocket::BindFlag > decl_QUdpSocket_BindFlag_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QUdpSocket> inject_QUdpSocket_BindFlag_Enum_in_parent (decl_QUdpSocket_BindFlag_Enum.defs ());
-static gsi::ClassExt<QUdpSocket> decl_QUdpSocket_BindFlag_Enum_as_child (decl_QUdpSocket_BindFlag_Enum, "QtNetwork", "BindFlag");
-static gsi::ClassExt<QUdpSocket> decl_QUdpSocket_BindFlag_Enums_as_child (decl_QUdpSocket_BindFlag_Enums, "QtNetwork", "QFlags_BindFlag");
+static gsi::ClassExt<QUdpSocket> decl_QUdpSocket_BindFlag_Enum_as_child (decl_QUdpSocket_BindFlag_Enum, "BindFlag");
+static gsi::ClassExt<QUdpSocket> decl_QUdpSocket_BindFlag_Enums_as_child (decl_QUdpSocket_BindFlag_Enums, "QFlags_BindFlag");
 
 }
 

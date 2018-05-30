@@ -646,8 +646,8 @@ static gsi::QFlagsClass<QTextFrameFormat::BorderStyle > decl_QTextFrameFormat_Bo
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextFrameFormat> inject_QTextFrameFormat_BorderStyle_Enum_in_parent (decl_QTextFrameFormat_BorderStyle_Enum.defs ());
-static gsi::ClassExt<QTextFrameFormat> decl_QTextFrameFormat_BorderStyle_Enum_as_child (decl_QTextFrameFormat_BorderStyle_Enum, "QtGui", "BorderStyle");
-static gsi::ClassExt<QTextFrameFormat> decl_QTextFrameFormat_BorderStyle_Enums_as_child (decl_QTextFrameFormat_BorderStyle_Enums, "QtGui", "QFlags_BorderStyle");
+static gsi::ClassExt<QTextFrameFormat> decl_QTextFrameFormat_BorderStyle_Enum_as_child (decl_QTextFrameFormat_BorderStyle_Enum, "BorderStyle");
+static gsi::ClassExt<QTextFrameFormat> decl_QTextFrameFormat_BorderStyle_Enums_as_child (decl_QTextFrameFormat_BorderStyle_Enums, "QFlags_BorderStyle");
 
 }
 
@@ -667,8 +667,8 @@ static gsi::QFlagsClass<QTextFrameFormat::Position > decl_QTextFrameFormat_Posit
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextFrameFormat> inject_QTextFrameFormat_Position_Enum_in_parent (decl_QTextFrameFormat_Position_Enum.defs ());
-static gsi::ClassExt<QTextFrameFormat> decl_QTextFrameFormat_Position_Enum_as_child (decl_QTextFrameFormat_Position_Enum, "QtGui", "Position");
-static gsi::ClassExt<QTextFrameFormat> decl_QTextFrameFormat_Position_Enums_as_child (decl_QTextFrameFormat_Position_Enums, "QtGui", "QFlags_Position");
+static gsi::ClassExt<QTextFrameFormat> decl_QTextFrameFormat_Position_Enum_as_child (decl_QTextFrameFormat_Position_Enum, "Position");
+static gsi::ClassExt<QTextFrameFormat> decl_QTextFrameFormat_Position_Enums_as_child (decl_QTextFrameFormat_Position_Enums, "QFlags_Position");
 
 }
 

@@ -2314,8 +2314,8 @@ static gsi::QFlagsClass<QTextDocument::FindFlag > decl_QTextDocument_FindFlag_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextDocument> inject_QTextDocument_FindFlag_Enum_in_parent (decl_QTextDocument_FindFlag_Enum.defs ());
-static gsi::ClassExt<QTextDocument> decl_QTextDocument_FindFlag_Enum_as_child (decl_QTextDocument_FindFlag_Enum, "QtGui", "FindFlag");
-static gsi::ClassExt<QTextDocument> decl_QTextDocument_FindFlag_Enums_as_child (decl_QTextDocument_FindFlag_Enums, "QtGui", "QFlags_FindFlag");
+static gsi::ClassExt<QTextDocument> decl_QTextDocument_FindFlag_Enum_as_child (decl_QTextDocument_FindFlag_Enum, "FindFlag");
+static gsi::ClassExt<QTextDocument> decl_QTextDocument_FindFlag_Enums_as_child (decl_QTextDocument_FindFlag_Enums, "QFlags_FindFlag");
 
 }
 
@@ -2334,8 +2334,8 @@ static gsi::QFlagsClass<QTextDocument::MetaInformation > decl_QTextDocument_Meta
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextDocument> inject_QTextDocument_MetaInformation_Enum_in_parent (decl_QTextDocument_MetaInformation_Enum.defs ());
-static gsi::ClassExt<QTextDocument> decl_QTextDocument_MetaInformation_Enum_as_child (decl_QTextDocument_MetaInformation_Enum, "QtGui", "MetaInformation");
-static gsi::ClassExt<QTextDocument> decl_QTextDocument_MetaInformation_Enums_as_child (decl_QTextDocument_MetaInformation_Enums, "QtGui", "QFlags_MetaInformation");
+static gsi::ClassExt<QTextDocument> decl_QTextDocument_MetaInformation_Enum_as_child (decl_QTextDocument_MetaInformation_Enum, "MetaInformation");
+static gsi::ClassExt<QTextDocument> decl_QTextDocument_MetaInformation_Enums_as_child (decl_QTextDocument_MetaInformation_Enums, "QFlags_MetaInformation");
 
 }
 

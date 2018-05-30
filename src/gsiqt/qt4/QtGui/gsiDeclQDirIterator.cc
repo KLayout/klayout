@@ -345,8 +345,8 @@ static gsi::QFlagsClass<QDirIterator::IteratorFlag > decl_QDirIterator_IteratorF
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDirIterator> inject_QDirIterator_IteratorFlag_Enum_in_parent (decl_QDirIterator_IteratorFlag_Enum.defs ());
-static gsi::ClassExt<QDirIterator> decl_QDirIterator_IteratorFlag_Enum_as_child (decl_QDirIterator_IteratorFlag_Enum, "QtGui", "IteratorFlag");
-static gsi::ClassExt<QDirIterator> decl_QDirIterator_IteratorFlag_Enums_as_child (decl_QDirIterator_IteratorFlag_Enums, "QtGui", "QFlags_IteratorFlag");
+static gsi::ClassExt<QDirIterator> decl_QDirIterator_IteratorFlag_Enum_as_child (decl_QDirIterator_IteratorFlag_Enum, "IteratorFlag");
+static gsi::ClassExt<QDirIterator> decl_QDirIterator_IteratorFlag_Enums_as_child (decl_QDirIterator_IteratorFlag_Enums, "QFlags_IteratorFlag");
 
 }
 

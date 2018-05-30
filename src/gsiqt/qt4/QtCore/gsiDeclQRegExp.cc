@@ -656,8 +656,8 @@ static gsi::QFlagsClass<QRegExp::CaretMode > decl_QRegExp_CaretMode_Enums ("QtCo
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QRegExp> inject_QRegExp_CaretMode_Enum_in_parent (decl_QRegExp_CaretMode_Enum.defs ());
-static gsi::ClassExt<QRegExp> decl_QRegExp_CaretMode_Enum_as_child (decl_QRegExp_CaretMode_Enum, "QtCore", "CaretMode");
-static gsi::ClassExt<QRegExp> decl_QRegExp_CaretMode_Enums_as_child (decl_QRegExp_CaretMode_Enums, "QtCore", "QFlags_CaretMode");
+static gsi::ClassExt<QRegExp> decl_QRegExp_CaretMode_Enum_as_child (decl_QRegExp_CaretMode_Enum, "CaretMode");
+static gsi::ClassExt<QRegExp> decl_QRegExp_CaretMode_Enums_as_child (decl_QRegExp_CaretMode_Enums, "QFlags_CaretMode");
 
 }
 
@@ -680,8 +680,8 @@ static gsi::QFlagsClass<QRegExp::PatternSyntax > decl_QRegExp_PatternSyntax_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QRegExp> inject_QRegExp_PatternSyntax_Enum_in_parent (decl_QRegExp_PatternSyntax_Enum.defs ());
-static gsi::ClassExt<QRegExp> decl_QRegExp_PatternSyntax_Enum_as_child (decl_QRegExp_PatternSyntax_Enum, "QtCore", "PatternSyntax");
-static gsi::ClassExt<QRegExp> decl_QRegExp_PatternSyntax_Enums_as_child (decl_QRegExp_PatternSyntax_Enums, "QtCore", "QFlags_PatternSyntax");
+static gsi::ClassExt<QRegExp> decl_QRegExp_PatternSyntax_Enum_as_child (decl_QRegExp_PatternSyntax_Enum, "PatternSyntax");
+static gsi::ClassExt<QRegExp> decl_QRegExp_PatternSyntax_Enums_as_child (decl_QRegExp_PatternSyntax_Enums, "QFlags_PatternSyntax");
 
 }
 

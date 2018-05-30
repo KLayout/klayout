@@ -1791,8 +1791,8 @@ static gsi::QFlagsClass<QUrl::FormattingOption > decl_QUrl_FormattingOption_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QUrl> inject_QUrl_FormattingOption_Enum_in_parent (decl_QUrl_FormattingOption_Enum.defs ());
-static gsi::ClassExt<QUrl> decl_QUrl_FormattingOption_Enum_as_child (decl_QUrl_FormattingOption_Enum, "QtCore", "FormattingOption");
-static gsi::ClassExt<QUrl> decl_QUrl_FormattingOption_Enums_as_child (decl_QUrl_FormattingOption_Enums, "QtCore", "QFlags_FormattingOption");
+static gsi::ClassExt<QUrl> decl_QUrl_FormattingOption_Enum_as_child (decl_QUrl_FormattingOption_Enum, "FormattingOption");
+static gsi::ClassExt<QUrl> decl_QUrl_FormattingOption_Enums_as_child (decl_QUrl_FormattingOption_Enums, "QFlags_FormattingOption");
 
 }
 
@@ -1811,8 +1811,8 @@ static gsi::QFlagsClass<QUrl::ParsingMode > decl_QUrl_ParsingMode_Enums ("QtCore
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QUrl> inject_QUrl_ParsingMode_Enum_in_parent (decl_QUrl_ParsingMode_Enum.defs ());
-static gsi::ClassExt<QUrl> decl_QUrl_ParsingMode_Enum_as_child (decl_QUrl_ParsingMode_Enum, "QtCore", "ParsingMode");
-static gsi::ClassExt<QUrl> decl_QUrl_ParsingMode_Enums_as_child (decl_QUrl_ParsingMode_Enums, "QtCore", "QFlags_ParsingMode");
+static gsi::ClassExt<QUrl> decl_QUrl_ParsingMode_Enum_as_child (decl_QUrl_ParsingMode_Enum, "ParsingMode");
+static gsi::ClassExt<QUrl> decl_QUrl_ParsingMode_Enums_as_child (decl_QUrl_ParsingMode_Enums, "QFlags_ParsingMode");
 
 }
 

@@ -5,7 +5,7 @@
  <category>pymacros</category>
  <prolog/>
  <epilog/>
- <doc>@class PCellDeclarationHelper &lt; PCellDeclaration
+ <doc>@class [db] PCellDeclarationHelper &lt; PCellDeclaration
 @brief A helper class to simplify the declaration of a PCell (Python version)
 
 This class provides adds some convenience to the PCell declaration based

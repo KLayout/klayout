@@ -650,8 +650,8 @@ static gsi::QFlagsClass<QSqlField::RequiredStatus > decl_QSqlField_RequiredStatu
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSqlField> inject_QSqlField_RequiredStatus_Enum_in_parent (decl_QSqlField_RequiredStatus_Enum.defs ());
-static gsi::ClassExt<QSqlField> decl_QSqlField_RequiredStatus_Enum_as_child (decl_QSqlField_RequiredStatus_Enum, "QtSql", "RequiredStatus");
-static gsi::ClassExt<QSqlField> decl_QSqlField_RequiredStatus_Enums_as_child (decl_QSqlField_RequiredStatus_Enums, "QtSql", "QFlags_RequiredStatus");
+static gsi::ClassExt<QSqlField> decl_QSqlField_RequiredStatus_Enum_as_child (decl_QSqlField_RequiredStatus_Enum, "RequiredStatus");
+static gsi::ClassExt<QSqlField> decl_QSqlField_RequiredStatus_Enums_as_child (decl_QSqlField_RequiredStatus_Enums, "QFlags_RequiredStatus");
 
 }
 

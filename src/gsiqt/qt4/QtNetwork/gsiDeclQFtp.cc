@@ -1299,8 +1299,8 @@ static gsi::QFlagsClass<QFtp::Command > decl_QFtp_Command_Enums ("QtNetwork", "Q
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFtp> inject_QFtp_Command_Enum_in_parent (decl_QFtp_Command_Enum.defs ());
-static gsi::ClassExt<QFtp> decl_QFtp_Command_Enum_as_child (decl_QFtp_Command_Enum, "QtNetwork", "Command");
-static gsi::ClassExt<QFtp> decl_QFtp_Command_Enums_as_child (decl_QFtp_Command_Enums, "QtNetwork", "QFlags_Command");
+static gsi::ClassExt<QFtp> decl_QFtp_Command_Enum_as_child (decl_QFtp_Command_Enum, "Command");
+static gsi::ClassExt<QFtp> decl_QFtp_Command_Enums_as_child (decl_QFtp_Command_Enums, "QFlags_Command");
 
 }
 
@@ -1322,8 +1322,8 @@ static gsi::QFlagsClass<QFtp::Error > decl_QFtp_Error_Enums ("QtNetwork", "QFtp_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFtp> inject_QFtp_Error_Enum_in_parent (decl_QFtp_Error_Enum.defs ());
-static gsi::ClassExt<QFtp> decl_QFtp_Error_Enum_as_child (decl_QFtp_Error_Enum, "QtNetwork", "Error");
-static gsi::ClassExt<QFtp> decl_QFtp_Error_Enums_as_child (decl_QFtp_Error_Enums, "QtNetwork", "QFlags_Error");
+static gsi::ClassExt<QFtp> decl_QFtp_Error_Enum_as_child (decl_QFtp_Error_Enum, "Error");
+static gsi::ClassExt<QFtp> decl_QFtp_Error_Enums_as_child (decl_QFtp_Error_Enums, "QFlags_Error");
 
 }
 
@@ -1346,8 +1346,8 @@ static gsi::QFlagsClass<QFtp::State > decl_QFtp_State_Enums ("QtNetwork", "QFtp_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFtp> inject_QFtp_State_Enum_in_parent (decl_QFtp_State_Enum.defs ());
-static gsi::ClassExt<QFtp> decl_QFtp_State_Enum_as_child (decl_QFtp_State_Enum, "QtNetwork", "State");
-static gsi::ClassExt<QFtp> decl_QFtp_State_Enums_as_child (decl_QFtp_State_Enums, "QtNetwork", "QFlags_State");
+static gsi::ClassExt<QFtp> decl_QFtp_State_Enum_as_child (decl_QFtp_State_Enum, "State");
+static gsi::ClassExt<QFtp> decl_QFtp_State_Enums_as_child (decl_QFtp_State_Enums, "QFlags_State");
 
 }
 
@@ -1366,8 +1366,8 @@ static gsi::QFlagsClass<QFtp::TransferMode > decl_QFtp_TransferMode_Enums ("QtNe
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFtp> inject_QFtp_TransferMode_Enum_in_parent (decl_QFtp_TransferMode_Enum.defs ());
-static gsi::ClassExt<QFtp> decl_QFtp_TransferMode_Enum_as_child (decl_QFtp_TransferMode_Enum, "QtNetwork", "TransferMode");
-static gsi::ClassExt<QFtp> decl_QFtp_TransferMode_Enums_as_child (decl_QFtp_TransferMode_Enums, "QtNetwork", "QFlags_TransferMode");
+static gsi::ClassExt<QFtp> decl_QFtp_TransferMode_Enum_as_child (decl_QFtp_TransferMode_Enum, "TransferMode");
+static gsi::ClassExt<QFtp> decl_QFtp_TransferMode_Enums_as_child (decl_QFtp_TransferMode_Enums, "QFlags_TransferMode");
 
 }
 
@@ -1386,8 +1386,8 @@ static gsi::QFlagsClass<QFtp::TransferType > decl_QFtp_TransferType_Enums ("QtNe
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFtp> inject_QFtp_TransferType_Enum_in_parent (decl_QFtp_TransferType_Enum.defs ());
-static gsi::ClassExt<QFtp> decl_QFtp_TransferType_Enum_as_child (decl_QFtp_TransferType_Enum, "QtNetwork", "TransferType");
-static gsi::ClassExt<QFtp> decl_QFtp_TransferType_Enums_as_child (decl_QFtp_TransferType_Enums, "QtNetwork", "QFlags_TransferType");
+static gsi::ClassExt<QFtp> decl_QFtp_TransferType_Enum_as_child (decl_QFtp_TransferType_Enum, "TransferType");
+static gsi::ClassExt<QFtp> decl_QFtp_TransferType_Enums_as_child (decl_QFtp_TransferType_Enums, "QFlags_TransferType");
 
 }
 

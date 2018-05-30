@@ -3319,8 +3319,8 @@ static gsi::QFlagsClass<QAbstractSpinBox::ButtonSymbols > decl_QAbstractSpinBox_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractSpinBox> inject_QAbstractSpinBox_ButtonSymbols_Enum_in_parent (decl_QAbstractSpinBox_ButtonSymbols_Enum.defs ());
-static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_ButtonSymbols_Enum_as_child (decl_QAbstractSpinBox_ButtonSymbols_Enum, "QtGui", "ButtonSymbols");
-static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_ButtonSymbols_Enums_as_child (decl_QAbstractSpinBox_ButtonSymbols_Enums, "QtGui", "QFlags_ButtonSymbols");
+static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_ButtonSymbols_Enum_as_child (decl_QAbstractSpinBox_ButtonSymbols_Enum, "ButtonSymbols");
+static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_ButtonSymbols_Enums_as_child (decl_QAbstractSpinBox_ButtonSymbols_Enums, "QFlags_ButtonSymbols");
 
 }
 
@@ -3339,8 +3339,8 @@ static gsi::QFlagsClass<QAbstractSpinBox::CorrectionMode > decl_QAbstractSpinBox
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractSpinBox> inject_QAbstractSpinBox_CorrectionMode_Enum_in_parent (decl_QAbstractSpinBox_CorrectionMode_Enum.defs ());
-static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_CorrectionMode_Enum_as_child (decl_QAbstractSpinBox_CorrectionMode_Enum, "QtGui", "CorrectionMode");
-static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_CorrectionMode_Enums_as_child (decl_QAbstractSpinBox_CorrectionMode_Enums, "QtGui", "QFlags_CorrectionMode");
+static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_CorrectionMode_Enum_as_child (decl_QAbstractSpinBox_CorrectionMode_Enum, "CorrectionMode");
+static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_CorrectionMode_Enums_as_child (decl_QAbstractSpinBox_CorrectionMode_Enums, "QFlags_CorrectionMode");
 
 }
 
@@ -3360,8 +3360,8 @@ static gsi::QFlagsClass<QAbstractSpinBox::StepEnabledFlag > decl_QAbstractSpinBo
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractSpinBox> inject_QAbstractSpinBox_StepEnabledFlag_Enum_in_parent (decl_QAbstractSpinBox_StepEnabledFlag_Enum.defs ());
-static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_StepEnabledFlag_Enum_as_child (decl_QAbstractSpinBox_StepEnabledFlag_Enum, "QtGui", "StepEnabledFlag");
-static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_StepEnabledFlag_Enums_as_child (decl_QAbstractSpinBox_StepEnabledFlag_Enums, "QtGui", "QFlags_StepEnabledFlag");
+static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_StepEnabledFlag_Enum_as_child (decl_QAbstractSpinBox_StepEnabledFlag_Enum, "StepEnabledFlag");
+static gsi::ClassExt<QAbstractSpinBox> decl_QAbstractSpinBox_StepEnabledFlag_Enums_as_child (decl_QAbstractSpinBox_StepEnabledFlag_Enums, "QFlags_StepEnabledFlag");
 
 }
 

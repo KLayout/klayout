@@ -638,8 +638,8 @@ static gsi::QFlagsClass<QFontDatabase::WritingSystem > decl_QFontDatabase_Writin
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFontDatabase> inject_QFontDatabase_WritingSystem_Enum_in_parent (decl_QFontDatabase_WritingSystem_Enum.defs ());
-static gsi::ClassExt<QFontDatabase> decl_QFontDatabase_WritingSystem_Enum_as_child (decl_QFontDatabase_WritingSystem_Enum, "QtGui", "WritingSystem");
-static gsi::ClassExt<QFontDatabase> decl_QFontDatabase_WritingSystem_Enums_as_child (decl_QFontDatabase_WritingSystem_Enums, "QtGui", "QFlags_WritingSystem");
+static gsi::ClassExt<QFontDatabase> decl_QFontDatabase_WritingSystem_Enum_as_child (decl_QFontDatabase_WritingSystem_Enum, "WritingSystem");
+static gsi::ClassExt<QFontDatabase> decl_QFontDatabase_WritingSystem_Enums_as_child (decl_QFontDatabase_WritingSystem_Enums, "QFlags_WritingSystem");
 
 }
 

@@ -756,8 +756,8 @@ static gsi::QFlagsClass<QLineF::IntersectType > decl_QLineF_IntersectType_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLineF> inject_QLineF_IntersectType_Enum_in_parent (decl_QLineF_IntersectType_Enum.defs ());
-static gsi::ClassExt<QLineF> decl_QLineF_IntersectType_Enum_as_child (decl_QLineF_IntersectType_Enum, "QtCore", "IntersectType");
-static gsi::ClassExt<QLineF> decl_QLineF_IntersectType_Enums_as_child (decl_QLineF_IntersectType_Enums, "QtCore", "QFlags_IntersectType");
+static gsi::ClassExt<QLineF> decl_QLineF_IntersectType_Enum_as_child (decl_QLineF_IntersectType_Enum, "IntersectType");
+static gsi::ClassExt<QLineF> decl_QLineF_IntersectType_Enums_as_child (decl_QLineF_IntersectType_Enums, "QFlags_IntersectType");
 
 }
 

@@ -935,8 +935,8 @@ static gsi::QFlagsClass<QGraphicsEffect::ChangeFlag > decl_QGraphicsEffect_Chang
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsEffect> inject_QGraphicsEffect_ChangeFlag_Enum_in_parent (decl_QGraphicsEffect_ChangeFlag_Enum.defs ());
-static gsi::ClassExt<QGraphicsEffect> decl_QGraphicsEffect_ChangeFlag_Enum_as_child (decl_QGraphicsEffect_ChangeFlag_Enum, "QtGui", "ChangeFlag");
-static gsi::ClassExt<QGraphicsEffect> decl_QGraphicsEffect_ChangeFlag_Enums_as_child (decl_QGraphicsEffect_ChangeFlag_Enums, "QtGui", "QFlags_ChangeFlag");
+static gsi::ClassExt<QGraphicsEffect> decl_QGraphicsEffect_ChangeFlag_Enum_as_child (decl_QGraphicsEffect_ChangeFlag_Enum, "ChangeFlag");
+static gsi::ClassExt<QGraphicsEffect> decl_QGraphicsEffect_ChangeFlag_Enums_as_child (decl_QGraphicsEffect_ChangeFlag_Enums, "QFlags_ChangeFlag");
 
 }
 
@@ -956,8 +956,8 @@ static gsi::QFlagsClass<QGraphicsEffect::PixmapPadMode > decl_QGraphicsEffect_Pi
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QGraphicsEffect> inject_QGraphicsEffect_PixmapPadMode_Enum_in_parent (decl_QGraphicsEffect_PixmapPadMode_Enum.defs ());
-static gsi::ClassExt<QGraphicsEffect> decl_QGraphicsEffect_PixmapPadMode_Enum_as_child (decl_QGraphicsEffect_PixmapPadMode_Enum, "QtGui", "PixmapPadMode");
-static gsi::ClassExt<QGraphicsEffect> decl_QGraphicsEffect_PixmapPadMode_Enums_as_child (decl_QGraphicsEffect_PixmapPadMode_Enums, "QtGui", "QFlags_PixmapPadMode");
+static gsi::ClassExt<QGraphicsEffect> decl_QGraphicsEffect_PixmapPadMode_Enum_as_child (decl_QGraphicsEffect_PixmapPadMode_Enum, "PixmapPadMode");
+static gsi::ClassExt<QGraphicsEffect> decl_QGraphicsEffect_PixmapPadMode_Enums_as_child (decl_QGraphicsEffect_PixmapPadMode_Enums, "QFlags_PixmapPadMode");
 
 }
 

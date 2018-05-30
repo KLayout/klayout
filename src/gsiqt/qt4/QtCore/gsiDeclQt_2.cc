@@ -53,8 +53,8 @@ static gsi::QFlagsClass<Qt::MaskMode > decl_Qt_MaskMode_Enums ("QtCore", "Qt_QFl
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_MaskMode_Enum_in_parent (decl_Qt_MaskMode_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_MaskMode_Enum_as_child (decl_Qt_MaskMode_Enum, "QtCore", "MaskMode");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_MaskMode_Enums_as_child (decl_Qt_MaskMode_Enums, "QtCore", "QFlags_MaskMode");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_MaskMode_Enum_as_child (decl_Qt_MaskMode_Enum, "MaskMode");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_MaskMode_Enums_as_child (decl_Qt_MaskMode_Enums, "QFlags_MaskMode");
 
 }
 
@@ -81,8 +81,8 @@ static gsi::QFlagsClass<Qt::MatchFlag > decl_Qt_MatchFlag_Enums ("QtCore", "Qt_Q
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_MatchFlag_Enum_in_parent (decl_Qt_MatchFlag_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_MatchFlag_Enum_as_child (decl_Qt_MatchFlag_Enum, "QtCore", "MatchFlag");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_MatchFlag_Enums_as_child (decl_Qt_MatchFlag_Enums, "QtCore", "QFlags_MatchFlag");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_MatchFlag_Enum_as_child (decl_Qt_MatchFlag_Enum, "MatchFlag");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_MatchFlag_Enums_as_child (decl_Qt_MatchFlag_Enums, "QFlags_MatchFlag");
 
 }
 
@@ -105,8 +105,8 @@ static gsi::QFlagsClass<Qt::Modifier > decl_Qt_Modifier_Enums ("QtCore", "Qt_QFl
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_Modifier_Enum_in_parent (decl_Qt_Modifier_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_Modifier_Enum_as_child (decl_Qt_Modifier_Enum, "QtCore", "Modifier");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_Modifier_Enums_as_child (decl_Qt_Modifier_Enums, "QtCore", "QFlags_Modifier");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_Modifier_Enum_as_child (decl_Qt_Modifier_Enum, "Modifier");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_Modifier_Enums_as_child (decl_Qt_Modifier_Enums, "QFlags_Modifier");
 
 }
 
@@ -130,8 +130,8 @@ static gsi::QFlagsClass<Qt::MouseButton > decl_Qt_MouseButton_Enums ("QtCore", "
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_MouseButton_Enum_in_parent (decl_Qt_MouseButton_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_MouseButton_Enum_as_child (decl_Qt_MouseButton_Enum, "QtCore", "MouseButton");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_MouseButton_Enums_as_child (decl_Qt_MouseButton_Enums, "QtCore", "QFlags_MouseButton");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_MouseButton_Enum_as_child (decl_Qt_MouseButton_Enum, "MouseButton");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_MouseButton_Enums_as_child (decl_Qt_MouseButton_Enums, "QFlags_MouseButton");
 
 }
 
@@ -153,8 +153,8 @@ static gsi::QFlagsClass<Qt::NavigationMode > decl_Qt_NavigationMode_Enums ("QtCo
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_NavigationMode_Enum_in_parent (decl_Qt_NavigationMode_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_NavigationMode_Enum_as_child (decl_Qt_NavigationMode_Enum, "QtCore", "NavigationMode");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_NavigationMode_Enums_as_child (decl_Qt_NavigationMode_Enums, "QtCore", "QFlags_NavigationMode");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_NavigationMode_Enum_as_child (decl_Qt_NavigationMode_Enum, "NavigationMode");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_NavigationMode_Enums_as_child (decl_Qt_NavigationMode_Enums, "QFlags_NavigationMode");
 
 }
 
@@ -173,8 +173,8 @@ static gsi::QFlagsClass<Qt::Orientation > decl_Qt_Orientation_Enums ("QtCore", "
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_Orientation_Enum_in_parent (decl_Qt_Orientation_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_Orientation_Enum_as_child (decl_Qt_Orientation_Enum, "QtCore", "Orientation");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_Orientation_Enums_as_child (decl_Qt_Orientation_Enums, "QtCore", "QFlags_Orientation");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_Orientation_Enum_as_child (decl_Qt_Orientation_Enum, "Orientation");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_Orientation_Enums_as_child (decl_Qt_Orientation_Enums, "QFlags_Orientation");
 
 }
 
@@ -195,8 +195,8 @@ static gsi::QFlagsClass<Qt::PenCapStyle > decl_Qt_PenCapStyle_Enums ("QtCore", "
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_PenCapStyle_Enum_in_parent (decl_Qt_PenCapStyle_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_PenCapStyle_Enum_as_child (decl_Qt_PenCapStyle_Enum, "QtCore", "PenCapStyle");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_PenCapStyle_Enums_as_child (decl_Qt_PenCapStyle_Enums, "QtCore", "QFlags_PenCapStyle");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_PenCapStyle_Enum_as_child (decl_Qt_PenCapStyle_Enum, "PenCapStyle");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_PenCapStyle_Enums_as_child (decl_Qt_PenCapStyle_Enums, "QFlags_PenCapStyle");
 
 }
 
@@ -218,8 +218,8 @@ static gsi::QFlagsClass<Qt::PenJoinStyle > decl_Qt_PenJoinStyle_Enums ("QtCore",
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_PenJoinStyle_Enum_in_parent (decl_Qt_PenJoinStyle_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_PenJoinStyle_Enum_as_child (decl_Qt_PenJoinStyle_Enum, "QtCore", "PenJoinStyle");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_PenJoinStyle_Enums_as_child (decl_Qt_PenJoinStyle_Enums, "QtCore", "QFlags_PenJoinStyle");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_PenJoinStyle_Enum_as_child (decl_Qt_PenJoinStyle_Enum, "PenJoinStyle");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_PenJoinStyle_Enums_as_child (decl_Qt_PenJoinStyle_Enums, "QFlags_PenJoinStyle");
 
 }
 
@@ -244,8 +244,8 @@ static gsi::QFlagsClass<Qt::PenStyle > decl_Qt_PenStyle_Enums ("QtCore", "Qt_QFl
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_PenStyle_Enum_in_parent (decl_Qt_PenStyle_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_PenStyle_Enum_as_child (decl_Qt_PenStyle_Enum, "QtCore", "PenStyle");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_PenStyle_Enums_as_child (decl_Qt_PenStyle_Enums, "QtCore", "QFlags_PenStyle");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_PenStyle_Enum_as_child (decl_Qt_PenStyle_Enum, "PenStyle");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_PenStyle_Enums_as_child (decl_Qt_PenStyle_Enums, "QFlags_PenStyle");
 
 }
 
@@ -265,8 +265,8 @@ static gsi::QFlagsClass<Qt::ScrollBarPolicy > decl_Qt_ScrollBarPolicy_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_ScrollBarPolicy_Enum_in_parent (decl_Qt_ScrollBarPolicy_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ScrollBarPolicy_Enum_as_child (decl_Qt_ScrollBarPolicy_Enum, "QtCore", "ScrollBarPolicy");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ScrollBarPolicy_Enums_as_child (decl_Qt_ScrollBarPolicy_Enums, "QtCore", "QFlags_ScrollBarPolicy");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ScrollBarPolicy_Enum_as_child (decl_Qt_ScrollBarPolicy_Enum, "ScrollBarPolicy");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ScrollBarPolicy_Enums_as_child (decl_Qt_ScrollBarPolicy_Enums, "QFlags_ScrollBarPolicy");
 
 }
 
@@ -287,8 +287,8 @@ static gsi::QFlagsClass<Qt::ShortcutContext > decl_Qt_ShortcutContext_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_ShortcutContext_Enum_in_parent (decl_Qt_ShortcutContext_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ShortcutContext_Enum_as_child (decl_Qt_ShortcutContext_Enum, "QtCore", "ShortcutContext");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ShortcutContext_Enums_as_child (decl_Qt_ShortcutContext_Enums, "QtCore", "QFlags_ShortcutContext");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ShortcutContext_Enum_as_child (decl_Qt_ShortcutContext_Enum, "ShortcutContext");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ShortcutContext_Enums_as_child (decl_Qt_ShortcutContext_Enums, "QFlags_ShortcutContext");
 
 }
 
@@ -310,8 +310,8 @@ static gsi::QFlagsClass<Qt::SizeHint > decl_Qt_SizeHint_Enums ("QtCore", "Qt_QFl
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_SizeHint_Enum_in_parent (decl_Qt_SizeHint_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_SizeHint_Enum_as_child (decl_Qt_SizeHint_Enum, "QtCore", "SizeHint");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_SizeHint_Enums_as_child (decl_Qt_SizeHint_Enums, "QtCore", "QFlags_SizeHint");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_SizeHint_Enum_as_child (decl_Qt_SizeHint_Enum, "SizeHint");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_SizeHint_Enums_as_child (decl_Qt_SizeHint_Enums, "QFlags_SizeHint");
 
 }
 
@@ -330,8 +330,8 @@ static gsi::QFlagsClass<Qt::SizeMode > decl_Qt_SizeMode_Enums ("QtCore", "Qt_QFl
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_SizeMode_Enum_in_parent (decl_Qt_SizeMode_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_SizeMode_Enum_as_child (decl_Qt_SizeMode_Enum, "QtCore", "SizeMode");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_SizeMode_Enums_as_child (decl_Qt_SizeMode_Enums, "QtCore", "QFlags_SizeMode");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_SizeMode_Enum_as_child (decl_Qt_SizeMode_Enum, "SizeMode");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_SizeMode_Enums_as_child (decl_Qt_SizeMode_Enums, "QFlags_SizeMode");
 
 }
 
@@ -350,8 +350,8 @@ static gsi::QFlagsClass<Qt::SortOrder > decl_Qt_SortOrder_Enums ("QtCore", "Qt_Q
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_SortOrder_Enum_in_parent (decl_Qt_SortOrder_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_SortOrder_Enum_as_child (decl_Qt_SortOrder_Enum, "QtCore", "SortOrder");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_SortOrder_Enums_as_child (decl_Qt_SortOrder_Enums, "QtCore", "QFlags_SortOrder");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_SortOrder_Enum_as_child (decl_Qt_SortOrder_Enum, "SortOrder");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_SortOrder_Enums_as_child (decl_Qt_SortOrder_Enums, "QFlags_SortOrder");
 
 }
 
@@ -372,8 +372,8 @@ static gsi::QFlagsClass<Qt::TextElideMode > decl_Qt_TextElideMode_Enums ("QtCore
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_TextElideMode_Enum_in_parent (decl_Qt_TextElideMode_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TextElideMode_Enum_as_child (decl_Qt_TextElideMode_Enum, "QtCore", "TextElideMode");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TextElideMode_Enums_as_child (decl_Qt_TextElideMode_Enums, "QtCore", "QFlags_TextElideMode");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TextElideMode_Enum_as_child (decl_Qt_TextElideMode_Enum, "TextElideMode");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TextElideMode_Enums_as_child (decl_Qt_TextElideMode_Enums, "QFlags_TextElideMode");
 
 }
 
@@ -403,8 +403,8 @@ static gsi::QFlagsClass<Qt::TextFlag > decl_Qt_TextFlag_Enums ("QtCore", "Qt_QFl
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_TextFlag_Enum_in_parent (decl_Qt_TextFlag_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TextFlag_Enum_as_child (decl_Qt_TextFlag_Enum, "QtCore", "TextFlag");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TextFlag_Enums_as_child (decl_Qt_TextFlag_Enums, "QtCore", "QFlags_TextFlag");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TextFlag_Enum_as_child (decl_Qt_TextFlag_Enum, "TextFlag");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TextFlag_Enums_as_child (decl_Qt_TextFlag_Enums, "QFlags_TextFlag");
 
 }
 
@@ -425,8 +425,8 @@ static gsi::QFlagsClass<Qt::TextFormat > decl_Qt_TextFormat_Enums ("QtCore", "Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_TextFormat_Enum_in_parent (decl_Qt_TextFormat_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TextFormat_Enum_as_child (decl_Qt_TextFormat_Enum, "QtCore", "TextFormat");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TextFormat_Enums_as_child (decl_Qt_TextFormat_Enums, "QtCore", "QFlags_TextFormat");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TextFormat_Enum_as_child (decl_Qt_TextFormat_Enum, "TextFormat");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TextFormat_Enums_as_child (decl_Qt_TextFormat_Enums, "QFlags_TextFormat");
 
 }
 
@@ -451,8 +451,8 @@ static gsi::QFlagsClass<Qt::TextInteractionFlag > decl_Qt_TextInteractionFlag_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_TextInteractionFlag_Enum_in_parent (decl_Qt_TextInteractionFlag_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TextInteractionFlag_Enum_as_child (decl_Qt_TextInteractionFlag_Enum, "QtCore", "TextInteractionFlag");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TextInteractionFlag_Enums_as_child (decl_Qt_TextInteractionFlag_Enums, "QtCore", "QFlags_TextInteractionFlag");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TextInteractionFlag_Enum_as_child (decl_Qt_TextInteractionFlag_Enum, "TextInteractionFlag");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TextInteractionFlag_Enums_as_child (decl_Qt_TextInteractionFlag_Enums, "QFlags_TextInteractionFlag");
 
 }
 
@@ -472,8 +472,8 @@ static gsi::QFlagsClass<Qt::TileRule > decl_Qt_TileRule_Enums ("QtCore", "Qt_QFl
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_TileRule_Enum_in_parent (decl_Qt_TileRule_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TileRule_Enum_as_child (decl_Qt_TileRule_Enum, "QtCore", "TileRule");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TileRule_Enums_as_child (decl_Qt_TileRule_Enums, "QtCore", "QFlags_TileRule");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TileRule_Enum_as_child (decl_Qt_TileRule_Enum, "TileRule");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TileRule_Enums_as_child (decl_Qt_TileRule_Enums, "QFlags_TileRule");
 
 }
 
@@ -493,8 +493,8 @@ static gsi::QFlagsClass<Qt::TimeSpec > decl_Qt_TimeSpec_Enums ("QtCore", "Qt_QFl
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<Qt_Namespace> inject_Qt_TimeSpec_Enum_in_parent (decl_Qt_TimeSpec_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TimeSpec_Enum_as_child (decl_Qt_TimeSpec_Enum, "QtCore", "TimeSpec");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_TimeSpec_Enums_as_child (decl_Qt_TimeSpec_Enums, "QtCore", "QFlags_TimeSpec");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TimeSpec_Enum_as_child (decl_Qt_TimeSpec_Enum, "TimeSpec");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_TimeSpec_Enums_as_child (decl_Qt_TimeSpec_Enums, "QFlags_TimeSpec");
 
 }
 

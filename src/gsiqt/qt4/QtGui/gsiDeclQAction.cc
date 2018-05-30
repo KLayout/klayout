@@ -1746,8 +1746,8 @@ static gsi::QFlagsClass<QAction::ActionEvent > decl_QAction_ActionEvent_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAction> inject_QAction_ActionEvent_Enum_in_parent (decl_QAction_ActionEvent_Enum.defs ());
-static gsi::ClassExt<QAction> decl_QAction_ActionEvent_Enum_as_child (decl_QAction_ActionEvent_Enum, "QtGui", "ActionEvent");
-static gsi::ClassExt<QAction> decl_QAction_ActionEvent_Enums_as_child (decl_QAction_ActionEvent_Enums, "QtGui", "QFlags_ActionEvent");
+static gsi::ClassExt<QAction> decl_QAction_ActionEvent_Enum_as_child (decl_QAction_ActionEvent_Enum, "ActionEvent");
+static gsi::ClassExt<QAction> decl_QAction_ActionEvent_Enums_as_child (decl_QAction_ActionEvent_Enums, "QFlags_ActionEvent");
 
 }
 
@@ -1771,8 +1771,8 @@ static gsi::QFlagsClass<QAction::MenuRole > decl_QAction_MenuRole_Enums ("QtGui"
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAction> inject_QAction_MenuRole_Enum_in_parent (decl_QAction_MenuRole_Enum.defs ());
-static gsi::ClassExt<QAction> decl_QAction_MenuRole_Enum_as_child (decl_QAction_MenuRole_Enum, "QtGui", "MenuRole");
-static gsi::ClassExt<QAction> decl_QAction_MenuRole_Enums_as_child (decl_QAction_MenuRole_Enums, "QtGui", "QFlags_MenuRole");
+static gsi::ClassExt<QAction> decl_QAction_MenuRole_Enum_as_child (decl_QAction_MenuRole_Enum, "MenuRole");
+static gsi::ClassExt<QAction> decl_QAction_MenuRole_Enums_as_child (decl_QAction_MenuRole_Enums, "QFlags_MenuRole");
 
 }
 
@@ -1792,8 +1792,8 @@ static gsi::QFlagsClass<QAction::Priority > decl_QAction_Priority_Enums ("QtGui"
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAction> inject_QAction_Priority_Enum_in_parent (decl_QAction_Priority_Enum.defs ());
-static gsi::ClassExt<QAction> decl_QAction_Priority_Enum_as_child (decl_QAction_Priority_Enum, "QtGui", "Priority");
-static gsi::ClassExt<QAction> decl_QAction_Priority_Enums_as_child (decl_QAction_Priority_Enums, "QtGui", "QFlags_Priority");
+static gsi::ClassExt<QAction> decl_QAction_Priority_Enum_as_child (decl_QAction_Priority_Enum, "Priority");
+static gsi::ClassExt<QAction> decl_QAction_Priority_Enums_as_child (decl_QAction_Priority_Enums, "QFlags_Priority");
 
 }
 
@@ -1814,8 +1814,8 @@ static gsi::QFlagsClass<QAction::SoftKeyRole > decl_QAction_SoftKeyRole_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAction> inject_QAction_SoftKeyRole_Enum_in_parent (decl_QAction_SoftKeyRole_Enum.defs ());
-static gsi::ClassExt<QAction> decl_QAction_SoftKeyRole_Enum_as_child (decl_QAction_SoftKeyRole_Enum, "QtGui", "SoftKeyRole");
-static gsi::ClassExt<QAction> decl_QAction_SoftKeyRole_Enums_as_child (decl_QAction_SoftKeyRole_Enums, "QtGui", "QFlags_SoftKeyRole");
+static gsi::ClassExt<QAction> decl_QAction_SoftKeyRole_Enum_as_child (decl_QAction_SoftKeyRole_Enum, "SoftKeyRole");
+static gsi::ClassExt<QAction> decl_QAction_SoftKeyRole_Enums_as_child (decl_QAction_SoftKeyRole_Enums, "QFlags_SoftKeyRole");
 
 }
 

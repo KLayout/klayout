@@ -2107,8 +2107,8 @@ static gsi::QFlagsClass<QBoxLayout::Direction > decl_QBoxLayout_Direction_Enums 
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QBoxLayout> inject_QBoxLayout_Direction_Enum_in_parent (decl_QBoxLayout_Direction_Enum.defs ());
-static gsi::ClassExt<QBoxLayout> decl_QBoxLayout_Direction_Enum_as_child (decl_QBoxLayout_Direction_Enum, "QtGui", "Direction");
-static gsi::ClassExt<QBoxLayout> decl_QBoxLayout_Direction_Enums_as_child (decl_QBoxLayout_Direction_Enums, "QtGui", "QFlags_Direction");
+static gsi::ClassExt<QBoxLayout> decl_QBoxLayout_Direction_Enum_as_child (decl_QBoxLayout_Direction_Enum, "Direction");
+static gsi::ClassExt<QBoxLayout> decl_QBoxLayout_Direction_Enums_as_child (decl_QBoxLayout_Direction_Enums, "QFlags_Direction");
 
 }
 

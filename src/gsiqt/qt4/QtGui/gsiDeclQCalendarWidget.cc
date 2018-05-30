@@ -3434,8 +3434,8 @@ static gsi::QFlagsClass<QCalendarWidget::HorizontalHeaderFormat > decl_QCalendar
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QCalendarWidget> inject_QCalendarWidget_HorizontalHeaderFormat_Enum_in_parent (decl_QCalendarWidget_HorizontalHeaderFormat_Enum.defs ());
-static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_HorizontalHeaderFormat_Enum_as_child (decl_QCalendarWidget_HorizontalHeaderFormat_Enum, "QtGui", "HorizontalHeaderFormat");
-static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_HorizontalHeaderFormat_Enums_as_child (decl_QCalendarWidget_HorizontalHeaderFormat_Enums, "QtGui", "QFlags_HorizontalHeaderFormat");
+static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_HorizontalHeaderFormat_Enum_as_child (decl_QCalendarWidget_HorizontalHeaderFormat_Enum, "HorizontalHeaderFormat");
+static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_HorizontalHeaderFormat_Enums_as_child (decl_QCalendarWidget_HorizontalHeaderFormat_Enums, "QFlags_HorizontalHeaderFormat");
 
 }
 
@@ -3454,8 +3454,8 @@ static gsi::QFlagsClass<QCalendarWidget::SelectionMode > decl_QCalendarWidget_Se
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QCalendarWidget> inject_QCalendarWidget_SelectionMode_Enum_in_parent (decl_QCalendarWidget_SelectionMode_Enum.defs ());
-static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_SelectionMode_Enum_as_child (decl_QCalendarWidget_SelectionMode_Enum, "QtGui", "SelectionMode");
-static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_SelectionMode_Enums_as_child (decl_QCalendarWidget_SelectionMode_Enums, "QtGui", "QFlags_SelectionMode");
+static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_SelectionMode_Enum_as_child (decl_QCalendarWidget_SelectionMode_Enum, "SelectionMode");
+static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_SelectionMode_Enums_as_child (decl_QCalendarWidget_SelectionMode_Enums, "QFlags_SelectionMode");
 
 }
 
@@ -3474,8 +3474,8 @@ static gsi::QFlagsClass<QCalendarWidget::VerticalHeaderFormat > decl_QCalendarWi
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QCalendarWidget> inject_QCalendarWidget_VerticalHeaderFormat_Enum_in_parent (decl_QCalendarWidget_VerticalHeaderFormat_Enum.defs ());
-static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_VerticalHeaderFormat_Enum_as_child (decl_QCalendarWidget_VerticalHeaderFormat_Enum, "QtGui", "VerticalHeaderFormat");
-static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_VerticalHeaderFormat_Enums_as_child (decl_QCalendarWidget_VerticalHeaderFormat_Enums, "QtGui", "QFlags_VerticalHeaderFormat");
+static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_VerticalHeaderFormat_Enum_as_child (decl_QCalendarWidget_VerticalHeaderFormat_Enum, "VerticalHeaderFormat");
+static gsi::ClassExt<QCalendarWidget> decl_QCalendarWidget_VerticalHeaderFormat_Enums_as_child (decl_QCalendarWidget_VerticalHeaderFormat_Enums, "QFlags_VerticalHeaderFormat");
 
 }
 

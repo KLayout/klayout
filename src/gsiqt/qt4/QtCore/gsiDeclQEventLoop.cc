@@ -708,8 +708,8 @@ static gsi::QFlagsClass<QEventLoop::ProcessEventsFlag > decl_QEventLoop_ProcessE
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QEventLoop> inject_QEventLoop_ProcessEventsFlag_Enum_in_parent (decl_QEventLoop_ProcessEventsFlag_Enum.defs ());
-static gsi::ClassExt<QEventLoop> decl_QEventLoop_ProcessEventsFlag_Enum_as_child (decl_QEventLoop_ProcessEventsFlag_Enum, "QtCore", "ProcessEventsFlag");
-static gsi::ClassExt<QEventLoop> decl_QEventLoop_ProcessEventsFlag_Enums_as_child (decl_QEventLoop_ProcessEventsFlag_Enums, "QtCore", "QFlags_ProcessEventsFlag");
+static gsi::ClassExt<QEventLoop> decl_QEventLoop_ProcessEventsFlag_Enum_as_child (decl_QEventLoop_ProcessEventsFlag_Enum, "ProcessEventsFlag");
+static gsi::ClassExt<QEventLoop> decl_QEventLoop_ProcessEventsFlag_Enums_as_child (decl_QEventLoop_ProcessEventsFlag_Enums, "QFlags_ProcessEventsFlag");
 
 }
 

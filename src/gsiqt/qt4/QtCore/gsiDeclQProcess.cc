@@ -1074,8 +1074,8 @@ static gsi::QFlagsClass<QProcess::ExitStatus > decl_QProcess_ExitStatus_Enums ("
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QProcess> inject_QProcess_ExitStatus_Enum_in_parent (decl_QProcess_ExitStatus_Enum.defs ());
-static gsi::ClassExt<QProcess> decl_QProcess_ExitStatus_Enum_as_child (decl_QProcess_ExitStatus_Enum, "QtCore", "ExitStatus");
-static gsi::ClassExt<QProcess> decl_QProcess_ExitStatus_Enums_as_child (decl_QProcess_ExitStatus_Enums, "QtCore", "QFlags_ExitStatus");
+static gsi::ClassExt<QProcess> decl_QProcess_ExitStatus_Enum_as_child (decl_QProcess_ExitStatus_Enum, "ExitStatus");
+static gsi::ClassExt<QProcess> decl_QProcess_ExitStatus_Enums_as_child (decl_QProcess_ExitStatus_Enums, "QFlags_ExitStatus");
 
 }
 
@@ -1094,8 +1094,8 @@ static gsi::QFlagsClass<QProcess::ProcessChannel > decl_QProcess_ProcessChannel_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QProcess> inject_QProcess_ProcessChannel_Enum_in_parent (decl_QProcess_ProcessChannel_Enum.defs ());
-static gsi::ClassExt<QProcess> decl_QProcess_ProcessChannel_Enum_as_child (decl_QProcess_ProcessChannel_Enum, "QtCore", "ProcessChannel");
-static gsi::ClassExt<QProcess> decl_QProcess_ProcessChannel_Enums_as_child (decl_QProcess_ProcessChannel_Enums, "QtCore", "QFlags_ProcessChannel");
+static gsi::ClassExt<QProcess> decl_QProcess_ProcessChannel_Enum_as_child (decl_QProcess_ProcessChannel_Enum, "ProcessChannel");
+static gsi::ClassExt<QProcess> decl_QProcess_ProcessChannel_Enums_as_child (decl_QProcess_ProcessChannel_Enums, "QFlags_ProcessChannel");
 
 }
 
@@ -1115,8 +1115,8 @@ static gsi::QFlagsClass<QProcess::ProcessChannelMode > decl_QProcess_ProcessChan
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QProcess> inject_QProcess_ProcessChannelMode_Enum_in_parent (decl_QProcess_ProcessChannelMode_Enum.defs ());
-static gsi::ClassExt<QProcess> decl_QProcess_ProcessChannelMode_Enum_as_child (decl_QProcess_ProcessChannelMode_Enum, "QtCore", "ProcessChannelMode");
-static gsi::ClassExt<QProcess> decl_QProcess_ProcessChannelMode_Enums_as_child (decl_QProcess_ProcessChannelMode_Enums, "QtCore", "QFlags_ProcessChannelMode");
+static gsi::ClassExt<QProcess> decl_QProcess_ProcessChannelMode_Enum_as_child (decl_QProcess_ProcessChannelMode_Enum, "ProcessChannelMode");
+static gsi::ClassExt<QProcess> decl_QProcess_ProcessChannelMode_Enums_as_child (decl_QProcess_ProcessChannelMode_Enums, "QFlags_ProcessChannelMode");
 
 }
 
@@ -1139,8 +1139,8 @@ static gsi::QFlagsClass<QProcess::ProcessError > decl_QProcess_ProcessError_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QProcess> inject_QProcess_ProcessError_Enum_in_parent (decl_QProcess_ProcessError_Enum.defs ());
-static gsi::ClassExt<QProcess> decl_QProcess_ProcessError_Enum_as_child (decl_QProcess_ProcessError_Enum, "QtCore", "ProcessError");
-static gsi::ClassExt<QProcess> decl_QProcess_ProcessError_Enums_as_child (decl_QProcess_ProcessError_Enums, "QtCore", "QFlags_ProcessError");
+static gsi::ClassExt<QProcess> decl_QProcess_ProcessError_Enum_as_child (decl_QProcess_ProcessError_Enum, "ProcessError");
+static gsi::ClassExt<QProcess> decl_QProcess_ProcessError_Enums_as_child (decl_QProcess_ProcessError_Enums, "QFlags_ProcessError");
 
 }
 
@@ -1160,8 +1160,8 @@ static gsi::QFlagsClass<QProcess::ProcessState > decl_QProcess_ProcessState_Enum
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QProcess> inject_QProcess_ProcessState_Enum_in_parent (decl_QProcess_ProcessState_Enum.defs ());
-static gsi::ClassExt<QProcess> decl_QProcess_ProcessState_Enum_as_child (decl_QProcess_ProcessState_Enum, "QtCore", "ProcessState");
-static gsi::ClassExt<QProcess> decl_QProcess_ProcessState_Enums_as_child (decl_QProcess_ProcessState_Enums, "QtCore", "QFlags_ProcessState");
+static gsi::ClassExt<QProcess> decl_QProcess_ProcessState_Enum_as_child (decl_QProcess_ProcessState_Enum, "ProcessState");
+static gsi::ClassExt<QProcess> decl_QProcess_ProcessState_Enums_as_child (decl_QProcess_ProcessState_Enums, "QFlags_ProcessState");
 
 }
 

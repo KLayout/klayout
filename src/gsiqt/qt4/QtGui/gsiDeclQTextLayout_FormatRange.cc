@@ -65,7 +65,7 @@ gsi::Class<QTextLayout::FormatRange> decl_QTextLayout_FormatRange ("QtGui", "QTe
   methods_QTextLayout_FormatRange (),
   "@qt\n@brief Binding of QTextLayout::FormatRange");
 
-gsi::ClassExt<QTextLayout> decl_QTextLayout_FormatRange_as_child (decl_QTextLayout_FormatRange, "QtGui", "FormatRange");
+gsi::ClassExt<QTextLayout> decl_QTextLayout_FormatRange_as_child (decl_QTextLayout_FormatRange, "FormatRange");
 
 GSI_QTGUI_PUBLIC gsi::Class<QTextLayout::FormatRange> &qtdecl_QTextLayout_FormatRange () { return decl_QTextLayout_FormatRange; }
 

@@ -1086,8 +1086,8 @@ static gsi::QFlagsClass<QTextCharFormat::UnderlineStyle > decl_QTextCharFormat_U
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextCharFormat> inject_QTextCharFormat_UnderlineStyle_Enum_in_parent (decl_QTextCharFormat_UnderlineStyle_Enum.defs ());
-static gsi::ClassExt<QTextCharFormat> decl_QTextCharFormat_UnderlineStyle_Enum_as_child (decl_QTextCharFormat_UnderlineStyle_Enum, "QtGui", "UnderlineStyle");
-static gsi::ClassExt<QTextCharFormat> decl_QTextCharFormat_UnderlineStyle_Enums_as_child (decl_QTextCharFormat_UnderlineStyle_Enums, "QtGui", "QFlags_UnderlineStyle");
+static gsi::ClassExt<QTextCharFormat> decl_QTextCharFormat_UnderlineStyle_Enum_as_child (decl_QTextCharFormat_UnderlineStyle_Enum, "UnderlineStyle");
+static gsi::ClassExt<QTextCharFormat> decl_QTextCharFormat_UnderlineStyle_Enums_as_child (decl_QTextCharFormat_UnderlineStyle_Enums, "QFlags_UnderlineStyle");
 
 }
 
@@ -1110,8 +1110,8 @@ static gsi::QFlagsClass<QTextCharFormat::VerticalAlignment > decl_QTextCharForma
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextCharFormat> inject_QTextCharFormat_VerticalAlignment_Enum_in_parent (decl_QTextCharFormat_VerticalAlignment_Enum.defs ());
-static gsi::ClassExt<QTextCharFormat> decl_QTextCharFormat_VerticalAlignment_Enum_as_child (decl_QTextCharFormat_VerticalAlignment_Enum, "QtGui", "VerticalAlignment");
-static gsi::ClassExt<QTextCharFormat> decl_QTextCharFormat_VerticalAlignment_Enums_as_child (decl_QTextCharFormat_VerticalAlignment_Enums, "QtGui", "QFlags_VerticalAlignment");
+static gsi::ClassExt<QTextCharFormat> decl_QTextCharFormat_VerticalAlignment_Enum_as_child (decl_QTextCharFormat_VerticalAlignment_Enum, "VerticalAlignment");
+static gsi::ClassExt<QTextCharFormat> decl_QTextCharFormat_VerticalAlignment_Enums_as_child (decl_QTextCharFormat_VerticalAlignment_Enums, "QFlags_VerticalAlignment");
 
 }
 

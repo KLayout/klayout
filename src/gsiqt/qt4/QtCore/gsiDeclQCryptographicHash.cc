@@ -191,8 +191,8 @@ static gsi::QFlagsClass<QCryptographicHash::Algorithm > decl_QCryptographicHash_
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QCryptographicHash> inject_QCryptographicHash_Algorithm_Enum_in_parent (decl_QCryptographicHash_Algorithm_Enum.defs ());
-static gsi::ClassExt<QCryptographicHash> decl_QCryptographicHash_Algorithm_Enum_as_child (decl_QCryptographicHash_Algorithm_Enum, "QtCore", "Algorithm");
-static gsi::ClassExt<QCryptographicHash> decl_QCryptographicHash_Algorithm_Enums_as_child (decl_QCryptographicHash_Algorithm_Enums, "QtCore", "QFlags_Algorithm");
+static gsi::ClassExt<QCryptographicHash> decl_QCryptographicHash_Algorithm_Enum_as_child (decl_QCryptographicHash_Algorithm_Enum, "Algorithm");
+static gsi::ClassExt<QCryptographicHash> decl_QCryptographicHash_Algorithm_Enums_as_child (decl_QCryptographicHash_Algorithm_Enums, "QFlags_Algorithm");
 
 }
 

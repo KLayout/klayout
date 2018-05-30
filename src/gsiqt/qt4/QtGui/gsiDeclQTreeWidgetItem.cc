@@ -1956,8 +1956,8 @@ static gsi::QFlagsClass<QTreeWidgetItem::ChildIndicatorPolicy > decl_QTreeWidget
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTreeWidgetItem> inject_QTreeWidgetItem_ChildIndicatorPolicy_Enum_in_parent (decl_QTreeWidgetItem_ChildIndicatorPolicy_Enum.defs ());
-static gsi::ClassExt<QTreeWidgetItem> decl_QTreeWidgetItem_ChildIndicatorPolicy_Enum_as_child (decl_QTreeWidgetItem_ChildIndicatorPolicy_Enum, "QtGui", "ChildIndicatorPolicy");
-static gsi::ClassExt<QTreeWidgetItem> decl_QTreeWidgetItem_ChildIndicatorPolicy_Enums_as_child (decl_QTreeWidgetItem_ChildIndicatorPolicy_Enums, "QtGui", "QFlags_ChildIndicatorPolicy");
+static gsi::ClassExt<QTreeWidgetItem> decl_QTreeWidgetItem_ChildIndicatorPolicy_Enum_as_child (decl_QTreeWidgetItem_ChildIndicatorPolicy_Enum, "ChildIndicatorPolicy");
+static gsi::ClassExt<QTreeWidgetItem> decl_QTreeWidgetItem_ChildIndicatorPolicy_Enums_as_child (decl_QTreeWidgetItem_ChildIndicatorPolicy_Enums, "QFlags_ChildIndicatorPolicy");
 
 }
 

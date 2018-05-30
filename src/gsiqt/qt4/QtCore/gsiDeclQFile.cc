@@ -941,8 +941,8 @@ static gsi::QFlagsClass<QFile::FileError > decl_QFile_FileError_Enums ("QtCore",
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFile> inject_QFile_FileError_Enum_in_parent (decl_QFile_FileError_Enum.defs ());
-static gsi::ClassExt<QFile> decl_QFile_FileError_Enum_as_child (decl_QFile_FileError_Enum, "QtCore", "FileError");
-static gsi::ClassExt<QFile> decl_QFile_FileError_Enums_as_child (decl_QFile_FileError_Enums, "QtCore", "QFlags_FileError");
+static gsi::ClassExt<QFile> decl_QFile_FileError_Enum_as_child (decl_QFile_FileError_Enum, "FileError");
+static gsi::ClassExt<QFile> decl_QFile_FileError_Enums_as_child (decl_QFile_FileError_Enums, "QFlags_FileError");
 
 }
 
@@ -971,8 +971,8 @@ static gsi::QFlagsClass<QFile::Permission > decl_QFile_Permission_Enums ("QtCore
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QFile> inject_QFile_Permission_Enum_in_parent (decl_QFile_Permission_Enum.defs ());
-static gsi::ClassExt<QFile> decl_QFile_Permission_Enum_as_child (decl_QFile_Permission_Enum, "QtCore", "Permission");
-static gsi::ClassExt<QFile> decl_QFile_Permission_Enums_as_child (decl_QFile_Permission_Enums, "QtCore", "QFlags_Permission");
+static gsi::ClassExt<QFile> decl_QFile_Permission_Enum_as_child (decl_QFile_Permission_Enum, "Permission");
+static gsi::ClassExt<QFile> decl_QFile_Permission_Enums_as_child (decl_QFile_Permission_Enums, "QFlags_Permission");
 
 }
 

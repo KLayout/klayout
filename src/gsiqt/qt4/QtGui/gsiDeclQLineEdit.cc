@@ -3774,8 +3774,8 @@ static gsi::QFlagsClass<QLineEdit::EchoMode > decl_QLineEdit_EchoMode_Enums ("Qt
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QLineEdit> inject_QLineEdit_EchoMode_Enum_in_parent (decl_QLineEdit_EchoMode_Enum.defs ());
-static gsi::ClassExt<QLineEdit> decl_QLineEdit_EchoMode_Enum_as_child (decl_QLineEdit_EchoMode_Enum, "QtGui", "EchoMode");
-static gsi::ClassExt<QLineEdit> decl_QLineEdit_EchoMode_Enums_as_child (decl_QLineEdit_EchoMode_Enums, "QtGui", "QFlags_EchoMode");
+static gsi::ClassExt<QLineEdit> decl_QLineEdit_EchoMode_Enum_as_child (decl_QLineEdit_EchoMode_Enum, "EchoMode");
+static gsi::ClassExt<QLineEdit> decl_QLineEdit_EchoMode_Enums_as_child (decl_QLineEdit_EchoMode_Enums, "QFlags_EchoMode");
 
 }
 

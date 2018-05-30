@@ -283,7 +283,7 @@ gsi::Class<QTextFrame::iterator> decl_QTextFrame_Iterator ("QtGui", "QTextFrame_
   methods_QTextFrame_Iterator (),
   "@qt\n@brief Binding of QTextFrame::iterator");
 
-gsi::ClassExt<QTextFrame> decl_QTextFrame_Iterator_as_child (decl_QTextFrame_Iterator, "QtGui", "Iterator");
+gsi::ClassExt<QTextFrame> decl_QTextFrame_Iterator_as_child (decl_QTextFrame_Iterator, "Iterator");
 
 GSI_QTGUI_PUBLIC gsi::Class<QTextFrame::iterator> &qtdecl_QTextFrame_Iterator () { return decl_QTextFrame_Iterator; }
 

@@ -30,7 +30,7 @@
 #if !defined(HDR_gsiQtSqlExternals)
 #define HDR_gsiQtSqlExternals
 
-#include "gsiClassBase.h"
+#include "gsiClass.h"
 #include "gsiQtSqlCommon.h"
 
 class QSqlDatabase;

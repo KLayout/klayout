@@ -2906,8 +2906,8 @@ static gsi::QFlagsClass<QDialogButtonBox::ButtonRole > decl_QDialogButtonBox_But
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDialogButtonBox> inject_QDialogButtonBox_ButtonRole_Enum_in_parent (decl_QDialogButtonBox_ButtonRole_Enum.defs ());
-static gsi::ClassExt<QDialogButtonBox> decl_QDialogButtonBox_ButtonRole_Enum_as_child (decl_QDialogButtonBox_ButtonRole_Enum, "QtGui", "ButtonRole");
-static gsi::ClassExt<QDialogButtonBox> decl_QDialogButtonBox_ButtonRole_Enums_as_child (decl_QDialogButtonBox_ButtonRole_Enums, "QtGui", "QFlags_ButtonRole");
+static gsi::ClassExt<QDialogButtonBox> decl_QDialogButtonBox_ButtonRole_Enum_as_child (decl_QDialogButtonBox_ButtonRole_Enum, "ButtonRole");
+static gsi::ClassExt<QDialogButtonBox> decl_QDialogButtonBox_ButtonRole_Enums_as_child (decl_QDialogButtonBox_ButtonRole_Enums, "QFlags_ButtonRole");
 
 }
 
@@ -2945,8 +2945,8 @@ static gsi::QFlagsClass<QDialogButtonBox::StandardButton > decl_QDialogButtonBox
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDialogButtonBox> inject_QDialogButtonBox_StandardButton_Enum_in_parent (decl_QDialogButtonBox_StandardButton_Enum.defs ());
-static gsi::ClassExt<QDialogButtonBox> decl_QDialogButtonBox_StandardButton_Enum_as_child (decl_QDialogButtonBox_StandardButton_Enum, "QtGui", "StandardButton");
-static gsi::ClassExt<QDialogButtonBox> decl_QDialogButtonBox_StandardButton_Enums_as_child (decl_QDialogButtonBox_StandardButton_Enums, "QtGui", "QFlags_StandardButton");
+static gsi::ClassExt<QDialogButtonBox> decl_QDialogButtonBox_StandardButton_Enum_as_child (decl_QDialogButtonBox_StandardButton_Enum, "StandardButton");
+static gsi::ClassExt<QDialogButtonBox> decl_QDialogButtonBox_StandardButton_Enums_as_child (decl_QDialogButtonBox_StandardButton_Enums, "QFlags_StandardButton");
 
 }
 

@@ -78,7 +78,7 @@ gsi::Class<QInputMethodEvent::Attribute> decl_QInputMethodEvent_Attribute ("QtGu
   methods_QInputMethodEvent_Attribute (),
   "@qt\n@brief Binding of QInputMethodEvent::Attribute");
 
-gsi::ClassExt<QInputMethodEvent> decl_QInputMethodEvent_Attribute_as_child (decl_QInputMethodEvent_Attribute, "QtGui", "Attribute");
+gsi::ClassExt<QInputMethodEvent> decl_QInputMethodEvent_Attribute_as_child (decl_QInputMethodEvent_Attribute, "Attribute");
 
 GSI_QTGUI_PUBLIC gsi::Class<QInputMethodEvent::Attribute> &qtdecl_QInputMethodEvent_Attribute () { return decl_QInputMethodEvent_Attribute; }
 

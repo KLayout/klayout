@@ -1040,8 +1040,8 @@ static gsi::QFlagsClass<QNetworkAccessManager::Operation > decl_QNetworkAccessMa
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QNetworkAccessManager> inject_QNetworkAccessManager_Operation_Enum_in_parent (decl_QNetworkAccessManager_Operation_Enum.defs ());
-static gsi::ClassExt<QNetworkAccessManager> decl_QNetworkAccessManager_Operation_Enum_as_child (decl_QNetworkAccessManager_Operation_Enum, "QtNetwork", "Operation");
-static gsi::ClassExt<QNetworkAccessManager> decl_QNetworkAccessManager_Operation_Enums_as_child (decl_QNetworkAccessManager_Operation_Enums, "QtNetwork", "QFlags_Operation");
+static gsi::ClassExt<QNetworkAccessManager> decl_QNetworkAccessManager_Operation_Enum_as_child (decl_QNetworkAccessManager_Operation_Enum, "Operation");
+static gsi::ClassExt<QNetworkAccessManager> decl_QNetworkAccessManager_Operation_Enums_as_child (decl_QNetworkAccessManager_Operation_Enums, "QFlags_Operation");
 
 }
 

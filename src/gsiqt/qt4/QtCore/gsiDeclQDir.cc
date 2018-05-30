@@ -1372,8 +1372,8 @@ static gsi::QFlagsClass<QDir::Filter > decl_QDir_Filter_Enums ("QtCore", "QDir_Q
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDir> inject_QDir_Filter_Enum_in_parent (decl_QDir_Filter_Enum.defs ());
-static gsi::ClassExt<QDir> decl_QDir_Filter_Enum_as_child (decl_QDir_Filter_Enum, "QtCore", "Filter");
-static gsi::ClassExt<QDir> decl_QDir_Filter_Enums_as_child (decl_QDir_Filter_Enums, "QtCore", "QFlags_Filter");
+static gsi::ClassExt<QDir> decl_QDir_Filter_Enum_as_child (decl_QDir_Filter_Enum, "Filter");
+static gsi::ClassExt<QDir> decl_QDir_Filter_Enums_as_child (decl_QDir_Filter_Enums, "QFlags_Filter");
 
 }
 
@@ -1402,8 +1402,8 @@ static gsi::QFlagsClass<QDir::SortFlag > decl_QDir_SortFlag_Enums ("QtCore", "QD
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QDir> inject_QDir_SortFlag_Enum_in_parent (decl_QDir_SortFlag_Enum.defs ());
-static gsi::ClassExt<QDir> decl_QDir_SortFlag_Enum_as_child (decl_QDir_SortFlag_Enum, "QtCore", "SortFlag");
-static gsi::ClassExt<QDir> decl_QDir_SortFlag_Enums_as_child (decl_QDir_SortFlag_Enums, "QtCore", "QFlags_SortFlag");
+static gsi::ClassExt<QDir> decl_QDir_SortFlag_Enum_as_child (decl_QDir_SortFlag_Enum, "SortFlag");
+static gsi::ClassExt<QDir> decl_QDir_SortFlag_Enums_as_child (decl_QDir_SortFlag_Enums, "QFlags_SortFlag");
 
 }
 

@@ -551,8 +551,8 @@ static gsi::QFlagsClass<QSslCertificate::SubjectInfo > decl_QSslCertificate_Subj
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QSslCertificate> inject_QSslCertificate_SubjectInfo_Enum_in_parent (decl_QSslCertificate_SubjectInfo_Enum.defs ());
-static gsi::ClassExt<QSslCertificate> decl_QSslCertificate_SubjectInfo_Enum_as_child (decl_QSslCertificate_SubjectInfo_Enum, "QtNetwork", "SubjectInfo");
-static gsi::ClassExt<QSslCertificate> decl_QSslCertificate_SubjectInfo_Enums_as_child (decl_QSslCertificate_SubjectInfo_Enums, "QtNetwork", "QFlags_SubjectInfo");
+static gsi::ClassExt<QSslCertificate> decl_QSslCertificate_SubjectInfo_Enum_as_child (decl_QSslCertificate_SubjectInfo_Enum, "SubjectInfo");
+static gsi::ClassExt<QSslCertificate> decl_QSslCertificate_SubjectInfo_Enums_as_child (decl_QSslCertificate_SubjectInfo_Enums, "QFlags_SubjectInfo");
 
 }
 

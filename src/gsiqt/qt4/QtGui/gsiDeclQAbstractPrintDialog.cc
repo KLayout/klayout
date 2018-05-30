@@ -2973,8 +2973,8 @@ static gsi::QFlagsClass<QAbstractPrintDialog::PrintDialogOption > decl_QAbstract
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractPrintDialog> inject_QAbstractPrintDialog_PrintDialogOption_Enum_in_parent (decl_QAbstractPrintDialog_PrintDialogOption_Enum.defs ());
-static gsi::ClassExt<QAbstractPrintDialog> decl_QAbstractPrintDialog_PrintDialogOption_Enum_as_child (decl_QAbstractPrintDialog_PrintDialogOption_Enum, "QtGui", "PrintDialogOption");
-static gsi::ClassExt<QAbstractPrintDialog> decl_QAbstractPrintDialog_PrintDialogOption_Enums_as_child (decl_QAbstractPrintDialog_PrintDialogOption_Enums, "QtGui", "QFlags_PrintDialogOption");
+static gsi::ClassExt<QAbstractPrintDialog> decl_QAbstractPrintDialog_PrintDialogOption_Enum_as_child (decl_QAbstractPrintDialog_PrintDialogOption_Enum, "PrintDialogOption");
+static gsi::ClassExt<QAbstractPrintDialog> decl_QAbstractPrintDialog_PrintDialogOption_Enums_as_child (decl_QAbstractPrintDialog_PrintDialogOption_Enums, "QFlags_PrintDialogOption");
 
 }
 
@@ -2994,8 +2994,8 @@ static gsi::QFlagsClass<QAbstractPrintDialog::PrintRange > decl_QAbstractPrintDi
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QAbstractPrintDialog> inject_QAbstractPrintDialog_PrintRange_Enum_in_parent (decl_QAbstractPrintDialog_PrintRange_Enum.defs ());
-static gsi::ClassExt<QAbstractPrintDialog> decl_QAbstractPrintDialog_PrintRange_Enum_as_child (decl_QAbstractPrintDialog_PrintRange_Enum, "QtGui", "PrintRange");
-static gsi::ClassExt<QAbstractPrintDialog> decl_QAbstractPrintDialog_PrintRange_Enums_as_child (decl_QAbstractPrintDialog_PrintRange_Enums, "QtGui", "QFlags_PrintRange");
+static gsi::ClassExt<QAbstractPrintDialog> decl_QAbstractPrintDialog_PrintRange_Enum_as_child (decl_QAbstractPrintDialog_PrintRange_Enum, "PrintRange");
+static gsi::ClassExt<QAbstractPrintDialog> decl_QAbstractPrintDialog_PrintRange_Enums_as_child (decl_QAbstractPrintDialog_PrintRange_Enums, "QFlags_PrintRange");
 
 }
 

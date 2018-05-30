@@ -3547,8 +3547,8 @@ static gsi::QFlagsClass<QMainWindow::DockOption > decl_QMainWindow_DockOption_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QMainWindow> inject_QMainWindow_DockOption_Enum_in_parent (decl_QMainWindow_DockOption_Enum.defs ());
-static gsi::ClassExt<QMainWindow> decl_QMainWindow_DockOption_Enum_as_child (decl_QMainWindow_DockOption_Enum, "QtGui", "DockOption");
-static gsi::ClassExt<QMainWindow> decl_QMainWindow_DockOption_Enums_as_child (decl_QMainWindow_DockOption_Enums, "QtGui", "QFlags_DockOption");
+static gsi::ClassExt<QMainWindow> decl_QMainWindow_DockOption_Enum_as_child (decl_QMainWindow_DockOption_Enum, "DockOption");
+static gsi::ClassExt<QMainWindow> decl_QMainWindow_DockOption_Enums_as_child (decl_QMainWindow_DockOption_Enums, "QFlags_DockOption");
 
 }
 

@@ -799,8 +799,8 @@ static gsi::QFlagsClass<QTextLayout::CursorMode > decl_QTextLayout_CursorMode_En
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QTextLayout> inject_QTextLayout_CursorMode_Enum_in_parent (decl_QTextLayout_CursorMode_Enum.defs ());
-static gsi::ClassExt<QTextLayout> decl_QTextLayout_CursorMode_Enum_as_child (decl_QTextLayout_CursorMode_Enum, "QtGui", "CursorMode");
-static gsi::ClassExt<QTextLayout> decl_QTextLayout_CursorMode_Enums_as_child (decl_QTextLayout_CursorMode_Enums, "QtGui", "QFlags_CursorMode");
+static gsi::ClassExt<QTextLayout> decl_QTextLayout_CursorMode_Enum_as_child (decl_QTextLayout_CursorMode_Enum, "CursorMode");
+static gsi::ClassExt<QTextLayout> decl_QTextLayout_CursorMode_Enums_as_child (decl_QTextLayout_CursorMode_Enums, "QFlags_CursorMode");
 
 }
 

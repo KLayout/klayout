@@ -105,7 +105,7 @@ gsi::Class<QTextOption::Tab> decl_QTextOption_Tab ("QtGui", "QTextOption_Tab",
   methods_QTextOption_Tab (),
   "@qt\n@brief Binding of QTextOption::Tab");
 
-gsi::ClassExt<QTextOption> decl_QTextOption_Tab_as_child (decl_QTextOption_Tab, "QtGui", "Tab");
+gsi::ClassExt<QTextOption> decl_QTextOption_Tab_as_child (decl_QTextOption_Tab, "Tab");
 
 GSI_QTGUI_PUBLIC gsi::Class<QTextOption::Tab> &qtdecl_QTextOption_Tab () { return decl_QTextOption_Tab; }
 

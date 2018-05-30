@@ -1456,8 +1456,8 @@ static gsi::QFlagsClass<QCoreApplication::Encoding > decl_QCoreApplication_Encod
 
 //  Inject the declarations into the parent
 static gsi::ClassExt<QCoreApplication> inject_QCoreApplication_Encoding_Enum_in_parent (decl_QCoreApplication_Encoding_Enum.defs ());
-static gsi::ClassExt<QCoreApplication> decl_QCoreApplication_Encoding_Enum_as_child (decl_QCoreApplication_Encoding_Enum, "QtCore", "Encoding");
-static gsi::ClassExt<QCoreApplication> decl_QCoreApplication_Encoding_Enums_as_child (decl_QCoreApplication_Encoding_Enums, "QtCore", "QFlags_Encoding");
+static gsi::ClassExt<QCoreApplication> decl_QCoreApplication_Encoding_Enum_as_child (decl_QCoreApplication_Encoding_Enum, "Encoding");
+static gsi::ClassExt<QCoreApplication> decl_QCoreApplication_Encoding_Enums_as_child (decl_QCoreApplication_Encoding_Enums, "QFlags_Encoding");
 
 }
 

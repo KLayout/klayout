@@ -376,10 +376,11 @@ class CPPStructDeclaration
   end
 
   def remove(d)
-    self.struct.body_decl.delete(d)
+    self.struct.body_decl && self.struct.body_decl.delete(d)
   end
 
   def insert(d)
+    self.struct.body_decl ||= []
     self.struct.body_decl << d
   end
 
@@ -390,15 +391,19 @@ class CPPStructDeclaration
     c = [ self ]
 
     (self.struct.base_classes || []).each do |bc|
-      bc_obj = self.parent.resolve_qid(bc.class_id)
-      # NOTE: it may look strange to test whether the base class is the class itself but
-      # since we do a half-hearted job of resolving template variants, this may happen
-      # if we derive a template specialization from another one (specifically 
-      # "template<class T> struct is_default_constructible : is_default_constructible<> { .. }"
-      if bc_obj != self && bc_obj.is_a?(CPPStructDeclaration)
-        c << bc_obj
-        c += bc_obj.children
-        c += bc_obj.other_children
+      # The parent may be null for template base classes which are 
+      # forward-declared .. we're not interested in this case.
+      if self.parent
+        bc_obj = self.parent.resolve_qid(bc.class_id)
+        # NOTE: it may look strange to test whether the base class is the class itself but
+        # since we do a half-hearted job of resolving template variants, this may happen
+        # if we derive a template specialization from another one (specifically 
+        # "template<class T> struct is_default_constructible : is_default_constructible<> { .. }"
+        if bc_obj != self && bc_obj.is_a?(CPPStructDeclaration)
+          c << bc_obj
+          c += bc_obj.children
+          c += bc_obj.other_children
+        end
       end
     end
 

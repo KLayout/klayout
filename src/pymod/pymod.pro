@@ -1,4 +1,7 @@
 
 TEMPLATE = subdirs
-SUBDIRS = db 
+SUBDIRS = \
+  db \
+  tl \
+  lay \
 

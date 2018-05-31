@@ -2355,7 +2355,7 @@ PythonModule::python_doc (const gsi::MethodBase *method)
 }
 
 void
-PythonModule::make_classes ()
+PythonModule::make_classes (const char *mod_name)
 {
   PyObject *module = mp_module.get ();
 
@@ -2406,6 +2406,11 @@ PythonModule::make_classes ()
 
     more_classes = false;
     for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+
+      if (mod_name && c->module () != mod_name) {
+        //  don't handle classes outside this module
+        continue;
+      }
 
       if (m_rev_cls_map.find (&*c) != m_rev_cls_map.end ()) {
         //  don't handle classes twice

@@ -33,8 +33,8 @@ static PyObject *module_init ()
   gsi::initialize_expressions ();
 
   static pya::PythonModule module;
-  module.init ("klayout.db", "KLayout core module (db)");
-  module.make_classes ("db");
+  module.init ("klayout.tl", "KLayout core module (tl)");
+  module.make_classes ("tl");
 
   return module.module ();
 }
@@ -42,14 +42,14 @@ static PyObject *module_init ()
 #if PY_MAJOR_VERSION < 3
 PyMODINIT_FUNC
 DEF_INSIDE_PUBLIC
-initdb ()
+inittl ()
 {
   module_init ();
 }
 #else
 PyMODINIT_FUNC
 DEF_INSIDE_PUBLIC
-PyInit_db ()
+PyInit_tl ()
 {
   return module_init();
 }

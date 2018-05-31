@@ -1,18 +1,18 @@
 
 LIBDIR = $$OUT_PWD/../..
 DESTDIR = $$LIBDIR/pymod
-TARGET = db
+TARGET = tl
 
 include($$PWD/../../lib.pri)
 
 SOURCES = \
-  dbMain.cc \
+  tlMain.cc \
 
 HEADERS += \
 
 INCLUDEPATH += $$PYTHONINCLUDE $$TL_INC $$GSI_INC $$PYA_INC
 DEPENDPATH += $$PYTHONINCLUDE $$TL_INC $$GSI_INC $$PYA_INC
-LIBS += $$PYTHONLIBFILE -L$$LIBDIR -lklayout_tl -lklayout_gsi -lklayout_db -lklayout_pya
+LIBS += $$PYTHONLIBFILE -L$$LIBDIR -lklayout_tl -lklayout_gsi -lklayout_pya
 
 # Python is somewhat sloppy and relies on the compiler initializing fields 
 # of strucs to 0:

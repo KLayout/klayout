@@ -1073,15 +1073,10 @@ private:
 void GSI_PUBLIC 
 initialize_expressions ()
 {
-  //  Allow duplicate initialization without any effect
-  static bool s_is_initialized = false;
-  if (s_is_initialized) {
-    return;
-  }
-  s_is_initialized = true;
-
+  //  just in case this did not happen yet ...
   gsi::initialize ();
 
+  //  Go through all classes (maybe again)
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
 
     //  install the method table:

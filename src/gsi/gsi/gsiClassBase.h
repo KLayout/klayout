@@ -221,6 +221,23 @@ public:
   }
  
   /**
+   *  @brief Iterates all freshly registered classes (begin)
+   *  This collection is emptied on "merge_declarations".
+   */
+  static class_iterator begin_new_classes ()
+  {
+    return new_collection ().begin ();
+  }
+
+  /**
+   *  @brief Iterates all freshly registered classes (begin)
+   */
+  static class_iterator end_new_classes ()
+  {
+    return new_collection ().end ();
+  }
+
+  /**
    *  @brief Iterates the methods (begin)
    */
   method_iterator begin_methods () const
@@ -557,6 +574,7 @@ public:
 
 protected:
   static const class_collection &collection ();
+  static const class_collection &new_collection ();
 
   const tl::weak_collection<ClassBase> &subclasses () const
   {
@@ -587,7 +605,7 @@ private:
   mutable std::auto_ptr<PerClassClientSpecificData> mp_data[ClientIndex::MaxClientIndex];
 
   static class_collection *mp_class_collection;
-  static unsigned int m_class_count;
+  static class_collection *mp_new_class_collection;
 
   //  No copying
   ClassBase (const ClassBase &other);

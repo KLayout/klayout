@@ -20,37 +20,6 @@
 
 */
 
-#include <Python.h>
-#include "pya.h"
-#include "gsi.h"
-#include "gsiExpression.h"
+#include "../pymodHelper.h"
 
-static PyObject *module_init ()
-{
-  gsi::initialize ();
-
-  //  required for the tiling processor for example
-  gsi::initialize_expressions ();
-
-  static pya::PythonModule module;
-  module.init ("klayout.db", "KLayout core module (db)");
-  module.make_classes ("db");
-
-  return module.module ();
-}
-
-#if PY_MAJOR_VERSION < 3
-PyMODINIT_FUNC
-DEF_INSIDE_PUBLIC
-initdb ()
-{
-  module_init ();
-}
-#else
-PyMODINIT_FUNC
-DEF_INSIDE_PUBLIC
-PyInit_db ()
-{
-  return module_init();
-}
-#endif
+DEFINE_PYMOD(db, "db", "KLayout core module 'db'")

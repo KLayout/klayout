@@ -4,4 +4,6 @@ SUBDIRS = \
   db \
   tl \
   lay \
+  QtGui \
+  QtCore \
 

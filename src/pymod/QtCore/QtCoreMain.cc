@@ -22,4 +22,4 @@
 
 #include "../pymodHelper.h"
 
-DEFINE_PYMOD(lay, "lay", "KLayout core module 'lay'")
+DEFINE_PYMOD(QtCore, "QtCore", "KLayout/Qt module 'QtCore'")

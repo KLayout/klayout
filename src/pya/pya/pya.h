@@ -69,6 +69,42 @@ namespace pya
   } 
 
 /**
+ *  Two helper macros that translate C++ exceptions into Python errors
+ */
+
+#define PYA_TRY \
+  { \
+    try {
+
+#define PYA_CATCH(where) \
+    } catch (tl::ExitException &ex) { \
+      PyErr_SetObject (PyExc_SystemExit, PyLong_FromLong (ex.status ())); \
+    } catch (std::exception &ex) { \
+      std::string msg = std::string(ex.what ()) + tl::to_string (QObject::tr (" in ")) + (where); \
+      PyErr_SetString (PyExc_RuntimeError, msg.c_str ()); \
+    } catch (tl::Exception &ex) { \
+      std::string msg; \
+      msg = ex.msg () + tl::to_string (QObject::tr (" in ")) + (where); \
+      PyErr_SetString (PyExc_RuntimeError, msg.c_str ()); \
+    } catch (...) { \
+      std::string msg = tl::to_string (QObject::tr ("Unspecific exception in ")) + (where); \
+      PyErr_SetString (PyExc_RuntimeError, msg.c_str ()); \
+    } \
+  }
+
+#define PYA_CATCH_ANYWHERE \
+    } catch (tl::ExitException &ex) { \
+      PyErr_SetObject (PyExc_SystemExit, PyLong_FromLong (ex.status ())); \
+    } catch (std::exception &ex) { \
+      PyErr_SetString (PyExc_RuntimeError, ex.what ()); \
+    } catch (tl::Exception &ex) { \
+      PyErr_SetString (PyExc_RuntimeError, ex.msg ().c_str ()); \
+    } catch (...) { \
+      PyErr_SetString (PyExc_RuntimeError, tl::to_string (QObject::tr ("Unspecific exception in ")).c_str ()); \
+    } \
+  }
+
+/**
  *  @brief A class encapsulating a python exception
  */
 class PYA_PUBLIC PythonError
@@ -143,9 +179,20 @@ public:
   static std::string python_doc (const gsi::MethodBase *method);
 
   /**
-   *  @brief Gets the PyObject for the module
+   *  @brief Gets the PyModule object
    */
   PyObject *module ();
+
+  /**
+   *  @brief Gets the PyModule object
+   *  This method will release the ownership over the PyObject
+   */
+  PyObject *take_module ();
+
+  /**
+   *  @brief Deletes the PyModule object
+   */
+  void delete_module ();
 
 private:
   void add_python_doc (const gsi::ClassBase &cls, const MethodTable *mt, int mid, const std::string &doc);

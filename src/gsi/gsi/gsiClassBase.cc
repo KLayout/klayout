@@ -106,7 +106,9 @@ ClassBase::add_child_class (const ClassBase *cls)
   //  TODO: ugly const_cast hack
   ClassBase *non_const_cls = const_cast<ClassBase *> (cls);
   non_const_cls->set_parent (this);
-  m_child_classes.push_back (const_cast <ClassBase *> (cls));
+  //  child classes inherit the module of their parent
+  non_const_cls->set_module (module ());
+  m_child_classes.push_back (non_const_cls);
 }
 
 bool 
@@ -497,7 +499,6 @@ ClassBase::merge_declarations ()
     mp_class_collection->push_back (non_const_decl);
   }
   mp_new_class_collection->clear ();
-
 }
 
 void

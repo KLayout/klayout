@@ -58,25 +58,6 @@ class PYAObjectBase;
 
 // --------------------------------------------------------------------------
 
-#define PYA_TRY \
-  { \
-    try {
-
-#define PYA_CATCH(where) \
-    } catch (tl::ExitException &ex) { \
-      PyErr_SetObject (PyExc_SystemExit, c2python<int> (ex.status ())); \
-    } catch (std::exception &ex) { \
-      std::string msg = std::string(ex.what ()) + tl::to_string (QObject::tr (" in ")) + (where); \
-      PyErr_SetString (PyExc_RuntimeError, msg.c_str ()); \
-    } catch (tl::Exception &ex) { \
-      std::string msg = ex.msg () + tl::to_string (QObject::tr (" in ")) + (where); \
-      PyErr_SetString (PyExc_RuntimeError, msg.c_str ()); \
-    } catch (...) { \
-      std::string msg = tl::to_string (QObject::tr ("Unspecific exception in ")) + (where); \
-      PyErr_SetString (PyExc_RuntimeError, msg.c_str ()); \
-    } \
-  }
-
 /**
  *  @brief The python interpreter instance
  */
@@ -2265,6 +2246,18 @@ PythonModule::module ()
   return mp_module.get ();
 }
 
+PyObject *
+PythonModule::take_module ()
+{
+  return mp_module.release ();
+}
+
+void
+PythonModule::delete_module ()
+{
+  mp_module = PythonRef ();
+}
+
 void
 PythonModule::init (const char *mod_name, const char *description)
 {
@@ -2359,6 +2352,18 @@ PythonModule::make_classes (const char *mod_name)
 {
   PyObject *module = mp_module.get ();
 
+  //  Prepare an __all__ index for the module
+
+  PythonRef all_list;
+  if (! PyObject_HasAttrString (module, "__all__")) {
+    all_list = PythonRef (PyList_New (0));
+    PyObject_SetAttrString (module, "__all__", all_list.get ());
+  } else {
+    all_list = PythonRef (PyObject_GetAttrString (module, "__all__"));
+  }
+
+  PyObject_SetAttrString (module, "__doc__", PythonRef (c2python (m_mod_description)).get ());
+
   //  Create a (built-in) base class for all objects exposed by this module
 
   m_base_class_name = m_mod_name + ".__Base";
@@ -2421,6 +2426,9 @@ PythonModule::make_classes (const char *mod_name)
       for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = c->begin_child_classes (); cc != c->end_child_classes (); ++cc) {
         tl_assert (cc->declaration () != 0);
         if (m_rev_cls_map.find (cc->declaration ()) == m_rev_cls_map.end ()) {
+          if (mod_name && cc->module () != mod_name) {
+            throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import klayout.%s' before 'import klayout.%s')")), c->name (), mod_name, cc->module (), cc->name (), cc->module (), mod_name));
+          }
           all_children_available = false;
           break;
         }
@@ -2432,6 +2440,9 @@ PythonModule::make_classes (const char *mod_name)
       }
 
       if (c->base () && m_rev_cls_map.find (c->base ()) == m_rev_cls_map.end ()) {
+        if (mod_name && c->base ()->module () != mod_name) {
+          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import klayout.%s' before 'import klayout.%s')")), c->name (), mod_name, c->base ()->module (), c->base ()->name (), c->base ()->module (), mod_name));
+        }
         //  can't produce this class yet. The base class needs to be handled first.
         more_classes = true;
         continue;
@@ -2464,6 +2475,7 @@ PythonModule::make_classes (const char *mod_name)
       PyTypeObject *type = (PyTypeObject *) PyObject_Call ((PyObject *) &PyType_Type, args.get (), NULL);
       tl_assert (type != NULL);
 
+      PyList_Append (all_list.get (), PythonRef (c2python (c->name ())).get ());
       PyModule_AddObject (module, c->name ().c_str (), (PyObject *) type);
 
       m_cls_map.insert (std::make_pair (type, &*c));

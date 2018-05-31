@@ -27,6 +27,7 @@
 #include "laybasicCommon.h"
 #include "gsiDecl.h"
 #include "gsiQtGuiExternals.h"
+#include "gsiQtWidgetsExternals.h"
 
 namespace tl
 {

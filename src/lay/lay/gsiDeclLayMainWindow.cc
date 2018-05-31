@@ -23,6 +23,7 @@
 #include "gsiDecl.h"
 #include "gsiSignals.h"
 #include "gsiQtGuiExternals.h"
+#include "gsiQtWidgetsExternals.h"  // for Qt5
 #include "layMainWindow.h"
 
 namespace gsi

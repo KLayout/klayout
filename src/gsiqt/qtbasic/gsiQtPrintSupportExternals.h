@@ -20,8 +20,9 @@
 
 */
 
-# if defined(HAVE_QT5)
-#   include "../qt5/QtPrintSupport/gsiQtExternals.h"
-# else
+#if QT_VERSION >= 0x050000
+#  include "../qt5/QtPrintSupport/gsiQtExternals.h"
+#else
 //  no present in Qt4
-# endif
+#  define FORCE_LINK_GSI_QTPRINTSUPPORT
+#endif

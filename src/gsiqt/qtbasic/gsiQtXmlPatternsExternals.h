@@ -20,8 +20,9 @@
 
 */
 
-# if defined(HAVE_QT5)
-#   include "../qt5/QtXmlPatterns/gsiQtExternals.h"
-# else
+#if QT_VERSION >= 0x050000
+#  include "../qt5/QtXmlPatterns/gsiQtExternals.h"
+#else
 //  Not present in Qt4
-# endif
+#  define FORCE_LINK_GSI_QTXMLPATTERNS
+#endif

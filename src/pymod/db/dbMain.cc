@@ -25,9 +25,7 @@
 #include "gsi.h"
 #include "gsiExpression.h"
 
-PyMODINIT_FUNC
-DEF_INSIDE_PUBLIC
-PyInit_db ()
+static PyObject *module_init ()
 {
   gsi::initialize ();
   gsi::initialize_expressions ();
@@ -38,3 +36,19 @@ PyInit_db ()
 
   return module.module ();
 }
+
+#if PY_MAJOR_VERSION < 3
+PyMODINIT_FUNC
+DEF_INSIDE_PUBLIC
+initdb ()
+{
+  module_init ();
+}
+#else
+PyMODINIT_FUNC
+DEF_INSIDE_PUBLIC
+PyMODINIT_FUNC PyInit_themodulename ()
+{
+  return module_init();
+}
+#endif

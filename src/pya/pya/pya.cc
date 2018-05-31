@@ -2253,8 +2253,6 @@ PythonModule::~PythonModule ()
     m_getseters_heap.pop_back ();
   }
 
-  m_string_heap.clear ();
-
   if (mp_mod_def) {
     delete[] mp_mod_def;
     mp_mod_def = 0;
@@ -3127,6 +3125,13 @@ PythonInterpreter::~PythonInterpreter ()
   }
 
   sp_interpreter = 0;
+}
+
+char *
+PythonInterpreter::make_string (const std::string &s)
+{
+  m_string_heap.push_back (s);
+  return const_cast<char *> (m_string_heap.back ().c_str ());
 }
 
 void

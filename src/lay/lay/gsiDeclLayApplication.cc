@@ -25,6 +25,7 @@
 #include "laySignalHandler.h"
 #include "gsiDecl.h"
 #include "gsiQtGuiExternals.h"
+#include "gsiQtWidgetsExternals.h"  //  for Qt5
 #include "gsiQtCoreExternals.h"
 #include "gsiQtXmlExternals.h"
 #include "tlArch.h"
@@ -32,6 +33,7 @@
 //  this is here *once*
 FORCE_LINK_GSI_QTCORE
 FORCE_LINK_GSI_QTGUI
+FORCE_LINK_GSI_QTWIDGETS
 //  required because the GSI bindings use QDomDocument
 FORCE_LINK_GSI_QTXML
 

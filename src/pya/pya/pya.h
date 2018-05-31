@@ -329,6 +329,9 @@ private:
   size_t prepare_trace (PyObject *);
   tl::Variant eval_int (const char *string, const char *filename, int line, bool eval_expr, int context);
   void get_context (int context, PythonRef &globals, PythonRef &locals, const char *file);
+  char *make_string (const std::string &s);
+
+  std::list<std::string> m_string_heap;
 
   PythonRef m_stdout_channel, m_stderr_channel;
   PythonPtr m_stdout, m_stderr;

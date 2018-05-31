@@ -23,6 +23,7 @@
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
 #include "gsiQtGuiExternals.h"
+#include "gsiQtWidgetsExternals.h"
 #include "layBrowserDialog.h"
 #include "layBrowserPanel.h"
 
@@ -35,6 +36,7 @@
 #include <limits>
 
 FORCE_LINK_GSI_QTGUI
+FORCE_LINK_GSI_QTWIDGETS // for Qt5
 
 namespace gsi
 {

@@ -46,7 +46,7 @@ namespace lay
 
 static std::string module_doc_path (const std::string &m)
 {
-  return "/code/index.xml?module=" + m;
+  return "/code/module_" + m + ".xml";
 }
 
 static std::string class_doc_path (const std::string &c)
@@ -448,15 +448,13 @@ GSIHelpProvider::get (const std::string &path) const
   QUrl url = QUrl::fromEncoded (path.c_str ());
   QString url_path = url.path ();
   QRegExp class_doc_url (QString::fromUtf8 ("^/code/class_(.*)\\.xml$"));
+  QRegExp module_index_url (QString::fromUtf8 ("^/code/module_(.*)\\.xml$"));
 
   std::string text;
   if (url_path == QString::fromUtf8 ("/code/index.xml")) {
-    if (url.hasQueryItem (QString::fromUtf8 ("module"))) {
-      QString module = url.queryItemValue (QString::fromUtf8 ("module"));
-      text = produce_class_index (module.toUtf8 ().constData ());
-    } else {
-      text = produce_class_index (0);
-    }
+    text = produce_class_index (0);
+  } else if (module_index_url.indexIn (url_path) == 0) {
+    text = produce_class_index (tl::to_string (module_index_url.cap (1)).c_str ());
   } else if (class_doc_url.indexIn (url_path) == 0) {
     text = produce_class_doc (tl::to_string (class_doc_url.cap (1)));
   } else {

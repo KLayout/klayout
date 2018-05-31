@@ -437,8 +437,14 @@ void produce_toc (const gsi::ClassBase *cls, std::vector <std::string> &toc)
 void 
 GSIHelpProvider::toc (std::vector<std::string> &t)
 {
+  std::set<std::string> mod_names;
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+    mod_names.insert (c->module ());
     produce_toc (c.operator-> (), t);
+  }
+
+  for (std::set<std::string>::const_iterator m = mod_names.begin (); m != mod_names.end (); ++m) {
+    t.push_back (module_doc_path (*m));
   }
 }
 
@@ -484,7 +490,24 @@ GSIHelpProvider::get (const std::string &path) const
 }
 
 static 
-void produce_doc_index (const gsi::ClassBase *cls, const std::string &module, std::ostringstream &os, std::vector <std::pair <std::string, std::pair<std::string, std::string> > > &class_names, std::vector <std::pair <std::string, std::pair<std::string, std::string> > > &qt_class_names)
+void produce_doc_index (const gsi::ClassBase *cls, std::ostringstream &os)
+{
+  DocumentationParser &doc = cls_documentation (cls);
+  std::string qname = make_qualified_name (cls);
+
+  //  Only list the name if the class is not hidden, it's a top-level class or the path is an expanded one
+  //  (the last criterion avoids generating classes such as A::B_C)
+  if (! doc.hidden) {
+    os << "<topic-ref href=\"" << escape_xml (class_doc_path (qname)) << "\"/>" << std::endl;
+  }
+
+  for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
+    produce_doc_index (cc.operator-> (), os);
+  }
+}
+
+static
+void collect_class_info (const gsi::ClassBase *cls, const std::string &module, std::vector <std::pair <std::string, std::pair<std::string, std::string> > > &class_names, std::vector <std::pair <std::string, std::pair<std::string, std::string> > > &qt_class_names)
 {
   DocumentationParser &doc = cls_documentation (cls);
   std::string qname = make_qualified_name (cls);
@@ -497,15 +520,14 @@ void produce_doc_index (const gsi::ClassBase *cls, const std::string &module, st
     } else {
       qt_class_names.push_back (std::make_pair (qname, std::make_pair (module, doc.brief_doc)));
     }
-    os << "<topic-ref href=\"" << escape_xml (class_doc_path (qname)) << "\"/>" << std::endl;
   }
 
   for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
-    produce_doc_index (cc.operator-> (), module, os, class_names, qt_class_names);
+    collect_class_info (cc.operator-> (), module, class_names, qt_class_names);
   }
 }
 
-std::string  
+std::string
 GSIHelpProvider::produce_class_index (const char *module_name) const
 {
   std::ostringstream os;
@@ -518,41 +540,26 @@ GSIHelpProvider::produce_class_index (const char *module_name) const
   if (!module_name) {
     os << "<title>" << tl::to_string (QObject::tr ("Class Index")) << "</title>" << std::endl;
   } else {
-    os << "<title>" << tl::to_string (QObject::tr ("Class Index for Module ")) << module_name << "</title>" << std::endl;
+    os << "<title>" << tl::to_string (QObject::tr ("Class Index for Module ")) << escape_xml (module_name) << "</title>" << std::endl;
+    os << "<keyword name=\"" << escape_xml (module_name) << "\"/>" << std::endl;
   }
 
   typedef std::vector <std::pair <std::string, std::pair<std::string, std::string> > > class_index_t;
 
   class_index_t class_names;
   class_index_t qt_class_names;
+
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-    produce_doc_index (&*c, c->module (), os, class_names, qt_class_names);
+    if (! module_name || c->module () == module_name) {
+      collect_class_info (c.operator-> (), c->module (), class_names, qt_class_names);
+    }
   }
 
-  if (module_name) {
+  if (! module_name) {
 
-    //  filter out the classes for this module
-    class_index_t filtered_class_names;
-    class_index_t filtered_qt_class_names;
-
-    for (class_index_t::iterator i = class_names.begin (); i != class_names.end (); ++i) {
-      if (i->second.first == module_name) {
-        filtered_class_names.push_back (*i);
-      }
+    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+      produce_doc_index (c.operator-> (), os);
     }
-
-    for (class_index_t::iterator i = qt_class_names.begin (); i != qt_class_names.end (); ++i) {
-      if (i->second.first == module_name) {
-        filtered_qt_class_names.push_back (*i);
-      }
-    }
-
-    class_names.swap (filtered_class_names);
-    qt_class_names.swap (filtered_qt_class_names);
-
-  } else {
-
-    os << "<p>" << tl::to_string (QObject::tr ("Per-Module documentation:")) << "</p>";
 
     std::set<std::string> mod_names;
     std::set<std::string> qt_mod_names;
@@ -565,12 +572,21 @@ GSIHelpProvider::produce_class_index (const char *module_name) const
       qt_mod_names.insert (i->second.first);
     }
 
-    os << "<ul>";
     for (std::set<std::string>::const_iterator m = mod_names.begin (); m != mod_names.end (); ++m) {
-      os << "<li><a href=\"" << module_doc_path (*m) << "\">" << tl::to_string (QObject::tr ("Core Module")) << " " << *m << "</a></li>";
+      os << "<topic-ref href=\"" << escape_xml (module_doc_path (*m)) << "\"/>" << std::endl;
     }
     for (std::set<std::string>::const_iterator m = qt_mod_names.begin (); m != qt_mod_names.end (); ++m) {
-      os << "<li><a href=\"" << module_doc_path (*m) << "\">" << tl::to_string (QObject::tr ("Qt Module")) << " " << *m << "</a></li>";
+      os << "<topic-ref href=\"" << escape_xml (module_doc_path (*m)) << "\"/>" << std::endl;
+    }
+
+    os << "<p>" << tl::to_string (QObject::tr ("Per-Module documentation:")) << "</p>";
+
+    os << "<ul>";
+    for (std::set<std::string>::const_iterator m = mod_names.begin (); m != mod_names.end (); ++m) {
+      os << "<li><a href=\"" << escape_xml (module_doc_path (*m)) << "\">" << tl::to_string (QObject::tr ("Core Module")) << " " << escape_xml (*m) << "</a></li>";
+    }
+    for (std::set<std::string>::const_iterator m = qt_mod_names.begin (); m != qt_mod_names.end (); ++m) {
+      os << "<li><a href=\"" << escape_xml (module_doc_path (*m)) << "\">" << tl::to_string (QObject::tr ("Qt Module")) << " " << escape_xml (*m) << "</a></li>";
     }
     os << "</ul>";
 

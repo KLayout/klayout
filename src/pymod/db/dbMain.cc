@@ -47,7 +47,7 @@ initdb ()
 #else
 PyMODINIT_FUNC
 DEF_INSIDE_PUBLIC
-PyMODINIT_FUNC PyInit_themodulename ()
+PyInit_db ()
 {
   return module_init();
 }

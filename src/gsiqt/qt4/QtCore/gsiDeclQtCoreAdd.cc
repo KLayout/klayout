@@ -34,6 +34,11 @@
 //  namespace which is in QtCore ... this introduces a dependency of QtCore GSI lib on QtGui.
 #include <QTextDocument>
 
+//  And this is *only* required because of QSignalMapper which takes a QWidget argument from
+//  the QtGui library and we need to supply the GSI binding for this ...
+#include "gsiQtGuiExternals.h"
+FORCE_LINK_GSI_QTGUI
+
 class Qt_Namespace { };
 
 namespace gsi_qt
@@ -147,14 +152,6 @@ gsi::Class<QPair<double, double> > decl_double_QPair ("QtCore", "QPair_double_do
 gsi::Class<QPair<double, QPointF> > decl_double_QPointF_QPair ("QtCore", "QPair_double_QPointF",
   qt_gsi::pair_decl<double, QPointF>::methods (),
   "@qt\\n@brief Represents a QPair<double, QPointF>"
-);
-
-// ------------------------------------------------------------
-//  Declarations for QPair<double, QColor>
-
-gsi::Class<QPair<double, QColor> > decl_double_QColor_QPair ("QtCore", "QPair_double_QColor",
-  qt_gsi::pair_decl<double, QColor>::methods (),
-  "@qt\\n@brief Represents a QPair<double, QColor>"
 );
 
 // ------------------------------------------------------------

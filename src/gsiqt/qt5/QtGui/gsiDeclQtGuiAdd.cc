@@ -37,4 +37,12 @@ gsi::Class<QPair<QAccessibleInterface*, QAccessible::Relation> > decl_QAccessibl
   "@qt\\n@brief Represents a QPair<QAccessibleInterface*, QAccessible::Relation> >"
 );
 
+// ------------------------------------------------------------
+//  Declarations for QPair<double, QColor>
+
+gsi::Class<QPair<double, QColor> > decl_double_QColor_QPair ("QtCore", "QPair_double_QColor",
+  qt_gsi::pair_decl<double, QColor>::methods (),
+  "@qt\\n@brief Represents a QPair<double, QColor>"
+);
+
 }

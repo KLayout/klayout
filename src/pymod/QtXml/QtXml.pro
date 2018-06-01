@@ -1,10 +1,11 @@
 
-TARGET = tl
+TARGET = QtXml
 
 include($$PWD/../pymod.pri)
 
 SOURCES = \
-  tlMain.cc \
+  QtXmlMain.cc \
 
 HEADERS += \
 
+LIBS += -lklayout_QtXml

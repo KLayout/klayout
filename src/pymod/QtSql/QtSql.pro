@@ -1,10 +1,11 @@
 
-TARGET = tl
+TARGET = QtSql
 
 include($$PWD/../pymod.pri)
 
 SOURCES = \
-  tlMain.cc \
+  QtSqlMain.cc \
 
 HEADERS += \
 
+LIBS += -lklayout_QtSql

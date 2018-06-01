@@ -4,6 +4,31 @@ SUBDIRS = \
   db \
   tl \
   lay \
-  QtGui \
-  QtCore \
+
+equals(HAVE_QT5, "1") {
+
+  SUBDIRS += \
+    QtCore \
+    QtGui \
+    QtNetwork \
+    QtSql \
+    QtWidgets \
+    QtDesigner \
+    QtMultimedia \
+    QtPrintSupport \
+    QtSvg \
+    QtXmlPatterns \
+    QtXml
+
+} else {
+
+  SUBDIRS += \
+    QtCore \
+    QtGui \
+    QtXml \
+    QtSql \
+    QtNetwork \
+    QtDesigner
+
+}
 

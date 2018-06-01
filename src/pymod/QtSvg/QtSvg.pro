@@ -1,10 +1,11 @@
 
-TARGET = tl
+TARGET = QtSvg
 
 include($$PWD/../pymod.pri)
 
 SOURCES = \
-  tlMain.cc \
+  QtSvgMain.cc \
 
 HEADERS += \
 
+LIBS += -lklayout_QtSvg

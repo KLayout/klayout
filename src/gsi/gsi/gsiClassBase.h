@@ -189,6 +189,12 @@ public:
   void add_child_class (const ClassBase *cls);
 
   /**
+   *  @brief Adds a subclass
+   *  Subclasses are the ones that derive from us (opposite of base)
+   */
+  void add_subclass (const ClassBase *cls);
+
+  /**
    *  @brief Iterates all child classes (begin)
    */
   tl::weak_collection<ClassBase>::const_iterator begin_child_classes () const
@@ -595,6 +601,7 @@ protected:
   void set_base (const ClassBase *base);
 
 private:
+  bool m_initialized;
   const ClassBase *mp_base, *mp_parent;
   std::string m_doc;
   Methods m_methods;

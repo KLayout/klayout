@@ -55,7 +55,7 @@ namespace {
 static std::map<const std::type_info *, const ClassBase *, type_info_compare> s_ti_to_class;
 
 ClassBase::ClassBase (const std::string &doc, const Methods &mm, bool do_register)
-  : mp_base (0), mp_parent (0), m_doc (doc), m_methods (mm)
+  : m_initialized (false), mp_base (0), mp_parent (0), m_doc (doc), m_methods (mm)
 { 
   if (do_register) {
 
@@ -79,13 +79,19 @@ ClassBase::~ClassBase ()
 void
 ClassBase::set_parent (const ClassBase *p)
 {
-  mp_parent = p;
+  if (mp_parent != p) {
+    mp_parent = p;
+    m_initialized = false;
+  }
 }
 
 void
 ClassBase::set_base (const ClassBase *b)
 {
-  mp_base = b;
+  if (mp_base != b) {
+    mp_base = b;
+    m_initialized = false;
+  }
 }
 
 std::string 
@@ -101,6 +107,15 @@ ClassBase::qname () const
 }
 
 void
+ClassBase::add_subclass (const ClassBase *cls)
+{
+  //  TODO: ugly const_cast hack
+  ClassBase *non_const_cls = const_cast<ClassBase *> (cls);
+  m_subclasses.push_back (non_const_cls);
+  m_initialized = false;
+}
+
+void
 ClassBase::add_child_class (const ClassBase *cls)
 {
   //  TODO: ugly const_cast hack
@@ -109,6 +124,7 @@ ClassBase::add_child_class (const ClassBase *cls)
   //  child classes inherit the module of their parent
   non_const_cls->set_module (module ());
   m_child_classes.push_back (non_const_cls);
+  m_initialized = false;
 }
 
 bool 
@@ -395,7 +411,7 @@ ClassBase::merge_declarations ()
 
   //  Consolidate the classes (merge, remove etc.)
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
-    if (! c->consolidate()) {
+    if (! c->consolidate ()) {
       to_remove.push_back (&*c);
     }
   }
@@ -410,7 +426,7 @@ ClassBase::merge_declarations ()
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
     if (c->base ()) {
       //  TODO: ugly const_cast hack
-      const_cast<gsi::ClassBase *> (c->base ())->m_subclasses.push_back (const_cast<gsi::ClassBase *> (c.operator-> ()));
+      const_cast<gsi::ClassBase *> (c->base ())->add_subclass (c.operator-> ());
     }
   }
 
@@ -499,11 +515,26 @@ ClassBase::merge_declarations ()
     mp_class_collection->push_back (non_const_decl);
   }
   mp_new_class_collection->clear ();
+
+  //  do a full re-initialization - maybe merge_declarations modified existing classes too
+  for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+    //  Initialize the method table once again after we have merged the declarations
+    //  TODO: get rid of that const cast
+    (const_cast<gsi::ClassBase *> (&*c))->initialize ();
+
+    //  there should be only main declarations since we merged
+    tl_assert (c->declaration () == &*c);
+  }
 }
 
 void
 ClassBase::initialize ()
 {
+  //  don't initialize again
+  if (m_initialized) {
+    return;
+  }
+
   m_methods.initialize ();
 
   m_constructors.clear ();
@@ -519,11 +550,14 @@ ClassBase::initialize ()
       m_callbacks.push_back (*m);
     }
   }
+
+  m_initialized = true;
 }
 
 void
 ClassBase::add_method (MethodBase *method, bool /*base_class*/)
 {
+  m_initialized = false;
   m_methods.add_method (method);
 }
 

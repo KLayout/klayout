@@ -2223,21 +2223,7 @@ PythonModule::PythonModule ()
 PythonModule::~PythonModule ()
 {
   PYAObjectBase::clear_callbacks_cache ();
-
-  while (!m_methods_heap.empty ()) {
-    delete m_methods_heap.back ();
-    m_methods_heap.pop_back ();
-  }
-
-  while (!m_getseters_heap.empty ()) {
-    delete m_getseters_heap.back ();
-    m_getseters_heap.pop_back ();
-  }
-
-  if (mp_mod_def) {
-    delete[] mp_mod_def;
-    mp_mod_def = 0;
-  }
+  delete_module ();
 }
 
 PyObject *
@@ -2256,6 +2242,22 @@ void
 PythonModule::delete_module ()
 {
   mp_module = PythonRef ();
+  mp_base_class = PythonRef ();
+
+  while (!m_methods_heap.empty ()) {
+    delete m_methods_heap.back ();
+    m_methods_heap.pop_back ();
+  }
+
+  while (!m_getseters_heap.empty ()) {
+    delete m_getseters_heap.back ();
+    m_getseters_heap.pop_back ();
+  }
+
+  if (mp_mod_def) {
+    delete[] mp_mod_def;
+    mp_mod_def = 0;
+  }
 }
 
 void
@@ -2283,12 +2285,13 @@ PythonModule::init (const char *mod_name, const char *description)
      module_methods
   };
 
-  tl_assert (mp_mod_def == 0);
+  tl_assert (! mp_mod_def);
 
   //  prepare a persistent structure with the module definition
   //  and pass this one to PyModule_Create
   mp_mod_def = new char[sizeof (PyModuleDef)];
   memcpy ((void *) mp_mod_def, (const void *) &mod_def, sizeof (PyModuleDef));
+
   module = PyModule_Create ((PyModuleDef *) mp_mod_def);
 
 #endif
@@ -2350,6 +2353,39 @@ PythonModule::python_doc (const gsi::MethodBase *method)
 void
 PythonModule::make_classes (const char *mod_name)
 {
+  //  Check whether the new classes are self-contained within this module
+  if (mod_name) {
+
+    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+
+      if (c->module () != mod_name) {
+        //  don't handle classes outside this module
+        continue;
+      }
+
+      if (m_rev_cls_map.find (&*c) != m_rev_cls_map.end ()) {
+        //  don't handle classes twice
+        continue;
+      }
+
+      //  All child classes must originate from this module or be known already
+      for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = c->begin_child_classes (); cc != c->end_child_classes (); ++cc) {
+        if (m_rev_cls_map.find (cc->declaration ()) == m_rev_cls_map.end ()
+            && cc->module () != mod_name) {
+          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import klayout.%s' before 'import klayout.%s')")), c->name (), mod_name, cc->module (), cc->name (), cc->module (), mod_name));
+        }
+      }
+
+      //  Same for base class
+      if (c->base () && m_rev_cls_map.find (c->base ()) == m_rev_cls_map.end ()
+          && c->base ()->module () != mod_name) {
+        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import klayout.%s' before 'import klayout.%s')")), c->name (), mod_name, c->base ()->module (), c->base ()->name (), c->base ()->module (), mod_name));
+      }
+
+    }
+
+  }
+
   PyObject *module = mp_module.get ();
 
   //  Prepare an __all__ index for the module
@@ -2426,9 +2462,6 @@ PythonModule::make_classes (const char *mod_name)
       for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = c->begin_child_classes (); cc != c->end_child_classes (); ++cc) {
         tl_assert (cc->declaration () != 0);
         if (m_rev_cls_map.find (cc->declaration ()) == m_rev_cls_map.end ()) {
-          if (mod_name && cc->module () != mod_name) {
-            throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import klayout.%s' before 'import klayout.%s')")), c->name (), mod_name, cc->module (), cc->name (), cc->module (), mod_name));
-          }
           all_children_available = false;
           break;
         }
@@ -2440,9 +2473,6 @@ PythonModule::make_classes (const char *mod_name)
       }
 
       if (c->base () && m_rev_cls_map.find (c->base ()) == m_rev_cls_map.end ()) {
-        if (mod_name && c->base ()->module () != mod_name) {
-          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import klayout.%s' before 'import klayout.%s')")), c->name (), mod_name, c->base ()->module (), c->base ()->name (), c->base ()->module (), mod_name));
-        }
         //  can't produce this class yet. The base class needs to be handled first.
         more_classes = true;
         continue;
@@ -2478,8 +2508,9 @@ PythonModule::make_classes (const char *mod_name)
       PyList_Append (all_list.get (), PythonRef (c2python (c->name ())).get ());
       PyModule_AddObject (module, c->name ().c_str (), (PyObject *) type);
 
-      m_cls_map.insert (std::make_pair (type, &*c));
-      m_rev_cls_map.insert (std::make_pair (&*c, type));
+      //  NOTE: we force the new values as there may be value from a previous (failed) attempt
+      m_cls_map[type] = c.operator-> ();
+      m_rev_cls_map[c.operator-> ()] = type;
 
       //  Create the sub-class attributes
 

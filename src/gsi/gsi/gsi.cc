@@ -51,16 +51,6 @@ initialize ()
   //  merge the extensions to the main declaration
   gsi::ClassBase::merge_declarations ();
 
-  //  do a full re-initialization - maybe merge_declarations modified existing classes too
-  for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-    //  Initialize the method table once again after we have merged the declarations
-    //  TODO: get rid of that const cast
-    (const_cast<gsi::ClassBase *> (&*c))->initialize ();
-
-    //  there should be only main declarations since we merged
-    tl_assert (c->declaration () == &*c);
-  }
-
   //  build or rebuild the variant user class table
   //  NOTE: as the variant classes are tied to the gsi::Class objects, we can rebuild the table
   //  and will get the same pointers for the classes that have been there before

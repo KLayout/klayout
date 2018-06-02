@@ -34,8 +34,8 @@ namespace tl
 
 static DeferredMethodScheduler *s_inst = 0;
 
-DeferredMethodScheduler::DeferredMethodScheduler ()
-  : QObject (0),
+DeferredMethodScheduler::DeferredMethodScheduler (QObject *parent)
+  : QObject (parent),
     m_disabled (0), m_scheduled (false)
 {
   connect (&m_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
@@ -60,8 +60,9 @@ DeferredMethodScheduler::~DeferredMethodScheduler ()
 DeferredMethodScheduler *
 DeferredMethodScheduler::instance ()
 {
-  //  NOTE: this is not locked intentionally. The instance is shut down once in the application shortly before it
-  //  will terminate and it is created initially before any threads start.
+  if (! s_inst && qApp) {
+    new DeferredMethodScheduler (qApp);
+  }
   return s_inst;
 }
 

@@ -23,6 +23,8 @@
 
 #include "gsiDecl.h"
 #include "gsiSignals.h"
+#include "gsiQtGuiExternals.h"
+#include "gsiQtWidgetsExternals.h"  // for Qt5
 #include "rdb.h"
 #include "layLayoutView.h"
 #include "layDitherPattern.h"
@@ -367,7 +369,7 @@ static lay::LayoutView *new_view ()
   return new lay::LayoutView (0, false, 0);
 }
 
-Class<lay::LayoutView> decl_LayoutView ("lay", "LayoutView",
+Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "LayoutView",
   gsi::constructor ("new", &new_view,
     "@brief Creates a standalone view\n"
     "\n"

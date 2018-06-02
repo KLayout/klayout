@@ -461,6 +461,9 @@ MainWindow::MainWindow (QApplication *app, const char *name)
       m_busy (false),
       mp_app (app)
 {
+  //  ensures the deferred method scheduler is present
+  tl::DeferredMethodScheduler::instance ();
+
   setObjectName (QString::fromUtf8 (name));
 
   if (mw_instance != 0) {

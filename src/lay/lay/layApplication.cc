@@ -1348,10 +1348,6 @@ GuiApplication::GuiApplication (int &argc, char **argv)
 #if QT_VERSION >= 0x040500
   setAttribute (Qt::AA_DontShowIconsInMenus, false);
 #endif
-
-  //  only a GUI-enabled application runs an event loop and can have a deferred
-  //  method scheduler therefore.
-  mp_dm_scheduler.reset (new tl::DeferredMethodScheduler ());
 }
 
 GuiApplication::~GuiApplication ()
@@ -1533,8 +1529,8 @@ GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool 
 {
   if (mp_mw) {
 
-    if (silent) {
-      mp_dm_scheduler->enable (false);
+    if (silent && tl::DeferredMethodScheduler::instance ()) {
+      tl::DeferredMethodScheduler::instance ()->enable (false);
     }
 
 #if QT_VERSION < 0x050000
@@ -1549,8 +1545,8 @@ GuiApplication::process_events_impl (QEventLoop::ProcessEventsFlags flags, bool 
     }
     mp_mw->enter_busy_mode (false);
 
-    if (silent) {
-      mp_dm_scheduler->enable (true);
+    if (silent && tl::DeferredMethodScheduler::instance ()) {
+      tl::DeferredMethodScheduler::instance ()->enable (true);
     }
 
   }

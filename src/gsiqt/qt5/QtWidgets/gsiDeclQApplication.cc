@@ -53,12 +53,6 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
   ret.write<const QMetaObject &> (QApplication::staticMetaObject);
 }
 
-  static QApplication *ctor_QApplication()
-  {
-    static char *(dummy_argv[]) = { (char *)"undefined_application" };
-    int argc = 1;
-    return new QApplication (argc, dummy_argv);
-  }
 
 // bool QApplication::autoSipEnabled()
 
@@ -1158,8 +1152,6 @@ static gsi::Methods methods_QApplication () {
 gsi::Class<QGuiApplication> &qtdecl_QGuiApplication ();
 
 qt_gsi::QtNativeClass<QApplication> decl_QApplication (qtdecl_QGuiApplication (), "QtWidgets", "QApplication_Native",
-  gsi::constructor("new_app", &ctor_QApplication, "@brief Creates a new QApplication object\n\nThis implementation is provided for test purposes only. It is not required usually to create a QApplication object. Use the object provided by QApplication::instance instead.")
-+
   methods_QApplication (),
   "@hide\n@alias QApplication");
 
@@ -1171,6 +1163,27 @@ GSI_QTWIDGETS_PUBLIC gsi::Class<QApplication> &qtdecl_QApplication () { return d
 class QApplication_Adaptor : public QApplication, public qt_gsi::QtObjectBase
 {
 public:
+  static QApplication *ctor_QApplication_Adaptor_args(const std::vector<std::string> &args)
+  {
+    //  QApplication needs static sources, so we give it some.
+    static char **argv = 0;
+    static std::vector<std::string> args_copy;
+    static int argc = 0;
+
+    if (argv != 0) {
+      throw tl::Exception(tl::to_string(QObject::tr("QApplication cannot be instantiated twice")));
+    }
+    argv = new char *[args.size ()];
+    args_copy = args;
+    argc = int (args.size ());
+    for (std::vector<std::string>::const_iterator a = args_copy.begin (); a != args_copy.end (); ++a) {
+      argv[a - args_copy.begin ()] = (char *) a->c_str ();
+    }
+
+    return new QApplication_Adaptor (argc, argv);
+  }
+
+  QApplication_Adaptor (int &argc, char **argv) : QApplication (argc, argv) { }
 
   virtual ~QApplication_Adaptor();
 
@@ -1978,6 +1991,8 @@ static gsi::Methods methods_QApplication_Adaptor () {
 }
 
 gsi::Class<QApplication_Adaptor> decl_QApplication_Adaptor (qtdecl_QApplication (), "QtWidgets", "QApplication",
+    gsi::constructor("new", &QApplication_Adaptor::ctor_QApplication_Adaptor_args, gsi::arg ("argv"), "@brief Creates a new QApplication object\n\n@param argv The command line arguments to pass to Qt")
++
   methods_QApplication_Adaptor (),
   "@qt\n@brief Binding of QApplication");
 

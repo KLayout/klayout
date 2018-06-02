@@ -2223,6 +2223,12 @@ PythonModule::PythonModule ()
 PythonModule::~PythonModule ()
 {
   PYAObjectBase::clear_callbacks_cache ();
+
+  //  the Python objects were probably deleted by Python itself as it exited -
+  //  don't try to delete them again.
+  mp_module.release ();
+  mp_base_class.release ();
+
   delete_module ();
 }
 

@@ -48,11 +48,6 @@ namespace gtf
   class Recorder;
 }
 
-namespace tl
-{
-  class DeferredMethodScheduler;
-}
-
 namespace lym
 {
   class MacroCollection;
@@ -476,7 +471,6 @@ protected:
 private:
   MainWindow *mp_mw;
   gtf::Recorder *mp_recorder;
-  std::auto_ptr<tl::DeferredMethodScheduler> mp_dm_scheduler;
 };
 
 /**

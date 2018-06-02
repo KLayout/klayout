@@ -255,6 +255,9 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::PluginRoot *ro
     m_annotation_shapes (manager),
     dm_prop_changed (this, &LayoutView::do_prop_changed) 
 {
+  //  ensures the deferred method scheduler is present
+  tl::DeferredMethodScheduler::instance ();
+
   setObjectName (QString::fromUtf8 (name));
   init (manager, root, parent);
 }
@@ -267,6 +270,9 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
     m_annotation_shapes (manager),
     dm_prop_changed (this, &LayoutView::do_prop_changed)
 {
+  //  ensures the deferred method scheduler is present
+  tl::DeferredMethodScheduler::instance ();
+
   setObjectName (QString::fromUtf8 (name));
 
   m_annotation_shapes = source->m_annotation_shapes;

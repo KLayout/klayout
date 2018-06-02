@@ -53,12 +53,6 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
   ret.write<const QMetaObject &> (QGuiApplication::staticMetaObject);
 }
 
-  static QGuiApplication *ctor_QGuiApplication()
-  {
-    static char *(dummy_argv[]) = { (char *)"undefined_application" };
-    int argc = 1;
-    return new QGuiApplication (argc, dummy_argv);
-  }
 
 // double QGuiApplication::devicePixelRatio()
 
@@ -902,8 +896,6 @@ static gsi::Methods methods_QGuiApplication () {
 gsi::Class<QCoreApplication> &qtdecl_QCoreApplication ();
 
 qt_gsi::QtNativeClass<QGuiApplication> decl_QGuiApplication (qtdecl_QCoreApplication (), "QtGui", "QGuiApplication_Native",
-  gsi::constructor("new_app", &ctor_QGuiApplication, "@brief Creates a new QGuiApplication object\n\nThis implementation is provided for test purposes only. It is not required usually to create a QGuiApplication object. Use the object provided by QGuiApplication::instance instead.")
-+
   methods_QGuiApplication (),
   "@hide\n@alias QGuiApplication");
 
@@ -915,6 +907,27 @@ GSI_QTGUI_PUBLIC gsi::Class<QGuiApplication> &qtdecl_QGuiApplication () { return
 class QGuiApplication_Adaptor : public QGuiApplication, public qt_gsi::QtObjectBase
 {
 public:
+  static QGuiApplication *ctor_QGuiApplication_Adaptor_args(const std::vector<std::string> &args)
+  {
+    //  QGuiApplication needs static sources, so we give it some.
+    static char **argv = 0;
+    static std::vector<std::string> args_copy;
+    static int argc = 0;
+
+    if (argv != 0) {
+      throw tl::Exception(tl::to_string(QObject::tr("QGuiApplication cannot be instantiated twice")));
+    }
+    argv = new char *[args.size ()];
+    args_copy = args;
+    argc = int (args.size ());
+    for (std::vector<std::string>::const_iterator a = args_copy.begin (); a != args_copy.end (); ++a) {
+      argv[a - args_copy.begin ()] = (char *) a->c_str ();
+    }
+
+    return new QGuiApplication_Adaptor (argc, argv);
+  }
+
+  QGuiApplication_Adaptor (int &argc, char **argv) : QGuiApplication (argc, argv) { }
 
   virtual ~QGuiApplication_Adaptor();
 
@@ -1694,6 +1707,8 @@ static gsi::Methods methods_QGuiApplication_Adaptor () {
 }
 
 gsi::Class<QGuiApplication_Adaptor> decl_QGuiApplication_Adaptor (qtdecl_QGuiApplication (), "QtGui", "QGuiApplication",
+    gsi::constructor("new", &QGuiApplication_Adaptor::ctor_QGuiApplication_Adaptor_args, gsi::arg ("argv"), "@brief Creates a new QGuiApplication object\n\n@param argv The command line arguments to pass to Qt")
++
   methods_QGuiApplication_Adaptor (),
   "@qt\n@brief Binding of QGuiApplication");
 

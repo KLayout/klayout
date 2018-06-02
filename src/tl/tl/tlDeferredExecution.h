@@ -72,16 +72,6 @@ class TL_PUBLIC DeferredMethodScheduler
 Q_OBJECT
 public:
   /**
-   *  @brief Constructor
-   */
-  DeferredMethodScheduler ();
-
-  /**
-   *  @brief Destructor
-   */
-  ~DeferredMethodScheduler ();
-
-  /**
    *  @brief The singleton instance of the scheduler
    */
   static DeferredMethodScheduler *instance ();
@@ -129,6 +119,16 @@ private slots:
   void timer ();
 
 private:
+  /**
+   *  @brief Constructor
+   */
+  DeferredMethodScheduler (QObject *parent);
+
+  /**
+   *  @brief Destructor
+   */
+  ~DeferredMethodScheduler ();
+
   int m_disabled;
   bool m_scheduled;
   std::list<DeferredMethodBase *> m_methods;

@@ -48,7 +48,7 @@ pya_channel_write (PyObject *self, PyObject *args)
   }
 
   PYAChannelObject *channel = (PYAChannelObject *) self;
-  if (PythonInterpreter::instance ()->current_console ()) {
+  if (PythonInterpreter::instance () && PythonInterpreter::instance ()->current_console ()) {
     PythonInterpreter::instance ()->current_console ()->write_str (msg, channel->channel);
   }
 
@@ -65,7 +65,7 @@ pya_channel_flush (PyObject * /*self*/, PyObject *args)
     return NULL;
   }
 
-  if (PythonInterpreter::instance ()->current_console ()) {
+  if (PythonInterpreter::instance () && PythonInterpreter::instance ()->current_console ()) {
     PythonInterpreter::instance ()->current_console ()->flush ();
   }
 
@@ -82,7 +82,7 @@ pya_channel_isatty (PyObject * /*self*/, PyObject *args)
     return NULL;
   }
 
-  if (PythonInterpreter::instance ()->current_console () && PythonInterpreter::instance ()->current_console ()->is_tty ()) {
+  if (PythonInterpreter::instance () && PythonInterpreter::instance ()->current_console () && PythonInterpreter::instance ()->current_console ()->is_tty ()) {
     Py_RETURN_TRUE;
   } else {
     Py_RETURN_FALSE;

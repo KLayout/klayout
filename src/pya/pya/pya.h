@@ -59,12 +59,12 @@ namespace pya
 
 #define PYTHON_BEGIN_EXEC \
   try { \
-    PythonInterpreter::instance ()->begin_execution ();
+    if (PythonInterpreter::instance ()) { PythonInterpreter::instance ()->begin_execution (); }
 
 #define PYTHON_END_EXEC \
-    PythonInterpreter::instance ()->end_execution (); \
+    if (PythonInterpreter::instance ()) { PythonInterpreter::instance ()->end_execution (); } \
   } catch (...) { \
-    PythonInterpreter::instance ()->end_execution (); \
+    if (PythonInterpreter::instance ()) { PythonInterpreter::instance ()->end_execution (); } \
     throw; \
   } 
 

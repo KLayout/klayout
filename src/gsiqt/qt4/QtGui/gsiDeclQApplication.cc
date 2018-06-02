@@ -58,7 +58,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
   static QApplication *ctor_QApplication()
   {
     static char *(dummy_argv[]) = { (char *)"undefined_application" };
-    int argc = 1;
+    static int argc = 1;
     return new QApplication (argc, dummy_argv);
   }
 

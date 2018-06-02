@@ -3418,7 +3418,11 @@ PythonInterpreter::prepare_trace (PyObject *fn_object)
 static
 int pya_trace_func (PyObject * /*obj*/, PyFrameObject *frame, int event, PyObject *arg)
 {
-  return PythonInterpreter::instance ()->trace_func (frame, event, arg);
+  if (PythonInterpreter::instance ()) {
+    return PythonInterpreter::instance ()->trace_func (frame, event, arg);
+  } else {
+    return 0;
+  }
 }
 
 int

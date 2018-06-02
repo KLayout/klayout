@@ -203,6 +203,10 @@ if [ $update != 0 ]; then
   # classes first
   for d in $qt_mods; do
 
+    echo "--------------------------------------------------------"
+    echo "Production on $d ..."
+    echo ""
+
     cd $d
 
     mkdir -p generated

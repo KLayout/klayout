@@ -1005,6 +1005,27 @@ GSI_QTCORE_PUBLIC gsi::Class<QCoreApplication> &qtdecl_QCoreApplication () { ret
 class QCoreApplication_Adaptor : public QCoreApplication, public qt_gsi::QtObjectBase
 {
 public:
+  static QCoreApplication *ctor_QCoreApplication_Adaptor_args(const std::vector<std::string> &args)
+  {
+    //  QCoreApplication needs static sources, so we give it some.
+    static char **argv = 0;
+    static std::vector<std::string> args_copy;
+    static int argc = 0;
+
+    if (argv != 0) {
+      throw tl::Exception(tl::to_string(QObject::tr("QCoreApplication cannot be instantiated twice")));
+    }
+    argv = new char *[args.size ()];
+    args_copy = args;
+    argc = int (args.size ());
+    for (std::vector<std::string>::const_iterator a = args_copy.begin (); a != args_copy.end (); ++a) {
+      argv[a - args_copy.begin ()] = (char *) a->c_str ();
+    }
+
+    return new QCoreApplication_Adaptor (argc, argv);
+  }
+
+  QCoreApplication_Adaptor (int &argc, char **argv) : QCoreApplication (argc, argv) { }
 
   virtual ~QCoreApplication_Adaptor();
 
@@ -1435,6 +1456,8 @@ static gsi::Methods methods_QCoreApplication_Adaptor () {
 }
 
 gsi::Class<QCoreApplication_Adaptor> decl_QCoreApplication_Adaptor (qtdecl_QCoreApplication (), "QtCore", "QCoreApplication",
+    gsi::constructor("new", &QCoreApplication_Adaptor::ctor_QCoreApplication_Adaptor_args, gsi::arg ("argv"), "@brief Creates a new QCoreApplication object\n\n@param argv The command line arguments to pass to Qt")
++
   methods_QCoreApplication_Adaptor (),
   "@qt\n@brief Binding of QCoreApplication");
 

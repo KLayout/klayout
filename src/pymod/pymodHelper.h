@@ -39,8 +39,7 @@ static PyObject *
 module_init (const char *mod_name, const char *mod_description)
 {
   static pya::PythonModule module;
-  std::string mod_qname (std::string ("klayout.") + mod_name);
-  std::string import_text ("'import " + mod_qname + "'");
+  std::string mod_qname (std::string ("pykl.") + mod_name);
   
   PYA_TRY
   

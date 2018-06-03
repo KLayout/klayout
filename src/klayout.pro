@@ -71,6 +71,7 @@ equals(HAVE_QTBINDINGS, "1") {
   SUBDIRS += gsiqt
   gsiqt.depends += gsi
   laybasic.depends += gsiqt
+  pymod.depends += gsiqt
 }
 
 plugins.depends += lay ext lib

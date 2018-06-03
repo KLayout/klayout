@@ -25,6 +25,7 @@
 #include "laySearchReplacePropertiesWidgets.h"
 #include "laySearchReplaceConfigPage.h"
 #include "layConfigurationDialog.h"
+#include "layQtTools.h"
 
 #include "layMainWindow.h"
 #include "tlExceptions.h"
@@ -728,10 +729,10 @@ SearchReplaceDialog::SearchReplaceDialog (lay::PluginRoot *root, lay::LayoutView
   connect (delete_selected_button, SIGNAL (clicked ()), this, SLOT (execute_selected_button_clicked ()));
   connect (replace_selected_button, SIGNAL (clicked ()), this, SLOT (execute_selected_button_clicked ()));
 
-  connect (hint_label1, SIGNAL (linkActivated (const QString &)), lay::MainWindow::instance (), SLOT (show_help (const QString &)));
-  connect (hint_label2, SIGNAL (linkActivated (const QString &)), lay::MainWindow::instance (), SLOT (show_help (const QString &)));
-  connect (hint_label3, SIGNAL (linkActivated (const QString &)), lay::MainWindow::instance (), SLOT (show_help (const QString &)));
-  connect (hint_label4, SIGNAL (linkActivated (const QString &)), lay::MainWindow::instance (), SLOT (show_help (const QString &)));
+  activate_help_links (hint_label1);
+  activate_help_links (hint_label2);
+  activate_help_links (hint_label3);
+  activate_help_links (hint_label4);
 
   fill_ctx_cbx (find_context);
   fill_ctx_cbx (delete_context);

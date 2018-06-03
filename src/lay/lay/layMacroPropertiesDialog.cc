@@ -23,6 +23,7 @@
 
 #include "layMacroPropertiesDialog.h"
 #include "layMainWindow.h"
+#include "layQtTools.h"
 #include "lymMacroInterpreter.h"
 #include "tlString.h"
 
@@ -37,7 +38,7 @@ MacroPropertiesDialog::MacroPropertiesDialog (QWidget *parent)
   setupUi (this);
 
   connect (shortcut, SIGNAL (editingFinished ()), this, SLOT (shortcut_edited ()));
-  connect (helpLabel, SIGNAL (linkActivated (const QString &)), lay::MainWindow::instance (), SLOT (show_help (const QString &)));
+  activate_help_links (helpLabel);
 }
 
 int 

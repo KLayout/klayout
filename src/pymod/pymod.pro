@@ -31,4 +31,3 @@ equals(HAVE_QT5, "1") {
     QtDesigner
 
 }
-

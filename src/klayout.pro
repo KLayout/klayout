@@ -40,7 +40,7 @@ equals(HAVE_PYTHON, "1") {
   LANG_DEPENDS += pya
   pya.depends += gsi db
   SUBDIRS += pymod
-  pymod.depends += pya
+  pymod.depends += pya lay
 } else {
   SUBDIRS += pyastub
   pyastub.depends += gsi
@@ -69,7 +69,7 @@ buddies.depends += rdb lib $$LANG_DEPENDS
 
 equals(HAVE_QTBINDINGS, "1") {
   SUBDIRS += gsiqt
-  gsiqt.depends += gsi
+  gsiqt.depends += gsi db
   laybasic.depends += gsiqt
   pymod.depends += gsiqt
 }

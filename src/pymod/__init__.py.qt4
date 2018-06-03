@@ -1,0 +1,5 @@
+
+# pykl library definition file
+
+__all__ = [ "tl", "db", "lay", "QtCore", "QtGui", "QtXml", "QtSql", "QtNetwork", "QtDesigner" ]
+

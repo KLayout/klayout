@@ -5,29 +5,31 @@ SUBDIRS = \
   tl \
   lay \
 
-equals(HAVE_QT5, "1") {
+equals(HAVE_QTBINDINGS, "1") {
+  equals(HAVE_QT5, "1") {
 
-  SUBDIRS += \
-    QtCore \
-    QtGui \
-    QtNetwork \
-    QtSql \
-    QtWidgets \
-    QtDesigner \
-    QtMultimedia \
-    QtPrintSupport \
-    QtSvg \
-    QtXmlPatterns \
-    QtXml
+    SUBDIRS += \
+      QtCore \
+      QtGui \
+      QtNetwork \
+      QtSql \
+      QtWidgets \
+      QtDesigner \
+      QtMultimedia \
+      QtPrintSupport \
+      QtSvg \
+      QtXmlPatterns \
+      QtXml
 
-} else {
+  } else {
 
-  SUBDIRS += \
-    QtCore \
-    QtGui \
-    QtXml \
-    QtSql \
-    QtNetwork \
-    QtDesigner
+    SUBDIRS += \
+      QtCore \
+      QtGui \
+      QtXml \
+      QtSql \
+      QtNetwork \
+      QtDesigner
 
+  }
 }

@@ -33,3 +33,7 @@ equals(HAVE_QTBINDINGS, "1") {
 
   }
 }
+
+ALL_DIRS = $$SUBDIRS
+SUBDIRS += unit_tests
+unit_tests.depends += $$ALL_DIRS

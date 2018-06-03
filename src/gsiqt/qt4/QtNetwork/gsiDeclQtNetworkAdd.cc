@@ -20,7 +20,6 @@
 
 */
 
-
 #include "gsiQt.h"
 
 #include <QPair>

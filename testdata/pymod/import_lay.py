@@ -18,7 +18,8 @@
 
 import pykl.QtCore
 import pykl.QtGui
-import pykl.QtWidgets
+if not "QApplication" in pykl.QtGui.__all__:
+  import pykl.QtWidgets  # Qt5
 import pykl.lay as lay
 import unittest
 import sys

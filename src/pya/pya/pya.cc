@@ -2280,13 +2280,13 @@ PythonModule::init (const char *mod_name, const char *description)
   module = Py_InitModule3 (m_mod_name.c_str (), module_methods, m_mod_description.c_str ());
 #else
 
-  static struct PyModuleDef mod_def = {
+  struct PyModuleDef mod_def = {
      PyModuleDef_HEAD_INIT,
      m_mod_name.c_str (),
      NULL,     // module documentation
      -1,       // size of per-interpreter state of the module,
                // if the module keeps state in global variables.
-     module_methods
+     NULL
   };
 
   tl_assert (! mp_mod_def);

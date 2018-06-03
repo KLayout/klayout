@@ -12,6 +12,9 @@ DEPENDPATH += $$TL_INC $$GSI_INC $$QTBASIC_INC
 
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_qtbasic
 
+# because QAsbtractTableModel is used as base class, we need this:
+LIBS += -lklayout_QtCore
+
 SOURCES += \
 
 HEADERS += \

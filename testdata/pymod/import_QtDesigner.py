@@ -29,6 +29,7 @@ class BasicTest(unittest.TestCase):
     self.assertEqual("QFormBuilder" in QtDesigner.__all__, True)
 
   def test_2(self):
+    app = QtCore.QCoreApplication([ "appname" ])
     q = QtDesigner.QFormBuilder()
 
 # run unit tests

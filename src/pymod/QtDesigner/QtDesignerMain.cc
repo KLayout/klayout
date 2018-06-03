@@ -22,4 +22,8 @@
 
 #include "../pymodHelper.h"
 
+//  To force linking of the QtDesigner module
+#include "../../gsiqt/qtbasic/gsiQtDesignerExternals.h"
+FORCE_LINK_GSI_QTDESIGNER
+
 DEFINE_PYMOD(QtDesigner, "QtDesigner", "KLayout/Qt module 'QtDesigner'")

@@ -20,10 +20,21 @@
 
 */
 
-#include "../pymodHelper.h"
 
-//  To force linking of the QtSql module
-#include "../../gsiqt/qtbasic/gsiQtSqlExternals.h"
-FORCE_LINK_GSI_QTSQL
+#ifndef HDR_dbForceLink
+#define HDR_dbForceLink
 
-DEFINE_PYMOD(QtSql, "QtSql", "KLayout/Qt module 'QtSql'")
+#include "dbCommon.h"
+
+/**
+ *  @file Include this function to force linking of the db module
+ */
+
+namespace db
+{
+  DB_PUBLIC int _force_link_f ();
+  static int _force_link_target = _force_link_f ();
+}
+
+#endif
+

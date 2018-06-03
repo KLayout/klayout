@@ -2214,6 +2214,8 @@ std::map<const gsi::MethodBase *, std::string> PythonModule::m_python_doc;
 std::map <PyTypeObject *, const gsi::ClassBase *> PythonModule::m_cls_map;
 std::map <const gsi::ClassBase *, PyTypeObject *> PythonModule::m_rev_cls_map;
 
+const std::string pymod_name ("pykl");
+
 PythonModule::PythonModule ()
   : mp_mod_def (0)
 {
@@ -2228,27 +2230,6 @@ PythonModule::~PythonModule ()
   //  don't try to delete them again.
   mp_module.release ();
   mp_base_class.release ();
-
-  delete_module ();
-}
-
-PyObject *
-PythonModule::module ()
-{
-  return mp_module.get ();
-}
-
-PyObject *
-PythonModule::take_module ()
-{
-  return mp_module.release ();
-}
-
-void
-PythonModule::delete_module ()
-{
-  mp_module = PythonRef ();
-  mp_base_class = PythonRef ();
 
   while (!m_methods_heap.empty ()) {
     delete m_methods_heap.back ();
@@ -2266,10 +2247,27 @@ PythonModule::delete_module ()
   }
 }
 
+PyObject *
+PythonModule::module ()
+{
+  return mp_module.get ();
+}
+
+PyObject *
+PythonModule::take_module ()
+{
+  return mp_module.release ();
+}
+
 void
 PythonModule::init (const char *mod_name, const char *description)
 {
-  m_mod_name = mod_name;
+  //  do some checks before we create the module
+  tl_assert (mod_name != 0);
+  tl_assert (mp_module.get () == 0);
+  check (mod_name);
+
+  m_mod_name = pymod_name + "." + mod_name;
   m_mod_description = description;
 
   static PyMethodDef module_methods[] = {
@@ -2308,6 +2306,10 @@ PythonModule::init (const char *mod_name, const char *description)
 void
 PythonModule::init (const char *mod_name, PyObject *module)
 {
+  //  do some checks before we create the module
+  tl_assert (mp_module.get () == 0);
+  check (mod_name);
+
   m_mod_name = mod_name;
   mp_module = PythonRef (module);
 }
@@ -2357,41 +2359,45 @@ PythonModule::python_doc (const gsi::MethodBase *method)
 }
 
 void
-PythonModule::make_classes (const char *mod_name)
+PythonModule::check (const char *mod_name)
 {
+  if (! mod_name) {
+    return;
+  }
+
   //  Check whether the new classes are self-contained within this module
-  if (mod_name) {
+  for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
 
-    for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
+    if (c->module () != mod_name) {
+      //  don't handle classes outside this module
+      continue;
+    }
 
-      if (c->module () != mod_name) {
-        //  don't handle classes outside this module
-        continue;
+    if (m_rev_cls_map.find (&*c) != m_rev_cls_map.end ()) {
+      //  don't handle classes twice
+      continue;
+    }
+
+    //  All child classes must originate from this module or be known already
+    for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = c->begin_child_classes (); cc != c->end_child_classes (); ++cc) {
+      if (m_rev_cls_map.find (cc->declaration ()) == m_rev_cls_map.end ()
+          && cc->module () != mod_name) {
+        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import %s' before 'import %s')")), c->name (), mod_name, cc->module (), cc->name (), pymod_name + "." + cc->module (), pymod_name + "." + mod_name));
       }
+    }
 
-      if (m_rev_cls_map.find (&*c) != m_rev_cls_map.end ()) {
-        //  don't handle classes twice
-        continue;
-      }
-
-      //  All child classes must originate from this module or be known already
-      for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = c->begin_child_classes (); cc != c->end_child_classes (); ++cc) {
-        if (m_rev_cls_map.find (cc->declaration ()) == m_rev_cls_map.end ()
-            && cc->module () != mod_name) {
-          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import klayout.%s' before 'import klayout.%s')")), c->name (), mod_name, cc->module (), cc->name (), cc->module (), mod_name));
-        }
-      }
-
-      //  Same for base class
-      if (c->base () && m_rev_cls_map.find (c->base ()) == m_rev_cls_map.end ()
-          && c->base ()->module () != mod_name) {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import klayout.%s' before 'import klayout.%s')")), c->name (), mod_name, c->base ()->module (), c->base ()->name (), c->base ()->module (), mod_name));
-      }
-
+    //  Same for base class
+    if (c->base () && m_rev_cls_map.find (c->base ()) == m_rev_cls_map.end ()
+        && c->base ()->module () != mod_name) {
+      throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import %s' before 'import %s')")), c->name (), mod_name, c->base ()->module (), c->base ()->name (), pymod_name + "." + c->base ()->module (), pymod_name + "." + mod_name));
     }
 
   }
+}
 
+void
+PythonModule::make_classes (const char *mod_name)
+{
   PyObject *module = mp_module.get ();
 
   //  Prepare an __all__ index for the module
@@ -2451,6 +2457,9 @@ PythonModule::make_classes (const char *mod_name)
   bool more_classes = true;
   while (more_classes) {
 
+    std::string reason_for_more;
+    bool any = false;
+
     more_classes = false;
     for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
 
@@ -2468,6 +2477,7 @@ PythonModule::make_classes (const char *mod_name)
       for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = c->begin_child_classes (); cc != c->end_child_classes (); ++cc) {
         tl_assert (cc->declaration () != 0);
         if (m_rev_cls_map.find (cc->declaration ()) == m_rev_cls_map.end ()) {
+          reason_for_more = tl::sprintf ("child of class %s.%s not available (%s.%s)", c->module (), c->name (), cc->module (), cc->name ());
           all_children_available = false;
           break;
         }
@@ -2480,6 +2490,7 @@ PythonModule::make_classes (const char *mod_name)
 
       if (c->base () && m_rev_cls_map.find (c->base ()) == m_rev_cls_map.end ()) {
         //  can't produce this class yet. The base class needs to be handled first.
+        reason_for_more = tl::sprintf ("base of class %s.%s not available (%s.%s)", c->module (), c->name (), c->base ()->module (), c->base ()->name ());
         more_classes = true;
         continue;
       }
@@ -2488,6 +2499,8 @@ PythonModule::make_classes (const char *mod_name)
       tl_assert (c->declaration () == &*c);
 
       //  Create the class as a heap object, since that way we can dynamically extend the objects
+
+      any = true;
 
       PythonRef bases (PyTuple_New (1));
       PyObject *base = mp_base_class.get ();
@@ -2947,6 +2960,11 @@ PythonModule::make_classes (const char *mod_name)
 
       mt->finish ();
 
+    }
+
+    if (! any && more_classes) {
+      //  prevent infinite recursion
+      throw tl::Exception ("Internal error: infinite recursion on class building. Reason is: " + reason_for_more);
     }
 
   }

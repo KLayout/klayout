@@ -20,10 +20,13 @@
 
 */
 
-#include "../pymodHelper.h"
+#include "layForceLink.h"
 
-//  To force linking of the QtSql module
-#include "../../gsiqt/qtbasic/gsiQtSqlExternals.h"
-FORCE_LINK_GSI_QTSQL
+namespace lay
+{
+  int _force_link_f ()
+  {
+    return 0;
+  }
+}
 
-DEFINE_PYMOD(QtSql, "QtSql", "KLayout/Qt module 'QtSql'")

@@ -22,4 +22,8 @@
 
 #include "../pymodHelper.h"
 
+//  To force linking of the QtNetwork module
+#include "../../gsiqt/qtbasic/gsiQtNetworkExternals.h"
+FORCE_LINK_GSI_QTNETWORK
+
 DEFINE_PYMOD(QtNetwork, "QtNetwork", "KLayout/Qt module 'QtNetwork'")

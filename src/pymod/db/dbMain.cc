@@ -22,4 +22,7 @@
 
 #include "../pymodHelper.h"
 
+//  to force linking of the db module
+#include "../../db/db/dbForceLink.h"
+
 DEFINE_PYMOD(db, "db", "KLayout core module 'db'")

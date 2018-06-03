@@ -20,8 +20,9 @@
 
 */
 
-
 #include "gsiQt.h"
+//  required to pull in the GSI declarations from db:
+#include "dbForceLink.h"
 
 #include <QPair>
 #include <QAccessibleInterface>

@@ -22,4 +22,8 @@
 
 #include "../pymodHelper.h"
 
+//  To force linking of the QtWidgets module
+#include "../../gsiqt/qtbasic/gsiQtWidgetsExternals.h"
+FORCE_LINK_GSI_QTWIDGETS
+
 DEFINE_PYMOD(QtWidgets, "QtWidgets", "KLayout/Qt module 'QtWidgets'")

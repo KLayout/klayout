@@ -58,7 +58,8 @@ HEADERS = \
     layNativePlugin.h \
     laySystemPaths.h \
     layMacroEditorSetupPage.h \
-    layPasswordDialog.h
+    layPasswordDialog.h \
+    layForceLink.h
 
 FORMS = \
     ClipDialog.ui \
@@ -163,7 +164,8 @@ SOURCES = \
     layNativePlugin.cc \
     laySystemPaths.cc \
     layMacroEditorSetupPage.cc \
-    layPasswordDialog.cc
+    layPasswordDialog.cc \
+    layForceLink.cc
 
 RESOURCES = layBuildInMacros.qrc \
     layHelpResources.qrc \

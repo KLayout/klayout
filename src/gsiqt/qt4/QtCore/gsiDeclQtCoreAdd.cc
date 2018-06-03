@@ -34,11 +34,6 @@
 //  namespace which is in QtCore ... this introduces a dependency of QtCore GSI lib on QtGui.
 #include <QTextDocument>
 
-//  And this is *only* required because of QSignalMapper which takes a QWidget argument from
-//  the QtGui library and we need to supply the GSI binding for this ...
-#include "gsiQtGuiExternals.h"
-FORCE_LINK_GSI_QTGUI
-
 class Qt_Namespace { };
 
 namespace gsi_qt

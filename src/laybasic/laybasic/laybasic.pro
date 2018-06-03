@@ -282,5 +282,8 @@ DEPENDPATH += $$QTBASIC_INC
 
 equals(HAVE_QTBINDINGS, "1") {
   LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtCore
+  equals(HAVE_QT5, "1") {
+    LIBS += -lklayout_QtWidgets
+  }
 }
 

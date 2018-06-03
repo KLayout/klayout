@@ -131,7 +131,8 @@ SOURCES = \
   gsiDeclDbGlyphs.cc \
     dbVariableWidthPath.cc \
     dbNamedLayerReader.cc \
-    dbEdgesToContours.cc
+    dbEdgesToContours.cc \
+    dbForceLink.cc
 
 HEADERS = \
   dbArray.h \
@@ -233,7 +234,8 @@ HEADERS = \
     dbGlyphs.h \
     dbCommon.h \
     dbVariableWidthPath.h \
-    dbNamedLayerReader.h
+    dbNamedLayerReader.h \
+    dbForceLink.h
 
 RESOURCES = \
   dbResources.qrc

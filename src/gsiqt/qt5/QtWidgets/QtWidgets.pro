@@ -12,6 +12,12 @@ DEPENDPATH += $$TL_INC $$GSI_INC $$QTBASIC_INC
 
 LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_qtbasic
 
+# because QPainter is used as base class for QStylePainter, we need this:
+LIBS += -lklayout_QtGui
+
+SOURCES += \
+  gsiDeclQtWidgetsAdd.cc
+
 HEADERS += \
 
 include(QtWidgets.pri)

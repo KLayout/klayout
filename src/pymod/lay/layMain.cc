@@ -22,4 +22,7 @@
 
 #include "../pymodHelper.h"
 
+//  to force linking of the lay module
+#include "../../lay/lay/layForceLink.h"
+
 DEFINE_PYMOD(lay, "lay", "KLayout core module 'lay'")

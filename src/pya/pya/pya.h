@@ -189,16 +189,12 @@ public:
    */
   PyObject *take_module ();
 
-  /**
-   *  @brief Deletes the PyModule object
-   */
-  void delete_module ();
-
 private:
   void add_python_doc (const gsi::ClassBase &cls, const MethodTable *mt, int mid, const std::string &doc);
   PyMethodDef *make_method_def ();
   PyGetSetDef *make_getset_def ();
   char *make_string (const std::string &s);
+  static void check (const char *mod_name);
 
   std::list<std::string> m_string_heap;
   std::vector<PyMethodDef *> m_methods_heap;

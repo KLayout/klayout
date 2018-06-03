@@ -17,6 +17,9 @@ INCLUDEPATH += $$DB_INC
 DEPENDPATH += $$DB_INC
 LIBS += -lklayout_db
 
+# because QQbject is used as base class for many classes, we need this:
+LIBS += -lklayout_QtCore
+
 SOURCES += \
   gsiDeclQtGuiAdd.cc
 

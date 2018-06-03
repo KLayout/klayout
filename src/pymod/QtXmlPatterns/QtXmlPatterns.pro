@@ -8,4 +8,4 @@ SOURCES = \
 
 HEADERS += \
 
-LIBS += -lklayout_QtXmlPatterns
+LIBS += -lklayout_QtXmlPatterns -lklayout_QtNetwork

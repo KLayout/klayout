@@ -8,4 +8,9 @@ SOURCES = \
 
 HEADERS += \
 
-LIBS += -lklayout_QtGui
+LIBS += -lklayout_QtGui -lklayout_QtCore
+
+equals(HAVE_QT5, "1") {
+  LIBS += -lklayout_QtWidgets
+}
+

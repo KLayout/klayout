@@ -22,4 +22,8 @@
 
 #include "../pymodHelper.h"
 
+//  To force linking of the QtMultimedia module
+#include "../../gsiqt/qtbasic/gsiQtMultimediaExternals.h"
+FORCE_LINK_GSI_QTMULTIMEDIA
+
 DEFINE_PYMOD(QtMultimedia, "QtMultimedia", "KLayout/Qt module 'QtMultimedia'")

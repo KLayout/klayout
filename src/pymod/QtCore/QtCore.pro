@@ -8,4 +8,4 @@ SOURCES = \
 
 HEADERS += \
 
-LIBS += -lklayout_QtCore
+LIBS += -lklayout_QtCore -lklayout_QtGui -lklayout_QtWidgets

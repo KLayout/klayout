@@ -39,8 +39,7 @@ static PyObject *
 module_init (const char *mod_name, const char *mod_description)
 {
   static pya::PythonModule module;
-  std::string mod_qname (std::string ("pykl.") + mod_name);
-  
+
   PYA_TRY
   
     gsi::initialize ();
@@ -48,14 +47,13 @@ module_init (const char *mod_name, const char *mod_description)
     //  required for the tiling processor for example
     gsi::initialize_expressions ();
 
-    module.init (mod_qname.c_str (), mod_description);
+    module.init (mod_name, mod_description);
     module.make_classes (mod_name);
 
     return module.take_module ();
 
   PYA_CATCH_ANYWHERE
   
-  module.delete_module ();
   return 0;
 }
 

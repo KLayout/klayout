@@ -20,10 +20,6 @@
 
 */
 
-#include "../pymodHelper.h"
+#include "gsiQt.h"
 
-//  To force linking of the QtSql module
-#include "../../gsiqt/qtbasic/gsiQtSqlExternals.h"
-FORCE_LINK_GSI_QTSQL
-
-DEFINE_PYMOD(QtSql, "QtSql", "KLayout/Qt module 'QtSql'")
+//  .. nothing yet ..

@@ -85,12 +85,19 @@ Class<db::TextGenerator> decl_TextGenerator ("db", "TextGenerator",
   method ("text", &db::TextGenerator::text_as_region,
     arg ("text"),
     arg ("target_dbu"),
-    arg ("mag", 1.0, "The magnification (1.0 for original size)"),
-    arg ("inv", false, "inverted rendering: if true, the glyphs are rendered inverse with the background box as the outer bounding box"),
-    arg ("bias", 0.0, "An additional bias to be applied (happens before inversion, can be negative)"),
-    arg ("char_spacing", 0.0, "Additional space between characters (in micron units)"),
-    arg ("line_spacing", 0.0, "Additional space between lines (in micron units)"),
+    arg ("mag", 1.0),
+    arg ("inv", false),
+    arg ("bias", 0.0),
+    arg ("char_spacing", 0.0),
+    arg ("line_spacing", 0.0),
     "@brief Gets the rendered text as a region\n"
+    "@param text The text string\n"
+    "@param target_dbu The database unit for which to produce the text\n"
+    "@param mag The magnification (1.0 for original size)\n"
+    "@param inv inverted rendering: if true, the glyphs are rendered inverse with the background box as the outer bounding box\n"
+    "@param bias An additional bias to be applied (happens before inversion, can be negative)\n"
+    "@param char_spacing Additional space between characters (in micron units)\n"
+    "@param line_spacing Additional space between lines (in micron units)\n"
     "Various options can be specified to control the appearance of the text. See the description of the parameters. "
     "It's important to specify the target database unit in \\target_dbu to indicate what database unit shall be used to create the "
     "output for."
@@ -175,10 +182,10 @@ Class<db::TextGenerator> decl_TextGenerator ("db", "TextGenerator",
   "\n"
   "To create a generator from a font file proceed this way:\n"
   "@code\n"
-  "gen = RBA::Generator::new\n"
+  "gen = RBA::TextGenerator::new\n"
   "gen.load_from_file(\"myfont.gds\")\n"
   "region = gen.text(\"A TEXT\", 0.001)\n"
-  "@endcode\n"
+  "@/code\n"
   "\n"
   "This code produces a RBA::Region with a database unit of 0.001 micron. This region can be fed "
   "into a \\Shapes container to place it into a cell for example.\n"

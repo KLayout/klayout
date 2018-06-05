@@ -164,7 +164,7 @@ if [ $update != 0 ]; then
   for d in Qt*; do
     cd $d
     cp $inst_dir/{mkqtdecl.conf,mkqtdecl.properties,mkqtdecl.events} .
-    cp $inst_dir_common/{cpp_parser_classes.rb,cpp_classes.rb,c++.treetop,parse.rb,reader_ext.rb,produce.rb} .
+    cp $inst_dir_common/{cpp_parser_classes.rb,cpp_classes.rb,c++.treetop,parse.rb,reader_ext.rb,produce.rb,common.conf} .
     cd ..
   done
 

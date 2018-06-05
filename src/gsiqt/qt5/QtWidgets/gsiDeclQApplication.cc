@@ -1991,7 +1991,7 @@ static gsi::Methods methods_QApplication_Adaptor () {
 }
 
 gsi::Class<QApplication_Adaptor> decl_QApplication_Adaptor (qtdecl_QApplication (), "QtWidgets", "QApplication",
-    gsi::constructor("new", &QApplication_Adaptor::ctor_QApplication_Adaptor_args, gsi::arg ("argv"), gsi::arg ("gui", false), "@brief Creates a new QApplication object\n\n@param argv The command line arguments to pass to Qt\n@param gui If true, a GUI-enabled application is constructed")
+    gsi::constructor("new", &QApplication_Adaptor::ctor_QApplication_Adaptor_args, gsi::arg ("argv"), gsi::arg ("gui", true), "@brief Creates a new QApplication object\n\n@param argv The command line arguments to pass to Qt\n@param gui If true, a GUI-enabled application is constructed")
 +
   methods_QApplication_Adaptor (),
   "@qt\n@brief Binding of QApplication");

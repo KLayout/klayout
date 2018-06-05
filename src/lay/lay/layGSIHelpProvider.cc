@@ -44,22 +44,32 @@ namespace lay
 // --------------------------------------------------------------------------------------
 //  Some utilities
 
-static std::string module_doc_path (const std::string &m)
+static std::string to_encoded_class_name (const std::string &s)
 {
-  return "/code/module_" + m + ".xml";
+  return tl::replaced (s, ":", "+");
 }
 
-static std::string class_doc_path (const std::string &c)
+static std::string from_encoded_class_name (const std::string &s)
 {
-  return "/code/class_" + c + ".xml";
+  return tl::replaced (s, "+", ":");
 }
 
-static std::string class_doc_path (const std::string &c, const std::string &m)
+static std::string module_doc_url (const std::string &m)
+{
+  return "/code/module_" + to_encoded_class_name (m) + ".xml";
+}
+
+static std::string class_doc_url (const std::string &c)
+{
+  return "/code/class_" + to_encoded_class_name (c) + ".xml";
+}
+
+static std::string class_doc_url (const std::string &c, const std::string &m)
 {
   if (c.empty ()) {
     return "#m_" + m;
   } else {
-    return "/code/class_" + c + ".xml#m_" + m;
+    return "/code/class_" + to_encoded_class_name (c) + ".xml#m_" + m;
   }
 }
 
@@ -365,7 +375,7 @@ replace_references (const std::string &t, const gsi::ClassBase *cls_base)
 
     bool found = false;
     if (name_map.find (id) != name_map.end ()) {
-      r += "<a href=\"" + escape_xml (class_doc_path (std::string (), id)) + "\">" + escape_xml (id) + "</a>";
+      r += "<a href=\"" + escape_xml (class_doc_url (std::string (), id)) + "\">" + escape_xml (id) + "</a>";
       found = true;
     }
 
@@ -373,9 +383,9 @@ replace_references (const std::string &t, const gsi::ClassBase *cls_base)
       if (c->name () == id) {
         r += "<a href=\"";
         if (mid.empty ()) {
-          r += escape_xml (class_doc_path (id));
+          r += escape_xml (class_doc_url (id));
         } else {
-          r += escape_xml (class_doc_path (id, mid));
+          r += escape_xml (class_doc_url (id, mid));
         }
         r += "\">";
         if (mid.empty ()) {
@@ -427,7 +437,7 @@ void produce_toc (const gsi::ClassBase *cls, std::vector <std::string> &toc)
 {
   DocumentationParser &doc = cls_documentation (cls);
   if (! doc.hidden) {
-    toc.push_back (class_doc_path (make_qualified_name (cls)));
+    toc.push_back (class_doc_url (make_qualified_name (cls)));
   }
   for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
     produce_toc (cc.operator-> (), toc);
@@ -444,7 +454,7 @@ GSIHelpProvider::toc (std::vector<std::string> &t)
   }
 
   for (std::set<std::string>::const_iterator m = mod_names.begin (); m != mod_names.end (); ++m) {
-    t.push_back (module_doc_path (*m));
+    t.push_back (module_doc_url (*m));
   }
 }
 
@@ -460,9 +470,9 @@ GSIHelpProvider::get (const std::string &path) const
   if (url_path == QString::fromUtf8 ("/code/index.xml")) {
     text = produce_class_index (0);
   } else if (module_index_url.indexIn (url_path) == 0) {
-    text = produce_class_index (tl::to_string (module_index_url.cap (1)).c_str ());
+    text = produce_class_index (from_encoded_class_name (tl::to_string (module_index_url.cap (1))).c_str ());
   } else if (class_doc_url.indexIn (url_path) == 0) {
-    text = produce_class_doc (tl::to_string (class_doc_url.cap (1)));
+    text = produce_class_doc (from_encoded_class_name (tl::to_string (class_doc_url.cap (1))));
   } else {
     throw tl::Exception (tl::to_string (QObject::tr ("Page not found: ")) + path);
   }
@@ -498,7 +508,7 @@ void produce_doc_index (const gsi::ClassBase *cls, std::ostringstream &os)
   //  Only list the name if the class is not hidden, it's a top-level class or the path is an expanded one
   //  (the last criterion avoids generating classes such as A::B_C)
   if (! doc.hidden) {
-    os << "<topic-ref href=\"" << escape_xml (class_doc_path (qname)) << "\"/>" << std::endl;
+    os << "<topic-ref href=\"" << escape_xml (class_doc_url (qname)) << "\"/>" << std::endl;
   }
 
   for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
@@ -573,20 +583,20 @@ GSIHelpProvider::produce_class_index (const char *module_name) const
     }
 
     for (std::set<std::string>::const_iterator m = mod_names.begin (); m != mod_names.end (); ++m) {
-      os << "<topic-ref href=\"" << escape_xml (module_doc_path (*m)) << "\"/>" << std::endl;
+      os << "<topic-ref href=\"" << escape_xml (module_doc_url (*m)) << "\"/>" << std::endl;
     }
     for (std::set<std::string>::const_iterator m = qt_mod_names.begin (); m != qt_mod_names.end (); ++m) {
-      os << "<topic-ref href=\"" << escape_xml (module_doc_path (*m)) << "\"/>" << std::endl;
+      os << "<topic-ref href=\"" << escape_xml (module_doc_url (*m)) << "\"/>" << std::endl;
     }
 
     os << "<p>" << tl::to_string (QObject::tr ("Per-Module documentation:")) << "</p>";
 
     os << "<ul>";
     for (std::set<std::string>::const_iterator m = mod_names.begin (); m != mod_names.end (); ++m) {
-      os << "<li><a href=\"" << escape_xml (module_doc_path (*m)) << "\">" << tl::to_string (QObject::tr ("Core Module")) << " " << escape_xml (*m) << "</a></li>";
+      os << "<li><a href=\"" << escape_xml (module_doc_url (*m)) << "\">" << tl::to_string (QObject::tr ("Core Module")) << " " << escape_xml (*m) << "</a></li>";
     }
     for (std::set<std::string>::const_iterator m = qt_mod_names.begin (); m != qt_mod_names.end (); ++m) {
-      os << "<li><a href=\"" << escape_xml (module_doc_path (*m)) << "\">" << tl::to_string (QObject::tr ("Qt Module")) << " " << escape_xml (*m) << "</a></li>";
+      os << "<li><a href=\"" << escape_xml (module_doc_url (*m)) << "\">" << tl::to_string (QObject::tr ("Qt Module")) << " " << escape_xml (*m) << "</a></li>";
     }
     os << "</ul>";
 
@@ -605,9 +615,9 @@ GSIHelpProvider::produce_class_index (const char *module_name) const
     int n = 0;
     for (class_index_t::const_iterator cc = class_names.begin (); cc != class_names.end (); ++cc, ++n) {
       os << "<tr class=\"row" << (n % 2)  << "\">" << std::endl;
-      os << "<td><a href=\"" << escape_xml (class_doc_path (cc->first)) << "\">" << escape_xml (cc->first) << "</a></td>";
+      os << "<td><a href=\"" << escape_xml (class_doc_url (cc->first)) << "\">" << escape_xml (cc->first) << "</a></td>";
       if (! module_name) {
-        os << "<td>&nbsp;&nbsp;&nbsp;<nobr><a href=\"" << module_doc_path (cc->second.first) << "\">" << escape_xml (cc->second.first) << "</a></nobr></td>";
+        os << "<td>&nbsp;&nbsp;&nbsp;<nobr><a href=\"" << module_doc_url (cc->second.first) << "\">" << escape_xml (cc->second.first) << "</a></nobr></td>";
       }
       os << "<td>&nbsp;&nbsp;&nbsp;<nobr>" << escape_xml (cc->second.second) << "</nobr></td></tr>" << std::endl;
     }
@@ -624,9 +634,9 @@ GSIHelpProvider::produce_class_index (const char *module_name) const
     int n = 0;
     for (class_index_t::const_iterator cc = qt_class_names.begin (); cc != qt_class_names.end (); ++cc, ++n) {
       os << "<tr class=\"row" << (n % 2)  << "\">" << std::endl;
-      os << "<td><a href=\"" << escape_xml (class_doc_path (cc->first)) << "\">" << escape_xml (cc->first) << "</a></td>";
+      os << "<td><a href=\"" << escape_xml (class_doc_url (cc->first)) << "\">" << escape_xml (cc->first) << "</a></td>";
       if (! module_name) {
-        os << "<td>&nbsp;&nbsp;&nbsp;<nobr><a href=\"" << module_doc_path (cc->second.first) << "\">" << escape_xml (cc->second.first) << "</a></nobr></td>";
+        os << "<td>&nbsp;&nbsp;&nbsp;<nobr><a href=\"" << module_doc_url (cc->second.first) << "\">" << escape_xml (cc->second.first) << "</a></nobr></td>";
       }
       os << "<td>&nbsp;&nbsp;&nbsp;<nobr>" << escape_xml (cc->second.second) << "</nobr></td></tr>" << std::endl;
     }
@@ -693,7 +703,7 @@ type_to_s (const gsi::ArgType &a, bool linked, bool for_return)
       s += "new ";
     }
     if (linked) {
-      s += "<a href=\"" + escape_xml (class_doc_path (aliased_name (a.cls ()))) + "\">" + escape_xml (aliased_name (a.cls ())) + "</a>";
+      s += "<a href=\"" + escape_xml (class_doc_url (aliased_name (a.cls ()))) + "\">" + escape_xml (aliased_name (a.cls ())) + "</a>";
     } else {
       s += aliased_name (a.cls ());
     }
@@ -962,13 +972,13 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
       if (! bdoc.alias.empty ()) {
         //  suppress direct base class alias to our class (x_Native for x)
         if (bdoc.alias != last_cls->name ()) {
-          os << " &#187; <a href=\"" << escape_xml (class_doc_path (bdoc.alias)) << "\">" << escape_xml (bdoc.alias) << "</a>";
+          os << " &#187; <a href=\"" << escape_xml (class_doc_url (bdoc.alias)) << "\">" << escape_xml (bdoc.alias) << "</a>";
           all_collected = true;
         } else if (! all_collected) {
           classes.push_back (base);
         }
       } else if (! bdoc.hidden) {
-        os << " &#187; <a href=\"" << escape_xml (class_doc_path (base->name ())) << "\">" << escape_xml (base->name ()) << "</a>";
+        os << " &#187; <a href=\"" << escape_xml (class_doc_url (base->name ())) << "\">" << escape_xml (base->name ()) << "</a>";
         all_collected = true;
       } else if (! all_collected) {
         //  class needs to be mixed into the parent
@@ -987,7 +997,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
   if (tl_alias) {
     os << "<p>" << tl::to_string (QObject::tr ("This class is equivalent to the class "));
     std::string n = make_qualified_name (tl_alias);
-    os << "<a href=\"" << escape_xml (class_doc_path (n)) << "\">" << escape_xml (n) << "</a>";
+    os << "<a href=\"" << escape_xml (class_doc_url (n)) << "\">" << escape_xml (n) << "</a>";
     os << "</p>" << std::endl;
   }
 
@@ -1006,7 +1016,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
           any = true;
         }
 
-        os << "<a href=\"" << escape_xml (class_doc_path (make_qualified_name (cc.operator-> ()))) << "\">" << escape_xml (cc->name ()) << "</a>";
+        os << "<a href=\"" << escape_xml (class_doc_url (make_qualified_name (cc.operator-> ()))) << "\">" << escape_xml (cc->name ()) << "</a>";
 
       }
 

@@ -35,6 +35,7 @@
 #include <QTextDocument>
 
 class Qt_Namespace { };
+class QVariant_Namespace { };
 
 namespace gsi_qt
 {
@@ -42,8 +43,6 @@ namespace gsi_qt
 // ---------------------------------------------------------------------------
 //  QVariant::Type implementation
 //  (this type is not created automatically since QVariant is implemented implicitly)
-
-class QVariant_Namespace { };
 
 //  A dummy namespace "QVariant"
 gsi::Class<QVariant_Namespace> decl_QVariant_Namespace ("QtCore", "QVariant",
@@ -189,5 +188,16 @@ static gsi::QFlagsClass<Qt::HitTestAccuracy > decl_Qt_HitTestAccuracy_Enums ("Qt
 static gsi::ClassExt<Qt_Namespace> inject_Qt_HitTestAccuracy_Enum_in_parent (decl_Qt_HitTestAccuracy_Enum.defs ());
 static gsi::ClassExt<Qt_Namespace> decl_Qt_HitTestAccuracy_Enum_as_child (decl_Qt_HitTestAccuracy_Enum, "HitTestAccuracy");
 static gsi::ClassExt<Qt_Namespace> decl_Qt_HitTestAccuracy_Enums_as_child (decl_Qt_HitTestAccuracy_Enums, "QFlags_HitTestAccuracy");
+
+// ---------------------------------------------------------------------------
+//  Add declarations for Qt constants and propagate into QtCore space
+
+static int _qt_version () { return QT_VERSION; }
+static std::string _qt_version_str () { return QT_VERSION_STR; }
+
+static gsi::ClassExt<Qt_Namespace> decl_QtCore_constants (
+  gsi::constant ("QT_VERSION", _qt_version, "@brief QT_VERSION constant") +
+  gsi::constant ("QT_VERSION_STR", _qt_version_str, "@brief QT_VERSION_STR constant")
+);
 
 }

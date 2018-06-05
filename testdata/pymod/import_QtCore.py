@@ -29,6 +29,8 @@ class BasicTest(unittest.TestCase):
 
   def test_2(self):
     # Some smoke test
+    v = QtCore.Qt.QT_VERSION
+    self.assertEqual(v > 1, True)
     b = QtCore.QBuffer()
     b.setData("all you can eat")
     b.open(QtCore.QIODevice.ReadOnly)

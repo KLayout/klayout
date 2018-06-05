@@ -35,6 +35,7 @@
 #include <QTextDocument>
 
 class Qt_Namespace { };
+class QVariant_Namespace { };
 
 namespace gsi_qt
 {
@@ -42,8 +43,6 @@ namespace gsi_qt
 // ---------------------------------------------------------------------------
 //  QVariant::Type implementation
 //  (this type is not created automatically since QVariant is implemented implicitly)
-
-class QVariant_Namespace { };
 
 //  A dummy namespace "QVariant"
 gsi::Class<QVariant_Namespace> decl_QVariant_Namespace ("QtCore", "QVariant",
@@ -184,7 +183,8 @@ static gsi::Enum<QtMsgType> decl_QtMsgType ("QtCore", "QtMsgType",
   gsi::enum_const ("QtCriticalMsg", QtCriticalMsg, "@brief Enum constant QtCriticalMsg of QtMsgType") +
   gsi::enum_const ("QtFatalMsg", QtFatalMsg, "@brief Enum constant QtFatalMsg of QtMsgType") +
   gsi::enum_const ("QtInfoMsg", QtInfoMsg, "@brief Enum constant QtInfoMsg of QtMsgType") +
-  gsi::enum_const ("QtSystemMsg", QtSystemMsg, "@brief Enum constant QtSystemMsg of QtMsgType")
+  gsi::enum_const ("QtSystemMsg", QtSystemMsg, "@brief Enum constant QtSystemMsg of QtMsgType"),
+  "@qt\n@brief Binding of QtMsgType"
 );
 
 // ---------------------------------------------------------------------------
@@ -455,9 +455,28 @@ public:
   }
 };
 
-static QUrlTwoFlagsClass<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> decl_QUrlTwoFlags ("QtCore", "QUrl_FormattingOptions", "@brief Binding of QUrl::FormattingOptions");
+static QUrlTwoFlagsClass<QUrl::UrlFormattingOption, QUrl::ComponentFormattingOption> decl_QUrlTwoFlags ("QtCore", "QUrl_FormattingOptions", "@qt\n@brief Binding of QUrl::FormattingOptions");
 
 //  inject as QUrl::FormattingOptions
-static gsi::ClassExt<QUrl> decl_QUrlTwoFlags_as_child (decl_QUrlTwoFlags, "FormattingOptions", "@brief Binding of QUrl::FormattingOptions");
+static gsi::ClassExt<QUrl> decl_QUrlTwoFlags_as_child (decl_QUrlTwoFlags, "FormattingOptions", "@qt\n@brief Binding of QUrl::FormattingOptions");
+
+// ---------------------------------------------------------------------------
+//  Add declarations for Qt constants and propagate into QtCore space
+
+static int _qt_version () { return QT_VERSION; }
+static std::string _qt_version_str () { return QT_VERSION_STR; }
+
+static gsi::ClassExt<Qt_Namespace> decl_QtCore_constants (
+  gsi::constant ("QT_VERSION", _qt_version,
+    "@brief QT_VERSION constant\n"
+    "This is the Qt version used at build time. "
+    "Note that the script binding may be derived from an older version so effectively the API may be older."
+  ) +
+  gsi::constant ("QT_VERSION_STR", _qt_version_str,
+    "@brief QT_VERSION_STR constant\n"
+    "This is the Qt version used at build time. "
+    "Note that the script binding may be derived from an older version so effectively the API may be older."
+  )
+);
 
 }

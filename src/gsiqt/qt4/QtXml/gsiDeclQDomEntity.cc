@@ -86,7 +86,7 @@ static void _call_ctor_QDomEntity_2319 (const qt_gsi::GenericStaticMethod * /*de
 }
 
 
-// () const
+// QDomNode::NodeType QDomEntity::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -116,7 +116,7 @@ static void _call_f_notationName_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QDomEntity &)
+// QDomEntity &QDomEntity::operator=(const QDomEntity &)
 
 
 static void _init_f_operator_eq__2319 (qt_gsi::GenericMethod *decl)
@@ -173,9 +173,9 @@ static gsi::Methods methods_QDomEntity () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomEntity::QDomEntity()\nThis method creates an object of class QDomEntity.", &_init_ctor_QDomEntity_0, &_call_ctor_QDomEntity_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomEntity::QDomEntity(const QDomEntity &x)\nThis method creates an object of class QDomEntity.", &_init_ctor_QDomEntity_2319, &_call_ctor_QDomEntity_2319);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomEntity::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
   methods += new qt_gsi::GenericMethod ("notationName", "@brief Method QString QDomEntity::notationName()\n", true, &_init_f_notationName_c0, &_call_f_notationName_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomEntity &)\n", false, &_init_f_operator_eq__2319, &_call_f_operator_eq__2319);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomEntity &QDomEntity::operator=(const QDomEntity &)\n", false, &_init_f_operator_eq__2319, &_call_f_operator_eq__2319);
   methods += new qt_gsi::GenericMethod ("publicId", "@brief Method QString QDomEntity::publicId()\n", true, &_init_f_publicId_c0, &_call_f_publicId_c0);
   methods += new qt_gsi::GenericMethod ("systemId", "@brief Method QString QDomEntity::systemId()\n", true, &_init_f_systemId_c0, &_call_f_systemId_c0);
   return methods;

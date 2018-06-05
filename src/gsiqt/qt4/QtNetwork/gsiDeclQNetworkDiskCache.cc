@@ -72,7 +72,7 @@ static void _call_f_cacheDirectory_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// qint64 QNetworkDiskCache::cacheSize()
 
 
 static void _init_f_cacheSize_c0 (qt_gsi::GenericMethod *decl)
@@ -87,7 +87,7 @@ static void _call_f_cacheSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// ()
+// void QNetworkDiskCache::clear()
 
 
 static void _init_f_clear_0 (qt_gsi::GenericMethod *decl)
@@ -103,7 +103,7 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (const QUrl &)
+// QIODevice *QNetworkDiskCache::data(const QUrl &url)
 
 
 static void _init_f_data_1701 (qt_gsi::GenericMethod *decl)
@@ -141,7 +141,7 @@ static void _call_f_fileMetaData_c2025 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (QIODevice *)
+// void QNetworkDiskCache::insert(QIODevice *device)
 
 
 static void _init_f_insert_1447 (qt_gsi::GenericMethod *decl)
@@ -176,7 +176,7 @@ static void _call_f_maximumCacheSize_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (const QUrl &)
+// QNetworkCacheMetaData QNetworkDiskCache::metaData(const QUrl &url)
 
 
 static void _init_f_metaData_1701 (qt_gsi::GenericMethod *decl)
@@ -195,7 +195,7 @@ static void _call_f_metaData_1701 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QNetworkCacheMetaData &)
+// QIODevice *QNetworkDiskCache::prepare(const QNetworkCacheMetaData &metaData)
 
 
 static void _init_f_prepare_3377 (qt_gsi::GenericMethod *decl)
@@ -214,7 +214,7 @@ static void _call_f_prepare_3377 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (const QUrl &)
+// bool QNetworkDiskCache::remove(const QUrl &url)
 
 
 static void _init_f_remove_1701 (qt_gsi::GenericMethod *decl)
@@ -273,7 +273,7 @@ static void _call_f_setMaximumCacheSize_986 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (const QNetworkCacheMetaData &)
+// void QNetworkDiskCache::updateMetaData(const QNetworkCacheMetaData &metaData)
 
 
 static void _init_f_updateMetaData_3377 (qt_gsi::GenericMethod *decl)
@@ -394,18 +394,18 @@ static gsi::Methods methods_QNetworkDiskCache () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":cacheDirectory", "@brief Method QString QNetworkDiskCache::cacheDirectory()\n", true, &_init_f_cacheDirectory_c0, &_call_f_cacheDirectory_c0);
-  methods += new qt_gsi::GenericMethod ("cacheSize", "@brief Method () const\nThis is a reimplementation of QAbstractNetworkCache::cacheSize", true, &_init_f_cacheSize_c0, &_call_f_cacheSize_c0);
-  methods += new qt_gsi::GenericMethod ("clear", "@brief Method ()\nThis is a reimplementation of QAbstractNetworkCache::clear", false, &_init_f_clear_0, &_call_f_clear_0);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Method (const QUrl &)\nThis is a reimplementation of QAbstractNetworkCache::data", false, &_init_f_data_1701, &_call_f_data_1701);
+  methods += new qt_gsi::GenericMethod ("cacheSize", "@brief Method qint64 QNetworkDiskCache::cacheSize()\nThis is a reimplementation of QAbstractNetworkCache::cacheSize", true, &_init_f_cacheSize_c0, &_call_f_cacheSize_c0);
+  methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QNetworkDiskCache::clear()\nThis is a reimplementation of QAbstractNetworkCache::clear", false, &_init_f_clear_0, &_call_f_clear_0);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Method QIODevice *QNetworkDiskCache::data(const QUrl &url)\nThis is a reimplementation of QAbstractNetworkCache::data", false, &_init_f_data_1701, &_call_f_data_1701);
   methods += new qt_gsi::GenericMethod ("fileMetaData", "@brief Method QNetworkCacheMetaData QNetworkDiskCache::fileMetaData(const QString &fileName)\n", true, &_init_f_fileMetaData_c2025, &_call_f_fileMetaData_c2025);
-  methods += new qt_gsi::GenericMethod ("insert", "@brief Method (QIODevice *)\nThis is a reimplementation of QAbstractNetworkCache::insert", false, &_init_f_insert_1447, &_call_f_insert_1447);
+  methods += new qt_gsi::GenericMethod ("insert", "@brief Method void QNetworkDiskCache::insert(QIODevice *device)\nThis is a reimplementation of QAbstractNetworkCache::insert", false, &_init_f_insert_1447, &_call_f_insert_1447);
   methods += new qt_gsi::GenericMethod (":maximumCacheSize", "@brief Method qint64 QNetworkDiskCache::maximumCacheSize()\n", true, &_init_f_maximumCacheSize_c0, &_call_f_maximumCacheSize_c0);
-  methods += new qt_gsi::GenericMethod ("metaData", "@brief Method (const QUrl &)\nThis is a reimplementation of QAbstractNetworkCache::metaData", false, &_init_f_metaData_1701, &_call_f_metaData_1701);
-  methods += new qt_gsi::GenericMethod ("prepare", "@brief Method (const QNetworkCacheMetaData &)\nThis is a reimplementation of QAbstractNetworkCache::prepare", false, &_init_f_prepare_3377, &_call_f_prepare_3377);
-  methods += new qt_gsi::GenericMethod ("remove", "@brief Method (const QUrl &)\nThis is a reimplementation of QAbstractNetworkCache::remove", false, &_init_f_remove_1701, &_call_f_remove_1701);
+  methods += new qt_gsi::GenericMethod ("metaData", "@brief Method QNetworkCacheMetaData QNetworkDiskCache::metaData(const QUrl &url)\nThis is a reimplementation of QAbstractNetworkCache::metaData", false, &_init_f_metaData_1701, &_call_f_metaData_1701);
+  methods += new qt_gsi::GenericMethod ("prepare", "@brief Method QIODevice *QNetworkDiskCache::prepare(const QNetworkCacheMetaData &metaData)\nThis is a reimplementation of QAbstractNetworkCache::prepare", false, &_init_f_prepare_3377, &_call_f_prepare_3377);
+  methods += new qt_gsi::GenericMethod ("remove", "@brief Method bool QNetworkDiskCache::remove(const QUrl &url)\nThis is a reimplementation of QAbstractNetworkCache::remove", false, &_init_f_remove_1701, &_call_f_remove_1701);
   methods += new qt_gsi::GenericMethod ("setCacheDirectory|cacheDirectory=", "@brief Method void QNetworkDiskCache::setCacheDirectory(const QString &cacheDir)\n", false, &_init_f_setCacheDirectory_2025, &_call_f_setCacheDirectory_2025);
   methods += new qt_gsi::GenericMethod ("setMaximumCacheSize|maximumCacheSize=", "@brief Method void QNetworkDiskCache::setMaximumCacheSize(qint64 size)\n", false, &_init_f_setMaximumCacheSize_986, &_call_f_setMaximumCacheSize_986);
-  methods += new qt_gsi::GenericMethod ("updateMetaData", "@brief Method (const QNetworkCacheMetaData &)\nThis is a reimplementation of QAbstractNetworkCache::updateMetaData", false, &_init_f_updateMetaData_3377, &_call_f_updateMetaData_3377);
+  methods += new qt_gsi::GenericMethod ("updateMetaData", "@brief Method void QNetworkDiskCache::updateMetaData(const QNetworkCacheMetaData &metaData)\nThis is a reimplementation of QAbstractNetworkCache::updateMetaData", false, &_init_f_updateMetaData_3377, &_call_f_updateMetaData_3377);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QNetworkDiskCache::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QNetworkDiskCache::tr(const char *s, const char *c)\nThis method is static and can be called without an instance.", &_init_f_tr_3354, &_call_f_tr_3354);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QNetworkDiskCache::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);

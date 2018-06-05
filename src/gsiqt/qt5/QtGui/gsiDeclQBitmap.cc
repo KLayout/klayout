@@ -67,7 +67,7 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (const QPixmap &)
+// QBitmap &QBitmap::operator=(const QPixmap &)
 
 
 static void _init_f_operator_eq__2017 (qt_gsi::GenericMethod *decl)
@@ -86,7 +86,7 @@ static void _call_f_operator_eq__2017 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QBitmap &)
+// void QBitmap::swap(QBitmap &other)
 
 
 static void _init_f_swap_1304 (qt_gsi::GenericMethod *decl)
@@ -106,7 +106,7 @@ static void _call_f_swap_1304 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (const QMatrix &) const
+// QBitmap QBitmap::transformed(const QMatrix &)
 
 
 static void _init_f_transformed_c2023 (qt_gsi::GenericMethod *decl)
@@ -125,7 +125,7 @@ static void _call_f_transformed_c2023 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QTransform &) const
+// QBitmap QBitmap::transformed(const QTransform &matrix)
 
 
 static void _init_f_transformed_c2350 (qt_gsi::GenericMethod *decl)
@@ -197,10 +197,10 @@ namespace gsi
 static gsi::Methods methods_QBitmap () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QBitmap::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QPixmap &)\n", false, &_init_f_operator_eq__2017, &_call_f_operator_eq__2017);
-  methods += new qt_gsi::GenericMethod ("swap", "@brief Method (QBitmap &)\n", false, &_init_f_swap_1304, &_call_f_swap_1304);
-  methods += new qt_gsi::GenericMethod ("transformed", "@brief Method (const QMatrix &) const\n", true, &_init_f_transformed_c2023, &_call_f_transformed_c2023);
-  methods += new qt_gsi::GenericMethod ("transformed", "@brief Method (const QTransform &) const\n", true, &_init_f_transformed_c2350, &_call_f_transformed_c2350);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QBitmap &QBitmap::operator=(const QPixmap &)\n", false, &_init_f_operator_eq__2017, &_call_f_operator_eq__2017);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QBitmap::swap(QBitmap &other)\n", false, &_init_f_swap_1304, &_call_f_swap_1304);
+  methods += new qt_gsi::GenericMethod ("transformed", "@brief Method QBitmap QBitmap::transformed(const QMatrix &)\n", true, &_init_f_transformed_c2023, &_call_f_transformed_c2023);
+  methods += new qt_gsi::GenericMethod ("transformed", "@brief Method QBitmap QBitmap::transformed(const QTransform &matrix)\n", true, &_init_f_transformed_c2350, &_call_f_transformed_c2350);
   methods += new qt_gsi::GenericStaticMethod ("fromData", "@brief Static method QBitmap QBitmap::fromData(const QSize &size, const unsigned char *bits, QImage::Format monoFormat)\nThis method is static and can be called without an instance.", &_init_f_fromData_6058, &_call_f_fromData_6058);
   methods += new qt_gsi::GenericStaticMethod ("fromImage", "@brief Static method QBitmap QBitmap::fromImage(const QImage &image, QFlags<Qt::ImageConversionFlag> flags)\nThis method is static and can be called without an instance.", &_init_f_fromImage_5137, &_call_f_fromImage_5137);
   return methods;

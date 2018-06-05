@@ -116,7 +116,7 @@ static void _call_f_isAlternativeFrequenciesEnabled_c0 (const qt_gsi::GenericMet
 }
 
 
-// () const
+// QMediaObject *QRadioData::mediaObject()
 
 
 static void _init_f_mediaObject_c0 (qt_gsi::GenericMethod *decl)
@@ -331,7 +331,7 @@ static gsi::Methods methods_QRadioData () {
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QRadioData::Error QRadioData::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QRadioData::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("isAlternativeFrequenciesEnabled?|:alternativeFrequenciesEnabled", "@brief Method bool QRadioData::isAlternativeFrequenciesEnabled()\n", true, &_init_f_isAlternativeFrequenciesEnabled_c0, &_call_f_isAlternativeFrequenciesEnabled_c0);
-  methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Method () const\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
+  methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Method QMediaObject *QRadioData::mediaObject()\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
   methods += new qt_gsi::GenericMethod (":programType", "@brief Method QRadioData::ProgramType QRadioData::programType()\n", true, &_init_f_programType_c0, &_call_f_programType_c0);
   methods += new qt_gsi::GenericMethod (":programTypeName", "@brief Method QString QRadioData::programTypeName()\n", true, &_init_f_programTypeName_c0, &_call_f_programTypeName_c0);
   methods += new qt_gsi::GenericMethod (":radioText", "@brief Method QString QRadioData::radioText()\n", true, &_init_f_radioText_c0, &_call_f_radioText_c0);

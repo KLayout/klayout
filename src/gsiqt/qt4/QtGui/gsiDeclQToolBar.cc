@@ -158,7 +158,7 @@ static void _call_f_actionGeometry_c1309 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (QAction *)
+// void QToolBar::addAction(QAction *action)
 
 
 static void _init_f_addAction_1309 (qt_gsi::GenericMethod *decl)
@@ -178,7 +178,7 @@ static void _call_f_addAction_1309 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QString &)
+// QAction *QToolBar::addAction(const QString &text)
 
 
 static void _init_f_addAction_2025 (qt_gsi::GenericMethod *decl)
@@ -197,7 +197,7 @@ static void _call_f_addAction_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QIcon &, const QString &)
+// QAction *QToolBar::addAction(const QIcon &icon, const QString &text)
 
 
 static void _init_f_addAction_3704 (qt_gsi::GenericMethod *decl)
@@ -219,7 +219,7 @@ static void _call_f_addAction_3704 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QString &, const QObject *, const char *)
+// QAction *QToolBar::addAction(const QString &text, const QObject *receiver, const char *member)
 
 
 static void _init_f_addAction_5537 (qt_gsi::GenericMethod *decl)
@@ -244,7 +244,7 @@ static void _call_f_addAction_5537 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QIcon &, const QString &, const QObject *, const char *)
+// QAction *QToolBar::addAction(const QIcon &icon, const QString &text, const QObject *receiver, const char *member)
 
 
 static void _init_f_addAction_7216 (qt_gsi::GenericMethod *decl)
@@ -744,11 +744,11 @@ static gsi::Methods methods_QToolBar () {
   methods += new qt_gsi::GenericMethod ("actionAt", "@brief Method QAction *QToolBar::actionAt(const QPoint &p)\n", true, &_init_f_actionAt_c1916, &_call_f_actionAt_c1916);
   methods += new qt_gsi::GenericMethod ("actionAt", "@brief Method QAction *QToolBar::actionAt(int x, int y)\n", true, &_init_f_actionAt_c1426, &_call_f_actionAt_c1426);
   methods += new qt_gsi::GenericMethod ("actionGeometry", "@brief Method QRect QToolBar::actionGeometry(QAction *action)\n", true, &_init_f_actionGeometry_c1309, &_call_f_actionGeometry_c1309);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (QAction *)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (const QString &)\n", false, &_init_f_addAction_2025, &_call_f_addAction_2025);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (const QIcon &, const QString &)\n", false, &_init_f_addAction_3704, &_call_f_addAction_3704);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (const QString &, const QObject *, const char *)\n", false, &_init_f_addAction_5537, &_call_f_addAction_5537);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (const QIcon &, const QString &, const QObject *, const char *)\n", false, &_init_f_addAction_7216, &_call_f_addAction_7216);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method void QToolBar::addAction(QAction *action)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QToolBar::addAction(const QString &text)\n", false, &_init_f_addAction_2025, &_call_f_addAction_2025);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QToolBar::addAction(const QIcon &icon, const QString &text)\n", false, &_init_f_addAction_3704, &_call_f_addAction_3704);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QToolBar::addAction(const QString &text, const QObject *receiver, const char *member)\n", false, &_init_f_addAction_5537, &_call_f_addAction_5537);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QToolBar::addAction(const QIcon &icon, const QString &text, const QObject *receiver, const char *member)\n", false, &_init_f_addAction_7216, &_call_f_addAction_7216);
   methods += new qt_gsi::GenericMethod ("addSeparator", "@brief Method QAction *QToolBar::addSeparator()\n", false, &_init_f_addSeparator_0, &_call_f_addSeparator_0);
   methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method QAction *QToolBar::addWidget(QWidget *widget)\n", false, &_init_f_addWidget_1315, &_call_f_addWidget_1315);
   methods += new qt_gsi::GenericMethod (":allowedAreas", "@brief Method QFlags<Qt::ToolBarArea> QToolBar::allowedAreas()\n", true, &_init_f_allowedAreas_c0, &_call_f_allowedAreas_c0);

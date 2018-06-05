@@ -101,7 +101,7 @@ static void _call_f_name_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// () const
+// QDomNode::NodeType QDomAttr::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -116,7 +116,7 @@ static void _call_f_nodeType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QDomAttr &)
+// QDomAttr &QDomAttr::operator=(const QDomAttr &)
 
 
 static void _init_f_operator_eq__2093 (qt_gsi::GenericMethod *decl)
@@ -209,8 +209,8 @@ static gsi::Methods methods_QDomAttr () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomAttr::QDomAttr()\nThis method creates an object of class QDomAttr.", &_init_ctor_QDomAttr_0, &_call_ctor_QDomAttr_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomAttr::QDomAttr(const QDomAttr &x)\nThis method creates an object of class QDomAttr.", &_init_ctor_QDomAttr_2093, &_call_ctor_QDomAttr_2093);
   methods += new qt_gsi::GenericMethod ("name", "@brief Method QString QDomAttr::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomAttr &)\n", false, &_init_f_operator_eq__2093, &_call_f_operator_eq__2093);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomAttr::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomAttr &QDomAttr::operator=(const QDomAttr &)\n", false, &_init_f_operator_eq__2093, &_call_f_operator_eq__2093);
   methods += new qt_gsi::GenericMethod ("ownerElement", "@brief Method QDomElement QDomAttr::ownerElement()\n", true, &_init_f_ownerElement_c0, &_call_f_ownerElement_c0);
   methods += new qt_gsi::GenericMethod ("setValue|value=", "@brief Method void QDomAttr::setValue(const QString &)\n", false, &_init_f_setValue_2025, &_call_f_setValue_2025);
   methods += new qt_gsi::GenericMethod ("specified", "@brief Method bool QDomAttr::specified()\n", true, &_init_f_specified_c0, &_call_f_specified_c0);

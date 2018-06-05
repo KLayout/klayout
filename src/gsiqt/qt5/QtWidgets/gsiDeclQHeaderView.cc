@@ -168,7 +168,7 @@ static void _call_f_defaultSectionSize_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// ()
+// void QHeaderView::doItemsLayout()
 
 
 static void _init_f_doItemsLayout_0 (qt_gsi::GenericMethod *decl)
@@ -471,7 +471,7 @@ static void _call_f_orientation_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// ()
+// void QHeaderView::reset()
 
 
 static void _init_f_reset_0 (qt_gsi::GenericMethod *decl)
@@ -870,7 +870,7 @@ static void _call_f_setMinimumSectionSize_767 (const qt_gsi::GenericMethod * /*d
 }
 
 
-// (QAbstractItemModel *)
+// void QHeaderView::setModel(QAbstractItemModel *model)
 
 
 static void _init_f_setModel_2419 (qt_gsi::GenericMethod *decl)
@@ -1135,7 +1135,7 @@ static void _call_f_setStretchLastSection_864 (const qt_gsi::GenericMethod * /*d
 }
 
 
-// (bool)
+// void QHeaderView::setVisible(bool v)
 
 
 static void _init_f_setVisible_864 (qt_gsi::GenericMethod *decl)
@@ -1175,7 +1175,7 @@ static void _call_f_showSection_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// QSize QHeaderView::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -1371,7 +1371,7 @@ static gsi::Methods methods_QHeaderView () {
   methods += new qt_gsi::GenericMethod ("count", "@brief Method int QHeaderView::count()\n", true, &_init_f_count_c0, &_call_f_count_c0);
   methods += new qt_gsi::GenericMethod (":defaultAlignment", "@brief Method QFlags<Qt::AlignmentFlag> QHeaderView::defaultAlignment()\n", true, &_init_f_defaultAlignment_c0, &_call_f_defaultAlignment_c0);
   methods += new qt_gsi::GenericMethod (":defaultSectionSize", "@brief Method int QHeaderView::defaultSectionSize()\n", true, &_init_f_defaultSectionSize_c0, &_call_f_defaultSectionSize_c0);
-  methods += new qt_gsi::GenericMethod ("doItemsLayout", "@brief Method ()\nThis is a reimplementation of QAbstractItemView::doItemsLayout", false, &_init_f_doItemsLayout_0, &_call_f_doItemsLayout_0);
+  methods += new qt_gsi::GenericMethod ("doItemsLayout", "@brief Method void QHeaderView::doItemsLayout()\nThis is a reimplementation of QAbstractItemView::doItemsLayout", false, &_init_f_doItemsLayout_0, &_call_f_doItemsLayout_0);
   methods += new qt_gsi::GenericMethod ("headerDataChanged", "@brief Method void QHeaderView::headerDataChanged(Qt::Orientation orientation, int logicalFirst, int logicalLast)\n", false, &_init_f_headerDataChanged_3231, &_call_f_headerDataChanged_3231);
   methods += new qt_gsi::GenericMethod ("hiddenSectionCount", "@brief Method int QHeaderView::hiddenSectionCount()\n", true, &_init_f_hiddenSectionCount_c0, &_call_f_hiddenSectionCount_c0);
   methods += new qt_gsi::GenericMethod ("hideSection", "@brief Method void QHeaderView::hideSection(int logicalIndex)\n", false, &_init_f_hideSection_767, &_call_f_hideSection_767);
@@ -1388,7 +1388,7 @@ static gsi::Methods methods_QHeaderView () {
   methods += new qt_gsi::GenericMethod ("moveSection", "@brief Method void QHeaderView::moveSection(int from, int to)\n", false, &_init_f_moveSection_1426, &_call_f_moveSection_1426);
   methods += new qt_gsi::GenericMethod (":offset", "@brief Method int QHeaderView::offset()\n", true, &_init_f_offset_c0, &_call_f_offset_c0);
   methods += new qt_gsi::GenericMethod ("orientation", "@brief Method Qt::Orientation QHeaderView::orientation()\n", true, &_init_f_orientation_c0, &_call_f_orientation_c0);
-  methods += new qt_gsi::GenericMethod ("reset", "@brief Method ()\nThis is a reimplementation of QAbstractItemView::reset", false, &_init_f_reset_0, &_call_f_reset_0);
+  methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QHeaderView::reset()\nThis is a reimplementation of QAbstractItemView::reset", false, &_init_f_reset_0, &_call_f_reset_0);
   methods += new qt_gsi::GenericMethod ("resetDefaultSectionSize", "@brief Method void QHeaderView::resetDefaultSectionSize()\n", false, &_init_f_resetDefaultSectionSize_0, &_call_f_resetDefaultSectionSize_0);
   methods += new qt_gsi::GenericMethod (":resizeContentsPrecision", "@brief Method int QHeaderView::resizeContentsPrecision()\n", true, &_init_f_resizeContentsPrecision_c0, &_call_f_resizeContentsPrecision_c0);
   methods += new qt_gsi::GenericMethod ("resizeSection", "@brief Method void QHeaderView::resizeSection(int logicalIndex, int size)\n", false, &_init_f_resizeSection_1426, &_call_f_resizeSection_1426);
@@ -1410,7 +1410,7 @@ static gsi::Methods methods_QHeaderView () {
   methods += new qt_gsi::GenericMethod ("setHighlightSections|highlightSections=", "@brief Method void QHeaderView::setHighlightSections(bool highlight)\n", false, &_init_f_setHighlightSections_864, &_call_f_setHighlightSections_864);
   methods += new qt_gsi::GenericMethod ("setMaximumSectionSize|maximumSectionSize=", "@brief Method void QHeaderView::setMaximumSectionSize(int size)\n", false, &_init_f_setMaximumSectionSize_767, &_call_f_setMaximumSectionSize_767);
   methods += new qt_gsi::GenericMethod ("setMinimumSectionSize|minimumSectionSize=", "@brief Method void QHeaderView::setMinimumSectionSize(int size)\n", false, &_init_f_setMinimumSectionSize_767, &_call_f_setMinimumSectionSize_767);
-  methods += new qt_gsi::GenericMethod ("setModel|model=", "@brief Method (QAbstractItemModel *)\nThis is a reimplementation of QAbstractItemView::setModel", false, &_init_f_setModel_2419, &_call_f_setModel_2419);
+  methods += new qt_gsi::GenericMethod ("setModel|model=", "@brief Method void QHeaderView::setModel(QAbstractItemModel *model)\nThis is a reimplementation of QAbstractItemView::setModel", false, &_init_f_setModel_2419, &_call_f_setModel_2419);
   methods += new qt_gsi::GenericMethod ("setOffset|offset=", "@brief Method void QHeaderView::setOffset(int offset)\n", false, &_init_f_setOffset_767, &_call_f_setOffset_767);
   methods += new qt_gsi::GenericMethod ("setOffsetToLastSection", "@brief Method void QHeaderView::setOffsetToLastSection()\n", false, &_init_f_setOffsetToLastSection_0, &_call_f_setOffsetToLastSection_0);
   methods += new qt_gsi::GenericMethod ("setOffsetToSectionPosition", "@brief Method void QHeaderView::setOffsetToSectionPosition(int visualIndex)\n", false, &_init_f_setOffsetToSectionPosition_767, &_call_f_setOffsetToSectionPosition_767);
@@ -1423,9 +1423,9 @@ static gsi::Methods methods_QHeaderView () {
   methods += new qt_gsi::GenericMethod ("setSortIndicator", "@brief Method void QHeaderView::setSortIndicator(int logicalIndex, Qt::SortOrder order)\n", false, &_init_f_setSortIndicator_2340, &_call_f_setSortIndicator_2340);
   methods += new qt_gsi::GenericMethod ("setSortIndicatorShown|sortIndicatorShown=", "@brief Method void QHeaderView::setSortIndicatorShown(bool show)\n", false, &_init_f_setSortIndicatorShown_864, &_call_f_setSortIndicatorShown_864);
   methods += new qt_gsi::GenericMethod ("setStretchLastSection|stretchLastSection=", "@brief Method void QHeaderView::setStretchLastSection(bool stretch)\n", false, &_init_f_setStretchLastSection_864, &_call_f_setStretchLastSection_864);
-  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method (bool)\nThis is a reimplementation of QWidget::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
+  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QHeaderView::setVisible(bool v)\nThis is a reimplementation of QWidget::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += new qt_gsi::GenericMethod ("showSection", "@brief Method void QHeaderView::showSection(int logicalIndex)\n", false, &_init_f_showSection_767, &_call_f_showSection_767);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QAbstractScrollArea::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QHeaderView::sizeHint()\nThis is a reimplementation of QAbstractScrollArea::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod ("sortIndicatorOrder", "@brief Method Qt::SortOrder QHeaderView::sortIndicatorOrder()\n", true, &_init_f_sortIndicatorOrder_c0, &_call_f_sortIndicatorOrder_c0);
   methods += new qt_gsi::GenericMethod ("sortIndicatorSection", "@brief Method int QHeaderView::sortIndicatorSection()\n", true, &_init_f_sortIndicatorSection_c0, &_call_f_sortIndicatorSection_c0);
   methods += new qt_gsi::GenericMethod (":stretchLastSection", "@brief Method bool QHeaderView::stretchLastSection()\n", true, &_init_f_stretchLastSection_c0, &_call_f_stretchLastSection_c0);

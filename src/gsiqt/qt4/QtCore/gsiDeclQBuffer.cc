@@ -93,7 +93,7 @@ static void _call_ctor_QBuffer_2812 (const qt_gsi::GenericStaticMethod * /*decl*
 }
 
 
-// () const
+// bool QBuffer::atEnd()
 
 
 static void _init_f_atEnd_c0 (qt_gsi::GenericMethod *decl)
@@ -138,7 +138,7 @@ static void _call_f_buffer_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// bool QBuffer::canReadLine()
 
 
 static void _init_f_canReadLine_c0 (qt_gsi::GenericMethod *decl)
@@ -153,7 +153,7 @@ static void _call_f_canReadLine_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// ()
+// void QBuffer::close()
 
 
 static void _init_f_close_0 (qt_gsi::GenericMethod *decl)
@@ -184,7 +184,7 @@ static void _call_f_data_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (QFlags<QIODevice::OpenModeFlag>)
+// bool QBuffer::open(QFlags<QIODevice::OpenModeFlag> openMode)
 
 
 static void _init_f_open_3242 (qt_gsi::GenericMethod *decl)
@@ -203,7 +203,7 @@ static void _call_f_open_3242 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// qint64 QBuffer::pos()
 
 
 static void _init_f_pos_c0 (qt_gsi::GenericMethod *decl)
@@ -218,7 +218,7 @@ static void _call_f_pos_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (qint64)
+// bool QBuffer::seek(qint64 off)
 
 
 static void _init_f_seek_986 (qt_gsi::GenericMethod *decl)
@@ -300,7 +300,7 @@ static void _call_f_setData_2390 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// qint64 QBuffer::size()
 
 
 static void _init_f_size_c0 (qt_gsi::GenericMethod *decl)
@@ -418,19 +418,19 @@ static gsi::Methods methods_QBuffer () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QBuffer::QBuffer(QObject *parent)\nThis method creates an object of class QBuffer.", &_init_ctor_QBuffer_1302, &_call_ctor_QBuffer_1302);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QBuffer::QBuffer(QByteArray *buf, QObject *parent)\nThis method creates an object of class QBuffer.", &_init_ctor_QBuffer_2812, &_call_ctor_QBuffer_2812);
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method () const\nThis is a reimplementation of QIODevice::atEnd", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
+  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method bool QBuffer::atEnd()\nThis is a reimplementation of QIODevice::atEnd", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
   methods += new qt_gsi::GenericMethod ("buffer", "@brief Method QByteArray &QBuffer::buffer()\n", false, &_init_f_buffer_0, &_call_f_buffer_0);
   methods += new qt_gsi::GenericMethod ("buffer", "@brief Method const QByteArray &QBuffer::buffer()\n", true, &_init_f_buffer_c0, &_call_f_buffer_c0);
-  methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Method () const\nThis is a reimplementation of QIODevice::canReadLine", true, &_init_f_canReadLine_c0, &_call_f_canReadLine_c0);
-  methods += new qt_gsi::GenericMethod ("close", "@brief Method ()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
+  methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Method bool QBuffer::canReadLine()\nThis is a reimplementation of QIODevice::canReadLine", true, &_init_f_canReadLine_c0, &_call_f_canReadLine_c0);
+  methods += new qt_gsi::GenericMethod ("close", "@brief Method void QBuffer::close()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
   methods += new qt_gsi::GenericMethod (":data", "@brief Method const QByteArray &QBuffer::data()\n", true, &_init_f_data_c0, &_call_f_data_c0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method (QFlags<QIODevice::OpenModeFlag>)\nThis is a reimplementation of QIODevice::open", false, &_init_f_open_3242, &_call_f_open_3242);
-  methods += new qt_gsi::GenericMethod ("pos", "@brief Method () const\nThis is a reimplementation of QIODevice::pos", true, &_init_f_pos_c0, &_call_f_pos_c0);
-  methods += new qt_gsi::GenericMethod ("seek", "@brief Method (qint64)\nThis is a reimplementation of QIODevice::seek", false, &_init_f_seek_986, &_call_f_seek_986);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method bool QBuffer::open(QFlags<QIODevice::OpenModeFlag> openMode)\nThis is a reimplementation of QIODevice::open", false, &_init_f_open_3242, &_call_f_open_3242);
+  methods += new qt_gsi::GenericMethod ("pos", "@brief Method qint64 QBuffer::pos()\nThis is a reimplementation of QIODevice::pos", true, &_init_f_pos_c0, &_call_f_pos_c0);
+  methods += new qt_gsi::GenericMethod ("seek", "@brief Method bool QBuffer::seek(qint64 off)\nThis is a reimplementation of QIODevice::seek", false, &_init_f_seek_986, &_call_f_seek_986);
   methods += new qt_gsi::GenericMethod ("setBuffer", "@brief Method void QBuffer::setBuffer(QByteArray *a)\n", false, &_init_f_setBuffer_1618, &_call_f_setBuffer_1618);
   methods += new qt_gsi::GenericMethod ("setData|data=", "@brief Method void QBuffer::setData(const QByteArray &data)\n", false, &_init_f_setData_2309, &_call_f_setData_2309);
   methods += new qt_gsi::GenericMethod ("setData", "@brief Method void QBuffer::setData(const char *data, int len)\n", false, &_init_f_setData_2390, &_call_f_setData_2390);
-  methods += new qt_gsi::GenericMethod ("size", "@brief Method () const\nThis is a reimplementation of QIODevice::size", true, &_init_f_size_c0, &_call_f_size_c0);
+  methods += new qt_gsi::GenericMethod ("size", "@brief Method qint64 QBuffer::size()\nThis is a reimplementation of QIODevice::size", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QBuffer::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QBuffer::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QBuffer::destroyed(QObject *)\nYou can bind a procedure to this signal.");

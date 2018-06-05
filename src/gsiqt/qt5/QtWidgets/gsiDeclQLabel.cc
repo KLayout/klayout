@@ -179,7 +179,7 @@ static void _call_f_hasSelectedText_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int) const
+// int QLabel::heightForWidth(int)
 
 
 static void _init_f_heightForWidth_c767 (qt_gsi::GenericMethod *decl)
@@ -228,7 +228,7 @@ static void _call_f_margin_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// QSize QLabel::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -656,7 +656,7 @@ static void _call_f_setWordWrap_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// QSize QLabel::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -792,10 +792,10 @@ static gsi::Methods methods_QLabel () {
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QLabel::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
   methods += new qt_gsi::GenericMethod ("hasScaledContents|:scaledContents", "@brief Method bool QLabel::hasScaledContents()\n", true, &_init_f_hasScaledContents_c0, &_call_f_hasScaledContents_c0);
   methods += new qt_gsi::GenericMethod (":hasSelectedText", "@brief Method bool QLabel::hasSelectedText()\n", true, &_init_f_hasSelectedText_c0, &_call_f_hasSelectedText_c0);
-  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method (int) const\nThis is a reimplementation of QWidget::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
+  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method int QLabel::heightForWidth(int)\nThis is a reimplementation of QWidget::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
   methods += new qt_gsi::GenericMethod (":indent", "@brief Method int QLabel::indent()\n", true, &_init_f_indent_c0, &_call_f_indent_c0);
   methods += new qt_gsi::GenericMethod (":margin", "@brief Method int QLabel::margin()\n", true, &_init_f_margin_c0, &_call_f_margin_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QLabel::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod (":movie", "@brief Method QMovie *QLabel::movie()\n", true, &_init_f_movie_c0, &_call_f_movie_c0);
   methods += new qt_gsi::GenericMethod (":openExternalLinks", "@brief Method bool QLabel::openExternalLinks()\n", true, &_init_f_openExternalLinks_c0, &_call_f_openExternalLinks_c0);
   methods += new qt_gsi::GenericMethod ("picture", "@brief Method const QPicture *QLabel::picture()\n", true, &_init_f_picture_c0, &_call_f_picture_c0);
@@ -818,7 +818,7 @@ static gsi::Methods methods_QLabel () {
   methods += new qt_gsi::GenericMethod ("setTextFormat|textFormat=", "@brief Method void QLabel::setTextFormat(Qt::TextFormat)\n", false, &_init_f_setTextFormat_1787, &_call_f_setTextFormat_1787);
   methods += new qt_gsi::GenericMethod ("setTextInteractionFlags|textInteractionFlags=", "@brief Method void QLabel::setTextInteractionFlags(QFlags<Qt::TextInteractionFlag> flags)\n", false, &_init_f_setTextInteractionFlags_3396, &_call_f_setTextInteractionFlags_3396);
   methods += new qt_gsi::GenericMethod ("setWordWrap|wordWrap=", "@brief Method void QLabel::setWordWrap(bool on)\n", false, &_init_f_setWordWrap_864, &_call_f_setWordWrap_864);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QFrame::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QLabel::sizeHint()\nThis is a reimplementation of QFrame::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":text", "@brief Method QString QLabel::text()\n", true, &_init_f_text_c0, &_call_f_text_c0);
   methods += new qt_gsi::GenericMethod (":textFormat", "@brief Method Qt::TextFormat QLabel::textFormat()\n", true, &_init_f_textFormat_c0, &_call_f_textFormat_c0);
   methods += new qt_gsi::GenericMethod (":textInteractionFlags", "@brief Method QFlags<Qt::TextInteractionFlag> QLabel::textInteractionFlags()\n", true, &_init_f_textInteractionFlags_c0, &_call_f_textInteractionFlags_c0);

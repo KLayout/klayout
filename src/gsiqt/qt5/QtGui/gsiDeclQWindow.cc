@@ -237,7 +237,7 @@ static void _call_f_focusObject_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QSurfaceFormat QWindow::format()
 
 
 static void _init_f_format_c0 (qt_gsi::GenericMethod *decl)
@@ -644,7 +644,7 @@ static void _call_f_opacity_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QWindow *QWindow::parent()
 
 
 static void _init_f_parent_c0 (qt_gsi::GenericMethod *decl)
@@ -1242,7 +1242,7 @@ static void _call_f_setOpacity_1071 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QWindow *)
+// void QWindow::setParent(QWindow *parent)
 
 
 static void _init_f_setParent_1335 (qt_gsi::GenericMethod *decl)
@@ -1605,7 +1605,7 @@ static void _call_f_showNormal_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QSize QWindow::size()
 
 
 static void _init_f_size_c0 (qt_gsi::GenericMethod *decl)
@@ -1635,7 +1635,7 @@ static void _call_f_sizeIncrement_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// () const
+// QSurface::SurfaceType QWindow::surfaceType()
 
 
 static void _init_f_surfaceType_c0 (qt_gsi::GenericMethod *decl)
@@ -1933,7 +1933,7 @@ static gsi::Methods methods_QWindow () {
   methods += new qt_gsi::GenericMethod (":filePath", "@brief Method QString QWindow::filePath()\n", true, &_init_f_filePath_c0, &_call_f_filePath_c0);
   methods += new qt_gsi::GenericMethod (":flags", "@brief Method QFlags<Qt::WindowType> QWindow::flags()\n", true, &_init_f_flags_c0, &_call_f_flags_c0);
   methods += new qt_gsi::GenericMethod ("focusObject", "@brief Method QObject *QWindow::focusObject()\n", true, &_init_f_focusObject_c0, &_call_f_focusObject_c0);
-  methods += new qt_gsi::GenericMethod (":format", "@brief Method () const\nThis is a reimplementation of QSurface::format", true, &_init_f_format_c0, &_call_f_format_c0);
+  methods += new qt_gsi::GenericMethod (":format", "@brief Method QSurfaceFormat QWindow::format()\nThis is a reimplementation of QSurface::format", true, &_init_f_format_c0, &_call_f_format_c0);
   methods += new qt_gsi::GenericMethod ("frameGeometry", "@brief Method QRect QWindow::frameGeometry()\n", true, &_init_f_frameGeometry_c0, &_call_f_frameGeometry_c0);
   methods += new qt_gsi::GenericMethod ("frameMargins", "@brief Method QMargins QWindow::frameMargins()\n", true, &_init_f_frameMargins_c0, &_call_f_frameMargins_c0);
   methods += new qt_gsi::GenericMethod (":framePosition", "@brief Method QPoint QWindow::framePosition()\n", true, &_init_f_framePosition_c0, &_call_f_framePosition_c0);
@@ -1959,7 +1959,7 @@ static gsi::Methods methods_QWindow () {
   methods += new qt_gsi::GenericMethod (":minimumWidth", "@brief Method int QWindow::minimumWidth()\n", true, &_init_f_minimumWidth_c0, &_call_f_minimumWidth_c0);
   methods += new qt_gsi::GenericMethod (":modality", "@brief Method Qt::WindowModality QWindow::modality()\n", true, &_init_f_modality_c0, &_call_f_modality_c0);
   methods += new qt_gsi::GenericMethod (":opacity", "@brief Method double QWindow::opacity()\n", true, &_init_f_opacity_c0, &_call_f_opacity_c0);
-  methods += new qt_gsi::GenericMethod (":parent", "@brief Method () const\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
+  methods += new qt_gsi::GenericMethod (":parent", "@brief Method QWindow *QWindow::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
   methods += new qt_gsi::GenericMethod (":position", "@brief Method QPoint QWindow::position()\n", true, &_init_f_position_c0, &_call_f_position_c0);
   methods += new qt_gsi::GenericMethod ("qt_raise", "@brief Method void QWindow::raise()\n", false, &_init_f_raise_0, &_call_f_raise_0);
   methods += new qt_gsi::GenericMethod ("reportContentOrientationChange", "@brief Method void QWindow::reportContentOrientationChange(Qt::ScreenOrientation orientation)\n", false, &_init_f_reportContentOrientationChange_2521, &_call_f_reportContentOrientationChange_2521);
@@ -1990,7 +1990,7 @@ static gsi::Methods methods_QWindow () {
   methods += new qt_gsi::GenericMethod ("setModality|modality=", "@brief Method void QWindow::setModality(Qt::WindowModality modality)\n", false, &_init_f_setModality_2216, &_call_f_setModality_2216);
   methods += new qt_gsi::GenericMethod ("setMouseGrabEnabled", "@brief Method bool QWindow::setMouseGrabEnabled(bool grab)\n", false, &_init_f_setMouseGrabEnabled_864, &_call_f_setMouseGrabEnabled_864);
   methods += new qt_gsi::GenericMethod ("setOpacity|opacity=", "@brief Method void QWindow::setOpacity(double level)\n", false, &_init_f_setOpacity_1071, &_call_f_setOpacity_1071);
-  methods += new qt_gsi::GenericMethod ("setParent|parent=", "@brief Method (QWindow *)\n", false, &_init_f_setParent_1335, &_call_f_setParent_1335);
+  methods += new qt_gsi::GenericMethod ("setParent|parent=", "@brief Method void QWindow::setParent(QWindow *parent)\n", false, &_init_f_setParent_1335, &_call_f_setParent_1335);
   methods += new qt_gsi::GenericMethod ("setPosition|position=", "@brief Method void QWindow::setPosition(const QPoint &pt)\n", false, &_init_f_setPosition_1916, &_call_f_setPosition_1916);
   methods += new qt_gsi::GenericMethod ("setPosition", "@brief Method void QWindow::setPosition(int posx, int posy)\n", false, &_init_f_setPosition_1426, &_call_f_setPosition_1426);
   methods += new qt_gsi::GenericMethod ("setScreen|screen=", "@brief Method void QWindow::setScreen(QScreen *screen)\n", false, &_init_f_setScreen_1311, &_call_f_setScreen_1311);
@@ -2009,9 +2009,9 @@ static gsi::Methods methods_QWindow () {
   methods += new qt_gsi::GenericMethod ("showMaximized", "@brief Method void QWindow::showMaximized()\n", false, &_init_f_showMaximized_0, &_call_f_showMaximized_0);
   methods += new qt_gsi::GenericMethod ("showMinimized", "@brief Method void QWindow::showMinimized()\n", false, &_init_f_showMinimized_0, &_call_f_showMinimized_0);
   methods += new qt_gsi::GenericMethod ("showNormal", "@brief Method void QWindow::showNormal()\n", false, &_init_f_showNormal_0, &_call_f_showNormal_0);
-  methods += new qt_gsi::GenericMethod ("size", "@brief Method () const\nThis is a reimplementation of QSurface::size", true, &_init_f_size_c0, &_call_f_size_c0);
+  methods += new qt_gsi::GenericMethod ("size", "@brief Method QSize QWindow::size()\nThis is a reimplementation of QSurface::size", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod (":sizeIncrement", "@brief Method QSize QWindow::sizeIncrement()\n", true, &_init_f_sizeIncrement_c0, &_call_f_sizeIncrement_c0);
-  methods += new qt_gsi::GenericMethod (":surfaceType", "@brief Method () const\nThis is a reimplementation of QSurface::surfaceType", true, &_init_f_surfaceType_c0, &_call_f_surfaceType_c0);
+  methods += new qt_gsi::GenericMethod (":surfaceType", "@brief Method QSurface::SurfaceType QWindow::surfaceType()\nThis is a reimplementation of QSurface::surfaceType", true, &_init_f_surfaceType_c0, &_call_f_surfaceType_c0);
   methods += new qt_gsi::GenericMethod (":title", "@brief Method QString QWindow::title()\n", true, &_init_f_title_c0, &_call_f_title_c0);
   methods += new qt_gsi::GenericMethod (":transientParent", "@brief Method QWindow *QWindow::transientParent()\n", true, &_init_f_transientParent_c0, &_call_f_transientParent_c0);
   methods += new qt_gsi::GenericMethod ("type", "@brief Method Qt::WindowType QWindow::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);

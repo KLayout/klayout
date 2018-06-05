@@ -379,7 +379,7 @@ static void _call_f_indexWidget_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (Qt::InputMethodQuery) const
+// QVariant QAbstractItemView::inputMethodQuery(Qt::InputMethodQuery query)
 
 
 static void _init_f_inputMethodQuery_c2420 (qt_gsi::GenericMethod *decl)
@@ -1263,7 +1263,7 @@ static void _call_f_textElideMode_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QRegion &)
+// void QAbstractItemView::update(const QRegion &)
 
 
 static void _init_f_update_2006 (qt_gsi::GenericMethod *decl)
@@ -1283,7 +1283,7 @@ static void _call_f_update_2006 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QModelIndex &)
+// void QAbstractItemView::update(const QModelIndex &index)
 
 
 static void _init_f_update_2395 (qt_gsi::GenericMethod *decl)
@@ -1454,7 +1454,7 @@ static gsi::Methods methods_QAbstractItemView () {
   methods += new qt_gsi::GenericMethod (":iconSize", "@brief Method QSize QAbstractItemView::iconSize()\n", true, &_init_f_iconSize_c0, &_call_f_iconSize_c0);
   methods += new qt_gsi::GenericMethod ("indexAt", "@brief Method QModelIndex QAbstractItemView::indexAt(const QPoint &point)\n", true, &_init_f_indexAt_c1916, &_call_f_indexAt_c1916);
   methods += new qt_gsi::GenericMethod ("indexWidget", "@brief Method QWidget *QAbstractItemView::indexWidget(const QModelIndex &index)\n", true, &_init_f_indexWidget_c2395, &_call_f_indexWidget_c2395);
-  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method (Qt::InputMethodQuery) const\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
+  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method QVariant QAbstractItemView::inputMethodQuery(Qt::InputMethodQuery query)\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
   methods += new qt_gsi::GenericMethod (":itemDelegate", "@brief Method QAbstractItemDelegate *QAbstractItemView::itemDelegate()\n", true, &_init_f_itemDelegate_c0, &_call_f_itemDelegate_c0);
   methods += new qt_gsi::GenericMethod ("itemDelegate", "@brief Method QAbstractItemDelegate *QAbstractItemView::itemDelegate(const QModelIndex &index)\n", true, &_init_f_itemDelegate_c2395, &_call_f_itemDelegate_c2395);
   methods += new qt_gsi::GenericMethod ("itemDelegateForColumn", "@brief Method QAbstractItemDelegate *QAbstractItemView::itemDelegateForColumn(int column)\n", true, &_init_f_itemDelegateForColumn_c767, &_call_f_itemDelegateForColumn_c767);
@@ -1501,8 +1501,8 @@ static gsi::Methods methods_QAbstractItemView () {
   methods += new qt_gsi::GenericMethod ("sizeHintForRow", "@brief Method int QAbstractItemView::sizeHintForRow(int row)\n", true, &_init_f_sizeHintForRow_c767, &_call_f_sizeHintForRow_c767);
   methods += new qt_gsi::GenericMethod (":tabKeyNavigation", "@brief Method bool QAbstractItemView::tabKeyNavigation()\n", true, &_init_f_tabKeyNavigation_c0, &_call_f_tabKeyNavigation_c0);
   methods += new qt_gsi::GenericMethod (":textElideMode", "@brief Method Qt::TextElideMode QAbstractItemView::textElideMode()\n", true, &_init_f_textElideMode_c0, &_call_f_textElideMode_c0);
-  methods += new qt_gsi::GenericMethod ("update", "@brief Method (const QRegion &)\n", false, &_init_f_update_2006, &_call_f_update_2006);
-  methods += new qt_gsi::GenericMethod ("update", "@brief Method (const QModelIndex &)\n", false, &_init_f_update_2395, &_call_f_update_2395);
+  methods += new qt_gsi::GenericMethod ("update", "@brief Method void QAbstractItemView::update(const QRegion &)\n", false, &_init_f_update_2006, &_call_f_update_2006);
+  methods += new qt_gsi::GenericMethod ("update", "@brief Method void QAbstractItemView::update(const QModelIndex &index)\n", false, &_init_f_update_2395, &_call_f_update_2395);
   methods += new qt_gsi::GenericMethod (":verticalScrollMode", "@brief Method QAbstractItemView::ScrollMode QAbstractItemView::verticalScrollMode()\n", true, &_init_f_verticalScrollMode_c0, &_call_f_verticalScrollMode_c0);
   methods += new qt_gsi::GenericMethod ("visualRect", "@brief Method QRect QAbstractItemView::visualRect(const QModelIndex &index)\n", true, &_init_f_visualRect_c2395, &_call_f_visualRect_c2395);
   methods += gsi::qt_signal<const QModelIndex & > ("activated(const QModelIndex &)", "activated", gsi::arg("index"), "@brief Signal declaration for QAbstractItemView::activated(const QModelIndex &index)\nYou can bind a procedure to this signal.");

@@ -68,7 +68,7 @@ static void _call_ctor_QAccessibleWidget_5165 (const qt_gsi::GenericStaticMethod
 }
 
 
-// () const
+// QStringList QAccessibleWidget::actionNames()
 
 
 static void _init_f_actionNames_c0 (qt_gsi::GenericMethod *decl)
@@ -83,7 +83,7 @@ static void _call_f_actionNames_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QColor QAccessibleWidget::backgroundColor()
 
 
 static void _init_f_backgroundColor_c0 (qt_gsi::GenericMethod *decl)
@@ -98,7 +98,7 @@ static void _call_f_backgroundColor_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int) const
+// QAccessibleInterface *QAccessibleWidget::child(int index)
 
 
 static void _init_f_child_c767 (qt_gsi::GenericMethod *decl)
@@ -117,7 +117,7 @@ static void _call_f_child_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// int QAccessibleWidget::childCount()
 
 
 static void _init_f_childCount_c0 (qt_gsi::GenericMethod *decl)
@@ -132,7 +132,7 @@ static void _call_f_childCount_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QString &)
+// void QAccessibleWidget::doAction(const QString &actionName)
 
 
 static void _init_f_doAction_2025 (qt_gsi::GenericMethod *decl)
@@ -152,7 +152,7 @@ static void _call_f_doAction_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// () const
+// QAccessibleInterface *QAccessibleWidget::focusChild()
 
 
 static void _init_f_focusChild_c0 (qt_gsi::GenericMethod *decl)
@@ -167,7 +167,7 @@ static void _call_f_focusChild_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// () const
+// QColor QAccessibleWidget::foregroundColor()
 
 
 static void _init_f_foregroundColor_c0 (qt_gsi::GenericMethod *decl)
@@ -182,7 +182,7 @@ static void _call_f_foregroundColor_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QAccessibleInterface *) const
+// int QAccessibleWidget::indexOfChild(const QAccessibleInterface *child)
 
 
 static void _init_f_indexOfChild_c3317 (qt_gsi::GenericMethod *decl)
@@ -201,7 +201,7 @@ static void _call_f_indexOfChild_c3317 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (QAccessible::InterfaceType)
+// void *QAccessibleWidget::interface_cast(QAccessible::InterfaceType t)
 
 
 static void _init_f_interface_cast_2970 (qt_gsi::GenericMethod *decl)
@@ -220,7 +220,7 @@ static void _call_f_interface_cast_2970 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// bool QAccessibleWidget::isValid()
 
 
 static void _init_f_isValid_c0 (qt_gsi::GenericMethod *decl)
@@ -235,7 +235,7 @@ static void _call_f_isValid_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (const QString &) const
+// QStringList QAccessibleWidget::keyBindingsForAction(const QString &actionName)
 
 
 static void _init_f_keyBindingsForAction_c2025 (qt_gsi::GenericMethod *decl)
@@ -254,7 +254,7 @@ static void _call_f_keyBindingsForAction_c2025 (const qt_gsi::GenericMethod * /*
 }
 
 
-// () const
+// QAccessibleInterface *QAccessibleWidget::parent()
 
 
 static void _init_f_parent_c0 (qt_gsi::GenericMethod *decl)
@@ -269,7 +269,7 @@ static void _call_f_parent_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// QRect QAccessibleWidget::rect()
 
 
 static void _init_f_rect_c0 (qt_gsi::GenericMethod *decl)
@@ -284,7 +284,7 @@ static void _call_f_rect_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (QFlags<QAccessible::RelationFlag>) const
+// QVector<QPair<QAccessibleInterface*, QAccessible::Relation> > QAccessibleWidget::relations(QFlags<QAccessible::RelationFlag> match)
 
 
 static void _init_f_relations_c3543 (qt_gsi::GenericMethod *decl)
@@ -303,7 +303,7 @@ static void _call_f_relations_c3543 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// QAccessible::Role QAccessibleWidget::role()
 
 
 static void _init_f_role_c0 (qt_gsi::GenericMethod *decl)
@@ -318,7 +318,7 @@ static void _call_f_role_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// () const
+// QAccessible::State QAccessibleWidget::state()
 
 
 static void _init_f_state_c0 (qt_gsi::GenericMethod *decl)
@@ -333,7 +333,7 @@ static void _call_f_state_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (QAccessible::Text) const
+// QString QAccessibleWidget::text(QAccessible::Text t)
 
 
 static void _init_f_text_c2060 (qt_gsi::GenericMethod *decl)
@@ -352,7 +352,7 @@ static void _call_f_text_c2060 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QWindow *QAccessibleWidget::window()
 
 
 static void _init_f_window_c0 (qt_gsi::GenericMethod *decl)
@@ -419,24 +419,24 @@ namespace gsi
 static gsi::Methods methods_QAccessibleWidget () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAccessibleWidget::QAccessibleWidget(QWidget *o, QAccessible::Role r, const QString &name)\nThis method creates an object of class QAccessibleWidget.", &_init_ctor_QAccessibleWidget_5165, &_call_ctor_QAccessibleWidget_5165);
-  methods += new qt_gsi::GenericMethod ("actionNames", "@brief Method () const\nThis is a reimplementation of QAccessibleActionInterface::actionNames", true, &_init_f_actionNames_c0, &_call_f_actionNames_c0);
-  methods += new qt_gsi::GenericMethod ("backgroundColor", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::backgroundColor", true, &_init_f_backgroundColor_c0, &_call_f_backgroundColor_c0);
-  methods += new qt_gsi::GenericMethod ("child", "@brief Method (int) const\nThis is a reimplementation of QAccessibleInterface::child", true, &_init_f_child_c767, &_call_f_child_c767);
-  methods += new qt_gsi::GenericMethod ("childCount", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::childCount", true, &_init_f_childCount_c0, &_call_f_childCount_c0);
-  methods += new qt_gsi::GenericMethod ("doAction", "@brief Method (const QString &)\nThis is a reimplementation of QAccessibleActionInterface::doAction", false, &_init_f_doAction_2025, &_call_f_doAction_2025);
-  methods += new qt_gsi::GenericMethod ("focusChild", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::focusChild", true, &_init_f_focusChild_c0, &_call_f_focusChild_c0);
-  methods += new qt_gsi::GenericMethod ("foregroundColor", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::foregroundColor", true, &_init_f_foregroundColor_c0, &_call_f_foregroundColor_c0);
-  methods += new qt_gsi::GenericMethod ("indexOfChild", "@brief Method (const QAccessibleInterface *) const\nThis is a reimplementation of QAccessibleInterface::indexOfChild", true, &_init_f_indexOfChild_c3317, &_call_f_indexOfChild_c3317);
-  methods += new qt_gsi::GenericMethod ("interface_cast", "@brief Method (QAccessible::InterfaceType)\nThis is a reimplementation of QAccessibleInterface::interface_cast", false, &_init_f_interface_cast_2970, &_call_f_interface_cast_2970);
-  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method () const\nThis is a reimplementation of QAccessibleObject::isValid", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
-  methods += new qt_gsi::GenericMethod ("keyBindingsForAction", "@brief Method (const QString &) const\nThis is a reimplementation of QAccessibleActionInterface::keyBindingsForAction", true, &_init_f_keyBindingsForAction_c2025, &_call_f_keyBindingsForAction_c2025);
-  methods += new qt_gsi::GenericMethod ("parent", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::parent", true, &_init_f_parent_c0, &_call_f_parent_c0);
-  methods += new qt_gsi::GenericMethod ("rect", "@brief Method () const\nThis is a reimplementation of QAccessibleObject::rect", true, &_init_f_rect_c0, &_call_f_rect_c0);
-  methods += new qt_gsi::GenericMethod ("relations", "@brief Method (QFlags<QAccessible::RelationFlag>) const\nThis is a reimplementation of QAccessibleInterface::relations", true, &_init_f_relations_c3543, &_call_f_relations_c3543);
-  methods += new qt_gsi::GenericMethod ("role", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::role", true, &_init_f_role_c0, &_call_f_role_c0);
-  methods += new qt_gsi::GenericMethod ("state", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::state", true, &_init_f_state_c0, &_call_f_state_c0);
-  methods += new qt_gsi::GenericMethod ("text", "@brief Method (QAccessible::Text) const\nThis is a reimplementation of QAccessibleInterface::text", true, &_init_f_text_c2060, &_call_f_text_c2060);
-  methods += new qt_gsi::GenericMethod ("window", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::window", true, &_init_f_window_c0, &_call_f_window_c0);
+  methods += new qt_gsi::GenericMethod ("actionNames", "@brief Method QStringList QAccessibleWidget::actionNames()\nThis is a reimplementation of QAccessibleActionInterface::actionNames", true, &_init_f_actionNames_c0, &_call_f_actionNames_c0);
+  methods += new qt_gsi::GenericMethod ("backgroundColor", "@brief Method QColor QAccessibleWidget::backgroundColor()\nThis is a reimplementation of QAccessibleInterface::backgroundColor", true, &_init_f_backgroundColor_c0, &_call_f_backgroundColor_c0);
+  methods += new qt_gsi::GenericMethod ("child", "@brief Method QAccessibleInterface *QAccessibleWidget::child(int index)\nThis is a reimplementation of QAccessibleInterface::child", true, &_init_f_child_c767, &_call_f_child_c767);
+  methods += new qt_gsi::GenericMethod ("childCount", "@brief Method int QAccessibleWidget::childCount()\nThis is a reimplementation of QAccessibleInterface::childCount", true, &_init_f_childCount_c0, &_call_f_childCount_c0);
+  methods += new qt_gsi::GenericMethod ("doAction", "@brief Method void QAccessibleWidget::doAction(const QString &actionName)\nThis is a reimplementation of QAccessibleActionInterface::doAction", false, &_init_f_doAction_2025, &_call_f_doAction_2025);
+  methods += new qt_gsi::GenericMethod ("focusChild", "@brief Method QAccessibleInterface *QAccessibleWidget::focusChild()\nThis is a reimplementation of QAccessibleInterface::focusChild", true, &_init_f_focusChild_c0, &_call_f_focusChild_c0);
+  methods += new qt_gsi::GenericMethod ("foregroundColor", "@brief Method QColor QAccessibleWidget::foregroundColor()\nThis is a reimplementation of QAccessibleInterface::foregroundColor", true, &_init_f_foregroundColor_c0, &_call_f_foregroundColor_c0);
+  methods += new qt_gsi::GenericMethod ("indexOfChild", "@brief Method int QAccessibleWidget::indexOfChild(const QAccessibleInterface *child)\nThis is a reimplementation of QAccessibleInterface::indexOfChild", true, &_init_f_indexOfChild_c3317, &_call_f_indexOfChild_c3317);
+  methods += new qt_gsi::GenericMethod ("interface_cast", "@brief Method void *QAccessibleWidget::interface_cast(QAccessible::InterfaceType t)\nThis is a reimplementation of QAccessibleInterface::interface_cast", false, &_init_f_interface_cast_2970, &_call_f_interface_cast_2970);
+  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QAccessibleWidget::isValid()\nThis is a reimplementation of QAccessibleObject::isValid", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("keyBindingsForAction", "@brief Method QStringList QAccessibleWidget::keyBindingsForAction(const QString &actionName)\nThis is a reimplementation of QAccessibleActionInterface::keyBindingsForAction", true, &_init_f_keyBindingsForAction_c2025, &_call_f_keyBindingsForAction_c2025);
+  methods += new qt_gsi::GenericMethod ("parent", "@brief Method QAccessibleInterface *QAccessibleWidget::parent()\nThis is a reimplementation of QAccessibleInterface::parent", true, &_init_f_parent_c0, &_call_f_parent_c0);
+  methods += new qt_gsi::GenericMethod ("rect", "@brief Method QRect QAccessibleWidget::rect()\nThis is a reimplementation of QAccessibleObject::rect", true, &_init_f_rect_c0, &_call_f_rect_c0);
+  methods += new qt_gsi::GenericMethod ("relations", "@brief Method QVector<QPair<QAccessibleInterface*, QAccessible::Relation> > QAccessibleWidget::relations(QFlags<QAccessible::RelationFlag> match)\nThis is a reimplementation of QAccessibleInterface::relations", true, &_init_f_relations_c3543, &_call_f_relations_c3543);
+  methods += new qt_gsi::GenericMethod ("role", "@brief Method QAccessible::Role QAccessibleWidget::role()\nThis is a reimplementation of QAccessibleInterface::role", true, &_init_f_role_c0, &_call_f_role_c0);
+  methods += new qt_gsi::GenericMethod ("state", "@brief Method QAccessible::State QAccessibleWidget::state()\nThis is a reimplementation of QAccessibleInterface::state", true, &_init_f_state_c0, &_call_f_state_c0);
+  methods += new qt_gsi::GenericMethod ("text", "@brief Method QString QAccessibleWidget::text(QAccessible::Text t)\nThis is a reimplementation of QAccessibleInterface::text", true, &_init_f_text_c2060, &_call_f_text_c2060);
+  methods += new qt_gsi::GenericMethod ("window", "@brief Method QWindow *QAccessibleWidget::window()\nThis is a reimplementation of QAccessibleInterface::window", true, &_init_f_window_c0, &_call_f_window_c0);
   methods += new qt_gsi::GenericMethod ("asQAccessibleObject", "@brief Delivers the base class interface QAccessibleObject of QAccessibleWidget\nClass QAccessibleWidget is derived from multiple base classes. This method delivers the QAccessibleObject base class aspect.", false, &_init_f_QAccessibleWidget_as_QAccessibleObject, &_call_f_QAccessibleWidget_as_QAccessibleObject);
   methods += new qt_gsi::GenericMethod ("asConstQAccessibleObject", "@brief Delivers the base class interface QAccessibleObject of QAccessibleWidget\nClass QAccessibleWidget is derived from multiple base classes. This method delivers the QAccessibleObject base class aspect.\n\nUse this version if you have a const reference.", true, &_init_f_QAccessibleWidget_as_const_QAccessibleObject, &_call_f_QAccessibleWidget_as_const_QAccessibleObject);
   methods += new qt_gsi::GenericMethod ("asQAccessibleActionInterface", "@brief Delivers the base class interface QAccessibleActionInterface of QAccessibleWidget\nClass QAccessibleWidget is derived from multiple base classes. This method delivers the QAccessibleActionInterface base class aspect.", false, &_init_f_QAccessibleWidget_as_QAccessibleActionInterface, &_call_f_QAccessibleWidget_as_QAccessibleActionInterface);

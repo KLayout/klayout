@@ -41,7 +41,7 @@
 // -----------------------------------------------------------------------
 // class QWidgetItem
 
-// () const
+// QFlags<QSizePolicy::ControlType> QWidgetItem::controlTypes()
 
 
 static void _init_f_controlTypes_c0 (qt_gsi::GenericMethod *decl)
@@ -56,7 +56,7 @@ static void _call_f_controlTypes_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// QFlags<Qt::Orientation> QWidgetItem::expandingDirections()
 
 
 static void _init_f_expandingDirections_c0 (qt_gsi::GenericMethod *decl)
@@ -71,7 +71,7 @@ static void _call_f_expandingDirections_c0 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// QRect QWidgetItem::geometry()
 
 
 static void _init_f_geometry_c0 (qt_gsi::GenericMethod *decl)
@@ -86,7 +86,7 @@ static void _call_f_geometry_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// bool QWidgetItem::hasHeightForWidth()
 
 
 static void _init_f_hasHeightForWidth_c0 (qt_gsi::GenericMethod *decl)
@@ -101,7 +101,7 @@ static void _call_f_hasHeightForWidth_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (int) const
+// int QWidgetItem::heightForWidth(int)
 
 
 static void _init_f_heightForWidth_c767 (qt_gsi::GenericMethod *decl)
@@ -120,7 +120,7 @@ static void _call_f_heightForWidth_c767 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// bool QWidgetItem::isEmpty()
 
 
 static void _init_f_isEmpty_c0 (qt_gsi::GenericMethod *decl)
@@ -135,7 +135,7 @@ static void _call_f_isEmpty_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QSize QWidgetItem::maximumSize()
 
 
 static void _init_f_maximumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -150,7 +150,7 @@ static void _call_f_maximumSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QSize QWidgetItem::minimumSize()
 
 
 static void _init_f_minimumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -165,7 +165,7 @@ static void _call_f_minimumSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QRect &)
+// void QWidgetItem::setGeometry(const QRect &)
 
 
 static void _init_f_setGeometry_1792 (qt_gsi::GenericMethod *decl)
@@ -185,7 +185,7 @@ static void _call_f_setGeometry_1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// () const
+// QSize QWidgetItem::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -200,7 +200,7 @@ static void _call_f_sizeHint_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// ()
+// QWidget *QWidgetItem::widget()
 
 
 static void _init_f_widget_0 (qt_gsi::GenericMethod *decl)
@@ -220,17 +220,17 @@ namespace gsi
 
 static gsi::Methods methods_QWidgetItem () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("controlTypes", "@brief Method () const\nThis is a reimplementation of QLayoutItem::controlTypes", true, &_init_f_controlTypes_c0, &_call_f_controlTypes_c0);
-  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method () const\nThis is a reimplementation of QLayoutItem::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
-  methods += new qt_gsi::GenericMethod (":geometry", "@brief Method () const\nThis is a reimplementation of QLayoutItem::geometry", true, &_init_f_geometry_c0, &_call_f_geometry_c0);
-  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Method () const\nThis is a reimplementation of QLayoutItem::hasHeightForWidth", true, &_init_f_hasHeightForWidth_c0, &_call_f_hasHeightForWidth_c0);
-  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method (int) const\nThis is a reimplementation of QLayoutItem::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
-  methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method () const\nThis is a reimplementation of QLayoutItem::isEmpty", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
-  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Method () const\nThis is a reimplementation of QLayoutItem::maximumSize", true, &_init_f_maximumSize_c0, &_call_f_maximumSize_c0);
-  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method () const\nThis is a reimplementation of QLayoutItem::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRect &)\nThis is a reimplementation of QLayoutItem::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method () const\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
-  methods += new qt_gsi::GenericMethod ("widget", "@brief Method ()\nThis is a reimplementation of QLayoutItem::widget", false, &_init_f_widget_0, &_call_f_widget_0);
+  methods += new qt_gsi::GenericMethod ("controlTypes", "@brief Method QFlags<QSizePolicy::ControlType> QWidgetItem::controlTypes()\nThis is a reimplementation of QLayoutItem::controlTypes", true, &_init_f_controlTypes_c0, &_call_f_controlTypes_c0);
+  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method QFlags<Qt::Orientation> QWidgetItem::expandingDirections()\nThis is a reimplementation of QLayoutItem::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
+  methods += new qt_gsi::GenericMethod (":geometry", "@brief Method QRect QWidgetItem::geometry()\nThis is a reimplementation of QLayoutItem::geometry", true, &_init_f_geometry_c0, &_call_f_geometry_c0);
+  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Method bool QWidgetItem::hasHeightForWidth()\nThis is a reimplementation of QLayoutItem::hasHeightForWidth", true, &_init_f_hasHeightForWidth_c0, &_call_f_hasHeightForWidth_c0);
+  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method int QWidgetItem::heightForWidth(int)\nThis is a reimplementation of QLayoutItem::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
+  methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QWidgetItem::isEmpty()\nThis is a reimplementation of QLayoutItem::isEmpty", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
+  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Method QSize QWidgetItem::maximumSize()\nThis is a reimplementation of QLayoutItem::maximumSize", true, &_init_f_maximumSize_c0, &_call_f_maximumSize_c0);
+  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method QSize QWidgetItem::minimumSize()\nThis is a reimplementation of QLayoutItem::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QWidgetItem::setGeometry(const QRect &)\nThis is a reimplementation of QLayoutItem::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method QSize QWidgetItem::sizeHint()\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod ("widget", "@brief Method QWidget *QWidgetItem::widget()\nThis is a reimplementation of QLayoutItem::widget", false, &_init_f_widget_0, &_call_f_widget_0);
   return methods;
 }
 

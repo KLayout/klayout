@@ -98,7 +98,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QEvent *)
+// bool QSlider::event(QEvent *event)
 
 
 static void _init_f_event_1217 (qt_gsi::GenericMethod *decl)
@@ -117,7 +117,7 @@ static void _call_f_event_1217 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QSize QSlider::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -172,7 +172,7 @@ static void _call_f_setTickPosition_2492 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// () const
+// QSize QSlider::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -317,11 +317,11 @@ namespace gsi
 static gsi::Methods methods_QSlider () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Method (QEvent *)\nThis is a reimplementation of QAbstractSlider::event", false, &_init_f_event_1217, &_call_f_event_1217);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Method bool QSlider::event(QEvent *event)\nThis is a reimplementation of QAbstractSlider::event", false, &_init_f_event_1217, &_call_f_event_1217);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QSlider::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("setTickInterval|tickInterval=", "@brief Method void QSlider::setTickInterval(int ti)\n", false, &_init_f_setTickInterval_767, &_call_f_setTickInterval_767);
   methods += new qt_gsi::GenericMethod ("setTickPosition|tickPosition=", "@brief Method void QSlider::setTickPosition(QSlider::TickPosition position)\n", false, &_init_f_setTickPosition_2492, &_call_f_setTickPosition_2492);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QSlider::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":tickInterval", "@brief Method int QSlider::tickInterval()\n", true, &_init_f_tickInterval_c0, &_call_f_tickInterval_c0);
   methods += new qt_gsi::GenericMethod (":tickPosition", "@brief Method QSlider::TickPosition QSlider::tickPosition()\n", true, &_init_f_tickPosition_c0, &_call_f_tickPosition_c0);
   methods += gsi::qt_signal<int > ("actionTriggered(int)", "actionTriggered", gsi::arg("action"), "@brief Signal declaration for QSlider::actionTriggered(int action)\nYou can bind a procedure to this signal.");

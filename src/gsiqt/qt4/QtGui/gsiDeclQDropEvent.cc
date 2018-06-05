@@ -70,7 +70,7 @@ static void _call_f_dropAction_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const char *) const
+// QByteArray QDropEvent::encodedData(const char *)
 
 
 static void _init_f_encodedData_c1731 (qt_gsi::GenericMethod *decl)
@@ -89,7 +89,7 @@ static void _call_f_encodedData_c1731 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (int) const
+// const char *QDropEvent::format(int n)
 
 
 static void _init_f_format_c767 (qt_gsi::GenericMethod *decl)
@@ -198,7 +198,7 @@ static void _call_f_proposedAction_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const char *) const
+// bool QDropEvent::provides(const char *)
 
 
 static void _init_f_provides_c1731 (qt_gsi::GenericMethod *decl)
@@ -304,15 +304,15 @@ static gsi::Methods methods_QDropEvent () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("acceptProposedAction", "@brief Method void QDropEvent::acceptProposedAction()\n", false, &_init_f_acceptProposedAction_0, &_call_f_acceptProposedAction_0);
   methods += new qt_gsi::GenericMethod (":dropAction", "@brief Method Qt::DropAction QDropEvent::dropAction()\n", true, &_init_f_dropAction_c0, &_call_f_dropAction_c0);
-  methods += new qt_gsi::GenericMethod ("encodedData", "@brief Method (const char *) const\nThis is a reimplementation of QMimeSource::encodedData", true, &_init_f_encodedData_c1731, &_call_f_encodedData_c1731);
-  methods += new qt_gsi::GenericMethod ("format", "@brief Method (int) const\nThis is a reimplementation of QMimeSource::format", true, &_init_f_format_c767, &_call_f_format_c767);
+  methods += new qt_gsi::GenericMethod ("encodedData", "@brief Method QByteArray QDropEvent::encodedData(const char *)\nThis is a reimplementation of QMimeSource::encodedData", true, &_init_f_encodedData_c1731, &_call_f_encodedData_c1731);
+  methods += new qt_gsi::GenericMethod ("format", "@brief Method const char *QDropEvent::format(int n)\nThis is a reimplementation of QMimeSource::format", true, &_init_f_format_c767, &_call_f_format_c767);
   methods += new qt_gsi::GenericMethod ("keyboardModifiers", "@brief Method QFlags<Qt::KeyboardModifier> QDropEvent::keyboardModifiers()\n", true, &_init_f_keyboardModifiers_c0, &_call_f_keyboardModifiers_c0);
   methods += new qt_gsi::GenericMethod ("mimeData", "@brief Method const QMimeData *QDropEvent::mimeData()\n", true, &_init_f_mimeData_c0, &_call_f_mimeData_c0);
   methods += new qt_gsi::GenericMethod ("mouseButtons", "@brief Method QFlags<Qt::MouseButton> QDropEvent::mouseButtons()\n", true, &_init_f_mouseButtons_c0, &_call_f_mouseButtons_c0);
   methods += new qt_gsi::GenericMethod ("pos", "@brief Method const QPoint &QDropEvent::pos()\n", true, &_init_f_pos_c0, &_call_f_pos_c0);
   methods += new qt_gsi::GenericMethod ("possibleActions", "@brief Method QFlags<Qt::DropAction> QDropEvent::possibleActions()\n", true, &_init_f_possibleActions_c0, &_call_f_possibleActions_c0);
   methods += new qt_gsi::GenericMethod ("proposedAction", "@brief Method Qt::DropAction QDropEvent::proposedAction()\n", true, &_init_f_proposedAction_c0, &_call_f_proposedAction_c0);
-  methods += new qt_gsi::GenericMethod ("provides", "@brief Method (const char *) const\nThis is a reimplementation of QMimeSource::provides", true, &_init_f_provides_c1731, &_call_f_provides_c1731);
+  methods += new qt_gsi::GenericMethod ("provides", "@brief Method bool QDropEvent::provides(const char *)\nThis is a reimplementation of QMimeSource::provides", true, &_init_f_provides_c1731, &_call_f_provides_c1731);
   methods += new qt_gsi::GenericMethod ("setDropAction|dropAction=", "@brief Method void QDropEvent::setDropAction(Qt::DropAction action)\n", false, &_init_f_setDropAction_1760, &_call_f_setDropAction_1760);
   methods += new qt_gsi::GenericMethod ("source", "@brief Method QWidget *QDropEvent::source()\n", true, &_init_f_source_c0, &_call_f_source_c0);
   methods += new qt_gsi::GenericMethod ("asQEvent", "@brief Delivers the base class interface QEvent of QDropEvent\nClass QDropEvent is derived from multiple base classes. This method delivers the QEvent base class aspect.", false, &_init_f_QDropEvent_as_QEvent, &_call_f_QDropEvent_as_QEvent);

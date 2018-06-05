@@ -434,7 +434,7 @@ static void _call_f_setSmallDecimalPoint_864 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// () const
+// QSize QLCDNumber::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -598,7 +598,7 @@ static gsi::Methods methods_QLCDNumber () {
   methods += new qt_gsi::GenericMethod ("setOctMode", "@brief Method void QLCDNumber::setOctMode()\n", false, &_init_f_setOctMode_0, &_call_f_setOctMode_0);
   methods += new qt_gsi::GenericMethod ("setSegmentStyle|segmentStyle=", "@brief Method void QLCDNumber::setSegmentStyle(QLCDNumber::SegmentStyle)\n", false, &_init_f_setSegmentStyle_2713, &_call_f_setSegmentStyle_2713);
   methods += new qt_gsi::GenericMethod ("setSmallDecimalPoint|smallDecimalPoint=", "@brief Method void QLCDNumber::setSmallDecimalPoint(bool)\n", false, &_init_f_setSmallDecimalPoint_864, &_call_f_setSmallDecimalPoint_864);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QFrame::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QLCDNumber::sizeHint()\nThis is a reimplementation of QFrame::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":smallDecimalPoint", "@brief Method bool QLCDNumber::smallDecimalPoint()\n", true, &_init_f_smallDecimalPoint_c0, &_call_f_smallDecimalPoint_c0);
   methods += new qt_gsi::GenericMethod (":value", "@brief Method double QLCDNumber::value()\n", true, &_init_f_value_c0, &_call_f_value_c0);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QLCDNumber::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");

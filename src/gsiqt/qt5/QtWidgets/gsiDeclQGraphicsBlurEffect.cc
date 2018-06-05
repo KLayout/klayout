@@ -89,7 +89,7 @@ static void _call_f_blurRadius_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QRectF &) const
+// QRectF QGraphicsBlurEffect::boundingRectFor(const QRectF &rect)
 
 
 static void _init_f_boundingRectFor_c1862 (qt_gsi::GenericMethod *decl)
@@ -206,7 +206,7 @@ static gsi::Methods methods_QGraphicsBlurEffect () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":blurHints", "@brief Method QFlags<QGraphicsBlurEffect::BlurHint> QGraphicsBlurEffect::blurHints()\n", true, &_init_f_blurHints_c0, &_call_f_blurHints_c0);
   methods += new qt_gsi::GenericMethod (":blurRadius", "@brief Method double QGraphicsBlurEffect::blurRadius()\n", true, &_init_f_blurRadius_c0, &_call_f_blurRadius_c0);
-  methods += new qt_gsi::GenericMethod ("boundingRectFor", "@brief Method (const QRectF &) const\nThis is a reimplementation of QGraphicsEffect::boundingRectFor", true, &_init_f_boundingRectFor_c1862, &_call_f_boundingRectFor_c1862);
+  methods += new qt_gsi::GenericMethod ("boundingRectFor", "@brief Method QRectF QGraphicsBlurEffect::boundingRectFor(const QRectF &rect)\nThis is a reimplementation of QGraphicsEffect::boundingRectFor", true, &_init_f_boundingRectFor_c1862, &_call_f_boundingRectFor_c1862);
   methods += new qt_gsi::GenericMethod ("setBlurHints|blurHints=", "@brief Method void QGraphicsBlurEffect::setBlurHints(QFlags<QGraphicsBlurEffect::BlurHint> hints)\n", false, &_init_f_setBlurHints_3948, &_call_f_setBlurHints_3948);
   methods += new qt_gsi::GenericMethod ("setBlurRadius|blurRadius=", "@brief Method void QGraphicsBlurEffect::setBlurRadius(double blurRadius)\n", false, &_init_f_setBlurRadius_1071, &_call_f_setBlurRadius_1071);
   methods += gsi::qt_signal<QFlags<QGraphicsBlurEffect::BlurHint> > ("blurHintsChanged(QFlags<QGraphicsBlurEffect::BlurHint>)", "blurHintsChanged", gsi::arg("hints"), "@brief Signal declaration for QGraphicsBlurEffect::blurHintsChanged(QFlags<QGraphicsBlurEffect::BlurHint> hints)\nYou can bind a procedure to this signal.");

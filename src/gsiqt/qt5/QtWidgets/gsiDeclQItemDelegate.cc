@@ -69,7 +69,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const
+// QWidget *QItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index)
 
 
 static void _init_f_createEditor_c6860 (qt_gsi::GenericMethod *decl)
@@ -124,7 +124,7 @@ static void _call_f_itemEditorFactory_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (QPainter *, const QStyleOptionViewItem &, const QModelIndex &) const
+// void QItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index)
 
 
 static void _init_f_paint_c6971 (qt_gsi::GenericMethod *decl)
@@ -170,7 +170,7 @@ static void _call_f_setClipping_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QWidget *, const QModelIndex &) const
+// void QItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 
 
 static void _init_f_setEditorData_c3602 (qt_gsi::GenericMethod *decl)
@@ -213,7 +213,7 @@ static void _call_f_setItemEditorFactory_2445 (const qt_gsi::GenericMethod * /*d
 }
 
 
-// (QWidget *, QAbstractItemModel *, const QModelIndex &) const
+// void QItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index)
 
 
 static void _init_f_setModelData_c5913 (qt_gsi::GenericMethod *decl)
@@ -239,7 +239,7 @@ static void _call_f_setModelData_c5913 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QStyleOptionViewItem &, const QModelIndex &) const
+// QSize QItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index)
 
 
 static void _init_f_sizeHint_c5653 (qt_gsi::GenericMethod *decl)
@@ -261,7 +261,7 @@ static void _call_f_sizeHint_c5653 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const
+// void QItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index)
 
 
 static void _init_f_updateEditorGeometry_c6860 (qt_gsi::GenericMethod *decl)
@@ -343,16 +343,16 @@ namespace gsi
 static gsi::Methods methods_QItemDelegate () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("createEditor", "@brief Method (QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemDelegate::createEditor", true, &_init_f_createEditor_c6860, &_call_f_createEditor_c6860);
+  methods += new qt_gsi::GenericMethod ("createEditor", "@brief Method QWidget *QItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis is a reimplementation of QAbstractItemDelegate::createEditor", true, &_init_f_createEditor_c6860, &_call_f_createEditor_c6860);
   methods += new qt_gsi::GenericMethod ("hasClipping|:clipping", "@brief Method bool QItemDelegate::hasClipping()\n", true, &_init_f_hasClipping_c0, &_call_f_hasClipping_c0);
   methods += new qt_gsi::GenericMethod (":itemEditorFactory", "@brief Method QItemEditorFactory *QItemDelegate::itemEditorFactory()\n", true, &_init_f_itemEditorFactory_c0, &_call_f_itemEditorFactory_c0);
-  methods += new qt_gsi::GenericMethod ("paint", "@brief Method (QPainter *, const QStyleOptionViewItem &, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemDelegate::paint", true, &_init_f_paint_c6971, &_call_f_paint_c6971);
+  methods += new qt_gsi::GenericMethod ("paint", "@brief Method void QItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis is a reimplementation of QAbstractItemDelegate::paint", true, &_init_f_paint_c6971, &_call_f_paint_c6971);
   methods += new qt_gsi::GenericMethod ("setClipping|clipping=", "@brief Method void QItemDelegate::setClipping(bool clip)\n", false, &_init_f_setClipping_864, &_call_f_setClipping_864);
-  methods += new qt_gsi::GenericMethod ("setEditorData", "@brief Method (QWidget *, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemDelegate::setEditorData", true, &_init_f_setEditorData_c3602, &_call_f_setEditorData_c3602);
+  methods += new qt_gsi::GenericMethod ("setEditorData", "@brief Method void QItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index)\nThis is a reimplementation of QAbstractItemDelegate::setEditorData", true, &_init_f_setEditorData_c3602, &_call_f_setEditorData_c3602);
   methods += new qt_gsi::GenericMethod ("setItemEditorFactory|itemEditorFactory=", "@brief Method void QItemDelegate::setItemEditorFactory(QItemEditorFactory *factory)\n", false, &_init_f_setItemEditorFactory_2445, &_call_f_setItemEditorFactory_2445);
-  methods += new qt_gsi::GenericMethod ("setModelData", "@brief Method (QWidget *, QAbstractItemModel *, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemDelegate::setModelData", true, &_init_f_setModelData_c5913, &_call_f_setModelData_c5913);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method (const QStyleOptionViewItem &, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemDelegate::sizeHint", true, &_init_f_sizeHint_c5653, &_call_f_sizeHint_c5653);
-  methods += new qt_gsi::GenericMethod ("updateEditorGeometry", "@brief Method (QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemDelegate::updateEditorGeometry", true, &_init_f_updateEditorGeometry_c6860, &_call_f_updateEditorGeometry_c6860);
+  methods += new qt_gsi::GenericMethod ("setModelData", "@brief Method void QItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index)\nThis is a reimplementation of QAbstractItemDelegate::setModelData", true, &_init_f_setModelData_c5913, &_call_f_setModelData_c5913);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method QSize QItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index)\nThis is a reimplementation of QAbstractItemDelegate::sizeHint", true, &_init_f_sizeHint_c5653, &_call_f_sizeHint_c5653);
+  methods += new qt_gsi::GenericMethod ("updateEditorGeometry", "@brief Method void QItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis is a reimplementation of QAbstractItemDelegate::updateEditorGeometry", true, &_init_f_updateEditorGeometry_c6860, &_call_f_updateEditorGeometry_c6860);
   methods += gsi::qt_signal<QWidget *, const qt_gsi::Converter<QAbstractItemDelegate::EndEditHint>::target_type & > ("closeEditor(QWidget *, QAbstractItemDelegate::EndEditHint)", "closeEditor", gsi::arg("editor"), gsi::arg("hint"), "@brief Signal declaration for QItemDelegate::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QWidget * > ("commitData(QWidget *)", "commitData", gsi::arg("editor"), "@brief Signal declaration for QItemDelegate::commitData(QWidget *editor)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QItemDelegate::destroyed(QObject *)\nYou can bind a procedure to this signal.");

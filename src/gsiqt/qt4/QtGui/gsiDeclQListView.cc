@@ -135,7 +135,7 @@ static void _call_f_clearPropertyFlags_0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// ()
+// void QListView::doItemsLayout()
 
 
 static void _init_f_doItemsLayout_0 (qt_gsi::GenericMethod *decl)
@@ -181,7 +181,7 @@ static void _call_f_gridSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QPoint &) const
+// QModelIndex QListView::indexAt(const QPoint &p)
 
 
 static void _init_f_indexAt_c1916 (qt_gsi::GenericMethod *decl)
@@ -294,7 +294,7 @@ static void _call_f_movement_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// ()
+// void QListView::reset()
 
 
 static void _init_f_reset_0 (qt_gsi::GenericMethod *decl)
@@ -325,7 +325,7 @@ static void _call_f_resizeMode_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QModelIndex &, QAbstractItemView::ScrollHint)
+// void QListView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHint hint)
 
 
 static void _init_f_scrollTo_5576 (qt_gsi::GenericMethod *decl)
@@ -488,7 +488,7 @@ static void _call_f_setResizeMode_2471 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QModelIndex &)
+// void QListView::setRootIndex(const QModelIndex &index)
 
 
 static void _init_f_setRootIndex_2395 (qt_gsi::GenericMethod *decl)
@@ -696,7 +696,7 @@ static void _call_f_viewMode_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QModelIndex &) const
+// QRect QListView::visualRect(const QModelIndex &index)
 
 
 static void _init_f_visualRect_c2395 (qt_gsi::GenericMethod *decl)
@@ -832,19 +832,19 @@ static gsi::Methods methods_QListView () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":batchSize", "@brief Method int QListView::batchSize()\n", true, &_init_f_batchSize_c0, &_call_f_batchSize_c0);
   methods += new qt_gsi::GenericMethod ("clearPropertyFlags", "@brief Method void QListView::clearPropertyFlags()\n", false, &_init_f_clearPropertyFlags_0, &_call_f_clearPropertyFlags_0);
-  methods += new qt_gsi::GenericMethod ("doItemsLayout", "@brief Method ()\nThis is a reimplementation of QAbstractItemView::doItemsLayout", false, &_init_f_doItemsLayout_0, &_call_f_doItemsLayout_0);
+  methods += new qt_gsi::GenericMethod ("doItemsLayout", "@brief Method void QListView::doItemsLayout()\nThis is a reimplementation of QAbstractItemView::doItemsLayout", false, &_init_f_doItemsLayout_0, &_call_f_doItemsLayout_0);
   methods += new qt_gsi::GenericMethod (":flow", "@brief Method QListView::Flow QListView::flow()\n", true, &_init_f_flow_c0, &_call_f_flow_c0);
   methods += new qt_gsi::GenericMethod (":gridSize", "@brief Method QSize QListView::gridSize()\n", true, &_init_f_gridSize_c0, &_call_f_gridSize_c0);
-  methods += new qt_gsi::GenericMethod ("indexAt", "@brief Method (const QPoint &) const\nThis is a reimplementation of QAbstractItemView::indexAt", true, &_init_f_indexAt_c1916, &_call_f_indexAt_c1916);
+  methods += new qt_gsi::GenericMethod ("indexAt", "@brief Method QModelIndex QListView::indexAt(const QPoint &p)\nThis is a reimplementation of QAbstractItemView::indexAt", true, &_init_f_indexAt_c1916, &_call_f_indexAt_c1916);
   methods += new qt_gsi::GenericMethod ("isRowHidden?", "@brief Method bool QListView::isRowHidden(int row)\n", true, &_init_f_isRowHidden_c767, &_call_f_isRowHidden_c767);
   methods += new qt_gsi::GenericMethod ("isSelectionRectVisible?|:selectionRectVisible", "@brief Method bool QListView::isSelectionRectVisible()\n", true, &_init_f_isSelectionRectVisible_c0, &_call_f_isSelectionRectVisible_c0);
   methods += new qt_gsi::GenericMethod ("isWrapping?|:isWrapping", "@brief Method bool QListView::isWrapping()\n", true, &_init_f_isWrapping_c0, &_call_f_isWrapping_c0);
   methods += new qt_gsi::GenericMethod (":layoutMode", "@brief Method QListView::LayoutMode QListView::layoutMode()\n", true, &_init_f_layoutMode_c0, &_call_f_layoutMode_c0);
   methods += new qt_gsi::GenericMethod (":modelColumn", "@brief Method int QListView::modelColumn()\n", true, &_init_f_modelColumn_c0, &_call_f_modelColumn_c0);
   methods += new qt_gsi::GenericMethod (":movement", "@brief Method QListView::Movement QListView::movement()\n", true, &_init_f_movement_c0, &_call_f_movement_c0);
-  methods += new qt_gsi::GenericMethod ("reset", "@brief Method ()\nThis is a reimplementation of QAbstractItemView::reset", false, &_init_f_reset_0, &_call_f_reset_0);
+  methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QListView::reset()\nThis is a reimplementation of QAbstractItemView::reset", false, &_init_f_reset_0, &_call_f_reset_0);
   methods += new qt_gsi::GenericMethod (":resizeMode", "@brief Method QListView::ResizeMode QListView::resizeMode()\n", true, &_init_f_resizeMode_c0, &_call_f_resizeMode_c0);
-  methods += new qt_gsi::GenericMethod ("scrollTo", "@brief Method (const QModelIndex &, QAbstractItemView::ScrollHint)\nThis is a reimplementation of QAbstractItemView::scrollTo", false, &_init_f_scrollTo_5576, &_call_f_scrollTo_5576);
+  methods += new qt_gsi::GenericMethod ("scrollTo", "@brief Method void QListView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHint hint)\nThis is a reimplementation of QAbstractItemView::scrollTo", false, &_init_f_scrollTo_5576, &_call_f_scrollTo_5576);
   methods += new qt_gsi::GenericMethod ("setBatchSize|batchSize=", "@brief Method void QListView::setBatchSize(int batchSize)\n", false, &_init_f_setBatchSize_767, &_call_f_setBatchSize_767);
   methods += new qt_gsi::GenericMethod ("setFlow|flow=", "@brief Method void QListView::setFlow(QListView::Flow flow)\n", false, &_init_f_setFlow_1864, &_call_f_setFlow_1864);
   methods += new qt_gsi::GenericMethod ("setGridSize|gridSize=", "@brief Method void QListView::setGridSize(const QSize &size)\n", false, &_init_f_setGridSize_1805, &_call_f_setGridSize_1805);
@@ -852,7 +852,7 @@ static gsi::Methods methods_QListView () {
   methods += new qt_gsi::GenericMethod ("setModelColumn|modelColumn=", "@brief Method void QListView::setModelColumn(int column)\n", false, &_init_f_setModelColumn_767, &_call_f_setModelColumn_767);
   methods += new qt_gsi::GenericMethod ("setMovement|movement=", "@brief Method void QListView::setMovement(QListView::Movement movement)\n", false, &_init_f_setMovement_2299, &_call_f_setMovement_2299);
   methods += new qt_gsi::GenericMethod ("setResizeMode|resizeMode=", "@brief Method void QListView::setResizeMode(QListView::ResizeMode mode)\n", false, &_init_f_setResizeMode_2471, &_call_f_setResizeMode_2471);
-  methods += new qt_gsi::GenericMethod ("setRootIndex|rootIndex=", "@brief Method (const QModelIndex &)\nThis is a reimplementation of QAbstractItemView::setRootIndex", false, &_init_f_setRootIndex_2395, &_call_f_setRootIndex_2395);
+  methods += new qt_gsi::GenericMethod ("setRootIndex|rootIndex=", "@brief Method void QListView::setRootIndex(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemView::setRootIndex", false, &_init_f_setRootIndex_2395, &_call_f_setRootIndex_2395);
   methods += new qt_gsi::GenericMethod ("setRowHidden", "@brief Method void QListView::setRowHidden(int row, bool hide)\n", false, &_init_f_setRowHidden_1523, &_call_f_setRowHidden_1523);
   methods += new qt_gsi::GenericMethod ("setSelectionRectVisible|selectionRectVisible=", "@brief Method void QListView::setSelectionRectVisible(bool show)\n", false, &_init_f_setSelectionRectVisible_864, &_call_f_setSelectionRectVisible_864);
   methods += new qt_gsi::GenericMethod ("setSpacing|spacing=", "@brief Method void QListView::setSpacing(int space)\n", false, &_init_f_setSpacing_767, &_call_f_setSpacing_767);
@@ -863,7 +863,7 @@ static gsi::Methods methods_QListView () {
   methods += new qt_gsi::GenericMethod (":spacing", "@brief Method int QListView::spacing()\n", true, &_init_f_spacing_c0, &_call_f_spacing_c0);
   methods += new qt_gsi::GenericMethod (":uniformItemSizes", "@brief Method bool QListView::uniformItemSizes()\n", true, &_init_f_uniformItemSizes_c0, &_call_f_uniformItemSizes_c0);
   methods += new qt_gsi::GenericMethod (":viewMode", "@brief Method QListView::ViewMode QListView::viewMode()\n", true, &_init_f_viewMode_c0, &_call_f_viewMode_c0);
-  methods += new qt_gsi::GenericMethod ("visualRect", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemView::visualRect", true, &_init_f_visualRect_c2395, &_call_f_visualRect_c2395);
+  methods += new qt_gsi::GenericMethod ("visualRect", "@brief Method QRect QListView::visualRect(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemView::visualRect", true, &_init_f_visualRect_c2395, &_call_f_visualRect_c2395);
   methods += new qt_gsi::GenericMethod (":wordWrap", "@brief Method bool QListView::wordWrap()\n", true, &_init_f_wordWrap_c0, &_call_f_wordWrap_c0);
   methods += gsi::qt_signal<const QModelIndex & > ("activated(const QModelIndex &)", "activated", gsi::arg("index"), "@brief Signal declaration for QListView::activated(const QModelIndex &index)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex & > ("clicked(const QModelIndex &)", "clicked", gsi::arg("index"), "@brief Signal declaration for QListView::clicked(const QModelIndex &index)\nYou can bind a procedure to this signal.");

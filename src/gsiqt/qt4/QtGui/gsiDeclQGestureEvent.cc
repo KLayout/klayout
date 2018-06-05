@@ -39,7 +39,7 @@
 // -----------------------------------------------------------------------
 // class QGestureEvent
 
-// ()
+// void QGestureEvent::accept()
 
 
 static void _init_f_accept_0 (qt_gsi::GenericMethod *decl)
@@ -55,7 +55,7 @@ static void _call_f_accept_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (QGesture *)
+// void QGestureEvent::accept(QGesture *)
 
 
 static void _init_f_accept_1438 (qt_gsi::GenericMethod *decl)
@@ -75,7 +75,7 @@ static void _call_f_accept_1438 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (Qt::GestureType)
+// void QGestureEvent::accept(Qt::GestureType)
 
 
 static void _init_f_accept_1902 (qt_gsi::GenericMethod *decl)
@@ -159,7 +159,7 @@ static void _call_f_gestures_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// ()
+// void QGestureEvent::ignore()
 
 
 static void _init_f_ignore_0 (qt_gsi::GenericMethod *decl)
@@ -175,7 +175,7 @@ static void _call_f_ignore_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (QGesture *)
+// void QGestureEvent::ignore(QGesture *)
 
 
 static void _init_f_ignore_1438 (qt_gsi::GenericMethod *decl)
@@ -195,7 +195,7 @@ static void _call_f_ignore_1438 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (Qt::GestureType)
+// void QGestureEvent::ignore(Qt::GestureType)
 
 
 static void _init_f_ignore_1902 (qt_gsi::GenericMethod *decl)
@@ -215,7 +215,7 @@ static void _call_f_ignore_1902 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// bool QGestureEvent::isAccepted()
 
 
 static void _init_f_isAccepted_c0 (qt_gsi::GenericMethod *decl)
@@ -230,7 +230,7 @@ static void _call_f_isAccepted_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (QGesture *) const
+// bool QGestureEvent::isAccepted(QGesture *)
 
 
 static void _init_f_isAccepted_c1438 (qt_gsi::GenericMethod *decl)
@@ -249,7 +249,7 @@ static void _call_f_isAccepted_c1438 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (Qt::GestureType) const
+// bool QGestureEvent::isAccepted(Qt::GestureType)
 
 
 static void _init_f_isAccepted_c1902 (qt_gsi::GenericMethod *decl)
@@ -287,7 +287,7 @@ static void _call_f_mapToGraphicsScene_c1986 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// (bool)
+// void QGestureEvent::setAccepted(bool accepted)
 
 
 static void _init_f_setAccepted_864 (qt_gsi::GenericMethod *decl)
@@ -307,7 +307,7 @@ static void _call_f_setAccepted_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QGesture *, bool)
+// void QGestureEvent::setAccepted(QGesture *, bool)
 
 
 static void _init_f_setAccepted_2194 (qt_gsi::GenericMethod *decl)
@@ -330,7 +330,7 @@ static void _call_f_setAccepted_2194 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (Qt::GestureType, bool)
+// void QGestureEvent::setAccepted(Qt::GestureType, bool)
 
 
 static void _init_f_setAccepted_2658 (qt_gsi::GenericMethod *decl)
@@ -393,23 +393,23 @@ namespace gsi
 
 static gsi::Methods methods_QGestureEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("accept", "@brief Method ()\n", false, &_init_f_accept_0, &_call_f_accept_0);
-  methods += new qt_gsi::GenericMethod ("accept", "@brief Method (QGesture *)\n", false, &_init_f_accept_1438, &_call_f_accept_1438);
-  methods += new qt_gsi::GenericMethod ("accept", "@brief Method (Qt::GestureType)\n", false, &_init_f_accept_1902, &_call_f_accept_1902);
+  methods += new qt_gsi::GenericMethod ("accept", "@brief Method void QGestureEvent::accept()\n", false, &_init_f_accept_0, &_call_f_accept_0);
+  methods += new qt_gsi::GenericMethod ("accept", "@brief Method void QGestureEvent::accept(QGesture *)\n", false, &_init_f_accept_1438, &_call_f_accept_1438);
+  methods += new qt_gsi::GenericMethod ("accept", "@brief Method void QGestureEvent::accept(Qt::GestureType)\n", false, &_init_f_accept_1902, &_call_f_accept_1902);
   methods += new qt_gsi::GenericMethod ("activeGestures", "@brief Method QList<QGesture *> QGestureEvent::activeGestures()\n", true, &_init_f_activeGestures_c0, &_call_f_activeGestures_c0);
   methods += new qt_gsi::GenericMethod ("canceledGestures", "@brief Method QList<QGesture *> QGestureEvent::canceledGestures()\n", true, &_init_f_canceledGestures_c0, &_call_f_canceledGestures_c0);
   methods += new qt_gsi::GenericMethod ("gesture", "@brief Method QGesture *QGestureEvent::gesture(Qt::GestureType type)\n", true, &_init_f_gesture_c1902, &_call_f_gesture_c1902);
   methods += new qt_gsi::GenericMethod ("gestures", "@brief Method QList<QGesture *> QGestureEvent::gestures()\n", true, &_init_f_gestures_c0, &_call_f_gestures_c0);
-  methods += new qt_gsi::GenericMethod ("ignore", "@brief Method ()\n", false, &_init_f_ignore_0, &_call_f_ignore_0);
-  methods += new qt_gsi::GenericMethod ("ignore", "@brief Method (QGesture *)\n", false, &_init_f_ignore_1438, &_call_f_ignore_1438);
-  methods += new qt_gsi::GenericMethod ("ignore", "@brief Method (Qt::GestureType)\n", false, &_init_f_ignore_1902, &_call_f_ignore_1902);
-  methods += new qt_gsi::GenericMethod ("isAccepted?|:accepted", "@brief Method () const\n", true, &_init_f_isAccepted_c0, &_call_f_isAccepted_c0);
-  methods += new qt_gsi::GenericMethod ("isAccepted?", "@brief Method (QGesture *) const\n", true, &_init_f_isAccepted_c1438, &_call_f_isAccepted_c1438);
-  methods += new qt_gsi::GenericMethod ("isAccepted?", "@brief Method (Qt::GestureType) const\n", true, &_init_f_isAccepted_c1902, &_call_f_isAccepted_c1902);
+  methods += new qt_gsi::GenericMethod ("ignore", "@brief Method void QGestureEvent::ignore()\n", false, &_init_f_ignore_0, &_call_f_ignore_0);
+  methods += new qt_gsi::GenericMethod ("ignore", "@brief Method void QGestureEvent::ignore(QGesture *)\n", false, &_init_f_ignore_1438, &_call_f_ignore_1438);
+  methods += new qt_gsi::GenericMethod ("ignore", "@brief Method void QGestureEvent::ignore(Qt::GestureType)\n", false, &_init_f_ignore_1902, &_call_f_ignore_1902);
+  methods += new qt_gsi::GenericMethod ("isAccepted?|:accepted", "@brief Method bool QGestureEvent::isAccepted()\n", true, &_init_f_isAccepted_c0, &_call_f_isAccepted_c0);
+  methods += new qt_gsi::GenericMethod ("isAccepted?", "@brief Method bool QGestureEvent::isAccepted(QGesture *)\n", true, &_init_f_isAccepted_c1438, &_call_f_isAccepted_c1438);
+  methods += new qt_gsi::GenericMethod ("isAccepted?", "@brief Method bool QGestureEvent::isAccepted(Qt::GestureType)\n", true, &_init_f_isAccepted_c1902, &_call_f_isAccepted_c1902);
   methods += new qt_gsi::GenericMethod ("mapToGraphicsScene", "@brief Method QPointF QGestureEvent::mapToGraphicsScene(const QPointF &gesturePoint)\n", true, &_init_f_mapToGraphicsScene_c1986, &_call_f_mapToGraphicsScene_c1986);
-  methods += new qt_gsi::GenericMethod ("setAccepted|accepted=", "@brief Method (bool)\n", false, &_init_f_setAccepted_864, &_call_f_setAccepted_864);
-  methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Method (QGesture *, bool)\n", false, &_init_f_setAccepted_2194, &_call_f_setAccepted_2194);
-  methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Method (Qt::GestureType, bool)\n", false, &_init_f_setAccepted_2658, &_call_f_setAccepted_2658);
+  methods += new qt_gsi::GenericMethod ("setAccepted|accepted=", "@brief Method void QGestureEvent::setAccepted(bool accepted)\n", false, &_init_f_setAccepted_864, &_call_f_setAccepted_864);
+  methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Method void QGestureEvent::setAccepted(QGesture *, bool)\n", false, &_init_f_setAccepted_2194, &_call_f_setAccepted_2194);
+  methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Method void QGestureEvent::setAccepted(Qt::GestureType, bool)\n", false, &_init_f_setAccepted_2658, &_call_f_setAccepted_2658);
   methods += new qt_gsi::GenericMethod ("setWidget|widget=", "@brief Method void QGestureEvent::setWidget(QWidget *widget)\n", false, &_init_f_setWidget_1315, &_call_f_setWidget_1315);
   methods += new qt_gsi::GenericMethod (":widget", "@brief Method QWidget *QGestureEvent::widget()\n", true, &_init_f_widget_c0, &_call_f_widget_c0);
   return methods;

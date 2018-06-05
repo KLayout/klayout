@@ -66,7 +66,7 @@
 // -----------------------------------------------------------------------
 // class QGraphicsSimpleTextItem
 
-// () const
+// QRectF QGraphicsSimpleTextItem::boundingRect()
 
 
 static void _init_f_boundingRect_c0 (qt_gsi::GenericMethod *decl)
@@ -81,7 +81,7 @@ static void _call_f_boundingRect_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QPointF &) const
+// bool QGraphicsSimpleTextItem::contains(const QPointF &point)
 
 
 static void _init_f_contains_c1986 (qt_gsi::GenericMethod *decl)
@@ -115,7 +115,7 @@ static void _call_f_font_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (const QGraphicsItem *) const
+// bool QGraphicsSimpleTextItem::isObscuredBy(const QGraphicsItem *item)
 
 
 static void _init_f_isObscuredBy_c2614 (qt_gsi::GenericMethod *decl)
@@ -134,7 +134,7 @@ static void _call_f_isObscuredBy_c2614 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// () const
+// QPainterPath QGraphicsSimpleTextItem::opaqueArea()
 
 
 static void _init_f_opaqueArea_c0 (qt_gsi::GenericMethod *decl)
@@ -149,7 +149,7 @@ static void _call_f_opaqueArea_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
+// void QGraphicsSimpleTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 
 
 static void _init_f_paint_6301 (qt_gsi::GenericMethod *decl)
@@ -215,7 +215,7 @@ static void _call_f_setText_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QPainterPath QGraphicsSimpleTextItem::shape()
 
 
 static void _init_f_shape_c0 (qt_gsi::GenericMethod *decl)
@@ -245,7 +245,7 @@ static void _call_f_text_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// () const
+// int QGraphicsSimpleTextItem::type()
 
 
 static void _init_f_type_c0 (qt_gsi::GenericMethod *decl)
@@ -265,17 +265,17 @@ namespace gsi
 
 static gsi::Methods methods_QGraphicsSimpleTextItem () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::boundingRect", true, &_init_f_boundingRect_c0, &_call_f_boundingRect_c0);
-  methods += new qt_gsi::GenericMethod ("contains", "@brief Method (const QPointF &) const\nThis is a reimplementation of QGraphicsItem::contains", true, &_init_f_contains_c1986, &_call_f_contains_c1986);
+  methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method QRectF QGraphicsSimpleTextItem::boundingRect()\nThis is a reimplementation of QGraphicsItem::boundingRect", true, &_init_f_boundingRect_c0, &_call_f_boundingRect_c0);
+  methods += new qt_gsi::GenericMethod ("contains", "@brief Method bool QGraphicsSimpleTextItem::contains(const QPointF &point)\nThis is a reimplementation of QGraphicsItem::contains", true, &_init_f_contains_c1986, &_call_f_contains_c1986);
   methods += new qt_gsi::GenericMethod (":font", "@brief Method QFont QGraphicsSimpleTextItem::font()\n", true, &_init_f_font_c0, &_call_f_font_c0);
-  methods += new qt_gsi::GenericMethod ("isObscuredBy?", "@brief Method (const QGraphicsItem *) const\nThis is a reimplementation of QAbstractGraphicsShapeItem::isObscuredBy", true, &_init_f_isObscuredBy_c2614, &_call_f_isObscuredBy_c2614);
-  methods += new qt_gsi::GenericMethod ("opaqueArea", "@brief Method () const\nThis is a reimplementation of QAbstractGraphicsShapeItem::opaqueArea", true, &_init_f_opaqueArea_c0, &_call_f_opaqueArea_c0);
-  methods += new qt_gsi::GenericMethod ("paint", "@brief Method (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)\nThis is a reimplementation of QGraphicsItem::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
+  methods += new qt_gsi::GenericMethod ("isObscuredBy?", "@brief Method bool QGraphicsSimpleTextItem::isObscuredBy(const QGraphicsItem *item)\nThis is a reimplementation of QAbstractGraphicsShapeItem::isObscuredBy", true, &_init_f_isObscuredBy_c2614, &_call_f_isObscuredBy_c2614);
+  methods += new qt_gsi::GenericMethod ("opaqueArea", "@brief Method QPainterPath QGraphicsSimpleTextItem::opaqueArea()\nThis is a reimplementation of QAbstractGraphicsShapeItem::opaqueArea", true, &_init_f_opaqueArea_c0, &_call_f_opaqueArea_c0);
+  methods += new qt_gsi::GenericMethod ("paint", "@brief Method void QGraphicsSimpleTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)\nThis is a reimplementation of QGraphicsItem::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
   methods += new qt_gsi::GenericMethod ("setFont|font=", "@brief Method void QGraphicsSimpleTextItem::setFont(const QFont &font)\n", false, &_init_f_setFont_1801, &_call_f_setFont_1801);
   methods += new qt_gsi::GenericMethod ("setText|text=", "@brief Method void QGraphicsSimpleTextItem::setText(const QString &text)\n", false, &_init_f_setText_2025, &_call_f_setText_2025);
-  methods += new qt_gsi::GenericMethod ("shape", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::shape", true, &_init_f_shape_c0, &_call_f_shape_c0);
+  methods += new qt_gsi::GenericMethod ("shape", "@brief Method QPainterPath QGraphicsSimpleTextItem::shape()\nThis is a reimplementation of QGraphicsItem::shape", true, &_init_f_shape_c0, &_call_f_shape_c0);
   methods += new qt_gsi::GenericMethod (":text", "@brief Method QString QGraphicsSimpleTextItem::text()\n", true, &_init_f_text_c0, &_call_f_text_c0);
-  methods += new qt_gsi::GenericMethod ("type", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::type", true, &_init_f_type_c0, &_call_f_type_c0);
+  methods += new qt_gsi::GenericMethod ("type", "@brief Method int QGraphicsSimpleTextItem::type()\nThis is a reimplementation of QGraphicsItem::type", true, &_init_f_type_c0, &_call_f_type_c0);
   return methods;
 }
 

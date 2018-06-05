@@ -53,7 +53,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// () const
+// QMultimedia::AvailabilityStatus QMediaPlayer::availability()
 
 
 static void _init_f_availability_c0 (qt_gsi::GenericMethod *decl)
@@ -68,7 +68,7 @@ static void _call_f_availability_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QObject *)
+// bool QMediaPlayer::bind(QObject *)
 
 
 static void _init_f_bind_1302 (qt_gsi::GenericMethod *decl)
@@ -593,7 +593,7 @@ static void _call_f_stop_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QObject *)
+// void QMediaPlayer::unbind(QObject *)
 
 
 static void _init_f_unbind_1302 (qt_gsi::GenericMethod *decl)
@@ -728,8 +728,8 @@ namespace gsi
 static gsi::Methods methods_QMediaPlayer () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("availability", "@brief Method () const\nThis is a reimplementation of QMediaObject::availability", true, &_init_f_availability_c0, &_call_f_availability_c0);
-  methods += new qt_gsi::GenericMethod ("bind", "@brief Method (QObject *)\nThis is a reimplementation of QMediaObject::bind", false, &_init_f_bind_1302, &_call_f_bind_1302);
+  methods += new qt_gsi::GenericMethod ("availability", "@brief Method QMultimedia::AvailabilityStatus QMediaPlayer::availability()\nThis is a reimplementation of QMediaObject::availability", true, &_init_f_availability_c0, &_call_f_availability_c0);
+  methods += new qt_gsi::GenericMethod ("bind", "@brief Method bool QMediaPlayer::bind(QObject *)\nThis is a reimplementation of QMediaObject::bind", false, &_init_f_bind_1302, &_call_f_bind_1302);
   methods += new qt_gsi::GenericMethod (":bufferStatus", "@brief Method int QMediaPlayer::bufferStatus()\n", true, &_init_f_bufferStatus_c0, &_call_f_bufferStatus_c0);
   methods += new qt_gsi::GenericMethod (":currentMedia", "@brief Method QMediaContent QMediaPlayer::currentMedia()\n", true, &_init_f_currentMedia_c0, &_call_f_currentMedia_c0);
   methods += new qt_gsi::GenericMethod ("currentNetworkConfiguration", "@brief Method QNetworkConfiguration QMediaPlayer::currentNetworkConfiguration()\n", true, &_init_f_currentNetworkConfiguration_c0, &_call_f_currentNetworkConfiguration_c0);
@@ -760,7 +760,7 @@ static gsi::Methods methods_QMediaPlayer () {
   methods += new qt_gsi::GenericMethod ("setVolume|volume=", "@brief Method void QMediaPlayer::setVolume(int volume)\n", false, &_init_f_setVolume_767, &_call_f_setVolume_767);
   methods += new qt_gsi::GenericMethod (":state", "@brief Method QMediaPlayer::State QMediaPlayer::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Method void QMediaPlayer::stop()\n", false, &_init_f_stop_0, &_call_f_stop_0);
-  methods += new qt_gsi::GenericMethod ("unbind", "@brief Method (QObject *)\nThis is a reimplementation of QMediaObject::unbind", false, &_init_f_unbind_1302, &_call_f_unbind_1302);
+  methods += new qt_gsi::GenericMethod ("unbind", "@brief Method void QMediaPlayer::unbind(QObject *)\nThis is a reimplementation of QMediaObject::unbind", false, &_init_f_unbind_1302, &_call_f_unbind_1302);
   methods += new qt_gsi::GenericMethod (":volume", "@brief Method int QMediaPlayer::volume()\n", true, &_init_f_volume_c0, &_call_f_volume_c0);
   methods += gsi::qt_signal<bool > ("audioAvailableChanged(bool)", "audioAvailableChanged", gsi::arg("available"), "@brief Signal declaration for QMediaPlayer::audioAvailableChanged(bool available)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("availabilityChanged(bool)", "availabilityChanged_bool", gsi::arg("available"), "@brief Signal declaration for QMediaPlayer::availabilityChanged(bool available)\nYou can bind a procedure to this signal.");

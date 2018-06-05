@@ -150,7 +150,7 @@ static void _call_f_pixmap_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// ()
+// void QSplashScreen::repaint()
 
 
 static void _init_f_repaint_0 (qt_gsi::GenericMethod *decl)
@@ -315,7 +315,7 @@ static gsi::Methods methods_QSplashScreen () {
   methods += new qt_gsi::GenericMethod ("clearMessage", "@brief Method void QSplashScreen::clearMessage()\n", false, &_init_f_clearMessage_0, &_call_f_clearMessage_0);
   methods += new qt_gsi::GenericMethod ("finish", "@brief Method void QSplashScreen::finish(QWidget *w)\n", false, &_init_f_finish_1315, &_call_f_finish_1315);
   methods += new qt_gsi::GenericMethod (":pixmap", "@brief Method const QPixmap QSplashScreen::pixmap()\n", true, &_init_f_pixmap_c0, &_call_f_pixmap_c0);
-  methods += new qt_gsi::GenericMethod ("repaint", "@brief Method ()\n", false, &_init_f_repaint_0, &_call_f_repaint_0);
+  methods += new qt_gsi::GenericMethod ("repaint", "@brief Method void QSplashScreen::repaint()\n", false, &_init_f_repaint_0, &_call_f_repaint_0);
   methods += new qt_gsi::GenericMethod ("setPixmap|pixmap=", "@brief Method void QSplashScreen::setPixmap(const QPixmap &pixmap)\n", false, &_init_f_setPixmap_2017, &_call_f_setPixmap_2017);
   methods += new qt_gsi::GenericMethod ("showMessage", "@brief Method void QSplashScreen::showMessage(const QString &message, int alignment, const QColor &color)\n", false, &_init_f_showMessage_4481, &_call_f_showMessage_4481);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QSplashScreen::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");

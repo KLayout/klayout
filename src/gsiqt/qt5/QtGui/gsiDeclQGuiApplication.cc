@@ -99,7 +99,7 @@ static void _call_f_isSessionRestored_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (QObject *, QEvent *)
+// bool QGuiApplication::notify(QObject *, QEvent *)
 
 
 static void _init_f_notify_2411 (qt_gsi::GenericMethod *decl)
@@ -831,7 +831,7 @@ static gsi::Methods methods_QGuiApplication () {
   methods += new qt_gsi::GenericMethod ("devicePixelRatio", "@brief Method double QGuiApplication::devicePixelRatio()\n", true, &_init_f_devicePixelRatio_c0, &_call_f_devicePixelRatio_c0);
   methods += new qt_gsi::GenericMethod ("isSavingSession?", "@brief Method bool QGuiApplication::isSavingSession()\n", true, &_init_f_isSavingSession_c0, &_call_f_isSavingSession_c0);
   methods += new qt_gsi::GenericMethod ("isSessionRestored?", "@brief Method bool QGuiApplication::isSessionRestored()\n", true, &_init_f_isSessionRestored_c0, &_call_f_isSessionRestored_c0);
-  methods += new qt_gsi::GenericMethod ("notify", "@brief Method (QObject *, QEvent *)\nThis is a reimplementation of QCoreApplication::notify", false, &_init_f_notify_2411, &_call_f_notify_2411);
+  methods += new qt_gsi::GenericMethod ("notify", "@brief Method bool QGuiApplication::notify(QObject *, QEvent *)\nThis is a reimplementation of QCoreApplication::notify", false, &_init_f_notify_2411, &_call_f_notify_2411);
   methods += new qt_gsi::GenericMethod ("sessionId", "@brief Method QString QGuiApplication::sessionId()\n", true, &_init_f_sessionId_c0, &_call_f_sessionId_c0);
   methods += new qt_gsi::GenericMethod ("sessionKey", "@brief Method QString QGuiApplication::sessionKey()\n", true, &_init_f_sessionKey_c0, &_call_f_sessionKey_c0);
   methods += gsi::qt_signal ("applicationNameChanged()", "applicationNameChanged", "@brief Signal declaration for QGuiApplication::applicationNameChanged()\nYou can bind a procedure to this signal.");

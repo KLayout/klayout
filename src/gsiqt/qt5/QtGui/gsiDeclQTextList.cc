@@ -93,7 +93,7 @@ static void _call_f_count_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// () const
+// QTextListFormat QTextList::format()
 
 
 static void _init_f_format_c0 (qt_gsi::GenericMethod *decl)
@@ -220,7 +220,7 @@ static void _call_f_removeItem_767 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QTextListFormat &)
+// void QTextList::setFormat(const QTextListFormat &format)
 
 
 static void _init_f_setFormat_2844 (qt_gsi::GenericMethod *decl)
@@ -298,14 +298,14 @@ static gsi::Methods methods_QTextList () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("add", "@brief Method void QTextList::add(const QTextBlock &block)\n", false, &_init_f_add_2306, &_call_f_add_2306);
   methods += new qt_gsi::GenericMethod ("count", "@brief Method int QTextList::count()\n", true, &_init_f_count_c0, &_call_f_count_c0);
-  methods += new qt_gsi::GenericMethod (":format", "@brief Method () const\n", true, &_init_f_format_c0, &_call_f_format_c0);
+  methods += new qt_gsi::GenericMethod (":format", "@brief Method QTextListFormat QTextList::format()\n", true, &_init_f_format_c0, &_call_f_format_c0);
   methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QTextList::isEmpty()\n", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
   methods += new qt_gsi::GenericMethod ("item", "@brief Method QTextBlock QTextList::item(int i)\n", true, &_init_f_item_c767, &_call_f_item_c767);
   methods += new qt_gsi::GenericMethod ("itemNumber", "@brief Method int QTextList::itemNumber(const QTextBlock &)\n", true, &_init_f_itemNumber_c2306, &_call_f_itemNumber_c2306);
   methods += new qt_gsi::GenericMethod ("itemText", "@brief Method QString QTextList::itemText(const QTextBlock &)\n", true, &_init_f_itemText_c2306, &_call_f_itemText_c2306);
   methods += new qt_gsi::GenericMethod ("remove", "@brief Method void QTextList::remove(const QTextBlock &)\n", false, &_init_f_remove_2306, &_call_f_remove_2306);
   methods += new qt_gsi::GenericMethod ("removeItem", "@brief Method void QTextList::removeItem(int i)\n", false, &_init_f_removeItem_767, &_call_f_removeItem_767);
-  methods += new qt_gsi::GenericMethod ("setFormat|format=", "@brief Method (const QTextListFormat &)\n", false, &_init_f_setFormat_2844, &_call_f_setFormat_2844);
+  methods += new qt_gsi::GenericMethod ("setFormat|format=", "@brief Method void QTextList::setFormat(const QTextListFormat &format)\n", false, &_init_f_setFormat_2844, &_call_f_setFormat_2844);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QTextList::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QTextList::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QTextList::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);

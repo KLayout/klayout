@@ -161,7 +161,7 @@ static void _call_f_isFlat_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// QSize QGroupBox::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -351,7 +351,7 @@ static gsi::Methods methods_QGroupBox () {
   methods += new qt_gsi::GenericMethod ("isCheckable?|:checkable", "@brief Method bool QGroupBox::isCheckable()\n", true, &_init_f_isCheckable_c0, &_call_f_isCheckable_c0);
   methods += new qt_gsi::GenericMethod ("isChecked?|:checked", "@brief Method bool QGroupBox::isChecked()\n", true, &_init_f_isChecked_c0, &_call_f_isChecked_c0);
   methods += new qt_gsi::GenericMethod ("isFlat?|:flat", "@brief Method bool QGroupBox::isFlat()\n", true, &_init_f_isFlat_c0, &_call_f_isFlat_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QGroupBox::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("setAlignment|alignment=", "@brief Method void QGroupBox::setAlignment(int alignment)\n", false, &_init_f_setAlignment_767, &_call_f_setAlignment_767);
   methods += new qt_gsi::GenericMethod ("setCheckable|checkable=", "@brief Method void QGroupBox::setCheckable(bool checkable)\n", false, &_init_f_setCheckable_864, &_call_f_setCheckable_864);
   methods += new qt_gsi::GenericMethod ("setChecked|checked=", "@brief Method void QGroupBox::setChecked(bool checked)\n", false, &_init_f_setChecked_864, &_call_f_setChecked_864);

@@ -341,7 +341,7 @@ static void _call_f_informativeText_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// ()
+// void QMessageBox::open()
 
 
 static void _init_f_open_0 (qt_gsi::GenericMethod *decl)
@@ -357,7 +357,7 @@ static void _call_f_open_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QObject *, const char *)
+// void QMessageBox::open(QObject *receiver, const char *member)
 
 
 static void _init_f_open_2925 (qt_gsi::GenericMethod *decl)
@@ -643,7 +643,7 @@ static void _call_f_setTextFormat_1787 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (Qt::WindowModality)
+// void QMessageBox::setWindowModality(Qt::WindowModality windowModality)
 
 
 static void _init_f_setWindowModality_2216 (qt_gsi::GenericMethod *decl)
@@ -663,7 +663,7 @@ static void _call_f_setWindowModality_2216 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (const QString &)
+// void QMessageBox::setWindowTitle(const QString &title)
 
 
 static void _init_f_setWindowTitle_2025 (qt_gsi::GenericMethod *decl)
@@ -683,7 +683,7 @@ static void _call_f_setWindowTitle_2025 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// QSize QMessageBox::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -1049,8 +1049,8 @@ static gsi::Methods methods_QMessageBox () {
   methods += new qt_gsi::GenericMethod (":icon", "@brief Method QMessageBox::Icon QMessageBox::icon()\n", true, &_init_f_icon_c0, &_call_f_icon_c0);
   methods += new qt_gsi::GenericMethod (":iconPixmap", "@brief Method QPixmap QMessageBox::iconPixmap()\n", true, &_init_f_iconPixmap_c0, &_call_f_iconPixmap_c0);
   methods += new qt_gsi::GenericMethod (":informativeText", "@brief Method QString QMessageBox::informativeText()\n", true, &_init_f_informativeText_c0, &_call_f_informativeText_c0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method ()\n", false, &_init_f_open_0, &_call_f_open_0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method (QObject *, const char *)\n", false, &_init_f_open_2925, &_call_f_open_2925);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QMessageBox::open()\n", false, &_init_f_open_0, &_call_f_open_0);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QMessageBox::open(QObject *receiver, const char *member)\n", false, &_init_f_open_2925, &_call_f_open_2925);
   methods += new qt_gsi::GenericMethod ("removeButton", "@brief Method void QMessageBox::removeButton(QAbstractButton *button)\n", false, &_init_f_removeButton_2159, &_call_f_removeButton_2159);
   methods += new qt_gsi::GenericMethod ("setButtonText", "@brief Method void QMessageBox::setButtonText(int button, const QString &text)\n", false, &_init_f_setButtonText_2684, &_call_f_setButtonText_2684);
   methods += new qt_gsi::GenericMethod ("setDefaultButton|defaultButton=", "@brief Method void QMessageBox::setDefaultButton(QPushButton *button)\n", false, &_init_f_setDefaultButton_1755, &_call_f_setDefaultButton_1755);
@@ -1064,9 +1064,9 @@ static gsi::Methods methods_QMessageBox () {
   methods += new qt_gsi::GenericMethod ("setStandardButtons|standardButtons=", "@brief Method void QMessageBox::setStandardButtons(QFlags<QMessageBox::StandardButton> buttons)\n", false, &_init_f_setStandardButtons_3788, &_call_f_setStandardButtons_3788);
   methods += new qt_gsi::GenericMethod ("setText|text=", "@brief Method void QMessageBox::setText(const QString &text)\n", false, &_init_f_setText_2025, &_call_f_setText_2025);
   methods += new qt_gsi::GenericMethod ("setTextFormat|textFormat=", "@brief Method void QMessageBox::setTextFormat(Qt::TextFormat format)\n", false, &_init_f_setTextFormat_1787, &_call_f_setTextFormat_1787);
-  methods += new qt_gsi::GenericMethod ("setWindowModality|windowModality=", "@brief Method (Qt::WindowModality)\n", false, &_init_f_setWindowModality_2216, &_call_f_setWindowModality_2216);
-  methods += new qt_gsi::GenericMethod ("setWindowTitle|windowTitle=", "@brief Method (const QString &)\n", false, &_init_f_setWindowTitle_2025, &_call_f_setWindowTitle_2025);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QDialog::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod ("setWindowModality|windowModality=", "@brief Method void QMessageBox::setWindowModality(Qt::WindowModality windowModality)\n", false, &_init_f_setWindowModality_2216, &_call_f_setWindowModality_2216);
+  methods += new qt_gsi::GenericMethod ("setWindowTitle|windowTitle=", "@brief Method void QMessageBox::setWindowTitle(const QString &title)\n", false, &_init_f_setWindowTitle_2025, &_call_f_setWindowTitle_2025);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QMessageBox::sizeHint()\nThis is a reimplementation of QDialog::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod ("standardButton", "@brief Method QMessageBox::StandardButton QMessageBox::standardButton(QAbstractButton *button)\n", true, &_init_f_standardButton_c2159, &_call_f_standardButton_c2159);
   methods += new qt_gsi::GenericMethod (":standardButtons", "@brief Method QFlags<QMessageBox::StandardButton> QMessageBox::standardButtons()\n", true, &_init_f_standardButtons_c0, &_call_f_standardButtons_c0);
   methods += new qt_gsi::GenericMethod (":text", "@brief Method QString QMessageBox::text()\n", true, &_init_f_text_c0, &_call_f_text_c0);

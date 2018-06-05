@@ -326,7 +326,7 @@ static void _call_f_setMidLineWidth_767 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// QSize QFrame::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -410,7 +410,7 @@ static gsi::Methods methods_QFrame () {
   methods += new qt_gsi::GenericMethod ("setFrameStyle|frameStyle=", "@brief Method void QFrame::setFrameStyle(int)\n", false, &_init_f_setFrameStyle_767, &_call_f_setFrameStyle_767);
   methods += new qt_gsi::GenericMethod ("setLineWidth|lineWidth=", "@brief Method void QFrame::setLineWidth(int)\n", false, &_init_f_setLineWidth_767, &_call_f_setLineWidth_767);
   methods += new qt_gsi::GenericMethod ("setMidLineWidth|midLineWidth=", "@brief Method void QFrame::setMidLineWidth(int)\n", false, &_init_f_setMidLineWidth_767, &_call_f_setMidLineWidth_767);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QFrame::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QFrame::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QFrame::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QIcon & > ("windowIconChanged(const QIcon &)", "windowIconChanged", gsi::arg("icon"), "@brief Signal declaration for QFrame::windowIconChanged(const QIcon &icon)\nYou can bind a procedure to this signal.");

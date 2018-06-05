@@ -393,7 +393,7 @@ static void _call_f_pageSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// QPaintEngine *QPrinter::paintEngine()
 
 
 static void _init_f_paintEngine_c0 (qt_gsi::GenericMethod *decl)
@@ -1116,7 +1116,7 @@ static gsi::Methods methods_QPrinter () {
   methods += new qt_gsi::GenericMethod ("pageRect", "@brief Method QRect QPrinter::pageRect()\n", true, &_init_f_pageRect_c0, &_call_f_pageRect_c0);
   methods += new qt_gsi::GenericMethod ("pageRect", "@brief Method QRectF QPrinter::pageRect(QPrinter::Unit)\n", true, &_init_f_pageRect_c1789, &_call_f_pageRect_c1789);
   methods += new qt_gsi::GenericMethod (":pageSize", "@brief Method QPrinter::PageSize QPrinter::pageSize()\n", true, &_init_f_pageSize_c0, &_call_f_pageSize_c0);
-  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Method () const\nThis is a reimplementation of QPaintDevice::paintEngine", true, &_init_f_paintEngine_c0, &_call_f_paintEngine_c0);
+  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Method QPaintEngine *QPrinter::paintEngine()\nThis is a reimplementation of QPaintDevice::paintEngine", true, &_init_f_paintEngine_c0, &_call_f_paintEngine_c0);
   methods += new qt_gsi::GenericMethod ("paperRect", "@brief Method QRect QPrinter::paperRect()\n", true, &_init_f_paperRect_c0, &_call_f_paperRect_c0);
   methods += new qt_gsi::GenericMethod ("paperRect", "@brief Method QRectF QPrinter::paperRect(QPrinter::Unit)\n", true, &_init_f_paperRect_c1789, &_call_f_paperRect_c1789);
   methods += new qt_gsi::GenericMethod (":paperSize", "@brief Method QPrinter::PageSize QPrinter::paperSize()\n", true, &_init_f_paperSize_c0, &_call_f_paperSize_c0);

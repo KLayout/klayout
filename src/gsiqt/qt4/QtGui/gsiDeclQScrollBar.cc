@@ -98,7 +98,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QEvent *)
+// bool QScrollBar::event(QEvent *event)
 
 
 static void _init_f_event_1217 (qt_gsi::GenericMethod *decl)
@@ -117,7 +117,7 @@ static void _call_f_event_1217 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QSize QScrollBar::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -232,8 +232,8 @@ namespace gsi
 static gsi::Methods methods_QScrollBar () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Method (QEvent *)\nThis is a reimplementation of QAbstractSlider::event", false, &_init_f_event_1217, &_call_f_event_1217);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Method bool QScrollBar::event(QEvent *event)\nThis is a reimplementation of QAbstractSlider::event", false, &_init_f_event_1217, &_call_f_event_1217);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QScrollBar::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += gsi::qt_signal<int > ("actionTriggered(int)", "actionTriggered", gsi::arg("action"), "@brief Signal declaration for QScrollBar::actionTriggered(int action)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QScrollBar::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QScrollBar::destroyed(QObject *)\nYou can bind a procedure to this signal.");

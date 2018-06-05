@@ -162,7 +162,7 @@ static void _call_f_clearContents_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QTableWidgetItem *)
+// void QTableWidget::closePersistentEditor(QTableWidgetItem *item)
 
 
 static void _init_f_closePersistentEditor_2202 (qt_gsi::GenericMethod *decl)
@@ -381,7 +381,7 @@ static void _call_f_isItemSelected_c2897 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// () const
+// bool QTableWidget::isSortingEnabled()
 
 
 static void _init_f_isSortingEnabled_c0 (qt_gsi::GenericMethod *decl)
@@ -474,7 +474,7 @@ static void _call_f_itemPrototype_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (QTableWidgetItem *)
+// void QTableWidget::openPersistentEditor(QTableWidgetItem *item)
 
 
 static void _init_f_openPersistentEditor_2202 (qt_gsi::GenericMethod *decl)
@@ -938,7 +938,7 @@ static void _call_f_setRowCount_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (bool)
+// void QTableWidget::setSortingEnabled(bool enable)
 
 
 static void _init_f_setSortingEnabled_864 (qt_gsi::GenericMethod *decl)
@@ -1263,7 +1263,7 @@ static gsi::Methods methods_QTableWidget () {
   methods += new qt_gsi::GenericMethod ("cellWidget", "@brief Method QWidget *QTableWidget::cellWidget(int row, int column)\n", true, &_init_f_cellWidget_c1426, &_call_f_cellWidget_c1426);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QTableWidget::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
   methods += new qt_gsi::GenericMethod ("clearContents", "@brief Method void QTableWidget::clearContents()\n", false, &_init_f_clearContents_0, &_call_f_clearContents_0);
-  methods += new qt_gsi::GenericMethod ("closePersistentEditor", "@brief Method (QTableWidgetItem *)\n", false, &_init_f_closePersistentEditor_2202, &_call_f_closePersistentEditor_2202);
+  methods += new qt_gsi::GenericMethod ("closePersistentEditor", "@brief Method void QTableWidget::closePersistentEditor(QTableWidgetItem *item)\n", false, &_init_f_closePersistentEditor_2202, &_call_f_closePersistentEditor_2202);
   methods += new qt_gsi::GenericMethod ("column", "@brief Method int QTableWidget::column(const QTableWidgetItem *item)\n", true, &_init_f_column_c2897, &_call_f_column_c2897);
   methods += new qt_gsi::GenericMethod (":columnCount", "@brief Method int QTableWidget::columnCount()\n", true, &_init_f_columnCount_c0, &_call_f_columnCount_c0);
   methods += new qt_gsi::GenericMethod ("currentColumn", "@brief Method int QTableWidget::currentColumn()\n", true, &_init_f_currentColumn_c0, &_call_f_currentColumn_c0);
@@ -1275,12 +1275,12 @@ static gsi::Methods methods_QTableWidget () {
   methods += new qt_gsi::GenericMethod ("insertColumn", "@brief Method void QTableWidget::insertColumn(int column)\n", false, &_init_f_insertColumn_767, &_call_f_insertColumn_767);
   methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QTableWidget::insertRow(int row)\n", false, &_init_f_insertRow_767, &_call_f_insertRow_767);
   methods += new qt_gsi::GenericMethod ("isItemSelected?", "@brief Method bool QTableWidget::isItemSelected(const QTableWidgetItem *item)\n", true, &_init_f_isItemSelected_c2897, &_call_f_isItemSelected_c2897);
-  methods += new qt_gsi::GenericMethod ("isSortingEnabled?|:sortingEnabled", "@brief Method () const\n", true, &_init_f_isSortingEnabled_c0, &_call_f_isSortingEnabled_c0);
+  methods += new qt_gsi::GenericMethod ("isSortingEnabled?|:sortingEnabled", "@brief Method bool QTableWidget::isSortingEnabled()\n", true, &_init_f_isSortingEnabled_c0, &_call_f_isSortingEnabled_c0);
   methods += new qt_gsi::GenericMethod ("item", "@brief Method QTableWidgetItem *QTableWidget::item(int row, int column)\n", true, &_init_f_item_c1426, &_call_f_item_c1426);
   methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QTableWidgetItem *QTableWidget::itemAt(const QPoint &p)\n", true, &_init_f_itemAt_c1916, &_call_f_itemAt_c1916);
   methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QTableWidgetItem *QTableWidget::itemAt(int x, int y)\n", true, &_init_f_itemAt_c1426, &_call_f_itemAt_c1426);
   methods += new qt_gsi::GenericMethod (":itemPrototype", "@brief Method const QTableWidgetItem *QTableWidget::itemPrototype()\n", true, &_init_f_itemPrototype_c0, &_call_f_itemPrototype_c0);
-  methods += new qt_gsi::GenericMethod ("openPersistentEditor", "@brief Method (QTableWidgetItem *)\n", false, &_init_f_openPersistentEditor_2202, &_call_f_openPersistentEditor_2202);
+  methods += new qt_gsi::GenericMethod ("openPersistentEditor", "@brief Method void QTableWidget::openPersistentEditor(QTableWidgetItem *item)\n", false, &_init_f_openPersistentEditor_2202, &_call_f_openPersistentEditor_2202);
   methods += new qt_gsi::GenericMethod ("removeCellWidget", "@brief Method void QTableWidget::removeCellWidget(int row, int column)\n", false, &_init_f_removeCellWidget_1426, &_call_f_removeCellWidget_1426);
   methods += new qt_gsi::GenericMethod ("removeColumn", "@brief Method void QTableWidget::removeColumn(int column)\n", false, &_init_f_removeColumn_767, &_call_f_removeColumn_767);
   methods += new qt_gsi::GenericMethod ("removeRow", "@brief Method void QTableWidget::removeRow(int row)\n", false, &_init_f_removeRow_767, &_call_f_removeRow_767);
@@ -1302,7 +1302,7 @@ static gsi::Methods methods_QTableWidget () {
   methods += new qt_gsi::GenericMethod ("setItemSelected", "@brief Method void QTableWidget::setItemSelected(const QTableWidgetItem *item, bool select)\n", false, &_init_f_setItemSelected_3653, &_call_f_setItemSelected_3653);
   methods += new qt_gsi::GenericMethod ("setRangeSelected", "@brief Method void QTableWidget::setRangeSelected(const QTableWidgetSelectionRange &range, bool select)\n", false, &_init_f_setRangeSelected_4677, &_call_f_setRangeSelected_4677);
   methods += new qt_gsi::GenericMethod ("setRowCount|rowCount=", "@brief Method void QTableWidget::setRowCount(int rows)\n", false, &_init_f_setRowCount_767, &_call_f_setRowCount_767);
-  methods += new qt_gsi::GenericMethod ("setSortingEnabled|sortingEnabled=", "@brief Method (bool)\n", false, &_init_f_setSortingEnabled_864, &_call_f_setSortingEnabled_864);
+  methods += new qt_gsi::GenericMethod ("setSortingEnabled|sortingEnabled=", "@brief Method void QTableWidget::setSortingEnabled(bool enable)\n", false, &_init_f_setSortingEnabled_864, &_call_f_setSortingEnabled_864);
   methods += new qt_gsi::GenericMethod ("setVerticalHeaderItem", "@brief Method void QTableWidget::setVerticalHeaderItem(int row, QTableWidgetItem *item)\n", false, &_init_f_setVerticalHeaderItem_2861, &_call_f_setVerticalHeaderItem_2861);
   methods += new qt_gsi::GenericMethod ("setVerticalHeaderLabels", "@brief Method void QTableWidget::setVerticalHeaderLabels(const QStringList &labels)\n", false, &_init_f_setVerticalHeaderLabels_2437, &_call_f_setVerticalHeaderLabels_2437);
   methods += new qt_gsi::GenericMethod ("sortItems", "@brief Method void QTableWidget::sortItems(int column, Qt::SortOrder order)\n", false, &_init_f_sortItems_2340, &_call_f_sortItems_2340);

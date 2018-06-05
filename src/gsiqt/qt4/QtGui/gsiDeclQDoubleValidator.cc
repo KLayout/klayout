@@ -221,7 +221,7 @@ static void _call_f_top_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QString &, int &) const
+// QValidator::State QDoubleValidator::validate(QString &, int &)
 
 
 static void _init_f_validate_c2171 (qt_gsi::GenericMethod *decl)
@@ -352,7 +352,7 @@ static gsi::Methods methods_QDoubleValidator () {
   methods += new qt_gsi::GenericMethod ("setRange", "@brief Method void QDoubleValidator::setRange(double bottom, double top, int decimals)\n", false, &_init_f_setRange_2693, &_call_f_setRange_2693);
   methods += new qt_gsi::GenericMethod ("setTop|top=", "@brief Method void QDoubleValidator::setTop(double)\n", false, &_init_f_setTop_1071, &_call_f_setTop_1071);
   methods += new qt_gsi::GenericMethod (":top", "@brief Method double QDoubleValidator::top()\n", true, &_init_f_top_c0, &_call_f_top_c0);
-  methods += new qt_gsi::GenericMethod ("validate", "@brief Method (QString &, int &) const\nThis is a reimplementation of QValidator::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
+  methods += new qt_gsi::GenericMethod ("validate", "@brief Method QValidator::State QDoubleValidator::validate(QString &, int &)\nThis is a reimplementation of QValidator::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QDoubleValidator::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QDoubleValidator::tr(const char *s, const char *c)\nThis method is static and can be called without an instance.", &_init_f_tr_3354, &_call_f_tr_3354);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QDoubleValidator::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);

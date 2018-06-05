@@ -78,7 +78,7 @@ static void _call_f_creator_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// ()
+// bool QPdfWriter::newPage()
 
 
 static void _init_f_newPage_0 (qt_gsi::GenericMethod *decl)
@@ -128,7 +128,7 @@ static void _call_f_setCreator_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QPagedPaintDevice::Margins &)
+// void QPdfWriter::setMargins(const QPagedPaintDevice::Margins &m)
 
 
 static void _init_f_setMargins_3812 (qt_gsi::GenericMethod *decl)
@@ -148,7 +148,7 @@ static void _call_f_setMargins_3812 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QPagedPaintDevice::PageSize)
+// void QPdfWriter::setPageSize(QPagedPaintDevice::PageSize size)
 
 
 static void _init_f_setPageSize_3006 (qt_gsi::GenericMethod *decl)
@@ -168,7 +168,7 @@ static void _call_f_setPageSize_3006 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QSizeF &)
+// void QPdfWriter::setPageSizeMM(const QSizeF &size)
 
 
 static void _init_f_setPageSizeMM_1875 (qt_gsi::GenericMethod *decl)
@@ -345,12 +345,12 @@ static gsi::Methods methods_QPdfWriter () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":creator", "@brief Method QString QPdfWriter::creator()\n", true, &_init_f_creator_c0, &_call_f_creator_c0);
-  methods += new qt_gsi::GenericMethod ("newPage", "@brief Method ()\nThis is a reimplementation of QPagedPaintDevice::newPage", false, &_init_f_newPage_0, &_call_f_newPage_0);
+  methods += new qt_gsi::GenericMethod ("newPage", "@brief Method bool QPdfWriter::newPage()\nThis is a reimplementation of QPagedPaintDevice::newPage", false, &_init_f_newPage_0, &_call_f_newPage_0);
   methods += new qt_gsi::GenericMethod (":resolution", "@brief Method int QPdfWriter::resolution()\n", true, &_init_f_resolution_c0, &_call_f_resolution_c0);
   methods += new qt_gsi::GenericMethod ("setCreator|creator=", "@brief Method void QPdfWriter::setCreator(const QString &creator)\n", false, &_init_f_setCreator_2025, &_call_f_setCreator_2025);
-  methods += new qt_gsi::GenericMethod ("setMargins", "@brief Method (const QPagedPaintDevice::Margins &)\nThis is a reimplementation of QPagedPaintDevice::setMargins", false, &_init_f_setMargins_3812, &_call_f_setMargins_3812);
-  methods += new qt_gsi::GenericMethod ("setPageSize|pageSize=", "@brief Method (QPagedPaintDevice::PageSize)\nThis is a reimplementation of QPagedPaintDevice::setPageSize", false, &_init_f_setPageSize_3006, &_call_f_setPageSize_3006);
-  methods += new qt_gsi::GenericMethod ("setPageSizeMM", "@brief Method (const QSizeF &)\nThis is a reimplementation of QPagedPaintDevice::setPageSizeMM", false, &_init_f_setPageSizeMM_1875, &_call_f_setPageSizeMM_1875);
+  methods += new qt_gsi::GenericMethod ("setMargins", "@brief Method void QPdfWriter::setMargins(const QPagedPaintDevice::Margins &m)\nThis is a reimplementation of QPagedPaintDevice::setMargins", false, &_init_f_setMargins_3812, &_call_f_setMargins_3812);
+  methods += new qt_gsi::GenericMethod ("setPageSize|pageSize=", "@brief Method void QPdfWriter::setPageSize(QPagedPaintDevice::PageSize size)\nThis is a reimplementation of QPagedPaintDevice::setPageSize", false, &_init_f_setPageSize_3006, &_call_f_setPageSize_3006);
+  methods += new qt_gsi::GenericMethod ("setPageSizeMM", "@brief Method void QPdfWriter::setPageSizeMM(const QSizeF &size)\nThis is a reimplementation of QPagedPaintDevice::setPageSizeMM", false, &_init_f_setPageSizeMM_1875, &_call_f_setPageSizeMM_1875);
   methods += new qt_gsi::GenericMethod ("setResolution|resolution=", "@brief Method void QPdfWriter::setResolution(int resolution)\n", false, &_init_f_setResolution_767, &_call_f_setResolution_767);
   methods += new qt_gsi::GenericMethod ("setTitle|title=", "@brief Method void QPdfWriter::setTitle(const QString &title)\n", false, &_init_f_setTitle_2025, &_call_f_setTitle_2025);
   methods += new qt_gsi::GenericMethod (":title", "@brief Method QString QPdfWriter::title()\n", true, &_init_f_title_c0, &_call_f_title_c0);

@@ -88,7 +88,7 @@ static void _call_f_arguments_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// bool QProcess::atEnd()
 
 
 static void _init_f_atEnd_c0 (qt_gsi::GenericMethod *decl)
@@ -103,7 +103,7 @@ static void _call_f_atEnd_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// () const
+// qint64 QProcess::bytesAvailable()
 
 
 static void _init_f_bytesAvailable_c0 (qt_gsi::GenericMethod *decl)
@@ -118,7 +118,7 @@ static void _call_f_bytesAvailable_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// qint64 QProcess::bytesToWrite()
 
 
 static void _init_f_bytesToWrite_c0 (qt_gsi::GenericMethod *decl)
@@ -133,7 +133,7 @@ static void _call_f_bytesToWrite_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// bool QProcess::canReadLine()
 
 
 static void _init_f_canReadLine_c0 (qt_gsi::GenericMethod *decl)
@@ -148,7 +148,7 @@ static void _call_f_canReadLine_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// ()
+// void QProcess::close()
 
 
 static void _init_f_close_0 (qt_gsi::GenericMethod *decl)
@@ -275,7 +275,7 @@ static void _call_f_inputChannelMode_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// bool QProcess::isSequential()
 
 
 static void _init_f_isSequential_c0 (qt_gsi::GenericMethod *decl)
@@ -306,7 +306,7 @@ static void _call_f_kill_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QFlags<QIODevice::OpenModeFlag>)
+// bool QProcess::open(QFlags<QIODevice::OpenModeFlag> mode)
 
 
 static void _init_f_open_3242 (qt_gsi::GenericMethod *decl)
@@ -826,7 +826,7 @@ static void _call_f_terminate_0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (int)
+// bool QProcess::waitForBytesWritten(int msecs)
 
 
 static void _init_f_waitForBytesWritten_767 (qt_gsi::GenericMethod *decl)
@@ -864,7 +864,7 @@ static void _call_f_waitForFinished_767 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (int)
+// bool QProcess::waitForReadyRead(int msecs)
 
 
 static void _init_f_waitForReadyRead_767 (qt_gsi::GenericMethod *decl)
@@ -1116,11 +1116,11 @@ static gsi::Methods methods_QProcess () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QProcess::QProcess(QObject *parent)\nThis method creates an object of class QProcess.", &_init_ctor_QProcess_1302, &_call_ctor_QProcess_1302);
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":arguments", "@brief Method QStringList QProcess::arguments()\n", true, &_init_f_arguments_c0, &_call_f_arguments_c0);
-  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method () const\nThis is a reimplementation of QIODevice::atEnd", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
-  methods += new qt_gsi::GenericMethod ("bytesAvailable", "@brief Method () const\nThis is a reimplementation of QIODevice::bytesAvailable", true, &_init_f_bytesAvailable_c0, &_call_f_bytesAvailable_c0);
-  methods += new qt_gsi::GenericMethod ("bytesToWrite", "@brief Method () const\nThis is a reimplementation of QIODevice::bytesToWrite", true, &_init_f_bytesToWrite_c0, &_call_f_bytesToWrite_c0);
-  methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Method () const\nThis is a reimplementation of QIODevice::canReadLine", true, &_init_f_canReadLine_c0, &_call_f_canReadLine_c0);
-  methods += new qt_gsi::GenericMethod ("close", "@brief Method ()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
+  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method bool QProcess::atEnd()\nThis is a reimplementation of QIODevice::atEnd", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
+  methods += new qt_gsi::GenericMethod ("bytesAvailable", "@brief Method qint64 QProcess::bytesAvailable()\nThis is a reimplementation of QIODevice::bytesAvailable", true, &_init_f_bytesAvailable_c0, &_call_f_bytesAvailable_c0);
+  methods += new qt_gsi::GenericMethod ("bytesToWrite", "@brief Method qint64 QProcess::bytesToWrite()\nThis is a reimplementation of QIODevice::bytesToWrite", true, &_init_f_bytesToWrite_c0, &_call_f_bytesToWrite_c0);
+  methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Method bool QProcess::canReadLine()\nThis is a reimplementation of QIODevice::canReadLine", true, &_init_f_canReadLine_c0, &_call_f_canReadLine_c0);
+  methods += new qt_gsi::GenericMethod ("close", "@brief Method void QProcess::close()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
   methods += new qt_gsi::GenericMethod ("closeReadChannel", "@brief Method void QProcess::closeReadChannel(QProcess::ProcessChannel channel)\n", false, &_init_f_closeReadChannel_2800, &_call_f_closeReadChannel_2800);
   methods += new qt_gsi::GenericMethod ("closeWriteChannel", "@brief Method void QProcess::closeWriteChannel()\n", false, &_init_f_closeWriteChannel_0, &_call_f_closeWriteChannel_0);
   methods += new qt_gsi::GenericMethod (":environment", "@brief Method QStringList QProcess::environment()\n", true, &_init_f_environment_c0, &_call_f_environment_c0);
@@ -1128,9 +1128,9 @@ static gsi::Methods methods_QProcess () {
   methods += new qt_gsi::GenericMethod ("exitCode", "@brief Method int QProcess::exitCode()\n", true, &_init_f_exitCode_c0, &_call_f_exitCode_c0);
   methods += new qt_gsi::GenericMethod ("exitStatus", "@brief Method QProcess::ExitStatus QProcess::exitStatus()\n", true, &_init_f_exitStatus_c0, &_call_f_exitStatus_c0);
   methods += new qt_gsi::GenericMethod (":inputChannelMode", "@brief Method QProcess::InputChannelMode QProcess::inputChannelMode()\n", true, &_init_f_inputChannelMode_c0, &_call_f_inputChannelMode_c0);
-  methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method () const\nThis is a reimplementation of QIODevice::isSequential", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
+  methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method bool QProcess::isSequential()\nThis is a reimplementation of QIODevice::isSequential", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
   methods += new qt_gsi::GenericMethod ("kill", "@brief Method void QProcess::kill()\n", false, &_init_f_kill_0, &_call_f_kill_0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method (QFlags<QIODevice::OpenModeFlag>)\nThis is a reimplementation of QIODevice::open", false, &_init_f_open_3242, &_call_f_open_3242);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method bool QProcess::open(QFlags<QIODevice::OpenModeFlag> mode)\nThis is a reimplementation of QIODevice::open", false, &_init_f_open_3242, &_call_f_open_3242);
   methods += new qt_gsi::GenericMethod ("pid", "@brief Method Q_PID QProcess::pid()\n", true, &_init_f_pid_c0, &_call_f_pid_c0);
   methods += new qt_gsi::GenericMethod (":processChannelMode", "@brief Method QProcess::ProcessChannelMode QProcess::processChannelMode()\n", true, &_init_f_processChannelMode_c0, &_call_f_processChannelMode_c0);
   methods += new qt_gsi::GenericMethod (":processEnvironment", "@brief Method QProcessEnvironment QProcess::processEnvironment()\n", true, &_init_f_processEnvironment_c0, &_call_f_processEnvironment_c0);
@@ -1158,9 +1158,9 @@ static gsi::Methods methods_QProcess () {
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QProcess::start(QFlags<QIODevice::OpenModeFlag> mode)\n", false, &_init_f_start_3242, &_call_f_start_3242);
   methods += new qt_gsi::GenericMethod ("state", "@brief Method QProcess::ProcessState QProcess::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
   methods += new qt_gsi::GenericMethod ("terminate", "@brief Method void QProcess::terminate()\n", false, &_init_f_terminate_0, &_call_f_terminate_0);
-  methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Method (int)\nThis is a reimplementation of QIODevice::waitForBytesWritten", false, &_init_f_waitForBytesWritten_767, &_call_f_waitForBytesWritten_767);
+  methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Method bool QProcess::waitForBytesWritten(int msecs)\nThis is a reimplementation of QIODevice::waitForBytesWritten", false, &_init_f_waitForBytesWritten_767, &_call_f_waitForBytesWritten_767);
   methods += new qt_gsi::GenericMethod ("waitForFinished", "@brief Method bool QProcess::waitForFinished(int msecs)\n", false, &_init_f_waitForFinished_767, &_call_f_waitForFinished_767);
-  methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Method (int)\nThis is a reimplementation of QIODevice::waitForReadyRead", false, &_init_f_waitForReadyRead_767, &_call_f_waitForReadyRead_767);
+  methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Method bool QProcess::waitForReadyRead(int msecs)\nThis is a reimplementation of QIODevice::waitForReadyRead", false, &_init_f_waitForReadyRead_767, &_call_f_waitForReadyRead_767);
   methods += new qt_gsi::GenericMethod ("waitForStarted", "@brief Method bool QProcess::waitForStarted(int msecs)\n", false, &_init_f_waitForStarted_767, &_call_f_waitForStarted_767);
   methods += new qt_gsi::GenericMethod (":workingDirectory", "@brief Method QString QProcess::workingDirectory()\n", true, &_init_f_workingDirectory_c0, &_call_f_workingDirectory_c0);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QProcess::aboutToClose()\nYou can bind a procedure to this signal.");

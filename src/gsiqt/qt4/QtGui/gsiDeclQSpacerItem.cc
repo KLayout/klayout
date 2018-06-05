@@ -69,7 +69,7 @@ static void _call_f_changeSize_5794 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// QFlags<Qt::Orientation> QSpacerItem::expandingDirections()
 
 
 static void _init_f_expandingDirections_c0 (qt_gsi::GenericMethod *decl)
@@ -84,7 +84,7 @@ static void _call_f_expandingDirections_c0 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// QRect QSpacerItem::geometry()
 
 
 static void _init_f_geometry_c0 (qt_gsi::GenericMethod *decl)
@@ -99,7 +99,7 @@ static void _call_f_geometry_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// bool QSpacerItem::isEmpty()
 
 
 static void _init_f_isEmpty_c0 (qt_gsi::GenericMethod *decl)
@@ -114,7 +114,7 @@ static void _call_f_isEmpty_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QSize QSpacerItem::maximumSize()
 
 
 static void _init_f_maximumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -129,7 +129,7 @@ static void _call_f_maximumSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QSize QSpacerItem::minimumSize()
 
 
 static void _init_f_minimumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -144,7 +144,7 @@ static void _call_f_minimumSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QRect &)
+// void QSpacerItem::setGeometry(const QRect &)
 
 
 static void _init_f_setGeometry_1792 (qt_gsi::GenericMethod *decl)
@@ -164,7 +164,7 @@ static void _call_f_setGeometry_1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// () const
+// QSize QSpacerItem::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -179,7 +179,7 @@ static void _call_f_sizeHint_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// ()
+// QSpacerItem *QSpacerItem::spacerItem()
 
 
 static void _init_f_spacerItem_0 (qt_gsi::GenericMethod *decl)
@@ -200,14 +200,14 @@ namespace gsi
 static gsi::Methods methods_QSpacerItem () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("changeSize", "@brief Method void QSpacerItem::changeSize(int w, int h, QSizePolicy::Policy hData, QSizePolicy::Policy vData)\n", false, &_init_f_changeSize_5794, &_call_f_changeSize_5794);
-  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method () const\nThis is a reimplementation of QLayoutItem::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
-  methods += new qt_gsi::GenericMethod (":geometry", "@brief Method () const\nThis is a reimplementation of QLayoutItem::geometry", true, &_init_f_geometry_c0, &_call_f_geometry_c0);
-  methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method () const\nThis is a reimplementation of QLayoutItem::isEmpty", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
-  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Method () const\nThis is a reimplementation of QLayoutItem::maximumSize", true, &_init_f_maximumSize_c0, &_call_f_maximumSize_c0);
-  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method () const\nThis is a reimplementation of QLayoutItem::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRect &)\nThis is a reimplementation of QLayoutItem::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method () const\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
-  methods += new qt_gsi::GenericMethod ("spacerItem", "@brief Method ()\nThis is a reimplementation of QLayoutItem::spacerItem", false, &_init_f_spacerItem_0, &_call_f_spacerItem_0);
+  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method QFlags<Qt::Orientation> QSpacerItem::expandingDirections()\nThis is a reimplementation of QLayoutItem::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
+  methods += new qt_gsi::GenericMethod (":geometry", "@brief Method QRect QSpacerItem::geometry()\nThis is a reimplementation of QLayoutItem::geometry", true, &_init_f_geometry_c0, &_call_f_geometry_c0);
+  methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QSpacerItem::isEmpty()\nThis is a reimplementation of QLayoutItem::isEmpty", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
+  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Method QSize QSpacerItem::maximumSize()\nThis is a reimplementation of QLayoutItem::maximumSize", true, &_init_f_maximumSize_c0, &_call_f_maximumSize_c0);
+  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method QSize QSpacerItem::minimumSize()\nThis is a reimplementation of QLayoutItem::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QSpacerItem::setGeometry(const QRect &)\nThis is a reimplementation of QLayoutItem::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method QSize QSpacerItem::sizeHint()\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod ("spacerItem", "@brief Method QSpacerItem *QSpacerItem::spacerItem()\nThis is a reimplementation of QLayoutItem::spacerItem", false, &_init_f_spacerItem_0, &_call_f_spacerItem_0);
   return methods;
 }
 

@@ -450,7 +450,7 @@ static void _call_f_importNode_2828 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// QDomNode::NodeType QDomDocument::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -465,7 +465,7 @@ static void _call_f_nodeType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QDomDocument &)
+// QDomDocument &QDomDocument::operator=(const QDomDocument &)
 
 
 static void _init_f_operator_eq__2513 (qt_gsi::GenericMethod *decl)
@@ -729,8 +729,8 @@ static gsi::Methods methods_QDomDocument () {
   methods += new qt_gsi::GenericMethod ("elementsByTagNameNS", "@brief Method QDomNodeList QDomDocument::elementsByTagNameNS(const QString &nsURI, const QString &localName)\n", false, &_init_f_elementsByTagNameNS_3942, &_call_f_elementsByTagNameNS_3942);
   methods += new qt_gsi::GenericMethod ("implementation", "@brief Method QDomImplementation QDomDocument::implementation()\n", true, &_init_f_implementation_c0, &_call_f_implementation_c0);
   methods += new qt_gsi::GenericMethod ("importNode", "@brief Method QDomNode QDomDocument::importNode(const QDomNode &importedNode, bool deep)\n", false, &_init_f_importNode_2828, &_call_f_importNode_2828);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomDocument &)\n", false, &_init_f_operator_eq__2513, &_call_f_operator_eq__2513);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomDocument::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomDocument &QDomDocument::operator=(const QDomDocument &)\n", false, &_init_f_operator_eq__2513, &_call_f_operator_eq__2513);
   methods += new qt_gsi::GenericMethod ("setContent", "@brief Method bool QDomDocument::setContent(const QString &text, bool namespaceProcessing, QString *errorMsg, int *errorLine, int *errorColumn)\n", false, &_init_f_setContent_5697, &_call_f_setContent_5697);
   methods += new qt_gsi::GenericMethod ("setContent", "@brief Method bool QDomDocument::setContent(QIODevice *dev, bool namespaceProcessing, QString *errorMsg, int *errorLine, int *errorColumn)\n", false, &_init_f_setContent_5119, &_call_f_setContent_5119);
   methods += new qt_gsi::GenericMethod ("setContent", "@brief Method bool QDomDocument::setContent(QXmlInputSource *source, bool namespaceProcessing, QString *errorMsg, int *errorLine, int *errorColumn)\n", false, &_init_f_setContent_5833, &_call_f_setContent_5833);

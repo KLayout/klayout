@@ -86,7 +86,7 @@ static void _call_ctor_QDomNotation_2526 (const qt_gsi::GenericStaticMethod * /*
 }
 
 
-// () const
+// QDomNode::NodeType QDomNotation::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -101,7 +101,7 @@ static void _call_f_nodeType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QDomNotation &)
+// QDomNotation &QDomNotation::operator=(const QDomNotation &)
 
 
 static void _init_f_operator_eq__2526 (qt_gsi::GenericMethod *decl)
@@ -158,8 +158,8 @@ static gsi::Methods methods_QDomNotation () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomNotation::QDomNotation()\nThis method creates an object of class QDomNotation.", &_init_ctor_QDomNotation_0, &_call_ctor_QDomNotation_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomNotation::QDomNotation(const QDomNotation &x)\nThis method creates an object of class QDomNotation.", &_init_ctor_QDomNotation_2526, &_call_ctor_QDomNotation_2526);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomNotation &)\n", false, &_init_f_operator_eq__2526, &_call_f_operator_eq__2526);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomNotation::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomNotation &QDomNotation::operator=(const QDomNotation &)\n", false, &_init_f_operator_eq__2526, &_call_f_operator_eq__2526);
   methods += new qt_gsi::GenericMethod ("publicId", "@brief Method QString QDomNotation::publicId()\n", true, &_init_f_publicId_c0, &_call_f_publicId_c0);
   methods += new qt_gsi::GenericMethod ("systemId", "@brief Method QString QDomNotation::systemId()\n", true, &_init_f_systemId_c0, &_call_f_systemId_c0);
   return methods;

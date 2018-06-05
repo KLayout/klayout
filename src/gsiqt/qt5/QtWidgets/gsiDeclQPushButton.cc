@@ -163,7 +163,7 @@ static void _call_f_menu_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// () const
+// QSize QPushButton::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -274,7 +274,7 @@ static void _call_f_showMenu_0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QSize QPushButton::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -349,13 +349,13 @@ static gsi::Methods methods_QPushButton () {
   methods += new qt_gsi::GenericMethod ("isDefault?|:default", "@brief Method bool QPushButton::isDefault()\n", true, &_init_f_isDefault_c0, &_call_f_isDefault_c0);
   methods += new qt_gsi::GenericMethod ("isFlat?|:flat", "@brief Method bool QPushButton::isFlat()\n", true, &_init_f_isFlat_c0, &_call_f_isFlat_c0);
   methods += new qt_gsi::GenericMethod (":menu", "@brief Method QMenu *QPushButton::menu()\n", true, &_init_f_menu_c0, &_call_f_menu_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QPushButton::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("setAutoDefault|autoDefault=", "@brief Method void QPushButton::setAutoDefault(bool)\n", false, &_init_f_setAutoDefault_864, &_call_f_setAutoDefault_864);
   methods += new qt_gsi::GenericMethod ("setDefault|default=", "@brief Method void QPushButton::setDefault(bool)\n", false, &_init_f_setDefault_864, &_call_f_setDefault_864);
   methods += new qt_gsi::GenericMethod ("setFlat|flat=", "@brief Method void QPushButton::setFlat(bool)\n", false, &_init_f_setFlat_864, &_call_f_setFlat_864);
   methods += new qt_gsi::GenericMethod ("setMenu|menu=", "@brief Method void QPushButton::setMenu(QMenu *menu)\n", false, &_init_f_setMenu_1108, &_call_f_setMenu_1108);
   methods += new qt_gsi::GenericMethod ("showMenu", "@brief Method void QPushButton::showMenu()\n", false, &_init_f_showMenu_0, &_call_f_showMenu_0);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QPushButton::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += gsi::qt_signal<bool > ("clicked(bool)", "clicked", gsi::arg("checked"), "@brief Signal declaration for QPushButton::clicked(bool checked)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QPushButton::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QPushButton::destroyed(QObject *)\nYou can bind a procedure to this signal.");

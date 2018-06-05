@@ -183,7 +183,7 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (QListWidgetItem *)
+// void QListWidget::closePersistentEditor(QListWidgetItem *item)
 
 
 static void _init_f_closePersistentEditor_2126 (qt_gsi::GenericMethod *decl)
@@ -248,7 +248,7 @@ static void _call_f_currentRow_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (QDropEvent *)
+// void QListWidget::dropEvent(QDropEvent *event)
 
 
 static void _init_f_dropEvent_1622 (qt_gsi::GenericMethod *decl)
@@ -512,7 +512,7 @@ static void _call_f_itemWidget_c2126 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (QListWidgetItem *)
+// void QListWidget::openPersistentEditor(QListWidgetItem *item)
 
 
 static void _init_f_openPersistentEditor_2126 (qt_gsi::GenericMethod *decl)
@@ -946,11 +946,11 @@ static gsi::Methods methods_QListWidget () {
   methods += new qt_gsi::GenericMethod ("addItem", "@brief Method void QListWidget::addItem(QListWidgetItem *item)\n", false, &_init_f_addItem_2126, &_call_f_addItem_2126);
   methods += new qt_gsi::GenericMethod ("addItems", "@brief Method void QListWidget::addItems(const QStringList &labels)\n", false, &_init_f_addItems_2437, &_call_f_addItems_2437);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QListWidget::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
-  methods += new qt_gsi::GenericMethod ("closePersistentEditor", "@brief Method (QListWidgetItem *)\n", false, &_init_f_closePersistentEditor_2126, &_call_f_closePersistentEditor_2126);
+  methods += new qt_gsi::GenericMethod ("closePersistentEditor", "@brief Method void QListWidget::closePersistentEditor(QListWidgetItem *item)\n", false, &_init_f_closePersistentEditor_2126, &_call_f_closePersistentEditor_2126);
   methods += new qt_gsi::GenericMethod (":count", "@brief Method int QListWidget::count()\n", true, &_init_f_count_c0, &_call_f_count_c0);
   methods += new qt_gsi::GenericMethod (":currentItem", "@brief Method QListWidgetItem *QListWidget::currentItem()\n", true, &_init_f_currentItem_c0, &_call_f_currentItem_c0);
   methods += new qt_gsi::GenericMethod (":currentRow", "@brief Method int QListWidget::currentRow()\n", true, &_init_f_currentRow_c0, &_call_f_currentRow_c0);
-  methods += new qt_gsi::GenericMethod ("dropEvent", "@brief Method (QDropEvent *)\nThis is a reimplementation of QListView::dropEvent", false, &_init_f_dropEvent_1622, &_call_f_dropEvent_1622);
+  methods += new qt_gsi::GenericMethod ("dropEvent", "@brief Method void QListWidget::dropEvent(QDropEvent *event)\nThis is a reimplementation of QListView::dropEvent", false, &_init_f_dropEvent_1622, &_call_f_dropEvent_1622);
   methods += new qt_gsi::GenericMethod ("editItem", "@brief Method void QListWidget::editItem(QListWidgetItem *item)\n", false, &_init_f_editItem_2126, &_call_f_editItem_2126);
   methods += new qt_gsi::GenericMethod ("findItems", "@brief Method QList<QListWidgetItem*> QListWidget::findItems(const QString &text, QFlags<Qt::MatchFlag> flags)\n", true, &_init_f_findItems_c4233, &_call_f_findItems_c4233);
   methods += new qt_gsi::GenericMethod ("insertItem", "@brief Method void QListWidget::insertItem(int row, QListWidgetItem *item)\n", false, &_init_f_insertItem_2785, &_call_f_insertItem_2785);
@@ -963,7 +963,7 @@ static gsi::Methods methods_QListWidget () {
   methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QListWidgetItem *QListWidget::itemAt(const QPoint &p)\n", true, &_init_f_itemAt_c1916, &_call_f_itemAt_c1916);
   methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QListWidgetItem *QListWidget::itemAt(int x, int y)\n", true, &_init_f_itemAt_c1426, &_call_f_itemAt_c1426);
   methods += new qt_gsi::GenericMethod ("itemWidget", "@brief Method QWidget *QListWidget::itemWidget(QListWidgetItem *item)\n", true, &_init_f_itemWidget_c2126, &_call_f_itemWidget_c2126);
-  methods += new qt_gsi::GenericMethod ("openPersistentEditor", "@brief Method (QListWidgetItem *)\n", false, &_init_f_openPersistentEditor_2126, &_call_f_openPersistentEditor_2126);
+  methods += new qt_gsi::GenericMethod ("openPersistentEditor", "@brief Method void QListWidget::openPersistentEditor(QListWidgetItem *item)\n", false, &_init_f_openPersistentEditor_2126, &_call_f_openPersistentEditor_2126);
   methods += new qt_gsi::GenericMethod ("removeItemWidget", "@brief Method void QListWidget::removeItemWidget(QListWidgetItem *item)\n", false, &_init_f_removeItemWidget_2126, &_call_f_removeItemWidget_2126);
   methods += new qt_gsi::GenericMethod ("row", "@brief Method int QListWidget::row(const QListWidgetItem *item)\n", true, &_init_f_row_c2821, &_call_f_row_c2821);
   methods += new qt_gsi::GenericMethod ("scrollToItem", "@brief Method void QListWidget::scrollToItem(const QListWidgetItem *item, QAbstractItemView::ScrollHint hint)\n", false, &_init_f_scrollToItem_6002, &_call_f_scrollToItem_6002);

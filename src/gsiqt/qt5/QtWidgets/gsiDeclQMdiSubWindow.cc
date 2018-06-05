@@ -192,7 +192,7 @@ static void _call_f_mdiArea_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QSize QMdiSubWindow::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -342,7 +342,7 @@ static void _call_f_showSystemMenu_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// () const
+// QSize QMdiSubWindow::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -468,7 +468,7 @@ static gsi::Methods methods_QMdiSubWindow () {
   methods += new qt_gsi::GenericMethod ("maximizedButtonsWidget", "@brief Method QWidget *QMdiSubWindow::maximizedButtonsWidget()\n", true, &_init_f_maximizedButtonsWidget_c0, &_call_f_maximizedButtonsWidget_c0);
   methods += new qt_gsi::GenericMethod ("maximizedSystemMenuIconWidget", "@brief Method QWidget *QMdiSubWindow::maximizedSystemMenuIconWidget()\n", true, &_init_f_maximizedSystemMenuIconWidget_c0, &_call_f_maximizedSystemMenuIconWidget_c0);
   methods += new qt_gsi::GenericMethod ("mdiArea", "@brief Method QMdiArea *QMdiSubWindow::mdiArea()\n", true, &_init_f_mdiArea_c0, &_call_f_mdiArea_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QMdiSubWindow::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("setKeyboardPageStep|keyboardPageStep=", "@brief Method void QMdiSubWindow::setKeyboardPageStep(int step)\n", false, &_init_f_setKeyboardPageStep_767, &_call_f_setKeyboardPageStep_767);
   methods += new qt_gsi::GenericMethod ("setKeyboardSingleStep|keyboardSingleStep=", "@brief Method void QMdiSubWindow::setKeyboardSingleStep(int step)\n", false, &_init_f_setKeyboardSingleStep_767, &_call_f_setKeyboardSingleStep_767);
   methods += new qt_gsi::GenericMethod ("setOption", "@brief Method void QMdiSubWindow::setOption(QMdiSubWindow::SubWindowOption option, bool on)\n", false, &_init_f_setOption_4164, &_call_f_setOption_4164);
@@ -476,7 +476,7 @@ static gsi::Methods methods_QMdiSubWindow () {
   methods += new qt_gsi::GenericMethod ("setWidget|widget=", "@brief Method void QMdiSubWindow::setWidget(QWidget *widget)\n", false, &_init_f_setWidget_1315, &_call_f_setWidget_1315);
   methods += new qt_gsi::GenericMethod ("showShaded", "@brief Method void QMdiSubWindow::showShaded()\n", false, &_init_f_showShaded_0, &_call_f_showShaded_0);
   methods += new qt_gsi::GenericMethod ("showSystemMenu", "@brief Method void QMdiSubWindow::showSystemMenu()\n", false, &_init_f_showSystemMenu_0, &_call_f_showSystemMenu_0);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QMdiSubWindow::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":systemMenu", "@brief Method QMenu *QMdiSubWindow::systemMenu()\n", true, &_init_f_systemMenu_c0, &_call_f_systemMenu_c0);
   methods += new qt_gsi::GenericMethod ("testOption", "@brief Method bool QMdiSubWindow::testOption(QMdiSubWindow::SubWindowOption)\n", true, &_init_f_testOption_c3408, &_call_f_testOption_c3408);
   methods += new qt_gsi::GenericMethod (":widget", "@brief Method QWidget *QMdiSubWindow::widget()\n", true, &_init_f_widget_c0, &_call_f_widget_c0);

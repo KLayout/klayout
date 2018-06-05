@@ -37,7 +37,7 @@
 // -----------------------------------------------------------------------
 // class QXmlFormatter
 
-// (const QVariant &)
+// void QXmlFormatter::atomicValue(const QVariant &value)
 
 
 static void _init_f_atomicValue_2119 (qt_gsi::GenericMethod *decl)
@@ -57,7 +57,7 @@ static void _call_f_atomicValue_2119 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QXmlName &, const QStringRef &)
+// void QXmlFormatter::attribute(const QXmlName &name, const QStringRef &value)
 
 
 static void _init_f_attribute_4286 (qt_gsi::GenericMethod *decl)
@@ -80,7 +80,7 @@ static void _call_f_attribute_4286 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QStringRef &)
+// void QXmlFormatter::characters(const QStringRef &value)
 
 
 static void _init_f_characters_2310 (qt_gsi::GenericMethod *decl)
@@ -100,7 +100,7 @@ static void _call_f_characters_2310 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QString &)
+// void QXmlFormatter::comment(const QString &value)
 
 
 static void _init_f_comment_2025 (qt_gsi::GenericMethod *decl)
@@ -120,7 +120,7 @@ static void _call_f_comment_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// ()
+// void QXmlFormatter::endDocument()
 
 
 static void _init_f_endDocument_0 (qt_gsi::GenericMethod *decl)
@@ -136,7 +136,7 @@ static void _call_f_endDocument_0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// ()
+// void QXmlFormatter::endElement()
 
 
 static void _init_f_endElement_0 (qt_gsi::GenericMethod *decl)
@@ -152,7 +152,7 @@ static void _call_f_endElement_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// ()
+// void QXmlFormatter::endOfSequence()
 
 
 static void _init_f_endOfSequence_0 (qt_gsi::GenericMethod *decl)
@@ -183,7 +183,7 @@ static void _call_f_indentationDepth_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (const QXmlName &, const QString &)
+// void QXmlFormatter::processingInstruction(const QXmlName &name, const QString &value)
 
 
 static void _init_f_processingInstruction_4001 (qt_gsi::GenericMethod *decl)
@@ -226,7 +226,7 @@ static void _call_f_setIndentationDepth_767 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// ()
+// void QXmlFormatter::startDocument()
 
 
 static void _init_f_startDocument_0 (qt_gsi::GenericMethod *decl)
@@ -242,7 +242,7 @@ static void _call_f_startDocument_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QXmlName &)
+// void QXmlFormatter::startElement(const QXmlName &name)
 
 
 static void _init_f_startElement_2084 (qt_gsi::GenericMethod *decl)
@@ -262,7 +262,7 @@ static void _call_f_startElement_2084 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// ()
+// void QXmlFormatter::startOfSequence()
 
 
 static void _init_f_startOfSequence_0 (qt_gsi::GenericMethod *decl)
@@ -283,19 +283,19 @@ namespace gsi
 
 static gsi::Methods methods_QXmlFormatter () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("atomicValue", "@brief Method (const QVariant &)\nThis is a reimplementation of QXmlSerializer::atomicValue", false, &_init_f_atomicValue_2119, &_call_f_atomicValue_2119);
-  methods += new qt_gsi::GenericMethod ("attribute", "@brief Method (const QXmlName &, const QStringRef &)\nThis is a reimplementation of QXmlSerializer::attribute", false, &_init_f_attribute_4286, &_call_f_attribute_4286);
-  methods += new qt_gsi::GenericMethod ("characters", "@brief Method (const QStringRef &)\nThis is a reimplementation of QXmlSerializer::characters", false, &_init_f_characters_2310, &_call_f_characters_2310);
-  methods += new qt_gsi::GenericMethod ("comment", "@brief Method (const QString &)\nThis is a reimplementation of QXmlSerializer::comment", false, &_init_f_comment_2025, &_call_f_comment_2025);
-  methods += new qt_gsi::GenericMethod ("endDocument", "@brief Method ()\nThis is a reimplementation of QXmlSerializer::endDocument", false, &_init_f_endDocument_0, &_call_f_endDocument_0);
-  methods += new qt_gsi::GenericMethod ("endElement", "@brief Method ()\nThis is a reimplementation of QXmlSerializer::endElement", false, &_init_f_endElement_0, &_call_f_endElement_0);
-  methods += new qt_gsi::GenericMethod ("endOfSequence", "@brief Method ()\nThis is a reimplementation of QXmlSerializer::endOfSequence", false, &_init_f_endOfSequence_0, &_call_f_endOfSequence_0);
+  methods += new qt_gsi::GenericMethod ("atomicValue", "@brief Method void QXmlFormatter::atomicValue(const QVariant &value)\nThis is a reimplementation of QXmlSerializer::atomicValue", false, &_init_f_atomicValue_2119, &_call_f_atomicValue_2119);
+  methods += new qt_gsi::GenericMethod ("attribute", "@brief Method void QXmlFormatter::attribute(const QXmlName &name, const QStringRef &value)\nThis is a reimplementation of QXmlSerializer::attribute", false, &_init_f_attribute_4286, &_call_f_attribute_4286);
+  methods += new qt_gsi::GenericMethod ("characters", "@brief Method void QXmlFormatter::characters(const QStringRef &value)\nThis is a reimplementation of QXmlSerializer::characters", false, &_init_f_characters_2310, &_call_f_characters_2310);
+  methods += new qt_gsi::GenericMethod ("comment", "@brief Method void QXmlFormatter::comment(const QString &value)\nThis is a reimplementation of QXmlSerializer::comment", false, &_init_f_comment_2025, &_call_f_comment_2025);
+  methods += new qt_gsi::GenericMethod ("endDocument", "@brief Method void QXmlFormatter::endDocument()\nThis is a reimplementation of QXmlSerializer::endDocument", false, &_init_f_endDocument_0, &_call_f_endDocument_0);
+  methods += new qt_gsi::GenericMethod ("endElement", "@brief Method void QXmlFormatter::endElement()\nThis is a reimplementation of QXmlSerializer::endElement", false, &_init_f_endElement_0, &_call_f_endElement_0);
+  methods += new qt_gsi::GenericMethod ("endOfSequence", "@brief Method void QXmlFormatter::endOfSequence()\nThis is a reimplementation of QXmlSerializer::endOfSequence", false, &_init_f_endOfSequence_0, &_call_f_endOfSequence_0);
   methods += new qt_gsi::GenericMethod (":indentationDepth", "@brief Method int QXmlFormatter::indentationDepth()\n", true, &_init_f_indentationDepth_c0, &_call_f_indentationDepth_c0);
-  methods += new qt_gsi::GenericMethod ("processingInstruction", "@brief Method (const QXmlName &, const QString &)\nThis is a reimplementation of QXmlSerializer::processingInstruction", false, &_init_f_processingInstruction_4001, &_call_f_processingInstruction_4001);
+  methods += new qt_gsi::GenericMethod ("processingInstruction", "@brief Method void QXmlFormatter::processingInstruction(const QXmlName &name, const QString &value)\nThis is a reimplementation of QXmlSerializer::processingInstruction", false, &_init_f_processingInstruction_4001, &_call_f_processingInstruction_4001);
   methods += new qt_gsi::GenericMethod ("setIndentationDepth|indentationDepth=", "@brief Method void QXmlFormatter::setIndentationDepth(int depth)\n", false, &_init_f_setIndentationDepth_767, &_call_f_setIndentationDepth_767);
-  methods += new qt_gsi::GenericMethod ("startDocument", "@brief Method ()\nThis is a reimplementation of QXmlSerializer::startDocument", false, &_init_f_startDocument_0, &_call_f_startDocument_0);
-  methods += new qt_gsi::GenericMethod ("startElement", "@brief Method (const QXmlName &)\nThis is a reimplementation of QXmlSerializer::startElement", false, &_init_f_startElement_2084, &_call_f_startElement_2084);
-  methods += new qt_gsi::GenericMethod ("startOfSequence", "@brief Method ()\nThis is a reimplementation of QXmlSerializer::startOfSequence", false, &_init_f_startOfSequence_0, &_call_f_startOfSequence_0);
+  methods += new qt_gsi::GenericMethod ("startDocument", "@brief Method void QXmlFormatter::startDocument()\nThis is a reimplementation of QXmlSerializer::startDocument", false, &_init_f_startDocument_0, &_call_f_startDocument_0);
+  methods += new qt_gsi::GenericMethod ("startElement", "@brief Method void QXmlFormatter::startElement(const QXmlName &name)\nThis is a reimplementation of QXmlSerializer::startElement", false, &_init_f_startElement_2084, &_call_f_startElement_2084);
+  methods += new qt_gsi::GenericMethod ("startOfSequence", "@brief Method void QXmlFormatter::startOfSequence()\nThis is a reimplementation of QXmlSerializer::startOfSequence", false, &_init_f_startOfSequence_0, &_call_f_startOfSequence_0);
   return methods;
 }
 

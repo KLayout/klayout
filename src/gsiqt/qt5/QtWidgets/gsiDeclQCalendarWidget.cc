@@ -271,7 +271,7 @@ static void _call_f_minimumDate_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QSize QCalendarWidget::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -759,7 +759,7 @@ static void _call_f_showToday_0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// QSize QCalendarWidget::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -890,7 +890,7 @@ static gsi::Methods methods_QCalendarWidget () {
   methods += new qt_gsi::GenericMethod ("isNavigationBarVisible?|:navigationBarVisible", "@brief Method bool QCalendarWidget::isNavigationBarVisible()\n", true, &_init_f_isNavigationBarVisible_c0, &_call_f_isNavigationBarVisible_c0);
   methods += new qt_gsi::GenericMethod (":maximumDate", "@brief Method QDate QCalendarWidget::maximumDate()\n", true, &_init_f_maximumDate_c0, &_call_f_maximumDate_c0);
   methods += new qt_gsi::GenericMethod (":minimumDate", "@brief Method QDate QCalendarWidget::minimumDate()\n", true, &_init_f_minimumDate_c0, &_call_f_minimumDate_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QCalendarWidget::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("monthShown", "@brief Method int QCalendarWidget::monthShown()\n", true, &_init_f_monthShown_c0, &_call_f_monthShown_c0);
   methods += new qt_gsi::GenericMethod (":selectedDate", "@brief Method QDate QCalendarWidget::selectedDate()\n", true, &_init_f_selectedDate_c0, &_call_f_selectedDate_c0);
   methods += new qt_gsi::GenericMethod (":selectionMode", "@brief Method QCalendarWidget::SelectionMode QCalendarWidget::selectionMode()\n", true, &_init_f_selectionMode_c0, &_call_f_selectionMode_c0);
@@ -916,7 +916,7 @@ static gsi::Methods methods_QCalendarWidget () {
   methods += new qt_gsi::GenericMethod ("showPreviousYear", "@brief Method void QCalendarWidget::showPreviousYear()\n", false, &_init_f_showPreviousYear_0, &_call_f_showPreviousYear_0);
   methods += new qt_gsi::GenericMethod ("showSelectedDate", "@brief Method void QCalendarWidget::showSelectedDate()\n", false, &_init_f_showSelectedDate_0, &_call_f_showSelectedDate_0);
   methods += new qt_gsi::GenericMethod ("showToday", "@brief Method void QCalendarWidget::showToday()\n", false, &_init_f_showToday_0, &_call_f_showToday_0);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QCalendarWidget::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":verticalHeaderFormat", "@brief Method QCalendarWidget::VerticalHeaderFormat QCalendarWidget::verticalHeaderFormat()\n", true, &_init_f_verticalHeaderFormat_c0, &_call_f_verticalHeaderFormat_c0);
   methods += new qt_gsi::GenericMethod ("weekdayTextFormat", "@brief Method QTextCharFormat QCalendarWidget::weekdayTextFormat(Qt::DayOfWeek dayOfWeek)\n", true, &_init_f_weekdayTextFormat_c1612, &_call_f_weekdayTextFormat_c1612);
   methods += new qt_gsi::GenericMethod ("yearShown", "@brief Method int QCalendarWidget::yearShown()\n", true, &_init_f_yearShown_c0, &_call_f_yearShown_c0);

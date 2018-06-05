@@ -160,7 +160,7 @@ static void _call_f_load_3648 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (const QPicture &)
+// QPicture &QPicture::operator=(const QPicture &p)
 
 
 static void _init_f_operator_eq__2126 (qt_gsi::GenericMethod *decl)
@@ -179,7 +179,7 @@ static void _call_f_operator_eq__2126 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// QPaintEngine *QPicture::paintEngine()
 
 
 static void _init_f_paintEngine_c0 (qt_gsi::GenericMethod *decl)
@@ -406,8 +406,8 @@ static gsi::Methods methods_QPicture () {
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QPicture::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
   methods += new qt_gsi::GenericMethod ("load", "@brief Method bool QPicture::load(QIODevice *dev, const char *format)\n", false, &_init_f_load_3070, &_call_f_load_3070);
   methods += new qt_gsi::GenericMethod ("load", "@brief Method bool QPicture::load(const QString &fileName, const char *format)\n", false, &_init_f_load_3648, &_call_f_load_3648);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QPicture &)\n", false, &_init_f_operator_eq__2126, &_call_f_operator_eq__2126);
-  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Method () const\nThis is a reimplementation of QPaintDevice::paintEngine", true, &_init_f_paintEngine_c0, &_call_f_paintEngine_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QPicture &QPicture::operator=(const QPicture &p)\n", false, &_init_f_operator_eq__2126, &_call_f_operator_eq__2126);
+  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Method QPaintEngine *QPicture::paintEngine()\nThis is a reimplementation of QPaintDevice::paintEngine", true, &_init_f_paintEngine_c0, &_call_f_paintEngine_c0);
   methods += new qt_gsi::GenericMethod ("play", "@brief Method bool QPicture::play(QPainter *p)\n", false, &_init_f_play_1426, &_call_f_play_1426);
   methods += new qt_gsi::GenericMethod ("save", "@brief Method bool QPicture::save(QIODevice *dev, const char *format)\n", false, &_init_f_save_3070, &_call_f_save_3070);
   methods += new qt_gsi::GenericMethod ("save", "@brief Method bool QPicture::save(const QString &fileName, const char *format)\n", false, &_init_f_save_3648, &_call_f_save_3648);

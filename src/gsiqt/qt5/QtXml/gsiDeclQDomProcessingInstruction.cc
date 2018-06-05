@@ -101,7 +101,7 @@ static void _call_f_data_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// () const
+// QDomNode::NodeType QDomProcessingInstruction::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -116,7 +116,7 @@ static void _call_f_nodeType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QDomProcessingInstruction &)
+// QDomProcessingInstruction &QDomProcessingInstruction::operator=(const QDomProcessingInstruction &)
 
 
 static void _init_f_operator_eq__3921 (qt_gsi::GenericMethod *decl)
@@ -179,8 +179,8 @@ static gsi::Methods methods_QDomProcessingInstruction () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomProcessingInstruction::QDomProcessingInstruction()\nThis method creates an object of class QDomProcessingInstruction.", &_init_ctor_QDomProcessingInstruction_0, &_call_ctor_QDomProcessingInstruction_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomProcessingInstruction::QDomProcessingInstruction(const QDomProcessingInstruction &x)\nThis method creates an object of class QDomProcessingInstruction.", &_init_ctor_QDomProcessingInstruction_3921, &_call_ctor_QDomProcessingInstruction_3921);
   methods += new qt_gsi::GenericMethod (":data", "@brief Method QString QDomProcessingInstruction::data()\n", true, &_init_f_data_c0, &_call_f_data_c0);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomProcessingInstruction &)\n", false, &_init_f_operator_eq__3921, &_call_f_operator_eq__3921);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomProcessingInstruction::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomProcessingInstruction &QDomProcessingInstruction::operator=(const QDomProcessingInstruction &)\n", false, &_init_f_operator_eq__3921, &_call_f_operator_eq__3921);
   methods += new qt_gsi::GenericMethod ("setData|data=", "@brief Method void QDomProcessingInstruction::setData(const QString &d)\n", false, &_init_f_setData_2025, &_call_f_setData_2025);
   methods += new qt_gsi::GenericMethod ("target", "@brief Method QString QDomProcessingInstruction::target()\n", true, &_init_f_target_c0, &_call_f_target_c0);
   return methods;

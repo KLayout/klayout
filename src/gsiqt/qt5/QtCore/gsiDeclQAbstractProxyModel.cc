@@ -62,7 +62,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (const QModelIndex &) const
+// QModelIndex QAbstractProxyModel::buddy(const QModelIndex &index)
 
 
 static void _init_f_buddy_c2395 (qt_gsi::GenericMethod *decl)
@@ -81,7 +81,7 @@ static void _call_f_buddy_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &) const
+// bool QAbstractProxyModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_canDropMimeData_c7425 (qt_gsi::GenericMethod *decl)
@@ -112,7 +112,7 @@ static void _call_f_canDropMimeData_c7425 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// (const QModelIndex &) const
+// bool QAbstractProxyModel::canFetchMore(const QModelIndex &parent)
 
 
 static void _init_f_canFetchMore_c2395 (qt_gsi::GenericMethod *decl)
@@ -131,7 +131,7 @@ static void _call_f_canFetchMore_c2395 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QModelIndex &, int) const
+// QVariant QAbstractProxyModel::data(const QModelIndex &proxyIndex, int role)
 
 
 static void _init_f_data_c3054 (qt_gsi::GenericMethod *decl)
@@ -153,7 +153,7 @@ static void _call_f_data_c3054 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)
+// bool QAbstractProxyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_dropMimeData_7425 (qt_gsi::GenericMethod *decl)
@@ -184,7 +184,7 @@ static void _call_f_dropMimeData_7425 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QModelIndex &)
+// void QAbstractProxyModel::fetchMore(const QModelIndex &parent)
 
 
 static void _init_f_fetchMore_2395 (qt_gsi::GenericMethod *decl)
@@ -204,7 +204,7 @@ static void _call_f_fetchMore_2395 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QModelIndex &) const
+// QFlags<Qt::ItemFlag> QAbstractProxyModel::flags(const QModelIndex &index)
 
 
 static void _init_f_flags_c2395 (qt_gsi::GenericMethod *decl)
@@ -223,7 +223,7 @@ static void _call_f_flags_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QModelIndex &) const
+// bool QAbstractProxyModel::hasChildren(const QModelIndex &parent)
 
 
 static void _init_f_hasChildren_c2395 (qt_gsi::GenericMethod *decl)
@@ -242,7 +242,7 @@ static void _call_f_hasChildren_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (int, Qt::Orientation, int) const
+// QVariant QAbstractProxyModel::headerData(int section, Qt::Orientation orientation, int role)
 
 
 static void _init_f_headerData_c3231 (qt_gsi::GenericMethod *decl)
@@ -267,7 +267,7 @@ static void _call_f_headerData_c3231 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QModelIndex &) const
+// QMap<int, QVariant> QAbstractProxyModel::itemData(const QModelIndex &index)
 
 
 static void _init_f_itemData_c2395 (qt_gsi::GenericMethod *decl)
@@ -362,7 +362,7 @@ static void _call_f_mapToSource_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QList<QModelIndex> &) const
+// QMimeData *QAbstractProxyModel::mimeData(const QList<QModelIndex> &indexes)
 
 
 static void _init_f_mimeData_c3010 (qt_gsi::GenericMethod *decl)
@@ -381,7 +381,7 @@ static void _call_f_mimeData_c3010 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QStringList QAbstractProxyModel::mimeTypes()
 
 
 static void _init_f_mimeTypes_c0 (qt_gsi::GenericMethod *decl)
@@ -396,7 +396,7 @@ static void _call_f_mimeTypes_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// ()
+// void QAbstractProxyModel::revert()
 
 
 static void _init_f_revert_0 (qt_gsi::GenericMethod *decl)
@@ -412,7 +412,7 @@ static void _call_f_revert_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (const QModelIndex &, const QVariant &, int)
+// bool QAbstractProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)
 
 
 static void _init_f_setData_5065 (qt_gsi::GenericMethod *decl)
@@ -437,7 +437,7 @@ static void _call_f_setData_5065 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int, Qt::Orientation, const QVariant &, int)
+// bool QAbstractProxyModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 
 
 static void _init_f_setHeaderData_5242 (qt_gsi::GenericMethod *decl)
@@ -465,7 +465,7 @@ static void _call_f_setHeaderData_5242 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QModelIndex &, const QMap<int, QVariant> &)
+// bool QAbstractProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles)
 
 
 static void _init_f_setItemData_5414 (qt_gsi::GenericMethod *decl)
@@ -507,7 +507,7 @@ static void _call_f_setSourceModel_2419 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (int, int, const QModelIndex &) const
+// QModelIndex QAbstractProxyModel::sibling(int row, int column, const QModelIndex &idx)
 
 
 static void _init_f_sibling_c3713 (qt_gsi::GenericMethod *decl)
@@ -532,7 +532,7 @@ static void _call_f_sibling_c3713 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (int, Qt::SortOrder)
+// void QAbstractProxyModel::sort(int column, Qt::SortOrder order)
 
 
 static void _init_f_sort_2340 (qt_gsi::GenericMethod *decl)
@@ -570,7 +570,7 @@ static void _call_f_sourceModel_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QModelIndex &) const
+// QSize QAbstractProxyModel::span(const QModelIndex &index)
 
 
 static void _init_f_span_c2395 (qt_gsi::GenericMethod *decl)
@@ -589,7 +589,7 @@ static void _call_f_span_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// ()
+// bool QAbstractProxyModel::submit()
 
 
 static void _init_f_submit_0 (qt_gsi::GenericMethod *decl)
@@ -604,7 +604,7 @@ static void _call_f_submit_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// () const
+// QFlags<Qt::DropAction> QAbstractProxyModel::supportedDragActions()
 
 
 static void _init_f_supportedDragActions_c0 (qt_gsi::GenericMethod *decl)
@@ -619,7 +619,7 @@ static void _call_f_supportedDragActions_c0 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// () const
+// QFlags<Qt::DropAction> QAbstractProxyModel::supportedDropActions()
 
 
 static void _init_f_supportedDropActions_c0 (qt_gsi::GenericMethod *decl)
@@ -690,34 +690,34 @@ namespace gsi
 static gsi::Methods methods_QAbstractProxyModel () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("buddy", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::buddy", true, &_init_f_buddy_c2395, &_call_f_buddy_c2395);
-  methods += new qt_gsi::GenericMethod ("canDropMimeData", "@brief Method (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::canDropMimeData", true, &_init_f_canDropMimeData_c7425, &_call_f_canDropMimeData_c7425);
-  methods += new qt_gsi::GenericMethod ("canFetchMore", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::canFetchMore", true, &_init_f_canFetchMore_c2395, &_call_f_canFetchMore_c2395);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Method (const QModelIndex &, int) const\nThis is a reimplementation of QAbstractItemModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
-  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
-  methods += new qt_gsi::GenericMethod ("fetchMore", "@brief Method (const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::fetchMore", false, &_init_f_fetchMore_2395, &_call_f_fetchMore_2395);
-  methods += new qt_gsi::GenericMethod ("flags", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
-  methods += new qt_gsi::GenericMethod ("hasChildren", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::hasChildren", true, &_init_f_hasChildren_c2395, &_call_f_hasChildren_c2395);
-  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method (int, Qt::Orientation, int) const\nThis is a reimplementation of QAbstractItemModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
-  methods += new qt_gsi::GenericMethod ("itemData", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::itemData", true, &_init_f_itemData_c2395, &_call_f_itemData_c2395);
+  methods += new qt_gsi::GenericMethod ("buddy", "@brief Method QModelIndex QAbstractProxyModel::buddy(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::buddy", true, &_init_f_buddy_c2395, &_call_f_buddy_c2395);
+  methods += new qt_gsi::GenericMethod ("canDropMimeData", "@brief Method bool QAbstractProxyModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::canDropMimeData", true, &_init_f_canDropMimeData_c7425, &_call_f_canDropMimeData_c7425);
+  methods += new qt_gsi::GenericMethod ("canFetchMore", "@brief Method bool QAbstractProxyModel::canFetchMore(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::canFetchMore", true, &_init_f_canFetchMore_c2395, &_call_f_canFetchMore_c2395);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Method QVariant QAbstractProxyModel::data(const QModelIndex &proxyIndex, int role)\nThis is a reimplementation of QAbstractItemModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
+  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method bool QAbstractProxyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
+  methods += new qt_gsi::GenericMethod ("fetchMore", "@brief Method void QAbstractProxyModel::fetchMore(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::fetchMore", false, &_init_f_fetchMore_2395, &_call_f_fetchMore_2395);
+  methods += new qt_gsi::GenericMethod ("flags", "@brief Method QFlags<Qt::ItemFlag> QAbstractProxyModel::flags(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
+  methods += new qt_gsi::GenericMethod ("hasChildren", "@brief Method bool QAbstractProxyModel::hasChildren(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::hasChildren", true, &_init_f_hasChildren_c2395, &_call_f_hasChildren_c2395);
+  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method QVariant QAbstractProxyModel::headerData(int section, Qt::Orientation orientation, int role)\nThis is a reimplementation of QAbstractItemModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
+  methods += new qt_gsi::GenericMethod ("itemData", "@brief Method QMap<int, QVariant> QAbstractProxyModel::itemData(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::itemData", true, &_init_f_itemData_c2395, &_call_f_itemData_c2395);
   methods += new qt_gsi::GenericMethod ("mapFromSource", "@brief Method QModelIndex QAbstractProxyModel::mapFromSource(const QModelIndex &sourceIndex)\n", true, &_init_f_mapFromSource_c2395, &_call_f_mapFromSource_c2395);
   methods += new qt_gsi::GenericMethod ("mapSelectionFromSource", "@brief Method QItemSelection QAbstractProxyModel::mapSelectionFromSource(const QItemSelection &selection)\n", true, &_init_f_mapSelectionFromSource_c2727, &_call_f_mapSelectionFromSource_c2727);
   methods += new qt_gsi::GenericMethod ("mapSelectionToSource", "@brief Method QItemSelection QAbstractProxyModel::mapSelectionToSource(const QItemSelection &selection)\n", true, &_init_f_mapSelectionToSource_c2727, &_call_f_mapSelectionToSource_c2727);
   methods += new qt_gsi::GenericMethod ("mapToSource", "@brief Method QModelIndex QAbstractProxyModel::mapToSource(const QModelIndex &proxyIndex)\n", true, &_init_f_mapToSource_c2395, &_call_f_mapToSource_c2395);
-  methods += new qt_gsi::GenericMethod ("mimeData", "@brief Method (const QList<QModelIndex> &) const\nThis is a reimplementation of QAbstractItemModel::mimeData", true, &_init_f_mimeData_c3010, &_call_f_mimeData_c3010);
-  methods += new qt_gsi::GenericMethod ("mimeTypes", "@brief Method () const\nThis is a reimplementation of QAbstractItemModel::mimeTypes", true, &_init_f_mimeTypes_c0, &_call_f_mimeTypes_c0);
-  methods += new qt_gsi::GenericMethod ("revert", "@brief Method ()\nThis is a reimplementation of QAbstractItemModel::revert", false, &_init_f_revert_0, &_call_f_revert_0);
-  methods += new qt_gsi::GenericMethod ("setData", "@brief Method (const QModelIndex &, const QVariant &, int)\nThis is a reimplementation of QAbstractItemModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
-  methods += new qt_gsi::GenericMethod ("setHeaderData", "@brief Method (int, Qt::Orientation, const QVariant &, int)\nThis is a reimplementation of QAbstractItemModel::setHeaderData", false, &_init_f_setHeaderData_5242, &_call_f_setHeaderData_5242);
-  methods += new qt_gsi::GenericMethod ("setItemData", "@brief Method (const QModelIndex &, const QMap<int, QVariant> &)\nThis is a reimplementation of QAbstractItemModel::setItemData", false, &_init_f_setItemData_5414, &_call_f_setItemData_5414);
+  methods += new qt_gsi::GenericMethod ("mimeData", "@brief Method QMimeData *QAbstractProxyModel::mimeData(const QList<QModelIndex> &indexes)\nThis is a reimplementation of QAbstractItemModel::mimeData", true, &_init_f_mimeData_c3010, &_call_f_mimeData_c3010);
+  methods += new qt_gsi::GenericMethod ("mimeTypes", "@brief Method QStringList QAbstractProxyModel::mimeTypes()\nThis is a reimplementation of QAbstractItemModel::mimeTypes", true, &_init_f_mimeTypes_c0, &_call_f_mimeTypes_c0);
+  methods += new qt_gsi::GenericMethod ("revert", "@brief Method void QAbstractProxyModel::revert()\nThis is a reimplementation of QAbstractItemModel::revert", false, &_init_f_revert_0, &_call_f_revert_0);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Method bool QAbstractProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)\nThis is a reimplementation of QAbstractItemModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
+  methods += new qt_gsi::GenericMethod ("setHeaderData", "@brief Method bool QAbstractProxyModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)\nThis is a reimplementation of QAbstractItemModel::setHeaderData", false, &_init_f_setHeaderData_5242, &_call_f_setHeaderData_5242);
+  methods += new qt_gsi::GenericMethod ("setItemData", "@brief Method bool QAbstractProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles)\nThis is a reimplementation of QAbstractItemModel::setItemData", false, &_init_f_setItemData_5414, &_call_f_setItemData_5414);
   methods += new qt_gsi::GenericMethod ("setSourceModel|sourceModel=", "@brief Method void QAbstractProxyModel::setSourceModel(QAbstractItemModel *sourceModel)\n", false, &_init_f_setSourceModel_2419, &_call_f_setSourceModel_2419);
-  methods += new qt_gsi::GenericMethod ("sibling", "@brief Method (int, int, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::sibling", true, &_init_f_sibling_c3713, &_call_f_sibling_c3713);
-  methods += new qt_gsi::GenericMethod ("sort", "@brief Method (int, Qt::SortOrder)\nThis is a reimplementation of QAbstractItemModel::sort", false, &_init_f_sort_2340, &_call_f_sort_2340);
+  methods += new qt_gsi::GenericMethod ("sibling", "@brief Method QModelIndex QAbstractProxyModel::sibling(int row, int column, const QModelIndex &idx)\nThis is a reimplementation of QAbstractItemModel::sibling", true, &_init_f_sibling_c3713, &_call_f_sibling_c3713);
+  methods += new qt_gsi::GenericMethod ("sort", "@brief Method void QAbstractProxyModel::sort(int column, Qt::SortOrder order)\nThis is a reimplementation of QAbstractItemModel::sort", false, &_init_f_sort_2340, &_call_f_sort_2340);
   methods += new qt_gsi::GenericMethod (":sourceModel", "@brief Method QAbstractItemModel *QAbstractProxyModel::sourceModel()\n", true, &_init_f_sourceModel_c0, &_call_f_sourceModel_c0);
-  methods += new qt_gsi::GenericMethod ("span", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::span", true, &_init_f_span_c2395, &_call_f_span_c2395);
-  methods += new qt_gsi::GenericMethod ("submit", "@brief Method ()\nThis is a reimplementation of QAbstractItemModel::submit", false, &_init_f_submit_0, &_call_f_submit_0);
-  methods += new qt_gsi::GenericMethod ("supportedDragActions", "@brief Method () const\nThis is a reimplementation of QAbstractItemModel::supportedDragActions", true, &_init_f_supportedDragActions_c0, &_call_f_supportedDragActions_c0);
-  methods += new qt_gsi::GenericMethod ("supportedDropActions", "@brief Method () const\nThis is a reimplementation of QAbstractItemModel::supportedDropActions", true, &_init_f_supportedDropActions_c0, &_call_f_supportedDropActions_c0);
+  methods += new qt_gsi::GenericMethod ("span", "@brief Method QSize QAbstractProxyModel::span(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::span", true, &_init_f_span_c2395, &_call_f_span_c2395);
+  methods += new qt_gsi::GenericMethod ("submit", "@brief Method bool QAbstractProxyModel::submit()\nThis is a reimplementation of QAbstractItemModel::submit", false, &_init_f_submit_0, &_call_f_submit_0);
+  methods += new qt_gsi::GenericMethod ("supportedDragActions", "@brief Method QFlags<Qt::DropAction> QAbstractProxyModel::supportedDragActions()\nThis is a reimplementation of QAbstractItemModel::supportedDragActions", true, &_init_f_supportedDragActions_c0, &_call_f_supportedDragActions_c0);
+  methods += new qt_gsi::GenericMethod ("supportedDropActions", "@brief Method QFlags<Qt::DropAction> QAbstractProxyModel::supportedDropActions()\nThis is a reimplementation of QAbstractItemModel::supportedDropActions", true, &_init_f_supportedDropActions_c0, &_call_f_supportedDropActions_c0);
   methods += gsi::qt_signal<const QModelIndex &, const QModelIndex &, const QVector<int> & > ("dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)", "dataChanged", gsi::arg("topLeft"), gsi::arg("bottomRight"), gsi::arg("roles"), "@brief Signal declaration for QAbstractProxyModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAbstractProxyModel::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::Orientation>::target_type &, int, int > ("headerDataChanged(Qt::Orientation, int, int)", "headerDataChanged", gsi::arg("orientation"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QAbstractProxyModel::headerDataChanged(Qt::Orientation orientation, int first, int last)\nYou can bind a procedure to this signal.");

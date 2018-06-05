@@ -175,7 +175,7 @@ static void _call_f_columns_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QTextTableFormat QTextTable::format()
 
 
 static void _init_f_format_c0 (qt_gsi::GenericMethod *decl)
@@ -407,7 +407,7 @@ static void _call_f_rows_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (const QTextTableFormat &)
+// void QTextTable::setFormat(const QTextTableFormat &format)
 
 
 static void _init_f_setFormat_2920 (qt_gsi::GenericMethod *decl)
@@ -562,7 +562,7 @@ static gsi::Methods methods_QTextTable () {
   methods += new qt_gsi::GenericMethod ("cellAt", "@brief Method QTextTableCell QTextTable::cellAt(int position)\n", true, &_init_f_cellAt_c767, &_call_f_cellAt_c767);
   methods += new qt_gsi::GenericMethod ("cellAt", "@brief Method QTextTableCell QTextTable::cellAt(const QTextCursor &c)\n", true, &_init_f_cellAt_c2453, &_call_f_cellAt_c2453);
   methods += new qt_gsi::GenericMethod ("columns", "@brief Method int QTextTable::columns()\n", true, &_init_f_columns_c0, &_call_f_columns_c0);
-  methods += new qt_gsi::GenericMethod (":format", "@brief Method () const\n", true, &_init_f_format_c0, &_call_f_format_c0);
+  methods += new qt_gsi::GenericMethod (":format", "@brief Method QTextTableFormat QTextTable::format()\n", true, &_init_f_format_c0, &_call_f_format_c0);
   methods += new qt_gsi::GenericMethod ("insertColumns", "@brief Method void QTextTable::insertColumns(int pos, int num)\n", false, &_init_f_insertColumns_1426, &_call_f_insertColumns_1426);
   methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method void QTextTable::insertRows(int pos, int num)\n", false, &_init_f_insertRows_1426, &_call_f_insertRows_1426);
   methods += new qt_gsi::GenericMethod ("mergeCells", "@brief Method void QTextTable::mergeCells(int row, int col, int numRows, int numCols)\n", false, &_init_f_mergeCells_2744, &_call_f_mergeCells_2744);
@@ -573,7 +573,7 @@ static gsi::Methods methods_QTextTable () {
   methods += new qt_gsi::GenericMethod ("rowEnd", "@brief Method QTextCursor QTextTable::rowEnd(const QTextCursor &c)\n", true, &_init_f_rowEnd_c2453, &_call_f_rowEnd_c2453);
   methods += new qt_gsi::GenericMethod ("rowStart", "@brief Method QTextCursor QTextTable::rowStart(const QTextCursor &c)\n", true, &_init_f_rowStart_c2453, &_call_f_rowStart_c2453);
   methods += new qt_gsi::GenericMethod ("rows", "@brief Method int QTextTable::rows()\n", true, &_init_f_rows_c0, &_call_f_rows_c0);
-  methods += new qt_gsi::GenericMethod ("setFormat|format=", "@brief Method (const QTextTableFormat &)\n", false, &_init_f_setFormat_2920, &_call_f_setFormat_2920);
+  methods += new qt_gsi::GenericMethod ("setFormat|format=", "@brief Method void QTextTable::setFormat(const QTextTableFormat &format)\n", false, &_init_f_setFormat_2920, &_call_f_setFormat_2920);
   methods += new qt_gsi::GenericMethod ("splitCell", "@brief Method void QTextTable::splitCell(int row, int col, int numRows, int numCols)\n", false, &_init_f_splitCell_2744, &_call_f_splitCell_2744);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QTextTable::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QTextTable::tr(const char *s, const char *c)\nThis method is static and can be called without an instance.", &_init_f_tr_3354, &_call_f_tr_3354);

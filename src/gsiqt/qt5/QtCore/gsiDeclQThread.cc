@@ -50,7 +50,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QEvent *)
+// bool QThread::event(QEvent *event)
 
 
 static void _init_f_event_1217 (qt_gsi::GenericMethod *decl)
@@ -518,7 +518,7 @@ namespace gsi
 static gsi::Methods methods_QThread () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Method (QEvent *)\nThis is a reimplementation of QObject::event", false, &_init_f_event_1217, &_call_f_event_1217);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Method bool QThread::event(QEvent *event)\nThis is a reimplementation of QObject::event", false, &_init_f_event_1217, &_call_f_event_1217);
   methods += new qt_gsi::GenericMethod (":eventDispatcher", "@brief Method QAbstractEventDispatcher *QThread::eventDispatcher()\n", true, &_init_f_eventDispatcher_c0, &_call_f_eventDispatcher_c0);
   methods += new qt_gsi::GenericMethod ("exit", "@brief Method void QThread::exit(int retcode)\n", false, &_init_f_exit_767, &_call_f_exit_767);
   methods += new qt_gsi::GenericMethod ("isFinished?", "@brief Method bool QThread::isFinished()\n", true, &_init_f_isFinished_c0, &_call_f_isFinished_c0);

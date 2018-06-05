@@ -350,7 +350,7 @@ static void _call_f_mediaCount_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// () const
+// QMediaObject *QMediaPlaylist::mediaObject()
 
 
 static void _init_f_mediaObject_c0 (qt_gsi::GenericMethod *decl)
@@ -708,7 +708,7 @@ static gsi::Methods methods_QMediaPlaylist () {
   methods += new qt_gsi::GenericMethod ("load", "@brief Method void QMediaPlaylist::load(QIODevice *device, const char *format)\n", false, &_init_f_load_3070, &_call_f_load_3070);
   methods += new qt_gsi::GenericMethod ("media", "@brief Method QMediaContent QMediaPlaylist::media(int index)\n", true, &_init_f_media_c767, &_call_f_media_c767);
   methods += new qt_gsi::GenericMethod ("mediaCount", "@brief Method int QMediaPlaylist::mediaCount()\n", true, &_init_f_mediaCount_c0, &_call_f_mediaCount_c0);
-  methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Method () const\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
+  methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Method QMediaObject *QMediaPlaylist::mediaObject()\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
   methods += new qt_gsi::GenericMethod ("next", "@brief Method void QMediaPlaylist::next()\n", false, &_init_f_next_0, &_call_f_next_0);
   methods += new qt_gsi::GenericMethod ("nextIndex", "@brief Method int QMediaPlaylist::nextIndex(int steps)\n", true, &_init_f_nextIndex_c767, &_call_f_nextIndex_c767);
   methods += new qt_gsi::GenericMethod (":playbackMode", "@brief Method QMediaPlaylist::PlaybackMode QMediaPlaylist::playbackMode()\n", true, &_init_f_playbackMode_c0, &_call_f_playbackMode_c0);

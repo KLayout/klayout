@@ -209,7 +209,7 @@ static void _call_f_minimumDuration_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// ()
+// void QProgressDialog::open()
 
 
 static void _init_f_open_0 (qt_gsi::GenericMethod *decl)
@@ -225,7 +225,7 @@ static void _call_f_open_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QObject *, const char *)
+// void QProgressDialog::open(QObject *receiver, const char *member)
 
 
 static void _init_f_open_2925 (qt_gsi::GenericMethod *decl)
@@ -507,7 +507,7 @@ static void _call_f_setValue_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QSize QProgressDialog::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -615,8 +615,8 @@ static gsi::Methods methods_QProgressDialog () {
   methods += new qt_gsi::GenericMethod (":maximum", "@brief Method int QProgressDialog::maximum()\n", true, &_init_f_maximum_c0, &_call_f_maximum_c0);
   methods += new qt_gsi::GenericMethod (":minimum", "@brief Method int QProgressDialog::minimum()\n", true, &_init_f_minimum_c0, &_call_f_minimum_c0);
   methods += new qt_gsi::GenericMethod (":minimumDuration", "@brief Method int QProgressDialog::minimumDuration()\n", true, &_init_f_minimumDuration_c0, &_call_f_minimumDuration_c0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method ()\nThis is a reimplementation of QDialog::open", false, &_init_f_open_0, &_call_f_open_0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method (QObject *, const char *)\n", false, &_init_f_open_2925, &_call_f_open_2925);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QProgressDialog::open()\nThis is a reimplementation of QDialog::open", false, &_init_f_open_0, &_call_f_open_0);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QProgressDialog::open(QObject *receiver, const char *member)\n", false, &_init_f_open_2925, &_call_f_open_2925);
   methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QProgressDialog::reset()\n", false, &_init_f_reset_0, &_call_f_reset_0);
   methods += new qt_gsi::GenericMethod ("setAutoClose|autoClose=", "@brief Method void QProgressDialog::setAutoClose(bool close)\n", false, &_init_f_setAutoClose_864, &_call_f_setAutoClose_864);
   methods += new qt_gsi::GenericMethod ("setAutoReset|autoReset=", "@brief Method void QProgressDialog::setAutoReset(bool reset)\n", false, &_init_f_setAutoReset_864, &_call_f_setAutoReset_864);
@@ -630,7 +630,7 @@ static gsi::Methods methods_QProgressDialog () {
   methods += new qt_gsi::GenericMethod ("setMinimumDuration|minimumDuration=", "@brief Method void QProgressDialog::setMinimumDuration(int ms)\n", false, &_init_f_setMinimumDuration_767, &_call_f_setMinimumDuration_767);
   methods += new qt_gsi::GenericMethod ("setRange", "@brief Method void QProgressDialog::setRange(int minimum, int maximum)\n", false, &_init_f_setRange_1426, &_call_f_setRange_1426);
   methods += new qt_gsi::GenericMethod ("setValue|value=", "@brief Method void QProgressDialog::setValue(int progress)\n", false, &_init_f_setValue_767, &_call_f_setValue_767);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QDialog::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QProgressDialog::sizeHint()\nThis is a reimplementation of QDialog::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":value", "@brief Method int QProgressDialog::value()\n", true, &_init_f_value_c0, &_call_f_value_c0);
   methods += new qt_gsi::GenericMethod (":wasCanceled", "@brief Method bool QProgressDialog::wasCanceled()\n", true, &_init_f_wasCanceled_c0, &_call_f_wasCanceled_c0);
   methods += gsi::qt_signal ("accepted()", "accepted", "@brief Signal declaration for QProgressDialog::accepted()\nYou can bind a procedure to this signal.");

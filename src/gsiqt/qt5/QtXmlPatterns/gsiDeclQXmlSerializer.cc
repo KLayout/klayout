@@ -37,7 +37,7 @@
 // -----------------------------------------------------------------------
 // class QXmlSerializer
 
-// (const QVariant &)
+// void QXmlSerializer::atomicValue(const QVariant &value)
 
 
 static void _init_f_atomicValue_2119 (qt_gsi::GenericMethod *decl)
@@ -57,7 +57,7 @@ static void _call_f_atomicValue_2119 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QXmlName &, const QStringRef &)
+// void QXmlSerializer::attribute(const QXmlName &name, const QStringRef &value)
 
 
 static void _init_f_attribute_4286 (qt_gsi::GenericMethod *decl)
@@ -80,7 +80,7 @@ static void _call_f_attribute_4286 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QStringRef &)
+// void QXmlSerializer::characters(const QStringRef &value)
 
 
 static void _init_f_characters_2310 (qt_gsi::GenericMethod *decl)
@@ -115,7 +115,7 @@ static void _call_f_codec_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (const QString &)
+// void QXmlSerializer::comment(const QString &value)
 
 
 static void _init_f_comment_2025 (qt_gsi::GenericMethod *decl)
@@ -135,7 +135,7 @@ static void _call_f_comment_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// ()
+// void QXmlSerializer::endDocument()
 
 
 static void _init_f_endDocument_0 (qt_gsi::GenericMethod *decl)
@@ -151,7 +151,7 @@ static void _call_f_endDocument_0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// ()
+// void QXmlSerializer::endElement()
 
 
 static void _init_f_endElement_0 (qt_gsi::GenericMethod *decl)
@@ -167,7 +167,7 @@ static void _call_f_endElement_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// ()
+// void QXmlSerializer::endOfSequence()
 
 
 static void _init_f_endOfSequence_0 (qt_gsi::GenericMethod *decl)
@@ -183,7 +183,7 @@ static void _call_f_endOfSequence_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QXmlName &)
+// void QXmlSerializer::namespaceBinding(const QXmlName &nb)
 
 
 static void _init_f_namespaceBinding_2084 (qt_gsi::GenericMethod *decl)
@@ -218,7 +218,7 @@ static void _call_f_outputDevice_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QXmlName &, const QString &)
+// void QXmlSerializer::processingInstruction(const QXmlName &name, const QString &value)
 
 
 static void _init_f_processingInstruction_4001 (qt_gsi::GenericMethod *decl)
@@ -261,7 +261,7 @@ static void _call_f_setCodec_2297 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// ()
+// void QXmlSerializer::startDocument()
 
 
 static void _init_f_startDocument_0 (qt_gsi::GenericMethod *decl)
@@ -277,7 +277,7 @@ static void _call_f_startDocument_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QXmlName &)
+// void QXmlSerializer::startElement(const QXmlName &name)
 
 
 static void _init_f_startElement_2084 (qt_gsi::GenericMethod *decl)
@@ -297,7 +297,7 @@ static void _call_f_startElement_2084 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// ()
+// void QXmlSerializer::startOfSequence()
 
 
 static void _init_f_startOfSequence_0 (qt_gsi::GenericMethod *decl)
@@ -318,21 +318,21 @@ namespace gsi
 
 static gsi::Methods methods_QXmlSerializer () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("atomicValue", "@brief Method (const QVariant &)\nThis is a reimplementation of QAbstractXmlReceiver::atomicValue", false, &_init_f_atomicValue_2119, &_call_f_atomicValue_2119);
-  methods += new qt_gsi::GenericMethod ("attribute", "@brief Method (const QXmlName &, const QStringRef &)\nThis is a reimplementation of QAbstractXmlReceiver::attribute", false, &_init_f_attribute_4286, &_call_f_attribute_4286);
-  methods += new qt_gsi::GenericMethod ("characters", "@brief Method (const QStringRef &)\nThis is a reimplementation of QAbstractXmlReceiver::characters", false, &_init_f_characters_2310, &_call_f_characters_2310);
+  methods += new qt_gsi::GenericMethod ("atomicValue", "@brief Method void QXmlSerializer::atomicValue(const QVariant &value)\nThis is a reimplementation of QAbstractXmlReceiver::atomicValue", false, &_init_f_atomicValue_2119, &_call_f_atomicValue_2119);
+  methods += new qt_gsi::GenericMethod ("attribute", "@brief Method void QXmlSerializer::attribute(const QXmlName &name, const QStringRef &value)\nThis is a reimplementation of QAbstractXmlReceiver::attribute", false, &_init_f_attribute_4286, &_call_f_attribute_4286);
+  methods += new qt_gsi::GenericMethod ("characters", "@brief Method void QXmlSerializer::characters(const QStringRef &value)\nThis is a reimplementation of QAbstractXmlReceiver::characters", false, &_init_f_characters_2310, &_call_f_characters_2310);
   methods += new qt_gsi::GenericMethod (":codec", "@brief Method const QTextCodec *QXmlSerializer::codec()\n", true, &_init_f_codec_c0, &_call_f_codec_c0);
-  methods += new qt_gsi::GenericMethod ("comment", "@brief Method (const QString &)\nThis is a reimplementation of QAbstractXmlReceiver::comment", false, &_init_f_comment_2025, &_call_f_comment_2025);
-  methods += new qt_gsi::GenericMethod ("endDocument", "@brief Method ()\nThis is a reimplementation of QAbstractXmlReceiver::endDocument", false, &_init_f_endDocument_0, &_call_f_endDocument_0);
-  methods += new qt_gsi::GenericMethod ("endElement", "@brief Method ()\nThis is a reimplementation of QAbstractXmlReceiver::endElement", false, &_init_f_endElement_0, &_call_f_endElement_0);
-  methods += new qt_gsi::GenericMethod ("endOfSequence", "@brief Method ()\nThis is a reimplementation of QAbstractXmlReceiver::endOfSequence", false, &_init_f_endOfSequence_0, &_call_f_endOfSequence_0);
-  methods += new qt_gsi::GenericMethod ("namespaceBinding", "@brief Method (const QXmlName &)\nThis is a reimplementation of QAbstractXmlReceiver::namespaceBinding", false, &_init_f_namespaceBinding_2084, &_call_f_namespaceBinding_2084);
+  methods += new qt_gsi::GenericMethod ("comment", "@brief Method void QXmlSerializer::comment(const QString &value)\nThis is a reimplementation of QAbstractXmlReceiver::comment", false, &_init_f_comment_2025, &_call_f_comment_2025);
+  methods += new qt_gsi::GenericMethod ("endDocument", "@brief Method void QXmlSerializer::endDocument()\nThis is a reimplementation of QAbstractXmlReceiver::endDocument", false, &_init_f_endDocument_0, &_call_f_endDocument_0);
+  methods += new qt_gsi::GenericMethod ("endElement", "@brief Method void QXmlSerializer::endElement()\nThis is a reimplementation of QAbstractXmlReceiver::endElement", false, &_init_f_endElement_0, &_call_f_endElement_0);
+  methods += new qt_gsi::GenericMethod ("endOfSequence", "@brief Method void QXmlSerializer::endOfSequence()\nThis is a reimplementation of QAbstractXmlReceiver::endOfSequence", false, &_init_f_endOfSequence_0, &_call_f_endOfSequence_0);
+  methods += new qt_gsi::GenericMethod ("namespaceBinding", "@brief Method void QXmlSerializer::namespaceBinding(const QXmlName &nb)\nThis is a reimplementation of QAbstractXmlReceiver::namespaceBinding", false, &_init_f_namespaceBinding_2084, &_call_f_namespaceBinding_2084);
   methods += new qt_gsi::GenericMethod ("outputDevice", "@brief Method QIODevice *QXmlSerializer::outputDevice()\n", true, &_init_f_outputDevice_c0, &_call_f_outputDevice_c0);
-  methods += new qt_gsi::GenericMethod ("processingInstruction", "@brief Method (const QXmlName &, const QString &)\nThis is a reimplementation of QAbstractXmlReceiver::processingInstruction", false, &_init_f_processingInstruction_4001, &_call_f_processingInstruction_4001);
+  methods += new qt_gsi::GenericMethod ("processingInstruction", "@brief Method void QXmlSerializer::processingInstruction(const QXmlName &name, const QString &value)\nThis is a reimplementation of QAbstractXmlReceiver::processingInstruction", false, &_init_f_processingInstruction_4001, &_call_f_processingInstruction_4001);
   methods += new qt_gsi::GenericMethod ("setCodec|codec=", "@brief Method void QXmlSerializer::setCodec(const QTextCodec *codec)\n", false, &_init_f_setCodec_2297, &_call_f_setCodec_2297);
-  methods += new qt_gsi::GenericMethod ("startDocument", "@brief Method ()\nThis is a reimplementation of QAbstractXmlReceiver::startDocument", false, &_init_f_startDocument_0, &_call_f_startDocument_0);
-  methods += new qt_gsi::GenericMethod ("startElement", "@brief Method (const QXmlName &)\nThis is a reimplementation of QAbstractXmlReceiver::startElement", false, &_init_f_startElement_2084, &_call_f_startElement_2084);
-  methods += new qt_gsi::GenericMethod ("startOfSequence", "@brief Method ()\nThis is a reimplementation of QAbstractXmlReceiver::startOfSequence", false, &_init_f_startOfSequence_0, &_call_f_startOfSequence_0);
+  methods += new qt_gsi::GenericMethod ("startDocument", "@brief Method void QXmlSerializer::startDocument()\nThis is a reimplementation of QAbstractXmlReceiver::startDocument", false, &_init_f_startDocument_0, &_call_f_startDocument_0);
+  methods += new qt_gsi::GenericMethod ("startElement", "@brief Method void QXmlSerializer::startElement(const QXmlName &name)\nThis is a reimplementation of QAbstractXmlReceiver::startElement", false, &_init_f_startElement_2084, &_call_f_startElement_2084);
+  methods += new qt_gsi::GenericMethod ("startOfSequence", "@brief Method void QXmlSerializer::startOfSequence()\nThis is a reimplementation of QAbstractXmlReceiver::startOfSequence", false, &_init_f_startOfSequence_0, &_call_f_startOfSequence_0);
   return methods;
 }
 

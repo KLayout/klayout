@@ -61,7 +61,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (const QModelIndex &) const
+// int QDirModel::columnCount(const QModelIndex &parent)
 
 
 static void _init_f_columnCount_c2395 (qt_gsi::GenericMethod *decl)
@@ -80,7 +80,7 @@ static void _call_f_columnCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QModelIndex &, int) const
+// QVariant QDirModel::data(const QModelIndex &index, int role)
 
 
 static void _init_f_data_c3054 (qt_gsi::GenericMethod *decl)
@@ -102,7 +102,7 @@ static void _call_f_data_c3054 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)
+// bool QDirModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_dropMimeData_7425 (qt_gsi::GenericMethod *decl)
@@ -224,7 +224,7 @@ static void _call_f_filter_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (const QModelIndex &) const
+// QFlags<Qt::ItemFlag> QDirModel::flags(const QModelIndex &index)
 
 
 static void _init_f_flags_c2395 (qt_gsi::GenericMethod *decl)
@@ -243,7 +243,7 @@ static void _call_f_flags_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QModelIndex &) const
+// bool QDirModel::hasChildren(const QModelIndex &index)
 
 
 static void _init_f_hasChildren_c2395 (qt_gsi::GenericMethod *decl)
@@ -262,7 +262,7 @@ static void _call_f_hasChildren_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (int, Qt::Orientation, int) const
+// QVariant QDirModel::headerData(int section, Qt::Orientation orientation, int role)
 
 
 static void _init_f_headerData_c3231 (qt_gsi::GenericMethod *decl)
@@ -302,7 +302,7 @@ static void _call_f_iconProvider_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (int, int, const QModelIndex &) const
+// QModelIndex QDirModel::index(int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_index_c3713 (qt_gsi::GenericMethod *decl)
@@ -327,7 +327,7 @@ static void _call_f_index_c3713 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QString &, int) const
+// QModelIndex QDirModel::index(const QString &path, int column)
 
 
 static void _init_f_index_c2684 (qt_gsi::GenericMethod *decl)
@@ -398,7 +398,7 @@ static void _call_f_lazyChildCount_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QList<QModelIndex> &) const
+// QMimeData *QDirModel::mimeData(const QList<QModelIndex> &indexes)
 
 
 static void _init_f_mimeData_c3010 (qt_gsi::GenericMethod *decl)
@@ -417,7 +417,7 @@ static void _call_f_mimeData_c3010 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QStringList QDirModel::mimeTypes()
 
 
 static void _init_f_mimeTypes_c0 (qt_gsi::GenericMethod *decl)
@@ -469,7 +469,7 @@ static void _call_f_nameFilters_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QModelIndex &) const
+// QModelIndex QDirModel::parent(const QModelIndex &child)
 
 
 static void _init_f_parent_c2395 (qt_gsi::GenericMethod *decl)
@@ -488,7 +488,7 @@ static void _call_f_parent_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QObject *QDirModel::parent()
 
 
 static void _init_f_parent_c0 (qt_gsi::GenericMethod *decl)
@@ -576,7 +576,7 @@ static void _call_f_rmdir_2395 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (const QModelIndex &) const
+// int QDirModel::rowCount(const QModelIndex &parent)
 
 
 static void _init_f_rowCount_c2395 (qt_gsi::GenericMethod *decl)
@@ -595,7 +595,7 @@ static void _call_f_rowCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QModelIndex &, const QVariant &, int)
+// bool QDirModel::setData(const QModelIndex &index, const QVariant &value, int role)
 
 
 static void _init_f_setData_5065 (qt_gsi::GenericMethod *decl)
@@ -760,7 +760,7 @@ static void _call_f_setSorting_2418 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (int, Qt::SortOrder)
+// void QDirModel::sort(int column, Qt::SortOrder order)
 
 
 static void _init_f_sort_2340 (qt_gsi::GenericMethod *decl)
@@ -798,7 +798,7 @@ static void _call_f_sorting_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QFlags<Qt::DropAction> QDirModel::supportedDropActions()
 
 
 static void _init_f_supportedDropActions_c0 (qt_gsi::GenericMethod *decl)
@@ -913,35 +913,35 @@ namespace gsi
 static gsi::Methods methods_QDirModel () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::columnCount", true, &_init_f_columnCount_c2395, &_call_f_columnCount_c2395);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Method (const QModelIndex &, int) const\nThis is a reimplementation of QAbstractItemModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
-  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
+  methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method int QDirModel::columnCount(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::columnCount", true, &_init_f_columnCount_c2395, &_call_f_columnCount_c2395);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Method QVariant QDirModel::data(const QModelIndex &index, int role)\nThis is a reimplementation of QAbstractItemModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
+  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method bool QDirModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
   methods += new qt_gsi::GenericMethod ("fileIcon", "@brief Method QIcon QDirModel::fileIcon(const QModelIndex &index)\n", true, &_init_f_fileIcon_c2395, &_call_f_fileIcon_c2395);
   methods += new qt_gsi::GenericMethod ("fileInfo", "@brief Method QFileInfo QDirModel::fileInfo(const QModelIndex &index)\n", true, &_init_f_fileInfo_c2395, &_call_f_fileInfo_c2395);
   methods += new qt_gsi::GenericMethod ("fileName", "@brief Method QString QDirModel::fileName(const QModelIndex &index)\n", true, &_init_f_fileName_c2395, &_call_f_fileName_c2395);
   methods += new qt_gsi::GenericMethod ("filePath", "@brief Method QString QDirModel::filePath(const QModelIndex &index)\n", true, &_init_f_filePath_c2395, &_call_f_filePath_c2395);
   methods += new qt_gsi::GenericMethod (":filter", "@brief Method QFlags<QDir::Filter> QDirModel::filter()\n", true, &_init_f_filter_c0, &_call_f_filter_c0);
-  methods += new qt_gsi::GenericMethod ("flags", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
-  methods += new qt_gsi::GenericMethod ("hasChildren", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::hasChildren", true, &_init_f_hasChildren_c2395, &_call_f_hasChildren_c2395);
-  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method (int, Qt::Orientation, int) const\nThis is a reimplementation of QAbstractItemModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
+  methods += new qt_gsi::GenericMethod ("flags", "@brief Method QFlags<Qt::ItemFlag> QDirModel::flags(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
+  methods += new qt_gsi::GenericMethod ("hasChildren", "@brief Method bool QDirModel::hasChildren(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::hasChildren", true, &_init_f_hasChildren_c2395, &_call_f_hasChildren_c2395);
+  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method QVariant QDirModel::headerData(int section, Qt::Orientation orientation, int role)\nThis is a reimplementation of QAbstractItemModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
   methods += new qt_gsi::GenericMethod (":iconProvider", "@brief Method QFileIconProvider *QDirModel::iconProvider()\n", true, &_init_f_iconProvider_c0, &_call_f_iconProvider_c0);
-  methods += new qt_gsi::GenericMethod ("index", "@brief Method (int, int, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::index", true, &_init_f_index_c3713, &_call_f_index_c3713);
-  methods += new qt_gsi::GenericMethod ("index", "@brief Method (const QString &, int) const\n", true, &_init_f_index_c2684, &_call_f_index_c2684);
+  methods += new qt_gsi::GenericMethod ("index", "@brief Method QModelIndex QDirModel::index(int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::index", true, &_init_f_index_c3713, &_call_f_index_c3713);
+  methods += new qt_gsi::GenericMethod ("index", "@brief Method QModelIndex QDirModel::index(const QString &path, int column)\n", true, &_init_f_index_c2684, &_call_f_index_c2684);
   methods += new qt_gsi::GenericMethod ("isDir?", "@brief Method bool QDirModel::isDir(const QModelIndex &index)\n", true, &_init_f_isDir_c2395, &_call_f_isDir_c2395);
   methods += new qt_gsi::GenericMethod ("isReadOnly?|:readOnly", "@brief Method bool QDirModel::isReadOnly()\n", true, &_init_f_isReadOnly_c0, &_call_f_isReadOnly_c0);
   methods += new qt_gsi::GenericMethod (":lazyChildCount", "@brief Method bool QDirModel::lazyChildCount()\n", true, &_init_f_lazyChildCount_c0, &_call_f_lazyChildCount_c0);
-  methods += new qt_gsi::GenericMethod ("mimeData", "@brief Method (const QList<QModelIndex> &) const\nThis is a reimplementation of QAbstractItemModel::mimeData", true, &_init_f_mimeData_c3010, &_call_f_mimeData_c3010);
-  methods += new qt_gsi::GenericMethod ("mimeTypes", "@brief Method () const\nThis is a reimplementation of QAbstractItemModel::mimeTypes", true, &_init_f_mimeTypes_c0, &_call_f_mimeTypes_c0);
+  methods += new qt_gsi::GenericMethod ("mimeData", "@brief Method QMimeData *QDirModel::mimeData(const QList<QModelIndex> &indexes)\nThis is a reimplementation of QAbstractItemModel::mimeData", true, &_init_f_mimeData_c3010, &_call_f_mimeData_c3010);
+  methods += new qt_gsi::GenericMethod ("mimeTypes", "@brief Method QStringList QDirModel::mimeTypes()\nThis is a reimplementation of QAbstractItemModel::mimeTypes", true, &_init_f_mimeTypes_c0, &_call_f_mimeTypes_c0);
   methods += new qt_gsi::GenericMethod ("mkdir", "@brief Method QModelIndex QDirModel::mkdir(const QModelIndex &parent, const QString &name)\n", false, &_init_f_mkdir_4312, &_call_f_mkdir_4312);
   methods += new qt_gsi::GenericMethod (":nameFilters", "@brief Method QStringList QDirModel::nameFilters()\n", true, &_init_f_nameFilters_c0, &_call_f_nameFilters_c0);
-  methods += new qt_gsi::GenericMethod ("parent", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::parent", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
-  methods += new qt_gsi::GenericMethod (":parent", "@brief Method () const\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
+  methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QDirModel::parent(const QModelIndex &child)\nThis is a reimplementation of QAbstractItemModel::parent", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
+  methods += new qt_gsi::GenericMethod (":parent", "@brief Method QObject *QDirModel::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
   methods += new qt_gsi::GenericMethod ("refresh", "@brief Method void QDirModel::refresh(const QModelIndex &parent)\n", false, &_init_f_refresh_2395, &_call_f_refresh_2395);
   methods += new qt_gsi::GenericMethod ("remove", "@brief Method bool QDirModel::remove(const QModelIndex &index)\n", false, &_init_f_remove_2395, &_call_f_remove_2395);
   methods += new qt_gsi::GenericMethod (":resolveSymlinks", "@brief Method bool QDirModel::resolveSymlinks()\n", true, &_init_f_resolveSymlinks_c0, &_call_f_resolveSymlinks_c0);
   methods += new qt_gsi::GenericMethod ("rmdir", "@brief Method bool QDirModel::rmdir(const QModelIndex &index)\n", false, &_init_f_rmdir_2395, &_call_f_rmdir_2395);
-  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
-  methods += new qt_gsi::GenericMethod ("setData", "@brief Method (const QModelIndex &, const QVariant &, int)\nThis is a reimplementation of QAbstractItemModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
+  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method int QDirModel::rowCount(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Method bool QDirModel::setData(const QModelIndex &index, const QVariant &value, int role)\nThis is a reimplementation of QAbstractItemModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
   methods += new qt_gsi::GenericMethod ("setFilter|filter=", "@brief Method void QDirModel::setFilter(QFlags<QDir::Filter> filters)\n", false, &_init_f_setFilter_2230, &_call_f_setFilter_2230);
   methods += new qt_gsi::GenericMethod ("setIconProvider|iconProvider=", "@brief Method void QDirModel::setIconProvider(QFileIconProvider *provider)\n", false, &_init_f_setIconProvider_2323, &_call_f_setIconProvider_2323);
   methods += new qt_gsi::GenericMethod ("setLazyChildCount|lazyChildCount=", "@brief Method void QDirModel::setLazyChildCount(bool enable)\n", false, &_init_f_setLazyChildCount_864, &_call_f_setLazyChildCount_864);
@@ -949,9 +949,9 @@ static gsi::Methods methods_QDirModel () {
   methods += new qt_gsi::GenericMethod ("setReadOnly|readOnly=", "@brief Method void QDirModel::setReadOnly(bool enable)\n", false, &_init_f_setReadOnly_864, &_call_f_setReadOnly_864);
   methods += new qt_gsi::GenericMethod ("setResolveSymlinks|resolveSymlinks=", "@brief Method void QDirModel::setResolveSymlinks(bool enable)\n", false, &_init_f_setResolveSymlinks_864, &_call_f_setResolveSymlinks_864);
   methods += new qt_gsi::GenericMethod ("setSorting|sorting=", "@brief Method void QDirModel::setSorting(QFlags<QDir::SortFlag> sort)\n", false, &_init_f_setSorting_2418, &_call_f_setSorting_2418);
-  methods += new qt_gsi::GenericMethod ("sort", "@brief Method (int, Qt::SortOrder)\nThis is a reimplementation of QAbstractItemModel::sort", false, &_init_f_sort_2340, &_call_f_sort_2340);
+  methods += new qt_gsi::GenericMethod ("sort", "@brief Method void QDirModel::sort(int column, Qt::SortOrder order)\nThis is a reimplementation of QAbstractItemModel::sort", false, &_init_f_sort_2340, &_call_f_sort_2340);
   methods += new qt_gsi::GenericMethod (":sorting", "@brief Method QFlags<QDir::SortFlag> QDirModel::sorting()\n", true, &_init_f_sorting_c0, &_call_f_sorting_c0);
-  methods += new qt_gsi::GenericMethod ("supportedDropActions", "@brief Method () const\nThis is a reimplementation of QAbstractItemModel::supportedDropActions", true, &_init_f_supportedDropActions_c0, &_call_f_supportedDropActions_c0);
+  methods += new qt_gsi::GenericMethod ("supportedDropActions", "@brief Method QFlags<Qt::DropAction> QDirModel::supportedDropActions()\nThis is a reimplementation of QAbstractItemModel::supportedDropActions", true, &_init_f_supportedDropActions_c0, &_call_f_supportedDropActions_c0);
   methods += gsi::qt_signal<const QModelIndex &, const QModelIndex & > ("dataChanged(const QModelIndex &, const QModelIndex &)", "dataChanged", gsi::arg("topLeft"), gsi::arg("bottomRight"), "@brief Signal declaration for QDirModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QDirModel::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::Orientation>::target_type &, int, int > ("headerDataChanged(Qt::Orientation, int, int)", "headerDataChanged", gsi::arg("orientation"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QDirModel::headerDataChanged(Qt::Orientation orientation, int first, int last)\nYou can bind a procedure to this signal.");

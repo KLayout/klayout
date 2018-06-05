@@ -92,7 +92,7 @@ static void _call_f_setRegularExpression_3188 (const qt_gsi::GenericMethod * /*d
 }
 
 
-// (QString &, int &) const
+// QValidator::State QRegularExpressionValidator::validate(QString &input, int &pos)
 
 
 static void _init_f_validate_c2171 (qt_gsi::GenericMethod *decl)
@@ -172,7 +172,7 @@ static gsi::Methods methods_QRegularExpressionValidator () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":regularExpression", "@brief Method QRegularExpression QRegularExpressionValidator::regularExpression()\n", true, &_init_f_regularExpression_c0, &_call_f_regularExpression_c0);
   methods += new qt_gsi::GenericMethod ("setRegularExpression|regularExpression=", "@brief Method void QRegularExpressionValidator::setRegularExpression(const QRegularExpression &re)\n", false, &_init_f_setRegularExpression_3188, &_call_f_setRegularExpression_3188);
-  methods += new qt_gsi::GenericMethod ("validate", "@brief Method (QString &, int &) const\nThis is a reimplementation of QValidator::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
+  methods += new qt_gsi::GenericMethod ("validate", "@brief Method QValidator::State QRegularExpressionValidator::validate(QString &input, int &pos)\nThis is a reimplementation of QValidator::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
   methods += gsi::qt_signal ("changed()", "changed", "@brief Signal declaration for QRegularExpressionValidator::changed()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QRegularExpressionValidator::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QRegularExpression & > ("regularExpressionChanged(const QRegularExpression &)", "regularExpressionChanged", gsi::arg("re"), "@brief Signal declaration for QRegularExpressionValidator::regularExpressionChanged(const QRegularExpression &re)\nYou can bind a procedure to this signal.");

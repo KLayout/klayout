@@ -86,7 +86,7 @@ static void _call_ctor_QDomCDATASection_2756 (const qt_gsi::GenericStaticMethod 
 }
 
 
-// () const
+// QDomNode::NodeType QDomCDATASection::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -101,7 +101,7 @@ static void _call_f_nodeType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QDomCDATASection &)
+// QDomCDATASection &QDomCDATASection::operator=(const QDomCDATASection &)
 
 
 static void _init_f_operator_eq__2756 (qt_gsi::GenericMethod *decl)
@@ -128,8 +128,8 @@ static gsi::Methods methods_QDomCDATASection () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomCDATASection::QDomCDATASection()\nThis method creates an object of class QDomCDATASection.", &_init_ctor_QDomCDATASection_0, &_call_ctor_QDomCDATASection_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomCDATASection::QDomCDATASection(const QDomCDATASection &x)\nThis method creates an object of class QDomCDATASection.", &_init_ctor_QDomCDATASection_2756, &_call_ctor_QDomCDATASection_2756);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomCDATASection &)\n", false, &_init_f_operator_eq__2756, &_call_f_operator_eq__2756);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomCDATASection::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomCDATASection &QDomCDATASection::operator=(const QDomCDATASection &)\n", false, &_init_f_operator_eq__2756, &_call_f_operator_eq__2756);
   return methods;
 }
 

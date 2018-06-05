@@ -174,7 +174,7 @@ static void _call_f_attributeNodeNS_3942 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// () const
+// QDomNamedNodeMap QDomElement::attributes()
 
 
 static void _init_f_attributes_c0 (qt_gsi::GenericMethod *decl)
@@ -271,7 +271,7 @@ static void _call_f_hasAttributeNS_c3942 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// () const
+// QDomNode::NodeType QDomElement::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -286,7 +286,7 @@ static void _call_f_nodeType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QDomElement &)
+// QDomElement &QDomElement::operator=(const QDomElement &)
 
 
 static void _init_f_operator_eq__2396 (qt_gsi::GenericMethod *decl)
@@ -784,13 +784,13 @@ static gsi::Methods methods_QDomElement () {
   methods += new qt_gsi::GenericMethod ("attributeNS", "@brief Method QString QDomElement::attributeNS(const QString nsURI, const QString &localName, const QString &defValue)\n", true, &_init_f_attributeNS_c5677, &_call_f_attributeNS_c5677);
   methods += new qt_gsi::GenericMethod ("attributeNode", "@brief Method QDomAttr QDomElement::attributeNode(const QString &name)\n", false, &_init_f_attributeNode_2025, &_call_f_attributeNode_2025);
   methods += new qt_gsi::GenericMethod ("attributeNodeNS", "@brief Method QDomAttr QDomElement::attributeNodeNS(const QString &nsURI, const QString &localName)\n", false, &_init_f_attributeNodeNS_3942, &_call_f_attributeNodeNS_3942);
-  methods += new qt_gsi::GenericMethod ("attributes", "@brief Method () const\n", true, &_init_f_attributes_c0, &_call_f_attributes_c0);
+  methods += new qt_gsi::GenericMethod ("attributes", "@brief Method QDomNamedNodeMap QDomElement::attributes()\n", true, &_init_f_attributes_c0, &_call_f_attributes_c0);
   methods += new qt_gsi::GenericMethod ("elementsByTagName", "@brief Method QDomNodeList QDomElement::elementsByTagName(const QString &tagname)\n", true, &_init_f_elementsByTagName_c2025, &_call_f_elementsByTagName_c2025);
   methods += new qt_gsi::GenericMethod ("elementsByTagNameNS", "@brief Method QDomNodeList QDomElement::elementsByTagNameNS(const QString &nsURI, const QString &localName)\n", true, &_init_f_elementsByTagNameNS_c3942, &_call_f_elementsByTagNameNS_c3942);
   methods += new qt_gsi::GenericMethod ("hasAttribute", "@brief Method bool QDomElement::hasAttribute(const QString &name)\n", true, &_init_f_hasAttribute_c2025, &_call_f_hasAttribute_c2025);
   methods += new qt_gsi::GenericMethod ("hasAttributeNS", "@brief Method bool QDomElement::hasAttributeNS(const QString &nsURI, const QString &localName)\n", true, &_init_f_hasAttributeNS_c3942, &_call_f_hasAttributeNS_c3942);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomElement &)\n", false, &_init_f_operator_eq__2396, &_call_f_operator_eq__2396);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomElement::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomElement &QDomElement::operator=(const QDomElement &)\n", false, &_init_f_operator_eq__2396, &_call_f_operator_eq__2396);
   methods += new qt_gsi::GenericMethod ("removeAttribute", "@brief Method void QDomElement::removeAttribute(const QString &name)\n", false, &_init_f_removeAttribute_2025, &_call_f_removeAttribute_2025);
   methods += new qt_gsi::GenericMethod ("removeAttributeNS", "@brief Method void QDomElement::removeAttributeNS(const QString &nsURI, const QString &localName)\n", false, &_init_f_removeAttributeNS_3942, &_call_f_removeAttributeNS_3942);
   methods += new qt_gsi::GenericMethod ("removeAttributeNode", "@brief Method QDomAttr QDomElement::removeAttributeNode(const QDomAttr &oldAttr)\n", false, &_init_f_removeAttributeNode_2093, &_call_f_removeAttributeNode_2093);

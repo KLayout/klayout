@@ -101,7 +101,7 @@ static void _call_f_directWriteFallback_c0 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// QString QSaveFile::fileName()
 
 
 static void _init_f_fileName_c0 (qt_gsi::GenericMethod *decl)
@@ -116,7 +116,7 @@ static void _call_f_fileName_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (QFlags<QIODevice::OpenModeFlag>)
+// bool QSaveFile::open(QFlags<QIODevice::OpenModeFlag> flags)
 
 
 static void _init_f_open_3242 (qt_gsi::GenericMethod *decl)
@@ -234,8 +234,8 @@ static gsi::Methods methods_QSaveFile () {
   methods += new qt_gsi::GenericMethod ("cancelWriting", "@brief Method void QSaveFile::cancelWriting()\n", false, &_init_f_cancelWriting_0, &_call_f_cancelWriting_0);
   methods += new qt_gsi::GenericMethod ("commit", "@brief Method bool QSaveFile::commit()\n", false, &_init_f_commit_0, &_call_f_commit_0);
   methods += new qt_gsi::GenericMethod (":directWriteFallback", "@brief Method bool QSaveFile::directWriteFallback()\n", true, &_init_f_directWriteFallback_c0, &_call_f_directWriteFallback_c0);
-  methods += new qt_gsi::GenericMethod (":fileName", "@brief Method () const\nThis is a reimplementation of QFileDevice::fileName", true, &_init_f_fileName_c0, &_call_f_fileName_c0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method (QFlags<QIODevice::OpenModeFlag>)\nThis is a reimplementation of QIODevice::open", false, &_init_f_open_3242, &_call_f_open_3242);
+  methods += new qt_gsi::GenericMethod (":fileName", "@brief Method QString QSaveFile::fileName()\nThis is a reimplementation of QFileDevice::fileName", true, &_init_f_fileName_c0, &_call_f_fileName_c0);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method bool QSaveFile::open(QFlags<QIODevice::OpenModeFlag> flags)\nThis is a reimplementation of QIODevice::open", false, &_init_f_open_3242, &_call_f_open_3242);
   methods += new qt_gsi::GenericMethod ("setDirectWriteFallback|directWriteFallback=", "@brief Method void QSaveFile::setDirectWriteFallback(bool enabled)\n", false, &_init_f_setDirectWriteFallback_864, &_call_f_setDirectWriteFallback_864);
   methods += new qt_gsi::GenericMethod ("setFileName|fileName=", "@brief Method void QSaveFile::setFileName(const QString &name)\n", false, &_init_f_setFileName_2025, &_call_f_setFileName_2025);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QSaveFile::aboutToClose()\nYou can bind a procedure to this signal.");

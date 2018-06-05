@@ -161,7 +161,7 @@ static void _call_f_count_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// () const
+// QFlags<Qt::Orientation> QLayout::expandingDirections()
 
 
 static void _init_f_expandingDirections_c0 (qt_gsi::GenericMethod *decl)
@@ -176,7 +176,7 @@ static void _call_f_expandingDirections_c0 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// QRect QLayout::geometry()
 
 
 static void _init_f_geometry_c0 (qt_gsi::GenericMethod *decl)
@@ -239,7 +239,7 @@ static void _call_f_indexOf_c1315 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// ()
+// void QLayout::invalidate()
 
 
 static void _init_f_invalidate_0 (qt_gsi::GenericMethod *decl)
@@ -255,7 +255,7 @@ static void _call_f_invalidate_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// bool QLayout::isEmpty()
 
 
 static void _init_f_isEmpty_c0 (qt_gsi::GenericMethod *decl)
@@ -304,7 +304,7 @@ static void _call_f_itemAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// ()
+// QLayout *QLayout::layout()
 
 
 static void _init_f_layout_0 (qt_gsi::GenericMethod *decl)
@@ -334,7 +334,7 @@ static void _call_f_margin_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// QSize QLayout::maximumSize()
 
 
 static void _init_f_maximumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -364,7 +364,7 @@ static void _call_f_menuBar_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QSize QLayout::minimumSize()
 
 
 static void _init_f_minimumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -434,7 +434,7 @@ static void _call_f_removeWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QWidget *, QFlags<Qt::AlignmentFlag>)
+// bool QLayout::setAlignment(QWidget *w, QFlags<Qt::AlignmentFlag> alignment)
 
 
 static void _init_f_setAlignment_3957 (qt_gsi::GenericMethod *decl)
@@ -456,7 +456,7 @@ static void _call_f_setAlignment_3957 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QLayout *, QFlags<Qt::AlignmentFlag>)
+// bool QLayout::setAlignment(QLayout *l, QFlags<Qt::AlignmentFlag> alignment)
 
 
 static void _init_f_setAlignment_3983 (qt_gsi::GenericMethod *decl)
@@ -478,7 +478,7 @@ static void _call_f_setAlignment_3983 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QFlags<Qt::AlignmentFlag>)
+// void QLayout::setAlignment(QFlags<Qt::AlignmentFlag> a)
 
 
 static void _init_f_setAlignment_2750 (qt_gsi::GenericMethod *decl)
@@ -567,7 +567,7 @@ static void _call_f_setEnabled_864 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QRect &)
+// void QLayout::setGeometry(const QRect &)
 
 
 static void _init_f_setGeometry_1792 (qt_gsi::GenericMethod *decl)
@@ -969,29 +969,29 @@ static gsi::Methods methods_QLayout () {
   methods += new qt_gsi::GenericMethod (":contentsMargins", "@brief Method QMargins QLayout::contentsMargins()\n", true, &_init_f_contentsMargins_c0, &_call_f_contentsMargins_c0);
   methods += new qt_gsi::GenericMethod ("contentsRect", "@brief Method QRect QLayout::contentsRect()\n", true, &_init_f_contentsRect_c0, &_call_f_contentsRect_c0);
   methods += new qt_gsi::GenericMethod ("count", "@brief Method int QLayout::count()\n", true, &_init_f_count_c0, &_call_f_count_c0);
-  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method () const\nThis is a reimplementation of QLayoutItem::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
-  methods += new qt_gsi::GenericMethod (":geometry", "@brief Method () const\nThis is a reimplementation of QLayoutItem::geometry", true, &_init_f_geometry_c0, &_call_f_geometry_c0);
+  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method QFlags<Qt::Orientation> QLayout::expandingDirections()\nThis is a reimplementation of QLayoutItem::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
+  methods += new qt_gsi::GenericMethod (":geometry", "@brief Method QRect QLayout::geometry()\nThis is a reimplementation of QLayoutItem::geometry", true, &_init_f_geometry_c0, &_call_f_geometry_c0);
   methods += new qt_gsi::GenericMethod ("getContentsMargins", "@brief Method void QLayout::getContentsMargins(int *left, int *top, int *right, int *bottom)\n", true, &_init_f_getContentsMargins_c3488, &_call_f_getContentsMargins_c3488);
   methods += new qt_gsi::GenericMethod ("indexOf", "@brief Method int QLayout::indexOf(QWidget *)\n", true, &_init_f_indexOf_c1315, &_call_f_indexOf_c1315);
-  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method ()\nThis is a reimplementation of QLayoutItem::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
-  methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method () const\nThis is a reimplementation of QLayoutItem::isEmpty", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
+  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QLayout::invalidate()\nThis is a reimplementation of QLayoutItem::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
+  methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QLayout::isEmpty()\nThis is a reimplementation of QLayoutItem::isEmpty", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
   methods += new qt_gsi::GenericMethod ("isEnabled?|:enabled", "@brief Method bool QLayout::isEnabled()\n", true, &_init_f_isEnabled_c0, &_call_f_isEnabled_c0);
   methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QLayoutItem *QLayout::itemAt(int index)\n", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
-  methods += new qt_gsi::GenericMethod ("layout", "@brief Method ()\nThis is a reimplementation of QLayoutItem::layout", false, &_init_f_layout_0, &_call_f_layout_0);
+  methods += new qt_gsi::GenericMethod ("layout", "@brief Method QLayout *QLayout::layout()\nThis is a reimplementation of QLayoutItem::layout", false, &_init_f_layout_0, &_call_f_layout_0);
   methods += new qt_gsi::GenericMethod (":margin", "@brief Method int QLayout::margin()\n", true, &_init_f_margin_c0, &_call_f_margin_c0);
-  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Method () const\nThis is a reimplementation of QLayoutItem::maximumSize", true, &_init_f_maximumSize_c0, &_call_f_maximumSize_c0);
+  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Method QSize QLayout::maximumSize()\nThis is a reimplementation of QLayoutItem::maximumSize", true, &_init_f_maximumSize_c0, &_call_f_maximumSize_c0);
   methods += new qt_gsi::GenericMethod (":menuBar", "@brief Method QWidget *QLayout::menuBar()\n", true, &_init_f_menuBar_c0, &_call_f_menuBar_c0);
-  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method () const\nThis is a reimplementation of QLayoutItem::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
+  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method QSize QLayout::minimumSize()\nThis is a reimplementation of QLayoutItem::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
   methods += new qt_gsi::GenericMethod ("parentWidget", "@brief Method QWidget *QLayout::parentWidget()\n", true, &_init_f_parentWidget_c0, &_call_f_parentWidget_c0);
   methods += new qt_gsi::GenericMethod ("removeItem", "@brief Method void QLayout::removeItem(QLayoutItem *)\n", false, &_init_f_removeItem_1740, &_call_f_removeItem_1740);
   methods += new qt_gsi::GenericMethod ("removeWidget", "@brief Method void QLayout::removeWidget(QWidget *w)\n", false, &_init_f_removeWidget_1315, &_call_f_removeWidget_1315);
-  methods += new qt_gsi::GenericMethod ("setAlignment", "@brief Method (QWidget *, QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_setAlignment_3957, &_call_f_setAlignment_3957);
-  methods += new qt_gsi::GenericMethod ("setAlignment", "@brief Method (QLayout *, QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_setAlignment_3983, &_call_f_setAlignment_3983);
-  methods += new qt_gsi::GenericMethod ("setAlignment|alignment=", "@brief Method (QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_setAlignment_2750, &_call_f_setAlignment_2750);
+  methods += new qt_gsi::GenericMethod ("setAlignment", "@brief Method bool QLayout::setAlignment(QWidget *w, QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setAlignment_3957, &_call_f_setAlignment_3957);
+  methods += new qt_gsi::GenericMethod ("setAlignment", "@brief Method bool QLayout::setAlignment(QLayout *l, QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setAlignment_3983, &_call_f_setAlignment_3983);
+  methods += new qt_gsi::GenericMethod ("setAlignment|alignment=", "@brief Method void QLayout::setAlignment(QFlags<Qt::AlignmentFlag> a)\n", false, &_init_f_setAlignment_2750, &_call_f_setAlignment_2750);
   methods += new qt_gsi::GenericMethod ("setContentsMargins", "@brief Method void QLayout::setContentsMargins(int left, int top, int right, int bottom)\n", false, &_init_f_setContentsMargins_2744, &_call_f_setContentsMargins_2744);
   methods += new qt_gsi::GenericMethod ("setContentsMargins|contentsMargins=", "@brief Method void QLayout::setContentsMargins(const QMargins &margins)\n", false, &_init_f_setContentsMargins_2115, &_call_f_setContentsMargins_2115);
   methods += new qt_gsi::GenericMethod ("setEnabled|enabled=", "@brief Method void QLayout::setEnabled(bool)\n", false, &_init_f_setEnabled_864, &_call_f_setEnabled_864);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRect &)\nThis is a reimplementation of QLayoutItem::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QLayout::setGeometry(const QRect &)\nThis is a reimplementation of QLayoutItem::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
   methods += new qt_gsi::GenericMethod ("setMargin|margin=", "@brief Method void QLayout::setMargin(int)\n", false, &_init_f_setMargin_767, &_call_f_setMargin_767);
   methods += new qt_gsi::GenericMethod ("setMenuBar|menuBar=", "@brief Method void QLayout::setMenuBar(QWidget *w)\n", false, &_init_f_setMenuBar_1315, &_call_f_setMenuBar_1315);
   methods += new qt_gsi::GenericMethod ("setSizeConstraint|sizeConstraint=", "@brief Method void QLayout::setSizeConstraint(QLayout::SizeConstraint)\n", false, &_init_f_setSizeConstraint_2743, &_call_f_setSizeConstraint_2743);

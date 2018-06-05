@@ -69,7 +69,7 @@ static void _call_f_autoSipEnabled_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QObject *, QEvent *)
+// bool QApplication::notify(QObject *, QEvent *)
 
 
 static void _init_f_notify_2411 (qt_gsi::GenericMethod *decl)
@@ -1074,7 +1074,7 @@ static gsi::Methods methods_QApplication () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":autoSipEnabled", "@brief Method bool QApplication::autoSipEnabled()\n", true, &_init_f_autoSipEnabled_c0, &_call_f_autoSipEnabled_c0);
-  methods += new qt_gsi::GenericMethod ("notify", "@brief Method (QObject *, QEvent *)\nThis is a reimplementation of QGuiApplication::notify", false, &_init_f_notify_2411, &_call_f_notify_2411);
+  methods += new qt_gsi::GenericMethod ("notify", "@brief Method bool QApplication::notify(QObject *, QEvent *)\nThis is a reimplementation of QGuiApplication::notify", false, &_init_f_notify_2411, &_call_f_notify_2411);
   methods += new qt_gsi::GenericMethod ("setAutoSipEnabled|autoSipEnabled=", "@brief Method void QApplication::setAutoSipEnabled(const bool enabled)\n", false, &_init_f_setAutoSipEnabled_1559, &_call_f_setAutoSipEnabled_1559);
   methods += new qt_gsi::GenericMethod ("setStyleSheet|styleSheet=", "@brief Method void QApplication::setStyleSheet(const QString &sheet)\n", false, &_init_f_setStyleSheet_2025, &_call_f_setStyleSheet_2025);
   methods += new qt_gsi::GenericMethod (":styleSheet", "@brief Method QString QApplication::styleSheet()\n", true, &_init_f_styleSheet_c0, &_call_f_styleSheet_c0);
@@ -1163,7 +1163,7 @@ GSI_QTWIDGETS_PUBLIC gsi::Class<QApplication> &qtdecl_QApplication () { return d
 class QApplication_Adaptor : public QApplication, public qt_gsi::QtObjectBase
 {
 public:
-  static QApplication *ctor_QApplication_Adaptor_args(const std::vector<std::string> &args)
+  static QApplication *ctor_QApplication_Adaptor_args(const std::vector<std::string> &args, bool gui)
   {
     //  QApplication needs static sources, so we give it some.
     static char **argv = 0;
@@ -1180,10 +1180,10 @@ public:
       argv[a - args_copy.begin ()] = (char *) a->c_str ();
     }
 
-    return new QApplication_Adaptor (argc, argv);
+    return new QApplication_Adaptor (argc, argv, gui);
   }
 
-  QApplication_Adaptor (int &argc, char **argv) : QApplication (argc, argv) { }
+  QApplication_Adaptor (int &argc, char **argv, bool gui) : QApplication (argc, argv, gui) { }
 
   virtual ~QApplication_Adaptor();
 
@@ -1991,7 +1991,7 @@ static gsi::Methods methods_QApplication_Adaptor () {
 }
 
 gsi::Class<QApplication_Adaptor> decl_QApplication_Adaptor (qtdecl_QApplication (), "QtWidgets", "QApplication",
-    gsi::constructor("new", &QApplication_Adaptor::ctor_QApplication_Adaptor_args, gsi::arg ("argv"), "@brief Creates a new QApplication object\n\n@param argv The command line arguments to pass to Qt")
+    gsi::constructor("new", &QApplication_Adaptor::ctor_QApplication_Adaptor_args, gsi::arg ("argv"), gsi::arg ("gui", false), "@brief Creates a new QApplication object\n\n@param argv The command line arguments to pass to Qt\n@param gui If true, a GUI-enabled application is constructed")
 +
   methods_QApplication_Adaptor (),
   "@qt\n@brief Binding of QApplication");

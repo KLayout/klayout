@@ -68,7 +68,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QStyle::ControlElement, const QStyleOption *, QPainter *, const QWidget *) const
+// void QCDEStyle::drawControl(QStyle::ControlElement element, const QStyleOption *opt, QPainter *p, const QWidget *w)
 
 
 static void _init_f_drawControl_c8285 (qt_gsi::GenericMethod *decl)
@@ -97,7 +97,7 @@ static void _call_f_drawControl_c8285 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QStyle::PrimitiveElement, const QStyleOption *, QPainter *, const QWidget *) const
+// void QCDEStyle::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w)
 
 
 static void _init_f_drawPrimitive_c8501 (qt_gsi::GenericMethod *decl)
@@ -126,7 +126,7 @@ static void _call_f_drawPrimitive_c8501 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (QStyle::PixelMetric, const QStyleOption *, const QWidget *) const
+// int QCDEStyle::pixelMetric(QStyle::PixelMetric metric, const QStyleOption *option, const QWidget *widget)
 
 
 static void _init_f_pixelMetric_c6642 (qt_gsi::GenericMethod *decl)
@@ -151,7 +151,7 @@ static void _call_f_pixelMetric_c6642 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// QPalette QCDEStyle::standardPalette()
 
 
 static void _init_f_standardPalette_c0 (qt_gsi::GenericMethod *decl)
@@ -266,10 +266,10 @@ namespace gsi
 static gsi::Methods methods_QCDEStyle () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("drawControl", "@brief Method (QStyle::ControlElement, const QStyleOption *, QPainter *, const QWidget *) const\nThis is a reimplementation of QMotifStyle::drawControl", true, &_init_f_drawControl_c8285, &_call_f_drawControl_c8285);
-  methods += new qt_gsi::GenericMethod ("drawPrimitive", "@brief Method (QStyle::PrimitiveElement, const QStyleOption *, QPainter *, const QWidget *) const\nThis is a reimplementation of QMotifStyle::drawPrimitive", true, &_init_f_drawPrimitive_c8501, &_call_f_drawPrimitive_c8501);
-  methods += new qt_gsi::GenericMethod ("pixelMetric", "@brief Method (QStyle::PixelMetric, const QStyleOption *, const QWidget *) const\nThis is a reimplementation of QMotifStyle::pixelMetric", true, &_init_f_pixelMetric_c6642, &_call_f_pixelMetric_c6642);
-  methods += new qt_gsi::GenericMethod ("standardPalette", "@brief Method () const\nThis is a reimplementation of QMotifStyle::standardPalette", true, &_init_f_standardPalette_c0, &_call_f_standardPalette_c0);
+  methods += new qt_gsi::GenericMethod ("drawControl", "@brief Method void QCDEStyle::drawControl(QStyle::ControlElement element, const QStyleOption *opt, QPainter *p, const QWidget *w)\nThis is a reimplementation of QMotifStyle::drawControl", true, &_init_f_drawControl_c8285, &_call_f_drawControl_c8285);
+  methods += new qt_gsi::GenericMethod ("drawPrimitive", "@brief Method void QCDEStyle::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w)\nThis is a reimplementation of QMotifStyle::drawPrimitive", true, &_init_f_drawPrimitive_c8501, &_call_f_drawPrimitive_c8501);
+  methods += new qt_gsi::GenericMethod ("pixelMetric", "@brief Method int QCDEStyle::pixelMetric(QStyle::PixelMetric metric, const QStyleOption *option, const QWidget *widget)\nThis is a reimplementation of QMotifStyle::pixelMetric", true, &_init_f_pixelMetric_c6642, &_call_f_pixelMetric_c6642);
+  methods += new qt_gsi::GenericMethod ("standardPalette", "@brief Method QPalette QCDEStyle::standardPalette()\nThis is a reimplementation of QMotifStyle::standardPalette", true, &_init_f_standardPalette_c0, &_call_f_standardPalette_c0);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCDEStyle::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCDEStyle::tr(const char *s, const char *c)\nThis method is static and can be called without an instance.", &_init_f_tr_3354, &_call_f_tr_3354);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCDEStyle::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);

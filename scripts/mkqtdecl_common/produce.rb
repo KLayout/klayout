@@ -1968,9 +1968,9 @@ END
 
         is_reimp = nil
         if bc_methods_by_name[mid]
-          sig = bd.call_sig
+          call_sig = bd.call_sig
           bc_methods_by_name[mid].each do |bd_base|
-            if bd_base.call_sig == sig
+            if bd_base.call_sig == call_sig
               bd_base.virtual && (is_reimp = bd_base)
               break
             end

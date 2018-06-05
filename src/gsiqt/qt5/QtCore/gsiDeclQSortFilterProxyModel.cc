@@ -63,7 +63,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (const QModelIndex &) const
+// QModelIndex QSortFilterProxyModel::buddy(const QModelIndex &index)
 
 
 static void _init_f_buddy_c2395 (qt_gsi::GenericMethod *decl)
@@ -82,7 +82,7 @@ static void _call_f_buddy_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QModelIndex &) const
+// bool QSortFilterProxyModel::canFetchMore(const QModelIndex &parent)
 
 
 static void _init_f_canFetchMore_c2395 (qt_gsi::GenericMethod *decl)
@@ -117,7 +117,7 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (const QModelIndex &) const
+// int QSortFilterProxyModel::columnCount(const QModelIndex &parent)
 
 
 static void _init_f_columnCount_c2395 (qt_gsi::GenericMethod *decl)
@@ -136,7 +136,7 @@ static void _call_f_columnCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QModelIndex &, int) const
+// QVariant QSortFilterProxyModel::data(const QModelIndex &index, int role)
 
 
 static void _init_f_data_c3054 (qt_gsi::GenericMethod *decl)
@@ -158,7 +158,7 @@ static void _call_f_data_c3054 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)
+// bool QSortFilterProxyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_dropMimeData_7425 (qt_gsi::GenericMethod *decl)
@@ -204,7 +204,7 @@ static void _call_f_dynamicSortFilter_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (const QModelIndex &)
+// void QSortFilterProxyModel::fetchMore(const QModelIndex &parent)
 
 
 static void _init_f_fetchMore_2395 (qt_gsi::GenericMethod *decl)
@@ -284,7 +284,7 @@ static void _call_f_filterRole_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QModelIndex &) const
+// QFlags<Qt::ItemFlag> QSortFilterProxyModel::flags(const QModelIndex &index)
 
 
 static void _init_f_flags_c2395 (qt_gsi::GenericMethod *decl)
@@ -303,7 +303,7 @@ static void _call_f_flags_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QModelIndex &) const
+// bool QSortFilterProxyModel::hasChildren(const QModelIndex &parent)
 
 
 static void _init_f_hasChildren_c2395 (qt_gsi::GenericMethod *decl)
@@ -322,7 +322,7 @@ static void _call_f_hasChildren_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (int, Qt::Orientation, int) const
+// QVariant QSortFilterProxyModel::headerData(int section, Qt::Orientation orientation, int role)
 
 
 static void _init_f_headerData_c3231 (qt_gsi::GenericMethod *decl)
@@ -347,7 +347,7 @@ static void _call_f_headerData_c3231 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (int, int, const QModelIndex &) const
+// QModelIndex QSortFilterProxyModel::index(int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_index_c3713 (qt_gsi::GenericMethod *decl)
@@ -372,7 +372,7 @@ static void _call_f_index_c3713 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QSortFilterProxyModel::insertColumns(int column, int count, const QModelIndex &parent)
 
 
 static void _init_f_insertColumns_3713 (qt_gsi::GenericMethod *decl)
@@ -397,7 +397,7 @@ static void _call_f_insertColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QSortFilterProxyModel::insertRows(int row, int count, const QModelIndex &parent)
 
 
 static void _init_f_insertRows_3713 (qt_gsi::GenericMethod *decl)
@@ -453,7 +453,7 @@ static void _call_f_isSortLocaleAware_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (const QModelIndex &) const
+// QModelIndex QSortFilterProxyModel::mapFromSource(const QModelIndex &sourceIndex)
 
 
 static void _init_f_mapFromSource_c2395 (qt_gsi::GenericMethod *decl)
@@ -472,7 +472,7 @@ static void _call_f_mapFromSource_c2395 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (const QItemSelection &) const
+// QItemSelection QSortFilterProxyModel::mapSelectionFromSource(const QItemSelection &sourceSelection)
 
 
 static void _init_f_mapSelectionFromSource_c2727 (qt_gsi::GenericMethod *decl)
@@ -491,7 +491,7 @@ static void _call_f_mapSelectionFromSource_c2727 (const qt_gsi::GenericMethod * 
 }
 
 
-// (const QItemSelection &) const
+// QItemSelection QSortFilterProxyModel::mapSelectionToSource(const QItemSelection &proxySelection)
 
 
 static void _init_f_mapSelectionToSource_c2727 (qt_gsi::GenericMethod *decl)
@@ -510,7 +510,7 @@ static void _call_f_mapSelectionToSource_c2727 (const qt_gsi::GenericMethod * /*
 }
 
 
-// (const QModelIndex &) const
+// QModelIndex QSortFilterProxyModel::mapToSource(const QModelIndex &proxyIndex)
 
 
 static void _init_f_mapToSource_c2395 (qt_gsi::GenericMethod *decl)
@@ -529,7 +529,7 @@ static void _call_f_mapToSource_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QModelIndex &, int, const QVariant &, int, QFlags<Qt::MatchFlag>) const
+// QList<QModelIndex> QSortFilterProxyModel::match(const QModelIndex &start, int role, const QVariant &value, int hits, QFlags<Qt::MatchFlag> flags)
 
 
 static void _init_f_match_c7932 (qt_gsi::GenericMethod *decl)
@@ -560,7 +560,7 @@ static void _call_f_match_c7932 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QList<QModelIndex> &) const
+// QMimeData *QSortFilterProxyModel::mimeData(const QList<QModelIndex> &indexes)
 
 
 static void _init_f_mimeData_c3010 (qt_gsi::GenericMethod *decl)
@@ -579,7 +579,7 @@ static void _call_f_mimeData_c3010 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QStringList QSortFilterProxyModel::mimeTypes()
 
 
 static void _init_f_mimeTypes_c0 (qt_gsi::GenericMethod *decl)
@@ -594,7 +594,7 @@ static void _call_f_mimeTypes_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QObject *QSortFilterProxyModel::parent()
 
 
 static void _init_f_parent_c0 (qt_gsi::GenericMethod *decl)
@@ -609,7 +609,7 @@ static void _call_f_parent_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (const QModelIndex &) const
+// QModelIndex QSortFilterProxyModel::parent(const QModelIndex &child)
 
 
 static void _init_f_parent_c2395 (qt_gsi::GenericMethod *decl)
@@ -628,7 +628,7 @@ static void _call_f_parent_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QSortFilterProxyModel::removeColumns(int column, int count, const QModelIndex &parent)
 
 
 static void _init_f_removeColumns_3713 (qt_gsi::GenericMethod *decl)
@@ -653,7 +653,7 @@ static void _call_f_removeColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QSortFilterProxyModel::removeRows(int row, int count, const QModelIndex &parent)
 
 
 static void _init_f_removeRows_3713 (qt_gsi::GenericMethod *decl)
@@ -678,7 +678,7 @@ static void _call_f_removeRows_3713 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QModelIndex &) const
+// int QSortFilterProxyModel::rowCount(const QModelIndex &parent)
 
 
 static void _init_f_rowCount_c2395 (qt_gsi::GenericMethod *decl)
@@ -697,7 +697,7 @@ static void _call_f_rowCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QModelIndex &, const QVariant &, int)
+// bool QSortFilterProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)
 
 
 static void _init_f_setData_5065 (qt_gsi::GenericMethod *decl)
@@ -882,7 +882,7 @@ static void _call_f_setFilterWildcard_2025 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (int, Qt::Orientation, const QVariant &, int)
+// bool QSortFilterProxyModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 
 
 static void _init_f_setHeaderData_5242 (qt_gsi::GenericMethod *decl)
@@ -970,7 +970,7 @@ static void _call_f_setSortRole_767 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QAbstractItemModel *)
+// void QSortFilterProxyModel::setSourceModel(QAbstractItemModel *sourceModel)
 
 
 static void _init_f_setSourceModel_2419 (qt_gsi::GenericMethod *decl)
@@ -990,7 +990,7 @@ static void _call_f_setSourceModel_2419 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (int, int, const QModelIndex &) const
+// QModelIndex QSortFilterProxyModel::sibling(int row, int column, const QModelIndex &idx)
 
 
 static void _init_f_sibling_c3713 (qt_gsi::GenericMethod *decl)
@@ -1015,7 +1015,7 @@ static void _call_f_sibling_c3713 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (int, Qt::SortOrder)
+// void QSortFilterProxyModel::sort(int column, Qt::SortOrder order)
 
 
 static void _init_f_sort_2340 (qt_gsi::GenericMethod *decl)
@@ -1098,7 +1098,7 @@ static void _call_f_sortRole_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QModelIndex &) const
+// QSize QSortFilterProxyModel::span(const QModelIndex &index)
 
 
 static void _init_f_span_c2395 (qt_gsi::GenericMethod *decl)
@@ -1117,7 +1117,7 @@ static void _call_f_span_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QFlags<Qt::DropAction> QSortFilterProxyModel::supportedDropActions()
 
 
 static void _init_f_supportedDropActions_c0 (qt_gsi::GenericMethod *decl)
@@ -1188,39 +1188,39 @@ namespace gsi
 static gsi::Methods methods_QSortFilterProxyModel () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("buddy", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractProxyModel::buddy", true, &_init_f_buddy_c2395, &_call_f_buddy_c2395);
-  methods += new qt_gsi::GenericMethod ("canFetchMore", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractProxyModel::canFetchMore", true, &_init_f_canFetchMore_c2395, &_call_f_canFetchMore_c2395);
+  methods += new qt_gsi::GenericMethod ("buddy", "@brief Method QModelIndex QSortFilterProxyModel::buddy(const QModelIndex &index)\nThis is a reimplementation of QAbstractProxyModel::buddy", true, &_init_f_buddy_c2395, &_call_f_buddy_c2395);
+  methods += new qt_gsi::GenericMethod ("canFetchMore", "@brief Method bool QSortFilterProxyModel::canFetchMore(const QModelIndex &parent)\nThis is a reimplementation of QAbstractProxyModel::canFetchMore", true, &_init_f_canFetchMore_c2395, &_call_f_canFetchMore_c2395);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QSortFilterProxyModel::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
-  methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::columnCount", true, &_init_f_columnCount_c2395, &_call_f_columnCount_c2395);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Method (const QModelIndex &, int) const\nThis is a reimplementation of QAbstractProxyModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
-  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractProxyModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
+  methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method int QSortFilterProxyModel::columnCount(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::columnCount", true, &_init_f_columnCount_c2395, &_call_f_columnCount_c2395);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Method QVariant QSortFilterProxyModel::data(const QModelIndex &index, int role)\nThis is a reimplementation of QAbstractProxyModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
+  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method bool QSortFilterProxyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractProxyModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
   methods += new qt_gsi::GenericMethod (":dynamicSortFilter", "@brief Method bool QSortFilterProxyModel::dynamicSortFilter()\n", true, &_init_f_dynamicSortFilter_c0, &_call_f_dynamicSortFilter_c0);
-  methods += new qt_gsi::GenericMethod ("fetchMore", "@brief Method (const QModelIndex &)\nThis is a reimplementation of QAbstractProxyModel::fetchMore", false, &_init_f_fetchMore_2395, &_call_f_fetchMore_2395);
+  methods += new qt_gsi::GenericMethod ("fetchMore", "@brief Method void QSortFilterProxyModel::fetchMore(const QModelIndex &parent)\nThis is a reimplementation of QAbstractProxyModel::fetchMore", false, &_init_f_fetchMore_2395, &_call_f_fetchMore_2395);
   methods += new qt_gsi::GenericMethod (":filterCaseSensitivity", "@brief Method Qt::CaseSensitivity QSortFilterProxyModel::filterCaseSensitivity()\n", true, &_init_f_filterCaseSensitivity_c0, &_call_f_filterCaseSensitivity_c0);
   methods += new qt_gsi::GenericMethod (":filterKeyColumn", "@brief Method int QSortFilterProxyModel::filterKeyColumn()\n", true, &_init_f_filterKeyColumn_c0, &_call_f_filterKeyColumn_c0);
   methods += new qt_gsi::GenericMethod (":filterRegExp", "@brief Method QRegExp QSortFilterProxyModel::filterRegExp()\n", true, &_init_f_filterRegExp_c0, &_call_f_filterRegExp_c0);
   methods += new qt_gsi::GenericMethod (":filterRole", "@brief Method int QSortFilterProxyModel::filterRole()\n", true, &_init_f_filterRole_c0, &_call_f_filterRole_c0);
-  methods += new qt_gsi::GenericMethod ("flags", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractProxyModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
-  methods += new qt_gsi::GenericMethod ("hasChildren", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractProxyModel::hasChildren", true, &_init_f_hasChildren_c2395, &_call_f_hasChildren_c2395);
-  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method (int, Qt::Orientation, int) const\nThis is a reimplementation of QAbstractProxyModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
-  methods += new qt_gsi::GenericMethod ("index", "@brief Method (int, int, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::index", true, &_init_f_index_c3713, &_call_f_index_c3713);
-  methods += new qt_gsi::GenericMethod ("insertColumns", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::insertColumns", false, &_init_f_insertColumns_3713, &_call_f_insertColumns_3713);
-  methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::insertRows", false, &_init_f_insertRows_3713, &_call_f_insertRows_3713);
+  methods += new qt_gsi::GenericMethod ("flags", "@brief Method QFlags<Qt::ItemFlag> QSortFilterProxyModel::flags(const QModelIndex &index)\nThis is a reimplementation of QAbstractProxyModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
+  methods += new qt_gsi::GenericMethod ("hasChildren", "@brief Method bool QSortFilterProxyModel::hasChildren(const QModelIndex &parent)\nThis is a reimplementation of QAbstractProxyModel::hasChildren", true, &_init_f_hasChildren_c2395, &_call_f_hasChildren_c2395);
+  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method QVariant QSortFilterProxyModel::headerData(int section, Qt::Orientation orientation, int role)\nThis is a reimplementation of QAbstractProxyModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
+  methods += new qt_gsi::GenericMethod ("index", "@brief Method QModelIndex QSortFilterProxyModel::index(int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::index", true, &_init_f_index_c3713, &_call_f_index_c3713);
+  methods += new qt_gsi::GenericMethod ("insertColumns", "@brief Method bool QSortFilterProxyModel::insertColumns(int column, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::insertColumns", false, &_init_f_insertColumns_3713, &_call_f_insertColumns_3713);
+  methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method bool QSortFilterProxyModel::insertRows(int row, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::insertRows", false, &_init_f_insertRows_3713, &_call_f_insertRows_3713);
   methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QSortFilterProxyModel::invalidate()\n", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
   methods += new qt_gsi::GenericMethod ("isSortLocaleAware?|:isSortLocaleAware", "@brief Method bool QSortFilterProxyModel::isSortLocaleAware()\n", true, &_init_f_isSortLocaleAware_c0, &_call_f_isSortLocaleAware_c0);
-  methods += new qt_gsi::GenericMethod ("mapFromSource", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractProxyModel::mapFromSource", true, &_init_f_mapFromSource_c2395, &_call_f_mapFromSource_c2395);
-  methods += new qt_gsi::GenericMethod ("mapSelectionFromSource", "@brief Method (const QItemSelection &) const\nThis is a reimplementation of QAbstractProxyModel::mapSelectionFromSource", true, &_init_f_mapSelectionFromSource_c2727, &_call_f_mapSelectionFromSource_c2727);
-  methods += new qt_gsi::GenericMethod ("mapSelectionToSource", "@brief Method (const QItemSelection &) const\nThis is a reimplementation of QAbstractProxyModel::mapSelectionToSource", true, &_init_f_mapSelectionToSource_c2727, &_call_f_mapSelectionToSource_c2727);
-  methods += new qt_gsi::GenericMethod ("mapToSource", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractProxyModel::mapToSource", true, &_init_f_mapToSource_c2395, &_call_f_mapToSource_c2395);
-  methods += new qt_gsi::GenericMethod ("match", "@brief Method (const QModelIndex &, int, const QVariant &, int, QFlags<Qt::MatchFlag>) const\nThis is a reimplementation of QAbstractItemModel::match", true, &_init_f_match_c7932, &_call_f_match_c7932);
-  methods += new qt_gsi::GenericMethod ("mimeData", "@brief Method (const QList<QModelIndex> &) const\nThis is a reimplementation of QAbstractProxyModel::mimeData", true, &_init_f_mimeData_c3010, &_call_f_mimeData_c3010);
-  methods += new qt_gsi::GenericMethod ("mimeTypes", "@brief Method () const\nThis is a reimplementation of QAbstractProxyModel::mimeTypes", true, &_init_f_mimeTypes_c0, &_call_f_mimeTypes_c0);
-  methods += new qt_gsi::GenericMethod (":parent", "@brief Method () const\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
-  methods += new qt_gsi::GenericMethod ("parent", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::parent", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
-  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
-  methods += new qt_gsi::GenericMethod ("removeRows", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::removeRows", false, &_init_f_removeRows_3713, &_call_f_removeRows_3713);
-  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
-  methods += new qt_gsi::GenericMethod ("setData", "@brief Method (const QModelIndex &, const QVariant &, int)\nThis is a reimplementation of QAbstractProxyModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
+  methods += new qt_gsi::GenericMethod ("mapFromSource", "@brief Method QModelIndex QSortFilterProxyModel::mapFromSource(const QModelIndex &sourceIndex)\nThis is a reimplementation of QAbstractProxyModel::mapFromSource", true, &_init_f_mapFromSource_c2395, &_call_f_mapFromSource_c2395);
+  methods += new qt_gsi::GenericMethod ("mapSelectionFromSource", "@brief Method QItemSelection QSortFilterProxyModel::mapSelectionFromSource(const QItemSelection &sourceSelection)\nThis is a reimplementation of QAbstractProxyModel::mapSelectionFromSource", true, &_init_f_mapSelectionFromSource_c2727, &_call_f_mapSelectionFromSource_c2727);
+  methods += new qt_gsi::GenericMethod ("mapSelectionToSource", "@brief Method QItemSelection QSortFilterProxyModel::mapSelectionToSource(const QItemSelection &proxySelection)\nThis is a reimplementation of QAbstractProxyModel::mapSelectionToSource", true, &_init_f_mapSelectionToSource_c2727, &_call_f_mapSelectionToSource_c2727);
+  methods += new qt_gsi::GenericMethod ("mapToSource", "@brief Method QModelIndex QSortFilterProxyModel::mapToSource(const QModelIndex &proxyIndex)\nThis is a reimplementation of QAbstractProxyModel::mapToSource", true, &_init_f_mapToSource_c2395, &_call_f_mapToSource_c2395);
+  methods += new qt_gsi::GenericMethod ("match", "@brief Method QList<QModelIndex> QSortFilterProxyModel::match(const QModelIndex &start, int role, const QVariant &value, int hits, QFlags<Qt::MatchFlag> flags)\nThis is a reimplementation of QAbstractItemModel::match", true, &_init_f_match_c7932, &_call_f_match_c7932);
+  methods += new qt_gsi::GenericMethod ("mimeData", "@brief Method QMimeData *QSortFilterProxyModel::mimeData(const QList<QModelIndex> &indexes)\nThis is a reimplementation of QAbstractProxyModel::mimeData", true, &_init_f_mimeData_c3010, &_call_f_mimeData_c3010);
+  methods += new qt_gsi::GenericMethod ("mimeTypes", "@brief Method QStringList QSortFilterProxyModel::mimeTypes()\nThis is a reimplementation of QAbstractProxyModel::mimeTypes", true, &_init_f_mimeTypes_c0, &_call_f_mimeTypes_c0);
+  methods += new qt_gsi::GenericMethod (":parent", "@brief Method QObject *QSortFilterProxyModel::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
+  methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QSortFilterProxyModel::parent(const QModelIndex &child)\nThis is a reimplementation of QAbstractItemModel::parent", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
+  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method bool QSortFilterProxyModel::removeColumns(int column, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
+  methods += new qt_gsi::GenericMethod ("removeRows", "@brief Method bool QSortFilterProxyModel::removeRows(int row, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::removeRows", false, &_init_f_removeRows_3713, &_call_f_removeRows_3713);
+  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method int QSortFilterProxyModel::rowCount(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Method bool QSortFilterProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)\nThis is a reimplementation of QAbstractProxyModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
   methods += new qt_gsi::GenericMethod ("setDynamicSortFilter|dynamicSortFilter=", "@brief Method void QSortFilterProxyModel::setDynamicSortFilter(bool enable)\n", false, &_init_f_setDynamicSortFilter_864, &_call_f_setDynamicSortFilter_864);
   methods += new qt_gsi::GenericMethod ("setFilterCaseSensitivity|filterCaseSensitivity=", "@brief Method void QSortFilterProxyModel::setFilterCaseSensitivity(Qt::CaseSensitivity cs)\n", false, &_init_f_setFilterCaseSensitivity_2324, &_call_f_setFilterCaseSensitivity_2324);
   methods += new qt_gsi::GenericMethod ("setFilterFixedString", "@brief Method void QSortFilterProxyModel::setFilterFixedString(const QString &pattern)\n", false, &_init_f_setFilterFixedString_2025, &_call_f_setFilterFixedString_2025);
@@ -1229,19 +1229,19 @@ static gsi::Methods methods_QSortFilterProxyModel () {
   methods += new qt_gsi::GenericMethod ("setFilterRegExp|filterRegExp=", "@brief Method void QSortFilterProxyModel::setFilterRegExp(const QString &pattern)\n", false, &_init_f_setFilterRegExp_2025, &_call_f_setFilterRegExp_2025);
   methods += new qt_gsi::GenericMethod ("setFilterRole|filterRole=", "@brief Method void QSortFilterProxyModel::setFilterRole(int role)\n", false, &_init_f_setFilterRole_767, &_call_f_setFilterRole_767);
   methods += new qt_gsi::GenericMethod ("setFilterWildcard", "@brief Method void QSortFilterProxyModel::setFilterWildcard(const QString &pattern)\n", false, &_init_f_setFilterWildcard_2025, &_call_f_setFilterWildcard_2025);
-  methods += new qt_gsi::GenericMethod ("setHeaderData", "@brief Method (int, Qt::Orientation, const QVariant &, int)\nThis is a reimplementation of QAbstractProxyModel::setHeaderData", false, &_init_f_setHeaderData_5242, &_call_f_setHeaderData_5242);
+  methods += new qt_gsi::GenericMethod ("setHeaderData", "@brief Method bool QSortFilterProxyModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)\nThis is a reimplementation of QAbstractProxyModel::setHeaderData", false, &_init_f_setHeaderData_5242, &_call_f_setHeaderData_5242);
   methods += new qt_gsi::GenericMethod ("setSortCaseSensitivity|sortCaseSensitivity=", "@brief Method void QSortFilterProxyModel::setSortCaseSensitivity(Qt::CaseSensitivity cs)\n", false, &_init_f_setSortCaseSensitivity_2324, &_call_f_setSortCaseSensitivity_2324);
   methods += new qt_gsi::GenericMethod ("setSortLocaleAware", "@brief Method void QSortFilterProxyModel::setSortLocaleAware(bool on)\n", false, &_init_f_setSortLocaleAware_864, &_call_f_setSortLocaleAware_864);
   methods += new qt_gsi::GenericMethod ("setSortRole|sortRole=", "@brief Method void QSortFilterProxyModel::setSortRole(int role)\n", false, &_init_f_setSortRole_767, &_call_f_setSortRole_767);
-  methods += new qt_gsi::GenericMethod ("setSourceModel|sourceModel=", "@brief Method (QAbstractItemModel *)\nThis is a reimplementation of QAbstractProxyModel::setSourceModel", false, &_init_f_setSourceModel_2419, &_call_f_setSourceModel_2419);
-  methods += new qt_gsi::GenericMethod ("sibling", "@brief Method (int, int, const QModelIndex &) const\nThis is a reimplementation of QAbstractProxyModel::sibling", true, &_init_f_sibling_c3713, &_call_f_sibling_c3713);
-  methods += new qt_gsi::GenericMethod ("sort", "@brief Method (int, Qt::SortOrder)\nThis is a reimplementation of QAbstractProxyModel::sort", false, &_init_f_sort_2340, &_call_f_sort_2340);
+  methods += new qt_gsi::GenericMethod ("setSourceModel|sourceModel=", "@brief Method void QSortFilterProxyModel::setSourceModel(QAbstractItemModel *sourceModel)\nThis is a reimplementation of QAbstractProxyModel::setSourceModel", false, &_init_f_setSourceModel_2419, &_call_f_setSourceModel_2419);
+  methods += new qt_gsi::GenericMethod ("sibling", "@brief Method QModelIndex QSortFilterProxyModel::sibling(int row, int column, const QModelIndex &idx)\nThis is a reimplementation of QAbstractProxyModel::sibling", true, &_init_f_sibling_c3713, &_call_f_sibling_c3713);
+  methods += new qt_gsi::GenericMethod ("sort", "@brief Method void QSortFilterProxyModel::sort(int column, Qt::SortOrder order)\nThis is a reimplementation of QAbstractProxyModel::sort", false, &_init_f_sort_2340, &_call_f_sort_2340);
   methods += new qt_gsi::GenericMethod (":sortCaseSensitivity", "@brief Method Qt::CaseSensitivity QSortFilterProxyModel::sortCaseSensitivity()\n", true, &_init_f_sortCaseSensitivity_c0, &_call_f_sortCaseSensitivity_c0);
   methods += new qt_gsi::GenericMethod ("sortColumn", "@brief Method int QSortFilterProxyModel::sortColumn()\n", true, &_init_f_sortColumn_c0, &_call_f_sortColumn_c0);
   methods += new qt_gsi::GenericMethod ("sortOrder", "@brief Method Qt::SortOrder QSortFilterProxyModel::sortOrder()\n", true, &_init_f_sortOrder_c0, &_call_f_sortOrder_c0);
   methods += new qt_gsi::GenericMethod (":sortRole", "@brief Method int QSortFilterProxyModel::sortRole()\n", true, &_init_f_sortRole_c0, &_call_f_sortRole_c0);
-  methods += new qt_gsi::GenericMethod ("span", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractProxyModel::span", true, &_init_f_span_c2395, &_call_f_span_c2395);
-  methods += new qt_gsi::GenericMethod ("supportedDropActions", "@brief Method () const\nThis is a reimplementation of QAbstractProxyModel::supportedDropActions", true, &_init_f_supportedDropActions_c0, &_call_f_supportedDropActions_c0);
+  methods += new qt_gsi::GenericMethod ("span", "@brief Method QSize QSortFilterProxyModel::span(const QModelIndex &index)\nThis is a reimplementation of QAbstractProxyModel::span", true, &_init_f_span_c2395, &_call_f_span_c2395);
+  methods += new qt_gsi::GenericMethod ("supportedDropActions", "@brief Method QFlags<Qt::DropAction> QSortFilterProxyModel::supportedDropActions()\nThis is a reimplementation of QAbstractProxyModel::supportedDropActions", true, &_init_f_supportedDropActions_c0, &_call_f_supportedDropActions_c0);
   methods += gsi::qt_signal<const QModelIndex &, const QModelIndex &, const QVector<int> & > ("dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)", "dataChanged", gsi::arg("topLeft"), gsi::arg("bottomRight"), gsi::arg("roles"), "@brief Signal declaration for QSortFilterProxyModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSortFilterProxyModel::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::Orientation>::target_type &, int, int > ("headerDataChanged(Qt::Orientation, int, int)", "headerDataChanged", gsi::arg("orientation"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QSortFilterProxyModel::headerDataChanged(Qt::Orientation orientation, int first, int last)\nYou can bind a procedure to this signal.");

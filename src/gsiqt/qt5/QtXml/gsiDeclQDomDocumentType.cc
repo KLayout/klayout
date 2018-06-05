@@ -131,7 +131,7 @@ static void _call_f_name_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// () const
+// QDomNode::NodeType QDomDocumentType::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -161,7 +161,7 @@ static void _call_f_notations_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (const QDomDocumentType &)
+// QDomDocumentType &QDomDocumentType::operator=(const QDomDocumentType &)
 
 
 static void _init_f_operator_eq__2931 (qt_gsi::GenericMethod *decl)
@@ -221,9 +221,9 @@ static gsi::Methods methods_QDomDocumentType () {
   methods += new qt_gsi::GenericMethod ("entities", "@brief Method QDomNamedNodeMap QDomDocumentType::entities()\n", true, &_init_f_entities_c0, &_call_f_entities_c0);
   methods += new qt_gsi::GenericMethod ("internalSubset", "@brief Method QString QDomDocumentType::internalSubset()\n", true, &_init_f_internalSubset_c0, &_call_f_internalSubset_c0);
   methods += new qt_gsi::GenericMethod ("name", "@brief Method QString QDomDocumentType::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomDocumentType::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
   methods += new qt_gsi::GenericMethod ("notations", "@brief Method QDomNamedNodeMap QDomDocumentType::notations()\n", true, &_init_f_notations_c0, &_call_f_notations_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomDocumentType &)\n", false, &_init_f_operator_eq__2931, &_call_f_operator_eq__2931);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomDocumentType &QDomDocumentType::operator=(const QDomDocumentType &)\n", false, &_init_f_operator_eq__2931, &_call_f_operator_eq__2931);
   methods += new qt_gsi::GenericMethod ("publicId", "@brief Method QString QDomDocumentType::publicId()\n", true, &_init_f_publicId_c0, &_call_f_publicId_c0);
   methods += new qt_gsi::GenericMethod ("systemId", "@brief Method QString QDomDocumentType::systemId()\n", true, &_init_f_systemId_c0, &_call_f_systemId_c0);
   return methods;

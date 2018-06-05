@@ -77,7 +77,7 @@ static void _call_f_indent_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// bool QTextListFormat::isValid()
 
 
 static void _init_f_isValid_c0 (qt_gsi::GenericMethod *decl)
@@ -225,7 +225,7 @@ static gsi::Methods methods_QTextListFormat () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextListFormat::QTextListFormat()\nThis method creates an object of class QTextListFormat.", &_init_ctor_QTextListFormat_0, &_call_ctor_QTextListFormat_0);
   methods += new qt_gsi::GenericMethod (":indent", "@brief Method int QTextListFormat::indent()\n", true, &_init_f_indent_c0, &_call_f_indent_c0);
-  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method () const\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QTextListFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod (":numberPrefix", "@brief Method QString QTextListFormat::numberPrefix()\n", true, &_init_f_numberPrefix_c0, &_call_f_numberPrefix_c0);
   methods += new qt_gsi::GenericMethod (":numberSuffix", "@brief Method QString QTextListFormat::numberSuffix()\n", true, &_init_f_numberSuffix_c0, &_call_f_numberSuffix_c0);
   methods += new qt_gsi::GenericMethod ("setIndent|indent=", "@brief Method void QTextListFormat::setIndent(int indent)\n", false, &_init_f_setIndent_767, &_call_f_setIndent_767);

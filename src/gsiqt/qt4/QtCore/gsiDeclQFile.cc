@@ -127,7 +127,7 @@ static void _call_ctor_QFile_3219 (const qt_gsi::GenericStaticMethod * /*decl*/,
 }
 
 
-// () const
+// bool QFile::atEnd()
 
 
 static void _init_f_atEnd_c0 (qt_gsi::GenericMethod *decl)
@@ -142,7 +142,7 @@ static void _call_f_atEnd_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// ()
+// void QFile::close()
 
 
 static void _init_f_close_0 (qt_gsi::GenericMethod *decl)
@@ -252,7 +252,7 @@ static void _call_f_handle_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// bool QFile::isSequential()
 
 
 static void _init_f_isSequential_c0 (qt_gsi::GenericMethod *decl)
@@ -286,7 +286,7 @@ static void _call_f_link_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (QFlags<QIODevice::OpenModeFlag>)
+// bool QFile::open(QFlags<QIODevice::OpenModeFlag> flags)
 
 
 static void _init_f_open_3242 (qt_gsi::GenericMethod *decl)
@@ -320,7 +320,7 @@ static void _call_f_permissions_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// qint64 QFile::pos()
 
 
 static void _init_f_pos_c0 (qt_gsi::GenericMethod *decl)
@@ -403,7 +403,7 @@ static void _call_f_resize_986 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (qint64)
+// bool QFile::seek(qint64 offset)
 
 
 static void _init_f_seek_986 (qt_gsi::GenericMethod *decl)
@@ -461,7 +461,7 @@ static void _call_f_setPermissions_2778 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// qint64 QFile::size()
 
 
 static void _init_f_size_c0 (qt_gsi::GenericMethod *decl)
@@ -855,27 +855,27 @@ static gsi::Methods methods_QFile () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QFile::QFile(QObject *parent)\nThis method creates an object of class QFile.", &_init_ctor_QFile_1302, &_call_ctor_QFile_1302);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QFile::QFile(const QString &name, QObject *parent)\nThis method creates an object of class QFile.", &_init_ctor_QFile_3219, &_call_ctor_QFile_3219);
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method () const\nThis is a reimplementation of QIODevice::atEnd", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
-  methods += new qt_gsi::GenericMethod ("close", "@brief Method ()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
+  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method bool QFile::atEnd()\nThis is a reimplementation of QIODevice::atEnd", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
+  methods += new qt_gsi::GenericMethod ("close", "@brief Method void QFile::close()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
   methods += new qt_gsi::GenericMethod ("copy", "@brief Method bool QFile::copy(const QString &newName)\n", false, &_init_f_copy_2025, &_call_f_copy_2025);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QFile::FileError QFile::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("exists", "@brief Method bool QFile::exists()\n", true, &_init_f_exists_c0, &_call_f_exists_c0);
   methods += new qt_gsi::GenericMethod (":fileName", "@brief Method QString QFile::fileName()\n", true, &_init_f_fileName_c0, &_call_f_fileName_c0);
   methods += new qt_gsi::GenericMethod ("flush", "@brief Method bool QFile::flush()\n", false, &_init_f_flush_0, &_call_f_flush_0);
   methods += new qt_gsi::GenericMethod ("handle", "@brief Method int QFile::handle()\n", true, &_init_f_handle_c0, &_call_f_handle_c0);
-  methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method () const\nThis is a reimplementation of QIODevice::isSequential", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
+  methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method bool QFile::isSequential()\nThis is a reimplementation of QIODevice::isSequential", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
   methods += new qt_gsi::GenericMethod ("link", "@brief Method bool QFile::link(const QString &newName)\n", false, &_init_f_link_2025, &_call_f_link_2025);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method (QFlags<QIODevice::OpenModeFlag>)\nThis is a reimplementation of QIODevice::open", false, &_init_f_open_3242, &_call_f_open_3242);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method bool QFile::open(QFlags<QIODevice::OpenModeFlag> flags)\nThis is a reimplementation of QIODevice::open", false, &_init_f_open_3242, &_call_f_open_3242);
   methods += new qt_gsi::GenericMethod ("permissions", "@brief Method QFlags<QFile::Permission> QFile::permissions()\n", true, &_init_f_permissions_c0, &_call_f_permissions_c0);
-  methods += new qt_gsi::GenericMethod ("pos", "@brief Method () const\nThis is a reimplementation of QIODevice::pos", true, &_init_f_pos_c0, &_call_f_pos_c0);
+  methods += new qt_gsi::GenericMethod ("pos", "@brief Method qint64 QFile::pos()\nThis is a reimplementation of QIODevice::pos", true, &_init_f_pos_c0, &_call_f_pos_c0);
   methods += new qt_gsi::GenericMethod ("readLink", "@brief Method QString QFile::readLink()\n", true, &_init_f_readLink_c0, &_call_f_readLink_c0);
   methods += new qt_gsi::GenericMethod ("remove", "@brief Method bool QFile::remove()\n", false, &_init_f_remove_0, &_call_f_remove_0);
   methods += new qt_gsi::GenericMethod ("rename", "@brief Method bool QFile::rename(const QString &newName)\n", false, &_init_f_rename_2025, &_call_f_rename_2025);
   methods += new qt_gsi::GenericMethod ("resize", "@brief Method bool QFile::resize(qint64 sz)\n", false, &_init_f_resize_986, &_call_f_resize_986);
-  methods += new qt_gsi::GenericMethod ("seek", "@brief Method (qint64)\nThis is a reimplementation of QIODevice::seek", false, &_init_f_seek_986, &_call_f_seek_986);
+  methods += new qt_gsi::GenericMethod ("seek", "@brief Method bool QFile::seek(qint64 offset)\nThis is a reimplementation of QIODevice::seek", false, &_init_f_seek_986, &_call_f_seek_986);
   methods += new qt_gsi::GenericMethod ("setFileName|fileName=", "@brief Method void QFile::setFileName(const QString &name)\n", false, &_init_f_setFileName_2025, &_call_f_setFileName_2025);
   methods += new qt_gsi::GenericMethod ("setPermissions", "@brief Method bool QFile::setPermissions(QFlags<QFile::Permission> permissionSpec)\n", false, &_init_f_setPermissions_2778, &_call_f_setPermissions_2778);
-  methods += new qt_gsi::GenericMethod ("size", "@brief Method () const\nThis is a reimplementation of QIODevice::size", true, &_init_f_size_c0, &_call_f_size_c0);
+  methods += new qt_gsi::GenericMethod ("size", "@brief Method qint64 QFile::size()\nThis is a reimplementation of QIODevice::size", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod ("symLinkTarget", "@brief Method QString QFile::symLinkTarget()\n", true, &_init_f_symLinkTarget_c0, &_call_f_symLinkTarget_c0);
   methods += new qt_gsi::GenericMethod ("unsetError", "@brief Method void QFile::unsetError()\n", false, &_init_f_unsetError_0, &_call_f_unsetError_0);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QFile::aboutToClose()\nYou can bind a procedure to this signal.");

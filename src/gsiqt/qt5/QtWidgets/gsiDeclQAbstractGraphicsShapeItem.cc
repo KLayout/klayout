@@ -80,7 +80,7 @@ static void _call_f_brush_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (const QGraphicsItem *) const
+// bool QAbstractGraphicsShapeItem::isObscuredBy(const QGraphicsItem *item)
 
 
 static void _init_f_isObscuredBy_c2614 (qt_gsi::GenericMethod *decl)
@@ -99,7 +99,7 @@ static void _call_f_isObscuredBy_c2614 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// () const
+// QPainterPath QAbstractGraphicsShapeItem::opaqueArea()
 
 
 static void _init_f_opaqueArea_c0 (qt_gsi::GenericMethod *decl)
@@ -175,8 +175,8 @@ namespace gsi
 static gsi::Methods methods_QAbstractGraphicsShapeItem () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod (":brush", "@brief Method QBrush QAbstractGraphicsShapeItem::brush()\n", true, &_init_f_brush_c0, &_call_f_brush_c0);
-  methods += new qt_gsi::GenericMethod ("isObscuredBy?", "@brief Method (const QGraphicsItem *) const\nThis is a reimplementation of QGraphicsItem::isObscuredBy", true, &_init_f_isObscuredBy_c2614, &_call_f_isObscuredBy_c2614);
-  methods += new qt_gsi::GenericMethod ("opaqueArea", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::opaqueArea", true, &_init_f_opaqueArea_c0, &_call_f_opaqueArea_c0);
+  methods += new qt_gsi::GenericMethod ("isObscuredBy?", "@brief Method bool QAbstractGraphicsShapeItem::isObscuredBy(const QGraphicsItem *item)\nThis is a reimplementation of QGraphicsItem::isObscuredBy", true, &_init_f_isObscuredBy_c2614, &_call_f_isObscuredBy_c2614);
+  methods += new qt_gsi::GenericMethod ("opaqueArea", "@brief Method QPainterPath QAbstractGraphicsShapeItem::opaqueArea()\nThis is a reimplementation of QGraphicsItem::opaqueArea", true, &_init_f_opaqueArea_c0, &_call_f_opaqueArea_c0);
   methods += new qt_gsi::GenericMethod (":pen", "@brief Method QPen QAbstractGraphicsShapeItem::pen()\n", true, &_init_f_pen_c0, &_call_f_pen_c0);
   methods += new qt_gsi::GenericMethod ("setBrush|brush=", "@brief Method void QAbstractGraphicsShapeItem::setBrush(const QBrush &brush)\n", false, &_init_f_setBrush_1910, &_call_f_setBrush_1910);
   methods += new qt_gsi::GenericMethod ("setPen|pen=", "@brief Method void QAbstractGraphicsShapeItem::setPen(const QPen &pen)\n", false, &_init_f_setPen_1685, &_call_f_setPen_1685);

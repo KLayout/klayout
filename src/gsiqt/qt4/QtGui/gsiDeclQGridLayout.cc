@@ -61,7 +61,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QLayoutItem *, int, int, int, int, QFlags<Qt::AlignmentFlag>)
+// void QGridLayout::addItem(QLayoutItem *item, int row, int column, int rowSpan, int columnSpan, QFlags<Qt::AlignmentFlag>)
 
 
 static void _init_f_addItem_7018 (qt_gsi::GenericMethod *decl)
@@ -162,7 +162,7 @@ static void _call_f_addLayout_6619 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (QWidget *)
+// void QGridLayout::addWidget(QWidget *w)
 
 
 static void _init_f_addWidget_1315 (qt_gsi::GenericMethod *decl)
@@ -182,7 +182,7 @@ static void _call_f_addWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (QWidget *, int, int, QFlags<Qt::AlignmentFlag>)
+// void QGridLayout::addWidget(QWidget *, int row, int column, QFlags<Qt::AlignmentFlag>)
 
 
 static void _init_f_addWidget_5275 (qt_gsi::GenericMethod *decl)
@@ -211,7 +211,7 @@ static void _call_f_addWidget_5275 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (QWidget *, int, int, int, int, QFlags<Qt::AlignmentFlag>)
+// void QGridLayout::addWidget(QWidget *, int row, int column, int rowSpan, int columnSpan, QFlags<Qt::AlignmentFlag>)
 
 
 static void _init_f_addWidget_6593 (qt_gsi::GenericMethod *decl)
@@ -321,7 +321,7 @@ static void _call_f_columnStretch_c767 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// () const
+// int QGridLayout::count()
 
 
 static void _init_f_count_c0 (qt_gsi::GenericMethod *decl)
@@ -336,7 +336,7 @@ static void _call_f_count_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// () const
+// QFlags<Qt::Orientation> QGridLayout::expandingDirections()
 
 
 static void _init_f_expandingDirections_c0 (qt_gsi::GenericMethod *decl)
@@ -383,7 +383,7 @@ static void _call_f_getItemPosition_4147 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// () const
+// bool QGridLayout::hasHeightForWidth()
 
 
 static void _init_f_hasHeightForWidth_c0 (qt_gsi::GenericMethod *decl)
@@ -398,7 +398,7 @@ static void _call_f_hasHeightForWidth_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (int) const
+// int QGridLayout::heightForWidth(int)
 
 
 static void _init_f_heightForWidth_c767 (qt_gsi::GenericMethod *decl)
@@ -432,7 +432,7 @@ static void _call_f_horizontalSpacing_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// ()
+// void QGridLayout::invalidate()
 
 
 static void _init_f_invalidate_0 (qt_gsi::GenericMethod *decl)
@@ -448,7 +448,7 @@ static void _call_f_invalidate_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int) const
+// QLayoutItem *QGridLayout::itemAt(int index)
 
 
 static void _init_f_itemAt_c767 (qt_gsi::GenericMethod *decl)
@@ -489,7 +489,7 @@ static void _call_f_itemAtPosition_c1426 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// () const
+// QSize QGridLayout::maximumSize()
 
 
 static void _init_f_maximumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -504,7 +504,7 @@ static void _call_f_maximumSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (int) const
+// int QGridLayout::minimumHeightForWidth(int)
 
 
 static void _init_f_minimumHeightForWidth_c767 (qt_gsi::GenericMethod *decl)
@@ -523,7 +523,7 @@ static void _call_f_minimumHeightForWidth_c767 (const qt_gsi::GenericMethod * /*
 }
 
 
-// () const
+// QSize QGridLayout::minimumSize()
 
 
 static void _init_f_minimumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -675,7 +675,7 @@ static void _call_f_setDefaultPositioning_2572 (const qt_gsi::GenericMethod * /*
 }
 
 
-// (const QRect &)
+// void QGridLayout::setGeometry(const QRect &)
 
 
 static void _init_f_setGeometry_1792 (qt_gsi::GenericMethod *decl)
@@ -781,7 +781,7 @@ static void _call_f_setRowStretch_1426 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int)
+// void QGridLayout::setSpacing(int spacing)
 
 
 static void _init_f_setSpacing_767 (qt_gsi::GenericMethod *decl)
@@ -821,7 +821,7 @@ static void _call_f_setVerticalSpacing_767 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// QSize QGridLayout::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -836,7 +836,7 @@ static void _call_f_sizeHint_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// int QGridLayout::spacing()
 
 
 static void _init_f_spacing_c0 (qt_gsi::GenericMethod *decl)
@@ -851,7 +851,7 @@ static void _call_f_spacing_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (int)
+// QLayoutItem *QGridLayout::takeAt(int index)
 
 
 static void _init_f_takeAt_767 (qt_gsi::GenericMethod *decl)
@@ -985,28 +985,28 @@ namespace gsi
 static gsi::Methods methods_QGridLayout () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("addItem", "@brief Method (QLayoutItem *, int, int, int, int, QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_addItem_7018, &_call_f_addItem_7018);
+  methods += new qt_gsi::GenericMethod ("addItem", "@brief Method void QGridLayout::addItem(QLayoutItem *item, int row, int column, int rowSpan, int columnSpan, QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_addItem_7018, &_call_f_addItem_7018);
   methods += new qt_gsi::GenericMethod ("addLayout", "@brief Method void QGridLayout::addLayout(QLayout *, int row, int column, QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_addLayout_5301, &_call_f_addLayout_5301);
   methods += new qt_gsi::GenericMethod ("addLayout", "@brief Method void QGridLayout::addLayout(QLayout *, int row, int column, int rowSpan, int columnSpan, QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_addLayout_6619, &_call_f_addLayout_6619);
-  methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method (QWidget *)\n", false, &_init_f_addWidget_1315, &_call_f_addWidget_1315);
-  methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method (QWidget *, int, int, QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_addWidget_5275, &_call_f_addWidget_5275);
-  methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method (QWidget *, int, int, int, int, QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_addWidget_6593, &_call_f_addWidget_6593);
+  methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method void QGridLayout::addWidget(QWidget *w)\n", false, &_init_f_addWidget_1315, &_call_f_addWidget_1315);
+  methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method void QGridLayout::addWidget(QWidget *, int row, int column, QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_addWidget_5275, &_call_f_addWidget_5275);
+  methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method void QGridLayout::addWidget(QWidget *, int row, int column, int rowSpan, int columnSpan, QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_addWidget_6593, &_call_f_addWidget_6593);
   methods += new qt_gsi::GenericMethod ("cellRect", "@brief Method QRect QGridLayout::cellRect(int row, int column)\n", true, &_init_f_cellRect_c1426, &_call_f_cellRect_c1426);
   methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method int QGridLayout::columnCount()\n", true, &_init_f_columnCount_c0, &_call_f_columnCount_c0);
   methods += new qt_gsi::GenericMethod ("columnMinimumWidth", "@brief Method int QGridLayout::columnMinimumWidth(int column)\n", true, &_init_f_columnMinimumWidth_c767, &_call_f_columnMinimumWidth_c767);
   methods += new qt_gsi::GenericMethod ("columnStretch", "@brief Method int QGridLayout::columnStretch(int column)\n", true, &_init_f_columnStretch_c767, &_call_f_columnStretch_c767);
-  methods += new qt_gsi::GenericMethod ("count", "@brief Method () const\nThis is a reimplementation of QLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
-  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method () const\nThis is a reimplementation of QLayout::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
+  methods += new qt_gsi::GenericMethod ("count", "@brief Method int QGridLayout::count()\nThis is a reimplementation of QLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
+  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method QFlags<Qt::Orientation> QGridLayout::expandingDirections()\nThis is a reimplementation of QLayout::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
   methods += new qt_gsi::GenericMethod ("getItemPosition", "@brief Method void QGridLayout::getItemPosition(int idx, int *row, int *column, int *rowSpan, int *columnSpan)\n", false, &_init_f_getItemPosition_4147, &_call_f_getItemPosition_4147);
-  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Method () const\nThis is a reimplementation of QLayoutItem::hasHeightForWidth", true, &_init_f_hasHeightForWidth_c0, &_call_f_hasHeightForWidth_c0);
-  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method (int) const\nThis is a reimplementation of QLayoutItem::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
+  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Method bool QGridLayout::hasHeightForWidth()\nThis is a reimplementation of QLayoutItem::hasHeightForWidth", true, &_init_f_hasHeightForWidth_c0, &_call_f_hasHeightForWidth_c0);
+  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method int QGridLayout::heightForWidth(int)\nThis is a reimplementation of QLayoutItem::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
   methods += new qt_gsi::GenericMethod (":horizontalSpacing", "@brief Method int QGridLayout::horizontalSpacing()\n", true, &_init_f_horizontalSpacing_c0, &_call_f_horizontalSpacing_c0);
-  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method ()\nThis is a reimplementation of QLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
-  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method (int) const\nThis is a reimplementation of QLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
+  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QGridLayout::invalidate()\nThis is a reimplementation of QLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
+  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QLayoutItem *QGridLayout::itemAt(int index)\nThis is a reimplementation of QLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
   methods += new qt_gsi::GenericMethod ("itemAtPosition", "@brief Method QLayoutItem *QGridLayout::itemAtPosition(int row, int column)\n", true, &_init_f_itemAtPosition_c1426, &_call_f_itemAtPosition_c1426);
-  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Method () const\nThis is a reimplementation of QLayout::maximumSize", true, &_init_f_maximumSize_c0, &_call_f_maximumSize_c0);
-  methods += new qt_gsi::GenericMethod ("minimumHeightForWidth", "@brief Method (int) const\nThis is a reimplementation of QLayoutItem::minimumHeightForWidth", true, &_init_f_minimumHeightForWidth_c767, &_call_f_minimumHeightForWidth_c767);
-  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method () const\nThis is a reimplementation of QLayout::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
+  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Method QSize QGridLayout::maximumSize()\nThis is a reimplementation of QLayout::maximumSize", true, &_init_f_maximumSize_c0, &_call_f_maximumSize_c0);
+  methods += new qt_gsi::GenericMethod ("minimumHeightForWidth", "@brief Method int QGridLayout::minimumHeightForWidth(int)\nThis is a reimplementation of QLayoutItem::minimumHeightForWidth", true, &_init_f_minimumHeightForWidth_c767, &_call_f_minimumHeightForWidth_c767);
+  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method QSize QGridLayout::minimumSize()\nThis is a reimplementation of QLayout::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
   methods += new qt_gsi::GenericMethod (":originCorner", "@brief Method Qt::Corner QGridLayout::originCorner()\n", true, &_init_f_originCorner_c0, &_call_f_originCorner_c0);
   methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method int QGridLayout::rowCount()\n", true, &_init_f_rowCount_c0, &_call_f_rowCount_c0);
   methods += new qt_gsi::GenericMethod ("rowMinimumHeight", "@brief Method int QGridLayout::rowMinimumHeight(int row)\n", true, &_init_f_rowMinimumHeight_c767, &_call_f_rowMinimumHeight_c767);
@@ -1014,16 +1014,16 @@ static gsi::Methods methods_QGridLayout () {
   methods += new qt_gsi::GenericMethod ("setColumnMinimumWidth", "@brief Method void QGridLayout::setColumnMinimumWidth(int column, int minSize)\n", false, &_init_f_setColumnMinimumWidth_1426, &_call_f_setColumnMinimumWidth_1426);
   methods += new qt_gsi::GenericMethod ("setColumnStretch", "@brief Method void QGridLayout::setColumnStretch(int column, int stretch)\n", false, &_init_f_setColumnStretch_1426, &_call_f_setColumnStretch_1426);
   methods += new qt_gsi::GenericMethod ("setDefaultPositioning", "@brief Method void QGridLayout::setDefaultPositioning(int n, Qt::Orientation orient)\n", false, &_init_f_setDefaultPositioning_2572, &_call_f_setDefaultPositioning_2572);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRect &)\nThis is a reimplementation of QLayout::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QGridLayout::setGeometry(const QRect &)\nThis is a reimplementation of QLayout::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
   methods += new qt_gsi::GenericMethod ("setHorizontalSpacing|horizontalSpacing=", "@brief Method void QGridLayout::setHorizontalSpacing(int spacing)\n", false, &_init_f_setHorizontalSpacing_767, &_call_f_setHorizontalSpacing_767);
   methods += new qt_gsi::GenericMethod ("setOriginCorner|originCorner=", "@brief Method void QGridLayout::setOriginCorner(Qt::Corner)\n", false, &_init_f_setOriginCorner_1366, &_call_f_setOriginCorner_1366);
   methods += new qt_gsi::GenericMethod ("setRowMinimumHeight", "@brief Method void QGridLayout::setRowMinimumHeight(int row, int minSize)\n", false, &_init_f_setRowMinimumHeight_1426, &_call_f_setRowMinimumHeight_1426);
   methods += new qt_gsi::GenericMethod ("setRowStretch", "@brief Method void QGridLayout::setRowStretch(int row, int stretch)\n", false, &_init_f_setRowStretch_1426, &_call_f_setRowStretch_1426);
-  methods += new qt_gsi::GenericMethod ("setSpacing|spacing=", "@brief Method (int)\n", false, &_init_f_setSpacing_767, &_call_f_setSpacing_767);
+  methods += new qt_gsi::GenericMethod ("setSpacing|spacing=", "@brief Method void QGridLayout::setSpacing(int spacing)\n", false, &_init_f_setSpacing_767, &_call_f_setSpacing_767);
   methods += new qt_gsi::GenericMethod ("setVerticalSpacing|verticalSpacing=", "@brief Method void QGridLayout::setVerticalSpacing(int spacing)\n", false, &_init_f_setVerticalSpacing_767, &_call_f_setVerticalSpacing_767);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method () const\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
-  methods += new qt_gsi::GenericMethod (":spacing", "@brief Method () const\n", true, &_init_f_spacing_c0, &_call_f_spacing_c0);
-  methods += new qt_gsi::GenericMethod ("takeAt", "@brief Method (int)\nThis is a reimplementation of QLayout::takeAt", false, &_init_f_takeAt_767, &_call_f_takeAt_767);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method QSize QGridLayout::sizeHint()\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":spacing", "@brief Method int QGridLayout::spacing()\n", true, &_init_f_spacing_c0, &_call_f_spacing_c0);
+  methods += new qt_gsi::GenericMethod ("takeAt", "@brief Method QLayoutItem *QGridLayout::takeAt(int index)\nThis is a reimplementation of QLayout::takeAt", false, &_init_f_takeAt_767, &_call_f_takeAt_767);
   methods += new qt_gsi::GenericMethod (":verticalSpacing", "@brief Method int QGridLayout::verticalSpacing()\n", true, &_init_f_verticalSpacing_c0, &_call_f_verticalSpacing_c0);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QGridLayout::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QGridLayout::tr(const char *s, const char *c)\nThis method is static and can be called without an instance.", &_init_f_tr_3354, &_call_f_tr_3354);

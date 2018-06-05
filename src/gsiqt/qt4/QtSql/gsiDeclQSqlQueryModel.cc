@@ -62,7 +62,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (const QModelIndex &) const
+// bool QSqlQueryModel::canFetchMore(const QModelIndex &parent)
 
 
 static void _init_f_canFetchMore_c2395 (qt_gsi::GenericMethod *decl)
@@ -97,7 +97,7 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (const QModelIndex &) const
+// int QSqlQueryModel::columnCount(const QModelIndex &parent)
 
 
 static void _init_f_columnCount_c2395 (qt_gsi::GenericMethod *decl)
@@ -116,7 +116,7 @@ static void _call_f_columnCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QModelIndex &, int) const
+// QVariant QSqlQueryModel::data(const QModelIndex &item, int role)
 
 
 static void _init_f_data_c3054 (qt_gsi::GenericMethod *decl)
@@ -138,7 +138,7 @@ static void _call_f_data_c3054 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (const QModelIndex &)
+// void QSqlQueryModel::fetchMore(const QModelIndex &parent)
 
 
 static void _init_f_fetchMore_2395 (qt_gsi::GenericMethod *decl)
@@ -158,7 +158,7 @@ static void _call_f_fetchMore_2395 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (int, Qt::Orientation, int) const
+// QVariant QSqlQueryModel::headerData(int section, Qt::Orientation orientation, int role)
 
 
 static void _init_f_headerData_c3231 (qt_gsi::GenericMethod *decl)
@@ -183,7 +183,7 @@ static void _call_f_headerData_c3231 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QSqlQueryModel::insertColumns(int column, int count, const QModelIndex &parent)
 
 
 static void _init_f_insertColumns_3713 (qt_gsi::GenericMethod *decl)
@@ -272,7 +272,7 @@ static void _call_f_record_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QSqlQueryModel::removeColumns(int column, int count, const QModelIndex &parent)
 
 
 static void _init_f_removeColumns_3713 (qt_gsi::GenericMethod *decl)
@@ -297,7 +297,7 @@ static void _call_f_removeColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QModelIndex &) const
+// int QSqlQueryModel::rowCount(const QModelIndex &parent)
 
 
 static void _init_f_rowCount_c2395 (qt_gsi::GenericMethod *decl)
@@ -316,7 +316,7 @@ static void _call_f_rowCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (int, Qt::Orientation, const QVariant &, int)
+// bool QSqlQueryModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 
 
 static void _init_f_setHeaderData_5242 (qt_gsi::GenericMethod *decl)
@@ -487,20 +487,20 @@ namespace gsi
 static gsi::Methods methods_QSqlQueryModel () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("canFetchMore", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::canFetchMore", true, &_init_f_canFetchMore_c2395, &_call_f_canFetchMore_c2395);
+  methods += new qt_gsi::GenericMethod ("canFetchMore", "@brief Method bool QSqlQueryModel::canFetchMore(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::canFetchMore", true, &_init_f_canFetchMore_c2395, &_call_f_canFetchMore_c2395);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QSqlQueryModel::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
-  methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::columnCount", true, &_init_f_columnCount_c2395, &_call_f_columnCount_c2395);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Method (const QModelIndex &, int) const\nThis is a reimplementation of QAbstractItemModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
-  methods += new qt_gsi::GenericMethod ("fetchMore", "@brief Method (const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::fetchMore", false, &_init_f_fetchMore_2395, &_call_f_fetchMore_2395);
-  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method (int, Qt::Orientation, int) const\nThis is a reimplementation of QAbstractItemModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
-  methods += new qt_gsi::GenericMethod ("insertColumns", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::insertColumns", false, &_init_f_insertColumns_3713, &_call_f_insertColumns_3713);
+  methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method int QSqlQueryModel::columnCount(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::columnCount", true, &_init_f_columnCount_c2395, &_call_f_columnCount_c2395);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Method QVariant QSqlQueryModel::data(const QModelIndex &item, int role)\nThis is a reimplementation of QAbstractItemModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
+  methods += new qt_gsi::GenericMethod ("fetchMore", "@brief Method void QSqlQueryModel::fetchMore(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::fetchMore", false, &_init_f_fetchMore_2395, &_call_f_fetchMore_2395);
+  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method QVariant QSqlQueryModel::headerData(int section, Qt::Orientation orientation, int role)\nThis is a reimplementation of QAbstractItemModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
+  methods += new qt_gsi::GenericMethod ("insertColumns", "@brief Method bool QSqlQueryModel::insertColumns(int column, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::insertColumns", false, &_init_f_insertColumns_3713, &_call_f_insertColumns_3713);
   methods += new qt_gsi::GenericMethod ("lastError", "@brief Method QSqlError QSqlQueryModel::lastError()\n", true, &_init_f_lastError_c0, &_call_f_lastError_c0);
   methods += new qt_gsi::GenericMethod (":query", "@brief Method QSqlQuery QSqlQueryModel::query()\n", true, &_init_f_query_c0, &_call_f_query_c0);
   methods += new qt_gsi::GenericMethod ("record", "@brief Method QSqlRecord QSqlQueryModel::record(int row)\n", true, &_init_f_record_c767, &_call_f_record_c767);
   methods += new qt_gsi::GenericMethod ("record", "@brief Method QSqlRecord QSqlQueryModel::record()\n", true, &_init_f_record_c0, &_call_f_record_c0);
-  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
-  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
-  methods += new qt_gsi::GenericMethod ("setHeaderData", "@brief Method (int, Qt::Orientation, const QVariant &, int)\nThis is a reimplementation of QAbstractItemModel::setHeaderData", false, &_init_f_setHeaderData_5242, &_call_f_setHeaderData_5242);
+  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method bool QSqlQueryModel::removeColumns(int column, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
+  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method int QSqlQueryModel::rowCount(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
+  methods += new qt_gsi::GenericMethod ("setHeaderData", "@brief Method bool QSqlQueryModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)\nThis is a reimplementation of QAbstractItemModel::setHeaderData", false, &_init_f_setHeaderData_5242, &_call_f_setHeaderData_5242);
   methods += new qt_gsi::GenericMethod ("setQuery|query=", "@brief Method void QSqlQueryModel::setQuery(const QSqlQuery &query)\n", false, &_init_f_setQuery_2232, &_call_f_setQuery_2232);
   methods += new qt_gsi::GenericMethod ("setQuery", "@brief Method void QSqlQueryModel::setQuery(const QString &query, const QSqlDatabase &db)\n", false, &_init_f_setQuery_4404, &_call_f_setQuery_4404);
   methods += gsi::qt_signal<const QModelIndex &, const QModelIndex & > ("dataChanged(const QModelIndex &, const QModelIndex &)", "dataChanged", gsi::arg("topLeft"), gsi::arg("bottomRight"), "@brief Signal declaration for QSqlQueryModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)\nYou can bind a procedure to this signal.");

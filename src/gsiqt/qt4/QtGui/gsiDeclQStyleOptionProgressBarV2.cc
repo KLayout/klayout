@@ -91,7 +91,7 @@ static void _call_ctor_QStyleOptionProgressBarV2_3822 (const qt_gsi::GenericStat
 }
 
 
-// (const QStyleOptionProgressBar &)
+// QStyleOptionProgressBarV2 &QStyleOptionProgressBarV2::operator=(const QStyleOptionProgressBar &other)
 
 
 static void _init_f_operator_eq__3686 (qt_gsi::GenericMethod *decl)
@@ -119,7 +119,7 @@ static gsi::Methods methods_QStyleOptionProgressBarV2 () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionProgressBarV2::QStyleOptionProgressBarV2()\nThis method creates an object of class QStyleOptionProgressBarV2.", &_init_ctor_QStyleOptionProgressBarV2_0, &_call_ctor_QStyleOptionProgressBarV2_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionProgressBarV2::QStyleOptionProgressBarV2(const QStyleOptionProgressBar &other)\nThis method creates an object of class QStyleOptionProgressBarV2.", &_init_ctor_QStyleOptionProgressBarV2_3686, &_call_ctor_QStyleOptionProgressBarV2_3686);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionProgressBarV2::QStyleOptionProgressBarV2(const QStyleOptionProgressBarV2 &other)\nThis method creates an object of class QStyleOptionProgressBarV2.", &_init_ctor_QStyleOptionProgressBarV2_3822, &_call_ctor_QStyleOptionProgressBarV2_3822);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QStyleOptionProgressBar &)\n", false, &_init_f_operator_eq__3686, &_call_f_operator_eq__3686);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QStyleOptionProgressBarV2 &QStyleOptionProgressBarV2::operator=(const QStyleOptionProgressBar &other)\n", false, &_init_f_operator_eq__3686, &_call_f_operator_eq__3686);
   return methods;
 }
 

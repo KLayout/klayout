@@ -101,7 +101,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// () const
+// QSize QDial::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -221,7 +221,7 @@ static void _call_f_setWrapping_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// QSize QDial::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -307,14 +307,14 @@ namespace gsi
 static gsi::Methods methods_QDial () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QDial::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod (":notchSize", "@brief Method int QDial::notchSize()\n", true, &_init_f_notchSize_c0, &_call_f_notchSize_c0);
   methods += new qt_gsi::GenericMethod (":notchTarget", "@brief Method double QDial::notchTarget()\n", true, &_init_f_notchTarget_c0, &_call_f_notchTarget_c0);
   methods += new qt_gsi::GenericMethod (":notchesVisible", "@brief Method bool QDial::notchesVisible()\n", true, &_init_f_notchesVisible_c0, &_call_f_notchesVisible_c0);
   methods += new qt_gsi::GenericMethod ("setNotchTarget|notchTarget=", "@brief Method void QDial::setNotchTarget(double target)\n", false, &_init_f_setNotchTarget_1071, &_call_f_setNotchTarget_1071);
   methods += new qt_gsi::GenericMethod ("setNotchesVisible|notchesVisible=", "@brief Method void QDial::setNotchesVisible(bool visible)\n", false, &_init_f_setNotchesVisible_864, &_call_f_setNotchesVisible_864);
   methods += new qt_gsi::GenericMethod ("setWrapping|wrapping=", "@brief Method void QDial::setWrapping(bool on)\n", false, &_init_f_setWrapping_864, &_call_f_setWrapping_864);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QDial::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":wrapping", "@brief Method bool QDial::wrapping()\n", true, &_init_f_wrapping_c0, &_call_f_wrapping_c0);
   methods += gsi::qt_signal<int > ("actionTriggered(int)", "actionTriggered", gsi::arg("action"), "@brief Signal declaration for QDial::actionTriggered(int action)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QDial::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");

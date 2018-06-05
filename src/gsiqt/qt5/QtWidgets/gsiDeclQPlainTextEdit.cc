@@ -474,7 +474,7 @@ static void _call_f_extraSelections_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QString &, QFlags<QTextDocument::FindFlag>)
+// bool QPlainTextEdit::find(const QString &exp, QFlags<QTextDocument::FindFlag> options)
 
 
 static void _init_f_find_5261 (qt_gsi::GenericMethod *decl)
@@ -496,7 +496,7 @@ static void _call_f_find_5261 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (const QRegExp &, QFlags<QTextDocument::FindFlag>)
+// bool QPlainTextEdit::find(const QRegExp &exp, QFlags<QTextDocument::FindFlag> options)
 
 
 static void _init_f_find_5217 (qt_gsi::GenericMethod *decl)
@@ -518,7 +518,7 @@ static void _call_f_find_5217 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (Qt::InputMethodQuery) const
+// QVariant QPlainTextEdit::inputMethodQuery(Qt::InputMethodQuery property)
 
 
 static void _init_f_inputMethodQuery_c2420 (qt_gsi::GenericMethod *decl)
@@ -537,7 +537,7 @@ static void _call_f_inputMethodQuery_c2420 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (Qt::InputMethodQuery, QVariant) const
+// QVariant QPlainTextEdit::inputMethodQuery(Qt::InputMethodQuery query, QVariant argument)
 
 
 static void _init_f_inputMethodQuery_c3554 (qt_gsi::GenericMethod *decl)
@@ -1406,10 +1406,10 @@ static gsi::Methods methods_QPlainTextEdit () {
   methods += new qt_gsi::GenericMethod (":documentTitle", "@brief Method QString QPlainTextEdit::documentTitle()\n", true, &_init_f_documentTitle_c0, &_call_f_documentTitle_c0);
   methods += new qt_gsi::GenericMethod ("ensureCursorVisible", "@brief Method void QPlainTextEdit::ensureCursorVisible()\n", false, &_init_f_ensureCursorVisible_0, &_call_f_ensureCursorVisible_0);
   methods += new qt_gsi::GenericMethod (":extraSelections", "@brief Method QList<QTextEdit::ExtraSelection> QPlainTextEdit::extraSelections()\n", true, &_init_f_extraSelections_c0, &_call_f_extraSelections_c0);
-  methods += new qt_gsi::GenericMethod ("find", "@brief Method (const QString &, QFlags<QTextDocument::FindFlag>)\n", false, &_init_f_find_5261, &_call_f_find_5261);
-  methods += new qt_gsi::GenericMethod ("find", "@brief Method (const QRegExp &, QFlags<QTextDocument::FindFlag>)\n", false, &_init_f_find_5217, &_call_f_find_5217);
-  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method (Qt::InputMethodQuery) const\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
-  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method (Qt::InputMethodQuery, QVariant) const\n", true, &_init_f_inputMethodQuery_c3554, &_call_f_inputMethodQuery_c3554);
+  methods += new qt_gsi::GenericMethod ("find", "@brief Method bool QPlainTextEdit::find(const QString &exp, QFlags<QTextDocument::FindFlag> options)\n", false, &_init_f_find_5261, &_call_f_find_5261);
+  methods += new qt_gsi::GenericMethod ("find", "@brief Method bool QPlainTextEdit::find(const QRegExp &exp, QFlags<QTextDocument::FindFlag> options)\n", false, &_init_f_find_5217, &_call_f_find_5217);
+  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method QVariant QPlainTextEdit::inputMethodQuery(Qt::InputMethodQuery property)\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
+  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method QVariant QPlainTextEdit::inputMethodQuery(Qt::InputMethodQuery query, QVariant argument)\n", true, &_init_f_inputMethodQuery_c3554, &_call_f_inputMethodQuery_c3554);
   methods += new qt_gsi::GenericMethod ("insertPlainText", "@brief Method void QPlainTextEdit::insertPlainText(const QString &text)\n", false, &_init_f_insertPlainText_2025, &_call_f_insertPlainText_2025);
   methods += new qt_gsi::GenericMethod ("isReadOnly?|:readOnly", "@brief Method bool QPlainTextEdit::isReadOnly()\n", true, &_init_f_isReadOnly_c0, &_call_f_isReadOnly_c0);
   methods += new qt_gsi::GenericMethod ("isUndoRedoEnabled?|:undoRedoEnabled", "@brief Method bool QPlainTextEdit::isUndoRedoEnabled()\n", true, &_init_f_isUndoRedoEnabled_c0, &_call_f_isUndoRedoEnabled_c0);

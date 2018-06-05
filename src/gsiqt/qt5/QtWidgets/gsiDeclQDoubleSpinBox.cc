@@ -132,7 +132,7 @@ static void _call_f_decimals_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (QString &) const
+// void QDoubleSpinBox::fixup(QString &str)
 
 
 static void _init_f_fixup_c1330 (qt_gsi::GenericMethod *decl)
@@ -409,7 +409,7 @@ static void _call_f_textFromValue_c1071 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (QString &, int &) const
+// QValidator::State QDoubleSpinBox::validate(QString &input, int &pos)
 
 
 static void _init_f_validate_c2171 (qt_gsi::GenericMethod *decl)
@@ -523,7 +523,7 @@ static gsi::Methods methods_QDoubleSpinBox () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":cleanText", "@brief Method QString QDoubleSpinBox::cleanText()\n", true, &_init_f_cleanText_c0, &_call_f_cleanText_c0);
   methods += new qt_gsi::GenericMethod (":decimals", "@brief Method int QDoubleSpinBox::decimals()\n", true, &_init_f_decimals_c0, &_call_f_decimals_c0);
-  methods += new qt_gsi::GenericMethod ("fixup", "@brief Method (QString &) const\nThis is a reimplementation of QAbstractSpinBox::fixup", true, &_init_f_fixup_c1330, &_call_f_fixup_c1330);
+  methods += new qt_gsi::GenericMethod ("fixup", "@brief Method void QDoubleSpinBox::fixup(QString &str)\nThis is a reimplementation of QAbstractSpinBox::fixup", true, &_init_f_fixup_c1330, &_call_f_fixup_c1330);
   methods += new qt_gsi::GenericMethod (":maximum", "@brief Method double QDoubleSpinBox::maximum()\n", true, &_init_f_maximum_c0, &_call_f_maximum_c0);
   methods += new qt_gsi::GenericMethod (":minimum", "@brief Method double QDoubleSpinBox::minimum()\n", true, &_init_f_minimum_c0, &_call_f_minimum_c0);
   methods += new qt_gsi::GenericMethod (":prefix", "@brief Method QString QDoubleSpinBox::prefix()\n", true, &_init_f_prefix_c0, &_call_f_prefix_c0);
@@ -538,7 +538,7 @@ static gsi::Methods methods_QDoubleSpinBox () {
   methods += new qt_gsi::GenericMethod (":singleStep", "@brief Method double QDoubleSpinBox::singleStep()\n", true, &_init_f_singleStep_c0, &_call_f_singleStep_c0);
   methods += new qt_gsi::GenericMethod (":suffix", "@brief Method QString QDoubleSpinBox::suffix()\n", true, &_init_f_suffix_c0, &_call_f_suffix_c0);
   methods += new qt_gsi::GenericMethod ("textFromValue", "@brief Method QString QDoubleSpinBox::textFromValue(double val)\n", true, &_init_f_textFromValue_c1071, &_call_f_textFromValue_c1071);
-  methods += new qt_gsi::GenericMethod ("validate", "@brief Method (QString &, int &) const\nThis is a reimplementation of QAbstractSpinBox::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
+  methods += new qt_gsi::GenericMethod ("validate", "@brief Method QValidator::State QDoubleSpinBox::validate(QString &input, int &pos)\nThis is a reimplementation of QAbstractSpinBox::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
   methods += new qt_gsi::GenericMethod (":value", "@brief Method double QDoubleSpinBox::value()\n", true, &_init_f_value_c0, &_call_f_value_c0);
   methods += new qt_gsi::GenericMethod ("valueFromText", "@brief Method double QDoubleSpinBox::valueFromText(const QString &text)\n", true, &_init_f_valueFromText_c2025, &_call_f_valueFromText_c2025);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QDoubleSpinBox::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");

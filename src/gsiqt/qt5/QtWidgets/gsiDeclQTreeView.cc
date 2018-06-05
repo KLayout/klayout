@@ -232,7 +232,7 @@ static void _call_f_columnWidth_c767 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QModelIndex &, const QModelIndex &, const QVector<int> &)
+// void QTreeView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 
 
 static void _init_f_dataChanged_7048 (qt_gsi::GenericMethod *decl)
@@ -258,7 +258,7 @@ static void _call_f_dataChanged_7048 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// ()
+// void QTreeView::doItemsLayout()
 
 
 static void _init_f_doItemsLayout_0 (qt_gsi::GenericMethod *decl)
@@ -414,7 +414,7 @@ static void _call_f_indexAbove_c2395 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QPoint &) const
+// QModelIndex QTreeView::indexAt(const QPoint &p)
 
 
 static void _init_f_indexAt_c1916 (qt_gsi::GenericMethod *decl)
@@ -594,7 +594,7 @@ static void _call_f_itemsExpandable_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QString &)
+// void QTreeView::keyboardSearch(const QString &search)
 
 
 static void _init_f_keyboardSearch_2025 (qt_gsi::GenericMethod *decl)
@@ -614,7 +614,7 @@ static void _call_f_keyboardSearch_2025 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// ()
+// void QTreeView::reset()
 
 
 static void _init_f_reset_0 (qt_gsi::GenericMethod *decl)
@@ -681,7 +681,7 @@ static void _call_f_rootIsDecorated_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QModelIndex &, QAbstractItemView::ScrollHint)
+// void QTreeView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHint hint)
 
 
 static void _init_f_scrollTo_5576 (qt_gsi::GenericMethod *decl)
@@ -704,7 +704,7 @@ static void _call_f_scrollTo_5576 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// ()
+// void QTreeView::selectAll()
 
 
 static void _init_f_selectAll_0 (qt_gsi::GenericMethod *decl)
@@ -975,7 +975,7 @@ static void _call_f_setItemsExpandable_864 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (QAbstractItemModel *)
+// void QTreeView::setModel(QAbstractItemModel *model)
 
 
 static void _init_f_setModel_2419 (qt_gsi::GenericMethod *decl)
@@ -995,7 +995,7 @@ static void _call_f_setModel_2419 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QModelIndex &)
+// void QTreeView::setRootIndex(const QModelIndex &index)
 
 
 static void _init_f_setRootIndex_2395 (qt_gsi::GenericMethod *decl)
@@ -1061,7 +1061,7 @@ static void _call_f_setRowHidden_3810 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QItemSelectionModel *)
+// void QTreeView::setSelectionModel(QItemSelectionModel *selectionModel)
 
 
 static void _init_f_setSelectionModel_2533 (qt_gsi::GenericMethod *decl)
@@ -1254,7 +1254,7 @@ static void _call_f_uniformRowHeights_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (const QModelIndex &) const
+// QRect QTreeView::visualRect(const QModelIndex &index)
 
 
 static void _init_f_visualRect_c2395 (qt_gsi::GenericMethod *decl)
@@ -1351,8 +1351,8 @@ static gsi::Methods methods_QTreeView () {
   methods += new qt_gsi::GenericMethod ("columnAt", "@brief Method int QTreeView::columnAt(int x)\n", true, &_init_f_columnAt_c767, &_call_f_columnAt_c767);
   methods += new qt_gsi::GenericMethod ("columnViewportPosition", "@brief Method int QTreeView::columnViewportPosition(int column)\n", true, &_init_f_columnViewportPosition_c767, &_call_f_columnViewportPosition_c767);
   methods += new qt_gsi::GenericMethod ("columnWidth", "@brief Method int QTreeView::columnWidth(int column)\n", true, &_init_f_columnWidth_c767, &_call_f_columnWidth_c767);
-  methods += new qt_gsi::GenericMethod ("dataChanged", "@brief Method (const QModelIndex &, const QModelIndex &, const QVector<int> &)\nThis is a reimplementation of QAbstractItemView::dataChanged", false, &_init_f_dataChanged_7048, &_call_f_dataChanged_7048);
-  methods += new qt_gsi::GenericMethod ("doItemsLayout", "@brief Method ()\nThis is a reimplementation of QAbstractItemView::doItemsLayout", false, &_init_f_doItemsLayout_0, &_call_f_doItemsLayout_0);
+  methods += new qt_gsi::GenericMethod ("dataChanged", "@brief Method void QTreeView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)\nThis is a reimplementation of QAbstractItemView::dataChanged", false, &_init_f_dataChanged_7048, &_call_f_dataChanged_7048);
+  methods += new qt_gsi::GenericMethod ("doItemsLayout", "@brief Method void QTreeView::doItemsLayout()\nThis is a reimplementation of QAbstractItemView::doItemsLayout", false, &_init_f_doItemsLayout_0, &_call_f_doItemsLayout_0);
   methods += new qt_gsi::GenericMethod ("expand", "@brief Method void QTreeView::expand(const QModelIndex &index)\n", false, &_init_f_expand_2395, &_call_f_expand_2395);
   methods += new qt_gsi::GenericMethod ("expandAll", "@brief Method void QTreeView::expandAll()\n", false, &_init_f_expandAll_0, &_call_f_expandAll_0);
   methods += new qt_gsi::GenericMethod ("expandToDepth", "@brief Method void QTreeView::expandToDepth(int depth)\n", false, &_init_f_expandToDepth_767, &_call_f_expandToDepth_767);
@@ -1361,7 +1361,7 @@ static gsi::Methods methods_QTreeView () {
   methods += new qt_gsi::GenericMethod ("hideColumn", "@brief Method void QTreeView::hideColumn(int column)\n", false, &_init_f_hideColumn_767, &_call_f_hideColumn_767);
   methods += new qt_gsi::GenericMethod (":indentation", "@brief Method int QTreeView::indentation()\n", true, &_init_f_indentation_c0, &_call_f_indentation_c0);
   methods += new qt_gsi::GenericMethod ("indexAbove", "@brief Method QModelIndex QTreeView::indexAbove(const QModelIndex &index)\n", true, &_init_f_indexAbove_c2395, &_call_f_indexAbove_c2395);
-  methods += new qt_gsi::GenericMethod ("indexAt", "@brief Method (const QPoint &) const\nThis is a reimplementation of QAbstractItemView::indexAt", true, &_init_f_indexAt_c1916, &_call_f_indexAt_c1916);
+  methods += new qt_gsi::GenericMethod ("indexAt", "@brief Method QModelIndex QTreeView::indexAt(const QPoint &p)\nThis is a reimplementation of QAbstractItemView::indexAt", true, &_init_f_indexAt_c1916, &_call_f_indexAt_c1916);
   methods += new qt_gsi::GenericMethod ("indexBelow", "@brief Method QModelIndex QTreeView::indexBelow(const QModelIndex &index)\n", true, &_init_f_indexBelow_c2395, &_call_f_indexBelow_c2395);
   methods += new qt_gsi::GenericMethod ("isAnimated?|:animated", "@brief Method bool QTreeView::isAnimated()\n", true, &_init_f_isAnimated_c0, &_call_f_isAnimated_c0);
   methods += new qt_gsi::GenericMethod ("isColumnHidden?", "@brief Method bool QTreeView::isColumnHidden(int column)\n", true, &_init_f_isColumnHidden_c767, &_call_f_isColumnHidden_c767);
@@ -1371,13 +1371,13 @@ static gsi::Methods methods_QTreeView () {
   methods += new qt_gsi::GenericMethod ("isRowHidden?", "@brief Method bool QTreeView::isRowHidden(int row, const QModelIndex &parent)\n", true, &_init_f_isRowHidden_c3054, &_call_f_isRowHidden_c3054);
   methods += new qt_gsi::GenericMethod ("isSortingEnabled?|:sortingEnabled", "@brief Method bool QTreeView::isSortingEnabled()\n", true, &_init_f_isSortingEnabled_c0, &_call_f_isSortingEnabled_c0);
   methods += new qt_gsi::GenericMethod (":itemsExpandable", "@brief Method bool QTreeView::itemsExpandable()\n", true, &_init_f_itemsExpandable_c0, &_call_f_itemsExpandable_c0);
-  methods += new qt_gsi::GenericMethod ("keyboardSearch", "@brief Method (const QString &)\nThis is a reimplementation of QAbstractItemView::keyboardSearch", false, &_init_f_keyboardSearch_2025, &_call_f_keyboardSearch_2025);
-  methods += new qt_gsi::GenericMethod ("reset", "@brief Method ()\nThis is a reimplementation of QAbstractItemView::reset", false, &_init_f_reset_0, &_call_f_reset_0);
+  methods += new qt_gsi::GenericMethod ("keyboardSearch", "@brief Method void QTreeView::keyboardSearch(const QString &search)\nThis is a reimplementation of QAbstractItemView::keyboardSearch", false, &_init_f_keyboardSearch_2025, &_call_f_keyboardSearch_2025);
+  methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QTreeView::reset()\nThis is a reimplementation of QAbstractItemView::reset", false, &_init_f_reset_0, &_call_f_reset_0);
   methods += new qt_gsi::GenericMethod ("resetIndentation", "@brief Method void QTreeView::resetIndentation()\n", false, &_init_f_resetIndentation_0, &_call_f_resetIndentation_0);
   methods += new qt_gsi::GenericMethod ("resizeColumnToContents", "@brief Method void QTreeView::resizeColumnToContents(int column)\n", false, &_init_f_resizeColumnToContents_767, &_call_f_resizeColumnToContents_767);
   methods += new qt_gsi::GenericMethod (":rootIsDecorated", "@brief Method bool QTreeView::rootIsDecorated()\n", true, &_init_f_rootIsDecorated_c0, &_call_f_rootIsDecorated_c0);
-  methods += new qt_gsi::GenericMethod ("scrollTo", "@brief Method (const QModelIndex &, QAbstractItemView::ScrollHint)\nThis is a reimplementation of QAbstractItemView::scrollTo", false, &_init_f_scrollTo_5576, &_call_f_scrollTo_5576);
-  methods += new qt_gsi::GenericMethod ("selectAll", "@brief Method ()\nThis is a reimplementation of QAbstractItemView::selectAll", false, &_init_f_selectAll_0, &_call_f_selectAll_0);
+  methods += new qt_gsi::GenericMethod ("scrollTo", "@brief Method void QTreeView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHint hint)\nThis is a reimplementation of QAbstractItemView::scrollTo", false, &_init_f_scrollTo_5576, &_call_f_scrollTo_5576);
+  methods += new qt_gsi::GenericMethod ("selectAll", "@brief Method void QTreeView::selectAll()\nThis is a reimplementation of QAbstractItemView::selectAll", false, &_init_f_selectAll_0, &_call_f_selectAll_0);
   methods += new qt_gsi::GenericMethod ("setAllColumnsShowFocus|allColumnsShowFocus=", "@brief Method void QTreeView::setAllColumnsShowFocus(bool enable)\n", false, &_init_f_setAllColumnsShowFocus_864, &_call_f_setAllColumnsShowFocus_864);
   methods += new qt_gsi::GenericMethod ("setAnimated|animated=", "@brief Method void QTreeView::setAnimated(bool enable)\n", false, &_init_f_setAnimated_864, &_call_f_setAnimated_864);
   methods += new qt_gsi::GenericMethod ("setAutoExpandDelay|autoExpandDelay=", "@brief Method void QTreeView::setAutoExpandDelay(int delay)\n", false, &_init_f_setAutoExpandDelay_767, &_call_f_setAutoExpandDelay_767);
@@ -1390,11 +1390,11 @@ static gsi::Methods methods_QTreeView () {
   methods += new qt_gsi::GenericMethod ("setHeaderHidden|headerHidden=", "@brief Method void QTreeView::setHeaderHidden(bool hide)\n", false, &_init_f_setHeaderHidden_864, &_call_f_setHeaderHidden_864);
   methods += new qt_gsi::GenericMethod ("setIndentation|indentation=", "@brief Method void QTreeView::setIndentation(int i)\n", false, &_init_f_setIndentation_767, &_call_f_setIndentation_767);
   methods += new qt_gsi::GenericMethod ("setItemsExpandable|itemsExpandable=", "@brief Method void QTreeView::setItemsExpandable(bool enable)\n", false, &_init_f_setItemsExpandable_864, &_call_f_setItemsExpandable_864);
-  methods += new qt_gsi::GenericMethod ("setModel|model=", "@brief Method (QAbstractItemModel *)\nThis is a reimplementation of QAbstractItemView::setModel", false, &_init_f_setModel_2419, &_call_f_setModel_2419);
-  methods += new qt_gsi::GenericMethod ("setRootIndex|rootIndex=", "@brief Method (const QModelIndex &)\nThis is a reimplementation of QAbstractItemView::setRootIndex", false, &_init_f_setRootIndex_2395, &_call_f_setRootIndex_2395);
+  methods += new qt_gsi::GenericMethod ("setModel|model=", "@brief Method void QTreeView::setModel(QAbstractItemModel *model)\nThis is a reimplementation of QAbstractItemView::setModel", false, &_init_f_setModel_2419, &_call_f_setModel_2419);
+  methods += new qt_gsi::GenericMethod ("setRootIndex|rootIndex=", "@brief Method void QTreeView::setRootIndex(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemView::setRootIndex", false, &_init_f_setRootIndex_2395, &_call_f_setRootIndex_2395);
   methods += new qt_gsi::GenericMethod ("setRootIsDecorated|rootIsDecorated=", "@brief Method void QTreeView::setRootIsDecorated(bool show)\n", false, &_init_f_setRootIsDecorated_864, &_call_f_setRootIsDecorated_864);
   methods += new qt_gsi::GenericMethod ("setRowHidden", "@brief Method void QTreeView::setRowHidden(int row, const QModelIndex &parent, bool hide)\n", false, &_init_f_setRowHidden_3810, &_call_f_setRowHidden_3810);
-  methods += new qt_gsi::GenericMethod ("setSelectionModel|selectionModel=", "@brief Method (QItemSelectionModel *)\nThis is a reimplementation of QAbstractItemView::setSelectionModel", false, &_init_f_setSelectionModel_2533, &_call_f_setSelectionModel_2533);
+  methods += new qt_gsi::GenericMethod ("setSelectionModel|selectionModel=", "@brief Method void QTreeView::setSelectionModel(QItemSelectionModel *selectionModel)\nThis is a reimplementation of QAbstractItemView::setSelectionModel", false, &_init_f_setSelectionModel_2533, &_call_f_setSelectionModel_2533);
   methods += new qt_gsi::GenericMethod ("setSortingEnabled|sortingEnabled=", "@brief Method void QTreeView::setSortingEnabled(bool enable)\n", false, &_init_f_setSortingEnabled_864, &_call_f_setSortingEnabled_864);
   methods += new qt_gsi::GenericMethod ("setTreePosition|treePosition=", "@brief Method void QTreeView::setTreePosition(int logicalIndex)\n", false, &_init_f_setTreePosition_767, &_call_f_setTreePosition_767);
   methods += new qt_gsi::GenericMethod ("setUniformRowHeights|uniformRowHeights=", "@brief Method void QTreeView::setUniformRowHeights(bool uniform)\n", false, &_init_f_setUniformRowHeights_864, &_call_f_setUniformRowHeights_864);
@@ -1404,7 +1404,7 @@ static gsi::Methods methods_QTreeView () {
   methods += new qt_gsi::GenericMethod ("sortByColumn", "@brief Method void QTreeView::sortByColumn(int column)\n", false, &_init_f_sortByColumn_767, &_call_f_sortByColumn_767);
   methods += new qt_gsi::GenericMethod (":treePosition", "@brief Method int QTreeView::treePosition()\n", true, &_init_f_treePosition_c0, &_call_f_treePosition_c0);
   methods += new qt_gsi::GenericMethod (":uniformRowHeights", "@brief Method bool QTreeView::uniformRowHeights()\n", true, &_init_f_uniformRowHeights_c0, &_call_f_uniformRowHeights_c0);
-  methods += new qt_gsi::GenericMethod ("visualRect", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemView::visualRect", true, &_init_f_visualRect_c2395, &_call_f_visualRect_c2395);
+  methods += new qt_gsi::GenericMethod ("visualRect", "@brief Method QRect QTreeView::visualRect(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemView::visualRect", true, &_init_f_visualRect_c2395, &_call_f_visualRect_c2395);
   methods += new qt_gsi::GenericMethod (":wordWrap", "@brief Method bool QTreeView::wordWrap()\n", true, &_init_f_wordWrap_c0, &_call_f_wordWrap_c0);
   methods += gsi::qt_signal<const QModelIndex & > ("activated(const QModelIndex &)", "activated", gsi::arg("index"), "@brief Signal declaration for QTreeView::activated(const QModelIndex &index)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex & > ("clicked(const QModelIndex &)", "clicked", gsi::arg("index"), "@brief Signal declaration for QTreeView::clicked(const QModelIndex &index)\nYou can bind a procedure to this signal.");

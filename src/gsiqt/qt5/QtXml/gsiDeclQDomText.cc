@@ -86,7 +86,7 @@ static void _call_ctor_QDomText_2103 (const qt_gsi::GenericStaticMethod * /*decl
 }
 
 
-// () const
+// QDomNode::NodeType QDomText::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -101,7 +101,7 @@ static void _call_f_nodeType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QDomText &)
+// QDomText &QDomText::operator=(const QDomText &)
 
 
 static void _init_f_operator_eq__2103 (qt_gsi::GenericMethod *decl)
@@ -147,8 +147,8 @@ static gsi::Methods methods_QDomText () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomText::QDomText()\nThis method creates an object of class QDomText.", &_init_ctor_QDomText_0, &_call_ctor_QDomText_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomText::QDomText(const QDomText &x)\nThis method creates an object of class QDomText.", &_init_ctor_QDomText_2103, &_call_ctor_QDomText_2103);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomText &)\n", false, &_init_f_operator_eq__2103, &_call_f_operator_eq__2103);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomText::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomText &QDomText::operator=(const QDomText &)\n", false, &_init_f_operator_eq__2103, &_call_f_operator_eq__2103);
   methods += new qt_gsi::GenericMethod ("splitText", "@brief Method QDomText QDomText::splitText(int offset)\n", false, &_init_f_splitText_767, &_call_f_splitText_767);
   return methods;
 }

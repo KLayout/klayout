@@ -273,7 +273,7 @@ static void _call_f_isCollapsible_c767 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// () const
+// QSize QSplitter::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -514,7 +514,7 @@ static void _call_f_setStretchFactor_1426 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// () const
+// QSize QSplitter::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -628,7 +628,7 @@ static gsi::Methods methods_QSplitter () {
   methods += new qt_gsi::GenericMethod ("indexOf", "@brief Method int QSplitter::indexOf(QWidget *w)\n", true, &_init_f_indexOf_c1315, &_call_f_indexOf_c1315);
   methods += new qt_gsi::GenericMethod ("insertWidget", "@brief Method void QSplitter::insertWidget(int index, QWidget *widget)\n", false, &_init_f_insertWidget_1974, &_call_f_insertWidget_1974);
   methods += new qt_gsi::GenericMethod ("isCollapsible?", "@brief Method bool QSplitter::isCollapsible(int index)\n", true, &_init_f_isCollapsible_c767, &_call_f_isCollapsible_c767);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QSplitter::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod (":opaqueResize", "@brief Method bool QSplitter::opaqueResize()\n", true, &_init_f_opaqueResize_c0, &_call_f_opaqueResize_c0);
   methods += new qt_gsi::GenericMethod (":orientation", "@brief Method Qt::Orientation QSplitter::orientation()\n", true, &_init_f_orientation_c0, &_call_f_orientation_c0);
   methods += new qt_gsi::GenericMethod ("refresh", "@brief Method void QSplitter::refresh()\n", false, &_init_f_refresh_0, &_call_f_refresh_0);
@@ -641,7 +641,7 @@ static gsi::Methods methods_QSplitter () {
   methods += new qt_gsi::GenericMethod ("setOrientation|orientation=", "@brief Method void QSplitter::setOrientation(Qt::Orientation)\n", false, &_init_f_setOrientation_1913, &_call_f_setOrientation_1913);
   methods += new qt_gsi::GenericMethod ("setSizes|sizes=", "@brief Method void QSplitter::setSizes(const QList<int> &list)\n", false, &_init_f_setSizes_2259, &_call_f_setSizes_2259);
   methods += new qt_gsi::GenericMethod ("setStretchFactor", "@brief Method void QSplitter::setStretchFactor(int index, int stretch)\n", false, &_init_f_setStretchFactor_1426, &_call_f_setStretchFactor_1426);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QFrame::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QSplitter::sizeHint()\nThis is a reimplementation of QFrame::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":sizes", "@brief Method QList<int> QSplitter::sizes()\n", true, &_init_f_sizes_c0, &_call_f_sizes_c0);
   methods += new qt_gsi::GenericMethod ("widget", "@brief Method QWidget *QSplitter::widget(int index)\n", true, &_init_f_widget_c767, &_call_f_widget_c767);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QSplitter::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");

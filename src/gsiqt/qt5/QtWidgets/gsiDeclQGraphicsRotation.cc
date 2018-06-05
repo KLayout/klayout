@@ -72,7 +72,7 @@ static void _call_f_angle_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (QMatrix4x4 *) const
+// void QGraphicsRotation::applyTo(QMatrix4x4 *matrix)
 
 
 static void _init_f_applyTo_c1556 (qt_gsi::GenericMethod *decl)
@@ -259,7 +259,7 @@ static gsi::Methods methods_QGraphicsRotation () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":angle", "@brief Method double QGraphicsRotation::angle()\n", true, &_init_f_angle_c0, &_call_f_angle_c0);
-  methods += new qt_gsi::GenericMethod ("applyTo", "@brief Method (QMatrix4x4 *) const\nThis is a reimplementation of QGraphicsTransform::applyTo", true, &_init_f_applyTo_c1556, &_call_f_applyTo_c1556);
+  methods += new qt_gsi::GenericMethod ("applyTo", "@brief Method void QGraphicsRotation::applyTo(QMatrix4x4 *matrix)\nThis is a reimplementation of QGraphicsTransform::applyTo", true, &_init_f_applyTo_c1556, &_call_f_applyTo_c1556);
   methods += new qt_gsi::GenericMethod (":axis", "@brief Method QVector3D QGraphicsRotation::axis()\n", true, &_init_f_axis_c0, &_call_f_axis_c0);
   methods += new qt_gsi::GenericMethod (":origin", "@brief Method QVector3D QGraphicsRotation::origin()\n", true, &_init_f_origin_c0, &_call_f_origin_c0);
   methods += new qt_gsi::GenericMethod ("setAngle|angle=", "@brief Method void QGraphicsRotation::setAngle(double)\n", false, &_init_f_setAngle_1071, &_call_f_setAngle_1071);

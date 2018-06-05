@@ -68,7 +68,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QStyle::ComplexControl, const QStyleOptionComplex *, QPainter *, const QWidget *) const
+// void QWindowsStyle::drawComplexControl(QStyle::ComplexControl cc, const QStyleOptionComplex *opt, QPainter *p, const QWidget *w)
 
 
 static void _init_f_drawComplexControl_c9027 (qt_gsi::GenericMethod *decl)
@@ -97,7 +97,7 @@ static void _call_f_drawComplexControl_c9027 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// (QStyle::ControlElement, const QStyleOption *, QPainter *, const QWidget *) const
+// void QWindowsStyle::drawControl(QStyle::ControlElement element, const QStyleOption *opt, QPainter *p, const QWidget *w)
 
 
 static void _init_f_drawControl_c8285 (qt_gsi::GenericMethod *decl)
@@ -126,7 +126,7 @@ static void _call_f_drawControl_c8285 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QStyle::PrimitiveElement, const QStyleOption *, QPainter *, const QWidget *) const
+// void QWindowsStyle::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w)
 
 
 static void _init_f_drawPrimitive_c8501 (qt_gsi::GenericMethod *decl)
@@ -155,7 +155,7 @@ static void _call_f_drawPrimitive_c8501 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (QStyle::PixelMetric, const QStyleOption *, const QWidget *) const
+// int QWindowsStyle::pixelMetric(QStyle::PixelMetric pm, const QStyleOption *option, const QWidget *widget)
 
 
 static void _init_f_pixelMetric_c6642 (qt_gsi::GenericMethod *decl)
@@ -180,7 +180,7 @@ static void _call_f_pixelMetric_c6642 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QApplication *)
+// void QWindowsStyle::polish(QApplication *)
 
 
 static void _init_f_polish_1843 (qt_gsi::GenericMethod *decl)
@@ -200,7 +200,7 @@ static void _call_f_polish_1843 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (QWidget *)
+// void QWindowsStyle::polish(QWidget *)
 
 
 static void _init_f_polish_1315 (qt_gsi::GenericMethod *decl)
@@ -220,7 +220,7 @@ static void _call_f_polish_1315 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (QPalette &)
+// void QWindowsStyle::polish(QPalette &)
 
 
 static void _init_f_polish_1418 (qt_gsi::GenericMethod *decl)
@@ -240,7 +240,7 @@ static void _call_f_polish_1418 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (QStyle::ContentsType, const QStyleOption *, const QSize &, const QWidget *) const
+// QSize QWindowsStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *opt, const QSize &contentsSize, const QWidget *widget)
 
 
 static void _init_f_sizeFromContents_c8477 (qt_gsi::GenericMethod *decl)
@@ -268,7 +268,7 @@ static void _call_f_sizeFromContents_c8477 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (QStyle::StandardPixmap, const QStyleOption *, const QWidget *) const
+// QPixmap QWindowsStyle::standardPixmap(QStyle::StandardPixmap standardPixmap, const QStyleOption *opt, const QWidget *widget)
 
 
 static void _init_f_standardPixmap_c6956 (qt_gsi::GenericMethod *decl)
@@ -293,7 +293,7 @@ static void _call_f_standardPixmap_c6956 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (QStyle::StyleHint, const QStyleOption *, const QWidget *, QStyleHintReturn *) const
+// int QWindowsStyle::styleHint(QStyle::StyleHint hint, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *returnData)
 
 
 static void _init_f_styleHint_c8615 (qt_gsi::GenericMethod *decl)
@@ -321,7 +321,7 @@ static void _call_f_styleHint_c8615 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QStyle::SubElement, const QStyleOption *, const QWidget *) const
+// QRect QWindowsStyle::subElementRect(QStyle::SubElement r, const QStyleOption *opt, const QWidget *widget)
 
 
 static void _init_f_subElementRect_c6528 (qt_gsi::GenericMethod *decl)
@@ -346,7 +346,7 @@ static void _call_f_subElementRect_c6528 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (QApplication *)
+// void QWindowsStyle::unpolish(QApplication *)
 
 
 static void _init_f_unpolish_1843 (qt_gsi::GenericMethod *decl)
@@ -366,7 +366,7 @@ static void _call_f_unpolish_1843 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (QWidget *)
+// void QWindowsStyle::unpolish(QWidget *)
 
 
 static void _init_f_unpolish_1315 (qt_gsi::GenericMethod *decl)
@@ -486,19 +486,19 @@ namespace gsi
 static gsi::Methods methods_QWindowsStyle () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("drawComplexControl", "@brief Method (QStyle::ComplexControl, const QStyleOptionComplex *, QPainter *, const QWidget *) const\nThis is a reimplementation of QCommonStyle::drawComplexControl", true, &_init_f_drawComplexControl_c9027, &_call_f_drawComplexControl_c9027);
-  methods += new qt_gsi::GenericMethod ("drawControl", "@brief Method (QStyle::ControlElement, const QStyleOption *, QPainter *, const QWidget *) const\nThis is a reimplementation of QCommonStyle::drawControl", true, &_init_f_drawControl_c8285, &_call_f_drawControl_c8285);
-  methods += new qt_gsi::GenericMethod ("drawPrimitive", "@brief Method (QStyle::PrimitiveElement, const QStyleOption *, QPainter *, const QWidget *) const\nThis is a reimplementation of QCommonStyle::drawPrimitive", true, &_init_f_drawPrimitive_c8501, &_call_f_drawPrimitive_c8501);
-  methods += new qt_gsi::GenericMethod ("pixelMetric", "@brief Method (QStyle::PixelMetric, const QStyleOption *, const QWidget *) const\nThis is a reimplementation of QCommonStyle::pixelMetric", true, &_init_f_pixelMetric_c6642, &_call_f_pixelMetric_c6642);
-  methods += new qt_gsi::GenericMethod ("polish", "@brief Method (QApplication *)\nThis is a reimplementation of QCommonStyle::polish", false, &_init_f_polish_1843, &_call_f_polish_1843);
-  methods += new qt_gsi::GenericMethod ("polish", "@brief Method (QWidget *)\nThis is a reimplementation of QCommonStyle::polish", false, &_init_f_polish_1315, &_call_f_polish_1315);
-  methods += new qt_gsi::GenericMethod ("polish", "@brief Method (QPalette &)\nThis is a reimplementation of QCommonStyle::polish", false, &_init_f_polish_1418, &_call_f_polish_1418);
-  methods += new qt_gsi::GenericMethod ("sizeFromContents", "@brief Method (QStyle::ContentsType, const QStyleOption *, const QSize &, const QWidget *) const\nThis is a reimplementation of QCommonStyle::sizeFromContents", true, &_init_f_sizeFromContents_c8477, &_call_f_sizeFromContents_c8477);
-  methods += new qt_gsi::GenericMethod ("standardPixmap", "@brief Method (QStyle::StandardPixmap, const QStyleOption *, const QWidget *) const\nThis is a reimplementation of QCommonStyle::standardPixmap", true, &_init_f_standardPixmap_c6956, &_call_f_standardPixmap_c6956);
-  methods += new qt_gsi::GenericMethod ("styleHint", "@brief Method (QStyle::StyleHint, const QStyleOption *, const QWidget *, QStyleHintReturn *) const\nThis is a reimplementation of QCommonStyle::styleHint", true, &_init_f_styleHint_c8615, &_call_f_styleHint_c8615);
-  methods += new qt_gsi::GenericMethod ("subElementRect", "@brief Method (QStyle::SubElement, const QStyleOption *, const QWidget *) const\nThis is a reimplementation of QCommonStyle::subElementRect", true, &_init_f_subElementRect_c6528, &_call_f_subElementRect_c6528);
-  methods += new qt_gsi::GenericMethod ("unpolish", "@brief Method (QApplication *)\nThis is a reimplementation of QCommonStyle::unpolish", false, &_init_f_unpolish_1843, &_call_f_unpolish_1843);
-  methods += new qt_gsi::GenericMethod ("unpolish", "@brief Method (QWidget *)\nThis is a reimplementation of QCommonStyle::unpolish", false, &_init_f_unpolish_1315, &_call_f_unpolish_1315);
+  methods += new qt_gsi::GenericMethod ("drawComplexControl", "@brief Method void QWindowsStyle::drawComplexControl(QStyle::ComplexControl cc, const QStyleOptionComplex *opt, QPainter *p, const QWidget *w)\nThis is a reimplementation of QCommonStyle::drawComplexControl", true, &_init_f_drawComplexControl_c9027, &_call_f_drawComplexControl_c9027);
+  methods += new qt_gsi::GenericMethod ("drawControl", "@brief Method void QWindowsStyle::drawControl(QStyle::ControlElement element, const QStyleOption *opt, QPainter *p, const QWidget *w)\nThis is a reimplementation of QCommonStyle::drawControl", true, &_init_f_drawControl_c8285, &_call_f_drawControl_c8285);
+  methods += new qt_gsi::GenericMethod ("drawPrimitive", "@brief Method void QWindowsStyle::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *w)\nThis is a reimplementation of QCommonStyle::drawPrimitive", true, &_init_f_drawPrimitive_c8501, &_call_f_drawPrimitive_c8501);
+  methods += new qt_gsi::GenericMethod ("pixelMetric", "@brief Method int QWindowsStyle::pixelMetric(QStyle::PixelMetric pm, const QStyleOption *option, const QWidget *widget)\nThis is a reimplementation of QCommonStyle::pixelMetric", true, &_init_f_pixelMetric_c6642, &_call_f_pixelMetric_c6642);
+  methods += new qt_gsi::GenericMethod ("polish", "@brief Method void QWindowsStyle::polish(QApplication *)\nThis is a reimplementation of QCommonStyle::polish", false, &_init_f_polish_1843, &_call_f_polish_1843);
+  methods += new qt_gsi::GenericMethod ("polish", "@brief Method void QWindowsStyle::polish(QWidget *)\nThis is a reimplementation of QCommonStyle::polish", false, &_init_f_polish_1315, &_call_f_polish_1315);
+  methods += new qt_gsi::GenericMethod ("polish", "@brief Method void QWindowsStyle::polish(QPalette &)\nThis is a reimplementation of QCommonStyle::polish", false, &_init_f_polish_1418, &_call_f_polish_1418);
+  methods += new qt_gsi::GenericMethod ("sizeFromContents", "@brief Method QSize QWindowsStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *opt, const QSize &contentsSize, const QWidget *widget)\nThis is a reimplementation of QCommonStyle::sizeFromContents", true, &_init_f_sizeFromContents_c8477, &_call_f_sizeFromContents_c8477);
+  methods += new qt_gsi::GenericMethod ("standardPixmap", "@brief Method QPixmap QWindowsStyle::standardPixmap(QStyle::StandardPixmap standardPixmap, const QStyleOption *opt, const QWidget *widget)\nThis is a reimplementation of QCommonStyle::standardPixmap", true, &_init_f_standardPixmap_c6956, &_call_f_standardPixmap_c6956);
+  methods += new qt_gsi::GenericMethod ("styleHint", "@brief Method int QWindowsStyle::styleHint(QStyle::StyleHint hint, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *returnData)\nThis is a reimplementation of QCommonStyle::styleHint", true, &_init_f_styleHint_c8615, &_call_f_styleHint_c8615);
+  methods += new qt_gsi::GenericMethod ("subElementRect", "@brief Method QRect QWindowsStyle::subElementRect(QStyle::SubElement r, const QStyleOption *opt, const QWidget *widget)\nThis is a reimplementation of QCommonStyle::subElementRect", true, &_init_f_subElementRect_c6528, &_call_f_subElementRect_c6528);
+  methods += new qt_gsi::GenericMethod ("unpolish", "@brief Method void QWindowsStyle::unpolish(QApplication *)\nThis is a reimplementation of QCommonStyle::unpolish", false, &_init_f_unpolish_1843, &_call_f_unpolish_1843);
+  methods += new qt_gsi::GenericMethod ("unpolish", "@brief Method void QWindowsStyle::unpolish(QWidget *)\nThis is a reimplementation of QCommonStyle::unpolish", false, &_init_f_unpolish_1315, &_call_f_unpolish_1315);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QWindowsStyle::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QWindowsStyle::tr(const char *s, const char *c)\nThis method is static and can be called without an instance.", &_init_f_tr_3354, &_call_f_tr_3354);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QWindowsStyle::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);

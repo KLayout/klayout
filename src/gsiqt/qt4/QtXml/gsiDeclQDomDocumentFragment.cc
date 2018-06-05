@@ -86,7 +86,7 @@ static void _call_ctor_QDomDocumentFragment_3333 (const qt_gsi::GenericStaticMet
 }
 
 
-// () const
+// QDomNode::NodeType QDomDocumentFragment::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -101,7 +101,7 @@ static void _call_f_nodeType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QDomDocumentFragment &)
+// QDomDocumentFragment &QDomDocumentFragment::operator=(const QDomDocumentFragment &)
 
 
 static void _init_f_operator_eq__3333 (qt_gsi::GenericMethod *decl)
@@ -128,8 +128,8 @@ static gsi::Methods methods_QDomDocumentFragment () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomDocumentFragment::QDomDocumentFragment()\nThis method creates an object of class QDomDocumentFragment.", &_init_ctor_QDomDocumentFragment_0, &_call_ctor_QDomDocumentFragment_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomDocumentFragment::QDomDocumentFragment(const QDomDocumentFragment &x)\nThis method creates an object of class QDomDocumentFragment.", &_init_ctor_QDomDocumentFragment_3333, &_call_ctor_QDomDocumentFragment_3333);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomDocumentFragment &)\n", false, &_init_f_operator_eq__3333, &_call_f_operator_eq__3333);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomDocumentFragment::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomDocumentFragment &QDomDocumentFragment::operator=(const QDomDocumentFragment &)\n", false, &_init_f_operator_eq__3333, &_call_f_operator_eq__3333);
   return methods;
 }
 

@@ -222,7 +222,7 @@ static void _call_f_top_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QString &, int &) const
+// QValidator::State QDoubleValidator::validate(QString &, int &)
 
 
 static void _init_f_validate_c2171 (qt_gsi::GenericMethod *decl)
@@ -309,7 +309,7 @@ static gsi::Methods methods_QDoubleValidator () {
   methods += new qt_gsi::GenericMethod ("setRange", "@brief Method void QDoubleValidator::setRange(double bottom, double top, int decimals)\n", false, &_init_f_setRange_2693, &_call_f_setRange_2693);
   methods += new qt_gsi::GenericMethod ("setTop|top=", "@brief Method void QDoubleValidator::setTop(double)\n", false, &_init_f_setTop_1071, &_call_f_setTop_1071);
   methods += new qt_gsi::GenericMethod (":top", "@brief Method double QDoubleValidator::top()\n", true, &_init_f_top_c0, &_call_f_top_c0);
-  methods += new qt_gsi::GenericMethod ("validate", "@brief Method (QString &, int &) const\nThis is a reimplementation of QValidator::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
+  methods += new qt_gsi::GenericMethod ("validate", "@brief Method QValidator::State QDoubleValidator::validate(QString &, int &)\nThis is a reimplementation of QValidator::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
   methods += gsi::qt_signal<double > ("bottomChanged(double)", "bottomChanged", gsi::arg("bottom"), "@brief Signal declaration for QDoubleValidator::bottomChanged(double bottom)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("changed()", "changed", "@brief Signal declaration for QDoubleValidator::changed()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("decimalsChanged(int)", "decimalsChanged", gsi::arg("decimals"), "@brief Signal declaration for QDoubleValidator::decimalsChanged(int decimals)\nYou can bind a procedure to this signal.");

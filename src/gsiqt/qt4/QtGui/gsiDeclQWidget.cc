@@ -834,7 +834,7 @@ static void _call_f_hasMouseTracking_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// int QWidget::height()
 
 
 static void _init_f_height_c0 (qt_gsi::GenericMethod *decl)
@@ -1690,7 +1690,7 @@ static void _call_f_overrideWindowState_2590 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// () const
+// QPaintEngine *QWidget::paintEngine()
 
 
 static void _init_f_paintEngine_c0 (qt_gsi::GenericMethod *decl)
@@ -3066,7 +3066,7 @@ static void _call_f_setPalette_2113 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QWidget *)
+// void QWidget::setParent(QWidget *parent)
 
 
 static void _init_f_setParent_1315 (qt_gsi::GenericMethod *decl)
@@ -3086,7 +3086,7 @@ static void _call_f_setParent_1315 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (QWidget *, QFlags<Qt::WindowType>)
+// void QWidget::setParent(QWidget *parent, QFlags<Qt::WindowType> f)
 
 
 static void _init_f_setParent_3702 (qt_gsi::GenericMethod *decl)
@@ -4084,7 +4084,7 @@ static void _call_f_whatsThis_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// int QWidget::width()
 
 
 static void _init_f_width_c0 (qt_gsi::GenericMethod *decl)
@@ -4571,7 +4571,7 @@ static gsi::Methods methods_QWidget () {
   methods += new qt_gsi::GenericMethod ("graphicsProxyWidget", "@brief Method QGraphicsProxyWidget *QWidget::graphicsProxyWidget()\n", true, &_init_f_graphicsProxyWidget_c0, &_call_f_graphicsProxyWidget_c0);
   methods += new qt_gsi::GenericMethod ("hasFocus|:focus", "@brief Method bool QWidget::hasFocus()\n", true, &_init_f_hasFocus_c0, &_call_f_hasFocus_c0);
   methods += new qt_gsi::GenericMethod ("hasMouseTracking|:mouseTracking", "@brief Method bool QWidget::hasMouseTracking()\n", true, &_init_f_hasMouseTracking_c0, &_call_f_hasMouseTracking_c0);
-  methods += new qt_gsi::GenericMethod (":height", "@brief Method () const\n", true, &_init_f_height_c0, &_call_f_height_c0);
+  methods += new qt_gsi::GenericMethod (":height", "@brief Method int QWidget::height()\n", true, &_init_f_height_c0, &_call_f_height_c0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method int QWidget::heightForWidth(int)\n", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
   methods += new qt_gsi::GenericMethod ("hide", "@brief Method void QWidget::hide()\n", false, &_init_f_hide_0, &_call_f_hide_0);
   methods += new qt_gsi::GenericMethod (":inputContext", "@brief Method QInputContext *QWidget::inputContext()\n", false, &_init_f_inputContext_0, &_call_f_inputContext_0);
@@ -4622,7 +4622,7 @@ static gsi::Methods methods_QWidget () {
   methods += new qt_gsi::GenericMethod (":normalGeometry", "@brief Method QRect QWidget::normalGeometry()\n", true, &_init_f_normalGeometry_c0, &_call_f_normalGeometry_c0);
   methods += new qt_gsi::GenericMethod ("overrideWindowFlags", "@brief Method void QWidget::overrideWindowFlags(QFlags<Qt::WindowType> type)\n", false, &_init_f_overrideWindowFlags_2495, &_call_f_overrideWindowFlags_2495);
   methods += new qt_gsi::GenericMethod ("overrideWindowState", "@brief Method void QWidget::overrideWindowState(QFlags<Qt::WindowState> state)\n", false, &_init_f_overrideWindowState_2590, &_call_f_overrideWindowState_2590);
-  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Method () const\nThis is a reimplementation of QPaintDevice::paintEngine", true, &_init_f_paintEngine_c0, &_call_f_paintEngine_c0);
+  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Method QPaintEngine *QWidget::paintEngine()\nThis is a reimplementation of QPaintDevice::paintEngine", true, &_init_f_paintEngine_c0, &_call_f_paintEngine_c0);
   methods += new qt_gsi::GenericMethod (":palette", "@brief Method const QPalette &QWidget::palette()\n", true, &_init_f_palette_c0, &_call_f_palette_c0);
   methods += new qt_gsi::GenericMethod ("parentWidget", "@brief Method QWidget *QWidget::parentWidget()\n", true, &_init_f_parentWidget_c0, &_call_f_parentWidget_c0);
   methods += new qt_gsi::GenericMethod (":pos", "@brief Method QPoint QWidget::pos()\n", true, &_init_f_pos_c0, &_call_f_pos_c0);
@@ -4690,8 +4690,8 @@ static gsi::Methods methods_QWidget () {
   methods += new qt_gsi::GenericMethod ("setMinimumWidth|minimumWidth=", "@brief Method void QWidget::setMinimumWidth(int minw)\n", false, &_init_f_setMinimumWidth_767, &_call_f_setMinimumWidth_767);
   methods += new qt_gsi::GenericMethod ("setMouseTracking|mouseTracking=", "@brief Method void QWidget::setMouseTracking(bool enable)\n", false, &_init_f_setMouseTracking_864, &_call_f_setMouseTracking_864);
   methods += new qt_gsi::GenericMethod ("setPalette|palette=", "@brief Method void QWidget::setPalette(const QPalette &)\n", false, &_init_f_setPalette_2113, &_call_f_setPalette_2113);
-  methods += new qt_gsi::GenericMethod ("setParent", "@brief Method (QWidget *)\n", false, &_init_f_setParent_1315, &_call_f_setParent_1315);
-  methods += new qt_gsi::GenericMethod ("setParent", "@brief Method (QWidget *, QFlags<Qt::WindowType>)\n", false, &_init_f_setParent_3702, &_call_f_setParent_3702);
+  methods += new qt_gsi::GenericMethod ("setParent", "@brief Method void QWidget::setParent(QWidget *parent)\n", false, &_init_f_setParent_1315, &_call_f_setParent_1315);
+  methods += new qt_gsi::GenericMethod ("setParent", "@brief Method void QWidget::setParent(QWidget *parent, QFlags<Qt::WindowType> f)\n", false, &_init_f_setParent_3702, &_call_f_setParent_3702);
   methods += new qt_gsi::GenericMethod ("setShortcutAutoRepeat", "@brief Method void QWidget::setShortcutAutoRepeat(int id, bool enable)\n", false, &_init_f_setShortcutAutoRepeat_1523, &_call_f_setShortcutAutoRepeat_1523);
   methods += new qt_gsi::GenericMethod ("setShortcutEnabled", "@brief Method void QWidget::setShortcutEnabled(int id, bool enable)\n", false, &_init_f_setShortcutEnabled_1523, &_call_f_setShortcutEnabled_1523);
   methods += new qt_gsi::GenericMethod ("setShown", "@brief Method void QWidget::setShown(bool shown)\n", false, &_init_f_setShown_864, &_call_f_setShown_864);
@@ -4745,7 +4745,7 @@ static gsi::Methods methods_QWidget () {
   methods += new qt_gsi::GenericMethod (":updatesEnabled", "@brief Method bool QWidget::updatesEnabled()\n", true, &_init_f_updatesEnabled_c0, &_call_f_updatesEnabled_c0);
   methods += new qt_gsi::GenericMethod ("visibleRegion", "@brief Method QRegion QWidget::visibleRegion()\n", true, &_init_f_visibleRegion_c0, &_call_f_visibleRegion_c0);
   methods += new qt_gsi::GenericMethod (":whatsThis", "@brief Method QString QWidget::whatsThis()\n", true, &_init_f_whatsThis_c0, &_call_f_whatsThis_c0);
-  methods += new qt_gsi::GenericMethod (":width", "@brief Method () const\n", true, &_init_f_width_c0, &_call_f_width_c0);
+  methods += new qt_gsi::GenericMethod (":width", "@brief Method int QWidget::width()\n", true, &_init_f_width_c0, &_call_f_width_c0);
   methods += new qt_gsi::GenericMethod ("winId", "@brief Method WId QWidget::winId()\n", true, &_init_f_winId_c0, &_call_f_winId_c0);
   methods += new qt_gsi::GenericMethod ("window", "@brief Method QWidget *QWidget::window()\n", true, &_init_f_window_c0, &_call_f_window_c0);
   methods += new qt_gsi::GenericMethod (":windowFilePath", "@brief Method QString QWidget::windowFilePath()\n", true, &_init_f_windowFilePath_c0, &_call_f_windowFilePath_c0);

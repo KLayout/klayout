@@ -136,7 +136,7 @@ static void _call_f_calendarWidget_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// ()
+// void QDateTimeEdit::clear()
 
 
 static void _init_f_clear_0 (qt_gsi::GenericMethod *decl)
@@ -338,7 +338,7 @@ static void _call_f_displayedSections_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (QEvent *)
+// bool QDateTimeEdit::event(QEvent *event)
 
 
 static void _init_f_event_1217 (qt_gsi::GenericMethod *decl)
@@ -889,7 +889,7 @@ static void _call_f_setTimeSpec_1543 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// () const
+// QSize QDateTimeEdit::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -904,7 +904,7 @@ static void _call_f_sizeHint_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (int)
+// void QDateTimeEdit::stepBy(int steps)
 
 
 static void _init_f_stepBy_767 (qt_gsi::GenericMethod *decl)
@@ -1012,7 +1012,7 @@ static gsi::Methods methods_QDateTimeEdit () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":calendarPopup", "@brief Method bool QDateTimeEdit::calendarPopup()\n", true, &_init_f_calendarPopup_c0, &_call_f_calendarPopup_c0);
   methods += new qt_gsi::GenericMethod (":calendarWidget", "@brief Method QCalendarWidget *QDateTimeEdit::calendarWidget()\n", true, &_init_f_calendarWidget_c0, &_call_f_calendarWidget_c0);
-  methods += new qt_gsi::GenericMethod ("clear", "@brief Method ()\nThis is a reimplementation of QAbstractSpinBox::clear", false, &_init_f_clear_0, &_call_f_clear_0);
+  methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QDateTimeEdit::clear()\nThis is a reimplementation of QAbstractSpinBox::clear", false, &_init_f_clear_0, &_call_f_clear_0);
   methods += new qt_gsi::GenericMethod ("clearMaximumDate", "@brief Method void QDateTimeEdit::clearMaximumDate()\n", false, &_init_f_clearMaximumDate_0, &_call_f_clearMaximumDate_0);
   methods += new qt_gsi::GenericMethod ("clearMaximumDateTime", "@brief Method void QDateTimeEdit::clearMaximumDateTime()\n", false, &_init_f_clearMaximumDateTime_0, &_call_f_clearMaximumDateTime_0);
   methods += new qt_gsi::GenericMethod ("clearMaximumTime", "@brief Method void QDateTimeEdit::clearMaximumTime()\n", false, &_init_f_clearMaximumTime_0, &_call_f_clearMaximumTime_0);
@@ -1025,7 +1025,7 @@ static gsi::Methods methods_QDateTimeEdit () {
   methods += new qt_gsi::GenericMethod (":dateTime", "@brief Method QDateTime QDateTimeEdit::dateTime()\n", true, &_init_f_dateTime_c0, &_call_f_dateTime_c0);
   methods += new qt_gsi::GenericMethod (":displayFormat", "@brief Method QString QDateTimeEdit::displayFormat()\n", true, &_init_f_displayFormat_c0, &_call_f_displayFormat_c0);
   methods += new qt_gsi::GenericMethod (":displayedSections", "@brief Method QFlags<QDateTimeEdit::Section> QDateTimeEdit::displayedSections()\n", true, &_init_f_displayedSections_c0, &_call_f_displayedSections_c0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Method (QEvent *)\nThis is a reimplementation of QAbstractSpinBox::event", false, &_init_f_event_1217, &_call_f_event_1217);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Method bool QDateTimeEdit::event(QEvent *event)\nThis is a reimplementation of QAbstractSpinBox::event", false, &_init_f_event_1217, &_call_f_event_1217);
   methods += new qt_gsi::GenericMethod (":maximumDate", "@brief Method QDate QDateTimeEdit::maximumDate()\n", true, &_init_f_maximumDate_c0, &_call_f_maximumDate_c0);
   methods += new qt_gsi::GenericMethod (":maximumDateTime", "@brief Method QDateTime QDateTimeEdit::maximumDateTime()\n", true, &_init_f_maximumDateTime_c0, &_call_f_maximumDateTime_c0);
   methods += new qt_gsi::GenericMethod (":maximumTime", "@brief Method QTime QDateTimeEdit::maximumTime()\n", true, &_init_f_maximumTime_c0, &_call_f_maximumTime_c0);
@@ -1054,8 +1054,8 @@ static gsi::Methods methods_QDateTimeEdit () {
   methods += new qt_gsi::GenericMethod ("setTime|time=", "@brief Method void QDateTimeEdit::setTime(const QTime &time)\n", false, &_init_f_setTime_1793, &_call_f_setTime_1793);
   methods += new qt_gsi::GenericMethod ("setTimeRange", "@brief Method void QDateTimeEdit::setTimeRange(const QTime &min, const QTime &max)\n", false, &_init_f_setTimeRange_3478, &_call_f_setTimeRange_3478);
   methods += new qt_gsi::GenericMethod ("setTimeSpec|timeSpec=", "@brief Method void QDateTimeEdit::setTimeSpec(Qt::TimeSpec spec)\n", false, &_init_f_setTimeSpec_1543, &_call_f_setTimeSpec_1543);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QAbstractSpinBox::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
-  methods += new qt_gsi::GenericMethod ("stepBy", "@brief Method (int)\nThis is a reimplementation of QAbstractSpinBox::stepBy", false, &_init_f_stepBy_767, &_call_f_stepBy_767);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QDateTimeEdit::sizeHint()\nThis is a reimplementation of QAbstractSpinBox::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod ("stepBy", "@brief Method void QDateTimeEdit::stepBy(int steps)\nThis is a reimplementation of QAbstractSpinBox::stepBy", false, &_init_f_stepBy_767, &_call_f_stepBy_767);
   methods += new qt_gsi::GenericMethod (":time", "@brief Method QTime QDateTimeEdit::time()\n", true, &_init_f_time_c0, &_call_f_time_c0);
   methods += new qt_gsi::GenericMethod (":timeSpec", "@brief Method Qt::TimeSpec QDateTimeEdit::timeSpec()\n", true, &_init_f_timeSpec_c0, &_call_f_timeSpec_c0);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QDateTimeEdit::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");

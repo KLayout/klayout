@@ -137,7 +137,7 @@ static void _call_f_height_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// bool QTextFrameFormat::isValid()
 
 
 static void _init_f_isValid_c0 (qt_gsi::GenericMethod *decl)
@@ -584,7 +584,7 @@ static gsi::Methods methods_QTextFrameFormat () {
   methods += new qt_gsi::GenericMethod (":borderStyle", "@brief Method QTextFrameFormat::BorderStyle QTextFrameFormat::borderStyle()\n", true, &_init_f_borderStyle_c0, &_call_f_borderStyle_c0);
   methods += new qt_gsi::GenericMethod (":bottomMargin", "@brief Method double QTextFrameFormat::bottomMargin()\n", true, &_init_f_bottomMargin_c0, &_call_f_bottomMargin_c0);
   methods += new qt_gsi::GenericMethod ("height", "@brief Method QTextLength QTextFrameFormat::height()\n", true, &_init_f_height_c0, &_call_f_height_c0);
-  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method () const\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QTextFrameFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod (":leftMargin", "@brief Method double QTextFrameFormat::leftMargin()\n", true, &_init_f_leftMargin_c0, &_call_f_leftMargin_c0);
   methods += new qt_gsi::GenericMethod (":margin", "@brief Method double QTextFrameFormat::margin()\n", true, &_init_f_margin_c0, &_call_f_margin_c0);
   methods += new qt_gsi::GenericMethod (":padding", "@brief Method double QTextFrameFormat::padding()\n", true, &_init_f_padding_c0, &_call_f_padding_c0);

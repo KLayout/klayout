@@ -86,7 +86,7 @@ static void _call_ctor_QDomComment_2405 (const qt_gsi::GenericStaticMethod * /*d
 }
 
 
-// () const
+// QDomNode::NodeType QDomComment::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -101,7 +101,7 @@ static void _call_f_nodeType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QDomComment &)
+// QDomComment &QDomComment::operator=(const QDomComment &)
 
 
 static void _init_f_operator_eq__2405 (qt_gsi::GenericMethod *decl)
@@ -128,8 +128,8 @@ static gsi::Methods methods_QDomComment () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomComment::QDomComment()\nThis method creates an object of class QDomComment.", &_init_ctor_QDomComment_0, &_call_ctor_QDomComment_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomComment::QDomComment(const QDomComment &x)\nThis method creates an object of class QDomComment.", &_init_ctor_QDomComment_2405, &_call_ctor_QDomComment_2405);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomComment &)\n", false, &_init_f_operator_eq__2405, &_call_f_operator_eq__2405);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomComment::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomComment &QDomComment::operator=(const QDomComment &)\n", false, &_init_f_operator_eq__2405, &_call_f_operator_eq__2405);
   return methods;
 }
 

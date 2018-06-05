@@ -165,7 +165,7 @@ static void _call_f_adjustSize_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QRectF QGraphicsWidget::boundingRect()
 
 
 static void _init_f_boundingRect_c0 (qt_gsi::GenericMethod *decl)
@@ -180,7 +180,7 @@ static void _call_f_boundingRect_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// const QList<QObject*> &QGraphicsWidget::children()
 
 
 static void _init_f_children_c0 (qt_gsi::GenericMethod *decl)
@@ -255,7 +255,7 @@ static void _call_f_font_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (double *, double *, double *, double *) const
+// void QGraphicsWidget::getContentsMargins(double *left, double *top, double *right, double *bottom)
 
 
 static void _init_f_getContentsMargins_c4704 (qt_gsi::GenericMethod *decl)
@@ -426,7 +426,7 @@ static void _call_f_layoutDirection_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
+// void QGraphicsWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 
 
 static void _init_f_paint_6301 (qt_gsi::GenericMethod *decl)
@@ -683,7 +683,7 @@ static void _call_f_setFont_1801 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (const QRectF &)
+// void QGraphicsWidget::setGeometry(const QRectF &rect)
 
 
 static void _init_f_setGeometry_1862 (qt_gsi::GenericMethod *decl)
@@ -703,7 +703,7 @@ static void _call_f_setGeometry_1862 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (double, double, double, double)
+// void QGraphicsWidget::setGeometry(double x, double y, double w, double h)
 
 
 static void _init_f_setGeometry_3960 (qt_gsi::GenericMethod *decl)
@@ -927,7 +927,7 @@ static void _call_f_setWindowTitle_2025 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// QPainterPath QGraphicsWidget::shape()
 
 
 static void _init_f_shape_c0 (qt_gsi::GenericMethod *decl)
@@ -991,7 +991,7 @@ static void _call_f_testAttribute_c2309 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// int QGraphicsWidget::type()
 
 
 static void _init_f_type_c0 (qt_gsi::GenericMethod *decl)
@@ -1285,13 +1285,13 @@ static gsi::Methods methods_QGraphicsWidget () {
   methods += new qt_gsi::GenericMethod ("addAction", "@brief Method void QGraphicsWidget::addAction(QAction *action)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
   methods += new qt_gsi::GenericMethod ("addActions", "@brief Method void QGraphicsWidget::addActions(QList<QAction*> actions)\n", false, &_init_f_addActions_1780, &_call_f_addActions_1780);
   methods += new qt_gsi::GenericMethod ("adjustSize", "@brief Method void QGraphicsWidget::adjustSize()\n", false, &_init_f_adjustSize_0, &_call_f_adjustSize_0);
-  methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::boundingRect", true, &_init_f_boundingRect_c0, &_call_f_boundingRect_c0);
-  methods += new qt_gsi::GenericMethod (":children", "@brief Method () const\n", true, &_init_f_children_c0, &_call_f_children_c0);
+  methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method QRectF QGraphicsWidget::boundingRect()\nThis is a reimplementation of QGraphicsItem::boundingRect", true, &_init_f_boundingRect_c0, &_call_f_boundingRect_c0);
+  methods += new qt_gsi::GenericMethod (":children", "@brief Method const QList<QObject*> &QGraphicsWidget::children()\n", true, &_init_f_children_c0, &_call_f_children_c0);
   methods += new qt_gsi::GenericMethod ("close", "@brief Method bool QGraphicsWidget::close()\n", false, &_init_f_close_0, &_call_f_close_0);
   methods += new qt_gsi::GenericMethod (":focusPolicy", "@brief Method Qt::FocusPolicy QGraphicsWidget::focusPolicy()\n", true, &_init_f_focusPolicy_c0, &_call_f_focusPolicy_c0);
   methods += new qt_gsi::GenericMethod ("focusWidget", "@brief Method QGraphicsWidget *QGraphicsWidget::focusWidget()\n", true, &_init_f_focusWidget_c0, &_call_f_focusWidget_c0);
   methods += new qt_gsi::GenericMethod (":font", "@brief Method QFont QGraphicsWidget::font()\n", true, &_init_f_font_c0, &_call_f_font_c0);
-  methods += new qt_gsi::GenericMethod ("getContentsMargins", "@brief Method (double *, double *, double *, double *) const\nThis is a reimplementation of QGraphicsLayoutItem::getContentsMargins", true, &_init_f_getContentsMargins_c4704, &_call_f_getContentsMargins_c4704);
+  methods += new qt_gsi::GenericMethod ("getContentsMargins", "@brief Method void QGraphicsWidget::getContentsMargins(double *left, double *top, double *right, double *bottom)\nThis is a reimplementation of QGraphicsLayoutItem::getContentsMargins", true, &_init_f_getContentsMargins_c4704, &_call_f_getContentsMargins_c4704);
   methods += new qt_gsi::GenericMethod ("getWindowFrameMargins", "@brief Method void QGraphicsWidget::getWindowFrameMargins(double *left, double *top, double *right, double *bottom)\n", true, &_init_f_getWindowFrameMargins_c4704, &_call_f_getWindowFrameMargins_c4704);
   methods += new qt_gsi::GenericMethod ("grabShortcut", "@brief Method int QGraphicsWidget::grabShortcut(const QKeySequence &sequence, Qt::ShortcutContext context)\n", false, &_init_f_grabShortcut_4758, &_call_f_grabShortcut_4758);
   methods += new qt_gsi::GenericMethod ("insertAction", "@brief Method void QGraphicsWidget::insertAction(QAction *before, QAction *action)\n", false, &_init_f_insertAction_2510, &_call_f_insertAction_2510);
@@ -1299,7 +1299,7 @@ static gsi::Methods methods_QGraphicsWidget () {
   methods += new qt_gsi::GenericMethod ("isActiveWindow?", "@brief Method bool QGraphicsWidget::isActiveWindow()\n", true, &_init_f_isActiveWindow_c0, &_call_f_isActiveWindow_c0);
   methods += new qt_gsi::GenericMethod (":layout", "@brief Method QGraphicsLayout *QGraphicsWidget::layout()\n", true, &_init_f_layout_c0, &_call_f_layout_c0);
   methods += new qt_gsi::GenericMethod (":layoutDirection", "@brief Method Qt::LayoutDirection QGraphicsWidget::layoutDirection()\n", true, &_init_f_layoutDirection_c0, &_call_f_layoutDirection_c0);
-  methods += new qt_gsi::GenericMethod ("paint", "@brief Method (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)\nThis is a reimplementation of QGraphicsItem::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
+  methods += new qt_gsi::GenericMethod ("paint", "@brief Method void QGraphicsWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)\nThis is a reimplementation of QGraphicsItem::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
   methods += new qt_gsi::GenericMethod ("paintWindowFrame", "@brief Method void QGraphicsWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)\n", false, &_init_f_paintWindowFrame_6301, &_call_f_paintWindowFrame_6301);
   methods += new qt_gsi::GenericMethod (":palette", "@brief Method QPalette QGraphicsWidget::palette()\n", true, &_init_f_palette_c0, &_call_f_palette_c0);
   methods += new qt_gsi::GenericMethod ("rect", "@brief Method QRectF QGraphicsWidget::rect()\n", true, &_init_f_rect_c0, &_call_f_rect_c0);
@@ -1311,8 +1311,8 @@ static gsi::Methods methods_QGraphicsWidget () {
   methods += new qt_gsi::GenericMethod ("setContentsMargins", "@brief Method void QGraphicsWidget::setContentsMargins(double left, double top, double right, double bottom)\n", false, &_init_f_setContentsMargins_3960, &_call_f_setContentsMargins_3960);
   methods += new qt_gsi::GenericMethod ("setFocusPolicy|focusPolicy=", "@brief Method void QGraphicsWidget::setFocusPolicy(Qt::FocusPolicy policy)\n", false, &_init_f_setFocusPolicy_1885, &_call_f_setFocusPolicy_1885);
   methods += new qt_gsi::GenericMethod ("setFont|font=", "@brief Method void QGraphicsWidget::setFont(const QFont &font)\n", false, &_init_f_setFont_1801, &_call_f_setFont_1801);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRectF &)\nThis is a reimplementation of QGraphicsLayoutItem::setGeometry", false, &_init_f_setGeometry_1862, &_call_f_setGeometry_1862);
-  methods += new qt_gsi::GenericMethod ("setGeometry", "@brief Method (double, double, double, double)\n", false, &_init_f_setGeometry_3960, &_call_f_setGeometry_3960);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QGraphicsWidget::setGeometry(const QRectF &rect)\nThis is a reimplementation of QGraphicsLayoutItem::setGeometry", false, &_init_f_setGeometry_1862, &_call_f_setGeometry_1862);
+  methods += new qt_gsi::GenericMethod ("setGeometry", "@brief Method void QGraphicsWidget::setGeometry(double x, double y, double w, double h)\n", false, &_init_f_setGeometry_3960, &_call_f_setGeometry_3960);
   methods += new qt_gsi::GenericMethod ("setLayout|layout=", "@brief Method void QGraphicsWidget::setLayout(QGraphicsLayout *layout)\n", false, &_init_f_setLayout_2158, &_call_f_setLayout_2158);
   methods += new qt_gsi::GenericMethod ("setLayoutDirection|layoutDirection=", "@brief Method void QGraphicsWidget::setLayoutDirection(Qt::LayoutDirection direction)\n", false, &_init_f_setLayoutDirection_2316, &_call_f_setLayoutDirection_2316);
   methods += new qt_gsi::GenericMethod ("setPalette|palette=", "@brief Method void QGraphicsWidget::setPalette(const QPalette &palette)\n", false, &_init_f_setPalette_2113, &_call_f_setPalette_2113);
@@ -1322,11 +1322,11 @@ static gsi::Methods methods_QGraphicsWidget () {
   methods += new qt_gsi::GenericMethod ("setWindowFlags|windowFlags=", "@brief Method void QGraphicsWidget::setWindowFlags(QFlags<Qt::WindowType> wFlags)\n", false, &_init_f_setWindowFlags_2495, &_call_f_setWindowFlags_2495);
   methods += new qt_gsi::GenericMethod ("setWindowFrameMargins", "@brief Method void QGraphicsWidget::setWindowFrameMargins(double left, double top, double right, double bottom)\n", false, &_init_f_setWindowFrameMargins_3960, &_call_f_setWindowFrameMargins_3960);
   methods += new qt_gsi::GenericMethod ("setWindowTitle|windowTitle=", "@brief Method void QGraphicsWidget::setWindowTitle(const QString &title)\n", false, &_init_f_setWindowTitle_2025, &_call_f_setWindowTitle_2025);
-  methods += new qt_gsi::GenericMethod ("shape", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::shape", true, &_init_f_shape_c0, &_call_f_shape_c0);
+  methods += new qt_gsi::GenericMethod ("shape", "@brief Method QPainterPath QGraphicsWidget::shape()\nThis is a reimplementation of QGraphicsItem::shape", true, &_init_f_shape_c0, &_call_f_shape_c0);
   methods += new qt_gsi::GenericMethod (":size", "@brief Method QSizeF QGraphicsWidget::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod (":style", "@brief Method QStyle *QGraphicsWidget::style()\n", true, &_init_f_style_c0, &_call_f_style_c0);
   methods += new qt_gsi::GenericMethod ("testAttribute", "@brief Method bool QGraphicsWidget::testAttribute(Qt::WidgetAttribute attribute)\n", true, &_init_f_testAttribute_c2309, &_call_f_testAttribute_c2309);
-  methods += new qt_gsi::GenericMethod ("type", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::type", true, &_init_f_type_c0, &_call_f_type_c0);
+  methods += new qt_gsi::GenericMethod ("type", "@brief Method int QGraphicsWidget::type()\nThis is a reimplementation of QGraphicsItem::type", true, &_init_f_type_c0, &_call_f_type_c0);
   methods += new qt_gsi::GenericMethod ("unsetLayoutDirection", "@brief Method void QGraphicsWidget::unsetLayoutDirection()\n", false, &_init_f_unsetLayoutDirection_0, &_call_f_unsetLayoutDirection_0);
   methods += new qt_gsi::GenericMethod ("unsetWindowFrameMargins", "@brief Method void QGraphicsWidget::unsetWindowFrameMargins()\n", false, &_init_f_unsetWindowFrameMargins_0, &_call_f_unsetWindowFrameMargins_0);
   methods += new qt_gsi::GenericMethod (":windowFlags", "@brief Method QFlags<Qt::WindowType> QGraphicsWidget::windowFlags()\n", true, &_init_f_windowFlags_c0, &_call_f_windowFlags_c0);

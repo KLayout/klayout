@@ -91,7 +91,7 @@ static void _call_ctor_QStyleOptionToolBoxV2_3267 (const qt_gsi::GenericStaticMe
 }
 
 
-// (const QStyleOptionToolBox &)
+// QStyleOptionToolBoxV2 &QStyleOptionToolBoxV2::operator=(const QStyleOptionToolBox &other)
 
 
 static void _init_f_operator_eq__3267 (qt_gsi::GenericMethod *decl)
@@ -119,7 +119,7 @@ static gsi::Methods methods_QStyleOptionToolBoxV2 () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionToolBoxV2::QStyleOptionToolBoxV2()\nThis method creates an object of class QStyleOptionToolBoxV2.", &_init_ctor_QStyleOptionToolBoxV2_0, &_call_ctor_QStyleOptionToolBoxV2_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionToolBoxV2::QStyleOptionToolBoxV2(const QStyleOptionToolBoxV2 &other)\nThis method creates an object of class QStyleOptionToolBoxV2.", &_init_ctor_QStyleOptionToolBoxV2_3403, &_call_ctor_QStyleOptionToolBoxV2_3403);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionToolBoxV2::QStyleOptionToolBoxV2(const QStyleOptionToolBox &other)\nThis method creates an object of class QStyleOptionToolBoxV2.", &_init_ctor_QStyleOptionToolBoxV2_3267, &_call_ctor_QStyleOptionToolBoxV2_3267);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QStyleOptionToolBox &)\n", false, &_init_f_operator_eq__3267, &_call_f_operator_eq__3267);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QStyleOptionToolBoxV2 &QStyleOptionToolBoxV2::operator=(const QStyleOptionToolBox &other)\n", false, &_init_f_operator_eq__3267, &_call_f_operator_eq__3267);
   return methods;
 }
 

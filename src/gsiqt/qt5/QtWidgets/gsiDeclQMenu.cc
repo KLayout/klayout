@@ -154,7 +154,7 @@ static void _call_f_activeAction_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QAction *)
+// void QMenu::addAction(QAction *action)
 
 
 static void _init_f_addAction_1309 (qt_gsi::GenericMethod *decl)
@@ -174,7 +174,7 @@ static void _call_f_addAction_1309 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QString &)
+// QAction *QMenu::addAction(const QString &text)
 
 
 static void _init_f_addAction_2025 (qt_gsi::GenericMethod *decl)
@@ -193,7 +193,7 @@ static void _call_f_addAction_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QIcon &, const QString &)
+// QAction *QMenu::addAction(const QIcon &icon, const QString &text)
 
 
 static void _init_f_addAction_3704 (qt_gsi::GenericMethod *decl)
@@ -215,7 +215,7 @@ static void _call_f_addAction_3704 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QString &, const QObject *, const char *, const QKeySequence &)
+// QAction *QMenu::addAction(const QString &text, const QObject *receiver, const char *member, const QKeySequence &shortcut)
 
 
 static void _init_f_addAction_7945 (qt_gsi::GenericMethod *decl)
@@ -243,7 +243,7 @@ static void _call_f_addAction_7945 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QIcon &, const QString &, const QObject *, const char *, const QKeySequence &)
+// QAction *QMenu::addAction(const QIcon &icon, const QString &text, const QObject *receiver, const char *member, const QKeySequence &shortcut)
 
 
 static void _init_f_addAction_9624 (qt_gsi::GenericMethod *decl)
@@ -835,7 +835,7 @@ static void _call_f_setToolTipsVisible_864 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// QSize QMenu::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -967,11 +967,11 @@ static gsi::Methods methods_QMenu () {
   methods += new qt_gsi::GenericMethod ("actionAt", "@brief Method QAction *QMenu::actionAt(const QPoint &)\n", true, &_init_f_actionAt_c1916, &_call_f_actionAt_c1916);
   methods += new qt_gsi::GenericMethod ("actionGeometry", "@brief Method QRect QMenu::actionGeometry(QAction *)\n", true, &_init_f_actionGeometry_c1309, &_call_f_actionGeometry_c1309);
   methods += new qt_gsi::GenericMethod (":activeAction", "@brief Method QAction *QMenu::activeAction()\n", true, &_init_f_activeAction_c0, &_call_f_activeAction_c0);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (QAction *)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (const QString &)\n", false, &_init_f_addAction_2025, &_call_f_addAction_2025);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (const QIcon &, const QString &)\n", false, &_init_f_addAction_3704, &_call_f_addAction_3704);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (const QString &, const QObject *, const char *, const QKeySequence &)\n", false, &_init_f_addAction_7945, &_call_f_addAction_7945);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (const QIcon &, const QString &, const QObject *, const char *, const QKeySequence &)\n", false, &_init_f_addAction_9624, &_call_f_addAction_9624);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method void QMenu::addAction(QAction *action)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenu::addAction(const QString &text)\n", false, &_init_f_addAction_2025, &_call_f_addAction_2025);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenu::addAction(const QIcon &icon, const QString &text)\n", false, &_init_f_addAction_3704, &_call_f_addAction_3704);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenu::addAction(const QString &text, const QObject *receiver, const char *member, const QKeySequence &shortcut)\n", false, &_init_f_addAction_7945, &_call_f_addAction_7945);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenu::addAction(const QIcon &icon, const QString &text, const QObject *receiver, const char *member, const QKeySequence &shortcut)\n", false, &_init_f_addAction_9624, &_call_f_addAction_9624);
   methods += new qt_gsi::GenericMethod ("addMenu", "@brief Method QAction *QMenu::addMenu(QMenu *menu)\n", false, &_init_f_addMenu_1108, &_call_f_addMenu_1108);
   methods += new qt_gsi::GenericMethod ("addMenu", "@brief Method QMenu *QMenu::addMenu(const QString &title)\n", false, &_init_f_addMenu_2025, &_call_f_addMenu_2025);
   methods += new qt_gsi::GenericMethod ("addMenu", "@brief Method QMenu *QMenu::addMenu(const QIcon &icon, const QString &title)\n", false, &_init_f_addMenu_3704, &_call_f_addMenu_3704);
@@ -1002,7 +1002,7 @@ static gsi::Methods methods_QMenu () {
   methods += new qt_gsi::GenericMethod ("setTearOffEnabled|tearOffEnabled=", "@brief Method void QMenu::setTearOffEnabled(bool)\n", false, &_init_f_setTearOffEnabled_864, &_call_f_setTearOffEnabled_864);
   methods += new qt_gsi::GenericMethod ("setTitle|title=", "@brief Method void QMenu::setTitle(const QString &title)\n", false, &_init_f_setTitle_2025, &_call_f_setTitle_2025);
   methods += new qt_gsi::GenericMethod ("setToolTipsVisible|toolTipsVisible=", "@brief Method void QMenu::setToolTipsVisible(bool visible)\n", false, &_init_f_setToolTipsVisible_864, &_call_f_setToolTipsVisible_864);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QMenu::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":title", "@brief Method QString QMenu::title()\n", true, &_init_f_title_c0, &_call_f_title_c0);
   methods += new qt_gsi::GenericMethod (":toolTipsVisible", "@brief Method bool QMenu::toolTipsVisible()\n", true, &_init_f_toolTipsVisible_c0, &_call_f_toolTipsVisible_c0);
   methods += gsi::qt_signal ("aboutToHide()", "aboutToHide", "@brief Signal declaration for QMenu::aboutToHide()\nYou can bind a procedure to this signal.");

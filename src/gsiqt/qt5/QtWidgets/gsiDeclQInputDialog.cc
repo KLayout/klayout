@@ -130,7 +130,7 @@ static void _call_f_comboBoxItems_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (int)
+// void QInputDialog::done(int result)
 
 
 static void _init_f_done_767 (qt_gsi::GenericMethod *decl)
@@ -315,7 +315,7 @@ static void _call_f_labelText_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QSize QInputDialog::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -345,7 +345,7 @@ static void _call_f_okButtonText_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// ()
+// void QInputDialog::open()
 
 
 static void _init_f_open_0 (qt_gsi::GenericMethod *decl)
@@ -361,7 +361,7 @@ static void _call_f_open_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QObject *, const char *)
+// void QInputDialog::open(QObject *receiver, const char *member)
 
 
 static void _init_f_open_2925 (qt_gsi::GenericMethod *decl)
@@ -808,7 +808,7 @@ static void _call_f_setTextValue_2025 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (bool)
+// void QInputDialog::setVisible(bool visible)
 
 
 static void _init_f_setVisible_864 (qt_gsi::GenericMethod *decl)
@@ -828,7 +828,7 @@ static void _call_f_setVisible_864 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QSize QInputDialog::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -1156,7 +1156,7 @@ static gsi::Methods methods_QInputDialog () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":cancelButtonText", "@brief Method QString QInputDialog::cancelButtonText()\n", true, &_init_f_cancelButtonText_c0, &_call_f_cancelButtonText_c0);
   methods += new qt_gsi::GenericMethod (":comboBoxItems", "@brief Method QStringList QInputDialog::comboBoxItems()\n", true, &_init_f_comboBoxItems_c0, &_call_f_comboBoxItems_c0);
-  methods += new qt_gsi::GenericMethod ("done", "@brief Method (int)\nThis is a reimplementation of QDialog::done", false, &_init_f_done_767, &_call_f_done_767);
+  methods += new qt_gsi::GenericMethod ("done", "@brief Method void QInputDialog::done(int result)\nThis is a reimplementation of QDialog::done", false, &_init_f_done_767, &_call_f_done_767);
   methods += new qt_gsi::GenericMethod (":doubleDecimals", "@brief Method int QInputDialog::doubleDecimals()\n", true, &_init_f_doubleDecimals_c0, &_call_f_doubleDecimals_c0);
   methods += new qt_gsi::GenericMethod (":doubleMaximum", "@brief Method double QInputDialog::doubleMaximum()\n", true, &_init_f_doubleMaximum_c0, &_call_f_doubleMaximum_c0);
   methods += new qt_gsi::GenericMethod (":doubleMinimum", "@brief Method double QInputDialog::doubleMinimum()\n", true, &_init_f_doubleMinimum_c0, &_call_f_doubleMinimum_c0);
@@ -1168,10 +1168,10 @@ static gsi::Methods methods_QInputDialog () {
   methods += new qt_gsi::GenericMethod (":intValue", "@brief Method int QInputDialog::intValue()\n", true, &_init_f_intValue_c0, &_call_f_intValue_c0);
   methods += new qt_gsi::GenericMethod ("isComboBoxEditable?|:comboBoxEditable", "@brief Method bool QInputDialog::isComboBoxEditable()\n", true, &_init_f_isComboBoxEditable_c0, &_call_f_isComboBoxEditable_c0);
   methods += new qt_gsi::GenericMethod (":labelText", "@brief Method QString QInputDialog::labelText()\n", true, &_init_f_labelText_c0, &_call_f_labelText_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QDialog::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QInputDialog::minimumSizeHint()\nThis is a reimplementation of QDialog::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod (":okButtonText", "@brief Method QString QInputDialog::okButtonText()\n", true, &_init_f_okButtonText_c0, &_call_f_okButtonText_c0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method ()\nThis is a reimplementation of QDialog::open", false, &_init_f_open_0, &_call_f_open_0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method (QObject *, const char *)\n", false, &_init_f_open_2925, &_call_f_open_2925);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QInputDialog::open()\nThis is a reimplementation of QDialog::open", false, &_init_f_open_0, &_call_f_open_0);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QInputDialog::open(QObject *receiver, const char *member)\n", false, &_init_f_open_2925, &_call_f_open_2925);
   methods += new qt_gsi::GenericMethod (":options", "@brief Method QFlags<QInputDialog::InputDialogOption> QInputDialog::options()\n", true, &_init_f_options_c0, &_call_f_options_c0);
   methods += new qt_gsi::GenericMethod ("setCancelButtonText|cancelButtonText=", "@brief Method void QInputDialog::setCancelButtonText(const QString &text)\n", false, &_init_f_setCancelButtonText_2025, &_call_f_setCancelButtonText_2025);
   methods += new qt_gsi::GenericMethod ("setComboBoxEditable|comboBoxEditable=", "@brief Method void QInputDialog::setComboBoxEditable(bool editable)\n", false, &_init_f_setComboBoxEditable_864, &_call_f_setComboBoxEditable_864);
@@ -1193,8 +1193,8 @@ static gsi::Methods methods_QInputDialog () {
   methods += new qt_gsi::GenericMethod ("setOptions|options=", "@brief Method void QInputDialog::setOptions(QFlags<QInputDialog::InputDialogOption> options)\n", false, &_init_f_setOptions_4202, &_call_f_setOptions_4202);
   methods += new qt_gsi::GenericMethod ("setTextEchoMode|textEchoMode=", "@brief Method void QInputDialog::setTextEchoMode(QLineEdit::EchoMode mode)\n", false, &_init_f_setTextEchoMode_2187, &_call_f_setTextEchoMode_2187);
   methods += new qt_gsi::GenericMethod ("setTextValue|textValue=", "@brief Method void QInputDialog::setTextValue(const QString &text)\n", false, &_init_f_setTextValue_2025, &_call_f_setTextValue_2025);
-  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method (bool)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QDialog::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QInputDialog::setVisible(bool visible)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QInputDialog::sizeHint()\nThis is a reimplementation of QDialog::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod ("testOption", "@brief Method bool QInputDialog::testOption(QInputDialog::InputDialogOption option)\n", true, &_init_f_testOption_c3506, &_call_f_testOption_c3506);
   methods += new qt_gsi::GenericMethod (":textEchoMode", "@brief Method QLineEdit::EchoMode QInputDialog::textEchoMode()\n", true, &_init_f_textEchoMode_c0, &_call_f_textEchoMode_c0);
   methods += new qt_gsi::GenericMethod (":textValue", "@brief Method QString QInputDialog::textValue()\n", true, &_init_f_textValue_c0, &_call_f_textValue_c0);

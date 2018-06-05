@@ -79,7 +79,7 @@ static void _call_ctor_QSslSocket_1302 (const qt_gsi::GenericStaticMethod * /*de
 }
 
 
-// ()
+// void QSslSocket::abort()
 
 
 static void _init_f_abort_0 (qt_gsi::GenericMethod *decl)
@@ -160,7 +160,7 @@ static void _call_f_addCaCertificates_3438 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// bool QSslSocket::atEnd()
 
 
 static void _init_f_atEnd_c0 (qt_gsi::GenericMethod *decl)
@@ -175,7 +175,7 @@ static void _call_f_atEnd_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// () const
+// qint64 QSslSocket::bytesAvailable()
 
 
 static void _init_f_bytesAvailable_c0 (qt_gsi::GenericMethod *decl)
@@ -190,7 +190,7 @@ static void _call_f_bytesAvailable_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// qint64 QSslSocket::bytesToWrite()
 
 
 static void _init_f_bytesToWrite_c0 (qt_gsi::GenericMethod *decl)
@@ -220,7 +220,7 @@ static void _call_f_caCertificates_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// bool QSslSocket::canReadLine()
 
 
 static void _init_f_canReadLine_c0 (qt_gsi::GenericMethod *decl)
@@ -250,7 +250,7 @@ static void _call_f_ciphers_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// ()
+// void QSslSocket::close()
 
 
 static void _init_f_close_0 (qt_gsi::GenericMethod *decl)
@@ -351,7 +351,7 @@ static void _call_f_encryptedBytesToWrite_c0 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// ()
+// bool QSslSocket::flush()
 
 
 static void _init_f_flush_0 (qt_gsi::GenericMethod *decl)
@@ -764,7 +764,7 @@ static void _call_f_setProtocol_2095 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (qint64)
+// void QSslSocket::setReadBufferSize(qint64 size)
 
 
 static void _init_f_setReadBufferSize_986 (qt_gsi::GenericMethod *decl)
@@ -784,7 +784,7 @@ static void _call_f_setReadBufferSize_986 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// (int, QAbstractSocket::SocketState, QFlags<QIODevice::OpenModeFlag>)
+// bool QSslSocket::setSocketDescriptor(int socketDescriptor, QAbstractSocket::SocketState state, QFlags<QIODevice::OpenModeFlag> openMode)
 
 
 static void _init_f_setSocketDescriptor_6993 (qt_gsi::GenericMethod *decl)
@@ -809,7 +809,7 @@ static void _call_f_setSocketDescriptor_6993 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// (QAbstractSocket::SocketOption, const QVariant &)
+// void QSslSocket::setSocketOption(QAbstractSocket::SocketOption option, const QVariant &value)
 
 
 static void _init_f_setSocketOption_5331 (qt_gsi::GenericMethod *decl)
@@ -852,7 +852,7 @@ static void _call_f_setSslConfiguration_3068 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// (QAbstractSocket::SocketOption)
+// QVariant QSslSocket::socketOption(QAbstractSocket::SocketOption option)
 
 
 static void _init_f_socketOption_3320 (qt_gsi::GenericMethod *decl)
@@ -933,7 +933,7 @@ static void _call_f_startServerEncryption_0 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (int)
+// bool QSslSocket::waitForBytesWritten(int msecs)
 
 
 static void _init_f_waitForBytesWritten_767 (qt_gsi::GenericMethod *decl)
@@ -952,7 +952,7 @@ static void _call_f_waitForBytesWritten_767 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (int)
+// bool QSslSocket::waitForConnected(int msecs)
 
 
 static void _init_f_waitForConnected_767 (qt_gsi::GenericMethod *decl)
@@ -971,7 +971,7 @@ static void _call_f_waitForConnected_767 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (int)
+// bool QSslSocket::waitForDisconnected(int msecs)
 
 
 static void _init_f_waitForDisconnected_767 (qt_gsi::GenericMethod *decl)
@@ -1009,7 +1009,7 @@ static void _call_f_waitForEncrypted_767 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (int)
+// bool QSslSocket::waitForReadyRead(int msecs)
 
 
 static void _init_f_waitForReadyRead_767 (qt_gsi::GenericMethod *decl)
@@ -1310,22 +1310,22 @@ static gsi::Methods methods_QSslSocket () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSslSocket::QSslSocket(QObject *parent)\nThis method creates an object of class QSslSocket.", &_init_ctor_QSslSocket_1302, &_call_ctor_QSslSocket_1302);
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("abort", "@brief Method ()\n", false, &_init_f_abort_0, &_call_f_abort_0);
+  methods += new qt_gsi::GenericMethod ("abort", "@brief Method void QSslSocket::abort()\n", false, &_init_f_abort_0, &_call_f_abort_0);
   methods += new qt_gsi::GenericMethod ("addCaCertificate", "@brief Method void QSslSocket::addCaCertificate(const QSslCertificate &certificate)\n", false, &_init_f_addCaCertificate_2823, &_call_f_addCaCertificate_2823);
   methods += new qt_gsi::GenericMethod ("addCaCertificates", "@brief Method bool QSslSocket::addCaCertificates(const QString &path, QSsl::EncodingFormat format, QRegExp::PatternSyntax syntax)\n", false, &_init_f_addCaCertificates_6773, &_call_f_addCaCertificates_6773);
   methods += new qt_gsi::GenericMethod ("addCaCertificates", "@brief Method void QSslSocket::addCaCertificates(const QList<QSslCertificate> &certificates)\n", false, &_init_f_addCaCertificates_3438, &_call_f_addCaCertificates_3438);
-  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method () const\nThis is a reimplementation of QAbstractSocket::atEnd", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
-  methods += new qt_gsi::GenericMethod ("bytesAvailable", "@brief Method () const\nThis is a reimplementation of QAbstractSocket::bytesAvailable", true, &_init_f_bytesAvailable_c0, &_call_f_bytesAvailable_c0);
-  methods += new qt_gsi::GenericMethod ("bytesToWrite", "@brief Method () const\nThis is a reimplementation of QAbstractSocket::bytesToWrite", true, &_init_f_bytesToWrite_c0, &_call_f_bytesToWrite_c0);
+  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method bool QSslSocket::atEnd()\nThis is a reimplementation of QAbstractSocket::atEnd", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
+  methods += new qt_gsi::GenericMethod ("bytesAvailable", "@brief Method qint64 QSslSocket::bytesAvailable()\nThis is a reimplementation of QAbstractSocket::bytesAvailable", true, &_init_f_bytesAvailable_c0, &_call_f_bytesAvailable_c0);
+  methods += new qt_gsi::GenericMethod ("bytesToWrite", "@brief Method qint64 QSslSocket::bytesToWrite()\nThis is a reimplementation of QAbstractSocket::bytesToWrite", true, &_init_f_bytesToWrite_c0, &_call_f_bytesToWrite_c0);
   methods += new qt_gsi::GenericMethod (":caCertificates", "@brief Method QList<QSslCertificate> QSslSocket::caCertificates()\n", true, &_init_f_caCertificates_c0, &_call_f_caCertificates_c0);
-  methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Method () const\nThis is a reimplementation of QAbstractSocket::canReadLine", true, &_init_f_canReadLine_c0, &_call_f_canReadLine_c0);
+  methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Method bool QSslSocket::canReadLine()\nThis is a reimplementation of QAbstractSocket::canReadLine", true, &_init_f_canReadLine_c0, &_call_f_canReadLine_c0);
   methods += new qt_gsi::GenericMethod (":ciphers", "@brief Method QList<QSslCipher> QSslSocket::ciphers()\n", true, &_init_f_ciphers_c0, &_call_f_ciphers_c0);
-  methods += new qt_gsi::GenericMethod ("close", "@brief Method ()\nThis is a reimplementation of QAbstractSocket::close", false, &_init_f_close_0, &_call_f_close_0);
+  methods += new qt_gsi::GenericMethod ("close", "@brief Method void QSslSocket::close()\nThis is a reimplementation of QAbstractSocket::close", false, &_init_f_close_0, &_call_f_close_0);
   methods += new qt_gsi::GenericMethod ("connectToHostEncrypted", "@brief Method void QSslSocket::connectToHostEncrypted(const QString &hostName, quint16 port, QFlags<QIODevice::OpenModeFlag> mode)\n", false, &_init_f_connectToHostEncrypted_6151, &_call_f_connectToHostEncrypted_6151);
   methods += new qt_gsi::GenericMethod ("connectToHostEncrypted", "@brief Method void QSslSocket::connectToHostEncrypted(const QString &hostName, quint16 port, const QString &sslPeerName, QFlags<QIODevice::OpenModeFlag> mode)\n", false, &_init_f_connectToHostEncrypted_8068, &_call_f_connectToHostEncrypted_8068);
   methods += new qt_gsi::GenericMethod ("encryptedBytesAvailable", "@brief Method qint64 QSslSocket::encryptedBytesAvailable()\n", true, &_init_f_encryptedBytesAvailable_c0, &_call_f_encryptedBytesAvailable_c0);
   methods += new qt_gsi::GenericMethod ("encryptedBytesToWrite", "@brief Method qint64 QSslSocket::encryptedBytesToWrite()\n", true, &_init_f_encryptedBytesToWrite_c0, &_call_f_encryptedBytesToWrite_c0);
-  methods += new qt_gsi::GenericMethod ("flush", "@brief Method ()\n", false, &_init_f_flush_0, &_call_f_flush_0);
+  methods += new qt_gsi::GenericMethod ("flush", "@brief Method bool QSslSocket::flush()\n", false, &_init_f_flush_0, &_call_f_flush_0);
   methods += new qt_gsi::GenericMethod ("ignoreSslErrors", "@brief Method void QSslSocket::ignoreSslErrors(const QList<QSslError> &errors)\n", false, &_init_f_ignoreSslErrors_2837, &_call_f_ignoreSslErrors_2837);
   methods += new qt_gsi::GenericMethod ("ignoreSslErrors", "@brief Method void QSslSocket::ignoreSslErrors()\n", false, &_init_f_ignoreSslErrors_0, &_call_f_ignoreSslErrors_0);
   methods += new qt_gsi::GenericMethod ("isEncrypted?", "@brief Method bool QSslSocket::isEncrypted()\n", true, &_init_f_isEncrypted_c0, &_call_f_isEncrypted_c0);
@@ -1348,20 +1348,20 @@ static gsi::Methods methods_QSslSocket () {
   methods += new qt_gsi::GenericMethod ("setPrivateKey|privateKey=", "@brief Method void QSslSocket::setPrivateKey(const QSslKey &key)\n", false, &_init_f_setPrivateKey_1997, &_call_f_setPrivateKey_1997);
   methods += new qt_gsi::GenericMethod ("setPrivateKey", "@brief Method void QSslSocket::setPrivateKey(const QString &fileName, QSsl::KeyAlgorithm algorithm, QSsl::EncodingFormat format, const QByteArray &passPhrase)\n", false, &_init_f_setPrivateKey_8544, &_call_f_setPrivateKey_8544);
   methods += new qt_gsi::GenericMethod ("setProtocol|protocol=", "@brief Method void QSslSocket::setProtocol(QSsl::SslProtocol protocol)\n", false, &_init_f_setProtocol_2095, &_call_f_setProtocol_2095);
-  methods += new qt_gsi::GenericMethod ("setReadBufferSize|readBufferSize=", "@brief Method (qint64)\n", false, &_init_f_setReadBufferSize_986, &_call_f_setReadBufferSize_986);
-  methods += new qt_gsi::GenericMethod ("setSocketDescriptor", "@brief Method (int, QAbstractSocket::SocketState, QFlags<QIODevice::OpenModeFlag>)\n", false, &_init_f_setSocketDescriptor_6993, &_call_f_setSocketDescriptor_6993);
-  methods += new qt_gsi::GenericMethod ("setSocketOption", "@brief Method (QAbstractSocket::SocketOption, const QVariant &)\n", false, &_init_f_setSocketOption_5331, &_call_f_setSocketOption_5331);
+  methods += new qt_gsi::GenericMethod ("setReadBufferSize|readBufferSize=", "@brief Method void QSslSocket::setReadBufferSize(qint64 size)\n", false, &_init_f_setReadBufferSize_986, &_call_f_setReadBufferSize_986);
+  methods += new qt_gsi::GenericMethod ("setSocketDescriptor", "@brief Method bool QSslSocket::setSocketDescriptor(int socketDescriptor, QAbstractSocket::SocketState state, QFlags<QIODevice::OpenModeFlag> openMode)\n", false, &_init_f_setSocketDescriptor_6993, &_call_f_setSocketDescriptor_6993);
+  methods += new qt_gsi::GenericMethod ("setSocketOption", "@brief Method void QSslSocket::setSocketOption(QAbstractSocket::SocketOption option, const QVariant &value)\n", false, &_init_f_setSocketOption_5331, &_call_f_setSocketOption_5331);
   methods += new qt_gsi::GenericMethod ("setSslConfiguration|sslConfiguration=", "@brief Method void QSslSocket::setSslConfiguration(const QSslConfiguration &config)\n", false, &_init_f_setSslConfiguration_3068, &_call_f_setSslConfiguration_3068);
-  methods += new qt_gsi::GenericMethod ("socketOption", "@brief Method (QAbstractSocket::SocketOption)\n", false, &_init_f_socketOption_3320, &_call_f_socketOption_3320);
+  methods += new qt_gsi::GenericMethod ("socketOption", "@brief Method QVariant QSslSocket::socketOption(QAbstractSocket::SocketOption option)\n", false, &_init_f_socketOption_3320, &_call_f_socketOption_3320);
   methods += new qt_gsi::GenericMethod (":sslConfiguration", "@brief Method QSslConfiguration QSslSocket::sslConfiguration()\n", true, &_init_f_sslConfiguration_c0, &_call_f_sslConfiguration_c0);
   methods += new qt_gsi::GenericMethod ("sslErrors", "@brief Method QList<QSslError> QSslSocket::sslErrors()\n", true, &_init_f_sslErrors_c0, &_call_f_sslErrors_c0);
   methods += new qt_gsi::GenericMethod ("startClientEncryption", "@brief Method void QSslSocket::startClientEncryption()\n", false, &_init_f_startClientEncryption_0, &_call_f_startClientEncryption_0);
   methods += new qt_gsi::GenericMethod ("startServerEncryption", "@brief Method void QSslSocket::startServerEncryption()\n", false, &_init_f_startServerEncryption_0, &_call_f_startServerEncryption_0);
-  methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Method (int)\nThis is a reimplementation of QAbstractSocket::waitForBytesWritten", false, &_init_f_waitForBytesWritten_767, &_call_f_waitForBytesWritten_767);
-  methods += new qt_gsi::GenericMethod ("waitForConnected", "@brief Method (int)\n", false, &_init_f_waitForConnected_767, &_call_f_waitForConnected_767);
-  methods += new qt_gsi::GenericMethod ("waitForDisconnected", "@brief Method (int)\n", false, &_init_f_waitForDisconnected_767, &_call_f_waitForDisconnected_767);
+  methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Method bool QSslSocket::waitForBytesWritten(int msecs)\nThis is a reimplementation of QAbstractSocket::waitForBytesWritten", false, &_init_f_waitForBytesWritten_767, &_call_f_waitForBytesWritten_767);
+  methods += new qt_gsi::GenericMethod ("waitForConnected", "@brief Method bool QSslSocket::waitForConnected(int msecs)\n", false, &_init_f_waitForConnected_767, &_call_f_waitForConnected_767);
+  methods += new qt_gsi::GenericMethod ("waitForDisconnected", "@brief Method bool QSslSocket::waitForDisconnected(int msecs)\n", false, &_init_f_waitForDisconnected_767, &_call_f_waitForDisconnected_767);
   methods += new qt_gsi::GenericMethod ("waitForEncrypted", "@brief Method bool QSslSocket::waitForEncrypted(int msecs)\n", false, &_init_f_waitForEncrypted_767, &_call_f_waitForEncrypted_767);
-  methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Method (int)\nThis is a reimplementation of QAbstractSocket::waitForReadyRead", false, &_init_f_waitForReadyRead_767, &_call_f_waitForReadyRead_767);
+  methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Method bool QSslSocket::waitForReadyRead(int msecs)\nThis is a reimplementation of QAbstractSocket::waitForReadyRead", false, &_init_f_waitForReadyRead_767, &_call_f_waitForReadyRead_767);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QSslSocket::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QSslSocket::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("connected()", "connected", "@brief Signal declaration for QSslSocket::connected()\nYou can bind a procedure to this signal.");

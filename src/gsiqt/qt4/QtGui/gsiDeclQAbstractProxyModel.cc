@@ -60,7 +60,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (const QModelIndex &, int) const
+// QVariant QAbstractProxyModel::data(const QModelIndex &proxyIndex, int role)
 
 
 static void _init_f_data_c3054 (qt_gsi::GenericMethod *decl)
@@ -82,7 +82,7 @@ static void _call_f_data_c3054 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (const QModelIndex &) const
+// QFlags<Qt::ItemFlag> QAbstractProxyModel::flags(const QModelIndex &index)
 
 
 static void _init_f_flags_c2395 (qt_gsi::GenericMethod *decl)
@@ -101,7 +101,7 @@ static void _call_f_flags_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (int, Qt::Orientation, int) const
+// QVariant QAbstractProxyModel::headerData(int section, Qt::Orientation orientation, int role)
 
 
 static void _init_f_headerData_c3231 (qt_gsi::GenericMethod *decl)
@@ -126,7 +126,7 @@ static void _call_f_headerData_c3231 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QModelIndex &) const
+// QMap<int, QVariant> QAbstractProxyModel::itemData(const QModelIndex &index)
 
 
 static void _init_f_itemData_c2395 (qt_gsi::GenericMethod *decl)
@@ -221,7 +221,7 @@ static void _call_f_mapToSource_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// ()
+// void QAbstractProxyModel::revert()
 
 
 static void _init_f_revert_0 (qt_gsi::GenericMethod *decl)
@@ -237,7 +237,7 @@ static void _call_f_revert_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (const QModelIndex &, const QVariant &, int)
+// bool QAbstractProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)
 
 
 static void _init_f_setData_5065 (qt_gsi::GenericMethod *decl)
@@ -262,7 +262,7 @@ static void _call_f_setData_5065 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int, Qt::Orientation, const QVariant &, int)
+// bool QAbstractProxyModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 
 
 static void _init_f_setHeaderData_5242 (qt_gsi::GenericMethod *decl)
@@ -325,7 +325,7 @@ static void _call_f_sourceModel_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// ()
+// bool QAbstractProxyModel::submit()
 
 
 static void _init_f_submit_0 (qt_gsi::GenericMethod *decl)
@@ -440,20 +440,20 @@ namespace gsi
 static gsi::Methods methods_QAbstractProxyModel () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Method (const QModelIndex &, int) const\nThis is a reimplementation of QAbstractItemModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
-  methods += new qt_gsi::GenericMethod ("flags", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
-  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method (int, Qt::Orientation, int) const\nThis is a reimplementation of QAbstractItemModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
-  methods += new qt_gsi::GenericMethod ("itemData", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::itemData", true, &_init_f_itemData_c2395, &_call_f_itemData_c2395);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Method QVariant QAbstractProxyModel::data(const QModelIndex &proxyIndex, int role)\nThis is a reimplementation of QAbstractItemModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
+  methods += new qt_gsi::GenericMethod ("flags", "@brief Method QFlags<Qt::ItemFlag> QAbstractProxyModel::flags(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
+  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method QVariant QAbstractProxyModel::headerData(int section, Qt::Orientation orientation, int role)\nThis is a reimplementation of QAbstractItemModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
+  methods += new qt_gsi::GenericMethod ("itemData", "@brief Method QMap<int, QVariant> QAbstractProxyModel::itemData(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::itemData", true, &_init_f_itemData_c2395, &_call_f_itemData_c2395);
   methods += new qt_gsi::GenericMethod ("mapFromSource", "@brief Method QModelIndex QAbstractProxyModel::mapFromSource(const QModelIndex &sourceIndex)\n", true, &_init_f_mapFromSource_c2395, &_call_f_mapFromSource_c2395);
   methods += new qt_gsi::GenericMethod ("mapSelectionFromSource", "@brief Method QItemSelection QAbstractProxyModel::mapSelectionFromSource(const QItemSelection &selection)\n", true, &_init_f_mapSelectionFromSource_c2727, &_call_f_mapSelectionFromSource_c2727);
   methods += new qt_gsi::GenericMethod ("mapSelectionToSource", "@brief Method QItemSelection QAbstractProxyModel::mapSelectionToSource(const QItemSelection &selection)\n", true, &_init_f_mapSelectionToSource_c2727, &_call_f_mapSelectionToSource_c2727);
   methods += new qt_gsi::GenericMethod ("mapToSource", "@brief Method QModelIndex QAbstractProxyModel::mapToSource(const QModelIndex &proxyIndex)\n", true, &_init_f_mapToSource_c2395, &_call_f_mapToSource_c2395);
-  methods += new qt_gsi::GenericMethod ("revert", "@brief Method ()\nThis is a reimplementation of QAbstractItemModel::revert", false, &_init_f_revert_0, &_call_f_revert_0);
-  methods += new qt_gsi::GenericMethod ("setData", "@brief Method (const QModelIndex &, const QVariant &, int)\nThis is a reimplementation of QAbstractItemModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
-  methods += new qt_gsi::GenericMethod ("setHeaderData", "@brief Method (int, Qt::Orientation, const QVariant &, int)\nThis is a reimplementation of QAbstractItemModel::setHeaderData", false, &_init_f_setHeaderData_5242, &_call_f_setHeaderData_5242);
+  methods += new qt_gsi::GenericMethod ("revert", "@brief Method void QAbstractProxyModel::revert()\nThis is a reimplementation of QAbstractItemModel::revert", false, &_init_f_revert_0, &_call_f_revert_0);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Method bool QAbstractProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)\nThis is a reimplementation of QAbstractItemModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
+  methods += new qt_gsi::GenericMethod ("setHeaderData", "@brief Method bool QAbstractProxyModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)\nThis is a reimplementation of QAbstractItemModel::setHeaderData", false, &_init_f_setHeaderData_5242, &_call_f_setHeaderData_5242);
   methods += new qt_gsi::GenericMethod ("setSourceModel|sourceModel=", "@brief Method void QAbstractProxyModel::setSourceModel(QAbstractItemModel *sourceModel)\n", false, &_init_f_setSourceModel_2419, &_call_f_setSourceModel_2419);
   methods += new qt_gsi::GenericMethod (":sourceModel", "@brief Method QAbstractItemModel *QAbstractProxyModel::sourceModel()\n", true, &_init_f_sourceModel_c0, &_call_f_sourceModel_c0);
-  methods += new qt_gsi::GenericMethod ("submit", "@brief Method ()\nThis is a reimplementation of QAbstractItemModel::submit", false, &_init_f_submit_0, &_call_f_submit_0);
+  methods += new qt_gsi::GenericMethod ("submit", "@brief Method bool QAbstractProxyModel::submit()\nThis is a reimplementation of QAbstractItemModel::submit", false, &_init_f_submit_0, &_call_f_submit_0);
   methods += gsi::qt_signal<const QModelIndex &, const QModelIndex & > ("dataChanged(const QModelIndex &, const QModelIndex &)", "dataChanged", gsi::arg("topLeft"), gsi::arg("bottomRight"), "@brief Signal declaration for QAbstractProxyModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAbstractProxyModel::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::Orientation>::target_type &, int, int > ("headerDataChanged(Qt::Orientation, int, int)", "headerDataChanged", gsi::arg("orientation"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QAbstractProxyModel::headerDataChanged(Qt::Orientation orientation, int first, int last)\nYou can bind a procedure to this signal.");

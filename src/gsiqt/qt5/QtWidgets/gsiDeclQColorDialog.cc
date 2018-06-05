@@ -116,7 +116,7 @@ static void _call_f_currentColor_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// ()
+// void QColorDialog::open()
 
 
 static void _init_f_open_0 (qt_gsi::GenericMethod *decl)
@@ -132,7 +132,7 @@ static void _call_f_open_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QObject *, const char *)
+// void QColorDialog::open(QObject *receiver, const char *member)
 
 
 static void _init_f_open_2925 (qt_gsi::GenericMethod *decl)
@@ -248,7 +248,7 @@ static void _call_f_setOptions_4168 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (bool)
+// void QColorDialog::setVisible(bool visible)
 
 
 static void _init_f_setVisible_864 (qt_gsi::GenericMethod *decl)
@@ -496,14 +496,14 @@ static gsi::Methods methods_QColorDialog () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":currentColor", "@brief Method QColor QColorDialog::currentColor()\n", true, &_init_f_currentColor_c0, &_call_f_currentColor_c0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method ()\nThis is a reimplementation of QDialog::open", false, &_init_f_open_0, &_call_f_open_0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method (QObject *, const char *)\n", false, &_init_f_open_2925, &_call_f_open_2925);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QColorDialog::open()\nThis is a reimplementation of QDialog::open", false, &_init_f_open_0, &_call_f_open_0);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QColorDialog::open(QObject *receiver, const char *member)\n", false, &_init_f_open_2925, &_call_f_open_2925);
   methods += new qt_gsi::GenericMethod (":options", "@brief Method QFlags<QColorDialog::ColorDialogOption> QColorDialog::options()\n", true, &_init_f_options_c0, &_call_f_options_c0);
   methods += new qt_gsi::GenericMethod ("selectedColor", "@brief Method QColor QColorDialog::selectedColor()\n", true, &_init_f_selectedColor_c0, &_call_f_selectedColor_c0);
   methods += new qt_gsi::GenericMethod ("setCurrentColor|currentColor=", "@brief Method void QColorDialog::setCurrentColor(const QColor &color)\n", false, &_init_f_setCurrentColor_1905, &_call_f_setCurrentColor_1905);
   methods += new qt_gsi::GenericMethod ("setOption", "@brief Method void QColorDialog::setOption(QColorDialog::ColorDialogOption option, bool on)\n", false, &_init_f_setOption_4228, &_call_f_setOption_4228);
   methods += new qt_gsi::GenericMethod ("setOptions|options=", "@brief Method void QColorDialog::setOptions(QFlags<QColorDialog::ColorDialogOption> options)\n", false, &_init_f_setOptions_4168, &_call_f_setOptions_4168);
-  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method (bool)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
+  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QColorDialog::setVisible(bool visible)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += new qt_gsi::GenericMethod ("testOption", "@brief Method bool QColorDialog::testOption(QColorDialog::ColorDialogOption option)\n", true, &_init_f_testOption_c3472, &_call_f_testOption_c3472);
   methods += gsi::qt_signal ("accepted()", "accepted", "@brief Signal declaration for QColorDialog::accepted()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QColor & > ("colorSelected(const QColor &)", "colorSelected", gsi::arg("color"), "@brief Signal declaration for QColorDialog::colorSelected(const QColor &color)\nYou can bind a procedure to this signal.");

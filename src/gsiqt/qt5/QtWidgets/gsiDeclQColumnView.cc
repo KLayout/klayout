@@ -124,7 +124,7 @@ static void _call_f_columnWidths_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QPoint &) const
+// QModelIndex QColumnView::indexAt(const QPoint &point)
 
 
 static void _init_f_indexAt_c1916 (qt_gsi::GenericMethod *decl)
@@ -173,7 +173,7 @@ static void _call_f_resizeGripsVisible_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// (const QModelIndex &, QAbstractItemView::ScrollHint)
+// void QColumnView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHint hint)
 
 
 static void _init_f_scrollTo_5576 (qt_gsi::GenericMethod *decl)
@@ -196,7 +196,7 @@ static void _call_f_scrollTo_5576 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// ()
+// void QColumnView::selectAll()
 
 
 static void _init_f_selectAll_0 (qt_gsi::GenericMethod *decl)
@@ -232,7 +232,7 @@ static void _call_f_setColumnWidths_2259 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (QAbstractItemModel *)
+// void QColumnView::setModel(QAbstractItemModel *model)
 
 
 static void _init_f_setModel_2419 (qt_gsi::GenericMethod *decl)
@@ -292,7 +292,7 @@ static void _call_f_setResizeGripsVisible_864 (const qt_gsi::GenericMethod * /*d
 }
 
 
-// (const QModelIndex &)
+// void QColumnView::setRootIndex(const QModelIndex &index)
 
 
 static void _init_f_setRootIndex_2395 (qt_gsi::GenericMethod *decl)
@@ -312,7 +312,7 @@ static void _call_f_setRootIndex_2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QItemSelectionModel *)
+// void QColumnView::setSelectionModel(QItemSelectionModel *selectionModel)
 
 
 static void _init_f_setSelectionModel_2533 (qt_gsi::GenericMethod *decl)
@@ -332,7 +332,7 @@ static void _call_f_setSelectionModel_2533 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// QSize QColumnView::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -347,7 +347,7 @@ static void _call_f_sizeHint_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QModelIndex &) const
+// QRect QColumnView::visualRect(const QModelIndex &index)
 
 
 static void _init_f_visualRect_c2395 (qt_gsi::GenericMethod *decl)
@@ -423,19 +423,19 @@ static gsi::Methods methods_QColumnView () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":columnWidths", "@brief Method QList<int> QColumnView::columnWidths()\n", true, &_init_f_columnWidths_c0, &_call_f_columnWidths_c0);
-  methods += new qt_gsi::GenericMethod ("indexAt", "@brief Method (const QPoint &) const\nThis is a reimplementation of QAbstractItemView::indexAt", true, &_init_f_indexAt_c1916, &_call_f_indexAt_c1916);
+  methods += new qt_gsi::GenericMethod ("indexAt", "@brief Method QModelIndex QColumnView::indexAt(const QPoint &point)\nThis is a reimplementation of QAbstractItemView::indexAt", true, &_init_f_indexAt_c1916, &_call_f_indexAt_c1916);
   methods += new qt_gsi::GenericMethod (":previewWidget", "@brief Method QWidget *QColumnView::previewWidget()\n", true, &_init_f_previewWidget_c0, &_call_f_previewWidget_c0);
   methods += new qt_gsi::GenericMethod (":resizeGripsVisible", "@brief Method bool QColumnView::resizeGripsVisible()\n", true, &_init_f_resizeGripsVisible_c0, &_call_f_resizeGripsVisible_c0);
-  methods += new qt_gsi::GenericMethod ("scrollTo", "@brief Method (const QModelIndex &, QAbstractItemView::ScrollHint)\nThis is a reimplementation of QAbstractItemView::scrollTo", false, &_init_f_scrollTo_5576, &_call_f_scrollTo_5576);
-  methods += new qt_gsi::GenericMethod ("selectAll", "@brief Method ()\nThis is a reimplementation of QAbstractItemView::selectAll", false, &_init_f_selectAll_0, &_call_f_selectAll_0);
+  methods += new qt_gsi::GenericMethod ("scrollTo", "@brief Method void QColumnView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHint hint)\nThis is a reimplementation of QAbstractItemView::scrollTo", false, &_init_f_scrollTo_5576, &_call_f_scrollTo_5576);
+  methods += new qt_gsi::GenericMethod ("selectAll", "@brief Method void QColumnView::selectAll()\nThis is a reimplementation of QAbstractItemView::selectAll", false, &_init_f_selectAll_0, &_call_f_selectAll_0);
   methods += new qt_gsi::GenericMethod ("setColumnWidths|columnWidths=", "@brief Method void QColumnView::setColumnWidths(const QList<int> &list)\n", false, &_init_f_setColumnWidths_2259, &_call_f_setColumnWidths_2259);
-  methods += new qt_gsi::GenericMethod ("setModel|model=", "@brief Method (QAbstractItemModel *)\nThis is a reimplementation of QAbstractItemView::setModel", false, &_init_f_setModel_2419, &_call_f_setModel_2419);
+  methods += new qt_gsi::GenericMethod ("setModel|model=", "@brief Method void QColumnView::setModel(QAbstractItemModel *model)\nThis is a reimplementation of QAbstractItemView::setModel", false, &_init_f_setModel_2419, &_call_f_setModel_2419);
   methods += new qt_gsi::GenericMethod ("setPreviewWidget|previewWidget=", "@brief Method void QColumnView::setPreviewWidget(QWidget *widget)\n", false, &_init_f_setPreviewWidget_1315, &_call_f_setPreviewWidget_1315);
   methods += new qt_gsi::GenericMethod ("setResizeGripsVisible|resizeGripsVisible=", "@brief Method void QColumnView::setResizeGripsVisible(bool visible)\n", false, &_init_f_setResizeGripsVisible_864, &_call_f_setResizeGripsVisible_864);
-  methods += new qt_gsi::GenericMethod ("setRootIndex|rootIndex=", "@brief Method (const QModelIndex &)\nThis is a reimplementation of QAbstractItemView::setRootIndex", false, &_init_f_setRootIndex_2395, &_call_f_setRootIndex_2395);
-  methods += new qt_gsi::GenericMethod ("setSelectionModel|selectionModel=", "@brief Method (QItemSelectionModel *)\nThis is a reimplementation of QAbstractItemView::setSelectionModel", false, &_init_f_setSelectionModel_2533, &_call_f_setSelectionModel_2533);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QAbstractScrollArea::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
-  methods += new qt_gsi::GenericMethod ("visualRect", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemView::visualRect", true, &_init_f_visualRect_c2395, &_call_f_visualRect_c2395);
+  methods += new qt_gsi::GenericMethod ("setRootIndex|rootIndex=", "@brief Method void QColumnView::setRootIndex(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemView::setRootIndex", false, &_init_f_setRootIndex_2395, &_call_f_setRootIndex_2395);
+  methods += new qt_gsi::GenericMethod ("setSelectionModel|selectionModel=", "@brief Method void QColumnView::setSelectionModel(QItemSelectionModel *selectionModel)\nThis is a reimplementation of QAbstractItemView::setSelectionModel", false, &_init_f_setSelectionModel_2533, &_call_f_setSelectionModel_2533);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QColumnView::sizeHint()\nThis is a reimplementation of QAbstractScrollArea::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod ("visualRect", "@brief Method QRect QColumnView::visualRect(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemView::visualRect", true, &_init_f_visualRect_c2395, &_call_f_visualRect_c2395);
   methods += gsi::qt_signal<const QModelIndex & > ("activated(const QModelIndex &)", "activated", gsi::arg("index"), "@brief Signal declaration for QColumnView::activated(const QModelIndex &index)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex & > ("clicked(const QModelIndex &)", "clicked", gsi::arg("index"), "@brief Signal declaration for QColumnView::clicked(const QModelIndex &index)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QColumnView::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");

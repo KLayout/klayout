@@ -101,7 +101,7 @@ static void _call_f_alignment_c2557 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// int QGraphicsLinearLayout::count()
 
 
 static void _init_f_count_c0 (qt_gsi::GenericMethod *decl)
@@ -182,7 +182,7 @@ static void _call_f_insertStretch_1426 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// ()
+// void QGraphicsLinearLayout::invalidate()
 
 
 static void _init_f_invalidate_0 (qt_gsi::GenericMethod *decl)
@@ -198,7 +198,7 @@ static void _call_f_invalidate_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int) const
+// QGraphicsLayoutItem *QGraphicsLinearLayout::itemAt(int index)
 
 
 static void _init_f_itemAt_c767 (qt_gsi::GenericMethod *decl)
@@ -251,7 +251,7 @@ static void _call_f_orientation_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (int)
+// void QGraphicsLinearLayout::removeAt(int index)
 
 
 static void _init_f_removeAt_767 (qt_gsi::GenericMethod *decl)
@@ -314,7 +314,7 @@ static void _call_f_setAlignment_5199 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QRectF &)
+// void QGraphicsLinearLayout::setGeometry(const QRectF &rect)
 
 
 static void _init_f_setGeometry_1862 (qt_gsi::GenericMethod *decl)
@@ -420,7 +420,7 @@ static void _call_f_setStretchFactor_3216 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// (Qt::SizeHint, const QSizeF &) const
+// QSizeF QGraphicsLinearLayout::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
 
 
 static void _init_f_sizeHint_c3330 (qt_gsi::GenericMethod *decl)
@@ -484,23 +484,23 @@ static gsi::Methods methods_QGraphicsLinearLayout () {
   methods += new qt_gsi::GenericMethod ("addItem", "@brief Method void QGraphicsLinearLayout::addItem(QGraphicsLayoutItem *item)\n", false, &_init_f_addItem_2557, &_call_f_addItem_2557);
   methods += new qt_gsi::GenericMethod ("addStretch", "@brief Method void QGraphicsLinearLayout::addStretch(int stretch)\n", false, &_init_f_addStretch_767, &_call_f_addStretch_767);
   methods += new qt_gsi::GenericMethod ("alignment", "@brief Method QFlags<Qt::AlignmentFlag> QGraphicsLinearLayout::alignment(QGraphicsLayoutItem *item)\n", true, &_init_f_alignment_c2557, &_call_f_alignment_c2557);
-  methods += new qt_gsi::GenericMethod ("count", "@brief Method () const\nThis is a reimplementation of QGraphicsLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
+  methods += new qt_gsi::GenericMethod ("count", "@brief Method int QGraphicsLinearLayout::count()\nThis is a reimplementation of QGraphicsLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
   methods += new qt_gsi::GenericMethod ("dump", "@brief Method void QGraphicsLinearLayout::dump(int indent)\n", true, &_init_f_dump_c767, &_call_f_dump_c767);
   methods += new qt_gsi::GenericMethod ("insertItem", "@brief Method void QGraphicsLinearLayout::insertItem(int index, QGraphicsLayoutItem *item)\n", false, &_init_f_insertItem_3216, &_call_f_insertItem_3216);
   methods += new qt_gsi::GenericMethod ("insertStretch", "@brief Method void QGraphicsLinearLayout::insertStretch(int index, int stretch)\n", false, &_init_f_insertStretch_1426, &_call_f_insertStretch_1426);
-  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method ()\nThis is a reimplementation of QGraphicsLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
-  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method (int) const\nThis is a reimplementation of QGraphicsLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
+  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QGraphicsLinearLayout::invalidate()\nThis is a reimplementation of QGraphicsLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
+  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QGraphicsLayoutItem *QGraphicsLinearLayout::itemAt(int index)\nThis is a reimplementation of QGraphicsLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
   methods += new qt_gsi::GenericMethod ("itemSpacing", "@brief Method double QGraphicsLinearLayout::itemSpacing(int index)\n", true, &_init_f_itemSpacing_c767, &_call_f_itemSpacing_c767);
   methods += new qt_gsi::GenericMethod (":orientation", "@brief Method Qt::Orientation QGraphicsLinearLayout::orientation()\n", true, &_init_f_orientation_c0, &_call_f_orientation_c0);
-  methods += new qt_gsi::GenericMethod ("removeAt", "@brief Method (int)\nThis is a reimplementation of QGraphicsLayout::removeAt", false, &_init_f_removeAt_767, &_call_f_removeAt_767);
+  methods += new qt_gsi::GenericMethod ("removeAt", "@brief Method void QGraphicsLinearLayout::removeAt(int index)\nThis is a reimplementation of QGraphicsLayout::removeAt", false, &_init_f_removeAt_767, &_call_f_removeAt_767);
   methods += new qt_gsi::GenericMethod ("removeItem", "@brief Method void QGraphicsLinearLayout::removeItem(QGraphicsLayoutItem *item)\n", false, &_init_f_removeItem_2557, &_call_f_removeItem_2557);
   methods += new qt_gsi::GenericMethod ("setAlignment", "@brief Method void QGraphicsLinearLayout::setAlignment(QGraphicsLayoutItem *item, QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setAlignment_5199, &_call_f_setAlignment_5199);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRectF &)\nThis is a reimplementation of QGraphicsLayoutItem::setGeometry", false, &_init_f_setGeometry_1862, &_call_f_setGeometry_1862);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QGraphicsLinearLayout::setGeometry(const QRectF &rect)\nThis is a reimplementation of QGraphicsLayoutItem::setGeometry", false, &_init_f_setGeometry_1862, &_call_f_setGeometry_1862);
   methods += new qt_gsi::GenericMethod ("setItemSpacing", "@brief Method void QGraphicsLinearLayout::setItemSpacing(int index, double spacing)\n", false, &_init_f_setItemSpacing_1730, &_call_f_setItemSpacing_1730);
   methods += new qt_gsi::GenericMethod ("setOrientation|orientation=", "@brief Method void QGraphicsLinearLayout::setOrientation(Qt::Orientation orientation)\n", false, &_init_f_setOrientation_1913, &_call_f_setOrientation_1913);
   methods += new qt_gsi::GenericMethod ("setSpacing|spacing=", "@brief Method void QGraphicsLinearLayout::setSpacing(double spacing)\n", false, &_init_f_setSpacing_1071, &_call_f_setSpacing_1071);
   methods += new qt_gsi::GenericMethod ("setStretchFactor", "@brief Method void QGraphicsLinearLayout::setStretchFactor(QGraphicsLayoutItem *item, int stretch)\n", false, &_init_f_setStretchFactor_3216, &_call_f_setStretchFactor_3216);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method (Qt::SizeHint, const QSizeF &) const\nThis is a reimplementation of QGraphicsLayoutItem::sizeHint", true, &_init_f_sizeHint_c3330, &_call_f_sizeHint_c3330);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method QSizeF QGraphicsLinearLayout::sizeHint(Qt::SizeHint which, const QSizeF &constraint)\nThis is a reimplementation of QGraphicsLayoutItem::sizeHint", true, &_init_f_sizeHint_c3330, &_call_f_sizeHint_c3330);
   methods += new qt_gsi::GenericMethod (":spacing", "@brief Method double QGraphicsLinearLayout::spacing()\n", true, &_init_f_spacing_c0, &_call_f_spacing_c0);
   methods += new qt_gsi::GenericMethod ("stretchFactor", "@brief Method int QGraphicsLinearLayout::stretchFactor(QGraphicsLayoutItem *item)\n", true, &_init_f_stretchFactor_c2557, &_call_f_stretchFactor_c2557);
   return methods;

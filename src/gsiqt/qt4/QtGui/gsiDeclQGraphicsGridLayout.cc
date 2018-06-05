@@ -254,7 +254,7 @@ static void _call_f_columnStretchFactor_c767 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// () const
+// int QGraphicsGridLayout::count()
 
 
 static void _init_f_count_c0 (qt_gsi::GenericMethod *decl)
@@ -284,7 +284,7 @@ static void _call_f_horizontalSpacing_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// ()
+// void QGraphicsGridLayout::invalidate()
 
 
 static void _init_f_invalidate_0 (qt_gsi::GenericMethod *decl)
@@ -300,7 +300,7 @@ static void _call_f_invalidate_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int, int) const
+// QGraphicsLayoutItem *QGraphicsGridLayout::itemAt(int row, int column)
 
 
 static void _init_f_itemAt_c1426 (qt_gsi::GenericMethod *decl)
@@ -322,7 +322,7 @@ static void _call_f_itemAt_c1426 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int) const
+// QGraphicsLayoutItem *QGraphicsGridLayout::itemAt(int index)
 
 
 static void _init_f_itemAt_c767 (qt_gsi::GenericMethod *decl)
@@ -341,7 +341,7 @@ static void _call_f_itemAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (int)
+// void QGraphicsGridLayout::removeAt(int index)
 
 
 static void _init_f_removeAt_767 (qt_gsi::GenericMethod *decl)
@@ -674,7 +674,7 @@ static void _call_f_setColumnStretchFactor_1426 (const qt_gsi::GenericMethod * /
 }
 
 
-// (const QRectF &)
+// void QGraphicsGridLayout::setGeometry(const QRectF &rect)
 
 
 static void _init_f_setGeometry_1862 (qt_gsi::GenericMethod *decl)
@@ -915,7 +915,7 @@ static void _call_f_setVerticalSpacing_1071 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (Qt::SizeHint, const QSizeF &) const
+// QSizeF QGraphicsGridLayout::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
 
 
 static void _init_f_sizeHint_c3330 (qt_gsi::GenericMethod *decl)
@@ -967,12 +967,12 @@ static gsi::Methods methods_QGraphicsGridLayout () {
   methods += new qt_gsi::GenericMethod ("columnPreferredWidth", "@brief Method double QGraphicsGridLayout::columnPreferredWidth(int column)\n", true, &_init_f_columnPreferredWidth_c767, &_call_f_columnPreferredWidth_c767);
   methods += new qt_gsi::GenericMethod ("columnSpacing", "@brief Method double QGraphicsGridLayout::columnSpacing(int column)\n", true, &_init_f_columnSpacing_c767, &_call_f_columnSpacing_c767);
   methods += new qt_gsi::GenericMethod ("columnStretchFactor", "@brief Method int QGraphicsGridLayout::columnStretchFactor(int column)\n", true, &_init_f_columnStretchFactor_c767, &_call_f_columnStretchFactor_c767);
-  methods += new qt_gsi::GenericMethod ("count", "@brief Method () const\nThis is a reimplementation of QGraphicsLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
+  methods += new qt_gsi::GenericMethod ("count", "@brief Method int QGraphicsGridLayout::count()\nThis is a reimplementation of QGraphicsLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
   methods += new qt_gsi::GenericMethod (":horizontalSpacing", "@brief Method double QGraphicsGridLayout::horizontalSpacing()\n", true, &_init_f_horizontalSpacing_c0, &_call_f_horizontalSpacing_c0);
-  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method ()\nThis is a reimplementation of QGraphicsLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
-  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method (int, int) const\n", true, &_init_f_itemAt_c1426, &_call_f_itemAt_c1426);
-  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method (int) const\nThis is a reimplementation of QGraphicsLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
-  methods += new qt_gsi::GenericMethod ("removeAt", "@brief Method (int)\nThis is a reimplementation of QGraphicsLayout::removeAt", false, &_init_f_removeAt_767, &_call_f_removeAt_767);
+  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QGraphicsGridLayout::invalidate()\nThis is a reimplementation of QGraphicsLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
+  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QGraphicsLayoutItem *QGraphicsGridLayout::itemAt(int row, int column)\n", true, &_init_f_itemAt_c1426, &_call_f_itemAt_c1426);
+  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QGraphicsLayoutItem *QGraphicsGridLayout::itemAt(int index)\nThis is a reimplementation of QGraphicsLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
+  methods += new qt_gsi::GenericMethod ("removeAt", "@brief Method void QGraphicsGridLayout::removeAt(int index)\nThis is a reimplementation of QGraphicsLayout::removeAt", false, &_init_f_removeAt_767, &_call_f_removeAt_767);
   methods += new qt_gsi::GenericMethod ("rowAlignment", "@brief Method QFlags<Qt::AlignmentFlag> QGraphicsGridLayout::rowAlignment(int row)\n", true, &_init_f_rowAlignment_c767, &_call_f_rowAlignment_c767);
   methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method int QGraphicsGridLayout::rowCount()\n", true, &_init_f_rowCount_c0, &_call_f_rowCount_c0);
   methods += new qt_gsi::GenericMethod ("rowMaximumHeight", "@brief Method double QGraphicsGridLayout::rowMaximumHeight(int row)\n", true, &_init_f_rowMaximumHeight_c767, &_call_f_rowMaximumHeight_c767);
@@ -988,7 +988,7 @@ static gsi::Methods methods_QGraphicsGridLayout () {
   methods += new qt_gsi::GenericMethod ("setColumnPreferredWidth", "@brief Method void QGraphicsGridLayout::setColumnPreferredWidth(int column, double width)\n", false, &_init_f_setColumnPreferredWidth_1730, &_call_f_setColumnPreferredWidth_1730);
   methods += new qt_gsi::GenericMethod ("setColumnSpacing", "@brief Method void QGraphicsGridLayout::setColumnSpacing(int column, double spacing)\n", false, &_init_f_setColumnSpacing_1730, &_call_f_setColumnSpacing_1730);
   methods += new qt_gsi::GenericMethod ("setColumnStretchFactor", "@brief Method void QGraphicsGridLayout::setColumnStretchFactor(int column, int stretch)\n", false, &_init_f_setColumnStretchFactor_1426, &_call_f_setColumnStretchFactor_1426);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRectF &)\nThis is a reimplementation of QGraphicsLayoutItem::setGeometry", false, &_init_f_setGeometry_1862, &_call_f_setGeometry_1862);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QGraphicsGridLayout::setGeometry(const QRectF &rect)\nThis is a reimplementation of QGraphicsLayoutItem::setGeometry", false, &_init_f_setGeometry_1862, &_call_f_setGeometry_1862);
   methods += new qt_gsi::GenericMethod ("setHorizontalSpacing|horizontalSpacing=", "@brief Method void QGraphicsGridLayout::setHorizontalSpacing(double spacing)\n", false, &_init_f_setHorizontalSpacing_1071, &_call_f_setHorizontalSpacing_1071);
   methods += new qt_gsi::GenericMethod ("setRowAlignment", "@brief Method void QGraphicsGridLayout::setRowAlignment(int row, QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setRowAlignment_3409, &_call_f_setRowAlignment_3409);
   methods += new qt_gsi::GenericMethod ("setRowFixedHeight", "@brief Method void QGraphicsGridLayout::setRowFixedHeight(int row, double height)\n", false, &_init_f_setRowFixedHeight_1730, &_call_f_setRowFixedHeight_1730);
@@ -999,7 +999,7 @@ static gsi::Methods methods_QGraphicsGridLayout () {
   methods += new qt_gsi::GenericMethod ("setRowStretchFactor", "@brief Method void QGraphicsGridLayout::setRowStretchFactor(int row, int stretch)\n", false, &_init_f_setRowStretchFactor_1426, &_call_f_setRowStretchFactor_1426);
   methods += new qt_gsi::GenericMethod ("setSpacing", "@brief Method void QGraphicsGridLayout::setSpacing(double spacing)\n", false, &_init_f_setSpacing_1071, &_call_f_setSpacing_1071);
   methods += new qt_gsi::GenericMethod ("setVerticalSpacing|verticalSpacing=", "@brief Method void QGraphicsGridLayout::setVerticalSpacing(double spacing)\n", false, &_init_f_setVerticalSpacing_1071, &_call_f_setVerticalSpacing_1071);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method (Qt::SizeHint, const QSizeF &) const\nThis is a reimplementation of QGraphicsLayoutItem::sizeHint", true, &_init_f_sizeHint_c3330, &_call_f_sizeHint_c3330);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method QSizeF QGraphicsGridLayout::sizeHint(Qt::SizeHint which, const QSizeF &constraint)\nThis is a reimplementation of QGraphicsLayoutItem::sizeHint", true, &_init_f_sizeHint_c3330, &_call_f_sizeHint_c3330);
   methods += new qt_gsi::GenericMethod (":verticalSpacing", "@brief Method double QGraphicsGridLayout::verticalSpacing()\n", true, &_init_f_verticalSpacing_c0, &_call_f_verticalSpacing_c0);
   return methods;
 }

@@ -204,7 +204,7 @@ static void _call_f_columnWidth_c767 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// ()
+// void QTableView::doItemsLayout()
 
 
 static void _init_f_doItemsLayout_0 (qt_gsi::GenericMethod *decl)
@@ -290,7 +290,7 @@ static void _call_f_horizontalHeader_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (const QPoint &) const
+// QModelIndex QTableView::indexAt(const QPoint &p)
 
 
 static void _init_f_indexAt_c1916 (qt_gsi::GenericMethod *decl)
@@ -528,7 +528,7 @@ static void _call_f_rowViewportPosition_c767 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// (const QModelIndex &, QAbstractItemView::ScrollHint)
+// void QTableView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHint hint)
 
 
 static void _init_f_scrollTo_5576 (qt_gsi::GenericMethod *decl)
@@ -697,7 +697,7 @@ static void _call_f_setHorizontalHeader_1699 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// (QAbstractItemModel *)
+// void QTableView::setModel(QAbstractItemModel *model)
 
 
 static void _init_f_setModel_2419 (qt_gsi::GenericMethod *decl)
@@ -717,7 +717,7 @@ static void _call_f_setModel_2419 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QModelIndex &)
+// void QTableView::setRootIndex(const QModelIndex &index)
 
 
 static void _init_f_setRootIndex_2395 (qt_gsi::GenericMethod *decl)
@@ -783,7 +783,7 @@ static void _call_f_setRowHidden_1523 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QItemSelectionModel *)
+// void QTableView::setSelectionModel(QItemSelectionModel *selectionModel)
 
 
 static void _init_f_setSelectionModel_2533 (qt_gsi::GenericMethod *decl)
@@ -1025,7 +1025,7 @@ static void _call_f_verticalHeader_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QModelIndex &) const
+// QRect QTableView::visualRect(const QModelIndex &index)
 
 
 static void _init_f_visualRect_c2395 (qt_gsi::GenericMethod *decl)
@@ -1120,12 +1120,12 @@ static gsi::Methods methods_QTableView () {
   methods += new qt_gsi::GenericMethod ("columnSpan", "@brief Method int QTableView::columnSpan(int row, int column)\n", true, &_init_f_columnSpan_c1426, &_call_f_columnSpan_c1426);
   methods += new qt_gsi::GenericMethod ("columnViewportPosition", "@brief Method int QTableView::columnViewportPosition(int column)\n", true, &_init_f_columnViewportPosition_c767, &_call_f_columnViewportPosition_c767);
   methods += new qt_gsi::GenericMethod ("columnWidth", "@brief Method int QTableView::columnWidth(int column)\n", true, &_init_f_columnWidth_c767, &_call_f_columnWidth_c767);
-  methods += new qt_gsi::GenericMethod ("doItemsLayout", "@brief Method ()\nThis is a reimplementation of QAbstractItemView::doItemsLayout", false, &_init_f_doItemsLayout_0, &_call_f_doItemsLayout_0);
+  methods += new qt_gsi::GenericMethod ("doItemsLayout", "@brief Method void QTableView::doItemsLayout()\nThis is a reimplementation of QAbstractItemView::doItemsLayout", false, &_init_f_doItemsLayout_0, &_call_f_doItemsLayout_0);
   methods += new qt_gsi::GenericMethod (":gridStyle", "@brief Method Qt::PenStyle QTableView::gridStyle()\n", true, &_init_f_gridStyle_c0, &_call_f_gridStyle_c0);
   methods += new qt_gsi::GenericMethod ("hideColumn", "@brief Method void QTableView::hideColumn(int column)\n", false, &_init_f_hideColumn_767, &_call_f_hideColumn_767);
   methods += new qt_gsi::GenericMethod ("hideRow", "@brief Method void QTableView::hideRow(int row)\n", false, &_init_f_hideRow_767, &_call_f_hideRow_767);
   methods += new qt_gsi::GenericMethod (":horizontalHeader", "@brief Method QHeaderView *QTableView::horizontalHeader()\n", true, &_init_f_horizontalHeader_c0, &_call_f_horizontalHeader_c0);
-  methods += new qt_gsi::GenericMethod ("indexAt", "@brief Method (const QPoint &) const\nThis is a reimplementation of QAbstractItemView::indexAt", true, &_init_f_indexAt_c1916, &_call_f_indexAt_c1916);
+  methods += new qt_gsi::GenericMethod ("indexAt", "@brief Method QModelIndex QTableView::indexAt(const QPoint &p)\nThis is a reimplementation of QAbstractItemView::indexAt", true, &_init_f_indexAt_c1916, &_call_f_indexAt_c1916);
   methods += new qt_gsi::GenericMethod ("isColumnHidden?", "@brief Method bool QTableView::isColumnHidden(int column)\n", true, &_init_f_isColumnHidden_c767, &_call_f_isColumnHidden_c767);
   methods += new qt_gsi::GenericMethod ("isCornerButtonEnabled?|:cornerButtonEnabled", "@brief Method bool QTableView::isCornerButtonEnabled()\n", true, &_init_f_isCornerButtonEnabled_c0, &_call_f_isCornerButtonEnabled_c0);
   methods += new qt_gsi::GenericMethod ("isRowHidden?", "@brief Method bool QTableView::isRowHidden(int row)\n", true, &_init_f_isRowHidden_c767, &_call_f_isRowHidden_c767);
@@ -1138,7 +1138,7 @@ static gsi::Methods methods_QTableView () {
   methods += new qt_gsi::GenericMethod ("rowHeight", "@brief Method int QTableView::rowHeight(int row)\n", true, &_init_f_rowHeight_c767, &_call_f_rowHeight_c767);
   methods += new qt_gsi::GenericMethod ("rowSpan", "@brief Method int QTableView::rowSpan(int row, int column)\n", true, &_init_f_rowSpan_c1426, &_call_f_rowSpan_c1426);
   methods += new qt_gsi::GenericMethod ("rowViewportPosition", "@brief Method int QTableView::rowViewportPosition(int row)\n", true, &_init_f_rowViewportPosition_c767, &_call_f_rowViewportPosition_c767);
-  methods += new qt_gsi::GenericMethod ("scrollTo", "@brief Method (const QModelIndex &, QAbstractItemView::ScrollHint)\nThis is a reimplementation of QAbstractItemView::scrollTo", false, &_init_f_scrollTo_5576, &_call_f_scrollTo_5576);
+  methods += new qt_gsi::GenericMethod ("scrollTo", "@brief Method void QTableView::scrollTo(const QModelIndex &index, QAbstractItemView::ScrollHint hint)\nThis is a reimplementation of QAbstractItemView::scrollTo", false, &_init_f_scrollTo_5576, &_call_f_scrollTo_5576);
   methods += new qt_gsi::GenericMethod ("selectColumn", "@brief Method void QTableView::selectColumn(int column)\n", false, &_init_f_selectColumn_767, &_call_f_selectColumn_767);
   methods += new qt_gsi::GenericMethod ("selectRow", "@brief Method void QTableView::selectRow(int row)\n", false, &_init_f_selectRow_767, &_call_f_selectRow_767);
   methods += new qt_gsi::GenericMethod ("setColumnHidden", "@brief Method void QTableView::setColumnHidden(int column, bool hide)\n", false, &_init_f_setColumnHidden_1523, &_call_f_setColumnHidden_1523);
@@ -1146,11 +1146,11 @@ static gsi::Methods methods_QTableView () {
   methods += new qt_gsi::GenericMethod ("setCornerButtonEnabled|cornerButtonEnabled=", "@brief Method void QTableView::setCornerButtonEnabled(bool enable)\n", false, &_init_f_setCornerButtonEnabled_864, &_call_f_setCornerButtonEnabled_864);
   methods += new qt_gsi::GenericMethod ("setGridStyle|gridStyle=", "@brief Method void QTableView::setGridStyle(Qt::PenStyle style)\n", false, &_init_f_setGridStyle_1569, &_call_f_setGridStyle_1569);
   methods += new qt_gsi::GenericMethod ("setHorizontalHeader|horizontalHeader=", "@brief Method void QTableView::setHorizontalHeader(QHeaderView *header)\n", false, &_init_f_setHorizontalHeader_1699, &_call_f_setHorizontalHeader_1699);
-  methods += new qt_gsi::GenericMethod ("setModel|model=", "@brief Method (QAbstractItemModel *)\nThis is a reimplementation of QAbstractItemView::setModel", false, &_init_f_setModel_2419, &_call_f_setModel_2419);
-  methods += new qt_gsi::GenericMethod ("setRootIndex|rootIndex=", "@brief Method (const QModelIndex &)\nThis is a reimplementation of QAbstractItemView::setRootIndex", false, &_init_f_setRootIndex_2395, &_call_f_setRootIndex_2395);
+  methods += new qt_gsi::GenericMethod ("setModel|model=", "@brief Method void QTableView::setModel(QAbstractItemModel *model)\nThis is a reimplementation of QAbstractItemView::setModel", false, &_init_f_setModel_2419, &_call_f_setModel_2419);
+  methods += new qt_gsi::GenericMethod ("setRootIndex|rootIndex=", "@brief Method void QTableView::setRootIndex(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemView::setRootIndex", false, &_init_f_setRootIndex_2395, &_call_f_setRootIndex_2395);
   methods += new qt_gsi::GenericMethod ("setRowHeight", "@brief Method void QTableView::setRowHeight(int row, int height)\n", false, &_init_f_setRowHeight_1426, &_call_f_setRowHeight_1426);
   methods += new qt_gsi::GenericMethod ("setRowHidden", "@brief Method void QTableView::setRowHidden(int row, bool hide)\n", false, &_init_f_setRowHidden_1523, &_call_f_setRowHidden_1523);
-  methods += new qt_gsi::GenericMethod ("setSelectionModel|selectionModel=", "@brief Method (QItemSelectionModel *)\nThis is a reimplementation of QAbstractItemView::setSelectionModel", false, &_init_f_setSelectionModel_2533, &_call_f_setSelectionModel_2533);
+  methods += new qt_gsi::GenericMethod ("setSelectionModel|selectionModel=", "@brief Method void QTableView::setSelectionModel(QItemSelectionModel *selectionModel)\nThis is a reimplementation of QAbstractItemView::setSelectionModel", false, &_init_f_setSelectionModel_2533, &_call_f_setSelectionModel_2533);
   methods += new qt_gsi::GenericMethod ("setShowGrid|showGrid=", "@brief Method void QTableView::setShowGrid(bool show)\n", false, &_init_f_setShowGrid_864, &_call_f_setShowGrid_864);
   methods += new qt_gsi::GenericMethod ("setSortingEnabled|sortingEnabled=", "@brief Method void QTableView::setSortingEnabled(bool enable)\n", false, &_init_f_setSortingEnabled_864, &_call_f_setSortingEnabled_864);
   methods += new qt_gsi::GenericMethod ("setSpan", "@brief Method void QTableView::setSpan(int row, int column, int rowSpan, int columnSpan)\n", false, &_init_f_setSpan_2744, &_call_f_setSpan_2744);
@@ -1162,7 +1162,7 @@ static gsi::Methods methods_QTableView () {
   methods += new qt_gsi::GenericMethod ("sortByColumn", "@brief Method void QTableView::sortByColumn(int column, Qt::SortOrder order)\n", false, &_init_f_sortByColumn_2340, &_call_f_sortByColumn_2340);
   methods += new qt_gsi::GenericMethod ("sortByColumn", "@brief Method void QTableView::sortByColumn(int column)\n", false, &_init_f_sortByColumn_767, &_call_f_sortByColumn_767);
   methods += new qt_gsi::GenericMethod (":verticalHeader", "@brief Method QHeaderView *QTableView::verticalHeader()\n", true, &_init_f_verticalHeader_c0, &_call_f_verticalHeader_c0);
-  methods += new qt_gsi::GenericMethod ("visualRect", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemView::visualRect", true, &_init_f_visualRect_c2395, &_call_f_visualRect_c2395);
+  methods += new qt_gsi::GenericMethod ("visualRect", "@brief Method QRect QTableView::visualRect(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemView::visualRect", true, &_init_f_visualRect_c2395, &_call_f_visualRect_c2395);
   methods += new qt_gsi::GenericMethod (":wordWrap", "@brief Method bool QTableView::wordWrap()\n", true, &_init_f_wordWrap_c0, &_call_f_wordWrap_c0);
   methods += gsi::qt_signal<const QModelIndex & > ("activated(const QModelIndex &)", "activated", gsi::arg("index"), "@brief Signal declaration for QTableView::activated(const QModelIndex &index)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QModelIndex & > ("clicked(const QModelIndex &)", "clicked", gsi::arg("index"), "@brief Signal declaration for QTableView::clicked(const QModelIndex &index)\nYou can bind a procedure to this signal.");

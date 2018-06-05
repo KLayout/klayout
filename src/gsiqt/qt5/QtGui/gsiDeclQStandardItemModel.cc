@@ -137,7 +137,7 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (const QModelIndex &) const
+// int QStandardItemModel::columnCount(const QModelIndex &parent)
 
 
 static void _init_f_columnCount_c2395 (qt_gsi::GenericMethod *decl)
@@ -156,7 +156,7 @@ static void _call_f_columnCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QModelIndex &, int) const
+// QVariant QStandardItemModel::data(const QModelIndex &index, int role)
 
 
 static void _init_f_data_c3054 (qt_gsi::GenericMethod *decl)
@@ -178,7 +178,7 @@ static void _call_f_data_c3054 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)
+// bool QStandardItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_dropMimeData_7425 (qt_gsi::GenericMethod *decl)
@@ -234,7 +234,7 @@ static void _call_f_findItems_c4892 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QModelIndex &) const
+// QFlags<Qt::ItemFlag> QStandardItemModel::flags(const QModelIndex &index)
 
 
 static void _init_f_flags_c2395 (qt_gsi::GenericMethod *decl)
@@ -253,7 +253,7 @@ static void _call_f_flags_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QModelIndex &) const
+// bool QStandardItemModel::hasChildren(const QModelIndex &parent)
 
 
 static void _init_f_hasChildren_c2395 (qt_gsi::GenericMethod *decl)
@@ -272,7 +272,7 @@ static void _call_f_hasChildren_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (int, Qt::Orientation, int) const
+// QVariant QStandardItemModel::headerData(int section, Qt::Orientation orientation, int role)
 
 
 static void _init_f_headerData_c3231 (qt_gsi::GenericMethod *decl)
@@ -316,7 +316,7 @@ static void _call_f_horizontalHeaderItem_c767 (const qt_gsi::GenericMethod * /*d
 }
 
 
-// (int, int, const QModelIndex &) const
+// QModelIndex QStandardItemModel::index(int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_index_c3713 (qt_gsi::GenericMethod *decl)
@@ -360,7 +360,7 @@ static void _call_f_indexFromItem_c2614 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (int, const QList<QStandardItem*> &)
+// void QStandardItemModel::insertColumn(int column, const QList<QStandardItem*> &items)
 
 
 static void _init_f_insertColumn_3926 (qt_gsi::GenericMethod *decl)
@@ -383,7 +383,7 @@ static void _call_f_insertColumn_3926 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (int, const QModelIndex &)
+// bool QStandardItemModel::insertColumn(int column, const QModelIndex &parent)
 
 
 static void _init_f_insertColumn_3054 (qt_gsi::GenericMethod *decl)
@@ -405,7 +405,7 @@ static void _call_f_insertColumn_3054 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QStandardItemModel::insertColumns(int column, int count, const QModelIndex &parent)
 
 
 static void _init_f_insertColumns_3713 (qt_gsi::GenericMethod *decl)
@@ -430,7 +430,7 @@ static void _call_f_insertColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int, const QList<QStandardItem*> &)
+// void QStandardItemModel::insertRow(int row, const QList<QStandardItem*> &items)
 
 
 static void _init_f_insertRow_3926 (qt_gsi::GenericMethod *decl)
@@ -453,7 +453,7 @@ static void _call_f_insertRow_3926 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (int, QStandardItem *)
+// void QStandardItemModel::insertRow(int row, QStandardItem *item)
 
 
 static void _init_f_insertRow_2578 (qt_gsi::GenericMethod *decl)
@@ -476,7 +476,7 @@ static void _call_f_insertRow_2578 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (int, const QModelIndex &)
+// bool QStandardItemModel::insertRow(int row, const QModelIndex &parent)
 
 
 static void _init_f_insertRow_3054 (qt_gsi::GenericMethod *decl)
@@ -498,7 +498,7 @@ static void _call_f_insertRow_3054 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QStandardItemModel::insertRows(int row, int count, const QModelIndex &parent)
 
 
 static void _init_f_insertRows_3713 (qt_gsi::GenericMethod *decl)
@@ -560,7 +560,7 @@ static void _call_f_item_c1426 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (const QModelIndex &) const
+// QMap<int, QVariant> QStandardItemModel::itemData(const QModelIndex &index)
 
 
 static void _init_f_itemData_c2395 (qt_gsi::GenericMethod *decl)
@@ -613,7 +613,7 @@ static void _call_f_itemPrototype_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QList<QModelIndex> &) const
+// QMimeData *QStandardItemModel::mimeData(const QList<QModelIndex> &indexes)
 
 
 static void _init_f_mimeData_c3010 (qt_gsi::GenericMethod *decl)
@@ -632,7 +632,7 @@ static void _call_f_mimeData_c3010 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QStringList QStandardItemModel::mimeTypes()
 
 
 static void _init_f_mimeTypes_c0 (qt_gsi::GenericMethod *decl)
@@ -647,7 +647,7 @@ static void _call_f_mimeTypes_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (const QModelIndex &) const
+// QModelIndex QStandardItemModel::parent(const QModelIndex &child)
 
 
 static void _init_f_parent_c2395 (qt_gsi::GenericMethod *decl)
@@ -666,7 +666,7 @@ static void _call_f_parent_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QObject *QStandardItemModel::parent()
 
 
 static void _init_f_parent_c0 (qt_gsi::GenericMethod *decl)
@@ -681,7 +681,7 @@ static void _call_f_parent_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QStandardItemModel::removeColumns(int column, int count, const QModelIndex &parent)
 
 
 static void _init_f_removeColumns_3713 (qt_gsi::GenericMethod *decl)
@@ -706,7 +706,7 @@ static void _call_f_removeColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QStandardItemModel::removeRows(int row, int count, const QModelIndex &parent)
 
 
 static void _init_f_removeRows_3713 (qt_gsi::GenericMethod *decl)
@@ -731,7 +731,7 @@ static void _call_f_removeRows_3713 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QModelIndex &) const
+// int QStandardItemModel::rowCount(const QModelIndex &parent)
 
 
 static void _init_f_rowCount_c2395 (qt_gsi::GenericMethod *decl)
@@ -770,7 +770,7 @@ static void _call_f_setColumnCount_767 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QModelIndex &, const QVariant &, int)
+// bool QStandardItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
 
 
 static void _init_f_setData_5065 (qt_gsi::GenericMethod *decl)
@@ -795,7 +795,7 @@ static void _call_f_setData_5065 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int, Qt::Orientation, const QVariant &, int)
+// bool QStandardItemModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 
 
 static void _init_f_setHeaderData_5242 (qt_gsi::GenericMethod *decl)
@@ -915,7 +915,7 @@ static void _call_f_setItem_2578 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (const QModelIndex &, const QMap<int, QVariant> &)
+// bool QStandardItemModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles)
 
 
 static void _init_f_setItemData_5414 (qt_gsi::GenericMethod *decl)
@@ -1060,7 +1060,7 @@ static void _call_f_setVerticalHeaderLabels_2437 (const qt_gsi::GenericMethod * 
 }
 
 
-// (int, int, const QModelIndex &) const
+// QModelIndex QStandardItemModel::sibling(int row, int column, const QModelIndex &idx)
 
 
 static void _init_f_sibling_c3713 (qt_gsi::GenericMethod *decl)
@@ -1085,7 +1085,7 @@ static void _call_f_sibling_c3713 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (int, Qt::SortOrder)
+// void QStandardItemModel::sort(int column, Qt::SortOrder order)
 
 
 static void _init_f_sort_2340 (qt_gsi::GenericMethod *decl)
@@ -1123,7 +1123,7 @@ static void _call_f_sortRole_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// QFlags<Qt::DropAction> QStandardItemModel::supportedDropActions()
 
 
 static void _init_f_supportedDropActions_c0 (qt_gsi::GenericMethod *decl)
@@ -1315,53 +1315,53 @@ static gsi::Methods methods_QStandardItemModel () {
   methods += new qt_gsi::GenericMethod ("appendRow", "@brief Method void QStandardItemModel::appendRow(const QList<QStandardItem*> &items)\n", false, &_init_f_appendRow_3267, &_call_f_appendRow_3267);
   methods += new qt_gsi::GenericMethod ("appendRow", "@brief Method void QStandardItemModel::appendRow(QStandardItem *item)\n", false, &_init_f_appendRow_1919, &_call_f_appendRow_1919);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QStandardItemModel::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
-  methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::columnCount", true, &_init_f_columnCount_c2395, &_call_f_columnCount_c2395);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Method (const QModelIndex &, int) const\nThis is a reimplementation of QAbstractItemModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
-  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
+  methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method int QStandardItemModel::columnCount(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::columnCount", true, &_init_f_columnCount_c2395, &_call_f_columnCount_c2395);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Method QVariant QStandardItemModel::data(const QModelIndex &index, int role)\nThis is a reimplementation of QAbstractItemModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
+  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method bool QStandardItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
   methods += new qt_gsi::GenericMethod ("findItems", "@brief Method QList<QStandardItem*> QStandardItemModel::findItems(const QString &text, QFlags<Qt::MatchFlag> flags, int column)\n", true, &_init_f_findItems_c4892, &_call_f_findItems_c4892);
-  methods += new qt_gsi::GenericMethod ("flags", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
-  methods += new qt_gsi::GenericMethod ("hasChildren", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::hasChildren", true, &_init_f_hasChildren_c2395, &_call_f_hasChildren_c2395);
-  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method (int, Qt::Orientation, int) const\nThis is a reimplementation of QAbstractItemModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
+  methods += new qt_gsi::GenericMethod ("flags", "@brief Method QFlags<Qt::ItemFlag> QStandardItemModel::flags(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
+  methods += new qt_gsi::GenericMethod ("hasChildren", "@brief Method bool QStandardItemModel::hasChildren(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::hasChildren", true, &_init_f_hasChildren_c2395, &_call_f_hasChildren_c2395);
+  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method QVariant QStandardItemModel::headerData(int section, Qt::Orientation orientation, int role)\nThis is a reimplementation of QAbstractItemModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
   methods += new qt_gsi::GenericMethod ("horizontalHeaderItem", "@brief Method QStandardItem *QStandardItemModel::horizontalHeaderItem(int column)\n", true, &_init_f_horizontalHeaderItem_c767, &_call_f_horizontalHeaderItem_c767);
-  methods += new qt_gsi::GenericMethod ("index", "@brief Method (int, int, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::index", true, &_init_f_index_c3713, &_call_f_index_c3713);
+  methods += new qt_gsi::GenericMethod ("index", "@brief Method QModelIndex QStandardItemModel::index(int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::index", true, &_init_f_index_c3713, &_call_f_index_c3713);
   methods += new qt_gsi::GenericMethod ("indexFromItem", "@brief Method QModelIndex QStandardItemModel::indexFromItem(const QStandardItem *item)\n", true, &_init_f_indexFromItem_c2614, &_call_f_indexFromItem_c2614);
-  methods += new qt_gsi::GenericMethod ("insertColumn", "@brief Method (int, const QList<QStandardItem*> &)\n", false, &_init_f_insertColumn_3926, &_call_f_insertColumn_3926);
-  methods += new qt_gsi::GenericMethod ("insertColumn", "@brief Method (int, const QModelIndex &)\n", false, &_init_f_insertColumn_3054, &_call_f_insertColumn_3054);
-  methods += new qt_gsi::GenericMethod ("insertColumns", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::insertColumns", false, &_init_f_insertColumns_3713, &_call_f_insertColumns_3713);
-  methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method (int, const QList<QStandardItem*> &)\n", false, &_init_f_insertRow_3926, &_call_f_insertRow_3926);
-  methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method (int, QStandardItem *)\n", false, &_init_f_insertRow_2578, &_call_f_insertRow_2578);
-  methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method (int, const QModelIndex &)\n", false, &_init_f_insertRow_3054, &_call_f_insertRow_3054);
-  methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::insertRows", false, &_init_f_insertRows_3713, &_call_f_insertRows_3713);
+  methods += new qt_gsi::GenericMethod ("insertColumn", "@brief Method void QStandardItemModel::insertColumn(int column, const QList<QStandardItem*> &items)\n", false, &_init_f_insertColumn_3926, &_call_f_insertColumn_3926);
+  methods += new qt_gsi::GenericMethod ("insertColumn", "@brief Method bool QStandardItemModel::insertColumn(int column, const QModelIndex &parent)\n", false, &_init_f_insertColumn_3054, &_call_f_insertColumn_3054);
+  methods += new qt_gsi::GenericMethod ("insertColumns", "@brief Method bool QStandardItemModel::insertColumns(int column, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::insertColumns", false, &_init_f_insertColumns_3713, &_call_f_insertColumns_3713);
+  methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QStandardItemModel::insertRow(int row, const QList<QStandardItem*> &items)\n", false, &_init_f_insertRow_3926, &_call_f_insertRow_3926);
+  methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QStandardItemModel::insertRow(int row, QStandardItem *item)\n", false, &_init_f_insertRow_2578, &_call_f_insertRow_2578);
+  methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method bool QStandardItemModel::insertRow(int row, const QModelIndex &parent)\n", false, &_init_f_insertRow_3054, &_call_f_insertRow_3054);
+  methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method bool QStandardItemModel::insertRows(int row, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::insertRows", false, &_init_f_insertRows_3713, &_call_f_insertRows_3713);
   methods += new qt_gsi::GenericMethod ("invisibleRootItem", "@brief Method QStandardItem *QStandardItemModel::invisibleRootItem()\n", true, &_init_f_invisibleRootItem_c0, &_call_f_invisibleRootItem_c0);
   methods += new qt_gsi::GenericMethod ("item", "@brief Method QStandardItem *QStandardItemModel::item(int row, int column)\n", true, &_init_f_item_c1426, &_call_f_item_c1426);
-  methods += new qt_gsi::GenericMethod ("itemData", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::itemData", true, &_init_f_itemData_c2395, &_call_f_itemData_c2395);
+  methods += new qt_gsi::GenericMethod ("itemData", "@brief Method QMap<int, QVariant> QStandardItemModel::itemData(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::itemData", true, &_init_f_itemData_c2395, &_call_f_itemData_c2395);
   methods += new qt_gsi::GenericMethod ("itemFromIndex", "@brief Method QStandardItem *QStandardItemModel::itemFromIndex(const QModelIndex &index)\n", true, &_init_f_itemFromIndex_c2395, &_call_f_itemFromIndex_c2395);
   methods += new qt_gsi::GenericMethod (":itemPrototype", "@brief Method const QStandardItem *QStandardItemModel::itemPrototype()\n", true, &_init_f_itemPrototype_c0, &_call_f_itemPrototype_c0);
-  methods += new qt_gsi::GenericMethod ("mimeData", "@brief Method (const QList<QModelIndex> &) const\nThis is a reimplementation of QAbstractItemModel::mimeData", true, &_init_f_mimeData_c3010, &_call_f_mimeData_c3010);
-  methods += new qt_gsi::GenericMethod ("mimeTypes", "@brief Method () const\nThis is a reimplementation of QAbstractItemModel::mimeTypes", true, &_init_f_mimeTypes_c0, &_call_f_mimeTypes_c0);
-  methods += new qt_gsi::GenericMethod ("parent", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::parent", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
-  methods += new qt_gsi::GenericMethod (":parent", "@brief Method () const\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
-  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
-  methods += new qt_gsi::GenericMethod ("removeRows", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::removeRows", false, &_init_f_removeRows_3713, &_call_f_removeRows_3713);
-  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
+  methods += new qt_gsi::GenericMethod ("mimeData", "@brief Method QMimeData *QStandardItemModel::mimeData(const QList<QModelIndex> &indexes)\nThis is a reimplementation of QAbstractItemModel::mimeData", true, &_init_f_mimeData_c3010, &_call_f_mimeData_c3010);
+  methods += new qt_gsi::GenericMethod ("mimeTypes", "@brief Method QStringList QStandardItemModel::mimeTypes()\nThis is a reimplementation of QAbstractItemModel::mimeTypes", true, &_init_f_mimeTypes_c0, &_call_f_mimeTypes_c0);
+  methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QStandardItemModel::parent(const QModelIndex &child)\nThis is a reimplementation of QAbstractItemModel::parent", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
+  methods += new qt_gsi::GenericMethod (":parent", "@brief Method QObject *QStandardItemModel::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
+  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method bool QStandardItemModel::removeColumns(int column, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
+  methods += new qt_gsi::GenericMethod ("removeRows", "@brief Method bool QStandardItemModel::removeRows(int row, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::removeRows", false, &_init_f_removeRows_3713, &_call_f_removeRows_3713);
+  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method int QStandardItemModel::rowCount(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
   methods += new qt_gsi::GenericMethod ("setColumnCount|columnCount=", "@brief Method void QStandardItemModel::setColumnCount(int columns)\n", false, &_init_f_setColumnCount_767, &_call_f_setColumnCount_767);
-  methods += new qt_gsi::GenericMethod ("setData", "@brief Method (const QModelIndex &, const QVariant &, int)\nThis is a reimplementation of QAbstractItemModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
-  methods += new qt_gsi::GenericMethod ("setHeaderData", "@brief Method (int, Qt::Orientation, const QVariant &, int)\nThis is a reimplementation of QAbstractItemModel::setHeaderData", false, &_init_f_setHeaderData_5242, &_call_f_setHeaderData_5242);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Method bool QStandardItemModel::setData(const QModelIndex &index, const QVariant &value, int role)\nThis is a reimplementation of QAbstractItemModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
+  methods += new qt_gsi::GenericMethod ("setHeaderData", "@brief Method bool QStandardItemModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)\nThis is a reimplementation of QAbstractItemModel::setHeaderData", false, &_init_f_setHeaderData_5242, &_call_f_setHeaderData_5242);
   methods += new qt_gsi::GenericMethod ("setHorizontalHeaderItem", "@brief Method void QStandardItemModel::setHorizontalHeaderItem(int column, QStandardItem *item)\n", false, &_init_f_setHorizontalHeaderItem_2578, &_call_f_setHorizontalHeaderItem_2578);
   methods += new qt_gsi::GenericMethod ("setHorizontalHeaderLabels", "@brief Method void QStandardItemModel::setHorizontalHeaderLabels(const QStringList &labels)\n", false, &_init_f_setHorizontalHeaderLabels_2437, &_call_f_setHorizontalHeaderLabels_2437);
   methods += new qt_gsi::GenericMethod ("setItem", "@brief Method void QStandardItemModel::setItem(int row, int column, QStandardItem *item)\n", false, &_init_f_setItem_3237, &_call_f_setItem_3237);
   methods += new qt_gsi::GenericMethod ("setItem", "@brief Method void QStandardItemModel::setItem(int row, QStandardItem *item)\n", false, &_init_f_setItem_2578, &_call_f_setItem_2578);
-  methods += new qt_gsi::GenericMethod ("setItemData", "@brief Method (const QModelIndex &, const QMap<int, QVariant> &)\nThis is a reimplementation of QAbstractItemModel::setItemData", false, &_init_f_setItemData_5414, &_call_f_setItemData_5414);
+  methods += new qt_gsi::GenericMethod ("setItemData", "@brief Method bool QStandardItemModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles)\nThis is a reimplementation of QAbstractItemModel::setItemData", false, &_init_f_setItemData_5414, &_call_f_setItemData_5414);
   methods += new qt_gsi::GenericMethod ("setItemPrototype|itemPrototype=", "@brief Method void QStandardItemModel::setItemPrototype(const QStandardItem *item)\n", false, &_init_f_setItemPrototype_2614, &_call_f_setItemPrototype_2614);
   methods += new qt_gsi::GenericMethod ("setItemRoleNames", "@brief Method void QStandardItemModel::setItemRoleNames(const QHash<int, QByteArray> &roleNames)\n", false, &_init_f_setItemRoleNames_3419, &_call_f_setItemRoleNames_3419);
   methods += new qt_gsi::GenericMethod ("setRowCount|rowCount=", "@brief Method void QStandardItemModel::setRowCount(int rows)\n", false, &_init_f_setRowCount_767, &_call_f_setRowCount_767);
   methods += new qt_gsi::GenericMethod ("setSortRole|sortRole=", "@brief Method void QStandardItemModel::setSortRole(int role)\n", false, &_init_f_setSortRole_767, &_call_f_setSortRole_767);
   methods += new qt_gsi::GenericMethod ("setVerticalHeaderItem", "@brief Method void QStandardItemModel::setVerticalHeaderItem(int row, QStandardItem *item)\n", false, &_init_f_setVerticalHeaderItem_2578, &_call_f_setVerticalHeaderItem_2578);
   methods += new qt_gsi::GenericMethod ("setVerticalHeaderLabels", "@brief Method void QStandardItemModel::setVerticalHeaderLabels(const QStringList &labels)\n", false, &_init_f_setVerticalHeaderLabels_2437, &_call_f_setVerticalHeaderLabels_2437);
-  methods += new qt_gsi::GenericMethod ("sibling", "@brief Method (int, int, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::sibling", true, &_init_f_sibling_c3713, &_call_f_sibling_c3713);
-  methods += new qt_gsi::GenericMethod ("sort", "@brief Method (int, Qt::SortOrder)\nThis is a reimplementation of QAbstractItemModel::sort", false, &_init_f_sort_2340, &_call_f_sort_2340);
+  methods += new qt_gsi::GenericMethod ("sibling", "@brief Method QModelIndex QStandardItemModel::sibling(int row, int column, const QModelIndex &idx)\nThis is a reimplementation of QAbstractItemModel::sibling", true, &_init_f_sibling_c3713, &_call_f_sibling_c3713);
+  methods += new qt_gsi::GenericMethod ("sort", "@brief Method void QStandardItemModel::sort(int column, Qt::SortOrder order)\nThis is a reimplementation of QAbstractItemModel::sort", false, &_init_f_sort_2340, &_call_f_sort_2340);
   methods += new qt_gsi::GenericMethod (":sortRole", "@brief Method int QStandardItemModel::sortRole()\n", true, &_init_f_sortRole_c0, &_call_f_sortRole_c0);
-  methods += new qt_gsi::GenericMethod ("supportedDropActions", "@brief Method () const\nThis is a reimplementation of QAbstractItemModel::supportedDropActions", true, &_init_f_supportedDropActions_c0, &_call_f_supportedDropActions_c0);
+  methods += new qt_gsi::GenericMethod ("supportedDropActions", "@brief Method QFlags<Qt::DropAction> QStandardItemModel::supportedDropActions()\nThis is a reimplementation of QAbstractItemModel::supportedDropActions", true, &_init_f_supportedDropActions_c0, &_call_f_supportedDropActions_c0);
   methods += new qt_gsi::GenericMethod ("takeColumn", "@brief Method QList<QStandardItem*> QStandardItemModel::takeColumn(int column)\n", false, &_init_f_takeColumn_767, &_call_f_takeColumn_767);
   methods += new qt_gsi::GenericMethod ("takeHorizontalHeaderItem", "@brief Method QStandardItem *QStandardItemModel::takeHorizontalHeaderItem(int column)\n", false, &_init_f_takeHorizontalHeaderItem_767, &_call_f_takeHorizontalHeaderItem_767);
   methods += new qt_gsi::GenericMethod ("takeItem", "@brief Method QStandardItem *QStandardItemModel::takeItem(int row, int column)\n", false, &_init_f_takeItem_1426, &_call_f_takeItem_1426);

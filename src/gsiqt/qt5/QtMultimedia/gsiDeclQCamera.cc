@@ -53,7 +53,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// () const
+// QMultimedia::AvailabilityStatus QCamera::availability()
 
 
 static void _init_f_availability_c0 (qt_gsi::GenericMethod *decl)
@@ -688,7 +688,7 @@ namespace gsi
 static gsi::Methods methods_QCamera () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("availability", "@brief Method () const\nThis is a reimplementation of QMediaObject::availability", true, &_init_f_availability_c0, &_call_f_availability_c0);
+  methods += new qt_gsi::GenericMethod ("availability", "@brief Method QMultimedia::AvailabilityStatus QCamera::availability()\nThis is a reimplementation of QMediaObject::availability", true, &_init_f_availability_c0, &_call_f_availability_c0);
   methods += new qt_gsi::GenericMethod (":captureMode", "@brief Method QFlags<QCamera::CaptureMode> QCamera::captureMode()\n", true, &_init_f_captureMode_c0, &_call_f_captureMode_c0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QCamera::Error QCamera::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QCamera::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);

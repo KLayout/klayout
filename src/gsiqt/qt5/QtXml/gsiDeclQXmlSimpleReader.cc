@@ -43,7 +43,7 @@
 // -----------------------------------------------------------------------
 // class QXmlSimpleReader
 
-// () const
+// QXmlDTDHandler *QXmlSimpleReader::DTDHandler()
 
 
 static void _init_f_DTDHandler_c0 (qt_gsi::GenericMethod *decl)
@@ -58,7 +58,7 @@ static void _call_f_DTDHandler_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// () const
+// QXmlContentHandler *QXmlSimpleReader::contentHandler()
 
 
 static void _init_f_contentHandler_c0 (qt_gsi::GenericMethod *decl)
@@ -73,7 +73,7 @@ static void _call_f_contentHandler_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// QXmlDeclHandler *QXmlSimpleReader::declHandler()
 
 
 static void _init_f_declHandler_c0 (qt_gsi::GenericMethod *decl)
@@ -88,7 +88,7 @@ static void _call_f_declHandler_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QXmlEntityResolver *QXmlSimpleReader::entityResolver()
 
 
 static void _init_f_entityResolver_c0 (qt_gsi::GenericMethod *decl)
@@ -103,7 +103,7 @@ static void _call_f_entityResolver_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// QXmlErrorHandler *QXmlSimpleReader::errorHandler()
 
 
 static void _init_f_errorHandler_c0 (qt_gsi::GenericMethod *decl)
@@ -118,7 +118,7 @@ static void _call_f_errorHandler_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QString &, bool *) const
+// bool QXmlSimpleReader::feature(const QString &name, bool *ok)
 
 
 static void _init_f_feature_c2967 (qt_gsi::GenericMethod *decl)
@@ -140,7 +140,7 @@ static void _call_f_feature_c2967 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QString &) const
+// bool QXmlSimpleReader::hasFeature(const QString &name)
 
 
 static void _init_f_hasFeature_c2025 (qt_gsi::GenericMethod *decl)
@@ -159,7 +159,7 @@ static void _call_f_hasFeature_c2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QString &) const
+// bool QXmlSimpleReader::hasProperty(const QString &name)
 
 
 static void _init_f_hasProperty_c2025 (qt_gsi::GenericMethod *decl)
@@ -178,7 +178,7 @@ static void _call_f_hasProperty_c2025 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// QXmlLexicalHandler *QXmlSimpleReader::lexicalHandler()
 
 
 static void _init_f_lexicalHandler_c0 (qt_gsi::GenericMethod *decl)
@@ -193,7 +193,7 @@ static void _call_f_lexicalHandler_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QXmlInputSource *)
+// bool QXmlSimpleReader::parse(const QXmlInputSource *input)
 
 
 static void _init_f_parse_2856 (qt_gsi::GenericMethod *decl)
@@ -212,7 +212,7 @@ static void _call_f_parse_2856 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (const QXmlInputSource *, bool)
+// bool QXmlSimpleReader::parse(const QXmlInputSource *input, bool incremental)
 
 
 static void _init_f_parse_3612 (qt_gsi::GenericMethod *decl)
@@ -249,7 +249,7 @@ static void _call_f_parseContinue_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QString &, bool *) const
+// void *QXmlSimpleReader::property(const QString &name, bool *ok)
 
 
 static void _init_f_property_c2967 (qt_gsi::GenericMethod *decl)
@@ -271,7 +271,7 @@ static void _call_f_property_c2967 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (QXmlContentHandler *)
+// void QXmlSimpleReader::setContentHandler(QXmlContentHandler *handler)
 
 
 static void _init_f_setContentHandler_2441 (qt_gsi::GenericMethod *decl)
@@ -291,7 +291,7 @@ static void _call_f_setContentHandler_2441 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (QXmlDTDHandler *)
+// void QXmlSimpleReader::setDTDHandler(QXmlDTDHandler *handler)
 
 
 static void _init_f_setDTDHandler_1930 (qt_gsi::GenericMethod *decl)
@@ -311,7 +311,7 @@ static void _call_f_setDTDHandler_1930 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (QXmlDeclHandler *)
+// void QXmlSimpleReader::setDeclHandler(QXmlDeclHandler *handler)
 
 
 static void _init_f_setDeclHandler_2086 (qt_gsi::GenericMethod *decl)
@@ -331,7 +331,7 @@ static void _call_f_setDeclHandler_2086 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (QXmlEntityResolver *)
+// void QXmlSimpleReader::setEntityResolver(QXmlEntityResolver *handler)
 
 
 static void _init_f_setEntityResolver_2495 (qt_gsi::GenericMethod *decl)
@@ -351,7 +351,7 @@ static void _call_f_setEntityResolver_2495 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (QXmlErrorHandler *)
+// void QXmlSimpleReader::setErrorHandler(QXmlErrorHandler *handler)
 
 
 static void _init_f_setErrorHandler_2232 (qt_gsi::GenericMethod *decl)
@@ -371,7 +371,7 @@ static void _call_f_setErrorHandler_2232 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (const QString &, bool)
+// void QXmlSimpleReader::setFeature(const QString &name, bool value)
 
 
 static void _init_f_setFeature_2781 (qt_gsi::GenericMethod *decl)
@@ -394,7 +394,7 @@ static void _call_f_setFeature_2781 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QXmlLexicalHandler *)
+// void QXmlSimpleReader::setLexicalHandler(QXmlLexicalHandler *handler)
 
 
 static void _init_f_setLexicalHandler_2416 (qt_gsi::GenericMethod *decl)
@@ -414,7 +414,7 @@ static void _call_f_setLexicalHandler_2416 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (const QString &, void *)
+// void QXmlSimpleReader::setProperty(const QString &name, void *value)
 
 
 static void _init_f_setProperty_2973 (qt_gsi::GenericMethod *decl)
@@ -442,27 +442,27 @@ namespace gsi
 
 static gsi::Methods methods_QXmlSimpleReader () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("DTDHandler", "@brief Method () const\nThis is a reimplementation of QXmlReader::DTDHandler", true, &_init_f_DTDHandler_c0, &_call_f_DTDHandler_c0);
-  methods += new qt_gsi::GenericMethod (":contentHandler", "@brief Method () const\nThis is a reimplementation of QXmlReader::contentHandler", true, &_init_f_contentHandler_c0, &_call_f_contentHandler_c0);
-  methods += new qt_gsi::GenericMethod (":declHandler", "@brief Method () const\nThis is a reimplementation of QXmlReader::declHandler", true, &_init_f_declHandler_c0, &_call_f_declHandler_c0);
-  methods += new qt_gsi::GenericMethod (":entityResolver", "@brief Method () const\nThis is a reimplementation of QXmlReader::entityResolver", true, &_init_f_entityResolver_c0, &_call_f_entityResolver_c0);
-  methods += new qt_gsi::GenericMethod (":errorHandler", "@brief Method () const\nThis is a reimplementation of QXmlReader::errorHandler", true, &_init_f_errorHandler_c0, &_call_f_errorHandler_c0);
-  methods += new qt_gsi::GenericMethod ("feature", "@brief Method (const QString &, bool *) const\nThis is a reimplementation of QXmlReader::feature", true, &_init_f_feature_c2967, &_call_f_feature_c2967);
-  methods += new qt_gsi::GenericMethod ("hasFeature", "@brief Method (const QString &) const\nThis is a reimplementation of QXmlReader::hasFeature", true, &_init_f_hasFeature_c2025, &_call_f_hasFeature_c2025);
-  methods += new qt_gsi::GenericMethod ("hasProperty", "@brief Method (const QString &) const\nThis is a reimplementation of QXmlReader::hasProperty", true, &_init_f_hasProperty_c2025, &_call_f_hasProperty_c2025);
-  methods += new qt_gsi::GenericMethod (":lexicalHandler", "@brief Method () const\nThis is a reimplementation of QXmlReader::lexicalHandler", true, &_init_f_lexicalHandler_c0, &_call_f_lexicalHandler_c0);
-  methods += new qt_gsi::GenericMethod ("parse", "@brief Method (const QXmlInputSource *)\nThis is a reimplementation of QXmlReader::parse", false, &_init_f_parse_2856, &_call_f_parse_2856);
-  methods += new qt_gsi::GenericMethod ("parse", "@brief Method (const QXmlInputSource *, bool)\n", false, &_init_f_parse_3612, &_call_f_parse_3612);
+  methods += new qt_gsi::GenericMethod ("DTDHandler", "@brief Method QXmlDTDHandler *QXmlSimpleReader::DTDHandler()\nThis is a reimplementation of QXmlReader::DTDHandler", true, &_init_f_DTDHandler_c0, &_call_f_DTDHandler_c0);
+  methods += new qt_gsi::GenericMethod (":contentHandler", "@brief Method QXmlContentHandler *QXmlSimpleReader::contentHandler()\nThis is a reimplementation of QXmlReader::contentHandler", true, &_init_f_contentHandler_c0, &_call_f_contentHandler_c0);
+  methods += new qt_gsi::GenericMethod (":declHandler", "@brief Method QXmlDeclHandler *QXmlSimpleReader::declHandler()\nThis is a reimplementation of QXmlReader::declHandler", true, &_init_f_declHandler_c0, &_call_f_declHandler_c0);
+  methods += new qt_gsi::GenericMethod (":entityResolver", "@brief Method QXmlEntityResolver *QXmlSimpleReader::entityResolver()\nThis is a reimplementation of QXmlReader::entityResolver", true, &_init_f_entityResolver_c0, &_call_f_entityResolver_c0);
+  methods += new qt_gsi::GenericMethod (":errorHandler", "@brief Method QXmlErrorHandler *QXmlSimpleReader::errorHandler()\nThis is a reimplementation of QXmlReader::errorHandler", true, &_init_f_errorHandler_c0, &_call_f_errorHandler_c0);
+  methods += new qt_gsi::GenericMethod ("feature", "@brief Method bool QXmlSimpleReader::feature(const QString &name, bool *ok)\nThis is a reimplementation of QXmlReader::feature", true, &_init_f_feature_c2967, &_call_f_feature_c2967);
+  methods += new qt_gsi::GenericMethod ("hasFeature", "@brief Method bool QXmlSimpleReader::hasFeature(const QString &name)\nThis is a reimplementation of QXmlReader::hasFeature", true, &_init_f_hasFeature_c2025, &_call_f_hasFeature_c2025);
+  methods += new qt_gsi::GenericMethod ("hasProperty", "@brief Method bool QXmlSimpleReader::hasProperty(const QString &name)\nThis is a reimplementation of QXmlReader::hasProperty", true, &_init_f_hasProperty_c2025, &_call_f_hasProperty_c2025);
+  methods += new qt_gsi::GenericMethod (":lexicalHandler", "@brief Method QXmlLexicalHandler *QXmlSimpleReader::lexicalHandler()\nThis is a reimplementation of QXmlReader::lexicalHandler", true, &_init_f_lexicalHandler_c0, &_call_f_lexicalHandler_c0);
+  methods += new qt_gsi::GenericMethod ("parse", "@brief Method bool QXmlSimpleReader::parse(const QXmlInputSource *input)\nThis is a reimplementation of QXmlReader::parse", false, &_init_f_parse_2856, &_call_f_parse_2856);
+  methods += new qt_gsi::GenericMethod ("parse", "@brief Method bool QXmlSimpleReader::parse(const QXmlInputSource *input, bool incremental)\n", false, &_init_f_parse_3612, &_call_f_parse_3612);
   methods += new qt_gsi::GenericMethod ("parseContinue", "@brief Method bool QXmlSimpleReader::parseContinue()\n", false, &_init_f_parseContinue_0, &_call_f_parseContinue_0);
-  methods += new qt_gsi::GenericMethod ("property", "@brief Method (const QString &, bool *) const\nThis is a reimplementation of QXmlReader::property", true, &_init_f_property_c2967, &_call_f_property_c2967);
-  methods += new qt_gsi::GenericMethod ("setContentHandler|contentHandler=", "@brief Method (QXmlContentHandler *)\nThis is a reimplementation of QXmlReader::setContentHandler", false, &_init_f_setContentHandler_2441, &_call_f_setContentHandler_2441);
-  methods += new qt_gsi::GenericMethod ("setDTDHandler", "@brief Method (QXmlDTDHandler *)\nThis is a reimplementation of QXmlReader::setDTDHandler", false, &_init_f_setDTDHandler_1930, &_call_f_setDTDHandler_1930);
-  methods += new qt_gsi::GenericMethod ("setDeclHandler|declHandler=", "@brief Method (QXmlDeclHandler *)\nThis is a reimplementation of QXmlReader::setDeclHandler", false, &_init_f_setDeclHandler_2086, &_call_f_setDeclHandler_2086);
-  methods += new qt_gsi::GenericMethod ("setEntityResolver|entityResolver=", "@brief Method (QXmlEntityResolver *)\nThis is a reimplementation of QXmlReader::setEntityResolver", false, &_init_f_setEntityResolver_2495, &_call_f_setEntityResolver_2495);
-  methods += new qt_gsi::GenericMethod ("setErrorHandler|errorHandler=", "@brief Method (QXmlErrorHandler *)\nThis is a reimplementation of QXmlReader::setErrorHandler", false, &_init_f_setErrorHandler_2232, &_call_f_setErrorHandler_2232);
-  methods += new qt_gsi::GenericMethod ("setFeature", "@brief Method (const QString &, bool)\nThis is a reimplementation of QXmlReader::setFeature", false, &_init_f_setFeature_2781, &_call_f_setFeature_2781);
-  methods += new qt_gsi::GenericMethod ("setLexicalHandler|lexicalHandler=", "@brief Method (QXmlLexicalHandler *)\nThis is a reimplementation of QXmlReader::setLexicalHandler", false, &_init_f_setLexicalHandler_2416, &_call_f_setLexicalHandler_2416);
-  methods += new qt_gsi::GenericMethod ("setProperty", "@brief Method (const QString &, void *)\nThis is a reimplementation of QXmlReader::setProperty", false, &_init_f_setProperty_2973, &_call_f_setProperty_2973);
+  methods += new qt_gsi::GenericMethod ("property", "@brief Method void *QXmlSimpleReader::property(const QString &name, bool *ok)\nThis is a reimplementation of QXmlReader::property", true, &_init_f_property_c2967, &_call_f_property_c2967);
+  methods += new qt_gsi::GenericMethod ("setContentHandler|contentHandler=", "@brief Method void QXmlSimpleReader::setContentHandler(QXmlContentHandler *handler)\nThis is a reimplementation of QXmlReader::setContentHandler", false, &_init_f_setContentHandler_2441, &_call_f_setContentHandler_2441);
+  methods += new qt_gsi::GenericMethod ("setDTDHandler", "@brief Method void QXmlSimpleReader::setDTDHandler(QXmlDTDHandler *handler)\nThis is a reimplementation of QXmlReader::setDTDHandler", false, &_init_f_setDTDHandler_1930, &_call_f_setDTDHandler_1930);
+  methods += new qt_gsi::GenericMethod ("setDeclHandler|declHandler=", "@brief Method void QXmlSimpleReader::setDeclHandler(QXmlDeclHandler *handler)\nThis is a reimplementation of QXmlReader::setDeclHandler", false, &_init_f_setDeclHandler_2086, &_call_f_setDeclHandler_2086);
+  methods += new qt_gsi::GenericMethod ("setEntityResolver|entityResolver=", "@brief Method void QXmlSimpleReader::setEntityResolver(QXmlEntityResolver *handler)\nThis is a reimplementation of QXmlReader::setEntityResolver", false, &_init_f_setEntityResolver_2495, &_call_f_setEntityResolver_2495);
+  methods += new qt_gsi::GenericMethod ("setErrorHandler|errorHandler=", "@brief Method void QXmlSimpleReader::setErrorHandler(QXmlErrorHandler *handler)\nThis is a reimplementation of QXmlReader::setErrorHandler", false, &_init_f_setErrorHandler_2232, &_call_f_setErrorHandler_2232);
+  methods += new qt_gsi::GenericMethod ("setFeature", "@brief Method void QXmlSimpleReader::setFeature(const QString &name, bool value)\nThis is a reimplementation of QXmlReader::setFeature", false, &_init_f_setFeature_2781, &_call_f_setFeature_2781);
+  methods += new qt_gsi::GenericMethod ("setLexicalHandler|lexicalHandler=", "@brief Method void QXmlSimpleReader::setLexicalHandler(QXmlLexicalHandler *handler)\nThis is a reimplementation of QXmlReader::setLexicalHandler", false, &_init_f_setLexicalHandler_2416, &_call_f_setLexicalHandler_2416);
+  methods += new qt_gsi::GenericMethod ("setProperty", "@brief Method void QXmlSimpleReader::setProperty(const QString &name, void *value)\nThis is a reimplementation of QXmlReader::setProperty", false, &_init_f_setProperty_2973, &_call_f_setProperty_2973);
   return methods;
 }
 

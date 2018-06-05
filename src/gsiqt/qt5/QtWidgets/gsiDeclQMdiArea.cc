@@ -281,7 +281,7 @@ static void _call_f_documentMode_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// QSize QMdiArea::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -519,7 +519,7 @@ static void _call_f_setViewMode_2092 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// () const
+// QSize QMdiArea::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -730,7 +730,7 @@ static gsi::Methods methods_QMdiArea () {
   methods += new qt_gsi::GenericMethod ("closeAllSubWindows", "@brief Method void QMdiArea::closeAllSubWindows()\n", false, &_init_f_closeAllSubWindows_0, &_call_f_closeAllSubWindows_0);
   methods += new qt_gsi::GenericMethod ("currentSubWindow", "@brief Method QMdiSubWindow *QMdiArea::currentSubWindow()\n", true, &_init_f_currentSubWindow_c0, &_call_f_currentSubWindow_c0);
   methods += new qt_gsi::GenericMethod (":documentMode", "@brief Method bool QMdiArea::documentMode()\n", true, &_init_f_documentMode_c0, &_call_f_documentMode_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QAbstractScrollArea::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QMdiArea::minimumSizeHint()\nThis is a reimplementation of QAbstractScrollArea::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("removeSubWindow", "@brief Method void QMdiArea::removeSubWindow(QWidget *widget)\n", false, &_init_f_removeSubWindow_1315, &_call_f_removeSubWindow_1315);
   methods += new qt_gsi::GenericMethod ("setActivationOrder|activationOrder=", "@brief Method void QMdiArea::setActivationOrder(QMdiArea::WindowOrder order)\n", false, &_init_f_setActivationOrder_2432, &_call_f_setActivationOrder_2432);
   methods += new qt_gsi::GenericMethod ("setActiveSubWindow|activeSubWindow=", "@brief Method void QMdiArea::setActiveSubWindow(QMdiSubWindow *window)\n", false, &_init_f_setActiveSubWindow_1915, &_call_f_setActiveSubWindow_1915);
@@ -742,7 +742,7 @@ static gsi::Methods methods_QMdiArea () {
   methods += new qt_gsi::GenericMethod ("setTabsClosable|tabsClosable=", "@brief Method void QMdiArea::setTabsClosable(bool closable)\n", false, &_init_f_setTabsClosable_864, &_call_f_setTabsClosable_864);
   methods += new qt_gsi::GenericMethod ("setTabsMovable|tabsMovable=", "@brief Method void QMdiArea::setTabsMovable(bool movable)\n", false, &_init_f_setTabsMovable_864, &_call_f_setTabsMovable_864);
   methods += new qt_gsi::GenericMethod ("setViewMode|viewMode=", "@brief Method void QMdiArea::setViewMode(QMdiArea::ViewMode mode)\n", false, &_init_f_setViewMode_2092, &_call_f_setViewMode_2092);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QAbstractScrollArea::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QMdiArea::sizeHint()\nThis is a reimplementation of QAbstractScrollArea::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod ("subWindowList", "@brief Method QList<QMdiSubWindow *> QMdiArea::subWindowList(QMdiArea::WindowOrder order)\n", true, &_init_f_subWindowList_c2432, &_call_f_subWindowList_c2432);
   methods += new qt_gsi::GenericMethod (":tabPosition", "@brief Method QTabWidget::TabPosition QMdiArea::tabPosition()\n", true, &_init_f_tabPosition_c0, &_call_f_tabPosition_c0);
   methods += new qt_gsi::GenericMethod (":tabShape", "@brief Method QTabWidget::TabShape QMdiArea::tabShape()\n", true, &_init_f_tabShape_c0, &_call_f_tabShape_c0);

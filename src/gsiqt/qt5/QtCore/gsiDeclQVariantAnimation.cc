@@ -72,7 +72,7 @@ static void _call_f_currentValue_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// int QVariantAnimation::duration()
 
 
 static void _init_f_duration_c0 (qt_gsi::GenericMethod *decl)
@@ -346,7 +346,7 @@ static gsi::Methods methods_QVariantAnimation () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":currentValue", "@brief Method QVariant QVariantAnimation::currentValue()\n", true, &_init_f_currentValue_c0, &_call_f_currentValue_c0);
-  methods += new qt_gsi::GenericMethod (":duration", "@brief Method () const\nThis is a reimplementation of QAbstractAnimation::duration", true, &_init_f_duration_c0, &_call_f_duration_c0);
+  methods += new qt_gsi::GenericMethod (":duration", "@brief Method int QVariantAnimation::duration()\nThis is a reimplementation of QAbstractAnimation::duration", true, &_init_f_duration_c0, &_call_f_duration_c0);
   methods += new qt_gsi::GenericMethod (":easingCurve", "@brief Method QEasingCurve QVariantAnimation::easingCurve()\n", true, &_init_f_easingCurve_c0, &_call_f_easingCurve_c0);
   methods += new qt_gsi::GenericMethod (":endValue", "@brief Method QVariant QVariantAnimation::endValue()\n", true, &_init_f_endValue_c0, &_call_f_endValue_c0);
   methods += new qt_gsi::GenericMethod ("keyValueAt", "@brief Method QVariant QVariantAnimation::keyValueAt(double step)\n", true, &_init_f_keyValueAt_c1071, &_call_f_keyValueAt_c1071);

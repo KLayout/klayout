@@ -195,7 +195,7 @@ static void _call_f_setWritingSystem_3214 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// () const
+// QSize QFontComboBox::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -330,7 +330,7 @@ static gsi::Methods methods_QFontComboBox () {
   methods += new qt_gsi::GenericMethod ("setCurrentFont|currentFont=", "@brief Method void QFontComboBox::setCurrentFont(const QFont &f)\n", false, &_init_f_setCurrentFont_1801, &_call_f_setCurrentFont_1801);
   methods += new qt_gsi::GenericMethod ("setFontFilters|fontFilters=", "@brief Method void QFontComboBox::setFontFilters(QFlags<QFontComboBox::FontFilter> filters)\n", false, &_init_f_setFontFilters_3550, &_call_f_setFontFilters_3550);
   methods += new qt_gsi::GenericMethod ("setWritingSystem|writingSystem=", "@brief Method void QFontComboBox::setWritingSystem(QFontDatabase::WritingSystem)\n", false, &_init_f_setWritingSystem_3214, &_call_f_setWritingSystem_3214);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QComboBox::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QFontComboBox::sizeHint()\nThis is a reimplementation of QComboBox::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":writingSystem", "@brief Method QFontDatabase::WritingSystem QFontComboBox::writingSystem()\n", true, &_init_f_writingSystem_c0, &_call_f_writingSystem_c0);
   methods += gsi::qt_signal<int > ("activated(int)", "activated", gsi::arg("index"), "@brief Signal declaration for QFontComboBox::activated(int index)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("activated(const QString &)", "activated_qs", gsi::arg("arg1"), "@brief Signal declaration for QFontComboBox::activated(const QString &)\nYou can bind a procedure to this signal.");

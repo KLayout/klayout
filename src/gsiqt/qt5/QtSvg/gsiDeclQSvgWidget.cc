@@ -156,7 +156,7 @@ static void _call_f_renderer_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// QSize QSvgWidget::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -230,7 +230,7 @@ static gsi::Methods methods_QSvgWidget () {
   methods += new qt_gsi::GenericMethod ("load", "@brief Method void QSvgWidget::load(const QString &file)\n", false, &_init_f_load_2025, &_call_f_load_2025);
   methods += new qt_gsi::GenericMethod ("load", "@brief Method void QSvgWidget::load(const QByteArray &contents)\n", false, &_init_f_load_2309, &_call_f_load_2309);
   methods += new qt_gsi::GenericMethod ("renderer", "@brief Method QSvgRenderer *QSvgWidget::renderer()\n", true, &_init_f_renderer_c0, &_call_f_renderer_c0);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QSvgWidget::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QSvgWidget::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSvgWidget::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QIcon & > ("windowIconChanged(const QIcon &)", "windowIconChanged", gsi::arg("icon"), "@brief Signal declaration for QSvgWidget::windowIconChanged(const QIcon &icon)\nYou can bind a procedure to this signal.");

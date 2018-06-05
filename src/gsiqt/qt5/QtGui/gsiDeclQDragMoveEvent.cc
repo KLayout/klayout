@@ -42,7 +42,7 @@
 // -----------------------------------------------------------------------
 // class QDragMoveEvent
 
-// ()
+// void QDragMoveEvent::accept()
 
 
 static void _init_f_accept_0 (qt_gsi::GenericMethod *decl)
@@ -58,7 +58,7 @@ static void _call_f_accept_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (const QRect &)
+// void QDragMoveEvent::accept(const QRect &r)
 
 
 static void _init_f_accept_1792 (qt_gsi::GenericMethod *decl)
@@ -93,7 +93,7 @@ static void _call_f_answerRect_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// ()
+// void QDragMoveEvent::ignore()
 
 
 static void _init_f_ignore_0 (qt_gsi::GenericMethod *decl)
@@ -109,7 +109,7 @@ static void _call_f_ignore_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (const QRect &)
+// void QDragMoveEvent::ignore(const QRect &r)
 
 
 static void _init_f_ignore_1792 (qt_gsi::GenericMethod *decl)
@@ -134,11 +134,11 @@ namespace gsi
 
 static gsi::Methods methods_QDragMoveEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("accept", "@brief Method ()\n", false, &_init_f_accept_0, &_call_f_accept_0);
-  methods += new qt_gsi::GenericMethod ("accept", "@brief Method (const QRect &)\n", false, &_init_f_accept_1792, &_call_f_accept_1792);
+  methods += new qt_gsi::GenericMethod ("accept", "@brief Method void QDragMoveEvent::accept()\n", false, &_init_f_accept_0, &_call_f_accept_0);
+  methods += new qt_gsi::GenericMethod ("accept", "@brief Method void QDragMoveEvent::accept(const QRect &r)\n", false, &_init_f_accept_1792, &_call_f_accept_1792);
   methods += new qt_gsi::GenericMethod ("answerRect", "@brief Method QRect QDragMoveEvent::answerRect()\n", true, &_init_f_answerRect_c0, &_call_f_answerRect_c0);
-  methods += new qt_gsi::GenericMethod ("ignore", "@brief Method ()\n", false, &_init_f_ignore_0, &_call_f_ignore_0);
-  methods += new qt_gsi::GenericMethod ("ignore", "@brief Method (const QRect &)\n", false, &_init_f_ignore_1792, &_call_f_ignore_1792);
+  methods += new qt_gsi::GenericMethod ("ignore", "@brief Method void QDragMoveEvent::ignore()\n", false, &_init_f_ignore_0, &_call_f_ignore_0);
+  methods += new qt_gsi::GenericMethod ("ignore", "@brief Method void QDragMoveEvent::ignore(const QRect &r)\n", false, &_init_f_ignore_1792, &_call_f_ignore_1792);
   return methods;
 }
 

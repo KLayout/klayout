@@ -181,7 +181,7 @@ static void _call_f_isSizeGripEnabled_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// () const
+// QSize QDialog::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -358,7 +358,7 @@ static void _call_f_setSizeGripEnabled_864 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (bool)
+// void QDialog::setVisible(bool visible)
 
 
 static void _init_f_setVisible_864 (qt_gsi::GenericMethod *decl)
@@ -398,7 +398,7 @@ static void _call_f_showExtension_864 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// QSize QDialog::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -474,7 +474,7 @@ static gsi::Methods methods_QDialog () {
   methods += new qt_gsi::GenericMethod ("exec", "@brief Method int QDialog::exec()\n", false, &_init_f_exec_0, &_call_f_exec_0);
   methods += new qt_gsi::GenericMethod (":extension", "@brief Method QWidget *QDialog::extension()\n", true, &_init_f_extension_c0, &_call_f_extension_c0);
   methods += new qt_gsi::GenericMethod ("isSizeGripEnabled?|:sizeGripEnabled", "@brief Method bool QDialog::isSizeGripEnabled()\n", true, &_init_f_isSizeGripEnabled_c0, &_call_f_isSizeGripEnabled_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QDialog::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("open", "@brief Method void QDialog::open()\n", false, &_init_f_open_0, &_call_f_open_0);
   methods += new qt_gsi::GenericMethod (":orientation", "@brief Method Qt::Orientation QDialog::orientation()\n", true, &_init_f_orientation_c0, &_call_f_orientation_c0);
   methods += new qt_gsi::GenericMethod ("reject", "@brief Method void QDialog::reject()\n", false, &_init_f_reject_0, &_call_f_reject_0);
@@ -484,9 +484,9 @@ static gsi::Methods methods_QDialog () {
   methods += new qt_gsi::GenericMethod ("setOrientation|orientation=", "@brief Method void QDialog::setOrientation(Qt::Orientation orientation)\n", false, &_init_f_setOrientation_1913, &_call_f_setOrientation_1913);
   methods += new qt_gsi::GenericMethod ("setResult|result=", "@brief Method void QDialog::setResult(int r)\n", false, &_init_f_setResult_767, &_call_f_setResult_767);
   methods += new qt_gsi::GenericMethod ("setSizeGripEnabled|sizeGripEnabled=", "@brief Method void QDialog::setSizeGripEnabled(bool)\n", false, &_init_f_setSizeGripEnabled_864, &_call_f_setSizeGripEnabled_864);
-  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method (bool)\nThis is a reimplementation of QWidget::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
+  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QDialog::setVisible(bool visible)\nThis is a reimplementation of QWidget::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += new qt_gsi::GenericMethod ("showExtension", "@brief Method void QDialog::showExtension(bool)\n", false, &_init_f_showExtension_864, &_call_f_showExtension_864);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QDialog::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += gsi::qt_signal ("accepted()", "accepted", "@brief Signal declaration for QDialog::accepted()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QDialog::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QDialog::destroyed(QObject *)\nYou can bind a procedure to this signal.");

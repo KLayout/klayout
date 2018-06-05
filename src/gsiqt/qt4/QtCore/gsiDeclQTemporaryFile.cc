@@ -143,7 +143,7 @@ static void _call_f_autoRemove_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// () const
+// QString QTemporaryFile::fileName()
 
 
 static void _init_f_fileName_c0 (qt_gsi::GenericMethod *decl)
@@ -173,7 +173,7 @@ static void _call_f_fileTemplate_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// ()
+// bool QTemporaryFile::open()
 
 
 static void _init_f_open_0 (qt_gsi::GenericMethod *decl)
@@ -372,9 +372,9 @@ static gsi::Methods methods_QTemporaryFile () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTemporaryFile::QTemporaryFile(const QString &templateName, QObject *parent)\nThis method creates an object of class QTemporaryFile.", &_init_ctor_QTemporaryFile_3219, &_call_ctor_QTemporaryFile_3219);
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":autoRemove", "@brief Method bool QTemporaryFile::autoRemove()\n", true, &_init_f_autoRemove_c0, &_call_f_autoRemove_c0);
-  methods += new qt_gsi::GenericMethod (":fileName", "@brief Method () const\n", true, &_init_f_fileName_c0, &_call_f_fileName_c0);
+  methods += new qt_gsi::GenericMethod (":fileName", "@brief Method QString QTemporaryFile::fileName()\n", true, &_init_f_fileName_c0, &_call_f_fileName_c0);
   methods += new qt_gsi::GenericMethod (":fileTemplate", "@brief Method QString QTemporaryFile::fileTemplate()\n", true, &_init_f_fileTemplate_c0, &_call_f_fileTemplate_c0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method ()\n", false, &_init_f_open_0, &_call_f_open_0);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method bool QTemporaryFile::open()\n", false, &_init_f_open_0, &_call_f_open_0);
   methods += new qt_gsi::GenericMethod ("setAutoRemove|autoRemove=", "@brief Method void QTemporaryFile::setAutoRemove(bool b)\n", false, &_init_f_setAutoRemove_864, &_call_f_setAutoRemove_864);
   methods += new qt_gsi::GenericMethod ("setFileTemplate|fileTemplate=", "@brief Method void QTemporaryFile::setFileTemplate(const QString &name)\n", false, &_init_f_setFileTemplate_2025, &_call_f_setFileTemplate_2025);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QTemporaryFile::aboutToClose()\nYou can bind a procedure to this signal.");

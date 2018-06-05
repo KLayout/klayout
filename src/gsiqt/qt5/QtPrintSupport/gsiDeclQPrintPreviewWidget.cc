@@ -334,7 +334,7 @@ static void _call_f_setViewMode_3308 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (bool)
+// void QPrintPreviewWidget::setVisible(bool visible)
 
 
 static void _init_f_setVisible_864 (qt_gsi::GenericMethod *decl)
@@ -565,7 +565,7 @@ static gsi::Methods methods_QPrintPreviewWidget () {
   methods += new qt_gsi::GenericMethod ("setPortraitOrientation", "@brief Method void QPrintPreviewWidget::setPortraitOrientation()\n", false, &_init_f_setPortraitOrientation_0, &_call_f_setPortraitOrientation_0);
   methods += new qt_gsi::GenericMethod ("setSinglePageViewMode", "@brief Method void QPrintPreviewWidget::setSinglePageViewMode()\n", false, &_init_f_setSinglePageViewMode_0, &_call_f_setSinglePageViewMode_0);
   methods += new qt_gsi::GenericMethod ("setViewMode|viewMode=", "@brief Method void QPrintPreviewWidget::setViewMode(QPrintPreviewWidget::ViewMode viewMode)\n", false, &_init_f_setViewMode_3308, &_call_f_setViewMode_3308);
-  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method (bool)\nThis is a reimplementation of QWidget::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
+  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QPrintPreviewWidget::setVisible(bool visible)\nThis is a reimplementation of QWidget::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += new qt_gsi::GenericMethod ("setZoomFactor|zoomFactor=", "@brief Method void QPrintPreviewWidget::setZoomFactor(double zoomFactor)\n", false, &_init_f_setZoomFactor_1071, &_call_f_setZoomFactor_1071);
   methods += new qt_gsi::GenericMethod ("setZoomMode|zoomMode=", "@brief Method void QPrintPreviewWidget::setZoomMode(QPrintPreviewWidget::ZoomMode zoomMode)\n", false, &_init_f_setZoomMode_3318, &_call_f_setZoomMode_3318);
   methods += new qt_gsi::GenericMethod ("updatePreview", "@brief Method void QPrintPreviewWidget::updatePreview()\n", false, &_init_f_updatePreview_0, &_call_f_updatePreview_0);

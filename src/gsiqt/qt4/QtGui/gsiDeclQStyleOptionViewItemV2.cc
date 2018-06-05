@@ -91,7 +91,7 @@ static void _call_ctor_QStyleOptionViewItemV2_3366 (const qt_gsi::GenericStaticM
 }
 
 
-// (const QStyleOptionViewItem &)
+// QStyleOptionViewItemV2 &QStyleOptionViewItemV2::operator=(const QStyleOptionViewItem &other)
 
 
 static void _init_f_operator_eq__3366 (qt_gsi::GenericMethod *decl)
@@ -119,7 +119,7 @@ static gsi::Methods methods_QStyleOptionViewItemV2 () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionViewItemV2::QStyleOptionViewItemV2()\nThis method creates an object of class QStyleOptionViewItemV2.", &_init_ctor_QStyleOptionViewItemV2_0, &_call_ctor_QStyleOptionViewItemV2_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionViewItemV2::QStyleOptionViewItemV2(const QStyleOptionViewItemV2 &other)\nThis method creates an object of class QStyleOptionViewItemV2.", &_init_ctor_QStyleOptionViewItemV2_3502, &_call_ctor_QStyleOptionViewItemV2_3502);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionViewItemV2::QStyleOptionViewItemV2(const QStyleOptionViewItem &other)\nThis method creates an object of class QStyleOptionViewItemV2.", &_init_ctor_QStyleOptionViewItemV2_3366, &_call_ctor_QStyleOptionViewItemV2_3366);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QStyleOptionViewItem &)\n", false, &_init_f_operator_eq__3366, &_call_f_operator_eq__3366);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QStyleOptionViewItemV2 &QStyleOptionViewItemV2::operator=(const QStyleOptionViewItem &other)\n", false, &_init_f_operator_eq__3366, &_call_f_operator_eq__3366);
   return methods;
 }
 

@@ -393,7 +393,7 @@ static void _call_f_isAnchor_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// bool QTextCharFormat::isValid()
 
 
 static void _init_f_isValid_c0 (qt_gsi::GenericMethod *decl)
@@ -1148,7 +1148,7 @@ static gsi::Methods methods_QTextCharFormat () {
   methods += new qt_gsi::GenericMethod (":fontWeight", "@brief Method int QTextCharFormat::fontWeight()\n", true, &_init_f_fontWeight_c0, &_call_f_fontWeight_c0);
   methods += new qt_gsi::GenericMethod (":fontWordSpacing", "@brief Method double QTextCharFormat::fontWordSpacing()\n", true, &_init_f_fontWordSpacing_c0, &_call_f_fontWordSpacing_c0);
   methods += new qt_gsi::GenericMethod ("isAnchor?|:anchor", "@brief Method bool QTextCharFormat::isAnchor()\n", true, &_init_f_isAnchor_c0, &_call_f_isAnchor_c0);
-  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method () const\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QTextCharFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("setAnchor|anchor=", "@brief Method void QTextCharFormat::setAnchor(bool anchor)\n", false, &_init_f_setAnchor_864, &_call_f_setAnchor_864);
   methods += new qt_gsi::GenericMethod ("setAnchorHref|anchorHref=", "@brief Method void QTextCharFormat::setAnchorHref(const QString &value)\n", false, &_init_f_setAnchorHref_2025, &_call_f_setAnchorHref_2025);
   methods += new qt_gsi::GenericMethod ("setAnchorName|anchorName=", "@brief Method void QTextCharFormat::setAnchorName(const QString &name)\n", false, &_init_f_setAnchorName_2025, &_call_f_setAnchorName_2025);

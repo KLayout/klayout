@@ -58,7 +58,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)
+// bool QAbstractListModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_dropMimeData_7425 (qt_gsi::GenericMethod *decl)
@@ -89,7 +89,7 @@ static void _call_f_dropMimeData_7425 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (int, int, const QModelIndex &) const
+// QModelIndex QAbstractListModel::index(int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_index_c3713 (qt_gsi::GenericMethod *decl)
@@ -214,8 +214,8 @@ namespace gsi
 static gsi::Methods methods_QAbstractListModel () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
-  methods += new qt_gsi::GenericMethod ("index", "@brief Method (int, int, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::index", true, &_init_f_index_c3713, &_call_f_index_c3713);
+  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method bool QAbstractListModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
+  methods += new qt_gsi::GenericMethod ("index", "@brief Method QModelIndex QAbstractListModel::index(int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::index", true, &_init_f_index_c3713, &_call_f_index_c3713);
   methods += gsi::qt_signal<const QModelIndex &, const QModelIndex & > ("dataChanged(const QModelIndex &, const QModelIndex &)", "dataChanged", gsi::arg("topLeft"), gsi::arg("bottomRight"), "@brief Signal declaration for QAbstractListModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAbstractListModel::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::Orientation>::target_type &, int, int > ("headerDataChanged(Qt::Orientation, int, int)", "headerDataChanged", gsi::arg("orientation"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QAbstractListModel::headerDataChanged(Qt::Orientation orientation, int first, int last)\nYou can bind a procedure to this signal.");

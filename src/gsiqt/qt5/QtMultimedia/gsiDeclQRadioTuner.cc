@@ -57,7 +57,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// () const
+// QMultimedia::AvailabilityStatus QRadioTuner::availability()
 
 
 static void _init_f_availability_c0 (qt_gsi::GenericMethod *decl)
@@ -580,7 +580,7 @@ namespace gsi
 static gsi::Methods methods_QRadioTuner () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("availability", "@brief Method () const\nThis is a reimplementation of QMediaObject::availability", true, &_init_f_availability_c0, &_call_f_availability_c0);
+  methods += new qt_gsi::GenericMethod ("availability", "@brief Method QMultimedia::AvailabilityStatus QRadioTuner::availability()\nThis is a reimplementation of QMediaObject::availability", true, &_init_f_availability_c0, &_call_f_availability_c0);
   methods += new qt_gsi::GenericMethod (":band", "@brief Method QRadioTuner::Band QRadioTuner::band()\n", true, &_init_f_band_c0, &_call_f_band_c0);
   methods += new qt_gsi::GenericMethod ("cancelSearch", "@brief Method void QRadioTuner::cancelSearch()\n", false, &_init_f_cancelSearch_0, &_call_f_cancelSearch_0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QRadioTuner::Error QRadioTuner::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);

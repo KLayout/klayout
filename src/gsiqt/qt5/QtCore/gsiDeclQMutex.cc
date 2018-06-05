@@ -55,7 +55,7 @@ static void _call_ctor_QMutex_2507 (const qt_gsi::GenericStaticMethod * /*decl*/
 }
 
 
-// ()
+// bool QMutex::isRecursive()
 
 
 static void _init_f_isRecursive_0 (qt_gsi::GenericMethod *decl)
@@ -70,7 +70,7 @@ static void _call_f_isRecursive_0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// ()
+// void QMutex::lock()
 
 
 static void _init_f_lock_0 (qt_gsi::GenericMethod *decl)
@@ -86,7 +86,7 @@ static void _call_f_lock_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (int)
+// bool QMutex::tryLock(int timeout)
 
 
 static void _init_f_tryLock_767 (qt_gsi::GenericMethod *decl)
@@ -105,7 +105,7 @@ static void _call_f_tryLock_767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// ()
+// void QMutex::unlock()
 
 
 static void _init_f_unlock_0 (qt_gsi::GenericMethod *decl)
@@ -128,10 +128,10 @@ namespace gsi
 static gsi::Methods methods_QMutex () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMutex::QMutex(QMutex::RecursionMode mode)\nThis method creates an object of class QMutex.", &_init_ctor_QMutex_2507, &_call_ctor_QMutex_2507);
-  methods += new qt_gsi::GenericMethod ("isRecursive?", "@brief Method ()\n", false, &_init_f_isRecursive_0, &_call_f_isRecursive_0);
-  methods += new qt_gsi::GenericMethod ("lock", "@brief Method ()\n", false, &_init_f_lock_0, &_call_f_lock_0);
-  methods += new qt_gsi::GenericMethod ("tryLock", "@brief Method (int)\n", false, &_init_f_tryLock_767, &_call_f_tryLock_767);
-  methods += new qt_gsi::GenericMethod ("unlock", "@brief Method ()\n", false, &_init_f_unlock_0, &_call_f_unlock_0);
+  methods += new qt_gsi::GenericMethod ("isRecursive?", "@brief Method bool QMutex::isRecursive()\n", false, &_init_f_isRecursive_0, &_call_f_isRecursive_0);
+  methods += new qt_gsi::GenericMethod ("lock", "@brief Method void QMutex::lock()\n", false, &_init_f_lock_0, &_call_f_lock_0);
+  methods += new qt_gsi::GenericMethod ("tryLock", "@brief Method bool QMutex::tryLock(int timeout)\n", false, &_init_f_tryLock_767, &_call_f_tryLock_767);
+  methods += new qt_gsi::GenericMethod ("unlock", "@brief Method void QMutex::unlock()\n", false, &_init_f_unlock_0, &_call_f_unlock_0);
   return methods;
 }
 

@@ -42,7 +42,7 @@
 // -----------------------------------------------------------------------
 // class QSimpleXmlNodeModel
 
-// (const QXmlNodeModelIndex &) const
+// QUrl QSimpleXmlNodeModel::baseUri(const QXmlNodeModelIndex &node)
 
 
 static void _init_f_baseUri_c3090 (qt_gsi::GenericMethod *decl)
@@ -61,7 +61,7 @@ static void _call_f_baseUri_c3090 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QXmlName &) const
+// QXmlNodeModelIndex QSimpleXmlNodeModel::elementById(const QXmlName &id)
 
 
 static void _init_f_elementById_c2084 (qt_gsi::GenericMethod *decl)
@@ -95,7 +95,7 @@ static void _call_f_namePool_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QXmlNodeModelIndex &) const
+// QVector<QXmlName> QSimpleXmlNodeModel::namespaceBindings(const QXmlNodeModelIndex &)
 
 
 static void _init_f_namespaceBindings_c3090 (qt_gsi::GenericMethod *decl)
@@ -114,7 +114,7 @@ static void _call_f_namespaceBindings_c3090 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (const QXmlName &) const
+// QVector<QXmlNodeModelIndex> QSimpleXmlNodeModel::nodesByIdref(const QXmlName &idref)
 
 
 static void _init_f_nodesByIdref_c2084 (qt_gsi::GenericMethod *decl)
@@ -133,7 +133,7 @@ static void _call_f_nodesByIdref_c2084 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QXmlNodeModelIndex &) const
+// QString QSimpleXmlNodeModel::stringValue(const QXmlNodeModelIndex &node)
 
 
 static void _init_f_stringValue_c3090 (qt_gsi::GenericMethod *decl)
@@ -158,12 +158,12 @@ namespace gsi
 
 static gsi::Methods methods_QSimpleXmlNodeModel () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("baseUri", "@brief Method (const QXmlNodeModelIndex &) const\nThis is a reimplementation of QAbstractXmlNodeModel::baseUri", true, &_init_f_baseUri_c3090, &_call_f_baseUri_c3090);
-  methods += new qt_gsi::GenericMethod ("elementById", "@brief Method (const QXmlName &) const\nThis is a reimplementation of QAbstractXmlNodeModel::elementById", true, &_init_f_elementById_c2084, &_call_f_elementById_c2084);
+  methods += new qt_gsi::GenericMethod ("baseUri", "@brief Method QUrl QSimpleXmlNodeModel::baseUri(const QXmlNodeModelIndex &node)\nThis is a reimplementation of QAbstractXmlNodeModel::baseUri", true, &_init_f_baseUri_c3090, &_call_f_baseUri_c3090);
+  methods += new qt_gsi::GenericMethod ("elementById", "@brief Method QXmlNodeModelIndex QSimpleXmlNodeModel::elementById(const QXmlName &id)\nThis is a reimplementation of QAbstractXmlNodeModel::elementById", true, &_init_f_elementById_c2084, &_call_f_elementById_c2084);
   methods += new qt_gsi::GenericMethod ("namePool", "@brief Method QXmlNamePool &QSimpleXmlNodeModel::namePool()\n", true, &_init_f_namePool_c0, &_call_f_namePool_c0);
-  methods += new qt_gsi::GenericMethod ("namespaceBindings", "@brief Method (const QXmlNodeModelIndex &) const\nThis is a reimplementation of QAbstractXmlNodeModel::namespaceBindings", true, &_init_f_namespaceBindings_c3090, &_call_f_namespaceBindings_c3090);
-  methods += new qt_gsi::GenericMethod ("nodesByIdref", "@brief Method (const QXmlName &) const\nThis is a reimplementation of QAbstractXmlNodeModel::nodesByIdref", true, &_init_f_nodesByIdref_c2084, &_call_f_nodesByIdref_c2084);
-  methods += new qt_gsi::GenericMethod ("stringValue", "@brief Method (const QXmlNodeModelIndex &) const\nThis is a reimplementation of QAbstractXmlNodeModel::stringValue", true, &_init_f_stringValue_c3090, &_call_f_stringValue_c3090);
+  methods += new qt_gsi::GenericMethod ("namespaceBindings", "@brief Method QVector<QXmlName> QSimpleXmlNodeModel::namespaceBindings(const QXmlNodeModelIndex &)\nThis is a reimplementation of QAbstractXmlNodeModel::namespaceBindings", true, &_init_f_namespaceBindings_c3090, &_call_f_namespaceBindings_c3090);
+  methods += new qt_gsi::GenericMethod ("nodesByIdref", "@brief Method QVector<QXmlNodeModelIndex> QSimpleXmlNodeModel::nodesByIdref(const QXmlName &idref)\nThis is a reimplementation of QAbstractXmlNodeModel::nodesByIdref", true, &_init_f_nodesByIdref_c2084, &_call_f_nodesByIdref_c2084);
+  methods += new qt_gsi::GenericMethod ("stringValue", "@brief Method QString QSimpleXmlNodeModel::stringValue(const QXmlNodeModelIndex &node)\nThis is a reimplementation of QAbstractXmlNodeModel::stringValue", true, &_init_f_stringValue_c3090, &_call_f_stringValue_c3090);
   return methods;
 }
 

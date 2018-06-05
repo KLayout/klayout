@@ -56,7 +56,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QMatrix4x4 *) const
+// void QGraphicsScale::applyTo(QMatrix4x4 *matrix)
 
 
 static void _init_f_applyTo_c1556 (qt_gsi::GenericMethod *decl)
@@ -316,7 +316,7 @@ namespace gsi
 static gsi::Methods methods_QGraphicsScale () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("applyTo", "@brief Method (QMatrix4x4 *) const\nThis is a reimplementation of QGraphicsTransform::applyTo", true, &_init_f_applyTo_c1556, &_call_f_applyTo_c1556);
+  methods += new qt_gsi::GenericMethod ("applyTo", "@brief Method void QGraphicsScale::applyTo(QMatrix4x4 *matrix)\nThis is a reimplementation of QGraphicsTransform::applyTo", true, &_init_f_applyTo_c1556, &_call_f_applyTo_c1556);
   methods += new qt_gsi::GenericMethod (":origin", "@brief Method QVector3D QGraphicsScale::origin()\n", true, &_init_f_origin_c0, &_call_f_origin_c0);
   methods += new qt_gsi::GenericMethod ("setOrigin|origin=", "@brief Method void QGraphicsScale::setOrigin(const QVector3D &point)\n", false, &_init_f_setOrigin_2140, &_call_f_setOrigin_2140);
   methods += new qt_gsi::GenericMethod ("setXScale|xScale=", "@brief Method void QGraphicsScale::setXScale(double)\n", false, &_init_f_setXScale_1071, &_call_f_setXScale_1071);

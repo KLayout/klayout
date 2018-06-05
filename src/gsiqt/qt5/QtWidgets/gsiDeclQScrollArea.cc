@@ -172,7 +172,7 @@ static void _call_f_ensureWidgetVisible_2633 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// (bool)
+// bool QScrollArea::focusNextPrevChild(bool next)
 
 
 static void _init_f_focusNextPrevChild_864 (qt_gsi::GenericMethod *decl)
@@ -251,7 +251,7 @@ static void _call_f_setWidgetResizable_864 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// QSize QScrollArea::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -370,11 +370,11 @@ static gsi::Methods methods_QScrollArea () {
   methods += new qt_gsi::GenericMethod (":alignment", "@brief Method QFlags<Qt::AlignmentFlag> QScrollArea::alignment()\n", true, &_init_f_alignment_c0, &_call_f_alignment_c0);
   methods += new qt_gsi::GenericMethod ("ensureVisible", "@brief Method void QScrollArea::ensureVisible(int x, int y, int xmargin, int ymargin)\n", false, &_init_f_ensureVisible_2744, &_call_f_ensureVisible_2744);
   methods += new qt_gsi::GenericMethod ("ensureWidgetVisible", "@brief Method void QScrollArea::ensureWidgetVisible(QWidget *childWidget, int xmargin, int ymargin)\n", false, &_init_f_ensureWidgetVisible_2633, &_call_f_ensureWidgetVisible_2633);
-  methods += new qt_gsi::GenericMethod ("focusNextPrevChild", "@brief Method (bool)\nThis is a reimplementation of QWidget::focusNextPrevChild", false, &_init_f_focusNextPrevChild_864, &_call_f_focusNextPrevChild_864);
+  methods += new qt_gsi::GenericMethod ("focusNextPrevChild", "@brief Method bool QScrollArea::focusNextPrevChild(bool next)\nThis is a reimplementation of QWidget::focusNextPrevChild", false, &_init_f_focusNextPrevChild_864, &_call_f_focusNextPrevChild_864);
   methods += new qt_gsi::GenericMethod ("setAlignment|alignment=", "@brief Method void QScrollArea::setAlignment(QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_setAlignment_2750, &_call_f_setAlignment_2750);
   methods += new qt_gsi::GenericMethod ("setWidget|widget=", "@brief Method void QScrollArea::setWidget(QWidget *widget)\n", false, &_init_f_setWidget_1315, &_call_f_setWidget_1315);
   methods += new qt_gsi::GenericMethod ("setWidgetResizable|widgetResizable=", "@brief Method void QScrollArea::setWidgetResizable(bool resizable)\n", false, &_init_f_setWidgetResizable_864, &_call_f_setWidgetResizable_864);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QAbstractScrollArea::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QScrollArea::sizeHint()\nThis is a reimplementation of QAbstractScrollArea::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod ("takeWidget", "@brief Method QWidget *QScrollArea::takeWidget()\n", false, &_init_f_takeWidget_0, &_call_f_takeWidget_0);
   methods += new qt_gsi::GenericMethod (":widget", "@brief Method QWidget *QScrollArea::widget()\n", true, &_init_f_widget_c0, &_call_f_widget_c0);
   methods += new qt_gsi::GenericMethod (":widgetResizable", "@brief Method bool QScrollArea::widgetResizable()\n", true, &_init_f_widgetResizable_c0, &_call_f_widgetResizable_c0);

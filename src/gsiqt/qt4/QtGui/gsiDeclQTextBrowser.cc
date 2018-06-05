@@ -268,7 +268,7 @@ static void _call_f_isForwardAvailable_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// (int, const QUrl &)
+// QVariant QTextBrowser::loadResource(int type, const QUrl &name)
 
 
 static void _init_f_loadResource_2360 (qt_gsi::GenericMethod *decl)
@@ -556,7 +556,7 @@ static gsi::Methods methods_QTextBrowser () {
   methods += new qt_gsi::GenericMethod ("home", "@brief Method void QTextBrowser::home()\n", false, &_init_f_home_0, &_call_f_home_0);
   methods += new qt_gsi::GenericMethod ("isBackwardAvailable?", "@brief Method bool QTextBrowser::isBackwardAvailable()\n", true, &_init_f_isBackwardAvailable_c0, &_call_f_isBackwardAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isForwardAvailable?", "@brief Method bool QTextBrowser::isForwardAvailable()\n", true, &_init_f_isForwardAvailable_c0, &_call_f_isForwardAvailable_c0);
-  methods += new qt_gsi::GenericMethod ("loadResource", "@brief Method (int, const QUrl &)\nThis is a reimplementation of QTextEdit::loadResource", false, &_init_f_loadResource_2360, &_call_f_loadResource_2360);
+  methods += new qt_gsi::GenericMethod ("loadResource", "@brief Method QVariant QTextBrowser::loadResource(int type, const QUrl &name)\nThis is a reimplementation of QTextEdit::loadResource", false, &_init_f_loadResource_2360, &_call_f_loadResource_2360);
   methods += new qt_gsi::GenericMethod (":openExternalLinks", "@brief Method bool QTextBrowser::openExternalLinks()\n", true, &_init_f_openExternalLinks_c0, &_call_f_openExternalLinks_c0);
   methods += new qt_gsi::GenericMethod (":openLinks", "@brief Method bool QTextBrowser::openLinks()\n", true, &_init_f_openLinks_c0, &_call_f_openLinks_c0);
   methods += new qt_gsi::GenericMethod ("reload", "@brief Method void QTextBrowser::reload()\n", false, &_init_f_reload_0, &_call_f_reload_0);

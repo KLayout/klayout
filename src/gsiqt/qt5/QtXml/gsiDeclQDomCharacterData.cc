@@ -182,7 +182,7 @@ static void _call_f_length_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// QDomNode::NodeType QDomCharacterData::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -197,7 +197,7 @@ static void _call_f_nodeType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QDomCharacterData &)
+// QDomCharacterData &QDomCharacterData::operator=(const QDomCharacterData &)
 
 
 static void _init_f_operator_eq__2969 (qt_gsi::GenericMethod *decl)
@@ -297,8 +297,8 @@ static gsi::Methods methods_QDomCharacterData () {
   methods += new qt_gsi::GenericMethod ("deleteData", "@brief Method void QDomCharacterData::deleteData(unsigned long int offset, unsigned long int count)\n", false, &_init_f_deleteData_4588, &_call_f_deleteData_4588);
   methods += new qt_gsi::GenericMethod ("insertData", "@brief Method void QDomCharacterData::insertData(unsigned long int offset, const QString &arg)\n", false, &_init_f_insertData_4265, &_call_f_insertData_4265);
   methods += new qt_gsi::GenericMethod ("length", "@brief Method int QDomCharacterData::length()\n", true, &_init_f_length_c0, &_call_f_length_c0);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomCharacterData &)\n", false, &_init_f_operator_eq__2969, &_call_f_operator_eq__2969);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomCharacterData::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomCharacterData &QDomCharacterData::operator=(const QDomCharacterData &)\n", false, &_init_f_operator_eq__2969, &_call_f_operator_eq__2969);
   methods += new qt_gsi::GenericMethod ("replaceData", "@brief Method void QDomCharacterData::replaceData(unsigned long int offset, unsigned long int count, const QString &arg)\n", false, &_init_f_replaceData_6505, &_call_f_replaceData_6505);
   methods += new qt_gsi::GenericMethod ("setData|data=", "@brief Method void QDomCharacterData::setData(const QString &)\n", false, &_init_f_setData_2025, &_call_f_setData_2025);
   methods += new qt_gsi::GenericMethod ("substringData", "@brief Method QString QDomCharacterData::substringData(unsigned long int offset, unsigned long int count)\n", false, &_init_f_substringData_4588, &_call_f_substringData_4588);

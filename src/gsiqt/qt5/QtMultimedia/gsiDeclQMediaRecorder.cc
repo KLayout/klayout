@@ -278,7 +278,7 @@ static void _call_f_isMuted_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QMediaObject *QMediaRecorder::mediaObject()
 
 
 static void _init_f_mediaObject_c0 (qt_gsi::GenericMethod *decl)
@@ -848,7 +848,7 @@ static gsi::Methods methods_QMediaRecorder () {
   methods += new qt_gsi::GenericMethod ("isMetaDataAvailable?|:metaDataAvailable", "@brief Method bool QMediaRecorder::isMetaDataAvailable()\n", true, &_init_f_isMetaDataAvailable_c0, &_call_f_isMetaDataAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isMetaDataWritable?|:metaDataWritable", "@brief Method bool QMediaRecorder::isMetaDataWritable()\n", true, &_init_f_isMetaDataWritable_c0, &_call_f_isMetaDataWritable_c0);
   methods += new qt_gsi::GenericMethod ("isMuted?|:muted", "@brief Method bool QMediaRecorder::isMuted()\n", true, &_init_f_isMuted_c0, &_call_f_isMuted_c0);
-  methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Method () const\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
+  methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Method QMediaObject *QMediaRecorder::mediaObject()\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
   methods += new qt_gsi::GenericMethod ("metaData", "@brief Method QVariant QMediaRecorder::metaData(const QString &key)\n", true, &_init_f_metaData_c2025, &_call_f_metaData_c2025);
   methods += new qt_gsi::GenericMethod (":outputLocation", "@brief Method QUrl QMediaRecorder::outputLocation()\n", true, &_init_f_outputLocation_c0, &_call_f_outputLocation_c0);
   methods += new qt_gsi::GenericMethod ("pause", "@brief Method void QMediaRecorder::pause()\n", false, &_init_f_pause_0, &_call_f_pause_0);

@@ -62,7 +62,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (const QModelIndex &) const
+// int QIdentityProxyModel::columnCount(const QModelIndex &parent)
 
 
 static void _init_f_columnCount_c2395 (qt_gsi::GenericMethod *decl)
@@ -81,7 +81,7 @@ static void _call_f_columnCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)
+// bool QIdentityProxyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_dropMimeData_7425 (qt_gsi::GenericMethod *decl)
@@ -112,7 +112,7 @@ static void _call_f_dropMimeData_7425 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (int, Qt::Orientation, int) const
+// QVariant QIdentityProxyModel::headerData(int section, Qt::Orientation orientation, int role)
 
 
 static void _init_f_headerData_c3231 (qt_gsi::GenericMethod *decl)
@@ -137,7 +137,7 @@ static void _call_f_headerData_c3231 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (int, int, const QModelIndex &) const
+// QModelIndex QIdentityProxyModel::index(int row, int column, const QModelIndex &parent)
 
 
 static void _init_f_index_c3713 (qt_gsi::GenericMethod *decl)
@@ -162,7 +162,7 @@ static void _call_f_index_c3713 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QIdentityProxyModel::insertColumns(int column, int count, const QModelIndex &parent)
 
 
 static void _init_f_insertColumns_3713 (qt_gsi::GenericMethod *decl)
@@ -187,7 +187,7 @@ static void _call_f_insertColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QIdentityProxyModel::insertRows(int row, int count, const QModelIndex &parent)
 
 
 static void _init_f_insertRows_3713 (qt_gsi::GenericMethod *decl)
@@ -212,7 +212,7 @@ static void _call_f_insertRows_3713 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QModelIndex &) const
+// QModelIndex QIdentityProxyModel::mapFromSource(const QModelIndex &sourceIndex)
 
 
 static void _init_f_mapFromSource_c2395 (qt_gsi::GenericMethod *decl)
@@ -231,7 +231,7 @@ static void _call_f_mapFromSource_c2395 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (const QItemSelection &) const
+// QItemSelection QIdentityProxyModel::mapSelectionFromSource(const QItemSelection &selection)
 
 
 static void _init_f_mapSelectionFromSource_c2727 (qt_gsi::GenericMethod *decl)
@@ -250,7 +250,7 @@ static void _call_f_mapSelectionFromSource_c2727 (const qt_gsi::GenericMethod * 
 }
 
 
-// (const QItemSelection &) const
+// QItemSelection QIdentityProxyModel::mapSelectionToSource(const QItemSelection &selection)
 
 
 static void _init_f_mapSelectionToSource_c2727 (qt_gsi::GenericMethod *decl)
@@ -269,7 +269,7 @@ static void _call_f_mapSelectionToSource_c2727 (const qt_gsi::GenericMethod * /*
 }
 
 
-// (const QModelIndex &) const
+// QModelIndex QIdentityProxyModel::mapToSource(const QModelIndex &proxyIndex)
 
 
 static void _init_f_mapToSource_c2395 (qt_gsi::GenericMethod *decl)
@@ -288,7 +288,7 @@ static void _call_f_mapToSource_c2395 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QModelIndex &, int, const QVariant &, int, QFlags<Qt::MatchFlag>) const
+// QList<QModelIndex> QIdentityProxyModel::match(const QModelIndex &start, int role, const QVariant &value, int hits, QFlags<Qt::MatchFlag> flags)
 
 
 static void _init_f_match_c7932 (qt_gsi::GenericMethod *decl)
@@ -319,7 +319,7 @@ static void _call_f_match_c7932 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QModelIndex &) const
+// QModelIndex QIdentityProxyModel::parent(const QModelIndex &child)
 
 
 static void _init_f_parent_c2395 (qt_gsi::GenericMethod *decl)
@@ -338,7 +338,7 @@ static void _call_f_parent_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QIdentityProxyModel::removeColumns(int column, int count, const QModelIndex &parent)
 
 
 static void _init_f_removeColumns_3713 (qt_gsi::GenericMethod *decl)
@@ -363,7 +363,7 @@ static void _call_f_removeColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QIdentityProxyModel::removeRows(int row, int count, const QModelIndex &parent)
 
 
 static void _init_f_removeRows_3713 (qt_gsi::GenericMethod *decl)
@@ -388,7 +388,7 @@ static void _call_f_removeRows_3713 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QModelIndex &) const
+// int QIdentityProxyModel::rowCount(const QModelIndex &parent)
 
 
 static void _init_f_rowCount_c2395 (qt_gsi::GenericMethod *decl)
@@ -407,7 +407,7 @@ static void _call_f_rowCount_c2395 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (QAbstractItemModel *)
+// void QIdentityProxyModel::setSourceModel(QAbstractItemModel *sourceModel)
 
 
 static void _init_f_setSourceModel_2419 (qt_gsi::GenericMethod *decl)
@@ -427,7 +427,7 @@ static void _call_f_setSourceModel_2419 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (int, int, const QModelIndex &) const
+// QModelIndex QIdentityProxyModel::sibling(int row, int column, const QModelIndex &idx)
 
 
 static void _init_f_sibling_c3713 (qt_gsi::GenericMethod *decl)
@@ -508,23 +508,23 @@ namespace gsi
 static gsi::Methods methods_QIdentityProxyModel () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::columnCount", true, &_init_f_columnCount_c2395, &_call_f_columnCount_c2395);
-  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method (const QMimeData *, Qt::DropAction, int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractProxyModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
-  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method (int, Qt::Orientation, int) const\nThis is a reimplementation of QAbstractProxyModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
-  methods += new qt_gsi::GenericMethod ("index", "@brief Method (int, int, const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::index", true, &_init_f_index_c3713, &_call_f_index_c3713);
-  methods += new qt_gsi::GenericMethod ("insertColumns", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::insertColumns", false, &_init_f_insertColumns_3713, &_call_f_insertColumns_3713);
-  methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::insertRows", false, &_init_f_insertRows_3713, &_call_f_insertRows_3713);
-  methods += new qt_gsi::GenericMethod ("mapFromSource", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractProxyModel::mapFromSource", true, &_init_f_mapFromSource_c2395, &_call_f_mapFromSource_c2395);
-  methods += new qt_gsi::GenericMethod ("mapSelectionFromSource", "@brief Method (const QItemSelection &) const\nThis is a reimplementation of QAbstractProxyModel::mapSelectionFromSource", true, &_init_f_mapSelectionFromSource_c2727, &_call_f_mapSelectionFromSource_c2727);
-  methods += new qt_gsi::GenericMethod ("mapSelectionToSource", "@brief Method (const QItemSelection &) const\nThis is a reimplementation of QAbstractProxyModel::mapSelectionToSource", true, &_init_f_mapSelectionToSource_c2727, &_call_f_mapSelectionToSource_c2727);
-  methods += new qt_gsi::GenericMethod ("mapToSource", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractProxyModel::mapToSource", true, &_init_f_mapToSource_c2395, &_call_f_mapToSource_c2395);
-  methods += new qt_gsi::GenericMethod ("match", "@brief Method (const QModelIndex &, int, const QVariant &, int, QFlags<Qt::MatchFlag>) const\nThis is a reimplementation of QAbstractItemModel::match", true, &_init_f_match_c7932, &_call_f_match_c7932);
-  methods += new qt_gsi::GenericMethod ("parent", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::parent", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
-  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
-  methods += new qt_gsi::GenericMethod ("removeRows", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::removeRows", false, &_init_f_removeRows_3713, &_call_f_removeRows_3713);
-  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
-  methods += new qt_gsi::GenericMethod ("setSourceModel|sourceModel=", "@brief Method (QAbstractItemModel *)\nThis is a reimplementation of QAbstractProxyModel::setSourceModel", false, &_init_f_setSourceModel_2419, &_call_f_setSourceModel_2419);
-  methods += new qt_gsi::GenericMethod ("sibling", "@brief Method (int, int, const QModelIndex &) const\nThis is a reimplementation of QAbstractProxyModel::sibling", true, &_init_f_sibling_c3713, &_call_f_sibling_c3713);
+  methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method int QIdentityProxyModel::columnCount(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::columnCount", true, &_init_f_columnCount_c2395, &_call_f_columnCount_c2395);
+  methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method bool QIdentityProxyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractProxyModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
+  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method QVariant QIdentityProxyModel::headerData(int section, Qt::Orientation orientation, int role)\nThis is a reimplementation of QAbstractProxyModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
+  methods += new qt_gsi::GenericMethod ("index", "@brief Method QModelIndex QIdentityProxyModel::index(int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::index", true, &_init_f_index_c3713, &_call_f_index_c3713);
+  methods += new qt_gsi::GenericMethod ("insertColumns", "@brief Method bool QIdentityProxyModel::insertColumns(int column, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::insertColumns", false, &_init_f_insertColumns_3713, &_call_f_insertColumns_3713);
+  methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method bool QIdentityProxyModel::insertRows(int row, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::insertRows", false, &_init_f_insertRows_3713, &_call_f_insertRows_3713);
+  methods += new qt_gsi::GenericMethod ("mapFromSource", "@brief Method QModelIndex QIdentityProxyModel::mapFromSource(const QModelIndex &sourceIndex)\nThis is a reimplementation of QAbstractProxyModel::mapFromSource", true, &_init_f_mapFromSource_c2395, &_call_f_mapFromSource_c2395);
+  methods += new qt_gsi::GenericMethod ("mapSelectionFromSource", "@brief Method QItemSelection QIdentityProxyModel::mapSelectionFromSource(const QItemSelection &selection)\nThis is a reimplementation of QAbstractProxyModel::mapSelectionFromSource", true, &_init_f_mapSelectionFromSource_c2727, &_call_f_mapSelectionFromSource_c2727);
+  methods += new qt_gsi::GenericMethod ("mapSelectionToSource", "@brief Method QItemSelection QIdentityProxyModel::mapSelectionToSource(const QItemSelection &selection)\nThis is a reimplementation of QAbstractProxyModel::mapSelectionToSource", true, &_init_f_mapSelectionToSource_c2727, &_call_f_mapSelectionToSource_c2727);
+  methods += new qt_gsi::GenericMethod ("mapToSource", "@brief Method QModelIndex QIdentityProxyModel::mapToSource(const QModelIndex &proxyIndex)\nThis is a reimplementation of QAbstractProxyModel::mapToSource", true, &_init_f_mapToSource_c2395, &_call_f_mapToSource_c2395);
+  methods += new qt_gsi::GenericMethod ("match", "@brief Method QList<QModelIndex> QIdentityProxyModel::match(const QModelIndex &start, int role, const QVariant &value, int hits, QFlags<Qt::MatchFlag> flags)\nThis is a reimplementation of QAbstractItemModel::match", true, &_init_f_match_c7932, &_call_f_match_c7932);
+  methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QIdentityProxyModel::parent(const QModelIndex &child)\nThis is a reimplementation of QAbstractItemModel::parent", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
+  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method bool QIdentityProxyModel::removeColumns(int column, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
+  methods += new qt_gsi::GenericMethod ("removeRows", "@brief Method bool QIdentityProxyModel::removeRows(int row, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::removeRows", false, &_init_f_removeRows_3713, &_call_f_removeRows_3713);
+  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method int QIdentityProxyModel::rowCount(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
+  methods += new qt_gsi::GenericMethod ("setSourceModel|sourceModel=", "@brief Method void QIdentityProxyModel::setSourceModel(QAbstractItemModel *sourceModel)\nThis is a reimplementation of QAbstractProxyModel::setSourceModel", false, &_init_f_setSourceModel_2419, &_call_f_setSourceModel_2419);
+  methods += new qt_gsi::GenericMethod ("sibling", "@brief Method QModelIndex QIdentityProxyModel::sibling(int row, int column, const QModelIndex &idx)\nThis is a reimplementation of QAbstractProxyModel::sibling", true, &_init_f_sibling_c3713, &_call_f_sibling_c3713);
   methods += gsi::qt_signal<const QModelIndex &, const QModelIndex &, const QVector<int> & > ("dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)", "dataChanged", gsi::arg("topLeft"), gsi::arg("bottomRight"), gsi::arg("roles"), "@brief Signal declaration for QIdentityProxyModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QIdentityProxyModel::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::Orientation>::target_type &, int, int > ("headerDataChanged(Qt::Orientation, int, int)", "headerDataChanged", gsi::arg("orientation"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QIdentityProxyModel::headerDataChanged(Qt::Orientation orientation, int first, int last)\nYou can bind a procedure to this signal.");

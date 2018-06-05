@@ -56,7 +56,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (const QString &)
+// QMediaService *QMediaServiceProviderPlugin::create(const QString &key)
 
 
 static void _init_f_create_2025u1 (qt_gsi::GenericMethod *decl)
@@ -75,7 +75,7 @@ static void _call_f_create_2025u1 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (QMediaService *)
+// void QMediaServiceProviderPlugin::release(QMediaService *service)
 
 
 static void _init_f_release_1904 (qt_gsi::GenericMethod *decl)
@@ -196,8 +196,8 @@ namespace gsi
 static gsi::Methods methods_QMediaServiceProviderPlugin () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Method (const QString &)\n", false, &_init_f_create_2025u1, &_call_f_create_2025u1);
-  methods += new qt_gsi::GenericMethod ("release", "@brief Method (QMediaService *)\nThis is a reimplementation of QMediaServiceProviderFactoryInterface::release", false, &_init_f_release_1904, &_call_f_release_1904);
+  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Method QMediaService *QMediaServiceProviderPlugin::create(const QString &key)\n", false, &_init_f_create_2025u1, &_call_f_create_2025u1);
+  methods += new qt_gsi::GenericMethod ("release", "@brief Method void QMediaServiceProviderPlugin::release(QMediaService *service)\nThis is a reimplementation of QMediaServiceProviderFactoryInterface::release", false, &_init_f_release_1904, &_call_f_release_1904);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QMediaServiceProviderPlugin::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QMediaServiceProviderPlugin::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QMediaServiceProviderPlugin::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);

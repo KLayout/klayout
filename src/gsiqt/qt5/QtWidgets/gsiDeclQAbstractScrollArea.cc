@@ -185,7 +185,7 @@ static void _call_f_maximumViewportSize_c0 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// QSize QAbstractScrollArea::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -394,7 +394,7 @@ static void _call_f_sizeAdjustPolicy_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// QSize QAbstractScrollArea::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -515,7 +515,7 @@ static gsi::Methods methods_QAbstractScrollArea () {
   methods += new qt_gsi::GenericMethod (":horizontalScrollBar", "@brief Method QScrollBar *QAbstractScrollArea::horizontalScrollBar()\n", true, &_init_f_horizontalScrollBar_c0, &_call_f_horizontalScrollBar_c0);
   methods += new qt_gsi::GenericMethod (":horizontalScrollBarPolicy", "@brief Method Qt::ScrollBarPolicy QAbstractScrollArea::horizontalScrollBarPolicy()\n", true, &_init_f_horizontalScrollBarPolicy_c0, &_call_f_horizontalScrollBarPolicy_c0);
   methods += new qt_gsi::GenericMethod ("maximumViewportSize", "@brief Method QSize QAbstractScrollArea::maximumViewportSize()\n", true, &_init_f_maximumViewportSize_c0, &_call_f_maximumViewportSize_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QAbstractScrollArea::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("scrollBarWidgets", "@brief Method QList<QWidget *> QAbstractScrollArea::scrollBarWidgets(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_scrollBarWidgets_2750, &_call_f_scrollBarWidgets_2750);
   methods += new qt_gsi::GenericMethod ("setCornerWidget|cornerWidget=", "@brief Method void QAbstractScrollArea::setCornerWidget(QWidget *widget)\n", false, &_init_f_setCornerWidget_1315, &_call_f_setCornerWidget_1315);
   methods += new qt_gsi::GenericMethod ("setHorizontalScrollBar|horizontalScrollBar=", "@brief Method void QAbstractScrollArea::setHorizontalScrollBar(QScrollBar *scrollbar)\n", false, &_init_f_setHorizontalScrollBar_1603, &_call_f_setHorizontalScrollBar_1603);
@@ -526,7 +526,7 @@ static gsi::Methods methods_QAbstractScrollArea () {
   methods += new qt_gsi::GenericMethod ("setViewport|viewport=", "@brief Method void QAbstractScrollArea::setViewport(QWidget *widget)\n", false, &_init_f_setViewport_1315, &_call_f_setViewport_1315);
   methods += new qt_gsi::GenericMethod ("setupViewport", "@brief Method void QAbstractScrollArea::setupViewport(QWidget *viewport)\n", false, &_init_f_setupViewport_1315, &_call_f_setupViewport_1315);
   methods += new qt_gsi::GenericMethod (":sizeAdjustPolicy", "@brief Method QAbstractScrollArea::SizeAdjustPolicy QAbstractScrollArea::sizeAdjustPolicy()\n", true, &_init_f_sizeAdjustPolicy_c0, &_call_f_sizeAdjustPolicy_c0);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QFrame::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QAbstractScrollArea::sizeHint()\nThis is a reimplementation of QFrame::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":verticalScrollBar", "@brief Method QScrollBar *QAbstractScrollArea::verticalScrollBar()\n", true, &_init_f_verticalScrollBar_c0, &_call_f_verticalScrollBar_c0);
   methods += new qt_gsi::GenericMethod (":verticalScrollBarPolicy", "@brief Method Qt::ScrollBarPolicy QAbstractScrollArea::verticalScrollBarPolicy()\n", true, &_init_f_verticalScrollBarPolicy_c0, &_call_f_verticalScrollBarPolicy_c0);
   methods += new qt_gsi::GenericMethod (":viewport", "@brief Method QWidget *QAbstractScrollArea::viewport()\n", true, &_init_f_viewport_c0, &_call_f_viewport_c0);

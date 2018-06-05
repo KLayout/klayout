@@ -333,7 +333,7 @@ static void _call_f_duplicatesEnabled_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (QEvent *)
+// bool QComboBox::event(QEvent *event)
 
 
 static void _init_f_event_1217 (qt_gsi::GenericMethod *decl)
@@ -445,7 +445,7 @@ static void _call_f_iconSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (Qt::InputMethodQuery) const
+// QVariant QComboBox::inputMethodQuery(Qt::InputMethodQuery)
 
 
 static void _init_f_inputMethodQuery_c2420 (qt_gsi::GenericMethod *decl)
@@ -727,7 +727,7 @@ static void _call_f_minimumContentsLength_c0 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// () const
+// QSize QComboBox::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -1350,7 +1350,7 @@ static void _call_f_sizeAdjustPolicy_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// QSize QComboBox::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -1464,13 +1464,13 @@ static gsi::Methods methods_QComboBox () {
   methods += new qt_gsi::GenericMethod (":currentIndex", "@brief Method int QComboBox::currentIndex()\n", true, &_init_f_currentIndex_c0, &_call_f_currentIndex_c0);
   methods += new qt_gsi::GenericMethod (":currentText", "@brief Method QString QComboBox::currentText()\n", true, &_init_f_currentText_c0, &_call_f_currentText_c0);
   methods += new qt_gsi::GenericMethod (":duplicatesEnabled", "@brief Method bool QComboBox::duplicatesEnabled()\n", true, &_init_f_duplicatesEnabled_c0, &_call_f_duplicatesEnabled_c0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Method (QEvent *)\nThis is a reimplementation of QWidget::event", false, &_init_f_event_1217, &_call_f_event_1217);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Method bool QComboBox::event(QEvent *event)\nThis is a reimplementation of QWidget::event", false, &_init_f_event_1217, &_call_f_event_1217);
   methods += new qt_gsi::GenericMethod ("findData", "@brief Method int QComboBox::findData(const QVariant &data, int role, QFlags<Qt::MatchFlag> flags)\n", true, &_init_f_findData_c4986, &_call_f_findData_c4986);
   methods += new qt_gsi::GenericMethod ("findText", "@brief Method int QComboBox::findText(const QString &text, QFlags<Qt::MatchFlag> flags)\n", true, &_init_f_findText_c4233, &_call_f_findText_c4233);
   methods += new qt_gsi::GenericMethod ("hasFrame|:frame", "@brief Method bool QComboBox::hasFrame()\n", true, &_init_f_hasFrame_c0, &_call_f_hasFrame_c0);
   methods += new qt_gsi::GenericMethod ("hidePopup", "@brief Method void QComboBox::hidePopup()\n", false, &_init_f_hidePopup_0, &_call_f_hidePopup_0);
   methods += new qt_gsi::GenericMethod (":iconSize", "@brief Method QSize QComboBox::iconSize()\n", true, &_init_f_iconSize_c0, &_call_f_iconSize_c0);
-  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method (Qt::InputMethodQuery) const\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
+  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method QVariant QComboBox::inputMethodQuery(Qt::InputMethodQuery)\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
   methods += new qt_gsi::GenericMethod ("insertItem", "@brief Method void QComboBox::insertItem(int index, const QString &text, const QVariant &userData)\n", false, &_init_f_insertItem_4695, &_call_f_insertItem_4695);
   methods += new qt_gsi::GenericMethod ("insertItem", "@brief Method void QComboBox::insertItem(int index, const QIcon &icon, const QString &text, const QVariant &userData)\n", false, &_init_f_insertItem_6374, &_call_f_insertItem_6374);
   methods += new qt_gsi::GenericMethod ("insertItems", "@brief Method void QComboBox::insertItems(int index, const QStringList &texts)\n", false, &_init_f_insertItems_3096, &_call_f_insertItems_3096);
@@ -1485,7 +1485,7 @@ static gsi::Methods methods_QComboBox () {
   methods += new qt_gsi::GenericMethod (":maxCount", "@brief Method int QComboBox::maxCount()\n", true, &_init_f_maxCount_c0, &_call_f_maxCount_c0);
   methods += new qt_gsi::GenericMethod (":maxVisibleItems", "@brief Method int QComboBox::maxVisibleItems()\n", true, &_init_f_maxVisibleItems_c0, &_call_f_maxVisibleItems_c0);
   methods += new qt_gsi::GenericMethod (":minimumContentsLength", "@brief Method int QComboBox::minimumContentsLength()\n", true, &_init_f_minimumContentsLength_c0, &_call_f_minimumContentsLength_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QComboBox::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod (":model", "@brief Method QAbstractItemModel *QComboBox::model()\n", true, &_init_f_model_c0, &_call_f_model_c0);
   methods += new qt_gsi::GenericMethod (":modelColumn", "@brief Method int QComboBox::modelColumn()\n", true, &_init_f_modelColumn_c0, &_call_f_modelColumn_c0);
   methods += new qt_gsi::GenericMethod ("removeItem", "@brief Method void QComboBox::removeItem(int index)\n", false, &_init_f_removeItem_767, &_call_f_removeItem_767);
@@ -1517,7 +1517,7 @@ static gsi::Methods methods_QComboBox () {
   methods += new qt_gsi::GenericMethod ("setView|view=", "@brief Method void QComboBox::setView(QAbstractItemView *itemView)\n", false, &_init_f_setView_2333, &_call_f_setView_2333);
   methods += new qt_gsi::GenericMethod ("showPopup", "@brief Method void QComboBox::showPopup()\n", false, &_init_f_showPopup_0, &_call_f_showPopup_0);
   methods += new qt_gsi::GenericMethod (":sizeAdjustPolicy", "@brief Method QComboBox::SizeAdjustPolicy QComboBox::sizeAdjustPolicy()\n", true, &_init_f_sizeAdjustPolicy_c0, &_call_f_sizeAdjustPolicy_c0);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QComboBox::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":validator", "@brief Method const QValidator *QComboBox::validator()\n", true, &_init_f_validator_c0, &_call_f_validator_c0);
   methods += new qt_gsi::GenericMethod (":view", "@brief Method QAbstractItemView *QComboBox::view()\n", true, &_init_f_view_c0, &_call_f_view_c0);
   methods += gsi::qt_signal<int > ("activated(int)", "activated", gsi::arg("index"), "@brief Signal declaration for QComboBox::activated(int index)\nYou can bind a procedure to this signal.");

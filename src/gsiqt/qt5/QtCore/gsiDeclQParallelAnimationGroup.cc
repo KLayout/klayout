@@ -57,7 +57,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// () const
+// int QParallelAnimationGroup::duration()
 
 
 static void _init_f_duration_c0 (qt_gsi::GenericMethod *decl)
@@ -128,7 +128,7 @@ namespace gsi
 static gsi::Methods methods_QParallelAnimationGroup () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod (":duration", "@brief Method () const\nThis is a reimplementation of QAbstractAnimation::duration", true, &_init_f_duration_c0, &_call_f_duration_c0);
+  methods += new qt_gsi::GenericMethod (":duration", "@brief Method int QParallelAnimationGroup::duration()\nThis is a reimplementation of QAbstractAnimation::duration", true, &_init_f_duration_c0, &_call_f_duration_c0);
   methods += gsi::qt_signal<int > ("currentLoopChanged(int)", "currentLoopChanged", gsi::arg("currentLoop"), "@brief Signal declaration for QParallelAnimationGroup::currentLoopChanged(int currentLoop)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QParallelAnimationGroup::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<QAbstractAnimation::Direction>::target_type & > ("directionChanged(QAbstractAnimation::Direction)", "directionChanged", gsi::arg("arg1"), "@brief Signal declaration for QParallelAnimationGroup::directionChanged(QAbstractAnimation::Direction)\nYou can bind a procedure to this signal.");

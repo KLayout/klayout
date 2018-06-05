@@ -115,7 +115,7 @@ static void _call_f_createProxyForChildWidget_1315 (const qt_gsi::GenericMethod 
 }
 
 
-// (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
+// void QGraphicsProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 
 
 static void _init_f_paint_6301 (qt_gsi::GenericMethod *decl)
@@ -141,7 +141,7 @@ static void _call_f_paint_6301 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (const QRectF &)
+// void QGraphicsProxyWidget::setGeometry(const QRectF &rect)
 
 
 static void _init_f_setGeometry_1862 (qt_gsi::GenericMethod *decl)
@@ -200,7 +200,7 @@ static void _call_f_subWidgetRect_c2010 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// int QGraphicsProxyWidget::type()
 
 
 static void _init_f_type_c0 (qt_gsi::GenericMethod *decl)
@@ -287,11 +287,11 @@ static gsi::Methods methods_QGraphicsProxyWidget () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("createProxyForChildWidget", "@brief Method QGraphicsProxyWidget *QGraphicsProxyWidget::createProxyForChildWidget(QWidget *child)\n", false, &_init_f_createProxyForChildWidget_1315, &_call_f_createProxyForChildWidget_1315);
-  methods += new qt_gsi::GenericMethod ("paint", "@brief Method (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)\nThis is a reimplementation of QGraphicsWidget::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRectF &)\nThis is a reimplementation of QGraphicsWidget::setGeometry", false, &_init_f_setGeometry_1862, &_call_f_setGeometry_1862);
+  methods += new qt_gsi::GenericMethod ("paint", "@brief Method void QGraphicsProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)\nThis is a reimplementation of QGraphicsWidget::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QGraphicsProxyWidget::setGeometry(const QRectF &rect)\nThis is a reimplementation of QGraphicsWidget::setGeometry", false, &_init_f_setGeometry_1862, &_call_f_setGeometry_1862);
   methods += new qt_gsi::GenericMethod ("setWidget|widget=", "@brief Method void QGraphicsProxyWidget::setWidget(QWidget *widget)\n", false, &_init_f_setWidget_1315, &_call_f_setWidget_1315);
   methods += new qt_gsi::GenericMethod ("subWidgetRect", "@brief Method QRectF QGraphicsProxyWidget::subWidgetRect(const QWidget *widget)\n", true, &_init_f_subWidgetRect_c2010, &_call_f_subWidgetRect_c2010);
-  methods += new qt_gsi::GenericMethod ("type", "@brief Method () const\nThis is a reimplementation of QGraphicsWidget::type", true, &_init_f_type_c0, &_call_f_type_c0);
+  methods += new qt_gsi::GenericMethod ("type", "@brief Method int QGraphicsProxyWidget::type()\nThis is a reimplementation of QGraphicsWidget::type", true, &_init_f_type_c0, &_call_f_type_c0);
   methods += new qt_gsi::GenericMethod (":widget", "@brief Method QWidget *QGraphicsProxyWidget::widget()\n", true, &_init_f_widget_c0, &_call_f_widget_c0);
   methods += gsi::qt_signal ("childrenChanged()", "childrenChanged", "@brief Signal declaration for QGraphicsProxyWidget::childrenChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QGraphicsProxyWidget::destroyed(QObject *)\nYou can bind a procedure to this signal.");

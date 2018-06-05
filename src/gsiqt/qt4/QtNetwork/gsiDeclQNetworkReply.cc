@@ -92,7 +92,7 @@ static void _call_f_attribute_c3072 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// ()
+// void QNetworkReply::close()
 
 
 static void _init_f_close_0 (qt_gsi::GenericMethod *decl)
@@ -227,7 +227,7 @@ static void _call_f_isRunning_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// bool QNetworkReply::isSequential()
 
 
 static void _init_f_isSequential_c0 (qt_gsi::GenericMethod *decl)
@@ -509,7 +509,7 @@ static gsi::Methods methods_QNetworkReply () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("abort", "@brief Method void QNetworkReply::abort()\n", false, &_init_f_abort_0, &_call_f_abort_0);
   methods += new qt_gsi::GenericMethod ("attribute", "@brief Method QVariant QNetworkReply::attribute(QNetworkRequest::Attribute code)\n", true, &_init_f_attribute_c3072, &_call_f_attribute_c3072);
-  methods += new qt_gsi::GenericMethod ("close", "@brief Method ()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
+  methods += new qt_gsi::GenericMethod ("close", "@brief Method void QNetworkReply::close()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QNetworkReply::NetworkError QNetworkReply::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("hasRawHeader", "@brief Method bool QNetworkReply::hasRawHeader(const QByteArray &headerName)\n", true, &_init_f_hasRawHeader_c2309, &_call_f_hasRawHeader_c2309);
   methods += new qt_gsi::GenericMethod ("header", "@brief Method QVariant QNetworkReply::header(QNetworkRequest::KnownHeaders header)\n", true, &_init_f_header_c3349, &_call_f_header_c3349);
@@ -517,7 +517,7 @@ static gsi::Methods methods_QNetworkReply () {
   methods += new qt_gsi::GenericMethod ("ignoreSslErrors", "@brief Method void QNetworkReply::ignoreSslErrors()\n", false, &_init_f_ignoreSslErrors_0, &_call_f_ignoreSslErrors_0);
   methods += new qt_gsi::GenericMethod ("isFinished?", "@brief Method bool QNetworkReply::isFinished()\n", true, &_init_f_isFinished_c0, &_call_f_isFinished_c0);
   methods += new qt_gsi::GenericMethod ("isRunning?", "@brief Method bool QNetworkReply::isRunning()\n", true, &_init_f_isRunning_c0, &_call_f_isRunning_c0);
-  methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method () const\nThis is a reimplementation of QIODevice::isSequential", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
+  methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method bool QNetworkReply::isSequential()\nThis is a reimplementation of QIODevice::isSequential", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
   methods += new qt_gsi::GenericMethod ("manager", "@brief Method QNetworkAccessManager *QNetworkReply::manager()\n", true, &_init_f_manager_c0, &_call_f_manager_c0);
   methods += new qt_gsi::GenericMethod ("operation", "@brief Method QNetworkAccessManager::Operation QNetworkReply::operation()\n", true, &_init_f_operation_c0, &_call_f_operation_c0);
   methods += new qt_gsi::GenericMethod ("rawHeader", "@brief Method QByteArray QNetworkReply::rawHeader(const QByteArray &headerName)\n", true, &_init_f_rawHeader_c2309, &_call_f_rawHeader_c2309);

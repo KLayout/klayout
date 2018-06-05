@@ -168,7 +168,7 @@ static void _call_f_headerRowCount_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// bool QTextTableFormat::isValid()
 
 
 static void _init_f_isValid_c0 (qt_gsi::GenericMethod *decl)
@@ -317,7 +317,7 @@ static gsi::Methods methods_QTextTableFormat () {
   methods += new qt_gsi::GenericMethod (":columnWidthConstraints", "@brief Method QVector<QTextLength> QTextTableFormat::columnWidthConstraints()\n", true, &_init_f_columnWidthConstraints_c0, &_call_f_columnWidthConstraints_c0);
   methods += new qt_gsi::GenericMethod (":columns", "@brief Method int QTextTableFormat::columns()\n", true, &_init_f_columns_c0, &_call_f_columns_c0);
   methods += new qt_gsi::GenericMethod (":headerRowCount", "@brief Method int QTextTableFormat::headerRowCount()\n", true, &_init_f_headerRowCount_c0, &_call_f_headerRowCount_c0);
-  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method () const\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QTextTableFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("setAlignment|alignment=", "@brief Method void QTextTableFormat::setAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setAlignment_2750, &_call_f_setAlignment_2750);
   methods += new qt_gsi::GenericMethod ("setCellPadding|cellPadding=", "@brief Method void QTextTableFormat::setCellPadding(double padding)\n", false, &_init_f_setCellPadding_1071, &_call_f_setCellPadding_1071);
   methods += new qt_gsi::GenericMethod ("setCellSpacing|cellSpacing=", "@brief Method void QTextTableFormat::setCellSpacing(double spacing)\n", false, &_init_f_setCellSpacing_1071, &_call_f_setCellSpacing_1071);

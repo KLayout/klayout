@@ -410,7 +410,7 @@ static void _call_f_foregroundBrush_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (Qt::InputMethodQuery) const
+// QVariant QGraphicsView::inputMethodQuery(Qt::InputMethodQuery query)
 
 
 static void _init_f_inputMethodQuery_c2420 (qt_gsi::GenericMethod *decl)
@@ -958,7 +958,7 @@ static void _call_f_optimizationFlags_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (QPainter *, const QRectF &, const QRect &, Qt::AspectRatioMode)
+// void QGraphicsView::render(QPainter *painter, const QRectF &target, const QRect &source, Qt::AspectRatioMode aspectRatioMode)
 
 
 static void _init_f_render_7013 (qt_gsi::GenericMethod *decl)
@@ -1577,7 +1577,7 @@ static void _call_f_shear_2034 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QSize QGraphicsView::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -1829,7 +1829,7 @@ static gsi::Methods methods_QGraphicsView () {
   methods += new qt_gsi::GenericMethod ("fitInView", "@brief Method void QGraphicsView::fitInView(double x, double y, double w, double h, Qt::AspectRatioMode aspectRadioMode)\n", false, &_init_f_fitInView_6109, &_call_f_fitInView_6109);
   methods += new qt_gsi::GenericMethod ("fitInView", "@brief Method void QGraphicsView::fitInView(const QGraphicsItem *item, Qt::AspectRatioMode aspectRadioMode)\n", false, &_init_f_fitInView_4763, &_call_f_fitInView_4763);
   methods += new qt_gsi::GenericMethod (":foregroundBrush", "@brief Method QBrush QGraphicsView::foregroundBrush()\n", true, &_init_f_foregroundBrush_c0, &_call_f_foregroundBrush_c0);
-  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method (Qt::InputMethodQuery) const\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
+  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method QVariant QGraphicsView::inputMethodQuery(Qt::InputMethodQuery query)\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
   methods += new qt_gsi::GenericMethod ("invalidateScene", "@brief Method void QGraphicsView::invalidateScene(const QRectF &rect, QFlags<QGraphicsScene::SceneLayer> layers)\n", false, &_init_f_invalidateScene_5397, &_call_f_invalidateScene_5397);
   methods += new qt_gsi::GenericMethod ("isInteractive?|:interactive", "@brief Method bool QGraphicsView::isInteractive()\n", true, &_init_f_isInteractive_c0, &_call_f_isInteractive_c0);
   methods += new qt_gsi::GenericMethod ("isTransformed?", "@brief Method bool QGraphicsView::isTransformed()\n", true, &_init_f_isTransformed_c0, &_call_f_isTransformed_c0);
@@ -1856,7 +1856,7 @@ static gsi::Methods methods_QGraphicsView () {
   methods += new qt_gsi::GenericMethod ("mapToScene", "@brief Method QPolygonF QGraphicsView::mapToScene(int x, int y, int w, int h)\n", true, &_init_f_mapToScene_c2744, &_call_f_mapToScene_c2744);
   methods += new qt_gsi::GenericMethod (":matrix", "@brief Method QMatrix QGraphicsView::matrix()\n", true, &_init_f_matrix_c0, &_call_f_matrix_c0);
   methods += new qt_gsi::GenericMethod (":optimizationFlags", "@brief Method QFlags<QGraphicsView::OptimizationFlag> QGraphicsView::optimizationFlags()\n", true, &_init_f_optimizationFlags_c0, &_call_f_optimizationFlags_c0);
-  methods += new qt_gsi::GenericMethod ("render", "@brief Method (QPainter *, const QRectF &, const QRect &, Qt::AspectRatioMode)\n", false, &_init_f_render_7013, &_call_f_render_7013);
+  methods += new qt_gsi::GenericMethod ("render", "@brief Method void QGraphicsView::render(QPainter *painter, const QRectF &target, const QRect &source, Qt::AspectRatioMode aspectRatioMode)\n", false, &_init_f_render_7013, &_call_f_render_7013);
   methods += new qt_gsi::GenericMethod (":renderHints", "@brief Method QFlags<QPainter::RenderHint> QGraphicsView::renderHints()\n", true, &_init_f_renderHints_c0, &_call_f_renderHints_c0);
   methods += new qt_gsi::GenericMethod ("resetCachedContent", "@brief Method void QGraphicsView::resetCachedContent()\n", false, &_init_f_resetCachedContent_0, &_call_f_resetCachedContent_0);
   methods += new qt_gsi::GenericMethod ("resetMatrix", "@brief Method void QGraphicsView::resetMatrix()\n", false, &_init_f_resetMatrix_0, &_call_f_resetMatrix_0);
@@ -1887,7 +1887,7 @@ static gsi::Methods methods_QGraphicsView () {
   methods += new qt_gsi::GenericMethod ("setTransformationAnchor|transformationAnchor=", "@brief Method void QGraphicsView::setTransformationAnchor(QGraphicsView::ViewportAnchor anchor)\n", false, &_init_f_setTransformationAnchor_3328, &_call_f_setTransformationAnchor_3328);
   methods += new qt_gsi::GenericMethod ("setViewportUpdateMode|viewportUpdateMode=", "@brief Method void QGraphicsView::setViewportUpdateMode(QGraphicsView::ViewportUpdateMode mode)\n", false, &_init_f_setViewportUpdateMode_3725, &_call_f_setViewportUpdateMode_3725);
   methods += new qt_gsi::GenericMethod ("shear", "@brief Method void QGraphicsView::shear(double sh, double sv)\n", false, &_init_f_shear_2034, &_call_f_shear_2034);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QAbstractScrollArea::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QGraphicsView::sizeHint()\nThis is a reimplementation of QAbstractScrollArea::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":transform", "@brief Method QTransform QGraphicsView::transform()\n", true, &_init_f_transform_c0, &_call_f_transform_c0);
   methods += new qt_gsi::GenericMethod (":transformationAnchor", "@brief Method QGraphicsView::ViewportAnchor QGraphicsView::transformationAnchor()\n", true, &_init_f_transformationAnchor_c0, &_call_f_transformationAnchor_c0);
   methods += new qt_gsi::GenericMethod ("translate", "@brief Method void QGraphicsView::translate(double dx, double dy)\n", false, &_init_f_translate_2034, &_call_f_translate_2034);

@@ -163,7 +163,7 @@ static void _call_f_menu_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// () const
+// QSize QToolButton::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -329,7 +329,7 @@ static void _call_f_showMenu_0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QSize QToolButton::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -419,7 +419,7 @@ static gsi::Methods methods_QToolButton () {
   methods += new qt_gsi::GenericMethod (":autoRaise", "@brief Method bool QToolButton::autoRaise()\n", true, &_init_f_autoRaise_c0, &_call_f_autoRaise_c0);
   methods += new qt_gsi::GenericMethod (":defaultAction", "@brief Method QAction *QToolButton::defaultAction()\n", true, &_init_f_defaultAction_c0, &_call_f_defaultAction_c0);
   methods += new qt_gsi::GenericMethod (":menu", "@brief Method QMenu *QToolButton::menu()\n", true, &_init_f_menu_c0, &_call_f_menu_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QToolButton::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod (":popupMode", "@brief Method QToolButton::ToolButtonPopupMode QToolButton::popupMode()\n", true, &_init_f_popupMode_c0, &_call_f_popupMode_c0);
   methods += new qt_gsi::GenericMethod ("setArrowType|arrowType=", "@brief Method void QToolButton::setArrowType(Qt::ArrowType type)\n", false, &_init_f_setArrowType_1690, &_call_f_setArrowType_1690);
   methods += new qt_gsi::GenericMethod ("setAutoRaise|autoRaise=", "@brief Method void QToolButton::setAutoRaise(bool enable)\n", false, &_init_f_setAutoRaise_864, &_call_f_setAutoRaise_864);
@@ -428,7 +428,7 @@ static gsi::Methods methods_QToolButton () {
   methods += new qt_gsi::GenericMethod ("setPopupMode|popupMode=", "@brief Method void QToolButton::setPopupMode(QToolButton::ToolButtonPopupMode mode)\n", false, &_init_f_setPopupMode_3654, &_call_f_setPopupMode_3654);
   methods += new qt_gsi::GenericMethod ("setToolButtonStyle|toolButtonStyle=", "@brief Method void QToolButton::setToolButtonStyle(Qt::ToolButtonStyle style)\n", false, &_init_f_setToolButtonStyle_2328, &_call_f_setToolButtonStyle_2328);
   methods += new qt_gsi::GenericMethod ("showMenu", "@brief Method void QToolButton::showMenu()\n", false, &_init_f_showMenu_0, &_call_f_showMenu_0);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QToolButton::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":toolButtonStyle", "@brief Method Qt::ToolButtonStyle QToolButton::toolButtonStyle()\n", true, &_init_f_toolButtonStyle_c0, &_call_f_toolButtonStyle_c0);
   methods += gsi::qt_signal<bool > ("clicked(bool)", "clicked", gsi::arg("checked"), "@brief Signal declaration for QToolButton::clicked(bool checked)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QToolButton::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");

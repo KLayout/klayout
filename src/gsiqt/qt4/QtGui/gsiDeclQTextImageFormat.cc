@@ -78,7 +78,7 @@ static void _call_f_height_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// bool QTextImageFormat::isValid()
 
 
 static void _init_f_isValid_c0 (qt_gsi::GenericMethod *decl)
@@ -191,7 +191,7 @@ static gsi::Methods methods_QTextImageFormat () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextImageFormat::QTextImageFormat()\nThis method creates an object of class QTextImageFormat.", &_init_ctor_QTextImageFormat_0, &_call_ctor_QTextImageFormat_0);
   methods += new qt_gsi::GenericMethod (":height", "@brief Method double QTextImageFormat::height()\n", true, &_init_f_height_c0, &_call_f_height_c0);
-  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method () const\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QTextImageFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod (":name", "@brief Method QString QTextImageFormat::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
   methods += new qt_gsi::GenericMethod ("setHeight|height=", "@brief Method void QTextImageFormat::setHeight(double height)\n", false, &_init_f_setHeight_1071, &_call_f_setHeight_1071);
   methods += new qt_gsi::GenericMethod ("setName|name=", "@brief Method void QTextImageFormat::setName(const QString &name)\n", false, &_init_f_setName_2025, &_call_f_setName_2025);

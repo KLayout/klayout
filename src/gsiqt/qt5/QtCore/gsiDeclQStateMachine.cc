@@ -195,7 +195,7 @@ static void _call_f_errorString_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (QObject *, QEvent *)
+// bool QStateMachine::eventFilter(QObject *watched, QEvent *event)
 
 
 static void _init_f_eventFilter_2411 (qt_gsi::GenericMethod *decl)
@@ -503,7 +503,7 @@ static gsi::Methods methods_QStateMachine () {
   methods += new qt_gsi::GenericMethod ("defaultAnimations", "@brief Method QList<QAbstractAnimation *> QStateMachine::defaultAnimations()\n", true, &_init_f_defaultAnimations_c0, &_call_f_defaultAnimations_c0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QStateMachine::Error QStateMachine::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod (":errorString", "@brief Method QString QStateMachine::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Method (QObject *, QEvent *)\nThis is a reimplementation of QObject::eventFilter", false, &_init_f_eventFilter_2411, &_call_f_eventFilter_2411);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Method bool QStateMachine::eventFilter(QObject *watched, QEvent *event)\nThis is a reimplementation of QObject::eventFilter", false, &_init_f_eventFilter_2411, &_call_f_eventFilter_2411);
   methods += new qt_gsi::GenericMethod (":globalRestorePolicy", "@brief Method QState::RestorePolicy QStateMachine::globalRestorePolicy()\n", true, &_init_f_globalRestorePolicy_c0, &_call_f_globalRestorePolicy_c0);
   methods += new qt_gsi::GenericMethod ("isAnimated?|:animated", "@brief Method bool QStateMachine::isAnimated()\n", true, &_init_f_isAnimated_c0, &_call_f_isAnimated_c0);
   methods += new qt_gsi::GenericMethod ("isRunning?|:running", "@brief Method bool QStateMachine::isRunning()\n", true, &_init_f_isRunning_c0, &_call_f_isRunning_c0);

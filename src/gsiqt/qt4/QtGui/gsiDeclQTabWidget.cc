@@ -377,7 +377,7 @@ static void _call_f_isTabEnabled_c767 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// QSize QTabWidget::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -750,7 +750,7 @@ static void _call_f_setUsesScrollButtons_864 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// () const
+// QSize QTabWidget::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -1035,7 +1035,7 @@ static gsi::Methods methods_QTabWidget () {
   methods += new qt_gsi::GenericMethod ("insertTab", "@brief Method int QTabWidget::insertTab(int index, QWidget *widget, const QIcon &icon, const QString &label)\n", false, &_init_f_insertTab_5570, &_call_f_insertTab_5570);
   methods += new qt_gsi::GenericMethod ("isMovable?|:movable", "@brief Method bool QTabWidget::isMovable()\n", true, &_init_f_isMovable_c0, &_call_f_isMovable_c0);
   methods += new qt_gsi::GenericMethod ("isTabEnabled?", "@brief Method bool QTabWidget::isTabEnabled(int index)\n", true, &_init_f_isTabEnabled_c767, &_call_f_isTabEnabled_c767);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QTabWidget::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("removeTab", "@brief Method void QTabWidget::removeTab(int index)\n", false, &_init_f_removeTab_767, &_call_f_removeTab_767);
   methods += new qt_gsi::GenericMethod ("setCornerWidget", "@brief Method void QTabWidget::setCornerWidget(QWidget *w, Qt::Corner corner)\n", false, &_init_f_setCornerWidget_2573, &_call_f_setCornerWidget_2573);
   methods += new qt_gsi::GenericMethod ("setCurrentIndex|currentIndex=", "@brief Method void QTabWidget::setCurrentIndex(int index)\n", false, &_init_f_setCurrentIndex_767, &_call_f_setCurrentIndex_767);
@@ -1053,7 +1053,7 @@ static gsi::Methods methods_QTabWidget () {
   methods += new qt_gsi::GenericMethod ("setTabWhatsThis", "@brief Method void QTabWidget::setTabWhatsThis(int index, const QString &text)\n", false, &_init_f_setTabWhatsThis_2684, &_call_f_setTabWhatsThis_2684);
   methods += new qt_gsi::GenericMethod ("setTabsClosable|tabsClosable=", "@brief Method void QTabWidget::setTabsClosable(bool closeable)\n", false, &_init_f_setTabsClosable_864, &_call_f_setTabsClosable_864);
   methods += new qt_gsi::GenericMethod ("setUsesScrollButtons|usesScrollButtons=", "@brief Method void QTabWidget::setUsesScrollButtons(bool useButtons)\n", false, &_init_f_setUsesScrollButtons_864, &_call_f_setUsesScrollButtons_864);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QTabWidget::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod ("tabIcon", "@brief Method QIcon QTabWidget::tabIcon(int index)\n", true, &_init_f_tabIcon_c767, &_call_f_tabIcon_c767);
   methods += new qt_gsi::GenericMethod (":tabPosition", "@brief Method QTabWidget::TabPosition QTabWidget::tabPosition()\n", true, &_init_f_tabPosition_c0, &_call_f_tabPosition_c0);
   methods += new qt_gsi::GenericMethod (":tabShape", "@brief Method QTabWidget::TabShape QTabWidget::tabShape()\n", true, &_init_f_tabShape_c0, &_call_f_tabShape_c0);

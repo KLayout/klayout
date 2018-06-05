@@ -79,7 +79,7 @@ static void _call_ctor_QSqlIndex_2202 (const qt_gsi::GenericStaticMethod * /*dec
 }
 
 
-// (const QSqlField &)
+// void QSqlIndex::append(const QSqlField &field)
 
 
 static void _init_f_append_2182 (qt_gsi::GenericMethod *decl)
@@ -99,7 +99,7 @@ static void _call_f_append_2182 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QSqlField &, bool)
+// void QSqlIndex::append(const QSqlField &field, bool desc)
 
 
 static void _init_f_append_2938 (qt_gsi::GenericMethod *decl)
@@ -171,7 +171,7 @@ static void _call_f_name_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (const QSqlIndex &)
+// QSqlIndex &QSqlIndex::operator=(const QSqlIndex &other)
 
 
 static void _init_f_operator_eq__2202 (qt_gsi::GenericMethod *decl)
@@ -261,12 +261,12 @@ static gsi::Methods methods_QSqlIndex () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSqlIndex::QSqlIndex(const QString &cursorName, const QString &name)\nThis method creates an object of class QSqlIndex.", &_init_ctor_QSqlIndex_3942, &_call_ctor_QSqlIndex_3942);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSqlIndex::QSqlIndex(const QSqlIndex &other)\nThis method creates an object of class QSqlIndex.", &_init_ctor_QSqlIndex_2202, &_call_ctor_QSqlIndex_2202);
-  methods += new qt_gsi::GenericMethod ("append", "@brief Method (const QSqlField &)\n", false, &_init_f_append_2182, &_call_f_append_2182);
-  methods += new qt_gsi::GenericMethod ("append", "@brief Method (const QSqlField &, bool)\n", false, &_init_f_append_2938, &_call_f_append_2938);
+  methods += new qt_gsi::GenericMethod ("append", "@brief Method void QSqlIndex::append(const QSqlField &field)\n", false, &_init_f_append_2182, &_call_f_append_2182);
+  methods += new qt_gsi::GenericMethod ("append", "@brief Method void QSqlIndex::append(const QSqlField &field, bool desc)\n", false, &_init_f_append_2938, &_call_f_append_2938);
   methods += new qt_gsi::GenericMethod (":cursorName", "@brief Method QString QSqlIndex::cursorName()\n", true, &_init_f_cursorName_c0, &_call_f_cursorName_c0);
   methods += new qt_gsi::GenericMethod ("isDescending?", "@brief Method bool QSqlIndex::isDescending(int i)\n", true, &_init_f_isDescending_c767, &_call_f_isDescending_c767);
   methods += new qt_gsi::GenericMethod (":name", "@brief Method QString QSqlIndex::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QSqlIndex &)\n", false, &_init_f_operator_eq__2202, &_call_f_operator_eq__2202);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QSqlIndex &QSqlIndex::operator=(const QSqlIndex &other)\n", false, &_init_f_operator_eq__2202, &_call_f_operator_eq__2202);
   methods += new qt_gsi::GenericMethod ("setCursorName|cursorName=", "@brief Method void QSqlIndex::setCursorName(const QString &cursorName)\n", false, &_init_f_setCursorName_2025, &_call_f_setCursorName_2025);
   methods += new qt_gsi::GenericMethod ("setDescending", "@brief Method void QSqlIndex::setDescending(int i, bool desc)\n", false, &_init_f_setDescending_1523, &_call_f_setDescending_1523);
   methods += new qt_gsi::GenericMethod ("setName|name=", "@brief Method void QSqlIndex::setName(const QString &name)\n", false, &_init_f_setName_2025, &_call_f_setName_2025);

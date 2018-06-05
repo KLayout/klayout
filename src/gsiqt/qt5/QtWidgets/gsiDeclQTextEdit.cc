@@ -451,7 +451,7 @@ static void _call_f_extraSelections_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QString &, QFlags<QTextDocument::FindFlag>)
+// bool QTextEdit::find(const QString &exp, QFlags<QTextDocument::FindFlag> options)
 
 
 static void _init_f_find_5261 (qt_gsi::GenericMethod *decl)
@@ -473,7 +473,7 @@ static void _call_f_find_5261 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (const QRegExp &, QFlags<QTextDocument::FindFlag>)
+// bool QTextEdit::find(const QRegExp &exp, QFlags<QTextDocument::FindFlag> options)
 
 
 static void _init_f_find_5217 (qt_gsi::GenericMethod *decl)
@@ -570,7 +570,7 @@ static void _call_f_fontWeight_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (Qt::InputMethodQuery) const
+// QVariant QTextEdit::inputMethodQuery(Qt::InputMethodQuery property)
 
 
 static void _init_f_inputMethodQuery_c2420 (qt_gsi::GenericMethod *decl)
@@ -589,7 +589,7 @@ static void _call_f_inputMethodQuery_c2420 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (Qt::InputMethodQuery, QVariant) const
+// QVariant QTextEdit::inputMethodQuery(Qt::InputMethodQuery query, QVariant argument)
 
 
 static void _init_f_inputMethodQuery_c3554 (qt_gsi::GenericMethod *decl)
@@ -1762,15 +1762,15 @@ static gsi::Methods methods_QTextEdit () {
   methods += new qt_gsi::GenericMethod (":documentTitle", "@brief Method QString QTextEdit::documentTitle()\n", true, &_init_f_documentTitle_c0, &_call_f_documentTitle_c0);
   methods += new qt_gsi::GenericMethod ("ensureCursorVisible", "@brief Method void QTextEdit::ensureCursorVisible()\n", false, &_init_f_ensureCursorVisible_0, &_call_f_ensureCursorVisible_0);
   methods += new qt_gsi::GenericMethod (":extraSelections", "@brief Method QList<QTextEdit::ExtraSelection> QTextEdit::extraSelections()\n", true, &_init_f_extraSelections_c0, &_call_f_extraSelections_c0);
-  methods += new qt_gsi::GenericMethod ("find", "@brief Method (const QString &, QFlags<QTextDocument::FindFlag>)\n", false, &_init_f_find_5261, &_call_f_find_5261);
-  methods += new qt_gsi::GenericMethod ("find", "@brief Method (const QRegExp &, QFlags<QTextDocument::FindFlag>)\n", false, &_init_f_find_5217, &_call_f_find_5217);
+  methods += new qt_gsi::GenericMethod ("find", "@brief Method bool QTextEdit::find(const QString &exp, QFlags<QTextDocument::FindFlag> options)\n", false, &_init_f_find_5261, &_call_f_find_5261);
+  methods += new qt_gsi::GenericMethod ("find", "@brief Method bool QTextEdit::find(const QRegExp &exp, QFlags<QTextDocument::FindFlag> options)\n", false, &_init_f_find_5217, &_call_f_find_5217);
   methods += new qt_gsi::GenericMethod (":fontFamily", "@brief Method QString QTextEdit::fontFamily()\n", true, &_init_f_fontFamily_c0, &_call_f_fontFamily_c0);
   methods += new qt_gsi::GenericMethod (":fontItalic", "@brief Method bool QTextEdit::fontItalic()\n", true, &_init_f_fontItalic_c0, &_call_f_fontItalic_c0);
   methods += new qt_gsi::GenericMethod (":fontPointSize", "@brief Method double QTextEdit::fontPointSize()\n", true, &_init_f_fontPointSize_c0, &_call_f_fontPointSize_c0);
   methods += new qt_gsi::GenericMethod (":fontUnderline", "@brief Method bool QTextEdit::fontUnderline()\n", true, &_init_f_fontUnderline_c0, &_call_f_fontUnderline_c0);
   methods += new qt_gsi::GenericMethod (":fontWeight", "@brief Method int QTextEdit::fontWeight()\n", true, &_init_f_fontWeight_c0, &_call_f_fontWeight_c0);
-  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method (Qt::InputMethodQuery) const\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
-  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method (Qt::InputMethodQuery, QVariant) const\n", true, &_init_f_inputMethodQuery_c3554, &_call_f_inputMethodQuery_c3554);
+  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method QVariant QTextEdit::inputMethodQuery(Qt::InputMethodQuery property)\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
+  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method QVariant QTextEdit::inputMethodQuery(Qt::InputMethodQuery query, QVariant argument)\n", true, &_init_f_inputMethodQuery_c3554, &_call_f_inputMethodQuery_c3554);
   methods += new qt_gsi::GenericMethod ("insertHtml", "@brief Method void QTextEdit::insertHtml(const QString &text)\n", false, &_init_f_insertHtml_2025, &_call_f_insertHtml_2025);
   methods += new qt_gsi::GenericMethod ("insertPlainText", "@brief Method void QTextEdit::insertPlainText(const QString &text)\n", false, &_init_f_insertPlainText_2025, &_call_f_insertPlainText_2025);
   methods += new qt_gsi::GenericMethod ("isReadOnly?|:readOnly", "@brief Method bool QTextEdit::isReadOnly()\n", true, &_init_f_isReadOnly_c0, &_call_f_isReadOnly_c0);

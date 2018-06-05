@@ -64,7 +64,7 @@
 // -----------------------------------------------------------------------
 // class QGraphicsPixmapItem
 
-// () const
+// QRectF QGraphicsPixmapItem::boundingRect()
 
 
 static void _init_f_boundingRect_c0 (qt_gsi::GenericMethod *decl)
@@ -79,7 +79,7 @@ static void _call_f_boundingRect_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QPointF &) const
+// bool QGraphicsPixmapItem::contains(const QPointF &point)
 
 
 static void _init_f_contains_c1986 (qt_gsi::GenericMethod *decl)
@@ -98,7 +98,7 @@ static void _call_f_contains_c1986 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QGraphicsItem *) const
+// bool QGraphicsPixmapItem::isObscuredBy(const QGraphicsItem *item)
 
 
 static void _init_f_isObscuredBy_c2614 (qt_gsi::GenericMethod *decl)
@@ -132,7 +132,7 @@ static void _call_f_offset_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// QPainterPath QGraphicsPixmapItem::opaqueArea()
 
 
 static void _init_f_opaqueArea_c0 (qt_gsi::GenericMethod *decl)
@@ -147,7 +147,7 @@ static void _call_f_opaqueArea_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
+// void QGraphicsPixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 
 
 static void _init_f_paint_6301 (qt_gsi::GenericMethod *decl)
@@ -291,7 +291,7 @@ static void _call_f_setTransformationMode_2633 (const qt_gsi::GenericMethod * /*
 }
 
 
-// () const
+// QPainterPath QGraphicsPixmapItem::shape()
 
 
 static void _init_f_shape_c0 (qt_gsi::GenericMethod *decl)
@@ -336,7 +336,7 @@ static void _call_f_transformationMode_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// () const
+// int QGraphicsPixmapItem::type()
 
 
 static void _init_f_type_c0 (qt_gsi::GenericMethod *decl)
@@ -356,22 +356,22 @@ namespace gsi
 
 static gsi::Methods methods_QGraphicsPixmapItem () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::boundingRect", true, &_init_f_boundingRect_c0, &_call_f_boundingRect_c0);
-  methods += new qt_gsi::GenericMethod ("contains", "@brief Method (const QPointF &) const\nThis is a reimplementation of QGraphicsItem::contains", true, &_init_f_contains_c1986, &_call_f_contains_c1986);
-  methods += new qt_gsi::GenericMethod ("isObscuredBy?", "@brief Method (const QGraphicsItem *) const\nThis is a reimplementation of QGraphicsItem::isObscuredBy", true, &_init_f_isObscuredBy_c2614, &_call_f_isObscuredBy_c2614);
+  methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method QRectF QGraphicsPixmapItem::boundingRect()\nThis is a reimplementation of QGraphicsItem::boundingRect", true, &_init_f_boundingRect_c0, &_call_f_boundingRect_c0);
+  methods += new qt_gsi::GenericMethod ("contains", "@brief Method bool QGraphicsPixmapItem::contains(const QPointF &point)\nThis is a reimplementation of QGraphicsItem::contains", true, &_init_f_contains_c1986, &_call_f_contains_c1986);
+  methods += new qt_gsi::GenericMethod ("isObscuredBy?", "@brief Method bool QGraphicsPixmapItem::isObscuredBy(const QGraphicsItem *item)\nThis is a reimplementation of QGraphicsItem::isObscuredBy", true, &_init_f_isObscuredBy_c2614, &_call_f_isObscuredBy_c2614);
   methods += new qt_gsi::GenericMethod (":offset", "@brief Method QPointF QGraphicsPixmapItem::offset()\n", true, &_init_f_offset_c0, &_call_f_offset_c0);
-  methods += new qt_gsi::GenericMethod ("opaqueArea", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::opaqueArea", true, &_init_f_opaqueArea_c0, &_call_f_opaqueArea_c0);
-  methods += new qt_gsi::GenericMethod ("paint", "@brief Method (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)\nThis is a reimplementation of QGraphicsItem::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
+  methods += new qt_gsi::GenericMethod ("opaqueArea", "@brief Method QPainterPath QGraphicsPixmapItem::opaqueArea()\nThis is a reimplementation of QGraphicsItem::opaqueArea", true, &_init_f_opaqueArea_c0, &_call_f_opaqueArea_c0);
+  methods += new qt_gsi::GenericMethod ("paint", "@brief Method void QGraphicsPixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)\nThis is a reimplementation of QGraphicsItem::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
   methods += new qt_gsi::GenericMethod (":pixmap", "@brief Method QPixmap QGraphicsPixmapItem::pixmap()\n", true, &_init_f_pixmap_c0, &_call_f_pixmap_c0);
   methods += new qt_gsi::GenericMethod ("setOffset|offset=", "@brief Method void QGraphicsPixmapItem::setOffset(const QPointF &offset)\n", false, &_init_f_setOffset_1986, &_call_f_setOffset_1986);
   methods += new qt_gsi::GenericMethod ("setOffset", "@brief Method void QGraphicsPixmapItem::setOffset(double x, double y)\n", false, &_init_f_setOffset_2034, &_call_f_setOffset_2034);
   methods += new qt_gsi::GenericMethod ("setPixmap|pixmap=", "@brief Method void QGraphicsPixmapItem::setPixmap(const QPixmap &pixmap)\n", false, &_init_f_setPixmap_2017, &_call_f_setPixmap_2017);
   methods += new qt_gsi::GenericMethod ("setShapeMode|shapeMode=", "@brief Method void QGraphicsPixmapItem::setShapeMode(QGraphicsPixmapItem::ShapeMode mode)\n", false, &_init_f_setShapeMode_3358, &_call_f_setShapeMode_3358);
   methods += new qt_gsi::GenericMethod ("setTransformationMode|transformationMode=", "@brief Method void QGraphicsPixmapItem::setTransformationMode(Qt::TransformationMode mode)\n", false, &_init_f_setTransformationMode_2633, &_call_f_setTransformationMode_2633);
-  methods += new qt_gsi::GenericMethod ("shape", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::shape", true, &_init_f_shape_c0, &_call_f_shape_c0);
+  methods += new qt_gsi::GenericMethod ("shape", "@brief Method QPainterPath QGraphicsPixmapItem::shape()\nThis is a reimplementation of QGraphicsItem::shape", true, &_init_f_shape_c0, &_call_f_shape_c0);
   methods += new qt_gsi::GenericMethod (":shapeMode", "@brief Method QGraphicsPixmapItem::ShapeMode QGraphicsPixmapItem::shapeMode()\n", true, &_init_f_shapeMode_c0, &_call_f_shapeMode_c0);
   methods += new qt_gsi::GenericMethod (":transformationMode", "@brief Method Qt::TransformationMode QGraphicsPixmapItem::transformationMode()\n", true, &_init_f_transformationMode_c0, &_call_f_transformationMode_c0);
-  methods += new qt_gsi::GenericMethod ("type", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::type", true, &_init_f_type_c0, &_call_f_type_c0);
+  methods += new qt_gsi::GenericMethod ("type", "@brief Method int QGraphicsPixmapItem::type()\nThis is a reimplementation of QGraphicsItem::type", true, &_init_f_type_c0, &_call_f_type_c0);
   return methods;
 }
 

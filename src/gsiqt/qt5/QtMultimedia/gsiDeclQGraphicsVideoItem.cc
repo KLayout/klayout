@@ -98,7 +98,7 @@ static void _call_f_aspectRatioMode_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// () const
+// QRectF QGraphicsVideoItem::boundingRect()
 
 
 static void _init_f_boundingRect_c0 (qt_gsi::GenericMethod *decl)
@@ -113,7 +113,7 @@ static void _call_f_boundingRect_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// QMediaObject *QGraphicsVideoItem::mediaObject()
 
 
 static void _init_f_mediaObject_c0 (qt_gsi::GenericMethod *decl)
@@ -158,7 +158,7 @@ static void _call_f_offset_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
+// void QGraphicsVideoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 
 
 static void _init_f_paint_6301 (qt_gsi::GenericMethod *decl)
@@ -361,11 +361,11 @@ static gsi::Methods methods_QGraphicsVideoItem () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":aspectRatioMode", "@brief Method Qt::AspectRatioMode QGraphicsVideoItem::aspectRatioMode()\n", true, &_init_f_aspectRatioMode_c0, &_call_f_aspectRatioMode_c0);
-  methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::boundingRect", true, &_init_f_boundingRect_c0, &_call_f_boundingRect_c0);
-  methods += new qt_gsi::GenericMethod (":mediaObject", "@brief Method () const\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
+  methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method QRectF QGraphicsVideoItem::boundingRect()\nThis is a reimplementation of QGraphicsItem::boundingRect", true, &_init_f_boundingRect_c0, &_call_f_boundingRect_c0);
+  methods += new qt_gsi::GenericMethod (":mediaObject", "@brief Method QMediaObject *QGraphicsVideoItem::mediaObject()\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
   methods += new qt_gsi::GenericMethod (":nativeSize", "@brief Method QSizeF QGraphicsVideoItem::nativeSize()\n", true, &_init_f_nativeSize_c0, &_call_f_nativeSize_c0);
   methods += new qt_gsi::GenericMethod (":offset", "@brief Method QPointF QGraphicsVideoItem::offset()\n", true, &_init_f_offset_c0, &_call_f_offset_c0);
-  methods += new qt_gsi::GenericMethod ("paint", "@brief Method (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)\nThis is a reimplementation of QGraphicsItem::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
+  methods += new qt_gsi::GenericMethod ("paint", "@brief Method void QGraphicsVideoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)\nThis is a reimplementation of QGraphicsItem::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
   methods += new qt_gsi::GenericMethod ("setAspectRatioMode|aspectRatioMode=", "@brief Method void QGraphicsVideoItem::setAspectRatioMode(Qt::AspectRatioMode mode)\n", false, &_init_f_setAspectRatioMode_2257, &_call_f_setAspectRatioMode_2257);
   methods += new qt_gsi::GenericMethod ("setOffset|offset=", "@brief Method void QGraphicsVideoItem::setOffset(const QPointF &offset)\n", false, &_init_f_setOffset_1986, &_call_f_setOffset_1986);
   methods += new qt_gsi::GenericMethod ("setSize|size=", "@brief Method void QGraphicsVideoItem::setSize(const QSizeF &size)\n", false, &_init_f_setSize_1875, &_call_f_setSize_1875);

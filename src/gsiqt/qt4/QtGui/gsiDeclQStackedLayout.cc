@@ -61,7 +61,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QLayoutItem *)
+// void QStackedLayout::addItem(QLayoutItem *item)
 
 
 static void _init_f_addItem_1740 (qt_gsi::GenericMethod *decl)
@@ -81,7 +81,7 @@ static void _call_f_addItem_1740 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (QWidget *)
+// int QStackedLayout::addWidget(QWidget *w)
 
 
 static void _init_f_addWidget_1315 (qt_gsi::GenericMethod *decl)
@@ -100,7 +100,7 @@ static void _call_f_addWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// int QStackedLayout::count()
 
 
 static void _init_f_count_c0 (qt_gsi::GenericMethod *decl)
@@ -167,7 +167,7 @@ static void _call_f_insertWidget_1974 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (int) const
+// QLayoutItem *QStackedLayout::itemAt(int)
 
 
 static void _init_f_itemAt_c767 (qt_gsi::GenericMethod *decl)
@@ -186,7 +186,7 @@ static void _call_f_itemAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// QSize QStackedLayout::minimumSize()
 
 
 static void _init_f_minimumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -241,7 +241,7 @@ static void _call_f_setCurrentWidget_1315 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// (const QRect &)
+// void QStackedLayout::setGeometry(const QRect &rect)
 
 
 static void _init_f_setGeometry_1792 (qt_gsi::GenericMethod *decl)
@@ -281,7 +281,7 @@ static void _call_f_setStackingMode_3183 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// () const
+// QSize QStackedLayout::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -311,7 +311,7 @@ static void _call_f_stackingMode_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (int)
+// QLayoutItem *QStackedLayout::takeAt(int)
 
 
 static void _init_f_takeAt_767 (qt_gsi::GenericMethod *decl)
@@ -330,7 +330,7 @@ static void _call_f_takeAt_767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// ()
+// QWidget *QStackedLayout::widget()
 
 
 static void _init_f_widget_0 (qt_gsi::GenericMethod *decl)
@@ -345,7 +345,7 @@ static void _call_f_widget_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (int) const
+// QWidget *QStackedLayout::widget(int)
 
 
 static void _init_f_widget_c767 (qt_gsi::GenericMethod *decl)
@@ -464,23 +464,23 @@ namespace gsi
 static gsi::Methods methods_QStackedLayout () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("addItem", "@brief Method (QLayoutItem *)\nThis is a reimplementation of QLayout::addItem", false, &_init_f_addItem_1740, &_call_f_addItem_1740);
-  methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method (QWidget *)\n", false, &_init_f_addWidget_1315, &_call_f_addWidget_1315);
-  methods += new qt_gsi::GenericMethod ("count", "@brief Method () const\nThis is a reimplementation of QLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
+  methods += new qt_gsi::GenericMethod ("addItem", "@brief Method void QStackedLayout::addItem(QLayoutItem *item)\nThis is a reimplementation of QLayout::addItem", false, &_init_f_addItem_1740, &_call_f_addItem_1740);
+  methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method int QStackedLayout::addWidget(QWidget *w)\n", false, &_init_f_addWidget_1315, &_call_f_addWidget_1315);
+  methods += new qt_gsi::GenericMethod ("count", "@brief Method int QStackedLayout::count()\nThis is a reimplementation of QLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
   methods += new qt_gsi::GenericMethod (":currentIndex", "@brief Method int QStackedLayout::currentIndex()\n", true, &_init_f_currentIndex_c0, &_call_f_currentIndex_c0);
   methods += new qt_gsi::GenericMethod (":currentWidget", "@brief Method QWidget *QStackedLayout::currentWidget()\n", true, &_init_f_currentWidget_c0, &_call_f_currentWidget_c0);
   methods += new qt_gsi::GenericMethod ("insertWidget", "@brief Method int QStackedLayout::insertWidget(int index, QWidget *w)\n", false, &_init_f_insertWidget_1974, &_call_f_insertWidget_1974);
-  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method (int) const\nThis is a reimplementation of QLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
-  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method () const\nThis is a reimplementation of QLayout::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
+  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QLayoutItem *QStackedLayout::itemAt(int)\nThis is a reimplementation of QLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
+  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method QSize QStackedLayout::minimumSize()\nThis is a reimplementation of QLayout::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
   methods += new qt_gsi::GenericMethod ("setCurrentIndex|currentIndex=", "@brief Method void QStackedLayout::setCurrentIndex(int index)\n", false, &_init_f_setCurrentIndex_767, &_call_f_setCurrentIndex_767);
   methods += new qt_gsi::GenericMethod ("setCurrentWidget|currentWidget=", "@brief Method void QStackedLayout::setCurrentWidget(QWidget *w)\n", false, &_init_f_setCurrentWidget_1315, &_call_f_setCurrentWidget_1315);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRect &)\nThis is a reimplementation of QLayout::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QStackedLayout::setGeometry(const QRect &rect)\nThis is a reimplementation of QLayout::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
   methods += new qt_gsi::GenericMethod ("setStackingMode|stackingMode=", "@brief Method void QStackedLayout::setStackingMode(QStackedLayout::StackingMode stackingMode)\n", false, &_init_f_setStackingMode_3183, &_call_f_setStackingMode_3183);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method () const\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method QSize QStackedLayout::sizeHint()\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":stackingMode", "@brief Method QStackedLayout::StackingMode QStackedLayout::stackingMode()\n", true, &_init_f_stackingMode_c0, &_call_f_stackingMode_c0);
-  methods += new qt_gsi::GenericMethod ("takeAt", "@brief Method (int)\nThis is a reimplementation of QLayout::takeAt", false, &_init_f_takeAt_767, &_call_f_takeAt_767);
-  methods += new qt_gsi::GenericMethod ("widget", "@brief Method ()\nThis is a reimplementation of QLayoutItem::widget", false, &_init_f_widget_0, &_call_f_widget_0);
-  methods += new qt_gsi::GenericMethod ("widget", "@brief Method (int) const\n", true, &_init_f_widget_c767, &_call_f_widget_c767);
+  methods += new qt_gsi::GenericMethod ("takeAt", "@brief Method QLayoutItem *QStackedLayout::takeAt(int)\nThis is a reimplementation of QLayout::takeAt", false, &_init_f_takeAt_767, &_call_f_takeAt_767);
+  methods += new qt_gsi::GenericMethod ("widget", "@brief Method QWidget *QStackedLayout::widget()\nThis is a reimplementation of QLayoutItem::widget", false, &_init_f_widget_0, &_call_f_widget_0);
+  methods += new qt_gsi::GenericMethod ("widget", "@brief Method QWidget *QStackedLayout::widget(int)\n", true, &_init_f_widget_c767, &_call_f_widget_c767);
   methods += gsi::qt_signal<int > ("currentChanged(int)", "currentChanged", gsi::arg("index"), "@brief Signal declaration for QStackedLayout::currentChanged(int index)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QStackedLayout::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("widgetRemoved(int)", "widgetRemoved", gsi::arg("index"), "@brief Signal declaration for QStackedLayout::widgetRemoved(int index)\nYou can bind a procedure to this signal.");

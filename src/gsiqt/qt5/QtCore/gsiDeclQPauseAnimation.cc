@@ -56,7 +56,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// () const
+// int QPauseAnimation::duration()
 
 
 static void _init_f_duration_c0 (qt_gsi::GenericMethod *decl)
@@ -147,7 +147,7 @@ namespace gsi
 static gsi::Methods methods_QPauseAnimation () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod (":duration", "@brief Method () const\nThis is a reimplementation of QAbstractAnimation::duration", true, &_init_f_duration_c0, &_call_f_duration_c0);
+  methods += new qt_gsi::GenericMethod (":duration", "@brief Method int QPauseAnimation::duration()\nThis is a reimplementation of QAbstractAnimation::duration", true, &_init_f_duration_c0, &_call_f_duration_c0);
   methods += new qt_gsi::GenericMethod ("setDuration|duration=", "@brief Method void QPauseAnimation::setDuration(int msecs)\n", false, &_init_f_setDuration_767, &_call_f_setDuration_767);
   methods += gsi::qt_signal<int > ("currentLoopChanged(int)", "currentLoopChanged", gsi::arg("currentLoop"), "@brief Signal declaration for QPauseAnimation::currentLoopChanged(int currentLoop)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QPauseAnimation::destroyed(QObject *)\nYou can bind a procedure to this signal.");

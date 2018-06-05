@@ -94,7 +94,7 @@ static void _call_f_abort_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// () const
+// bool QAbstractSocket::atEnd()
 
 
 static void _init_f_atEnd_c0 (qt_gsi::GenericMethod *decl)
@@ -156,7 +156,7 @@ static void _call_f_bind_4517 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// qint64 QAbstractSocket::bytesAvailable()
 
 
 static void _init_f_bytesAvailable_c0 (qt_gsi::GenericMethod *decl)
@@ -171,7 +171,7 @@ static void _call_f_bytesAvailable_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// qint64 QAbstractSocket::bytesToWrite()
 
 
 static void _init_f_bytesToWrite_c0 (qt_gsi::GenericMethod *decl)
@@ -186,7 +186,7 @@ static void _call_f_bytesToWrite_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// bool QAbstractSocket::canReadLine()
 
 
 static void _init_f_canReadLine_c0 (qt_gsi::GenericMethod *decl)
@@ -201,7 +201,7 @@ static void _call_f_canReadLine_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// ()
+// void QAbstractSocket::close()
 
 
 static void _init_f_close_0 (qt_gsi::GenericMethod *decl)
@@ -318,7 +318,7 @@ static void _call_f_flush_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// () const
+// bool QAbstractSocket::isSequential()
 
 
 static void _init_f_isSequential_c0 (qt_gsi::GenericMethod *decl)
@@ -656,7 +656,7 @@ static void _call_f_state_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (int)
+// bool QAbstractSocket::waitForBytesWritten(int msecs)
 
 
 static void _init_f_waitForBytesWritten_767 (qt_gsi::GenericMethod *decl)
@@ -713,7 +713,7 @@ static void _call_f_waitForDisconnected_767 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (int)
+// bool QAbstractSocket::waitForReadyRead(int msecs)
 
 
 static void _init_f_waitForReadyRead_767 (qt_gsi::GenericMethod *decl)
@@ -791,19 +791,19 @@ static gsi::Methods methods_QAbstractSocket () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAbstractSocket::QAbstractSocket(QAbstractSocket::SocketType socketType, QObject *parent)\nThis method creates an object of class QAbstractSocket.", &_init_ctor_QAbstractSocket_4299, &_call_ctor_QAbstractSocket_4299);
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("abort", "@brief Method void QAbstractSocket::abort()\n", false, &_init_f_abort_0, &_call_f_abort_0);
-  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method () const\nThis is a reimplementation of QIODevice::atEnd", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
+  methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method bool QAbstractSocket::atEnd()\nThis is a reimplementation of QIODevice::atEnd", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
   methods += new qt_gsi::GenericMethod ("bind", "@brief Method bool QAbstractSocket::bind(const QHostAddress &address, quint16 port, QFlags<QAbstractSocket::BindFlag> mode)\n", false, &_init_f_bind_6927, &_call_f_bind_6927);
   methods += new qt_gsi::GenericMethod ("bind", "@brief Method bool QAbstractSocket::bind(quint16 port, QFlags<QAbstractSocket::BindFlag> mode)\n", false, &_init_f_bind_4517, &_call_f_bind_4517);
-  methods += new qt_gsi::GenericMethod ("bytesAvailable", "@brief Method () const\nThis is a reimplementation of QIODevice::bytesAvailable", true, &_init_f_bytesAvailable_c0, &_call_f_bytesAvailable_c0);
-  methods += new qt_gsi::GenericMethod ("bytesToWrite", "@brief Method () const\nThis is a reimplementation of QIODevice::bytesToWrite", true, &_init_f_bytesToWrite_c0, &_call_f_bytesToWrite_c0);
-  methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Method () const\nThis is a reimplementation of QIODevice::canReadLine", true, &_init_f_canReadLine_c0, &_call_f_canReadLine_c0);
-  methods += new qt_gsi::GenericMethod ("close", "@brief Method ()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
+  methods += new qt_gsi::GenericMethod ("bytesAvailable", "@brief Method qint64 QAbstractSocket::bytesAvailable()\nThis is a reimplementation of QIODevice::bytesAvailable", true, &_init_f_bytesAvailable_c0, &_call_f_bytesAvailable_c0);
+  methods += new qt_gsi::GenericMethod ("bytesToWrite", "@brief Method qint64 QAbstractSocket::bytesToWrite()\nThis is a reimplementation of QIODevice::bytesToWrite", true, &_init_f_bytesToWrite_c0, &_call_f_bytesToWrite_c0);
+  methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Method bool QAbstractSocket::canReadLine()\nThis is a reimplementation of QIODevice::canReadLine", true, &_init_f_canReadLine_c0, &_call_f_canReadLine_c0);
+  methods += new qt_gsi::GenericMethod ("close", "@brief Method void QAbstractSocket::close()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
   methods += new qt_gsi::GenericMethod ("connectToHost", "@brief Method void QAbstractSocket::connectToHost(const QString &hostName, quint16 port, QFlags<QIODevice::OpenModeFlag> mode, QAbstractSocket::NetworkLayerProtocol protocol)\n", false, &_init_f_connectToHost_10218, &_call_f_connectToHost_10218);
   methods += new qt_gsi::GenericMethod ("connectToHost", "@brief Method void QAbstractSocket::connectToHost(const QHostAddress &address, quint16 port, QFlags<QIODevice::OpenModeFlag> mode)\n", false, &_init_f_connectToHost_6644, &_call_f_connectToHost_6644);
   methods += new qt_gsi::GenericMethod ("disconnectFromHost", "@brief Method void QAbstractSocket::disconnectFromHost()\n", false, &_init_f_disconnectFromHost_0, &_call_f_disconnectFromHost_0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QAbstractSocket::SocketError QAbstractSocket::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("flush", "@brief Method bool QAbstractSocket::flush()\n", false, &_init_f_flush_0, &_call_f_flush_0);
-  methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method () const\nThis is a reimplementation of QIODevice::isSequential", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
+  methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method bool QAbstractSocket::isSequential()\nThis is a reimplementation of QIODevice::isSequential", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QAbstractSocket::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("localAddress", "@brief Method QHostAddress QAbstractSocket::localAddress()\n", true, &_init_f_localAddress_c0, &_call_f_localAddress_c0);
   methods += new qt_gsi::GenericMethod ("localPort", "@brief Method quint16 QAbstractSocket::localPort()\n", true, &_init_f_localPort_c0, &_call_f_localPort_c0);
@@ -823,10 +823,10 @@ static gsi::Methods methods_QAbstractSocket () {
   methods += new qt_gsi::GenericMethod ("socketOption", "@brief Method QVariant QAbstractSocket::socketOption(QAbstractSocket::SocketOption option)\n", false, &_init_f_socketOption_3320, &_call_f_socketOption_3320);
   methods += new qt_gsi::GenericMethod ("socketType", "@brief Method QAbstractSocket::SocketType QAbstractSocket::socketType()\n", true, &_init_f_socketType_c0, &_call_f_socketType_c0);
   methods += new qt_gsi::GenericMethod ("state", "@brief Method QAbstractSocket::SocketState QAbstractSocket::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
-  methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Method (int)\nThis is a reimplementation of QIODevice::waitForBytesWritten", false, &_init_f_waitForBytesWritten_767, &_call_f_waitForBytesWritten_767);
+  methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Method bool QAbstractSocket::waitForBytesWritten(int msecs)\nThis is a reimplementation of QIODevice::waitForBytesWritten", false, &_init_f_waitForBytesWritten_767, &_call_f_waitForBytesWritten_767);
   methods += new qt_gsi::GenericMethod ("waitForConnected", "@brief Method bool QAbstractSocket::waitForConnected(int msecs)\n", false, &_init_f_waitForConnected_767, &_call_f_waitForConnected_767);
   methods += new qt_gsi::GenericMethod ("waitForDisconnected", "@brief Method bool QAbstractSocket::waitForDisconnected(int msecs)\n", false, &_init_f_waitForDisconnected_767, &_call_f_waitForDisconnected_767);
-  methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Method (int)\nThis is a reimplementation of QIODevice::waitForReadyRead", false, &_init_f_waitForReadyRead_767, &_call_f_waitForReadyRead_767);
+  methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Method bool QAbstractSocket::waitForReadyRead(int msecs)\nThis is a reimplementation of QIODevice::waitForReadyRead", false, &_init_f_waitForReadyRead_767, &_call_f_waitForReadyRead_767);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QAbstractSocket::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QAbstractSocket::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("connected()", "connected", "@brief Signal declaration for QAbstractSocket::connected()\nYou can bind a procedure to this signal.");

@@ -160,7 +160,7 @@ static void _call_f_correctionMode_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QEvent *)
+// bool QAbstractSpinBox::event(QEvent *event)
 
 
 static void _init_f_event_1217 (qt_gsi::GenericMethod *decl)
@@ -229,7 +229,7 @@ static void _call_f_hasFrame_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (Qt::InputMethodQuery) const
+// QVariant QAbstractSpinBox::inputMethodQuery(Qt::InputMethodQuery)
 
 
 static void _init_f_inputMethodQuery_c2420 (qt_gsi::GenericMethod *decl)
@@ -309,7 +309,7 @@ static void _call_f_keyboardTracking_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// QSize QAbstractSpinBox::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -520,7 +520,7 @@ static void _call_f_setWrapping_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// QSize QAbstractSpinBox::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -758,16 +758,16 @@ static gsi::Methods methods_QAbstractSpinBox () {
   methods += new qt_gsi::GenericMethod (":buttonSymbols", "@brief Method QAbstractSpinBox::ButtonSymbols QAbstractSpinBox::buttonSymbols()\n", true, &_init_f_buttonSymbols_c0, &_call_f_buttonSymbols_c0);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QAbstractSpinBox::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
   methods += new qt_gsi::GenericMethod (":correctionMode", "@brief Method QAbstractSpinBox::CorrectionMode QAbstractSpinBox::correctionMode()\n", true, &_init_f_correctionMode_c0, &_call_f_correctionMode_c0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Method (QEvent *)\nThis is a reimplementation of QWidget::event", false, &_init_f_event_1217, &_call_f_event_1217);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Method bool QAbstractSpinBox::event(QEvent *event)\nThis is a reimplementation of QWidget::event", false, &_init_f_event_1217, &_call_f_event_1217);
   methods += new qt_gsi::GenericMethod ("fixup", "@brief Method void QAbstractSpinBox::fixup(QString &input)\n", true, &_init_f_fixup_c1330, &_call_f_fixup_c1330);
   methods += new qt_gsi::GenericMethod ("hasAcceptableInput|:acceptableInput", "@brief Method bool QAbstractSpinBox::hasAcceptableInput()\n", true, &_init_f_hasAcceptableInput_c0, &_call_f_hasAcceptableInput_c0);
   methods += new qt_gsi::GenericMethod ("hasFrame|:frame", "@brief Method bool QAbstractSpinBox::hasFrame()\n", true, &_init_f_hasFrame_c0, &_call_f_hasFrame_c0);
-  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method (Qt::InputMethodQuery) const\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
+  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method QVariant QAbstractSpinBox::inputMethodQuery(Qt::InputMethodQuery)\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
   methods += new qt_gsi::GenericMethod ("interpretText", "@brief Method void QAbstractSpinBox::interpretText()\n", false, &_init_f_interpretText_0, &_call_f_interpretText_0);
   methods += new qt_gsi::GenericMethod ("isAccelerated?|:accelerated", "@brief Method bool QAbstractSpinBox::isAccelerated()\n", true, &_init_f_isAccelerated_c0, &_call_f_isAccelerated_c0);
   methods += new qt_gsi::GenericMethod ("isReadOnly?|:readOnly", "@brief Method bool QAbstractSpinBox::isReadOnly()\n", true, &_init_f_isReadOnly_c0, &_call_f_isReadOnly_c0);
   methods += new qt_gsi::GenericMethod (":keyboardTracking", "@brief Method bool QAbstractSpinBox::keyboardTracking()\n", true, &_init_f_keyboardTracking_c0, &_call_f_keyboardTracking_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QAbstractSpinBox::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("selectAll", "@brief Method void QAbstractSpinBox::selectAll()\n", false, &_init_f_selectAll_0, &_call_f_selectAll_0);
   methods += new qt_gsi::GenericMethod ("setAccelerated|accelerated=", "@brief Method void QAbstractSpinBox::setAccelerated(bool on)\n", false, &_init_f_setAccelerated_864, &_call_f_setAccelerated_864);
   methods += new qt_gsi::GenericMethod ("setAlignment|alignment=", "@brief Method void QAbstractSpinBox::setAlignment(QFlags<Qt::AlignmentFlag> flag)\n", false, &_init_f_setAlignment_2750, &_call_f_setAlignment_2750);
@@ -778,7 +778,7 @@ static gsi::Methods methods_QAbstractSpinBox () {
   methods += new qt_gsi::GenericMethod ("setReadOnly|readOnly=", "@brief Method void QAbstractSpinBox::setReadOnly(bool r)\n", false, &_init_f_setReadOnly_864, &_call_f_setReadOnly_864);
   methods += new qt_gsi::GenericMethod ("setSpecialValueText|specialValueText=", "@brief Method void QAbstractSpinBox::setSpecialValueText(const QString &txt)\n", false, &_init_f_setSpecialValueText_2025, &_call_f_setSpecialValueText_2025);
   methods += new qt_gsi::GenericMethod ("setWrapping|wrapping=", "@brief Method void QAbstractSpinBox::setWrapping(bool w)\n", false, &_init_f_setWrapping_864, &_call_f_setWrapping_864);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QAbstractSpinBox::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":specialValueText", "@brief Method QString QAbstractSpinBox::specialValueText()\n", true, &_init_f_specialValueText_c0, &_call_f_specialValueText_c0);
   methods += new qt_gsi::GenericMethod ("stepBy", "@brief Method void QAbstractSpinBox::stepBy(int steps)\n", false, &_init_f_stepBy_767, &_call_f_stepBy_767);
   methods += new qt_gsi::GenericMethod ("stepDown", "@brief Method void QAbstractSpinBox::stepDown()\n", false, &_init_f_stepDown_0, &_call_f_stepDown_0);

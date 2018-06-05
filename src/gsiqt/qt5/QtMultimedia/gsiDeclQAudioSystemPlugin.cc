@@ -58,7 +58,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QAudio::Mode) const
+// QList<QByteArray> QAudioSystemPlugin::availableDevices(QAudio::Mode)
 
 
 static void _init_f_availableDevices_c1520 (qt_gsi::GenericMethod *decl)
@@ -77,7 +77,7 @@ static void _call_f_availableDevices_c1520 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (const QByteArray &, QAudio::Mode)
+// QAbstractAudioDeviceInfo *QAudioSystemPlugin::createDeviceInfo(const QByteArray &device, QAudio::Mode mode)
 
 
 static void _init_f_createDeviceInfo_3721 (qt_gsi::GenericMethod *decl)
@@ -99,7 +99,7 @@ static void _call_f_createDeviceInfo_3721 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// (const QByteArray &)
+// QAbstractAudioInput *QAudioSystemPlugin::createInput(const QByteArray &device)
 
 
 static void _init_f_createInput_2309 (qt_gsi::GenericMethod *decl)
@@ -118,7 +118,7 @@ static void _call_f_createInput_2309 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QByteArray &)
+// QAbstractAudioOutput *QAudioSystemPlugin::createOutput(const QByteArray &device)
 
 
 static void _init_f_createOutput_2309 (qt_gsi::GenericMethod *decl)
@@ -238,10 +238,10 @@ namespace gsi
 static gsi::Methods methods_QAudioSystemPlugin () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("availableDevices", "@brief Method (QAudio::Mode) const\nThis is a reimplementation of QAudioSystemFactoryInterface::availableDevices", true, &_init_f_availableDevices_c1520, &_call_f_availableDevices_c1520);
-  methods += new qt_gsi::GenericMethod ("createDeviceInfo", "@brief Method (const QByteArray &, QAudio::Mode)\nThis is a reimplementation of QAudioSystemFactoryInterface::createDeviceInfo", false, &_init_f_createDeviceInfo_3721, &_call_f_createDeviceInfo_3721);
-  methods += new qt_gsi::GenericMethod ("createInput", "@brief Method (const QByteArray &)\nThis is a reimplementation of QAudioSystemFactoryInterface::createInput", false, &_init_f_createInput_2309, &_call_f_createInput_2309);
-  methods += new qt_gsi::GenericMethod ("createOutput", "@brief Method (const QByteArray &)\nThis is a reimplementation of QAudioSystemFactoryInterface::createOutput", false, &_init_f_createOutput_2309, &_call_f_createOutput_2309);
+  methods += new qt_gsi::GenericMethod ("availableDevices", "@brief Method QList<QByteArray> QAudioSystemPlugin::availableDevices(QAudio::Mode)\nThis is a reimplementation of QAudioSystemFactoryInterface::availableDevices", true, &_init_f_availableDevices_c1520, &_call_f_availableDevices_c1520);
+  methods += new qt_gsi::GenericMethod ("createDeviceInfo", "@brief Method QAbstractAudioDeviceInfo *QAudioSystemPlugin::createDeviceInfo(const QByteArray &device, QAudio::Mode mode)\nThis is a reimplementation of QAudioSystemFactoryInterface::createDeviceInfo", false, &_init_f_createDeviceInfo_3721, &_call_f_createDeviceInfo_3721);
+  methods += new qt_gsi::GenericMethod ("createInput", "@brief Method QAbstractAudioInput *QAudioSystemPlugin::createInput(const QByteArray &device)\nThis is a reimplementation of QAudioSystemFactoryInterface::createInput", false, &_init_f_createInput_2309, &_call_f_createInput_2309);
+  methods += new qt_gsi::GenericMethod ("createOutput", "@brief Method QAbstractAudioOutput *QAudioSystemPlugin::createOutput(const QByteArray &device)\nThis is a reimplementation of QAudioSystemFactoryInterface::createOutput", false, &_init_f_createOutput_2309, &_call_f_createOutput_2309);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAudioSystemPlugin::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAudioSystemPlugin::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAudioSystemPlugin::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);

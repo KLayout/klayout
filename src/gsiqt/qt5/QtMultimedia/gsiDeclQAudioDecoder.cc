@@ -74,7 +74,7 @@ static void _call_f_audioFormat_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (QObject *)
+// bool QAudioDecoder::bind(QObject *)
 
 
 static void _init_f_bind_1302 (qt_gsi::GenericMethod *decl)
@@ -320,7 +320,7 @@ static void _call_f_stop_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QObject *)
+// void QAudioDecoder::unbind(QObject *)
 
 
 static void _init_f_unbind_1302 (qt_gsi::GenericMethod *decl)
@@ -419,7 +419,7 @@ static gsi::Methods methods_QAudioDecoder () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":audioFormat", "@brief Method QAudioFormat QAudioDecoder::audioFormat()\n", true, &_init_f_audioFormat_c0, &_call_f_audioFormat_c0);
-  methods += new qt_gsi::GenericMethod ("bind", "@brief Method (QObject *)\nThis is a reimplementation of QMediaObject::bind", false, &_init_f_bind_1302, &_call_f_bind_1302);
+  methods += new qt_gsi::GenericMethod ("bind", "@brief Method bool QAudioDecoder::bind(QObject *)\nThis is a reimplementation of QMediaObject::bind", false, &_init_f_bind_1302, &_call_f_bind_1302);
   methods += new qt_gsi::GenericMethod (":bufferAvailable", "@brief Method bool QAudioDecoder::bufferAvailable()\n", true, &_init_f_bufferAvailable_c0, &_call_f_bufferAvailable_c0);
   methods += new qt_gsi::GenericMethod ("duration", "@brief Method qint64 QAudioDecoder::duration()\n", true, &_init_f_duration_c0, &_call_f_duration_c0);
   methods += new qt_gsi::GenericMethod (":error", "@brief Method QAudioDecoder::Error QAudioDecoder::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
@@ -434,7 +434,7 @@ static gsi::Methods methods_QAudioDecoder () {
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QAudioDecoder::start()\n", false, &_init_f_start_0, &_call_f_start_0);
   methods += new qt_gsi::GenericMethod (":state", "@brief Method QAudioDecoder::State QAudioDecoder::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Method void QAudioDecoder::stop()\n", false, &_init_f_stop_0, &_call_f_stop_0);
-  methods += new qt_gsi::GenericMethod ("unbind", "@brief Method (QObject *)\nThis is a reimplementation of QMediaObject::unbind", false, &_init_f_unbind_1302, &_call_f_unbind_1302);
+  methods += new qt_gsi::GenericMethod ("unbind", "@brief Method void QAudioDecoder::unbind(QObject *)\nThis is a reimplementation of QMediaObject::unbind", false, &_init_f_unbind_1302, &_call_f_unbind_1302);
   methods += gsi::qt_signal<bool > ("availabilityChanged(bool)", "availabilityChanged_bool", gsi::arg("available"), "@brief Signal declaration for QAudioDecoder::availabilityChanged(bool available)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > ("availabilityChanged(QMultimedia::AvailabilityStatus)", "availabilityChanged_status", gsi::arg("availability"), "@brief Signal declaration for QAudioDecoder::availabilityChanged(QMultimedia::AvailabilityStatus availability)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("bufferAvailableChanged(bool)", "bufferAvailableChanged", gsi::arg("arg1"), "@brief Signal declaration for QAudioDecoder::bufferAvailableChanged(bool)\nYou can bind a procedure to this signal.");

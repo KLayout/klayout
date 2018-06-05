@@ -185,7 +185,7 @@ static void _call_f_createMaskFromColor_c3331 (const qt_gsi::GenericMethod * /*d
 }
 
 
-// () const
+// int QPixmap::depth()
 
 
 static void _init_f_depth_c0 (qt_gsi::GenericMethod *decl)
@@ -315,7 +315,7 @@ static void _call_f_hasAlphaChannel_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// () const
+// int QPixmap::height()
 
 
 static void _init_f_height_c0 (qt_gsi::GenericMethod *decl)
@@ -483,7 +483,7 @@ static void _call_f_operator_excl__c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QPixmap &)
+// QPixmap &QPixmap::operator=(const QPixmap &)
 
 
 static void _init_f_operator_eq__2017 (qt_gsi::GenericMethod *decl)
@@ -502,7 +502,7 @@ static void _call_f_operator_eq__2017 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// QPaintEngine *QPixmap::paintEngine()
 
 
 static void _init_f_paintEngine_c0 (qt_gsi::GenericMethod *decl)
@@ -875,7 +875,7 @@ static void _call_f_transformed_c4875 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// int QPixmap::width()
 
 
 static void _init_f_width_c0 (qt_gsi::GenericMethod *decl)
@@ -1073,14 +1073,14 @@ static gsi::Methods methods_QPixmap () {
   methods += new qt_gsi::GenericMethod ("createHeuristicMask", "@brief Method QBitmap QPixmap::createHeuristicMask(bool clipTight)\n", true, &_init_f_createHeuristicMask_c864, &_call_f_createHeuristicMask_c864);
   methods += new qt_gsi::GenericMethod ("createMaskFromColor", "@brief Method QBitmap QPixmap::createMaskFromColor(const QColor &maskColor)\n", true, &_init_f_createMaskFromColor_c1905, &_call_f_createMaskFromColor_c1905);
   methods += new qt_gsi::GenericMethod ("createMaskFromColor", "@brief Method QBitmap QPixmap::createMaskFromColor(const QColor &maskColor, Qt::MaskMode mode)\n", true, &_init_f_createMaskFromColor_c3331, &_call_f_createMaskFromColor_c3331);
-  methods += new qt_gsi::GenericMethod ("depth", "@brief Method () const\n", true, &_init_f_depth_c0, &_call_f_depth_c0);
+  methods += new qt_gsi::GenericMethod ("depth", "@brief Method int QPixmap::depth()\n", true, &_init_f_depth_c0, &_call_f_depth_c0);
   methods += new qt_gsi::GenericMethod ("detach", "@brief Method void QPixmap::detach()\n", false, &_init_f_detach_0, &_call_f_detach_0);
   methods += new qt_gsi::GenericMethod ("fill", "@brief Method void QPixmap::fill(const QColor &fillColor)\n", false, &_init_f_fill_1905, &_call_f_fill_1905);
   methods += new qt_gsi::GenericMethod ("fill", "@brief Method void QPixmap::fill(const QWidget *widget, const QPoint &ofs)\n", false, &_init_f_fill_3818, &_call_f_fill_3818);
   methods += new qt_gsi::GenericMethod ("fill", "@brief Method void QPixmap::fill(const QWidget *widget, int xofs, int yofs)\n", false, &_init_f_fill_3328, &_call_f_fill_3328);
   methods += new qt_gsi::GenericMethod ("hasAlpha", "@brief Method bool QPixmap::hasAlpha()\n", true, &_init_f_hasAlpha_c0, &_call_f_hasAlpha_c0);
   methods += new qt_gsi::GenericMethod ("hasAlphaChannel", "@brief Method bool QPixmap::hasAlphaChannel()\n", true, &_init_f_hasAlphaChannel_c0, &_call_f_hasAlphaChannel_c0);
-  methods += new qt_gsi::GenericMethod ("height", "@brief Method () const\n", true, &_init_f_height_c0, &_call_f_height_c0);
+  methods += new qt_gsi::GenericMethod ("height", "@brief Method int QPixmap::height()\n", true, &_init_f_height_c0, &_call_f_height_c0);
   methods += new qt_gsi::GenericMethod ("isDetached?", "@brief Method bool QPixmap::isDetached()\n", true, &_init_f_isDetached_c0, &_call_f_isDetached_c0);
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QPixmap::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
   methods += new qt_gsi::GenericMethod ("isQBitmap?", "@brief Method bool QPixmap::isQBitmap()\n", true, &_init_f_isQBitmap_c0, &_call_f_isQBitmap_c0);
@@ -1089,8 +1089,8 @@ static gsi::Methods methods_QPixmap () {
   methods += new qt_gsi::GenericMethod ("loadFromData", "@brief Method bool QPixmap::loadFromData(const QByteArray &data, const char *format, QFlags<Qt::ImageConversionFlag> flags)\n", false, &_init_f_loadFromData_7192, &_call_f_loadFromData_7192);
   methods += new qt_gsi::GenericMethod (":mask", "@brief Method QBitmap QPixmap::mask()\n", true, &_init_f_mask_c0, &_call_f_mask_c0);
   methods += new qt_gsi::GenericMethod ("!", "@brief Method bool QPixmap::operator!()\n", true, &_init_f_operator_excl__c0, &_call_f_operator_excl__c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QPixmap &)\n", false, &_init_f_operator_eq__2017, &_call_f_operator_eq__2017);
-  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Method () const\nThis is a reimplementation of QPaintDevice::paintEngine", true, &_init_f_paintEngine_c0, &_call_f_paintEngine_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QPixmap &QPixmap::operator=(const QPixmap &)\n", false, &_init_f_operator_eq__2017, &_call_f_operator_eq__2017);
+  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Method QPaintEngine *QPixmap::paintEngine()\nThis is a reimplementation of QPaintDevice::paintEngine", true, &_init_f_paintEngine_c0, &_call_f_paintEngine_c0);
   methods += new qt_gsi::GenericMethod ("rect", "@brief Method QRect QPixmap::rect()\n", true, &_init_f_rect_c0, &_call_f_rect_c0);
   methods += new qt_gsi::GenericMethod ("save", "@brief Method bool QPixmap::save(const QString &fileName, const char *format, int quality)\n", true, &_init_f_save_c4307, &_call_f_save_c4307);
   methods += new qt_gsi::GenericMethod ("save", "@brief Method bool QPixmap::save(QIODevice *device, const char *format, int quality)\n", true, &_init_f_save_c3729, &_call_f_save_c3729);
@@ -1107,7 +1107,7 @@ static gsi::Methods methods_QPixmap () {
   methods += new qt_gsi::GenericMethod ("toImage", "@brief Method QImage QPixmap::toImage()\n", true, &_init_f_toImage_c0, &_call_f_toImage_c0);
   methods += new qt_gsi::GenericMethod ("transformed", "@brief Method QPixmap QPixmap::transformed(const QMatrix &, Qt::TransformationMode mode)\n", true, &_init_f_transformed_c4548, &_call_f_transformed_c4548);
   methods += new qt_gsi::GenericMethod ("transformed", "@brief Method QPixmap QPixmap::transformed(const QTransform &, Qt::TransformationMode mode)\n", true, &_init_f_transformed_c4875, &_call_f_transformed_c4875);
-  methods += new qt_gsi::GenericMethod ("width", "@brief Method () const\n", true, &_init_f_width_c0, &_call_f_width_c0);
+  methods += new qt_gsi::GenericMethod ("width", "@brief Method int QPixmap::width()\n", true, &_init_f_width_c0, &_call_f_width_c0);
   methods += new qt_gsi::GenericStaticMethod ("defaultDepth", "@brief Static method int QPixmap::defaultDepth()\nThis method is static and can be called without an instance.", &_init_f_defaultDepth_0, &_call_f_defaultDepth_0);
   methods += new qt_gsi::GenericStaticMethod ("fromImage", "@brief Static method QPixmap QPixmap::fromImage(const QImage &image, QFlags<Qt::ImageConversionFlag> flags)\nThis method is static and can be called without an instance.", &_init_f_fromImage_5137, &_call_f_fromImage_5137);
   methods += new qt_gsi::GenericStaticMethod ("grabWidget", "@brief Static method QPixmap QPixmap::grabWidget(QWidget *widget, const QRect &rect)\nThis method is static and can be called without an instance.", &_init_f_grabWidget_2999, &_call_f_grabWidget_2999);

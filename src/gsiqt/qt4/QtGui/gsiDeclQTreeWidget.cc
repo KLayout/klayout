@@ -165,7 +165,7 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (QTreeWidgetItem *, int)
+// void QTreeWidget::closePersistentEditor(QTreeWidgetItem *item, int column)
 
 
 static void _init_f_closePersistentEditor_2773 (qt_gsi::GenericMethod *decl)
@@ -513,7 +513,7 @@ static void _call_f_isItemSelected_c2809 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// () const
+// bool QTreeWidget::isSortingEnabled()
 
 
 static void _init_f_isSortingEnabled_c0 (qt_gsi::GenericMethod *decl)
@@ -629,7 +629,7 @@ static void _call_f_itemWidget_c2773 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (QTreeWidgetItem *, int)
+// void QTreeWidget::openPersistentEditor(QTreeWidgetItem *item, int column)
 
 
 static void _init_f_openPersistentEditor_2773 (qt_gsi::GenericMethod *decl)
@@ -980,7 +980,7 @@ static void _call_f_setItemWidget_3980 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (QItemSelectionModel *)
+// void QTreeWidget::setSelectionModel(QItemSelectionModel *selectionModel)
 
 
 static void _init_f_setSelectionModel_2533 (qt_gsi::GenericMethod *decl)
@@ -1000,7 +1000,7 @@ static void _call_f_setSelectionModel_2533 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// (bool)
+// void QTreeWidget::setSortingEnabled(bool enable)
 
 
 static void _init_f_setSortingEnabled_864 (qt_gsi::GenericMethod *decl)
@@ -1233,7 +1233,7 @@ static gsi::Methods methods_QTreeWidget () {
   methods += new qt_gsi::GenericMethod ("addTopLevelItem", "@brief Method void QTreeWidget::addTopLevelItem(QTreeWidgetItem *item)\n", false, &_init_f_addTopLevelItem_2114, &_call_f_addTopLevelItem_2114);
   methods += new qt_gsi::GenericMethod ("addTopLevelItems", "@brief Method void QTreeWidget::addTopLevelItems(const QList<QTreeWidgetItem*> &items)\n", false, &_init_f_addTopLevelItems_3462, &_call_f_addTopLevelItems_3462);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QTreeWidget::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
-  methods += new qt_gsi::GenericMethod ("closePersistentEditor", "@brief Method (QTreeWidgetItem *, int)\n", false, &_init_f_closePersistentEditor_2773, &_call_f_closePersistentEditor_2773);
+  methods += new qt_gsi::GenericMethod ("closePersistentEditor", "@brief Method void QTreeWidget::closePersistentEditor(QTreeWidgetItem *item, int column)\n", false, &_init_f_closePersistentEditor_2773, &_call_f_closePersistentEditor_2773);
   methods += new qt_gsi::GenericMethod ("collapseItem", "@brief Method void QTreeWidget::collapseItem(const QTreeWidgetItem *item)\n", false, &_init_f_collapseItem_2809, &_call_f_collapseItem_2809);
   methods += new qt_gsi::GenericMethod (":columnCount", "@brief Method int QTreeWidget::columnCount()\n", true, &_init_f_columnCount_c0, &_call_f_columnCount_c0);
   methods += new qt_gsi::GenericMethod ("currentColumn", "@brief Method int QTreeWidget::currentColumn()\n", true, &_init_f_currentColumn_c0, &_call_f_currentColumn_c0);
@@ -1251,13 +1251,13 @@ static gsi::Methods methods_QTreeWidget () {
   methods += new qt_gsi::GenericMethod ("isItemExpanded?", "@brief Method bool QTreeWidget::isItemExpanded(const QTreeWidgetItem *item)\n", true, &_init_f_isItemExpanded_c2809, &_call_f_isItemExpanded_c2809);
   methods += new qt_gsi::GenericMethod ("isItemHidden?", "@brief Method bool QTreeWidget::isItemHidden(const QTreeWidgetItem *item)\n", true, &_init_f_isItemHidden_c2809, &_call_f_isItemHidden_c2809);
   methods += new qt_gsi::GenericMethod ("isItemSelected?", "@brief Method bool QTreeWidget::isItemSelected(const QTreeWidgetItem *item)\n", true, &_init_f_isItemSelected_c2809, &_call_f_isItemSelected_c2809);
-  methods += new qt_gsi::GenericMethod ("isSortingEnabled?|:sortingEnabled", "@brief Method () const\n", true, &_init_f_isSortingEnabled_c0, &_call_f_isSortingEnabled_c0);
+  methods += new qt_gsi::GenericMethod ("isSortingEnabled?|:sortingEnabled", "@brief Method bool QTreeWidget::isSortingEnabled()\n", true, &_init_f_isSortingEnabled_c0, &_call_f_isSortingEnabled_c0);
   methods += new qt_gsi::GenericMethod ("itemAbove", "@brief Method QTreeWidgetItem *QTreeWidget::itemAbove(const QTreeWidgetItem *item)\n", true, &_init_f_itemAbove_c2809, &_call_f_itemAbove_c2809);
   methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QTreeWidgetItem *QTreeWidget::itemAt(const QPoint &p)\n", true, &_init_f_itemAt_c1916, &_call_f_itemAt_c1916);
   methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QTreeWidgetItem *QTreeWidget::itemAt(int x, int y)\n", true, &_init_f_itemAt_c1426, &_call_f_itemAt_c1426);
   methods += new qt_gsi::GenericMethod ("itemBelow", "@brief Method QTreeWidgetItem *QTreeWidget::itemBelow(const QTreeWidgetItem *item)\n", true, &_init_f_itemBelow_c2809, &_call_f_itemBelow_c2809);
   methods += new qt_gsi::GenericMethod ("itemWidget", "@brief Method QWidget *QTreeWidget::itemWidget(QTreeWidgetItem *item, int column)\n", true, &_init_f_itemWidget_c2773, &_call_f_itemWidget_c2773);
-  methods += new qt_gsi::GenericMethod ("openPersistentEditor", "@brief Method (QTreeWidgetItem *, int)\n", false, &_init_f_openPersistentEditor_2773, &_call_f_openPersistentEditor_2773);
+  methods += new qt_gsi::GenericMethod ("openPersistentEditor", "@brief Method void QTreeWidget::openPersistentEditor(QTreeWidgetItem *item, int column)\n", false, &_init_f_openPersistentEditor_2773, &_call_f_openPersistentEditor_2773);
   methods += new qt_gsi::GenericMethod ("removeItemWidget", "@brief Method void QTreeWidget::removeItemWidget(QTreeWidgetItem *item, int column)\n", false, &_init_f_removeItemWidget_2773, &_call_f_removeItemWidget_2773);
   methods += new qt_gsi::GenericMethod ("scrollToItem", "@brief Method void QTreeWidget::scrollToItem(const QTreeWidgetItem *item, QAbstractItemView::ScrollHint hint)\n", false, &_init_f_scrollToItem_5990, &_call_f_scrollToItem_5990);
   methods += new qt_gsi::GenericMethod ("selectedItems", "@brief Method QList<QTreeWidgetItem*> QTreeWidget::selectedItems()\n", true, &_init_f_selectedItems_c0, &_call_f_selectedItems_c0);
@@ -1273,8 +1273,8 @@ static gsi::Methods methods_QTreeWidget () {
   methods += new qt_gsi::GenericMethod ("setItemHidden", "@brief Method void QTreeWidget::setItemHidden(const QTreeWidgetItem *item, bool hide)\n", false, &_init_f_setItemHidden_3565, &_call_f_setItemHidden_3565);
   methods += new qt_gsi::GenericMethod ("setItemSelected", "@brief Method void QTreeWidget::setItemSelected(const QTreeWidgetItem *item, bool select)\n", false, &_init_f_setItemSelected_3565, &_call_f_setItemSelected_3565);
   methods += new qt_gsi::GenericMethod ("setItemWidget", "@brief Method void QTreeWidget::setItemWidget(QTreeWidgetItem *item, int column, QWidget *widget)\n", false, &_init_f_setItemWidget_3980, &_call_f_setItemWidget_3980);
-  methods += new qt_gsi::GenericMethod ("setSelectionModel|selectionModel=", "@brief Method (QItemSelectionModel *)\nThis is a reimplementation of QTreeView::setSelectionModel", false, &_init_f_setSelectionModel_2533, &_call_f_setSelectionModel_2533);
-  methods += new qt_gsi::GenericMethod ("setSortingEnabled|sortingEnabled=", "@brief Method (bool)\n", false, &_init_f_setSortingEnabled_864, &_call_f_setSortingEnabled_864);
+  methods += new qt_gsi::GenericMethod ("setSelectionModel|selectionModel=", "@brief Method void QTreeWidget::setSelectionModel(QItemSelectionModel *selectionModel)\nThis is a reimplementation of QTreeView::setSelectionModel", false, &_init_f_setSelectionModel_2533, &_call_f_setSelectionModel_2533);
+  methods += new qt_gsi::GenericMethod ("setSortingEnabled|sortingEnabled=", "@brief Method void QTreeWidget::setSortingEnabled(bool enable)\n", false, &_init_f_setSortingEnabled_864, &_call_f_setSortingEnabled_864);
   methods += new qt_gsi::GenericMethod ("sortColumn", "@brief Method int QTreeWidget::sortColumn()\n", true, &_init_f_sortColumn_c0, &_call_f_sortColumn_c0);
   methods += new qt_gsi::GenericMethod ("sortItems", "@brief Method void QTreeWidget::sortItems(int column, Qt::SortOrder order)\n", false, &_init_f_sortItems_2340, &_call_f_sortItems_2340);
   methods += new qt_gsi::GenericMethod ("takeTopLevelItem", "@brief Method QTreeWidgetItem *QTreeWidget::takeTopLevelItem(int index)\n", false, &_init_f_takeTopLevelItem_767, &_call_f_takeTopLevelItem_767);

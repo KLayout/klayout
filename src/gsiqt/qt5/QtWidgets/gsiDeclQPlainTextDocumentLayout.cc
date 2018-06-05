@@ -67,7 +67,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (const QTextBlock &) const
+// QRectF QPlainTextDocumentLayout::blockBoundingRect(const QTextBlock &block)
 
 
 static void _init_f_blockBoundingRect_c2306 (qt_gsi::GenericMethod *decl)
@@ -101,7 +101,7 @@ static void _call_f_cursorWidth_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QSizeF QPlainTextDocumentLayout::documentSize()
 
 
 static void _init_f_documentSize_c0 (qt_gsi::GenericMethod *decl)
@@ -116,7 +116,7 @@ static void _call_f_documentSize_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QPainter *, const QAbstractTextDocumentLayout::PaintContext &)
+// void QPlainTextDocumentLayout::draw(QPainter *, const QAbstractTextDocumentLayout::PaintContext &)
 
 
 static void _init_f_draw_6787 (qt_gsi::GenericMethod *decl)
@@ -159,7 +159,7 @@ static void _call_f_ensureBlockLayout_c2306 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (QTextFrame *) const
+// QRectF QPlainTextDocumentLayout::frameBoundingRect(QTextFrame *)
 
 
 static void _init_f_frameBoundingRect_c1615 (qt_gsi::GenericMethod *decl)
@@ -178,7 +178,7 @@ static void _call_f_frameBoundingRect_c1615 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (const QPointF &, Qt::HitTestAccuracy) const
+// int QPlainTextDocumentLayout::hitTest(const QPointF &, Qt::HitTestAccuracy)
 
 
 static void _init_f_hitTest_c4147 (qt_gsi::GenericMethod *decl)
@@ -200,7 +200,7 @@ static void _call_f_hitTest_c4147 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// () const
+// int QPlainTextDocumentLayout::pageCount()
 
 
 static void _init_f_pageCount_c0 (qt_gsi::GenericMethod *decl)
@@ -307,14 +307,14 @@ namespace gsi
 static gsi::Methods methods_QPlainTextDocumentLayout () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("blockBoundingRect", "@brief Method (const QTextBlock &) const\nThis is a reimplementation of QAbstractTextDocumentLayout::blockBoundingRect", true, &_init_f_blockBoundingRect_c2306, &_call_f_blockBoundingRect_c2306);
+  methods += new qt_gsi::GenericMethod ("blockBoundingRect", "@brief Method QRectF QPlainTextDocumentLayout::blockBoundingRect(const QTextBlock &block)\nThis is a reimplementation of QAbstractTextDocumentLayout::blockBoundingRect", true, &_init_f_blockBoundingRect_c2306, &_call_f_blockBoundingRect_c2306);
   methods += new qt_gsi::GenericMethod (":cursorWidth", "@brief Method int QPlainTextDocumentLayout::cursorWidth()\n", true, &_init_f_cursorWidth_c0, &_call_f_cursorWidth_c0);
-  methods += new qt_gsi::GenericMethod ("documentSize", "@brief Method () const\nThis is a reimplementation of QAbstractTextDocumentLayout::documentSize", true, &_init_f_documentSize_c0, &_call_f_documentSize_c0);
-  methods += new qt_gsi::GenericMethod ("draw", "@brief Method (QPainter *, const QAbstractTextDocumentLayout::PaintContext &)\nThis is a reimplementation of QAbstractTextDocumentLayout::draw", false, &_init_f_draw_6787, &_call_f_draw_6787);
+  methods += new qt_gsi::GenericMethod ("documentSize", "@brief Method QSizeF QPlainTextDocumentLayout::documentSize()\nThis is a reimplementation of QAbstractTextDocumentLayout::documentSize", true, &_init_f_documentSize_c0, &_call_f_documentSize_c0);
+  methods += new qt_gsi::GenericMethod ("draw", "@brief Method void QPlainTextDocumentLayout::draw(QPainter *, const QAbstractTextDocumentLayout::PaintContext &)\nThis is a reimplementation of QAbstractTextDocumentLayout::draw", false, &_init_f_draw_6787, &_call_f_draw_6787);
   methods += new qt_gsi::GenericMethod ("ensureBlockLayout", "@brief Method void QPlainTextDocumentLayout::ensureBlockLayout(const QTextBlock &block)\n", true, &_init_f_ensureBlockLayout_c2306, &_call_f_ensureBlockLayout_c2306);
-  methods += new qt_gsi::GenericMethod ("frameBoundingRect", "@brief Method (QTextFrame *) const\nThis is a reimplementation of QAbstractTextDocumentLayout::frameBoundingRect", true, &_init_f_frameBoundingRect_c1615, &_call_f_frameBoundingRect_c1615);
-  methods += new qt_gsi::GenericMethod ("hitTest", "@brief Method (const QPointF &, Qt::HitTestAccuracy) const\nThis is a reimplementation of QAbstractTextDocumentLayout::hitTest", true, &_init_f_hitTest_c4147, &_call_f_hitTest_c4147);
-  methods += new qt_gsi::GenericMethod ("pageCount", "@brief Method () const\nThis is a reimplementation of QAbstractTextDocumentLayout::pageCount", true, &_init_f_pageCount_c0, &_call_f_pageCount_c0);
+  methods += new qt_gsi::GenericMethod ("frameBoundingRect", "@brief Method QRectF QPlainTextDocumentLayout::frameBoundingRect(QTextFrame *)\nThis is a reimplementation of QAbstractTextDocumentLayout::frameBoundingRect", true, &_init_f_frameBoundingRect_c1615, &_call_f_frameBoundingRect_c1615);
+  methods += new qt_gsi::GenericMethod ("hitTest", "@brief Method int QPlainTextDocumentLayout::hitTest(const QPointF &, Qt::HitTestAccuracy)\nThis is a reimplementation of QAbstractTextDocumentLayout::hitTest", true, &_init_f_hitTest_c4147, &_call_f_hitTest_c4147);
+  methods += new qt_gsi::GenericMethod ("pageCount", "@brief Method int QPlainTextDocumentLayout::pageCount()\nThis is a reimplementation of QAbstractTextDocumentLayout::pageCount", true, &_init_f_pageCount_c0, &_call_f_pageCount_c0);
   methods += new qt_gsi::GenericMethod ("requestUpdate", "@brief Method void QPlainTextDocumentLayout::requestUpdate()\n", false, &_init_f_requestUpdate_0, &_call_f_requestUpdate_0);
   methods += new qt_gsi::GenericMethod ("setCursorWidth|cursorWidth=", "@brief Method void QPlainTextDocumentLayout::setCursorWidth(int width)\n", false, &_init_f_setCursorWidth_767, &_call_f_setCursorWidth_767);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QPlainTextDocumentLayout::destroyed(QObject *)\nYou can bind a procedure to this signal.");

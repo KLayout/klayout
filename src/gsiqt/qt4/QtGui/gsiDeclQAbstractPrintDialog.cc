@@ -133,7 +133,7 @@ static void _call_f_enabledOptions_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// ()
+// int QAbstractPrintDialog::exec()
 
 
 static void _init_f_exec_0 (qt_gsi::GenericMethod *decl)
@@ -465,7 +465,7 @@ static gsi::Methods methods_QAbstractPrintDialog () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("addEnabledOption", "@brief Method void QAbstractPrintDialog::addEnabledOption(QAbstractPrintDialog::PrintDialogOption option)\n", false, &_init_f_addEnabledOption_4320, &_call_f_addEnabledOption_4320);
   methods += new qt_gsi::GenericMethod (":enabledOptions", "@brief Method QFlags<QAbstractPrintDialog::PrintDialogOption> QAbstractPrintDialog::enabledOptions()\n", true, &_init_f_enabledOptions_c0, &_call_f_enabledOptions_c0);
-  methods += new qt_gsi::GenericMethod ("exec", "@brief Method ()\n", false, &_init_f_exec_0, &_call_f_exec_0);
+  methods += new qt_gsi::GenericMethod ("exec", "@brief Method int QAbstractPrintDialog::exec()\n", false, &_init_f_exec_0, &_call_f_exec_0);
   methods += new qt_gsi::GenericMethod ("fromPage", "@brief Method int QAbstractPrintDialog::fromPage()\n", true, &_init_f_fromPage_c0, &_call_f_fromPage_c0);
   methods += new qt_gsi::GenericMethod ("isOptionEnabled?", "@brief Method bool QAbstractPrintDialog::isOptionEnabled(QAbstractPrintDialog::PrintDialogOption option)\n", true, &_init_f_isOptionEnabled_c4320, &_call_f_isOptionEnabled_c4320);
   methods += new qt_gsi::GenericMethod ("maxPage", "@brief Method int QAbstractPrintDialog::maxPage()\n", true, &_init_f_maxPage_c0, &_call_f_maxPage_c0);

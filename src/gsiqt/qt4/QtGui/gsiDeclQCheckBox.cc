@@ -169,7 +169,7 @@ static void _call_f_setTristate_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// () const
+// QSize QCheckBox::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -288,7 +288,7 @@ static gsi::Methods methods_QCheckBox () {
   methods += new qt_gsi::GenericMethod ("isTristate?|:tristate", "@brief Method bool QCheckBox::isTristate()\n", true, &_init_f_isTristate_c0, &_call_f_isTristate_c0);
   methods += new qt_gsi::GenericMethod ("setCheckState|checkState=", "@brief Method void QCheckBox::setCheckState(Qt::CheckState state)\n", false, &_init_f_setCheckState_1740, &_call_f_setCheckState_1740);
   methods += new qt_gsi::GenericMethod ("setTristate|tristate=", "@brief Method void QCheckBox::setTristate(bool y)\n", false, &_init_f_setTristate_864, &_call_f_setTristate_864);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QCheckBox::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += gsi::qt_signal<bool > ("clicked(bool)", "clicked", gsi::arg("checked"), "@brief Signal declaration for QCheckBox::clicked(bool checked)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QCheckBox::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCheckBox::destroyed(QObject *)\nYou can bind a procedure to this signal.");

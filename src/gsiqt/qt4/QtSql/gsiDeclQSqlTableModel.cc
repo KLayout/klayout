@@ -63,7 +63,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// ()
+// void QSqlTableModel::clear()
 
 
 static void _init_f_clear_0 (qt_gsi::GenericMethod *decl)
@@ -79,7 +79,7 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (const QModelIndex &, int) const
+// QVariant QSqlTableModel::data(const QModelIndex &idx, int role)
 
 
 static void _init_f_data_c3054 (qt_gsi::GenericMethod *decl)
@@ -165,7 +165,7 @@ static void _call_f_filter_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (const QModelIndex &) const
+// QFlags<Qt::ItemFlag> QSqlTableModel::flags(const QModelIndex &index)
 
 
 static void _init_f_flags_c2395 (qt_gsi::GenericMethod *decl)
@@ -184,7 +184,7 @@ static void _call_f_flags_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (int, Qt::Orientation, int) const
+// QVariant QSqlTableModel::headerData(int section, Qt::Orientation orientation, int role)
 
 
 static void _init_f_headerData_c3231 (qt_gsi::GenericMethod *decl)
@@ -231,7 +231,7 @@ static void _call_f_insertRecord_2964 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QSqlTableModel::insertRows(int row, int count, const QModelIndex &parent)
 
 
 static void _init_f_insertRows_3713 (qt_gsi::GenericMethod *decl)
@@ -290,7 +290,7 @@ static void _call_f_primaryKey_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QSqlTableModel::removeColumns(int column, int count, const QModelIndex &parent)
 
 
 static void _init_f_removeColumns_3713 (qt_gsi::GenericMethod *decl)
@@ -315,7 +315,7 @@ static void _call_f_removeColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QSqlTableModel::removeRows(int row, int count, const QModelIndex &parent)
 
 
 static void _init_f_removeRows_3713 (qt_gsi::GenericMethod *decl)
@@ -340,7 +340,7 @@ static void _call_f_removeRows_3713 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// ()
+// void QSqlTableModel::revert()
 
 
 static void _init_f_revert_0 (qt_gsi::GenericMethod *decl)
@@ -392,7 +392,7 @@ static void _call_f_revertRow_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QModelIndex &) const
+// int QSqlTableModel::rowCount(const QModelIndex &parent)
 
 
 static void _init_f_rowCount_c2395 (qt_gsi::GenericMethod *decl)
@@ -426,7 +426,7 @@ static void _call_f_select_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (const QModelIndex &, const QVariant &, int)
+// bool QSqlTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 
 
 static void _init_f_setData_5065 (qt_gsi::GenericMethod *decl)
@@ -556,7 +556,7 @@ static void _call_f_setTable_2025 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (int, Qt::SortOrder)
+// void QSqlTableModel::sort(int column, Qt::SortOrder order)
 
 
 static void _init_f_sort_2340 (qt_gsi::GenericMethod *decl)
@@ -579,7 +579,7 @@ static void _call_f_sort_2340 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// ()
+// bool QSqlTableModel::submit()
 
 
 static void _init_f_submit_0 (qt_gsi::GenericMethod *decl)
@@ -724,33 +724,33 @@ namespace gsi
 static gsi::Methods methods_QSqlTableModel () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("clear", "@brief Method ()\nThis is a reimplementation of QSqlQueryModel::clear", false, &_init_f_clear_0, &_call_f_clear_0);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Method (const QModelIndex &, int) const\nThis is a reimplementation of QSqlQueryModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
+  methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QSqlTableModel::clear()\nThis is a reimplementation of QSqlQueryModel::clear", false, &_init_f_clear_0, &_call_f_clear_0);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Method QVariant QSqlTableModel::data(const QModelIndex &idx, int role)\nThis is a reimplementation of QSqlQueryModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
   methods += new qt_gsi::GenericMethod ("database", "@brief Method QSqlDatabase QSqlTableModel::database()\n", true, &_init_f_database_c0, &_call_f_database_c0);
   methods += new qt_gsi::GenericMethod (":editStrategy", "@brief Method QSqlTableModel::EditStrategy QSqlTableModel::editStrategy()\n", true, &_init_f_editStrategy_c0, &_call_f_editStrategy_c0);
   methods += new qt_gsi::GenericMethod ("fieldIndex", "@brief Method int QSqlTableModel::fieldIndex(const QString &fieldName)\n", true, &_init_f_fieldIndex_c2025, &_call_f_fieldIndex_c2025);
   methods += new qt_gsi::GenericMethod (":filter", "@brief Method QString QSqlTableModel::filter()\n", true, &_init_f_filter_c0, &_call_f_filter_c0);
-  methods += new qt_gsi::GenericMethod ("flags", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QAbstractItemModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
-  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method (int, Qt::Orientation, int) const\nThis is a reimplementation of QSqlQueryModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
+  methods += new qt_gsi::GenericMethod ("flags", "@brief Method QFlags<Qt::ItemFlag> QSqlTableModel::flags(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
+  methods += new qt_gsi::GenericMethod ("headerData", "@brief Method QVariant QSqlTableModel::headerData(int section, Qt::Orientation orientation, int role)\nThis is a reimplementation of QSqlQueryModel::headerData", true, &_init_f_headerData_c3231, &_call_f_headerData_c3231);
   methods += new qt_gsi::GenericMethod ("insertRecord", "@brief Method bool QSqlTableModel::insertRecord(int row, const QSqlRecord &record)\n", false, &_init_f_insertRecord_2964, &_call_f_insertRecord_2964);
-  methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::insertRows", false, &_init_f_insertRows_3713, &_call_f_insertRows_3713);
+  methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method bool QSqlTableModel::insertRows(int row, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::insertRows", false, &_init_f_insertRows_3713, &_call_f_insertRows_3713);
   methods += new qt_gsi::GenericMethod ("isDirty?", "@brief Method bool QSqlTableModel::isDirty(const QModelIndex &index)\n", true, &_init_f_isDirty_c2395, &_call_f_isDirty_c2395);
   methods += new qt_gsi::GenericMethod ("primaryKey", "@brief Method QSqlIndex QSqlTableModel::primaryKey()\n", true, &_init_f_primaryKey_c0, &_call_f_primaryKey_c0);
-  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QSqlQueryModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
-  methods += new qt_gsi::GenericMethod ("removeRows", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QAbstractItemModel::removeRows", false, &_init_f_removeRows_3713, &_call_f_removeRows_3713);
-  methods += new qt_gsi::GenericMethod ("revert", "@brief Method ()\nThis is a reimplementation of QAbstractItemModel::revert", false, &_init_f_revert_0, &_call_f_revert_0);
+  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method bool QSqlTableModel::removeColumns(int column, int count, const QModelIndex &parent)\nThis is a reimplementation of QSqlQueryModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
+  methods += new qt_gsi::GenericMethod ("removeRows", "@brief Method bool QSqlTableModel::removeRows(int row, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::removeRows", false, &_init_f_removeRows_3713, &_call_f_removeRows_3713);
+  methods += new qt_gsi::GenericMethod ("revert", "@brief Method void QSqlTableModel::revert()\nThis is a reimplementation of QAbstractItemModel::revert", false, &_init_f_revert_0, &_call_f_revert_0);
   methods += new qt_gsi::GenericMethod ("revertAll", "@brief Method void QSqlTableModel::revertAll()\n", false, &_init_f_revertAll_0, &_call_f_revertAll_0);
   methods += new qt_gsi::GenericMethod ("revertRow", "@brief Method void QSqlTableModel::revertRow(int row)\n", false, &_init_f_revertRow_767, &_call_f_revertRow_767);
-  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method (const QModelIndex &) const\nThis is a reimplementation of QSqlQueryModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
+  methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method int QSqlTableModel::rowCount(const QModelIndex &parent)\nThis is a reimplementation of QSqlQueryModel::rowCount", true, &_init_f_rowCount_c2395, &_call_f_rowCount_c2395);
   methods += new qt_gsi::GenericMethod ("select", "@brief Method bool QSqlTableModel::select()\n", false, &_init_f_select_0, &_call_f_select_0);
-  methods += new qt_gsi::GenericMethod ("setData", "@brief Method (const QModelIndex &, const QVariant &, int)\nThis is a reimplementation of QAbstractItemModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Method bool QSqlTableModel::setData(const QModelIndex &index, const QVariant &value, int role)\nThis is a reimplementation of QAbstractItemModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
   methods += new qt_gsi::GenericMethod ("setEditStrategy|editStrategy=", "@brief Method void QSqlTableModel::setEditStrategy(QSqlTableModel::EditStrategy strategy)\n", false, &_init_f_setEditStrategy_3163, &_call_f_setEditStrategy_3163);
   methods += new qt_gsi::GenericMethod ("setFilter|filter=", "@brief Method void QSqlTableModel::setFilter(const QString &filter)\n", false, &_init_f_setFilter_2025, &_call_f_setFilter_2025);
   methods += new qt_gsi::GenericMethod ("setRecord", "@brief Method bool QSqlTableModel::setRecord(int row, const QSqlRecord &record)\n", false, &_init_f_setRecord_2964, &_call_f_setRecord_2964);
   methods += new qt_gsi::GenericMethod ("setSort", "@brief Method void QSqlTableModel::setSort(int column, Qt::SortOrder order)\n", false, &_init_f_setSort_2340, &_call_f_setSort_2340);
   methods += new qt_gsi::GenericMethod ("setTable", "@brief Method void QSqlTableModel::setTable(const QString &tableName)\n", false, &_init_f_setTable_2025, &_call_f_setTable_2025);
-  methods += new qt_gsi::GenericMethod ("sort", "@brief Method (int, Qt::SortOrder)\nThis is a reimplementation of QAbstractItemModel::sort", false, &_init_f_sort_2340, &_call_f_sort_2340);
-  methods += new qt_gsi::GenericMethod ("submit", "@brief Method ()\nThis is a reimplementation of QAbstractItemModel::submit", false, &_init_f_submit_0, &_call_f_submit_0);
+  methods += new qt_gsi::GenericMethod ("sort", "@brief Method void QSqlTableModel::sort(int column, Qt::SortOrder order)\nThis is a reimplementation of QAbstractItemModel::sort", false, &_init_f_sort_2340, &_call_f_sort_2340);
+  methods += new qt_gsi::GenericMethod ("submit", "@brief Method bool QSqlTableModel::submit()\nThis is a reimplementation of QAbstractItemModel::submit", false, &_init_f_submit_0, &_call_f_submit_0);
   methods += new qt_gsi::GenericMethod ("submitAll", "@brief Method bool QSqlTableModel::submitAll()\n", false, &_init_f_submitAll_0, &_call_f_submitAll_0);
   methods += new qt_gsi::GenericMethod ("tableName", "@brief Method QString QSqlTableModel::tableName()\n", true, &_init_f_tableName_c0, &_call_f_tableName_c0);
   methods += gsi::qt_signal<int > ("beforeDelete(int)", "beforeDelete", gsi::arg("row"), "@brief Signal declaration for QSqlTableModel::beforeDelete(int row)\nYou can bind a procedure to this signal.");

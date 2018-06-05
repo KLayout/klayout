@@ -115,7 +115,7 @@ static void _call_f_matches_c2869 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// () const
+// QFlags<Qt::KeyboardModifier> QKeyEvent::modifiers()
 
 
 static void _init_f_modifiers_c0 (qt_gsi::GenericMethod *decl)
@@ -243,7 +243,7 @@ static gsi::Methods methods_QKeyEvent () {
   methods += new qt_gsi::GenericMethod ("isAutoRepeat?", "@brief Method bool QKeyEvent::isAutoRepeat()\n", true, &_init_f_isAutoRepeat_c0, &_call_f_isAutoRepeat_c0);
   methods += new qt_gsi::GenericMethod ("key", "@brief Method int QKeyEvent::key()\n", true, &_init_f_key_c0, &_call_f_key_c0);
   methods += new qt_gsi::GenericMethod ("matches", "@brief Method bool QKeyEvent::matches(QKeySequence::StandardKey key)\n", true, &_init_f_matches_c2869, &_call_f_matches_c2869);
-  methods += new qt_gsi::GenericMethod (":modifiers", "@brief Method () const\n", true, &_init_f_modifiers_c0, &_call_f_modifiers_c0);
+  methods += new qt_gsi::GenericMethod (":modifiers", "@brief Method QFlags<Qt::KeyboardModifier> QKeyEvent::modifiers()\n", true, &_init_f_modifiers_c0, &_call_f_modifiers_c0);
   methods += new qt_gsi::GenericMethod ("nativeModifiers", "@brief Method quint32 QKeyEvent::nativeModifiers()\n", true, &_init_f_nativeModifiers_c0, &_call_f_nativeModifiers_c0);
   methods += new qt_gsi::GenericMethod ("nativeScanCode", "@brief Method quint32 QKeyEvent::nativeScanCode()\n", true, &_init_f_nativeScanCode_c0, &_call_f_nativeScanCode_c0);
   methods += new qt_gsi::GenericMethod ("nativeVirtualKey", "@brief Method quint32 QKeyEvent::nativeVirtualKey()\n", true, &_init_f_nativeVirtualKey_c0, &_call_f_nativeVirtualKey_c0);

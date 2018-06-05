@@ -65,7 +65,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// ()
+// void QSqlRelationalTableModel::clear()
 
 
 static void _init_f_clear_0 (qt_gsi::GenericMethod *decl)
@@ -81,7 +81,7 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (const QModelIndex &, int) const
+// QVariant QSqlRelationalTableModel::data(const QModelIndex &item, int role)
 
 
 static void _init_f_data_c3054 (qt_gsi::GenericMethod *decl)
@@ -141,7 +141,7 @@ static void _call_f_relationModel_c767 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int, int, const QModelIndex &)
+// bool QSqlRelationalTableModel::removeColumns(int column, int count, const QModelIndex &parent)
 
 
 static void _init_f_removeColumns_3713 (qt_gsi::GenericMethod *decl)
@@ -166,7 +166,7 @@ static void _call_f_removeColumns_3713 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int)
+// void QSqlRelationalTableModel::revertRow(int row)
 
 
 static void _init_f_revertRow_767 (qt_gsi::GenericMethod *decl)
@@ -186,7 +186,7 @@ static void _call_f_revertRow_767 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// ()
+// bool QSqlRelationalTableModel::select()
 
 
 static void _init_f_select_0 (qt_gsi::GenericMethod *decl)
@@ -201,7 +201,7 @@ static void _call_f_select_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (const QModelIndex &, const QVariant &, int)
+// bool QSqlRelationalTableModel::setData(const QModelIndex &item, const QVariant &value, int role)
 
 
 static void _init_f_setData_5065 (qt_gsi::GenericMethod *decl)
@@ -249,7 +249,7 @@ static void _call_f_setRelation_3187 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QString &)
+// void QSqlRelationalTableModel::setTable(const QString &tableName)
 
 
 static void _init_f_setTable_2025 (qt_gsi::GenericMethod *decl)
@@ -369,16 +369,16 @@ namespace gsi
 static gsi::Methods methods_QSqlRelationalTableModel () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("clear", "@brief Method ()\nThis is a reimplementation of QSqlTableModel::clear", false, &_init_f_clear_0, &_call_f_clear_0);
-  methods += new qt_gsi::GenericMethod ("data", "@brief Method (const QModelIndex &, int) const\nThis is a reimplementation of QSqlTableModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
+  methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QSqlRelationalTableModel::clear()\nThis is a reimplementation of QSqlTableModel::clear", false, &_init_f_clear_0, &_call_f_clear_0);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Method QVariant QSqlRelationalTableModel::data(const QModelIndex &item, int role)\nThis is a reimplementation of QSqlTableModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
   methods += new qt_gsi::GenericMethod ("relation", "@brief Method QSqlRelation QSqlRelationalTableModel::relation(int column)\n", true, &_init_f_relation_c767, &_call_f_relation_c767);
   methods += new qt_gsi::GenericMethod ("relationModel", "@brief Method QSqlTableModel *QSqlRelationalTableModel::relationModel(int column)\n", true, &_init_f_relationModel_c767, &_call_f_relationModel_c767);
-  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method (int, int, const QModelIndex &)\nThis is a reimplementation of QSqlTableModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
-  methods += new qt_gsi::GenericMethod ("revertRow", "@brief Method (int)\nThis is a reimplementation of QSqlTableModel::revertRow", false, &_init_f_revertRow_767, &_call_f_revertRow_767);
-  methods += new qt_gsi::GenericMethod ("select", "@brief Method ()\nThis is a reimplementation of QSqlTableModel::select", false, &_init_f_select_0, &_call_f_select_0);
-  methods += new qt_gsi::GenericMethod ("setData", "@brief Method (const QModelIndex &, const QVariant &, int)\nThis is a reimplementation of QSqlTableModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
+  methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method bool QSqlRelationalTableModel::removeColumns(int column, int count, const QModelIndex &parent)\nThis is a reimplementation of QSqlTableModel::removeColumns", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
+  methods += new qt_gsi::GenericMethod ("revertRow", "@brief Method void QSqlRelationalTableModel::revertRow(int row)\nThis is a reimplementation of QSqlTableModel::revertRow", false, &_init_f_revertRow_767, &_call_f_revertRow_767);
+  methods += new qt_gsi::GenericMethod ("select", "@brief Method bool QSqlRelationalTableModel::select()\nThis is a reimplementation of QSqlTableModel::select", false, &_init_f_select_0, &_call_f_select_0);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Method bool QSqlRelationalTableModel::setData(const QModelIndex &item, const QVariant &value, int role)\nThis is a reimplementation of QSqlTableModel::setData", false, &_init_f_setData_5065, &_call_f_setData_5065);
   methods += new qt_gsi::GenericMethod ("setRelation", "@brief Method void QSqlRelationalTableModel::setRelation(int column, const QSqlRelation &relation)\n", false, &_init_f_setRelation_3187, &_call_f_setRelation_3187);
-  methods += new qt_gsi::GenericMethod ("setTable", "@brief Method (const QString &)\nThis is a reimplementation of QSqlTableModel::setTable", false, &_init_f_setTable_2025, &_call_f_setTable_2025);
+  methods += new qt_gsi::GenericMethod ("setTable", "@brief Method void QSqlRelationalTableModel::setTable(const QString &tableName)\nThis is a reimplementation of QSqlTableModel::setTable", false, &_init_f_setTable_2025, &_call_f_setTable_2025);
   methods += gsi::qt_signal<int > ("beforeDelete(int)", "beforeDelete", gsi::arg("row"), "@brief Signal declaration for QSqlRelationalTableModel::beforeDelete(int row)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QSqlRecord & > ("beforeInsert(QSqlRecord &)", "beforeInsert", gsi::arg("record"), "@brief Signal declaration for QSqlRelationalTableModel::beforeInsert(QSqlRecord &record)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int, QSqlRecord & > ("beforeUpdate(int, QSqlRecord &)", "beforeUpdate", gsi::arg("row"), gsi::arg("record"), "@brief Signal declaration for QSqlRelationalTableModel::beforeUpdate(int row, QSqlRecord &record)\nYou can bind a procedure to this signal.");

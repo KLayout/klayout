@@ -253,7 +253,7 @@ static void _call_f_isReadyForCapture_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// () const
+// QMediaObject *QCameraImageCapture::mediaObject()
 
 
 static void _init_f_mediaObject_c0 (qt_gsi::GenericMethod *decl)
@@ -493,7 +493,7 @@ static gsi::Methods methods_QCameraImageCapture () {
   methods += new qt_gsi::GenericMethod ("isAvailable?", "@brief Method bool QCameraImageCapture::isAvailable()\n", true, &_init_f_isAvailable_c0, &_call_f_isAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isCaptureDestinationSupported?", "@brief Method bool QCameraImageCapture::isCaptureDestinationSupported(QFlags<QCameraImageCapture::CaptureDestination> destination)\n", true, &_init_f_isCaptureDestinationSupported_c4999, &_call_f_isCaptureDestinationSupported_c4999);
   methods += new qt_gsi::GenericMethod ("isReadyForCapture?|:readyForCapture", "@brief Method bool QCameraImageCapture::isReadyForCapture()\n", true, &_init_f_isReadyForCapture_c0, &_call_f_isReadyForCapture_c0);
-  methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Method () const\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
+  methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Method QMediaObject *QCameraImageCapture::mediaObject()\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
   methods += new qt_gsi::GenericMethod ("setBufferFormat|bufferFormat=", "@brief Method void QCameraImageCapture::setBufferFormat(const QVideoFrame::PixelFormat format)\n", false, &_init_f_setBufferFormat_3453, &_call_f_setBufferFormat_3453);
   methods += new qt_gsi::GenericMethod ("setCaptureDestination|captureDestination=", "@brief Method void QCameraImageCapture::setCaptureDestination(QFlags<QCameraImageCapture::CaptureDestination> destination)\n", false, &_init_f_setCaptureDestination_4999, &_call_f_setCaptureDestination_4999);
   methods += new qt_gsi::GenericMethod ("setEncodingSettings|encodingSettings=", "@brief Method void QCameraImageCapture::setEncodingSettings(const QImageEncoderSettings &settings)\n", false, &_init_f_setEncodingSettings_3430, &_call_f_setEncodingSettings_3430);

@@ -71,7 +71,7 @@ static void _call_f_bottom_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (QString &) const
+// void QIntValidator::fixup(QString &input)
 
 
 static void _init_f_fixup_c1330 (qt_gsi::GenericMethod *decl)
@@ -169,7 +169,7 @@ static void _call_f_top_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QString &, int &) const
+// QValidator::State QIntValidator::validate(QString &, int &)
 
 
 static void _init_f_validate_c2171 (qt_gsi::GenericMethod *decl)
@@ -248,12 +248,12 @@ static gsi::Methods methods_QIntValidator () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":bottom", "@brief Method int QIntValidator::bottom()\n", true, &_init_f_bottom_c0, &_call_f_bottom_c0);
-  methods += new qt_gsi::GenericMethod ("fixup", "@brief Method (QString &) const\nThis is a reimplementation of QValidator::fixup", true, &_init_f_fixup_c1330, &_call_f_fixup_c1330);
+  methods += new qt_gsi::GenericMethod ("fixup", "@brief Method void QIntValidator::fixup(QString &input)\nThis is a reimplementation of QValidator::fixup", true, &_init_f_fixup_c1330, &_call_f_fixup_c1330);
   methods += new qt_gsi::GenericMethod ("setBottom|bottom=", "@brief Method void QIntValidator::setBottom(int)\n", false, &_init_f_setBottom_767, &_call_f_setBottom_767);
   methods += new qt_gsi::GenericMethod ("setRange", "@brief Method void QIntValidator::setRange(int bottom, int top)\n", false, &_init_f_setRange_1426, &_call_f_setRange_1426);
   methods += new qt_gsi::GenericMethod ("setTop|top=", "@brief Method void QIntValidator::setTop(int)\n", false, &_init_f_setTop_767, &_call_f_setTop_767);
   methods += new qt_gsi::GenericMethod (":top", "@brief Method int QIntValidator::top()\n", true, &_init_f_top_c0, &_call_f_top_c0);
-  methods += new qt_gsi::GenericMethod ("validate", "@brief Method (QString &, int &) const\nThis is a reimplementation of QValidator::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
+  methods += new qt_gsi::GenericMethod ("validate", "@brief Method QValidator::State QIntValidator::validate(QString &, int &)\nThis is a reimplementation of QValidator::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
   methods += gsi::qt_signal<int > ("bottomChanged(int)", "bottomChanged", gsi::arg("bottom"), "@brief Signal declaration for QIntValidator::bottomChanged(int bottom)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("changed()", "changed", "@brief Signal declaration for QIntValidator::changed()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QIntValidator::destroyed(QObject *)\nYou can bind a procedure to this signal.");

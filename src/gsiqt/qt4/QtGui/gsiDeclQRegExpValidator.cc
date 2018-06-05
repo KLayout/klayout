@@ -91,7 +91,7 @@ static void _call_f_setRegExp_1981 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (QString &, int &) const
+// QValidator::State QRegExpValidator::validate(QString &input, int &pos)
 
 
 static void _init_f_validate_c2171 (qt_gsi::GenericMethod *decl)
@@ -215,7 +215,7 @@ static gsi::Methods methods_QRegExpValidator () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":regExp", "@brief Method const QRegExp &QRegExpValidator::regExp()\n", true, &_init_f_regExp_c0, &_call_f_regExp_c0);
   methods += new qt_gsi::GenericMethod ("setRegExp|regExp=", "@brief Method void QRegExpValidator::setRegExp(const QRegExp &rx)\n", false, &_init_f_setRegExp_1981, &_call_f_setRegExp_1981);
-  methods += new qt_gsi::GenericMethod ("validate", "@brief Method (QString &, int &) const\nThis is a reimplementation of QValidator::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
+  methods += new qt_gsi::GenericMethod ("validate", "@brief Method QValidator::State QRegExpValidator::validate(QString &input, int &pos)\nThis is a reimplementation of QValidator::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QRegExpValidator::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QRegExpValidator::tr(const char *s, const char *c)\nThis method is static and can be called without an instance.", &_init_f_tr_3354, &_call_f_tr_3354);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QRegExpValidator::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);

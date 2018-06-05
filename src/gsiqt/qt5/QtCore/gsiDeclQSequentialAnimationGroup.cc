@@ -92,7 +92,7 @@ static void _call_f_currentAnimation_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// int QSequentialAnimationGroup::duration()
 
 
 static void _init_f_duration_c0 (qt_gsi::GenericMethod *decl)
@@ -187,7 +187,7 @@ static gsi::Methods methods_QSequentialAnimationGroup () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("addPause", "@brief Method QPauseAnimation *QSequentialAnimationGroup::addPause(int msecs)\n", false, &_init_f_addPause_767, &_call_f_addPause_767);
   methods += new qt_gsi::GenericMethod (":currentAnimation", "@brief Method QAbstractAnimation *QSequentialAnimationGroup::currentAnimation()\n", true, &_init_f_currentAnimation_c0, &_call_f_currentAnimation_c0);
-  methods += new qt_gsi::GenericMethod (":duration", "@brief Method () const\nThis is a reimplementation of QAbstractAnimation::duration", true, &_init_f_duration_c0, &_call_f_duration_c0);
+  methods += new qt_gsi::GenericMethod (":duration", "@brief Method int QSequentialAnimationGroup::duration()\nThis is a reimplementation of QAbstractAnimation::duration", true, &_init_f_duration_c0, &_call_f_duration_c0);
   methods += new qt_gsi::GenericMethod ("insertPause", "@brief Method QPauseAnimation *QSequentialAnimationGroup::insertPause(int index, int msecs)\n", false, &_init_f_insertPause_1426, &_call_f_insertPause_1426);
   methods += gsi::qt_signal<QAbstractAnimation * > ("currentAnimationChanged(QAbstractAnimation *)", "currentAnimationChanged", gsi::arg("current"), "@brief Signal declaration for QSequentialAnimationGroup::currentAnimationChanged(QAbstractAnimation *current)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("currentLoopChanged(int)", "currentLoopChanged", gsi::arg("currentLoop"), "@brief Signal declaration for QSequentialAnimationGroup::currentLoopChanged(int currentLoop)\nYou can bind a procedure to this signal.");

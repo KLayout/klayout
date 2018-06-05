@@ -55,7 +55,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QEvent *)
+// bool QEventLoop::event(QEvent *event)
 
 
 static void _init_f_event_1217 (qt_gsi::GenericMethod *decl)
@@ -258,7 +258,7 @@ namespace gsi
 static gsi::Methods methods_QEventLoop () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Method (QEvent *)\nThis is a reimplementation of QObject::event", false, &_init_f_event_1217, &_call_f_event_1217);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Method bool QEventLoop::event(QEvent *event)\nThis is a reimplementation of QObject::event", false, &_init_f_event_1217, &_call_f_event_1217);
   methods += new qt_gsi::GenericMethod ("exec", "@brief Method int QEventLoop::exec(QFlags<QEventLoop::ProcessEventsFlag> flags)\n", false, &_init_f_exec_3995, &_call_f_exec_3995);
   methods += new qt_gsi::GenericMethod ("exit", "@brief Method void QEventLoop::exit(int returnCode)\n", false, &_init_f_exit_767, &_call_f_exit_767);
   methods += new qt_gsi::GenericMethod ("isRunning?", "@brief Method bool QEventLoop::isRunning()\n", true, &_init_f_isRunning_c0, &_call_f_isRunning_c0);

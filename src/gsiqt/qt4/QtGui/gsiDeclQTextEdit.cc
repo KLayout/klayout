@@ -446,7 +446,7 @@ static void _call_f_extraSelections_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QString &, QFlags<QTextDocument::FindFlag>)
+// bool QTextEdit::find(const QString &exp, QFlags<QTextDocument::FindFlag> options)
 
 
 static void _init_f_find_5261 (qt_gsi::GenericMethod *decl)
@@ -1703,7 +1703,7 @@ static gsi::Methods methods_QTextEdit () {
   methods += new qt_gsi::GenericMethod (":documentTitle", "@brief Method QString QTextEdit::documentTitle()\n", true, &_init_f_documentTitle_c0, &_call_f_documentTitle_c0);
   methods += new qt_gsi::GenericMethod ("ensureCursorVisible", "@brief Method void QTextEdit::ensureCursorVisible()\n", false, &_init_f_ensureCursorVisible_0, &_call_f_ensureCursorVisible_0);
   methods += new qt_gsi::GenericMethod (":extraSelections", "@brief Method QList<QTextEdit::ExtraSelection> QTextEdit::extraSelections()\n", true, &_init_f_extraSelections_c0, &_call_f_extraSelections_c0);
-  methods += new qt_gsi::GenericMethod ("find", "@brief Method (const QString &, QFlags<QTextDocument::FindFlag>)\n", false, &_init_f_find_5261, &_call_f_find_5261);
+  methods += new qt_gsi::GenericMethod ("find", "@brief Method bool QTextEdit::find(const QString &exp, QFlags<QTextDocument::FindFlag> options)\n", false, &_init_f_find_5261, &_call_f_find_5261);
   methods += new qt_gsi::GenericMethod (":fontFamily", "@brief Method QString QTextEdit::fontFamily()\n", true, &_init_f_fontFamily_c0, &_call_f_fontFamily_c0);
   methods += new qt_gsi::GenericMethod (":fontItalic", "@brief Method bool QTextEdit::fontItalic()\n", true, &_init_f_fontItalic_c0, &_call_f_fontItalic_c0);
   methods += new qt_gsi::GenericMethod (":fontPointSize", "@brief Method double QTextEdit::fontPointSize()\n", true, &_init_f_fontPointSize_c0, &_call_f_fontPointSize_c0);

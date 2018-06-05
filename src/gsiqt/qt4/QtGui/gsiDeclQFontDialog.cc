@@ -112,7 +112,7 @@ static void _call_f_currentFont_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// ()
+// void QFontDialog::open()
 
 
 static void _init_f_open_0 (qt_gsi::GenericMethod *decl)
@@ -128,7 +128,7 @@ static void _call_f_open_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QObject *, const char *)
+// void QFontDialog::open(QObject *receiver, const char *member)
 
 
 static void _init_f_open_2925 (qt_gsi::GenericMethod *decl)
@@ -244,7 +244,7 @@ static void _call_f_setOptions_3960 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (bool)
+// void QFontDialog::setVisible(bool visible)
 
 
 static void _init_f_setVisible_864 (qt_gsi::GenericMethod *decl)
@@ -490,14 +490,14 @@ static gsi::Methods methods_QFontDialog () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":currentFont", "@brief Method QFont QFontDialog::currentFont()\n", true, &_init_f_currentFont_c0, &_call_f_currentFont_c0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method ()\n", false, &_init_f_open_0, &_call_f_open_0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method (QObject *, const char *)\n", false, &_init_f_open_2925, &_call_f_open_2925);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QFontDialog::open()\n", false, &_init_f_open_0, &_call_f_open_0);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QFontDialog::open(QObject *receiver, const char *member)\n", false, &_init_f_open_2925, &_call_f_open_2925);
   methods += new qt_gsi::GenericMethod (":options", "@brief Method QFlags<QFontDialog::FontDialogOption> QFontDialog::options()\n", true, &_init_f_options_c0, &_call_f_options_c0);
   methods += new qt_gsi::GenericMethod ("selectedFont", "@brief Method QFont QFontDialog::selectedFont()\n", true, &_init_f_selectedFont_c0, &_call_f_selectedFont_c0);
   methods += new qt_gsi::GenericMethod ("setCurrentFont|currentFont=", "@brief Method void QFontDialog::setCurrentFont(const QFont &font)\n", false, &_init_f_setCurrentFont_1801, &_call_f_setCurrentFont_1801);
   methods += new qt_gsi::GenericMethod ("setOption", "@brief Method void QFontDialog::setOption(QFontDialog::FontDialogOption option, bool on)\n", false, &_init_f_setOption_4020, &_call_f_setOption_4020);
   methods += new qt_gsi::GenericMethod ("setOptions|options=", "@brief Method void QFontDialog::setOptions(QFlags<QFontDialog::FontDialogOption> options)\n", false, &_init_f_setOptions_3960, &_call_f_setOptions_3960);
-  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method (bool)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
+  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QFontDialog::setVisible(bool visible)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += new qt_gsi::GenericMethod ("testOption", "@brief Method bool QFontDialog::testOption(QFontDialog::FontDialogOption option)\n", true, &_init_f_testOption_c3264, &_call_f_testOption_c3264);
   methods += gsi::qt_signal ("accepted()", "accepted", "@brief Signal declaration for QFontDialog::accepted()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QFont & > ("currentFontChanged(const QFont &)", "currentFontChanged", gsi::arg("font"), "@brief Signal declaration for QFontDialog::currentFontChanged(const QFont &font)\nYou can bind a procedure to this signal.");

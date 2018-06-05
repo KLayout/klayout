@@ -82,7 +82,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// () const
+// QRectF QGraphicsSvgItem::boundingRect()
 
 
 static void _init_f_boundingRect_c0 (qt_gsi::GenericMethod *decl)
@@ -142,7 +142,7 @@ static void _call_f_maximumCacheSize_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
+// void QGraphicsSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 
 
 static void _init_f_paint_6301 (qt_gsi::GenericMethod *decl)
@@ -263,7 +263,7 @@ static void _call_f_setSharedRenderer_1830 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// int QGraphicsSvgItem::type()
 
 
 static void _init_f_type_c0 (qt_gsi::GenericMethod *decl)
@@ -334,17 +334,17 @@ namespace gsi
 static gsi::Methods methods_QGraphicsSvgItem () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::boundingRect", true, &_init_f_boundingRect_c0, &_call_f_boundingRect_c0);
+  methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method QRectF QGraphicsSvgItem::boundingRect()\nThis is a reimplementation of QGraphicsItem::boundingRect", true, &_init_f_boundingRect_c0, &_call_f_boundingRect_c0);
   methods += new qt_gsi::GenericMethod (":elementId", "@brief Method QString QGraphicsSvgItem::elementId()\n", true, &_init_f_elementId_c0, &_call_f_elementId_c0);
   methods += new qt_gsi::GenericMethod ("isCachingEnabled?|:cachingEnabled", "@brief Method bool QGraphicsSvgItem::isCachingEnabled()\n", true, &_init_f_isCachingEnabled_c0, &_call_f_isCachingEnabled_c0);
   methods += new qt_gsi::GenericMethod (":maximumCacheSize", "@brief Method QSize QGraphicsSvgItem::maximumCacheSize()\n", true, &_init_f_maximumCacheSize_c0, &_call_f_maximumCacheSize_c0);
-  methods += new qt_gsi::GenericMethod ("paint", "@brief Method (QPainter *, const QStyleOptionGraphicsItem *, QWidget *)\nThis is a reimplementation of QGraphicsItem::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
+  methods += new qt_gsi::GenericMethod ("paint", "@brief Method void QGraphicsSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)\nThis is a reimplementation of QGraphicsItem::paint", false, &_init_f_paint_6301, &_call_f_paint_6301);
   methods += new qt_gsi::GenericMethod ("renderer", "@brief Method QSvgRenderer *QGraphicsSvgItem::renderer()\n", true, &_init_f_renderer_c0, &_call_f_renderer_c0);
   methods += new qt_gsi::GenericMethod ("setCachingEnabled|cachingEnabled=", "@brief Method void QGraphicsSvgItem::setCachingEnabled(bool)\n", false, &_init_f_setCachingEnabled_864, &_call_f_setCachingEnabled_864);
   methods += new qt_gsi::GenericMethod ("setElementId|elementId=", "@brief Method void QGraphicsSvgItem::setElementId(const QString &id)\n", false, &_init_f_setElementId_2025, &_call_f_setElementId_2025);
   methods += new qt_gsi::GenericMethod ("setMaximumCacheSize|maximumCacheSize=", "@brief Method void QGraphicsSvgItem::setMaximumCacheSize(const QSize &size)\n", false, &_init_f_setMaximumCacheSize_1805, &_call_f_setMaximumCacheSize_1805);
   methods += new qt_gsi::GenericMethod ("setSharedRenderer", "@brief Method void QGraphicsSvgItem::setSharedRenderer(QSvgRenderer *renderer)\n", false, &_init_f_setSharedRenderer_1830, &_call_f_setSharedRenderer_1830);
-  methods += new qt_gsi::GenericMethod ("type", "@brief Method () const\nThis is a reimplementation of QGraphicsItem::type", true, &_init_f_type_c0, &_call_f_type_c0);
+  methods += new qt_gsi::GenericMethod ("type", "@brief Method int QGraphicsSvgItem::type()\nThis is a reimplementation of QGraphicsItem::type", true, &_init_f_type_c0, &_call_f_type_c0);
   methods += gsi::qt_signal ("childrenChanged()", "childrenChanged", "@brief Signal declaration for QGraphicsSvgItem::childrenChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QGraphicsSvgItem::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("enabledChanged()", "enabledChanged", "@brief Signal declaration for QGraphicsSvgItem::enabledChanged()\nYou can bind a procedure to this signal.");

@@ -80,7 +80,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// () const
+// const QList<QObject*> &QGraphicsObject::children()
 
 
 static void _init_f_children_c0 (qt_gsi::GenericMethod *decl)
@@ -239,7 +239,7 @@ namespace gsi
 static gsi::Methods methods_QGraphicsObject () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod (":children", "@brief Method () const\n", true, &_init_f_children_c0, &_call_f_children_c0);
+  methods += new qt_gsi::GenericMethod (":children", "@brief Method const QList<QObject*> &QGraphicsObject::children()\n", true, &_init_f_children_c0, &_call_f_children_c0);
   methods += new qt_gsi::GenericMethod ("grabGesture", "@brief Method void QGraphicsObject::grabGesture(Qt::GestureType type, QFlags<Qt::GestureFlag> flags)\n", false, &_init_f_grabGesture_4352, &_call_f_grabGesture_4352);
   methods += new qt_gsi::GenericMethod ("ungrabGesture", "@brief Method void QGraphicsObject::ungrabGesture(Qt::GestureType type)\n", false, &_init_f_ungrabGesture_1902, &_call_f_ungrabGesture_1902);
   methods += gsi::qt_signal ("childrenChanged()", "childrenChanged", "@brief Signal declaration for QGraphicsObject::childrenChanged()\nYou can bind a procedure to this signal.");

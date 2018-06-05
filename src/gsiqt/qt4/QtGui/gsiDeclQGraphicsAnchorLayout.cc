@@ -154,7 +154,7 @@ static void _call_f_anchor_8538 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// int QGraphicsAnchorLayout::count()
 
 
 static void _init_f_count_c0 (qt_gsi::GenericMethod *decl)
@@ -184,7 +184,7 @@ static void _call_f_horizontalSpacing_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// ()
+// void QGraphicsAnchorLayout::invalidate()
 
 
 static void _init_f_invalidate_0 (qt_gsi::GenericMethod *decl)
@@ -200,7 +200,7 @@ static void _call_f_invalidate_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int) const
+// QGraphicsLayoutItem *QGraphicsAnchorLayout::itemAt(int index)
 
 
 static void _init_f_itemAt_c767 (qt_gsi::GenericMethod *decl)
@@ -219,7 +219,7 @@ static void _call_f_itemAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (int)
+// void QGraphicsAnchorLayout::removeAt(int index)
 
 
 static void _init_f_removeAt_767 (qt_gsi::GenericMethod *decl)
@@ -239,7 +239,7 @@ static void _call_f_removeAt_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (const QRectF &)
+// void QGraphicsAnchorLayout::setGeometry(const QRectF &rect)
 
 
 static void _init_f_setGeometry_1862 (qt_gsi::GenericMethod *decl)
@@ -343,12 +343,12 @@ static gsi::Methods methods_QGraphicsAnchorLayout () {
   methods += new qt_gsi::GenericMethod ("addAnchors", "@brief Method void QGraphicsAnchorLayout::addAnchors(QGraphicsLayoutItem *firstItem, QGraphicsLayoutItem *secondItem, QFlags<Qt::Orientation> orientations)\n", false, &_init_f_addAnchors_7507, &_call_f_addAnchors_7507);
   methods += new qt_gsi::GenericMethod ("addCornerAnchors", "@brief Method void QGraphicsAnchorLayout::addCornerAnchors(QGraphicsLayoutItem *firstItem, Qt::Corner firstCorner, QGraphicsLayoutItem *secondItem, Qt::Corner secondCorner)\n", false, &_init_f_addCornerAnchors_7522, &_call_f_addCornerAnchors_7522);
   methods += new qt_gsi::GenericMethod ("anchor", "@brief Method QGraphicsAnchor *QGraphicsAnchorLayout::anchor(QGraphicsLayoutItem *firstItem, Qt::AnchorPoint firstEdge, QGraphicsLayoutItem *secondItem, Qt::AnchorPoint secondEdge)\n", false, &_init_f_anchor_8538, &_call_f_anchor_8538);
-  methods += new qt_gsi::GenericMethod ("count", "@brief Method () const\nThis is a reimplementation of QGraphicsLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
+  methods += new qt_gsi::GenericMethod ("count", "@brief Method int QGraphicsAnchorLayout::count()\nThis is a reimplementation of QGraphicsLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
   methods += new qt_gsi::GenericMethod (":horizontalSpacing", "@brief Method double QGraphicsAnchorLayout::horizontalSpacing()\n", true, &_init_f_horizontalSpacing_c0, &_call_f_horizontalSpacing_c0);
-  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method ()\nThis is a reimplementation of QGraphicsLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
-  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method (int) const\nThis is a reimplementation of QGraphicsLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
-  methods += new qt_gsi::GenericMethod ("removeAt", "@brief Method (int)\nThis is a reimplementation of QGraphicsLayout::removeAt", false, &_init_f_removeAt_767, &_call_f_removeAt_767);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRectF &)\nThis is a reimplementation of QGraphicsLayoutItem::setGeometry", false, &_init_f_setGeometry_1862, &_call_f_setGeometry_1862);
+  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QGraphicsAnchorLayout::invalidate()\nThis is a reimplementation of QGraphicsLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
+  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QGraphicsLayoutItem *QGraphicsAnchorLayout::itemAt(int index)\nThis is a reimplementation of QGraphicsLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
+  methods += new qt_gsi::GenericMethod ("removeAt", "@brief Method void QGraphicsAnchorLayout::removeAt(int index)\nThis is a reimplementation of QGraphicsLayout::removeAt", false, &_init_f_removeAt_767, &_call_f_removeAt_767);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QGraphicsAnchorLayout::setGeometry(const QRectF &rect)\nThis is a reimplementation of QGraphicsLayoutItem::setGeometry", false, &_init_f_setGeometry_1862, &_call_f_setGeometry_1862);
   methods += new qt_gsi::GenericMethod ("setHorizontalSpacing|horizontalSpacing=", "@brief Method void QGraphicsAnchorLayout::setHorizontalSpacing(double spacing)\n", false, &_init_f_setHorizontalSpacing_1071, &_call_f_setHorizontalSpacing_1071);
   methods += new qt_gsi::GenericMethod ("setSpacing", "@brief Method void QGraphicsAnchorLayout::setSpacing(double spacing)\n", false, &_init_f_setSpacing_1071, &_call_f_setSpacing_1071);
   methods += new qt_gsi::GenericMethod ("setVerticalSpacing|verticalSpacing=", "@brief Method void QGraphicsAnchorLayout::setVerticalSpacing(double spacing)\n", false, &_init_f_setVerticalSpacing_1071, &_call_f_setVerticalSpacing_1071);

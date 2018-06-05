@@ -62,7 +62,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QLayoutItem *)
+// void QBoxLayout::addItem(QLayoutItem *)
 
 
 static void _init_f_addItem_1740 (qt_gsi::GenericMethod *decl)
@@ -186,7 +186,7 @@ static void _call_f_addStrut_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (QWidget *, int, QFlags<Qt::AlignmentFlag>)
+// void QBoxLayout::addWidget(QWidget *, int stretch, QFlags<Qt::AlignmentFlag> alignment)
 
 
 static void _init_f_addWidget_4616 (qt_gsi::GenericMethod *decl)
@@ -212,7 +212,7 @@ static void _call_f_addWidget_4616 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// int QBoxLayout::count()
 
 
 static void _init_f_count_c0 (qt_gsi::GenericMethod *decl)
@@ -242,7 +242,7 @@ static void _call_f_direction_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QFlags<Qt::Orientation> QBoxLayout::expandingDirections()
 
 
 static void _init_f_expandingDirections_c0 (qt_gsi::GenericMethod *decl)
@@ -257,7 +257,7 @@ static void _call_f_expandingDirections_c0 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// () const
+// bool QBoxLayout::hasHeightForWidth()
 
 
 static void _init_f_hasHeightForWidth_c0 (qt_gsi::GenericMethod *decl)
@@ -272,7 +272,7 @@ static void _call_f_hasHeightForWidth_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (int) const
+// int QBoxLayout::heightForWidth(int)
 
 
 static void _init_f_heightForWidth_c767 (qt_gsi::GenericMethod *decl)
@@ -438,7 +438,7 @@ static void _call_f_insertWidget_5275 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// ()
+// void QBoxLayout::invalidate()
 
 
 static void _init_f_invalidate_0 (qt_gsi::GenericMethod *decl)
@@ -454,7 +454,7 @@ static void _call_f_invalidate_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int) const
+// QLayoutItem *QBoxLayout::itemAt(int)
 
 
 static void _init_f_itemAt_c767 (qt_gsi::GenericMethod *decl)
@@ -473,7 +473,7 @@ static void _call_f_itemAt_c767 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// QSize QBoxLayout::maximumSize()
 
 
 static void _init_f_maximumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -488,7 +488,7 @@ static void _call_f_maximumSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (int) const
+// int QBoxLayout::minimumHeightForWidth(int)
 
 
 static void _init_f_minimumHeightForWidth_c767 (qt_gsi::GenericMethod *decl)
@@ -507,7 +507,7 @@ static void _call_f_minimumHeightForWidth_c767 (const qt_gsi::GenericMethod * /*
 }
 
 
-// () const
+// QSize QBoxLayout::minimumSize()
 
 
 static void _init_f_minimumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -542,7 +542,7 @@ static void _call_f_setDirection_2497 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QRect &)
+// void QBoxLayout::setGeometry(const QRect &)
 
 
 static void _init_f_setGeometry_1792 (qt_gsi::GenericMethod *decl)
@@ -562,7 +562,7 @@ static void _call_f_setGeometry_1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (int)
+// void QBoxLayout::setSpacing(int spacing)
 
 
 static void _init_f_setSpacing_767 (qt_gsi::GenericMethod *decl)
@@ -649,7 +649,7 @@ static void _call_f_setStretchFactor_2000 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// () const
+// QSize QBoxLayout::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -664,7 +664,7 @@ static void _call_f_sizeHint_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// int QBoxLayout::spacing()
 
 
 static void _init_f_spacing_c0 (qt_gsi::GenericMethod *decl)
@@ -698,7 +698,7 @@ static void _call_f_stretch_c767 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int)
+// QLayoutItem *QBoxLayout::takeAt(int)
 
 
 static void _init_f_takeAt_767 (qt_gsi::GenericMethod *decl)
@@ -773,39 +773,39 @@ namespace gsi
 static gsi::Methods methods_QBoxLayout () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("addItem", "@brief Method (QLayoutItem *)\nThis is a reimplementation of QLayout::addItem", false, &_init_f_addItem_1740, &_call_f_addItem_1740);
+  methods += new qt_gsi::GenericMethod ("addItem", "@brief Method void QBoxLayout::addItem(QLayoutItem *)\nThis is a reimplementation of QLayout::addItem", false, &_init_f_addItem_1740, &_call_f_addItem_1740);
   methods += new qt_gsi::GenericMethod ("addLayout", "@brief Method void QBoxLayout::addLayout(QLayout *layout, int stretch)\n", false, &_init_f_addLayout_2000, &_call_f_addLayout_2000);
   methods += new qt_gsi::GenericMethod ("addSpacerItem", "@brief Method void QBoxLayout::addSpacerItem(QSpacerItem *spacerItem)\n", false, &_init_f_addSpacerItem_1708, &_call_f_addSpacerItem_1708);
   methods += new qt_gsi::GenericMethod ("addSpacing", "@brief Method void QBoxLayout::addSpacing(int size)\n", false, &_init_f_addSpacing_767, &_call_f_addSpacing_767);
   methods += new qt_gsi::GenericMethod ("addStretch", "@brief Method void QBoxLayout::addStretch(int stretch)\n", false, &_init_f_addStretch_767, &_call_f_addStretch_767);
   methods += new qt_gsi::GenericMethod ("addStrut", "@brief Method void QBoxLayout::addStrut(int)\n", false, &_init_f_addStrut_767, &_call_f_addStrut_767);
-  methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method (QWidget *, int, QFlags<Qt::AlignmentFlag>)\n", false, &_init_f_addWidget_4616, &_call_f_addWidget_4616);
-  methods += new qt_gsi::GenericMethod ("count", "@brief Method () const\nThis is a reimplementation of QLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
+  methods += new qt_gsi::GenericMethod ("addWidget", "@brief Method void QBoxLayout::addWidget(QWidget *, int stretch, QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_addWidget_4616, &_call_f_addWidget_4616);
+  methods += new qt_gsi::GenericMethod ("count", "@brief Method int QBoxLayout::count()\nThis is a reimplementation of QLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
   methods += new qt_gsi::GenericMethod (":direction", "@brief Method QBoxLayout::Direction QBoxLayout::direction()\n", true, &_init_f_direction_c0, &_call_f_direction_c0);
-  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method () const\nThis is a reimplementation of QLayout::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
-  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Method () const\nThis is a reimplementation of QLayoutItem::hasHeightForWidth", true, &_init_f_hasHeightForWidth_c0, &_call_f_hasHeightForWidth_c0);
-  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method (int) const\nThis is a reimplementation of QLayoutItem::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
+  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method QFlags<Qt::Orientation> QBoxLayout::expandingDirections()\nThis is a reimplementation of QLayout::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
+  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Method bool QBoxLayout::hasHeightForWidth()\nThis is a reimplementation of QLayoutItem::hasHeightForWidth", true, &_init_f_hasHeightForWidth_c0, &_call_f_hasHeightForWidth_c0);
+  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method int QBoxLayout::heightForWidth(int)\nThis is a reimplementation of QLayoutItem::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
   methods += new qt_gsi::GenericMethod ("insertItem", "@brief Method void QBoxLayout::insertItem(int index, QLayoutItem *)\n", false, &_init_f_insertItem_2399, &_call_f_insertItem_2399);
   methods += new qt_gsi::GenericMethod ("insertLayout", "@brief Method void QBoxLayout::insertLayout(int index, QLayout *layout, int stretch)\n", false, &_init_f_insertLayout_2659, &_call_f_insertLayout_2659);
   methods += new qt_gsi::GenericMethod ("insertSpacerItem", "@brief Method void QBoxLayout::insertSpacerItem(int index, QSpacerItem *spacerItem)\n", false, &_init_f_insertSpacerItem_2367, &_call_f_insertSpacerItem_2367);
   methods += new qt_gsi::GenericMethod ("insertSpacing", "@brief Method void QBoxLayout::insertSpacing(int index, int size)\n", false, &_init_f_insertSpacing_1426, &_call_f_insertSpacing_1426);
   methods += new qt_gsi::GenericMethod ("insertStretch", "@brief Method void QBoxLayout::insertStretch(int index, int stretch)\n", false, &_init_f_insertStretch_1426, &_call_f_insertStretch_1426);
   methods += new qt_gsi::GenericMethod ("insertWidget", "@brief Method void QBoxLayout::insertWidget(int index, QWidget *widget, int stretch, QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_insertWidget_5275, &_call_f_insertWidget_5275);
-  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method ()\nThis is a reimplementation of QLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
-  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method (int) const\nThis is a reimplementation of QLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
-  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Method () const\nThis is a reimplementation of QLayout::maximumSize", true, &_init_f_maximumSize_c0, &_call_f_maximumSize_c0);
-  methods += new qt_gsi::GenericMethod ("minimumHeightForWidth", "@brief Method (int) const\nThis is a reimplementation of QLayoutItem::minimumHeightForWidth", true, &_init_f_minimumHeightForWidth_c767, &_call_f_minimumHeightForWidth_c767);
-  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method () const\nThis is a reimplementation of QLayout::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
+  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QBoxLayout::invalidate()\nThis is a reimplementation of QLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
+  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QLayoutItem *QBoxLayout::itemAt(int)\nThis is a reimplementation of QLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
+  methods += new qt_gsi::GenericMethod ("maximumSize", "@brief Method QSize QBoxLayout::maximumSize()\nThis is a reimplementation of QLayout::maximumSize", true, &_init_f_maximumSize_c0, &_call_f_maximumSize_c0);
+  methods += new qt_gsi::GenericMethod ("minimumHeightForWidth", "@brief Method int QBoxLayout::minimumHeightForWidth(int)\nThis is a reimplementation of QLayoutItem::minimumHeightForWidth", true, &_init_f_minimumHeightForWidth_c767, &_call_f_minimumHeightForWidth_c767);
+  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method QSize QBoxLayout::minimumSize()\nThis is a reimplementation of QLayout::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
   methods += new qt_gsi::GenericMethod ("setDirection|direction=", "@brief Method void QBoxLayout::setDirection(QBoxLayout::Direction)\n", false, &_init_f_setDirection_2497, &_call_f_setDirection_2497);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRect &)\nThis is a reimplementation of QLayout::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
-  methods += new qt_gsi::GenericMethod ("setSpacing|spacing=", "@brief Method (int)\n", false, &_init_f_setSpacing_767, &_call_f_setSpacing_767);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QBoxLayout::setGeometry(const QRect &)\nThis is a reimplementation of QLayout::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
+  methods += new qt_gsi::GenericMethod ("setSpacing|spacing=", "@brief Method void QBoxLayout::setSpacing(int spacing)\n", false, &_init_f_setSpacing_767, &_call_f_setSpacing_767);
   methods += new qt_gsi::GenericMethod ("setStretch", "@brief Method void QBoxLayout::setStretch(int index, int stretch)\n", false, &_init_f_setStretch_1426, &_call_f_setStretch_1426);
   methods += new qt_gsi::GenericMethod ("setStretchFactor", "@brief Method bool QBoxLayout::setStretchFactor(QWidget *w, int stretch)\n", false, &_init_f_setStretchFactor_1974, &_call_f_setStretchFactor_1974);
   methods += new qt_gsi::GenericMethod ("setStretchFactor", "@brief Method bool QBoxLayout::setStretchFactor(QLayout *l, int stretch)\n", false, &_init_f_setStretchFactor_2000, &_call_f_setStretchFactor_2000);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method () const\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
-  methods += new qt_gsi::GenericMethod (":spacing", "@brief Method () const\n", true, &_init_f_spacing_c0, &_call_f_spacing_c0);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method QSize QBoxLayout::sizeHint()\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":spacing", "@brief Method int QBoxLayout::spacing()\n", true, &_init_f_spacing_c0, &_call_f_spacing_c0);
   methods += new qt_gsi::GenericMethod ("stretch", "@brief Method int QBoxLayout::stretch(int index)\n", true, &_init_f_stretch_c767, &_call_f_stretch_c767);
-  methods += new qt_gsi::GenericMethod ("takeAt", "@brief Method (int)\nThis is a reimplementation of QLayout::takeAt", false, &_init_f_takeAt_767, &_call_f_takeAt_767);
+  methods += new qt_gsi::GenericMethod ("takeAt", "@brief Method QLayoutItem *QBoxLayout::takeAt(int)\nThis is a reimplementation of QLayout::takeAt", false, &_init_f_takeAt_767, &_call_f_takeAt_767);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QBoxLayout::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QBoxLayout::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QBoxLayout::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);

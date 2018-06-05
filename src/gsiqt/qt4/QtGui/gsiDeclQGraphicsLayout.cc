@@ -73,7 +73,7 @@ static void _call_f_count_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// (double *, double *, double *, double *) const
+// void QGraphicsLayout::getContentsMargins(double *left, double *top, double *right, double *bottom)
 
 
 static void _init_f_getContentsMargins_c4704 (qt_gsi::GenericMethod *decl)
@@ -201,7 +201,7 @@ static void _call_f_setContentsMargins_3960 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// ()
+// void QGraphicsLayout::updateGeometry()
 
 
 static void _init_f_updateGeometry_0 (qt_gsi::GenericMethod *decl)
@@ -244,13 +244,13 @@ static gsi::Methods methods_QGraphicsLayout () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("activate", "@brief Method void QGraphicsLayout::activate()\n", false, &_init_f_activate_0, &_call_f_activate_0);
   methods += new qt_gsi::GenericMethod ("count", "@brief Method int QGraphicsLayout::count()\n", true, &_init_f_count_c0, &_call_f_count_c0);
-  methods += new qt_gsi::GenericMethod ("getContentsMargins", "@brief Method (double *, double *, double *, double *) const\nThis is a reimplementation of QGraphicsLayoutItem::getContentsMargins", true, &_init_f_getContentsMargins_c4704, &_call_f_getContentsMargins_c4704);
+  methods += new qt_gsi::GenericMethod ("getContentsMargins", "@brief Method void QGraphicsLayout::getContentsMargins(double *left, double *top, double *right, double *bottom)\nThis is a reimplementation of QGraphicsLayoutItem::getContentsMargins", true, &_init_f_getContentsMargins_c4704, &_call_f_getContentsMargins_c4704);
   methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QGraphicsLayout::invalidate()\n", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
   methods += new qt_gsi::GenericMethod ("isActivated?", "@brief Method bool QGraphicsLayout::isActivated()\n", true, &_init_f_isActivated_c0, &_call_f_isActivated_c0);
   methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QGraphicsLayoutItem *QGraphicsLayout::itemAt(int i)\n", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
   methods += new qt_gsi::GenericMethod ("removeAt", "@brief Method void QGraphicsLayout::removeAt(int index)\n", false, &_init_f_removeAt_767, &_call_f_removeAt_767);
   methods += new qt_gsi::GenericMethod ("setContentsMargins", "@brief Method void QGraphicsLayout::setContentsMargins(double left, double top, double right, double bottom)\n", false, &_init_f_setContentsMargins_3960, &_call_f_setContentsMargins_3960);
-  methods += new qt_gsi::GenericMethod ("updateGeometry", "@brief Method ()\nThis is a reimplementation of QGraphicsLayoutItem::updateGeometry", false, &_init_f_updateGeometry_0, &_call_f_updateGeometry_0);
+  methods += new qt_gsi::GenericMethod ("updateGeometry", "@brief Method void QGraphicsLayout::updateGeometry()\nThis is a reimplementation of QGraphicsLayoutItem::updateGeometry", false, &_init_f_updateGeometry_0, &_call_f_updateGeometry_0);
   methods += new qt_gsi::GenericMethod ("widgetEvent", "@brief Method void QGraphicsLayout::widgetEvent(QEvent *e)\n", false, &_init_f_widgetEvent_1217, &_call_f_widgetEvent_1217);
   return methods;
 }

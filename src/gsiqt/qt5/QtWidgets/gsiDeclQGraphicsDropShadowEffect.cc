@@ -76,7 +76,7 @@ static void _call_f_blurRadius_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QRectF &) const
+// QRectF QGraphicsDropShadowEffect::boundingRectFor(const QRectF &rect)
 
 
 static void _init_f_boundingRectFor_c1862 (qt_gsi::GenericMethod *decl)
@@ -355,7 +355,7 @@ static gsi::Methods methods_QGraphicsDropShadowEffect () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":blurRadius", "@brief Method double QGraphicsDropShadowEffect::blurRadius()\n", true, &_init_f_blurRadius_c0, &_call_f_blurRadius_c0);
-  methods += new qt_gsi::GenericMethod ("boundingRectFor", "@brief Method (const QRectF &) const\nThis is a reimplementation of QGraphicsEffect::boundingRectFor", true, &_init_f_boundingRectFor_c1862, &_call_f_boundingRectFor_c1862);
+  methods += new qt_gsi::GenericMethod ("boundingRectFor", "@brief Method QRectF QGraphicsDropShadowEffect::boundingRectFor(const QRectF &rect)\nThis is a reimplementation of QGraphicsEffect::boundingRectFor", true, &_init_f_boundingRectFor_c1862, &_call_f_boundingRectFor_c1862);
   methods += new qt_gsi::GenericMethod (":color", "@brief Method QColor QGraphicsDropShadowEffect::color()\n", true, &_init_f_color_c0, &_call_f_color_c0);
   methods += new qt_gsi::GenericMethod (":offset", "@brief Method QPointF QGraphicsDropShadowEffect::offset()\n", true, &_init_f_offset_c0, &_call_f_offset_c0);
   methods += new qt_gsi::GenericMethod ("setBlurRadius|blurRadius=", "@brief Method void QGraphicsDropShadowEffect::setBlurRadius(double blurRadius)\n", false, &_init_f_setBlurRadius_1071, &_call_f_setBlurRadius_1071);

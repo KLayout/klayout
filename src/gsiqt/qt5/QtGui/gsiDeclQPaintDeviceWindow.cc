@@ -80,7 +80,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// () const
+// double QPaintDeviceWindow::devicePixelRatio()
 
 
 static void _init_f_devicePixelRatio_c0 (qt_gsi::GenericMethod *decl)
@@ -95,7 +95,7 @@ static void _call_f_devicePixelRatio_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// int QPaintDeviceWindow::height()
 
 
 static void _init_f_height_c0 (qt_gsi::GenericMethod *decl)
@@ -166,7 +166,7 @@ static void _call_f_update_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// () const
+// int QPaintDeviceWindow::width()
 
 
 static void _init_f_width_c0 (qt_gsi::GenericMethod *decl)
@@ -282,12 +282,12 @@ namespace gsi
 static gsi::Methods methods_QPaintDeviceWindow () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("devicePixelRatio", "@brief Method () const\n", true, &_init_f_devicePixelRatio_c0, &_call_f_devicePixelRatio_c0);
-  methods += new qt_gsi::GenericMethod (":height", "@brief Method () const\n", true, &_init_f_height_c0, &_call_f_height_c0);
+  methods += new qt_gsi::GenericMethod ("devicePixelRatio", "@brief Method double QPaintDeviceWindow::devicePixelRatio()\n", true, &_init_f_devicePixelRatio_c0, &_call_f_devicePixelRatio_c0);
+  methods += new qt_gsi::GenericMethod (":height", "@brief Method int QPaintDeviceWindow::height()\n", true, &_init_f_height_c0, &_call_f_height_c0);
   methods += new qt_gsi::GenericMethod ("update", "@brief Method void QPaintDeviceWindow::update(const QRect &rect)\n", false, &_init_f_update_1792, &_call_f_update_1792);
   methods += new qt_gsi::GenericMethod ("update", "@brief Method void QPaintDeviceWindow::update(const QRegion &region)\n", false, &_init_f_update_2006, &_call_f_update_2006);
   methods += new qt_gsi::GenericMethod ("update", "@brief Method void QPaintDeviceWindow::update()\n", false, &_init_f_update_0, &_call_f_update_0);
-  methods += new qt_gsi::GenericMethod (":width", "@brief Method () const\n", true, &_init_f_width_c0, &_call_f_width_c0);
+  methods += new qt_gsi::GenericMethod (":width", "@brief Method int QPaintDeviceWindow::width()\n", true, &_init_f_width_c0, &_call_f_width_c0);
   methods += gsi::qt_signal ("activeChanged()", "activeChanged", "@brief Signal declaration for QPaintDeviceWindow::activeChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & > ("contentOrientationChanged(Qt::ScreenOrientation)", "contentOrientationChanged", gsi::arg("orientation"), "@brief Signal declaration for QPaintDeviceWindow::contentOrientationChanged(Qt::ScreenOrientation orientation)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QPaintDeviceWindow::destroyed(QObject *)\nYou can bind a procedure to this signal.");

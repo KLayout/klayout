@@ -78,7 +78,7 @@ static void _call_f_bottomPadding_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// () const
+// bool QTextTableCellFormat::isValid()
 
 
 static void _init_f_isValid_c0 (qt_gsi::GenericMethod *decl)
@@ -246,7 +246,7 @@ static gsi::Methods methods_QTextTableCellFormat () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextTableCellFormat::QTextTableCellFormat()\nThis method creates an object of class QTextTableCellFormat.", &_init_ctor_QTextTableCellFormat_0, &_call_ctor_QTextTableCellFormat_0);
   methods += new qt_gsi::GenericMethod (":bottomPadding", "@brief Method double QTextTableCellFormat::bottomPadding()\n", true, &_init_f_bottomPadding_c0, &_call_f_bottomPadding_c0);
-  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method () const\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QTextTableCellFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod (":leftPadding", "@brief Method double QTextTableCellFormat::leftPadding()\n", true, &_init_f_leftPadding_c0, &_call_f_leftPadding_c0);
   methods += new qt_gsi::GenericMethod (":rightPadding", "@brief Method double QTextTableCellFormat::rightPadding()\n", true, &_init_f_rightPadding_c0, &_call_f_rightPadding_c0);
   methods += new qt_gsi::GenericMethod ("setBottomPadding|bottomPadding=", "@brief Method void QTextTableCellFormat::setBottomPadding(double padding)\n", false, &_init_f_setBottomPadding_1071, &_call_f_setBottomPadding_1071);

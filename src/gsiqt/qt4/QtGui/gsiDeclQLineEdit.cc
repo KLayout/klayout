@@ -427,7 +427,7 @@ static void _call_f_end_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (QEvent *)
+// bool QLineEdit::event(QEvent *)
 
 
 static void _init_f_event_1217 (qt_gsi::GenericMethod *decl)
@@ -555,7 +555,7 @@ static void _call_f_inputMask_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (Qt::InputMethodQuery) const
+// QVariant QLineEdit::inputMethodQuery(Qt::InputMethodQuery)
 
 
 static void _init_f_inputMethodQuery_c2420 (qt_gsi::GenericMethod *decl)
@@ -669,7 +669,7 @@ static void _call_f_maxLength_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QSize QLineEdit::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -1074,7 +1074,7 @@ static void _call_f_setValidator_2332 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// QSize QLineEdit::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -1269,21 +1269,21 @@ static gsi::Methods methods_QLineEdit () {
   methods += new qt_gsi::GenericMethod (":dragEnabled", "@brief Method bool QLineEdit::dragEnabled()\n", true, &_init_f_dragEnabled_c0, &_call_f_dragEnabled_c0);
   methods += new qt_gsi::GenericMethod (":echoMode", "@brief Method QLineEdit::EchoMode QLineEdit::echoMode()\n", true, &_init_f_echoMode_c0, &_call_f_echoMode_c0);
   methods += new qt_gsi::GenericMethod ("end", "@brief Method void QLineEdit::end(bool mark)\n", false, &_init_f_end_864, &_call_f_end_864);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Method (QEvent *)\nThis is a reimplementation of QWidget::event", false, &_init_f_event_1217, &_call_f_event_1217);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Method bool QLineEdit::event(QEvent *)\nThis is a reimplementation of QWidget::event", false, &_init_f_event_1217, &_call_f_event_1217);
   methods += new qt_gsi::GenericMethod ("getTextMargins", "@brief Method void QLineEdit::getTextMargins(int *left, int *top, int *right, int *bottom)\n", true, &_init_f_getTextMargins_c3488, &_call_f_getTextMargins_c3488);
   methods += new qt_gsi::GenericMethod ("hasAcceptableInput|:acceptableInput", "@brief Method bool QLineEdit::hasAcceptableInput()\n", true, &_init_f_hasAcceptableInput_c0, &_call_f_hasAcceptableInput_c0);
   methods += new qt_gsi::GenericMethod ("hasFrame|:frame", "@brief Method bool QLineEdit::hasFrame()\n", true, &_init_f_hasFrame_c0, &_call_f_hasFrame_c0);
   methods += new qt_gsi::GenericMethod (":hasSelectedText", "@brief Method bool QLineEdit::hasSelectedText()\n", true, &_init_f_hasSelectedText_c0, &_call_f_hasSelectedText_c0);
   methods += new qt_gsi::GenericMethod ("home", "@brief Method void QLineEdit::home(bool mark)\n", false, &_init_f_home_864, &_call_f_home_864);
   methods += new qt_gsi::GenericMethod (":inputMask", "@brief Method QString QLineEdit::inputMask()\n", true, &_init_f_inputMask_c0, &_call_f_inputMask_c0);
-  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method (Qt::InputMethodQuery) const\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
+  methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Method QVariant QLineEdit::inputMethodQuery(Qt::InputMethodQuery)\nThis is a reimplementation of QWidget::inputMethodQuery", true, &_init_f_inputMethodQuery_c2420, &_call_f_inputMethodQuery_c2420);
   methods += new qt_gsi::GenericMethod ("insert", "@brief Method void QLineEdit::insert(const QString &)\n", false, &_init_f_insert_2025, &_call_f_insert_2025);
   methods += new qt_gsi::GenericMethod ("isModified?|:modified", "@brief Method bool QLineEdit::isModified()\n", true, &_init_f_isModified_c0, &_call_f_isModified_c0);
   methods += new qt_gsi::GenericMethod ("isReadOnly?|:readOnly", "@brief Method bool QLineEdit::isReadOnly()\n", true, &_init_f_isReadOnly_c0, &_call_f_isReadOnly_c0);
   methods += new qt_gsi::GenericMethod ("isRedoAvailable?|:redoAvailable", "@brief Method bool QLineEdit::isRedoAvailable()\n", true, &_init_f_isRedoAvailable_c0, &_call_f_isRedoAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isUndoAvailable?|:undoAvailable", "@brief Method bool QLineEdit::isUndoAvailable()\n", true, &_init_f_isUndoAvailable_c0, &_call_f_isUndoAvailable_c0);
   methods += new qt_gsi::GenericMethod (":maxLength", "@brief Method int QLineEdit::maxLength()\n", true, &_init_f_maxLength_c0, &_call_f_maxLength_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QLineEdit::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("paste", "@brief Method void QLineEdit::paste()\n", false, &_init_f_paste_0, &_call_f_paste_0);
   methods += new qt_gsi::GenericMethod ("redo", "@brief Method void QLineEdit::redo()\n", false, &_init_f_redo_0, &_call_f_redo_0);
   methods += new qt_gsi::GenericMethod ("selectAll", "@brief Method void QLineEdit::selectAll()\n", false, &_init_f_selectAll_0, &_call_f_selectAll_0);
@@ -1304,7 +1304,7 @@ static gsi::Methods methods_QLineEdit () {
   methods += new qt_gsi::GenericMethod ("setTextMargins", "@brief Method void QLineEdit::setTextMargins(int left, int top, int right, int bottom)\n", false, &_init_f_setTextMargins_2744, &_call_f_setTextMargins_2744);
   methods += new qt_gsi::GenericMethod ("setTextMargins|textMargins=", "@brief Method void QLineEdit::setTextMargins(const QMargins &margins)\n", false, &_init_f_setTextMargins_2115, &_call_f_setTextMargins_2115);
   methods += new qt_gsi::GenericMethod ("setValidator|validator=", "@brief Method void QLineEdit::setValidator(const QValidator *)\n", false, &_init_f_setValidator_2332, &_call_f_setValidator_2332);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QLineEdit::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":text", "@brief Method QString QLineEdit::text()\n", true, &_init_f_text_c0, &_call_f_text_c0);
   methods += new qt_gsi::GenericMethod (":textMargins", "@brief Method QMargins QLineEdit::textMargins()\n", true, &_init_f_textMargins_c0, &_call_f_textMargins_c0);
   methods += new qt_gsi::GenericMethod ("undo", "@brief Method void QLineEdit::undo()\n", false, &_init_f_undo_0, &_call_f_undo_0);

@@ -274,7 +274,7 @@ static void _call_f_isValid_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// ()
+// bool QPrinter::newPage()
 
 
 static void _init_f_newPage_0 (qt_gsi::GenericMethod *decl)
@@ -398,7 +398,7 @@ static void _call_f_pageRect_c1789 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QPagedPaintDevice::PageSize QPrinter::pageSize()
 
 
 static void _init_f_pageSize_c0 (qt_gsi::GenericMethod *decl)
@@ -413,7 +413,7 @@ static void _call_f_pageSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// QPaintEngine *QPrinter::paintEngine()
 
 
 static void _init_f_paintEngine_c0 (qt_gsi::GenericMethod *decl)
@@ -819,7 +819,7 @@ static void _call_f_setFullPage_864 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QPagedPaintDevice::Margins &)
+// void QPrinter::setMargins(const QPagedPaintDevice::Margins &m)
 
 
 static void _init_f_setMargins_3812 (qt_gsi::GenericMethod *decl)
@@ -919,7 +919,7 @@ static void _call_f_setOutputFormat_2647 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (const QMarginsF &, QPageLayout::Unit)
+// bool QPrinter::setPageMargins(const QMarginsF &margins, QPageLayout::Unit units)
 
 
 static void _init_f_setPageMargins_4145 (qt_gsi::GenericMethod *decl)
@@ -941,7 +941,7 @@ static void _call_f_setPageMargins_4145 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (double, double, double, double, QPrinter::Unit)
+// void QPrinter::setPageMargins(double left, double top, double right, double bottom, QPrinter::Unit unit)
 
 
 static void _init_f_setPageMargins_5641 (qt_gsi::GenericMethod *decl)
@@ -993,7 +993,7 @@ static void _call_f_setPageOrder_2262 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (QPagedPaintDevice::PageSize)
+// void QPrinter::setPageSize(QPagedPaintDevice::PageSize size)
 
 
 static void _init_f_setPageSize_3006 (qt_gsi::GenericMethod *decl)
@@ -1013,7 +1013,7 @@ static void _call_f_setPageSize_3006 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QSizeF &)
+// void QPrinter::setPageSizeMM(const QSizeF &size)
 
 
 static void _init_f_setPageSizeMM_1875 (qt_gsi::GenericMethod *decl)
@@ -1295,7 +1295,7 @@ static gsi::Methods methods_QPrinter () {
   methods += new qt_gsi::GenericMethod (":fullPage", "@brief Method bool QPrinter::fullPage()\n", true, &_init_f_fullPage_c0, &_call_f_fullPage_c0);
   methods += new qt_gsi::GenericMethod ("getPageMargins", "@brief Method void QPrinter::getPageMargins(double *left, double *top, double *right, double *bottom, QPrinter::Unit unit)\n", true, &_init_f_getPageMargins_c6385, &_call_f_getPageMargins_c6385);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QPrinter::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
-  methods += new qt_gsi::GenericMethod ("newPage", "@brief Method ()\nThis is a reimplementation of QPagedPaintDevice::newPage", false, &_init_f_newPage_0, &_call_f_newPage_0);
+  methods += new qt_gsi::GenericMethod ("newPage", "@brief Method bool QPrinter::newPage()\nThis is a reimplementation of QPagedPaintDevice::newPage", false, &_init_f_newPage_0, &_call_f_newPage_0);
   methods += new qt_gsi::GenericMethod (":numCopies", "@brief Method int QPrinter::numCopies()\n", true, &_init_f_numCopies_c0, &_call_f_numCopies_c0);
   methods += new qt_gsi::GenericMethod (":orientation", "@brief Method QPrinter::Orientation QPrinter::orientation()\n", true, &_init_f_orientation_c0, &_call_f_orientation_c0);
   methods += new qt_gsi::GenericMethod (":outputFileName", "@brief Method QString QPrinter::outputFileName()\n", true, &_init_f_outputFileName_c0, &_call_f_outputFileName_c0);
@@ -1303,8 +1303,8 @@ static gsi::Methods methods_QPrinter () {
   methods += new qt_gsi::GenericMethod (":pageOrder", "@brief Method QPrinter::PageOrder QPrinter::pageOrder()\n", true, &_init_f_pageOrder_c0, &_call_f_pageOrder_c0);
   methods += new qt_gsi::GenericMethod ("pageRect", "@brief Method QRect QPrinter::pageRect()\n", true, &_init_f_pageRect_c0, &_call_f_pageRect_c0);
   methods += new qt_gsi::GenericMethod ("pageRect", "@brief Method QRectF QPrinter::pageRect(QPrinter::Unit)\n", true, &_init_f_pageRect_c1789, &_call_f_pageRect_c1789);
-  methods += new qt_gsi::GenericMethod (":pageSize", "@brief Method () const\n", true, &_init_f_pageSize_c0, &_call_f_pageSize_c0);
-  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Method () const\nThis is a reimplementation of QPaintDevice::paintEngine", true, &_init_f_paintEngine_c0, &_call_f_paintEngine_c0);
+  methods += new qt_gsi::GenericMethod (":pageSize", "@brief Method QPagedPaintDevice::PageSize QPrinter::pageSize()\n", true, &_init_f_pageSize_c0, &_call_f_pageSize_c0);
+  methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Method QPaintEngine *QPrinter::paintEngine()\nThis is a reimplementation of QPaintDevice::paintEngine", true, &_init_f_paintEngine_c0, &_call_f_paintEngine_c0);
   methods += new qt_gsi::GenericMethod (":paperName", "@brief Method QString QPrinter::paperName()\n", true, &_init_f_paperName_c0, &_call_f_paperName_c0);
   methods += new qt_gsi::GenericMethod ("paperRect", "@brief Method QRect QPrinter::paperRect()\n", true, &_init_f_paperRect_c0, &_call_f_paperRect_c0);
   methods += new qt_gsi::GenericMethod ("paperRect", "@brief Method QRectF QPrinter::paperRect(QPrinter::Unit)\n", true, &_init_f_paperRect_c1789, &_call_f_paperRect_c1789);
@@ -1327,16 +1327,16 @@ static gsi::Methods methods_QPrinter () {
   methods += new qt_gsi::GenericMethod ("setFontEmbeddingEnabled|fontEmbeddingEnabled=", "@brief Method void QPrinter::setFontEmbeddingEnabled(bool enable)\n", false, &_init_f_setFontEmbeddingEnabled_864, &_call_f_setFontEmbeddingEnabled_864);
   methods += new qt_gsi::GenericMethod ("setFromTo", "@brief Method void QPrinter::setFromTo(int fromPage, int toPage)\n", false, &_init_f_setFromTo_1426, &_call_f_setFromTo_1426);
   methods += new qt_gsi::GenericMethod ("setFullPage|fullPage=", "@brief Method void QPrinter::setFullPage(bool)\n", false, &_init_f_setFullPage_864, &_call_f_setFullPage_864);
-  methods += new qt_gsi::GenericMethod ("setMargins|margins=", "@brief Method (const QPagedPaintDevice::Margins &)\nThis is a reimplementation of QPagedPaintDevice::setMargins", false, &_init_f_setMargins_3812, &_call_f_setMargins_3812);
+  methods += new qt_gsi::GenericMethod ("setMargins|margins=", "@brief Method void QPrinter::setMargins(const QPagedPaintDevice::Margins &m)\nThis is a reimplementation of QPagedPaintDevice::setMargins", false, &_init_f_setMargins_3812, &_call_f_setMargins_3812);
   methods += new qt_gsi::GenericMethod ("setNumCopies|numCopies=", "@brief Method void QPrinter::setNumCopies(int)\n", false, &_init_f_setNumCopies_767, &_call_f_setNumCopies_767);
   methods += new qt_gsi::GenericMethod ("setOrientation|orientation=", "@brief Method void QPrinter::setOrientation(QPrinter::Orientation)\n", false, &_init_f_setOrientation_2537, &_call_f_setOrientation_2537);
   methods += new qt_gsi::GenericMethod ("setOutputFileName|outputFileName=", "@brief Method void QPrinter::setOutputFileName(const QString &)\n", false, &_init_f_setOutputFileName_2025, &_call_f_setOutputFileName_2025);
   methods += new qt_gsi::GenericMethod ("setOutputFormat|outputFormat=", "@brief Method void QPrinter::setOutputFormat(QPrinter::OutputFormat format)\n", false, &_init_f_setOutputFormat_2647, &_call_f_setOutputFormat_2647);
-  methods += new qt_gsi::GenericMethod ("setPageMargins", "@brief Method (const QMarginsF &, QPageLayout::Unit)\n", false, &_init_f_setPageMargins_4145, &_call_f_setPageMargins_4145);
-  methods += new qt_gsi::GenericMethod ("setPageMargins", "@brief Method (double, double, double, double, QPrinter::Unit)\n", false, &_init_f_setPageMargins_5641, &_call_f_setPageMargins_5641);
+  methods += new qt_gsi::GenericMethod ("setPageMargins", "@brief Method bool QPrinter::setPageMargins(const QMarginsF &margins, QPageLayout::Unit units)\n", false, &_init_f_setPageMargins_4145, &_call_f_setPageMargins_4145);
+  methods += new qt_gsi::GenericMethod ("setPageMargins", "@brief Method void QPrinter::setPageMargins(double left, double top, double right, double bottom, QPrinter::Unit unit)\n", false, &_init_f_setPageMargins_5641, &_call_f_setPageMargins_5641);
   methods += new qt_gsi::GenericMethod ("setPageOrder|pageOrder=", "@brief Method void QPrinter::setPageOrder(QPrinter::PageOrder)\n", false, &_init_f_setPageOrder_2262, &_call_f_setPageOrder_2262);
-  methods += new qt_gsi::GenericMethod ("setPageSize|pageSize=", "@brief Method (QPagedPaintDevice::PageSize)\nThis is a reimplementation of QPagedPaintDevice::setPageSize", false, &_init_f_setPageSize_3006, &_call_f_setPageSize_3006);
-  methods += new qt_gsi::GenericMethod ("setPageSizeMM|pageSizeMM=", "@brief Method (const QSizeF &)\nThis is a reimplementation of QPagedPaintDevice::setPageSizeMM", false, &_init_f_setPageSizeMM_1875, &_call_f_setPageSizeMM_1875);
+  methods += new qt_gsi::GenericMethod ("setPageSize|pageSize=", "@brief Method void QPrinter::setPageSize(QPagedPaintDevice::PageSize size)\nThis is a reimplementation of QPagedPaintDevice::setPageSize", false, &_init_f_setPageSize_3006, &_call_f_setPageSize_3006);
+  methods += new qt_gsi::GenericMethod ("setPageSizeMM|pageSizeMM=", "@brief Method void QPrinter::setPageSizeMM(const QSizeF &size)\nThis is a reimplementation of QPagedPaintDevice::setPageSizeMM", false, &_init_f_setPageSizeMM_1875, &_call_f_setPageSizeMM_1875);
   methods += new qt_gsi::GenericMethod ("setPaperName|paperName=", "@brief Method void QPrinter::setPaperName(const QString &paperName)\n", false, &_init_f_setPaperName_2025, &_call_f_setPaperName_2025);
   methods += new qt_gsi::GenericMethod ("setPaperSize|paperSize=", "@brief Method void QPrinter::setPaperSize(QPagedPaintDevice::PageSize)\n", false, &_init_f_setPaperSize_3006, &_call_f_setPaperSize_3006);
   methods += new qt_gsi::GenericMethod ("setPaperSize", "@brief Method void QPrinter::setPaperSize(const QSizeF &paperSize, QPrinter::Unit unit)\n", false, &_init_f_setPaperSize_3556, &_call_f_setPaperSize_3556);

@@ -42,7 +42,7 @@
 // -----------------------------------------------------------------------
 // class QAccessibleObject
 
-// (int, int) const
+// QAccessibleInterface *QAccessibleObject::childAt(int x, int y)
 
 
 static void _init_f_childAt_c1426 (qt_gsi::GenericMethod *decl)
@@ -64,7 +64,7 @@ static void _call_f_childAt_c1426 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// () const
+// bool QAccessibleObject::isValid()
 
 
 static void _init_f_isValid_c0 (qt_gsi::GenericMethod *decl)
@@ -79,7 +79,7 @@ static void _call_f_isValid_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QObject *QAccessibleObject::object()
 
 
 static void _init_f_object_c0 (qt_gsi::GenericMethod *decl)
@@ -94,7 +94,7 @@ static void _call_f_object_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// QRect QAccessibleObject::rect()
 
 
 static void _init_f_rect_c0 (qt_gsi::GenericMethod *decl)
@@ -109,7 +109,7 @@ static void _call_f_rect_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// (QAccessible::Text, const QString &)
+// void QAccessibleObject::setText(QAccessible::Text t, const QString &text)
 
 
 static void _init_f_setText_3977 (qt_gsi::GenericMethod *decl)
@@ -138,11 +138,11 @@ namespace gsi
 
 static gsi::Methods methods_QAccessibleObject () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("childAt", "@brief Method (int, int) const\nThis is a reimplementation of QAccessibleInterface::childAt", true, &_init_f_childAt_c1426, &_call_f_childAt_c1426);
-  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::isValid", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
-  methods += new qt_gsi::GenericMethod ("object", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::object", true, &_init_f_object_c0, &_call_f_object_c0);
-  methods += new qt_gsi::GenericMethod ("rect", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::rect", true, &_init_f_rect_c0, &_call_f_rect_c0);
-  methods += new qt_gsi::GenericMethod ("setText", "@brief Method (QAccessible::Text, const QString &)\nThis is a reimplementation of QAccessibleInterface::setText", false, &_init_f_setText_3977, &_call_f_setText_3977);
+  methods += new qt_gsi::GenericMethod ("childAt", "@brief Method QAccessibleInterface *QAccessibleObject::childAt(int x, int y)\nThis is a reimplementation of QAccessibleInterface::childAt", true, &_init_f_childAt_c1426, &_call_f_childAt_c1426);
+  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QAccessibleObject::isValid()\nThis is a reimplementation of QAccessibleInterface::isValid", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("object", "@brief Method QObject *QAccessibleObject::object()\nThis is a reimplementation of QAccessibleInterface::object", true, &_init_f_object_c0, &_call_f_object_c0);
+  methods += new qt_gsi::GenericMethod ("rect", "@brief Method QRect QAccessibleObject::rect()\nThis is a reimplementation of QAccessibleInterface::rect", true, &_init_f_rect_c0, &_call_f_rect_c0);
+  methods += new qt_gsi::GenericMethod ("setText", "@brief Method void QAccessibleObject::setText(QAccessible::Text t, const QString &text)\nThis is a reimplementation of QAccessibleInterface::setText", false, &_init_f_setText_3977, &_call_f_setText_3977);
   return methods;
 }
 

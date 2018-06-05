@@ -91,7 +91,7 @@ static void _call_ctor_QStyleOptionTabBarBaseV2_3491 (const qt_gsi::GenericStati
 }
 
 
-// (const QStyleOptionTabBarBase &)
+// QStyleOptionTabBarBaseV2 &QStyleOptionTabBarBaseV2::operator=(const QStyleOptionTabBarBase &other)
 
 
 static void _init_f_operator_eq__3491 (qt_gsi::GenericMethod *decl)
@@ -119,7 +119,7 @@ static gsi::Methods methods_QStyleOptionTabBarBaseV2 () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionTabBarBaseV2::QStyleOptionTabBarBaseV2()\nThis method creates an object of class QStyleOptionTabBarBaseV2.", &_init_ctor_QStyleOptionTabBarBaseV2_0, &_call_ctor_QStyleOptionTabBarBaseV2_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionTabBarBaseV2::QStyleOptionTabBarBaseV2(const QStyleOptionTabBarBaseV2 &other)\nThis method creates an object of class QStyleOptionTabBarBaseV2.", &_init_ctor_QStyleOptionTabBarBaseV2_3627, &_call_ctor_QStyleOptionTabBarBaseV2_3627);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionTabBarBaseV2::QStyleOptionTabBarBaseV2(const QStyleOptionTabBarBase &other)\nThis method creates an object of class QStyleOptionTabBarBaseV2.", &_init_ctor_QStyleOptionTabBarBaseV2_3491, &_call_ctor_QStyleOptionTabBarBaseV2_3491);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QStyleOptionTabBarBase &)\n", false, &_init_f_operator_eq__3491, &_call_f_operator_eq__3491);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QStyleOptionTabBarBaseV2 &QStyleOptionTabBarBaseV2::operator=(const QStyleOptionTabBarBase &other)\n", false, &_init_f_operator_eq__3491, &_call_f_operator_eq__3491);
   return methods;
 }
 

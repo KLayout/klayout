@@ -98,7 +98,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (int)
+// void QPrintPreviewDialog::done(int result)
 
 
 static void _init_f_done_767 (qt_gsi::GenericMethod *decl)
@@ -118,7 +118,7 @@ static void _call_f_done_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// ()
+// void QPrintPreviewDialog::open()
 
 
 static void _init_f_open_0 (qt_gsi::GenericMethod *decl)
@@ -134,7 +134,7 @@ static void _call_f_open_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QObject *, const char *)
+// void QPrintPreviewDialog::open(QObject *receiver, const char *member)
 
 
 static void _init_f_open_2925 (qt_gsi::GenericMethod *decl)
@@ -172,7 +172,7 @@ static void _call_f_printer_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (bool)
+// void QPrintPreviewDialog::setVisible(bool visible)
 
 
 static void _init_f_setVisible_864 (qt_gsi::GenericMethod *decl)
@@ -292,11 +292,11 @@ namespace gsi
 static gsi::Methods methods_QPrintPreviewDialog () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("done", "@brief Method (int)\nThis is a reimplementation of QDialog::done", false, &_init_f_done_767, &_call_f_done_767);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method ()\n", false, &_init_f_open_0, &_call_f_open_0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method (QObject *, const char *)\n", false, &_init_f_open_2925, &_call_f_open_2925);
+  methods += new qt_gsi::GenericMethod ("done", "@brief Method void QPrintPreviewDialog::done(int result)\nThis is a reimplementation of QDialog::done", false, &_init_f_done_767, &_call_f_done_767);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QPrintPreviewDialog::open()\n", false, &_init_f_open_0, &_call_f_open_0);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QPrintPreviewDialog::open(QObject *receiver, const char *member)\n", false, &_init_f_open_2925, &_call_f_open_2925);
   methods += new qt_gsi::GenericMethod ("printer", "@brief Method QPrinter *QPrintPreviewDialog::printer()\n", false, &_init_f_printer_0, &_call_f_printer_0);
-  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method (bool)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
+  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QPrintPreviewDialog::setVisible(bool visible)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += gsi::qt_signal ("accepted()", "accepted", "@brief Signal declaration for QPrintPreviewDialog::accepted()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QPrintPreviewDialog::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QPrintPreviewDialog::destroyed(QObject *)\nYou can bind a procedure to this signal.");

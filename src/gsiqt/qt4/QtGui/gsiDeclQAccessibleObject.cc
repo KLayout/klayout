@@ -40,7 +40,7 @@
 // -----------------------------------------------------------------------
 // class QAccessibleObject
 
-// (int, QAccessible::Text, int) const
+// QString QAccessibleObject::actionText(int action, QAccessible::Text t, int child)
 
 
 static void _init_f_actionText_c3378 (qt_gsi::GenericMethod *decl)
@@ -65,7 +65,7 @@ static void _call_f_actionText_c3378 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (int, int, const QList<QVariant> &)
+// bool QAccessibleObject::doAction(int action, int child, const QList<QVariant> &params)
 
 
 static void _init_f_doAction_4052 (qt_gsi::GenericMethod *decl)
@@ -90,7 +90,7 @@ static void _call_f_doAction_4052 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// () const
+// bool QAccessibleObject::isValid()
 
 
 static void _init_f_isValid_c0 (qt_gsi::GenericMethod *decl)
@@ -105,7 +105,7 @@ static void _call_f_isValid_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QObject *QAccessibleObject::object()
 
 
 static void _init_f_object_c0 (qt_gsi::GenericMethod *decl)
@@ -120,7 +120,7 @@ static void _call_f_object_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (int) const
+// QRect QAccessibleObject::rect(int child)
 
 
 static void _init_f_rect_c767 (qt_gsi::GenericMethod *decl)
@@ -139,7 +139,7 @@ static void _call_f_rect_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (QAccessible::Text, int, const QString &)
+// void QAccessibleObject::setText(QAccessible::Text t, int child, const QString &text)
 
 
 static void _init_f_setText_4636 (qt_gsi::GenericMethod *decl)
@@ -165,7 +165,7 @@ static void _call_f_setText_4636 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int) const
+// int QAccessibleObject::userActionCount(int child)
 
 
 static void _init_f_userActionCount_c767 (qt_gsi::GenericMethod *decl)
@@ -190,13 +190,13 @@ namespace gsi
 
 static gsi::Methods methods_QAccessibleObject () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("actionText", "@brief Method (int, QAccessible::Text, int) const\nThis is a reimplementation of QAccessibleInterface::actionText", true, &_init_f_actionText_c3378, &_call_f_actionText_c3378);
-  methods += new qt_gsi::GenericMethod ("doAction", "@brief Method (int, int, const QList<QVariant> &)\nThis is a reimplementation of QAccessibleInterface::doAction", false, &_init_f_doAction_4052, &_call_f_doAction_4052);
-  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::isValid", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
-  methods += new qt_gsi::GenericMethod ("object", "@brief Method () const\nThis is a reimplementation of QAccessibleInterface::object", true, &_init_f_object_c0, &_call_f_object_c0);
-  methods += new qt_gsi::GenericMethod ("rect", "@brief Method (int) const\nThis is a reimplementation of QAccessibleInterface::rect", true, &_init_f_rect_c767, &_call_f_rect_c767);
-  methods += new qt_gsi::GenericMethod ("setText", "@brief Method (QAccessible::Text, int, const QString &)\nThis is a reimplementation of QAccessibleInterface::setText", false, &_init_f_setText_4636, &_call_f_setText_4636);
-  methods += new qt_gsi::GenericMethod ("userActionCount", "@brief Method (int) const\nThis is a reimplementation of QAccessibleInterface::userActionCount", true, &_init_f_userActionCount_c767, &_call_f_userActionCount_c767);
+  methods += new qt_gsi::GenericMethod ("actionText", "@brief Method QString QAccessibleObject::actionText(int action, QAccessible::Text t, int child)\nThis is a reimplementation of QAccessibleInterface::actionText", true, &_init_f_actionText_c3378, &_call_f_actionText_c3378);
+  methods += new qt_gsi::GenericMethod ("doAction", "@brief Method bool QAccessibleObject::doAction(int action, int child, const QList<QVariant> &params)\nThis is a reimplementation of QAccessibleInterface::doAction", false, &_init_f_doAction_4052, &_call_f_doAction_4052);
+  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QAccessibleObject::isValid()\nThis is a reimplementation of QAccessibleInterface::isValid", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("object", "@brief Method QObject *QAccessibleObject::object()\nThis is a reimplementation of QAccessibleInterface::object", true, &_init_f_object_c0, &_call_f_object_c0);
+  methods += new qt_gsi::GenericMethod ("rect", "@brief Method QRect QAccessibleObject::rect(int child)\nThis is a reimplementation of QAccessibleInterface::rect", true, &_init_f_rect_c767, &_call_f_rect_c767);
+  methods += new qt_gsi::GenericMethod ("setText", "@brief Method void QAccessibleObject::setText(QAccessible::Text t, int child, const QString &text)\nThis is a reimplementation of QAccessibleInterface::setText", false, &_init_f_setText_4636, &_call_f_setText_4636);
+  methods += new qt_gsi::GenericMethod ("userActionCount", "@brief Method int QAccessibleObject::userActionCount(int child)\nThis is a reimplementation of QAccessibleInterface::userActionCount", true, &_init_f_userActionCount_c767, &_call_f_userActionCount_c767);
   return methods;
 }
 

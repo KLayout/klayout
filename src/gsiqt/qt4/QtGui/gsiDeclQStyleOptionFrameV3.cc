@@ -91,7 +91,7 @@ static void _call_ctor_QStyleOptionFrameV3_3047 (const qt_gsi::GenericStaticMeth
 }
 
 
-// (const QStyleOptionFrame &)
+// QStyleOptionFrameV3 &QStyleOptionFrameV3::operator=(const QStyleOptionFrame &other)
 
 
 static void _init_f_operator_eq__3047 (qt_gsi::GenericMethod *decl)
@@ -119,7 +119,7 @@ static gsi::Methods methods_QStyleOptionFrameV3 () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionFrameV3::QStyleOptionFrameV3()\nThis method creates an object of class QStyleOptionFrameV3.", &_init_ctor_QStyleOptionFrameV3_0, &_call_ctor_QStyleOptionFrameV3_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionFrameV3::QStyleOptionFrameV3(const QStyleOptionFrameV3 &other)\nThis method creates an object of class QStyleOptionFrameV3.", &_init_ctor_QStyleOptionFrameV3_3184, &_call_ctor_QStyleOptionFrameV3_3184);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionFrameV3::QStyleOptionFrameV3(const QStyleOptionFrame &other)\nThis method creates an object of class QStyleOptionFrameV3.", &_init_ctor_QStyleOptionFrameV3_3047, &_call_ctor_QStyleOptionFrameV3_3047);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QStyleOptionFrame &)\n", false, &_init_f_operator_eq__3047, &_call_f_operator_eq__3047);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QStyleOptionFrameV3 &QStyleOptionFrameV3::operator=(const QStyleOptionFrame &other)\n", false, &_init_f_operator_eq__3047, &_call_f_operator_eq__3047);
   return methods;
 }
 

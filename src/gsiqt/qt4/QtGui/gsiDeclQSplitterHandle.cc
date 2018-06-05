@@ -148,7 +148,7 @@ static void _call_f_setOrientation_1913 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// QSize QSplitterHandle::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -281,7 +281,7 @@ static gsi::Methods methods_QSplitterHandle () {
   methods += new qt_gsi::GenericMethod ("opaqueResize", "@brief Method bool QSplitterHandle::opaqueResize()\n", true, &_init_f_opaqueResize_c0, &_call_f_opaqueResize_c0);
   methods += new qt_gsi::GenericMethod (":orientation", "@brief Method Qt::Orientation QSplitterHandle::orientation()\n", true, &_init_f_orientation_c0, &_call_f_orientation_c0);
   methods += new qt_gsi::GenericMethod ("setOrientation|orientation=", "@brief Method void QSplitterHandle::setOrientation(Qt::Orientation o)\n", false, &_init_f_setOrientation_1913, &_call_f_setOrientation_1913);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QSplitterHandle::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod ("splitter", "@brief Method QSplitter *QSplitterHandle::splitter()\n", true, &_init_f_splitter_c0, &_call_f_splitter_c0);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QSplitterHandle::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSplitterHandle::destroyed(QObject *)\nYou can bind a procedure to this signal.");

@@ -111,7 +111,7 @@ static void _call_ctor_QStyleOptionTabV3_2835 (const qt_gsi::GenericStaticMethod
 }
 
 
-// (const QStyleOptionTab &)
+// QStyleOptionTabV3 &QStyleOptionTabV3::operator=(const QStyleOptionTab &other)
 
 
 static void _init_f_operator_eq__2835 (qt_gsi::GenericMethod *decl)
@@ -140,7 +140,7 @@ static gsi::Methods methods_QStyleOptionTabV3 () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionTabV3::QStyleOptionTabV3(const QStyleOptionTabV3 &other)\nThis method creates an object of class QStyleOptionTabV3.", &_init_ctor_QStyleOptionTabV3_2972, &_call_ctor_QStyleOptionTabV3_2972);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionTabV3::QStyleOptionTabV3(const QStyleOptionTabV2 &other)\nThis method creates an object of class QStyleOptionTabV3.", &_init_ctor_QStyleOptionTabV3_2971, &_call_ctor_QStyleOptionTabV3_2971);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStyleOptionTabV3::QStyleOptionTabV3(const QStyleOptionTab &other)\nThis method creates an object of class QStyleOptionTabV3.", &_init_ctor_QStyleOptionTabV3_2835, &_call_ctor_QStyleOptionTabV3_2835);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QStyleOptionTab &)\n", false, &_init_f_operator_eq__2835, &_call_f_operator_eq__2835);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QStyleOptionTabV3 &QStyleOptionTabV3::operator=(const QStyleOptionTab &other)\n", false, &_init_f_operator_eq__2835, &_call_f_operator_eq__2835);
   return methods;
 }
 

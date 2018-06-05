@@ -479,7 +479,7 @@ static void _call_f_mimeTypes_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (const QModelIndex &) const
+// QModelIndex QAbstractItemModel::parent(const QModelIndex &child)
 
 
 static void _init_f_parent_c2395 (qt_gsi::GenericMethod *decl)
@@ -498,7 +498,7 @@ static void _call_f_parent_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QObject *QAbstractItemModel::parent()
 
 
 static void _init_f_parent_c0 (qt_gsi::GenericMethod *decl)
@@ -983,8 +983,8 @@ static gsi::Methods methods_QAbstractItemModel () {
   methods += new qt_gsi::GenericMethod ("match", "@brief Method QList<QModelIndex> QAbstractItemModel::match(const QModelIndex &start, int role, const QVariant &value, int hits, QFlags<Qt::MatchFlag> flags)\n", true, &_init_f_match_c7932, &_call_f_match_c7932);
   methods += new qt_gsi::GenericMethod ("mimeData", "@brief Method QMimeData *QAbstractItemModel::mimeData(const QList<QModelIndex> &indexes)\n", true, &_init_f_mimeData_c3010, &_call_f_mimeData_c3010);
   methods += new qt_gsi::GenericMethod ("mimeTypes", "@brief Method QStringList QAbstractItemModel::mimeTypes()\n", true, &_init_f_mimeTypes_c0, &_call_f_mimeTypes_c0);
-  methods += new qt_gsi::GenericMethod ("parent", "@brief Method (const QModelIndex &) const\n", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
-  methods += new qt_gsi::GenericMethod (":parent", "@brief Method () const\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
+  methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QAbstractItemModel::parent(const QModelIndex &child)\n", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
+  methods += new qt_gsi::GenericMethod (":parent", "@brief Method QObject *QAbstractItemModel::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
   methods += new qt_gsi::GenericMethod ("removeColumn", "@brief Method bool QAbstractItemModel::removeColumn(int column, const QModelIndex &parent)\n", false, &_init_f_removeColumn_3054, &_call_f_removeColumn_3054);
   methods += new qt_gsi::GenericMethod ("removeColumns", "@brief Method bool QAbstractItemModel::removeColumns(int column, int count, const QModelIndex &parent)\n", false, &_init_f_removeColumns_3713, &_call_f_removeColumns_3713);
   methods += new qt_gsi::GenericMethod ("removeRow", "@brief Method bool QAbstractItemModel::removeRow(int row, const QModelIndex &parent)\n", false, &_init_f_removeRow_3054, &_call_f_removeRow_3054);

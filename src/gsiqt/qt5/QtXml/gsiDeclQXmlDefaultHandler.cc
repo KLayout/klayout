@@ -39,7 +39,7 @@
 // -----------------------------------------------------------------------
 // class QXmlDefaultHandler
 
-// (const QString &, const QString &, const QString &, const QString &, const QString &)
+// bool QXmlDefaultHandler::attributeDecl(const QString &eName, const QString &aName, const QString &type, const QString &valueDefault, const QString &value)
 
 
 static void _init_f_attributeDecl_9693 (qt_gsi::GenericMethod *decl)
@@ -70,7 +70,7 @@ static void _call_f_attributeDecl_9693 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (const QString &)
+// bool QXmlDefaultHandler::characters(const QString &ch)
 
 
 static void _init_f_characters_2025 (qt_gsi::GenericMethod *decl)
@@ -89,7 +89,7 @@ static void _call_f_characters_2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QString &)
+// bool QXmlDefaultHandler::comment(const QString &ch)
 
 
 static void _init_f_comment_2025 (qt_gsi::GenericMethod *decl)
@@ -108,7 +108,7 @@ static void _call_f_comment_2025 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// ()
+// bool QXmlDefaultHandler::endCDATA()
 
 
 static void _init_f_endCDATA_0 (qt_gsi::GenericMethod *decl)
@@ -123,7 +123,7 @@ static void _call_f_endCDATA_0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// ()
+// bool QXmlDefaultHandler::endDTD()
 
 
 static void _init_f_endDTD_0 (qt_gsi::GenericMethod *decl)
@@ -138,7 +138,7 @@ static void _call_f_endDTD_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// ()
+// bool QXmlDefaultHandler::endDocument()
 
 
 static void _init_f_endDocument_0 (qt_gsi::GenericMethod *decl)
@@ -153,7 +153,7 @@ static void _call_f_endDocument_0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// (const QString &, const QString &, const QString &)
+// bool QXmlDefaultHandler::endElement(const QString &namespaceURI, const QString &localName, const QString &qName)
 
 
 static void _init_f_endElement_5859 (qt_gsi::GenericMethod *decl)
@@ -178,7 +178,7 @@ static void _call_f_endElement_5859 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QString &)
+// bool QXmlDefaultHandler::endEntity(const QString &name)
 
 
 static void _init_f_endEntity_2025 (qt_gsi::GenericMethod *decl)
@@ -197,7 +197,7 @@ static void _call_f_endEntity_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QString &)
+// bool QXmlDefaultHandler::endPrefixMapping(const QString &prefix)
 
 
 static void _init_f_endPrefixMapping_2025 (qt_gsi::GenericMethod *decl)
@@ -216,7 +216,7 @@ static void _call_f_endPrefixMapping_2025 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// (const QXmlParseException &)
+// bool QXmlDefaultHandler::error(const QXmlParseException &exception)
 
 
 static void _init_f_error_3149 (qt_gsi::GenericMethod *decl)
@@ -235,7 +235,7 @@ static void _call_f_error_3149 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QString QXmlDefaultHandler::errorString()
 
 
 static void _init_f_errorString_c0 (qt_gsi::GenericMethod *decl)
@@ -250,7 +250,7 @@ static void _call_f_errorString_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QString &, const QString &, const QString &)
+// bool QXmlDefaultHandler::externalEntityDecl(const QString &name, const QString &publicId, const QString &systemId)
 
 
 static void _init_f_externalEntityDecl_5859 (qt_gsi::GenericMethod *decl)
@@ -275,7 +275,7 @@ static void _call_f_externalEntityDecl_5859 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (const QXmlParseException &)
+// bool QXmlDefaultHandler::fatalError(const QXmlParseException &exception)
 
 
 static void _init_f_fatalError_3149 (qt_gsi::GenericMethod *decl)
@@ -294,7 +294,7 @@ static void _call_f_fatalError_3149 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QString &)
+// bool QXmlDefaultHandler::ignorableWhitespace(const QString &ch)
 
 
 static void _init_f_ignorableWhitespace_2025 (qt_gsi::GenericMethod *decl)
@@ -313,7 +313,7 @@ static void _call_f_ignorableWhitespace_2025 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// (const QString &, const QString &)
+// bool QXmlDefaultHandler::internalEntityDecl(const QString &name, const QString &value)
 
 
 static void _init_f_internalEntityDecl_3942 (qt_gsi::GenericMethod *decl)
@@ -335,7 +335,7 @@ static void _call_f_internalEntityDecl_3942 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (const QString &, const QString &, const QString &)
+// bool QXmlDefaultHandler::notationDecl(const QString &name, const QString &publicId, const QString &systemId)
 
 
 static void _init_f_notationDecl_5859 (qt_gsi::GenericMethod *decl)
@@ -360,7 +360,7 @@ static void _call_f_notationDecl_5859 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QString &, const QString &)
+// bool QXmlDefaultHandler::processingInstruction(const QString &target, const QString &data)
 
 
 static void _init_f_processingInstruction_3942 (qt_gsi::GenericMethod *decl)
@@ -382,7 +382,7 @@ static void _call_f_processingInstruction_3942 (const qt_gsi::GenericMethod * /*
 }
 
 
-// (QXmlLocator *)
+// void QXmlDefaultHandler::setDocumentLocator(QXmlLocator *locator)
 
 
 static void _init_f_setDocumentLocator_1732 (qt_gsi::GenericMethod *decl)
@@ -402,7 +402,7 @@ static void _call_f_setDocumentLocator_1732 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (const QString &)
+// bool QXmlDefaultHandler::skippedEntity(const QString &name)
 
 
 static void _init_f_skippedEntity_2025 (qt_gsi::GenericMethod *decl)
@@ -421,7 +421,7 @@ static void _call_f_skippedEntity_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// ()
+// bool QXmlDefaultHandler::startCDATA()
 
 
 static void _init_f_startCDATA_0 (qt_gsi::GenericMethod *decl)
@@ -436,7 +436,7 @@ static void _call_f_startCDATA_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (const QString &, const QString &, const QString &)
+// bool QXmlDefaultHandler::startDTD(const QString &name, const QString &publicId, const QString &systemId)
 
 
 static void _init_f_startDTD_5859 (qt_gsi::GenericMethod *decl)
@@ -461,7 +461,7 @@ static void _call_f_startDTD_5859 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// ()
+// bool QXmlDefaultHandler::startDocument()
 
 
 static void _init_f_startDocument_0 (qt_gsi::GenericMethod *decl)
@@ -476,7 +476,7 @@ static void _call_f_startDocument_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (const QString &, const QString &, const QString &, const QXmlAttributes &)
+// bool QXmlDefaultHandler::startElement(const QString &namespaceURI, const QString &localName, const QString &qName, const QXmlAttributes &atts)
 
 
 static void _init_f_startElement_8513 (qt_gsi::GenericMethod *decl)
@@ -504,7 +504,7 @@ static void _call_f_startElement_8513 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// (const QString &)
+// bool QXmlDefaultHandler::startEntity(const QString &name)
 
 
 static void _init_f_startEntity_2025 (qt_gsi::GenericMethod *decl)
@@ -523,7 +523,7 @@ static void _call_f_startEntity_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (const QString &, const QString &)
+// bool QXmlDefaultHandler::startPrefixMapping(const QString &prefix, const QString &uri)
 
 
 static void _init_f_startPrefixMapping_3942 (qt_gsi::GenericMethod *decl)
@@ -545,7 +545,7 @@ static void _call_f_startPrefixMapping_3942 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (const QString &, const QString &, const QString &, const QString &)
+// bool QXmlDefaultHandler::unparsedEntityDecl(const QString &name, const QString &publicId, const QString &systemId, const QString &notationName)
 
 
 static void _init_f_unparsedEntityDecl_7776 (qt_gsi::GenericMethod *decl)
@@ -573,7 +573,7 @@ static void _call_f_unparsedEntityDecl_7776 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// (const QXmlParseException &)
+// bool QXmlDefaultHandler::warning(const QXmlParseException &exception)
 
 
 static void _init_f_warning_3149 (qt_gsi::GenericMethod *decl)
@@ -730,33 +730,33 @@ namespace gsi
 
 static gsi::Methods methods_QXmlDefaultHandler () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("attributeDecl", "@brief Method (const QString &, const QString &, const QString &, const QString &, const QString &)\nThis is a reimplementation of QXmlDeclHandler::attributeDecl", false, &_init_f_attributeDecl_9693, &_call_f_attributeDecl_9693);
-  methods += new qt_gsi::GenericMethod ("characters", "@brief Method (const QString &)\nThis is a reimplementation of QXmlContentHandler::characters", false, &_init_f_characters_2025, &_call_f_characters_2025);
-  methods += new qt_gsi::GenericMethod ("comment", "@brief Method (const QString &)\nThis is a reimplementation of QXmlLexicalHandler::comment", false, &_init_f_comment_2025, &_call_f_comment_2025);
-  methods += new qt_gsi::GenericMethod ("endCDATA", "@brief Method ()\nThis is a reimplementation of QXmlLexicalHandler::endCDATA", false, &_init_f_endCDATA_0, &_call_f_endCDATA_0);
-  methods += new qt_gsi::GenericMethod ("endDTD", "@brief Method ()\nThis is a reimplementation of QXmlLexicalHandler::endDTD", false, &_init_f_endDTD_0, &_call_f_endDTD_0);
-  methods += new qt_gsi::GenericMethod ("endDocument", "@brief Method ()\nThis is a reimplementation of QXmlContentHandler::endDocument", false, &_init_f_endDocument_0, &_call_f_endDocument_0);
-  methods += new qt_gsi::GenericMethod ("endElement", "@brief Method (const QString &, const QString &, const QString &)\nThis is a reimplementation of QXmlContentHandler::endElement", false, &_init_f_endElement_5859, &_call_f_endElement_5859);
-  methods += new qt_gsi::GenericMethod ("endEntity", "@brief Method (const QString &)\nThis is a reimplementation of QXmlLexicalHandler::endEntity", false, &_init_f_endEntity_2025, &_call_f_endEntity_2025);
-  methods += new qt_gsi::GenericMethod ("endPrefixMapping", "@brief Method (const QString &)\nThis is a reimplementation of QXmlContentHandler::endPrefixMapping", false, &_init_f_endPrefixMapping_2025, &_call_f_endPrefixMapping_2025);
-  methods += new qt_gsi::GenericMethod ("error", "@brief Method (const QXmlParseException &)\nThis is a reimplementation of QXmlErrorHandler::error", false, &_init_f_error_3149, &_call_f_error_3149);
-  methods += new qt_gsi::GenericMethod ("errorString", "@brief Method () const\nThis is a reimplementation of QXmlContentHandler::errorString", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
-  methods += new qt_gsi::GenericMethod ("externalEntityDecl", "@brief Method (const QString &, const QString &, const QString &)\nThis is a reimplementation of QXmlDeclHandler::externalEntityDecl", false, &_init_f_externalEntityDecl_5859, &_call_f_externalEntityDecl_5859);
-  methods += new qt_gsi::GenericMethod ("fatalError", "@brief Method (const QXmlParseException &)\nThis is a reimplementation of QXmlErrorHandler::fatalError", false, &_init_f_fatalError_3149, &_call_f_fatalError_3149);
-  methods += new qt_gsi::GenericMethod ("ignorableWhitespace", "@brief Method (const QString &)\nThis is a reimplementation of QXmlContentHandler::ignorableWhitespace", false, &_init_f_ignorableWhitespace_2025, &_call_f_ignorableWhitespace_2025);
-  methods += new qt_gsi::GenericMethod ("internalEntityDecl", "@brief Method (const QString &, const QString &)\nThis is a reimplementation of QXmlDeclHandler::internalEntityDecl", false, &_init_f_internalEntityDecl_3942, &_call_f_internalEntityDecl_3942);
-  methods += new qt_gsi::GenericMethod ("notationDecl", "@brief Method (const QString &, const QString &, const QString &)\nThis is a reimplementation of QXmlDTDHandler::notationDecl", false, &_init_f_notationDecl_5859, &_call_f_notationDecl_5859);
-  methods += new qt_gsi::GenericMethod ("processingInstruction", "@brief Method (const QString &, const QString &)\nThis is a reimplementation of QXmlContentHandler::processingInstruction", false, &_init_f_processingInstruction_3942, &_call_f_processingInstruction_3942);
-  methods += new qt_gsi::GenericMethod ("setDocumentLocator", "@brief Method (QXmlLocator *)\nThis is a reimplementation of QXmlContentHandler::setDocumentLocator", false, &_init_f_setDocumentLocator_1732, &_call_f_setDocumentLocator_1732);
-  methods += new qt_gsi::GenericMethod ("skippedEntity", "@brief Method (const QString &)\nThis is a reimplementation of QXmlContentHandler::skippedEntity", false, &_init_f_skippedEntity_2025, &_call_f_skippedEntity_2025);
-  methods += new qt_gsi::GenericMethod ("startCDATA", "@brief Method ()\nThis is a reimplementation of QXmlLexicalHandler::startCDATA", false, &_init_f_startCDATA_0, &_call_f_startCDATA_0);
-  methods += new qt_gsi::GenericMethod ("startDTD", "@brief Method (const QString &, const QString &, const QString &)\nThis is a reimplementation of QXmlLexicalHandler::startDTD", false, &_init_f_startDTD_5859, &_call_f_startDTD_5859);
-  methods += new qt_gsi::GenericMethod ("startDocument", "@brief Method ()\nThis is a reimplementation of QXmlContentHandler::startDocument", false, &_init_f_startDocument_0, &_call_f_startDocument_0);
-  methods += new qt_gsi::GenericMethod ("startElement", "@brief Method (const QString &, const QString &, const QString &, const QXmlAttributes &)\nThis is a reimplementation of QXmlContentHandler::startElement", false, &_init_f_startElement_8513, &_call_f_startElement_8513);
-  methods += new qt_gsi::GenericMethod ("startEntity", "@brief Method (const QString &)\nThis is a reimplementation of QXmlLexicalHandler::startEntity", false, &_init_f_startEntity_2025, &_call_f_startEntity_2025);
-  methods += new qt_gsi::GenericMethod ("startPrefixMapping", "@brief Method (const QString &, const QString &)\nThis is a reimplementation of QXmlContentHandler::startPrefixMapping", false, &_init_f_startPrefixMapping_3942, &_call_f_startPrefixMapping_3942);
-  methods += new qt_gsi::GenericMethod ("unparsedEntityDecl", "@brief Method (const QString &, const QString &, const QString &, const QString &)\nThis is a reimplementation of QXmlDTDHandler::unparsedEntityDecl", false, &_init_f_unparsedEntityDecl_7776, &_call_f_unparsedEntityDecl_7776);
-  methods += new qt_gsi::GenericMethod ("warning", "@brief Method (const QXmlParseException &)\nThis is a reimplementation of QXmlErrorHandler::warning", false, &_init_f_warning_3149, &_call_f_warning_3149);
+  methods += new qt_gsi::GenericMethod ("attributeDecl", "@brief Method bool QXmlDefaultHandler::attributeDecl(const QString &eName, const QString &aName, const QString &type, const QString &valueDefault, const QString &value)\nThis is a reimplementation of QXmlDeclHandler::attributeDecl", false, &_init_f_attributeDecl_9693, &_call_f_attributeDecl_9693);
+  methods += new qt_gsi::GenericMethod ("characters", "@brief Method bool QXmlDefaultHandler::characters(const QString &ch)\nThis is a reimplementation of QXmlContentHandler::characters", false, &_init_f_characters_2025, &_call_f_characters_2025);
+  methods += new qt_gsi::GenericMethod ("comment", "@brief Method bool QXmlDefaultHandler::comment(const QString &ch)\nThis is a reimplementation of QXmlLexicalHandler::comment", false, &_init_f_comment_2025, &_call_f_comment_2025);
+  methods += new qt_gsi::GenericMethod ("endCDATA", "@brief Method bool QXmlDefaultHandler::endCDATA()\nThis is a reimplementation of QXmlLexicalHandler::endCDATA", false, &_init_f_endCDATA_0, &_call_f_endCDATA_0);
+  methods += new qt_gsi::GenericMethod ("endDTD", "@brief Method bool QXmlDefaultHandler::endDTD()\nThis is a reimplementation of QXmlLexicalHandler::endDTD", false, &_init_f_endDTD_0, &_call_f_endDTD_0);
+  methods += new qt_gsi::GenericMethod ("endDocument", "@brief Method bool QXmlDefaultHandler::endDocument()\nThis is a reimplementation of QXmlContentHandler::endDocument", false, &_init_f_endDocument_0, &_call_f_endDocument_0);
+  methods += new qt_gsi::GenericMethod ("endElement", "@brief Method bool QXmlDefaultHandler::endElement(const QString &namespaceURI, const QString &localName, const QString &qName)\nThis is a reimplementation of QXmlContentHandler::endElement", false, &_init_f_endElement_5859, &_call_f_endElement_5859);
+  methods += new qt_gsi::GenericMethod ("endEntity", "@brief Method bool QXmlDefaultHandler::endEntity(const QString &name)\nThis is a reimplementation of QXmlLexicalHandler::endEntity", false, &_init_f_endEntity_2025, &_call_f_endEntity_2025);
+  methods += new qt_gsi::GenericMethod ("endPrefixMapping", "@brief Method bool QXmlDefaultHandler::endPrefixMapping(const QString &prefix)\nThis is a reimplementation of QXmlContentHandler::endPrefixMapping", false, &_init_f_endPrefixMapping_2025, &_call_f_endPrefixMapping_2025);
+  methods += new qt_gsi::GenericMethod ("error", "@brief Method bool QXmlDefaultHandler::error(const QXmlParseException &exception)\nThis is a reimplementation of QXmlErrorHandler::error", false, &_init_f_error_3149, &_call_f_error_3149);
+  methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QXmlDefaultHandler::errorString()\nThis is a reimplementation of QXmlContentHandler::errorString", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
+  methods += new qt_gsi::GenericMethod ("externalEntityDecl", "@brief Method bool QXmlDefaultHandler::externalEntityDecl(const QString &name, const QString &publicId, const QString &systemId)\nThis is a reimplementation of QXmlDeclHandler::externalEntityDecl", false, &_init_f_externalEntityDecl_5859, &_call_f_externalEntityDecl_5859);
+  methods += new qt_gsi::GenericMethod ("fatalError", "@brief Method bool QXmlDefaultHandler::fatalError(const QXmlParseException &exception)\nThis is a reimplementation of QXmlErrorHandler::fatalError", false, &_init_f_fatalError_3149, &_call_f_fatalError_3149);
+  methods += new qt_gsi::GenericMethod ("ignorableWhitespace", "@brief Method bool QXmlDefaultHandler::ignorableWhitespace(const QString &ch)\nThis is a reimplementation of QXmlContentHandler::ignorableWhitespace", false, &_init_f_ignorableWhitespace_2025, &_call_f_ignorableWhitespace_2025);
+  methods += new qt_gsi::GenericMethod ("internalEntityDecl", "@brief Method bool QXmlDefaultHandler::internalEntityDecl(const QString &name, const QString &value)\nThis is a reimplementation of QXmlDeclHandler::internalEntityDecl", false, &_init_f_internalEntityDecl_3942, &_call_f_internalEntityDecl_3942);
+  methods += new qt_gsi::GenericMethod ("notationDecl", "@brief Method bool QXmlDefaultHandler::notationDecl(const QString &name, const QString &publicId, const QString &systemId)\nThis is a reimplementation of QXmlDTDHandler::notationDecl", false, &_init_f_notationDecl_5859, &_call_f_notationDecl_5859);
+  methods += new qt_gsi::GenericMethod ("processingInstruction", "@brief Method bool QXmlDefaultHandler::processingInstruction(const QString &target, const QString &data)\nThis is a reimplementation of QXmlContentHandler::processingInstruction", false, &_init_f_processingInstruction_3942, &_call_f_processingInstruction_3942);
+  methods += new qt_gsi::GenericMethod ("setDocumentLocator", "@brief Method void QXmlDefaultHandler::setDocumentLocator(QXmlLocator *locator)\nThis is a reimplementation of QXmlContentHandler::setDocumentLocator", false, &_init_f_setDocumentLocator_1732, &_call_f_setDocumentLocator_1732);
+  methods += new qt_gsi::GenericMethod ("skippedEntity", "@brief Method bool QXmlDefaultHandler::skippedEntity(const QString &name)\nThis is a reimplementation of QXmlContentHandler::skippedEntity", false, &_init_f_skippedEntity_2025, &_call_f_skippedEntity_2025);
+  methods += new qt_gsi::GenericMethod ("startCDATA", "@brief Method bool QXmlDefaultHandler::startCDATA()\nThis is a reimplementation of QXmlLexicalHandler::startCDATA", false, &_init_f_startCDATA_0, &_call_f_startCDATA_0);
+  methods += new qt_gsi::GenericMethod ("startDTD", "@brief Method bool QXmlDefaultHandler::startDTD(const QString &name, const QString &publicId, const QString &systemId)\nThis is a reimplementation of QXmlLexicalHandler::startDTD", false, &_init_f_startDTD_5859, &_call_f_startDTD_5859);
+  methods += new qt_gsi::GenericMethod ("startDocument", "@brief Method bool QXmlDefaultHandler::startDocument()\nThis is a reimplementation of QXmlContentHandler::startDocument", false, &_init_f_startDocument_0, &_call_f_startDocument_0);
+  methods += new qt_gsi::GenericMethod ("startElement", "@brief Method bool QXmlDefaultHandler::startElement(const QString &namespaceURI, const QString &localName, const QString &qName, const QXmlAttributes &atts)\nThis is a reimplementation of QXmlContentHandler::startElement", false, &_init_f_startElement_8513, &_call_f_startElement_8513);
+  methods += new qt_gsi::GenericMethod ("startEntity", "@brief Method bool QXmlDefaultHandler::startEntity(const QString &name)\nThis is a reimplementation of QXmlLexicalHandler::startEntity", false, &_init_f_startEntity_2025, &_call_f_startEntity_2025);
+  methods += new qt_gsi::GenericMethod ("startPrefixMapping", "@brief Method bool QXmlDefaultHandler::startPrefixMapping(const QString &prefix, const QString &uri)\nThis is a reimplementation of QXmlContentHandler::startPrefixMapping", false, &_init_f_startPrefixMapping_3942, &_call_f_startPrefixMapping_3942);
+  methods += new qt_gsi::GenericMethod ("unparsedEntityDecl", "@brief Method bool QXmlDefaultHandler::unparsedEntityDecl(const QString &name, const QString &publicId, const QString &systemId, const QString &notationName)\nThis is a reimplementation of QXmlDTDHandler::unparsedEntityDecl", false, &_init_f_unparsedEntityDecl_7776, &_call_f_unparsedEntityDecl_7776);
+  methods += new qt_gsi::GenericMethod ("warning", "@brief Method bool QXmlDefaultHandler::warning(const QXmlParseException &exception)\nThis is a reimplementation of QXmlErrorHandler::warning", false, &_init_f_warning_3149, &_call_f_warning_3149);
   methods += new qt_gsi::GenericMethod ("asQXmlContentHandler", "@brief Delivers the base class interface QXmlContentHandler of QXmlDefaultHandler\nClass QXmlDefaultHandler is derived from multiple base classes. This method delivers the QXmlContentHandler base class aspect.", false, &_init_f_QXmlDefaultHandler_as_QXmlContentHandler, &_call_f_QXmlDefaultHandler_as_QXmlContentHandler);
   methods += new qt_gsi::GenericMethod ("asConstQXmlContentHandler", "@brief Delivers the base class interface QXmlContentHandler of QXmlDefaultHandler\nClass QXmlDefaultHandler is derived from multiple base classes. This method delivers the QXmlContentHandler base class aspect.\n\nUse this version if you have a const reference.", true, &_init_f_QXmlDefaultHandler_as_const_QXmlContentHandler, &_call_f_QXmlDefaultHandler_as_const_QXmlContentHandler);
   methods += new qt_gsi::GenericMethod ("asQXmlErrorHandler", "@brief Delivers the base class interface QXmlErrorHandler of QXmlDefaultHandler\nClass QXmlDefaultHandler is derived from multiple base classes. This method delivers the QXmlErrorHandler base class aspect.", false, &_init_f_QXmlDefaultHandler_as_QXmlErrorHandler, &_call_f_QXmlDefaultHandler_as_QXmlErrorHandler);

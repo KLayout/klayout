@@ -107,7 +107,7 @@ static void _call_f_indent_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// bool QTextBlockFormat::isValid()
 
 
 static void _init_f_isValid_c0 (qt_gsi::GenericMethod *decl)
@@ -512,7 +512,7 @@ static gsi::Methods methods_QTextBlockFormat () {
   methods += new qt_gsi::GenericMethod (":alignment", "@brief Method QFlags<Qt::AlignmentFlag> QTextBlockFormat::alignment()\n", true, &_init_f_alignment_c0, &_call_f_alignment_c0);
   methods += new qt_gsi::GenericMethod (":bottomMargin", "@brief Method double QTextBlockFormat::bottomMargin()\n", true, &_init_f_bottomMargin_c0, &_call_f_bottomMargin_c0);
   methods += new qt_gsi::GenericMethod (":indent", "@brief Method int QTextBlockFormat::indent()\n", true, &_init_f_indent_c0, &_call_f_indent_c0);
-  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method () const\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QTextBlockFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod (":leftMargin", "@brief Method double QTextBlockFormat::leftMargin()\n", true, &_init_f_leftMargin_c0, &_call_f_leftMargin_c0);
   methods += new qt_gsi::GenericMethod ("lineHeight", "@brief Method double QTextBlockFormat::lineHeight(double scriptLineHeight, double scaling)\n", true, &_init_f_lineHeight_c2034, &_call_f_lineHeight_c2034);
   methods += new qt_gsi::GenericMethod ("lineHeight", "@brief Method double QTextBlockFormat::lineHeight()\n", true, &_init_f_lineHeight_c0, &_call_f_lineHeight_c0);

@@ -101,7 +101,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (int, int)
+// void QRubberBand::move(int x, int y)
 
 
 static void _init_f_move_1426 (qt_gsi::GenericMethod *decl)
@@ -124,7 +124,7 @@ static void _call_f_move_1426 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (const QPoint &)
+// void QRubberBand::move(const QPoint &p)
 
 
 static void _init_f_move_1916 (qt_gsi::GenericMethod *decl)
@@ -144,7 +144,7 @@ static void _call_f_move_1916 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// (int, int)
+// void QRubberBand::resize(int w, int h)
 
 
 static void _init_f_resize_1426 (qt_gsi::GenericMethod *decl)
@@ -167,7 +167,7 @@ static void _call_f_resize_1426 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QSize &)
+// void QRubberBand::resize(const QSize &s)
 
 
 static void _init_f_resize_1805 (qt_gsi::GenericMethod *decl)
@@ -187,7 +187,7 @@ static void _call_f_resize_1805 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QRect &)
+// void QRubberBand::setGeometry(const QRect &r)
 
 
 static void _init_f_setGeometry_1792 (qt_gsi::GenericMethod *decl)
@@ -207,7 +207,7 @@ static void _call_f_setGeometry_1792 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (int, int, int, int)
+// void QRubberBand::setGeometry(int x, int y, int w, int h)
 
 
 static void _init_f_setGeometry_2744 (qt_gsi::GenericMethod *decl)
@@ -307,12 +307,12 @@ namespace gsi
 static gsi::Methods methods_QRubberBand () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("move", "@brief Method (int, int)\n", false, &_init_f_move_1426, &_call_f_move_1426);
-  methods += new qt_gsi::GenericMethod ("move", "@brief Method (const QPoint &)\n", false, &_init_f_move_1916, &_call_f_move_1916);
-  methods += new qt_gsi::GenericMethod ("resize", "@brief Method (int, int)\n", false, &_init_f_resize_1426, &_call_f_resize_1426);
-  methods += new qt_gsi::GenericMethod ("resize", "@brief Method (const QSize &)\n", false, &_init_f_resize_1805, &_call_f_resize_1805);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRect &)\n", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
-  methods += new qt_gsi::GenericMethod ("setGeometry", "@brief Method (int, int, int, int)\n", false, &_init_f_setGeometry_2744, &_call_f_setGeometry_2744);
+  methods += new qt_gsi::GenericMethod ("move", "@brief Method void QRubberBand::move(int x, int y)\n", false, &_init_f_move_1426, &_call_f_move_1426);
+  methods += new qt_gsi::GenericMethod ("move", "@brief Method void QRubberBand::move(const QPoint &p)\n", false, &_init_f_move_1916, &_call_f_move_1916);
+  methods += new qt_gsi::GenericMethod ("resize", "@brief Method void QRubberBand::resize(int w, int h)\n", false, &_init_f_resize_1426, &_call_f_resize_1426);
+  methods += new qt_gsi::GenericMethod ("resize", "@brief Method void QRubberBand::resize(const QSize &s)\n", false, &_init_f_resize_1805, &_call_f_resize_1805);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QRubberBand::setGeometry(const QRect &r)\n", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
+  methods += new qt_gsi::GenericMethod ("setGeometry", "@brief Method void QRubberBand::setGeometry(int x, int y, int w, int h)\n", false, &_init_f_setGeometry_2744, &_call_f_setGeometry_2744);
   methods += new qt_gsi::GenericMethod ("shape", "@brief Method QRubberBand::Shape QRubberBand::shape()\n", true, &_init_f_shape_c0, &_call_f_shape_c0);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QRubberBand::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QRubberBand::destroyed(QObject *)\nYou can bind a procedure to this signal.");

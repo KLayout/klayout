@@ -61,7 +61,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (QLayoutItem *)
+// void QFormLayout::addItem(QLayoutItem *item)
 
 
 static void _init_f_addItem_1740 (qt_gsi::GenericMethod *decl)
@@ -213,7 +213,7 @@ static void _call_f_addRow_1341 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// int QFormLayout::count()
 
 
 static void _init_f_count_c0 (qt_gsi::GenericMethod *decl)
@@ -228,7 +228,7 @@ static void _call_f_count_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// () const
+// QFlags<Qt::Orientation> QFormLayout::expandingDirections()
 
 
 static void _init_f_expandingDirections_c0 (qt_gsi::GenericMethod *decl)
@@ -351,7 +351,7 @@ static void _call_f_getWidgetPosition_c4714 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// () const
+// bool QFormLayout::hasHeightForWidth()
 
 
 static void _init_f_hasHeightForWidth_c0 (qt_gsi::GenericMethod *decl)
@@ -366,7 +366,7 @@ static void _call_f_hasHeightForWidth_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (int) const
+// int QFormLayout::heightForWidth(int width)
 
 
 static void _init_f_heightForWidth_c767 (qt_gsi::GenericMethod *decl)
@@ -550,7 +550,7 @@ static void _call_f_insertRow_2000 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// ()
+// void QFormLayout::invalidate()
 
 
 static void _init_f_invalidate_0 (qt_gsi::GenericMethod *decl)
@@ -566,7 +566,7 @@ static void _call_f_invalidate_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int, QFormLayout::ItemRole) const
+// QLayoutItem *QFormLayout::itemAt(int row, QFormLayout::ItemRole role)
 
 
 static void _init_f_itemAt_c3135 (qt_gsi::GenericMethod *decl)
@@ -588,7 +588,7 @@ static void _call_f_itemAt_c3135 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// (int) const
+// QLayoutItem *QFormLayout::itemAt(int index)
 
 
 static void _init_f_itemAt_c767 (qt_gsi::GenericMethod *decl)
@@ -660,7 +660,7 @@ static void _call_f_labelForField_c1341 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// () const
+// QSize QFormLayout::minimumSize()
 
 
 static void _init_f_minimumSize_c0 (qt_gsi::GenericMethod *decl)
@@ -745,7 +745,7 @@ static void _call_f_setFormAlignment_2750 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// (const QRect &)
+// void QFormLayout::setGeometry(const QRect &rect)
 
 
 static void _init_f_setGeometry_1792 (qt_gsi::GenericMethod *decl)
@@ -877,7 +877,7 @@ static void _call_f_setRowWrapPolicy_3021 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// (int)
+// void QFormLayout::setSpacing(int)
 
 
 static void _init_f_setSpacing_767 (qt_gsi::GenericMethod *decl)
@@ -943,7 +943,7 @@ static void _call_f_setWidget_4342 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QSize QFormLayout::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -958,7 +958,7 @@ static void _call_f_sizeHint_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// () const
+// int QFormLayout::spacing()
 
 
 static void _init_f_spacing_c0 (qt_gsi::GenericMethod *decl)
@@ -973,7 +973,7 @@ static void _call_f_spacing_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (int)
+// QLayoutItem *QFormLayout::takeAt(int index)
 
 
 static void _init_f_takeAt_767 (qt_gsi::GenericMethod *decl)
@@ -1107,22 +1107,22 @@ namespace gsi
 static gsi::Methods methods_QFormLayout () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("addItem", "@brief Method (QLayoutItem *)\nThis is a reimplementation of QLayout::addItem", false, &_init_f_addItem_1740, &_call_f_addItem_1740);
+  methods += new qt_gsi::GenericMethod ("addItem", "@brief Method void QFormLayout::addItem(QLayoutItem *item)\nThis is a reimplementation of QLayout::addItem", false, &_init_f_addItem_1740, &_call_f_addItem_1740);
   methods += new qt_gsi::GenericMethod ("addRow", "@brief Method void QFormLayout::addRow(QWidget *label, QWidget *field)\n", false, &_init_f_addRow_2522, &_call_f_addRow_2522);
   methods += new qt_gsi::GenericMethod ("addRow", "@brief Method void QFormLayout::addRow(QWidget *label, QLayout *field)\n", false, &_init_f_addRow_2548, &_call_f_addRow_2548);
   methods += new qt_gsi::GenericMethod ("addRow", "@brief Method void QFormLayout::addRow(const QString &labelText, QWidget *field)\n", false, &_init_f_addRow_3232, &_call_f_addRow_3232);
   methods += new qt_gsi::GenericMethod ("addRow", "@brief Method void QFormLayout::addRow(const QString &labelText, QLayout *field)\n", false, &_init_f_addRow_3258, &_call_f_addRow_3258);
   methods += new qt_gsi::GenericMethod ("addRow", "@brief Method void QFormLayout::addRow(QWidget *widget)\n", false, &_init_f_addRow_1315, &_call_f_addRow_1315);
   methods += new qt_gsi::GenericMethod ("addRow", "@brief Method void QFormLayout::addRow(QLayout *layout)\n", false, &_init_f_addRow_1341, &_call_f_addRow_1341);
-  methods += new qt_gsi::GenericMethod ("count", "@brief Method () const\nThis is a reimplementation of QLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
-  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method () const\nThis is a reimplementation of QLayout::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
+  methods += new qt_gsi::GenericMethod ("count", "@brief Method int QFormLayout::count()\nThis is a reimplementation of QLayout::count", true, &_init_f_count_c0, &_call_f_count_c0);
+  methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Method QFlags<Qt::Orientation> QFormLayout::expandingDirections()\nThis is a reimplementation of QLayout::expandingDirections", true, &_init_f_expandingDirections_c0, &_call_f_expandingDirections_c0);
   methods += new qt_gsi::GenericMethod (":fieldGrowthPolicy", "@brief Method QFormLayout::FieldGrowthPolicy QFormLayout::fieldGrowthPolicy()\n", true, &_init_f_fieldGrowthPolicy_c0, &_call_f_fieldGrowthPolicy_c0);
   methods += new qt_gsi::GenericMethod (":formAlignment", "@brief Method QFlags<Qt::AlignmentFlag> QFormLayout::formAlignment()\n", true, &_init_f_formAlignment_c0, &_call_f_formAlignment_c0);
   methods += new qt_gsi::GenericMethod ("getItemPosition", "@brief Method void QFormLayout::getItemPosition(int index, int *rowPtr, QFormLayout::ItemRole *rolePtr)\n", true, &_init_f_getItemPosition_c4166, &_call_f_getItemPosition_c4166);
   methods += new qt_gsi::GenericMethod ("getLayoutPosition", "@brief Method void QFormLayout::getLayoutPosition(QLayout *layout, int *rowPtr, QFormLayout::ItemRole *rolePtr)\n", true, &_init_f_getLayoutPosition_c4740, &_call_f_getLayoutPosition_c4740);
   methods += new qt_gsi::GenericMethod ("getWidgetPosition", "@brief Method void QFormLayout::getWidgetPosition(QWidget *widget, int *rowPtr, QFormLayout::ItemRole *rolePtr)\n", true, &_init_f_getWidgetPosition_c4714, &_call_f_getWidgetPosition_c4714);
-  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Method () const\nThis is a reimplementation of QLayoutItem::hasHeightForWidth", true, &_init_f_hasHeightForWidth_c0, &_call_f_hasHeightForWidth_c0);
-  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method (int) const\nThis is a reimplementation of QLayoutItem::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
+  methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Method bool QFormLayout::hasHeightForWidth()\nThis is a reimplementation of QLayoutItem::hasHeightForWidth", true, &_init_f_hasHeightForWidth_c0, &_call_f_hasHeightForWidth_c0);
+  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method int QFormLayout::heightForWidth(int width)\nThis is a reimplementation of QLayoutItem::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
   methods += new qt_gsi::GenericMethod (":horizontalSpacing", "@brief Method int QFormLayout::horizontalSpacing()\n", true, &_init_f_horizontalSpacing_c0, &_call_f_horizontalSpacing_c0);
   methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QFormLayout::insertRow(int row, QWidget *label, QWidget *field)\n", false, &_init_f_insertRow_3181, &_call_f_insertRow_3181);
   methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QFormLayout::insertRow(int row, QWidget *label, QLayout *field)\n", false, &_init_f_insertRow_3207, &_call_f_insertRow_3207);
@@ -1130,29 +1130,29 @@ static gsi::Methods methods_QFormLayout () {
   methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QFormLayout::insertRow(int row, const QString &labelText, QLayout *field)\n", false, &_init_f_insertRow_3917, &_call_f_insertRow_3917);
   methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QFormLayout::insertRow(int row, QWidget *widget)\n", false, &_init_f_insertRow_1974, &_call_f_insertRow_1974);
   methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QFormLayout::insertRow(int row, QLayout *layout)\n", false, &_init_f_insertRow_2000, &_call_f_insertRow_2000);
-  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method ()\nThis is a reimplementation of QLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
-  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method (int, QFormLayout::ItemRole) const\n", true, &_init_f_itemAt_c3135, &_call_f_itemAt_c3135);
-  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method (int) const\nThis is a reimplementation of QLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
+  methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QFormLayout::invalidate()\nThis is a reimplementation of QLayout::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
+  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QLayoutItem *QFormLayout::itemAt(int row, QFormLayout::ItemRole role)\n", true, &_init_f_itemAt_c3135, &_call_f_itemAt_c3135);
+  methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QLayoutItem *QFormLayout::itemAt(int index)\nThis is a reimplementation of QLayout::itemAt", true, &_init_f_itemAt_c767, &_call_f_itemAt_c767);
   methods += new qt_gsi::GenericMethod (":labelAlignment", "@brief Method QFlags<Qt::AlignmentFlag> QFormLayout::labelAlignment()\n", true, &_init_f_labelAlignment_c0, &_call_f_labelAlignment_c0);
   methods += new qt_gsi::GenericMethod ("labelForField", "@brief Method QWidget *QFormLayout::labelForField(QWidget *field)\n", true, &_init_f_labelForField_c1315, &_call_f_labelForField_c1315);
   methods += new qt_gsi::GenericMethod ("labelForField", "@brief Method QWidget *QFormLayout::labelForField(QLayout *field)\n", true, &_init_f_labelForField_c1341, &_call_f_labelForField_c1341);
-  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method () const\nThis is a reimplementation of QLayout::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
+  methods += new qt_gsi::GenericMethod ("minimumSize", "@brief Method QSize QFormLayout::minimumSize()\nThis is a reimplementation of QLayout::minimumSize", true, &_init_f_minimumSize_c0, &_call_f_minimumSize_c0);
   methods += new qt_gsi::GenericMethod ("rowCount", "@brief Method int QFormLayout::rowCount()\n", true, &_init_f_rowCount_c0, &_call_f_rowCount_c0);
   methods += new qt_gsi::GenericMethod (":rowWrapPolicy", "@brief Method QFormLayout::RowWrapPolicy QFormLayout::rowWrapPolicy()\n", true, &_init_f_rowWrapPolicy_c0, &_call_f_rowWrapPolicy_c0);
   methods += new qt_gsi::GenericMethod ("setFieldGrowthPolicy|fieldGrowthPolicy=", "@brief Method void QFormLayout::setFieldGrowthPolicy(QFormLayout::FieldGrowthPolicy policy)\n", false, &_init_f_setFieldGrowthPolicy_3418, &_call_f_setFieldGrowthPolicy_3418);
   methods += new qt_gsi::GenericMethod ("setFormAlignment|formAlignment=", "@brief Method void QFormLayout::setFormAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setFormAlignment_2750, &_call_f_setFormAlignment_2750);
-  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method (const QRect &)\nThis is a reimplementation of QLayout::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
+  methods += new qt_gsi::GenericMethod ("setGeometry|geometry=", "@brief Method void QFormLayout::setGeometry(const QRect &rect)\nThis is a reimplementation of QLayout::setGeometry", false, &_init_f_setGeometry_1792, &_call_f_setGeometry_1792);
   methods += new qt_gsi::GenericMethod ("setHorizontalSpacing|horizontalSpacing=", "@brief Method void QFormLayout::setHorizontalSpacing(int spacing)\n", false, &_init_f_setHorizontalSpacing_767, &_call_f_setHorizontalSpacing_767);
   methods += new qt_gsi::GenericMethod ("setItem", "@brief Method void QFormLayout::setItem(int row, QFormLayout::ItemRole role, QLayoutItem *item)\n", false, &_init_f_setItem_4767, &_call_f_setItem_4767);
   methods += new qt_gsi::GenericMethod ("setLabelAlignment|labelAlignment=", "@brief Method void QFormLayout::setLabelAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setLabelAlignment_2750, &_call_f_setLabelAlignment_2750);
   methods += new qt_gsi::GenericMethod ("setLayout", "@brief Method void QFormLayout::setLayout(int row, QFormLayout::ItemRole role, QLayout *layout)\n", false, &_init_f_setLayout_4368, &_call_f_setLayout_4368);
   methods += new qt_gsi::GenericMethod ("setRowWrapPolicy|rowWrapPolicy=", "@brief Method void QFormLayout::setRowWrapPolicy(QFormLayout::RowWrapPolicy policy)\n", false, &_init_f_setRowWrapPolicy_3021, &_call_f_setRowWrapPolicy_3021);
-  methods += new qt_gsi::GenericMethod ("setSpacing|spacing=", "@brief Method (int)\n", false, &_init_f_setSpacing_767, &_call_f_setSpacing_767);
+  methods += new qt_gsi::GenericMethod ("setSpacing|spacing=", "@brief Method void QFormLayout::setSpacing(int)\n", false, &_init_f_setSpacing_767, &_call_f_setSpacing_767);
   methods += new qt_gsi::GenericMethod ("setVerticalSpacing|verticalSpacing=", "@brief Method void QFormLayout::setVerticalSpacing(int spacing)\n", false, &_init_f_setVerticalSpacing_767, &_call_f_setVerticalSpacing_767);
   methods += new qt_gsi::GenericMethod ("setWidget", "@brief Method void QFormLayout::setWidget(int row, QFormLayout::ItemRole role, QWidget *widget)\n", false, &_init_f_setWidget_4342, &_call_f_setWidget_4342);
-  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method () const\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
-  methods += new qt_gsi::GenericMethod (":spacing", "@brief Method () const\n", true, &_init_f_spacing_c0, &_call_f_spacing_c0);
-  methods += new qt_gsi::GenericMethod ("takeAt", "@brief Method (int)\nThis is a reimplementation of QLayout::takeAt", false, &_init_f_takeAt_767, &_call_f_takeAt_767);
+  methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Method QSize QFormLayout::sizeHint()\nThis is a reimplementation of QLayoutItem::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":spacing", "@brief Method int QFormLayout::spacing()\n", true, &_init_f_spacing_c0, &_call_f_spacing_c0);
+  methods += new qt_gsi::GenericMethod ("takeAt", "@brief Method QLayoutItem *QFormLayout::takeAt(int index)\nThis is a reimplementation of QLayout::takeAt", false, &_init_f_takeAt_767, &_call_f_takeAt_767);
   methods += new qt_gsi::GenericMethod (":verticalSpacing", "@brief Method int QFormLayout::verticalSpacing()\n", true, &_init_f_verticalSpacing_c0, &_call_f_verticalSpacing_c0);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QFormLayout::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QFormLayout::tr(const char *s, const char *c)\nThis method is static and can be called without an instance.", &_init_f_tr_3354, &_call_f_tr_3354);

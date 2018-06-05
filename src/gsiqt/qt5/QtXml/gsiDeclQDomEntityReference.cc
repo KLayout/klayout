@@ -86,7 +86,7 @@ static void _call_ctor_QDomEntityReference_3230 (const qt_gsi::GenericStaticMeth
 }
 
 
-// () const
+// QDomNode::NodeType QDomEntityReference::nodeType()
 
 
 static void _init_f_nodeType_c0 (qt_gsi::GenericMethod *decl)
@@ -101,7 +101,7 @@ static void _call_f_nodeType_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// (const QDomEntityReference &)
+// QDomEntityReference &QDomEntityReference::operator=(const QDomEntityReference &)
 
 
 static void _init_f_operator_eq__3230 (qt_gsi::GenericMethod *decl)
@@ -128,8 +128,8 @@ static gsi::Methods methods_QDomEntityReference () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomEntityReference::QDomEntityReference()\nThis method creates an object of class QDomEntityReference.", &_init_ctor_QDomEntityReference_0, &_call_ctor_QDomEntityReference_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDomEntityReference::QDomEntityReference(const QDomEntityReference &x)\nThis method creates an object of class QDomEntityReference.", &_init_ctor_QDomEntityReference_3230, &_call_ctor_QDomEntityReference_3230);
-  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method () const\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
-  methods += new qt_gsi::GenericMethod ("assign", "@brief Method (const QDomEntityReference &)\n", false, &_init_f_operator_eq__3230, &_call_f_operator_eq__3230);
+  methods += new qt_gsi::GenericMethod ("nodeType", "@brief Method QDomNode::NodeType QDomEntityReference::nodeType()\n", true, &_init_f_nodeType_c0, &_call_f_nodeType_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QDomEntityReference &QDomEntityReference::operator=(const QDomEntityReference &)\n", false, &_init_f_operator_eq__3230, &_call_f_operator_eq__3230);
   return methods;
 }
 

@@ -161,7 +161,7 @@ static void _call_f_hue_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// () const
+// QMediaObject *QVideoWidget::mediaObject()
 
 
 static void _init_f_mediaObject_c0 (qt_gsi::GenericMethod *decl)
@@ -311,7 +311,7 @@ static void _call_f_setSaturation_767 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// () const
+// QSize QVideoWidget::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -431,7 +431,7 @@ static gsi::Methods methods_QVideoWidget () {
   methods += new qt_gsi::GenericMethod (":brightness", "@brief Method int QVideoWidget::brightness()\n", true, &_init_f_brightness_c0, &_call_f_brightness_c0);
   methods += new qt_gsi::GenericMethod (":contrast", "@brief Method int QVideoWidget::contrast()\n", true, &_init_f_contrast_c0, &_call_f_contrast_c0);
   methods += new qt_gsi::GenericMethod (":hue", "@brief Method int QVideoWidget::hue()\n", true, &_init_f_hue_c0, &_call_f_hue_c0);
-  methods += new qt_gsi::GenericMethod (":mediaObject", "@brief Method () const\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
+  methods += new qt_gsi::GenericMethod (":mediaObject", "@brief Method QMediaObject *QVideoWidget::mediaObject()\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
   methods += new qt_gsi::GenericMethod (":saturation", "@brief Method int QVideoWidget::saturation()\n", true, &_init_f_saturation_c0, &_call_f_saturation_c0);
   methods += new qt_gsi::GenericMethod ("setAspectRatioMode|aspectRatioMode=", "@brief Method void QVideoWidget::setAspectRatioMode(Qt::AspectRatioMode mode)\n", false, &_init_f_setAspectRatioMode_2257, &_call_f_setAspectRatioMode_2257);
   methods += new qt_gsi::GenericMethod ("setBrightness|brightness=", "@brief Method void QVideoWidget::setBrightness(int brightness)\n", false, &_init_f_setBrightness_767, &_call_f_setBrightness_767);
@@ -439,7 +439,7 @@ static gsi::Methods methods_QVideoWidget () {
   methods += new qt_gsi::GenericMethod ("setFullScreen|fullScreen=", "@brief Method void QVideoWidget::setFullScreen(bool fullScreen)\n", false, &_init_f_setFullScreen_864, &_call_f_setFullScreen_864);
   methods += new qt_gsi::GenericMethod ("setHue|hue=", "@brief Method void QVideoWidget::setHue(int hue)\n", false, &_init_f_setHue_767, &_call_f_setHue_767);
   methods += new qt_gsi::GenericMethod ("setSaturation|saturation=", "@brief Method void QVideoWidget::setSaturation(int saturation)\n", false, &_init_f_setSaturation_767, &_call_f_setSaturation_767);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QVideoWidget::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += gsi::qt_signal<int > ("brightnessChanged(int)", "brightnessChanged", gsi::arg("brightness"), "@brief Signal declaration for QVideoWidget::brightnessChanged(int brightness)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("contrastChanged(int)", "contrastChanged", gsi::arg("contrast"), "@brief Signal declaration for QVideoWidget::contrastChanged(int contrast)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QVideoWidget::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");

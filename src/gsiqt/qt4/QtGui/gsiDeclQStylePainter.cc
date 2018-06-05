@@ -122,7 +122,7 @@ static void _call_ctor_QStylePainter_3010 (const qt_gsi::GenericStaticMethod * /
 }
 
 
-// (QWidget *)
+// bool QStylePainter::begin(QWidget *w)
 
 
 static void _init_f_begin_1315 (qt_gsi::GenericMethod *decl)
@@ -141,7 +141,7 @@ static void _call_f_begin_1315 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// (QPaintDevice *, QWidget *)
+// bool QStylePainter::begin(QPaintDevice *pd, QWidget *w)
 
 
 static void _init_f_begin_3010 (qt_gsi::GenericMethod *decl)
@@ -317,8 +317,8 @@ static gsi::Methods methods_QStylePainter () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStylePainter::QStylePainter()\nThis method creates an object of class QStylePainter.", &_init_ctor_QStylePainter_0, &_call_ctor_QStylePainter_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStylePainter::QStylePainter(QWidget *w)\nThis method creates an object of class QStylePainter.", &_init_ctor_QStylePainter_1315, &_call_ctor_QStylePainter_1315);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStylePainter::QStylePainter(QPaintDevice *pd, QWidget *w)\nThis method creates an object of class QStylePainter.", &_init_ctor_QStylePainter_3010, &_call_ctor_QStylePainter_3010);
-  methods += new qt_gsi::GenericMethod ("begin", "@brief Method (QWidget *)\n", false, &_init_f_begin_1315, &_call_f_begin_1315);
-  methods += new qt_gsi::GenericMethod ("begin", "@brief Method (QPaintDevice *, QWidget *)\n", false, &_init_f_begin_3010, &_call_f_begin_3010);
+  methods += new qt_gsi::GenericMethod ("begin", "@brief Method bool QStylePainter::begin(QWidget *w)\n", false, &_init_f_begin_1315, &_call_f_begin_1315);
+  methods += new qt_gsi::GenericMethod ("begin", "@brief Method bool QStylePainter::begin(QPaintDevice *pd, QWidget *w)\n", false, &_init_f_begin_3010, &_call_f_begin_3010);
   methods += new qt_gsi::GenericMethod ("drawComplexControl", "@brief Method void QStylePainter::drawComplexControl(QStyle::ComplexControl cc, const QStyleOptionComplex &opt)\n", false, &_init_f_drawComplexControl_5803, &_call_f_drawComplexControl_5803);
   methods += new qt_gsi::GenericMethod ("drawControl", "@brief Method void QStylePainter::drawControl(QStyle::ControlElement ce, const QStyleOption &opt)\n", false, &_init_f_drawControl_5061, &_call_f_drawControl_5061);
   methods += new qt_gsi::GenericMethod ("drawItemPixmap", "@brief Method void QStylePainter::drawItemPixmap(const QRect &r, int flags, const QPixmap &pixmap)\n", false, &_init_f_drawItemPixmap_4360, &_call_f_drawItemPixmap_4360);

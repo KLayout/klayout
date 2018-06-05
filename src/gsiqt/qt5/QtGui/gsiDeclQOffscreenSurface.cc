@@ -82,7 +82,7 @@ static void _call_f_destroy_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// () const
+// QSurfaceFormat QOffscreenSurface::format()
 
 
 static void _init_f_format_c0 (qt_gsi::GenericMethod *decl)
@@ -182,7 +182,7 @@ static void _call_f_setScreen_1311 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QSize QOffscreenSurface::size()
 
 
 static void _init_f_size_c0 (qt_gsi::GenericMethod *decl)
@@ -197,7 +197,7 @@ static void _call_f_size_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// () const
+// QSurface::SurfaceType QOffscreenSurface::surfaceType()
 
 
 static void _init_f_surfaceType_c0 (qt_gsi::GenericMethod *decl)
@@ -315,14 +315,14 @@ static gsi::Methods methods_QOffscreenSurface () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("qt_create", "@brief Method void QOffscreenSurface::create()\n", false, &_init_f_create_0, &_call_f_create_0);
   methods += new qt_gsi::GenericMethod ("qt_destroy", "@brief Method void QOffscreenSurface::destroy()\n", false, &_init_f_destroy_0, &_call_f_destroy_0);
-  methods += new qt_gsi::GenericMethod (":format", "@brief Method () const\nThis is a reimplementation of QSurface::format", true, &_init_f_format_c0, &_call_f_format_c0);
+  methods += new qt_gsi::GenericMethod (":format", "@brief Method QSurfaceFormat QOffscreenSurface::format()\nThis is a reimplementation of QSurface::format", true, &_init_f_format_c0, &_call_f_format_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QOffscreenSurface::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("requestedFormat", "@brief Method QSurfaceFormat QOffscreenSurface::requestedFormat()\n", true, &_init_f_requestedFormat_c0, &_call_f_requestedFormat_c0);
   methods += new qt_gsi::GenericMethod (":screen", "@brief Method QScreen *QOffscreenSurface::screen()\n", true, &_init_f_screen_c0, &_call_f_screen_c0);
   methods += new qt_gsi::GenericMethod ("setFormat|format=", "@brief Method void QOffscreenSurface::setFormat(const QSurfaceFormat &format)\n", false, &_init_f_setFormat_2724, &_call_f_setFormat_2724);
   methods += new qt_gsi::GenericMethod ("setScreen|screen=", "@brief Method void QOffscreenSurface::setScreen(QScreen *screen)\n", false, &_init_f_setScreen_1311, &_call_f_setScreen_1311);
-  methods += new qt_gsi::GenericMethod ("size", "@brief Method () const\nThis is a reimplementation of QSurface::size", true, &_init_f_size_c0, &_call_f_size_c0);
-  methods += new qt_gsi::GenericMethod ("surfaceType", "@brief Method () const\nThis is a reimplementation of QSurface::surfaceType", true, &_init_f_surfaceType_c0, &_call_f_surfaceType_c0);
+  methods += new qt_gsi::GenericMethod ("size", "@brief Method QSize QOffscreenSurface::size()\nThis is a reimplementation of QSurface::size", true, &_init_f_size_c0, &_call_f_size_c0);
+  methods += new qt_gsi::GenericMethod ("surfaceType", "@brief Method QSurface::SurfaceType QOffscreenSurface::surfaceType()\nThis is a reimplementation of QSurface::surfaceType", true, &_init_f_surfaceType_c0, &_call_f_surfaceType_c0);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QOffscreenSurface::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QScreen * > ("screenChanged(QScreen *)", "screenChanged", gsi::arg("screen"), "@brief Signal declaration for QOffscreenSurface::screenChanged(QScreen *screen)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QOffscreenSurface::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);

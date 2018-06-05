@@ -662,7 +662,7 @@ static void _call_f_setTitleFormat_1787 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// (bool)
+// void QWizard::setVisible(bool visible)
 
 
 static void _init_f_setVisible_864 (qt_gsi::GenericMethod *decl)
@@ -717,7 +717,7 @@ static void _call_f_sideWidget_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// () const
+// QSize QWizard::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -926,10 +926,10 @@ static gsi::Methods methods_QWizard () {
   methods += new qt_gsi::GenericMethod ("setStartId|startId=", "@brief Method void QWizard::setStartId(int id)\n", false, &_init_f_setStartId_767, &_call_f_setStartId_767);
   methods += new qt_gsi::GenericMethod ("setSubTitleFormat|subTitleFormat=", "@brief Method void QWizard::setSubTitleFormat(Qt::TextFormat format)\n", false, &_init_f_setSubTitleFormat_1787, &_call_f_setSubTitleFormat_1787);
   methods += new qt_gsi::GenericMethod ("setTitleFormat|titleFormat=", "@brief Method void QWizard::setTitleFormat(Qt::TextFormat format)\n", false, &_init_f_setTitleFormat_1787, &_call_f_setTitleFormat_1787);
-  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method (bool)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
+  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QWizard::setVisible(bool visible)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += new qt_gsi::GenericMethod ("setWizardStyle|wizardStyle=", "@brief Method void QWizard::setWizardStyle(QWizard::WizardStyle style)\n", false, &_init_f_setWizardStyle_2412, &_call_f_setWizardStyle_2412);
   methods += new qt_gsi::GenericMethod (":sideWidget", "@brief Method QWidget *QWizard::sideWidget()\n", true, &_init_f_sideWidget_c0, &_call_f_sideWidget_c0);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QDialog::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QWizard::sizeHint()\nThis is a reimplementation of QDialog::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":startId", "@brief Method int QWizard::startId()\n", true, &_init_f_startId_c0, &_call_f_startId_c0);
   methods += new qt_gsi::GenericMethod (":subTitleFormat", "@brief Method Qt::TextFormat QWizard::subTitleFormat()\n", true, &_init_f_subTitleFormat_c0, &_call_f_subTitleFormat_c0);
   methods += new qt_gsi::GenericMethod ("testOption", "@brief Method bool QWizard::testOption(QWizard::WizardOption option)\n", true, &_init_f_testOption_c2516, &_call_f_testOption_c2516);

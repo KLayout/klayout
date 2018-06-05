@@ -188,7 +188,7 @@ static void _call_f_minimum_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// () const
+// QSize QProgressBar::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -437,7 +437,7 @@ static void _call_f_setValue_767 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// () const
+// QSize QProgressBar::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -603,7 +603,7 @@ static gsi::Methods methods_QProgressBar () {
   methods += new qt_gsi::GenericMethod ("isTextVisible?|:textVisible", "@brief Method bool QProgressBar::isTextVisible()\n", true, &_init_f_isTextVisible_c0, &_call_f_isTextVisible_c0);
   methods += new qt_gsi::GenericMethod (":maximum", "@brief Method int QProgressBar::maximum()\n", true, &_init_f_maximum_c0, &_call_f_maximum_c0);
   methods += new qt_gsi::GenericMethod (":minimum", "@brief Method int QProgressBar::minimum()\n", true, &_init_f_minimum_c0, &_call_f_minimum_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QProgressBar::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod (":orientation", "@brief Method Qt::Orientation QProgressBar::orientation()\n", true, &_init_f_orientation_c0, &_call_f_orientation_c0);
   methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QProgressBar::reset()\n", false, &_init_f_reset_0, &_call_f_reset_0);
   methods += new qt_gsi::GenericMethod ("setAlignment|alignment=", "@brief Method void QProgressBar::setAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setAlignment_2750, &_call_f_setAlignment_2750);
@@ -616,7 +616,7 @@ static gsi::Methods methods_QProgressBar () {
   methods += new qt_gsi::GenericMethod ("setTextDirection|textDirection=", "@brief Method void QProgressBar::setTextDirection(QProgressBar::Direction textDirection)\n", false, &_init_f_setTextDirection_2692, &_call_f_setTextDirection_2692);
   methods += new qt_gsi::GenericMethod ("setTextVisible|textVisible=", "@brief Method void QProgressBar::setTextVisible(bool visible)\n", false, &_init_f_setTextVisible_864, &_call_f_setTextVisible_864);
   methods += new qt_gsi::GenericMethod ("setValue|value=", "@brief Method void QProgressBar::setValue(int value)\n", false, &_init_f_setValue_767, &_call_f_setValue_767);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QProgressBar::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod (":text", "@brief Method QString QProgressBar::text()\n", true, &_init_f_text_c0, &_call_f_text_c0);
   methods += new qt_gsi::GenericMethod (":textDirection", "@brief Method QProgressBar::Direction QProgressBar::textDirection()\n", false, &_init_f_textDirection_0, &_call_f_textDirection_0);
   methods += new qt_gsi::GenericMethod (":value", "@brief Method int QProgressBar::value()\n", true, &_init_f_value_c0, &_call_f_value_c0);

@@ -152,7 +152,7 @@ static void _call_f_activeAction_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// (QAction *)
+// void QMenuBar::addAction(QAction *action)
 
 
 static void _init_f_addAction_1309 (qt_gsi::GenericMethod *decl)
@@ -172,7 +172,7 @@ static void _call_f_addAction_1309 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QString &)
+// QAction *QMenuBar::addAction(const QString &text)
 
 
 static void _init_f_addAction_2025 (qt_gsi::GenericMethod *decl)
@@ -191,7 +191,7 @@ static void _call_f_addAction_2025 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// (const QString &, const QObject *, const char *)
+// QAction *QMenuBar::addAction(const QString &text, const QObject *receiver, const char *member)
 
 
 static void _init_f_addAction_5537 (qt_gsi::GenericMethod *decl)
@@ -326,7 +326,7 @@ static void _call_f_cornerWidget_c1366 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// (int) const
+// int QMenuBar::heightForWidth(int)
 
 
 static void _init_f_heightForWidth_c767 (qt_gsi::GenericMethod *decl)
@@ -416,7 +416,7 @@ static void _call_f_isNativeMenuBar_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// () const
+// QSize QMenuBar::minimumSizeHint()
 
 
 static void _init_f_minimumSizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -514,7 +514,7 @@ static void _call_f_setNativeMenuBar_864 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// (bool)
+// void QMenuBar::setVisible(bool visible)
 
 
 static void _init_f_setVisible_864 (qt_gsi::GenericMethod *decl)
@@ -534,7 +534,7 @@ static void _call_f_setVisible_864 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// () const
+// QSize QMenuBar::sizeHint()
 
 
 static void _init_f_sizeHint_c0 (qt_gsi::GenericMethod *decl)
@@ -652,27 +652,27 @@ static gsi::Methods methods_QMenuBar () {
   methods += new qt_gsi::GenericMethod ("actionAt", "@brief Method QAction *QMenuBar::actionAt(const QPoint &)\n", true, &_init_f_actionAt_c1916, &_call_f_actionAt_c1916);
   methods += new qt_gsi::GenericMethod ("actionGeometry", "@brief Method QRect QMenuBar::actionGeometry(QAction *)\n", true, &_init_f_actionGeometry_c1309, &_call_f_actionGeometry_c1309);
   methods += new qt_gsi::GenericMethod (":activeAction", "@brief Method QAction *QMenuBar::activeAction()\n", true, &_init_f_activeAction_c0, &_call_f_activeAction_c0);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (QAction *)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (const QString &)\n", false, &_init_f_addAction_2025, &_call_f_addAction_2025);
-  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method (const QString &, const QObject *, const char *)\n", false, &_init_f_addAction_5537, &_call_f_addAction_5537);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method void QMenuBar::addAction(QAction *action)\n", false, &_init_f_addAction_1309, &_call_f_addAction_1309);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenuBar::addAction(const QString &text)\n", false, &_init_f_addAction_2025, &_call_f_addAction_2025);
+  methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QMenuBar::addAction(const QString &text, const QObject *receiver, const char *member)\n", false, &_init_f_addAction_5537, &_call_f_addAction_5537);
   methods += new qt_gsi::GenericMethod ("addMenu", "@brief Method QAction *QMenuBar::addMenu(QMenu *menu)\n", false, &_init_f_addMenu_1108, &_call_f_addMenu_1108);
   methods += new qt_gsi::GenericMethod ("addMenu", "@brief Method QMenu *QMenuBar::addMenu(const QString &title)\n", false, &_init_f_addMenu_2025, &_call_f_addMenu_2025);
   methods += new qt_gsi::GenericMethod ("addMenu", "@brief Method QMenu *QMenuBar::addMenu(const QIcon &icon, const QString &title)\n", false, &_init_f_addMenu_3704, &_call_f_addMenu_3704);
   methods += new qt_gsi::GenericMethod ("addSeparator", "@brief Method QAction *QMenuBar::addSeparator()\n", false, &_init_f_addSeparator_0, &_call_f_addSeparator_0);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QMenuBar::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
   methods += new qt_gsi::GenericMethod ("cornerWidget", "@brief Method QWidget *QMenuBar::cornerWidget(Qt::Corner corner)\n", true, &_init_f_cornerWidget_c1366, &_call_f_cornerWidget_c1366);
-  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method (int) const\nThis is a reimplementation of QWidget::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
+  methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method int QMenuBar::heightForWidth(int)\nThis is a reimplementation of QWidget::heightForWidth", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
   methods += new qt_gsi::GenericMethod ("insertMenu", "@brief Method QAction *QMenuBar::insertMenu(QAction *before, QMenu *menu)\n", false, &_init_f_insertMenu_2309, &_call_f_insertMenu_2309);
   methods += new qt_gsi::GenericMethod ("insertSeparator", "@brief Method QAction *QMenuBar::insertSeparator(QAction *before)\n", false, &_init_f_insertSeparator_1309, &_call_f_insertSeparator_1309);
   methods += new qt_gsi::GenericMethod ("isDefaultUp?|:defaultUp", "@brief Method bool QMenuBar::isDefaultUp()\n", true, &_init_f_isDefaultUp_c0, &_call_f_isDefaultUp_c0);
   methods += new qt_gsi::GenericMethod ("isNativeMenuBar?|:nativeMenuBar", "@brief Method bool QMenuBar::isNativeMenuBar()\n", true, &_init_f_isNativeMenuBar_c0, &_call_f_isNativeMenuBar_c0);
-  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
+  methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QMenuBar::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod ("setActiveAction|activeAction=", "@brief Method void QMenuBar::setActiveAction(QAction *action)\n", false, &_init_f_setActiveAction_1309, &_call_f_setActiveAction_1309);
   methods += new qt_gsi::GenericMethod ("setCornerWidget", "@brief Method void QMenuBar::setCornerWidget(QWidget *w, Qt::Corner corner)\n", false, &_init_f_setCornerWidget_2573, &_call_f_setCornerWidget_2573);
   methods += new qt_gsi::GenericMethod ("setDefaultUp|defaultUp=", "@brief Method void QMenuBar::setDefaultUp(bool)\n", false, &_init_f_setDefaultUp_864, &_call_f_setDefaultUp_864);
   methods += new qt_gsi::GenericMethod ("setNativeMenuBar|nativeMenuBar=", "@brief Method void QMenuBar::setNativeMenuBar(bool nativeMenuBar)\n", false, &_init_f_setNativeMenuBar_864, &_call_f_setNativeMenuBar_864);
-  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method (bool)\nThis is a reimplementation of QWidget::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
-  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method () const\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
+  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QMenuBar::setVisible(bool visible)\nThis is a reimplementation of QWidget::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
+  methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QMenuBar::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QMenuBar::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QMenuBar::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QAction * > ("hovered(QAction *)", "hovered", gsi::arg("action"), "@brief Signal declaration for QMenuBar::hovered(QAction *action)\nYou can bind a procedure to this signal.");

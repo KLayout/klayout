@@ -98,7 +98,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// (int)
+// void QAbstractPageSetupDialog::done(int result)
 
 
 static void _init_f_done_767 (qt_gsi::GenericMethod *decl)
@@ -118,7 +118,7 @@ static void _call_f_done_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// ()
+// int QAbstractPageSetupDialog::exec()
 
 
 static void _init_f_exec_0 (qt_gsi::GenericMethod *decl)
@@ -248,8 +248,8 @@ namespace gsi
 static gsi::Methods methods_QAbstractPageSetupDialog () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("done", "@brief Method (int)\nThis is a reimplementation of QDialog::done", false, &_init_f_done_767, &_call_f_done_767);
-  methods += new qt_gsi::GenericMethod ("exec", "@brief Method ()\n", false, &_init_f_exec_0, &_call_f_exec_0);
+  methods += new qt_gsi::GenericMethod ("done", "@brief Method void QAbstractPageSetupDialog::done(int result)\nThis is a reimplementation of QDialog::done", false, &_init_f_done_767, &_call_f_done_767);
+  methods += new qt_gsi::GenericMethod ("exec", "@brief Method int QAbstractPageSetupDialog::exec()\n", false, &_init_f_exec_0, &_call_f_exec_0);
   methods += new qt_gsi::GenericMethod ("printer", "@brief Method QPrinter *QAbstractPageSetupDialog::printer()\n", false, &_init_f_printer_0, &_call_f_printer_0);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAbstractPageSetupDialog::tr(const char *s, const char *c)\nThis method is static and can be called without an instance.", &_init_f_tr_3354, &_call_f_tr_3354);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAbstractPageSetupDialog::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);

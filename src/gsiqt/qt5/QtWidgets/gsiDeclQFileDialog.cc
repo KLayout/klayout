@@ -334,7 +334,7 @@ static void _call_f_nameFilters_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// ()
+// void QFileDialog::open()
 
 
 static void _init_f_open_0 (qt_gsi::GenericMethod *decl)
@@ -350,7 +350,7 @@ static void _call_f_open_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 }
 
 
-// (QObject *, const char *)
+// void QFileDialog::open(QObject *receiver, const char *member)
 
 
 static void _init_f_open_2925 (qt_gsi::GenericMethod *decl)
@@ -1043,7 +1043,7 @@ static void _call_f_setViewMode_2409 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// (bool)
+// void QFileDialog::setVisible(bool visible)
 
 
 static void _init_f_setVisible_864 (qt_gsi::GenericMethod *decl)
@@ -1455,8 +1455,8 @@ static gsi::Methods methods_QFileDialog () {
   methods += new qt_gsi::GenericMethod ("labelText", "@brief Method QString QFileDialog::labelText(QFileDialog::DialogLabel label)\n", true, &_init_f_labelText_c2681, &_call_f_labelText_c2681);
   methods += new qt_gsi::GenericMethod (":mimeTypeFilters", "@brief Method QStringList QFileDialog::mimeTypeFilters()\n", true, &_init_f_mimeTypeFilters_c0, &_call_f_mimeTypeFilters_c0);
   methods += new qt_gsi::GenericMethod (":nameFilters", "@brief Method QStringList QFileDialog::nameFilters()\n", true, &_init_f_nameFilters_c0, &_call_f_nameFilters_c0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method ()\nThis is a reimplementation of QDialog::open", false, &_init_f_open_0, &_call_f_open_0);
-  methods += new qt_gsi::GenericMethod ("open", "@brief Method (QObject *, const char *)\n", false, &_init_f_open_2925, &_call_f_open_2925);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QFileDialog::open()\nThis is a reimplementation of QDialog::open", false, &_init_f_open_0, &_call_f_open_0);
+  methods += new qt_gsi::GenericMethod ("open", "@brief Method void QFileDialog::open(QObject *receiver, const char *member)\n", false, &_init_f_open_2925, &_call_f_open_2925);
   methods += new qt_gsi::GenericMethod (":options", "@brief Method QFlags<QFileDialog::Option> QFileDialog::options()\n", true, &_init_f_options_c0, &_call_f_options_c0);
   methods += new qt_gsi::GenericMethod (":proxyModel", "@brief Method QAbstractProxyModel *QFileDialog::proxyModel()\n", true, &_init_f_proxyModel_c0, &_call_f_proxyModel_c0);
   methods += new qt_gsi::GenericMethod (":resolveSymlinks", "@brief Method bool QFileDialog::resolveSymlinks()\n", true, &_init_f_resolveSymlinks_c0, &_call_f_resolveSymlinks_c0);
@@ -1492,7 +1492,7 @@ static gsi::Methods methods_QFileDialog () {
   methods += new qt_gsi::GenericMethod ("setResolveSymlinks|resolveSymlinks=", "@brief Method void QFileDialog::setResolveSymlinks(bool enabled)\n", false, &_init_f_setResolveSymlinks_864, &_call_f_setResolveSymlinks_864);
   methods += new qt_gsi::GenericMethod ("setSidebarUrls|sidebarUrls=", "@brief Method void QFileDialog::setSidebarUrls(const QList<QUrl> &urls)\n", false, &_init_f_setSidebarUrls_2316, &_call_f_setSidebarUrls_2316);
   methods += new qt_gsi::GenericMethod ("setViewMode|viewMode=", "@brief Method void QFileDialog::setViewMode(QFileDialog::ViewMode mode)\n", false, &_init_f_setViewMode_2409, &_call_f_setViewMode_2409);
-  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method (bool)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
+  methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QFileDialog::setVisible(bool visible)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += new qt_gsi::GenericMethod (":sidebarUrls", "@brief Method QList<QUrl> QFileDialog::sidebarUrls()\n", true, &_init_f_sidebarUrls_c0, &_call_f_sidebarUrls_c0);
   methods += new qt_gsi::GenericMethod ("testOption", "@brief Method bool QFileDialog::testOption(QFileDialog::Option option)\n", true, &_init_f_testOption_c2242, &_call_f_testOption_c2242);
   methods += new qt_gsi::GenericMethod (":viewMode", "@brief Method QFileDialog::ViewMode QFileDialog::viewMode()\n", true, &_init_f_viewMode_c0, &_call_f_viewMode_c0);

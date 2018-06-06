@@ -24,7 +24,7 @@
 #include "pyaMarshal.h"
 #include "pyaObject.h"
 #include "pyaConvert.h"
-#include "pya.h"
+#include "pyaModule.h"
 
 #include "gsiTypes.h"
 #include "gsiObjectHolder.h"
@@ -175,7 +175,7 @@ struct get_boxed_value_func
     const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
     if (! cls_decl) {
 
-      R *v = new R (python2c<R> (arg, heap));
+      R *v = new R (python2c<R> (arg));
       heap->push (v);
       *ret = v;
 
@@ -240,14 +240,14 @@ struct writer
       } else if (atype.is_cref ()) {
         //  Note: POD's are written as copies for const refs, so we can pass a temporary here:
         //  (avoids having to create a temp object)
-        aa->write<const R &> (python2c<R> (arg, heap));
+        aa->write<const R &> (python2c<R> (arg));
       } else if (atype.is_cptr ()) {
         //  Note: POD's are written as copies for const ptrs, so we can pass a temporary here:
         //  (avoids having to create a temp object)
-        R r = python2c<R> (arg, heap);
+        R r = python2c<R> (arg);
         aa->write<const R *> (&r);
       } else {
-        aa->write<R> (python2c<R> (arg, heap));
+        aa->write<R> (python2c<R> (arg));
       }
 
     }

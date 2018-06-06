@@ -124,92 +124,7 @@ public:
   { }
 };
 
-class MethodTable;
-
-/**
- *  @brief A representative for a Python module
- *  Instantiate this object to represent a python module.
- *  If used externally (for a library), call init with the module name.
- *  Then call make_classes to create the individual classes.
- */
-class PYA_PUBLIC PythonModule
-{
-public:
-  /**
-   *  @brief Constructor
-   */
-  PythonModule ();
-
-  /**
-   *  @brief Destructor
-   */
-  ~PythonModule ();
-
-  /**
-   *  @brief Initializes the module
-   *  This entry point is for external use where the module has not been created yet
-   */
-  void init (const char *mod_name, const char *description);
-
-  /**
-   *  @brief Initializes the module
-   *  This entry point is for internal use where the module is created by the interpreter
-   */
-  void init (const char *mod_name, PyObject *module);
-
-  /**
-   *  @brief Creates the classes after init has been called
-   */
-  void make_classes (const char *mod_name = 0);
-
-  /**
-   *  @brief Gets the GSI class for a Python class
-   */
-  static const gsi::ClassBase *cls_for_type (PyTypeObject *type);
-
-  /**
-   *  @brief The reverse: gets a Python class for a GSI class or NULL if there is no binding
-   */
-  static PyTypeObject *type_for_cls (const gsi::ClassBase *cls);
-
-  /**
-   *  @brief Returns additional Python-specific documentation for the given method
-   *  If no specific documentation exists, an empty string is returned.
-   */
-  static std::string python_doc (const gsi::MethodBase *method);
-
-  /**
-   *  @brief Gets the PyModule object
-   */
-  PyObject *module ();
-
-  /**
-   *  @brief Gets the PyModule object
-   *  This method will release the ownership over the PyObject
-   */
-  PyObject *take_module ();
-
-private:
-  void add_python_doc (const gsi::ClassBase &cls, const MethodTable *mt, int mid, const std::string &doc);
-  PyMethodDef *make_method_def ();
-  PyGetSetDef *make_getset_def ();
-  char *make_string (const std::string &s);
-  static void check (const char *mod_name);
-
-  std::list<std::string> m_string_heap;
-  std::vector<PyMethodDef *> m_methods_heap;
-  std::vector<PyGetSetDef *> m_getseters_heap;
-
-  std::string m_mod_name, m_mod_description;
-  std::string m_base_class_name;
-  PythonRef mp_module;
-  PythonRef mp_base_class;
-  char *mp_mod_def;
-
-  static std::map<const gsi::MethodBase *, std::string> m_python_doc;
-  static std::map <PyTypeObject *, const gsi::ClassBase *> m_cls_map;
-  static std::map <const gsi::ClassBase *, PyTypeObject *> m_rev_cls_map;
-};
+class PythonModule;
 
 /**
  *  @brief The python interpreter wrapper class
@@ -359,6 +274,12 @@ public:
   int trace_func (PyFrameObject *frame, int event, PyObject *arg);
 
   /**
+   *  @brief Returns additional Python-specific documentation for the given method
+   *  If no specific documentation exists, an empty string is returned.
+   */
+  static std::string python_doc (const gsi::MethodBase *);
+
+  /**
    *  @brief Returns the singleton reference
    */
   static PythonInterpreter *instance ();
@@ -394,7 +315,7 @@ private:
   PyFrameObject *mp_current_frame;
   std::map<PyObject *, size_t> m_file_id_map;
   wchar_t *mp_py3_app_name;
-  pya::PythonModule m_pya_module;
+  std::auto_ptr<pya::PythonModule> m_pya_module;
 };
 
 }

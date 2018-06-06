@@ -31,7 +31,7 @@
  */
 
 #include <Python.h>
-#include "pya.h"
+#include "pyaModule.h"
 #include "gsi.h"
 #include "gsiExpression.h"
 

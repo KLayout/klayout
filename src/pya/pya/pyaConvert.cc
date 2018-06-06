@@ -23,8 +23,7 @@
 
 #include "pyaConvert.h"
 #include "pyaObject.h"
-
-#include "pya.h"
+#include "pyaModule.h"
 #include "pyaUtils.h"
 
 #include <string>
@@ -33,7 +32,7 @@ namespace pya
 {
 
 template <>
-long python2c<long> (PyObject *rval, tl::Heap *)
+long python2c_func<long>::operator() (PyObject *rval)
 {
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
@@ -50,13 +49,13 @@ long python2c<long> (PyObject *rval, tl::Heap *)
 }
 
 template <>
-bool python2c<bool> (PyObject *rval, tl::Heap *)
+bool python2c_func<bool>::operator() (PyObject *rval)
 {
   return PyObject_IsTrue (rval);
 }
 
 template <>
-char python2c<char> (PyObject *rval, tl::Heap *)
+char python2c_func<char>::operator() (PyObject *rval)
 {
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
@@ -73,7 +72,7 @@ char python2c<char> (PyObject *rval, tl::Heap *)
 }
 
 template <>
-unsigned long python2c<unsigned long> (PyObject *rval, tl::Heap *)
+unsigned long python2c_func<unsigned long>::operator() (PyObject *rval)
 {
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
@@ -90,7 +89,7 @@ unsigned long python2c<unsigned long> (PyObject *rval, tl::Heap *)
 }
 
 template <>
-long long python2c<long long> (PyObject *rval, tl::Heap *)
+long long python2c_func<long long>::operator() (PyObject *rval)
 {
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
@@ -107,7 +106,7 @@ long long python2c<long long> (PyObject *rval, tl::Heap *)
 }
 
 template <>
-unsigned long long python2c<unsigned long long> (PyObject *rval, tl::Heap *)
+unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval)
 {
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
@@ -125,7 +124,7 @@ unsigned long long python2c<unsigned long long> (PyObject *rval, tl::Heap *)
 
 #if defined(HAVE_64BIT_COORD)
 template <>
-__int128 python2c<__int128> (PyObject *rval, tl::Heap *)
+__int128 python2c_func<__int128>::operator() (PyObject *rval)
 {
   // TOOD: this is pretty simplistic
 #if PY_MAJOR_VERSION < 3
@@ -144,7 +143,7 @@ __int128 python2c<__int128> (PyObject *rval, tl::Heap *)
 #endif
 
 template <>
-double python2c<double> (PyObject *rval, tl::Heap *)
+double python2c_func<double>::operator() (PyObject *rval)
 {
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
@@ -161,7 +160,7 @@ double python2c<double> (PyObject *rval, tl::Heap *)
 }
 
 template <>
-std::string python2c<std::string> (PyObject *rval, tl::Heap *)
+std::string python2c_func<std::string>::operator() (PyObject *rval)
 {
 #if PY_MAJOR_VERSION < 3
   if (PyString_Check (rval)) {
@@ -186,7 +185,7 @@ std::string python2c<std::string> (PyObject *rval, tl::Heap *)
 }
 
 template <>
-QByteArray python2c<QByteArray> (PyObject *rval, tl::Heap *)
+QByteArray python2c_func<QByteArray>::operator() (PyObject *rval)
 {
 #if PY_MAJOR_VERSION < 3
   if (PyString_Check (rval)) {
@@ -211,66 +210,36 @@ QByteArray python2c<QByteArray> (PyObject *rval, tl::Heap *)
 }
 
 template <>
-const char *python2c<const char *> (PyObject *rval, tl::Heap *heap)
-{
-#if PY_MAJOR_VERSION < 3
-  if (PyString_Check (rval)) {
-    return PyString_AsString (rval);
-  } else 
-#else
-  if (PyBytes_Check (rval)) {
-    return PyBytes_AsString (rval);
-  } else 
-#endif
-  if (PyUnicode_Check (rval)) {
-
-    tl_assert (heap);
-
-    //  for creating a const char * we need a temporary object. Otherwise we cannot keep that
-    //  value.
-    std::string *converted_value = new std::string (python2c<std::string> (rval, heap));
-    heap->push (converted_value);
-
-    return converted_value->c_str ();
-
-  } else if (PyByteArray_Check (rval)) {
-    return PyByteArray_AsString (rval);
-  } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Argument cannot be converted to a string")));
-  }
-}
-
-template <>
-QString python2c<QString> (PyObject *rval, tl::Heap *heap)
+QString python2c_func<QString>::operator() (PyObject *rval)
 {
   //  TODO: directly convert Unicode strings to QString if possible
-  return tl::to_qstring (python2c<std::string> (rval, heap));
+  return tl::to_qstring (python2c<std::string> (rval));
 }
 
 template <>
-tl::Variant python2c<tl::Variant> (PyObject *rval, tl::Heap *heap)
+tl::Variant python2c_func<tl::Variant>::operator() (PyObject *rval)
 {
   if (rval == NULL || rval == Py_None) {
     return tl::Variant ();
   } else if (PyBool_Check (rval)) {
-    return tl::Variant (python2c<bool> (rval, heap));
+    return tl::Variant (python2c<bool> (rval));
   } else if (PyLong_Check (rval)) {
-    return tl::Variant (python2c<long long> (rval, heap));
+    return tl::Variant (python2c<long long> (rval));
 #if PY_MAJOR_VERSION < 3
   } else if (PyInt_Check (rval)) {
-    return tl::Variant (python2c<int> (rval, heap));
+    return tl::Variant (python2c<int> (rval));
 #endif
   } else if (PyFloat_Check (rval)) {
-    return tl::Variant (python2c<double> (rval, heap));
+    return tl::Variant (python2c<double> (rval));
 #if PY_MAJOR_VERSION < 3
   } else if (PyString_Check (rval)) {
-    return tl::Variant (python2c<std::string> (rval, heap));
+    return tl::Variant (python2c<std::string> (rval));
 #else
   } else if (PyBytes_Check (rval)) {
-    return tl::Variant (python2c<std::string> (rval, heap));
+    return tl::Variant (python2c<std::string> (rval));
 #endif
   } else if (PyUnicode_Check (rval) || PyByteArray_Check (rval)) {
-    return tl::Variant (python2c<std::string> (rval, heap));
+    return tl::Variant (python2c<std::string> (rval));
   } else if (PyList_Check (rval)) {
 
     size_t len = PyList_Size (rval);
@@ -279,7 +248,7 @@ tl::Variant python2c<tl::Variant> (PyObject *rval, tl::Heap *heap)
     tl::Variant r (empty.begin (), empty.end ());
     r.get_list ().reserve (len);
     for (size_t i = 0; i < len; ++i) {
-      r.get_list ().push_back (python2c<tl::Variant> (PyList_GetItem (rval, i), heap));
+      r.get_list ().push_back (python2c<tl::Variant> (PyList_GetItem (rval, i)));
     }
     return r;
 
@@ -291,7 +260,7 @@ tl::Variant python2c<tl::Variant> (PyObject *rval, tl::Heap *heap)
     tl::Variant r (empty.begin (), empty.end ());
     r.get_list ().reserve (len);
     for (size_t i = 0; i < len; ++i) {
-      r.get_list ().push_back (python2c<tl::Variant> (PyTuple_GetItem (rval, i), heap));
+      r.get_list ().push_back (python2c<tl::Variant> (PyTuple_GetItem (rval, i)));
     }
     return r;
 
@@ -349,7 +318,7 @@ tl::Variant python2c<tl::Variant> (PyObject *rval, tl::Heap *heap)
       std::string m ("<unknown type>");
       PythonRef msg_str (PyObject_Str (rval));
       if (msg_str) {
-        m = python2c<std::string> (msg_str.get (), heap);
+        m = python2c<std::string> (msg_str.get ());
       }
       return tl::Variant (m);
 
@@ -472,7 +441,7 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
 }
 
 template <>
-PyObject *c2python<tl::Variant> (const tl::Variant &c)
+PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c)
 {
   if (c.is_double ()) {
     return c2python<double> (c.to_double ());
@@ -522,31 +491,7 @@ PyObject *c2python<tl::Variant> (const tl::Variant &c)
 }
 
 template <>
-PyObject *c2python<gsi::ObjectType> (const gsi::ObjectType &)
-{
-  throw tl::Exception (tl::to_string (QObject::tr ("Internal error: abstract object type read")));
-}
-
-template <>
-PyObject *c2python<gsi::VectorType> (const gsi::VectorType &)
-{
-  throw tl::Exception (tl::to_string (QObject::tr ("Internal error: abstract vector type read")));
-}
-
-template <>
-PyObject *c2python<gsi::MapType> (const gsi::MapType &)
-{
-  throw tl::Exception (tl::to_string (QObject::tr ("Internal error: abstract map type read")));
-}
-
-template <>
-PyObject *c2python<gsi::VoidType> (const gsi::VoidType &)
-{
-  throw tl::Exception (tl::to_string (QObject::tr ("Internal error: abstract void type read")));
-}
-
-template <>
-PyObject *c2python<std::string> (const std::string &c)
+PyObject *c2python_func<const std::string &>::operator() (const std::string &c)
 {
 #if PY_MAJOR_VERSION < 3
   return PyString_FromStringAndSize (c.c_str (), Py_ssize_t (c.size ()));
@@ -560,7 +505,7 @@ PyObject *c2python<std::string> (const std::string &c)
 }
 
 template <>
-PyObject *c2python<const char *> (const char * const &p)
+PyObject *c2python_func<const char *>::operator() (const char *p)
 {
   const char *s = p;
   if (! s) {
@@ -579,7 +524,7 @@ PyObject *c2python<const char *> (const char * const &p)
 }
 
 template <>
-PyObject *c2python<QByteArray> (const QByteArray &qba)
+PyObject *c2python_func<const QByteArray &>::operator() (const QByteArray &qba)
 {
   if (qba.isNull ()) {
     Py_RETURN_NONE;
@@ -593,7 +538,7 @@ PyObject *c2python<QByteArray> (const QByteArray &qba)
 }
 
 template <>
-PyObject *c2python<QString> (const QString &qs)
+PyObject *c2python_func<const QString &>::operator() (const QString &qs)
 {
   if (qs.isNull ()) {
     Py_RETURN_NONE;

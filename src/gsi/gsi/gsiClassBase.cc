@@ -130,7 +130,9 @@ ClassBase::add_child_class (const ClassBase *cls)
 bool 
 ClassBase::is_derived_from (const ClassBase *base) const
 {
-  if (base == this) {
+  if (! base) {
+    return false;
+  } else if (base == this) {
     return true;
   } else if (!mp_base) {
     return false;

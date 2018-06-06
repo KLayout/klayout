@@ -26,6 +26,10 @@
 
 #include "Python.h"
 
+#include "pyaModule.h"
+#include "pyaObject.h"
+#include "gsiClassBase.h"
+
 #include "tlVariant.h"
 #include "tlException.h"
 #include "tlHeap.h"
@@ -36,8 +40,8 @@
 
 namespace gsi
 {
-  class GSI_PUBLIC ClassBase;
-  class GSI_PUBLIC ArgType;
+  class ClassBase;
+  class ArgType;
 }
 
 namespace pya
@@ -72,6 +76,159 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ArgType &atype);
 // -------------------------------------------------------------------
 //  Type checks 
 
+template <class T>
+struct test_type_func
+{
+  bool operator() (PyObject * /*rval*/, bool /*loose*/)
+  {
+    return false;
+  }
+};
+
+template <>
+struct test_type_func<bool>
+{
+  bool operator() (PyObject *rval, bool loose)
+  {
+    if (loose) {
+      return true;  // everything can be converted to bool
+    } else {
+      return PyBool_Check (rval) || rval == Py_None;
+    }
+  }
+};
+
+//  used for other integer types as well:
+template <>
+struct test_type_func<int>
+{
+  bool operator() (PyObject *rval, bool loose)
+  {
+    //  bool values don't count as int in strict mode
+    if (!loose && PyBool_Check (rval)) {
+      return false;
+    }
+#if PY_MAJOR_VERSION < 3
+   return PyInt_Check (rval) || PyLong_Check (rval) || (PyFloat_Check (rval) && loose);
+#else
+   return PyLong_Check (rval) || (PyFloat_Check (rval) && loose);
+#endif
+  }
+};
+
+template <> struct test_type_func<unsigned int> : public test_type_func<int> { };
+template <> struct test_type_func<char> : public test_type_func<int> { };
+template <> struct test_type_func<signed char> : public test_type_func<int> { };
+template <> struct test_type_func<unsigned char> : public test_type_func<int> { };
+template <> struct test_type_func<short> : public test_type_func<int> { };
+template <> struct test_type_func<unsigned short> : public test_type_func<int> { };
+template <> struct test_type_func<long> : public test_type_func<int> { };
+template <> struct test_type_func<unsigned long> : public test_type_func<int> { };
+template <> struct test_type_func<long long> : public test_type_func<int> { };
+template <> struct test_type_func<unsigned long long> : public test_type_func<int> { };
+
+#if defined(HAVE_64BIT_COORD)
+template <>
+struct test_type_func<__int128>
+{
+  bool operator() (PyObject *rval, bool loose)
+  {
+    return test_type<int> (rval, loose);
+  }
+};
+#endif
+
+template <>
+struct test_type_func<double>
+{
+  bool operator() (PyObject *rval, bool loose)
+  {
+    //  bool values don't count as int in strict mode
+    if (!loose && PyBool_Check (rval)) {
+      return false;
+    }
+#if PY_MAJOR_VERSION < 3
+    return PyFloat_Check (rval) || (PyInt_Check (rval) && loose) || (PyLong_Check (rval) && loose);
+#else
+    return PyFloat_Check (rval) || (PyLong_Check (rval) && loose);
+#endif
+  }
+};
+
+template <>
+struct test_type_func<float> : public test_type_func<double> { };
+
+template <>
+struct test_type_func<void *> : public test_type_func<size_t> { };
+
+//  used for strings in general:
+template <>
+struct test_type_func<const char *>
+{
+  bool operator() (PyObject *rval, bool /*loose*/)
+  {
+#if PY_MAJOR_VERSION < 3
+    return PyString_Check (rval) || PyUnicode_Check (rval) || PyByteArray_Check (rval);
+#else
+    return PyBytes_Check (rval) || PyUnicode_Check (rval) || PyByteArray_Check (rval);
+#endif
+  }
+};
+
+template <> struct test_type_func<std::string> : public test_type_func<const char *> { };
+template <> struct test_type_func<QString> : public test_type_func<const char *> { };
+template <> struct test_type_func<QByteArray> : public test_type_func<const char *> { };
+
+template <>
+struct test_type_func<tl::Variant>
+{
+  bool operator() (PyObject * /*rval*/, bool /*loose*/)
+  {
+    return true;
+  }
+};
+
+template <class T>
+struct test_type_func<T &>
+{
+  bool operator() (PyObject *rval, bool /*loose*/)
+  {
+    //  TODO: we currently don't check for non-constness
+    const gsi::ClassBase *cls_decl = pya::PythonModule::cls_for_type (Py_TYPE (rval));
+    return cls_decl && cls_decl->is_derived_from (gsi::class_by_typeinfo_no_assert (typeid (T)));
+  }
+};
+
+template <class T>
+struct test_type_func<const T &>
+{
+  bool operator() (PyObject *rval, bool loose)
+  {
+    return test_type_func<T &> () (rval, loose);
+  }
+};
+
+template <class T>
+struct test_type_func<const T *>
+{
+  bool operator() (PyObject *rval, bool loose)
+  {
+    //  for the pointer types, None is an allowed value
+    return rval == Py_None || test_type_func<T &> () (rval, loose);
+  }
+};
+
+template <class T>
+struct test_type_func<T *>
+{
+  bool operator() (PyObject *rval, bool loose)
+  {
+    //  for the pointer types, None is an allowed value
+    return rval == Py_None || test_type_func<T &> () (rval, loose);
+  }
+};
+
+
 /**
  *  @brief Checks whether the Python object is compatible with the given type
  *
@@ -82,163 +239,9 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ArgType &atype);
  *  @param loose If true, the type is checked more loosely. Use for second-pass matching.
  */
 template <class T>
-bool test_type (PyObject * /*rval*/, bool /*loose*/)
+inline bool test_type (PyObject * rval, bool loose)
 {
-  return false;
-}
-
-template <>
-inline bool test_type<bool> (PyObject *rval, bool loose)
-{
-  if (loose) {
-    return true;  // everything can be converted to bool
-  } else {
-    return PyBool_Check (rval) || rval == Py_None;
-  }
-}
-
-//  used for other integer types as well:
-template <>
-inline bool test_type<int> (PyObject *rval, bool loose)
-{
-  //  bool values don't count as int in strict mode
-  if (!loose && PyBool_Check (rval)) {
-    return false;
-  }
-#if PY_MAJOR_VERSION < 3
-  return PyInt_Check (rval) || PyLong_Check (rval) || (PyFloat_Check (rval) && loose);
-#else
-  return PyLong_Check (rval) || (PyFloat_Check (rval) && loose);
-#endif
-}
-
-template <>
-inline bool test_type<char> (PyObject *rval, bool loose)
-{
-  return test_type<int> (rval, loose);
-}
-
-template <>
-inline bool test_type<signed char> (PyObject *rval, bool loose)
-{
-  return test_type<int> (rval, loose);
-}
-
-template <>
-inline bool test_type<unsigned char> (PyObject *rval, bool loose)
-{
-  return test_type<int> (rval, loose);
-}
-
-template <>
-inline bool test_type<short> (PyObject *rval, bool loose)
-{
-  return test_type<int> (rval, loose);
-}
-
-template <>
-inline bool test_type<unsigned short> (PyObject *rval, bool loose)
-{
-  return test_type<int> (rval, loose);
-}
-
-template <>
-inline bool test_type<unsigned int> (PyObject *rval, bool loose)
-{
-  return test_type<int> (rval, loose);
-}
-
-template <>
-inline bool test_type<long> (PyObject *rval, bool loose)
-{
-  return test_type<int> (rval, loose);
-}
-
-template <>
-inline bool test_type<unsigned long> (PyObject *rval, bool loose)
-{
-  return test_type<int> (rval, loose);
-}
-
-template <>
-inline bool test_type<long long> (PyObject *rval, bool loose)
-{
-  return test_type<int> (rval, loose);
-}
-
-template <>
-inline bool test_type<unsigned long long> (PyObject *rval, bool loose)
-{
-  return test_type<int> (rval, loose);
-}
-
-#if defined(HAVE_64BIT_COORD)
-template <>
-inline bool test_type<__int128> (PyObject *rval, bool loose)
-{
-  return test_type<int> (rval, loose);
-}
-#endif
-
-template <>
-inline bool test_type<double> (PyObject *rval, bool loose)
-{
-  //  bool values don't count as int in strict mode
-  if (!loose && PyBool_Check (rval)) {
-    return false;
-  }
-#if PY_MAJOR_VERSION < 3
-  return PyFloat_Check (rval) || (PyInt_Check (rval) && loose) || (PyLong_Check (rval) && loose);
-#else
-  return PyFloat_Check (rval) || (PyLong_Check (rval) && loose);
-#endif
-}
-
-template <>
-inline bool test_type<float> (PyObject *rval, bool loose)
-{
-  return test_type<double> (rval, loose);
-}
-
-template <>
-inline bool test_type<void *> (PyObject *rval, bool loose)
-{
-  return test_type<size_t> (rval, loose);
-}
-
-//  used for strings in general:
-template <>
-inline bool test_type<const char *> (PyObject *rval, bool /*loose*/)
-{
-#if PY_MAJOR_VERSION < 3
-  return PyString_Check (rval) || PyUnicode_Check (rval) || PyByteArray_Check (rval);
-#else
-  return PyBytes_Check (rval) || PyUnicode_Check (rval) || PyByteArray_Check (rval);
-#endif
-}
-
-template <>
-inline bool test_type<std::string> (PyObject *rval, bool loose)
-{
-  return test_type<const char *> (rval, loose);
-}
-
-template <>
-inline bool test_type<QString> (PyObject *rval, bool loose)
-{
-  return test_type<const char *> (rval, loose);
-}
-
-template <>
-inline bool test_type<QByteArray> (PyObject *rval, bool loose)
-{
-  return test_type<const char *> (rval, loose);
-}
-
-template <>
-inline bool test_type<tl::Variant> (PyObject * /*rval*/, bool /*loose*/)
-{
-  return true;
+  return test_type_func<T> () (rval, loose);
 }
 
 /**
@@ -251,7 +254,7 @@ inline bool test_vector (PyObject *arr, bool loose)
 
     size_t len = PyList_Size (arr);
     for (size_t i = 0; i < len; ++i) {
-      if (! test_type<R> (PyList_GetItem (arr, i), loose)) {
+      if (! test_type_func<R> () (PyList_GetItem (arr, i), loose)) {
         return false;
       }
     }
@@ -262,7 +265,7 @@ inline bool test_vector (PyObject *arr, bool loose)
 
     size_t len = PyTuple_Size (arr);
     for (size_t i = 0; i < len; ++i) {
-      if (! test_type<R> (PyTuple_GetItem (arr, i), loose)) {
+      if (! test_type_func<R> () (PyTuple_GetItem (arr, i), loose)) {
         return false;
       }
     }
@@ -274,210 +277,365 @@ inline bool test_vector (PyObject *arr, bool loose)
   }
 }
 
-
 // -------------------------------------------------------------------
 //  Python to C conversion
+
+template <class T>
+struct python2c_func
+{
+  T operator() (PyObject *rval);
+};
+
+template <> long python2c_func<long>::operator() (PyObject *rval);
+template <> unsigned long python2c_func<unsigned long>::operator() (PyObject *rval);
+template <> bool python2c_func<bool>::operator() (PyObject *rval);
+template <> char python2c_func<char>::operator() (PyObject *rval);
+
+template <class D, class C>
+struct python2c_func_cast
+  : public python2c_func<C>
+{
+  D operator() (PyObject *rval)
+  {
+    return (D) (python2c_func<C>::operator() (rval));
+  }
+};
+
+template <> struct python2c_func<signed char> : public python2c_func_cast<signed char, char> { };
+template <> struct python2c_func<unsigned char> : public python2c_func_cast<unsigned char, char> { };
+template <> struct python2c_func<short> : public python2c_func_cast<short, long> { };
+template <> struct python2c_func<unsigned short> : public python2c_func_cast<unsigned short, long> { };
+template <> struct python2c_func<int> : public python2c_func_cast<int, long> { };
+template <> struct python2c_func<unsigned int> : public python2c_func_cast<unsigned int, long> { };
+
+template <> long long python2c_func<long long>::operator() (PyObject *rval);
+template <> unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval);
+
+#if defined(HAVE_64BIT_COORD)
+template <> __int128 python2c_func<__int128>::operator() (PyObject *rval);
+#endif
+
+template <> double python2c_func<double>::operator() (PyObject *rval);
+template <> struct python2c_func<float> : public python2c_func_cast<float, double> { };
+
+template <> std::string python2c_func<std::string>::operator() (PyObject *rval);
+template <> QByteArray python2c_func<QByteArray>::operator() (PyObject *rval);
+template <> QString python2c_func<QString>::operator() (PyObject *rval);
+
+template <> struct python2c_func<void *> : public python2c_func_cast<void *, size_t> { };
+
+template <> tl::Variant python2c_func<tl::Variant>::operator() (PyObject *rval);
+
+template <class T> struct python2c_func<T &>
+{
+  T &operator() (PyObject *rval)
+  {
+    tl_assert (rval != Py_None);
+
+    const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (rval));
+    tl_assert (cls_decl != 0);
+    tl_assert (cls_decl->is_derived_from (gsi::class_by_typeinfo_no_assert (typeid (T))));
+
+    PYAObjectBase *p = (PYAObjectBase *) (rval);
+    return *((T *)p->obj ());
+  }
+};
+
+template <class T> struct python2c_func<const T &>
+{
+  const T &operator() (PyObject *rval)
+  {
+    return python2c_func<T &>() (rval);
+  }
+};
+
+template <class T> struct python2c_func<T *>
+{
+  T *operator() (PyObject *rval)
+  {
+    tl_assert (rval != Py_None);
+
+    if (rval == Py_None) {
+      return 0;
+    } else {
+      return &python2c_func<T &>() (rval);
+    }
+  }
+};
+
+template <class T> struct python2c_func<const T *>
+{
+  const T *operator() (PyObject *rval)
+  {
+    return python2c_func<T *> (rval);
+  }
+};
 
 /**
  *  @brief Converts the Python object to the given type
  */
 template <class T>
-inline T python2c (PyObject *, tl::Heap * = 0)
+inline T python2c (PyObject *rval)
 {
-  tl_assert (false);
-  return T ();
+  return python2c_func<T> () (rval);
 }
-
-template <> long python2c<long> (PyObject *rval, tl::Heap *heap);
-template <> bool python2c<bool> (PyObject *rval, tl::Heap *heap);
-template <> char python2c<char> (PyObject *rval, tl::Heap *heap);
-
-template <>
-inline signed char python2c<signed char> (PyObject *rval, tl::Heap *)
-{
-  return (signed char) python2c<char> (rval);
-}
-
-template <>
-inline unsigned char python2c<unsigned char> (PyObject *rval, tl::Heap *)
-{
-  return (unsigned char) python2c<char> (rval);
-}
-
-template <>
-inline short python2c<short> (PyObject *rval, tl::Heap *)
-{
-  return (short) python2c<long> (rval);
-}
-
-template <>
-inline unsigned short python2c<unsigned short> (PyObject *rval, tl::Heap *)
-{
-  return (unsigned short) python2c<long> (rval);
-}
-
-template <>
-inline int python2c<int> (PyObject *rval, tl::Heap *)
-{
-  return (int) python2c<long> (rval);
-}
-
-template <>
-inline unsigned int python2c<unsigned int> (PyObject *rval, tl::Heap *)
-{
-  return (unsigned int) python2c<long> (rval);
-}
-
-template <> unsigned long python2c<unsigned long> (PyObject *rval, tl::Heap *heap);
-template <> long long python2c<long long> (PyObject *rval, tl::Heap *heap);
-template <> unsigned long long python2c<unsigned long long> (PyObject *rval, tl::Heap *heap);
-
-#if defined(HAVE_64BIT_COORD)
-template <> __int128 python2c<__int128> (PyObject *rval, tl::Heap *heap);
-#endif
-
-template <> double python2c<double> (PyObject *rval, tl::Heap *heap);
-
-template <>
-inline float python2c<float> (PyObject *rval, tl::Heap *)
-{
-  return (float) python2c<double> (rval);
-}
-
-template <> std::string python2c<std::string> (PyObject *rval, tl::Heap *heap);
-template <> QByteArray python2c<QByteArray> (PyObject *rval, tl::Heap *heap);
-template <> QString python2c<QString> (PyObject *rval, tl::Heap *heap);
-
-template <>
-inline void *python2c<void *> (PyObject *rval, tl::Heap *)
-{
-  return (void *) python2c<size_t> (rval);
-}
-
-template <> const char *python2c<const char *> (PyObject *rval, tl::Heap *heap);
-template <> tl::Variant python2c<tl::Variant> (PyObject *rval, tl::Heap *heap);
 
 // -------------------------------------------------------------------
 //  C to Python conversion
 
+template <class T>
+struct c2python_func
+{
+  PyObject *operator() (T t);
+};
+
 /**
- *  @brief Converts the given type to a Python object
+ *  @brief Converts a C++ object reference to a Python object
+ *  T must be a registered type.
  */
 template <class T>
-PyObject *c2python (const T &);
-
-template <>
-inline PyObject *c2python<bool> (const bool &c)
+struct c2python_func<T &>
 {
-  if (c) {
-    Py_RETURN_TRUE;
-  } else {
-    Py_RETURN_FALSE;
+  PyObject *operator() (T &p)
+  {
+    return object_to_python ((void *) &p, 0, gsi::class_by_typeinfo_no_assert (typeid (T)), false /*==don't pass*/, false /*==non-const*/, false, false /*==can't destroy*/);
   }
-}
+};
+
+/**
+ *  @brief Converts a const C++ object reference to a Python object
+ *  T must be a registered type.
+ */
+template <class T>
+struct c2python_func<const T &>
+{
+  PyObject *operator() (const T &p)
+  {
+    return object_to_python ((void *) &p, 0, gsi::class_by_typeinfo_no_assert (typeid (T)), false /*==don't pass*/, true /*==const*/, false, false /*==can't destroy*/);
+  }
+};
+
+/**
+ *  @brief Converts a C++ object pointer to a Python object
+ *  This version does not transfer ownership over the object to Python. The pointer will
+ *  still be held by the caller. To transer the ownership to Python, use python2c_new(p).
+ *  T must be a registered type.
+ */
+template <class T>
+struct c2python_func<T *>
+{
+  PyObject *operator() (T *p)
+  {
+    if (! p) {
+      Py_RETURN_NONE;
+    } else {
+      return object_to_python ((void *) p, 0, gsi::class_by_typeinfo_no_assert (typeid (T)), false /*==don't pass*/, false /*==non-const*/, false, false /*==can't destroy*/);
+    }
+  }
+};
+
+/**
+ *  @brief Converts a C++ object pointer to a Python object
+ *  This version will not transfer the ownership over the pointer as the pointer is const.
+ *  T must be a registered type.
+ */
+template <class T>
+struct c2python_func<const T *>
+{
+  PyObject *operator() (const T *p)
+  {
+    if (! p) {
+      Py_RETURN_NONE;
+    } else {
+      return object_to_python ((void *) p, 0, gsi::class_by_typeinfo_no_assert (typeid (T)), false /*==don't pass*/, true /*==const*/, false, false /*==can't destroy*/);
+    }
+  }
+};
 
 template <>
-inline PyObject *c2python<char> (const char &c)
+struct c2python_func<bool>
 {
-  return PyLong_FromLong (long (c));
-}
+  PyObject *operator() (bool c)
+  {
+    if (c) {
+      Py_RETURN_TRUE;
+    } else {
+      Py_RETURN_FALSE;
+    }
+  }
+};
 
 template <>
-inline PyObject *c2python<signed char> (const signed char &c)
+struct c2python_func<char>
 {
-  return PyLong_FromLong (long (c));
-}
+  PyObject *operator() (char c)
+  {
+    return PyLong_FromLong (long (c));
+  }
+};
 
 template <>
-inline PyObject *c2python<unsigned char> (const unsigned char &c)
+struct c2python_func<signed char>
 {
-  return PyLong_FromLong (long (c));
-}
+  PyObject *operator() (signed char c)
+  {
+    return PyLong_FromLong (long (c));
+  }
+};
 
 template <>
-inline PyObject *c2python<short> (const short &c)
+struct c2python_func<unsigned char>
 {
-  return PyLong_FromLong (long (c));
-}
+  PyObject *operator() (unsigned char c)
+  {
+    return PyLong_FromLong (long (c));
+  }
+};
 
 template <>
-inline PyObject *c2python<unsigned short> (const unsigned short &c)
+struct c2python_func<short>
 {
-  return PyLong_FromLong (long (c));
-}
+  PyObject *operator() (short c)
+  {
+    return PyLong_FromLong (long (c));
+  }
+};
 
 template <>
-inline PyObject *c2python<int> (const int &c)
+struct c2python_func<unsigned short>
 {
-  return PyLong_FromLong (long (c));
-}
+  PyObject *operator() (unsigned short c)
+  {
+    return PyLong_FromLong (long (c));
+  }
+};
 
 template <>
-inline PyObject *c2python<unsigned int> (const unsigned int &c)
+struct c2python_func<int>
 {
-  return PyLong_FromLong (long (c));
-}
+  PyObject *operator() (int c)
+  {
+    return PyLong_FromLong (long (c));
+  }
+};
 
 template <>
-inline PyObject *c2python<long> (const long &c)
+struct c2python_func<unsigned int>
 {
-  return PyLong_FromLong (c);
-}
+  PyObject *operator() (unsigned int c)
+  {
+    return PyLong_FromLong (long (c));
+  }
+};
 
 template <>
-inline PyObject *c2python<unsigned long> (const unsigned long &c)
+struct c2python_func<long>
 {
-  return PyLong_FromUnsignedLong (c);
-}
+  PyObject *operator() (long c)
+  {
+    return PyLong_FromLong (c);
+  }
+};
 
 template <>
-inline PyObject *c2python<long long> (const long long &c)
+struct c2python_func<unsigned long>
 {
-  return PyLong_FromLongLong (c);
-}
+  PyObject *operator() (unsigned long c)
+  {
+    return PyLong_FromUnsignedLong (c);
+  }
+};
 
 template <>
-inline PyObject *c2python<unsigned long long> (const unsigned long long &c)
+struct c2python_func<long long>
 {
-  return PyLong_FromUnsignedLongLong (c);
-}
+  PyObject *operator() (long long c)
+  {
+    return PyLong_FromLongLong (c);
+  }
+};
+
+template <>
+struct c2python_func<unsigned long long>
+{
+  PyObject *operator() (unsigned long long c)
+  {
+    return PyLong_FromUnsignedLongLong (c);
+  }
+};
 
 #if defined(HAVE_64BIT_COORD)
 template <>
-inline PyObject *c2python<__int128> (const __int128 &c)
+struct c2python_func<const __int128 &>
 {
-  return PyLong_FromUnsignedLongLong (c);
-}
+  PyObject *operator() (const __int128 &c)
+  {
+    return PyLong_FromUnsignedLongLong (c);
+  }
+};
 #endif
 
 template <>
-inline PyObject *c2python<double> (const double &c)
+struct c2python_func<double>
 {
-  return PyFloat_FromDouble (c);
-}
+  PyObject *operator() (double c)
+  {
+    return PyFloat_FromDouble (double (c));
+  }
+};
 
 template <>
-inline PyObject *c2python<float> (const float &c)
+struct c2python_func<float>
 {
-  return PyFloat_FromDouble (double (c));
-}
+  PyObject *operator() (float c)
+  {
+    return PyFloat_FromDouble (double (c));
+  }
+};
 
-template <> PyObject *c2python<std::string> (const std::string &c);
-template <> PyObject *c2python<QByteArray> (const QByteArray &qba);
-template <> PyObject *c2python<QString> (const QString &qs);
+template <> PyObject *c2python_func<const char *>::operator() (const char *);
+template <> PyObject *c2python_func<const QString &>::operator() (const QString &c);
+template <> PyObject *c2python_func<const QByteArray &>::operator() (const QByteArray &c);
+template <> PyObject *c2python_func<const std::string &>::operator() (const std::string &c);
 
 template <>
-inline PyObject *c2python<void *> (void * const &s)
+struct c2python_func<void *>
+  : public c2python_func<size_t>
 {
-  return c2python<size_t> (size_t (s));
+  PyObject *operator() (void *p)
+  {
+    return c2python_func<size_t>::operator () (size_t (p));
+  }
+};
+
+template <> PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c);
+
+/**
+ *  @brief Converts the Python object to the given type
+ */
+template <class T>
+inline PyObject *c2python (T t)
+{
+  return c2python_func<T> () (t);
 }
 
-template <>
-PyObject *c2python<tl::Variant> (const tl::Variant &c);
-
-template <> PyObject *c2python<const char *> (const char * const &p);
+/**
+ *  @brief Converts a C++ object pointer to a Python object
+ *  This version transfers ownership over the object to Python. The pointer will
+ *  be help by Python and the object will be destroyed when Python no longer needs the
+ *  object. To keep the ownership, use python2c(p).
+ *  T must be a registered type.
+ */
+template <class T>
+inline PyObject *c2python_new (T *p)
+{
+  if (! p) {
+    Py_RETURN_NONE;
+  } else {
+    return object_to_python ((void *) p, 0, gsi::class_by_typeinfo_no_assert (typeid (T)), true /*==pass*/, false /*==non-const*/, false, true /*==can destroy*/);
+  }
+}
 
 }
 
 #endif
-

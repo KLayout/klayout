@@ -15,6 +15,7 @@ SOURCES = \
   pyaObject.cc \
   pyaRefs.cc \
   pyaUtils.cc \
+    pyaModule.cc
 
 HEADERS += \
   pya.h \
@@ -25,7 +26,8 @@ HEADERS += \
   pyaMarshal.h \
   pyaObject.h \
   pyaRefs.h \
-  pyaUtils.h
+  pyaUtils.h \
+    pyaModule.h
 
 INCLUDEPATH += $$PYTHONINCLUDE $$TL_INC $$GSI_INC
 DEPENDPATH += $$PYTHONINCLUDE $$TL_INC $$GSI_INC

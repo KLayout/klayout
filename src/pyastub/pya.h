@@ -157,7 +157,7 @@ public:
    *  @brief Returns additional Python-specific documentation for the given method
    *  If no specific documentation exists, an empty string is returned.
    */
-  std::string python_doc (const gsi::MethodBase *) const
+  static std::string python_doc (const gsi::MethodBase *)
   {
     return std::string ();
   }

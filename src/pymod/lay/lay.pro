@@ -25,6 +25,6 @@ equals(HAVE_QTBINDINGS, "1") {
 QMAKE_POST_LINK += && $(COPY) $$INIT_PY $$DESTDIR/../pykl/__init__.py
 
 # INSTALLS needs to be inside a lib or app templates.
-init_target.path = $$PREFIX/pykl/__init__.py
-init_target.files += $$INIT_PY
+init_target.path = $$PREFIX/pykl
+init_target.files += $$DESTDIR/../pykl/__init__.py
 INSTALLS += init_target

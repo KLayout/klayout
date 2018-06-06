@@ -24,7 +24,17 @@ win32 {
   # because the library is called xyx0.dll.
   CONFIG += skip_target_version_ext
 
+  lib_target.path = $$PREFIX/pykl
+  lib_target.files += $$DESTDIR_PYMOD/$${TARGET}.dll
+  INSTALLS = lib_target
+
 } else {
+
   QMAKE_POST_LINK += $(MKDIR) $$DESTDIR_PYMOD && $(COPY) $(DESTDIR)$(TARGET) $$DESTDIR_PYMOD/$${TARGET}.so
+
+  lib_target.path = $$PREFIX/pykl
+  lib_target.files += $$DESTDIR_PYMOD/$${TARGET}.so
+  INSTALLS = lib_target
+
 }
 

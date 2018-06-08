@@ -112,6 +112,7 @@ private:
   char *mp_mod_def;
 
   static std::map<const gsi::MethodBase *, std::string> m_python_doc;
+  static std::vector<const gsi::ClassBase *> m_classes;
 };
 
 }

@@ -36,18 +36,6 @@ namespace pya
 {
 
 // -------------------------------------------------------------------
-//  A metatype object to identify the pya types
-
-struct PYAMetaType : public PyTypeObject { };
-static PYAMetaType PYA_MetaType;
-
-struct PYATypeObject
-  : public PyTypeObject
-{
-  const gsi::ClassBase *cls;
-};
-
-// -------------------------------------------------------------------
 //  The lookup table for the method overload resolution
 
 /**
@@ -930,7 +918,7 @@ object_default_ne_impl (PyObject *self, PyObject *args)
   if (! res) {
     return NULL;
   } else {
-    return c2python<bool> (! python2c<bool> (res.get ()));
+    return c2python (! python2c<bool> (res.get ()));
   }
 }
 
@@ -947,7 +935,7 @@ object_default_ge_impl (PyObject *self, PyObject *args)
   if (! res) {
     return NULL;
   } else {
-    return c2python<bool> (! python2c<bool> (res.get ()));
+    return c2python (! python2c<bool> (res.get ()));
   }
 }
 
@@ -971,7 +959,7 @@ object_default_le_impl (PyObject *self, PyObject *args)
   if (! lt_res) {
     return NULL;
   }
-  return c2python<bool> (python2c<bool> (eq_res.get ()) || python2c<bool> (lt_res.get ()));
+  return c2python (python2c<bool> (eq_res.get ()) || python2c<bool> (lt_res.get ()));
 }
 
 /**
@@ -994,7 +982,7 @@ object_default_gt_impl (PyObject *self, PyObject *args)
   if (! lt_res) {
     return NULL;
   }
-  return c2python<bool> (! (python2c<bool> (eq_res.get ()) || python2c<bool> (lt_res.get ())));
+  return c2python (! (python2c<bool> (eq_res.get ()) || python2c<bool> (lt_res.get ())));
 }
 
 /**
@@ -1063,7 +1051,7 @@ object_destroyed (PyObject *self, PyObject *args)
     return NULL;
   }
 
-  return c2python<bool> (((PYAObjectBase *) self)->destroyed ());
+  return c2python (((PYAObjectBase *) self)->destroyed ());
 }
 
 /**
@@ -1076,7 +1064,7 @@ object_is_const (PyObject *self, PyObject *args)
     return NULL;
   }
 
-  return c2python<bool> (((PYAObjectBase *) self)->const_ref ());
+  return c2python (((PYAObjectBase *) self)->const_ref ());
 }
 
 static PyObject *
@@ -2149,6 +2137,7 @@ property_setter_func (PyObject *self, PyObject *value, void *closure)
 //  The PythonModule implementation
 
 std::map<const gsi::MethodBase *, std::string> PythonModule::m_python_doc;
+std::vector<const gsi::ClassBase *> PythonModule::m_classes;
 
 const std::string pymod_name ("pykl");
 
@@ -2350,16 +2339,10 @@ PythonModule::make_classes (const char *mod_name)
 
   m_base_class_name = m_mod_name + ".__Base";
 
-  //  Late-initialize PYA_MetaType (we can do this multiple times as the initialization does not
-  //  change anything). PYATypeObject adds one pointer member at the end.
-  memcpy(&PYA_MetaType, &PyType_Type, sizeof (PyType_Type));
-  PYA_MetaType.tp_basicsize += sizeof (void *);
-
-  PYATypeObject *base_class = (PYATypeObject *) PyType_Type.tp_alloc (&PYA_MetaType, sizeof (PYATypeObject));
+  PyTypeObject *base_class = (PyTypeObject *) PyType_Type.tp_alloc (&PyType_Type, 0);
   tl_assert (base_class != NULL);
   mp_base_class = PythonRef ((PyObject *) base_class);
 
-  base_class->cls = 0; // base class
   base_class->tp_base = &PyBaseObject_Type;
   base_class->tp_name = m_base_class_name.c_str ();
   base_class->tp_basicsize = sizeof (PYAObjectBase);
@@ -2442,6 +2425,11 @@ PythonModule::make_classes (const char *mod_name)
 
       any = true;
 
+
+      //  Create the actual class
+
+      m_classes.push_back (c.operator-> ());
+
       PythonRef bases (PyTuple_New (1));
       PyObject *base = mp_base_class.get ();
       if (c->base () != 0) {
@@ -2455,16 +2443,21 @@ PythonModule::make_classes (const char *mod_name)
       PythonRef dict (PyDict_New ());
       PyDict_SetItemString (dict.get (), "__module__", PythonRef (c2python (m_mod_name)).get ());
       PyDict_SetItemString (dict.get (), "__doc__", PythonRef (c2python (c->doc ())).get ());
+      PyDict_SetItemString (dict.get (), "__gsi_id__", PythonRef (c2python (m_classes.size () - 1)).get ());
 
       PythonRef args (PyTuple_New (3));
       PyTuple_SetItem (args.get (), 0, c2python (c->name ()));
       PyTuple_SetItem (args.get (), 1, bases.release ());
       PyTuple_SetItem (args.get (), 2, dict.release ());
 
-      PYATypeObject *type = (PYATypeObject *) PyObject_Call ((PyObject *) &PYA_MetaType, args.get (), NULL);
-      type->cls = c.operator-> ();
+      PyTypeObject *type = (PyTypeObject *) PyObject_Call ((PyObject *) &PyType_Type, args.get (), NULL);
+      if (type == NULL) {
+        check_error ();
+        tl_assert (false);
+      }
       PythonClassClientData::initialize (*c, type);
-      tl_assert (type != NULL);
+
+      tl_assert (cls_for_type (type) == c.operator-> ()); // @@@
 
       PyList_Append (all_list.get (), PythonRef (c2python (c->name ())).get ());
       PyModule_AddObject (module, c->name ().c_str (), (PyObject *) type);
@@ -2888,7 +2881,7 @@ PythonModule::make_classes (const char *mod_name)
         } else {
 
           PyObject *desc = PYAAmbiguousMethodDispatcher::create (attr_inst, attr_class);
-          PythonRef name (c2python<std::string> (*a));
+          PythonRef name (c2python (*a));
           //  Note: we use GenericSetAttr since that one allows us setting attributes on built-in types
           PyObject_GenericSetAttr ((PyObject *) type, name.get (), desc);
 
@@ -2910,14 +2903,19 @@ PythonModule::make_classes (const char *mod_name)
 
 const gsi::ClassBase *PythonModule::cls_for_type (PyTypeObject *type)
 {
-  while (type) {
-    //  all pya class use our own metatype
-    if (type->ob_type == &PYA_MetaType) {
-      return ((PYATypeObject *)type)->cls;
+  //  GSI classes store their class index inside the __gsi_id__ attribute
+  if (PyObject_HasAttrString ((PyObject *) type, "__gsi_id__")) {
+
+    PyObject *cls_id = PyObject_GetAttrString ((PyObject *) type, "__gsi_id__");
+    if (cls_id != NULL && pya::test_type<size_t> (cls_id)) {
+      size_t i = pya::python2c<size_t> (cls_id);
+      if (i < m_classes.size ()) {
+        return m_classes [i];
+      }
     }
-    //  not found - try base class
-    type = type->tp_base;
+
   }
+
   return 0;
 }
 

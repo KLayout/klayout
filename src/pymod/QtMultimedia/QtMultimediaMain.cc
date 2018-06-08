@@ -26,4 +26,9 @@
 #include "../../gsiqt/qtbasic/gsiQtMultimediaExternals.h"
 FORCE_LINK_GSI_QTMULTIMEDIA
 
+//  This is required because QAction and QWidget are used are arguments in QtGui, but are
+//  defined in QtWidgets
+#include "../../gsiqt/qtbasic/gsiQtNetworkExternals.h"
+FORCE_LINK_GSI_QTNETWORK
+
 DEFINE_PYMOD(QtMultimedia, "QtMultimedia", "KLayout/Qt module 'QtMultimedia'")

@@ -474,25 +474,25 @@ struct reader
   void operator() (gsi::SerialArgs *rr, PythonRef *ret, PyObject * /*self*/, const gsi::ArgType &arg, tl::Heap *heap)
   {
     if (arg.is_ref ()) {
-      *ret = c2python<R> (rr->template read<R &> (*heap));
+      *ret = c2python (rr->template read<R &> (*heap));
     } else if (arg.is_cref ()) {
-      *ret = c2python<R> (rr->template read<const R &> (*heap));
+      *ret = c2python (rr->template read<const R &> (*heap));
     } else if (arg.is_ptr ()) {
       R *p = rr->template read<R *> (*heap);
       if (p) {
-        *ret = c2python<R> (*p);
+        *ret = c2python (*p);
       } else {
         *ret = PythonRef (Py_None, false /*borrowed*/);
       }
     } else if (arg.is_cptr ()) {
       const R *p = rr->template read<const R *> (*heap);
       if (p) {
-        *ret = c2python<R> (*p);
+        *ret = c2python (*p);
       } else {
         *ret = PythonRef (Py_None, false /*borrowed*/);
       }
     } else {
-      *ret = c2python<R> (rr->template read<R> (*heap));
+      *ret = c2python (rr->template read<R> (*heap));
     }
   }
 };
@@ -512,7 +512,7 @@ struct reader<void *>
     tl_assert (! arg.is_ref ());
     tl_assert (! arg.is_cptr ());
     tl_assert (! arg.is_ptr ());
-    *ret = c2python<void *> (rr->read<void *> (*heap));
+    *ret = c2python (rr->read<void *> (*heap));
   }
 };
 
@@ -528,7 +528,7 @@ struct reader<gsi::StringType>
     if (!a.get ()) {
       *ret = PythonRef (Py_None, false /*borrowed*/);
     } else {
-      *ret = c2python<std::string> (std::string (a->c_str (), a->size ()));
+      *ret = c2python (std::string (a->c_str (), a->size ()));
     }
   }
 };
@@ -582,7 +582,7 @@ PyObject *object_from_variant (const tl::Variant &var, PYAObjectBase *self, cons
     return object_to_python ((void *) var.to_user (), self, var.user_cls ()->gsi_cls (), pass_obj, is_const, prefer_copy, can_destroy);
 
   } else {
-    return c2python<tl::Variant> (var);
+    return c2python (var);
   }
 }
 

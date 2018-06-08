@@ -24,8 +24,9 @@
 #ifndef _HDR_pyaConvert
 #define _HDR_pyaConvert
 
-#include "Python.h"
+#include <Python.h>
 
+#include "pyaCommon.h"
 #include "pyaModule.h"
 #include "pyaObject.h"
 #include "gsiClassBase.h"
@@ -63,14 +64,14 @@ class PYAObjectBase;
  *  @param can_destroy If true, the Python object can be destroyed explicitly
  *  @return The Python object
  */
-PyObject *
+PYA_PUBLIC PyObject *
 object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, bool pass_obj, bool is_const, bool prefer_copy, bool can_destroy);
 
 /**
  *  @brief Translates an object to a Python object (PyObject)
  *  This version takes it's flags from the atype given.
  */
-PyObject *
+PYA_PUBLIC PyObject *
 object_to_python (void *obj, PYAObjectBase *self, const gsi::ArgType &atype);
 
 // -------------------------------------------------------------------
@@ -239,7 +240,7 @@ struct test_type_func<T *>
  *  @param loose If true, the type is checked more loosely. Use for second-pass matching.
  */
 template <class T>
-inline bool test_type (PyObject * rval, bool loose)
+inline bool test_type (PyObject * rval, bool loose = false)
 {
   return test_type_func<T> () (rval, loose);
 }
@@ -248,7 +249,7 @@ inline bool test_type (PyObject * rval, bool loose)
  *  @brief Test a PyObject *for compatibility with a vector of the given type R
  */
 template <class R>
-inline bool test_vector (PyObject *arr, bool loose)
+inline bool test_vector (PyObject *arr, bool loose = false)
 {
   if (PyList_Check (arr)) {
 
@@ -283,13 +284,16 @@ inline bool test_vector (PyObject *arr, bool loose)
 template <class T>
 struct python2c_func
 {
-  T operator() (PyObject *rval);
+  T operator() (PyObject * /*rval*/)
+  {
+    tl_assert (false);  //  type not bound
+  }
 };
 
-template <> long python2c_func<long>::operator() (PyObject *rval);
-template <> unsigned long python2c_func<unsigned long>::operator() (PyObject *rval);
-template <> bool python2c_func<bool>::operator() (PyObject *rval);
-template <> char python2c_func<char>::operator() (PyObject *rval);
+template <> PYA_PUBLIC long python2c_func<long>::operator() (PyObject *rval);
+template <> PYA_PUBLIC unsigned long python2c_func<unsigned long>::operator() (PyObject *rval);
+template <> PYA_PUBLIC bool python2c_func<bool>::operator() (PyObject *rval);
+template <> PYA_PUBLIC char python2c_func<char>::operator() (PyObject *rval);
 
 template <class D, class C>
 struct python2c_func_cast
@@ -308,23 +312,23 @@ template <> struct python2c_func<unsigned short> : public python2c_func_cast<uns
 template <> struct python2c_func<int> : public python2c_func_cast<int, long> { };
 template <> struct python2c_func<unsigned int> : public python2c_func_cast<unsigned int, long> { };
 
-template <> long long python2c_func<long long>::operator() (PyObject *rval);
-template <> unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval);
+template <> PYA_PUBLIC long long python2c_func<long long>::operator() (PyObject *rval);
+template <> PYA_PUBLIC unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval);
 
 #if defined(HAVE_64BIT_COORD)
 template <> __int128 python2c_func<__int128>::operator() (PyObject *rval);
 #endif
 
-template <> double python2c_func<double>::operator() (PyObject *rval);
+template <> PYA_PUBLIC double python2c_func<double>::operator() (PyObject *rval);
 template <> struct python2c_func<float> : public python2c_func_cast<float, double> { };
 
-template <> std::string python2c_func<std::string>::operator() (PyObject *rval);
-template <> QByteArray python2c_func<QByteArray>::operator() (PyObject *rval);
-template <> QString python2c_func<QString>::operator() (PyObject *rval);
+template <> PYA_PUBLIC std::string python2c_func<std::string>::operator() (PyObject *rval);
+template <> PYA_PUBLIC QByteArray python2c_func<QByteArray>::operator() (PyObject *rval);
+template <> PYA_PUBLIC QString python2c_func<QString>::operator() (PyObject *rval);
 
 template <> struct python2c_func<void *> : public python2c_func_cast<void *, size_t> { };
 
-template <> tl::Variant python2c_func<tl::Variant>::operator() (PyObject *rval);
+template <> PYA_PUBLIC tl::Variant python2c_func<tl::Variant>::operator() (PyObject *rval);
 
 template <class T> struct python2c_func<T &>
 {
@@ -593,10 +597,14 @@ struct c2python_func<float>
   }
 };
 
-template <> PyObject *c2python_func<const char *>::operator() (const char *);
-template <> PyObject *c2python_func<const QString &>::operator() (const QString &c);
-template <> PyObject *c2python_func<const QByteArray &>::operator() (const QByteArray &c);
-template <> PyObject *c2python_func<const std::string &>::operator() (const std::string &c);
+template <> PYA_PUBLIC PyObject *c2python_func<const char *>::operator() (const char *);
+
+template <> PYA_PUBLIC PyObject *c2python_func<const QString &>::operator() (const QString &c);
+template <> struct c2python_func<QString> : public c2python_func<const QString &> { };
+template <> PYA_PUBLIC PyObject *c2python_func<const QByteArray &>::operator() (const QByteArray &c);
+template <> struct c2python_func<QByteArray> : public c2python_func<const QByteArray &> { };
+template <> PYA_PUBLIC PyObject *c2python_func<const std::string &>::operator() (const std::string &c);
+template <> struct c2python_func<std::string> : public c2python_func<const std::string &> { };
 
 template <>
 struct c2python_func<void *>
@@ -608,7 +616,8 @@ struct c2python_func<void *>
   }
 };
 
-template <> PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c);
+template <> PYA_PUBLIC PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c);
+template <> struct c2python_func<tl::Variant> : public c2python_func<const tl::Variant &> { };
 
 /**
  *  @brief Converts the Python object to the given type

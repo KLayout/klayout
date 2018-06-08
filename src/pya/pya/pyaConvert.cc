@@ -444,24 +444,24 @@ template <>
 PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c)
 {
   if (c.is_double ()) {
-    return c2python<double> (c.to_double ());
+    return c2python (c.to_double ());
   } else if (c.is_bool ()) {
-    return c2python<bool> (c.to_bool ());
+    return c2python (c.to_bool ());
   } else if (c.is_a_string ()) {
-    return c2python<std::string> (c.to_string ());
+    return c2python (c.to_string ());
   } else if (c.is_long ()) {
-    return c2python<long> (c.to_long ());
+    return c2python (c.to_long ());
   } else if (c.is_ulong ()) {
-    return c2python<unsigned long> (c.to_ulong ());
+    return c2python (c.to_ulong ());
   } else if (c.is_longlong ()) {
-    return c2python<long long> (c.to_longlong ());
+    return c2python (c.to_longlong ());
   } else if (c.is_ulonglong ()) {
-    return c2python<unsigned long long> (c.to_ulonglong ());
+    return c2python (c.to_ulonglong ());
   } else if (c.is_array ()) {
 
     PyObject *ret = PyDict_New ();
     for (tl::Variant::const_array_iterator i = c.begin_array (); i != c.end_array (); ++i) {
-      PyDict_SetItem (ret, c2python<tl::Variant> (i->first), c2python<tl::Variant> (i->second));
+      PyDict_SetItem (ret, c2python (i->first), c2python (i->second));
     }
     return ret;
     
@@ -470,7 +470,7 @@ PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c)
     PyObject *ret = PyList_New (c.get_list ().size ());
     size_t index = 0;
     for (tl::Variant::const_iterator i = c.begin (); i != c.end (); ++i, ++index) {
-      PyList_SetItem (ret, index, c2python<tl::Variant> (*i));
+      PyList_SetItem (ret, index, c2python (*i));
     }
     return ret;
 
@@ -545,7 +545,7 @@ PyObject *c2python_func<const QString &>::operator() (const QString &qs)
   } else {
     //  TODO: can be done more efficently
     std::string c (tl::to_string (qs));
-    return c2python<std::string> (c);
+    return c2python (c);
   }
 }
 

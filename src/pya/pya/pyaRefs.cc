@@ -114,13 +114,13 @@ PyObject *PythonRef::release ()
 
 PythonPtr::PythonPtr ()
   : mp_obj (NULL)
-{ 
+{
   //  .. nothing yet ..
 }
 
 PythonPtr::PythonPtr (PyObject *obj)
   : mp_obj (obj)
-{ 
+{
   Py_XINCREF (obj);
 }
 

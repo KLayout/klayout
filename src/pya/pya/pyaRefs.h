@@ -24,6 +24,8 @@
 #ifndef _HDR_pyaRefs
 #define _HDR_pyaRefs
 
+#include "pyaCommon.h"
+
 struct _object;
 typedef _object PyObject;
 
@@ -41,7 +43,7 @@ class PythonPtr;
  *  borrowed references too. 
  *  PythonRef will basically become the owner of the referred object.
  */
-class PythonRef 
+class PYA_PUBLIC PythonRef
 {
 public:
   /**
@@ -140,7 +142,7 @@ private:
  *  This reference represents borrowed references. Upon construction and destruction, this
  *  object will automatically increment and decrement the reference count.
  */
-class PythonPtr 
+class PYA_PUBLIC PythonPtr
 {
 public:
   /**

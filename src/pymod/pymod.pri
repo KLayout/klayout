@@ -3,7 +3,9 @@ DESTDIR = $$OUT_PWD/..
 LIBDIR = $$OUT_PWD/../..
 DESTDIR_PYMOD = $$LIBDIR/pykl
 
-include($$PWD/../lib.pri)
+TEMPLATE = lib
+
+include($$PWD/../klayout.pri)
 
 INCLUDEPATH += $$PYTHONINCLUDE $$TL_INC $$GSI_INC $$PYA_INC
 DEPENDPATH += $$PYTHONINCLUDE $$TL_INC $$GSI_INC $$PYA_INC

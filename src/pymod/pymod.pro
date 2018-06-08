@@ -35,5 +35,8 @@ equals(HAVE_QTBINDINGS, "1") {
 }
 
 ALL_DIRS = $$SUBDIRS
+
 SUBDIRS += unit_tests
-unit_tests.depends += $$ALL_DIRS
+SUBDIRS += bridge_sample
+
+unit_tests.depends += $$ALL_DIRS bridge_sample

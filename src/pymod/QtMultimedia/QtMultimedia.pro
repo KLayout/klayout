@@ -8,4 +8,4 @@ SOURCES = \
 
 HEADERS += \
 
-LIBS += -lklayout_QtMultimedia
+LIBS += -lklayout_QtMultimedia -lklayout_QtNetwork

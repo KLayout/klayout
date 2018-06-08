@@ -542,7 +542,7 @@ PythonInterpreter::define_variable (const std::string &name, const std::string &
   PythonPtr main_module (PyImport_AddModule ("__main__"));
   PythonPtr dict (PyModule_GetDict (main_module.get ()));
   if (dict) {
-    PythonRef v (c2python<std::string> (value));
+    PythonRef v (c2python (value));
     PyDict_SetItemString (dict.get (), name.c_str (), v.get ());
   }
 }

@@ -32,6 +32,7 @@
 #include "tlObject.h"
 
 #include "pyaRefs.h"
+#include "pyaCommon.h"
 
 namespace pya
 {
@@ -176,7 +177,7 @@ private:
  *  Note: the PYAObjectBase must be directly derived from PyObject so that
  *  a PyObject pointer can be cast to a PYAObjectBase pointer.
  */
-class PYAObjectBase
+class PYA_PUBLIC PYAObjectBase
   : public PyObject
 {
 public:

@@ -24,152 +24,28 @@
 #ifndef _HDR_pyaObject
 #define _HDR_pyaObject
 
-#include "Python.h"
-
-#include "gsiDecl.h"
-#include "gsiDeclBasic.h"
-#include "gsiSignals.h"
-#include "tlObject.h"
+#include <Python.h>
 
 #include "pyaRefs.h"
 #include "pyaCommon.h"
+
+#include <vector>
+#include <map>
+#include <memory>
+
+namespace gsi
+{
+  class ClassBase;
+  class MethodBase;
+}
 
 namespace pya
 {
 
 class PYAObjectBase;
-
-/**
- *  @brief A storage object for a function to callback
- */
-struct CallbackFunction
-{
-  CallbackFunction (PythonRef pym, const gsi::MethodBase *m);
-
-  PythonRef callable () const;
-  const gsi::MethodBase *method () const;
-  bool operator== (const CallbackFunction &other) const;
-
-private:
-  PythonRef m_callable;
-  PythonRef m_weak_self;
-  PythonRef m_class;
-  const gsi::MethodBase *mp_method;
-
-  PyObject *self_ref () const;
-  PyObject *callable_ref () const;
-  bool is_instance_method () const;
-};
-
-/**
- *  @brief An adaptor class for the callback mechanism
- */
-class Callee
-  : public gsi::Callee
-{
-public:
-  /**
-   *  @brief Constructor for a Callee object pointing the to given Python object
-   */
-  Callee (PYAObjectBase *obj);
-  
-  /**
-   *  @brief Destructor
-   */
-  ~Callee ();
-
-  /**
-   *  @brief Adds a callback (given by the CallbackFunction)
-   *  This method returns a callback ID which can be used to register the callback
-   *  at an GSI object.
-   */
-  int add_callback (const CallbackFunction &vf);
-
-  /**
-   *  @brief Clears all callbacks registered 
-   */
-  void clear_callbacks ();
-
-  /**
-   *  @brief Implementation of the Callee interface
-   */
-  virtual void call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const;
-
-private:
-  PYAObjectBase *mp_obj;
-  std::vector<CallbackFunction> m_cbfuncs; 
-};
-
-/**
- *  @brief The signal handler abstraction
- *
- *  This class implements the signal handler that interfaces to GSI's signal system
- */
-class SignalHandler
-  : public gsi::SignalHandler
-{
-public:
-  /**
-   *  @brief Constructor
-   */
-  SignalHandler ();
-
-  /**
-   *  @brief Destructor
-   */
-  ~SignalHandler ();
-
-  /**
-   *  @brief Implementation of the callback interface
-   */
-  virtual void call (const gsi::MethodBase *method, gsi::SerialArgs &args, gsi::SerialArgs &ret) const;
-
-  /**
-   *  @brief Adds a callable to the list of targets
-   */
-  void add (PyObject *callable);
-
-  /**
-   *  @brief Removes a callable from the list of targets
-   */
-  void remove (PyObject *callable);
-
-  /**
-   *  @brief Clears the list of callables
-   */
-  void clear ();
-
-  /**
-   *  @brief Assign another handler to this
-   */
-  void assign (const SignalHandler *other);
-
-private:
-  std::vector<CallbackFunction> m_cbfuncs;
-};
-
-/**
- *  @brief A helper object to forward status changed events to a Python object
- *  This object is used to connect the events to the Python object. Unfortunately,
- *  PYAObjectBase cannot be derived from tl::Object directly since in that case,
- *  tl::Object will be placed before PyObject in the memory layout.
- */
-class StatusChangedListener
-  : public tl::Object
-{
-public:
-  StatusChangedListener (PYAObjectBase *pya_object);
-
-  void object_status_changed (gsi::ObjectBase::StatusEventType type);
-
-  PYAObjectBase *pya_object () const
-  {
-    return mp_pya_object;
-  }
-
-private:
-  PYAObjectBase *mp_pya_object;
-};
+class SignalHandler;
+class Callee;
+class StatusChangedListener;
 
 /**
  *  @brief The Python object representing a GSI object
@@ -290,22 +166,6 @@ public:
     return m_owned;
   }
 
-  /** 
-   *  @brief The callee interface
-   */
-  Callee &callee () 
-  {
-    return m_callee;
-  }
-
-  /** 
-   *  @brief The callee interface (const pointer)
-   */
-  const Callee &callee () const 
-  {
-    return m_callee;
-  }
-
   /**
    *  @brief Returns the signal handler for the signal given by "meth"
    *  If a signal handler was already present, the existing object is returned.
@@ -326,9 +186,11 @@ private:
 
   void detach_callbacks ();
   void initialize_callbacks ();
+  void object_destroyed ();
+  void keep_internal ();
 
-  StatusChangedListener m_listener;
-  Callee m_callee;
+  std::auto_ptr<StatusChangedListener> m_listener;
+  std::auto_ptr<Callee> m_callee;
   const gsi::ClassBase *m_cls_decl;
   void *m_obj;
   bool m_owned : 1;
@@ -336,9 +198,6 @@ private:
   bool m_destroyed : 1;
   bool m_can_destroy : 1;
   std::map <const gsi::MethodBase *, pya::SignalHandler> m_signal_table;
-
-  void object_status_changed (gsi::ObjectBase::StatusEventType type);
-  void keep_internal ();
 };
 
 }

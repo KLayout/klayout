@@ -24,12 +24,20 @@
 #include "pyaConvert.h"
 #include "pyaObject.h"
 #include "pyaModule.h"
+#include "pyaStatusChangedListener.h"
 #include "pyaUtils.h"
+
+#include "gsiClassBase.h"
 
 #include <string>
 
 namespace pya
 {
+
+bool is_derived_from (const gsi::ClassBase *cls, const std::type_info &ti)
+{
+  return cls->is_derived_from (gsi::class_by_typeinfo_no_assert (ti));
+}
 
 template <>
 long python2c_func<long>::operator() (PyObject *rval)

@@ -24,7 +24,21 @@
 #ifndef _HDR_pyaModule
 #define _HDR_pyaModule
 
-#include "pya.h"
+#include <Python.h>
+
+#include "pyaCommon.h"
+#include "pyaRefs.h"
+
+#include <map>
+#include <list>
+#include <vector>
+#include <string>
+
+namespace gsi
+{
+  class ClassBase;
+  class MethodBase;
+}
 
 namespace pya
 {

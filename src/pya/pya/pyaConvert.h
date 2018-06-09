@@ -29,7 +29,6 @@
 #include "pyaCommon.h"
 #include "pyaModule.h"
 #include "pyaObject.h"
-#include "gsiClassBase.h"
 
 #include "tlVariant.h"
 #include "tlException.h"
@@ -39,16 +38,23 @@
 #include <QString>
 #include <QByteArray>
 
+#include <typeinfo>
+
 namespace gsi
 {
   class ClassBase;
   class ArgType;
+
+  const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti);
 }
 
 namespace pya
 {
 
 class PYAObjectBase;
+
+//  Forward declarations to reduce the dependency on gsi
+PYA_PUBLIC bool is_derived_from (const gsi::ClassBase *cls, const std::type_info &ti);
 
 // -------------------------------------------------------------------
 //  Conversion of a generic object to a Python object
@@ -196,7 +202,7 @@ struct test_type_func<T &>
   {
     //  TODO: we currently don't check for non-constness
     const gsi::ClassBase *cls_decl = pya::PythonModule::cls_for_type (Py_TYPE (rval));
-    return cls_decl && cls_decl->is_derived_from (gsi::class_by_typeinfo_no_assert (typeid (T)));
+    return cls_decl && is_derived_from (cls_decl, typeid (T));
   }
 };
 
@@ -338,7 +344,7 @@ template <class T> struct python2c_func<T &>
 
     const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (rval));
     tl_assert (cls_decl != 0);
-    tl_assert (cls_decl->is_derived_from (gsi::class_by_typeinfo_no_assert (typeid (T))));
+    tl_assert (is_derived_from (cls_decl, typeid (T)));
 
     PYAObjectBase *p = (PYAObjectBase *) (rval);
     return *((T *)p->obj ());

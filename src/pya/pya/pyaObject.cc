@@ -25,7 +25,14 @@
 #include "pyaMarshal.h"
 #include "pyaUtils.h"
 #include "pyaConvert.h"
+#include "pyaSignalHandler.h"
+#include "pyaStatusChangedListener.h"
 #include "pya.h"
+
+#include "gsiDecl.h"
+#include "gsiDeclBasic.h"
+#include "gsiSignals.h"
+#include "tlObject.h"
 
 #include "tlLog.h"
 
@@ -33,83 +40,46 @@ namespace pya
 {
 
 // --------------------------------------------------------------------------
-//  Implementation of CallbackFunction
+//  Private classes
 
-CallbackFunction::CallbackFunction (PythonRef pym, const gsi::MethodBase *m)
-  : mp_method (m)
+/**
+ *  @brief An adaptor class for the callback mechanism
+ */
+class Callee
+  : public gsi::Callee
 {
-  //  We have a problem here with cyclic references. Bound instances methods can 
-  //  create reference cycles if their target objects somehow points back to us
-  //  (or worse, to some parent of us, i.e. inside a QWidget hierarchy).
-  //  A solution is to take a bound instance method apart and store a weak
-  //  reference to self plus a real reference to the function.
+public:
+  /**
+   *  @brief Constructor for a Callee object pointing the to given Python object
+   */
+  Callee (PYAObjectBase *obj);
 
-  if (pym && PyMethod_Check (pym.get ()) && PyMethod_Self (pym.get ()) != NULL) {
+  /**
+   *  @brief Destructor
+   */
+  ~Callee ();
 
-    m_weak_self = PythonRef (PyWeakref_NewRef (PyMethod_Self (pym.get ()), NULL));
-    m_callable = PythonRef (PyMethod_Function (pym.get ()), false /* borrowed ref */);
-#if PY_MAJOR_VERSION < 3
-    m_class = PythonRef (PyMethod_Class (pym.get ()), false /* borrowed ref */);
-#endif
+  /**
+   *  @brief Adds a callback (given by the CallbackFunction)
+   *  This method returns a callback ID which can be used to register the callback
+   *  at an GSI object.
+   */
+  int add_callback (const CallbackFunction &vf);
 
-  } else {
-    m_callable = pym;
-  }
-}
+  /**
+   *  @brief Clears all callbacks registered
+   */
+  void clear_callbacks ();
 
-const gsi::MethodBase *CallbackFunction::method () const
-{
-  return mp_method;
-}
+  /**
+   *  @brief Implementation of the Callee interface
+   */
+  virtual void call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const;
 
-PythonRef CallbackFunction::callable () const
-{
-  if (m_callable && m_weak_self) {
-
-    PyObject *self = PyWeakref_GetObject (m_weak_self.get ());
-    if (self == Py_None) {
-      //  object expired - no callback possible
-      return PythonRef ();
-    }
-
-#if PY_MAJOR_VERSION < 3
-    return PythonRef (PyMethod_New (m_callable.get (), self, m_class.get ()));
-#else
-    return PythonRef (PyMethod_New (m_callable.get (), self));
-#endif
-
-  } else {
-    return m_callable;
-  }
-}
-
-bool CallbackFunction::is_instance_method () const
-{
-  return m_callable && m_weak_self;
-}
-
-PyObject *CallbackFunction::self_ref () const
-{
-  return PyWeakref_GetObject (m_weak_self.get ());
-}
-
-PyObject *CallbackFunction::callable_ref () const
-{
-  return m_callable.get ();
-}
-
-bool CallbackFunction::operator== (const CallbackFunction &other) const
-{
-  if (is_instance_method () != other.is_instance_method ()) {
-    return false;
-  }
-  if (m_weak_self) {
-    if (self_ref () != other.self_ref ()) {
-      return false;
-    }
-  }
-  return callable_ref () == other.callable_ref ();
-}
+private:
+  PYAObjectBase *mp_obj;
+  std::vector<CallbackFunction> m_cbfuncs;
+};
 
 // --------------------------------------------------------------------------
 //  Implementation of Callee
@@ -197,134 +167,11 @@ Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 }
 
 // --------------------------------------------------------------------------
-//  Implementation of SignalHandler
-
-SignalHandler::SignalHandler ()
-{
-  //  .. nothing yet ..
-}
-
-SignalHandler::~SignalHandler ()
-{
-  clear ();
-}
-
-void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
-{
-  PYTHON_BEGIN_EXEC
-
-    tl::Heap heap;
-
-    int args_avail = int (std::distance (meth->begin_arguments (), meth->end_arguments ()));
-    PythonRef argv (PyTuple_New (args_avail));
-    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
-      PyTuple_SetItem (argv.get (), int (a - meth->begin_arguments ()), pop_arg (*a, args, 0, heap).release ());
-    }
-
-    //  NOTE: in case one event handler deletes the object, it's safer to first collect the handlers and
-    //  then call them.
-    std::vector<PythonRef> callables;
-    callables.reserve (m_cbfuncs.size ());
-    for (std::vector<CallbackFunction>::const_iterator c = m_cbfuncs.begin (); c != m_cbfuncs.end (); ++c) {
-      callables.push_back (c->callable ());
-    }
-
-    PythonRef result;
-
-    for (std::vector<PythonRef>::const_iterator c = callables.begin (); c != callables.end (); ++c) {
-
-      //  determine the number of arguments required
-      int arg_count = args_avail;
-      if (args_avail > 0) {
-
-        PythonRef fc (PyObject_GetAttrString (c->get (), "__code__"));
-        if (fc) {
-          PythonRef ac (PyObject_GetAttrString (fc.get (), "co_argcount"));
-          if (ac) {
-            arg_count = python2c<int> (ac.get ());
-            if (PyObject_HasAttrString (c->get (), "__self__")) {
-              arg_count -= 1;
-            }
-          }
-        }
-
-      }
-
-      //  use less arguments if applicable
-      if (arg_count == 0) {
-        result = PythonRef (PyObject_CallObject (c->get (), NULL));
-      } else if (arg_count < args_avail) {
-        PythonRef argv_less (PyTuple_GetSlice (argv.get (), 0, arg_count));
-        result = PythonRef (PyObject_CallObject (c->get (), argv_less.get ()));
-      } else {
-        result = PythonRef (PyObject_CallObject (c->get (), argv.get ()));
-      }
-
-      if (! result) {
-        check_error ();
-      }
-
-    }
-
-    push_arg (meth->ret_type (), ret, result.get (), heap);
-
-    //  a Python callback must not leave temporary objects
-    tl_assert (heap.empty ());
-
-  PYTHON_END_EXEC
-}
-
-void SignalHandler::add (PyObject *callable)
-{
-  remove (callable);
-  m_cbfuncs.push_back (CallbackFunction (PythonPtr (callable), 0));
-}
-
-void SignalHandler::remove (PyObject *callable)
-{
-  //  To avoid cyclic references, the CallbackFunction holder is employed. However, the
-  //  "true" callable no longer is the original one. Hence, we need to do a strict compare
-  //  against the effective one.
-  CallbackFunction cbref (PythonPtr (callable), 0);
-  for (std::vector<CallbackFunction>::iterator c = m_cbfuncs.begin (); c != m_cbfuncs.end (); ++c) {
-    if (*c == cbref) {
-      m_cbfuncs.erase (c);
-      break;
-    }
-  }
-}
-
-void SignalHandler::clear ()
-{
-  m_cbfuncs.clear ();
-}
-
-void SignalHandler::assign (const SignalHandler *other)
-{
-  m_cbfuncs = other->m_cbfuncs;
-}
-
-// --------------------------------------------------------------------------
-//  Implementation of StatusChangedListener
-
-StatusChangedListener::StatusChangedListener (PYAObjectBase *pya_object)
-  : mp_pya_object (pya_object)
-{
-  //  .. nothing yet ..
-}
-
-void
-StatusChangedListener::object_status_changed (gsi::ObjectBase::StatusEventType type)
-{
-  mp_pya_object->object_status_changed (type);
-}
-
-// --------------------------------------------------------------------------
 //  Implementation of PYAObjectBase
 
 PYAObjectBase::PYAObjectBase(const gsi::ClassBase *_cls_decl)
-  : m_listener (this),
-    m_callee (this),
+  : m_listener (new pya::StatusChangedListener (this)),
+    m_callee (new pya::Callee (this)),
     m_cls_decl (_cls_decl),
     m_obj (0),
     m_owned (false),
@@ -361,32 +208,24 @@ PYAObjectBase::~PYAObjectBase ()
 }
 
 void
-PYAObjectBase::object_status_changed (gsi::ObjectBase::StatusEventType type)
+PYAObjectBase::object_destroyed ()
 {
-  if (type == gsi::ObjectBase::ObjectDestroyed) {
+  //  This may happen outside the Python interpreter, so we safeguard ourselves against this.
+  //  In this case, we may encounter a memory leak, but there is little we can do
+  //  against this and it will happen in the application teardown anyway.
+  if (PythonInterpreter::instance ()) {
 
-    //  This may happen outside the Python interpreter, so we safeguard ourselves against this.
-    //  In this case, we may encounter a memory leak, but there is little we can do
-    //  against this and it will happen in the application teardown anyway.
-    if (PythonInterpreter::instance ()) {
+    bool prev_owner = m_owned;
 
-      bool prev_owner = m_owned;
+    m_destroyed = true;  // NOTE: must be set before detach!
 
-      m_destroyed = true;  // NOTE: must be set before detach!
+    detach ();
 
-      detach ();
-
-      //  NOTE: this may delete "this"!
-      if (!prev_owner) {
-        Py_DECREF (this);
-      }
-
+    //  NOTE: this may delete "this"!
+    if (!prev_owner) {
+      Py_DECREF (this);
     }
 
-  } else if (type == gsi::ObjectBase::ObjectKeep) {
-    keep_internal ();
-  } else if (type == gsi::ObjectBase::ObjectRelease) {
-    release ();
   }
 }
 
@@ -446,7 +285,7 @@ PYAObjectBase::detach ()
     if (! m_destroyed && cls && cls->is_managed ()) {
       gsi::ObjectBase *gsi_object = cls->gsi_object (m_obj, false);
       if (gsi_object) {
-        gsi_object->status_changed_event ().remove (&m_listener, &StatusChangedListener::object_status_changed);
+        gsi_object->status_changed_event ().remove (m_listener.get (), &StatusChangedListener::object_status_changed);
       }
     }
 
@@ -485,7 +324,7 @@ PYAObjectBase::set (void *obj, bool owned, bool const_ref, bool can_destroy)
     if (gsi_object->already_kept ()) {
       keep_internal ();
     }
-    gsi_object->status_changed_event ().add (&m_listener, &StatusChangedListener::object_status_changed);
+    gsi_object->status_changed_event ().add (m_listener.get (), &StatusChangedListener::object_status_changed);
   }
 
   if (!m_owned) {
@@ -586,8 +425,8 @@ PYAObjectBase::initialize_callbacks ()
     const char *nstr = (*m)->primary_name ().c_str ();
     py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (this), nstr);
 
-    int id = m_callee.add_callback (CallbackFunction (py_attr, *m));
-    (*m)->set_callback (m_obj, gsi::Callback (id, &m_callee, (*m)->argsize (), (*m)->retsize ()));
+    int id = m_callee->add_callback (CallbackFunction (py_attr, *m));
+    (*m)->set_callback (m_obj, gsi::Callback (id, m_callee.get (), (*m)->argsize (), (*m)->retsize ()));
 
   }
 
@@ -671,7 +510,7 @@ PYAObjectBase::detach_callbacks ()
     }
   }
 
-  m_callee.clear_callbacks ();
+  m_callee->clear_callbacks ();
 }
 
 void 

@@ -24,10 +24,12 @@
 #include <Python.h>
 
 #include "pyaModule.h"
+#include "pya.h"
 #include "pyaObject.h"
 #include "pyaConvert.h"
 #include "pyaHelpers.h"
 #include "pyaMarshal.h"
+#include "pyaSignalHandler.h"
 #include "pyaUtils.h"
 
 #include <map>

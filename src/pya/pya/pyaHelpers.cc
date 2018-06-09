@@ -26,6 +26,7 @@
 #include "pyaMarshal.h"
 #include "pyaObject.h"
 #include "pyaConvert.h"
+#include "pyaSignalHandler.h"
 #include "pya.h"
 
 namespace pya

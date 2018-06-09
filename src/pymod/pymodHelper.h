@@ -31,7 +31,10 @@
  */
 
 #include <Python.h>
+
 #include "pyaModule.h"
+#include "pyaUtils.h"
+
 #include "gsi.h"
 #include "gsiExpression.h"
 

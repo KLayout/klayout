@@ -49,9 +49,9 @@ QT = core
 # - GSI (generic scripting interface)
 # - TL (basic toolkit)
 # - PYA (Python binding for GSI)
-INCLUDEPATH += $$PYTHONINCLUDE $$INC/tl/tl $$INC/gsi/gsi $$INC/pya/pya
-DEPENDPATH += $$PYTHONINCLUDE $$INC/tl/tl $$INC/gsi/gsi $$INC/pya/pya
-LIBS += $$PYTHONLIBFILE -L$$LIBDIR -lklayout_tl -lklayout_gsi -lklayout_pya
+INCLUDEPATH += $$PYTHONINCLUDE $$INC/tl/tl $$INC/pya/pya
+DEPENDPATH += $$PYTHONINCLUDE $$INC/tl/tl $$INC/pya/pya
+LIBS += $$PYTHONLIBFILE -L$$LIBDIR -lklayout_tl -lklayout_pya
 
 # Also include DB as this is our sample
 INCLUDEPATH += $$INC/db/db

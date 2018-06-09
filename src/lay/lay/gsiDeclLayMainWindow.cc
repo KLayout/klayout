@@ -22,9 +22,14 @@
 
 #include "gsiDecl.h"
 #include "gsiSignals.h"
-#include "gsiQtGuiExternals.h"
-#include "gsiQtWidgetsExternals.h"  // for Qt5
 #include "layMainWindow.h"
+
+#if defined(HAVE_QTBINDINGS)
+# include "gsiQtGuiExternals.h"
+# include "gsiQtWidgetsExternals.h"  // for Qt5
+#else
+# define QT_EXTERNAL_BASE(x)
+#endif
 
 namespace gsi
 {

@@ -26,8 +26,13 @@
 #include "layMainWindow.h"
 #include "laybasicCommon.h"
 #include "gsiDecl.h"
-#include "gsiQtGuiExternals.h"
-#include "gsiQtWidgetsExternals.h"
+
+#if defined(HAVE_QTBINDINGS)
+# include "gsiQtGuiExternals.h"
+# include "gsiQtWidgetsExternals.h"
+#else
+# define QT_EXTERNAL_BASE(x)
+#endif
 
 namespace tl
 {

@@ -43,17 +43,19 @@
 #include "libForceLink.h"
 #include "antForceLink.h"
 #include "imgForceLink.h"
-#ifdef HAVE_RUBY
+#if defined(HAVE_RUBY)
 #include "drcForceLink.h"
 #endif
 
+#if defined(HAVE_QTBINDINGS)
+
 //  pulls in the Qt GSI binding modules
-#include "gsiQtGuiExternals.h"
-#include "gsiQtCoreExternals.h"
-#include "gsiQtXmlExternals.h"
-#include "gsiQtSqlExternals.h"
-#include "gsiQtNetworkExternals.h"
-#include "gsiQtDesignerExternals.h"
+# include "gsiQtGuiExternals.h"
+# include "gsiQtCoreExternals.h"
+# include "gsiQtXmlExternals.h"
+# include "gsiQtSqlExternals.h"
+# include "gsiQtNetworkExternals.h"
+# include "gsiQtDesignerExternals.h"
 
 FORCE_LINK_GSI_QTCORE
 FORCE_LINK_GSI_QTGUI
@@ -61,6 +63,10 @@ FORCE_LINK_GSI_QTXML
 FORCE_LINK_GSI_QTDESIGNER
 FORCE_LINK_GSI_QTNETWORK
 FORCE_LINK_GSI_QTSQL
+
+#else
+# define QT_EXTERNAL_BASE(x)
+#endif
 
 #include <QTranslator>
 #include <QLocale>

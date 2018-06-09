@@ -2195,14 +2195,16 @@ PythonModule::init (const char *mod_name, const char *description)
   m_mod_name = pymod_name + "." + mod_name;
   m_mod_description = description;
 
+  PyObject *module = 0;
+
+#if PY_MAJOR_VERSION < 3
+
   static PyMethodDef module_methods[] = {
     {NULL}  // Sentinel
   };
 
-  PyObject *module = 0;
-
-#if PY_MAJOR_VERSION < 3
   module = Py_InitModule3 (m_mod_name.c_str (), module_methods, m_mod_description.c_str ());
+
 #else
 
   struct PyModuleDef mod_def = {

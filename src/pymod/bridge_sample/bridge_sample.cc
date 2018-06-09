@@ -146,6 +146,8 @@ static PyMethodDef BridgeMethods[] = {
   { NULL, NULL, 0, NULL }  //  terminal
 };
 
+#if PY_MAJOR_VERSION < 3
+
 PyMODINIT_FUNC
 initbridge_sample ()
 {
@@ -160,3 +162,34 @@ initbridge_sample ()
   Py_INCREF (BridgeError);
   PyModule_AddObject (m, "error", BridgeError);
 }
+
+#else
+
+static
+struct PyModuleDef bridge_module =
+{
+  PyModuleDef_HEAD_INIT,
+  "bridge_sample",
+  NULL,
+  -1,
+  BridgeMethods
+};
+
+PyMODINIT_FUNC
+PyInit_bridge_sample ()
+{
+  PyObject *m;
+
+  m = PyModule_Create (&bridge_module);
+  if (m == NULL) {
+    return NULL;
+  }
+
+  BridgeError = PyErr_NewException ((char *) "bridge_sample.error", NULL, NULL);
+  Py_INCREF (BridgeError);
+  PyModule_AddObject (m, "error", BridgeError);
+
+  return m;
+}
+
+#endif

@@ -35,10 +35,11 @@ DESTDIR = $$OUT_PWD/../..
 TEMPLATE = lib
 
 # That's how we name our library
-TARGET = bridge
+TARGET = bridge_sample
 
 # The only source
-SOURCES = bridge.cc
+SOURCES = \
+    bridge_sample.cc
 
 # Include QtCore required for some includes
 QT = core

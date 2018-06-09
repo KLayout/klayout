@@ -1,4 +1,43 @@
 
+/*
+
+  KLayout Layout Viewer
+  Copyright (C) 2006-2018 Matthias Koefferlein
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+*/
+
+/*
+
+  This Python library demonstrates the use of the GSI/Python binding
+  API for developing "bridge" applications - i.e. libraries that access
+  the KLayout objects through their C++ API.
+
+  This sample library provides two conversion functions:
+
+    bridge.p2a(poly)    Converts pya.DSimplePolygon objects to Python
+                        arrays with the structure [ (x, y), ... ].
+
+    bridge.a2p(array)   Does the inverse transformation
+
+  Use cases for such libraries are fast C++ based conversion of KLayout
+  objects into other objects and vice versa.
+
+*/
+
 #include <Python.h>
 
 #include "pyaConvert.h"
@@ -108,16 +147,16 @@ static PyMethodDef BridgeMethods[] = {
 };
 
 PyMODINIT_FUNC
-initbridge ()
+initbridge_sample ()
 {
   PyObject *m;
 
-  m = Py_InitModule ("bridge", BridgeMethods);
+  m = Py_InitModule ("bridge_sample", BridgeMethods);
   if (m == NULL) {
     return;
   }
 
-  BridgeError = PyErr_NewException ((char *) "bridge.error", NULL, NULL);
+  BridgeError = PyErr_NewException ((char *) "bridge_sample.error", NULL, NULL);
   Py_INCREF (BridgeError);
   PyModule_AddObject (m, "error", BridgeError);
 }

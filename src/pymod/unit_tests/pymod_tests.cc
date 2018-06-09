@@ -53,6 +53,8 @@ int run_pymodtest (tl::TestBase * /*_this*/, const std::string &fn)
 #define PYMODTEST(n, file) \
   TEST(n) { EXPECT_EQ (run_pymodtest(_this, file), 0); }
 
+PYMODTEST (bridge, "bridge.py")
+
 PYMODTEST (import_tl, "import_tl.py")
 PYMODTEST (import_db, "import_db.py")
 PYMODTEST (import_lay, "import_lay.py")

@@ -27,19 +27,20 @@
 
 #include "extCommon.h"
 
+#include "dbShapes.h"
+#include "dbShape.h"
+#include "dbEdgeProcessor.h"
+
+#include "tlProgress.h"
+#include "tlFixedVector.h"
+
 #include <vector>
 #include <map>
 #include <list>
 
-#include "dbEdgeProcessor.h"
-#include "layCellView.h"
-#include "tlProgress.h"
-#include "tlFixedVector.h"
-
 namespace db
 {
   class RecursiveShapeIterator;
-  class EdgeProcessor;
 }
 
 namespace ext

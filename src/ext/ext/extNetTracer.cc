@@ -26,9 +26,6 @@
 #include "dbRecursiveShapeIterator.h"
 #include "dbPolygonTools.h"
 #include "dbShapeProcessor.h"
-#include "layViewObject.h"
-#include "layPlugin.h"
-#include "layLayoutView.h"
 #include "tlLog.h"
 
 //  -O3 appears not to work properly for gcc 4.4.7 (RHEL 6)

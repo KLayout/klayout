@@ -30,6 +30,7 @@
 #include "dbLayoutDiff.h"
 #include "dbTestSupport.h"
 #include "dbWriter.h"
+#include "dbReader.h"
 
 static ext::NetTracerConnectionInfo connection (const std::string &a, const std::string &v, const std::string &b)
 {

@@ -26,6 +26,7 @@
 #include "extNetTracerConfig.h"
 
 #include "layConverters.h"
+#include "layCellView.h"
 
 #include "gsiDecl.h"
 

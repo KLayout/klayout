@@ -62,9 +62,11 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
     options.set_format ("OASIS");
   }
 
-  tl::OutputStream stream (tmp_file.c_str ());
-  db::Writer writer (options);
-  writer.write (const_cast<db::Layout &> (layout), stream);
+  {
+    tl::OutputStream stream (tmp_file.c_str ());
+    db::Writer writer (options);
+    writer.write (const_cast<db::Layout &> (layout), stream);
+  }
 
   const db::Layout *subject = 0;
   db::Layout layout2;

@@ -35,11 +35,6 @@ SOURCES = \
   dbFillTool.cc \
   dbForceLinkStreams.cc \
   dbFuzzyCellMapping.cc \
-  dbGDS2.cc \
-  dbGDS2ReaderBase.cc \
-  dbGDS2Reader.cc \
-  dbGDS2WriterBase.cc \
-  dbGDS2Writer.cc \
   dbGlyphs.cc \
   dbHershey.cc \
   dbInstances.cc \
@@ -94,10 +89,6 @@ SOURCES = \
   dbVector.cc \
   dbWriter.cc \
   dbWriterTools.cc \
-  contrib/dbGDS2Converter.cc \
-  contrib/dbGDS2Text.cc \
-  contrib/dbGDS2TextReader.cc \
-  contrib/dbGDS2TextWriter.cc \
   gsiDeclDbBox.cc \
   gsiDeclDbCell.cc \
   gsiDeclDbCellMapping.cc \
@@ -132,7 +123,9 @@ SOURCES = \
     dbVariableWidthPath.cc \
     dbNamedLayerReader.cc \
     dbEdgesToContours.cc \
-    dbForceLink.cc
+    dbForceLink.cc \
+    dbPlugin.cc \
+    dbInit.cc
 
 HEADERS = \
   dbArray.h \
@@ -163,11 +156,6 @@ HEADERS = \
   dbEdgesToContours.h \
   dbFillTool.h \
   dbFuzzyCellMapping.h \
-  dbGDS2.h \
-  dbGDS2ReaderBase.h \
-  dbGDS2Reader.h \
-  dbGDS2WriterBase.h \
-  dbGDS2Writer.h \
   dbHash.h \
   dbHersheyFont.h \
   dbHershey.h \
@@ -226,16 +214,14 @@ HEADERS = \
   dbVector.h \
   dbWriter.h \
   dbWriterTools.h \
-  contrib/dbGDS2Converter.h \
-  contrib/dbGDS2Text.h \
-  contrib/dbGDS2TextReader.h \
-  contrib/dbGDS2TextWriter.h \
     dbCommonReader.h \
     dbGlyphs.h \
     dbCommon.h \
     dbVariableWidthPath.h \
     dbNamedLayerReader.h \
-    dbForceLink.h
+    dbForceLink.h \
+    dbPlugin.h \
+    dbInit.h
 
 RESOURCES = \
   dbResources.qrc

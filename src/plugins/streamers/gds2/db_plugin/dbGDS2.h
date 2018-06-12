@@ -26,9 +26,6 @@
 
 #include <stdint.h>
 
-//  place this macro to force linking of GDS2 plugin
-#define FORCE_LINK_GDS2 void force_link_GDS2_f () { extern int force_link_GDS2; force_link_GDS2 = 0; }
-
 namespace db
 {
 

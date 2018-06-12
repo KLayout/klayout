@@ -20,8 +20,6 @@
 
 */
 
-
-
 #include "dbGDS2Reader.h"
 #include "dbLayoutDiff.h"
 #include "dbTestSupport.h"
@@ -227,11 +225,11 @@ TEST(1)
   db::Manager m;
   db::Layout layout (&m);
   tl::InputStream file (im);
-  db::GDS2Reader reader (file);
+  db::Reader reader (file);
   db::LayerMap map = reader.read (layout);
 
   EXPECT_EQ (fabs (layout.dbu () / 0.001 - 1.0) < 1e-6, true);
-  EXPECT_EQ (reader.libname (), "LIB.DB");
+  EXPECT_EQ (layout.meta_info_value ("libname"), "LIB.DB");
 
   EXPECT_EQ (layout.layers (), size_t (11));
   EXPECT_EQ (map.mapping_str (0), "2/0 : 2/0");
@@ -272,7 +270,7 @@ TEST(2)
   db::LayerMap map_full;
   {
     tl::InputStream file (im);
-    db::GDS2Reader reader (file);
+    db::Reader reader (file);
     map_full = reader.read (layout);
   }
 
@@ -288,10 +286,10 @@ TEST(2)
     im.reset ();
     options = empty_options;
     tl::InputStream file (im);
-    db::GDS2Reader reader (file);
+    db::Reader reader (file);
     map = reader.read (layout_none, options);
     EXPECT_EQ (fabs (layout_none.dbu () / 0.001 - 1.0) < 1e-6, true);
-    EXPECT_EQ (reader.libname (), "LIB.DB");
+    EXPECT_EQ (layout.meta_info_value ("libname"), "LIB.DB");
   }
 
   EXPECT_EQ (layout_none.layers (), size_t (0));
@@ -324,7 +322,7 @@ TEST(2)
 
     im.reset ();
     tl::InputStream file (im);
-    db::GDS2Reader reader (file);
+    db::Reader reader (file);
     reader.read (layout_layer, options);
 
     EXPECT_EQ (layout_layer.layers (), size_t (1));
@@ -358,13 +356,13 @@ TEST(Bug_121_1)
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/bug_121a.gds");
-    db::GDS2Reader reader (file);
+    db::Reader reader (file);
     reader.read (layout);
   }
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/bug_121b.gds");
-    db::GDS2Reader reader (file);
+    db::Reader reader (file);
     reader.read (layout);
   }
 
@@ -379,13 +377,13 @@ TEST(Bug_121_2)
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/bug_121a.gds");
-    db::GDS2Reader reader (file);
+    db::Reader reader (file);
     reader.read (layout);
   }
 
   {
     tl::InputStream file (tl::testsrc () + "/testdata/gds/bug_121c.gds");
-    db::GDS2Reader reader (file);
+    db::Reader reader (file);
     reader.read (layout);
   }
 

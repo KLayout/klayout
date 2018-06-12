@@ -23,8 +23,6 @@
 
 #include "dbLayoutDiff.h"
 #include "dbWriter.h"
-#include "dbOASISWriter.h"
-#include "dbGDS2Writer.h"
 #include "extDEFImporter.h"
 #include "extLEFImporter.h"
 
@@ -107,9 +105,10 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
   {
     tl::OutputStream stream (tmp_file);
-    db::OASISWriter writer;
     db::SaveLayoutOptions options;
-    writer.write (layout, stream, options);
+    options.set_format ("OASIS");
+    db::Writer writer (options);
+    writer.write (layout, stream);
   }
 
   {

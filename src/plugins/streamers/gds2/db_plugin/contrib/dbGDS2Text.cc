@@ -93,8 +93,5 @@ class GDS2TextFormatDeclaration
 
 static tl::RegisteredClass<db::StreamFormatDeclaration> format_txt_decl (new GDS2TextFormatDeclaration(), 1, "GDS2Text");
 
-//  provide a symbol to force linking against
-int force_link_GDS2Text = 0;
-
 }
 

@@ -24,8 +24,8 @@
 #define HDR_bdReaderOptions
 
 #include "bdCommon.h"
-#include "dbGDS2Reader.h"
 #include "dbCommonReader.h"
+#include "dbGDS2Reader.h"
 #include "dbOASISReader.h"
 #include "dbDXFReader.h"
 #include "dbCIFReader.h"

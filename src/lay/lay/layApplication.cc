@@ -39,6 +39,7 @@
 #include "laySaltController.h"
 #include "laySystemPaths.h"
 #include "layPasswordDialog.h"
+#include "layInit.h"
 #include "lymMacro.h"
 #include "gtf.h"
 #include "gsiDecl.h"
@@ -49,6 +50,7 @@
 #include "dbStatic.h"
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
+#include "dbInit.h"
 #include "tlExceptions.h"
 #include "tlException.h"
 #include "tlAssert.h"
@@ -173,49 +175,6 @@ static void ui_exception_handler_def (QWidget *parent)
 // --------------------------------------------------------------------------------
 
 static ApplicationBase *ms_instance = 0;
-
-static PluginDescriptor load_plugin (const std::string &pp)
-{
-  PluginDescriptor desc;
-  desc.path = pp;
-
-  klp_init_func_t init_func = 0;
-  static const char *init_func_name = "klp_init";
-
-  //  NOTE: since we are using a different suffix ("*.klp"), we can't use QLibrary.
-#ifdef _WIN32
-  //  there is no "dlopen" on mingw, so we need to emulate it.
-  HINSTANCE handle = LoadLibraryW ((const wchar_t *) tl::to_qstring (pp).constData ());
-  if (! handle) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unable to load plugin: %s with error message: %s ")), pp, GetLastError ());
-  }
-  init_func = reinterpret_cast<klp_init_func_t> (GetProcAddress (handle, init_func_name));
-#else
-  void *handle;
-  handle = dlopen (tl::string_to_system (pp).c_str (), RTLD_LAZY);
-  if (! handle) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unable to load plugin: %s")), pp);
-  }
-  init_func = reinterpret_cast<klp_init_func_t> (dlsym (handle, init_func_name));
-#endif
-
-  //  If present, call the initialization function to fetch some details from the plugin
-  if (init_func) {
-    const char *version = 0;
-    const char *description = 0;
-    (*init_func) (&desc.autorun, &desc.autorun_early, &version, &description);
-    if (version) {
-      desc.version = version;
-    }
-    if (description) {
-      desc.description = description;
-    }
-  }
-
-  tl::log << "Loaded plugin '" << pp << "'";
-
-  return desc;
-}
 
 // --------------------------------------------------------------------------------
 //  ApplicationBase implementation
@@ -449,7 +408,7 @@ ApplicationBase::parse_cmd (int &argc, char **argv)
 
     } else if (a == "-p" && (i + 1) < argc) {
 
-      m_native_plugins.push_back (load_plugin (args [++i]));
+      lay::load_plugin (args [++i]);
 
     } else if (a == "-s") {
 
@@ -560,14 +519,16 @@ ApplicationBase::parse_cmd (int &argc, char **argv)
 void
 ApplicationBase::init_app ()
 {
-  //  Try to locate the native plugins:
-  //  Native plugins are DLL's or SO's disguised as "*.klp" files.
+  //  Try to locate the plugins:
   //  The are installed either
   //    - directly in one of the KLAYOUT_PATH directories
   //    - in a folder named by the architecture (i.e. "i686-win32-mingw" or "x86_64-linux-gcc") below
   //      one of these folders
   //    - in one of the Salt packages
   //    - in one of the Salt packages, in a folder named after the architecture
+  //  Below this, the following folders are looked up:
+  //    - db_plugins    for db module plugins
+  //    - lay_plugins   for lay module plugins
 
   std::string version = lay::Version::version ();
   std::vector<std::string> vv = tl::split (version, ".");
@@ -579,18 +540,17 @@ ApplicationBase::init_app ()
   }
   std::string short_arch_string = tl::join (as, "-");
 
+  std::vector<std::string> klp_paths;
+
   for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
 
-    std::set<std::string> modules;
-
-    std::vector<QString> klp_paths;
-    klp_paths.push_back (tl::to_qstring (*p));
-    klp_paths.push_back (QDir (klp_paths.back ()).filePath (tl::to_qstring (tl::arch_string ())));
+    klp_paths.push_back (*p);
+    klp_paths.push_back (tl::to_string (QDir (tl::to_qstring (klp_paths.back ())).filePath (tl::to_qstring (tl::arch_string ()))));
 
     lay::Salt salt;
     salt.add_location (tl::to_string (QDir (tl::to_qstring (*p)).filePath (QString::fromUtf8 ("salt"))));
 
-    //  Build the search path for the *.klp files. The search priority is for example:
+    //  Build the search path for the plugin locations. The search priority is for example:
     //    salt/mypackage/x86_64-linux-gcc-0.25.1
     //    salt/mypackage/x86_64-linux-gcc-0.25
     //    salt/mypackage/x86_64-linux-gcc-0
@@ -600,46 +560,24 @@ ApplicationBase::init_app ()
 
     for (lay::Salt::flat_iterator g = salt.begin_flat (); g != salt.end_flat (); ++g) {
       QDir dir = QDir (tl::to_qstring ((*g)->path ()));
-      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + lay::Version::version())));
+      klp_paths.push_back (tl::to_string (dir.filePath (tl::to_qstring (arch_string + "-" + lay::Version::version()))));
       if (vv.size () >= 2) {
-        klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + vv[0] + "." + vv[1])));
+        klp_paths.push_back (tl::to_string (dir.filePath (tl::to_qstring (arch_string + "-" + vv[0] + "." + vv[1]))));
       }
       if (vv.size () >= 1) {
-        klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + vv[0])));
+        klp_paths.push_back (tl::to_string (dir.filePath (tl::to_qstring (arch_string + "-" + vv[0]))));
       }
-      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string + "-" + tl::to_string (lay::Version::version ()))));
-      klp_paths.push_back (dir.filePath (tl::to_qstring (arch_string)));
-      klp_paths.push_back (dir.filePath (tl::to_qstring (short_arch_string)));
-      klp_paths.push_back (tl::to_qstring ((*g)->path ()));
-    }
-
-    QStringList name_filters;
-    name_filters << QString::fromUtf8 ("*.klp");
-
-    for (std::vector<QString>::const_iterator p = klp_paths.begin (); p != klp_paths.end (); ++p) {
-
-      QStringList inst_modules = QDir (*p).entryList (name_filters);
-      inst_modules.sort ();
-
-      for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
-        QFileInfo klp_file (*p, *im);
-        if (klp_file.exists () && klp_file.isReadable ()) {
-          std::string m = tl::to_string (klp_file.absoluteFilePath ());
-          std::string mn = tl::to_string (klp_file.fileName ());
-          if (modules.find (mn) == modules.end ()) {
-            try {
-              m_native_plugins.push_back (load_plugin (m));
-              modules.insert (mn);
-            } catch (tl::Exception &ex) {
-              tl::error << tl::to_string (QObject::tr ("Unable to load plugin %1: %2").arg (tl::to_qstring (m)).arg (tl::to_qstring (ex.msg ())));
-            }
-          }
-        }
-      }
-
+      klp_paths.push_back (tl::to_string (dir.filePath (tl::to_qstring (arch_string + "-" + tl::to_string (lay::Version::version ())))));
+      klp_paths.push_back (tl::to_string (dir.filePath (tl::to_qstring (arch_string))));
+      klp_paths.push_back (tl::to_string (dir.filePath (tl::to_qstring (short_arch_string))));
+      klp_paths.push_back ((*g)->path ());
     }
 
   }
+
+  //  initialize the modules (load their plugins from the paths)
+  db::init (klp_paths);
+  lay::init (klp_paths);
 
   //  initialize the GSI class system (Variant binding, Expression support)
   //  We have to do this now since plugins may register GSI classes and before the
@@ -800,7 +738,7 @@ ApplicationBase::init_app ()
   tl::Eval::set_global_var ("klayout_path", kp);
 
   //  call "autorun_early" on all plugins that wish so
-  for (std::vector <lay::PluginDescriptor>::const_iterator p = m_native_plugins.begin (); p != m_native_plugins.end (); ++p) {
+  for (std::list<lay::PluginDescriptor>::const_iterator p = lay::plugins ().begin (); p != lay::plugins ().end (); ++p) {
     if (p->autorun_early) {
       (*p->autorun_early) ();
     }
@@ -1212,7 +1150,7 @@ void
 ApplicationBase::autorun ()
 {
   //  call "autorun" on all plugins that wish so
-  for (std::vector <lay::PluginDescriptor>::const_iterator p = m_native_plugins.begin (); p != m_native_plugins.end (); ++p) {
+  for (std::list <lay::PluginDescriptor>::const_iterator p = lay::plugins ().begin (); p != lay::plugins ().end (); ++p) {
     if (p->autorun) {
       (*p->autorun) ();
     }

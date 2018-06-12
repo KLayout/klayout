@@ -25,17 +25,13 @@
 //  of the objects by using the macros provided when we build tools from common.a.
 
 #include "dbOASIS.h"
-#include "dbGDS2.h"
 #include "dbCIF.h"
 #include "dbDXF.h"
-#include "contrib/dbGDS2Text.h"
 
 namespace db
 {
 
 FORCE_LINK_OASIS
-FORCE_LINK_GDS2
-FORCE_LINK_GDS2_TXT
 FORCE_LINK_CIF
 FORCE_LINK_DXF
 

@@ -27,8 +27,6 @@ FORMS = \
   DuplicateLayerDialog.ui \
   EditStipplesForm.ui \
   FlattenInstOptionsDialog.ui \
-  GDS2ReaderOptionPage.ui \
-  GDS2WriterOptionPage.ui \
   GridNetConfigPage.ui \
   LayerMappingWidget.ui \
   LayerSourceDialog.ui \
@@ -121,8 +119,6 @@ SOURCES = \
   layFileDialog.cc \
   layFinder.cc \
   layFixedFont.cc \
-  layGDS2ReaderPlugin.cc \
-  layGDS2WriterPlugin.cc \
   layGridNet.cc \
   layHierarchyControlPanel.cc \
   layLayerControlPanel.cc \
@@ -215,8 +211,6 @@ HEADERS = \
   layFileDialog.h \
   layFinder.h \
   layFixedFont.h \
-  layGDS2ReaderPlugin.h \
-  layGDS2WriterPlugin.h \
   layGridNet.h \
   layHierarchyControlPanel.h \
   layLayerControlPanel.h \

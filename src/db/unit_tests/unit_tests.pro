@@ -26,8 +26,6 @@ SOURCES = \
   dbEdgeProcessor.cc \
   dbEdges.cc \
   dbEdgesToContours.cc \
-  dbGDS2Reader.cc \
-  dbGDS2Writer.cc \
   dbLayer.cc \
   dbLayerMapping.cc \
   dbLayout.cc \

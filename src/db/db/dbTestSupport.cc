@@ -24,8 +24,6 @@
 #include "dbStreamLayers.h"
 #include "dbReader.h"
 #include "dbWriter.h"
-#include "dbGDS2Writer.h"
-#include "dbOASISWriter.h"
 #include "dbCommonReader.h"
 #include "dbCell.h"
 #include "dbCellInst.h"
@@ -54,26 +52,19 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
   }
 
   std::string tmp_file;
+  db::SaveLayoutOptions options;
 
   if (norm == WriteGDS2) {
-
     tmp_file = _this->tmp_file (tl::sprintf ("tmp_%x.gds", hash));
-
-    tl::OutputStream stream (tmp_file.c_str ());
-    db::GDS2Writer writer;
-    db::SaveLayoutOptions options;
-    writer.write (const_cast<db::Layout &> (layout), stream, options);
-
+    options.set_format ("GDS2");
   } else {
-
     tmp_file = _this->tmp_file (tl::sprintf ("tmp_%x.oas", hash));
-
-    tl::OutputStream stream (tmp_file.c_str ());
-    db::OASISWriter writer;
-    db::SaveLayoutOptions options;
-    writer.write (const_cast<db::Layout &> (layout), stream, options);
-
+    options.set_format ("OASIS");
   }
+
+  tl::OutputStream stream (tmp_file.c_str ());
+  db::Writer writer (options);
+  writer.write (const_cast<db::Layout &> (layout), stream);
 
   const db::Layout *subject = 0;
   db::Layout layout2;

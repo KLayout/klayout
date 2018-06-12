@@ -62,24 +62,6 @@ class ProgressReporter;
 class ProgressBar;
 
 /**
- *  @brief A tiny struct describing a native plugin
- */
-struct PluginDescriptor
-{
-  typedef void (*runner_func_t) ();
-
-  runner_func_t autorun;
-  runner_func_t autorun_early;
-  std::string version;
-  std::string path;
-  std::string description;
-
-  PluginDescriptor ()
-    : autorun (0), autorun_early (0)
-  { }
-};
-
-/**
  *  @brief The application base class
  *
  *  This is the basic functionality for the application class.
@@ -317,14 +299,6 @@ public:
   }
 
   /**
-   *  @brief Gets the native plugin descriptors
-   */
-  const std::vector<PluginDescriptor> &native_plugins () const
-  {
-    return m_native_plugins;
-  }
-
-  /**
    *  @brief Parses the given command line arguments and configures the application object accordingly.
    */
   void parse_cmd (int &argc, char **argv);
@@ -395,7 +369,6 @@ private:
   //  in order to maintain a valid MainWindow reference for ruby scripts and Ruby's GC all the time.
   gsi::Interpreter *mp_ruby_interpreter;
   gsi::Interpreter *mp_python_interpreter;
-  std::vector<PluginDescriptor> m_native_plugins;
 };
 
 /**

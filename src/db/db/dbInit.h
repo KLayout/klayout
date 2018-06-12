@@ -21,11 +21,44 @@
 */
 
 
-#ifndef HDR_dbGDS2Text
-#define HDR_dbGDS2Text
+#ifndef HDR_dbInit
+#define HDR_dbInit
 
-//  place this macro to force linking of GDS2Text plugin
-#define FORCE_LINK_GDS2_TXT void force_link_GDS2Text_f () { extern int force_link_GDS2Text; force_link_GDS2Text = 0; }
+#include "dbCommon.h"
+
+#include <string>
+#include <list>
+#include <vector>
+
+namespace db
+{
+
+/**
+ *  @brief A tiny structure describing a db plugin
+ */
+struct PluginDescriptor
+{
+  std::string version;
+  std::string path;
+  std::string description;
+
+  PluginDescriptor ()
+  { }
+};
+
+/**
+ *  @brief The main initialization function for the "db" module
+ *  This function needs to be called initially by all code using the db
+ *  module. It will load the plugins and perform initialization of all
+ *  of them.
+ */
+DB_PUBLIC void init (const std::vector<std::string> &paths = std::vector<std::string> ());
+
+/**
+ *  @brief Gets a list of all plugins registered
+ */
+DB_PUBLIC const std::list<db::PluginDescriptor> &plugins ();
+
+}
 
 #endif
-

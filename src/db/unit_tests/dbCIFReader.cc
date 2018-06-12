@@ -25,7 +25,6 @@
 #include "dbLayoutDiff.h"
 #include "dbWriter.h"
 #include "dbCIFWriter.h"
-#include "dbGDS2Writer.h"
 #include "tlUnitTest.h"
 
 #include <QDir>
@@ -81,9 +80,10 @@ static void run_test (tl::TestBase *_this, const std::string &base, const char *
 
   {
     tl::OutputStream stream (tmp_gds_file);
-    db::GDS2Writer writer;
     db::SaveLayoutOptions options;
-    writer.write (layout, stream, options);
+    options.set_format ("GDS2");
+    db::Writer writer (options);
+    writer.write (layout, stream);
   }
 
   {

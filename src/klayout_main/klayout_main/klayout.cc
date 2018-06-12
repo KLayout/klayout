@@ -235,6 +235,7 @@ klayout_main_cont (int &argc, char **argv)
 
   try {
 
+    //  initialize the Python interpreter
     pya::PythonInterpreter::initialize ();
 
     //  this registers the gsi definitions
@@ -259,7 +260,10 @@ klayout_main_cont (int &argc, char **argv)
       lay::enable_signal_handler_gui (true);
     }
 
+    //  configures the application with the command line arguments
     app->parse_cmd (argc, argv);
+
+    //  initialize the application
     app->init_app ();
 
     /* TODO: this kills valgrind

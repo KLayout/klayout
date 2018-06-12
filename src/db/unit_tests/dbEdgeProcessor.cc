@@ -29,9 +29,9 @@
 #include "dbReader.h"
 #include "dbCommonReader.h"
 #include "dbLayoutDiff.h"
-#include "dbGDS2Writer.h"
-#include "dbGDS2Writer.h"
 #include "dbTestSupport.h"
+#include "dbSaveLayoutOptions.h"
+#include "dbWriter.h"
 #include "tlStream.h"
 #include "tlTimer.h"
 
@@ -616,9 +616,11 @@ void write (const std::vector<db::Polygon> &q1, const std::vector<db::Polygon> &
     cell->shapes (lb).insert (*p);
   }
 
-  db::GDS2Writer writer;
+  db::SaveLayoutOptions options;
+  options.set_format ("GDS2");
+  db::Writer writer (options);
   tl::OutputStream stream (fn); 
-  writer.write (out, stream, db::SaveLayoutOptions ());
+  writer.write (out, stream);
   printf ("%s written.\n", fn.c_str ());
 }
 

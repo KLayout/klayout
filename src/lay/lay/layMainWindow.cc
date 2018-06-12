@@ -58,6 +58,7 @@
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
 #include "dbStatic.h"
+#include "dbInit.h"
 #include "edtConfig.h"
 #include "laySession.h"
 #include "layApplication.h"
@@ -91,6 +92,7 @@
 #include "layLayoutPropertiesForm.h"
 #include "layLayoutStatisticsForm.h"
 #include "layMacroController.h"
+#include "layInit.h"
 #include "antObject.h"
 #include "antService.h"
 #include "ui_HelpAboutDialog.h"
@@ -5658,12 +5660,14 @@ HelpAboutDialog::HelpAboutDialog (QWidget *parent)
     s += "</ul>";
   }
 
-  if (! lay::ApplicationBase::instance ()->native_plugins ().empty ()) {
+  if (! lay::plugins ().empty () || ! db::plugins ().empty ()) {
+
     s += "<p>";
     s += "<h4>";
     s += escape_xml (tl::to_string (QObject::tr ("Binary extensions:")));
     s += "</h4><ul>";
-    for (std::vector<lay::PluginDescriptor>::const_iterator pd = lay::ApplicationBase::instance ()->native_plugins ().begin (); pd != lay::ApplicationBase::instance ()->native_plugins ().end (); ++pd) {
+
+    for (std::list<lay::PluginDescriptor>::const_iterator pd = lay::plugins ().begin (); pd != lay::plugins ().end (); ++pd) {
       s += "<li>";
       if (! pd->description.empty ()) {
         s += escape_xml (pd->description);
@@ -5675,7 +5679,22 @@ HelpAboutDialog::HelpAboutDialog (QWidget *parent)
       }
       s += "</li>";
     }
+
+    for (std::list<db::PluginDescriptor>::const_iterator pd = db::plugins ().begin (); pd != db::plugins ().end (); ++pd) {
+      s += "<li>";
+      if (! pd->description.empty ()) {
+        s += escape_xml (pd->description);
+      } else {
+        s += escape_xml (pd->path);
+      }
+      if (! pd->version.empty ()) {
+        s += " (" + escape_xml (pd->version) + ")";
+      }
+      s += "</li>";
+    }
+
     s += "</ul>";
+
   }
 
   s += "</body></html>";

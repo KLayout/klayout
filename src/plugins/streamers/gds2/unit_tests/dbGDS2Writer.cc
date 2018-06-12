@@ -49,10 +49,11 @@ void run_test (tl::TestBase *_this, const char *file, const char *file_ref, bool
 
   {
     tl::OutputStream stream (tmp_file);
-    db::GDS2Writer writer;
     db::SaveLayoutOptions options;
+    options.set_format ("GDS2");
     options.set_options (new db::GDS2WriterOptions (opt));
-    writer.write (layout_org, stream, options);
+    db::Writer writer (options);
+    writer.write (layout_org, stream);
   }
 
   db::Layout layout_read (&m);
@@ -108,13 +109,13 @@ TEST(2)
 
   {
     tl::OutputStream stream (tmp_file);
-    db::GDS2Writer writer;
     db::SaveLayoutOptions options;
     db::GDS2WriterOptions *opt = new db::GDS2WriterOptions ();
     opt->multi_xy_records = true;
     options.set_options (opt);
     options.set_format (opt->format_name ());
-    writer.write (layout_org, stream, options);
+    db::Writer writer (options);
+    writer.write (layout_org, stream);
   }
 
   db::Layout layout_read (&m);
@@ -145,13 +146,13 @@ TEST(3)
 
   {
     tl::OutputStream stream (tmp_file);
-    db::GDS2Writer writer;
     db::SaveLayoutOptions options;
     db::GDS2WriterOptions *opt = new db::GDS2WriterOptions ();
     opt->max_vertex_count = 4;
     options.set_options (opt);
     options.set_format (opt->format_name ());
-    writer.write (layout_org, stream, options);
+    db::Writer writer (options);
+    writer.write (layout_org, stream);
   }
 
   db::Layout layout_read (&m);
@@ -211,9 +212,9 @@ TEST(4)
 
   {
     tl::OutputStream stream (tmp_file);
-    db::GDS2Writer writer;
     db::SaveLayoutOptions options;
-    writer.write (layout_org, stream, options);
+    db::Writer writer (options);
+    writer.write (layout_org, stream);
   }
 
   db::Layout layout_read (&m);

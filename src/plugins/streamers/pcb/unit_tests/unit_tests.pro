@@ -6,6 +6,7 @@ TARGET = pcb_tests
 include($$PWD/../../../../lib_ut.pri)
 
 SOURCES = \
+  extGerberImport.cc \
 
 INCLUDEPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin
 DEPENDPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin

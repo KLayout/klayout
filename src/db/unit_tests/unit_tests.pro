@@ -15,9 +15,7 @@ SOURCES = \
   dbCellGraphUtils.cc \
   dbCellHullGenerator.cc \
   dbCellMapping.cc \
-  dbCIFReader.cc \
   dbClip.cc \
-  dbDXFReader.cc \
   dbExpression.cc \
   dbEdge.cc \
   dbEdgePair.cc \
@@ -34,9 +32,6 @@ SOURCES = \
   dbLayoutQuery.cc \
   dbLibraries.cc \
   dbMatrix.cc \
-  dbOASISReader.cc \
-  dbOASISWriter2.cc \
-  dbOASISWriter.cc \
   dbObject.cc \
   dbPath.cc \
   dbPCells.cc \

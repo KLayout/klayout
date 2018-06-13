@@ -17,15 +17,9 @@ SOURCES = \
   dbCellHullGenerator.cc \
   dbCellInst.cc \
   dbCellMapping.cc \
-  dbCIF.cc \
-  dbCIFReader.cc \
-  dbCIFWriter.cc \
   dbClipboard.cc \
   dbClipboardData.cc \
   dbClip.cc \
-  dbDXF.cc \
-  dbDXFReader.cc \
-  dbDXFWriter.cc \
   dbEdge.cc \
   dbEdgePair.cc \
   dbEdgePairRelations.cc \
@@ -33,7 +27,6 @@ SOURCES = \
   dbEdgeProcessor.cc \
   dbEdges.cc \
   dbFillTool.cc \
-  dbForceLinkStreams.cc \
   dbFuzzyCellMapping.cc \
   dbGlyphs.cc \
   dbHershey.cc \
@@ -54,9 +47,6 @@ SOURCES = \
   dbManager.cc \
   dbMatrix.cc \
   dbMemStatistics.cc \
-  dbOASIS.cc \
-  dbOASISReader.cc \
-  dbOASISWriter.cc \
   dbObject.cc \
   dbPath.cc \
   dbPCellDeclaration.cc \
@@ -138,15 +128,9 @@ HEADERS = \
   dbCellHullGenerator.h \
   dbCellInst.h \
   dbCellMapping.h \
-  dbCIF.h \
-  dbCIFReader.h \
-  dbCIFWriter.h \
   dbClipboardData.h \
   dbClipboard.h \
   dbClip.h \
-  dbDXF.h \
-  dbDXFReader.h \
-  dbDXFWriter.h \
   dbEdge.h \
   dbEdgePair.h \
   dbEdgePairRelations.h \
@@ -177,9 +161,6 @@ HEADERS = \
   dbMatrix.h \
   dbMemStatistics.h \
   dbMetaInfo.h \
-  dbOASIS.h \
-  dbOASISReader.h \
-  dbOASISWriter.h \
   dbObject.h \
   dbObjectTag.h \
   dbObjectWithProperties.h \

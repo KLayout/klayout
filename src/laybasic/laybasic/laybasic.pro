@@ -15,14 +15,10 @@ FORMS = \
   BrowserPanel.ui \
   BrowseShapesConfigPage.ui \
   BrowseShapesForm.ui \
-  CIFReaderOptionPage.ui \
-  CIFWriterOptionPage.ui \
   CellSelectionForm.ui \
   ClearLayerModeDialog.ui \
   ConfigurationDialog.ui \
   CopyCellModeDialog.ui \
-  DXFReaderOptionPage.ui \
-  DXFWriterOptionPage.ui \
   DeleteCellModeDialog.ui \
   DuplicateLayerDialog.ui \
   EditStipplesForm.ui \
@@ -56,7 +52,6 @@ FORMS = \
   NewCellPropertiesDialog.ui \
   NewLayerPropertiesDialog.ui \
   NewLayoutPropertiesDialog.ui \
-  OASISWriterOptionPage.ui \
   OpenLayoutModeDialog.ui \
   PropertiesDialog.ui \
   RenameCellDialog.ui \
@@ -101,8 +96,6 @@ SOURCES = \
   layCellSelectionForm.cc \
   layCellTreeModel.cc \
   layCellView.cc \
-  layCIFReaderPlugin.cc \
-  layCIFWriterPlugin.cc \
   layColorPalette.cc \
   layConfigurationDialog.cc \
   layConverters.cc \
@@ -111,8 +104,6 @@ SOURCES = \
   layDisplayState.cc \
   layDitherPattern.cc \
   layDrawing.cc \
-  layDXFReaderPlugin.cc \
-  layDXFWriterPlugin.cc \
   layEditable.cc \
   layEditStipplesForm.cc \
   layEditStippleWidget.cc \
@@ -134,7 +125,6 @@ SOURCES = \
   layMarker.cc \
   layMouseTracker.cc \
   layMove.cc \
-  layOASISWriterPlugin.cc \
   layObjectInstPath.cc \
   layParsedLayerSource.cc \
   layPlugin.cc \
@@ -164,7 +154,6 @@ SOURCES = \
   rdbMarkerBrowser.cc \
   rdbMarkerBrowserDialog.cc \
   rdbMarkerBrowserPage.cc \
-  layOASISReaderPlugin.cc \
   layCommonReaderPlugin.cc \
   layLineStyles.cc \
   laySelectLineStyleForm.cc \
@@ -193,8 +182,6 @@ HEADERS = \
   layCellSelectionForm.h \
   layCellTreeModel.h \
   layCellView.h \
-  layCIFReaderPlugin.h \
-  layCIFWriterPlugin.h \
   layColorPalette.h \
   layConfigurationDialog.h \
   layConverters.h \
@@ -203,8 +190,6 @@ HEADERS = \
   layDisplayState.h \
   layDitherPattern.h \
   layDrawing.h \
-  layDXFReaderPlugin.h \
-  layDXFWriterPlugin.h \
   layEditable.h \
   layEditStipplesForm.h \
   layEditStippleWidget.h \
@@ -226,7 +211,6 @@ HEADERS = \
   layMarker.h \
   layMouseTracker.h \
   layMove.h \
-  layOASISWriterPlugin.h \
   layObjectInstPath.h \
   layParsedLayerSource.h \
   layPlugin.h \
@@ -256,7 +240,6 @@ HEADERS = \
   rdbMarkerBrowserDialog.h \
   rdbMarkerBrowser.h \
   rdbMarkerBrowserPage.h \
-  layOASISReaderPlugin.h \
   layCommonReaderPlugin.h \
   layLineStyles.h \
   laySelectLineStyleForm.h \

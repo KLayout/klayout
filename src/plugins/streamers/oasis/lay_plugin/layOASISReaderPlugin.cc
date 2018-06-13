@@ -21,13 +21,11 @@
 */
 
 
-
 #include "dbOASIS.h"
 #include "dbOASISReader.h"
 #include "dbLoadLayoutOptions.h"
 #include "layOASISReaderPlugin.h"
 #include "layStream.h"
-#include "gsiDecl.h"
 
 #include <QFrame>
 

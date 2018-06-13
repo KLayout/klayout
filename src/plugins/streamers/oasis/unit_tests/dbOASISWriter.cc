@@ -264,7 +264,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
 
     {
       tl::OutputStream stream (tmp1_file);
-      db::SaveLayoutOptions gds2_options;
+      db::SaveLayoutOptions gds2_options = options;
       gds2_options.set_format ("GDS2");
       db::Writer writer (gds2_options);
       writer.write (layout, stream);

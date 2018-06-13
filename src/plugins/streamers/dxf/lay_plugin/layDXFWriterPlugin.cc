@@ -20,13 +20,11 @@
 
 */
 
-
 #include "dbDXF.h"
 #include "dbDXFWriter.h"
 #include "dbSaveLayoutOptions.h"
 #include "layDXFWriterPlugin.h"
 #include "ui_DXFWriterOptionPage.h"
-#include "gsiDecl.h"
 
 #include <QFrame>
 
@@ -74,7 +72,7 @@ class DXFWriterPluginDeclaration
   : public StreamWriterPluginDeclaration
 {
 public:
-  DXFWriterPluginDeclaration () 
+  DXFWriterPluginDeclaration ()
     : StreamWriterPluginDeclaration (db::DXFWriterOptions ().format_name ())
   {
     // .. nothing yet ..
@@ -100,44 +98,5 @@ public:
 
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::DXFWriterPluginDeclaration (), 10000, "DXFWriter");
 
-// ---------------------------------------------------------------
-//  gsi Implementation of specific methods
-
-static void set_dxf_polygon_mode (db::SaveLayoutOptions *options, int mode)
-{
-  if (mode < 0 || mode > 3) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid polygon mode")));
-  }
-
-  options->get_options<db::DXFWriterOptions> ().polygon_mode = mode;
 }
-
-static int get_dxf_polygon_mode (const db::SaveLayoutOptions *options)
-{
-  return options->get_options<db::DXFWriterOptions> ().polygon_mode;
-}
-
-//  extend lay::SaveLayoutOptions with the DXF options 
-static
-gsi::ClassExt<db::SaveLayoutOptions> dxf_writer_options (
-  gsi::method_ext ("dxf_polygon_mode=", &set_dxf_polygon_mode,
-    "@brief Specifies how to write polygons.\n"
-    "@args mode\n"
-    "The mode is 0 (write POLYLINE entities), 1 (write LWPOLYLINE entities), 2 (decompose into SOLID entities) or "
-    "or 3 (write HATCH entities).\n"
-    "\nThis property has been added in version 0.21.3.\n"
-  ) +
-  gsi::method_ext ("dxf_polygon_mode", &get_dxf_polygon_mode,
-    "@brief Specifies how to write polygons.\n"
-    "See \\dxf_polygon_mode= for a description of this property.\n"
-    "\nThis property has been added in version 0.21.3.\n"
-  ),
-  ""
-);
-
-}
-
-
-
-
 

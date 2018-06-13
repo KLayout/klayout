@@ -37,6 +37,9 @@ LIBS += -L$$DESTDIR -lklayout_tl -lklayout_db -lklayout_gsi -lklayout_lib -lklay
 
 PLUGINPATH += \
   $$PWD/../../../plugins/streamers/gds2/db_plugin \
+  $$PWD/../../../plugins/streamers/cif/db_plugin \
+  $$PWD/../../../plugins/streamers/oasis/db_plugin \
+  $$PWD/../../../plugins/streamers/dxf/db_plugin \
 
 INCLUDEPATH += $$PLUGINPATH
 DEPENDPATH += $$PLUGINPATH

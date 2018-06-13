@@ -26,7 +26,6 @@
 #include "dbSaveLayoutOptions.h"
 #include "layCIFWriterPlugin.h"
 #include "ui_CIFWriterOptionPage.h"
-#include "gsiDecl.h"
 
 #include <QFrame>
 
@@ -104,60 +103,6 @@ public:
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::CIFWriterPluginDeclaration (), 10000, "CIFWriter");
-
-// ---------------------------------------------------------------
-//  gsi Implementation of specific methods
-
-static void set_cif_dummy_calls (db::SaveLayoutOptions *options, bool f)
-{
-  options->get_options<db::CIFWriterOptions> ().dummy_calls = f;
-}
-
-static bool get_cif_dummy_calls (const db::SaveLayoutOptions *options)
-{
-  return options->get_options<db::CIFWriterOptions> ().dummy_calls;
-}
-
-static void set_cif_blank_separator (db::SaveLayoutOptions *options, bool f)
-{
-  options->get_options<db::CIFWriterOptions> ().blank_separator = f;
-}
-
-static bool get_cif_blank_separator (const db::SaveLayoutOptions *options)
-{
-  return options->get_options<db::CIFWriterOptions> ().blank_separator;
-}
-
-//  extend lay::SaveLayoutOptions with the GDS2 options 
-static
-gsi::ClassExt<db::SaveLayoutOptions> cif_writer_options (
-  gsi::method_ext ("cif_dummy_calls=", &set_cif_dummy_calls,
-    "@brief Sets a flag indicating whether dummy calls shall be written\n"
-    "If this property is set to true, dummy calls will be written in the top level entity "
-    "of the CIF file calling every top cell.\n"
-    "This option is useful for enhanced compatibility with other tools.\n"
-    "\nThis property has been added in version 0.23.10.\n"
-  ) +
-  gsi::method_ext ("cif_dummy_calls?|#cif_dummy_calls", &get_cif_dummy_calls,
-    "@brief Gets a flag indicating whether dummy calls shall be written\n"
-    "See \\cif_dummy_calls= method for a description of that property."
-    "\nThis property has been added in version 0.23.10.\n"
-    "\nThe predicate version (cif_blank_separator?) has been added in version 0.25.1.\n"
-  ) +
-  gsi::method_ext ("cif_blank_separator=", &set_cif_blank_separator,
-    "@brief Sets a flag indicating whether blanks shall be used as x/y separator characters\n"
-    "If this property is set to true, the x and y coordinates are separated with blank characters "
-    "rather than comma characters."
-    "\nThis property has been added in version 0.23.10.\n"
-  ) +
-  gsi::method_ext ("cif_blank_separator?|#cif_blank_separator", &get_cif_blank_separator,
-    "@brief Gets a flag indicating whether blanks shall be used as x/y separator characters\n"
-    "See \\cif_blank_separator= method for a description of that property."
-    "\nThis property has been added in version 0.23.10.\n"
-    "\nThe predicate version (cif_blank_separator?) has been added in version 0.25.1.\n"
-  ),
-  ""
-);
 
 }
 

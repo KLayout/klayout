@@ -24,7 +24,6 @@
 #include "extGerberImporter.h"
 #include "extGerberDrillFileReader.h"
 #include "extRS274XReader.h"
-#include "layLayoutView.h"
 #include "tlStream.h"
 #include "tlString.h"
 #include "tlString.h"

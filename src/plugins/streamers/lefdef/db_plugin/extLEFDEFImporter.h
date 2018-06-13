@@ -24,13 +24,12 @@
 #ifndef HDR_extLEFDEFImporter
 #define HDR_extLEFDEFImporter
 
-#include "extCommon.h"
+#include "dbCommon.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbStreamLayers.h"
 #include "tlStream.h"
 #include "tlVariant.h"
-#include "layTechnology.h"
 
 #include <vector>
 #include <string>
@@ -47,7 +46,7 @@ namespace ext
 /**
  *  @brief Generic base class of DXF reader exceptions
  */
-class EXT_PUBLIC LEFDEFReaderException
+class DB_PUBLIC LEFDEFReaderException
   : public db::ReaderException
 {
 public:
@@ -61,7 +60,7 @@ public:
  *
  *  This component provides technology specific information for the LEF/DEF importer.
  */
-class EXT_PUBLIC LEFDEFReaderOptions
+class DB_PUBLIC LEFDEFReaderOptions
   : public db::FormatSpecificReaderOptions
 {
 public:
@@ -472,7 +471,7 @@ enum LayerPurpose
  *
  *  This class will handle the creation and management of layers in the LEF/DEF reader context
  */
-class EXT_PUBLIC LEFDEFLayerDelegate
+class DB_PUBLIC LEFDEFLayerDelegate
 {
 public:
   /**
@@ -537,7 +536,7 @@ private:
 /**
  *  @brief The LEF importer object
  */
-class EXT_PUBLIC LEFDEFImporter
+class DB_PUBLIC LEFDEFImporter
 {
 public:
   /**

@@ -38,6 +38,7 @@
 #include <QProxyStyle>
 #include <QPainter>
 #include <QPen>
+#include <QVBoxLayout>
 
 #include "dbClipboard.h"
 #include "dbClipboardData.h"

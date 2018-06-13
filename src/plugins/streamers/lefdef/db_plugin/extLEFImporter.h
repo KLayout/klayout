@@ -27,11 +27,11 @@
 
 #include "extLEFDEFImporter.h"
 
+#include "dbCommon.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbStreamLayers.h"
 #include "tlStream.h"
-#include "layTechnology.h"
 
 #include <vector>
 #include <string>
@@ -43,7 +43,7 @@ namespace ext
 /**
  *  @brief The LEF importer object
  */
-class EXT_PUBLIC LEFImporter
+class DB_PUBLIC LEFImporter
   : public LEFDEFImporter
 {
 public:

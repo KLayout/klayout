@@ -31,6 +31,9 @@
 #include "tlClassRegistry.h"
 #include "tlExceptions.h"
 
+#include "ui_LoadLayoutOptionsDialog.h"
+#include "ui_SpecificLoadLayoutOptionsDialog.h"
+
 #include <QScrollArea>
 #include <QLabel>
 #include <QPushButton>
@@ -41,17 +44,18 @@ namespace lay
 {
 
 LoadLayoutOptionsDialog::LoadLayoutOptionsDialog (QWidget *parent, const std::string &title)
-  : QDialog (parent), Ui::LoadLayoutOptionsDialog (),
+  : QDialog (parent),
     m_show_always (false), m_technology_index (-1)
 {
   setObjectName (QString::fromUtf8 ("load_layout_options_dialog"));
 
-  Ui::LoadLayoutOptionsDialog::setupUi (this);
+  mp_ui = new Ui::LoadLayoutOptionsDialog ();
+  mp_ui->setupUi (this);
 
   setWindowTitle (tl::to_qstring (title));
 
-  while (options_tab->count () > 0) {
-    options_tab->removeTab (0);
+  while (mp_ui->options_tab->count () > 0) {
+    mp_ui->options_tab->removeTab (0);
   }
 
   bool any_option = false;
@@ -63,17 +67,17 @@ LoadLayoutOptionsDialog::LoadLayoutOptionsDialog (QWidget *parent, const std::st
     //  obtain the config page from the plugin which we identify by format name
     const StreamReaderPluginDeclaration *decl = StreamReaderPluginDeclaration::plugin_for_format (fmt->format_name ());
 
-    QScrollArea *page_host = new QScrollArea (options_tab);
+    QScrollArea *page_host = new QScrollArea (mp_ui->options_tab);
     page_host->setFrameStyle (QFrame::NoFrame);
     page_host->setWidgetResizable (true);
 
-    page = decl ? decl->format_specific_options_page (options_tab) : 0;
+    page = decl ? decl->format_specific_options_page (mp_ui->options_tab) : 0;
     if (page) {
       page_host->setWidget (page);
     } else {
 #if 0
       //  Show an empty page
-      QLabel *empty = new QLabel (options_tab);
+      QLabel *empty = new QLabel (mp_ui->options_tab);
       empty->setAlignment (Qt::AlignCenter);
       empty->setText (QObject::tr ("No specific options available for this format"));
       page_host->setWidget (empty);
@@ -85,7 +89,7 @@ LoadLayoutOptionsDialog::LoadLayoutOptionsDialog (QWidget *parent, const std::st
     }
 
     if (page_host) {
-      options_tab->addTab (page_host, tl::to_qstring (fmt->format_desc ()));
+      mp_ui->options_tab->addTab (page_host, tl::to_qstring (fmt->format_desc ()));
       m_pages.push_back (std::make_pair (page, fmt->format_name ()));
       any_option = true;
     }
@@ -93,23 +97,24 @@ LoadLayoutOptionsDialog::LoadLayoutOptionsDialog (QWidget *parent, const std::st
   }
 
   if (! any_option) {
-    options_tab->hide ();
+    mp_ui->options_tab->hide ();
   }
 
-  connect (buttonBox, SIGNAL (accepted ()), this, SLOT (ok_button_pressed ()));
-  connect (buttonBox, SIGNAL (clicked (QAbstractButton *)), this, SLOT (button_pressed (QAbstractButton *)));
-  connect (tech_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (current_tech_changed (int)));
+  connect (mp_ui->buttonBox, SIGNAL (accepted ()), this, SLOT (ok_button_pressed ()));
+  connect (mp_ui->buttonBox, SIGNAL (clicked (QAbstractButton *)), this, SLOT (button_pressed (QAbstractButton *)));
+  connect (mp_ui->tech_cbx, SIGNAL (currentIndexChanged (int)), this, SLOT (current_tech_changed (int)));
 }
 
 LoadLayoutOptionsDialog::~LoadLayoutOptionsDialog ()
 {
-  // .. nothing yet ..
+  delete mp_ui;
+  mp_ui = 0;
 }
 
 void 
 LoadLayoutOptionsDialog::button_pressed (QAbstractButton *button)
 {
-  if (button == buttonBox->button (QDialogButtonBox::Reset)) {
+  if (button == mp_ui->buttonBox->button (QDialogButtonBox::Reset)) {
     reset_button_pressed ();
   }
 }
@@ -182,7 +187,7 @@ LoadLayoutOptionsDialog::update ()
   }
 
   const lay::Technology *tech = m_tech_array [m_technology_index];
-  options_tab->setEnabled (tech && tech->is_persisted ());
+  mp_ui->options_tab->setEnabled (tech && tech->is_persisted ());
 
   for (std::vector< std::pair<StreamReaderOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
     if (page->first) {
@@ -205,11 +210,11 @@ LoadLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
   } catch (...) {
     m_show_always = false;
   }
-  always_cbx->setChecked (m_show_always);
-  always_cbx->show ();
+  mp_ui->always_cbx->setChecked (m_show_always);
+  mp_ui->always_cbx->show ();
 
-  tech_cbx->blockSignals (true);
-  tech_cbx->clear ();
+  mp_ui->tech_cbx->blockSignals (true);
+  mp_ui->tech_cbx->clear ();
 
   unsigned int i = 0;
   m_technology_index = -1;
@@ -225,16 +230,16 @@ LoadLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
     m_opt_array.push_back (t->load_layout_options ());
     m_tech_array.push_back (t.operator-> ());
 
-    tech_cbx->addItem (tl::to_qstring (d));
+    mp_ui->tech_cbx->addItem (tl::to_qstring (d));
     if (t->name () == technology) {
-      tech_cbx->setCurrentIndex (i);
+      mp_ui->tech_cbx->setCurrentIndex (i);
       m_technology_index = i;
     }
 
   }
 
-  tech_cbx->blockSignals (false);
-  tech_cbx->show ();
+  mp_ui->tech_cbx->blockSignals (false);
+  mp_ui->tech_cbx->show ();
 
   if (get_options_internal ()) {
 
@@ -246,7 +251,7 @@ LoadLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
     }
     config_root->config_set (cfg_initial_technology, technology);
 
-    m_show_always = always_cbx->isChecked ();
+    m_show_always = mp_ui->always_cbx->isChecked ();
     config_root->config_set (cfg_reader_options_show_always, tl::to_string (m_show_always));
 
     i = 0;
@@ -266,8 +271,8 @@ LoadLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
 bool 
 LoadLayoutOptionsDialog::get_options (db::LoadLayoutOptions &options)
 {
-  tech_cbx->hide ();
-  always_cbx->hide ();
+  mp_ui->tech_cbx->hide ();
+  mp_ui->always_cbx->hide ();
 
   m_opt_array.clear ();
   m_opt_array.push_back (options);
@@ -304,7 +309,8 @@ SpecificLoadLayoutOptionsDialog::SpecificLoadLayoutOptionsDialog (QWidget *paren
 {
   setObjectName (QString::fromUtf8 ("specific_load_layout_options_dialog"));
 
-  Ui::SpecificLoadLayoutOptionsDialog::setupUi (this);
+  mp_ui = new Ui::SpecificLoadLayoutOptionsDialog ();
+  mp_ui->setupUi (this);
 
   setWindowTitle (tl::to_qstring (tl::to_string (QObject::tr ("Edit Reader Options")) + " - " + format_name));
 
@@ -314,13 +320,13 @@ SpecificLoadLayoutOptionsDialog::SpecificLoadLayoutOptionsDialog (QWidget *paren
 
     mp_specific_options = specific_options->clone ();
 
-    mp_editor = decl->format_specific_options_page (content_frame);
+    mp_editor = decl->format_specific_options_page (mp_ui->content_frame);
     if (mp_editor) {
 
-      QVBoxLayout *layout = new QVBoxLayout (content_frame);
+      QVBoxLayout *layout = new QVBoxLayout (mp_ui->content_frame);
       layout->addWidget (mp_editor);
       layout->setMargin (0);
-      content_frame->setLayout (layout);
+      mp_ui->content_frame->setLayout (layout);
 
       mp_editor->show ();
       mp_editor->setup (specific_options, 0);
@@ -331,6 +337,9 @@ SpecificLoadLayoutOptionsDialog::SpecificLoadLayoutOptionsDialog (QWidget *paren
 
 SpecificLoadLayoutOptionsDialog::~SpecificLoadLayoutOptionsDialog ()
 {
+  delete mp_ui;
+  mp_ui = 0;
+
   delete mp_specific_options;
   mp_specific_options = 0;
 }

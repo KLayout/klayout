@@ -23,7 +23,6 @@
 
 #include "dbLayoutDiff.h"
 #include "dbWriter.h"
-#include "dbOASISWriter.h"
 #include "dbLoadLayoutOptions.h"
 #include "dbReader.h"
 #include "dbTestSupport.h"

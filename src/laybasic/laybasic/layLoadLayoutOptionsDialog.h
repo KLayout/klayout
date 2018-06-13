@@ -25,20 +25,26 @@
 #ifndef HDR_layLoadLayoutOptionsDialog
 #define HDR_layLoadLayoutOptionsDialog
 
-#include "ui_LoadLayoutOptionsDialog.h"
-#include "ui_SpecificLoadLayoutOptionsDialog.h"
 #include "dbStream.h"
 #include "dbLayout.h"
 #include "layStream.h"
 
 #include <string>
+#include <QDialog>
 
 class QScrollArea;
 class QWidget;
+class QAbstractButton;
 
 namespace db
 {
   class LoadLayoutOptions;
+}
+
+namespace Ui
+{
+  class LoadLayoutOptionsDialog;
+  class SpecificLoadLayoutOptionsDialog;
 }
 
 namespace lay
@@ -50,7 +56,7 @@ class FileDialog;
 class Technologies;
 
 class LAYBASIC_PUBLIC LoadLayoutOptionsDialog
-  : public QDialog, private Ui::LoadLayoutOptionsDialog
+  : public QDialog
 {
   Q_OBJECT 
 
@@ -78,6 +84,7 @@ public slots:
   void current_tech_changed (int index);
 
 private:
+  Ui::LoadLayoutOptionsDialog *mp_ui;
   std::vector< std::pair<StreamReaderOptionsPage *, std::string> > m_pages;
   bool m_show_always;
   int m_technology_index;
@@ -90,8 +97,7 @@ private:
 };
 
 class LAYBASIC_PUBLIC SpecificLoadLayoutOptionsDialog
-  : public QDialog,
-    private Ui::SpecificLoadLayoutOptionsDialog
+  : public QDialog
 {
 public:
   SpecificLoadLayoutOptionsDialog (QWidget *parent, db::LoadLayoutOptions *options, const std::string &format_name);
@@ -101,6 +107,7 @@ protected:
   void accept ();
 
 private:
+  Ui::SpecificLoadLayoutOptionsDialog *mp_ui;
   std::string m_format_name;
   db::LoadLayoutOptions *mp_options;
   db::FormatSpecificReaderOptions *mp_specific_options;

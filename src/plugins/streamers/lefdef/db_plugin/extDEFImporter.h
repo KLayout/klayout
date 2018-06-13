@@ -25,6 +25,7 @@
 #ifndef HDR_extDEFImporter
 #define HDR_extDEFImporter
 
+#include "dbCommon.h"
 #include "dbLayout.h"
 #include "tlStream.h"
 #include "extLEFImporter.h"
@@ -38,7 +39,7 @@ namespace ext
 /**
  *  @brief The DEF importer object
  */
-class EXT_PUBLIC DEFImporter
+class DB_PUBLIC DEFImporter
   : public LEFDEFImporter 
 {
 public:

@@ -22,7 +22,6 @@
 
 
 #include "extLEFDEFImporter.h"
-#include "extLEFDEFImportDialogs.h"
 
 #include "tlStream.h"
 #include "tlProgress.h"

@@ -24,32 +24,40 @@
 #ifndef HDR_layDialogs
 #define HDR_layDialogs
 
-#include "ui_LayerSourceDialog.h"
-#include "ui_NewLayoutPropertiesDialog.h"
-#include "ui_NewLayerPropertiesDialog.h"
-#include "ui_NewCellPropertiesDialog.h"
-#include "ui_MoveOptionsDialog.h"
-#include "ui_MoveToOptionsDialog.h"
-#include "ui_DeleteCellModeDialog.h"
-#include "ui_CopyCellModeDialog.h"
-#include "ui_ReplaceCellOptionsDialog.h"
-#include "ui_ClearLayerModeDialog.h"
-#include "ui_OpenLayoutModeDialog.h"
-#include "ui_RenameCellDialog.h"
-#include "ui_DuplicateLayerDialog.h"
-#include "ui_AlignCellOptionsDialog.h"
-#include "ui_FlattenInstOptionsDialog.h"
-#include "ui_UserPropertiesForm.h"
-#include "ui_UserPropertiesEditForm.h"
-
 #include "dbPoint.h"
 #include "dbVector.h"
 #include "dbTypes.h"
 #include "laybasicCommon.h"
 
+#include <QDialog>
+
+class QTreeWidgetItem;
+
 namespace db
 {
   class Layout;
+  struct LayerProperties;
+}
+
+namespace Ui
+{
+  class LayerSourceDialog;
+  class NewLayoutPropertiesDialog;
+  class NewLayerPropertiesDialog;
+  class NewCellPropertiesDialog;
+  class MoveOptionsDialog;
+  class MoveToOptionsDialog;
+  class DeleteCellModeDialog;
+  class CopyCellModeDialog;
+  class ReplaceCellOptionsDialog;
+  class ClearLayerModeDialog;
+  class OpenLayoutModeDialog;
+  class RenameCellDialog;
+  class DuplicateLayerDialog;
+  class AlignCellOptionsDialog;
+  class FlattenInstOptionsDialog;
+  class UserPropertiesForm;
+  class UserPropertiesEditForm;
 }
 
 namespace lay
@@ -62,23 +70,25 @@ class LayoutView;
  *  @brief The layer source dialog
  */
 class LAYBASIC_PUBLIC LayerSourceDialog
-  : public QDialog,
-    public Ui::LayerSourceDialog
+  : public QDialog
 {
 Q_OBJECT
 
 public:
   LayerSourceDialog (QWidget *parent);
+  ~LayerSourceDialog ();
 
   bool exec_dialog (std::string &s);
+
+private:
+  Ui::LayerSourceDialog *mp_ui;
 };
 
 /**
  *  @brief The new cell properties dialog
  */
 class LAYBASIC_PUBLIC NewCellPropertiesDialog 
-  : public QDialog,
-    public Ui::NewCellPropertiesDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -91,6 +101,7 @@ public:
 private:
   virtual void accept ();
 
+  Ui::NewCellPropertiesDialog *mp_ui;
   const db::Layout *mp_layout;
 };
 
@@ -98,8 +109,7 @@ private:
  *  @brief The new layer properties dialog
  */
 class LAYBASIC_PUBLIC NewLayerPropertiesDialog 
-  : public QDialog,
-    public Ui::NewLayerPropertiesDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -113,14 +123,15 @@ public:
 private:
   virtual void accept ();
   void get (db::LayerProperties &src);
+
+  Ui::NewLayerPropertiesDialog *mp_ui;
 };
 
 /**
  *  @brief The move options dialog
  */
 class LAYBASIC_PUBLIC MoveOptionsDialog 
-  : public QDialog,
-    public Ui::MoveOptionsDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -132,14 +143,15 @@ public:
 
 private:
   virtual void accept ();
+
+  Ui::MoveOptionsDialog *mp_ui;
 };
 
 /**
  *  @brief The move "to" options dialog
  */
 class LAYBASIC_PUBLIC MoveToOptionsDialog 
-  : public QDialog,
-    public Ui::MoveToOptionsDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -149,19 +161,20 @@ public:
 
   bool exec_dialog (int &mode_x, int &mode_y, db::DPoint &target);
 
+private slots:
+  void button_clicked ();
+
 private:
   virtual void accept ();
 
-private slots:
-  void button_clicked ();
+  Ui::MoveToOptionsDialog *mp_ui;
 };
 
 /**
  *  @brief The rename cell options dialog
  */
 class LAYBASIC_PUBLIC RenameCellDialog 
-  : public QDialog,
-    public Ui::RenameCellDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -174,6 +187,7 @@ public:
 private:
   virtual void accept ();
 
+  Ui::RenameCellDialog *mp_ui;
   const db::Layout *mp_layout;
 };
 
@@ -181,8 +195,7 @@ private:
  *  @brief The replace cell options dialog
  */
 class LAYBASIC_PUBLIC ReplaceCellOptionsDialog
-  : public QDialog,
-    public Ui::ReplaceCellOptionsDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -199,14 +212,16 @@ public:
 
 protected:
   virtual void accept ();
+
+private:
+  Ui::ReplaceCellOptionsDialog *mp_ui;
 };
 
 /**
  *  @brief The copy cell options dialog
  */
 class LAYBASIC_PUBLIC CopyCellModeDialog 
-  : public QDialog,
-    public Ui::CopyCellModeDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -220,14 +235,16 @@ public:
    *  The mode is either 0 (for shallow), 1 (for deep)
    */
   bool exec_dialog (int &copy_mode);
+
+private:
+  Ui::CopyCellModeDialog *mp_ui;
 };
 
 /**
  *  @brief The delete cell options dialog
  */
 class LAYBASIC_PUBLIC DeleteCellModeDialog 
-  : public QDialog,
-    public Ui::DeleteCellModeDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -241,14 +258,16 @@ public:
    *  The mode is either 0 (for shallow), 1 (for deep) and 2 (for complete)
    */
   bool exec_dialog (int &delete_mode);
+
+private:
+  Ui::DeleteCellModeDialog *mp_ui;
 };
 
 /**
  *  @brief The delete cell options dialog
  */
 class LAYBASIC_PUBLIC ClearLayerModeDialog 
-  : public QDialog,
-    public Ui::ClearLayerModeDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -262,14 +281,16 @@ public:
    *  The mode is either 0 (for locally), 1 (for hierarchically) and 2 (for all)
    */
   bool exec_dialog (int &clear_mode);
+
+private:
+  Ui::ClearLayerModeDialog *mp_ui;
 };
 
 /**
  *  @brief The open layout mode dialog
  */
 class LAYBASIC_PUBLIC OpenLayoutModeDialog 
-  : public QDialog,
-    public Ui::OpenLayoutModeDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -283,14 +304,16 @@ public:
    *  The mode is either 0 (to replace current view), 1 (to create new view) and 2 (add to current view)
    */
   bool exec_dialog (int &open_mode);
+
+private:
+  Ui::OpenLayoutModeDialog *mp_ui;
 };
 
 /**
  *  @brief The new layout properties dialog
  */
 class LAYBASIC_PUBLIC NewLayoutPropertiesDialog 
-  : public QDialog,
-    public Ui::NewLayoutPropertiesDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -305,14 +328,15 @@ private slots:
 
 private:
   virtual void accept ();
+
+  Ui::NewLayoutPropertiesDialog *mp_ui;
 };
 
 /**
  *  @brief The duplicate layer operation options
  */
 class LAYBASIC_PUBLIC DuplicateLayerDialog 
-  : public QDialog,
-    public Ui::DuplicateLayerDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -328,6 +352,7 @@ public slots:
 private:
   virtual void accept ();
 
+  Ui::DuplicateLayerDialog *mp_ui;
   lay::LayoutView *mp_view;
 };
 
@@ -335,8 +360,7 @@ private:
  *  @brief The merge operation options
  */
 class LAYBASIC_PUBLIC AlignCellOptionsDialog 
-  : public QDialog,
-    public Ui::AlignCellOptionsDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -346,33 +370,39 @@ public:
 
   bool exec_dialog (int &mode_x, int &mode_y, bool &visible_only, bool &adjust_calls);
 
-public slots:
+private:
   void button_clicked ();
+
+  Ui::AlignCellOptionsDialog *mp_ui;
 };
 
 /**
  *  @brief Options dialog for the "flatten instances" function
  */
 class LAYBASIC_PUBLIC FlattenInstOptionsDialog
-  : public QDialog, 
-    private Ui::FlattenInstOptionsDialog
+  : public QDialog
 {
 public:
   FlattenInstOptionsDialog (QWidget *parent, bool enable_pruning = true);
+  virtual ~FlattenInstOptionsDialog ();
+
   bool exec_dialog (int &levels, bool &prune); 
+
+private:
+  Ui::FlattenInstOptionsDialog *mp_ui;
 };
 
 /**
  *  @brief The user properties report form
  */
 class LAYBASIC_PUBLIC UserPropertiesForm 
-  : public QDialog,
-    public Ui::UserPropertiesForm
+  : public QDialog
 {
 Q_OBJECT
 
 public:
   UserPropertiesForm (QWidget *parent);
+  virtual ~UserPropertiesForm ();
 
   bool show (lay::LayoutView *view, unsigned int cv_index, db::properties_id_type &prop_id);
 
@@ -384,20 +414,25 @@ public slots:
 
 private:
   bool m_editable;
+
+  Ui::UserPropertiesForm *mp_ui;
 };
 
 /**
  *  @brief The user properties report form
  */
 class LAYBASIC_PUBLIC UserPropertiesEditForm 
-  : public QDialog,
-    public Ui::UserPropertiesEditForm
+  : public QDialog
 {
 public:
   UserPropertiesEditForm (QWidget *parent);
+  virtual ~UserPropertiesEditForm ();
 
   bool show (QString &key, QString &value);
   virtual void accept ();
+
+private:
+  Ui::UserPropertiesEditForm *mp_ui;
 };
 
 }

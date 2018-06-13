@@ -36,6 +36,7 @@ mkqtdecl.tmp
 # private data
 private
 src/plugins/*
+!src/plugins/streamers
 !src/plugins/*.pro
 !src/plugins/*.pri
 

@@ -21,13 +21,13 @@
 */
 
 
-#include "extDEFImporter.h"
+#include "dbDEFImporter.h"
 #include "dbPolygonTools.h"
 #include "tlGlobPattern.h"
 
 #include <cmath>
 
-namespace ext
+namespace db
 {
 
 DEFImporter::DEFImporter ()

@@ -22,18 +22,18 @@
 
 
 
-#ifndef HDR_extDEFImporter
-#define HDR_extDEFImporter
+#ifndef HDR_dbDEFImporter
+#define HDR_dbDEFImporter
 
 #include "dbCommon.h"
 #include "dbLayout.h"
 #include "tlStream.h"
-#include "extLEFImporter.h"
+#include "dbLEFImporter.h"
 
 #include <vector>
 #include <string>
 
-namespace ext
+namespace db
 {
 
 /**

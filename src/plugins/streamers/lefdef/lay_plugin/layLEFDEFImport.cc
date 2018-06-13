@@ -21,10 +21,10 @@
 */
 
 
-#include "extLEFImporter.h"
-#include "extDEFImporter.h"
-#include "extLEFDEFImportDialogs.h"
+#include "dbLEFImporter.h"
+#include "dbDEFImporter.h"
 
+#include "layLEFDEFImportDialogs.h"
 #include "layPlugin.h"
 #include "layMainWindow.h"
 #include "layFileDialog.h"
@@ -36,7 +36,7 @@
 #include <QFileInfo>
 #include <QApplication>
 
-namespace ext
+namespace lay
 {
 
 // -----------------------------------------------------------------------------------------------
@@ -69,8 +69,8 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("ext::import_lef", "import_lef:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("LEF"))));
-    menu_entries.push_back (lay::MenuEntry ("ext::import_def", "import_def:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("DEF/LEF"))));
+    menu_entries.push_back (lay::MenuEntry ("db::import_lef", "import_lef:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("LEF"))));
+    menu_entries.push_back (lay::MenuEntry ("db::import_def", "import_def:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("DEF/LEF"))));
   }
 
   virtual bool configure (const std::string &name, const std::string &value)
@@ -93,9 +93,9 @@ public:
 
   virtual bool menu_activated (const std::string &symbol) const
   {
-    if (symbol == "ext::import_lef" || symbol == "ext::import_def") {
+    if (symbol == "db::import_lef" || symbol == "db::import_def") {
 
-      bool import_lef = (symbol == "ext::import_lef");
+      bool import_lef = (symbol == "db::import_lef");
 
       LEFDEFImportData data;
       try {
@@ -132,15 +132,15 @@ public:
           tech_name.clear (); // use default technology
         }
         const lay::Technology *tech = lay::Technologies::instance ()->technology_by_name (tech_name);
-        ext::LEFDEFReaderOptions options;
+        db::LEFDEFReaderOptions options;
         if (tech) {
-          const ext::LEFDEFReaderOptions *tech_options = dynamic_cast<const ext::LEFDEFReaderOptions *>(tech->load_layout_options ().get_options ("LEFDEF"));
+          const db::LEFDEFReaderOptions *tech_options = dynamic_cast<const db::LEFDEFReaderOptions *>(tech->load_layout_options ().get_options ("LEFDEF"));
           if (tech_options) {
             options = *tech_options;
           }
         }
 
-        ext::LEFDEFLayerDelegate layers (&options);
+        db::LEFDEFLayerDelegate layers (&options);
         layers.prepare (*layout);
         layout->dbu (options.dbu ());
 
@@ -148,7 +148,7 @@ public:
 
           tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Reading LEF file")));
 
-          ext::LEFImporter importer;
+          db::LEFImporter importer;
 
           for (std::vector<std::string>::const_iterator l = options.begin_lef_files (); l != options.end_lef_files (); ++l) {
             tl::InputStream lef_stream (*l);
@@ -163,7 +163,7 @@ public:
 
           tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Reading DEF file")));
 
-          DEFImporter importer;
+          db::DEFImporter importer;
 
           QFileInfo def_fi (tl::to_qstring (data.file));
 
@@ -219,7 +219,7 @@ private:
   std::string m_def_spec;
 };
 
-static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ext::LEFDEFImportPluginDeclaration (), 1400, "ext::LEFDEFImportPlugin");
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::LEFDEFImportPluginDeclaration (), 1400, "db::LEFDEFImportPlugin");
 
 }
 

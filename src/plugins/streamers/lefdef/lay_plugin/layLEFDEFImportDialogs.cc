@@ -21,10 +21,11 @@
 */
 
 
-#include "extLEFDEFImportDialogs.h"
-#include "extLEFDEFImporter.h"
+#include "dbLEFDEFImporter.h"
 
 #include "tlExceptions.h"
+
+#include "layLEFDEFImportDialogs.h"
 #include "layLoadLayoutOptionsDialog.h"
 #include "layQtTools.h"
 #include "layMainWindow.h"
@@ -32,7 +33,7 @@
 
 #include <QFileDialog>
 
-namespace ext
+namespace lay
 {
 
 // -----------------------------------------------------------------------------------------------
@@ -366,7 +367,7 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
 void 
 LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, const lay::Technology * /*tech*/)
 {
-  LEFDEFReaderOptions *data = dynamic_cast<LEFDEFReaderOptions *> (options);
+  db::LEFDEFReaderOptions *data = dynamic_cast<db::LEFDEFReaderOptions *> (options);
   if (! data) {
     return;
   }
@@ -437,8 +438,8 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
 void 
 LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options, const lay::Technology *tech)
 {
-  static LEFDEFReaderOptions empty;
-  const LEFDEFReaderOptions *data = dynamic_cast<const LEFDEFReaderOptions *> (options);
+  static db::LEFDEFReaderOptions empty;
+  const db::LEFDEFReaderOptions *data = dynamic_cast<const db::LEFDEFReaderOptions *> (options);
   if (! data) {
     data = &empty;
   }

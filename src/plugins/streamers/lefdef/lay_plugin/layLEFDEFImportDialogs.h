@@ -21,8 +21,8 @@
 */
 
 
-#ifndef HDR_extLEFImportDialog
-#define HDR_extLEFImportDialog
+#ifndef HDR_dbLEFImportDialog
+#define HDR_dbLEFImportDialog
 
 #include "layCommon.h"
 #include "layTechnology.h"
@@ -33,7 +33,7 @@
 
 #include <QDialog>
 
-namespace ext
+namespace lay
 {
 
 /**

@@ -21,8 +21,8 @@
 */
 
 
-#ifndef HDR_extGerberImportDialog
-#define HDR_extGerberImportDialog
+#ifndef HDR_dbGerberImportDialog
+#define HDR_dbGerberImportDialog
 
 #include <QDialog>
 #include <QAction>
@@ -52,10 +52,13 @@ namespace tl
   class InputStream;
 }
 
-namespace ext
+namespace db
 {
+  class GerberImporter;
+}
 
-class GerberImporter;
+namespace lay
+{
 
 struct GerberArtworkFileDescriptor
 {
@@ -107,7 +110,7 @@ public:
   std::string topcell_name;
 
   std::string get_layer_properties_file () const;
-  void setup_importer (GerberImporter *importer);
+  void setup_importer (db::GerberImporter *importer);
   void reset ();
   void load (tl::InputStream &stream);
   void load (const std::string &file);

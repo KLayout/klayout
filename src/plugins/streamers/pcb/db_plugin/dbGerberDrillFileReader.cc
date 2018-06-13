@@ -21,9 +21,9 @@
 */
 
 
-#include "extGerberDrillFileReader.h"
+#include "dbGerberDrillFileReader.h"
 
-namespace ext
+namespace db
 {
 
 // ---------------------------------------------------------------------------------

@@ -22,10 +22,10 @@
 
 
 
-#ifndef HDR_extLEFImporter
-#define HDR_extLEFImporter
+#ifndef HDR_dbLEFImporter
+#define HDR_dbLEFImporter
 
-#include "extLEFDEFImporter.h"
+#include "dbLEFDEFImporter.h"
 
 #include "dbCommon.h"
 #include "dbLayout.h"
@@ -37,7 +37,7 @@
 #include <string>
 #include <map>
 
-namespace ext
+namespace db
 {
 
 /**

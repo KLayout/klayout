@@ -22,12 +22,12 @@
 
 
 #include "ui_GerberImportDialog.h"
-#include "extGerberImporter.h"
-#include "extGerberImportDialog.h"
+#include "dbGerberImporter.h"
 
 #include "layFileDialog.h"
 #include "layDialogs.h"
 #include "layConverters.h"
+#include "layGerberImportDialog.h"
 
 #include "tlExceptions.h"
 #include "tlXMLParser.h"
@@ -39,7 +39,7 @@
 
 #include <fstream>
 
-namespace ext
+namespace lay
 {
 
 // -----------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ GerberImportData::get_layer_properties_file () const
 }
 
 void 
-GerberImportData::setup_importer (GerberImporter *importer)
+GerberImportData::setup_importer (db::GerberImporter *importer)
 {
   if (num_circle_points >= 4) {
     importer->set_circle_points (num_circle_points);
@@ -107,7 +107,7 @@ GerberImportData::setup_importer (GerberImporter *importer)
 
       if (! file->filename.empty ()) {
 
-        GerberFile file_spec;
+        db::GerberFile file_spec;
         file_spec.set_filename (file->filename);
 
         for (std::vector <int>::const_iterator i = file->layout_layers.begin (); i != file->layout_layers.end (); ++i) {
@@ -136,7 +136,7 @@ GerberImportData::setup_importer (GerberImporter *importer)
         }
 
         if (n * 2 < layout_layers.size ()) {
-          GerberFile file_spec;
+          db::GerberFile file_spec;
           file_spec.set_filename (file->filename);
           file_spec.add_layer_spec (layout_layers [n * 2]);
           importer->add_file (file_spec);
@@ -159,7 +159,7 @@ GerberImportData::setup_importer (GerberImporter *importer)
           nstart = std::distance (artwork_files.begin () + file->stop, artwork_files.end ()) - 1;
         }
 
-        GerberFile file_spec;
+        db::GerberFile file_spec;
         file_spec.set_filename (file->filename);
 
         for (size_t n = nstart; n < nstop; ++n) {
@@ -343,7 +343,7 @@ GerberImportData::from_string (const std::string &s)
       artwork_files.clear ();
       while (! ex.test (";") && ! ex.at_end ()) {
         ex.test ("(");
-        artwork_files.push_back (ext::GerberArtworkFileDescriptor ());
+        artwork_files.push_back (lay::GerberArtworkFileDescriptor ());
         ex.read_word_or_quoted (artwork_files.back ().filename);
         ex.test (")");
         ex.test (",");
@@ -356,7 +356,7 @@ GerberImportData::from_string (const std::string &s)
       drill_files.clear ();
       while (! ex.test (";") && ! ex.at_end ()) {
         ex.test ("(");
-        drill_files.push_back (ext::GerberDrillFileDescriptor ());
+        drill_files.push_back (lay::GerberDrillFileDescriptor ());
         ex.read (drill_files.back ().start);
         ex.test (",");
         ex.read (drill_files.back ().stop);
@@ -373,7 +373,7 @@ GerberImportData::from_string (const std::string &s)
       free_files.clear ();
       while (! ex.test (";") && ! ex.at_end ()) {
         ex.test ("(");
-        free_files.push_back (ext::GerberFreeFileDescriptor ());
+        free_files.push_back (lay::GerberFreeFileDescriptor ());
         ex.read_word_or_quoted (free_files.back ().filename);
         ex.test (",");
         while (! ex.test (")") && ! ex.at_end ()) {
@@ -1343,7 +1343,7 @@ GerberImportDialog::layout_layer_double_clicked (QTreeWidgetItem *, int)
 
 struct FilePositionCompare
 {
-  bool operator() (const std::pair<ext::GerberMetaData, std::string> &a, const std::pair<ext::GerberMetaData, std::string> &b)
+  bool operator() (const std::pair<db::GerberMetaData, std::string> &a, const std::pair<db::GerberMetaData, std::string> &b)
   {
     if ((a.first.cu_layer_number == 0) != (b.first.cu_layer_number == 0)) {
       return (a.first.cu_layer_number == 0) < (b.first.cu_layer_number == 0);
@@ -1381,11 +1381,11 @@ GerberImportDialog::enter_page ()
         filters << tl::to_qstring ("*.gbr");
         filters << tl::to_qstring ("*.GBR");
 
-        std::vector<std::pair<ext::GerberMetaData, std::string> > files;
+        std::vector<std::pair<db::GerberMetaData, std::string> > files;
 
         QStringList entries = dir.entryList (filters);
         for (QStringList::const_iterator e = entries.begin (); e != entries.end (); ++e) {
-          ext::GerberMetaData data = ext::GerberImporter::scan (tl::to_string (dir.filePath (*e)));
+          db::GerberMetaData data = db::GerberImporter::scan (tl::to_string (dir.filePath (*e)));
           files.push_back (std::make_pair (data, tl::to_string (*e)));
         }
 
@@ -1401,7 +1401,7 @@ GerberImportDialog::enter_page ()
         mp_data->layout_layers.clear ();
 
         int min_layer = 0, max_layer = 0;
-        for (std::vector<std::pair<ext::GerberMetaData, std::string> >::const_iterator f = files.begin (); f != files.end (); ++f) {
+        for (std::vector<std::pair<db::GerberMetaData, std::string> >::const_iterator f = files.begin (); f != files.end (); ++f) {
           if (f->first.cu_layer_number > 0) {
             if (min_layer == 0 || min_layer > f->first.cu_layer_number) {
               min_layer = f->first.cu_layer_number;
@@ -1429,33 +1429,33 @@ GerberImportDialog::enter_page ()
         int next_layer = max_layer * 2;
         int hole_num = 0, profile_num = 0, legend_num = 0, solder_num = 0;
 
-        for (std::vector<std::pair<ext::GerberMetaData, std::string> >::const_iterator f = files.begin (); f != files.end (); ++f) {
+        for (std::vector<std::pair<db::GerberMetaData, std::string> >::const_iterator f = files.begin (); f != files.end (); ++f) {
 
           mp_data->free_files.push_back (GerberFreeFileDescriptor ());
           mp_data->free_files.back ().filename = tl::to_string (f->second);
 
           std::vector<int> layers;
 
-          if (f->first.function == ext::GerberMetaData::Copper) {
+          if (f->first.function == db::GerberMetaData::Copper) {
             if (l2l.find (f->first.cu_layer_number) != l2l.end ()) {
               layers.push_back (l2l [f->first.cu_layer_number]);
             }
-          } else if (f->first.function == ext::GerberMetaData::PlatedHole) {
+          } else if (f->first.function == db::GerberMetaData::PlatedHole) {
             for (int l = std::min (f->first.from_cu, f->first.to_cu); l < std::max (f->first.from_cu, f->first.to_cu); ++l) {
               if (l2v.find (l) != l2v.end ()) {
                 layers.push_back (l2v [l]);
               }
             }
-          } else if (f->first.function == ext::GerberMetaData::NonPlatedHole || f->first.function == ext::GerberMetaData::NonPlatedHole) {
+          } else if (f->first.function == db::GerberMetaData::NonPlatedHole || f->first.function == db::GerberMetaData::NonPlatedHole) {
             layers.push_back (int (mp_data->layout_layers.size ()));
             mp_data->layout_layers.push_back (db::LayerProperties (++next_layer, 0, "Hole" + tl::to_string (++hole_num)));
-          } else if (f->first.function == ext::GerberMetaData::Profile) {
+          } else if (f->first.function == db::GerberMetaData::Profile) {
             layers.push_back (int (mp_data->layout_layers.size ()));
             mp_data->layout_layers.push_back (db::LayerProperties (++next_layer, 0, "Profile" + tl::to_string (++profile_num)));
-          } else if (f->first.function == ext::GerberMetaData::Legend) {
+          } else if (f->first.function == db::GerberMetaData::Legend) {
             layers.push_back (int (mp_data->layout_layers.size ()));
             mp_data->layout_layers.push_back (db::LayerProperties (++next_layer, 0, "Legend" + tl::to_string (++legend_num)));
-          } else if (f->first.function == ext::GerberMetaData::SolderMask) {
+          } else if (f->first.function == db::GerberMetaData::SolderMask) {
             layers.push_back (int (mp_data->layout_layers.size ()));
             mp_data->layout_layers.push_back (db::LayerProperties (++next_layer, 0, "SolderMask" + tl::to_string (++solder_num)));
           }

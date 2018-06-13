@@ -21,8 +21,8 @@
 */
 
 
-#ifndef HDR_extGerberImporter
-#define HDR_extGerberImporter
+#ifndef HDR_dbGerberImporter
+#define HDR_dbGerberImporter
 
 #include "dbCommon.h"
 
@@ -45,7 +45,7 @@ namespace lay
   class LayoutView;
 }
 
-namespace ext
+namespace db
 {
 
 /**
@@ -1016,7 +1016,7 @@ public:
   /**
    *  @brief Add a file specification
    */
-  void add_file (const ext::GerberFile &file)
+  void add_file (const db::GerberFile &file)
   {
     m_files.push_back (file);
   }
@@ -1024,7 +1024,7 @@ public:
   /**
    *  @brief Get the files: begin iterator
    */
-  std::vector<ext::GerberFile>::const_iterator begin_files () const
+  std::vector<db::GerberFile>::const_iterator begin_files () const
   {
     return m_files.begin ();
   }
@@ -1032,7 +1032,7 @@ public:
   /**
    *  @brief Get the files: end iterator
    */
-  std::vector<ext::GerberFile>::const_iterator end_files () const
+  std::vector<db::GerberFile>::const_iterator end_files () const
   {
     return m_files.end ();
   }
@@ -1049,7 +1049,7 @@ private:
   std::string m_dir;
   db::DCplxTrans m_global_trans;
   std::vector <std::pair <db::DPoint, db::DPoint> > m_reference_points;
-  std::vector <ext::GerberFile> m_files;
+  std::vector <db::GerberFile> m_files;
 
   void do_read (db::Layout &layout, db::cell_index_type cell_index);
   void do_load_project (tl::TextInputStream &stream);

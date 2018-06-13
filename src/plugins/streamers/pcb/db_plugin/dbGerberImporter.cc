@@ -21,9 +21,9 @@
 */
 
 
-#include "extGerberImporter.h"
-#include "extGerberDrillFileReader.h"
-#include "extRS274XReader.h"
+#include "dbGerberImporter.h"
+#include "dbGerberDrillFileReader.h"
+#include "dbRS274XReader.h"
 #include "tlStream.h"
 #include "tlString.h"
 #include "tlString.h"
@@ -35,7 +35,7 @@
 #include <cmath>
 #include <cctype>
 
-namespace ext
+namespace db
 {
 
 // ---------------------------------------------------------------------------------------
@@ -517,11 +517,11 @@ GerberFile::layers_string () const
 //  Implementation of GerberImporter
 
 //  TODO: generalize this:
-std::vector <tl::shared_ptr<ext::GerberFileReader> > get_readers ()
+std::vector <tl::shared_ptr<db::GerberFileReader> > get_readers ()
 {
-  std::vector <tl::shared_ptr<ext::GerberFileReader> > readers;
-  readers.push_back (new ext::GerberDrillFileReader ());
-  readers.push_back (new ext::RS274XReader ());
+  std::vector <tl::shared_ptr<db::GerberFileReader> > readers;
+  readers.push_back (new db::GerberDrillFileReader ());
+  readers.push_back (new db::RS274XReader ());
   return readers;
 }
 
@@ -570,10 +570,10 @@ GerberImporter::scan (tl::TextInputStream &stream)
 {
   try {
 
-    std::vector <tl::shared_ptr<ext::GerberFileReader> > readers = get_readers ();
+    std::vector <tl::shared_ptr<db::GerberFileReader> > readers = get_readers ();
 
     //  determine the reader to use:
-    for (std::vector <tl::shared_ptr<ext::GerberFileReader> >::iterator r = readers.begin (); r != readers.end (); ++r) {
+    for (std::vector <tl::shared_ptr<db::GerberFileReader> >::iterator r = readers.begin (); r != readers.end (); ++r) {
       stream.reset ();
       if ((*r)->accepts (stream)) {
         return (*r)->scan (stream);
@@ -746,7 +746,7 @@ GerberImporter::do_load_project (tl::TextInputStream &stream)
 
       l.test ("file");
 
-      ext::GerberFile file;
+      db::GerberFile file;
 
       std::string fn;
       l.read_word_or_quoted (fn, "%!.:/\\+-,=_$");
@@ -840,7 +840,7 @@ GerberImporter::save_project (std::ostream &stream)
     stream << "layer-styles=" << tl::to_quoted_string (m_layer_styles) << std::endl;
   }
 
-  for (std::vector<ext::GerberFile>::iterator file = m_files.begin (); file != m_files.end (); ++file) {
+  for (std::vector<db::GerberFile>::iterator file = m_files.begin (); file != m_files.end (); ++file) {
 
     stream << "file " << tl::to_quoted_string (file->filename ());
     for (std::vector <db::LayerProperties>::const_iterator ls = file->layer_specs ().begin (); ls != file->layer_specs ().end (); ++ls) {
@@ -959,7 +959,7 @@ GerberImporter::do_read (db::Layout &layout, db::cell_index_type cell_index)
 
     std::string format (m_format_string);
 
-    for (std::vector<ext::GerberFile>::iterator file = m_files.begin (); file != m_files.end (); ++file) {
+    for (std::vector<db::GerberFile>::iterator file = m_files.begin (); file != m_files.end (); ++file) {
 
       ++progress;
 
@@ -987,11 +987,11 @@ GerberImporter::do_read (db::Layout &layout, db::cell_index_type cell_index)
       tl::InputStream input_file (tl::to_string (fi.absoluteFilePath ()));
       tl::TextInputStream stream (input_file);
 
-      std::vector <tl::shared_ptr<ext::GerberFileReader> > readers = get_readers ();
+      std::vector <tl::shared_ptr<db::GerberFileReader> > readers = get_readers ();
 
       //  determine the reader to use:
-      ext::GerberFileReader *reader = 0;
-      for (std::vector <tl::shared_ptr<ext::GerberFileReader> >::iterator r = readers.begin (); r != readers.end (); ++r) {
+      db::GerberFileReader *reader = 0;
+      for (std::vector <tl::shared_ptr<db::GerberFileReader> >::iterator r = readers.begin (); r != readers.end (); ++r) {
         stream.reset ();
         if ((*r)->accepts (stream)) {
           reader = r->operator-> ();

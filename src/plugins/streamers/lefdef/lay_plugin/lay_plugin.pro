@@ -13,12 +13,12 @@ LIBS += -L$$DESTDIR/../db_plugins -llefdef
 }
 
 HEADERS = \
-  extLEFDEFImportDialogs.h \
+    layLEFDEFImportDialogs.h
 
 SOURCES = \
-  extLEFDEFImport.cc \
-  extLEFDEFImportDialogs.cc \
-  extLEFDEFPlugin.cc \
+    layLEFDEFPlugin.cc \
+    layLEFDEFImportDialogs.cc \
+    layLEFDEFImport.cc
 
 FORMS = \
   LEFDEFImportOptionsDialog.ui \

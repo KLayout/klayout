@@ -21,12 +21,12 @@
 */
 
 
-#include "extGerberImporter.h"
-#include "extGerberImportDialog.h"
-#include "extRS274XReader.h"
+#include "dbGerberImporter.h"
+#include "dbRS274XReader.h"
 
 #include "dbStream.h"
 
+#include "layGerberImportDialog.h"
 #include "layPlugin.h"
 #include "layFileDialog.h"
 #include "layMainWindow.h"
@@ -35,7 +35,7 @@
 
 #include <QApplication>
 
-namespace ext
+namespace lay
 {
 
 static const std::string cfg_pcb_import_spec ("pcb-import-spec");
@@ -63,11 +63,11 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("ext::import_gerber", "import_gerber_menu:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("Gerber PCB")), true));
-    menu_entries.push_back (lay::MenuEntry ("ext::import_gerber_new", "import_gerber_new:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("New Project"))));
-    menu_entries.push_back (lay::MenuEntry ("ext::import_gerber_new_free", "import_gerber_new_free:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("New Project - Free Layer Mapping"))));
-    menu_entries.push_back (lay::MenuEntry ("ext::import_gerber_open", "import_gerber_open:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("Open Project"))));
-    menu_entries.push_back (lay::MenuEntry ("ext::import_gerber_recent", "import_gerber_recent:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("Recent Project"))));
+    menu_entries.push_back (lay::MenuEntry ("db::import_gerber", "import_gerber_menu:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("Gerber PCB")), true));
+    menu_entries.push_back (lay::MenuEntry ("db::import_gerber_new", "import_gerber_new:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("New Project"))));
+    menu_entries.push_back (lay::MenuEntry ("db::import_gerber_new_free", "import_gerber_new_free:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("New Project - Free Layer Mapping"))));
+    menu_entries.push_back (lay::MenuEntry ("db::import_gerber_open", "import_gerber_open:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("Open Project"))));
+    menu_entries.push_back (lay::MenuEntry ("db::import_gerber_recent", "import_gerber_recent:edit", "file_menu.import_menu.import_gerber_menu.end", tl::to_string (QObject::tr ("Recent Project"))));
   }
 
   virtual bool configure (const std::string &name, const std::string &value)
@@ -87,10 +87,10 @@ public:
 
   virtual bool menu_activated (const std::string &symbol) const
   {
-    if (symbol == "ext::import_gerber_recent" || 
-        symbol == "ext::import_gerber_new_free" ||
-        symbol == "ext::import_gerber_new" ||
-        symbol == "ext::import_gerber_open") {
+    if (symbol == "db::import_gerber_recent" ||
+        symbol == "db::import_gerber_new_free" ||
+        symbol == "db::import_gerber_new" ||
+        symbol == "db::import_gerber_open") {
 
       GerberImportData data;
       try {
@@ -99,17 +99,17 @@ public:
         data = GerberImportData ();
       }
 
-      if (symbol == "ext::import_gerber_new_free") {
+      if (symbol == "db::import_gerber_new_free") {
 
         data.reset ();
         data.free_layer_mapping = true;
 
-      } else if (symbol == "ext::import_gerber_new") {
+      } else if (symbol == "db::import_gerber_new") {
 
         data.reset ();
         data.free_layer_mapping = false;
 
-      } else if (symbol == "ext::import_gerber_open") {
+      } else if (symbol == "db::import_gerber_open") {
 
         //  Get the name of the file to open
         lay::FileDialog open_dialog (QApplication::activeWindow (), tl::to_string (QObject::tr ("Gerber Import Project File")), tl::to_string (QObject::tr ("PCB project file (*.pcb);;All files (*)")));
@@ -128,7 +128,7 @@ public:
       lay::PluginRoot *config_root = lay::PluginRoot::instance ();
 
       GerberImportDialog dialog (QApplication::activeWindow (), &data);
-      ext::GerberImporter importer;
+      db::GerberImporter importer;
 
       bool ok = false;
       while (! ok && dialog.exec ()) {
@@ -146,8 +146,8 @@ public:
         config_root->config_end ();
 
         //  TODO: discard layout when an error occurs
-        if (data.mode != ext::GerberImportData::ModeIntoLayout) {
-          lay::MainWindow::instance ()->create_layout (data.mode == ext::GerberImportData::ModeSamePanel ? 2 : 1);
+        if (data.mode != lay::GerberImportData::ModeIntoLayout) {
+          lay::MainWindow::instance ()->create_layout (data.mode == lay::GerberImportData::ModeSamePanel ? 2 : 1);
         }
 
         lay::LayoutView *view = lay::LayoutView::current ();
@@ -156,7 +156,7 @@ public:
 
         std::string lyp_file = data.get_layer_properties_file ();
 
-        if (data.mode == ext::GerberImportData::ModeIntoLayout) {
+        if (data.mode == lay::GerberImportData::ModeIntoLayout) {
 
           importer.read (cv->layout (), cv.cell_index ());
           view->create_initial_layer_props (cv_index, lyp_file, true /*add missing*/);
@@ -189,7 +189,7 @@ private:
   std::string m_import_spec;
 };
 
-static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ext::GerberImportPluginDeclaration (), 1200, "ext::GerberImportPlugin");
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::GerberImportPluginDeclaration (), 1200, "db::GerberImportPlugin");
 
 // ---------------------------------------------------------------
 //  Plugin for the stream reader
@@ -229,7 +229,7 @@ public:
 
     data.load (m_stream);
 
-    ext::GerberImporter importer;
+    db::GerberImporter importer;
     data.setup_importer (&importer);
 
     importer.read (layout);

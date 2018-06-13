@@ -21,8 +21,8 @@
 */
 
 
-#ifndef HDR_extGerberDrillFileReader
-#define HDR_extGerberDrillFileReader
+#ifndef HDR_dbGerberDrillFileReader
+#define HDR_dbGerberDrillFileReader
 
 #include "tlStream.h"
 #include "tlString.h"
@@ -30,13 +30,13 @@
 #include "dbTrans.h"
 #include "dbPolygon.h"
 #include "dbEdgeProcessor.h"
-#include "extGerberImporter.h"
+#include "dbGerberImporter.h"
 
 #include <string>
 #include <map>
 #include <vector>
 
-namespace ext
+namespace db
 {
 
 struct DrillHoleDescriptor

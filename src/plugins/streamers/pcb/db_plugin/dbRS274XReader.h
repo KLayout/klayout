@@ -21,8 +21,8 @@
 */
 
 
-#ifndef HDR_extRS274XReader
-#define HDR_extRS274XReader
+#ifndef HDR_dbRS274XReader
+#define HDR_dbRS274XReader
 
 #include "tlStream.h"
 #include "tlString.h"
@@ -30,13 +30,13 @@
 #include "dbTrans.h"
 #include "dbPolygon.h"
 #include "dbEdgeProcessor.h"
-#include "extGerberImporter.h"
+#include "dbGerberImporter.h"
 
 #include <string>
 #include <map>
 #include <vector>
 
-namespace ext
+namespace db
 {
 
 // ---------------------------------------------------------------------------------

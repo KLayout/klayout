@@ -5,12 +5,12 @@ DESTDIR = $$OUT_PWD/../../../../db_plugins
 include($$PWD/../../../db_plugin.pri)
 
 HEADERS = \
-  extDEFImporter.h \
-  extLEFImporter.h \
-  extLEFDEFImporter.h \
+    dbDEFImporter.h \
+    dbLEFDEFImporter.h \
+    dbLEFImporter.h
 
 SOURCES = \
-  extDEFImporter.cc \
-  extLEFDEFImporter.cc \
-  extLEFImporter.cc \
   gsiDeclDbLEFDEF.cc \
+    dbDEFImporter.cc \
+    dbLEFDEFImporter.cc \
+    dbLEFImporter.cc

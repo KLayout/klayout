@@ -23,8 +23,8 @@
 
 #include "dbLayoutDiff.h"
 #include "dbWriter.h"
-#include "extDEFImporter.h"
-#include "extLEFImporter.h"
+#include "dbDEFImporter.h"
+#include "dbLEFImporter.h"
 
 #include "tlUnitTest.h"
 
@@ -33,7 +33,7 @@
 
 static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au)
 {
-  ext::LEFDEFReaderOptions tc;
+  db::LEFDEFReaderOptions tc;
   tc.set_via_geometry_datatype (0);
   tc.set_via_geometry_suffix ("");
   tc.set_pins_datatype (2);
@@ -46,7 +46,7 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
   tc.set_labels_suffix (".LABEL");
   tc.set_blockages_datatype (4);
   tc.set_blockages_suffix (".BLK");
-  ext::LEFDEFLayerDelegate ld (&tc);
+  db::LEFDEFLayerDelegate ld (&tc);
 
   db::Manager m;
   db::Layout layout (&m), layout2 (&m), layout_au (&m);
@@ -55,7 +55,7 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
   ld.prepare (layout);
 
-  ext::DEFImporter imp;
+  db::DEFImporter imp;
 
   while (! ex.at_end ()) {
 

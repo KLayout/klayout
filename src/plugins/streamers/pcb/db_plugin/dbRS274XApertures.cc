@@ -21,11 +21,11 @@
 */
 
 
-#include "extRS274XApertures.h"
-#include "extRS274XReader.h"
+#include "dbRS274XApertures.h"
+#include "dbRS274XReader.h"
 #include "dbPolygonTools.h"
 
-namespace ext
+namespace db
 {
 
 // -----------------------------------------------------------------------------
@@ -320,7 +320,7 @@ RS274XCircleAperture::do_produce_linear (const db::DPoint &from, const db::DPoin
 // -----------------------------------------------------------------------------
 //  RS274XRectAperture implementation
 
-RS274XRectAperture::RS274XRectAperture (ext::RS274XReader &reader, tl::Extractor &ex)
+RS274XRectAperture::RS274XRectAperture (db::RS274XReader &reader, tl::Extractor &ex)
   : m_dx (0.0), m_dy (0.0), m_hx (0.0), m_hy (0.0)
 {
   ex.expect(",");
@@ -378,7 +378,7 @@ RS274XRectAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DP
 // -----------------------------------------------------------------------------
 //  RS274XOvalAperture implementation
 
-RS274XOvalAperture::RS274XOvalAperture (ext::RS274XReader &reader, tl::Extractor &ex)
+RS274XOvalAperture::RS274XOvalAperture (db::RS274XReader &reader, tl::Extractor &ex)
   : m_dx (0.0), m_dy (0.0), m_hx (0.0), m_hy (0.0)
 {
   ex.expect(",");
@@ -479,7 +479,7 @@ RS274XOvalAperture::do_produce_linear (const db::DPoint & /*from*/, const db::DP
 // -----------------------------------------------------------------------------
 //  RS274XRegularAperture implementation
 
-RS274XRegularAperture::RS274XRegularAperture (ext::RS274XReader &reader, tl::Extractor &ex)
+RS274XRegularAperture::RS274XRegularAperture (db::RS274XReader &reader, tl::Extractor &ex)
   : m_d (0.0), m_a (0.0), m_nsides (0), m_hx (0.0), m_hy (0.0)
 {
   ex.expect(",");
@@ -581,7 +581,7 @@ RS274XRegionAperture::do_produce_linear (const db::DPoint & /*from*/, const db::
 // -----------------------------------------------------------------------------
 //  RS274XMacroAperture implementation
 
-RS274XMacroAperture::RS274XMacroAperture (ext::RS274XReader &reader, const std::string &name, const std::string &def, tl::Extractor &ex)
+RS274XMacroAperture::RS274XMacroAperture (db::RS274XReader &reader, const std::string &name, const std::string &def, tl::Extractor &ex)
   : m_name (name), m_def (def), m_unit (1.0)
 { 
   //  use the unit at definition time, not at execution time

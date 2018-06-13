@@ -21,8 +21,8 @@
 */
 
 
-#ifndef HDR_extLEFDEFImporter
-#define HDR_extLEFDEFImporter
+#ifndef HDR_dbLEFDEFImporter
+#define HDR_dbLEFDEFImporter
 
 #include "dbCommon.h"
 #include "dbLayout.h"
@@ -40,7 +40,7 @@ namespace tl
   class AbsoluteProgress;
 }
 
-namespace ext
+namespace db
 {
 
 /**

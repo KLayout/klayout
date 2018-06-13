@@ -21,13 +21,13 @@
 */
 
 
-#include "extLEFImporter.h"
+#include "dbLEFImporter.h"
 
 #include "tlStream.h"
 
 #include <cctype>
 
-namespace ext
+namespace db
 {
 
 // -----------------------------------------------------------------------------------

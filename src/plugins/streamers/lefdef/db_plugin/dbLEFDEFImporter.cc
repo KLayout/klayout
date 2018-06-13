@@ -21,7 +21,7 @@
 */
 
 
-#include "extLEFDEFImporter.h"
+#include "dbLEFDEFImporter.h"
 
 #include "tlStream.h"
 #include "tlProgress.h"
@@ -30,7 +30,7 @@
 
 #include <QFileInfo>
 
-namespace ext
+namespace db
 {
 
 // -----------------------------------------------------------------------------------

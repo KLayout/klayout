@@ -21,10 +21,10 @@
 */
 
 
-#include "extRS274XReader.h"
-#include "extRS274XApertures.h"
+#include "dbRS274XReader.h"
+#include "dbRS274XApertures.h"
 
-namespace ext
+namespace db
 {
 
 // ---------------------------------------------------------------------------------

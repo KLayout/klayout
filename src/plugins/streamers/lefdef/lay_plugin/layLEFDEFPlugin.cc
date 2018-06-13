@@ -23,21 +23,23 @@
 
 #include "tlTimer.h"
 #include "tlStream.h"
+
 #include "dbReader.h"
 #include "dbStream.h"
+#include "dbLEFImporter.h"
+#include "dbDEFImporter.h"
+#include "dbLEFDEFImporter.h"
+
 #include "layPlugin.h"
 #include "layStream.h"
-#include "gsiDecl.h"
+#include "layLEFDEFImportDialogs.h"
 
-#include "extLEFDEFImportDialogs.h"
-#include "extLEFImporter.h"
-#include "extDEFImporter.h"
-#include "extLEFDEFImporter.h"
+#include "gsiDecl.h"
 
 #include <QFileInfo>
 #include <QDir>
 
-namespace ext
+namespace db
 {
 
 // ---------------------------------------------------------------
@@ -125,14 +127,14 @@ private:
 
   const db::LayerMap &read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &options, bool import_lef) throw (tl::Exception)
   {
-    const ext::LEFDEFReaderOptions *lefdef_options = dynamic_cast<const ext::LEFDEFReaderOptions *> (options.get_options (format ()));
-    static ext::LEFDEFReaderOptions default_options;
+    const db::LEFDEFReaderOptions *lefdef_options = dynamic_cast<const db::LEFDEFReaderOptions *> (options.get_options (format ()));
+    static db::LEFDEFReaderOptions default_options;
     if (! lefdef_options) {
       lefdef_options = &default_options;
     }
 
     //  Take the layer map and the "read all layers" flag from the reader options - hence we override the
-    ext::LEFDEFLayerDelegate layers (lefdef_options);
+    db::LEFDEFLayerDelegate layers (lefdef_options);
     layers.prepare (layout);
     layout.dbu (lefdef_options->dbu ());
 
@@ -140,7 +142,7 @@ private:
 
       tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Reading LEF file")));
 
-      ext::LEFImporter importer;
+      db::LEFImporter importer;
 
       for (std::vector<std::string>::const_iterator l = lefdef_options->begin_lef_files (); l != lefdef_options->end_lef_files (); ++l) {
 
@@ -255,7 +257,7 @@ public:
 
   lay::StreamReaderOptionsPage *format_specific_options_page (QWidget *parent) const
   {
-    return new LEFDEFReaderOptionsEditor (parent);
+    return new lay::LEFDEFReaderOptionsEditor (parent);
   }
 
   db::FormatSpecificReaderOptions *create_specific_options () const

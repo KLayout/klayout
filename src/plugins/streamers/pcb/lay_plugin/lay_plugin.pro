@@ -13,11 +13,11 @@ LIBS += -L$$DESTDIR/../db_plugins -lpcb
 }
 
 HEADERS = \
-  extGerberImportDialog.h \
+    layGerberImportDialog.h
 
 SOURCES = \
-  extGerberImport.cc \
-  extGerberImportDialog.cc \
+    layGerberImport.cc \
+    layGerberImportDialog.cc
 
 FORMS = \
   GerberImportDialog.ui \

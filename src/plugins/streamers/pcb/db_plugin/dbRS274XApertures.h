@@ -21,8 +21,8 @@
 */
 
 
-#ifndef HDR_extRS274XApertures
-#define HDR_extRS274XApertures
+#ifndef HDR_dbRS274XApertures
+#define HDR_dbRS274XApertures
 
 #include "dbPoint.h"
 #include "dbPath.h"
@@ -38,7 +38,7 @@ namespace db
   class EdgeProcessor;
 }
  
-namespace ext
+namespace db
 {
 
 class RS274XReader;

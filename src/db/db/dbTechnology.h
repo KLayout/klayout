@@ -699,14 +699,12 @@ private:
  *  @brief A base class for a technology component provider
  */
 class DB_PUBLIC TechnologyComponentProvider
-  : public tl::RegisteredClass<TechnologyComponentProvider>
 {
 public:
   /**
    *  @brief The constructor
    */
   TechnologyComponentProvider ()
-    : tl::RegisteredClass<TechnologyComponentProvider> (this)
   {
     // .. nothing yet ..
   }

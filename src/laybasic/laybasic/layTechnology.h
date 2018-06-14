@@ -106,14 +106,12 @@ private:
  *  @brief A base class for a technology component provider
  */
 class LAYBASIC_PUBLIC TechnologyEditorProvider
-  : public tl::RegisteredClass<TechnologyEditorProvider>
 {
 public:
   /**
    *  @brief The constructor
    */
   TechnologyEditorProvider ()
-    : tl::RegisteredClass<TechnologyEditorProvider> (this)
   {
     // .. nothing yet ..
   }

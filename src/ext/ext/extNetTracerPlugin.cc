@@ -79,18 +79,6 @@ extern std::string net_tracer_component_name;
 // -----------------------------------------------------------------------------------
 //  NetTracerPlugin definition and implementation
 
-class NetTracerTechnologyEditorProvider
-  : public lay::TechnologyEditorProvider
-{
-public:
-  virtual lay::TechnologyComponentEditor *create_editor (QWidget *parent) const
-  {
-    return new NetTracerTechComponentEditor (parent);
-  }
-};
-
-static tl::RegisteredClass<lay::TechnologyEditorProvider> editor_decl (new NetTracerTechnologyEditorProvider (), 13000, "NetTracerPlugin");
-
 class NetTracerPluginDeclaration
   : public lay::PluginDeclaration
 {
@@ -132,6 +120,18 @@ public:
 };
 
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new NetTracerPluginDeclaration (), 13000, "NetTracerPlugin");
+
+class NetTracerTechnologyEditorProvider
+  : public lay::TechnologyEditorProvider
+{
+public:
+  virtual lay::TechnologyComponentEditor *create_editor (QWidget *parent) const
+  {
+    return new NetTracerTechComponentEditor (parent);
+  }
+};
+
+static tl::RegisteredClass<lay::TechnologyEditorProvider> editor_decl (new NetTracerTechnologyEditorProvider (), 13000, net_tracer_component_name.c_str ());
 
 class NetTracerTechnologyComponentProvider
   : public db::TechnologyComponentProvider

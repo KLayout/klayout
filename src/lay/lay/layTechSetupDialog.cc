@@ -972,7 +972,7 @@ TechSetupDialog::update_tech (db::Technology *t)
       m_technology_components.insert (std::make_pair (*n, tc));
 
       tce_widget = 0;
-      for (tl::Registrar<lay::TechnologyEditorProvider>::iterator cls = tl::Registrar<lay::TechnologyEditorProvider>::begin (); cls != tl::Registrar<lay::TechnologyEditorProvider>::begin () && ! tce_widget; ++cls) {
+      for (tl::Registrar<lay::TechnologyEditorProvider>::iterator cls = tl::Registrar<lay::TechnologyEditorProvider>::begin (); cls != tl::Registrar<lay::TechnologyEditorProvider>::end () && ! tce_widget; ++cls) {
         if (cls.current_name () == tc->name ()) {
           tce_widget = cls->create_editor (this);
         }
@@ -1155,7 +1155,7 @@ TechComponentSetupDialog::TechComponentSetupDialog (QWidget *parent, db::Technol
     mp_component = component->clone ();
 
     mp_editor = 0;
-    for (tl::Registrar<lay::TechnologyEditorProvider>::iterator cls = tl::Registrar<lay::TechnologyEditorProvider>::begin (); cls != tl::Registrar<lay::TechnologyEditorProvider>::begin () && ! mp_editor; ++cls) {
+    for (tl::Registrar<lay::TechnologyEditorProvider>::iterator cls = tl::Registrar<lay::TechnologyEditorProvider>::begin (); cls != tl::Registrar<lay::TechnologyEditorProvider>::end () && ! mp_editor; ++cls) {
       if (cls.current_name () == mp_component->name ()) {
         mp_editor = cls->create_editor (content_frame);
       }

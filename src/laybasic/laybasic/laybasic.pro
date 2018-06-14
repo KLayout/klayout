@@ -237,7 +237,6 @@ HEADERS = \
   rdbMarkerBrowserDialog.h \
   rdbMarkerBrowser.h \
   rdbMarkerBrowserPage.h \
-  layCommonReaderPlugin.h \
   layLineStyles.h \
   laySelectLineStyleForm.h \
   layLineStylePalette.h \

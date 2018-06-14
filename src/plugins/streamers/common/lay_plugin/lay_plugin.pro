@@ -13,9 +13,10 @@ LIBS += -L$$DESTDIR/../db_plugins -lcif
 }
 
 HEADERS = \
+  layCommonReaderPlugin.h \
 
 SOURCES = \
-  layCommonStreamOptions.cc \
+  layCommonReaderPlugin.cc \
 
 FORMS = \
   CommonReaderOptionsPage.ui \

@@ -30,10 +30,9 @@
 #include <QFileInfo>
 #include <QDir>
 
-namespace lay
+namespace tl
 {
-
-  //  .. nothing yet ..
-
+  template<> LAYBASIC_PUBLIC tl::Registrar<lay::TechnologyEditorProvider> *tl::Registrar<lay::TechnologyEditorProvider>::instance = 0;
+  template class LAYBASIC_PUBLIC tl::RegisteredClass<lay::TechnologyEditorProvider>;
 }
 

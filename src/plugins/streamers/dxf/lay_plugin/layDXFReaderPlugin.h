@@ -45,8 +45,8 @@ public:
   DXFReaderOptionPage (QWidget *parent);
   ~DXFReaderOptionPage ();
 
-  void setup (const db::FormatSpecificReaderOptions *options, const lay::Technology *tech);
-  void commit (db::FormatSpecificReaderOptions *options, const lay::Technology *tech);
+  void setup (const db::FormatSpecificReaderOptions *options, const db::Technology *tech);
+  void commit (db::FormatSpecificReaderOptions *options, const db::Technology *tech);
 
 private:
   Ui::DXFReaderOptionPage *mp_ui;

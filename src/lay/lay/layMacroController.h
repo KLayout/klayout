@@ -37,12 +37,16 @@
 
 #include <QObject>
 
+namespace db
+{
+  class Technology;
+}
+
 namespace lay
 {
 
 class MacroEditorDialog;
 class MainWindow;
-class Technology;
 class Action;
 
 /**
@@ -248,7 +252,7 @@ private:
   std::vector<std::pair<std::string, bool> > m_menu_items_hidden;
 
   void sync_implicit_macros (bool ask_before_autorun);
-  void add_macro_items_to_menu (lym::MacroCollection &collection, std::set<std::string> &used_names, std::set<std::string> &groups, const lay::Technology *tech);
+  void add_macro_items_to_menu (lym::MacroCollection &collection, std::set<std::string> &used_names, std::set<std::string> &groups, const db::Technology *tech);
   void do_update_menu_with_macros ();
   void do_sync_with_external_sources ();
   void sync_file_watcher ();

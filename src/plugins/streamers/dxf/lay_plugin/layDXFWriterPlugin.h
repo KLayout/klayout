@@ -45,8 +45,8 @@ public:
   DXFWriterOptionPage (QWidget *parent);
   ~DXFWriterOptionPage ();
 
-  void setup (const db::FormatSpecificWriterOptions *options, const lay::Technology *tech);
-  void commit (db::FormatSpecificWriterOptions *options, const lay::Technology *tech, bool gzip);
+  void setup (const db::FormatSpecificWriterOptions *options, const db::Technology *tech);
+  void commit (db::FormatSpecificWriterOptions *options, const db::Technology *tech, bool gzip);
 
 private:
   Ui::DXFWriterOptionPage *mp_ui;

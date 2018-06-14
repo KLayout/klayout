@@ -3390,13 +3390,13 @@ MainWindow::cm_pull_in ()
 void
 MainWindow::cm_reader_options ()
 {
-  mp_layout_load_options->edit_global_options (this, lay::Technologies::instance ());
+  mp_layout_load_options->edit_global_options (this, db::Technologies::instance ());
 }
 
 void
 MainWindow::cm_writer_options ()
 {
-  mp_layout_save_options->edit_global_options (this, lay::Technologies::instance ());
+  mp_layout_save_options->edit_global_options (this, db::Technologies::instance ());
 }
 
 void
@@ -4154,7 +4154,7 @@ MainWindow::open_recent ()
     return;
   }
 
-  if (mp_layout_load_options->show_always () && !mp_layout_load_options->edit_global_options (this, lay::Technologies::instance ())) {
+  if (mp_layout_load_options->show_always () && !mp_layout_load_options->edit_global_options (this, db::Technologies::instance ())) {
     return;
   }
 
@@ -4203,7 +4203,7 @@ MainWindow::open (int mode)
     return;
   }
 
-  if (mp_layout_load_options->show_always () && !mp_layout_load_options->edit_global_options (this, lay::Technologies::instance ())) {
+  if (mp_layout_load_options->show_always () && !mp_layout_load_options->edit_global_options (this, db::Technologies::instance ())) {
     return;
   }
 

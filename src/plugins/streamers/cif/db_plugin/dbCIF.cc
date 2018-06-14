@@ -164,6 +164,25 @@ public:
   {
     return true;
   }
+
+  virtual tl::XMLElementBase *xml_reader_options_element () const
+  {
+    return new db::ReaderOptionsXMLElement<db::CIFReaderOptions> ("cif",
+      tl::make_member (&db::CIFReaderOptions::wire_mode, "wire-mode") +
+      tl::make_member (&db::CIFReaderOptions::dbu, "dbu") +
+      tl::make_member (&db::CIFReaderOptions::layer_map, "layer-map") +
+      tl::make_member (&db::CIFReaderOptions::create_other_layers, "create-other-layers") +
+      tl::make_member (&db::CIFReaderOptions::keep_layer_names, "keep-layer-names")
+    );
+  }
+
+  virtual tl::XMLElementBase *xml_writer_options_element () const
+  {
+    return new db::WriterOptionsXMLElement<db::CIFWriterOptions> ("cif",
+      tl::make_member (&db::CIFWriterOptions::dummy_calls, "dummy-calls") +
+      tl::make_member (&db::CIFWriterOptions::blank_separator, "blank-separator")
+    );
+  }
 };
 
 static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new CIFFormatDeclaration (), 100, "CIF");

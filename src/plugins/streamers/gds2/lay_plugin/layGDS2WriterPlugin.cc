@@ -51,7 +51,7 @@ GDS2WriterOptionPage::~GDS2WriterOptionPage ()
 }
 
 void 
-GDS2WriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const lay::Technology * /*tech*/)
+GDS2WriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
 {
   const db::GDS2WriterOptions *options = dynamic_cast<const db::GDS2WriterOptions *> (o);
   if (options) {
@@ -68,7 +68,7 @@ GDS2WriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const lay
 }
 
 void 
-GDS2WriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const lay::Technology * /*tech*/, bool /*gzip*/)
+GDS2WriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool /*gzip*/)
 {
   db::GDS2WriterOptions *options = dynamic_cast<db::GDS2WriterOptions *> (o);
   if (options) {
@@ -133,20 +133,6 @@ public:
   db::FormatSpecificWriterOptions *create_specific_options () const
   {
     return new db::GDS2WriterOptions ();
-  }
-
-  virtual tl::XMLElementBase *xml_element () const
-  {
-    return new lay::WriterOptionsXMLElement<db::GDS2WriterOptions> ("gds2",
-      tl::make_member (&db::GDS2WriterOptions::write_timestamps, "write-timestamps") +
-      tl::make_member (&db::GDS2WriterOptions::write_cell_properties, "write-cell-properties") +
-      tl::make_member (&db::GDS2WriterOptions::write_file_properties, "write-file-properties") +
-      tl::make_member (&db::GDS2WriterOptions::no_zero_length_paths, "no-zero-length-paths") +
-      tl::make_member (&db::GDS2WriterOptions::multi_xy_records, "multi-xy-records") +
-      tl::make_member (&db::GDS2WriterOptions::max_vertex_count, "max-vertex-count") +
-      tl::make_member (&db::GDS2WriterOptions::max_cellname_length, "max-cellname-length") +
-      tl::make_member (&db::GDS2WriterOptions::libname, "libname")
-    );
   }
 
   void initialize_options_from_layout_handle (db::FormatSpecificWriterOptions *o, const lay::LayoutHandle &lh) const

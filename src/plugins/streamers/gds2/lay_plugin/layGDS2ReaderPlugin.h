@@ -45,8 +45,8 @@ public:
   GDS2ReaderOptionPage (QWidget *parent);
   ~GDS2ReaderOptionPage ();
 
-  void setup (const db::FormatSpecificReaderOptions *options, const lay::Technology *tech);
-  void commit (db::FormatSpecificReaderOptions *options, const lay::Technology *tech);
+  void setup (const db::FormatSpecificReaderOptions *options, const db::Technology *tech);
+  void commit (db::FormatSpecificReaderOptions *options, const db::Technology *tech);
 
 private:
   Ui::GDS2ReaderOptionPage *mp_ui;

@@ -151,7 +151,7 @@ static tl::XMLElementList xml_elements ()
     ) +
     tl::make_member (&StreamImportData::explicit_trans, "explicit-trans") +
     tl::make_element (&StreamImportData::options, "options",
-      lay::load_options_xml_element_list ()
+      db::load_options_xml_element_list ()
     );
 }
 

@@ -128,10 +128,10 @@ public:
         tl::InputStream stream (data.file);
 
         std::string tech_name = lay::MainWindow::instance ()->initial_technology ();
-        if (! lay::Technologies::instance ()->has_technology (tech_name)) {
+        if (! db::Technologies::instance ()->has_technology (tech_name)) {
           tech_name.clear (); // use default technology
         }
-        const lay::Technology *tech = lay::Technologies::instance ()->technology_by_name (tech_name);
+        const db::Technology *tech = db::Technologies::instance ()->technology_by_name (tech_name);
         db::LEFDEFReaderOptions options;
         if (tech) {
           const db::LEFDEFReaderOptions *tech_options = dynamic_cast<const db::LEFDEFReaderOptions *>(tech->load_layout_options ().get_options ("LEFDEF"));

@@ -50,7 +50,7 @@ GDS2ReaderOptionPage::~GDS2ReaderOptionPage ()
 }
 
 void 
-GDS2ReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const lay::Technology * /*tech*/)
+GDS2ReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   static const db::GDS2ReaderOptions default_options;
   const db::GDS2ReaderOptions *options = dynamic_cast<const db::GDS2ReaderOptions *> (o);
@@ -64,7 +64,7 @@ GDS2ReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const lay
 }
 
 void 
-GDS2ReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const lay::Technology * /*tech*/)
+GDS2ReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   db::GDS2ReaderOptions *options = dynamic_cast<db::GDS2ReaderOptions *> (o);
   if (options) {
@@ -97,15 +97,6 @@ public:
   db::FormatSpecificReaderOptions *create_specific_options () const
   {
     return new db::GDS2ReaderOptions ();
-  }
-
-  virtual tl::XMLElementBase *xml_element () const
-  {
-    return new lay::ReaderOptionsXMLElement<db::GDS2ReaderOptions> ("gds2",
-      tl::make_member (&db::GDS2ReaderOptions::box_mode, "box-mode") +
-      tl::make_member (&db::GDS2ReaderOptions::allow_big_records, "allow-big-records") +
-      tl::make_member (&db::GDS2ReaderOptions::allow_multi_xy_records, "allow-multi-xy-records")
-    );
   }
 };
 

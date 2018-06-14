@@ -48,7 +48,7 @@ DXFReaderOptionPage::~DXFReaderOptionPage ()
 }
 
 void 
-DXFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const lay::Technology * /*tech*/)
+DXFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   static const db::DXFReaderOptions default_options;
   const db::DXFReaderOptions *options = dynamic_cast<const db::DXFReaderOptions *> (o);
@@ -71,7 +71,7 @@ DXFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const lay:
 }
 
 void 
-DXFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const lay::Technology * /*tech*/)
+DXFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   db::DXFReaderOptions *options = dynamic_cast<db::DXFReaderOptions *> (o);
   if (options) {
@@ -123,24 +123,6 @@ public:
   db::FormatSpecificReaderOptions *create_specific_options () const
   {
     return new db::DXFReaderOptions ();
-  }
-
-  virtual tl::XMLElementBase *xml_element () const
-  {
-    return new lay::ReaderOptionsXMLElement<db::DXFReaderOptions> ("dxf",
-      tl::make_member (&db::DXFReaderOptions::dbu, "dbu") +
-      tl::make_member (&db::DXFReaderOptions::unit, "unit") +
-      tl::make_member (&db::DXFReaderOptions::text_scaling, "text-scaling") +
-      tl::make_member (&db::DXFReaderOptions::circle_points, "circle-points") +
-      tl::make_member (&db::DXFReaderOptions::circle_accuracy, "circle-accuracy") +
-      tl::make_member (&db::DXFReaderOptions::contour_accuracy, "contour-accuracy") +
-      tl::make_member (&db::DXFReaderOptions::polyline_mode, "polyline-mode") +
-      tl::make_member (&db::DXFReaderOptions::render_texts_as_polygons, "render-texts-as-polygons") +
-      tl::make_member (&db::DXFReaderOptions::keep_other_cells, "keep-other-cells") +
-      tl::make_member (&db::DXFReaderOptions::keep_layer_names, "keep-layer-names") +
-      tl::make_member (&db::DXFReaderOptions::create_other_layers, "create-other-layers") +
-      tl::make_member (&db::DXFReaderOptions::layer_map, "layer-map")
-    );
   }
 };
 

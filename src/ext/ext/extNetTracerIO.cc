@@ -358,13 +358,13 @@ NetTracerLayerExpressionInfo::get (const db::Layout &layout, const NetTracerTech
 //  NetTracerTechnologyComponent implementation
 
 NetTracerTechnologyComponent::NetTracerTechnologyComponent ()
-  : lay::TechnologyComponent (net_tracer_component_name, tl::to_string (QObject::tr ("Connectivity")))
+  : db::TechnologyComponent (net_tracer_component_name, tl::to_string (QObject::tr ("Connectivity")))
 {
   // .. nothing yet ..
 }
 
 NetTracerTechnologyComponent::NetTracerTechnologyComponent (const NetTracerTechnologyComponent &d)
-  : lay::TechnologyComponent (net_tracer_component_name, tl::to_string (QObject::tr ("Connectivity")))
+  : db::TechnologyComponent (net_tracer_component_name, tl::to_string (QObject::tr ("Connectivity")))
 {
   m_connections = d.m_connections;
   m_symbols = d.m_symbols;
@@ -412,12 +412,6 @@ NetTracerTechnologyComponent::get_tracer_data (const db::Layout &layout) const
   }
 
   return data;
-}
-
-lay::TechnologyComponentEditor *
-NetTracerTechnologyComponent::create_editor (QWidget *parent) 
-{
-  return new NetTracerTechComponentEditor (parent);
 }
 
 // -----------------------------------------------------------------------------------------

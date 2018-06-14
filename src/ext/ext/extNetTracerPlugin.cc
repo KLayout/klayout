@@ -79,12 +79,23 @@ extern std::string net_tracer_component_name;
 // -----------------------------------------------------------------------------------
 //  NetTracerPlugin definition and implementation
 
-class NetTracerPluginDeclaration
-  : public lay::PluginDeclaration,
-    public lay::TechnologyComponentProvider
+class NetTracerTechnologyEditorProvider
+  : public lay::TechnologyEditorProvider
 {
 public:
-  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const 
+  virtual lay::TechnologyComponentEditor *create_editor (QWidget *parent) const
+  {
+    return new NetTracerTechComponentEditor (parent);
+  }
+};
+
+static tl::RegisteredClass<lay::TechnologyEditorProvider> editor_decl (new NetTracerTechnologyEditorProvider (), 13000, "NetTracerPlugin");
+
+class NetTracerPluginDeclaration
+  : public lay::PluginDeclaration
+{
+public:
+  virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
   {
     options.push_back (std::pair<std::string, std::string> (cfg_nt_window_mode, "fit-net"));
     options.push_back (std::pair<std::string, std::string> (cfg_nt_window_dim, "1.0"));
@@ -99,7 +110,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_nt_marker_intensity, "50"));
   }
 
-  virtual std::vector<std::pair <std::string, lay::ConfigPage *> > config_pages (QWidget *parent) const 
+  virtual std::vector<std::pair <std::string, lay::ConfigPage *> > config_pages (QWidget *parent) const
   {
     std::vector<std::pair <std::string, lay::ConfigPage *> > pages;
     pages.push_back (std::make_pair (tl::to_string (QObject::tr ("Other Tools|Net Tracer")), new NetTracerConfigPage (parent)));
@@ -113,32 +124,40 @@ public:
     menu_entries.push_back (lay::MenuEntry ("net_trace_group", "tools_menu.end"));
     menu_entries.push_back (lay::MenuEntry ("ext::net_trace", "net_trace", "tools_menu.end", tl::to_string (QObject::tr ("Trace Net"))));
   }
- 
+
   virtual lay::Plugin *create_plugin (db::Manager * /*manager*/, lay::PluginRoot *root, lay::LayoutView *view) const
   {
     return new NetTracerDialog (root, view);
   }
+};
 
-  virtual const lay::TechnologyComponentProvider *technology_component_provider () const 
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new NetTracerPluginDeclaration (), 13000, "NetTracerPlugin");
+
+class NetTracerTechnologyComponentProvider
+  : public db::TechnologyComponentProvider
+{
+public:
+  NetTracerTechnologyComponentProvider ()
+    : db::TechnologyComponentProvider ()
   {
-    return this;
+    //  .. nothing yet ..
   }
 
-  virtual lay::TechnologyComponent *create_component () const
+  virtual db::TechnologyComponent *create_component () const
   {
     return new NetTracerTechnologyComponent ();
   }
 
-  virtual tl::XMLElementBase *xml_element () const 
+  virtual tl::XMLElementBase *xml_element () const
   {
-    return new lay::TechnologyComponentXMLElement<NetTracerTechnologyComponent> (net_tracer_component_name, 
+    return new db::TechnologyComponentXMLElement<NetTracerTechnologyComponent> (net_tracer_component_name,
       tl::make_member ((NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::begin, (NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::end, &NetTracerTechnologyComponent::add, "connection") +
       tl::make_member ((NetTracerTechnologyComponent::const_symbol_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::begin_symbols, (NetTracerTechnologyComponent::const_symbol_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::end_symbols, &NetTracerTechnologyComponent::add_symbol, "symbols")
     );
   }
 };
 
-static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new NetTracerPluginDeclaration (), 13000, "NetTracerPlugin");
+static tl::RegisteredClass<db::TechnologyComponentProvider> tc_decl (new NetTracerTechnologyComponentProvider (), 13000, "NetTracerPlugin");
 
 }
 
@@ -168,7 +187,7 @@ static void def_symbol (ext::NetTracerTechnologyComponent *tech, const std::stri
   tech->add_symbol (ext::NetTracerSymbolInfo (db::LayerProperties (name), expr));
 }
 
-gsi::Class<lay::TechnologyComponent> &decl_layTechnologyComponent ();
+gsi::Class<db::TechnologyComponent> &decl_layTechnologyComponent ();
 
 gsi::Class<ext::NetTracerTechnologyComponent> decl_NetTracerTechnology (decl_layTechnologyComponent (), "lay", "NetTracerTechnology",
   gsi::method_ext ("connection", &def_connection2, gsi::arg("a"), gsi::arg("b"),
@@ -216,7 +235,7 @@ static void trace2 (ext::NetTracer *net_tracer, const ext::NetTracerTechnologyCo
 
 static ext::NetTracerData get_tracer_data_from_cv (const lay::CellViewRef &cv)
 {
-  const lay::Technology *tech = cv->technology ();
+  const db::Technology *tech = cv->technology ();
   tl_assert (tech != 0);
 
   const ext::NetTracerTechnologyComponent *tech_component = dynamic_cast <const ext::NetTracerTechnologyComponent *> (tech->component_by_name (ext::net_tracer_component_name));
@@ -239,7 +258,7 @@ static void trace2_cv (ext::NetTracer *net_tracer, const lay::CellViewRef &cv, c
 
 static ext::NetTracerData get_tracer_data_from_tech (const std::string &tech_name, const db::Layout &layout)
 {
-  const lay::Technology *tech = lay::Technologies::instance ()->technology_by_name (tech_name);
+  const db::Technology *tech = db::Technologies::instance ()->technology_by_name (tech_name);
   tl_assert (tech != 0);
 
   const ext::NetTracerTechnologyComponent *tech_component = dynamic_cast <const ext::NetTracerTechnologyComponent *> (tech->component_by_name (ext::net_tracer_component_name));

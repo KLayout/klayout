@@ -38,6 +38,11 @@
 
 #include <memory>
 
+namespace db
+{
+  class Technology;
+}
+
 namespace lym
 {
   class Macro;
@@ -48,7 +53,6 @@ namespace lay
 {
 
 class TechnologyComponentEditor;
-class Technology;
 
 class TechBaseEditorPage
   : public TechnologyComponentEditor,
@@ -133,7 +137,7 @@ public:
   TechSetupDialog (QWidget *parent);
   ~TechSetupDialog ();
 
-  int exec (lay::Technologies &technologies);
+  int exec (db::Technologies &technologies);
 
 protected slots:
   void current_tech_changed (QTreeWidgetItem *current, QTreeWidgetItem *previous);
@@ -146,22 +150,22 @@ protected slots:
 
 private:
   void update_tech_tree ();
-  void update_tech (lay::Technology *tech);
+  void update_tech (db::Technology *tech);
   void update_tech_component ();
   void accept ();
-  lay::Technology *selected_tech ();
-  void select_tech (const lay::Technology &tech);
+  db::Technology *selected_tech ();
+  void select_tech (const db::Technology &tech);
   std::string selected_tech_component_name ();
   void commit_tech_component ();
   void clear_components ();
   void update ();
 
-  lay::Technologies m_technologies;
-  lay::Technology *mp_current_tech;
+  db::Technologies m_technologies;
+  db::Technology *mp_current_tech;
   std::map <std::string, lay::TechnologyComponentEditor *> m_component_editors;
-  std::map <std::string, lay::TechnologyComponent *> m_technology_components;
+  std::map <std::string, db::TechnologyComponent *> m_technology_components;
   lay::TechnologyComponentEditor *mp_current_editor;
-  lay::TechnologyComponent *mp_current_tech_component;
+  db::TechnologyComponent *mp_current_tech_component;
   bool m_current_tech_changed_enabled;
 };
 
@@ -170,16 +174,16 @@ class LAY_PUBLIC TechComponentSetupDialog
     public Ui::TechComponentSetupDialog
 {
 public:
-  TechComponentSetupDialog (QWidget *parent, Technology *tech, const std::string &component_name);
+  TechComponentSetupDialog (QWidget *parent, db::Technology *tech, const std::string &component_name);
   ~TechComponentSetupDialog ();
 
 protected:
   void accept ();
 
 private:
-  Technology *mp_tech;
-  TechnologyComponent *mp_component;
-  TechnologyComponentEditor *mp_editor;
+  db::Technology *mp_tech;
+  db::TechnologyComponent *mp_component;
+  lay::TechnologyComponentEditor *mp_editor;
 };
 
 }

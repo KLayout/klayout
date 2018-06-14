@@ -39,6 +39,7 @@ class QWidget;
 namespace db
 {
   class SaveLayoutOptions;
+  class Technologies;
 }
 
 namespace lay
@@ -46,7 +47,6 @@ namespace lay
 
 class LayoutView;
 class PluginRoot;
-class Technologies;
 
 class LAYBASIC_PUBLIC SaveLayoutAsOptionsDialog
   : public QDialog, private Ui::SaveLayoutAsOptionsDialog
@@ -68,7 +68,7 @@ private:
   std::vector<int> m_tab_positions;
   std::string m_filename;
   db::SaveLayoutOptions m_options;
-  const lay::Technology *mp_tech;
+  const db::Technology *mp_tech;
 };
 
 class LAYBASIC_PUBLIC SaveLayoutOptionsDialog
@@ -80,7 +80,7 @@ public:
   SaveLayoutOptionsDialog (QWidget *parent, const std::string &title);
   ~SaveLayoutOptionsDialog ();
 
-  bool edit_global_options (lay::PluginRoot *config_root, lay::Technologies *technologies);
+  bool edit_global_options (lay::PluginRoot *config_root, db::Technologies *technologies);
   bool get_options (db::SaveLayoutOptions &options);
 
 public slots:
@@ -93,7 +93,7 @@ private:
   std::vector< std::pair<StreamWriterOptionsPage *, std::string> > m_pages;
   int m_technology_index;
   std::vector<db::SaveLayoutOptions> m_opt_array;
-  std::vector<const lay::Technology *> m_tech_array;
+  std::vector<const db::Technology *> m_tech_array;
 
   void commit ();
   void update ();

@@ -51,7 +51,7 @@ CIFWriterOptionPage::~CIFWriterOptionPage ()
 }
 
 void 
-CIFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const lay::Technology * /*tech*/)
+CIFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
 {
   const db::CIFWriterOptions *options = dynamic_cast<const db::CIFWriterOptions *> (o);
   if (options) {
@@ -61,7 +61,7 @@ CIFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const lay:
 }
 
 void 
-CIFWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const lay::Technology * /*tech*/, bool /*gzip*/)
+CIFWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool /*gzip*/)
 {
   db::CIFWriterOptions *options = dynamic_cast<db::CIFWriterOptions *> (o);
   if (options) {
@@ -91,14 +91,6 @@ public:
   db::FormatSpecificWriterOptions *create_specific_options () const
   {
     return new db::CIFWriterOptions ();
-  }
-
-  virtual tl::XMLElementBase *xml_element () const
-  {
-    return new lay::WriterOptionsXMLElement<db::CIFWriterOptions> ("cif",
-      tl::make_member (&db::CIFWriterOptions::dummy_calls, "dummy-calls") +
-      tl::make_member (&db::CIFWriterOptions::blank_separator, "blank-separator")
-    );
   }
 };
 

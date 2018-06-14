@@ -39,6 +39,7 @@ class QAbstractButton;
 namespace db
 {
   class LoadLayoutOptions;
+  class Technologies;
 }
 
 namespace Ui
@@ -53,7 +54,6 @@ namespace lay
 class LayoutView;
 class PluginRoot;
 class FileDialog;
-class Technologies;
 
 class LAYBASIC_PUBLIC LoadLayoutOptionsDialog
   : public QDialog
@@ -64,7 +64,7 @@ public:
   LoadLayoutOptionsDialog (QWidget *parent, const std::string &title);
   ~LoadLayoutOptionsDialog ();
 
-  bool edit_global_options (lay::PluginRoot *config_root, lay::Technologies *technologies);
+  bool edit_global_options (lay::PluginRoot *config_root, db::Technologies *technologies);
   bool get_options (db::LoadLayoutOptions &options);
 
   void show_always (bool sa)
@@ -89,7 +89,7 @@ private:
   bool m_show_always;
   int m_technology_index;
   std::vector<db::LoadLayoutOptions> m_opt_array;
-  std::vector<const lay::Technology *> m_tech_array;
+  std::vector<const db::Technology *> m_tech_array;
 
   void commit ();
   void update ();

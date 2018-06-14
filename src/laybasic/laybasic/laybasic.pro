@@ -63,7 +63,6 @@ FORMS = \
   UserPropertiesForm.ui \
   UserPropertiesEditForm.ui \
   SpecificLoadLayoutOptionsDialog.ui \
-  CommonReaderOptionsPage.ui \
   SelectLineStyleForm.ui \
   LayoutViewConfigPage6a.ui \
   EditLineStylesForm.ui
@@ -154,14 +153,12 @@ SOURCES = \
   rdbMarkerBrowser.cc \
   rdbMarkerBrowserDialog.cc \
   rdbMarkerBrowserPage.cc \
-  layCommonReaderPlugin.cc \
   layLineStyles.cc \
   laySelectLineStyleForm.cc \
   layLineStylePalette.cc \
   layEditLineStylesForm.cc \
   layEditLineStyleWidget.cc \
   layBackgroundAwareTreeStyle.cc \
-  gsiDeclLayTechnologies.cc
 
 HEADERS = \
   gtf.h \

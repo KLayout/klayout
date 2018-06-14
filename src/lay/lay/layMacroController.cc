@@ -502,7 +502,7 @@ MacroController::sync_macro_sources ()
   std::map<std::string, std::vector<std::string> > grain_names_by_path;
   std::set<std::string> readonly_paths;
 
-  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
+  for (db::Technologies::const_iterator t = db::Technologies::instance ()->begin (); t != db::Technologies::instance ()->end (); ++t) {
     if (! t->base_path ().empty ()) {
       QDir base_dir (tl::to_qstring (t->base_path ()));
       if (base_dir.exists ()) {
@@ -652,7 +652,7 @@ static std::string menu_name (std::set<std::string> &used_names, const std::stri
 }
 
 void
-MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std::set<std::string> &used_names, std::set<std::string> &groups, const lay::Technology *tech)
+MacroController::add_macro_items_to_menu (lym::MacroCollection &collection, std::set<std::string> &used_names, std::set<std::string> &groups, const db::Technology *tech)
 {
   for (lym::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
 
@@ -775,7 +775,7 @@ MacroController::do_update_menu_with_macros ()
     return;
   }
 
-  const lay::Technology *tech = 0;
+  const db::Technology *tech = 0;
   if (lay::TechnologyController::instance ()) {
     tech = lay::TechnologyController::instance ()->active_technology ();
   }

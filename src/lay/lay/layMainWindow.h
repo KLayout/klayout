@@ -227,7 +227,7 @@ public:
    */
   lay::CellViewRef load_layout (const std::string &filename, const std::string &technology, int mode = 0)
   {
-    return load_layout (filename, lay::Technologies::instance ()->technology_by_name (technology)->load_layout_options (), technology, mode);
+    return load_layout (filename, db::Technologies::instance ()->technology_by_name (technology)->load_layout_options (), technology, mode);
   }
 
   /** 

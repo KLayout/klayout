@@ -203,10 +203,10 @@ LayoutHandle::remove_ref ()
   }
 }
 
-const lay::Technology *
+const db::Technology *
 LayoutHandle::technology () const
 {
-  return lay::Technologies::instance ()->technology_by_name (m_tech_name);
+  return db::Technologies::instance ()->technology_by_name (m_tech_name);
 }
 
 void 
@@ -221,7 +221,7 @@ void
 LayoutHandle::set_tech_name (const std::string &tn)
 {
   if (tn != m_tech_name) {
-    if (lay::Technologies::instance ()->has_technology (tn)) {
+    if (db::Technologies::instance ()->has_technology (tn)) {
       m_tech_name = tn;
     } else {
       m_tech_name = std::string ();

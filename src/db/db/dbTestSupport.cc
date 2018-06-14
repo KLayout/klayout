@@ -21,10 +21,10 @@
 */
 
 #include "dbTestSupport.h"
+#include "dbCommonReader.h"
 #include "dbStreamLayers.h"
 #include "dbReader.h"
 #include "dbWriter.h"
-#include "dbCommonReader.h"
 #include "dbCell.h"
 #include "dbCellInst.h"
 #include "dbLayoutDiff.h"

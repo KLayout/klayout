@@ -115,8 +115,8 @@ NewLayoutPropertiesDialog::tech_changed ()
 {
   double dbu = 0.001;
   int technology_index = mp_ui->tech_cbx->currentIndex ();
-  if (technology_index >= 0 && technology_index < (int) lay::Technologies::instance ()->technologies ()) {
-    dbu = lay::Technologies::instance ()->begin () [technology_index].dbu ();
+  if (technology_index >= 0 && technology_index < (int) db::Technologies::instance ()->technologies ()) {
+    dbu = db::Technologies::instance ()->begin () [technology_index].dbu ();
   }
 
 #if QT_VERSION >= 0x40700
@@ -129,7 +129,7 @@ NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &ce
 {
   mp_ui->tech_cbx->clear ();
   unsigned int technology_index = 0;
-  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t, ++technology_index) {
+  for (db::Technologies::const_iterator t = db::Technologies::instance ()->begin (); t != db::Technologies::instance ()->end (); ++t, ++technology_index) {
 
     std::string d = t->name ();
     if (! d.empty () && ! t->description ().empty ()) {
@@ -157,8 +157,8 @@ NewLayoutPropertiesDialog::exec_dialog (std::string &technology, std::string &ce
 
     //  get the selected technology name
     int technology_index = mp_ui->tech_cbx->currentIndex ();
-    if (technology_index >= 0 && technology_index < (int) lay::Technologies::instance ()->technologies ()) {
-      technology = lay::Technologies::instance ()->begin () [technology_index].name ();
+    if (technology_index >= 0 && technology_index < (int) db::Technologies::instance ()->technologies ()) {
+      technology = db::Technologies::instance ()->begin () [technology_index].name ();
     } else {
       technology = std::string ();
     }

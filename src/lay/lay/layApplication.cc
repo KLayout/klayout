@@ -670,7 +670,7 @@ ApplicationBase::init_app ()
           tl::info << "Importing technology from " << f->second.second;
         }
 
-        lay::Technology t;
+        db::Technology t;
         t.load (f->second.second);
 
         tc->add_temp_tech (t);

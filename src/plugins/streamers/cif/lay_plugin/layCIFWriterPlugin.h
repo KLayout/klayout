@@ -44,8 +44,8 @@ public:
   CIFWriterOptionPage (QWidget *parent);
   ~CIFWriterOptionPage ();
 
-  void setup (const db::FormatSpecificWriterOptions *options, const lay::Technology *tech);
-  void commit (db::FormatSpecificWriterOptions *options, const lay::Technology *tech, bool gzip);
+  void setup (const db::FormatSpecificWriterOptions *options, const db::Technology *tech);
+  void commit (db::FormatSpecificWriterOptions *options, const db::Technology *tech, bool gzip);
 
 private:
   Ui::CIFWriterOptionPage *mp_ui;

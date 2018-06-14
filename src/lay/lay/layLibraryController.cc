@@ -145,7 +145,7 @@ LibraryController::sync_files ()
 
   //  add the technologies as potential sources for library definitions
 
-  for (lay::Technologies::iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
+  for (db::Technologies::iterator t = db::Technologies::instance ()->begin (); t != db::Technologies::instance ()->end (); ++t) {
     if (! t->base_path ().empty ()) {
       paths.push_back (std::make_pair (t->base_path (), t->name ()));
     }

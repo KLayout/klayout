@@ -43,8 +43,8 @@ public:
   OASISWriterOptionPage (QWidget *parent);
   ~OASISWriterOptionPage ();
 
-  void setup (const db::FormatSpecificWriterOptions *options, const lay::Technology *tech);
-  void commit (db::FormatSpecificWriterOptions *options, const lay::Technology *tech, bool gzip);
+  void setup (const db::FormatSpecificWriterOptions *options, const db::Technology *tech);
+  void commit (db::FormatSpecificWriterOptions *options, const db::Technology *tech, bool gzip);
 
 private:
   Ui::OASISWriterOptionPage *mp_ui;
@@ -63,7 +63,7 @@ OASISWriterOptionPage::~OASISWriterOptionPage ()
 }
 
 void 
-OASISWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const lay::Technology * /*tech*/)
+OASISWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
 {
   const db::OASISWriterOptions *options = dynamic_cast<const db::OASISWriterOptions *> (o);
   if (options) {
@@ -77,7 +77,7 @@ OASISWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const la
 }
 
 void 
-OASISWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const lay::Technology * /*tech*/, bool gzip)
+OASISWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool gzip)
 {
   if (gzip && mp_ui->write_cblocks->isChecked ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("gzip compression cannot be used with CBLOCK compression")));
@@ -119,18 +119,6 @@ public:
   db::FormatSpecificWriterOptions *create_specific_options () const
   {
     return new db::OASISWriterOptions ();
-  }
-
-  virtual tl::XMLElementBase *xml_element () const
-  {
-    return new lay::WriterOptionsXMLElement<db::OASISWriterOptions> ("oasis",
-      tl::make_member (&db::OASISWriterOptions::compression_level, "compression-level") +
-      tl::make_member (&db::OASISWriterOptions::write_cblocks, "write-cblocks") +
-      tl::make_member (&db::OASISWriterOptions::strict_mode, "strict-mode") +
-      tl::make_member (&db::OASISWriterOptions::write_std_properties, "write-std-properties") +
-      tl::make_member (&db::OASISWriterOptions::subst_char, "subst-char") +
-      tl::make_member (&db::OASISWriterOptions::permissive, "permissive")
-    );
   }
 };
 

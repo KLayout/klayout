@@ -30,6 +30,7 @@
 #include "layStream.h"
 #include "tlXMLParser.h"
 #include "tlStream.h"
+#include "dbStream.h"
 #include "rdb.h"
 
 #include <fstream>
@@ -261,10 +262,10 @@ session_structure ("session",
     tl::make_member<std::string, SessionLayoutDescriptor> (&SessionLayoutDescriptor::file_path, "file-path") +
     tl::make_member<bool, SessionLayoutDescriptor> (&SessionLayoutDescriptor::save_options_valid, "save-options-valid") +
     tl::make_element<db::SaveLayoutOptions, SessionLayoutDescriptor> (&SessionLayoutDescriptor::save_options, "save-options",
-      lay::save_options_xml_element_list ()
+      db::save_options_xml_element_list ()
     ) +
     tl::make_element<db::LoadLayoutOptions, SessionLayoutDescriptor> (&SessionLayoutDescriptor::load_options, "load-options",
-      lay::load_options_xml_element_list ()
+      db::load_options_xml_element_list ()
     )
   ) +
   tl::make_element<SessionViewDescriptor, std::vector<SessionViewDescriptor>::const_iterator, Session> (&Session::begin_views, &Session::end_views, &Session::add_view, "view", 

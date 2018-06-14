@@ -139,6 +139,31 @@ public:
   {
     return true;
   }
+
+  virtual tl::XMLElementBase *xml_reader_options_element () const
+  {
+    return new db::ReaderOptionsXMLElement<db::DXFReaderOptions> ("dxf",
+      tl::make_member (&db::DXFReaderOptions::dbu, "dbu") +
+      tl::make_member (&db::DXFReaderOptions::unit, "unit") +
+      tl::make_member (&db::DXFReaderOptions::text_scaling, "text-scaling") +
+      tl::make_member (&db::DXFReaderOptions::circle_points, "circle-points") +
+      tl::make_member (&db::DXFReaderOptions::circle_accuracy, "circle-accuracy") +
+      tl::make_member (&db::DXFReaderOptions::contour_accuracy, "contour-accuracy") +
+      tl::make_member (&db::DXFReaderOptions::polyline_mode, "polyline-mode") +
+      tl::make_member (&db::DXFReaderOptions::render_texts_as_polygons, "render-texts-as-polygons") +
+      tl::make_member (&db::DXFReaderOptions::keep_other_cells, "keep-other-cells") +
+      tl::make_member (&db::DXFReaderOptions::keep_layer_names, "keep-layer-names") +
+      tl::make_member (&db::DXFReaderOptions::create_other_layers, "create-other-layers") +
+      tl::make_member (&db::DXFReaderOptions::layer_map, "layer-map")
+    );
+  }
+
+  virtual tl::XMLElementBase *xml_writer_options_element () const
+  {
+    return new db::WriterOptionsXMLElement<db::DXFWriterOptions> ("cif",
+      tl::make_member (&db::DXFWriterOptions::polygon_mode, "polygon-mode")
+    );
+  }
 };
 
 static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new DXFFormatDeclaration (), 100, "DXF");

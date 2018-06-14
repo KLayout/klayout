@@ -463,6 +463,18 @@ public:
   {
     return true;
   }
+
+  virtual tl::XMLElementBase *xml_writer_options_element () const
+  {
+    return new db::WriterOptionsXMLElement<db::OASISWriterOptions> ("oasis",
+      tl::make_member (&db::OASISWriterOptions::compression_level, "compression-level") +
+      tl::make_member (&db::OASISWriterOptions::write_cblocks, "write-cblocks") +
+      tl::make_member (&db::OASISWriterOptions::strict_mode, "strict-mode") +
+      tl::make_member (&db::OASISWriterOptions::write_std_properties, "write-std-properties") +
+      tl::make_member (&db::OASISWriterOptions::subst_char, "subst-char") +
+      tl::make_member (&db::OASISWriterOptions::permissive, "permissive")
+    );
+  }
 };
 
 static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new OASISFormatDeclaration (), 10, "OASIS");

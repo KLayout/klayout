@@ -45,8 +45,8 @@ public:
   CommonReaderOptionPage (QWidget *parent);
   ~CommonReaderOptionPage ();
 
-  void setup (const db::FormatSpecificReaderOptions *options, const lay::Technology *tech);
-  void commit (db::FormatSpecificReaderOptions *options, const lay::Technology *tech);
+  void setup (const db::FormatSpecificReaderOptions *options, const db::Technology *tech);
+  void commit (db::FormatSpecificReaderOptions *options, const db::Technology *tech);
 
 private:
   Ui::CommonReaderOptionPage *mp_ui;

@@ -334,7 +334,7 @@ NetTracerDialog::do_trace (const db::DBox &start_search_box, const db::DBox &sto
   }
 
   //  fetch the net tracer data from the technology and apply to the current layout
-  const lay::Technology *tech = cv->technology ();
+  const db::Technology *tech = cv->technology ();
   if (! tech) {
     return 0;
   }
@@ -1192,17 +1192,17 @@ BEGIN_PROTECTED
     tech_name = cv->tech_name ();
   }
 
-  if (! lay::Technologies::instance ()->has_technology (tech_name)) {
+  if (! db::Technologies::instance ()->has_technology (tech_name)) {
     throw std::runtime_error (tl::to_string (QObject::tr ("Invalid technology attached to layout: ")) + tech_name);
   }
 
   //  create a temporary copy
-  lay::Technology tech = *lay::Technologies::instance ()->technology_by_name (tech_name);
+  db::Technology tech = *db::Technologies::instance ()->technology_by_name (tech_name);
 
   //  call the dialog and if successful, install the new technology
   lay::TechComponentSetupDialog dialog (this, &tech, net_tracer_component_name);
   if (dialog.exec ()) {
-    *lay::Technologies::instance ()->technology_by_name (tech.name ()) = tech;
+    *db::Technologies::instance ()->technology_by_name (tech.name ()) = tech;
   }
 
 END_PROTECTED

@@ -48,7 +48,7 @@ DXFWriterOptionPage::~DXFWriterOptionPage ()
 }
 
 void 
-DXFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const lay::Technology * /*tech*/)
+DXFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/)
 {
   const db::DXFWriterOptions *options = dynamic_cast<const db::DXFWriterOptions *> (o);
   if (options) {
@@ -57,7 +57,7 @@ DXFWriterOptionPage::setup (const db::FormatSpecificWriterOptions *o, const lay:
 }
 
 void 
-DXFWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const lay::Technology * /*tech*/, bool /*gzip*/)
+DXFWriterOptionPage::commit (db::FormatSpecificWriterOptions *o, const db::Technology * /*tech*/, bool /*gzip*/)
 {
   db::DXFWriterOptions *options = dynamic_cast<db::DXFWriterOptions *> (o);
   if (options) {
@@ -86,13 +86,6 @@ public:
   db::FormatSpecificWriterOptions *create_specific_options () const
   {
     return new db::DXFWriterOptions ();
-  }
-
-  virtual tl::XMLElementBase *xml_element () const
-  {
-    return new lay::WriterOptionsXMLElement<db::DXFWriterOptions> ("cif",
-      tl::make_member (&db::DXFWriterOptions::polygon_mode, "polygon-mode")
-    );
   }
 };
 

@@ -317,11 +317,11 @@ BEGIN_PROTECTED
 
   std::string tech_name;
   tech_name = lay::MainWindow::instance ()->initial_technology ();
-  if (! lay::Technologies::instance ()->has_technology (tech_name)) {
+  if (! db::Technologies::instance ()->has_technology (tech_name)) {
     tech_name.clear (); // use default technology
   }
 
-  lay::Technology *tech = lay::Technologies::instance ()->technology_by_name (tech_name);
+  db::Technology *tech = db::Technologies::instance ()->technology_by_name (tech_name);
   if (!tech) {
     return;
   }
@@ -365,7 +365,7 @@ LEFDEFReaderOptionsEditor::LEFDEFReaderOptionsEditor (QWidget *parent)
 }
 
 void 
-LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, const lay::Technology * /*tech*/)
+LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, const db::Technology * /*tech*/)
 {
   db::LEFDEFReaderOptions *data = dynamic_cast<db::LEFDEFReaderOptions *> (options);
   if (! data) {
@@ -436,7 +436,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
 }
 
 void 
-LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options, const lay::Technology *tech)
+LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options, const db::Technology *tech)
 {
   static db::LEFDEFReaderOptions empty;
   const db::LEFDEFReaderOptions *data = dynamic_cast<const db::LEFDEFReaderOptions *> (options);
@@ -445,7 +445,7 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   }
 
   //  TODO: there should be a const weak ptr ...
-  mp_tech.reset (const_cast<lay::Technology *> (tech));
+  mp_tech.reset (const_cast<db::Technology *> (tech));
 
   dbu->setText (tl::to_qstring (tl::to_string (data->dbu ())));
   read_all_cbx->setChecked (data->read_all_layers ());

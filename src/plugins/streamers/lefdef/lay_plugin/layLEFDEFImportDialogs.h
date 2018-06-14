@@ -89,8 +89,8 @@ Q_OBJECT
 public:
   LEFDEFReaderOptionsEditor (QWidget *parent);
 
-  void commit (db::FormatSpecificReaderOptions *options, const lay::Technology *tech);
-  void setup (const db::FormatSpecificReaderOptions *options, const lay::Technology *tech);
+  void commit (db::FormatSpecificReaderOptions *options, const db::Technology *tech);
+  void setup (const db::FormatSpecificReaderOptions *options, const db::Technology *tech);
 
 private slots:
   void checkbox_changed ();
@@ -100,7 +100,7 @@ private slots:
   void move_lef_files_down_clicked ();
 
 private:
-  tl::weak_ptr<lay::Technology> mp_tech;
+  tl::weak_ptr<db::Technology> mp_tech;
 };
 
 }

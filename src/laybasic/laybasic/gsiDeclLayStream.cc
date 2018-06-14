@@ -29,7 +29,7 @@ namespace gsi
 
 static db::LoadLayoutOptions get_options_from_technology (const std::string &technology)
 {
-  return lay::Technologies::instance ()->technology_by_name (technology)->load_layout_options ();
+  return db::Technologies::instance ()->technology_by_name (technology)->load_layout_options ();
 }
 
 //  Extend "LoadLayoutOptions" by contributions from lay

@@ -108,7 +108,7 @@ public:
   /**
    *  @brief Gets the technology attached to this layout
    */
-  const lay::Technology *technology () const;
+  const db::Technology *technology () const;
 
   /**
    *  @brief Gets the technology name for this layout

@@ -49,7 +49,7 @@ CIFReaderOptionPage::~CIFReaderOptionPage ()
 }
 
 void 
-CIFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const lay::Technology * /*tech*/)
+CIFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   static const db::CIFReaderOptions default_options;
   const db::CIFReaderOptions *options = dynamic_cast<const db::CIFReaderOptions *> (o);
@@ -65,7 +65,7 @@ CIFReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const lay:
 }
 
 void 
-CIFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const lay::Technology * /*tech*/)
+CIFReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const db::Technology * /*tech*/)
 {
   db::CIFReaderOptions *options = dynamic_cast<db::CIFReaderOptions *> (o);
   if (options) {
@@ -101,17 +101,6 @@ public:
   db::FormatSpecificReaderOptions *create_specific_options () const
   {
     return new db::CIFReaderOptions ();
-  }
-
-  virtual tl::XMLElementBase *xml_element () const
-  {
-    return new lay::ReaderOptionsXMLElement<db::CIFReaderOptions> ("cif",
-      tl::make_member (&db::CIFReaderOptions::wire_mode, "wire-mode") +
-      tl::make_member (&db::CIFReaderOptions::dbu, "dbu") +
-      tl::make_member (&db::CIFReaderOptions::layer_map, "layer-map") +
-      tl::make_member (&db::CIFReaderOptions::create_other_layers, "create-other-layers") +
-      tl::make_member (&db::CIFReaderOptions::keep_layer_names, "keep-layer-names")
-    );
   }
 };
 

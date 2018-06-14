@@ -24,95 +24,12 @@
 
 #include "dbCommonReader.h"
 #include "dbLoadLayoutOptions.h"
-#include "layCommonReaderPlugin.h"
-#include "ui_CommonReaderOptionsPage.h"
 #include "gsiDecl.h"
 
 #include <QFrame>
 
-namespace lay
+namespace dn
 {
-
-// ---------------------------------------------------------------
-//  CommonReaderOptionPage definition and implementation
-
-CommonReaderOptionPage::CommonReaderOptionPage (QWidget *parent)
-  : StreamReaderOptionsPage (parent)
-{
-  mp_ui = new Ui::CommonReaderOptionPage ();
-  mp_ui->setupUi (this);
-}
-
-CommonReaderOptionPage::~CommonReaderOptionPage ()
-{
-  delete mp_ui;
-  mp_ui = 0;
-}
-
-void 
-CommonReaderOptionPage::setup (const db::FormatSpecificReaderOptions *o, const lay::Technology * /*tech*/)
-{
-  static const db::CommonReaderOptions default_options;
-  const db::CommonReaderOptions *options = dynamic_cast<const db::CommonReaderOptions *> (o);
-  if (!options) {
-    options = &default_options;
-  }
-
-  mp_ui->enable_text_cbx->setChecked (options->enable_text_objects);
-  mp_ui->enable_properties_cbx->setChecked (options->enable_properties);
-  mp_ui->layer_map->set_layer_map (options->layer_map);
-  mp_ui->read_all_cbx->setChecked (options->create_other_layers);
-}
-
-void 
-CommonReaderOptionPage::commit (db::FormatSpecificReaderOptions *o, const lay::Technology * /*tech*/)
-{
-  db::CommonReaderOptions *options = dynamic_cast<db::CommonReaderOptions *> (o);
-  if (options) {
-
-    options->enable_text_objects = mp_ui->enable_text_cbx->isChecked ();
-    options->enable_properties = mp_ui->enable_properties_cbx->isChecked ();
-    options->layer_map = mp_ui->layer_map->get_layer_map ();
-    options->create_other_layers = mp_ui->read_all_cbx->isChecked ();
-
-  }
-}
-
-// ---------------------------------------------------------------
-//  CommonReaderPluginDeclaration definition and implementation
-
-class CommonReaderPluginDeclaration
-  : public StreamReaderPluginDeclaration
-{
-public:
-  CommonReaderPluginDeclaration () 
-    : StreamReaderPluginDeclaration (db::CommonReaderOptions ().format_name ())
-  {
-    // .. nothing yet ..
-  }
-
-  StreamReaderOptionsPage *format_specific_options_page (QWidget *parent) const
-  {
-    return new CommonReaderOptionPage (parent);
-  }
-
-  db::FormatSpecificReaderOptions *create_specific_options () const
-  {
-    return new db::CommonReaderOptions ();
-  }
-
-  virtual tl::XMLElementBase *xml_element () const
-  {
-    return new lay::ReaderOptionsXMLElement<db::CommonReaderOptions> ("common",
-      tl::make_member (&db::CommonReaderOptions::create_other_layers, "create-other-layers") +
-      tl::make_member (&db::CommonReaderOptions::layer_map, "layer-map") +
-      tl::make_member (&db::CommonReaderOptions::enable_properties, "enable-properties") +
-      tl::make_member (&db::CommonReaderOptions::enable_text_objects, "enable-text-objects")
-    );
-  }
-};
-
-static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::CommonReaderPluginDeclaration (), 10000, "CommonReader");
 
 // ---------------------------------------------------------------
 //  gsi Implementation of specific methods
@@ -164,7 +81,7 @@ static void set_properties_enabled (db::LoadLayoutOptions *options, bool l)
   options->get_options<db::CommonReaderOptions> ().enable_properties = l;
 }
 
-//  extend lay::LoadLayoutOptions with the Common options 
+//  extend lay::LoadLayoutOptions with the Common options
 static
 gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
   gsi::method_ext ("set_layer_map", &set_layer_map, gsi::arg ("map"), gsi::arg ("create_other_layers"),

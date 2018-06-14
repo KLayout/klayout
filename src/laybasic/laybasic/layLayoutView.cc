@@ -2442,7 +2442,7 @@ LayoutView::signal_apply_technology (lay::LayoutHandle *layout_handle)
     if (cellview (i).handle () == layout_handle) {
 
       std::string lyp_file;
-      const lay::Technology *tech = lay::Technologies::instance ()->technology_by_name (cellview (i)->tech_name ());
+      const db::Technology *tech = db::Technologies::instance ()->technology_by_name (cellview (i)->tech_name ());
       if (tech && ! tech->eff_layer_properties_file ().empty ()) {
         lyp_file = tech->eff_layer_properties_file ();
       }
@@ -3005,7 +3005,7 @@ LayoutView::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview, boo
       //  Use the "layer-properties-file" meta info from the handle to get the layer properties file.
       //  If no such file is present, use the default file or the technology specific file.
       std::string lyp_file = m_def_lyp_file;
-      const lay::Technology *tech = lay::Technologies::instance ()->technology_by_name (layout_handle->tech_name ());
+      const db::Technology *tech = db::Technologies::instance ()->technology_by_name (layout_handle->tech_name ());
       if (tech && ! tech->eff_layer_properties_file ().empty ()) {
         lyp_file = tech->eff_layer_properties_file ();
         add_other_layers = tech->add_other_layers ();
@@ -3072,7 +3072,7 @@ LayoutView::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview, boo
 unsigned int 
 LayoutView::create_layout (const std::string &technology, bool add_cellview, bool initialize_layers)
 {
-  const lay::Technology *tech = lay::Technologies::instance ()->technology_by_name (technology);
+  const db::Technology *tech = db::Technologies::instance ()->technology_by_name (technology);
 
   db::Layout *layout = new db::Layout (manager ());
   if (tech) {
@@ -3097,7 +3097,7 @@ LayoutView::load_layout (const std::string &filename, const db::LoadLayoutOption
   
   bool set_max_hier = (m_full_hier_new_cell || has_max_hier ());
 
-  const lay::Technology *tech = lay::Technologies::instance ()->technology_by_name (technology);
+  const db::Technology *tech = db::Technologies::instance ()->technology_by_name (technology);
 
   //  create a new layout handle 
   lay::CellView cv;

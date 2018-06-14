@@ -20,7 +20,7 @@
 */
 
 #include "gsiDecl.h"
-#include "layTechnology.h"
+#include "dbTechnology.h"
 #include "tlXMLWriter.h"
 #include "tlXMLParser.h"
 
@@ -30,84 +30,84 @@ namespace gsi
 static std::vector<std::string> technology_names ()
 {
   std::vector<std::string> names;
-  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t) {
+  for (db::Technologies::const_iterator t = db::Technologies::instance ()->begin (); t != db::Technologies::instance ()->end (); ++t) {
     names.push_back (t->name ());
   }
   return names;
 }
 
-static lay::Technology *technology_by_name (const std::string &name)
+static db::Technology *technology_by_name (const std::string &name)
 {
-  return lay::Technologies::instance ()->technology_by_name (name);
+  return db::Technologies::instance ()->technology_by_name (name);
 }
 
-static lay::Technology *create_technology (const std::string &name)
+static db::Technology *create_technology (const std::string &name)
 {
-  lay::Technology *tech = new lay::Technology ();
+  db::Technology *tech = new db::Technology ();
   tech->set_name (name);
-  lay::Technologies::instance ()->add_new (tech);
+  db::Technologies::instance ()->add_new (tech);
   return tech;
 }
 
 static void remove_technology (const std::string &name)
 {
-  lay::Technologies::instance ()->remove (name);
+  db::Technologies::instance ()->remove (name);
 }
 
 static bool has_technology (const std::string &name)
 {
-  return lay::Technologies::instance ()->has_technology (name);
+  return db::Technologies::instance ()->has_technology (name);
 }
 
 static std::string technologies_to_xml ()
 {
-  return lay::Technologies::instance ()->to_xml ();
+  return db::Technologies::instance ()->to_xml ();
 }
 
 static void technologies_from_xml (const std::string &s)
 {
-  lay::Technologies::instance ()->load_from_xml (s);
+  db::Technologies::instance ()->load_from_xml (s);
 }
 
-static lay::Technology technology_from_xml (const std::string &s)
+static db::Technology technology_from_xml (const std::string &s)
 {
-  lay::Technology tech;
+  db::Technology tech;
   tl::XMLStringSource source (s);
-  tl::XMLStruct<lay::Technology> xml_struct ("technology", lay::Technology::xml_elements ());
+  tl::XMLStruct<db::Technology> xml_struct ("technology", db::Technology::xml_elements ());
   xml_struct.parse (source, tech);
   return tech;
 }
 
-static std::string technology_to_xml (const lay::Technology *tech)
+static std::string technology_to_xml (const db::Technology *tech)
 {
   if (! tech) {
     return std::string ();
   } else {
     tl::OutputStringStream os;
-    tl::XMLStruct<lay::Technology> xml_struct ("technology", lay::Technology::xml_elements ());
+    tl::XMLStruct<db::Technology> xml_struct ("technology", db::Technology::xml_elements ());
     tl::OutputStream oss (os);
     xml_struct.write (oss, *tech);
     return os.string ();
   }
 }
 
-static lay::TechnologyComponent *get_component (lay::Technology *tech, const std::string &name)
+static db::TechnologyComponent *get_component (db::Technology *tech, const std::string &name)
 {
   return tech->component_by_name (name);
 }
 
-static std::vector<std::string> get_component_names (const lay::Technology *tech)
+static std::vector<std::string> get_component_names (const db::Technology *tech)
 {
   return tech->component_names ();
 }
 
-gsi::Class<lay::TechnologyComponent> technology_component_decl ("lay", "TechnologyComponent",
-  gsi::method ("name", &lay::TechnologyComponent::name,
+gsi::Class<db::TechnologyComponent> technology_component_decl ("lay", "TechnologyComponent",
+  gsi::method ("name", &db::TechnologyComponent::name,
     "@brief Gets the formal name of the technology component\n"
     "This is the name by which the component can be obtained from a technology using "
     "\\Technology#component."
   ) +
-  gsi::method ("description", &lay::TechnologyComponent::description,
+  gsi::method ("description", &db::TechnologyComponent::description,
     "@brief Gets the human-readable description string of the technology component\n"
   ),
   "@brief A part of a technology definition\n"
@@ -122,16 +122,16 @@ gsi::Class<lay::TechnologyComponent> technology_component_decl ("lay", "Technolo
   "This class has been introduced in version 0.25."
 );
 
-LAYBASIC_PUBLIC gsi::Class<lay::TechnologyComponent> &decl_layTechnologyComponent () { return technology_component_decl; }
+DB_PUBLIC gsi::Class<db::TechnologyComponent> &decl_layTechnologyComponent () { return technology_component_decl; }
 
-gsi::Class<lay::Technology> technology_decl ("lay", "Technology",
-  gsi::method ("name", &lay::Technology::name,
+gsi::Class<db::Technology> technology_decl ("lay", "Technology",
+  gsi::method ("name", &db::Technology::name,
     "@brief Gets the name of the technology"
   ) +
-  gsi::method ("name=", &lay::Technology::set_name, gsi::arg ("name"),
+  gsi::method ("name=", &db::Technology::set_name, gsi::arg ("name"),
     "@brief Sets the name of the technology"
   ) +
-  gsi::method ("base_path", &lay::Technology::base_path,
+  gsi::method ("base_path", &db::Technology::base_path,
     "@brief Gets the base path of the technology\n"
     "\n"
     "The base path is the effective path where files are read from if their "
@@ -140,15 +140,15 @@ gsi::Class<lay::Technology> technology_decl ("lay", "Technology",
     "a technology file was imported. The explicit one is the one that is specified\n"
     "explicitly with \\explicit_base_path=.\n"
   ) +
-  gsi::method ("default_base_path", &lay::Technology::default_base_path,
+  gsi::method ("default_base_path", &db::Technology::default_base_path,
     "@brief Gets the default base path\n"
     "\n"
     "See \\base_path for details about the default base path.\n"
   ) +
-  gsi::method ("default_base_path=", &lay::Technology::set_default_base_path, gsi::arg ("path"),
+  gsi::method ("default_base_path=", &db::Technology::set_default_base_path, gsi::arg ("path"),
     "@hide\n" // only for testing
   ) +
-  gsi::method ("correct_path", &lay::Technology::correct_path, gsi::arg ("path"),
+  gsi::method ("correct_path", &db::Technology::correct_path, gsi::arg ("path"),
     "@brief Makes a file path relative to the base path if one is specified\n"
     "\n"
     "This method turns an absolute path into one relative to the base path. "
@@ -157,7 +157,7 @@ gsi::Class<lay::Technology> technology_decl ("lay", "Technology",
     "\n"
     "See \\base_path for details about the default base path.\n"
   ) +
-  gsi::method ("eff_path", &lay::Technology::build_effective_path, gsi::arg ("path"),
+  gsi::method ("eff_path", &db::Technology::build_effective_path, gsi::arg ("path"),
     "@brief Makes a file path relative to the base path if one is specified\n"
     "\n"
     "This method will return the actual path for a file from the file's path. "
@@ -166,55 +166,55 @@ gsi::Class<lay::Technology> technology_decl ("lay", "Technology",
     "\n"
     "See \\base_path for details about the default base path.\n"
   ) +
-  gsi::method ("explicit_base_path", &lay::Technology::explicit_base_path,
+  gsi::method ("explicit_base_path", &db::Technology::explicit_base_path,
     "@brief Gets the explicit base path\n"
     "\n"
     "See \\base_path for details about the explicit base path.\n"
   ) +
-  gsi::method ("explicit_base_path=", &lay::Technology::set_explicit_base_path, gsi::arg ("path"),
+  gsi::method ("explicit_base_path=", &db::Technology::set_explicit_base_path, gsi::arg ("path"),
     "@brief Sets the explicit base path\n"
     "\n"
     "See \\base_path for details about the explicit base path.\n"
   ) +
-  gsi::method ("description", &lay::Technology::description,
+  gsi::method ("description", &db::Technology::description,
     "@brief Gets the description\n"
     "\n"
     "The technology description is shown to the user in technology selection dialogs and for "
     "display purposes."
   ) +
-  gsi::method ("description=", &lay::Technology::set_description, gsi::arg ("description"),
+  gsi::method ("description=", &db::Technology::set_description, gsi::arg ("description"),
     "@brief Sets the description\n"
   ) +
-  gsi::method ("dbu", &lay::Technology::dbu,
+  gsi::method ("dbu", &db::Technology::dbu,
     "@brief Gets the default database unit\n"
     "\n"
     "The default database unit is the one used when creating a layout for example."
   ) +
-  gsi::method ("dbu=", &lay::Technology::set_dbu, gsi::arg ("dbu"),
+  gsi::method ("dbu=", &db::Technology::set_dbu, gsi::arg ("dbu"),
     "@brief Sets the default database unit\n"
   ) +
-  gsi::method ("layer_properties_file", &lay::Technology::layer_properties_file,
+  gsi::method ("layer_properties_file", &db::Technology::layer_properties_file,
     "@brief Gets the path of the layer properties file\n"
     "\n"
     "If empty, no layer properties file is associated with the technology. "
     "If non-empty, this path will be corrected by the base path (see \\correct_path) and "
     "this layer properties file will be loaded for layouts with this technology."
   ) +
-  gsi::method ("layer_properties_file=", &lay::Technology::set_layer_properties_file, gsi::arg ("file"),
+  gsi::method ("layer_properties_file=", &db::Technology::set_layer_properties_file, gsi::arg ("file"),
     "@brief Sets the path of the layer properties file\n"
     "\n"
     "See \\layer_properties_file for details about this property."
   ) +
-  gsi::method ("eff_layer_properties_file", &lay::Technology::eff_layer_properties_file,
+  gsi::method ("eff_layer_properties_file", &db::Technology::eff_layer_properties_file,
     "@brief Gets the effective path of the layer properties file\n"
   ) +
-  gsi::method ("add_other_layers?", &lay::Technology::add_other_layers,
+  gsi::method ("add_other_layers?", &db::Technology::add_other_layers,
     "@brief Gets the flag indicating whether to add other layers to the layer properties\n"
   ) +
-  gsi::method ("add_other_layers=", &lay::Technology::set_add_other_layers, gsi::arg ("add"),
+  gsi::method ("add_other_layers=", &db::Technology::set_add_other_layers, gsi::arg ("add"),
     "@brief Sets the flag indicating whether to add other layers to the layer properties\n"
   ) +
-  gsi::method ("load_layout_options", &lay::Technology::load_layout_options,
+  gsi::method ("load_layout_options", &db::Technology::load_layout_options,
     "@brief Gets the layout reader options\n"
     "\n"
     "This method returns the layout reader options that are used when reading layouts "
@@ -228,12 +228,12 @@ gsi::Class<lay::Technology> technology_decl ("lay", "Technology",
     "tech.load_layout_options = opt\n"
     "@/code\n"
   ) +
-  gsi::method ("load_layout_options=", &lay::Technology::set_load_layout_options, gsi::arg ("options"),
+  gsi::method ("load_layout_options=", &db::Technology::set_load_layout_options, gsi::arg ("options"),
     "@brief Sets the layout reader options\n"
     "\n"
     "See \\load_layout_options for a description of this property.\n"
   ) +
-  gsi::method ("save_layout_options", &lay::Technology::save_layout_options,
+  gsi::method ("save_layout_options", &db::Technology::save_layout_options,
     "@brief Gets the layout writer options\n"
     "\n"
     "This method returns the layout writer options that are used when writing layouts "
@@ -247,15 +247,15 @@ gsi::Class<lay::Technology> technology_decl ("lay", "Technology",
     "tech.save_layout_options = opt\n"
     "@/code\n"
   ) +
-  gsi::method ("save_layout_options=", &lay::Technology::set_save_layout_options, gsi::arg ("options"),
+  gsi::method ("save_layout_options=", &db::Technology::set_save_layout_options, gsi::arg ("options"),
     "@brief Sets the layout writer options\n"
     "\n"
     "See \\save_layout_options for a description of this property.\n"
   ) +
-  gsi::method ("load", &lay::Technology::load, gsi::arg ("file"),
+  gsi::method ("load", &db::Technology::load, gsi::arg ("file"),
     "@brief Loads the technology definition from a file\n"
   ) +
-  gsi::method ("load", &lay::Technology::save, gsi::arg ("file"),
+  gsi::method ("load", &db::Technology::save, gsi::arg ("file"),
     "@brief Saves the technology definition to a file\n"
   ) +
   gsi::method ("technology_names", &technology_names,

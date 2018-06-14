@@ -67,7 +67,7 @@ public:
    *  @brief Gets the active technology object or 0 if none is active
    *  The active technology is the one the current cellview uses
    */
-  lay::Technology *active_technology () const;
+  db::Technology *active_technology () const;
 
   /**
    *  @brief Adds a path as a search path for technologies
@@ -81,12 +81,12 @@ public:
    *  but are not persisted or editable.
    *  "load" needs to be called after temp technologies have been added.
    */
-  void add_temp_tech (const lay::Technology &t);
+  void add_temp_tech (const db::Technology &t);
 
   /**
    *  @brief Updates the given technology collection with the technologies from the search path and the temp technologies
    */
-  void rescan (lay::Technologies &technologies);
+  void rescan (db::Technologies &technologies);
 
   /**
    *  @brief Loads the global list of technologies
@@ -133,19 +133,19 @@ private:
   lay::TechSetupDialog *mp_editor;
   lay::MainWindow *mp_mw;
   std::vector<std::string> m_paths;
-  std::vector<lay::Technology> m_temp_tech;
-  lay::Technology *mp_active_technology;
+  std::vector<db::Technology> m_temp_tech;
+  db::Technology *mp_active_technology;
 
   void update_active_technology ();
   void connect_events ();
   void technologies_changed ();
-  void technology_changed (lay::Technology *);
+  void technology_changed (db::Technology *);
   bool configure (const std::string &name, const std::string &value);
   void config_finalize ();
   bool menu_activated (const std::string &symbol) const;
   void update_current_technology ();
   void update_menu ();
-  void replace_technologies (const lay::Technologies &technologies);
+  void replace_technologies (const db::Technologies &technologies);
 };
 
 }

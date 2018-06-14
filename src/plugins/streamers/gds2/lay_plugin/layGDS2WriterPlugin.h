@@ -44,8 +44,8 @@ public:
   GDS2WriterOptionPage (QWidget *parent);
   ~GDS2WriterOptionPage ();
 
-  void setup (const db::FormatSpecificWriterOptions *options, const lay::Technology *tech);
-  void commit (db::FormatSpecificWriterOptions *options, const lay::Technology *tech, bool gzip);
+  void setup (const db::FormatSpecificWriterOptions *options, const db::Technology *tech);
+  void commit (db::FormatSpecificWriterOptions *options, const db::Technology *tech, bool gzip);
 
 public slots:
   void multi_xy_clicked ();

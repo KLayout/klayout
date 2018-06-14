@@ -186,7 +186,7 @@ LoadLayoutOptionsDialog::update ()
     return;
   }
 
-  const lay::Technology *tech = m_tech_array [m_technology_index];
+  const db::Technology *tech = m_tech_array [m_technology_index];
   mp_ui->options_tab->setEnabled (tech && tech->is_persisted ());
 
   for (std::vector< std::pair<StreamReaderOptionsPage *, std::string> >::iterator page = m_pages.begin (); page != m_pages.end (); ++page) {
@@ -197,7 +197,7 @@ LoadLayoutOptionsDialog::update ()
 }
 
 bool 
-LoadLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay::Technologies *technologies)
+LoadLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, db::Technologies *technologies)
 {
   m_opt_array.clear ();
   m_tech_array.clear ();
@@ -219,7 +219,7 @@ LoadLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
   unsigned int i = 0;
   m_technology_index = -1;
 
-  for (lay::Technologies::const_iterator t = technologies->begin (); t != technologies->end (); ++t, ++i) {
+  for (db::Technologies::const_iterator t = technologies->begin (); t != technologies->end (); ++t, ++i) {
 
     std::string d = t->name ();
     if (! d.empty () && ! t->description ().empty ()) {
@@ -256,7 +256,7 @@ LoadLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
 
     i = 0;
     technologies->begin_updates ();
-    for (lay::Technologies::iterator t = technologies->begin (); t != technologies->end () && i < m_opt_array.size (); ++t, ++i) {
+    for (db::Technologies::iterator t = technologies->begin (); t != technologies->end () && i < m_opt_array.size (); ++t, ++i) {
       technologies->begin ()[i].set_load_layout_options (m_opt_array [i]);
     }
     technologies->end_updates ();

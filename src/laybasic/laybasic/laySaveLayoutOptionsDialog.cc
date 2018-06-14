@@ -230,7 +230,7 @@ SaveLayoutOptionsDialog::update ()
 }
 
 bool
-SaveLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay::Technologies *technologies)
+SaveLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, db::Technologies *technologies)
 {
   m_opt_array.clear ();
   m_tech_array.clear ();
@@ -244,7 +244,7 @@ SaveLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
   unsigned int i = 0;
   m_technology_index = -1;
 
-  for (lay::Technologies::const_iterator t = technologies->begin (); t != technologies->end (); ++t, ++i) {
+  for (db::Technologies::const_iterator t = technologies->begin (); t != technologies->end (); ++t, ++i) {
 
     std::string d = t->name ();
     if (! d.empty () && ! t->description ().empty ()) {
@@ -270,7 +270,7 @@ SaveLayoutOptionsDialog::edit_global_options (lay::PluginRoot *config_root, lay:
 
     //  get the selected technology name and store in the config
     unsigned int i = 0;
-    for (lay::Technologies::iterator t = technologies->begin (); t != technologies->end () && i < m_opt_array.size (); ++t, ++i) {
+    for (db::Technologies::iterator t = technologies->begin (); t != technologies->end () && i < m_opt_array.size (); ++t, ++i) {
       technologies->begin ()[i].set_save_layout_options (m_opt_array [i]);
     }
 

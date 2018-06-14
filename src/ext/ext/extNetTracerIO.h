@@ -370,7 +370,7 @@ private:
 };
 
 class EXT_PUBLIC NetTracerTechnologyComponent
-  : public lay::TechnologyComponent
+  : public db::TechnologyComponent
 {
 public:
   typedef std::vector<NetTracerConnectionInfo>::const_iterator const_iterator;
@@ -469,9 +469,7 @@ public:
 
   NetTracerData get_tracer_data (const db::Layout &layout) const;
 
-  virtual lay::TechnologyComponentEditor *create_editor (QWidget *parent);
-
-  lay::TechnologyComponent *clone () const
+  db::TechnologyComponent *clone () const
   {
     return new NetTracerTechnologyComponent (*this);
   }

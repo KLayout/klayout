@@ -110,9 +110,9 @@ LayoutPropertiesForm::commit ()
   //  get the selected technology name
   std::string technology;
   int technology_index = tech_cbx->currentIndex ();
-  const lay::Technology *tech = 0;
-  if (technology_index >= 0 && technology_index < (int) lay::Technologies::instance ()->technologies ()) {
-    tech = &(lay::Technologies::instance ()->begin () [technology_index]);
+  const db::Technology *tech = 0;
+  if (technology_index >= 0 && technology_index < (int) db::Technologies::instance ()->technologies ()) {
+    tech = &(db::Technologies::instance ()->begin () [technology_index]);
     technology = tech->name ();
   }
 
@@ -190,7 +190,7 @@ BEGIN_PROTECTED
 
   tech_cbx->clear ();
   unsigned int technology_index = 0;
-  for (lay::Technologies::const_iterator t = lay::Technologies::instance ()->begin (); t != lay::Technologies::instance ()->end (); ++t, ++technology_index) {
+  for (db::Technologies::const_iterator t = db::Technologies::instance ()->begin (); t != db::Technologies::instance ()->end (); ++t, ++technology_index) {
 
     std::string d = t->name ();
     if (! d.empty () && ! t->description ().empty ()) {

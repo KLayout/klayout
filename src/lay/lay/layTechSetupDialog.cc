@@ -35,6 +35,7 @@
 #include "lymMacro.h"
 #include "tlAssert.h"
 #include "tlStream.h"
+#include "tlClassRegistry.h"
 #include "dbStream.h"
 
 #include <QInputDialog>
@@ -52,7 +53,7 @@ namespace lay
 // ----------------------------------------------------------------
 
 static std::string
-title_for_technology (const lay::Technology *t)
+title_for_technology (const db::Technology *t)
 {
   std::string d;
   if (t->name ().empty ()) {
@@ -544,7 +545,7 @@ TechSetupDialog::~TechSetupDialog ()
 void
 TechSetupDialog::clear_components ()
 {
-  for (std::map <std::string, lay::TechnologyComponent *>::iterator tc = m_technology_components.begin (); tc != m_technology_components.end (); ++tc) {
+  for (std::map <std::string, db::TechnologyComponent *>::iterator tc = m_technology_components.begin (); tc != m_technology_components.end (); ++tc) {
     delete tc->second;
   }
   m_technology_components.clear ();
@@ -627,7 +628,7 @@ TechSetupDialog::update ()
 }
 
 int
-TechSetupDialog::exec (lay::Technologies &technologies)
+TechSetupDialog::exec (db::Technologies &technologies)
 {
   if (s_first_show) {
     TipDialog td (this,
@@ -649,7 +650,7 @@ TechSetupDialog::exec (lay::Technologies &technologies)
 
   //  clean up
   update_tech (0);
-  m_technologies = lay::Technologies ();
+  m_technologies = db::Technologies ();
   update_tech_tree ();
 
   return ret;
@@ -662,7 +663,7 @@ BEGIN_PROTECTED
 
   commit_tech_component ();
 
-  lay::Technology *t = selected_tech ();
+  db::Technology *t = selected_tech ();
   if (! t) {
     t = m_technologies.technology_by_name (std::string ());
     tl_assert (t != 0);
@@ -698,7 +699,7 @@ BEGIN_PROTECTED
       }
     }
 
-    lay::Technology *nt = new lay::Technology (*t);
+    db::Technology *nt = new db::Technology (*t);
 
     nt->set_tech_file_path (tl::to_string (tech_dir.absoluteFilePath (tn + QString::fromUtf8 (".lyt"))));
     nt->set_default_base_path (tl::to_string (tech_dir.absolutePath ()));
@@ -720,7 +721,7 @@ TechSetupDialog::delete_clicked ()
 {
 BEGIN_PROTECTED
 
-  lay::Technology *t = selected_tech ();
+  db::Technology *t = selected_tech ();
   if (! t) {
     throw tl::Exception (tl::to_string (QObject::tr ("No technology selected")));
   }
@@ -737,7 +738,7 @@ BEGIN_PROTECTED
                                    QObject::tr ("Are you sure to delete this technology?\nThis operation cannot be undone, except by cancelling the technology manager."),
                                    QMessageBox::No | QMessageBox::Yes) == QMessageBox::Yes) {
 
-    for (lay::Technologies::const_iterator i = m_technologies.begin (); i != m_technologies.end (); ++i) {
+    for (db::Technologies::const_iterator i = m_technologies.begin (); i != m_technologies.end (); ++i) {
 
       if (i->name () == t->name ()) {
 
@@ -763,7 +764,7 @@ BEGIN_PROTECTED
 
   commit_tech_component ();
 
-  lay::Technology *t = selected_tech ();
+  db::Technology *t = selected_tech ();
   if (! t) {
     throw tl::Exception (tl::to_string (QObject::tr ("No technology selected")));
   }
@@ -821,13 +822,13 @@ BEGIN_PROTECTED
   std::string fn;
   if (open_dialog.get_open (fn)) {
 
-    lay::Technology t;
+    db::Technology t;
     t.load (fn);
 
     if (m_technologies.has_technology (t.name ())) {
       *m_technologies.technology_by_name (t.name ()) = t;
     } else {
-      m_technologies.add (new lay::Technology (t));
+      m_technologies.add (new db::Technology (t));
     }
 
     update_tech_tree ();
@@ -843,7 +844,7 @@ TechSetupDialog::export_clicked ()
 {
 BEGIN_PROTECTED
 
-  lay::Technology *t = selected_tech ();
+  db::Technology *t = selected_tech ();
   if (! t) {
     throw tl::Exception (tl::to_string (QObject::tr ("No technology selected")));
   }
@@ -863,12 +864,12 @@ TechSetupDialog::update_tech_tree ()
 {
   tech_tree->clear ();
 
-  std::map <std::string, const lay::Technology *> tech_by_name;
-  for (lay::Technologies::const_iterator t = m_technologies.begin (); t != m_technologies.end (); ++t) {
+  std::map <std::string, const db::Technology *> tech_by_name;
+  for (db::Technologies::const_iterator t = m_technologies.begin (); t != m_technologies.end (); ++t) {
     tech_by_name.insert (std::make_pair (t->name (), &*t));
   }
 
-  for (std::map <std::string, const lay::Technology *>::const_iterator t = tech_by_name.begin (); t != tech_by_name.end (); ++t) {
+  for (std::map <std::string, const db::Technology *>::const_iterator t = tech_by_name.begin (); t != tech_by_name.end (); ++t) {
     
     QFont f (tech_tree->font ());
     f.setItalic (t->second->is_readonly ());
@@ -882,7 +883,7 @@ TechSetupDialog::update_tech_tree ()
     }
     
     std::vector <std::string> tc_names = t->second->component_names ();
-    std::map <std::string, const lay::TechnologyComponent *> tc_by_name;
+    std::map <std::string, const db::TechnologyComponent *> tc_by_name;
     for (std::vector <std::string>::const_iterator n = tc_names.begin (); n != tc_names.end (); ++n) {
       tc_by_name.insert (std::make_pair (*n, t->second->component_by_name (*n)));
     }
@@ -912,7 +913,7 @@ TechSetupDialog::update_tech_tree ()
       }
     }
 
-    for (std::map <std::string, const lay::TechnologyComponent *>::const_iterator c = tc_by_name.begin (); c != tc_by_name.end (); ++c) {
+    for (std::map <std::string, const db::TechnologyComponent *>::const_iterator c = tc_by_name.begin (); c != tc_by_name.end (); ++c) {
       tci = new QTreeWidgetItem (ti);
       tci->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (c->second->description ())));
       tci->setData (0, Qt::UserRole + 1, QVariant (tl::to_qstring (c->first)));
@@ -923,7 +924,7 @@ TechSetupDialog::update_tech_tree ()
 }
 
 void 
-TechSetupDialog::update_tech (lay::Technology *t)
+TechSetupDialog::update_tech (db::Technology *t)
 {
   if (t == mp_current_tech) {
     return;
@@ -967,10 +968,16 @@ TechSetupDialog::update_tech (lay::Technology *t)
     std::vector <std::string> tc_names = t->component_names ();
     for (std::vector <std::string>::const_iterator n = tc_names.begin (); n != tc_names.end (); ++n) {
 
-      TechnologyComponent *tc = t->component_by_name (*n)->clone ();
+      db::TechnologyComponent *tc = t->component_by_name (*n)->clone ();
       m_technology_components.insert (std::make_pair (*n, tc));
 
-      tce_widget = tc->create_editor (this);
+      tce_widget = 0;
+      for (tl::Registrar<lay::TechnologyEditorProvider>::iterator cls = tl::Registrar<lay::TechnologyEditorProvider>::begin (); cls != tl::Registrar<lay::TechnologyEditorProvider>::begin () && ! tce_widget; ++cls) {
+        if (cls.current_name () == tc->name ()) {
+          tce_widget = cls->create_editor (this);
+        }
+      }
+
       if (tce_widget) {
         tce_widget->setEnabled (!t->is_readonly ());
         tce_widget->set_technology (t, tc);
@@ -990,7 +997,7 @@ TechSetupDialog::update_tech_component ()
   std::map <std::string, lay::TechnologyComponentEditor *>::const_iterator tce = m_component_editors.find (tc_name);
   if (tce != m_component_editors.end ()) {
 
-    std::map <std::string, lay::TechnologyComponent *>::const_iterator tc = m_technology_components.find (tc_name);
+    std::map <std::string, db::TechnologyComponent *>::const_iterator tc = m_technology_components.find (tc_name);
     if (tc != m_technology_components.end ()) {
       mp_current_tech_component = tc->second;
     } else {
@@ -1010,7 +1017,7 @@ TechSetupDialog::update_tech_component ()
 }
 
 void
-TechSetupDialog::select_tech (const lay::Technology &tech)
+TechSetupDialog::select_tech (const db::Technology &tech)
 {
   //  unselect the previous technology
   update_tech (0); 
@@ -1081,7 +1088,7 @@ TechSetupDialog::commit_tech_component ()
 
       QTreeWidgetItem *item = tech_tree->topLevelItem (i - 1);
 
-      lay::Technology *t = m_technologies.technology_by_name (tl::to_string (item->data (0, Qt::UserRole).toString ()));
+      db::Technology *t = m_technologies.technology_by_name (tl::to_string (item->data (0, Qt::UserRole).toString ()));
       item->setData (0, Qt::DisplayRole, QVariant (tl::to_qstring (title_for_technology (t))));
 
     }
@@ -1103,7 +1110,7 @@ TechSetupDialog::selected_tech_component_name ()
   return std::string ();
 }
 
-lay::Technology *
+db::Technology *
 TechSetupDialog::selected_tech ()
 {
   QTreeWidgetItem *item = tech_tree->currentItem ();
@@ -1128,7 +1135,7 @@ TechSetupDialog::selected_tech ()
 // ----------------------------------------------------------------
 //  TechComponentSetupDialog implementation
 
-TechComponentSetupDialog::TechComponentSetupDialog (QWidget *parent, Technology *tech, const std::string &component_name)
+TechComponentSetupDialog::TechComponentSetupDialog (QWidget *parent, db::Technology *tech, const std::string &component_name)
   : QDialog (parent),
     mp_tech (tech), mp_component (0), mp_editor (0)
 {
@@ -1142,12 +1149,18 @@ TechComponentSetupDialog::TechComponentSetupDialog (QWidget *parent, Technology 
     setWindowTitle (tl::to_qstring (tl::to_string (QObject::tr ("Edit Technology")) + " - " + tech->name ()));
   }
 
-  const TechnologyComponent *component = tech->component_by_name (component_name);
+  const db::TechnologyComponent *component = tech->component_by_name (component_name);
   if (component) {
 
     mp_component = component->clone ();
 
-    mp_editor = mp_component->create_editor (content_frame);
+    mp_editor = 0;
+    for (tl::Registrar<lay::TechnologyEditorProvider>::iterator cls = tl::Registrar<lay::TechnologyEditorProvider>::begin (); cls != tl::Registrar<lay::TechnologyEditorProvider>::begin () && ! mp_editor; ++cls) {
+      if (cls.current_name () == mp_component->name ()) {
+        mp_editor = cls->create_editor (content_frame);
+      }
+    }
+
     if (mp_editor) {
 
       QVBoxLayout *layout = new QVBoxLayout (content_frame);

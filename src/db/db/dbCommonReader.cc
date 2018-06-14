@@ -73,6 +73,16 @@ public:
   {
     return false;
   }
+
+  virtual tl::XMLElementBase *xml_reader_options_element () const
+  {
+    return new db::ReaderOptionsXMLElement<db::CommonReaderOptions> ("common",
+      tl::make_member (&db::CommonReaderOptions::create_other_layers, "create-other-layers") +
+      tl::make_member (&db::CommonReaderOptions::layer_map, "layer-map") +
+      tl::make_member (&db::CommonReaderOptions::enable_properties, "enable-properties") +
+      tl::make_member (&db::CommonReaderOptions::enable_text_objects, "enable-text-objects")
+    );
+  }
 };
 
 static tl::RegisteredClass<db::StreamFormatDeclaration> reader_decl (new CommonFormatDeclaration (), 20, "Common");

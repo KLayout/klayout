@@ -82,42 +82,5 @@ const StreamWriterPluginDeclaration *StreamWriterPluginDeclaration::plugin_for_f
   return 0;
 }
 
-// ------------------------------------------------------------------
-//  Implementation of load_options_xml_element_list
-
-tl::XMLElementList load_options_xml_element_list ()
-{
-  tl::XMLElementList elements;
-
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    const StreamReaderPluginDeclaration *decl = dynamic_cast <const StreamReaderPluginDeclaration *> (&*cls);
-    if (decl) {
-      elements.append (decl->xml_element ());
-    }
-  }
-
-  // ignore all unknown elements
-  elements.append (tl::make_member<db::LoadLayoutOptions> ("*"));
-
-  return elements;
-}
-
-tl::XMLElementList save_options_xml_element_list ()
-{
-  tl::XMLElementList elements;
-
-  for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
-    const StreamWriterPluginDeclaration *decl = dynamic_cast <const StreamWriterPluginDeclaration *> (&*cls);
-    if (decl) {
-      elements.append (decl->xml_element ());
-    }
-  }
-
-  // ignore all unknown elements
-  elements.append (tl::make_member<db::FormatSpecificWriterOptions> ("*"));
-
-  return elements;
-}
-
 }
 

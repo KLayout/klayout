@@ -77,7 +77,7 @@ static void set_net_property_name (db::LEFDEFReaderOptions *config, const tl::Va
 }
 
 static
-gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("lay", "LEFDEFReaderConfiguration",
+gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfiguration",
   gsi::method ("layer_map", (db::LayerMap &(db::LEFDEFReaderOptions::*) ()) &db::LEFDEFReaderOptions::layer_map,
     "@brief Gets the layer map to be used for the LEF/DEF reader\n"
     "@return A reference to the layer map\n"

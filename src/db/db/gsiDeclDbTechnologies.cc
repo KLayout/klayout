@@ -101,7 +101,7 @@ static std::vector<std::string> get_component_names (const db::Technology *tech)
   return tech->component_names ();
 }
 
-gsi::Class<db::TechnologyComponent> technology_component_decl ("lay", "TechnologyComponent",
+gsi::Class<db::TechnologyComponent> technology_component_decl ("db", "TechnologyComponent",
   gsi::method ("name", &db::TechnologyComponent::name,
     "@brief Gets the formal name of the technology component\n"
     "This is the name by which the component can be obtained from a technology using "
@@ -124,7 +124,7 @@ gsi::Class<db::TechnologyComponent> technology_component_decl ("lay", "Technolog
 
 DB_PUBLIC gsi::Class<db::TechnologyComponent> &decl_layTechnologyComponent () { return technology_component_decl; }
 
-gsi::Class<db::Technology> technology_decl ("lay", "Technology",
+gsi::Class<db::Technology> technology_decl ("db", "Technology",
   gsi::method ("name", &db::Technology::name,
     "@brief Gets the name of the technology"
   ) +

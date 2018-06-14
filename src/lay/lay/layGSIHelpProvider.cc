@@ -954,6 +954,8 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
      << "<link href=\"/about/rba_notation.xml\"/>"
      << "</p>" << std::endl;
 
+  os << "<p><b>" << tl::to_string (QObject::tr ("Module")) << "</b>: <a href=\"" << escape_xml (module_doc_url (cls_obj->module ())) << "\">" << escape_xml (cls_obj->module ()) << "</a></p>";
+
   os << "<p><b>" << tl::to_string (QObject::tr ("Description")) << "</b>: " << escape_xml (class_doc.brief_doc) << "</p>" << std::endl;
 
   std::vector<const gsi::ClassBase *> classes;

@@ -22,15 +22,15 @@
 
 
 
-#ifndef HDR_extNetTracerConfig
-#define HDR_extNetTracerConfig
+#ifndef HDR_layNetTracerConfig
+#define HDR_layNetTracerConfig
 
 #include "ui_NetTracerConfigPage.h"
 
 #include "layPlugin.h"
 #include "layColorPalette.h"
 
-namespace ext
+namespace lay
 {
 
 extern const std::string cfg_nt_marker_color;
@@ -50,8 +50,8 @@ enum nt_window_type { NTDontChange = 0, NTFitNet, NTCenter, NTCenterSize };
 class NetTracerWindowModeConverter
 {
 public:
-  void from_string (const std::string &value, ext::nt_window_type &mode);
-  std::string to_string (ext::nt_window_type mode);
+  void from_string (const std::string &value, lay::nt_window_type &mode);
+  std::string to_string (lay::nt_window_type mode);
 };
 
 class NetTracerConfigPage

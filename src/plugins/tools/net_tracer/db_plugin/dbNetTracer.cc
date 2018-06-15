@@ -21,7 +21,7 @@
 */
 
 
-#include "extNetTracer.h"
+#include "dbNetTracer.h"
 
 #include "dbRecursiveShapeIterator.h"
 #include "dbPolygonTools.h"
@@ -34,7 +34,7 @@
 #  pragma GCC optimize("O2")
 #endif
 
-namespace ext
+namespace db
 {
 
 // -----------------------------------------------------------------------------------

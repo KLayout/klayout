@@ -20,35 +20,21 @@
 
 */
 
+#ifndef HDR_dbNetTracerIO
+#define HDR_dbNetTracerIO
 
+#include "dbNetTracer.h"
+#include "dbLayerProperties.h"
+#include "dbTechnology.h"
 
-#ifndef HDR_extNetTracerIO
-#define HDR_extNetTracerIO
+#include <QColor>
 
-#include "ui_NetTracerTechComponentEditor.h"
-
-#include "extNetTracer.h"
-#include "extNetTracerConfig.h"
-
-#include "layBrowser.h"
-#include "layPlugin.h"
-#include "layViewObject.h"
-#include "layMarker.h"
-#include "layTechnology.h"
-
-#include "tlObject.h"
-
-namespace lay
-{
-  class FileDialog;
-}
-
-namespace ext
+namespace db
 {
 
 class NetTracerTechnologyComponent;
 
-class EXT_PUBLIC NetTracerLayerExpressionInfo
+class DB_PUBLIC NetTracerLayerExpressionInfo
 {
 public:
   NetTracerLayerExpressionInfo ();
@@ -68,7 +54,7 @@ public:
   {
     return m_expression;
   }
-  
+
   NetTracerLayerExpression *get (const db::Layout &layout, const NetTracerTechnologyComponent &tech) const;
 
 private:
@@ -86,7 +72,7 @@ private:
   NetTracerLayerExpression *get_expr (const db::LayerProperties &lp, const db::Layout &layout, const NetTracerTechnologyComponent &tech, const std::set<std::string> &used_symbols) const;
 };
 
-class EXT_PUBLIC NetTracerConnectionInfo
+class DB_PUBLIC NetTracerConnectionInfo
 {
 public:
   NetTracerConnectionInfo ();
@@ -98,32 +84,32 @@ public:
   std::string to_string () const;
   void parse (tl::Extractor &ex);
 
-  const NetTracerLayerExpressionInfo &layer_a () const 
+  const NetTracerLayerExpressionInfo &layer_a () const
   {
     return m_la;
   }
 
-  void set_layer_a (const NetTracerLayerExpressionInfo &l) 
+  void set_layer_a (const NetTracerLayerExpressionInfo &l)
   {
     m_la = l;
   }
 
-  const NetTracerLayerExpressionInfo &via_layer () const 
+  const NetTracerLayerExpressionInfo &via_layer () const
   {
     return m_via;
   }
 
-  void set_via_layer (const NetTracerLayerExpressionInfo &l) 
+  void set_via_layer (const NetTracerLayerExpressionInfo &l)
   {
     m_via = l;
   }
 
-  const NetTracerLayerExpressionInfo &layer_b () const 
+  const NetTracerLayerExpressionInfo &layer_b () const
   {
     return m_lb;
   }
 
-  void set_layer_b (const NetTracerLayerExpressionInfo &l) 
+  void set_layer_b (const NetTracerLayerExpressionInfo &l)
   {
     m_lb = l;
   }
@@ -132,7 +118,7 @@ private:
   NetTracerLayerExpressionInfo m_la, m_via, m_lb;
 };
 
-class EXT_PUBLIC NetTracerSymbolInfo
+class DB_PUBLIC NetTracerSymbolInfo
 {
 public:
   NetTracerSymbolInfo ();
@@ -141,22 +127,22 @@ public:
   std::string to_string () const;
   void parse (tl::Extractor &ex);
 
-  const db::LayerProperties &symbol () const 
+  const db::LayerProperties &symbol () const
   {
     return m_symbol;
   }
 
-  void set_symbol (const db::LayerProperties &s) 
+  void set_symbol (const db::LayerProperties &s)
   {
     m_symbol = s;
   }
 
-  const std::string &expression () const 
+  const std::string &expression () const
   {
     return m_expression;
   }
 
-  void set_expression (const std::string &e) 
+  void set_expression (const std::string &e)
   {
     m_expression = e;
   }
@@ -166,10 +152,10 @@ private:
   std::string m_expression;
 };
 
-class EXT_PUBLIC Net
+class DB_PUBLIC Net
 {
 public:
-  typedef std::vector <NetTracerShape>::const_iterator iterator;
+  typedef std::vector <db::NetTracerShape>::const_iterator iterator;
 
   /**
    *  @brief Default constructor
@@ -179,7 +165,7 @@ public:
   /**
    *  @brief Constructor
    */
-  Net (const NetTracer &tracer, const db::ICplxTrans &trans, const db::Layout &layout, db::cell_index_type cell_index, const std::string &layout_filename, const std::string &layout_name, const NetTracerData &data);
+  Net (const db::NetTracer &tracer, const db::ICplxTrans &trans, const db::Layout &layout, db::cell_index_type cell_index, const std::string &layout_filename, const std::string &layout_name, const db::NetTracerData &data);
 
   /**
    *  @brief Iterate the shapes (begin)
@@ -216,7 +202,7 @@ public:
   /**
    *  @brief Sets the color in which the net is drawn
    */
-  void set_color (QColor c) 
+  void set_color (QColor c)
   {
     m_color = c;
   }
@@ -240,7 +226,7 @@ public:
   }
 
   /**
-   *  @brief Gets the database unit 
+   *  @brief Gets the database unit
    */
   double dbu () const
   {
@@ -289,7 +275,7 @@ public:
   const std::string &cell_name (db::cell_index_type cell_index) const;
 
   /**
-   *  @brief Provides the 
+   *  @brief Provides the
    */
   db::LayerProperties representative_layer_for (unsigned int log_layer) const;
 
@@ -338,7 +324,7 @@ public:
   /**
    *  @brief Sets the "trace path" flag for redo
    */
-  void set_trace_path_flag (bool tp) 
+  void set_trace_path_flag (bool tp)
   {
     m_trace_path = tp;
   }
@@ -358,7 +344,7 @@ private:
   std::string m_layout_name;
   std::string m_top_cell_name;
   bool m_incomplete;
-  std::vector <NetTracerShape> m_net_shapes;
+  std::vector <db::NetTracerShape> m_net_shapes;
   db::Shapes m_shapes;
   std::map <unsigned int, std::pair <db::LayerProperties, db::LayerProperties> > m_layers;
   std::map <unsigned int, std::string> m_cell_names;
@@ -369,7 +355,7 @@ private:
   void define_layer (unsigned int l, const db::LayerProperties &lp, const db::LayerProperties &lp_representative);
 };
 
-class EXT_PUBLIC NetTracerTechnologyComponent
+class DB_PUBLIC NetTracerTechnologyComponent
   : public db::TechnologyComponent
 {
 public:
@@ -479,35 +465,6 @@ private:
   std::vector<NetTracerSymbolInfo> m_symbols;
 };
 
-class NetTracerTechComponentEditor
-  : public lay::TechnologyComponentEditor,
-    public Ui::NetTracerTechComponentEditor
-{
-Q_OBJECT
-
-public:
-  NetTracerTechComponentEditor (QWidget *parent);
-
-  void commit ();
-  void setup ();
-
-public slots:
-  void add_clicked ();
-  void del_clicked ();
-  void move_up_clicked ();
-  void move_down_clicked ();
-  void symbol_add_clicked ();
-  void symbol_del_clicked ();
-  void symbol_move_up_clicked ();
-  void symbol_move_down_clicked ();
-
-private:
-  NetTracerTechnologyComponent m_data;
-
-  void update ();
-};
-
 }
 
 #endif
-

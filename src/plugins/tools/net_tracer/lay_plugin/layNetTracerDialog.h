@@ -22,29 +22,29 @@
 
 
 
-#ifndef HDR_extNetTracerDialog
-#define HDR_extNetTracerDialog
+#ifndef HDR_layNetTracerDialog
+#define HDR_layNetTracerDialog
 
 #include "ui_NetTracerDialog.h"
 
-#include "extNetTracer.h"
-#include "extNetTracerConfig.h"
+#include "dbNetTracer.h"
+#include "dbTechnology.h"
 
+#include "layNetTracerConfig.h"
 #include "layBrowser.h"
 #include "layPlugin.h"
 #include "layViewObject.h"
 #include "layMarker.h"
-#include "layTechnology.h"
+
+namespace db
+{
+  class Net;
+}
 
 namespace lay
 {
-  class FileDialog;
-}
 
-namespace ext
-{
-
-class Net;
+class FileDialog;
 
 class NetTracerDialog
   : public lay::Browser,
@@ -82,7 +82,7 @@ protected slots:
   void redo_trace_clicked ();
 
 private:
-  std::vector <Net *> mp_nets;
+  std::vector <db::Net *> mp_nets;
   std::vector <lay::ShapeMarker *> mp_markers;
   unsigned int m_cv_index;
   int m_net_index;
@@ -113,7 +113,7 @@ private:
   void update_info ();
   void layer_list_changed (int index);
   void release_mouse ();
-  Net *do_trace (const db::DBox &start_search_box, const db::DBox &stop_search_box, bool trace_path);
+  db::Net *do_trace (const db::DBox &start_search_box, const db::DBox &stop_search_box, bool trace_path);
 };
 
 }

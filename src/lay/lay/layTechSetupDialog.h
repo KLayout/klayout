@@ -24,19 +24,13 @@
 #ifndef HDR_layTechSetupDialog
 #define HDR_layTechSetupDialog
 
-#include "ui_TechSetupDialog.h"
-#include "ui_TechMacrosPage.h"
-#include "ui_TechComponentSetupDialog.h"
-#include "ui_TechBaseEditorPage.h"
-#include "ui_TechLayerMappingEditorPage.h"
-#include "ui_TechLoadOptionsEditorPage.h"
-#include "ui_TechSaveOptionsEditorPage.h"
-
 #include "layTechnology.h"
 #include "layStream.h"
 #include "layCommon.h"
 
 #include <memory>
+
+#include <QDialog>
 
 namespace db
 {
@@ -49,19 +43,33 @@ namespace lym
   class MacroCollection;
 }
 
+namespace Ui
+{
+  class TechBaseEditorPage;
+  class TechComponentSetupDialog;
+  class TechSetupDialog;
+  class TechSaveOptionsEditorPage;
+  class TechLoadOptionsEditorPage;
+  class TechMacrosPage;
+}
+
+class QLabel;
+class QModelIndex;
+class QTreeWidgetItem;
+
 namespace lay
 {
 
 class TechnologyComponentEditor;
 
 class TechBaseEditorPage
-  : public TechnologyComponentEditor,
-    public Ui::TechBaseEditorPage
+  : public TechnologyComponentEditor
 {
 Q_OBJECT
 
 public:
   TechBaseEditorPage (QWidget *parent);
+  ~TechBaseEditorPage ();
 
   virtual void setup ();
   virtual void commit ();
@@ -69,11 +77,13 @@ public:
 private slots:
   void browse_clicked ();
   void browse_lyp_clicked ();
+
+private:
+  Ui::TechBaseEditorPage *mp_ui;
 };
 
 class TechMacrosPage
-  : public TechnologyComponentEditor,
-    public Ui::TechMacrosPage
+  : public TechnologyComponentEditor
 {
 Q_OBJECT
 
@@ -85,6 +95,7 @@ public:
   virtual void commit ();
 
 private:
+  Ui::TechMacrosPage *mp_ui;
   std::string m_cat, m_cat_desc;
   std::vector<std::pair<QLabel *, QString> > m_original_labels;
   std::auto_ptr<lym::MacroCollection> mp_collection;
@@ -96,40 +107,41 @@ private slots:
 };
 
 class TechLoadOptionsEditorPage
-  : public TechnologyComponentEditor,
-    public Ui::TechLoadOptionsEditorPage
+  : public TechnologyComponentEditor
 {
 Q_OBJECT
 
 public:
   TechLoadOptionsEditorPage (QWidget *parent);
+  ~TechLoadOptionsEditorPage ();
 
   virtual void setup ();
   virtual void commit ();
 
 private:
+  Ui::TechLoadOptionsEditorPage *mp_ui;
   std::vector< std::pair<lay::StreamReaderOptionsPage *, std::string> > m_pages;
 };
 
 class TechSaveOptionsEditorPage
-  : public TechnologyComponentEditor,
-    public Ui::TechSaveOptionsEditorPage
+  : public TechnologyComponentEditor
 {
 Q_OBJECT
 
 public:
   TechSaveOptionsEditorPage (QWidget *parent);
+  ~TechSaveOptionsEditorPage ();
 
   virtual void setup ();
   virtual void commit ();
 
 private:
+  Ui::TechSaveOptionsEditorPage *mp_ui;
   std::vector< std::pair<lay::StreamWriterOptionsPage *, std::string> > m_pages;
 };
 
 class LAY_PUBLIC TechSetupDialog
-  : public QDialog,
-    public Ui::TechSetupDialog
+  : public QDialog
 {
 Q_OBJECT
 
@@ -160,6 +172,7 @@ private:
   void clear_components ();
   void update ();
 
+  Ui::TechSetupDialog *mp_ui;
   db::Technologies m_technologies;
   db::Technology *mp_current_tech;
   std::map <std::string, lay::TechnologyComponentEditor *> m_component_editors;
@@ -170,8 +183,7 @@ private:
 };
 
 class LAY_PUBLIC TechComponentSetupDialog
-  : public QDialog,
-    public Ui::TechComponentSetupDialog
+  : public QDialog
 {
 public:
   TechComponentSetupDialog (QWidget *parent, db::Technology *tech, const std::string &component_name);
@@ -181,6 +193,7 @@ protected:
   void accept ();
 
 private:
+  Ui::TechComponentSetupDialog *mp_ui;
   db::Technology *mp_tech;
   db::TechnologyComponent *mp_component;
   lay::TechnologyComponentEditor *mp_editor;

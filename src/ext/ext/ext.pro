@@ -9,10 +9,6 @@ DEFINES += MAKE_EXT_LIBRARY
 HEADERS += \
   extBooleanOperationsDialogs.h \
   extDiffToolDialog.h \
-  extNetTracer.h \
-  extNetTracerConfig.h \
-  extNetTracerDialog.h \
-  extNetTracerIO.h \
   extStreamImportDialog.h \
   extStreamImporter.h \
   extXORToolDialog.h \
@@ -23,9 +19,6 @@ HEADERS += \
 FORMS += \ 
   BooleanOptionsDialog.ui \
   DiffToolDialog.ui \
-  NetTracerConfigPage.ui \
-  NetTracerDialog.ui \
-  NetTracerTechComponentEditor.ui \
   SizingOptionsDialog.ui \
   StreamImportDialog.ui \
   MergeOptionsDialog.ui \
@@ -37,11 +30,6 @@ SOURCES += \
   extDiffPlugin.cc \
   extDiffToolDialog.cc \
   extForceLink.cc \
-  extNetTracer.cc \
-  extNetTracerConfig.cc \
-  extNetTracerDialog.cc \
-  extNetTracerIO.cc \
-  extNetTracerPlugin.cc \
   extStreamImport.cc \
   extStreamImportDialog.cc \
   extStreamImporter.cc \

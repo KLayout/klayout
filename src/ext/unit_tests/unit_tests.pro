@@ -7,7 +7,6 @@ TARGET = ext_tests
 include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
-  extNetTracer.cc \
 
 INCLUDEPATH += $$EXT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$EXT_INC $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC

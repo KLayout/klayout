@@ -122,7 +122,7 @@ gsi::Class<db::TechnologyComponent> technology_component_decl ("db", "Technology
   "This class has been introduced in version 0.25."
 );
 
-DB_PUBLIC gsi::Class<db::TechnologyComponent> &decl_layTechnologyComponent () { return technology_component_decl; }
+DB_PUBLIC gsi::Class<db::TechnologyComponent> &decl_dbTechnologyComponent () { return technology_component_decl; }
 
 gsi::Class<db::Technology> technology_decl ("db", "Technology",
   gsi::method ("name", &db::Technology::name,

@@ -21,13 +21,13 @@
 */
 
 
-#include "extNetTracerConfig.h"
+#include "layNetTracerConfig.h"
 #include "layConverters.h"
 
 #include <QColorDialog>
 #include <QPainter>
 
-namespace ext
+namespace lay
 {
 
 extern const std::string cfg_nt_marker_color ("nt-marker-color");
@@ -45,17 +45,17 @@ extern const std::string cfg_nt_max_shapes_highlighted ("nt-max-shapes-highlight
 // ------------------------------------------------------------
 
 static struct {
-  ext::nt_window_type mode;
+  lay::nt_window_type mode;
   const char *string;
 } window_modes [] = {
-  { ext::NTDontChange,    "dont-change" },
-  { ext::NTFitNet,        "fit-net"     },
-  { ext::NTCenter,        "center"      },
-  { ext::NTCenterSize,    "center-size" }
+  { lay::NTDontChange,    "dont-change" },
+  { lay::NTFitNet,        "fit-net"     },
+  { lay::NTCenter,        "center"      },
+  { lay::NTCenterSize,    "center-size" }
 };
 
 void
-NetTracerWindowModeConverter::from_string (const std::string &value, ext::nt_window_type &mode)
+NetTracerWindowModeConverter::from_string (const std::string &value, lay::nt_window_type &mode)
 {
   for (unsigned int i = 0; i < sizeof (window_modes) / sizeof (window_modes [0]); ++i) {
     if (value == window_modes [i].string) {
@@ -67,7 +67,7 @@ NetTracerWindowModeConverter::from_string (const std::string &value, ext::nt_win
 }
 
 std::string 
-NetTracerWindowModeConverter::to_string (ext::nt_window_type mode)
+NetTracerWindowModeConverter::to_string (lay::nt_window_type mode)
 {
   for (unsigned int i = 0; i < sizeof (window_modes) / sizeof (window_modes [0]); ++i) {
     if (mode == window_modes [i].mode) {
@@ -131,7 +131,7 @@ void
 NetTracerConfigPage::setup (lay::PluginRoot *root)
 {
   //  window mode
-  ext::nt_window_type wmode = ext::NTFitNet;
+  lay::nt_window_type wmode = lay::NTFitNet;
   root->config_get (cfg_nt_window_mode, wmode, NetTracerWindowModeConverter ());
   cbx_window->setCurrentIndex (int (wmode));
 
@@ -233,7 +233,7 @@ NetTracerConfigPage::update_colors ()
 void
 NetTracerConfigPage::window_changed (int m)
 {
-  le_window->setEnabled (m == int (ext::NTFitNet) || m == int (ext::NTCenterSize));
+  le_window->setEnabled (m == int (lay::NTFitNet) || m == int (lay::NTCenterSize));
 }
 
 void 
@@ -245,7 +245,7 @@ NetTracerConfigPage::commit (lay::PluginRoot *root)
   unsigned int max_shapes_highlighted = 10000;
   tl::from_string (tl::to_string (le_max_markers->text ()), max_shapes_highlighted);
 
-  root->config_set (cfg_nt_window_mode, ext::nt_window_type (cbx_window->currentIndex ()), NetTracerWindowModeConverter ());
+  root->config_set (cfg_nt_window_mode, lay::nt_window_type (cbx_window->currentIndex ()), NetTracerWindowModeConverter ());
   root->config_set (cfg_nt_window_dim, dim);
   root->config_set (cfg_nt_max_shapes_highlighted, max_shapes_highlighted);
 

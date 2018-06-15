@@ -96,7 +96,7 @@ static rdb::Reference *new_ref_tp (const db::DCplxTrans &trans, rdb::id_type par
   return new rdb::Reference (trans, parent_cell_id);
 }
 
-Class<rdb::Reference> decl_RdbReference ("lay", "RdbReference",
+Class<rdb::Reference> decl_RdbReference ("rdb", "RdbReference",
   gsi::constructor ("new", &new_ref_tp, 
     "@brief Creates a reference with a given transformation and parent cell ID\n"
     "@args trans, parent_cell_id\n"
@@ -166,7 +166,7 @@ ItemRefUnwrappingIterator cell_items_end (const rdb::Cell *cell)
   return cell->database ()->items_by_cell (cell->id ()).second;
 }
 
-Class<rdb::Cell> decl_RdbCell ("lay", "RdbCell",
+Class<rdb::Cell> decl_RdbCell ("rdb", "RdbCell",
   gsi::method ("rdb_id", &rdb::Cell::id, 
     "@brief Gets the cell ID\n"
     "The cell ID is an integer that uniquely identifies the cell. It is used for referring to a "
@@ -272,7 +272,7 @@ static void scan_shapes (rdb::Category *cat, const db::RecursiveShapeIterator &i
   rdb::scan_layer (cat, iter);
 }
 
-Class<rdb::Category> decl_RdbCategory ("lay", "RdbCategory",
+Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
   gsi::method ("rdb_id", &rdb::Category::id, 
     "@brief Gets the category ID\n"
     "The category ID is an integer that uniquely identifies the category. It is used for referring to a "
@@ -559,7 +559,7 @@ void value_set_tag_id (rdb::ValueWrapper *v, rdb::id_type id)
   v->set_tag_id (id);
 }
 
-Class<rdb::ValueWrapper> decl_RdbItemValue ("lay", "RdbItemValue",
+Class<rdb::ValueWrapper> decl_RdbItemValue ("rdb", "RdbItemValue",
   gsi::method ("from_s", &value_from_string, 
     "@brief Creates a value object from a string\n"
     "@args s\n"
@@ -739,7 +739,7 @@ static void clear_values (rdb::Item *item)
   item->set_values (rdb::Values ());
 }
 
-Class<rdb::Item> decl_RdbItem ("lay", "RdbItem",
+Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
   gsi::method ("database", (const rdb::Database *(rdb::Item::*)() const) &rdb::Item::database,
     "@brief Gets the database object that item is associated with\n"
     "\n"
@@ -1078,7 +1078,7 @@ static rdb::Item *create_item_from_objects (rdb::Database *db, rdb::Cell *cell, 
   }
 }
 
-Class<rdb::Database> decl_ReportDatabase ("lay", "ReportDatabase",
+Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
   gsi::constructor ("new", &create_rdb, 
     "@brief Creates a report database\n"
     "@args name\n"

@@ -3,6 +3,7 @@ TEMPLATE = subdirs
 SUBDIRS = \
   db \
   tl \
+  rdb \
   lay \
 
 equals(HAVE_QTBINDINGS, "1") {

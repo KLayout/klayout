@@ -29,6 +29,7 @@
 #include <QProcessEnvironment>
 
 
+
 int run_pymodtest (tl::TestBase * /*_this*/, const std::string &fn)
 {
   QProcess process;
@@ -57,7 +58,12 @@ PYMODTEST (bridge, "bridge.py")
 
 PYMODTEST (import_tl, "import_tl.py")
 PYMODTEST (import_db, "import_db.py")
+PYMODTEST (import_rdb, "import_rdb.py")
+
+#if defined(HAVE_QTBINDINGS)
+
 PYMODTEST (import_lay, "import_lay.py")
+
 PYMODTEST (import_QtCore, "import_QtCore.py")
 PYMODTEST (import_QtGui, "import_QtGui.py")
 PYMODTEST (import_QtXml, "import_QtXml.py")
@@ -72,5 +78,11 @@ PYMODTEST (import_QtMultimedia, "import_QtMultimedia.py")
 PYMODTEST (import_QtPrintSupport, "import_QtPrintSupport.py")
 PYMODTEST (import_QtSvg, "import_QtSvg.py")
 PYMODTEST (import_QtXmlPatterns, "import_QtXmlPatterns.py")
+
+#endif
+
+#else
+
+PYMODTEST (import_lay, "import_lay_noqt.py")
 
 #endif

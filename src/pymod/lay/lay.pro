@@ -8,7 +8,7 @@ SOURCES = \
 
 HEADERS += \
 
-LIBS += -lklayout_lay
+LIBS += -lklayout_lay -lklayout_ext
 
 # Use this opportunity to provide the __init__.py file
 

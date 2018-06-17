@@ -62,7 +62,7 @@ static PluginDescriptor load_plugin (const std::string &pp)
   HINSTANCE handle = LoadLibraryW ((const wchar_t *) tl::to_qstring (pp).constData ());
   if (! handle) {
     throw tl::Exception (tl::to_string (QObject::tr ("Unable to load plugin: %s with error message: %s ")), pp, GetLastError ());
-    return;
+    return desc;
   }
   init_func = reinterpret_cast<dbp_init_func_t> (GetProcAddress (handle, init_func_name));
 

@@ -51,7 +51,7 @@ QT = core
 # - PYA (Python binding for GSI)
 INCLUDEPATH += $$PYTHONINCLUDE $$INC/tl/tl $$INC/pya/pya
 DEPENDPATH += $$PYTHONINCLUDE $$INC/tl/tl $$INC/pya/pya
-LIBS += $$PYTHONLIBFILE -L$$LIBDIR -lklayout_tl -lklayout_pya
+LIBS += $$PYTHONLIBFILE -L$$LIBDIR -lklayout_tl -lklayout_pya -lklayout_gsi
 
 # Also include DB as this is our sample
 INCLUDEPATH += $$INC/db/db

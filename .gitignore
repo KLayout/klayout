@@ -38,6 +38,7 @@ private
 src/plugins/*
 !src/plugins/streamers
 !src/plugins/tools
+!src/plugins/common
 !src/plugins/*.pro
 !src/plugins/*.pri
 

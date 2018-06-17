@@ -45,6 +45,12 @@ PLUGINPATH += \
 INCLUDEPATH += $$PLUGINPATH
 DEPENDPATH += $$PLUGINPATH
 
+LIBS += -L$$DESTDIR/db_plugins \
+  -lgds2 \
+  -lcif \
+  -loasis \
+  -ldxf \
+
 INCLUDEPATH += $$RBA_INC
 DEPENDPATH += $$RBA_INC
 

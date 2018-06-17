@@ -30,3 +30,9 @@ PLUGINPATH += \
 
 INCLUDEPATH += $$PLUGINPATH
 DEPENDPATH += $$PLUGINPATH
+
+LIBS += -L$$DESTDIR_UT/db_plugins \
+  -lgds2 \
+  -lcif \
+  -loasis \
+  -ldxf \

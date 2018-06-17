@@ -25,9 +25,6 @@
 //  to force linking of the lay module
 #include "../../lay/lay/layForceLink.h"
 
-//  to force linking of the ext module
-#include "../../ext/ext/extForceLink.h"
-
 //  NOTE: img, ant, edt and rdb don't need to be force-linked
 //  as they are hard-linked by lay
 

@@ -196,7 +196,10 @@ INCLUDEPATH += $$QTBASIC_INC
 DEPENDPATH += $$QTBASIC_INC
 
 equals(HAVE_QTBINDINGS, "1") {
-  LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtXml
+  LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtXml -lklayout_QtCore
+  equals(HAVE_QT5, "1") {
+    LIBS += -lklayout_QtWidgets
+  }
 }
 
 INCLUDEPATH += $$RBA_INC

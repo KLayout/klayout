@@ -27,7 +27,7 @@
 namespace db
 {
 
-DB_PUBLIC std::string net_tracer_component_name ("connectivity");
+DB_PLUGIN_PUBLIC std::string net_tracer_component_name ("connectivity");
 
 // -----------------------------------------------------------------------------------------
 //  NetTracerLayerExpressionInfo implementation

@@ -15,6 +15,9 @@ LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_qtbasic
 # because QPainter is used as base class for QStylePainter, we need this:
 LIBS += -lklayout_QtGui
 
+# because QObject is the base class of some classes we need this
+LIBS += -lklayout_QtCore
+
 SOURCES += \
   gsiDeclQtWidgetsAdd.cc
 

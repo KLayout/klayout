@@ -18,6 +18,9 @@ LIBS += -lklayout_QtCore
 # because QWidget is used for some UI stuff, we need this:
 LIBS += -lklayout_QtWidgets
 
+# because QPaintDevice is used, we need this:
+LIBS += -lklayout_QtGui
+
 SOURCES += \
 
 HEADERS += \

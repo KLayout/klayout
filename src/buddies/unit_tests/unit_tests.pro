@@ -22,6 +22,7 @@ DEPENDPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC
 LIBS += -L$$DESTDIR_UT -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi
 
 PLUGINPATH += \
+  $$PWD/../../plugins/common \
   $$PWD/../../plugins/streamers/gds2/db_plugin \
   $$PWD/../../plugins/streamers/cif/db_plugin \
   $$PWD/../../plugins/streamers/oasis/db_plugin \

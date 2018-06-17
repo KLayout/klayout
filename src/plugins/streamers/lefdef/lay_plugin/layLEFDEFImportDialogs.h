@@ -24,7 +24,7 @@
 #ifndef HDR_dbLEFImportDialog
 #define HDR_dbLEFImportDialog
 
-#include "layCommon.h"
+#include "layPluginCommon.h"
 #include "layTechnology.h"
 #include "layStream.h"
 
@@ -39,7 +39,7 @@ namespace lay
 /**
  *  @brief A structure containing the LEF importer data
  */
-struct LAY_PUBLIC LEFDEFImportData
+struct LAY_PLUGIN_PUBLIC LEFDEFImportData
 {
   LEFDEFImportData ();
 
@@ -54,7 +54,7 @@ struct LAY_PUBLIC LEFDEFImportData
 /**
  *  @brief The LEF importer dialog
  */
-class LAY_PUBLIC LEFDEFImportOptionsDialog
+class LAY_PLUGIN_PUBLIC LEFDEFImportOptionsDialog
   : public QDialog,
     private Ui::LEFDEFImportOptionsDialog
 {

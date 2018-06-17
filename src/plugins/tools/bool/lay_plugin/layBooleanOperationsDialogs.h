@@ -21,8 +21,8 @@
 */
 
 
-#ifndef HDR_extDialogs
-#define HDR_extDialogs
+#ifndef HDR_layDialogs
+#define HDR_layDialogs
 
 #include "ui_BooleanOptionsDialog.h"
 #include "ui_SizingOptionsDialog.h"
@@ -33,7 +33,7 @@ namespace db
   class Layout;
 }
 
-namespace ext
+namespace lay
 {
 
 class CellView;

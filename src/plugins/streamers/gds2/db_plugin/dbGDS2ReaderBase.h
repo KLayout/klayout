@@ -25,16 +25,16 @@
 #ifndef HDR_dbGDS2ReaderBase
 #define HDR_dbGDS2ReaderBase
 
+#include "dbPluginCommon.h"
+#include "dbLayout.h"
+#include "dbReader.h"
+#include "dbStreamLayers.h"
+
 #include "tlException.h"
 #include "tlInternational.h"
 #include "tlProgress.h"
 #include "tlString.h"
-
-#include "dbLayout.h"
-#include "dbReader.h"
 #include "tlStream.h"
-#include "dbStreamLayers.h"
-
 
 namespace db
 {
@@ -48,7 +48,7 @@ struct GDS2XY
 /**
  *  @brief The GDS2 format basic stream reader
  */
-class DB_PUBLIC GDS2ReaderBase
+class DB_PLUGIN_PUBLIC GDS2ReaderBase
   : public ReaderBase
 {
 public: 

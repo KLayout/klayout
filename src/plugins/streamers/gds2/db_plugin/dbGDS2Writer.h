@@ -24,6 +24,7 @@
 #ifndef HDR_dbGDS2Writer
 #define HDR_dbGDS2Writer
 
+#include "dbPluginCommon.h"
 #include "dbGDS2WriterBase.h"
 #include "dbWriterTools.h"
 #include "tlProgress.h"
@@ -35,7 +36,7 @@ namespace db
  *  @brief A GDS2 writer abstraction
  */
 
-class DB_PUBLIC GDS2Writer
+class DB_PLUGIN_PUBLIC GDS2Writer
   : public db::GDS2WriterBase
 {
 public:

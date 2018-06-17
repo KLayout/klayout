@@ -21,31 +21,58 @@
 */
 
 
-#if !defined(HDR_extCommon_h)
-# define HDR_extCommon_h
 
-# if defined _WIN32 || defined __CYGWIN__
 
-#   ifdef MAKE_EXT_LIBRARY
-#     define EXT_PUBLIC __declspec(dllexport)
-#   else
-#     define EXT_PUBLIC __declspec(dllimport)
-#   endif
-#   define EXT_LOCAL
-#   define EXT_PUBLIC_TEMPLATE
+#ifndef HDR_layDiffToolDialog
+#define HDR_layDiffToolDialog
 
-# else
+#include <QDialog>
+#include <string>
 
-#   if __GNUC__ >= 4 || defined(__clang__)
-#     define EXT_PUBLIC __attribute__ ((visibility ("default")))
-#     define EXT_PUBLIC_TEMPLATE __attribute__ ((visibility ("default")))
-#     define EXT_LOCAL  __attribute__ ((visibility ("hidden")))
-#   else
-#     define EXT_PUBLIC
-#     define EXT_PUBLIC_TEMPLATE
-#     define EXT_LOCAL
-#   endif
+namespace Ui
+{
+  class DiffToolDialog;
+}
 
-# endif
+namespace lay
+{
+  class LayoutView;
+}
+
+namespace lay
+{
+
+extern std::string cfg_diff_run_xor;
+extern std::string cfg_diff_detailed;
+extern std::string cfg_diff_summarize;
+extern std::string cfg_diff_expand_cell_arrays;
+extern std::string cfg_diff_exact;
+
+class DiffToolDialog
+  : public QDialog
+{
+Q_OBJECT 
+
+public:
+  DiffToolDialog (QWidget *parent);
+  ~DiffToolDialog ();
+
+  int exec_dialog (lay::LayoutView *view);
+
+protected slots:
+  void xor_changed () { update (); }
+
+protected:
+  void accept ();
+  void run_diff ();
+  void update ();
+
+private:
+  Ui::DiffToolDialog *mp_ui;
+  lay::LayoutView *mp_view;
+};
+
+}
 
 #endif
+

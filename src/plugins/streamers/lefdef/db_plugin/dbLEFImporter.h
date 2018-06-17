@@ -25,9 +25,9 @@
 #ifndef HDR_dbLEFImporter
 #define HDR_dbLEFImporter
 
+#include "dbPluginCommon.h"
 #include "dbLEFDEFImporter.h"
 
-#include "dbCommon.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbStreamLayers.h"
@@ -43,7 +43,7 @@ namespace db
 /**
  *  @brief The LEF importer object
  */
-class DB_PUBLIC LEFImporter
+class DB_PLUGIN_PUBLIC LEFImporter
   : public LEFDEFImporter
 {
 public:

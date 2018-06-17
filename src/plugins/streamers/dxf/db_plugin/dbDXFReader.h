@@ -25,17 +25,18 @@
 #ifndef HDR_dbDXFReader
 #define HDR_dbDXFReader
 
+#include "dbPluginCommon.h"
+#include "dbLayout.h"
+#include "dbNamedLayerReader.h"
+#include "dbDXF.h"
+#include "dbStreamLayers.h"
+#include "dbPropertiesRepository.h"
+
 #include "tlException.h"
 #include "tlInternational.h"
 #include "tlProgress.h"
 #include "tlString.h"
-
-#include "dbLayout.h"
-#include "dbNamedLayerReader.h"
-#include "dbDXF.h"
 #include "tlStream.h"
-#include "dbStreamLayers.h"
-#include "dbPropertiesRepository.h"
 
 #include <map>
 #include <set>
@@ -48,7 +49,7 @@ class Matrix3d;
 /**
  *  @brief Structure that holds the DXF specific options for the reader
  */
-class DB_PUBLIC DXFReaderOptions
+class DB_PLUGIN_PUBLIC DXFReaderOptions
   : public FormatSpecificReaderOptions
 {
 public:
@@ -204,7 +205,7 @@ public:
 /**
  *  @brief Generic base class of DXF reader exceptions
  */
-class DB_PUBLIC DXFReaderException
+class DB_PLUGIN_PUBLIC DXFReaderException
   : public ReaderException
 {
 public:
@@ -220,7 +221,7 @@ public:
 /**
  *  @brief The DXF format stream reader
  */
-class DB_PUBLIC DXFReader
+class DB_PLUGIN_PUBLIC DXFReader
   : public NamedLayerReader,
     public DXFDiagnostics
 {

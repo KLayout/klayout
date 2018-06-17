@@ -21,17 +21,17 @@
 */
 
 
-#ifndef HDR_extStreamImporter
-#define HDR_extStreamImporter
+#ifndef HDR_layStreamImporter
+#define HDR_layStreamImporter
 
-#include "extCommon.h"
+#include "layPluginCommon.h"
 
 #include "dbLayout.h"
 #include "dbTrans.h"
 #include "dbLoadLayoutOptions.h"
 #include "tlStream.h"
 #include "tlProgress.h"
-#include "extStreamImportDialog.h"
+#include "layStreamImportDialog.h"
 
 #include <iostream>
 
@@ -45,13 +45,13 @@ namespace lay
   class LayoutView;
 }
 
-namespace ext
+namespace lay
 {
 
 /**
  *  @brief The Stream importer object
  */
-class EXT_PUBLIC StreamImporter
+class LAY_PLUGIN_PUBLIC StreamImporter
 {
 public:
   /**

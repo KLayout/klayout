@@ -22,24 +22,25 @@
 
 
 
-#include "extXORToolDialog.h"
+
+#include "layDiffToolDialog.h"
 
 #include "layPlugin.h"
 
-namespace ext
+namespace lay
 {
 
-class XORPlugin
+class DiffPlugin
   : public lay::Plugin
 {
 public:
-  XORPlugin (Plugin *parent, lay::LayoutView *view)
+  DiffPlugin (Plugin *parent, lay::LayoutView *view)
     : lay::Plugin (parent), mp_view (view)
   {
-    mp_dialog = new ext::XORToolDialog (0);
+    mp_dialog = new lay::DiffToolDialog (0);
   }
 
-  ~XORPlugin ()
+  ~DiffPlugin ()
   {
     delete mp_dialog;
     mp_dialog = 0;
@@ -47,11 +48,11 @@ public:
 
   void menu_activated (const std::string &symbol) 
   {
-    if (symbol == "ext::xor_tool") {
+    if (symbol == "lay::diff_tool") {
 
       if (mp_dialog->exec_dialog (mp_view)) {
 
-        // ... implementation is in extXORToolDialog.cc ...
+        // ... implementation is in layDiffToolDialog.cc ...
 
       }
 
@@ -60,31 +61,25 @@ public:
 
 private:
   lay::LayoutView *mp_view;
-  ext::XORToolDialog *mp_dialog;
+  lay::DiffToolDialog *mp_dialog;
 };
 
-class XORPluginDeclaration
+class DiffPluginDeclaration
   : public lay::PluginDeclaration
 {
 public:
-  XORPluginDeclaration ()
+  DiffPluginDeclaration ()
   {
     //  .. nothing yet ..
   }
   
   virtual void get_options (std::vector < std::pair<std::string, std::string> > &options) const
   {
-    options.push_back (std::pair<std::string, std::string> (cfg_xor_input_mode, "all"));
-    options.push_back (std::pair<std::string, std::string> (cfg_xor_output_mode, "rdb"));
-    options.push_back (std::pair<std::string, std::string> (cfg_xor_nworkers, "1"));
-    options.push_back (std::pair<std::string, std::string> (cfg_xor_layer_offset, ""));
-    options.push_back (std::pair<std::string, std::string> (cfg_xor_axorb, "true"));
-    options.push_back (std::pair<std::string, std::string> (cfg_xor_anotb, "false"));
-    options.push_back (std::pair<std::string, std::string> (cfg_xor_bnota, "false"));
-    options.push_back (std::pair<std::string, std::string> (cfg_xor_summarize, "false"));
-    options.push_back (std::pair<std::string, std::string> (cfg_xor_tolerances, ""));
-    options.push_back (std::pair<std::string, std::string> (cfg_xor_tiling, ""));
-    options.push_back (std::pair<std::string, std::string> (cfg_xor_region_mode, "all"));
+    options.push_back (std::pair<std::string, std::string> (cfg_diff_run_xor, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_diff_detailed, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_diff_summarize, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_diff_expand_cell_arrays, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_diff_exact, "false"));
   }
 
   virtual lay::ConfigPage *config_page (QWidget * /*parent*/, std::string & /*title*/) const
@@ -96,7 +91,7 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("ext::xor_tool", "xor_tool:edit", "tools_menu.post_verification_group", tl::to_string (QObject::tr ("XOR Tool"))));
+    menu_entries.push_back (lay::MenuEntry ("lay::diff_tool", "diff_tool:edit", "tools_menu.post_verification_group", tl::to_string (QObject::tr ("Diff Tool"))));
   }
 
   virtual bool configure (const std::string & /*name*/, const std::string & /*value*/)
@@ -111,11 +106,11 @@ public:
 
   lay::Plugin *create_plugin (db::Manager *, lay::PluginRoot *root, lay::LayoutView *view) const
   {
-    return new XORPlugin (root, view);
+    return new DiffPlugin (root, view);
   }
 };
 
-static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ext::XORPluginDeclaration (), 3000, "ext::XORPlugin");
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::DiffPluginDeclaration (), 3001, "lay::DiffPlugin");
 
 }
 

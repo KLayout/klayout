@@ -34,9 +34,6 @@
 #include <string>
 #include <vector>
 
-//  place this macro to force linking of CIF plugin
-#define FORCE_LINK_CIF void force_link_CIF_f () { extern int force_link_CIF; force_link_CIF = 0; }
-
 namespace db
 {
 

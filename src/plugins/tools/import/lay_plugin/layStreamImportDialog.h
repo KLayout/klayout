@@ -21,8 +21,8 @@
 */
 
 
-#ifndef HDR_extStreamImportDialog
-#define HDR_extStreamImportDialog
+#ifndef HDR_layStreamImportDialog
+#define HDR_layStreamImportDialog
 
 #include <QDialog>
 #include <QAction>
@@ -59,7 +59,7 @@ namespace lay
   class PluginRoot;
 }
 
-namespace ext
+namespace lay
 {
 
 class StreamImporter;

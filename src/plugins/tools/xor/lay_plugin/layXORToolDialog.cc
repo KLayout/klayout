@@ -21,8 +21,8 @@
 */
 
 
-#include "extXORToolDialog.h"
-#include "extXORProgress.h"
+#include "layXORToolDialog.h"
+#include "layXORProgress.h"
 #include "antService.h"
 #include "rdb.h"
 #include "dbShapeProcessor.h"
@@ -46,7 +46,7 @@
 
 #include <QMessageBox>
 
-namespace ext
+namespace lay
 {
 
 std::string cfg_xor_input_mode ("xor-input-mode");

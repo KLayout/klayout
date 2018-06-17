@@ -24,6 +24,7 @@
 #ifndef HDR_dbGDS2WriterBase
 #define HDR_dbGDS2WriterBase
 
+#include "dbPluginCommon.h"
 #include "dbWriter.h"
 #include "dbWriterTools.h"
 #include "tlProgress.h"
@@ -42,7 +43,7 @@ class SaveLayoutOptions;
 /**
  *  @brief Structure that holds the GDS2 specific options for the Writer
  */
-class DB_PUBLIC GDS2WriterOptions
+class DB_PLUGIN_PUBLIC GDS2WriterOptions
   : public FormatSpecificWriterOptions
 {
 public:
@@ -149,7 +150,7 @@ public:
  *  @brief A GDS2 writer abstraction
  */
 
-class DB_PUBLIC GDS2WriterBase
+class DB_PLUGIN_PUBLIC GDS2WriterBase
   : public db::WriterBase
 {
 public:

@@ -20,7 +20,7 @@
 
 */
 
-#include "extXORProgress.h"
+#include "layXORProgress.h"
 
 #include "tlString.h"
 
@@ -29,7 +29,7 @@
 #include <QPainter>
 #include <QBitmap>
 
-namespace ext
+namespace lay
 {
 
 static inline void merge (size_t &a, size_t b)

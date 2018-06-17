@@ -26,6 +26,7 @@
 #ifndef HDR_dbDXFWriter
 #define HDR_dbDXFWriter
 
+#include "dbPluginCommon.h"
 #include "dbWriter.h"
 #include "dbDXF.h"
 #include "dbSaveLayoutOptions.h"
@@ -45,7 +46,7 @@ class SaveLayoutOptions;
 /**
  *  @brief Structure that holds the DXF specific options for the Writer
  */
-class DB_PUBLIC DXFWriterOptions
+class DB_PLUGIN_PUBLIC DXFWriterOptions
   : public FormatSpecificWriterOptions
 {
 public:
@@ -89,7 +90,7 @@ public:
 /**
  *  @brief A DXF writer abstraction
  */
-class DB_PUBLIC DXFWriter
+class DB_PLUGIN_PUBLIC DXFWriter
   : public db::WriterBase
 {
 public:

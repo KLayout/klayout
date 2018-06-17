@@ -21,8 +21,8 @@
 */
 
 
-#include "extStreamImportDialog.h"
-#include "extStreamImporter.h"
+#include "layStreamImportDialog.h"
+#include "layStreamImporter.h"
 
 #include "dbStream.h"
 
@@ -33,7 +33,7 @@
 
 #include <QApplication>
 
-namespace ext
+namespace lay
 {
 
 static const std::string cfg_stream_import_spec ("stream-import-spec2");
@@ -61,7 +61,7 @@ public:
   virtual void get_menu_entries (std::vector<lay::MenuEntry> &menu_entries) const
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
-    menu_entries.push_back (lay::MenuEntry ("ext::import_stream", "import_stream:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("Other File Into Current"))));
+    menu_entries.push_back (lay::MenuEntry ("lay::import_stream", "import_stream:edit", "file_menu.import_menu.end", tl::to_string (QObject::tr ("Other File Into Current"))));
   }
 
   virtual bool configure (const std::string &name, const std::string &value)
@@ -81,7 +81,7 @@ public:
 
   virtual bool menu_activated (const std::string &symbol) const
   {
-    if (symbol == "ext::import_stream") {
+    if (symbol == "lay::import_stream") {
 
       lay::LayoutView *view = lay::LayoutView::current ();
       if (! view) {
@@ -98,7 +98,7 @@ public:
       lay::PluginRoot *config_root = lay::PluginRoot::instance ();
 
       StreamImportDialog dialog (QApplication::activeWindow (), &data);
-      ext::StreamImporter importer;
+      lay::StreamImporter importer;
 
       bool ok = false;
       while (! ok && dialog.exec ()) {
@@ -167,7 +167,7 @@ private:
   std::string m_import_spec;
 };
 
-static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ext::StreamImportPluginDeclaration (), 1300, "ext::StreamImportPlugin");
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::StreamImportPluginDeclaration (), 1300, "lay::StreamImportPlugin");
 
 }
 

@@ -25,17 +25,18 @@
 #ifndef HDR_dbCIFReader
 #define HDR_dbCIFReader
 
+#include "dbPluginCommon.h"
+#include "dbNamedLayerReader.h"
+#include "dbLayout.h"
+#include "dbCIF.h"
+#include "dbStreamLayers.h"
+#include "dbPropertiesRepository.h"
+
 #include "tlException.h"
 #include "tlInternational.h"
 #include "tlProgress.h"
 #include "tlString.h"
-
-#include "dbNamedLayerReader.h"
-#include "dbLayout.h"
-#include "dbCIF.h"
 #include "tlStream.h"
-#include "dbStreamLayers.h"
-#include "dbPropertiesRepository.h"
 
 #include <map>
 #include <set>
@@ -46,7 +47,7 @@ namespace db
 /**
  *  @brief Structure that holds the CIF specific options for the reader
  */
-class DB_PUBLIC CIFReaderOptions
+class DB_PLUGIN_PUBLIC CIFReaderOptions
   : public FormatSpecificReaderOptions
 {
 public:
@@ -128,7 +129,7 @@ public:
 /**
  *  @brief Generic base class of CIF reader exceptions
  */
-class DB_PUBLIC CIFReaderException
+class DB_PLUGIN_PUBLIC CIFReaderException
   : public ReaderException
 {
 public:
@@ -140,7 +141,7 @@ public:
 /**
  *  @brief The CIF format stream reader
  */
-class DB_PUBLIC CIFReader
+class DB_PLUGIN_PUBLIC CIFReader
   : public NamedLayerReader,
     public CIFDiagnostics
 {

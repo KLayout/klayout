@@ -24,6 +24,7 @@
 #ifndef HDR_dbGDS2WriterText
 #define HDR_dbGDS2WriterText
 
+#include "dbPluginCommon.h"
 #include "dbGDS2WriterBase.h"
 #include <sstream>
 #include <climits>
@@ -32,7 +33,7 @@ namespace db
 {
 
 
-class DB_PUBLIC GDS2WriterText
+class DB_PLUGIN_PUBLIC GDS2WriterText
   : public db::GDS2WriterBase
 {
 

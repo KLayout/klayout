@@ -34,9 +34,6 @@
 #include <string>
 #include <vector>
 
-//  place this macro to force linking of DXF plugin
-#define FORCE_LINK_DXF void force_link_DXF_f () { extern int force_link_DXF; force_link_DXF = 0; }
-
 namespace db
 {
 

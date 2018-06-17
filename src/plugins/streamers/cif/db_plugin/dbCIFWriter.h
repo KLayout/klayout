@@ -25,6 +25,7 @@
 #ifndef HDR_dbCIFWriter
 #define HDR_dbCIFWriter
 
+#include "dbPluginCommon.h"
 #include "dbWriter.h"
 #include "dbCIF.h"
 #include "dbSaveLayoutOptions.h"
@@ -44,7 +45,7 @@ class SaveLayoutOptions;
 /**
  *  @brief Structure that holds the CIF specific options for the Writer
  */
-class DB_PUBLIC CIFWriterOptions
+class DB_PLUGIN_PUBLIC CIFWriterOptions
   : public FormatSpecificWriterOptions
 {
 public:
@@ -92,7 +93,7 @@ public:
 /**
  *  @brief A CIF writer abstraction
  */
-class DB_PUBLIC CIFWriter
+class DB_PLUGIN_PUBLIC CIFWriter
   : public db::WriterBase
 {
 public:

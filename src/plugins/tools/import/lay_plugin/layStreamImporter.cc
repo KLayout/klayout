@@ -21,7 +21,7 @@
 */
 
 
-#include "extStreamImporter.h"
+#include "layStreamImporter.h"
 #include "layLayoutView.h"
 #include "tlStream.h"
 #include "tlString.h"
@@ -37,7 +37,7 @@
 
 #include <math.h>
 
-namespace ext
+namespace lay
 {
 
 // ---------------------------------------------------------------------------------------

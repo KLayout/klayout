@@ -21,12 +21,12 @@
 */
 
 
-#include "extBooleanOperationsDialogs.h"
+#include "layBooleanOperationsDialogs.h"
 
 #include "layLayoutView.h"
 #include "tlExceptions.h"
 
-namespace ext
+namespace lay
 {
 
 // --------------------------------------------------------------------------------

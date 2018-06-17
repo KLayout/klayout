@@ -24,6 +24,7 @@
 #ifndef HDR_dbGDS2ReaderText
 #define HDR_dbGDS2ReaderText
 
+#include "dbPluginCommon.h"
 #include "dbGDS2Reader.h"
 #include <sstream>
 
@@ -34,7 +35,7 @@ namespace db
 /**
  *  @brief Generic base class of GDS2 Text reader exceptions
  */
-class DB_PUBLIC GDS2ReaderTextException
+class DB_PLUGIN_PUBLIC GDS2ReaderTextException
   : public ReaderException 
 {
 public:
@@ -46,7 +47,7 @@ public:
 /**
  *  @brief The GDS2 text format stream reader
  */
-class DB_PUBLIC GDS2ReaderText
+class DB_PLUGIN_PUBLIC GDS2ReaderText
   : public GDS2ReaderBase
 {
 

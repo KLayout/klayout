@@ -23,6 +23,7 @@
 #ifndef HDR_dbNetTracerIO
 #define HDR_dbNetTracerIO
 
+#include "dbPluginCommon.h"
 #include "dbNetTracer.h"
 #include "dbLayerProperties.h"
 #include "dbTechnology.h"
@@ -34,7 +35,7 @@ namespace db
 
 class NetTracerTechnologyComponent;
 
-class DB_PUBLIC NetTracerLayerExpressionInfo
+class DB_PLUGIN_PUBLIC NetTracerLayerExpressionInfo
 {
 public:
   NetTracerLayerExpressionInfo ();
@@ -72,7 +73,7 @@ private:
   NetTracerLayerExpression *get_expr (const db::LayerProperties &lp, const db::Layout &layout, const NetTracerTechnologyComponent &tech, const std::set<std::string> &used_symbols) const;
 };
 
-class DB_PUBLIC NetTracerConnectionInfo
+class DB_PLUGIN_PUBLIC NetTracerConnectionInfo
 {
 public:
   NetTracerConnectionInfo ();
@@ -118,7 +119,7 @@ private:
   NetTracerLayerExpressionInfo m_la, m_via, m_lb;
 };
 
-class DB_PUBLIC NetTracerSymbolInfo
+class DB_PLUGIN_PUBLIC NetTracerSymbolInfo
 {
 public:
   NetTracerSymbolInfo ();
@@ -152,7 +153,7 @@ private:
   std::string m_expression;
 };
 
-class DB_PUBLIC Net
+class DB_PLUGIN_PUBLIC Net
 {
 public:
   typedef std::vector <db::NetTracerShape>::const_iterator iterator;
@@ -355,7 +356,7 @@ private:
   void define_layer (unsigned int l, const db::LayerProperties &lp, const db::LayerProperties &lp_representative);
 };
 
-class DB_PUBLIC NetTracerTechnologyComponent
+class DB_PLUGIN_PUBLIC NetTracerTechnologyComponent
   : public db::TechnologyComponent
 {
 public:

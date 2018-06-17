@@ -25,17 +25,17 @@
 #ifndef HDR_dbGDS2Reader
 #define HDR_dbGDS2Reader
 
+#include "dbPluginCommon.h"
+#include "dbLayout.h"
+#include "dbGDS2ReaderBase.h"
+#include "dbCommonReader.h"
+#include "dbStreamLayers.h"
+
 #include "tlException.h"
 #include "tlInternational.h"
 #include "tlProgress.h"
 #include "tlString.h"
-
-#include "dbLayout.h"
-#include "dbGDS2ReaderBase.h"
-#include "dbCommonReader.h"
 #include "tlStream.h"
-#include "dbStreamLayers.h"
-
 
 namespace db
 {
@@ -43,7 +43,7 @@ namespace db
 /**
  *  @brief Structure that holds the GDS2 specific options for the reader
  */
-class DB_PUBLIC GDS2ReaderOptions
+class DB_PLUGIN_PUBLIC GDS2ReaderOptions
   : public FormatSpecificReaderOptions
 {
 public:
@@ -104,7 +104,7 @@ public:
 /**
  *  @brief Generic base class of GDS2 reader exceptions
  */
-class DB_PUBLIC GDS2ReaderException
+class DB_PLUGIN_PUBLIC GDS2ReaderException
   : public ReaderException 
 {
 public:
@@ -116,7 +116,7 @@ public:
 /**
  *  @brief The GDS2 format stream reader
  */
-class DB_PUBLIC GDS2Reader
+class DB_PLUGIN_PUBLIC GDS2Reader
   : public GDS2ReaderBase
 {
 public: 

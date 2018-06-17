@@ -8,8 +8,8 @@ include($$PWD/../../../../lib_ut.pri)
 SOURCES = \
   dbDXFReader.cc \
 
-INCLUDEPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin
-DEPENDPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin
+INCLUDEPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin $$PWD/../../../common
+DEPENDPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin $$PWD/../../../common
 
 LIBS += -L$$DESTDIR_UT -lklayout_db -lklayout_tl -lklayout_gsi
 

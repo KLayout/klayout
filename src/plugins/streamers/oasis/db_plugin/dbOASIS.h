@@ -24,6 +24,7 @@
 #ifndef HDR_dbOASIS
 #define HDR_dbOASIS
 
+#include "dbPluginCommon.h"
 #include "dbPoint.h"
 #include "dbVector.h"
 
@@ -34,9 +35,6 @@
 
 #include <string>
 #include <vector>
-
-//  place this macro to force linking of OASIS plugin
-#define FORCE_LINK_OASIS void force_link_OASIS_f () { extern int force_link_OASIS; force_link_OASIS = 0; }
 
 namespace db
 {
@@ -67,7 +65,7 @@ class OASISReader;
 /**
  *  @brief A repetition iterator
  */
-class DB_PUBLIC RepetitionIterator
+class DB_PLUGIN_PUBLIC RepetitionIterator
 {
 public:
   /**
@@ -125,7 +123,7 @@ private:
 /**
  *  @brief A class representing a repetition
  */
-class DB_PUBLIC Repetition
+class DB_PLUGIN_PUBLIC Repetition
 {
 public:
   /**
@@ -237,7 +235,7 @@ private:
 
 //  Base classes
 
-class DB_PUBLIC RepetitionBase
+class DB_PLUGIN_PUBLIC RepetitionBase
 {
 public:
   RepetitionBase ()

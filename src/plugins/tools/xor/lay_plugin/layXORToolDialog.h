@@ -20,8 +20,8 @@
 
 */
 
-#ifndef HDR_extXORToolDialog
-#define HDR_extXORToolDialog
+#ifndef HDR_layXORToolDialog
+#define HDR_layXORToolDialog
 
 #include <QDialog>
 
@@ -37,7 +37,7 @@ namespace lay
   class LayoutView;
 }
 
-namespace ext
+namespace lay
 {
 
 extern std::string cfg_xor_input_mode;

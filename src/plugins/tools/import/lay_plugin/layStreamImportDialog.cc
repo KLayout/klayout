@@ -22,8 +22,8 @@
 
 
 #include "ui_StreamImportDialog.h"
-#include "extStreamImporter.h"
-#include "extStreamImportDialog.h"
+#include "layStreamImporter.h"
+#include "layStreamImportDialog.h"
 
 #include "tlExceptions.h"
 #include "layFileDialog.h"
@@ -39,17 +39,17 @@ namespace {
 
 static struct {
   const char *string;
-  ext::StreamImportData::mode_type value;
+  lay::StreamImportData::mode_type value;
 } mode_strings [] = {
-  { "simple", ext::StreamImportData::Simple },
-  { "instantiate", ext::StreamImportData::Instantiate },
-  { "extra", ext::StreamImportData::Extra },
-  { "merge", ext::StreamImportData::Merge }
+  { "simple", lay::StreamImportData::Simple },
+  { "instantiate", lay::StreamImportData::Instantiate },
+  { "extra", lay::StreamImportData::Extra },
+  { "merge", lay::StreamImportData::Merge }
 };
 
 struct ModeConverter
 {
-  std::string to_string (ext::StreamImportData::mode_type t) const
+  std::string to_string (lay::StreamImportData::mode_type t) const
   {
     for (unsigned int i = 0; i < sizeof (mode_strings) / sizeof (mode_strings [0]); ++i) {
       if (mode_strings [i].value == t) {
@@ -59,7 +59,7 @@ struct ModeConverter
     return std::string ();
   }
 
-  void from_string (const std::string &s, ext::StreamImportData::mode_type &t) const
+  void from_string (const std::string &s, lay::StreamImportData::mode_type &t) const
   {
     for (unsigned int i = 0; i < sizeof (mode_strings) / sizeof (mode_strings [0]); ++i) {
       if (s == mode_strings [i].string) {
@@ -74,15 +74,15 @@ struct ModeConverter
 
 static struct {
   const char *string;
-  ext::StreamImportData::layer_mode_type value;
+  lay::StreamImportData::layer_mode_type value;
 } layer_mode_strings [] = {
-  { "original", ext::StreamImportData::Original },
-  { "offset", ext::StreamImportData::Offset }
+  { "original", lay::StreamImportData::Original },
+  { "offset", lay::StreamImportData::Offset }
 };
 
 struct LayerModeConverter
 {
-  std::string to_string (ext::StreamImportData::layer_mode_type t) const
+  std::string to_string (lay::StreamImportData::layer_mode_type t) const
   {
     for (unsigned int i = 0; i < sizeof (layer_mode_strings) / sizeof (layer_mode_strings [0]); ++i) {
       if (layer_mode_strings [i].value == t) {
@@ -92,7 +92,7 @@ struct LayerModeConverter
     return std::string ();
   }
 
-  void from_string (const std::string &s, ext::StreamImportData::layer_mode_type &t) const
+  void from_string (const std::string &s, lay::StreamImportData::layer_mode_type &t) const
   {
     for (unsigned int i = 0; i < sizeof (layer_mode_strings) / sizeof (layer_mode_strings [0]); ++i) {
       if (s == layer_mode_strings [i].string) {
@@ -107,7 +107,7 @@ struct LayerModeConverter
 
 }
 
-namespace ext
+namespace lay
 {
 
 // -----------------------------------------------------------------------------------------

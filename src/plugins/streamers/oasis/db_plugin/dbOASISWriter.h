@@ -24,6 +24,7 @@
 #ifndef HDR_dbOASISWriter
 #define HDR_dbOASISWriter
 
+#include "dbPluginCommon.h"
 #include "dbWriter.h"
 #include "dbOASIS.h"
 #include "dbSaveLayoutOptions.h"
@@ -49,7 +50,7 @@ class OASISWriter;
 /**
  *  @brief Structure that holds the OASIS specific options for the Writer
  */
-class DB_PUBLIC OASISWriterOptions
+class DB_PLUGIN_PUBLIC OASISWriterOptions
   : public FormatSpecificWriterOptions
 {
 public:
@@ -190,7 +191,7 @@ private:
 /**
  *  @brief A OASIS writer abstraction
  */
-class DB_PUBLIC OASISWriter
+class DB_PLUGIN_PUBLIC OASISWriter
   : public db::WriterBase
 {
 public:

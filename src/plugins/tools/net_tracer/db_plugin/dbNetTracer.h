@@ -25,7 +25,7 @@
 #ifndef HDR_dbNetTracer
 #define HDR_dbNetTracer
 
-#include "dbCommon.h"
+#include "dbPluginCommon.h"
 
 #include "dbShapes.h"
 #include "dbShape.h"
@@ -52,7 +52,7 @@ class NetTracerData;
  *  the data and second, this guarantees that the Shape references delivered point to the same object
  *  for identical shapes.
  */
-class DB_PUBLIC NetTracerShapeHeap
+class DB_PLUGIN_PUBLIC NetTracerShapeHeap
 {
 public:
   /**
@@ -81,7 +81,7 @@ private:
  *  This class describes a shape in the hierarchy by the transformation into the top cell, the shape reference, the cell
  *  index and the layer the shape resides on.
  */
-class DB_PUBLIC NetTracerShape
+class DB_PLUGIN_PUBLIC NetTracerShape
 {
 public:
   /**
@@ -252,7 +252,7 @@ typedef db::box_tree<db::Box, const NetTracerShape *, HitTestDataBoxConverter, 1
 /**
  *  @brief Describes a boolean expression for computed layers
  */
-class DB_PUBLIC NetTracerLayerExpression
+class DB_PLUGIN_PUBLIC NetTracerLayerExpression
 {
 public:
   /**
@@ -397,7 +397,7 @@ private:
  *  This class has three members: the index of the first conductive layer, the
  *  index of the via layer and the index of the second conductive layer.
  */
-class DB_PUBLIC NetTracerConnection
+class DB_PLUGIN_PUBLIC NetTracerConnection
 {
 public:
   /**
@@ -474,7 +474,7 @@ private:
 /**
  *  @brief Wraps the data for a net tracing 
  */
-class DB_PUBLIC NetTracerData
+class DB_PLUGIN_PUBLIC NetTracerData
 {
 public:
   /**
@@ -582,7 +582,7 @@ private:
  *  Net tracing can be performed with a given seed point and given tracing data.
  *  The tracing is initiated with the "trace" method.
  */
-class DB_PUBLIC NetTracer
+class DB_PLUGIN_PUBLIC NetTracer
 {
 public:
   typedef std::set <NetTracerShape>::const_iterator iterator;

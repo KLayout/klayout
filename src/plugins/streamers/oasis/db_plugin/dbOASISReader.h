@@ -25,18 +25,19 @@
 #ifndef HDR_dbOASISReader
 #define HDR_dbOASISReader
 
-#include "tlException.h"
-#include "tlInternational.h"
-#include "tlProgress.h"
-#include "tlString.h"
-
+#include "dbPluginCommon.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbTypes.h"
 #include "dbOASIS.h"
-#include "tlStream.h"
 #include "dbStreamLayers.h"
 #include "dbPropertiesRepository.h"
+
+#include "tlException.h"
+#include "tlInternational.h"
+#include "tlProgress.h"
+#include "tlString.h"
+#include "tlStream.h"
 
 #include <map>
 #include <set>
@@ -47,7 +48,7 @@ namespace db
 /**
  *  @brief Generic base class of OASIS reader exceptions
  */
-class DB_PUBLIC OASISReaderException
+class DB_PLUGIN_PUBLIC OASISReaderException
   : public ReaderException
 {
 public:
@@ -59,7 +60,7 @@ public:
 /**
  *  @brief Structure that holds the OASIS specific options for the reader
  */
-class DB_PUBLIC OASISReaderOptions
+class DB_PLUGIN_PUBLIC OASISReaderOptions
   : public FormatSpecificReaderOptions
 {
 public:
@@ -115,7 +116,7 @@ public:
 /**
  *  @brief The OASIS format stream reader
  */
-class DB_PUBLIC OASISReader
+class DB_PLUGIN_PUBLIC OASISReader
   : public ReaderBase, 
     public OASISDiagnostics
 {

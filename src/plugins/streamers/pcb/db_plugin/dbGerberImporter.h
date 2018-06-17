@@ -24,8 +24,7 @@
 #ifndef HDR_dbGerberImporter
 #define HDR_dbGerberImporter
 
-#include "dbCommon.h"
-
+#include "dbPluginCommon.h"
 #include "dbLayout.h"
 #include "dbTrans.h"
 #include "dbEdgeProcessor.h"
@@ -606,7 +605,7 @@ private:
 /**
  *  @brief Represents one file in a Gerber stack.
  */
-class DB_PUBLIC GerberFile
+class DB_PLUGIN_PUBLIC GerberFile
 {
 public:
   GerberFile ();
@@ -770,7 +769,7 @@ private:
  *  This class provides a importer for Gerber layer stacks. It can be 
  *  loaded from project files and saved to such.
  */
-class DB_PUBLIC GerberImporter
+class DB_PLUGIN_PUBLIC GerberImporter
 {
 public:
   /**

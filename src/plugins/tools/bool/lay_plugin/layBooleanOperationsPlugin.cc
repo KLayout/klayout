@@ -22,7 +22,7 @@
 
 
 
-#include "extBooleanOperationsDialogs.h"
+#include "layBooleanOperationsDialogs.h"
 
 #include "layPlugin.h"
 #include "layTipDialog.h"
@@ -32,7 +32,7 @@
 
 #include <QApplication>
 
-namespace ext
+namespace lay
 {
 
 class BooleanOperationsPlugin
@@ -63,11 +63,11 @@ public:
 
   void menu_activated (const std::string &symbol) 
   {
-    if (symbol == "ext::boolean") {
+    if (symbol == "lay::boolean") {
       boolean ();
-    } else if (symbol == "ext::merge") {
+    } else if (symbol == "lay::merge") {
       merge ();
-    } else if (symbol == "ext::size") {
+    } else if (symbol == "lay::size") {
       size ();
     }
   }
@@ -100,7 +100,7 @@ public:
 
     }
 
-    ext::BooleanOptionsDialog dialog (mp_view);
+    lay::BooleanOptionsDialog dialog (mp_view);
     if (dialog.exec_dialog (mp_view, m_boolean_cva, m_boolean_layera, m_boolean_cvb, m_boolean_layerb, m_boolean_cvr, m_boolean_layerr, m_boolean_mode, m_boolean_hier_mode, m_boolean_mincoh)) {
 
       mp_view->cancel ();
@@ -237,7 +237,7 @@ public:
 
     }
 
-    ext::MergeOptionsDialog dialog (mp_view);
+    lay::MergeOptionsDialog dialog (mp_view);
     if (dialog.exec_dialog (mp_view, m_boolean_cva, m_boolean_layera, m_boolean_cvr, m_boolean_layerr, m_boolean_minwc, m_boolean_hier_mode, m_boolean_mincoh)) {
 
       mp_view->cancel ();
@@ -352,7 +352,7 @@ public:
 
     }
 
-    ext::SizingOptionsDialog dialog (mp_view);
+    lay::SizingOptionsDialog dialog (mp_view);
     if (dialog.exec_dialog (mp_view, m_boolean_cva, m_boolean_layera, m_boolean_cvr, m_boolean_layerr, m_boolean_sizex, m_boolean_sizey, m_boolean_size_mode, m_boolean_hier_mode, m_boolean_mincoh)) {
 
       mp_view->cancel ();
@@ -479,9 +479,9 @@ public:
   {
     lay::PluginDeclaration::get_menu_entries (menu_entries);
     menu_entries.push_back (lay::MenuEntry ("ops_group", "edit_menu.layer_menu.end"));
-    menu_entries.push_back (lay::MenuEntry ("ext::boolean", "boolean:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Boolean Operations"))));
-    menu_entries.push_back (lay::MenuEntry ("ext::merge", "merge:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Merge"))));
-    menu_entries.push_back (lay::MenuEntry ("ext::size", "size:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Size"))));
+    menu_entries.push_back (lay::MenuEntry ("lay::boolean", "boolean:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Boolean Operations"))));
+    menu_entries.push_back (lay::MenuEntry ("lay::merge", "merge:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Merge"))));
+    menu_entries.push_back (lay::MenuEntry ("lay::size", "size:edit:edit_mode", "edit_menu.layer_menu.end", tl::to_string (QObject::tr ("Size"))));
   }
 
   virtual bool configure (const std::string & /*name*/, const std::string & /*value*/)
@@ -500,7 +500,7 @@ public:
   }
 };
 
-static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new ext::BooleanOperationsPluginDeclaration (), 3010, "ext::BooleanOperationsPlugin");
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl (new lay::BooleanOperationsPluginDeclaration (), 3010, "lay::BooleanOperationsPlugin");
 
 }
 

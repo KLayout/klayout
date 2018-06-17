@@ -20,8 +20,8 @@
 
 */
 
-#ifndef HDR_extXORToolProgress
-#define HDR_extXORToolProgress
+#ifndef HDR_layXORToolProgress
+#define HDR_layXORToolProgress
 
 #include "tlProgress.h"
 
@@ -34,7 +34,7 @@
 
 class QWidget;
 
-namespace ext
+namespace lay
 {
 
 const size_t missing_in_a = std::numeric_limits<size_t>::max ();

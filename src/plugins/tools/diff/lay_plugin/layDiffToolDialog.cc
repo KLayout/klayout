@@ -22,7 +22,7 @@
 
 
 
-#include "extDiffToolDialog.h"
+#include "layDiffToolDialog.h"
 #include "rdb.h"
 #include "dbLayoutDiff.h"
 #include "dbRecursiveShapeIterator.h"
@@ -37,7 +37,7 @@
 
 #include <stdio.h>
 
-namespace ext
+namespace lay
 {
 
 std::string cfg_diff_run_xor ("diff-run-xor");

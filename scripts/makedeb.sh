@@ -43,7 +43,7 @@ bindir="bin.linux.release"
 builddir="build.linux.release" 
 libdir="/usr/lib/klayout"
 
-./build.sh -j4 \
+./build.sh -j1 \
            -bin $bindir \
            -build $builddir \
            -rpath $libdir 

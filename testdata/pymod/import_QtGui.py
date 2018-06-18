@@ -16,8 +16,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-import pykl.QtCore
-import pykl.QtGui as QtGui
+import klayout.QtCore
+import klayout.QtGui as QtGui
 import unittest
 import sys
 

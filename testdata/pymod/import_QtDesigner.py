@@ -16,8 +16,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-import pykl.QtCore as QtCore
-import pykl.QtDesigner as QtDesigner
+import klayout.QtCore as QtCore
+import klayout.QtDesigner as QtDesigner
 import unittest
 import sys
 

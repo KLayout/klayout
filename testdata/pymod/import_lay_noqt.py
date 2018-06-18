@@ -16,8 +16,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-import pykl.db as db
-import pykl.lay as lay
+import klayout.db as db
+import klayout.lay as lay
 import unittest
 import sys
 

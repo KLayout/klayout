@@ -355,6 +355,20 @@ main_cont (int &argc, char **argv)
     pya::PythonInterpreter::initialize ();
     gsi::initialize_external ();
 
+    //  NOTE: we need an application object, but we don't call parse_cmd. This makes the object
+    //  behave neutral as far as possible.
+    lay::GuiApplication app (argc, argv);
+    app.init_app ();
+
+    app.ruby_interpreter ().push_console (&console);
+    app.python_interpreter ().push_console (&console);
+
+    app.autorun ();
+
+#if QT_VERSION < 0x050000
+    QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
+#endif
+
     //  Search and initialize plugin unit tests
 
     QStringList name_filters;
@@ -394,20 +408,6 @@ main_cont (int &argc, char **argv)
     if (! tl::TestRegistrar::instance()) {
       throw tl::Exception ("No test libraries found - make sure, the *.ut files are next to the ut_runner executable.");
     }
-
-    //  NOTE: we need an application object, but we don't call parse_cmd. This makes the object
-    //  behave neutral as far as possible.
-    lay::GuiApplication app (argc, argv);
-    app.init_app ();
-
-    app.ruby_interpreter ().push_console (&console);
-    app.python_interpreter ().push_console (&console);
-
-    app.autorun ();
-
-#if QT_VERSION < 0x050000
-    QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
-#endif
 
     bool editable = false, non_editable = false;
     bool gsi_coverage = false;

@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-import pykl.rdb as rdb
+import klayout.rdb as rdb
 import unittest
 import sys
 

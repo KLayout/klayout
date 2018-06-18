@@ -29,13 +29,13 @@
 }
 
 # That's were we are going to put our Python module to
-DESTDIR = $$OUT_PWD/../..
+DESTDIR = $$OUT_PWD/..
 
 # We're going to build a library
 TEMPLATE = lib
 
 # That's how we name our library
-TARGET = bridge_sample
+TARGET = bridge_mod
 
 # The only source
 SOURCES = \

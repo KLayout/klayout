@@ -1,7 +1,7 @@
 
 DESTDIR_UT = $$OUT_PWD/../..
 
-TARGET = bd_tests
+TARGET = pymod_tests
 
 include($$PWD/../../klayout.pri)
 include($$PWD/../../lib_ut.pri)
@@ -11,10 +11,10 @@ SOURCES = \
 
 DEFINES += \
   PYTHON=$$PYTHON \
-  PYTHONPATH=$$DESTDIR_UT
+  PYTHONPATH=$$DESTDIR_UT/pymod
 
 
-INCLUDEPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC
-DEPENDPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC
+INCLUDEPATH += $$DB_INC $$TL_INC $$GSI_INC
+DEPENDPATH += $$DB_INC $$TL_INC $$GSI_INC
 
-LIBS += -L$$DESTDIR_UT -lklayout_bd -lklayout_db -lklayout_tl -lklayout_gsi
+LIBS += -L$$DESTDIR_UT -lklayout_db -lklayout_tl -lklayout_gsi

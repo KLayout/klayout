@@ -2141,7 +2141,7 @@ property_setter_func (PyObject *self, PyObject *value, void *closure)
 std::map<const gsi::MethodBase *, std::string> PythonModule::m_python_doc;
 std::vector<const gsi::ClassBase *> PythonModule::m_classes;
 
-const std::string pymod_name ("pykl");
+const std::string pymod_name ("klayout");
 
 PythonModule::PythonModule ()
   : mp_mod_def (0)

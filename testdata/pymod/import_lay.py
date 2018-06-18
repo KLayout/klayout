@@ -16,11 +16,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-import pykl.QtCore
-import pykl.QtGui
-if not "QApplication" in pykl.QtGui.__all__:
-  import pykl.QtWidgets  # Qt5
-import pykl.lay as lay
+import klayout.QtCore
+import klayout.QtGui
+if not "QApplication" in klayout.QtGui.__all__:
+  import klayout.QtWidgets  # Qt5
+import klayout.lay as lay
 import unittest
 import sys
 

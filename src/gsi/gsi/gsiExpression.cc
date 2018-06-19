@@ -1079,6 +1079,11 @@ initialize_expressions ()
   //  Go through all classes (maybe again)
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
 
+    //  Skip external classes
+    if (c->is_external ()) {
+      continue;
+    }
+
     //  install the method table:
     ExpressionMethodTable::initialize_class (&*c);
 

@@ -524,6 +524,14 @@ public:
   }
 
   /**
+   *  @brief Returns true, if the class is an external class provided by Python or Ruby code
+   */
+  virtual bool is_external () const
+  {
+    return false;
+  }
+
+  /**
    *  @brief Post-construction initialization
    *
    *  This method will be called by the GSI system to provide initialization after 

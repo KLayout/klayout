@@ -39,7 +39,6 @@ equals(HAVE_PYTHON, "1") {
   LIBS += -lklayout_pyastub
 }
 
-
 DEFINES += BD_TARGET=$$TARGET
 
 LIBS += $$RUBYLIBFILE

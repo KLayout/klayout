@@ -14,6 +14,7 @@ SOURCES = \
   bdStrmclipTests.cc \
   bdStrmcmpTests.cc \
   bdStrmxorTests.cc \
+  bdStrmrunTests.cc \
 
 
 INCLUDEPATH += $$BD_INC $$DB_INC $$TL_INC $$GSI_INC
@@ -30,9 +31,3 @@ PLUGINPATH += \
 
 INCLUDEPATH += $$PLUGINPATH
 DEPENDPATH += $$PLUGINPATH
-
-LIBS += -L$$DESTDIR_UT/db_plugins \
-  -lgds2 \
-  -lcif \
-  -loasis \
-  -ldxf \

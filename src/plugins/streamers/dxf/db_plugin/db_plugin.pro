@@ -6,6 +6,7 @@ include($$PWD/../../../db_plugin.pri)
 
 HEADERS = \
   dbDXF.h \
+  dbDXFFormat.h \
   dbDXFReader.h \
   dbDXFWriter.h \
 

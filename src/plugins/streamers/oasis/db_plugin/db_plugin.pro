@@ -6,6 +6,7 @@ include($$PWD/../../../db_plugin.pri)
 
 HEADERS = \
   dbOASIS.h \
+  dbOASISFormat.h \
   dbOASISReader.h \
   dbOASISWriter.h \
 

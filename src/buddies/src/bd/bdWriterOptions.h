@@ -27,7 +27,7 @@
 #include "dbGDS2WriterBase.h"
 #include "dbOASISWriter.h"
 #include "dbDXFWriter.h"
-#include "dbCIFWriter.h"
+#include "dbCIFFormat.h"
 
 #include <string>
 

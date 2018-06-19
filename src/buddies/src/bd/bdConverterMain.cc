@@ -25,7 +25,6 @@
 #include "bdConverterMain.h"
 #include "dbLayout.h"
 #include "dbReader.h"
-#include "dbCIFWriter.h"
 #include "tlCommandLineParser.h"
 
 namespace bd

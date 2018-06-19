@@ -30,6 +30,7 @@
 #include "dbReader.h"
 #include "dbTypes.h"
 #include "dbOASIS.h"
+#include "dbOASISFormat.h"
 #include "dbStreamLayers.h"
 #include "dbPropertiesRepository.h"
 
@@ -55,62 +56,6 @@ public:
   OASISReaderException (const std::string &msg, size_t p, const std::string &cell)
     : ReaderException (tl::sprintf (tl::to_string (QObject::tr ("%s (position=%ld, cell=%s)")), msg, p, cell))
   { }
-};
-
-/**
- *  @brief Structure that holds the OASIS specific options for the reader
- */
-class DB_PLUGIN_PUBLIC OASISReaderOptions
-  : public FormatSpecificReaderOptions
-{
-public:
-  /**
-   *  @brief The constructor
-   */
-  OASISReaderOptions ()
-    : read_all_properties (false), expect_strict_mode (-1)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief A flag indicating whether to read all properties
-   *
-   *  If this flag is set, all properties, including the special properties are read.
-   *  This mode is only provided for testing and writing such a layout will probably
-   *  result in duplicate entries.
-   */
-  bool read_all_properties; 
-
-  /**
-   *  @brief Indicates that the reader expects strict mode or note
-   *
-   *  This is mainly a debugging an testing option but it may be used to verifiy
-   *  the compliance of a file with string or non-strict mode.
-   *
-   *  The values are:
-   *    -1: don't care (default)
-   *     0:  expect non-strict
-   *     1:  expect strict
-   */
-  int expect_strict_mode;
-
-  /**
-   *  @brief Implementation of FormatSpecificReaderOptions
-   */
-  virtual FormatSpecificReaderOptions *clone () const
-  {
-    return new OASISReaderOptions (*this);
-  }
-
-  /**
-   *  @brief Implementation of FormatSpecificReaderOptions
-   */
-  virtual const std::string &format_name () const
-  {
-    static const std::string n ("OASIS");
-    return n;
-  }
 };
 
 /**

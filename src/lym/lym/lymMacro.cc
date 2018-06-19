@@ -839,6 +839,11 @@ public:
     return true;
   }
 
+  virtual bool is_external () const
+  {
+    return true;
+  }
+
 private:
   std::string m_category;
 };

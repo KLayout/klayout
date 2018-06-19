@@ -20,15 +20,13 @@
 
 */
 
-
-
-
 #ifndef HDR_dbDXFWriter
 #define HDR_dbDXFWriter
 
 #include "dbPluginCommon.h"
 #include "dbWriter.h"
 #include "dbDXF.h"
+#include "dbDXFFormat.h"
 #include "dbSaveLayoutOptions.h"
 #include "tlProgress.h"
 
@@ -42,50 +40,6 @@ namespace db
 
 class Layout;
 class SaveLayoutOptions;
-
-/**
- *  @brief Structure that holds the DXF specific options for the Writer
- */
-class DB_PLUGIN_PUBLIC DXFWriterOptions
-  : public FormatSpecificWriterOptions
-{
-public:
-  /**
-   *  @brief The constructor
-   */
-  DXFWriterOptions ()
-    : polygon_mode (0)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Polygon mode
-   *
-   *  0: create POLYLINE
-   *  1: create LWPOLYLINE
-   *  2: decompose into SOLID
-   *  3: create HATCH
-   */
-  int polygon_mode;
-
-  /** 
-   *  @brief Implementation of FormatSpecificWriterOptions
-   */
-  virtual FormatSpecificWriterOptions *clone () const
-  {
-    return new DXFWriterOptions (*this);
-  }
-
-  /**
-   *  @brief Implementation of FormatSpecificWriterOptions
-   */
-  virtual const std::string &format_name () const
-  {
-    static std::string n ("DXF");
-    return n;
-  }
-};
 
 /**
  *  @brief A DXF writer abstraction
@@ -108,7 +62,7 @@ private:
   struct endl_tag { };
 
   tl::OutputStream *mp_stream;
-  DXFWriterOptions m_options;
+  db::DXFWriterOptions m_options;
   tl::AbsoluteProgress m_progress;
   endl_tag endl;
   db::LayerProperties m_layer;

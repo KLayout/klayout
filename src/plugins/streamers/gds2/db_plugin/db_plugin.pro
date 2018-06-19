@@ -8,6 +8,7 @@ HEADERS = \
   contrib/dbGDS2Converter.h \
   contrib/dbGDS2TextReader.h \
   contrib/dbGDS2TextWriter.h \
+  dbGDS2Format.h \
   dbGDS2.h \
   dbGDS2ReaderBase.h \
   dbGDS2Reader.h \

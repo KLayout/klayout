@@ -435,6 +435,11 @@ ClassBase::merge_declarations ()
   //  Add to the classes the special methods and clean up the method table
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
 
+    //  Skip external classes (i.e. provided by Ruby or Python)
+    if (c->is_external ()) {
+      continue;
+    }
+
     std::set<std::pair<std::string, bool> > name_map;
     for (gsi::ClassBase::method_iterator m = c->begin_methods (); m != c->end_methods (); ++m) {
       for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
@@ -525,7 +530,9 @@ ClassBase::merge_declarations ()
     (const_cast<gsi::ClassBase *> (&*c))->initialize ();
 
     //  there should be only main declarations since we merged
-    tl_assert (c->declaration () == &*c);
+    //  (the declaration==0 case covers dummy declarations introduced by
+    //  lym::ExternalClass)
+    tl_assert (! c->declaration () || c->declaration () == &*c);
   }
 }
 

@@ -29,6 +29,7 @@
 #include "dbNamedLayerReader.h"
 #include "dbLayout.h"
 #include "dbCIF.h"
+#include "dbCIFFormat.h"
 #include "dbStreamLayers.h"
 #include "dbPropertiesRepository.h"
 
@@ -43,88 +44,6 @@
 
 namespace db
 {
-
-/**
- *  @brief Structure that holds the CIF specific options for the reader
- */
-class DB_PLUGIN_PUBLIC CIFReaderOptions
-  : public FormatSpecificReaderOptions
-{
-public:
-  /**
-   *  @brief The constructor
-   */
-  CIFReaderOptions ()
-    : wire_mode (0),
-      dbu (0.001),
-      create_other_layers (true),
-      keep_layer_names (false)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief How to read 'W' objects
-   *
-   *  This property specifies how to read 'W' (wire) objects. 
-   *  Allowed values are 0 (as square ended paths), 1 (as flush ended paths), 2 (as round paths)
-   */
-  unsigned int wire_mode; 
-
-  /**
-   *  @brief Specify the database unit to produce 
-   *
-   *  Specify the database unit which the resulting layout will receive.
-   */
-  double dbu;
-
-  /**
-   *  @brief Specifies a layer mapping
-   *
-   *  If a layer mapping is specified, only the given layers are read.
-   *  Otherwise, all layers are read.
-   *  Setting "create_other_layers" to true will make the reader
-   *  create other layers for all layers not given in the layer map.
-   *  Setting an empty layer map and create_other_layers to true effectively
-   *  enables all layers for reading.
-   */
-  db::LayerMap layer_map;
-
-  /**
-   *  @brief A flag indicating that a new layers shall be created
-   *
-   *  If this flag is set to true, layers not listed in the layer map a created
-   *  too.
-   */
-  bool create_other_layers;
-
-  /**
-   *  @brief A flag indicating whether the names of layers shall be kept as such
-   *
-   *  If this flag is set to false (the default), layer name translation happens.
-   *  If set to true, translation will not happen.
-   *  Name translation will try to extract GDS layer/datatype numbers from the
-   *  layer names. If this value is set to true, no name translation happens.
-   */
-  bool keep_layer_names;
-
-  /** 
-   *  @brief Implementation of FormatSpecificReaderOptions
-   */
-  virtual FormatSpecificReaderOptions *clone () const
-  {
-    return new CIFReaderOptions (*this);
-  }
-
-  /**
-   *  @brief Implementation of FormatSpecificReaderOptions
-   */
-  virtual const std::string &format_name () const
-  {
-    static const std::string n ("CIF");
-    return n;
-  }
-};
 
 /**
  *  @brief Generic base class of CIF reader exceptions

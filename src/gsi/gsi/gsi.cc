@@ -57,13 +57,19 @@ initialize ()
   tl::VariantUserClassBase::clear_class_table ();
 
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_classes (); c != gsi::ClassBase::end_classes (); ++c) {
-    //  Note: for backward compatibility we use lower case names
-    std::string lc = tl::to_lower_case (c->name ());
-    std::string lc_trans = tl::VariantUserClassBase::translate_class_name (lc);
-    tl::VariantUserClassBase::register_user_class (lc, c->var_cls (false));
-    if (lc != lc_trans) {
-      tl::VariantUserClassBase::register_user_class (lc_trans, c->var_cls (false));
+
+    if (! c->is_external ()) {
+
+      //  Note: for backward compatibility we use lower case names
+      std::string lc = tl::to_lower_case (c->name ());
+      std::string lc_trans = tl::VariantUserClassBase::translate_class_name (lc);
+      tl::VariantUserClassBase::register_user_class (lc, c->var_cls (false));
+      if (lc != lc_trans) {
+        tl::VariantUserClassBase::register_user_class (lc_trans, c->var_cls (false));
+      }
+
     }
+
   }
 }
 

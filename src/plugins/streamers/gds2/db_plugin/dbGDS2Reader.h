@@ -27,6 +27,7 @@
 
 #include "dbPluginCommon.h"
 #include "dbLayout.h"
+#include "dbGDS2Format.h"
 #include "dbGDS2ReaderBase.h"
 #include "dbCommonReader.h"
 #include "dbStreamLayers.h"
@@ -39,67 +40,6 @@
 
 namespace db
 {
-
-/**
- *  @brief Structure that holds the GDS2 specific options for the reader
- */
-class DB_PLUGIN_PUBLIC GDS2ReaderOptions
-  : public FormatSpecificReaderOptions
-{
-public:
-  /**
-   *  @brief The constructor
-   */
-  GDS2ReaderOptions ()
-    : box_mode (1),
-      allow_big_records (true),
-      allow_multi_xy_records (true)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief How to treat BOX records
-   *
-   *  This property specifies how to treat BOX records. 
-   *  Allowed values are 0 (ignore), 1 (treat as rectangles), 2 (treat as boundaries) or 3 (treat as errors).
-   */
-  unsigned int box_mode; 
-
-  /**
-   *  @brief Allow multiple big records
-   *
-   *  Setting this property to true allows to use up to 65535 bytes (instead of 32767) per record
-   *  by treating the record length as unsigned short rather than signed short.
-   *  This allows bigger polygons (up to ~8000 points) without having to use multiple XY records.
-   */
-  bool allow_big_records;
-
-  /**
-   *  @brief Allow multiple XY records in BOUNDARY elements for unlimited large polygons
-   *
-   *  Setting this property to true allows to unlimited polygons 
-   *  by using multiple XY records. 
-   */
-  bool allow_multi_xy_records;
-
-  /** 
-   *  @brief Implementation of FormatSpecificReaderOptions
-   */
-  virtual FormatSpecificReaderOptions *clone () const
-  {
-    return new GDS2ReaderOptions (*this);
-  }
-
-  /**
-   *  @brief Implementation of FormatSpecificReaderOptions
-   */
-  virtual const std::string &format_name () const
-  {
-    static const std::string n ("GDS2");
-    return n;
-  }
-};
 
 /**
  *  @brief Generic base class of GDS2 reader exceptions

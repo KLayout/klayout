@@ -27,6 +27,7 @@
 #include "dbPluginCommon.h"
 #include "dbWriter.h"
 #include "dbOASIS.h"
+#include "dbOASISFormat.h"
 #include "dbSaveLayoutOptions.h"
 #include "dbObjectWithProperties.h"
 #include "dbHash.h"
@@ -46,100 +47,6 @@ namespace db
 class Layout;
 class SaveLayoutOptions;
 class OASISWriter;
-
-/**
- *  @brief Structure that holds the OASIS specific options for the Writer
- */
-class DB_PLUGIN_PUBLIC OASISWriterOptions
-  : public FormatSpecificWriterOptions
-{
-public:
-  /**
-   *  @brief The constructor
-   */
-  OASISWriterOptions ()
-    : compression_level (2), write_cblocks (false), strict_mode (false), recompress (false), permissive (false), write_std_properties (1), subst_char ("*")
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief OASIS writer compression level
-   *
-   *  This level describes how hard the OASIS writer will try to compress the shapes
-   *  using shape arrays. Building shape arrays may take some time and requires some memory.
-   *    0 - no shape array building
-   *    1 - nearest neighbor shape array formation 
-   *    2++ - enhanced shape array search algorithm using 2nd and further neighbor distances as well
-   */
-  int compression_level; 
-
-  /**
-   *  @brief CBLOCK compression
-   *
-   *  If this flag is set, every cell is CBLOCK-compressed.
-   */
-  bool write_cblocks;
-
-  /**
-   *  @brief Strict mode
-   *
-   *  If this flag is set, a strict-mode file will be produced
-   */
-  bool strict_mode;
-
-  /**
-   *  @brief Recompressions
-   *
-   *  If the recompression flag is true, existing shape arrays will be resolved and 
-   *  put into the compressor again (may take longer).
-   */
-  bool recompress;
-
-  /**
-   *  @brief Permissive mode
-   *
-   *  In permissive mode, a warning is issued for certain cases rather than
-   *  an error:
-   *  - Polygons with less than three points (omitted)
-   *  - Paths/circles with odd diameter (rounded)
-   */
-  bool permissive;
-
-  /**
-   *  @brief Write global standard properties
-   *
-   *  If this value is 0, no standard properties are written. If it's 1, global
-   *  standard properties such as S_TOP_CELL are written. If 2, bounding box 
-   *  standard properties are written for every cell too.
-   */
-  int write_std_properties;
-
-  /**
-   *  @brief Substitution character
-   *
-   *  If non-empty, this string (first character) will be used for 
-   *  substituting invalid characters in a-strings and n-strings.
-   */
-  std::string subst_char;
-
-  /** 
-   *  @brief Implementation of FormatSpecificWriterOptions
-   */
-  virtual FormatSpecificWriterOptions *clone () const
-  {
-    return new OASISWriterOptions (*this);
-  }
-
-  /**
-   *  @brief Implementation of FormatSpecificWriterOptions
-   */
-  virtual const std::string &format_name () const
-  {
-    static std::string n ("OASIS");
-    return n;
-  }
-};
 
 /**
  *  @brief A displacement list compactor

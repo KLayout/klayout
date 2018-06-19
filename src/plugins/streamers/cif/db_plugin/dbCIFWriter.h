@@ -28,6 +28,7 @@
 #include "dbPluginCommon.h"
 #include "dbWriter.h"
 #include "dbCIF.h"
+#include "dbCIFFormat.h"
 #include "dbSaveLayoutOptions.h"
 #include "tlProgress.h"
 
@@ -41,54 +42,6 @@ namespace db
 
 class Layout;
 class SaveLayoutOptions;
-
-/**
- *  @brief Structure that holds the CIF specific options for the Writer
- */
-class DB_PLUGIN_PUBLIC CIFWriterOptions
-  : public FormatSpecificWriterOptions
-{
-public:
-  /**
-   *  @brief The constructor
-   */
-  CIFWriterOptions ()
-    : dummy_calls (false), blank_separator (false)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief A flag indicating whether dummy calls shall be written
-   *  If this flag is true, the writer will produce dummy cell calls on global
-   *  level for all top cells.
-   */
-  bool dummy_calls;
-
-  /**
-   *  @brief A flag indicating whether to use blanks as x/y separators
-   *  If this flag is true, blank characters will be used to separate x and y values.
-   *  Otherwise comma characters will be used.
-   */
-  bool blank_separator;
-
-  /** 
-   *  @brief Implementation of FormatSpecificWriterOptions
-   */
-  virtual FormatSpecificWriterOptions *clone () const
-  {
-    return new CIFWriterOptions (*this);
-  }
-
-  /**
-   *  @brief Implementation of FormatSpecificWriterOptions
-   */
-  virtual const std::string &format_name () const
-  {
-    static std::string n ("CIF");
-    return n;
-  }
-};
 
 /**
  *  @brief A CIF writer abstraction

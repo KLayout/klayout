@@ -8,6 +8,7 @@ HEADERS = \
   dbCIF.h \
   dbCIFReader.h \
   dbCIFWriter.h \
+  dbCIFFormat.h \
 
 SOURCES = \
   dbCIF.cc \

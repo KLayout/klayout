@@ -20,10 +20,28 @@
 
 */
 
-#include "bdConverterMain.h"
-#include "dbCIFFormat.h"
+#include "tlUnitTest.h"
 
-BD_PUBLIC int strm2cif (int argc, char *argv[])
+#include <QProcess>
+#include <QStringList>
+
+//  Testing the converter main implementation (CIF)
+TEST(1)
 {
-  return bd::converter_main (argc, argv, db::CIFWriterOptions ().format_name ());
+  QProcess process;
+  process.setProcessChannelMode (QProcess::MergedChannels);
+
+  QStringList args;
+
+  std::string fp (tl::testsrc ());
+  fp += "/testdata/bd/strmrun.py";
+  args << tl::to_qstring (fp);
+
+  process.start (tl::to_qstring ("./strmrun"), args);
+  bool success = process.waitForFinished (-1);
+
+  QByteArray ba = process.readAll ();
+  EXPECT_EQ (ba.constData (), "Hello, world (0,-42;42,0)!\n");
+  EXPECT_EQ (success, true);
 }
+

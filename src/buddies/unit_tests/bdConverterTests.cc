@@ -21,7 +21,8 @@
 */
 
 #include "bdConverterMain.h"
-#include "dbCIFReader.h"
+#include "dbStream.h"
+#include "dbCIFFormat.h"
 #include "dbDXFReader.h"
 #include "dbOASISReader.h"
 #include "dbGDS2Reader.h"
@@ -45,8 +46,11 @@ TEST(1)
 
   {
     tl::InputStream stream (output);
-    db::CIFReader reader (stream);
-    reader.read (layout, db::LoadLayoutOptions ());
+    db::LoadLayoutOptions options;
+    options.set_options (new db::CIFReaderOptions ());
+    db::Reader reader (stream);
+    reader.read (layout, options);
+    EXPECT_EQ (reader.format (), "CIF");
   }
 
   db::compare_layouts (this, layout, input, db::NoNormalization);
@@ -68,8 +72,11 @@ TEST(2)
 
   {
     tl::InputStream stream (output);
-    db::DXFReader reader (stream);
-    reader.read (layout, db::LoadLayoutOptions ());
+    db::LoadLayoutOptions options;
+    options.set_options (new db::DXFReaderOptions ());
+    db::Reader reader (stream);
+    reader.read (layout, options);
+    EXPECT_EQ (reader.format (), "DXF");
   }
 
   //  Fix top cell name (which is TOP in DXF, not RINGO as in reference)
@@ -97,8 +104,11 @@ TEST(3)
 
   {
     tl::InputStream stream (output);
-    db::GDS2Reader reader (stream);
-    reader.read (layout, db::LoadLayoutOptions ());
+    db::LoadLayoutOptions options;
+    options.set_options (new db::GDS2ReaderOptions ());
+    db::Reader reader (stream);
+    reader.read (layout, options);
+    EXPECT_EQ (reader.format (), "GDS2");
   }
 
   db::compare_layouts (this, layout, input, db::NoNormalization);
@@ -120,8 +130,11 @@ TEST(4)
 
   {
     tl::InputStream stream (output);
-    db::GDS2ReaderText reader (stream);
-    reader.read (layout, db::LoadLayoutOptions ());
+    db::LoadLayoutOptions options;
+    options.set_options (new db::GDS2ReaderOptions ());
+    db::Reader reader (stream);
+    reader.read (layout, options);
+    EXPECT_EQ (reader.format (), "GDS2Text");
   }
 
   db::compare_layouts (this, layout, input, db::NoNormalization);
@@ -143,8 +156,11 @@ TEST(5)
 
   {
     tl::InputStream stream (output);
-    db::OASISReader reader (stream);
-    reader.read (layout, db::LoadLayoutOptions ());
+    db::LoadLayoutOptions options;
+    options.set_options (new db::OASISReaderOptions ());
+    db::Reader reader (stream);
+    reader.read (layout, options);
+    EXPECT_EQ (reader.format (), "OASIS");
   }
 
   db::compare_layouts (this, layout, input, db::NoNormalization);

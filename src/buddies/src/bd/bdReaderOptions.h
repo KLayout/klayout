@@ -28,7 +28,7 @@
 #include "dbGDS2Reader.h"
 #include "dbOASISReader.h"
 #include "dbDXFReader.h"
-#include "dbCIFReader.h"
+#include "dbCIFFormat.h"
 
 #include <string>
 

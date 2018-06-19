@@ -37,7 +37,7 @@ Requires:	ruby >= 2.0.0
 Requires:	python >= 2.7.5
 Requires: qt-x11 >= 4.8.5
 %define buildopt -j2
-%define pylib "%{python2_sitearch}"
+%define pylib %{python_sitearch}
 %endif
 
 %if "%{target_system}" == "centos6"
@@ -47,7 +47,7 @@ Requires: ruby >= 1.8.7
 Requires: python >= 2.6.6
 Requires: qt-x11 >= 4.6.2
 %define buildopt -libcurl -j2
-%define pylib "%{python2_sitearch}"
+%define pylib %{python_sitearch}
 %endif
 
 %if "%{target_system}" == "opensuse42_2"
@@ -56,7 +56,7 @@ Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
 %define buildopt -j2
-%define pylib "%{python3_sitearch}"
+%define pylib %{python_sitearch}
 %endif
 
 %if "%{target_system}" == "opensuse42_3"
@@ -65,7 +65,7 @@ Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
 %define buildopt -j2
-%define pylib "%{python3_sitearch}"
+%define pylib %{python_sitearch}
 %endif
 
 %description
@@ -96,7 +96,7 @@ cd %{_sourcedir}
 ./build.sh -rpath %{_libdir}/klayout \
            -bin %{_builddir}/bin.$TARGET \
            -build %{_builddir}/build.$TARGET \
-           %{buildopt} 
+           %{buildopt} -without-qtbinding
 
 cp -p LICENSE Changelog CONTRIB %{_builddir}
 strip %{_builddir}/bin.$TARGET/*.so
@@ -140,6 +140,7 @@ install -Dm644 %{_sourcedir}/etc/logo.png %{buildroot}%{_datadir}/pixmaps/%{name
 %doc CONTRIB
 %{_bindir}/klayout
 %{_bindir}/strm*
+%{pylib}/klayout/*
 %{_libdir}/klayout/*
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/pixmaps/%{name}.png

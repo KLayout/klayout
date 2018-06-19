@@ -23,7 +23,6 @@
 
 #include "gsiExpression.h"
 #include "gsiDecl.h"
-#include "gsiTest.h"
 
 #include "tlUnitTest.h"
 

@@ -24,6 +24,8 @@ HEADERS += \
   LIBS += -ldl
 }
 
+LIBS += -lklayout_gsi_test
+
 INCLUDEPATH += $$QTBASIC_INC
 DEPENDPATH += $$QTBASIC_INC
 

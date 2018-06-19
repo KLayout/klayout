@@ -36,6 +36,9 @@
 #include "gsiDecl.h"
 #include "gsiExternalMain.h"
 
+//  This hard-links the GSI test classes
+#include "../gsi_test/gsiTestForceLink.h"
+
 #include "version.h"
 
 #include <QDir>

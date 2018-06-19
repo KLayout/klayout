@@ -8,10 +8,8 @@ include($$PWD/../../lib_ut.pri)
 
 SOURCES = \
   gsiExpression.cc \
-  gsiTest.cc \
 
 HEADERS += \
-  gsiTest.h \
 
 INCLUDEPATH += $$TL_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$GSI_INC

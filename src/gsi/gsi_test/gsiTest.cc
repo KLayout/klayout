@@ -22,6 +22,7 @@
 
 
 #include "gsiTest.h"
+#include "gsiTestForceLink.h"
 #include "gsiDecl.h"
 #include "gsiEnums.h"
 #include "gsiSignals.h"
@@ -30,6 +31,14 @@
 
 namespace gsi_test
 {
+
+/**
+ *  @brief For the forceLink implementation
+ */
+int _force_link_f ()
+{
+  return 0;
+}
 
 // ----------------------------------------------------------------
 //  Implementation of A

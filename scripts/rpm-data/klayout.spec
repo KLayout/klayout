@@ -37,6 +37,7 @@ Requires:	ruby >= 2.0.0
 Requires:	python >= 2.7.5
 Requires: qt-x11 >= 4.8.5
 %define buildopt -j2
+%define pylib "%{python2_sitearch}"
 %endif
 
 %if "%{target_system}" == "centos6"
@@ -46,6 +47,7 @@ Requires: ruby >= 1.8.7
 Requires: python >= 2.6.6
 Requires: qt-x11 >= 4.6.2
 %define buildopt -libcurl -j2
+%define pylib "%{python2_sitearch}"
 %endif
 
 %if "%{target_system}" == "opensuse42_2"
@@ -54,6 +56,7 @@ Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
 %define buildopt -j2
+%define pylib "%{python3_sitearch}"
 %endif
 
 %if "%{target_system}" == "opensuse42_3"
@@ -62,6 +65,7 @@ Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
 %define buildopt -j2
+%define pylib "%{python3_sitearch}"
 %endif
 
 %description
@@ -95,16 +99,30 @@ cd %{_sourcedir}
            %{buildopt} 
 
 cp -p LICENSE Changelog CONTRIB %{_builddir}
-strip %{_builddir}/bin.$TARGET/*
+strip %{_builddir}/bin.$TARGET/*.so
+strip %{_builddir}/bin.$TARGET/*/*.so
+strip %{_builddir}/bin.$TARGET/*/*/*.so
+strip %{_builddir}/bin.$TARGET/klayout
+strip %{_builddir}/bin.$TARGET/strm*
 
 %install
 
 TARGET="linux-release"
 
+mkdir -p %{buildroot}%{pylib}/klayout
 mkdir -p %{buildroot}%{_libdir}/klayout
+mkdir -p %{buildroot}%{_libdir}/klayout/db_plugins
+mkdir -p %{buildroot}%{_libdir}/klayout/lay_plugins
 mkdir -p %{buildroot}%{_bindir}
+cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.so %{buildroot}%{pylib}/klayout
+cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.py %{buildroot}%{pylib}/klayout
 cp -pd %{_builddir}/bin.$TARGET/lib*.so* %{buildroot}%{_libdir}/klayout
-chmod 644 %{buildroot}%{_libdir}/klayout/*
+cp -pd %{_builddir}/bin.$TARGET/db_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/db_plugins
+cp -pd %{_builddir}/bin.$TARGET/lay_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/lay_plugins
+chmod 644 %{buildroot}%{pylib}/klayout/*
+chmod 644 %{buildroot}%{_libdir}/klayout/*.so*
+chmod 644 %{buildroot}%{_libdir}/klayout/db_plugins/*.so*
+chmod 644 %{buildroot}%{_libdir}/klayout/lay_plugins/*.so*
 cp -pd %{_builddir}/bin.$TARGET/klayout %{_builddir}/bin.$TARGET/strm* %{buildroot}%{_bindir}
 chmod 755 %{buildroot}%{_bindir}/*
 install -Dm644 %{_sourcedir}/etc/%{name}.desktop %{buildroot}%{_datadir}/applications/%{name}.desktop

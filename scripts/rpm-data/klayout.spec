@@ -86,7 +86,6 @@ For details see README.md
 
 TARGET="linux-release"
 
-# TODO: remove -without-qtbinding
 %if "%{git_source}" != ""
 # build from git sources if possible
 cd %{git_source}
@@ -96,7 +95,7 @@ cd %{_sourcedir}
 ./build.sh -rpath %{_libdir}/klayout \
            -bin %{_builddir}/bin.$TARGET \
            -build %{_builddir}/build.$TARGET \
-           %{buildopt} -without-qtbinding
+           %{buildopt} 
 
 cp -p LICENSE Changelog CONTRIB %{_builddir}
 strip %{_builddir}/bin.$TARGET/*.so

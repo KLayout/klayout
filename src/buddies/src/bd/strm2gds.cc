@@ -21,7 +21,7 @@
 */
 
 #include "bdConverterMain.h"
-#include "dbGDS2Writer.h"
+#include "dbGDS2Format.h"
 
 BD_PUBLIC int strm2gds (int argc, char *argv[])
 {

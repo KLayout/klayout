@@ -21,6 +21,7 @@
 */
 
 #include "dbGDS2.h"
+#include "dbGDS2Format.h"
 #include "dbGDS2Writer.h"
 #include "dbSaveLayoutOptions.h"
 #include "layCellView.h"

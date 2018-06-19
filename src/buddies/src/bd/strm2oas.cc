@@ -21,7 +21,7 @@
 */
 
 #include "bdConverterMain.h"
-#include "dbOASISWriter.h"
+#include "dbOASISFormat.h"
 
 BD_PUBLIC int strm2oas (int argc, char *argv[])
 {

@@ -29,6 +29,7 @@
 #include "dbPolygonTools.h"
 #include "dbGDS2Writer.h"
 #include "dbGDS2.h"
+#include "dbGDS2Format.h"
 #include "dbClip.h"
 #include "dbSaveLayoutOptions.h"
 #include "dbPolygonGenerators.h"

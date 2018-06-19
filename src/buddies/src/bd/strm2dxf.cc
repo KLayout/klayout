@@ -21,7 +21,7 @@
 */
 
 #include "bdConverterMain.h"
-#include "dbDXFWriter.h"
+#include "dbDXFFormat.h"
 
 BD_PUBLIC int strm2dxf (int argc, char *argv[])
 {

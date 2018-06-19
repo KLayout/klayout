@@ -25,9 +25,9 @@
 
 #include "bdCommon.h"
 #include "dbCommonReader.h"
-#include "dbGDS2Reader.h"
-#include "dbOASISReader.h"
-#include "dbDXFReader.h"
+#include "dbGDS2Format.h"
+#include "dbOASISFormat.h"
+#include "dbDXFFormat.h"
 #include "dbCIFFormat.h"
 
 #include <string>

@@ -35,7 +35,10 @@ win32 {
   QMAKE_POST_LINK += $(MKDIR) $$DESTDIR_PYMOD && $(COPY) $(DESTDIR)$(TARGET) $$DESTDIR_PYMOD/$${TARGET}.so
 
   lib_target.path = $$PREFIX/pymod/klayout
-  lib_target.files += $$DESTDIR_PYMOD/$${TARGET}.so
+  # This would be nice:
+  #   lib_target.files += $$DESTDIR_PYMOD/$${TARGET}.so
+  # but some Qt versions need this explicitly:
+  lib_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/$${TARGET}.so $(INSTALLROOT)$$PREFIX/pymod/klayout
   INSTALLS = lib_target
 
 }

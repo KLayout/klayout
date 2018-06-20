@@ -844,6 +844,13 @@ public:
     return true;
   }
 
+  virtual bool can_upcast (const void *) const
+  {
+    //  It does not make sense to upcast-check vs. an external class
+    //  An external class is only provided as a stub.
+    return false;
+  }
+
 private:
   std::string m_category;
 };

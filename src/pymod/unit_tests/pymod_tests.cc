@@ -28,12 +28,10 @@
 #include <QProcess>
 #include <QProcessEnvironment>
 
-
-
 int run_pymodtest (tl::TestBase * /*_this*/, const std::string &fn)
 {
   QProcess process;
-  process.setProcessChannelMode (QProcess::ForwardedChannels);
+  process.setProcessChannelMode (QProcess::MergedChannels);
 
   QStringList args;
 
@@ -48,6 +46,9 @@ int run_pymodtest (tl::TestBase * /*_this*/, const std::string &fn)
 
   process.start (tl::to_qstring (STRINGIFY (PYTHON)), args);
   process.waitForFinished (-1);
+
+  tl::info << process.readAll ().constData ();
+
   return process.exitCode ();
 }
 

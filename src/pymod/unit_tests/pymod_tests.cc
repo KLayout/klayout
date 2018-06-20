@@ -20,6 +20,13 @@
 
 */
 
+//  Oh my god ... STRINGIFY(s) will get the argument with MACROS REPLACED.
+//  So if the PYTHONPATH is something like build.linux-released, the "linux" macro
+//  set to 1 will make this "build.1-release". So STRINGIFY isn't a real solution.
+//  On the other hand that is the only documented way to turn a macro into a string.
+//  This will prevent that issue:
+#undef linux
+
 #define STRINGIFY(s) _STRINGIFY(s)
 #define _STRINGIFY(s) #s
 
@@ -41,7 +48,7 @@ int run_pymodtest (tl::TestBase * /*_this*/, const std::string &fn)
   args << tl::to_qstring (fp);
 
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment ();
-  env.insert("PYTHONPATH", STRINGIFY(PYTHONPATH));
+  env.insert("PYTHONPATH", STRINGIFY (PYTHONPATH));
   process.setProcessEnvironment(env);
 
   process.start (tl::to_qstring (STRINGIFY (PYTHON)), args);

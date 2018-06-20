@@ -251,56 +251,59 @@ Session::restore (lay::MainWindow &mw)
 
 //  declaration of the session file XML structure
 static const tl::XMLStruct <Session>
-session_structure ("session", 
-  tl::make_member<int, Session> (&Session::width, &Session::set_width, "window-width") +
-  tl::make_member<int, Session> (&Session::height, &Session::set_height, "window-height") +
-  tl::make_member<std::string, Session> (&Session::window_state, &Session::set_window_state, "window-state") +
-  tl::make_member<std::string, Session> (&Session::window_geometry, &Session::set_window_geometry, "window-geometry") +
-  tl::make_member<int, Session> (&Session::current_view, &Session::set_current_view, "current-view") +
-  tl::make_element<SessionLayoutDescriptor, std::vector<SessionLayoutDescriptor>::const_iterator, Session> (&Session::begin_layouts, &Session::end_layouts, &Session::add_layout, "layout", 
-    tl::make_member<std::string, SessionLayoutDescriptor> (&SessionLayoutDescriptor::name, "name") + 
-    tl::make_member<std::string, SessionLayoutDescriptor> (&SessionLayoutDescriptor::file_path, "file-path") +
-    tl::make_member<bool, SessionLayoutDescriptor> (&SessionLayoutDescriptor::save_options_valid, "save-options-valid") +
-    tl::make_element<db::SaveLayoutOptions, SessionLayoutDescriptor> (&SessionLayoutDescriptor::save_options, "save-options",
-      db::save_options_xml_element_list ()
+session_structure ()
+{
+  return tl::XMLStruct <Session> ("session",
+    tl::make_member<int, Session> (&Session::width, &Session::set_width, "window-width") +
+    tl::make_member<int, Session> (&Session::height, &Session::set_height, "window-height") +
+    tl::make_member<std::string, Session> (&Session::window_state, &Session::set_window_state, "window-state") +
+    tl::make_member<std::string, Session> (&Session::window_geometry, &Session::set_window_geometry, "window-geometry") +
+    tl::make_member<int, Session> (&Session::current_view, &Session::set_current_view, "current-view") +
+    tl::make_element<SessionLayoutDescriptor, std::vector<SessionLayoutDescriptor>::const_iterator, Session> (&Session::begin_layouts, &Session::end_layouts, &Session::add_layout, "layout",
+      tl::make_member<std::string, SessionLayoutDescriptor> (&SessionLayoutDescriptor::name, "name") +
+      tl::make_member<std::string, SessionLayoutDescriptor> (&SessionLayoutDescriptor::file_path, "file-path") +
+      tl::make_member<bool, SessionLayoutDescriptor> (&SessionLayoutDescriptor::save_options_valid, "save-options-valid") +
+      tl::make_element<db::SaveLayoutOptions, SessionLayoutDescriptor> (&SessionLayoutDescriptor::save_options, "save-options",
+        db::save_options_xml_element_list ()
+      ) +
+      tl::make_element<db::LoadLayoutOptions, SessionLayoutDescriptor> (&SessionLayoutDescriptor::load_options, "load-options",
+        db::load_options_xml_element_list ()
+      )
     ) +
-    tl::make_element<db::LoadLayoutOptions, SessionLayoutDescriptor> (&SessionLayoutDescriptor::load_options, "load-options",
-      db::load_options_xml_element_list ()
-    )
-  ) +
-  tl::make_element<SessionViewDescriptor, std::vector<SessionViewDescriptor>::const_iterator, Session> (&Session::begin_views, &Session::end_views, &Session::add_view, "view", 
-    tl::make_member<std::string, SessionViewDescriptor> (&SessionViewDescriptor::title, "title") + 
-    tl::make_member<int, SessionViewDescriptor> (&SessionViewDescriptor::active_cellview, "active-cellview-index") + 
-    tl::make_element<lay::DisplayState, SessionViewDescriptor> (&SessionViewDescriptor::display_state, "display", lay::DisplayState::xml_format ()) +
-    tl::make_element<SessionCellViewDescriptors, SessionViewDescriptor> (&SessionViewDescriptor::cellviews, "cellviews",
-      tl::make_element<SessionCellViewDescriptor, std::vector<SessionCellViewDescriptor>::const_iterator, SessionCellViewDescriptors> (&SessionCellViewDescriptors::begin, &SessionCellViewDescriptors::end, &SessionCellViewDescriptors::push_back, "cellview", 
-        tl::make_member<std::string, SessionCellViewDescriptor> (&SessionCellViewDescriptor::layout_name, "layout-ref") +
-        tl::make_member<std::string, SessionCellViewDescriptor> (&SessionCellViewDescriptor::tech_name, "tech-name") +
-        tl::make_element<SessionHiddenCellNames, SessionCellViewDescriptor> (&SessionCellViewDescriptor::hidden_cell_names, "hidden-cells",
-          tl::make_member<std::string, std::vector<std::string>::const_iterator, SessionHiddenCellNames> (&SessionHiddenCellNames::begin, &SessionHiddenCellNames::end, &SessionHiddenCellNames::push_back, "hidden-cell") 
-        ) 
-      ) 
-    ) +
-    tl::make_element<BookmarkList, SessionViewDescriptor> (&SessionViewDescriptor::bookmarks, "bookmarks", 
-      tl::make_element<BookmarkListElement, BookmarkList::const_iterator, BookmarkList> (&BookmarkList::begin, &BookmarkList::end, &BookmarkList::add, "bookmark", BookmarkListElement::xml_format())
-    ) +
-    tl::make_element<std::vector<std::string>, SessionViewDescriptor> (&SessionViewDescriptor::rdb_filenames, "rdb-files", 
-      tl::make_member<std::string, std::vector<std::string>::const_iterator, std::vector<std::string> > (&std::vector<std::string>::begin, &std::vector<std::string>::end, &std::vector<std::string>::push_back, "rdb-file")
-    ) +
-    //  for backward compatibility:
-    tl::make_element<lay::LayerPropertiesList, SessionViewDescriptor> (&SessionViewDescriptor::set_layer_properties, "layer-properties", lay::LayerPropertiesList::xml_format ()) +
-    tl::make_member<unsigned int, SessionViewDescriptor> (&SessionViewDescriptor::current_layer_list, "current-layer-property-tab") + 
-    tl::make_element<std::vector<lay::LayerPropertiesList>, SessionViewDescriptor> (&SessionViewDescriptor::layer_properties_lists, "layer-properties-tabs", 
-      tl::make_element<lay::LayerPropertiesList, std::vector<lay::LayerPropertiesList>::const_iterator, std::vector<lay::LayerPropertiesList> > (&std::vector<lay::LayerPropertiesList>::begin, &std::vector<lay::LayerPropertiesList>::end, &std::vector<lay::LayerPropertiesList>::push_back, "layer-properties", lay::LayerPropertiesList::xml_format())
-    ) +
-    tl::make_element<SessionAnnotationShapes, SessionViewDescriptor> (&SessionViewDescriptor::annotation_shapes, "annotations",
-      tl::make_element<SessionAnnotationDescriptor, std::vector<SessionAnnotationDescriptor>::const_iterator, SessionAnnotationShapes> (&SessionAnnotationShapes::begin_annotation_shapes, &SessionAnnotationShapes::end_annotation_shapes, &SessionAnnotationShapes::add_annotation_shape, "annotation",
-        tl::make_member<std::string, SessionAnnotationDescriptor> (&SessionAnnotationDescriptor::class_name, "class") +
-        tl::make_member<std::string, SessionAnnotationDescriptor> (&SessionAnnotationDescriptor::value_string, "value") 
+    tl::make_element<SessionViewDescriptor, std::vector<SessionViewDescriptor>::const_iterator, Session> (&Session::begin_views, &Session::end_views, &Session::add_view, "view",
+      tl::make_member<std::string, SessionViewDescriptor> (&SessionViewDescriptor::title, "title") +
+      tl::make_member<int, SessionViewDescriptor> (&SessionViewDescriptor::active_cellview, "active-cellview-index") +
+      tl::make_element<lay::DisplayState, SessionViewDescriptor> (&SessionViewDescriptor::display_state, "display", lay::DisplayState::xml_format ()) +
+      tl::make_element<SessionCellViewDescriptors, SessionViewDescriptor> (&SessionViewDescriptor::cellviews, "cellviews",
+        tl::make_element<SessionCellViewDescriptor, std::vector<SessionCellViewDescriptor>::const_iterator, SessionCellViewDescriptors> (&SessionCellViewDescriptors::begin, &SessionCellViewDescriptors::end, &SessionCellViewDescriptors::push_back, "cellview",
+          tl::make_member<std::string, SessionCellViewDescriptor> (&SessionCellViewDescriptor::layout_name, "layout-ref") +
+          tl::make_member<std::string, SessionCellViewDescriptor> (&SessionCellViewDescriptor::tech_name, "tech-name") +
+          tl::make_element<SessionHiddenCellNames, SessionCellViewDescriptor> (&SessionCellViewDescriptor::hidden_cell_names, "hidden-cells",
+            tl::make_member<std::string, std::vector<std::string>::const_iterator, SessionHiddenCellNames> (&SessionHiddenCellNames::begin, &SessionHiddenCellNames::end, &SessionHiddenCellNames::push_back, "hidden-cell")
+          )
+        )
+      ) +
+      tl::make_element<BookmarkList, SessionViewDescriptor> (&SessionViewDescriptor::bookmarks, "bookmarks",
+        tl::make_element<BookmarkListElement, BookmarkList::const_iterator, BookmarkList> (&BookmarkList::begin, &BookmarkList::end, &BookmarkList::add, "bookmark", BookmarkListElement::xml_format())
+      ) +
+      tl::make_element<std::vector<std::string>, SessionViewDescriptor> (&SessionViewDescriptor::rdb_filenames, "rdb-files",
+        tl::make_member<std::string, std::vector<std::string>::const_iterator, std::vector<std::string> > (&std::vector<std::string>::begin, &std::vector<std::string>::end, &std::vector<std::string>::push_back, "rdb-file")
+      ) +
+      //  for backward compatibility:
+      tl::make_element<lay::LayerPropertiesList, SessionViewDescriptor> (&SessionViewDescriptor::set_layer_properties, "layer-properties", lay::LayerPropertiesList::xml_format ()) +
+      tl::make_member<unsigned int, SessionViewDescriptor> (&SessionViewDescriptor::current_layer_list, "current-layer-property-tab") +
+      tl::make_element<std::vector<lay::LayerPropertiesList>, SessionViewDescriptor> (&SessionViewDescriptor::layer_properties_lists, "layer-properties-tabs",
+        tl::make_element<lay::LayerPropertiesList, std::vector<lay::LayerPropertiesList>::const_iterator, std::vector<lay::LayerPropertiesList> > (&std::vector<lay::LayerPropertiesList>::begin, &std::vector<lay::LayerPropertiesList>::end, &std::vector<lay::LayerPropertiesList>::push_back, "layer-properties", lay::LayerPropertiesList::xml_format())
+      ) +
+      tl::make_element<SessionAnnotationShapes, SessionViewDescriptor> (&SessionViewDescriptor::annotation_shapes, "annotations",
+        tl::make_element<SessionAnnotationDescriptor, std::vector<SessionAnnotationDescriptor>::const_iterator, SessionAnnotationShapes> (&SessionAnnotationShapes::begin_annotation_shapes, &SessionAnnotationShapes::end_annotation_shapes, &SessionAnnotationShapes::add_annotation_shape, "annotation",
+          tl::make_member<std::string, SessionAnnotationDescriptor> (&SessionAnnotationDescriptor::class_name, "class") +
+          tl::make_member<std::string, SessionAnnotationDescriptor> (&SessionAnnotationDescriptor::value_string, "value")
+        )
       )
     )
-  ) 
-);
+  );
+}
 
 void 
 Session::load (const std::string &fn)
@@ -310,7 +313,7 @@ Session::load (const std::string &fn)
 
   tl::XMLFileSource in (fn);
 
-  session_structure.parse (in, *this); 
+  session_structure ().parse (in, *this);
 
   tl::log << "Loaded session from " << fn;
 }
@@ -319,7 +322,7 @@ void
 Session::save (const std::string &fn)
 {
   tl::OutputStream os (fn, tl::OutputStream::OM_Plain);
-  session_structure.write (os, *this); 
+  session_structure ().write (os, *this);
 
   tl::log << "Saved session to " << fn;
 }

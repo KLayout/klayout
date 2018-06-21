@@ -22,4 +22,7 @@
 
 #include "../pymodHelper.h"
 
+//  to force linking of the rdb module
+#include "../../rdb/rdb/rdbForceLink.h"
+
 DEFINE_PYMOD(rdb, "rdb", "KLayout core module 'rdb'")

@@ -63,9 +63,9 @@ module_init (const char *mod_name, const char *mod_description)
 #if PY_MAJOR_VERSION < 3
 
 #define DEFINE_PYMOD(__name__, __name_str__, __description__) \
-  PyMODINIT_FUNC \
+  extern "C" \
   DEF_INSIDE_PUBLIC \
-  init##__name__ () \
+  void init##__name__ () \
   { \
     module_init (__name_str__, __description__); \
   } \
@@ -73,9 +73,9 @@ module_init (const char *mod_name, const char *mod_description)
 #else
 
 #define DEFINE_PYMOD(__name__, __name_str__, __description__) \
-  PyMODINIT_FUNC \
+  extern "C" \
   DEF_INSIDE_PUBLIC \
-  PyInit_##__name__ () \
+  PyObject *PyInit_##__name__ () \
   { \
     return module_init (__name_str__, __description__); \
   } \

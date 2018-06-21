@@ -19,10 +19,10 @@ fi
 # TODO: derive this list automatically?
 case $target in
 ubuntu16)
-  depends="libqt4-designer (>= 4.8.6), libqt4-xml (>= 4.8.6), libqt4-sql (>= 4.8.6), libqt4-network (>= 4.8.6), libqtcore4 (>= 4.8.6), libqtgui4 (>= 4.8.6), zlib1g (>= 1.2.8), libruby2.3 (>= 2.3.1), libpython3.5 (>= 3.5.1), libstdc++6 (>= 4.6.3), libc6 (>= 2.15)"
+  depends="libqt4-designer (>= 4.8.6), libqt4-xml (>= 4.8.6), libqt4-sql (>= 4.8.6), libqt4-network (>= 4.8.6), libqtcore4 (>= 4.8.6), libqtgui4 (>= 4.8.6), zlib1g (>= 1.2.8), libruby2.3 (>= 2.3.1), python3 (>= 3.5.1), libpython3.5 (>= 3.5.1), libstdc++6 (>= 4.6.3), libc6 (>= 2.15)"
   ;;
 ubuntu18)
-  depends="libqt4-designer (>= 4.8.7), libqt4-xml (>= 4.8.7), libqt4-sql (>= 4.8.7), libqt4-network (>= 4.8.7), libqtcore4 (>= 4.8.7), libqtgui4 (>= 4.8.7), zlib1g (>= 1.2.11), libruby2.5 (>= 2.5.1), libpython3.6 (>= 3.6.5), libstdc++6 (>= 8), libc6 (>= 2.27)"
+  depends="libqt4-designer (>= 4.8.7), libqt4-xml (>= 4.8.7), libqt4-sql (>= 4.8.7), libqt4-network (>= 4.8.7), libqtcore4 (>= 4.8.7), libqtgui4 (>= 4.8.7), zlib1g (>= 1.2.11), libruby2.5 (>= 2.5.1), python3 (>= 3.6.5), libpython3.6 (>= 3.6.5), libstdc++6 (>= 8), libc6 (>= 2.27)"
   ;;
 *)
   echo "Unknown target '$target' (given as first argument)"
@@ -53,10 +53,11 @@ libdir="usr/lib/klayout"
 # TODO: is there a better way to produce this path?
 pylibdir="usr/lib/python3/dist-packages/klayout"
 
+# @@@ TODO: remove -without-qtbinding
 ./build.sh -j2 \
            -bin $bininstdir \
            -build $builddir \
-           -rpath /$libdir 
+           -rpath /$libdir -without-qtbinding
 
 if [ "$bits" = "32" ]; then
   arch="i386"

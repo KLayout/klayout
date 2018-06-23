@@ -1,22 +1,6 @@
 
-// This Jenkinsfile needs a configuration parameter
-//
-//   platform = suffix of OS 
-//
-//              Selects Docker containers to use for
-//                * building (jenkins-<platform>)
-//                * installtest (jenkins-<platform>-basic)
-//              The docker containers need to be set up
-//              properly, so they offer the same user/group
-//              as the one that runs Jenkins
-//              (usually that's jenkins:jenkins)
-// 
-
-properties([
-  parameters([
-    string(name: 'platform', defaultValue: 'platform-not-set')
-  ])
-])
+//  a test ...
+org.klayout.osconfig()
 
 target = params.platform
 currentBuild.description = "Pipelined "+target

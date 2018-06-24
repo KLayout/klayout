@@ -8,21 +8,27 @@ currentBuild.description = "Pipelined "+target
 
 node("master") {
 
-    branch = 'staging'
-    artefacts = pwd() + "/artefacts"
-    src_dir = pwd()
+  branch = 'staging'
+  artefacts = pwd() + "/artefacts"
+  src_dir = pwd()
 
-    target_dir = artefacts + "/" + target
-    work_dir = pwd() + "/" + target
+  target_dir = artefacts + "/" + target
+  work_dir = pwd() + "/" + target
 
-    stage("Building target ${target}")
+  stage("Checkout sources") {
+
+    checkout scm
+
+  }
+
+  stage("Building target ${target}") {
         
     sh("rm -rf ${target_dir}")
     sh("mkdir -p ${target_dir}")
         
     withDockerContainer(image: "jenkins-${target}") {
     
-        sh """
+      sh """
 echo "UID=\$UID"
 echo "GID=\$GID"
 ls -al scripts/rpm-data/klayout.spec
@@ -40,37 +46,39 @@ cp ${work_dir}/RPMS/*/*.rpm ${target_dir}
 """
 
     }
+
+  }
         
-    stage("Publish and test")
+  stage("Publish and test") {
         
     parallel(
     "Publish": {
 
       //  from shared library
-      publish(target)
+      publish(BRANCH_NAME, target, target_dir)
 
     },
     "Unit testing": {
             
-        withDockerContainer(image: "jenkins-${target}") {
+      withDockerContainer(image: "jenkins-${target}") {
                 
-            sh """
+        sh """
 cd ${work_dir}/BUILD/build.linux-release
 set +e
 LD_LIBRARY_PATH=. TESTSRC=../../.. TESTTMP=testtmp xvfb-run ./ut_runner -c -a | tee ut_runner.xml
 set -e            
 """
 
-        }
+      }
             
-        junit(testResults: "${target}/BUILD/build.linux-release/ut_runner.xml")
+      junit(testResults: "${target}/BUILD/build.linux-release/ut_runner.xml")
 
     }, 
     "Installtest": {
             
-        withDockerContainer(image: "jenkins-${target}-basic") {
+      withDockerContainer(image: "jenkins-${target}-basic") {
 
-            sh """
+        sh """
 cd ${target_dir}
 
 echo \$USER
@@ -79,9 +87,11 @@ sudo yum -y install klayout-*.x86_64.rpm
 klayout -b -h
 """
                 
-        }
+      }
 
     })
+
+  }
         
 }
 

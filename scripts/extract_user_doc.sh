@@ -25,6 +25,9 @@ for qt in 5 4; do
 
   target_doc=$(pwd)/doc-qt$qt
 
+  rm -rf $target_doc
+  mkdir -p $target_doc
+
   export QT_SELECT=$qt
   ./build.sh -qmake qmake -j4 -bin bin-release-qt$qt -build build-release-qt$qt
 
@@ -49,7 +52,8 @@ for qt in 5 4; do
   rm -f $bin/help-index.xml
   $bin/klayout -rx -b -rd "target_doc=$target_doc" -rd "qt=$qt" -r $inst_dir/extract_user_doc.rb
 
-  mv $bin/help-index.xml $target_doc/help-index.data
+  # just big:
+  # mv $bin/help-index.xml $target_doc/help-index.data
 
 done
 

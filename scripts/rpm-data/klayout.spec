@@ -56,7 +56,7 @@ Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
 %define buildopt -j2
-%define pylib %{python_sitearch}
+%define pylib %{python3_sitearch}
 %endif
 
 %if "%{target_system}" == "opensuse42_3"
@@ -65,7 +65,7 @@ Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
 %define buildopt -j2
-%define pylib %{python_sitearch}
+%define pylib %{python3_sitearch}
 %endif
 
 %description

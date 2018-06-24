@@ -37,7 +37,8 @@ node("master") {
     },
     "Unit testing": {
             
-      work_dir = pwd() + "/" + target + "/BUILD/build.linux-release"
+      rel_work_dir = target + "/BUILD/build.linux-release"
+      work_dir = pwd() + "/" + rel_work_dir 
 
       withDockerContainer(image: "jenkins-${target}") {
                 
@@ -50,7 +51,7 @@ set -e
 
       }
             
-      junit(testResults: "${work_dir}/ut_runner.xml")
+      junit(testResults: "${rel_work_dir}/ut_runner.xml")
 
     }, 
     "Installtest": {

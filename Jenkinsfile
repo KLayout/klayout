@@ -37,21 +37,12 @@ node("master") {
     },
     "Unit testing": {
             
-      rel_work_dir = target + "/BUILD/build.linux-release"
-      work_dir = pwd() + "/" + rel_work_dir 
-
+      ut_result = "no-result"
       withDockerContainer(image: "jenkins-${target}") {
-                
-        sh """
-cd ${work_dir}
-set +e
-LD_LIBRARY_PATH=. TESTSRC=../../.. TESTTMP=testtmp xvfb-run ./ut_runner -c -a | tee ut_runner.xml
-set -e            
-"""
-
+        ut_result = run_ut(target)
       }
             
-      junit(testResults: "${rel_work_dir}/ut_runner.xml")
+      junit(testResults: ut_result)
 
     }, 
     "Installtest": {

@@ -2,6 +2,14 @@
 @Library("osconfig") _
 
 node("master") {
-  publish_sources(BRANCH_NAME)
+
+  stage("Checkout sources") {
+    checkout scm
+  }
+
+  stage("Publish sources") {
+    publish_sources(BRANCH_NAME)
+  }
+
 }
 

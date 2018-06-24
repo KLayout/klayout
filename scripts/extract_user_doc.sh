@@ -23,7 +23,7 @@ doc_src=./src/lay/lay/doc
 
 for qt in 5 4; do
 
-  target_doc=./doc-qt$qt
+  target_doc=$(pwd)/doc-qt$qt
 
   export QT_SELECT=$qt
   ./build.sh -qmake qmake -j4 -bin bin-release-qt$qt -build build-release-qt$qt
@@ -41,15 +41,15 @@ for qt in 5 4; do
 
   mkdir -p $target_doc/code
 
-  cd bin-release-qt$qt
-  export LD_LIBRARY_PATH=.
-  export KLAYOUT_PATH=.
-  export KLAYOUT_HOME=.
+  bin=bin-release-qt$qt
+  export LD_LIBRARY_PATH=$bin
+  export KLAYOUT_PATH=$bin
+  export KLAYOUT_HOME=$bin
 
-  rm -f ./help-index.xml
-  ./klayout -rx -b -rd "target_doc=$target_doc" -rd "qt=$qt" -r $inst_dir/extract_user_doc.rb
+  rm -f $bin/help-index.xml
+  $bin/klayout -rx -b -rd "target_doc=$target_doc" -rd "qt=$qt" -r $inst_dir/extract_user_doc.rb
 
-  mv ./help-index.xml $target_doc/help-index.data
+  mv $bin/help-index.xml $target_doc/help-index.data
 
 done
 

@@ -4,16 +4,12 @@
 //  from shared library
 target = osconfig()
 
-currentBuild.description = "Pipelined "+target
+currentBuild.description = "Pipelined " + target
 
 node("master") {
 
-  branch = 'staging'
   artefacts = pwd() + "/artefacts"
-  src_dir = pwd()
-
   target_dir = artefacts + "/" + target
-  work_dir = pwd() + "/" + target
 
   stage("Checkout sources") {
 
@@ -23,28 +19,9 @@ node("master") {
 
   stage("Building target ${target}") {
         
-    sh("rm -rf ${target_dir}")
-    sh("mkdir -p ${target_dir}")
-        
     withDockerContainer(image: "jenkins-${target}") {
-    
-      sh """
-echo "UID=\$UID"
-echo "GID=\$GID"
-ls -al scripts/rpm-data/klayout.spec
-
-cat /etc/redhat-release
-
-. ./version.sh
-rpmbuild -ba scripts/rpm-data/klayout.spec \\
-  -D "_topdir ${work_dir}" \\
-  -D "git_source ${src_dir}" \\
-  -D "git_version \${KLAYOUT_VERSION}" \\
-  -D "target_system ${target}"
-  
-cp ${work_dir}/RPMS/*/*.rpm ${target_dir}
-"""
-
+      //  from shared library
+      build(target, target_dir)
     }
 
   }
@@ -60,10 +37,12 @@ cp ${work_dir}/RPMS/*/*.rpm ${target_dir}
     },
     "Unit testing": {
             
+      work_dir = pwd() + "/" + target + "/BUILD/build.linux-release"
+
       withDockerContainer(image: "jenkins-${target}") {
                 
         sh """
-cd ${work_dir}/BUILD/build.linux-release
+cd ${work_dir}
 set +e
 LD_LIBRARY_PATH=. TESTSRC=../../.. TESTTMP=testtmp xvfb-run ./ut_runner -c -a | tee ut_runner.xml
 set -e            
@@ -71,22 +50,14 @@ set -e
 
       }
             
-      junit(testResults: "${target}/BUILD/build.linux-release/ut_runner.xml")
+      junit(testResults: "${work_dir}/ut_runner.xml")
 
     }, 
     "Installtest": {
             
       withDockerContainer(image: "jenkins-${target}-basic") {
-
-        sh """
-cd ${target_dir}
-
-echo \$USER
-sudo yum -y install klayout-*.x86_64.rpm
-
-klayout -b -h
-"""
-                
+        //  from shared library
+        installtest(target, target_dir)
       }
 
     })

@@ -1,0 +1,7 @@
+
+@Library("osconfig") _
+
+node("master") {
+  publish_sources(BRANCH_NAME)
+}
+

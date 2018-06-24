@@ -2,7 +2,7 @@
 # This script is sourced to define the main version parameters
 
 # The main version
-KLAYOUT_VERSION="0.25.3"
+KLAYOUT_VERSION="0.26"
 
 # The build date
 KLAYOUT_VERSION_DATE=$(date "+%Y-%m-%d")

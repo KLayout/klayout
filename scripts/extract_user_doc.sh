@@ -47,7 +47,7 @@ for qt in 5 4; do
   export KLAYOUT_HOME=.
 
   rm -f ./help-index.xml
-  ./klayout -rx -z -rd "target_doc=$target_doc" -rd "qt=$qt" -r $inst_dir/extract_user_doc.rb
+  ./klayout -rx -b -rd "target_doc=$target_doc" -rd "qt=$qt" -r $inst_dir/extract_user_doc.rb
 
   mv ./help-index.xml $target_doc/help-index.data
 

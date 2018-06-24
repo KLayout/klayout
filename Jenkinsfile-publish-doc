@@ -12,7 +12,7 @@ node("master") {
   }
 
   stage("Publish doc") {
-    //publish_doc(BRANCH_NAME)
+    publish_doc(BRANCH_NAME)
   }
 
 }

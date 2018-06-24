@@ -1,6 +1,6 @@
 
 //  a test ...
-org.klayout.osconfig()
+osconfig()
 
 target = params.platform
 currentBuild.description = "Pipelined "+target

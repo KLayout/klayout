@@ -1,4 +1,6 @@
 
+@Library("osconfig") _
+
 //  a test ...
 osconfig()
 

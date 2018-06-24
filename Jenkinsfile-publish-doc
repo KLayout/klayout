@@ -8,7 +8,7 @@ node("master") {
   }
 
   stage("Producing doc") {
-    sh "./scripts/extract_user_doc.sh"
+    sh "./scripts/extract_user_doc.sh -i " + BRANCH_NAME
   }
 
   stage("Publish doc") {

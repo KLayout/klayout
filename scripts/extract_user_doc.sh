@@ -5,14 +5,17 @@ src=""
 
 self=$(realpath $(which $0))
 inst_dir=$(dirname $self)
+info=""
 
 while [ "$1" != "" ]; do
   a="$1"
   shift
   if [ "$a" = "-h" ]; then
-    echo "extract_user_doc.sh"
-    echo "  ./scripts/extract_user_doc"
+    echo "./scripts/extract_user_doc -i <branch-info>"
     exit 1
+  elif [ "$a" = "-i" ]; then
+    info="$1"
+    shift
   else
     echo "invalid option $a"
     exit 1
@@ -20,6 +23,7 @@ while [ "$1" != "" ]; do
 done
 
 doc_src=./src/lay/lay/doc
+. ./version.sh
 
 for qt in 5 4; do
 
@@ -50,7 +54,7 @@ for qt in 5 4; do
   export KLAYOUT_HOME=$bin
 
   rm -f $bin/help-index.xml
-  $bin/klayout -rx -b -rd "target_doc=$target_doc" -rd "qt=$qt" -r $inst_dir/extract_user_doc.rb
+  $bin/klayout -rx -b -rd "target_doc=$target_doc" -rd "target_info=$info" -rd "qt=$qt" -r $inst_dir/extract_user_doc.rb
 
   # just big:
   # mv $bin/help-index.xml $target_doc/help-index.data

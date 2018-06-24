@@ -341,52 +341,48 @@ TEST(12)
   EXPECT_EQ (s_sum[0].sum () + s_sum[1].sum() + s_sum[2].sum() + s_sum[3].sum() < 10000000, true);
 }
 
-TEST(13) 
+void run_thread_tests (tl::TestBase *_this, int wait)
 {
-  MyJob job (4);
+  int tries = 4;
+  bool stopped_in_action = false;
 
-  s_sum[0].reset ();
-  s_sum[1].reset ();
-  s_sum[2].reset ();
-  s_sum[3].reset ();
+  for (int i = 0; i < tries && !stopped_in_action; ++i) {
 
-  for (int i = 0; i < 10000; ++i) {
-    job.schedule (new MyTask (1000));
+    MyJob job (4);
+
+    s_sum[0].reset ();
+    s_sum[1].reset ();
+    s_sum[2].reset ();
+    s_sum[3].reset ();
+
+    for (int i = 0; i < 10000; ++i) {
+      job.schedule (new MyTask (10000));
+    }
+
+    job.start ();
+    usleep (wait);
+    job.terminate ();
+
+    EXPECT_EQ (job.is_running (), false);
+    EXPECT_EQ (s_sum[0].sum () + s_sum[1].sum() + s_sum[2].sum() + s_sum[3].sum() < 400000000, true);
+
+    //  at least one must be stopped in the perform task - as this is not always the case,
+    //  we retry a few times.
+    stopped_in_action = (s_sum[0].sum () % 10000) + (s_sum[1].sum () % 10000) + (s_sum[2].sum () % 10000) + (s_sum[3].sum () % 10000) > 0;
+
   }
 
-  job.start ();
-  usleep (20000);
-  job.terminate ();
-
-  EXPECT_EQ (job.is_running (), false);
-
-  //  at least one must be stopped in the perform task ...
-  EXPECT_EQ ((s_sum[0].sum () % 1000) + (s_sum[1].sum () % 1000) + (s_sum[2].sum () % 1000) + (s_sum[3].sum () % 1000) > 0, true);
-  EXPECT_EQ (s_sum[0].sum () + s_sum[1].sum() + s_sum[2].sum() + s_sum[3].sum() < 10000000, true);
+  EXPECT_EQ (stopped_in_action, true);
 }
 
-TEST(14) 
+TEST(13)
 {
-  MyJob job (4);
+  run_thread_tests (_this, 20000);
+}
 
-  s_sum[0].reset ();
-  s_sum[1].reset ();
-  s_sum[2].reset ();
-  s_sum[3].reset ();
-
-  for (int i = 0; i < 10000; ++i) {
-    job.schedule (new MyTask (1000));
-  }
-
-  job.start ();
-  usleep (200000);
-  job.stop ();
-
-  EXPECT_EQ (job.is_running (), false);
-
-  //  at least one must be stopped in the perform task ...
-  EXPECT_EQ (s_sum[0].sum () + s_sum[1].sum() + s_sum[2].sum() + s_sum[3].sum() < 10000000, true);
-  EXPECT_EQ ((s_sum[0].sum () % 1000) + (s_sum[1].sum () % 1000) + (s_sum[2].sum () % 1000) + (s_sum[3].sum () % 1000) > 0, true);
+TEST(14)
+{
+  run_thread_tests (_this, 200000);
 }
 
 TEST(20) 

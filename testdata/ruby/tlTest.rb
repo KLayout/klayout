@@ -68,7 +68,7 @@ class Tl_TestClass < TestBase
     expr = RBA::Expression::new("[a[1],a[2],a[0],a[4],a[3]]", { "a" => [ 17, "a", nil, [ 2, 7 ], { 8 => "x", "u" => 42 } ] })
     res = expr.eval
     assert_equal(res.class.to_s, "Array")
-    assert_equal(res.inspect, "[\"a\", nil, 17, {8=>\"x\", \"u\"=>42}, [2, 7]]")
+    assert_equal(res.inspect, ["a", nil, 17, {8=>"x", "u"=>42}, [2, 7]].inspect)
 
     expr = RBA::Expression::new("a[1]", { "a" => [ 17, "a", nil, [ 2, 7 ], { 8 => "x", "u" => 42 } ] })
     res = expr.eval
@@ -78,7 +78,7 @@ class Tl_TestClass < TestBase
     expr = RBA::Expression::new("a[4]", { "a" => [ 17, "a", nil, [ 2, 7 ], { 8 => "x", "u" => 42 } ] })
     res = expr.eval
     assert_equal(res.class.to_s, "Hash")
-    assert_equal(res.inspect, "{8=>\"x\", \"u\"=>42}")
+    assert_equal(res.inspect, {8=>"x", "u"=>42}.inspect)
 
   end
 

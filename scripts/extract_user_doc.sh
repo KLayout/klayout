@@ -54,7 +54,14 @@ for qt in 5 4; do
   export KLAYOUT_HOME=$bin
 
   rm -f $bin/help-index.xml
-  $bin/klayout -rx -b -rd "target_doc=$target_doc" -rd "target_info=$info" -rd "qt=$qt" -r $inst_dir/extract_user_doc.rb
+  $bin/klayout -rx -b \
+    -rd "klayout_version=$KLAYOUT_VERSION" \
+    -rd "klayout_version_rev=$KLAYOUT_VERSION_REV" \
+    -rd "klayout_version_date=$KLAYOUT_VERSION_DATE" \
+    -rd "target_doc=$target_doc" \
+    -rd "target_info=$info" \
+    -rd "qt=$qt" \
+    -r $inst_dir/extract_user_doc.rb
 
   # just big:
   # mv $bin/help-index.xml $target_doc/help-index.data

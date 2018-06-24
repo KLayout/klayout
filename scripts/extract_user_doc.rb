@@ -25,10 +25,10 @@ def xml2html(t)
 end
 
 title = "KLayout "
-title += (ENV["KLAYOUT_VERSION"] || "$version") + " "
+title += ($klayout_version || "$version") + " "
 title += "("
-title += (ENV["KLAYOUT_VERSION_DATE"] || "$date") + " "
-title += (ENV["KLAYOUT_VERSION_REV"] || "$rev")
+title += ($klayout_version_date || "$date") + " "
+title += ($klayout_version_rev || "$rev")
 title += ") "
 title += ($target_info && $target_info != "" ? "[#{$target_info}] " : "") 
 

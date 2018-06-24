@@ -1,11 +1,9 @@
 
 @Library("osconfig") _
 
+//  from shared library
+target = osconfig()
 
-//  a test ...
-osconfig()
-
-target = params.platform
 currentBuild.description = "Pipelined "+target
 
 node("master") {
@@ -46,6 +44,12 @@ cp ${work_dir}/RPMS/*/*.rpm ${target_dir}
     stage("Publish and test")
         
     parallel(
+    "Publish": {
+
+      //  from shared library
+      publish(target)
+
+    },
     "Unit testing": {
             
         withDockerContainer(image: "jenkins-${target}") {

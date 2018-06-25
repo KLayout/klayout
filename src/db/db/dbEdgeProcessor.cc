@@ -155,7 +155,7 @@ is_point_on_fuzzy (const db::Edge &e, const db::Point &pt)
     if (a1 < 0) { a1 = -a1; }
     area_type a2 = db::vprod (offset, e.d ());
     if (a2 < 0) { a2 = -a2; }
-    return a1 <= a2;
+    return a1 < a2;
 
   }
 }
@@ -1345,32 +1345,17 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 #endif
 
                   //  The new cutpoint must be inserted into other edges as well.
-                  //  If the cutpoint is exactly on the edge and there is just one other edge
-                  //  the cutpoint will be a weak attractor - that is an optional cutpoint.
-                  //  In that case we can skip the cutpoint because no related edge will move.
                   ip_weak.clear ();
-                  size_t n_off_edge = on_edge1 ? 0 : 1;
                   for (std::vector <WorkEdge>::iterator cc = c; cc != f; ++cc) {
                     if ((with_h || cc->dy () != 0) && cc != c1 && cc != c2 && is_point_on_fuzzy (*cc, cp.second)) {
                       ip_weak.push_back (&*cc);
-                      if (!is_point_on_exact (*cc, cp.second)) {
-                        ++n_off_edge;
-                      }
                     }
                   }
                   for (std::vector <WorkEdge *>::iterator icc = ip_weak.begin (); icc != ip_weak.end (); ++icc) {
-                    if (n_off_edge > 1) {
-                      (*icc)->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, true);
+                    (*icc)->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, true);
 #ifdef DEBUG_EDGE_PROCESSOR
-                      printf ("intersection point %s gives cutpoint in %s.\n", cp.second.to_string ().c_str (), (*icc)->to_string ().c_str ());
+                    printf ("intersection point %s gives cutpoint in %s.\n", cp.second.to_string ().c_str (), (*icc)->to_string ().c_str ());
 #endif
-                    } else {
-                      CutPoints *cpp = (*icc)->make_cutpoints (cutpoints);
-                      cpp->add_attractor (cp.second, (*icc)->data - 1);
-#ifdef DEBUG_EDGE_PROCESSOR
-                      printf ("intersection point %s gives weak attractor in %s.\n", cp.second.to_string ().c_str (), (*icc)->to_string ().c_str ());
-#endif
-                    }
                   }
 
                 }
@@ -1435,38 +1420,17 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 #endif
 
                 //  The new cutpoint must be inserted into other edges as well.
-                //  If the cutpoint is exactly on the edge and there is just one other edge
-                //  the cutpoint will be a weak attractor - that is an optional cutpoint.
-                //  In that case we can skip the cutpoint because no related edge will move.
                 ip_weak.clear ();
-                size_t n_off_edge = 0;
-                if (!on_edge1) {
-                  n_off_edge += 1;
-                }
-                if (!on_edge2) {
-                  n_off_edge += 1;
-                }
                 for (std::vector <WorkEdge>::iterator cc = c; cc != f; ++cc) {
                   if ((with_h || cc->dy () != 0) && cc != c1 && cc != c2 && is_point_on_fuzzy (*cc, cp.second)) {
                     ip_weak.push_back (&*cc);
-                    if (!is_point_on_exact (*cc, cp.second)) {
-                      ++n_off_edge;
-                    }
                   }
                 }
                 for (std::vector <WorkEdge *>::iterator icc = ip_weak.begin (); icc != ip_weak.end (); ++icc) {
-                  if (n_off_edge > 1) {
-                    (*icc)->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, true);
+                  (*icc)->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, true);
 #ifdef DEBUG_EDGE_PROCESSOR
-                    printf ("intersection point %s gives cutpoint in %s.\n", cp.second.to_string ().c_str (), (*icc)->to_string ().c_str ()); 
+                  printf ("intersection point %s gives cutpoint in %s.\n", cp.second.to_string ().c_str (), (*icc)->to_string ().c_str ());
 #endif
-                  } else {
-                    CutPoints *cpp = (*icc)->make_cutpoints (cutpoints);
-                    cpp->add_attractor (cp.second, (*icc)->data - 1);
-#ifdef DEBUG_EDGE_PROCESSOR
-                    printf ("intersection point %s gives weak attractor in %s.\n", cp.second.to_string ().c_str (), (*icc)->to_string ().c_str ()); 
-#endif
-                  }
                 }
 
               }

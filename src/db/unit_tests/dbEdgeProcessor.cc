@@ -25,6 +25,7 @@
 
 #include "dbShapeProcessor.h"
 #include "dbPolygon.h"
+#include "dbPolygonGenerators.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbCommonReader.h"
@@ -1390,15 +1391,29 @@ TEST(24)
     in1.back ().assign_hull (p1 + 0, p1 + sizeof (p1) / sizeof (p1[0]));
   }
 
-  std::vector<db::Polygon> out;
+  {
+    std::vector<db::Polygon> out;
 
-  db::EdgeProcessor ep;
-  ep.simple_merge (in1, out, false, false);
+    db::EdgeProcessor ep;
+    ep.simple_merge (in1, out, false, false);
 
-  EXPECT_EQ (out.size (), size_t (2));
-  std::sort (out.begin (), out.end ());
-  EXPECT_EQ (out[0].to_string (), "(0,-9;0,0;3,0;3,-2;1,0;1,-9)");
-  EXPECT_EQ (out[1].to_string (), "(-2,1;-2,3;0,1;0,10;1,10;1,1)");
+    EXPECT_EQ (out.size (), size_t (1));
+    std::sort (out.begin (), out.end ());
+    EXPECT_EQ (out[0].to_string (), "(0,-9;0,0;-2,1;-2,3;0,1;0,10;1,10;1,1;3,0;3,-2;1,0;1,-9/1,0;1,1;0,1)");
+  }
+
+  {
+    std::vector<db::Polygon> out;
+
+    db::EdgeProcessor ep;
+    ep.simple_merge (in1, out, false, true);
+
+    EXPECT_EQ (out.size (), size_t (3));
+    std::sort (out.begin (), out.end ());
+    EXPECT_EQ (out[0].to_string (), "(0,-9;0,0;-2,1;-2,3;1,0;1,-9)");
+    EXPECT_EQ (out[1].to_string (), "(3,-2;1,0;1,1;3,0)");
+    EXPECT_EQ (out[2].to_string (), "(0,1;0,10;1,10;1,1)");
+  }
 }
 
 TEST(25)
@@ -2347,4 +2362,29 @@ TEST(102)
 
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out[0].to_string (), "(0,0;0,200;100,200;100,100;200,100;200,200;500,200;500,100;600,100;600,200;0,200;0,1000;1000,1000;1000,0)");
+}
+
+//  Bug 134
+TEST(134)
+{
+  const char *pd = "(30,-7957;0,0;56,-4102;30,-7921)";
+
+  db::Coord dx = 0;
+  db::Coord dy = -3999;
+  unsigned int mode = 3;
+
+  db::Polygon p;
+  tl::from_string (pd, p);
+
+  db::EdgeProcessor ep;
+  db::Polygon ps (p.sized (dx, dy, mode));
+  ep.insert (ps);
+
+  db::SimpleMerge op (1 /*wc>0*/);
+  std::vector<db::Polygon> out;
+  db::PolygonContainer pc (out);
+  db::PolygonGenerator pg (pc);
+  ep.process (pg, op);
+
+  EXPECT_EQ (out.size (), size_t (0));
 }

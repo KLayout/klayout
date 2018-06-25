@@ -1,0 +1,15 @@
+
+@Library("osconfig") _
+
+node("master") {
+
+  stage("Checkout sources") {
+    checkout scm
+  }
+
+  stage("Publish sources") {
+    publish_sources(BRANCH_NAME)
+  }
+
+}
+

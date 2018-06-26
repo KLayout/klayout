@@ -206,10 +206,12 @@ if CAN_DEPLOY_PYTHON:
     else:
       raise RuntimeError("Exceeded maximum recursion depth.")
 
-  def WalkFrameworkPaths(frameworkPaths, filter_regex=r'\.(so|dylib)$'):
+  def WalkFrameworkPaths(frameworkPaths, filter_regex=r'\.(so|dylib)$', search_path_filter=r'\t+/usr/local/opt'):
 
     if isinstance(frameworkPaths, str):
       frameworkPathsIter = [frameworkPaths]
+    else:
+      frameworkPathsIter = frameworkPaths
 
     dependency_dict = dict()
 
@@ -223,7 +225,7 @@ if CAN_DEPLOY_PYTHON:
 
       dependency_dict[frameworkPath] = list()
       for idx, file in enumerate(framework_files):
-        dict_file = {file: WalkLibDependencyTree(file)}
+        dict_file = {file: WalkLibDependencyTree(file, filter_regex=search_path_filter)}
         dependency_dict[frameworkPath].append(dict_file)
     return dependency_dict
 
@@ -277,7 +279,7 @@ if CAN_DEPLOY_PYTHON:
 
     return libNameChanges
 
-  def PerformChanges(frameworkDependencyDict, replaceFromToPairs=None, executable_path="/tmp/klayout", libdir=False):
+  def PerformChanges(frameworkDependencyDict, replaceFromToPairs=None, executable_path="/tmp/klayout"):
     libNameChanges = DetectChanges(frameworkDependencyDict)
     cmdNameId = XcodeToolChain['nameID']
     cmdNameChg = XcodeToolChain['nameCH']
@@ -290,11 +292,15 @@ if CAN_DEPLOY_PYTHON:
           dependencies = next(libNameChangeIterator)
         except StopIteration:
           dependencies = list()
-        for replaceFrom, replaceTo in replaceFromToPairs:
+        for replaceFrom, replaceTo, libdir in replaceFromToPairs:
           replaceFrom = str(Path(replaceFrom))
           replaceTo = str(Path(replaceTo))
 
           fileName = ResolveExecutablePath(lib.replace(replaceFrom, replaceTo), executable_path)
+          if str(fileName).startswith('/usr'):
+            # print(f'skipping fileName: {fileName}')
+            continue
+
           if lib.find(replaceFrom) >= 0:
             if libdir:
               frameworkPath = FindFramework(lib, replaceFrom)
@@ -320,7 +326,7 @@ if CAN_DEPLOY_PYTHON:
 
           for dependency in dependencies:
             if dependency.find(replaceFrom) >= 0:
-              print("In:", fileName)
+              print("\tIn:", fileName)
               print("\tRENAME", dependency, " -> ", dependency.replace(replaceFrom, replaceTo))
 
               # Try changing id first

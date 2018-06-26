@@ -797,23 +797,41 @@ def DeployBinariesForBundle():
       os.chmod( targetDirM + "/klayout_console",      0o0755 )
 
       print("  [2] Relinking dylib dependencies inside Python.framework")
+      print("   [2.1] Patching Python Framework")
       depdict = WalkFrameworkPaths(pythonFrameworkPath)
       appPythonFrameworkPath = '@executable_path/../Frameworks/Python.framework/'
-      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath)], bundleExecPathAbs)
+      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
+      print("   [2.2] Patching /usr/local/opt/ libs")
       usrLocalPath = '/usr/local/opt/'
       appUsrLocalPath = '@executable_path/../Frameworks/'
-      depdict = WalkFrameworkPaths(pythonFrameworkPath)
-      PerformChanges(depdict, [(usrLocalPath, appUsrLocalPath)], bundleExecPathAbs, libdir=True)
+      replacePairs = [(usrLocalPath, appUsrLocalPath, True)]
+      depdict = WalkFrameworkPaths(pythonFrameworkPath, search_path_filter=r'\t+/usr/local/(opt|Cellar)')
+      PerformChanges(depdict, replacePairs, bundleExecPathAbs)
+
+      print("   [2.3] Patching openssl, gdbm, readline, sqlite, tcl-tk, xz")
+      usrLocalPath = '/usr/local/opt'
+      appUsrLocalPath = '@executable_path/../Frameworks/'
+      replacePairs = [(usrLocalPath, appUsrLocalPath, True)]
+      replacePairs.extend([(openssl_version, '@executable_path/../Frameworks/openssl', True)
+        for openssl_version in list(Path('/usr/local/Cellar/openssl').glob('*'))])
+      depdict = WalkFrameworkPaths([pythonFrameworkPath + '/../openssl',
+                                    pythonFrameworkPath + '/../gdbm',
+                                    pythonFrameworkPath + '/../readline',
+                                    pythonFrameworkPath + '/../sqlite',
+                                    pythonFrameworkPath + '/../tcl-tk',
+                                    pythonFrameworkPath + '/../xz'], search_path_filter=r'\t+/usr/local/(opt|Cellar)')
+
+      PerformChanges(depdict, replacePairs, bundleExecPathAbs)
 
       print("  [3] Relinking dylib dependencies for klayout")
       klayoutPath = bundleExecPathAbs
       depdict = WalkFrameworkPaths(klayoutPath, filter_regex=r'klayout$')
-      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath)], bundleExecPathAbs)
+      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
       libKlayoutPath = bundleExecPathAbs + '../Frameworks'
       depdict = WalkFrameworkPaths(libKlayoutPath, filter_regex=r'libklayout')
-      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath)], bundleExecPathAbs)
+      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
       print("  [4] Patching site.py, pip/, and distutils/")
       site_module = f"{pythonFrameworkPath}/Versions/3.6/lib/python3.6/site.py"

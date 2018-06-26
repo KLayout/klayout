@@ -49,7 +49,7 @@ node("master") {
             
       withDockerContainer(image: "jenkins-${target}-basic") {
         //  from shared library
-        installtest(target, target_dir)
+        installtest_nopymod(target, target_dir)
       }
 
     })

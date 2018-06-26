@@ -86,7 +86,7 @@ ConfirmationDialog::mark_fetching (const std::string &name)
     list->scrollToItem (i->second);
     for (int c = 0; c < list->columnCount (); ++c) {
       i->second->setData (c, Qt::BackgroundColorRole, QColor (224, 244, 244));
-      i->second->setData (c, Qt::TextColorRole, Qt::blue);
+      i->second->setData (c, Qt::TextColorRole, QColor (Qt::blue));
     }
     i->second->setData (1, Qt::DisplayRole, tr ("FETCHING"));
   }

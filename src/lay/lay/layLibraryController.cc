@@ -117,12 +117,10 @@ LibraryController::can_exit (lay::PluginRoot * /*root*/) const
 void
 LibraryController::sync_files ()
 {
-  if (! m_file_watcher) {
-    return;
+  if (m_file_watcher) {
+    m_file_watcher->clear ();
+    m_file_watcher->enable (false);
   }
-
-  m_file_watcher->clear ();
-  m_file_watcher->enable (false);
 
   std::map<std::string, std::pair<std::string, QDateTime> > new_lib_files;
 
@@ -158,7 +156,9 @@ LibraryController::sync_files ()
     QDir lp = QDir (tl::to_qstring (p->first)).filePath (tl::to_qstring ("libraries"));
     if (lp.exists ()) {
 
-      m_file_watcher->add_file (tl::to_string (lp.absolutePath ()));
+      if (m_file_watcher) {
+        m_file_watcher->add_file (tl::to_string (lp.absolutePath ()));
+      }
 
       QStringList name_filters;
       name_filters << QString::fromUtf8 ("*");
@@ -222,7 +222,9 @@ LibraryController::sync_files ()
 
   }
 
-  m_file_watcher->enable (true);
+  if (m_file_watcher) {
+    m_file_watcher->enable (true);
+  }
 
   //  remove libraries which are no longer present
 

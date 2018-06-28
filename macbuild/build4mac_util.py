@@ -200,24 +200,24 @@ if CAN_DEPLOY_PYTHON:
           lib = str(Path(lib))
           if lib != list(keys)[0]:
             deplibs[idx] = WalkLibDependencyTree(lib, depth+1, filter_regex)
-      else:
-        return NOTHINGTODO
       if depth == 0:
         return deplibs
       return exedepdic
     else:
       raise RuntimeError("Exceeded maximum recursion depth.")
 
-  def WalkFrameworkPaths(frameworkPaths, filter_regex=r'\.(so|dylib)$'):
-    try:
-      frameworkPathsIter = iter(frameworkPaths)
-    except TypeError:
+  def WalkFrameworkPaths(frameworkPaths, filter_regex=r'\.(so|dylib)$', search_path_filter=r'\t+/usr/local/opt'):
+
+    if isinstance(frameworkPaths, str):
       frameworkPathsIter = [frameworkPaths]
+    else:
+      frameworkPathsIter = frameworkPaths
 
     dependency_dict = dict()
 
-    for frameworkPath in frameworkPaths:
+    for frameworkPath in frameworkPathsIter:
       frameworkPath = str(Path(frameworkPath))
+      # print("Calling:", 'find %s -type f | grep -E "%s"' % (frameworkPath, filter_regex))
       find_grep_results = os.popen('find %s -type f | grep -E "%s"' % (frameworkPath, filter_regex)).read().split('\n')
       framework_files = filter(lambda x: x != '',
                             map(lambda x: x.strip(),
@@ -225,7 +225,7 @@ if CAN_DEPLOY_PYTHON:
 
       dependency_dict[frameworkPath] = list()
       for idx, file in enumerate(framework_files):
-        dict_file = {file: WalkLibDependencyTree(file)}
+        dict_file = {file: WalkLibDependencyTree(file, filter_regex=search_path_filter)}
         dependency_dict[frameworkPath].append(dict_file)
     return dependency_dict
 
@@ -263,14 +263,11 @@ if CAN_DEPLOY_PYTHON:
     relPath = path.relative_to(root_path)
     return str(root_path / relPath.parts[0])
 
-  def ReplaceExecutablePath(path, executable_path):
+  def ResolveExecutablePath(path, executable_path):
+    """ Transforms @executable_path into executable_path"""
     executable_path = str(executable_path)
     p = Path(str(path).replace("@executable_path", "/%s/" % executable_path))
     return p
-
-  def FileExists(file_path, executable_path):
-    p = ReplaceExecutablePath(file_path, executable_path)
-    return p.exists()
 
   def DetectChanges(frameworkDependencyDict):
     visited_files = list()
@@ -282,7 +279,7 @@ if CAN_DEPLOY_PYTHON:
 
     return libNameChanges
 
-  def PerformChanges(frameworkDependencyDict, replaceFromToPairs=None, executable_path="/tmp/klayout", libdir=False):
+  def PerformChanges(frameworkDependencyDict, replaceFromToPairs=None, executable_path="/tmp/klayout"):
     libNameChanges = DetectChanges(frameworkDependencyDict)
     cmdNameId = XcodeToolChain['nameID']
     cmdNameChg = XcodeToolChain['nameCH']
@@ -295,9 +292,14 @@ if CAN_DEPLOY_PYTHON:
           dependencies = next(libNameChangeIterator)
         except StopIteration:
           dependencies = list()
-        for replaceFrom, replaceTo in replaceFromToPairs:
+        for replaceFrom, replaceTo, libdir in replaceFromToPairs:
           replaceFrom = str(Path(replaceFrom))
           replaceTo = str(Path(replaceTo))
+
+          fileName = ResolveExecutablePath(lib.replace(replaceFrom, replaceTo), executable_path)
+          if str(fileName).startswith('/usr'):
+            # print(f'skipping fileName: {fileName}')
+            continue
 
           if lib.find(replaceFrom) >= 0:
             if libdir:
@@ -305,27 +307,26 @@ if CAN_DEPLOY_PYTHON:
             else:
               frameworkPath = lib
             destFrameworkPath = frameworkPath.replace(replaceFrom, replaceTo)
-            destFrameworkPath = ReplaceExecutablePath(destFrameworkPath, executable_path)
-            if not FileExists(lib.replace(replaceFrom, replaceTo), executable_path):
+            destFrameworkPath = ResolveExecutablePath(destFrameworkPath, executable_path)
+
+            if not fileName.exists():
               print (lib.replace(replaceFrom, replaceTo), "DOES NOT EXIST")
               print ("COPY", frameworkPath, " -> ", destFrameworkPath)
               shutil.copytree(frameworkPath, destFrameworkPath)
 
-            fileName = ReplaceExecutablePath(lib.replace(replaceFrom, replaceTo), executable_path)
             nameId = lib.replace(replaceFrom, replaceTo)
             command = "%s %s %s" % ( cmdNameId, nameId, fileName )
             if not os.access(fileName, os.W_OK):
               command = "chmod u+w %s; %s; chmod u-w %s" % (fileName, command, fileName)
-            print("\t%s" % command)
+            # print("\t%s" % command)
             if subprocess.call( command, shell=True ) != 0:
               msg = "!!! Failed to set the new identification name to <%s> !!!"
               print( msg % fileName, file=sys.stderr )
               return 1
 
-          fileName = ReplaceExecutablePath(lib.replace(replaceFrom, replaceTo), executable_path)
           for dependency in dependencies:
             if dependency.find(replaceFrom) >= 0:
-              print("In:", fileName)
+              print("\tIn:", fileName)
               print("\tRENAME", dependency, " -> ", dependency.replace(replaceFrom, replaceTo))
 
               # Try changing id first
@@ -333,7 +334,7 @@ if CAN_DEPLOY_PYTHON:
               command = "%s %s %s" % ( cmdNameId, nameId, fileName )
               if not os.access(fileName, os.W_OK):
                 command = "chmod u+w %s; %s; chmod u-w %s" % (fileName, command, fileName)
-              print("\t%s" % command)
+              # print("\t%s" % command)
               if subprocess.call( command, shell=True ) != 0:
                 msg = "!!! Failed to set the new identification name to <%s> !!!"
                 print( msg % fileName, file=sys.stderr )
@@ -346,7 +347,7 @@ if CAN_DEPLOY_PYTHON:
               if not os.access(fileName, os.W_OK):
                 command = "chmod u+w %s; %s; chmod u-w %s" % (fileName, command, fileName)
 
-              print("\t%s" % command)
+              # print("\t%s" % command)
               if subprocess.call( command, shell=True ) != 0:
                 msg = "!!! Failed to set the new identification name to <%s> !!!"
                 print( msg % fileName, file=sys.stderr )

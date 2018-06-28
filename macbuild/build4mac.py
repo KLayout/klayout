@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #===============================================================================
@@ -538,8 +538,8 @@ def DeployBinariesForBundle():
   if not DeploymentF and not DeploymentP:
     return 1
   if DeploymentF and NonOSStdLang:
-    print( "WARNING!!! You chose <-y|--deploy> while using non-OS-standard script language.", file=sys.stderr )
-    print( "    Use <-Y|--DEPLOY> instead", file=sys.stderr )
+    print( "     WARNING!!! You chose <-y|--deploy> while using non-OS-standard script language.", file=sys.stderr )
+    print( "         Consider using <-Y|--DEPLOY> instead", file=sys.stderr )
     #return 1
   if not os.path.isfile(MacBuildLog):
     print( "!!! Build log file <%s> does not present !!!" % MacBuildLog, file=sys.stderr )
@@ -756,7 +756,6 @@ def DeployBinariesForBundle():
     os.chdir(ProjectDir)
     os.chdir(MacPkgDir)
     command = "%s %s %s" % ( deploytool, app_bundle, options )
-    print(command)
     if subprocess.call( command, shell=True ) != 0:
       msg = "!!! Failed to deploy applications on OSX !!!"
       print( msg, file=sys.stderr )
@@ -764,43 +763,112 @@ def DeployBinariesForBundle():
       os.chdir(ProjectDir)
       return 1
 
-    deploymentPython = False
-    if deploymentPython:
-      # TODO Code incomplete! To be finished.
-      from macbuild.build4mac_util import WalkFrameworkPaths, PerformChanges, DetectChanges
+    deploymentPython = True
+    if deploymentPython and NonOSStdLang:
+      from build4mac_util import WalkFrameworkPaths, PerformChanges, DetectChanges
+      from pathlib import Path
 
-      bundlePath = 'qt5.pkg.macos-HighSierra-release/klayout.app'
-      bundleExecPathAbs = os.getcwd() + '/%s/Contents/MacOS/' % bundlePath
-
-      # rsync -a --safe-links /usr/local/opt/python/Frameworks/Python.framework/ qt5.pkg.macos-HighSierra-release/klayout.app/Contents/Frameworks/Python.framework
-      # cp -RL /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages qt5.pkg.macos-HighSierra-release/klayout.app/Contents/Frameworks/Python.framework/Versions/3.6/lib/python3.6/
-      # rm -rf qt5.pkg.macos-HighSierra-release/klayout.app/Contents/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/test
-
-      pythonFrameworkPath = '%s/Contents/Frameworks/Python.framework' % bundlePath
-      depdict = WalkFrameworkPaths(pythonFrameworkPath)
-
+      bundlePath = AbsMacPkgDir + '/klayout.app'
+      # bundlePath = os.getcwd() + '/qt5.pkg.macos-HighSierra-release/klayout.app'
+      bundleExecPathAbs = '%s/Contents/MacOS/' % bundlePath
       pythonOriginalFrameworkPath = '/usr/local/opt/python/Frameworks/Python.framework'
+      pythonFrameworkPath = '%s/Contents/Frameworks/Python.framework' % bundlePath
+
+      print(f" [8.1] Deploying Python from {pythonOriginalFrameworkPath} ..." )
+      print("  [1] Copying Python Framework")
+      shell_commands = list()
+      shell_commands.append(f"rm -rf {pythonFrameworkPath}")
+      shell_commands.append(f"rsync -a --safe-links {pythonOriginalFrameworkPath}/ {pythonFrameworkPath}")
+      shell_commands.append(f"mkdir {pythonFrameworkPath}/Versions/3.6/lib/python3.6/site-packages/")
+      shell_commands.append(f"cp -RL {pythonOriginalFrameworkPath}/Versions/3.6/lib/python3.6/site-packages/{{pip*,pkg_resources,setuptools*,wheel*}} " +
+                            f"{pythonFrameworkPath}/Versions/3.6/lib/python3.6/site-packages/")
+      shell_commands.append(f"rm -rf {pythonFrameworkPath}/Versions/3.6/lib/python3.6/test")
+      shell_commands.append(f"rm -rf {pythonFrameworkPath}/Versions/3.6/Resources")
+      shell_commands.append(f"rm -rf {pythonFrameworkPath}/Versions/3.6/bin")
+
+      for command in shell_commands:
+        if subprocess.call( command, shell=True ) != 0:
+          msg = "command failed: %s"
+          print( msg % command, file=sys.stderr )
+          exit(1)
+
+      shutil.copy2( sourceDir2 + "/start-console.py", targetDirM )
+      shutil.copy2( sourceDir2 + "/klayout_console", targetDirM )
+      os.chmod( targetDirM + "/klayout_console",      0o0755 )
+
+      print("  [2] Relinking dylib dependencies inside Python.framework")
+      print("   [2.1] Patching Python Framework")
+      depdict = WalkFrameworkPaths(pythonFrameworkPath)
       appPythonFrameworkPath = '@executable_path/../Frameworks/Python.framework/'
-      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath)], bundleExecPathAbs)
+      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
-      klayoutPath = bundleExecPathAbs
-      depdict = WalkFrameworkPaths(klayoutPath, filter_regex=r'klayout$')
-      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath)], bundleExecPathAbs)
-
-      klayoutPath = bundleExecPathAbs + '../Frameworks'
-      depdict = WalkFrameworkPaths(klayoutPath, filter_regex=r'libklayout')
-      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath)], bundleExecPathAbs)
-
-
+      print("   [2.2] Patching /usr/local/opt/ libs")
       usrLocalPath = '/usr/local/opt/'
       appUsrLocalPath = '@executable_path/../Frameworks/'
-      depdict = WalkFrameworkPaths(pythonFrameworkPath)
-      PerformChanges(depdict, [(usrLocalPath, appUsrLocalPath)], bundleExecPathAbs)
+      replacePairs = [(usrLocalPath, appUsrLocalPath, True)]
+      depdict = WalkFrameworkPaths(pythonFrameworkPath, search_path_filter=r'\t+/usr/local/(opt|Cellar)')
+      PerformChanges(depdict, replacePairs, bundleExecPathAbs)
 
-      # usrLocalPath = '/usr/local/lib/'
-      # appUsrLocalPath = '@executable_path/../Frameworks/'
-      # depdict = WalkFrameworkPaths(pythonFrameworkPath)
-      # PerformChanges(depdict, [(usrLocalPath, appUsrLocalPath)], bundleExecPathAbs)
+      print("   [2.3] Patching openssl, gdbm, readline, sqlite, tcl-tk, xz")
+      usrLocalPath = '/usr/local/opt'
+      appUsrLocalPath = '@executable_path/../Frameworks/'
+      replacePairs = [(usrLocalPath, appUsrLocalPath, True)]
+      replacePairs.extend([(openssl_version, '@executable_path/../Frameworks/openssl', True)
+        for openssl_version in list(Path('/usr/local/Cellar/openssl').glob('*'))])
+      depdict = WalkFrameworkPaths([pythonFrameworkPath + '/../openssl',
+                                    pythonFrameworkPath + '/../gdbm',
+                                    pythonFrameworkPath + '/../readline',
+                                    pythonFrameworkPath + '/../sqlite',
+                                    pythonFrameworkPath + '/../tcl-tk',
+                                    pythonFrameworkPath + '/../xz'], search_path_filter=r'\t+/usr/local/(opt|Cellar)')
+
+      PerformChanges(depdict, replacePairs, bundleExecPathAbs)
+
+      print("  [3] Relinking dylib dependencies for klayout")
+      klayoutPath = bundleExecPathAbs
+      depdict = WalkFrameworkPaths(klayoutPath, filter_regex=r'klayout$')
+      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+
+      libKlayoutPath = bundleExecPathAbs + '../Frameworks'
+      depdict = WalkFrameworkPaths(libKlayoutPath, filter_regex=r'libklayout')
+      PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+
+      print("  [4] Patching site.py, pip/, and distutils/")
+      site_module = f"{pythonFrameworkPath}/Versions/3.6/lib/python3.6/site.py"
+      with open(site_module, 'r') as site:
+        buf = site.readlines()
+      with open(site_module, 'w') as site:
+        import re
+        for line in buf:
+          # This will fool pip into thinking it's inside a virtual environment
+          # and install new packates to the correct site-packages
+          if re.match("^PREFIXES", line) is not None:
+            line = line + "sys.real_prefix = sys.prefix\n"
+          # do not allow installation in the user folder.
+          if re.match("^ENABLE_USER_SITE", line) is not None:
+            line = "ENABLE_USER_SITE = False\n"
+          site.write(line)
+
+      pip_module = f"{pythonFrameworkPath}/Versions/3.6/lib/python3.6/site-packages/pip/__init__.py"
+      with open(pip_module, 'r') as pip:
+        buf = pip.readlines()
+      with open(pip_module, 'w') as pip:
+        import re
+        for line in buf:
+          # this will reject user's configuration of pip, forcing the isolated mode
+          line = re.sub("return isolated$", "return isolated or True", line)
+          pip.write(line)
+
+      distutilsconfig = f"{pythonFrameworkPath}/Versions/3.6/lib/python3.6/distutils/distutils.cfg"
+      with open(distutilsconfig, 'r') as file:
+        buf = file.readlines()
+      with open(distutilsconfig, 'w') as file:
+        import re
+        for line in buf:
+          # This will cause all packages to be installed to sys.prefix
+          if re.match('prefix=', line) is not None:
+            continue
+          file.write(line)
 
   else:
     print( " [8] Skipped deploying Qt's Frameworks ..." )

@@ -270,7 +270,7 @@ MarkerBase::set_line_style (int line_style)
   }
 }
 
-void 
+void
 MarkerBase::get_bitmaps (const Viewport & /*vp*/, ViewObjectCanvas &canvas, lay::CanvasPlane *&fill, lay::CanvasPlane *&contour, lay::CanvasPlane *&vertex, lay::CanvasPlane *&text)
 {
   double resolution = canvas.resolution ();

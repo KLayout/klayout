@@ -1063,6 +1063,19 @@ public:
   }
 
   /**
+   *  @brief Show or hide markers
+   */
+  void show_markers (bool f);
+
+  /**
+   *  @brief "show_markers" property getter
+   */
+  bool show_markers () const
+  {
+    return m_show_markers;
+  }
+
+  /**
    *  @brief Don't show stipples
    */
   void no_stipples (bool f);
@@ -2671,6 +2684,7 @@ private:
   bool m_apply_text_trans;
   double m_default_text_size;
   unsigned int m_text_font;
+  bool m_show_markers;
   bool m_no_stipples;
   bool m_stipple_offset;
 

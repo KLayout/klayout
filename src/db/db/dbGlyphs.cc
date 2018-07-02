@@ -26,10 +26,12 @@
 #include "dbEdgeProcessor.h"
 #include "dbReader.h"
 #include "tlStream.h"
+#include "tlFileUtils.h"
 
-#include <QDir>
-#include <QResource>
-#include <QByteArray>
+#if defined(HAVE_QT)
+#  include <QResource>
+#  include <QByteArray>
+#endif
 
 #include <cctype>
 
@@ -141,6 +143,7 @@ TextGenerator::text_as_region (const std::string &t, double target_dbu, double m
   return region;
 }
 
+#if defined(HAVE_QT)
 void
 TextGenerator::load_from_resource (const std::string &name)
 {
@@ -169,6 +172,7 @@ TextGenerator::load_from_resource (const std::string &name)
 
   m_name = tl::to_string (QFileInfo (tl::to_qstring (name)).baseName ());
 }
+#endif
 
 void
 TextGenerator::load_from_file (const std::string &filename)
@@ -188,7 +192,7 @@ TextGenerator::load_from_file (const std::string &filename)
     read_from_layout (layout, l1.second, l2.second, l3.second);
   }
 
-  m_name = tl::to_string (QFileInfo (tl::to_qstring (filename)).baseName ());
+  m_name = tl::basename (filename);
 }
 
 void
@@ -318,6 +322,7 @@ TextGenerator::generators ()
 
     s_fonts.clear ();
 
+#if defined(HAVE_QT)
     const char *resources[] = {
       ":/fonts/std_font.gds"
     };
@@ -332,23 +337,21 @@ TextGenerator::generators ()
         s_fonts.pop_back ();
       }
     }
+#endif
 
     //  scan for font files
     for (std::vector<std::string>::const_iterator p = s_font_paths.begin (); p != s_font_paths.end (); ++p) {
 
-      QDir fp = QDir (tl::to_qstring (*p));
-      if (fp.exists ()) {
+      if (tl::file_exists (*p)) {
 
-        QStringList name_filters;
-        name_filters << QString::fromUtf8 ("*");
-
-        QStringList font_files = fp.entryList (name_filters, QDir::Files);
-        for (QStringList::const_iterator ff = font_files.begin (); ff != font_files.end (); ++ff) {
+        std::vector<std::string> font_files = tl::dir_entries (*p, true, false, true);
+        for (std::vector<std::string>::const_iterator ff = font_files.begin (); ff != font_files.end (); ++ff) {
 
           try {
-            tl::log << "Loading font from " << tl::to_string (fp.filePath (*ff)) << " ..";
+            std::string ffp = tl::combine_path (*p, *ff);
+            tl::log << "Loading font from " << ffp << " ..";
             s_fonts.push_back (TextGenerator ());
-            s_fonts.back ().load_from_file (tl::to_string (fp.filePath (*ff)));
+            s_fonts.back ().load_from_file (ffp);
           } catch (tl::Exception &ex) {
             tl::error << ex.msg ();
             s_fonts.pop_back ();

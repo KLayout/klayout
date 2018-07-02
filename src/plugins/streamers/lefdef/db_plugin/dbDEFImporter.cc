@@ -65,7 +65,7 @@ DEFImporter::get_orient (bool optional)
   } else if (optional) {
     return db::FTrans (db::FTrans::r0);
   } else {
-    error (tl::to_string (QObject::tr ("Invalid orientation specification: ")) + get ());
+    error (tl::to_string (tr ("Invalid orientation specification: ")) + get ());
     return db::FTrans (db::FTrans::r0);
   }
 }
@@ -576,7 +576,7 @@ DEFImporter::do_read (db::Layout &layout)
                 if (test ("RECT")) {
 
                   if (! test ("(")) {
-                    error (tl::to_string (QObject::tr ("RECT routing specification not followed by coordinate list")));
+                    error (tl::to_string (tr ("RECT routing specification not followed by coordinate list")));
                   }
 
                   //  breaks wiring
@@ -1016,7 +1016,7 @@ DEFImporter::do_read (db::Layout &layout)
               db::CellInstArray inst (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), d));
               instances.push_back (std::make_pair (inst_name, inst));
             } else {
-              warn (tl::to_string (QObject::tr ("Macro not found in LEF file: ")) + model);
+              warn (tl::to_string (tr ("Macro not found in LEF file: ")) + model);
             }
 
           } else {
@@ -1208,7 +1208,7 @@ DEFImporter::do_read (db::Layout &layout)
 
         std::map<std::string, std::vector<db::Polygon> >::const_iterator r = regions.find (g->region_name);
         if (r == regions.end ()) {
-          warn (tl::to_string (QObject::tr ("Not a valid region name: %1 in group %2").arg (tl::to_qstring (g->region_name).arg (tl::to_qstring (g->name)))));
+          warn (tl::sprintf (tl::to_string (tr ("Not a valid region name: %s in group %s")), g->region_name, g->name));
         } else {
           std::pair <bool, unsigned int> dl = open_layer (layout, std::string (), Region);
           if (dl.first) {

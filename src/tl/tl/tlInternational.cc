@@ -100,13 +100,17 @@ void initialize_codecs ()
 
 std::string system_to_string (const std::string &s)
 {
-  //  TODO: this fallback implementation assumes the system encoding is UTF-8
-  return s;
+  return tl::to_string_from_local (s.c_str ());
 }
 
 std::string string_to_system (const std::string &s)
 {
-  //  TODO: this fallback implementation assumes the system encoding is UTF-8
+  return tl::to_local (s);
+}
+
+std::string tr (const char *s)
+{
+  //  TODO: this is a fallback implementation without translation
   return std::string (s);
 }
 

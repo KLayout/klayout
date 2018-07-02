@@ -146,23 +146,23 @@ BasicStrokedPolygon::get_parameter_declarations () const
   tl_assert (parameters.size () == p_layer);
   parameters.push_back (db::PCellParameterDeclaration ("layer"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_layer);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Layer")));
+  parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
   //  parameter #1: radius 
   tl_assert (parameters.size () == p_radius);
   parameters.push_back (db::PCellParameterDeclaration ("radius"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Radius")));
+  parameters.back ().set_description (tl::to_string (tr ("Radius")));
   parameters.back ().set_default (0.0);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
   //  parameter #2: width 
   tl_assert (parameters.size () == p_width);
   parameters.push_back (db::PCellParameterDeclaration ("width"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Width")));
+  parameters.back ().set_description (tl::to_string (tr ("Width")));
   parameters.back ().set_default (0.1);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
   //  parameter #3: handle 
   tl_assert (parameters.size () == p_shape);
@@ -181,7 +181,7 @@ BasicStrokedPolygon::get_parameter_declarations () const
   tl_assert (parameters.size () == p_npoints);
   parameters.push_back (db::PCellParameterDeclaration ("npoints"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_int);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Number of points / full circle.")));
+  parameters.back ().set_description (tl::to_string (tr ("Number of points / full circle.")));
   parameters.back ().set_default (64);
 
   return parameters;

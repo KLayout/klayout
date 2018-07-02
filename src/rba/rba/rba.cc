@@ -33,6 +33,7 @@
 #include "tlLog.h"
 #include "tlTimer.h"
 #include "tlExpression.h"
+#include "tlFileUtils.h"
 
 #include "rba.h"
 #include "rbaInspector.h"
@@ -47,12 +48,6 @@
 #include <iostream>
 #include <cctype>
 #include <algorithm>
-
-#include <QString>
-#include <QByteArray>
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
 
 #if !defined(HAVE_RUBY_VERSION_CODE)
 #  define HAVE_RUBY_VERSION_CODE 10901
@@ -311,7 +306,7 @@ private:
           break;
 
         } else {
-          throw tl::Exception (tl::to_string (QObject::tr ("An event needs a block")));
+          throw tl::Exception (tl::to_string (tr ("An event needs a block")));
         }
 
       } else if ((*m)->is_callback()) {
@@ -350,7 +345,7 @@ private:
         nargs_s += tl::to_string (*na);
       }
 
-      throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Invalid number of arguments (got %d, expected %s)")), argc, nargs_s));
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid number of arguments (got %d, expected %s)")), argc, nargs_s));
 
     }
 
@@ -418,15 +413,15 @@ private:
     }
 
     if (! meth) {
-      throw tl::Exception (tl::to_string (QObject::tr ("No overload with matching arguments")));
+      throw tl::Exception (tl::to_string (tr ("No overload with matching arguments")));
     }
 
     if (candidates > 1) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Ambiguous overload variants - multiple method declarations match arguments")));
+      throw tl::Exception (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments")));
     }
 
     if (is_const && ! meth->is_const ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Cannot call non-const method on a const reference")));
+      throw tl::Exception (tl::to_string (tr ("Cannot call non-const method on a const reference")));
     }
 
     return meth;
@@ -670,20 +665,20 @@ struct RubyInterpreterPrivateData
 #define RBA_CATCH(where) \
     } catch (std::exception &ex) { \
       __eclass = rb_eRuntimeError; \
-      __error_msg = rb_str_new2 ((std::string(ex.what ()) + tl::to_string (QObject::tr (" in ")) + (where)).c_str ()); \
+      __error_msg = rb_str_new2 ((std::string(ex.what ()) + tl::to_string (tr (" in ")) + (where)).c_str ()); \
     } catch (tl::ExitException &ex) { \
       __estatus = ex.status (); \
       __eclass = rb_eSystemExit; \
-      __error_msg = rb_str_new2 ((ex.msg () + tl::to_string (QObject::tr (" in ")) + (where)).c_str ()); \
+      __error_msg = rb_str_new2 ((ex.msg () + tl::to_string (tr (" in ")) + (where)).c_str ()); \
     } catch (rba::RubyError &ex) { \
       __eclass = rb_eRuntimeError; \
       __exc = ex.exc (); \
     } catch (tl::Exception &ex) { \
       __eclass = rb_eRuntimeError; \
-      __error_msg = rb_str_new2 ((ex.msg () + tl::to_string (QObject::tr (" in ")) + (where)).c_str ()); \
+      __error_msg = rb_str_new2 ((ex.msg () + tl::to_string (tr (" in ")) + (where)).c_str ()); \
     } catch (...) { \
       __eclass = rb_eRuntimeError; \
-      __error_msg = rb_str_new2 ((tl::to_string (QObject::tr ("Unspecific exception in ")) + (where)).c_str ()); \
+      __error_msg = rb_str_new2 ((tl::to_string (tr ("Unspecific exception in ")) + (where)).c_str ()); \
     } \
   } \
   if (__exc != Qnil) { \
@@ -777,10 +772,10 @@ assign (VALUE self, VALUE src)
   void *obj_self = p->obj ();
 
   if (cls_decl_src != cls_decl_self) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Type is not identical on copy")));
+    throw tl::Exception (tl::to_string (tr ("Type is not identical on copy")));
   } 
   if (! cls_decl_self->can_copy ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("No assignment provided for class '%s'")), cls_decl_self->name ());
+    throw tl::Exception (tl::to_string (tr ("No assignment provided for class '%s'")), cls_decl_self->name ());
   }
   cls_decl_self->assign (obj_self, obj_src);
 
@@ -1823,7 +1818,7 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
           QFileInfo fi (inst_dir.absoluteFilePath (tl::to_qstring(".ruby-paths.txt")));
           if (fi.exists ()) {
 
-            tl::log << tl::to_string (QObject::tr ("Reading Ruby path from ")) << tl::to_string (fi.filePath ());
+            tl::log << tl::to_string (tr ("Reading Ruby path from ")) << tl::to_string (fi.filePath ());
 
             QFile paths_txt (fi.filePath ());
             paths_txt.open (QIODevice::ReadOnly);
@@ -1845,9 +1840,9 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
         }
 
       } catch (tl::Exception &ex) {
-        tl::error << tl::to_string (QObject::tr ("Evaluation of Ruby path expression failed")) << ": " << ex.msg (); 
+        tl::error << tl::to_string (tr ("Evaluation of Ruby path expression failed")) << ": " << ex.msg ();
       } catch (...) {
-        tl::error << tl::to_string (QObject::tr ("Evaluation of Ruby path expression failed"));
+        tl::error << tl::to_string (tr ("Evaluation of Ruby path expression failed"));
       }
 
 #endif
@@ -1915,8 +1910,8 @@ RubyInterpreter::ignore_next_exception ()
 void
 RubyInterpreter::add_package_location (const std::string &package_path)
 {
-  std::string path = tl::to_string (QDir (tl::to_qstring (package_path)).absoluteFilePath (QString::fromUtf8 ("ruby")));
-  if (QDir (tl::to_qstring (path)).exists () && d->package_paths.find (path) == d->package_paths.end ()) {
+  std::string path = tl::combine_path (tl::absolute_file_path (package_path), "ruby");
+  if (tl::file_exists (path) && d->package_paths.find (path) == d->package_paths.end ()) {
     d->package_paths.insert (path);
     add_path (path);
   }
@@ -2297,7 +2292,7 @@ namespace rba
 
 static void fail (const char *file, int line)
 {
-  throw tl::ScriptError (tl::to_string (QObject::tr ("Ruby support not compiled in")).c_str (), file, line, "missing_feature", std::vector<tl::BacktraceElement> ());
+  throw tl::ScriptError (tl::to_string (tr ("Ruby support not compiled in")).c_str (), file, line, "missing_feature", std::vector<tl::BacktraceElement> ());
 }
 
 RubyInterpreter::RubyInterpreter () 

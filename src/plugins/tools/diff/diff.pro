@@ -1,5 +1,6 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS = lay_plugin 
-
+!equals(HAVE_QT, "0") {
+  SUBDIRS = lay_plugin
+}

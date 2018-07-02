@@ -216,59 +216,59 @@ BasicArc::get_parameter_declarations () const
   tl_assert (parameters.size () == p_layer);
   parameters.push_back (db::PCellParameterDeclaration ("layer"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_layer);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Layer")));
+  parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
   //  parameter #1: radius 
   tl_assert (parameters.size () == p_radius1);
   parameters.push_back (db::PCellParameterDeclaration ("radius1"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Radius 1")));
+  parameters.back ().set_description (tl::to_string (tr ("Radius 1")));
   parameters.back ().set_default (0.1);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
   //  parameter #2: radius 
   tl_assert (parameters.size () == p_radius2);
   parameters.push_back (db::PCellParameterDeclaration ("radius2"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Radius 2")));
+  parameters.back ().set_description (tl::to_string (tr ("Radius 2")));
   parameters.back ().set_default (0.2);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
   //  parameter #3: start angle 
   tl_assert (parameters.size () == p_start_angle);
   parameters.push_back (db::PCellParameterDeclaration ("a1"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Start angle")));
+  parameters.back ().set_description (tl::to_string (tr ("Start angle")));
   parameters.back ().set_default (0);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("degree")));
+  parameters.back ().set_unit (tl::to_string (tr ("degree")));
 
   //  parameter #4: end angle 
   tl_assert (parameters.size () == p_end_angle);
   parameters.push_back (db::PCellParameterDeclaration ("a2"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("End angle")));
+  parameters.back ().set_description (tl::to_string (tr ("End angle")));
   parameters.back ().set_default (90);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("degree")));
+  parameters.back ().set_unit (tl::to_string (tr ("degree")));
 
   //  parameter #5: handle 1
   tl_assert (parameters.size () == p_handle1);
   parameters.push_back (db::PCellParameterDeclaration ("handle1"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
   parameters.back ().set_default (db::DPoint (0.1, 0));
-  parameters.back ().set_description (tl::to_string (QObject::tr ("S")));
+  parameters.back ().set_description (tl::to_string (tr ("S")));
 
   //  parameter #6: handle 1
   tl_assert (parameters.size () == p_handle2);
   parameters.push_back (db::PCellParameterDeclaration ("handle2"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
   parameters.back ().set_default (db::DPoint (0, 0.1));
-  parameters.back ().set_description (tl::to_string (QObject::tr ("E")));
+  parameters.back ().set_description (tl::to_string (tr ("E")));
 
   //  parameter #7: number of points 
   tl_assert (parameters.size () == p_npoints);
   parameters.push_back (db::PCellParameterDeclaration ("npoints"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_int);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Number of points")));
+  parameters.back ().set_description (tl::to_string (tr ("Number of points")));
   parameters.back ().set_default (64);
 
   //  parameter #8: used radius 1

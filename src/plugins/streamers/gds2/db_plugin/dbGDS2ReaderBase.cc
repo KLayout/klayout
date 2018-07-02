@@ -118,10 +118,10 @@ GDS2ReaderBase::finish_element ()
     } else if (rec_id == sTEXT || rec_id == sPATH || rec_id == sBOUNDARY || rec_id == sBOX || 
                rec_id == sAREF || rec_id == sSREF || rec_id == sENDSTR) {
       unget_record (rec_id);
-      warn (tl::to_string (QObject::tr ("ENDEL record expected - assuming missing ENDEL")));
+      warn (tl::to_string (tr ("ENDEL record expected - assuming missing ENDEL")));
       break;
     } else {
-      error (tl::to_string (QObject::tr ("ENDEL, PROPATTR or PROPVALUE record expected")));
+      error (tl::to_string (tr ("ENDEL, PROPATTR or PROPVALUE record expected")));
     }
 
   } 
@@ -157,10 +157,10 @@ GDS2ReaderBase::finish_element (db::PropertiesRepository &rep)
     } else if (rec_id == sTEXT || rec_id == sPATH || rec_id == sBOUNDARY || rec_id == sBOX || 
                rec_id == sAREF || rec_id == sSREF || rec_id == sENDSTR) {
       unget_record (rec_id);
-      warn (tl::to_string (QObject::tr ("ENDEL record expected - assuming missing ENDEL")));
+      warn (tl::to_string (tr ("ENDEL record expected - assuming missing ENDEL")));
       break;
     } else {
-      error (tl::to_string (QObject::tr ("ENDEL, PROPATTR or PROPVALUE record expected")));
+      error (tl::to_string (tr ("ENDEL, PROPATTR or PROPVALUE record expected")));
     }
 
   } 
@@ -241,17 +241,17 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
   //  read header
   if (get_record () != sHEADER) {
-    error (tl::to_string (QObject::tr ("HEADER record expected")));
+    error (tl::to_string (tr ("HEADER record expected")));
   }
   if (get_record () != sBGNLIB) {
-    error (tl::to_string (QObject::tr ("BGNLIB record expected")));
+    error (tl::to_string (tr ("BGNLIB record expected")));
   }
 
   unsigned int mod_time[6] = { 0, 0, 0, 0, 0, 0 };
   unsigned int access_time[6] = { 0, 0, 0, 0, 0, 0 };
   get_time (mod_time, access_time);
-  layout.add_meta_info (MetaInfo ("mod_time", tl::to_string (QObject::tr ("Modification Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", mod_time[1], mod_time[2], mod_time[0], mod_time[3], mod_time[4], mod_time[5])));
-  layout.add_meta_info (MetaInfo ("access_time", tl::to_string (QObject::tr ("Access Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", access_time[1], access_time[2], access_time[0], access_time[3], access_time[4], access_time[5])));
+  layout.add_meta_info (MetaInfo ("mod_time", tl::to_string (tr ("Modification Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", mod_time[1], mod_time[2], mod_time[0], mod_time[3], mod_time[4], mod_time[5])));
+  layout.add_meta_info (MetaInfo ("access_time", tl::to_string (tr ("Access Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", access_time[1], access_time[2], access_time[0], access_time[3], access_time[4], access_time[5])));
 
   long attr = 0;
   db::PropertiesRepository::properties_set layout_properties;
@@ -299,16 +299,16 @@ GDS2ReaderBase::do_read (db::Layout &layout)
       double dbuu = get_double ();
       double dbum = get_double ();
       
-      layout.add_meta_info (MetaInfo ("dbuu", tl::to_string (QObject::tr ("Database unit in user units")), tl::to_string (dbuu)));
-      layout.add_meta_info (MetaInfo ("dbum", tl::to_string (QObject::tr ("Database unit in meter")), tl::to_string (dbum)));
-      layout.add_meta_info (MetaInfo ("libname", tl::to_string (QObject::tr ("Library name")), m_libname));
+      layout.add_meta_info (MetaInfo ("dbuu", tl::to_string (tr ("Database unit in user units")), tl::to_string (dbuu)));
+      layout.add_meta_info (MetaInfo ("dbum", tl::to_string (tr ("Database unit in meter")), tl::to_string (dbum)));
+      layout.add_meta_info (MetaInfo ("libname", tl::to_string (tr ("Library name")), m_libname));
 
       m_dbuu = dbuu;
       m_dbu = dbum * 1e6; /*in micron*/
       layout.dbu (m_dbu);
 
     } else {
-      error (tl::to_string (QObject::tr ("Invalid record or data type")));
+      error (tl::to_string (tr ("Invalid record or data type")));
     }
 
   } while (true);
@@ -338,7 +338,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
     instances_with_props.erase (instances_with_props.begin (), instances_with_props.end ());
 
     if (get_record () != sSTRNAME) {
-      error (tl::to_string (QObject::tr ("STRNAME record expected")));
+      error (tl::to_string (tr ("STRNAME record expected")));
     }
 
     get_string (m_cellname);
@@ -413,7 +413,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
           } else if (m_box_mode == 2) {
             read_boundary (layout, *cell, true);
           } else if (m_box_mode == 3) {
-            error (tl::to_string (QObject::tr ("BOX record encountered (reader is configured to produce an error in this case)")));
+            error (tl::to_string (tr ("BOX record encountered (reader is configured to produce an error in this case)")));
           } else {
             while (get_record () != sENDEL) { }
           }
@@ -424,7 +424,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
           while (get_record () != sENDEL) { }
 
         } else {
-          error (tl::to_string (QObject::tr ("Invalid record or data type")));
+          error (tl::to_string (tr ("Invalid record or data type")));
         }
       
       }
@@ -451,7 +451,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
   //  check, if the last record is a ENDLIB
   if (rec_id != sENDLIB) {
-    error (tl::to_string (QObject::tr ("ENDLIB record expected")));
+    error (tl::to_string (tr ("ENDLIB record expected")));
   }
 }
 
@@ -471,7 +471,7 @@ GDS2ReaderBase::read_context_info_cell ()
         rec_id = get_record ();
       } while (rec_id == sELFLAGS || rec_id == sPLEX);
       if (rec_id != sSNAME) {
-        error (tl::to_string (QObject::tr ("SNAME record expected")));
+        error (tl::to_string (tr ("SNAME record expected")));
       }
 
       std::string cn = get_string ();
@@ -481,7 +481,7 @@ GDS2ReaderBase::read_context_info_cell ()
         rec_id = get_record ();
       }
       if (rec_id != sXY) {
-        error (tl::to_string (QObject::tr ("XY record expected")));
+        error (tl::to_string (tr ("XY record expected")));
       }
 
       std::vector <std::string> &strings = m_context_info.insert (std::make_pair (cn, std::vector <std::string> ())).first->second;
@@ -504,13 +504,13 @@ GDS2ReaderBase::read_context_info_cell ()
           strings [attr] = get_string ();
 
         } else {
-          error (tl::to_string (QObject::tr ("ENDEL, PROPATTR or PROPVALUE record expected")));
+          error (tl::to_string (tr ("ENDEL, PROPATTR or PROPVALUE record expected")));
         }
 
       } 
 
     } else {
-      error (tl::to_string (QObject::tr ("Invalid record inside a context info cell")));
+      error (tl::to_string (tr ("Invalid record inside a context info cell")));
     }
   
   }
@@ -526,25 +526,25 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
     rec_id = get_record ();
   } while (rec_id == sELFLAGS || rec_id == sPLEX);
   if (rec_id != sLAYER) {
-    error (tl::to_string (QObject::tr ("LAYER record expected")));
+    error (tl::to_string (tr ("LAYER record expected")));
   }
   ld.layer = get_ushort ();
 
   rec_id = get_record ();
   if (from_box_record) {
     if (rec_id != sBOXTYPE) {
-      error (tl::to_string (QObject::tr ("BOXTYPE record expected")));
+      error (tl::to_string (tr ("BOXTYPE record expected")));
     }
   } else {
     if (rec_id != sDATATYPE) {
-      error (tl::to_string (QObject::tr ("DATATYPE record expected")));
+      error (tl::to_string (tr ("DATATYPE record expected")));
     }
   }
 
   ld.datatype = get_ushort ();
 
   if (get_record () != sXY) {
-    error (tl::to_string (QObject::tr ("XY record expected")));
+    error (tl::to_string (tr ("XY record expected")));
   }
 
   unsigned int xy_length = 0;
@@ -609,7 +609,7 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
           if ((rec_id = get_record ()) == sXY) {
             xy_data = get_xy_data (xy_length);
             if (! m_allow_multi_xy_records) {
-              error (tl::to_string (QObject::tr ("Multiple XY records detected on BOUNDARY element (reader is configured not to allow this)")));
+              error (tl::to_string (tr ("Multiple XY records detected on BOUNDARY element (reader is configured not to allow this)")));
             }
           } else {
             unget_record (rec_id);
@@ -637,7 +637,7 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
       }
 
       if (poly.hull ().size () < 3) {
-        warn (tl::to_string (QObject::tr ("BOUNDARY with less than 3 points ignored")));
+        warn (tl::to_string (tr ("BOUNDARY with less than 3 points ignored")));
         finish_element ();
       } else {
         //  this will copy the polyon:
@@ -656,7 +656,7 @@ GDS2ReaderBase::read_boundary (db::Layout &layout, db::Cell &cell, bool from_box
     while ((rec_id = get_record ()) == sXY) { 
       // read over multi-XY records
       if (! m_allow_multi_xy_records) {
-        error (tl::to_string (QObject::tr ("Multiple XY records detected on BOUNDARY element (reader is configured not to allow this)")));
+        error (tl::to_string (tr ("Multiple XY records detected on BOUNDARY element (reader is configured not to allow this)")));
       }
     }
     unget_record (rec_id);
@@ -676,11 +676,11 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
     rec_id = get_record ();
   } while (rec_id == sELFLAGS || rec_id == sPLEX);
   if (rec_id != sLAYER) {
-    error (tl::to_string (QObject::tr ("LAYER record expected")));
+    error (tl::to_string (tr ("LAYER record expected")));
   }
   ld.layer = get_ushort ();
   if (get_record () != sDATATYPE) {
-    error (tl::to_string (QObject::tr ("DATATYPE record expected")));
+    error (tl::to_string (tr ("DATATYPE record expected")));
   }
   ld.datatype = get_ushort ();
     
@@ -693,7 +693,7 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
   }
 
   if (type != 0 && type != 1 && type != 2 && type != 4) {
-    warn (tl::to_string (QObject::tr ("Unsupported PATHTYPE")));
+    warn (tl::to_string (tr ("Unsupported PATHTYPE")));
     type = 0;
   }
 
@@ -725,7 +725,7 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
   }
 
   if (rec_id != sXY) {
-    error (tl::to_string (QObject::tr ("XY record expected")));
+    error (tl::to_string (tr ("XY record expected")));
   }
 
   unsigned int xy_length = 0;
@@ -752,7 +752,7 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
         if ((rec_id = get_record ()) == sXY) {
           xy_data = get_xy_data (xy_length);
           if (! m_allow_multi_xy_records) {
-            error (tl::to_string (QObject::tr ("Multiple XY records detected on PATH element (reader is configured not to allow this)")));
+            error (tl::to_string (tr ("Multiple XY records detected on PATH element (reader is configured not to allow this)")));
           }
         } else {
           unget_record (rec_id);
@@ -772,11 +772,11 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
     path.round (type == 1);
 
     if (path.points () < 1) {
-      warn (tl::to_string (QObject::tr ("PATH with less than one point ignored")));
+      warn (tl::to_string (tr ("PATH with less than one point ignored")));
       finish_element ();
     } else {
       if (path.points () < 2 && type != 1) {
-        warn (tl::to_string (QObject::tr ("PATH with less than two points encountered - interpretation may be different in other tools")));
+        warn (tl::to_string (tr ("PATH with less than two points encountered - interpretation may be different in other tools")));
       }
       std::pair<bool, db::properties_id_type> pp = finish_element (layout.properties_repository ());
       if (pp.first) {
@@ -791,7 +791,7 @@ GDS2ReaderBase::read_path (db::Layout &layout, db::Cell &cell)
     while ((rec_id = get_record ()) == sXY) {
       // read over multi-XY records
       if (! m_allow_multi_xy_records) {
-        error (tl::to_string (QObject::tr ("Multiple XY records detected on PATH element (reader is configured not to allow this)")));
+        error (tl::to_string (tr ("Multiple XY records detected on PATH element (reader is configured not to allow this)")));
       }
     }
     unget_record (rec_id);
@@ -811,11 +811,11 @@ GDS2ReaderBase::read_text (db::Layout &layout, db::Cell &cell)
     rec_id = get_record ();
   } while (rec_id == sELFLAGS || rec_id == sPLEX);
   if (rec_id != sLAYER) {
-    error (tl::to_string (QObject::tr ("LAYER record expected")));
+    error (tl::to_string (tr ("LAYER record expected")));
   }
   ld.layer = get_ushort ();
   if (get_record () != sTEXTTYPE) {
-    error (tl::to_string (QObject::tr ("DATATYPE record expected")));
+    error (tl::to_string (tr ("DATATYPE record expected")));
   }
   ld.datatype = get_ushort ();
 
@@ -871,11 +871,11 @@ GDS2ReaderBase::read_text (db::Layout &layout, db::Cell &cell)
         double aorg = get_double ();
         double a = aorg / 90.0;
         if (a < -4 || a > 4) {
-          warn (tl::sprintf (tl::to_string (QObject::tr ("Invalid text rotation angle (%g is less than -360 or larger than 360)")), aorg));
+          warn (tl::sprintf (tl::to_string (tr ("Invalid text rotation angle (%g is less than -360 or larger than 360)")), aorg));
         }
         angle = int (a < 0 ? (a - 0.5) : (a + 0.5));
         if (fabs (double (angle) - a) > 1e-9) {
-          warn (tl::sprintf (tl::to_string (QObject::tr ("Invalid text rotation angle (%g is not a multiple of 90)")), aorg));
+          warn (tl::sprintf (tl::to_string (tr ("Invalid text rotation angle (%g is not a multiple of 90)")), aorg));
         }
         while (angle < 0) {
           angle += 4;
@@ -892,21 +892,21 @@ GDS2ReaderBase::read_text (db::Layout &layout, db::Cell &cell)
   }
 
   if (rec_id != sXY) {
-    error (tl::to_string (QObject::tr ("XY record expected")));
+    error (tl::to_string (tr ("XY record expected")));
   }
 
   unsigned int xy_length = 0;
   GDS2XY *xy_data = get_xy_data (xy_length);
   if (xy_length == 0) {
-    error (tl::to_string (QObject::tr ("No point in XY record for text")));
+    error (tl::to_string (tr ("No point in XY record for text")));
   } else if (xy_length > 1) {
-    warn (tl::to_string (QObject::tr ("More than one point in XY record for text")));
+    warn (tl::to_string (tr ("More than one point in XY record for text")));
   }
 
   db::Trans t (angle, mirror, pt_conv (xy_data [0]) - db::Point ());
 
   if (get_record () != sSTRING) {
-    error (tl::to_string (QObject::tr ("STRING record expected")));
+    error (tl::to_string (tr ("STRING record expected")));
   }
 
   if (ll.first) {
@@ -936,18 +936,18 @@ GDS2ReaderBase::read_box (db::Layout &layout, db::Cell &cell)
     rec_id = get_record ();
   } while (rec_id == sELFLAGS || rec_id == sPLEX);
   if (rec_id != sLAYER) {
-    error (tl::to_string (QObject::tr ("LAYER record expected")));
+    error (tl::to_string (tr ("LAYER record expected")));
   }
   ld.layer = get_ushort ();
   if (get_record () != sBOXTYPE) {
-    error (tl::to_string (QObject::tr ("DATATYPE record expected")));
+    error (tl::to_string (tr ("DATATYPE record expected")));
   }
   ld.datatype = get_ushort ();
 
   std::pair<bool, unsigned int> ll = open_dl (layout, ld, m_create_layers);
 
   if (get_record () != sXY) {
-    error (tl::to_string (QObject::tr ("XY record expected")));
+    error (tl::to_string (tr ("XY record expected")));
   }
 
   unsigned int xy_length = 0;
@@ -1032,7 +1032,7 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
     rec_id = get_record ();
   } while (rec_id == sELFLAGS || rec_id == sPLEX);
   if (rec_id != sSNAME) {
-    error (tl::to_string (QObject::tr ("SNAME record expected")));
+    error (tl::to_string (tr ("SNAME record expected")));
   }
 
   db::cell_index_type ci = make_cell (layout, get_string (), true);
@@ -1053,7 +1053,7 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
         mirror = true;
       }
       if ((f & (4 | 2)) != 0) {
-        warn (tl::to_string (QObject::tr ("Absolute transformations are not supported")));
+        warn (tl::to_string (tr ("Absolute transformations are not supported")));
       }  
     } else if (rec_id == sMAG) {
       mag = get_double ();
@@ -1064,7 +1064,7 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
       angle_deg = get_double ();
       double a = angle_deg / 90.0;
       if (a < -4 || a > 4) {
-        warn (tl::sprintf (tl::to_string (QObject::tr ("Invalid rotation angle (%g is less than -360 or larger than 360)")), angle_deg));
+        warn (tl::sprintf (tl::to_string (tr ("Invalid rotation angle (%g is less than -360 or larger than 360)")), angle_deg));
       }
       angle = int (a < 0 ? (a - 0.5) : (a + 0.5));
       if (fabs (double (angle) - a) > 1e-9) {
@@ -1085,7 +1085,7 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
 
     //  Array reference
     if (rec_id != sCOLROW) {
-      error (tl::to_string (QObject::tr ("COLROW record expected")));
+      error (tl::to_string (tr ("COLROW record expected")));
     }
 
     int cols = get_ushort ();
@@ -1096,16 +1096,16 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
 
     //  Array reference
     if (get_record () != sXY) {
-      error (tl::to_string (QObject::tr ("XY record expected")));
+      error (tl::to_string (tr ("XY record expected")));
     }
 
     //  Create the instance
     unsigned int xy_length = 0;
     GDS2XY *xy_data = get_xy_data (xy_length);
     if (xy_length < 3) {
-      error (tl::to_string (QObject::tr ("Too few points in XY record for AREF")));
+      error (tl::to_string (tr ("Too few points in XY record for AREF")));
     } else if (xy_length > 3) {
-      warn (tl::to_string (QObject::tr ("More than three points in XY record for AREF")));
+      warn (tl::to_string (tr ("More than three points in XY record for AREF")));
     }
 
     //  Create the instance
@@ -1127,11 +1127,11 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
     bool split_cols = false, split_rows = false;
 
     if (cols > 1 && (c.x () % cols != 0 || c.y () % cols != 0)) {
-      warn (tl::to_string (QObject::tr ("Off-grid AREF column vector - AREF will be split into subarrays to preserve locations")));
+      warn (tl::to_string (tr ("Off-grid AREF column vector - AREF will be split into subarrays to preserve locations")));
       split_cols = true;
     }
     if (rows > 1 && (r.x () % rows != 0 || r.y () % rows != 0)) {
-      warn (tl::to_string (QObject::tr ("Off-grid AREF row vector - AREF will be split into subarrays to preserve locations")));
+      warn (tl::to_string (tr ("Off-grid AREF row vector - AREF will be split into subarrays to preserve locations")));
       split_rows = true;
     }
 
@@ -1238,16 +1238,16 @@ GDS2ReaderBase::read_ref (db::Layout &layout, db::Cell & /*cell*/, bool array, t
 
     //  Single reference
     if (rec_id != sXY) {
-      error (tl::to_string (QObject::tr ("XY record expected")));
+      error (tl::to_string (tr ("XY record expected")));
     }
 
     //  Create the instance
     unsigned int xy_length = 0;
     GDS2XY *xy_data = get_xy_data (xy_length);
     if (xy_length < 1) {
-      error (tl::to_string (QObject::tr ("Too few points in XY record for SREF")));
+      error (tl::to_string (tr ("Too few points in XY record for SREF")));
     } else if (xy_length > 1) {
-      warn (tl::to_string (QObject::tr ("More than one point in XY record for SREF")));
+      warn (tl::to_string (tr ("More than one point in XY record for SREF")));
     }
 
     //  Create the instance

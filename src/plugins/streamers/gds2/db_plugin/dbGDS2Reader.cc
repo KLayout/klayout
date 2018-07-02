@@ -43,9 +43,9 @@ GDS2Reader::GDS2Reader (tl::InputStream &s)
     m_recptr (0),
     mp_rec_buf (0),
     m_stored_rec (0),
-    m_progress (tl::to_string (QObject::tr ("Reading GDS2 file")), 10000)
+    m_progress (tl::to_string (tr ("Reading GDS2 file")), 10000)
 {
-  m_progress.set_format (tl::to_string (QObject::tr ("%.0f MB")));
+  m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
 }
 
@@ -91,7 +91,7 @@ GDS2Reader::get_record ()
 
   unsigned char *b = (unsigned char *) m_stream.get (4);
   if (! b) {
-    error (tl::to_string (QObject::tr ("Unexpected end-of-file")));
+    error (tl::to_string (tr ("Unexpected end-of-file")));
     return 0;
   }
 
@@ -105,17 +105,17 @@ GDS2Reader::get_record ()
   gds2h ((int16_t &) rec_id);
 
   if (m_reclen < 4) {
-    error (tl::to_string (QObject::tr ("Invalid record length (less than 4)")));
+    error (tl::to_string (tr ("Invalid record length (less than 4)")));
   }
   if (m_reclen >= 0x8000) {
     if (m_options.allow_big_records) {
-      warn (tl::to_string (QObject::tr ("Record length larger than 0x8000 encountered: interpreting as unsigned")));
+      warn (tl::to_string (tr ("Record length larger than 0x8000 encountered: interpreting as unsigned")));
     } else {
-      error (tl::to_string (QObject::tr ("Record length larger than 0x8000 encountered (reader is configured not to allow such records)")));
+      error (tl::to_string (tr ("Record length larger than 0x8000 encountered (reader is configured not to allow such records)")));
     }
   }
   if (m_reclen % 2 == 1) {
-    warn (tl::to_string (QObject::tr ("Odd record length")));
+    warn (tl::to_string (tr ("Odd record length")));
   }
 
   m_reclen -= 4;
@@ -123,7 +123,7 @@ GDS2Reader::get_record ()
   if (m_reclen > 0) {
     mp_rec_buf = (unsigned char *) m_stream.get (m_reclen);
     if (! mp_rec_buf) {
-      error (tl::to_string (QObject::tr ("Unexpected end-of-file")));
+      error (tl::to_string (tr ("Unexpected end-of-file")));
     }
   } else {
     mp_rec_buf = 0;
@@ -267,9 +267,9 @@ GDS2Reader::warn (const std::string &msg)
 {
   // TODO: compress
   tl::warn << msg 
-           << tl::to_string (QObject::tr (" (position=")) << m_stream.pos ()
-           << tl::to_string (QObject::tr (", record number=")) << m_recnum
-           << tl::to_string (QObject::tr (", cell=")) << cellname ().c_str ()
+           << tl::to_string (tr (" (position=")) << m_stream.pos ()
+           << tl::to_string (tr (", record number=")) << m_recnum
+           << tl::to_string (tr (", cell=")) << cellname ().c_str ()
            << ")";
 }
 

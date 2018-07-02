@@ -441,6 +441,18 @@ static std::pair<std::string, bool> absolute_path_of_existing (const std::string
 #endif
 }
 
+bool is_absolute (const std::string &s)
+{
+  std::vector<std::string> parts = split_path (s);
+  if (parts.size () > 1 && is_drive (parts [0])) {
+    return is_part_with_separator (parts [1]);
+  } else if (! parts.empty ()) {
+    return is_part_with_separator (parts.front ());
+  } else {
+    return false;
+  }
+}
+
 std::string absolute_file_path (const std::string &s)
 {
   std::vector<std::string> parts = split_path (s);
@@ -560,6 +572,32 @@ bool is_dir (const std::string &p)
   } else {
     return !S_ISREG (st.st_mode);
   }
+}
+
+std::string relative_path (const std::string &base, const std::string &p)
+{
+  std::vector<std::string> rem;
+  std::vector<std::string> parts = split_path (p);
+
+  while (! parts.empty ()) {
+
+    if (is_same_file (base, tl::join (parts, ""))) {
+
+      //  combine the remaining path
+      std::reverse (rem.begin (), rem.end ());
+      if (! rem.empty ()) {
+        rem[0] = tl::trimmed_part (rem.front ());
+      }
+      return tl::join (rem, "");
+
+    }
+
+    rem.push_back (parts.back ());
+    parts.pop_back ();
+
+  }
+
+  return p;
 }
 
 std::string combine_path (const std::string &p1, const std::string &p2)

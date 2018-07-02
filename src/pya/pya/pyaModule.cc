@@ -766,7 +766,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
       nargs_s += tl::to_string (*na);
     }
 
-    throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Invalid number of arguments (got %d, expected %s)")), argc, nargs_s));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid number of arguments (got %d, expected %s)")), argc, nargs_s));
 
   }
 
@@ -837,7 +837,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
     if (! strict) {
       return 0;
     } else {
-      throw tl::Exception (tl::to_string (QObject::tr ("No overload with matching arguments")));
+      throw tl::Exception (tl::to_string (tr ("No overload with matching arguments")));
     }
   }
 
@@ -845,7 +845,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
     if (! strict) {
       return 0;
     } else {
-      throw tl::Exception (tl::to_string (QObject::tr ("Ambiguous overload variants - multiple method declarations match arguments")));
+      throw tl::Exception (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments")));
     }
   }
 
@@ -866,7 +866,7 @@ object_dup (PyObject *self, PyObject *args)
   }
 
   if (! cls_decl_self->can_copy ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("No copy constructor provided for class '%s'")), cls_decl_self->name ());
+    throw tl::Exception (tl::to_string (tr ("No copy constructor provided for class '%s'")), cls_decl_self->name ());
   }
 
   PYAObjectBase *new_object = (PYAObjectBase *) Py_TYPE (self)->tp_alloc (Py_TYPE (self), 0);
@@ -895,10 +895,10 @@ object_assign (PyObject *self, PyObject *args)
   tl_assert (cls_decl_src != 0);
 
   if (cls_decl_src != cls_decl_self) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Type is not identical on assign")));
+    throw tl::Exception (tl::to_string (tr ("Type is not identical on assign")));
   }
   if (! cls_decl_self->can_copy ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("No assignment provided for class '%s'")), cls_decl_self->name ());
+    throw tl::Exception (tl::to_string (tr ("No assignment provided for class '%s'")), cls_decl_self->name ());
   }
 
   cls_decl_self->assign (((PYAObjectBase *) self)->obj (), ((PYAObjectBase *) src)->obj ());
@@ -1118,7 +1118,7 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
       tl::Heap heap;
 
       if (p && p->const_ref () && ! meth->is_const ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Cannot call non-const method on a const reference")));
+        throw tl::Exception (tl::to_string (tr ("Cannot call non-const method on a const reference")));
       }
 
       int argc = args == NULL ? 0 : int (PyTuple_Size (args));
@@ -1348,7 +1348,7 @@ property_getter_adaptor (int mid, PyObject *self, PyObject *args)
 
     int argc = args == NULL ? 0 : int (PyTuple_Size (args));
     if (argc != 0) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Property getters must not have an argument")));
+      throw tl::Exception (tl::to_string (tr ("Property getters must not have an argument")));
     }
 
     ret = property_getter_impl (mid, self);
@@ -1507,7 +1507,7 @@ property_setter_adaptor (int mid, PyObject *self, PyObject *args)
 
     int argc = args == NULL ? 0 : int (PyTuple_Size (args));
     if (argc != 1) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Property setter needs exactly one argument")));
+      throw tl::Exception (tl::to_string (tr ("Property setter needs exactly one argument")));
     }
 
     PyObject *value = PyTuple_GetItem (args, 0);
@@ -1912,7 +1912,7 @@ property_getter_impl (int mid, PyObject *self)
   if (mt->begin_getters (mid) != mt->end_getters (mid)) {
     meth = *mt->begin_getters (mid);
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Internal error: cannot locate getter method")));
+    throw tl::Exception (tl::to_string (tr ("Internal error: cannot locate getter method")));
   }
 
   if (meth->is_signal ()) {
@@ -1925,7 +1925,7 @@ property_getter_impl (int mid, PyObject *self)
 
     //  getter must not have arguments
     if (meth->argsize () > 0) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Internal error: getters must not have arguments")));
+      throw tl::Exception (tl::to_string (tr ("Internal error: getters must not have arguments")));
     }
 
     void *obj = 0;
@@ -1976,7 +1976,7 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
   }
 
   if (p && p->const_ref ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot call a setter on a const reference")));
+    throw tl::Exception (tl::to_string (tr ("Cannot call a setter on a const reference")));
   }
 
   const MethodTable *mt = MethodTable::method_table_by_class (cls_decl);
@@ -1993,7 +1993,7 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
   }
 
   if (mt->begin_setters (mid) == mt->end_setters (mid)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Internal error: cannot locate setter method")));
+    throw tl::Exception (tl::to_string (tr ("Internal error: cannot locate setter method")));
   }
 
   const gsi::MethodBase *meth = 0;
@@ -2019,7 +2019,7 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
 
   //  no candidate -> error
   if (! meth) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Internal error: no setter compatible with one argument")));
+    throw tl::Exception (tl::to_string (tr ("Internal error: no setter compatible with one argument")));
   }
 
   //  more than one candidate -> refine by checking the arguments
@@ -2055,9 +2055,9 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
   }
 
   if (! meth) {
-    throw tl::Exception (tl::to_string (QObject::tr ("No setter overload with matching arguments")));
+    throw tl::Exception (tl::to_string (tr ("No setter overload with matching arguments")));
   } else if (candidates > 1) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Ambiguous overload variants - multiple setter declarations match arguments")));
+    throw tl::Exception (tl::to_string (tr ("Ambiguous overload variants - multiple setter declarations match arguments")));
   }
 
   void *obj = 0;
@@ -2077,7 +2077,7 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
       //  assigning a signal to a signal works if it applies to the same handler -
       //  this simplifies the implementation of += and -=.
       if (p->signal_handler (meth) != ((PYASignal *) value)->handler.get ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Invalid assignment of signal to signal")));
+        throw tl::Exception (tl::to_string (tr ("Invalid assignment of signal to signal")));
       }
 
     } else if (value == Py_None) {
@@ -2086,7 +2086,7 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
       p->signal_handler (meth)->clear ();
 
     } else if (! PyCallable_Check (value)) {
-      throw tl::Exception (tl::to_string (QObject::tr ("A signal needs to be assigned a callable object")));
+      throw tl::Exception (tl::to_string (tr ("A signal needs to be assigned a callable object")));
     } else {
 
       //  assigning a callable
@@ -2310,13 +2310,13 @@ PythonModule::check (const char *mod_name)
     //  All child classes must originate from this module or be known already
     for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = c->begin_child_classes (); cc != c->end_child_classes (); ++cc) {
       if (! PythonClassClientData::py_type (*cc->declaration ()) && cc->module () != mod_name) {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import %s' before 'import %s')")), c->name (), mod_name, cc->module (), cc->name (), pymod_name + "." + cc->module (), pymod_name + "." + mod_name));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Class %s from module %s depends on %s.%s (try 'import %s' before 'import %s')")), c->name (), mod_name, cc->module (), cc->name (), pymod_name + "." + cc->module (), pymod_name + "." + mod_name));
       }
     }
 
     //  Same for base class
     if (c->base () && ! PythonClassClientData::py_type (*c->base ()) && c->base ()->module () != mod_name) {
-      throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Class %s from module %s depends on %s.%s (try 'import %s' before 'import %s')")), c->name (), mod_name, c->base ()->module (), c->base ()->name (), pymod_name + "." + c->base ()->module (), pymod_name + "." + mod_name));
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Class %s from module %s depends on %s.%s (try 'import %s' before 'import %s')")), c->name (), mod_name, c->base ()->module (), c->base ()->name (), pymod_name + "." + c->base ()->module (), pymod_name + "." + mod_name));
     }
 
   }
@@ -2567,7 +2567,7 @@ PythonModule::make_classes (const char *mod_name)
             doc += "\n\n";
           }
           doc += (*m)->doc ();
-          m_python_doc [*m] += tl::sprintf (tl::to_string (QObject::tr ("The object exposes a readable attribute '%s'. This is the getter.\n\n")), name);
+          m_python_doc [*m] += tl::sprintf (tl::to_string (tr ("The object exposes a readable attribute '%s'. This is the getter.\n\n")), name);
         }
 
         for (MethodTableEntry::method_iterator m = begin_setters; m != end_setters; ++m) {
@@ -2575,7 +2575,7 @@ PythonModule::make_classes (const char *mod_name)
             doc += "\n\n";
           }
           doc += (*m)->doc ();
-          m_python_doc [*m] += tl::sprintf (tl::to_string (QObject::tr ("The object exposes a writable attribute '%s'. This is the setter.\n\n")), name);
+          m_python_doc [*m] += tl::sprintf (tl::to_string (tr ("The object exposes a writable attribute '%s'. This is the setter.\n\n")), name);
         }
 
         PythonRef attr;
@@ -2629,10 +2629,10 @@ PythonModule::make_classes (const char *mod_name)
 
           //  drop non-standard names
           if (tl::verbosity () >= 20) {
-            tl::warn << tl::to_string (QObject::tr ("Class ")) << c->name () << ": " << tl::to_string (QObject::tr ("no Python mapping for method ")) << mt->name (mid);
+            tl::warn << tl::to_string (tr ("Class ")) << c->name () << ": " << tl::to_string (tr ("no Python mapping for method ")) << mt->name (mid);
           }
 
-          add_python_doc (*c, mt, mid, tl::to_string (QObject::tr ("This method is not available for Python")));
+          add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is not available for Python")));
 
         } else {
 
@@ -2659,7 +2659,7 @@ PythonModule::make_classes (const char *mod_name)
 
             //  drop non-standard names
             if (tl::verbosity () >= 20) {
-              tl::warn << tl::to_string (QObject::tr ("Class ")) << c->name () << ": " << tl::to_string (QObject::tr ("no Python mapping for method (reserved word) ")) << name;
+              tl::warn << tl::to_string (tr ("Class ")) << c->name () << ": " << tl::to_string (tr ("no Python mapping for method (reserved word) ")) << name;
             }
 
             name += "_";
@@ -2667,7 +2667,7 @@ PythonModule::make_classes (const char *mod_name)
           }
 
           if (name != raw_name) {
-            add_python_doc (*c, mt, mid, tl::sprintf (tl::to_string (QObject::tr ("This method is available as method '%s' in Python")), name));
+            add_python_doc (*c, mt, mid, tl::sprintf (tl::to_string (tr ("This method is available as method '%s' in Python")), name));
           }
 
           //  create documentation
@@ -2691,29 +2691,29 @@ PythonModule::make_classes (const char *mod_name)
               //  The str method is also routed via the tp_str implementation
               alt_names.push_back ("__str__");
               if (! has_inspect) {
-                add_python_doc (*c, mt, mid, tl::to_string (QObject::tr ("This method is also available as 'str(object)' and 'repr(object)'")));
+                add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is also available as 'str(object)' and 'repr(object)'")));
                 alt_names.push_back ("__repr__");
               } else {
-                add_python_doc (*c, mt, mid, tl::to_string (QObject::tr ("This method is also available as 'str(object)'")));
+                add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is also available as 'str(object)'")));
               }
 
             } else if (name == "inspect" && m_first->compatible_with_num_args (0)) {
 
               //  The str method is also routed via the tp_str implementation
-              add_python_doc (*c, mt, mid, tl::to_string (QObject::tr ("This method is also available as 'repr(object)'")));
+              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is also available as 'repr(object)'")));
               alt_names.push_back ("__repr__");
 
             } else if (name == "size" && m_first->compatible_with_num_args (0)) {
 
               //  The size method is also routed via the sequence methods protocol if there
               //  is a [] function
-              add_python_doc (*c, mt, mid, tl::to_string (QObject::tr ("This method is also available as 'len(object)'")));
+              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is also available as 'len(object)'")));
               alt_names.push_back ("__len__");
 
             } else if (name == "each" && m_first->compatible_with_num_args (0) && m_first->ret_type ().is_iter ()) {
 
               //  each makes the object iterable
-              add_python_doc (*c, mt, mid, tl::to_string (QObject::tr ("This method enables iteration of the object")));
+              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method enables iteration of the object")));
               alt_names.push_back ("__iter__");
 
             }
@@ -2756,7 +2756,7 @@ PythonModule::make_classes (const char *mod_name)
 
             } else if (tl::verbosity () >= 20) {
               tl::warn << "Upper case method name encountered which cannot be used as a Python constant (more than one overload or at least one argument): " << c->name () << "." << name;
-              add_python_doc (*c, mt, mid, tl::to_string (QObject::tr ("This method is not available for Python")));
+              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is not available for Python")));
             }
 
           } else {
@@ -2764,7 +2764,7 @@ PythonModule::make_classes (const char *mod_name)
             if (m_first->ret_type ().type () == gsi::T_object && m_first->ret_type ().pass_obj () && name == "new") {
 
               //  The constructor is also routed via the pya_object_init implementation
-              add_python_doc (*c, mt, mid, tl::to_string (QObject::tr ("This method is the default initializer of the object")));
+              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is the default initializer of the object")));
 
               PyMethodDef *method = make_method_def ();
               method->ml_name = "__init__";

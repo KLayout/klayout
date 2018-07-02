@@ -38,9 +38,9 @@ namespace db
 
 DXFWriter::DXFWriter ()
   : mp_stream (0),
-    m_progress (tl::to_string (QObject::tr ("Writing DXF file")), 10000)
+    m_progress (tl::to_string (tr ("Writing DXF file")), 10000)
 {
-  m_progress.set_format (tl::to_string (QObject::tr ("%.0f MB")));
+  m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
 }
 
@@ -188,7 +188,7 @@ DXFWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 
       if (is_top_cell) {
         if (top_cell) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Top-level cell is not unique - DXF can only store a single top cell")));
+          throw tl::Exception (tl::to_string (tr ("Top-level cell is not unique - DXF can only store a single top cell")));
         } else {
           top_cell = &layout.cell (*cell);
         }

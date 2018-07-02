@@ -158,7 +158,7 @@ pya_static_attribute_descriptor_get (PyObject *self, PyObject * /*obj*/, PyObjec
     return (*(attr->getter)) ((PyObject *) attr->type, NULL);
   } else {
     std::string msg;
-    msg += tl::to_string (QObject::tr ("Attribute not readable"));
+    msg += tl::to_string (tr ("Attribute not readable"));
     msg += ": ";
     msg += attr->type->tp_name;
     msg += ".";
@@ -186,7 +186,7 @@ pya_static_attribute_descriptor_set (PyObject *self, PyObject * /*obj*/, PyObjec
     }
   } else {
     std::string msg;
-    msg += tl::to_string (QObject::tr ("Attribute cannot be changed"));
+    msg += tl::to_string (tr ("Attribute cannot be changed"));
     msg += ": ";
     msg += attr->type->tp_name;
     msg += ".";
@@ -448,7 +448,7 @@ pya_signal_add (PyObject *self, PyObject *args)
 
   if (! PyCallable_Check (callable)) {
     std::string msg;
-    msg += tl::to_string (QObject::tr ("Signal's += operator needs a callable object"));
+    msg += tl::to_string (tr ("Signal's += operator needs a callable object"));
     PyErr_SetString (PyExc_AttributeError, msg.c_str ());
     return NULL;
   }
@@ -466,7 +466,7 @@ pya_signal_inplace_add (PyObject *self, PyObject *callable)
 {
   if (! PyCallable_Check (callable)) {
     std::string msg;
-    msg += tl::to_string (QObject::tr ("Signal's += operator needs a callable object"));
+    msg += tl::to_string (tr ("Signal's += operator needs a callable object"));
     PyErr_SetString (PyExc_AttributeError, msg.c_str ());
     return NULL;
   }
@@ -493,7 +493,7 @@ pya_signal_remove (PyObject *self, PyObject *args)
 
   if (! PyCallable_Check (callable)) {
     std::string msg;
-    msg += tl::to_string (QObject::tr ("Signal's -= operator needs a callable object"));
+    msg += tl::to_string (tr ("Signal's -= operator needs a callable object"));
     PyErr_SetString (PyExc_AttributeError, msg.c_str ());
     return NULL;
   }
@@ -514,7 +514,7 @@ pya_signal_inplace_remove (PyObject *self, PyObject *callable)
 {
   if (! PyCallable_Check (callable)) {
     std::string msg;
-    msg += tl::to_string (QObject::tr ("Signal's -= operator needs a callable object"));
+    msg += tl::to_string (tr ("Signal's -= operator needs a callable object"));
     PyErr_SetString (PyExc_AttributeError, msg.c_str ());
     return NULL;
   }
@@ -541,7 +541,7 @@ pya_signal_set (PyObject *self, PyObject *args)
 
   if (! PyCallable_Check (callable)) {
     std::string msg;
-    msg += tl::to_string (QObject::tr ("Signal's 'set' method needs a callable object"));
+    msg += tl::to_string (tr ("Signal's 'set' method needs a callable object"));
     PyErr_SetString (PyExc_AttributeError, msg.c_str ());
     return NULL;
   }

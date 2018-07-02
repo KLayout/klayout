@@ -43,10 +43,10 @@ namespace db
 
 CIFReader::CIFReader (tl::InputStream &s)
   : m_stream (s),
-    m_progress (tl::to_string (QObject::tr ("Reading CIF file")), 1000),
+    m_progress (tl::to_string (tr ("Reading CIF file")), 1000),
     m_dbu (0.001), m_wire_mode (0)
 {
-  m_progress.set_format (tl::to_string (QObject::tr ("%.0fk lines")));
+  m_progress.set_format (tl::to_string (tr ("%.0fk lines")));
   m_progress.set_format_unit (1000.0);
   m_progress.set_unit (100000.0);
 }
@@ -94,8 +94,8 @@ CIFReader::warn (const std::string &msg)
 {
   // TODO: compress
   tl::warn << msg 
-           << tl::to_string (QObject::tr (" (line=")) << m_stream.line_number ()
-           << tl::to_string (QObject::tr (", cell=")) << m_cellname
+           << tl::to_string (tr (" (line=")) << m_stream.line_number ()
+           << tl::to_string (tr (", cell=")) << m_cellname
            << ")";
 }
 

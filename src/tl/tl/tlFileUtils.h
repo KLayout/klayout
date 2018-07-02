@@ -35,6 +35,11 @@ namespace tl
 bool TL_PUBLIC is_parent_path (const std::string &parent, const std::string &path);
 
 /**
+ *  @brief Returns true if s is an absolute path
+ */
+bool TL_PUBLIC is_absolute (const std::string &s);
+
+/**
  *  @brief Recursively remove the given directory, the files from that directory and all sub-directories (version with std::string)
  *  @return True, if successful. false otherwise.
  */
@@ -119,6 +124,12 @@ bool TL_PUBLIC rm_dir (const std::string &path);
  *  @brief Returns true, if the given path is the same directory of file than the other one
  */
 bool TL_PUBLIC is_same_file (const std::string &a, const std::string &b);
+
+/**
+ *  @brief Gets the relative path of p vs. base
+ *  If p cannot be resolved relative to base, p is returned.
+ */
+std::string TL_PUBLIC relative_path (const std::string &base, const std::string &p);
 
 /**
  *  @brief Combines the two path components into one path

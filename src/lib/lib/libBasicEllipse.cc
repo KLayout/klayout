@@ -185,43 +185,43 @@ BasicEllipse::get_parameter_declarations () const
   tl_assert (parameters.size () == p_layer);
   parameters.push_back (db::PCellParameterDeclaration ("layer"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_layer);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Layer")));
+  parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
   //  parameter #1: x radius 
   tl_assert (parameters.size () == p_radius_x);
   parameters.push_back (db::PCellParameterDeclaration ("radius_x"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Radius (x)")));
+  parameters.back ().set_description (tl::to_string (tr ("Radius (x)")));
   parameters.back ().set_default (0.1);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
   //  parameter #2: y radius 
   tl_assert (parameters.size () == p_radius_y);
   parameters.push_back (db::PCellParameterDeclaration ("radius_y"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Radius (y)")));
+  parameters.back ().set_description (tl::to_string (tr ("Radius (y)")));
   parameters.back ().set_default (0.1);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
   //  parameter #3: x handle 
   tl_assert (parameters.size () == p_handle_x);
   parameters.push_back (db::PCellParameterDeclaration ("handle_x"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
   parameters.back ().set_default (db::DPoint (-0.2, 0));
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Rx")));
+  parameters.back ().set_description (tl::to_string (tr ("Rx")));
 
   //  parameter #4: x handle 
   tl_assert (parameters.size () == p_handle_y);
   parameters.push_back (db::PCellParameterDeclaration ("handle_y"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_shape);
   parameters.back ().set_default (db::DPoint (-0.1, 0));
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Ry")));
+  parameters.back ().set_description (tl::to_string (tr ("Ry")));
 
   //  parameter #5: number of points 
   tl_assert (parameters.size () == p_npoints);
   parameters.push_back (db::PCellParameterDeclaration ("npoints"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_int);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Number of points")));
+  parameters.back ().set_description (tl::to_string (tr ("Number of points")));
   parameters.back ().set_default (64);
 
   //  parameter #6: used x radius

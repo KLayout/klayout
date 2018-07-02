@@ -192,7 +192,7 @@ struct get_boxed_value_func
       Proxy *p = 0;
       Data_Get_Struct (arg, Proxy, p);
       if (!p->cls_decl ()->is_derived_from (bt)) {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Passing an object to pointer or reference requires a boxed type (RBA::%s)")), bt->name ()));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Passing an object to pointer or reference requires a boxed type (RBA::%s)")), bt->name ()));
       }
 
       gsi::Value *bo = reinterpret_cast<gsi::Value *> (p->obj ());
@@ -241,7 +241,7 @@ struct writer
     if (arg == Qnil) {
 
       if (atype.is_ref () || atype.is_cref ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Arguments or return values of reference type cannot be passed nil")));
+        throw tl::Exception (tl::to_string (tr ("Arguments or return values of reference type cannot be passed nil")));
       } else if (atype.is_ptr ()) {
         aa->write<R *> ((R *)0);
       } else if (atype.is_cptr ()) {
@@ -256,7 +256,7 @@ struct writer
         // references or pointers require a boxed object. Pointers also allow nil.
         void *vc = boxed_value_ptr (atype.type (), arg, *heap);
         if (! vc && atype.is_ref ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Arguments or return values of reference or direct type cannot be passed nil or an empty boxed value object")));
+          throw tl::Exception (tl::to_string (tr ("Arguments or return values of reference or direct type cannot be passed nil or an empty boxed value object")));
         }
         aa->write<void *> (vc);
       } else if (atype.is_cref ()) {
@@ -300,7 +300,7 @@ struct writer<gsi::StringType>
         void *vc = 0;
         get_boxed_value_func<std::string> () (&vc, arg, heap);
         if (! vc && atype.is_ref ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Arguments or return values of reference or direct type cannot be passed nil or an empty boxed value object")));
+          throw tl::Exception (tl::to_string (tr ("Arguments or return values of reference or direct type cannot be passed nil or an empty boxed value object")));
         }
 
         //  NOTE: by convention we pass the ownership to the receiver for adaptors.
@@ -345,7 +345,7 @@ struct writer<gsi::VectorType>
   {
     if (arg == Qnil) {
       if (! (atype.is_ptr () || atype.is_cptr ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Arguments of reference or direct type cannot be passed nil")));
+        throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else {
         aa->write<void *> ((void *)0);
       }
@@ -366,7 +366,7 @@ struct writer<gsi::MapType>
   {
     if (arg == Qnil) {
       if (! (atype.is_ptr () || atype.is_cptr ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Arguments of reference or direct type cannot be passed nil")));
+        throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else {
         aa->write<void *> ((void *)0);
       }
@@ -389,7 +389,7 @@ struct writer <gsi::ObjectType>
     if (arg == Qnil) {
 
       if (! (atype.is_ptr () || atype.is_cptr ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Arguments of reference or direct type cannot be passed nil")));
+        throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else {
         aa->write<void *> ((void *) 0);
       }
@@ -397,7 +397,7 @@ struct writer <gsi::ObjectType>
     } else {
 
       if (TYPE (arg) != T_DATA) {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), rba_class_name (arg).c_str ()));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), rba_class_name (arg).c_str ()));
       }
 
       Proxy *p = 0;
@@ -423,7 +423,7 @@ struct writer <gsi::ObjectType>
           aa->write<void *> (new_obj);
 
         } else {
-          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), rba_class_name (arg).c_str ()));
+          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), rba_class_name (arg).c_str ()));
         }
 
       } else {
@@ -442,7 +442,7 @@ struct writer <gsi::ObjectType>
           aa->write<void *> (atype.cls ()->create_obj_from (p->cls_decl (), p->obj ()));
 
         } else {
-          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), rba_class_name (arg).c_str ()));
+          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), rba_class_name (arg).c_str ()));
         }
 
       }

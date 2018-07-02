@@ -72,7 +72,7 @@ private:
 
 OASISReader::OASISReader (tl::InputStream &s)
   : m_stream (s), 
-    m_progress (tl::to_string (QObject::tr ("Reading OASIS file")), 10000),
+    m_progress (tl::to_string (tr ("Reading OASIS file")), 10000),
     m_dbu (0.001),
     m_expect_strict_mode (-1),
     mm_repetition (this, "repetition"),
@@ -108,7 +108,7 @@ OASISReader::OASISReader (tl::InputStream &s)
     m_s_gds_property_name_id (0),
     m_klayout_context_property_name_id (0)
 {
-  m_progress.set_format (tl::to_string (QObject::tr ("%.0f MB")));
+  m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
   m_first_cellname = 0;
   m_first_propname = 0;
@@ -183,13 +183,13 @@ OASISReader::get_ulong_long ()
   do {
     unsigned char *b = (unsigned char *) m_stream.get (1);
     if (! b) {
-      error (tl::to_string (QObject::tr ("Unexpected end-of-file")));
+      error (tl::to_string (tr ("Unexpected end-of-file")));
       return 0;
     }
     c = *b;
     if (vm > std::numeric_limits <unsigned long long>::max () / 128 && 
         (unsigned long long) (c & 0x7f) > (std::numeric_limits <unsigned long long>::max () / vm)) {
-      error (tl::to_string (QObject::tr ("Unsigned long value overflow")));
+      error (tl::to_string (tr ("Unsigned long value overflow")));
     }
     v += (unsigned long long) (c & 0x7f) * vm;
     vm <<= 7;
@@ -214,7 +214,7 @@ OASISReader::get_ulong_for_divider ()
 {
   unsigned long l = get_ulong ();
   if (l == 0) {
-    error (tl::to_string (QObject::tr ("Divider must not be zero")));
+    error (tl::to_string (tr ("Divider must not be zero")));
   }
   return l;
 }
@@ -229,13 +229,13 @@ OASISReader::get_ulong ()
   do {
     unsigned char *b = (unsigned char *) m_stream.get (1);
     if (! b) {
-      error (tl::to_string (QObject::tr ("Unexpected end-of-file")));
+      error (tl::to_string (tr ("Unexpected end-of-file")));
       return 0;
     }
     c = *b;
     if (vm > std::numeric_limits <unsigned long>::max () / 128 && 
         (unsigned long) (c & 0x7f) > (std::numeric_limits <unsigned long>::max () / vm)) {
-      error (tl::to_string (QObject::tr ("Unsigned long value overflow")));
+      error (tl::to_string (tr ("Unsigned long value overflow")));
     }
     v += (unsigned long) (c & 0x7f) * vm;
     vm <<= 7;
@@ -265,13 +265,13 @@ OASISReader::get_uint ()
   do {
     unsigned char *b = (unsigned char *) m_stream.get (1);
     if (! b) {
-      error (tl::to_string (QObject::tr ("Unexpected end-of-file")));
+      error (tl::to_string (tr ("Unexpected end-of-file")));
       return 0;
     }
     c = *b;
     if (vm > std::numeric_limits <unsigned int>::max () / 128 && 
         (unsigned int) (c & 0x7f) > (std::numeric_limits <unsigned int>::max () / vm)) {
-      error (tl::to_string (QObject::tr ("Unsigned integer value overflow")));
+      error (tl::to_string (tr ("Unsigned integer value overflow")));
     }
     v += (unsigned int) (c & 0x7f) * vm;
     vm <<= 7;
@@ -342,7 +342,7 @@ OASISReader::get_real ()
 
     unsigned char *b = (unsigned char *) m_stream.get (sizeof (i2f.i));
     if (! b) {
-      error (tl::to_string (QObject::tr ("Unexpected end-of-file")));
+      error (tl::to_string (tr ("Unexpected end-of-file")));
     }
     i2f.i = 0;
     b += sizeof (i2f.i);
@@ -361,7 +361,7 @@ OASISReader::get_real ()
 
     unsigned char *b = (unsigned char *) m_stream.get (sizeof (i2f.i));
     if (! b) {
-      error (tl::to_string (QObject::tr ("Unexpected end-of-file")));
+      error (tl::to_string (tr ("Unexpected end-of-file")));
     }
     i2f.i = 0;
     b += sizeof (i2f.i);
@@ -372,7 +372,7 @@ OASISReader::get_real ()
     return double (i2f.d);
 
   } else {
-    error (tl::sprintf (tl::to_string (QObject::tr ("Invalid real type %d")), t));
+    error (tl::sprintf (tl::to_string (tr ("Invalid real type %d")), t));
     return 0.0;
   }
 }
@@ -384,7 +384,7 @@ OASISReader::get_ucoord (unsigned long grid)
   get (lx);
   lx *= grid;
   if (lx > (unsigned long long) (std::numeric_limits <db::Coord>::max ())) {
-    error (tl::to_string (QObject::tr ("Coordinate value overflow")));
+    error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return db::Coord (lx);
 }
@@ -396,7 +396,7 @@ OASISReader::get_ucoord_as_distance (unsigned long grid)
   get (lx);
   lx *= grid;
   if (lx > (unsigned long long) (std::numeric_limits <distance_type>::max ())) {
-    error (tl::to_string (QObject::tr ("Coordinate value overflow")));
+    error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return distance_type (lx);
 }
@@ -409,7 +409,7 @@ OASISReader::get_coord (long grid)
   lx *= grid;
   if (lx < (long long) (std::numeric_limits <db::Coord>::min ()) ||
       lx > (long long) (std::numeric_limits <db::Coord>::max ())) {
-    error (tl::to_string (QObject::tr ("Coordinate value overflow")));
+    error (tl::to_string (tr ("Coordinate value overflow")));
   }
   return db::Coord (lx);
 }
@@ -423,7 +423,7 @@ OASISReader::get_2delta (long grid)
   long long lx = l1 >> 2;
   lx *= grid;
   if (lx > (long long) (std::numeric_limits <db::Coord>::max ())) {
-    error (tl::to_string (QObject::tr ("Coordinate value overflow")));
+    error (tl::to_string (tr ("Coordinate value overflow")));
   }
   db::Coord x = lx;
 
@@ -449,7 +449,7 @@ OASISReader::get_3delta (long grid)
   long long lx = l1 >> 3;
   lx *= grid;
   if (lx > (long long) (std::numeric_limits <db::Coord>::max ())) {
-    error (tl::to_string (QObject::tr ("Coordinate value overflow")));
+    error (tl::to_string (tr ("Coordinate value overflow")));
   }
   db::Coord x = lx;
 
@@ -486,7 +486,7 @@ OASISReader::get_gdelta (long grid)
     lx *= grid;
     if (lx < (long long) (std::numeric_limits <db::Coord>::min ()) ||
         lx > (long long) (std::numeric_limits <db::Coord>::max ())) {
-      error (tl::to_string (QObject::tr ("Coordinate value overflow")));
+      error (tl::to_string (tr ("Coordinate value overflow")));
     }
 
     long long ly;
@@ -494,7 +494,7 @@ OASISReader::get_gdelta (long grid)
     ly *= grid;
     if (ly < (long long) (std::numeric_limits <db::Coord>::min ()) ||
         ly > (long long) (std::numeric_limits <db::Coord>::max ())) {
-      error (tl::to_string (QObject::tr ("Coordinate value overflow")));
+      error (tl::to_string (tr ("Coordinate value overflow")));
     }
     
     return db::Vector (db::Coord (lx), db::Coord (ly));
@@ -504,7 +504,7 @@ OASISReader::get_gdelta (long grid)
     long long lx = l1 >> 4;
     lx *= grid;
     if (lx > (long long) (std::numeric_limits <db::Coord>::max ())) {
-      error (tl::to_string (QObject::tr ("Coordinate value overflow")));
+      error (tl::to_string (tr ("Coordinate value overflow")));
     }
     db::Coord x = lx;
 
@@ -545,8 +545,8 @@ OASISReader::warn (const std::string &msg)
   } else {
     // TODO: compress
     tl::warn << msg 
-             << tl::to_string (QObject::tr (" (position=")) << m_stream.pos ()
-             << tl::to_string (QObject::tr (", cell=")) << m_cellname
+             << tl::to_string (tr (" (position=")) << m_stream.pos ()
+             << tl::to_string (tr (", cell=")) << m_cellname
              << ")";
   }
 }
@@ -652,31 +652,31 @@ OASISReader::read_offset_table ()
   of = get_uint ();
   m_table_cellname = get_ulong ();
   if (m_table_cellname != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
-    warn (tl::to_string (QObject::tr ("CELLNAME offset table has unexpected strict mode")));
+    warn (tl::to_string (tr ("CELLNAME offset table has unexpected strict mode")));
   }
 
   of = get_uint ();
   m_table_textstring = get_ulong ();
   if (m_table_textstring != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
-    warn (tl::to_string (QObject::tr ("TEXTSTRING offset table has unexpected strict mode")));
+    warn (tl::to_string (tr ("TEXTSTRING offset table has unexpected strict mode")));
   }
 
   of = get_uint ();
   m_table_propname = get_ulong ();
   if (m_table_propname != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
-    warn (tl::to_string (QObject::tr ("PROPNAME offset table has unexpected strict mode")));
+    warn (tl::to_string (tr ("PROPNAME offset table has unexpected strict mode")));
   }
 
   of = get_uint ();
   m_table_propstring = get_ulong ();
   if (m_table_propstring != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
-    warn (tl::to_string (QObject::tr ("PROPSTRING offset table has unexpected strict mode")));
+    warn (tl::to_string (tr ("PROPSTRING offset table has unexpected strict mode")));
   }
 
   of = get_uint ();
   m_table_layername = get_ulong ();
   if (m_table_layername != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
-    warn (tl::to_string (QObject::tr ("LAYERNAME offset table has unexpected strict mode")));
+    warn (tl::to_string (tr ("LAYERNAME offset table has unexpected strict mode")));
   }
 
   //  XNAME table ignored currently
@@ -701,27 +701,27 @@ OASISReader::do_read (db::Layout &layout)
   //  read magic bytes
   mb = (char *) m_stream.get (sizeof (magic_bytes) - 1);
   if (! mb) {
-    error (tl::to_string (QObject::tr ("File too short")));
+    error (tl::to_string (tr ("File too short")));
     return;
   }
   if (strncmp (mb, magic_bytes, sizeof (magic_bytes) - 1) != 0) {
-    error (tl::to_string (QObject::tr ("Format error (missing magic bytes)")));
+    error (tl::to_string (tr ("Format error (missing magic bytes)")));
   }
 
   //  read first record
   r = get_byte ();
   if (r != 1 /*START*/) {
-    error (tl::to_string (QObject::tr ("Format error (START record expected)")));
+    error (tl::to_string (tr ("Format error (START record expected)")));
   }
 
   std::string v = get_str ();
   if (v != "1.0") {
-    error (tl::sprintf (tl::to_string (QObject::tr ("Format error (only version 1.0 is supported, file has version %s)")), v));
+    error (tl::sprintf (tl::to_string (tr ("Format error (only version 1.0 is supported, file has version %s)")), v));
   }
 
   double res = get_real ();
   if (res < 1e-6) {
-    error (tl::sprintf (tl::to_string (QObject::tr ("Invalid resolution of %g")), res));
+    error (tl::sprintf (tl::to_string (tr ("Invalid resolution of %g")), res));
   }
 
   //  compute database unit in pixel per meter
@@ -799,7 +799,7 @@ OASISReader::do_read (db::Layout &layout)
       if (m_first_cellname == 0) {
         m_first_cellname = m_table_start;
       } else if (m_expect_strict_mode == 1 && m_in_table != InCELLNAME && m_first_cellname != 0) {
-        warn (tl::to_string (QObject::tr ("CELLNAME outside table in strict mode")));
+        warn (tl::to_string (tr ("CELLNAME outside table in strict mode")));
       }
       m_in_table = InCELLNAME;
 
@@ -816,20 +816,20 @@ OASISReader::do_read (db::Layout &layout)
       unsigned long id = cellname_id;
       if (r == 3) {
         if (cellname_id_mode == expl) {
-          error (tl::to_string (QObject::tr ("Explicit and implicit CELLNAME modes cannot be mixed")));
+          error (tl::to_string (tr ("Explicit and implicit CELLNAME modes cannot be mixed")));
         }
         cellname_id_mode = impl;
         ++cellname_id;
       } else {
         if (cellname_id_mode == impl) {
-          error (tl::to_string (QObject::tr ("Explicit and implicit CELLNAME modes cannot be mixed")));
+          error (tl::to_string (tr ("Explicit and implicit CELLNAME modes cannot be mixed")));
         }
         cellname_id_mode = expl;
         get (id);
       }
 
       if (! m_cellnames.insert (std::make_pair (id, name)).second) {
-        error (tl::sprintf (tl::to_string (QObject::tr ("A CELLNAME with id %ld is present already")), id));
+        error (tl::sprintf (tl::to_string (tr ("A CELLNAME with id %ld is present already")), id));
       }
 
       reset_modal_variables ();
@@ -844,7 +844,7 @@ OASISReader::do_read (db::Layout &layout)
       if (m_first_textstring == 0) {
         m_first_textstring = m_table_start;
       } else if (m_expect_strict_mode == 1 && m_in_table != InTEXTSTRING && m_first_textstring != 0) {
-        warn (tl::to_string (QObject::tr ("TEXTSTRING outside table in strict mode")));
+        warn (tl::to_string (tr ("TEXTSTRING outside table in strict mode")));
       }
       m_in_table = InTEXTSTRING;
 
@@ -862,20 +862,20 @@ OASISReader::do_read (db::Layout &layout)
       unsigned long id = textstring_id;
       if (r == 5) {
         if (textstring_id_mode == expl) {
-          error (tl::to_string (QObject::tr ("Explicit and implicit TEXTSTRING modes cannot be mixed")));
+          error (tl::to_string (tr ("Explicit and implicit TEXTSTRING modes cannot be mixed")));
         }
         textstring_id_mode = impl;
         ++textstring_id;
       } else {
         if (textstring_id_mode == impl) {
-          error (tl::to_string (QObject::tr ("Explicit and implicit TEXTSTRING modes cannot be mixed")));
+          error (tl::to_string (tr ("Explicit and implicit TEXTSTRING modes cannot be mixed")));
         }
         textstring_id_mode = expl;
         get (id);
       }
 
       if (! m_textstrings.insert (std::make_pair (id, name)).second) {
-        error (tl::sprintf (tl::to_string (QObject::tr ("A TEXTSTRING with id %ld is present already")), id));
+        error (tl::sprintf (tl::to_string (tr ("A TEXTSTRING with id %ld is present already")), id));
       }
 
       reset_modal_variables ();
@@ -888,7 +888,7 @@ OASISReader::do_read (db::Layout &layout)
       if (m_first_propname == 0) {
         m_first_propname = m_table_start;
       } else if (m_expect_strict_mode == 1 && m_in_table != InPROPNAME && m_first_propname != 0) {
-        warn (tl::to_string (QObject::tr ("PROPNAME outside table in strict mode")));
+        warn (tl::to_string (tr ("PROPNAME outside table in strict mode")));
       }
       m_in_table = InPROPNAME;
 
@@ -905,20 +905,20 @@ OASISReader::do_read (db::Layout &layout)
       unsigned long id = propname_id;
       if (r == 7) {
         if (propname_id_mode == expl) {
-          error (tl::to_string (QObject::tr ("Explicit and implicit PROPNAME modes cannot be mixed")));
+          error (tl::to_string (tr ("Explicit and implicit PROPNAME modes cannot be mixed")));
         }
         propname_id_mode = impl;
         ++propname_id;
       } else {
         if (propname_id_mode == impl) {
-          error (tl::to_string (QObject::tr ("Explicit and implicit PROPNAME modes cannot be mixed")));
+          error (tl::to_string (tr ("Explicit and implicit PROPNAME modes cannot be mixed")));
         }
         propname_id_mode = expl;
         get (id);
       }
 
       if (! m_propnames.insert (std::make_pair (id, name)).second) {
-        error (tl::sprintf (tl::to_string (QObject::tr ("A PROPNAME with id %ld is present already")), id));
+        error (tl::sprintf (tl::to_string (tr ("A PROPNAME with id %ld is present already")), id));
       }
 
       //  resolve forward references to property names
@@ -949,7 +949,7 @@ OASISReader::do_read (db::Layout &layout)
               if (s->first == s_gds_name_id) {
 
                 if (!s->second.is_list () || s->second.get_list ().size () != 2) {
-                  error (tl::to_string (QObject::tr ("S_GDS_PROPERTY must have a value list with exactly two elements")));
+                  error (tl::to_string (tr ("S_GDS_PROPERTY must have a value list with exactly two elements")));
                 }
 
                 new_set.insert (std::make_pair (rep.prop_name_id (s->second.get_list () [0]), s->second.get_list () [1]));
@@ -980,7 +980,7 @@ OASISReader::do_read (db::Layout &layout)
       if (m_first_propstring == 0) {
         m_first_propstring = m_table_start;
       } else if (m_expect_strict_mode == 1 && m_in_table != InPROPSTRING && m_first_propstring != 0) {
-        warn (tl::to_string (QObject::tr ("PROPSTRING outside table in strict mode")));
+        warn (tl::to_string (tr ("PROPSTRING outside table in strict mode")));
       }
       m_in_table = InPROPSTRING;
 
@@ -997,20 +997,20 @@ OASISReader::do_read (db::Layout &layout)
       unsigned long id = propstring_id;
       if (r == 9) {
         if (propstring_id_mode == expl) {
-          error (tl::to_string (QObject::tr ("Explicit and implicit PROPSTRING modes cannot be mixed")));
+          error (tl::to_string (tr ("Explicit and implicit PROPSTRING modes cannot be mixed")));
         }
         propstring_id_mode = impl;
         ++propstring_id;
       } else {
         if (propstring_id_mode == impl) {
-          error (tl::to_string (QObject::tr ("Explicit and implicit PROPSTRING modes cannot be mixed")));
+          error (tl::to_string (tr ("Explicit and implicit PROPSTRING modes cannot be mixed")));
         }
         propstring_id_mode = expl;
         get (id);
       }
 
       if (! m_propstrings.insert (std::make_pair (id, name)).second) {
-        error (tl::sprintf (tl::to_string (QObject::tr ("A PROPSTRING with id %ld is present already")), id));
+        error (tl::sprintf (tl::to_string (tr ("A PROPSTRING with id %ld is present already")), id));
       }
 
       std::map<unsigned long, std::string>::iterator fw = m_propvalue_forward_references.find (id);
@@ -1028,7 +1028,7 @@ OASISReader::do_read (db::Layout &layout)
       if (m_first_layername == 0) {
         m_first_layername = m_table_start;
       } else if (m_expect_strict_mode == 1 && m_in_table != InLAYERNAME && m_first_layername != 0) {
-        warn (tl::to_string (QObject::tr ("LAYERNAME outside table in strict mode")));
+        warn (tl::to_string (tr ("LAYERNAME outside table in strict mode")));
       }
       m_in_table = InLAYERNAME;
 
@@ -1059,7 +1059,7 @@ OASISReader::do_read (db::Layout &layout)
         l1 = get_uint ();
         l2 = get_uint ();
       } else {
-        error (tl::to_string (QObject::tr ("Invalid LAYERNAME interval mode (layer)")));
+        error (tl::to_string (tr ("Invalid LAYERNAME interval mode (layer)")));
       }
 
       it = get_uint ();
@@ -1076,7 +1076,7 @@ OASISReader::do_read (db::Layout &layout)
         dt1 = get_uint ();
         dt2 = get_uint ();
       } else {
-        error (tl::to_string (QObject::tr ("Invalid LAYERNAME interval mode (datatype)")));
+        error (tl::to_string (tr ("Invalid LAYERNAME interval mode (datatype)")));
       }
 
       //  add to the layer name map
@@ -1153,7 +1153,7 @@ OASISReader::do_read (db::Layout &layout)
         unsigned long id = 0;
         get (id);
         if (! m_defined_cells_by_id.insert (id).second) {
-          error (tl::sprintf (tl::to_string (QObject::tr ("A cell with id %ld is defined already")), id));
+          error (tl::sprintf (tl::to_string (tr ("A cell with id %ld is defined already")), id));
         }
 
         std::map <unsigned long, db::cell_index_type>::const_iterator c = m_cells_by_id.find (id);
@@ -1187,12 +1187,12 @@ OASISReader::do_read (db::Layout &layout)
       } else {
 
         if (m_expect_strict_mode == 1) {
-          warn (tl::to_string (QObject::tr ("CELL names must be references to CELLNAME ids in strict mode")));
+          warn (tl::to_string (tr ("CELL names must be references to CELLNAME ids in strict mode")));
         }
 
         std::string name = get_str ();
         if (! m_defined_cells_by_name.insert (name).second) {
-          error (tl::sprintf (tl::to_string (QObject::tr ("A cell with name %s is defined already")), name.c_str ()));
+          error (tl::sprintf (tl::to_string (tr ("A cell with name %s is defined already")), name.c_str ()));
         }
 
         std::map <std::string, db::cell_index_type>::const_iterator c = m_cells_by_name.find (name);
@@ -1219,7 +1219,7 @@ OASISReader::do_read (db::Layout &layout)
 
       unsigned int type = get_uint ();
       if (type != 0) {
-        error (tl::sprintf (tl::to_string (QObject::tr ("Invalid CBLOCK compression type %d")), type));
+        error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
       get_uint ();  // uncomp-byte-count - not needed
@@ -1229,7 +1229,7 @@ OASISReader::do_read (db::Layout &layout)
       m_stream.inflate ();
 
     } else {
-      error (tl::sprintf (tl::to_string (QObject::tr ("Invalid record type on global level %d")), int (r)));
+      error (tl::sprintf (tl::to_string (tr ("Invalid record type on global level %d")), int (r)));
     }
 
   }
@@ -1248,19 +1248,19 @@ OASISReader::do_read (db::Layout &layout)
   //  read over tail and discard
   mb = (char *) m_stream.get (pt + 254 - m_stream.pos ());
   if (! mb) {
-    error (tl::to_string (QObject::tr ("Format error (too few bytes after END record)")));
+    error (tl::to_string (tr ("Format error (too few bytes after END record)")));
   }
 
   //  check if there are no more bytes
   mb = (char *) m_stream.get (254);
   if (mb) {
-    error (tl::to_string (QObject::tr ("Format error (too many bytes after END record)")));
+    error (tl::to_string (tr ("Format error (too many bytes after END record)")));
   }
 
   for (std::map <unsigned long, const db::StringRef *>::const_iterator fw = m_text_forward_references.begin (); fw != m_text_forward_references.end (); ++fw) {
     std::map <unsigned long, std::string>::const_iterator ts = m_textstrings.find (fw->first);
     if (ts == m_textstrings.end ()) {
-      error (tl::sprintf (tl::to_string (QObject::tr ("No text string defined for text string id %ld")), fw->first));
+      error (tl::sprintf (tl::to_string (tr ("No text string defined for text string id %ld")), fw->first));
     } else {
       layout.string_repository ().change_string_ref (fw->second, ts->second);
     }
@@ -1268,7 +1268,7 @@ OASISReader::do_read (db::Layout &layout)
 
   //  all forward references to property names must be resolved
   for (std::map <unsigned long, db::property_names_id_type>::const_iterator fw = m_propname_forward_references.begin (); fw != m_propname_forward_references.end (); ++fw) {
-    error (tl::sprintf (tl::to_string (QObject::tr ("No property name defined for property name id %ld")), fw->first));
+    error (tl::sprintf (tl::to_string (tr ("No property name defined for property name id %ld")), fw->first));
   }
 
   //  resolve all propvalue forward referenced
@@ -1285,7 +1285,7 @@ OASISReader::do_read (db::Layout &layout)
           if (fw != m_propvalue_forward_references.end ()) {
             ps->second = tl::Variant (fw->second);
           } else {
-            error (tl::sprintf (tl::to_string (QObject::tr ("No property value defined for property value id %ld")), id));
+            error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
           }
 
         } else if (ps->second.is_list ()) {
@@ -1309,7 +1309,7 @@ OASISReader::do_read (db::Layout &layout)
                 if (fw != m_propvalue_forward_references.end ()) {
                   *ll = tl::Variant (fw->second);
                 } else {
-                  error (tl::sprintf (tl::to_string (QObject::tr ("No property value defined for property value id %ld")), id));
+                  error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
                 }
               }
             }
@@ -1333,7 +1333,7 @@ OASISReader::do_read (db::Layout &layout)
     std::map <unsigned long, std::string>::const_iterator cn = m_cellnames.find (fw->first);
     if (cn == m_cellnames.end ()) {
 
-      error (tl::sprintf (tl::to_string (QObject::tr ("No cellname defined for cell name id %ld")), fw->first));
+      error (tl::sprintf (tl::to_string (tr ("No cellname defined for cell name id %ld")), fw->first));
 
     } else {
 
@@ -1407,19 +1407,19 @@ OASISReader::do_read (db::Layout &layout)
 
   //  Check the table offsets vs. real occurance
   if (m_first_cellname != 0 && m_first_cellname != m_table_cellname && m_expect_strict_mode == 1) {
-    warn (tl::to_string (QObject::tr ("CELLNAME table offset does not match first occurance of CELLNAME in strict mode - %1 vs. %2").arg (m_table_cellname).arg (m_first_cellname)));
+    warn (tl::sprintf (tl::to_string (tr ("CELLNAME table offset does not match first occurance of CELLNAME in strict mode - %s vs. %s")), m_table_cellname, m_first_cellname));
   }
   if (m_first_propname != 0 && m_first_propname != m_table_propname && m_expect_strict_mode == 1) {
-    warn (tl::to_string (QObject::tr ("PROPNAME table offset does not match first occurance of PROPNAME in strict mode - %1 vs. %2").arg (m_table_propname).arg (m_first_propname)));
+    warn (tl::sprintf (tl::to_string (tr ("PROPNAME table offset does not match first occurance of PROPNAME in strict mode - %s vs. %s")), m_table_propname, m_first_propname));
   }
   if (m_first_propstring != 0 && m_first_propstring != m_table_propstring && m_expect_strict_mode == 1) {
-    warn (tl::to_string (QObject::tr ("PROPSTRING table offset does not match first occurance of PROPSTRING in strict mode - %1 vs. %2").arg (m_table_propstring).arg (m_first_propstring)));
+    warn (tl::sprintf (tl::to_string (tr ("PROPSTRING table offset does not match first occurance of PROPSTRING in strict mode - %s vs. %s")), m_table_propstring, m_first_propstring));
   }
   if (m_first_layername != 0 && m_first_layername != m_table_layername && m_expect_strict_mode == 1) {
-    warn (tl::to_string (QObject::tr ("LAYERNAME table offset does not match first occurance of LAYERNAME in strict mode - %1 vs. %2").arg (m_table_layername).arg (m_first_layername)));
+    warn (tl::sprintf (tl::to_string (tr ("LAYERNAME table offset does not match first occurance of LAYERNAME in strict mode - %s vs. %s")), m_table_layername, m_first_layername));
   }
   if (m_first_textstring != 0 && m_first_textstring != m_table_textstring && m_expect_strict_mode == 1) {
-    warn (tl::to_string (QObject::tr ("TEXTSTRING table offset does not match first occurance of TEXTSTRING in strict mode - %1 vs. %2").arg (m_table_textstring).arg (m_first_textstring)));
+    warn (tl::sprintf (tl::to_string (tr ("TEXTSTRING table offset does not match first occurance of TEXTSTRING in strict mode - %s vs. %s")), m_table_textstring, m_first_textstring));
   }
 }
 
@@ -1433,7 +1433,7 @@ OASISReader::store_last_properties (db::PropertiesRepository &rep, db::Propertie
   } else if (mm_last_property_is_sprop.get () && mm_last_property_name.get () == m_s_gds_property_name_id) {
 
     if (mm_last_value_list.get ().size () != 2) {
-      error (tl::to_string (QObject::tr ("S_GDS_PROPERTY must have a value list with exactly two elements")));
+      error (tl::to_string (tr ("S_GDS_PROPERTY must have a value list with exactly two elements")));
     }
 
     properties.insert (std::make_pair (rep.prop_name_id (mm_last_value_list.get () [0]), mm_last_value_list.get () [1]));
@@ -1473,7 +1473,7 @@ OASISReader::read_element_properties (db::PropertiesRepository &rep, bool ignore
 
       unsigned int type = get_uint ();
       if (type != 0) {
-        error (tl::sprintf (tl::to_string (QObject::tr ("Invalid CBLOCK compression type %d")), type));
+        error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
       get_uint ();  // uncomp-byte-count - not needed
@@ -1533,7 +1533,7 @@ OASISReader::read_properties (db::PropertiesRepository &rep)
     } else {
 
       if (m_expect_strict_mode == 1) {
-        warn (tl::to_string (QObject::tr ("PROPERTY names must be references to PROPNAME ids in strict mode")));
+        warn (tl::to_string (tr ("PROPERTY names must be references to PROPNAME ids in strict mode")));
       }
 
       mm_last_property_name = rep.prop_name_id (tl::Variant (get_str ()));
@@ -1583,7 +1583,7 @@ OASISReader::read_properties (db::PropertiesRepository &rep)
       } else if (t == 10 || t == 11 || t == 12) {
 
         if (m_expect_strict_mode == 1) {
-          warn (tl::to_string (QObject::tr ("PROPERTY strings must be references to PROPSTRING ids in strict mode")));
+          warn (tl::to_string (tr ("PROPERTY strings must be references to PROPSTRING ids in strict mode")));
         }
 
         if (m_read_properties) {
@@ -1607,7 +1607,7 @@ OASISReader::read_properties (db::PropertiesRepository &rep)
         }
 
       } else {
-        error (tl::sprintf (tl::to_string (QObject::tr ("Invalid property value type %d")), int (t)));
+        error (tl::sprintf (tl::to_string (tr ("Invalid property value type %d")), int (t)));
       }
 
       --n;
@@ -1629,7 +1629,7 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
   unsigned long n = 0;
   get (n);
   if (n == 0) {
-    error (tl::to_string (QObject::tr ("Invalid point list: length is zero")).c_str ());
+    error (tl::to_string (tr ("Invalid point list: length is zero")).c_str ());
   }
 
   pointlist.get_non_const ().clear ();
@@ -1661,7 +1661,7 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
     //  synthesize the last point for polygons
     if (for_polygon) {
       if ((n % 2) != 0) {
-        warn (tl::to_string (QObject::tr ("Type 0 or 1 point list with odd number of points is illegal")));
+        warn (tl::to_string (tr ("Type 0 or 1 point list with odd number of points is illegal")));
       }
       if (h) {
         pointlist.get_non_const ().push_back (db::Point (0, pos.y ()));
@@ -1705,7 +1705,7 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
     }
 
   } else {
-    error (tl::sprintf (tl::to_string (QObject::tr ("Invalid point list type %d")), type));
+    error (tl::sprintf (tl::to_string (tr ("Invalid point list type %d")), type));
   }
 
   pointlist.set_initialized ();
@@ -1840,7 +1840,7 @@ OASISReader::read_repetition ()
     }
 
   } else {
-    error (tl::sprintf (tl::to_string (QObject::tr ("Invalid repetition type %d")), type));
+    error (tl::sprintf (tl::to_string (tr ("Invalid repetition type %d")), type));
   }
 
   return mm_repetition.get ().size () > 1;
@@ -1977,7 +1977,7 @@ OASISReader::do_read_placement (unsigned char r,
       angle_deg = get_real ();
       double a = angle_deg / 90.0;
       if (a < -4 || a > 4) {
-        warn (tl::sprintf (tl::to_string (QObject::tr ("Invalid rotation angle (%g is less than -360 or larger than 360)")), angle_deg));
+        warn (tl::sprintf (tl::to_string (tr ("Invalid rotation angle (%g is less than -360 or larger than 360)")), angle_deg));
       }
       angle = int (a < 0 ? (a - 0.5) : (a + 0.5));
       if (fabs (double (angle) - a) > 1e-6) {
@@ -2128,7 +2128,7 @@ OASISReader::do_read_text (bool xy_absolute,
     } else {
 
       if (m_expect_strict_mode == 1) {
-        warn (tl::to_string (QObject::tr ("TEXT strings must be references to TEXTSTRING ids in strict mode")));
+        warn (tl::to_string (tr ("TEXT strings must be references to TEXTSTRING ids in strict mode")));
       }
 
       mm_text_string = get_str ();
@@ -2435,7 +2435,7 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
       db::Cell &cell = layout.cell (cell_index);
 
       if (mm_polygon_point_list.get ().size () < 3) {
-        warn (tl::to_string (QObject::tr ("POLYGON with less than 3 points ignored")));
+        warn (tl::to_string (tr ("POLYGON with less than 3 points ignored")));
       } else {
 
         //  convert the OASIS record into the polygon.
@@ -2507,7 +2507,7 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
     if (ll.first) {
 
       if (mm_polygon_point_list.get ().size () < 3) {
-        warn (tl::to_string (QObject::tr ("POLYGON with less than 3 points ignored")));
+        warn (tl::to_string (tr ("POLYGON with less than 3 points ignored")));
       } else {
 
         //  convert the OASIS record into the polygon.
@@ -2600,7 +2600,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
     if (ll.first) {
 
       if (mm_path_point_list.get ().size () < 2) {
-        warn (tl::to_string (QObject::tr ("POLYGON with less than 2 points ignored")));
+        warn (tl::to_string (tr ("POLYGON with less than 2 points ignored")));
       } else {
 
         //  convert the OASIS record into the path.
@@ -2676,7 +2676,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
     if (ll.first) {
 
       if (mm_path_point_list.get ().size () < 2) {
-        warn (tl::to_string (QObject::tr ("PATH with less than 2 points ignored")));
+        warn (tl::to_string (tr ("PATH with less than 2 points ignored")));
       } else {
 
         //  convert the OASIS record into the path.
@@ -3095,7 +3095,7 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
   };
 
   if (mm_ctrapezoid_type.get () >= sizeof (ctraps_table) / sizeof (ctraps_table [0])) {
-    error (tl::sprintf (tl::to_string (QObject::tr ("Invalid CTRAPEZOID type %d")), int (mm_ctrapezoid_type.get ())));
+    error (tl::sprintf (tl::to_string (tr ("Invalid CTRAPEZOID type %d")), int (mm_ctrapezoid_type.get ())));
   }
 
   db::Coord w = 0, h = 0;
@@ -3538,7 +3538,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
 
       unsigned int type = get_uint ();
       if (type != 0) {
-        error (tl::sprintf (tl::to_string (QObject::tr ("Invalid CBLOCK compression type %d")), type));
+        error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
       get_uint ();  // uncomp-byte-count - not needed

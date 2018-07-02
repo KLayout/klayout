@@ -32,8 +32,6 @@
 #include "tlStream.h"
 #include "tlUnitTest.h"
 
-#include <QDir>
-
 class PD 
   : public db::PCellDeclaration
 {

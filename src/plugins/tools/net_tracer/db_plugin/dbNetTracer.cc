@@ -841,14 +841,14 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
 
   try {
 
-    tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Tracing Net")), 1);
-    progress.set_format (tl::to_string (QObject::tr ("%.0f shapes")));
+    tl::AbsoluteProgress progress (tl::to_string (tr ("Tracing Net")), 1);
+    progress.set_format (tl::to_string (tr ("%.0f shapes")));
     progress.set_unit (100);
     progress.set_format_unit (1);
 
     mp_progress = &progress;
 
-    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Net Tracing")));
+    tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Net Tracing")));
 
     m_stop_shape = stop;
     m_start_shape = start;
@@ -1062,8 +1062,8 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
 
     if (m_stop_shape.is_valid ()) {
 
-      tl::AbsoluteProgress search_progress (tl::to_string (QObject::tr ("Finding Path")), 100);
-      search_progress.set_format (tl::to_string (QObject::tr ("Iteration %.0f00")));
+      tl::AbsoluteProgress search_progress (tl::to_string (tr ("Finding Path")), 100);
+      search_progress.set_format (tl::to_string (tr ("Iteration %.0f00")));
       search_progress.set_unit (100);
 
       const NetTracerShape *stop = &m_shapes_graph.find (m_stop_shape)->first;
@@ -1127,7 +1127,7 @@ NetTracer::trace (const db::Layout &layout, const db::Cell &cell, const NetTrace
       m_shapes_found.clear ();
 
       if (! found) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Nets are not connected")));
+        throw tl::Exception (tl::to_string (tr ("Nets are not connected")));
       }
 
       const NetTracerShape *s = start;

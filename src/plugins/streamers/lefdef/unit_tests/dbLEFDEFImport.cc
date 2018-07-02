@@ -29,7 +29,6 @@
 #include "tlUnitTest.h"
 
 #include <cstdlib>
-#include <QDir>
 
 static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au)
 {

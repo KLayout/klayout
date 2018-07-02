@@ -28,9 +28,8 @@
 #include "tlString.h"
 #include "tlString.h"
 #include "tlLog.h"
+#include "tlFileUtils.h"
 #include "dbShapeProcessor.h"
-
-#include <QDir>
 
 #include <cmath>
 #include <cctype>
@@ -75,7 +74,7 @@ static void parse_format (const std::string &format, int &l, int &t, bool &tz)
     }
 
   } catch (tl::Exception &ex) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Gerber format specification '%s' is invalid: %s")), format, ex.msg ());
+    throw tl::Exception (tl::to_string (tr ("Gerber format specification '%s' is invalid: %s")), format, ex.msg ());
   }
 }
 
@@ -114,9 +113,9 @@ GerberFileReader::GerberFileReader ()
     m_orot (0.0), m_os (1.0), m_omx (false), m_omy (false),
     m_ep (true /*report progress*/),
     mp_layout (0), mp_top_cell (0), mp_stream (0),
-    m_progress (tl::to_string (QObject::tr ("Reading Gerber file")), 10000)
+    m_progress (tl::to_string (tr ("Reading Gerber file")), 10000)
 {
-  m_progress.set_format (tl::to_string (QObject::tr ("%.0f MB")));
+  m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
 }
 
@@ -142,7 +141,7 @@ GerberFileReader::scan (tl::TextInputStream &stream)
   try {
     meta_data = do_scan();
   } catch (tl::Exception &ex) {
-    throw tl::Exception (ex.msg () + tl::to_string (QObject::tr (" in line ")) + tl::to_string (stream.line_number ()));
+    throw tl::Exception (ex.msg () + tl::to_string (tr (" in line ")) + tl::to_string (stream.line_number ()));
   }
 
   mp_stream = 0;
@@ -167,7 +166,7 @@ GerberFileReader::read (tl::TextInputStream &stream, db::Layout &layout, db::Cel
   } catch (tl::BreakException &) {
     throw;
   } catch (tl::Exception &ex) {
-    throw tl::Exception (ex.msg () + tl::to_string (QObject::tr (" in line ")) + tl::to_string (stream.line_number ()));
+    throw tl::Exception (ex.msg () + tl::to_string (tr (" in line ")) + tl::to_string (stream.line_number ()));
   }
 
   flush ();
@@ -195,13 +194,13 @@ GerberFileReader::format_string () const
 void 
 GerberFileReader::warn (const std::string &warning)
 {
-  tl::warn << warning << tl::to_string (QObject::tr (" in line ")) << mp_stream->line_number () << tl::to_string (QObject::tr (" (file ")) << mp_stream->source () << ")";
+  tl::warn << warning << tl::to_string (tr (" in line ")) << mp_stream->line_number () << tl::to_string (tr (" (file ")) << mp_stream->source () << ")";
 }
 
 void 
 GerberFileReader::error (const std::string &error)
 {
-  tl::error << error << tl::to_string (QObject::tr (" in line ")) << mp_stream->line_number () << tl::to_string (QObject::tr (" (file ")) << mp_stream->source () << ")";
+  tl::error << error << tl::to_string (tr (" in line ")) << mp_stream->line_number () << tl::to_string (tr (" (file ")) << mp_stream->source () << ")";
 }
 
 void 
@@ -246,12 +245,12 @@ GerberFileReader::read_coord (tl::Extractor &ex)
     number /= pow (10.0, ndigits);
   } else if (m_omit_leading_zeroes) {
     if (m_digits_after < 0) {
-      error (tl::to_string (QObject::tr ("Undefined number of digits - format missing")));
+      error (tl::to_string (tr ("Undefined number of digits - format missing")));
     }
     number /= pow (10.0, m_digits_after);
   } else {
     if (m_digits_before < 0) {
-      error (tl::to_string (QObject::tr ("Undefined number of digits - format missing")));
+      error (tl::to_string (tr ("Undefined number of digits - format missing")));
     }
     number /= pow (10.0, ndigits - m_digits_before);
   }
@@ -537,8 +536,7 @@ void
 GerberImporter::load_project (const std::string &fn)
 {
   //  use the file's absolute path as the base directory
-  QFileInfo fi (tl::to_qstring (fn));
-  m_dir = tl::to_string (fi.absolutePath ());
+  m_dir = tl::absolute_file_path (fn);
 
   tl::InputStream stream (fn);
   tl::TextInputStream text_stream (stream);
@@ -552,7 +550,7 @@ GerberImporter::load_project (tl::TextInputStream &stream)
   try {
     do_load_project (stream);
   } catch (tl::Exception &ex) {
-    throw tl::Exception (ex.msg () + tl::to_string (QObject::tr (" in line ")) + tl::to_string (stream.line_number ()));
+    throw tl::Exception (ex.msg () + tl::to_string (tr (" in line ")) + tl::to_string (stream.line_number ()));
   }
 }
 
@@ -627,7 +625,7 @@ GerberImporter::do_load_project (tl::TextInputStream &stream)
       l.read (m_dbu);
 
       if (m_dbu < 1e-6) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Invalid database unit %g")), m_dbu);
+        throw tl::Exception (tl::to_string (tr ("Invalid database unit %g")), m_dbu);
       }
 
     } else if (l.test ("cell-name")) {
@@ -646,7 +644,7 @@ GerberImporter::do_load_project (tl::TextInputStream &stream)
       l.read (m_circle_points);
 
       if (m_circle_points < 4) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Invalid number of points for full circle (%d)")), m_circle_points);
+        throw tl::Exception (tl::to_string (tr ("Invalid number of points for full circle (%d)")), m_circle_points);
       }
 
     } else if (l.test ("keep-path")) {
@@ -762,7 +760,7 @@ GerberImporter::do_load_project (tl::TextInputStream &stream)
           l.read (cp);
 
           if (cp < 4) {
-            throw tl::Exception (tl::to_string (QObject::tr ("Invalid number of points for full circle (%d)")), m_circle_points);
+            throw tl::Exception (tl::to_string (tr ("Invalid number of points for full circle (%d)")), m_circle_points);
           }
 
           file.set_circle_points (cp);
@@ -809,12 +807,12 @@ GerberImporter::do_load_project (tl::TextInputStream &stream)
   m_reference_points.clear ();
 
   if (ref_points.size () > 3) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Not more than three reference points can be specified")));
+    throw tl::Exception (tl::to_string (tr ("Not more than three reference points can be specified")));
   }
 
   for (unsigned int i = 0; i < ref_points.size (); ++i) {
     if (ref_points [i].first.empty () || ref_points [i].second.empty ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Reference point #%d is not fully specified (either PCB or layout coordinate is missing)")), int (i + 1));
+      throw tl::Exception (tl::to_string (tr ("Reference point #%d is not fully specified (either PCB or layout coordinate is missing)")), int (i + 1));
     }
     m_reference_points.push_back (std::make_pair (ref_points [i].first.center (), ref_points [i].second.center ()));
   }
@@ -885,12 +883,12 @@ GerberImporter::read (db::Layout &layout)
 void 
 GerberImporter::do_read (db::Layout &layout, db::cell_index_type cell_index)
 {
-  tl::log << tl::to_string (QObject::tr ("Importing PCB data"));
+  tl::log << tl::to_string (tr ("Importing PCB data"));
 
   std::set<unsigned int> inverse_layers;
 
   {
-    tl::RelativeProgress progress (tl::to_string (QObject::tr ("Importing PCB data")), m_files.size (), 1);
+    tl::RelativeProgress progress (tl::to_string (tr ("Importing PCB data")), m_files.size (), 1);
 
     //  derive the actual global transformation from the reference points
     db::DCplxTrans global_trans (m_global_trans);
@@ -921,7 +919,7 @@ GerberImporter::do_read (db::Layout &layout, db::cell_index_type cell_index)
         }
 
         if (ru < 0 || rm < 0) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Unable to deduce rotation from reference points p1 and p2 (PCB and layout)")));
+          throw tl::Exception (tl::to_string (tr ("Unable to deduce rotation from reference points p1 and p2 (PCB and layout)")));
         }
 
         if (m_reference_points.size () > 2) {
@@ -983,8 +981,8 @@ GerberImporter::do_read (db::Layout &layout, db::cell_index_type cell_index)
 
       }
 
-      QFileInfo fi (QDir (tl::to_qstring (m_dir)), tl::to_qstring (file->filename ()));
-      tl::InputStream input_file (tl::to_string (fi.absoluteFilePath ()));
+      std::string fp = tl::combine_path (tl::absolute_file_path (m_dir), file->filename ());
+      tl::InputStream input_file (fp);
       tl::TextInputStream stream (input_file);
 
       std::vector <tl::shared_ptr<db::GerberFileReader> > readers = get_readers ();
@@ -1000,7 +998,7 @@ GerberImporter::do_read (db::Layout &layout, db::cell_index_type cell_index)
       }
 
       if (! reader) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Unable to determine format for file '%s'")), tl::to_string (fi.absoluteFilePath ()).c_str ());
+        throw tl::Exception (tl::to_string (tr ("Unable to determine format for file '%s'")), fp);
       }
       
       stream.reset ();
@@ -1054,7 +1052,7 @@ GerberImporter::do_read (db::Layout &layout, db::cell_index_type cell_index)
 
       tl::log << "Inverting layer " << layout.get_properties (*l).to_string ();
 
-      sp.enable_progress (tl::to_string (QObject::tr ("Inverting layer")) + " " + tl::to_string (n + 1) + " " + tl::to_string (QObject::tr ("of")) + " " + tl::to_string (inverse_layers.size ()));
+      sp.enable_progress (tl::to_string (tr ("Inverting layer")) + " " + tl::to_string (n + 1) + " " + tl::to_string (tr ("of")) + " " + tl::to_string (inverse_layers.size ()));
       sp.boolean (layout, cell, *l, layout, cell, bbox_layer, cell.shapes (*l), db::BooleanOp::BNotA, true);
 
       //  clear the result layer for all called cells (if there are some)

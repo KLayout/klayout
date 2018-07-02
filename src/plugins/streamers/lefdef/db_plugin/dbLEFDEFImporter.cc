@@ -28,8 +28,6 @@
 
 #include <cctype>
 
-#include <QFileInfo>
-
 namespace db
 {
 
@@ -374,8 +372,8 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerDe
 {
   m_fn = stream.filename ();
 
-  tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Reading ")) + m_fn, 1000);
-  progress.set_format (tl::to_string (QObject::tr ("%.0fk lines")));
+  tl::AbsoluteProgress progress (tl::to_string (tr ("Reading ")) + m_fn, 1000);
+  progress.set_format (tl::to_string (tr ("%.0fk lines")));
   progress.set_format_unit (1000.0);
   progress.set_unit (10000.0);
 
@@ -425,9 +423,9 @@ void
 LEFDEFImporter::warn (const std::string &msg)
 {
   tl::warn << msg 
-           << tl::to_string (QObject::tr (" (line=")) << mp_stream->line_number ()
-           << tl::to_string (QObject::tr (", cell=")) << m_cellname
-           << tl::to_string (QObject::tr (", file=")) << m_fn
+           << tl::to_string (tr (" (line=")) << mp_stream->line_number ()
+           << tl::to_string (tr (", cell=")) << m_cellname
+           << tl::to_string (tr (", file=")) << m_fn
            << ")";
 }
 

@@ -23,15 +23,13 @@
 
 #include "tlTimer.h"
 #include "tlStream.h"
+#include "tlFileUtils.h"
 
 #include "dbReader.h"
 #include "dbStream.h"
 #include "dbLEFImporter.h"
 #include "dbDEFImporter.h"
 #include "dbLEFDEFImporter.h"
-
-#include <QFileInfo>
-#include <QDir>
 
 namespace db
 {
@@ -110,10 +108,8 @@ private:
 
   std::string correct_path (const std::string &fn)
   {
-    QFileInfo fi (tl::to_qstring (fn));
-    if (! fi.isAbsolute ()) {
-      QDir input_dir (QFileInfo (tl::to_qstring (m_stream.absolute_path ())).dir ());
-      return tl::to_string (input_dir.filePath (fi.filePath ()));
+    if (! tl::is_absolute (fn)) {
+      return tl::combine_path (m_stream.absolute_path (), fn);
     } else {
       return fn;
     }
@@ -134,7 +130,7 @@ private:
 
     if (import_lef) {
 
-      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Reading LEF file")));
+      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Reading LEF file")));
 
       db::LEFImporter importer;
 
@@ -143,17 +139,17 @@ private:
         std::string lp = correct_path (*l);
 
         tl::InputStream lef_stream (lp);
-        tl::log << tl::to_string (QObject::tr ("Reading")) << " " << lp;
+        tl::log << tl::to_string (tr ("Reading")) << " " << lp;
         importer.read (lef_stream, layout, layers);
 
       }
 
-      tl::log << tl::to_string (QObject::tr ("Reading")) << " " << m_stream.source ();
+      tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
       importer.read (m_stream, layout, layers);
 
     } else {
 
-      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Reading DEF file")));
+      tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Reading DEF file")));
 
       DEFImporter importer;
 
@@ -162,24 +158,24 @@ private:
         std::string lp = correct_path (*l);
 
         tl::InputStream lef_stream (lp);
-        tl::log << tl::to_string (QObject::tr ("Reading")) << " " << lp;
+        tl::log << tl::to_string (tr ("Reading")) << " " << lp;
         importer.read_lef (lef_stream, layout, layers);
 
       }
 
       //  Additionally read all LEF files next to the DEF file
 
-      QDir input_dir (QFileInfo (tl::to_qstring (m_stream.absolute_path ())).dir ());
-      if (input_dir.exists () && input_dir.isReadable ()) {
+      std::string input_dir = tl::absolute_path (m_stream.absolute_path ());
+      if (tl::file_exists (input_dir)) {
 
-        QStringList entries = input_dir.entryList ();
-        for (QStringList::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+        std::vector<std::string> entries = tl::dir_entries (input_dir);
+        for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
 
-          if (is_lef_format (tl::to_string (*e))) {
+          if (is_lef_format (*e)) {
 
-            std::string lp = tl::to_string (input_dir.filePath (*e));
+            std::string lp = tl::combine_path (input_dir, *e);
             tl::InputStream lef_stream (lp);
-            tl::log << tl::to_string (QObject::tr ("Reading")) << " " << lp;
+            tl::log << tl::to_string (tr ("Reading")) << " " << lp;
             importer.read_lef (lef_stream, layout, layers);
 
           }
@@ -188,7 +184,7 @@ private:
 
       }
 
-      tl::log << tl::to_string (QObject::tr ("Reading")) << " " << m_stream.source ();
+      tl::log << tl::to_string (tr ("Reading")) << " " << m_stream.source ();
       importer.read (m_stream, layout, layers);
 
     }

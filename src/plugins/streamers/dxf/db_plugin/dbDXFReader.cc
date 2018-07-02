@@ -38,12 +38,14 @@
 #include <cctype>
 #include <set>
 
-#include <QString>
-#include <QStringList>
-#include <QFont>
-#include <QFontMetrics>
-#include <QPolygon>
-#include <QPainterPath>
+#if defined(HAVE_QT)
+# include <QString>
+# include <QStringList>
+# include <QFont>
+# include <QFontMetrics>
+# include <QPolygon>
+# include <QPainterPath>
+#endif
 
 namespace db
 {
@@ -55,12 +57,12 @@ static std::string zero_layer_name ("0");
 
 DXFReader::DXFReader (tl::InputStream &s)
   : m_stream (s),
-    m_progress (tl::to_string (QObject::tr ("Reading DXF file")), 1000),
+    m_progress (tl::to_string (tr ("Reading DXF file")), 1000),
     m_dbu (0.001), m_unit (1.0), m_text_scaling (1.0), m_polyline_mode (0), m_circle_points (100), m_circle_accuracy (0.0), m_contour_accuracy (0.0),
     m_ascii (false), m_initial (true), m_render_texts_as_polygons (false), m_keep_other_cells (false), m_line_number (0),
     m_zero_layer (0)
 {
-  m_progress.set_format (tl::to_string (QObject::tr ("%.0fk lines")));
+  m_progress.set_format (tl::to_string (tr ("%.0fk lines")));
   m_progress.set_format_unit (1000.0);
   m_progress.set_unit (100000.0);
 }
@@ -76,7 +78,7 @@ DXFReader::check_coord (double x)
   //  Note: we stay on the safe side by dropping one bit (*0.5)
   if (x < std::numeric_limits <db::Coord>::min () * 0.5 ||
       x > std::numeric_limits <db::Coord>::max () * 0.5) {
-    error (tl::to_string (QObject::tr ("Coordinate value overflow")));
+    error (tl::to_string (tr ("Coordinate value overflow")));
   }
 }
 
@@ -305,11 +307,11 @@ DXFReader::read (db::Layout &layout, const db::LoadLayoutOptions &options)
   if (m_polyline_mode == 0 /*auto mode*/) {
     m_polyline_mode = determine_polyline_mode ();
     if (m_polyline_mode == 3) {
-      tl::log << tl::to_string (QObject::tr ("Automatic polyline mode: merge lines with width = 0 into polygons"));
+      tl::log << tl::to_string (tr ("Automatic polyline mode: merge lines with width = 0 into polygons"));
     } else if (m_polyline_mode == 2) {
-      tl::log << tl::to_string (QObject::tr ("Automatic polyline mode: create polygons from closed polylines with width = 0"));
+      tl::log << tl::to_string (tr ("Automatic polyline mode: create polygons from closed polylines with width = 0"));
     } else if (m_polyline_mode == 1) {
-      tl::log << tl::to_string (QObject::tr ("Automatic polyline mode: keep lines, make polygons from solid and hatch entities"));
+      tl::log << tl::to_string (tr ("Automatic polyline mode: keep lines, make polygons from solid and hatch entities"));
     }
   }
 
@@ -353,13 +355,13 @@ DXFReader::warn (const std::string &msg)
   // TODO: compress
   if (m_ascii) {
     tl::warn << msg 
-             << tl::to_string (QObject::tr (" (line=")) << m_line_number
-             << tl::to_string (QObject::tr (", cell=")) << m_cellname
+             << tl::to_string (tr (" (line=")) << m_line_number
+             << tl::to_string (tr (", cell=")) << m_cellname
              << ")";
   } else {
     tl::warn << msg 
-             << tl::to_string (QObject::tr (" (position=")) << m_stream.pos ()
-             << tl::to_string (QObject::tr (", cell=")) << m_cellname
+             << tl::to_string (tr (" (position=")) << m_stream.pos ()
+             << tl::to_string (tr (", cell=")) << m_cellname
              << ")";
   }
 }
@@ -1192,7 +1194,9 @@ normalize_string (const std::string &in, bool for_mtext)
         }
       }
 
-      s += QString (QChar(code)).toUtf8 ().constData ();
+      std::wstring ws;
+      ws += wchar_t (code);
+      s += tl::to_string (ws);
 
     } else if (for_mtext && *c == '\\' && c[1] && tolower(c[1]) == 'p') {
       s += "\n";
@@ -1247,6 +1251,8 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
   }
 
   if (m_render_texts_as_polygons) {
+
+#if defined(HAVE_QT)
 
     db::EdgeProcessor ep;
 
@@ -1365,6 +1371,10 @@ DXFReader::deliver_text (db::Shapes &shapes, const std::string &s, const db::DCp
       y0 -= ls;
 
     }
+
+#else
+    error (tl::to_string (tr ("Render texts as polygons is not available (Qt not compiled in)")));
+#endif
 
   } else {
     db::DText text (s, db::DTrans (text_trans), text_trans.ctrans (h * m_text_scaling / 100.0), db::NoFont, ha, va);
@@ -2739,7 +2749,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
   
   if (! collected_edges.empty ()) {
 
-    tl::RelativeProgress progress (tl::to_string (QObject::tr ("Merging edges")), 1000000, 10000);
+    tl::RelativeProgress progress (tl::to_string (tr ("Merging edges")), 1000000, 10000);
 
     db::EdgesToContours e2c;
 

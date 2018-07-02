@@ -15,6 +15,10 @@ equals(HAVE_CURL, "1") {
   }
 }
 
+equals(HAVE_EXPAT, "1") {
+  LIBS += -lexpat
+}
+
 FORMS =
 
 SOURCES = \

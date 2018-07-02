@@ -54,7 +54,7 @@ class DB_PLUGIN_PUBLIC OASISReaderException
 {
 public:
   OASISReaderException (const std::string &msg, size_t p, const std::string &cell)
-    : ReaderException (tl::sprintf (tl::to_string (QObject::tr ("%s (position=%ld, cell=%s)")), msg, p, cell))
+    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (position=%ld, cell=%s)")), msg, p, cell))
   { }
 };
 
@@ -255,7 +255,7 @@ private:
   {
     unsigned char *b = (unsigned char *) m_stream.get (1);
     if (! b) {
-      error (tl::to_string (QObject::tr ("Unexpected end-of-file")));
+      error (tl::to_string (tr ("Unexpected end-of-file")));
       return 0;
     } else {
       return *b;

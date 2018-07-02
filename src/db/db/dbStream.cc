@@ -23,6 +23,7 @@
 
 #include "dbStream.h"
 #include "tlClassRegistry.h"
+#include "tlXMLParser.h"
 
 #include <string.h>
 
@@ -38,7 +39,6 @@ namespace db
 // ------------------------------------------------------------------
 //  Implementation of load_options_xml_element_list
 
-#if defined(HAVE_XML)
 
 tl::XMLElementList load_options_xml_element_list ()
 {
@@ -73,8 +73,6 @@ tl::XMLElementList save_options_xml_element_list ()
 
   return elements;
 }
-
-#endif
 
 }
 

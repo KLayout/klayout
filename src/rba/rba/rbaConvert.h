@@ -313,6 +313,7 @@ inline std::string ruby2c<std::string> (VALUE rval)
   return std::string (RSTRING_PTR(str), RSTRING_LEN(str));
 }
 
+#if defined(HAVE_QT)
 template <>
 inline QByteArray ruby2c<QByteArray> (VALUE rval)
 {
@@ -326,6 +327,7 @@ inline QString ruby2c<QString> (VALUE rval)
   VALUE str = rba_safe_string_value (rval);
   return tl::to_qstring (std::string (RSTRING_PTR(str), RSTRING_LEN(str)));
 }
+#endif
 
 template <>
 inline void *ruby2c<void *> (VALUE rval)
@@ -448,6 +450,7 @@ inline VALUE c2ruby<std::string> (const std::string &c)
   return rb_str_new (c.c_str (), c.size ());
 }
 
+#if defined(HAVE_QT)
 template <>
 inline VALUE c2ruby<QByteArray> (const QByteArray &qba)
 {
@@ -468,6 +471,7 @@ inline VALUE c2ruby<QString> (const QString &qs)
     return rb_str_new (c.c_str (), c.size ());
   }
 }
+#endif
 
 template <>
 inline VALUE c2ruby<void *> (void * const &s)

@@ -31,10 +31,8 @@
 #include "dbLoadLayoutOptions.h"
 
 #include "tlClassRegistry.h"
-#if defined(HAVE_XML)
-#  include "tlXMLParser.h"
-#  include "tlXMLWriter.h"
-#endif
+#include "tlXMLParser.h"
+#include "tlXMLWriter.h"
 
 #include <string>
 #include <vector>
@@ -111,7 +109,6 @@ public:
    */
   virtual bool can_write () const = 0;
 
-#if defined(HAVE_XML)
   /**
    *  @brief Delivers the XMLElement object that represents the reader options within a technology XML tree
    *
@@ -139,10 +136,8 @@ public:
   {
     return 0;
   }
-#endif
 };
 
-#if defined(HAVE_XML)
 /**
  *  @brief A helper class for the XML serialization of the stream options (custom read adaptor)
  *
@@ -303,7 +298,6 @@ DB_PUBLIC tl::XMLElementList load_options_xml_element_list ();
  *  @brief Returns the XMLElement list that can represent a db::SaveLayoutOptions object
  */
 DB_PUBLIC tl::XMLElementList save_options_xml_element_list ();
-#endif
 
 }
 

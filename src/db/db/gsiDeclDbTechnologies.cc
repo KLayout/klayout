@@ -22,10 +22,8 @@
 #include "gsiDecl.h"
 #include "dbTechnology.h"
 
-#if defined(HAVE_XML)
-#  include "tlXMLWriter.h"
-#  include "tlXMLParser.h"
-#endif
+#include "tlXMLWriter.h"
+#include "tlXMLParser.h"
 
 namespace gsi
 {
@@ -62,7 +60,6 @@ static bool has_technology (const std::string &name)
   return db::Technologies::instance ()->has_technology (name);
 }
 
-#if defined(HAVE_XML)
 static std::string technologies_to_xml ()
 {
   return db::Technologies::instance ()->to_xml ();
@@ -94,7 +91,6 @@ static std::string technology_to_xml (const db::Technology *tech)
     return os.string ();
   }
 }
-#endif
 
 static db::TechnologyComponent *get_component (db::Technology *tech, const std::string &name)
 {
@@ -280,7 +276,6 @@ gsi::Class<db::Technology> technology_decl ("db", "Technology",
   gsi::method ("remove_technology", &remove_technology, gsi::arg ("name"),
     "@brief Removes the technology with the given name\n"
   ) +
-#if defined(HAVE_XML)
   gsi::method ("technologies_to_xml", &technologies_to_xml,
     "@brief Returns a XML representation of all technologies registered in the system\n"
     "\n"
@@ -304,7 +299,6 @@ gsi::Class<db::Technology> technology_decl ("db", "Technology",
     "\n"
     "See \\technology_to_xml for details."
   ) +
-#endif
   gsi::method_ext ("component_names", &get_component_names,
     "@brief Gets the names of all components available for \\component"
   ) +

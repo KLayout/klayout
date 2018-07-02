@@ -51,7 +51,7 @@ class DB_PLUGIN_PUBLIC LEFDEFReaderException
 {
 public:
   LEFDEFReaderException (const std::string &msg, int line, const std::string &cell, const std::string &fn)
-    : db::ReaderException (tl::sprintf (tl::to_string (QObject::tr ("%s (line=%d, cell=%s, file=%s)")), msg.c_str (), line, cell, fn))
+    : db::ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%d, cell=%s, file=%s)")), msg.c_str (), line, cell, fn))
   { }
 };
 

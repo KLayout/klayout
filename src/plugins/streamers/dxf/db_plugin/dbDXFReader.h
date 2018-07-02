@@ -53,11 +53,11 @@ class DB_PLUGIN_PUBLIC DXFReaderException
 {
 public:
   DXFReaderException (const std::string &msg, size_t p, const std::string &cell)
-    : ReaderException (tl::sprintf (tl::to_string (QObject::tr ("%s (position=%ld, cell=%s)")), msg.c_str (), p, cell))
+    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (position=%ld, cell=%s)")), msg.c_str (), p, cell))
   { }
 
   DXFReaderException (const std::string &msg, int line, const std::string &cell)
-    : ReaderException (tl::sprintf (tl::to_string (QObject::tr ("%s (line=%d, cell=%s)")), msg.c_str (), line, cell))
+    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%d, cell=%s)")), msg.c_str (), line, cell))
   { }
 };
 

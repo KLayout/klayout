@@ -4,34 +4,38 @@ SUBDIRS = \
   db \
   tl \
   rdb \
-  lay \
 
-equals(HAVE_QTBINDINGS, "1") {
-  equals(HAVE_QT5, "1") {
+!equals(HAVE_QT, "0") {
 
-    SUBDIRS += \
-      QtCore \
-      QtGui \
-      QtNetwork \
-      QtSql \
-      QtWidgets \
-      QtDesigner \
-      QtMultimedia \
-      QtPrintSupport \
-      QtSvg \
-      QtXmlPatterns \
-      QtXml
+  SUBDIRS += lay
 
-  } else {
+  equals(HAVE_QTBINDINGS, "1") {
+    equals(HAVE_QT5, "1") {
 
-    SUBDIRS += \
-      QtCore \
-      QtGui \
-      QtXml \
-      QtSql \
-      QtNetwork \
-      QtDesigner
+      SUBDIRS += \
+        QtCore \
+        QtGui \
+        QtNetwork \
+        QtSql \
+        QtWidgets \
+        QtDesigner \
+        QtMultimedia \
+        QtPrintSupport \
+        QtSvg \
+        QtXmlPatterns \
+        QtXml
 
+    } else {
+
+      SUBDIRS += \
+        QtCore \
+        QtGui \
+        QtXml \
+        QtSql \
+        QtNetwork \
+        QtDesigner
+
+    }
   }
 }
 

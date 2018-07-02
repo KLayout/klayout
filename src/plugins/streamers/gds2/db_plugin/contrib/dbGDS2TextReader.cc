@@ -39,10 +39,10 @@ namespace db
 
 GDS2ReaderText::GDS2ReaderText(tl::InputStream &s, int /*ignored*/)
   : GDS2ReaderBase(), sStream(s),
-    mProgress (tl::to_string (QObject::tr ("Reading GDS2 text file")), 10000),
+    mProgress (tl::to_string (tr ("Reading GDS2 text file")), 10000),
     storedRecId (0)
 {
-  mProgress.set_format (tl::to_string (QObject::tr ("%.0f MB")));
+  mProgress.set_format (tl::to_string (tr ("%.0f MB")));
   mProgress.set_unit (1024 * 1024);
 }
 
@@ -253,7 +253,7 @@ GDS2ReaderText::get_double () throw (tl::Exception)
 {
   double x = 0;
   if (! reader.try_read (x)) {
-    error (tl::to_string (QObject::tr ("Expected a floating-point number")));
+    error (tl::to_string (tr ("Expected a floating-point number")));
   }
   return x;
 }
@@ -270,7 +270,7 @@ GDS2ReaderText::get_int () throw (tl::Exception)
 {
   int x = 0;
   if (! reader.try_read (x)) {
-    error (tl::to_string (QObject::tr ("Expected an integer number")));
+    error (tl::to_string (tr ("Expected an integer number")));
   }
   return x;
 }
@@ -280,10 +280,10 @@ GDS2ReaderText::get_short () throw (tl::Exception)
 {
   int x = 0;
   if (! reader.try_read (x)) {
-    error (tl::to_string (QObject::tr ("Expected an integer number")));
+    error (tl::to_string (tr ("Expected an integer number")));
   }
   if (x < std::numeric_limits<short>::min() || x > std::numeric_limits<short>::max ()) {
-    error (tl::to_string (QObject::tr ("Value out of range for 16bit signed integer")));
+    error (tl::to_string (tr ("Value out of range for 16bit signed integer")));
   }
   return x;
 }
@@ -293,10 +293,10 @@ GDS2ReaderText::get_ushort () throw (tl::Exception)
 {
   unsigned int x = 0;
   if (! reader.try_read (x)) {
-    error (tl::to_string (QObject::tr ("Expected an integer number")));
+    error (tl::to_string (tr ("Expected an integer number")));
   }
   if (x > std::numeric_limits<unsigned short>::max ()) {
-    error (tl::to_string (QObject::tr ("Value out of range for 16bit unsigned integer")));
+    error (tl::to_string (tr ("Value out of range for 16bit unsigned integer")));
   }
   return x;
 }
@@ -312,8 +312,8 @@ GDS2ReaderText::warn (const std::string &msg)
 {
   // TODO: compress
   tl::warn << msg 
-           << tl::to_string (QObject::tr (", line number=")) << sStream.line_number()
-           << tl::to_string (QObject::tr (", cell=")) << cellname ().c_str ()
+           << tl::to_string (tr (", line number=")) << sStream.line_number()
+           << tl::to_string (tr (", cell=")) << cellname ().c_str ()
            << ")";
 }
 

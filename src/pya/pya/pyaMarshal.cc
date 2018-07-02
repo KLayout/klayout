@@ -184,7 +184,7 @@ struct get_boxed_value_func
       const gsi::ClassBase *bt = gsi::cls_decl <gsi::Value> ();
 
       if (!cls_decl->is_derived_from (bt)) {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Passing an object to pointer or reference requires a boxed type (pya.%s)")), bt->name ()));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Passing an object to pointer or reference requires a boxed type (pya.%s)")), bt->name ()));
       }
 
       PYAObjectBase *p = (PYAObjectBase *) arg;
@@ -219,7 +219,7 @@ struct writer
     if (arg == Py_None || arg == NULL) {
 
       if (atype.is_ref () || atype.is_cref ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Arguments or return values of reference type cannot be passed None")));
+        throw tl::Exception (tl::to_string (tr ("Arguments or return values of reference type cannot be passed None")));
       } else if (atype.is_ptr ()) {
         aa->write<R *> ((R *)0);
       } else if (atype.is_cptr ()) {
@@ -234,7 +234,7 @@ struct writer
         // references or pointers require a boxed object. Pointers also allow None.
         void *vc = boxed_value_ptr (atype.type (), arg, *heap);
         if (! vc && atype.is_ref ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Arguments or return values of reference or direct type cannot be passed None or an empty boxed value object")));
+          throw tl::Exception (tl::to_string (tr ("Arguments or return values of reference or direct type cannot be passed None or an empty boxed value object")));
         }
         aa->write<void *> (vc);
       } else if (atype.is_cref ()) {
@@ -282,7 +282,7 @@ struct writer<gsi::StringType>
         void *vc = 0;
         get_boxed_value_func<std::string> () (&vc, arg, heap);
         if (! vc && atype.is_ref ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Arguments or return values of reference or direct type cannot be passed nil or an empty boxed value object")));
+          throw tl::Exception (tl::to_string (tr ("Arguments or return values of reference or direct type cannot be passed nil or an empty boxed value object")));
         }
 
         //  NOTE: by convention we pass the ownership to the receiver for adaptors.
@@ -327,7 +327,7 @@ struct writer<gsi::VectorType>
   {
     if (arg == Py_None || arg == NULL) {
       if (! (atype.is_ptr () || atype.is_cptr ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Arguments of reference or direct type cannot be passed nil")));
+        throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else {
         aa->write<void *> ((void *)0);
       }
@@ -348,7 +348,7 @@ struct writer<gsi::MapType>
   {
     if (arg == Py_None || arg == NULL) {
       if (! (atype.is_ptr () || atype.is_cptr ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Arguments of reference or direct type cannot be passed nil")));
+        throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else {
         aa->write<void *> ((void *)0);
       }
@@ -372,7 +372,7 @@ struct writer<gsi::ObjectType>
     if (arg == Py_None || arg == NULL) {
 
       if (! (atype.is_ptr () || atype.is_cptr ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Arguments of reference or direct type cannot be passed null")));
+        throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed null")));
       } else {
         aa->write<void *> ((void *) 0);
         return;
@@ -384,7 +384,7 @@ struct writer<gsi::ObjectType>
 
       const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
       if (! cls_decl) {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
       }
 
       if (cls_decl->is_derived_from (atype.cls ())) {
@@ -409,14 +409,14 @@ struct writer<gsi::ObjectType>
         aa->write<void *> (new_obj);
 
       } else {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), cls_decl->name ()));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), cls_decl->name ()));
       }
 
     } else {
 
       const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
       if (! cls_decl) {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
       }
 
       if (cls_decl->is_derived_from (atype.cls ())) {
@@ -436,7 +436,7 @@ struct writer<gsi::ObjectType>
         aa->write<void *> (atype.cls ()->create_obj_from (cls_decl, p->obj ()));
 
       } else {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), cls_decl->name ()));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), cls_decl->name ()));
       }
 
     }
@@ -757,7 +757,7 @@ void PythonBasedVectorAdaptor::push (gsi::SerialArgs &r, tl::Heap &heap)
     gsi::do_on_type<reader> () (mp_ainner->type (), &r, &member, (PYAObjectBase *) 0, *mp_ainner, &heap);
     PyList_Append (m_array.get (), member.get ());
   } else if (PyTuple_Check (m_array.get ())) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Tuples cannot be modified and cannot be used as out parameters")));
+    throw tl::Exception (tl::to_string (tr ("Tuples cannot be modified and cannot be used as out parameters")));
   }
 }
 

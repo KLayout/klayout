@@ -53,7 +53,7 @@ class DB_PLUGIN_PUBLIC CIFReaderException
 {
 public:
   CIFReaderException (const std::string &msg, size_t l, const std::string &cell)
-    : ReaderException (tl::sprintf (tl::to_string (QObject::tr ("%s (line=%ld, cell=%s)")), msg, l, cell))
+    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%ld, cell=%s)")), msg, l, cell))
   { }
 };
 

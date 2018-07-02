@@ -49,7 +49,7 @@ class DB_PLUGIN_PUBLIC GDS2ReaderException
 {
 public:
   GDS2ReaderException (const std::string &msg, size_t p, size_t n, const std::string &cell)
-    : ReaderException (tl::sprintf (tl::to_string (QObject::tr ("%s (position=%ld, record number=%ld, cell=%s)")), msg, p, n, cell))
+    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (position=%ld, record number=%ld, cell=%s)")), msg, p, n, cell))
   { }
 };
 

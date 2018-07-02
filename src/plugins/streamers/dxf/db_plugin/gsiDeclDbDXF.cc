@@ -116,7 +116,7 @@ static double get_dxf_contour_accuracy (const db::LoadLayoutOptions *options)
 static void set_dxf_polyline_mode (db::LoadLayoutOptions *options, int mode)
 {
   if (mode < 0 || mode > 4) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid polygon mode")));
+    throw tl::Exception (tl::to_string (tr ("Invalid polygon mode")));
   }
 
   options->get_options<db::DXFReaderOptions> ().polyline_mode = mode;
@@ -348,7 +348,7 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
 static void set_dxf_polygon_mode (db::SaveLayoutOptions *options, int mode)
 {
   if (mode < 0 || mode > 3) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid polygon mode")));
+    throw tl::Exception (tl::to_string (tr ("Invalid polygon mode")));
   }
 
   options->get_options<db::DXFWriterOptions> ().polygon_mode = mode;

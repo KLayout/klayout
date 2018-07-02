@@ -40,7 +40,7 @@ class DB_PLUGIN_PUBLIC GDS2ReaderTextException
 {
 public:
   GDS2ReaderTextException (const std::string &msg, size_t n, const std::string &cell)
-    : ReaderException (tl::sprintf (tl::to_string (QObject::tr ("%s (line number=%ld, cell=%s)")).c_str (), msg.c_str (),  n, cell.c_str ()))
+    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line number=%ld, cell=%s)")).c_str (), msg.c_str (),  n, cell.c_str ()))
   { }
 };
 

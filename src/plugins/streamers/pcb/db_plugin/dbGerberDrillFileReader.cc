@@ -412,7 +412,7 @@ GerberDrillFileReader::process_line (const std::string &s)
             //  some file formats indicate "no tool" with this code ..
             m_current_diameter = 0.0;
           } else {
-            throw tl::Exception (tl::to_string (QObject::tr ("Undefined tool code %d")), tcode);
+            throw tl::Exception (tl::to_string (tr ("Undefined tool code %d")), tcode);
           }
         } else {
           m_current_diameter = m_tools [tcode];
@@ -766,11 +766,11 @@ GerberDrillFileReader::process_line (const std::string &s)
     }
 
     if (! ex.at_end ()) {
-      warn (tl::sprintf (tl::to_string (QObject::tr ("Part of line ignored: %s")), ex.skip ()));
+      warn (tl::sprintf (tl::to_string (tr ("Part of line ignored: %s")), ex.skip ()));
     }
 
   } else if (!m_in_header && c != 0) {
-    warn (tl::to_string (QObject::tr ("Statement ignored")));
+    warn (tl::to_string (tr ("Statement ignored")));
   }
 }
 

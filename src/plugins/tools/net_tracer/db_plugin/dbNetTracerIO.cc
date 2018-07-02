@@ -185,7 +185,7 @@ NetTracerLayerExpressionInfo::get_expr (const db::LayerProperties &lp, const db:
     if (s->symbol ().log_equal (lp)) {
       std::set<std::string> us = used_symbols;
       if (! us.insert (s->symbol ().to_string ()).second) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Recursive expression through symbol %s")), s->symbol ());
+        throw tl::Exception (tl::to_string (tr ("Recursive expression through symbol %s")), s->symbol ());
       }
       return NetTracerLayerExpressionInfo::compile (s->expression ()).get (layout, tech, us);
     }
@@ -486,13 +486,13 @@ Net::define_layer (unsigned int l, const db::LayerProperties &lp, const db::Laye
 //  NetTracerTechnologyComponent implementation
 
 NetTracerTechnologyComponent::NetTracerTechnologyComponent ()
-  : db::TechnologyComponent (net_tracer_component_name, tl::to_string (QObject::tr ("Connectivity")))
+  : db::TechnologyComponent (net_tracer_component_name, tl::to_string (tr ("Connectivity")))
 {
   // .. nothing yet ..
 }
 
 NetTracerTechnologyComponent::NetTracerTechnologyComponent (const NetTracerTechnologyComponent &d)
-  : db::TechnologyComponent (net_tracer_component_name, tl::to_string (QObject::tr ("Connectivity")))
+  : db::TechnologyComponent (net_tracer_component_name, tl::to_string (tr ("Connectivity")))
 {
   m_connections = d.m_connections;
   m_symbols = d.m_symbols;
@@ -505,25 +505,25 @@ NetTracerTechnologyComponent::get_tracer_data (const db::Layout &layout) const
   int n = 1;
   for (NetTracerTechnologyComponent::const_iterator c = begin (); c != end (); ++c, ++n) {
     if (c->layer_a ().to_string ().empty ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Missing first layer specification on connectivity specification #%d")), n);
+      throw tl::Exception (tl::to_string (tr ("Missing first layer specification on connectivity specification #%d")), n);
     }
     if (c->layer_b ().to_string ().empty ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Missing second layer specification on connectivity specification #%d")), n);
+      throw tl::Exception (tl::to_string (tr ("Missing second layer specification on connectivity specification #%d")), n);
     }
   }
 
   n = 1;
   for (NetTracerTechnologyComponent::const_symbol_iterator s = begin_symbols (); s != end_symbols (); ++s, ++n) {
     if (s->symbol ().to_string ().empty ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Missing symbol name on symbol specification #%d")), n);
+      throw tl::Exception (tl::to_string (tr ("Missing symbol name on symbol specification #%d")), n);
     }
     if (s->expression ().empty ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Missing expression on symbol specification #%d")), n);
+      throw tl::Exception (tl::to_string (tr ("Missing expression on symbol specification #%d")), n);
     }
     try {
       std::auto_ptr<NetTracerLayerExpression> expr_in (NetTracerLayerExpressionInfo::compile (s->expression ()).get (layout, *this));
     } catch (tl::Exception &ex) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Error compiling expression '%s' (symbol #%d): %s")), s->expression (), n, ex.msg ());
+      throw tl::Exception (tl::to_string (tr ("Error compiling expression '%s' (symbol #%d): %s")), s->expression (), n, ex.msg ());
     }
   }
 

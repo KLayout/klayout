@@ -24,7 +24,9 @@
 #include "tlStaticObjects.h"
 #include "rba.h"
 
+#if defined(HAVE_QT)
 #include <QCoreApplication>
+#endif
 
 BD_PUBLIC int BD_TARGET (int argc, char *argv []);
 
@@ -33,7 +35,9 @@ BD_PUBLIC int BD_TARGET (int argc, char *argv []);
  */
 static int main_cont (int &argc, char **argv)
 {
+#if defined(HAVE_QT)
   QCoreApplication app (argc, argv);
+#endif
   return bd::_main_impl (&BD_TARGET, argc, argv);
 }
 

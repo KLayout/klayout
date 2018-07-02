@@ -603,7 +603,7 @@ RS274XMacroAperture::do_produce_flash ()
   try {
     do_produce_flash_internal ();
   } catch (tl::Exception &ex) {
-    throw tl::Exception (ex.msg () + " (" + tl::to_string (QObject::tr ("expanding macro")) + " " + m_name + ")");
+    throw tl::Exception (ex.msg () + " (" + tl::to_string (tr ("expanding macro")) + " " + m_name + ")");
   }
 }
 
@@ -619,7 +619,7 @@ RS274XMacroAperture::read_exposure (tl::Extractor &ex, bool &clear, bool &clear_
   } else if (pol == 2) {
     clear = !clear_set || !clear;
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid exposure code '%d'")), pol);
+    throw tl::Exception (tl::to_string (tr ("Invalid exposure code '%d'")), pol);
   }
 
   clear_set = true;
@@ -698,7 +698,7 @@ RS274XMacroAperture::do_produce_flash_internal ()
 
         db::DVector p (to - from);
         if (p.sq_length () < 1e-10) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Identical start and end point in type 2 or 20 aperture macro primitive")));
+          throw tl::Exception (tl::to_string (tr ("Identical start and end point in type 2 or 20 aperture macro primitive")));
         }
 
         clear_points ();
@@ -756,7 +756,7 @@ RS274XMacroAperture::do_produce_flash_internal ()
         ex.expect (",");
         int n = int (read_expr (ex) + 0.5);
         if (n < 1) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Invalid point count in outline element in aperture macro")));
+          throw tl::Exception (tl::to_string (tr ("Invalid point count in outline element in aperture macro")));
         }
 
         std::vector<db::DPoint> points;
@@ -833,7 +833,7 @@ RS274XMacroAperture::do_produce_flash_internal ()
         ex.expect (",");
         int n = int (read_expr (ex) + 0.5);
         if (n < 3) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Invalid point count in polygon element in aperture macro")));
+          throw tl::Exception (tl::to_string (tr ("Invalid point count in polygon element in aperture macro")));
         }
 
         ex.expect (",");

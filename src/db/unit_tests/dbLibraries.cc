@@ -35,7 +35,6 @@
 #include "tlStaticObjects.h"
 #include "tlUnitTest.h"
 
-#include <QDir>
 #include <memory>
 
 class LIBT_PD 

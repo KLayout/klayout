@@ -28,7 +28,6 @@
 #include "tlUnitTest.h"
 
 #include <stdlib.h>
-#include <QDir>
 
 // Test the writer's capabilities to write polygon's with holes
 TEST(1)

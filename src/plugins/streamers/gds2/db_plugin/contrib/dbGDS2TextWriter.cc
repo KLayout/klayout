@@ -43,9 +43,9 @@ namespace db
 
 GDS2WriterText::GDS2WriterText()
   : pStream(0),siCurrentRecord(0),bIsXCoordinate(true),
-    mProgress (tl::to_string (QObject::tr ("Writing GDS2 text file")), 10000)
+    mProgress (tl::to_string (tr ("Writing GDS2 text file")), 10000)
 {
-  mProgress.set_format (tl::to_string (QObject::tr ("%.0f MB")));
+  mProgress.set_format (tl::to_string (tr ("%.0f MB")));
   mProgress.set_unit (1024 * 1024);
 }
 

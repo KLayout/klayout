@@ -65,10 +65,12 @@ static std::vector<const db::TextGenerator *> generators ()
 }
 
 Class<db::TextGenerator> decl_TextGenerator ("db", "TextGenerator",
+#if defined(HAVE_QT)
   method ("load_from_resource", &db::TextGenerator::load_from_resource, arg ("resource_path"),
     "@brief Loads the given resource data (as layout data) into the generator\n"
     "See the description of the class how the layout data is read."
   ) +
+#endif
   method ("load_from_file", &db::TextGenerator::load_from_file, arg ("path"),
     "@brief Loads the given file into the generator\n"
     "See the description of the class how the layout data is read."

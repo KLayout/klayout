@@ -79,7 +79,6 @@ equals(HAVE_QT, "0") {
 } else {
 
   DEFINES += HAVE_QT
-  DEFINES += HAVE_XML
   QT += network xml sql
 
   equals(HAVE_QT5, "1") {

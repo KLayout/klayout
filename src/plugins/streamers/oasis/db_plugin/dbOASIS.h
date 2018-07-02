@@ -512,7 +512,7 @@ modal_variable<T>::get () const
 {
   if (! m_initialized) {
     if (mp_diag) {
-      mp_diag->warn (tl::to_string (QObject::tr ("Modal variable accessed before being defined: ")) + m_name);
+      mp_diag->warn (tl::to_string (tr ("Modal variable accessed before being defined: ")) + m_name);
     } else {
       tl_assert (false);
     }

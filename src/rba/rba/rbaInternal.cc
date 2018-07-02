@@ -345,7 +345,7 @@ Proxy::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
   } catch (tl::ExitException & /*ex*/) {
     throw;
   } catch (tl::Exception &ex) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Error calling method")) + " '" + m_cls_decl->name () + "::" + meth->names () + "': " + ex.msg ());
+    throw tl::Exception (tl::to_string (tr ("Error calling method")) + " '" + m_cls_decl->name () + "::" + meth->names () + "': " + ex.msg ());
   } catch (...) {
     throw;
   }
@@ -360,14 +360,14 @@ Proxy::destroy ()
   }
 
   if (!m_can_destroy && m_obj) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Object cannot be destroyed explicitly")));
+    throw tl::Exception (tl::to_string (tr ("Object cannot be destroyed explicitly")));
   }
 
   //  first create the object if it was not created yet and check if it has not been
   //  destroyed already (the former is to ensure that the object is created at least)
   if (! m_obj) {
     if (m_destroyed) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Object has been destroyed already")));
+      throw tl::Exception (tl::to_string (tr ("Object has been destroyed already")));
     } else {
       m_obj = m_cls_decl->create ();
       m_owned = true;
@@ -676,12 +676,12 @@ Proxy::obj ()
 {
   if (! m_obj) {
     if (m_destroyed) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Object has been destroyed already")));
+      throw tl::Exception (tl::to_string (tr ("Object has been destroyed already")));
     } else if (cls_decl ()->can_default_create()) {
       //  delayed creation of a detached C++ object ..
       set (cls_decl ()->create (), true, false, true, m_self);
     } else {
-      throw tl::Exception (tl::to_string (QObject::tr ("Object cannot be default-created (missing arguments to 'new'?)")));
+      throw tl::Exception (tl::to_string (tr ("Object cannot be default-created (missing arguments to 'new'?)")));
     }
   }
 
@@ -811,7 +811,7 @@ SignalHandler::static_assign (VALUE self, VALUE proc)
   if (proc != self) {
 
     if (TYPE (proc) != T_DATA || rb_obj_is_kind_of (proc, rb_cProc) != Qtrue) {
-      std::string msg = tl::to_string (QObject::tr ("Single argument to signal must be a Proc object"));
+      std::string msg = tl::to_string (tr ("Single argument to signal must be a Proc object"));
       VALUE args [1];
       args [0] = rb_str_new2 (msg.c_str ());
       rb_exc_raise (rb_class_new_instance(1, args, rb_eRuntimeError));
@@ -832,7 +832,7 @@ VALUE
 SignalHandler::static_add (VALUE self, VALUE proc)
 {
   if (TYPE (proc) != T_DATA || rb_obj_is_kind_of (proc, rb_cProc) != Qtrue) {
-    std::string msg = tl::to_string (QObject::tr ("Single argument to signal's add method must be a Proc object"));
+    std::string msg = tl::to_string (tr ("Single argument to signal's add method must be a Proc object"));
     VALUE args [1];
     args [0] = rb_str_new2 (msg.c_str ());
     rb_exc_raise (rb_class_new_instance(1, args, rb_eRuntimeError));

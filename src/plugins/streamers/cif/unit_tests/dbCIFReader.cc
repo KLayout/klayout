@@ -27,7 +27,6 @@
 #include "dbCIFWriter.h"
 #include "tlUnitTest.h"
 
-#include <QDir>
 #include <stdlib.h>
 
 static void run_test (tl::TestBase *_this, const std::string &base, const char *file, const char *file_au, const char *map = 0, double dbu = 0.001, bool dummy_calls = false, bool blank_sep = false)

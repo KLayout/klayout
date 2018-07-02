@@ -37,9 +37,7 @@
 #include "tlLog.h"
 #include "tlStream.h"
 #include "tlTimer.h"
-
-#include <QCoreApplication>
-#include <QDir>
+#include "tlFileUtils.h"
 
 namespace pya
 {
@@ -168,7 +166,10 @@ PythonInterpreter::PythonInterpreter ()
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, "Initializing Python");
 
-  std::string app_path = tl::to_string (QCoreApplication::applicationFilePath ());
+  std::string app_path;
+#if defined(HAVE_QT)
+  app_path = tl::to_string (QCoreApplication::applicationFilePath ());
+#endif
 
 #if PY_MAJOR_VERSION >= 3
 
@@ -196,7 +197,7 @@ PythonInterpreter::PythonInterpreter ()
       QFileInfo fi (inst_dir.absoluteFilePath (tl::to_qstring(".python-paths.txt")));
       if (fi.exists ()) {
 
-        tl::log << tl::to_string (QObject::tr ("Reading Python path from ")) << tl::to_string (fi.filePath ());
+        tl::log << tl::to_string (tr ("Reading Python path from ")) << tl::to_string (fi.filePath ());
 
         QFile paths_txt (fi.filePath ());
         paths_txt.open (QIODevice::ReadOnly);
@@ -223,9 +224,9 @@ PythonInterpreter::PythonInterpreter ()
       Py_SetPath ((const wchar_t *) path.utf16 ());
 
     } catch (tl::Exception &ex) {
-      tl::error << tl::to_string (QObject::tr ("Evaluation of Python path expression failed")) << ": " << ex.msg ();
+      tl::error << tl::to_string (tr ("Evaluation of Python path expression failed")) << ": " << ex.msg ();
     } catch (...) {
-      tl::error << tl::to_string (QObject::tr ("Evaluation of Python path expression failed"));
+      tl::error << tl::to_string (tr ("Evaluation of Python path expression failed"));
     }
 
   }
@@ -350,8 +351,8 @@ PythonInterpreter::add_path (const std::string &p)
 void
 PythonInterpreter::add_package_location (const std::string &package_path)
 {
-  std::string path = tl::to_string (QDir (tl::to_qstring (package_path)).absoluteFilePath (QString::fromUtf8 ("python")));
-  if (QDir (tl::to_qstring (path)).exists () && m_package_paths.find (path) == m_package_paths.end ()) {
+  std::string path = tl::combine_path (tl::absolute_file_path (package_path), "python");
+  if (tl::file_exists (path) && m_package_paths.find (path) == m_package_paths.end ()) {
     m_package_paths.insert (path);
     add_path (path);
   }
@@ -367,7 +368,7 @@ void
 PythonInterpreter::require (const std::string & /*filename*/)
 {
   //  TOOD: is there a way to implement that?
-  throw tl::Exception (tl::to_string (QObject::tr ("'require' not implemented for Python interpreter")));
+  throw tl::Exception (tl::to_string (tr ("'require' not implemented for Python interpreter")));
 }
 
 void

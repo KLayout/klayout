@@ -232,7 +232,7 @@ RS274XReader::do_read ()
         param += stream ().get_char ();
 
         if (stream ().at_end ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Unexpected EOF")));
+          throw tl::Exception (tl::to_string (tr ("Unexpected EOF")));
         }
 
         param += stream ().get_char ();
@@ -274,7 +274,7 @@ RS274XReader::do_read ()
           if (dcode.empty ()) {
 
             if (graphics_stack_empty ()) {
-              throw tl::Exception (tl::to_string (QObject::tr ("AB closed without initial opening AB command")));
+              throw tl::Exception (tl::to_string (tr ("AB closed without initial opening AB command")));
             } else {
               db::Region region;
               collect (region);
@@ -283,7 +283,7 @@ RS274XReader::do_read ()
             }
 
           } else if (m_polygon_mode) {
-            warn (tl::to_string (QObject::tr ("AB command inside polygon sequence (G36/G37) - polygon ignored")));
+            warn (tl::to_string (tr ("AB command inside polygon sequence (G36/G37) - polygon ignored")));
           } else {
             push_state (dcode);
           }
@@ -318,7 +318,7 @@ RS274XReader::do_read ()
           read_if_parameter (get_block ());
         } else {
           get_block ();
-          warn (tl::to_string (QObject::tr ("Parameter ignored: ")) + param);
+          warn (tl::to_string (tr ("Parameter ignored: ")) + param);
         }
 
       }
@@ -441,7 +441,7 @@ RS274XReader::do_read ()
             m_current_gcode = 1;
 
           } else if (gcode >= 0) {
-            warn (tl::sprintf (tl::to_string (QObject::tr ("Invalid 'G' code %d - ignored")), gcode));
+            warn (tl::sprintf (tl::to_string (tr ("Invalid 'G' code %d - ignored")), gcode));
           }
 
         } else if (c == 'X') {
@@ -481,7 +481,7 @@ RS274XReader::do_read ()
 
             //  set current aperture
             if (dcode >= int (m_apertures.size ()) || m_apertures[dcode] == 0) {
-              throw tl::Exception (tl::to_string (QObject::tr ("Aperture code D%d is invalid or undefined")), dcode);
+              throw tl::Exception (tl::to_string (tr ("Aperture code D%d is invalid or undefined")), dcode);
             }
 
             m_current_aperture = m_apertures[dcode];
@@ -496,11 +496,11 @@ RS274XReader::do_read ()
             }
 
           } else {
-            warn (tl::sprintf (tl::to_string (QObject::tr ("Invalid D code %d ignored")), dcode));
+            warn (tl::sprintf (tl::to_string (tr ("Invalid D code %d ignored")), dcode));
           }
 
         } else {
-          throw tl::Exception (tl::to_string (QObject::tr ("Invalid function code '%c'")), c);
+          throw tl::Exception (tl::to_string (tr ("Invalid function code '%c'")), c);
         }
 
       }
@@ -527,11 +527,11 @@ RS274XReader::do_read ()
 
           //  flash
           if (! m_current_aperture) {
-            throw tl::Exception (tl::to_string (QObject::tr ("No aperture defined (missing G54 block)")));
+            throw tl::Exception (tl::to_string (tr ("No aperture defined (missing G54 block)")));
           }
 
           if (m_polygon_mode) {
-            warn (tl::to_string (QObject::tr ("D03 blocks are ignored in polygon mode")));
+            warn (tl::to_string (tr ("D03 blocks are ignored in polygon mode")));
           } else {
             m_current_aperture->produce_flash (db::DCplxTrans (db::DVector (x, y)) * object_trans (), *this, ep (), is_clear_polarity ());
           }
@@ -588,7 +588,7 @@ RS274XReader::do_read ()
                 }
 
                 if (! has_center) {
-                  warn (tl::sprintf (tl::to_string (QObject::tr ("No suitable center point found for G%d code: P1=%s P2=%s I=%g J=%g")), 
+                  warn (tl::sprintf (tl::to_string (tr ("No suitable center point found for G%d code: P1=%s P2=%s I=%g J=%g")),
                                      m_current_gcode, from.to_string (), to.to_string (), i, j));
                 }
 
@@ -624,7 +624,7 @@ RS274XReader::do_read ()
                   } else {
 
                     if (! m_current_aperture) {
-                      throw tl::Exception (tl::to_string (QObject::tr ("No aperture defined (missing G54 block)")));
+                      throw tl::Exception (tl::to_string (tr ("No aperture defined (missing G54 block)")));
                     }
 
                     m_current_aperture->produce_linear (db::DCplxTrans (db::DVector (m_x, m_y)) * object_trans (), pe - db::DPoint (m_x, m_y), *this, ep (), is_clear_polarity ());
@@ -643,7 +643,7 @@ RS274XReader::do_read ()
           } else if (m_current_gcode == 0) {
 
             //  is it correct to ignore G00?
-            warn (tl::to_string (QObject::tr ("Block with G00 interpolation mode is ignored")));
+            warn (tl::to_string (tr ("Block with G00 interpolation mode is ignored")));
 
           } else if (m_current_gcode == 1 || m_current_gcode < 0) {
 
@@ -653,7 +653,7 @@ RS274XReader::do_read ()
             } else {
               
               if (! m_current_aperture) {
-                throw tl::Exception (tl::to_string (QObject::tr ("No aperture defined (missing G54 block)")));
+                throw tl::Exception (tl::to_string (tr ("No aperture defined (missing G54 block)")));
               }
 
               m_current_aperture->produce_linear (db::DCplxTrans (db::DVector (m_x, m_y)) * object_trans (), db::DPoint (x, y) - db::DPoint (m_x, m_y), *this, ep (), is_clear_polarity ());
@@ -661,7 +661,7 @@ RS274XReader::do_read ()
             }
 
           } else {
-            throw tl::Exception (tl::to_string (QObject::tr ("G00 or unspecified 'G' code requires D03")));
+            throw tl::Exception (tl::to_string (tr ("G00 or unspecified 'G' code requires D03")));
           }
 
         }
@@ -676,7 +676,7 @@ RS274XReader::do_read ()
   }
 
   if (! graphics_stack_empty ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("AB block not closed")));
+    throw tl::Exception (tl::to_string (tr ("AB block not closed")));
   }
 }
 
@@ -709,7 +709,7 @@ RS274XReader::read_as_parameter (const std::string &block)
   } else if (block == "AYBX") {
     m_axis_mapping = ab_yx;
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid argument '%s' for AS parameter")), block);
+    throw tl::Exception (tl::to_string (tr ("Invalid argument '%s' for AS parameter")), block);
   }
 }
 
@@ -752,7 +752,7 @@ RS274XReader::read_fs_parameter (const std::string &block)
   ex.expect ("Y");
   ex.read (j);
   if (i != j) {
-    throw tl::Exception (tl::to_string (QObject::tr ("X and Y format must be identical currently")));
+    throw tl::Exception (tl::to_string (tr ("X and Y format must be identical currently")));
   }
 
   if (ex.test ("D")) {
@@ -798,7 +798,7 @@ RS274XReader::read_mo_parameter (const std::string &block)
   } else if (block == "MM") {
     set_unit (1000);
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid argument of M0 parameter - must be 'IN' or 'MM', not '%s'")), block);
+    throw tl::Exception (tl::to_string (tr ("Invalid argument of M0 parameter - must be 'IN' or 'MM', not '%s'")), block);
   }
 }
 
@@ -846,7 +846,7 @@ RS274XReader::read_sf_parameter (const std::string &block)
   }
 
   if (fabs (sx - sy) > 1e-6) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Different scalings for x and y axis is not supported currently.")));
+    throw tl::Exception (tl::to_string (tr ("Different scalings for x and y axis is not supported currently.")));
   }
 
   update_local_scale (sx);
@@ -896,7 +896,7 @@ RS274XReader::read_lm_parameter (const std::string &block)
 void
 RS274XReader::read_ij_parameter (const std::string & /*block*/)
 {
-  warn (tl::to_string (QObject::tr ("IJ parameters are ignored currently")));
+  warn (tl::to_string (tr ("IJ parameters are ignored currently")));
 }
 
 void
@@ -958,7 +958,7 @@ RS274XReader::read_ir_parameter (const std::string &block)
 void
 RS274XReader::read_pf_parameter (const std::string & /*block*/)
 {
-  warn (tl::to_string (QObject::tr ("PF parameters are ignored")));
+  warn (tl::to_string (tr ("PF parameters are ignored")));
 }
 
 void
@@ -976,7 +976,7 @@ RS274XReader::read_ad_parameter (const std::string &block)
   ex.read (dcode);
 
   if (dcode < 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid D code for AD parameter")));
+    throw tl::Exception (tl::to_string (tr ("Invalid D code for AD parameter")));
   }
 
   while (int (m_apertures.size ()) <= dcode) {
@@ -1000,7 +1000,7 @@ RS274XReader::read_ad_parameter (const std::string &block)
   } else if (m_aperture_macros.find (name) != m_aperture_macros.end ()) {
     m_apertures[dcode] = new RS274XMacroAperture (*this, name, m_aperture_macros[name], ex);
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid aperture name '%s' (not a macro name and not a standard aperture) for AD parameter")), name);
+    throw tl::Exception (tl::to_string (tr ("Invalid aperture name '%s' (not a macro name and not a standard aperture) for AD parameter")), name);
   }
 }
 
@@ -1015,11 +1015,11 @@ RS274XReader::install_block_aperture (const std::string &d, const db::Region &re
     ex.read (dcode);
     ex.expect_end ();
   } catch (...) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid aperture code string for AB command")));
+    throw tl::Exception (tl::to_string (tr ("Invalid aperture code string for AB command")));
   }
 
   if (dcode < 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid D code for AB command")));
+    throw tl::Exception (tl::to_string (tr ("Invalid D code for AB command")));
   }
 
   while (int (m_apertures.size ()) <= dcode) {
@@ -1048,7 +1048,7 @@ RS274XReader::read_am_parameter (const std::string &block)
 void
 RS274XReader::read_ko_parameter (const std::string & /*block*/)
 {
-  warn (tl::to_string (QObject::tr ("KO parameters are not supported currently")));
+  warn (tl::to_string (tr ("KO parameters are not supported currently")));
 }
 
 void
@@ -1075,7 +1075,7 @@ RS274XReader::read_lp_parameter (const std::string &block)
     }
     m_clear = false;
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid argument '%s' for LP parameter")), block);
+    throw tl::Exception (tl::to_string (tr ("Invalid argument '%s' for LP parameter")), block);
   }
 }
 
@@ -1130,7 +1130,7 @@ RS274XReader::read_sr_parameter (const std::string &block)
 void
 RS274XReader::read_if_parameter (const std::string & /*block*/)
 {
-  warn (tl::to_string (QObject::tr ("IF parameters are not supported currently")));
+  warn (tl::to_string (tr ("IF parameters are not supported currently")));
 }
 
 }

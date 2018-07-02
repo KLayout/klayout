@@ -26,6 +26,8 @@
 #include "tlException.h"
 #include "tlLog.h"
 #include "tlString.h"
+#include "tlFileUtils.h"
+#include "tlGlobPattern.h"
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -34,9 +36,6 @@
 #endif
 
 #include <set>
-#include <QFileInfo>
-#include <QStringList>
-#include <QDir>
 
 namespace db
 {
@@ -108,8 +107,7 @@ get_module_path ()
     wchar_t buffer[MAX_PATH];
     int len;
     if ((len = GetModuleFileName(h_module, buffer, MAX_PATH)) > 0) {
-      QFileInfo fi (QString::fromUtf16 ((const ushort *) buffer, len));
-      return tl::to_string (fi.absolutePath ());
+      return tl::absolute_file_path (tl::to_string (std::wstring (buffer, 0, len)));
     }
 
   }
@@ -121,8 +119,7 @@ get_module_path ()
 
   Dl_info info = { };
   if (dladdr ((void *) &init, &info)) {
-    QFileInfo fi (QString::fromLocal8Bit (info.dli_fname));
-    return tl::to_string (fi.absolutePath ());
+    return tl::absolute_file_path (tl::to_string_from_local (info.dli_fname));
   } else {
     return std::string ();
   }
@@ -151,36 +148,37 @@ void init (const std::vector<std::string> &_paths)
 
     //  look next to the db library, but in "db_plugins" directory
     const char *db_plugin_dir = "db_plugins";
-    std::string pp = tl::to_string (QDir (tl::to_qstring (*p)).filePath (QString::fromUtf8 (db_plugin_dir)));
+    std::string pp = tl::combine_path (*p, db_plugin_dir);
 
-    QStringList name_filters;
+    std::vector<std::string> ee = tl::dir_entries (pp, true, false);
+
+    tl::GlobPattern pattern;
 #if defined(_WIN32)
-    name_filters << QString::fromUtf8 ("*.dll");
+    pattern.set_case_sensitive (false);
+    pattern = std::string ("*.dll");
 #else
-    name_filters << QString::fromUtf8 ("*.so");
+    pattern = std::string ("*.so");
 #endif
 
-    QStringList inst_modules = QDir (tl::to_qstring (pp)).entryList (name_filters);
-    inst_modules.sort ();
+    std::vector<std::string> inst_modules;
+    for (std::vector<std::string>::const_iterator e = ee.begin (); e != ee.end (); ++e) {
+      if (pattern.match (*e)) {
+        inst_modules.push_back (*e);
+      }
+    }
 
-    for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
+    std::sort (inst_modules.begin (), inst_modules.end ());
 
-      QFileInfo dbp_file (tl::to_qstring (pp), *im);
-      if (dbp_file.exists () && dbp_file.isReadable ()) {
+    for (std::vector<std::string>::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
 
-        std::string mn = tl::to_string (dbp_file.fileName ());
-        if (modules.find (mn) == modules.end ()) {
-
-          std::string m = tl::to_string (dbp_file.absoluteFilePath ());
-          try {
-            s_plugins.push_back (load_plugin (m));
-            modules.insert (mn);
-          } catch (tl::Exception (&ex)) {
-            tl::error << ex.msg ();
-          }
-
+      std::string imp = tl::combine_path (pp, *im);
+      if (modules.find (*im) == modules.end ()) {
+        try {
+          s_plugins.push_back (load_plugin (imp));
+          modules.insert (*im);
+        } catch (tl::Exception (&ex)) {
+          tl::error << ex.msg ();
         }
-
       }
 
     }

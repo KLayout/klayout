@@ -30,7 +30,6 @@
 #include "tlUnitTest.h"
 
 #include <cstdlib>
-#include <QDir>
 
 void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int compr, bool recompress)
 {

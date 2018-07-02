@@ -670,9 +670,9 @@ OASISWriter::OASISWriter ()
     m_propname_id (0),
     m_propstring_id (0),
     m_proptables_written (false),
-    m_progress (tl::to_string (QObject::tr ("Writing OASIS file")), 10000)
+    m_progress (tl::to_string (tr ("Writing OASIS file")), 10000)
 {
-  m_progress.set_format (tl::to_string (QObject::tr ("%.0f MB")));
+  m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
 }
 
@@ -2367,7 +2367,7 @@ OASISWriter::write (const db::SimplePolygon &polygon, db::properties_id_type pro
   }
 
   if (m_pointlist.size () < 2) {
-    std::string msg = tl::to_string (QObject::tr ("Polygons with less than three points cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
+    std::string msg = tl::to_string (tr ("Polygons with less than three points cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
     if (m_options.permissive) {
       tl::warn << msg;
       return;
@@ -2468,7 +2468,7 @@ OASISWriter::write (const db::Polygon &polygon, db::properties_id_type prop_id, 
     }
 
     if (m_pointlist.size () < 2) {
-      std::string msg = tl::to_string (QObject::tr ("Polygons with less than three points cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
+      std::string msg = tl::to_string (tr ("Polygons with less than three points cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
       if (m_options.permissive) {
         tl::warn << msg;
         return;
@@ -2644,9 +2644,9 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
       db::Coord w = safe_scale (m_sf, path.width ());
       db::Coord hw = w / 2;
       if (hw * 2 != w) {
-        std::string msg = tl::to_string (QObject::tr ("Circles with odd diameter cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
+        std::string msg = tl::to_string (tr ("Circles with odd diameter cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
         if (m_options.permissive) {
-          tl::warn << msg << " - " << tl::to_string (QObject::tr ("circle diameter is rounded"));
+          tl::warn << msg << " - " << tl::to_string (tr ("circle diameter is rounded"));
         } else {
           throw tl::Exception (msg);
         }
@@ -2716,9 +2716,9 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
     db::Coord w = safe_scale (m_sf, path.width ());
     db::Coord hw = w / 2;
     if (hw * 2 != w) {
-      std::string msg = tl::to_string (QObject::tr ("Paths with odd width cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (QObject::tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
+      std::string msg = tl::to_string (tr ("Paths with odd width cannot be written to OASIS files (cell ")) + mp_layout->cell_name (mp_cell->cell_index ()) + tl::to_string (tr (", position ")) + tl::to_string (start.x ()) + ", " + tl::to_string (start.y ()) + " DBU)";
       if (m_options.permissive) {
-        tl::warn << msg << " - " << tl::to_string (QObject::tr ("path diameter is rounded"));
+        tl::warn << msg << " - " << tl::to_string (tr ("path diameter is rounded"));
       } else {
         throw tl::Exception (msg);
       }

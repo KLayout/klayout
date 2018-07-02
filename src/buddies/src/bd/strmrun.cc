@@ -29,14 +29,13 @@
 #include "dbReader.h"
 #include "tlLog.h"
 #include "tlCommandLineParser.h"
+#include "tlFileUtils.h"
 #include "rba.h"
 #include "pya.h"
 #include "gsi.h"
 #include "gsiExpression.h"
 #include "libForceLink.h"
 #include "rdbForceLink.h"
-
-#include <QFileInfo>
 
 struct RunnerData
 {
@@ -93,15 +92,15 @@ BD_PUBLIC int strmrun (int argc, char *argv[])
     python.define_variable (v->first, v->second);
   }
 
-  std::string script = tl::to_string (QFileInfo (tl::to_qstring (data.script)).absoluteFilePath ());
+  std::string script = tl::absolute_file_path (data.script);
 
-  std::string ext = tl::to_string (QFileInfo (tl::to_qstring (data.script)).suffix ());
+  std::string ext = tl::extension (data.script);
   if (ext == "py") {
     python.load_file (script);
   } else if (ext == "rb") {
     ruby.load_file (script);
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unknown suffix \"%1\" - must be either .rb or .py").arg (tl::to_qstring (ext))));
+    throw tl::Exception (tl::to_string (tr ("Unknown suffix \"%s\" - must be either .rb or .py")), ext);
   }
 
   return 0;

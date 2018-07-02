@@ -23,11 +23,9 @@
 
 #include "dbTechnology.h"
 #include "dbStream.h"
+#include "tlFileUtils.h"
 
 #include <stdio.h>
-
-#include <QDir>
-#include <QFileInfo>
 
 namespace tl
 {
@@ -148,7 +146,7 @@ Technologies::add_tech (Technology *tech, bool replace_same)
     if (replace_same) {
       *t = *tech;
     } else {
-      throw tl::Exception (tl::to_string (tr ("A technology with this name already exists: %1").arg (tl::to_qstring (tech->name ()))));
+      throw tl::Exception (tl::to_string (tr ("A technology with this name already exists: ")) + tech->name ());
     }
   } else {
     m_technologies.push_back (tech_ptr.release ());
@@ -421,14 +419,8 @@ Technology::correct_path (const std::string &fp) const
 {
   if (base_path ().empty ()) {
     return fp;
-  }
-
-  QString rfp = QDir (tl::to_qstring (base_path ())).relativeFilePath (tl::to_qstring (fp));
-  if (rfp.startsWith (QString::fromUtf8 (".."))) {
-    //  upwards or beside - don't correct:
-    return fp;
   } else {
-    return tl::to_string (rfp);
+    return tl::relative_path (base_path (), fp);
   }
 }
 
@@ -440,8 +432,7 @@ Technology::load (const std::string &fn)
   xml_struct.parse (source, *this);
 
   //  use the tech file's path as the default base path
-  std::string lyt_file = tl::to_string (QFileInfo (tl::to_qstring (fn)).absoluteDir ().path ());
-  set_default_base_path (lyt_file);
+  set_default_base_path (tl::absolute_path (fn));
 
   set_tech_file_path (fn);
 }
@@ -461,11 +452,10 @@ Technology::build_effective_path (const std::string &p) const
     return p;
   }
 
-  QFileInfo f (tl::to_qstring (p));
-  if (f.isAbsolute ()) {
+  if (tl::is_absolute (p)) {
     return p;
   } else {
-    return tl::to_string (QDir (tl::to_qstring (base_path ())).filePath (tl::to_qstring (p)));
+    return tl::combine_path (base_path (), p);
   }
 }
 

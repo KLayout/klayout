@@ -29,7 +29,6 @@
 #include "dbTextWriter.h"
 #include "tlUnitTest.h"
 
-#include <QDir>
 #include <stdlib.h>
 
 void run_test (tl::TestBase *_this, const char *file, const char *file_ref, bool priv = false, const db::GDS2WriterOptions &opt = db::GDS2WriterOptions ())

@@ -208,8 +208,12 @@ HEADERS = \
   dbPlugin.h \
   dbInit.h
 
-RESOURCES = \
-  dbResources.qrc
+!equals(HAVE_QT, "0") {
+
+  RESOURCES = \
+    dbResources.qrc \
+
+}
 
 INCLUDEPATH += $$TL_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$GSI_INC

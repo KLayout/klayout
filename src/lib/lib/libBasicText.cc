@@ -189,14 +189,14 @@ BasicText::get_parameter_declarations () const
   tl_assert (parameters.size () == p_text);
   parameters.push_back (db::PCellParameterDeclaration ("text"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_string);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Text")));
+  parameters.back ().set_description (tl::to_string (tr ("Text")));
   parameters.back ().set_default ("");
 
   //  parameter: font name
   tl_assert (parameters.size () == p_font_name);
   parameters.push_back (db::PCellParameterDeclaration ("font_name"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_string);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Font")));
+  parameters.back ().set_description (tl::to_string (tr ("Font")));
   parameters.back ().set_default (0);
 
   std::vector<tl::Variant> choices;
@@ -212,80 +212,80 @@ BasicText::get_parameter_declarations () const
   tl_assert (parameters.size () == p_layer);
   parameters.push_back (db::PCellParameterDeclaration ("layer"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_layer);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Layer")));
+  parameters.back ().set_description (tl::to_string (tr ("Layer")));
 
   //  parameter: magnification
   tl_assert (parameters.size () == p_magnification);
   parameters.push_back (db::PCellParameterDeclaration ("mag"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Magnification")));
+  parameters.back ().set_description (tl::to_string (tr ("Magnification")));
   parameters.back ().set_default (1.0);
 
   //  parameter: inverse 
   tl_assert (parameters.size () == p_inverse);
   parameters.push_back (db::PCellParameterDeclaration ("inverse"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_boolean);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Inverse")));
+  parameters.back ().set_description (tl::to_string (tr ("Inverse")));
   parameters.back ().set_default (false);
 
   //  parameter: bias 
   tl_assert (parameters.size () == p_bias);
   parameters.push_back (db::PCellParameterDeclaration ("bias"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Bias")));
+  parameters.back ().set_description (tl::to_string (tr ("Bias")));
   parameters.back ().set_default (0.0);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
   //  parameter: character spacing 
   tl_assert (parameters.size () == p_char_spacing);
   parameters.push_back (db::PCellParameterDeclaration ("cspacing"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Additional character spacing")));
+  parameters.back ().set_description (tl::to_string (tr ("Additional character spacing")));
   parameters.back ().set_default (0.0);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
   //  parameter: line spacing 
   tl_assert (parameters.size () == p_line_spacing);
   parameters.push_back (db::PCellParameterDeclaration ("lspacing"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Additional line spacing")));
+  parameters.back ().set_description (tl::to_string (tr ("Additional line spacing")));
   parameters.back ().set_default (0.0);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
 
   //  parameter: effective cell width
   tl_assert (parameters.size () == p_eff_cell_width);
   parameters.push_back (db::PCellParameterDeclaration ("eff_cw"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Computed parameters\tCell width")));
+  parameters.back ().set_description (tl::to_string (tr ("Computed parameters\tCell width")));
   parameters.back ().set_default (0.0);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
   parameters.back ().set_readonly (true);
 
   //  parameter: effective cell height
   tl_assert (parameters.size () == p_eff_cell_height);
   parameters.push_back (db::PCellParameterDeclaration ("eff_ch"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Computed parameters\tCell height")));
+  parameters.back ().set_description (tl::to_string (tr ("Computed parameters\tCell height")));
   parameters.back ().set_default (0.0);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
   parameters.back ().set_readonly (true);
 
   //  parameter: effective line width
   tl_assert (parameters.size () == p_eff_line_width);
   parameters.push_back (db::PCellParameterDeclaration ("eff_lw"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Computed parameters\tLine width")));
+  parameters.back ().set_description (tl::to_string (tr ("Computed parameters\tLine width")));
   parameters.back ().set_default (0.0);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
   parameters.back ().set_readonly (true);
 
   //  parameter: effective design raster
   tl_assert (parameters.size () == p_eff_design_raster);
   parameters.push_back (db::PCellParameterDeclaration ("eff_dr"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_double);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Computed parameters\tDesign raster")));
+  parameters.back ().set_description (tl::to_string (tr ("Computed parameters\tDesign raster")));
   parameters.back ().set_default (0.0);
-  parameters.back ().set_unit (tl::to_string (QObject::tr ("micron")));
+  parameters.back ().set_unit (tl::to_string (tr ("micron")));
   parameters.back ().set_readonly (true);
 
   //  parameter: font number
@@ -294,7 +294,7 @@ BasicText::get_parameter_declarations () const
   tl_assert (parameters.size () == p_font);
   parameters.push_back (db::PCellParameterDeclaration ("font"));
   parameters.back ().set_type (db::PCellParameterDeclaration::t_int);
-  parameters.back ().set_description (tl::to_string (QObject::tr ("Font")));
+  parameters.back ().set_description (tl::to_string (tr ("Font")));
   parameters.back ().set_default (0);
   parameters.back ().set_hidden (true);
 

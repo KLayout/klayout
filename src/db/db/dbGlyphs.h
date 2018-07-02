@@ -76,10 +76,12 @@ public:
    */
   TextGenerator ();
 
+#if defined(HAVE_QT)
   /**
    *  @brief Loads the font from the given resource
    */
   void load_from_resource (const std::string &name);
+#endif
 
   /**
    *  @brief Loads the font from the given file

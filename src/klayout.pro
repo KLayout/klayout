@@ -4,22 +4,29 @@ include(klayout.pri)
 TEMPLATE = subdirs
 
 SUBDIRS = \
-  klayout_main \
-  unit_tests \
   tl \
   gsi \
   db \
   rdb \
-  lym \
-  laybasic \
-  lay \
-  ant \
-  img \
-  edt \
   lib \
-  plugins \
   buddies \
-  fontgen \
+  plugins \
+
+!equals(HAVE_QT, "0") {
+
+  # TODO: make unit_tests capable of running without Qt
+  SUBDIRS += \
+    unit_tests \
+    klayout_main \
+    laybasic \
+    lay \
+    ant \
+    lym \
+    img \
+    edt \
+    fontgen \
+
+}
 
 LANG_DEPENDS =
 MAIN_DEPENDS =
@@ -39,7 +46,7 @@ equals(HAVE_PYTHON, "1") {
   LANG_DEPENDS += pya
   pya.depends += gsi db
   SUBDIRS += pymod
-  pymod.depends += pya lay
+  pymod.depends += pya
 } else {
   SUBDIRS += pyastub
   pyastub.depends += gsi
@@ -49,30 +56,45 @@ equals(HAVE_PYTHON, "1") {
 gsi.depends += tl
 db.depends += gsi
 rdb.depends += db
-laybasic.depends += rdb
-ant.depends += laybasic
-img.depends += laybasic
-edt.depends += laybasic
-
-equals(HAVE_RUBY, "1") {
-  SUBDIRS += drc
-  MAIN_DEPENDS += drc
-  drc.depends += rdb lym
-}
-
-lym.depends += gsi $$LANG_DEPENDS
-lay.depends += laybasic ant img edt lym
 lib.depends += db
 
-equals(HAVE_QTBINDINGS, "1") {
-  SUBDIRS += gsiqt
-  gsiqt.depends += gsi db
-  laybasic.depends += gsiqt
-  pymod.depends += gsiqt
+buddies.depends += plugins $$LANG_DEPENDS
+plugins.depends += lib rdb db
+
+!equals(HAVE_QT, "0") {
+
+  equals(HAVE_PYTHON, "1") {
+    pymod.depends += lay
+  }
+
+  equals(HAVE_RUBY, "1") {
+    SUBDIRS += drc
+    MAIN_DEPENDS += drc
+    drc.depends += rdb lym
+  }
+
+  equals(HAVE_QTBINDINGS, "1") {
+
+    SUBDIRS += gsiqt
+    gsiqt.depends += gsi db
+    laybasic.depends += gsiqt
+
+    equals(HAVE_PYTHON, "1") {
+      pymod.depends += gsiqt
+    }
+
+  }
+
+  plugins.depends += lay ant
+
+  laybasic.depends += rdb
+  ant.depends += laybasic
+  img.depends += laybasic
+  edt.depends += laybasic
+  lym.depends += gsi $$LANG_DEPENDS
+  lay.depends += laybasic ant img edt lym
+  klayout_main.depends += plugins $$MAIN_DEPENDS
+  unit_tests.depends += plugins $$MAIN_DEPENDS
+
 }
 
-plugins.depends += lay lib rdb ant
-
-buddies.depends += plugins $$LANG_DEPENDS
-klayout_main.depends += plugins $$MAIN_DEPENDS
-unit_tests.depends += plugins $$MAIN_DEPENDS

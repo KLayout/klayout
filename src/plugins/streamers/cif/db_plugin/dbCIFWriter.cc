@@ -37,10 +37,10 @@ namespace db
 
 CIFWriter::CIFWriter ()
   : mp_stream (0),
-    m_progress (tl::to_string (QObject::tr ("Writing CIF file")), 10000),
+    m_progress (tl::to_string (tr ("Writing CIF file")), 10000),
     m_needs_emit (false)
 {
-  m_progress.set_format (tl::to_string (QObject::tr ("%.0f MB")));
+  m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
 }
 

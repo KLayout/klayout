@@ -30,7 +30,7 @@
 
 #if defined(HAVE_QT)
 # include <QString>
-//  provides QObject for QObject::tr
+//  provides QObject for tr
 # include <QObject>
 #endif
 
@@ -38,12 +38,12 @@
  *  @brief Generic tr function for non-Qt and Qt builds
  */
 #if defined(HAVE_QT)
-QString tr (const char *s)
+inline QString tr (const char *s)
 {
   return QObject::tr (s);
 }
 #else
-std::string tr (const char *s);
+std::string TL_PUBLIC tr (const char *s);
 #endif
 
 namespace tl

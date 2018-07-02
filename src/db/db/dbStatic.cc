@@ -42,14 +42,14 @@ void set_default_editable_mode (bool editable)
 void check_editable_mode (const char *f_str)
 {
   if (! ms_editable) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function '%s' is permitted only in editable mode")), f_str);
+    throw tl::Exception (tl::to_string (tr ("Function '%s' is permitted only in editable mode")), f_str);
   }
 }
 
 void check_editable_mode ()
 {
   if (! ms_editable) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Operation is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Operation is permitted only in editable mode")));
   }
 }
 

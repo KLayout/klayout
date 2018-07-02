@@ -1580,11 +1580,11 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
   std::auto_ptr<tl::AbsoluteProgress> progress (0);
   if (m_report_progress) {
     if (m_progress_desc.empty ()) {
-      progress.reset (new tl::AbsoluteProgress (tl::to_string (QObject::tr ("Processing")), 1000));
+      progress.reset (new tl::AbsoluteProgress (tl::to_string (tr ("Processing")), 1000));
     } else {
       progress.reset (new tl::AbsoluteProgress (m_progress_desc, 1000));
     }
-    progress->set_format (tl::to_string (QObject::tr ("%.0f%%")));
+    progress->set_format (tl::to_string (tr ("%.0f%%")));
     progress->set_unit (todo_max / 100);
   }
 

@@ -189,11 +189,11 @@ JobBase::~JobBase ()
 void
 JobBase::log_error (const std::string &s)
 {
-  tl::error << tl::to_string (QObject::tr ("Worker thread: ")) << s;
+  tl::error << tl::to_string (tr ("Worker thread: ")) << s;
 
   m_lock.lock ();
   if (m_error_messages.size () == max_errors) {
-    m_error_messages.push_back (tl::to_string (QObject::tr ("Error list abbreviated (more errors were ignored)")));
+    m_error_messages.push_back (tl::to_string (tr ("Error list abbreviated (more errors were ignored)")));
   } else if (m_error_messages.size () < max_errors) {
     m_error_messages.push_back (s);
   }
@@ -293,7 +293,7 @@ JobBase::start ()
       } catch (std::exception &ex) {
         log_error (ex.what ());
       } catch (...) {
-        log_error (tl::to_string (QObject::tr ("Unspecific error")));
+        log_error (tl::to_string (tr ("Unspecific error")));
       }
     }
 
@@ -324,7 +324,7 @@ JobBase::wait (long timeout)
   bool status = true;
 
   m_lock.lock ();
-  if (m_nworkers > 0 && m_running && ! m_queue_empty_condition.wait (&m_lock, timeout >= 0 ? (unsigned long) timeout : ULONG_MAX)) {
+  if (m_nworkers > 0 && m_running && ! m_queue_empty_condition.wait (&m_lock, timeout >= 0 ? (unsigned long) timeout : std::numeric_limits<unsigned long>::max ())) {
     status = false;
   }
   m_lock.unlock ();
@@ -567,7 +567,7 @@ Worker::start (JobBase *job, int worker_index)
 {
   mp_job = job;
   m_worker_index = worker_index;
-  QThread::start ();
+  tl::Thread::start ();
 }
 
 void 
@@ -598,7 +598,7 @@ Worker::run ()
     } catch (std::exception &ex) {
       mp_job->log_error (ex.what ());
     } catch (...) {
-      mp_job->log_error (tl::to_string (QObject::tr ("Unspecific error")));
+      mp_job->log_error (tl::to_string (tr ("Unspecific error")));
     }
   }
 }

@@ -148,7 +148,7 @@ Technologies::add_tech (Technology *tech, bool replace_same)
     if (replace_same) {
       *t = *tech;
     } else {
-      throw tl::Exception (tl::to_string (QObject::tr ("A technology with this name already exists: %1").arg (tl::to_qstring (tech->name ()))));
+      throw tl::Exception (tl::to_string (tr ("A technology with this name already exists: %1").arg (tl::to_qstring (tech->name ()))));
     }
   } else {
     m_technologies.push_back (tech_ptr.release ());

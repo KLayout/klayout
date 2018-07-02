@@ -35,10 +35,11 @@
 #include "dbText.h"
 #include "dbShape.h"
 
-#include <QFileInfo>
-#include <QByteArray>
-#include <QBuffer>
-#include <QImage>
+#if defined(HAVE_QT)
+#  include <QByteArray>
+#  include <QBuffer>
+#  include <QImage>
+#endif
 
 #include <limits>
 #include <memory>
@@ -247,7 +248,7 @@ ValueBase::create_from_string (tl::Extractor &ex)
     return new Value <double> (v);
 
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid value string at '...%s'")), ex.skip ());
+    throw tl::Exception (tl::to_string (tr ("Invalid value string at '...%s'")), ex.skip ());
   }
 }
 
@@ -542,7 +543,7 @@ Reference::set_parent_cell_qname (const std::string &qname)
   tl_assert (mp_database != 0);
   const Cell *cell = mp_database->cell_by_qname (qname);
   if (! cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("%s is not a valid cell name or name/variant combination")), qname);
+    throw tl::Exception (tl::to_string (tr ("%s is not a valid cell name or name/variant combination")), qname);
   }
   m_parent_cell_id = cell->id ();
 }
@@ -783,26 +784,26 @@ Tags::has_tag (const std::string &name, bool user_tag) const
 //  Item implementation
 
 Item::Item (Items *items)
-  : m_cell_id (0), m_category_id (0), m_multiplicity (1), m_visited (false), mp_database (items->database ()), mp_image (0)
+  : m_cell_id (0), m_category_id (0), m_multiplicity (1), m_visited (false), mp_database (items->database ())
 {
   // .. nothing yet ..
 }
 
 Item::Item ()
-  : m_cell_id (0), m_category_id (0), m_multiplicity (1), m_visited (false), mp_database (0), mp_image (0)
+  : m_cell_id (0), m_category_id (0), m_multiplicity (1), m_visited (false), mp_database (0)
 {
   // .. nothing yet ..
 }
 
 Item::Item (const Item &d)
-  : tl::Object (d), m_cell_id (0), m_category_id (0), m_multiplicity (1), m_visited (false), mp_database (d.mp_database), mp_image (0)
+  : tl::Object (d), m_cell_id (0), m_category_id (0), m_multiplicity (1), m_visited (false), mp_database (d.mp_database)
 {
   operator= (d);
 }
 
 Item::~Item ()
 {
-  set_image (0);
+  // .. nothing yet ..
 }
 
 Item &Item::operator= (const Item &d)
@@ -815,13 +816,14 @@ Item &Item::operator= (const Item &d)
     m_multiplicity = d.m_multiplicity;
     m_tag_ids = d.m_tag_ids;
 
+#if defined(HAVE_QT)
     if (mp_image) {
-      delete mp_image;
-      mp_image = 0;
+      mp_image.reset (0);
     }
-    if (d.mp_image) {
-      mp_image = new QImage (*d.mp_image);
+    if (d.mp_image.get ()) {
+      mp_image.reset (new QImage (*d.mp_image));
     }
+#endif
   }
 
   return *this;
@@ -871,7 +873,7 @@ Item::set_cell_qname (const std::string &qname)
   tl_assert (mp_database != 0);
   const Cell *cell = mp_database->cell_by_qname (qname);
   if (! cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("%s is not a valid cell name or name/variant combination")), qname);
+    throw tl::Exception (tl::to_string (tr ("%s is not a valid cell name or name/variant combination")), qname);
   }
   m_cell_id = cell->id ();
 }
@@ -891,7 +893,7 @@ Item::set_category_name (const std::string &path)
   tl_assert (mp_database != 0);
   const Category *category = mp_database->categories ().category_by_name (path.c_str ());
   if (! category) {
-    throw tl::Exception (tl::to_string (QObject::tr ("%s is not a valid category path")), path);
+    throw tl::Exception (tl::to_string (tr ("%s is not a valid category path")), path);
   }
   m_category_id = category->id ();
 }
@@ -942,22 +944,17 @@ Item::set_tag_str (const std::string &tags)
   }
 }
 
+#if defined(HAVE_QT)
 void 
 Item::set_image (QImage *image)
 {
-  if (mp_image) {
-    delete mp_image;
-    mp_image = 0;
-  }
-  if (image) {
-    mp_image = image;
-  }
+  mp_image.reset (image);
 }
 
 std::string 
 Item::image_str () const
 {
-  if (! mp_image) {
+  if (! mp_image.get ()) {
     return std::string ();
   } else {
 
@@ -989,6 +986,7 @@ Item::set_image_str (const std::string &s)
 
   }
 }
+#endif
 
 // ------------------------------------------------------------------------------------------
 //  Database implementation
@@ -1318,12 +1316,14 @@ Database::remove_item_tag (const Item *item, id_type tag)
   const_cast <Item *> (item)->remove_tag (tag);
 }
 
+#if defined(HAVE_QT)
 void 
 Database::set_item_image (const Item *item, QImage *image)
 {
   set_modified ();
   const_cast <Item *> (item)->set_image (image);
 }
+#endif
 
 void 
 Database::set_item_multiplicity (const Item *item, size_t n)

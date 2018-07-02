@@ -20,8 +20,6 @@
 
 */
 
-#if !defined(HAVE_CURL)
-
 #include "tlHttpStream.h"
 #include "tlLog.h"
 #include "tlStaticObjects.h"
@@ -300,5 +298,3 @@ InputHttpStream::filename () const
 }
 
 }
-
-#endif

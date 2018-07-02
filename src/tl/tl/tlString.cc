@@ -29,12 +29,88 @@
 #include <limits>
 #include <vector>
 #include <sstream>
+#include <cwctype>
 
 #include "tlString.h"
 #include "tlExpression.h"
 #include "tlInternational.h"
 
 static std::locale c_locale ("C");
+
+// -------------------------------------------------------------------------
+//  Conversion of UTF8 to wchar_t
+
+static std::vector<wchar_t> utf8_to_wchar (const std::string &s)
+{
+  std::vector<wchar_t> ws;
+
+  const char *cpe = s.c_str () + s.size ();
+  for (const char *cp = s.c_str (); cp < cpe; ) {
+
+    uint32_t c32 = (unsigned char) *cp++;
+    if (c32 >= 0xf0 && cp + 2 < cpe) {
+      c32 = (c32 << 18) | ((uint32_t (cp [0]) & 0x3f) << 12) | ((uint32_t (cp [1]) & 0x3f) << 6) | (uint32_t (cp [2]) & 0x3f);
+      cp += 3;
+    } else if (c32 >= 0xe0 && cp + 1 < cpe) {
+      c32 = (c32 << 12) | ((uint32_t (cp [0]) & 0x3f) << 6) | (uint32_t (cp [1]) & 0x3f);
+      cp += 2;
+    } else if (c32 >= 0xc0 && cp < cpe) {
+      c32 = (c32 << 6) | (uint32_t (*cp) & 0x3f);
+      ++cp;
+    }
+
+    if (c32 >= 0x10000) {
+      c32 -= 0x10000;
+      ws.push_back (wchar_t (0xd800 + (c32 >> 10)));
+      ws.push_back (wchar_t (0xdc00 + (c32 & 0x3ff)));
+    } else {
+      ws.push_back (wchar_t (c32));
+    }
+
+  }
+
+  return ws;
+}
+
+static std::string wchar_to_utf8 (const std::vector<wchar_t> &ws)
+{
+  std::string s;
+
+  for (std::vector<wchar_t>::const_iterator c = ws.begin (); c != ws.end (); ++c) {
+
+    uint32_t c32 = *c;
+    if (c32 >= 0xd800 && c + 1 < ws.end ()) {
+      ++c;
+      c32 = (c32 & 0x3ff) << 10;
+      c32 |= uint32_t (*c) & 0x3ff;
+    }
+
+    if (c32 >= 0x10000) {
+
+      s.push_back (0xf0 | ((c32 >> 18) & 0x7));
+      s.push_back (0x80 | ((c32 >> 12) & 0x3f));
+      s.push_back (0x80 | ((c32 >> 6) & 0x3f));
+      s.push_back (0x80 | (c32 & 0x3f));
+
+    } else if (c32 >= 0x800) {
+
+      s.push_back (0xf0 | ((c32 >> 12) & 0xf));
+      s.push_back (0x80 | ((c32 >> 6) & 0x3f));
+      s.push_back (0x80 | (c32 & 0x3f));
+
+    } else if (c32 >= 0x80) {
+
+      s.push_back (0xf0 | ((c32 >> 6) & 0xc));
+      s.push_back (0x80 | (c32 & 0x3f));
+
+    } else {
+      s.push_back (char (c32));
+    }
+
+  }
+
+  return s;
+}
 
 // -------------------------------------------------------------------------
 //  Utility: a strtod version that is independent of the locale
@@ -64,12 +140,44 @@ std::string tl::db_to_string (double d)
 
 std::string tl::to_upper_case (const std::string &s)
 {
-  return tl::to_string (tl::to_qstring (s).toUpper ());
+  std::vector<wchar_t> ws = utf8_to_wchar (s);
+  for (std::vector<wchar_t>::iterator c = ws.begin (); c != ws.end (); ++c) {
+    *c = towupper (*c);
+  }
+  return wchar_to_utf8 (ws);
 }
 
 std::string tl::to_lower_case (const std::string &s)
 {
-  return tl::to_string (tl::to_qstring (s).toLower ());
+  std::vector<wchar_t> ws = utf8_to_wchar (s);
+  for (std::vector<wchar_t>::iterator c = ws.begin (); c != ws.end (); ++c) {
+    *c = towlower (*c);
+  }
+  return wchar_to_utf8 (ws);
+}
+
+std::string to_string_from_local (const char *cp)
+{
+  mbstate_t state;
+  memset ((void *) &state, 0, sizeof (mbstate_t));
+
+  std::vector<wchar_t> ws;
+
+  size_t max = strlen (cp);
+
+  while (max > 0) {
+    wchar_t wc;
+    //  NOTE: mbrtowc uses the current LOCALE, hence "local"
+    int length = mbrtowc (&wc, cp, max, &state);
+    if (length < 1) {
+      break;
+    }
+    ws.push_back (wc);
+    cp += length;
+    max -= length;
+  }
+
+  return wchar_to_utf8 (ws);
 }
 
 // -------------------------------------------------------------------------
@@ -575,7 +683,7 @@ tl::from_string (const std::string &s, double &v) throw (tl::Exception)
     ++cp;
   }
   if (! *cp) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Got empty string where a real number was expected")));
+    throw tl::Exception (tl::to_string (tr ("Got empty string where a real number was expected")));
   }
   const char *cp_end = cp;
   v = local_strtod (cp, cp_end);
@@ -596,14 +704,14 @@ convert_string_to_int (const std::string &s, T &v) throw (tl::Exception)
   // HACK: this should be some real string-to-int conversion
   tl::from_string (s, x);
   if (x < std::numeric_limits <T>::min ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Range underflow: ")) + s);
+    throw tl::Exception (tl::to_string (tr ("Range underflow: ")) + s);
   }
   if (x > std::numeric_limits <T>::max ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Range overflow: ")) + s);
+    throw tl::Exception (tl::to_string (tr ("Range overflow: ")) + s);
   }
   v = T (x);
   if (x != v) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Number cannot be represented precisely: ")) + s);
+    throw tl::Exception (tl::to_string (tr ("Number cannot be represented precisely: ")) + s);
   }
 }
 
@@ -656,7 +764,7 @@ tl::from_string (const std::string &s, bool &b) throw (tl::Exception)
   } else if (t == "0") {
     b = false;
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid boolean value: ")) + s);
+    throw tl::Exception (tl::to_string (tr ("Invalid boolean value: ")) + s);
   }
 }
 
@@ -727,7 +835,7 @@ tl::Extractor &
 tl::Extractor::read (unsigned int &value)
 {
   if (! try_read (value)) {
-    error (tl::to_string (QObject::tr ("Expected an unsigned integer value")));
+    error (tl::to_string (tr ("Expected an unsigned integer value")));
   }
   return *this;
 }
@@ -736,7 +844,7 @@ tl::Extractor &
 tl::Extractor::read (unsigned long &value)
 {
   if (! try_read (value)) {
-    error (tl::to_string (QObject::tr ("Expected an unsigned long integer value")));
+    error (tl::to_string (tr ("Expected an unsigned long integer value")));
   }
   return *this;
 }
@@ -745,7 +853,7 @@ tl::Extractor &
 tl::Extractor::read (unsigned long long &value)
 {
   if (! try_read (value)) {
-    error (tl::to_string (QObject::tr ("Expected an unsigned long integer value")));
+    error (tl::to_string (tr ("Expected an unsigned long integer value")));
   }
   return *this;
 }
@@ -754,7 +862,7 @@ tl::Extractor &
 tl::Extractor::read (double &value)
 {
   if (! try_read (value)) {
-    error (tl::to_string (QObject::tr ("Expected a real number")));
+    error (tl::to_string (tr ("Expected a real number")));
   }
   return *this;
 }
@@ -763,7 +871,7 @@ tl::Extractor &
 tl::Extractor::read (int &value)
 {
   if (! try_read (value)) {
-    error (tl::to_string (QObject::tr ("Expected a integer value")));
+    error (tl::to_string (tr ("Expected a integer value")));
   }
   return *this;
 }
@@ -772,7 +880,7 @@ tl::Extractor &
 tl::Extractor::read (long &value)
 {
   if (! try_read (value)) {
-    error (tl::to_string (QObject::tr ("Expected a long integer value")));
+    error (tl::to_string (tr ("Expected a long integer value")));
   }
   return *this;
 }
@@ -781,7 +889,7 @@ tl::Extractor &
 tl::Extractor::read (long long &value)
 {
   if (! try_read (value)) {
-    error (tl::to_string (QObject::tr ("Expected a long integer value")));
+    error (tl::to_string (tr ("Expected a long integer value")));
   }
   return *this;
 }
@@ -790,7 +898,7 @@ tl::Extractor &
 tl::Extractor::read (bool &value)
 {
   if (! try_read (value)) {
-    error (tl::to_string (QObject::tr ("Expected a boolean value ('true', 'false')")));
+    error (tl::to_string (tr ("Expected a boolean value ('true', 'false')")));
   }
   return *this;
 }
@@ -799,7 +907,7 @@ tl::Extractor &
 tl::Extractor::read (std::string &value, const char *term)
 {
   if (! try_read (value, term)) {
-    error (tl::to_string (QObject::tr ("Expected a string")));
+    error (tl::to_string (tr ("Expected a string")));
   }
   return *this;
 }
@@ -808,7 +916,7 @@ tl::Extractor &
 tl::Extractor::read_word (std::string &value, const char *non_term)
 {
   if (! try_read_word (value, non_term)) {
-    error (tl::to_string (QObject::tr ("Expected a word string")));
+    error (tl::to_string (tr ("Expected a word string")));
   }
   return *this;
 }
@@ -817,7 +925,7 @@ tl::Extractor &
 tl::Extractor::read_word_or_quoted (std::string &value, const char *non_term)
 {
   if (! try_read_word (value, non_term) && ! try_read_quoted (value)) {
-    error (tl::to_string (QObject::tr ("Expected a word or quoted string")));
+    error (tl::to_string (tr ("Expected a word or quoted string")));
   }
   return *this;
 }
@@ -826,7 +934,7 @@ tl::Extractor &
 tl::Extractor::read_quoted (std::string &value)
 {
   if (! try_read_quoted (value)) {
-    error (tl::to_string (QObject::tr ("Expected a quoted string")));
+    error (tl::to_string (tr ("Expected a quoted string")));
   }
   return *this;
 }
@@ -839,7 +947,7 @@ namespace
   {
     std::string operator() () const
     {
-      return tl::to_string (QObject::tr ("Range overflow on long long integer"));
+      return tl::to_string (tr ("Range overflow on long long integer"));
     }
   };
 
@@ -847,7 +955,7 @@ namespace
   {
     std::string operator() () const
     {
-      return tl::to_string (QObject::tr ("Range overflow on unsigned long long integer"));
+      return tl::to_string (tr ("Range overflow on unsigned long long integer"));
     }
   };
 
@@ -855,7 +963,7 @@ namespace
   {
     std::string operator() () const
     {
-      return tl::to_string (QObject::tr ("Range overflow on long integer"));
+      return tl::to_string (tr ("Range overflow on long integer"));
     }
   };
 
@@ -863,7 +971,7 @@ namespace
   {
     std::string operator() () const
     {
-      return tl::to_string (QObject::tr ("Range overflow on unsigned long integer"));
+      return tl::to_string (tr ("Range overflow on unsigned long integer"));
     }
   };
 
@@ -871,7 +979,7 @@ namespace
   {
     std::string operator() () const
     {
-      return tl::to_string (QObject::tr ("Range overflow on integer"));
+      return tl::to_string (tr ("Range overflow on integer"));
     }
   };
 
@@ -879,7 +987,7 @@ namespace
   {
     std::string operator() () const
     {
-      return tl::to_string (QObject::tr ("Range overflow on unsigned integer"));
+      return tl::to_string (tr ("Range overflow on unsigned integer"));
     }
   };
 }
@@ -1096,7 +1204,7 @@ tl::Extractor &
 tl::Extractor::expect_end ()
 {
   if (! at_end ()) {
-    error (tl::to_string (QObject::tr ("Expected end of text")));
+    error (tl::to_string (tr ("Expected end of text")));
   }
   return *this;
 }
@@ -1105,7 +1213,7 @@ tl::Extractor &
 tl::Extractor::expect_more ()
 {
   if (at_end ()) {
-    error (tl::to_string (QObject::tr ("Expected more text")));
+    error (tl::to_string (tr ("Expected more text")));
   }
   return *this;
 }
@@ -1114,7 +1222,7 @@ tl::Extractor &
 tl::Extractor::expect (const char *token)
 {
   if (! test (token)) {
-    error (tl::sprintf (tl::to_string (QObject::tr ("Expected '%s'")).c_str (), token));
+    error (tl::sprintf (tl::to_string (tr ("Expected '%s'")).c_str (), token));
   }
   return *this;
 }
@@ -1156,9 +1264,9 @@ tl::Extractor::error (const std::string &msg)
   std::string m (msg);
 
   if (at_end ()) {
-    m += tl::to_string (QObject::tr (", but text ended"));
+    m += tl::to_string (tr (", but text ended"));
   } else {
-    m += tl::to_string (QObject::tr (" here: "));
+    m += tl::to_string (tr (" here: "));
     const char *cp = m_cp;
     for (unsigned int i = 0; i < 10 && *cp; ++i, ++cp) {
       m += *cp;

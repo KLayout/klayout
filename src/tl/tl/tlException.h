@@ -141,7 +141,7 @@ struct TL_PUBLIC CancelException
   : public Exception
 {
   CancelException ()
-    : Exception (tl::to_string (QObject::tr ("Operation cancelled")))
+    : Exception (tl::to_string (tr ("Operation cancelled")))
   { }
 };
 
@@ -152,7 +152,7 @@ struct TL_PUBLIC InternalException
   : public Exception
 {
   InternalException (const char *file, int line, const char *cond)
-    : Exception (tl::to_string (QObject::tr ("Internal error: %s:%d %s was not true")).c_str (), file, line, cond)
+    : Exception (tl::to_string (tr ("Internal error: %s:%d %s was not true")).c_str (), file, line, cond)
   { }
 };
 

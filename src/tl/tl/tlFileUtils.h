@@ -25,55 +25,102 @@
 
 #include "tlCommon.h"
 #include "tlString.h"
-#include <QString>
 
 namespace tl
 {
 
 /**
- *  @brief Returns a value indicating whether the parent path is a parent directory of the path
- */
-bool TL_PUBLIC is_parent_path (const QString &parent, const QString &path);
-
-/**
  *  @brief Returns a value indicating whether the parent path is a parent directory of the path (version with std::string)
  */
-inline bool is_parent_path (const std::string &parent, const std::string &path)
-{
-  return is_parent_path (tl::to_qstring (parent), tl::to_qstring (path));
-}
-
-/**
- *  @brief Recursively remove the given directory, the files from that directory and all sub-directories
- *  @return True, if successful. false otherwise.
- */
-bool TL_PUBLIC rm_dir_recursive (const QString &path);
+bool TL_PUBLIC is_parent_path (const std::string &parent, const std::string &path);
 
 /**
  *  @brief Recursively remove the given directory, the files from that directory and all sub-directories (version with std::string)
  *  @return True, if successful. false otherwise.
  */
-inline bool rm_dir_recursive (const std::string &path)
-{
-  return rm_dir_recursive (tl::to_qstring (path));
-}
+bool TL_PUBLIC rm_dir_recursive (const std::string &path);
 
 /**
- *  @brief Recursively copies a given directory to a target directory
- *  Both target and source directories need to exist. New directories are created in the target
- *  directory if required.
+ *  @brief Creates the given path as far it does not exist yet
  *  @return True, if successful. false otherwise.
  */
-bool TL_PUBLIC cp_dir_recursive (const QString &source, const QString &target);
+bool TL_PUBLIC mkpath (const std::string &path);
 
 /**
  *  @brief Recursively remove the given directory, the files from that directory and all sub-directories (version with std::string)
  *  @return True, if successful. false otherwise.
  */
-inline bool cp_dir_recursive (const std::string &source, const std::string &target)
-{
-  return cp_dir_recursive (tl::to_qstring (source), tl::to_qstring (target));
-}
+bool TL_PUBLIC cp_dir_recursive (const std::string &source, const std::string &target);
+
+/**
+ *  @brief Gets the absolute path for a given file path
+ *  This will deliver the directory of the file as absolute path.
+ */
+std::string TL_PUBLIC absolute_path (const std::string &s);
+
+/**
+ *  @brief Gets the absolute file path for a given file path
+ *  This will deliver the directory and the file part as absolute path.
+ */
+std::string TL_PUBLIC absolute_file_path (const std::string &s);
+
+/**
+ *  @brief Gets the directory name for a given file path
+ */
+std::string TL_PUBLIC dirname (const std::string &s);
+
+/**
+ *  @brief Gets the filename for a given file path (file name without directory part)
+ */
+std::string TL_PUBLIC filename (const std::string &s);
+
+/**
+ *  @brief Gets the basename for a given file path (file name without any extensions)
+ *  This will strip all extensions (i.e. "archive.tar.gz" will become "archive").
+ */
+std::string TL_PUBLIC basename (const std::string &s);
+
+/**
+ *  @brief Gets the complete extension for a given file path
+ */
+std::string TL_PUBLIC extension (const std::string &s);
+
+/**
+ *  @brief Returns true, if the given path exists
+ *  If the path is a directory, file_exists will return true, if the directory exists.
+ */
+bool TL_PUBLIC file_exists (const std::string &s);
+
+/**
+ *  @brief Returns true, if the given path is a directory
+ */
+bool TL_PUBLIC is_dir (const std::string &s);
+
+/**
+ *  @brief Returns true, if the given path is the same directory of file than the other one
+ */
+bool TL_PUBLIC is_same_file (const std::string &a, const std::string &b);
+
+/**
+ *  @brief Combines the two path components into one path
+ */
+std::string TL_PUBLIC combine_path (const std::string &p1, const std::string &p2);
+
+/**
+ *  @brief Gets the current directory
+ */
+std::string TL_PUBLIC current_dir ();
+
+/**
+ *  @brief This function splits the path into it's components
+ *  On Windows, the first component may be the drive prefix ("C:") or
+ *  UNC server name ("\\server").
+ *  The components will keep their path separator, so joining the
+ *  parts will render the original path. A trailing empty element is
+ *  added if the path terminates with a separator (like "C:\" or "/home/user/").
+ *  The idea is that the last element is the file name part.
+ */
+static std::vector<std::string> split_path (const std::string &p);
 
 }
 

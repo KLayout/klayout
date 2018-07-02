@@ -68,16 +68,26 @@ QMAKE_CXXFLAGS_WARN_ON += \
     -Wno-deprecated-declarations \
     -Wno-reserved-user-defined-literal \
 
-QT += network xml sql 
+equals(HAVE_QT, "0") {
 
-equals(HAVE_QT5, "1") {
-  QT += designer printsupport
-  equals(HAVE_QTBINDINGS, "1") {
-    QT += multimedia multimediawidgets xmlpatterns svg gui
-  }
+  QT =
+
 } else {
-  # questionable: use uitools instead?
-  CONFIG += designer 
+
+  DEFINES += HAVE_QT
+  DEFINES += HAVE_XML
+  QT += network xml sql
+
+  equals(HAVE_QT5, "1") {
+    QT += designer printsupport
+    equals(HAVE_QTBINDINGS, "1") {
+      QT += multimedia multimediawidgets xmlpatterns svg gui
+    }
+  } else {
+    # questionable: use uitools instead?
+    CONFIG += designer
+  }
+
 }
 
 # only support the required symbols for shared object load performance

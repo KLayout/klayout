@@ -20,10 +20,12 @@
 
 */
 
-
-
 #ifndef HDR_tlDeferredExecution
 #define HDR_tlDeferredExecution
+
+#if !defined(HAVE_QT)
+#  error tl::DeferredExecution not available without Qt
+#endif
 
 #include "tlCommon.h"
 #include "tlObject.h"
@@ -267,8 +269,6 @@ private:
 };
 
 }
-
-
 
 #endif
 

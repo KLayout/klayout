@@ -26,8 +26,7 @@
 
 #include "tlObject.h"
 #include "tlEvents.h"
-
-#include <QMutex>
+#include "tlThreads.h"
 
 #include <iterator>
 #include <vector>
@@ -435,11 +434,11 @@ public:
 
 private:
   friend class holder_type;
-  QMutex m_lock;
+  tl::Mutex m_lock;
 
   void remove_element (holder_type *h)
   {
-    QMutexLocker locker (&m_lock);
+    tl::MutexLocker locker (&m_lock);
     tl_assert (! empty ());
     m_about_to_change ();
     erase (h);

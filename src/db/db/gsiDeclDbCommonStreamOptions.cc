@@ -26,8 +26,6 @@
 #include "dbLoadLayoutOptions.h"
 #include "gsiDecl.h"
 
-#include <QFrame>
-
 namespace dn
 {
 

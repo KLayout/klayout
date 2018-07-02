@@ -34,9 +34,6 @@
 #include <cstdio>
 #include <algorithm>
 
-#include <QMutex>
-#include <QMutexLocker>
-
 namespace gsi
 {
 
@@ -481,7 +478,7 @@ struct writer
     if (arg->is_nil () && atype.type () != gsi::T_var) {
 
       if (! (atype.is_ptr () || atype.is_cptr ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Arguments of reference or direct type cannot be passed nil")));
+        throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else if (atype.is_ptr ()) {
         aa->write<R *> ((R *)0);
       } else {
@@ -571,7 +568,7 @@ struct writer<VectorType>
   {
     if (arg->is_nil ()) {
       if (! (atype.is_ptr () || atype.is_cptr ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Arguments of reference or direct type cannot be passed nil")));
+        throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else {
         aa->write<void *> ((void *)0);
       }
@@ -592,7 +589,7 @@ struct writer<MapType>
   {
     if (arg->is_nil ()) {
       if (! (atype.is_ptr () || atype.is_cptr ())) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Arguments of reference or direct type cannot be passed nil")));
+        throw tl::Exception (tl::to_string (tr ("Arguments of reference or direct type cannot be passed nil")));
       } else {
         aa->write<void *> ((void *)0);
       }
@@ -629,7 +626,7 @@ struct writer<gsi::ObjectType>
       if (arg->is_nil ()) {
 
         if (atype.is_ref () || atype.is_cref ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Cannot pass nil to reference parameters")));
+          throw tl::Exception (tl::to_string (tr ("Cannot pass nil to reference parameters")));
         }
 
         aa->write<void *> ((void *) 0);
@@ -637,15 +634,15 @@ struct writer<gsi::ObjectType>
       } else {
 
         if (! arg->is_user ()) {
-          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
+          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
         }
 
         const tl::VariantUserClassBase *cls = arg->user_cls ();
         if (!cls) {
-          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
+          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
         }
         if (cls->is_const () && (atype.is_ref () || atype.is_ptr ())) {
-          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Cannot pass a const reference of class %s to a non-const reference or pointer parameter")), atype.cls ()->name ()));
+          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot pass a const reference of class %s to a non-const reference or pointer parameter")), atype.cls ()->name ()));
         }
 
         if (cls->gsi_cls ()->is_derived_from (atype.cls ())) {
@@ -666,7 +663,7 @@ struct writer<gsi::ObjectType>
           aa->write<void *> (new_obj);
 
         } else {
-          throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
+          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
         }
 
       }
@@ -674,15 +671,15 @@ struct writer<gsi::ObjectType>
     } else {
 
       if (! arg->is_user ()) {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
       }
 
       const tl::VariantUserClassBase *cls = arg->user_cls ();
       if (!cls) {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
       }
       if (cls->is_const () && (atype.is_ref () || atype.is_ptr ())) {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Cannot pass a const reference of class %s to a non-const reference or pointer parameter")), atype.cls ()->name ()));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot pass a const reference of class %s to a non-const reference or pointer parameter")), atype.cls ()->name ()));
       }
 
       if (cls->gsi_cls ()->is_derived_from (atype.cls ())) {
@@ -698,7 +695,7 @@ struct writer<gsi::ObjectType>
         aa->write<void *> (atype.cls ()->create_obj_from (cls->gsi_cls (), get_object (*arg)));
 
       } else {
-        throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
       }
 
     }
@@ -1061,7 +1058,7 @@ public:
   void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, const std::vector<tl::Variant> &args) const 
   {
     if (! args.empty ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Class '%s' is not a function - use 'new' to create a new object")), mp_var_cls->name ());
+      throw tl::Exception (tl::to_string (tr ("Class '%s' is not a function - use 'new' to create a new object")), mp_var_cls->name ());
     }
     out = tl::Variant ((void *) 0, mp_var_cls, false);
   }
@@ -1235,7 +1232,7 @@ VariantUserClassImpl::execute (const tl::ExpressionParserContext &context, tl::V
   if (mp_object_cls == 0 && method == "is_a") {
 
     if (args.size () != 1) {
-      throw tl::EvalError (tl::to_string (QObject::tr ("'is_a' method requires exactly one argument")), context);
+      throw tl::EvalError (tl::to_string (tr ("'is_a' method requires exactly one argument")), context);
     }
 
     bool ret = false;
@@ -1273,7 +1270,7 @@ VariantUserClassImpl::execute (const tl::ExpressionParserContext &context, tl::V
   } else if (mp_object_cls == 0 && method == "dup") {
 
     if (args.size () != 0) {
-      throw tl::EvalError (tl::to_string (QObject::tr ("'dup' method does not allow arguments")), context);
+      throw tl::EvalError (tl::to_string (tr ("'dup' method does not allow arguments")), context);
     }
 
     void *obj = mp_cls->create ();
@@ -1338,7 +1335,7 @@ special_method_impl (gsi::MethodBase::special_method_type smt, tl::Variant &self
   } else if (smt == gsi::MethodBase::Assign) {
     tl_assert (args.size () == 1);
     if (!args.front ().is_user () || self.user_cls () != args.front ().user_cls ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Source and target object must be of the same type for assignment")));
+      throw tl::Exception (tl::to_string (tr ("Source and target object must be of the same type for assignment")));
     }
     self.user_assign (args.front ());
   } else if (smt == gsi::MethodBase::Dup) {
@@ -1380,7 +1377,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
   }
 
   if (cls == 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unknown method")) + " '" + method + "' of class '" + clsact->name () + "'");
+    throw tl::Exception (tl::to_string (tr ("Unknown method")) + " '" + method + "' of class '" + clsact->name () + "'");
   }
 
   const gsi::MethodBase *meth = 0;
@@ -1389,7 +1386,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
   for (ExpressionMethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
 
     if ((*m)->is_signal()) {
-      throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Signals are not supported inside expressions (event %s)")), method.c_str ()));
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Signals are not supported inside expressions (event %s)")), method.c_str ()));
     } else if ((*m)->is_callback()) {
       //  ignore callbacks
     } else if ((*m)->compatible_with_num_args (args.size ())) {
@@ -1414,7 +1411,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
       nargs_s += tl::to_string (*na);
     }
 
-    throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Invalid number of arguments for method %s, class %s (got %d, expected %s)")), method.c_str (), mp_cls->name (), int (args.size ()), nargs_s));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid number of arguments for method %s, class %s (got %d, expected %s)")), method.c_str (), mp_cls->name (), int (args.size ()), nargs_s));
   }
 
   //  more than one candidate -> refine by checking the arguments
@@ -1481,21 +1478,21 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
   }
 
   if (! meth) {
-    throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("No method with matching arguments for method %s, class %s")), method.c_str (), mp_cls->name ()));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("No method with matching arguments for method %s, class %s")), method.c_str (), mp_cls->name ()));
   }
 
   if (candidates > 1) {
-    throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Ambiguous overload variants for method %s, class %s - multiple method declarations match arguments")), method.c_str (), mp_cls->name ()));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Ambiguous overload variants for method %s, class %s - multiple method declarations match arguments")), method.c_str (), mp_cls->name ()));
   }
 
   if (m_is_const && ! meth->is_const ()) {
-    throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Cannot call non-const method %s, class %s on a const reference")), method.c_str (), mp_cls->name ()));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot call non-const method %s, class %s on a const reference")), method.c_str (), mp_cls->name ()));
   }
 
   if (meth->is_signal ()) {
 
     //  TODO: events not supported yet
-    throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Signals not supported yet (method %s, class %s)")), method.c_str (), mp_cls->name ()));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Signals not supported yet (method %s, class %s)")), method.c_str (), mp_cls->name ()));
 
   } else if (meth->smt () != gsi::MethodBase::None) {
 
@@ -1518,7 +1515,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
 
     if (meth->ret_type ().is_iter ()) {
       //  TODO: iterators not supported yet
-      throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Iterators not supported yet (method %s, class %s)")), method.c_str (), mp_cls->name ()));
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Iterators not supported yet (method %s, class %s)")), method.c_str (), mp_cls->name ()));
     } else {
       out = tl::Variant ();
       gsi::do_on_type<reader> () (meth->ret_type ().type (), &out, &retlist, meth->ret_type (), &heap);

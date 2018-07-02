@@ -298,7 +298,7 @@ static void collect_cell_signatures (const db::Layout &layout, const std::vector
 void 
 FuzzyCellMapping::create (const db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Cell mapping")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Cell mapping")));
 
   if (tl::verbosity () >= 20) {
     tl::info << "Cell mapping";
@@ -321,16 +321,16 @@ FuzzyCellMapping::create (const db::Layout &layout_a, db::cell_index_type cell_i
   }
 
   std::map <db::cell_index_type, CellSignature> ma;
-  collect_cell_signatures (layout_a, la, cell_index_a, ma, tl::to_string (QObject::tr ("Collecting cell signatures (A)")));
+  collect_cell_signatures (layout_a, la, cell_index_a, ma, tl::to_string (tr ("Collecting cell signatures (A)")));
 
   if (tl::verbosity () >= 40) {
     tl::info << "Signatures (b):";
   }
 
   std::map <db::cell_index_type, CellSignature> mb;
-  collect_cell_signatures (layout_b, lb, cell_index_b, mb, tl::to_string (QObject::tr ("Collecting cell signatures (B)")));
+  collect_cell_signatures (layout_b, lb, cell_index_b, mb, tl::to_string (tr ("Collecting cell signatures (B)")));
 
-  tl::RelativeProgress progress (tl::to_string (QObject::tr ("Finding matching cells")), ma.size () * ma.size ());
+  tl::RelativeProgress progress (tl::to_string (tr ("Finding matching cells")), ma.size () * ma.size ());
 
   for (std::map <db::cell_index_type, CellSignature>::const_iterator m = ma.begin (); m != ma.end (); ++m) {
 

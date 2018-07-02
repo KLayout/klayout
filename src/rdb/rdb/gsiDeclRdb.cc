@@ -784,6 +784,7 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "@args tags\n"
     "@param tags A comma-separated list of tags\n"
   ) +
+#if defined(HAVE_QT)
   gsi::method ("image_str", &rdb::Item::image_str, 
     "@brief Gets the image associated with this item as a string\n"
     "@return A base64-encoded image file (usually in PNG format)\n"
@@ -793,6 +794,7 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "@args image\n"
     "@param image A base64-encoded image file (preferably in PNG format)\n"
   ) +
+#endif
   /* Not supported yet:
   gsi::method ("multiplicity", &rdb::Item::multiplicity, 
     "@brief Gets the item's multiplicity\n"
@@ -1061,10 +1063,10 @@ void create_items_from_edge_pair_array (rdb::Database *db, rdb::id_type cell_id,
 static rdb::Item *create_item (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id)
 {
   if (! db->cell_by_id (cell_id)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell ID: %1").arg (cell_id)));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Not a valid cell ID: %d")), cell_id));
   }
   if (! db->category_by_id (cat_id)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid category ID: %1").arg (cat_id)));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Not a valid category ID: %d")), cat_id));
   }
   return db->create_item (cell_id, cat_id);
 }

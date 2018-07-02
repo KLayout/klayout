@@ -64,14 +64,14 @@ Proxy::destroy ()
   }
 
   if (!m_can_destroy && m_obj) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Object cannot be destroyed explicitly")));
+    throw tl::Exception (tl::to_string (tr ("Object cannot be destroyed explicitly")));
   }
 
   //  first create the object if it was not created yet and check if it has not been
   //  destroyed already (the former is to ensure that the object is created at least)
   if (! m_obj) {
     if (m_destroyed) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Object has been destroyed already")));
+      throw tl::Exception (tl::to_string (tr ("Object has been destroyed already")));
     } else {
       m_obj = m_cls_decl->create ();
       m_owned = true;
@@ -203,7 +203,7 @@ Proxy::obj ()
 {
   if (! m_obj) {
     if (m_destroyed) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Object has been destroyed already")));
+      throw tl::Exception (tl::to_string (tr ("Object has been destroyed already")));
     } else {
       //  delayed creation of a detached C++ object ..
       set(m_cls_decl->create (), true, false, true);

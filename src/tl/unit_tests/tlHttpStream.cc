@@ -25,7 +25,9 @@
 #include "tlUnitTest.h"
 #include "tlTimer.h"
 
-#include <QCoreApplication>
+#if defined(HAVE_QT)
+# include <QCoreApplication>
+#endif
 
 static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
 static std::string test_url2 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1");
@@ -90,6 +92,8 @@ public:
 
 }
 
+#if defined(HAVE_QT)
+
 //  async mode
 TEST(3)
 {
@@ -113,3 +117,5 @@ TEST(3)
   std::string res (b, n);
   EXPECT_EQ (res, "hello, world.\n");
 }
+
+#endif

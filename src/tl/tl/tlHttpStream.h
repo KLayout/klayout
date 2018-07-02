@@ -23,10 +23,14 @@
 #ifndef HDR_tlHttpStream
 #define HDR_tlHttpStream
 
-#include "tlHttpStreamCurl.h"
-#include "tlHttpStreamQt.h"
+#if defined(HAVE_CURL)
+# include "tlHttpStreamCurl.h"
+#elif defined(HAVE_QT)
+# include "tlHttpStreamQt.h"
+#endif
 
 #include "tlObject.h"
+#include "tlException.h"
 
 namespace tl
 {
@@ -55,7 +59,7 @@ class TL_PUBLIC HttpErrorException
 {
 public:
   HttpErrorException (const std::string &f, int en, const std::string &url)
-    : tl::Exception (tl::to_string (QObject::tr ("Error %d: %s, fetching %s")), en, f, url)
+    : tl::Exception (tl::to_string (tr ("Error %d: %s, fetching %s")), en, f, url)
   { }
 };
 

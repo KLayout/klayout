@@ -43,7 +43,7 @@ class RVEReaderException
 {
 public:
   RVEReaderException (const std::string &msg, size_t line)
-    : ReaderException (tl::sprintf (tl::to_string (QObject::tr ("%s (line=%lu)")), msg, line))
+    : ReaderException (tl::sprintf (tl::to_string (tr ("%s (line=%lu)")), msg, line))
   { }
 };
 
@@ -53,9 +53,9 @@ class RVEReader
 public:
   RVEReader (tl::InputStream &stream)
     : m_input_stream (stream),
-      m_progress (tl::to_string (QObject::tr ("Reading RVE DB")), 10000)
+      m_progress (tl::to_string (tr ("Reading RVE DB")), 10000)
   {
-    m_progress.set_format (tl::to_string (QObject::tr ("%.0f MB")));
+    m_progress.set_format (tl::to_string (tr ("%.0f MB")));
     m_progress.set_unit (1024 * 1024);
   }
 
@@ -88,7 +88,7 @@ public:
     ex.read (res);
 
     if (res < 0.001 || res > 1e6) {
-      error (tl::sprintf (tl::to_string (QObject::tr ("Invalid resolution value: %g")), res));
+      error (tl::sprintf (tl::to_string (tr ("Invalid resolution value: %g")), res));
     }
 
     dbu = 1.0 / res;
@@ -128,7 +128,7 @@ public:
       cat_name.clear ();
 
       if (m_input_stream.at_end ()) {
-        error (tl::to_string (QObject::tr ("Unexpected end of file")));
+        error (tl::to_string (tr ("Unexpected end of file")));
       }
 
       ex = tl::Extractor (m_input_stream.get_line ().c_str ());
@@ -143,7 +143,7 @@ public:
       for (size_t i = 0; i < n3; ++i) {
 
         if (m_input_stream.at_end ()) {
-          error (tl::to_string (QObject::tr ("Unexpected end of file")));
+          error (tl::to_string (tr ("Unexpected end of file")));
         }
 
         std::string l = m_input_stream.get_line ();
@@ -179,7 +179,7 @@ public:
         //  TODO: add waiver string somehow ...
 
         if (m_input_stream.at_end ()) {
-          warn (tl::to_string (QObject::tr ("Unexpected end of file before the specified number of shapes was read - stopping.")));
+          warn (tl::to_string (tr ("Unexpected end of file before the specified number of shapes was read - stopping.")));
           break;
         }
 
@@ -204,7 +204,7 @@ public:
           ex = tl::Extractor (s.c_str ());
           const char *start = ex.skip ();
           if (! *start) {
-            warn (tl::to_string (QObject::tr ("Unexpected end of file before the specified number of shapes was read - stopping.")));
+            warn (tl::to_string (tr ("Unexpected end of file before the specified number of shapes was read - stopping.")));
           } else {
             const char *end = start + strlen (start);
             while (end > start && isspace (end [-1])) {
@@ -214,7 +214,7 @@ public:
               --end;
             }
             cat_name = std::string (start, end - start);
-            warn (tl::to_string (QObject::tr ("Obviously reaching end of shapes list before the specified number of shapes was read - parsing next category.")));
+            warn (tl::to_string (tr ("Obviously reaching end of shapes list before the specified number of shapes was read - parsing next category.")));
           }
           break;
         }
@@ -222,7 +222,7 @@ public:
         while (true) {
         
           if (m_input_stream.at_end ()) {
-            error (tl::to_string (QObject::tr ("Unexpected end of file")));
+            error (tl::to_string (tr ("Unexpected end of file")));
           }
 
           ex = tl::Extractor (m_input_stream.get_line ().c_str ());
@@ -341,7 +341,7 @@ public:
             if (point > 0) {
 
               if (m_input_stream.at_end ()) {
-                error (tl::to_string (QObject::tr ("Unexpected end of file")));
+                error (tl::to_string (tr ("Unexpected end of file")));
               }
 
               ex = tl::Extractor (m_input_stream.get_line ().c_str ());
@@ -369,7 +369,7 @@ public:
             if (point > 0) {
 
               if (m_input_stream.at_end ()) {
-                error (tl::to_string (QObject::tr ("Unexpected end of file")));
+                error (tl::to_string (tr ("Unexpected end of file")));
               }
 
               ex = tl::Extractor (m_input_stream.get_line ().c_str ());
@@ -400,7 +400,7 @@ public:
           }
 
         } else {
-          error (tl::sprintf (tl::to_string (QObject::tr ("Invalid shape type: %c")), shape_type));
+          error (tl::sprintf (tl::to_string (tr ("Invalid shape type: %c")), shape_type));
         }
 
         Item *item = db.create_item (cell->id (), cath->id ());
@@ -427,7 +427,7 @@ private:
 
   void warn (const std::string &msg)
   { 
-    tl::warn << tl::sprintf (tl::to_string (QObject::tr ("%s (line=%lu)")), msg, m_input_stream.line_number ());
+    tl::warn << tl::sprintf (tl::to_string (tr ("%s (line=%lu)")), msg, m_input_stream.line_number ());
   }
 
   void error (const std::string &msg)

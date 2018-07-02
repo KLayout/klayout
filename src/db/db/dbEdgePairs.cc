@@ -218,7 +218,7 @@ namespace tl
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::EdgePairs &b)
   {
     if (! test_extractor_impl (ex, b)) {
-      ex.error (tl::to_string (QObject::tr ("Expected an edge pair collection specification")));
+      ex.error (tl::to_string (tr ("Expected an edge pair collection specification")));
     }
   }
 }

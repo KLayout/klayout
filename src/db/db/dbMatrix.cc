@@ -818,7 +818,7 @@ namespace tl
   template<> void extractor_impl (tl::Extractor &ex, db::Matrix2d &m)
   {
     if (! test_extractor_impl (ex, m)) {
-      ex.error (tl::to_string (QObject::tr ("Expected a 2d matrix specification")));
+      ex.error (tl::to_string (tr ("Expected a 2d matrix specification")));
     }
   }
 
@@ -899,7 +899,7 @@ namespace tl
   template<> void extractor_impl (tl::Extractor &ex, db::Matrix3d &m)
   {
     if (! test_extractor_impl (ex, m)) {
-      ex.error (tl::to_string (QObject::tr ("Expected a 3d matrix specification")));
+      ex.error (tl::to_string (tr ("Expected a 3d matrix specification")));
     }
   }
 }

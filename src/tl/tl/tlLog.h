@@ -27,9 +27,8 @@
 #include "tlCommon.h"
 
 #include "tlString.h"
+#include "tlThreads.h"
 #include "tlObjectCollection.h"
-
-#include <QMutex>
 
 namespace tl
 {
@@ -138,7 +137,7 @@ protected:
   virtual void end () = 0;
   virtual void begin () = 0;
 
-  QMutex m_lock;
+  tl::Mutex m_lock;
 
 private:
   friend class ChannelProxy;

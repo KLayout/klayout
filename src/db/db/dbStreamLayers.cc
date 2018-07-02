@@ -548,7 +548,7 @@ LayerMap::from_string_file_format (const std::string &s)
     }
 
   } catch (tl::Exception &ex) {
-    throw tl::Exception (ex.msg () + tl::to_string (QObject::tr (" in line ")) + tl::to_string (lnr));
+    throw tl::Exception (ex.msg () + tl::to_string (tr (" in line ")) + tl::to_string (lnr));
   }
 
   return lm;

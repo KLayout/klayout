@@ -61,7 +61,7 @@ static PluginDescriptor load_plugin (const std::string &pp)
   //  there is no "dlopen" on mingw, so we need to emulate it.
   HINSTANCE handle = LoadLibraryW ((const wchar_t *) tl::to_qstring (pp).constData ());
   if (! handle) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unable to load plugin: %s with error message: %s ")), pp, GetLastError ());
+    throw tl::Exception (tl::to_string (tr ("Unable to load plugin: %s with error message: %s ")), pp, GetLastError ());
     return desc;
   }
   init_func = reinterpret_cast<dbp_init_func_t> (GetProcAddress (handle, init_func_name));
@@ -71,7 +71,7 @@ static PluginDescriptor load_plugin (const std::string &pp)
   void *handle;
   handle = dlopen (tl::string_to_system (pp).c_str (), RTLD_LAZY);
   if (! handle) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unable to load plugin: %s")), pp);
+    throw tl::Exception (tl::to_string (tr ("Unable to load plugin: %s")), pp);
   }
   init_func = reinterpret_cast<dbp_init_func_t> (dlsym (handle, init_func_name));
 
@@ -90,7 +90,7 @@ static PluginDescriptor load_plugin (const std::string &pp)
     }
   }
 
-  tl::log << tl::sprintf (tl::to_string (QObject::tr ("Loaded plugin: %s")), pp);
+  tl::log << tl::sprintf (tl::to_string (tr ("Loaded plugin: %s")), pp);
   return desc;
 }
 

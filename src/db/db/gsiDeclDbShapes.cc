@@ -38,7 +38,7 @@ namespace gsi
 static double shapes_dbu (const db::Shapes *shapes)
 {
   if (! shapes->layout ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("The shapes do not reside inside a layout - cannot obtain database unit")));
+    throw tl::Exception (tl::to_string (tr ("The shapes do not reside inside a layout - cannot obtain database unit")));
   }
   return shapes->layout ()->dbu ();
 }

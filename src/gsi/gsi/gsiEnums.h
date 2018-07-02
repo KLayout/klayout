@@ -27,7 +27,9 @@
 #include "gsiDecl.h"
 #include "tlString.h"
 
-#include <QFlags>
+#if defined(HAVE_QT)
+#  include <QFlags>
+#endif
 
 namespace gsi
 {
@@ -329,6 +331,8 @@ private:
   EnumSpecs<E> m_specs;
 };
 
+#if defined(HAVE_QT)
+
 template <class E>
 class QFlagsClass;
 
@@ -570,6 +574,8 @@ public:
 private:
   gsi::ClassExt<E> m_enum_ext;
 };
+
+#endif
 
 }
 

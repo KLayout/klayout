@@ -37,7 +37,9 @@
 #include "tlVariant.h"
 #include "tlString.h"
 
-#include <QObject>
+#if defined(HAVE_QT)
+#  include <QObject>
+#endif
 
 namespace gsi_test
 {
@@ -113,6 +115,7 @@ struct A
   int a3 (const std::string &x) { 
     return x.size (); 
   }
+#if defined(HAVE_QT)
   int a3_qstr (const QString &x) { 
     return x.size (); 
   }
@@ -122,6 +125,7 @@ struct A
   int a3_qba (const QByteArray &x) { 
     return x.size (); 
   }
+#endif
   double a4 (const std::vector<double> &d) { 
     m_d = d;
     return d.back (); 
@@ -152,9 +156,11 @@ struct A
   int a9b (bool f) const { return f ? 5 : -5; }
 
   std::string a10_d (double f) { return tl::to_string (f); }
+#if defined(HAVE_QT)
   QByteArray a10_d_qba (double f) { return tl::to_qstring (tl::to_string (f)).toUtf8 (); }
   QString a10_d_qstr (double f) { return tl::to_qstring (tl::to_string (f)); }
   QStringRef a10_d_qstrref (double f) { m_s = tl::to_qstring (tl::to_string (f)); return QStringRef (&m_s); }
+#endif
   std::string a10_f (float f) { return tl::to_string(f); }
   std::string a10_fptr (float *f) { if (f) { *f += 5; return tl::to_string(*f); } else { return "nil"; } }
   std::string a10_dptr (double *f) { if (f) { *f += 6; return tl::to_string(*f); } else { return "nil"; } }
@@ -212,6 +218,7 @@ struct A
   void push_ev (Enum e) { ee.push_back (e); }
   const std::vector<Enum> &ev () const { return ee; }
 
+#if defined(HAVE_QT)
   QFlags<Enum> get_ef () const { return ef; }
   QFlags<Enum> *get_efptr () { return int (ef) == 0 ? 0 : &ef; }
   const QFlags<Enum> *get_efcptr () const { return int (ef) == 0 ? 0 : &ef; }
@@ -224,6 +231,7 @@ struct A
   void set_efcref (const QFlags<Enum> &_ef) { ef = _ef; }
   void mod_efptr (QFlags<Enum> *_ef, Enum ee) { if (_ef) *_ef |= ee; }
   void mod_efref (QFlags<Enum> &_ef, Enum ee) { _ef |= ee; }
+#endif
 
   const char *a_vp1 (void *s) { return (const char *)s; }
   void *a_vp2 () { return (void *)"abc"; }
@@ -238,9 +246,13 @@ struct A
   int n;
   bool f;
   Enum e;
+#if defined(HAVE_QT)
   QFlags<Enum> ef;
+#endif
   std::vector<Enum> ee;
+#if defined(HAVE_QT)
   QString m_s;
+#endif
 };
 
 
@@ -774,6 +786,7 @@ struct B
   std::set<std::string> ss () { return m_ss; }
   void set_ss (std::set<std::string> v) { m_ss = v; }
 
+#if defined(HAVE_QT)
   static void push_qls (QList<QString> &m, const QString &v) { m.push_back (v); }
   QList<QString> qls () { return m_qls; }
   void set_qls (QList<QString> v) { m_qls = v; }
@@ -801,6 +814,7 @@ struct B
   static void insert_qhash_is (QHash<int, QString> &m, int k, const QString &v) { m.insert (k, v); }
   QHash<int, QString> qhash_is () { return m_qhash_is; }
   void set_qhash_is (QHash<int, QString> v) { m_qhash_is = v; }
+#endif
 
   std::string m;
   A a;
@@ -819,6 +833,7 @@ struct B
   std::vector<std::vector<std::string> > m_vvs; 
   std::list<std::string> m_ls;
   std::set<std::string> m_ss;
+#if defined_HAVE_QT
   QList<QString> m_qls;
   QList<QVariant> m_qlv;
   QStringList m_qsl;
@@ -826,6 +841,7 @@ struct B
   QSet<QString> m_qss;
   QMap<int, QString> m_qmap_is;
   QHash<int, QString> m_qhash_is;
+#endif
 
   static B *b_inst;
 };
@@ -950,13 +966,13 @@ public:
   static std::vector<const X *> vx_cptr ();
   static std::vector<X *> vx_ptr ();
 
-  virtual QString cls_name () const;
-  QString s () const;
-  void set_s (const QString &s);
+  virtual std::string cls_name () const;
+  std::string s () const;
+  void set_s (const std::string &s);
   void set_si (int v);
 
 protected:
-  QString m_s;
+  std::string m_s;
 
 private:
   static std::auto_ptr<X> sp_a, sp_b;
@@ -984,7 +1000,7 @@ public:
   static std::vector<const Y *> vy_cptr ();
   static std::vector<Y *> vy0_ptr ();
   static std::vector<Y *> vy_ptr (); 
-  virtual QString cls_name () const;
+  virtual std::string cls_name () const;
   int i () const;
 
 private:
@@ -1018,7 +1034,7 @@ class YY : public Y
 public:
   YY ();
   YY (const char *x);
-  virtual QString cls_name() const;
+  virtual std::string cls_name() const;
 };
 
 class Z
@@ -1097,6 +1113,7 @@ public:
   gsi::Callback f_cb;
 };
 
+#if defined(HAVE_QT)
 class SQ
   : public QObject
 {
@@ -1122,6 +1139,7 @@ signals:
 private:
   int m_tag;
 };
+#endif
 
 class SE
   : public tl::Object
@@ -1131,7 +1149,7 @@ public:
 
   void trigger_s0 ();
   void trigger_s1 (int x);
-  void trigger_s2 (const QString &s);
+  void trigger_s2 (const std::string &s);
 
   void set_tag (int x);
   int tag () const
@@ -1142,7 +1160,7 @@ public:
 public:
   tl::event<> s0;
   tl::event<int> s1;
-  tl::event<const QString &, SE *> s2;
+  tl::event<const std::string &, SE *> s2;
 
 private:
   int m_tag;
@@ -1155,9 +1173,11 @@ namespace tl
   template <> struct type_traits<gsi_test::A_NC> : public type_traits<void> {
     typedef tl::false_tag has_copy_constructor;
   };
+#if defined(HAVE_QT)
   template <> struct type_traits<gsi_test::SQ> : public type_traits<void> {
     typedef tl::false_tag has_copy_constructor;
   };
+#endif
 }
 
 #endif

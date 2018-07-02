@@ -249,7 +249,7 @@ InflateFilter::get (size_t n)
 
   while ((m_b_insert + sizeof (m_buffer) - m_b_read) % sizeof (m_buffer) < n) {
     if (! process ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Unexpected end of file (DEFLATE implementation)")));
+      throw tl::Exception (tl::to_string (tr ("Unexpected end of file (DEFLATE implementation)")));
     }
   }
 
@@ -472,7 +472,7 @@ InflateFilter::process ()
         }
 
       } else {
-        throw tl::Exception (tl::to_string (QObject::tr ("Invalid compression type: %d")), t);
+        throw tl::Exception (tl::to_string (tr ("Invalid compression type: %d")), t);
       }
 
     } else {

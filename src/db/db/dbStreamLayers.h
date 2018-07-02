@@ -48,7 +48,7 @@ class DB_PUBLIC LayerSpecFormatException
 {
 public:
   LayerSpecFormatException (const char *s)
-    : tl::Exception (tl::to_string (QObject::tr ("Not a valid layer map expression: '..%s' (use '/' to separated layer and datatype, ',' to list numbers for layer or datatype, '-' to create ranges and ';' to concatenate multiple subexpressions)")), s)
+    : tl::Exception (tl::to_string (tr ("Not a valid layer map expression: '..%s' (use '/' to separated layer and datatype, ',' to list numbers for layer or datatype, '-' to create ranges and ';' to concatenate multiple subexpressions)")), s)
   { }
 };
 

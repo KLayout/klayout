@@ -26,6 +26,10 @@
 
 #include "tlCommon.h"
 
+#if !defined(HAVE_XML)
+#  error tl::XMLParser not available without QtXml
+#endif
+
 #include <QXmlInputSource>
 #include <QXmlDefaultHandler>
 #include <QXmlLocator>

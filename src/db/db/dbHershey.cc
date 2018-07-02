@@ -85,13 +85,13 @@ std::vector<std::string>
 hershey_font_names ()
 {
   std::vector<std::string> ff;
-  ff.push_back (tl::to_string (QObject::tr ("Default")));
-  ff.push_back (tl::to_string (QObject::tr ("Gothic")));
-  ff.push_back (tl::to_string (QObject::tr ("Sans Serif")));
-  ff.push_back (tl::to_string (QObject::tr ("Stick")));
-  ff.push_back (tl::to_string (QObject::tr ("Times Italic")));
-  ff.push_back (tl::to_string (QObject::tr ("Times Thin")));
-  ff.push_back (tl::to_string (QObject::tr ("Times")));
+  ff.push_back (tl::to_string (tr ("Default")));
+  ff.push_back (tl::to_string (tr ("Gothic")));
+  ff.push_back (tl::to_string (tr ("Sans Serif")));
+  ff.push_back (tl::to_string (tr ("Stick")));
+  ff.push_back (tl::to_string (tr ("Times Italic")));
+  ff.push_back (tl::to_string (tr ("Times Thin")));
+  ff.push_back (tl::to_string (tr ("Times")));
   return ff;
 }
 

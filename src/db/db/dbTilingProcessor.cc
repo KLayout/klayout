@@ -26,6 +26,7 @@
 #include "tlExpression.h"
 #include "tlProgress.h"
 #include "tlThreadedWorkers.h"
+#include "tlThreads.h"
 #include "gsiDecl.h"
 
 #include <cmath>
@@ -290,7 +291,7 @@ public:
 
   void next_progress () 
   {
-    QMutexLocker locker (&m_mutex);
+    tl::MutexLocker locker (&m_mutex);
     ++m_progress;
   }
 
@@ -298,7 +299,7 @@ public:
   {
     unsigned int p;
     {
-      QMutexLocker locker (&m_mutex);
+      tl::MutexLocker locker (&m_mutex);
       p = m_progress;
     }
 
@@ -316,7 +317,7 @@ private:
   TilingProcessor *mp_proc;
   bool m_has_tiles;
   unsigned int m_progress;
-  QMutex m_mutex;
+  tl::Mutex m_mutex;
 };
 
 class TilingProcessorTask
@@ -711,15 +712,15 @@ TilingProcessor::output (const std::string &name, db::Edges &edges)
 tl::Variant
 TilingProcessor::receiver (const std::vector<tl::Variant> &args)
 {
-  QMutexLocker locker (&m_output_mutex);
+  tl::MutexLocker locker (&m_output_mutex);
 
   if (args.size () != 1) {
-    throw tl::Exception (tl::to_string (QObject::tr ("_rec function requires one argument: the handle of the output channel")));
+    throw tl::Exception (tl::to_string (tr ("_rec function requires one argument: the handle of the output channel")));
   }
 
   size_t index = args[0].to<size_t> ();
   if (index >= m_outputs.size ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid handle in _rec function call")));
+    throw tl::Exception (tl::to_string (tr ("Invalid handle in _rec function call")));
   }
 
   gsi::Proxy *proxy = new gsi::Proxy (gsi::cls_decl<TileOutputReceiver> ());
@@ -733,17 +734,17 @@ TilingProcessor::receiver (const std::vector<tl::Variant> &args)
 void 
 TilingProcessor::put (size_t ix, size_t iy, const db::Box &tile, const std::vector<tl::Variant> &args)
 {
-  QMutexLocker locker (&m_output_mutex);
+  tl::MutexLocker locker (&m_output_mutex);
 
   if (args.size () < 2 || args.size () > 3) {
-    throw tl::Exception (tl::to_string (QObject::tr ("_output function requires two or three arguments: handle and object and a clip flag (optional)")));
+    throw tl::Exception (tl::to_string (tr ("_output function requires two or three arguments: handle and object and a clip flag (optional)")));
   }
 
   bool clip = ((args.size () <= 2 || args [2].to_bool ()) && ! tile.empty ());
 
   size_t index = args[0].to<size_t> ();
   if (index >= m_outputs.size ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid handle (first argument) in _output function call")));
+    throw tl::Exception (tl::to_string (tr ("Invalid handle (first argument) in _output function call")));
   }
 
   m_outputs[index].receiver->put (ix, iy, tile, m_outputs[index].id, args[1], dbu (), m_outputs[index].trans, clip);
@@ -909,7 +910,7 @@ TilingProcessor::execute (const std::string &desc)
   }
 
   if (job.has_error ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Errors occured during processing. First error message says:\n")) + job.error_messages ().front ());
+    throw tl::Exception (tl::to_string (tr ("Errors occured during processing. First error message says:\n")) + job.error_messages ().front ());
   }
 }
 

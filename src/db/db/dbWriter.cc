@@ -39,7 +39,7 @@ Writer::Writer (const db::SaveLayoutOptions &options)
     }
   }
   if (! mp_writer) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unknown stream format: %s")), m_options.format ());
+    throw tl::Exception (tl::to_string (tr ("Unknown stream format: %s")), m_options.format ());
   }
 }
 

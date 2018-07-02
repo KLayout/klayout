@@ -30,8 +30,7 @@
 #include "dbLayoutDiff.h"
 
 #include "tlUnitTest.h"
-
-#include <QFileInfo>
+#include "tlFileUtils.h"
 
 namespace db
 {
@@ -110,7 +109,7 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
       fn += tl::sprintf (".%d", n);
     }
 
-    if (QFileInfo (tl::to_qstring (fn)).exists ()) {
+    if (tl::file_exists (fn)) {
 
       if (n == 1 && any) {
         throw tl::Exception (tl::sprintf ("Inconsistent reference variants for %s: there can be either variants (.1,.2,... suffix) or a single file (without suffix)", au_file));
@@ -138,8 +137,8 @@ void compare_layouts (tl::TestBase *_this, const db::Layout &layout, const std::
 
   if (! equal) {
     _this->raise (tl::sprintf ("Compare failed - see\n  actual: %s\n  golden: %s%s",
-                               tl::to_string (QFileInfo (tl::to_qstring (tmp_file)).absoluteFilePath ()),
-                               tl::to_string (QFileInfo (tl::to_qstring (au_file)).absoluteFilePath ()),
+                               tl::absolute_file_path (tmp_file),
+                               tl::absolute_file_path (au_file),
                                (n > 1 ? "\nand variants" : "")));
   }
 }

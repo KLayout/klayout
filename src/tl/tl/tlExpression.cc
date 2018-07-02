@@ -25,6 +25,7 @@
 #include "tlInternational.h"
 #include "tlString.h"
 #include "tlGlobPattern.h"
+#include "tlFileUtils.h"
 
 #include <map>
 #include <vector>
@@ -34,9 +35,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-
-#include <QFileInfo>
-#include <QDir>
 
 //  Suggestions for further functions:
 //  - provide date/time function
@@ -53,7 +51,7 @@ static std::locale c_locale ("C");
 //  Implementation of EvalError
 
 EvalError::EvalError (const std::string &what, const ExpressionParserContext &context)
-  : tl::Exception (what + tl::to_string (QObject::tr (" at ")) + context.where ())
+  : tl::Exception (what + tl::to_string (tr (" at ")) + context.where ())
 {
   // .. nothing yet ..
 }
@@ -62,7 +60,7 @@ EvalError::EvalError (const std::string &what, const ExpressionParserContext &co
 //  Implementation of NoMethodError
 
 NoMethodError::NoMethodError (const std::string &cls_name, const std::string &method, const ExpressionParserContext &context)
-  : EvalError (tl::sprintf (tl::to_string (QObject::tr ("'%s' is not a valid method name for objects of class '%s'")), method, cls_name), context)
+  : EvalError (tl::sprintf (tl::to_string (tr ("'%s' is not a valid method name for objects of class '%s'")), method, cls_name), context)
 { 
   // .. nothing yet ..
 }
@@ -99,7 +97,7 @@ ExpressionParserContext::where () const
     size_t len = strlen (text);
 
     if (pos >= len) {
-      return tl::to_string (QObject::tr ("end of text"));
+      return tl::to_string (tr ("end of text"));
     } else {
 
       int line = 1;
@@ -116,9 +114,9 @@ ExpressionParserContext::where () const
       std::ostringstream os;
 
       if (line == 1) {
-        os << tl::to_string (QObject::tr ("position")) << " " << pos;
+        os << tl::to_string (tr ("position")) << " " << pos;
       } else {
-        os << tl::to_string (QObject::tr ("line")) << " " << line << ", " << tl::to_string (QObject::tr ("position")) << " " << col;
+        os << tl::to_string (tr ("line")) << " " << line << ", " << tl::to_string (tr ("position")) << " " << col;
       }
 
       os << " (";
@@ -138,7 +136,7 @@ ExpressionParserContext::where () const
     }
 
   } else {
-    return std::string (tl::to_string (QObject::tr ("[unspecified location]")));
+    return std::string (tl::to_string (tr ("[unspecified location]")));
   }
 }
 
@@ -152,14 +150,14 @@ static double to_double (const ExpressionParserContext &context, const tl::Varia
   } else if (v.is_list ()) {
     return v.get_list ().size ();
   } else {
-    throw EvalError (tl::to_string (QObject::tr ("Double precision floating point value expected")), context);
+    throw EvalError (tl::to_string (tr ("Double precision floating point value expected")), context);
   }
 }
 
 static double to_double (const ExpressionParserContext &context, const std::vector <tl::Variant> &v)
 {
   if (v.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("Function expects a single numeric argument")), context);
+    throw EvalError (tl::to_string (tr ("Function expects a single numeric argument")), context);
   }
 
   return to_double (context, v [0]);
@@ -172,7 +170,7 @@ static long to_long (const ExpressionParserContext &context, const tl::Variant &
   } else if (v.is_list ()) {
     return long (v.get_list ().size ());
   } else {
-    throw EvalError (tl::to_string (QObject::tr ("Integer value expected")), context);
+    throw EvalError (tl::to_string (tr ("Integer value expected")), context);
   }
 }
 
@@ -183,7 +181,7 @@ static unsigned long to_ulong (const ExpressionParserContext &context, const tl:
   } else if (v.is_list ()) {
     return (unsigned long) (v.get_list ().size ());
   } else {
-    throw EvalError (tl::to_string (QObject::tr ("Unsigned integer value expected")), context);
+    throw EvalError (tl::to_string (tr ("Unsigned integer value expected")), context);
   }
 }
 
@@ -194,7 +192,7 @@ static long long to_longlong (const ExpressionParserContext &context, const tl::
   } else if (v.is_list ()) {
     return long (v.get_list ().size ());
   } else {
-    throw EvalError (tl::to_string (QObject::tr ("Integer value expected")), context);
+    throw EvalError (tl::to_string (tr ("Integer value expected")), context);
   }
 }
 
@@ -205,7 +203,7 @@ static unsigned long long to_ulonglong (const ExpressionParserContext &context, 
   } else if (v.is_list ()) {
     return (unsigned long long) (v.get_list ().size ());
   } else {
-    throw EvalError (tl::to_string (QObject::tr ("Unsigned integer value expected")), context);
+    throw EvalError (tl::to_string (tr ("Unsigned integer value expected")), context);
   }
 }
 
@@ -311,7 +309,7 @@ public:
     if (method == "push") {
 
       if (args.size () != 1) {
-        throw EvalError (tl::to_string (QObject::tr ("'push' method expects one argument")), context);
+        throw EvalError (tl::to_string (tr ("'push' method expects one argument")), context);
       }
 
       object.push (args [0]);
@@ -320,13 +318,13 @@ public:
     } else if (method == "size") {
       
       if (args.size () != 0) {
-        throw EvalError (tl::to_string (QObject::tr ("'size' method does not accept an argument")), context);
+        throw EvalError (tl::to_string (tr ("'size' method does not accept an argument")), context);
       }
 
       out = object.size ();
     
     } else {
-      throw EvalError (tl::to_string (QObject::tr ("Unknown method")) + " '" + method + "' for list", context);
+      throw EvalError (tl::to_string (tr ("Unknown method")) + " '" + method + "' for list", context);
     }
 
   }
@@ -348,7 +346,7 @@ public:
     if (method == "insert") {
 
       if (args.size () != 2) {
-        throw EvalError (tl::to_string (QObject::tr ("'insert' method expects two arguments")), context);
+        throw EvalError (tl::to_string (tr ("'insert' method expects two arguments")), context);
       }
 
       object.insert (args [0], args [1]);
@@ -357,7 +355,7 @@ public:
     } else if (method == "size") {
       
       if (args.size () != 0) {
-        throw EvalError (tl::to_string (QObject::tr ("'size' method does not accept an argument")), context);
+        throw EvalError (tl::to_string (tr ("'size' method does not accept an argument")), context);
       }
 
       out = object.array_size ();
@@ -365,7 +363,7 @@ public:
     } else if (method == "keys") {
 
       if (args.size () != 0) {
-        throw EvalError (tl::to_string (QObject::tr ("'keys' method does not accept an argument")), context);
+        throw EvalError (tl::to_string (tr ("'keys' method does not accept an argument")), context);
       }
 
       out.set_list (object.array_size ());
@@ -376,7 +374,7 @@ public:
     } else if (method == "values") {
 
       if (args.size () != 0) {
-        throw EvalError (tl::to_string (QObject::tr ("'keys' method does not accept an argument")), context);
+        throw EvalError (tl::to_string (tr ("'keys' method does not accept an argument")), context);
       }
 
       out.set_list (object.array_size ());
@@ -385,7 +383,7 @@ public:
       }
 
     } else {
-      throw EvalError (tl::to_string (QObject::tr ("Unknown method")) + " '" + method + "' for array", context);
+      throw EvalError (tl::to_string (tr ("Unknown method")) + " '" + method + "' for array", context);
     }
 
   }
@@ -470,7 +468,7 @@ public:
     m_c[1]->execute (a);
 
     if (! v.lvalue ()) {
-      throw EvalError (tl::to_string (QObject::tr ("Assignment needs a lvalue")), m_context);
+      throw EvalError (tl::to_string (tr ("Assignment needs a lvalue")), m_context);
     }
     a.swap (*v.lvalue ());
   }
@@ -511,7 +509,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -561,7 +559,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -611,7 +609,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -661,7 +659,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -711,7 +709,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -761,7 +759,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -811,7 +809,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -908,7 +906,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1079,7 +1077,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1135,7 +1133,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1191,7 +1189,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1253,7 +1251,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1313,7 +1311,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1326,7 +1324,7 @@ public:
 
       long x = to_long (m_context, *b);
       if (x < 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Numeric argument of '*' operator with string must be positive")), m_context);
+        throw EvalError (tl::to_string (tr ("Numeric argument of '*' operator with string must be positive")), m_context);
       }
 
       std::string s;
@@ -1341,7 +1339,7 @@ public:
 
       long x = to_long (m_context, *v);
       if (x < 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Numeric argument of '*' operator with string must be positive")), m_context);
+        throw EvalError (tl::to_string (tr ("Numeric argument of '*' operator with string must be positive")), m_context);
       }
 
       std::string s;
@@ -1403,7 +1401,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1415,37 +1413,37 @@ public:
     } else if (v->is_double () || b->is_double ()) {
       double d = to_double (m_context, *b);
       if (d == 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Division by zero")), m_context);
+        throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
       v.set (tl::Variant (to_double (m_context, *v) / d));
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
       unsigned long long d = to_ulonglong (m_context, *b);
       if (d == 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Division by zero")), m_context);
+        throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
       v.set (tl::Variant (to_ulonglong (m_context, *v) / d));
     } else if (v->is_longlong () || b->is_longlong ()) {
       long long d = to_longlong (m_context, *b);
       if (d == 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Division by zero")), m_context);
+        throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
       v.set (tl::Variant (to_longlong (m_context, *v) / d));
     } else if (v->is_ulong () || b->is_ulong ()) {
       unsigned long d = to_ulong (m_context, *b);
       if (d == 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Division by zero")), m_context);
+        throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
       v.set (tl::Variant (to_ulong (m_context, *v) / d));
     } else if (v->is_long () || b->is_long ()) {
       long d = to_long (m_context, *b);
       if (d == 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Division by zero")), m_context);
+        throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
       v.set (tl::Variant (to_long (m_context, *v) / d));
     } else {
       double d = to_double (m_context, *b);
       if (d == 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Division by zero")), m_context);
+        throw EvalError (tl::to_string (tr ("Division by zero")), m_context);
       }
       v.set (tl::Variant (to_double (m_context, *v) / d));
     }
@@ -1487,7 +1485,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1499,25 +1497,25 @@ public:
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
       unsigned long long d = to_ulonglong (m_context, *b);
       if (d == 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Modulo by zero")), m_context);
+        throw EvalError (tl::to_string (tr ("Modulo by zero")), m_context);
       }
       v.set (tl::Variant (to_ulonglong (m_context, *v) % d));
     } else if (v->is_longlong () || b->is_longlong ()) {
       long long d = to_longlong (m_context, *b);
       if (d == 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Modulo by zero")), m_context);
+        throw EvalError (tl::to_string (tr ("Modulo by zero")), m_context);
       }
       v.set (tl::Variant (to_longlong (m_context, *v) % d));
     } else if (v->is_ulong () || b->is_ulong ()) {
       unsigned long d = to_ulong (m_context, *b);
       if (d == 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Modulo by zero")), m_context);
+        throw EvalError (tl::to_string (tr ("Modulo by zero")), m_context);
       }
       v.set (tl::Variant (to_ulong (m_context, *v) % d));
     } else {
       long d = to_long (m_context, *b);
       if (d == 0) {
-        throw EvalError (tl::to_string (QObject::tr ("Modulo by zero")), m_context);
+        throw EvalError (tl::to_string (tr ("Modulo by zero")), m_context);
       }
       v.set (tl::Variant (to_long (m_context, *v) % d));
     }
@@ -1559,7 +1557,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1615,7 +1613,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1671,7 +1669,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1727,7 +1725,7 @@ public:
 
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1739,7 +1737,7 @@ public:
     } else if (v->is_list ()) {
 
       if (! e->can_convert_to_ulong ()) {
-        throw EvalError (tl::to_string (QObject::tr ("Invalid index for [] operator")), m_context);
+        throw EvalError (tl::to_string (tr ("Invalid index for [] operator")), m_context);
       }
       unsigned long i = e->to_ulong ();
       if (i >= (unsigned long) v->size ()) {
@@ -1769,7 +1767,7 @@ public:
       }
 
     } else {
-      throw EvalError (tl::to_string (QObject::tr ("[] operator expects a list or an array")), m_context);
+      throw EvalError (tl::to_string (tr ("[] operator expects a list or an array")), m_context);
     }
   }
 };
@@ -1804,11 +1802,11 @@ public:
 
     if (v->is_user ()) {
 
-      throw EvalError (tl::to_string (QObject::tr ("Unary minus not implemented for objects")), m_context);
+      throw EvalError (tl::to_string (tr ("Unary minus not implemented for objects")), m_context);
       /*
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -1861,11 +1859,11 @@ public:
 
     if (v->is_user ()) {
 
-      throw EvalError (tl::to_string (QObject::tr ("Unary tilde not implemented for objects")), m_context);
+      throw EvalError (tl::to_string (tr ("Unary tilde not implemented for objects")), m_context);
       /*
       const EvalClass *c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object)")), m_context);
+        throw EvalError (tl::to_string (tr ("Not a valid object for a method call (not an object)")), m_context);
       }
 
       tl::Variant o;
@@ -2041,10 +2039,10 @@ public:
     } else if (v->is_user ()) {
       c = v->user_cls () ? v->user_cls ()->eval_cls () : 0;
       if (! c) {
-        throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (not an object) - value is %1").arg (tl::to_qstring (v->to_parsable_string ()))), m_context);
+        throw EvalError (tl::sprintf (tl::to_string (tr ("Not a valid object for a method call (not an object) - value is %s")), v->to_parsable_string ()), m_context);
       }
     } else {
-      throw EvalError (tl::to_string (QObject::tr ("Not a valid object for a method call (wrong type) - value is %1").arg (tl::to_qstring (v->to_parsable_string ()))), m_context);
+      throw EvalError (tl::sprintf (tl::to_string (tr ("Not a valid object for a method call (wrong type) - value is %1")), v->to_parsable_string ()), m_context);
     }
 
     tl::Variant o;
@@ -2358,7 +2356,7 @@ static void
 abs_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &v)
 {
   if (v.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'abs' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'abs' function expects exactly one argument")), context);
   }
 
   if (v[0].is_long ()) {
@@ -2444,7 +2442,7 @@ static void
 pow_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 2) {
-    throw EvalError (tl::to_string (QObject::tr ("'pow' function expects exactly two arguments")), context);
+    throw EvalError (tl::to_string (tr ("'pow' function expects exactly two arguments")), context);
   }
 
   out = pow (to_double (context, vv [0]), to_double (context, vv [1]));
@@ -2454,7 +2452,7 @@ static void
 atan2_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 2) {
-    throw EvalError (tl::to_string (QObject::tr ("'atan2' function expects exactly two arguments")), context);
+    throw EvalError (tl::to_string (tr ("'atan2' function expects exactly two arguments")), context);
   }
 
   out = atan2 (to_double (context, vv [0]), to_double (context, vv [1]));
@@ -2464,7 +2462,7 @@ static void
 to_f_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'to_f' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'to_f' function expects exactly one argument")), context);
   }
 
   out = vv [0].to_double ();
@@ -2474,7 +2472,7 @@ static void
 to_s_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'to_s' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'to_s' function expects exactly one argument")), context);
   }
 
   out = vv [0].to_string ();
@@ -2484,7 +2482,7 @@ static void
 to_i_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'to_i' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'to_i' function expects exactly one argument")), context);
   }
 
   out = vv [0].to_long ();
@@ -2494,7 +2492,7 @@ static void
 to_ui_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'to_ui' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'to_ui' function expects exactly one argument")), context);
   }
 
   out = vv [0].to_ulong ();
@@ -2504,7 +2502,7 @@ static void
 to_l_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'to_l' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'to_l' function expects exactly one argument")), context);
   }
 
   out = vv [0].to_longlong ();
@@ -2514,7 +2512,7 @@ static void
 to_ul_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'to_ul' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'to_ul' function expects exactly one argument")), context);
   }
 
   out = vv [0].to_ulonglong ();
@@ -2524,7 +2522,7 @@ static void
 is_string_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'is_string' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'is_string' function expects exactly one argument")), context);
   }
 
   out = vv[0].is_a_string ();
@@ -2534,7 +2532,7 @@ static void
 is_numeric_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'is_numeric' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'is_numeric' function expects exactly one argument")), context);
   }
 
   out = vv [0].can_convert_to_double ();
@@ -2544,7 +2542,7 @@ static void
 is_array_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'is_array' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'is_array' function expects exactly one argument")), context);
   }
 
   out = vv [0].is_list ();
@@ -2554,7 +2552,7 @@ static void
 is_nil_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'is_nil' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'is_nil' function expects exactly one argument")), context);
   }
 
   out = vv [0].is_nil ();
@@ -2564,7 +2562,7 @@ static void
 gsub_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 3) {
-    throw EvalError (tl::to_string (QObject::tr ("'gsub' function expects exactly three arguments")), context);
+    throw EvalError (tl::to_string (tr ("'gsub' function expects exactly three arguments")), context);
   }
 
   std::string s (vv [0].to_string ());
@@ -2589,7 +2587,7 @@ static void
 sub_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 3) {
-    throw EvalError (tl::to_string (QObject::tr ("'sub' function expects exactly three arguments")), context);
+    throw EvalError (tl::to_string (tr ("'sub' function expects exactly three arguments")), context);
   }
 
   std::string s (vv [0].to_string ());
@@ -2617,7 +2615,7 @@ static void
 find_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 2) {
-    throw EvalError (tl::to_string (QObject::tr ("'find' function expects exactly two arguments")), context);
+    throw EvalError (tl::to_string (tr ("'find' function expects exactly two arguments")), context);
   }
 
   std::string s (vv [0].to_string ());
@@ -2635,7 +2633,7 @@ static void
 rfind_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 2) {
-    throw EvalError (tl::to_string (QObject::tr ("'rfind' function expects exactly two arguments")), context);
+    throw EvalError (tl::to_string (tr ("'rfind' function expects exactly two arguments")), context);
   }
 
   std::string s (vv [0].to_string ());
@@ -2653,7 +2651,7 @@ static void
 len_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'len' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'len' function expects exactly one argument")), context);
   }
 
   if (vv [0].is_list ()) {
@@ -2667,7 +2665,7 @@ static void
 substr_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 3 && vv.size () != 2) {
-    throw EvalError (tl::to_string (QObject::tr ("'substr' function expects two or three arguments")), context);
+    throw EvalError (tl::to_string (tr ("'substr' function expects two or three arguments")), context);
   }
 
   std::string s (vv [0].to_string ());
@@ -2701,11 +2699,11 @@ static void
 join_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 2) {
-    throw EvalError (tl::to_string (QObject::tr ("'join' function expects exactly two arguments")), context);
+    throw EvalError (tl::to_string (tr ("'join' function expects exactly two arguments")), context);
   }
 
   if (! vv[0].is_list ()) {
-    throw EvalError (tl::to_string (QObject::tr ("First argument of 'join' function must be a list")), context);
+    throw EvalError (tl::to_string (tr ("First argument of 'join' function must be a list")), context);
   }
 
   std::ostringstream r;
@@ -2729,11 +2727,11 @@ static void
 item_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 2) {
-    throw EvalError (tl::to_string (QObject::tr ("'item' function expects exactly two arguments")), context);
+    throw EvalError (tl::to_string (tr ("'item' function expects exactly two arguments")), context);
   }
 
   if (! vv[0].is_list ()) {
-    throw EvalError (tl::to_string (QObject::tr ("First argument of 'item' function must be a list")), context);
+    throw EvalError (tl::to_string (tr ("First argument of 'item' function must be a list")), context);
   }
 
   long index = to_long (context, vv [1]);
@@ -2748,7 +2746,7 @@ static void
 split_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 2) {
-    throw EvalError (tl::to_string (QObject::tr ("'split' function expects exactly two arguments")), context);
+    throw EvalError (tl::to_string (tr ("'split' function expects exactly two arguments")), context);
   }
 
   out = tl::Variant::empty_list ();
@@ -2767,7 +2765,7 @@ static void
 true_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 0) {
-    throw EvalError (tl::to_string (QObject::tr ("'true' function must not have arguments")), context);
+    throw EvalError (tl::to_string (tr ("'true' function must not have arguments")), context);
   }
 
   out = true;
@@ -2777,7 +2775,7 @@ static void
 false_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 0) {
-    throw EvalError (tl::to_string (QObject::tr ("'false' function must not have arguments")), context);
+    throw EvalError (tl::to_string (tr ("'false' function must not have arguments")), context);
   }
 
   out = false;
@@ -2787,7 +2785,7 @@ static void
 nil_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 0) {
-    throw EvalError (tl::to_string (QObject::tr ("'nil' function must not have arguments")), context);
+    throw EvalError (tl::to_string (tr ("'nil' function must not have arguments")), context);
   }
 
   out = tl::Variant ();
@@ -2797,7 +2795,7 @@ static void
 env_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'env' function expects exactly two arguments")), context);
+    throw EvalError (tl::to_string (tr ("'env' function expects exactly two arguments")), context);
   }
 
   const char *env = getenv (vv [0].to_string ());
@@ -2812,7 +2810,7 @@ static void
 error_f (const ExpressionParserContext &context, tl::Variant &, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'error' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'error' function expects exactly one argument")), context);
   }
 
   throw tl::Exception (vv [0].to_string ());
@@ -2822,87 +2820,87 @@ static void
 absolute_file_path_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'absolute_file_path' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'absolute_file_path' function expects exactly one argument")), context);
   }
 
-  out = QFileInfo (vv [0].to_qstring ()).absoluteFilePath ();
+  out = tl::absolute_file_path (vv [0].to_string ());
 }
 
 static void
 absolute_path_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'absolute_path' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'absolute_path' function expects exactly one argument")), context);
   }
 
-  out = QFileInfo (vv [0].to_qstring ()).absolutePath ();
+  out = tl::absolute_path (vv [0].to_string ());
 }
 
 static void
 path_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'path' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'path' function expects exactly one argument")), context);
   }
 
-  out = QFileInfo (vv [0].to_qstring ()).path ();
+  out = tl::dirname (vv [0].to_string ());
 }
 
 static void
 basename_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'basename' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'basename' function expects exactly one argument")), context);
   }
 
-  out = QFileInfo (vv [0].to_qstring ()).baseName ();
+  out = tl::basename (vv [0].to_string ());
 }
 
 static void
 extension_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'extension' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'extension' function expects exactly one argument")), context);
   }
 
-  out = QFileInfo (vv [0].to_qstring ()).completeSuffix ();
+  out = tl::extension (vv [0].to_string ());
 }
 
 static void
 file_exists_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'file_exists' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'file_exists' function expects exactly one argument")), context);
   }
 
-  out = QFileInfo (vv [0].to_qstring ()).exists ();
+  out = tl::file_exists (vv [0].to_string ());
 }
 
 static void
 is_dir_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'is_dir' function expects exactly one argument")), context);
+    throw EvalError (tl::to_string (tr ("'is_dir' function expects exactly one argument")), context);
   }
 
-  out = QFileInfo (vv [0].to_qstring ()).isDir ();
+  out = tl::is_dir (vv [0].to_string ());
 }
 
 static void
 combine_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () != 2) {
-    throw EvalError (tl::to_string (QObject::tr ("'combine' function expects two arguments")), context);
+    throw EvalError (tl::to_string (tr ("'combine' function expects two arguments")), context);
   }
 
-  out = QFileInfo (QDir (vv [0].to_qstring ()), vv [1].to_qstring ()).filePath ();
+  out = tl::combine_path (vv [0].to_string (), vv [1].to_string ());
 }
 
 static void
 sprintf_f (const ExpressionParserContext &context, tl::Variant &out, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () < 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'sprintf' function expects at least one argument")), context);
+    throw EvalError (tl::to_string (tr ("'sprintf' function expects at least one argument")), context);
   }
 
   out = tl::sprintf (vv[0].to_string (), vv, 1);
@@ -2912,7 +2910,7 @@ static void
 printf_f (const ExpressionParserContext &context, tl::Variant &, const std::vector <tl::Variant> &vv)
 {
   if (vv.size () < 1) {
-    throw EvalError (tl::to_string (QObject::tr ("'printf' function expects at least one argument")), context);
+    throw EvalError (tl::to_string (tr ("'printf' function expects at least one argument")), context);
   }
 
   std::cout << tl::sprintf (vv[0].to_string (), vv, 1);
@@ -3240,7 +3238,7 @@ Eval::eval_if (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n)
     std::auto_ptr<ExpressionNode> b, c;
     eval_if (ex, b);
     if (! ex.test (":")) {
-      throw EvalError (tl::to_string (QObject::tr ("Expected ':'")), ex);
+      throw EvalError (tl::to_string (tr ("Expected ':'")), ex);
     }
     eval_if (ex, c);
     n.reset (new IfExpressionNode (ex1, n.release (), b.release (), c.release ()));
@@ -3556,7 +3554,7 @@ Eval::eval_suffix (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
             if (ex.test (")")) {
               break;
             } else if (! ex.test (",")) {
-              throw EvalError (tl::to_string (QObject::tr ("Expected closing bracket ')'")), ex);
+              throw EvalError (tl::to_string (tr ("Expected closing bracket ')'")), ex);
             }
 
           } while (true);
@@ -3625,7 +3623,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
 
     eval_top (ex, n);
     if (! ex.test (")")) {
-      throw EvalError (tl::to_string (QObject::tr ("Expected closing bracket ')'")), ex);
+      throw EvalError (tl::to_string (tr ("Expected closing bracket ')'")), ex);
     }
 
   } else if (ex.test ("[")) {
@@ -3643,7 +3641,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
         if (ex.test ("]")) {
           break;
         } else if (! ex.test (",")) {
-          throw EvalError (tl::to_string (QObject::tr ("Expected closing bracket ']'")), ex);
+          throw EvalError (tl::to_string (tr ("Expected closing bracket ']'")), ex);
         }
 
       } while (true);
@@ -3664,7 +3662,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
       } else if (ctx_handler ()) {
         n.reset (new ContextEvaluationNode (ex1, ctx_handler (), n.release (), true /*double bracket*/));
       } else {
-        throw EvalError (tl::to_string (QObject::tr ("<<..>> expression not available in this context")), ex1);
+        throw EvalError (tl::to_string (tr ("<<..>> expression not available in this context")), ex1);
       }
 
     } else {
@@ -3677,7 +3675,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
       } else if (ctx_handler ()) {
         n.reset (new ConstantExpressionNode (ex1, ctx_handler ()->eval_double_bracket (s)));
       } else {
-        throw EvalError (tl::to_string (QObject::tr ("<<..>> expression not available in this context")), ex1);
+        throw EvalError (tl::to_string (tr ("<<..>> expression not available in this context")), ex1);
       }
 
     }
@@ -3696,7 +3694,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
       } else if (ctx_handler ()) {
         n.reset (new ContextEvaluationNode (ex1, ctx_handler (), n.release (), false /*single bracket*/));
       } else {
-        throw EvalError (tl::to_string (QObject::tr ("<<..>> expression not available in this context")), ex1);
+        throw EvalError (tl::to_string (tr ("<<..>> expression not available in this context")), ex1);
       }
 
     } else {
@@ -3709,7 +3707,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
       } else if (ctx_handler ()) {
         n.reset (new ConstantExpressionNode (ex1, ctx_handler ()->eval_bracket (s)));
       } else {
-        throw EvalError (tl::to_string (QObject::tr ("<..> expression not available in this context")), ex1);
+        throw EvalError (tl::to_string (tr ("<..> expression not available in this context")), ex1);
       }
 
     }
@@ -3745,7 +3743,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
         if (ex.test ("}")) {
           break;
         } else if (! ex.test (",")) {
-          throw EvalError (tl::to_string (QObject::tr ("Expected closing bracket ']'")), ex);
+          throw EvalError (tl::to_string (tr ("Expected closing bracket ']'")), ex);
         }
 
       } while (true);
@@ -3758,7 +3756,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
     while (! ex.at_end ()) {
       if (isdigit (*ex) || (tolower (*ex) <= 'f' && tolower (*ex) >= 'a')) {
         if ((x * 16) / 16 != x) {
-          throw EvalError (tl::to_string (QObject::tr ("Hexadecimal number overflow")), ex1);
+          throw EvalError (tl::to_string (tr ("Hexadecimal number overflow")), ex1);
         }
         x *= 16;
         if (isdigit (*ex)) {
@@ -3836,7 +3834,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
     } else {
 
       if (dbu_units && ! ctx_handler ()) {
-        throw EvalError (tl::to_string (QObject::tr ("Length or area value with unit requires a layout context")), ex1);
+        throw EvalError (tl::to_string (tr ("Length or area value with unit requires a layout context")), ex1);
       }
 
       if (dbu_units) {
@@ -3844,7 +3842,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
         double gg = g;
         g = floor (0.5 + g);
         if (fabs (g) < 1e12 && fabs (g - gg) > 1e-3) {
-          throw EvalError (tl::to_string (QObject::tr ("Value is not a multiple of the database unit")), ex1);
+          throw EvalError (tl::to_string (tr ("Value is not a multiple of the database unit")), ex1);
         }
       }
 
@@ -3898,7 +3896,7 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
             if (ex.test (")")) {
               break;
             } else if (! ex.test (",")) {
-              throw EvalError (tl::to_string (QObject::tr ("Expected closing bracket ')'")), ex);
+              throw EvalError (tl::to_string (tr ("Expected closing bracket ')'")), ex);
             }
 
           } while (true);
@@ -3914,11 +3912,11 @@ Eval::eval_atomic (ExpressionParserContext &ex, std::auto_ptr<ExpressionNode> &n
     } else if (m_sloppy) {
       n.reset (new ConstantExpressionNode (ex1, tl::Variant ()));
     } else {
-      throw EvalError (tl::to_string (QObject::tr ("Unknown variable or function")) + " '" + t + "'", ex1);
+      throw EvalError (tl::to_string (tr ("Unknown variable or function")) + " '" + t + "'", ex1);
     }
 
   } else {
-    throw EvalError (tl::to_string (QObject::tr ("Expected constant, function or bracket expression")), ex1);
+    throw EvalError (tl::to_string (tr ("Expected constant, function or bracket expression")), ex1);
   }
 }
 

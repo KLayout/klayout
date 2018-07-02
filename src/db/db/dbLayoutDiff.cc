@@ -805,7 +805,7 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
   }
 
 
-  tl::RelativeProgress progress (tl::to_string (QObject::tr ("Layout diff")), common_cells.size (), 1);
+  tl::RelativeProgress progress (tl::to_string (tr ("Layout diff")), common_cells.size (), 1);
 
   //  compare cell by cell
   

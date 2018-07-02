@@ -29,7 +29,9 @@
 #include "tlStableVector.h"
 #include "tlString.h"
 #include "tlEvents.h"
-#include "tlXMLParser.h"
+#if defined(HAVE_XML)
+#  include "tlXMLParser.h"
+#endif
 #include "tlTypeTraits.h"
 #include "tlClassRegistry.h"
 #include "dbStreamLayers.h"
@@ -528,10 +530,12 @@ public:
    */
   void save (const std::string &fn) const;
 
+#if defined(HAVE_XML)
   /**
    *  @brief Delivers the XMLElementList that specifies the technology's XML representation
    */
   static tl::XMLElementList xml_elements ();
+#endif
 
   /**
    *  @brief Sets the technology component by the component name
@@ -722,13 +726,17 @@ public:
    */
   virtual TechnologyComponent *create_component () const = 0;
 
+#if defined(HAVE_XML)
   /**
    *  @brief Delivers the XMLElement object that represents this component within a technology XML tree
    *
    *  The object returned is destroyed by the caller.
    */
   virtual tl::XMLElementBase *xml_element () const = 0;
+#endif
 };
+
+#if defined(HAVE_XML)
 
 /**
  *  @brief A helper class for the XML serialization of the technology component (custom read adaptor)
@@ -847,6 +855,8 @@ public:
     return new TechnologyComponentXMLElement (*this);
   }
 };
+
+#endif
 
 }
 

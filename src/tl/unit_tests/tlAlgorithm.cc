@@ -26,6 +26,7 @@
 #include "tlTimer.h"
 #include "tlUnitTest.h"
 
+#include <cstring>
 #include <string>
 #include <algorithm>
 #include <vector>

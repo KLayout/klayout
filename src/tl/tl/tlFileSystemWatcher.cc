@@ -20,7 +20,6 @@
 
 */
 
-
 #include "tlFileSystemWatcher.h"
 #include "tlString.h"
 #include "tlTimer.h"

@@ -405,7 +405,7 @@ X::X ()
 }
 
 X::X (const char *x) 
-  : m_s (QString::fromUtf8(x))
+  : m_s (x)
 {
   ++s_xinst;
 }
@@ -467,24 +467,24 @@ std::vector<X *> X::vx_ptr ()
   return r;
 }
 
-QString X::cls_name () const 
+std::string X::cls_name () const
 { 
-  return QString::fromUtf8 ("X"); 
+  return "X";
 }
 
-QString X::s () const 
+std::string X::s () const
 { 
   return m_s; 
 }
 
-void X::set_s (const QString &s) 
+void X::set_s (const std::string &s)
 { 
   m_s = s; 
 }
 
 void X::set_si (int v) 
 { 
-  m_s = QString::number (v + 1); 
+  m_s = tl::to_string (v + 1);
 }
 
 // ----------------------------------------------------------------
@@ -594,9 +594,9 @@ std::vector<Y *> Y::vy_ptr()
   return r;
 }
 
-QString Y::cls_name() const 
+std::string Y::cls_name() const
 { 
-  return QString::fromUtf8 ("Y"); 
+  return "Y";
 }
 
 int Y::i () const 
@@ -619,9 +619,9 @@ YY::YY (const char *x)
   //  .. nothing yet ..
 }
 
-QString YY::cls_name() const 
+std::string YY::cls_name() const
 { 
-  return QString::fromUtf8 ("YY"); 
+  return "YY";
 }
 
 // ----------------------------------------------------------------
@@ -700,6 +700,8 @@ std::string Z_P::f_with_yy (const std::string &s)
 // ----------------------------------------------------------------
 //  Implementation of SQ
 
+#if defined(HAVE_QT)
+
 SQ::SQ ()
   : m_tag (0)
 {
@@ -726,6 +728,8 @@ void SQ::trigger_s2 (const QString &s)
   emit s2 (s, this);
 }
 
+#endif
+
 // ----------------------------------------------------------------
 //  Implementation of SE
 
@@ -750,7 +754,7 @@ void SE::trigger_s1 (int x)
   s1 (x);
 }
 
-void SE::trigger_s2 (const QString &s)
+void SE::trigger_s2 (const std::string &s)
 {
   s2 (s, this);
 }
@@ -764,7 +768,9 @@ static gsi::Enum<Enum> decl_enum ("", "Enum",
   gsi::enum_const ("c", Enum_c) 
 );
 
+#if defined(HAVE_QT)
 static gsi::QFlagsClass<Enum> decl_qflags_enum ("", "Enums");
+#endif
 
 static gsi::Class<A> decl_a ("", "A",
   gsi::constructor ("new_a|new", &a_ctor) +
@@ -781,6 +787,7 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("set_ecref", &A::set_ecref) +
   gsi::method ("mod_eptr", &A::mod_eptr) +
   gsi::method ("mod_eref", &A::mod_eref) +
+#if defined(HAVE_QT)
   gsi::method ("get_ef", &A::get_ef) +
   gsi::method ("get_efptr", &A::get_efptr) +
   gsi::method ("get_efcptr", &A::get_efcptr) +
@@ -793,6 +800,7 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("set_efcref", &A::set_efcref) +
   gsi::method ("mod_efptr", &A::mod_efptr) +
   gsi::method ("mod_efref", &A::mod_efref) +
+#endif
   gsi::method ("push_ev", &A::push_ev) +
   gsi::method ("ev", &A::ev) +
   gsi::method ("af=", &A::set_af) +
@@ -805,15 +813,19 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("a1c", &A::a1c) +
   gsi::method ("a2", &A::a2) +
   gsi::method ("a3", &A::a3) +
+#if defined(HAVE_QT)
   gsi::method ("a3_qba", &A::a3_qba) +
   gsi::method ("a3_qstr", &A::a3_qstr) +
   gsi::method ("a3_qstrref", &A::a3_qstrref) +
+#endif
   gsi::method ("a4", &A::a4) +
   gsi::method ("a5|n=", &A::a5) +
   gsi::method ("a10_d", &A::a10_d) +
+#if defined(HAVE_QT)
   gsi::method ("a10_d_qba", &A::a10_d_qba) +
   gsi::method ("a10_d_qstr", &A::a10_d_qstr) +
   gsi::method ("a10_d_qstrref", &A::a10_d_qstrref) +
+#endif
   gsi::method ("*a10_prot", &A::a10_d) +
   gsi::method ("a10_f", &A::a10_f) +
   gsi::method ("a10_fptr", &A::a10_fptr) +
@@ -1006,7 +1018,9 @@ static gsi::Class<B> decl_b ("", "B",
   gsi::method ("set_ls", &B::set_ls) +
   gsi::method ("push_ss", &B::push_ss) +
   gsi::method ("ss", &B::ss) +
-  gsi::method ("set_ss", &B::set_ss) +
+  gsi::method ("set_ss", &B::set_ss)
+#if defined(HAVE_QT)
+  +
   gsi::method ("push_qls", &B::push_qls) +
   gsi::method ("qls", &B::qls) +
   gsi::method ("set_qls", &B::set_qls) +
@@ -1028,6 +1042,7 @@ static gsi::Class<B> decl_b ("", "B",
   gsi::method ("insert_qhash_is", &B::insert_qhash_is) +
   gsi::method ("qhash_is", &B::qhash_is) +
   gsi::method ("set_qhash_is", &B::set_qhash_is)
+#endif
 );
 
 //  extending B
@@ -1153,6 +1168,7 @@ gsi::Class<Z_P> decl_z ("", "Z",
   gsi::method ("set_x_keep", &Z_P::set_x_keep)
 );
 
+#if defined(HAVE_QT)
 gsi::Class<SQ> decl_sq ("", "SQ",
   gsi::method ("trigger_s0", &SQ::trigger_s0) +
   gsi::method ("trigger_s1", &SQ::trigger_s1) +
@@ -1163,6 +1179,7 @@ gsi::Class<SQ> decl_sq ("", "SQ",
   gsi::qt_signal<int> ("s1(int)", "s1") +
   gsi::qt_signal<const QString &, SQ *> ("s2(const QString &, SQ *)", "s2")
 );
+#endif
 
 gsi::Class<SE> decl_se ("", "SE",
   gsi::method ("trigger_s0", &SE::trigger_s0) +

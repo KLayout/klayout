@@ -25,6 +25,7 @@
 #include "tlThreadedWorkers.h"
 #include "tlTimer.h"
 #include "tlUnitTest.h"
+#include "tlThreads.h"
 
 #include <stdio.h>
 
@@ -57,7 +58,7 @@ public:
   bool flag() const { return m_flag; }
 
 private:
-  QMutex lock;
+  tl::Mutex lock;
   int m_sum;
   volatile bool m_flag;
 };

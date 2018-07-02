@@ -30,6 +30,7 @@
 
 #include <list>
 #include <memory>
+#include <cstring>
 
 namespace gsi
 {
@@ -78,7 +79,7 @@ struct GSI_PUBLIC ArglistUnderflowException
   : public tl::Exception
 {
   ArglistUnderflowException ()
-    : tl::Exception (tl::to_string (QObject::tr ("Too few arguments or no return value supplied")))
+    : tl::Exception (tl::to_string (tr ("Too few arguments or no return value supplied")))
   { }
 };
 
@@ -89,7 +90,7 @@ struct GSI_PUBLIC NilPointerToReference
   : public tl::Exception
 {
   NilPointerToReference ()
-    : tl::Exception (tl::to_string (QObject::tr ("nil object passed to a reference")))
+    : tl::Exception (tl::to_string (tr ("nil object passed to a reference")))
   { }
 };
 
@@ -655,6 +656,8 @@ class GSI_PUBLIC_TEMPLATE StringAdaptorImpl
 {
 };
 
+#if defined(HAVE_QT)
+
 /**
  *  @brief Specialization for QByteArray
  */
@@ -870,6 +873,8 @@ private:
   QStringRef m_s;
   mutable QByteArray m_s_utf8;
 };
+
+#endif
 
 /**
  *  @brief Specialization for std::string
@@ -1108,6 +1113,8 @@ class GSI_PUBLIC_TEMPLATE VariantAdaptorImpl
 {
 };
 
+#if defined(HAVE_QT)
+
 /**
  *  @brief Specialization for QVariant
  */
@@ -1177,6 +1184,8 @@ private:
   bool m_is_const;
   QVariant m_v;
 };
+
+#endif
 
 /**
  *  @brief Specialization for tl::Variant
@@ -1407,6 +1416,8 @@ void push_vector (std::set<X> &v, const X &x)
   v.insert (x);
 }
 
+#if defined(HAVE_QT)
+
 template <class X>
 void push_vector (QVector<X> &v, const X &x)
 {
@@ -1429,6 +1440,8 @@ void push_vector (QSet<X> &v, const X &x)
 {
   v.insert (x);
 }
+
+#endif
 
 /**
  *  @brief Implementation of the generic adaptor for a specific container
@@ -1651,6 +1664,8 @@ struct map_access
   }
 };
 
+#if defined(HAVE_QT)
+
 /**
  *  @brief Specialization for QMap
  */
@@ -1704,6 +1719,8 @@ struct map_access<QHash<X, Y> >
     return i.value ();
   }
 };
+
+#endif
 
 /**
  *  @brief Implementation of the generic iterator adaptor for a specific container

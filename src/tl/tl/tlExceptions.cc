@@ -30,8 +30,6 @@
 
 #include <stdexcept>
 
-#include <QMessageBox>
-
 namespace tl
 {
 
@@ -54,9 +52,9 @@ void handle_exception_silent (const tl::Exception &ex)
   if (script_error) {
     if (script_error->line () > 0) {
       tl::error << script_error->sourcefile () << ":" << script_error->line () << ": " 
-                << script_error->msg () << tl::to_string (QObject::tr (" (class ")) << script_error->cls () << ")";
+                << script_error->msg () << tl::to_string (tr (" (class ")) << script_error->cls () << ")";
     } else {
-      tl::error << script_error->msg () << tl::to_string (QObject::tr (" (class ")) << script_error->cls () << ")";
+      tl::error << script_error->msg () << tl::to_string (tr (" (class ")) << script_error->cls () << ")";
     }
   } else {
     tl::error << ex.msg (); 
@@ -98,7 +96,7 @@ void handle_exception_ui (const std::exception &ex, QWidget *parent)
 
 void handle_exception_silent ()
 {
-  tl::error << tl::to_string (QObject::tr ("An unspecific error occured"));
+  tl::error << tl::to_string (tr ("An unspecific error occured"));
 }
 
 void handle_exception ()

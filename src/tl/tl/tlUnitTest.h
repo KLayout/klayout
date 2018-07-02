@@ -32,8 +32,6 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include <QString>
-
 namespace tl {
 
 /**
@@ -297,11 +295,6 @@ public:
   std::string tmp_file (const std::string &fn = "tmp") const;
 
   /**
-   *  @brief Removes all temporary files
-   */
-  void remove_tmp_folder ();
-
-  /**
    *  @brief A generic diff printer
    */
   template <class X, class Y>
@@ -468,7 +461,7 @@ private:
   std::string m_cp_file;
   int m_cp_line;
   bool m_any_failed;
-  QString m_testtmp;
+  std::string m_testtmp;
 };
 
 /**

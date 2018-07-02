@@ -25,10 +25,7 @@
 #define HDR_tlThreadedWorkers
 
 #include "tlCommon.h"
-
-#include <QMutex>
-#include <QWaitCondition>
-#include <QThread>
+#include "tlThreads.h"
 
 #include <set>
 #include <vector>
@@ -268,9 +265,9 @@ private:
   bool m_stopping;
   bool m_running;
 
-  QMutex m_lock;
-  QWaitCondition m_task_available_condition;
-  QWaitCondition m_queue_empty_condition;
+  tl::Mutex m_lock;
+  tl::WaitCondition m_task_available_condition;
+  tl::WaitCondition m_queue_empty_condition;
 
   std::vector<Worker *> mp_workers;
   std::set<Boss *> m_bosses;
@@ -313,7 +310,7 @@ protected:
  *  A worker is provided with a sequence of tasks with define the operations that the
  *  worker is supposed to perform.
  */
-class TL_PUBLIC Worker : protected QThread
+class TL_PUBLIC Worker : protected tl::Thread
 {
 public:
   friend class JobBase;

@@ -27,9 +27,7 @@
 #include "tlCommon.h"
 
 #include "tlAssert.h"
-
-#include <QMutex>
-#include <QMutexLocker>
+#include "tlThreads.h"
 
 #include <iterator>
 #include <vector>
@@ -232,7 +230,7 @@ private:
   Object *mp_t;
   bool m_is_shared : 1;
   bool m_is_event : 1;
-  static QMutex &lock ();
+  static tl::Mutex &lock ();
 };
 
 /**

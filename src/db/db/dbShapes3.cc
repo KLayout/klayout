@@ -249,7 +249,7 @@ bool
 Shapes::is_valid_shape_by_tag (Tag /*tag*/, const shape_type &shape) const
 {
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'is_valid' is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Function 'is_valid' is permitted only in editable mode")));
   }
   if (! shape.has_prop_id ()) {
     return iterator_from_shape (get_layer<typename Tag::object_type, db::stable_layer_tag> (), shape).is_valid ();
@@ -327,7 +327,7 @@ void
 Shapes::erase_shape_by_tag_ws (Tag /*tag*/, StableTag /*stable_tag*/, const shape_type &shape)
 {
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'erase' is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
   }
   if (! shape.has_prop_id ()) {
 
@@ -407,7 +407,7 @@ void
 Shapes::erase_shape (const Shapes::shape_type &shape)
 {
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'erase' is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
   }
 
   switch (shape.m_type) {
@@ -492,7 +492,7 @@ void
 Shapes::erase_shapes (const std::vector<Shapes::shape_type> &shapes)
 {
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'erase' is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
   }
 
   for (std::vector<shape_type>::const_iterator s = shapes.begin (); s != shapes.end (); ) {

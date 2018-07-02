@@ -1438,7 +1438,7 @@ public:
   FilterStateBase *do_create_state (db::Layout *layout, tl::Eval &eval) const
   {
     if (! layout->is_editable ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Cannot execute a delete query on a non-editable layout")));
+      throw tl::Exception (tl::to_string (tr ("Cannot execute a delete query on a non-editable layout")));
     }
     return new DeleteFilterState (this, eval, layout, m_pids, m_transparent);
   }
@@ -1541,7 +1541,7 @@ public:
   FilterStateBase *do_create_state (db::Layout *layout, tl::Eval &eval) const
   {
     if (! layout->is_editable ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Cannot execute a with .. do query on a non-editable layout")));
+      throw tl::Exception (tl::to_string (tr ("Cannot execute a with .. do query on a non-editable layout")));
     }
     return new WithDoFilterState (this, m_do_expression, eval, layout, m_transparent);
   }
@@ -1886,7 +1886,7 @@ public:
   void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args) const 
   {
     if (args.size () > 0) {
-      throw tl::EvalError (tl::to_string (QObject::tr ("Query function does not allow parameters")), context);
+      throw tl::EvalError (tl::to_string (tr ("Query function does not allow parameters")), context);
     }
 
     out = tl::Variant ();

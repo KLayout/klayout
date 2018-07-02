@@ -38,7 +38,7 @@ struct NoArgumentsAllowedException
   : public tl::Exception
 {
   NoArgumentsAllowedException ()
-    : tl::Exception (tl::to_string (QObject::tr ("Method does not allow arguments")))
+    : tl::Exception (tl::to_string (tr ("Method does not allow arguments")))
   { }
 };
 
@@ -46,7 +46,7 @@ struct NeedsArgumentsException
   : public tl::Exception
 {
   NeedsArgumentsException (unsigned int got, unsigned int want)
-    : tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("Method requires %d arguments, got %d")), want, got))
+    : tl::Exception (tl::sprintf (tl::to_string (tr ("Method requires %d arguments, got %d")), want, got))
   { }
 };
 
@@ -54,7 +54,7 @@ struct IncompatibleReturnTypeException
   : public tl::Exception
 {
   IncompatibleReturnTypeException (const ArgType &got, const ArgType &want)
-    : tl::Exception (tl::to_string (QObject::tr ("Incompatible return types: got '")) + got.to_string () + tl::to_string (QObject::tr ("', want '")) + want.to_string () + "'")
+    : tl::Exception (tl::to_string (tr ("Incompatible return types: got '")) + got.to_string () + tl::to_string (tr ("', want '")) + want.to_string () + "'")
   { }
 };
 

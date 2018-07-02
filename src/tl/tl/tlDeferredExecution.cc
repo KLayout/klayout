@@ -20,7 +20,6 @@
 
 */
 
-
 #include "tlDeferredExecution.h"
 #include "tlAssert.h"
 #include "tlLog.h"
@@ -159,4 +158,3 @@ DeferredMethodScheduler::do_execute ()
 }
 
 }
-

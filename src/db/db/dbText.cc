@@ -41,14 +41,14 @@ namespace tl
 template<> void extractor_impl (tl::Extractor &ex, db::Text &p)
 {
   if (! test_extractor_impl (ex, p)) {
-    ex.error (tl::to_string (QObject::tr ("Expected a text specification")));
+    ex.error (tl::to_string (tr ("Expected a text specification")));
   }
 }
 
 template<> void extractor_impl (tl::Extractor &ex, db::DText &p)
 {
   if (! test_extractor_impl (ex, p)) {
-    ex.error (tl::to_string (QObject::tr ("Expected a text specification")));
+    ex.error (tl::to_string (tr ("Expected a text specification")));
   }
 }
 

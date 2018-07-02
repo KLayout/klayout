@@ -37,7 +37,9 @@
 #include <set>
 #include <vector>
 
+#if defined(HAVE_QT)
 class QImage;
+#endif
 
 namespace tl
 {
@@ -928,6 +930,7 @@ public:
    */
   void set_tag_str (const std::string &tags);
 
+#if defined(HAVE_QT)
   /**
    *  @brief Get the image object attached to this item 
    *
@@ -957,6 +960,7 @@ public:
    *  If the image string is not valid, the image will also be cleared.
    */
   void set_image_str (const std::string &s);
+#endif
 
   /**
    *  @brief Get the database reference
@@ -985,7 +989,9 @@ private:
   bool m_visited;
   std::vector <bool> m_tag_ids;
   Database *mp_database;
-  QImage *mp_image;
+#if defined(HAVE_QT)
+  std::auto_ptr<QImage> mp_image;
+#endif
 
   Item ();
 
@@ -2207,10 +2213,12 @@ public:
    */
   void remove_item_tag (const Item *item, id_type tag);
 
+#if defined(HAVE_QT)
   /**
    *  @brief Set the image of an item
    */
   void set_item_image (const Item *item, QImage *image);
+#endif
 
   /**
    *  @brief Set the multiplicity of an item

@@ -40,6 +40,7 @@
 #include "tlAlgorithm.h"
 #include "tlAssert.h"
 
+#include <cstddef>
 #include <string>
 #include <vector>
 #include <iterator>

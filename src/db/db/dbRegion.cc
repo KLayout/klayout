@@ -1890,7 +1890,7 @@ namespace tl
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Region &b)
   {
     if (! test_extractor_impl (ex, b)) {
-      ex.error (tl::to_string (QObject::tr ("Expected an region collection specification")));
+      ex.error (tl::to_string (tr ("Expected an region collection specification")));
     }
   }
 }

@@ -20,8 +20,6 @@
 
 */
 
-#if defined(HAVE_CURL)
-
 #include "tlHttpStream.h"
 #include "tlHttpStreamCurl.h"
 #include "tlLog.h"
@@ -1231,5 +1229,3 @@ InputHttpStream::set_credential_provider (HttpCredentialProvider *cp)
 }
 
 }
-
-#endif

@@ -291,7 +291,7 @@ public:
       std::auto_ptr<tl::RelativeProgress> progress (0);
       if (m_report_progress) {
         if (m_progress_desc.empty ()) {
-          progress.reset (new tl::RelativeProgress (tl::to_string (QObject::tr ("Processing")), m_pp.size (), 1000));
+          progress.reset (new tl::RelativeProgress (tl::to_string (tr ("Processing")), m_pp.size (), 1000));
         } else {
           progress.reset (new tl::RelativeProgress (m_progress_desc, m_pp.size (), 1000));
         }

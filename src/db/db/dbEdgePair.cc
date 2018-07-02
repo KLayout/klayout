@@ -29,14 +29,14 @@ namespace tl
 template<> void extractor_impl (tl::Extractor &ex, db::EdgePair &e)
 {
   if (! test_extractor_impl (ex, e)) {
-    ex.error (tl::to_string (QObject::tr ("Expected an edge specification")));
+    ex.error (tl::to_string (tr ("Expected an edge specification")));
   }
 }
 
 template<> void extractor_impl (tl::Extractor &ex, db::DEdgePair &e)
 {
   if (! test_extractor_impl (ex, e)) {
-    ex.error (tl::to_string (QObject::tr ("Expected an edge specification")));
+    ex.error (tl::to_string (tr ("Expected an edge specification")));
   }
 }
 

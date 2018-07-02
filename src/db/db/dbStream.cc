@@ -38,6 +38,8 @@ namespace db
 // ------------------------------------------------------------------
 //  Implementation of load_options_xml_element_list
 
+#if defined(HAVE_XML)
+
 tl::XMLElementList load_options_xml_element_list ()
 {
   tl::XMLElementList elements;
@@ -71,6 +73,8 @@ tl::XMLElementList save_options_xml_element_list ()
 
   return elements;
 }
+
+#endif
 
 }
 

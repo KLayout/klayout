@@ -36,6 +36,7 @@
 
 #include "tlExpression.h"
 #include "tlTypeTraits.h"
+#include "tlThreads.h"
 
 namespace db
 {
@@ -661,7 +662,7 @@ private:
   bool m_dbu_specific_set;
   bool m_scale_to_dbu;
   std::vector<std::string> m_scripts;
-  QMutex m_output_mutex;
+  tl::Mutex m_output_mutex;
   tl::Eval m_top_eval;
 };
 

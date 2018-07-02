@@ -11,14 +11,11 @@ SOURCES = \
   tlClassRegistry.cc \
   tlCommandLineParser.cc \
   tlDataMapping.cc \
-  tlDeferredExecution.cc \
   tlDeflate.cc \
   tlEvents.cc \
   tlExpression.cc \
-  tlFileSystemWatcher.cc \
   tlFileUtils.cc \
   tlGlobPattern.cc \
-  tlHttpStream.cc \
   tlIntervalMap.cc \
   tlIntervalSet.cc \
   tlKDTree.cc \
@@ -30,9 +27,31 @@ SOURCES = \
   tlThreadedWorkers.cc \
   tlUtils.cc \
   tlVariant.cc \
-  tlWebDAV.cc \
-  tlXMLParser.cc \
-    tlInt128Support.cc
+  tlInt128Support.cc
+
+equals(HAVE_QT, "0") {
+  # nothing
+} else {
+  SOURCES += \
+    tlWebDAV.cc \
+    tlDeferredExecution.cc \
+    tlXMLParser.cc \
+    tlFileSystemWatcher.cc \
+}
+
+equals(HAVE_CURL, "1") {
+  SOURCES += \
+    tlHttpStream.cc \
+} else {
+  equals(HAVE_QT, "0") {
+    # no HTTP stream available
+  } else {
+    SOURCES += \
+      tlHttpStream.cc \
+  }
+}
+
+
 
 INCLUDEPATH += $$TL_INC
 DEPENDPATH += $$TL_INC

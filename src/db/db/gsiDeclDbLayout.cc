@@ -334,7 +334,7 @@ static db::cell_index_type cell_by_name (db::Layout *l, const char *name)
 {
   std::pair<bool, db::cell_index_type> c = l->cell_by_name (name);
   if (! c.first) {
-    throw tl::Exception (tl::sprintf (tl::to_string (QObject::tr ("No such cell: '%s'")), name));
+    throw tl::Exception (tl::sprintf (tl::to_string (tr ("No such cell: '%s'")), name));
   }
   return c.second;
 }
@@ -464,7 +464,7 @@ static db::properties_id_type properties_id (db::Layout *layout, const std::vect
 
   for (std::vector<tl::Variant>::const_iterator v = properties.begin (); v != properties.end (); ++v) {
     if (! v->is_list () || v->get_list ().size () != 2) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Expected a list of pairs of variants (found at least one that is not a pair)")));
+      throw tl::Exception (tl::to_string (tr ("Expected a list of pairs of variants (found at least one that is not a pair)")));
     }
     db::property_names_id_type name_id = layout->properties_repository ().prop_name_id (v->get_list ()[0]);
     props.insert (std::make_pair (name_id, v->get_list () [1]));
@@ -529,7 +529,7 @@ write_simple (db::Layout *layout, const std::string &filename)
 {
   db::SaveLayoutOptions options;
   if (! options.set_format_from_filename (filename)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot determine format from filename")));
+    throw tl::Exception (tl::to_string (tr ("Cannot determine format from filename")));
   }
 
   db::Writer writer (options);
@@ -555,10 +555,10 @@ static db::RecursiveShapeIterator
 begin_shapes (const db::Layout *layout, db::cell_index_type starting_cell, unsigned int layer)
 {
   if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid layer index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
   }
   if (! layout->is_valid_cell_index (starting_cell)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid cell index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid cell index")));
   }
   return db::RecursiveShapeIterator (*layout, layout->cell (starting_cell), layer);
 }
@@ -573,10 +573,10 @@ static db::RecursiveShapeIterator
 begin_shapes_touching (const db::Layout *layout, db::cell_index_type starting_cell, unsigned int layer, db::Box region)
 {
   if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid layer index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
   }
   if (! layout->is_valid_cell_index (starting_cell)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid cell index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid cell index")));
   }
   return db::RecursiveShapeIterator (*layout, layout->cell (starting_cell), layer, region, false);
 }
@@ -591,10 +591,10 @@ static db::RecursiveShapeIterator
 begin_shapes_overlapping (const db::Layout *layout, db::cell_index_type starting_cell, unsigned int layer, db::Box region)
 {
   if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid layer index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
   }
   if (! layout->is_valid_cell_index (starting_cell)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid cell index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid cell index")));
   }
   return db::RecursiveShapeIterator (*layout, layout->cell (starting_cell), layer, region, true);
 }
@@ -609,10 +609,10 @@ static db::RecursiveShapeIterator
 begin_shapes_touching_um (const db::Layout *layout, db::cell_index_type starting_cell, unsigned int layer, db::DBox region)
 {
   if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid layer index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
   }
   if (! layout->is_valid_cell_index (starting_cell)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid cell index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid cell index")));
   }
   return db::RecursiveShapeIterator (*layout, layout->cell (starting_cell), layer, db::CplxTrans (layout->dbu ()).inverted () * region, false);
 }
@@ -627,10 +627,10 @@ static db::RecursiveShapeIterator
 begin_shapes_overlapping_um (const db::Layout *layout, db::cell_index_type starting_cell, unsigned int layer, db::DBox region)
 {
   if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid layer index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
   }
   if (! layout->is_valid_cell_index (starting_cell)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid cell index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid cell index")));
   }
   return db::RecursiveShapeIterator (*layout, layout->cell (starting_cell), layer, db::CplxTrans (layout->dbu ()).inverted () * region, true);
 }
@@ -706,7 +706,7 @@ static std::vector<std::string> pcell_names (const db::Layout *layout)
 static db::Cell *cell_from_index (db::Layout *ly, db::cell_index_type ci)
 {
   if (! ly->is_valid_cell_index (ci)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell index: ")) + tl::to_string (ci));
+    throw tl::Exception (tl::to_string (tr ("Not a valid cell index: ")) + tl::to_string (ci));
   }
   return &ly->cell (ci);
 }
@@ -740,7 +740,7 @@ static db::Cell *top_cell (db::Layout *layout)
     if (! tc) {
       tc = &layout->cell (*td);
     } else {
-      throw tl::Exception (tl::to_string (QObject::tr ("The layout has multiple top cells")));
+      throw tl::Exception (tl::to_string (tr ("The layout has multiple top cells")));
     }
     ++td;
   }
@@ -2000,7 +2000,7 @@ static db::SaveLayoutOptions *new_v ()
 static bool set_format_from_filename (db::SaveLayoutOptions *opt, const std::string &fn)
 {
   if (! opt->set_format_from_filename (fn)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot determine format from filename")));
+    throw tl::Exception (tl::to_string (tr ("Cannot determine format from filename")));
   }
   return true;
 }

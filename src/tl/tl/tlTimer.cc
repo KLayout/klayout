@@ -25,8 +25,6 @@
 #include "tlLog.h"
 #include "tlString.h"
 
-#include <QDateTime>
-
 #ifndef _WIN32
 #  include <sys/times.h>
 #endif
@@ -42,15 +40,14 @@ namespace tl
 {
 
 // -------------------------------------------------------------
-//  Implementation of msecs_to
+//  Gets the current time in ms from epoch
 
-int64_t msecs_to (const QDateTime &from, const QDateTime &to)
+static int64_t ms_time ()
 {
-#if QT_VERSION >= 0x040700
-  return from.msecsTo (to);
-#else
-  return int64_t (from.secsTo (to)) * 1000 + (from.time ().msecsTo (to.time ()) % 1000);
-#endif
+  struct timespec spec;
+  clock_gettime (CLOCK_REALTIME, &spec);
+
+  return int64_t (spec.tv_sec) * 1000 + int64_t (0.5 + spec.tv_nsec / 1.0e6);
 }
 
 // -------------------------------------------------------------
@@ -78,7 +75,11 @@ Timer::start ()
   m_user_ms += (timer_t) ((clks.tms_utime + clks.tms_cutime) * clk2msec + 0.5);
   m_sys_ms += (timer_t) ((clks.tms_stime + clks.tms_cstime) * clk2msec + 0.5);
 #endif
-  m_wall_ms += msecs_to (QDateTime::fromTime_t (0), QDateTime::currentDateTime ());
+
+  struct timespec spec;
+  clock_gettime (CLOCK_REALTIME, &spec);
+
+  m_wall_ms = ms_time ();
 }
 
 void
@@ -202,7 +203,7 @@ Clock
 Clock::current ()
 {
   Clock c;
-  c.m_clock_ms += msecs_to (QDateTime::fromTime_t (0), QDateTime::currentDateTime ());
+  c.m_clock_ms += ms_time ();
   return c;
 }
 

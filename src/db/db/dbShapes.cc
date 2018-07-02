@@ -527,7 +527,7 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Trans &t, tl::func_del
   case shape_type::TextPtrArray:
     //  Arrays are not supported yet 
     //  TODO: implement
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'insert' with transformation does not support shape arrays")));
+    throw tl::Exception (tl::to_string (tr ("Function 'insert' with transformation does not support shape arrays")));
   };
 }
 
@@ -588,7 +588,7 @@ Shapes::replace_prop_id (const Shapes::shape_type &ref, db::properties_id_type p
 {
   tl_assert (! ref.is_array_member ());
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'replace_prop_id' is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Function 'replace_prop_id' is permitted only in editable mode")));
   }
 
   if (ref.with_props ()) {
@@ -721,7 +721,7 @@ Shapes::transform (const Shapes::shape_type &ref, const Trans &t)
 {
   tl_assert (! ref.is_array_member ());
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'transform' is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Function 'transform' is permitted only in editable mode")));
   }
 
   switch (ref.m_type) {
@@ -823,7 +823,7 @@ Shapes::replace (const Shapes::shape_type &ref, const Sh &sh)
 {
   tl_assert (! ref.is_array_member ());
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'replace' is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
   }
 
   switch (ref.m_type) {
@@ -1016,7 +1016,7 @@ Shapes::shape_type
 Shapes::find_shape_by_tag (Tag tag, const shape_type &shape) const
 {
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'find' is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Function 'find' is permitted only in editable mode")));
   }
   if (! shape.has_prop_id ()) {
     typename db::layer<typename Tag::object_type, db::stable_layer_tag>::iterator i = get_layer<typename Tag::object_type, db::stable_layer_tag> ().find (*shape.basic_ptr (tag));
@@ -1042,7 +1042,7 @@ Shapes::replace_prop_id (const Sh *pos, db::properties_id_type prop_id)
 {
   if (pos->properties_id () != prop_id) {
     if (! is_editable ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Function 'replace' is permitted only in editable mode")));
+      throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
     }
     if (manager () && manager ()->transacting ()) {
       db::layer_op<Sh, db::stable_layer_tag>::queue_or_append (manager (), this, false /*not insert*/, *pos);
@@ -1060,7 +1060,7 @@ Shapes::shape_type
 Shapes::replace_prop_id_iter (typename db::object_tag<Sh>, const Iter &iter, db::properties_id_type prop_id)
 {
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'replace' is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
   }
 
   if (manager () && manager ()->transacting ()) {
@@ -1080,7 +1080,7 @@ Shapes::shape_type
 Shapes::reinsert_member_with_props (typename db::object_tag<Sh1>, const shape_type &ref, const Sh2 &sh)
 {
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'replace' is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
   }
 
   //  the shape types are not equal - resolve into erase and insert (of new)
@@ -1099,7 +1099,7 @@ Shapes::shape_type
 Shapes::replace_member_with_props (typename db::object_tag<Sh1>, const shape_type &ref, const Sh2 &sh)
 {
   if (! is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function 'replace' is permitted only in editable mode")));
+    throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
   }
 
   //  the shape types are not equal - resolve into erase and insert (of new)
@@ -1149,7 +1149,7 @@ Shapes::replace_member_with_props (typename db::object_tag<Sh> tag, const shape_
   } else {
 
     if (! is_editable ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Function 'replace' is permitted only in editable mode")));
+      throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
     }
 
     if (! ref.with_props ()) {

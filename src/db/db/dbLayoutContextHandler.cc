@@ -48,7 +48,7 @@ tl::Variant LayoutContextHandler::eval_bracket (const std::string &content) cons
   lp.read (ex);
 
   if (! ex.at_end ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid layer source expression: ")) + content);
+    throw tl::Exception (tl::to_string (tr ("Not a valid layer source expression: ")) + content);
   }
 
   for (db::LayerIterator l = mp_layout->begin_layers (); l != mp_layout->end_layers (); ++l) {
@@ -60,7 +60,7 @@ tl::Variant LayoutContextHandler::eval_bracket (const std::string &content) cons
   if (mp_layout_nc) {
     return tl::Variant (mp_layout_nc->insert_layer (lp));
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Not a valid layer: ")) + lp.to_string ());
+    throw tl::Exception (tl::to_string (tr ("Not a valid layer: ")) + lp.to_string ());
   }
 }
 
@@ -82,7 +82,7 @@ tl::Variant LayoutContextHandler::eval_double_bracket (const std::string &s) con
 
         db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name (libname);
         if (! lib) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Not a valid library name: ")) + libname);
+          throw tl::Exception (tl::to_string (tr ("Not a valid library name: ")) + libname);
         }
 
         db::LayoutContextHandler lib_context (&lib->layout (), true);
@@ -100,7 +100,7 @@ tl::Variant LayoutContextHandler::eval_double_bracket (const std::string &s) con
 
 
     } else {
-      throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell name: ")) + s);
+      throw tl::Exception (tl::to_string (tr ("Not a valid cell name: ")) + s);
     }
 
   }

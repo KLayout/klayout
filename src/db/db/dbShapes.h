@@ -959,7 +959,7 @@ public:
   void erase (Tag /*tag*/, StableTag /*stable_tag*/, typename db::layer<typename Tag::object_type, StableTag>::iterator pos)
   {
     if (! is_editable ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Function 'erase' is permitted only in editable mode")));
+      throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
     }
     if (manager () && manager ()->transacting ()) {
       db::layer_op<typename Tag::object_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, *pos);
@@ -1022,7 +1022,7 @@ public:
                                                      typename db::layer<typename Tag::object_type, StableTag>::iterator to)
   {
     if (! is_editable ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Function 'erase' is permitted only in editable mode")));
+      throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
     }
     if (manager () && manager ()->transacting ()) {
       db::layer_op<typename Tag::object_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, from, to);
@@ -1048,7 +1048,7 @@ public:
   void erase_positions (Tag /*tag*/, StableTag /*stable_tag*/, I first, I last)
   {
     if (! is_editable ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Function 'erase' is permitted only in editable mode")));
+      throw tl::Exception (tl::to_string (tr ("Function 'erase' is permitted only in editable mode")));
     }
     if (manager () && manager ()->transacting ()) {
       db::layer_op<typename Tag::object_type, StableTag>::queue_or_append (manager (), this, false /*not insert*/, first, last, true /*dummy*/);

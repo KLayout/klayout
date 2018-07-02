@@ -603,14 +603,14 @@ namespace tl
 template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Path &p)
 {
   if (! test_extractor_impl (ex, p)) {
-    ex.error (tl::to_string (QObject::tr ("Expected a path specification")));
+    ex.error (tl::to_string (tr ("Expected a path specification")));
   }
 }
 
 template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPath &p)
 {
   if (! test_extractor_impl (ex, p)) {
-    ex.error (tl::to_string (QObject::tr ("Expected a path specification")));
+    ex.error (tl::to_string (tr ("Expected a path specification")));
   }
 }
 

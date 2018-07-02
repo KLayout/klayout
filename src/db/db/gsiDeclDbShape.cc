@@ -48,7 +48,7 @@ static double shape_dbu (const db::Shape *s)
 {
   const db::Layout *layout = layout_ptr_const (s);
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not reside inside a layout - cannot obtain database unit")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not reside inside a layout - cannot obtain database unit")));
   }
   return layout->dbu ();
 }
@@ -57,7 +57,7 @@ static db::Shapes *shapes_checked (db::Shape *s)
 {
   db::Shapes *shapes = s->shapes ();
   if (! shapes) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not reside inside a shape container - cannot change the shape")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not reside inside a shape container - cannot change the shape")));
   }
   return shapes;
 }
@@ -65,21 +65,21 @@ static db::Shapes *shapes_checked (db::Shape *s)
 static void check_is_path (const db::Shape *s)
 {
   if (! s->is_path ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape is not a path")));
+    throw tl::Exception (tl::to_string (tr ("Shape is not a path")));
   }
 }
 
 static void check_is_text (const db::Shape *s)
 {
   if (! s->is_text ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape is not a text")));
+    throw tl::Exception (tl::to_string (tr ("Shape is not a text")));
   }
 }
 
 static void check_is_box (const db::Shape *s)
 {
   if (! s->is_box ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape is not a box")));
+    throw tl::Exception (tl::to_string (tr ("Shape is not a box")));
   }
 }
 
@@ -724,17 +724,17 @@ static unsigned int shape_layer_index (const db::Shape *s)
 {
   db::Shapes *shapes = s->shapes ();
   if (! shapes) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a shape container")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a shape container")));
   }
 
   db::Cell *cell = shapes->cell ();
   if (! cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a cell")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a cell")));
   }
 
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a layout")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a layout")));
   }
 
   for (db::Layout::layer_iterator l = layout->begin_layers (); l != layout->end_layers (); ++l) {
@@ -743,28 +743,28 @@ static unsigned int shape_layer_index (const db::Shape *s)
     }
   }
 
-  throw tl::Exception (tl::to_string (QObject::tr ("Cannot identify layer of shape")));
+  throw tl::Exception (tl::to_string (tr ("Cannot identify layer of shape")));
 }
 
 static void set_shape_layer_index (db::Shape *s, unsigned int layer)
 {
   db::Shapes *shapes = s->shapes ();
   if (! shapes) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a shape container")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a shape container")));
   }
 
   db::Cell *cell = shapes->cell ();
   if (! cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a cell")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a cell")));
   }
 
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a layout")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a layout")));
   }
 
   if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Layer index does not point to a valid layer")));
+    throw tl::Exception (tl::to_string (tr ("Layer index does not point to a valid layer")));
   }
 
   if (& cell->shapes (layer) != shapes) {
@@ -778,17 +778,17 @@ static db::LayerProperties shape_layer (const db::Shape *s)
 {
   db::Shapes *shapes = s->shapes ();
   if (! shapes) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a shape container")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a shape container")));
   }
 
   db::Cell *cell = shapes->cell ();
   if (! cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a cell")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a cell")));
   }
 
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a layout")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a layout")));
   }
 
   for (db::Layout::layer_iterator l = layout->begin_layers (); l != layout->end_layers (); ++l) {
@@ -797,24 +797,24 @@ static db::LayerProperties shape_layer (const db::Shape *s)
     }
   }
 
-  throw tl::Exception (tl::to_string (QObject::tr ("Cannot identify layer of shape")));
+  throw tl::Exception (tl::to_string (tr ("Cannot identify layer of shape")));
 }
 
 static void set_shape_layer (db::Shape *s, const db::LayerProperties &lp)
 {
   db::Shapes *shapes = s->shapes ();
   if (! shapes) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a shape container")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a shape container")));
   }
 
   db::Cell *cell = shapes->cell ();
   if (! cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a cell")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a cell")));
   }
 
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not belong to a layout")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not belong to a layout")));
   }
 
   for (db::Layout::layer_iterator l = layout->begin_layers (); l != layout->end_layers (); ++l) {
@@ -834,7 +834,7 @@ static void set_shape_layer (db::Shape *s, const db::LayerProperties &lp)
 
   }
 
-  throw tl::Exception (tl::to_string (QObject::tr ("Layer info object is not giving a valid layer")));
+  throw tl::Exception (tl::to_string (tr ("Layer info object is not giving a valid layer")));
 }
 
 static db::Cell *cell_ptr (db::Shape *s)
@@ -847,7 +847,7 @@ static void set_cell_ptr (db::Shape *s, db::Cell *new_cell)
 {
   db::Shapes *shapes = shapes_checked (s);
   if (layout_ptr (s) != new_cell->layout ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Current and new cell belong to a different layout")));
+    throw tl::Exception (tl::to_string (tr ("Current and new cell belong to a different layout")));
   }
 
   unsigned int l = shape_layer_index (s);
@@ -881,7 +881,7 @@ static void delete_property (db::Shape *s, const tl::Variant &key)
 
   db::Layout *layout = layout_ptr (s);
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not reside inside a layout - cannot delete properties")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not reside inside a layout - cannot delete properties")));
   }
 
   std::pair<bool, db::property_names_id_type> nid = layout->properties_repository ().get_id_of_name (key);
@@ -903,7 +903,7 @@ static void set_property (db::Shape *s, const tl::Variant &key, const tl::Varian
 
   db::Layout *layout = layout_ptr (s);
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not reside inside a layout - cannot set properties")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not reside inside a layout - cannot set properties")));
   }
 
   db::property_names_id_type nid = layout->properties_repository ().prop_name_id (key);
@@ -927,7 +927,7 @@ static tl::Variant get_property (const db::Shape *s, const tl::Variant &key)
 
   const db::Layout *layout = layout_ptr_const (s);
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Shape does not reside inside a layout - cannot retrieve properties")));
+    throw tl::Exception (tl::to_string (tr ("Shape does not reside inside a layout - cannot retrieve properties")));
   }
 
   std::pair<bool, db::property_names_id_type> nid = layout->properties_repository ().get_id_of_name (key);

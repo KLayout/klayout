@@ -97,7 +97,9 @@ TEST(1)
 
   {
   tl::Variant v;
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::to_string (v.to_qvariant ().toString ()), "");
+#endif
   EXPECT_EQ (v.is_nil (), true);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -131,7 +133,9 @@ TEST(1)
 
   {
   tl::Variant v (1ul);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u1");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -161,7 +165,9 @@ TEST(1)
 
   {
   tl::Variant v (2u);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u2");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -197,7 +203,9 @@ TEST(1)
 
   {
   tl::Variant v (1);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#1");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -230,7 +238,9 @@ TEST(1)
 
   {
   tl::Variant v (2l);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#2");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -268,7 +278,9 @@ TEST(1)
 
   {
   tl::Variant v ((float)5.0);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "##5");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -313,7 +325,9 @@ TEST(1)
 
   {
   tl::Variant v (5.0);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "##5");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -373,7 +387,9 @@ TEST(1)
 
   {
   tl::Variant v((short)2);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#2");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -419,7 +435,9 @@ TEST(1)
 
   {
   tl::Variant v((unsigned short)2);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u2");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -460,7 +478,9 @@ TEST(1)
 
   {
   tl::Variant v ("hal'l\"o");
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "'hal\\'l\"o'");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), true);
@@ -489,12 +509,13 @@ TEST(1)
   }
 
   {
+#if defined(HAVE_QT)
   tl::Variant v (tl::to_qstring ("hal'l\"o"));
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "'hal\\'l\"o'");
+  EXPECT_EQ (v.is_qstring (), true);
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
-  EXPECT_EQ (v.is_qstring (), true);
   EXPECT_EQ (v.is_stdstring (), false);
   EXPECT_EQ (v.is_long (), false);
   EXPECT_EQ (v.is_ulong (), false);
@@ -516,12 +537,15 @@ TEST(1)
   EXPECT_EQ (v.is_stdstring (), false);
   EXPECT_EQ (std::string (v.to_string ()), "hal'l\"o");
   EXPECT_EQ (std::string ((const char *)v.native_ptr ()), "hal'l\"o");
+#endif
   }
 
   {
   long a[3] = { 1, 5, 25 };
   tl::Variant v (a, a + 3);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "(#1,#5,#25)");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), true);
   EXPECT_EQ (v.is_cstring (), false);
@@ -556,7 +580,9 @@ TEST(1)
 
   {
   tl::Variant v ((long long) 17);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#l17");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -578,7 +604,9 @@ TEST(1)
 
   {
   tl::Variant v ((unsigned long long) 17);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#lu17");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -600,7 +628,9 @@ TEST(1)
 
   {
   tl::Variant v (17, true);
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "#u17");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_cstring (), false);
@@ -616,7 +646,9 @@ TEST(1)
 
   {
   tl::Variant v = tl::Variant::empty_array ();
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "{}");
+#endif
   EXPECT_EQ (v.is_nil (), false);
   EXPECT_EQ (v.is_list (), false);
   EXPECT_EQ (v.is_array (), true);
@@ -633,7 +665,9 @@ TEST(1)
   EXPECT_EQ (v.to_parsable_string (), "{#1=>\'A\'}");
   v.insert (tl::Variant ("B"), tl::Variant (17));
   EXPECT_EQ (v.to_parsable_string (), "{#1=>\'A\',\'B\'=>#17}");
+#if defined(HAVE_QT)
   EXPECT_EQ (tl::Variant (v.to_qvariant ()).to_parsable_string (), "{\'1\'=>\'A\',\'B\'=>#17}");
+#endif
   tl::Variant *x;
   x = v.find (tl::Variant ("B"));
   EXPECT_EQ (x != 0, true);

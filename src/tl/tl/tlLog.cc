@@ -51,7 +51,7 @@ verbosity ()
 //  Channel implementation
 
 Channel::Channel () 
-  : m_lock (), m_no_endl (false), m_active (false)
+  : m_no_endl (false), m_active (false)
 {
   //  .. nothing else ..
 }

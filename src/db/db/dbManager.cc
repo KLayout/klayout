@@ -114,7 +114,7 @@ Manager::transaction (const std::string &description, transaction_id_t join_with
 
     //  close transactions that are still open (was an assertion before)
     if (m_opened) {
-      tl::warn << tl::to_string (QObject::tr ("Transaction still opened: ")) << m_current->second;
+      tl::warn << tl::to_string (tr ("Transaction still opened: ")) << m_current->second;
       commit ();
     }
 
@@ -177,7 +177,7 @@ Manager::undo ()
   m_replay = true;
   --m_current;
 
-  tl::RelativeProgress progress (tl::to_string (QObject::tr ("Undoing")), m_current->first.size (), 10);
+  tl::RelativeProgress progress (tl::to_string (tr ("Undoing")), m_current->first.size (), 10);
 
   try {
 
@@ -212,7 +212,7 @@ Manager::redo ()
   tl_assert (! m_opened);
   tl_assert (! m_replay);
 
-  tl::RelativeProgress progress (tl::to_string (QObject::tr ("Redoing")), m_current->first.size (), 10);
+  tl::RelativeProgress progress (tl::to_string (tr ("Redoing")), m_current->first.size (), 10);
 
   try {
 

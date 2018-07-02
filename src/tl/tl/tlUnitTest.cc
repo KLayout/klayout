@@ -25,7 +25,6 @@
 #include "tlTimer.h"
 #include "tlStream.h"
 
-#include <QDir>
 #include <cmath>
 
 namespace tl
@@ -95,11 +94,11 @@ std::string testsrc ()
 
 std::string testsrc_private ()
 {
-  QDir d (QDir (tl::to_qstring (tl::testsrc ())).filePath (QString::fromUtf8 ("private")));
-  if (! d.exists ()) {
+  std::string pp = tl::combine_path (tl::testsrc (), "private");
+  if (! tl::file_exists (pp)) {
     throw tl::CancelException ();
   }
-  return tl::to_string (d.path ());
+  return pp;
 }
 
 std::string testtmp ()
@@ -206,9 +205,8 @@ TestRegistrar::tests () const
 TestBase::TestBase (const std::string &file, const std::string &name)
   : m_editable (false), m_slow (false), m_cp_line (0), m_any_failed (false)
 {
-  QFileInfo f (tl::to_qstring (file));
-  m_test = tl::to_string (f.baseName ()) + ":" + name;
-  m_testdir = tl::to_string (f.baseName ()) + "_" + name;
+  m_test = tl::basename (file) + ":" + name;
+  m_testdir = tl::basename (file) + "_" + name;
   tl::TestRegistrar::reg (this);
 }
 
@@ -218,17 +216,15 @@ bool TestBase::do_test (bool editable, bool slow)
   m_slow = slow;
 
   //  Ensures the test temp directory is present
-  QDir dir (tl::to_qstring (testtmp ()));
-  QDir tmpdir (dir.absoluteFilePath (tl::to_qstring (m_testdir)));
-  if (tmpdir.exists () && ! tl::rm_dir_recursive (tmpdir.absolutePath ())) {
-    throw tl::Exception ("Unable to clean temporary dir: " + tl::to_string (tmpdir.absolutePath ()));
+  std::string tmpdir = tl::combine_path (tl::absolute_file_path (testtmp ()), m_testdir);
+  if (tl::file_exists (tmpdir) && ! tl::rm_dir_recursive (tmpdir)) {
+    throw tl::Exception ("Unable to clean temporary dir: " + tmpdir);
   }
-  if (! dir.mkpath (tl::to_qstring (m_testdir))) {
-    throw tl::Exception ("Unable to create path for temporary files: " + tl::to_string (tmpdir.absolutePath ()));
+  if (! tl::mkpath (tmpdir)) {
+    throw tl::Exception ("Unable to create path for temporary files: " + tmpdir);
   }
-  dir.cd (tl::to_qstring (m_testdir));
 
-  m_testtmp = dir.absolutePath ();
+  m_testtmp = tmpdir;
 
   static std::string testname_value;
   static std::string testtmp_value;
@@ -238,7 +234,7 @@ bool TestBase::do_test (bool editable, bool slow)
   putenv (const_cast<char *> (testname_value.c_str ()));
 
   putenv (const_cast<char *> ("TESTTMP_WITH_NAME="));
-  testtmp_value = std::string ("TESTTMP_WITH_NAME=") + m_testtmp.toUtf8().constData();
+  testtmp_value = std::string ("TESTTMP_WITH_NAME=") + m_testtmp;
   putenv (const_cast<char *> (testtmp_value.c_str ()));
 
   reset_checkpoint ();
@@ -252,42 +248,8 @@ bool TestBase::do_test (bool editable, bool slow)
 
 std::string TestBase::tmp_file (const std::string &fn) const
 {
-  tl_assert (! m_testtmp.isEmpty ());
-  QDir dir (m_testtmp);
-  return tl::to_string (dir.absoluteFilePath (tl::to_qstring (fn)));
-}
-
-/**
- *  @brief Recursively empties a directory
- */
-static void empty_dir (QDir dir)
-{
-  QStringList entries = dir.entryList (QDir::AllEntries | QDir::NoDotAndDotDot);
-  for (QStringList::const_iterator e = entries.begin (); e != entries.end (); ++e) {
-    QString epath = dir.absoluteFilePath (*e);
-    if (QFileInfo (epath).isDir ()) {
-      empty_dir (QDir (epath));
-      dir.rmdir (*e);
-    } else if (! dir.remove (*e)) {
-      throw tl::Exception ("Unable to remove file or directory: " + tl::to_string (dir.filePath (*e)));
-    }
-  }
-}
-
-void TestBase::remove_tmp_folder ()
-{
-  //  Ensures the test temp directory is present
-  QDir dir (tl::to_qstring (testtmp ()));
-  if (dir.cd (tl::to_qstring (m_test))) {
-
-    empty_dir (dir);
-
-    dir.cdUp ();
-    if (! dir.rmdir (tl::to_qstring (m_test))) {
-      throw tl::Exception ("Unable to remove directory: " + tl::to_string (dir.filePath (tl::to_qstring (m_test))));
-    }
-
-  }
+  tl_assert (! m_testtmp.empty ());
+  return tl::combine_path (m_testtmp, fn);
 }
 
 void TestBase::checkpoint (const std::string &file, int line)
@@ -359,13 +321,8 @@ void TestBase::write_detailed_diff (std::ostream &os, const std::string &subject
 
 static std::string read_file (const std::string &path)
 {
-  QFile file (tl::to_qstring (path));
-  if (! file.open (QIODevice::ReadOnly | QIODevice::Text)) {
-    tl::warn << tl::sprintf ("Unable to open file %s", path);
-  }
-
-  QByteArray ba = file.readAll ();
-  return std::string (ba.constData (), 0, ba.size ());
+  tl::InputStream s (path);
+  return s.read_all ();
 }
 
 void TestBase::compare_text_files (const std::string &path_a, const std::string &path_b)
@@ -375,8 +332,8 @@ void TestBase::compare_text_files (const std::string &path_a, const std::string 
 
   if (text_a != text_b) {
     raise (tl::sprintf ("Compare failed - see:\n  file 1: %s\n  file 2: %s",
-                        tl::to_string (QFileInfo (tl::to_qstring (path_a)).absoluteFilePath ()),
-                        tl::to_string (QFileInfo (tl::to_qstring (path_b)).absoluteFilePath ())));
+                        tl::absolute_file_path (path_a),
+                        tl::absolute_file_path (path_b)));
   }
 }
 

@@ -26,8 +26,6 @@
 #include "tlCommon.h"
 #include "tlLog.h"
 
-#include <QFileInfo>
-
 namespace tl
 {
 

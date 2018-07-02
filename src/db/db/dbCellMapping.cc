@@ -348,7 +348,7 @@ CellMapping::create_missing_mapping (db::Layout &layout_a, db::cell_index_type /
 void 
 CellMapping::create_from_geometry (const db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b)
 {
-  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (QObject::tr ("Cell mapping")));
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Cell mapping")));
 
   if (tl::verbosity () >= 20) {
     tl::info << "Cell mapping - first step: mapping instance count and instance identity";

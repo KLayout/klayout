@@ -1057,7 +1057,7 @@ Instances::instance_type
 Instances::replace (const instance_type &ref, const cell_inst_wp_array_type &inst)
 {
   if (ref.instances () != this) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Trying to replace an object in a list that it does not belong to")));
+    throw tl::Exception (tl::to_string (tr ("Trying to replace an object in a list that it does not belong to")));
   }
 
   const cell_inst_wp_array_type *cp = ref.basic_ptr (cell_inst_wp_array_type::tag ());
@@ -1080,7 +1080,7 @@ Instances::instance_type
 Instances::replace (const instance_type &ref, const cell_inst_array_type &inst)
 {
   if (ref.instances () != this) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Trying to replace an object in a list that it does not belong to")));
+    throw tl::Exception (tl::to_string (tr ("Trying to replace an object in a list that it does not belong to")));
   }
 
   const cell_inst_array_type *cp = ref.basic_ptr (cell_inst_array_type::tag ());
@@ -1121,7 +1121,7 @@ void
 Instances::erase_inst_by_iter (Tag tag, ET editable_tag, I iter)
 {
   if (iter.vector () != &inst_tree (tag, editable_tag).objects ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Trying to erase an object from a list that it does not belong to")));
+    throw tl::Exception (tl::to_string (tr ("Trying to erase an object from a list that it does not belong to")));
   }
 
   if (mp_cell) {
@@ -1468,7 +1468,7 @@ Instances::instance_type
 Instances::replace_prop_id (const instance_type &ref, db::properties_id_type prop_id)
 {
   if (ref.instances () != this) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Trying to replace an object in a list that it does not belong to")));
+    throw tl::Exception (tl::to_string (tr ("Trying to replace an object in a list that it does not belong to")));
   }
 
   if (! ref.is_null ()) {

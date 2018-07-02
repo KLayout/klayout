@@ -36,9 +36,11 @@
 #include "tlAssert.h"
 #include "tlObject.h"
 
-#include <QString>
-#include <QByteArray>
-#include <QVariant>
+#if defined(HAVE_QT)
+# include <QString>
+# include <QByteArray>
+# include <QVariant>
+#endif
 
 namespace gsi
 {
@@ -162,8 +164,10 @@ public:
     t_double, 
     t_string, 
     t_stdstring, 
-    t_qstring, 
+#if defined(HAVE_QT)
+    t_qstring,
     t_qbytearray, 
+#endif
     t_list, 
     t_array, 
     t_user,
@@ -186,6 +190,7 @@ public:
    */
   Variant (const tl::Variant &d);
 
+#if defined(HAVE_QT)
   /**
    *  @brief Initialize the Variant with a QByteArray
    */
@@ -195,6 +200,14 @@ public:
    *  @brief Initialize the Variant with a QString
    */
   Variant (const QString &s);
+
+  /**
+   *  @brief Create from a QVariant
+   *
+   *  This constructor will convert a QVariant into a tl::Variant as far as possible.
+   */
+  explicit Variant (const QVariant &v);
+#endif
 
   /**
    *  @brief Initialize the Variant with "string"
@@ -290,13 +303,6 @@ public:
    *  One application for that type is a placeholder for an OASIS name until it is associated with a real value.
    */
   Variant (size_t l, bool /*dummy*/);
-
-  /**
-   *  @brief Create from a QVariant
-   *
-   *  This constructor will convert a QVariant into a tl::Variant as far as possible.
-   */
-  explicit Variant (const QVariant &v);
 
   /**
    *  @brief Initialize with a user type based on void *
@@ -398,10 +404,12 @@ public:
     return tl::Variant ((void *) new T(t), c, true);
   }
 
+#if defined(HAVE_QT)
   /**
    *  @brief Convert to a QVariant
    */
   QVariant to_qvariant () const;
+#endif
 
   /**
    *  @brief Assignment
@@ -413,6 +421,7 @@ public:
    */
   Variant &operator= (const char *v);
 
+#if defined(HAVE_QT)
   /**
    *  @brief Assignment of a QByteArray
    */
@@ -422,6 +431,7 @@ public:
    *  @brief Assignment of a QString
    */
   Variant &operator= (const QString &v);
+#endif
 
   /**
    *  @brief Assignment of a string
@@ -588,6 +598,7 @@ public:
    */
   const char *to_string () const;
 
+#if defined(HAVE_QT)
   /**
    *  @brief Conversion to a QByteArray
    *
@@ -603,6 +614,7 @@ public:
    *  No conversion is provided to user types currently.
    */
   QString to_qstring () const;
+#endif
 
   /**
    *  @brief Conversion to a std::string
@@ -1305,6 +1317,8 @@ public:
     return m_type == t_id;
   }
 
+#if defined(HAVE_QT)
+
   /**
    *  @brief Test, if it is a QByteArray
    */
@@ -1320,6 +1334,8 @@ public:
   {
     return m_type == t_qstring;
   }
+
+#endif
 
   /**
    *  @brief Test, if it is a std::string
@@ -1342,7 +1358,11 @@ public:
    */
   bool is_a_string () const
   {
+#if defined(HAVE_QT)
     return m_type == t_string || m_type == t_stdstring || m_type == t_qstring || m_type == t_qbytearray;
+#else
+    return m_type == t_string || m_type == t_stdstring;
+#endif
   }
 
   /**
@@ -1492,8 +1512,10 @@ private:
       char ptr [sizeof (WeakOrSharedPtr)];
       const VariantUserClassBase *cls;
     } mp_user_ref;
+#if defined(HAVE_QT)
     QString *m_qstring;
     QByteArray *m_qbytearray;
+#endif
     std::string *m_stdstring;
   } m_var;
 
@@ -1522,8 +1544,10 @@ template<> inline __int128 Variant::to<__int128> () const                       
 template<> inline double Variant::to<double> () const                             { return to_double (); }
 template<> inline float Variant::to<float> () const                               { return to_float (); }
 template<> inline std::string Variant::to<std::string> () const                   { return to_stdstring (); }
+#if defined(HAVE_QT)
 template<> inline QString Variant::to<QString> () const                           { return to_qstring (); }
 template<> inline QByteArray Variant::to<QByteArray> () const                     { return to_qbytearray (); }
+#endif
 template<> inline const char *Variant::to<const char *> () const                  { return to_string (); }
 
 //  specializations if the is.. methods
@@ -1545,8 +1569,10 @@ template<> inline bool Variant::is<__int128> () const             { return m_typ
 template<> inline bool Variant::is<double> () const               { return m_type == t_double; }
 template<> inline bool Variant::is<float> () const                { return m_type == t_float; }
 template<> inline bool Variant::is<std::string> () const          { return m_type == t_stdstring; }
+#if defined(HAVE_QT)
 template<> inline bool Variant::is<QString> () const              { return m_type == t_qstring; }
 template<> inline bool Variant::is<QByteArray> () const           { return m_type == t_qbytearray; }
+#endif
 template<> inline bool Variant::is<const char *> () const         { return m_type == t_string; }
 
 //  specializations of the can_convert.. methods
@@ -1568,8 +1594,10 @@ template<> inline bool Variant::can_convert_to<__int128> () const             { 
 template<> inline bool Variant::can_convert_to<double> () const               { return can_convert_to_double (); }
 template<> inline bool Variant::can_convert_to<float> () const                { return can_convert_to_float (); }
 template<> inline bool Variant::can_convert_to<std::string> () const          { return true; }
+#if defined(HAVE_QT)
 template<> inline bool Variant::can_convert_to<QString> () const              { return true; }
 template<> inline bool Variant::can_convert_to<QByteArray> () const           { return true; }
+#endif
 template<> inline bool Variant::can_convert_to<const char *> () const         { return true; }
 
 /**

@@ -53,7 +53,7 @@ namespace {
   void _extractor_impl (tl::Extractor &ex, db::simple_trans<C> &t)
   {
     if (! _test_extractor_impl (ex, t)) {
-      ex.error (tl::to_string (QObject::tr ("Expected a transformation specification")));
+      ex.error (tl::to_string (tr ("Expected a transformation specification")));
     }
   }
 
@@ -78,7 +78,7 @@ namespace {
   void _extractor_impl (tl::Extractor &ex, db::disp_trans<C> &t)
   {
     if (! _test_extractor_impl (ex, t)) {
-      ex.error (tl::to_string (QObject::tr ("Expected a transformation specification")));
+      ex.error (tl::to_string (tr ("Expected a transformation specification")));
     }
   }
 
@@ -120,7 +120,7 @@ namespace {
   void _extractor_impl (tl::Extractor &ex, db::complex_trans<I, F, R> &t)
   {
     if (! _test_extractor_impl (ex, t)) {
-      ex.error (tl::to_string (QObject::tr ("Expected transformation specification")));
+      ex.error (tl::to_string (tr ("Expected transformation specification")));
     }
   }
 
@@ -148,7 +148,7 @@ namespace {
   void _extractor_impl (tl::Extractor &ex, db::combined_trans<C1, C2> &t)
   {
     if (! _test_extractor_impl (ex, t)) {
-      ex.error (tl::to_string (QObject::tr ("Expected transformation/magnification specification")));
+      ex.error (tl::to_string (tr ("Expected transformation/magnification specification")));
     }
   }
 
@@ -162,7 +162,7 @@ void DB_PUBLIC
 extractor_impl (tl::Extractor &ex, db::FTrans &t)
 {
   if (! test_extractor_impl (ex, t)) {
-    ex.error (tl::to_string (QObject::tr ("Expected rotation/mirror code (r0,r90,r180,r270,m0,m45,m90,m135)")));
+    ex.error (tl::to_string (tr ("Expected rotation/mirror code (r0,r90,r180,r270,m0,m45,m90,m135)")));
   }
 }
 

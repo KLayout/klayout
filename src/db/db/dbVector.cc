@@ -49,7 +49,7 @@ namespace {
   void _extractor_impl (tl::Extractor &ex, db::vector<C> &p)
   {
     if (! _test_extractor_impl (ex, p)) {
-      ex.error (tl::to_string (QObject::tr ("Expected a vector specification")));
+      ex.error (tl::to_string (tr ("Expected a vector specification")));
     }
   }
 

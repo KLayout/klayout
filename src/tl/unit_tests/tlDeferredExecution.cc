@@ -20,8 +20,6 @@
 
 */
 
-
-
 #include "tlDeferredExecution.h"
 #include "tlUnitTest.h"
 

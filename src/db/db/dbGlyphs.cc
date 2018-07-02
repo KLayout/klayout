@@ -146,7 +146,7 @@ TextGenerator::load_from_resource (const std::string &name)
 {
   QResource res (tl::to_qstring (name));
   if (res.size () == 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unable to load font resource from ")) + name);
+    throw tl::Exception (tl::to_string (tr ("Unable to load font resource from ")) + name);
   }
 
   QByteArray data = qUncompress (QByteArray ((const char *) res.data (), int (res.size ())));

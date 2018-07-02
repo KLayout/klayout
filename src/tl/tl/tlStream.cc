@@ -22,7 +22,8 @@
 
 
 
-#include <ctype.h> 
+#include <stddef.h>
+#include <ctype.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -36,12 +37,14 @@
 #include "tlHttpStream.h"
 #include "tlDeflate.h"
 #include "tlAssert.h"
+#include "tlFileUtils.h"
 
 #include "tlException.h"
 #include "tlString.h"
 
-#include <QFileInfo>
-#include <QUrl>
+#if defined(HAVE_QT)
+# include <QUrl>
+#endif
 
 namespace tl
 {
@@ -54,7 +57,7 @@ class FileWriteErrorException
 {
 public:
   FileWriteErrorException (const std::string &f, int en)
-    : tl::Exception (tl::to_string (QObject::tr ("Write error on file: %s (errno=%d)")), f, en)
+    : tl::Exception (tl::to_string (tr ("Write error on file: %s (errno=%d)")), f, en)
   { }
 };
 
@@ -63,7 +66,7 @@ class FileReadErrorException
 {
 public:
   FileReadErrorException (const std::string &f, int en)
-    : tl::Exception (tl::to_string (QObject::tr ("Read error on file: %s (errno=%d)")), f, en)
+    : tl::Exception (tl::to_string (tr ("Read error on file: %s (errno=%d)")), f, en)
   { }
 };
 
@@ -72,7 +75,7 @@ class ZLibWriteErrorException
 {
 public:
   ZLibWriteErrorException (const std::string &f, const char *em)
-    : tl::Exception (tl::to_string (QObject::tr ("Write error on file in decompression library: %s (message=%s)")), f, em)
+    : tl::Exception (tl::to_string (tr ("Write error on file in decompression library: %s (message=%s)")), f, em)
   { }
 };
 
@@ -81,7 +84,7 @@ class ZLibReadErrorException
 {
 public:
   ZLibReadErrorException (const std::string &f, const char *em)
-    : tl::Exception (tl::to_string (QObject::tr ("Read error on file in decompression library: %s (message=%s)")), f, em)
+    : tl::Exception (tl::to_string (tr ("Read error on file in decompression library: %s (message=%s)")), f, em)
   { }
 };
 
@@ -90,7 +93,7 @@ class FileOpenErrorException
 {
 public:
   FileOpenErrorException (const std::string &f, int en)
-    : tl::Exception (tl::to_string (QObject::tr ("Unable to open file: %s (errno=%d)")), f, en)
+    : tl::Exception (tl::to_string (tr ("Unable to open file: %s (errno=%d)")), f, en)
   { }
 };
 
@@ -99,7 +102,7 @@ class FilePOpenErrorException
 {
 public:
   FilePOpenErrorException (const std::string &f, int en)
-    : tl::Exception (tl::to_string (QObject::tr ("Unable to get input from command through pipe: %s (errno=%d)")), f, en)
+    : tl::Exception (tl::to_string (tr ("Unable to get input from command through pipe: %s (errno=%d)")), f, en)
   { }
 };
 
@@ -108,7 +111,7 @@ class FilePReadErrorException
 {
 public:
   FilePReadErrorException (const std::string &f, int en)
-    : tl::Exception (tl::to_string (QObject::tr ("Read error on pipe from command: %s (errno=%d)")), f, en)
+    : tl::Exception (tl::to_string (tr ("Read error on pipe from command: %s (errno=%d)")), f, en)
   { }
 };
 
@@ -117,7 +120,7 @@ class FilePWriteErrorException
 {
 public:
   FilePWriteErrorException (const std::string &f, int en)
-    : tl::Exception (tl::to_string (QObject::tr ("Write error on pipe from command: %s (errno=%d)")), f, en)
+    : tl::Exception (tl::to_string (tr ("Write error on pipe from command: %s (errno=%d)")), f, en)
   { }
 };
 
@@ -327,16 +330,24 @@ InputStream::InputStream (const std::string &abstract_path)
   mp_buffer = new char [m_bcap];
 
   tl::Extractor ex (abstract_path.c_str ());
+#if defined(HAVE_CURL) || defined(HAVE_QT)
   if (ex.test ("http:") || ex.test ("https:")) {
     mp_delegate = new InputHttpStream (abstract_path);
-#ifndef _WIN32 // not available on Windows
-  } else if (ex.test ("pipe:")) {
-    mp_delegate = new InputPipe (ex.get ());
+  } else
 #endif
-  } else if (ex.test ("file:")) {
+#if !defined (_WIN32) // not available on Windows
+  if (ex.test ("pipe:")) {
+    mp_delegate = new InputPipe (ex.get ());
+  } else
+#endif
+#if defined(HAVE_QT)
+  //  TODO: provide a substitute for QUrl
+  if (ex.test ("file:")) {
     QUrl url (tl::to_qstring (abstract_path));
     mp_delegate = new InputZLibFile (tl::to_string (url.toLocalFile ()));
-  } else {
+  } else
+#endif
+  {
     mp_delegate = new InputZLibFile (abstract_path);
   }
 
@@ -350,15 +361,18 @@ std::string InputStream::absolute_path (const std::string &abstract_path)
   tl::Extractor ex (abstract_path.c_str ());
   if (ex.test ("http:") || ex.test ("https:")) {
     return abstract_path;
-#ifndef _WIN32 // not available on Windows
+#if !defined(_WIN32) // not available on Windows
   } else if (ex.test ("pipe:")) {
     return abstract_path;
 #endif
+#if defined(HAVE_QT)
+  //  TODO: provide a substitute for QUrl
   } else if (ex.test ("file:")) {
     QUrl url (tl::to_qstring (abstract_path));
     return tl::to_string (QFileInfo (url.toLocalFile ()).absoluteFilePath ());
+#endif
   } else {
-    return tl::to_string (QFileInfo (tl::to_qstring (abstract_path)).absoluteFilePath ());
+    return tl::absolute_file_path (abstract_path);
   }
 }
 
@@ -698,13 +712,13 @@ InputFile::reset ()
 std::string
 InputFile::absolute_path () const
 {
-  return tl::to_string (QFileInfo (tl::to_qstring (m_source)).absoluteFilePath ());
+  return tl::absolute_file_path (m_source);
 }
 
 std::string
 InputFile::filename () const
 {
-  return tl::to_string (QFileInfo (tl::to_qstring (m_source)).fileName ());
+  return tl::filename (m_source);
 }
 
 // ---------------------------------------------------------------
@@ -771,13 +785,13 @@ InputZLibFile::reset ()
 std::string
 InputZLibFile::absolute_path () const
 {
-  return tl::to_string (QFileInfo (tl::to_qstring (m_source)).absoluteFilePath ());
+  return tl::absolute_file_path (m_source);
 }
 
 std::string
 InputZLibFile::filename () const
 {
-  return tl::to_string (QFileInfo (tl::to_qstring (m_source)).fileName ());
+  return tl::filename (m_source);
 }
 
 // ---------------------------------------------------------------------------------
@@ -964,7 +978,7 @@ OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode o
 
   tl::Extractor ex (abstract_path.c_str ());
   if (ex.test ("http:") || ex.test ("https:")) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot write to http:, https: or pipe: URL's")));
+    throw tl::Exception (tl::to_string (tr ("Cannot write to http:, https: or pipe: URL's")));
 #ifndef _WIN32 // not available on Windows
   } else if (ex.test ("pipe:")) {
     mp_delegate = new OutputPipe (ex.get ());
@@ -1213,7 +1227,7 @@ InputPipe::read (char *b, size_t n)
 void 
 InputPipe::reset ()
 {
-  throw tl::Exception (tl::to_string (QObject::tr ("'reset' is not supported on pipeline input files")));
+  throw tl::Exception (tl::to_string (tr ("'reset' is not supported on pipeline input files")));
 }
 
 // ---------------------------------------------------------------
@@ -1267,19 +1281,19 @@ InputPipe::~InputPipe ()
 size_t 
 InputPipe::read (char * /*b*/, size_t /*n*/)
 {
-  throw tl::Exception (tl::to_string (QObject::tr ("pipeline input files not available on Windows")));
+  throw tl::Exception (tl::to_string (tr ("pipeline input files not available on Windows")));
 }
 
 void 
 InputPipe::reset ()
 {
-  throw tl::Exception (tl::to_string (QObject::tr ("pipeline input files not available on Windows")));
+  throw tl::Exception (tl::to_string (tr ("pipeline input files not available on Windows")));
 }
 
 void
 InputPipe::close ()
 {
-  throw tl::Exception (tl::to_string (QObject::tr ("pipeline input files not available on Windows")));
+  throw tl::Exception (tl::to_string (tr ("pipeline input files not available on Windows")));
 }
 
 // ---------------------------------------------------------------
@@ -1298,7 +1312,7 @@ OutputPipe::~OutputPipe ()
 void 
 OutputPipe::write (const char * /*b*/, size_t /*n*/)
 {
-  throw tl::Exception (tl::to_string (QObject::tr ("pipeline input files not available on Windows")));
+  throw tl::Exception (tl::to_string (tr ("pipeline input files not available on Windows")));
 }
 
 #endif

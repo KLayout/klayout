@@ -261,6 +261,7 @@ TL_PUBLIC std::string to_string (double d, int prec);
 TL_PUBLIC std::string to_string (float d, int prec);
 TL_PUBLIC std::string to_string (const unsigned char *cp, int length);
 TL_PUBLIC std::string to_string (const char *cp, int length);
+TL_PUBLIC std::string to_string_from_local (const char *cp);
 
 template <class T> inline std::string to_string (const T &o) { return o.to_string (); }
 template <> inline std::string to_string (const double &d) { return to_string (d, 12); }

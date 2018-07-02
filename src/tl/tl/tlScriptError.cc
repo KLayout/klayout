@@ -69,7 +69,7 @@ ScriptError::basic_msg () const
 {
   std::string m = tl::Exception::msg ();
   if (! m_context.empty ()) {
-    m += tl::to_string (QObject::tr (" in ")) + m_context;
+    m += tl::to_string (tr (" in ")) + m_context;
   }
   return m;
 }

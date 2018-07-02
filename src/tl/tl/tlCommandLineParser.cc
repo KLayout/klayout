@@ -22,8 +22,7 @@
 
 #include "tlLog.h"
 #include "tlCommandLineParser.h"
-
-#include <QFileInfo>
+#include "tlFileUtils.h"
 
 namespace tl
 {
@@ -463,7 +462,7 @@ CommandLineOptions::produce_version ()
 void
 CommandLineOptions::parse (int argc, char *argv[])
 {
-  m_program_name = tl::to_string (QFileInfo (QString::fromLocal8Bit (argv [0])).fileName ());
+  m_program_name = tl::filename (tl::to_string_from_local (argv [0]));
 
   std::vector<ArgBase *> plain_args;
   std::map<std::string, ArgBase *> arg_by_short_option, arg_by_long_option;
@@ -493,7 +492,7 @@ CommandLineOptions::parse (int argc, char *argv[])
 
     ArgBase *arg = 0;
 
-    std::string arg_as_utf8 = tl::to_string (QString::fromLocal8Bit (argv [i]));
+    std::string arg_as_utf8 = tl::to_string_from_local (argv [i]);
     tl::Extractor ex (arg_as_utf8.c_str ());
 
     if (ex.test ("--")) {
@@ -502,7 +501,7 @@ CommandLineOptions::parse (int argc, char *argv[])
       ex.read_word (n, "_-");
       std::map<std::string, ArgBase *>::const_iterator a = arg_by_long_option.find (n);
       if (a == arg_by_long_option.end ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Unknown command line option --%1 (use -h for help)").arg (tl::to_qstring (n))));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unknown command line option --%1 (use -h for help)")), n));
       }
       arg = a->second;
 
@@ -512,14 +511,14 @@ CommandLineOptions::parse (int argc, char *argv[])
       ex.read_word (n);
       std::map<std::string, ArgBase *>::const_iterator a = arg_by_short_option.find (n);
       if (a == arg_by_short_option.end ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Unknown command line option --%1 (use -h for help)").arg (tl::to_qstring (n))));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unknown command line option --%1 (use -h for help)")), n));
       }
       arg = a->second;
 
     } else {
 
       if (next_plain_arg == plain_args.end ()) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Unknown command line component %1 - no further plain argument expected (use -h for help)").arg (tl::to_qstring (arg_as_utf8))));
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unknown command line component %1 - no further plain argument expected (use -h for help)")), arg_as_utf8));
       }
 
       arg = *next_plain_arg;
@@ -544,10 +543,10 @@ CommandLineOptions::parse (int argc, char *argv[])
           ex.expect_end ();
           ++i;
           if (i == argc) {
-            throw tl::Exception (tl::to_string (QObject::tr ("Value missing")));
+            throw tl::Exception (tl::to_string (tr ("Value missing")));
           }
 
-          std::string arg_as_utf8 = tl::to_string (QString::fromLocal8Bit (argv [i]));
+          std::string arg_as_utf8 = tl::to_string_from_local (argv [i]);
           tl::Extractor ex_value (arg_as_utf8);
           arg->take_value (ex_value);
 
@@ -589,7 +588,7 @@ CommandLineOptions::parse (int argc, char *argv[])
   }
 
   if (next_plain_arg != plain_args.end () && !(*next_plain_arg)->option ().optional) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Additional arguments required (use -h for help)")));
+    throw tl::Exception (tl::to_string (tr ("Additional arguments required (use -h for help)")));
   }
 }
 

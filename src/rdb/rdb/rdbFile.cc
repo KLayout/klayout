@@ -32,7 +32,6 @@
 
 #include <fstream>
 #include <string>
-#include <QXmlInputSource>
 
 namespace rdb
 {

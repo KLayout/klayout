@@ -24,8 +24,6 @@
 #ifndef HDR_tlHttpStreamQt
 #define HDR_tlHttpStreamQt
 
-#if !defined(HAVE_CURL)
-
 #include "tlStream.h"
 #include "tlEvents.h"
 
@@ -188,8 +186,6 @@ private:
 };
 
 }
-
-#endif
 
 #endif
 

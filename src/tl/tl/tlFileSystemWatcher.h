@@ -23,6 +23,10 @@
 #ifndef HDR_tlFileSystemWatcher
 #define HDR_tlFileSystemWatcher
 
+#if !defined(HAVE_QT)
+# error tl::FileSystemWatcher not available
+#endif
+
 #include "tlEvents.h"
 
 #include <QObject>

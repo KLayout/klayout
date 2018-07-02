@@ -27,9 +27,7 @@
 #include "tlProgress.h"
 #include "tlString.h"
 #include "tlAssert.h"
-
-#include <QThreadStorage>
-#include <QThread>
+#include "tlThreads.h"
 
 namespace tl
 {
@@ -65,7 +63,7 @@ ProgressAdaptor::prev ()
 
 //  Hint: we don't want the QThreadStorage take ownership over the object. Hence we don't
 //  store a pointer but a pointer to a pointer.
-static QThreadStorage<ProgressAdaptor **> s_thread_data;
+static tl::ThreadStorage<ProgressAdaptor **> s_thread_data;
 
 Progress::Progress (const std::string &desc, size_t yield_interval)
   : m_desc (desc), m_title (desc),

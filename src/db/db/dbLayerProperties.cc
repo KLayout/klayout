@@ -328,14 +328,14 @@ template<> bool test_extractor_impl (tl::Extractor &ex, db::LayerOffset &e)
 template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::LayerProperties &e)
 {
   if (! test_extractor_impl (ex, e)) {
-    ex.error (tl::to_string (QObject::tr ("Expected a layer specification")));
+    ex.error (tl::to_string (tr ("Expected a layer specification")));
   }
 }
 
 template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::LayerOffset &e)
 {
   if (! test_extractor_impl (ex, e)) {
-    ex.error (tl::to_string (QObject::tr ("Expected a layer offset specification")));
+    ex.error (tl::to_string (tr ("Expected a layer offset specification")));
   }
 }
 

@@ -431,7 +431,7 @@ void _push_ptr_vector_of (SerialArgs &to, const ArgType &a, tl::Heap &heap, cons
 template <class X> 
 void *_create (tl::false_tag)
 {
-  throw tl::Exception (tl::to_string (QObject::tr ("Object cannot be created here")));
+  throw tl::Exception (tl::to_string (tr ("Object cannot be created here")));
   return 0;
 }
 
@@ -444,7 +444,7 @@ void *_create (tl::true_tag)
 template <class X> 
 void *_clone (tl::false_tag, const void * /*other*/)
 {
-  throw tl::Exception (tl::to_string (QObject::tr ("Object cannot be copied here")));
+  throw tl::Exception (tl::to_string (tr ("Object cannot be copied here")));
   return 0;
 }
 
@@ -457,7 +457,7 @@ void *_clone (tl::true_tag, const void *other)
 template <class X> 
 void _assign (tl::false_tag /*has_copy_ctor*/, void *, const void *)
 {
-  throw tl::Exception (tl::to_string (QObject::tr ("Object cannot be copied here")));
+  throw tl::Exception (tl::to_string (tr ("Object cannot be copied here")));
 }
 
 template <class X> 

@@ -1362,7 +1362,7 @@ namespace tl
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Edges &b)
   {
     if (! test_extractor_impl (ex, b)) {
-      ex.error (tl::to_string (QObject::tr ("Expected an edge collection specification")));
+      ex.error (tl::to_string (tr ("Expected an edge collection specification")));
     }
   }
 }

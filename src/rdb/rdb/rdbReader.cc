@@ -70,7 +70,7 @@ Reader::Reader (tl::InputStream &stream)
   }
 
   if (! mp_actual_reader) {
-    throw rdb::ReaderException (tl::to_string (QObject::tr ("Marker database has unknown format")));
+    throw rdb::ReaderException (tl::to_string (tr ("Marker database has unknown format")));
   }
 }
 

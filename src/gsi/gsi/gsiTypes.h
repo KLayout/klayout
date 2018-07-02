@@ -34,6 +34,7 @@
 #include <set>
 #include <stdexcept>
 
+#if defined(HAVE_QT)
 #include <QString>
 #include <QStringRef>
 #include <QVariant>
@@ -43,6 +44,7 @@
 #include <QSet>
 #include <QList>
 #include <QStringList>
+#endif
 
 namespace tl
 {
@@ -422,11 +424,13 @@ template <> struct type_traits<__int128>                    : generic_type_trait
 template <> struct type_traits<double>                      : generic_type_traits<double_tag, double, T_double> { };
 template <> struct type_traits<float>                       : generic_type_traits<float_tag, float, T_float> { };
 template <> struct type_traits<std::string>                 : generic_type_traits<string_tag, StringAdaptor, T_string> { };
+#if defined(HAVE_QT)
 template <> struct type_traits<QString>                     : generic_type_traits<string_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef>                  : generic_type_traits<string_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QByteArray>                  : generic_type_traits<string_tag, StringAdaptor, T_string> { };
-template <> struct type_traits<tl::Variant>                 : generic_type_traits<var_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<QVariant>                    : generic_type_traits<var_tag, VariantAdaptor, T_var> { };
+#endif
+template <> struct type_traits<tl::Variant>                 : generic_type_traits<var_tag, VariantAdaptor, T_var> { };
 
 template <> struct type_traits<void *>                      : generic_type_traits<vptr_tag, void *, T_void_ptr> { };
 template <> struct type_traits<const void *>                : generic_type_traits<vptr_tag, void *, T_void_ptr> { };
@@ -452,11 +456,13 @@ template <> struct type_traits<const __int128 &>            : generic_type_trait
 template <> struct type_traits<const double &>              : generic_type_traits<double_cref_tag, double, T_double> { };
 template <> struct type_traits<const float &>               : generic_type_traits<float_cref_tag, float, T_float> { };
 template <> struct type_traits<const std::string &>         : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
+#if defined(HAVE_QT)
 template <> struct type_traits<const QString &>             : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QStringRef &>          : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QByteArray &>          : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
-template <> struct type_traits<const tl::Variant &>         : generic_type_traits<var_cref_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<const QVariant &>            : generic_type_traits<var_cref_tag, VariantAdaptor, T_var> { };
+#endif
+template <> struct type_traits<const tl::Variant &>         : generic_type_traits<var_cref_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<const char * const &>            : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const unsigned char * const &>   : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const signed char * const &>     : generic_type_traits<string_cref_tag, StringAdaptor, T_string> { };
@@ -479,11 +485,13 @@ template <> struct type_traits<__int128 &>                  : generic_type_trait
 template <> struct type_traits<double &>                    : generic_type_traits<double_ref_tag, double, T_double> { };
 template <> struct type_traits<float &>                     : generic_type_traits<float_ref_tag, float, T_float> { };
 template <> struct type_traits<std::string &>               : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
+#if defined(HAVE_QT)
 template <> struct type_traits<QString &>                   : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef &>                : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QByteArray &>                : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
-template <> struct type_traits<tl::Variant &>               : generic_type_traits<var_ref_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<QVariant &>                  : generic_type_traits<var_ref_tag, VariantAdaptor, T_var> { };
+#endif
+template <> struct type_traits<tl::Variant &>               : generic_type_traits<var_ref_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<const char * &>              : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const unsigned char * &>     : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const signed char * &>       : generic_type_traits<string_ref_tag, StringAdaptor, T_string> { };
@@ -507,11 +515,13 @@ template <> struct type_traits<const __int128 *>            : generic_type_trait
 template <> struct type_traits<const double *>              : generic_type_traits<double_cptr_tag, double, T_double> { };
 template <> struct type_traits<const float *>               : generic_type_traits<float_cptr_tag, float, T_float> { };
 template <> struct type_traits<const std::string *>         : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
+#if defined(HAVE_QT)
 template <> struct type_traits<const QString *>             : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QStringRef *>          : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const QByteArray *>          : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
-template <> struct type_traits<const tl::Variant *>         : generic_type_traits<var_cptr_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<const QVariant *>            : generic_type_traits<var_cptr_tag, VariantAdaptor, T_var> { };
+#endif
+template <> struct type_traits<const tl::Variant *>         : generic_type_traits<var_cptr_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<const char * const *>            : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const unsigned char * const *>   : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const signed char * const *>     : generic_type_traits<string_cptr_tag, StringAdaptor, T_string> { };
@@ -535,11 +545,13 @@ template <> struct type_traits<__int128 *>                  : generic_type_trait
 template <> struct type_traits<double *>                    : generic_type_traits<double_ptr_tag, double, T_double> { };
 template <> struct type_traits<float *>                     : generic_type_traits<float_ptr_tag, float, T_float> { };
 template <> struct type_traits<std::string *>               : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
+#if defined(HAVE_QT)
 template <> struct type_traits<QString *>                   : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QStringRef *>                : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<QByteArray *>                : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
-template <> struct type_traits<tl::Variant *>               : generic_type_traits<var_ptr_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<QVariant *>                  : generic_type_traits<var_ptr_tag, VariantAdaptor, T_var> { };
+#endif
+template <> struct type_traits<tl::Variant *>               : generic_type_traits<var_ptr_tag, VariantAdaptor, T_var> { };
 template <> struct type_traits<const char * *>              : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const unsigned char * *>     : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
 template <> struct type_traits<const signed char * *>       : generic_type_traits<string_ptr_tag, StringAdaptor, T_string> { };
@@ -614,6 +626,8 @@ struct type_traits<X * &>
 {
   static const ClassBase *cls_decl () { return gsi::cls_decl<X> (); }
 };
+
+#if defined(HAVE_QT)
 
 template <>
 struct type_traits<QStringList>
@@ -755,6 +769,88 @@ struct type_traits< QVector<X> * >
   typedef X inner_type;
 };
 
+template <class X, class Y>
+struct type_traits< QHash<X, Y> >
+  : generic_type_traits<map_tag, MapAdaptor, T_map>
+{
+  typedef X inner_k_type;
+  typedef Y inner_type;
+};
+
+template <class X, class Y>
+struct type_traits< const QHash<X, Y> & >
+  : generic_type_traits<map_cref_tag, MapAdaptor, T_map>
+{
+  typedef X inner_k_type;
+  typedef Y inner_type;
+};
+
+template <class X, class Y>
+struct type_traits< QHash<X, Y> & >
+  : generic_type_traits<map_ref_tag, MapAdaptor, T_map>
+{
+  typedef X inner_k_type;
+  typedef Y inner_type;
+};
+
+template <class X, class Y>
+struct type_traits< const QHash<X, Y> * >
+  : generic_type_traits<map_cptr_tag, MapAdaptor, T_map>
+{
+  typedef X inner_k_type;
+  typedef Y inner_type;
+};
+
+template <class X, class Y>
+struct type_traits< QHash<X, Y> * >
+  : generic_type_traits<map_ptr_tag, MapAdaptor, T_map>
+{
+  typedef X inner_k_type;
+  typedef Y inner_type;
+};
+
+template <class X, class Y>
+struct type_traits< QMap<X, Y> >
+  : generic_type_traits<map_tag, MapAdaptor, T_map>
+{
+  typedef X inner_k_type;
+  typedef Y inner_type;
+};
+
+template <class X, class Y>
+struct type_traits< const QMap<X, Y> & >
+  : generic_type_traits<map_cref_tag, MapAdaptor, T_map>
+{
+  typedef X inner_k_type;
+  typedef Y inner_type;
+};
+
+template <class X, class Y>
+struct type_traits< QMap<X, Y> & >
+  : generic_type_traits<map_ref_tag, MapAdaptor, T_map>
+{
+  typedef X inner_k_type;
+  typedef Y inner_type;
+};
+
+template <class X, class Y>
+struct type_traits< const QMap<X, Y> * >
+  : generic_type_traits<map_cptr_tag, MapAdaptor, T_map>
+{
+  typedef X inner_k_type;
+  typedef Y inner_type;
+};
+
+template <class X, class Y>
+struct type_traits< QMap<X, Y> * >
+  : generic_type_traits<map_ptr_tag, MapAdaptor, T_map>
+{
+  typedef X inner_k_type;
+  typedef Y inner_type;
+};
+
+#endif
+
 template <class X>
 struct type_traits< std::set<X> >
   : generic_type_traits<vector_tag, VectorAdaptor, T_vector>
@@ -851,86 +947,6 @@ struct type_traits< std::list<X> * >
   : generic_type_traits<vector_ptr_tag, VectorAdaptor, T_vector>
 {
   typedef X inner_type;
-};
-
-template <class X, class Y>
-struct type_traits< QHash<X, Y> >
-  : generic_type_traits<map_tag, MapAdaptor, T_map>
-{
-  typedef X inner_k_type;
-  typedef Y inner_type;
-};
-
-template <class X, class Y>
-struct type_traits< const QHash<X, Y> & >
-  : generic_type_traits<map_cref_tag, MapAdaptor, T_map>
-{
-  typedef X inner_k_type;
-  typedef Y inner_type;
-};
-
-template <class X, class Y>
-struct type_traits< QHash<X, Y> & >
-  : generic_type_traits<map_ref_tag, MapAdaptor, T_map>
-{
-  typedef X inner_k_type;
-  typedef Y inner_type;
-};
-
-template <class X, class Y>
-struct type_traits< const QHash<X, Y> * >
-  : generic_type_traits<map_cptr_tag, MapAdaptor, T_map>
-{
-  typedef X inner_k_type;
-  typedef Y inner_type;
-};
-
-template <class X, class Y>
-struct type_traits< QHash<X, Y> * >
-  : generic_type_traits<map_ptr_tag, MapAdaptor, T_map>
-{
-  typedef X inner_k_type;
-  typedef Y inner_type;
-};
-
-template <class X, class Y>
-struct type_traits< QMap<X, Y> >
-  : generic_type_traits<map_tag, MapAdaptor, T_map>
-{
-  typedef X inner_k_type;
-  typedef Y inner_type;
-};
-
-template <class X, class Y>
-struct type_traits< const QMap<X, Y> & >
-  : generic_type_traits<map_cref_tag, MapAdaptor, T_map>
-{
-  typedef X inner_k_type;
-  typedef Y inner_type;
-};
-
-template <class X, class Y>
-struct type_traits< QMap<X, Y> & >
-  : generic_type_traits<map_ref_tag, MapAdaptor, T_map>
-{
-  typedef X inner_k_type;
-  typedef Y inner_type;
-};
-
-template <class X, class Y>
-struct type_traits< const QMap<X, Y> * >
-  : generic_type_traits<map_cptr_tag, MapAdaptor, T_map>
-{
-  typedef X inner_k_type;
-  typedef Y inner_type;
-};
-
-template <class X, class Y>
-struct type_traits< QMap<X, Y> * >
-  : generic_type_traits<map_ptr_tag, MapAdaptor, T_map>
-{
-  typedef X inner_k_type;
-  typedef Y inner_type;
 };
 
 template <class X, class Y>
@@ -1696,7 +1712,7 @@ struct GSI_PUBLIC IncompatibleTypeException
   : public tl::Exception
 {
   IncompatibleTypeException (const ArgType &got, const ArgType &want)
-    : tl::Exception (tl::to_string (QObject::tr ("Incompatible types: got '")) + got.to_string () + tl::to_string (QObject::tr ("', want '")) + want.to_string () + "'")
+    : tl::Exception (tl::to_string (tr ("Incompatible types: got '")) + got.to_string () + tl::to_string (tr ("', want '")) + want.to_string () + "'")
   { }
 };
 

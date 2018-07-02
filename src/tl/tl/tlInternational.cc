@@ -24,18 +24,22 @@
 #include "tlInternational.h"
 #include "tlString.h"
 
-#include <QTextCodec>
+#if defined(HAVE_QT)
+# include <QTextCodec>
+#endif
 
 #include <memory>
 #include <iostream>
 #include <locale.h>
 #include <stdio.h>
-#ifndef _WIN32
-#  include <langinfo.h>
+#if !defined(_WIN32)
+# include <langinfo.h>
 #endif
 
 namespace tl
 {
+
+#if defined(HAVE_QT)
 
 QTextCodec *ms_system_codec = 0;
 
@@ -49,7 +53,7 @@ std::string to_string (const QString &s)
   return std::string (s.toUtf8 ().constData ());
 }
 
-#ifndef _WIN32
+#if !defined(_WIN32)
 std::string system_to_string (const std::string &s)
 {
   if (! ms_system_codec) {
@@ -91,6 +95,22 @@ void initialize_codecs ()
   std::cin.imbue (c_locale);
   std::cerr.imbue (c_locale);
 }
+
+#else
+
+std::string system_to_string (const std::string &s)
+{
+  //  TODO: this fallback implementation assumes the system encoding is UTF-8
+  return s;
+}
+
+std::string string_to_system (const std::string &s)
+{
+  //  TODO: this fallback implementation assumes the system encoding is UTF-8
+  return std::string (s);
+}
+
+#endif
 
 }
 

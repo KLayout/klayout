@@ -23,8 +23,6 @@
 #ifndef HDR_tlHttpStreamCurl
 #define HDR_tlHttpStreamCurl
 
-#if defined(HAVE_CURL)
-
 #include "tlStream.h"
 #include "tlEvents.h"
 #include "tlObject.h"
@@ -162,8 +160,6 @@ private:
 };
 
 }
-
-#endif
 
 #endif
 

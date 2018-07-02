@@ -481,28 +481,28 @@ namespace tl
 template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Polygon &p)
 {
   if (! test_extractor_impl (ex, p)) {
-    ex.error (tl::to_string (QObject::tr ("Expected a polygon specification")));
+    ex.error (tl::to_string (tr ("Expected a polygon specification")));
   }
 }
 
 template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPolygon &p)
 {
   if (! test_extractor_impl (ex, p)) {
-    ex.error (tl::to_string (QObject::tr ("Expected a polygon specification")));
+    ex.error (tl::to_string (tr ("Expected a polygon specification")));
   }
 }
 
 template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::SimplePolygon &p)
 {
   if (! test_extractor_impl (ex, p)) {
-    ex.error (tl::to_string (QObject::tr ("Expected a polygon specification")));
+    ex.error (tl::to_string (tr ("Expected a polygon specification")));
   }
 }
 
 template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DSimplePolygon &p)
 {
   if (! test_extractor_impl (ex, p)) {
-    ex.error (tl::to_string (QObject::tr ("Expected a polygon specification")));
+    ex.error (tl::to_string (tr ("Expected a polygon specification")));
   }
 }
 

@@ -23,7 +23,6 @@
 
 #include "tlObject.h"
 
-#include <QMutexLocker>
 #include <memory>
 
 namespace tl
@@ -181,27 +180,27 @@ namespace {
     GlobalLockInitializer ()
     {
       if (! sp_lock) {
-        sp_lock = new QMutex ();
+        sp_lock = new tl::Mutex ();
       }
     }
 
-    QMutex &gl ()
+    tl::Mutex &gl ()
     {
       return *sp_lock;
     }
 
   private:
-    static QMutex *sp_lock;
+    static tl::Mutex *sp_lock;
   };
 
-  QMutex *GlobalLockInitializer::sp_lock = 0;
+  tl::Mutex *GlobalLockInitializer::sp_lock = 0;
 
   //  This ensures the instance is created in the initialization code
   static GlobalLockInitializer s_gl_init;
 
 }
 
-QMutex &WeakOrSharedPtr::lock ()
+tl::Mutex &WeakOrSharedPtr::lock ()
 {
   //  NOTE: to ensure proper function in static initialization code we cannot simply use
   //  a static QMutex instance - this may not be initialized. This is not entirely thread
@@ -224,7 +223,7 @@ const Object *WeakOrSharedPtr::get () const
 
 void WeakOrSharedPtr::reset_object ()
 {
-  QMutexLocker locker (&lock ());
+  tl::MutexLocker locker (&lock ());
 
   if (mp_t) {
     mp_t->unregister_ptr (this);
@@ -242,7 +241,7 @@ void WeakOrSharedPtr::reset (Object *t, bool is_shared, bool is_event)
   Object *to_delete = 0;
 
   {
-    QMutexLocker locker (&lock ());
+    tl::MutexLocker locker (&lock ());
 
     if (mp_t) {
       Object *told = mp_t;

@@ -690,14 +690,14 @@ struct cell_inst_array_defs
 static void check_is_editable (const db::Instances *insts)
 {
   if (! insts->is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function permitted on editable layouts only")));
+    throw tl::Exception (tl::to_string (tr ("Function permitted on editable layouts only")));
   }
 }
 
 static void check_is_editable (const db::Cell *cell)
 {
   if (cell->layout () && ! cell->layout ()->is_editable ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Function permitted on editable layouts only")));
+    throw tl::Exception (tl::to_string (tr ("Function permitted on editable layouts only")));
   }
 }
 
@@ -745,7 +745,7 @@ static db::Shapes::shape_iterator begin_touching_shapes_um (const db::Cell *s, u
 {
   const db::Layout *layout = s->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
   }
   return s->begin_touching (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, flags);
 }
@@ -754,7 +754,7 @@ static db::Shapes::shape_iterator begin_touching_shapes_all_um (const db::Cell *
 {
   const db::Layout *layout = s->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
   }
   return s->begin_touching (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, db::ShapeIterator::All);
 }
@@ -763,7 +763,7 @@ static db::Shapes::shape_iterator begin_overlapping_shapes_um (const db::Cell *s
 {
   const db::Layout *layout = s->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
   }
   return s->begin_overlapping (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, flags);
 }
@@ -772,7 +772,7 @@ static db::Shapes::shape_iterator begin_overlapping_shapes_all_um (const db::Cel
 {
   const db::Layout *layout = s->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer search box")));
   }
   return s->begin_overlapping (layer_index, db::CplxTrans (layout->dbu ()).inverted () * box, db::ShapeIterator::All);
 }
@@ -790,7 +790,7 @@ static db::Instance insert_dcell_inst_array_with_props (db::Cell *c, const db::D
 {
   const db::Layout *layout = c->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot insert a micrometer-unit cell instance array")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot insert a micrometer-unit cell instance array")));
   }
 
   db::CellInstArray inst = cell_inst_array_defs<db::DCellInstArray>::transform_array (dinst, db::CplxTrans (layout->dbu ()).inverted ());
@@ -815,7 +815,7 @@ static db::Instance replace_dinst_with_props (db::Cell *c, const db::Instance &o
 {
   const db::Layout *layout = c->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer-unit cell instance array")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit cell instance array")));
   }
 
   db::CellInstArray inst = cell_inst_array_defs<db::DCellInstArray>::transform_array (dinst, db::CplxTrans (layout->dbu ()).inverted ());
@@ -890,7 +890,7 @@ static void delete_cell_property (db::Cell *c, const tl::Variant &key)
 
   db::Layout *layout = c->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot delete properties")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot delete properties")));
   }
 
   std::pair<bool, db::property_names_id_type> nid = layout->properties_repository ().get_id_of_name (key);
@@ -913,7 +913,7 @@ static void set_cell_property (db::Cell *c, const tl::Variant &key, const tl::Va
 
   db::Layout *layout = c->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot set properties")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot set properties")));
   }
 
   db::property_names_id_type nid = layout->properties_repository ().prop_name_id (key);
@@ -938,7 +938,7 @@ static tl::Variant get_cell_property (db::Cell *c, const tl::Variant &key)
 
   db::Layout *layout = c->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot retrieve properties")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot retrieve properties")));
   }
 
   std::pair<bool, db::property_names_id_type> nid = layout->properties_repository ().get_id_of_name (key);
@@ -1215,10 +1215,10 @@ begin_shapes_rec (const db::Cell *cell, unsigned int layer)
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell is not inside layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
   }
   if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid layer index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
   }
   return db::RecursiveShapeIterator (*layout, *cell, layer);
 }
@@ -1228,10 +1228,10 @@ begin_shapes_rec_touching (const db::Cell *cell, unsigned int layer, db::Box reg
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell is not inside layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
   }
   if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid layer index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
   }
   return db::RecursiveShapeIterator (*layout, *cell, layer, region, false);
 }
@@ -1241,10 +1241,10 @@ begin_shapes_rec_touching_um (const db::Cell *cell, unsigned int layer, db::DBox
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell is not inside layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
   }
   if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid layer index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
   }
   return db::RecursiveShapeIterator (*layout, *cell, layer, db::CplxTrans (layout->dbu ()).inverted () * region, false);
 }
@@ -1254,10 +1254,10 @@ begin_shapes_rec_overlapping (const db::Cell *cell, unsigned int layer, db::Box 
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell is not inside layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
   }
   if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid layer index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
   }
   return db::RecursiveShapeIterator (*layout, *cell, layer, region, true);
 }
@@ -1267,10 +1267,10 @@ begin_shapes_rec_overlapping_um (const db::Cell *cell, unsigned int layer, db::D
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell is not inside layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
   }
   if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid layer index")));
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
   }
   return db::RecursiveShapeIterator (*layout, *cell, layer, db::CplxTrans (layout->dbu ()).inverted () * region, true);
 }
@@ -1278,16 +1278,16 @@ begin_shapes_rec_overlapping_um (const db::Cell *cell, unsigned int layer, db::D
 static void copy_shapes2 (db::Cell *cell, const db::Cell &source_cell, const db::LayerMapping &layer_mapping)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy shapes within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
   }
 
   db::Layout *target_layout = cell->layout ();
   if (! target_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
   const db::Layout *source_layout = source_cell.layout ();
   if (! source_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Source cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
   if (target_layout != source_layout) {
@@ -1306,16 +1306,16 @@ static void copy_shapes2 (db::Cell *cell, const db::Cell &source_cell, const db:
 static void copy_shapes1 (db::Cell *cell, const db::Cell &source_cell)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy shapes within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
   }
   db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
 
   if (layout != source_cell.layout ()) {
     if (! source_cell.layout ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Source cell does not reside in a layout")));
+      throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
     }
     db::LayerMapping lm;
     lm.create_full (*layout, *source_cell.layout ());
@@ -1330,10 +1330,10 @@ static void copy_shapes1 (db::Cell *cell, const db::Cell &source_cell)
 static void copy_instances (db::Cell *cell, const db::Cell &source_cell)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy instances within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot copy instances within the same cell")));
   }
   if (cell->layout () != source_cell.layout ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cells do not reside in the same layout")));
+    throw tl::Exception (tl::to_string (tr ("Cells do not reside in the same layout")));
   }
 
   for (db::Cell::const_iterator i = source_cell.begin (); ! i.at_end (); ++i) {
@@ -1344,16 +1344,16 @@ static void copy_instances (db::Cell *cell, const db::Cell &source_cell)
 static std::vector<db::cell_index_type> copy_tree (db::Cell *cell, const db::Cell &source_cell)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy shapes within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
   }
 
   db::Layout *target_layout = cell->layout ();
   if (! target_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
   const db::Layout *source_layout = source_cell.layout ();
   if (! source_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Source cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
   db::PropertyMapper pm (*target_layout, *source_layout);
@@ -1375,16 +1375,16 @@ static std::vector<db::cell_index_type> copy_tree (db::Cell *cell, const db::Cel
 static void copy_tree_shapes2 (db::Cell *cell, const db::Cell &source_cell, const db::CellMapping &cm)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy shapes within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
   }
 
   db::Layout *target_layout = cell->layout ();
   if (! target_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
   const db::Layout *source_layout = source_cell.layout ();
   if (! source_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Source cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
   db::PropertyMapper pm (*target_layout, *source_layout);
@@ -1401,16 +1401,16 @@ static void copy_tree_shapes2 (db::Cell *cell, const db::Cell &source_cell, cons
 static void copy_tree_shapes3 (db::Cell *cell, const db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot copy shapes within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot copy shapes within the same cell")));
   }
 
   db::Layout *target_layout = cell->layout ();
   if (! target_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
   const db::Layout *source_layout = source_cell.layout ();
   if (! source_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Source cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
   db::PropertyMapper pm (*target_layout, *source_layout);
@@ -1424,16 +1424,16 @@ static void copy_tree_shapes3 (db::Cell *cell, const db::Cell &source_cell, cons
 static void move_shapes2 (db::Cell *cell, db::Cell &source_cell, const db::LayerMapping &layer_mapping)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot move shapes within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
   }
 
   db::Layout *target_layout = cell->layout ();
   if (! target_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
   db::Layout *source_layout = source_cell.layout ();
   if (! source_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Source cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
   if (target_layout != source_layout) {
@@ -1454,16 +1454,16 @@ static void move_shapes2 (db::Cell *cell, db::Cell &source_cell, const db::Layer
 static void move_shapes1 (db::Cell *cell, db::Cell &source_cell)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot move shapes within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
   }
   db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
 
   if (layout != source_cell.layout ()) {
     if (! source_cell.layout ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Source cell does not reside in a layout")));
+      throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
     }
     db::LayerMapping lm;
     lm.create_full (*layout, *source_cell.layout ());
@@ -1479,10 +1479,10 @@ static void move_shapes1 (db::Cell *cell, db::Cell &source_cell)
 static void move_instances (db::Cell *cell, db::Cell &source_cell)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot move instances within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot move instances within the same cell")));
   }
   if (cell->layout () != source_cell.layout ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cells do not reside in the same layout")));
+    throw tl::Exception (tl::to_string (tr ("Cells do not reside in the same layout")));
   }
 
   for (db::Cell::const_iterator i = source_cell.begin (); ! i.at_end (); ++i) {
@@ -1495,16 +1495,16 @@ static void move_instances (db::Cell *cell, db::Cell &source_cell)
 static std::vector<db::cell_index_type> move_tree (db::Cell *cell, db::Cell &source_cell)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot move shapes within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
   }
 
   db::Layout *target_layout = cell->layout ();
   if (! target_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
   db::Layout *source_layout = source_cell.layout ();
   if (! source_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Source cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
   db::PropertyMapper pm (*target_layout, *source_layout);
@@ -1528,16 +1528,16 @@ static std::vector<db::cell_index_type> move_tree (db::Cell *cell, db::Cell &sou
 static void move_tree_shapes2 (db::Cell *cell, db::Cell &source_cell, const db::CellMapping &cm)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot move shapes within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
   }
 
   db::Layout *target_layout = cell->layout ();
   if (! target_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
   db::Layout *source_layout = source_cell.layout ();
   if (! source_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Source cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
   db::PropertyMapper pm (*target_layout, *source_layout);
@@ -1554,16 +1554,16 @@ static void move_tree_shapes2 (db::Cell *cell, db::Cell &source_cell, const db::
 static void move_tree_shapes3 (db::Cell *cell, db::Cell &source_cell, const db::CellMapping &cm, const db::LayerMapping &lm)
 {
   if (cell == &source_cell) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cannot move shapes within the same cell")));
+    throw tl::Exception (tl::to_string (tr ("Cannot move shapes within the same cell")));
   }
 
   db::Layout *target_layout = cell->layout ();
   if (! target_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside in a layout")));
   }
   db::Layout *source_layout = source_cell.layout ();
   if (! source_layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Source cell does not reside in a layout")));
+    throw tl::Exception (tl::to_string (tr ("Source cell does not reside in a layout")));
   }
 
   db::PropertyMapper pm (*target_layout, *source_layout);
@@ -1578,7 +1578,7 @@ static void
 fill_region1 (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cell_index, const db::Box &fc_box, const db::Point *origin)
 {
   if (fc_box.empty () || fc_box.width () == 0 || fc_box.height () == 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid fill cell footprint (empty or zero width/height)")));
+    throw tl::Exception (tl::to_string (tr ("Invalid fill cell footprint (empty or zero width/height)")));
   }
   db::fill_region (cell, fr, fill_cell_index, fc_box, origin ? *origin : db::Point (), origin == 0, 0, db::Vector (), 0);
 }
@@ -1588,7 +1588,7 @@ fill_region2 (db::Cell *cell, const db::Region &fr, db::cell_index_type fill_cel
               db::Region *remaining_parts, const db::Vector &fill_margin, db::Region *remaining_polygons)
 {
   if (fc_box.empty () || fc_box.width () == 0 || fc_box.height () == 0) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid fill cell footprint (empty or zero width/height)")));
+    throw tl::Exception (tl::to_string (tr ("Invalid fill cell footprint (empty or zero width/height)")));
   }
   db::fill_region (cell, fr, fill_cell_index, fc_box, origin ? *origin : db::Point (), origin == 0, remaining_parts, fill_margin, remaining_polygons);
 }
@@ -1597,7 +1597,7 @@ static db::Instance cell_inst_dtransform_simple (db::Cell *cell, const db::Insta
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
   }
 
   db::CplxTrans dbu_trans (layout->dbu ());
@@ -1608,7 +1608,7 @@ static db::Instance cell_inst_dtransform_cplx (db::Cell *cell, const db::Instanc
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
   }
 
   db::CplxTrans dbu_trans (layout->dbu ());
@@ -1619,7 +1619,7 @@ static db::Instance cell_inst_dtransform_into_simple (db::Cell *cell, const db::
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
   }
 
   db::CplxTrans dbu_trans (layout->dbu ());
@@ -1630,7 +1630,7 @@ static db::Instance cell_inst_dtransform_into_cplx (db::Cell *cell, const db::In
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
   }
 
   db::CplxTrans dbu_trans (layout->dbu ());
@@ -1641,7 +1641,7 @@ static void cell_dtransform_into_simple (db::Cell *cell, const db::DTrans &t)
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
   }
 
   db::CplxTrans dbu_trans (layout->dbu ());
@@ -1652,7 +1652,7 @@ static void cell_dtransform_into_cplx (db::Cell *cell, const db::DCplxTrans &t)
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit transformation")));
   }
 
   db::CplxTrans dbu_trans (layout->dbu ());
@@ -1663,7 +1663,7 @@ static db::DBox cell_dbbox (const db::Cell *cell)
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot get the micrometer-unit bounding box")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot get the micrometer-unit bounding box")));
   }
 
   return cell->bbox () * layout->dbu ();
@@ -1673,7 +1673,7 @@ static db::DBox cell_dbbox_per_layer (const db::Cell *cell, unsigned int layer_i
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot get the micrometer-unit bounding box")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot get the micrometer-unit bounding box")));
   }
 
   return cell->bbox (layer_index) * layout->dbu ();
@@ -1683,7 +1683,7 @@ static db::Cell::overlapping_iterator cell_begin_overlapping_inst_um (const db::
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer-unit search boxes")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit search boxes")));
   }
 
   db::CplxTrans dbu_trans (layout->dbu ());
@@ -1694,7 +1694,7 @@ static db::Cell::touching_iterator cell_begin_touching_inst_um (const db::Cell *
 {
   const db::Layout *layout = cell->layout ();
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Cell does not reside inside a layout - cannot use a micrometer-unit search boxes")));
+    throw tl::Exception (tl::to_string (tr ("Cell does not reside inside a layout - cannot use a micrometer-unit search boxes")));
   }
 
   db::CplxTrans dbu_trans (layout->dbu ());
@@ -3077,7 +3077,7 @@ static double inst_dbu (const db::Instance *inst)
 {
   const db::Layout *layout = layout_ptr_const (inst);
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Instance is not a part of a layout - cannot determine database unit")));
+    throw tl::Exception (tl::to_string (tr ("Instance is not a part of a layout - cannot determine database unit")));
   }
   return layout->dbu ();
 }
@@ -3159,13 +3159,13 @@ static void set_parent_cell_ptr (db::Instance *i, db::Cell *new_parent)
 {
   db::Cell *parent = parent_cell_ptr (i);
   if (! parent) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Instance does not reside in a cell")));
+    throw tl::Exception (tl::to_string (tr ("Instance does not reside in a cell")));
   }
   if (! parent->layout ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Instance does not reside in a cell")));
+    throw tl::Exception (tl::to_string (tr ("Instance does not reside in a cell")));
   }
   if (new_parent->layout () != parent->layout ()) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Source and target layouts are not identical")));
+    throw tl::Exception (tl::to_string (tr ("Source and target layouts are not identical")));
   }
 
   if (new_parent != parent) {
@@ -3186,7 +3186,7 @@ static void delete_property (db::Instance *i, const tl::Variant &key)
 
   db::Layout *layout = layout_ptr (i);
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Instance does not reside inside a layout - cannot delete properties")));
+    throw tl::Exception (tl::to_string (tr ("Instance does not reside inside a layout - cannot delete properties")));
   }
 
   std::pair<bool, db::property_names_id_type> nid = layout->properties_repository ().get_id_of_name (key);
@@ -3208,7 +3208,7 @@ static void set_property (db::Instance *i, const tl::Variant &key, const tl::Var
 
   db::Layout *layout = layout_ptr (i);
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Instance does not reside inside a layout - cannot set properties")));
+    throw tl::Exception (tl::to_string (tr ("Instance does not reside inside a layout - cannot set properties")));
   }
 
   db::property_names_id_type nid = layout->properties_repository ().prop_name_id (key);
@@ -3232,7 +3232,7 @@ static tl::Variant get_property (const db::Instance *i, const tl::Variant &key)
 
   const db::Layout *layout = layout_ptr_const (i);
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Instance does not reside inside a layout - cannot retrieve properties")));
+    throw tl::Exception (tl::to_string (tr ("Instance does not reside inside a layout - cannot retrieve properties")));
   }
 
   std::pair<bool, db::property_names_id_type> nid = layout->properties_repository ().get_id_of_name (key);
@@ -3664,7 +3664,7 @@ db::Box inst_bbox_per_layer (const db::Instance *inst, unsigned int layer_index)
 {
   const db::Layout *layout = layout_ptr_const (inst);
   if (! layout) {
-    throw tl::Exception (tl::to_string (QObject::tr ("Instance is not a part of a layout - cannot compute micrometer bounding box")));
+    throw tl::Exception (tl::to_string (tr ("Instance is not a part of a layout - cannot compute micrometer bounding box")));
   }
 
   db::box_convert <db::CellInst> bc (*layout, layer_index);

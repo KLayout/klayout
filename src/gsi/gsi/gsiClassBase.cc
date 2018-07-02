@@ -25,9 +25,6 @@
 #include "tlLog.h"
 #include "tlAssert.h"
 
-#include <QMetaMethod>
-#include <QMetaObject>
-
 #include <cstdio>
 #include <set>
 
@@ -192,7 +189,7 @@ ClassBase::create_obj_from (const ClassBase *from, void *obj) const
   for (method_iterator m = begin_constructors (); m != end_constructors (); ++m) {
     if (is_constructor_of (this, *m, from)) {
       if (ctor) {
-        throw tl::Exception (tl::to_string (QObject::tr ("There are multiple conversion constructors available to convert object of type %s to type %s")), from->name (), name ());
+        throw tl::Exception (tl::to_string (tr ("There are multiple conversion constructors available to convert object of type %s to type %s")), from->name (), name ());
       }
       ctor = *m;
     }
@@ -242,7 +239,7 @@ static SpecialMethod *
 sm_default_ctor (const char *name, const gsi::ClassBase *cls)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (QObject::tr ("@brief Creates a new object of this class\n")), 
+    tl::to_string (tr ("@brief Creates a new object of this class\n")),
     false,   //  non-const
     true,    //  static
     MethodBase::DefaultCtor);
@@ -261,8 +258,8 @@ static SpecialMethod *
 sm_destroy (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (QObject::tr ("@brief Explicitly destroys the object\nExplicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.\n" 
-                                "If the object is not owned by the script, this method will do nothing.")), 
+    tl::to_string (tr ("@brief Explicitly destroys the object\nExplicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.\n"
+                       "If the object is not owned by the script, this method will do nothing.")),
     false,   //  non-const
     false,   //  non-static
     MethodBase::Destroy);
@@ -274,9 +271,9 @@ static SpecialMethod *
 sm_create (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (QObject::tr ("@brief Ensures the C++ object is created\n"
-                                "Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. "
-                                "Usually C++ objects are created on demand and not necessarily when the script object is created.")),
+    tl::to_string (tr ("@brief Ensures the C++ object is created\n"
+                       "Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. "
+                       "Usually C++ objects are created on demand and not necessarily when the script object is created.")),
     false,   //  non-const
     false,   //  non-static
     MethodBase::Create);
@@ -288,13 +285,13 @@ static SpecialMethod *
 sm_keep (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (QObject::tr ("@brief Marks the object as no longer owned by the script side.\n" 
-                                "Calling this method will make this object no longer owned by the script's memory management. "
-                                "Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. "
-                                "Technically speaking, this method will turn the script's reference into a weak reference. "
-                                "After the script engine decides to delete the reference, the object itself will still exist. "
-                                "If the object is not managed otherwise, memory leaks will occur.\n\n"
-                                "Usually it's not required to call this method. It has been introduced in version 0.24.")), 
+    tl::to_string (tr ("@brief Marks the object as no longer owned by the script side.\n"
+                       "Calling this method will make this object no longer owned by the script's memory management. "
+                       "Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. "
+                       "Technically speaking, this method will turn the script's reference into a weak reference. "
+                       "After the script engine decides to delete the reference, the object itself will still exist. "
+                       "If the object is not managed otherwise, memory leaks will occur.\n\n"
+                       "Usually it's not required to call this method. It has been introduced in version 0.24.")),
     false,   //  non-const
     false,   //  non-static
     MethodBase::Keep);
@@ -306,11 +303,11 @@ static SpecialMethod *
 sm_release (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (QObject::tr ("@brief Marks the object as managed by the script side.\n"
-                                "After calling this method on an object, the script side will be responsible for the management of the object. "
-                                "This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. "
-                                "If necessary, the script side may delete the object if the script's reference is no longer required.\n\n"
-                                "Usually it's not required to call this method. It has been introduced in version 0.24.")),
+    tl::to_string (tr ("@brief Marks the object as managed by the script side.\n"
+                       "After calling this method on an object, the script side will be responsible for the management of the object. "
+                       "This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. "
+                       "If necessary, the script side may delete the object if the script's reference is no longer required.\n\n"
+                       "Usually it's not required to call this method. It has been introduced in version 0.24.")),
     false,   //  non-const
     false,   //  non-static
     MethodBase::Release);
@@ -322,8 +319,8 @@ static SpecialMethod *
 sm_is_const (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (QObject::tr ("@brief Returns a value indicating whether the reference is a const reference\nThis method returns true, if self is a const reference.\n" 
-                                "In that case, only const methods may be called on self.")),
+    tl::to_string (tr ("@brief Returns a value indicating whether the reference is a const reference\nThis method returns true, if self is a const reference.\n"
+                       "In that case, only const methods may be called on self.")),
     true,    //  const
     false,   //  non-static
     MethodBase::IsConst);
@@ -339,8 +336,8 @@ static SpecialMethod *
 sm_destroyed (const char *name)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (QObject::tr ("@brief Returns a value indicating whether the object was already destroyed\nThis method returns true, if the object was destroyed, either explicitly or by the C++ side.\n" 
-                                "The latter may happen, if the object is owned by a C++ object which got destroyed itself.")),
+    tl::to_string (tr ("@brief Returns a value indicating whether the object was already destroyed\nThis method returns true, if the object was destroyed, either explicitly or by the C++ side.\n"
+                       "The latter may happen, if the object is owned by a C++ object which got destroyed itself.")),
     true,    //  const
     false,   //  non-static
     MethodBase::Destroyed);
@@ -356,7 +353,7 @@ static SpecialMethod *
 sm_dup (const char *name, const gsi::ClassBase *cls)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (QObject::tr ("@brief Creates a copy of self\n")),
+    tl::to_string (tr ("@brief Creates a copy of self\n")),
     true,    //  const
     false,   //  non-static
     MethodBase::Dup);
@@ -375,7 +372,7 @@ static SpecialMethod *
 sm_assign (const char *name, const gsi::ClassBase *cls)
 {
   SpecialMethod *sm = new SpecialMethod (name,
-    tl::to_string (QObject::tr ("@brief Assigns another object to self\n@args other")),
+    tl::to_string (tr ("@brief Assigns another object to self\n@args other")),
     false,   //  non-const
     false,   //  non-static
     MethodBase::Assign);

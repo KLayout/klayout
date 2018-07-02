@@ -31,14 +31,14 @@ namespace tl
 template<> void extractor_impl (tl::Extractor &ex, db::Box &b)
 {
   if (! test_extractor_impl (ex, b)) {
-    ex.error (tl::to_string (QObject::tr ("Expected an box specification")));
+    ex.error (tl::to_string (tr ("Expected an box specification")));
   }
 }
 
 template<> void extractor_impl (tl::Extractor &ex, db::DBox &b)
 {
   if (! test_extractor_impl (ex, b)) {
-    ex.error (tl::to_string (QObject::tr ("Expected an box specification")));
+    ex.error (tl::to_string (tr ("Expected an box specification")));
   }
 }
 

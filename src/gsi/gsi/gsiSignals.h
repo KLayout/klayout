@@ -38,7 +38,9 @@
 #  undef access
 #endif
 
-#include <QMetaMethod>
+#if defined(HAVE_QT)
+#  include <QMetaMethod>
+#endif
 
 /**
  *  @brief A signal exposure framework
@@ -228,6 +230,8 @@ public:
 
 // ---------------------------------------------------------------------------------------
 //  Adaptors for Qt signals
+
+#if defined(HAVE_QT)
 
 /**
  *  @brief A base class for Qt signals
@@ -686,6 +690,8 @@ inline Methods qt_signal (const char *signal, const std::string &name,
   return Methods((new QtSignalImpl<type_pair_t<A1, type_pair_t<A2, type_pair_t<A3, type_pair_t<A4, type_pair_t<A5, type_pair_t<A6, type_pair_t<A7, type_pair_t<A8, type_pair_t<A9, empty_list_t> > > > > > > > > > (signal, name, doc))
                   ->def_arg (s1)->def_arg (s2)->def_arg (s3)->def_arg (s4)->def_arg (s5)->def_arg (s6)->def_arg (s7)->def_arg (s8)->def_arg (s9));
 }
+
+#endif
 
 // ---------------------------------------------------------------------------------------
 //  Adaptors for tl::event

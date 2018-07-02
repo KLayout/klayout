@@ -1271,13 +1271,13 @@ Layout::update () const
 void 
 Layout::do_update ()
 {
-  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (QObject::tr ("Sorting")));
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Sorting")));
 
   //  establish a progress report since this operation can take some time.
   //  HINT: because of some gcc bug, automatic destruction of the tl::Progress
   //  object does not work. We overcome this problem by creating the object with new 
   //  and catching exceptions.
-  tl::RelativeProgress *pr = new tl::RelativeProgress (tl::to_string (QObject::tr ("Sorting layout")), m_cells_size, 1000);
+  tl::RelativeProgress *pr = new tl::RelativeProgress (tl::to_string (tr ("Sorting layout")), m_cells_size, 1000);
   pr->set_desc ("");
 
   try {
@@ -1287,12 +1287,12 @@ Layout::do_update ()
     if (hier_dirty ()) {
       {
         tl::SelfTimer timer (tl::verbosity () >= 31, "Updating relations");
-        pr->set_desc (tl::to_string (QObject::tr ("Updating relations")));
+        pr->set_desc (tl::to_string (tr ("Updating relations")));
         update_relations ();
       } 
       {
         tl::SelfTimer timer (tl::verbosity () >= 31, "Topological sort");
-        pr->set_desc (tl::to_string (QObject::tr ("Topological sorting")));
+        pr->set_desc (tl::to_string (tr ("Topological sorting")));
         tl_assert (topological_sort ());
       }
     }
@@ -1312,7 +1312,7 @@ Layout::do_update ()
         tl::SelfTimer timer (tl::verbosity () >= 31, "Updating bounding boxes");
         unsigned int layers = 0;
         pr->set (0);
-        pr->set_desc (tl::to_string (QObject::tr ("Updating bounding boxes")));
+        pr->set_desc (tl::to_string (tr ("Updating bounding boxes")));
         for (bottom_up_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
           ++*pr;
           cell_type &cp (cell (*c));
@@ -1333,7 +1333,7 @@ Layout::do_update ()
       {
         tl::SelfTimer timer (tl::verbosity () >= 31, "Sorting shapes");
         pr->set (0);
-        pr->set_desc (tl::to_string (QObject::tr ("Sorting shapes")));
+        pr->set_desc (tl::to_string (tr ("Sorting shapes")));
         for (bottom_up_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
           ++*pr;
           cell_type &cp (cell (*c));
@@ -1347,7 +1347,7 @@ Layout::do_update ()
       tl::SelfTimer timer (tl::verbosity () >= 31, "Sorting instances");
       size_t layers = 0;
       pr->set (0);
-      pr->set_desc (tl::to_string (QObject::tr ("Sorting instances")));
+      pr->set_desc (tl::to_string (tr ("Sorting instances")));
       for (bottom_up_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
         ++*pr;
         cell_type &cp (cell (*c));

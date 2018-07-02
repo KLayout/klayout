@@ -21,7 +21,6 @@ SOURCES = \
     tlAssert.cc \
     tlClassRegistry.cc \
     tlDataMapping.cc \
-    tlDeferredExecution.cc \
     tlDeflate.cc \
     tlException.cc \
     tlExceptions.cc \
@@ -38,27 +37,21 @@ SOURCES = \
     tlStaticObjects.cc \
     tlStream.cc \
     tlString.cc \
-    tlThreadedWorkers.cc \
     tlTimer.cc \
     tlVariant.cc \
-    tlXMLParser.cc \
-    tlXMLWriter.cc \
-    tlFileSystemWatcher.cc \
     tlFileUtils.cc \
-    tlWebDAV.cc \
     tlArch.cc \
     tlCommandLineParser.cc \
     tlUnitTest.cc \
     tlInt128Support.cc \
-    tlHttpStreamCurl.cc \
-    tlHttpStreamQt.cc
+    tlThreadedWorkers.cc \
+    tlThreads.cc
 
 HEADERS = \
     tlAlgorithm.h \
     tlAssert.h \
     tlClassRegistry.h \
     tlDataMapping.h \
-    tlDeferredExecution.h \
     tlDeflate.h \
     tlException.h \
     tlExceptions.h \
@@ -82,28 +75,65 @@ HEADERS = \
     tlStaticObjects.h \
     tlStream.h \
     tlString.h \
-    tlThreadedWorkers.h \
     tlTimer.h \
     tlTypeTraits.h \
     tlUtils.h \
     tlVariant.h \
     tlVariantUserClasses.h \
     tlVector.h \
-    tlXMLParser.h \
-    tlXMLWriter.h \
-    tlFileSystemWatcher.h \
     tlCommon.h \
     tlMath.h \
     tlCpp.h \
     tlFileUtils.h \
-    tlWebDAV.h \
     tlArch.h \
     tlCommandLineParser.h \
     tlUnitTest.h \
     tlInt128Support.h \
     tlHttpStreamCurl.h \
+    tlDefs.h \
+    tlThreadedWorkers.h \
+    tlThreads.h
+
+equals(HAVE_CURL, "1") {
+
+  SOURCES += \
+    tlHttpStreamCurl.cc \
+
+} else {
+
+  equals(HAVE_QT, "0") {
+    # no HTTP stream available
+  } else {
+
+    SOURCES += \
+      tlHttpStreamQt.cc \
+
+  }
+
+}
+
+equals(HAVE_QT, "0") {
+
+  # nothing
+
+} else {
+
+  HEADERS += \
+    tlWebDAV.h \
+    tlDeferredExecution.h \
+    tlXMLParser.h \
+    tlXMLWriter.h \
+    tlFileSystemWatcher.h \
     tlHttpStreamQt.h \
-    tlDefs.h
+
+  SOURCES += \
+    tlWebDAV.cc \
+    tlDeferredExecution.cc \
+    tlXMLParser.cc \
+    tlXMLWriter.cc \
+    tlFileSystemWatcher.cc \
+
+}
 
 INCLUDEPATH =
 DEPENDPATH =

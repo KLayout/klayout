@@ -27,8 +27,6 @@
 #include "dbBox.h"
 #include "dbEdge.h"
 
-#include <QDir>
-
 TEST(1) 
 {
   rdb::Database db;

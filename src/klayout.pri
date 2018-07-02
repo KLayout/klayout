@@ -47,6 +47,10 @@ equals(HAVE_CURL, "1") {
   DEFINES += HAVE_CURL
 }
 
+equals(HAVE_EXPAT, "1") {
+  DEFINES += HAVE_EXPAT
+}
+
 equals(HAVE_RUBY, "1") {
   DEFINES += \
     HAVE_RUBY \

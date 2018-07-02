@@ -26,14 +26,6 @@
 
 #include "tlCommon.h"
 
-#if !defined(HAVE_XML)
-#  error tl::XMLParser not available without QtXml
-#endif
-
-#include <QXmlInputSource>
-#include <QXmlDefaultHandler>
-#include <QXmlLocator>
-
 #include <list>
 #include <vector>
 
@@ -55,7 +47,7 @@ class TL_PUBLIC XMLException : public tl::Exception
 {
 public: 
   XMLException (const char *msg)
-    : Exception (tl::to_string (QObject::tr ("XML parser error: %s")).c_str ()),
+    : Exception (tl::to_string (tr ("XML parser error: %s")).c_str ()),
       m_msg (msg)
   {
     //  .. nothing yet ..
@@ -91,9 +83,9 @@ private:
   static std::string fmt (int line, int /*column*/)
   {
     if (line < 0) {
-      return tl::to_string (QObject::tr ("XML parser error: %s")).c_str ();
+      return tl::to_string (tr ("XML parser error: %s")).c_str ();
     } else {
-      return tl::to_string (QObject::tr ("XML parser error: %s in line %d, column %d")).c_str ();
+      return tl::to_string (tr ("XML parser error: %s in line %d, column %d")).c_str ();
     }
   }
 };
@@ -305,6 +297,9 @@ private:
   std::vector <XMLReaderProxyBase *> m_objects;
 };
 
+//  The opaque source type
+class XMLSourcePrivateData;
+
 /**
  *  @brief A generic XML text source class
  *
@@ -316,17 +311,22 @@ private:
 class TL_PUBLIC XMLSource 
 {
 public:
-  XMLSource ()
+  XMLSource ();
+  virtual ~XMLSource ();
+
+  virtual XMLSourcePrivateData *source ()
   {
-    //  ..  nothing yet ..
-  }
-  
-  virtual ~XMLSource ()
-  {
-    //  ..  nothing yet ..
+    return mp_source;
   }
 
-  virtual QXmlInputSource *source () = 0;
+protected:
+  void set_source (XMLSourcePrivateData *source)
+  {
+    mp_source = source;
+  }
+
+private:
+  XMLSourcePrivateData *mp_source;
 };
 
 /**
@@ -338,14 +338,6 @@ class TL_PUBLIC XMLStringSource : public XMLSource
 public:
   XMLStringSource (const std::string &string);
   virtual ~XMLStringSource ();
-
-  virtual QXmlInputSource *source ()  
-  {
-    return mp_source;
-  }
-
-private:
-  QXmlInputSource *mp_source;
 };
 
 /**
@@ -358,16 +350,6 @@ public:
   XMLFileSource (const std::string &path);
   XMLFileSource (const std::string &path, const std::string &progress_message);
   virtual ~XMLFileSource ();
-
-  virtual QXmlInputSource *source ()  
-  {
-    return mp_source;
-  }
-
-private:
-  QXmlInputSource *mp_source;
-  QIODevice *mp_io;
-  tl::InputStream m_stream;
 };
 
 /**
@@ -382,36 +364,8 @@ public:
   XMLStreamSource (tl::InputStream &stream);
   XMLStreamSource (tl::InputStream &stream, const std::string &progress_message);
   virtual ~XMLStreamSource ();
-
-  virtual QXmlInputSource *source ()  
-  {
-    return mp_source;
-  }
-
-private:
-  QXmlInputSource *mp_source;
-  QIODevice *mp_io;
 };
 
-
-/**
- *  @brief The XML parser class
- *
- *  The class is the basic wrapper around the Qt XML parser.
- *  It is provided mainly for compatibility with the "libparsifal branch".
- */
-
-class TL_PUBLIC XMLParser
-{
-public:
-  XMLParser ();
-  ~XMLParser ();
-
-  void parse (XMLSource &source, QXmlDefaultHandler &handler);
-
-private:
-  QXmlSimpleReader *mp_reader;
-};
 
 // -----------------------------------------------------------------
 //  The C++ structure definition interface (for use cases see tlXMLParser.ut)
@@ -433,26 +387,38 @@ struct pass_by_ref_tag {
  *  elements to implement the search algorithm.
  */
 
-class TL_PUBLIC XMLStructureHandler 
-  : public QXmlDefaultHandler
+class TL_PUBLIC XMLStructureHandler
 {
 public:
   XMLStructureHandler (const XMLElementBase *root, XMLReaderState *reader_state);
 
-  bool characters (const QString &ch);
-  bool endElement (const QString &namespaceURI, const QString &localName, const QString &qName);
-  bool startElement (const QString &namespaceURI, const QString &localName, const QString &qName, const QXmlAttributes &atts);
-  bool error (const QXmlParseException &exception);
-  bool fatalError (const QXmlParseException &exception);
-  bool warning (const QXmlParseException &exception);
-
-  void setDocumentLocator (QXmlLocator *locator);
+  void characters (const std::string &ch);
+  void end_element (const std::string &uri, const std::string &lname, const std::string &qname);
+  void start_element (const std::string &uri, const std::string &lname, const std::string &qname);
 
 private:
-  std::vector <const XMLElementBase *> m_stack;  
+  std::vector <const XMLElementBase *> m_stack;
   const XMLElementBase *mp_root;
-  QXmlLocator *mp_locator;
   XMLReaderState *mp_state;
+};
+
+class XMLParserPrivateData;
+
+/**
+ *  @brief The XML parser class
+ *  This is the main entry point. It will take a structure handler and
+ *  parse the given source.
+ */
+class TL_PUBLIC XMLParser
+{
+public:
+  XMLParser ();
+  ~XMLParser ();
+
+  void parse (XMLSource &source, XMLStructureHandler &handler);
+
+private:
+  XMLParserPrivateData *mp_data;
 };
 
 /**

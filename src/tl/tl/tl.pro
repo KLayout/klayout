@@ -44,6 +44,8 @@ SOURCES = \
     tlCommandLineParser.cc \
     tlUnitTest.cc \
     tlInt128Support.cc \
+    tlXMLParser.cc \
+    tlXMLWriter.cc \
     tlThreadedWorkers.cc \
     tlThreads.cc
 
@@ -91,46 +93,44 @@ HEADERS = \
     tlInt128Support.h \
     tlHttpStreamCurl.h \
     tlDefs.h \
+    tlXMLParser.h \
+    tlXMLWriter.h \
     tlThreadedWorkers.h \
     tlThreads.h
 
 equals(HAVE_CURL, "1") {
 
+  HEADERS += \
+    tlWebDAV.h \
+
   SOURCES += \
     tlHttpStreamCurl.cc \
+    tlWebDAV.cc \
 
 } else {
 
-  equals(HAVE_QT, "0") {
-    # no HTTP stream available
-  } else {
+  !equals(HAVE_QT, "0") {
+
+    HEADERS += \
+      tlHttpStreamQt.h \
+      tlWebDAV.h \
 
     SOURCES += \
       tlHttpStreamQt.cc \
+      tlWebDAV.cc \
 
   }
 
 }
 
-equals(HAVE_QT, "0") {
-
-  # nothing
-
-} else {
+!equals(HAVE_QT, "0") {
 
   HEADERS += \
-    tlWebDAV.h \
     tlDeferredExecution.h \
-    tlXMLParser.h \
-    tlXMLWriter.h \
     tlFileSystemWatcher.h \
-    tlHttpStreamQt.h \
 
   SOURCES += \
-    tlWebDAV.cc \
     tlDeferredExecution.cc \
-    tlXMLParser.cc \
-    tlXMLWriter.cc \
     tlFileSystemWatcher.cc \
 
 }

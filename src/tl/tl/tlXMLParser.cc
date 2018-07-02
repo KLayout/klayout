@@ -27,27 +27,482 @@
 #include "tlAssert.h"
 #include "tlProgress.h"
 
-#include <QFile>
-#include <QIODevice>
-
 #include <cstring>
+#include <memory>
+
+#if defined(HAVE_EXPAT)
+
+#include <expat.h>
 
 namespace tl
 {
+
+// --------------------------------------------------------------------
+//  SourcePrivateData implementation
+
+class XMLSourcePrivateData
+{
+public:
+  XMLSourcePrivateData (tl::InputStreamBase *stream_delegate)
+    : mp_stream_holder (new tl::InputStream (*stream_delegate)),
+      mp_stream_delegate (stream_delegate),
+      m_has_error (false)
+  {
+    mp_stream = mp_stream_holder.get ();
+  }
+
+  XMLSourcePrivateData (tl::InputStreamBase *stream_delegate, const std::string &progress_message)
+    : mp_stream_holder (new tl::InputStream (*stream_delegate)),
+      mp_stream_delegate (stream_delegate),
+      mp_progress (new AbsoluteProgress (progress_message, 100)),
+      m_has_error (false)
+  {
+    mp_stream = mp_stream_holder.get ();
+    mp_progress->set_format (tl::to_string (tr ("%.0f MB")));
+    mp_progress->set_unit (1024 * 1024);
+  }
+
+  XMLSourcePrivateData (tl::InputStream &stream)
+    : m_has_error (false)
+  {
+    mp_stream = &stream;
+  }
+
+  XMLSourcePrivateData (tl::InputStream &stream, const std::string &progress_message)
+    : mp_progress (new AbsoluteProgress (progress_message, 100)),
+      m_has_error (false)
+  {
+    mp_stream = &stream;
+    mp_progress->set_format (tl::to_string (tr ("%.0f MB")));
+    mp_progress->set_unit (1024 * 1024);
+  }
+
+  size_t read (char *data, size_t n)
+  {
+    try {
+
+      if (mp_progress.get ()) {
+        mp_progress->set (mp_stream->pos ());
+      }
+
+      size_t n0 = n;
+      for (const char *rd = 0; n > 0 && (rd = mp_stream->get (1)) != 0; --n) {
+        *data++ = *rd;
+      }
+
+      if (n0 == n) {
+        return -1;
+      } else {
+        return n0 - n;
+      }
+
+    } catch (tl::Exception &ex) {
+      m_error = ex.msg ();
+      m_has_error = true;
+      return -1;
+    }
+  }
+
+  bool has_error () const
+  {
+    return m_has_error;
+  }
+
+  const std::string &error_msg () const
+  {
+    return m_error;
+  }
+
+private:
+  std::auto_ptr<tl::InputStream> mp_stream_holder;
+  tl::InputStream *mp_stream;
+  std::auto_ptr<tl::InputStreamBase> mp_stream_delegate;
+  std::auto_ptr<tl::AbsoluteProgress> mp_progress;
+  bool m_has_error;
+  std::string m_error;
+};
+
+// --------------------------------------------------------------------
+//  XMLSource implementation
+
+XMLSource::XMLSource ()
+  : mp_source (0)
+{
+  //  .. nothing yet ..
+}
+
+XMLSource::~XMLSource ()
+{
+  delete mp_source;
+  mp_source = 0;
+}
 
 // --------------------------------------------------------------------
 //  XMLStringSource implementation
 
 XMLStringSource::XMLStringSource (const std::string &string)
 {
-  mp_source = new QXmlInputSource ();
-  mp_source->setData (QByteArray (string.c_str ()));
+  set_source (new XMLSourcePrivateData (new tl::InputMemoryStream (string.c_str (), string.size ())));
 }
 
 XMLStringSource::~XMLStringSource ()
 {
+  //  .. nothing yet ..
+}
+
+// --------------------------------------------------------------------
+//  XMLFileSource implementation
+
+XMLFileSource::XMLFileSource (const std::string &path, const std::string &progress_message)
+{
+  set_source (new XMLSourcePrivateData (new tl::InputZLibFile (path), progress_message));
+}
+
+XMLFileSource::XMLFileSource (const std::string &path)
+{
+  set_source (new XMLSourcePrivateData (new tl::InputZLibFile (path)));
+}
+
+XMLFileSource::~XMLFileSource ()
+{
+  //  .. nothing yet ..
+}
+
+// --------------------------------------------------------------------
+//  XMLStreamSource implementation
+
+XMLStreamSource::XMLStreamSource (tl::InputStream &s, const std::string &progress_message)
+{
+  set_source (new XMLSourcePrivateData (s, progress_message));
+}
+
+XMLStreamSource::XMLStreamSource (tl::InputStream &s)
+{
+  set_source (new XMLSourcePrivateData (s));
+}
+
+XMLStreamSource::~XMLStreamSource ()
+{
+  //  .. nothing yet ..
+}
+
+// --------------------------------------------------------------------
+//  XMLParser implementation
+
+void XMLCALL start_element_handler (void *user_data, const XML_Char *name, const XML_Char **atts);
+void XMLCALL end_element_handler (void *user_data, const XML_Char *name);
+void XMLCALL cdata_handler (void *user_data, const XML_Char *s, int len);
+
+class XMLParserPrivateData
+{
+public:
+  XMLParserPrivateData ()
+    : mp_struct_handler (0)
+  {
+    mp_parser = XML_ParserCreate ("UTF-8");
+    tl_assert (mp_parser != NULL);
+    XML_SetUserData (mp_parser, (void *) this);
+    XML_SetElementHandler (mp_parser, start_element_handler, end_element_handler);
+    XML_SetCharacterDataHandler (mp_parser, cdata_handler);
+  }
+
+  ~XMLParserPrivateData ()
+  {
+    if (mp_parser != NULL) {
+      XML_ParserFree (mp_parser);
+    }
+  }
+
+  void start_element (const std::string &name)
+  {
+    try {
+      //  TODO: separate qname and lname?
+      mp_struct_handler->start_element (std::string (), name, name);
+    } catch (tl::Exception &ex) {
+      error (ex);
+    }
+  }
+
+  void end_element (const std::string &name)
+  {
+    try {
+      //  TODO: separate qname and lname?
+      mp_struct_handler->end_element (std::string (), name, name);
+    } catch (tl::Exception &ex) {
+      error (ex);
+    }
+  }
+
+  void cdata (const std::string &cdata)
+  {
+    try {
+      mp_struct_handler->characters (cdata);
+    } catch (tl::Exception &ex) {
+      error (ex);
+    }
+  }
+
+  void parse (tl::XMLSource &source, XMLStructureHandler &struct_handler)
+  {
+    m_has_error = false;
+    mp_struct_handler = &struct_handler;
+
+    //  Just in case we want to reuse it ...
+    XML_ParserReset (mp_parser, "UTF-8");
+
+    const size_t chunk = 65536;
+    char buffer [chunk];
+
+    size_t n;
+
+    do {
+
+      try {
+
+        n = source.source ()->read (buffer, chunk);
+
+        XML_Status status = XML_Parse (mp_parser, buffer, int (n), n < chunk /*is final*/);
+        if (status == XML_STATUS_ERROR) {
+          m_has_error = true;
+          m_error = XML_ErrorString (XML_GetErrorCode (mp_parser));
+          m_error_line = XML_GetErrorLineNumber (mp_parser);
+          m_error_column = XML_GetErrorColumnNumber (mp_parser);
+        }
+
+      } catch (tl::Exception &ex) {
+        error (ex);
+      }
+
+    } while (n == chunk && !m_has_error);
+  }
+
+  void check_error ()
+  {
+    if (m_has_error) {
+      throw tl::XMLLocatedException (m_error, m_error_line, m_error_column);
+    }
+  }
+
+private:
+  void error (tl::Exception &ex)
+  {
+    m_has_error = true;
+    m_error_line = XML_GetCurrentLineNumber (mp_parser);
+    m_error_column = XML_GetCurrentColumnNumber (mp_parser);
+    m_error = ex.msg ();
+  }
+
+  XML_Parser mp_parser;
+  XMLStructureHandler *mp_struct_handler;
+  bool m_has_error;
+  std::string m_error;
+  int m_error_line, m_error_column;
+};
+
+void start_element_handler (void *user_data, const XML_Char *name, const XML_Char ** /*atts*/)
+{
+  XMLParserPrivateData *d = reinterpret_cast<XMLParserPrivateData *> (user_data);
+  d->start_element (std::string (name));
+}
+
+void end_element_handler (void *user_data, const XML_Char *name)
+{
+  XMLParserPrivateData *d = reinterpret_cast<XMLParserPrivateData *> (user_data);
+  d->end_element (std::string (name));
+}
+
+void cdata_handler (void *user_data, const XML_Char *s, int len)
+{
+  XMLParserPrivateData *d = reinterpret_cast<XMLParserPrivateData *> (user_data);
+  d->cdata (std::string (s, 0, size_t (len)));
+}
+
+
+XMLParser::XMLParser ()
+  : mp_data (new XMLParserPrivateData ())
+{
+  //  .. nothing yet ..
+}
+
+XMLParser::~XMLParser ()
+{
+  delete mp_data;
+  mp_data = 0;
+}
+
+void
+XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
+{
+  mp_data->parse (source, struct_handler);
+
+  //  throws an exception if there is an error
+  mp_data->check_error ();
+}
+
+}
+
+#elif defined(HAVE_QT)
+
+#include <QFile>
+#include <QIODevice>
+
+namespace tl
+{
+
+// --------------------------------------------------------------------
+//  A SAX handler for the Qt implementation
+
+class SAXHandler
+  : public QXmlDefaultHandler
+{
+public:
+  SAXHandler (trureHandler *sh);
+
+  bool characters (const QString &ch);
+  bool endElement (const QString &namespaceURI, const QString &localName, const QString &qName);
+  bool startElement (const QString &namespaceURI, const QString &localName, const QString &qName, const QXmlAttributes &atts);
+  bool error (const QXmlParseException &exception);
+  bool fatalError (const QXmlParseException &exception);
+  bool warning (const QXmlParseException &exception);
+
+  void setDocumentLocator (QXmlLocator *locator);
+
+private:
+  QXmlLocator *mp_locator;
+  trureHandler *mp_struct_handler;
+};
+
+// --------------------------------------------------------------------------------------------------------
+//  trureHandler implementation
+
+SAXHandler::SAXHandler (trureHandler *sh)
+  : QXmlDefaultHandler (), mp_locator (0), mp_struct_handler (sh)
+{
+  // .. nothing yet ..
+}
+
+void
+SAXHandler::setDocumentLocator (QXmlLocator *locator)
+{
+  mp_locator = locator;
+}
+
+bool
+SAXHandler::startElement (const QString &qs_uri, const QString &qs_lname, const QString &qs_qname, const QXmlAttributes & /*atts*/)
+{
+  std::string uri (tl::to_string (qs_uri));
+  std::string lname (tl::to_string (qs_lname));
+  std::string qname (tl::to_string (qs_qname));
+
+  try {
+    mp_struct_handler->start_element (uri, lname, qname);
+  } catch (tl::XMLException &ex) {
+    throw tl::XMLLocatedException (ex.raw_msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+  } catch (tl::Exception &ex) {
+    throw tl::XMLLocatedException (ex.msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+  }
+
+  //  successful
+  return true;
+}
+
+bool
+SAXHandler::endElement (const QString &qs_uri, const QString &qs_lname, const QString &qs_qname)
+{
+  std::string uri (tl::to_string (qs_uri));
+  std::string lname (tl::to_string (qs_lname));
+  std::string qname (tl::to_string (qs_qname));
+
+  try {
+    mp_struct_handler->end_element (uri, lname, qname);
+  } catch (tl::XMLException &ex) {
+    throw tl::XMLLocatedException (ex.raw_msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+  } catch (tl::Exception &ex) {
+    throw tl::XMLLocatedException (ex.msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+  }
+
+  //  successful
+  return true;
+}
+
+bool
+SAXHandler::characters (const QString &t)
+{
+  try {
+    mp_struct_handler->cdata (tl::to_string (t));
+  } catch (tl::XMLException &ex) {
+    throw tl::XMLLocatedException (ex.raw_msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+  } catch (tl::Exception &ex) {
+    throw tl::XMLLocatedException (ex.msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+  }
+
+  //  successful
+  return true;
+}
+
+bool
+SAXHandler::error (const QXmlParseException &ex)
+{
+  throw tl::XMLLocatedException (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ());
+}
+
+bool
+SAXHandler::fatalError (const QXmlParseException &ex)
+{
+  throw tl::XMLLocatedException (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ());
+}
+
+bool
+SAXHandler::warning (const QXmlParseException &ex)
+{
+  tl::XMLLocatedException lex (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ());
+  tl::warn << lex.msg ();
+  //  continue
+  return true;
+}
+
+// --------------------------------------------------------------------
+//  SourcePrivateData implementation
+
+class XMLSourcePrivateData
+  : public QXmlInputSource
+{
+public:
+  XMLSourcePrivateData ()
+    : QXmlInputSource ()
+  {
+    //  .. nothing yet ..
+  }
+};
+
+// --------------------------------------------------------------------
+//  XMLSource implementation
+
+XMLSource::XMLSource ()
+  : mp_source (0)
+{
+  //  .. nothing yet ..
+}
+
+XMLSource::~XMLSource ()
+{
   delete mp_source;
   mp_source = 0;
+}
+
+// --------------------------------------------------------------------
+//  XMLStringSource implementation
+
+XMLStringSource::XMLStringSource (const std::string &string)
+{
+  XMLSourcePrivateData *source = new XMLSourcePrivateData ();
+  source->setData (QByteArray (string.c_str ()));
+  set_source (source);
+}
+
+XMLStringSource::~XMLStringSource ()
+{
+  //  .. nothing yet ..
 }
 
 // --------------------------------------------------------------------
@@ -70,7 +525,7 @@ public:
       mp_progress (new AbsoluteProgress (progress_message, 100)),
       m_has_error (false)
   {
-    mp_progress->set_format (tl::to_string (QObject::tr ("%.0f MB")));
+    mp_progress->set_format (tl::to_string (tr ("%.0f MB")));
     mp_progress->set_unit (1024 * 1024);
     open (QIODevice::ReadOnly);
   }
@@ -131,14 +586,63 @@ private:
 };
 
 // --------------------------------------------------------------------
-//  ErrorAwareQXmlInputSource definition and implementation
+//  XMLFileSource implementation
 
-class ErrorAwareQXmlInputSource
-  : public QXmlInputSource
+class XMLFileSourcePrivateData
+  : public XMLSourcePrivateData
 {
 public:
-  ErrorAwareQXmlInputSource (StreamIODevice *dev)
-    : QXmlInputSource (dev), mp_dev (dev)
+  XMLFileSourcePrivateData (const std::string &path, const std::string &progress_message)
+    : m_stream (path)
+  {
+    mp_io.reset (new StreamIODevice (m_stream, progress_message));
+  }
+
+  XMLFileSourcePrivateData (const std::string &path)
+    : m_stream (path)
+  {
+    mp_io.reset (new StreamIODevice (m_stream));
+  }
+
+  virtual void fetchData ()
+  {
+    QXmlInputSource::fetchData ();
+
+    //  This feature is actually missing in the original implementation: throw an exception on error
+    if (mp_io->has_error ()) {
+      throw tl::Exception (tl::to_string (mp_io->errorString ()));
+    }
+  }
+
+private:
+  std::auto_ptr<StreamIODevice> mp_io;
+  tl::InputStream m_stream;
+};
+
+XMLFileSource::XMLFileSource (const std::string &path, const std::string &progress_message)
+{
+  set_source (new XMLFileSourcePrivateData (path, progress_message));
+}
+
+XMLFileSource::XMLFileSource (const std::string &path)
+{
+  set_source (new XMLFileSourcePrivateData (path));
+}
+
+XMLFileSource::~XMLFileSource ()
+{
+  //  .. nothing yet ..
+}
+
+// --------------------------------------------------------------------
+//  XMLStreamSource implementation
+
+class XMLStreamSourcePrivateData
+  : public XMLSourcePrivateData
+{
+public:
+  XMLStreamSourcePrivateData (StreamIODevice *io)
+    : mp_io (io)
   {
     //  .. nothing yet ..
   }
@@ -148,89 +652,68 @@ public:
     QXmlInputSource::fetchData ();
 
     //  This feature is actually missing in the original implementation: throw an exception on error
-    if (mp_dev->has_error ()) {
-      throw tl::Exception (tl::to_string (mp_dev->errorString ()));
+    if (mp_io->has_error ()) {
+      throw tl::Exception (tl::to_string (mp_io->errorString ()));
     }
   }
 
 private:
-  StreamIODevice *mp_dev;
+  std::auto_ptr<StreamIODevice> mp_io;
 };
-
-// --------------------------------------------------------------------
-//  XMLFileSource implementation
-
-XMLFileSource::XMLFileSource (const std::string &path, const std::string &progress_message)
-  : mp_source (0), mp_io (0), m_stream (path)
-{
-  StreamIODevice *io = new StreamIODevice (m_stream, progress_message);
-  mp_io = io;
-  mp_source = new ErrorAwareQXmlInputSource (io);
-}
-
-XMLFileSource::XMLFileSource (const std::string &path)
-  : mp_source (0), mp_io (0), m_stream (path)
-{
-  StreamIODevice *io = new StreamIODevice (m_stream);
-  mp_io = io;
-  mp_source = new ErrorAwareQXmlInputSource (io);
-}
-
-XMLFileSource::~XMLFileSource ()
-{
-  delete mp_source;
-  mp_source = 0;
-  delete mp_io;
-  mp_io = 0;
-}
-
-// --------------------------------------------------------------------
-//  XMLStreamSource implementation
 
 XMLStreamSource::XMLStreamSource (tl::InputStream &s, const std::string &progress_message)
 {
-  StreamIODevice *io = new StreamIODevice (s, progress_message);
-  mp_io = io;
-  mp_source = new ErrorAwareQXmlInputSource (io);
+  set_source (new XMLStreamSourcePrivateData (new StreamIODevice (s, progress_message)));
 }
 
 XMLStreamSource::XMLStreamSource (tl::InputStream &s)
 {
-  StreamIODevice *io = new StreamIODevice (s);
-  mp_io = io;
-  mp_source = new ErrorAwareQXmlInputSource (io);
+  set_source (new XMLStreamSourcePrivateData (new StreamIODevice (s)));
 }
 
 XMLStreamSource::~XMLStreamSource ()
 {
-  delete mp_source;
-  mp_source = 0;
-  delete mp_io;
-  mp_io = 0;
+  //  .. nothing yet ..
 }
 
 // --------------------------------------------------------------------
 //  XMLParser implementation
 
-XMLParser::XMLParser ()
+class XMLParserPrivateData
+  : public QXmlSimpleReader
 {
-  mp_reader = new QXmlSimpleReader ();
+public:
+  XMLParserPrivateData () : QXmlSimpleReader () { }
+};
+
+XMLParser::XMLParser ()
+  : mp_data (new XMLParserPrivateData ())
+{
+  //  .. nothing yet ..
 }
 
 XMLParser::~XMLParser ()
 {
-  delete mp_reader;
-  mp_reader = 0;
+  delete mp_data;
+  mp_data = 0;
 }
 
 void 
-XMLParser::parse (XMLSource &source, QXmlDefaultHandler &handler) 
+XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
 {
-  mp_reader->setContentHandler (&handler);
-  mp_reader->setErrorHandler (&handler);
+  SAXHandler handler (&struct_handler);
 
-  mp_reader->parse (source.source (), false /*=not incremental*/);
+  mp_data->setContentHandler (&handler);
+  mp_data->setErrorHandler (&handler);
+
+  mp_data->parse (source.source (), false /*=not incremental*/);
 }
+
+}
+
+#endif
+
+namespace tl {
 
 // -----------------------------------------------------------------
 //  The C++ structure definition interface (for use cases see tlXMLParser.ut)
@@ -294,128 +777,66 @@ XMLElementBase::write_string (tl::OutputStream &os, const std::string &s)
   }
 }
 
-//  XMLStructureHandler implementation
+// --------------------------------------------------------------------------------------------------------
+//  trureHandler implementation
 
-XMLStructureHandler::XMLStructureHandler (const XMLElementBase *root, XMLReaderState *reader_state) 
-  : QXmlDefaultHandler (), mp_root (root), mp_locator (0), mp_state (reader_state)
+XMLStructureHandler::XMLStructureHandler (const XMLElementBase *root, XMLReaderState *reader_state)
+  : mp_root (root), mp_state (reader_state)
 { 
   // .. nothing yet ..
 }
 
 void
-XMLStructureHandler::setDocumentLocator (QXmlLocator *locator)
-{
-  mp_locator = locator;
-}
-
-bool 
-XMLStructureHandler::startElement (const QString &qs_uri, const QString &qs_lname, const QString &qs_qname, const QXmlAttributes & /*atts*/)
+XMLStructureHandler::start_element (const std::string &uri, const std::string &lname, const std::string &qname)
 {
   const XMLElementBase *new_element = 0;
   const XMLElementBase *parent = 0;
 
-  std::string uri (tl::to_string (qs_uri));
-  std::string lname (tl::to_string (qs_lname));
-  std::string qname (tl::to_string (qs_qname));
-
-  try {
-
-    if (m_stack.size () == 0) {
-      if (! mp_root->check_name (uri, lname, qname)) {
-        throw tl::XMLException (tl::to_string (QObject::tr ("Root element must be ")) + mp_root->name ());
-      }
-      new_element = mp_root;
-    } else {
-      parent = m_stack.back ();
-      if (parent) {
-        for (XMLElementBase::iterator c = parent->begin (); c != parent->end (); ++c) {
-          if ((*c)->check_name (uri, lname, qname)) {
-            new_element = (*c).get ();
-            break;
-          }
+  if (m_stack.size () == 0) {
+    if (! mp_root->check_name (uri, lname, qname)) {
+      throw tl::XMLException (tl::to_string (tr ("Root element must be ")) + mp_root->name ());
+    }
+    new_element = mp_root;
+  } else {
+    parent = m_stack.back ();
+    if (parent) {
+      for (XMLElementBase::iterator c = parent->begin (); c != parent->end (); ++c) {
+        if ((*c)->check_name (uri, lname, qname)) {
+          new_element = (*c).get ();
+          break;
         }
       }
     }
-
-    if (new_element) {
-      new_element->create (parent, *mp_state, uri, lname, qname);
-    }
-
-  } catch (tl::XMLException &ex) {
-    throw tl::XMLLocatedException (ex.raw_msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
-  } catch (tl::Exception &ex) {
-    throw tl::XMLLocatedException (ex.msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
   }
-  m_stack.push_back (new_element);
 
-  //  successful
-  return true;
+  if (new_element) {
+    new_element->create (parent, *mp_state, uri, lname, qname);
+  }
+
+  m_stack.push_back (new_element);
 }
 
-bool 
-XMLStructureHandler::endElement (const QString &qs_uri, const QString &qs_lname, const QString &qs_qname)
+void
+XMLStructureHandler::end_element (const std::string &uri, const std::string &lname, const std::string &qname)
 {
   const XMLElementBase *element = m_stack.back ();
   m_stack.pop_back ();
 
-  std::string uri (tl::to_string (qs_uri));
-  std::string lname (tl::to_string (qs_lname));
-  std::string qname (tl::to_string (qs_qname));
-
-  try {
-    if (! element) {
-      //  inside unknown element
-    } else if (m_stack.size () == 0) {
-      element->finish (0, *mp_state, uri, lname, qname);
-    } else {
-      element->finish (m_stack.back (), *mp_state, uri, lname, qname);
-    }
-  } catch (tl::XMLException &ex) {
-    throw tl::XMLLocatedException (ex.raw_msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
-  } catch (tl::Exception &ex) {
-    throw tl::XMLLocatedException (ex.msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+  if (! element) {
+    //  inside unknown element
+  } else if (m_stack.size () == 0) {
+    element->finish (0, *mp_state, uri, lname, qname);
+  } else {
+    element->finish (m_stack.back (), *mp_state, uri, lname, qname);
   }
-
-  //  successful
-  return true;
 }
 
-bool 
-XMLStructureHandler::characters (const QString &t)
+void
+XMLStructureHandler::characters (const std::string &t)
 {
-  try {
-    if (m_stack.back ()) {
-      m_stack.back ()->cdata (tl::to_string (t), *mp_state);
-    }
-  } catch (tl::XMLException &ex) {
-    throw tl::XMLLocatedException (ex.raw_msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
-  } catch (tl::Exception &ex) {
-    throw tl::XMLLocatedException (ex.msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
+  if (m_stack.back ()) {
+    m_stack.back ()->cdata (t, *mp_state);
   }
-
-  //  successful
-  return true;
-}
-
-bool  
-XMLStructureHandler::error (const QXmlParseException &ex)
-{
-  throw tl::XMLLocatedException (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ());
-}
-
-bool  
-XMLStructureHandler::fatalError (const QXmlParseException &ex)
-{
-  throw tl::XMLLocatedException (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ());
-}
-
-bool  
-XMLStructureHandler::warning (const QXmlParseException &ex)
-{
-  tl::XMLLocatedException lex (tl::to_string (ex.message ()), ex.lineNumber (), ex.columnNumber ());
-  tl::warn << lex.msg ();
-  //  continue
-  return true;
 }
 
 // --------------------------------------------------------------------

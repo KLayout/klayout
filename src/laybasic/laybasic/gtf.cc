@@ -53,6 +53,7 @@
 #include <QFile>
 #include <QBuffer>
 #include <QTimer>
+#include <QXmlContentHandler>
 
 #include <fstream>
 #include <sstream>

@@ -113,6 +113,11 @@ public:
     return m_error;
   }
 
+  void reset ()
+  {
+    mp_stream->reset ();
+  }
+
 private:
   std::auto_ptr<tl::InputStream> mp_stream_holder;
   tl::InputStream *mp_stream;
@@ -135,6 +140,12 @@ XMLSource::~XMLSource ()
 {
   delete mp_source;
   mp_source = 0;
+}
+
+void
+XMLSource::reset ()
+{
+  mp_source->reset ();
 }
 
 // --------------------------------------------------------------------
@@ -345,6 +356,7 @@ XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
 
 #include <QFile>
 #include <QIODevice>
+#include <QXmlContentHandler>
 
 namespace tl
 {
@@ -356,7 +368,7 @@ class SAXHandler
   : public QXmlDefaultHandler
 {
 public:
-  SAXHandler (trureHandler *sh);
+  SAXHandler (XMLStructureHandler *sh);
 
   bool characters (const QString &ch);
   bool endElement (const QString &namespaceURI, const QString &localName, const QString &qName);
@@ -369,13 +381,13 @@ public:
 
 private:
   QXmlLocator *mp_locator;
-  trureHandler *mp_struct_handler;
+  XMLStructureHandler *mp_struct_handler;
 };
 
 // --------------------------------------------------------------------------------------------------------
 //  trureHandler implementation
 
-SAXHandler::SAXHandler (trureHandler *sh)
+SAXHandler::SAXHandler (XMLStructureHandler *sh)
   : QXmlDefaultHandler (), mp_locator (0), mp_struct_handler (sh)
 {
   // .. nothing yet ..
@@ -429,7 +441,7 @@ bool
 SAXHandler::characters (const QString &t)
 {
   try {
-    mp_struct_handler->cdata (tl::to_string (t));
+    mp_struct_handler->characters (tl::to_string (t));
   } catch (tl::XMLException &ex) {
     throw tl::XMLLocatedException (ex.raw_msg (), mp_locator->lineNumber (), mp_locator->columnNumber ());
   } catch (tl::Exception &ex) {
@@ -488,6 +500,12 @@ XMLSource::~XMLSource ()
 {
   delete mp_source;
   mp_source = 0;
+}
+
+void
+XMLSource::reset ()
+{
+  mp_source->reset ();
 }
 
 // --------------------------------------------------------------------

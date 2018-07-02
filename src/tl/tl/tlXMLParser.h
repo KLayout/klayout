@@ -312,12 +312,14 @@ class TL_PUBLIC XMLSource
 {
 public:
   XMLSource ();
-  virtual ~XMLSource ();
+  ~XMLSource ();
 
-  virtual XMLSourcePrivateData *source ()
+  XMLSourcePrivateData *source ()
   {
     return mp_source;
   }
+
+  void reset ();
 
 protected:
   void set_source (XMLSourcePrivateData *source)
@@ -337,7 +339,7 @@ class TL_PUBLIC XMLStringSource : public XMLSource
 {
 public:
   XMLStringSource (const std::string &string);
-  virtual ~XMLStringSource ();
+  ~XMLStringSource ();
 };
 
 /**
@@ -349,7 +351,7 @@ class TL_PUBLIC XMLFileSource : public XMLSource
 public:
   XMLFileSource (const std::string &path);
   XMLFileSource (const std::string &path, const std::string &progress_message);
-  virtual ~XMLFileSource ();
+  ~XMLFileSource ();
 };
 
 /**
@@ -363,7 +365,7 @@ class TL_PUBLIC XMLStreamSource : public XMLSource
 public:
   XMLStreamSource (tl::InputStream &stream);
   XMLStreamSource (tl::InputStream &stream, const std::string &progress_message);
-  virtual ~XMLStreamSource ();
+  ~XMLStreamSource ();
 };
 
 

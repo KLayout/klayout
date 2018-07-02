@@ -210,6 +210,14 @@ TestBase::TestBase (const std::string &file, const std::string &name)
   tl::TestRegistrar::reg (this);
 }
 
+void TestBase::remove_tmp_folder ()
+{
+  std::string tmpdir = tl::combine_path (tl::absolute_file_path (testtmp ()), m_testdir);
+  if (tl::file_exists (tmpdir) && ! tl::rm_dir_recursive (tmpdir)) {
+    throw tl::Exception ("Unable to clean temporary dir: " + tmpdir);
+  }
+}
+
 bool TestBase::do_test (bool editable, bool slow)
 {
   m_editable = editable;

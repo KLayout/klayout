@@ -31,6 +31,7 @@
 #if defined(HAVE_QT)
 #  include <QResource>
 #  include <QByteArray>
+#  include <QFileInfo>
 #endif
 
 #include <cctype>

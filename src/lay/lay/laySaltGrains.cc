@@ -78,7 +78,7 @@ SaltGrains::remove_collection (collection_iterator iter, bool with_files)
   //  NOTE: this is kind of inefficient, but in order to maintain the const iterator semantics this approach is required
   for (collections_type::iterator i = m_collections.begin (); i != m_collections.end (); ++i) {
     if (i == iter) {
-      if (with_files && !tl::rm_dir_recursive (tl::to_qstring (i->path ()))) {
+      if (with_files && !tl::rm_dir_recursive (i->path ())) {
         return false;
       }
       m_collections.erase (i);
@@ -101,7 +101,7 @@ SaltGrains::remove_grain (grain_iterator iter, bool with_files)
   //  NOTE: this is kind of inefficient, but in order to maintain the const iterator semantics this approach is required
   for (grains_type::iterator i = m_grains.begin (); i != m_grains.end (); ++i) {
     if (i == iter) {
-      if (with_files && !tl::rm_dir_recursive (tl::to_qstring (i->path ()))) {
+      if (with_files && !tl::rm_dir_recursive (i->path ())) {
         return false;
       }
       m_grains.erase (i);

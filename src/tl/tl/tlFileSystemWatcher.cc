@@ -31,8 +31,8 @@
 namespace tl
 {
 
-//  The maximum allowed processing tim
-const int processing_time = 20;
+//  The maximum allowed processing time in seconds
+const double processing_time = 0.02;
 
 FileSystemWatcher::FileSystemWatcher (QObject *parent)
   : QObject (parent)
@@ -120,7 +120,7 @@ FileSystemWatcher::remove_file (const std::string &path)
 void
 FileSystemWatcher::timeout ()
 {
-  QDateTime start = QDateTime::currentDateTime ();
+  tl::Clock start = tl::Clock::current ();
 
   if (m_iter == m_files.end ()) {
     m_iter = m_files.begin ();
@@ -131,7 +131,7 @@ FileSystemWatcher::timeout ()
 
   std::list<std::string> files_removed, files_changed;
 
-  while (m_index < i0 + m_batch_size && m_iter != m_files.end () && tl::msecs_to (start, QDateTime::currentDateTime()) < processing_time) {
+  while (m_index < i0 + m_batch_size && m_iter != m_files.end () && (tl::Clock::current () - start).seconds () < processing_time) {
 
     QFileInfo fi (tl::to_qstring (m_iter->first));
     if (! fi.exists ()) {

@@ -397,7 +397,7 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target)
   if (! path.empty ()) {
     coll = 0;
     for (SaltGrains::collection_iterator gg = m_root.begin_collections (); gg != m_root.end_collections (); ++gg) {
-      if (tl::is_parent_path (tl::to_qstring (gg->path ()), tl::to_qstring (path))) {
+      if (tl::is_parent_path (gg->path (), path)) {
         coll = gg.operator-> ();
         break;
       }

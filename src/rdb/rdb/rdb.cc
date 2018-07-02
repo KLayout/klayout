@@ -817,7 +817,7 @@ Item &Item::operator= (const Item &d)
     m_tag_ids = d.m_tag_ids;
 
 #if defined(HAVE_QT)
-    if (mp_image) {
+    if (mp_image.get ()) {
       mp_image.reset (0);
     }
     if (d.mp_image.get ()) {

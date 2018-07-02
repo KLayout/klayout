@@ -58,7 +58,7 @@ TEST (2)
   adir.cd (QString::fromUtf8 ("a"));
 
   EXPECT_EQ (adir.exists (), true);
-  EXPECT_EQ (tl::rm_dir_recursive (adir.absolutePath ()), true);
+  EXPECT_EQ (tl::rm_dir_recursive (tl::to_string (adir.absolutePath ())), true);
   EXPECT_EQ (adir.exists (), false);
 
   tmp_dir.mkdir (QString::fromUtf8 ("a"));
@@ -93,7 +93,7 @@ TEST (2)
   }
 
   EXPECT_EQ (adir.exists (), true);
-  EXPECT_EQ (tl::rm_dir_recursive (adir.absolutePath ()), true);
+  EXPECT_EQ (tl::rm_dir_recursive (tl::to_string (adir.absolutePath ())), true);
   EXPECT_EQ (adir.exists (), false);
   EXPECT_EQ (b1dir.exists (), false);
   EXPECT_EQ (b2dir.exists (), false);
@@ -104,7 +104,7 @@ TEST (3)
 {
   QDir tmp_dir = QFileInfo (tl::to_qstring (tmp_file ())).absoluteDir ();
 
-  tl::rm_dir_recursive (tmp_dir.filePath (QString::fromUtf8 ("a")));
+  tl::rm_dir_recursive (tl::to_string (tmp_dir.filePath (QString::fromUtf8 ("a"))));
   tmp_dir.mkdir (QString::fromUtf8 ("a"));
 
   QDir adir = tmp_dir;
@@ -132,10 +132,10 @@ TEST (3)
     file.close ();
   }
 
-  tl::rm_dir_recursive (tmp_dir.filePath (QString::fromUtf8 ("acopy")));
+  tl::rm_dir_recursive (tl::to_string (tmp_dir.filePath (QString::fromUtf8 ("acopy"))));
   tmp_dir.mkdir (QString::fromUtf8 ("acopy"));
 
-  tl::cp_dir_recursive (tmp_dir.absoluteFilePath (QString::fromUtf8 ("a")), tmp_dir.absoluteFilePath (QString::fromUtf8 ("acopy")));
+  tl::cp_dir_recursive (tl::to_string (tmp_dir.absoluteFilePath (QString::fromUtf8 ("a"))), tl::to_string (tmp_dir.absoluteFilePath (QString::fromUtf8 ("acopy"))));
 
   QDir acopydir = tmp_dir;
   EXPECT_EQ (acopydir.cd (QString::fromUtf8 ("acopy")), true);

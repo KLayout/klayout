@@ -158,7 +158,7 @@ private:
  *  @code
  *  tl::Clock start = tl::Clock::current ();
  *  ... do something
- *  if ((tl::Clock::current () - start).second () > 2) {
+ *  if ((tl::Clock::current () - start).seconds () > 2) {
  *    ... took longer than 2 seconds
  *  }
  *  @/code

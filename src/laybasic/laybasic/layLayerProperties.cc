@@ -1803,7 +1803,7 @@ LayerPropertiesList::load (tl::XMLSource &stream, std::vector <lay::LayerPropert
     properties_lists.push_back (properties_list);
   } catch (...) {
     // "new" way
-    stream.source ()->reset ();
+    stream.reset ();
     layer_prop_lists_structure.parse (stream, properties_lists); 
   }
 }

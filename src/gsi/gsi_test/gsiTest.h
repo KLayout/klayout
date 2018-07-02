@@ -833,7 +833,7 @@ struct B
   std::vector<std::vector<std::string> > m_vvs; 
   std::list<std::string> m_ls;
   std::set<std::string> m_ss;
-#if defined_HAVE_QT
+#if defined(HAVE_QT)
   QList<QString> m_qls;
   QList<QVariant> m_qlv;
   QStringList m_qsl;

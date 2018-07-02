@@ -43,7 +43,8 @@
 #include "tlString.h"
 
 #if defined(HAVE_QT)
-# include <QUrl>
+#  include <QUrl>
+#  include <QFileInfo>
 #endif
 
 namespace tl

@@ -27,6 +27,13 @@
 
 #include <limits>
 
+#if defined(HAVE_QT)
+#  include <QMutex>
+#  include <QWaitCondition>
+#  include <QThread>
+#  include <QThreadStorage>
+#endif
+
 namespace tl
 {
 
@@ -72,7 +79,7 @@ class TL_PUBLIC WaitCondition
 public:
   WaitCondition () : QWaitCondition () { }
 
-  bool wait (Mutex *mutex, unsigned long time = std::numeric_limits<unsigned long>::max ()) { QWaitCondition::wakt (mutex, time); }
+  bool wait (Mutex *mutex, unsigned long time = std::numeric_limits<unsigned long>::max ()) { return QWaitCondition::wait (mutex, time); }
 };
 
 #else
@@ -118,7 +125,7 @@ private:
 
 #if defined(HAVE_QT)
 
-public TL_PUBLIC Thread
+class TL_PUBLIC Thread
   : public QThread
 {
 public:

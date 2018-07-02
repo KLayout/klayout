@@ -154,7 +154,7 @@ SaltGrain::eff_doc_url () const
 
     //  if the resulting path is inside the downloaded package, use this path
     QString dp = fi.canonicalFilePath ();
-    if (!dp.isEmpty () && tl::is_parent_path (p, dp)) {
+    if (!dp.isEmpty () && tl::is_parent_path (tl::to_string (p), tl::to_string (dp))) {
       url = QUrl::fromLocalFile (dp);
       url.setScheme (tl::to_qstring ("file"));
       return tl::to_string (url.toString ());

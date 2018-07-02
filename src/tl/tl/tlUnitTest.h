@@ -295,6 +295,11 @@ public:
   std::string tmp_file (const std::string &fn = "tmp") const;
 
   /**
+   *  @brief Removes the temporay file folder
+   */
+  void remove_tmp_folder ();
+
+  /**
    *  @brief A generic diff printer
    */
   template <class X, class Y>

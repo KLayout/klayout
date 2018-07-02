@@ -39,6 +39,10 @@
 #include "tlTimer.h"
 #include "tlFileUtils.h"
 
+#if defined(HAVE_QT)
+#  include <QCoreApplication>
+#endif
+
 namespace pya
 {
 

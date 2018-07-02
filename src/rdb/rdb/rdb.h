@@ -938,7 +938,7 @@ public:
    */
   const QImage *image () const
   {
-    return mp_image;
+    return mp_image.get ();
   }
 
   /**

@@ -40,9 +40,9 @@ static std::locale c_locale ("C");
 // -------------------------------------------------------------------------
 //  Conversion of UTF8 to wchar_t
 
-static std::vector<wchar_t> utf8_to_wchar (const std::string &s)
+std::wstring to_wstring (const std::string &s)
 {
-  std::vector<wchar_t> ws;
+  std::wstring ws;
 
   const char *cpe = s.c_str () + s.size ();
   for (const char *cp = s.c_str (); cp < cpe; ) {
@@ -61,10 +61,10 @@ static std::vector<wchar_t> utf8_to_wchar (const std::string &s)
 
     if (c32 >= 0x10000) {
       c32 -= 0x10000;
-      ws.push_back (wchar_t (0xd800 + (c32 >> 10)));
-      ws.push_back (wchar_t (0xdc00 + (c32 & 0x3ff)));
+      ws += wchar_t (0xd800 + (c32 >> 10));
+      ws += wchar_t (0xdc00 + (c32 & 0x3ff));
     } else {
-      ws.push_back (wchar_t (c32));
+      ws += wchar_t (c32);
     }
 
   }
@@ -72,11 +72,11 @@ static std::vector<wchar_t> utf8_to_wchar (const std::string &s)
   return ws;
 }
 
-static std::string wchar_to_utf8 (const std::vector<wchar_t> &ws)
+std::string to_string (const std::wstring &ws)
 {
   std::string s;
 
-  for (std::vector<wchar_t>::const_iterator c = ws.begin (); c != ws.end (); ++c) {
+  for (std::wstring::const_iterator c = ws.begin (); c != ws.end (); ++c) {
 
     uint32_t c32 = *c;
     if (c32 >= 0xd800 && c + 1 < ws.end ()) {
@@ -140,20 +140,36 @@ std::string tl::db_to_string (double d)
 
 std::string tl::to_upper_case (const std::string &s)
 {
-  std::vector<wchar_t> ws = utf8_to_wchar (s);
-  for (std::vector<wchar_t>::iterator c = ws.begin (); c != ws.end (); ++c) {
+  std::wstring ws = to_wstring (s);
+  for (std::wstring::iterator c = ws.begin (); c != ws.end (); ++c) {
     *c = towupper (*c);
   }
-  return wchar_to_utf8 (ws);
+  return to_string (ws);
 }
 
 std::string tl::to_lower_case (const std::string &s)
 {
-  std::vector<wchar_t> ws = utf8_to_wchar (s);
-  for (std::vector<wchar_t>::iterator c = ws.begin (); c != ws.end (); ++c) {
+  std::wstring ws = to_wstring (s);
+  for (std::wstring::iterator c = ws.begin (); c != ws.end (); ++c) {
     *c = towlower (*c);
   }
-  return wchar_to_utf8 (ws);
+  return to_string (ws);
+}
+
+std::string to_local (const std::string &s)
+{
+  std::auto_ptr<char> buffer (new char [MB_CUR_MAX]); //  MB_CUR_MAX isn't a constant
+  std::string ls;
+
+  std::wstring ws = to_wstring (s);
+  for (std::wstring::const_iterator c = ws.begin (); c != ws.end (); ++c) {
+    int length = wctomb (buffer.get (), *c);
+    for (int i = 0; i < length; ++i) {
+      ls += buffer.get ()[i];
+    }
+  }
+
+  return ls;
 }
 
 std::string to_string_from_local (const char *cp)
@@ -161,7 +177,7 @@ std::string to_string_from_local (const char *cp)
   mbstate_t state;
   memset ((void *) &state, 0, sizeof (mbstate_t));
 
-  std::vector<wchar_t> ws;
+  std::wstring ws;
 
   size_t max = strlen (cp);
 
@@ -172,12 +188,12 @@ std::string to_string_from_local (const char *cp)
     if (length < 1) {
       break;
     }
-    ws.push_back (wc);
+    ws += wc;
     cp += length;
     max -= length;
   }
 
-  return wchar_to_utf8 (ws);
+  return to_string (ws);
 }
 
 // -------------------------------------------------------------------------

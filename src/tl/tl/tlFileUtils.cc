@@ -21,6 +21,7 @@
 */
 
 #include "tlFileUtils.h"
+#include "tlStream.h"
 #include "tlLog.h"
 #include "tlInternational.h"
 
@@ -28,6 +29,7 @@
 
 #include <sys/stat.h>
 #include <unistd.h>
+#include <dirent.h>
 
 namespace tl
 {
@@ -191,35 +193,140 @@ is_parent_path (const std::string &parent, const std::string &path)
   return (is_same_file (parent, tl::combine_path (tl::join (parts, ""), "")));
 }
 
-bool rm_dir_recursive (const std::string &path)
+std::vector<std::string> dir_entries (const std::string &s, bool with_files, bool with_dirs, bool without_dotfiles)
 {
-#if 0  // @@@
-  QDir dir (path);
+  std::vector<std::string> ee;
 
-  QStringList entries = dir.entryList (QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs);
-  for (QStringList::const_iterator e = entries.begin (); e != entries.end (); ++e) {
-    QFileInfo fi (dir.absoluteFilePath (*e));
-    if (fi.isDir ()) {
-      if (! rm_dir_recursive (fi.filePath ())) {
-        return false;
+#if defined(_WIN32)
+
+  struct _wfinddata_t fileinfo;
+
+  intptr_t h = _wfindfirst (tl::to_wstring (s + "\\*.*").c_str (), &fileinfo);
+  if (h != -1) {
+
+    do {
+
+      std::string e = tl::to_string fileinfo.name);
+      if (e.empty () || e == "." || e == "..") {
+        continue;
       }
-    } else if (fi.isFile ()) {
-      if (! dir.remove (*e)) {
-        tl::error << tr ("Unable to remove file: %1").arg (dir.absoluteFilePath (*e));
+
+      bool is_dir = ((fileinfo.attrib & _A_SUBDIR) != 0);
+      if ((e[0] != '.' || !without_dotfiles) && ((is_dir && with_dirs) || (!is_dir && with_files))) {
+        ee.push_back (e);
+      }
+
+    } while (_wfindnext (h, &fileinfo) == 0);
+
+  }
+
+  _wfindclose (h);
+
+#else
+
+  DIR *h = opendir (tl::to_local (s).c_str ());
+  if (h) {
+
+    struct dirent *d;
+    while ((d = readdir (h)) != NULL) {
+
+      std::string e = tl::to_string_from_local (d->d_name);
+      if (e.empty () || e == "." || e == "..") {
+        continue;
+      }
+
+      bool is_dir = (d->d_type == DT_DIR);
+      if ((e[0] != '.' || !without_dotfiles) && ((is_dir && with_dirs) || (!is_dir && with_files))) {
+        ee.push_back (e);
+      }
+
+    }
+
+    closedir (h);
+
+  }
+
+#endif
+
+  return ee;
+}
+
+bool mkdir (const std::string &path)
+{
+#if defined(_WIN32)
+  return _wunlink (tl::to_wstring (path).c_str ()) == 0;
+#else
+  return unlink (tl::to_local (path).c_str ()) == 0;
+#endif
+}
+
+bool mkpath (const std::string &p)
+{
+  std::vector<std::string> parts = split_path (absolute_file_path (p));
+
+  size_t i = 0;
+  std::string front;
+  if (! parts.empty () && is_drive (parts.front ())) {
+    front = parts.front ();
+    ++i;
+  }
+
+  while (i < parts.size ()) {
+    front += parts[i++];
+    if (! file_exists (front)) {
+      if (! mkdir (front)) {
+        tl::error << tr ("Unable to create directory: ") << front;
         return false;
       }
     }
   }
 
-  QString name = dir.dirName ();
-  if (dir.cdUp ()) {
-    if (! dir.rmdir (name)) {
-      tl::error << tr ("Unable to remove directory: %1").arg (dir.absoluteFilePath (name));
+  return true;
+}
+
+bool rm_file (const std::string &path)
+{
+#if defined(_WIN32)
+  return _wunlink (tl::to_wstring (path).c_str ()) == 0;
+#else
+  return unlink (tl::to_local (path).c_str ()) == 0;
+#endif
+}
+
+bool rm_dir (const std::string &path)
+{
+#if defined(_WIN32)
+  return _wrmdir (tl::to_wstring (path).c_str ()) == 0;
+#else
+  return rmdir (tl::to_local (path).c_str ()) == 0;
+#endif
+}
+
+bool rm_dir_recursive (const std::string &p)
+{
+  std::vector<std::string> entries;
+  std::string path = tl::absolute_file_path (p);
+
+  entries = dir_entries (path, false /*without_files*/, true /*with_dirs*/);
+  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+    if (! rm_dir_recursive (tl::combine_path (path, *e))) {
       return false;
     }
   }
 
-#endif
+  entries = dir_entries (path, true /*with_files*/, false /*without_dirs*/);
+  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+    std::string tc = tl::combine_path (path, *e);
+    if (! rm_file (tc)) {
+      tl::error << tr ("Unable to remove file: ") << tc;
+      return false;
+    }
+  }
+
+  if (! rm_dir (path)) {
+    tl::error << tr ("Unable to remove directory: ") << path;
+    return false;
+  }
 
   return true;
 }
@@ -227,70 +334,45 @@ bool rm_dir_recursive (const std::string &path)
 bool
 cp_dir_recursive (const std::string &source, const std::string &target)
 {
-#if 0  // @@@
-  QDir dir (source);
-  QDir dir_target (target);
+  std::vector<std::string> entries;
+  std::string path = tl::absolute_file_path (source);
+  std::string path_to = tl::absolute_file_path (target);
 
-  QStringList entries = dir.entryList (QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs);
-  for (QStringList::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+  entries = dir_entries (path, false /*without_files*/, true /*with_dirs*/);
+  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+    std::string tc = tl::combine_path (path_to, *e);
+    if (! mkpath (tc)) {
+      tl::error << tr ("Unable to create target directory: ") << tc;
+      return false;
+    }
+    if (! cp_dir_recursive (tl::combine_path (path, *e), tc)) {
+      return false;
+    }
+  }
 
-    QFileInfo fi (dir.absoluteFilePath (*e));
-    QFileInfo fi_target (dir_target.absoluteFilePath (*e));
-
-    if (fi.isDir ()) {
-
-      //  Copy subdirectory
-      if (! fi_target.exists ()) {
-        if (! dir_target.mkdir (*e)) {
-          tl::error << tr ("Unable to create target directory: %1").arg (dir_target.absoluteFilePath (*e));
-          return false;
-        }
-      } else if (! fi_target.isDir ()) {
-        tl::error << tr ("Unable to create target directory (is a file already): %1").arg (dir_target.absoluteFilePath (*e));
-        return false;
-      }
-      if (! cp_dir_recursive (fi.filePath (), fi_target.filePath ())) {
-        return false;
-      }
+  entries = dir_entries (path, true /*with_files*/, false /*without_dirs*/);
+  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
 
     //  TODO: leave symlinks symlinks? How to copy symlinks with Qt?
-    } else if (fi.isFile ()) {
 
-      QFile file (fi.filePath ());
-      QFile file_target (fi_target.filePath ());
+    //  copy the files
+    try {
 
-      if (! file.open (QIODevice::ReadOnly)) {
-        tl::error << tr ("Unable to open source file for reading: %1").arg (fi.filePath ());
-        return false;
-      }
-      if (! file_target.open (QIODevice::WriteOnly)) {
-        tl::error << tr ("Unable to open target file for writing: %1").arg (fi_target.filePath ());
-        return false;
-      }
+      tl::OutputFile os_file (tl::combine_path (path_to, *e));
+      tl::OutputStream os (os_file);
+      tl::InputFile is_file (tl::combine_path (path, *e));
+      tl::InputStream is (is_file);
+      is.copy_to (os);
 
-      size_t chunk_size = 64 * 1024;
-
-      while (! file.atEnd ()) {
-        QByteArray data = file.read (chunk_size);
-        file_target.write (data);
-      }
-
-      file.close ();
-      file_target.close ();
-
+    } catch (tl::Exception &ex) {
+      tl::error << tr ("Unable to copy file ") << tl::combine_path (path_to, *e) << tr (" to ") << tl::combine_path (path, *e)
+                << tr ("(Error ") << ex.msg () << ")";
+      return false;
     }
 
   }
 
-#endif
-
   return true;
-}
-
-bool mkpath (const std::string &path)
-{
-  //  @@@
-  return false;
 }
 
 std::string absolute_path (const std::string &s)
@@ -305,39 +387,58 @@ std::string absolute_path (const std::string &s)
 
 std::string current_dir ()
 {
-  char *cwd;
 #if defined(_WIN32)
-  cwd = _getcwd (NULL, 0);
-#else
-  cwd = getcwd (NULL, 0);
-#endif
 
+  wchar_t *cwd = _wgetcwd (NULL, 0);
   if (cwd == NULL) {
     return std::string ();
   } else {
-    std::string cwds (cwd);
+    std::string cwds (tl::to_string (std::wstring (cwd)));
     free (cwd);
     return cwds;
   }
+
+#else
+
+  char *cwd = getcwd (NULL, 0);
+  if (cwd == NULL) {
+    return std::string ();
+  } else {
+    std::string cwds (tl::to_string_from_local (cwd));
+    free (cwd);
+    return cwds;
+  }
+
+#endif
 }
 
 
 static std::pair<std::string, bool> absolute_path_of_existing (const std::string &s)
 {
-  char *fp;
 #if defined (_WIN32)
-  fp = _fullpath (NULL, s.c_str (), 0);
-#else
-  fp = realpath (s.c_str (), NULL);
-#endif
 
+  wchar_t *fp = _wfullpath (NULL, tl::to_wstring (s).c_str (), 0);
   if (fp == NULL) {
     return std::make_pair (std::string (), false);
   } else {
-    std::string fps (fp);
+    std::string fps (tl::to_string (std::wstring (fp)));
     free (fp);
     return std::make_pair (fps, true);
   }
+
+#else
+
+  char *fp;
+  fp = realpath (tl::to_local (s).c_str (), NULL);
+  if (fp == NULL) {
+    return std::make_pair (std::string (), false);
+  } else {
+    std::string fps (tl::to_string_from_local (fp));
+    free (fp);
+    return std::make_pair (fps, true);
+  }
+
+#endif
 }
 
 std::string absolute_file_path (const std::string &s)
@@ -436,16 +537,25 @@ std::string extension (const std::string &s)
   return tl::join (fnp, ".");
 }
 
+static int stat_func (const std::string &s, struct stat &st)
+{
+#if defined(_WIN32)
+  return _wstat (tl::to_wstring (s).c_str (), &st);
+#else
+  return stat (tl::to_local (s).c_str (), &st);
+#endif
+}
+
 bool file_exists (const std::string &p)
 {
   struct stat st;
-  return stat (p.c_str (), &st) == 0;
+  return stat_func (p, st) == 0;
 }
 
 bool is_dir (const std::string &p)
 {
   struct stat st;
-  if (stat (p.c_str (), &st) != 0) {
+  if (stat_func (p, st) != 0) {
     return false;
   } else {
     return !S_ISREG (st.st_mode);
@@ -466,8 +576,8 @@ bool is_same_file (const std::string &a, const std::string &b)
 
 #if defined(_WIN32)
 
-  HANDLE h1 = ::CreateFile (a.c_str (), 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  HANDLE h2 = ::CreateFile (b.c_str (), 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  HANDLE h1 = ::CreateFileW (tl::to_wstring (a).c_str (), 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  HANDLE h2 = ::CreateFileW (tl::to_wstring (b).c_str (), 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
   bool result = false;
 
@@ -493,10 +603,7 @@ bool is_same_file (const std::string &a, const std::string &b)
 #else
 
   struct stat sta, stb;
-  if (stat (a.c_str (), &sta) != 0) {
-    return false;
-  }
-  if (stat (b.c_str (), &stb) != 0) {
+  if (stat_func (a, sta) != 0 || stat_func (b, stb) != 0) {
     return false;
   }
 

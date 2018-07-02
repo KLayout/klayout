@@ -34,7 +34,9 @@
 #include "tlException.h"
 #include "tlVariant.h"
 
+#if defined(HAVE_QT)
 class QImage;
+#endif
 
 namespace tl {
 
@@ -262,6 +264,7 @@ TL_PUBLIC std::string to_string (float d, int prec);
 TL_PUBLIC std::string to_string (const unsigned char *cp, int length);
 TL_PUBLIC std::string to_string (const char *cp, int length);
 TL_PUBLIC std::string to_string_from_local (const char *cp);
+TL_PUBLIC std::string to_local (const std::string &s);
 
 template <class T> inline std::string to_string (const T &o) { return o.to_string (); }
 template <> inline std::string to_string (const double &d) { return to_string (d, 12); }
@@ -287,8 +290,20 @@ template <> inline std::string to_string (const std::string &s) { return s; }
 //  to a variant object
 template <> inline std::string to_string (const tl::Variant &v) { return v.to_parsable_string (); }
 
+#if defined(HAVE_QT)
 //  some dummy conversions provided for tl::Variant implementation
 template <> inline std::string to_string (const QImage &) { return std::string (); }
+#endif
+
+/**
+ *  @brief Converts UTF-8 to wide character string
+ */
+std::wstring TL_PUBLIC to_wstring (const std::string &s);
+
+/**
+ *  @brief Converts a wide character string to UTF-8
+ */
+std::string TL_PUBLIC to_string (const std::wstring &ws);
 
 /**
  *  @brief Convert to a quoted string 

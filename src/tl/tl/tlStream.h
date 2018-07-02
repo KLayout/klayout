@@ -166,6 +166,182 @@ private:
   size_t m_length, m_pos;
 };
 
+/**
+ *  @brief A zlib input file delegate
+ *
+ *  Implements the reader for a zlib stream
+ */
+class InputZLibFile
+  : public InputStreamBase
+{
+public:
+  /**
+   *  @brief Open a file with the given path
+   *
+   *  Opening a file is a prerequisite for reading from the
+   *  object. open() will throw a FileOpenErrorException if
+   *  an error occurs.
+   *
+   *  @param path The (relative) path of the file to open
+   */
+  InputZLibFile (const std::string &path);
+
+  /**
+   *  @brief Close the file
+   *
+   *  The destructor will automatically close the file.
+   */
+  virtual ~InputZLibFile ();
+
+  /**
+   *  @brief Read from a file
+   *
+   *  Implements the basic read method.
+   *  Will throw a ZLibReadErrorException if an error occurs.
+   */
+  virtual size_t read (char *b, size_t n);
+
+  virtual void reset ();
+
+  virtual void close ();
+
+  virtual std::string source () const
+  {
+    return m_source;
+  }
+
+  virtual std::string absolute_path () const;
+
+  virtual std::string filename () const;
+
+private:
+  std::string m_source;
+  gzFile m_zs;
+};
+
+/**
+ *  @brief A simple input file delegate
+ *
+ *  Implements the reader for ordinary files.
+ */
+class InputFile
+  : public InputStreamBase
+{
+public:
+  /**
+   *  @brief Open a file with the given path
+   *
+   *  Opening a file is a prerequisite for reading from the
+   *  object. open() will throw a FileOpenErrorException if
+   *  an error occurs.
+   *
+   *  @param path The (relative) path of the file to open
+   *  @param read True, if the file should be read, false on write.
+   */
+  InputFile (const std::string &path);
+
+  /**
+   *  @brief Close the file
+   *
+   *  The destructor will automatically close the file.
+   */
+  virtual ~InputFile ();
+
+  virtual size_t read (char *b, size_t n);
+
+  virtual void reset ();
+
+  virtual void close ();
+
+  virtual std::string source () const
+  {
+    return m_source;
+  }
+
+  virtual std::string absolute_path () const;
+
+  virtual std::string filename () const;
+
+private:
+  std::string m_source;
+  int m_fd;
+};
+
+/**
+ *  @brief A simple pipe input delegate
+ *
+ *  Implements the reader for pipe streams
+ */
+class InputPipe
+  : public InputStreamBase
+{
+public:
+  /**
+   *  @brief Open a stream by connecting with the stdout of a given command
+   *
+   *  Opening a pipe is a prerequisite for reading from the
+   *  object. open() will throw a FilePOpenErrorException if
+   *  an error occurs - commonly if the command cannot be executed.
+   *  This implementation is based on popen ().
+   *
+   *  @param cmd The command to execute
+   *  @param read True, if the file should be read, false on write.
+   */
+  InputPipe (const std::string &path);
+
+  /**
+   *  @brief Close the pipe
+   *
+   *  The destructor will automatically close the pipe.
+   */
+  virtual ~InputPipe ();
+
+  /**
+   *  @brief Read from the pipe
+   *
+   *  Implements the basic read method.
+   *  Will throw a FilePReadErrorException if an error occurs.
+   */
+  virtual size_t read (char *b, size_t n);
+
+  /**
+   *  @brief Reset to the beginning of the file
+   */
+  virtual void reset ();
+
+  /**
+   *  @brief Closes the pipe
+   */
+  virtual void close ();
+
+  /**
+   *  @brief Get the source specification (the file name)
+   *
+   *  Returns an empty string if no file name is available.
+   */
+  virtual std::string source () const
+  {
+    //  No source (in the sense of a file name) is available ..
+    return std::string ();
+  }
+
+  virtual std::string absolute_path () const
+  {
+    //  No source (in the sense of a file name) is available ..
+    return std::string ();
+  }
+
+  virtual std::string filename () const
+  {
+    //  No source (in the sense of a file name) is available ..
+    return std::string ();
+  }
+
+private:
+  FILE *m_file;
+  std::string m_source;
+};
+
 // ---------------------------------------------------------------------------------
 
 /**
@@ -248,8 +424,9 @@ public:
 
   /**
    *  @brief Copies the content of the stream to the output stream
+   *  Throws an exception on error.
    */
-  void copy_to (tl::OutputStream &os);
+  void copy_to(tl::OutputStream &os);
 
   /**
    *  @brief Enable uncompression of the following DEFLATE-compressed block
@@ -602,6 +779,144 @@ public:
 
 private:
   std::ostringstream m_stream;
+};
+
+/**
+ *  @brief A zlib output file delegate
+ *
+ *  Implements the writer for a zlib stream
+ */
+class OutputZLibFile
+  : public OutputStreamBase
+{
+public:
+  /**
+   *  @brief Open a file with the given path
+   *
+   *  Opening a file is a prerequisite for reading from the
+   *  object. open() will throw a FileOpenErrorException if
+   *  an error occurs.
+   *
+   *  @param path The (relative) path of the file to open
+   */
+  OutputZLibFile (const std::string &path);
+
+  /**
+   *  @brief Close the file
+   *
+   *  The destructor will automatically close the file.
+   */
+  virtual ~OutputZLibFile ();
+
+  /**
+   *  @brief Write to a file
+   *
+   *  Implements the basic write method.
+   *  Will throw a ZLibWriteErrorException if an error occurs.
+   */
+  virtual void write (const char *b, size_t n);
+
+private:
+  std::string m_source;
+  gzFile m_zs;
+};
+
+/**
+ *  @brief A simple output file delegate
+ *
+ *  Implements the writer for ordinary files.
+ */
+class OutputFile
+  : public OutputStreamBase
+{
+public:
+  /**
+   *  @brief Open a file with the given path
+   *
+   *  Opening a file is a prerequisite for reading from the
+   *  object. open() will throw a FileOpenErrorException if
+   *  an error occurs.
+   *
+   *  @param path The (relative) path of the file to open
+   *  @param read True, if the file should be read, false on write.
+   */
+  OutputFile (const std::string &path);
+
+  /**
+   *  @brief Close the file
+   *
+   *  The destructor will automatically close the file.
+   */
+  virtual ~OutputFile ();
+
+  /**
+   *  @brief Seek to the specified position
+   *
+   *  Writing continues at that position after a seek.
+   */
+  virtual void seek (size_t s);
+
+  /**
+   *  @brief Returns a value indicating whether that stream supports seek
+   */
+  bool supports_seek ()
+  {
+    return true;
+  }
+
+  /**
+   *  @brief Write to a file
+   *
+   *  Implements the basic write method.
+   *  Will throw a FileWriteErrorException if an error occurs.
+   */
+  virtual void write (const char *b, size_t n);
+
+private:
+  std::string m_source;
+  int m_fd;
+};
+
+/**
+ *  @brief A simple pipe output delegate
+ *
+ *  Implements the writer for pipe streams
+ */
+class OutputPipe
+  : public OutputStreamBase
+{
+public:
+  /**
+   *  @brief Open a stream by connecting with the stdout of a given command
+   *
+   *  Opening a pipe is a prerequisite for reading from the
+   *  object. open() will throw a FilePOpenErrorException if
+   *  an error occurs - commonly if the command cannot be executed.
+   *  This implementation is based on popen ().
+   *
+   *  @param cmd The command to execute
+   *  @param read True, if the file should be read, false on write.
+   */
+  OutputPipe (const std::string &path);
+
+  /**
+   *  @brief Close the pipe
+   *
+   *  The destructor will automatically close the pipe.
+   */
+  virtual ~OutputPipe ();
+
+  /**
+   *  @brief Write to a file
+   *
+   *  Implements the basic write method.
+   *  Will throw a FilePWriteErrorException if an error occurs.
+   */
+  virtual void write (const char *b, size_t n);
+
+private:
+  FILE *m_file;
+  std::string m_source;
 };
 
 // ---------------------------------------------------------------------------------

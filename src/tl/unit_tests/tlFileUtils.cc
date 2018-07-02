@@ -24,6 +24,10 @@
 #include "tlFileUtils.h"
 #include "tlUnitTest.h"
 
+#if defined(HAVE_QT)
+
+//  A few things we cross-check against Qt
+
 #include <QDir>
 #include <QFileInfo>
 #include <QFile>
@@ -161,3 +165,5 @@ TEST (3)
     file.close ();
   }
 }
+
+#endif

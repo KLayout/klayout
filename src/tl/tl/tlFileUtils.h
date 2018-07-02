@@ -97,6 +97,25 @@ bool TL_PUBLIC file_exists (const std::string &s);
 bool TL_PUBLIC is_dir (const std::string &s);
 
 /**
+ *  @brief Gets the directory entries for the given directory
+ *  This method will NEVER return the ".." entry.
+ *  @param with_files Includes all files
+ *  @param with_dirs Include all directories
+ *  @param without_dotfiles Exclude all ".*" files
+ */
+std::vector<std::string> TL_PUBLIC dir_entries (const std::string &s, bool with_files = true, bool with_dirs = true, bool without_dotfiles = false);
+
+/**
+ *  @brief Removes the given file and returns true on success
+ */
+bool TL_PUBLIC rm_file (const std::string &path);
+
+/**
+ *  @brief Removes the given directory and returns true on success
+ */
+bool TL_PUBLIC rm_dir (const std::string &path);
+
+/**
  *  @brief Returns true, if the given path is the same directory of file than the other one
  */
 bool TL_PUBLIC is_same_file (const std::string &a, const std::string &b);
@@ -120,7 +139,7 @@ std::string TL_PUBLIC current_dir ();
  *  added if the path terminates with a separator (like "C:\" or "/home/user/").
  *  The idea is that the last element is the file name part.
  */
-static std::vector<std::string> split_path (const std::string &p);
+std::vector<std::string> split_path (const std::string &p);
 
 }
 

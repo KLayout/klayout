@@ -118,3 +118,12 @@ std::string tr (const char *s)
 
 }
 
+#if ! defined(HAVE_QT)
+
+std::string tr (const char *s)
+{
+  //  TODO: this is a fallback implementation without translation
+  return std::string (s);
+}
+
+#endif

@@ -22,12 +22,16 @@
 
 #include "tlUnitTest.h"
 
-#include <QProcess>
-#include <QStringList>
+#if defined(HAVE_QT)
+# include <QProcess>
+# include <QStringList>
+#endif
 
 //  Testing the converter main implementation (CIF)
 TEST(1)
 {
+//  TODO: provide a Qt-less way of running these tests
+#if defined(HAVE_QT)
   QProcess process;
   process.setProcessChannelMode (QProcess::MergedChannels);
 
@@ -43,5 +47,8 @@ TEST(1)
   QByteArray ba = process.readAll ();
   EXPECT_EQ (ba.constData (), "Hello, world (0,-42;42,0)!\n");
   EXPECT_EQ (success, true);
+#else
+  EXPECT_EQ (true, false);
+#endif
 }
 

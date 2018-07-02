@@ -32,11 +32,14 @@
 
 #include "tlUnitTest.h"
 
-#include <QProcess>
-#include <QProcessEnvironment>
+#if defined(HAVE_QT)
+# include <QProcess>
+# include <QProcessEnvironment>
+#endif
 
 int run_pymodtest (tl::TestBase * /*_this*/, const std::string &fn)
 {
+#if defined(HAVE_QT)
   QProcess process;
   process.setProcessChannelMode (QProcess::MergedChannels);
 
@@ -57,6 +60,9 @@ int run_pymodtest (tl::TestBase * /*_this*/, const std::string &fn)
   tl::info << process.readAll ().constData ();
 
   return process.exitCode ();
+#else
+  return 1; // TODO: provide a Qt-less version
+#endif
 }
 
 #define PYMODTEST(n, file) \

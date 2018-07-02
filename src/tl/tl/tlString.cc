@@ -35,6 +35,9 @@
 #include "tlExpression.h"
 #include "tlInternational.h"
 
+namespace tl
+{
+
 static std::locale c_locale ("C");
 
 // -------------------------------------------------------------------------
@@ -118,27 +121,27 @@ std::string to_string (const std::wstring &ws)
 static std::string micron_format ("%.5f");
 static std::string dbu_format ("%.2f");
 
-void tl::set_micron_resolution (unsigned int ndigits)
+void set_micron_resolution (unsigned int ndigits)
 {
   micron_format = "%." + tl::to_string (ndigits) + "f";
 }
 
-void tl::set_db_resolution (unsigned int ndigits)
+void set_db_resolution (unsigned int ndigits)
 {
   dbu_format = "%." + tl::to_string (ndigits) + "f";
 }
 
-std::string tl::micron_to_string (double d) 
+std::string micron_to_string (double d)
 {
   return tl::sprintf (micron_format.c_str (), d);
 }
 
-std::string tl::db_to_string (double d) 
+std::string db_to_string (double d)
 {
   return tl::sprintf (dbu_format.c_str (), d);
 }
 
-std::string tl::to_upper_case (const std::string &s)
+std::string to_upper_case (const std::string &s)
 {
   std::wstring ws = to_wstring (s);
   for (std::wstring::iterator c = ws.begin (); c != ws.end (); ++c) {
@@ -147,7 +150,7 @@ std::string tl::to_upper_case (const std::string &s)
   return to_string (ws);
 }
 
-std::string tl::to_lower_case (const std::string &s)
+std::string to_lower_case (const std::string &s)
 {
   std::wstring ws = to_wstring (s);
   for (std::wstring::iterator c = ws.begin (); c != ws.end (); ++c) {
@@ -262,7 +265,7 @@ static double local_strtod (const char *cp, const char *&cp_new)
 //  Implementation
 
 std::string 
-tl::to_string (double d, int prec)
+to_string (double d, int prec)
 {
   //  For small values less than 1e-(prec) simply return "0" to avoid ugly values like "1.2321716e-14".
   if (fabs (d) < pow (10.0, -prec)) {
@@ -279,7 +282,7 @@ tl::to_string (double d, int prec)
 }
 
 std::string 
-tl::to_string (float d, int prec)
+to_string (float d, int prec)
 {
   //  For small values less than 1e-(prec) simply return "0" to avoid ugly values like "1.2321716e-14".
   if (fabs (d) < pow (10.0, -prec)) {
@@ -297,7 +300,7 @@ tl::to_string (float d, int prec)
 
 template <>
 std::string 
-tl::to_string (const int &d)
+to_string (const int &d)
 {
   std::ostringstream os;
   os.imbue (c_locale);
@@ -307,7 +310,7 @@ tl::to_string (const int &d)
 
 template <>
 std::string 
-tl::to_string (const unsigned int &d)
+to_string (const unsigned int &d)
 {
   std::ostringstream os;
   os.imbue (c_locale);
@@ -317,7 +320,7 @@ tl::to_string (const unsigned int &d)
 
 template <>
 std::string 
-tl::to_string (const long &d)
+to_string (const long &d)
 {
   std::ostringstream os;
   os.imbue (c_locale);
@@ -327,7 +330,7 @@ tl::to_string (const long &d)
 
 template <>
 std::string 
-tl::to_string (const long long &d)
+to_string (const long long &d)
 {
   std::ostringstream os;
   os.imbue (c_locale);
@@ -337,7 +340,7 @@ tl::to_string (const long long &d)
 
 template <>
 std::string 
-tl::to_string (const unsigned long &d)
+to_string (const unsigned long &d)
 {
   std::ostringstream os;
   os.imbue (c_locale);
@@ -347,7 +350,7 @@ tl::to_string (const unsigned long &d)
 
 template <>
 std::string 
-tl::to_string (const unsigned long long &d)
+to_string (const unsigned long long &d)
 {
   std::ostringstream os;
   os.imbue (c_locale);
@@ -359,7 +362,7 @@ tl::to_string (const unsigned long long &d)
 
 template <>
 std::string
-tl::to_string (const __int128 &d)
+to_string (const __int128 &d)
 {
   if (d < 0 ) {
     return "-" + tl::to_string(static_cast<unsigned __int128> (-d));
@@ -370,7 +373,7 @@ tl::to_string (const __int128 &d)
 
 template <>
 std::string
-tl::to_string (const unsigned __int128 &_x)
+to_string (const unsigned __int128 &_x)
 {
   std::string r;
   unsigned __int128 x = _x;
@@ -406,53 +409,53 @@ tl::to_string (const unsigned __int128 &_x)
 
 template <>
 std::string
-tl::to_string (char * const &cp)
+to_string (char * const &cp)
 {
   return std::string (cp);
 }
 
 template <>
 std::string
-tl::to_string (const char * const &cp)
+to_string (const char * const &cp)
 {
   return std::string (cp);
 }
 
 template <>
 std::string
-tl::to_string (unsigned char * const &cp)
+to_string (unsigned char * const &cp)
 {
   return std::string ((const char *) cp);
 }
 
 template <>
 std::string
-tl::to_string (const unsigned char * const &cp)
+to_string (const unsigned char * const &cp)
 {
   return std::string ((const char *) cp);
 }
 
 std::string
-tl::to_string (const char *cp, int length)
+to_string (const char *cp, int length)
 {
   return std::string (cp, length);
 }
 
 std::string
-tl::to_string (const unsigned char *cp, int length)
+to_string (const unsigned char *cp, int length)
 {
   return std::string ((const char *) cp, length);
 }
 
 template <>
 std::string
-tl::to_string (const bool &b)
+to_string (const bool &b)
 {
   return b ? "true" : "false";
 }
 
 int 
-tl::edit_distance (const std::string &a, const std::string &b)
+edit_distance (const std::string &a, const std::string &b)
 {
   std::vector<int> row0, row1;
   row0.resize (a.size () + 1, 0);
@@ -479,7 +482,7 @@ tl::edit_distance (const std::string &a, const std::string &b)
 }
 
 std::string
-tl::to_quoted_string (const std::string &s)
+to_quoted_string (const std::string &s)
 {
   std::string r;
   r.reserve (s.size () + 2);
@@ -507,7 +510,7 @@ tl::to_quoted_string (const std::string &s)
 }
 
 std::string 
-tl::escape_string (const std::string &s)
+escape_string (const std::string &s)
 {
   std::string r;
   for (const char *c = s.c_str (); *c; ++c) {
@@ -553,7 +556,7 @@ inline char unescape_char (const char * &cp)
 }
 
 std::string 
-tl::unescape_string (const std::string &value)
+unescape_string (const std::string &value)
 {
   std::string r;
   for (const char *cp = value.c_str (); *cp; ++cp) {
@@ -568,7 +571,7 @@ tl::unescape_string (const std::string &value)
 }
 
 std::string
-tl::to_word_or_quoted_string (const std::string &s, const char *non_term)
+to_word_or_quoted_string (const std::string &s, const char *non_term)
 {
   //  If the string does not contain non_term characters, we may simply keep it. 
   //  Otherwise we need to quote it.
@@ -587,7 +590,7 @@ tl::to_word_or_quoted_string (const std::string &s, const char *non_term)
 }
 
 void
-tl::escape_to_html (std::string &out, const std::string &in, bool replace_newlines)
+escape_to_html (std::string &out, const std::string &in, bool replace_newlines)
 {
   for (const char *cp = in.c_str (); *cp; ++cp) {
     if (*cp == '<') {
@@ -607,7 +610,7 @@ tl::escape_to_html (std::string &out, const std::string &in, bool replace_newlin
 }
 
 std::string
-tl::escaped_to_html (const std::string &in, bool replace_newlines)
+escaped_to_html (const std::string &in, bool replace_newlines)
 {
   std::string s;
   escape_to_html (s, in, replace_newlines);
@@ -615,7 +618,7 @@ tl::escaped_to_html (const std::string &in, bool replace_newlines)
 }
 
 std::string
-tl::replicate (const std::string &s, unsigned int n)
+replicate (const std::string &s, unsigned int n)
 {
   if (n == 0) {
     return std::string ();
@@ -631,7 +634,7 @@ tl::replicate (const std::string &s, unsigned int n)
 }
 
 std::string
-tl::pad_string_right (unsigned int columns, const std::string &text)
+pad_string_right (unsigned int columns, const std::string &text)
 {
   std::string s = text;
   s.reserve (columns);
@@ -642,7 +645,7 @@ tl::pad_string_right (unsigned int columns, const std::string &text)
 }
 
 std::string
-tl::pad_string_left (unsigned int columns, const std::string &text)
+pad_string_left (unsigned int columns, const std::string &text)
 {
   std::string s;
   s.reserve (columns);
@@ -654,7 +657,7 @@ tl::pad_string_left (unsigned int columns, const std::string &text)
 }
 
 std::string
-tl::replaced (const std::string &subject, const std::string &before, const std::string &after)
+replaced (const std::string &subject, const std::string &before, const std::string &after)
 {
   if (before.empty ()) {
     return subject;
@@ -680,19 +683,19 @@ tl::replaced (const std::string &subject, const std::string &before, const std::
 }
 
 void
-tl::from_string (const std::string &s, const char * &result)
+from_string (const std::string &s, const char * &result)
 {
   result = s.c_str ();
 }
 
 void
-tl::from_string (const std::string &s, const unsigned char * &result)
+from_string (const std::string &s, const unsigned char * &result)
 {
   result = (unsigned char *) s.c_str ();
 }
 
 void 
-tl::from_string (const std::string &s, double &v) throw (tl::Exception)
+from_string (const std::string &s, double &v) throw (tl::Exception)
 {
   const char *cp = s.c_str ();
   while (*cp && isspace (*cp)) {
@@ -732,43 +735,43 @@ convert_string_to_int (const std::string &s, T &v) throw (tl::Exception)
 }
 
 void 
-tl::from_string (const std::string &s, int &v) throw (tl::Exception)
+from_string (const std::string &s, int &v) throw (tl::Exception)
 {
   convert_string_to_int (s, v);
 }
 
 void 
-tl::from_string (const std::string &s, long &v) throw (tl::Exception)
+from_string (const std::string &s, long &v) throw (tl::Exception)
 {
   convert_string_to_int (s, v);
 }
 
 void 
-tl::from_string (const std::string &s, long long &v) throw (tl::Exception)
+from_string (const std::string &s, long long &v) throw (tl::Exception)
 {
   convert_string_to_int (s, v);
 }
 
 void 
-tl::from_string (const std::string &s, unsigned int &v) throw (tl::Exception)
+from_string (const std::string &s, unsigned int &v) throw (tl::Exception)
 {
   convert_string_to_int (s, v);
 }
 
 void 
-tl::from_string (const std::string &s, unsigned long &v) throw (tl::Exception)
+from_string (const std::string &s, unsigned long &v) throw (tl::Exception)
 {
   convert_string_to_int (s, v);
 }
 
 void 
-tl::from_string (const std::string &s, unsigned long long &v) throw (tl::Exception)
+from_string (const std::string &s, unsigned long long &v) throw (tl::Exception)
 {
   convert_string_to_int (s, v);
 }
 
 void
-tl::from_string (const std::string &s, bool &b) throw (tl::Exception)
+from_string (const std::string &s, bool &b) throw (tl::Exception)
 {
   std::string t (tl::trim (s));
   if (t == "true") {
@@ -785,7 +788,7 @@ tl::from_string (const std::string &s, bool &b) throw (tl::Exception)
 }
 
 std::string
-tl::join (const std::vector <std::string> &vv, const std::string &s)
+join (const std::vector <std::string> &vv, const std::string &s)
 {
   std::ostringstream r;
 
@@ -802,7 +805,7 @@ tl::join (const std::vector <std::string> &vv, const std::string &s)
 }
 
 std::vector<std::string> 
-tl::split (const std::string &t, const std::string &s)
+split (const std::string &t, const std::string &s)
 {
   std::vector<std::string> r;
 
@@ -817,7 +820,7 @@ tl::split (const std::string &t, const std::string &s)
 }
 
 std::string 
-tl::trim (const std::string &s)
+trim (const std::string &s)
 {
   const char *cp = s.c_str ();
   while (isspace (*cp) && *cp) {
@@ -835,20 +838,20 @@ tl::trim (const std::string &s)
 // -------------------------------------------------------------------
 //  tl::Extractor implementation
 
-tl::Extractor::Extractor (const char *s)
+Extractor::Extractor (const char *s)
   : m_cp (s)
 {
   //  .. nothing yet ..
 }
 
-tl::Extractor::Extractor (const std::string &str)
+Extractor::Extractor (const std::string &str)
   : m_str (str)
 {
   m_cp = m_str.c_str ();
 }
 
-tl::Extractor &
-tl::Extractor::read (unsigned int &value)
+Extractor &
+Extractor::read (unsigned int &value)
 {
   if (! try_read (value)) {
     error (tl::to_string (tr ("Expected an unsigned integer value")));
@@ -856,8 +859,8 @@ tl::Extractor::read (unsigned int &value)
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::read (unsigned long &value)
+Extractor &
+Extractor::read (unsigned long &value)
 {
   if (! try_read (value)) {
     error (tl::to_string (tr ("Expected an unsigned long integer value")));
@@ -865,8 +868,8 @@ tl::Extractor::read (unsigned long &value)
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::read (unsigned long long &value)
+Extractor &
+Extractor::read (unsigned long long &value)
 {
   if (! try_read (value)) {
     error (tl::to_string (tr ("Expected an unsigned long integer value")));
@@ -874,8 +877,8 @@ tl::Extractor::read (unsigned long long &value)
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::read (double &value)
+Extractor &
+Extractor::read (double &value)
 {
   if (! try_read (value)) {
     error (tl::to_string (tr ("Expected a real number")));
@@ -883,8 +886,8 @@ tl::Extractor::read (double &value)
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::read (int &value)
+Extractor &
+Extractor::read (int &value)
 {
   if (! try_read (value)) {
     error (tl::to_string (tr ("Expected a integer value")));
@@ -892,8 +895,8 @@ tl::Extractor::read (int &value)
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::read (long &value)
+Extractor &
+Extractor::read (long &value)
 {
   if (! try_read (value)) {
     error (tl::to_string (tr ("Expected a long integer value")));
@@ -901,8 +904,8 @@ tl::Extractor::read (long &value)
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::read (long long &value)
+Extractor &
+Extractor::read (long long &value)
 {
   if (! try_read (value)) {
     error (tl::to_string (tr ("Expected a long integer value")));
@@ -910,8 +913,8 @@ tl::Extractor::read (long long &value)
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::read (bool &value)
+Extractor &
+Extractor::read (bool &value)
 {
   if (! try_read (value)) {
     error (tl::to_string (tr ("Expected a boolean value ('true', 'false')")));
@@ -919,8 +922,8 @@ tl::Extractor::read (bool &value)
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::read (std::string &value, const char *term)
+Extractor &
+Extractor::read (std::string &value, const char *term)
 {
   if (! try_read (value, term)) {
     error (tl::to_string (tr ("Expected a string")));
@@ -928,8 +931,8 @@ tl::Extractor::read (std::string &value, const char *term)
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::read_word (std::string &value, const char *non_term)
+Extractor &
+Extractor::read_word (std::string &value, const char *non_term)
 {
   if (! try_read_word (value, non_term)) {
     error (tl::to_string (tr ("Expected a word string")));
@@ -937,8 +940,8 @@ tl::Extractor::read_word (std::string &value, const char *non_term)
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::read_word_or_quoted (std::string &value, const char *non_term)
+Extractor &
+Extractor::read_word_or_quoted (std::string &value, const char *non_term)
 {
   if (! try_read_word (value, non_term) && ! try_read_quoted (value)) {
     error (tl::to_string (tr ("Expected a word or quoted string")));
@@ -946,8 +949,8 @@ tl::Extractor::read_word_or_quoted (std::string &value, const char *non_term)
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::read_quoted (std::string &value)
+Extractor &
+Extractor::read_quoted (std::string &value)
 {
   if (! try_read_quoted (value)) {
     error (tl::to_string (tr ("Expected a quoted string")));
@@ -1009,7 +1012,7 @@ namespace
 }
 
 template <class T> bool
-tl::Extractor::try_read_signed_int (T &value)
+Extractor::try_read_signed_int (T &value)
 {
   if (! *skip ()) {
     return false;
@@ -1048,7 +1051,7 @@ tl::Extractor::try_read_signed_int (T &value)
 }
 
 template <class T> bool
-tl::Extractor::try_read_unsigned_int (T &value)
+Extractor::try_read_unsigned_int (T &value)
 {
   if (! *skip ()) {
     return false;
@@ -1075,42 +1078,42 @@ tl::Extractor::try_read_unsigned_int (T &value)
 }
 
 bool
-tl::Extractor::try_read (unsigned int &value)
+Extractor::try_read (unsigned int &value)
 {
   return try_read_unsigned_int (value);
 }
 
 bool
-tl::Extractor::try_read (unsigned long &value)
+Extractor::try_read (unsigned long &value)
 {
   return try_read_unsigned_int (value);
 }
 
 bool
-tl::Extractor::try_read (unsigned long long &value)
+Extractor::try_read (unsigned long long &value)
 {
   return try_read_unsigned_int (value);
 }
 
 bool
-tl::Extractor::try_read (int &value)
+Extractor::try_read (int &value)
 {
   return try_read_signed_int (value);
 }
 
 bool
-tl::Extractor::try_read (long &value)
+Extractor::try_read (long &value)
 {
   return try_read_signed_int (value);
 }
 
 bool
-tl::Extractor::try_read (long long &value)
+Extractor::try_read (long long &value)
 {
   return try_read_signed_int (value);
 }
 bool 
-tl::Extractor::try_read (double &value)
+Extractor::try_read (double &value)
 {
   if (! *skip ()) {
     return false;
@@ -1128,7 +1131,7 @@ tl::Extractor::try_read (double &value)
 }
 
 bool 
-tl::Extractor::try_read (bool &value)
+Extractor::try_read (bool &value)
 {
   if (test ("0") || test ("false")) {
     value = false;
@@ -1142,7 +1145,7 @@ tl::Extractor::try_read (bool &value)
 }
 
 bool 
-tl::Extractor::try_read_word (std::string &string, const char *non_term)
+Extractor::try_read_word (std::string &string, const char *non_term)
 {
   if (! *skip ()) {
     return false;
@@ -1157,13 +1160,13 @@ tl::Extractor::try_read_word (std::string &string, const char *non_term)
 }
 
 bool 
-tl::Extractor::try_read_word_or_quoted (std::string &string, const char *non_term)
+Extractor::try_read_word_or_quoted (std::string &string, const char *non_term)
 {
   return try_read_word (string, non_term) || try_read_quoted (string);
 }
 
 bool 
-tl::Extractor::try_read_quoted (std::string &string)
+Extractor::try_read_quoted (std::string &string)
 {
   char q = *skip ();
 
@@ -1189,7 +1192,7 @@ tl::Extractor::try_read_quoted (std::string &string)
 }
 
 bool 
-tl::Extractor::try_read (std::string &string, const char *term)
+Extractor::try_read (std::string &string, const char *term)
 {
   //  if the terminating characters contain line feed for blank, we must not skip over them
   if (strchr (term, '\n') || strchr (term, ' ')) {
@@ -1216,8 +1219,8 @@ tl::Extractor::try_read (std::string &string, const char *term)
   return true;
 }
 
-tl::Extractor & 
-tl::Extractor::expect_end ()
+Extractor &
+Extractor::expect_end ()
 {
   if (! at_end ()) {
     error (tl::to_string (tr ("Expected end of text")));
@@ -1225,8 +1228,8 @@ tl::Extractor::expect_end ()
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::expect_more ()
+Extractor &
+Extractor::expect_more ()
 {
   if (at_end ()) {
     error (tl::to_string (tr ("Expected more text")));
@@ -1234,8 +1237,8 @@ tl::Extractor::expect_more ()
   return *this;
 }
 
-tl::Extractor & 
-tl::Extractor::expect (const char *token)
+Extractor &
+Extractor::expect (const char *token)
 {
   if (! test (token)) {
     error (tl::sprintf (tl::to_string (tr ("Expected '%s'")).c_str (), token));
@@ -1244,7 +1247,7 @@ tl::Extractor::expect (const char *token)
 }
 
 bool 
-tl::Extractor::test (const char *token)
+Extractor::test (const char *token)
 {
   skip ();
 
@@ -1266,7 +1269,7 @@ tl::Extractor::test (const char *token)
 }
 
 const char *
-tl::Extractor::skip ()
+Extractor::skip ()
 {
   while (isspace (*m_cp) && *m_cp) {
     ++m_cp;
@@ -1275,7 +1278,7 @@ tl::Extractor::skip ()
 }
 
 void
-tl::Extractor::error (const std::string &msg)
+Extractor::error (const std::string &msg)
 {
   std::string m (msg);
 
@@ -1296,9 +1299,9 @@ tl::Extractor::error (const std::string &msg)
 }
 
 // -------------------------------------------------------------------
-//  tl::string implementation
+//  string implementation
 
-tl::string::string (const char *c)
+string::string (const char *c)
 {
   if (c && *c) {
     m_capacity = m_size = strlen (c);
@@ -1311,7 +1314,7 @@ tl::string::string (const char *c)
   }
 }
 
-tl::string::string (const char *c, size_t from, size_t to)
+string::string (const char *c, size_t from, size_t to)
 {
   m_capacity = m_size = to - from;
   if (m_size > 0) {
@@ -1324,7 +1327,7 @@ tl::string::string (const char *c, size_t from, size_t to)
   }
 }
 
-tl::string::string (const tl::string &s)
+string::string (const tl::string &s)
 {
   m_capacity = m_size = s.size ();
   if (m_size > 0) {
@@ -1337,7 +1340,7 @@ tl::string::string (const tl::string &s)
   }
 }
 
-tl::string::string (const tl::string &s, size_t from, size_t to)
+string::string (const tl::string &s, size_t from, size_t to)
 {
   m_capacity = m_size = to - from;
   if (m_size > 0) {
@@ -1350,7 +1353,7 @@ tl::string::string (const tl::string &s, size_t from, size_t to)
   }
 }
 
-tl::string::string (const std::string &s)
+string::string (const std::string &s)
 {
   m_capacity = m_size = s.size ();
   if (m_size > 0) {
@@ -1363,7 +1366,7 @@ tl::string::string (const std::string &s)
   }
 }
 
-tl::string::string (const std::string &s, size_t from, size_t to)
+string::string (const std::string &s, size_t from, size_t to)
 {
   m_capacity = m_size = to - from;
   if (m_size > 0) {
@@ -1376,7 +1379,7 @@ tl::string::string (const std::string &s, size_t from, size_t to)
   }
 }
 
-tl::string::~string ()
+string::~string ()
 {
   if (mp_rep) {
     allocator_t alloc;
@@ -1385,8 +1388,8 @@ tl::string::~string ()
   mp_rep = 0;
 }
 
-tl::string &
-tl::string::operator= (const char *c)
+string &
+string::operator= (const char *c)
 {
   if (c && *c) {
     assign (c, 0, strlen (c));
@@ -1400,7 +1403,7 @@ tl::string::operator= (const char *c)
 }
 
 void 
-tl::string::assign (const char *c, size_t from, size_t to)
+string::assign (const char *c, size_t from, size_t to)
 {
   m_size = to - from;
   if (m_size > 0) {
@@ -1421,8 +1424,8 @@ tl::string::assign (const char *c, size_t from, size_t to)
   }
 }
 
-tl::string &
-tl::string::operator= (const tl::string &s)
+string &
+string::operator= (const string &s)
 {
   if (&s != this) {
     m_size = s.size ();
@@ -1447,7 +1450,7 @@ tl::string::operator= (const tl::string &s)
 }
 
 void 
-tl::string::assign (const tl::string &s, size_t from, size_t to)
+string::assign (const tl::string &s, size_t from, size_t to)
 {
   if (&s != this) {
     assign (s.c_str (), from, to);
@@ -1457,21 +1460,21 @@ tl::string::assign (const tl::string &s, size_t from, size_t to)
   }
 }
 
-tl::string &
-tl::string::operator= (const std::string &s)
+string &
+string::operator= (const std::string &s)
 {
   assign (s.c_str (), 0, s.size ());
   return *this;
 }
 
 void 
-tl::string::assign (const std::string &s, size_t from, size_t to)
+string::assign (const std::string &s, size_t from, size_t to)
 {
   assign (s.c_str (), from, to);
 }
 
 void
-tl::string::clear ()
+string::clear ()
 {
   if (mp_rep) {
     allocator_t alloc;
@@ -1483,7 +1486,7 @@ tl::string::clear ()
 }
 
 void 
-tl::string::reserve (size_t n) 
+string::reserve (size_t n)
 {
   if (m_capacity < n) {
     allocator_t alloc;
@@ -1498,79 +1501,79 @@ tl::string::reserve (size_t n)
 }
 
 bool 
-tl::string::operator== (const char *c) const
+string::operator== (const char *c) const
 {
   return (c[0] == c_str()[0] && strcmp (c, c_str()) == 0);
 }
 
 bool 
-tl::string::operator== (const tl::string &s) const
+string::operator== (const tl::string &s) const
 {
   return (c_str()[0] == s.c_str()[0] && strcmp (c_str(), s.c_str()) == 0);
 }
 
 bool 
-tl::string::operator!= (const char *c) const
+string::operator!= (const char *c) const
 {
   return (c[0] != c_str()[0] || strcmp (c, c_str()) != 0);
 }
 
 bool 
-tl::string::operator!= (const tl::string &s) const
+string::operator!= (const tl::string &s) const
 {
   return (c_str()[0] != s.c_str()[0] || strcmp (c_str(), s.c_str()) != 0);
 }
 
 bool 
-tl::string::operator< (const char *c) const
+string::operator< (const char *c) const
 {
   return strcmp (c_str(), c) < 0;
 }
  
 bool 
-tl::string::operator< (const tl::string &s) const
+string::operator< (const tl::string &s) const
 {
   return strcmp (c_str(), s.c_str()) < 0;
 }
 
 bool 
-tl::string::operator<= (const char *c) const
+string::operator<= (const char *c) const
 {
   return strcmp (c_str(), c) <= 0;
 }
  
 bool 
-tl::string::operator<= (const tl::string &s) const
+string::operator<= (const tl::string &s) const
 {
   return strcmp (c_str(), s.c_str()) <= 0;
 }
 
 bool 
-tl::string::operator> (const char *c) const
+string::operator> (const char *c) const
 {
   return strcmp (c_str(), c) > 0;
 }
  
 bool 
-tl::string::operator> (const tl::string &s) const
+string::operator> (const tl::string &s) const
 {
   return strcmp (c_str(), s.c_str()) > 0;
 }
 
 bool 
-tl::string::operator>= (const char *c) const
+string::operator>= (const char *c) const
 {
   return strcmp (c_str(), c) >= 0;
 }
  
 bool 
-tl::string::operator>= (const tl::string &s) const
+string::operator>= (const tl::string &s) const
 {
   return strcmp (c_str(), s.c_str()) >= 0;
 }
 
 // -------------------------------------------------------------------
-//  tl::sprintf implementation
+//  sprintf implementation
 
 #if defined(_STLPORT_VERSION) && _STLPORT_VERSION == 0x521 && defined(_MSC_VER)
 /**
@@ -1599,7 +1602,7 @@ std::string format_sci_stlport_fix (double f, int prec, unsigned int flags)
 #endif
 
 std::string
-tl::sprintf (const char *f, const std::vector <tl::Variant> &vv, unsigned int a0)
+sprintf (const char *f, const std::vector <tl::Variant> &vv, unsigned int a0)
 {
   std::ostringstream os;
   os.imbue (c_locale);
@@ -1728,8 +1731,10 @@ tl::sprintf (const char *f, const std::vector <tl::Variant> &vv, unsigned int a0
 }
 
 std::string
-tl::sprintf (const std::string &f, const std::vector <tl::Variant> &vv, unsigned int a0)
+sprintf (const std::string &f, const std::vector <tl::Variant> &vv, unsigned int a0)
 {
   return tl::sprintf (f.c_str (), vv, a0);
+}
+
 }
 

@@ -36,8 +36,8 @@
 
 void wait_for_ms (int ms)
 {
-  QDateTime start = QDateTime::currentDateTime ();
-  while (tl::msecs_to (start, QDateTime::currentDateTime()) < ms) {
+  tl::Clock start = tl::Clock::current ();
+  while ((tl::Clock::current () - start).seconds () < ms * 0.001) {
     QCoreApplication::processEvents ();
   }
 }

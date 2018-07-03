@@ -35,12 +35,6 @@ namespace tl
 {
 
 /**
- *  @brief Provides a ms difference between QDateTimes
- *  This function is provided to emulate QDateTime::msecsTo for Qt < 4.7
- */
-TL_PUBLIC int64_t msecs_to (const QDateTime &from, const QDateTime &to);
-
-/**
  *  @brief A basic timer class
  *
  *  Measure the time between start() and stop() and 

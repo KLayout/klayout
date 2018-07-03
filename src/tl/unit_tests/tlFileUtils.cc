@@ -245,6 +245,10 @@ TEST (10)
     EXPECT_EQ (tl::extension ("\\hello\\.world.gz"), "gz");
     EXPECT_EQ (tl::extension ("/hello//world/"), "");
 
+    EXPECT_EQ (tl::combine_path ("hello", "world"), "hello\\world");
+    EXPECT_EQ (tl::combine_path ("hello", ""), "hello");
+    EXPECT_EQ (tl::combine_path ("hello", "", true), "hello\\");
+
     tl::file_utils_force_reset ();
 
   } catch (...) {
@@ -291,12 +295,32 @@ TEST (11)
     EXPECT_EQ (tl::extension ("/hello/.world.gz"), "gz");
     EXPECT_EQ (tl::extension ("/hello//world/"), "");
 
+    EXPECT_EQ (tl::combine_path ("hello", "world"), "hello/world");
+    EXPECT_EQ (tl::combine_path ("hello", ""), "hello");
+    EXPECT_EQ (tl::combine_path ("hello", "", true), "hello/");
+
     tl::file_utils_force_reset ();
 
   } catch (...) {
     tl::file_utils_force_reset ();
     throw;
   }
+}
+
+//  current_dir
+TEST (12)
+{
+  std::string currdir = tl::current_dir ();
+  std::string currdir_abs = tl::absolute_file_path (".");
+  EXPECT_EQ (currdir, currdir_abs);
+
+  std::string above = tl::absolute_file_path ("..");
+  EXPECT_EQ (tl::is_same_file (currdir, above), false);
+  EXPECT_EQ (tl::is_parent_path (currdir, above), false);
+  EXPECT_EQ (tl::is_parent_path (currdir, currdir), true);
+  EXPECT_EQ (tl::is_parent_path (above, currdir), true);
+  EXPECT_EQ (tl::is_parent_path (above, above), true);
+  EXPECT_EQ (tl::is_same_file (tl::combine_path (currdir, ".."), above), true);
 }
 
 #endif

@@ -485,6 +485,12 @@ public:
   {
     //  .. nothing yet ..
   }
+
+  XMLSourcePrivateData (QIODevice *dev)
+    : QXmlInputSource (dev)
+  {
+    //  .. nothing yet ..
+  }
 };
 
 // --------------------------------------------------------------------
@@ -531,7 +537,7 @@ class StreamIODevice
 {
 public:
   StreamIODevice (tl::InputStream &stream)
-    : m_stream (stream),
+    : mp_stream (&stream),
       mp_progress (0),
       m_has_error (false)
   {
@@ -539,10 +545,30 @@ public:
   }
 
   StreamIODevice (tl::InputStream &stream, const std::string &progress_message)
-    : m_stream (stream),
+    : mp_stream (&stream),
       mp_progress (new AbsoluteProgress (progress_message, 100)),
       m_has_error (false)
   {
+    mp_progress->set_format (tl::to_string (tr ("%.0f MB")));
+    mp_progress->set_unit (1024 * 1024);
+    open (QIODevice::ReadOnly);
+  }
+
+  StreamIODevice (const std::string &path)
+    : mp_stream_holder (new tl::InputStream (path)),
+      mp_progress (0),
+      m_has_error (false)
+  {
+    mp_stream = mp_stream_holder.get ();
+    open (QIODevice::ReadOnly);
+  }
+
+  StreamIODevice (const std::string &path, const std::string &progress_message)
+    : mp_stream_holder (new tl::InputStream (path)),
+      mp_progress (new AbsoluteProgress (progress_message, 100)),
+      m_has_error (false)
+  {
+    mp_stream = mp_stream_holder.get ();
     mp_progress->set_format (tl::to_string (tr ("%.0f MB")));
     mp_progress->set_unit (1024 * 1024);
     open (QIODevice::ReadOnly);
@@ -571,11 +597,11 @@ public:
     try {
 
       if (mp_progress) {
-        mp_progress->set (m_stream.pos ());
+        mp_progress->set (mp_stream->pos ());
       }
 
       qint64 n0 = n;
-      for (const char *rd = 0; n > 0 && (rd = m_stream.get (1)) != 0; --n) {
+      for (const char *rd = 0; n > 0 && (rd = mp_stream->get (1)) != 0; --n) {
         *data++ = *rd;
       }
 
@@ -598,7 +624,8 @@ public:
   }
 
 private:
-  tl::InputStream &m_stream;
+  tl::InputStream *mp_stream;
+  std::auto_ptr<tl::InputStream> mp_stream_holder;
   tl::AbsoluteProgress *mp_progress;
   bool m_has_error;
 };
@@ -606,61 +633,12 @@ private:
 // --------------------------------------------------------------------
 //  XMLFileSource implementation
 
-class XMLFileSourcePrivateData
-  : public XMLSourcePrivateData
-{
-public:
-  XMLFileSourcePrivateData (const std::string &path, const std::string &progress_message)
-    : m_stream (path)
-  {
-    mp_io.reset (new StreamIODevice (m_stream, progress_message));
-  }
-
-  XMLFileSourcePrivateData (const std::string &path)
-    : m_stream (path)
-  {
-    mp_io.reset (new StreamIODevice (m_stream));
-  }
-
-  virtual void fetchData ()
-  {
-    QXmlInputSource::fetchData ();
-
-    //  This feature is actually missing in the original implementation: throw an exception on error
-    if (mp_io->has_error ()) {
-      throw tl::Exception (tl::to_string (mp_io->errorString ()));
-    }
-  }
-
-private:
-  std::auto_ptr<StreamIODevice> mp_io;
-  tl::InputStream m_stream;
-};
-
-XMLFileSource::XMLFileSource (const std::string &path, const std::string &progress_message)
-{
-  set_source (new XMLFileSourcePrivateData (path, progress_message));
-}
-
-XMLFileSource::XMLFileSource (const std::string &path)
-{
-  set_source (new XMLFileSourcePrivateData (path));
-}
-
-XMLFileSource::~XMLFileSource ()
-{
-  //  .. nothing yet ..
-}
-
-// --------------------------------------------------------------------
-//  XMLStreamSource implementation
-
 class XMLStreamSourcePrivateData
   : public XMLSourcePrivateData
 {
 public:
   XMLStreamSourcePrivateData (StreamIODevice *io)
-    : mp_io (io)
+    : XMLSourcePrivateData (io), mp_io (io)
   {
     //  .. nothing yet ..
   }
@@ -678,6 +656,27 @@ public:
 private:
   std::auto_ptr<StreamIODevice> mp_io;
 };
+
+// --------------------------------------------------------------------
+//  XMLFileSource implementation
+
+XMLFileSource::XMLFileSource (const std::string &path, const std::string &progress_message)
+{
+  set_source (new XMLStreamSourcePrivateData (new StreamIODevice (path, progress_message)));
+}
+
+XMLFileSource::XMLFileSource (const std::string &path)
+{
+  set_source (new XMLStreamSourcePrivateData (new StreamIODevice (path)));
+}
+
+XMLFileSource::~XMLFileSource ()
+{
+  //  .. nothing yet ..
+}
+
+// --------------------------------------------------------------------
+//  XMLStreamSource implementation
 
 XMLStreamSource::XMLStreamSource (tl::InputStream &s, const std::string &progress_message)
 {

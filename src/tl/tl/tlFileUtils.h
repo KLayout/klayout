@@ -140,8 +140,10 @@ std::string TL_PUBLIC normalize_path (const std::string &s);
 
 /**
  *  @brief Combines the two path components into one path
+ *  If "always_join" is true, the path is also built if p2 is empty. This will
+ *  essentially add a slash or backslash to p1.
  */
-std::string TL_PUBLIC combine_path (const std::string &p1, const std::string &p2);
+std::string TL_PUBLIC combine_path (const std::string &p1, const std::string &p2, bool always_join = false);
 
 /**
  *  @brief Gets the current directory
@@ -156,8 +158,10 @@ std::string TL_PUBLIC current_dir ();
  *  parts will render the original path. A trailing empty element is
  *  added if the path terminates with a separator (like "C:\" or "/home/user/").
  *  The idea is that the last element is the file name part.
+ *  If "keep_last" is true, the last part will be kept even if it's empty.
+ *  With this, a path like "/hello/" becomes "/hello"+"/".
  */
-std::vector<std::string> split_path (const std::string &p);
+std::vector<std::string> TL_PUBLIC split_path (const std::string &p, bool keep_last = false);
 
 }
 

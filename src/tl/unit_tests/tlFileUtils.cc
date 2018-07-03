@@ -166,4 +166,137 @@ TEST (3)
   }
 }
 
+//  Secret mode switchers for testing
+namespace tl
+{
+TL_PUBLIC void file_utils_force_windows ();
+TL_PUBLIC void file_utils_force_linux ();
+TL_PUBLIC void file_utils_force_reset ();
+}
+
+//  Fake Windows-tests
+TEST (10)
+{
+  tl::file_utils_force_windows ();
+  try {
+
+    EXPECT_EQ (tl::join (tl::split_path ("\\hello\\world"), "+"), "\\hello+\\world");
+    EXPECT_EQ (tl::join (tl::split_path ("\\hello\\\\world\\"), "+"), "\\hello+\\world");
+    EXPECT_EQ (tl::join (tl::split_path ("hello\\\\world\\"), "+"), "hello+\\world");
+    EXPECT_EQ (tl::join (tl::split_path ("\\\\SERVER\\hello\\world"), "+"), "\\\\SERVER+\\hello+\\world");
+    EXPECT_EQ (tl::join (tl::split_path ("c:\\hello\\\\world\\"), "+"), "C:+\\hello+\\world");
+
+    //  slashes are good too:
+    EXPECT_EQ (tl::join (tl::split_path ("/hello/world"), "+"), "\\hello+\\world");
+    EXPECT_EQ (tl::join (tl::split_path ("/hello//world/"), "+"), "\\hello+\\world");
+    EXPECT_EQ (tl::join (tl::split_path ("hello//world/"), "+"), "hello+\\world");
+    EXPECT_EQ (tl::join (tl::split_path ("//SERVER/hello/world"), "+"), "\\\\SERVER+\\hello+\\world");
+    EXPECT_EQ (tl::join (tl::split_path ("c:/hello//world/"), "+"), "C:+\\hello+\\world");
+
+    //  boundary cases
+    EXPECT_EQ (tl::join (tl::split_path (""), "+"), "");
+    EXPECT_EQ (tl::join (tl::split_path ("\\"), "+"), "\\");
+    EXPECT_EQ (tl::join (tl::split_path ("/"), "+"), "\\");
+    EXPECT_EQ (tl::join (tl::split_path ("d:"), "+"), "D:");
+    EXPECT_EQ (tl::join (tl::split_path ("\\\\"), "+"), "\\\\");
+    EXPECT_EQ (tl::join (tl::split_path ("//"), "+"), "\\\\");
+    EXPECT_EQ (tl::join (tl::split_path ("d:\\"), "+"), "D:+\\");
+    EXPECT_EQ (tl::join (tl::split_path ("d:\\\\"), "+"), "D:+\\");
+    EXPECT_EQ (tl::join (tl::split_path ("d:/"), "+"), "D:+\\");
+    EXPECT_EQ (tl::join (tl::split_path ("d://"), "+"), "D:+\\");
+
+    EXPECT_EQ (tl::dirname ("/hello/world"), "\\hello");
+    EXPECT_EQ (tl::dirname ("\\hello\\world"), "\\hello");
+    EXPECT_EQ (tl::dirname ("/hello//world/"), "\\hello\\world");
+    EXPECT_EQ (tl::dirname ("\\hello\\\\world\\"), "\\hello\\world");
+    EXPECT_EQ (tl::dirname ("hello//world/"), "hello\\world");
+    EXPECT_EQ (tl::dirname ("hello\\\\world\\"), "hello\\world");
+    EXPECT_EQ (tl::dirname ("\\\\SERVER\\hello\\world"), "\\\\SERVER\\hello");
+    EXPECT_EQ (tl::dirname ("//SERVER/hello/world"), "\\\\SERVER\\hello");
+    EXPECT_EQ (tl::dirname ("c:\\hello\\world"), "C:\\hello");
+    EXPECT_EQ (tl::dirname ("c:\\hello\\\\world"), "C:\\hello");
+    EXPECT_EQ (tl::dirname ("c:/hello//world"), "C:\\hello");
+    EXPECT_EQ (tl::dirname ("c:/hello//world/"), "C:\\hello\\world");
+
+    EXPECT_EQ (tl::filename ("/hello/world"), "world");
+    EXPECT_EQ (tl::filename ("\\hello\\world"), "world");
+    EXPECT_EQ (tl::filename ("/hello//world/"), "");
+    EXPECT_EQ (tl::filename ("\\hello\\\\world\\"), "");
+    EXPECT_EQ (tl::filename ("hello//world/"), "");
+    EXPECT_EQ (tl::filename ("hello\\\\world\\"), "");
+    EXPECT_EQ (tl::filename ("\\\\SERVER\\hello\\world"), "world");
+    EXPECT_EQ (tl::filename ("//SERVER/hello/world"), "world");
+    EXPECT_EQ (tl::filename ("c:\\hello\\world"), "world");
+    EXPECT_EQ (tl::filename ("c:\\hello\\\\world"), "world");
+    EXPECT_EQ (tl::filename ("c:/hello//world"), "world");
+    EXPECT_EQ (tl::filename ("c:/hello//world/"), "");
+
+    EXPECT_EQ (tl::basename ("/hello/world"), "world");
+    EXPECT_EQ (tl::basename ("/hello/world.tar"), "world");
+    EXPECT_EQ (tl::basename ("/hello/world.tar.gz"), "world");
+    EXPECT_EQ (tl::basename ("\\hello\\.world"), ".world");
+    EXPECT_EQ (tl::basename ("\\hello\\.world.gz"), ".world");
+    EXPECT_EQ (tl::basename ("/hello//world/"), "");
+
+    EXPECT_EQ (tl::extension ("/hello/world"), "");
+    EXPECT_EQ (tl::extension ("/hello/world.tar"), "tar");
+    EXPECT_EQ (tl::extension ("/hello/world.tar.gz"), "tar.gz");
+    EXPECT_EQ (tl::extension ("\\hello\\.world"), "");
+    EXPECT_EQ (tl::extension ("\\hello\\.world.gz"), "gz");
+    EXPECT_EQ (tl::extension ("/hello//world/"), "");
+
+    tl::file_utils_force_reset ();
+
+  } catch (...) {
+    tl::file_utils_force_reset ();
+    throw;
+  }
+}
+
+//  Fake Linux-tests
+TEST (11)
+{
+  tl::file_utils_force_linux ();
+  try {
+
+    EXPECT_EQ (tl::join (tl::split_path ("/hello/world"), "+"), "/hello+/world");
+    EXPECT_EQ (tl::join (tl::split_path ("/hel\\/\\\\lo/world"), "+"), "/hel\\/\\\\lo+/world");
+    EXPECT_EQ (tl::join (tl::split_path ("/hello//world/"), "+"), "/hello+/world");
+    EXPECT_EQ (tl::join (tl::split_path ("hello//world/"), "+"), "hello+/world");
+
+    //  boundary cases
+    EXPECT_EQ (tl::join (tl::split_path (""), "+"), "");
+    EXPECT_EQ (tl::join (tl::split_path ("/"), "+"), "/");
+    EXPECT_EQ (tl::join (tl::split_path ("//"), "+"), "/");
+
+    EXPECT_EQ (tl::dirname ("/hello/world"), "/hello");
+    EXPECT_EQ (tl::dirname ("/hello//world/"), "/hello/world");
+    EXPECT_EQ (tl::dirname ("hello//world/"), "hello/world");
+
+    EXPECT_EQ (tl::filename ("/hello/world"), "world");
+    EXPECT_EQ (tl::filename ("/hello//world/"), "");
+    EXPECT_EQ (tl::filename ("hello//world/"), "");
+
+    EXPECT_EQ (tl::basename ("/hello/world"), "world");
+    EXPECT_EQ (tl::basename ("/hello/world.tar"), "world");
+    EXPECT_EQ (tl::basename ("/hello/world.tar.gz"), "world");
+    EXPECT_EQ (tl::basename ("/hello/.world"), ".world");
+    EXPECT_EQ (tl::basename ("/hello/.world.gz"), ".world");
+    EXPECT_EQ (tl::basename ("/hello//world/"), "");
+
+    EXPECT_EQ (tl::extension ("/hello/world"), "");
+    EXPECT_EQ (tl::extension ("/hello///world.tar"), "tar");
+    EXPECT_EQ (tl::extension ("/hello/world.tar.gz"), "tar.gz");
+    EXPECT_EQ (tl::extension ("/hello//.world"), "");
+    EXPECT_EQ (tl::extension ("/hello/.world.gz"), "gz");
+    EXPECT_EQ (tl::extension ("/hello//world/"), "");
+
+    tl::file_utils_force_reset ();
+
+  } catch (...) {
+    tl::file_utils_force_reset ();
+    throw;
+  }
+}
+
 #endif

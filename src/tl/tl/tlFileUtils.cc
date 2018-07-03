@@ -34,31 +34,64 @@
 namespace tl
 {
 
+enum { OS_Auto, OS_Windows, OS_Linux } s_mode = OS_Auto;
+
+static bool is_win ()
+{
+  if (s_mode == OS_Windows) {
+    return true;
+  } else if (s_mode == OS_Linux) {
+    return false;
+  } else {
 #if defined(_WIN32)
+    return true;
+#else
+    return false;
+#endif
+  }
+}
+
+//  Secret mode switchers for testing
+TL_PUBLIC void file_utils_force_windows () { s_mode = OS_Windows; }
+TL_PUBLIC void file_utils_force_linux () { s_mode = OS_Linux; }
+TL_PUBLIC void file_utils_force_reset () { s_mode = OS_Auto; }
+
+
 static bool is_drive (const std::string &part)
 {
-  return (part.size () == 2 && isletter (part[0]) && part[1] == ':');
+  return is_win () && (part.size () == 2 && isalpha (part[0]) && part[1] == ':');
 }
-#else
-static bool is_drive (const std::string &)
+
+static std::string normalized_part (const std::string &part)
 {
-  return false;
+  if (! is_win ()) {
+    return part;
+  }
+
+  std::string p;
+  p.reserve (part.size ());
+  const char *cp = part.c_str ();
+  while (*cp == '\\' || *cp == '/') {
+    p += '\\';
+    ++cp;
+  }
+  p += cp;
+  return p;
 }
-#endif
 
 static std::string trimmed_part (const std::string &part)
 {
   const char *cp = part.c_str ();
 
-#if defined(_WIN32)
-  while (*cp == '\\' || *cp == '/') {
-    ++cp;
+  if (is_win ()) {
+    while (*cp == '\\' || *cp == '/') {
+      ++cp;
+    }
+  } else {
+    while (*cp == '/') {
+      ++cp;
+    }
   }
-#else
-  while (*cp == '/') {
-    ++cp;
-  }
-#endif
 
   return std::string (cp);
 }
@@ -66,87 +99,91 @@ static std::string trimmed_part (const std::string &part)
 static bool is_part_with_separator (const std::string &part)
 {
   const char *cp = part.c_str ();
-#if defined(_WIN32)
-  return (*cp == '\\' || *cp == '/');
-#else
-  return (*cp == '/');
-#endif
+  if (is_win ()) {
+    return (*cp == '\\' || *cp == '/');
+  } else {
+    return (*cp == '/');
+  }
 }
 
-std::vector<std::string> split_path (const std::string &p)
+std::vector<std::string> split_path (const std::string &p, bool keep_last)
 {
   std::vector<std::string> parts;
 
-#if defined(_WIN32)
+  bool first = true;
 
-  const char *cp = p.c_str ();
-  if (*cp && isletter (*cp) && cp[1] == ':') {
+  if (is_win ()) {
 
-    //  drive name
-    parts.push_back (std::string ());
-    parts.back () += toupper (*cp);
-    parts.back () += ":";
+    const char *cp = p.c_str ();
+    if (*cp && isalpha (*cp) && cp[1] == ':') {
 
-    cp += 2;
+      //  drive name
+      parts.push_back (std::string ());
+      parts.back () += toupper (*cp);
+      parts.back () += ":";
 
-  } else if ((*cp == '\\' && cp[1] == '\\') || (*cp == '/' && cp[1] == '/')) {
+      cp += 2;
 
-    //  UNC server name
-    const char *cp0 = cp;
-    cp += 2;
-    while (*cp && *cp != '\\' && *cp != '/') {
-      ++cp;
-    }
-    parts.push_back (std::string (cp0, 0, cp - cp0));
+    } else if ((*cp == '\\' && cp[1] == '\\') || (*cp == '/' && cp[1] == '/')) {
 
-  }
-
-  while (*cp) {
-
-    const char *cp0 = cp;
-    bool any = false;
-    while (*cp && (!any || (*cp != '\\' && *cp != '/'))) {
-      if (*cp != '\\' && *cp != '/') {
-        any = true;
-      } else {
-        cp0 = cp;
-      }
-      ++cp;
-    }
-
-    if (any) {
-      parts.push_back (std::string (cp0, 0, cp - cp0));
-    }
-
-  }
-
-#else
-
-  const char *cp = p.c_str ();
-  while (*cp) {
-
-    const char *cp0 = cp;
-    bool any = false;
-    while (*cp && (!any || *cp != '/')) {
-      if (*cp != '/') {
-        any = true;
-      } else {
-        cp0 = cp;
-      }
-      //  backslash escape
-      if (*cp == '\\' && cp[1]) {
+      //  UNC server name
+      const char *cp0 = cp;
+      cp += 2;
+      while (*cp && *cp != '\\' && *cp != '/') {
         ++cp;
       }
-      ++cp;
+      parts.push_back (tl::normalized_part (std::string (cp0, 0, cp - cp0)));
+
     }
 
-    if (any) {
-      parts.push_back (std::string (cp0, 0, cp - cp0));
+    while (*cp) {
+
+      const char *cp0 = cp;
+      bool any = false;
+      while (*cp && (!any || (*cp != '\\' && *cp != '/'))) {
+        if (*cp != '\\' && *cp != '/') {
+          any = true;
+        } else {
+          cp0 = cp;
+        }
+        ++cp;
+      }
+
+      if (any || first || keep_last) {
+        first = false;
+        parts.push_back (tl::normalized_part (std::string (cp0, 0, cp - cp0)));
+      }
+
+    }
+
+  } else {
+
+    const char *cp = p.c_str ();
+    while (*cp) {
+
+      const char *cp0 = cp;
+      bool any = false;
+      while (*cp && (!any || *cp != '/')) {
+        if (*cp != '/') {
+          any = true;
+        } else {
+          cp0 = cp;
+        }
+        //  backslash escape
+        if (*cp == '\\' && cp[1]) {
+          ++cp;
+        }
+        ++cp;
+      }
+
+      if (any || first || keep_last) {
+        first = false;
+        parts.push_back (std::string (cp0, 0, cp - cp0));
+      }
+
     }
 
   }
-
-#endif
 
   return parts;
 }
@@ -179,6 +216,61 @@ static std::vector<std::string> split_filename (const std::string &fn)
   return parts;
 }
 
+std::string normalize_path (const std::string &s)
+{
+  return tl::join (tl::split_path (s), "");
+}
+
+std::string combine_path (const std::string &p1, const std::string &p2, bool always_join)
+{
+  if (! always_join && p2.empty ()) {
+    return p1;
+  } else if (is_win ()) {
+    return p1 + "\\" + p2;
+  } else {
+    return p1 + "/" + p2;
+  }
+}
+
+std::string dirname (const std::string &s)
+{
+  std::vector<std::string> parts = split_path (s, true /*keep last part*/);
+  if (parts.size () > 0) {
+    parts.pop_back ();
+  }
+
+  return tl::join (parts, "");
+}
+
+std::string filename (const std::string &s)
+{
+  std::vector<std::string> parts = split_path (s, true /*keep last part*/);
+  if (parts.size () > 0) {
+    return trimmed_part (parts.back ());
+  } else {
+    return std::string ();
+  }
+}
+
+std::string basename (const std::string &s)
+{
+  std::vector<std::string> fnp = split_filename (filename (s));
+  if (fnp.size () > 0) {
+    return fnp.front ();
+  } else {
+    return std::string ();
+  }
+}
+
+std::string extension (const std::string &s)
+{
+  std::vector<std::string> fnp = split_filename (filename (s));
+  if (fnp.size () > 0) {
+    fnp.erase (fnp.begin ());
+  }
+  return tl::join (fnp, ".");
+}
+
 bool
 is_parent_path (const std::string &parent, const std::string &path)
 {
@@ -198,7 +290,7 @@ is_parent_path (const std::string &parent, const std::string &path)
   }
 
   //  We did not find a match - now maybe the parent is root
-  return (is_same_file (parent, tl::combine_path (tl::join (parts, ""), "")));
+  return (is_same_file (parent, tl::combine_path (tl::join (parts, ""), "", true /*always add slash*/)));
 }
 
 std::vector<std::string> dir_entries (const std::string &s, bool with_files, bool with_dirs, bool without_dotfiles)
@@ -314,6 +406,11 @@ bool rm_dir_recursive (const std::string &p)
 {
   std::vector<std::string> entries;
   std::string path = tl::absolute_file_path (p);
+
+  if (! tl::file_exists (path)) {
+    //  already gone.
+    return true;
+  }
 
   entries = dir_entries (path, false /*without_files*/, true /*with_dirs*/);
   for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
@@ -518,45 +615,6 @@ std::string absolute_file_path (const std::string &s)
   }
 }
 
-std::string dirname (const std::string &s)
-{
-  std::vector<std::string> parts = split_path (s);
-  if (parts.size () > 0) {
-    parts.pop_back ();
-  }
-
-  return tl::join (parts, "");
-}
-
-std::string filename (const std::string &s)
-{
-  std::vector<std::string> parts = split_path (s);
-  if (parts.size () > 0) {
-    return trimmed_part (parts.back ());
-  } else {
-    return std::string ();
-  }
-}
-
-std::string basename (const std::string &s)
-{
-  std::vector<std::string> fnp = split_filename (filename (s));
-  if (fnp.size () > 0) {
-    return fnp.front ();
-  } else {
-    return std::string ();
-  }
-}
-
-std::string extension (const std::string &s)
-{
-  std::vector<std::string> fnp = split_filename (filename (s));
-  if (fnp.size () > 0) {
-    fnp.erase (fnp.begin ());
-  }
-  return tl::join (fnp, ".");
-}
-
 static int stat_func (const std::string &s, struct stat &st)
 {
 #if defined(_WIN32)
@@ -606,24 +664,6 @@ std::string relative_path (const std::string &base, const std::string &p)
   }
 
   return p;
-}
-
-std::string normalize_path (const std::string &s)
-{
-  return tl::join (tl::split_path (s), "");
-}
-
-std::string combine_path (const std::string &p1, const std::string &p2)
-{
-  if (p2.empty ()) {
-    return p1;
-  } else {
-#if defined(_WIN32)
-    return p1 + "\\" + p2;
-#else
-    return p1 + "/" + p2;
-#endif
-  }
 }
 
 bool is_same_file (const std::string &a, const std::string &b)

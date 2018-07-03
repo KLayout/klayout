@@ -163,14 +163,14 @@ protected:
  *  available.
  */
 
-#if defined(HVE_QT)
+#if defined(HAVE_QT)
 
 template <class T>
 class TL_PUBLIC ThreadStorage
   : public QThreadStorage<T>
 {
 public:
-  ThreadStorage () : QThreadStorage () { }
+  ThreadStorage () : QThreadStorage<T> () { }
 };
 
 #else
@@ -180,15 +180,16 @@ template <class T>
 class TL_PUBLIC ThreadStorage
 {
 public:
-  ThreadStorage () : m_t () { }
+  ThreadStorage () : m_t (), m_has_data (false) { }
 
-  bool hasLocalData () const { return true; }
+  bool hasLocalData () const { return m_has_data; }
   T &localData () { return m_t; }
   T localData () const { return m_t; }
-  void setLocalData (T data) { m_t = data; }
+  void setLocalData (const T &data) { m_t = data; m_has_data = true; }
 
 private:
   T m_t;
+  bool m_has_data;
 };
 
 #endif

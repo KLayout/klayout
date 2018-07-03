@@ -1,5 +1,5 @@
 
-TARGET = common
+TARGET = common_ui
 DESTDIR = $$OUT_PWD/../../../../lay_plugins
 
 include($$PWD/../../../lay_plugin.pri)

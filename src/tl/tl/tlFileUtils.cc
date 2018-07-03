@@ -51,16 +51,16 @@ static std::string trimmed_part (const std::string &part)
   const char *cp = part.c_str ();
 
 #if defined(_WIN32)
-  while (*cp && *cp != '\\' && *cp != '/') {
+  while (*cp == '\\' || *cp == '/') {
     ++cp;
   }
 #else
-  while (*cp && *cp != '/') {
+  while (*cp == '/') {
     ++cp;
   }
 #endif
 
-  return std::string (part, 0, cp - part.c_str ());
+  return std::string (cp);
 }
 
 static bool is_part_with_separator (const std::string &part)
@@ -108,11 +108,15 @@ std::vector<std::string> split_path (const std::string &p)
     while (*cp && (!any || (*cp != '\\' && *cp != '/'))) {
       if (*cp != '\\' && *cp != '/') {
         any = true;
+      } else {
+        cp0 = cp;
       }
       ++cp;
     }
 
-    parts.push_back (std::string (cp0, 0, cp - cp0));
+    if (any) {
+      parts.push_back (std::string (cp0, 0, cp - cp0));
+    }
 
   }
 
@@ -126,6 +130,8 @@ std::vector<std::string> split_path (const std::string &p)
     while (*cp && (!any || *cp != '/')) {
       if (*cp != '/') {
         any = true;
+      } else {
+        cp0 = cp;
       }
       //  backslash escape
       if (*cp == '\\' && cp[1]) {
@@ -134,7 +140,9 @@ std::vector<std::string> split_path (const std::string &p)
       ++cp;
     }
 
-    parts.push_back (std::string (cp0, 0, cp - cp0));
+    if (any) {
+      parts.push_back (std::string (cp0, 0, cp - cp0));
+    }
 
   }
 
@@ -254,9 +262,9 @@ std::vector<std::string> dir_entries (const std::string &s, bool with_files, boo
 bool mkdir (const std::string &path)
 {
 #if defined(_WIN32)
-  return _wunlink (tl::to_wstring (path).c_str ()) == 0;
+  return _wmkdir (tl::to_wstring (path).c_str ()) == 0;
 #else
-  return unlink (tl::to_local (path).c_str ()) == 0;
+  return ::mkdir (tl::to_local (path).c_str (), 0777) == 0;
 #endif
 }
 
@@ -600,13 +608,22 @@ std::string relative_path (const std::string &base, const std::string &p)
   return p;
 }
 
+std::string normalize_path (const std::string &s)
+{
+  return tl::join (tl::split_path (s), "");
+}
+
 std::string combine_path (const std::string &p1, const std::string &p2)
 {
+  if (p2.empty ()) {
+    return p1;
+  } else {
 #if defined(_WIN32)
-  return p1 + "\\" + p2;
+    return p1 + "\\" + p2;
 #else
-  return p1 + "/" + p2;
+    return p1 + "/" + p2;
 #endif
+  }
 }
 
 bool is_same_file (const std::string &a, const std::string &b)

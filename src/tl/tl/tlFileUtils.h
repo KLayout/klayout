@@ -132,6 +132,13 @@ bool TL_PUBLIC is_same_file (const std::string &a, const std::string &b);
 std::string TL_PUBLIC relative_path (const std::string &base, const std::string &p);
 
 /**
+ *  @brief Normalizes the path
+ *  This function will remove duplicate "/" or "\" and strip any trailing
+ *  "/" or "\".
+ */
+std::string TL_PUBLIC normalize_path (const std::string &s);
+
+/**
  *  @brief Combines the two path components into one path
  */
 std::string TL_PUBLIC combine_path (const std::string &p1, const std::string &p2);

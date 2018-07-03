@@ -79,7 +79,7 @@ Timer::start ()
   struct timespec spec;
   clock_gettime (CLOCK_REALTIME, &spec);
 
-  m_wall_ms = ms_time ();
+  m_wall_ms += ms_time ();
 }
 
 void

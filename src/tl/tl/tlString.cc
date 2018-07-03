@@ -52,17 +52,17 @@ std::wstring to_wstring (const std::string &s)
 
     uint32_t c32 = (unsigned char) *cp++;
     if (c32 >= 0xf0 && cp + 2 < cpe) {
-      c32 = (c32 << 18) | ((uint32_t (cp [0]) & 0x3f) << 12) | ((uint32_t (cp [1]) & 0x3f) << 6) | (uint32_t (cp [2]) & 0x3f);
+      c32 = ((c32 & 0x7) << 18) | ((uint32_t (cp [0]) & 0x3f) << 12) | ((uint32_t (cp [1]) & 0x3f) << 6) | (uint32_t (cp [2]) & 0x3f);
       cp += 3;
     } else if (c32 >= 0xe0 && cp + 1 < cpe) {
-      c32 = (c32 << 12) | ((uint32_t (cp [0]) & 0x3f) << 6) | (uint32_t (cp [1]) & 0x3f);
+      c32 = ((c32 & 0xf) << 12) | ((uint32_t (cp [0]) & 0x3f) << 6) | (uint32_t (cp [1]) & 0x3f);
       cp += 2;
     } else if (c32 >= 0xc0 && cp < cpe) {
-      c32 = (c32 << 6) | (uint32_t (*cp) & 0x3f);
+      c32 = ((c32 & 0x1f) << 6) | (uint32_t (*cp) & 0x3f);
       ++cp;
     }
 
-    if (c32 >= 0x10000) {
+    if (sizeof (wchar_t) == 2 && c32 >= 0x10000) {
       c32 -= 0x10000;
       ws += wchar_t (0xd800 + (c32 >> 10));
       ws += wchar_t (0xdc00 + (c32 & 0x3ff));
@@ -82,7 +82,7 @@ std::string to_string (const std::wstring &ws)
   for (std::wstring::const_iterator c = ws.begin (); c != ws.end (); ++c) {
 
     uint32_t c32 = *c;
-    if (c32 >= 0xd800 && c + 1 < ws.end ()) {
+    if (sizeof (wchar_t) == 2 && c32 >= 0xd800 && c + 1 < ws.end ()) {
       ++c;
       c32 = (c32 & 0x3ff) << 10;
       c32 |= uint32_t (*c) & 0x3ff;
@@ -97,13 +97,13 @@ std::string to_string (const std::wstring &ws)
 
     } else if (c32 >= 0x800) {
 
-      s.push_back (0xf0 | ((c32 >> 12) & 0xf));
+      s.push_back (0xe0 | ((c32 >> 12) & 0xf));
       s.push_back (0x80 | ((c32 >> 6) & 0x3f));
       s.push_back (0x80 | (c32 & 0x3f));
 
     } else if (c32 >= 0x80) {
 
-      s.push_back (0xf0 | ((c32 >> 6) & 0xc));
+      s.push_back (0xc0 | ((c32 >> 6) & 0x1f));
       s.push_back (0x80 | (c32 & 0x3f));
 
     } else {

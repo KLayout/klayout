@@ -1,5 +1,5 @@
 
-TARGET = oasis
+TARGET = oasis_ui
 DESTDIR = $$OUT_PWD/../../../../lay_plugins
 
 include($$PWD/../../../lay_plugin.pri)

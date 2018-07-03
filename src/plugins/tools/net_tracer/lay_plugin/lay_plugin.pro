@@ -1,5 +1,5 @@
 
-TARGET = net_tracer
+TARGET = net_tracer_ui
 DESTDIR = $$OUT_PWD/../../../../lay_plugins
 
 include($$PWD/../../../lay_plugin.pri)

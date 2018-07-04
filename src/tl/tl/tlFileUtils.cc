@@ -668,6 +668,9 @@ std::string relative_path (const std::string &base, const std::string &p)
 
 bool is_same_file (const std::string &a, const std::string &b)
 {
+  if (tl::normalize_path (a) == tl::normalize_path (b)) {
+    return true;
+  }
 
 #if defined(_WIN32)
 

@@ -28,22 +28,31 @@
 #include "tlStaticObjects.h"
 #include "tlTimer.h"
 #include "tlCommandLineParser.h"
-#include "layApplication.h"
-#include "laySystemPaths.h"
-#include "layVersion.h"
+#include "tlFileUtils.h"
+#include "tlGlobPattern.h"
 #include "rba.h"
 #include "pya.h"
 #include "gsiDecl.h"
 #include "gsiExternalMain.h"
+#include "dbStatic.h"
+#include "dbInit.h"
 
 //  This hard-links the GSI test classes
 #include "../gsi_test/gsiTestForceLink.h"
 
-#include "version.h"
+#if defined(HAVE_QT)
 
-#include <QDir>
-#include <QFileInfo>
-#include <QTextCodec>
+#  include "layApplication.h"
+#  include "laySystemPaths.h"
+#  include "layVersion.h"
+
+#  include "version.h"
+
+#  include <QDir>
+#  include <QFileInfo>
+#  include <QTextCodec>
+
+#endif
 
 #if !defined(_WIN32)
 #  include <dlfcn.h>
@@ -54,7 +63,7 @@
 
 //  required to force linking of the "ext", "lib" and "drc" module
 #include "libForceLink.h"
-#if defined(HAVE_RUBY)
+#if defined(HAVE_RUBY) && defined(HAVE_QT)
 #include "drcForceLink.h"
 #endif
 
@@ -87,7 +96,7 @@ run_test (tl::TestBase *t, bool editable, bool slow, int repeat)
 }
 
 static int
-run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, bool non_editable, bool slow, int repeat, lay::ApplicationBase &app, bool gsi_coverage, const std::vector<std::string> &class_names_vector)
+run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, bool non_editable, bool slow, int repeat, bool gsi_coverage, const std::vector<std::string> &class_names_vector)
 {
   std::set<std::string> class_names;
   class_names.insert (class_names_vector.begin (), class_names_vector.end ());
@@ -109,7 +118,11 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
 
       ut::noctrl << tl::replicate ("=", ut::TestConsole::instance ()->real_columns ());
       ut::noctrl << "Running tests in " << mode << " mode ...";
-      app.set_editable (e != 0);
+
+      db::set_default_editable_mode (e != 0);
+#if defined(HAVE_QT)
+      lay::ApplicationBase::instance ()->set_editable (e != 0);
+#endif
 
       int failed = 0;
       std::vector <tl::TestBase *> failed_tests;
@@ -339,6 +352,11 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
 static int
 main_cont (int &argc, char **argv)
 {
+  std::auto_ptr<rba::RubyInterpreter> ruby_interpreter;
+  std::auto_ptr<pya::PythonInterpreter> python_interpreter;
+
+#if defined(HAVE_QT)
+
   //  install the version strings
   lay::Version::set_exe_name (prg_exe_name);
   lay::Version::set_name (prg_name);
@@ -349,12 +367,15 @@ main_cont (int &argc, char **argv)
   subversion += prg_rev;
   lay::Version::set_subversion (subversion.c_str ());
 
+#endif
+
   int result = 0;
 
   ut::TestConsole console (stdout);
 
   try {
 
+#if defined(HAVE_QT)
     pya::PythonInterpreter::initialize ();
     gsi::initialize_external ();
 
@@ -372,35 +393,60 @@ main_cont (int &argc, char **argv)
     QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
 #endif
 
+#else
+
+    //  initialize the modules (load their plugins from the paths)
+    db::init ();
+
+    //  initialize the GSI class system (Variant binding, Expression support)
+    //  We have to do this now since plugins may register GSI classes and before the
+    //  ruby interpreter, because it depends on a proper class system.
+    gsi::initialize ();
+
+    //  initialize the tl::Expression subsystem with GSI-bound classes
+    gsi::initialize_expressions ();
+
+    //  instantiate the interpreters
+
+    ruby_interpreter.reset (new rba::RubyInterpreter ());
+    ruby_interpreter->push_console (&console);
+
+    python_interpreter.reset (new pya::PythonInterpreter ());
+    python_interpreter->push_console (&console);
+
+#endif
+
     //  Search and initialize plugin unit tests
 
-    QStringList name_filters;
-    name_filters << QString::fromUtf8 ("*.ut");
+    std::string inst_dir = tl::get_inst_path ();
+    std::vector<std::string> inst_modules = tl::dir_entries (inst_dir, true, false);
+    std::sort (inst_modules.begin (), inst_modules.end ());
 
-    QDir inst_dir (tl::to_qstring (lay::get_inst_path ()));
-    QStringList inst_modules = inst_dir.entryList (name_filters);
-    inst_modules.sort ();
+    tl::GlobPattern pat ("*.ut");
 
-    for (QStringList::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
+    for (std::vector<std::string>::const_iterator im = inst_modules.begin (); im != inst_modules.end (); ++im) {
 
-      QFileInfo ut_file (inst_dir.path (), *im);
-      if (ut_file.exists () && ut_file.isReadable ()) {
+      if (! pat.match (*im)) {
+        continue;
+      }
 
-        std::string pp = tl::to_string (ut_file.absoluteFilePath ());
-        tl::log << "Loading unit tests " << pp;
+      std::string ut_file = tl::absolute_file_path (tl::combine_path (inst_dir, *im));
+      if (tl::file_exists (ut_file)) {
+
+        tl::log << "Loading unit tests " << ut_file;
 
         //  NOTE: since we are using a different suffix ("*.ut"), we can't use QLibrary.
 #ifdef _WIN32
         //  there is no "dlopen" on mingw, so we need to emulate it.
-        HINSTANCE handle = LoadLibraryW ((const wchar_t *) tl::to_qstring (pp).constData ());
+        HINSTANCE handle = LoadLibraryW (tl::to_wstring (ut_file).c_str ());
         if (! handle) {
-          throw tl::Exception (tl::sprintf ("Unable to load plugin tests: %s with error message: %s", pp.c_str (), GetLastError ()));
+          throw tl::Exception (tl::sprintf ("Unable to load plugin tests: %s with error message: %s", ut_file.c_str (), GetLastError ()));
         }
 #else
         void *handle;
-        handle = dlopen (tl::string_to_system (pp).c_str (), RTLD_LAZY);
+        handle = dlopen (tl::string_to_system (ut_file).c_str (), RTLD_LAZY);
         if (! handle) {
-          throw tl::Exception (tl::sprintf ("Unable to load plugin tests: %s", pp.c_str ()));
+          throw tl::Exception (tl::sprintf ("Unable to load plugin tests: %s", ut_file.c_str ()));
         }
 #endif
 
@@ -486,7 +532,7 @@ main_cont (int &argc, char **argv)
       ut::noctrl << "Entering KLayout test suite";
 
       ut::noctrl << "TESTSRC=" << tl::testsrc ();
-      ut::noctrl << "TESTTMP=" << tl::to_string (QDir (tl::to_qstring (tl::testtmp ())).absolutePath ());
+      ut::noctrl << "TESTTMP=" << tl::absolute_file_path (tl::testtmp ());
 
       const std::vector<tl::TestBase *> *selected_tests = 0;
       std::vector<tl::TestBase *> subset;
@@ -500,15 +546,19 @@ main_cont (int &argc, char **argv)
           bool exclude = false;
 
           for (std::vector<std::string>::const_iterator m = exclude_test_list.begin (); m != exclude_test_list.end () && !exclude; ++m) {
-            QRegExp re (tl::to_qstring (*m), Qt::CaseInsensitive, QRegExp::Wildcard);
-            if (re.indexIn (tl::to_qstring ((*i)->name ())) == 0) {
+            tl::GlobPattern re (*m);
+            re.set_case_sensitive (false);
+            re.set_header_match (true);
+            if (re.match ((*i)->name ())) {
               exclude = true;
             }
           }
 
           for (std::vector<std::string>::const_iterator m = test_list.begin (); !exclude && m != test_list.end (); ++m) {
-            QRegExp re (tl::to_qstring (*m), Qt::CaseInsensitive, QRegExp::Wildcard);
-            if (re.indexIn (tl::to_qstring ((*i)->name ())) == 0) {
+            tl::GlobPattern re (*m);
+            re.set_case_sensitive (false);
+            re.set_header_match (true);
+            if (re.match ((*i)->name ())) {
               ut::noctrl << "  " << (*i)->name ();
               subset.push_back (*i);
               break;
@@ -521,7 +571,7 @@ main_cont (int &argc, char **argv)
         selected_tests = &tl::TestRegistrar::instance()->tests ();
       }
 
-      result = run_tests (*selected_tests, editable, non_editable, slow, repeat, app, gsi_coverage, class_names);
+      result = run_tests (*selected_tests, editable, non_editable, slow, repeat, gsi_coverage, class_names);
 
       ut::ctrl << "</testsuites>";
 

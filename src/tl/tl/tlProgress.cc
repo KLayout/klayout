@@ -61,7 +61,7 @@ ProgressAdaptor::prev ()
 // ---------------------------------------------------------------------------------------------
 //  Progress implementation
 
-//  Hint: we don't want the QThreadStorage take ownership over the object. Hence we don't
+//  Hint: we don't want the ThreadStorage take ownership over the object. Hence we don't
 //  store a pointer but a pointer to a pointer.
 static tl::ThreadStorage<ProgressAdaptor **> s_thread_data;
 

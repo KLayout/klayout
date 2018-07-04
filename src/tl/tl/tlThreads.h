@@ -32,6 +32,9 @@
 #  include <QWaitCondition>
 #  include <QThread>
 #  include <QThreadStorage>
+#else
+//  atomics taken from https://github.com/mbitsnbites/atomic
+#  include "atomic/spinlock.h"
 #endif
 
 namespace tl
@@ -56,11 +59,10 @@ public:
 
 //  The non-Qt version is a dummy implementation as threading is not supported (yet)
 class TL_PUBLIC Mutex
+  : public atomic::spinlock
 {
 public:
-  Mutex () { }
-  void lock () { }
-  void unlock () { }
+  Mutex () : atomic::spinlock () { }
 };
 
 #endif
@@ -88,10 +90,10 @@ public:
 class TL_PUBLIC WaitCondition
 {
 public:
-  WaitCondition () { }
-  bool wait (Mutex * /*mutex*/, unsigned long /*time*/ = std::numeric_limits<unsigned long>::max ()) { return true; }
-  void wakeAll () { }
-  void wakeOne () { }
+  WaitCondition ();
+  bool wait (Mutex * /*mutex*/, unsigned long /*time*/ = std::numeric_limits<unsigned long>::max ());
+  void wakeAll ();
+  void wakeOne ();
 };
 
 #endif
@@ -136,23 +138,29 @@ public:
 
 #else
 
-//  TODO: this is a non-threaded dummy implementation
+class ThreadPrivateData;
+
 class TL_PUBLIC Thread
 {
 public:
-  Thread () { }
-  virtual ~Thread () { }
+  Thread ();
+  virtual ~Thread ();
 
-  void exit (int /*returnCode*/ = 0) { }
-  bool isFinished () const { return true; }
-  bool isRunning () const { return false; }
-  void quit () { }
-  void start () { run (); }
-  void terminate () { }
-  bool wait (unsigned long /*time*/ = std::numeric_limits<unsigned long>::max ()) { return true; }
+  void exit (int /*returnCode*/ = 0);
+  bool isFinished () const;
+  bool isRunning () const;
+  void quit ();
+  void start ();
+  void terminate ();
+  bool wait (unsigned long /*time*/ = std::numeric_limits<unsigned long>::max ());
 
 protected:
   virtual void run () { }
+
+private:
+  friend void *start_thread (void *);
+  ThreadPrivateData *mp_data;
+  void do_run ();
 };
 
 #endif
@@ -175,21 +183,69 @@ public:
 
 #else
 
-//  TODO: this is the non-threaded dummy implementation
-template <class T>
-class TL_PUBLIC ThreadStorage
+class TL_PUBLIC ThreadStorageHolderBase
 {
 public:
-  ThreadStorage () : m_t (), m_has_data (false) { }
+  ThreadStorageHolderBase (void *obj) : mp_obj (obj) { }
+  virtual ~ThreadStorageHolderBase () { }
 
-  bool hasLocalData () const { return m_has_data; }
-  T &localData () { return m_t; }
-  T localData () const { return m_t; }
-  void setLocalData (const T &data) { m_t = data; m_has_data = true; }
+protected:
+  void *obj () { return mp_obj; }
+  void *mp_obj;
+};
 
-private:
-  T m_t;
-  bool m_has_data;
+template <class T>
+class ThreadStorageHolder
+  : public ThreadStorageHolderBase
+{
+public:
+  ThreadStorageHolder (T *t) : ThreadStorageHolderBase ((void *) t) { }
+  ~ThreadStorageHolder () { delete data (); }
+  T *data () { return (T *) obj (); }
+};
+
+class TL_PUBLIC ThreadStorageBase
+{
+public:
+  ThreadStorageBase ();
+
+protected:
+  void add (ThreadStorageHolderBase *holder);
+  ThreadStorageHolderBase *holder ();
+
+  const ThreadStorageHolderBase *holder () const
+  {
+    return (const_cast<ThreadStorageBase *> (this)->holder ());
+  }
+};
+
+//  TODO: this is the non-threaded dummy implementation
+template <class T>
+class ThreadStorage
+  : public ThreadStorageBase
+{
+public:
+  ThreadStorage () : ThreadStorageBase () { }
+
+  bool hasLocalData () const
+  {
+    return dynamic_cast<const ThreadStorageHolder<T> *> (holder ()) != 0;
+  }
+
+  T &localData ()
+  {
+    return *(dynamic_cast<ThreadStorageHolder<T> *> (holder ())->data ());
+  }
+
+  T localData () const
+  {
+    return *(dynamic_cast<const ThreadStorageHolder<T> *> (holder ())->data ());
+  }
+
+  void setLocalData (const T &data)
+  {
+    add (new ThreadStorageHolder<T> (new T (data)));
+  }
 };
 
 #endif

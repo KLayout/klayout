@@ -11,12 +11,12 @@ SUBDIRS = \
   lib \
   buddies \
   plugins \
+  unit_tests \
 
 !equals(HAVE_QT, "0") {
 
   # TODO: make unit_tests capable of running without Qt
   SUBDIRS += \
-    unit_tests \
     klayout_main \
     laybasic \
     lay \
@@ -94,7 +94,7 @@ plugins.depends += lib rdb db
   lym.depends += gsi $$LANG_DEPENDS
   lay.depends += laybasic ant img edt lym
   klayout_main.depends += plugins $$MAIN_DEPENDS
-  unit_tests.depends += plugins $$MAIN_DEPENDS
 
 }
 
+unit_tests.depends += plugins $$MAIN_DEPENDS

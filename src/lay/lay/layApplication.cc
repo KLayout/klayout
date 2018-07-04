@@ -61,6 +61,7 @@
 #include "tlInternational.h"
 #include "tlHttpStream.h"
 #include "tlArch.h"
+#include "tlFileUtils.h"
 
 #include <QIcon>
 #include <QDir>
@@ -219,7 +220,7 @@ ApplicationBase::ApplicationBase (bool non_ui_mode)
   m_appdata_path = lay::get_appdata_path ();
 
   //  get the installation path
-  m_inst_path = lay::get_inst_path ();
+  m_inst_path = tl::get_inst_path ();
 }
 
 void

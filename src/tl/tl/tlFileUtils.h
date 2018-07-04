@@ -163,6 +163,11 @@ std::string TL_PUBLIC current_dir ();
  */
 std::vector<std::string> TL_PUBLIC split_path (const std::string &p, bool keep_last = false);
 
+/**
+ *  @brief Gets the path of the currently running process
+ */
+std::string TL_PUBLIC get_inst_path ();
+
 }
 
 #endif

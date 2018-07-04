@@ -8,6 +8,10 @@ DEFINES += MAKE_TL_LIBRARY
 
 LIBS += -lz
 
+equals(HAVE_QT, "0") {
+  LIBS += -lpthread
+}
+
 equals(HAVE_CURL, "1") {
   LIBS += -lcurl
   win32 {

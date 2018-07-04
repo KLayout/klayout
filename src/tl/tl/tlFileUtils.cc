@@ -710,4 +710,45 @@ bool is_same_file (const std::string &a, const std::string &b)
 #endif
 }
 
+static std::string
+get_inst_path_internal ()
+{
+#ifdef _WIN32
+
+  wchar_t buffer[MAX_PATH];
+  int len;
+  if ((len = GetModuleFileName (NULL, buffer, MAX_PATH)) > 0) {
+    return tl::absolute_path (tl::to_string (std::wstring (buffer)));
+  }
+
+#elif __APPLE__
+
+  char buffer[PROC_PIDPATHINFO_MAXSIZE];
+  int ret = proc_pidpath (getpid (), buffer, sizeof (buffer));
+  if (ret > 0) {
+    //  TODO: does this correctly translate paths? (MacOS uses UTF-8 encoding with D-like normalization)
+    return tl::absolute_path (buffer);
+  }
+
+#else
+
+  std::string pf = tl::sprintf ("/proc/%d/exe", getpid ());
+  if (tl::file_exists (pf)) {
+    return tl::absolute_path (pf);
+  }
+
+#endif
+  tl_assert (false);
+}
+
+std::string
+get_inst_path ()
+{
+  static std::string s_inst_path;
+  if (s_inst_path.empty ()) {
+    s_inst_path = get_inst_path_internal ();
+  }
+  return s_inst_path;
+}
+
 }

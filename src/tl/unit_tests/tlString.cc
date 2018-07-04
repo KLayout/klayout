@@ -487,7 +487,7 @@ TEST(15)
   EXPECT_EQ (tl::to_string_from_local (tl::to_local ("Hällo\tWörld!").c_str ()), "Hällo\tWörld!");
   EXPECT_EQ (std::string ("Ä").size (), size_t (2));
   EXPECT_EQ (tl::to_string (std::wstring (L"Ä")), "Ä");
-  EXPECT_EQ (tl::to_wstring (std::string ("Ä")).size (), 1);
+  EXPECT_EQ (tl::to_wstring (std::string ("Ä")).size (), size_t (1));
   EXPECT_EQ (tl::to_string (tl::to_wstring ("Utf8 supports emoticons: \xF0\x9F\x98\x81\nand Umlauts: äüö")).c_str (), "Utf8 supports emoticons: \xF0\x9F\x98\x81\nand Umlauts: äüö");
 
   EXPECT_EQ (tl::to_upper_case ("äÄüÜöÖß"), "ÄÄÜÜÖÖß");

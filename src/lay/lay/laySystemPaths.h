@@ -42,12 +42,6 @@ namespace lay
 LAY_PUBLIC std::string get_appdata_path ();
 
 /**
- *  @brief Gets the installation path
- *  The installation path is the path where the current application is installed.
- */
-LAY_PUBLIC std::string get_inst_path ();
-
-/**
  *  @brief Gets the KLayout path 
  *  This is a path (in the sense of a search path - i.e. multiple paths)
  *  where KLayout (and derived applications) looks for configuration files.

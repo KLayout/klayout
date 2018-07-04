@@ -22,6 +22,7 @@
 
 
 #include "laySystemPaths.h"
+#include "tlFileUtils.h"l"
 #include "tlString.h"
 
 #include <QDir>
@@ -66,53 +67,6 @@ get_appdata_path ()
 #endif
 
   return tl::to_string (appdata_dir.absoluteFilePath (appdata_folder));
-}
-
-static std::string 
-get_inst_path_internal ()
-{
-  //  Note: the QCoreApplication::applicationDirPath cannot be used before
-  //  a QApplication object is instantiated. Hence this custom implementation.
-#ifdef _WIN32
-
-  wchar_t buffer[MAX_PATH]; 
-  int len;
-  if ((len = GetModuleFileName(NULL, buffer, MAX_PATH)) > 0) {
-    QFileInfo fi (QString::fromUtf16 ((const ushort *) buffer, len));
-    return tl::to_string (fi.absolutePath ());
-  } 
-
-#elif __APPLE__
-
-  char buffer[PROC_PIDPATHINFO_MAXSIZE];
-  int ret = proc_pidpath (getpid (), buffer, sizeof (buffer));
-  if (ret > 0) {
-    //  TODO: does this correctly translate paths? (MacOS uses UTF-8 encoding with D-like normalization)
-    return tl::to_string (QFileInfo (QString::fromUtf8 (buffer)).absolutePath ());
-  }
-
-#else 
-    
-  QFileInfo proc_exe (tl::to_qstring (tl::sprintf ("/proc/%d/exe", getpid ())));
-  if (proc_exe.exists () && proc_exe.isSymLink ()) {
-    return tl::to_string (QFileInfo (proc_exe.canonicalFilePath ()).absolutePath ());
-  }
-
-#endif
-
-  //  As a fallback use QCoreApplication::applicationDirPath, which however is not
-  //  available before QCoreApplication is initialized
-  return tl::to_string (QCoreApplication::applicationDirPath ());
-}
-
-std::string 
-get_inst_path ()
-{
-  static std::string s_inst_path;
-  if (s_inst_path.empty ()) {
-    s_inst_path = get_inst_path_internal ();
-  }
-  return s_inst_path;
 }
 
 #ifdef _WIN32
@@ -198,7 +152,7 @@ get_klayout_path ()
       split_path (tl::system_to_string (env), klayout_path);
     } else {
       get_other_system_paths (klayout_path);
-      klayout_path.push_back (get_inst_path ());
+      klayout_path.push_back (tl::get_inst_path ());
     }
 #endif
 

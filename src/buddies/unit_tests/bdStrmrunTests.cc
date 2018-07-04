@@ -21,34 +21,19 @@
 */
 
 #include "tlUnitTest.h"
-
-#if defined(HAVE_QT)
-# include <QProcess>
-# include <QStringList>
-#endif
+#include "tlStream.h"
 
 //  Testing the converter main implementation (CIF)
 TEST(1)
 {
-//  TODO: provide a Qt-less way of running these tests
-#if defined(HAVE_QT)
-  QProcess process;
-  process.setProcessChannelMode (QProcess::MergedChannels);
-
-  QStringList args;
-
   std::string fp (tl::testsrc ());
   fp += "/testdata/bd/strmrun.py";
-  args << tl::to_qstring (fp);
 
-  process.start (tl::to_qstring ("./strmrun"), args);
-  bool success = process.waitForFinished (-1);
+  std::string path = "./strmrun " + fp;
+  tl::InputPipe pipe (path);
+  tl::InputStream is (pipe);
+  std::string data = is.read_all ();
 
-  QByteArray ba = process.readAll ();
-  EXPECT_EQ (ba.constData (), "Hello, world (0,-42;42,0)!\n");
-  EXPECT_EQ (success, true);
-#else
-  EXPECT_EQ (true, false);
-#endif
+  EXPECT_EQ (data, "Hello, world (0,-42;42,0)!\n");
 }
 

@@ -24,6 +24,8 @@
 #include "tlFileUtils.h"
 #include "tlUnitTest.h"
 
+#include <fstream>
+
 #if defined(HAVE_QT)
 
 //  A few things we cross-check against Qt
@@ -174,7 +176,7 @@ TL_PUBLIC void file_utils_force_linux ();
 TL_PUBLIC void file_utils_force_reset ();
 }
 
-//  Fake Windows-tests
+//  Fake Windows-tests (split_path, dirname, filename, basename, extension, combine_path)
 TEST (10)
 {
   tl::file_utils_force_windows ();
@@ -204,6 +206,31 @@ TEST (10)
     EXPECT_EQ (tl::join (tl::split_path ("d:\\\\"), "+"), "D:+\\");
     EXPECT_EQ (tl::join (tl::split_path ("d:/"), "+"), "D:+\\");
     EXPECT_EQ (tl::join (tl::split_path ("d://"), "+"), "D:+\\");
+
+    EXPECT_EQ (tl::normalize_path ("\\hello\\world"), "\\hello\\world");
+    EXPECT_EQ (tl::normalize_path ("\\hello\\\\world\\"), "\\hello\\world");
+    EXPECT_EQ (tl::normalize_path ("hello\\\\world\\"), "hello\\world");
+    EXPECT_EQ (tl::normalize_path ("\\\\SERVER\\hello\\world"), "\\\\SERVER\\hello\\world");
+    EXPECT_EQ (tl::normalize_path ("c:\\hello\\\\world\\"), "C:\\hello\\world");
+
+    //  slashes are good too:
+    EXPECT_EQ (tl::normalize_path ("/hello/world"), "\\hello\\world");
+    EXPECT_EQ (tl::normalize_path ("/hello//world/"), "\\hello\\world");
+    EXPECT_EQ (tl::normalize_path ("hello//world/"), "hello\\world");
+    EXPECT_EQ (tl::normalize_path ("//SERVER/hello/world"), "\\\\SERVER\\hello\\world");
+    EXPECT_EQ (tl::normalize_path ("c:/hello//world/"), "C:\\hello\\world");
+
+    //  boundary cases
+    EXPECT_EQ (tl::normalize_path (""), "");
+    EXPECT_EQ (tl::normalize_path ("\\"), "\\");
+    EXPECT_EQ (tl::normalize_path ("/"), "\\");
+    EXPECT_EQ (tl::normalize_path ("d:"), "D:");
+    EXPECT_EQ (tl::normalize_path ("\\\\"), "\\\\");
+    EXPECT_EQ (tl::normalize_path ("//"), "\\\\");
+    EXPECT_EQ (tl::normalize_path ("d:\\"), "D:\\");
+    EXPECT_EQ (tl::normalize_path ("d:\\\\"), "D:\\");
+    EXPECT_EQ (tl::normalize_path ("d:/"), "D:\\");
+    EXPECT_EQ (tl::normalize_path ("d://"), "D:\\");
 
     EXPECT_EQ (tl::dirname ("/hello/world"), "\\hello");
     EXPECT_EQ (tl::dirname ("\\hello\\world"), "\\hello");
@@ -245,6 +272,11 @@ TEST (10)
     EXPECT_EQ (tl::extension ("\\hello\\.world.gz"), "gz");
     EXPECT_EQ (tl::extension ("/hello//world/"), "");
 
+    EXPECT_EQ (tl::is_absolute ("world"), false);
+    EXPECT_EQ (tl::is_absolute ("world/"), false);
+    EXPECT_EQ (tl::is_absolute ("hello//world/"), false);
+    EXPECT_EQ (tl::is_absolute ("/hello//world/"), true);
+
     EXPECT_EQ (tl::combine_path ("hello", "world"), "hello\\world");
     EXPECT_EQ (tl::combine_path ("hello", ""), "hello");
     EXPECT_EQ (tl::combine_path ("hello", "", true), "hello\\");
@@ -257,7 +289,7 @@ TEST (10)
   }
 }
 
-//  Fake Linux-tests
+//  Fake Linux-tests (split_path, dirname, filename, basename, extension, combine_path)
 TEST (11)
 {
   tl::file_utils_force_linux ();
@@ -267,6 +299,11 @@ TEST (11)
     EXPECT_EQ (tl::join (tl::split_path ("/hel\\/\\\\lo/world"), "+"), "/hel\\/\\\\lo+/world");
     EXPECT_EQ (tl::join (tl::split_path ("/hello//world/"), "+"), "/hello+/world");
     EXPECT_EQ (tl::join (tl::split_path ("hello//world/"), "+"), "hello+/world");
+
+    EXPECT_EQ (tl::normalize_path ("/hello/world"), "/hello/world");
+    EXPECT_EQ (tl::normalize_path ("/hel\\/\\\\lo/world"), "/hel\\/\\\\lo/world");
+    EXPECT_EQ (tl::normalize_path ("/hello//world/"), "/hello/world");
+    EXPECT_EQ (tl::normalize_path ("hello//world/"), "hello/world");
 
     //  boundary cases
     EXPECT_EQ (tl::join (tl::split_path (""), "+"), "");
@@ -321,6 +358,143 @@ TEST (12)
   EXPECT_EQ (tl::is_parent_path (above, currdir), true);
   EXPECT_EQ (tl::is_parent_path (above, above), true);
   EXPECT_EQ (tl::is_same_file (tl::combine_path (currdir, ".."), above), true);
+}
+
+//  mkpath
+TEST(13)
+{
+  std::string tp = tl::absolute_file_path (tmp_file ());
+  std::string tt = tl::combine_path (tp, "mkpathtest");
+  std::string tta = tl::combine_path (tt, "a");
+  std::string ttab = tl::combine_path (tta, "b");
+  tl::rm_dir_recursive (tt);
+
+  EXPECT_EQ (tl::file_exists (tt), false);
+  EXPECT_EQ (tl::mkpath (tt), true);
+  EXPECT_EQ (tl::file_exists (tt), true);
+  tl::rm_dir_recursive (tt);
+
+  EXPECT_EQ (tl::file_exists (tt), false);
+  EXPECT_EQ (tl::mkpath (tta), true);
+  EXPECT_EQ (tl::file_exists (tta), true);
+  EXPECT_EQ (tl::file_exists (tt), true);
+  tl::rm_dir_recursive (tt);
+  EXPECT_EQ (tl::file_exists (tta), false);
+
+  EXPECT_EQ (tl::file_exists (tt), false);
+  EXPECT_EQ (tl::mkpath (ttab), true);
+  EXPECT_EQ (tl::file_exists (ttab), true);
+  EXPECT_EQ (tl::file_exists (tta), true);
+  EXPECT_EQ (tl::file_exists (tt), true);
+  tl::rm_dir_recursive (tt);
+  EXPECT_EQ (tl::file_exists (ttab), false);
+  EXPECT_EQ (tl::file_exists (tta), false);
+
+  EXPECT_EQ (tl::file_exists (tt), false);
+}
+
+//  absolute_path, relative_path and absolute_file_path
+TEST(14)
+{
+  std::string xpath_qt = tl::to_string (QDir::current ().absoluteFilePath ("doesnotexist"));
+  std::string xpath = tl::absolute_file_path ("doesnotexist");
+  EXPECT_EQ (xpath_qt, xpath);
+
+  std::string xpath2_qt = tl::to_string (QDir::current ().absolutePath ());
+  std::string xpath2 = tl::absolute_path ("./doesnotexist");
+  EXPECT_EQ (xpath2_qt, xpath2);
+
+  xpath2 = tl::absolute_file_path (xpath2);
+  EXPECT_EQ (xpath2_qt, xpath2);
+
+  EXPECT_EQ (tl::relative_path (xpath2, xpath2), "");
+  EXPECT_EQ (tl::relative_path (xpath2, xpath), "doesnotexist");
+  EXPECT_EQ (tl::relative_path (xpath2, tl::combine_path (xpath, "a")), "doesnotexist/a");
+}
+
+//  dir_entries
+TEST(15)
+{
+  std::string tp = tl::absolute_file_path (tmp_file ());
+  std::string tt = tl::combine_path (tp, "detest");
+  EXPECT_EQ (tl::mkpath (tt), true);
+
+  {
+    std::ofstream of (tl::combine_path (tt, "x").c_str ());
+    of << "Hello, world!\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (tl::combine_path (tt, "x")), true);
+  EXPECT_EQ (tl::is_dir (tl::combine_path (tt, "x")), false);
+
+  {
+    std::ofstream of (tl::combine_path (tt, "y").c_str ());
+    of << "Hello, world!\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (tl::combine_path (tt, "y")), true);
+  EXPECT_EQ (tl::is_dir (tl::combine_path (tt, "y")), false);
+
+  {
+    std::ofstream of (tl::combine_path (tt, ".z").c_str ());
+    of << "Hello, world!\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (tl::combine_path (tt, ".z")), true);
+  EXPECT_EQ (tl::is_dir (tl::combine_path (tt, ".z")), false);
+
+  EXPECT_EQ (tl::mkpath (tl::combine_path (tt, "u")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (tt, "u")), true);
+  EXPECT_EQ (tl::is_dir (tl::combine_path (tt, "u")), true);
+
+  EXPECT_EQ (tl::mkpath (tl::combine_path (tt, "v")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (tt, "v")), true);
+  EXPECT_EQ (tl::is_dir (tl::combine_path (tt, "v")), true);
+
+  EXPECT_EQ (tl::mkpath (tl::combine_path (tt, ".w")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (tt, ".w")), true);
+  EXPECT_EQ (tl::is_dir (tl::combine_path (tt, ".w")), true);
+
+  std::vector<std::string> ee;
+  ee = tl::dir_entries (tt, true, true);
+  std::sort (ee.begin (), ee.end ());
+  EXPECT_EQ (tl::join (ee, "+"), ".w+.z+u+v+x+y");
+
+  ee = tl::dir_entries (tt, true, true, true);
+  std::sort (ee.begin (), ee.end ());
+  EXPECT_EQ (tl::join (ee, "+"), "u+v+x+y");
+
+  ee = tl::dir_entries (tt, false, true);
+  std::sort (ee.begin (), ee.end ());
+  EXPECT_EQ (tl::join (ee, "+"), ".w+u+v");
+
+  ee = tl::dir_entries (tt, false, true, true);
+  std::sort (ee.begin (), ee.end ());
+  EXPECT_EQ (tl::join (ee, "+"), "u+v");
+
+  ee = tl::dir_entries (tt, true, false);
+  std::sort (ee.begin (), ee.end ());
+  EXPECT_EQ (tl::join (ee, "+"), ".z+x+y");
+
+  ee = tl::dir_entries (tt, true, false, true);
+  std::sort (ee.begin (), ee.end ());
+  EXPECT_EQ (tl::join (ee, "+"), "x+y");
+
+  EXPECT_EQ (tl::rm_file (tl::combine_path (tt, "xxx")), false);
+
+  EXPECT_EQ (tl::rm_file (tl::combine_path (tt, "x")), true);
+
+  ee = tl::dir_entries (tt, true, false);
+  std::sort (ee.begin (), ee.end ());
+  EXPECT_EQ (tl::join (ee, "+"), ".z+y");
+
+  EXPECT_EQ (tl::rm_dir (tl::combine_path (tt, "u")), true);
+
+  ee = tl::dir_entries (tt, false, true);
+  std::sort (ee.begin (), ee.end ());
+  EXPECT_EQ (tl::join (ee, "+"), ".w+v");
+
+  EXPECT_EQ (tl::rm_dir (tt), false);  //  not empty
 }
 
 #endif

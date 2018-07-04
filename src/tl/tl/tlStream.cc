@@ -861,7 +861,91 @@ OutputZLibFile::write (const char *b, size_t n)
   }
 }
 
-#ifndef _WIN32 // not available on Windows
+#if defined(_WIN32)
+
+// ---------------------------------------------------------------
+//  InputPipe delegate implementation
+
+InputPipe::InputPipe (const std::string &path)
+  : m_file (NULL)
+{
+  std::wstring wpath = tl::to_wstring (path);
+  m_source = path;
+  m_file = _wpopen (wpath.c_str (), "r");
+  if (m_file == NULL) {
+    throw FilePOpenErrorException (m_source, errno);
+  }
+}
+
+InputPipe::~InputPipe ()
+{
+  close ();
+}
+
+void
+InputPipe::close ()
+{
+  if (m_file != NULL) {
+    fclose (m_file);
+    m_file = NULL;
+  }
+}
+
+size_t
+InputPipe::read (char *b, size_t n)
+{
+  tl_assert (m_file != NULL);
+  size_t ret = fread (b, 1, n, m_file);
+  if (ret < n) {
+    if (ferror (m_file)) {
+      throw FilePReadErrorException (m_source, ferror (m_file));
+    }
+  }
+
+  return ret;
+}
+
+void
+InputPipe::reset ()
+{
+  throw tl::Exception (tl::to_string (tr ("'reset' is not supported on pipeline input files")));
+}
+
+// ---------------------------------------------------------------
+//  OutputPipe delegate implementation
+
+OutputPipe::OutputPipe (const std::string &path)
+  : m_file (NULL)
+{
+  std::wstring wpath = tl::to_wstring (path);
+  m_source = path;
+  m_file = _wpopen (wpath.c_str (), "w");
+  if (m_file == NULL) {
+    throw FilePOpenErrorException (m_source, errno);
+  }
+}
+
+OutputPipe::~OutputPipe ()
+{
+  if (m_file != NULL) {
+    fclose (m_file);
+    m_file = NULL;
+  }
+}
+
+void
+OutputPipe::write (const char *b, size_t n)
+{
+  tl_assert (m_file != NULL);
+  size_t ret = fwrite (b, 1, n, m_file);
+  if (ret < n) {
+    if (ferror (m_file)) {
+      throw FilePWriteErrorException (m_source, ferror (m_file));
+    }
+  }
+}
+
+#else
 
 // ---------------------------------------------------------------
 //  InputPipe delegate implementation
@@ -941,58 +1025,6 @@ OutputPipe::write (const char *b, size_t n)
       throw FilePWriteErrorException (m_source, ferror (m_file));
     }
   }
-}
-
-#else
-
-// ---------------------------------------------------------------
-//  InputPipe delegate implementation
-
-InputPipe::InputPipe (const std::string & /*path*/)
-  : m_file (NULL)
-{
-  // TODO: emulate?
-}
-
-InputPipe::~InputPipe ()
-{
-}
-
-size_t 
-InputPipe::read (char * /*b*/, size_t /*n*/)
-{
-  throw tl::Exception (tl::to_string (tr ("pipeline input files not available on Windows")));
-}
-
-void 
-InputPipe::reset ()
-{
-  throw tl::Exception (tl::to_string (tr ("pipeline input files not available on Windows")));
-}
-
-void
-InputPipe::close ()
-{
-  throw tl::Exception (tl::to_string (tr ("pipeline input files not available on Windows")));
-}
-
-// ---------------------------------------------------------------
-//  OutputPipe delegate implementation
-
-OutputPipe::OutputPipe (const std::string & /*path*/)
-  : m_file (NULL)
-{
-  // TODO: emulate?
-}
-
-OutputPipe::~OutputPipe ()
-{
-}
-
-void 
-OutputPipe::write (const char * /*b*/, size_t /*n*/)
-{
-  throw tl::Exception (tl::to_string (tr ("pipeline input files not available on Windows")));
 }
 
 #endif

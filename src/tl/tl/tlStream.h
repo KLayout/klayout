@@ -171,7 +171,7 @@ private:
  *
  *  Implements the reader for a zlib stream
  */
-class InputZLibFile
+class TL_PUBLIC InputZLibFile
   : public InputStreamBase
 {
 public:
@@ -224,7 +224,7 @@ private:
  *
  *  Implements the reader for ordinary files.
  */
-class InputFile
+class TL_PUBLIC InputFile
   : public InputStreamBase
 {
 public:
@@ -272,7 +272,7 @@ private:
  *
  *  Implements the reader for pipe streams
  */
-class InputPipe
+class TL_PUBLIC InputPipe
   : public InputStreamBase
 {
 public:

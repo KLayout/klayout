@@ -31,38 +31,30 @@
 #define _STRINGIFY(s) #s
 
 #include "tlUnitTest.h"
+#include "tlStream.h"
 
-#if defined(HAVE_QT)
-# include <QProcess>
-# include <QProcessEnvironment>
-#endif
-
-int run_pymodtest (tl::TestBase * /*_this*/, const std::string &fn)
+int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 {
-#if defined(HAVE_QT)
-  QProcess process;
-  process.setProcessChannelMode (QProcess::MergedChannels);
-
-  QStringList args;
+  static std::string pypath;
+  pypath = "PYTHONPATH=";
+  pypath += STRINGIFY (PYTHONPATH);
+  putenv ((char *) pypath.c_str ());
 
   std::string fp (tl::testsrc ());
   fp += "/testdata/pymod/";
   fp += fn;
-  args << tl::to_qstring (fp);
 
-  QProcessEnvironment env = QProcessEnvironment::systemEnvironment ();
-  env.insert("PYTHONPATH", STRINGIFY (PYTHONPATH));
-  process.setProcessEnvironment(env);
+  std::string text;
+  {
+    tl::InputPipe pipe (std::string (STRINGIFY (PYTHON)) + " " + fp + " 2>&1");
+    tl::InputStream is (pipe);
+    text = is.read_all ();
+  }
 
-  process.start (tl::to_qstring (STRINGIFY (PYTHON)), args);
-  process.waitForFinished (-1);
+  tl::info << text;
+  EXPECT_EQ (text.find ("OK") != std::string::npos, true);
 
-  tl::info << process.readAll ().constData ();
-
-  return process.exitCode ();
-#else
-  return 1; // TODO: provide a Qt-less version
-#endif
+  return 0;
 }
 
 #define PYMODTEST(n, file) \

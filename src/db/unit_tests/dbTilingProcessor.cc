@@ -31,6 +31,8 @@
 #include "dbSaveLayoutOptions.h"
 
 #include <cstdlib>
+#include <QMutex>
+#include <QMutexLocker>
 
 unsigned int get_rand()
 {
@@ -400,6 +402,8 @@ public:
 
   void add (double x) const
   {
+    static QMutex lock;
+    QMutexLocker locker (&lock);
     *mp_sum += x;
     *mp_n += 1;
   }
@@ -419,6 +423,8 @@ gsi::Class<MyTilingOutputReceiver> decl_MyTilingOutputReceiver (gsi::dbdecl_Tile
 );
 
 //  Multithreaded, access to _rec()
+//  This will mainly test the ability of gsi::Proxy to manage references
+//  in a multithreaded case.
 TEST(5)
 {
   db::Layout ly1;

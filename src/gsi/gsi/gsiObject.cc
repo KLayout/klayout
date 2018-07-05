@@ -27,8 +27,12 @@
 
 #include "tlLog.h"
 
+#include <QMutexLocker>
+
 namespace gsi
 {
+
+QMutex Proxy::m_lock;
 
 Proxy::Proxy (const gsi::ClassBase *_cls_decl)
   : m_cls_decl (_cls_decl),
@@ -43,8 +47,10 @@ Proxy::Proxy (const gsi::ClassBase *_cls_decl)
 
 Proxy::~Proxy ()
 {
+  QMutexLocker locker (&m_lock);
+
   try {
-    set (0, false, false, false);
+    set_internal (0, false, false, false);
   } catch (std::exception &ex) {
     tl::warn << "Caught exception in object destructor: " << ex.what ();
   } catch (tl::Exception &ex) {
@@ -58,6 +64,8 @@ Proxy::~Proxy ()
 void
 Proxy::destroy ()
 {
+  QMutexLocker locker (&m_lock);
+
   if (! m_cls_decl) {
     m_obj = 0;
     return;
@@ -82,7 +90,7 @@ Proxy::destroy ()
   if (m_owned || m_can_destroy) {
     o = m_obj;
   }
-  detach ();
+  detach_internal ();
   if (o) {
     m_cls_decl->destroy (o);
   }
@@ -91,23 +99,15 @@ Proxy::destroy ()
 void
 Proxy::detach ()
 {
-  if (! m_destroyed && m_cls_decl && m_cls_decl->is_managed ()) {
-    gsi::ObjectBase *gsi_object = m_cls_decl->gsi_object (m_obj, false);
-    if (gsi_object) {
-      gsi_object->status_changed_event ().remove (this, &Proxy::object_status_changed);
-    }
-  }
-
-  m_obj = 0;
-  m_destroyed = true;
-  m_const_ref = false;
-  m_owned = false;
-  m_can_destroy = false;
+  QMutexLocker locker (&m_lock);
+  detach_internal ();
 }
 
 void
 Proxy::release ()
 {
+  QMutexLocker locker (&m_lock);
+
   //  If the object is managed we first reset the ownership of all other clients
   //  and then make us the owner
   const gsi::ClassBase *cls = m_cls_decl;
@@ -125,6 +125,8 @@ Proxy::release ()
 void
 Proxy::keep ()
 {
+  QMutexLocker locker (&m_lock);
+
   const gsi::ClassBase *cls = m_cls_decl;
   if (cls) {
     void *o = obj ();
@@ -142,6 +144,45 @@ Proxy::keep ()
 
 void
 Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy)
+{
+  QMutexLocker locker (&m_lock);
+  set_internal (obj, owned, const_ref, can_destroy);
+}
+
+void *
+Proxy::obj ()
+{
+  QMutexLocker locker (&m_lock);
+
+  if (! m_obj) {
+    if (m_destroyed) {
+      throw tl::Exception (tl::to_string (QObject::tr ("Object has been destroyed already")));
+    } else {
+      //  delayed creation of a detached C++ object ..
+      set_internal (m_cls_decl->create (), true, false, true);
+    }
+  }
+
+  return m_obj;
+}
+
+void
+Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
+{
+  QMutexLocker locker (&m_lock);
+
+  if (type == gsi::ObjectBase::ObjectDestroyed) {
+    m_destroyed = true;  //  NOTE: must be set before detach and indicates that the object was destroyed externally.
+    detach_internal ();
+  } else if (type == gsi::ObjectBase::ObjectKeep) {
+    m_owned = false;
+  } else if (type == gsi::ObjectBase::ObjectRelease) {
+    m_owned = true;
+  }
+}
+
+void
+Proxy::set_internal (void *obj, bool owned, bool const_ref, bool can_destroy)
 {
   bool prev_owned = m_owned;
 
@@ -198,32 +239,21 @@ Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy)
   m_destroyed = false;
 }
 
-void *
-Proxy::obj ()
+void
+Proxy::detach_internal()
 {
-  if (! m_obj) {
-    if (m_destroyed) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Object has been destroyed already")));
-    } else {
-      //  delayed creation of a detached C++ object ..
-      set(m_cls_decl->create (), true, false, true);
+  if (! m_destroyed && m_cls_decl && m_cls_decl->is_managed ()) {
+    gsi::ObjectBase *gsi_object = m_cls_decl->gsi_object (m_obj, false);
+    if (gsi_object) {
+      gsi_object->status_changed_event ().remove (this, &Proxy::object_status_changed);
     }
   }
 
-  return m_obj;
-}
-
-void
-Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
-{
-  if (type == gsi::ObjectBase::ObjectDestroyed) {
-    m_destroyed = true;  //  NOTE: must be set before detach and indicates that the object was destroyed externally.
-    detach ();
-  } else if (type == gsi::ObjectBase::ObjectKeep) {
-    m_owned = false;
-  } else if (type == gsi::ObjectBase::ObjectRelease) {
-    m_owned = true;
-  }
+  m_obj = 0;
+  m_destroyed = true;
+  m_const_ref = false;
+  m_owned = false;
+  m_can_destroy = false;
 }
 
 }

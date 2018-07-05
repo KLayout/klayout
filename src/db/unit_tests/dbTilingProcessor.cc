@@ -26,6 +26,7 @@
 #include "dbTilingProcessor.h"
 #include "dbTextWriter.h"
 #include "gsiExpression.h"
+#include "gsiDecl.h"
 #include "dbWriter.h"
 #include "dbSaveLayoutOptions.h"
 
@@ -385,3 +386,59 @@ TEST(4)
 
 }
 
+class MyTilingOutputReceiver
+  : public db::TileOutputReceiver
+{
+public:
+  MyTilingOutputReceiver (double *sum, int *n)
+    : mp_sum (sum), mp_n (n)
+  { }
+
+  MyTilingOutputReceiver ()
+    : mp_sum (0), mp_n (0)
+  { }
+
+  void add (double x) const
+  {
+    *mp_sum += x;
+    *mp_n += 1;
+  }
+
+private:
+  double *mp_sum;
+  int *mp_n;
+};
+
+namespace gsi
+{
+DB_PUBLIC gsi::Class<db::TileOutputReceiver> &dbdecl_TileOutputReceiverBase ();
+}
+
+gsi::Class<MyTilingOutputReceiver> decl_MyTilingOutputReceiver (gsi::dbdecl_TileOutputReceiverBase (), "MyTileOutputReceiver",
+  gsi::method ("add", &MyTilingOutputReceiver::add)
+);
+
+//  Multithreaded, access to _rec()
+TEST(5)
+{
+  db::Layout ly1;
+  ly1.dbu (0.001);
+  unsigned int l11 = ly1.insert_layer (db::LayerProperties (1, 0));
+  db::cell_index_type top1 = ly1.add_cell ("TOP");
+  ly1.cell (top1).shapes (l11).insert (db::Box (0, 0, 50000, 50000));
+
+  double sum = 0.0;
+  int num = 0;
+  MyTilingOutputReceiver *rec = new MyTilingOutputReceiver (&sum, &num);
+
+  db::TilingProcessor tp;
+  tp.set_threads (4);
+  tp.tile_size (0.11, 0.17);
+  tp.input ("i1", db::RecursiveShapeIterator (ly1, ly1.cell (top1), l11));
+  tp.output ("o1", 0, rec, db::ICplxTrans ());
+  tp.queue ("_rec(o1).add((i1 & _tile).area)");
+  tp.execute ("test");
+
+  EXPECT_EQ (sum, 2500000000);
+  EXPECT_EQ (num, 134225);
+}

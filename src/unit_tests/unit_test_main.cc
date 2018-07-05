@@ -375,9 +375,10 @@ main_cont (int &argc, char **argv)
 
   try {
 
-#if defined(HAVE_QT)
     pya::PythonInterpreter::initialize ();
     gsi::initialize_external ();
+
+#if defined(HAVE_QT)
 
     //  NOTE: we need an application object, but we don't call parse_cmd. This makes the object
     //  behave neutral as far as possible.
@@ -394,6 +395,9 @@ main_cont (int &argc, char **argv)
 #endif
 
 #else
+
+    //  select the system locale
+    setlocale (LC_ALL, "");
 
     //  initialize the modules (load their plugins from the paths)
     db::init ();

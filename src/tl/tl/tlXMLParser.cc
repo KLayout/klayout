@@ -152,8 +152,19 @@ XMLSource::reset ()
 //  XMLStringSource implementation
 
 XMLStringSource::XMLStringSource (const std::string &string)
+  : m_copy (string)
 {
-  set_source (new XMLSourcePrivateData (new tl::InputMemoryStream (string.c_str (), string.size ())));
+  set_source (new XMLSourcePrivateData (new tl::InputMemoryStream (m_copy.c_str (), string.size ())));
+}
+
+XMLStringSource::XMLStringSource (const char *cp)
+{
+  set_source (new XMLSourcePrivateData (new tl::InputMemoryStream (cp, strlen (cp))));
+}
+
+XMLStringSource::XMLStringSource (const char *cp, size_t len)
+{
+  set_source (new XMLSourcePrivateData (new tl::InputMemoryStream (cp, len)));
 }
 
 XMLStringSource::~XMLStringSource ()
@@ -212,9 +223,6 @@ public:
   {
     mp_parser = XML_ParserCreate ("UTF-8");
     tl_assert (mp_parser != NULL);
-    XML_SetUserData (mp_parser, (void *) this);
-    XML_SetElementHandler (mp_parser, start_element_handler, end_element_handler);
-    XML_SetCharacterDataHandler (mp_parser, cdata_handler);
   }
 
   ~XMLParserPrivateData ()
@@ -259,7 +267,10 @@ public:
     mp_struct_handler = &struct_handler;
 
     //  Just in case we want to reuse it ...
-    XML_ParserReset (mp_parser, "UTF-8");
+    XML_ParserReset (mp_parser, NULL);
+    XML_SetUserData (mp_parser, (void *) this);
+    XML_SetElementHandler (mp_parser, start_element_handler, end_element_handler);
+    XML_SetCharacterDataHandler (mp_parser, cdata_handler);
 
     const size_t chunk = 65536;
     char buffer [chunk];

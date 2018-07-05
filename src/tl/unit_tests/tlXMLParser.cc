@@ -27,139 +27,7 @@
 
 #include <sstream>
 #include <cmath>
-#include <QDir>
 
-#ifdef USE_PARSIFAL
-
-class XMLMyHandler : public tl::XMLHandler
-{
-public:
-  XMLMyHandler () : tl::XMLHandler () { }
-
-  void start_element (const std::string &uri, const std::string &lname, const std::string &qname, const tl::XMLAttributes &atts) throw (tl::XMLException)
-  {
-    if (qname != "root" && qname != "sub" && qname != "subsub") {
-      throw tl::XMLException ("not a root, sub or subsub, but " + qname);
-    }
-
-    txt += uri + "." + lname + "." + qname + " (";
-    for (tl::XMLAttributes::iterator a = atts.begin (); a != atts.end (); ++a) {
-      txt += a->uri () + "." + (*a).lname () + "." + a->qname () + "=" + (*a).value () + " ";
-    }
-    txt += ") ([a1]=";
-    tl::XMLAttributes::iterator aa = atts.by_name ("a1");
-    if (aa == atts.end ()) {
-      txt += "null";
-    } else {
-      txt += aa->uri () + "." + (*aa).lname () + "." + aa->qname () + "=" + (*aa).value ();
-    }
-    txt += ") ";
-  }
-
-  void characters (const std::string &t) throw (tl::XMLException)
-  {
-    txt += "'" + t + "'";
-  }
-
-  void start_document () throw (tl::XMLException)
-  {
-    txt += "{";
-  }
-
-  void end_document () throw (tl::XMLException)
-  {
-    txt += "}";
-  }
-
-  std::string txt;
-};
-
-TEST(1) 
-{
-  tl::XMLParser p;
-  tl::XMLStringSource s ("<?xml version=\"1.0\"?>\n"
-                         "<root>\n"
-                         "  <sub attr=\"x\">\n"
-                         "    <subsub a1=\"1\" a2=\"2\"/>\n"
-                         "  </sub>\n"
-                         "</rot>\n");
-  
-  XMLMyHandler h;
-
-  std::string error;
-  try {
-    p.parse (s, h);
-  } catch (tl::XMLException &ex) {
-    error = ex.msg ();
-  }
-
-  EXPECT_EQ (error, "XML parser error: Expected 'root', found 'rot' in line 6, column 7");
-}
-
-TEST(2) 
-{
-  tl::XMLParser p;
-  tl::XMLStringSource s ("<?xml version=\"1.0\"?>\n"
-                         "<root>\n"
-                         "  <sub attr=\"x\">\n"
-                         "    <sibsub a1=\"1\" a2=\"2\"/>\n"
-                         "  </sub>\n"
-                         "</root>\n");
-  
-  XMLMyHandler h;
-
-  std::string error;
-  try {
-    p.parse (s, h);
-  } catch (tl::XMLException &ex) {
-    error = ex.msg ();
-  }
-
-  EXPECT_EQ (error, "XML parser error: not a root, sub or subsub, but sibsub in line 4, column 28");
-}
-
-TEST(3) 
-{
-  tl::XMLParser p;
-  tl::XMLStringSource s ("<?xml version=\"1.0\"?>\n"
-                         "<root>\n"
-                         "  <sub attr=\"x\">\n"
-                         "    <subsub a1=\"1\" a2=\"2\"/>\n"
-                         "  </sub>\n"
-                         "</root>\n");
-  
-  XMLMyHandler h;
-
-  std::string error;
-  try {
-    p.parse (s, h);
-  } catch (tl::XMLException &ex) {
-    error = ex.msg ();
-  }
-
-  EXPECT_EQ (error, "");
-  EXPECT_EQ (h.txt, "{..root () ([a1]=null) ..sub (..attr=x ) ([a1]=null) ..subsub (..a1=1 ..a2=2 ) ([a1]=..a1=1) }");
-}
-
-TEST(4) 
-{
-  tl::XMLParser p;
-  tl::XMLStringSource s ("<?xml version=\"1.0\"?>\n"
-                         "<root>a b<sub/>c</root>");
-  
-  XMLMyHandler h;
-
-  std::string error;
-  try {
-    p.parse (s, h);
-  } catch (tl::XMLException &ex) {
-    error = ex.msg ();
-  }
-
-  EXPECT_EQ (error, "");
-  EXPECT_EQ (h.txt, "{..root () ([a1]=null) 'a b'..sub () ([a1]=null) 'c'}");
-}
-#endif
 
 struct Child {
   Child () : txt (""), d(-1), live(true) { }
@@ -227,7 +95,7 @@ struct Root {
   const Child &get_child () const { return m_child; }
 };
 
-TEST (5)
+TEST (1)
 {
   tl::XMLStringSource s ("<?xml version=\"1.0\"?>\n"
                          "<root>"
@@ -304,6 +172,29 @@ TEST (5)
   EXPECT_EQ (root == rsave, true);
 }
 
+TEST (5)
+{
+  tl::XMLStringSource s ("<?xml version=\"1.0\"?>\n"
+                         "<root>"
+                         "  <member>1a</member>"
+                         "</ruut>");
+
+  Root root;
+
+  tl::XMLStruct<Root> structure ("root",
+    tl::make_member (&Root::m, "member")
+  );
+
+  std::string error;
+  try {
+    structure.parse (s, root);
+  } catch (tl::XMLException &ex) {
+    error = ex.msg ();
+  }
+
+  EXPECT_EQ (error, "XML parser error: mismatched tag in line 2, column 29");
+}
+
 TEST (6)
 {
   tl::XMLStringSource s ("<?xml version=\"1.0\"?>\n"
@@ -324,10 +215,11 @@ TEST (6)
     error = ex.msg ();
   }
 
-#ifdef USE_PARSIFAL
-  EXPECT_EQ (error, "XML parser error: Expected end of text at position 1 (..a) in line 2, column 28");
-#else
+#if defined (HAVE_QT)
   EXPECT_EQ (error, "XML parser error: Expected end of text at position 1 (..a) in line 2, column 27");
+#else
+  //  expat delivers cdata at beginning of closing tag
+  EXPECT_EQ (error, "XML parser error: Expected end of text at position 1 (..a) in line 2, column 18");
 #endif
 }
 
@@ -679,9 +571,9 @@ TEST (10)
 
 TEST (11)
 {
-  //  ISO88 encoding
+  //  iso8859-1 encoding
   std::string x =
-    "<?xml version=\"1.0\" encoding=\"iso8859-1\"?>\n"
+    "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n"
     "<child><t>H\xe4llo</t>\n"
     "</child>\n";
 
@@ -731,9 +623,9 @@ TEST (12)
 
 TEST (13)
 {
-  //  ISO88 encoding
+  //  iso8859 encoding
   std::string x =
-    "<?xml version=\"1.0\" encoding=\"iso8859-1\"?>\n"
+    "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n"
     "<child><t>H\xe4llo</t>\n"
     "</child>\n";
 

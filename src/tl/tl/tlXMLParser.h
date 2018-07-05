@@ -339,7 +339,12 @@ class TL_PUBLIC XMLStringSource : public XMLSource
 {
 public:
   XMLStringSource (const std::string &string);
+  XMLStringSource (const char *cp);
+  XMLStringSource (const char *cp, size_t len);
   ~XMLStringSource ();
+
+private:
+  std::string m_copy;
 };
 
 /**

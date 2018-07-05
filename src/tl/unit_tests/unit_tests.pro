@@ -27,7 +27,8 @@ SOURCES = \
   tlThreadedWorkers.cc \
   tlUtils.cc \
   tlVariant.cc \
-  tlInt128Support.cc
+  tlInt128Support.cc \
+  tlXMLParser.cc \
 
 equals(HAVE_QT, "0") {
   # nothing
@@ -35,7 +36,6 @@ equals(HAVE_QT, "0") {
   SOURCES += \
     tlWebDAV.cc \
     tlDeferredExecution.cc \
-    tlXMLParser.cc \
     tlFileSystemWatcher.cc \
 }
 

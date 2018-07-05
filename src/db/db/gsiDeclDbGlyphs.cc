@@ -178,7 +178,7 @@ Class<db::TextGenerator> decl_TextGenerator ("TextGenerator",
   "gen = RBA::Generator::new\n"
   "gen.load_from_file(\"myfont.gds\")\n"
   "region = gen.text(\"A TEXT\", 0.001)\n"
-  "@endcode\n"
+  "@/code\n"
   "\n"
   "This code produces a RBA::Region with a database unit of 0.001 micron. This region can be fed "
   "into a \\Shapes container to place it into a cell for example.\n"

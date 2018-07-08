@@ -119,6 +119,7 @@ SOURCES = \
   gsiDeclDbVector.cc \
   gsiDeclDbLayoutDiff.cc \
   gsiDeclDbGlyphs.cc \
+    dbConverters.cc
 
 HEADERS = \
   dbArray.h \
@@ -206,7 +207,8 @@ HEADERS = \
   dbNamedLayerReader.h \
   dbForceLink.h \
   dbPlugin.h \
-  dbInit.h
+  dbInit.h \
+    dbConverters.h
 
 !equals(HAVE_QT, "0") {
 

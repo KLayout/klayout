@@ -22,8 +22,12 @@
 
 
 #include "dbGerberImporter.h"
+#include "dbGerberImportData.h"
 #include "dbGerberDrillFileReader.h"
 #include "dbRS274XReader.h"
+#include "dbReader.h"
+#include "dbStream.h"
+
 #include "tlStream.h"
 #include "tlString.h"
 #include "tlString.h"
@@ -1069,6 +1073,112 @@ GerberImporter::do_read (db::Layout &layout, db::cell_index_type cell_index)
   }
 
 }
+
+// ---------------------------------------------------------------
+//  Plugin for the stream reader
+
+
+class GerberReader
+  : public db::ReaderBase
+{
+public:
+
+  GerberReader (tl::InputStream &s)
+    : m_stream (s)
+  {
+    //  .. nothing yet ..
+  }
+
+  ~GerberReader ()
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions & /*options*/) throw (tl::Exception)
+  {
+    //  TODO: too simple, should provide at least a layer filtering.
+    return read (layout);
+  }
+
+  virtual const db::LayerMap &read (db::Layout &layout) throw (tl::Exception)
+  {
+    db::GerberImportData data;
+
+    std::string fn (m_stream.source ());
+    if (! fn.empty ()) {
+      data.base_dir = tl::absolute_path (fn);
+    }
+
+    data.load (m_stream);
+
+    db::GerberImporter importer;
+    data.setup_importer (&importer);
+
+    importer.read (layout);
+
+    std::string lyr_file = data.get_layer_properties_file ();
+    if (! lyr_file.empty ()) {
+      layout.add_meta_info (db::MetaInfo ("layer-properties-file", "Layer Properties File", lyr_file));
+    }
+
+    return m_layers;
+  }
+
+  virtual const char *format () const
+  {
+    return "GerberPCB";
+  }
+
+private:
+  tl::InputStream &m_stream;
+  db::LayerMap m_layers;
+};
+
+class GerberFormatDeclaration
+  : public db::StreamFormatDeclaration
+{
+  virtual std::string format_name () const { return "GerberPCB"; }
+  virtual std::string format_desc () const { return "Gerber PCB"; }
+  virtual std::string format_title () const { return "Gerber PCB (project files)"; }
+  virtual std::string file_format () const { return "Gerber PCB project files (*.pcb)"; }
+
+  virtual bool detect (tl::InputStream &stream) const
+  {
+    //  The test is that somewhere within the first 1000 bytes, a <pcb-project> XML tag appears.
+    //  1000 bytes are within the initial block that the stream reader reads and hence
+    //  this does not trigger any reread which is not available on some sources.
+    //  TODO: this is pretty simple test. A more elaborate test would be in place here.
+    std::string h = stream.read_all (1000);
+    //  HINT: this assumes UTF8 or ISO encoding ...
+    if (h.find ("<pcb-project>") != std::string::npos) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  virtual db::ReaderBase *create_reader (tl::InputStream &s) const
+  {
+    return new GerberReader (s);
+  }
+
+  virtual db::WriterBase *create_writer () const
+  {
+    return 0;
+  }
+
+  virtual bool can_read () const
+  {
+    return true;
+  }
+
+  virtual bool can_write () const
+  {
+    return false;
+  }
+};
+
+static tl::RegisteredClass<db::StreamFormatDeclaration> format_decl (new GerberFormatDeclaration (), 1000, "GerberPCB");
 
 }
 

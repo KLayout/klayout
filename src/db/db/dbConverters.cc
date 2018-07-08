@@ -20,27 +20,13 @@
 
 */
 
+#include "dbConverters.h"
+#include "tlInternational.h"
 
-#ifndef HDR_layConverters
-#define HDR_layConverters
-
-#include "laybasicCommon.h"
-
-#include <QColor>
-
-namespace lay
+namespace db
 {
 
-/**
- *  @brief A color converter class for converting colors to strings and vice versa
- */
-struct LAYBASIC_PUBLIC ColorConverter 
-{
-  std::string to_string (const QColor &c) const;
-  void from_string (const std::string &s, QColor &c) const;
-};
+  //  .. nothing yet ..
 
 }
-
-#endif
 

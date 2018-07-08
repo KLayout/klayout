@@ -36,6 +36,7 @@
 #endif
 
 #include <set>
+#include <cstdio>
 
 namespace db
 {
@@ -133,7 +134,7 @@ void init (const std::vector<std::string> &_paths)
   if (paths.empty ()) {
     std::string module_path = get_module_path ();
     if (! module_path.empty ()) {
-      paths.push_back (module_path);
+      paths.push_back (tl::absolute_path (module_path));
     }
   }
 

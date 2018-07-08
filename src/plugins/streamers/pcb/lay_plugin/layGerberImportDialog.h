@@ -67,7 +67,7 @@ class GerberImportDialogFileColumnEditorWidget
 {
 Q_OBJECT 
 public:
-  GerberImportDialogFileColumnEditorWidget (QWidget *parent, GerberImportData *data);
+  GerberImportDialogFileColumnEditorWidget (QWidget *parent, db::GerberImportData *data);
 
   void set_filename (const std::string &s);
   std::string get_filename () const;
@@ -78,7 +78,7 @@ public slots:
 private:
   QToolButton *mp_browse_button;
   QLineEdit *mp_filename_edit;
-  GerberImportData *mp_data;
+  db::GerberImportData *mp_data;
 };
 
 //  The item editor for the start/stop column 
@@ -87,7 +87,7 @@ class GerberImportDialogMetalLayerColumnEditorWidget
 {
 Q_OBJECT 
 public:
-  GerberImportDialogMetalLayerColumnEditorWidget (QWidget *parent, GerberImportData *data);
+  GerberImportDialogMetalLayerColumnEditorWidget (QWidget *parent, db::GerberImportData *data);
 
   void set_layer (int layer);
   int get_layer () const;
@@ -99,7 +99,7 @@ class GerberImportDialog
 Q_OBJECT 
 
 public:
-  GerberImportDialog (QWidget *parent, GerberImportData *data);
+  GerberImportDialog (QWidget *parent, db::GerberImportData *data);
   ~GerberImportDialog ();
 
   int exec ();
@@ -127,7 +127,7 @@ public slots:
   void free_layer_mapping_item_clicked (QTreeWidgetItem *, int);
 
 private:
-  GerberImportData *mp_data;
+  db::GerberImportData *mp_data;
   Ui::GerberImportDialog *mp_ui;
   QAction *m_open_action;
   QAction *m_saveas_action;

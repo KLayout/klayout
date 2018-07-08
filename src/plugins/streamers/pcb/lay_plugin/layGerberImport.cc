@@ -92,11 +92,11 @@ public:
         symbol == "db::import_gerber_new" ||
         symbol == "db::import_gerber_open") {
 
-      GerberImportData data;
+      db::GerberImportData data;
       try {
         data.from_string (m_import_spec);
       } catch (...) {
-        data = GerberImportData ();
+        data = db::GerberImportData ();
       }
 
       if (symbol == "db::import_gerber_new_free") {
@@ -146,8 +146,8 @@ public:
         config_root->config_end ();
 
         //  TODO: discard layout when an error occurs
-        if (data.mode != lay::GerberImportData::ModeIntoLayout) {
-          lay::MainWindow::instance ()->create_layout (data.mode == lay::GerberImportData::ModeSamePanel ? 2 : 1);
+        if (data.mode != db::GerberImportData::ModeIntoLayout) {
+          lay::MainWindow::instance ()->create_layout (data.mode == db::GerberImportData::ModeSamePanel ? 2 : 1);
         }
 
         lay::LayoutView *view = lay::LayoutView::current ();
@@ -156,7 +156,7 @@ public:
 
         std::string lyp_file = data.get_layer_properties_file ();
 
-        if (data.mode == lay::GerberImportData::ModeIntoLayout) {
+        if (data.mode == db::GerberImportData::ModeIntoLayout) {
 
           importer.read (cv->layout (), cv.cell_index ());
           view->create_initial_layer_props (cv_index, lyp_file, true /*add missing*/);

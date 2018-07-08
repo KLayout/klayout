@@ -23,6 +23,7 @@
 
 #include "layConverters.h"
 #include "tlInternational.h"
+#include "tlString.h"
 
 namespace lay
 {

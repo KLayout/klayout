@@ -25,6 +25,7 @@ SOURCES = \
   tlStableVector.cc \
   tlString.cc \
   tlThreadedWorkers.cc \
+  tlThreads.cc \
   tlUtils.cc \
   tlVariant.cc \
   tlInt128Support.cc \

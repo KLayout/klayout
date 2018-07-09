@@ -258,6 +258,7 @@ public:
     while (m_value < 10000000) {
       m_value += s_mythread2_increment;
       if (m_value == m_nstop) {
+        tl::MutexLocker locker (&s_wait_mutex);
         m_stopped = true;
         s_condition.wait (&s_wait_mutex);
         m_stopped = false;
@@ -280,7 +281,15 @@ TEST(4_wakeAll)
   thr1.start ();
   thr2.start ();
 
-  while (! thr1.stopped () || ! thr2.stopped ()) {
+  while (true) {
+    bool res;
+    {
+      tl::MutexLocker locker (&s_wait_mutex);
+      res = thr1.stopped () && thr2.stopped ();
+    }
+    if (res) {
+      break;
+    }
     EXPECT_EQ (thr1.isRunning (), true);
     EXPECT_EQ (thr2.isRunning (), true);
     tl_assert (thr1.isRunning () && thr2.isRunning ());
@@ -305,7 +314,15 @@ TEST(4_wakeOne)
   thr1.start ();
   thr2.start ();
 
-  while (! thr1.stopped () || ! thr2.stopped ()) {
+  while (true) {
+    bool res;
+    {
+      tl::MutexLocker locker (&s_wait_mutex);
+      res = thr1.stopped () && thr2.stopped ();
+    }
+    if (res) {
+      break;
+    }
     EXPECT_EQ (thr1.isRunning (), true);
     EXPECT_EQ (thr2.isRunning (), true);
     tl_assert (thr1.isRunning () && thr2.isRunning ());

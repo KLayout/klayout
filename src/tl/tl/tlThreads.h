@@ -86,14 +86,20 @@ public:
 
 #else
 
+class WaitConditionPrivate;
+
 //  The non-Qt version is a dummy implementation as threading is not supported (yet)
 class TL_PUBLIC WaitCondition
 {
 public:
   WaitCondition ();
+  ~WaitCondition ();
   bool wait (Mutex * /*mutex*/, unsigned long /*time*/ = std::numeric_limits<unsigned long>::max ());
   void wakeAll ();
   void wakeOne ();
+
+private:
+  WaitConditionPrivate *mp_data;
 };
 
 #endif

@@ -81,57 +81,59 @@ class PCellTestLib(pya.Library):
     self.register("PCellTestLib")
 
 
-# A PCell based on the declaration helper
+if "PCellDeclarationHelper" in pya.__dict__:
 
-class BoxPCell2(pya.PCellDeclarationHelper):
+  # A PCell based on the declaration helper
 
-  def __init__(self):
+  class BoxPCell2(pya.PCellDeclarationHelper):
 
-    super(BoxPCell2, self).__init__()
-  
-    self.param("layer", self.TypeLayer, "Layer", default = pya.LayerInfo(0, 0))
-    self.param("width", self.TypeDouble, "Width", default = 1.0)
-    self.param("height", self.TypeDouble, "Height", default = 1.0)
+    def __init__(self):
+
+      super(BoxPCell2, self).__init__()
     
-  def display_text_impl(self):
-    # provide a descriptive text for the cell
-    return "Box2(L=" + str(self.layer) + ",W=" + ('%.3f' % self.width) + ",H=" + ('%.3f' % self.height) + ")"
-  
-  def produce_impl(self):
-  
-    dbu = self.layout.dbu
-
-    # fetch the parameters
-    l = self.layer_layer
-    w = self.width / self.layout.dbu
-    h = self.height / self.layout.dbu
+      self.param("layer", self.TypeLayer, "Layer", default = pya.LayerInfo(0, 0))
+      self.param("width", self.TypeDouble, "Width", default = 1.0)
+      self.param("height", self.TypeDouble, "Height", default = 1.0)
+      
+    def display_text_impl(self):
+      # provide a descriptive text for the cell
+      return "Box2(L=" + str(self.layer) + ",W=" + ('%.3f' % self.width) + ",H=" + ('%.3f' % self.height) + ")"
     
-    # create the shape
-    self.cell.shapes(l).insert(pya.Box(-w / 2, -h / 2, w / 2, h / 2))
+    def produce_impl(self):
     
-  def can_create_from_shape_impl(self):
-    return self.shape.is_box()
+      dbu = self.layout.dbu
 
-  def transformation_from_shape_impl(self):
-    return pya.Trans(self.shape.box.center() - pya.Point())
+      # fetch the parameters
+      l = self.layer_layer
+      w = self.width / self.layout.dbu
+      h = self.height / self.layout.dbu
+      
+      # create the shape
+      self.cell.shapes(l).insert(pya.Box(-w / 2, -h / 2, w / 2, h / 2))
+      
+    def can_create_from_shape_impl(self):
+      return self.shape.is_box()
 
-  def parameters_from_shape_impl(self):
-    self.layer = self.layout.get_info(self.layer)
-    self.width = self.shape.box.width() * self.layout.dbu
-    self.height = self.shape.box.height() * self.layout.dbu
+    def transformation_from_shape_impl(self):
+      return pya.Trans(self.shape.box.center() - pya.Point())
+
+    def parameters_from_shape_impl(self):
+      self.layer = self.layout.get_info(self.layer)
+      self.width = self.shape.box.width() * self.layout.dbu
+      self.height = self.shape.box.height() * self.layout.dbu
+      
+  class PCellTestLib2(pya.Library):
+
+    def __init__(self):  
     
-class PCellTestLib2(pya.Library):
+      # set the description
+      self.description = "PCell test lib2"
+      
+      # create the PCell declarations
+      self.layout().register_pcell("Box2", BoxPCell2())
 
-  def __init__(self):  
-  
-    # set the description
-    self.description = "PCell test lib2"
-    
-    # create the PCell declarations
-    self.layout().register_pcell("Box2", BoxPCell2())
-
-    # register us with the name "MyLib"
-    self.register("PCellTestLib2")
+      # register us with the name "MyLib"
+      self.register("PCellTestLib2")
 
 
 def inspect_LayerInfo(self):
@@ -303,6 +305,9 @@ class DBPCellTests(unittest.TestCase):
 
 
   def test_1a(self):
+
+    if not "PCellDeclarationHelper" in pya.__dict__:
+      return
 
     # instantiate and register the library
     tl = PCellTestLib2()

@@ -86,15 +86,17 @@ class Basic_TestClass < TestBase
     assert_equal( a.a3("a"), 1 )
     assert_equal( a.a3("ab"), 2 )
     assert_equal( a.a3("µ"), 2 )  # two UTF8 bytes
-    assert_equal( a.a3_qstr("a"), 1 )
-    assert_equal( a.a3_qstr("ab"), 2 )
-    assert_equal( a.a3_qstr("µ"), 1 )  # one UTF8 character
-    assert_equal( a.a3_qstrref("a"), 1 )
-    assert_equal( a.a3_qstrref("ab"), 2 )
-    assert_equal( a.a3_qstrref("µ"), 1 )  # one UTF8 character
-    assert_equal( a.a3_qba("a"), 1 )
-    assert_equal( a.a3_qba("ab"), 2 )
-    assert_equal( a.a3_qba("µ"), 2 )  # two UTF8 bytes
+    if a.respond_to?(:a3_qstr) 
+      assert_equal( a.a3_qstr("a"), 1 )
+      assert_equal( a.a3_qstr("ab"), 2 )
+      assert_equal( a.a3_qstr("µ"), 1 )  # one UTF8 character
+      assert_equal( a.a3_qstrref("a"), 1 )
+      assert_equal( a.a3_qstrref("ab"), 2 )
+      assert_equal( a.a3_qstrref("µ"), 1 )  # one UTF8 character
+      assert_equal( a.a3_qba("a"), 1 )
+      assert_equal( a.a3_qba("ab"), 2 )
+      assert_equal( a.a3_qba("µ"), 2 )  # two UTF8 bytes
+    end
     assert_equal( a.a3(""), 0 )
 
     assert_equal( a.a4([1]), 1.0 )
@@ -176,111 +178,115 @@ class Basic_TestClass < TestBase
     assert_equal( eb < eb, false )
     assert_equal( ea < eb, true )
 
-    eea = RBA::Enums::new
-    eei = RBA::Enums::new(3)
-    eeb = RBA::Enums::new(eb)
-    assert_equal( eea.to_s, "" )
-    assert_equal( eea.inspect, " (0)" )
-    assert_equal( RBA::Enums::new(eea.to_s).inspect, " (0)" )
-    assert_equal( eei.inspect, "a|b (3)" )
-    assert_equal( RBA::Enums::new(eei.to_s).inspect, "a|b (3)" )
-    assert_equal( eeb.inspect, "b (2)" )
-    assert_equal( RBA::Enums::new(eeb.to_s).inspect, "b (2)" )
-    eeab1 = ea | eb
-    eeab2 = ea | RBA::Enums::new(eb)
-    eeab3 = RBA::Enums::new(ea) | eb
-    eeab4 = RBA::Enums::new(ea) | RBA::Enums::new(eb)
-    assert_equal( eeab1.inspect, "a|b (3)" )
-    assert_equal( eeab2.inspect, "a|b (3)" )
-    assert_equal( eeab3.inspect, "a|b (3)" )
-    assert_equal( eeab4.inspect, "a|b (3)" )
-    # Note: unsigned enum's will produce the long int, signed enums will produce the short one
-    assert_equal( (~eeab4).inspect == " (-4)" || (~eeab4).inspect == " (4294967292)", true )
-    assert_equal( (eeab4 & ea).inspect, "a (1)" )
-    assert_equal( (eeab4 & eeb).inspect, "b (2)" )
-    assert_equal( (eeab4 ^ eeb).inspect, "a (1)" )
-    assert_equal( (eeab4 ^ eb).inspect, "a (1)" )
-    assert_equal( eeab4.inspect, "a|b (3)" )
-    eeab4 ^= ea
-    assert_equal( eeab4.inspect, "b (2)" )
+    if RBA.constants.member?(:Enums)
 
-    assert_equal( a.get_e.to_s, "#0" )
-    a.set_e( RBA::Enum::a )
-    assert_equal( a.get_e.to_s, "a" )
-    a.set_e( RBA::Enum::b )
-    assert_equal( a.get_e.to_s, "b" )
-    a.set_eptr( nil )
-    assert_equal( a.get_e.to_s, "#0" )
-    a.set_eptr( RBA::Enum::c )
-    assert_equal( a.get_e.to_s, "c" )
-    a.set_ecptr( nil )
-    assert_equal( a.get_e.to_s, "#0" )
-    a.set_ecptr( RBA::Enum::b )
-    assert_equal( a.get_e.to_s, "b" )
-    a.set_ecref( RBA::Enum::a )
-    assert_equal( a.get_e.to_s, "a" )
-    a.set_eref( RBA::Enum::c )
-    assert_equal( a.get_e.to_s, "c" )
-    assert_equal( a.get_eptr.to_s, "c" )
-    assert_equal( a.get_eref.to_s, "c" )
-    assert_equal( a.get_ecptr.to_s, "c" )
-    assert_equal( a.get_ecref.to_s, "c" )
-    a.set_ecptr( nil )
-    assert_equal( a.get_ecptr, nil )
-    assert_equal( a.get_ecref.to_s, "#0" )
-    assert_equal( a.get_eptr, nil )
-    assert_equal( a.get_eref.to_s, "#0" )
+      eea = RBA::Enums::new
+      eei = RBA::Enums::new(3)
+      eeb = RBA::Enums::new(eb)
+      assert_equal( eea.to_s, "" )
+      assert_equal( eea.inspect, " (0)" )
+      assert_equal( RBA::Enums::new(eea.to_s).inspect, " (0)" )
+      assert_equal( eei.inspect, "a|b (3)" )
+      assert_equal( RBA::Enums::new(eei.to_s).inspect, "a|b (3)" )
+      assert_equal( eeb.inspect, "b (2)" )
+      assert_equal( RBA::Enums::new(eeb.to_s).inspect, "b (2)" )
+      eeab1 = ea | eb
+      eeab2 = ea | RBA::Enums::new(eb)
+      eeab3 = RBA::Enums::new(ea) | eb
+      eeab4 = RBA::Enums::new(ea) | RBA::Enums::new(eb)
+      assert_equal( eeab1.inspect, "a|b (3)" )
+      assert_equal( eeab2.inspect, "a|b (3)" )
+      assert_equal( eeab3.inspect, "a|b (3)" )
+      assert_equal( eeab4.inspect, "a|b (3)" )
+      # Note: unsigned enum's will produce the long int, signed enums will produce the short one
+      assert_equal( (~eeab4).inspect == " (-4)" || (~eeab4).inspect == " (4294967292)", true )
+      assert_equal( (eeab4 & ea).inspect, "a (1)" )
+      assert_equal( (eeab4 & eeb).inspect, "b (2)" )
+      assert_equal( (eeab4 ^ eeb).inspect, "a (1)" )
+      assert_equal( (eeab4 ^ eb).inspect, "a (1)" )
+      assert_equal( eeab4.inspect, "a|b (3)" )
+      eeab4 ^= ea
+      assert_equal( eeab4.inspect, "b (2)" )
 
-    ee = RBA::Enum::new
-    assert_equal( ee.to_s, "#0" )
-    a.mod_eref( ee, RBA::Enum::c )
-    assert_equal( ee.to_s, "c" )
-    a.mod_eptr( ee, RBA::Enum::a )
-    assert_equal( ee.to_s, "a" )
+      assert_equal( a.get_e.to_s, "#0" )
+      a.set_e( RBA::Enum::a )
+      assert_equal( a.get_e.to_s, "a" )
+      a.set_e( RBA::Enum::b )
+      assert_equal( a.get_e.to_s, "b" )
+      a.set_eptr( nil )
+      assert_equal( a.get_e.to_s, "#0" )
+      a.set_eptr( RBA::Enum::c )
+      assert_equal( a.get_e.to_s, "c" )
+      a.set_ecptr( nil )
+      assert_equal( a.get_e.to_s, "#0" )
+      a.set_ecptr( RBA::Enum::b )
+      assert_equal( a.get_e.to_s, "b" )
+      a.set_ecref( RBA::Enum::a )
+      assert_equal( a.get_e.to_s, "a" )
+      a.set_eref( RBA::Enum::c )
+      assert_equal( a.get_e.to_s, "c" )
+      assert_equal( a.get_eptr.to_s, "c" )
+      assert_equal( a.get_eref.to_s, "c" )
+      assert_equal( a.get_ecptr.to_s, "c" )
+      assert_equal( a.get_ecref.to_s, "c" )
+      a.set_ecptr( nil )
+      assert_equal( a.get_ecptr, nil )
+      assert_equal( a.get_ecref.to_s, "#0" )
+      assert_equal( a.get_eptr, nil )
+      assert_equal( a.get_eref.to_s, "#0" )
 
-    assert_equal( a.ev.inspect, "[]" )
-    a.push_ev( RBA::Enum::a )
-    a.push_ev( RBA::Enum::new )
-    a.push_ev( RBA::Enum::b )
-    assert_equal( a.ev.inspect, "[a (1), (not a valid enum value), b (2)]" )
+      ee = RBA::Enum::new
+      assert_equal( ee.to_s, "#0" )
+      a.mod_eref( ee, RBA::Enum::c )
+      assert_equal( ee.to_s, "c" )
+      a.mod_eptr( ee, RBA::Enum::a )
+      assert_equal( ee.to_s, "a" )
 
-    assert_equal( a.get_ef.inspect, " (0)" )
-    a.set_ef( RBA::Enum::a )
-    assert_equal( a.get_ef.to_s, "a" )
-    a.set_ef( RBA::Enums::new(RBA::Enum::b) )
-    assert_equal( a.get_ef.to_s, "b" )
-    a.set_efptr( nil )
-    assert_equal( a.get_ef.inspect, " (0)" )
-    a.set_efptr( RBA::Enums::new(RBA::Enum::c) )
-    assert_equal( a.get_ef.to_s, "a|b|c" )
-    a.set_efcptr( nil )
-    assert_equal( a.get_ef.inspect, " (0)" )
-    a.set_efcptr( RBA::Enums::new(RBA::Enum::b) )
-    assert_equal( a.get_ef.to_s, "b" )
-    a.set_efcptr( RBA::Enum::c )
-    assert_equal( a.get_ef.to_s, "a|b|c" )
-    a.set_efcref( RBA::Enum::b )
-    assert_equal( a.get_ef.to_s, "b" )
-    a.set_efcref( RBA::Enums::new(RBA::Enum::a) )
-    assert_equal( a.get_ef.to_s, "a" )
-    a.set_efref( RBA::Enums::new(RBA::Enum::c) )
-    assert_equal( a.get_ef.to_s, "a|b|c" )
-    assert_equal( a.get_efptr.to_s, "a|b|c" )
-    assert_equal( a.get_efref.to_s, "a|b|c" )
-    assert_equal( a.get_efcptr.to_s, "a|b|c" )
-    assert_equal( a.get_efcref.to_s, "a|b|c" )
-    a.set_efcptr( nil )
-    assert_equal( a.get_efcptr, nil )
-    assert_equal( a.get_efcref.inspect, " (0)" )
-    assert_equal( a.get_efptr, nil )
-    assert_equal( a.get_efref.inspect, " (0)" )
+      assert_equal( a.ev.inspect, "[]" )
+      a.push_ev( RBA::Enum::a )
+      a.push_ev( RBA::Enum::new )
+      a.push_ev( RBA::Enum::b )
+      assert_equal( a.ev.inspect, "[a (1), (not a valid enum value), b (2)]" )
 
-    ee = RBA::Enums::new
-    assert_equal( ee.inspect, " (0)" )
-    a.mod_efref( ee, RBA::Enum::b )
-    assert_equal( ee.to_s, "b" )
-    a.mod_efptr( ee, RBA::Enum::a )
-    assert_equal( ee.to_s, "a|b" )
+      assert_equal( a.get_ef.inspect, " (0)" )
+      a.set_ef( RBA::Enum::a )
+      assert_equal( a.get_ef.to_s, "a" )
+      a.set_ef( RBA::Enums::new(RBA::Enum::b) )
+      assert_equal( a.get_ef.to_s, "b" )
+      a.set_efptr( nil )
+      assert_equal( a.get_ef.inspect, " (0)" )
+      a.set_efptr( RBA::Enums::new(RBA::Enum::c) )
+      assert_equal( a.get_ef.to_s, "a|b|c" )
+      a.set_efcptr( nil )
+      assert_equal( a.get_ef.inspect, " (0)" )
+      a.set_efcptr( RBA::Enums::new(RBA::Enum::b) )
+      assert_equal( a.get_ef.to_s, "b" )
+      a.set_efcptr( RBA::Enum::c )
+      assert_equal( a.get_ef.to_s, "a|b|c" )
+      a.set_efcref( RBA::Enum::b )
+      assert_equal( a.get_ef.to_s, "b" )
+      a.set_efcref( RBA::Enums::new(RBA::Enum::a) )
+      assert_equal( a.get_ef.to_s, "a" )
+      a.set_efref( RBA::Enums::new(RBA::Enum::c) )
+      assert_equal( a.get_ef.to_s, "a|b|c" )
+      assert_equal( a.get_efptr.to_s, "a|b|c" )
+      assert_equal( a.get_efref.to_s, "a|b|c" )
+      assert_equal( a.get_efcptr.to_s, "a|b|c" )
+      assert_equal( a.get_efcref.to_s, "a|b|c" )
+      a.set_efcptr( nil )
+      assert_equal( a.get_efcptr, nil )
+      assert_equal( a.get_efcref.inspect, " (0)" )
+      assert_equal( a.get_efptr, nil )
+      assert_equal( a.get_efref.inspect, " (0)" )
+
+      ee = RBA::Enums::new
+      assert_equal( ee.inspect, " (0)" )
+      a.mod_efref( ee, RBA::Enum::b )
+      assert_equal( ee.to_s, "b" )
+      a.mod_efptr( ee, RBA::Enum::a )
+      assert_equal( ee.to_s, "a|b" )
+
+    end
 
   end
 
@@ -303,9 +309,11 @@ class Basic_TestClass < TestBase
     assert_equal( a3.a1, -11 )
 
     assert_equal( a1.a10_d(5.2), "5.2" )
-    assert_equal( a1.a10_d_qstr(5.25), "5.25" )
-    assert_equal( a1.a10_d_qstrref(5.2), "5.2" )
-    assert_equal( a1.a10_d_qba(5.1), "5.1" )
+    if a1.respond_to?(:a10_d_qstr)
+      assert_equal( a1.a10_d_qstr(5.25), "5.25" )
+      assert_equal( a1.a10_d_qstrref(5.2), "5.2" )
+      assert_equal( a1.a10_d_qba(5.1), "5.1" )
+    end
     assert_equal( a1.a10_f(5.7), "5.7" )
     x = RBA::Value.new(1.5)
     assert_equal( x.value.to_s, "1.5" )
@@ -2212,61 +2220,65 @@ class Basic_TestClass < TestBase
     b.set_ss([])
     assert_equal(b.ss, [])
 
-    v = [ "a", "b" ]
-    RBA::B::push_qls(v, "x")
-    assert_equal(v, [ "a", "b", "x" ])
-    b.set_qls([ "1" ])
-    assert_equal(b.qls, [ "1" ])
-    b.set_qls([])
-    assert_equal(b.qls, [])
+    if b.respond_to?(:set_qls) 
 
-    v = [ "a", 1 ]
-    RBA::B::push_qlv(v, 2.5)
-    assert_equal(v, [ "a", 1, 2.5 ])
-    b.set_qlv([ 17, "1" ])
-    assert_equal(b.qlv, [ 17, "1" ])
-    b.set_qlv([])
-    assert_equal(b.qlv, [])
+      v = [ "a", "b" ]
+      RBA::B::push_qls(v, "x")
+      assert_equal(v, [ "a", "b", "x" ])
+      b.set_qls([ "1" ])
+      assert_equal(b.qls, [ "1" ])
+      b.set_qls([])
+      assert_equal(b.qls, [])
 
-    v = [ "a", "b" ]
-    RBA::B::push_qsl(v, "x")
-    assert_equal(v, [ "a", "b", "x" ])
-    b.set_qsl([ "1" ])
-    assert_equal(b.qsl, [ "1" ])
-    b.set_qsl([])
-    assert_equal(b.qsl, [])
+      v = [ "a", 1 ]
+      RBA::B::push_qlv(v, 2.5)
+      assert_equal(v, [ "a", 1, 2.5 ])
+      b.set_qlv([ 17, "1" ])
+      assert_equal(b.qlv, [ 17, "1" ])
+      b.set_qlv([])
+      assert_equal(b.qlv, [])
 
-    v = [ "a", "b" ]
-    RBA::B::push_qvs(v, "x")
-    assert_equal(v, [ "a", "b", "x" ])
-    b.set_qvs([ "1" ])
-    assert_equal(b.qvs, [ "1" ])
-    b.set_qvs([])
-    assert_equal(b.qvs, [])
+      v = [ "a", "b" ]
+      RBA::B::push_qsl(v, "x")
+      assert_equal(v, [ "a", "b", "x" ])
+      b.set_qsl([ "1" ])
+      assert_equal(b.qsl, [ "1" ])
+      b.set_qsl([])
+      assert_equal(b.qsl, [])
 
-    v = [ "a", "b" ]
-    RBA::B::push_qss(v, "x")
-    assert_equal(v.sort, [ "a", "b", "x" ])
-    b.set_qss([ "1" ])
-    assert_equal(b.qss, [ "1" ])
-    b.set_qss([])
-    assert_equal(b.qss, [])
+      v = [ "a", "b" ]
+      RBA::B::push_qvs(v, "x")
+      assert_equal(v, [ "a", "b", "x" ])
+      b.set_qvs([ "1" ])
+      assert_equal(b.qvs, [ "1" ])
+      b.set_qvs([])
+      assert_equal(b.qvs, [])
 
-    v = { 1 => "a", 17 => "b" }
-    RBA::B::insert_qmap_is(v, 2, "x")
-    assert_equal(v, { 1 => "a", 17 => "b", 2 => "x" })
-    b.set_qmap_is({ 1 => "t", 17 => "b" })
-    assert_equal(b.qmap_is, { 1 => "t", 17 => "b" })
-    b.set_qmap_is({})
-    assert_equal(b.qmap_is, {})
+      v = [ "a", "b" ]
+      RBA::B::push_qss(v, "x")
+      assert_equal(v.sort, [ "a", "b", "x" ])
+      b.set_qss([ "1" ])
+      assert_equal(b.qss, [ "1" ])
+      b.set_qss([])
+      assert_equal(b.qss, [])
 
-    v = { 1 => "a", 17 => "b" }
-    RBA::B::insert_qhash_is(v, 2, "x")
-    assert_equal(v, { 1 => "a", 17 => "b", 2 => "x" })
-    b.set_qhash_is({ 1 => "t", 17 => "b" })
-    assert_equal(b.qhash_is, { 1 => "t", 17 => "b" })
-    b.set_qhash_is({})
-    assert_equal(b.qhash_is, {})
+      v = { 1 => "a", 17 => "b" }
+      RBA::B::insert_qmap_is(v, 2, "x")
+      assert_equal(v, { 1 => "a", 17 => "b", 2 => "x" })
+      b.set_qmap_is({ 1 => "t", 17 => "b" })
+      assert_equal(b.qmap_is, { 1 => "t", 17 => "b" })
+      b.set_qmap_is({})
+      assert_equal(b.qmap_is, {})
+
+      v = { 1 => "a", 17 => "b" }
+      RBA::B::insert_qhash_is(v, 2, "x")
+      assert_equal(v, { 1 => "a", 17 => "b", 2 => "x" })
+      b.set_qhash_is({ 1 => "t", 17 => "b" })
+      assert_equal(b.qhash_is, { 1 => "t", 17 => "b" })
+      b.set_qhash_is({})
+      assert_equal(b.qhash_is, {})
+
+    end
 
   end
 
@@ -2290,6 +2302,10 @@ class Basic_TestClass < TestBase
   end
 
   def test_60
+
+    if !RBA.constants.member?(:SQ)
+      return
+    end
   
     sq = RBA::SQ::new
 
@@ -2352,6 +2368,10 @@ class Basic_TestClass < TestBase
   end
 
   def test_61
+  
+    if !RBA.constants.member?(:SQ)
+      return
+    end
   
     sq = RBA::SQ::new
 

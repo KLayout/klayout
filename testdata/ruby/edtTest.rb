@@ -28,6 +28,10 @@ class EDT_TestClass < TestBase
   # ObjectInstPath
   def test_1
 
+    if !RBA.constants.member?(:ObjectInstPath)
+      return
+    end
+
     ly = RBA::Layout::new
     li = ly.insert_layer(RBA::LayerInfo::new(1, 0))
     tc = ly.create_cell("TOP")
@@ -109,6 +113,10 @@ class EDT_TestClass < TestBase
 
   # Selection
   def test_2
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     mw = RBA::Application::instance.main_window
     mw.close_all

@@ -39,6 +39,10 @@ class LAYLayoutView_TestClass < TestBase
   # Basic view creation and MainWindow events
   def test_1
 
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
     app = RBA::Application.instance
     mw = app.main_window
     mw.close_all
@@ -121,6 +125,10 @@ class LAYLayoutView_TestClass < TestBase
   end
 
   def test_2
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     app = RBA::Application.instance
     mw = app.main_window

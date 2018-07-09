@@ -184,15 +184,16 @@ class BasicTest(unittest.TestCase):
     self.assertEqual( a.a3("a"), 1 )
     self.assertEqual( a.a3("ab"), 2 )
     self.assertEqual( a.a3("µ"), 2 )  # two UTF8 bytes
-    self.assertEqual( a.a3_qstr("a"), 1 )
-    self.assertEqual( a.a3_qstr("ab"), 2 )
-    self.assertEqual( a.a3_qstr("µ"), 1 )  # one UTF character
-    self.assertEqual( a.a3_qstrref("a"), 1 )
-    self.assertEqual( a.a3_qstrref("ab"), 2 )
-    self.assertEqual( a.a3_qstrref("µ"), 1 )  # one UTF character
-    self.assertEqual( a.a3_qba("a"), 1 )
-    self.assertEqual( a.a3_qba("ab"), 2 )
-    self.assertEqual( a.a3_qba("µ"), 2 )  # two UTF8 bytes
+    if "a3_qstr" in a.__dict__:
+      self.assertEqual( a.a3_qstr("a"), 1 )
+      self.assertEqual( a.a3_qstr("ab"), 2 )
+      self.assertEqual( a.a3_qstr("µ"), 1 )  # one UTF character
+      self.assertEqual( a.a3_qstrref("a"), 1 )
+      self.assertEqual( a.a3_qstrref("ab"), 2 )
+      self.assertEqual( a.a3_qstrref("µ"), 1 )  # one UTF character
+      self.assertEqual( a.a3_qba("a"), 1 )
+      self.assertEqual( a.a3_qba("ab"), 2 )
+      self.assertEqual( a.a3_qba("µ"), 2 )  # two UTF8 bytes
     self.assertEqual( a.a3(""), 0 )
 
     self.assertEqual( a.a4([1]), 1.0 )
@@ -303,84 +304,86 @@ class BasicTest(unittest.TestCase):
     self.assertEqual( eb < eb, False )
     self.assertEqual( ea < eb, True )
 
-    eea = pya.Enums()
-    eei = pya.Enums(3)
-    eeb = pya.Enums(eb)
-    self.assertEqual( str(eea), "" )
-    self.assertEqual( repr(eea), " (0)" )
-    self.assertEqual( repr(pya.Enums(str(eea))), " (0)" )
-    self.assertEqual( repr(eei), "a|b (3)" )
-    self.assertEqual( repr(pya.Enums(str(eei))), "a|b (3)" )
-    self.assertEqual( repr(eeb), "b (2)" )
-    self.assertEqual( repr(pya.Enums(str(eeb))), "b (2)" )
-    eeab1 = ea | eb
-    eeab2 = ea | pya.Enums(eb)
-    eeab3 = pya.Enums(ea) | eb
-    eeab4 = pya.Enums(ea) | pya.Enums(eb)
-    self.assertEqual( repr(eeab1), "a|b (3)" )
-    self.assertEqual( repr(eeab2), "a|b (3)" )
-    self.assertEqual( repr(eeab3), "a|b (3)" )
-    self.assertEqual( repr(eeab4), "a|b (3)" )
-    # Note: unsigned enum's will produce the long int, signed enums will produce the short one
-    self.assertEqual( repr(~eeab4) == " (-4)" or repr(~eeab4) == " (4294967292)", True )
-    self.assertEqual( repr(eeab4 & ea), "a (1)" )
-    self.assertEqual( repr(eeab4 & eeb), "b (2)" )
-    self.assertEqual( repr(eeab4 ^ eeb), "a (1)" )
-    self.assertEqual( repr(eeab4 ^ eb), "a (1)" )
-    self.assertEqual( repr(eeab4), "a|b (3)" )
-    eeab4 ^= ea
-    self.assertEqual( repr(eeab4), "b (2)" )
+    if "Enums" in pya.__dict__:
 
-    ee = pya.Enum()
-    self.assertEqual( str(ee), "#0" )
-    a.mod_eref( ee, pya.Enum.c )
-    self.assertEqual( str(ee), "c" )
-    a.mod_eptr( ee, pya.Enum.a )
-    self.assertEqual( str(ee), "a" )
+      eea = pya.Enums()
+      eei = pya.Enums(3)
+      eeb = pya.Enums(eb)
+      self.assertEqual( str(eea), "" )
+      self.assertEqual( repr(eea), " (0)" )
+      self.assertEqual( repr(pya.Enums(str(eea))), " (0)" )
+      self.assertEqual( repr(eei), "a|b (3)" )
+      self.assertEqual( repr(pya.Enums(str(eei))), "a|b (3)" )
+      self.assertEqual( repr(eeb), "b (2)" )
+      self.assertEqual( repr(pya.Enums(str(eeb))), "b (2)" )
+      eeab1 = ea | eb
+      eeab2 = ea | pya.Enums(eb)
+      eeab3 = pya.Enums(ea) | eb
+      eeab4 = pya.Enums(ea) | pya.Enums(eb)
+      self.assertEqual( repr(eeab1), "a|b (3)" )
+      self.assertEqual( repr(eeab2), "a|b (3)" )
+      self.assertEqual( repr(eeab3), "a|b (3)" )
+      self.assertEqual( repr(eeab4), "a|b (3)" )
+      # Note: unsigned enum's will produce the long int, signed enums will produce the short one
+      self.assertEqual( repr(~eeab4) == " (-4)" or repr(~eeab4) == " (4294967292)", True )
+      self.assertEqual( repr(eeab4 & ea), "a (1)" )
+      self.assertEqual( repr(eeab4 & eeb), "b (2)" )
+      self.assertEqual( repr(eeab4 ^ eeb), "a (1)" )
+      self.assertEqual( repr(eeab4 ^ eb), "a (1)" )
+      self.assertEqual( repr(eeab4), "a|b (3)" )
+      eeab4 ^= ea
+      self.assertEqual( repr(eeab4), "b (2)" )
 
-    self.assertEqual( repr(a.ev()), "[]" )
-    a.push_ev( pya.Enum.a )
-    a.push_ev( pya.Enum() )
-    a.push_ev( pya.Enum.b )
-    self.assertEqual( repr(a.ev()), "[a (1), (not a valid enum value), b (2)]" )
+      ee = pya.Enum()
+      self.assertEqual( str(ee), "#0" )
+      a.mod_eref( ee, pya.Enum.c )
+      self.assertEqual( str(ee), "c" )
+      a.mod_eptr( ee, pya.Enum.a )
+      self.assertEqual( str(ee), "a" )
 
-    self.assertEqual( repr(a.get_ef()), " (0)" )
-    a.set_ef( pya.Enum.a )
-    self.assertEqual( str(a.get_ef()), "a" )
-    a.set_ef( pya.Enums(pya.Enum.b) )
-    self.assertEqual( str(a.get_ef()), "b" )
-    a.set_efptr( None )
-    self.assertEqual( repr(a.get_ef()), " (0)" )
-    a.set_efptr( pya.Enums(pya.Enum.c) )
-    self.assertEqual( str(a.get_ef()), "a|b|c" )
-    a.set_efcptr( None )
-    self.assertEqual( repr(a.get_ef()), " (0)" )
-    a.set_efcptr( pya.Enums(pya.Enum.b) )
-    self.assertEqual( str(a.get_ef()), "b" )
-    a.set_efcptr( pya.Enum.c )
-    self.assertEqual( str(a.get_ef()), "a|b|c" )
-    a.set_efcref( pya.Enum.b )
-    self.assertEqual( str(a.get_ef()), "b" )
-    a.set_efcref( pya.Enums(pya.Enum.a) )
-    self.assertEqual( str(a.get_ef()), "a" )
-    a.set_efref( pya.Enums(pya.Enum.c) )
-    self.assertEqual( str(a.get_ef()), "a|b|c" )
-    self.assertEqual( str(a.get_efptr()), "a|b|c" )
-    self.assertEqual( str(a.get_efref()), "a|b|c" )
-    self.assertEqual( str(a.get_efcptr()), "a|b|c" )
-    self.assertEqual( str(a.get_efcref()), "a|b|c" )
-    a.set_efcptr( None )
-    self.assertEqual( a.get_efcptr(), None )
-    self.assertEqual( repr(a.get_efcref()), " (0)" )
-    self.assertEqual( a.get_efptr(), None )
-    self.assertEqual( repr(a.get_efref()), " (0)" )
+      self.assertEqual( repr(a.ev()), "[]" )
+      a.push_ev( pya.Enum.a )
+      a.push_ev( pya.Enum() )
+      a.push_ev( pya.Enum.b )
+      self.assertEqual( repr(a.ev()), "[a (1), (not a valid enum value), b (2)]" )
 
-    ee = pya.Enums()
-    self.assertEqual( repr(ee), " (0)" )
-    a.mod_efref( ee, pya.Enum.b )
-    self.assertEqual( str(ee), "b" )
-    a.mod_efptr( ee, pya.Enum.a )
-    self.assertEqual( str(ee), "a|b" )
+      self.assertEqual( repr(a.get_ef()), " (0)" )
+      a.set_ef( pya.Enum.a )
+      self.assertEqual( str(a.get_ef()), "a" )
+      a.set_ef( pya.Enums(pya.Enum.b) )
+      self.assertEqual( str(a.get_ef()), "b" )
+      a.set_efptr( None )
+      self.assertEqual( repr(a.get_ef()), " (0)" )
+      a.set_efptr( pya.Enums(pya.Enum.c) )
+      self.assertEqual( str(a.get_ef()), "a|b|c" )
+      a.set_efcptr( None )
+      self.assertEqual( repr(a.get_ef()), " (0)" )
+      a.set_efcptr( pya.Enums(pya.Enum.b) )
+      self.assertEqual( str(a.get_ef()), "b" )
+      a.set_efcptr( pya.Enum.c )
+      self.assertEqual( str(a.get_ef()), "a|b|c" )
+      a.set_efcref( pya.Enum.b )
+      self.assertEqual( str(a.get_ef()), "b" )
+      a.set_efcref( pya.Enums(pya.Enum.a) )
+      self.assertEqual( str(a.get_ef()), "a" )
+      a.set_efref( pya.Enums(pya.Enum.c) )
+      self.assertEqual( str(a.get_ef()), "a|b|c" )
+      self.assertEqual( str(a.get_efptr()), "a|b|c" )
+      self.assertEqual( str(a.get_efref()), "a|b|c" )
+      self.assertEqual( str(a.get_efcptr()), "a|b|c" )
+      self.assertEqual( str(a.get_efcref()), "a|b|c" )
+      a.set_efcptr( None )
+      self.assertEqual( a.get_efcptr(), None )
+      self.assertEqual( repr(a.get_efcref()), " (0)" )
+      self.assertEqual( a.get_efptr(), None )
+      self.assertEqual( repr(a.get_efref()), " (0)" )
+
+      ee = pya.Enums()
+      self.assertEqual( repr(ee), " (0)" )
+      a.mod_efref( ee, pya.Enum.b )
+      self.assertEqual( str(ee), "b" )
+      a.mod_efptr( ee, pya.Enum.a )
+      self.assertEqual( str(ee), "a|b" )
 
   def test_12(self):
 
@@ -401,9 +404,10 @@ class BasicTest(unittest.TestCase):
     self.assertEqual( a3.a1(), -11 )
 
     self.assertEqual( a1.a10_d(5.2), "5.2" )
-    self.assertEqual( a1.a10_d_qstr(5.25), "5.25" )
-    self.assertEqual( a1.a10_d_qstrref(5.2), "5.2" )
-    self.assertEqual( a1.a10_d_qba(5.1), "5.1" )
+    if "a10_d_qstr" in a1.__dict__:
+      self.assertEqual( a1.a10_d_qstr(5.25), "5.25" )
+      self.assertEqual( a1.a10_d_qstrref(5.2), "5.2" )
+      self.assertEqual( a1.a10_d_qba(5.1), "5.1" )
     self.assertEqual( a1.a10_f(5.7), "5.7" )
     x = pya.Value(1.5)
     self.assertEqual( str(x.value), "1.5" )
@@ -2313,63 +2317,65 @@ class BasicTest(unittest.TestCase):
     b.set_ss([])
     self.assertEqual(b.ss(), [])
 
-    v = [ "a", "b" ]
-    pya.B.push_qls(v, "x")
-    self.assertEqual(v, [ "a", "b", "x" ])
-    b.set_qls([ "1" ])
-    self.assertEqual(b.qls(), [ "1" ])
-    b.set_qls([])
-    self.assertEqual(b.qls(), [])
+    if "set_qls" in b.__dict__:
 
-    v = [ "a", 1 ]
-    pya.B.push_qlv(v, 2.5)
-    self.assertEqual(v, [ "a", 1, 2.5 ])
-    b.set_qlv([ 17, "1" ])
-    self.assertEqual(b.qlv(), [ 17, "1" ])
-    b.set_qlv([])
-    self.assertEqual(b.qlv(), [])
+      v = [ "a", "b" ]
+      pya.B.push_qls(v, "x")
+      self.assertEqual(v, [ "a", "b", "x" ])
+      b.set_qls([ "1" ])
+      self.assertEqual(b.qls(), [ "1" ])
+      b.set_qls([])
+      self.assertEqual(b.qls(), [])
 
-    v = [ "a", "b" ]
-    pya.B.push_qsl(v, "x")
-    self.assertEqual(v, [ "a", "b", "x" ])
-    b.set_qsl([ "1" ])
-    self.assertEqual(b.qsl(), [ "1" ])
-    b.set_qsl([])
-    self.assertEqual(b.qsl(), [])
+      v = [ "a", 1 ]
+      pya.B.push_qlv(v, 2.5)
+      self.assertEqual(v, [ "a", 1, 2.5 ])
+      b.set_qlv([ 17, "1" ])
+      self.assertEqual(b.qlv(), [ 17, "1" ])
+      b.set_qlv([])
+      self.assertEqual(b.qlv(), [])
 
-    v = [ "a", "b" ]
-    pya.B.push_qvs(v, "x")
-    self.assertEqual(v, [ "a", "b", "x" ])
-    b.set_qvs([ "1" ])
-    self.assertEqual(b.qvs(), [ "1" ])
-    b.set_qvs([])
-    self.assertEqual(b.qvs(), [])
+      v = [ "a", "b" ]
+      pya.B.push_qsl(v, "x")
+      self.assertEqual(v, [ "a", "b", "x" ])
+      b.set_qsl([ "1" ])
+      self.assertEqual(b.qsl(), [ "1" ])
+      b.set_qsl([])
+      self.assertEqual(b.qsl(), [])
 
-    v = [ "a", "b" ]
-    pya.B.push_qss(v, "x")
-    v_sorted = v
-    v_sorted.sort()
-    self.assertEqual(v_sorted, [ "a", "b", "x" ])
-    b.set_qss([ "1" ])
-    self.assertEqual(b.qss(), [ "1" ])
-    b.set_qss([])
-    self.assertEqual(b.qss(), [])
+      v = [ "a", "b" ]
+      pya.B.push_qvs(v, "x")
+      self.assertEqual(v, [ "a", "b", "x" ])
+      b.set_qvs([ "1" ])
+      self.assertEqual(b.qvs(), [ "1" ])
+      b.set_qvs([])
+      self.assertEqual(b.qvs(), [])
 
-    v = { 1: "a", 17: "b" }
-    pya.B.insert_qmap_is(v, 2, "x")
-    self.assertEqual(v, { 1: "a", 17: "b", 2: "x" })
-    b.set_qmap_is({ 1: "t", 17: "b" })
-    self.assertEqual(b.qmap_is(), { 1: "t", 17: "b" })
-    b.set_qmap_is({})
-    self.assertEqual(b.qmap_is(), {})
+      v = [ "a", "b" ]
+      pya.B.push_qss(v, "x")
+      v_sorted = v
+      v_sorted.sort()
+      self.assertEqual(v_sorted, [ "a", "b", "x" ])
+      b.set_qss([ "1" ])
+      self.assertEqual(b.qss(), [ "1" ])
+      b.set_qss([])
+      self.assertEqual(b.qss(), [])
 
-    v = { 1: "a", 17: "b" }
-    pya.B.insert_qhash_is(v, 2, "x")
-    self.assertEqual(v, { 1: "a", 17: "b", 2: "x" })
-    b.set_qhash_is({ 1: "t", 17: "b" })
-    self.assertEqual(b.qhash_is(), { 1: "t", 17: "b" })
-    b.set_qhash_is({})
-    self.assertEqual(b.qhash_is(), {})
+      v = { 1: "a", 17: "b" }
+      pya.B.insert_qmap_is(v, 2, "x")
+      self.assertEqual(v, { 1: "a", 17: "b", 2: "x" })
+      b.set_qmap_is({ 1: "t", 17: "b" })
+      self.assertEqual(b.qmap_is(), { 1: "t", 17: "b" })
+      b.set_qmap_is({})
+      self.assertEqual(b.qmap_is(), {})
+
+      v = { 1: "a", 17: "b" }
+      pya.B.insert_qhash_is(v, 2, "x")
+      self.assertEqual(v, { 1: "a", 17: "b", 2: "x" })
+      b.set_qhash_is({ 1: "t", 17: "b" })
+      self.assertEqual(b.qhash_is(), { 1: "t", 17: "b" })
+      b.set_qhash_is({})
+      self.assertEqual(b.qhash_is(), {})
 
   def test_51(self):
   
@@ -2389,6 +2395,9 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(isinstance(y4, pya.X), False)
 
   def test_60(self):
+
+    if not "SQ" in pya.__dict__:
+      return
 
     class SignalCollector(object):
 
@@ -2483,6 +2492,9 @@ class BasicTest(unittest.TestCase):
 
   def test_61(self):
   
+    if not "SQ" in pya.__dict__:
+      return
+
     class SignalCollector(object):
 
       got_s0a = 0

@@ -27,6 +27,10 @@ class LAYMenuTest_TestClass < TestBase
 
   def test_0
 
+    if !RBA.constants.member?(:Action)
+      return
+    end
+
     a = RBA::Action::new
     b = a.dup
 
@@ -93,6 +97,10 @@ class LAYMenuTest_TestClass < TestBase
   end
 
   def test_1
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     app = RBA::Application.instance
     mw = app.main_window
@@ -261,20 +269,28 @@ RESULT
 
   end
 
-  class MenuHandler < RBA::Action
-    def initialize( t, k, &action ) 
-      self.title = t
-      self.shortcut = k
-      @action = action
+  if RBA.constants.member?(:Action)
+
+    class MenuHandler < RBA::Action
+      def initialize( t, k, &action ) 
+        self.title = t
+        self.shortcut = k
+        @action = action
+      end
+      def triggered 
+        @action.call( self ) 
+      end
+    private
+      @action
     end
-    def triggered 
-      @action.call( self ) 
-    end
-  private
-    @action
+
   end
 
   def test_2
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     app = RBA::Application.instance
     mw = app.main_window

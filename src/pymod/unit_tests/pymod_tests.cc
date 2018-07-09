@@ -87,7 +87,7 @@ PYMODTEST (import_QtXmlPatterns, "import_QtXmlPatterns.py")
 
 #endif
 
-#else
+#elif defined(HAVE_QT)
 
 PYMODTEST (import_lay, "import_lay_noqt.py")
 

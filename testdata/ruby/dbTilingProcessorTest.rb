@@ -252,6 +252,10 @@ END
 
   def test_7
 
+    if !RBA.constants.member?(:Image)
+      return
+    end
+
     rin = RBA::Region::new
     rin.insert(RBA::Box::new(0, 0, 100, 200))
     rin.insert(RBA::Box::new(9900, 9800, 10000, 10000))

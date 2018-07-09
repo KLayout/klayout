@@ -310,7 +310,7 @@ class DBLayoutTest(unittest.TestCase):
     self.assertEqual( inst.nb, 20 )
     self.assertEqual( inst.cell_index, c1.cell_index() )
 
-    if( pya.Application.instance().is_editable() ):
+    if ly.is_editable():
       for inst in c2.each_inst():
         c2.erase( inst )
       self.assertEqual( c2.bbox().to_s(), "()" )
@@ -566,7 +566,7 @@ class DBLayoutTest(unittest.TestCase):
     self.assertEqual( inst.nb, 20 )
     self.assertEqual( inst.cell_index, c1.cell_index() )
 
-    if( pya.Application.instance().is_editable() ):
+    if ly.is_editable():
       for inst in c2.each_inst():
         c2.erase( inst ) 
       self.assertEqual( c2.bbox().to_s(), "()" )
@@ -727,9 +727,9 @@ class DBLayoutTest(unittest.TestCase):
   # Instances and bboxes (editable mode)
   def test_6_Layout_new(self):
 
-    if pya.Application.instance().is_editable():
+    ly = pya.Layout()
+    if ly.is_editable():
 
-      ly = pya.Layout()
       pv = { 17: "a", "b": [ 1, 5, 7 ] }
       pid1 = ly.properties_id( pv )
       pv = { 100: "x" }
@@ -831,11 +831,12 @@ class DBLayoutTest(unittest.TestCase):
   # Copy/move between cells
   def test_7_cells_copy_move(self):
 
+    ly1 = pya.Layout()
+
     # because of set_property ...
-    if not pya.Application.instance().is_editable():
+    if not ly1.is_editable():
       return
 
-    ly1 = pya.Layout()
     la1 = ly1.insert_layer(pya.LayerInfo(1, 0))
     lb1 = ly1.insert_layer(pya.LayerInfo(2, 0))
     ly1.dbu = 0.001
@@ -1001,7 +1002,7 @@ class DBLayoutTest(unittest.TestCase):
       sv.append(i.to_s(True))
     self.assertEqual(";".join(sv), "")
 
-    if pya.Application.instance().is_editable():
+    if ly.is_editable():
 
       i1.cell_index = ci3
 

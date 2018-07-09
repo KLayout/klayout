@@ -1044,7 +1044,7 @@ END
     assert_equal(dump_layer(lll, 1, "c0"), "(0,100;1000,1200); (100,0;1100,1100)")
 
     # TODO: undo tests crashes in non-editable mode! Should be checked properly.
-    if RBA::Application::instance.is_editable?
+    if lll.is_editable?
 
       assert_equal(m.has_undo?, true)
       assert_equal(m.has_redo?, false)

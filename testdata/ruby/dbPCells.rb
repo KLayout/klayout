@@ -97,67 +97,71 @@ class PCellTestLib < RBA::Library
 
 end
 
-# A PCell based on the declaration helper
+if RBA.constants.member?(:PCellDeclarationHelper)
 
-class BoxPCell2 < RBA::PCellDeclarationHelper
+  # A PCell based on the declaration helper
 
-  def initialize
+  class BoxPCell2 < RBA::PCellDeclarationHelper
 
-    super()
+    def initialize
 
-    param("layer", BoxPCell2::TypeLayer, "Layer", :default => RBA::LayerInfo::new(0, 0))
-    param("width", BoxPCell2::TypeDouble, "Width", :default => 1.0)
-    param("height", BoxPCell2::TypeDouble, "Height", :default => 1.0)
+      super()
 
-  end
+      param("layer", BoxPCell2::TypeLayer, "Layer", :default => RBA::LayerInfo::new(0, 0))
+      param("width", BoxPCell2::TypeDouble, "Width", :default => 1.0)
+      param("height", BoxPCell2::TypeDouble, "Height", :default => 1.0)
+
+    end
+      
+    def display_text_impl
+      # provide a descriptive text for the cell
+      return "Box2(L=" + layer.to_s + ",W=" + ('%.3f' % width) + ",H=" + ('%.3f' % height) + ")"
+    end
     
-  def display_text_impl
-    # provide a descriptive text for the cell
-    return "Box2(L=" + layer.to_s + ",W=" + ('%.3f' % width) + ",H=" + ('%.3f' % height) + ")"
-  end
-  
-  def produce_impl
-  
-    # fetch the parameters
-    l = layer_layer
-    w = width / layout.dbu
-    h = height / layout.dbu
+    def produce_impl
     
-    # create the shape
-    cell.shapes(l).insert(RBA::Box::new(-w / 2, -h / 2, w / 2, h / 2))
+      # fetch the parameters
+      l = layer_layer
+      w = width / layout.dbu
+      h = height / layout.dbu
+      
+      # create the shape
+      cell.shapes(l).insert(RBA::Box::new(-w / 2, -h / 2, w / 2, h / 2))
 
+    end
+      
+    def can_create_from_shape_impl
+      return self.shape.is_box?
+    end
+
+    def transformation_from_shape_impl
+      return RBA::Trans::new(shape.box.center - RBA::Point::new)
+    end
+
+    def parameters_from_shape_impl
+      # NOTE: because there is one parameter called "layer" already, we need to use
+      # the "_layer" fallback to access the argument to this method
+      set_layer(_layout.get_info(_layer))
+      set_width(shape.box.width * _layout.dbu)
+      set_height(shape.box.height * _layout.dbu)
+    end
+      
   end
+
+  class PCellTestLib2 < RBA::Library
+
+    def initialize  
     
-  def can_create_from_shape_impl
-    return self.shape.is_box?
-  end
+      # set the description
+      description = "PCell test lib2"
+      
+      # create the PCell declarations
+      layout.register_pcell("Box2", BoxPCell2::new)
 
-  def transformation_from_shape_impl
-    return RBA::Trans::new(shape.box.center - RBA::Point::new)
-  end
+      # register us with the name "MyLib"
+      self.register("PCellTestLib2")
 
-  def parameters_from_shape_impl
-    # NOTE: because there is one parameter called "layer" already, we need to use
-    # the "_layer" fallback to access the argument to this method
-    set_layer(_layout.get_info(_layer))
-    set_width(shape.box.width * _layout.dbu)
-    set_height(shape.box.height * _layout.dbu)
-  end
-    
-end
-
-class PCellTestLib2 < RBA::Library
-
-  def initialize  
-  
-    # set the description
-    description = "PCell test lib2"
-    
-    # create the PCell declarations
-    layout.register_pcell("Box2", BoxPCell2::new)
-
-    # register us with the name "MyLib"
-    self.register("PCellTestLib2")
+    end
 
   end
 
@@ -336,6 +340,10 @@ class DBPCell_TestClass < TestBase
   end
 
   def test_1a
+
+    if !RBA.constants.member?(:PCellDeclarationHelper)
+      return
+    end
 
     # instantiate and register the library
     tl = PCellTestLib2::new

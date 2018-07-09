@@ -61,6 +61,10 @@ class LAYLayers_TestClass < TestBase
 
   def test_1
 
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
     app = RBA::Application.instance
     mw = app.main_window
     mw.close_all
@@ -212,6 +216,10 @@ class LAYLayers_TestClass < TestBase
   end
 
   def test_1a
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     app = RBA::Application.instance
     mw = app.main_window
@@ -423,6 +431,10 @@ class LAYLayers_TestClass < TestBase
   end
 
   def test_2
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     p = RBA::LayerPropertiesNode::new
 
@@ -667,6 +679,10 @@ class LAYLayers_TestClass < TestBase
   # direct replacement of objects and attributes
   def test_3
 
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
     app = RBA::Application.instance
     mw = app.main_window
     mw.close_all
@@ -749,6 +765,10 @@ class LAYLayers_TestClass < TestBase
   # propagation of "real" attributes through the hierarchy
   def test_4
 
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
     app = RBA::Application.instance
     mw = app.main_window
     mw.close_all
@@ -785,6 +805,10 @@ class LAYLayers_TestClass < TestBase
 
   # delete method of iterator
   def test_5
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     app = RBA::Application.instance
     mw = app.main_window
@@ -829,6 +853,10 @@ class LAYLayers_TestClass < TestBase
 
   # custom stipples and line styles
   def test_6
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     app = RBA::Application.instance
     mw = app.main_window

@@ -29,11 +29,7 @@ class DBInstance_TestClass < TestBase
   def test_1_InstEdit
 
     # this only works in editable mode
-    if ! RBA::Application::instance.is_editable?
-      return 
-    end
-
-    ly = RBA::Layout::new
+    ly = RBA::Layout::new(true)
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
@@ -224,11 +220,7 @@ class DBInstance_TestClass < TestBase
   def test_2_InstEdit
 
     # this only works in editable mode
-    if ! RBA::Application::instance.is_editable?
-      return 
-    end
-
-    ly = RBA::Layout::new
+    ly = RBA::Layout::new(true)
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
@@ -435,11 +427,7 @@ class DBInstance_TestClass < TestBase
   def test_4_InstFlatten
 
     # this only works in editable mode
-    if ! RBA::Application::instance.is_editable?
-      return 
-    end
-
-    ly = RBA::Layout::new
+    ly = RBA::Layout::new(true)
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
@@ -502,11 +490,7 @@ class DBInstance_TestClass < TestBase
   def test_5_InstEdit_Double
 
     # this only works in editable mode
-    if ! RBA::Application::instance.is_editable?
-      return 
-    end
-
-    ly = RBA::Layout::new
+    ly = RBA::Layout::new(true)
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
@@ -697,11 +681,7 @@ class DBInstance_TestClass < TestBase
   def test_6_InstEdit_Double
 
     # this only works in editable mode
-    if ! RBA::Application::instance.is_editable?
-      return 
-    end
-
-    ly = RBA::Layout::new
+    ly = RBA::Layout::new(true)
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )

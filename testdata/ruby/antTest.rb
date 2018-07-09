@@ -155,6 +155,10 @@ class Ant_TestClass < TestBase
   # Annotation object
   def test_1
 
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
     a = RBA::Annotation::new
     assert_equal( a.to_s, "p1=0,0, p2=0,0, fmt=$D, fmt_x=$X, fmt_y=$Y, style=ruler, outline=diag, snap=true, ac=global" )
 
@@ -387,6 +391,10 @@ class Ant_TestClass < TestBase
   # Test LayoutView integration
   def test_2
 
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
     mw = RBA::Application::instance.main_window
     mw.close_all
     mw.create_layout( 0 )
@@ -458,6 +466,10 @@ class Ant_TestClass < TestBase
 
   # Test LayoutView integration with live updates
   def test_3
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     mw = RBA::Application::instance.main_window
     mw.close_all

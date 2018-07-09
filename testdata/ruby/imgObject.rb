@@ -27,6 +27,10 @@ class IMG_TestClass < TestBase
 
   def test_1
 
+    if !RBA.constants.member?(:ImageDataMapping)
+      return
+    end
+
     dm = RBA::ImageDataMapping.new 
     dm.gamma = 0.5
     assert_equal(dm.gamma, 0.5)
@@ -61,6 +65,10 @@ class IMG_TestClass < TestBase
   end
 
   def test_2
+
+    if !RBA.constants.member?(:Image)
+      return
+    end
 
     image = RBA::Image.new 
     assert_equal(image.to_s, "empty:")
@@ -181,6 +189,10 @@ class IMG_TestClass < TestBase
 
   def test_3
 
+    if !RBA.constants.member?(:Image)
+      return
+    end
+
     # compatibility with 0.21
     d = []
     20000.times { d.push(0.0) }
@@ -196,6 +208,10 @@ class IMG_TestClass < TestBase
   end
 
   def test_4
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     mw = RBA::Application.instance.main_window
     mw.close_all

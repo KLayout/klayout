@@ -157,6 +157,7 @@ TEST(1)
   v = e.parse ("var a=A.new; a.push_ev(Enum.a); a.push_ev(Enum.new); a.push_ev(Enum.b); a.ev").execute ();
   EXPECT_EQ (v.to_string (), std::string ("a,#0,b"));
 
+#if defined(HAVE_QT)
   v = e.parse ("var a=A.new; a.get_ef").execute ();
   EXPECT_EQ (v.to_string (), std::string (""));
   v = e.parse ("var a=A.new; a.set_ef(Enum.a); a.get_ef").execute ();
@@ -204,6 +205,8 @@ TEST(1)
   v = e.parse ("var a=A.new; var ef=Enums.new(); a.mod_efref(ef, Enum.b); a.mod_efptr(ef, Enum.a); ef").execute ();
   EXPECT_EQ (v.to_string (), std::string ("a|b"));
 #endif
+#endif
+
 }
 
 TEST(2) 

@@ -592,11 +592,7 @@ class DBShapes_TestClass < TestBase
   # Shapes (edit)
   def test_7_LayoutEdit
 
-    if ! RBA::Application::instance.is_editable?
-      return
-    end
-
-    ly = RBA::Layout::new
+    ly = RBA::Layout::new(true)
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
@@ -741,11 +737,7 @@ class DBShapes_TestClass < TestBase
   # Shapes (edit, new methods)
   def test_7_LayoutEdit2
 
-    if ! RBA::Application::instance.is_editable?
-      return
-    end
-
-    ly = RBA::Layout::new
+    ly = RBA::Layout::new(true)
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
@@ -951,11 +943,7 @@ class DBShapes_TestClass < TestBase
   # Shapes (edit, new methods)
   def test_7_DLayoutEdit2
 
-    if ! RBA::Application::instance.is_editable?
-      return
-    end
-
-    ly = RBA::Layout::new
+    ly = RBA::Layout::new(true)
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )
@@ -1161,11 +1149,7 @@ class DBShapes_TestClass < TestBase
   # Shapes (edit, new methods)
   def test_7_LayoutEdit3
 
-    if ! RBA::Application::instance.is_editable?
-      return
-    end
-
-    ly = RBA::Layout::new
+    ly = RBA::Layout::new(true)
 
     ci1 = ly.add_cell( "c1" )
     ci2 = ly.add_cell( "c2" )

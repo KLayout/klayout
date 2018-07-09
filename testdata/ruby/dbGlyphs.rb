@@ -29,6 +29,10 @@ class DBGlyph_TestClass < TestBase
   def test_1_Glyph
 
     tg = RBA::TextGenerator.default_generator
+
+    # TODO: no default generator in non-Qt mode (no resources)
+    tg || return
+
     assert_equal(tg.name, "std_font")
     assert_equal(tg.description, "Non-manhattan (0.6 x 0.8 um cell)")
     assert_equal(tg.width.to_s, "600")

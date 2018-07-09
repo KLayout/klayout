@@ -422,10 +422,12 @@ class RDB_TestClass < TestBase
     assert_equal(item.has_tag?(db.tag_id("x1")), false)
     assert_equal(item.tags_str, "")
     
-    is="iVBORw0KGgoAAAANSUhEUgAAACoAAAA0CAIAAABzfT3nAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA0SAAANOgHo3ZneAAAA3UlEQVRYhe2WwQ3DIAxFoco8XaGZIaeO43FyYgZYgYXcQ6SWuDGgBhWq/qccIvGCEd9SbAwAAPSGaW2lFR2rfWDpXrPpSe2SP10fvnn/PZHZH9IwbKFVZZ/Z6wMtZcjW02Bn2FVpZYdWdkr2nvh23S2FyDNJuVITpwmRjTGbNr0v20U5byNtJuuJt/fO2f93+UlbEJl5UjVPr3Y71EQ/PoPPlU+lDJtWlCt3GwCMG33BuJGAcWMEMG6c1jBudCyf/nzV8nbZPRohclFLHdGbZ8eNSjN1fmf0AACA1jwA4hKxu4C6P7EAAAAASUVORK5CYII="
-    item.image_str=is
-    # Only the first 30 bytes count ... the remaining part is too different for different versions of Qt
-    assert_equal(item.image_str[0..30], is[0..30])
+    if item.respond_to?(:image_str)
+      is="iVBORw0KGgoAAAANSUhEUgAAACoAAAA0CAIAAABzfT3nAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA0SAAANOgHo3ZneAAAA3UlEQVRYhe2WwQ3DIAxFoco8XaGZIaeO43FyYgZYgYXcQ6SWuDGgBhWq/qccIvGCEd9SbAwAAPSGaW2lFR2rfWDpXrPpSe2SP10fvnn/PZHZH9IwbKFVZZ/Z6wMtZcjW02Bn2FVpZYdWdkr2nvh23S2FyDNJuVITpwmRjTGbNr0v20U5byNtJuuJt/fO2f93+UlbEJl5UjVPr3Y71EQ/PoPPlU+lDJtWlCt3GwCMG33BuJGAcWMEMG6c1jBudCyf/nzV8nbZPRohclFLHdGbZ8eNSjN1fmf0AACA1jwA4hKxu4C6P7EAAAAASUVORK5CYII="
+      item.image_str=is
+      # Only the first 30 bytes count ... the remaining part is too different for different versions of Qt
+      assert_equal(item.image_str[0..30], is[0..30])
+    end
     
     vs = RBA::RdbItemValue.new("a string")
     vs2 = RBA::RdbItemValue.new("a string (ii)")
@@ -599,7 +601,9 @@ class RDB_TestClass < TestBase
     item.add_tag(db.tag_id("x1"))
     item.add_tag(db.user_tag_id("x2"))
     is="iVBORw0KGgoAAAANSUhEUgAAACoAAAA0CAIAAABzfT3nAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA0SAAANOgHo3ZneAAAA3UlEQVRYhe2WwQ3DIAxFoco8XaGZIaeO43FyYgZYgYXcQ6SWuDGgBhWq/qccIvGCEd9SbAwAAPSGaW2lFR2rfWDpXrPpSe2SP10fvnn/PZHZH9IwbKFVZZ/Z6wMtZcjW02Bn2FVpZYdWdkr2nvh23S2FyDNJuVITpwmRjTGbNr0v20U5byNtJuuJt/fO2f93+UlbEJl5UjVPr3Y71EQ/PoPPlU+lDJtWlCt3GwCMG33BuJGAcWMEMG6c1jBudCyf/nzV8nbZPRohclFLHdGbZ8eNSjN1fmf0AACA1jwA4hKxu4C6P7EAAAAASUVORK5CYII="
-    item.image_str=is
+    if item.respond_to?(:image_str)
+      item.image_str=is
+    end
 
     tmp = File::join($ut_testtmp, "tmp.lyrdb")
 
@@ -635,7 +639,9 @@ class RDB_TestClass < TestBase
     assert_equal(ii[0].has_tag?(db2.tag_id("x1")), true)
     assert_equal(ii[0].has_tag?(db2.tag_id("x")), false)
     # Only the first 30 bytes count ... the remaining part is too different for different versions of Qt
-    assert_equal(ii[0].image_str[0..30], is[0..30])
+    if ii[0].respond_to?(:image_str)
+      assert_equal(ii[0].image_str[0..30], is[0..30])
+    end
     assert_equal(db2.cell_by_id(ii[0].cell_id).qname, "cell_name")
     assert_equal(db2.category_by_id(ii[0].category_id).path, "cat")
     vs = ""
@@ -655,6 +661,10 @@ class RDB_TestClass < TestBase
 
   # LayoutView
   def test_10
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
 
     mw = RBA::Application.instance.main_window
     mw.create_layout(1)

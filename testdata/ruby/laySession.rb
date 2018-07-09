@@ -45,6 +45,10 @@ class LAYSession_TestClass < TestBase
 
   def test_1
 
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
     app = RBA::Application.instance
     mw = app.main_window
     mw.close_all

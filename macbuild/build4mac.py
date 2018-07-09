@@ -67,7 +67,7 @@ def SetGlobals():
   Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details           | \n"
   Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew']             | qt5macports \n"
   Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24', 'B25']                | sys \n"
-  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B36']       | sys \n"
+  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37']       | sys \n"
   Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                  | disabled \n"
   Usage += "   [-m|--make <option>] : option passed to 'make'                                    | -j4 \n"
   Usage += "   [-d|--debug]         : enable debug mode build                                    | disabled \n"
@@ -175,7 +175,7 @@ def ParseCommandLineArguments():
 
   p.add_option( '-p', '--python',
                 dest='type_python',
-                help="Python type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36']" )
+                help="Python type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37']" )
 
   p.add_option( '-n', '--noqtbinding',
                 action='store_true',
@@ -294,7 +294,7 @@ def ParseCommandLineArguments():
     exit()
 
   # Determine Python type
-  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B36'] ]
+  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37'] ]
   ModulePython = ""
   index        = 0
   for item in candidates:
@@ -324,7 +324,7 @@ def ParseCommandLineArguments():
         ModulePython = 'Python36MacPorts'
         NonOSStdLang = True
       elif index == 5:
-        ModulePython = 'Python36Brew'
+        ModulePython = 'Python37Brew'
         NonOSStdLang = True
     else:
       index += 1

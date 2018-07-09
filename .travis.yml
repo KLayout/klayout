@@ -1,49 +1,26 @@
-# qt app example with linux and mac: https://stackoverflow.com/questions/29721240/ci-for-qt-app-build-with-different-qt-versions
-
 matrix:
   include:
-    - os: osx
-      osx_image: xcode9.3beta
-      env:
-        - MATRIX_EVAL=""
-
-    # - os: osx
-    #   osx_image: xcode8
-    #   env:
-    #     - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
-
-    # - os: osx
-    #   osx_image: xcode8
-    #   env:
-    #     - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
-
-    # - os: osx
-    #   osx_image: xcode8
-    #   env:
-    #     - MATRIX_EVAL="brew install gcc6 && CC=gcc-6 && CXX=g++-6"
-
-    # - os: osx
-    #   osx_image: xcode8
-    #   env:
-    #     - MATRIX_EVAL="brew install gcc && CC=gcc-7 && CXX=g++-7"
-
+  - os: osx
+    osx_image: xcode9.3beta
+    env:
+    - MATRIX_EVAL=""
 before_install:
-    - eval "${MATRIX_EVAL}"
-    - brew update
-    - brew bundle
-
-install:
-  - git clone https://github.com/kristovatlas/osx-config-check
-  - cd osx-config-check ; python2.7 app.py --report-only --skip-sudo-checks ; cd ..
-
+- eval "${MATRIX_EVAL}"
+- brew update
+- brew bundle
 script:
-  - python3 build4mac.py -p B36 -q Qt5Brew -c
-  - source filter-clang.sh; python3 build4mac.py -p B36 -q Qt5Brew | filter
-  - python3 build4mac.py -p B36 -q Qt5Brew -y
-  - qt5.pkg.macos-HighSierra-release/klayout.app/Contents/MacOS/klayout -b -r test-pylib-script.py
-  - cd qt5.build.macos-HighSierra-release
-  - ln -s klayout.app/Contents/MacOS/klayout klayout
-  - export TESTTMP=testtmp    # path to a directory that will hold temporary data (will be created)
-  - export TESTSRC=..         # path to the source directory
-  - ./ut_runner -h
-  - ./ut_runner -s
+- python3 build4mac.py -p B37 -q Qt5Brew -c
+- source filter-clang.sh; python3 build4mac.py -p B37 -q Qt5Brew | filter
+- python3 build4mac.py -p B37 -q Qt5Brew -y
+
+deploy:
+  provider: s3
+  access_key_id: AKIAIV2JJIENURARWFUQ
+  secret_access_key:
+    secure: LdxO80/boYFIa/6XuF1gi2V7vtoDFro+ImIcmf8ARKddYxjlLp31mVDt1ZezeYvjPt3T0KvDErMtez7Ea8yUPXayxLycAb5nEhP6QMTuW3QcSTllsG3Bpz1b1zCx4LiYWzYbmgqHru1kh3WhqQbKAgq4Xl5zIIE2yvWlGvpUf9mP586KGe5HJl6hbAJI8XdkJTjp48jHanKIUlxDDPrxon1i1GD+8PSl2JEvggRpp+mSaA5dJJJRYPNFlQn0T1TuHkRBErLqHYJ8qTSee72jMbTOVOPxuMy4KKdZt6bpDJiJccH2FJ87+qyXM/8dDQnlpWPVOgQhklFBMUmGkooVxfjphVLmBRNgkfohBC6DmKeIk/Os+TRvXjuL/SMwQ17jwKSRw/QPrIGwvGb2GdZ/jQCV0WWw3x/N8xlXZ2EhkLC8lznVuaf++CCC3qm0+ejojRFz7uFyqDvq9HPXHzllZTbTMI+6+QE5Gpi1s513iio/nRPYCLoyFe5144VfnlJCXxsC11jrous2HWo2YFJGqj0ipJdnit/Kolq+Shs2gTiGz0yb7f/JKsyA/N0Bz4npKlt7O1MmXyFjDJCfSn2WyfXjSYiyKu3fjkbf4e4AK5qsR2BcNlJXl6Z3ACLIS6OinRPFLZyCS24yQ0eNIR1Q5Xvg88vTUbyhDc2QsYpyP1Y=
+  bucket: danielwang
+  acl: bucket_owner_full_control
+  skip_cleanup: true
+  on:
+    repo: dwang/klayout
+    branch: travis-ci

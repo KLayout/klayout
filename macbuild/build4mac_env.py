@@ -126,7 +126,7 @@ RubyDictionary  = { 'nil'           : None,
 # [3] Python
 #-----------------------------------------------------
 Pythons  = [ 'nil', 'PythonYosemite', 'PythonElCapitan', 'PythonSierra', 'PythonHighSierra' ]
-Pythons += [ 'Anaconda27', 'Anaconda36', 'Python36MacPorts', 'Python36Brew' ]
+Pythons += [ 'Anaconda27', 'Anaconda36', 'Python36MacPorts', 'Python37Brew' ]
 
 #-----------------------------------------------------
 # Whereabout of different components of Python
@@ -188,11 +188,11 @@ Python36MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versi
                     'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.6/lib/libpython3.6m.dylib'
                   }
 
-# Python 3.6 from Brew *+*+*+ EXPERIMENTAL *+*+*+
+# Python 3.7 from Brew *+*+*+ EXPERIMENTAL *+*+*+
 # [Key Type Name] = 'pybrew'
-Python36Brew= { 'exe': '/usr/local/opt/python/libexec/bin/python' ,
-                'inc': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/3.6/Headers',
-                'lib': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/3.6/Python'
+Python37Brew= { 'exe': '/usr/local/opt/python/libexec/bin/python' ,
+                'inc': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/3.7/Headers',
+                'lib': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/3.7/Python'
               }
 
 # Consolidated dictionary kit for Python
@@ -204,7 +204,7 @@ PythonDictionary= { 'nil'             : None,
                     'Anaconda27'      : Anaconda27,
                     'Anaconda36'      : Anaconda36,
                     'Python36MacPorts': Python36MacPorts,
-                    'Python36Brew'    : Python36Brew,
+                    'Python37Brew'    : Python37Brew,
                   }
 
 #-----------------------------------------------------

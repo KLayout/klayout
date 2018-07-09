@@ -102,8 +102,8 @@ public:
     }
 
     //  transfers the lock back
-    mutex->lock ();
     pthread_mutex_unlock (&m_mutex);
+    mutex->lock ();
 
     return woken;
   }

@@ -28,6 +28,7 @@
 
 #include <map>
 #include <pthread.h>
+#include <errno.h>
 
 namespace tl
 {
@@ -90,6 +91,8 @@ Thread::Thread ()
 
 Thread::~Thread ()
 {
+  terminate ();
+  wait ();
   delete mp_data;
   mp_data = 0;
 }
@@ -97,7 +100,6 @@ Thread::~Thread ()
 void Thread::do_run ()
 {
   try {
-    mp_data->running = true;
     run ();
     mp_data->running = false;
   } catch (tl::Exception &ex) {
@@ -143,11 +145,10 @@ void Thread::start ()
     return;
   }
 
-  if (! mp_data->initialized) {
-    mp_data->initialized = true;
-    if (pthread_create (&mp_data->pthread, NULL, &start_thread, (void *) this) != 0) {
-      tl::error << tr ("Failed to create thread");
-    }
+  mp_data->initialized = true;
+  mp_data->running = true;
+  if (pthread_create (&mp_data->pthread, NULL, &start_thread, (void *) this) != 0) {
+    tl::error << tr ("Failed to create thread");
   }
 }
 
@@ -158,17 +159,42 @@ void Thread::terminate ()
   }
 }
 
-bool Thread::wait (unsigned long /*time*/)
+bool Thread::wait (unsigned long time)
 {
-  if (! mp_data->initialized) {
+  if (! isRunning ()) {
     return true;
   }
 
-  //  @@@ TODO: timed join
-  if (pthread_join (mp_data->pthread, &mp_data->return_code) != 0) {
-    tl::error << tr ("Could not join threads");
+  if (time < std::numeric_limits<unsigned long>::max ()) {
+
+    struct timespec end_time;
+    clock_gettime (CLOCK_REALTIME, &end_time);
+
+    end_time.tv_sec += (time / 1000);
+    end_time.tv_nsec += (time % 1000) * 1000000;
+    if (end_time.tv_nsec > 1000000000) {
+      end_time.tv_nsec -= 1000000000;
+      end_time.tv_sec += 1;
+    }
+
+    int res = pthread_timedjoin_np (mp_data->pthread, &mp_data->return_code, &end_time);
+    if (res == ETIMEDOUT) {
+      return false;
+    } else if (res) {
+      tl::error << tr ("Could not join threads");
+    }
+
+    return true;
+
+  } else {
+
+    if (pthread_join (mp_data->pthread, &mp_data->return_code) != 0) {
+      tl::error << tr ("Could not join threads");
+    }
+
+    return true;
+
   }
-  return true;
 }
 
 // -------------------------------------------------------------------------------

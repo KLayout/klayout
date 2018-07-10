@@ -25,6 +25,7 @@ IS_MAC="no"
 
 HAVE_QTBINDINGS=1
 HAVE_64BIT_COORD=0
+HAVE_QT=1
 HAVE_QT5=""
 HAVE_CURL=""
 HAVE_EXPAT=""
@@ -73,6 +74,9 @@ while [ "$*" != "" ]; do
   case $a in
   -with-qtbinding)
     HAVE_QTBINDINGS=1
+    ;;
+  -without-qt)
+    HAVE_QT=0
     ;;
   -without-qtbinding)
     HAVE_QTBINDINGS=0
@@ -191,6 +195,7 @@ while [ "$*" != "" ]; do
     echo "  -with-64bit-coord     Use long (64bit) coordinates - EXPERIMENTAL FEATURE"
     echo "                        (only available for gcc>=4.4 for 64bit build)"
     echo "  -without-64bit-coord  Don't use long (64bit) coordinates [default]"
+    echo "  -without-qt           Qt-less build of the core libraries (including pymod)"
     echo ""
     echo "  -dry-run              Don't build, just run qmake"
     echo ""
@@ -550,6 +555,7 @@ qmake_options=(
   HAVE_PYTHON="$HAVE_PYTHON"
   HAVE_QTBINDINGS="$HAVE_QTBINDINGS"
   HAVE_64BIT_COORD="$HAVE_64BIT_COORD"
+  HAVE_QT="$HAVE_QT"
   HAVE_QT5="$HAVE_QT5"
   HAVE_CURL="$HAVE_CURL"
   HAVE_EXPAT="$HAVE_EXPAT"

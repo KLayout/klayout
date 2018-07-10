@@ -28,7 +28,11 @@
 
 #include <map>
 #include <pthread.h>
+#include <time.h>
 #include <errno.h>
+#if defined(_WIN32)
+#  include <windows.h>
+#endif
 
 namespace tl
 {
@@ -274,12 +278,31 @@ bool Thread::wait (unsigned long time)
       end_time.tv_sec += 1;
     }
 
+#if defined(_WIN32)
+
+    //  wait if the thread terminated or the timeout has expired
+    while (isRunning ()) {
+
+      struct timespec current_time;
+      clock_gettime (CLOCK_REALTIME, &current_time);
+      if (end_time.tv_sec < current_time.tv_sec || (end_time.tv_sec == current_time.tv_sec && end_time.tv_nsec < current_time.tv_nsec)) {
+        return false;
+      }
+
+      Sleep (1);
+
+    }
+
+#else
+
     int res = pthread_timedjoin_np (mp_data->pthread, &mp_data->return_code, &end_time);
     if (res == ETIMEDOUT) {
       return false;
     } else if (res) {
       tl::error << tr ("Could not join threads");
     }
+
+#endif
 
     return true;
 

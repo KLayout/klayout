@@ -66,7 +66,7 @@ PYMODTEST (import_tl, "import_tl.py")
 PYMODTEST (import_db, "import_db.py")
 PYMODTEST (import_rdb, "import_rdb.py")
 
-#if defined(HAVE_QTBINDINGS)
+#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 
 PYMODTEST (import_lay, "import_lay.py")
 

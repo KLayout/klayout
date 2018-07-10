@@ -37,6 +37,7 @@ RUBYVERSIONCODE=""
 
 PYTHONINCLUDE=""
 PYTHONLIBFILE=""
+PYTHONEXTSUFFIX=""
 
 QMAKE=""
 RUBY=""
@@ -109,6 +110,10 @@ while [ "$*" != "" ]; do
     ;;
   -pylib)
     PYTHONLIBFILE="$1"
+    shift
+    ;;
+  -pyextsuffix)
+    PYTHONEXTSUFFIX="$1"
     shift
     ;;
   -qmake)
@@ -414,6 +419,11 @@ if [ "$PYTHON" != "" ] && [ "$PYTHON" != "-" ]; then
     echo "    Python headers found: $PYTHONINCLUDE"
   fi
 
+  if [ "$PYTHONEXTSUFFIX" = "" ]; then
+    PYTHONEXTSUFFIX=`$PYTHON -c "import sysconfig; print(sysconfig.get_config_vars('EXT_SUFFIX')[0])" 2>/dev/null`
+    echo "    Python extension suffix: $PYTHONEXTSUFFIX"
+  fi
+
   echo "    Python installation is in:"
   echo "    - $PYTHONLIBFILE (lib)"
   echo "    - $PYTHONINCLUDE (includes)"
@@ -552,6 +562,7 @@ qmake_options=(
   PYTHON="$PYTHON"
   PYTHONLIBFILE="$PYTHONLIBFILE"
   PYTHONINCLUDE="$PYTHONINCLUDE"
+  PYTHONEXTSUFFIX="$PYTHONEXTSUFFIX"
   HAVE_PYTHON="$HAVE_PYTHON"
   HAVE_QTBINDINGS="$HAVE_QTBINDINGS"
   HAVE_64BIT_COORD="$HAVE_64BIT_COORD"

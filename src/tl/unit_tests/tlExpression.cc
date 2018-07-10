@@ -839,7 +839,11 @@ TEST(6)
   v = e.parse ("absolute_file_path('./x.gds')").execute ();
   // EXPECT_EQ (v.to_string (), std::string ()); // not universal
   v = e.parse ("path('../irgendwas/file.tar.gz')").execute ();
+#if defined(_WIN32)
+  EXPECT_EQ (v.to_string (), std::string ("..\\irgendwas"));
+#else
   EXPECT_EQ (v.to_string (), std::string ("../irgendwas"));
+#endif
   v = e.parse ("basename('../irgendwas/file.tar.gz')").execute ();
   EXPECT_EQ (v.to_string (), std::string ("file"));
   v = e.parse ("extension('../irgendwas/file.tar.gz')").execute ();

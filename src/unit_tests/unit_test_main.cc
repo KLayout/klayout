@@ -61,8 +61,10 @@
 #  include <Windows.h>
 #endif
 
-//  required to force linking of the "ext", "lib" and "drc" module
+//  required to force linking of the "rdb", "lib" and "drc" module 
+//  (some in non-Qt case)
 #include "libForceLink.h"
+#include "rdbForceLink.h"
 #if defined(HAVE_RUBY) && defined(HAVE_QT)
 #include "drcForceLink.h"
 #endif

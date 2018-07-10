@@ -20,6 +20,7 @@ SOURCES = \
   gsiObject.cc \
   gsiSerialisation.cc \
   gsiTypes.cc \
+  gsiSignals.cc \
   gsiObjectHolder.cc \
 
 HEADERS = \

@@ -86,6 +86,7 @@ std::string to_string (const std::wstring &ws)
       ++c;
       c32 = (c32 & 0x3ff) << 10;
       c32 |= uint32_t (*c) & 0x3ff;
+      c32 += 0x10000;
     }
 
     if (c32 >= 0x10000) {
@@ -497,7 +498,7 @@ to_quoted_string (const std::string &s)
       r += "\\r";
     } else if (*c == '\t') {
       r += "\\t";
-    } else if (! isprint (*c)) {
+    } else if (! isprint (*c) || (unsigned char) *c >= 0x80) {
       char b [20];
       ::sprintf (b, "\\%03o", int ((unsigned char) *c));
       r += b;

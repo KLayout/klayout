@@ -20,26 +20,22 @@ QMAKE_CXXFLAGS_WARN_ON += \
 # $(DESTDIR) and $(TARGET)
 win32 {
 
-  QMAKE_POST_LINK += $(MKDIR) $$DESTDIR_PYMOD && $(COPY) $(DESTDIR_TARGET) $$DESTDIR_PYMOD/$${TARGET}.dll
+  QMAKE_POST_LINK += $(MKDIR) $$DESTDIR_PYMOD && $(COPY) $(DESTDIR_TARGET) $$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX}
 
   # to avoid the major version being appended to the dll name - in this case -lxyz won't link it again
   # because the library is called xyx0.dll.
   CONFIG += skip_target_version_ext
 
-  lib_target.path = $$PREFIX/pymod/klayout
-  lib_target.files += $$DESTDIR_PYMOD/$${TARGET}.dll
-  INSTALLS = lib_target
-
 } else {
 
-  QMAKE_POST_LINK += $(MKDIR) $$DESTDIR_PYMOD && $(COPY) $(DESTDIR)$(TARGET) $$DESTDIR_PYMOD/$${TARGET}.so
-
-  lib_target.path = $$PREFIX/pymod/klayout
-  # This would be nice:
-  #   lib_target.files += $$DESTDIR_PYMOD/$${TARGET}.so
-  # but some Qt versions need this explicitly:
-  lib_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/$${TARGET}.so $(INSTALLROOT)$$PREFIX/pymod/klayout
-  INSTALLS = lib_target
+  QMAKE_POST_LINK += $(MKDIR) $$DESTDIR_PYMOD && $(COPY) $(DESTDIR)$(TARGET) $$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX}
 
 }
+
+lib_target.path = $$PREFIX/pymod/klayout
+# This would be nice:
+#   lib_target.files += $$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX}
+# but some Qt versions need this explicitly:
+lib_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX} $(INSTALLROOT)$$PREFIX/pymod/klayout
+INSTALLS = lib_target
 

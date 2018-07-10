@@ -59,7 +59,7 @@ static PluginDescriptor load_plugin (const std::string &pp)
 #if defined(_WIN32)
 
   //  there is no "dlopen" on mingw, so we need to emulate it.
-  HINSTANCE handle = LoadLibraryW ((const wchar_t *) tl::to_qstring (pp).constData ());
+  HINSTANCE handle = LoadLibraryW (tl::to_wstring (pp).c_str ());
   if (! handle) {
     throw tl::Exception (tl::to_string (tr ("Unable to load plugin: %s with error message: %s ")), pp, GetLastError ());
     return desc;

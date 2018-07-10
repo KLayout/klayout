@@ -89,17 +89,17 @@ END
     assert_equal(tech.default_base_path, "/default/path")
     assert_equal(tech.base_path, "/default/path")
     assert_equal(tech.correct_path("/default/path/myfile.xml"), "myfile.xml")
-    assert_equal(tech.eff_path("myfile.xml"), "/default/path/myfile.xml")
+    assert_equal(tech.eff_path("myfile.xml").gsub("\\", "/"), "/default/path/myfile.xml")
 
     tech.explicit_base_path = "/basic/path"
     assert_equal(tech.explicit_base_path, "/basic/path")
     assert_equal(tech.base_path, "/basic/path")
     assert_equal(tech.correct_path("/basic/path/myfile.xml"), "myfile.xml")
-    assert_equal(tech.eff_path("myfile.xml"), "/basic/path/myfile.xml")
+    assert_equal(tech.eff_path("myfile.xml").gsub("\\", "/"), "/basic/path/myfile.xml")
 
     tech.layer_properties_file = "x.lyp"
     assert_equal(tech.layer_properties_file, "x.lyp")
-    assert_equal(tech.eff_layer_properties_file, "/basic/path/x.lyp")
+    assert_equal(tech.eff_layer_properties_file.gsub("\\", "/"), "/basic/path/x.lyp")
 
     tech.add_other_layers = true
     assert_equal(tech.add_other_layers?, true)

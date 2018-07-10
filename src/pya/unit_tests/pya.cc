@@ -103,7 +103,7 @@ PYTHONTEST (dbPCellsTest, "dbPCells.py")
 PYTHONTEST (dbPolygonTest, "dbPolygonTest.py")
 PYTHONTEST (dbTransTest, "dbTransTest.py")
 PYTHONTEST (tlTest, "tlTest.py")
-#if defined(HAVE_QTBINDINGS)
+#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 PYTHONTEST (qtbinding, "qtbinding.py")
 #endif
 

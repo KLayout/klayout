@@ -34,6 +34,7 @@
 #include "tlTimer.h"
 #include "tlExpression.h"
 #include "tlFileUtils.h"
+#include "tlStream.h"
 
 #include "rba.h"
 #include "rbaInspector.h"
@@ -1812,21 +1813,21 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
 
         wchar_t buffer[MAX_PATH];
         int len;
-        if ((len = GetModuleFileName(NULL, buffer, MAX_PATH)) > 0) {
+        if ((len = GetModuleFileName (NULL, buffer, MAX_PATH)) > 0) {
 
-          QDir inst_dir (QString::fromUtf16 ((const ushort *) buffer, len));
-          QFileInfo fi (inst_dir.absoluteFilePath (tl::to_qstring(".ruby-paths.txt")));
-          if (fi.exists ()) {
+          std::string inst_dir = tl::absolute_path (tl::to_string (std::wstring (buffer, len)));
+          std::string path_file = tl::combine_path (inst_dir, ".ruby-paths.txt");
+          if (tl::file_exists (path_file)) {
 
-            tl::log << tl::to_string (tr ("Reading Ruby path from ")) << tl::to_string (fi.filePath ());
+            tl::log << tl::to_string (tr ("Reading Ruby path from ")) << path_file;
 
-            QFile paths_txt (fi.filePath ());
-            paths_txt.open (QIODevice::ReadOnly);
+            tl::InputStream path_file_stream (path_file);
+            std::string path_file_text = path_file_stream.read_all ();
 
             tl::Eval eval;
-            eval.set_global_var ("inst_path", tl::Variant (tl::to_string (inst_dir.absolutePath ())));
+            eval.set_global_var ("inst_path", tl::Variant (inst_dir));
             tl::Expression ex;
-            eval.parse (ex, paths_txt.readAll ().constData ());
+            eval.parse (ex, path_file_text.c_str ());
             tl::Variant v = ex.execute ();
 
             if (v.is_list ()) {

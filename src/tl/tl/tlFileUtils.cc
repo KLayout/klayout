@@ -31,6 +31,11 @@
 #include <unistd.h>
 #include <dirent.h>
 
+#if defined(_WIN32)
+#  include <dir.h>
+#  include <windows.h>
+#endif
+
 namespace tl
 {
 
@@ -306,7 +311,7 @@ std::vector<std::string> dir_entries (const std::string &s, bool with_files, boo
 
     do {
 
-      std::string e = tl::to_string fileinfo.name);
+      std::string e = tl::to_string (std::wstring (fileinfo.name));
       if (e.empty () || e == "." || e == "..") {
         continue;
       }
@@ -320,7 +325,7 @@ std::vector<std::string> dir_entries (const std::string &s, bool with_files, boo
 
   }
 
-  _wfindclose (h);
+  _findclose (h);
 
 #else
 
@@ -615,24 +620,35 @@ std::string absolute_file_path (const std::string &s)
   }
 }
 
-static int stat_func (const std::string &s, struct stat &st)
-{
 #if defined(_WIN32)
+
+typedef struct _stat stat_struct;
+
+static int stat_func (const std::string &s, stat_struct &st)
+{
   return _wstat (tl::to_wstring (s).c_str (), &st);
-#else
-  return stat (tl::to_local (s).c_str (), &st);
-#endif
 }
+
+#else
+
+typedef struct stat stat_struct;
+
+static int stat_func (const std::string &s, stat_struct &st)
+{
+  return stat (tl::to_local (s).c_str (), &st);
+}
+
+#endif
 
 bool file_exists (const std::string &p)
 {
-  struct stat st;
+  stat_struct st;
   return stat_func (p, st) == 0;
 }
 
 bool is_dir (const std::string &p)
 {
-  struct stat st;
+  stat_struct st;
   if (stat_func (p, st) != 0) {
     return false;
   } else {
@@ -700,7 +716,7 @@ bool is_same_file (const std::string &a, const std::string &b)
 
 #else
 
-  struct stat sta, stb;
+  stat_struct sta, stb;
   if (stat_func (a, sta) != 0 || stat_func (b, stb) != 0) {
     return false;
   }

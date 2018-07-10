@@ -34,7 +34,7 @@ TEST (1)
 {
   EXPECT_EQ (gsi::has_class ("Value"), true);
   EXPECT_EQ (gsi::has_class ("DoesNotExist"), false);
-#if defined(HAVE_QTBINDINGS)
+#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
   EXPECT_EQ (gsi::has_class ("QDialog"), true);
   EXPECT_EQ (gsi::has_class ("QApplication"), true);
 #endif
@@ -131,7 +131,7 @@ RUBYTEST (layMenuTest, "layMenuTest.rb")
 RUBYTEST (laySession, "laySession.rb")
 RUBYTEST (layTechnologies, "layTechnologies.rb")
 RUBYTEST (laySaveLayoutOptions, "laySaveLayoutOptions.rb")
-#if defined(HAVE_QTBINDINGS)
+#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 RUBYTEST (qtbinding, "qtbinding.rb")
 #endif
 RUBYTEST (rdbTest, "rdbTest.rb")

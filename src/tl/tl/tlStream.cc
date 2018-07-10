@@ -469,7 +469,7 @@ InputFile::InputFile (const std::string &path)
 {
   m_source = path;
 #if defined(_WIN32)
-  int fd = _wopen ((const wchar_t *) tl::to_qstring (path).constData (), _O_BINARY | _O_RDONLY | _O_SEQUENTIAL);
+  int fd = _wopen (tl::to_wstring (path).c_str (), _O_BINARY | _O_RDONLY | _O_SEQUENTIAL);
   if (fd < 0) {
     throw FileOpenErrorException (m_source, errno);
   }
@@ -550,7 +550,7 @@ InputZLibFile::InputZLibFile (const std::string &path)
 {
   m_source = path;
 #if defined(_WIN32)
-  int fd = _wopen ((const wchar_t *) tl::to_qstring (path).constData (), _O_BINARY | _O_RDONLY | _O_SEQUENTIAL);
+  int fd = _wopen (tl::to_wstring (path).c_str (), _O_BINARY | _O_RDONLY | _O_SEQUENTIAL);
   if (fd < 0) {
     throw FileOpenErrorException (m_source, errno);
   }
@@ -763,7 +763,7 @@ OutputFile::OutputFile (const std::string &path)
 {
   m_source = path;
 #if defined(_WIN32)
-  int fd = _wopen ((const wchar_t *) tl::to_qstring (path).constData (), _O_CREAT | _O_TRUNC | _O_BINARY | _O_WRONLY | _O_SEQUENTIAL, _S_IREAD | _S_IWRITE );
+  int fd = _wopen (tl::to_wstring (path).c_str (), _O_CREAT | _O_TRUNC | _O_BINARY | _O_WRONLY | _O_SEQUENTIAL, _S_IREAD | _S_IWRITE );
   if (fd < 0) {
     throw FileOpenErrorException (m_source, errno);
   }
@@ -824,7 +824,7 @@ OutputZLibFile::OutputZLibFile (const std::string &path)
 {
   m_source = path;
 #if defined(_WIN32)
-  FILE *file = _wfopen ((const wchar_t *) tl::to_qstring (path).constData (), L"wb");
+  FILE *file = _wfopen (tl::to_wstring (path).c_str (), L"wb");
   if (file == NULL) {
     throw FileOpenErrorException (m_source, errno);
   }
@@ -871,7 +871,7 @@ InputPipe::InputPipe (const std::string &path)
 {
   std::wstring wpath = tl::to_wstring (path);
   m_source = path;
-  m_file = _wpopen (wpath.c_str (), "r");
+  m_file = _wpopen (wpath.c_str (), L"r");
   if (m_file == NULL) {
     throw FilePOpenErrorException (m_source, errno);
   }
@@ -919,7 +919,7 @@ OutputPipe::OutputPipe (const std::string &path)
 {
   std::wstring wpath = tl::to_wstring (path);
   m_source = path;
-  m_file = _wpopen (wpath.c_str (), "w");
+  m_file = _wpopen (wpath.c_str (), L"w");
   if (m_file == NULL) {
     throw FilePOpenErrorException (m_source, errno);
   }

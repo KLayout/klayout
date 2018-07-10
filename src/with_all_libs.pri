@@ -16,10 +16,10 @@ LIBS += $$PYTHONLIBFILE $$RUBYLIBFILE -L$$DESTDIR -lklayout_tl -lklayout_gsi -lk
   INCLUDEPATH += $$DESTDIR/laybasic $$DESTDIR/lay $$DESTDIR/ext
   DEPENDPATH += $$DESTDIR/laybasic $$DESTDIR/lay $$DESTDIR/ext
 
-}
+  equals(HAVE_QTBINDINGS, "1") {
+    LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtCore
+  }
 
-equals(HAVE_QTBINDINGS, "1") {
-  LIBS += -lklayout_qtbasic -lklayout_QtGui -lklayout_QtCore
 }
 
 equals(HAVE_RUBY, "1") {

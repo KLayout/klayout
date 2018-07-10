@@ -138,6 +138,10 @@ TEST(1_timed_wait)
 }
 
 int s_mythread2_increment = 1;
+void inc (volatile int &value)
+{
+  value += s_mythread2_increment;
+}
 
 class MyThread2 : public tl::Thread
 {
@@ -155,11 +159,11 @@ public:
       for (int i = 0; i < 10000000; ++i) {
         tl::MutexLocker locker (&m_lock);
         //  Do it more elaborate than ++m_value to prevent compiler optimization
-        m_value += s_mythread2_increment;
+        inc (m_value);
       }
     } else {
       for (int i = 0; i < 10000000; ++i) {
-        m_value += s_mythread2_increment;
+        inc (m_value);
       }
     }
   }

@@ -1,0 +1,4 @@
+deploy:
+  dropbox_path: /Builds/klayout # The path to the folder on Dropbox where the files will go
+  artifacts_path: deploy # can be a single file, or a path
+  debug: true # if you want to see more logs

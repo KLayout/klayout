@@ -34,21 +34,27 @@ SOURCES = \
 equals(HAVE_QT, "0") {
   # nothing
 } else {
+
   SOURCES += \
     tlWebDAV.cc \
     tlDeferredExecution.cc \
     tlFileSystemWatcher.cc \
+
 }
 
 equals(HAVE_CURL, "1") {
+
   SOURCES += \
     tlHttpStream.cc \
+
 } else {
   equals(HAVE_QT, "0") {
     # no HTTP stream available
   } else {
+
     SOURCES += \
       tlHttpStream.cc \
+
   }
 }
 

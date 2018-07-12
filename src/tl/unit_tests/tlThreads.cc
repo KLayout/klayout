@@ -199,6 +199,9 @@ TEST(2_nonlocked)
   EXPECT_EQ (my_thread.value () < 20000000, true);
 }
 
+//  NOTE: ThreadStorage is broken on Qt 4.6.2 (invalid static_cast from type 'void*' to type 'int')
+#if !defined(HAVE_QT) || QT_VERSION >= 0x40700
+
 static tl::ThreadStorage<int> s_tls;
 
 class MyThread3 : public tl::Thread
@@ -241,6 +244,8 @@ TEST(3)
   my_thread.wait ();
   EXPECT_EQ (my_thread.value (), 10000000);
 }
+
+#endif
 
 static tl::WaitCondition s_condition;
 static tl::Mutex s_wait_mutex;

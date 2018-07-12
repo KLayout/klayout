@@ -83,6 +83,7 @@ mkdir -p makedeb-tmp/${sharedir}/doc/klayout
 mkdir -p makedeb-tmp/${sharedir}/applications
 mkdir -p makedeb-tmp/${sharedir}/pixmaps
 mkdir -p makedeb-tmp/${bindir}
+mkdir -p makedeb-tmp/${libdir}
 
 cp etc/klayout.desktop makedeb-tmp/${sharedir}/applications
 cp etc/logo.png makedeb-tmp/${sharedir}/pixmaps

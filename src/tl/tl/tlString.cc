@@ -41,6 +41,31 @@ namespace tl
 static std::locale c_locale ("C");
 
 // -------------------------------------------------------------------------
+//  lower and upper case for wchar_t
+
+#include "utf_casefolding.h"
+
+wchar_t wdowncase (wchar_t c)
+{
+  int ch = c >> 8;
+  if (ch >= 0 && ch < int (sizeof (uc_tab) / sizeof (uc_tab[0])) && uc_tab[ch]) {
+    return uc_tab[ch][c & 0xff];
+  } else {
+    return c;
+  }
+}
+
+wchar_t wupcase (wchar_t c)
+{
+  int ch = c >> 8;
+  if (ch >= 0 && ch < int (sizeof (lc_tab) / sizeof (lc_tab[0])) && lc_tab[ch]) {
+    return lc_tab[ch][c & 0xff];
+  } else {
+    return c;
+  }
+}
+
+// -------------------------------------------------------------------------
 //  Conversion of UTF8 to wchar_t
 
 std::wstring to_wstring (const std::string &s)
@@ -146,7 +171,7 @@ std::string to_upper_case (const std::string &s)
 {
   std::wstring ws = to_wstring (s);
   for (std::wstring::iterator c = ws.begin (); c != ws.end (); ++c) {
-    *c = towupper (*c);
+    *c = wupcase (*c);
   }
   return to_string (ws);
 }
@@ -155,7 +180,7 @@ std::string to_lower_case (const std::string &s)
 {
   std::wstring ws = to_wstring (s);
   for (std::wstring::iterator c = ws.begin (); c != ws.end (); ++c) {
-    *c = towlower (*c);
+    *c = wdowncase (*c);
   }
   return to_string (ws);
 }

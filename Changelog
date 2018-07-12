@@ -1,4 +1,4 @@
-0.25.3          (2018-07-11):
+0.25.4          (2018-07-11):
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/121
        Issue with multiple reads of GDS2 layouts including PCells
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/134

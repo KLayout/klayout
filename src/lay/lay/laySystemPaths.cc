@@ -22,7 +22,7 @@
 
 
 #include "laySystemPaths.h"
-#include "tlFileUtils.h"l"
+#include "tlFileUtils.h"
 #include "tlString.h"
 
 #include <QDir>

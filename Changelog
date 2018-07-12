@@ -12,6 +12,19 @@
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/142
        Issue with RBA::RecursiveShapeIterator#region=
 * Bugfix: 8 bit indexed GIF images can be used for package icons now
+* Enhancement: Provide a way to specify the type of a macro
+       This feature is mainly useful for command line arguments.
+       If you run KLayout with "klayout -b -r myscript"
+       it will not be able to determine the type of macro without
+       a suffix. 
+
+       You can now explicitly specify a certain type by
+       giving the suffix implicitly like: "klayout -b -r myscript[rb]"
+       This will read "myscript" but pretend it was "myscript.rb"
+       and execute it as Ruby script.
+    
+       This feature is handy if you need to run a file with a
+       specific interpreter but cannot modify the file name.
 * Enhancement: Selection now shows PCell display names
        Before, the internal name was shown for instances
 * Enhancement: There is an option in the View menu to show or hide markers

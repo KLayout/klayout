@@ -176,7 +176,7 @@ TEST (5)
 {
   tl::XMLStringSource s ("<?xml version=\"1.0\"?>\n"
                          "<root>"
-                         "  <member>1a</member>"
+                         "  <member>1</member>"
                          "</ruut>");
 
   Root root;
@@ -192,7 +192,11 @@ TEST (5)
     error = ex.msg ();
   }
 
+#if defined (HAVE_QT)
+  EXPECT_EQ (error, "XML parser error: tag mismatch in line 2, column 33");
+#else
   EXPECT_EQ (error, "XML parser error: mismatched tag in line 2, column 29");
+#endif
 }
 
 TEST (6)

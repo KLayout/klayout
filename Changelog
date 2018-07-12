@@ -7,6 +7,8 @@
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/139
        Libraries have not been reassigned when loading a GDS file
        from command line (does not happen on File/Open)
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/142
+       Issue with RBA::RecursiveShapeIterator#region=
 * Bugfix: 8 bit indexed GIF images can be used for package icons now
 * Enhancement: Selection now shows PCell display names
        Before, the internal name was shown for instances

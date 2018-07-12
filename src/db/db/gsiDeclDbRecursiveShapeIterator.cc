@@ -280,7 +280,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
   ) +
   gsi::method ("region=", (void (db::RecursiveShapeIterator::*)(const db::RecursiveShapeIterator::box_type &)) &db::RecursiveShapeIterator::set_region,
     "@brief Sets the rectangular region that is iterator is iterating over\n"
-    "@args region\n"
+    "@args box_region\n"
     "See \\region for a description of this attribute.\n"
     "Setting a simple region will reset the complex region to a rectangle and reset the iterator to "
     "the beginning of the sequence."
@@ -298,15 +298,19 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("RecursiveShapeIt
   ) +
   gsi::method ("confine_region", (void (db::RecursiveShapeIterator::*)(const db::RecursiveShapeIterator::box_type &)) &db::RecursiveShapeIterator::confine_region,
     "@brief Confines the region that is iterator is iterating over\n"
-    "@args region\n"
-    "This method is similar to setting the region (see \\region=), but will add to any (complex or simple) region already set. "
+    "@args box_region\n"
+    "This method is similar to setting the region (see \\region=), but will confine any region (complex or simple) already set. "
+    "Essentially it does a logical AND operation between the existing and given region. "
+    "Hence this method can only reduce a region, not extend it.\n"
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
-  gsi::method ("region=", (void (db::RecursiveShapeIterator::*)(const db::RecursiveShapeIterator::region_type &)) &db::RecursiveShapeIterator::confine_region,
+  gsi::method ("confine_region", (void (db::RecursiveShapeIterator::*)(const db::RecursiveShapeIterator::region_type &)) &db::RecursiveShapeIterator::confine_region,
     "@brief Confines the region that is iterator is iterating over\n"
-    "@args region\n"
-    "This method is similar to setting the complex region (see \\region=), but will add to any (complex or simple) region already set."
+    "@args complex_region\n"
+    "This method is similar to setting the region (see \\region=), but will confine any region (complex or simple) already set. "
+    "Essentially it does a logical AND operation between the existing and given region. "
+    "Hence this method can only reduce a region, not extend it.\n"
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +

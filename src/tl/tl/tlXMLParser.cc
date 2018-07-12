@@ -535,6 +535,20 @@ XMLStringSource::XMLStringSource (const std::string &string)
   set_source (source);
 }
 
+XMLStringSource::XMLStringSource (const char *cp)
+{
+  XMLSourcePrivateData *source = new XMLSourcePrivateData ();
+  source->setData (QByteArray (cp));
+  set_source (source);
+}
+
+XMLStringSource::XMLStringSource (const char *cp, size_t len)
+{
+  XMLSourcePrivateData *source = new XMLSourcePrivateData ();
+  source->setData (QByteArray (cp, int (len)));
+  set_source (source);
+}
+
 XMLStringSource::~XMLStringSource ()
 {
   //  .. nothing yet ..

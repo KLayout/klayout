@@ -242,7 +242,7 @@ private:
   bool m_can_destroy : 1;
   static QMutex m_lock;
 
-  void set_internal (void *obj, bool owned, bool const_ref, bool can_destroy);
+  void *set_internal (void *obj, bool owned, bool const_ref, bool can_destroy);
   void object_status_changed (gsi::ObjectBase::StatusEventType type);
   void detach_internal ();
 };

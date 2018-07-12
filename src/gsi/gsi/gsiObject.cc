@@ -47,18 +47,27 @@ Proxy::Proxy (const gsi::ClassBase *_cls_decl)
 
 Proxy::~Proxy ()
 {
-  QMutexLocker locker (&m_lock);
+  void *prev_obj = 0;
 
-  try {
-    set_internal (0, false, false, false);
-  } catch (std::exception &ex) {
-    tl::warn << "Caught exception in object destructor: " << ex.what ();
-  } catch (tl::Exception &ex) {
-    tl::warn << "Caught exception in object destructor: " << ex.msg ();
-  } catch (...) {
-    tl::warn << "Caught unspecified exception in object destructor";
+  {
+    QMutexLocker locker (&m_lock);
+    try {
+      prev_obj = set_internal (0, false, false, false);
+    } catch (std::exception &ex) {
+      tl::warn << "Caught exception in object destructor: " << ex.what ();
+    } catch (tl::Exception &ex) {
+      tl::warn << "Caught exception in object destructor: " << ex.msg ();
+    } catch (...) {
+      tl::warn << "Caught unspecified exception in object destructor";
+    }
+    m_destroyed = true;
   }
-  m_destroyed = true;
+
+  //  destroy outside the locker because the destructor may raise status
+  //  changed events
+  if (prev_obj) {
+    m_cls_decl->destroy (prev_obj);
+  }
 }
 
 void
@@ -145,8 +154,18 @@ Proxy::keep ()
 void
 Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy)
 {
-  QMutexLocker locker (&m_lock);
-  set_internal (obj, owned, const_ref, can_destroy);
+  void *prev_obj;
+
+  {
+    QMutexLocker locker (&m_lock);
+    prev_obj = set_internal (obj, owned, const_ref, can_destroy);
+  }
+
+  //  destroy outside the locker because the destructor may raise status
+  //  changed events
+  if (prev_obj) {
+    m_cls_decl->destroy (prev_obj);
+  }
 }
 
 void *
@@ -159,7 +178,7 @@ Proxy::obj ()
       throw tl::Exception (tl::to_string (QObject::tr ("Object has been destroyed already")));
     } else {
       //  delayed creation of a detached C++ object ..
-      set_internal (m_cls_decl->create (), true, false, true);
+      tl_assert (set_internal (m_cls_decl->create (), true, false, true) == 0);
     }
   }
 
@@ -181,7 +200,7 @@ Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
   }
 }
 
-void
+void *
 Proxy::set_internal (void *obj, bool owned, bool const_ref, bool can_destroy)
 {
   bool prev_owned = m_owned;
@@ -189,6 +208,7 @@ Proxy::set_internal (void *obj, bool owned, bool const_ref, bool can_destroy)
   m_owned = owned;
   m_can_destroy = can_destroy;
   m_const_ref = const_ref;
+  void *prev_object = 0;
 
   const gsi::ClassBase *cls = m_cls_decl;
   if (! cls) {
@@ -210,9 +230,8 @@ Proxy::set_internal (void *obj, bool owned, bool const_ref, bool can_destroy)
       //  Destroy the object if we are owner. We don't destroy the object if it was locked
       //  (either because we are not owner or from C++ side using keep())
       if (prev_owned) {
-        void *o = m_obj;
+        prev_object = m_obj;
         m_obj = 0;
-        cls->destroy (o);
       }
 
     }
@@ -237,6 +256,8 @@ Proxy::set_internal (void *obj, bool owned, bool const_ref, bool can_destroy)
   //  now we have a valid object (or nil) - we can reset "destroyed" state. Note: this has to be done
   //  here because before detach might be called on *this which resets m_destroyed.
   m_destroyed = false;
+
+  return prev_object;
 }
 
 void

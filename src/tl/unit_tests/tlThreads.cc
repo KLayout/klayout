@@ -115,13 +115,16 @@ TEST(1_basic)
   EXPECT_EQ (my_thread.value () >= 5 && my_thread.value () < 10, true);
 }
 
+#if !defined(HAVE_QT)
 //  basic: thread dtor while running
+//  NOTE: QThread can't handle this - the pthread-based implementation will terminate the thread in this case
 TEST(1_brute_shutdown)
 {
   MyThread my_thread;
   my_thread.start ();
   EXPECT_EQ (true, true); // makes the compiler happy
 }
+#endif
 
 //  basic: concurrency, ability to stop async, wait
 TEST(1_timed_wait)

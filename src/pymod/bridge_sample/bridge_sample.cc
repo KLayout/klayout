@@ -44,6 +44,7 @@
 #include "pyaRefs.h"
 #include "dbPolygon.h"
 
+
 static PyObject *BridgeError;
 
 static PyObject *

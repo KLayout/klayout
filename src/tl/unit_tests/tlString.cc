@@ -490,6 +490,6 @@ TEST(15)
   EXPECT_EQ (tl::to_wstring (std::string ("Ä")).size (), size_t (1));
   EXPECT_EQ (tl::to_string (tl::to_wstring ("Utf8 supports emoticons: \xF0\x9F\x98\x81\nand Umlauts: äüö")).c_str (), "Utf8 supports emoticons: \xF0\x9F\x98\x81\nand Umlauts: äüö");
 
-  EXPECT_EQ (tl::to_upper_case ("nOrMal(äÄüÜöÖß-42°+6€)"), "NORMAL(ÄÄÜÜÖÖß-42°+6€)");
-  EXPECT_EQ (tl::to_lower_case ("nOrMal(äÄüÜöÖß-42°+6€)"), "normal(ääüüööß-42°+6€)");
+  EXPECT_EQ (tl::to_upper_case ("nOrMaliI(äÄüÜöÖß-42°+6€)"), "NORMALII(ÄÄÜÜÖÖß-42°+6€)");
+  EXPECT_EQ (tl::to_lower_case ("nOrMaliI(äÄüÜöÖß-42°+6€)"), "normalii(ääüüööß-42°+6€)");
 }

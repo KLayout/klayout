@@ -41,8 +41,15 @@ TARGET = bridge_mod
 SOURCES = \
     bridge_sample.cc
 
-# Include QtCore required for some includes
-QT = core
+# Depending on whether we have a Qt-less build or not we
+# need to include QtCore. Also set -DHAVE_QT
+equals(HAVE_QT, "0") {
+  QT =
+} else {
+  # Include QtCore required for some includes
+  QT = core
+  DEFINES += HAVE_QT
+}
 
 # Further dependencies include:
 # - Python (of course)

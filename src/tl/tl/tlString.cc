@@ -1763,4 +1763,3 @@ sprintf (const std::string &f, const std::vector <tl::Variant> &vv, unsigned int
 }
 
 }
-

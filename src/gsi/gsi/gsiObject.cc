@@ -193,14 +193,15 @@ Proxy::obj_internal ()
 void
 Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
 {
-  QMutexLocker locker (&m_lock);
-
   if (type == gsi::ObjectBase::ObjectDestroyed) {
+    QMutexLocker locker (&m_lock);
     m_destroyed = true;  //  NOTE: must be set before detach and indicates that the object was destroyed externally.
     detach_internal ();
   } else if (type == gsi::ObjectBase::ObjectKeep) {
+    //  NOTE: don't lock this as this will cause a deadlock from keep()
     m_owned = false;
   } else if (type == gsi::ObjectBase::ObjectRelease) {
+    //  NOTE: don't lock this as this will cause a deadlock from release()
     m_owned = true;
   }
 }

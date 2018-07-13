@@ -26,6 +26,7 @@
 #include "tlUnitTest.h"
 
 #include <cmath>
+#include <clocale>
 
 using namespace tl;
 
@@ -484,7 +485,16 @@ TEST(14)
 TEST(15)
 {
   //  NOTE: we don't know the local setting, but translation back and forth should work.
-  EXPECT_EQ (tl::to_string_from_local (tl::to_local ("Hällo\tWörld!").c_str ()), "Hällo\tWörld!");
+  std::string locale = setlocale (LC_ALL, NULL);
+  setlocale (LC_ALL, "en_US.UTF-8");
+  try {
+    EXPECT_EQ (tl::to_string_from_local (tl::to_local ("Hällo\tWörld!").c_str ()), "Hällo\tWörld!");
+    setlocale (LC_ALL, locale.c_str ());
+  } catch (...) {
+    setlocale (LC_ALL, locale.c_str ());
+    throw;
+  }
+
   EXPECT_EQ (std::string ("Ä").size (), size_t (2));
   EXPECT_EQ (tl::to_string (std::wstring (L"Ä")), "Ä");
   EXPECT_EQ (tl::to_wstring (std::string ("Ä")).size (), size_t (1));

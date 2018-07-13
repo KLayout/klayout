@@ -245,6 +245,7 @@ private:
   void *set_internal (void *obj, bool owned, bool const_ref, bool can_destroy);
   void object_status_changed (gsi::ObjectBase::StatusEventType type);
   void detach_internal ();
+  void *obj_internal ();
 };
 
 }

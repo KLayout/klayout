@@ -121,7 +121,7 @@ Proxy::release ()
   //  and then make us the owner
   const gsi::ClassBase *cls = m_cls_decl;
   if (cls && cls->is_managed ()) {
-    void *o = obj ();
+    void *o = obj_internal ();
     if (o) {
       cls->gsi_object (o)->keep ();
     }
@@ -138,7 +138,7 @@ Proxy::keep ()
 
   const gsi::ClassBase *cls = m_cls_decl;
   if (cls) {
-    void *o = obj ();
+    void *o = obj_internal ();
     if (o) {
       if (cls->is_managed ()) {
         cls->gsi_object (o)->keep ();
@@ -172,7 +172,12 @@ void *
 Proxy::obj ()
 {
   QMutexLocker locker (&m_lock);
+  return obj_internal ();
+}
 
+void *
+Proxy::obj_internal ()
+{
   if (! m_obj) {
     if (m_destroyed) {
       throw tl::Exception (tl::to_string (QObject::tr ("Object has been destroyed already")));

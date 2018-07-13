@@ -375,7 +375,7 @@ TEST(14)
   s_sum[3].reset ();
 
   for (int i = 0; i < 10000; ++i) {
-    job.schedule (new MyTask (1000));
+    job.schedule (new MyTask (100000));
   }
 
   job.start ();
@@ -385,7 +385,7 @@ TEST(14)
   EXPECT_EQ (job.is_running (), false);
 
   //  at least one must be stopped in the perform task ...
-  EXPECT_EQ (s_sum[0].sum () + s_sum[1].sum() + s_sum[2].sum() + s_sum[3].sum() < 10000000, true);
+  EXPECT_EQ (s_sum[0].sum () + s_sum[1].sum() + s_sum[2].sum() + s_sum[3].sum() < 1000000000, true);
   EXPECT_EQ ((s_sum[0].sum () % 1000) + (s_sum[1].sum () % 1000) + (s_sum[2].sum () % 1000) + (s_sum[3].sum () % 1000) > 0, true);
 }
 

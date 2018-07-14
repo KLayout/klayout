@@ -144,7 +144,7 @@ get_klayout_path ()
       split_path (tl::to_string (QString ((const QChar *) env)), klayout_path);
     } else {
       get_other_system_paths (klayout_path);
-      klayout_path.push_back (get_inst_path ());
+      klayout_path.push_back (tl::get_inst_path ());
     }
 #else
     char *env = getenv ("KLAYOUT_PATH");

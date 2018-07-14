@@ -8,27 +8,34 @@ class Config(object):
 
   def __init__(self):
 
+    # TODO: is this really how we get the build paths?
+
     build_cmd = Distribution().get_command_obj('build')
     build_cmd.finalize_options()
     self.build_platlib = build_cmd.build_platlib
+
+    install_cmd = Distribution().get_command_obj('install')
+    install_cmd.finalize_options()
+    self.install_platlib = install_cmd.install_platlib
 
     self.ext_suffix = sysconfig.get_config_var("EXT_SUFFIX")
 
   def libname_of(self, mod):
     return mod + self.ext_suffix
 
-  # TODO: is this really the portable way to find the path of a 
-  # library's build directory?
   def path_of(self, mod):
     return os.path.join(self.build_platlib, "klayout", self.libname_of(mod))
 
-  # TODO: what is the portable way of getting the RPATH
   def rpath(self):
-    return ['/usr/local/lib/python3.5/dist-packages/klayout']
+    return [ os.path.join(self.install_platlib, "klayout") ]
 
-  # TODO: should be platform specific
   def link_args(self, mod):
-    return ['-Wl,-soname,' + self.libname_of(mod)]
+    if os.name == "nt":
+      return [ ]
+    else:
+      # this makes the libraries suitable for linking with a path -
+      # i.e. from path_of('_tl')
+      return ['-Wl,-soname,' + self.libname_of(mod)]
 
 config = Config()
 
@@ -81,7 +88,7 @@ tl = Extension('klayout.tl',
                 runtime_library_dirs = config.rpath(),
                 sources = tl_sources)
 
-setup (name = 'KLayout',
+setup (name = 'klayout',
        version = '0.26',
        description = 'KLayout standalone Python package',
        author = 'Matthias Koefferlein',

@@ -283,7 +283,7 @@ WebDAVObject::download (const std::string &url, const std::string &target)
 
     for (std::list<DownloadItem>::const_iterator i = items.begin (); i != items.end (); ++i) {
 
-      tl::info << tl::sprintf (tr ("Downloading '%s' to '%s' .."), i->url, i->path);
+      tl::info << tl::sprintf (tl::to_string (tr ("Downloading '%s' to '%s' ..")), i->url, i->path);
 
       try {
 

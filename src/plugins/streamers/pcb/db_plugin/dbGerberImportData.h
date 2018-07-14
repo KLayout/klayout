@@ -24,6 +24,7 @@
 #ifndef HDR_dbGerberImportData
 #define HDR_dbGerberImportData
 
+#include "dbPluginCommon.h"
 #include "dbTrans.h"
 #include "dbLayerProperties.h"
 

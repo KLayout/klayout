@@ -58,7 +58,7 @@ struct GerberFreeFileDescriptor
   std::vector<int> layout_layers;
 };
 
-struct GerberImportData
+struct DB_PLUGIN_PUBLIC GerberImportData
 {
 public:
   GerberImportData ();

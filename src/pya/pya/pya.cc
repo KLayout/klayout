@@ -250,13 +250,8 @@ PythonInterpreter::PythonInterpreter ()
   const char *python_path = getenv ("KLAYOUT_PYTHONPATH");
   if (python_path) {
 
-    QString path = QString::fromLocal8Bit (python_path);
-
-    if (sizeof (wchar_t) == 4) {
-      Py_SetPath ((const wchar_t *) path.toUcs4 ().constData ());
-    } else if (sizeof (wchar_t) == 2) {
-      Py_SetPath ((const wchar_t *) path.utf16 ());
-    }
+    std::wstring path = tl::to_wstring (tl::to_string_from_local (python_path));
+    Py_SetPath (path.c_str ());
 
   }
 

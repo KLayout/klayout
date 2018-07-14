@@ -1,26 +1,36 @@
 
 from distutils.core import setup, Extension, Distribution
-from distutils.command.build import build
 import glob
+import os
+import sysconfig
 
-# TODO: what is the portable way of finding the path of a 
-def libname_of(mod):
-  return mod + ".cpython-35m-x86_64-linux-gnu.so"
+class Config(object):
 
-# TODO: what is the portable way of finding the path of a 
-# library
-# ....
-def path_of(mod):
-  return "build/lib.linux-x86_64-3.5/klayout/" + libname_of(mod)
-# ....
+  def __init__(self):
 
-# TODO: what is the portable way of getting the RPATH
-def rpath():
-  return ['/usr/local/lib/python3.5/dist-packages/klayout']
+    build_cmd = Distribution().get_command_obj('build')
+    build_cmd.finalize_options()
+    self.build_platlib = build_cmd.build_platlib
 
-# TODO: should be platform specific
-def link_args(mod):
-  return ['-Wl,-soname,' + libname_of(mod)]
+    self.ext_suffix = sysconfig.get_config_var("EXT_SUFFIX")
+
+  def libname_of(self, mod):
+    return mod + self.ext_suffix
+
+  # TODO: is this really the portable way to find the path of a 
+  # library's build directory?
+  def path_of(self, mod):
+    return os.path.join(self.build_platlib, "klayout", self.libname_of(mod))
+
+  # TODO: what is the portable way of getting the RPATH
+  def rpath(self):
+    return ['/usr/local/lib/python3.5/dist-packages/klayout']
+
+  # TODO: should be platform specific
+  def link_args(self, mod):
+    return ['-Wl,-soname,' + self.libname_of(mod)]
+
+config = Config()
 
 # ------------------------------------------------------------------
 
@@ -37,7 +47,7 @@ _tl = Extension('klayout._tl',
                 define_macros = macros + [ ('MAKE_TL_LIBRARY', 1) ],
                 language = 'c++',
 		libraries = [ 'curl', 'expat' ],
-                extra_link_args = link_args('_tl'),
+                extra_link_args = config.link_args('_tl'),
                 sources = _tl_sources)
 
 _gsi_sources = glob.glob("src/gsi/gsi/*.cc")
@@ -45,10 +55,10 @@ _gsi_sources = glob.glob("src/gsi/gsi/*.cc")
 _gsi = Extension('klayout._gsi', 
                 define_macros = macros + [ ('MAKE_GSI_LIBRARY', 1) ],
                 include_dirs = [ 'src/tl/tl' ],
-                extra_objects = [ path_of('_tl') ],
-                runtime_library_dirs = rpath(),
+                extra_objects = [ config.path_of('_tl') ],
+                runtime_library_dirs = config.rpath(),
                 language = 'c++',
-                extra_link_args = link_args('_gsi'),
+                extra_link_args = config.link_args('_gsi'),
                 sources = _gsi_sources)
 
 _pya_sources = glob.glob("src/pya/pya/*.cc")
@@ -56,10 +66,10 @@ _pya_sources = glob.glob("src/pya/pya/*.cc")
 _pya = Extension('klayout._pya', 
                 define_macros = macros + [ ('MAKE_PYA_LIBRARY', 1) ],
                 include_dirs = [ 'src/tl/tl', 'src/gsi/gsi' ],
-                extra_objects = [ path_of('_tl'), path_of('_gsi') ],
-                runtime_library_dirs = rpath(),
+                extra_objects = [ config.path_of('_tl'), config.path_of('_gsi') ],
+                runtime_library_dirs = config.rpath(),
                 language = 'c++',
-                extra_link_args = link_args('_pya'),
+                extra_link_args = config.link_args('_pya'),
                 sources = _pya_sources)
 
 tl_sources = glob.glob("src/pymod/tl/*.cc")
@@ -67,8 +77,8 @@ tl_sources = glob.glob("src/pymod/tl/*.cc")
 tl = Extension('klayout.tl', 
                 define_macros = macros,
                 include_dirs = [ 'src/tl/tl', 'src/gsi/gsi', 'src/pya/pya' ],
-                extra_objects = [ path_of('_tl'), path_of('_gsi'), path_of('_pya') ],
-                runtime_library_dirs = rpath(),
+                extra_objects = [ config.path_of('_tl'), config.path_of('_gsi'), config.path_of('_pya') ],
+                runtime_library_dirs = config.rpath(),
                 sources = tl_sources)
 
 setup (name = 'KLayout',

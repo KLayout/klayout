@@ -139,6 +139,15 @@ std::vector<std::string> split_path (const std::string &p, bool keep_last)
       }
       parts.push_back (tl::normalized_part (std::string (cp0, 0, cp - cp0)));
 
+    } else if ((*cp == '\\' || *cp == '/') && cp[1] && isalpha (cp[1]) && cp[2] == ':') {
+
+      //  drive name in the form "/c:" or "\c:"
+      parts.push_back (std::string ());
+      parts.back () += toupper (cp[1]);
+      parts.back () += ":";
+
+      cp += 3;
+
     }
 
     while (*cp) {
@@ -644,6 +653,18 @@ bool file_exists (const std::string &p)
 {
   stat_struct st;
   return stat_func (p, st) == 0;
+}
+
+bool is_writable (const std::string &p)
+{
+  stat_struct st;
+  return stat_func (p, st) == 0 && (st.st_mode & S_IWUSR) != 0;
+}
+
+bool is_readable (const std::string &p)
+{
+  stat_struct st;
+  return stat_func (p, st) == 0 && (st.st_mode & S_IRUSR) != 0;
 }
 
 bool is_dir (const std::string &p)

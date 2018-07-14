@@ -22,31 +22,21 @@
 
 #include "tlDeferredExecution.h"
 #include "tlAssert.h"
-#include "tlLog.h"
 
 #include <stdio.h>
 
-#include <QApplication>
+#if defined(HAVE_QT)
+#  include "tlDeferredExecutionQt.h"
+#endif
 
 namespace tl
 {
 
 static DeferredMethodScheduler *s_inst = 0;
 
-DeferredMethodScheduler::DeferredMethodScheduler (QObject *parent)
-  : QObject (parent),
-    m_disabled (0), m_scheduled (false)
+DeferredMethodScheduler::DeferredMethodScheduler ()
+  : m_disabled (0), m_scheduled (false)
 {
-  connect (&m_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
-
-  m_timer.setInterval (0); // immediately
-  m_timer.setSingleShot (true); //  just once
-
-  //  set up a fallback timer that cleans up pending execute jobs if something goes wrong
-  connect (&m_fallback_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
-  m_fallback_timer.setInterval (500);
-  m_fallback_timer.setSingleShot (false);
-
   tl_assert (! s_inst);
   s_inst = this;
 }
@@ -59,31 +49,33 @@ DeferredMethodScheduler::~DeferredMethodScheduler ()
 DeferredMethodScheduler *
 DeferredMethodScheduler::instance ()
 {
-  if (! s_inst && qApp) {
-    new DeferredMethodScheduler (qApp);
+//  TODO: provide a way to register non-Qt schedulers
+#if defined(HAVE_QT)
+  if (! s_inst) {
+    new DeferredMethodSchedulerQt ();
   }
+#endif
   return s_inst;
 }
 
 void 
 DeferredMethodScheduler::schedule (DeferredMethodBase *method)
 {
-  m_lock.lock ();
+  tl::MutexLocker locker (&m_lock);
   if (! method->m_scheduled || ! method->m_compressed) {
     m_methods.push_back (method);
     if (! m_scheduled) {
-      qApp->postEvent (this, new QEvent (QEvent::User));
+      queue_event ();
       m_scheduled = true;
     }
     method->m_scheduled = true;
   }
-  m_lock.unlock ();
 }
 
 void 
 DeferredMethodScheduler::unqueue (DeferredMethodBase *method)
 {
-  m_lock.lock ();
+  tl::MutexLocker locker (&m_lock);
   for (std::list<DeferredMethodBase *>::iterator m = m_methods.begin (); m != m_methods.end (); ) {
     std::list<DeferredMethodBase *>::iterator mm = m;
     ++mm;
@@ -93,49 +85,17 @@ DeferredMethodScheduler::unqueue (DeferredMethodBase *method)
     }
     m = mm;
   }
-  m_lock.unlock ();
 }
 
 void 
 DeferredMethodScheduler::do_enable (bool en)
 {
-  m_lock.lock ();
+  tl::MutexLocker locker (&m_lock);
   if (en) {
     tl_assert (m_disabled > 0);
     --m_disabled;
   } else {
     ++m_disabled;
-  }
-  m_lock.unlock ();
-}
-
-bool
-DeferredMethodScheduler::event (QEvent *event)
-{
-  if (event->type () == QEvent::User) {
-    timer ();
-    return true;
-  } else {
-    return QObject::event (event);
-  }
-}
-
-void 
-DeferredMethodScheduler::timer ()
-{
-  if (m_disabled) {
-    //  start again if disabled
-    m_timer.start ();
-  } else {
-    try {
-      do_execute ();
-    } catch (tl::Exception &ex) {
-      tl::error << tl::to_string (QObject::tr ("Exception caught: ")) << ex.msg ();
-    } catch (std::exception &ex) {
-      tl::error << tl::to_string (QObject::tr ("Exception caught: ")) << ex.what ();
-    } catch (...) {
-      tl::error << tl::to_string (QObject::tr ("Unspecific exception caught"));
-    }
   }
 }
 

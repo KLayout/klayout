@@ -37,6 +37,7 @@
 #include "edtConfig.h"
 
 #include <QObject>
+#include <QTimer>
 
 namespace db {
   class Manager;

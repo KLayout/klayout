@@ -55,7 +55,9 @@ SOURCES = \
     tlXMLParser.cc \
     tlXMLWriter.cc \
     tlThreadedWorkers.cc \
-    tlThreads.cc
+    tlThreads.cc \
+    tlDeferredExecution.cc \
+    tlUri.cc
 
 HEADERS = \
     tlAlgorithm.h \
@@ -104,7 +106,9 @@ HEADERS = \
     tlXMLParser.h \
     tlXMLWriter.h \
     tlThreadedWorkers.h \
-    tlThreads.h
+    tlThreads.h \
+    tlDeferredExecution.h \
+    tlUri.h
 
 equals(HAVE_CURL, "1") {
 
@@ -134,11 +138,11 @@ equals(HAVE_CURL, "1") {
 !equals(HAVE_QT, "0") {
 
   HEADERS += \
-    tlDeferredExecution.h \
+    tlDeferredExecutionQt.h \
     tlFileSystemWatcher.h \
 
   SOURCES += \
-    tlDeferredExecution.cc \
+    tlDeferredExecutionQt.cc \
     tlFileSystemWatcher.cc \
 
 }

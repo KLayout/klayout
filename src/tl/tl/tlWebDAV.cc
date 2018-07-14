@@ -28,10 +28,10 @@
 #include "tlInternational.h"
 #include "tlProgress.h"
 #include "tlLog.h"
+#include "tlUri.h"
+#include "tlFileUtils.h"
 
 #include <memory>
-#include <QUrl>
-#include <QDir>
 
 namespace tl
 {
@@ -125,15 +125,15 @@ tl::XMLStruct<MultiStatus> xml_struct ("multistatus",
   )
 );
 
-static std::string item_name (const QString &path1, const QString &path2)
+static std::string item_name (const std::string &path1, const std::string &path2)
 {
-  QStringList sl1 = path1.split (QChar ('/'));
-  if (! sl1.empty () && sl1.back ().isEmpty ()) {
+  std::vector <std::string> sl1 = tl::split (path1, "/");
+  if (! sl1.empty () && sl1.back ().empty ()) {
     sl1.pop_back ();
   }
 
-  QStringList sl2 = path2.split (QChar ('/'));
-  if (! sl2.empty () && sl2.back ().isEmpty ()) {
+  std::vector <std::string> sl2 = tl::split (path2, "/");
+  if (! sl2.empty () && sl2.back ().empty ()) {
     sl2.pop_back ();
   }
 
@@ -141,16 +141,16 @@ static std::string item_name (const QString &path1, const QString &path2)
     //  This is the top-level item (echoed in the PROPFIND response)
     return std::string ();
   } else if (! sl2.empty ()) {
-    return tl::to_string (sl2.back ());
+    return sl2.back ();
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Invalid WebDAV response: %1 is not a collection sub-item of %2").arg (path2).arg (path1)));
+    throw tl::Exception (tl::to_string (tr ("Invalid WebDAV response: %s is not a collection sub-item of %s")), path2, path1);
   }
 }
 
 void
 WebDAVObject::read (const std::string &url, int depth)
 {
-  QUrl base_url = QUrl (tl::to_qstring (url));
+  tl::URI base_uri (url);
 
   tl::InputHttpStream http (url);
   http.add_header ("User-Agent", "SVN");
@@ -169,10 +169,10 @@ WebDAVObject::read (const std::string &url, int depth)
   for (MultiStatus::iterator r = multistatus.begin (); r != multistatus.end (); ++r) {
 
     bool is_collection = r->propstat.prop.resourcetype.is_collection;
-    QUrl item_url = base_url.resolved (QUrl (tl::to_qstring (r->href)));
+    tl::URI item_url = base_uri.resolved (tl::URI (r->href));
 
-    std::string n = item_name (base_url.path (), item_url.path ());
-    std::string item_url_string = tl::to_string (item_url.toString ());
+    std::string n = item_name (base_uri.path (), item_url.path ());
+    std::string item_url_string = item_url.to_string ();
 
     if (! n.empty ()) {
       m_items.push_back (WebDAVItem (is_collection, item_url_string, n));
@@ -211,36 +211,35 @@ void fetch_download_items (const std::string &url, const std::string &target, st
 
   if (object.is_collection ()) {
 
-    QDir dir (tl::to_qstring (target));
-    if (! dir.exists ()) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Download failed: target directory '%1' does not exists").arg (dir.path ())));
+    if (! tl::file_exists (target)) {
+      throw tl::Exception (tl::to_string (tr ("Download failed: target directory '%s' does not exists")), target);
     }
 
     for (WebDAVObject::iterator i = object.begin (); i != object.end (); ++i) {
 
-      QFileInfo new_item (dir.absoluteFilePath (tl::to_qstring (i->name ())));
+      std::string item_path = tl::absolute_file_path (tl::combine_path (target, i->name ()));
 
       if (i->is_collection ()) {
 
-        if (! new_item.exists ()) {
-          if (! dir.mkdir (tl::to_qstring (i->name ()))) {
-            throw tl::Exception (tl::to_string (QObject::tr ("Download failed: unable to create subdirectory '%2' in '%1'").arg (dir.path ()).arg (tl::to_qstring (i->name ()))));
+        if (! tl::file_exists (item_path)) {
+          if (! tl::mkpath (item_path)) {
+            throw tl::Exception (tl::to_string (tr ("Download failed: unable to create subdirectory '%s' in '%s'")), i->name (), target);
           }
-        } else if (! new_item.isDir ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Download failed: unable to create subdirectory '%2' in '%1' - is already a file").arg (dir.path ()).arg (tl::to_qstring (i->name ()))));
-        } else if (! new_item.isWritable ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Download failed: unable to create subdirectory '%2' in '%1' - no write permissions").arg (dir.path ()).arg (tl::to_qstring (i->name ()))));
+        } else if (! tl::is_dir (item_path)) {
+          throw tl::Exception (tl::to_string (tr ("Download failed: unable to create subdirectory '%s' in '%s' - is already a file")), i->name (), target);
+        } else if (! tl::is_writable (item_path)) {
+          throw tl::Exception (tl::to_string (tr ("Download failed: unable to create subdirectory '%s' in '%s' - no write permissions")), i->name (), target);
         }
 
-        fetch_download_items (i->url (), tl::to_string (new_item.filePath ()), items, progress);
+        fetch_download_items (i->url (), item_path, items, progress);
 
       } else {
 
-        if (new_item.exists () && ! new_item.isWritable ()) {
-          throw tl::Exception (tl::to_string (QObject::tr ("Download failed: file is '%2' in '%1' - already exists, but no write permissions").arg (dir.path ()).arg (tl::to_qstring (i->name ()))));
+        if (tl::file_exists (item_path) && ! tl::is_writable (item_path)) {
+          throw tl::Exception (tl::to_string (tr ("Download failed: file is '%s' in '%s' - already exists, but no write permissions")), i->name (), target);
         }
 
-        items.push_back (DownloadItem (i->url (), tl::to_string (dir.absoluteFilePath (tl::to_qstring (i->name ())))));
+        items.push_back (DownloadItem (i->url (), item_path));
 
       }
     }
@@ -266,25 +265,25 @@ WebDAVObject::download (const std::string &url, const std::string &target)
 
   try {
 
-    tl::info << QObject::tr ("Fetching file structure from ") << url;
-    tl::AbsoluteProgress progress (tl::to_string (QObject::tr ("Fetching directory structure from %1").arg (tl::to_qstring (url))));
+    tl::info << tr ("Fetching file structure from ") << url;
+    tl::AbsoluteProgress progress (tl::sprintf (tl::to_string (tr ("Fetching directory structure from %s")), url));
     fetch_download_items (url, target, items, progress);
 
   } catch (tl::Exception &ex) {
-    tl::error << QObject::tr ("Error downloading file structure from '") << url << "':" << tl::endl << ex.msg ();
+    tl::error << tr ("Error downloading file structure from '") << url << "':" << tl::endl << ex.msg ();
     return false;
   }
 
   bool has_errors = false;
 
   {
-    tl::info << tl::to_string (QObject::tr ("Downloading %1 file(s) now ..").arg (items.size ()));
+    tl::info << tl::sprintf (tl::to_string (tr ("Downloading %d file(s) now ..")), items.size ());
 
-    tl::RelativeProgress progress (tl::to_string (QObject::tr ("Downloading file(s) from %1").arg (tl::to_qstring (url))), items.size (), 1);
+    tl::RelativeProgress progress (tl::sprintf (tl::to_string (tr ("Downloading file(s) from %s")), url), items.size (), 1);
 
     for (std::list<DownloadItem>::const_iterator i = items.begin (); i != items.end (); ++i) {
 
-      tl::info << QObject::tr ("Downloading '%1' to '%2' ..").arg (tl::to_qstring  (i->url)).arg (tl::to_qstring (i->path));
+      tl::info << tl::sprintf (tr ("Downloading '%s' to '%s' .."), i->url, i->path);
 
       try {
 
@@ -293,7 +292,7 @@ WebDAVObject::download (const std::string &url, const std::string &target)
         is->copy_to (os);
 
       } catch (tl::Exception &ex) {
-        tl::error << QObject::tr ("Error downloading file from '") << i->url << "':" << tl::endl << ex.msg ();
+        tl::error << tr ("Error downloading file from '") << i->url << "':" << tl::endl << ex.msg ();
         has_errors = true;
       }
 

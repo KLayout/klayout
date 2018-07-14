@@ -23,16 +23,9 @@
 #ifndef HDR_tlDeferredExecution
 #define HDR_tlDeferredExecution
 
-#if !defined(HAVE_QT)
-#  error tl::DeferredExecution not available without Qt
-#endif
-
 #include "tlCommon.h"
 #include "tlObject.h"
-
-#include <QObject>
-#include <QTimer>
-#include <QMutex>
+#include "tlThreads.h"
 
 #include <list>
 
@@ -69,9 +62,7 @@ template <class T> class DeferredMethod;
  *  @brief The deferred method scheduler
  */
 class TL_PUBLIC DeferredMethodScheduler
-  : public QObject
 {
-Q_OBJECT
 public:
   /**
    *  @brief The singleton instance of the scheduler
@@ -117,29 +108,43 @@ public:
     }
   }
 
-private slots:
-  void timer ();
+  /**
+   *  @brief Gets a value indicating whether the scheduler is disabled
+   */
+  bool is_disabled () const
+  {
+    return m_disabled;
+  }
 
-private:
+protected:
+  /**
+   *  @brief Reimplementation of the interface: queue an event
+   *  In effect, the event should later trigger a call to do_execute ().
+   */
+  virtual void queue_event () = 0;
+
+  /**
+   *  @brief Executes the pending methods
+   */
+  void do_execute ();
+
   /**
    *  @brief Constructor
    */
-  DeferredMethodScheduler (QObject *parent);
+  DeferredMethodScheduler ();
 
   /**
    *  @brief Destructor
    */
-  ~DeferredMethodScheduler ();
+  virtual ~DeferredMethodScheduler ();
 
+private:
   int m_disabled;
   bool m_scheduled;
   std::list<DeferredMethodBase *> m_methods;
-  QTimer m_timer, m_fallback_timer;
-  QMutex m_lock;
+  tl::Mutex m_lock;
 
-  virtual bool event (QEvent *event);
   void do_enable (bool en);
-  void do_execute ();
 };
 
 /**

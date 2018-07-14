@@ -215,6 +215,16 @@ void XMLCALL start_element_handler (void *user_data, const XML_Char *name, const
 void XMLCALL end_element_handler (void *user_data, const XML_Char *name);
 void XMLCALL cdata_handler (void *user_data, const XML_Char *s, int len);
 
+static std::string get_lname (const std::string &name)
+{
+  size_t colon = name.find (':');
+  if (colon != std::string::npos) {
+    return std::string (name, colon + 1, name.size () - colon - 1);
+  } else {
+    return name;
+  }
+}
+
 class XMLParserPrivateData
 {
 public:
@@ -235,8 +245,8 @@ public:
   void start_element (const std::string &name)
   {
     try {
-      //  TODO: separate qname and lname?
-      mp_struct_handler->start_element (std::string (), name, name);
+      //  TODO: Provide namespace URI?
+      mp_struct_handler->start_element (std::string (), get_lname (name), name);
     } catch (tl::Exception &ex) {
       error (ex);
     }
@@ -245,8 +255,8 @@ public:
   void end_element (const std::string &name)
   {
     try {
-      //  TODO: separate qname and lname?
-      mp_struct_handler->end_element (std::string (), name, name);
+      //  TODO: Provide namespace URI?
+      mp_struct_handler->end_element (std::string (), get_lname (name), name);
     } catch (tl::Exception &ex) {
       error (ex);
     }
@@ -861,6 +871,10 @@ XMLStructureHandler::start_element (const std::string &uri, const std::string &l
 void
 XMLStructureHandler::end_element (const std::string &uri, const std::string &lname, const std::string &qname)
 {
+  if (m_stack.empty ()) {
+    return;
+  }
+
   const XMLElementBase *element = m_stack.back ();
   m_stack.pop_back ();
 
@@ -876,7 +890,7 @@ XMLStructureHandler::end_element (const std::string &uri, const std::string &lna
 void
 XMLStructureHandler::characters (const std::string &t)
 {
-  if (m_stack.back ()) {
+  if (! m_stack.empty () && m_stack.back ()) {
     m_stack.back ()->cdata (t, *mp_state);
   }
 }

@@ -168,6 +168,8 @@ TEST (3)
   }
 }
 
+#endif
+
 //  Secret mode switchers for testing
 namespace tl
 {
@@ -225,6 +227,8 @@ TEST (10)
     EXPECT_EQ (tl::normalize_path ("\\"), "\\");
     EXPECT_EQ (tl::normalize_path ("/"), "\\");
     EXPECT_EQ (tl::normalize_path ("d:"), "D:");
+    EXPECT_EQ (tl::normalize_path ("/d:"), "D:");
+    EXPECT_EQ (tl::normalize_path ("\\d:"), "D:");
     EXPECT_EQ (tl::normalize_path ("\\\\"), "\\\\");
     EXPECT_EQ (tl::normalize_path ("//"), "\\\\");
     EXPECT_EQ (tl::normalize_path ("d:\\"), "D:\\");
@@ -370,8 +374,12 @@ TEST(13)
   tl::rm_dir_recursive (tt);
 
   EXPECT_EQ (tl::file_exists (tt), false);
+  EXPECT_EQ (tl::is_readable (tt), false);
+  EXPECT_EQ (tl::is_writable (tt), false);
   EXPECT_EQ (tl::mkpath (tt), true);
   EXPECT_EQ (tl::file_exists (tt), true);
+  EXPECT_EQ (tl::is_readable (tt), true);
+  EXPECT_EQ (tl::is_writable (tt), true);
   tl::rm_dir_recursive (tt);
 
   EXPECT_EQ (tl::file_exists (tt), false);
@@ -393,6 +401,8 @@ TEST(13)
   EXPECT_EQ (tl::file_exists (tt), false);
 }
 
+#if defined(HAVE_QT)
+
 //  absolute_path, relative_path and absolute_file_path
 TEST(14)
 {
@@ -411,6 +421,8 @@ TEST(14)
   EXPECT_EQ (tl::relative_path (xpath2, xpath), "doesnotexist");
   EXPECT_EQ (tl::relative_path (xpath2, tl::combine_path (xpath, "a")), "doesnotexist/a");
 }
+
+#endif
 
 //  dir_entries
 TEST(15)
@@ -497,4 +509,3 @@ TEST(15)
   EXPECT_EQ (tl::rm_dir (tt), false);  //  not empty
 }
 
-#endif

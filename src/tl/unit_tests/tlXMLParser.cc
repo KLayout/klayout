@@ -195,7 +195,7 @@ TEST (5)
 #if defined (HAVE_QT)
   EXPECT_EQ (error, "XML parser error: tag mismatch in line 2, column 33");
 #else
-  EXPECT_EQ (error, "XML parser error: mismatched tag in line 2, column 29");
+  EXPECT_EQ (error, "XML parser error: mismatched tag in line 2, column 28");
 #endif
 }
 

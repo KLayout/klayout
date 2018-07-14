@@ -41,11 +41,7 @@
 
 #include "tlException.h"
 #include "tlString.h"
-
-#if defined(HAVE_QT)
-#  include <QUrl>
-#  include <QFileInfo>
-#endif
+#include "tlUri.h"
 
 namespace tl
 {
@@ -157,18 +153,13 @@ InputStream::InputStream (const std::string &abstract_path)
     mp_delegate = new InputHttpStream (abstract_path);
   } else
 #endif
-#if !defined (_WIN32) // not available on Windows
   if (ex.test ("pipe:")) {
     mp_delegate = new InputPipe (ex.get ());
   } else
-#endif
-#if defined(HAVE_QT)
-  //  TODO: provide a substitute for QUrl
   if (ex.test ("file:")) {
-    QUrl url (tl::to_qstring (abstract_path));
-    mp_delegate = new InputZLibFile (tl::to_string (url.toLocalFile ()));
+    tl::URI uri (abstract_path);
+    mp_delegate = new InputZLibFile (uri.path ());
   } else
-#endif
   {
     mp_delegate = new InputZLibFile (abstract_path);
   }
@@ -183,16 +174,11 @@ std::string InputStream::absolute_path (const std::string &abstract_path)
   tl::Extractor ex (abstract_path.c_str ());
   if (ex.test ("http:") || ex.test ("https:")) {
     return abstract_path;
-#if !defined(_WIN32) // not available on Windows
   } else if (ex.test ("pipe:")) {
     return abstract_path;
-#endif
-#if defined(HAVE_QT)
-  //  TODO: provide a substitute for QUrl
   } else if (ex.test ("file:")) {
-    QUrl url (tl::to_qstring (abstract_path));
-    return tl::to_string (QFileInfo (url.toLocalFile ()).absoluteFilePath ());
-#endif
+    tl::URI uri (abstract_path);
+    return tl::absolute_path (uri.path ());
   } else {
     return tl::absolute_file_path (abstract_path);
   }

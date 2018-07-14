@@ -97,6 +97,16 @@ std::string TL_PUBLIC extension (const std::string &s);
 bool TL_PUBLIC file_exists (const std::string &s);
 
 /**
+ *  @brief Returns true, if the given path is writable
+ */
+bool TL_PUBLIC is_writable (const std::string &s);
+
+/**
+ *  @brief Returns true, if the given path is readable
+ */
+bool TL_PUBLIC is_readable (const std::string &s);
+
+/**
  *  @brief Returns true, if the given path is a directory
  */
 bool TL_PUBLIC is_dir (const std::string &s);

@@ -23,8 +23,7 @@
 
 #include "tlWebDAV.h"
 #include "tlUnitTest.h"
-
-#include <QDir>
+#include "tlFileUtils.h"
 
 static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata");
 static std::string test_url2 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
@@ -96,34 +95,29 @@ TEST(5)
 {
   tl::WebDAVObject collection;
 
-  QDir tmp_dir (tl::to_qstring (tmp_file ("tmp")));
-  EXPECT_EQ (tmp_dir.exists (), false);
+  std::string tmp_dir (tmp_file ("tmp"));
+  EXPECT_EQ (tl::file_exists (tmp_dir), false);
 
-  tmp_dir.cdUp ();
-  tmp_dir.mkdir (tl::to_qstring ("tmp"));
-  tmp_dir.cd (tl::to_qstring ("tmp"));
+  tl::mkpath (tmp_dir);
+  EXPECT_EQ (tl::file_exists (tmp_dir), true);
 
-  bool res = collection.download (test_url1, tl::to_string (tmp_dir.absolutePath ()));
+  bool res = collection.download (test_url1, tl::absolute_file_path (tmp_dir));
   EXPECT_EQ (res, true);
 
-  QDir dir1 (tmp_dir.absoluteFilePath (QString::fromUtf8 ("dir1")));
-  QDir dir2 (tmp_dir.absoluteFilePath (QString::fromUtf8 ("dir2")));
-  QDir dir21 (dir2.absoluteFilePath (QString::fromUtf8 ("dir21")));
-  EXPECT_EQ (dir1.exists (), true);
-  EXPECT_EQ (dir2.exists (), true);
-  EXPECT_EQ (dir21.exists (), true);
+  std::string dir1 (tl::absolute_file_path (tl::combine_path (tmp_dir, "dir1")));
+  std::string dir2 (tl::absolute_file_path (tl::combine_path (tmp_dir, "dir2")));
+  std::string dir21 (tl::absolute_file_path (tl::combine_path (dir2, "dir21")));
+  EXPECT_EQ (tl::file_exists (dir1), true);
+  EXPECT_EQ (tl::file_exists (dir2), true);
+  EXPECT_EQ (tl::file_exists (dir21), true);
 
-  QByteArray ba;
-
-  QFile text1 (dir1.absoluteFilePath (QString::fromUtf8 ("text")));
-  text1.open (QIODevice::ReadOnly);
-  ba = text1.read (10000);
-  EXPECT_EQ (ba.constData (), "A text.\n");
+  tl::InputStream text1 (tl::combine_path (dir1, "text"));
+  std::string ba1 = text1.read_all ();
+  EXPECT_EQ (ba1, "A text.\n");
   text1.close ();
 
-  QFile text21 (dir21.absoluteFilePath (QString::fromUtf8 ("text")));
-  text21.open (QIODevice::ReadOnly);
-  ba = text21.read (10000);
-  EXPECT_EQ (ba.constData (), "A text II.I.\n");
+  tl::InputStream text21 (tl::combine_path (dir21, "text"));
+  std::string ba21 = text21.read_all ();
+  EXPECT_EQ (ba21, "A text II.I.\n");
   text21.close ();
 }

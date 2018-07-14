@@ -30,13 +30,14 @@ SOURCES = \
   tlVariant.cc \
   tlInt128Support.cc \
   tlXMLParser.cc \
+  tlUri.cc \
+  tlWebDAV.cc \
 
 equals(HAVE_QT, "0") {
   # nothing
 } else {
 
   SOURCES += \
-    tlWebDAV.cc \
     tlDeferredExecution.cc \
     tlFileSystemWatcher.cc \
 

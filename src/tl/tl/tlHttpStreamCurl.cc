@@ -29,11 +29,8 @@
 #include "tlAssert.h"
 #include "tlStaticObjects.h"
 #include "tlProgress.h"
-#include "tlDeferredExecution.h"
-
-#include <QUrl>
-#include <QFileInfo>
-#include <QCoreApplication>
+#include "tlFileUtils.h"
+#include "tlUri.h"
 
 #include <sys/time.h>
 #include <unistd.h>
@@ -58,8 +55,8 @@ namespace tl
 
 std::string server_from_url (const std::string &url)
 {
-  QUrl qurl (tl::to_qstring (url));
-  return tl::to_string (qurl.scheme ()) + ":" + tl::to_string (qurl.host ());
+  tl::URI uri (url);
+  return uri.scheme () + "://" + uri.authority ();
 }
 
 std::string parse_realm (const std::string &header)
@@ -750,7 +747,7 @@ void CurlConnection::check () const
 
   } else if (m_status != 0) {
 
-    throw tl::HttpErrorException (tl::to_string (QObject::tr ("Connection error (%1)").arg (QString::fromLatin1 (m_error_msg))), m_status, m_url);
+    throw tl::HttpErrorException (tl::sprintf (tl::to_string (tr ("Connection error (%s)")), m_error_msg), m_status, m_url);
 
   } else if (m_http_status < 200 || m_http_status >= 300) {
 
@@ -776,7 +773,7 @@ void CurlConnection::check () const
     if (error_text) {
       throw tl::HttpErrorException (error_text, m_http_status, m_url);
     } else {
-      throw tl::HttpErrorException (tl::to_string (QObject::tr ("HTTP error")), m_http_status, m_url);
+      throw tl::HttpErrorException (tl::to_string (tr ("HTTP error")), m_http_status, m_url);
     }
 
   }
@@ -1013,7 +1010,7 @@ int CurlNetworkManager::tick ()
   mc = curl_multi_fdset (mp_multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
 
   if (mc != CURLM_OK) {
-    throw tl::HttpErrorException (tl::to_string (QObject::tr ("Connection error (curl_multi_fdset() failed)")), mc, std::string ());
+    throw tl::HttpErrorException (tl::to_string (tr ("Connection error (curl_multi_fdset() failed)")), mc, std::string ());
   }
 
   /* On success the value of maxfd is guaranteed to be >= -1. We call
@@ -1170,7 +1167,7 @@ InputHttpStream::read (char *b, size_t n)
     tl::NoDeferredMethods silent;
 
     if (! m_progress.get ()) {
-      m_progress.reset (new tl::AbsoluteProgress (tl::to_string (QObject::tr ("Downloading")) + " " + m_connection->url (), 1));
+      m_progress.reset (new tl::AbsoluteProgress (tl::to_string (tr ("Downloading")) + " " + m_connection->url (), 1));
     }
 
     while (n > m_connection->read_available () && ! m_connection->finished () && CurlNetworkManager::instance ()->tick ()) {
@@ -1200,13 +1197,13 @@ InputHttpStream::close ()
 void
 InputHttpStream::reset ()
 {
-  throw tl::Exception (tl::to_string (QObject::tr ("'reset' is not supported on HTTP input streams")));
+  throw tl::Exception (tl::to_string (tr ("'reset' is not supported on HTTP input streams")));
 }
 
 std::string
 InputHttpStream::filename () const
 {
-  return tl::to_string (QFileInfo (QUrl (tl::to_qstring (m_connection->url ())).path ()).fileName ());
+  return tl::filename (tl::URI (m_connection->url ()).path ());
 }
 
 std::string

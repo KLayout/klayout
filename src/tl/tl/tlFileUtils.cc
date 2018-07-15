@@ -713,8 +713,8 @@ bool is_same_file (const std::string &a, const std::string &b)
 
 #if defined(_WIN32)
 
-  HANDLE h1 = ::CreateFileW (tl::to_wstring (a).c_str (), 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  HANDLE h2 = ::CreateFileW (tl::to_wstring (b).c_str (), 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  HANDLE h1 = ::CreateFileW (tl::to_wstring (a).c_str (), 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+  HANDLE h2 = ::CreateFileW (tl::to_wstring (b).c_str (), 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
   bool result = false;
 

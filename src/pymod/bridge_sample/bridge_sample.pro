@@ -91,9 +91,11 @@ win32 {
   # to avoid the major version being appended to the dll name - in this case -lxyz won't link it again
   # because the library is called xyx0.dll.
   CONFIG += skip_target_version_ext
+  # make the proper library name for Python
+  QMAKE_POST_LINK += $(COPY) $(DESTDIR_TARGET) $$DESTDIR/$${TARGET}$${PYTHONEXTSUFFIX}
 } else {
   # Make the target library without the "lib" prefix on Linux
-  QMAKE_POST_LINK += $(COPY) $(DESTDIR)$(TARGET) $$DESTDIR/$${TARGET}.so
+  QMAKE_POST_LINK += $(COPY) $(DESTDIR)$(TARGET) $$DESTDIR/$${TARGET}$${PYTHONEXTSUFFIX}
 }
 
 # nothing to install as we're building a test library

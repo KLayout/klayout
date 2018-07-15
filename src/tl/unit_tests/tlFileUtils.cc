@@ -24,6 +24,7 @@
 #include "tlFileUtils.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
+#include "tlString.h"
 
 #include <fstream>
 
@@ -540,7 +541,7 @@ TEST(15)
 
   EXPECT_EQ (tl::relative_path (xpath2, xpath2), "");
   EXPECT_EQ (tl::relative_path (xpath2, xpath), "doesnotexist");
-  EXPECT_EQ (tl::relative_path (xpath2, tl::combine_path (xpath, "a")), "doesnotexist/a");
+  EXPECT_EQ (tl::replaced (tl::relative_path (xpath2, tl::combine_path (xpath, "a")), "\\", "/"), "doesnotexist/a");
 }
 
 //  dir_entries
@@ -626,5 +627,45 @@ TEST(16)
   EXPECT_EQ (tl::join (ee, "+"), ".w+v");
 
   EXPECT_EQ (tl::rm_dir (tt), false);  //  not empty
+}
+
+//  is_same_file
+TEST (17)
+{
+  std::string currdir = tl::current_dir ();
+  std::string currdir_abs = tl::absolute_file_path (".");
+  EXPECT_EQ (currdir, currdir_abs);
+  EXPECT_EQ (tl::is_same_file (currdir, "."), true);
+  EXPECT_EQ (tl::is_same_file (".", currdir), true);
+
+  std::string above = tl::absolute_file_path ("..");
+  EXPECT_EQ (tl::is_same_file (currdir, above), false);
+  EXPECT_EQ (tl::is_same_file (above, currdir), false);
+
+  std::string tp = tl::absolute_file_path (tmp_file ());
+  std::string dpath = tl::combine_path (tp, "d");
+  EXPECT_EQ (tl::mkpath (dpath), true);
+  std::string xfile = tl::combine_path (dpath, "x");
+  std::string yfile = tl::combine_path (dpath, "y");
+  {
+    tl::OutputStream os (xfile);
+    os << "hello, world!";
+  }
+  {
+    tl::OutputStream os (yfile);
+    os << "hello, world II!";
+  }
+  EXPECT_EQ (tl::file_exists (xfile), true);
+  EXPECT_EQ (tl::is_same_file (xfile, tp), false);
+  EXPECT_EQ (tl::is_same_file (dpath, xfile), false);
+  EXPECT_EQ (tl::is_parent_path (dpath, xfile), true);
+  EXPECT_EQ (tl::is_parent_path (xfile, dpath), false);
+
+  EXPECT_EQ (tl::is_same_file (tl::combine_path (dpath, "../d/x"), xfile), true);
+  EXPECT_EQ (tl::is_same_file (tl::combine_path (dpath, "../d/y"), xfile), false);
+  EXPECT_EQ (tl::is_same_file (tl::combine_path (dpath, "../d/y"), yfile), true);
+  EXPECT_EQ (tl::is_same_file (xfile, tl::combine_path (dpath, "../d/x")), true);
+  EXPECT_EQ (tl::is_same_file (xfile, tl::combine_path (dpath, "../d/y")), false);
+  EXPECT_EQ (tl::is_same_file (yfile, tl::combine_path (dpath, "../d/y")), true);
 }
 

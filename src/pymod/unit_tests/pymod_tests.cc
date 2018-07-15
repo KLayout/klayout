@@ -39,6 +39,7 @@ int run_pymodtest (tl::TestBase *_this, const std::string &fn)
   pypath = "PYTHONPATH=";
   pypath += STRINGIFY (PYTHONPATH);
   putenv ((char *) pypath.c_str ());
+  tl::info << pypath;
 
   std::string fp (tl::testsrc ());
   fp += "/testdata/pymod/";

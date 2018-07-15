@@ -42,7 +42,7 @@ static int default_verbosity ()
   const char *verbosity_str = 0;
 
 #if defined(_WIN32)
-  const wchar_t *verbosity_wstr = _wgetenv (L"KLAYOUT_VERBOSITY"));
+  const wchar_t *verbosity_wstr = _wgetenv (L"KLAYOUT_VERBOSITY");
   std::string vs;
   if (verbosity_wstr) {
     vs = tl::to_string (std::wstring (verbosity_wstr));

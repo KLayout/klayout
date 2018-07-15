@@ -516,30 +516,35 @@ TEST(13)
 }
 
 #if defined(HAVE_QT)
-
-//  absolute_path, relative_path and absolute_file_path
+//  absolute_path vs. Qt
 TEST(14)
 {
   std::string xpath_qt = tl::to_string (QDir::current ().absoluteFilePath ("doesnotexist"));
   std::string xpath = tl::absolute_file_path ("doesnotexist");
-  EXPECT_EQ (xpath_qt, xpath);
+  EXPECT_EQ (tl::replaced (xpath_qt, "\\", "/"), tl::replaced (xpath, "\\", "/"));
 
   std::string xpath2_qt = tl::to_string (QDir::current ().absolutePath ());
   std::string xpath2 = tl::absolute_path ("./doesnotexist");
-  EXPECT_EQ (xpath2_qt, xpath2);
+  EXPECT_EQ (tl::replaced (xpath2_qt, "\\", "/"), tl::replaced (xpath2, "\\", "/"));
 
   xpath2 = tl::absolute_file_path (xpath2);
-  EXPECT_EQ (xpath2_qt, xpath2);
+  EXPECT_EQ (tl::replaced (xpath2_qt, "\\", "/"), tl::replaced (xpath2, "\\", "/"));
+}
+#endif
+
+//  relative_path and absolute_file_path
+TEST(15)
+{
+  std::string xpath = tl::absolute_file_path ("doesnotexist");
+  std::string xpath2 = tl::absolute_path ("./doesnotexist");
 
   EXPECT_EQ (tl::relative_path (xpath2, xpath2), "");
   EXPECT_EQ (tl::relative_path (xpath2, xpath), "doesnotexist");
   EXPECT_EQ (tl::relative_path (xpath2, tl::combine_path (xpath, "a")), "doesnotexist/a");
 }
 
-#endif
-
 //  dir_entries
-TEST(15)
+TEST(16)
 {
   std::string tp = tl::absolute_file_path (tmp_file ());
   std::string tt = tl::combine_path (tp, "detest");

@@ -23,17 +23,18 @@
 
 #include "tlFileUtils.h"
 #include "tlUnitTest.h"
+#include "tlStream.h"
 
 #include <fstream>
 
 #if defined(HAVE_QT)
-
 //  A few things we cross-check against Qt
+#  include <QDir>
+#  include <QFileInfo>
+#  include <QFile>
+#endif
 
-#include <QDir>
-#include <QFileInfo>
-#include <QFile>
-
+#if defined(HAVE_QT)
 TEST (1)
 {
   EXPECT_EQ (tl::is_parent_path (std::string ("."), "./doesnotexist"), true);
@@ -50,7 +51,26 @@ TEST (1)
   EXPECT_EQ (tl::is_parent_path (tl::to_string (QDir::root ().absolutePath ()), tl::to_string (p) + "/y"), true);
   EXPECT_EQ (tl::is_parent_path (tl::to_string (QDir::root ().absolutePath ()), tl::to_string (p)), true);
 }
+#endif
 
+TEST (1_NOQT)
+{
+  std::string root = tl::absolute_file_path ("/");
+  EXPECT_EQ (tl::is_parent_path (std::string ("."), "./doesnotexist"), true);
+  EXPECT_EQ (tl::is_parent_path (std::string ("./doesnotexist"), "./alsodoesnotexist"), false);
+  EXPECT_EQ (tl::is_parent_path (std::string ("."), "."), true);
+
+  std::string p = tl::absolute_path (tmp_file ());
+  tl::mkpath (tl::combine_path (tl::combine_path (p, "x"), "y"));
+  EXPECT_EQ (tl::is_parent_path (p, tl::to_string (p)), true);
+  EXPECT_EQ (tl::is_parent_path (p, tl::to_string (p) + "/x"), true);
+  EXPECT_EQ (tl::is_parent_path (p + "/x", tl::to_string (p) + "/x"), true);
+  EXPECT_EQ (tl::is_parent_path (p + "/x", tl::to_string (p) + "/y"), false);
+  EXPECT_EQ (tl::is_parent_path (root, tl::to_string (p) + "/y"), true);
+  EXPECT_EQ (tl::is_parent_path (root, tl::to_string (p)), true);
+}
+
+#if defined(HAVE_QT)
 TEST (2)
 {
   QDir tmp_dir = QFileInfo (tl::to_qstring (tmp_file ())).absoluteDir ();
@@ -101,7 +121,51 @@ TEST (2)
   EXPECT_EQ (b2dir.exists (), false);
   EXPECT_EQ (QFileInfo (b2dir.absoluteFilePath (QString::fromUtf8 ("x"))).exists (), false);
 }
+#endif
 
+TEST (2_NOQT)
+{
+  std::string tmp_dir = tl::absolute_file_path (tmp_file ());
+  std::string adir = tl::combine_path (tmp_dir, "a");
+  tl::mkpath (adir);
+
+  EXPECT_EQ (tl::file_exists (adir), true);
+  EXPECT_EQ (tl::rm_dir_recursive (adir), true);
+  EXPECT_EQ (tl::file_exists (adir), false);
+
+  tl::mkpath (adir);
+  EXPECT_EQ (tl::file_exists (adir), true);
+
+  EXPECT_EQ (tl::rm_dir_recursive (adir), true);
+  EXPECT_EQ (tl::file_exists (adir), false);
+
+  std::string b1dir = tl::combine_path (adir, "b1");
+  tl::mkpath (b1dir);
+  EXPECT_EQ (tl::file_exists (b1dir), true);
+
+  std::string b2dir = tl::combine_path (adir, "b2");
+  tl::mkpath (b2dir);
+  EXPECT_EQ (tl::file_exists (b1dir), true);
+
+  {
+    tl::OutputStream os (tl::absolute_file_path (tl::combine_path (b2dir, "x")));
+    os << "hello, world!\n";
+  }
+
+  {
+    tl::OutputStream os (tl::absolute_file_path (tl::combine_path (b2dir, "y")));
+    os << "hello, world!\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (adir), true);
+  EXPECT_EQ (tl::rm_dir_recursive (adir), true);
+  EXPECT_EQ (tl::file_exists (adir), false);
+  EXPECT_EQ (tl::file_exists (b1dir), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (b2dir, "x")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (b2dir, "y")), false);
+}
+
+#if defined(HAVE_QT)
 TEST (3)
 {
   QDir tmp_dir = QFileInfo (tl::to_qstring (tmp_file ())).absoluteDir ();
@@ -167,8 +231,58 @@ TEST (3)
     file.close ();
   }
 }
-
 #endif
+
+TEST (3_NOQT)
+{
+  std::string tmp_dir = tl::absolute_file_path (tmp_file ());
+  std::string adir = tl::combine_path (tmp_dir, "a");
+
+  std::string b1dir = tl::combine_path (adir, "b1");
+  tl::mkpath (b1dir);
+  EXPECT_EQ (tl::file_exists (b1dir), true);
+
+  std::string b2dir = tl::combine_path (adir, "b2");
+  tl::mkpath (b2dir);
+  EXPECT_EQ (tl::file_exists (b1dir), true);
+
+  {
+    tl::OutputStream os (tl::absolute_file_path (tl::combine_path (b2dir, "x")));
+    os << "hello, world!\n";
+  }
+
+  {
+    tl::OutputStream os (tl::absolute_file_path (tl::combine_path (b2dir, "y")));
+    os << "hello, world II!\n";
+  }
+
+  std::string acopydir = tl::combine_path (tmp_dir, "acopy");
+  tl::rm_dir_recursive (acopydir);
+  tl::mkpath (acopydir);
+
+  tl::cp_dir_recursive (adir, acopydir);
+
+  EXPECT_EQ (tl::file_exists (acopydir), true);
+
+  std::string b1copydir = tl::combine_path (acopydir, "b1");
+  EXPECT_EQ (tl::file_exists (b1copydir), true);
+  std::string b2copydir = tl::combine_path (acopydir, "b2");
+  EXPECT_EQ (tl::file_exists (b2copydir), true);
+
+  {
+    std::string xfile = tl::combine_path (b2copydir, "x");
+    EXPECT_EQ (tl::file_exists (xfile), true);
+    tl::InputStream is (xfile);
+    EXPECT_EQ (is.read_all (), "hello, world!\n");
+  }
+
+  {
+    std::string yfile = tl::combine_path (b2copydir, "y");
+    EXPECT_EQ (tl::file_exists (yfile), true);
+    tl::InputStream is (yfile);
+    EXPECT_EQ (is.read_all (), "hello, world II!\n");
+  }
+}
 
 //  Secret mode switchers for testing
 namespace tl
@@ -402,30 +516,35 @@ TEST(13)
 }
 
 #if defined(HAVE_QT)
-
-//  absolute_path, relative_path and absolute_file_path
+//  absolute_path vs. Qt
 TEST(14)
 {
   std::string xpath_qt = tl::to_string (QDir::current ().absoluteFilePath ("doesnotexist"));
   std::string xpath = tl::absolute_file_path ("doesnotexist");
-  EXPECT_EQ (xpath_qt, xpath);
+  EXPECT_EQ (tl::replaced (xpath_qt, "\\", "/"), tl::replaced (xpath, "\\", "/"));
 
   std::string xpath2_qt = tl::to_string (QDir::current ().absolutePath ());
   std::string xpath2 = tl::absolute_path ("./doesnotexist");
-  EXPECT_EQ (xpath2_qt, xpath2);
+  EXPECT_EQ (tl::replaced (xpath2_qt, "\\", "/"), tl::replaced (xpath2, "\\", "/"));
 
   xpath2 = tl::absolute_file_path (xpath2);
-  EXPECT_EQ (xpath2_qt, xpath2);
+  EXPECT_EQ (tl::replaced (xpath2_qt, "\\", "/"), tl::replaced (xpath2, "\\", "/"));
+}
+#endif
+
+//  relative_path and absolute_file_path
+TEST(15)
+{
+  std::string xpath = tl::absolute_file_path ("doesnotexist");
+  std::string xpath2 = tl::absolute_path ("./doesnotexist");
 
   EXPECT_EQ (tl::relative_path (xpath2, xpath2), "");
   EXPECT_EQ (tl::relative_path (xpath2, xpath), "doesnotexist");
   EXPECT_EQ (tl::relative_path (xpath2, tl::combine_path (xpath, "a")), "doesnotexist/a");
 }
 
-#endif
-
 //  dir_entries
-TEST(15)
+TEST(16)
 {
   std::string tp = tl::absolute_file_path (tmp_file ());
   std::string tt = tl::combine_path (tp, "detest");

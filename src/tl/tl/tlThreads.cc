@@ -30,6 +30,7 @@
 #include <pthread.h>
 #include <time.h>
 #include <errno.h>
+#include <unistd.h>
 #if defined(_WIN32)
 #  include <windows.h>
 #endif
@@ -278,7 +279,7 @@ bool Thread::wait (unsigned long time)
       end_time.tv_sec += 1;
     }
 
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__APPLE__)
 
     //  wait if the thread terminated or the timeout has expired
     while (isRunning ()) {
@@ -289,7 +290,11 @@ bool Thread::wait (unsigned long time)
         return false;
       }
 
+#if defined(__WIN32)
       Sleep (1);
+#else
+      usleep (1000);
+#endif
 
     }
 

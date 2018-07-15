@@ -34,6 +34,8 @@
 #if defined(_WIN32)
 #  include <dir.h>
 #  include <windows.h>
+#elif defined(__APPLE__)
+#  include <libproc.h>
 #endif
 
 namespace tl

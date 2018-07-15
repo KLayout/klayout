@@ -57,6 +57,7 @@ and won't find them. So we need to take away the path with
 from distutils.core import setup, Extension, Distribution
 import glob
 import os
+import platform
 import sysconfig
 
 # ----------------------------------------------------------------------------------------
@@ -106,7 +107,9 @@ class Config(object):
     """
     Gets additional compiler arguments
     """
-    if os.name == "nt":
+    if platform.system() == "Windows":
+      return [ ]
+    elif platform.system() == "Darwin":
       return [ ]
     else:
       # Avoids many "type-punned pointer" warnings
@@ -116,8 +119,15 @@ class Config(object):
     """
     Gets additional linker arguments
     """
-    if os.name == "nt":
+    if platform.system() == "Windows":
       return [ ]
+    elif platform.system() == "Darwin":
+      # For the dependency modules, make sure we produce a dylib.
+      # We can only link against such, but the bundles produced otherwise.
+      if mod[0:1] == "_":
+        return [ "-Wl,-dylib" ]
+      else:
+        return []
     else:
       # this makes the libraries suitable for linking with a path -
       # i.e. from path_of('_tl'). Without this option, the path

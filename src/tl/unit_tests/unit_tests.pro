@@ -32,34 +32,15 @@ SOURCES = \
   tlXMLParser.cc \
   tlUri.cc \
   tlWebDAV.cc \
+  tlHttpStream.cc \
 
-equals(HAVE_QT, "0") {
-  # nothing
-} else {
+!equals(HAVE_QT, "0") {
 
   SOURCES += \
     tlDeferredExecution.cc \
     tlFileSystemWatcher.cc \
 
 }
-
-equals(HAVE_CURL, "1") {
-
-  SOURCES += \
-    tlHttpStream.cc \
-
-} else {
-  equals(HAVE_QT, "0") {
-    # no HTTP stream available
-  } else {
-
-    SOURCES += \
-      tlHttpStream.cc \
-
-  }
-}
-
-
 
 INCLUDEPATH += $$TL_INC
 DEPENDPATH += $$TL_INC

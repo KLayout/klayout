@@ -26,6 +26,7 @@
 #include "tlUnitTest.h"
 #include "dbBox.h"
 #include "dbEdge.h"
+#include "tlXMLParser.h"
 
 TEST(1) 
 {
@@ -215,6 +216,10 @@ TEST(4)
 
 TEST(5) 
 {
+  if (! tl::XMLParser::is_available ()) {
+    throw tl::CancelException ();
+  }
+
   std::string tmp_file = tl::TestBase::tmp_file ("tmp_5.lyrdb");
 
   {
@@ -358,6 +363,10 @@ TEST(5)
 
 TEST(5a) 
 {
+  if (! tl::XMLParser::is_available ()) {
+    throw tl::CancelException ();
+  }
+
   std::string tmp_file = tl::TestBase::tmp_file ("tmp_5a.lyrdb");
 
   {

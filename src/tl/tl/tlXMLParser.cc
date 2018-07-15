@@ -371,6 +371,12 @@ XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
   mp_data->check_error ();
 }
 
+bool
+XMLParser::is_available ()
+{
+  return true;
+}
+
 }
 
 #elif defined(HAVE_QT)
@@ -761,6 +767,12 @@ XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
   mp_data->parse (source.source (), false /*=not incremental*/);
 }
 
+bool
+XMLParser::is_available ()
+{
+  return true;
+}
+
 }
 
 #else
@@ -865,6 +877,12 @@ void
 XMLParser::parse (XMLSource &, XMLStructureHandler &)
 {
   tl_assert (false);
+}
+
+bool
+XMLParser::is_available ()
+{
+  return false;
 }
 
 }

@@ -29,11 +29,16 @@
 #include "dbGerberImporter.h"
 
 #include "tlUnitTest.h"
+#include "tlXMLParser.h"
 
 #include <stdlib.h>
 
 static void run_test (tl::TestBase *_this, const char *dir)
 {
+  if (! tl::XMLParser::is_available ()) {
+    throw tl::CancelException ();
+  }
+
   db::LoadLayoutOptions options;
 
   db::Layout layout;

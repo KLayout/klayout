@@ -25,17 +25,15 @@
 #include "tlUnitTest.h"
 #include "tlTimer.h"
 
-#if defined(HAVE_QT) || defined(HAVE_CURL)
-
-#if defined(HAVE_QT)
-# include <QCoreApplication>
-#endif
-
 static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
 static std::string test_url2 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/dir1");
 
 TEST(1)
 {
+  if (! tl::InputHttpStream::is_available ()) {
+    throw tl::CancelException ();
+  }
+
   tl::InputHttpStream stream (test_url1);
 
   char b[100];
@@ -46,6 +44,10 @@ TEST(1)
 
 TEST(2)
 {
+  if (! tl::InputHttpStream::is_available ()) {
+    throw tl::CancelException ();
+  }
+
   tl::InputHttpStream stream (test_url2);
   stream.add_header ("User-Agent", "SVN");
   stream.add_header ("Depth", "1");
@@ -94,22 +96,25 @@ public:
 
 }
 
-#if defined(HAVE_QT)
-
 //  async mode
 TEST(3)
 {
+  if (! tl::InputHttpStream::is_available ()) {
+    throw tl::CancelException ();
+  }
+
   tl::InputHttpStream stream (test_url1);
 
   Receiver r;
   stream.ready ().add (&r, &Receiver::handle);
 
+  EXPECT_EQ (stream.data_available (), false);
   stream.send ();
   EXPECT_EQ (stream.data_available (), false);
 
   tl::Clock start = tl::Clock::current ();
   while (! r.flag && (tl::Clock::current () - start).seconds () < 10) {
-    QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
+    stream.tick ();
   }
   EXPECT_EQ (r.flag, true);
   EXPECT_EQ (stream.data_available (), true);
@@ -120,6 +125,3 @@ TEST(3)
   EXPECT_EQ (res, "hello, world.\n");
 }
 
-#endif
-
-#endif

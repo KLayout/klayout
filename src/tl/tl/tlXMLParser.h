@@ -424,6 +424,11 @@ public:
 
   void parse (XMLSource &source, XMLStructureHandler &handler);
 
+  /**
+   *  @brief Returns true, if XML support is compiled in
+   */
+  static bool is_available ();
+
 private:
   XMLParserPrivateData *mp_data;
 };

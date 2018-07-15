@@ -22,10 +22,9 @@
 
 
 #include "tlWebDAV.h"
+#include "tlHttpStream.h"
 #include "tlUnitTest.h"
 #include "tlFileUtils.h"
-
-#if defined(HAVE_QT) || defined(HAVE_CURL)
 
 static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata");
 static std::string test_url2 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
@@ -49,6 +48,10 @@ static std::string collection2string (const tl::WebDAVObject &coll)
 
 TEST(1)
 {
+  if (! tl::InputHttpStream::is_available ()) {
+    throw tl::CancelException ();
+  }
+
   tl::WebDAVObject collection;
   collection.read (test_url1, 1);
 
@@ -65,6 +68,10 @@ TEST(1)
 
 TEST(2)
 {
+  if (! tl::InputHttpStream::is_available ()) {
+    throw tl::CancelException ();
+  }
+
   tl::WebDAVObject collection;
   collection.read (test_url1, 0);
 
@@ -75,6 +82,10 @@ TEST(2)
 
 TEST(3)
 {
+  if (! tl::InputHttpStream::is_available ()) {
+    throw tl::CancelException ();
+  }
+
   tl::WebDAVObject collection;
   collection.read (test_url2, 1);
 
@@ -85,6 +96,10 @@ TEST(3)
 
 TEST(4)
 {
+  if (! tl::InputHttpStream::is_available ()) {
+    throw tl::CancelException ();
+  }
+
   tl::WebDAVObject collection;
   collection.read (test_url2, 0);
 
@@ -95,6 +110,10 @@ TEST(4)
 
 TEST(5)
 {
+  if (! tl::InputHttpStream::is_available ()) {
+    throw tl::CancelException ();
+  }
+
   tl::WebDAVObject collection;
 
   std::string tmp_dir (tmp_file ("tmp"));
@@ -123,5 +142,3 @@ TEST(5)
   EXPECT_EQ (ba21, "A text II.I.\n");
   text21.close ();
 }
-
-#endif

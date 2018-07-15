@@ -186,6 +186,18 @@ InputHttpStream::filename () const
   return mp_data->filename ();
 }
 
+bool
+InputHttpStream::is_available ()
+{
+  return true;
+}
+
+void
+InputHttpStream::tick ()
+{
+  QCoreApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
+}
+
 // ---------------------------------------------------------------
 //  InputHttpStreamPrivateData implementation
 

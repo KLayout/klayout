@@ -130,4 +130,16 @@ InputHttpStream::filename () const
   return std::string ();
 }
 
+bool
+InputHttpStream::is_available ()
+{
+  return false;
+}
+
+void
+InputHttpStream::tick ()
+{
+  //  .. nothing yet ..
+}
+
 }

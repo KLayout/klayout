@@ -88,6 +88,17 @@ public:
   static void set_credential_provider (HttpCredentialProvider *cp);
 
   /**
+   *  @brief Returns true, if HTTP support is compiled in
+   */
+  static bool is_available ();
+
+  /**
+   *  @brief Polling: call this function regularily to explicitly establish polling
+   *  (in the Qt framework, this is done automatically within the event loop)
+   */
+  void tick ();
+
+  /**
    *  @brief Sends the request for data
    *  To ensure prompt delivery of data, this method can be used prior to
    *  "read" to trigger the download from the given URL.

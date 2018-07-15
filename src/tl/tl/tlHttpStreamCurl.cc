@@ -642,6 +642,18 @@ InputHttpStream::filename () const
   return mp_data->filename ();
 }
 
+bool
+InputHttpStream::is_available ()
+{
+  return true;
+}
+
+void
+InputHttpStream::tick ()
+{
+  CurlNetworkManager::instance ()->tick ();
+}
+
 // ----------------------------------------------------------------------
 //  CurlConnection implementation
 
@@ -1063,7 +1075,11 @@ void CurlNetworkManager::release_connection (CurlConnection *connection)
 void CurlNetworkManager::on_tick ()
 {
   if (tick ()) {
-    dm_tick ();
+    //  NOTE: don't reschedule if there is no DM scheduler. This will cause deep
+    //  recursion.
+    if (tl::DeferredMethodScheduler::instance ()) {
+      dm_tick ();
+    }
   }
 }
 

@@ -19,6 +19,7 @@
 import klayout.db as db
 import unittest
 import sys
+import os
 
 # Tests the basic abilities of the module
 
@@ -33,6 +34,12 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(str(v), "()")
     v = db.Box(1, 2, 3, 4)
     self.assertEqual(str(v), "(1,2;3,4)")
+
+  def test_3(self):
+    # db plugins loaded?
+    v = db.Layout()
+    v.read(os.path.join(os.path.dirname(__file__), "..", "gds", "t10.gds"))
+    self.assertEqual(v.top_cell().name, "RINGO")
 
 # run unit tests
 if __name__ == '__main__':

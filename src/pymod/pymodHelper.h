@@ -70,6 +70,14 @@ module_init (const char *mod_name, const char *mod_description)
     module_init (__name_str__, __description__); \
   } \
 
+#define DEFINE_PYMOD_WITH_INIT(__name__, __name_str__, __description__, __init__) \
+  extern "C" \
+  DEF_INSIDE_PUBLIC \
+  void init##__name__ () \
+  { \
+    __init__ (__name_str__, __description__); \
+  } \
+
 #else
 
 #define DEFINE_PYMOD(__name__, __name_str__, __description__) \
@@ -78,6 +86,14 @@ module_init (const char *mod_name, const char *mod_description)
   PyObject *PyInit_##__name__ () \
   { \
     return module_init (__name_str__, __description__); \
+  } \
+
+#define DEFINE_PYMOD_WITH_INIT(__name__, __name_str__, __description__, __init__) \
+  extern "C" \
+  DEF_INSIDE_PUBLIC \
+  PyObject *PyInit_##__name__ () \
+  { \
+    return __init__ (__name_str__, __description__); \
   } \
 
 #endif

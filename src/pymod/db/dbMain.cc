@@ -22,7 +22,15 @@
 
 #include "../pymodHelper.h"
 
+#include "../../db/db/dbInit.h"
+
 //  to force linking of the db module
 #include "../../db/db/dbForceLink.h"
 
-DEFINE_PYMOD(db, "db", "KLayout core module 'db'")
+static PyObject *db_module_init (const char *mod_name, const char *mod_description)
+{
+  db::init ();
+  return module_init (mod_name, mod_description);
+}
+
+DEFINE_PYMOD_WITH_INIT(db, "db", "KLayout core module 'db'", db_module_init)

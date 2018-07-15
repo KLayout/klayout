@@ -44,8 +44,8 @@ void runtest (tl::TestBase *_this, int mode)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_test_source = \"%s\"\n"
-        "$drc_test_target = \"%s\"\n"
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
         "$drc_test_mode = %d\n"
       , input, output, mode)
     );

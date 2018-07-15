@@ -22,6 +22,8 @@
 CURR_DIR=`pwd`
 RUN_MAKE=1
 IS_MAC="no"
+IS_WINDOWS="no"
+IS_LINUX="no"
 
 HAVE_QTBINDINGS=1
 HAVE_64BIT_COORD=0
@@ -53,11 +55,19 @@ BUILD_EXPERT=0
 
 # Check if building on Mac OSX Darwin family
 case `uname` in
+    Linux*)
+        IS_LINUX="yes"
+        ;;
+    MINGW*)
+        IS_WINDOWS="yes"
+        ;;
+    CYGWIN*)
+        IS_WINDOWS="yes"
+        ;;
     Darwin*)
         IS_MAC="yes"
         ;;
     *)
-        IS_MAC="no"
         ;;
 esac
 
@@ -416,7 +426,16 @@ if [ "$PYTHON" != "" ] && [ "$PYTHON" != "-" ]; then
   fi
 
   if [ "$PYTHONEXTSUFFIX" = "" ]; then
-    PYTHONEXTSUFFIX=`$PYTHON -c "import sysconfig; print(sysconfig.get_config_vars('EXT_SUFFIX')[0])" 2>/dev/null`
+    PYTHONEXTSUFFIX=$($PYTHON -c "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX') or sysconfig.get_config_var('SO'))" 2>/dev/null)
+    if [ "$PYTHONEXTSUFFIX" = "" ]; then
+      if [ "$IS_WINDOWS" = "yes" ]; then
+        PYTHONEXTSUFFIX=.dll
+      elif [ "$IS_MAC" = "yes" ]; then
+        PYTHONEXTSUFFIX=.dylib
+      else
+        PYTHONEXTSUFFIX=.so
+      fi
+    fi
     echo "    Python extension suffix: $PYTHONEXTSUFFIX"
   fi
 

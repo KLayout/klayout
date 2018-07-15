@@ -40,7 +40,7 @@ TEST(1)
     lym::Macro config;
     config.set_text (tl::sprintf (
         "$drc_test_source = nil\n"
-        "$drc_test_target = \"%s\"\n"
+        "$drc_test_target = '%s'\n"
       , output)
     );
     config.set_interpreter (lym::Macro::Ruby);
@@ -79,8 +79,8 @@ TEST(2)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_test_source = \"%s\"\n"
-        "$drc_test_target = \"%s\"\n"
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
       , input, output)
     );
     config.set_interpreter (lym::Macro::Ruby);
@@ -119,8 +119,8 @@ TEST(3)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
-        "$drc_test_source = \"%s\"\n"
-        "$drc_test_target = \"%s\"\n"
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
       , input, output)
     );
     config.set_interpreter (lym::Macro::Ruby);

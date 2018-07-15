@@ -645,10 +645,8 @@ OutputStream::OutputStream (const std::string &abstract_path, OutputStreamMode o
   tl::Extractor ex (abstract_path.c_str ());
   if (ex.test ("http:") || ex.test ("https:")) {
     throw tl::Exception (tl::to_string (tr ("Cannot write to http:, https: or pipe: URL's")));
-#ifndef _WIN32 // not available on Windows
   } else if (ex.test ("pipe:")) {
     mp_delegate = new OutputPipe (ex.get ());
-#endif
   } else if (ex.test ("file:")) {
     mp_delegate = create_file_stream (ex.get (), om);
   } else {

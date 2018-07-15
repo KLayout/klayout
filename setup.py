@@ -102,6 +102,16 @@ class Config(object):
     """
     return [ os.path.join(self.install_platlib, self.root) ]
 
+  def compile_args(self, mod):
+    """
+    Gets additional compiler arguments
+    """
+    if os.name == "nt":
+      return [ ]
+    else:
+      # Avoids many "type-punned pointer" warnings
+      return [ "-Wno-strict-aliasing" ]
+
   def link_args(self, mod):
     """
     Gets additional linker arguments
@@ -140,11 +150,12 @@ _tl_sources.remove("src/tl/tl/tlHttpStreamQt.cc")
 _tl_sources.remove("src/tl/tl/tlFileSystemWatcher.cc")
 _tl_sources.remove("src/tl/tl/tlDeferredExecutionQt.cc")
 
-_tl = Extension('klayout._tl', 
+_tl = Extension(config.root + '._tl', 
                 define_macros = config.macros() + [ ('MAKE_TL_LIBRARY', 1) ],
                 language = 'c++',
                 libraries = [ 'curl', 'expat' ],
                 extra_link_args = config.link_args('_tl'),
+                extra_compile_args = config.compile_args('_tl'),
                 sources = _tl_sources)
 
 # ------------------------------------------------------------------
@@ -152,13 +163,14 @@ _tl = Extension('klayout._tl',
 
 _gsi_sources = glob.glob("src/gsi/gsi/*.cc")
 
-_gsi = Extension('klayout._gsi', 
+_gsi = Extension(config.root + '._gsi', 
                 define_macros = config.macros() + [ ('MAKE_GSI_LIBRARY', 1) ],
                 include_dirs = [ 'src/tl/tl' ],
                 extra_objects = [ config.path_of('_tl') ],
                 runtime_library_dirs = config.rpath(),
                 language = 'c++',
                 extra_link_args = config.link_args('_gsi'),
+                extra_compile_args = config.compile_args('_gsi'),
                 sources = _gsi_sources)
 
 # ------------------------------------------------------------------
@@ -166,13 +178,14 @@ _gsi = Extension('klayout._gsi',
 
 _pya_sources = glob.glob("src/pya/pya/*.cc")
 
-_pya = Extension('klayout._pya', 
+_pya = Extension(config.root + '._pya', 
                 define_macros = config.macros() + [ ('MAKE_PYA_LIBRARY', 1) ],
                 include_dirs = [ 'src/tl/tl', 'src/gsi/gsi' ],
                 extra_objects = [ config.path_of('_tl'), config.path_of('_gsi') ],
                 runtime_library_dirs = config.rpath(),
                 language = 'c++',
                 extra_link_args = config.link_args('_pya'),
+                extra_compile_args = config.compile_args('_pya'),
                 sources = _pya_sources)
 
 # ------------------------------------------------------------------
@@ -183,13 +196,14 @@ _db_sources = glob.glob("src/db/db/*.cc")
 # Not a real source:
 _db_sources.remove("src/db/db/fonts.cc")
 
-_db = Extension('klayout._db', 
+_db = Extension(config.root + '._db', 
                 define_macros = config.macros() + [ ('MAKE_DB_LIBRARY', 1) ],
                 include_dirs = [ 'src/tl/tl', 'src/gsi/gsi', 'src/db/db' ],
                 extra_objects = [ config.path_of('_tl'), config.path_of('_gsi') ],
                 runtime_library_dirs = config.rpath(),
                 language = 'c++',
                 extra_link_args = config.link_args('_db'),
+                extra_compile_args = config.compile_args('_db'),
                 sources = _db_sources)
 
 # ------------------------------------------------------------------
@@ -197,21 +211,45 @@ _db = Extension('klayout._db',
 
 _rdb_sources = glob.glob("src/rdb/rdb/*.cc")
 
-_rdb = Extension('klayout._rdb', 
+_rdb = Extension(config.root + '._rdb', 
                 define_macros = config.macros() + [ ('MAKE_RDB_LIBRARY', 1) ],
                 include_dirs = [ 'src/db/db', 'src/tl/tl', 'src/gsi/gsi' ],
                 extra_objects = [ config.path_of('_tl'), config.path_of('_gsi'), config.path_of('_db') ],
                 runtime_library_dirs = config.rpath(),
                 language = 'c++',
                 extra_link_args = config.link_args('_rdb'),
+                extra_compile_args = config.compile_args('_rdb'),
                 sources = _rdb_sources)
 
+# ------------------------------------------------------------------
+# dependency libraries from db_plugins
+
+db_plugins = []
+
+for pi in glob.glob("src/plugins/*/db_plugin") + glob.glob("src/plugins/*/*/db_plugin"):
+
+  mod_name = "_" + os.path.split(os.path.split(pi)[-2])[-1] + "_dbpi"
+
+  pi_sources = glob.glob(pi + "/*.cc")
+
+  pi_ext = Extension(config.root + '.db_plugins.' + mod_name,
+                define_macros = config.macros() + [ ('MAKE_DB_PLUGIN_LIBRARY', 1) ],
+                include_dirs = [ 'src/plugins/common', 'src/db/db', 'src/tl/tl', 'src/gsi/gsi' ],
+                extra_objects = [ config.path_of('_tl'), config.path_of('_gsi'), config.path_of('_db') ],
+                runtime_library_dirs = config.rpath(),
+                language = 'c++',
+                extra_link_args = config.link_args(mod_name),
+                extra_compile_args = config.compile_args(mod_name),
+                sources = pi_sources)
+                     
+  db_plugins.append(pi_ext)
+  
 # ------------------------------------------------------------------
 # tl extension library
 
 tl_sources = glob.glob("src/pymod/tl/*.cc")
 
-tl = Extension('klayout.tl', 
+tl = Extension(config.root + '.tl', 
                 define_macros = config.macros(),
                 include_dirs = [ 'src/tl/tl', 'src/gsi/gsi', 'src/pya/pya' ],
                 extra_objects = [ config.path_of('_tl'), config.path_of('_gsi'), config.path_of('_pya') ],
@@ -223,7 +261,7 @@ tl = Extension('klayout.tl',
 
 db_sources = glob.glob("src/pymod/db/*.cc")
 
-db = Extension('klayout.db', 
+db = Extension(config.root + '.db', 
                 define_macros = config.macros(),
                 include_dirs = [ 'src/db/db', 'src/tl/tl', 'src/gsi/gsi', 'src/pya/pya' ],
                 extra_objects = [ config.path_of('_db'), config.path_of('_tl'), config.path_of('_gsi'), config.path_of('_pya') ],
@@ -235,7 +273,7 @@ db = Extension('klayout.db',
 
 rdb_sources = glob.glob("src/pymod/rdb/*.cc")
 
-rdb = Extension('klayout.rdb', 
+rdb = Extension(config.root + '.rdb', 
                 define_macros = config.macros(),
                 include_dirs = [ 'src/rdb/rdb', 'src/db/db', 'src/tl/tl', 'src/gsi/gsi', 'src/pya/pya' ],
                 extra_objects = [ config.path_of('_rdb'), config.path_of('_gsi'), config.path_of('_pya') ],
@@ -245,10 +283,10 @@ rdb = Extension('klayout.rdb',
 # ------------------------------------------------------------------
 # Core setup function
 
-setup (name = 'klayout',
+setup (name = config.root,
        version = config.version(),
        description = 'KLayout standalone Python package',
        author = 'Matthias Koefferlein',
        author_email = 'matthias@klayout.de',
-       ext_modules = [ _tl, _gsi, _pya, _db, _rdb, tl, db, rdb ])
+       ext_modules = [ _tl, _gsi, _pya, _db, _rdb ] + db_plugins + [ tl, db, rdb ])
 

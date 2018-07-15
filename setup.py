@@ -157,6 +157,7 @@ _tl_sources = glob.glob("src/tl/tl/*.cc")
 
 # Exclude sources which are compatible with Qt only
 _tl_sources.remove("src/tl/tl/tlHttpStreamQt.cc")
+_tl_sources.remove("src/tl/tl/tlHttpStreamNoQt.cc")
 _tl_sources.remove("src/tl/tl/tlFileSystemWatcher.cc")
 _tl_sources.remove("src/tl/tl/tlDeferredExecutionQt.cc")
 

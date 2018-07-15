@@ -25,6 +25,8 @@
 #include "tlUnitTest.h"
 #include "tlFileUtils.h"
 
+#if defined(HAVE_QT) || defined(HAVE_CURL)
+
 static std::string test_url1 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata");
 static std::string test_url2 ("http://www.klayout.org/svn-public/klayout-resources/trunk/testdata/text");
 
@@ -121,3 +123,5 @@ TEST(5)
   EXPECT_EQ (ba21, "A text II.I.\n");
   text21.close ();
 }
+
+#endif

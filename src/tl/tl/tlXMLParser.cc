@@ -763,6 +763,112 @@ XMLParser::parse (XMLSource &source, XMLStructureHandler &struct_handler)
 
 }
 
+#else
+
+namespace tl
+{
+
+// --------------------------------------------------------------------
+//  XMLSource implementation
+
+XMLSource::XMLSource ()
+  : mp_source (0)
+{
+  //  .. nothing yet ..
+}
+
+XMLSource::~XMLSource ()
+{
+  //  .. nothing yet ..
+}
+
+void
+XMLSource::reset ()
+{
+  //  .. nothing yet ..
+}
+
+// --------------------------------------------------------------------
+//  XMLStringSource implementation
+
+XMLStringSource::XMLStringSource (const std::string &)
+{
+  tl_assert (false);
+}
+
+XMLStringSource::XMLStringSource (const char *)
+{
+  tl_assert (false);
+}
+
+XMLStringSource::XMLStringSource (const char *, size_t)
+{
+  tl_assert (false);
+}
+
+XMLStringSource::~XMLStringSource ()
+{
+  //  .. nothing yet ..
+}
+
+// --------------------------------------------------------------------
+//  XMLFileSource implementation
+
+XMLFileSource::XMLFileSource (const std::string &, const std::string &)
+{
+  tl_assert (false);
+}
+
+XMLFileSource::XMLFileSource (const std::string &)
+{
+  tl_assert (false);
+}
+
+XMLFileSource::~XMLFileSource ()
+{
+  //  .. nothing yet ..
+}
+
+// --------------------------------------------------------------------
+//  XMLStreamSource implementation
+
+XMLStreamSource::XMLStreamSource (tl::InputStream &, const std::string &)
+{
+  tl_assert (false);
+}
+
+XMLStreamSource::XMLStreamSource (tl::InputStream &)
+{
+  tl_assert (false);
+}
+
+XMLStreamSource::~XMLStreamSource ()
+{
+  //  .. nothing yet ..
+}
+
+// --------------------------------------------------------------------
+//  XMLParser implementation
+
+XMLParser::XMLParser ()
+  : mp_data (0)
+{
+  //  .. nothing yet ..
+}
+
+XMLParser::~XMLParser ()
+{
+  //  .. nothing yet ..
+}
+
+void
+XMLParser::parse (XMLSource &, XMLStructureHandler &)
+{
+  tl_assert (false);
+}
+
+}
+
 #endif
 
 namespace tl {

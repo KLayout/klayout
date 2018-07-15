@@ -543,6 +543,105 @@ private:
   static CurlNetworkManager *ms_instance;
 };
 
+// ---------------------------------------------------------------
+//  InputHttpStream implementation
+
+InputHttpStream::InputHttpStream (const std::string &url)
+{
+  mp_data = new InputHttpStreamPrivateData (url);
+}
+
+InputHttpStream::~InputHttpStream ()
+{
+  delete mp_data;
+  mp_data = 0;
+}
+
+void
+InputHttpStream::set_credential_provider (HttpCredentialProvider *cp)
+{
+  CurlNetworkManager::instance ()->credentials ().set_provider (cp);
+  CurlNetworkManager::instance ()->proxy_credentials ().set_provider (cp);
+}
+
+void
+InputHttpStream::send ()
+{
+  mp_data->send ();
+}
+
+void
+InputHttpStream::close ()
+{
+  mp_data->close ();
+}
+
+void
+InputHttpStream::set_request (const char *r)
+{
+  mp_data->set_request (r);
+}
+
+void
+InputHttpStream::set_data (const char *data)
+{
+  mp_data->set_data (data);
+}
+
+void
+InputHttpStream::set_data (const char *data, size_t n)
+{
+  mp_data->set_data (data, n);
+}
+
+void
+InputHttpStream::add_header (const std::string &name, const std::string &value)
+{
+  mp_data->add_header (name, value);
+}
+
+tl::Event &
+InputHttpStream::ready ()
+{
+  return mp_data->ready ();
+}
+
+bool
+InputHttpStream::data_available ()
+{
+  return mp_data->data_available ();
+}
+
+size_t
+InputHttpStream::read (char *b, size_t n)
+{
+  return mp_data->read (b, n);
+}
+
+void
+InputHttpStream::reset ()
+{
+  mp_data->reset ();
+}
+
+std::string
+InputHttpStream::source () const
+{
+  return mp_data->source ();
+}
+
+std::string
+InputHttpStream::absolute_path () const
+{
+  return mp_data->absolute_path ();
+}
+
+std::string
+InputHttpStream::filename () const
+{
+  return mp_data->filename ();
+}
+
 // ----------------------------------------------------------------------
 //  CurlConnection implementation
 
@@ -1072,63 +1171,63 @@ int CurlNetworkManager::tick ()
 }
 
 // ---------------------------------------------------------------
-//  InputHttpFileCurl implementation
+//  InputHttpStreamPrivateData implementation
 
-InputHttpStream::InputHttpStream (const std::string &url)
+InputHttpStreamPrivateData::InputHttpStreamPrivateData (const std::string &url)
 {
   m_sent = false;
   m_ready = false;
 
   m_connection.reset (CurlNetworkManager::instance ()->create_connection ());
   m_connection->set_url (url.c_str ());
-  m_connection->data_available_event.add (this, &InputHttpStream::on_data_available);
-  m_connection->finished_event.add (this, &InputHttpStream::on_finished);
+  m_connection->data_available_event.add (this, &InputHttpStreamPrivateData::on_data_available);
+  m_connection->finished_event.add (this, &InputHttpStreamPrivateData::on_finished);
 }
 
-InputHttpStream::~InputHttpStream ()
+InputHttpStreamPrivateData::~InputHttpStreamPrivateData ()
 {
   // .. nothing yet ..
 }
 
 bool
-InputHttpStream::data_available ()
+InputHttpStreamPrivateData::data_available ()
 {
   return m_connection->read_available () > 0;
 }
 
 void
-InputHttpStream::set_request (const char *r)
+InputHttpStreamPrivateData::set_request (const char *r)
 {
   m_connection->set_request (r);
 }
 
 void
-InputHttpStream::set_data (const char *data)
+InputHttpStreamPrivateData::set_data (const char *data)
 {
   m_connection->set_data (data);
 }
 
 void
-InputHttpStream::set_data (const char *data, size_t n)
+InputHttpStreamPrivateData::set_data (const char *data, size_t n)
 {
   m_connection->set_data (data, n);
 }
 
 void
-InputHttpStream::add_header (const std::string &name, const std::string &value)
+InputHttpStreamPrivateData::add_header (const std::string &name, const std::string &value)
 {
   m_connection->add_header (name.c_str (), value.c_str ());
 }
 
 void
-InputHttpStream::on_finished ()
+InputHttpStreamPrivateData::on_finished ()
 {
   m_progress.reset (0);
   m_ready_event ();
 }
 
 void
-InputHttpStream::on_data_available ()
+InputHttpStreamPrivateData::on_data_available ()
 {
   //  send the ready event just once
   if (! m_ready) {
@@ -1138,7 +1237,7 @@ InputHttpStream::on_data_available ()
 }
 
 void
-InputHttpStream::send ()
+InputHttpStreamPrivateData::send ()
 {
   m_ready = false;
   m_progress.reset (0);
@@ -1147,7 +1246,7 @@ InputHttpStream::send ()
 }
 
 void
-InputHttpStream::check ()
+InputHttpStreamPrivateData::check ()
 {
   if (m_connection->finished ()) {
     m_connection->check ();
@@ -1155,7 +1254,7 @@ InputHttpStream::check ()
 }
 
 size_t
-InputHttpStream::read (char *b, size_t n)
+InputHttpStreamPrivateData::read (char *b, size_t n)
 {
   if (! m_sent) {
     send ();
@@ -1185,7 +1284,7 @@ InputHttpStream::read (char *b, size_t n)
 }
 
 void
-InputHttpStream::close ()
+InputHttpStreamPrivateData::close ()
 {
   m_progress.reset (0);
   if (m_connection.get ()) {
@@ -1195,34 +1294,27 @@ InputHttpStream::close ()
 }
 
 void
-InputHttpStream::reset ()
+InputHttpStreamPrivateData::reset ()
 {
   throw tl::Exception (tl::to_string (tr ("'reset' is not supported on HTTP input streams")));
 }
 
 std::string
-InputHttpStream::filename () const
+InputHttpStreamPrivateData::filename () const
 {
   return tl::filename (tl::URI (m_connection->url ()).path ());
 }
 
 std::string
-InputHttpStream::source () const
+InputHttpStreamPrivateData::source () const
 {
   return m_connection->url ();
 }
 
 std::string
-InputHttpStream::absolute_path () const
+InputHttpStreamPrivateData::absolute_path () const
 {
   return m_connection->url ();
-}
-
-void
-InputHttpStream::set_credential_provider (HttpCredentialProvider *cp)
-{
-  CurlNetworkManager::instance ()->credentials ().set_provider (cp);
-  CurlNetworkManager::instance ()->proxy_credentials ().set_provider (cp);
 }
 
 }

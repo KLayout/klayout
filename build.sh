@@ -26,9 +26,9 @@ IS_MAC="no"
 HAVE_QTBINDINGS=1
 HAVE_64BIT_COORD=0
 HAVE_QT=1
-HAVE_QT5=""
-HAVE_CURL=""
-HAVE_EXPAT=""
+HAVE_QT5="" # not set
+HAVE_CURL=0
+HAVE_EXPAT=0
 
 RUBYINCLUDE=""
 RUBYINCLUDE2=""
@@ -198,9 +198,10 @@ while [ "$*" != "" ]; do
     echo "  -with-qtbinding       Create Qt bindings for ruby scripts [default]"
     echo "  -without-qtbinding    Don't create Qt bindings for ruby scripts"
     echo "  -with-64bit-coord     Use long (64bit) coordinates - EXPERIMENTAL FEATURE"
-    echo "                        (only available for gcc>=4.4 for 64bit build)"
+    echo "                          (only available for gcc>=4.4 for 64bit build)"
     echo "  -without-64bit-coord  Don't use long (64bit) coordinates [default]"
     echo "  -without-qt           Qt-less build of the core libraries (including pymod)"
+    echo "                          (implies -without-qtbinding)"
     echo ""
     echo "  -dry-run              Don't build, just run qmake"
     echo ""
@@ -210,7 +211,7 @@ while [ "$*" != "" ]; do
     echo ""
     echo "  -rblib <file>         Location of the .so/.dll to link for Ruby support"
     echo "  -rbinc <dir>          Location of the Ruby headers (in particular 'ruby.h')"
-    echo "                        -rbinc and -rblib must be set to enable Ruby support"
+    echo "                          -rbinc and -rblib must be set to enable Ruby support"
     echo "  -rbinc2 <dir>         Second include path for Ruby 1.9 (containing 'ruby/config.h')"
     echo "  -rbvers <xyyzz>       Ruby version code"
     echo ""
@@ -268,11 +269,6 @@ if [ "$HAVE_QT5" = "" ]; then
 fi
 
 echo "Using qmake: $QMAKE"
-if [ "$HAVE_QT5" != "0" ]; then
-  echo "    Using Qt 5 API"
-else
-  echo "    Using Qt 4 API"
-fi
 echo ""
 
 # if not given, locate ruby interpreter (prefer 1.9, then default, finally 1.8 as fallback)
@@ -431,12 +427,29 @@ if [ "$PYTHON" != "" ] && [ "$PYTHON" != "-" ]; then
 
 fi
 
+if [ $HAVE_QT = 0 ]; then
+  HAVE_QTBINDINGS=0
+fi
+
 echo "Features:"
+if [ $HAVE_QT = 0 ]; then
+  echo "    Qt not used at all"
+fi
 if [ $HAVE_QTBINDINGS != 0 ]; then
-  echo "    Qt bindings enabled"
+  if [ "$HAVE_QT5" != "0" ]; then
+    echo "    Qt bindings enabled (Qt 5 API)"
+  else
+    echo "    Qt bindings enabled (Qt 4 API)"
+  fi
 fi
 if [ $HAVE_64BIT_COORD != 0 ]; then
   echo "    64 bit coordinates enabled"
+fi
+if [ $HAVE_EXPAT != 0 ]; then
+  echo "    Uses libexpat for XML parsing"
+fi
+if [ $HAVE_CURL != 0 ]; then
+  echo "    Uses libcurl for network access"
 fi
 if [ "$RPATH" = "" ]; then
   RPATH="$BIN"

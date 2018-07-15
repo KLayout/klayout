@@ -41,26 +41,21 @@ class HttpCredentialProvider;
  *
  *  Implements the reader from a server using the HTTP protocol
  */
-class TL_PUBLIC InputHttpStream
-  : public tl::Object, public InputStreamBase
+class TL_PUBLIC InputHttpStreamPrivateData
+  : public tl::Object
 {
 public:
   /**
    *  @brief Open a stream with the given URL
    */
-  InputHttpStream (const std::string &url);
+  InputHttpStreamPrivateData (const std::string &url);
 
   /**
    *  @brief Close the file
    *
    *  The destructor will automatically close the connection.
    */
-  virtual ~InputHttpStream ();
-
-  /**
-   *  @brief Sets the credential provider
-   */
-  static void set_credential_provider (HttpCredentialProvider *cp);
+  virtual ~InputHttpStreamPrivateData ();
 
   /**
    *  @brief Sends the request for data

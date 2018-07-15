@@ -25,6 +25,8 @@
 #include "tlUnitTest.h"
 #include "tlTimer.h"
 
+#if defined(HAVE_QT) || defined(HAVE_CURL)
+
 #if defined(HAVE_QT)
 # include <QCoreApplication>
 #endif
@@ -117,5 +119,7 @@ TEST(3)
   std::string res (b, n);
   EXPECT_EQ (res, "hello, world.\n");
 }
+
+#endif
 
 #endif

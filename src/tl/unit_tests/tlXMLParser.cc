@@ -20,10 +20,10 @@
 
 */
 
-
-
 #include "tlXMLParser.h"
 #include "tlUnitTest.h"
+
+#if defined(HAVE_QT) || defined(HAVE_EXPAT)
 
 #include <sstream>
 #include <cmath>
@@ -652,3 +652,4 @@ TEST (13)
   EXPECT_EQ (child.txt, "H\xc3\xa4llo");
 }
 
+#endif

@@ -131,6 +131,11 @@ equals(HAVE_CURL, "1") {
       tlHttpStreamQt.cc \
       tlWebDAV.cc \
 
+  } else {
+
+    SOURCES += \
+      tlHttpStreamNoQt.cc \
+
   }
 
 }

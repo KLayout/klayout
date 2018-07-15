@@ -17,7 +17,11 @@ equals(HAVE_QTBINDINGS, "1") {
     INIT_PY = $$PWD/../__init__.py.qt4
   }
 } else {
-  INIT_PY = $$PWD/../__init__.py.noqt
+  equals(HAVE_QT, "0") {
+    INIT_PY = $$PWD/../__init__.py.qtless
+  } else {
+    INIT_PY = $$PWD/../__init__.py.noqt
+  }
 }
 
 QMAKE_POST_LINK += && $(COPY) $$INIT_PY $$DESTDIR_PYMOD/__init__.py

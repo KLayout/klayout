@@ -27,7 +27,7 @@ namespace rba
 
 static void fail (const char *file, int line)
 {
-  throw tl::ScriptError (tl::to_string (QObject::tr ("Ruby support not compiled in")).c_str (), file, line, "missing_feature", std::vector<tl::BacktraceElement> ());
+  throw tl::ScriptError (tl::to_string (tr ("Ruby support not compiled in")).c_str (), file, line, "missing_feature", std::vector<tl::BacktraceElement> ());
 }
 
 static RubyInterpreter *sp_rba_interpreter = 0;

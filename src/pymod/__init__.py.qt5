@@ -1,7 +1,7 @@
 
-# pykl library definition file
+# klayout library definition file
 
-__all__ = [ "tl", "db", "lay", 
+__all__ = [ "tl", "db", "lay", "rdb", 
             "QtCore", "QtGui", "QtNetwork", "QtSql", "QtWidgets", "QtDesigner", 
             "QtMultimedia", "QtPrintSupport", "QtSvg", "QtXmlPatterns", "QtXml" ]
 

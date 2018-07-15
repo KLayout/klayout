@@ -21,6 +21,7 @@
 */
 
 #include "tlHttpStream.h"
+#include "tlHttpStreamQt.h"
 #include "tlLog.h"
 #include "tlStaticObjects.h"
 #include "tlDeferredExecution.h"
@@ -88,12 +89,110 @@ AuthenticationHandler::proxyAuthenticationRequired (const QNetworkProxy &proxy, 
 }
 
 // ---------------------------------------------------------------
-//  InputHttpFileQt implementation
+//  InputHttpStream implementation
+
+InputHttpStream::InputHttpStream (const std::string &url)
+{
+  mp_data = new InputHttpStreamPrivateData (url);
+}
+
+InputHttpStream::~InputHttpStream ()
+{
+  delete mp_data;
+  mp_data = 0;
+}
+
+void
+InputHttpStream::set_credential_provider (HttpCredentialProvider *cp)
+{
+  sp_credential_provider.reset (cp);
+}
+
+void
+InputHttpStream::send ()
+{
+  mp_data->send ();
+}
+
+void
+InputHttpStream::close ()
+{
+  mp_data->close ();
+}
+
+void
+InputHttpStream::set_request (const char *r)
+{
+  mp_data->set_request (r);
+}
+
+void
+InputHttpStream::set_data (const char *data)
+{
+  mp_data->set_data (data);
+}
+
+void
+InputHttpStream::set_data (const char *data, size_t n)
+{
+  mp_data->set_data (data, n);
+}
+
+void
+InputHttpStream::add_header (const std::string &name, const std::string &value)
+{
+  mp_data->add_header (name, value);
+}
+
+tl::Event &
+InputHttpStream::ready ()
+{
+  return mp_data->ready ();
+}
+
+bool
+InputHttpStream::data_available ()
+{
+  return mp_data->data_available ();
+}
+
+size_t
+InputHttpStream::read (char *b, size_t n)
+{
+  return mp_data->read (b, n);
+}
+
+void
+InputHttpStream::reset ()
+{
+  mp_data->reset ();
+}
+
+std::string
+InputHttpStream::source () const
+{
+  return mp_data->source ();
+}
+
+std::string
+InputHttpStream::absolute_path () const
+{
+  return mp_data->absolute_path ();
+}
+
+std::string
+InputHttpStream::filename () const
+{
+  return mp_data->filename ();
+}
+
+// ---------------------------------------------------------------
+//  InputHttpStreamPrivateData implementation
 
 static QNetworkAccessManager *s_network_manager (0);
 static AuthenticationHandler *s_auth_handler (0);
 
-InputHttpStream::InputHttpStream (const std::string &url)
+InputHttpStreamPrivateData::InputHttpStreamPrivateData (const std::string &url)
   : m_url (url), mp_reply (0), m_request ("GET"), mp_buffer (0)
 {
   if (! s_network_manager) {
@@ -111,13 +210,13 @@ InputHttpStream::InputHttpStream (const std::string &url)
   connect (s_network_manager, SIGNAL (finished (QNetworkReply *)), this, SLOT (finished (QNetworkReply *)));
 }
 
-InputHttpStream::~InputHttpStream ()
+InputHttpStreamPrivateData::~InputHttpStreamPrivateData ()
 {
   close ();
 }
 
 void
-InputHttpStream::close ()
+InputHttpStreamPrivateData::close ()
 {
   if (mp_active_reply.get ()) {
     mp_active_reply->abort ();
@@ -127,37 +226,31 @@ InputHttpStream::close ()
 }
 
 void
-InputHttpStream::set_credential_provider (HttpCredentialProvider *cp)
-{
-  sp_credential_provider.reset (cp);
-}
-
-void
-InputHttpStream::set_request (const char *r)
+InputHttpStreamPrivateData::set_request (const char *r)
 {
   m_request = QByteArray (r);
 }
 
 void
-InputHttpStream::set_data (const char *data)
+InputHttpStreamPrivateData::set_data (const char *data)
 {
   m_data = QByteArray (data);
 }
 
 void
-InputHttpStream::set_data (const char *data, size_t n)
+InputHttpStreamPrivateData::set_data (const char *data, size_t n)
 {
   m_data = QByteArray (data, int (n));
 }
 
 void
-InputHttpStream::add_header (const std::string &name, const std::string &value)
+InputHttpStreamPrivateData::add_header (const std::string &name, const std::string &value)
 {
   m_headers.insert (std::make_pair (name, value));
 }
 
 void
-InputHttpStream::finished (QNetworkReply *reply)
+InputHttpStreamPrivateData::finished (QNetworkReply *reply)
 {
   if (reply != mp_active_reply.get ()) {
     return;
@@ -177,7 +270,7 @@ InputHttpStream::finished (QNetworkReply *reply)
 }
 
 void
-InputHttpStream::issue_request (const QUrl &url)
+InputHttpStreamPrivateData::issue_request (const QUrl &url)
 {
   delete mp_buffer;
   mp_buffer = 0;
@@ -216,7 +309,7 @@ InputHttpStream::issue_request (const QUrl &url)
 }
 
 void
-InputHttpStream::send ()
+InputHttpStreamPrivateData::send ()
 {
   if (mp_reply == 0) {
     issue_request (QUrl (tl::to_qstring (m_url)));
@@ -224,7 +317,7 @@ InputHttpStream::send ()
 }
 
 size_t
-InputHttpStream::read (char *b, size_t n)
+InputHttpStreamPrivateData::read (char *b, size_t n)
 {
   //  Prevents deferred methods to be executed during the processEvents below (undesired side effects)
   tl::NoDeferredMethods silent;
@@ -286,13 +379,13 @@ InputHttpStream::read (char *b, size_t n)
 }
 
 void
-InputHttpStream::reset ()
+InputHttpStreamPrivateData::reset ()
 {
   throw tl::Exception (tl::to_string (QObject::tr ("'reset' is not supported on HTTP input streams")));
 }
 
 std::string
-InputHttpStream::filename () const
+InputHttpStreamPrivateData::filename () const
 {
   return tl::to_string (QFileInfo (QUrl (tl::to_qstring (m_url)).path ()).fileName ());
 }

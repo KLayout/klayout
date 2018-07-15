@@ -25,7 +25,7 @@
 #ifndef ATOMIC_SPINLOCK_H_
 #define ATOMIC_SPINLOCK_H_
 
-#include "atomic/atomic.h"
+#include "atomic.h"
 
 namespace atomic {
 class spinlock {

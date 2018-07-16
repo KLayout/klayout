@@ -128,8 +128,7 @@ class Config(object):
             args = []
             if mod[0] == "_":
                 args += ["-Wl,-dylib", '-Wl,-install_name,@rpath/%s' % self.libname_of(mod)]
-            else:
-                args += ['-Wl,-rpath,@loader_path/']
+            args += ['-Wl,-rpath,@loader_path/']
             return args
         else:
             # this makes the libraries suitable for linking with a path -

@@ -77,10 +77,6 @@ class Config(object):
         build_cmd.finalize_options()
         self.build_platlib = build_cmd.build_platlib
 
-        install_cmd = Distribution().get_command_obj('install')
-        install_cmd.finalize_options()
-        self.install_platlib = install_cmd.install_platlib
-
         self.ext_suffix = sysconfig.get_config_var("EXT_SUFFIX")
         self.root = "klayout"
 
@@ -96,13 +92,6 @@ class Config(object):
         Returns the build path of the library for a given module
         """
         return os.path.join(self.build_platlib, self.root, self.libname_of(mod))
-
-    def rpath(self):
-        """
-        Returns the runtime_library_dir to use when linking the modules
-        This path will ensure the auxiliary modules are found at runtime.
-        """
-        return [os.path.join(self.install_platlib, self.root)]
 
     def compile_args(self, mod):
         """
@@ -136,7 +125,10 @@ class Config(object):
             # will be included in the reference and at runtime the loaded
             # will look for the path-qualified library. But that's the
             # build path and the loader will fail.
-            return ['-Wl,-soname,' + self.libname_of(mod)]
+            args = []
+            args += ['-Wl,-soname,' + self.libname_of(mod)]
+            args += ['-Wl,-rpath,$ORIGIN']
+            return args
 
     def macros(self):
         """
@@ -180,7 +172,6 @@ _gsi = Extension(config.root + '._gsi',
                  define_macros=config.macros() + [('MAKE_GSI_LIBRARY', 1)],
                  include_dirs=['src/tl/tl'],
                  extra_objects=[config.path_of('_tl')],
-                 runtime_library_dirs=config.rpath(),
                  language='c++',
                  extra_link_args=config.link_args('_gsi'),
                  extra_compile_args=config.compile_args('_gsi'),
@@ -195,7 +186,6 @@ _pya = Extension(config.root + '._pya',
                  define_macros=config.macros() + [('MAKE_PYA_LIBRARY', 1)],
                  include_dirs=['src/tl/tl', 'src/gsi/gsi'],
                  extra_objects=[config.path_of('_tl'), config.path_of('_gsi')],
-                 runtime_library_dirs=config.rpath(),
                  language='c++',
                  extra_link_args=config.link_args('_pya'),
                  extra_compile_args=config.compile_args('_pya'),
@@ -213,7 +203,6 @@ _db = Extension(config.root + '._db',
                 define_macros=config.macros() + [('MAKE_DB_LIBRARY', 1)],
                 include_dirs=['src/tl/tl', 'src/gsi/gsi', 'src/db/db'],
                 extra_objects=[config.path_of('_tl'), config.path_of('_gsi')],
-                runtime_library_dirs=config.rpath(),
                 language='c++',
                 extra_link_args=config.link_args('_db'),
                 extra_compile_args=config.compile_args('_db'),
@@ -229,7 +218,6 @@ _rdb = Extension(config.root + '._rdb',
                  include_dirs=['src/db/db', 'src/tl/tl', 'src/gsi/gsi'],
                  extra_objects=[config.path_of('_tl'), config.path_of(
                      '_gsi'), config.path_of('_db')],
-                 runtime_library_dirs=config.rpath(),
                  language='c++',
                  extra_link_args=config.link_args('_rdb'),
                  extra_compile_args=config.compile_args('_rdb'),
@@ -252,7 +240,6 @@ for pi in glob.glob("src/plugins/*/db_plugin") + glob.glob("src/plugins/*/*/db_p
                                      'src/db/db', 'src/tl/tl', 'src/gsi/gsi'],
                        extra_objects=[config.path_of('_tl'), config.path_of(
                            '_gsi'), config.path_of('_db')],
-                       runtime_library_dirs=config.rpath(),
                        language='c++',
                        extra_link_args=config.link_args(mod_name),
                        extra_compile_args=config.compile_args(mod_name),
@@ -270,7 +257,6 @@ tl = Extension(config.root + '.tl',
                include_dirs=['src/tl/tl', 'src/gsi/gsi', 'src/pya/pya'],
                extra_objects=[config.path_of('_tl'), config.path_of(
                    '_gsi'), config.path_of('_pya')],
-               runtime_library_dirs=config.rpath(),
                extra_link_args=config.link_args('tl'),
                sources=tl_sources)
 
@@ -284,7 +270,6 @@ db = Extension(config.root + '.db',
                include_dirs=['src/db/db', 'src/tl/tl', 'src/gsi/gsi', 'src/pya/pya'],
                extra_objects=[config.path_of('_db'), config.path_of(
                    '_tl'), config.path_of('_gsi'), config.path_of('_pya')],
-               runtime_library_dirs=config.rpath(),
                extra_link_args=config.link_args('db'),
                sources=db_sources)
 
@@ -299,7 +284,6 @@ rdb = Extension(config.root + '.rdb',
                               'src/tl/tl', 'src/gsi/gsi', 'src/pya/pya'],
                 extra_objects=[config.path_of('_rdb'), config.path_of(
                     '_gsi'), config.path_of('_pya')],
-                runtime_library_dirs=config.rpath(),
                 extra_link_args=config.link_args('rdb'),
                 sources=rdb_sources)
 

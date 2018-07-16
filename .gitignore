@@ -48,3 +48,8 @@ src/plugins/*
 # QTCreator files
 src/klayout.pro.user
 
+
+# python setuptools eggs
+*.egg-info/
+build/
+dist/

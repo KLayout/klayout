@@ -31,7 +31,7 @@ Build requirements are:
 
 The main challenge is to map KLayout's shared object architecture.
 The structure consists of the Python extension libraries and a bunch
-of libraries providing the actual implementation part. 
+of libraries providing the actual implementation part.
 The Python extension libraries reference the implementation libraries.
 The extension libraries are prefixed with an underscore.
 
@@ -39,22 +39,22 @@ For example:
 
   tl (Python) -> _tl, _gsi
 
-There is a specific issue with the building of the extension 
+There is a specific issue with the building of the extension
 libraries: distutils only allows building of shared objects
 as extension libraries and does not provide a intrinsic feature
-for linking other libraries into the extension library. 
+for linking other libraries into the extension library.
 
 Hence we need to add the dependencies through "extra_objects".
 
-On Linux there is a specific issue: The shared objects produced 
+On Linux there is a specific issue: The shared objects produced
 for extension libraries are not matching the Linux name conventions.
-So we have to add them as .so link objects including the path. 
-If we do so, the runtime loading will look them up by their path 
-and won't find them. So we need to take away the path with 
+So we have to add them as .so link objects including the path.
+If we do so, the runtime loading will look them up by their path
+and won't find them. So we need to take away the path with
 "-Wl,-soname" on Linux (see Config.link_args).
 """
 
-from distutils.core import setup, Extension, Distribution
+from setuptools import setup, Extension, Distribution
 import glob
 import os
 import platform
@@ -124,15 +124,17 @@ class Config(object):
     elif platform.system() == "Darwin":
       # For the dependency modules, make sure we produce a dylib.
       # We can only link against such, but the bundles produced otherwise.
-      if mod[0:1] == "_":
-        return [ "-Wl,-dylib" ]
+      args = []
+      if mod[0] == "_":
+        args += [ "-Wl,-dylib", '-Wl,-install_name,@rpath/%s' % self.libname_of(mod) ]
       else:
-        return []
+        args += ['-Wl,-rpath,@loader_path/']
+      return args
     else:
       # this makes the libraries suitable for linking with a path -
       # i.e. from path_of('_tl'). Without this option, the path
       # will be included in the reference and at runtime the loaded
-      # will look for the path-qualified library. But that's the 
+      # will look for the path-qualified library. But that's the
       # build path and the loader will fail.
       return ['-Wl,-soname,' + self.libname_of(mod)]
 
@@ -161,7 +163,7 @@ _tl_sources.remove("src/tl/tl/tlHttpStreamNoQt.cc")
 _tl_sources.remove("src/tl/tl/tlFileSystemWatcher.cc")
 _tl_sources.remove("src/tl/tl/tlDeferredExecutionQt.cc")
 
-_tl = Extension(config.root + '._tl', 
+_tl = Extension(config.root + '._tl',
                 define_macros = config.macros() + [ ('MAKE_TL_LIBRARY', 1) ],
                 language = 'c++',
                 libraries = [ 'curl', 'expat' ],
@@ -174,7 +176,7 @@ _tl = Extension(config.root + '._tl',
 
 _gsi_sources = glob.glob("src/gsi/gsi/*.cc")
 
-_gsi = Extension(config.root + '._gsi', 
+_gsi = Extension(config.root + '._gsi',
                 define_macros = config.macros() + [ ('MAKE_GSI_LIBRARY', 1) ],
                 include_dirs = [ 'src/tl/tl' ],
                 extra_objects = [ config.path_of('_tl') ],
@@ -189,7 +191,7 @@ _gsi = Extension(config.root + '._gsi',
 
 _pya_sources = glob.glob("src/pya/pya/*.cc")
 
-_pya = Extension(config.root + '._pya', 
+_pya = Extension(config.root + '._pya',
                 define_macros = config.macros() + [ ('MAKE_PYA_LIBRARY', 1) ],
                 include_dirs = [ 'src/tl/tl', 'src/gsi/gsi' ],
                 extra_objects = [ config.path_of('_tl'), config.path_of('_gsi') ],
@@ -207,7 +209,7 @@ _db_sources = glob.glob("src/db/db/*.cc")
 # Not a real source:
 _db_sources.remove("src/db/db/fonts.cc")
 
-_db = Extension(config.root + '._db', 
+_db = Extension(config.root + '._db',
                 define_macros = config.macros() + [ ('MAKE_DB_LIBRARY', 1) ],
                 include_dirs = [ 'src/tl/tl', 'src/gsi/gsi', 'src/db/db' ],
                 extra_objects = [ config.path_of('_tl'), config.path_of('_gsi') ],
@@ -222,7 +224,7 @@ _db = Extension(config.root + '._db',
 
 _rdb_sources = glob.glob("src/rdb/rdb/*.cc")
 
-_rdb = Extension(config.root + '._rdb', 
+_rdb = Extension(config.root + '._rdb',
                 define_macros = config.macros() + [ ('MAKE_RDB_LIBRARY', 1) ],
                 include_dirs = [ 'src/db/db', 'src/tl/tl', 'src/gsi/gsi' ],
                 extra_objects = [ config.path_of('_tl'), config.path_of('_gsi'), config.path_of('_db') ],
@@ -252,19 +254,20 @@ for pi in glob.glob("src/plugins/*/db_plugin") + glob.glob("src/plugins/*/*/db_p
                 extra_link_args = config.link_args(mod_name),
                 extra_compile_args = config.compile_args(mod_name),
                 sources = pi_sources)
-                     
+
   db_plugins.append(pi_ext)
-  
+
 # ------------------------------------------------------------------
 # tl extension library
 
 tl_sources = glob.glob("src/pymod/tl/*.cc")
 
-tl = Extension(config.root + '.tl', 
+tl = Extension(config.root + '.tl',
                 define_macros = config.macros(),
                 include_dirs = [ 'src/tl/tl', 'src/gsi/gsi', 'src/pya/pya' ],
                 extra_objects = [ config.path_of('_tl'), config.path_of('_gsi'), config.path_of('_pya') ],
                 runtime_library_dirs = config.rpath(),
+                extra_link_args = config.link_args('tl'),
                 sources = tl_sources)
 
 # ------------------------------------------------------------------
@@ -272,11 +275,12 @@ tl = Extension(config.root + '.tl',
 
 db_sources = glob.glob("src/pymod/db/*.cc")
 
-db = Extension(config.root + '.db', 
+db = Extension(config.root + '.db',
                 define_macros = config.macros(),
                 include_dirs = [ 'src/db/db', 'src/tl/tl', 'src/gsi/gsi', 'src/pya/pya' ],
                 extra_objects = [ config.path_of('_db'), config.path_of('_tl'), config.path_of('_gsi'), config.path_of('_pya') ],
                 runtime_library_dirs = config.rpath(),
+                extra_link_args = config.link_args('db'),
                 sources = db_sources)
 
 # ------------------------------------------------------------------
@@ -284,22 +288,24 @@ db = Extension(config.root + '.db',
 
 rdb_sources = glob.glob("src/pymod/rdb/*.cc")
 
-rdb = Extension(config.root + '.rdb', 
+rdb = Extension(config.root + '.rdb',
                 define_macros = config.macros(),
                 include_dirs = [ 'src/rdb/rdb', 'src/db/db', 'src/tl/tl', 'src/gsi/gsi', 'src/pya/pya' ],
                 extra_objects = [ config.path_of('_rdb'), config.path_of('_gsi'), config.path_of('_pya') ],
                 runtime_library_dirs = config.rpath(),
+                extra_link_args = config.link_args('rdb'),
                 sources = rdb_sources)
 
 # ------------------------------------------------------------------
 # Core setup function
 
-setup(name = config.root,
-      version = config.version(),
-      description = 'KLayout standalone Python package',
-      author = 'Matthias Koefferlein',
-      author_email = 'matthias@klayout.de',
-      packages = [ config.root ],
-      package_dir = { config.root: 'src/pymod/distutils_src' },
-      ext_modules = [ _tl, _gsi, _pya, _db, _rdb ] + db_plugins + [ tl, db, rdb ])
+if __name__ == '__main__':
+  setup(name = config.root,
+        version = config.version(),
+        description = 'KLayout standalone Python package',
+        author = 'Matthias Koefferlein',
+        author_email = 'matthias@klayout.de',
+        packages = [ config.root ],
+        package_dir = { config.root: 'src/pymod/distutils_src' },
+        ext_modules = [ _tl, _gsi, _pya, _db, _rdb ] + db_plugins + [ tl, db, rdb ])
 

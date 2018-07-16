@@ -9,6 +9,7 @@ before_install:
   - eval "${MATRIX_EVAL}"
   - brew update
   - brew bundle
+  - env
 
 install:
   - python3 setup.py install
@@ -16,8 +17,3 @@ script:
   - python3 -c 'import klayout.db as db; print(dir(db))'
   - python3 -c 'import klayout.rdb as rdb; print(dir(rdb))'
   - python3 -c 'import klayout.tl as tl; print(dir(tl))'
-  - python3 -c 'import klayout._db as db; print(dir(db))'
-  - python3 -c 'import klayout._rdb as rdb; print(dir(rdb))'
-  - python3 -c 'import klayout._tl as tl; print(dir(tl))'
-  - python3 -c 'import klayout._gsi as gsi; print(dir(gsi))'
-  - python3 -c 'import klayout._pya as pya; print(dir(pya))'

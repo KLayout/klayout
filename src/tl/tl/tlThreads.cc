@@ -34,10 +34,33 @@
 #if defined(_WIN32)
 #  include <windows.h>
 #endif
+#if defined(__MACH__)
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
 
 namespace tl
 {
 
+// -------------------------------------------------------------------------------
+//  clock_gettime is not implemented in Mac OS X 10.11 and lower
+//  From: https://gist.githubusercontent.com/jbenet/1087739/raw/638b37f76cdd9dc46d617443cab27eac297e2ee3/current_utc_time.c
+
+void current_utc_time(struct timespec *ts) {
+
+#if defined(__MACH__)
+  clock_serv_t cclock;
+  mach_timespec_t mts;
+  host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+  clock_get_time(cclock, &mts);
+  mach_port_deallocate(mach_task_self(), cclock);
+  ts->tv_sec = mts.tv_sec;
+  ts->tv_nsec = mts.tv_nsec;
+#else
+  clock_gettime(CLOCK_REALTIME, ts);
+#endif
+
+}
 // -------------------------------------------------------------------------------
 //  WaitCondition implementation
 
@@ -270,7 +293,7 @@ bool Thread::wait (unsigned long time)
   if (time < std::numeric_limits<unsigned long>::max ()) {
 
     struct timespec end_time;
-    clock_gettime (CLOCK_REALTIME, &end_time);
+    current_utc_time (&end_time);
 
     end_time.tv_sec += (time / 1000);
     end_time.tv_nsec += (time % 1000) * 1000000;

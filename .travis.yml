@@ -7,10 +7,10 @@ matrix:
       - MATRIX_EVAL=""
   - osx_image: xcode8.3
     env:
-      - MATRIX_EVAL="brew install gcc || brew link --overwrite gcc; export CC=gcc-7 && export CXX=g++-7"
+      - MATRIX_EVAL="brew install gcc || brew link --overwrite gcc; export CC=gcc && export CXX=g++"
   - osx_image: xcode7.3
     env:
-      - MATRIX_EVAL="brew install gcc || brew link --overwrite gcc; export CC=gcc-7 && export CXX=g++-7"
+      - MATRIX_EVAL="brew install gcc || brew link --overwrite gcc; export CC=gcc && export CXX=g++"
 
 before_install:
   - env

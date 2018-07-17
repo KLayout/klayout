@@ -1,32 +1,35 @@
-os: osx
-
 matrix:
   include:
-  - osx_image: xcode9.3  # macOS 10.13
-    env:
-      - MATRIX_EVAL=""
-  - osx_image: xcode8.3  # macOS 10.12
-    env:
-      - MATRIX_EVAL=""
-  - osx_image: xcode8  # macOS 10.11
-    env:
-      - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+    - osx_image: xcode9.3  # macOS 10.13
+      env:
+        - MATRIX_EVAL=""
+    - osx_image: xcode8.3  # macOS 10.12
+      env:
+        - MATRIX_EVAL=""
+    - osx_image: xcode8  # macOS 10.11
+      env:
+        - MATRIX_EVAL=""
 
 before_install:
   - env
   - rvm install ruby --latest
   - gem install dropbox-deployment
-  - brew update
-  - brew bundle
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew bundle; fi
   - eval "${MATRIX_EVAL}"
 
 install:
   - python3 setup.py build
   - python3 setup.py install
   - python3 setup.py bdist_wheel
+
 script:
   - python3 -c 'import klayout.db as db; print(dir(db))'
   - python3 -c 'import klayout.rdb as rdb; print(dir(rdb))'
   - python3 -c 'import klayout.tl as tl; print(dir(tl))'
+
 after_success:
   - dropbox-deployment

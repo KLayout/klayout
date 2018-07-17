@@ -22,6 +22,7 @@
 
 
 #include "tlTimer.h"
+#include "tlUtils.h"
 #include "tlLog.h"
 #include "tlString.h"
 
@@ -30,7 +31,6 @@
 #endif
 
 #include <stdio.h>
-#include <time.h>
 
 #ifndef _MSC_VER // not available on MS VC++
 #  include <unistd.h>
@@ -45,7 +45,7 @@ namespace tl
 static int64_t ms_time ()
 {
   struct timespec spec;
-  clock_gettime (CLOCK_REALTIME, &spec);
+  current_utc_time (&spec);
 
   return int64_t (spec.tv_sec) * 1000 + int64_t (0.5 + spec.tv_nsec / 1.0e6);
 }
@@ -77,7 +77,7 @@ Timer::start ()
 #endif
 
   struct timespec spec;
-  clock_gettime (CLOCK_REALTIME, &spec);
+  current_utc_time (&spec);
 
   m_wall_ms += ms_time ();
 }

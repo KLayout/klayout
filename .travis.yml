@@ -14,7 +14,7 @@ matrix:
 
 before_install:
   - env
-  - rvm install 2.2.6
+  - rvm install ruby --latest
   - gem install dropbox-deployment
   - brew update
   - brew bundle

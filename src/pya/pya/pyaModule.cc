@@ -575,9 +575,9 @@ static std::string extract_python_name (const std::string &name)
 static void
 pya_object_deallocate (PyObject *self)
 {
-  PYAObjectBase *p = (PYAObjectBase *) self;
+  PYAObjectBase *p = PYAObjectBase::from_pyobject (self);
   p->~PYAObjectBase ();
-  Py_TYPE (self)->tp_free ((PyObject*)self);
+  Py_TYPE (self)->tp_free (self);
 }
 
 /**
@@ -602,9 +602,10 @@ static PyObject *
 pya_object_new (PyTypeObject *type, PyObject * /*args*/, PyObject * /*kwds*/)
 {
   //  create the object
-  PYAObjectBase *self = (PYAObjectBase *) type->tp_alloc (type, 0);
-  new (self) PYAObjectBase (PythonModule::cls_for_type (type));
-  return (PyObject *) self;
+  PyObject *self_pyobject = type->tp_alloc (type, 0);
+  PYAObjectBase *self = PYAObjectBase::from_pyobject_unsafe (self_pyobject);
+  new (self) PYAObjectBase (PythonModule::cls_for_type (type), self_pyobject);
+  return self_pyobject;
 }
 
 // --------------------------------------------------------------------------
@@ -619,7 +620,7 @@ method_name_from_id (int mid, PyObject *self)
   const gsi::ClassBase *cls_decl = 0;
 
   if (! PyType_Check (self)) {
-    PYAObjectBase *p = (PYAObjectBase *) self;
+    PYAObjectBase *p = PYAObjectBase::from_pyobject (self);
     cls_decl = p->cls_decl ();
   } else {
     cls_decl = PythonModule::cls_for_type ((PyTypeObject *) self);
@@ -652,7 +653,7 @@ property_name_from_id (int mid, PyObject *self)
   const gsi::ClassBase *cls_decl = 0;
 
   if (! PyType_Check (self)) {
-    PYAObjectBase *p = (PYAObjectBase *) self;
+    PYAObjectBase *p = PYAObjectBase::from_pyobject (self);
     cls_decl = p->cls_decl ();
   } else {
     cls_decl = PythonModule::cls_for_type ((PyTypeObject *) self);
@@ -684,7 +685,7 @@ get_return_value (PYAObjectBase *self, gsi::SerialArgs &retlist, const gsi::Meth
   if (meth->ret_type ().is_iter ()) {
 
     gsi::IterAdaptorAbstractBase *iter = (gsi::IterAdaptorAbstractBase *) retlist.read<gsi::IterAdaptorAbstractBase *> (heap);
-    ret = (PyObject *) PYAIteratorObject::create (self, iter, &meth->ret_type ());
+    ret = (PyObject *) PYAIteratorObject::create (self ? self->py_object () : 0, iter, &meth->ret_type ());
 
   } else {
 
@@ -702,7 +703,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
 
   PYAObjectBase *p = 0;
   if (! PyType_Check (self)) {
-    p = (PYAObjectBase *) self;
+    p = PYAObjectBase::from_pyobject (self);
     cls_decl = p->cls_decl ();
   } else {
     cls_decl = PythonModule::cls_for_type ((PyTypeObject *) self);
@@ -869,10 +870,11 @@ object_dup (PyObject *self, PyObject *args)
     throw tl::Exception (tl::to_string (tr ("No copy constructor provided for class '%s'")), cls_decl_self->name ());
   }
 
-  PYAObjectBase *new_object = (PYAObjectBase *) Py_TYPE (self)->tp_alloc (Py_TYPE (self), 0);
+  PyObject *new_object = Py_TYPE (self)->tp_alloc (Py_TYPE (self), 0);
   PythonRef obj (new_object);
-  new (new_object) PYAObjectBase (cls_decl_self);
-  new_object->set (cls_decl_self->clone (((PYAObjectBase *) self)->obj ()), true, false, false);
+  PYAObjectBase *new_pya_base = PYAObjectBase::from_pyobject_unsafe (new_object);
+  new (new_pya_base) PYAObjectBase (cls_decl_self, new_object);
+  new_pya_base->set (cls_decl_self->clone (PYAObjectBase::from_pyobject (self)->obj ()), true, false, false);
 
   return obj.release ();
 }
@@ -901,7 +903,7 @@ object_assign (PyObject *self, PyObject *args)
     throw tl::Exception (tl::to_string (tr ("No assignment provided for class '%s'")), cls_decl_self->name ());
   }
 
-  cls_decl_self->assign (((PYAObjectBase *) self)->obj (), ((PYAObjectBase *) src)->obj ());
+  cls_decl_self->assign ((PYAObjectBase::from_pyobject (self))->obj (), (PYAObjectBase::from_pyobject (src))->obj ());
 
   Py_INCREF (self);
   return self;
@@ -997,7 +999,7 @@ object_create (PyObject *self, PyObject *args)
     return NULL;
   }
 
-  ((PYAObjectBase *) self)->obj ();
+  (PYAObjectBase::from_pyobject (self))->obj ();
   Py_RETURN_NONE;
 }
 
@@ -1011,7 +1013,7 @@ object_release (PyObject *self, PyObject *args)
     return NULL;
   }
 
-  ((PYAObjectBase *) self)->release ();
+  (PYAObjectBase::from_pyobject (self))->release ();
   Py_RETURN_NONE;
 }
 
@@ -1025,7 +1027,7 @@ object_keep (PyObject *self, PyObject *args)
     return NULL;
   }
 
-  ((PYAObjectBase *) self)->keep ();
+  (PYAObjectBase::from_pyobject (self))->keep ();
   Py_RETURN_NONE;
 }
 
@@ -1039,7 +1041,7 @@ object_destroy (PyObject *self, PyObject *args)
     return NULL;
   }
 
-  ((PYAObjectBase *) self)->destroy ();
+  (PYAObjectBase::from_pyobject (self))->destroy ();
   Py_RETURN_NONE;
 }
 
@@ -1053,7 +1055,7 @@ object_destroyed (PyObject *self, PyObject *args)
     return NULL;
   }
 
-  return c2python (((PYAObjectBase *) self)->destroyed ());
+  return c2python (PYAObjectBase::from_pyobject (self)->destroyed ());
 }
 
 /**
@@ -1066,7 +1068,7 @@ object_is_const (PyObject *self, PyObject *args)
     return NULL;
   }
 
-  return c2python (((PYAObjectBase *) self)->const_ref ());
+  return c2python (PYAObjectBase::from_pyobject (self)->const_ref ());
 }
 
 static PyObject *
@@ -1112,7 +1114,7 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
       PYAObjectBase *p = 0;
       if (! PyType_Check (self)) {
         //  non-static method
-        p = (PYAObjectBase *) self;
+        p = PYAObjectBase::from_pyobject (self);
       }
 
       tl::Heap heap;
@@ -1666,7 +1668,7 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
 {
   PYA_TRY
 
-    PYAObjectBase *p = (PYAObjectBase *) self;
+    PYAObjectBase *p = PYAObjectBase::from_pyobject (self);
 
     //  delete any object which we may have already
     if (p->is_attached ()) {
@@ -1888,7 +1890,7 @@ property_getter_impl (int mid, PyObject *self)
 
   PYAObjectBase *p = 0;
   if (! PyType_Check (self)) {
-    p = (PYAObjectBase *) self;
+    p = PYAObjectBase::from_pyobject (self);
     cls_decl = p->cls_decl ();
   } else {
     cls_decl = PythonModule::cls_for_type ((PyTypeObject *) self);
@@ -1969,7 +1971,7 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
 
   PYAObjectBase *p = 0;
   if (! PyType_Check (self)) {
-    p = (PYAObjectBase *) self;
+    p = PYAObjectBase::from_pyobject (self);
     cls_decl = p->cls_decl ();
   } else {
     cls_decl = PythonModule::cls_for_type ((PyTypeObject *) self);
@@ -2156,7 +2158,6 @@ PythonModule::~PythonModule ()
   //  the Python objects were probably deleted by Python itself as it exited -
   //  don't try to delete them again.
   mp_module.release ();
-  mp_base_class.release ();
 
   while (!m_methods_heap.empty ()) {
     delete m_methods_heap.back ();
@@ -2339,36 +2340,6 @@ PythonModule::make_classes (const char *mod_name)
 
   PyObject_SetAttrString (module, "__doc__", PythonRef (c2python (m_mod_description)).get ());
 
-  //  Create a (built-in) base class for all objects exposed by this module
-
-  m_base_class_name = m_mod_name + ".__Base";
-
-  PyTypeObject *base_class = (PyTypeObject *) PyType_Type.tp_alloc (&PyType_Type, 0);
-  tl_assert (base_class != NULL);
-  mp_base_class = PythonRef ((PyObject *) base_class);
-
-  base_class->tp_base = &PyBaseObject_Type;
-  base_class->tp_name = m_base_class_name.c_str ();
-  base_class->tp_basicsize = sizeof (PYAObjectBase);
-  base_class->tp_init = &pya_object_init;
-  base_class->tp_new = &pya_object_new;
-  base_class->tp_dealloc = (destructor) &pya_object_deallocate;
-  base_class->tp_setattro = PyObject_GenericSetAttr;
-  base_class->tp_getattro = PyObject_GenericGetAttr;
-#if PY_MAJOR_VERSION < 3
-  base_class->tp_flags = Py_TPFLAGS_HEAPTYPE | Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_CHECKTYPES;
-#else
-  base_class->tp_flags = Py_TPFLAGS_HEAPTYPE | Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE;
-#endif
-
-  if (PyType_Ready (base_class) < 0) {
-    check_error ();
-    return;
-  }
-
-  PyModule_AddObject (module, "__Base", (PyObject *) base_class);
-
-
   //  Build a class for descriptors for static attributes
   PYAStaticAttributeDescriptorObject::make_class (module);
 
@@ -2434,15 +2405,17 @@ PythonModule::make_classes (const char *mod_name)
 
       m_classes.push_back (c.operator-> ());
 
-      PythonRef bases (PyTuple_New (1));
-      PyObject *base = mp_base_class.get ();
+      PythonRef bases;
       if (c->base () != 0) {
+        bases = PythonRef (PyTuple_New (1));
         PyTypeObject *pt = PythonClassClientData::py_type (*c->base ());
         tl_assert (pt != 0);
-        base = (PyObject *) pt;
+        PyObject *base = (PyObject *) pt;
+        Py_INCREF (base);
+        PyTuple_SetItem (bases.get (), 0, base);
+      } else {
+        bases = PythonRef (PyTuple_New (0));
       }
-      Py_INCREF (base);
-      PyTuple_SetItem (bases.get (), 0, base);
 
       PythonRef dict (PyDict_New ());
       PyDict_SetItemString (dict.get (), "__module__", PythonRef (c2python (m_mod_name)).get ());
@@ -2459,9 +2432,18 @@ PythonModule::make_classes (const char *mod_name)
         check_error ();
         tl_assert (false);
       }
+
+      //  Customize
+      type->tp_basicsize += sizeof (PYAObjectBase);
+      type->tp_init = &pya_object_init;
+      type->tp_new = &pya_object_new;
+      type->tp_dealloc = (destructor) &pya_object_deallocate;
+      type->tp_setattro = PyObject_GenericSetAttr;
+      type->tp_getattro = PyObject_GenericGetAttr;
+
       PythonClassClientData::initialize (*c, type);
 
-      tl_assert (cls_for_type (type) == c.operator-> ()); // @@@
+      tl_assert (cls_for_type (type) == c.operator-> ());
 
       PyList_Append (all_list.get (), PythonRef (c2python (c->name ())).get ());
       PyModule_AddObject (module, c->name ().c_str (), (PyObject *) type);

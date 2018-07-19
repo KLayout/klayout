@@ -2,7 +2,7 @@ matrix:
   include:
     - os: linux
       dist: trusty # Ubuntu 14.04
-      sudo: false
+      sudo: true
       env:
         - MATRIX_EVAL=""
     - os: osx
@@ -22,12 +22,12 @@ before_install:
   - env
   - rvm install ruby --latest
   - gem install dropbox-deployment
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install python3-setuptools; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew bundle; fi
   - eval "${MATRIX_EVAL}"
 
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip3 install --user setuptools; fi
   - python3 setup.py build
   - python3 setup.py install
   - python3 setup.py bdist_wheel

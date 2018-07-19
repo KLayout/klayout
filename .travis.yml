@@ -4,13 +4,47 @@ matrix:
       dist: trusty # Ubuntu 14.04
       sudo: false
       language: python
-      python:
-        - "3.3"
-        - "3.4"
-        - "3.5"
-        - "3.6"
-        - "3.6"
-        - "3.7" 
+      python: '2.6'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '2.7'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '3.3'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '3.4'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '3.5'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      python: '3.6'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      python: '3.7'
       env:
         - MATRIX_EVAL=""
     - os: osx
@@ -30,16 +64,13 @@ before_install:
   - env
   - rvm install ruby --latest
   - gem install dropbox-deployment
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install setuptools wheel; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew bundle; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew bundle; alias python='python3'; fi
   - eval "${MATRIX_EVAL}"
 
 install:
   - python setup.py build
   - python setup.py bdist_wheel
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python setup.py install; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo python setup.py install; fi
+  - python setup.py install
 
 script:
   - python -c 'import klayout.db as db; print(dir(db))'

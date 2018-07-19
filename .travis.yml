@@ -1,8 +1,17 @@
+language: python
+python:
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.6"
+  - "3.7" 
+
 matrix:
   include:
     - os: linux
       dist: trusty # Ubuntu 14.04
-      sudo: true
+      sudo: false
       env:
         - MATRIX_EVAL=""
     - os: osx
@@ -22,21 +31,21 @@ before_install:
   - env
   - rvm install ruby --latest
   - gem install dropbox-deployment
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install python3-setuptools python3-wheel; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install setuptools wheel; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew bundle; fi
   - eval "${MATRIX_EVAL}"
 
 install:
-  - python3 setup.py build
-  - python3 setup.py bdist_wheel
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python3 setup.py install; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo python3 setup.py install; fi
+  - python setup.py build
+  - python setup.py bdist_wheel
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python setup.py install; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo python setup.py install; fi
 
 script:
-  - python3 -c 'import klayout.db as db; print(dir(db))'
-  - python3 -c 'import klayout.rdb as rdb; print(dir(rdb))'
-  - python3 -c 'import klayout.tl as tl; print(dir(tl))'
+  - python -c 'import klayout.db as db; print(dir(db))'
+  - python -c 'import klayout.rdb as rdb; print(dir(rdb))'
+  - python -c 'import klayout.tl as tl; print(dir(tl))'
 
 after_success:
   - dropbox-deployment

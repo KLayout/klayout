@@ -79,8 +79,8 @@ class Config(object):
 
         self.ext_suffix = sysconfig.get_config_var("EXT_SUFFIX")
         if self.ext_suffix is None:
-            self.ext_suffix = ""
-            
+            self.ext_suffix = ".so"
+
         self.root = "klayout"
 
     def libname_of(self, mod):

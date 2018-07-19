@@ -1,17 +1,16 @@
-language: python
-python:
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "3.6"
-  - "3.7" 
-
 matrix:
   include:
     - os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
+      language: python
+      python:
+        - "3.3"
+        - "3.4"
+        - "3.5"
+        - "3.6"
+        - "3.6"
+        - "3.7" 
       env:
         - MATRIX_EVAL=""
     - os: osx

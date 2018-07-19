@@ -31,7 +31,7 @@ install:
   - python3 setup.py build
   - python3 setup.py bdist_wheel
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python3 setup.py install; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo python3 setup.py installs; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo python3 setup.py install; fi
 
 script:
   - python3 -c 'import klayout.db as db; print(dir(db))'

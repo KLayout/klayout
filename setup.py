@@ -58,7 +58,7 @@ from setuptools import setup, Extension, Distribution
 import glob
 import os
 import platform
-import sysconfig
+import distutils.sysconfig as sysconfig
 
 # ----------------------------------------------------------------------------------------
 
@@ -85,6 +85,7 @@ class Config(object):
         Returns the library name for a given module
         The library name is usually decorated (i.e. "tl" -> "tl.cpython-35m-x86_64-linux-gnu.so").
         """
+        print 
         return mod + self.ext_suffix
 
     def path_of(self, mod):

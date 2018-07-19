@@ -484,9 +484,13 @@ TEST(14)
 //  UTF-8 to wchar_t and local conversion
 TEST(15)
 {
-  //  NOTE: we don't know the local setting, but translation back and forth should work.
   std::string locale = setlocale (LC_ALL, NULL);
-  setlocale (LC_ALL, "en_US.UTF-8");
+  const char *lc = setlocale (LC_ALL, "en_US.UTF-8");
+  if (! lc || std::string (lc) != "en_US.UTF-8") {
+    //  use C.UTF-8 as fallback
+    setlocale (LC_ALL, "C.UTF-8");
+  }
+
   try {
     EXPECT_EQ (tl::to_string_from_local (tl::to_local ("Hällo\tWörld!").c_str ()), "Hällo\tWörld!");
     setlocale (LC_ALL, locale.c_str ());

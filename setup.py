@@ -127,7 +127,11 @@ class Config(object):
             # build path and the loader will fail.
             args = []
             args += ['-Wl,-soname,' + self.libname_of(mod)]
-            args += ['-Wl,-rpath,$ORIGIN']
+            if not '_dbpi' in mod:
+                loader_path = '$ORIGIN'
+            else:
+                loader_path = '$ORIGIN/..'
+            args += ['-Wl,-rpath,' + loader_path]
             return args
 
     def macros(self):

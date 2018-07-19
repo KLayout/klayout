@@ -187,7 +187,7 @@ struct get_boxed_value_func
         throw tl::Exception (tl::sprintf (tl::to_string (tr ("Passing an object to pointer or reference requires a boxed type (pya.%s)")), bt->name ()));
       }
 
-      PYAObjectBase *p = (PYAObjectBase *) arg;
+      PYAObjectBase *p = PYAObjectBase::from_pyobject (arg);
       gsi::Value *bo = reinterpret_cast<gsi::Value *> (p->obj ());
       if (bo) {
         *ret = bo->value ().template morph<R> ().native_ptr ();
@@ -389,7 +389,7 @@ struct writer<gsi::ObjectType>
 
       if (cls_decl->is_derived_from (atype.cls ())) {
 
-        PYAObjectBase *p = (PYAObjectBase *) (arg);
+        PYAObjectBase *p = PYAObjectBase::from_pyobject (arg);
 
         if (cls_decl->adapted_type_info ()) {
           //  resolved adapted type
@@ -400,7 +400,7 @@ struct writer<gsi::ObjectType>
 
       } else if (cls_decl->can_convert_to (atype.cls ())) {
 
-        PYAObjectBase *p = (PYAObjectBase *) (arg);
+        PYAObjectBase *p = PYAObjectBase::from_pyobject (arg);
 
         //  We can convert objects for cref and cptr, but ownership over these objects is not transferred.
         //  Hence we have to keep them on the heap.
@@ -421,7 +421,7 @@ struct writer<gsi::ObjectType>
 
       if (cls_decl->is_derived_from (atype.cls ())) {
 
-        PYAObjectBase *p = (PYAObjectBase *) (arg);
+        PYAObjectBase *p = PYAObjectBase::from_pyobject (arg);
 
         if (cls_decl->adapted_type_info ()) {
           //  resolved adapted type
@@ -432,7 +432,7 @@ struct writer<gsi::ObjectType>
 
       } else if (cls_decl->can_convert_to (atype.cls ())) {
 
-        PYAObjectBase *p = (PYAObjectBase *) (arg);
+        PYAObjectBase *p = PYAObjectBase::from_pyobject (arg);
         aa->write<void *> (atype.cls ()->create_obj_from (cls_decl, p->obj ()));
 
       } else {
@@ -471,7 +471,7 @@ push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PyObject *arg, tl
 template <class R>
 struct reader
 {
-  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PyObject * /*self*/, const gsi::ArgType &arg, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase * /*self*/, const gsi::ArgType &arg, tl::Heap *heap)
   {
     if (arg.is_ref ()) {
       *ret = c2python (rr->template read<R &> (*heap));
@@ -506,7 +506,7 @@ struct reader
 template <>
 struct reader<void *>
 {
-  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PyObject * /*self*/, const gsi::ArgType &arg, tl::Heap *heap)
+  void operator() (gsi::SerialArgs *rr, PythonRef *ret, PYAObjectBase * /*self*/, const gsi::ArgType &arg, tl::Heap *heap)
   {
     tl_assert (! arg.is_cref ());
     tl_assert (! arg.is_ref ());

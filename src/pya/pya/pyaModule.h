@@ -120,9 +120,7 @@ private:
   std::vector<PyGetSetDef *> m_getseters_heap;
 
   std::string m_mod_name, m_mod_description;
-  std::string m_base_class_name;
   PythonRef mp_module;
-  PythonRef mp_base_class;
   char *mp_mod_def;
 
   static std::map<const gsi::MethodBase *, std::string> m_python_doc;

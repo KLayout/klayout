@@ -352,7 +352,7 @@ template <class T> struct python2c_func<T &>
     tl_assert (cls_decl != 0);
     tl_assert (is_derived_from (cls_decl, typeid (T)));
 
-    PYAObjectBase *p = (PYAObjectBase *) (rval);
+    PYAObjectBase *p = PYAObjectBase::from_pyobject (rval);
     return *((T *)p->obj ());
   }
 };

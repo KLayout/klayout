@@ -129,8 +129,8 @@ Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
         PythonRef argv (PyTuple_New (arg4self + std::distance (meth->begin_arguments (), meth->end_arguments ())));
 
         //  Put self into first argument
-        PyTuple_SetItem (argv.get (), 0, mp_obj);
-        Py_INCREF (mp_obj);
+        PyTuple_SetItem (argv.get (), 0, mp_obj->py_object ());
+        Py_INCREF (mp_obj->py_object ());
 
         //  TODO: callbacks with default arguments?
         for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
@@ -169,8 +169,9 @@ Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 // --------------------------------------------------------------------------
 //  Implementation of PYAObjectBase
 
-PYAObjectBase::PYAObjectBase(const gsi::ClassBase *_cls_decl)
-  : m_listener (new pya::StatusChangedListener (this)),
+PYAObjectBase::PYAObjectBase(const gsi::ClassBase *_cls_decl, PyObject *py_object)
+  : mp_py_object (py_object),
+    m_listener (new pya::StatusChangedListener (this)),
     m_callee (new pya::Callee (this)),
     m_cls_decl (_cls_decl),
     m_obj (0),
@@ -179,6 +180,7 @@ PYAObjectBase::PYAObjectBase(const gsi::ClassBase *_cls_decl)
     m_destroyed (false),
     m_can_destroy (false)
 {
+  //  .. nothing yet ..
 }
 
 PYAObjectBase::~PYAObjectBase ()
@@ -223,7 +225,7 @@ PYAObjectBase::object_destroyed ()
 
     //  NOTE: this may delete "this"!
     if (!prev_owner) {
-      Py_DECREF (this);
+      Py_DECREF (py_object ());
     }
 
   }
@@ -246,7 +248,7 @@ PYAObjectBase::release ()
   if (!m_owned) {
     m_owned = true;
     //  NOTE: this may delete "this"! TODO: this should not happen. Can we assert that somehow?
-    Py_DECREF (this);
+    Py_DECREF (py_object ());
   }
 }
 
@@ -254,7 +256,7 @@ void
 PYAObjectBase::keep_internal ()
 {
   if (m_owned) {
-    Py_INCREF (this);
+    Py_INCREF (py_object ());
     m_owned = false;
   }
 }
@@ -328,7 +330,7 @@ PYAObjectBase::set (void *obj, bool owned, bool const_ref, bool can_destroy)
   }
 
   if (!m_owned) {
-    Py_INCREF (this);
+    Py_INCREF (py_object ());
   }
 }
 
@@ -353,7 +355,7 @@ PYAObjectBase::initialize_callbacks ()
 //  TODO: caching appears to create some leaks ...
 #if 1
 
-  PythonRef type_ref ((PyObject *) Py_TYPE (this), false /*borrowed*/);
+  PythonRef type_ref ((PyObject *) Py_TYPE (py_object ()), false /*borrowed*/);
 
   //  Locate the callback-enabled methods set by Python tpye object (pointer)
   //  NOTE: I'm not quite sure whether the type object pointer is a good key
@@ -391,7 +393,7 @@ PYAObjectBase::initialize_callbacks ()
           //  TOOD: That may happen too often, i.e. if the Python class does not reimplement the virtual
           //  method, but the C++ class defines a method hook that the reimplementation can call. 
           //  We don't want to produce a lot of overhead for the Qt classes here.
-          PythonRef py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (this), nstr);
+          PythonRef py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (py_object ()), nstr);
           if (! py_attr) {
 
             //  because PyObject_GetAttrString left an error
@@ -423,7 +425,7 @@ PYAObjectBase::initialize_callbacks ()
 
     PythonRef py_attr;
     const char *nstr = (*m)->primary_name ().c_str ();
-    py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (this), nstr);
+    py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (py_object ()), nstr);
 
     int id = m_callee->add_callback (CallbackFunction (py_attr, *m));
     (*m)->set_callback (m_obj, gsi::Callback (id, m_callee.get (), (*m)->argsize (), (*m)->retsize ()));
@@ -458,7 +460,7 @@ PYAObjectBase::initialize_callbacks ()
         //  TOOD: That may happen too often, i.e. if the Python class does not reimplement the virtual
         //  method, but the C++ class defines a method hook that the reimplementation can call. 
         //  We don't want to produce a lot of overhead for the Qt classes here.
-        PythonRef py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (this), nstr);
+        PythonRef py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (py_object ()), nstr);
         if (! py_attr) {
 
           //  because PyObject_GetAttrString left an error
@@ -471,7 +473,7 @@ PYAObjectBase::initialize_callbacks ()
           //  may create issues with callbacks during destruction (i.e. QWidget-destroyed signal)
           if (! PyCFunction_Check (py_attr.get ())) {
 
-            PyObject *py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (this), nstr);
+            PyObject *py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (py_object ()), nstr);
             tl_assert (py_attr != NULL);
             int id = m_callee.add_callback (CallbackFunction (py_attr, *m));
             (*m)->set_callback (m_obj, gsi::Callback (id, &m_callee, (*m)->argsize (), (*m)->retsize ()));
@@ -501,7 +503,7 @@ PYAObjectBase::clear_callbacks_cache ()
 void
 PYAObjectBase::detach_callbacks ()
 {
-  PythonRef type_ref ((PyObject *) Py_TYPE (this), false /*borrowed*/);
+  PythonRef type_ref ((PyObject *) Py_TYPE (py_object ()), false /*borrowed*/);
 
   callbacks_cache::iterator cb = s_callbacks_cache.find (type_ref);
   if (cb != s_callbacks_cache.end ()) {

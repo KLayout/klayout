@@ -29,6 +29,8 @@
 #include "pyaRefs.h"
 #include "pyaCommon.h"
 
+#include "tlAssert.h"
+
 #include <vector>
 #include <map>
 #include <memory>
@@ -50,22 +52,42 @@ class StatusChangedListener;
 /**
  *  @brief The Python object representing a GSI object
  *
- *  Note: the PYAObjectBase must be directly derived from PyObject so that
- *  a PyObject pointer can be cast to a PYAObjectBase pointer.
+ *  NOTE: this memory block is attached to the actual structure
+ *  and obtained by taking the last sizeof(PYAObjectBase) bytes.
+ *  It's basically a connector between GSI objects and the Python
+ *  objects.
  */
 class PYA_PUBLIC PYAObjectBase
-  : public PyObject
 {
 public:
   /**
    *  @brief Constructor - creates a new object for the given GSI class
    */
-  PYAObjectBase (const gsi::ClassBase *_cls_decl);
+  PYAObjectBase (const gsi::ClassBase *_cls_decl, PyObject *py_object);
 
   /**
    *  @brief Destructor
    */
   ~PYAObjectBase ();
+
+  /**
+   *  @brief Gets the PYAObjectBase pointer from a PyObject pointer
+   */
+  static PYAObjectBase *from_pyobject (PyObject *py_object)
+  {
+    PYAObjectBase *pya_object = (PYAObjectBase *)((char *) py_object + Py_TYPE (py_object)->tp_basicsize - sizeof (PYAObjectBase));
+    tl_assert (pya_object->py_object () == py_object);
+    return pya_object;
+  }
+
+  /**
+   *  @brief Gets the PYAObjectBase pointer from a PyObject pointer
+   *  This version doesn't check anything.
+   */
+  static PYAObjectBase *from_pyobject_unsafe (PyObject *py_object)
+  {
+    return (PYAObjectBase *)((char *) py_object + Py_TYPE (py_object)->tp_basicsize - sizeof (PYAObjectBase));
+  }
 
   /**
    *  @brief Indicates that a C++ object is present
@@ -143,6 +165,14 @@ public:
   }
 
   /**
+   *  @brief Gets the Python object for this bridge object
+   */
+  PyObject *py_object () const
+  {
+    return mp_py_object;
+  }
+
+  /**
    *  @brief Returns the C++ object reference
    */
   void *obj ();
@@ -189,6 +219,7 @@ private:
   void object_destroyed ();
   void keep_internal ();
 
+  PyObject *mp_py_object;
   std::auto_ptr<StatusChangedListener> m_listener;
   std::auto_ptr<Callee> m_callee;
   const gsi::ClassBase *m_cls_decl;

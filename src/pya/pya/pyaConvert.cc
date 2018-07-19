@@ -291,7 +291,7 @@ tl::Variant python2c_func<tl::Variant>::operator() (PyObject *rval)
     const gsi::ClassBase *cls = PythonModule::cls_for_type (Py_TYPE (rval));
     if (cls) {
 
-      PYAObjectBase *p = (PYAObjectBase *) rval;
+      PYAObjectBase *p = PYAObjectBase::from_pyobject (rval);
 
       //  employ the tl::Variant binding capabilities of the Expression binding to derive the 
       //  variant value.
@@ -359,9 +359,8 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ArgType &atype)
  *  object turns into a non-const one. This may be confusing but provides a certain level
  *  of "constness", at least until there is another non-const reference for that object.
  */
-void correct_constness (PyObject *obj, bool const_required)
+void correct_constness (PYAObjectBase *p, bool const_required)
 {
-  PYAObjectBase *p = (PYAObjectBase *) obj;
   if (p->const_ref () && ! const_required) {
     //  promote to non-const object
     p->set_const_ref (false);
@@ -421,20 +420,21 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
     tl_assert (type != NULL);
 
     //  create a instance and copy the value
-    PYAObjectBase *new_object = (PYAObjectBase *) type->tp_alloc (type, 0);
-    new (new_object) PYAObjectBase (clsact);
+    PyObject *new_pyobject = type->tp_alloc (type, 0);
+    PYAObjectBase *new_object = PYAObjectBase::from_pyobject_unsafe (new_pyobject);
+    new (new_object) PYAObjectBase (clsact, new_pyobject);
     clsact->assign (new_object->obj (), obj);
-    return new_object;
+    return new_pyobject;
 
   } else if (pya_object) {
 
     //  we have a that is located in C++ space but is supposed to get attached
     //  a Python object. If it already has, we simply return a reference to this
-    Py_INCREF (pya_object);
+    Py_INCREF (pya_object->py_object ());
 
     correct_constness (pya_object, is_const);
 
-    return pya_object;
+    return pya_object->py_object ();
 
   } else {
 
@@ -442,10 +442,11 @@ object_to_python (void *obj, PYAObjectBase *self, const gsi::ClassBase *cls, boo
     tl_assert (type != NULL);
 
     //  create a instance and copy the value
-    PYAObjectBase *new_object = (PYAObjectBase *) type->tp_alloc (type, 0);
-    new (new_object) PYAObjectBase (clsact);
+    PyObject *new_pyobject = type->tp_alloc (type, 0);
+    PYAObjectBase *new_object = PYAObjectBase::from_pyobject_unsafe (new_pyobject);
+    new (new_object) PYAObjectBase (clsact, new_pyobject);
     new_object->set (obj, pass_obj, is_const, can_destroy);
-    return new_object;
+    return new_pyobject;
 
   }
 }

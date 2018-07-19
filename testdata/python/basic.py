@@ -2718,6 +2718,7 @@ class BasicTest(unittest.TestCase):
     go = None
     self.assertEqual(pya.GObject.g_inst_count(), gc)
 
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestSuite()

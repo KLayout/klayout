@@ -38,12 +38,14 @@ matrix:
     - os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
+      language: python
       python: '3.6'
       env:
         - MATRIX_EVAL=""
     - os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
+      language: python
       python: '3.7'
       env:
         - MATRIX_EVAL=""

@@ -59,7 +59,7 @@ before_install:
   - env
   - rvm install ruby --latest
   - gem install dropbox-deployment
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew bundle; alias python='python3'; else pip install sysconfig; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew bundle; alias python='python3'; fi
   - eval "${MATRIX_EVAL}"
 
 install:

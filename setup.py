@@ -78,6 +78,9 @@ class Config(object):
         self.build_platlib = build_cmd.build_platlib
 
         self.ext_suffix = sysconfig.get_config_var("EXT_SUFFIX")
+        if self.ext_suffix is None:
+            self.ext_suffix = ""
+            
         self.root = "klayout"
 
     def libname_of(self, mod):
@@ -85,7 +88,6 @@ class Config(object):
         Returns the library name for a given module
         The library name is usually decorated (i.e. "tl" -> "tl.cpython-35m-x86_64-linux-gnu.so").
         """
-        print 
         return mod + self.ext_suffix
 
     def path_of(self, mod):

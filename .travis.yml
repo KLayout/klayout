@@ -27,7 +27,7 @@ before_install:
   - eval "${MATRIX_EVAL}"
 
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install --user setuptools; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip3 install --user setuptools; fi
   - python3 setup.py build
   - python3 setup.py install
   - python3 setup.py bdist_wheel

@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #if defined(_WIN32)
 #  include <windows.h>
@@ -64,13 +65,13 @@ static int default_verbosity ()
 
 static int m_verbosity_level = default_verbosity ();
 
-void 
+void
 verbosity (int level)
 {
   m_verbosity_level = level;
 }
 
-int 
+int
 verbosity ()
 {
   return m_verbosity_level;
@@ -79,7 +80,7 @@ verbosity ()
 // ------------------------------------------------
 //  Channel implementation
 
-Channel::Channel () 
+Channel::Channel ()
   : m_no_endl (false), m_active (false)
 {
   //  .. nothing else ..
@@ -90,7 +91,7 @@ Channel::~Channel ()
   // .. nothing yet ..
 }
 
-ChannelProxy 
+ChannelProxy
 Channel::issue_proxy ()
 {
   m_no_endl = false;
@@ -102,7 +103,7 @@ Channel::issue_proxy ()
   return ChannelProxy (this);
 }
 
-void 
+void
 Channel::release_proxy ()
 {
   if (! m_no_endl) {
@@ -130,7 +131,7 @@ LogTee::LogTee (Channel *first, bool owned)
   add (first, owned);
 }
 
-void 
+void
 LogTee::add (Channel *other, bool owned)
 {
   m_lock.lock ();
@@ -161,7 +162,7 @@ LogTee::clear ()
   m_lock.unlock ();
 }
 
-void 
+void
 LogTee::puts (const char *s)
 {
   try {
@@ -173,7 +174,7 @@ LogTee::puts (const char *s)
   }
 }
 
-void 
+void
 LogTee::endl ()
 {
   try {
@@ -185,7 +186,7 @@ LogTee::endl ()
   }
 }
 
-void 
+void
 LogTee::end ()
 {
   try {
@@ -197,7 +198,7 @@ LogTee::end ()
   }
 }
 
-void 
+void
 LogTee::begin ()
 {
   try {
@@ -292,7 +293,7 @@ InfoChannel::~InfoChannel ()
   //  .. nothing yet ..
 }
 
-void 
+void
 InfoChannel::puts (const char *s)
 {
   if (verbosity () >= m_verbosity) {
@@ -300,7 +301,7 @@ InfoChannel::puts (const char *s)
   }
 }
 
-void 
+void
 InfoChannel::endl ()
 {
   if (verbosity () >= m_verbosity) {
@@ -308,7 +309,7 @@ InfoChannel::endl ()
   }
 }
 
-void 
+void
 InfoChannel::end ()
 {
   if (verbosity () >= m_verbosity) {
@@ -319,7 +320,7 @@ InfoChannel::end ()
   }
 }
 
-void 
+void
 InfoChannel::begin ()
 {
   if (verbosity () >= m_verbosity) {
@@ -362,19 +363,19 @@ WarningChannel::~WarningChannel ()
   //  .. nothing yet ..
 }
 
-void 
+void
 WarningChannel::puts (const char *s)
 {
   fputs (s, stdout);
 }
 
-void 
+void
 WarningChannel::endl ()
 {
   fputs ("\n", stdout);
 }
 
-void 
+void
 WarningChannel::end ()
 {
   if (m_colorized) {
@@ -383,7 +384,7 @@ WarningChannel::end ()
   fflush (stdout);
 }
 
-void 
+void
 WarningChannel::begin ()
 {
   if (m_colorized) {
@@ -426,19 +427,19 @@ ErrorChannel::~ErrorChannel ()
   //  .. nothing yet ..
 }
 
-void 
+void
 ErrorChannel::puts (const char *s)
 {
   fputs (s, stderr);
 }
 
-void 
+void
 ErrorChannel::endl ()
 {
   fputs ("\n", stderr);
 }
 
-void 
+void
 ErrorChannel::end ()
 {
   if (m_colorized) {
@@ -447,7 +448,7 @@ ErrorChannel::end ()
   fflush (stderr);
 }
 
-void 
+void
 ErrorChannel::begin ()
 {
   if (m_colorized) {

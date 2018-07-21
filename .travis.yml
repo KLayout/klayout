@@ -1,19 +1,77 @@
 matrix:
   include:
-  - os: osx
-    osx_image: xcode9.3beta
-    env:
-    - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '2.6'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '2.7'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '3.3'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '3.4'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '3.5'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '3.6'
+      env:
+        - MATRIX_EVAL=""
+    - os: osx
+      osx_image: xcode9.3  # macOS 10.13
+      env:
+        - MATRIX_EVAL=""
+    - os: osx
+      osx_image: xcode8.3  # macOS 10.12
+      env:
+        - MATRIX_EVAL=""
+    - os: osx
+      osx_image: xcode8  # macOS 10.11
+      env:
+        - MATRIX_EVAL=""
 
 before_install:
-  - eval "${MATRIX_EVAL}"
-  - brew update
-  - brew bundle
   - env
+  - rvm install ruby --latest
+  - gem install dropbox-deployment
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew bundle; shopt -s expand_aliases; alias python='python3'; fi
+  - eval "${MATRIX_EVAL}"
+  - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
 
 install:
-  - python3 setup.py install
+  - python setup.py build
+  - python setup.py bdist_wheel
+  - python setup.py install
+
 script:
-  - python3 -c 'import klayout.db as db; print(dir(db))'
-  - python3 -c 'import klayout.rdb as rdb; print(dir(rdb))'
-  - python3 -c 'import klayout.tl as tl; print(dir(tl))'
+  - python -c 'import klayout.db as db; print(dir(db))'
+  - python -c 'import klayout.rdb as rdb; print(dir(rdb))'
+  - python -c 'import klayout.tl as tl; print(dir(tl))'
+
+after_success:
+  - dropbox-deployment

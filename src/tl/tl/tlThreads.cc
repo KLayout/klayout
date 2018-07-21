@@ -23,12 +23,12 @@
 #if !defined(HAVE_QT)
 
 #include "tlThreads.h"
+#include "tlUtils.h"
 #include "tlLog.h"
 #include "tlInternational.h"
 
 #include <map>
 #include <pthread.h>
-#include <time.h>
 #include <errno.h>
 #include <unistd.h>
 #if defined(_WIN32)
@@ -82,7 +82,7 @@ public:
     if (time < std::numeric_limits<unsigned long>::max ()) {
 
       struct timespec end_time;
-      clock_gettime (CLOCK_REALTIME, &end_time);
+      current_utc_time (&end_time);
 
       end_time.tv_sec += (time / 1000);
       end_time.tv_nsec += (time % 1000) * 1000000;
@@ -270,7 +270,7 @@ bool Thread::wait (unsigned long time)
   if (time < std::numeric_limits<unsigned long>::max ()) {
 
     struct timespec end_time;
-    clock_gettime (CLOCK_REALTIME, &end_time);
+    current_utc_time (&end_time);
 
     end_time.tv_sec += (time / 1000);
     end_time.tv_nsec += (time % 1000) * 1000000;
@@ -285,7 +285,7 @@ bool Thread::wait (unsigned long time)
     while (isRunning ()) {
 
       struct timespec current_time;
-      clock_gettime (CLOCK_REALTIME, &current_time);
+      current_utc_time (&current_time);
       if (end_time.tv_sec < current_time.tv_sec || (end_time.tv_sec == current_time.tv_sec && end_time.tv_nsec < current_time.tv_nsec)) {
         return false;
       }

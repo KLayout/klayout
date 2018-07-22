@@ -2386,3 +2386,31 @@ TEST(134)
 
   EXPECT_EQ (out.size (), size_t (0));
 }
+
+TEST(135)
+{
+  db::EdgeProcessor ep;
+
+  db::Point pts[] = {
+    db::Point (0, 0),
+    db::Point (19, 19),
+    db::Point (19, 18),
+    db::Point (43, 32),
+    db::Point (37, 27)
+  };
+
+  db::Polygon p;
+  p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+  p.size (-2, -2, 2);
+
+  ep.insert (p);
+
+  //  merge the resulting polygons to get the true outer contour
+  std::vector<db::Polygon> out;
+  db::PolygonContainer pc (out);
+  db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
+  db::SimpleMerge op (1 /*wc>0*/);
+  ep.process (pg2, op);
+
+  EXPECT_EQ (out.size (), size_t (0));
+}

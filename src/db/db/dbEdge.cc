@@ -23,6 +23,33 @@
 
 #include "dbEdge.h"
 
+namespace db
+{
+
+/**
+ *  @brief Computes the gcd of two numbers
+ */
+template <class C>
+inline C gcd (C a, C b)
+{
+  while (b != 0) {
+    a %= b;
+    std::swap (a, b);
+  }
+  return a;
+}
+
+db::Coord div_exact (db::Coord a, db::coord_traits<db::Coord>::area_type b, db::coord_traits<db::Coord>::area_type d)
+{
+  if (a < 0) {
+    return -db::Coord ((__int128 (-a) * __int128 (b) + __int128 (d / 2)) / __int128 (d));
+  } else {
+    return db::Coord ((__int128 (a) * __int128 (b) + __int128 ((d - 1) / 2)) / __int128 (d));
+  }
+}
+
+}
+
 namespace tl
 {
 

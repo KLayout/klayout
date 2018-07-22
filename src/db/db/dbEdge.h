@@ -38,6 +38,25 @@
 
 namespace db {
 
+/**
+ *  @brief A helper function for dividing integers with exact rounding
+ *  This function computes (a*b/d) where rounding is exact in the sense of:
+ *    a*b/d == N+0.5 => div_exact(a*b/d) = N
+ *  b and d needs to be positive.
+ *  a can be positive or negative.
+ *  The implementation uses the gcd to reduce the ratios. This way we can
+ *  represent the numbers with the area type.
+ */
+db::Coord DB_PUBLIC div_exact (db::Coord a, db::coord_traits<db::Coord>::area_type b, db::coord_traits<db::Coord>::area_type d);
+
+/**
+ *  @brief An overload of div_exact for double types
+ */
+inline db::DCoord div_exact (db::DCoord a, db::coord_traits<db::DCoord>::area_type b, db::coord_traits<db::DCoord>::area_type d)
+{
+  return db::coord_traits<db::DCoord>::rounded (double (a) * double (b) / double (d));
+}
+
 template <class C> class generic_repository;
 class ArrayRepository;
 
@@ -794,10 +813,15 @@ public:
 
       } else if (res) {
 
-        double f = fabs (double (vxa)) / (fabs (double (vxa)) + fabs (double (vxb)));
+        if (vxa < 0) {
+          vxa = -vxa;
+        }
+        if (vxb < 0) {
+          vxb = -vxb;
+        }
 
-        coord_type x = m_p1.x () + coord_traits::rounded (dx () * f);
-        coord_type y = m_p1.y () + coord_traits::rounded (dy () * f);
+        coord_type x = m_p1.x () + div_exact (dx (), vxa, vxa + vxb);
+        coord_type y = m_p1.y () + div_exact (dy (), vxa, vxa + vxb);
 
         return std::make_pair (true, db::point<C> (x, y));
 
@@ -1073,10 +1097,15 @@ public:
 
     if (res) {
 
-      double f = fabs (double (vxa)) / (fabs (double (vxa)) + fabs (double (vxb)));
+      if (vxa < 0) {
+        vxa = -vxa;
+      }
+      if (vxb < 0) {
+        vxb = -vxb;
+      }
 
-      coord_type x = e.p1 ().x () + coord_traits::rounded (e.dx () * f);
-      coord_type y = e.p1 ().y () + coord_traits::rounded (e.dy () * f);
+      coord_type x = e.p1 ().x () + div_exact (e.dx (), vxa, vxa + vxb);
+      coord_type y = e.p1 ().y () + div_exact (e.dy (), vxa, vxa + vxb);
 
       return std::make_pair (true, db::point<C> (x, y));
 

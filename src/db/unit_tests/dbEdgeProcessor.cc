@@ -2387,7 +2387,7 @@ TEST(134)
   EXPECT_EQ (out.size (), size_t (0));
 }
 
-TEST(135)
+void run_test135a (tl::TestBase *_this, const db::Trans &t)
 {
   db::EdgeProcessor ep;
 
@@ -2401,11 +2401,12 @@ TEST(135)
 
   db::Polygon p;
   p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+  p.transform (t);
   p.size (-2, -2, 2);
 
   ep.insert (p);
 
-  //  merge the resulting polygons to get the true outer contour
+  //  this is just supposed to work and not fail with internal error "m_open.empty()"
   std::vector<db::Polygon> out;
   db::PolygonContainer pc (out);
   db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
@@ -2413,4 +2414,58 @@ TEST(135)
   ep.process (pg2, op);
 
   EXPECT_EQ (out.size (), size_t (0));
+}
+
+TEST(135a)
+{
+  run_test135a (_this, db::Trans (db::Trans::r0));
+  run_test135a (_this, db::Trans (db::Trans::r90));
+  run_test135a (_this, db::Trans (db::Trans::r180));
+  run_test135a (_this, db::Trans (db::Trans::r270));
+  run_test135a (_this, db::Trans (db::Trans::m0));
+  run_test135a (_this, db::Trans (db::Trans::m45));
+  run_test135a (_this, db::Trans (db::Trans::m90));
+  run_test135a (_this, db::Trans (db::Trans::m135));
+}
+
+std::string run_test135b (tl::TestBase *_this, const db::Trans &t)
+{
+  db::EdgeProcessor ep;
+
+  db::Point pts[] = {
+    db::Point (215, 0),
+    db::Point (145, 11),
+    db::Point (37, 31),
+    db::Point (36, 31),
+    db::Point (0, 43)
+  };
+
+  db::Polygon p;
+  p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+  p.transform (t);
+  p.size (-2, -2, 2);
+
+  ep.insert (p);
+
+  //  this is just supposed to work and not fail with internal error "m_open.empty()"
+  std::vector<db::Polygon> out;
+  db::PolygonContainer pc (out);
+  db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
+  db::SimpleMerge op (1 /*wc>0*/);
+  ep.process (pg2, op);
+
+  EXPECT_EQ (out.size (), size_t (1));
+  return out.empty () ? std::string () : out.front ().to_string ();
+}
+
+TEST(135b)
+{
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::r0)), "(36,33;32,34;37,33)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::r90)), "(-35,32;-26,77;-33,37;-33,36)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::r180)), "(-33,-35;-78,-26;-37,-33;-36,-33)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::r270)), "(25,-78;33,-37;33,-36;34,-33)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::m0)), "(32,-35;36,-33;37,-33;77,-26)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::m45)), "(34,32;33,36;33,37)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::m90)), "(-78,25;-33,34;-36,33;-37,33)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::m135)), "(-26,-78;-35,-33;-33,-36;-33,-37)");
 }

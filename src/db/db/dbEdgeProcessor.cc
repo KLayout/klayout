@@ -122,6 +122,26 @@ private:
 };
 
 inline bool
+is_point_on_exact (const db::Edge &e, const db::Point &pt)
+{
+  if (pt.x () < db::edge_xmin (e) || pt.x () > db::edge_xmax (e) ||
+      pt.y () < db::edge_ymin (e) || pt.y () > db::edge_ymax (e)) {
+
+    return false;
+
+  } else if (e.dy () == 0 || e.dx () == 0) {
+
+    //  shortcut for orthogonal edges
+    return true;
+
+  } else {
+
+    return db::vprod_sign (pt - e.p1 (), e.p2 () - e.p1 ()) == 0;
+
+  }
+}
+
+inline bool
 is_point_on_fuzzy (const db::Edge &e, const db::Point &pt)
 {
   //  exclude the start and end point
@@ -141,9 +161,12 @@ is_point_on_fuzzy (const db::Edge &e, const db::Point &pt)
 
   } else {
 
+    bool with_equal = false;
+
     db::Vector offset;
     if ((e.dx () < 0 && e.dy () > 0) || (e.dx () > 0 && e.dy () < 0)) {
       offset = db::Vector (1, 1);
+      with_equal = true;
     } else {
       offset = db::Vector (-1, 1);
     }
@@ -152,30 +175,16 @@ is_point_on_fuzzy (const db::Edge &e, const db::Point &pt)
 
     typedef db::coord_traits<db::Point::coord_type>::area_type area_type;
     area_type a1 = 2 * db::vprod (pp1, e.d ());
-    if (a1 < 0) { a1 = -a1; }
     area_type a2 = db::vprod (offset, e.d ());
+
+    if ((a1 < 0) == (a2 < 0)) {
+      with_equal = false;
+    }
+
+    if (a1 < 0) { a1 = -a1; }
     if (a2 < 0) { a2 = -a2; }
-    return a1 < a2;
 
-  }
-}
-
-inline bool
-is_point_on_exact (const db::Edge &e, const db::Point &pt)
-{
-  if (pt.x () < db::edge_xmin (e) || pt.x () > db::edge_xmax (e) ||
-      pt.y () < db::edge_ymin (e) || pt.y () > db::edge_ymax (e)) {
-
-    return false;
-
-  } else if (e.dy () == 0 || e.dx () == 0) {
-
-    //  shortcut for orthogonal edges
-    return true;
-
-  } else {
-
-    return db::vprod_sign (pt - e.p1 (), e.p2 () - e.p1 ()) == 0;
+    return a1 < a2 || (a1 == a2 && with_equal);
 
   }
 }
@@ -804,7 +813,7 @@ MergeOp::edge (bool north, bool enter, property_type p)
   bool inside_after = (*wcv != 0);
   m_zeroes += (!inside_after) - (!inside_before);
 #ifdef DEBUG_MERGEOP
-  printf ("north=%d, enter=%d, prop=%d -> %d\n", north, enter, p, m_zeroes);
+  printf ("north=%d, enter=%d, prop=%d -> %d\n", north, enter, int (p), int (m_zeroes));
 #endif
   tl_assert (long (m_zeroes) >= 0);
 
@@ -887,7 +896,7 @@ BooleanOp::edge_impl (bool north, bool enter, property_type p, const InsideFunc 
   bool inside_after = ((p % 2) == 0 ? inside_a (*wcv) : inside_b (*wcv));
   m_zeroes += (!inside_after) - (!inside_before);
 #ifdef DEBUG_BOOLEAN
-  printf ("north=%d, enter=%d, prop=%d -> %d\n", north, enter, p, m_zeroes);
+  printf ("north=%d, enter=%d, prop=%d -> %d\n", north, enter, int (p), int (m_zeroes));
 #endif
   tl_assert (long (m_zeroes) >= 0);
 
@@ -1793,7 +1802,7 @@ EdgeProcessor::process (db::EdgeSink &es, EdgeEvaluatorBase &op)
         size_t skip = c->data % skip_unit;
         size_t skip_res = c->data / skip_unit;
 #ifdef DEBUG_EDGE_PROCESSOR
-        printf ("X %ld->%d,%d\n", long(c->data), skip, skip_res);
+        printf ("X %ld->%d,%d\n", long (c->data), int (skip), int (skip_res));
 #endif
 
         if (skip != 0 && (c + skip >= future || (c + skip)->data != 0)) {

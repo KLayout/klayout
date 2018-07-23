@@ -565,10 +565,10 @@ TEST(15)
   EXPECT_EQ (db::div_exact (area_type (-5), area_type (22) * f, area_type (176) * f), -1);
   EXPECT_EQ (db::div_exact (area_type (-8), area_type (22) * f, area_type (176) * f), -1);
 
-  EXPECT_EQ (db::div_exact (area_type (4) * 1000000000, area_type (22) * f, area_type (176) * f), 500000000);
-  EXPECT_EQ (db::div_exact (area_type (5) * 1000000000, area_type (22) * f, area_type (176) * f), 625000000);
-  EXPECT_EQ (db::div_exact (area_type (-4) * 1000000000, area_type (22) * f, area_type (176) * f), -500000000);
-  EXPECT_EQ (db::div_exact (area_type (-5) * 1000000000, area_type (22) * f, area_type (176) * f), -625000000);
+  EXPECT_EQ (db::div_exact (area_type (4) * 100000000, area_type (22) * f, area_type (176) * f), 50000000);
+  EXPECT_EQ (db::div_exact (area_type (5) * 100000000, area_type (22) * f, area_type (176) * f), 62500000);
+  EXPECT_EQ (db::div_exact (area_type (-4) * 100000000, area_type (22) * f, area_type (176) * f), -50000000);
+  EXPECT_EQ (db::div_exact (area_type (-5) * 100000000, area_type (22) * f, area_type (176) * f), -62500000);
 
   EXPECT_EQ (db::div_exact (1000000004, area_type (22) * f, area_type (176) * f), 125000000);
   EXPECT_EQ (db::div_exact (1000000005, area_type (22) * f, area_type (176) * f), 125000001);

@@ -2260,7 +2260,7 @@ TEST(100)
 }
 
 //  #74 (GitHub)
-TEST(101)
+std::string run_test101 (tl::TestBase *_this, const db::Trans &t)
 {
   db::EdgeProcessor ep;
 
@@ -2273,6 +2273,7 @@ TEST(101)
     };
     db::Polygon p;
     p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    p.transform (t);
     ep.insert (p, 0);
   }
 
@@ -2285,6 +2286,7 @@ TEST(101)
     };
     db::Polygon p;
     p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    p.transform (t);
     ep.insert (p, 1);
   }
 
@@ -2297,6 +2299,7 @@ TEST(101)
     };
     db::Polygon p;
     p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    p.transform (t);
     ep.insert (p, 1);
   }
 
@@ -2308,7 +2311,16 @@ TEST(101)
   ep.process (pg, op);
 
   EXPECT_EQ (out.size (), size_t (1));
-  EXPECT_EQ (out[0].to_string (), "(0,0;0,9;1,10;10,10;10,0)");
+
+  return out.empty () ? std::string () : out.front ().to_string ();
+}
+
+TEST(101)
+{
+  EXPECT_EQ (run_test101 (_this, db::Trans (db::Trans::r0)), "(0,0;0,9;1,10;10,10;10,0)");
+  EXPECT_EQ (run_test101 (_this, db::Trans (db::Trans::r90)), "(-9,0;-10,1;-10,10;0,10;0,0)");
+  EXPECT_EQ (run_test101 (_this, db::Trans (db::Trans::r180)), "(-10,-10;-10,0;0,0;0,-9;-1,-10)");
+  EXPECT_EQ (run_test101 (_this, db::Trans (db::Trans::r270)), "(0,-10;0,0;9,0;10,-1;10,-10)");
 }
 
 TEST(102)

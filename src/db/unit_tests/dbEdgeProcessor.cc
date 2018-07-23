@@ -1331,7 +1331,7 @@ TEST(23)
 
   EXPECT_EQ (out.size (), size_t (1));
   std::sort (out.begin (), out.end ());
-  EXPECT_EQ (out[0].to_string (), "(0,0;0,1;1,0)");
+  EXPECT_EQ (out[0].to_string (), "(0,0;0,1;1,1)");
 }
 
 TEST(24)
@@ -1397,7 +1397,7 @@ TEST(24)
 
     EXPECT_EQ (out.size (), size_t (1));
     std::sort (out.begin (), out.end ());
-    EXPECT_EQ (out[0].to_string (), "(0,-9;0,0;-2,1;-2,3;0,1;0,10;1,10;1,1;3,0;3,-2;1,0;1,-9/1,0;1,1;0,1)");
+    EXPECT_EQ (out[0].to_string (), "(0,-9;0,0;-2,1;-2,3;0,1;0,10;1,10;1,1;0,0;3,0;3,-2;1,0;1,-9)");
   }
 
   {
@@ -1408,9 +1408,9 @@ TEST(24)
 
     EXPECT_EQ (out.size (), size_t (3));
     std::sort (out.begin (), out.end ());
-    EXPECT_EQ (out[0].to_string (), "(0,-9;0,0;-2,1;-2,3;1,0;1,-9)");
-    EXPECT_EQ (out[1].to_string (), "(3,-2;1,0;1,1;3,0)");
-    EXPECT_EQ (out[2].to_string (), "(0,1;0,10;1,10;1,1)");
+    EXPECT_EQ (out[0].to_string (), "(0,-9;0,0;1,0;1,-9)");
+    EXPECT_EQ (out[1].to_string (), "(3,-2;1,0;3,0)");
+    EXPECT_EQ (out[2].to_string (), "(0,0;-2,1;-2,3;0,1;0,10;1,10;1,1)");
   }
 }
 

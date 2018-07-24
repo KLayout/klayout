@@ -22,6 +22,7 @@
 
 
 #include "dbEdge.h"
+#include "tlLongInt.h"
 
 namespace db
 {
@@ -39,12 +40,19 @@ inline C gcd (C a, C b)
   return a;
 }
 
+#if defined(__SIZEOF_INT128__)
+typedef __int128 a2_type;
+#else
+//  fallback to long_int in case the __int128 isn't defined
+typedef tl::long_int<4, uint32_t, uint64_t> a2_type;
+#endif
+
 db::Coord div_exact (db::Coord a, db::coord_traits<db::Coord>::area_type b, db::coord_traits<db::Coord>::area_type d)
 {
   if (a < 0) {
-    return -db::Coord ((__int128 (-a) * __int128 (b) + __int128 (d / 2)) / __int128 (d));
+    return -db::Coord ((a2_type (-a) * a2_type (b) + a2_type (d / 2)) / a2_type (d));
   } else {
-    return db::Coord ((__int128 (a) * __int128 (b) + __int128 ((d - 1) / 2)) / __int128 (d));
+    return db::Coord ((a2_type (a) * a2_type (b) + a2_type ((d - 1) / 2)) / a2_type (d));
   }
 }
 

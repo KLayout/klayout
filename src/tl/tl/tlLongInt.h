@@ -93,14 +93,19 @@ public:
   template <class T>
   operator T () const
   {
-    T t = 0;
     unsigned int tbits = sizeof (T) * 8;
+    T t = 0;
 
-    for (int i = N; i > 0 && tbits > 0; ) {
-      --i;
-      t <<= bits;
-      t |= b[i];
-      tbits -= bits;
+    if (tbits <= bits) {
+      t = T (b[0]);
+    } else {
+      unsigned int i = sizeof (T) / sizeof (B);
+      for ( ; i > 0 && tbits > 0; ) {
+        --i;
+        t <<= bits;
+        t |= b[i];
+        tbits -= bits;
+      }
     }
 
     return t;
@@ -734,9 +739,15 @@ public:
   template <class T>
   long_int (T t)
   {
+    unsigned int tbits = sizeof (T) * 8;
+
     for (unsigned int i = 0; i < N; ++i) {
       long_uint<N, B, BI>::b[i] = B (t);
-      t >>= long_uint<N, B, BI>::bits;
+      if (tbits <= long_uint<N, B, BI>::bits) {
+        t = (t < 0 ? ~B (0) : 0);
+      } else {
+        t >>= long_uint<N, B, BI>::bits;
+      }
     }
   }
 
@@ -748,14 +759,19 @@ public:
   template <class T>
   operator T () const
   {
-    T t = is_neg () ? -1 : 0;
     unsigned int tbits = sizeof (T) * 8;
+    T t = 0;
 
-    for (int i = N; i > 0 && tbits > 0; ) {
-      --i;
-      t <<= long_uint<N, B, BI>::bits;
-      t |= long_uint<N, B, BI>::b[i];
-      tbits -= long_uint<N, B, BI>::bits;
+    if (tbits <= long_uint<N, B, BI>::bits) {
+      t = T (long_uint<N, B, BI>::b[0]);
+    } else {
+      unsigned int i = sizeof (T) / sizeof (B);
+      for ( ; i > 0 && tbits > 0; ) {
+        --i;
+        t <<= long_uint<N, B, BI>::bits;
+        t |= long_uint<N, B, BI>::b[i];
+        tbits -= long_uint<N, B, BI>::bits;
+      }
     }
 
     return t;

@@ -1046,10 +1046,10 @@ public:
     } else if (is_neg () && d.is_neg ()) {
       std::pair<long_uint<N, B, BI>, long_uint<N, B, BI> > res = (-*this).long_uint<N, B, BI>::divmod (-d);
       //  The definition of the modulo sign is consistent with int arithmetics
-      return std::make_pair (res.first, -long_int<N, B, BI> (res.second));
+      return std::make_pair (long_int<N, B, BI> (res.first), -long_int<N, B, BI> (res.second));
     } else {
       std::pair<long_uint<N, B, BI>, long_uint<N, B, BI> > res = long_uint<N, B, BI>::divmod (d);
-      return std::make_pair (res.first, res.second);
+      return std::make_pair (long_int<N, B, BI> (res.first), long_int<N, B, BI> (res.second));
     }
   }
 

@@ -32,7 +32,8 @@ SOURCES = \
   tlVariant.cc \
   tlWebDAV.cc \
   tlXMLParser.cc \
-    tlInt128Support.cc
+    tlInt128Support.cc \
+    tlLongInt.cc
 
 INCLUDEPATH += $$TL_INC
 DEPENDPATH += $$TL_INC

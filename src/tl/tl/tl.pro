@@ -51,7 +51,8 @@ SOURCES = \
     tlUnitTest.cc \
     tlInt128Support.cc \
     tlHttpStreamCurl.cc \
-    tlHttpStreamQt.cc
+    tlHttpStreamQt.cc \
+    tlLongInt.cc
 
 HEADERS = \
     tlAlgorithm.h \
@@ -102,7 +103,8 @@ HEADERS = \
     tlUnitTest.h \
     tlInt128Support.h \
     tlHttpStreamCurl.h \
-    tlHttpStreamQt.h
+    tlHttpStreamQt.h \
+    tlLongInt.h
 
 INCLUDEPATH =
 DEPENDPATH =

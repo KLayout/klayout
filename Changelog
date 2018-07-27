@@ -1,4 +1,4 @@
-0.25.4          (2018-07-11):
+0.25.4          (2018-07-28):
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/121
        Issue with multiple reads of GDS2 layouts including PCells
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/134
@@ -11,6 +11,8 @@
        Issue with RBA::QHostAddress (ambiguous overload) on Qt5
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/142
        Issue with RBA::RecursiveShapeIterator#region=
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/148
+       Wrong font is used
 * Bugfix: 8 bit indexed GIF images can be used for package icons now
 * Enhancement: Provide a way to specify the type of a macro
        This feature is mainly useful for command line arguments.

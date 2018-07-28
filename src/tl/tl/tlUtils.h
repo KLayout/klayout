@@ -27,9 +27,36 @@
 #include "tlAssert.h"
 
 #include <map>
+#include <time.h>
+
+#if defined(__MACH__)
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
 
 namespace tl
 {
+
+/**
+*  @brief clock_gettime is not implemented in Mac OS X 10.11 and lower
+*  From: https://gist.githubusercontent.com/jbenet/1087739/raw/638b37f76cdd9dc46d617443cab27eac297e2ee3/current_utc_time.c
+*/
+
+inline void current_utc_time(struct timespec *ts) {
+
+#if defined(__MACH__)
+  clock_serv_t cclock;
+  mach_timespec_t mts;
+  host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+  clock_get_time(cclock, &mts);
+  mach_port_deallocate(mach_task_self(), cclock);
+  ts->tv_sec = mts.tv_sec;
+  ts->tv_nsec = mts.tv_nsec;
+#else
+  clock_gettime(CLOCK_REALTIME, ts);
+#endif
+
+}
 
 /**
  *  @brief A template class mapping a begin .. end iterator pair to the at_end semantics

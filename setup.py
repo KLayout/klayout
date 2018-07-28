@@ -58,7 +58,7 @@ from setuptools import setup, Extension, Distribution
 import glob
 import os
 import platform
-import sysconfig
+import distutils.sysconfig as sysconfig
 
 # ----------------------------------------------------------------------------------------
 
@@ -78,6 +78,9 @@ class Config(object):
         self.build_platlib = build_cmd.build_platlib
 
         self.ext_suffix = sysconfig.get_config_var("EXT_SUFFIX")
+        if self.ext_suffix is None:
+            self.ext_suffix = ".so"
+
         self.root = "klayout"
 
     def libname_of(self, mod):

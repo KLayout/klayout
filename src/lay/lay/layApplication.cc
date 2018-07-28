@@ -1399,10 +1399,16 @@ GuiApplication::shutdown ()
     mp_mw = 0;
   }
 
-  //  delete all other top level widgets for safety - we don't want Ruby clean them up for us
+  //  detach all top level widgets from Ruby/Python - we don't want the interpreter do this
+  //  for us. Qt will delete all top level widgets itself.
+  //  NOTE: we must only detach (= "keep" on C++ side), not delete them as top level widgets
+  //  may be owned by someone else.
   QWidgetList tl_widgets = topLevelWidgets ();
   for (QWidgetList::iterator w = tl_widgets.begin (); w != tl_widgets.end (); ++w) {
-    delete *w;
+    gsi::ObjectBase *gsi_obj = dynamic_cast<gsi::ObjectBase *> (*w);
+    if (gsi_obj) {
+      gsi_obj->keep ();
+    }
   }
 
   if (mp_recorder) {

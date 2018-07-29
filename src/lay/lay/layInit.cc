@@ -25,6 +25,7 @@
 #include "tlException.h"
 #include "tlLog.h"
 #include "tlString.h"
+#include "tlFileUtils.h"
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -121,9 +122,9 @@ get_module_path ()
 
   Dl_info info = { };
   if (dladdr ((void *) &init, &info)) {
-    QFileInfo fi (QString::fromLocal8Bit (info.dli_fname));
-    return tl::to_string (fi.absolutePath ());
+    return tl::absolute_file_path (tl::to_string_from_local (info.dli_fname));
   } else {
+    tl::warn << tl::to_string (tr ("Unable to get path of lay library (as basis for loading lay_plugins)"));
     return std::string ();
   }
 
@@ -142,6 +143,7 @@ void init (const std::vector<std::string> &_paths)
 
   if (paths.empty ()) {
     //  nothing to do
+    tl::log << tl::to_string (tr ("No lay_plugins loaded - no path given"));
     return;
   }
 

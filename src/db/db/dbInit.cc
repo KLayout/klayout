@@ -53,6 +53,8 @@ static PluginDescriptor load_plugin (const std::string &pp)
   PluginDescriptor desc;
   desc.path = pp;
 
+  tl::log << tl::sprintf (tl::to_string (tr ("Loading plugin: %s")), pp);
+
   dbp_init_func_t init_func = 0;
   static const char *init_func_name = "dbp_init";
 
@@ -90,7 +92,6 @@ static PluginDescriptor load_plugin (const std::string &pp)
     }
   }
 
-  tl::log << tl::sprintf (tl::to_string (tr ("Loaded plugin: %s")), pp);
   return desc;
 }
 
@@ -122,6 +123,7 @@ get_module_path ()
   if (dladdr ((void *) &init, &info)) {
     return tl::absolute_file_path (tl::to_string_from_local (info.dli_fname));
   } else {
+    tl::warn << tl::to_string (tr ("Unable to get path of db library (as basis for loading db_plugins)"));
     return std::string ();
   }
 
@@ -140,6 +142,7 @@ void init (const std::vector<std::string> &_paths)
 
   if (paths.empty ()) {
     //  nothing to do
+    tl::log << tl::to_string (tr ("No db_plugins loaded - no path given"));
     return;
   }
 

@@ -53,11 +53,14 @@ libdir="usr/lib/klayout"
 # TODO: is there a better way to produce this path?
 pylibdir="usr/lib/python3/dist-packages/klayout"
 
-# @@@ TODO: remove -without-qtbinding
+# clean bin directory
+rm -rf $bininstdir
+
+# do the actual build
 ./build.sh -j2 \
            -bin $bininstdir \
            -build $builddir \
-           -rpath /$libdir -without-qtbinding
+           -rpath /$libdir 
 
 if [ "$bits" = "32" ]; then
   arch="i386"

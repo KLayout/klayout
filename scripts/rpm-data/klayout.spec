@@ -92,11 +92,15 @@ cd %{git_source}
 %else
 cd %{_sourcedir}
 %endif
-# @@@ remove -without-qtbinding
+
+# clean bin dir
+rm -rf %{_builddir}/bin.$TARGET
+
+# do the actual build
 ./build.sh -rpath %{_libdir}/klayout \
            -bin %{_builddir}/bin.$TARGET \
            -build %{_builddir}/build.$TARGET \
-           %{buildopt} -without-qtbinding
+           %{buildopt} 
 
 cp -p LICENSE Changelog CONTRIB %{_builddir}
 strip %{_builddir}/bin.$TARGET/*.so

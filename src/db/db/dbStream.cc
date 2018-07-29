@@ -51,9 +51,6 @@ tl::XMLElementList load_options_xml_element_list ()
     }
   }
 
-  // ignore all unknown elements
-  elements.append (tl::make_member<db::LoadLayoutOptions> ("*"));
-
   return elements;
 }
 
@@ -67,9 +64,6 @@ tl::XMLElementList save_options_xml_element_list ()
       elements.append (decl->xml_writer_options_element ());
     }
   }
-
-  // ignore all unknown elements
-  elements.append (tl::make_member<db::FormatSpecificWriterOptions> ("*"));
 
   return elements;
 }

@@ -98,11 +98,11 @@ static PluginDescriptor load_plugin (const std::string &pp)
 void init (const std::vector<std::string> &_paths)
 {
   std::vector<std::string> paths = _paths;
-  if (paths.empty ()) {
-    std::string module_path = tl::get_module_path ((void *) &init);
-    if (! module_path.empty ()) {
-      paths.push_back (tl::absolute_path (module_path));
-    }
+
+  //  add the module path so we also look beside the "db" library
+  std::string module_path = tl::get_module_path ((void *) &init);
+  if (! module_path.empty ()) {
+    paths.push_back (tl::absolute_path (module_path));
   }
 
   if (paths.empty ()) {
@@ -119,7 +119,9 @@ void init (const std::vector<std::string> &_paths)
     const char *db_plugin_dir = "db_plugins";
     std::string pp = tl::combine_path (*p, db_plugin_dir);
 
-    tl::log << tl::sprintf (tl::to_string (tr ("Scanning '%s' for plugins ..")), pp);
+    if (tl::verbosity () >= 20) {
+      tl::info << "Scanning for db plugins: " << pp;
+    }
 
     std::vector<std::string> ee = tl::dir_entries (pp, true, false);
 

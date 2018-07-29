@@ -120,7 +120,7 @@ void init (const std::vector<std::string> &_paths)
     const char *lay_plugin_dir = "lay_plugins";
     std::string pp = tl::combine_path (*p, lay_plugin_dir);
 
-    tl::log << tl::sprintf (tl::to_string (tr ("Scanning '%s'' for plugins ..")), pp);
+    tl::log << tl::sprintf (tl::to_string (tr ("Scanning '%s' for plugins ..")), pp);
 
     std::vector<std::string> ee = tl::dir_entries (pp, true, false);
 

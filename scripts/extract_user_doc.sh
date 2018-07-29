@@ -32,6 +32,9 @@ for qt in 5 4; do
   rm -rf $target_doc
   mkdir -p $target_doc
 
+  # sanitize the binary dir
+  rm -rf bin-release-qt$qt
+
   export QT_SELECT=$qt
   ./build.sh -qmake qmake -j4 -bin bin-release-qt$qt -build build-release-qt$qt
 

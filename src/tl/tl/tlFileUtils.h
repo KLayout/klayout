@@ -178,6 +178,12 @@ std::vector<std::string> TL_PUBLIC split_path (const std::string &p, bool keep_l
  */
 std::string TL_PUBLIC get_inst_path ();
 
+/**
+ *  @brief Gets the absolute path of the module (DLL/.so) which contains the given address
+ *  "address" is supposed to be the address of a function inside the module.
+ */
+std::string TL_PUBLIC get_module_path (void *addr);
+
 }
 
 #endif

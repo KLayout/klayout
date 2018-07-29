@@ -95,46 +95,11 @@ static PluginDescriptor load_plugin (const std::string &pp)
   return desc;
 }
 
-/**
- *  @brief Gets the path to the current module
- */
-static std::string
-get_module_path ()
-{
-#if defined(_WIN32)
-
-  HMODULE h_module = NULL;
-  if (GetModuleHandleEx (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCTSTR) &init, &h_module)) {
-
-    wchar_t buffer[MAX_PATH];
-    int len;
-    if ((len = GetModuleFileName(h_module, buffer, MAX_PATH)) > 0) {
-      return tl::absolute_file_path (tl::to_string (std::wstring (buffer, 0, len)));
-    }
-
-  }
-
-  //  no way to get module file path
-  return std::string ();
-
-#else
-
-  Dl_info info = { };
-  if (dladdr ((void *) &init, &info)) {
-    return tl::absolute_file_path (tl::to_string_from_local (info.dli_fname));
-  } else {
-    tl::warn << tl::to_string (tr ("Unable to get path of db library (as basis for loading db_plugins)"));
-    return std::string ();
-  }
-
-#endif
-}
-
 void init (const std::vector<std::string> &_paths)
 {
   std::vector<std::string> paths = _paths;
   if (paths.empty ()) {
-    std::string module_path = get_module_path ();
+    std::string module_path = tl::get_module_path ((void *) &init);
     if (! module_path.empty ()) {
       paths.push_back (tl::absolute_path (module_path));
     }
@@ -153,6 +118,8 @@ void init (const std::vector<std::string> &_paths)
     //  look next to the db library, but in "db_plugins" directory
     const char *db_plugin_dir = "db_plugins";
     std::string pp = tl::combine_path (*p, db_plugin_dir);
+
+    tl::log << tl::sprintf (tl::to_string (tr ("Scanning '%s'' for plugins ..")), pp);
 
     std::vector<std::string> ee = tl::dir_entries (pp, true, false);
 

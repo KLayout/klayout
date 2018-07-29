@@ -38,6 +38,10 @@
 #  include <libproc.h>
 #endif
 
+#if !defined(_WIN32)
+#  include <dlfcn.h>
+#endif
+
 namespace tl
 {
 
@@ -788,6 +792,38 @@ get_inst_path ()
     s_inst_path = get_inst_path_internal ();
   }
   return s_inst_path;
+}
+
+std::string
+get_module_path (void *addr)
+{
+#if defined(_WIN32)
+
+  HMODULE h_module = NULL;
+  if (GetModuleHandleEx (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCTSTR) addr, &h_module)) {
+
+    wchar_t buffer[MAX_PATH];
+    int len;
+    if ((len = GetModuleFileName(h_module, buffer, MAX_PATH)) > 0) {
+      return tl::absolute_file_path (tl::to_string (std::wstring (buffer, 0, len)));
+    }
+
+  }
+
+  //  no way to get module file path
+  return std::string ();
+
+#else
+
+  Dl_info info = { };
+  if (dladdr (addr, &info)) {
+    return tl::absolute_file_path (tl::to_string_from_local (info.dli_fname));
+  } else {
+    tl::warn << tl::to_string (tr ("Unable to get path of db library (as basis for loading db_plugins)"));
+    return std::string ();
+  }
+
+#endif
 }
 
 }

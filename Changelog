@@ -11,6 +11,9 @@
        Issue with RBA::QHostAddress (ambiguous overload) on Qt5
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/142
        Issue with RBA::RecursiveShapeIterator#region=
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/144
+       The Salt package descriptions are not shown with Motif
+       style
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/148
        Wrong font is used
 * Bugfix: 8 bit indexed GIF images can be used for package icons now

@@ -24,6 +24,7 @@
 
 #include "tlThreads.h"
 #include "tlUtils.h"
+#include "tlTimer.h"
 #include "tlLog.h"
 #include "tlInternational.h"
 

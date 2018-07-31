@@ -64,10 +64,10 @@ Requires: libqt4-x11 >= 4.8.6
 %define buildopt -j2
 %endif
 
-%if "%{target_system}" == "opensuse_leap"
+%if "%{target_system}" == "opensuse15"
 # OpenSuSE Leap 15 requirements
-Requires:	ruby >= 2.1.9
-Requires:	python3 >= 3.4.6
+Requires:	ruby >= 2.5
+Requires:	python3 >= 3.6
 Requires: libqt4-x11 >= 4.8.7
 %define buildopt -j2
 %endif

@@ -74,6 +74,7 @@ Requires:	ruby >= 2.1.9
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.7
 %define buildopt -j2
+%define pylib %{python3_sitearch}
 %endif
 
 %description

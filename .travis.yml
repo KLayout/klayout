@@ -1,10 +1,22 @@
 matrix:
   include:
+    - os: osx
+      osx_image: xcode9.3  # macOS 10.13
+      env:
+        - MATRIX_EVAL=""
+    - os: osx
+      osx_image: xcode8.3  # macOS 10.12
+      env:
+        - MATRIX_EVAL=""
+    - os: osx
+      osx_image: xcode8  # macOS 10.11
+      env:
+        - MATRIX_EVAL=""
     - os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
       language: python
-      python: '2.6'
+      python: '3.6'
       env:
         - MATRIX_EVAL=""
     - os: linux
@@ -12,6 +24,13 @@ matrix:
       sudo: false
       language: python
       python: '2.7'
+      env:
+        - MATRIX_EVAL=""
+    - os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '2.6'
       env:
         - MATRIX_EVAL=""
     - os: linux
@@ -33,25 +52,6 @@ matrix:
       sudo: false
       language: python
       python: '3.5'
-      env:
-        - MATRIX_EVAL=""
-    - os: linux
-      dist: trusty # Ubuntu 14.04
-      sudo: false
-      language: python
-      python: '3.6'
-      env:
-        - MATRIX_EVAL=""
-    - os: osx
-      osx_image: xcode9.3  # macOS 10.13
-      env:
-        - MATRIX_EVAL=""
-    - os: osx
-      osx_image: xcode8.3  # macOS 10.12
-      env:
-        - MATRIX_EVAL=""
-    - os: osx
-      osx_image: xcode8  # macOS 10.11
       env:
         - MATRIX_EVAL=""
 

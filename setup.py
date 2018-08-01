@@ -59,28 +59,35 @@ import glob
 import os
 import platform
 import distutils.sysconfig as sysconfig
+import multiprocessing
+N_cores = multiprocessing.cpu_count()
 
 
 # monkey-patch for parallel compilation
 # from https://stackoverflow.com/questions/11013851/speeding-up-build-process-with-distutils
 def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=None, debug=0, extra_preargs=None, extra_postargs=None, depends=None):
     # those lines are copied from distutils.ccompiler.CCompiler directly
-    macros, objects, extra_postargs, pp_opts, build = self._setup_compile(output_dir, macros, include_dirs, sources, depends, extra_postargs)
+    macros, objects, extra_postargs, pp_opts, build = self._setup_compile(
+        output_dir, macros, include_dirs, sources, depends, extra_postargs)
     cc_args = self._get_cc_args(pp_opts, debug, extra_preargs)
     # parallel code
-    import multiprocessing
 
-    N = multiprocessing.cpu_count() # number of parallel compilations
+    N = min(N_cores, 4)  # number of parallel compilations
     import multiprocessing.pool
+
     def _single_compile(obj):
-        try: src, ext = build[obj]
-        except KeyError: return
+        try:
+            src, ext = build[obj]
+        except KeyError:
+            return
         self._compile(obj, src, ext, cc_args, extra_postargs, pp_opts)
     # convert to list, imap is evaluated on-demand
-    list(multiprocessing.pool.ThreadPool(N).imap(_single_compile,objects))
+    list(multiprocessing.pool.ThreadPool(N).imap(_single_compile, objects))
     return objects
+
+
 import distutils.ccompiler
-distutils.ccompiler.CCompiler.compile=parallelCCompile
+distutils.ccompiler.CCompiler.compile = parallelCCompile
 
 # ----------------------------------------------------------------------------------------
 
@@ -320,6 +327,7 @@ rdb = Extension(config.root + '.rdb',
 # Core setup function
 
 if __name__ == '__main__':
+    print("Number of cores", N_cores)
     setup(name=config.root,
           version=config.version(),
           description='KLayout standalone Python package',

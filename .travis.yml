@@ -4,14 +4,17 @@ matrix:
       osx_image: xcode9.3  # macOS 10.13
       env:
         - MATRIX_EVAL=""
+        - ARCHFLAGS="-std=c++11"
     - os: osx
       osx_image: xcode8.3  # macOS 10.12
       env:
         - MATRIX_EVAL=""
+        - ARCHFLAGS="-std=c++11"
     - os: osx
       osx_image: xcode8  # macOS 10.11
       env:
         - MATRIX_EVAL=""
+        - ARCHFLAGS="-std=c++11"
     - os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false

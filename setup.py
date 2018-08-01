@@ -68,7 +68,9 @@ def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=N
     macros, objects, extra_postargs, pp_opts, build = self._setup_compile(output_dir, macros, include_dirs, sources, depends, extra_postargs)
     cc_args = self._get_cc_args(pp_opts, debug, extra_preargs)
     # parallel code
-    N=2 # number of parallel compilations
+    import multiprocessing
+
+    N = multiprocessing.cpu_count() # number of parallel compilations
     import multiprocessing.pool
     def _single_compile(obj):
         try: src, ext = build[obj]

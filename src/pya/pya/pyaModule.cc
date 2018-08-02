@@ -493,7 +493,11 @@ static std::string extract_python_name (const std::string &name)
   } else if (name == "-@") {
     return "__neg__";
   } else if (name == "/") {
+    #if PY_MAJOR_VERSION < 3
     return "__div__";
+    #else
+    return "__truediv__";
+    #endif
   } else if (name == "*") {
     return "__mul__";
   } else if (name == "%") {
@@ -515,7 +519,11 @@ static std::string extract_python_name (const std::string &name)
   } else if (name == "-=") {
     return "__isub__";
   } else if (name == "/=") {
+    #if PY_MAJOR_VERSION < 3
     return "__idiv__";
+    #else
+    return "__itruediv__";
+    #endif
   } else if (name == "*=") {
     return "__imul__";
   } else if (name == "%=") {

@@ -70,6 +70,23 @@ struct vector_defs
     return C (*p * s);
   }
 
+  static C divide (const C *p, double s)
+  {
+    return C (*p / s);
+  }
+
+  static C iscale (C *p, double s)
+  {
+    *p *= s;
+    return *p;
+  }
+
+  static C idiv (C *p, double s)
+  {
+    *p /= s;
+    return *p;
+  }
+
   static C negate (const C *p)
   {
     return -*p;
@@ -200,6 +217,30 @@ struct vector_defs
       "@args f\n"
       "\n"
       "Returns the scaled object. All coordinates are multiplied with the given factor and if "
+      "necessary rounded."
+    ) +
+    method_ext ("*=", &iscale,
+      "@brief Scaling by some factor\n"
+      "\n"
+      "@args f\n"
+      "\n"
+      "Scales object in place. All coordinates are multiplied with the given factor and if "
+      "necessary rounded."
+    ) +
+    method_ext ("/", &divide,
+      "@brief Division by some divisor\n"
+      "\n"
+      "@args d\n"
+      "\n"
+      "Returns the scaled object. All coordinates are divided with the given divisor and if "
+      "necessary rounded."
+    ) +
+    method_ext ("/=", &idiv,
+      "@brief Division by some divisor\n"
+      "\n"
+      "@args d\n"
+      "\n"
+      "Divides the object in place. All coordinates are divided with the given divisor and if "
       "necessary rounded."
     ) +
     method_ext ("vprod", &vprod,

@@ -1,7 +1,8 @@
 matrix:
   include:
+    # python 3 osx
     - os: osx
-      osx_image: xcode9.3  # macOS 10.13
+      osx_image: xcode9.4  # macOS 10.13
       env:
         - MATRIX_EVAL=""
         - ARCHFLAGS="-std=c++11"
@@ -14,6 +15,22 @@ matrix:
       osx_image: xcode8  # macOS 10.11
       env:
         - MATRIX_EVAL=""
+        - ARCHFLAGS="-std=c++11"
+    # python 2 osx
+    - os: osx
+      osx_image: xcode9.4  # macOS 10.13
+      env:
+        - MATRIX_EVAL="brew update; brew bundle; shopt -s expand_aliases; alias python='python3';"
+        - ARCHFLAGS="-std=c++11"
+    - os: osx
+      osx_image: xcode8.3  # macOS 10.12
+      env:
+        - MATRIX_EVAL="brew update; brew bundle; shopt -s expand_aliases; alias python='python3';"
+        - ARCHFLAGS="-std=c++11"
+    - os: osx
+      osx_image: xcode8  # macOS 10.11
+      env:
+        - MATRIX_EVAL="brew update; brew bundle; shopt -s expand_aliases; alias python='python3';"
         - ARCHFLAGS="-std=c++11"
     - os: linux
       dist: trusty # Ubuntu 14.04
@@ -62,7 +79,6 @@ before_install:
   - env
   - rvm install ruby --latest
   - gem install dropbox-deployment
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew bundle; shopt -s expand_aliases; alias python='python3'; fi
   - eval "${MATRIX_EVAL}"
   - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
 

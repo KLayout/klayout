@@ -23,7 +23,11 @@
 
 #ifndef HDR_dbHash
 #define HDR_dbHash
-#if defined(__APPLE__) // clang compiler complains about deprecation warning on ext/hash_map and ext/hash_set
+
+#if defined(__APPLE__)
+#define __EXT_HASH_DEPRECATED
+#endif
+#if defined(__EXT_HASH_DEPRECATED) // clang compiler complains about deprecation warning on ext/hash_map and ext/hash_set
 #    include <unordered_map> 
 #    include <unordered_set>
 #    define DB_HASH_NAMESPACE std
@@ -104,7 +108,7 @@ namespace DB_HASH_NAMESPACE
   };
 #endif
 
-#if defined(__APPLE__)
+#if defined(__EXT_HASH_DEPRECATED)
   template<typename _Key, typename _Tp>
   using hash_map = unordered_map<_Key, _Tp>;
   template<typename _Value>

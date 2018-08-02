@@ -79,11 +79,12 @@ before_install:
   - env
   - rvm install ruby --latest
   - gem install dropbox-deployment
+  - eval "${MATRIX_EVAL}"
+  - if [[ "$TRAVIS_OS_NAME" == "osx" && ! -x "$(command -v pip)" ]]; then sudo easy_install pip; fi
   - pip --version
   - pip install --upgrade pip
   - pip --version
   - pip install --upgrade setuptools wheel
-  - eval "${MATRIX_EVAL}"
   - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
 
 install:

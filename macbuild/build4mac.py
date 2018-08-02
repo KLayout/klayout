@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 #===============================================================================
@@ -125,7 +125,7 @@ def SetGlobals():
     ModulePython = "PythonYosemite"
   elif Platform == "ElCapitan":
     ModuleRuby   = "RubyElCapitan"
-    ModulePytyon = "PythonElCapitan"
+    ModulePython = "PythonElCapitan"
   elif Platform == "Sierra":
     ModuleRuby   = "RubySierra"
     ModulePython = "PythonSierra"
@@ -766,25 +766,24 @@ def DeployBinariesForBundle():
     deploymentPython = True
     if deploymentPython and NonOSStdLang:
       from build4mac_util import WalkFrameworkPaths, PerformChanges, DetectChanges
-      from pathlib import Path
 
       bundlePath = AbsMacPkgDir + '/klayout.app'
       # bundlePath = os.getcwd() + '/qt5.pkg.macos-HighSierra-release/klayout.app'
       bundleExecPathAbs = '%s/Contents/MacOS/' % bundlePath
-      pythonOriginalFrameworkPath = '/usr/local/opt/python/Frameworks/Python.framework'
+      pythonOriginalFrameworkPath = '/usr/local/opt/python3/Frameworks/Python.framework'
       pythonFrameworkPath = '%s/Contents/Frameworks/Python.framework' % bundlePath
 
-      print(f" [8.1] Deploying Python from {pythonOriginalFrameworkPath} ..." )
+      print(" [8.1] Deploying Python from %s ..." % pythonOriginalFrameworkPath)
       print("  [1] Copying Python Framework")
       shell_commands = list()
-      shell_commands.append(f"rm -rf {pythonFrameworkPath}")
-      shell_commands.append(f"rsync -a --safe-links {pythonOriginalFrameworkPath}/ {pythonFrameworkPath}")
-      shell_commands.append(f"mkdir {pythonFrameworkPath}/Versions/3.6/lib/python3.6/site-packages/")
-      shell_commands.append(f"cp -RL {pythonOriginalFrameworkPath}/Versions/3.6/lib/python3.6/site-packages/{{pip*,pkg_resources,setuptools*,wheel*}} " +
-                            f"{pythonFrameworkPath}/Versions/3.6/lib/python3.6/site-packages/")
-      shell_commands.append(f"rm -rf {pythonFrameworkPath}/Versions/3.6/lib/python3.6/test")
-      shell_commands.append(f"rm -rf {pythonFrameworkPath}/Versions/3.6/Resources")
-      shell_commands.append(f"rm -rf {pythonFrameworkPath}/Versions/3.6/bin")
+      shell_commands.append("rm -rf %s" % pythonFrameworkPath)
+      shell_commands.append("rsync -a --safe-links %s/ %s" % (pythonOriginalFrameworkPath, pythonFrameworkPath))
+      shell_commands.append("mkdir %s/Versions/3.7/lib/python3.7/site-packages/" % pythonFrameworkPath)
+      shell_commands.append("cp -RL %s/Versions/3.7/lib/python3.7/site-packages/{pip*,pkg_resources,setuptools*,wheel*} " % pythonOriginalFrameworkPath +
+                            "%s/Versions/3.7/lib/python3.7/site-packages/" % pythonFrameworkPath)
+      shell_commands.append("rm -rf %s/Versions/3.7/lib/python3.7/test" % pythonFrameworkPath)
+      shell_commands.append("rm -rf %s/Versions/3.7/Resources" % pythonFrameworkPath)
+      shell_commands.append("rm -rf %s/Versions/3.7/bin" % pythonFrameworkPath)
 
       for command in shell_commands:
         if subprocess.call( command, shell=True ) != 0:
@@ -834,7 +833,7 @@ def DeployBinariesForBundle():
       PerformChanges(depdict, [(pythonOriginalFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
 
       print("  [4] Patching site.py, pip/, and distutils/")
-      site_module = f"{pythonFrameworkPath}/Versions/3.6/lib/python3.6/site.py"
+      site_module = "%s/Versions/3.7/lib/python3.7/site.py" % pythonFrameworkPath
       with open(site_module, 'r') as site:
         buf = site.readlines()
       with open(site_module, 'w') as site:
@@ -849,7 +848,7 @@ def DeployBinariesForBundle():
             line = "ENABLE_USER_SITE = False\n"
           site.write(line)
 
-      pip_module = f"{pythonFrameworkPath}/Versions/3.6/lib/python3.6/site-packages/pip/__init__.py"
+      pip_module = "%s/Versions/3.7/lib/python3.7/site-packages/pip/__init__.py" % pythonFrameworkPath
       with open(pip_module, 'r') as pip:
         buf = pip.readlines()
       with open(pip_module, 'w') as pip:
@@ -859,7 +858,7 @@ def DeployBinariesForBundle():
           line = re.sub("return isolated$", "return isolated or True", line)
           pip.write(line)
 
-      distutilsconfig = f"{pythonFrameworkPath}/Versions/3.6/lib/python3.6/distutils/distutils.cfg"
+      distutilsconfig = "%s/Versions/3.7/lib/python3.7/distutils/distutils.cfg" % pythonFrameworkPath
       with open(distutilsconfig, 'r') as file:
         buf = file.readlines()
       with open(distutilsconfig, 'w') as file:
@@ -993,9 +992,7 @@ def main():
   #----------------------------------------------------------
   ret = RunMainBuildBash()
   if not DeploymentF and not DeploymentP:
-    if ret == 0:
-      sys.exit(0)
-    else:
+    if not ret == 0:
       sys.exit(1)
   else:
     #----------------------------------------------------------
@@ -1012,6 +1009,7 @@ def main():
     #   to make "KLayoutEditor.app" and "KLayoutViewer.app"
     #----------------------------------------------------------
     ret2 = DeployScriptBundles()
+
     if not ret2 == 0:
       sys.exit(1)
     else:

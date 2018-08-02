@@ -79,6 +79,10 @@ before_install:
   - env
   - rvm install ruby --latest
   - gem install dropbox-deployment
+  - pip --version
+  - pip install --upgrade pip
+  - pip --version
+  - pip install --upgrade setuptools wheel
   - eval "${MATRIX_EVAL}"
   - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
 

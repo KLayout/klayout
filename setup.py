@@ -99,7 +99,7 @@ def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=N
 
 # only if python version > 2.6, somehow the travis compiler hangs in 2.6
 import sys
-if sys.version_info.major >= 2 and sys.version_info.minor > 6:
+if sys.version_info[0] * 10 + sys.version_info[1] > 26:
     import distutils.ccompiler
     distutils.ccompiler.CCompiler.compile = parallelCCompile
 

@@ -72,7 +72,8 @@ def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=N
     cc_args = self._get_cc_args(pp_opts, debug, extra_preargs)
     # parallel code
 
-    N = min(N_cores, 4)  # number of parallel compilations
+    N = min(N_cores, len(objects) // 2)  # number of parallel compilations
+    print("Compiling", output_dir, "with", N, "threads.")
     import multiprocessing.pool
 
     def _single_compile(obj):

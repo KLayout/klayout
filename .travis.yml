@@ -9,7 +9,7 @@ matrix:
     - os: osx
       osx_image: xcode8.3  # macOS 10.12
       env:
-        - MATRIX_EVAL=""
+        - MATRIX_EVAL="brew install python2 || brew link --overwrite python@2"  # deficient python2 in travis's xcode8.3 (no ssl)
         - ARCHFLAGS="-std=c++11"
     - os: osx
       osx_image: xcode8  # macOS 10.11
@@ -80,11 +80,10 @@ before_install:
   - rvm install ruby --latest
   - gem install dropbox-deployment
   - eval "${MATRIX_EVAL}"
-  - if [[ "$TRAVIS_OS_NAME" == "osx" && ! -x "$(command -v pip)" ]]; then sudo easy_install pip; fi
   - pip --version
   - sudo pip install --upgrade pip
   - pip --version
-  - pip install --upgrade setuptools wheel
+  - sudo pip install --upgrade setuptools wheel
   - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
 
 install:

@@ -1366,16 +1366,24 @@ LayoutViewConfigPage6a::update ()
     const unsigned int h = 26;
     const unsigned int w = 26;
 
-    QImage image (w, h, QImage::Format_RGB32);
-    image.fill (color0.rgb ());
+#if QT_VERSION > 0x050000
+    unsigned int dpr = devicePixelRatio ();
+#else
+    unsigned int dpr = 1;
+#endif
 
-    QBitmap bitmap = m_style.style (s).get_bitmap (w, h);
+    QImage image (w * dpr, h * dpr, QImage::Format_RGB32);
+    image.fill (color0.rgb ());
+    image.setDevicePixelRatio(dpr);
+
+    QBitmap bitmap = m_style.style (s).get_bitmap (w * dpr, h * dpr);
     QPainter painter (&image);
     painter.setPen (QPen (color1));
     painter.setBackgroundMode (Qt::TransparentMode);
-    painter.drawPixmap (0, 0, bitmap);
+    painter.drawPixmap (0, 0, w, h, bitmap);
 
     QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
+    pixmap.setDevicePixelRatio(dpr);
     b->setIconSize (pixmap.size ());
     b->setIcon (QIcon (pixmap));
 

@@ -10,17 +10,17 @@ before_install:
   - brew update
   - brew bundle
   - env
+  - pip install pathlib2
 
 install:
-  - rvm install ruby --latest
   - gem install dropbox-deployment
   - git clone https://github.com/kristovatlas/osx-config-check
   - cd osx-config-check ; python2.7 app.py --report-only --skip-sudo-checks ; cd ..
 
 script:
-  - python3 build4mac.py -p B37 -q Qt5Brew -c
-  - source filter-clang.sh; python3 build4mac.py -p B37 -q Qt5Brew | filter
-  - python3 build4mac.py -p B37 -q Qt5Brew -y
+  - ./build4mac.py -p B37 -q Qt5Brew -c
+  - source filter-clang.sh; ./build4mac.py -p B37 -q Qt5Brew | filter
+  - ./build4mac.py -p B37 -q Qt5Brew -y
   - qt5.pkg.macos-HighSierra-release/klayout.app/Contents/MacOS/klayout -b -r test-pylib-script.py
   - cd qt5.build.macos-HighSierra-release
   - ln -s klayout.app/Contents/MacOS/klayout klayout
@@ -35,16 +35,3 @@ script:
 
 after_success:
   - dropbox-deployment
-
-deploy:
-- provider: s3
-  access_key_id: AKIAIV2JJIENURARWFUQ
-  secret_access_key:
-    secure: LdxO80/boYFIa/6XuF1gi2V7vtoDFro+ImIcmf8ARKddYxjlLp31mVDt1ZezeYvjPt3T0KvDErMtez7Ea8yUPXayxLycAb5nEhP6QMTuW3QcSTllsG3Bpz1b1zCx4LiYWzYbmgqHru1kh3WhqQbKAgq4Xl5zIIE2yvWlGvpUf9mP586KGe5HJl6hbAJI8XdkJTjp48jHanKIUlxDDPrxon1i1GD+8PSl2JEvggRpp+mSaA5dJJJRYPNFlQn0T1TuHkRBErLqHYJ8qTSee72jMbTOVOPxuMy4KKdZt6bpDJiJccH2FJ87+qyXM/8dDQnlpWPVOgQhklFBMUmGkooVxfjphVLmBRNgkfohBC6DmKeIk/Os+TRvXjuL/SMwQ17jwKSRw/QPrIGwvGb2GdZ/jQCV0WWw3x/N8xlXZ2EhkLC8lznVuaf++CCC3qm0+ejojRFz7uFyqDvq9HPXHzllZTbTMI+6+QE5Gpi1s513iio/nRPYCLoyFe5144VfnlJCXxsC11jrous2HWo2YFJGqj0ipJdnit/Kolq+Shs2gTiGz0yb7f/JKsyA/N0Bz4npKlt7O1MmXyFjDJCfSn2WyfXjSYiyKu3fjkbf4e4AK5qsR2BcNlJXl6Z3ACLIS6OinRPFLZyCS24yQ0eNIR1Q5Xvg88vTUbyhDc2QsYpyP1Y=
-  bucket: danielwang
-  acl: bucket_owner_full_control
-  skip_cleanup: true
-  on:
-    repo: dwang/klayout
-    branch: travis-ci-pr
-

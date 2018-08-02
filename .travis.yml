@@ -1,16 +1,23 @@
 matrix:
   include:
-  - os: osx
-    osx_image: xcode9.3beta
-    env:
-    - MATRIX_EVAL=""
+    - os: osx
+      osx_image: xcode9.4  # macOS 10.13
+      env:
+        - MATRIX_EVAL="export PYTHON_VERSION=B37; export MACOS_VERSION=HighSierra;"
+    - os: osx
+      osx_image: xcode8.3  # macOS 10.12
+      env:
+        - MATRIX_EVAL="export PYTHON_VERSION=B37; export MACOS_VERSION=Sierra;"
+    - os: osx
+      osx_image: xcode8  # macOS 10.11
+      env:
+        - MATRIX_EVAL="export PYTHON_VERSION=B37; export MACOS_VERSION=ElCapitan;"
 
 before_install:
   - eval "${MATRIX_EVAL}"
   - brew update
   - brew bundle
   - env
-  - pip install pathlib2
 
 install:
   - gem install dropbox-deployment
@@ -18,20 +25,10 @@ install:
   - cd osx-config-check ; python2.7 app.py --report-only --skip-sudo-checks ; cd ..
 
 script:
-  - ./build4mac.py -p B37 -q Qt5Brew -c
-  - source filter-clang.sh; ./build4mac.py -p B37 -q Qt5Brew | filter
-  - ./build4mac.py -p B37 -q Qt5Brew -y
-  - qt5.pkg.macos-HighSierra-release/klayout.app/Contents/MacOS/klayout -b -r test-pylib-script.py
-  - cd qt5.build.macos-HighSierra-release
-  - ln -s klayout.app/Contents/MacOS/klayout klayout
-  - export TESTTMP=testtmp    # path to a directory that will hold temporary data (will be created)
-  - export TESTSRC=..         # path to the source directory
-  - ./ut_runner -h
-  - ./ut_runner -s || true
-  - cd ..
-  - export gitcommit=$(git rev-parse --short HEAD)
-  - mkdir deploy
-  - tar czf "deploy/qt5.pkg.macos-HighSierra-release-$gitcommit.tar.gz" qt5.pkg.macos-HighSierra-release
+  - make build
+  - make deploy
+  - make test
+  - make dropbox-deploy
 
 after_success:
   - dropbox-deployment

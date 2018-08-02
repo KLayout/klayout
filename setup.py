@@ -59,6 +59,7 @@ import glob
 import os
 import platform
 import distutils.sysconfig as sysconfig
+from distutils.errors import CompileError
 import multiprocessing
 N_cores = multiprocessing.cpu_count()
 
@@ -73,6 +74,7 @@ def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=N
     # parallel code
 
     N = min(N_cores, len(objects) // 2, 8)  # number of parallel compilations
+    N = max(N, 1)
     print("Compiling with", N, "threads.")
     import multiprocessing.pool
 
@@ -81,14 +83,25 @@ def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=N
             src, ext = build[obj]
         except KeyError:
             return
-        self._compile(obj, src, ext, cc_args, extra_postargs, pp_opts)
+        n_tries = 2
+        while n_tries > 0:
+            try:
+                self._compile(obj, src, ext, cc_args, extra_postargs, pp_opts)
+            except CompileError:
+                n_tries -= 1
+                print("Building", obj, "has failed. Trying again.")
+            else:
+                break
     # convert to list, imap is evaluated on-demand
     list(multiprocessing.pool.ThreadPool(N).imap(_single_compile, objects))
     return objects
 
 
-import distutils.ccompiler
-distutils.ccompiler.CCompiler.compile = parallelCCompile
+# only if python version > 2.6, somehow the travis compiler hangs in 2.6
+import sys
+if sys.version_info.major >= 2 and sys.version_info.minor > 6:
+    import distutils.ccompiler
+    distutils.ccompiler.CCompiler.compile = parallelCCompile
 
 # ----------------------------------------------------------------------------------------
 

@@ -6,32 +6,38 @@ matrix:
       env:
         - MATRIX_EVAL=""
         - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
     - os: osx
       osx_image: xcode8.3  # macOS 10.12
       env:
         - MATRIX_EVAL="brew install python2 || brew link --overwrite python@2"  # deficient python2 in travis's xcode8.3 (no ssl)
         - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
     - os: osx
       osx_image: xcode8  # macOS 10.11
       env:
         - MATRIX_EVAL=""
         - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
     # python 2 osx
     - os: osx
       osx_image: xcode9.4  # macOS 10.13
       env:
         - MATRIX_EVAL="brew update; brew bundle; shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
         - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
     - os: osx
       osx_image: xcode8.3  # macOS 10.12
       env:
         - MATRIX_EVAL="brew update; brew bundle; shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
         - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
     - os: osx
       osx_image: xcode8  # macOS 10.11
       env:
         - MATRIX_EVAL="brew update; brew bundle; shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
         - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
     - os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
@@ -39,6 +45,7 @@ matrix:
       python: '3.6'
       env:
         - MATRIX_EVAL=""
+        - PIP_UPDATE="1"
     - os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
@@ -46,6 +53,7 @@ matrix:
       python: '2.7'
       env:
         - MATRIX_EVAL=""
+        - PIP_UPDATE="1"
     - os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
@@ -53,6 +61,7 @@ matrix:
       python: '2.6'
       env:
         - MATRIX_EVAL=""
+        - PIP_UPDATE="0"  # setuptools installed from last pip has syntax error on py 2.6
     - os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
@@ -60,6 +69,7 @@ matrix:
       python: '3.3'
       env:
         - MATRIX_EVAL=""
+        - PIP_UPDATE="1"
     - os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
@@ -67,6 +77,7 @@ matrix:
       python: '3.4'
       env:
         - MATRIX_EVAL=""
+        - PIP_UPDATE="1"
     - os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
@@ -74,16 +85,19 @@ matrix:
       python: '3.5'
       env:
         - MATRIX_EVAL=""
+        - PIP_UPDATE="1"
 
 before_install:
   - env
   - rvm install ruby --latest
   - gem install dropbox-deployment
   - eval "${MATRIX_EVAL}"
-  - pip --version
-  - pip install --upgrade pip || sudo pip install --upgrade pip
-  - pip --version
-  - pip install --upgrade setuptools wheel || sudo pip install --upgrade setuptools wheel
+  - if [ "${PIP_UPDATE}" == "1" ]; then
+        pip --version;
+        pip install --upgrade pip || sudo pip install --upgrade pip;
+        pip --version;
+        pip install --upgrade setuptools wheel || sudo pip install --upgrade setuptools wheel;
+    fi
   - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
 
 install:

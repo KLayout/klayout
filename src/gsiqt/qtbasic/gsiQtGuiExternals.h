@@ -21,9 +21,7 @@
 */
 
 #if QT_VERSION >= 0x050000
-#  include "../qt5/QtGui/gsiDeclQtGuiTypeTraits.h"
 #  include "../qt5/QtGui/gsiQtExternals.h"
 #else
-#  include "../qt4/QtGui/gsiDeclQtGuiTypeTraits.h"
 #  include "../qt4/QtGui/gsiQtExternals.h"
 #endif

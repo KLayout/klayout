@@ -34,9 +34,19 @@
 #include "gsiQtDesignerCommon.h"
 
 class QAbstractFormBuilder;
+
+namespace tl { template <> struct type_traits<QAbstractFormBuilder> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+}; }
+
 namespace gsi { GSI_QTDESIGNER_PUBLIC gsi::Class<QAbstractFormBuilder> &qtdecl_QAbstractFormBuilder (); }
 
 class QFormBuilder;
+
+namespace tl { template <> struct type_traits<QFormBuilder> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+}; }
+
 namespace gsi { GSI_QTDESIGNER_PUBLIC gsi::Class<QFormBuilder> &qtdecl_QFormBuilder (); }
 
 

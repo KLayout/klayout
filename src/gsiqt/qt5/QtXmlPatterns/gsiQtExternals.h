@@ -34,51 +34,131 @@
 #include "gsiQtXmlPatternsCommon.h"
 
 class QAbstractMessageHandler;
+
+namespace tl { template <> struct type_traits<QAbstractMessageHandler> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QAbstractMessageHandler> &qtdecl_QAbstractMessageHandler (); }
 
 class QAbstractUriResolver;
+
+namespace tl { template <> struct type_traits<QAbstractUriResolver> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QAbstractUriResolver> &qtdecl_QAbstractUriResolver (); }
 
 class QAbstractXmlNodeModel;
+
+namespace tl { template <> struct type_traits<QAbstractXmlNodeModel> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QAbstractXmlNodeModel> &qtdecl_QAbstractXmlNodeModel (); }
 
 class QAbstractXmlReceiver;
+
+namespace tl { template <> struct type_traits<QAbstractXmlReceiver> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QAbstractXmlReceiver> &qtdecl_QAbstractXmlReceiver (); }
 
 class QSimpleXmlNodeModel;
+
+namespace tl { template <> struct type_traits<QSimpleXmlNodeModel> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QSimpleXmlNodeModel> &qtdecl_QSimpleXmlNodeModel (); }
 
 class QSourceLocation;
+
+namespace tl { template <> struct type_traits<QSourceLocation> : public type_traits<void> {
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QSourceLocation> &qtdecl_QSourceLocation (); }
 
 class QXmlFormatter;
+
+namespace tl { template <> struct type_traits<QXmlFormatter> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QXmlFormatter> &qtdecl_QXmlFormatter (); }
 
 class QXmlItem;
+
+namespace tl { template <> struct type_traits<QXmlItem> : public type_traits<void> {
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QXmlItem> &qtdecl_QXmlItem (); }
 
 class QXmlName;
+
+namespace tl { template <> struct type_traits<QXmlName> : public type_traits<void> {
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QXmlName> &qtdecl_QXmlName (); }
 
 class QXmlNamePool;
+
+namespace tl { template <> struct type_traits<QXmlNamePool> : public type_traits<void> {
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QXmlNamePool> &qtdecl_QXmlNamePool (); }
 
 class QXmlNodeModelIndex;
+
+namespace tl { template <> struct type_traits<QXmlNodeModelIndex> : public type_traits<void> {
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QXmlNodeModelIndex> &qtdecl_QXmlNodeModelIndex (); }
 
 class QXmlQuery;
+
+namespace tl { template <> struct type_traits<QXmlQuery> : public type_traits<void> {
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QXmlQuery> &qtdecl_QXmlQuery (); }
 
 class QXmlResultItems;
+
+namespace tl { template <> struct type_traits<QXmlResultItems> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QXmlResultItems> &qtdecl_QXmlResultItems (); }
 
 class QXmlSchema;
+
+namespace tl { template <> struct type_traits<QXmlSchema> : public type_traits<void> {
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QXmlSchema> &qtdecl_QXmlSchema (); }
 
 class QXmlSchemaValidator;
+
+namespace tl { template <> struct type_traits<QXmlSchemaValidator> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QXmlSchemaValidator> &qtdecl_QXmlSchemaValidator (); }
 
 class QXmlSerializer;
+
+namespace tl { template <> struct type_traits<QXmlSerializer> : public type_traits<void> {
+  typedef tl::false_tag has_copy_constructor;
+  typedef tl::false_tag has_default_constructor;
+}; }
+
 namespace gsi { GSI_QTXMLPATTERNS_PUBLIC gsi::Class<QXmlSerializer> &qtdecl_QXmlSerializer (); }
 
 

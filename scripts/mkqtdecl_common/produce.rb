@@ -1784,6 +1784,9 @@ END
       m.find { |bd| bd.virtual && bd.type.init == "0" } != nil
     end
 
+    # gets the operator= if there is one
+    eq_op = (all_methods_by_name["operator="] || [])[0]
+
     # collect used enums in order to generate forward converter declarations
     # ("used" implies argument types and defined enums)
     used_ed = {}
@@ -2306,8 +2309,27 @@ END
     end
 
     if !is_child_class
+
+      # forward decl
+      @ext_decls << "#{struct.kind.to_s} #{cls};\n\n"
+
+      # type traits included ...
+      tt = "namespace tl { template <> struct type_traits<#{cls}> : public type_traits<void> {\n"
+      if !conf.has_copy_ctor?(cls) || is_abstract || (eq_op && eq_op.visibility == :private)
+        tt += "  typedef tl::false_tag has_copy_constructor;\n"
+      end
+      if !conf.has_default_ctor?(cls) || is_abstract
+        tt += "  typedef tl::false_tag has_default_constructor;\n"
+      end
+      if (dtor = struct.get_dtor) && dtor.visibility != :public
+        tt += "  typedef tl::false_tag has_public_destructor;\n"
+      end
+      tt += "}; }\n\n"
+      @ext_decls << tt
+
       # only for top-level classes external declarations are produced currently
-      @ext_decls << "#{struct.kind.to_s} #{cls};\nnamespace gsi { GSI_#{modn.upcase}_PUBLIC gsi::Class<#{cls}> &qtdecl_#{clsn} (); }\n\n"
+      @ext_decls << "namespace gsi { GSI_#{modn.upcase}_PUBLIC gsi::Class<#{cls}> &qtdecl_#{clsn} (); }\n\n"
+
     end
 
     ofile.puts("")
@@ -3170,6 +3192,7 @@ l.each_with_index do |decl_obj,i|
 end
 
 puts("Producing ..")
+
 if cls_list
   cls_list.split(",").each do |cs|
     bp.produce_cpp(conf, cs)

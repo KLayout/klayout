@@ -572,6 +572,13 @@ struct pair_decl
 //  warning:
 #define __SUPPRESS_UNUSED_WARNING(x) (void)(x)
 
+//  HACK: the Qt binding code takes __null instead of NULL, but
+//  MS defines it as empty in sal.h ... better __null was NULL again.
+#if defined(__null)
+#  undef __null
+#  define __null 0
+#endif
+
 }
   
 #endif

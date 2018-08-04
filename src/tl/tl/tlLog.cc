@@ -25,7 +25,9 @@
 #include "tlString.h"
 
 #include <stdio.h>
-#include <unistd.h>
+#if !defined(_MSC_VER)
+#  include <unistd.h>
+#endif
 #include <stdlib.h>
 
 #if defined(_WIN32)
@@ -250,7 +252,11 @@ ChannelProxy::ChannelProxy (const ChannelProxy &d)
 static bool
 can_colorize (FILE *stream)
 {
+#if defined(_MSC_VER)
+  return false;
+#else
   return isatty (fileno (stream));
+#endif
 }
 
 #define ANSI_RED "\033[31;1m"

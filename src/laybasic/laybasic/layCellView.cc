@@ -112,7 +112,7 @@ LayoutHandle::layout_changed ()
 }
 
 void 
-LayoutHandle::rename (const std::string &name, bool force) throw (tl::Exception)
+LayoutHandle::rename (const std::string &name, bool force)
 {
   std::string n (name);
 

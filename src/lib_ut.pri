@@ -7,7 +7,7 @@ TEMPLATE = lib
 # $(DESTDIR) and $(TARGET)
 win32 {
 
-  QMAKE_POST_LINK += $(COPY) $(DESTDIR_TARGET) $$DESTDIR_UT/$${TARGET}.ut
+  QMAKE_POST_LINK += $(COPY) $(DESTDIR_TARGET) $$shell_path($$DESTDIR_UT/$${TARGET}.ut)
 
   # to avoid the major version being appended to the dll name - in this case -lxyz won't link it again
   # because the library is called xyx0.dll.

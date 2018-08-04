@@ -28,14 +28,14 @@
 namespace tl
 {
 
-TL_PUBLIC void handle_event_exception (tl::Exception &ex)
+void handle_event_exception (tl::Exception &ex)
 {
   //  Exceptions have unpredicable side effects for events so we just log
   //  them here.
   tl::warn << ex.msg ();
 }
 
-TL_PUBLIC void handle_event_exception (std::exception &ex)
+void handle_event_exception (std::exception &ex)
 {
   //  Exceptions have unpredicable side effects for events so we just log
   //  them here.

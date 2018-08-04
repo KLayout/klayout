@@ -30,6 +30,7 @@
 namespace std_ext = __gnu_cxx;
 #  define DB_HASH_NAMESPACE __gnu_cxx
 #else
+#   define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
 #   include <hash_map>
 #   include <hash_set>
 namespace std_ext = std;

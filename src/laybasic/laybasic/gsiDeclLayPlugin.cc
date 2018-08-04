@@ -43,8 +43,6 @@ namespace tl
   template <> struct type_traits<gsi::PluginBase> : public type_traits<void> {
     typedef tl::false_tag has_copy_constructor;
   };
-
-  template <> Registrar<gsi::PluginFactoryBase> *Registrar<gsi::PluginFactoryBase>::instance = 0;
 }
 
 namespace gsi

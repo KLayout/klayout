@@ -721,7 +721,7 @@ from_string (const std::string &s, const unsigned char * &result)
 }
 
 void 
-from_string (const std::string &s, double &v) throw (tl::Exception)
+from_string (const std::string &s, double &v)
 {
   const char *cp = s.c_str ();
   while (*cp && isspace (*cp)) {
@@ -743,7 +743,7 @@ from_string (const std::string &s, double &v) throw (tl::Exception)
 
 template <class T>
 void 
-convert_string_to_int (const std::string &s, T &v) throw (tl::Exception)
+convert_string_to_int (const std::string &s, T &v)
 {
   double x;
   // HACK: this should be some real string-to-int conversion
@@ -761,43 +761,43 @@ convert_string_to_int (const std::string &s, T &v) throw (tl::Exception)
 }
 
 void 
-from_string (const std::string &s, int &v) throw (tl::Exception)
+from_string (const std::string &s, int &v)
 {
   convert_string_to_int (s, v);
 }
 
 void 
-from_string (const std::string &s, long &v) throw (tl::Exception)
+from_string (const std::string &s, long &v)
 {
   convert_string_to_int (s, v);
 }
 
 void 
-from_string (const std::string &s, long long &v) throw (tl::Exception)
+from_string (const std::string &s, long long &v)
 {
   convert_string_to_int (s, v);
 }
 
 void 
-from_string (const std::string &s, unsigned int &v) throw (tl::Exception)
+from_string (const std::string &s, unsigned int &v)
 {
   convert_string_to_int (s, v);
 }
 
 void 
-from_string (const std::string &s, unsigned long &v) throw (tl::Exception)
+from_string (const std::string &s, unsigned long &v)
 {
   convert_string_to_int (s, v);
 }
 
 void 
-from_string (const std::string &s, unsigned long long &v) throw (tl::Exception)
+from_string (const std::string &s, unsigned long long &v)
 {
   convert_string_to_int (s, v);
 }
 
 void
-from_string (const std::string &s, bool &b) throw (tl::Exception)
+from_string (const std::string &s, bool &b)
 {
   std::string t (tl::trim (s));
   if (t == "true") {

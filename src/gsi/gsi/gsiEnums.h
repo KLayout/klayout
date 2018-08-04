@@ -195,14 +195,14 @@ public:
     return std::string ("(not a valid enum value)");
   }
 
-  static std::string enum_to_string (const E *e) 
+  static std::string enum_to_string_ext (const E *e)
   {
     const Enum<E> *ecls = dynamic_cast<const Enum<E> *> (cls_decl<E> ());
     tl_assert (ecls != 0);
     return ecls->enum_to_string (*e);
   }
 
-  static std::string enum_to_string_inspect (const E *e) 
+  static std::string enum_to_string_inspect_ext (const E *e)
   {
     const Enum<E> *ecls = dynamic_cast<const Enum<E> *> (cls_decl<E> ());
     tl_assert (ecls != 0);
@@ -246,8 +246,8 @@ public:
     gsi::Methods m = 
       gsi::constructor ("new", &new_enum_from_int, gsi::arg("i"), "@brief Creates an enum from an integer value") +
       gsi::constructor ("new", &new_enum_from_string, gsi::arg("s"), "@brief Creates an enum from a string value") +
-      gsi::method_ext ("to_s", &enum_to_string, "@brief Gets the symbolic string from an enum") +
-      gsi::method_ext ("inspect", &enum_to_string_inspect, "@brief Converts an enum to a visual string") +
+      gsi::method_ext ("to_s", &enum_to_string_ext, "@brief Gets the symbolic string from an enum") +
+      gsi::method_ext ("inspect", &enum_to_string_inspect_ext, "@brief Converts an enum to a visual string") +
       gsi::method_ext ("to_i", &enum_to_i, "@brief Gets the integer value from the enum") +
       gsi::method_ext ("==", &enum_eq, gsi::arg("other"), "@brief Compares two enums") +
       gsi::method_ext ("!=", &enum_ne, gsi::arg("other"), "@brief Compares two enums for inequality") +

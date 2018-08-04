@@ -23,6 +23,7 @@
 #include "tlLog.h"
 #include "tlCommandLineParser.h"
 #include "tlFileUtils.h"
+#include "tlString.h"
 
 namespace tl
 {

@@ -31,6 +31,7 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#define _USE_MATH_DEFINES // for MSVC
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>

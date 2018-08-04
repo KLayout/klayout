@@ -26,7 +26,7 @@
 #include <stdio.h>
 
 #if defined(WIN32)
-#include <windows.h>
+#include <Windows.h>
 inline void usleep(long us)
 {
   Sleep(us / 1000);

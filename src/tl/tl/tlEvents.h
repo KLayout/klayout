@@ -36,12 +36,12 @@ namespace tl
 /**
  *  @brief A helper function to handle event exceptions of tl::Exception type
  */
-void handle_event_exception (tl::Exception &ex);
+TL_PUBLIC void handle_event_exception (tl::Exception &ex);
 
 /**
  *  @brief A helper function to handle event exceptions of std::exception type
  */
-void handle_event_exception (std::exception &ex);
+TL_PUBLIC void handle_event_exception (std::exception &ex);
 
 /**
  *  @brief A framework of observer and observables

@@ -456,7 +456,7 @@ protected:
   }
 
 private:
-  virtual void execute (tl::TestBase *_this) throw (tl::Exception) = 0;
+  virtual void execute (tl::TestBase *_this) = 0;
 
   void write_detailed_diff (std::ostream &os, const std::string &subject, const std::string &ref);
 
@@ -496,11 +496,11 @@ struct TestImpl##NAME \
       : public tl::TestBase \
     { \
       TestImpl##NAME () : TestBase (__FILE__, #NAME) { } \
-      virtual void execute (tl::TestBase *_this) throw (tl::Exception); \
+      virtual void execute (tl::TestBase *_this); \
     }; \
     static TestImpl##NAME TestImpl_Inst##NAME; \
   } \
-  void TestImpl##NAME::execute (tl::TestBase *_this) throw (tl::Exception)
+  void TestImpl##NAME::execute (tl::TestBase *_this)
 
 #define EXPECT_EQ(WHAT,EQUALS) \
   _this->checkpoint (__FILE__, __LINE__); \

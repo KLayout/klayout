@@ -36,7 +36,6 @@
 #if defined(HAVE_QTBINDINGS)
 # include "gsiQtGuiExternals.h"
 # include "gsiQtWidgetsExternals.h"
-
 FORCE_LINK_GSI_QTGUI
 FORCE_LINK_GSI_QTWIDGETS // for Qt5
 

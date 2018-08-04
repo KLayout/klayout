@@ -27,19 +27,36 @@
 
 #include <cctype>
 
-#include <sys/stat.h>
-#include <unistd.h>
-#include <dirent.h>
+#if defined(_MSC_VER)
 
-#if defined(_WIN32)
+#  include <sys/types.h>
+#  include <sys/stat.h>
+#  include <io.h>
+#  include <Windows.h>
+
+#elif defined(_WIN32)
+
+#  include <sys/stat.h>
+#  include <unistd.h>
+#  include <dirent.h>
 #  include <dir.h>
-#  include <windows.h>
-#elif defined(__APPLE__)
-#  include <libproc.h>
-#endif
+#  include <Windows.h>
 
-#if !defined(_WIN32)
+#elif defined(__APPLE__)
+
+#  include <sys/stat.h>
+#  include <unistd.h>
+#  include <dirent.h>
+#  include <libproc.h>
 #  include <dlfcn.h>
+
+#else
+
+#  include <sys/stat.h>
+#  include <unistd.h>
+#  include <dirent.h>
+#  include <dlfcn.h>
+
 #endif
 
 namespace tl
@@ -664,13 +681,21 @@ bool file_exists (const std::string &p)
 bool is_writable (const std::string &p)
 {
   stat_struct st;
+#if defined(_MSC_VER)
+  return stat_func (p, st) == 0 && (st.st_mode & _S_IWRITE) != 0;
+#else
   return stat_func (p, st) == 0 && (st.st_mode & S_IWUSR) != 0;
+#endif
 }
 
 bool is_readable (const std::string &p)
 {
   stat_struct st;
+#if defined(_MSC_VER)
+  return stat_func (p, st) == 0 && (st.st_mode & _S_IREAD) != 0;
+#else
   return stat_func (p, st) == 0 && (st.st_mode & S_IRUSR) != 0;
+#endif
 }
 
 bool is_dir (const std::string &p)
@@ -679,7 +704,11 @@ bool is_dir (const std::string &p)
   if (stat_func (p, st) != 0) {
     return false;
   } else {
+#if defined(_MSC_VER)
+    return !(st.st_mode & _S_IFREG);
+#else
     return !S_ISREG (st.st_mode);
+#endif
   }
 }
 

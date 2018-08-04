@@ -22,11 +22,6 @@
 
 #include "gsiInterpreter.h"
 
-namespace tl
-{
-  template<> GSI_PUBLIC tl::Registrar<gsi::Interpreter> *tl::Registrar<gsi::Interpreter>::instance = 0;
-}
-
 namespace gsi
 {
 

@@ -23,3 +23,39 @@
  
 #include "tlClassRegistry.h"
 
+#include <map>
+
+namespace tl
+{
+
+struct ti_compare_f
+{
+  bool operator() (const std::type_info *a, const std::type_info *b) const
+  {
+    return a->before (*b);
+  }
+};
+
+typedef std::map<const std::type_info *, RegistrarBase *, ti_compare_f> inst_map_type;
+static inst_map_type s_inst_map;
+
+TL_PUBLIC void set_registrar_instance_by_type (const std::type_info &ti, RegistrarBase *rb)
+{
+  if (rb) {
+    s_inst_map[&ti] = rb;
+  } else {
+    s_inst_map.erase (&ti);
+  }
+}
+
+TL_PUBLIC RegistrarBase *registrar_instance_by_type (const std::type_info &ti)
+{
+  inst_map_type::const_iterator im = s_inst_map.find (&ti);
+  if (im != s_inst_map.end ()) {
+    return im->second;
+  } else {
+    return 0;
+  }
+}
+
+}

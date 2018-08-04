@@ -589,9 +589,3 @@ PluginRoot::instance ()
 }
 
 }
-
-namespace tl
-{
-  template<> LAYBASIC_PUBLIC Registrar<lay::PluginDeclaration> *tl::Registrar<lay::PluginDeclaration>::instance = 0;
-  template class LAYBASIC_PUBLIC tl::RegisteredClass<lay::PluginDeclaration>;
-}

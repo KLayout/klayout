@@ -32,46 +32,52 @@
 
 #include <stdio.h>
 
-#ifndef _MSC_VER // not available on MS VC++
+#if !defined(_MSC_VER) // not available on MS VC++
 #  include <unistd.h>
 #endif
 
+#if defined(_MSC_VER)
+#  include <Windows.h>
+#endif
+
 #if defined(__MACH__)
-#include <mach/clock.h>
-#include <mach/mach.h>
+#  include <mach/clock.h>
+#  include <mach/mach.h>
 #endif
 
 namespace tl
 {
 
 // -------------------------------------------------------------
+//  Gets the current time in ms from epoch
 
-void current_utc_time (struct timespec *ts)
+static int64_t ms_time ()
 {
-
 #if defined(__MACH__)
+
   clock_serv_t cclock;
   mach_timespec_t mts;
   host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
   clock_get_time(cclock, &mts);
   mach_port_deallocate(mach_task_self(), cclock);
-  ts->tv_sec = mts.tv_sec;
-  ts->tv_nsec = mts.tv_nsec;
+
+  return int64_t (mts.tv_sec) * 1000 + int64_t (0.5 + mts.tv_nsec / 1.0e6);
+
+#elif defined(_MSC_VER)
+
+  FILETIME ft;
+  GetSystemTimeAsFileTime (&ft);
+  //  device by 8192 -> should fit into a 64bit type
+  uint64_t t = (uint64_t (ft.dwHighDateTime) << (64 - 13)) | (uint64_t (ft.dwLowDateTime) >> 13);
+  return int64_t (0.5 + t / 0.8192);
+
 #else
+
+  timespec ts;
   clock_gettime(CLOCK_REALTIME, ts);
+  return int64_t (ts.tv_sec) * 1000 + int64_t (0.5 + ts.tv_nsec / 1.0e6);
+
 #endif
-
-}
-
-// -------------------------------------------------------------
-//  Gets the current time in ms from epoch
-
-static int64_t ms_time ()
-{
-  struct timespec spec;
-  current_utc_time (&spec);
-
-  return int64_t (spec.tv_sec) * 1000 + int64_t (0.5 + spec.tv_nsec / 1.0e6);
 }
 
 // -------------------------------------------------------------
@@ -99,9 +105,6 @@ Timer::start ()
   m_user_ms += (timer_t) ((clks.tms_utime + clks.tms_cutime) * clk2msec + 0.5);
   m_sys_ms += (timer_t) ((clks.tms_stime + clks.tms_cstime) * clk2msec + 0.5);
 #endif
-
-  struct timespec spec;
-  current_utc_time (&spec);
 
   m_wall_ms += ms_time ();
 }

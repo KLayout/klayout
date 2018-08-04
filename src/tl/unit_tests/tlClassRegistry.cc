@@ -20,7 +20,6 @@
 
 */
 
- 
 #include "tlClassRegistry.h"
 #include "tlUnitTest.h"
 
@@ -39,13 +38,13 @@ public:
 class Y : public X
 {
 public:
-  virtual const char *name () const { return "Y"; };
+  virtual const char *name () const { return "Y"; }
 };
 
 class Z : public X
 {
 public:
-  virtual const char *name () const { return "Z"; };
+  virtual const char *name () const { return "Z"; }
 };
 
 
@@ -59,12 +58,12 @@ public:
 
 class B : public A
 {
-  virtual const char *name () const { return "B"; };
+  virtual const char *name () const { return "B"; }
 };
 
 class C : public A
 {
-  virtual const char *name () const { return "C"; };
+  virtual const char *name () const { return "C"; }
 };
 
 
@@ -112,10 +111,3 @@ TEST(3)
 }
 
 }
-
-namespace tl
-{
-  template <> tl::Registrar<class_registry_test::X> *Registrar<class_registry_test::X>::instance = 0;
-  template <> tl::Registrar<class_registry_test::A> *Registrar<class_registry_test::A>::instance = 0;
-}
-

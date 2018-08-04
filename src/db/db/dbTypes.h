@@ -25,6 +25,7 @@
 #define HDR_dbTypes
 
 #include <stdint.h>
+#define _USE_MATH_DEFINES // for MSVC
 #include <math.h>
 #include <stdio.h>
 #include <algorithm>

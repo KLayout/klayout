@@ -122,9 +122,3 @@ MacroInterpreter::suffix (const std::string &dsl_name)
 }
 
 }
-
-namespace tl
-{
-  template<> LYM_PUBLIC tl::Registrar<lym::MacroInterpreter> *Registrar<lym::MacroInterpreter>::instance = 0;
-  template class LYM_PUBLIC tl::RegisteredClass<lym::MacroInterpreter>;
-}

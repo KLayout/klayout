@@ -61,16 +61,31 @@ equals(HAVE_RUBY, "1") {
   QMAKE_RPATHDIR += $$RPATH
 }
 
-QMAKE_CXXFLAGS_WARN_ON += \
-    -pedantic \
-    -Woverloaded-virtual \
-    -Wsign-promo \
-    -Wsynth \
-    -Wno-deprecated \
-    -Wno-long-long \
-    -Wno-strict-aliasing \
-    -Wno-deprecated-declarations \
-    -Wno-reserved-user-defined-literal \
+msvc {
+
+  INCLUDEPATH += \
+    $$THIRD_PARTY/zlib/1.2.11/include \
+
+  QMAKE_CXXFLAGS += -bigobj
+
+  QMAKE_CXXFLAGS_WARN_ON += \
+
+}
+
+!msvc {
+
+  QMAKE_CXXFLAGS_WARN_ON += \
+      -pedantic \
+      -Woverloaded-virtual \
+      -Wsign-promo \
+      -Wsynth \
+      -Wno-deprecated \
+      -Wno-long-long \
+      -Wno-strict-aliasing \
+      -Wno-deprecated-declarations \
+      -Wno-reserved-user-defined-literal \
+
+}
 
 equals(HAVE_QT, "0") {
 
@@ -79,7 +94,7 @@ equals(HAVE_QT, "0") {
 } else {
 
   DEFINES += HAVE_QT
-  QT += network xml sql
+  QT += core network xml sql
 
   equals(HAVE_QT5, "1") {
     QT += designer printsupport
@@ -94,10 +109,14 @@ equals(HAVE_QT, "0") {
 }
 
 # only support the required symbols for shared object load performance
-win32 {
-  QMAKE_LFLAGS += -Wl,--exclude-all-symbols
+msvc {
+  # ...
 } else {
-  QMAKE_CXXFLAGS += -fvisibility=hidden
+  win32 {
+    QMAKE_LFLAGS += -Wl,--exclude-all-symbols
+  } else {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+  }
 }
 
 VERSION_STRING = $$KLAYOUT_VERSION

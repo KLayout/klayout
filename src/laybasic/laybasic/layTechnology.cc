@@ -22,17 +22,5 @@
 
 
 #include "layTechnology.h"
-#include "layPlugin.h"
-#include "layStream.h"
 
-#include <stdio.h>
-
-#include <QFileInfo>
-#include <QDir>
-
-namespace tl
-{
-  template<> LAYBASIC_PUBLIC tl::Registrar<lay::TechnologyEditorProvider> *tl::Registrar<lay::TechnologyEditorProvider>::instance = 0;
-  template class LAYBASIC_PUBLIC tl::RegisteredClass<lay::TechnologyEditorProvider>;
-}
-
+//  .. nothing yet ..

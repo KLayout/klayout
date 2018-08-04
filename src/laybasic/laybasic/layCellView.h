@@ -83,7 +83,7 @@ public:
    *  If "force" is set to true, the layout will be given that name, irregardless if
    *  the name already is being used. If "force" is false, a new unique name is created.
    */
-  void rename (const std::string &name, bool force = false) throw (tl::Exception);
+  void rename (const std::string &name, bool force = false);
 
   /**
    *  @brief Gets the name of the handle

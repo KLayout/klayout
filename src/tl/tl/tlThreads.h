@@ -180,7 +180,7 @@ private:
 #if defined(HAVE_QT)
 
 template <class T>
-class TL_PUBLIC ThreadStorage
+class ThreadStorage
   : public QThreadStorage<T>
 {
 public:

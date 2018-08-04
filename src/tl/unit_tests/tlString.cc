@@ -25,7 +25,8 @@
 #include "tlTimer.h"
 #include "tlUnitTest.h"
 
-#include <cmath>
+#define _USE_MATH_DEFINES // for MSVC
+#include <math.h>
 #include <clocale>
 
 using namespace tl;

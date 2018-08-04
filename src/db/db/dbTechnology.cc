@@ -27,12 +27,6 @@
 
 #include <stdio.h>
 
-namespace tl
-{
-  template<> DB_PUBLIC tl::Registrar<db::TechnologyComponentProvider> *tl::Registrar<db::TechnologyComponentProvider>::instance = 0;
-  template class DB_PUBLIC tl::RegisteredClass<db::TechnologyComponentProvider>;
-}
-
 namespace db
 {
 

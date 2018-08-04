@@ -27,12 +27,6 @@
 
 #include <string.h>
 
-namespace tl
-{
-  template<> DB_PUBLIC tl::Registrar<db::StreamFormatDeclaration> *tl::Registrar<db::StreamFormatDeclaration>::instance = 0;
-  template class DB_PUBLIC tl::RegisteredClass<db::StreamFormatDeclaration>;
-}
-
 namespace db
 {
 

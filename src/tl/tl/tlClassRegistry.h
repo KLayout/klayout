@@ -27,6 +27,7 @@
 #include "tlCommon.h"
 
 #include "tlLog.h"
+#include <typeinfo>
 
 namespace tl
 {
@@ -93,10 +94,12 @@ public:
   RegisteredClass (X *inst, int position = 0, const char *name = "", bool owned = true) 
     : m_owned (owned)
   { 
-    if (! Registrar<X>::instance) {
-      Registrar<X>::instance = new Registrar<X> ();
+    Registrar<X> *instance = Registrar<X>::get_instance ();
+    if (! instance) {
+      instance = new Registrar<X> ();
+      Registrar<X>::set_instance (instance);
     }
-    mp_node = Registrar<X>::instance->insert (inst, owned, position, name);
+    mp_node = instance->insert (inst, owned, position, name);
     
     if (tl::verbosity () >= 40) {
       tl::info << "Registered object '" << name << "' with priority " << position;
@@ -105,13 +108,18 @@ public:
 
   ~RegisteredClass ()
   {
-    //  remove the associated object
-    Registrar<X>::instance->remove (mp_node);
+    Registrar<X> *instance = Registrar<X>::get_instance ();
+    if (instance) {
 
-    if (Registrar<X>::instance->begin () == Registrar<X>::instance->end ()) {
-      //  no more registered objects left - remove registrar
-      delete Registrar<X>::instance;
-      Registrar<X>::instance = 0;
+      //  remove the associated object
+      instance->remove (mp_node);
+
+      if (instance->begin () == instance->end ()) {
+        //  no more registered objects left - remove registrar
+        delete instance;
+        Registrar<X>::set_instance (0);
+      }
+
     }
   }
 
@@ -119,6 +127,22 @@ private:
   RegistrarNode<X> *mp_node;
   bool m_owned; 
 };
+
+/**
+ *  @brief A base class for the registrar types
+ */
+class RegistrarBase { };
+
+/**
+ *  @brief Sets the registrar instance by type
+ */
+TL_PUBLIC void set_registrar_instance_by_type (const std::type_info &ti, RegistrarBase *rb);
+
+/**
+ *  @brief Gets the registrar instance by type
+ *  Returns 0 if no registrar instance is set by this type;
+ */
+TL_PUBLIC RegistrarBase *registrar_instance_by_type (const std::type_info &ti);
 
 /**
  *  @brief The registrar capable of registering objects of type Y derived from X
@@ -131,6 +155,7 @@ private:
  */
 template <class X>
 class Registrar
+    : public RegistrarBase
 {
 public:
   class iterator
@@ -220,14 +245,17 @@ public:
 
   static Registrar<X> *get_instance () 
   {
-    return instance;
+    return static_cast<Registrar<X> *> (registrar_instance_by_type (typeid (X)));
+  }
+
+  static void set_instance (Registrar<X> *instance)
+  {
+    set_registrar_instance_by_type (typeid (X), instance);
   }
 
 private:
   friend class iterator;
   template <class Y> friend class RegisteredClass;
-
-  static Registrar<X> *instance;
 
   RegistrarNode<X> *insert (X *cls, bool owned, int position, const std::string &name)
   {

@@ -757,14 +757,14 @@ private:
 
 TL_PUBLIC void from_string (const std::string &s, const char * &result);
 TL_PUBLIC void from_string (const std::string &s, const unsigned char * &result);
-TL_PUBLIC void from_string (const std::string &s, double &v) throw (tl::Exception);
-TL_PUBLIC void from_string (const std::string &s, int &v) throw (tl::Exception);
-TL_PUBLIC void from_string (const std::string &s, long &v) throw (tl::Exception);
-TL_PUBLIC void from_string (const std::string &s, long long &v) throw (tl::Exception);
-TL_PUBLIC void from_string (const std::string &s, unsigned int &v) throw (tl::Exception);
-TL_PUBLIC void from_string (const std::string &s, unsigned long &v) throw (tl::Exception);
-TL_PUBLIC void from_string (const std::string &s, unsigned long long &v) throw (tl::Exception);
-TL_PUBLIC void from_string (const std::string &s, bool &b) throw (tl::Exception);
+TL_PUBLIC void from_string (const std::string &s, double &v);
+TL_PUBLIC void from_string (const std::string &s, int &v);
+TL_PUBLIC void from_string (const std::string &s, long &v);
+TL_PUBLIC void from_string (const std::string &s, long long &v);
+TL_PUBLIC void from_string (const std::string &s, unsigned int &v);
+TL_PUBLIC void from_string (const std::string &s, unsigned long &v);
+TL_PUBLIC void from_string (const std::string &s, unsigned long long &v);
+TL_PUBLIC void from_string (const std::string &s, bool &b);
 
 inline void from_string (const std::string &s, std::string &v) { v = s; }
 

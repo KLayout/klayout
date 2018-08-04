@@ -6,7 +6,16 @@ include($$PWD/../../lib.pri)
 
 DEFINES += MAKE_TL_LIBRARY
 
-LIBS += -lz
+!msvc {
+  LIBS += -lz
+}
+
+msvc {
+
+  LIBS += \
+    -L$$THIRD_PARTY/zlib/1.2.11/lib -lzlib
+
+}
 
 equals(HAVE_QT, "0") {
   LIBS += -lpthread
@@ -151,7 +160,4 @@ equals(HAVE_CURL, "1") {
     tlFileSystemWatcher.cc \
 
 }
-
-INCLUDEPATH =
-DEPENDPATH =
 

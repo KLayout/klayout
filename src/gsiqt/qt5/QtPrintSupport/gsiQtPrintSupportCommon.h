@@ -7,8 +7,6 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTPRINTSUPPORT void force_link_gsiQtPrintSupport_f () { extern int force_link_gsiQtPrintSupport; force_link_gsiQtPrintSupport = 0; }
-
 #if !defined(HDR_gsiQtPrintSupportCommon_h)
 # define HDR_gsiQtPrintSupportCommon_h
 
@@ -21,5 +19,7 @@
 #   define GSI_QTPRINTSUPPORT_PUBLIC_TEMPLATE  DEF_OUTSIDE_PUBLIC_TEMPLATE
 #   define GSI_QTPRINTSUPPORT_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
+
+#define FORCE_LINK_GSI_QTPRINTSUPPORT void force_link_gsiQtPrintSupport_f () { GSI_QTPRINTSUPPORT_PUBLIC int force_link_gsiQtPrintSupport; force_link_gsiQtPrintSupport = 0; }
 
 #endif

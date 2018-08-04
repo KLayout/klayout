@@ -7,8 +7,6 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTXMLPATTERNS void force_link_gsiQtXmlPatterns_f () { extern int force_link_gsiQtXmlPatterns; force_link_gsiQtXmlPatterns = 0; }
-
 #if !defined(HDR_gsiQtXmlPatternsCommon_h)
 # define HDR_gsiQtXmlPatternsCommon_h
 
@@ -21,5 +19,7 @@
 #   define GSI_QTXMLPATTERNS_PUBLIC_TEMPLATE  DEF_OUTSIDE_PUBLIC_TEMPLATE
 #   define GSI_QTXMLPATTERNS_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
+
+#define FORCE_LINK_GSI_QTXMLPATTERNS void force_link_gsiQtXmlPatterns_f () { GSI_QTXMLPATTERNS_PUBLIC int force_link_gsiQtXmlPatterns; force_link_gsiQtXmlPatterns = 0; }
 
 #endif

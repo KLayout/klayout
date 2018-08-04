@@ -7,8 +7,6 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTCORE void force_link_gsiQtCore_f () { extern int force_link_gsiQtCore; force_link_gsiQtCore = 0; }
-
 #if !defined(HDR_gsiQtCoreCommon_h)
 # define HDR_gsiQtCoreCommon_h
 
@@ -21,5 +19,7 @@
 #   define GSI_QTCORE_PUBLIC_TEMPLATE  DEF_OUTSIDE_PUBLIC_TEMPLATE
 #   define GSI_QTCORE_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
+
+#define FORCE_LINK_GSI_QTCORE void force_link_gsiQtCore_f () { GSI_QTCORE_PUBLIC int force_link_gsiQtCore; force_link_gsiQtCore = 0; }
 
 #endif

@@ -3080,8 +3080,6 @@ END
       src.puts("")
       src.puts("#include \"tlDefs.h\"")
       src.puts("")
-      src.puts("#define FORCE_LINK_GSI_#{modn.upcase} void force_link_gsi#{modn}_f () { extern int force_link_gsi#{modn}; force_link_gsi#{modn} = 0; }")
-      src.puts("")
       src.puts("#if !defined(HDR_gsi#{modn}Common_h)")
       src.puts("# define HDR_gsi#{modn}Common_h")
       src.puts("")
@@ -3094,6 +3092,8 @@ END
       src.puts("#   define GSI_#{modn.upcase}_PUBLIC_TEMPLATE  DEF_OUTSIDE_PUBLIC_TEMPLATE")
       src.puts("#   define GSI_#{modn.upcase}_LOCAL            DEF_OUTSIDE_LOCAL")
       src.puts("# endif")
+      src.puts("")
+      src.puts("#define FORCE_LINK_GSI_#{modn.upcase} void force_link_gsi#{modn}_f () { GSI_#{modn.upcase}_PUBLIC int force_link_gsi#{modn}; force_link_gsi#{modn} = 0; }")
       src.puts("")
       src.puts("#endif")
 

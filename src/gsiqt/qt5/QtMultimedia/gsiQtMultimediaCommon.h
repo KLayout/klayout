@@ -7,8 +7,6 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTMULTIMEDIA void force_link_gsiQtMultimedia_f () { extern int force_link_gsiQtMultimedia; force_link_gsiQtMultimedia = 0; }
-
 #if !defined(HDR_gsiQtMultimediaCommon_h)
 # define HDR_gsiQtMultimediaCommon_h
 
@@ -21,5 +19,7 @@
 #   define GSI_QTMULTIMEDIA_PUBLIC_TEMPLATE  DEF_OUTSIDE_PUBLIC_TEMPLATE
 #   define GSI_QTMULTIMEDIA_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
+
+#define FORCE_LINK_GSI_QTMULTIMEDIA void force_link_gsiQtMultimedia_f () { GSI_QTMULTIMEDIA_PUBLIC int force_link_gsiQtMultimedia; force_link_gsiQtMultimedia = 0; }
 
 #endif

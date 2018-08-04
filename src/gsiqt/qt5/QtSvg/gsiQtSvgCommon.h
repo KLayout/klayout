@@ -7,8 +7,6 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTSVG void force_link_gsiQtSvg_f () { extern int force_link_gsiQtSvg; force_link_gsiQtSvg = 0; }
-
 #if !defined(HDR_gsiQtSvgCommon_h)
 # define HDR_gsiQtSvgCommon_h
 
@@ -21,5 +19,7 @@
 #   define GSI_QTSVG_PUBLIC_TEMPLATE  DEF_OUTSIDE_PUBLIC_TEMPLATE
 #   define GSI_QTSVG_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
+
+#define FORCE_LINK_GSI_QTSVG void force_link_gsiQtSvg_f () { GSI_QTSVG_PUBLIC int force_link_gsiQtSvg; force_link_gsiQtSvg = 0; }
 
 #endif

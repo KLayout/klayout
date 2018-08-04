@@ -7,8 +7,6 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTWIDGETS void force_link_gsiQtWidgets_f () { extern int force_link_gsiQtWidgets; force_link_gsiQtWidgets = 0; }
-
 #if !defined(HDR_gsiQtWidgetsCommon_h)
 # define HDR_gsiQtWidgetsCommon_h
 
@@ -21,5 +19,7 @@
 #   define GSI_QTWIDGETS_PUBLIC_TEMPLATE  DEF_OUTSIDE_PUBLIC_TEMPLATE
 #   define GSI_QTWIDGETS_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
+
+#define FORCE_LINK_GSI_QTWIDGETS void force_link_gsiQtWidgets_f () { GSI_QTWIDGETS_PUBLIC int force_link_gsiQtWidgets; force_link_gsiQtWidgets = 0; }
 
 #endif

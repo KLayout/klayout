@@ -7,8 +7,6 @@
 
 #include "tlDefs.h"
 
-#define FORCE_LINK_GSI_QTNETWORK void force_link_gsiQtNetwork_f () { extern int force_link_gsiQtNetwork; force_link_gsiQtNetwork = 0; }
-
 #if !defined(HDR_gsiQtNetworkCommon_h)
 # define HDR_gsiQtNetworkCommon_h
 
@@ -21,5 +19,7 @@
 #   define GSI_QTNETWORK_PUBLIC_TEMPLATE  DEF_OUTSIDE_PUBLIC_TEMPLATE
 #   define GSI_QTNETWORK_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
+
+#define FORCE_LINK_GSI_QTNETWORK void force_link_gsiQtNetwork_f () { GSI_QTNETWORK_PUBLIC int force_link_gsiQtNetwork; force_link_gsiQtNetwork = 0; }
 
 #endif

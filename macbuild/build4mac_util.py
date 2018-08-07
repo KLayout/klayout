@@ -18,12 +18,6 @@ import string
 import subprocess
 import shutil
 
-try:
-    from pathlib import Path
-    Path('~').expanduser()
-except (ImportError,AttributeError):  # python2
-    from pathlib2 import Path
-
 #-------------------------------------------------------------------------------
 ## To import global dictionaries of different modules
 #-------------------------------------------------------------------------------
@@ -181,7 +175,6 @@ def SetChangeLibIdentificationName( executable, relativedir ):
 
 def WalkLibDependencyTree( dylibPath, depth=0, filter_regex=r'\t+/usr/local/opt'):
   NOTHINGTODO = []  # return empty list if nothing to do.
-  dylibPath = str(Path(dylibPath))
   cmdNameId  = XcodeToolChain['nameID']
   cmdNameChg = XcodeToolChain['nameCH']
   otoolCm    = 'otool -L %s | grep -E "%s"' % (dylibPath, filter_regex)
@@ -193,7 +186,7 @@ def WalkLibDependencyTree( dylibPath, depth=0, filter_regex=r'\t+/usr/local/opt'
   if depth < 5:
     if len(deplibs) > 0:
       for idx, lib in enumerate(deplibs):
-        lib = str(Path(lib))
+        lib = str(lib)
         if lib != list(keys)[0]:
           deplibs[idx] = WalkLibDependencyTree(lib, depth+1, filter_regex)
     if depth == 0:
@@ -212,7 +205,6 @@ def WalkFrameworkPaths(frameworkPaths, filter_regex=r'\.(so|dylib)$', search_pat
   dependency_dict = dict()
 
   for frameworkPath in frameworkPathsIter:
-    frameworkPath = str(Path(frameworkPath))
     # print("Calling:", 'find %s -type f | grep -E "%s"' % (frameworkPath, filter_regex))
     find_grep_results = os.popen('find %s -type f | grep -E "%s"' % (frameworkPath, filter_regex)).read().split('\n')
     framework_files = filter(lambda x: x != '',
@@ -239,7 +231,7 @@ def WalkDictTree(dependencyDict, visited_files):
           if deplib not in visited_files:
             visited_files.append(deplib)
         elif isinstance(deplib, dict):
-          dependency_list.append(str(next(iter(deplib))))
+          dependency_list.append(next(iter(deplib)))
           libNameChanges.extend(WalkDictTree(deplib, visited_files))
         else:
           #raise RuntimeError("Unexpected value: %s" % deplib)
@@ -253,16 +245,13 @@ def WalkDictTree(dependencyDict, visited_files):
     visited_files.append(lib)
   return libNameChanges
 
-def FindFramework(path, root_path):
-  path = Path(path)
-  root_path = Path(root_path)
-  relPath = path.relative_to(root_path)
-  return str(root_path / relPath.parts[0])
 
+def FindFramework(path, root_path):
+  relPath = os.path.relpath(path, root_path)
+  return os.path.join(root_path, relPath.split(os.sep)[0])
 def ResolveExecutablePath(path, executable_path):
   """ Transforms @executable_path into executable_path"""
-  executable_path = str(executable_path)
-  p = Path(str(path).replace("@executable_path", "/%s/" % executable_path))
+  p = path.replace("@executable_path", "/%s/" % executable_path)
   return p
 
 def DetectChanges(frameworkDependencyDict):
@@ -289,11 +278,8 @@ def PerformChanges(frameworkDependencyDict, replaceFromToPairs=None, executable_
       except StopIteration:
         dependencies = list()
       for replaceFrom, replaceTo, libdir in replaceFromToPairs:
-        replaceFrom = str(Path(replaceFrom))
-        replaceTo = str(Path(replaceTo))
-
         fileName = ResolveExecutablePath(lib.replace(replaceFrom, replaceTo), executable_path)
-        if str(fileName).startswith('/usr'):
+        if fileName.startswith('/usr'):
           # print(f'skipping fileName: {fileName}')
           continue
 
@@ -305,14 +291,14 @@ def PerformChanges(frameworkDependencyDict, replaceFromToPairs=None, executable_
           destFrameworkPath = frameworkPath.replace(replaceFrom, replaceTo)
           destFrameworkPath = ResolveExecutablePath(destFrameworkPath, executable_path)
 
-          if not fileName.exists():
+          if not os.path.exists(fileName):
             print (lib.replace(replaceFrom, replaceTo), "DOES NOT EXIST")
             print ("COPY", frameworkPath, " -> ", destFrameworkPath)
-            shutil.copytree(frameworkPath, str(destFrameworkPath))
+            shutil.copytree(frameworkPath, destFrameworkPath)
 
           nameId = lib.replace(replaceFrom, replaceTo)
           command = "%s %s %s" % ( cmdNameId, nameId, fileName )
-          if not os.access(str(fileName), os.W_OK):
+          if not os.access(fileName, os.W_OK):
             command = "chmod u+w %s; %s; chmod u-w %s" % (fileName, command, fileName)
           # print("\t%s" % command)
           if subprocess.call( command, shell=True ) != 0:

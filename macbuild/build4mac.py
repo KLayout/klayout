@@ -813,7 +813,7 @@ def DeployBinariesForBundle():
       appUsrLocalPath = '@executable_path/../Frameworks/'
       replacePairs = [(usrLocalPath, appUsrLocalPath, True)]
       replacePairs.extend([(openssl_version, '@executable_path/../Frameworks/openssl', True)
-        for openssl_version in list(Path('/usr/local/Cellar/openssl').glob('*'))])
+        for openssl_version in glob.glob('/usr/local/Cellar/openssl/*')])
       depdict = WalkFrameworkPaths([pythonFrameworkPath + '/../openssl',
                                     pythonFrameworkPath + '/../gdbm',
                                     pythonFrameworkPath + '/../readline',

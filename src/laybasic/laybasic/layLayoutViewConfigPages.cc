@@ -829,10 +829,12 @@ LayoutViewConfigPage4::update ()
     QRect rt (fm.boundingRect (QString::fromUtf8 ("AA")));
 
     const unsigned int h = rt.height () + 10;
-    const unsigned int w = rt.weight () + 10;
+    const unsigned int w = rt.width () + 10;
 
     QPixmap pxmp (w * dpr, h * dpr);
-    pxmp.setDevicePixelRatio(dpr);
+#if QT_VERSION > 0x050000
+    pxmp.setDevicePixelRatio (dpr);
+#endif
 
     QPainter pxpainter (&pxmp);
     pxpainter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text)));
@@ -1180,7 +1182,9 @@ LayoutViewConfigPage6::update ()
 #endif
 
     QImage image (w * dpr, h * dpr, QImage::Format_RGB32);
-    image.setDevicePixelRatio(dpr);
+#if QT_VERSION > 0x050000
+    image.setDevicePixelRatio (dpr);
+#endif
     image.fill (color0.rgb ());
 
     // copying code from layLayerToolbox.cc
@@ -1198,7 +1202,9 @@ LayoutViewConfigPage6::update ()
     pxpainter.setFont (font ());
     pxpainter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);
 
-    pxmp.setDevicePixelRatio(dpr);
+#if QT_VERSION > 0x050000
+    pxmp.setDevicePixelRatio (dpr);
+#endif
 
     (mp_ui->*(cfg6_buttons [i]))->setIconSize (pxmp.size ());
     (mp_ui->*(cfg6_buttons [i]))->setIcon (QIcon (pxmp));
@@ -1385,7 +1391,9 @@ LayoutViewConfigPage6a::update ()
 
     QImage image (w * dpr, h * dpr, QImage::Format_RGB32);
     image.fill (color0.rgb ());
-    image.setDevicePixelRatio(dpr);
+#if QT_VERSION > 0x050000
+    image.setDevicePixelRatio (dpr);
+#endif
 
     QBitmap bitmap = m_style.style (s).get_bitmap (w * dpr, h * dpr);
     QPainter painter (&image);
@@ -1394,7 +1402,9 @@ LayoutViewConfigPage6a::update ()
     painter.drawPixmap (0, 0, w, h, bitmap);
 
     QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
-    pixmap.setDevicePixelRatio(dpr);
+#if QT_VERSION > 0x050000
+    pixmap.setDevicePixelRatio (dpr);
+#endif
     b->setIconSize (pixmap.size ());
     b->setIcon (QIcon (pixmap));
 

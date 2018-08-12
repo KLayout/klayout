@@ -208,7 +208,9 @@ LCPDitherPalette::create_pixmap_for (LCPActiveLabel *b, int n)
 
   QImage image (w * dpr, h * dpr, QImage::Format_RGB32);
   image.fill (color0.rgb ());
-  image.setDevicePixelRatio(dpr);
+#if QT_VERSION > 0x050000
+  image.setDevicePixelRatio (dpr);
+#endif
 
   // TODO include a scaling algorithm in get_bitmap, because it looks small in highDPI screens
   QBitmap bitmap = pattern.pattern (n).get_bitmap (w * dpr, h * dpr);
@@ -218,7 +220,9 @@ LCPDitherPalette::create_pixmap_for (LCPActiveLabel *b, int n)
   painter.drawPixmap (0, 0, w, h, bitmap);
 
   QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
-  pixmap.setDevicePixelRatio(dpr);
+#if QT_VERSION > 0x050000
+  pixmap.setDevicePixelRatio (dpr);
+#endif
   b->setPixmap (pixmap);
 }
 
@@ -646,7 +650,9 @@ LCPStylePalette::create_pixmap_for_line_style (LCPActiveLabel *b, int n)
 
   QImage image (dpr * w, dpr * h, QImage::Format_RGB32);
   image.fill (color0.rgb ());
-  image.setDevicePixelRatio(dpr);
+#if QT_VERSION > 0x050000
+  image.setDevicePixelRatio (dpr);
+#endif
 
   QBitmap bitmap = styles.style (n).get_bitmap (dpr * w, dpr * h);
   QPainter painter (&image);
@@ -655,7 +661,9 @@ LCPStylePalette::create_pixmap_for_line_style (LCPActiveLabel *b, int n)
   painter.drawPixmap (0, 0, w, h, bitmap);
 
   QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
-  pixmap.setDevicePixelRatio(dpr);
+#if QT_VERSION > 0x050000
+  pixmap.setDevicePixelRatio (dpr);
+#endif
   b->setPixmap (pixmap);
 }
 

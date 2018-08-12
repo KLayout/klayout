@@ -1182,22 +1182,6 @@ LayoutViewConfigPage6::update ()
     QImage image (w * dpr, h * dpr, QImage::Format_RGB32);
     image.setDevicePixelRatio(dpr);
     image.fill (color0.rgb ());
-    // if (s >= 0) {
-    //   const uint32_t * const *dp = m_pattern.pattern ((unsigned int) s).pattern ();
-    //   for (unsigned int l = 0; l < h; ++l, ++dp) {
-    //     uint32_t m = **dp;
-    //     if (l == 0 || l == h - 1) { 
-    //       m |= ((1 << w) - 1);
-    //     } else {
-    //       m |= ((1 << (w - 1)) | 1);
-    //     }
-    //     color_t *pt = (color_t *) image.scanLine (h - 1 - l);
-    //     for (unsigned int b = 0; b < w; ++b) {
-    //       *pt++ = (m & 1) ? color1 : color0;
-    //       m >>= 1;
-    //     }
-    //   }
-    // }
 
     // copying code from layLayerToolbox.cc
     QBitmap bitmap = m_pattern.pattern ((unsigned int) s).get_bitmap (w * dpr, h * dpr);

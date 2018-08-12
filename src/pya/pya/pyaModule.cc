@@ -493,7 +493,11 @@ static std::string extract_python_name (const std::string &name)
   } else if (name == "-@") {
     return "__neg__";
   } else if (name == "/") {
+    #if PY_MAJOR_VERSION < 3
     return "__div__";
+    #else
+    return "__truediv__";
+    #endif
   } else if (name == "*") {
     return "__mul__";
   } else if (name == "%") {
@@ -515,7 +519,11 @@ static std::string extract_python_name (const std::string &name)
   } else if (name == "-=") {
     return "__isub__";
   } else if (name == "/=") {
+    #if PY_MAJOR_VERSION < 3
     return "__idiv__";
+    #else
+    return "__itruediv__";
+    #endif
   } else if (name == "*=") {
     return "__imul__";
   } else if (name == "%=") {
@@ -2698,6 +2706,11 @@ PythonModule::make_classes (const char *mod_name)
               add_python_doc (*c, mt, mid, tl::to_string (tr ("This method enables iteration of the object")));
               alt_names.push_back ("__iter__");
 
+            } else if (name == "__mul__") {
+              // Adding right multiplication
+              // Rationale: if pyaObj * x works, so should x * pyaObj
+              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is also available as '__mul__'")));
+              alt_names.push_back ("__rmul__");
             }
 
             for (std::vector <std::string>::const_iterator an = alt_names.begin (); an != alt_names.end (); ++an) {

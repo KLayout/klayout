@@ -24,16 +24,24 @@
 #ifndef HDR_dbHash
 #define HDR_dbHash
 
-#if defined(__GNUC__)
-#   include <ext/hash_map>
-#   include <ext/hash_set>
-namespace std_ext = __gnu_cxx;
-#  define DB_HASH_NAMESPACE __gnu_cxx
-#else
-#   include <hash_map>
-#   include <hash_set>
+#if defined(__APPLE__)
+#define __EXT_HASH_DEPRECATED
+#endif
+#if defined(__EXT_HASH_DEPRECATED) // clang compiler complains about deprecation warning on ext/hash_map and ext/hash_set
+#    include <unordered_map> 
+#    include <unordered_set>
+#    define DB_HASH_NAMESPACE std
 namespace std_ext = std;
-#  define DB_HASH_NAMESPACE std
+#elif defined(__GNUC__)
+#    include <ext/hash_map>
+#    include <ext/hash_set>
+namespace std_ext = __gnu_cxx;
+#    define DB_HASH_NAMESPACE __gnu_cxx
+#else
+#    include <hash_map>
+#    include <hash_set>
+namespace std_ext = std;
+#    define DB_HASH_NAMESPACE std
 #endif
 
 #include "dbPoint.h"
@@ -74,7 +82,7 @@ namespace DB_HASH_NAMESPACE
   };
 #endif
 
-#if defined(_WIN64) || defined(__APPLE__)
+#if defined(_WIN64)
   /**
    *  @brief Specialization missing for long long on WIN64
    */
@@ -98,6 +106,13 @@ namespace DB_HASH_NAMESPACE
       return size_t (__x ^ (__x >> 32));
     }
   };
+#endif
+
+#if defined(__EXT_HASH_DEPRECATED)
+  template<typename _Key, typename _Tp>
+  using hash_map = unordered_map<_Key, _Tp>;
+  template<typename _Value>
+  using hash_set = unordered_set<_Value>;
 #endif
 
   template <class T>

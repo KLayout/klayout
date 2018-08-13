@@ -1004,6 +1004,8 @@ MacroEditorPage::replace_all (const QString &replace)
       int i = m_current_search.indexIn (b.text (), o);
       if (i < 0) {
         break;
+      } else if (m_current_search.matchedLength () == 0) {
+        break;  //  avoid an infinite loop
       }
 
       QString r = interpolate_string (replace, m_current_search);

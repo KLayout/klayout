@@ -1377,6 +1377,23 @@ class DBShapes_TestClass < TestBase
 
   end
 
+  # issue 152 (number of shapes count wrong in viewer mode)
+  def test_10
+
+    ly = RBA::Layout::new(true)
+    ly.read(File.join($ut_testsrc, "testdata", "oasis", "issue_152.oas"))
+    assert_equal(ly.top_cell.shapes(ly.layer(1, 0)).size, 200)
+    ly.top_cell.shapes(ly.layer(1, 0)).insert(RBA::Polygon::new(RBA::Box::new(0, 0, 100, 100)))
+    assert_equal(ly.top_cell.shapes(ly.layer(1, 0)).size, 201)
+
+    ly = RBA::Layout::new(false)
+    ly.read(File.join($ut_testsrc, "testdata", "oasis", "issue_152.oas"))
+    assert_equal(ly.top_cell.shapes(ly.layer(1, 0)).size, 200)
+    ly.top_cell.shapes(ly.layer(1, 0)).insert(RBA::Polygon::new(RBA::Box::new(0, 0, 100, 100)))
+    assert_equal(ly.top_cell.shapes(ly.layer(1, 0)).size, 201)
+
+  end
+
 end
 
 load("test_epilogue.rb")

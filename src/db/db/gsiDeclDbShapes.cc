@@ -50,6 +50,21 @@ static void dump_mem_statistics (const db::Shapes *shapes, bool detailed)
   ms.print ();
 }
 
+static size_t shapes_size (const db::Shapes *shapes)
+{
+  //  we may have shape arrays - expand their count to match the shape count with the shapes delivered
+  size_t n = 0;
+  for (db::Shapes::shape_iterator i = shapes->begin (db::ShapeIterator::All); ! i.at_end (); ++i) {
+    if (i.in_array ()) {
+      n += i.array ().array_size ();
+      i.finish_array ();
+    } else {
+      ++n;
+    }
+  }
+  return n;
+}
+
 template<class Sh>
 static db::Shape insert (db::Shapes *s, const Sh &p)
 {
@@ -1088,7 +1103,7 @@ Class<db::Shapes> decl_Shapes ("Shapes",
     "@brief Clears the shape container\n"
     "This method has been introduced in version 0.16. It can only be used in editable mode."
   ) +
-  gsi::method ("size", (size_t (db::Shapes::*)() const) &db::Shapes::size, 
+  gsi::method_ext ("size", &shapes_size,
     "@brief Gets the number of shapes in this container\n"
     "This method was introduced in version 0.16\n"
     "@return The number of shapes in this container\n"

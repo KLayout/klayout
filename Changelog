@@ -16,6 +16,11 @@
        style
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/148
        Wrong font is used
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/152
+       Shapes#size reported a wrong shape count in viewer mode
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/155
+       Program freezes after replacing nothing by something in 
+       Macro editor
 * Bugfix: 8 bit indexed GIF images can be used for package icons now
 * Enhancement: Provide a way to specify the type of a macro
        This feature is mainly useful for command line arguments.

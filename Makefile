@@ -1,5 +1,7 @@
 .PHONY: help build deploy test dropbox-deploy
 
+.ONESHELL:
+
 default: help
 
 help:
@@ -11,23 +13,23 @@ help:
 	@echo "Valid Python Version: [nil, Sys, B37]"
 
 build: 
-	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew -c
-	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew
+	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew -c; \
+	source filter-clang.sh; ./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew | filter
 
 deploy: build
 	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew -y
 	
 test: deploy
-	qt5.pkg.macos--release/klayout.app/Contents/MacOS/klayout -b -r test-pylib-script.py
-	cd qt5.build.macos-$(MACOS_VERSION)-release
-	ln -s klayout.app/Contents/MacOS/klayout klayout
-	export TESTTMP=testtmp
-	export TESTSRC=..
-	./ut_runner -h
+	qt5.pkg.macos-$(MACOS_VERSION)-release/klayout.app/Contents/MacOS/klayout -b -r test-pylib-script.py; \
+	cd qt5.build.macos-$(MACOS_VERSION)-release; \
+	ln -s klayout.app/Contents/MacOS/klayout klayout; \
+	export TESTTMP=testtmp; \
+	export TESTSRC=..; \
+	./ut_runner -h; \
 	./ut_runner -s
 
 dropbox-deploy: test
-	cd ..
-	export gitcommit=$(git rev-parse --short HEAD)
-	mkdir deploy
+	cd ..; \
+	export gitcommit=$(git rev-parse --short HEAD); \
+	mkdir deploy; \
 	tar czf "deploy/qt5.pkg.macos-$(MACOS_VERSION)-release-$gitcommit.tar.gz" qt5.pkg.macos-$(MACOS_VERSION)-release

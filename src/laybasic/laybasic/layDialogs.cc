@@ -571,6 +571,18 @@ ReplaceCellOptionsDialog::~ReplaceCellOptionsDialog ()
   //  .. nothing yet ..
 }
 
+static std::pair<bool, db::cell_index_type>
+find_cell_by_display_name (const db::Layout &layout, const std::string &cn)
+{
+  for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
+    if (layout.display_name (c->cell_index ()) == cn) {
+      return std::make_pair (true, c->cell_index ());
+    }
+  }
+
+  return std::make_pair (false, 0);
+}
+
 bool 
 ReplaceCellOptionsDialog::exec_dialog (const lay::CellView &cv, int &replace_mode, db::cell_index_type &cell_index)
 {
@@ -593,7 +605,7 @@ ReplaceCellOptionsDialog::exec_dialog (const lay::CellView &cv, int &replace_mod
     }
 
     std::string cn = tl::to_string (cell_selection_cbx->lineEdit ()->text ());
-    std::pair<bool, db::cell_index_type> cc = cv->layout ().cell_by_name (cn.c_str ());
+    std::pair<bool, db::cell_index_type> cc = find_cell_by_display_name (cv->layout (), cn.c_str ());
     cell_index = cc.second;
 
     return cc.first;
@@ -611,7 +623,7 @@ BEGIN_PROTECTED;
   lay::CellTreeModel *model = dynamic_cast<lay::CellTreeModel *> (cell_selection_cbx->model ());
   if (model) {
     std::string cn = tl::to_string (cell_selection_cbx->lineEdit ()->text ());
-    std::pair<bool, db::cell_index_type> cc = model->layout ()->cell_by_name (cn.c_str ());
+    std::pair<bool, db::cell_index_type> cc = find_cell_by_display_name (*model->layout (), cn.c_str ());
     if (! cc.first) {
       throw tl::Exception (tl::to_string (QObject::tr ("Not a valid cell name: ")) + cn);
     }

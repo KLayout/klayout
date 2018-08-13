@@ -21,6 +21,9 @@
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/155
        Program freezes after replacing nothing by something in 
        Macro editor
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/157
+       "Replace cell with ..." rejected cell names with a library
+       prefix
 * Bugfix: 8 bit indexed GIF images can be used for package icons now
 * Enhancement: Provide a way to specify the type of a macro
        This feature is mainly useful for command line arguments.

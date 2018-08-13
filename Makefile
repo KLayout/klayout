@@ -14,7 +14,7 @@ help:
 
 build: 
 	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew -c; \
-	source filter-clang.sh; ./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew | filter
+	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew
 
 deploy: build
 	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew -y
@@ -32,4 +32,5 @@ dropbox-deploy: test
 	cd ..; \
 	export gitcommit=$(git rev-parse --short HEAD); \
 	mkdir deploy; \
+	mv build.txt deploy; \
 	tar czf "deploy/qt5.pkg.macos-$(MACOS_VERSION)-release-$gitcommit.tar.gz" qt5.pkg.macos-$(MACOS_VERSION)-release

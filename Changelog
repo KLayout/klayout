@@ -1,4 +1,4 @@
-0.25.4          (2018-07-28):
+0.25.4          (2018-08-25):
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/121
        Issue with multiple reads of GDS2 layouts including PCells
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/134
@@ -18,12 +18,19 @@
        Wrong font is used
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/152
        Shapes#size reported a wrong shape count in viewer mode
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/153
+       Application crash when editing guiding shape properties
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/155
        Program freezes after replacing nothing by something in 
        Macro editor
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/157
        "Replace cell with ..." rejected cell names with a library
        prefix
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/158
+       Repaint issue on cell context
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/159
+       Tech specific macros and DRC scripts were not shown in tech
+       manager
 * Bugfix: 8 bit indexed GIF images can be used for package icons now
 * Enhancement: Provide a way to specify the type of a macro
        This feature is mainly useful for command line arguments.

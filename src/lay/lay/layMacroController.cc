@@ -147,7 +147,10 @@ MacroController::finish ()
 
   if (! m_no_implicit_macros) {
     for (std::vector <ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
-      lym::MacroCollection::root ().add_folder (p->description, p->path, p->cat, p->readonly);
+      lym::MacroCollection *mc = lym::MacroCollection::root ().add_folder (p->description, p->path, p->cat, p->readonly);
+      if (mc) {
+        mc->set_virtual_mode (p->type);
+      }
     }
   }
 

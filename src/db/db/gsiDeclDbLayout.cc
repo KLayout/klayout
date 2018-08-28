@@ -115,7 +115,7 @@ db::LayerProperties li_from_string (const char *s)
 static
 size_t hash_value (const db::LayerProperties *l)
 {
-  return std_ext::hfunc (*l);
+  return std::hfunc (*l);
 }
 
 //  since there already exists a "LayerProperties" object, we call this one "LayerInfo"

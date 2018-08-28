@@ -239,6 +239,11 @@ public:
   RecursiveShapeIterator (const layout_type &layout, const cell_type &cell, const std::set<unsigned int> &layers);
 
   /**
+   *  @brief Destructor
+   */
+  ~RecursiveShapeIterator ();
+
+  /**
    *  @brief Specify the maximum hierarchy depth to look into
    *
    *  A depth of 0 instructs the iterator to deliver only shapes from the initial cell.

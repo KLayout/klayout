@@ -20,7 +20,6 @@
 
 */
 
-
 #include <Python.h>
 #include <frameobject.h>   //  Python - for traceback
 

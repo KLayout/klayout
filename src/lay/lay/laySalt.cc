@@ -216,7 +216,7 @@ Salt::validate ()
 
       for (std::map<std::string, SaltGrain *>::const_iterator g = m_grains_by_name.begin (); g != m_grains_by_name.end (); ++g) {
         int index = topological_index [g->first];
-        for (std::vector<SaltGrain::Dependency>::const_iterator d = g->second->dependencies ().begin (); d != g->second->dependencies ().end (); ++d) {
+        for (std::vector<SaltGrainDependency>::const_iterator d = g->second->dependencies ().begin (); d != g->second->dependencies ().end (); ++d) {
           std::map<std::string, int>::iterator ti = topological_index.find (d->name);
           if (ti != topological_index.end () && ti->second < index + 1) {
             ti->second = index + 1;

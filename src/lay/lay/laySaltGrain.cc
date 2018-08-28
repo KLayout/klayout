@@ -397,9 +397,9 @@ SaltGrain::xml_elements ()
       tl::make_member (&SaltGrain::icon, &SaltGrain::set_icon, "icon", ImageConverter ()) +
       tl::make_member (&SaltGrain::screenshot, &SaltGrain::set_screenshot, "screenshot", ImageConverter ()) +
       tl::make_element (&SaltGrain::begin_dependencies, &SaltGrain::end_dependencies, &SaltGrain::add_dependency, "depends",
-        tl::make_member (&SaltGrain::Dependency::name, "name") +
-        tl::make_member (&SaltGrain::Dependency::url, "url") +
-        tl::make_member (&SaltGrain::Dependency::version, "version")
+        tl::make_member (&SaltGrainDependency::name, "name") +
+        tl::make_member (&SaltGrainDependency::url, "url") +
+        tl::make_member (&SaltGrainDependency::version, "version")
       )
     );
   }

@@ -23,7 +23,9 @@
 #include "utTestConsole.h"
 #include "tlUnitTest.h"
 
-#include <unistd.h>
+#if !defined(_MSC_VER)
+#  include <unistd.h>
+#endif
 
 #if !defined(_WIN32)
 #  include <sys/ioctl.h>
@@ -195,7 +197,11 @@ TestConsole::TestConsole (FILE *file)
 {
   ms_instance = this;
 
+#if defined(_MSC_VER)
+  m_file_is_tty = false;
+#else
   m_file_is_tty = isatty (fileno (file));
+#endif
 
 #if !defined(_WIN32)
   if (m_file_is_tty) {
@@ -221,7 +227,8 @@ TestConsole::~TestConsole ()
 int
 TestConsole::columns ()
 {
-  return std::max (m_columns - tl::indent (), 0);
+  int c = m_columns - tl::indent ();
+  return c > 0 ? c : 0;
 }
 
 void

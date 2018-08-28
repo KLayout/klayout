@@ -63,7 +63,7 @@ private:
 };
 
 template <class C>
-class DB_PUBLIC hershey_edge_iterator
+class DB_PUBLIC_TEMPLATE hershey_edge_iterator
   : private basic_hershey_edge_iterator
 {
 public:
@@ -124,7 +124,7 @@ private:
  */
 
 template <class C>
-struct DB_PUBLIC hershey
+struct DB_PUBLIC_TEMPLATE hershey
 {
   typedef C coord_type;
   typedef db::coord_traits<C> coord_traits;

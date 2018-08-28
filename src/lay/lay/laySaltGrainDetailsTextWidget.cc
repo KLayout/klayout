@@ -283,7 +283,7 @@ SaltGrainDetailsTextWidget::details_text ()
   }
   if (! g->dependencies ().empty ()) {
     stream << "<p><b>" << QObject::tr ("Depends on: ") << "</b><br/>";
-    for (std::vector<lay::SaltGrain::Dependency>::const_iterator d = g->dependencies ().begin (); d != g->dependencies ().end (); ++d) {
+    for (std::vector<lay::SaltGrainDependency>::const_iterator d = g->dependencies ().begin (); d != g->dependencies ().end (); ++d) {
       stream << "&nbsp;&nbsp;&nbsp;&nbsp;" << tl::to_qstring (tl::escaped_to_html (d->name)) << " ";
       stream << tl::to_qstring (tl::escaped_to_html (d->version));
       if (! d->url.empty ()) {

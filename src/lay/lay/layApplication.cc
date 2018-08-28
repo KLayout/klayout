@@ -297,7 +297,9 @@ ApplicationBase::parse_cmd (int &argc, char **argv)
 
       int v = 0;
       tl::from_string (args [++i], v);
-      v = std::max (0, v);
+      if (v < 0) {
+        v = 0;
+      }
       tl::verbosity (v);
 
     } else if (a == "-l" && (i + 1) < argc) {
@@ -374,13 +376,13 @@ ApplicationBase::parse_cmd (int &argc, char **argv)
 
       int r = 0;
       tl::from_string (args [++i], r);
-      m_gtf_replay_rate = std::max (0, r);
+      m_gtf_replay_rate = r > 0 ? r : 0;
 
     } else if (a == "-gb" && (i + 1) < argc) {
 
       int s = 0;
       tl::from_string (args [++i], s);
-      m_gtf_replay_stop = std::max (0, s);
+      m_gtf_replay_stop = s > 0 ? s : 0;
 
     } else if (a == "-c" && (i + 1) < argc) {
 

@@ -20,22 +20,11 @@
 
 */
 
-
 #ifndef HDR_dbHash
 #define HDR_dbHash
 
-#if defined(__GNUC__)
-#   include <ext/hash_map>
-#   include <ext/hash_set>
-namespace std_ext = __gnu_cxx;
-#  define DB_HASH_NAMESPACE __gnu_cxx
-#else
-#   define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
-#   include <hash_map>
-#   include <hash_set>
-namespace std_ext = std;
-#  define DB_HASH_NAMESPACE std
-#endif
+#include <unordered_map>
+#include <unordered_set>
 
 #include "dbPoint.h"
 #include "dbVector.h"
@@ -59,9 +48,9 @@ namespace std_ext = std;
  *  It also provides namespace abstraction for the std_ext namespace
  */
 
-namespace DB_HASH_NAMESPACE
+namespace std
 {
-#if defined(_WIN64)
+#if defined(_WIN64) && !defined(_MSC_VER)
   /**
    *  @brief Specialization missing for size_t on WIN64
    */
@@ -75,7 +64,7 @@ namespace DB_HASH_NAMESPACE
   };
 #endif
 
-#if defined(_WIN64) || defined(__APPLE__)
+#if (defined(_WIN64) && !defined(_MSC_VER)) || defined(__APPLE__)
   /**
    *  @brief Specialization missing for long long on WIN64
    */
@@ -381,4 +370,3 @@ namespace DB_HASH_NAMESPACE
 }
 
 #endif
-

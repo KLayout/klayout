@@ -207,7 +207,7 @@ struct simple_polygon_defs
 
   static size_t hash_value (const C *p)
   {
-    return std_ext::hfunc (*p);
+    return std::hfunc (*p);
   }
 
   static bool touches_box (const C *p, const db::box<coord_type> &box)
@@ -1055,7 +1055,7 @@ struct polygon_defs
 
   static size_t hash_value (const C *p)
   {
-    return std_ext::hfunc (*p);
+    return std::hfunc (*p);
   }
 
   static bool touches_box (const C *p, const db::box<coord_type> &box)

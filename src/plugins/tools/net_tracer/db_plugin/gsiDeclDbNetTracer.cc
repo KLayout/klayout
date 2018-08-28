@@ -27,7 +27,7 @@
 
 namespace db
 {
-  extern const std::string net_tracer_component_name;
+  extern std::string net_tracer_component_name;
 }
 
 namespace gsi

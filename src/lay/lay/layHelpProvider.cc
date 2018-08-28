@@ -36,10 +36,3 @@ HelpProvider::HelpProvider ()
 }
 
 }
-
-namespace tl
-{
-  //  registration point for help providers
-  template<>
-  tl::Registrar<lay::HelpProvider> *Registrar<lay::HelpProvider>::instance = 0;
-}

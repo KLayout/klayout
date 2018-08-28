@@ -38,7 +38,7 @@ namespace db
  *  T is supposed a transformation type such as "db::DCplxTrans".
  */
 template <class T>
-struct DB_PUBLIC TransformationConverter
+struct DB_PUBLIC_TEMPLATE TransformationConverter
 {
   std::string to_string (const T &t) const
   {
@@ -77,7 +77,7 @@ struct DB_PUBLIC LayoutLayerConverter
  *  P is supposed to be a point type (i.e. db::DPoint).
  */
 template <class P>
-struct DB_PUBLIC PointConverter
+struct DB_PUBLIC_TEMPLATE PointConverter
 {
   std::string to_string (const P &p) const
   {

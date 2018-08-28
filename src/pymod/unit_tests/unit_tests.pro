@@ -9,10 +9,23 @@ include($$PWD/../../lib_ut.pri)
 SOURCES = \
   pymod_tests.cc
 
-DEFINES += \
-  PYTHON=$$PYTHON \
-  PYTHONPATH=$$DESTDIR_UT/pymod
+msvc {
 
+  # "\\\\" is actually *one* backslash for replacement string and *two* backslashes in the
+  # substitution string in qmake ... so we replace \ by \\ here:
+  PYTHON_ESCAPED = $$replace(PYTHON, "\\\\", "\\\\")
+  PYTHONPATH = $$shell_path($$DESTDIR_UT/pymod)
+  PYTHONPATH_ESCAPED = $$replace(PYTHONPATH, "\\\\", "\\\\")
+
+  QMAKE_CXXFLAGS += \
+    "-DPYTHON=\"$$PYTHON_ESCAPED\"" \
+    "-DPYTHONPATH=\"$$PYTHONPATH_ESCAPED\""
+
+} else {
+  DEFINES += \
+    PYTHON=$$PYTHON_ESCAPED \
+    PYTHONPATH=$$PYTHONPATH_ESCAPED
+}
 
 INCLUDEPATH += $$DB_INC $$TL_INC $$GSI_INC
 DEPENDPATH += $$DB_INC $$TL_INC $$GSI_INC

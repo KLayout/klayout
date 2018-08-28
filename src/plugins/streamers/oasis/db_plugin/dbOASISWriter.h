@@ -90,7 +90,7 @@ public:
 private:
   typedef std::vector<db::Vector> disp_vector;
   
-  std_ext::hash_map <Obj, disp_vector> m_normalized;
+  std::unordered_map <Obj, disp_vector> m_normalized;
 
   unsigned int m_level;
 };

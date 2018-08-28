@@ -343,7 +343,7 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
   tmp_rep_vector repetitions;
   std::vector<std::pair<db::Vector, db::Repetition> > rep_vector;
 
-  for (typename std_ext::hash_map <Obj, disp_vector>::iterator n = m_normalized.begin (); n != m_normalized.end (); ++n) {
+  for (typename std::unordered_map <Obj, disp_vector>::iterator n = m_normalized.begin (); n != m_normalized.end (); ++n) {
 
     rep_vector.clear ();
 
@@ -358,7 +358,7 @@ Compressor<Obj>::flush (db::OASISWriter *writer)
       disp_vector::iterator d;
       tmp_rep_vector::iterator rw;
 
-      std_ext::hash_set<db::Coord> xcoords, ycoords;
+      std::unordered_set<db::Coord> xcoords, ycoords;
       if (m_level > 1) {
         for (d = n->second.begin (); d != n->second.end (); ++d) {
           xcoords.insert (d->x ());

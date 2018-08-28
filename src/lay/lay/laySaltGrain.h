@@ -35,6 +35,26 @@ namespace lay
 {
 
 /**
+ *  @brief A descriptor for one dependency
+ *  A dependency can be specified either through a name (see name property)
+ *  or a download URL. If download URL are specified, they have precedence
+ *  over names.
+ *  The version is the minimum required version. If empty, any version is
+ *  allowed to resolve this dependency.
+ */
+struct SaltGrainDependency
+{
+  std::string name;
+  std::string url;
+  std::string version;
+
+  bool operator== (const SaltGrainDependency &other) const
+  {
+    return name == other.name && url == other.url && version == other.version;
+  }
+};
+
+/**
  *  @brief This class represents on grain of salt
  *  "One grain of salt" is one package.
  */
@@ -43,29 +63,14 @@ class LAY_PUBLIC SaltGrain
 {
 public:
   /**
-   *  @brief A descriptor for one dependency
-   *  A dependency can be specified either through a name (see name property)
-   *  or a download URL. If download URL are specified, they have precedence
-   *  over names.
-   *  The version is the minimum required version. If empty, any version is
-   *  allowed to resolve this dependency.
-   */
-  struct Dependency
-  {
-    std::string name;
-    std::string url;
-    std::string version;
-
-    bool operator== (const Dependency &other) const
-    {
-      return name == other.name && url == other.url && version == other.version;
-    }
-  };
-
-  /**
    *  @brief Constructor
    */
   SaltGrain ();
+
+  /**
+   *  @brief Destructor
+   */
+  virtual ~SaltGrain () { }
 
   /**
    *  @brief Equality
@@ -347,7 +352,7 @@ public:
    *  Grains this grain depends on are installed automatically when the grain
    *  is installed.
    */
-  const std::vector<Dependency> &dependencies () const
+  const std::vector<SaltGrainDependency> &dependencies () const
   {
     return m_dependencies;
   }
@@ -355,7 +360,7 @@ public:
   /**
    *  @brief Gets the dependencies of the grain (non-const)
    */
-  std::vector<Dependency> &dependencies ()
+  std::vector<SaltGrainDependency> &dependencies ()
   {
     return m_dependencies;
   }
@@ -363,7 +368,7 @@ public:
   /**
    *  @brief Dependency iterator (begin)
    */
-  std::vector<Dependency>::const_iterator begin_dependencies () const
+  std::vector<SaltGrainDependency>::const_iterator begin_dependencies () const
   {
     return m_dependencies.begin ();
   }
@@ -371,7 +376,7 @@ public:
   /**
    *  @brief Dependency iterator (end)
    */
-  std::vector<Dependency>::const_iterator end_dependencies () const
+  std::vector<SaltGrainDependency>::const_iterator end_dependencies () const
   {
     return m_dependencies.end ();
   }
@@ -379,7 +384,7 @@ public:
   /**
    *  @brief Adds a dependency
    */
-  void add_dependency (const Dependency &dep)
+  void add_dependency (const SaltGrainDependency &dep)
   {
     m_dependencies.push_back (dep);
   }
@@ -482,7 +487,7 @@ private:
   bool m_hidden;
   QDateTime m_authored_time, m_installed_time;
   QImage m_icon, m_screenshot;
-  std::vector<Dependency> m_dependencies;
+  std::vector<SaltGrainDependency> m_dependencies;
 };
 
 }

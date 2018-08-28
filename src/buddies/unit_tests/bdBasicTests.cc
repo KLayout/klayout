@@ -35,7 +35,8 @@ TEST(1)
 
   opt.add_options (cmd);
 
-  char *argv[] = { "x",
+  const char *argv[] = {
+                   "x",
                    "-os=1.25",
                    "-od=0.125",
                    "--drop-empty-cells",
@@ -64,7 +65,7 @@ TEST(1)
                    "--write-std-properties=2"
                  };
 
-  cmd.parse (sizeof (argv) / sizeof (argv[0]), argv);
+  cmd.parse (sizeof (argv) / sizeof (argv[0]), const_cast<char **> (argv));
 
   db::Layout layout;
 

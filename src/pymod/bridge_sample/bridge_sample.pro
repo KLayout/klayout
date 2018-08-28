@@ -56,9 +56,9 @@ equals(HAVE_QT, "0") {
 # - GSI (generic scripting interface)
 # - TL (basic toolkit)
 # - PYA (Python binding for GSI)
-INCLUDEPATH += $$PYTHONINCLUDE $$INC/tl/tl $$INC/pya/pya
-DEPENDPATH += $$PYTHONINCLUDE $$INC/tl/tl $$INC/pya/pya
-LIBS += $$PYTHONLIBFILE -L$$LIBDIR -lklayout_tl -lklayout_pya -lklayout_gsi
+INCLUDEPATH += "$$PYTHONINCLUDE" $$INC/tl/tl $$INC/pya/pya $$INC/gsi/gsi
+DEPENDPATH += "$$PYTHONINCLUDE" $$INC/tl/tl $$INC/pya/pya $$INC/gsi/gsi
+LIBS += "$$PYTHONLIBFILE" -L$$LIBDIR -lklayout_tl -lklayout_pya -lklayout_gsi
 
 # Also include DB as this is our sample
 INCLUDEPATH += $$INC/db/db
@@ -70,29 +70,32 @@ LIBS += -L$$LIBDIR -lklayout_db
   QMAKE_RPATHDIR += $$RPATH
 }
 
-# Some standard compiler warnings on
-QMAKE_CXXFLAGS_WARN_ON += \
-    -pedantic \
-    -Woverloaded-virtual \
-    -Wsign-promo \
-    -Wsynth \
-    -Wno-deprecated \
-    -Wno-long-long \
-    -Wno-strict-aliasing \
-    -Wno-deprecated-declarations \
-    -Wno-reserved-user-defined-literal \
+!msvc {
 
-# Python is somewhat sloppy and relies on the compiler initializing fields
-# of strucs to 0:
-QMAKE_CXXFLAGS_WARN_ON += \
-    -Wno-missing-field-initializers
+  # Some standard compiler warnings on
+  QMAKE_CXXFLAGS_WARN_ON += \
+      -pedantic \
+      -Woverloaded-virtual \
+      -Wsign-promo \
+      -Wsynth \
+      -Wno-deprecated \
+      -Wno-long-long \
+      -Wno-strict-aliasing \
+      -Wno-deprecated-declarations \
+      -Wno-reserved-user-defined-literal \
+
+  # Python is somewhat sloppy and relies on the compiler initializing fields
+  # of strucs to 0:
+  QMAKE_CXXFLAGS_WARN_ON += \
+      -Wno-missing-field-initializers
+}
 
 win32 {
   # to avoid the major version being appended to the dll name - in this case -lxyz won't link it again
   # because the library is called xyx0.dll.
   CONFIG += skip_target_version_ext
   # make the proper library name for Python
-  QMAKE_POST_LINK += $(COPY) $(DESTDIR_TARGET) $$DESTDIR/$${TARGET}$${PYTHONEXTSUFFIX}
+  QMAKE_POST_LINK += $(COPY) $(DESTDIR_TARGET) $$shell_path($$DESTDIR/$${TARGET}$${PYTHONEXTSUFFIX})
 } else {
   # Make the target library without the "lib" prefix on Linux
   QMAKE_POST_LINK += $(COPY) $(DESTDIR)$(TARGET) $$DESTDIR/$${TARGET}$${PYTHONEXTSUFFIX}

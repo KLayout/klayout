@@ -169,7 +169,7 @@ SaltGrainPropertiesDialog::update_controls ()
   license->setText (tl::to_qstring (m_grain.license ()));
 
   dependencies->clear ();
-  for (std::vector<SaltGrain::Dependency>::const_iterator d = m_grain.dependencies ().begin (); d != m_grain.dependencies ().end (); ++d) {
+  for (std::vector<SaltGrainDependency>::const_iterator d = m_grain.dependencies ().begin (); d != m_grain.dependencies ().end (); ++d) {
 
     QTreeWidgetItem *item = new QTreeWidgetItem (dependencies);
     item->setFlags (item->flags () | Qt::ItemIsEditable);
@@ -240,7 +240,7 @@ SaltGrainPropertiesDialog::update_data ()
     QString url = item->data (2, Qt::UserRole).toString ().simplified ();
 
     if (! name.isEmpty ()) {
-      lay::SaltGrain::Dependency dep = lay::SaltGrain::Dependency ();
+      lay::SaltGrainDependency dep = lay::SaltGrainDependency ();
       dep.name = tl::to_string (name);
       dep.version = tl::to_string (version);
       dep.url = tl::to_string (url);
@@ -482,7 +482,7 @@ private:
       }
     }
 
-    for (std::vector<SaltGrain::Dependency>::const_iterator d = current->dependencies ().begin (); d != current->dependencies ().end (); ++d) {
+    for (std::vector<SaltGrainDependency>::const_iterator d = current->dependencies ().begin (); d != current->dependencies ().end (); ++d) {
       check_circular_follow (grain_for_name (d->name), path);
     }
 
@@ -552,7 +552,7 @@ SaltGrainPropertiesDialog::accept ()
   dependencies_alert->clear ();
   DependencyGraph dep (mp_salt);
   std::set <std::string> dep_seen;
-  for (std::vector<SaltGrain::Dependency>::const_iterator d = m_grain.dependencies ().begin (); d != m_grain.dependencies ().end (); ++d) {
+  for (std::vector<SaltGrainDependency>::const_iterator d = m_grain.dependencies ().begin (); d != m_grain.dependencies ().end (); ++d) {
 
     if (! SaltGrain::valid_name (d->name)) {
       dependencies_alert->error () << tr ("'%1' is not a valid package name").arg (tl::to_qstring (d->name)) << tl::endl

@@ -267,6 +267,12 @@ RecursiveShapeIterator::RecursiveShapeIterator (const layout_type &layout, const
   init_region (box_type::world ());
 }
 
+RecursiveShapeIterator::~RecursiveShapeIterator ()
+{
+    //  .. nothing yet ..
+}
+
+
 void 
 RecursiveShapeIterator::init ()
 {

@@ -28,6 +28,7 @@
 
 #include "pyaRefs.h"
 #include "pyaCommon.h"
+#include "pyaSignalHandler.h"
 
 #include "tlAssert.h"
 
@@ -45,7 +46,6 @@ namespace pya
 {
 
 class PYAObjectBase;
-class SignalHandler;
 class Callee;
 class StatusChangedListener;
 

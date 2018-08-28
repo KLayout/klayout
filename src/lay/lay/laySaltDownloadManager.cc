@@ -206,7 +206,7 @@ SaltDownloadManager::compute_list (const lay::Salt &salt, const lay::Salt &salt_
 
       Descriptor p = m_registry [i];
 
-      for (std::vector<SaltGrain::Dependency>::const_iterator d = p.grain.dependencies ().begin (); d != p.grain.dependencies ().end (); ++d) {
+      for (std::vector<SaltGrainDependency>::const_iterator d = p.grain.dependencies ().begin (); d != p.grain.dependencies ().end (); ++d) {
 
         std::map<std::string, size_t>::iterator r = reg_by_name.find (d->name);
         if (r != reg_by_name.end ()) {

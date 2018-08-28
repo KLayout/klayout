@@ -47,7 +47,7 @@ namespace gsi
   class ClassBase;
   class ArgType;
 
-  const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti);
+  GSI_PUBLIC const ClassBase *class_by_typeinfo_no_assert (const std::type_info &ti);
 }
 
 namespace pya

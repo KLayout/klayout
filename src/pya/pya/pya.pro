@@ -15,9 +15,9 @@ SOURCES = \
   pyaObject.cc \
   pyaRefs.cc \
   pyaUtils.cc \
-    pyaModule.cc \
-    pyaSignalHandler.cc \
-    pyaStatusChangedListener.cc
+  pyaModule.cc \
+  pyaSignalHandler.cc \
+  pyaStatusChangedListener.cc
 
 HEADERS += \
   pya.h \
@@ -29,16 +29,22 @@ HEADERS += \
   pyaObject.h \
   pyaRefs.h \
   pyaUtils.h \
-    pyaModule.h \
-    pyaSignalHandler.h \
-    pyaStatusChangedListener.h
+  pyaModule.h \
+  pyaSignalHandler.h \
+  pyaStatusChangedListener.h
 
-INCLUDEPATH += $$PYTHONINCLUDE $$TL_INC $$GSI_INC
-DEPENDPATH += $$PYTHONINCLUDE $$TL_INC $$GSI_INC
-LIBS += $$PYTHONLIBFILE -L$$DESTDIR -lklayout_tl -lklayout_gsi
+INCLUDEPATH += "$$PYTHONINCLUDE" $$TL_INC $$GSI_INC
+DEPENDPATH += "$$PYTHONINCLUDE" $$TL_INC $$GSI_INC
+LIBS += "$$PYTHONLIBFILE" -L$$DESTDIR -lklayout_tl -lklayout_gsi
 
-# Python is somewhat sloppy and relies on the compiler initializing fields 
-# of strucs to 0:
-QMAKE_CXXFLAGS_WARN_ON += \
-    -Wno-missing-field-initializers
+!msvc {
+  # Python is somewhat sloppy and relies on the compiler initializing fields
+  # of strucs to 0:
+  QMAKE_CXXFLAGS_WARN_ON += \
+      -Wno-missing-field-initializers
+}
 
+msvc {
+  # pyconfig.h tries to tell us which library to link, but we know better ..
+  QMAKE_LINK_FLAGS += /NODEFAULTLIB:python*
+}

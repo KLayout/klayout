@@ -77,7 +77,7 @@ struct point_defs
 
   static size_t hash_value (const C *pt)
   {
-    return std_ext::hfunc (*pt);
+    return std::hfunc (*pt);
   }
 
   static gsi::Methods methods ()

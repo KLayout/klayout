@@ -127,7 +127,7 @@ TEST (1)
   EXPECT_EQ (QDateTime::fromMSecsSinceEpoch (0).msecsTo (g.installed_time ()), 2000000000);
 #endif
 
-  g.add_dependency (lay::SaltGrain::Dependency ());
+  g.add_dependency (lay::SaltGrainDependency ());
   g.dependencies ().back ().name = "depname";
   g.dependencies ().back ().url = "depurl";
   g.dependencies ().back ().version = "0.0";
@@ -156,7 +156,7 @@ TEST (1)
   EXPECT_EQ (int (gg.dependencies ().size ()), 1);
   EXPECT_EQ (g == gg, true);
 
-  gg.add_dependency (lay::SaltGrain::Dependency ());
+  gg.add_dependency (lay::SaltGrainDependency ());
   EXPECT_EQ (g == gg, false);
   gg.set_path (tl::to_string (QFileInfo (tl::to_qstring (tmp)).absolutePath ()));
   gg.save ();
@@ -379,7 +379,7 @@ TEST (5)
 
   lay::SaltGrain g1;
   g1.set_name ("g1");
-  lay::SaltGrain::Dependency dep;
+  lay::SaltGrainDependency dep;
   dep.name = "g2";
   g1.dependencies ().push_back (dep);
   dep.name = "g3";

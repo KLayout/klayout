@@ -97,7 +97,7 @@ struct vector_defs
 
   static size_t hash_value (const C *v)
   {
-    return std_ext::hfunc (*v);
+    return std::hfunc (*v);
   }
 
   static db::point<coord_type> add_with_point (const C *v, const db::point<coord_type> &p)

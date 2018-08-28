@@ -110,7 +110,7 @@ struct path_defs
 
   static size_t hash_value (const C *e)
   {
-    return std_ext::hfunc (*e);
+    return std::hfunc (*e);
   }
 
   static gsi::Methods methods ()

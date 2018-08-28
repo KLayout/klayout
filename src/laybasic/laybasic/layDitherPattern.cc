@@ -951,13 +951,13 @@ DitherPattern::merge (const DitherPattern &other, std::map<unsigned int, unsigne
 {
   //  insert the standard pattern into the map (for completeness)
   for (iterator c = begin (); c != begin_custom (); ++c) {
-    index_map.insert (std::make_pair (std::distance (begin (), c), std::distance (begin (), c)));
+    index_map.insert (std::make_pair ((unsigned int) std::distance (begin (), c), (unsigned int) std::distance (begin (), c)));
   }
 
   //  build an index of present pattern
   std::map <DitherPatternInfo, unsigned int, pattern_less_f> patterns;
   for (iterator c = begin_custom (); c != end (); ++c) {
-    patterns.insert (std::make_pair (*c, std::distance (begin (), c)));
+    patterns.insert (std::make_pair (*c, (unsigned int) std::distance (begin (), c)));
   }
 
   //  map the pattern of other into *this, possibly creating new ones
@@ -970,7 +970,7 @@ DitherPattern::merge (const DitherPattern &other, std::map<unsigned int, unsigne
     } else {
       new_index = p->second;
     }
-    index_map.insert (std::make_pair (std::distance (other.begin (), c), new_index));
+    index_map.insert (std::make_pair ((unsigned int) std::distance (other.begin (), c), new_index));
   }
 }
 

@@ -1467,7 +1467,7 @@ public:
     m_is_ptr      = type_traits<X>::is_ptr ();
     m_is_cref     = type_traits<X>::is_cref ();
     m_is_cptr     = type_traits<X>::is_cptr ();
-    m_size        = type_traits<X>::serial_size ();
+    m_size        = (unsigned int) type_traits<X>::serial_size ();
 
     if (mp_inner) {
       delete mp_inner;

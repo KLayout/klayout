@@ -310,7 +310,7 @@ public:
           db::DBox dregion = dworld & db::DBox (px - dd, py - dd, px + dd, py + dd);
           if (! dregion.empty ()) {
 
-            int ctx_levels = cv.specific_path ().size ();
+            int ctx_levels = int (cv.specific_path ().size ());
 
             int min_hier_level = view->get_min_hier_levels () - ctx_levels;
             int max_hier_level = view->get_max_hier_levels () - ctx_levels;

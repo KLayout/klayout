@@ -49,7 +49,7 @@ public:
   SettingsForm (QWidget *parent, lay::MainWindow *lv, const char *name);
   
   void setup ();
-  void commit () throw (tl::Exception);
+  void commit ();
 
 public slots:
   virtual void ok_clicked ();

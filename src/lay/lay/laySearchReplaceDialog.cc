@@ -469,7 +469,7 @@ SearchReplaceResults::export_csv (const std::string &file)
     if (c) {
       output << ",";
     }
-    output << escape_csv (tl::to_string (headerData (c, Qt::Horizontal, Qt::DisplayRole).toString ()));
+    output << escape_csv (tl::to_string (headerData (int (c), Qt::Horizontal, Qt::DisplayRole).toString ()));
   }
   output << std::endl;
 
@@ -480,7 +480,7 @@ SearchReplaceResults::export_csv (const std::string &file)
         output << ",";
       }
       //  TODO: optimize
-      output << escape_csv (tl::to_string (data (index (r, c, parent), Qt::DisplayRole).toString ()));
+      output << escape_csv (tl::to_string (data (index (int (r), int (c), parent), Qt::DisplayRole).toString ()));
     }
 
     output << std::endl;

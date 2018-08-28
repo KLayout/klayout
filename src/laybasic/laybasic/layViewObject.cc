@@ -1006,7 +1006,7 @@ BitmapViewObjectCanvas::plane (const lay::ViewOp &style)
   if (b == m_fg_bitmap_table.end ()) {
 
     //  we need to create a new plane
-    m_fg_bitmap_table.insert (std::make_pair (style, mp_alloc_bitmaps.size ()));
+    m_fg_bitmap_table.insert (std::make_pair (style, (unsigned int) mp_alloc_bitmaps.size ()));
     lay::Bitmap *bm = new lay::Bitmap (m_width, m_height, m_resolution);
     mp_fg_bitmaps.push_back (bm);
     mp_alloc_bitmaps.push_back (bm);
@@ -1026,7 +1026,7 @@ BitmapViewObjectCanvas::plane (const std::vector<lay::ViewOp> &style)
   if (b == m_fgv_bitmap_table.end ()) {
 
     //  we need to create a new bitmap
-    m_fgv_bitmap_table.insert (std::make_pair (style, mp_alloc_bitmaps.size ()));
+    m_fgv_bitmap_table.insert (std::make_pair (style, (unsigned int) mp_alloc_bitmaps.size ()));
     lay::Bitmap *bm = new lay::Bitmap (m_width, m_height, m_resolution);
     mp_alloc_bitmaps.push_back (bm);
     for (std::vector<lay::ViewOp>::const_iterator s = style.begin (); s != style.end (); ++s) {

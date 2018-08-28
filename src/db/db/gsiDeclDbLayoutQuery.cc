@@ -61,7 +61,7 @@ static std::vector<std::string> query_prop_names (const db::LayoutQuery *q)
   std::vector<std::string> pn;
   pn.reserve (pcount);
   for (size_t i = 0; i < pcount; ++i) {
-    pn.push_back (q->property_name (i));
+    pn.push_back (q->property_name (int (i)));
   }
   return pn;
 }

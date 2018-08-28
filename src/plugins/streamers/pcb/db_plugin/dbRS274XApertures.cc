@@ -563,7 +563,7 @@ void RS274XRegionAperture::do_produce_flash ()
 
     for (size_t h = 0; h < poly.holes (); ++h) {
       clear_points ();
-      for (db::Polygon::polygon_contour_iterator pt = poly.begin_hole (h); pt != poly.end_hole (h); ++pt) {
+      for (db::Polygon::polygon_contour_iterator pt = poly.begin_hole (int (h)); pt != poly.end_hole (int (h)); ++pt) {
         add_point (*pt);
       }
       produce_polygon (true);

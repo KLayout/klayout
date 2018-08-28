@@ -1094,13 +1094,13 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions & /*options*/) throw (tl::Exception)
+  virtual const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions & /*options*/)
   {
     //  TODO: too simple, should provide at least a layer filtering.
     return read (layout);
   }
 
-  virtual const db::LayerMap &read (db::Layout &layout) throw (tl::Exception)
+  virtual const db::LayerMap &read (db::Layout &layout)
   {
     db::GerberImportData data;
 

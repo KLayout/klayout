@@ -481,7 +481,7 @@ GSIHelpProvider::get (const std::string &path) const
   QString errorMsg;
   int errorLine = 0;
 
-  if (! doc.setContent (QByteArray (text.c_str (), text.size ()), true, &errorMsg, &errorLine)) {
+  if (! doc.setContent (QByteArray (text.c_str (), int (text.size ())), true, &errorMsg, &errorLine)) {
 
     //  fallback: provide the original text plus the error message
     std::string fallback_text = std::string ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n") +
@@ -492,7 +492,7 @@ GSIHelpProvider::get (const std::string &path) const
                                 escape_xml (text) + "\n" +
                                 "</pre></doc>";
 
-    doc.setContent (QByteArray (fallback_text.c_str (), fallback_text.size ()), true, &errorMsg, &errorLine);
+    doc.setContent (QByteArray (fallback_text.c_str (), int (fallback_text.size ())), true, &errorMsg, &errorLine);
 
   }
   

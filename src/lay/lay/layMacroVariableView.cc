@@ -212,7 +212,7 @@ void MacroVariableView::sync_item (QTreeWidgetItem *parent, gsi::Inspector *insp
       item->addChild (new PlaceholderItem (ci));
       update_value (item, inspector_description (ci), fresh);
     } else {
-      update_value (item, inspector_value (inspector, index), fresh);
+      update_value (item, inspector_value (inspector, int (index)), fresh);
     }
 
   } else if (parent->child (pos)->text (0) != key) {
@@ -229,7 +229,7 @@ void MacroVariableView::sync_item (QTreeWidgetItem *parent, gsi::Inspector *insp
       item->addChild (new PlaceholderItem (ci));
       update_value (item, inspector_description (ci), fresh);
     } else {
-      update_value (item, inspector_value (inspector, index), fresh);
+      update_value (item, inspector_value (inspector, int (index)), fresh);
     }
 
   } else {
@@ -248,7 +248,7 @@ void MacroVariableView::sync_item (QTreeWidgetItem *parent, gsi::Inspector *insp
 
     } else {
 
-      update_value (item, inspector_value (inspector, index), false);
+      update_value (item, inspector_value (inspector, int (index)), false);
       while (item->childCount () > 0) {
         delete item->takeChild (0);
       }
@@ -297,7 +297,7 @@ void MacroVariableView::sync (QTreeWidgetItem *parent, gsi::Inspector *inspector
 
     //  delete all items which are no longer present
     while (size_t (parent->childCount ()) > n) {
-      delete parent->takeChild (n);
+      delete parent->takeChild (int (n));
     }
 
     //  insert or update new items

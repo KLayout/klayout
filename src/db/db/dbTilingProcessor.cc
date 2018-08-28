@@ -814,7 +814,7 @@ TilingProcessor::execute (const std::string &desc)
   //  is just a single tile.
   bool has_tiles = (ntiles_w > 1 || ntiles_h > 1 || ! m_frame.empty ());
 
-  TilingProcessorJob job (this, m_threads, has_tiles);
+  TilingProcessorJob job (this, int (m_threads), has_tiles);
 
   double l = 0.0, b = 0.0;
 

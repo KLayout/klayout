@@ -974,7 +974,7 @@ Item::set_image_str (const std::string &s)
     set_image (0);
   } else {
 
-    QByteArray img_data (QByteArray::fromBase64 (QByteArray::fromRawData (s.c_str (), s.size ())));
+    QByteArray img_data (QByteArray::fromBase64 (QByteArray::fromRawData (s.c_str (), int (s.size ()))));
 
     QImage *image = new QImage ();
     if (image->loadFromData (img_data)) {

@@ -431,7 +431,7 @@ NetTracerTechComponentEditor::move_down_clicked ()
 
   connectivity_table->setCurrentIndex (QModelIndex ());
 
-  int n = m_data.size ();
+  int n = int (m_data.size ());
   for (db::NetTracerTechnologyComponent::iterator l = m_data.end (); l != m_data.begin (); ) {
     --l;
     --n;
@@ -557,7 +557,7 @@ NetTracerTechComponentEditor::symbol_move_down_clicked ()
 
   symbol_table->setCurrentIndex (QModelIndex ());
 
-  int n = m_data.symbols ();
+  int n = int (m_data.symbols ());
   for (db::NetTracerTechnologyComponent::symbol_iterator l = m_data.end_symbols (); l != m_data.begin_symbols (); ) {
     --l;
     --n;
@@ -590,7 +590,7 @@ NetTracerTechComponentEditor::update ()
   int n;
 
   connectivity_table->clear ();
-  connectivity_table->setRowCount (m_data.size ());
+  connectivity_table->setRowCount (int (m_data.size ()));
 
   connectivity_table->setColumnCount (3);
   labels.clear ();
@@ -643,7 +643,7 @@ NetTracerTechComponentEditor::update ()
   connectivity_table->clearSelection ();
 
   symbol_table->clear ();
-  symbol_table->setRowCount (m_data.symbols ());
+  symbol_table->setRowCount (int (m_data.symbols ()));
 
   symbol_table->setColumnCount (2);
   labels.clear ();

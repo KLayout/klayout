@@ -489,7 +489,7 @@ public:
     {
       QMutexLocker locker (&m_mutex);
       p = m_progress;
-      progress.configure (m_dbu, m_nx, m_ny, m_tolerances);
+      progress.configure (m_dbu, int (m_nx), int (m_ny), m_tolerances);
       progress.merge_results (m_results);
     }    
 
@@ -553,7 +553,7 @@ public:
     //  merge the polygons to heal and re-issue (this time without healing)
     for (std::map<std::pair<size_t, size_t>, db::Region>::iterator p = m_polygons_to_heal.begin (); p != m_polygons_to_heal.end (); ++p) {
       for (db::Region::const_iterator mp = p->second.begin_merged (); !mp.at_end (); ++mp) {
-        issue_polygon (p->first.first, p->first.second, *mp, false);
+        issue_polygon ((unsigned int) p->first.first, (unsigned int) p->first.second, *mp, false);
       }
     }
   }
@@ -1327,13 +1327,13 @@ XORToolDialog::run_xor ()
       db::Coord tile_enlargement_b = db::coord_traits<db::Coord>::rounded_up (tile_enlargement * dbu / cvb->layout ().dbu ());
 
       if (ntiles_w > 1 || ntiles_h > 1 || region_mode != RMAll /*enforces clip*/) {
-        job.set_tiles (true, ntiles_w, ntiles_h, tile_heal);
+        job.set_tiles (true, int (ntiles_w), int (ntiles_h), tile_heal);
       }
 
       //  create the XOR tasks
-      for (size_t nw = 0; nw < ntiles_w; ++nw) {
+      for (db::Coord nw = 0; nw < db::Coord (ntiles_w); ++nw) {
 
-        for (size_t nh = 0; nh < ntiles_h; ++nh) {
+        for (db::Coord nh = 0; nh < db::Coord (ntiles_h); ++nh) {
 
           db::Box clip_box (box_out.left () + nw * box_width_out, 
                             box_out.bottom () + nh * box_height_out,
@@ -1392,7 +1392,7 @@ XORToolDialog::run_xor ()
           job.wait (100);
         }
 
-      } catch (tl::BreakException &ex) {
+      } catch (tl::BreakException & /*ex*/) {
         job.terminate ();
         was_cancelled = true;
       } catch (tl::Exception &ex) {

@@ -52,7 +52,7 @@ public:
   ConfigurationDialog (QWidget *parent, lay::PluginRoot *root, const std::string &plugin_name, const char *name = "");
   ~ConfigurationDialog ();
   
-  void commit () throw (tl::Exception);
+  void commit ();
 
 public slots:
   virtual void ok_clicked ();

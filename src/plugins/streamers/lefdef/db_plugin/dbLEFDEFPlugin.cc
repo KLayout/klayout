@@ -88,12 +88,12 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions &options) throw (tl::Exception)
+  virtual const db::LayerMap &read (db::Layout &layout, const db::LoadLayoutOptions &options)
   {
     return read_lefdef (layout, options, is_lef_format (m_stream.filename ()));
   }
 
-  virtual const db::LayerMap &read (db::Layout &layout) throw (tl::Exception)
+  virtual const db::LayerMap &read (db::Layout &layout)
   {
     return read_lefdef (layout, db::LoadLayoutOptions (), is_lef_format (m_stream.filename ()));
   }
@@ -115,7 +115,7 @@ private:
     }
   }
 
-  const db::LayerMap &read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &options, bool import_lef) throw (tl::Exception)
+  const db::LayerMap &read_lefdef (db::Layout &layout, const db::LoadLayoutOptions &options, bool import_lef)
   {
     const db::LEFDEFReaderOptions *lefdef_options = dynamic_cast<const db::LEFDEFReaderOptions *> (options.get_options (format ()));
     static db::LEFDEFReaderOptions default_options;

@@ -1094,7 +1094,7 @@ TEST(11_8)
   bool error = false;
   try {
     db::LayerMap map = reader.read (layout);
-  } catch (tl::Exception &ex) {
+  } catch (tl::Exception & /*ex*/) {
     /*
       *** ERROR: Modal variable accessed before being defined: last-value-list (position=96, cell=)
     */
@@ -1116,7 +1116,7 @@ TEST(11_9)
   bool error = false;
   try {
     db::LayerMap map = reader.read (layout);
-  } catch (tl::Exception &ex) {
+  } catch (tl::Exception & /*ex*/) {
     /*
       *** ERROR: Modal variable accessed before being defined: last-value-list (position=118, cell=)
     */
@@ -1531,7 +1531,7 @@ TEST(2_3)
   bool error = false;
   try {
     db::LayerMap map = reader.read (layout);
-  } catch (tl::Exception &ex) {
+  } catch (tl::Exception & /*ex*/) {
     /*
       *** ERROR: Explicit and implicit CELLNAME modes cannot be mixed (position=45, cell=)
     */
@@ -1588,7 +1588,7 @@ TEST(2_5)
   bool error = false;
   try {
     db::LayerMap map = reader.read (layout);
-  } catch (tl::Exception &ex) {
+  } catch (tl::Exception & /*ex*/) {
     /*
       *** ERROR: No cellname declared for cell id 2 (position=305, cell=#2)
     */
@@ -1930,7 +1930,7 @@ TEST(3_11)
   bool error = false;
   try {
     db::LayerMap map = reader.read (layout);
-  } catch (tl::Exception &ex) {
+  } catch (tl::Exception & /*ex*/) {
     /*
       *** ERROR: Modal variable accessed before being defined: text-string (position=50, cell=ABC)
     */
@@ -2454,7 +2454,7 @@ TEST(3_3)
   bool error = false;
   try {
     db::LayerMap map = reader.read (layout);
-  } catch (tl::Exception &ex) {
+  } catch (tl::Exception & /*ex*/) {
     /*
       *** ERROR: Explicit and implicit TEXTSTRING modes cannot be mixed (position=41, cell=)
     */
@@ -2476,7 +2476,7 @@ TEST(3_4)
   bool error = false;
   try {
     db::LayerMap map = reader.read (layout);
-  } catch (tl::Exception &ex) {
+  } catch (tl::Exception & /*ex*/) {
     /*
       *** ERROR: No text string defined for id 2 (must be declared before text is used) (position=48, cell=ABC)
     */
@@ -2749,7 +2749,7 @@ TEST(3_6)
   bool error = false;
   try {
     db::LayerMap map = reader.read (layout);
-  } catch (tl::Exception &ex) {
+  } catch (tl::Exception & /*ex*/) {
     /*
       *** ERROR: Modal variable accessed before being defined: repetition (position=52, cell=ABC)
     */
@@ -2771,7 +2771,7 @@ TEST(3_7)
   bool error = false;
   try {
     db::LayerMap map = reader.read (layout);
-  } catch (tl::Exception &ex) {
+  } catch (tl::Exception & /*ex*/) {
     /*
       *** ERROR: Modal variable accessed before being defined: textlayer (position=50, cell=ABC)
     */
@@ -2793,7 +2793,7 @@ TEST(3_8)
   bool error = false;
   try {
     db::LayerMap map = reader.read (layout);
-  } catch (tl::Exception &ex) {
+  } catch (tl::Exception & /*ex*/) {
     /*
       *** ERROR: Modal variable accessed before being defined: texttype (position=50, cell=ABC)
     */

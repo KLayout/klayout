@@ -2614,7 +2614,7 @@ PythonModule::make_classes (const char *mod_name)
             tl::warn << tl::to_string (tr ("Class ")) << c->name () << ": " << tl::to_string (tr ("no Python mapping for method ")) << mt->name (mid);
           }
 
-          add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is not available for Python")));
+          add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is not available for Python")));
 
         } else {
 
@@ -2649,7 +2649,7 @@ PythonModule::make_classes (const char *mod_name)
           }
 
           if (name != raw_name) {
-            add_python_doc (*c, mt, mid, tl::sprintf (tl::to_string (tr ("This method is available as method '%s' in Python")), name));
+            add_python_doc (*c, mt, int (mid), tl::sprintf (tl::to_string (tr ("This method is available as method '%s' in Python")), name));
           }
 
           //  create documentation
@@ -2673,29 +2673,29 @@ PythonModule::make_classes (const char *mod_name)
               //  The str method is also routed via the tp_str implementation
               alt_names.push_back ("__str__");
               if (! has_inspect) {
-                add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is also available as 'str(object)' and 'repr(object)'")));
+                add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)' and 'repr(object)'")));
                 alt_names.push_back ("__repr__");
               } else {
-                add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is also available as 'str(object)'")));
+                add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)'")));
               }
 
             } else if (name == "inspect" && m_first->compatible_with_num_args (0)) {
 
               //  The str method is also routed via the tp_str implementation
-              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is also available as 'repr(object)'")));
+              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as 'repr(object)'")));
               alt_names.push_back ("__repr__");
 
             } else if (name == "size" && m_first->compatible_with_num_args (0)) {
 
               //  The size method is also routed via the sequence methods protocol if there
               //  is a [] function
-              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is also available as 'len(object)'")));
+              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as 'len(object)'")));
               alt_names.push_back ("__len__");
 
             } else if (name == "each" && m_first->compatible_with_num_args (0) && m_first->ret_type ().is_iter ()) {
 
               //  each makes the object iterable
-              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method enables iteration of the object")));
+              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method enables iteration of the object")));
               alt_names.push_back ("__iter__");
 
             }
@@ -2738,7 +2738,7 @@ PythonModule::make_classes (const char *mod_name)
 
             } else if (tl::verbosity () >= 20) {
               tl::warn << "Upper case method name encountered which cannot be used as a Python constant (more than one overload or at least one argument): " << c->name () << "." << name;
-              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is not available for Python")));
+              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is not available for Python")));
             }
 
           } else {
@@ -2746,7 +2746,7 @@ PythonModule::make_classes (const char *mod_name)
             if (m_first->ret_type ().type () == gsi::T_object && m_first->ret_type ().pass_obj () && name == "new") {
 
               //  The constructor is also routed via the pya_object_init implementation
-              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is the default initializer of the object")));
+              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is the default initializer of the object")));
 
               PyMethodDef *method = make_method_def ();
               method->ml_name = "__init__";

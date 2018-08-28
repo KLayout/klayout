@@ -85,6 +85,12 @@ msvc {
       -Wno-deprecated-declarations \
       -Wno-reserved-user-defined-literal \
 
+} else {
+
+  # disable some warnings
+  QMAKE_CXXFLAGS += \
+      /wd4251 \         # DLL interface required
+
 }
 
 equals(HAVE_QT, "0") {

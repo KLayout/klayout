@@ -113,7 +113,7 @@ struct A
   }
   void a2 () const { }
   int a3 (const std::string &x) { 
-    return x.size (); 
+    return int (x.size ());
   }
 #if defined(HAVE_QT)
   int a3_qstr (const QString &x) { 
@@ -626,12 +626,12 @@ struct B
       m_var = vars.back ();
     }
     m_vars = vars;
-    return vars.size ();
+    return long (vars.size ());
   }
 
   long set_vars (const std::vector<tl::Variant> &vars) {
     m_vars = vars;
-    return vars.size ();
+    return long (vars.size ());
   }
 
   tl::Variant b22b () const { return tl::Variant (); }

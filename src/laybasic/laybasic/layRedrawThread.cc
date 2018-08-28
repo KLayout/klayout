@@ -117,7 +117,7 @@ RedrawThread::commit (const std::vector <lay::RedrawLayerInfo> &layers, const la
   m_resolution = resolution;
 
   m_layers = layers;
-  m_nlayers = m_layers.size ();
+  m_nlayers = int (m_layers.size ());
   for (size_t i = 0; i < m_layers.size (); ++i) {
     if (m_layers [i].visible) {
       m_layers [i].enabled = false;
@@ -258,7 +258,7 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
       m_layers = *layers;
     }
 
-    m_nlayers = m_layers.size ();
+    m_nlayers = int (m_layers.size ());
 
     if (mp_view->cellviews () > 0) {
 

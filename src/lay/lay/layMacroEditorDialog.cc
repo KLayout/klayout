@@ -1256,7 +1256,7 @@ MacroEditorDialog::execute (const QString &cmd)
     write_str (ex.msg ().c_str (), OS_stderr);
     write_str ("\n", OS_stderr);
 
-  } catch (tl::CancelException &ex) {
+  } catch (tl::CancelException & /*ex*/) {
 
     //  ignore CancelException
     

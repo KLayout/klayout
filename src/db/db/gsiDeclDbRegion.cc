@@ -161,7 +161,7 @@ static typename Delivery::container_type *corners (const db::Region *r, double a
     size_t n = p->holes () + 1;
     for (size_t i = 0; i < n; ++i) {
 
-      const db::Polygon::contour_type &ctr = p->contour (i);
+      const db::Polygon::contour_type &ctr = p->contour (int (i));
       size_t nn = ctr.size ();
       if (nn > 2) {
 

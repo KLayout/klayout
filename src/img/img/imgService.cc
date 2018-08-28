@@ -750,7 +750,7 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
 
     //  realize transformation
     db::Matrix3d m (1.0);
-    db::adjust_matrix (m, li, lm, adjust, m_moved_landmark); 
+    db::adjust_matrix (m, li, lm, adjust, int (m_moved_landmark));
     m_current.set_matrix (m * m_initial.matrix ());
 
     m_selected_image_views [0]->redraw ();
@@ -874,7 +874,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
         inew->transform (m_trans);
         mp_view->annotation_shapes ().replace (s->first, db::DUserObject (inew));
 
-        image_changed_event (inew->id ());
+        image_changed_event (int (inew->id ()));
 
       }
 
@@ -886,7 +886,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
       //  replace the image that was moved
       img::Object *inew = new img::Object (m_current);
       mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew));
-      image_changed_event (inew->id ());
+      image_changed_event (int (inew->id ()));
 
       //  clear the selection (that was artifically created before)
       if (! m_keep_selection_for_landmark) {
@@ -900,7 +900,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
       //  replace the image that was moved
       img::Object *inew = new img::Object (m_current);
       mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew));
-      image_changed_event (inew->id ());
+      image_changed_event (int (inew->id ()));
 
       //  clear the selection (that was artifically created before)
       clear_selection ();
@@ -926,7 +926,7 @@ Service::selection_to_view (img::View::Mode mode)
 
   m_selected_image_views.reserve (m_selected.size ());
   for (std::map<obj_iterator, unsigned int>::iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    r->second = m_selected_image_views.size ();
+    r->second = (unsigned int) m_selected_image_views.size ();
     m_selected_image_views.push_back (new img::View (this, r->first, mode));
   }
 }
@@ -956,7 +956,7 @@ Service::transform (const db::DCplxTrans &trans)
     img::Object *inew = new img::Object (*iobj);
     inew->transform (trans);
     mp_view->annotation_shapes ().replace (s->first, db::DUserObject (inew));
-    image_changed_event (inew->id ());
+    image_changed_event (int (inew->id ()));
 
   }
 
@@ -994,7 +994,7 @@ Service::copy_selected ()
 {
   //  extract all selected images and paste in "micron" space
   for (std::map<obj_iterator, unsigned int>::iterator r = m_selected.begin (); r != m_selected.end (); ++r) {
-    r->second = m_selected_image_views.size ();
+    r->second = (unsigned int) m_selected_image_views.size ();
     const img::Object *iobj = dynamic_cast<const img::Object *> (r->first->ptr ());
     db::Clipboard::instance () += new db::ClipboardValue<img::Object> (*iobj);
   }
@@ -1342,7 +1342,7 @@ Service::change_image (obj_iterator pos, const img::Object &to)
   //  replace the object
   img::Object *inew = new img::Object (to);
   mp_view->annotation_shapes ().replace (pos, db::DUserObject (inew));
-  image_changed_event (inew->id ());
+  image_changed_event (int (inew->id ()));
 
   //  and make selection "visible"
   selection_to_view ();

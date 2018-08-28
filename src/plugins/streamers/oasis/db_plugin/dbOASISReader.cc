@@ -2030,10 +2030,10 @@ OASISReader::do_read_placement (unsigned char r,
 
       if (mag_set || angle < 0) {
         inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()), 
-                                  db::ICplxTrans (mag, angle_deg, mirror, pos), layout.array_repository (), a, b, na, nb);
+                                  db::ICplxTrans (mag, angle_deg, mirror, pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb);
       } else {
         inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()), 
-                                  db::Trans (angle, mirror, pos), layout.array_repository (), a, b, na, nb);
+                                  db::Trans (angle, mirror, pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb);
       }
 
       if (pp.first) {
@@ -2198,9 +2198,9 @@ OASISReader::do_read_text (bool xy_absolute,
         db::TextPtr text_ptr (text, layout.shape_repository ());
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::text_ptr_array_type> (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository (), a, b, na, nb), pp.second));
+          cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::text_ptr_array_type> (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
         } else {
-          cell.shapes (ll.second).insert (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository (), a, b, na, nb));
+          cell.shapes (ll.second).insert (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
         }
 
       } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -2330,9 +2330,9 @@ OASISReader::do_read_rectangle (bool xy_absolute,
 
         //  Create a box array
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::box_array_type> (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository (), a, b, na, nb), pp.second));
+          cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::box_array_type> (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
         } else {
-          cell.shapes (ll.second).insert (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository (), a, b, na, nb));
+          cell.shapes (ll.second).insert (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
         }
 
       } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -2456,9 +2456,9 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
           db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
           if (pp.first) {
-            cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, na, nb), pp.second));
+            cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
           } else {
-            cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, na, nb));
+            cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
           }
 
         } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -2625,9 +2625,9 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
           db::PathPtr path_ptr (path, layout.shape_repository ());
 
           if (pp.first) {
-            cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, na, nb), pp.second));
+            cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
           } else {
-            cell.shapes (ll.second).insert (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, na, nb));
+            cell.shapes (ll.second).insert (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
           }
 
         } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -2794,9 +2794,9 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
         db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, na, nb), pp.second));
+          cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
         } else {
-          cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, na, nb));
+          cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
         }
 
       } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -3153,9 +3153,9 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
         db::SimplePolygonPtr poly_ptr (poly, layout.shape_repository ());
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, na, nb), pp.second));
+          cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::SimplePolygonPtr, db::Disp> > (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
         } else {
-          cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, na, nb));
+          cell.shapes (ll.second).insert (db::array<db::SimplePolygonPtr, db::Disp> (poly_ptr, db::Disp (d + pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
         }
 
       } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {
@@ -3291,9 +3291,9 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
         db::PathPtr path_ptr (path, layout.shape_repository ());
 
         if (pp.first) {
-          cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, na, nb), pp.second));
+          cell.shapes (ll.second).insert (db::object_with_properties<db::array<db::PathPtr, db::Disp> > (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb), pp.second));
         } else {
-          cell.shapes (ll.second).insert (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, na, nb));
+          cell.shapes (ll.second).insert (db::array<db::PathPtr, db::Disp> (path_ptr, db::Disp (pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb));
         }
 
       } else if (! layout.is_editable () && (points = mm_repetition.get ().is_iterated ()) != 0) {

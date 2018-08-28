@@ -448,7 +448,7 @@ LayerTreeModel::parent (const QModelIndex &index) const
         } else {
           //  It is important that the column index of the parent is 0.
           //  Otherwise the tree view will not behave as expected.
-          return createIndex (iter.child_index (), 0, (void *) (iter.uint () + m_id_start));
+          return createIndex (int (iter.child_index ()), 0, (void *) (iter.uint () + m_id_start));
         }
       }
     } else {

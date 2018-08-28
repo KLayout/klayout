@@ -296,7 +296,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
     } else {
       *m_layer_properties_lists [i] = *source->m_layer_properties_lists [i];
     }
-    m_layer_properties_lists [i]->attach_view (this, i);
+    m_layer_properties_lists [i]->attach_view (this, (unsigned int) i);
   }
 
   if (! m_layer_properties_lists.empty ()) {
@@ -434,7 +434,7 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   m_copy_layerr = -1;
 
   m_layer_properties_lists.push_back (new LayerPropertiesList ());
-  m_layer_properties_lists.back ()->attach_view (this, m_layer_properties_lists.size () - 1);
+  m_layer_properties_lists.back ()->attach_view (this, (unsigned int) (m_layer_properties_lists.size () - 1));
   m_current_layer_list = 0;
 
   QVBoxLayout *vbl = new QVBoxLayout (this);
@@ -1764,7 +1764,7 @@ LayoutView::set_properties (unsigned int index, const LayerPropertiesList &props
       return;
     } else {
       m_layer_properties_lists.push_back (new LayerPropertiesList ());
-      m_layer_properties_lists.back ()->attach_view (this, m_layer_properties_lists.size () - 1);
+      m_layer_properties_lists.back ()->attach_view (this, (unsigned int) (m_layer_properties_lists.size () - 1));
     }
   }
 
@@ -1833,7 +1833,7 @@ LayoutView::replace_layer_node (unsigned int index, const LayerPropertiesConstIt
   if (*iter != node) {
 
     if (transacting ()) {
-      manager ()->queue (this, new OpSetLayerPropsNode (index, iter.uint (), *iter, node));
+      manager ()->queue (this, new OpSetLayerPropsNode (index, (unsigned int) iter.uint (), *iter, node));
     } else if (manager () && ! replaying ()) {
       manager ()->clear ();
     }
@@ -1867,7 +1867,7 @@ LayoutView::set_properties (unsigned int index, const LayerPropertiesConstIterat
   if (l != props) {
 
     if (transacting ()) {
-      manager ()->queue (this, new OpSetLayerProps (index, iter.uint (), l, props));
+      manager ()->queue (this, new OpSetLayerProps (index, (unsigned int) iter.uint (), l, props));
     } else if (manager () && ! replaying ()) {
       manager ()->clear ();
     }
@@ -1902,7 +1902,7 @@ const LayerPropertiesNode &
 LayoutView::insert_layer (unsigned int index, const LayerPropertiesConstIterator &before, const LayerPropertiesNode &node)
 {
   if (transacting ()) {
-    manager ()->queue (this, new OpInsertLayerProps (index, before.uint (), node));
+    manager ()->queue (this, new OpInsertLayerProps (index, (unsigned int) before.uint (), node));
   } else if (manager () && ! replaying ()) {
     manager ()->clear ();
   }
@@ -1935,7 +1935,7 @@ LayoutView::delete_layer (unsigned int index, LayerPropertiesConstIterator &iter
   m_layer_properties_lists [index]->erase (LayerPropertiesIterator (*m_layer_properties_lists [index], iter.uint ()));
 
   if (transacting ()) {
-    manager ()->queue (this, new OpDeleteLayerProps (index, iter.uint (), orig));
+    manager ()->queue (this, new OpDeleteLayerProps (index, (unsigned int) iter.uint (), orig));
   } else if (manager () && ! replaying ()) {
     manager ()->clear ();
   }
@@ -3313,12 +3313,12 @@ LayoutView::merge_layer_props (const std::vector<lay::LayerPropertiesList> &prop
       std::vector<lay::LayerPropertiesList>::const_iterator p = props.begin ();
 
       if (n < layer_lists ()) {
-        lay::LayerPropertiesList new_props (get_properties (n));
+        lay::LayerPropertiesList new_props (get_properties ((unsigned int) n));
         new_props.append (*p);
         if (! p->name ().empty ()) {
           new_props.set_name (p->name ());
         }
-        set_properties (n, new_props);
+        set_properties ((unsigned int) n, new_props);
       } else {
 
         lay::LayerPropertiesList new_props = p0;
@@ -3326,7 +3326,7 @@ LayoutView::merge_layer_props (const std::vector<lay::LayerPropertiesList> &prop
         if (! p->name ().empty ()) {
           new_props.set_name (p->name ());
         }
-        insert_layer_list (n, new_props);
+        insert_layer_list ((unsigned int) n, new_props);
       }
 
     }
@@ -3337,19 +3337,19 @@ LayoutView::merge_layer_props (const std::vector<lay::LayerPropertiesList> &prop
     for (std::vector<lay::LayerPropertiesList>::const_iterator p = props.begin (); p != props.end (); ++p, ++n) {
 
       if (n < layer_lists ()) {
-        lay::LayerPropertiesList new_props (get_properties (n));
+        lay::LayerPropertiesList new_props (get_properties ((unsigned int) n));
         new_props.append (*p);
         if (! p->name ().empty ()) {
           new_props.set_name (p->name ());
         }
-        set_properties (n, new_props);
+        set_properties ((unsigned int) n, new_props);
       } else {
         lay::LayerPropertiesList new_props = p0;
         new_props.append (*p);
         if (! p->name ().empty ()) {
           new_props.set_name (p->name ());
         }
-        insert_layer_list (n, new_props);
+        insert_layer_list ((unsigned int) n, new_props);
       }
 
     }
@@ -3385,7 +3385,7 @@ LayoutView::store_state ()
   DisplayState state (box (), get_min_hier_levels (), get_max_hier_levels (), m_cellviews);
   m_display_states.push_back (state);
 
-  m_display_state_ptr = m_display_states.size () - 1;
+  m_display_state_ptr = (unsigned int) (m_display_states.size () - 1);
 }
 
 db::DBox 

@@ -75,7 +75,7 @@ void Object::register_ptr (WeakOrSharedPtr *p)
     ptrs->mp_prev = p;
   }
 
-  mp_ptrs = (WeakOrSharedPtr *)(size_t (p) | kept);
+  mp_ptrs = (WeakOrSharedPtr *)(size_t (p) | (kept ? 1 : 0));
 }
 
 void Object::unregister_ptr (WeakOrSharedPtr *p)
@@ -84,7 +84,7 @@ void Object::unregister_ptr (WeakOrSharedPtr *p)
   bool kept = (size_t (mp_ptrs) & size_t(1));
 
   if (p == ptrs) {
-    mp_ptrs = (WeakOrSharedPtr *)(size_t (p->mp_next) | kept);
+    mp_ptrs = (WeakOrSharedPtr *)(size_t (p->mp_next) | (kept ? 1 : 0));
   } 
   if (p->mp_prev) {
     p->mp_prev->mp_next = p->mp_next;

@@ -538,7 +538,7 @@ GerberImportDialog::add_target_layer ()
   if (lp_dialog.exec_dialog (props)) {
     mp_data->layout_layers.push_back (props);
     update ();
-    tree->setCurrentItem (tree->topLevelItem (mp_data->layout_layers.size () - 1));
+    tree->setCurrentItem (tree->topLevelItem (int (mp_data->layout_layers.size () - 1)));
   }
 }
 
@@ -678,7 +678,7 @@ GerberImportDialog::add_free_file ()
     }
 
     update ();
-    tree->setCurrentItem (tree->topLevelItem (mp_data->free_files.size () - 1));
+    tree->setCurrentItem (tree->topLevelItem (int (mp_data->free_files.size () - 1)));
 
   }
 }

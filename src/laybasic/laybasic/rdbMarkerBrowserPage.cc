@@ -630,7 +630,7 @@ public:
 
     if (node) {
       update_cache (node);
-      return node->children ();
+      return int (node->children ());
     } else {
       return 0;
     }
@@ -1401,7 +1401,7 @@ public:
   int rowCount (const QModelIndex &index) const
   {
     if (mp_database && ! index.isValid ()) {
-      return m_item_list.size ();
+      return int (m_item_list.size ());
     } else {
       return 0;
     }

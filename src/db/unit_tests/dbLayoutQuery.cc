@@ -1358,13 +1358,13 @@ TEST(62)
   db::Layout g;
   init_layout (g);
 
-  size_t c3index = g.get_lib_proxy (basic_lib, v1t1);
-  size_t c4index = g.get_lib_proxy (basic_lib, v1t2);
+  size_t c3index = g.get_lib_proxy (basic_lib, db::cell_index_type (v1t1));
+  size_t c4index = g.get_lib_proxy (basic_lib, db::cell_index_type (v1t2));
 
   db::Cell &c1 (g.cell (g.add_cell ("c1")));
   db::Cell &c2 (g.cell (g.add_cell ("c2")));
-  db::Cell &c3 (g.cell (c3index));
-  db::Cell &c4 (g.cell (c4index));
+  db::Cell &c3 (g.cell (db::cell_index_type (c3index)));
+  db::Cell &c4 (g.cell (db::cell_index_type (c4index)));
 
   db::FTrans f (1, true);
   db::Vector p (-10, 20);

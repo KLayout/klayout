@@ -213,7 +213,7 @@ std::string to_string_from_local (const char *cp)
   while (max > 0) {
     wchar_t wc;
     //  NOTE: mbrtowc uses the current LOCALE, hence "local"
-    int length = mbrtowc (&wc, cp, max, &state);
+    int length = int (mbrtowc (&wc, cp, max, &state));
     if (length < 1) {
       break;
     }

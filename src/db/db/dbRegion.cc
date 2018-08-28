@@ -243,7 +243,7 @@ Region::holes () const
   for (const_iterator p = begin_merged (); ! p.at_end (); ++p) {
     for (size_t i = 0; i < p->holes (); ++i) {
       db::Polygon h;
-      h.assign_hull (p->begin_hole (i), p->end_hole (i));
+      h.assign_hull (p->begin_hole ((unsigned int) i), p->end_hole ((unsigned int) i));
       region.insert (h);
     }
   }
@@ -1151,8 +1151,8 @@ Region::grid_check (db::Coord gx, db::Coord gy) const
         b = p->begin_hull ();
         e = p->end_hull ();
       } else {
-        b = p->begin_hole (i - 1);
-        e = p->end_hole (i - 1);
+        b = p->begin_hole ((unsigned int) (i - 1));
+        e = p->end_hole ((unsigned int)  (i - 1));
       }
 
       for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
@@ -1199,7 +1199,7 @@ Region::angle_check (double min, double max, bool inverse) const
       if (i == 0) {
         h = &p->hull ();
       } else {
-        h = &p->hole (i - 1);
+        h = &p->hole ((unsigned int) (i - 1));
       }
 
       size_t np = h->size ();
@@ -1262,8 +1262,8 @@ Region::snap (db::Coord gx, db::Coord gy)
         b = p->begin_hull ();
         e = p->end_hull ();
       } else {
-        b = p->begin_hole (i - 1);
-        e = p->end_hole (i - 1);
+        b = p->begin_hole ((unsigned int)  (i - 1));
+        e = p->end_hole ((unsigned int)  (i - 1));
       }
 
       for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {

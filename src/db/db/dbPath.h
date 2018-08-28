@@ -554,17 +554,17 @@ public:
   {
     m_bbox = box_type ();
     if (m_width < 0) {
-      m_width = -t.ctrans (-m_width);
+      m_width = -coord_type (t.ctrans (-m_width));
     } else {
       m_width = t.ctrans (m_width);
     }
     if (m_bgn_ext < 0) {
-      m_bgn_ext = -t.ctrans (-m_bgn_ext);
+      m_bgn_ext = -coord_type (t.ctrans (-m_bgn_ext));
     } else {
       m_bgn_ext = t.ctrans (m_bgn_ext);
     }
     if (m_end_ext < 0) {
-      m_end_ext = -t.ctrans (-m_end_ext);
+      m_end_ext = -coord_type (t.ctrans (-m_end_ext));
     } else {
       m_end_ext = t.ctrans (m_end_ext);
     }
@@ -592,17 +592,17 @@ public:
     path<target_coord_type> res;
 
     if (m_width < 0) {
-      res.m_width = -t.ctrans (-m_width);
+      res.m_width = -target_coord_type (t.ctrans (-m_width));
     } else {
       res.m_width = t.ctrans (m_width);
     }
     if (m_bgn_ext < 0) {
-      res.m_bgn_ext = -t.ctrans (-m_bgn_ext);
+      res.m_bgn_ext = -target_coord_type (t.ctrans (-m_bgn_ext));
     } else {
       res.m_bgn_ext = t.ctrans (m_bgn_ext);
     }
     if (m_end_ext < 0) {
-      res.m_end_ext = -t.ctrans (-m_end_ext);
+      res.m_end_ext = -target_coord_type (t.ctrans (-m_end_ext));
     } else {
       res.m_end_ext = t.ctrans (m_end_ext);
     }

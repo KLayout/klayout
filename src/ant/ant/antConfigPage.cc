@@ -227,7 +227,7 @@ ConfigPage4::setup (lay::PluginRoot *root)
     m_current_template = 0;
   }
   if (m_current_template >= int (m_ruler_templates.size ())) {
-    m_current_template = m_ruler_templates.size ();
+    m_current_template = int (m_ruler_templates.size ());
     m_ruler_templates.push_back (ant::Template ());
   }
   
@@ -251,7 +251,7 @@ ConfigPage4::add_clicked ()
   commit ();
   ant::Template new_one;
   if (m_current_template < 0 || m_current_template >= int (m_ruler_templates.size ())) {
-    m_current_template = m_ruler_templates.size ();
+    m_current_template = int (m_ruler_templates.size ());
   } else {
     new_one = m_ruler_templates [m_current_template];
   }

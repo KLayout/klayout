@@ -24,7 +24,11 @@ equals(HAVE_QTBINDINGS, "1") {
   }
 }
 
-QMAKE_POST_LINK += && $(COPY) $$INIT_PY $$DESTDIR_PYMOD/__init__.py
+msvc {
+  QMAKE_POST_LINK += && $(COPY) $$shell_path($$INIT_PY) $$shell_path($$DESTDIR_PYMOD/__init__.py)
+} else {
+  QMAKE_POST_LINK += && $(COPY) $$INIT_PY $$DESTDIR_PYMOD/__init__.py
+}
 
 # INSTALLS needs to be inside a lib or app templates.
 init_target.path = $$PREFIX/pymod/klayout

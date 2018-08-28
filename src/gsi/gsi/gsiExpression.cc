@@ -1389,7 +1389,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
       throw tl::Exception (tl::sprintf (tl::to_string (tr ("Signals are not supported inside expressions (event %s)")), method.c_str ()));
     } else if ((*m)->is_callback()) {
       //  ignore callbacks
-    } else if ((*m)->compatible_with_num_args (args.size ())) {
+    } else if ((*m)->compatible_with_num_args ((unsigned int) args.size ())) {
       ++candidates;
       meth = *m;
     }
@@ -1427,7 +1427,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
       if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
 
         //  check arguments (count and type)
-        bool is_valid = (*m)->compatible_with_num_args (args.size ());
+        bool is_valid = (*m)->compatible_with_num_args ((unsigned int) args.size ());
         int sc = 0;
         int i = 0;
         for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && i < int (args.size ()) && a != (*m)->end_arguments (); ++a, ++i) {

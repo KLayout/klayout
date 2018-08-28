@@ -708,7 +708,7 @@ public:
   virtual void set (const char *c_str, size_t s, tl::Heap &) 
   {
     if (! m_is_const) {
-      *mp_s = QByteArray (c_str, s);
+      *mp_s = QByteArray (c_str, int (s));
     }
   }
 
@@ -779,7 +779,7 @@ public:
   virtual void set (const char *c_str, size_t s, tl::Heap &) 
   {
     if (! m_is_const) {
-      *mp_s = QString::fromUtf8 (c_str, s);
+      *mp_s = QString::fromUtf8 (c_str, int (s));
     }
   }
 
@@ -851,7 +851,7 @@ public:
   virtual void set (const char *c_str, size_t s, tl::Heap &heap) 
   {
     if (! m_is_const) {
-      QString *qstr = new QString (QString::fromUtf8 (c_str, s));
+      QString *qstr = new QString (QString::fromUtf8 (c_str, int (s)));
       heap.push (qstr);
       *mp_s = QStringRef (qstr);
     }

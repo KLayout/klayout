@@ -79,7 +79,7 @@ public:
    *  @param options The generic reader options
    *  @return The LayerMap object that tells where which layer was loaded
    */
-  virtual const LayerMap &read (db::Layout &layout, const LoadLayoutOptions &options) throw (tl::Exception);
+  virtual const LayerMap &read (db::Layout &layout, const LoadLayoutOptions &options);
 
   /** 
    *  @brief The basic read method (without mapping)
@@ -94,7 +94,7 @@ public:
    *  @param layout The layout object to write to
    *  @return The LayerMap object
    */
-  virtual const LayerMap &read (db::Layout &layout) throw (tl::Exception);
+  virtual const LayerMap &read (db::Layout &layout);
 
   /**
    *  @brief Format
@@ -110,16 +110,16 @@ private:
   tl::Extractor reader;
   std::vector<GDS2XY> xyData;
 
-  const char *get_string () throw (tl::Exception);
-  void get_string (tl::string &s) const throw (tl::Exception);
-  int get_int () throw (tl::Exception);
-  short get_short () throw (tl::Exception);
-  unsigned short get_ushort () throw (tl::Exception);
-  double get_double()throw (tl::Exception);
-  short get_record() throw (tl::Exception);
-  void unget_record (short rec_id) throw (tl::Exception);
-  void get_time (unsigned int *mod_time, unsigned int *access_time) throw (tl::Exception);
-  GDS2XY *get_xy_data (unsigned int &xy_length) throw (tl::Exception);
+  const char *get_string ();
+  void get_string (tl::string &s) const;
+  int get_int ();
+  short get_short ();
+  unsigned short get_ushort ();
+  double get_double();
+  short get_record();
+  void unget_record (short rec_id);
+  void get_time (unsigned int *mod_time, unsigned int *access_time);
+  GDS2XY *get_xy_data (unsigned int &xy_length);
   void progress_checkpoint ();
   short siExtractData(std::string &sInput, std::string &sToken, std::string &sArguments);
 
@@ -128,7 +128,7 @@ private:
    */
   void vConvertToXY(const std::string &_sArg);
 
-  void error (const std::string &txt) throw (tl::Exception);
+  void error (const std::string &txt);
   void warn (const std::string &txt);
 };
 

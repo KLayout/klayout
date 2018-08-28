@@ -134,7 +134,7 @@ private:
   //  one level up. Returns true if from right
   bool up () 
   {
-    size_type m = 1 << m_l;
+    size_type m = size_type (1) << m_l;
     size_type mm = m / 2;
     --m_l;
     bool right = ((m_j & mm) != 0);
@@ -159,7 +159,7 @@ private:
   //  one level down (left). Returns false if not possible
   bool down_left ()
   {
-    size_type m = 1 << m_l;
+    size_type m = size_type (1) << m_l;
     m_j += m;
     if (m_j > m_n) { 
       m_j -= m;

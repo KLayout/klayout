@@ -416,7 +416,7 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFLayerDe
 void 
 LEFDEFImporter::error (const std::string &msg)
 {
-  throw LEFDEFReaderException (msg, mp_stream->line_number (), m_cellname, m_fn);
+  throw LEFDEFReaderException (msg, int (mp_stream->line_number ()), m_cellname, m_fn);
 }
 
 void 
@@ -549,7 +549,7 @@ LEFDEFImporter::get ()
 const std::string &
 LEFDEFImporter::next ()
 {
-  unsigned int last_line = mp_stream->line_number ();
+  unsigned int last_line = (unsigned int) mp_stream->line_number ();
 
   m_last_token.clear ();
 

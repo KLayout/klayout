@@ -492,9 +492,9 @@ InputFile::read (char *b, size_t n)
 {
   tl_assert (m_fd >= 0);
 #if defined(_WIN32)
-  ptrdiff_t ret = _read (m_fd, b, n);
+  ptrdiff_t ret = _read (m_fd, b, (unsigned int) n);
 #else
-  ptrdiff_t ret = ::read (m_fd, b, n);
+  ptrdiff_t ret = ::read (m_fd, b, (unsigned int) n);
 #endif
   if (ret < 0) {
     throw FileReadErrorException (m_source, errno);
@@ -567,7 +567,7 @@ size_t
 InputZLibFile::read (char *b, size_t n)
 {
   tl_assert (m_zs != NULL);
-  int ret = gzread (m_zs, b, n);
+  int ret = gzread (m_zs, b, (unsigned int) n);
   if (ret < 0) {
     int gz_err = 0;
     const char *em = gzerror (m_zs, &gz_err);
@@ -791,9 +791,9 @@ OutputFile::write (const char *b, size_t n)
 {
   tl_assert (m_fd >= 0);
 #if defined(_WIN32)
-  ptrdiff_t ret = _write (m_fd, b, n);
+  ptrdiff_t ret = _write (m_fd, b, (unsigned int) n);
 #else
-  ptrdiff_t ret = ::write (m_fd, b, n);
+  ptrdiff_t ret = ::write (m_fd, b, (unsigned int) n);
 #endif
   if (ret < 0) {
     throw FileWriteErrorException (m_source, errno);
@@ -833,7 +833,7 @@ void
 OutputZLibFile::write (const char *b, size_t n)
 {
   tl_assert (m_zs != NULL);
-  int ret = gzwrite (m_zs, (char *) b, n);
+  int ret = gzwrite (m_zs, (char *) b, (unsigned int) n);
   if (ret < 0) {
     int gz_err = 0;
     const char *em = gzerror (m_zs, &gz_err);

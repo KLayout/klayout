@@ -1479,7 +1479,7 @@ Object::read_file ()
      
       for (size_t y = 0; y < h; ++y) {
         for (size_t x = 0; x < w; ++x) {
-          QRgb rgb = qimage.pixel (QPoint (x, h - y - 1));
+          QRgb rgb = qimage.pixel (QPoint (int (x), int (h - y - 1)));
           red[i] = qRed (rgb);
           green[i] = qGreen (rgb);
           blue[i] = qBlue (rgb);
@@ -1497,7 +1497,7 @@ Object::read_file ()
 
       for (size_t y = 0; y < h; ++y) {
         for (size_t x = 0; x < w; ++x) {
-          QRgb rgb = qimage.pixel (QPoint (x, h - y - 1));
+          QRgb rgb = qimage.pixel (QPoint (int (x), int (h - y - 1)));
           *d++ = qGreen (rgb);
           if (msk) {
             msk[i] = qAlpha (rgb) > 128;

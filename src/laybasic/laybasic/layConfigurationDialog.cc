@@ -119,7 +119,7 @@ ConfigurationDialog::init (const lay::PluginDeclaration *decl)
 }
 
 void 
-ConfigurationDialog::commit () throw (tl::Exception)
+ConfigurationDialog::commit ()
 {
   for (std::vector <lay::ConfigPage *>::iterator p = m_config_pages.begin (); p != m_config_pages.end (); ++p) {
     (*p)->commit (mp_root);

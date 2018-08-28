@@ -247,7 +247,7 @@ namespace std
     {
       size_t h = hfunc (o.hull ());
       for (size_t i = 0; i < o.holes (); ++i) {
-        h = hfunc (o.hole (i), h);
+        h = hfunc (o.hole (int (i)), h);
       }
       return h;
     }

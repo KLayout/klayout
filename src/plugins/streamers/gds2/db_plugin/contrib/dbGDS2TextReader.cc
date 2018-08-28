@@ -52,7 +52,7 @@ GDS2ReaderText::~GDS2ReaderText()
 }
   
 const LayerMap &
-GDS2ReaderText::read (db::Layout &layout, const db::LoadLayoutOptions &options) throw (tl::Exception)
+GDS2ReaderText::read (db::Layout &layout, const db::LoadLayoutOptions &options)
 {
   storedRecId = 0;
 
@@ -65,19 +65,19 @@ GDS2ReaderText::read (db::Layout &layout, const db::LoadLayoutOptions &options) 
 }
 
 const LayerMap &
-GDS2ReaderText::read (db::Layout &layout) throw (tl::Exception)
+GDS2ReaderText::read (db::Layout &layout)
 {
   return read (layout, db::LoadLayoutOptions ());
 }
 
 void
-GDS2ReaderText::unget_record (short rec_id) throw (tl::Exception)
+GDS2ReaderText::unget_record (short rec_id)
 {
   storedRecId = rec_id;
 }
 
 short 
-GDS2ReaderText::get_record () throw (tl::Exception)
+GDS2ReaderText::get_record ()
 {
   short siValueToReturn = 0;
 
@@ -243,13 +243,13 @@ GDS2ReaderText::siExtractData(std::string &_sInput, std::string &_sToken, std::s
 }
 
 const char *
-GDS2ReaderText::get_string () throw (tl::Exception)
+GDS2ReaderText::get_string ()
 {
   return reader.skip ();
 }
 
 double
-GDS2ReaderText::get_double () throw (tl::Exception)
+GDS2ReaderText::get_double ()
 {
   double x = 0;
   if (! reader.try_read (x)) {
@@ -259,14 +259,14 @@ GDS2ReaderText::get_double () throw (tl::Exception)
 }
 
 void
-GDS2ReaderText::get_string (tl::string &s) const throw (tl::Exception)
+GDS2ReaderText::get_string (tl::string &s) const
 {
   //  TODO: get rid of this const_cast hack
   s = (const_cast<GDS2ReaderText *> (this))->reader.skip ();
 }
 
 int 
-GDS2ReaderText::get_int () throw (tl::Exception)
+GDS2ReaderText::get_int ()
 {
   int x = 0;
   if (! reader.try_read (x)) {
@@ -276,7 +276,7 @@ GDS2ReaderText::get_int () throw (tl::Exception)
 }
 
 short 
-GDS2ReaderText::get_short () throw (tl::Exception)
+GDS2ReaderText::get_short ()
 {
   int x = 0;
   if (! reader.try_read (x)) {
@@ -289,7 +289,7 @@ GDS2ReaderText::get_short () throw (tl::Exception)
 }
 
 unsigned short 
-GDS2ReaderText::get_ushort () throw (tl::Exception)
+GDS2ReaderText::get_ushort ()
 {
   unsigned int x = 0;
   if (! reader.try_read (x)) {
@@ -302,7 +302,7 @@ GDS2ReaderText::get_ushort () throw (tl::Exception)
 }
 
 void 
-GDS2ReaderText::error (const std::string &msg) throw (tl::Exception)
+GDS2ReaderText::error (const std::string &msg)
 {
   throw GDS2ReaderTextException (msg, int(sStream.line_number()), cellname().c_str ());
 }
@@ -318,7 +318,7 @@ GDS2ReaderText::warn (const std::string &msg)
 }
 
 void 
-GDS2ReaderText::get_time (unsigned int *mod_time, unsigned int *access_time) throw (tl::Exception)
+GDS2ReaderText::get_time (unsigned int *mod_time, unsigned int *access_time)
 {
   if (! reader.try_read (mod_time [1])) {
     return;
@@ -370,9 +370,9 @@ GDS2ReaderText::get_time (unsigned int *mod_time, unsigned int *access_time) thr
 }
 
 GDS2XY * 
-GDS2ReaderText::get_xy_data (unsigned int &xy_length) throw (tl::Exception)
+GDS2ReaderText::get_xy_data (unsigned int &xy_length)
 {
-  xy_length = xyData.size ();
+  xy_length = (unsigned int) xyData.size ();
   return xyData.empty () ? 0 : &xyData.front ();
 }
 

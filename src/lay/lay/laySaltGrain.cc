@@ -368,7 +368,7 @@ struct ImageConverter
     if (image.empty ()) {
       res = QImage ();
     } else {
-      res = QImage::fromData (QByteArray::fromBase64 (QByteArray (image.c_str (), image.size ())));
+      res = QImage::fromData (QByteArray::fromBase64 (QByteArray (image.c_str (), int (image.size ()))));
     }
   }
 };

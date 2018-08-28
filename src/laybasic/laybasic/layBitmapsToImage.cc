@@ -427,7 +427,7 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
                       bool transparent,
                       QMutex *mutex)
 {
-  unsigned int n_in = view_ops_in.size ();
+  unsigned int n_in = (unsigned int) view_ops_in.size ();
 
   std::vector<unsigned int> bm_map;
   std::vector<unsigned int> vo_map;
@@ -607,7 +607,7 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
         };
 
         dptr = dptr_end - nwords + i;
-        for (int j = masks.size () - 1; j >= 0; --j) {
+        for (int j = int (masks.size () - 1); j >= 0; --j) {
 
           uint32_t d = *dptr;
           if (d != 0) {
@@ -660,7 +660,7 @@ bitmaps_to_image_mono (const std::vector<lay::ViewOp> &view_ops_in,
                        bool use_bitmap_index,
                        QMutex *mutex)
 {
-  unsigned int n_in = view_ops_in.size ();
+  unsigned int n_in = (unsigned int) view_ops_in.size ();
 
   std::vector<unsigned int> bm_map;
   std::vector<unsigned int> vo_map;
@@ -820,7 +820,7 @@ bitmaps_to_image_mono (const std::vector<lay::ViewOp> &view_ops_in,
         uint32_t z = lay::wordones;
 
         dptr = dptr_end - nwords + i;
-        for (int j = masks.size () - 1; j >= 0; --j) {
+        for (int j = int (masks.size () - 1); j >= 0; --j) {
           uint32_t d = *dptr;
           if (d != 0) {
             uint32_t m = 1;

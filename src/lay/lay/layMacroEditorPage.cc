@@ -635,11 +635,11 @@ void MacroEditorPage::cursor_position_changed ()
 
     bool forward = false, backward = false;
     if (e != user_data->elements ().end () && valid_element (*e)) {
-      QString t = b.text ().mid (pos, 1);
+      QString t = b.text ().mid (int (pos), 1);
       forward = (t == open_rbracket || t == open_sqbracket || t == open_cbracket);
     }
     if (e != user_data->elements ().begin () && e[-1].start_offset + e[-1].length >= pos && valid_element (*e)) {
-      QString t = b.text ().mid (pos - 1, 1);
+      QString t = b.text ().mid (int (pos) - 1, 1);
       backward = (t == close_rbracket || t == close_sqbracket || t == close_cbracket);
     }
 
@@ -656,7 +656,7 @@ void MacroEditorPage::cursor_position_changed ()
       int found = -1;
       while (true) {
 
-        QString t = b.text ().mid (e->start_offset, e->length).trimmed ();
+        QString t = b.text ().mid (int (e->start_offset), int (e->length)).trimmed ();
 
         if (valid_element (*e)) {
 
@@ -674,7 +674,7 @@ void MacroEditorPage::cursor_position_changed ()
                 } else if (c == bs.back ()) {
                   bs.pop_back ();
                   if (bs.empty ()) {
-                    found = p + e->start_offset;
+                    found = p + int (e->start_offset);
                   }
                 }
               }
@@ -684,7 +684,7 @@ void MacroEditorPage::cursor_position_changed ()
 
             for (int p = t.size (); p > 0 && found < 0; ) {
               --p;
-              if (p + e->start_offset < pos) {
+              if (p + int (e->start_offset) < pos) {
                 QString c = t.mid (p, 1);
                 if (c == close_rbracket) {
                   bs.push_back (open_rbracket);
@@ -695,7 +695,7 @@ void MacroEditorPage::cursor_position_changed ()
                 } else if (c == bs.back ()) {
                   bs.pop_back ();
                   if (bs.empty ()) {
-                    found = p + e->start_offset;
+                    found = p + int (e->start_offset);
                   }
                 }
               }

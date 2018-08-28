@@ -271,7 +271,7 @@ void
 InflateFilter::unget (size_t n)
 {
   tl_assert (m_b_read >= n);
-  m_b_read -= n;
+  m_b_read -= (unsigned int) n;
 }
 
 bool 
@@ -513,7 +513,7 @@ DeflateFilter::put (const char *b, size_t n)
   m_uc += n;
 
   mp_stream->next_in = (Byte *)b;
-  mp_stream->avail_in = n;
+  mp_stream->avail_in = (unsigned int) n;
 
   while (mp_stream->avail_in > 0) {
 

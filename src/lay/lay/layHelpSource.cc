@@ -606,7 +606,7 @@ HelpSource::produce_main_index ()
   QDomDocument doc;
   QString errorMsg;
   int errorLine = 0 ;
-  if (! doc.setContent (QByteArray (text.c_str (), text.size ()), true, &errorMsg, &errorLine)) {
+  if (! doc.setContent (QByteArray (text.c_str (), int (text.size ())), true, &errorMsg, &errorLine)) {
     throw tl::Exception (tl::to_string (errorMsg) + ", in line " + tl::to_string (errorLine) + " of main index");
   }
   
@@ -714,7 +714,7 @@ HelpSource::produce_search (const std::string &string)
   QDomDocument doc;
   QString errorMsg;
   int errorLine = 0 ;
-  if (! doc.setContent (QByteArray (text.c_str (), text.size ()), true, &errorMsg, &errorLine)) {
+  if (! doc.setContent (QByteArray (text.c_str (), int (text.size ())), true, &errorMsg, &errorLine)) {
     throw tl::Exception (tl::to_string (errorMsg) + ", in line " + tl::to_string (errorLine) + " of main index");
   }
   

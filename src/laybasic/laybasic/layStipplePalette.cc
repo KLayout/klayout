@@ -93,7 +93,7 @@ StipplePalette::stipple_by_index (unsigned int n) const
 unsigned int 
 StipplePalette::stipples () const
 {
-  return m_stipples.size ();
+  return (unsigned int) m_stipples.size ();
 }
 
 unsigned int
@@ -110,7 +110,7 @@ StipplePalette::standard_stipple_index_by_index (unsigned int n) const
 unsigned int 
 StipplePalette::standard_stipples () const
 {
-  return m_standard.size ();
+  return (unsigned int) m_standard.size ();
 }
 
 void 

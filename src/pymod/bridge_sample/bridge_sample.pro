@@ -88,6 +88,12 @@ LIBS += -L$$LIBDIR -lklayout_db
   # of strucs to 0:
   QMAKE_CXXFLAGS_WARN_ON += \
       -Wno-missing-field-initializers
+} else {
+
+  # disable some warnings
+  QMAKE_CXXFLAGS += \
+      /wd4251 \         # DLL interface required
+
 }
 
 win32 {

@@ -242,7 +242,7 @@ SettingsForm::setup ()
 }
 
 void 
-SettingsForm::commit () throw (tl::Exception)
+SettingsForm::commit ()
 {
   //  commit the custom config pages
   for (std::vector <lay::ConfigPage *>::iterator cp = m_config_pages.begin (); cp != m_config_pages.end (); ++cp) {

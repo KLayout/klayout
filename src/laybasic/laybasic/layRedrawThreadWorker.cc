@@ -2002,8 +2002,8 @@ RedrawThreadWorker::iterate_variants (const std::vector <db::Box> &redraw_region
   //  traversals along the context path bottom up.
   size_t ctx_path_length = m_cellviews [m_cv_index].specific_path ().size ();
   if (ctx_path_length > 0) {
-    m_from_level -= ctx_path_length;
-    m_to_level -= ctx_path_length;
+    m_from_level -= int (ctx_path_length);
+    m_to_level -= int (ctx_path_length);
     trans = trans * m_cellviews [m_cv_index].context_trans ();
   }
 

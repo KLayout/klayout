@@ -330,8 +330,8 @@ rasterize_extended (const db::Polygon &fp, const db::Box &fc_bbox, db::AreaMap &
 
   if (tl::verbosity () >= 50) {
 
-    db::Coord nx = am.nx ();
-    db::Coord ny = am.ny ();
+    db::Coord nx = db::Coord (am.nx ());
+    db::Coord ny = db::Coord (am.ny ());
     db::AreaMap::area_type amax = am.pixel_area ();
     double n = 0;
     for (size_t i = 0; i < size_t (nx); ++i) {
@@ -361,8 +361,8 @@ rasterize_extended (const db::Polygon &fp, const db::Box &fc_bbox, db::AreaMap &
 
     if (tl::verbosity () >= 50) {
 
-      db::Coord nx = am.nx ();
-      db::Coord ny = am.ny ();
+      db::Coord nx = db::Coord (am.nx ());
+      db::Coord ny = db::Coord (am.ny ());
       db::AreaMap::area_type amax = am.pixel_area ();
       double n = 0;
       for (size_t i = 0; i < size_t (nx); ++i) {

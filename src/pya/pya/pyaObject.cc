@@ -171,8 +171,8 @@ Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 
 PYAObjectBase::PYAObjectBase(const gsi::ClassBase *_cls_decl, PyObject *py_object)
   : mp_py_object (py_object),
-    m_listener (new pya::StatusChangedListener (this)),
-    m_callee (new pya::Callee (this)),
+    mp_listener (new pya::StatusChangedListener (this)),
+    mp_callee (new pya::Callee (this)),
     m_cls_decl (_cls_decl),
     m_obj (0),
     m_owned (false),
@@ -206,6 +206,10 @@ PYAObjectBase::~PYAObjectBase ()
     tl::warn << "Caught unspecified exception in object destructor";
   }
 
+  delete mp_listener;
+  mp_listener = 0;
+  delete mp_callee;
+  mp_callee = 0;
   m_destroyed = true;
 }
 
@@ -287,7 +291,7 @@ PYAObjectBase::detach ()
     if (! m_destroyed && cls && cls->is_managed ()) {
       gsi::ObjectBase *gsi_object = cls->gsi_object (m_obj, false);
       if (gsi_object) {
-        gsi_object->status_changed_event ().remove (m_listener.get (), &StatusChangedListener::object_status_changed);
+        gsi_object->status_changed_event ().remove (mp_listener, &StatusChangedListener::object_status_changed);
       }
     }
 
@@ -326,7 +330,7 @@ PYAObjectBase::set (void *obj, bool owned, bool const_ref, bool can_destroy)
     if (gsi_object->already_kept ()) {
       keep_internal ();
     }
-    gsi_object->status_changed_event ().add (m_listener.get (), &StatusChangedListener::object_status_changed);
+    gsi_object->status_changed_event ().add (mp_listener, &StatusChangedListener::object_status_changed);
   }
 
   if (!m_owned) {
@@ -427,8 +431,8 @@ PYAObjectBase::initialize_callbacks ()
     const char *nstr = (*m)->primary_name ().c_str ();
     py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (py_object ()), nstr);
 
-    int id = m_callee->add_callback (CallbackFunction (py_attr, *m));
-    (*m)->set_callback (m_obj, gsi::Callback (id, m_callee.get (), (*m)->argsize (), (*m)->retsize ()));
+    int id = mp_callee->add_callback (CallbackFunction (py_attr, *m));
+    (*m)->set_callback (m_obj, gsi::Callback (id, mp_callee, (*m)->argsize (), (*m)->retsize ()));
 
   }
 
@@ -475,8 +479,8 @@ PYAObjectBase::initialize_callbacks ()
 
             PyObject *py_attr = PyObject_GetAttrString ((PyObject *) Py_TYPE (py_object ()), nstr);
             tl_assert (py_attr != NULL);
-            int id = m_callee.add_callback (CallbackFunction (py_attr, *m));
-            (*m)->set_callback (m_obj, gsi::Callback (id, &m_callee, (*m)->argsize (), (*m)->retsize ()));
+            int id = mp_callee->add_callback (CallbackFunction (py_attr, *m));
+            (*m)->set_callback (m_obj, gsi::Callback (id, mp_callee, (*m)->argsize (), (*m)->retsize ()));
 
           }
 
@@ -512,7 +516,7 @@ PYAObjectBase::detach_callbacks ()
     }
   }
 
-  m_callee->clear_callbacks ();
+  mp_callee->clear_callbacks ();
 }
 
 void 

@@ -1029,7 +1029,7 @@ static void insert_image (lay::LayoutView *view, ImageRef &obj)
   img::Service *img_service = view->get_plugin <img::Service> ();
   if (img_service) {
     img::Object *inew = img_service->insert_image (obj);
-    obj.id (inew->id ());
+    obj.id (int (inew->id ()));
     obj.set_view (view);
   }
 }

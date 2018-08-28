@@ -107,7 +107,7 @@ Finder::start (lay::LayoutView *view, const lay::CellView &cv, unsigned int cv_i
   m_path.erase (m_path.begin (), m_path.end ());
 
   for (std::vector<db::ICplxTrans>::const_iterator t = trans.begin (); t != trans.end (); ++t) {
-    do_find (*cv.cell (), cv.specific_path ().size (), *t * cv.context_trans ());
+    do_find (*cv.cell (), int (cv.specific_path ().size ()), *t * cv.context_trans ());
   }
 }
 

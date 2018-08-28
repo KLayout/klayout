@@ -220,8 +220,8 @@ private:
   void keep_internal ();
 
   PyObject *mp_py_object;
-  std::auto_ptr<StatusChangedListener> m_listener;
-  std::auto_ptr<Callee> m_callee;
+  StatusChangedListener *mp_listener;
+  Callee *mp_callee;
   const gsi::ClassBase *m_cls_decl;
   void *m_obj;
   bool m_owned : 1;

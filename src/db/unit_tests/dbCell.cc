@@ -254,9 +254,9 @@ static unsigned int pi = 0;
 void insert_ci (db::Cell &c, size_t ci, const db::Trans &t)
 {
   if (pi == 0) {
-    c.insert (db::CellInstArray (db::CellInst (ci), t));
+    c.insert (db::CellInstArray (db::CellInst (db::cell_index_type (ci)), t));
   } else {
-    c.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (ci), t), pi));
+    c.insert (db::CellInstArrayWithProperties (db::CellInstArray (db::CellInst (db::cell_index_type (ci)), t), pi));
   }
   pi = (pi + 1) % 3;
 }

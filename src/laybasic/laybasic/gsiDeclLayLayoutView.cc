@@ -66,7 +66,7 @@ static unsigned int add_stipple1 (lay::LayoutView *view, const std::string &name
   lay::DitherPatternInfo p;
   p.set_name (name);
   if (bits > 0 && ! data.empty ()) {
-    p.set_pattern (&(*data.begin ()), std::min (32u, bits), std::min (size_t (32), data.size ()));
+    p.set_pattern (&(*data.begin ()), std::min (32u, bits), std::min (32u, (unsigned int) data.size ()));
   }
   unsigned int index = pattern.add_pattern (p);
 

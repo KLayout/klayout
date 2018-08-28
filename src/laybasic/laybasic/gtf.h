@@ -235,7 +235,7 @@ public:
    */
   unsigned int size () const
   {
-    return m_events.size ();
+    return int (m_events.size ());
   }
 
   /**

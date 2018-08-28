@@ -207,7 +207,7 @@ NetTracerDialog::mouse_click_event (const db::DPoint &p, unsigned int buttons, b
 
         update_list ();
         item_selection_changed ();
-        net_list->setCurrentItem (net_list->item (mp_nets.size () - 1));
+        net_list->setCurrentItem (net_list->item (int (mp_nets.size () - 1)));
 
       }
 
@@ -1053,7 +1053,7 @@ NetTracerDialog::update_list ()
     QListWidgetItem *item = 0;
 
     if (net_list->count () > int (i)) {
-      item = net_list->item (i);
+      item = net_list->item (int (i));
     } else {
       item = new QListWidgetItem (net_list);
       net_list->addItem (item);

@@ -82,11 +82,11 @@ struct cmp_cell_tree_item_vs_name_f
 // --------------------------------------------------------------------
 //  CellTreeItem implementation
 
-CellTreeItem::CellTreeItem (const db::Layout *layout, CellTreeItem *parent, bool is_pcell, size_t cell_index, bool flat, CellTreeModel::Sorting s)
-  : mp_layout (layout), mp_parent (parent), m_sorting (s), m_is_pcell (is_pcell), m_index (0), m_children (), m_cell_index (cell_index)
+CellTreeItem::CellTreeItem (const db::Layout *layout, CellTreeItem *parent, bool is_pcell, size_t cell_or_pcell_index, bool flat, CellTreeModel::Sorting s)
+  : mp_layout (layout), mp_parent (parent), m_sorting (s), m_is_pcell (is_pcell), m_index (0), m_children (), m_cell_or_pcell_index (cell_or_pcell_index)
 {
   if (! flat && ! is_pcell) {
-    m_child_count = mp_layout->cell (m_cell_index).child_cells ();
+    m_child_count = int (mp_layout->cell (cell_index ()).child_cells ());
   } else {
     m_child_count = 0;
   }
@@ -105,8 +105,8 @@ CellTreeItem::display_text () const
 {
   if (m_is_pcell) {
     return name ();
-  } else if (mp_layout->is_valid_cell_index (m_cell_index)) {
-    return mp_layout->cell (m_cell_index).get_display_name ();
+  } else if (mp_layout->is_valid_cell_index (cell_index ())) {
+    return mp_layout->cell (cell_index ()).get_display_name ();
   } else {
     return std::string ();
   }
@@ -125,7 +125,7 @@ CellTreeItem::child (int index)
 
     //  create a list of child sub-item
 
-    const db::Cell *cell = & mp_layout->cell (m_cell_index);
+    const db::Cell *cell = & mp_layout->cell (cell_index ());
 
     m_children.reserve (m_child_count);
 
@@ -148,7 +148,7 @@ CellTreeItem::child (int index)
 db::cell_index_type
 CellTreeItem::cell_index () const
 {
-  return m_cell_index;
+  return db::cell_index_type (m_cell_or_pcell_index);
 }
 
 CellTreeItem *
@@ -161,9 +161,9 @@ const char *
 CellTreeItem::name () const
 {
   if (! m_is_pcell) {
-    return mp_layout->cell_name (m_cell_index);
+    return mp_layout->cell_name (cell_index ());
   } else {
-    return mp_layout->pcell_header (m_cell_index)->get_name ().c_str ();
+    return mp_layout->pcell_header (m_cell_or_pcell_index)->get_name ().c_str ();
   }
 }
 
@@ -214,7 +214,7 @@ CellTreeItem::by_area_less_than (const CellTreeItem *b) const
     return m_is_pcell > b->is_pcell ();
   }
   // Hint: since mp_layout == b.mp_layout, not conversion to um^2 is required because of different DBU
-  return mp_layout->cell (m_cell_index).bbox ().area () < b->mp_layout->cell (b->m_cell_index).bbox ().area ();
+  return mp_layout->cell (cell_index ()).bbox ().area () < b->mp_layout->cell (b->cell_index ()).bbox ().area ();
 }
 
 bool
@@ -224,7 +224,7 @@ CellTreeItem::by_area_equal_than (const CellTreeItem *b) const
     return false;
   }
   // Hint: since mp_layout == b.mp_layout, not conversion to um^2 is required because of different DBU
-  return mp_layout->cell (m_cell_index).bbox ().area () == b->mp_layout->cell (b->m_cell_index).bbox ().area ();
+  return mp_layout->cell (cell_index ()).bbox ().area () == b->mp_layout->cell (b->cell_index ()).bbox ().area ();
 }
 
 // --------------------------------------------------------------------

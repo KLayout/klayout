@@ -89,7 +89,7 @@ LineStylePalette::style_by_index (unsigned int n) const
 unsigned int 
 LineStylePalette::styles () const
 {
-  return m_styles.size ();
+  return (unsigned int) m_styles.size ();
 }
 
 void 

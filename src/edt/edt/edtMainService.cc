@@ -190,7 +190,7 @@ public:
 
   unsigned int size () const
   {
-    return m_common_inst.size ();
+    return (unsigned int) m_common_inst.size ();
   }
 
   unsigned int cv_index () const

@@ -326,9 +326,9 @@ public:
     int x = p.x (), y = p.y ();
 
     if (halign < 0) {
-      x -= ff.width () * strlen (t);
+      x -= ff.width () * int (strlen (t));
     } else if (halign == 0) {
-      x -= ff.width () * strlen (t) / 2;
+      x -= ff.width () * int (strlen (t)) / 2;
     }
 
     if (valign < 0) {

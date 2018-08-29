@@ -124,7 +124,7 @@ ColorPalette::color_by_index (unsigned int n) const
 unsigned int 
 ColorPalette::colors () const
 {
-  return m_colors.size ();
+  return (unsigned int) m_colors.size ();
 }
 
 unsigned int
@@ -136,7 +136,7 @@ ColorPalette::luminous_color_index_by_index (unsigned int n) const
 unsigned int 
 ColorPalette::luminous_colors () const
 {
-  return m_luminous_color_indices.size ();
+  return (unsigned int) m_luminous_color_indices.size ();
 }
 
 void 

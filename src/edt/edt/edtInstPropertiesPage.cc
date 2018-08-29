@@ -159,7 +159,7 @@ InstPropertiesPage::display_mode_changed (bool)
 void 
 InstPropertiesPage::back ()
 {
-  m_index = m_selection_ptrs.size ();
+  m_index = (unsigned int) m_selection_ptrs.size ();
 }
 
 void 

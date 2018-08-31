@@ -340,6 +340,17 @@ class DBLayout_TestClass < TestBase
     i1copy.region = RBA::Box.new(0, 0, 100, 101)
     assert_equal(i1copy.region.to_s, "(0,0;100,101)")
     assert_equal(collect(i1copy, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)");
+    i1copy.region = RBA::Region::new(RBA::Box.new(0, 0, 100, 101))
+    assert_equal(i1copy.region.to_s, "(0,0;100,101)")
+    assert_equal(collect(i1copy, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)");
+    i1copy.region = RBA::Box.new(-1000, -1000, 1100, 1101)
+    i1copy.confine_region(RBA::Box.new(0, 0, 100, 101))
+    assert_equal(i1copy.region.to_s, "(0,0;100,101)")
+    assert_equal(collect(i1copy, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)");
+    i1copy.region = RBA::Box.new(-1000, -1000, 1100, 1101)
+    i1copy.confine_region(RBA::Region::new(RBA::Box.new(0, 0, 100, 101)))
+    assert_equal(i1copy.region.to_s, "(0,0;100,101)")
+    assert_equal(collect(i1copy, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)");
     i1o = l.begin_shapes_overlapping(c0.cell_index, 0, RBA::Box.new(0, 0, 101, 101));
     assert_equal(collect(i1o, l), "[c0](0,100;1000,1200)/[c1](0,100;1000,1200)/[c2](100,0;1100,1100)");
     i1o = c0.begin_shapes_rec_overlapping(0, RBA::Box.new(0, 0, 101, 101));

@@ -47,7 +47,9 @@ int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 
   std::string text;
   {
-    tl::InputPipe pipe (std::string (STRINGIFY (PYTHON)) + " " + fp + " 2>&1");
+    std::string cmd = std::string (STRINGIFY (PYTHON)) + " " + fp + " 2>&1";
+    tl::info << cmd;
+    tl::InputPipe pipe (cmd);
     tl::InputStream is (pipe);
     text = is.read_all ();
   }

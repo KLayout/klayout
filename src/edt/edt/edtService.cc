@@ -1480,30 +1480,23 @@ Service::add_selection (const lay::ObjectInstPath &sel)
   selection_to_view ();
 }
 
-bool 
-Service::handle_guiding_shape_changes ()
+std::pair<bool, lay::ObjectInstPath>
+Service::handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const
 {
-  //  just allow one guiding shape to be selected
-  if (m_selection.empty ()) {
-    return false;
-  }
-
-  objects::const_iterator s = m_selection.begin ();
-
-  unsigned int cv_index = s->cv_index ();
+  unsigned int cv_index = obj.cv_index ();
   lay::CellView cv = view ()->cellview (cv_index);
   db::Layout *layout = &cv->layout ();
 
-  if (s->is_cell_inst () || s->layer () != layout->guiding_shape_layer ()) {
-    return false;
+  if (obj.is_cell_inst () || obj.layer () != layout->guiding_shape_layer ()) {
+    return std::make_pair (false, lay::ObjectInstPath ());
   }
 
-  if (! s->shape ().has_prop_id ()) {
-    return false;
+  if (! obj.shape ().has_prop_id ()) {
+    return std::make_pair (false, lay::ObjectInstPath ());
   }
 
-  if (! layout->is_pcell_instance (s->cell_index ()).first) {
-    return false;
+  if (! layout->is_pcell_instance (obj.cell_index ()).first) {
+    return std::make_pair (false, lay::ObjectInstPath ());
   }
 
   db::cell_index_type top_cell = std::numeric_limits<db::cell_index_type>::max ();
@@ -1512,37 +1505,38 @@ Service::handle_guiding_shape_changes ()
   db::pcell_parameters_type parameters_for_pcell;
 
   //  determine parent cell and instance if required
-  lay::ObjectInstPath::iterator e = s->end ();
-  if (e == s->begin ()) {
-    top_cell = s->cell_index ();
+  lay::ObjectInstPath::iterator e = obj.end ();
+  if (e == obj.begin ()) {
+    top_cell = obj.cell_index ();
   } else {
     --e;
-    db::cell_index_type pc = s->topcell ();
-    if (e != s->begin ()) {
+    db::cell_index_type pc = obj.topcell ();
+    if (e != obj.begin ()) {
       --e;
       pc = e->inst_ptr.cell_index ();
     }
     parent_cell = pc;
-    parent_inst = s->back ().inst_ptr;
+    parent_inst = obj.back ().inst_ptr;
   }
 
   db::property_names_id_type pn = layout->properties_repository ().prop_name_id ("name");
 
-  const db::PropertiesRepository::properties_set &input_props = layout->properties_repository ().properties (s->shape ().prop_id ());
+  const db::PropertiesRepository::properties_set &input_props = layout->properties_repository ().properties (obj.shape ().prop_id ());
   db::PropertiesRepository::properties_set::const_iterator input_pv = input_props.find (pn);
   if (input_pv == input_props.end ()) {
-    return false;
+    return std::make_pair (false, lay::ObjectInstPath ());
   }
 
   std::string shape_name = input_pv->second.to_string ();
 
   //  Hint: get_parameters_from_pcell_and_guiding_shapes invalidates the shapes because it resets the changed
   //  guiding shapes. We must not access s->shape after that.
-  if (! get_parameters_from_pcell_and_guiding_shapes (layout, s->cell_index (), parameters_for_pcell)) {
-    return false;
+  if (! get_parameters_from_pcell_and_guiding_shapes (layout, obj.cell_index (), parameters_for_pcell)) {
+    return std::make_pair (false, lay::ObjectInstPath ());
   }
 
-  std::vector<lay::ObjectInstPath> new_sel;
+  bool found = false;
+  lay::ObjectInstPath new_obj = obj;
 
   if (parent_cell != std::numeric_limits <db::cell_index_type>::max ()) {
 
@@ -1550,21 +1544,20 @@ Service::handle_guiding_shape_changes ()
 
     //  try to identify the selected shape in the new shapes and select this one
     db::Shapes::shape_iterator sh = layout->cell (new_inst.cell_index ()).shapes (layout->guiding_shape_layer ()).begin (db::ShapeIterator::All);
-    while (! sh.at_end ()) {
+    while (! sh.at_end () && !found) {
       const db::PropertiesRepository::properties_set &props = layout->properties_repository ().properties (sh->prop_id ());
       db::PropertiesRepository::properties_set::const_iterator pv = props.find (pn);
       if (pv != props.end ()) {
         if (pv->second.to_string () == shape_name) {
-          new_sel.push_back (*s);
-          new_sel.back ().back ().inst_ptr = new_inst;
-          new_sel.back ().back ().array_inst = new_inst.begin ();
-          new_sel.back ().set_shape (*sh);
-          break;
+          new_obj.back ().inst_ptr = new_inst;
+          new_obj.back ().array_inst = new_inst.begin ();
+          new_obj.set_shape (*sh);
+          found = true;
         }
       }
       ++sh;
     }
-    
+
   }
 
   if (top_cell != std::numeric_limits <db::cell_index_type>::max ()) {
@@ -1572,12 +1565,33 @@ Service::handle_guiding_shape_changes ()
     // Currently there is not way to create such a configuration ...
   }
 
-  //  remove superfluous proxies
-  layout->cleanup ();
+  return std::make_pair (found, new_obj);
+}
 
-  set_selection (new_sel.begin (), new_sel.end ());
+bool 
+Service::handle_guiding_shape_changes ()
+{
+  //  just allow one guiding shape to be selected
+  if (m_selection.empty ()) {
+    return false;
+  }
 
-  return true;
+  std::pair<bool, lay::ObjectInstPath> gs = handle_guiding_shape_changes (*m_selection.begin ());
+  if (gs.first) {
+
+    //  remove superfluous proxies
+    view ()->cellview (gs.second.cv_index ())->layout ().cleanup ();
+
+    //  re-set the selection
+    std::vector<lay::ObjectInstPath> new_sel;
+    new_sel.push_back (gs.second);
+    set_selection (new_sel.begin (), new_sel.end ());
+
+    return true;
+
+  } else {
+    return false;
+  }
 }
 
 

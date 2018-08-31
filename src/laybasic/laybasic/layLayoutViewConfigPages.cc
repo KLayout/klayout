@@ -819,9 +819,22 @@ LayoutViewConfigPage4::update ()
       }
     }
 
+#if QT_VERSION > 0x050000
+    unsigned int dpr = 1; //devicePixelRatio ();
+#else
+    unsigned int dpr = 1;
+#endif
+
     QFontMetrics fm (font (), this);
     QRect rt (fm.boundingRect (QString::fromUtf8 ("AA")));
-    QPixmap pxmp (rt.width () + 10, rt.height () + 10);
+
+    const unsigned int h = rt.height () + 10;
+    const unsigned int w = rt.width () + 10;
+
+    QPixmap pxmp (w * dpr, h * dpr);
+#if QT_VERSION > 0x050000
+    pxmp.setDevicePixelRatio (dpr);
+#endif
 
     QPainter pxpainter (&pxmp);
     pxpainter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text)));
@@ -1159,35 +1172,39 @@ LayoutViewConfigPage6::update ()
     const unsigned int h = rt.height () + 10;
     const unsigned int w = rt.width () + 10;
 
-    unsigned int color0 = palette ().color (QPalette::Active, QPalette::Button).rgb();
-    unsigned int color1 = palette ().color (QPalette::Active, QPalette::Dark).rgb();
+    QColor color0 = palette ().color (QPalette::Active, QPalette::Button);
+    QColor color1 = palette ().color (QPalette::Active, QPalette::Dark);
 
-    QImage image (w, h, QImage::Format_RGB32);
-    if (s >= 0) {
-      const uint32_t * const *dp = m_pattern.pattern ((unsigned int) s).pattern ();
-      for (unsigned int l = 0; l < h; ++l, ++dp) {
-        uint32_t m = **dp;
-        if (l == 0 || l == h - 1) { 
-          m |= ((1 << w) - 1);
-        } else {
-          m |= ((1 << (w - 1)) | 1);
-        }
-        color_t *pt = (color_t *) image.scanLine (h - 1 - l);
-        for (unsigned int b = 0; b < w; ++b) {
-          *pt++ = (m & 1) ? color1 : color0;
-          m >>= 1;
-        }
-      }
-    }
+#if QT_VERSION > 0x050000
+    unsigned int dpr = 1; //devicePixelRatio ();
+#else
+    unsigned int dpr = 1;
+#endif
+
+    QImage image (w * dpr, h * dpr, QImage::Format_RGB32);
+#if QT_VERSION > 0x050000
+    image.setDevicePixelRatio (dpr);
+#endif
+    image.fill (color0.rgb ());
+
+    // copying code from layLayerToolbox.cc
+    QBitmap bitmap = m_pattern.pattern ((unsigned int) s).get_bitmap (w * dpr, h * dpr);
+    QPainter painter (&image);
+    painter.setPen (QPen (color1));
+    painter.setBackgroundMode (Qt::TransparentMode);
+    painter.drawPixmap (0, 0, w, h, bitmap);
 
     QPixmap pxmp = QPixmap::fromImage (image); // Qt 4.6.0 workaround
-
     QPainter pxpainter (&pxmp);
     pxpainter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text)));
     QRect r (0, 0, pxmp.width () - 1, pxmp.height () - 1);
     pxpainter.drawRect (r);
     pxpainter.setFont (font ());
     pxpainter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);
+
+#if QT_VERSION > 0x050000
+    pxmp.setDevicePixelRatio (dpr);
+#endif
 
     (mp_ui->*(cfg6_buttons [i]))->setIconSize (pxmp.size ());
     (mp_ui->*(cfg6_buttons [i]))->setIcon (QIcon (pxmp));
@@ -1366,16 +1383,28 @@ LayoutViewConfigPage6a::update ()
     const unsigned int h = 26;
     const unsigned int w = 26;
 
-    QImage image (w, h, QImage::Format_RGB32);
-    image.fill (color0.rgb ());
+#if QT_VERSION > 0x050000
+    unsigned int dpr = 1; //devicePixelRatio ();
+#else
+    unsigned int dpr = 1;
+#endif
 
-    QBitmap bitmap = m_style.style (s).get_bitmap (w, h);
+    QImage image (w * dpr, h * dpr, QImage::Format_RGB32);
+    image.fill (color0.rgb ());
+#if QT_VERSION > 0x050000
+    image.setDevicePixelRatio (dpr);
+#endif
+
+    QBitmap bitmap = m_style.style (s).get_bitmap (w * dpr, h * dpr);
     QPainter painter (&image);
     painter.setPen (QPen (color1));
     painter.setBackgroundMode (Qt::TransparentMode);
-    painter.drawPixmap (0, 0, bitmap);
+    painter.drawPixmap (0, 0, w, h, bitmap);
 
     QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
+#if QT_VERSION > 0x050000
+    pixmap.setDevicePixelRatio (dpr);
+#endif
     b->setIconSize (pixmap.size ());
     b->setIcon (QIcon (pixmap));
 
@@ -1510,6 +1539,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_stipple_offset, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_line_style_palette, lay::LineStylePalette ().to_string ()));
     options.push_back (std::pair<std::string, std::string> (cfg_no_stipple, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_markers_visible, "true"));
   }
 
   virtual std::vector<std::pair <std::string, ConfigPage *> > config_pages (QWidget *parent) const 

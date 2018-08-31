@@ -842,6 +842,7 @@ MainWindow::init_menu ()
     MenuLayoutEntry ("show_grid",                       tl::to_string (QObject::tr ("Show Grid")),                        std::make_pair (cfg_grid_visible, "?")),
     MenuLayoutEntry ("default_grid:default_grids_group", tl::to_string (QObject::tr ("Grid")),                            empty_menu),
     MenuLayoutEntry::separator ("layout_group"),
+    MenuLayoutEntry ("show_markers",                    tl::to_string (QObject::tr ("Show Markers")),                     std::make_pair (cfg_markers_visible, "?")),
     MenuLayoutEntry ("show_texts",                      tl::to_string (QObject::tr ("Show Texts")),                       std::make_pair (cfg_text_visible, "?")),
     MenuLayoutEntry ("show_cell_boxes",                 tl::to_string (QObject::tr ("Show Cell Frames")),                 std::make_pair (cfg_cell_box_visible, "?")),
     MenuLayoutEntry ("no_stipples",                     tl::to_string (QObject::tr ("Show Layers Without Fill")),         std::make_pair (cfg_no_stipple, "?")),
@@ -1306,6 +1307,18 @@ MainWindow::about_to_exec ()
     TipDialog td (this,
                   tl::to_string (QObject::tr ("Layers are shown without fill because fill has been intentionally turned off. This can be confusing since selecting a stipple does not have an effect in this case.\n\nTo turn this feature off, uncheck \"Show Layers Without Fill\" in the \"View\" menu.")),
                   "no-stipple");
+    if (td.exec_dialog ()) {
+      //  Don't bother the user with more dialogs.
+      return;
+    }
+  }
+
+  f = false;
+  config_get (cfg_markers_visible, f);
+  if (! f) {
+    TipDialog td (this,
+                  tl::to_string (QObject::tr ("Markers are not visible because they have been turned off.\nYou may not see markers when using the marker browser feature.\n\nTo turn markers on, check \"Show Markers\" in the \"View\" menu.")),
+                  "show-markers");
     if (td.exec_dialog ()) {
       //  Don't bother the user with more dialogs.
       return;
@@ -3161,6 +3174,8 @@ MainWindow::do_save (bool as)
 
           options.set_dbu (cv->layout ().dbu ());
           options.set_format_from_filename (fn);
+
+          cv->update_save_options (options);
 
           tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
 

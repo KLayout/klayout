@@ -97,6 +97,9 @@ Homebrew's installation of python3 (`brew install python3`) places a `Python.fra
 ```
 # Build step
 ./build4mac.py -p B36 -q Qt5Brew
+# build with log
+./build4mac.py -p B36 -q Qt5Brew 2>&1 | tee qt5.build.macos-HighSierra-release-version.log
+
 
 # Deploy step
 ./build4mac.py -p B36 -q Qt5Brew -y  # normal deploy

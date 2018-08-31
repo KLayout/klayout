@@ -20,21 +20,10 @@
 
 */
 
-#include "tlUnitTest.h"
-#include "tlStream.h"
-#include "tlFileUtils.h"
 
-//  Testing the converter main implementation (CIF)
-TEST(1)
+#include "tlLongInt.h"
+
+namespace tl
 {
-  std::string fp (tl::testsrc ());
-  fp += "/testdata/bd/strmrun.py";
-
-  std::string path = tl::combine_path (tl::get_inst_path (), "strmrun ") + fp;
-  tl::InputPipe pipe (path);
-  tl::InputStream is (pipe);
-  std::string data = is.read_all ();
-
-  EXPECT_EQ (data, "Hello, world (0,-42;42,0)!\n");
+  //  .. nothing yet ..
 }
-

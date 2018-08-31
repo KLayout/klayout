@@ -555,6 +555,7 @@ DitherPatternInfo::operator< (const DitherPatternInfo &d) const
   return m_order_index < d.m_order_index;
 }
 
+// TODO including a scaling algorithm in this formula, or give more resolution to the dither
 QBitmap
 DitherPatternInfo::get_bitmap (int width, int height) const
 {

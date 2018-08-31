@@ -25,6 +25,7 @@
 
 #include "dbShapeProcessor.h"
 #include "dbPolygon.h"
+#include "dbPolygonGenerators.h"
 #include "dbLayout.h"
 #include "dbReader.h"
 #include "dbCommonReader.h"
@@ -1332,7 +1333,7 @@ TEST(23)
 
   EXPECT_EQ (out.size (), size_t (1));
   std::sort (out.begin (), out.end ());
-  EXPECT_EQ (out[0].to_string (), "(0,0;0,1;1,0)");
+  EXPECT_EQ (out[0].to_string (), "(0,0;0,1;1,1)");
 }
 
 TEST(24)
@@ -1390,15 +1391,29 @@ TEST(24)
     in1.back ().assign_hull (p1 + 0, p1 + sizeof (p1) / sizeof (p1[0]));
   }
 
-  std::vector<db::Polygon> out;
+  {
+    std::vector<db::Polygon> out;
 
-  db::EdgeProcessor ep;
-  ep.simple_merge (in1, out, false, false);
+    db::EdgeProcessor ep;
+    ep.simple_merge (in1, out, false, false);
 
-  EXPECT_EQ (out.size (), size_t (2));
-  std::sort (out.begin (), out.end ());
-  EXPECT_EQ (out[0].to_string (), "(0,-9;0,0;3,0;3,-2;1,0;1,-9)");
-  EXPECT_EQ (out[1].to_string (), "(-2,1;-2,3;0,1;0,10;1,10;1,1)");
+    EXPECT_EQ (out.size (), size_t (1));
+    std::sort (out.begin (), out.end ());
+    EXPECT_EQ (out[0].to_string (), "(0,-9;0,0;-2,1;-2,3;0,1;0,10;1,10;1,1;0,0;3,0;3,-2;1,0;1,-9)");
+  }
+
+  {
+    std::vector<db::Polygon> out;
+
+    db::EdgeProcessor ep;
+    ep.simple_merge (in1, out, false, true);
+
+    EXPECT_EQ (out.size (), size_t (3));
+    std::sort (out.begin (), out.end ());
+    EXPECT_EQ (out[0].to_string (), "(0,-9;0,0;1,0;1,-9)");
+    EXPECT_EQ (out[1].to_string (), "(3,-2;1,0;3,0)");
+    EXPECT_EQ (out[2].to_string (), "(0,0;-2,1;-2,3;0,1;0,10;1,10;1,1)");
+  }
 }
 
 TEST(25)
@@ -2247,7 +2262,7 @@ TEST(100)
 }
 
 //  #74 (GitHub)
-TEST(101)
+std::string run_test101 (tl::TestBase *_this, const db::Trans &t)
 {
   db::EdgeProcessor ep;
 
@@ -2260,6 +2275,7 @@ TEST(101)
     };
     db::Polygon p;
     p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    p.transform (t);
     ep.insert (p, 0);
   }
 
@@ -2272,6 +2288,7 @@ TEST(101)
     };
     db::Polygon p;
     p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    p.transform (t);
     ep.insert (p, 1);
   }
 
@@ -2284,6 +2301,7 @@ TEST(101)
     };
     db::Polygon p;
     p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+    p.transform (t);
     ep.insert (p, 1);
   }
 
@@ -2295,7 +2313,16 @@ TEST(101)
   ep.process (pg, op);
 
   EXPECT_EQ (out.size (), size_t (1));
-  EXPECT_EQ (out[0].to_string (), "(0,0;0,9;1,10;10,10;10,0)");
+
+  return out.empty () ? std::string () : out.front ().to_string ();
+}
+
+TEST(101)
+{
+  EXPECT_EQ (run_test101 (_this, db::Trans (db::Trans::r0)), "(0,0;0,9;1,10;10,10;10,0)");
+  EXPECT_EQ (run_test101 (_this, db::Trans (db::Trans::r90)), "(-9,0;-10,1;-10,10;0,10;0,0)");
+  EXPECT_EQ (run_test101 (_this, db::Trans (db::Trans::r180)), "(-10,-10;-10,0;0,0;0,-9;-1,-10)");
+  EXPECT_EQ (run_test101 (_this, db::Trans (db::Trans::r270)), "(0,-10;0,0;9,0;10,-1;10,-10)");
 }
 
 TEST(102)
@@ -2347,4 +2374,112 @@ TEST(102)
 
   EXPECT_EQ (out.size (), size_t (1));
   EXPECT_EQ (out[0].to_string (), "(0,0;0,200;100,200;100,100;200,100;200,200;500,200;500,100;600,100;600,200;0,200;0,1000;1000,1000;1000,0)");
+}
+
+//  Bug 134
+TEST(134)
+{
+  const char *pd = "(30,-7957;0,0;56,-4102;30,-7921)";
+
+  db::Coord dx = 0;
+  db::Coord dy = -3999;
+  unsigned int mode = 3;
+
+  db::Polygon p;
+  tl::from_string (pd, p);
+
+  db::EdgeProcessor ep;
+  db::Polygon ps (p.sized (dx, dy, mode));
+  ep.insert (ps);
+
+  db::SimpleMerge op (1 /*wc>0*/);
+  std::vector<db::Polygon> out;
+  db::PolygonContainer pc (out);
+  db::PolygonGenerator pg (pc);
+  ep.process (pg, op);
+
+  EXPECT_EQ (out.size (), size_t (0));
+}
+
+void run_test135a (tl::TestBase *_this, const db::Trans &t)
+{
+  db::EdgeProcessor ep;
+
+  db::Point pts[] = {
+    db::Point (0, 0),
+    db::Point (19, 19),
+    db::Point (19, 18),
+    db::Point (43, 32),
+    db::Point (37, 27)
+  };
+
+  db::Polygon p;
+  p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+  p.transform (t);
+  p.size (-2, -2, 2);
+
+  ep.insert (p);
+
+  //  this is just supposed to work and not fail with internal error "m_open.empty()"
+  std::vector<db::Polygon> out;
+  db::PolygonContainer pc (out);
+  db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
+  db::SimpleMerge op (1 /*wc>0*/);
+  ep.process (pg2, op);
+
+  EXPECT_EQ (out.size (), size_t (0));
+}
+
+TEST(135a)
+{
+  run_test135a (_this, db::Trans (db::Trans::r0));
+  run_test135a (_this, db::Trans (db::Trans::r90));
+  run_test135a (_this, db::Trans (db::Trans::r180));
+  run_test135a (_this, db::Trans (db::Trans::r270));
+  run_test135a (_this, db::Trans (db::Trans::m0));
+  run_test135a (_this, db::Trans (db::Trans::m45));
+  run_test135a (_this, db::Trans (db::Trans::m90));
+  run_test135a (_this, db::Trans (db::Trans::m135));
+}
+
+std::string run_test135b (tl::TestBase *_this, const db::Trans &t)
+{
+  db::EdgeProcessor ep;
+
+  db::Point pts[] = {
+    db::Point (215, 0),
+    db::Point (145, 11),
+    db::Point (37, 31),
+    db::Point (36, 31),
+    db::Point (0, 43)
+  };
+
+  db::Polygon p;
+  p.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+  p.transform (t);
+  p.size (-2, -2, 2);
+
+  ep.insert (p);
+
+  //  this is just supposed to work and not fail with internal error "m_open.empty()"
+  std::vector<db::Polygon> out;
+  db::PolygonContainer pc (out);
+  db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
+  db::SimpleMerge op (1 /*wc>0*/);
+  ep.process (pg2, op);
+
+  EXPECT_EQ (out.size (), size_t (1));
+  return out.empty () ? std::string () : out.front ().to_string ();
+}
+
+TEST(135b)
+{
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::r0)), "(36,33;32,34;37,33)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::r90)), "(-35,32;-26,77;-33,37;-33,36)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::r180)), "(-33,-35;-78,-26;-37,-33;-36,-33)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::r270)), "(25,-78;33,-37;33,-36;34,-33)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::m0)), "(32,-35;36,-33;37,-33;77,-26)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::m45)), "(34,32;33,36;33,37)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::m90)), "(-78,25;-33,34;-36,33;-37,33)");
+  EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::m135)), "(-26,-78;-35,-33;-33,-36;-33,-37)");
 }

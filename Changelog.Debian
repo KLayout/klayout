@@ -1,9 +1,9 @@
-klayout (0.26-1) unstable; urgency=low
+klayout (0.25.4-1) unstable; urgency=low
 
   * New features and bugfixes
     - See changelog
 
- -- Matthias Köfferlein <matthias@koefferlein.de>  Sun, 24 Jun 2018 15:43:26 +0200
+ -- Matthias Köfferlein <matthias@koefferlein.de>  Sat, 25 Aug 2018 23:15:23 +0200
 
 klayout (0.25.3-1) unstable; urgency=low
 

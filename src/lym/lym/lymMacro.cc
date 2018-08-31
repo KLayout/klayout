@@ -32,6 +32,7 @@
 #include "tlClassRegistry.h"
 #include "tlLog.h"
 #include "tlXMLParser.h"
+#include "tlGlobPattern.h"
 
 #include "rba.h"
 #include "pya.h"
@@ -213,15 +214,18 @@ void Macro::save_to (const std::string &path)
   }
 }
 
-void Macro::load_from (const std::string &path)
+void Macro::load_from (const std::string &fn)
 {
   m_format = NoFormat;
 
-  if (tl::verbosity () >= 20) {
-    tl::log << "Loading macro from " << path;
-  }
+  std::pair<bool, std::string> f = format_from_filename (fn, m_interpreter, m_dsl_interpreter, m_autorun_default, m_format);
+  if (f.first) {
 
-  if (format_from_suffix (path, m_interpreter, m_dsl_interpreter, m_autorun_default, m_format)) {
+    const std::string &path = f.second;
+
+    if (tl::verbosity () >= 20) {
+      tl::log << "Loading macro from " << path;
+    }
 
     m_autorun = m_autorun_default;
 
@@ -242,7 +246,7 @@ void Macro::load_from (const std::string &path)
     }
 
   } else {
-    throw tl::Exception (tl::to_string (QObject::tr ("Unable to determine format for file from suffix ")) + path);
+    throw tl::Exception (tl::to_string (QObject::tr ("Unable to determine format for file from suffix or format spec ")) + fn);
   }
 
   m_modified = true;
@@ -297,7 +301,24 @@ bool
 Macro::format_from_suffix (const std::string &fn, Macro::Interpreter &interpreter, std::string &dsl_name, bool &autorun_pref, Macro::Format &format)
 {
   std::string suffix = tl::to_string (QFileInfo (tl::to_qstring (fn)).suffix ());
+  return format_from_suffix_string (suffix, interpreter, dsl_name, autorun_pref, format);
+}
 
+std::pair<bool, std::string>
+Macro::format_from_filename (const std::string &fn, Macro::Interpreter &interpreter, std::string &dsl_name, bool &autorun_pref, Macro::Format &format)
+{
+  tl::GlobPattern pat ("(*)\\[(*)\\]");
+  std::vector<std::string> pat_parts;
+  if (pat.match (fn, pat_parts) && pat_parts.size () == 2) {
+    return std::make_pair (format_from_suffix_string (pat_parts[1], interpreter, dsl_name, autorun_pref, format), pat_parts[0]);
+  } else {
+    return std::make_pair (format_from_suffix (fn, interpreter, dsl_name, autorun_pref, format), fn);
+  }
+}
+
+bool
+Macro::format_from_suffix_string (const std::string &suffix, Macro::Interpreter &interpreter, std::string &dsl_name, bool &autorun_pref, Macro::Format &format)
+{
   interpreter = None;
   dsl_name = std::string ();
   format = NoFormat;

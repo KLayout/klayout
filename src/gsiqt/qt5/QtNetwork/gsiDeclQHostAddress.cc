@@ -70,25 +70,6 @@ static void _call_ctor_QHostAddress_1098 (const qt_gsi::GenericStaticMethod * /*
 }
 
 
-//  Constructor QHostAddress::QHostAddress(const quint8 *ip6Addr)
-
-
-static void _init_ctor_QHostAddress_1934 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("ip6Addr");
-  decl->add_arg<const quint8 * > (argspec_0);
-  decl->set_return_new<QHostAddress> ();
-}
-
-static void _call_ctor_QHostAddress_1934 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const quint8 *arg1 = args.read<const quint8 * > (heap);
-  ret.write<QHostAddress *> (new QHostAddress (arg1));
-}
-
-
 //  Constructor QHostAddress::QHostAddress(const QString &address)
 
 
@@ -397,26 +378,6 @@ static void _call_f_setAddress_1098 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QHostAddress::setAddress(const quint8 *ip6Addr)
-
-
-static void _init_f_setAddress_1934 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("ip6Addr");
-  decl->add_arg<const quint8 * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_setAddress_1934 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const quint8 *arg1 = args.read<const quint8 * > (heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QHostAddress *)cls)->setAddress (arg1);
-}
-
-
 // bool QHostAddress::setAddress(const QString &address)
 
 
@@ -532,7 +493,6 @@ static gsi::Methods methods_QHostAddress () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHostAddress::QHostAddress()\nThis method creates an object of class QHostAddress.", &_init_ctor_QHostAddress_0, &_call_ctor_QHostAddress_0);
   methods += new qt_gsi::GenericStaticMethod ("new_ip4", "@brief Constructor QHostAddress::QHostAddress(quint32 ip4Addr)\nThis method creates an object of class QHostAddress.", &_init_ctor_QHostAddress_1098, &_call_ctor_QHostAddress_1098);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHostAddress::QHostAddress(const quint8 *ip6Addr)\nThis method creates an object of class QHostAddress.", &_init_ctor_QHostAddress_1934, &_call_ctor_QHostAddress_1934);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHostAddress::QHostAddress(const QString &address)\nThis method creates an object of class QHostAddress.", &_init_ctor_QHostAddress_2025, &_call_ctor_QHostAddress_2025);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHostAddress::QHostAddress(const QHostAddress &copy)\nThis method creates an object of class QHostAddress.", &_init_ctor_QHostAddress_2518, &_call_ctor_QHostAddress_2518);
   methods += new qt_gsi::GenericStaticMethod ("new_special", "@brief Constructor QHostAddress::QHostAddress(QHostAddress::SpecialAddress address)\nThis method creates an object of class QHostAddress.", &_init_ctor_QHostAddress_3172, &_call_ctor_QHostAddress_3172);
@@ -550,7 +510,6 @@ static gsi::Methods methods_QHostAddress () {
   methods += new qt_gsi::GenericMethod ("protocol", "@brief Method QAbstractSocket::NetworkLayerProtocol QHostAddress::protocol()\n", true, &_init_f_protocol_c0, &_call_f_protocol_c0);
   methods += new qt_gsi::GenericMethod (":scopeId", "@brief Method QString QHostAddress::scopeId()\n", true, &_init_f_scopeId_c0, &_call_f_scopeId_c0);
   methods += new qt_gsi::GenericMethod ("setAddress", "@brief Method void QHostAddress::setAddress(quint32 ip4Addr)\n", false, &_init_f_setAddress_1098, &_call_f_setAddress_1098);
-  methods += new qt_gsi::GenericMethod ("setAddress", "@brief Method void QHostAddress::setAddress(const quint8 *ip6Addr)\n", false, &_init_f_setAddress_1934, &_call_f_setAddress_1934);
   methods += new qt_gsi::GenericMethod ("setAddress", "@brief Method bool QHostAddress::setAddress(const QString &address)\n", false, &_init_f_setAddress_2025, &_call_f_setAddress_2025);
   methods += new qt_gsi::GenericMethod ("setScopeId|scopeId=", "@brief Method void QHostAddress::setScopeId(const QString &id)\n", false, &_init_f_setScopeId_2025, &_call_f_setScopeId_2025);
   methods += new qt_gsi::GenericMethod ("toIPv4Address", "@brief Method quint32 QHostAddress::toIPv4Address()\n", true, &_init_f_toIPv4Address_c0, &_call_f_toIPv4Address_c0);

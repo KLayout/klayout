@@ -29,6 +29,7 @@
 #include "gsiCommon.h"
 
 #include <memory>
+#include <QMutex>
 
 //  For a comprehensive documentation see gsi.h
 
@@ -191,6 +192,17 @@ private:
  *
  *  Using a proxy object allows having a gsi::ObjectBase that does not derive
  *  from tl::Object and can derive from any base class (specifically QObject).
+ *
+ *  NOTE about MT safety: the model is:
+ *
+ *  - the Proxy belongs to a thread
+ *  - the original object (the proxy target) belongs to a different thread
+ *  - there can be multiple Proxy objects for one target
+ *  - the target object itself and the methods by which the proxy acts on
+ *    the target object are thread safe
+ *
+ *  This implies that all operations related to the manipulation of proxy
+ *  to target relation need to be guarded by a lock.
  */
 class GSI_PUBLIC Proxy
   : public tl::Object
@@ -228,8 +240,12 @@ private:
   bool m_const_ref : 1;
   bool m_destroyed : 1;
   bool m_can_destroy : 1;
+  static QMutex m_lock;
 
+  void *set_internal (void *obj, bool owned, bool const_ref, bool can_destroy);
   void object_status_changed (gsi::ObjectBase::StatusEventType type);
+  void detach_internal ();
+  void *obj_internal ();
 };
 
 }

@@ -342,8 +342,18 @@ public:
    *  @brief Handle changes in the guiding shapes, i.e. create PCell variants
    *
    *  @return true, if PCell's have been updated, indicating that our selection is no longer valid
+   *
+   *  This version assumes there is only one guiding shape selected and will update the selection.
+   *  It will also call layout.cleanup() if required.
    */
   bool handle_guiding_shape_changes ();
+
+  /**
+   *  @brief Handle changes in a specific guiding shape, i.e. create new PCell variants if required
+   *
+   *  @return A pair of bool (indicating that the object path has changed) and the new guiding shape path
+   */
+  std::pair<bool, lay::ObjectInstPath> handle_guiding_shape_changes (const lay::ObjectInstPath &obj) const;
 
 protected:
   /**

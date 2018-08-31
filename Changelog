@@ -1,3 +1,8 @@
+0.25.5          (xxxx-xx-xx):
+
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/162
+       GDS2 LIBNAME was not maintained on "File/Save".
+
 0.25.4          (2018-08-25):
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/121
        Issue with multiple reads of GDS2 layouts including PCells

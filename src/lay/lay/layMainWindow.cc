@@ -3170,6 +3170,8 @@ MainWindow::do_save (bool as)
           options.set_dbu (cv->layout ().dbu ());
           options.set_format_from_filename (fn);
 
+          cv->update_save_options (options);
+
           tl::OutputStream::OutputStreamMode om = tl::OutputStream::OM_Auto;
 
           if (as && ! mp_layout_save_as_options->get_options (current_view (), cv_index, fn, om, options)) {

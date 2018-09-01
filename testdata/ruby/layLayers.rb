@@ -398,7 +398,7 @@ class LAYLayers_TestClass < TestBase
     new_p.clear_children
     assert_equal(new_p.has_children?, false)
 
-    assert_equal(ll.has_children?, true)
+    assert_equal(ll.has_children?, false)
 
     cv.transaction("Delete")
     li = cv.begin_layers(0)

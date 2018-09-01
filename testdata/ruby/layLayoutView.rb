@@ -375,6 +375,30 @@ class LAYLayoutView_TestClass < TestBase
 
   end
 
+  def test_3
+
+    # standalone layout view
+    lv = RBA::LayoutView::new
+
+    cv = lv.cellview(lv.create_layout(1))
+    cv.layout.create_cell("TOP")
+    cv.cell = cv.layout.top_cell
+
+    assert_equal(lv.cellview(cv.index).cell.name, "TOP")
+
+    # insert layer with default initializer
+    lp = lv.insert_layer(lv.begin_layers)
+    lp.fill_color = 0xffff31cc
+    assert_equal(lv.begin_layers.current.fill_color, 0xffff31cc)
+
+    lv.clear_layers
+
+    lp = lv.insert_layer(0, lv.begin_layers)
+    lp.fill_color = 0xffff31cc
+    assert_equal(lv.begin_layers.current.fill_color, 0xffff31cc)
+
+  end
+
 end
 
 load("test_epilogue.rb")

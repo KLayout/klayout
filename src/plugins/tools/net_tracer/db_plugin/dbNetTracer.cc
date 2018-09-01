@@ -148,6 +148,39 @@ NetTracerData::NetTracerData ()
   // .. nothing yet ..
 }
 
+NetTracerData::NetTracerData (const NetTracerData &other)
+  : m_next_log_layer (0)
+{
+  operator= (other);
+}
+
+NetTracerData &
+NetTracerData::operator= (const NetTracerData &other)
+{
+  if (this != &other) {
+
+    for (std::map <unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {
+      delete l->second;
+    }
+    m_log_layers.clear ();
+
+    for (std::map <unsigned int, NetTracerLayerExpression *>::const_iterator l = other.m_log_layers.begin (); l != other.m_log_layers.end (); ++l) {
+      m_log_layers.insert (std::make_pair (l->first, new NetTracerLayerExpression (*l->second)));
+    }
+
+    m_next_log_layer = other.m_next_log_layer;
+    m_connections = other.m_connections;
+    m_original_layers = other.m_original_layers;
+    m_connection_graph = other.m_connection_graph;
+    m_log_connection_graph = other.m_log_connection_graph;
+    m_requires_booleans = other.m_requires_booleans;
+    m_symbols = other.m_symbols;
+
+  }
+
+  return *this;
+}
+
 NetTracerData::~NetTracerData ()
 {
   for (std::map <unsigned int, NetTracerLayerExpression *>::const_iterator l = m_log_layers.begin (); l != m_log_layers.end (); ++l) {

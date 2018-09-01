@@ -488,6 +488,16 @@ public:
   ~NetTracerData ();
 
   /**
+   *  @brief Copy constructor
+   */
+  NetTracerData (const NetTracerData &other);
+
+  /**
+   *  @brief Assignment
+   */
+  NetTracerData &operator= (const NetTracerData &other);
+
+  /**
    *  @brief Register a logical layer
    *
    *  @param expr The expression by which the new layer is computed (can be 0 to set an alias)

@@ -39,13 +39,19 @@ Object::Object ()
 
 Object::~Object ()
 {
+  reset ();
+}
+
+void
+Object::reset ()
+{
   WeakOrSharedPtr *ptrs;
 
   //  NOTE: basically we'd need to lock the mutex here.
   //  But this will easily create deadlocks and the
   //  destructor should not be called while other threads
   //  are accessing this object anyway.
-  while ((ptrs = (WeakOrSharedPtr *)(size_t (mp_ptrs) & ~size_t (1))) != 0) {
+  while ((ptrs = reinterpret_cast<WeakOrSharedPtr *> (size_t (mp_ptrs) & ~size_t (1))) != 0) {
     ptrs->reset_object ();
   }
 }

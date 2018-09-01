@@ -121,6 +121,12 @@ protected:
    */
   void detach_from_all_events ();
 
+  /**
+   *  @brief Resets all references to this object
+   *  This method will release all references within weak and shared pointers.
+   */
+  void reset ();
+
 private:
   friend class WeakOrSharedPtr;
 

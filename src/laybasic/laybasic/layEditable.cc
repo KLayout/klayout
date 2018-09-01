@@ -57,6 +57,10 @@ Editable::Editable (lay::Editables *editables)
 
 Editable::~Editable ()
 {
+  //  Reasoning for reset (): on MSVC, virtual functions must not be called inside
+  //  the destructor. reset () avoids that lay::Editables::enable calls us.
+  reset ();
+
   //  erase the object from the table of enabled services
   if (mp_editables) {
     mp_editables->enable (this, false);

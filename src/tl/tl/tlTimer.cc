@@ -67,9 +67,9 @@ static int64_t ms_time ()
 
   FILETIME ft;
   GetSystemTimeAsFileTime (&ft);
-  //  device by 8192 -> should fit into a 64bit type
-  uint64_t t = (uint64_t (ft.dwHighDateTime) << (64 - 13)) | (uint64_t (ft.dwLowDateTime) >> 13);
-  return int64_t (0.5 + t / 0.8192);
+  uint64_t t = (uint64_t (ft.dwHighDateTime) << (sizeof (ft.dwHighDateTime) * 8)) | uint64_t (ft.dwLowDateTime);
+  //  FILETIME uses 100ns resolution, hence divide by 10000 to get ms:
+  return int64_t (t / 10000);
 
 #else
 

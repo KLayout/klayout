@@ -789,7 +789,7 @@ get_inst_path_internal ()
 
   wchar_t buffer[MAX_PATH];
   int len;
-  if ((len = GetModuleFileName (NULL, buffer, MAX_PATH)) > 0) {
+  if ((len = GetModuleFileNameW (NULL, buffer, MAX_PATH)) > 0) {
     return tl::absolute_path (tl::to_string (std::wstring (buffer)));
   }
 
@@ -833,7 +833,7 @@ get_module_path (void *addr)
 
     wchar_t buffer[MAX_PATH];
     int len;
-    if ((len = GetModuleFileName(h_module, buffer, MAX_PATH)) > 0) {
+    if ((len = GetModuleFileNameW (h_module, buffer, MAX_PATH)) > 0) {
       return tl::absolute_file_path (tl::to_string (std::wstring (buffer, 0, len)));
     }
 

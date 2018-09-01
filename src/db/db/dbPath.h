@@ -224,6 +224,7 @@ public:
   typedef typename coord_traits::area_type area_type; 
   typedef object_tag< path<C> > tag;
   typedef tl::vector<point_type> pointlist_type;
+  typedef typename tl::type_traits<pointlist_type>::relocate_requirements relocate_requirements;
   typedef db::path_point_iterator<path <C>, db::unit_trans<C> > iterator;
 
   /**
@@ -1129,10 +1130,6 @@ Path round_path_corners (const Path &input, int rad, int npoints);
 
 } // namespace db
 
-/**
- *  @brief Special extractors for the paths
- */
-
 namespace tl 
 {
   /**
@@ -1141,7 +1138,7 @@ namespace tl
   template <class C>
   struct type_traits <db::path<C> > : public type_traits<void> 
   {
-    typedef trivial_relocate_required relocate_requirements;
+    typedef typename db::path<C>::relocate_requirements relocate_requirements;
     typedef true_tag has_efficient_swap;
     typedef true_tag supports_extractor;
     typedef true_tag supports_to_string;
@@ -1149,6 +1146,9 @@ namespace tl
     typedef true_tag has_equal_operator;
   };
 
+  /**
+   *  @brief Special extractors for the paths
+   */
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Path &p);
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPath &p);
 

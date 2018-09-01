@@ -122,8 +122,12 @@ TestDifferenceReceiver::print_cell_inst (const db::CellInstArrayWithProperties &
 
 template <class SH>
 void
-TestDifferenceReceiver::print_diffs (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b)
+TestDifferenceReceiver::print_diffs (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <SH, db::properties_id_type> > &_a, const std::vector <std::pair <SH, db::properties_id_type> > &_b)
 {
+  std::vector <std::pair <SH, db::properties_id_type> > a = _a;
+  std::sort (a.begin (), a.end ());
+  std::vector <std::pair <SH, db::properties_id_type> > b = _b;
+  std::sort (b.begin (), b.end ());
   std::vector <std::pair <SH, db::properties_id_type> > anotb;
   std::set_difference (a.begin (), a.end (), b.begin (), b.end (), std::back_inserter (anotb));
   for (typename std::vector <std::pair <SH, db::properties_id_type> >::const_iterator s = anotb.begin (); s != anotb.end (); ++s) {
@@ -593,8 +597,8 @@ TEST(2)
     "layout_diff: boxes differ for layer 17/0 in cell c2x\n"
     "Not in b but in a:\n"
     "Not in a but in b:\n"
-    "  (2,2;1003,1004)\n"
     "  (1,2;1003,1006)\n"
+    "  (2,2;1003,1004)\n"
   );
 }
 
@@ -736,8 +740,8 @@ TEST(2P)
     "Not in b but in a:\n"
     "  (1,2;1003,1004) [1]\n"
     "Not in a but in b:\n"
-    "  (1,2;1003,1006) [1]\n"
     "  (1,2;1003,1005) [2]\n"
+    "  (1,2;1003,1006) [1]\n"
     "  (2,2;1003,1004) [3]\n"
   );
 
@@ -750,8 +754,8 @@ TEST(2P)
     "Not in b but in a:\n"
     "  (1,2;1003,1004) [1]\n"
     "Not in a but in b:\n"
-    "  (1,2;1003,1006) [1]\n"
     "  (1,2;1003,1005) [2]\n"
+    "  (1,2;1003,1006) [1]\n"
     "  (2,2;1003,1004) [3]\n"
   );
 
@@ -809,8 +813,8 @@ TEST(2P)
     "layout_diff: boxes differ for layer 17/0 in cell c2x\n"
     "Not in b but in a:\n"
     "Not in a but in b:\n"
-    "  (1,2;1003,1006) [2]\n"
     "  (1,2;1003,1005) [3]\n"
+    "  (1,2;1003,1006) [2]\n"
   );
 
   h = hh;
@@ -828,9 +832,9 @@ TEST(2P)
     "Not in b but in a:\n"
     "  (1,2;1003,1004) [1]\n"
     "Not in a but in b:\n"
-    "  (2,2;1003,1004)\n"
-    "  (1,2;1003,1006) [1]\n"
     "  (1,2;1003,1005) [1]\n"
+    "  (1,2;1003,1006) [1]\n"
+    "  (2,2;1003,1004)\n"
   );
 }
 
@@ -941,8 +945,8 @@ TEST(3)
     "layout_diff: polygons differ for layer 17/0 in cell c2x\n"
     "Not in b but in a:\n"
     "Not in a but in b:\n"
-    "  (2,2;2,1004;1003,1004;1003,2)\n"
     "  (1,2;1,1006;1003,1006;1003,2)\n"
+    "  (2,2;2,1004;1003,1004;1003,2)\n"
   );
 }
 
@@ -1053,8 +1057,8 @@ TEST(4)
     "layout_diff: edges differ for layer 17/0 in cell c2x\n"
     "Not in b but in a:\n"
     "Not in a but in b:\n"
-    "  (2,2;1003,1004)\n"
     "  (1,2;1003,1006)\n"
+    "  (2,2;1003,1004)\n"
   );
 }
 
@@ -1163,10 +1167,10 @@ TEST(5)
     "layout_diff: texts differ for layer 17/0 in cell c2x\n"
     "Not in b but in a:\n"
     "Not in a but in b:\n"
-    "  ('X',r90 3,4)\n"
     "  ('X',r90 2,3)\n"
-    "  ('X',r180 2,3)\n"
     "  ('Y',r90 2,3)\n"
+    "  ('X',r90 3,4)\n"
+    "  ('X',r180 2,3)\n"
   );
 
   //  two more to match more of h:
@@ -1181,8 +1185,8 @@ TEST(5)
     "layout_diff: texts differ for layer 17/0 in cell c2x\n"
     "Not in b but in a:\n"
     "Not in a but in b:\n"
-    "  ('X',r180 2,3)\n"
     "  ('Y',r90 2,3)\n"
+    "  ('X',r180 2,3)\n"
   );
 }
 
@@ -1297,9 +1301,9 @@ TEST(6)
     "layout_diff: paths differ for layer 17/0 in cell c2x\n"
     "Not in b but in a:\n"
     "Not in a but in b:\n"
+    "  (1,2;11,12) w=17 bx=0 ex=0 r=true\n"
     "  (1,2;11,12) w=17 bx=0 ex=-1 r=false\n"
     "  (1,3;11,11) w=17 bx=0 ex=0 r=false\n"
-    "  (1,2;11,12) w=17 bx=0 ex=0 r=true\n"
     "  (1,2;11,12) w=17 bx=1 ex=0 r=false\n"
     "  (1,2;11,12) w=18 bx=0 ex=0 r=false\n"
   );

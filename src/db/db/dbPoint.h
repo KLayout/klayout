@@ -686,6 +686,7 @@ namespace tl
   template <class C>
   struct type_traits <db::point<C> > : public type_traits<void> 
   {
+    typedef trivial_relocate_required relocate_requirements;
     typedef true_tag supports_extractor;
     typedef true_tag supports_to_string;
     typedef true_tag has_less_operator;

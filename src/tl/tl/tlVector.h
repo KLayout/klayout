@@ -25,6 +25,7 @@
 #define HDR_tlVector
 
 #include <vector>
+#include "tlTypeTraits.h"
 
 namespace tl 
 {
@@ -39,6 +40,7 @@ namespace tl
  *  2.) by use of a special allocator provide a garbage collection 
  *      mechanism that may move and compact the blocks allocated by
  *      the vectors.
+ *  3.) Avoid memory fragmentation by using blocks with a maximum size
  */
 
 template <class T>
@@ -56,12 +58,32 @@ public:
   /**
    *  @brief Copy constructor
    */
-  vector (const vector &d) : std::vector<T> (d) { }
+  explicit vector (const tl::vector<T> &d) : std::vector<T> (d) { }
 
   /**
    *  @brief Initialization with value and length
    */
   vector (const T &v, int s) : std::vector<T> (v, s) { }
+};
+
+/**
+ *  @brief The type traits for the vector type
+ */
+template <class C>
+struct type_traits <tl::vector<C> > : public type_traits<void>
+{
+#if defined(_ITERATOR_DEBUG_LEVEL) && _ITERATOR_DEBUG_LEVEL != 0
+  //  With iterator debugging on, the vector carries additional
+  //  information which cannot be copied trivially
+  typedef complex_relocate_required relocate_requirements;
+#else
+  typedef trivial_relocate_required relocate_requirements;
+#endif
+  typedef true_tag has_efficient_swap;
+  typedef false_tag supports_extractor;
+  typedef false_tag supports_to_string;
+  typedef true_tag has_less_operator;
+  typedef true_tag has_equal_operator;
 };
 
 } // namespace tl

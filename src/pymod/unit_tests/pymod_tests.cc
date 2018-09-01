@@ -36,9 +36,15 @@
 int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 {
   static std::string pypath;
-  pypath = "PYTHONPATH=";
-  pypath += STRINGIFY (PYTHONPATH);
-  putenv ((char *) pypath.c_str ());
+  if (pypath.empty ()) {
+    pypath = "PYTHONPATH=";
+    pypath += STRINGIFY (PYTHONPATH);
+  }
+#if defined(_WIN32)
+  _putenv (const_cast<char *> (pypath.c_str ()));
+#else
+  putenv (const_cast<char *> (pypath.c_str ()));
+#endif
   tl::info << pypath;
 
   std::string fp (tl::testsrc ());
@@ -47,7 +53,9 @@ int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 
   std::string text;
   {
-    tl::InputPipe pipe (std::string (STRINGIFY (PYTHON)) + " " + fp + " 2>&1");
+    std::string cmd = std::string ("\"") + STRINGIFY (PYTHON) + "\" " + fp + " 2>&1";
+    tl::info << cmd;
+    tl::InputPipe pipe (cmd);
     tl::InputStream is (pipe);
     text = is.read_all ();
   }

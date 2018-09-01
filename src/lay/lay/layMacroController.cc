@@ -46,8 +46,7 @@ MacroController::MacroController ()
     dm_sync_file_watcher (this, &MacroController::sync_file_watcher),
     dm_sync_files (this, &MacroController::sync_files)
 {
-  connect (&m_temp_macros, SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
-  connect (&m_temp_macros, SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
+  //  .. nothing yet ..
 }
 
 static lay::MacroController::MacroCategory ruby_cat ()
@@ -159,6 +158,9 @@ MacroController::finish ()
 void
 MacroController::initialized (lay::PluginRoot *root)
 {
+  connect (&m_temp_macros, SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
+  connect (&m_temp_macros, SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
+
   mp_mw = dynamic_cast <lay::MainWindow *> (root);
   if (mp_mw) {
     mp_macro_editor = new lay::MacroEditorDialog (mp_mw, &lym::MacroCollection::root ());

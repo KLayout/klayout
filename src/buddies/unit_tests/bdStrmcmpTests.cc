@@ -459,10 +459,10 @@ TEST(9B)
   EXPECT_EQ (cap.captured_text (),
     "Texts differ for layer 8/1 in cell RINGO\n"
     "Not in b but in a:\n"
+    "  ('VSS',r0 0,0)\n"
     "  ('FB',r0 0,1800)\n"
     "  ('OSC',r0 24560,1800)\n"
     "  ('VDD',r0 0,2800)\n"
-    "  ('VSS',r0 0,0)\n"
     "Not in a but in b:\n"
     "Layouts differ\n"
   );

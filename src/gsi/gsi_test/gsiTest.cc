@@ -237,12 +237,18 @@ static std::vector <A>::const_iterator b10e_ext (const B *b)
 
 static const A *b10bp_ext (const B *b) 
 { 
-  return &*(b->b10b ()); 
+  if (b->b10b () == b->b10e ()) {
+      return 0;
+  } else {
+    return b->b10b ().operator-> ();
+  }
 }
 
 static const A *b10ep_ext (const B *b) 
 { 
-  return &*(b->b10e ()); 
+  //  The way this code is written there are no assertions from MSVC's
+  //  iterator debug mode:
+  return b10bp_ext (b) + (b->b10e () - b->b10b ());
 }
 
 // ----------------------------------------------------------------

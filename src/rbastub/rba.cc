@@ -21,6 +21,7 @@
 */
 
 #include "rba.h"
+#include "tlExceptions.h"
 
 namespace rba
 {
@@ -129,7 +130,11 @@ RubyInterpreter::available () const
 int
 RubyInterpreter::initialize (int &argc, char **argv, int (*main_cont)(int &, char **))
 {
-  return (*main_cont) (argc, argv);
+  int res = 1;
+BEGIN_PROTECTED
+  res = (*main_cont) (argc, argv);
+END_PROTECTED
+  return res;
 }
 
 void 

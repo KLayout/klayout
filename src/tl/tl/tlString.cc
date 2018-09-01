@@ -142,6 +142,30 @@ std::string to_string (const std::wstring &ws)
 }
 
 // -------------------------------------------------------------------------
+//  safe versions (assertion-less) of safe_isdigit, safe_isprint, safe_isalpha, safe_isalnum
+//  (required for debug mode of MSVC)
+
+inline bool safe_isdigit (char c)
+{
+  return c != 0 && static_cast<unsigned char> (c) < 0x80 && isdigit (c);
+}
+
+inline bool safe_isalnum (char c)
+{
+  return c != 0 && static_cast<unsigned char> (c) < 0x80 && isalnum (c);
+}
+
+inline bool safe_isalpha (char c)
+{
+  return c != 0 && static_cast<unsigned char> (c) < 0x80 && isalpha (c);
+}
+
+inline bool safe_isprint (char c)
+{
+  return c != 0 && static_cast<unsigned char> (c) < 0x80 && isprint (c);
+}
+
+// -------------------------------------------------------------------------
 //  Utility: a strtod version that is independent of the locale
 
 static std::string micron_format ("%.5f");
@@ -246,7 +270,7 @@ static double local_strtod (const char *cp, const char *&cp_new)
   //  Extract upper digits
   int exponent = 0;
   double mant = 0.0;
-  while (isdigit (*cp)) {
+  while (safe_isdigit (*cp)) {
     mant = mant * 10.0 + double (*cp - '0');
     ++cp;
   }
@@ -254,7 +278,7 @@ static double local_strtod (const char *cp, const char *&cp_new)
   //  Extract lower digits
   if (*cp == '.') {
     ++cp;
-    while (isdigit (*cp)) {
+    while (safe_isdigit (*cp)) {
       mant = mant * 10.0 + double (*cp - '0');
       ++cp;
       --exponent;
@@ -272,7 +296,7 @@ static double local_strtod (const char *cp, const char *&cp_new)
       ++cp;
     }
     int en = 0;
-    while (isdigit (*cp)) {
+    while (safe_isdigit (*cp)) {
       en = en * 10 + int (*cp - '0');
       ++cp;
     }
@@ -523,7 +547,7 @@ to_quoted_string (const std::string &s)
       r += "\\r";
     } else if (*c == '\t') {
       r += "\\t";
-    } else if (! isprint (*c) || (unsigned char) *c >= 0x80) {
+    } else if (! safe_isprint (*c) || (unsigned char) *c >= 0x80) {
       char b [20];
       ::sprintf (b, "\\%03o", int ((unsigned char) *c));
       r += b;
@@ -549,7 +573,7 @@ escape_string (const std::string &s)
       r += "\\r";
     } else if (*c == '\t') {
       r += "\\t";
-    } else if (! isprint (*c)) {
+    } else if (! safe_isprint (*c)) {
       char b [20];
       ::sprintf (b, "\\%03o", int ((unsigned char) *c));
       r += b;
@@ -562,9 +586,9 @@ escape_string (const std::string &s)
 
 inline char unescape_char (const char * &cp)
 {
-  if (isdigit (*cp)) {
+  if (safe_isdigit (*cp)) {
     int c = 0;
-    while (*cp && isdigit (*cp)) {
+    while (*cp && safe_isdigit (*cp)) {
       c = c * 8 + int (*cp - '0');
       ++cp;
     }
@@ -602,9 +626,9 @@ to_word_or_quoted_string (const std::string &s, const char *non_term)
   //  If the string does not contain non_term characters, we may simply keep it. 
   //  Otherwise we need to quote it.
   const char *cp = s.c_str ();
-  if (*cp && (isalpha (*cp) || strchr (non_term, *cp) != NULL)) {
+  if (*cp && (safe_isalpha (*cp) || strchr (non_term, *cp) != NULL)) {
     ++cp;
-    for ( ; *cp && (isalnum (*cp) || strchr (non_term, *cp) != NULL); ++cp) {
+    for ( ; *cp && (safe_isalnum (*cp) || strchr (non_term, *cp) != NULL); ++cp) {
       ;
     }
   }
@@ -1052,12 +1076,12 @@ Extractor::try_read_signed_int (T &value)
     ++m_cp;
   }
 
-  if (! isdigit (*m_cp)) {
+  if (! safe_isdigit (*m_cp)) {
     return false;
   }
 
   value = 0;
-  while (isdigit (*m_cp)) {
+  while (safe_isdigit (*m_cp)) {
     if (value > std::numeric_limits<T>::max () / 10) {
       throw tl::Exception (overflow_msg_func<T> () ());
     }
@@ -1083,12 +1107,12 @@ Extractor::try_read_unsigned_int (T &value)
     return false;
   }
 
-  if (! isdigit (*m_cp)) {
+  if (! safe_isdigit (*m_cp)) {
     return false;
   }
 
   value = 0;
-  while (isdigit (*m_cp)) {
+  while (safe_isdigit (*m_cp)) {
     if (value > std::numeric_limits<T>::max () / 10) {
       throw tl::Exception (overflow_msg_func<T> () ());
     }
@@ -1178,7 +1202,7 @@ Extractor::try_read_word (std::string &string, const char *non_term)
   } 
 
   string.clear ();
-  while (*m_cp && (isalnum (*m_cp) || strchr (non_term, *m_cp) != NULL)) {
+  while (*m_cp && (safe_isalnum (*m_cp) || strchr (non_term, *m_cp) != NULL)) {
     string += *m_cp;
     ++m_cp;
   }
@@ -1660,7 +1684,7 @@ sprintf (const char *f, const std::vector <tl::Variant> &vv, unsigned int a0)
       }
 
       unsigned int width = 0;
-      while (isdigit (*cp) && *cp) {
+      while (safe_isdigit (*cp) && *cp) {
         width = (width * 10) + (unsigned int)(*cp - '0');
         ++cp;
       }
@@ -1669,7 +1693,7 @@ sprintf (const char *f, const std::vector <tl::Variant> &vv, unsigned int a0)
       if (*cp == '.') {
         ++cp;
         unsigned int prec = 0;
-        while (isdigit (*cp) && *cp) {
+        while (safe_isdigit (*cp) && *cp) {
           prec = (prec * 10) + (unsigned int)(*cp - '0');
           ++cp;
         }

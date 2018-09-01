@@ -1070,7 +1070,11 @@ OASISWriter::end_cblock ()
   tl::OutputStream deflated_stream (m_cblock_compressed);
   tl::DeflateFilter deflate (deflated_stream);
 
-  deflate.put (m_cblock_buffer.data (), m_cblock_buffer.size ());
+  //  Reasoning for if(...): we don't want to access data from an empty vector through data()
+  if (m_cblock_buffer.size () > 0) {
+    deflate.put (m_cblock_buffer.data (), m_cblock_buffer.size ());
+  }
+
   deflate.flush ();
 
   const size_t compression_overhead = 4;
@@ -1088,7 +1092,7 @@ OASISWriter::end_cblock ()
 
     write_bytes (m_cblock_compressed.data (), m_cblock_compressed.size ());
 
-  } else {
+  } else if (m_cblock_buffer.size () > 0) {  //  Reasoning for if(...): we don't want to access data from an empty vector through data()
     write_bytes (m_cblock_buffer.data (), m_cblock_buffer.size ());
   }
 

@@ -1217,8 +1217,15 @@ PrintingDifferenceReceiver::print_cell_inst (const db::CellInstArrayWithProperti
 
 template <class SH>
 void
-PrintingDifferenceReceiver::print_diffs (const db::PropertiesRepository &pr, const std::vector <std::pair <SH, db::properties_id_type> > &a, const std::vector <std::pair <SH, db::properties_id_type> > &b)
+PrintingDifferenceReceiver::print_diffs (const db::PropertiesRepository &pr, const std::vector <std::pair <SH, db::properties_id_type> > &_a, const std::vector <std::pair <SH, db::properties_id_type> > &_b)
 {
+  //  the vectors may be in any order (specifically because of tolerances) but
+  //  for the diff we need to make sure they are ordered.
+  std::vector <std::pair <SH, db::properties_id_type> > a = _a;
+  std::sort (a.begin (), a.end ());
+  std::vector <std::pair <SH, db::properties_id_type> > b = _b;
+  std::sort (b.begin (), b.end ());
+
   std::vector <std::pair <SH, db::properties_id_type> > anotb;
   std::set_difference (a.begin (), a.end (), b.begin (), b.end (), std::back_inserter (anotb));
   for (typename std::vector <std::pair <SH, db::properties_id_type> >::const_iterator s = anotb.begin (); s != anotb.end (); ++s) {

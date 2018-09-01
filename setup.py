@@ -154,13 +154,15 @@ config = Config()
 # ------------------------------------------------------------------
 # _tl dependency library
 
-_tl_sources = glob.glob("src/tl/tl/*.cc")
+_tl_path = os.path.join("src", "tl", "tl")
+
+_tl_sources = glob.glob(os.path.join(_tl_path, "*.cc"))
 
 # Exclude sources which are compatible with Qt only
-_tl_sources.remove("src/tl/tl/tlHttpStreamQt.cc")
-_tl_sources.remove("src/tl/tl/tlHttpStreamNoQt.cc")
-_tl_sources.remove("src/tl/tl/tlFileSystemWatcher.cc")
-_tl_sources.remove("src/tl/tl/tlDeferredExecutionQt.cc")
+_tl_sources.remove(os.path.join(_tl_path, "tlHttpStreamQt.cc"))
+_tl_sources.remove(os.path.join(_tl_path, "tlHttpStreamNoQt.cc"))
+_tl_sources.remove(os.path.join(_tl_path, "tlFileSystemWatcher.cc"))
+_tl_sources.remove(os.path.join(_tl_path, "tlDeferredExecutionQt.cc"))
 
 _tl = Extension(config.root + '._tl',
                 define_macros=config.macros() + [('MAKE_TL_LIBRARY', 1)],
@@ -201,10 +203,11 @@ _pya = Extension(config.root + '._pya',
 # ------------------------------------------------------------------
 # _db dependency library
 
-_db_sources = glob.glob("src/db/db/*.cc")
+_db_path = os.path.join("src", "db", "db")
+_db_sources = glob.glob(os.path.join(_db_path, "*.cc"))
 
 # Not a real source:
-_db_sources.remove("src/db/db/fonts.cc")
+_db_sources.remove(os.path.join(_db_path, "fonts.cc"))
 
 _db = Extension(config.root + '._db',
                 define_macros=config.macros() + [('MAKE_DB_LIBRARY', 1)],

@@ -1011,6 +1011,29 @@ private:
   }
 };
 
+}
+
+namespace tl
+{
+  /**
+   *  @brief The type traits for the contour type
+   */
+  template <class C>
+  struct type_traits <db::polygon_contour<C> > : public type_traits<void>
+  {
+    //  the contour just uses one pointer, hence the relocation requirements are simple
+    typedef typename tl::trivial_relocate_required relocate_requirements;
+    typedef true_tag has_efficient_swap;
+    typedef false_tag supports_extractor;
+    typedef false_tag supports_to_string;
+    typedef true_tag has_less_operator;
+    typedef true_tag has_equal_operator;
+  };
+}
+
+namespace db
+{
+
 /**
  *  @brief The contour point iterator
  *
@@ -1351,7 +1374,6 @@ private:
   }
 };
 
-
 /** 
  *  @brief A polygon class
  *
@@ -1383,6 +1405,7 @@ public:
   typedef typename coord_traits::area_type area_type; 
   typedef polygon_contour<C> contour_type;
   typedef tl::vector<contour_type> contour_list_type;
+  typedef typename tl::type_traits<contour_list_type>::relocate_requirements relocate_requirements;
   typedef db::polygon_edge_iterator< polygon<C>, db::unit_trans<C> > polygon_edge_iterator;
   typedef db::polygon_contour_iterator< contour_type, db::unit_trans<C> > polygon_contour_iterator;
   typedef db::object_tag< polygon<C> > tag;
@@ -2339,10 +2362,10 @@ public:
   typedef typename coord_traits::area_type area_type; 
   typedef polygon_contour<C> contour_type;
   typedef tl::vector<contour_type> contour_list_type;
+  typedef typename tl::type_traits<contour_type>::relocate_requirements relocate_requirements;
   typedef db::polygon_edge_iterator< simple_polygon<C>, db::unit_trans<C> > polygon_edge_iterator;
   typedef db::polygon_contour_iterator< contour_type, db::unit_trans<C> > polygon_contour_iterator;
   typedef db::object_tag< simple_polygon<C> > tag;
-
 
   /**
    *  @brief The default constructor.
@@ -3388,10 +3411,6 @@ void swap (db::simple_polygon<C> &a, db::simple_polygon<C> &b)
 
 } // namespace std
 
-/**
- *  @brief Special extractors for the polygons
- */
-
 namespace tl 
 {
   /**
@@ -3400,7 +3419,7 @@ namespace tl
   template <class C>
   struct type_traits <db::polygon<C> > : public type_traits<void> 
   {
-    typedef trivial_relocate_required relocate_requirements;
+    typedef typename db::polygon<C>::relocate_requirements relocate_requirements;
     typedef true_tag has_efficient_swap;
     typedef true_tag supports_extractor;
     typedef true_tag supports_to_string;
@@ -3414,13 +3433,16 @@ namespace tl
   template <class C>
   struct type_traits <db::simple_polygon<C> > : public type_traits<void> 
   {
-    typedef trivial_relocate_required relocate_requirements;
+    typedef typename db::simple_polygon<C>::relocate_requirements relocate_requirements;
     typedef true_tag supports_extractor;
     typedef true_tag supports_to_string;
     typedef true_tag has_less_operator;
     typedef true_tag has_equal_operator;
   };
 
+  /**
+   *  @brief Special extractors for the polygons
+   */
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Polygon &p);
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DPolygon &p);
   template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::SimplePolygon &p);

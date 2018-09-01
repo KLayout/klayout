@@ -209,11 +209,6 @@ public:
    */
   void signal_layer_changed ();
 
-signals:
-  void dataChanged (const QModelIndex & topLeft, const QModelIndex & bottomRight );
-  void layoutAboutToBeChanged ();
-  void layoutChanged ();
-
 private: 
   lay::LayoutView *mp_view;
   size_t m_id_start, m_id_end;

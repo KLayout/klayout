@@ -638,8 +638,8 @@ void MacroEditorPage::cursor_position_changed ()
       QString t = b.text ().mid (pos, 1);
       forward = (t == open_rbracket || t == open_sqbracket || t == open_cbracket);
     }
-    if (e != user_data->elements ().begin () && e[-1].start_offset + e[-1].length >= pos && valid_element (*e)) {
-      QString t = b.text ().mid (pos - 1, 1);
+    if (e != user_data->elements ().begin () && e[-1].start_offset + e[-1].length >= pos && valid_element (e[-1])) {
+      QString t = b.text ().mid (int (pos) - 1, 1);
       backward = (t == close_rbracket || t == close_sqbracket || t == close_cbracket);
     }
 

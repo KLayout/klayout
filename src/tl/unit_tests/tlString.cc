@@ -44,7 +44,7 @@ TEST(1)
   EXPECT_EQ (to_string ((unsigned char *)" 12"), " 12");
   EXPECT_EQ (to_string (std::string (" 12")), " 12");
 
-#if defined(WIN32)
+#if defined(_WIN32) && !defined(_MSC_VER)
   EXPECT_EQ (tl::sprintf("%g %e %f",M_PI,M_PI*1e6,M_PI*0.001), "3.14159 3.141593e+006 0.003142");
   EXPECT_EQ (tl::sprintf("%G %E %F",M_PI*1e6,M_PI*1e6,M_PI*1e6), "3.14159E+006 3.141593E+006 3141592.653590");
   EXPECT_EQ (tl::sprintf("%-15g %15.8e %15.12f %g",M_PI,M_PI*1e6,M_PI*0.001,M_PI), "3.14159         3.14159265e+006  0.003141592654 3.14159");
@@ -493,18 +493,18 @@ TEST(15)
   }
 
   try {
-    EXPECT_EQ (tl::to_string_from_local (tl::to_local ("Hällo\tWörld!").c_str ()), "Hällo\tWörld!");
+    EXPECT_EQ (tl::to_string_from_local (tl::to_local ("H\xc3\xa4llo\tW\xc3\xb6rld!").c_str ()), "H\xc3\xa4llo\tW\xc3\xb6rld!");
     setlocale (LC_ALL, locale.c_str ());
   } catch (...) {
     setlocale (LC_ALL, locale.c_str ());
     throw;
   }
 
-  EXPECT_EQ (std::string ("Ä").size (), size_t (2));
-  EXPECT_EQ (tl::to_string (std::wstring (L"Ä")), "Ä");
-  EXPECT_EQ (tl::to_wstring (std::string ("Ä")).size (), size_t (1));
-  EXPECT_EQ (tl::to_string (tl::to_wstring ("Utf8 supports emoticons: \xF0\x9F\x98\x81\nand Umlauts: äüö")).c_str (), "Utf8 supports emoticons: \xF0\x9F\x98\x81\nand Umlauts: äüö");
+  EXPECT_EQ (std::string ("\xc3\x84").size (), size_t (2));
+  EXPECT_EQ (tl::to_string (std::wstring (L"Ä")), "\xc3\x84");
+  EXPECT_EQ (tl::to_wstring (std::string ("\xc3\x84")).size (), size_t (1));
+  EXPECT_EQ (tl::to_string (tl::to_wstring ("Utf8 supports emoticons: \xF0\x9F\x98\x81\nand Umlauts: \xc3\xa4\xc3\xbc\xc3\xb6")).c_str (), "Utf8 supports emoticons: \xF0\x9F\x98\x81\nand Umlauts: \xc3\xa4\xc3\xbc\xc3\xb6");
 
-  EXPECT_EQ (tl::to_upper_case ("nOrMaliI(äÄüÜöÖß-42°+6€)"), "NORMALII(ÄÄÜÜÖÖß-42°+6€)");
-  EXPECT_EQ (tl::to_lower_case ("nOrMaliI(äÄüÜöÖß-42°+6€)"), "normalii(ääüüööß-42°+6€)");
+  EXPECT_EQ (tl::to_upper_case ("nOrMaliI(\xc3\xa4\xc3\x84\xc3\xbc\xc3\x9c\xc3\xb6\xc3\x96\xc3\x9f-42\xc2\xb0+6\xe2\x82\xac)"), "NORMALII(\xc3\x84\xc3\x84\xc3\x9c\xc3\x9c\xc3\x96\xc3\x96\xc3\x9f-42\xc2\xb0+6\xe2\x82\xac)");
+  EXPECT_EQ (tl::to_lower_case ("nOrMaliI(\xc3\xa4\xc3\x84\xc3\xbc\xc3\x9c\xc3\xb6\xc3\x96\xc3\x9f-42\xc2\xb0+6\xe2\x82\xac)"), "normalii(\xc3\xa4\xc3\xa4\xc3\xbc\xc3\xbc\xc3\xb6\xc3\xb6\xc3\x9f-42\xc2\xb0+6\xe2\x82\xac)");
 }

@@ -25,6 +25,20 @@
 namespace db
 {
 
+// -------------------------------------------------------------------------
+//  safe versions (assertion-less) of safe_isdigit, safe_isprint, safe_isalpha, safe_isalnum
+//  (required for debug mode of MSVC)
+
+inline bool safe_isdigit (char c)
+{
+  return c != 0 && static_cast<unsigned char> (c) < 0x80 && isdigit (c);
+}
+
+inline bool safe_isspace (char c)
+{
+  return c != 0 && static_cast<unsigned char> (c) < 0x80 && isspace (c);
+}
+
 // ---------------------------------------------------------------
 //  NamedLayerReader
 
@@ -58,8 +72,8 @@ extract_plain_layer (const char *s, int &l)
   if (! *s) {
     return false;
   }
-  while (*s && isdigit (*s)) {
-    l = l * 10 + (unsigned int) (*s - '0');
+  while (safe_isdigit (*s)) {
+    l = l * 10 + static_cast<int> (*s - '0');
     ++s;
   }
   return (*s == 0);
@@ -74,27 +88,27 @@ extract_ld (const char *s, int &l, int &d, std::string &n)
     ++s;
   }
 
-  if (! *s || ! isdigit (*s)) {
+  if (! safe_isdigit (*s)) {
     return false;
   }
 
-  while (*s && isdigit (*s)) {
-    l = l * 10 + (unsigned int) (*s - '0');
+  while (safe_isdigit (*s)) {
+    l = l * 10 + static_cast<int> (*s - '0');
     ++s;
   }
 
   if (*s == 'D' || *s == '.') {
     ++s;
-    if (! *s || ! isdigit (*s)) {
+    if (! safe_isdigit (*s)) {
       return false;
     }
-    while (*s && isdigit (*s)) {
-      d = d * 10 + (unsigned int) (*s - '0');
+    while (safe_isdigit (*s)) {
+      d = d * 10 + static_cast<int> (*s - '0');
       ++s;
     }
   }
 
-  if (*s && (isspace (*s) || *s == '_')) {
+  if (safe_isspace (*s) || *s == '_') {
     ++s;
     n = s;
     return true;

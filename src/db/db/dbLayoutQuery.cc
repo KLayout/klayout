@@ -1912,10 +1912,13 @@ LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, db::Layout *layo
     m_eval.define_function (mp_q->property_name (i), new FilterStateFunction (i, &m_state));
   }
 
-  init ();
-
   //  Avoid update() calls while iterating in modifying mode
+  mp_layout->update ();
   mp_layout->start_changes ();
+
+  //  NOTE: Stange - in modifying mode, init() will actually already execute the
+  //  first modification. Hence start_changes() needs to be called before.
+  init ();
 }
 
 LayoutQueryIterator::LayoutQueryIterator (const LayoutQuery &q, const db::Layout *layout, tl::Eval *parent_eval, tl::AbsoluteProgress *progress)

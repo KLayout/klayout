@@ -165,6 +165,11 @@ inline bool safe_isprint (char c)
   return c != 0 && static_cast<unsigned char> (c) < 0x80 && isprint (c);
 }
 
+inline bool safe_isspace (char c)
+{
+  return c != 0 && static_cast<unsigned char> (c) < 0x80 && isspace (c);
+}
+
 // -------------------------------------------------------------------------
 //  Utility: a strtod version that is independent of the locale
 
@@ -748,7 +753,7 @@ void
 from_string (const std::string &s, double &v)
 {
   const char *cp = s.c_str ();
-  while (*cp && isspace (*cp)) {
+  while (safe_isspace (*cp)) {
     ++cp;
   }
   if (! *cp) {
@@ -756,7 +761,7 @@ from_string (const std::string &s, double &v)
   }
   const char *cp_end = cp;
   v = local_strtod (cp, cp_end);
-  while (*cp_end && isspace (*cp_end)) {
+  while (safe_isspace (*cp_end)) {
     ++cp_end;
   }
   if (*cp_end) {
@@ -873,12 +878,12 @@ std::string
 trim (const std::string &s)
 {
   const char *cp = s.c_str ();
-  while (isspace (*cp) && *cp) {
+  while (safe_isspace (*cp)) {
     ++cp;
   }
 
   const char *cq = s.c_str () + s.size ();
-  while (cq > cp && isspace (cq [-1])) {
+  while (cq > cp && safe_isspace (cq [-1])) {
     --cq;
   }
 
@@ -1246,7 +1251,7 @@ Extractor::try_read (std::string &string, const char *term)
 {
   //  if the terminating characters contain line feed for blank, we must not skip over them
   if (strchr (term, '\n') || strchr (term, ' ')) {
-    while (isspace (*m_cp) && strchr (term, *m_cp) == 0 && *m_cp) {
+    while (safe_isspace (*m_cp) && strchr (term, *m_cp) == 0) {
       ++m_cp;
     }
     if (! *m_cp) {
@@ -1258,11 +1263,11 @@ Extractor::try_read (std::string &string, const char *term)
 
   bool term_is_space = false;
   for (const char *t = term; *t && ! term_is_space; ++t) {
-    term_is_space = isspace (*t);
+    term_is_space = safe_isspace (*t);
   }
 
   string.clear ();
-  while (*m_cp && (term_is_space || ! isspace (*m_cp)) && strchr (term, *m_cp) == NULL) {
+  while (*m_cp && (term_is_space || ! safe_isspace (*m_cp)) && strchr (term, *m_cp) == NULL) {
     string += *m_cp;
     ++m_cp;
   }
@@ -1321,7 +1326,7 @@ Extractor::test (const char *token)
 const char *
 Extractor::skip ()
 {
-  while (isspace (*m_cp) && *m_cp) {
+  while (safe_isspace (*m_cp)) {
     ++m_cp;
   }
   return m_cp;

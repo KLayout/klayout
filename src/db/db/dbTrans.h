@@ -1533,6 +1533,13 @@ public:
   complex_trans (const simple_trans<I> &s, double acos, double mag)
     : m_u (s.disp ())
   {
+    //  This prevents rounding issues (like acos = 1.0000000000002):
+    if (acos > 1.0) {
+      acos = 1.0;
+    } else if (acos < -1.0) {
+      acos = -1.0;
+    }
+
     db::point<R> t (1.0, 0.0);
     t = fixpoint_trans<R> (s.fp_trans ()) (t);
     double asin = sqrt (1.0 - acos * acos); // we may to this since we know that the angle is between 0 and 90 degree

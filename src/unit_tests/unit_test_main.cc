@@ -540,25 +540,31 @@ main_cont (int &argc, char **argv)
       ut::noctrl << "TESTSRC=" << tl::testsrc ();
       ut::noctrl << "TESTTMP=" << tl::absolute_file_path (tl::testtmp ());
 
-      const std::vector<tl::TestBase *> *selected_tests = 0;
       std::vector<tl::TestBase *> subset;
-      if (! test_list.empty ()) {
 
-        selected_tests = &subset;
-        ut::noctrl << "Selected tests:";
+      ut::noctrl << "Selected tests:";
 
-        for (std::vector<tl::TestBase *>::const_iterator i = tl::TestRegistrar::instance()->tests ().begin (); i != tl::TestRegistrar::instance()->tests ().end (); ++i) {
+      for (std::vector<tl::TestBase *>::const_iterator i = tl::TestRegistrar::instance()->tests ().begin (); i != tl::TestRegistrar::instance()->tests ().end (); ++i) {
 
-          bool exclude = false;
+        bool exclude = false;
 
-          for (std::vector<std::string>::const_iterator m = exclude_test_list.begin (); m != exclude_test_list.end () && !exclude; ++m) {
-            tl::GlobPattern re (*m);
-            re.set_case_sensitive (false);
-            re.set_header_match (true);
-            if (re.match ((*i)->name ())) {
-              exclude = true;
-            }
+        for (std::vector<std::string>::const_iterator m = exclude_test_list.begin (); m != exclude_test_list.end () && !exclude; ++m) {
+          tl::GlobPattern re (*m);
+          re.set_case_sensitive (false);
+          re.set_header_match (true);
+          if (re.match ((*i)->name ())) {
+            exclude = true;
           }
+        }
+
+        if (test_list.empty ()) {
+
+          if (!exclude) {
+            subset.push_back (*i);
+            ut::noctrl << "  " << (*i)->name ();
+          }
+
+        } else {
 
           for (std::vector<std::string>::const_iterator m = test_list.begin (); !exclude && m != test_list.end (); ++m) {
             tl::GlobPattern re (*m);
@@ -573,11 +579,9 @@ main_cont (int &argc, char **argv)
 
         }
 
-      } else {
-        selected_tests = &tl::TestRegistrar::instance()->tests ();
       }
 
-      result = run_tests (*selected_tests, editable, non_editable, slow, repeat, gsi_coverage, class_names);
+      result = run_tests (subset, editable, non_editable, slow, repeat, gsi_coverage, class_names);
 
       ut::ctrl << "</testsuites>";
 

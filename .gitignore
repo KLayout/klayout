@@ -31,10 +31,11 @@
 *.out
 *.app
 
-# Build and binary directories for shadow build:
+# Build, temporary and binary directories for shadow build:
 build-*
 bin-*
 mkqtdecl.tmp
+testtmp
 
 # private data
 private
@@ -47,7 +48,6 @@ src/plugins/*
 
 # QTCreator files
 src/klayout.pro.user
-
 
 # python setuptools eggs
 *.egg-info/

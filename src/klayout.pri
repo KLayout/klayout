@@ -87,9 +87,9 @@ msvc {
 
 } else {
 
-  # disable some warnings
   QMAKE_CXXFLAGS += \
-      /wd4251 \         # DLL interface required
+      /wd4251 \                   # Disable "DLL interface required"
+      /source-charset:utf-8 \     # Use UTF-8 for source files
 
 }
 

@@ -330,7 +330,16 @@ void TestBase::write_detailed_diff (std::ostream &os, const std::string &subject
 static std::string read_file (const std::string &path)
 {
   tl::InputStream s (path);
-  return s.read_all ();
+
+  //  NOTE: using the text reader means we normalize CRLF/LF
+  tl::TextInputStream ts (s);
+  std::string t;
+  while (!ts.at_end ()) {
+    t += ts.get_line ();
+    t += "\n";
+  }
+
+  return t;
 }
 
 void TestBase::compare_text_files (const std::string &path_a, const std::string &path_b)

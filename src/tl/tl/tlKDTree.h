@@ -256,16 +256,16 @@ public:
   typedef typename it_traits::pointer pointer;
   typedef typename it_traits::reference reference;
 
-  kd_n_it (size_type step, const it_type &i)
-    : m_iter (i), m_step (step) 
+  kd_n_it (size_type step, const it_type &begin, difference_type index)
+    : m_begin (begin), m_step (step), m_index (index)
   { }
 
   kd_n_it (const kd_n_it &i)
-    : m_iter (i.m_iter), m_step (i.m_step) 
+    : m_begin (i.m_begin), m_step (i.m_step), m_index (i.m_index)
   { }
 
   kd_n_it (size_type step, const kd_n_it &i)
-    : m_iter (i.m_iter), m_step (step) 
+    : m_begin (i.m_begin), m_step (step), m_index (i.m_index)
   { }
 
   size_type step () const 
@@ -273,80 +273,77 @@ public:
 
   kd_n_it &operator+= (difference_type n) 
   {
-    m_iter += (n * m_step);
+    m_index += (n * m_step);
     return *this;
   }
 
   kd_n_it &operator-= (difference_type n) 
   {
-    m_iter -= (n * m_step);
+    m_index -= (n * m_step);
     return *this;
   }
 
   kd_n_it operator+ (difference_type n) const
   {
-    it_type b (m_iter);
-    b += n * m_step;
-    return kd_n_it (m_step, b);
+    return kd_n_it (m_step, m_begin, m_index + n * m_step);
   }
 
   kd_n_it operator- (difference_type n) const
   {
-    it_type b (m_iter);
-    b -= n * m_step;
-    return kd_n_it (m_step, b);
+    return kd_n_it (m_step, m_begin, m_index - n * m_step);
   }
 
   value_type &operator* () const
   {
-    return *m_iter;
+    return m_begin [m_index];
   }
 
   kd_n_it &operator++ () 
   {
-    m_iter += m_step;
+    m_index += m_step;
     return *this;
   }
 
   kd_n_it &operator-- () 
   {
-    m_iter -= m_step;
+    m_index -= m_step;
     return *this;
   }
 
   value_type &operator[] (difference_type n) const 
   {
-    return m_iter [n * m_step];
+    return m_begin [m_index + n * m_step];
   }
 
   bool operator== (const kd_n_it &i) const
   {
-    return m_iter == i.m_iter;
+    return m_index == i.m_index;
   }
 
   bool operator!= (const kd_n_it &i) const
   {
-    return m_iter != i.m_iter;
+    return !operator== (i);
   }
 
   bool operator< (const kd_n_it &i) const
   {
-    return m_iter < i.m_iter;
+    return m_index < i.m_index;
   }
 
   bool operator<= (const kd_n_it &i) const
   {
-    return m_iter <= i.m_iter;
+    return m_index <= i.m_index;
   }
 
   difference_type operator- (const kd_n_it &i) const
   {
-    return std::distance (i.m_iter, m_iter) / m_step;
+    return (m_index - i.m_index) / m_step;
   }
 
 private:
-  it_type m_iter;
+  it_type m_begin;
   size_type m_step;
+  difference_type m_index;
 };
 
 /**
@@ -483,7 +480,7 @@ public:
     m_bounds.clear ();
     m_bounds.resize (m_objs.size ());
 
-    partial_sort (0, 0, kd_n_it (1, m_objs.begin ()), kd_n_it (1, m_objs.end ()), picker, comp);
+    partial_sort (0, 0, kd_n_it (1, m_objs.begin (), 0), kd_n_it (1, m_objs.begin (), m_objs.size ()), picker, comp);
   }
 
   /**

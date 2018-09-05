@@ -1448,7 +1448,7 @@ rba_add_path (const std::string &path)
 {
   VALUE pv = rb_gv_get ("$:");
   if (pv != Qnil && TYPE (pv) == T_ARRAY) {
-    rb_ary_push (pv, rb_str_new (path.c_str (), path.size ()));
+    rb_ary_push (pv, rb_str_new (path.c_str (), long (path.size ())));
   }
 }
 
@@ -1953,7 +1953,7 @@ RubyInterpreter::load_file (const std::string &filename_utf8)
 {
   std::string fl (rb_cstring_from_utf8 (filename_utf8));
 
-  rb_set_progname (rb_str_new (fl.c_str (), fl.size ()));
+  rb_set_progname (rb_str_new (fl.c_str (), long (fl.size ())));
 
   rb_set_errinfo (Qnil);
   int error = 0;
@@ -1961,7 +1961,7 @@ RubyInterpreter::load_file (const std::string &filename_utf8)
   rb_protect_init (); // see above
 
   RUBY_BEGIN_EXEC
-    rb_load_protect (rb_str_new (fl.c_str (), fl.size ()), wrap, &error);
+    rb_load_protect (rb_str_new (fl.c_str (), long (fl.size ())), wrap, &error);
   RUBY_END_EXEC
 
   if (error) {
@@ -2003,7 +2003,7 @@ RubyInterpreter::eval_string_and_print (const char *expr, const char *file, int 
 void
 RubyInterpreter::define_variable (const std::string &name, const std::string &value)
 {
-  rb_gv_set (name.c_str (), rb_str_new (value.c_str (), value.size ()));
+  rb_gv_set (name.c_str (), rb_str_new (value.c_str (), long (value.size ())));
 }
 
 gsi::Inspector *

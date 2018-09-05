@@ -538,7 +538,7 @@ struct reader<gsi::StringType>
     if (!a.get ()) {
       *ret = Qnil;
     } else {
-      *ret = rb_str_new (a->c_str (), a->size ());
+      *ret = rb_str_new (a->c_str (), long (a->size ()));
     }
   }
 };
@@ -720,7 +720,7 @@ RubyBasedVectorAdaptorIterator::RubyBasedVectorAdaptorIterator (VALUE array, con
 
 void RubyBasedVectorAdaptorIterator::get (gsi::SerialArgs &w, tl::Heap &heap) const
 {
-  gsi::do_on_type<writer> () (mp_ainner->type (), &w, rb_ary_entry (m_array, m_i), *mp_ainner, &heap);
+  gsi::do_on_type<writer> () (mp_ainner->type (), &w, rb_ary_entry (m_array, long (m_i)), *mp_ainner, &heap);
 }
 
 bool RubyBasedVectorAdaptorIterator::at_end () const

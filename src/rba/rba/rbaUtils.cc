@@ -505,15 +505,15 @@ VALUE rba_eval_string_in_context (const char *expr, const char *file, int line, 
   rb_set_errinfo (Qnil);
 
   if (file) {
-    rb_set_progname (rb_str_new (file, strlen (file)));
+    rb_set_progname (rb_str_new (file, long (strlen (file))));
   } else {
     const char *e = "<immediate>";
-    rb_set_progname (rb_str_new (e, strlen (e)));
+    rb_set_progname (rb_str_new (e, long (strlen (e))));
   }
 
   int argc;
   VALUE args[4];
-  args[0] = rb_str_new (expr, strlen (expr));
+  args[0] = rb_str_new (expr, long (strlen (expr)));
   //  use the current binding if there is one. This allows to eval in the context of a current trace callback
   //  when eval is called from the trace handler.
   if (context < 0) {
@@ -529,7 +529,7 @@ VALUE rba_eval_string_in_context (const char *expr, const char *file, int line, 
     args[1] = rb_binding_new ();
   }
   if (file) {
-    args[2] = rb_str_new (file, strlen (file));
+    args[2] = rb_str_new (file, long (strlen (file)));
     args[3] = INT2NUM(line);
     argc = 4;
   } else {

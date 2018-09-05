@@ -495,7 +495,7 @@ Proxy::initialize_callbacks ()
       //  There is no place in the ruby API to determine whether a method is defined.
       //  Instead we explicitly call "method_defined?" to check, whether the given method
       //  is defined.
-      VALUE name = rb_str_new (nstr, strlen (nstr));
+      VALUE name = rb_str_new (nstr, long (strlen (nstr)));
       RB_GC_GUARD (name);
 
       for (int prot = 0; prot < 2; ++prot) {

@@ -40,18 +40,37 @@ equals(HAVE_64BIT_COORD, "1") {
 }
 
 equals(HAVE_PYTHON, "1") {
+  !isEmpty(BITS_PATH) {
+    include($$BITS_PATH/python/python.pri)
+  }
   DEFINES += HAVE_PYTHON
 }
 
 equals(HAVE_CURL, "1") {
+  !isEmpty(BITS_PATH) {
+    include($$BITS_PATH/curl/curl.pri)
+  } else {
+    LIBS += -lcurl
+    win32 {
+      LIBS += -lwsock32    # required because we do "select"
+    }
+  }
   DEFINES += HAVE_CURL
 }
 
 equals(HAVE_EXPAT, "1") {
+  !isEmpty(BITS_PATH) {
+    include($$BITS_PATH/expat/expat.pri)
+  } else {
+    LIBS += -lexpat
+  }
   DEFINES += HAVE_EXPAT
 }
 
 equals(HAVE_RUBY, "1") {
+  !isEmpty(BITS_PATH) {
+    include($$BITS_PATH/ruby/ruby.pri)
+  }
   DEFINES += \
     HAVE_RUBY \
     HAVE_RUBY_VERSION_CODE=$$RUBYVERSIONCODE 
@@ -61,18 +80,24 @@ equals(HAVE_RUBY, "1") {
   QMAKE_RPATHDIR += $$RPATH
 }
 
+!isEmpty(BITS_PATH) {
+  include($$BITS_PATH/zlib/zlib.pri)
+} else {
+  !msvc {
+    LIBS += -lz
+  }
+}
+
 msvc {
 
-  INCLUDEPATH += \
-    $$THIRD_PARTY/zlib/1.2.11/include \
-
-  QMAKE_CXXFLAGS += -bigobj
+  QMAKE_CXXFLAGS += \
+      /bigobj \
+      /wd4251 \                   # Disable "DLL interface required"
+      /source-charset:utf-8 \     # Use UTF-8 for source files
 
   QMAKE_CXXFLAGS_WARN_ON += \
 
-}
-
-!msvc {
+} else {
 
   QMAKE_CXXFLAGS_WARN_ON += \
       -pedantic \
@@ -85,17 +110,12 @@ msvc {
       -Wno-deprecated-declarations \
       -Wno-reserved-user-defined-literal \
 
-} else {
-
-  QMAKE_CXXFLAGS += \
-      /wd4251 \                   # Disable "DLL interface required"
-      /source-charset:utf-8 \     # Use UTF-8 for source files
-
 }
 
 equals(HAVE_QT, "0") {
 
   QT =
+  LIBS += -lpthread
 
 } else {
 

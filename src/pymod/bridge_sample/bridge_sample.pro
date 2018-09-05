@@ -56,6 +56,10 @@ equals(HAVE_QT, "0") {
 # - GSI (generic scripting interface)
 # - TL (basic toolkit)
 # - PYA (Python binding for GSI)
+!isEmpty(BITS_PATH) {
+  # pull the definitions from the BITS_PATH if set
+  include($$BITS_PATH/python/python.pri)
+}
 INCLUDEPATH += "$$PYTHONINCLUDE" $$INC/tl/tl $$INC/pya/pya $$INC/gsi/gsi
 DEPENDPATH += "$$PYTHONINCLUDE" $$INC/tl/tl $$INC/pya/pya $$INC/gsi/gsi
 LIBS += "$$PYTHONLIBFILE" -L$$LIBDIR -lklayout_tl -lklayout_pya -lklayout_gsi

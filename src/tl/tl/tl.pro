@@ -6,32 +6,6 @@ include($$PWD/../../lib.pri)
 
 DEFINES += MAKE_TL_LIBRARY
 
-!msvc {
-  LIBS += -lz
-}
-
-msvc {
-
-  LIBS += \
-    -L$$THIRD_PARTY/zlib/1.2.11/lib -lzlib
-
-}
-
-equals(HAVE_QT, "0") {
-  LIBS += -lpthread
-}
-
-equals(HAVE_CURL, "1") {
-  LIBS += -lcurl
-  win32 {
-    LIBS += -lwsock32    # required because we do "select"
-  }
-}
-
-equals(HAVE_EXPAT, "1") {
-  LIBS += -lexpat
-}
-
 FORMS =
 
 SOURCES = \

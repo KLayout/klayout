@@ -20,6 +20,8 @@
 
 */
 
+#define NOMINMAX   //  for windows.h -> min/max not defined
+
 #include "tlHttpStream.h"
 #include "tlHttpStreamCurl.h"
 #include "tlLog.h"
@@ -32,8 +34,12 @@
 #include "tlFileUtils.h"
 #include "tlUri.h"
 
-#include <sys/time.h>
-#include <unistd.h>
+#if !defined(_MSC_VER)
+# include <sys/time.h>
+# include <unistd.h>
+#else
+# include <WinSock2.h>
+#endif
 
 #include <curl/curl.h>
 
@@ -43,6 +49,7 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <algorithm>
 
 // #define DEBUG_CURL 1
 

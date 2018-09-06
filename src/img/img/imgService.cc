@@ -223,6 +223,17 @@ is_selected (const img::Object &image, const db::DBox &box)
   return (box.contains (b.p1 ()) && box.contains (b.p2 ()));
 }
 
+static int
+obj2id (const db::DUserObject &obj)
+{
+  if (! obj.ptr ()) {
+    return 0;
+  } else {
+    const img::Object *iobj = dynamic_cast<const img::Object *>(obj.ptr ());
+    return iobj ? int (iobj->id ()) : 0;
+  }
+}
+
 struct SortImagePtrByZOrder 
 {
   bool operator() (const img::Object *a, const img::Object *b) const
@@ -872,9 +883,9 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
         //  KLUDGE: this creates a copy of the data!
         img::Object *inew = new img::Object (*iobj);
         inew->transform (m_trans);
-        mp_view->annotation_shapes ().replace (s->first, db::DUserObject (inew));
+        int id = obj2id (mp_view->annotation_shapes ().replace (s->first, db::DUserObject (inew)));
 
-        image_changed_event (int (inew->id ()));
+        image_changed_event (id);
 
       }
 
@@ -885,8 +896,8 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 
       //  replace the image that was moved
       img::Object *inew = new img::Object (m_current);
-      mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew));
-      image_changed_event (int (inew->id ()));
+      int id = obj2id (mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew)));
+      image_changed_event (id);
 
       //  clear the selection (that was artifically created before)
       if (! m_keep_selection_for_landmark) {
@@ -899,8 +910,8 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 
       //  replace the image that was moved
       img::Object *inew = new img::Object (m_current);
-      mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew));
-      image_changed_event (int (inew->id ()));
+      int id = obj2id (mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (inew)));
+      image_changed_event (id);
 
       //  clear the selection (that was artifically created before)
       clear_selection ();
@@ -955,8 +966,8 @@ Service::transform (const db::DCplxTrans &trans)
     //  compute transformed object and replace
     img::Object *inew = new img::Object (*iobj);
     inew->transform (trans);
-    mp_view->annotation_shapes ().replace (s->first, db::DUserObject (inew));
-    image_changed_event (int (inew->id ()));
+    int id = obj2id (mp_view->annotation_shapes ().replace (s->first, db::DUserObject (inew)));
+    image_changed_event (id);
 
   }
 
@@ -1341,8 +1352,8 @@ Service::change_image (obj_iterator pos, const img::Object &to)
 {
   //  replace the object
   img::Object *inew = new img::Object (to);
-  mp_view->annotation_shapes ().replace (pos, db::DUserObject (inew));
-  image_changed_event (int (inew->id ()));
+  int id = obj2id (mp_view->annotation_shapes ().replace (pos, db::DUserObject (inew)));
+  image_changed_event (id);
 
   //  and make selection "visible"
   selection_to_view ();

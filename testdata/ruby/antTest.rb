@@ -72,7 +72,7 @@ class RBA::Annotation
       "diag_yx"
     elsif s == OutlineBox
       "diag_box"
-    else 
+    else
       ""
     end
   end
@@ -401,7 +401,7 @@ class Ant_TestClass < TestBase
     lv = mw.current_view
 
     aac = 0
-    ac = [] 
+    ac = []
     asc = 0
     lv.on_annotations_changed { aac += 1 }
     lv.on_annotation_changed { |id| ac << id }
@@ -533,4 +533,3 @@ class Ant_TestClass < TestBase
 end
 
 load("test_epilogue.rb")
-

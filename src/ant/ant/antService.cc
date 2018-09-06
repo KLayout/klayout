@@ -921,7 +921,8 @@ Service::insert_ruler (const ant::Object &ruler, bool limit_number)
 
   //  create the ruler from the template
   ant::Object *new_ruler = new ant::Object (ruler);
-  new_ruler->id (idmax + 1);
+  int new_id = idmax + 1;
+  new_ruler->id (new_id);
   mp_view->annotation_shapes ().insert (db::DUserObject (new_ruler));
 
   //  delete surplus rulers
@@ -929,7 +930,7 @@ Service::insert_ruler (const ant::Object &ruler, bool limit_number)
     reduce_rulers (m_max_number_of_rulers);
   }
 
-  return new_ruler->id ();
+  return new_id;
 }
 
 /**
@@ -2082,10 +2083,12 @@ Service::change_ruler (obj_iterator pos, const ant::Object &to)
   ant::Object *new_ruler = new ant::Object (to);
   const ant::Object *current_ruler = dynamic_cast <const ant::Object *> (pos->ptr ());
   tl_assert (current_ruler != 0);
-  new_ruler->id (current_ruler->id ());
+
+  int new_id = current_ruler->id ();
+  new_ruler->id (new_id);
   mp_view->annotation_shapes ().replace (pos, db::DUserObject (new_ruler));
 
-  annotation_changed_event (new_ruler->id ());
+  annotation_changed_event (new_id);
 
   //  and make selection "visible"
   selection_to_view ();

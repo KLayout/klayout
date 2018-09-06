@@ -1732,8 +1732,7 @@ RubyInterpreter::~RubyInterpreter ()
 
   rb_release_top_self ();
 
-  //  This prevents reinitialization
-  sp_rba_interpreter = reinterpret_cast<RubyInterpreter *> (1);
+  sp_rba_interpreter = 0;
 }
 
 RubyInterpreter *RubyInterpreter::instance ()

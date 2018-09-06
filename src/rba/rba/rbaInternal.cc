@@ -301,6 +301,11 @@ Proxy::signal_handler (const gsi::MethodBase *meth)
   return sh;
 }
 
+bool Proxy::can_call () const
+{
+  return rba::RubyInterpreter::instance () != 0;
+}
+
 void
 Proxy::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 {

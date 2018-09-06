@@ -147,6 +147,7 @@ public:
   VALUE signal_handler (const gsi::MethodBase *meth);
 
   virtual void call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const;
+  virtual bool can_call () const;
 
 private:
   const gsi::ClassBase *m_cls_decl;

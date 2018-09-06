@@ -132,7 +132,7 @@ public:
     : m_hash (hash)
   {
     rb_gc_register_address (&m_hash);
-    m_keys = rb_ary_new2 (RHASH_SIZE (m_hash));
+    m_keys = rb_ary_new2 (long (RHASH_SIZE (m_hash)));
     rb_gc_register_address (&m_keys);
     rb_hash_foreach (m_hash, (int (*)(...)) &push_key_to_ary_i, m_keys);
   }

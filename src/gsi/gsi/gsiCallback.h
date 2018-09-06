@@ -41,6 +41,7 @@ struct GSI_PUBLIC Callee
   virtual ~Callee () { }
 
   virtual void call (int id, SerialArgs &args, SerialArgs &ret) const = 0;
+  virtual bool can_call () const { return true; }
 };
 
 /**
@@ -72,7 +73,7 @@ struct Callback
 
   bool can_issue () const
   {
-    return callee.get () != 0;
+    return callee && callee->can_call ();
   } 
 
 // 0 arguments

@@ -2709,7 +2709,7 @@ PythonModule::make_classes (const char *mod_name)
             } else if (name == "__mul__") {
               // Adding right multiplication
               // Rationale: if pyaObj * x works, so should x * pyaObj
-              add_python_doc (*c, mt, mid, tl::to_string (tr ("This method is also available as '__mul__'")));
+              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as '__mul__'")));
               alt_names.push_back ("__rmul__");
             }
 

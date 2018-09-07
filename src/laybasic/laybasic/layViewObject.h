@@ -514,6 +514,23 @@ public:
   }
 
   /**
+   *  @brief Gets a value indicating whether the marker can be dismissed (made invisible)
+   *
+   *  Markers with this flag set to true can be hidden by using ViewObjectCanvas::show_markers.
+   */
+  bool get_dismissable () const
+  {
+    return m_dismissable;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether the marker can be dismissed (made invisible)
+   *
+   *  See \\get_dismissable for details.
+   */
+  void set_dismissable (bool f);
+
+  /**
    *  @brief Set the visibility state of the view object
    *  
    *  Invisible objects are not drawn
@@ -561,6 +578,7 @@ private:
   tl::weak_ptr<ViewObjectWidget> mp_widget;
   bool m_static;
   bool m_visible;
+  bool m_dismissable;
 };
 
 /**
@@ -905,6 +923,21 @@ public:
    */
   void set_default_cursor (lay::Cursor::cursor_shape cursor);
 
+  /**
+   *  @brief Sets a value indicating whether dismissable view objects shall be drawn or not
+   *
+   *  Markers with dismissable = false are always drawn. The default value is "false".
+   */
+  void set_dismiss_view_objects (bool dismissed);
+
+  /**
+   *  @brief Gets a value indicating whether dismissable markers shall be drawn or not
+   */
+  bool dismiss_view_objects () const
+  {
+    return m_view_objects_dismissed;
+  }
+
 protected:
   /**
    *  @brief Qt focus event handler
@@ -985,6 +1018,7 @@ private:
   tl::weak_collection<lay::BackgroundViewObject> m_background_objects;
   std::list<lay::ViewService *> m_services;
   std::list<ViewService *> m_grabbed;
+  bool m_view_objects_dismissed;
   bool m_needs_update_static;
   bool m_needs_update_bg;
   lay::ViewService *mp_active_service;

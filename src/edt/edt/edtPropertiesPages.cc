@@ -251,6 +251,8 @@ ShapePropertiesPage::do_apply (bool current_only)
 
     for (std::vector<edt::Service::obj_iterator>::const_iterator p = m_selection_ptrs.begin (); p != m_selection_ptrs.end (); ++p) {
 
+      size_t index = p - m_selection_ptrs.begin ();
+
       edt::Service::obj_iterator pos = *p;
 
       //  only update objects from the same layout - this is not practical limitation but saves a lot of effort for
@@ -258,6 +260,9 @@ ShapePropertiesPage::do_apply (bool current_only)
       if (pos->cv_index () != cv_index) {
         continue;
       }
+
+      const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
+      db::Layout &layout = cv->layout ();
 
       tl_assert (! pos->is_cell_inst ());
 
@@ -271,10 +276,8 @@ ShapePropertiesPage::do_apply (bool current_only)
       std::map<db::Shape, db::Shape>::const_iterator s = shapes_seen.find (pos->shape ());
       if (s == shapes_seen.end ()) {
 
-        const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
-
-        db::Shapes &shapes = cv->layout ().cell (pos->cell_index ()).shapes (pos->layer ());
-        double dbu = cv->layout ().dbu ();
+        db::Shapes &shapes = layout.cell (pos->cell_index ()).shapes (pos->layer ());
+        double dbu = layout.dbu ();
 
         if (!current_only || pos->shape () == current) {
           new_shape = applicator->do_apply (shapes, pos->shape (), dbu, relative_mode);
@@ -288,8 +291,6 @@ ShapePropertiesPage::do_apply (bool current_only)
 
       if (new_shape != pos->shape ()) {
 
-        size_t index = p - m_selection_ptrs.begin ();
-
         //  change selection to new shape
         new_sel[index].set_shape (new_shape);
 
@@ -298,20 +299,33 @@ ShapePropertiesPage::do_apply (bool current_only)
 
         update_required = true;
 
-      } 
+      }
+
+      //  handle the case of guiding shape updates
+      std::pair<bool, lay::ObjectInstPath> gs = mp_service->handle_guiding_shape_changes (new_sel[index]);
+      if (gs.first) {
+
+        new_sel[index] = gs.second;
+
+        mp_service->select (*pos, lay::Editable::Reset);
+        mp_service->select (new_sel [index], lay::Editable::Add);
+
+        update_required = true;
+
+      }
 
     }
 
     if (update_required) {
+      mp_service->view ()->cellview (cv_index)->layout ().cleanup ();
       recompute_selection_ptrs (new_sel);
     }
 
   } catch (...) {
+    mp_service->view ()->cellview (cv_index)->layout ().cleanup ();
     recompute_selection_ptrs (new_sel);
     throw;
   }
-
-  mp_service->handle_guiding_shape_changes ();
 
   update ();
 }

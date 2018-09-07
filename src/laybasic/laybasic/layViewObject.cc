@@ -165,7 +165,7 @@ BackgroundViewObject::z_order (int z)
 //  ViewObject implementation
 
 ViewObject::ViewObject (ViewObjectWidget *widget, bool _static)
-  : mp_widget (widget), m_static (_static), m_visible (true)
+  : mp_widget (widget), m_static (_static), m_visible (true), m_dismissable (false)
 {
   if (widget) {
     widget->m_objects.push_back (this);
@@ -176,6 +176,15 @@ ViewObject::ViewObject (ViewObjectWidget *widget, bool _static)
 ViewObject::~ViewObject ()
 {
   redraw ();
+}
+
+void
+ViewObject::set_dismissable (bool dismissable)
+{
+  if (m_dismissable != dismissable) {
+    m_dismissable = dismissable;
+    redraw ();
+  }
 }
 
 void 
@@ -251,6 +260,7 @@ ViewService::set_cursor (lay::Cursor::cursor_shape cursor)
 
 ViewObjectWidget::ViewObjectWidget (QWidget *parent, const char *name)
   : QWidget (parent), 
+    m_view_objects_dismissed (false),
     m_needs_update_static (false),
     m_needs_update_bg (false),
     mp_active_service (0),
@@ -888,7 +898,7 @@ ViewObjectWidget::do_render (const lay::Viewport &vp, lay::ViewObjectCanvas &can
   }
 
   for (object_iterator obj = begin_objects (); obj != end_objects (); ++obj) {
-    if (obj->m_static == st && obj->is_visible ()) {
+    if (obj->m_static == st && obj->is_visible () && (! m_view_objects_dismissed || ! obj->get_dismissable ())) {
       BEGIN_PROTECTED_SILENT
       obj->render (vp, canvas);
       END_PROTECTED_SILENT
@@ -959,6 +969,16 @@ ViewObjectWidget::touch_bg ()
 {
   if (! m_needs_update_bg) {
     m_needs_update_bg = true;
+    update ();
+  }
+}
+
+void
+ViewObjectWidget::set_dismiss_view_objects (bool dismiss)
+{
+  if (dismiss != m_view_objects_dismissed) {
+    m_view_objects_dismissed = dismiss;
+    touch ();
     update ();
   }
 }

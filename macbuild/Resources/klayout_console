@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+if [ "$1" != "" ]; then
+/Applications/klayout.app/Contents/MacOS/klayout $1 -r /Applications/klayout.app/Contents/MacOS/start-console.py
+else
+/Applications/klayout.app/Contents/MacOS/klayout -z -r /Applications/klayout.app/Contents/MacOS/start-console.py
+fi

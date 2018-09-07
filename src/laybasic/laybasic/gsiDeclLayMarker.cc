@@ -164,6 +164,18 @@ Class<lay::DMarker> decl_Marker ("lay", "Marker",
     "@brief Returns a value indicating whether the marker has a specific frame color\n"
     "The set method has been added in version 0.20.\n"
   ) +
+  gsi::method ("dismissable=", &lay::DMarker::set_dismissable,
+    "@brief Sets a value indicating whether the marker can be hidden\n"
+    "@args flag\n"
+    "Dismissable markers can be hidden setting \"View/Show Markers\" to \"off\". "
+    "The default setting is \"false\" meaning the marker can't be hidden.\n"
+    "\n"
+    "This attribute has been introduced in version 0.25.4."
+  ) +
+  gsi::method ("dismissable?", &lay::DMarker::get_dismissable,
+    "@brief Gets a value indicating whether the marker can be hidden\n"
+    "See \\dismissable= for a description of this predicate."
+  ) +
   gsi::method ("line_width=", &lay::DMarker::set_line_width,
     "@brief Sets the line width of the marker\n"
     "@args width\n"

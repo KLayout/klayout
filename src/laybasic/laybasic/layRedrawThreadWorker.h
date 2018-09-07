@@ -175,20 +175,24 @@ protected:
   void perform_task (tl::Task *task);
 
 private:
-  void draw_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level);
-  void draw_layer (int from_level, int to_level, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text, const UpdateSnapshotCallback *update_snapshot);
+  void draw_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
+  void draw_layer (int from_level, int to_level, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text, const UpdateSnapshotCallback *update_snapshot);
+  void draw_layer (int from_level, int to_level, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text, const UpdateSnapshotCallback *update_snapshot);
   void draw_layer_wo_cache (int from_level, int to_level, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vv, int level, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text, const UpdateSnapshotCallback *update_snapshot);
-  void draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &box, int level);
-  void draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &box, int level);
-  void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &box, int level);
-  void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &box, int level, db::properties_id_type prop_id);
+  void draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
+  void draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_region, int level, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text);
+  void draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
+  void draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_region, int level);
+  void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
+  void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level, db::properties_id_type prop_id);
+  void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level, db::properties_id_type prop_id);
   void draw_cell (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, const std::string &txt);
   void draw_cell_properties (bool drawing_context, int level, const db::CplxTrans &trans, const db::Box &box, db::properties_id_type prop_id);
   void draw_cell_shapes (const db::CplxTrans &trans, const db::Cell &cell, const db::Box &vp, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text);
   void test_snapshot (const UpdateSnapshotCallback *update_snapshot);
   void transfer ();
-  void iterate_variants (const std::vector <db::Box> &redraw_regions, db::cell_index_type ci, db::CplxTrans trans, void (RedrawThreadWorker::*what) (bool, db::cell_index_type ci, const db::CplxTrans &, const db::Box &, int level));
-  void iterate_variants_rec (const std::vector <db::Box> &redraw_regions, db::cell_index_type ci, const db::CplxTrans &trans, int level, void (RedrawThreadWorker::*what) (bool, db::cell_index_type ci, const db::CplxTrans &, const db::Box &, int level), bool spread);
+  void iterate_variants (const std::vector <db::Box> &redraw_regions, db::cell_index_type ci, db::CplxTrans trans, void (RedrawThreadWorker::*what) (bool, db::cell_index_type ci, const db::CplxTrans &, const std::vector <db::Box> &, int level));
+  void iterate_variants_rec (const std::vector <db::Box> &redraw_regions, db::cell_index_type ci, const db::CplxTrans &trans, int level, void (RedrawThreadWorker::*what) (bool, db::cell_index_type ci, const db::CplxTrans &, const std::vector <db::Box> &, int level), bool spread);
   bool cell_var_cached (db::cell_index_type ci, const db::CplxTrans &trans);
   bool drop_cell (const db::Cell &cell, const db::CplxTrans &trans);
   std::vector<db::Box> search_regions (const db::Box &cell_bbox, const db::Box &vp, int level);

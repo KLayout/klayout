@@ -665,13 +665,11 @@ need_draw_box (const db::Layout *layout, const db::Cell &cell,
   return int (cell.hierarchy_levels ()) + level >= to_level;
 }
 
-void 
-RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level)
+void
+RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &redraw_regions, int level)
 {
-  lay::Renderer &r = *mp_renderer;
-
   //  do not draw, if there is nothing to draw
-  if (mp_layout->cells () <= ci || vp.empty ()) {
+  if (mp_layout->cells () <= ci || redraw_regions.empty ()) {
     return;
   }
 
@@ -684,6 +682,17 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
   if (cell_var_cached (ci, trans)) {
     return;
   }
+
+  for (std::vector<db::Box>::const_iterator b = redraw_regions.begin (); b != redraw_regions.end (); ++b) {
+    draw_boxes (drawing_context, ci, trans, *b, level);
+  }
+}
+
+void
+RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level)
+{
+  lay::Renderer &r = *mp_renderer;
+  const db::Cell &cell = mp_layout->cell (ci);
 
   //  For small bboxes, the cell outline can be reduced ..
   db::Box bbox = cell.bbox ();
@@ -714,19 +723,19 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
     } else {
 
       db::box_convert <db::CellInst> bc (*mp_layout);
-     
+
       //  create a set of boxes to look into
       db::Coord aw = db::coord_traits<db::Coord>::rounded (m_abstract_mode_width / mp_layout->dbu ());
       std::vector<db::Box> vv;
       if (level == 1 && m_abstract_mode_width > 0 && bbox.width () > db::Box::distance_type (aw * 2) && bbox.height () > db::Box::distance_type (aw * 2)) {
         vv.reserve (4);
-        vv.push_back (vp & db::Box (bbox.left (), bbox.bottom (), bbox.left () + aw, bbox.top ()));
-        vv.push_back (vp & db::Box (bbox.right () - aw, bbox.bottom (), bbox.right (), bbox.top ()));
-        vv.push_back (vp & db::Box (bbox.left () + aw, bbox.bottom (), bbox.right () - aw, bbox.bottom () + aw));
-        vv.push_back (vp & db::Box (bbox.left () + aw, bbox.top () - aw, bbox.right () - aw, bbox.top ()));
+        vv.push_back (redraw_box & db::Box (bbox.left (), bbox.bottom (), bbox.left () + aw, bbox.top ()));
+        vv.push_back (redraw_box & db::Box (bbox.right () - aw, bbox.bottom (), bbox.right (), bbox.top ()));
+        vv.push_back (redraw_box & db::Box (bbox.left () + aw, bbox.bottom (), bbox.right () - aw, bbox.bottom () + aw));
+        vv.push_back (redraw_box & db::Box (bbox.left () + aw, bbox.top () - aw, bbox.right () - aw, bbox.top ()));
       } else {
         vv.reserve (1);
-        vv.push_back (vp);
+        vv.push_back (redraw_box);
       }
 
       //  dive down into the hierarchy ..
@@ -737,7 +746,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
           bool anything = false;
           db::cell_index_type last_ci = std::numeric_limits<db::cell_index_type>::max ();
 
-          db::Cell::touching_iterator inst = cell.begin_touching (*v); 
+          db::Cell::touching_iterator inst = cell.begin_touching (*v);
           while (! inst.at_end ()) {
 
             const db::CellInstArray &cell_inst = inst->cell_inst ();
@@ -746,7 +755,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
             db::Box new_cell_box = mp_layout->cell (new_ci).bbox ();
 
             if (last_ci != new_ci) {
-              //  Hint: don't use any_cell_box on partially visible cells because that will degrade performance 
+              //  Hint: don't use any_cell_box on partially visible cells because that will degrade performance
               if (new_cell_box.inside (*v)) {
                 last_ci = new_ci;
                 anything = any_cell_box (new_ci, m_to_level - (level + 1));
@@ -758,7 +767,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
             if (anything) {
 
               db::Vector a, b;
-              unsigned long amax, bmax; 
+              unsigned long amax, bmax;
               bool simplify = false;
               if (cell_inst.is_regular_array (a, b, amax, bmax)) {
 
@@ -768,8 +777,8 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
                 } else {
                   inst_box = trans * new_cell_box;
                 }
-                if (((a.x () == 0 && b.y () == 0) || (a.y () == 0 && b.x () == 0)) && 
-                    inst_box.width () < 1.5 && inst_box.height () < 1.5 && 
+                if (((a.x () == 0 && b.y () == 0) || (a.y () == 0 && b.x () == 0)) &&
+                    inst_box.width () < 1.5 && inst_box.height () < 1.5 &&
                     (amax <= 1 || trans.ctrans (a.length ()) < 1.5) &&
                     (bmax <= 1 || trans.ctrans (b.length ()) < 1.5)) {
                   simplify = true;
@@ -781,7 +790,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
 
                 //  The array can be simplified if there are levels below to draw
                 if (need_draw_box (mp_layout, mp_layout->cell (new_ci), level + 1, m_to_level, m_hidden_cells, m_cv_index)) {
-                  
+
                   db::box_convert <db::CellInst> bc (*mp_layout);
 
                   unsigned int plane_group = 2;
@@ -801,8 +810,8 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
                 //  The array (or single instance) must be iterated instance
                 //  by instance
                 for (db::CellInstArray::iterator p = cell_inst.begin_touching (*v, bc); ! p.at_end (); ++p) {
-              
-                  test_snapshot (0); 
+
+                  test_snapshot (0);
                   db::ICplxTrans t (cell_inst.complex_trans (*p));
                   db::Box new_vp = db::Box (t.inverted () * *v);
                   draw_boxes (drawing_context, new_ci, trans * t, new_vp, level + 1);
@@ -814,7 +823,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
             }
 
             ++inst;
-          
+
           }
 
         }
@@ -828,7 +837,7 @@ RedrawThreadWorker::draw_boxes (bool drawing_context, db::cell_index_type ci, co
 }
 
 void 
-RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level)
+RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vp, int level)
 {
   if (! m_text_visible) {
     return;
@@ -838,7 +847,7 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
 }
 
 void 
-RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level, db::properties_id_type prop_id)
+RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vp, int level, db::properties_id_type prop_id)
 {
   //  do not draw, if there is nothing to draw
   if (mp_layout->cells () <= ci || vp.empty ()) {
@@ -854,6 +863,16 @@ RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_ty
   if (cell_var_cached (ci, trans)) {
     return;
   }
+
+  for (std::vector<db::Box>::const_iterator b = vp.begin (); b != vp.end (); ++b) {
+    draw_box_properties (drawing_context, ci, trans, *b, level, prop_id);
+  }
+}
+
+void
+RedrawThreadWorker::draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level, db::properties_id_type prop_id)
+{
+  const db::Cell &cell = mp_layout->cell (ci);
 
   //  For small bboxes, the cell outline can be reduced ..
   db::Box bbox = cell.bbox ();
@@ -1193,13 +1212,11 @@ RedrawThreadWorker::search_regions (const db::Box &cell_bbox, const db::Box &vp,
 }
 
 void 
-RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level)
+RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vp, int level)
 {
   if (! m_text_visible) {
     return;
   }
-
-  lay::Renderer &r = *mp_renderer;
 
   unsigned int plane_group = 2;
   if (drawing_context) {
@@ -1214,8 +1231,6 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
   text   = m_planes[2 + plane_group * (planes_per_layer / 3)];
   vertex = m_planes[3 + plane_group * (planes_per_layer / 3)];
 
-  test_snapshot (0); 
-
   //  do not draw, if there is nothing to draw
   if (mp_layout->cells () <= ci || vp.empty ()) {
     return;
@@ -1224,7 +1239,18 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
     return;
   }
 
+  for (std::vector<db::Box>::const_iterator b = vp.begin (); b != vp.end (); ++b) {
+    draw_text_layer (drawing_context, ci, trans, *b, level, fill, frame, vertex, text);
+  }
+}
+
+void
+RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level, CanvasPlane *fill, CanvasPlane *frame, CanvasPlane *vertex, CanvasPlane *text)
+{
+  test_snapshot (0);
+
   const db::Cell &cell = mp_layout->cell (ci);
+  lay::Renderer &r = *mp_renderer;
 
   //  For small bboxes, the cell outline can be reduced ..
   db::Box bbox = cell.bbox (m_layer);
@@ -1422,7 +1448,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
 
                       db::ICplxTrans t (cell_inst.complex_trans (*p));
                       db::Box new_vp = db::Box (t.inverted () * *v);
-                      draw_text_layer (drawing_context, new_ci, trans * t, new_vp, level + 1);
+                      draw_text_layer (drawing_context, new_ci, trans * t, new_vp, level + 1, fill, frame, vertex, text);
 
                     } 
 
@@ -1751,11 +1777,9 @@ private:
 };
 
 void
-RedrawThreadWorker::draw_layer (int from_level, int to_level, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level,
+RedrawThreadWorker::draw_layer (int from_level, int to_level, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vp, int level,
                                 lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text, const UpdateSnapshotCallback *update_snapshot)
 {
-  test_snapshot (update_snapshot); 
-
   //  do not draw, if there is nothing to draw
   if (mp_layout->cells () <= ci || vp.empty ()) {
     return;
@@ -1763,6 +1787,17 @@ RedrawThreadWorker::draw_layer (int from_level, int to_level, db::cell_index_typ
   if (cell_var_cached (ci, trans)) {
     return;
   }
+
+  for (std::vector<db::Box>::const_iterator b = vp.begin (); b != vp.end (); ++b) {
+    draw_layer (from_level, to_level, ci, trans, *b, level, fill, frame, vertex, text, update_snapshot);
+  }
+}
+
+void
+RedrawThreadWorker::draw_layer (int from_level, int to_level, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level,
+                                lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text, const UpdateSnapshotCallback *update_snapshot)
+{
+  test_snapshot (update_snapshot);
 
   const db::Cell &cell = mp_layout->cell (ci);
   db::Box bbox = cell.bbox (m_layer);
@@ -1891,7 +1926,7 @@ RedrawThreadWorker::draw_layer (int from_level, int to_level, db::cell_index_typ
 }
 
 void
-RedrawThreadWorker::draw_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level)
+RedrawThreadWorker::draw_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &redraw_regions, int level)
 {
   if (drawing_context) {
 
@@ -1904,7 +1939,7 @@ RedrawThreadWorker::draw_layer (bool drawing_context, db::cell_index_type ci, co
       text   = m_planes[2 + plane_group * (planes_per_layer / 3)];
       vertex = m_planes[3 + plane_group * (planes_per_layer / 3)];
 
-      draw_layer (m_from_level, m_to_level, ci, trans, vp, level, fill, frame, vertex, text, 0);
+      draw_layer (m_from_level, m_to_level, ci, trans, redraw_regions, level, fill, frame, vertex, text, 0);
 
     }
 
@@ -1919,7 +1954,7 @@ RedrawThreadWorker::draw_layer (bool drawing_context, db::cell_index_type ci, co
       text   = m_planes[2 + plane_group * (planes_per_layer / 3)];
       vertex = m_planes[3 + plane_group * (planes_per_layer / 3)];
 
-      draw_layer (m_from_level, m_to_level, ci, trans, vp, level, fill, frame, vertex, text, 0);
+      draw_layer (m_from_level, m_to_level, ci, trans, redraw_regions, level, fill, frame, vertex, text, 0);
 
     }
 
@@ -1934,7 +1969,7 @@ RedrawThreadWorker::draw_layer (bool drawing_context, db::cell_index_type ci, co
       text   = m_planes[2 + plane_group * (planes_per_layer / 3)];
       vertex = m_planes[3 + plane_group * (planes_per_layer / 3)];
 
-      draw_layer (m_from_level, 1, ci, trans, vp, level, fill, frame, vertex, text, 0);
+      draw_layer (m_from_level, 1, ci, trans, redraw_regions, level, fill, frame, vertex, text, 0);
 
     }
 
@@ -1947,7 +1982,7 @@ RedrawThreadWorker::draw_layer (bool drawing_context, db::cell_index_type ci, co
       text   = m_planes[2 + plane_group * (planes_per_layer / 3)];
       vertex = m_planes[3 + plane_group * (planes_per_layer / 3)];
 
-      draw_layer (1, m_to_level, ci, trans, vp, level, fill, frame, vertex, text, 0);
+      draw_layer (1, m_to_level, ci, trans, redraw_regions, level, fill, frame, vertex, text, 0);
 
     }
 
@@ -1990,7 +2025,7 @@ RedrawThreadWorker::cell_var_cached (db::cell_index_type ci, const db::CplxTrans
 }
 
 void 
-RedrawThreadWorker::iterate_variants (const std::vector <db::Box> &redraw_regions, db::cell_index_type ci, db::CplxTrans trans, void (RedrawThreadWorker::*what) (bool, db::cell_index_type, const db::CplxTrans &, const db::Box &, int))
+RedrawThreadWorker::iterate_variants (const std::vector <db::Box> &redraw_regions, db::cell_index_type ci, db::CplxTrans trans, void (RedrawThreadWorker::*what) (bool, db::cell_index_type, const db::CplxTrans &, const std::vector<db::Box> &, int))
 {
   //  save current state
   int from_level = m_from_level;
@@ -2050,7 +2085,7 @@ RedrawThreadWorker::iterate_variants (const std::vector <db::Box> &redraw_region
 }
 
 void 
-RedrawThreadWorker::iterate_variants_rec (const std::vector <db::Box> &redraw_regions, db::cell_index_type ci, const db::CplxTrans &trans, int level, void (RedrawThreadWorker::*what) (bool, db::cell_index_type, const db::CplxTrans &, const db::Box &, int), bool drawing_context)
+RedrawThreadWorker::iterate_variants_rec (const std::vector <db::Box> &redraw_regions, db::cell_index_type ci, const db::CplxTrans &trans, int level, void (RedrawThreadWorker::*what) (bool, db::cell_index_type, const db::CplxTrans &, const std::vector<db::Box> &, int), bool drawing_context)
 {
   db::Cell::parent_inst_iterator p = mp_layout->cell (ci).begin_parent_insts ();
   int context_path_length = int (m_cellviews [m_cv_index].specific_path ().size ());
@@ -2092,17 +2127,23 @@ RedrawThreadWorker::iterate_variants_rec (const std::vector <db::Box> &redraw_re
 
   } else {
 
+    std::vector<db::Box> actual_regions;
+    actual_regions.reserve (redraw_regions.size ());
+
     for (std::vector<db::Box>::const_iterator rr = redraw_regions.begin (); rr != redraw_regions.end (); ++rr) {
 
       db::Coord lim = std::numeric_limits<db::Coord>::max ();
       db::DBox world (trans * db::Box (db::Point (-lim, -lim), db::Point (lim, lim)));
       db::Box vp = db::Box (trans.inverted () * (world & db::DBox (*rr)));
       vp &= mp_layout->cell (ci).bbox (); // this avoids problems when accessing designs through very large viewports
-
       if (! vp.empty ()) {
-        (this->*what) (drawing_context, ci, trans, vp, level);
+        actual_regions.push_back (vp);
       }
 
+    }
+
+    if (! actual_regions.empty ()) {
+      (this->*what) (drawing_context, ci, trans, actual_regions, level);
     }
 
   }

@@ -28,11 +28,12 @@ SOURCES = \
   tlThreads.cc \
   tlUtils.cc \
   tlVariant.cc \
-  tlInt128Support.cc \
   tlXMLParser.cc \
   tlUri.cc \
   tlWebDAV.cc \
   tlHttpStream.cc \
+  tlInt128Support.cc \
+  tlLongInt.cc \
 
 !equals(HAVE_QT, "0") {
 

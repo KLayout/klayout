@@ -195,6 +195,20 @@ public:
   point<C> &operator*= (long s);
 
   /**
+   *  @brief Division by some divisor.
+   *
+   *  Scaline involves rounding which in our case is simply handled
+   *  with the coord_traits scheme.
+   */
+
+  point<C> &operator/= (double s);
+
+  /**
+   *  @brief Dividing self by some integer divisor
+   */
+  point<C> &operator/= (long s);
+
+  /**
    *  @brief The euclidian distance to another point
    *
    *  @param d The other to compute the distance to.
@@ -450,6 +464,32 @@ inline point<C>
 operator* (const db::point<C> &p, unsigned int s) 
 {
   return point<C> (p.x () * s, p.y () * s);
+}
+
+template <class C, typename Number>
+inline point<C>
+operator/ (const db::point<C> &p, Number s)
+{
+  double mult = 1.0 / static_cast<double>(s);
+  return point<C> (p.x () * mult, p.y () * mult);
+}
+
+template <class C>
+inline point<C> &
+point<C>::operator/= (double s)
+{
+  double mult = 1.0 / static_cast<double>(s);
+  *this *= mult;
+  return *this;
+}
+
+template <class C>
+inline point<C> &
+point<C>::operator/= (long s)
+{
+  double mult = 1.0 / static_cast<double>(s);
+  *this *= mult;
+  return *this;
 }
 
 template <class C>

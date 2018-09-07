@@ -200,16 +200,29 @@ LCPDitherPalette::create_pixmap_for (LCPActiveLabel *b, int n)
   const unsigned int h = 24;
   const unsigned int w = 24;
 
-  QImage image (w, h, QImage::Format_RGB32);
-  image.fill (color0.rgb ());
+#if QT_VERSION > 0x050000
+  unsigned int dpr = devicePixelRatio ();
+#else
+  unsigned int dpr = 1;
+#endif
 
-  QBitmap bitmap = pattern.pattern (n).get_bitmap (w, h);
+  QImage image (w * dpr, h * dpr, QImage::Format_RGB32);
+  image.fill (color0.rgb ());
+#if QT_VERSION > 0x050000
+  image.setDevicePixelRatio (dpr);
+#endif
+
+  // TODO include a scaling algorithm in get_bitmap, because it looks small in highDPI screens
+  QBitmap bitmap = pattern.pattern (n).get_bitmap (w * dpr, h * dpr);
   QPainter painter (&image);
   painter.setPen (QPen (color1));
   painter.setBackgroundMode (Qt::TransparentMode);
-  painter.drawPixmap (0, 0, bitmap);
+  painter.drawPixmap (0, 0, w, h, bitmap);
 
   QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
+#if QT_VERSION > 0x050000
+  pixmap.setDevicePixelRatio (dpr);
+#endif
   b->setPixmap (pixmap);
 }
 
@@ -629,16 +642,28 @@ LCPStylePalette::create_pixmap_for_line_style (LCPActiveLabel *b, int n)
   const unsigned int h = 14;
   const unsigned int w = 24;
 
-  QImage image (w, h, QImage::Format_RGB32);
-  image.fill (color0.rgb ());
+#if QT_VERSION > 0x050000
+  unsigned int dpr = devicePixelRatio ();
+#else
+  unsigned int dpr = 1;
+#endif
 
-  QBitmap bitmap = styles.style (n).get_bitmap (w, h);
+  QImage image (dpr * w, dpr * h, QImage::Format_RGB32);
+  image.fill (color0.rgb ());
+#if QT_VERSION > 0x050000
+  image.setDevicePixelRatio (dpr);
+#endif
+
+  QBitmap bitmap = styles.style (n).get_bitmap (dpr * w, dpr * h);
   QPainter painter (&image);
   painter.setPen (QPen (color1));
   painter.setBackgroundMode (Qt::TransparentMode);
-  painter.drawPixmap (0, 0, bitmap);
+  painter.drawPixmap (0, 0, w, h, bitmap);
 
   QPixmap pixmap = QPixmap::fromImage (image); // Qt 4.6.0 workaround
+#if QT_VERSION > 0x050000
+  pixmap.setDevicePixelRatio (dpr);
+#endif
   b->setPixmap (pixmap);
 }
 

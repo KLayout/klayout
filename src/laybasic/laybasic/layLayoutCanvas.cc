@@ -291,8 +291,6 @@ LayoutCanvas::LayoutCanvas (QWidget *parent, lay::LayoutView *view, const char *
 {
 #if QT_VERSION > 0x050000
   m_dpr = devicePixelRatio ();
-#else
-  m_dpr = 1;
 #endif
 
   //  The gamma value used for subsampling: something between 1.8 and 2.2.

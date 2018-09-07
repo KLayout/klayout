@@ -384,6 +384,7 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   m_apply_text_trans = true;
   m_default_text_size = 0.1;
   m_text_font = 0;
+  m_show_markers = true;
   m_no_stipples = false;
   m_stipple_offset = true;
   m_fit_new_cell = true;
@@ -1153,6 +1154,13 @@ LayoutView::configure (const std::string &name, const std::string &value)
     bool flag;
     tl::from_string (value, flag);
     apply_text_trans (flag);
+    return true;
+
+  } else if (name == cfg_markers_visible) {
+
+    bool flag;
+    tl::from_string (value, flag);
+    mp_canvas->set_dismiss_view_objects (! flag);
     return true;
 
   } else if (name == cfg_no_stipple) {
@@ -4923,7 +4931,16 @@ LayoutView::no_stipples (bool f)
   }
 }
   
-void 
+void
+LayoutView::show_markers (bool f)
+{
+  if (m_show_markers != f) {
+    m_show_markers = f;
+    mp_canvas->update_image ();
+  }
+}
+
+void
 LayoutView::text_color (QColor c)
 {
   if (m_text_color != c) {

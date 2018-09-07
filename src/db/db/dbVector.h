@@ -267,6 +267,20 @@ public:
   vector<C> operator*= (long s);
 
   /**
+   *  @brief Division by some divisor.
+   *
+   *  Scaline involves rounding which in our case is simply handled
+   *  with the coord_traits scheme.
+   */
+
+  vector<C> &operator/= (double s);
+
+  /**
+   *  @brief Dividing self by some integer divisor
+   */
+  vector<C> &operator/= (long s);
+
+  /**
    *  @brief The euclidian length 
    */
   distance_type length () const;
@@ -448,6 +462,32 @@ inline vector<C>
 vector<C>::operator* (long s) const
 {
   return vector<C> (m_x * s, m_y * s);
+}
+
+template <class C, typename Number>
+inline vector<C>
+operator/ (const db::vector<C> &p, Number s)
+{
+  double mult = 1.0 / static_cast<double>(s);
+  return vector<C> (p.x () * mult, p.y () * mult);
+}
+
+template <class C>
+inline vector<C> &
+vector<C>::operator/= (double s)
+{
+  double mult = 1.0 / static_cast<double>(s);
+  *this *= mult;
+  return *this;
+}
+
+template <class C>
+inline vector<C> &
+vector<C>::operator/= (long s)
+{
+  double mult = 1.0 / static_cast<double>(s);
+  *this *= mult;
+  return *this;
 }
 
 template <class C>

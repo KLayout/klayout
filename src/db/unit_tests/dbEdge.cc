@@ -514,3 +514,74 @@ TEST(14)
   EXPECT_EQ (e.coincident (db::Edge (db::Point (49, 0), db::Point (200, 0))), false);
 }
 
+//  exact rounding behaviour
+TEST(15)
+{
+  typedef db::coord_traits<db::Coord>::area_type area_type;
+  //  div_exact(a, b, d) computes a*b/d with exact rounding behaviour
+  EXPECT_EQ (db::div_exact (area_type (0), area_type (22), area_type (176)), 0);
+  EXPECT_EQ (db::div_exact (area_type (5), area_type (0), area_type (176)), 0);
+
+  EXPECT_EQ (db::div_exact (area_type (3), area_type (22), area_type (176)), 0);
+  EXPECT_EQ (db::div_exact (area_type (4), area_type (22), area_type (176)), 0);
+  EXPECT_EQ (db::div_exact (area_type (5), area_type (22), area_type (176)), 1);
+  EXPECT_EQ (db::div_exact (area_type (7), area_type (22), area_type (176)), 1);
+  EXPECT_EQ (db::div_exact (area_type (8), area_type (22), area_type (176)), 1);
+  EXPECT_EQ (db::div_exact (area_type (12), area_type (22), area_type (176)), 1);
+  EXPECT_EQ (db::div_exact (area_type (13), area_type (22), area_type (176)), 2);
+
+  EXPECT_EQ (db::div_exact (area_type (3 * 11), area_type (2), area_type (176)), 0);
+  EXPECT_EQ (db::div_exact (area_type (4 * 11), area_type (2), area_type (176)), 0);
+  EXPECT_EQ (db::div_exact (area_type (5 * 11), area_type (2), area_type (176)), 1);
+  EXPECT_EQ (db::div_exact (area_type (7 * 11), area_type (2), area_type (176)), 1);
+  EXPECT_EQ (db::div_exact (area_type (8 * 11), area_type (2), area_type (176)), 1);
+  EXPECT_EQ (db::div_exact (area_type (12 * 11), area_type (2), area_type (176)), 1);
+  EXPECT_EQ (db::div_exact (area_type (13 * 11), area_type (2), area_type (176)), 2);
+
+  EXPECT_EQ (db::div_exact (area_type (-3), area_type (22), area_type (176)), 0);
+  EXPECT_EQ (db::div_exact (area_type (-4), area_type (22), area_type (176)), -1);
+  EXPECT_EQ (db::div_exact (area_type (-5), area_type (22), area_type (176)), -1);
+  EXPECT_EQ (db::div_exact (area_type (-7), area_type (22), area_type (176)), -1);
+  EXPECT_EQ (db::div_exact (area_type (-8), area_type (22), area_type (176)), -1);
+  EXPECT_EQ (db::div_exact (area_type (-12), area_type (22), area_type (176)), -2);
+  EXPECT_EQ (db::div_exact (area_type (-13), area_type (22), area_type (176)), -2);
+
+  EXPECT_EQ (db::div_exact (area_type (-3 * 11), area_type (2), area_type (176)), 0);
+  EXPECT_EQ (db::div_exact (area_type (-4 * 11), area_type (2), area_type (176)), -1);
+  EXPECT_EQ (db::div_exact (area_type (-5 * 11), area_type (2), area_type (176)), -1);
+  EXPECT_EQ (db::div_exact (area_type (-7 * 11), area_type (2), area_type (176)), -1);
+  EXPECT_EQ (db::div_exact (area_type (-8 * 11), area_type (2), area_type (176)), -1);
+  EXPECT_EQ (db::div_exact (area_type (-12 * 11), area_type (2), area_type (176)), -2);
+  EXPECT_EQ (db::div_exact (area_type (-13 * 11), area_type (2), area_type (176)), -2);
+
+  area_type f = 790014345;
+
+  EXPECT_EQ (db::div_exact (area_type (4), area_type (22) * f, area_type (176) * f), 0);
+  EXPECT_EQ (db::div_exact (area_type (5), area_type (22) * f, area_type (176) * f), 1);
+  EXPECT_EQ (db::div_exact (area_type (8), area_type (22) * f, area_type (176) * f), 1);
+
+  EXPECT_EQ (db::div_exact (area_type (-3), area_type (22) * f, area_type (176) * f), 0);
+  EXPECT_EQ (db::div_exact (area_type (-4), area_type (22) * f, area_type (176) * f), -1);
+  EXPECT_EQ (db::div_exact (area_type (-5), area_type (22) * f, area_type (176) * f), -1);
+  EXPECT_EQ (db::div_exact (area_type (-8), area_type (22) * f, area_type (176) * f), -1);
+
+  EXPECT_EQ (db::div_exact (area_type (4) * 100000000, area_type (22) * f, area_type (176) * f), 50000000);
+  EXPECT_EQ (db::div_exact (area_type (5) * 100000000, area_type (22) * f, area_type (176) * f), 62500000);
+  EXPECT_EQ (db::div_exact (area_type (-4) * 100000000, area_type (22) * f, area_type (176) * f), -50000000);
+  EXPECT_EQ (db::div_exact (area_type (-5) * 100000000, area_type (22) * f, area_type (176) * f), -62500000);
+
+  EXPECT_EQ (db::div_exact (1000000004, area_type (22) * f, area_type (176) * f), 125000000);
+  EXPECT_EQ (db::div_exact (1000000005, area_type (22) * f, area_type (176) * f), 125000001);
+  EXPECT_EQ (db::div_exact (-1000000003, area_type (22) * f, area_type (176) * f), -125000000);
+  EXPECT_EQ (db::div_exact (-1000000004, area_type (22) * f, area_type (176) * f), -125000001);
+  EXPECT_EQ (db::div_exact (-1000000005, area_type (22) * f, area_type (176) * f), -125000001);
+
+  db::Edge e1 (db::Point (3, -3), db::Point (-8, -1));
+  db::Edge e2 (db::Point (-4, -2), db::Point (13, -4));
+
+  std::pair<bool, db::Point> ip;
+  ip = e1.intersect_point (e2);
+  EXPECT_EQ (ip.second.to_string ().c_str (), "0,-3");
+  ip = e2.intersect_point (e1);
+  EXPECT_EQ (ip.second.to_string ().c_str (), "0,-3");
+}

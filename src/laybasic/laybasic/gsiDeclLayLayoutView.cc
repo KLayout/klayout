@@ -197,13 +197,13 @@ static unsigned int create_rdb (lay::LayoutView *view, const std::string &name)
 }
 
 //  this binding returns a const pointer which is not converted into a copy by RBA
-static const lay::LayerPropertiesNode *insert_layer1 (lay::LayoutView *view, const lay::LayerPropertiesConstIterator &iter, const lay::LayerProperties &props)
+static lay::LayerPropertiesNodeRef insert_layer1 (lay::LayoutView *view, const lay::LayerPropertiesConstIterator &iter, const lay::LayerProperties &props)
 {
   const lay::LayerPropertiesNode *lp = dynamic_cast<const lay::LayerPropertiesNode *> (&props);
   if (lp) {
-    return &view->insert_layer (iter, *lp);
+    return lay::LayerPropertiesNodeRef (lay::LayerPropertiesConstIterator (&view->insert_layer (iter, *lp)));
   } else {
-    return &view->insert_layer (iter, props);
+    return lay::LayerPropertiesNodeRef (lay::LayerPropertiesConstIterator (&view->insert_layer (iter, props)));
   }
 }
 
@@ -227,13 +227,13 @@ static void replace_layer_node1 (lay::LayoutView *view, const lay::LayerProperti
   }
 }
 
-static const lay::LayerPropertiesNode *insert_layer2 (lay::LayoutView *view, unsigned int index, const lay::LayerPropertiesConstIterator &iter, const lay::LayerProperties &props)
+static lay::LayerPropertiesNodeRef insert_layer2 (lay::LayoutView *view, unsigned int index, const lay::LayerPropertiesConstIterator &iter, const lay::LayerProperties &props)
 {
   const lay::LayerPropertiesNode *lp = dynamic_cast<const lay::LayerPropertiesNode *> (&props);
   if (lp) {
-    return &view->insert_layer (index, iter, *lp);
+    return lay::LayerPropertiesNodeRef (lay::LayerPropertiesConstIterator (&view->insert_layer (index, iter, *lp)));
   } else {
-    return &view->insert_layer (index, iter, props);
+    return lay::LayerPropertiesNodeRef (lay::LayerPropertiesConstIterator (&view->insert_layer (index, iter, props)));
   }
 }
 
@@ -396,10 +396,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "layout or the cell views and the LayoutView configuration. This is usually done automatically. "
     "For rare cases, where this is not the case, this method is provided.\n"
   ) +
-  gsi::method ("title=|#set_title", &lay::LayoutView::set_title,
+  gsi::method ("title=|#set_title", &lay::LayoutView::set_title, gsi::arg ("title"),
     "@brief Sets the title of the view\n"
     "\n"
-    "@args title\n"
     "@param title The title string to use\n"
     "\n"
     "Override the standard title of the view indicating the file names loaded by "
@@ -419,25 +418,21 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "The title string is either a string composed of the file names loaded (in some "
     "\"readable\" manner) or a customized title string set by \\set_title."
   ) +
-  gsi::method ("save_layer_props", &lay::LayoutView::save_layer_props,
+  gsi::method ("save_layer_props", &lay::LayoutView::save_layer_props, gsi::arg ("fn"),
     "@brief Saves the layer properties\n"
-    "\n"
-    "@args fn\n"
     "\n"
     "Save the layer properties to the file given in \"fn\""
   ) +
-  gsi::method ("load_layer_props", (void (lay::LayoutView::*)(const std::string &)) &lay::LayoutView::load_layer_props,
+  gsi::method ("load_layer_props", (void (lay::LayoutView::*)(const std::string &)) &lay::LayoutView::load_layer_props, gsi::arg ("fn"),
     "@brief Loads the layer properties\n"
     "\n"
-    "@args fn\n"
     "@param fn The file name of the .lyp file to load\n"
     "\n"
     "Load the layer properties from the file given in \"fn\""
   ) +
-  gsi::method ("load_layer_props", (void (lay::LayoutView::*)(const std::string &, bool)) &lay::LayoutView::load_layer_props,
+  gsi::method ("load_layer_props", (void (lay::LayoutView::*)(const std::string &, bool)) &lay::LayoutView::load_layer_props, gsi::arg ("fn"), gsi::arg ("add_default"),
     "@brief Loads the layer properties with options\n"
     "\n"
-    "@args fn, add_default\n"
     "@param fn The file name of the .lyp file to load\n"
     "@param add_default If true, default layers will be added for each other layer in the layout\n"
     "\n"
@@ -447,10 +442,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This variant has been added on version 0.21."
   ) +
-  gsi::method ("load_layer_props", (void (lay::LayoutView::*)(const std::string &, int, bool)) &lay::LayoutView::load_layer_props,
+  gsi::method ("load_layer_props", (void (lay::LayoutView::*)(const std::string &, int, bool)) &lay::LayoutView::load_layer_props, gsi::arg ("fn"), gsi::arg ("cv_index"), gsi::arg ("add_default"),
     "@brief Loads the layer properties with options\n"
     "\n"
-    "@args fn, cv_index, add_default\n"
     "@param fn The file name of the .lyp file to load\n"
     "@param cv_index See description text\n"
     "@param add_default If true, default layers will be added for each other layer in the layout\n"
@@ -466,10 +460,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This variant has been added on version 0.21."
   ) +
-  gsi::method ("min_hier_levels=", &lay::LayoutView::set_min_hier_levels,
+  gsi::method ("min_hier_levels=", &lay::LayoutView::set_min_hier_levels, gsi::arg ("level"),
     "@brief Sets the minimum hierarchy level at which to display geometries\n"
     "\n"
-    "@args level\n"
     "@param level The minimum level above which to display something\n"
     "\n"
     "This methods allows to set the minimum hierarchy level above which to display geometries."
@@ -480,10 +473,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "@return The minimum level at which to display geometries"
   ) +
-  gsi::method ("max_hier_levels=", &lay::LayoutView::set_max_hier_levels,
+  gsi::method ("max_hier_levels=", &lay::LayoutView::set_max_hier_levels, gsi::arg ("level"),
     "@brief Sets the maximum hierarchy level up to which to display geometries\n"
     "\n"
-    "@args level\n"
     "@param level The maximum level below which to display something\n"
     "\n"
     "This methods allows to set the maximum hierarchy below which to display geometries."
@@ -494,10 +486,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "@return The maximum level up to which to display geometries"
   ) +
-  gsi::method ("enable_edits", &lay::LayoutView::enable_edits,
+  gsi::method ("enable_edits", &lay::LayoutView::enable_edits, gsi::arg ("enable"),
     "@brief Enables or disables edits\n"
     "\n"
-    "@args enable\n"
     "@param enable Enable edits if set to true\n"
     "\n"
     "This method allows putting the view into read-only mode by disabling all edit "
@@ -508,17 +499,13 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "In 0.25, this method has been moved from MainWindow to LayoutView.\n"
   ) +
-  gsi::method ("reload_layout", &lay::LayoutView::reload_layout,
+  gsi::method ("reload_layout", &lay::LayoutView::reload_layout, gsi::arg ("cv"),
     "@brief Reloads the given cellview\n"
-    "\n"
-    "@args cv\n"
     "\n"
     "@param cv The index of the cellview to reload"
   ) + 
-  gsi::method ("create_layout", (unsigned int (lay::LayoutView::*) (bool)) &lay::LayoutView::create_layout,
+  gsi::method ("create_layout", (unsigned int (lay::LayoutView::*) (bool)) &lay::LayoutView::create_layout, gsi::arg ("add_cellview"),
     "@brief Creates a new, empty layout\n"
-    "\n"
-    "@args add_cellview\n"
     "\n"
     "The add_cellview parameter controls whether to create a new cellview (true)\n"
     "or clear all cellviews before (false).\n"
@@ -527,10 +514,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "@return The index of the cellview created.\n"
   ) +
-  gsi::method ("create_layout", (unsigned int (lay::LayoutView::*) (const std::string &, bool)) &lay::LayoutView::create_layout,
+  gsi::method ("create_layout", (unsigned int (lay::LayoutView::*) (const std::string &, bool)) &lay::LayoutView::create_layout, gsi::arg ("tech"), gsi::arg ("add_cellview"),
     "@brief Create a new, empty layout and associate it with the given technology\n"
-    "\n"
-    "@args tech,add_cellview\n"
     "\n"
     "The add_cellview parameter controls whether to create a new cellview (true)\n"
     "or clear all cellviews before (false).\n"
@@ -539,10 +524,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This variant has been introduced in version 0.22.\n"
   ) +
-  gsi::method ("create_layout", (unsigned int (lay::LayoutView::*) (const std::string &, bool, bool)) &lay::LayoutView::create_layout,
+  gsi::method ("create_layout", (unsigned int (lay::LayoutView::*) (const std::string &, bool, bool)) &lay::LayoutView::create_layout, gsi::arg ("tech"), gsi::arg ("add_cellview"), gsi::arg ("init_layers"),
     "@brief Create a new, empty layout and associate it with the given technology\n"
-    "\n"
-    "@args tech,add_cellview,init_layers\n"
     "\n"
     "The add_cellview parameter controls whether to create a new cellview (true)\n"
     "or clear all cellviews before (false). This variant also allows to control whether the layer properties are\n"
@@ -552,9 +535,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This variant has been introduced in version 0.22.\n"
   ) +
-  gsi::method_ext ("show_layout", &show_layout1,
+  gsi::method_ext ("show_layout", &show_layout1, gsi::arg ("layout"), gsi::arg ("add_cellview"),
     "@brief Shows an existing layout in the view\n"
-    "@args layout, add_cellview\n"
     "\n"
     "Shows the given layout in the view. If add_cellview is true, the new layout is added to the list of "
     "cellviews in the view.\n"
@@ -566,9 +548,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +
-  gsi::method_ext ("show_layout", &show_layout2,
+  gsi::method_ext ("show_layout", &show_layout2, gsi::arg ("layout"), gsi::arg ("tech"), gsi::arg ("add_cellview"),
     "@brief Shows an existing layout in the view\n"
-    "@args layout, tech, add_cellview\n"
     "\n"
     "Shows the given layout in the view. If add_cellview is true, the new layout is added to the list of "
     "cellviews in the view.\n"
@@ -583,9 +564,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +
-  gsi::method_ext ("show_layout", &show_layout3,
+  gsi::method_ext ("show_layout", &show_layout3, gsi::arg ("layout"), gsi::arg ("tech"), gsi::arg ("add_cellview"), gsi::arg ("init_layers"),
     "@brief Shows an existing layout in the view\n"
-    "@args layout, tech, add_cellview, init_layers\n"
     "\n"
     "Shows the given layout in the view. If add_cellview is true, the new layout is added to the list of "
     "cellviews in the view.\n"
@@ -602,27 +582,21 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in version 0.22.\n"
   ) +
-  gsi::method ("erase_cellview", &lay::LayoutView::erase_cellview,
+  gsi::method ("erase_cellview", &lay::LayoutView::erase_cellview, gsi::arg ("index"),
     "@brief Erases the cellview with the given index\n"
-    "\n"
-    "@args index\n"
     "\n"
     "This closes the given cellview and unloads the layout associated with it, unless referred to by another cellview."
   ) +
-  gsi::method ("rename_cellview", &lay::LayoutView::rename_cellview,
+  gsi::method ("rename_cellview", &lay::LayoutView::rename_cellview, gsi::arg ("name"), gsi::arg ("index"),
     "@brief Renames the cellview with the given index\n"
-    "\n"
-    "@args name, index\n"
     "\n"
     "If the name is not unique, a unique name will be constructed from the name given.\n"
     "The name may be different from the filename but is associated with the layout object.\n"
     "If a layout is shared between multiple cellviews (which may happen due to a clone of the layout view\n"
     "for example), all cellviews are renamed.\n"
   ) +
-  gsi::method ("load_layout", (unsigned int (lay::LayoutView::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, bool)) &lay::LayoutView::load_layout,
+  gsi::method ("load_layout", (unsigned int (lay::LayoutView::*) (const std::string &, const db::LoadLayoutOptions &, const std::string &, bool)) &lay::LayoutView::load_layout, gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("technology"), gsi::arg ("add_cellview"),
     "@brief Loads a (new) file into the layout view with the given technology\n"
-    "\n"
-    "@args filename, options, technology, add_cellview\n"
     "\n"
     "Loads the file given by the \"filename\" parameter and associates it with the given technology.\n"
     "The options specify various options for reading the file.\n"
@@ -633,10 +607,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This version has been introduced in version 0.22.\n"
   ) +
-  gsi::method ("load_layout", (unsigned int (lay::LayoutView::*) (const std::string &, const db::LoadLayoutOptions &, bool)) &lay::LayoutView::load_layout,
+  gsi::method ("load_layout", (unsigned int (lay::LayoutView::*) (const std::string &, const db::LoadLayoutOptions &, bool)) &lay::LayoutView::load_layout, gsi::arg ("filename"), gsi::arg ("options"), gsi::arg ("add_cellview"),
     "@brief Loads a (new) file into the layout view\n"
-    "\n"
-    "@args filename, options, add_cellview\n"
     "\n"
     "Loads the file given by the \"filename\" parameter.\n"
     "The options specify various options for reading the file.\n"
@@ -647,10 +619,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in version 0.18.\n"
   ) +
-  gsi::method ("load_layout", (unsigned int (lay::LayoutView::*) (const std::string &, const std::string &, bool)) &lay::LayoutView::load_layout,
+  gsi::method ("load_layout", (unsigned int (lay::LayoutView::*) (const std::string &, const std::string &, bool)) &lay::LayoutView::load_layout, gsi::arg ("filename"), gsi::arg ("technology"), gsi::arg ("add_cellview"),
     "@brief Loads a (new) file into the layout view with the given technology\n"
-    "\n"
-    "@args filename, technology, add_cellview\n"
     "\n"
     "Loads the file given by the \"filename\" parameter and associates it with the given technology.\n"
     "The add_cellview param controls whether to create a new cellview (true)\n"
@@ -660,10 +630,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This version has been introduced in version 0.22.\n"
   ) +
-  gsi::method ("load_layout", (unsigned int (lay::LayoutView::*) (const std::string &filename, bool add_cellview)) &lay::LayoutView::load_layout,
+  gsi::method ("load_layout", (unsigned int (lay::LayoutView::*) (const std::string &filename, bool add_cellview)) &lay::LayoutView::load_layout, gsi::arg ("filename"), gsi::arg ("add_cellview"),
     "@brief Loads a (new) file into the layout view\n"
-    "\n"
-    "@args filename, add_cellview\n"
     "\n"
     "Loads the file given by the \"filename\" parameter.\n"
     "The add_cellview param controls whether to create a new cellview (true)\n"
@@ -683,18 +651,15 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
   gsi::method ("active_cellview_index", &lay::LayoutView::active_cellview_index,
     "@brief Gets the index of the active cellview (shown in hierarchy browser)\n"
   ) +
-  gsi::method ("active_setview_index=|#set_active_cellview_index", &lay::LayoutView::set_active_cellview_index,
+  gsi::method ("active_setview_index=|#set_active_cellview_index", &lay::LayoutView::set_active_cellview_index, gsi::arg ("index"),
     "@brief Makes the cellview with the given index the active one (shown in hierarchy browser)\n"
-    "@args index\n"
     "See \\active_cellview_index.\n"
     "\n"
     "This method has been renamed from set_active_cellview_index to active_cellview_index= in version 0.25. "
     "The original name is still available, but is deprecated."
   ) +
-  gsi::method_ext ("selected_cells_paths", &selected_cells_paths,
+  gsi::method_ext ("selected_cells_paths", &selected_cells_paths, gsi::arg ("cv_index"),
     "@brief Gets the paths of the selected cells\n"
-    "\n"
-    "@args cv_index\n"
     "\n"
     "Gets a list of cell paths to the cells selected in the cellview given by \\cv_index. "
     "The \"selected cells\" are the ones selected in the cell list or cell tree. This is not the \"current cell\" "
@@ -704,10 +669,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has be introduced in version 0.25.\n"
   ) +
-  gsi::method ("#get_current_cell_path", &lay::LayoutView::get_current_cell_path,
+  gsi::method ("#get_current_cell_path", &lay::LayoutView::get_current_cell_path, gsi::arg ("cv_index"),
     "@brief Gets the cell path of the current cell\n"
-    "\n"
-    "@args cv_index\n"
     "\n"
     "The current cell is the one highlighted in the browser with the focus rectangle. The \n"
     "current path is returned for the cellview given by cv_index.\n"
@@ -717,10 +680,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method is was deprecated in version 0.25 since from then, the \\CellView object can be used to obtain an manipulate the selected cell."
   ) +
-  gsi::method ("#set_current_cell_path", (void (lay::LayoutView::*) (int, const lay::LayoutView::cell_path_type &)) &lay::LayoutView::set_current_cell_path,
+  gsi::method ("#set_current_cell_path", (void (lay::LayoutView::*) (int, const lay::LayoutView::cell_path_type &)) &lay::LayoutView::set_current_cell_path, gsi::arg ("cv_index"), gsi::arg ("cell_path"),
     "@brief Sets the path to the current cell\n"
-    "\n"
-    "@args cv_index\n"
     "\n"
     "The current cell is the one highlighted in the browser with the focus rectangle. The\n"
     "cell given by the path is hightlighted and scrolled into view.\n"
@@ -734,10 +695,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
   gsi::method ("cellviews", &lay::LayoutView::cellviews,
     "@brief Gets the number of cellviews\n"
   ) + 
-  gsi::method ("cellview", &lay::LayoutView::cellview_ref,
+  gsi::method ("cellview", &lay::LayoutView::cellview_ref, gsi::arg ("cv_index"),
     "@brief Gets the cellview object for a given index\n"
-    "\n"
-    "@args cv_index\n"
     "\n"
     "@param cv_index The cellview index for which to get the object for\n"
     "\n"
@@ -752,10 +711,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
-  gsi::method ("zoom_box", &lay::LayoutView::zoom_box,
+  gsi::method ("zoom_box", &lay::LayoutView::zoom_box, gsi::arg ("box"),
     "@brief Sets the viewport to the given box\n"
     "\n"
-    "@args box\n"
     "@param box The box to which to set the view in micron coordinates\n"
   ) +
   gsi::method ("zoom_in", &lay::LayoutView::zoom_in,
@@ -776,10 +734,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
   gsi::method ("pan_right", &lay::LayoutView::pan_right,
     "@brief Pans to the right"
   ) +
-  gsi::method ("pan_center", &lay::LayoutView::pan_center,
+  gsi::method ("pan_center", &lay::LayoutView::pan_center, gsi::arg ("p"),
     "@brief Pans to the given point\n"
-    "\n"
-    "@args p\n"
     "\n"
     "The window is positioned such that \"p\" becomes the new center"
   ) +
@@ -801,10 +757,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@brief Return the viewport height in pixels\n"
     "This method was introduced in version 0.18.\n"
   ) +
-  gsi::method ("bookmark_view", &lay::LayoutView::bookmark_view,
+  gsi::method ("bookmark_view", &lay::LayoutView::bookmark_view, gsi::arg ("name"),
     "@brief Bookmarks the current view under the given name\n"
-    "\n"
-    "@args name\n"
     "\n"
     "@param name The name under which to bookmark the current state"
   ) +
@@ -816,9 +770,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@brief Removes unused layers from layer list\n"
     "This method was introduced in version 0.19.\n"
   ) +
-  gsi::method ("init_layer_properties", (void (lay::LayoutView::*) (lay::LayerProperties &) const) &lay::LayoutView::init_layer_properties,
+  gsi::method ("init_layer_properties", (void (lay::LayoutView::*) (lay::LayerProperties &) const) &lay::LayoutView::init_layer_properties, gsi::arg ("props"),
     "@brief Fills the layer properties for a new layer\n"
-    "@args props\n"
     "\n"
     "This method initializes a layer properties object's color and stipples according to "
     "the defaults for the given layer source specification. The layer's source must be set already "
@@ -839,10 +792,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@brief Stops redraw thread and close any browsers\n"
     "This method usually does not need to be called explicitly. The redraw thread is stopped automatically."
   ) +
-  gsi::method ("#select_cell_path", (void (lay::LayoutView::*) (const lay::LayoutView::cell_path_type &, int)) &lay::LayoutView::select_cell,
+  gsi::method ("#select_cell_path", (void (lay::LayoutView::*) (const lay::LayoutView::cell_path_type &, int)) &lay::LayoutView::select_cell, gsi::arg ("cell_index"), gsi::arg ("cv_index"),
     "@brief Selects a cell by cell index for a certain cell view\n"
-    "\n"
-    "@args cell_index, cv_index\n"
     "\n"
     "Select the current (top) cell by specifying a cell indexand the cellview index for which this cell should become the currently shown one. The path to the cell is constructed by "
     "selecting one that leads to a top cell.\n"
@@ -851,10 +802,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method is was deprecated in version 0.25 since from then, the \\CellView object can be used to obtain an manipulate the selected cell."
   ) +
-  gsi::method ("#select_cell", (void (lay::LayoutView::*) (lay::LayoutView::cell_index_type, int)) &lay::LayoutView::select_cell,
+  gsi::method ("#select_cell", (void (lay::LayoutView::*) (lay::LayoutView::cell_index_type, int)) &lay::LayoutView::select_cell, gsi::arg ("cell_index"), gsi::arg ("cv_index"),
     "@brief Selects a cell by index for a certain cell view\n"
-    "\n"
-    "@args cell_index, cv_index\n"
     "\n"
     "Select the current (top) cell by specifying a path (a list of cell indices from top to "
     "the actual cell) and the cellview index for which this cell should become the currently "
@@ -864,9 +813,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method is was deprecated in version 0.25 since from then, the \\CellView object can be used to obtain an manipulate the selected cell."
   ) +
-  gsi::method ("descend", &lay::LayoutView::descend,
+  gsi::method ("descend", &lay::LayoutView::descend, gsi::arg ("path"), gsi::arg ("index"),
     "@brief Descends further into the hierarchy.\n"
-    "@args path, index\n"
+    "\n"
     "Adds the given path (given as an array of InstElement objects) to the specific path of the "
     "cellview with the given index. In effect, the cell addressed by the terminal of the new path "
     "components can be shown in the context of the upper cells, if the minimum hierarchy level is "
@@ -874,28 +823,22 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "The path is assumed to originate from the current cell and contain specific instances sorted from "
     "top to bottom."
   ) +
-  gsi::method ("ascend", &lay::LayoutView::ascend,
+  gsi::method ("ascend", &lay::LayoutView::ascend, gsi::arg ("index"),
     "@brief Ascends upwards in the hierarchy.\n"
-    "@args index\n"
+    "\n"
     "Removes one element from the specific path of the cellview with the given index. Returns the element "
     "removed."
   ) +
-  gsi::method ("is_cell_hidden?", &lay::LayoutView::is_cell_hidden,
+  gsi::method ("is_cell_hidden?", &lay::LayoutView::is_cell_hidden, gsi::arg ("cell_index"), gsi::arg ("cv_index"),
     "@brief Returns true, if the cell is hidden\n"
-    "\n"
-    "@args cell_index, cv_index\n"
     "\n"
     "@return True, if the cell with \"cell_index\" is hidden for the cellview \"cv_index\""
   ) +
-  gsi::method ("hide_cell", &lay::LayoutView::hide_cell,
+  gsi::method ("hide_cell", &lay::LayoutView::hide_cell, gsi::arg ("cell_index"), gsi::arg ("cv_index"),
     "@brief Hides the given cell for the given cellview\n"
-    "\n"
-    "@args cell_index, cv_index\n"
   ) +
-  gsi::method ("show_cell", &lay::LayoutView::show_cell,
+  gsi::method ("show_cell", &lay::LayoutView::show_cell, gsi::arg ("cell_index"), gsi::arg ("cv_index"),
     "@brief Shows the given cell for the given cellview (cancel effect of \\hide_cell)\n"
-    "\n"
-    "@args cell_index, cv_index\n"
   ) +
   gsi::method ("show_all_cells", (void (lay::LayoutView::*) ()) &lay::LayoutView::show_all_cells,
     "@brief Makes all cells shown (cancel effects of \\hide_cell)"
@@ -929,20 +872,18 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "for the application to guarantee this condition. The image will have the size of the viewport "
     "showing the current layout."
   ) +
-  gsi::method ("get_image", &lay::LayoutView::get_image,
+  gsi::method ("get_image", &lay::LayoutView::get_image, gsi::arg ("width"), gsi::arg ("height"),
     "@brief Gets the layout image as a \\QImage\n"
     "\n"
-    "@args width, height\n"
     "@param width The width of the image to render in pixel.\n"
     "@param height The height of the image to render in pixel.\n"
     "\n"
     "The image contains the current scene (layout, annotations etc.).\n"
     "The image is drawn synchroneously with the given width and height. Drawing may take some time. "
   ) +
-  gsi::method_ext ("get_image_with_options", &get_image_with_options,
+  gsi::method_ext ("get_image_with_options", &get_image_with_options, gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("oversampling"), gsi::arg ("resolution"), gsi::arg ("target"), gsi::arg ("monochrome"),
     "@brief Gets the layout image as a \\QImage (with options)\n"
     "\n"
-    "@args width, height, linewidth, oversampling, resolution, target, monochrome\n"
     "@param width The width of the image to render in pixel.\n"
     "@param height The height of the image to render in pixel.\n"
     "@param linewidth The width of a line in pixels (usually 1) or 0 for default.\n"
@@ -959,10 +900,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "This method has been introduced in 0.23.10.\n"
   ) +
 #endif
-  gsi::method ("save_screenshot", &lay::LayoutView::save_screenshot,
+  gsi::method ("save_screenshot", &lay::LayoutView::save_screenshot, gsi::arg ("filename"),
     "@brief Saves a screenshot to the given file\n"
     "\n"
-    "@args filename\n"
     "@param filename The file to which to write the screenshot to.\n"
     "\n"
     "The screenshot is written as a PNG file to the given file. "
@@ -970,10 +910,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "for the application to guarantee this condition. The image will have the size of the viewport "
     "showing the current layout."
   ) +
-  gsi::method ("save_image", &lay::LayoutView::save_image,
+  gsi::method ("save_image", &lay::LayoutView::save_image, gsi::arg ("filename"), gsi::arg ("width"), gsi::arg ("height"),
     "@brief Saves the layout as an image to the given file\n"
     "\n"
-    "@args filename, width, height\n"
     "@param filename The file to which to write the screenshot to.\n"
     "@param width The width of the image to render in pixel.\n"
     "@param height The height of the image to render in pixel.\n"
@@ -982,10 +921,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "The image is written as a PNG file to the given file. "
     "The image is drawn synchroneously with the given width and height. Drawing may take some time. "
   ) +
-  gsi::method_ext ("save_image_with_options", &save_image_with_options,
+  gsi::method_ext ("save_image_with_options", &save_image_with_options, gsi::arg ("filename"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("linewidth"), gsi::arg ("oversampling"), gsi::arg ("resolution"), gsi::arg ("target"), gsi::arg ("monochrome"),
     "@brief Saves the layout as an image to the given file (with options)\n"
     "\n"
-    "@args filename, width, height, linewidth, oversampling, resolution, target, monochrome\n"
     "@param filename The file to which to write the screenshot to.\n"
     "@param width The width of the image to render in pixel.\n"
     "@param height The height of the image to render in pixel.\n"
@@ -1002,10 +940,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in 0.23.10.\n"
   ) +
-  gsi::method_ext ("#save_as", &save_as2,
+  gsi::method_ext ("#save_as", &save_as2, gsi::arg ("index"), gsi::arg ("filename"), gsi::arg ("gzip"), gsi::arg ("options"),
     "@brief Saves a layout to the given stream file\n"
     "\n"
-    "@args index, filename, gzip, options\n"
     "@param index The cellview index of the layout to save.\n"
     "@param filename The file to write.\n"
     "@param gzip Ignored.\n"
@@ -1019,10 +956,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "This method is deprecated starting from version 0.23. The compression mode is "
     "determined from the file name automatically and the \\gzip parameter is ignored.\n"
   ) +
-  gsi::method_ext ("save_as", &save_as1,
+  gsi::method_ext ("save_as", &save_as1, gsi::arg ("index"), gsi::arg ("filename"), gsi::arg ("options"),
     "@brief Saves a layout to the given stream file\n"
     "\n"
-    "@args index, filename, options\n"
     "@param index The cellview index of the layout to save.\n"
     "@param filename The file to write.\n"
     "@param options Writer options.\n"
@@ -1035,16 +971,14 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "If the file name ends with a suffix \".gz\" or \".gzip\", the file is compressed with the zlib "
     "algorithm.\n"
   ) +
-  gsi::method ("set_layer_properties", (void (lay::LayoutView::*) (const lay::LayerPropertiesConstIterator &, const lay::LayerProperties &)) &lay::LayoutView::set_properties,
+  gsi::method ("set_layer_properties", (void (lay::LayoutView::*) (const lay::LayerPropertiesConstIterator &, const lay::LayerProperties &)) &lay::LayoutView::set_properties, gsi::arg ("iter"), gsi::arg ("props"),
     "@brief Sets the layer properties of the layer pointed to by the iterator\n"
-    "@args iter, props\n"
     "\n"
     "This method replaces the layer properties of the element pointed to by \"iter\" by the properties "
     "given by \"props\". It will not change the hierarchy but just the properties of the given node."
   ) +
-  gsi::method ("set_layer_properties", (void (lay::LayoutView::*) (unsigned int index, const lay::LayerPropertiesConstIterator &, const lay::LayerProperties &)) &lay::LayoutView::set_properties,
+  gsi::method ("set_layer_properties", (void (lay::LayoutView::*) (unsigned int index, const lay::LayerPropertiesConstIterator &, const lay::LayerProperties &)) &lay::LayoutView::set_properties, gsi::arg ("index"), gsi::arg ("iter"), gsi::arg ("props"),
     "@brief Sets the layer properties of the layer pointed to by the iterator\n"
-    "@args index, iter, props\n"
     "\n"
     "This method replaces the layer properties of the element pointed to by \"iter\" by the properties "
     "given by \"props\" in the tab given by \"index\". It will not change the hierarchy but just the properties of the given node."
@@ -1059,34 +993,30 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method was introduced in version 0.21.\n"
   ) +
-  gsi::method ("expand_layer_properties", (void (lay::LayoutView::*) (unsigned int)) &lay::LayoutView::expand_properties,
+  gsi::method ("expand_layer_properties", (void (lay::LayoutView::*) (unsigned int)) &lay::LayoutView::expand_properties, gsi::arg ("index"),
     "@brief Expands the layer properties for the given tab\n"
-    "@args index\n"
     "\n"
     "This method will expand all wildcard specifications in the layer properties by iterating over the specified objects (i.e. layers, cellviews) and "
     "by replacing default colors and stipples by the ones specified with the palettes.\n"
     "\n"
     "This method was introduced in version 0.21.\n"
   ) +
-  gsi::method_ext ("replace_layer_node", &replace_layer_node1,
+  gsi::method_ext ("replace_layer_node", &replace_layer_node1, gsi::arg ("iter"), gsi::arg ("node"),
     "@brief Replaces the layer node at the position given by \"iter\" with a new one\n"
-    "@args iter, node\n"
     "\n"
     "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
     "object can contain a hierarchy of further nodes."
   ) +
-  gsi::method_ext ("replace_layer_node", &replace_layer_node2,
+  gsi::method_ext ("replace_layer_node", &replace_layer_node2, gsi::arg ("index"), gsi::arg ("iter"), gsi::arg ("node"),
     "@brief Replaces the layer node at the position given by \"iter\" with a new one\n"
-    "@args index, iter, node\n"
     "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
     "\n"
     "This method has been introduced in version 0.21.\n"
     "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
     "object can contain a hierarchy of further nodes."
   ) +
-  gsi::method_ext ("insert_layer", &insert_layer1,
+  gsi::method_ext ("insert_layer", &insert_layer1, gsi::arg ("iter"), gsi::arg ("node", lay::LayerProperties (), "LayerProperties()"),
     "@brief Inserts the given layer properties node into the list before the given position\n"
-    "@args iter, node\n"
     "\n"
     "This method inserts the new properties node before the position given by \"iter\" and returns "
     "a const reference to the element created. The iterator that specified the position will remain valid "
@@ -1094,11 +1024,12 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "To add children to the node inserted, use iter.last_child as insertion point for the next insert operations.\n"
     "\n"
     "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
-    "object can contain a hierarchy of further nodes."
+    "object can contain a hierarchy of further nodes.\n"
+    "Since version 0.26 the node parameter is optional and the "
+    "reference returned by this method can be used to set the properties of the new node."
   ) +
-  gsi::method_ext ("insert_layer", &insert_layer2,
+  gsi::method_ext ("insert_layer", &insert_layer2, gsi::arg ("index"), gsi::arg ("iter"), gsi::arg ("node", lay::LayerProperties (), "LayerProperties()"),
     "@brief Inserts the given layer properties node into the list before the given position\n"
-    "@args index, iter, node\n"
     "\n"
     "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
     "This method inserts the new properties node before the position given by \"iter\" and returns "
@@ -1107,9 +1038,11 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in version 0.21.\n"
     "Since version 0.22, this method accepts LayerProperties and LayerPropertiesNode objects. A LayerPropertiesNode "
-    "object can contain a hierarchy of further nodes."
+    "object can contain a hierarchy of further nodes.\n"
+    "Since version 0.26 the node parameter is optional and the "
+    "reference returned by this method can be used to set the properties of the new node."
   ) +
-  gsi::method_ext ("delete_layers", &delete_layers1,
+  gsi::method_ext ("delete_layers", &delete_layers1, gsi::arg ("iterators"),
     "@brief Deletes the layer properties nodes specified by the iterator\n"
     "@args iterators\n"
     "\n"
@@ -1118,25 +1051,22 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been added in version 0.22.\n"
   ) +
-  gsi::method_ext ("delete_layers", &delete_layers2,
+  gsi::method_ext ("delete_layers", &delete_layers2, gsi::arg ("index"), gsi::arg ("iterators"),
     "@brief Deletes the layer properties nodes specified by the iterator\n"
-    "@args index, iterators\n"
     "\n"
     "This method deletes the nodes specifies by the iterators. This method is the most convenient way to "
     "delete multiple entries.\n"
     "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
     "This method has been introduced in version 0.22.\n"
   ) +
-  gsi::method ("delete_layer", (void (lay::LayoutView::*) (lay::LayerPropertiesConstIterator &iter)) &lay::LayoutView::delete_layer,
+  gsi::method ("delete_layer", (void (lay::LayoutView::*) (lay::LayerPropertiesConstIterator &iter)) &lay::LayoutView::delete_layer, gsi::arg ("iter"),
     "@brief Deletes the layer properties node specified by the iterator\n"
-    "@args iter\n"
     "\n"
     "This method deletes the object that the iterator points to and invalidates\n"
     "the iterator since the object that the iterator points to is no longer valid.\n"
   ) +
-  gsi::method ("delete_layer", (void (lay::LayoutView::*) (unsigned int index, lay::LayerPropertiesConstIterator &iter)) &lay::LayoutView::delete_layer,
+  gsi::method ("delete_layer", (void (lay::LayoutView::*) (unsigned int index, lay::LayerPropertiesConstIterator &iter)) &lay::LayoutView::delete_layer, gsi::arg ("index"), gsi::arg ("iter"),
     "@brief Deletes the layer properties node specified by the iterator\n"
-    "@args index, iter\n"
     "\n"
     "This method deletes the object that the iterator points to and invalidates\n"
     "the iterator since the object that the iterator points to is no longer valid.\n"
@@ -1183,9 +1113,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@brief End iterator for the layers\n"
     "See \\begin_layers for a description about this iterator\n"
   ) +
-  gsi::method ("begin_layers", (lay::LayerPropertiesConstIterator (lay::LayoutView::*) (unsigned int index) const) &lay::LayoutView::begin_layers,
+  gsi::method ("begin_layers", (lay::LayerPropertiesConstIterator (lay::LayoutView::*) (unsigned int index) const) &lay::LayoutView::begin_layers, gsi::arg ("index"),
     "@brief Begin iterator for the layers\n"
-    "@args index\n"
     "\n"
     "This iterator delivers the layers of this view, either in a recursive or non-recursive\n"
     "fashion, depending which iterator increment methods are used.\n"
@@ -1194,9 +1123,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
     "This method has been introduced in version 0.21.\n"
   ) +
-  gsi::method ("end_layers", (lay::LayerPropertiesConstIterator (lay::LayoutView::*) (unsigned int index) const) &lay::LayoutView::end_layers,
+  gsi::method ("end_layers", (lay::LayerPropertiesConstIterator (lay::LayoutView::*) (unsigned int index) const) &lay::LayoutView::end_layers, gsi::arg ("index"),
     "@brief End iterator for the layers\n"
-    "@args index\n"
     "See \\begin_layers for a description about this iterator\n"
     "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
     "This method has been introduced in version 0.21.\n"
@@ -1204,21 +1132,18 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
   gsi::method ("clear_layers", (void (lay::LayoutView::*) ()) &lay::LayoutView::clear_layers,
     "@brief Clears all layers\n"
   ) +
-  gsi::method ("clear_layers", (void (lay::LayoutView::*) (unsigned int index)) &lay::LayoutView::clear_layers,
+  gsi::method ("clear_layers", (void (lay::LayoutView::*) (unsigned int index)) &lay::LayoutView::clear_layers, gsi::arg ("index"),
     "@brief Clears all layers for the given layer properties list\n"
-    "@args index\n"
     "This version addresses a specific list in a multi-tab layer properties arrangement with the \"index\" parameter. "
     "This method has been introduced in version 0.21.\n"
   ) +
-  gsi::method ("delete_layer_list", (void (lay::LayoutView::*) (unsigned int index)) &lay::LayoutView::delete_layer_list,
+  gsi::method ("delete_layer_list", (void (lay::LayoutView::*) (unsigned int index)) &lay::LayoutView::delete_layer_list, gsi::arg ("index"),
     "@brief Deletes the given properties list\n"
-    "@args index\n"
     "At least one layer properties list must remain. This method may change the current properties list.\n"
     "This method has been introduced in version 0.21.\n"
   ) +
-  gsi::method ("insert_layer_list", (void (lay::LayoutView::*) (unsigned int index)) &lay::LayoutView::insert_layer_list,
+  gsi::method ("insert_layer_list", (void (lay::LayoutView::*) (unsigned int index)) &lay::LayoutView::insert_layer_list, gsi::arg ("index"),
     "@brief Inserts a new layer properties list at the given index\n"
-    "@args index\n"
     "This method inserts a new tab at the given position. The current layer properties list will be changed to "
     "the new list.\n"
     "This method has been introduced in version 0.21.\n"
@@ -1231,19 +1156,16 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@brief Gets the index of the currently selected layer properties tab\n"
     "This method has been introduced in version 0.21.\n"
   ) +
-  gsi::method ("current_layer_list=|#set_current_layer_list", &lay::LayoutView::set_current_layer_list,
+  gsi::method ("current_layer_list=|#set_current_layer_list", &lay::LayoutView::set_current_layer_list, gsi::arg ("index"),
     "@brief Sets the index of the currently selected layer properties tab\n"
-    "@args index\n"
     "This method has been introduced in version 0.21.\n"
   ) +
-  gsi::method ("rename_layer_list", &lay::LayoutView::rename_properties,
+  gsi::method ("rename_layer_list", &lay::LayoutView::rename_properties, gsi::arg ("index"), gsi::arg ("name"),
     "@brief Sets the title of the given layer properties tab\n"
-    "@args index, name\n"
     "This method has been introduced in version 0.21.\n"
   ) +
-  gsi::method_ext ("remove_stipple", &remove_stipple,
+  gsi::method_ext ("remove_stipple", &remove_stipple, gsi::arg ("index"),
     "@brief Removes the stipple pattern with the given index\n"
-    "@args index\n"
     "The pattern with an index less than the first custom pattern cannot be removed. "
     "If a stipple pattern is removed that is still used, the results are undefined. "
   ) +
@@ -1286,9 +1208,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("remove_line_style", &remove_line_style,
+  gsi::method_ext ("remove_line_style", &remove_line_style, gsi::arg ("index"),
     "@brief Removes the line style with the given index\n"
-    "@args index\n"
     "The line styles with an index less than the first custom style. "
     "If a style is removed that is still used, the results are undefined.\n"
     "\n"
@@ -1335,9 +1256,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "Returns the \\LayerPropertiesIterator pointing to the current layer view (the one that has the focus). "
     "If no layer view is active currently, a null iterator is returned.\n"
   ) +
-  gsi::method ("current_layer=", (void (lay::LayoutView::*) (const lay::LayerPropertiesConstIterator &l)) &lay::LayoutView::set_current_layer,
+  gsi::method ("current_layer=", (void (lay::LayoutView::*) (const lay::LayerPropertiesConstIterator &l)) &lay::LayoutView::set_current_layer, gsi::arg ("iter"),
     "@brief Sets the current layer view\n"
-    "@args iter\n"
     "\n"
     "Specifies an \\LayerPropertiesIterator pointing to the new current layer view.\n"
     "\n"
@@ -1367,9 +1287,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
     "(add_cellview_list_observer/remove_cellview_list_observer) have been removed in 0.25.\n"
   ) +
-  gsi::event ("on_cellview_changed", &lay::LayoutView::cellview_changed_event,
+  gsi::event ("on_cellview_changed", &lay::LayoutView::cellview_changed_event, gsi::arg ("cellview_index"),
     "@brief An event indicating that a cellview has changed\n"
-    "@args cellview_index\n"
     "\n"
     "If a cellview is modified, this event is triggered.\n"
     "When this event is triggered, the cellview have already been changed.\n"
@@ -1414,9 +1333,8 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
     "(add_viewport_changed_observer/remove_viewport_changed_observer) have been removed in 0.25.\n"
   ) +
-  gsi::event ("on_layer_list_changed", &lay::LayoutView::layer_list_changed_event,
+  gsi::event ("on_layer_list_changed", &lay::LayoutView::layer_list_changed_event, gsi::arg ("flags"),
     "@brief An event indicating that the layer list has changed\n"
-    "@args flags\n"
     "\n"
     "This event is triggered after the layer list has changed it's configuration.\n"
     "The integer argument gives a hint about the nature of the changed:\n"
@@ -1426,27 +1344,24 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
     "(add_layer_list_observer/remove_layer_list_observer) have been removed in 0.25.\n"
   ) +
-  gsi::event ("on_layer_list_inserted", &lay::LayoutView::layer_list_inserted_event,
+  gsi::event ("on_layer_list_inserted", &lay::LayoutView::layer_list_inserted_event, gsi::arg ("index"),
     "@brief An event indicating that a layer list (a tab) has been inserted\n"
-    "@args index\n"
     "@param index The index of the layer list that was inserted\n"
     "\n"
     "This event is triggered after the layer list has been inserted - i.e. a new tab was created.\n"
     "\n"
     "This event was introduced in version 0.25.\n"
   ) +
-  gsi::event ("on_layer_list_deleted", &lay::LayoutView::layer_list_deleted_event,
+  gsi::event ("on_layer_list_deleted", &lay::LayoutView::layer_list_deleted_event, gsi::arg ("index"),
     "@brief An event indicating that a layer list (a tab) has been removed\n"
-    "@args index\n"
     "@param index The index of the layer list that was removed\n"
     "\n"
     "This event is triggered after the layer list has been removed - i.e. a tab was deleted.\n"
     "\n"
     "This event was introduced in version 0.25.\n"
   ) +
-  gsi::event ("on_current_layer_list_changed", &lay::LayoutView::current_layer_list_changed_event,
+  gsi::event ("on_current_layer_list_changed", &lay::LayoutView::current_layer_list_changed_event, gsi::arg ("index"),
     "@brief An event indicating the current layer list (the selected tab) has changed\n"
-    "@args index\n"
     "@param index The index of the new current layer list\n"
     "\n"
     "This event is triggered after the current layer list was changed - i.e. a new tab was selected.\n"
@@ -1491,28 +1406,24 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "@brief Gets the number of report databases loaded into this view\n"
     "@return The number of \\ReportDatabase objects present in this view\n"
   ) +
-  gsi::method ("remove_rdb", &lay::LayoutView::remove_rdb,
+  gsi::method ("remove_rdb", &lay::LayoutView::remove_rdb, gsi::arg ("index"),
     "@brief Removes a report database with the given index\n"
-    "@args index\n"
     "@param The index of the report database to remove from this view"
   ) +
-  gsi::method ("rdb", (rdb::Database *(lay::LayoutView::*) (int index)) &lay::LayoutView::get_rdb,
+  gsi::method ("rdb", (rdb::Database *(lay::LayoutView::*) (int index)) &lay::LayoutView::get_rdb, gsi::arg ("index"),
     "@brief Gets the report database with the given index\n"
-    "@args index\n"
     "@return The \\ReportDatabase object or nil if the index is not valid"
   ) +
-  gsi::method_ext ("create_rdb", &create_rdb,
+  gsi::method_ext ("create_rdb", &create_rdb, gsi::arg ("name"),
     "@brief Creates a new report database and returns the index of the new database\n"
-    "@args name\n"
     "@param name The name of the new report database\n"
     "@return The index of the new database\n"
     "This method returns an index of the new report database. Use \\rdb to get the actual object. "
     "If a report database with the given name already exists, a unique name will be created.\n"
     "The name will be replaced by the file name when a file is loaded into the report database.\n"
   ) +
-  gsi::method ("show_rdb", &lay::LayoutView::open_rdb_browser,
+  gsi::method ("show_rdb", &lay::LayoutView::open_rdb_browser, gsi::arg ("rdb_index"), gsi::arg ("cv_index"),
     "@brief Shows a report database in the marker browser on a certain layout\n"
-    "@args rdb_index, cv_index\n"
     "The marker browser is opened showing the report database with the index given by \"rdb_index\".\n"
     "It will be attached (i.e. navigate to) the layout with the given cellview index in \"cv_index\".\n"
   ) +
@@ -1542,10 +1453,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
   //  TODO: this method belongs to the Plugin interface and should be located there.
   //  Change this once there is a mixin concept available and the Plugin interface can 
   //  be mixed into LayoutView.
-  gsi::method ("get_config", (std::string (lay::LayoutView::*)(const std::string &name) const) &lay::LayoutView::config_get,
+  gsi::method ("get_config", (std::string (lay::LayoutView::*)(const std::string &name) const) &lay::LayoutView::config_get, gsi::arg ("name"),
     "@brief Gets the value of a local configuration parameter\n"
     "\n"
-    "@args name\n"
     "@param name The name of the configuration parameter whose value shall be obtained (a string)\n"
     "\n"
     "@return The value of the parameter\n"
@@ -1555,10 +1465,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
   //  TODO: this method belongs to the Plugin interface and should be located there.
   //  Change this once there is a mixin concept available and the Plugin interface can 
   //  be mixed into LayoutView.
-  gsi::method ("set_config", (void (lay::LayoutView::*)(const std::string &name, const std::string &value)) &lay::LayoutView::config_set,
+  gsi::method ("set_config", (void (lay::LayoutView::*)(const std::string &name, const std::string &value)) &lay::LayoutView::config_set, gsi::arg ("name"), gsi::arg ("value"),
     "@brief Sets a local configuration parameter with the given name to the given value\n"
     "\n"
-    "@args name, value\n"
     "@param name The name of the configuration parameter to set\n"
     "@param value The value to which to set the configuration parameter\n"
     "\n"
@@ -1580,10 +1489,9 @@ Class<lay::LayoutView> decl_LayoutView (QT_EXTERNAL_BASE (QWidget) "lay", "Layou
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) + 
-  gsi::method_ext ("transaction", &gsi::transaction,
+  gsi::method_ext ("transaction", &gsi::transaction, gsi::arg ("description"),
     "@brief Begins a transaction\n"
     "\n"
-    "@args description\n"
     "@param description A text that appears in the 'undo' description\n"
     "\n"
     "A transaction brackets a sequence of database modifications that appear as a single "

@@ -112,12 +112,10 @@ FontController::can_exit (lay::PluginRoot * /*root*/) const
 void
 FontController::sync_dirs ()
 {
-  if (! m_file_watcher) {
-    return;
+  if (m_file_watcher) {
+    m_file_watcher->clear ();
+    m_file_watcher->enable (false);
   }
-
-  m_file_watcher->clear ();
-  m_file_watcher->enable (false);
 
   std::vector<std::string> paths = lay::ApplicationBase::instance ()->klayout_path ();
 
@@ -137,14 +135,18 @@ FontController::sync_dirs ()
   for (std::vector <std::string>::const_iterator p = paths.begin (); p != paths.end (); ++p) {
     QDir fp = QDir (tl::to_qstring (*p)).filePath (tl::to_qstring ("fonts"));
     if (fp.exists ()) {
-      m_file_watcher->add_file (tl::to_string (fp.absolutePath ()));
+      if (m_file_watcher) {
+        m_file_watcher->add_file (tl::to_string (fp.absolutePath ()));
+      }
       font_paths.push_back (tl::to_string (fp.absolutePath ()));
     }
   }
 
   db::TextGenerator::set_font_paths (font_paths);
 
-  m_file_watcher->enable (true);
+  if (m_file_watcher) {
+    m_file_watcher->enable (true);
+  }
 }
 
 void

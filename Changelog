@@ -1,7 +1,65 @@
-0.26            (2018-06-23):
-* Enhancement: Standalone Python modules provide 
+0.26            (xxxx-xx-xx):
+* Enhancement: Standalone Python modules provided
        For details see: 
        https://github.com/klayoutmatthias/klayout/wiki/klayout---Standalone-KLayout-Python-Module
+
+0.25.5          (xxxx-xx-xx):
+
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/162
+       GDS2 LIBNAME was not maintained on "File/Save".
+
+0.25.4          (2018-08-25):
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/121
+       Issue with multiple reads of GDS2 layouts including PCells
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/134
+       Error in cell.fill_region caused by big polygon with 
+       spikes
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/139
+       Libraries have not been reassigned when loading a GDS file
+       from command line (does not happen on File/Open)
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/141
+       Issue with RBA::QHostAddress (ambiguous overload) on Qt5
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/142
+       Issue with RBA::RecursiveShapeIterator#region=
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/144
+       The Salt package descriptions are not shown with Motif
+       style
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/148
+       Wrong font is used
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/152
+       Shapes#size reported a wrong shape count in viewer mode
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/153
+       Application crash when editing guiding shape properties
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/155
+       Program freezes after replacing nothing by something in 
+       Macro editor
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/157
+       "Replace cell with ..." rejected cell names with a library
+       prefix
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/158
+       Repaint issue on cell context
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/159
+       Tech specific macros and DRC scripts were not shown in tech
+       manager
+* Bugfix: 8 bit indexed GIF images can be used for package icons now
+* Enhancement: Provide a way to specify the type of a macro
+       This feature is mainly useful for command line arguments.
+       If you run KLayout with "klayout -b -r myscript"
+       it will not be able to determine the type of macro without
+       a suffix. 
+
+       You can now explicitly specify a certain type by
+       giving the suffix implicitly like: "klayout -b -r myscript[rb]"
+       This will read "myscript" but pretend it was "myscript.rb"
+       and execute it as Ruby script.
+    
+       This feature is handy if you need to run a file with a
+       specific interpreter but cannot modify the file name.
+* Enhancement: Selection now shows PCell display names
+       Before, the internal name was shown for instances
+* Enhancement: There is an option in the View menu to show or hide markers
+       Markers may hide layout under them. With this feature you can
+       quickly disable all markers and the layout becomes visible.
 
 0.25.3          (2018-05-03):
 

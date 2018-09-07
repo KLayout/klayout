@@ -47,8 +47,15 @@ SaltItemDelegate::paint (QPainter *painter, const QStyleOptionViewItem &option, 
 {
   QStyleOptionViewItemV4 optionV4 = option;
   initStyleOption (&optionV4, index);
+  //  let the text take all the available space (fixes #144)
+  optionV4.showDecorationSelected = true;
 
   bool is_enabled = (optionV4.state & QStyle::State_Enabled);
+  if ((index.flags () & 0x10000) != 0) {
+    //  the item wants to be drawn "disabled"
+    is_enabled = false;
+  }
+
   optionV4.state |= QStyle::State_Enabled;
 
   QStyle *style = optionV4.widget ? optionV4.widget->style () : QApplication::style ();
@@ -121,6 +128,11 @@ SaltModel::flags (const QModelIndex &index) const
     f &= ~Qt::ItemIsEnabled;
   }
 
+  if (g && (! is_enabled (g->name ()) || g->is_hidden ())) {
+    //  We use a custom flag to indicate "disabled" display without actually disabling the item
+    f |= Qt::ItemFlags (0x10000);
+  }
+
   return f;
 }
 
@@ -134,15 +146,9 @@ SaltModel::data (const QModelIndex &index, int role) const
       return QVariant (tr ("<html><body><h4>There are no items to show in this list</h4><p>%1</p></body></html>").arg (m_empty_explanation));
     }
 
-    bool en = is_enabled (g->name ());
     bool hidden = g->is_hidden ();
 
     std::string text = "<html><body>";
-    if (! en || hidden) {
-      text += "<font color=\"#c0c0c0\">";
-    } else {
-      text += "<font color=\"#303030\">";
-    }
     if (hidden) {
       text += "<i>";
     }
@@ -179,7 +185,6 @@ SaltModel::data (const QModelIndex &index, int role) const
       text += tl::to_string (tr ("This package is an auxiliary package for use with other packages."));
       text += "</p></i>";
     }
-    text += "</font>";
     text += "</body></html>";
 
     return tl::to_qstring (text);

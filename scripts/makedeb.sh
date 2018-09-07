@@ -89,10 +89,15 @@ cd ..
 mkdir -p makedeb-tmp/${sharedir}/doc/klayout
 mkdir -p makedeb-tmp/${sharedir}/applications
 mkdir -p makedeb-tmp/${sharedir}/pixmaps
+<<<<<<< HEAD
 mkdir -p makedeb-tmp/${libdir}/db_plugins
 mkdir -p makedeb-tmp/${libdir}/lay_plugins
 mkdir -p makedeb-tmp/${pylibdir}
 mkdir -p makedeb-tmp/${bindir}
+=======
+mkdir -p makedeb-tmp/${bindir}
+mkdir -p makedeb-tmp/${libdir}
+>>>>>>> master
 
 cp etc/klayout.desktop makedeb-tmp/${sharedir}/applications
 cp etc/logo.png makedeb-tmp/${sharedir}/pixmaps
@@ -103,10 +108,13 @@ cp COPYRIGHT makedeb-tmp/${sharedir}/doc/klayout/copyright
 cp -pd $bininstdir/strm* makedeb-tmp/${bindir}
 cp -pd $bininstdir/klayout makedeb-tmp/${bindir}
 cp -pd $bininstdir/lib*so* makedeb-tmp/${libdir}
+<<<<<<< HEAD
 cp -pd $bininstdir/db_plugins/lib*so* makedeb-tmp/${libdir}/db_plugins
 cp -pd $bininstdir/lay_plugins/lib*so* makedeb-tmp/${libdir}/lay_plugins
 cp -pd $bininstdir/pymod/klayout/*so makedeb-tmp/${pylibdir}
 cp -pd $bininstdir/pymod/klayout/*py makedeb-tmp/${pylibdir}
+=======
+>>>>>>> master
 
 cd makedeb-tmp
 
@@ -131,9 +139,12 @@ echo "Modifying control file .."
 
 strip ${bindir}/*
 strip ${libdir}/*.so*
+<<<<<<< HEAD
 strip ${pylibdir}/*.so
 strip ${libdir}/db_plugins/*.so*
 strip ${libdir}/lay_plugins/*.so*
+=======
+>>>>>>> master
 
 size=`du -ck usr | grep total | sed "s/ *total//"`
 

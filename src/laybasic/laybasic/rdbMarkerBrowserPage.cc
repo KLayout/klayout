@@ -2177,36 +2177,42 @@ MarkerBrowserPage::do_update_markers ()
 
               mp_markers.push_back (new lay::DMarker (mp_view));
               mp_markers.back ()->set (trans * polygon_value->value ());
+              mp_markers.back ()->set_dismissable (true);
               m_markers_bbox += trans * polygon_value->value ().box ();
 
             } else if (edge_pair_value) {
 
               mp_markers.push_back (new lay::DMarker (mp_view));
               mp_markers.back ()->set (trans * edge_pair_value->value ());
+              mp_markers.back ()->set_dismissable (true);
               m_markers_bbox += trans * db::DBox (edge_pair_value->value ().bbox ());
 
             } else if (edge_value) {
 
               mp_markers.push_back (new lay::DMarker (mp_view));
               mp_markers.back ()->set (trans * edge_value->value ());
+              mp_markers.back ()->set_dismissable (true);
               m_markers_bbox += trans * db::DBox (edge_value->value ().bbox ());
 
             } else if (box_value) {
 
               mp_markers.push_back (new lay::DMarker (mp_view));
               mp_markers.back ()->set (trans * box_value->value ());
+              mp_markers.back ()->set_dismissable (true);
               m_markers_bbox += trans * box_value->value ();
 
             } else if (text_value) {
 
               mp_markers.push_back (new lay::DMarker (mp_view));
               mp_markers.back ()->set (trans * text_value->value ());
+              mp_markers.back ()->set_dismissable (true);
               m_markers_bbox += trans * text_value->value ().box ();
 
             } else if (path_value) {
 
               mp_markers.push_back (new lay::DMarker (mp_view));
               mp_markers.back ()->set (trans * path_value->value ());
+              mp_markers.back ()->set_dismissable (true);
               m_markers_bbox += trans * path_value->value ().box ();
 
             }

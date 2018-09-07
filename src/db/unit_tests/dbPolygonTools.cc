@@ -1082,7 +1082,7 @@ TEST(31)
 
   pout = minkowsky_sum (p, db::Edge (db::Point (10, 10), db::Point (210, -90)), true);
 
-  EXPECT_EQ (pout.to_string (), "(210,-190;143,-157;110,-165;-90,-65;10,110;85,73;110,85;310,-15;310,-140)");
+  EXPECT_EQ (pout.to_string (), "(210,-190;143,-157;110,-165;-90,-65;10,110;85,72;110,85;310,-15;310,-140)");
 
   std::vector <db::Point> c;
   c.push_back (db::Point (10, 10));

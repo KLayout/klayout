@@ -357,7 +357,7 @@ void run_thread_tests (tl::TestBase *_this, int wait)
     s_sum[3].reset ();
 
     for (int i = 0; i < 10000; ++i) {
-      job.schedule (new MyTask (10000));
+      job.schedule (new MyTask (100000));
     }
 
     job.start ();

@@ -40,7 +40,8 @@ SOURCES = \
     tlThreadedWorkers.cc \
     tlThreads.cc \
     tlDeferredExecution.cc \
-    tlUri.cc
+    tlUri.cc \
+    tlLongInt.cc
 
 HEADERS = \
     tlAlgorithm.h \
@@ -84,14 +85,14 @@ HEADERS = \
     tlCommandLineParser.h \
     tlUnitTest.h \
     tlInt128Support.h \
-    tlHttpStreamCurl.h \
     tlDefs.h \
     tlXMLParser.h \
     tlXMLWriter.h \
     tlThreadedWorkers.h \
     tlThreads.h \
     tlDeferredExecution.h \
-    tlUri.h
+    tlUri.h \
+    tlLongInt.h
 
 equals(HAVE_CURL, "1") {
 

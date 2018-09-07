@@ -344,11 +344,11 @@ namespace std
     size_t operator() (const db::LayerProperties &o) const
     {
       if (o.is_named ()) {
-        return hfunc (o.name.c_str ());
+        return hfunc (o.name);
       } else {
         size_t h = hfunc (o.layer);
         h = hfunc (o.datatype, h);
-        h = hfunc (o.name.c_str (), h);
+        h = hfunc (o.name, h);
         return h;
       }
     }

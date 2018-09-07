@@ -192,7 +192,7 @@ TEST (5)
     error = ex.msg ();
   }
 
-#if defined (HAVE_QT)
+#if !defined (HAVE_EXPAT)
   EXPECT_EQ (error, "XML parser error: tag mismatch in line 2, column 33");
 #else
   EXPECT_EQ (error, "XML parser error: mismatched tag in line 2, column 28");
@@ -219,7 +219,7 @@ TEST (6)
     error = ex.msg ();
   }
 
-#if defined (HAVE_QT)
+#if !defined (HAVE_EXPAT)
   EXPECT_EQ (error, "XML parser error: Expected end of text at position 1 (..a) in line 2, column 27");
 #else
   //  expat delivers cdata at beginning of closing tag

@@ -197,7 +197,8 @@ namespace std
       h = hfunc (int (o.valign ()), h);
       h = hfunc (o.trans ().rot (), h);
       h = hfunc (o.trans ().disp (), h);
-      h = hfunc (hfunc (o.string ()), h);
+      //  NOTE: using std::string for the value makes sure the default hasher doesn't use the pointer value
+      h = hfunc (hfunc (std::string (o.string ())), h);
       return h;
     }
   };

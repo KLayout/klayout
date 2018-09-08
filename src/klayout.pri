@@ -95,6 +95,9 @@ msvc {
       /wd4251 \                   # Disable "DLL interface required"
       /source-charset:utf-8 \     # Use UTF-8 for source files
 
+  QMAKE_LFLAGS += \
+      /OPT:NOREF \                # preserves functions we want to keep for implementing the "force link" mechanism
+
   QMAKE_CXXFLAGS_WARN_ON += \
 
 } else {

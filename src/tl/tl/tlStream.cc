@@ -552,7 +552,7 @@ InputZLibFile::InputZLibFile (const std::string &path)
   }
   mp_d->zs = gzdopen (fd, "rb");
 #else
-  m_zs = gzopen (tl::string_to_system (path).c_str (), "rb");
+  mp_d->zs = gzopen (tl::string_to_system (path).c_str (), "rb");
 #endif
   if (mp_d->zs == NULL) {
     throw FileOpenErrorException (m_source, errno);
@@ -826,7 +826,7 @@ OutputZLibFile::OutputZLibFile (const std::string &path)
   }
   mp_d->zs = gzdopen (_fileno (file), "wb");
 #else
-  m_zs = gzopen (tl::string_to_system (path).c_str (), "wb");
+  mp_d->zs = gzopen (tl::string_to_system (path).c_str (), "wb");
 #endif
   if (mp_d->zs == NULL) {
     throw FileOpenErrorException (m_source, errno);

@@ -121,6 +121,7 @@ msvc {
       -Wno-strict-aliasing \
       -Wno-deprecated-declarations \
       -Wno-reserved-user-defined-literal \
+      -std=c++11 \
 
   win32 {
     QMAKE_LFLAGS += -Wl,--exclude-all-symbols

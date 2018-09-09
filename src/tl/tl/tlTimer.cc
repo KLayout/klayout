@@ -114,7 +114,7 @@ static int64_t ms_time ()
 #else
 
   timespec ts;
-  clock_gettime(CLOCK_REALTIME, ts);
+  clock_gettime (CLOCK_REALTIME, &ts);
   return int64_t (ts.tv_sec) * 1000 + int64_t (0.5 + ts.tv_nsec / 1.0e6);
 
 #endif

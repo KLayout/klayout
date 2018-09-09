@@ -49,7 +49,7 @@
 
 namespace db
 {
-  DB_PLUGIN_PUBLIC std::string net_tracer_component_name;
+  extern std::string net_tracer_component_name;
 }
 
 namespace lay

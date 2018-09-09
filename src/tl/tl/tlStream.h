@@ -818,7 +818,7 @@ private:
  *
  *  Implements the writer for a zlib stream
  */
-class OutputZLibFile
+class TL_PUBLIC OutputZLibFile
   : public OutputStreamBase
 {
 public:
@@ -862,7 +862,7 @@ private:
  *
  *  Implements the writer for ordinary files.
  */
-class OutputFile
+class TL_PUBLIC OutputFile
   : public OutputStreamBase
 {
 public:
@@ -922,7 +922,7 @@ private:
  *
  *  Implements the writer for pipe streams
  */
-class OutputPipe
+class TL_PUBLIC OutputPipe
   : public OutputStreamBase
 {
 public:

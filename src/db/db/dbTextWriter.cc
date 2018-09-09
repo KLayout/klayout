@@ -39,22 +39,55 @@ namespace db
 //  TextWriter implementation
 
 TextWriter::TextWriter (tl::OutputStream &stream)
-  : m_stream (stream)
+  : m_stream (stream), m_in_cell (false)
 {
   //  .. nothing yet ..
+}
+
+void
+TextWriter::begin_sorted_section ()
+{
+  m_cc.clear ();
+  m_in_cell = true;
+  m_cc_line.clear ();
+}
+
+void
+TextWriter::end_sorted_section ()
+{
+  std::sort (m_cc.begin (), m_cc.end ());
+  for (std::vector<std::string>::const_iterator l = m_cc.begin (); l != m_cc.end (); ++l) {
+    m_stream.put (l->c_str (), l->size ());
+  }
+  m_cc.clear ();
+  m_in_cell = false;
 }
 
 TextWriter &
 TextWriter::operator<< (const std::string &s)
 {
-  m_stream.put (s.c_str (), s.size ());
+  if (m_in_cell) {
+    m_cc_line += s;
+  } else {
+    m_stream.put (s.c_str (), s.size ());
+  }
+
+  return *this;
+}
+
+TextWriter &
+TextWriter::operator<< (endl_t)
+{
+  *this << endl_str ();
+  m_cc.push_back (m_cc_line);
+  m_cc_line.clear ();
   return *this;
 }
 
 TextWriter &
 TextWriter::operator<< (const char *s)
 {
-  m_stream.put (s, strlen (s));
+  *this << std::string (s);
   return *this;
 }
 
@@ -93,8 +126,14 @@ TextWriter::operator<< (db::Vector p)
   return *this;
 }
 
-const char *
+TextWriter::endl_t
 TextWriter::endl ()
+{
+  return endl_t ();
+}
+
+const char *
+TextWriter::endl_str ()
 {
   return "\n";
 }
@@ -102,7 +141,7 @@ TextWriter::endl ()
 void
 TextWriter::write_props (const db::Layout &layout, size_t prop_id)
 {
-  *this << "set props {" << endl ();
+  *this << "set props {" << endl_str ();
 
   const db::PropertiesRepository::properties_set &props = layout.properties_repository ().properties (prop_id);
   for (db::PropertiesRepository::properties_set::const_iterator p = props.begin (); p != props.end (); ++p) {
@@ -110,14 +149,14 @@ TextWriter::write_props (const db::Layout &layout, size_t prop_id)
     const tl::Variant &name = layout.properties_repository ().prop_name (p->first);
 
     if (name.is_long () || name.is_ulong ()) {
-      *this << "  {" << int (name.to_long ()) << " {" << p->second.to_string () << "}}" << endl ();
+      *this << "  {" << int (name.to_long ()) << " {" << p->second.to_string () << "}}" << endl_str ();
     } else if (name.is_a_string ()) {
-      *this << "  {{" << name.to_string () << "} {" << p->second.to_string () << "}}" << endl ();
+      *this << "  {{" << name.to_string () << "} {" << p->second.to_string () << "}}" << endl_str ();
     }
 
   }
 
-  *this << "}" << endl ();
+  *this << "}" << endl_str ();
 }
 
 void
@@ -152,6 +191,8 @@ TextWriter::write (const db::Layout &layout)
     *this << "begin_cell" << pfx << " {" << layout.cell_name (*cell) << "}" << endl ();
 
     //  cell body 
+
+    begin_sorted_section ();
 
     //  instances
     
@@ -196,11 +237,15 @@ TextWriter::write (const db::Layout &layout)
 
     }
 
+    end_sorted_section ();
+
     //  shapes
 
     for (unsigned int l = 0; l < layout.layers (); ++l) {
  
       if (layout.is_valid_layer (l)) {
+
+        begin_sorted_section ();
 
         const LayerProperties &prop = layout.get_properties (l);
         int layer = prop.layer;
@@ -278,6 +323,8 @@ TextWriter::write (const db::Layout &layout)
           ++shape;
 
         }
+
+        end_sorted_section ();
 
       }
 

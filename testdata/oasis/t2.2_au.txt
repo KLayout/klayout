@@ -1,0 +1,6 @@
+begin_lib 0.001
+begin_cell {ABC}
+end_cell
+begin_cell {XYZ}
+end_cell
+end_lib

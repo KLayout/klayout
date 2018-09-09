@@ -1,0 +1,14 @@
+set props {
+  {{FileProp1} {FileProp1Value}}
+  {{FileProp2} {FileProp1Value}}
+}
+begin_libp $props 0.001
+set props {
+  {{CellProp0} {CPValue0}}
+  {{CellProp1} {CPValue}}
+  {{CellProp2} {CPValue}}
+}
+begin_cellp $props {A}
+box 1 2 {300 -400} {400 -200}
+end_cell
+end_lib

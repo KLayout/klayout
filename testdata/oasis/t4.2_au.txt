@@ -1,0 +1,100 @@
+begin_lib 0.001
+begin_cell {ABC}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 1 2 {300 -400} {400 -200}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 1 2 {400 -500} {500 -300}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 1 2 {600 -300} {700 -100}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 1 2 {800 -300} {900 -100}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {1000 1100} {1150 1250}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {1000 1400} {1150 1550}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {1000 2000} {1150 2150}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {1000 500} {1150 650}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {1000 800} {1150 950}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {1200 1100} {1350 1250}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {1200 1400} {1350 1550}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {1200 500} {1350 650}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {1200 800} {1350 950}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {1300 2000} {1450 2150}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {800 -1200} {900 -1000}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {800 -1500} {950 -1350}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {800 -1800} {950 -1650}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {800 -600} {900 -400}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {800 -900} {900 -700}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {800 1100} {950 1250}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {800 1400} {950 1550}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {800 2000} {950 2150}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {800 500} {950 650}
+set props {
+  {{PROP0} {0.2}}
+}
+boxp $props 2 3 {800 800} {950 950}
+end_cell
+end_lib

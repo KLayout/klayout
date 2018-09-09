@@ -1,0 +1,5 @@
+begin_lib 0.001
+begin_cell {ABC}
+text 1 2 0 0 {100 0} {A}
+end_cell
+end_lib

@@ -1,0 +1,29 @@
+begin_lib 0.001
+begin_cell {A}
+box 1 2 {0 0} {10 20}
+box 1 2 {100 -100} {110 -80}
+box 1 2 {200 -200} {210 -180}
+box 1 2 {300 -300} {310 -280}
+text 2 1 0 0 {0 0} {A}
+text 2 1 0 0 {100 -100} {A}
+text 2 1 0 0 {200 -200} {A}
+text 2 1 0 0 {300 -300} {A}
+end_cell
+begin_cell {B}
+sref {A} 0 0 1 {0 0}
+sref {A} 0 0 1 {50 50}
+box 1 2 {0 0} {20 10}
+box 1 2 {100 100} {120 110}
+box 1 2 {200 200} {220 210}
+box 1 2 {300 300} {320 310}
+text 2 1 0 0 {0 0} {B}
+text 2 1 0 0 {100 100} {B}
+text 2 1 0 0 {200 200} {B}
+text 2 1 0 0 {300 300} {B}
+end_cell
+begin_cell {TOP}
+sref {B} 0 0 1 {0 0}
+box 1 2 {0 0} {50 5}
+text 2 1 0 0 {0 0} {TOP}
+end_cell
+end_lib

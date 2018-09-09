@@ -1,0 +1,14 @@
+begin_lib 0.001
+begin_cell {A}
+box 1 2 {300 -400} {400 -200}
+end_cell
+begin_cell {TOP}
+sref {A} 0 0 1 {-300 1200}
+sref {A} 0 0 1 {-300 400}
+sref {A} 0 0 1 {-300 800}
+sref {A} 0 0 1 {0 1200}
+sref {A} 0 1 1 {700 400}
+sref {A} 90 0 1 {700 1400}
+sref {A} 90 1 1 {700 2400}
+end_cell
+end_lib

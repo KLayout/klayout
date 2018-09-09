@@ -34,6 +34,8 @@
 
 #include "dbStreamLayers.h"
 
+#include <memory>
+
 namespace db
 {
 
@@ -57,6 +59,9 @@ public:
   void write (const db::Layout &layout);
 
 protected:
+  struct endl_t { };
+
+  TextWriter &operator<< (endl_t em);
   TextWriter &operator<< (const std::string &s);
   TextWriter &operator<< (const char *s);
   TextWriter &operator<< (int64_t n);
@@ -64,12 +69,18 @@ protected:
   TextWriter &operator<< (double d);
   TextWriter &operator<< (db::Point p);
   TextWriter &operator<< (db::Vector p);
-  const char *endl ();
-  
+  endl_t endl ();
+  const char *endl_str ();
+
 private:
   tl::OutputStream &m_stream;
+  std::vector<std::string> m_cc;
+  std::string m_cc_line;
+  bool m_in_cell;
   
   void write_props (const db::Layout &layout, size_t prop_id);
+  void begin_sorted_section ();
+  void end_sorted_section ();
 };
 
 } // namespace db

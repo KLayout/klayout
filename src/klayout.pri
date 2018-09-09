@@ -121,7 +121,9 @@ msvc {
       -Wno-strict-aliasing \
       -Wno-deprecated-declarations \
       -Wno-reserved-user-defined-literal \
-      -std=c++11 \
+
+  # because we use unordered_map/unordered_set:
+  QMAKE_CXXFLAGS += -std=c++0x
 
   win32 {
     QMAKE_LFLAGS += -Wl,--exclude-all-symbols

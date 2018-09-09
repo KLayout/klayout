@@ -993,10 +993,10 @@ TEST(115)
   const char *expected = 
     "begin_lib 0.001\n"
     "begin_cell {$1}\n"
-    "boundary 1 0 {100 15} {150 15} {120 15} {100 15}\n"
     "boundary 1 0 {-15 100} {-15 120} {-15 150} {-15 100}\n"
-    "box 1 0 {100 0} {100 200}\n"
+    "boundary 1 0 {100 15} {150 15} {120 15} {100 15}\n"
     "box 1 0 {100 -20} {100 -20}\n"
+    "box 1 0 {100 0} {100 200}\n"
     "end_cell\n"
     "end_lib\n"
   ;

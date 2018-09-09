@@ -1,0 +1,10 @@
+begin_lib 0.001
+begin_cell {B}
+boundary 1 2 {-100 200} {100 400} {300 200} {-100 200}
+boundary 1 2 {-100 600} {100 800} {300 600} {-100 600}
+end_cell
+begin_cell {A}
+boundary 1 2 {-100 200} {-100 400} {100 200} {-100 200}
+boundary 1 2 {-100 600} {-100 800} {100 600} {-100 600}
+end_cell
+end_lib

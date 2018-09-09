@@ -49,6 +49,12 @@ namespace tl
 
 // -------------------------------------------------------------
 
+#if defined(_MSC_VER)
+//  FILETIME and Posix use different zero time. This is the difference
+//  between Jan 1, 1601 and Jan 1, 1970. This value is taken from pthread-win32.
+const uint64_t ft_to_epoch_offset = uint64_t (11644473600) * uint64_t (10000000);
+#endif
+
 void current_utc_time (struct timespec *ts)
 {
 
@@ -68,6 +74,8 @@ void current_utc_time (struct timespec *ts)
   GetSystemTimeAsFileTime (&ft);
 
   uint64_t t = (uint64_t (ft.dwHighDateTime) << (sizeof (ft.dwHighDateTime) * 8)) | uint64_t (ft.dwLowDateTime);
+  t -= ft_to_epoch_offset;
+
   //  t is in 100ns units
   ts->tv_nsec = (t % 10000000) * 100;
   ts->tv_sec = (t / 10000000);
@@ -96,7 +104,10 @@ static int64_t ms_time ()
 
   FILETIME ft;
   GetSystemTimeAsFileTime (&ft);
+
   uint64_t t = (uint64_t (ft.dwHighDateTime) << (sizeof (ft.dwHighDateTime) * 8)) | uint64_t (ft.dwLowDateTime);
+  t -= ft_to_epoch_offset;
+
   //  FILETIME uses 100ns resolution, hence divide by 10000 to get ms:
   return int64_t (t / 10000);
 

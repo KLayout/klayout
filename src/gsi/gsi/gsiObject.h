@@ -26,10 +26,10 @@
 
 #include "tlObject.h"
 #include "tlEvents.h"
+#include "tlThreads.h"
 #include "gsiCommon.h"
 
 #include <memory>
-#include <QMutex>
 
 //  For a comprehensive documentation see gsi.h
 
@@ -240,7 +240,7 @@ private:
   bool m_const_ref : 1;
   bool m_destroyed : 1;
   bool m_can_destroy : 1;
-  static QMutex m_lock;
+  static tl::Mutex m_lock;
 
   void *set_internal (void *obj, bool owned, bool const_ref, bool can_destroy);
   void object_status_changed (gsi::ObjectBase::StatusEventType type);

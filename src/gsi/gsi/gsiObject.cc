@@ -26,13 +26,12 @@
 #include "gsiDecl.h"
 
 #include "tlLog.h"
-
-#include <QMutexLocker>
+#include "tlInternational.h"
 
 namespace gsi
 {
 
-QMutex Proxy::m_lock;
+tl::Mutex Proxy::m_lock;
 
 Proxy::Proxy (const gsi::ClassBase *_cls_decl)
   : m_cls_decl (_cls_decl),
@@ -50,7 +49,7 @@ Proxy::~Proxy ()
   void *prev_obj = 0;
 
   {
-    QMutexLocker locker (&m_lock);
+    tl::MutexLocker locker (&m_lock);
     try {
       prev_obj = set_internal (0, false, false, false);
     } catch (std::exception &ex) {
@@ -73,7 +72,7 @@ Proxy::~Proxy ()
 void
 Proxy::destroy ()
 {
-  QMutexLocker locker (&m_lock);
+  tl::MutexLocker locker (&m_lock);
 
   if (! m_cls_decl) {
     m_obj = 0;
@@ -108,14 +107,14 @@ Proxy::destroy ()
 void
 Proxy::detach ()
 {
-  QMutexLocker locker (&m_lock);
+  tl::MutexLocker locker (&m_lock);
   detach_internal ();
 }
 
 void
 Proxy::release ()
 {
-  QMutexLocker locker (&m_lock);
+  tl::MutexLocker locker (&m_lock);
 
   //  If the object is managed we first reset the ownership of all other clients
   //  and then make us the owner
@@ -134,7 +133,7 @@ Proxy::release ()
 void
 Proxy::keep ()
 {
-  QMutexLocker locker (&m_lock);
+  tl::MutexLocker locker (&m_lock);
 
   const gsi::ClassBase *cls = m_cls_decl;
   if (cls) {
@@ -157,7 +156,7 @@ Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy)
   void *prev_obj;
 
   {
-    QMutexLocker locker (&m_lock);
+    tl::MutexLocker locker (&m_lock);
     prev_obj = set_internal (obj, owned, const_ref, can_destroy);
   }
 
@@ -171,7 +170,7 @@ Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy)
 void *
 Proxy::obj ()
 {
-  QMutexLocker locker (&m_lock);
+  tl::MutexLocker locker (&m_lock);
   return obj_internal ();
 }
 
@@ -180,7 +179,7 @@ Proxy::obj_internal ()
 {
   if (! m_obj) {
     if (m_destroyed) {
-      throw tl::Exception (tl::to_string (QObject::tr ("Object has been destroyed already")));
+      throw tl::Exception (tl::to_string (tr ("Object has been destroyed already")));
     } else {
       //  delayed creation of a detached C++ object ..
       tl_assert (set_internal (m_cls_decl->create (), true, false, true) == 0);
@@ -194,7 +193,7 @@ void
 Proxy::object_status_changed (gsi::ObjectBase::StatusEventType type)
 {
   if (type == gsi::ObjectBase::ObjectDestroyed) {
-    QMutexLocker locker (&m_lock);
+    tl::MutexLocker locker (&m_lock);
     m_destroyed = true;  //  NOTE: must be set before detach and indicates that the object was destroyed externally.
     detach_internal ();
   } else if (type == gsi::ObjectBase::ObjectKeep) {

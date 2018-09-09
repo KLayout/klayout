@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <errno.h>
+#include <zlib.h>
 #ifdef _WIN32 
 #  include <io.h>
 #endif
@@ -119,6 +120,15 @@ public:
   FilePWriteErrorException (const std::string &f, int en)
     : tl::Exception (tl::to_string (tr ("Write error on pipe from command: %s (errno=%d)")), f, en)
   { }
+};
+
+// ---------------------------------------------------------------
+
+class ZLibFilePrivate
+{
+public:
+  ZLibFilePrivate () : zs (NULL) { }
+  gzFile zs;
 };
 
 // ---------------------------------------------------------------
@@ -532,7 +542,7 @@ InputFile::filename () const
 //  InputZLibFile implementation
 
 InputZLibFile::InputZLibFile (const std::string &path)
-  : m_zs (NULL)
+  : mp_d (new ZLibFilePrivate ())
 {
   m_source = path;
 #if defined(_WIN32)
@@ -540,11 +550,11 @@ InputZLibFile::InputZLibFile (const std::string &path)
   if (fd < 0) {
     throw FileOpenErrorException (m_source, errno);
   }
-  m_zs = gzdopen (fd, "rb");
+  mp_d->zs = gzdopen (fd, "rb");
 #else
   m_zs = gzopen (tl::string_to_system (path).c_str (), "rb");
 #endif
-  if (m_zs == NULL) {
+  if (mp_d->zs == NULL) {
     throw FileOpenErrorException (m_source, errno);
   }
 }
@@ -552,25 +562,27 @@ InputZLibFile::InputZLibFile (const std::string &path)
 InputZLibFile::~InputZLibFile ()
 {
   close ();
+  delete mp_d;
+  mp_d = 0;
 }
 
 void
 InputZLibFile::close ()
 {
-  if (m_zs != NULL) {
-    gzclose (m_zs);
-    m_zs = NULL;
+  if (mp_d->zs != NULL) {
+    gzclose (mp_d->zs);
+    mp_d->zs = NULL;
   }  
 }
 
 size_t 
 InputZLibFile::read (char *b, size_t n)
 {
-  tl_assert (m_zs != NULL);
-  int ret = gzread (m_zs, b, (unsigned int) n);
+  tl_assert (mp_d->zs != NULL);
+  int ret = gzread (mp_d->zs, b, (unsigned int) n);
   if (ret < 0) {
     int gz_err = 0;
-    const char *em = gzerror (m_zs, &gz_err);
+    const char *em = gzerror (mp_d->zs, &gz_err);
     if (gz_err == Z_ERRNO) {
       throw FileReadErrorException (m_source, errno);
     } else {
@@ -584,8 +596,8 @@ InputZLibFile::read (char *b, size_t n)
 void 
 InputZLibFile::reset ()
 {
-  if (m_zs != NULL) {
-    gzrewind (m_zs);
+  if (mp_d->zs != NULL) {
+    gzrewind (mp_d->zs);
   }
 }
 
@@ -804,7 +816,7 @@ OutputFile::write (const char *b, size_t n)
 //  OutputZLibFile implementation
 
 OutputZLibFile::OutputZLibFile (const std::string &path)
-  : m_zs (NULL)
+  : mp_d (new ZLibFilePrivate ())
 {
   m_source = path;
 #if defined(_WIN32)
@@ -812,31 +824,33 @@ OutputZLibFile::OutputZLibFile (const std::string &path)
   if (file == NULL) {
     throw FileOpenErrorException (m_source, errno);
   }
-  m_zs = gzdopen (_fileno (file), "wb");
+  mp_d->zs = gzdopen (_fileno (file), "wb");
 #else
   m_zs = gzopen (tl::string_to_system (path).c_str (), "wb");
 #endif
-  if (m_zs == NULL) {
+  if (mp_d->zs == NULL) {
     throw FileOpenErrorException (m_source, errno);
   }
 }
 
 OutputZLibFile::~OutputZLibFile ()
 {
-  if (m_zs != NULL) {
-    gzclose (m_zs);
-    m_zs = NULL;
+  if (mp_d->zs != NULL) {
+    gzclose (mp_d->zs);
+    mp_d->zs = NULL;
   }  
+  delete mp_d;
+  mp_d = 0;
 }
 
 void 
 OutputZLibFile::write (const char *b, size_t n)
 {
-  tl_assert (m_zs != NULL);
-  int ret = gzwrite (m_zs, (char *) b, (unsigned int) n);
+  tl_assert (mp_d->zs != NULL);
+  int ret = gzwrite (mp_d->zs, (char *) b, (unsigned int) n);
   if (ret < 0) {
     int gz_err = 0;
-    const char *em = gzerror (m_zs, &gz_err);
+    const char *em = gzerror (mp_d->zs, &gz_err);
     if (gz_err == Z_ERRNO) {
       throw FileWriteErrorException (m_source, errno);
     } else {

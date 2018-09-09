@@ -44,7 +44,7 @@ TEST(1)
     0x00, 0x00
   };
 
-  tl::InputMemoryStream ims = tl::InputMemoryStream ((const char *) data, sizeof (data));
+  tl::InputMemoryStream ims ((const char *) data, sizeof (data));
   tl::InputStream is (ims);
   
   std::string out;
@@ -69,7 +69,7 @@ TEST(2)
   std::string deflated = oss.string ();
   for (size_t i = 0; i < deflated.size(); ++i) {
   }
-  tl::InputMemoryStream ims = tl::InputMemoryStream ((const char *) deflated.c_str (), deflated.size ());
+  tl::InputMemoryStream ims ((const char *) deflated.c_str (), deflated.size ());
   tl::InputStream is (ims);
   
   std::string out;
@@ -104,7 +104,7 @@ TEST(3)
   EXPECT_EQ (deflated.size () < 300000 && deflated.size () > 200000, true);
   EXPECT_EQ (deflated.size (), fg.compressed ());
   EXPECT_EQ (n_hello, fg.uncompressed ());
-  tl::InputMemoryStream ims = tl::InputMemoryStream ((const char *) deflated.c_str (), deflated.size ());
+  tl::InputMemoryStream ims ((const char *) deflated.c_str (), deflated.size ());
   tl::InputStream is (ims);
   
   std::string out;

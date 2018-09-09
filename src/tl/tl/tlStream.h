@@ -33,7 +33,6 @@
 #include <sstream>
 #include <cstdio>
 #include <cstring>
-#include <zlib.h>
 
 
 namespace tl
@@ -105,6 +104,10 @@ public:
 };
 
 // ---------------------------------------------------------------------------------
+
+class ZLibFilePrivate;
+
+// ---------------------------------------------------------------------------------
 //  InputStreamBase implementations
 
 /**
@@ -162,6 +165,10 @@ public:
   }
 
 private:
+  //  no copying
+  InputMemoryStream (const InputMemoryStream &);
+  InputMemoryStream &operator= (const InputMemoryStream &);
+
   const char *mp_data;
   size_t m_length, m_pos;
 };
@@ -215,8 +222,12 @@ public:
   virtual std::string filename () const;
 
 private:
+  //  no copying
+  InputZLibFile (const InputZLibFile &);
+  InputZLibFile &operator= (const InputZLibFile &);
+
   std::string m_source;
-  gzFile m_zs;
+  ZLibFilePrivate *mp_d;
 };
 
 /**
@@ -263,6 +274,10 @@ public:
   virtual std::string filename () const;
 
 private:
+  //  no copying
+  InputFile (const InputFile &d);
+  InputFile &operator= (const InputFile &d);
+
   std::string m_source;
   int m_fd;
 };
@@ -338,6 +353,10 @@ public:
   }
 
 private:
+  //  No copying
+  InputPipe (const InputPipe &);
+  InputPipe &operator= (const InputPipe &);
+
   FILE *m_file;
   std::string m_source;
 };
@@ -665,6 +684,11 @@ public:
   {
     return false;
   }
+
+private:
+  //  No copying
+  OutputStreamBase (const OutputStreamBase &);
+  OutputStreamBase &operator= (const OutputStreamBase &);
 };
 
 /**
@@ -719,6 +743,10 @@ public:
   }
 
 private:
+  //  No copying
+  OutputMemoryStream (const OutputMemoryStream &);
+  OutputMemoryStream &operator= (const OutputMemoryStream &);
+
   std::vector<char> m_buffer;
 };
 
@@ -778,6 +806,10 @@ public:
   }
 
 private:
+  //  No copying
+  OutputStringStream (const OutputStringStream &);
+  OutputStringStream &operator= (const OutputStringStream &);
+
   std::ostringstream m_stream;
 };
 
@@ -817,8 +849,12 @@ public:
   virtual void write (const char *b, size_t n);
 
 private:
+  //  No copying
+  OutputZLibFile (const OutputZLibFile &);
+  OutputZLibFile &operator= (const OutputZLibFile &);
+
   std::string m_source;
-  gzFile m_zs;
+  ZLibFilePrivate *mp_d;
 };
 
 /**
@@ -873,6 +909,10 @@ public:
   virtual void write (const char *b, size_t n);
 
 private:
+  //  No copying
+  OutputFile (const OutputFile &);
+  OutputFile &operator= (const OutputFile &);
+
   std::string m_source;
   int m_fd;
 };
@@ -915,6 +955,10 @@ public:
   virtual void write (const char *b, size_t n);
 
 private:
+  //  No copying
+  OutputPipe (const OutputPipe &);
+  OutputPipe &operator= (const OutputPipe &);
+
   FILE *m_file;
   std::string m_source;
 };

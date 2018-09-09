@@ -204,7 +204,7 @@ PythonInterpreter::PythonInterpreter ()
 
       wchar_t buffer[MAX_PATH];
       int len;
-      if ((len = GetModuleFileName (NULL, buffer, MAX_PATH)) > 0) {
+      if ((len = GetModuleFileNameW (NULL, buffer, MAX_PATH)) > 0) {
 
         std::string inst_dir = tl::absolute_path (tl::to_string (std::wstring (buffer, len)));
         std::string path_file = tl::combine_path (inst_dir, ".python-paths.txt");

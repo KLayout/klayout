@@ -20,7 +20,7 @@
 
 */
 
-#if !defined(HAVE_QT)
+#if !defined(HAVE_QT) || defined(HAVE_PTHREADS)
 
 #include "tlThreads.h"
 #include "tlUtils.h"
@@ -29,11 +29,14 @@
 #include "tlInternational.h"
 
 #include <map>
+#define _TIMESPEC_DEFINED   //  avoids errors with pthread-win and MSVC2017
 #include <pthread.h>
 #include <errno.h>
-#include <unistd.h>
 #if defined(_WIN32)
-#  include <windows.h>
+#  define NOMINMAX
+#  include <Windows.h>
+#else
+#  include <unistd.h>
 #endif
 
 namespace tl
@@ -291,7 +294,7 @@ bool Thread::wait (unsigned long time)
         return false;
       }
 
-#if defined(__WIN32)
+#if defined(_WIN32)
       Sleep (1);
 #else
       usleep (1000);

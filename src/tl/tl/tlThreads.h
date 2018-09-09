@@ -27,7 +27,7 @@
 
 #include <limits>
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && !defined(HAVE_PTHREADS)
 #  include <QMutex>
 #  include <QWaitCondition>
 #  include <QThread>
@@ -46,7 +46,7 @@ namespace tl
  *  available.
  */
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && !defined(HAVE_PTHREADS)
 
 class TL_PUBLIC Mutex
   : public QMutex
@@ -59,10 +59,13 @@ public:
 
 //  The non-Qt version is a dummy implementation as threading is not supported (yet)
 class TL_PUBLIC Mutex
-  : public atomic::spinlock
 {
 public:
-  Mutex () : atomic::spinlock () { }
+  Mutex () : m_spinlock () { }
+  void lock() { m_spinlock.lock(); }
+  void unlock() { m_spinlock.unlock(); }
+private:
+  atomic::spinlock m_spinlock;
 };
 
 #endif
@@ -73,7 +76,7 @@ public:
  *  available.
  */
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && !defined(HAVE_PTHREADS)
 
 class TL_PUBLIC WaitCondition
   : public QWaitCondition
@@ -131,7 +134,7 @@ private:
  *  available.
  */
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && !defined(HAVE_PTHREADS)
 
 class TL_PUBLIC Thread
   : public QThread
@@ -177,7 +180,7 @@ private:
  *  available.
  */
 
-#if defined(HAVE_QT)
+#if defined(HAVE_QT) && !defined(HAVE_PTHREADS)
 
 template <class T>
 class ThreadStorage

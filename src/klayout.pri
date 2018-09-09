@@ -67,6 +67,15 @@ equals(HAVE_EXPAT, "1") {
   DEFINES += HAVE_EXPAT
 }
 
+equals(HAVE_PTHREADS, "1") {
+  !isEmpty(BITS_PATH) {
+    include($$BITS_PATH/ptw/ptw.pri)
+  } else {
+    LIBS += -lpthread
+  }
+  DEFINES += HAVE_PTHREADS
+}
+
 equals(HAVE_RUBY, "1") {
   !isEmpty(BITS_PATH) {
     include($$BITS_PATH/ruby/ruby.pri)
@@ -113,12 +122,17 @@ msvc {
       -Wno-deprecated-declarations \
       -Wno-reserved-user-defined-literal \
 
+  win32 {
+    QMAKE_LFLAGS += -Wl,--exclude-all-symbols
+  } else {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+  }
+
 }
 
 equals(HAVE_QT, "0") {
 
   QT =
-  LIBS += -lpthread
 
 } else {
 
@@ -135,17 +149,6 @@ equals(HAVE_QT, "0") {
     CONFIG += designer
   }
 
-}
-
-# only support the required symbols for shared object load performance
-msvc {
-  # ...
-} else {
-  win32 {
-    QMAKE_LFLAGS += -Wl,--exclude-all-symbols
-  } else {
-    QMAKE_CXXFLAGS += -fvisibility=hidden
-  }
 }
 
 VERSION_STRING = $$KLAYOUT_VERSION

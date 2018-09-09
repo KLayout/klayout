@@ -30,6 +30,7 @@
 #include <vector>
 #include <sstream>
 #include <cwctype>
+#include <algorithm>
 
 #include "tlString.h"
 #include "tlExpression.h"
@@ -319,7 +320,7 @@ static double local_strtod (const char *cp, const char *&cp_new)
 // -------------------------------------------------------------------------
 //  Implementation
 
-std::string 
+std::string
 to_string (double d, int prec)
 {
   //  For small values less than 1e-(prec) simply return "0" to avoid ugly values like "1.2321716e-14".
@@ -336,7 +337,7 @@ to_string (double d, int prec)
   return os.str ();
 }
 
-std::string 
+std::string
 to_string (float d, int prec)
 {
   //  For small values less than 1e-(prec) simply return "0" to avoid ugly values like "1.2321716e-14".
@@ -354,7 +355,7 @@ to_string (float d, int prec)
 }
 
 template <>
-std::string 
+std::string
 to_string (const int &d)
 {
   std::ostringstream os;
@@ -364,7 +365,7 @@ to_string (const int &d)
 }
 
 template <>
-std::string 
+std::string
 to_string (const unsigned int &d)
 {
   std::ostringstream os;
@@ -374,7 +375,7 @@ to_string (const unsigned int &d)
 }
 
 template <>
-std::string 
+std::string
 to_string (const long &d)
 {
   std::ostringstream os;
@@ -384,7 +385,7 @@ to_string (const long &d)
 }
 
 template <>
-std::string 
+std::string
 to_string (const long long &d)
 {
   std::ostringstream os;
@@ -394,7 +395,7 @@ to_string (const long long &d)
 }
 
 template <>
-std::string 
+std::string
 to_string (const unsigned long &d)
 {
   std::ostringstream os;
@@ -404,7 +405,7 @@ to_string (const unsigned long &d)
 }
 
 template <>
-std::string 
+std::string
 to_string (const unsigned long long &d)
 {
   std::ostringstream os;
@@ -509,7 +510,7 @@ to_string (const bool &b)
   return b ? "true" : "false";
 }
 
-int 
+int
 edit_distance (const std::string &a, const std::string &b)
 {
   std::vector<int> row0, row1;
@@ -564,7 +565,7 @@ to_quoted_string (const std::string &s)
   return r;
 }
 
-std::string 
+std::string
 escape_string (const std::string &s)
 {
   std::string r;
@@ -610,7 +611,7 @@ inline char unescape_char (const char * &cp)
   }
 }
 
-std::string 
+std::string
 unescape_string (const std::string &value)
 {
   std::string r;
@@ -628,7 +629,7 @@ unescape_string (const std::string &value)
 std::string
 to_word_or_quoted_string (const std::string &s, const char *non_term)
 {
-  //  If the string does not contain non_term characters, we may simply keep it. 
+  //  If the string does not contain non_term characters, we may simply keep it.
   //  Otherwise we need to quote it.
   const char *cp = s.c_str ();
   if (*cp && (safe_isalpha (*cp) || strchr (non_term, *cp) != NULL)) {
@@ -749,7 +750,7 @@ from_string (const std::string &s, const unsigned char * &result)
   result = (unsigned char *) s.c_str ();
 }
 
-void 
+void
 from_string (const std::string &s, double &v)
 {
   const char *cp = s.c_str ();
@@ -771,7 +772,7 @@ from_string (const std::string &s, double &v)
 }
 
 template <class T>
-void 
+void
 convert_string_to_int (const std::string &s, T &v)
 {
   double x;
@@ -789,37 +790,37 @@ convert_string_to_int (const std::string &s, T &v)
   }
 }
 
-void 
+void
 from_string (const std::string &s, int &v)
 {
   convert_string_to_int (s, v);
 }
 
-void 
+void
 from_string (const std::string &s, long &v)
 {
   convert_string_to_int (s, v);
 }
 
-void 
+void
 from_string (const std::string &s, long long &v)
 {
   convert_string_to_int (s, v);
 }
 
-void 
+void
 from_string (const std::string &s, unsigned int &v)
 {
   convert_string_to_int (s, v);
 }
 
-void 
+void
 from_string (const std::string &s, unsigned long &v)
 {
   convert_string_to_int (s, v);
 }
 
-void 
+void
 from_string (const std::string &s, unsigned long long &v)
 {
   convert_string_to_int (s, v);
@@ -859,7 +860,7 @@ join (const std::vector <std::string> &vv, const std::string &s)
   return r.str ();
 }
 
-std::vector<std::string> 
+std::vector<std::string>
 split (const std::string &t, const std::string &s)
 {
   std::vector<std::string> r;
@@ -874,7 +875,7 @@ split (const std::string &t, const std::string &s)
   return r;
 }
 
-std::string 
+std::string
 trim (const std::string &s)
 {
   const char *cp = s.c_str ();
@@ -1167,12 +1168,12 @@ Extractor::try_read (long long &value)
 {
   return try_read_signed_int (value);
 }
-bool 
+bool
 Extractor::try_read (double &value)
 {
   if (! *skip ()) {
     return false;
-  } 
+  }
 
   const char *cp_end = m_cp;
   value = local_strtod (m_cp, cp_end);
@@ -1185,7 +1186,7 @@ Extractor::try_read (double &value)
   }
 }
 
-bool 
+bool
 Extractor::try_read (bool &value)
 {
   if (test ("0") || test ("false")) {
@@ -1199,12 +1200,12 @@ Extractor::try_read (bool &value)
   return false;
 }
 
-bool 
+bool
 Extractor::try_read_word (std::string &string, const char *non_term)
 {
   if (! *skip ()) {
     return false;
-  } 
+  }
 
   string.clear ();
   while (*m_cp && (safe_isalnum (*m_cp) || strchr (non_term, *m_cp) != NULL)) {
@@ -1214,13 +1215,13 @@ Extractor::try_read_word (std::string &string, const char *non_term)
   return ! string.empty ();
 }
 
-bool 
+bool
 Extractor::try_read_word_or_quoted (std::string &string, const char *non_term)
 {
   return try_read_word (string, non_term) || try_read_quoted (string);
 }
 
-bool 
+bool
 Extractor::try_read_quoted (std::string &string)
 {
   char q = *skip ();
@@ -1246,7 +1247,7 @@ Extractor::try_read_quoted (std::string &string)
   return true;
 }
 
-bool 
+bool
 Extractor::try_read (std::string &string, const char *term)
 {
   //  if the terminating characters contain line feed for blank, we must not skip over them
@@ -1259,7 +1260,7 @@ Extractor::try_read (std::string &string, const char *term)
     }
   } else if (! *skip ()) {
     return false;
-  } 
+  }
 
   bool term_is_space = false;
   for (const char *t = term; *t && ! term_is_space; ++t) {
@@ -1301,7 +1302,7 @@ Extractor::expect (const char *token)
   return *this;
 }
 
-bool 
+bool
 Extractor::test (const char *token)
 {
   skip ();
@@ -1314,7 +1315,7 @@ Extractor::test (const char *token)
     ++cp;
     ++token;
   }
-  
+
   if (! *token) {
     m_cp = cp;
     return true;
@@ -1457,7 +1458,7 @@ string::operator= (const char *c)
   return *this;
 }
 
-void 
+void
 string::assign (const char *c, size_t from, size_t to)
 {
   m_size = to - from;
@@ -1504,7 +1505,7 @@ string::operator= (const string &s)
   return *this;
 }
 
-void 
+void
 string::assign (const tl::string &s, size_t from, size_t to)
 {
   if (&s != this) {
@@ -1522,7 +1523,7 @@ string::operator= (const std::string &s)
   return *this;
 }
 
-void 
+void
 string::assign (const std::string &s, size_t from, size_t to)
 {
   assign (s.c_str (), from, to);
@@ -1540,7 +1541,7 @@ string::clear ()
   m_capacity = 0;
 }
 
-void 
+void
 string::reserve (size_t n)
 {
   if (m_capacity < n) {
@@ -1551,77 +1552,77 @@ string::reserve (size_t n)
       alloc.deallocate (mp_rep, m_capacity + 1);
     }
     mp_rep = nrep;
-    m_capacity = n; 
+    m_capacity = n;
   }
 }
 
-bool 
+bool
 string::operator== (const char *c) const
 {
   return (c[0] == c_str()[0] && strcmp (c, c_str()) == 0);
 }
 
-bool 
+bool
 string::operator== (const tl::string &s) const
 {
   return (c_str()[0] == s.c_str()[0] && strcmp (c_str(), s.c_str()) == 0);
 }
 
-bool 
+bool
 string::operator!= (const char *c) const
 {
   return (c[0] != c_str()[0] || strcmp (c, c_str()) != 0);
 }
 
-bool 
+bool
 string::operator!= (const tl::string &s) const
 {
   return (c_str()[0] != s.c_str()[0] || strcmp (c_str(), s.c_str()) != 0);
 }
 
-bool 
+bool
 string::operator< (const char *c) const
 {
   return strcmp (c_str(), c) < 0;
 }
- 
-bool 
+
+bool
 string::operator< (const tl::string &s) const
 {
   return strcmp (c_str(), s.c_str()) < 0;
 }
 
-bool 
+bool
 string::operator<= (const char *c) const
 {
   return strcmp (c_str(), c) <= 0;
 }
- 
-bool 
+
+bool
 string::operator<= (const tl::string &s) const
 {
   return strcmp (c_str(), s.c_str()) <= 0;
 }
 
-bool 
+bool
 string::operator> (const char *c) const
 {
   return strcmp (c_str(), c) > 0;
 }
- 
-bool 
+
+bool
 string::operator> (const tl::string &s) const
 {
   return strcmp (c_str(), s.c_str()) > 0;
 }
 
-bool 
+bool
 string::operator>= (const char *c) const
 {
   return strcmp (c_str(), c) >= 0;
 }
- 
-bool 
+
+bool
 string::operator>= (const tl::string &s) const
 {
   return strcmp (c_str(), s.c_str()) >= 0;
@@ -1632,7 +1633,7 @@ string::operator>= (const tl::string &s) const
 
 #if defined(_STLPORT_VERSION) && _STLPORT_VERSION == 0x521 && defined(_MSC_VER)
 /**
- *  @brief Workaround for STLPort 5.2.1 bug with scientific formatting 
+ *  @brief Workaround for STLPort 5.2.1 bug with scientific formatting
  *  In that version, the scientific formatting produces on digit less precision
  *  and replaces uses 0 for the last digit.
  *  To work around that problem we first create one digit too much and delete the

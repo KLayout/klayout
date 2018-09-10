@@ -1778,14 +1778,12 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
   argv[1] = argv1;
   argv[2] = argv2;
 
-#if 0
-//  According to the comments in ruby.c, this should not be required any longer:
 #if HAVE_RUBY_VERSION_CODE>=10900
-  //  Make sure we call ruby_sysinit because otherwise the program will crash
+  //  Make sure we call ruby_sysinit because otherwise the program will crash (this
+  //  has been observed on Windows under MSVC 2017 with Ruby 2.5.1 for example)
   char **argvp = argv;
   int argcp = argc;
   ruby_sysinit (&argcp, &argvp);
-#endif
 #endif
 
   {

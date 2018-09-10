@@ -68,8 +68,6 @@ namespace tl
 namespace db
 {
 
-extern std::string net_tracer_component_name;
-
 class NetTracerTechnologyComponentProvider
   : public db::TechnologyComponentProvider
 {
@@ -87,7 +85,7 @@ public:
 
   virtual tl::XMLElementBase *xml_element () const
   {
-    return new db::TechnologyComponentXMLElement<NetTracerTechnologyComponent> (net_tracer_component_name,
+    return new db::TechnologyComponentXMLElement<NetTracerTechnologyComponent> (net_tracer_component_name (),
       tl::make_member ((NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::begin, (NetTracerTechnologyComponent::const_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::end, &NetTracerTechnologyComponent::add, "connection") +
       tl::make_member ((NetTracerTechnologyComponent::const_symbol_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::begin_symbols, (NetTracerTechnologyComponent::const_symbol_iterator (NetTracerTechnologyComponent::*) () const) &NetTracerTechnologyComponent::end_symbols, &NetTracerTechnologyComponent::add_symbol, "symbols")
     );

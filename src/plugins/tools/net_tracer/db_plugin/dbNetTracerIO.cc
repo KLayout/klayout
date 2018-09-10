@@ -27,7 +27,10 @@
 namespace db
 {
 
-DB_PLUGIN_PUBLIC std::string net_tracer_component_name ("connectivity");
+std::string net_tracer_component_name ()
+{
+  return std::string ("connectivity");
+}
 
 // -----------------------------------------------------------------------------------------
 //  NetTracerLayerExpressionInfo implementation
@@ -486,13 +489,13 @@ Net::define_layer (unsigned int l, const db::LayerProperties &lp, const db::Laye
 //  NetTracerTechnologyComponent implementation
 
 NetTracerTechnologyComponent::NetTracerTechnologyComponent ()
-  : db::TechnologyComponent (net_tracer_component_name, tl::to_string (tr ("Connectivity")))
+  : db::TechnologyComponent (net_tracer_component_name (), tl::to_string (tr ("Connectivity")))
 {
   // .. nothing yet ..
 }
 
 NetTracerTechnologyComponent::NetTracerTechnologyComponent (const NetTracerTechnologyComponent &d)
-  : db::TechnologyComponent (net_tracer_component_name, tl::to_string (tr ("Connectivity")))
+  : db::TechnologyComponent (net_tracer_component_name (), tl::to_string (tr ("Connectivity")))
 {
   m_connections = d.m_connections;
   m_symbols = d.m_symbols;

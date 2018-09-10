@@ -37,6 +37,8 @@ namespace db
 
 class NetTracerTechnologyComponent;
 
+DB_PLUGIN_PUBLIC std::string net_tracer_component_name ();
+
 class DB_PLUGIN_PUBLIC NetTracerLayerExpressionInfo
 {
 public:

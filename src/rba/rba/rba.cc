@@ -1768,18 +1768,24 @@ static VALUE run_app_func (VALUE)
 int
 RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) (int &, char **))
 {
+  static char argv1[] = "-e";
+  static char argv2[] = "__run_app__";
+
   int argc = 3;
   char *argv[3];
   argv[0] = main_argv[0];
   // Hint: to keep ruby_options from reading stdin, we simulate a "-e" option with an empty script
-  argv[1] = (char *)"-e";
-  argv[2] = (char *)"__run_app__";
+  argv[1] = argv1;
+  argv[2] = argv2;
 
+#if 0
+//  According to the comments in ruby.c, this should not be required any longer:
 #if HAVE_RUBY_VERSION_CODE>=10900
   //  Make sure we call ruby_sysinit because otherwise the program will crash
   char **argvp = argv;
   int argcp = argc;
   ruby_sysinit (&argcp, &argvp);
+#endif
 #endif
 
   {

@@ -3093,7 +3093,7 @@ END
       src.puts("#   define GSI_#{modn.upcase}_LOCAL            DEF_OUTSIDE_LOCAL")
       src.puts("# endif")
       src.puts("")
-      src.puts("#define FORCE_LINK_GSI_#{modn.upcase} void force_link_gsi#{modn}_f () { GSI_#{modn.upcase}_PUBLIC int force_link_gsi#{modn}; force_link_gsi#{modn} = 0; }")
+      src.puts("#define FORCE_LINK_GSI_#{modn.upcase} GSI_#{modn.upcase}_PUBLIC int _force_link_gsi#{modn}_f (); int _force_link_gsi#{modn} = _force_link_gsi#{modn}_f ();")
       src.puts("")
       src.puts("#endif")
 
@@ -3120,7 +3120,7 @@ END
       src.puts("")
       src.puts("#include \"gsi#{modn}Common.h\"")
       src.puts("")
-      src.puts("GSI_#{modn.upcase}_PUBLIC int force_link_gsi#{modn} = 0;")
+      src.puts("GSI_#{modn.upcase}_PUBLIC int _force_link_gsi#{modn}_f () { return 0; }")
       src.puts("")
 
       puts("#{src_name} written.")

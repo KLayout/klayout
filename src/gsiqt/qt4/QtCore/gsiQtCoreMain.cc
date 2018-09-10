@@ -7,5 +7,5 @@
 
 #include "gsiQtCoreCommon.h"
 
-GSI_QTCORE_PUBLIC int force_link_gsiQtCore = 0;
+GSI_QTCORE_PUBLIC int _force_link_gsiQtCore_f () { return 0; }
 

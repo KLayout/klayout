@@ -7,5 +7,5 @@
 
 #include "gsiQtNetworkCommon.h"
 
-GSI_QTNETWORK_PUBLIC int force_link_gsiQtNetwork = 0;
+GSI_QTNETWORK_PUBLIC int _force_link_gsiQtNetwork_f () { return 0; }
 

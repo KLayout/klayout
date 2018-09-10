@@ -7,5 +7,5 @@
 
 #include "gsiQtGuiCommon.h"
 
-GSI_QTGUI_PUBLIC int force_link_gsiQtGui = 0;
+GSI_QTGUI_PUBLIC int _force_link_gsiQtGui_f () { return 0; }
 

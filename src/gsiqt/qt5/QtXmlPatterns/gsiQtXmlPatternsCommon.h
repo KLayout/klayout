@@ -20,6 +20,6 @@
 #   define GSI_QTXMLPATTERNS_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
 
-#define FORCE_LINK_GSI_QTXMLPATTERNS void force_link_gsiQtXmlPatterns_f () { GSI_QTXMLPATTERNS_PUBLIC int force_link_gsiQtXmlPatterns; force_link_gsiQtXmlPatterns = 0; }
+#define FORCE_LINK_GSI_QTXMLPATTERNS GSI_QTXMLPATTERNS_PUBLIC int _force_link_gsiQtXmlPatterns_f (); int _force_link_gsiQtXmlPatterns = _force_link_gsiQtXmlPatterns_f ();
 
 #endif

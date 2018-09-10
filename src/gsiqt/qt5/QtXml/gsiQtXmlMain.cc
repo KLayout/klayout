@@ -7,5 +7,5 @@
 
 #include "gsiQtXmlCommon.h"
 
-GSI_QTXML_PUBLIC int force_link_gsiQtXml = 0;
+GSI_QTXML_PUBLIC int _force_link_gsiQtXml_f () { return 0; }
 

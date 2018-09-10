@@ -20,6 +20,6 @@
 #   define GSI_QTSVG_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
 
-#define FORCE_LINK_GSI_QTSVG void force_link_gsiQtSvg_f () { GSI_QTSVG_PUBLIC int force_link_gsiQtSvg; force_link_gsiQtSvg = 0; }
+#define FORCE_LINK_GSI_QTSVG GSI_QTSVG_PUBLIC int _force_link_gsiQtSvg_f (); int _force_link_gsiQtSvg = _force_link_gsiQtSvg_f ();
 
 #endif

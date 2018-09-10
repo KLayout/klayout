@@ -7,5 +7,5 @@
 
 #include "gsiQtSvgCommon.h"
 
-GSI_QTSVG_PUBLIC int force_link_gsiQtSvg = 0;
+GSI_QTSVG_PUBLIC int _force_link_gsiQtSvg_f () { return 0; }
 

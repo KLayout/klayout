@@ -20,6 +20,6 @@
 #   define GSI_QTMULTIMEDIA_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
 
-#define FORCE_LINK_GSI_QTMULTIMEDIA void force_link_gsiQtMultimedia_f () { GSI_QTMULTIMEDIA_PUBLIC int force_link_gsiQtMultimedia; force_link_gsiQtMultimedia = 0; }
+#define FORCE_LINK_GSI_QTMULTIMEDIA GSI_QTMULTIMEDIA_PUBLIC int _force_link_gsiQtMultimedia_f (); int _force_link_gsiQtMultimedia = _force_link_gsiQtMultimedia_f ();
 
 #endif

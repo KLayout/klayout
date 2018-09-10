@@ -7,5 +7,5 @@
 
 #include "gsiQtSqlCommon.h"
 
-GSI_QTSQL_PUBLIC int force_link_gsiQtSql = 0;
+GSI_QTSQL_PUBLIC int _force_link_gsiQtSql_f () { return 0; }
 

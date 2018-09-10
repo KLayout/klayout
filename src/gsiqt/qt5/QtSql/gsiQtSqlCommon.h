@@ -20,6 +20,6 @@
 #   define GSI_QTSQL_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
 
-#define FORCE_LINK_GSI_QTSQL void force_link_gsiQtSql_f () { GSI_QTSQL_PUBLIC int force_link_gsiQtSql; force_link_gsiQtSql = 0; }
+#define FORCE_LINK_GSI_QTSQL GSI_QTSQL_PUBLIC int _force_link_gsiQtSql_f (); int _force_link_gsiQtSql = _force_link_gsiQtSql_f ();
 
 #endif

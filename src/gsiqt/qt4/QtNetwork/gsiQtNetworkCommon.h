@@ -20,6 +20,6 @@
 #   define GSI_QTNETWORK_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
 
-#define FORCE_LINK_GSI_QTNETWORK void force_link_gsiQtNetwork_f () { GSI_QTNETWORK_PUBLIC int force_link_gsiQtNetwork; force_link_gsiQtNetwork = 0; }
+#define FORCE_LINK_GSI_QTNETWORK GSI_QTNETWORK_PUBLIC int _force_link_gsiQtNetwork_f (); int _force_link_gsiQtNetwork = _force_link_gsiQtNetwork_f ();
 
 #endif

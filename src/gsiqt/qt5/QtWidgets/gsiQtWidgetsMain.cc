@@ -7,5 +7,5 @@
 
 #include "gsiQtWidgetsCommon.h"
 
-GSI_QTWIDGETS_PUBLIC int force_link_gsiQtWidgets = 0;
+GSI_QTWIDGETS_PUBLIC int _force_link_gsiQtWidgets_f () { return 0; }
 

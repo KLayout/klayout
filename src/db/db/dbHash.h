@@ -43,53 +43,13 @@
 
 /**
  *  This header defines some hash functions for various database objects 
- *  for use with std_ext::hash_map and std_ext::hash_set
+ *  for use with std::unordered_map and std::unordered_set
  *
  *  It also provides namespace abstraction for the std_ext namespace
  */
 
 namespace std
 {
-#if defined(_WIN64) && !defined(_MSC_VER)
-  /**
-   *  @brief Specialization missing for size_t on WIN64
-   */
-  template<>
-  struct hash<size_t>
-  {
-    size_t operator()(size_t __x) const
-    {
-      return __x;
-    }
-  };
-#endif
-
-#if (defined(_WIN64) && !defined(_MSC_VER)) || defined(__APPLE__)
-  /**
-   *  @brief Specialization missing for long long on WIN64
-   */
-  template<>
-  struct hash<long long>
-  {
-    size_t operator()(long long __x) const
-    {
-      return size_t (__x);
-    }
-  };
-#elif defined(_WIN32)
-  /**
-   *  @brief Specialization missing for long long (64 bit) on WIN32
-   */
-  template<>
-  struct hash<long long>
-  {
-    size_t operator()(long long __x) const
-    {
-      return size_t (__x ^ (__x >> 32));
-    }
-  };
-#endif
-
   template <class T>
   inline size_t hfunc (const T &t)
   {

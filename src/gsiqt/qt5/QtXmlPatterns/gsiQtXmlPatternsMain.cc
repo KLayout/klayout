@@ -7,5 +7,5 @@
 
 #include "gsiQtXmlPatternsCommon.h"
 
-GSI_QTXMLPATTERNS_PUBLIC int force_link_gsiQtXmlPatterns = 0;
+GSI_QTXMLPATTERNS_PUBLIC int _force_link_gsiQtXmlPatterns_f () { return 0; }
 

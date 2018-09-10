@@ -20,6 +20,6 @@
 #   define GSI_QTWIDGETS_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
 
-#define FORCE_LINK_GSI_QTWIDGETS void force_link_gsiQtWidgets_f () { GSI_QTWIDGETS_PUBLIC int force_link_gsiQtWidgets; force_link_gsiQtWidgets = 0; }
+#define FORCE_LINK_GSI_QTWIDGETS GSI_QTWIDGETS_PUBLIC int _force_link_gsiQtWidgets_f (); int _force_link_gsiQtWidgets = _force_link_gsiQtWidgets_f ();
 
 #endif

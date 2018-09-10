@@ -20,6 +20,6 @@
 #   define GSI_QTXML_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
 
-#define FORCE_LINK_GSI_QTXML void force_link_gsiQtXml_f () { GSI_QTXML_PUBLIC int force_link_gsiQtXml; force_link_gsiQtXml = 0; }
+#define FORCE_LINK_GSI_QTXML GSI_QTXML_PUBLIC int _force_link_gsiQtXml_f (); int _force_link_gsiQtXml = _force_link_gsiQtXml_f ();
 
 #endif

@@ -7,5 +7,5 @@
 
 #include "gsiQtPrintSupportCommon.h"
 
-GSI_QTPRINTSUPPORT_PUBLIC int force_link_gsiQtPrintSupport = 0;
+GSI_QTPRINTSUPPORT_PUBLIC int _force_link_gsiQtPrintSupport_f () { return 0; }
 

@@ -20,6 +20,6 @@
 #   define GSI_QTCORE_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
 
-#define FORCE_LINK_GSI_QTCORE void force_link_gsiQtCore_f () { GSI_QTCORE_PUBLIC int force_link_gsiQtCore; force_link_gsiQtCore = 0; }
+#define FORCE_LINK_GSI_QTCORE GSI_QTCORE_PUBLIC int _force_link_gsiQtCore_f (); int _force_link_gsiQtCore = _force_link_gsiQtCore_f ();
 
 #endif

@@ -7,5 +7,5 @@
 
 #include "gsiQtMultimediaCommon.h"
 
-GSI_QTMULTIMEDIA_PUBLIC int force_link_gsiQtMultimedia = 0;
+GSI_QTMULTIMEDIA_PUBLIC int _force_link_gsiQtMultimedia_f () { return 0; }
 

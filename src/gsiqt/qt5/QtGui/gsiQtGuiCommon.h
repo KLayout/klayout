@@ -20,6 +20,6 @@
 #   define GSI_QTGUI_LOCAL            DEF_OUTSIDE_LOCAL
 # endif
 
-#define FORCE_LINK_GSI_QTGUI void force_link_gsiQtGui_f () { GSI_QTGUI_PUBLIC int force_link_gsiQtGui; force_link_gsiQtGui = 0; }
+#define FORCE_LINK_GSI_QTGUI GSI_QTGUI_PUBLIC int _force_link_gsiQtGui_f (); int _force_link_gsiQtGui = _force_link_gsiQtGui_f ();
 
 #endif

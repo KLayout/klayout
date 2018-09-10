@@ -7,5 +7,5 @@
 
 #include "gsiQtDesignerCommon.h"
 
-GSI_QTDESIGNER_PUBLIC int force_link_gsiQtDesigner = 0;
+GSI_QTDESIGNER_PUBLIC int _force_link_gsiQtDesigner_f () { return 0; }
 

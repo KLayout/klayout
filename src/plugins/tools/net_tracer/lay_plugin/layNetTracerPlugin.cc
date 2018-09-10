@@ -20,6 +20,7 @@
 
 */
 
+#include "dbNetTracerIO.h"
 
 #include "layNetTracerIO.h"
 #include "layNetTracerDialog.h"
@@ -29,11 +30,6 @@
 #include "layCellView.h"
 
 #include "gsiDecl.h"
-
-namespace db
-{
-  DB_PLUGIN_PUBLIC std::string net_tracer_component_name;
-}
 
 namespace lay
 {
@@ -93,7 +89,7 @@ public:
   }
 };
 
-static tl::RegisteredClass<lay::TechnologyEditorProvider> editor_decl (new NetTracerTechnologyEditorProvider (), 13000, db::net_tracer_component_name.c_str ());
+static tl::RegisteredClass<lay::TechnologyEditorProvider> editor_decl (new NetTracerTechnologyEditorProvider (), 13000, db::net_tracer_component_name ().c_str ());
 
 }
 

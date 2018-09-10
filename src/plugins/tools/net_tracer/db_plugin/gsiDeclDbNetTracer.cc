@@ -25,11 +25,6 @@
 
 #include "gsiDecl.h"
 
-namespace db
-{
-  extern std::string net_tracer_component_name;
-}
-
 namespace gsi
 {
 
@@ -107,7 +102,7 @@ static db::NetTracerData get_tracer_data_from_tech (const std::string &tech_name
   const db::Technology *tech = db::Technologies::instance ()->technology_by_name (tech_name);
   tl_assert (tech != 0);
 
-  const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name));
+  const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
   tl_assert (tech_component != 0);
 
   return tech_component->get_tracer_data (layout);

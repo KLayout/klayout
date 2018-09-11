@@ -1772,18 +1772,17 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
   static char argv2[] = "__run_app__";
 
   int argc = 3;
-  char *argv[3];
-  argv[0] = main_argv[0];
+  char *argvv[3];
+  argvv[0] = main_argv[0];
   // Hint: to keep ruby_options from reading stdin, we simulate a "-e" option with an empty script
-  argv[1] = argv1;
-  argv[2] = argv2;
+  argvv[1] = argv1;
+  argvv[2] = argv2;
+  char **argv = argvv;
 
 #if HAVE_RUBY_VERSION_CODE>=10900
   //  Make sure we call ruby_sysinit because otherwise the program will crash (this
   //  has been observed on Windows under MSVC 2017 with Ruby 2.5.1 for example)
-  char **argvp = argv;
-  int argcp = argc;
-  ruby_sysinit (&argcp, &argvp);
+  ruby_sysinit (&argc, &argv);
 #endif
 
   {

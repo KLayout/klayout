@@ -54,9 +54,12 @@ compare_ref (tl::TestBase *_this, const char *test, const db::Layout &layout)
     //  ignore read errors on au files -> this way they can be updated easily
   }
 
+  //  Normalize the golden data's CRLF line breaks on Windows
+  au = tl::replaced (au, "\r\n", "\n");
+
   if (au != oss) {
 
-    EXPECT_EQ (std::string (os.string ()), au)
+    EXPECT_EQ (oss, au)
 
     std::string fn (_this->tmp_file (std::string ("t") + test + "_au.txt"));
     {
@@ -67,7 +70,7 @@ compare_ref (tl::TestBase *_this, const char *test, const db::Layout &layout)
 
     tl::info << "To update golden data use";
     tl::info << "  cp " << fn << " " << tl::absolute_file_path (fn_au);
-#if 1 //  auto update
+#if 0 //  auto update
     system ((std::string ("cp ") + fn + " " + tl::absolute_file_path (fn_au)).c_str ());
     tl::info << "Golden data updated.";
 #endif

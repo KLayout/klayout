@@ -1850,13 +1850,6 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
 
 #endif
 
-      //  Remove setters for $0 and $PROGRAM_NAME (still both are linked) because
-      //  the setter does strange things with the process and the argv, specifically argv[0] above.
-      static VALUE argv0 = Qnil;
-      argv0 = c2ruby<const char *> (main_argv [0]);
-      rb_define_hooked_variable("$0", &argv0, 0, 0);
-      rb_define_hooked_variable("$PROGRAM_NAME", &argv0, 0, 0);
-
       rb_define_global_function("__run_app__", (VALUE (*)(...)) run_app_func, 0);
 
       s_argc = &main_argc;

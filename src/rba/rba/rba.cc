@@ -1862,10 +1862,21 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
       //  fault on exception.
      
 #if HAVE_RUBY_VERSION_CODE<10900
+
+      //  Remove setters for $0 and $PROGRAM_NAME (still both are linked) because
+      //  the setter does strange things with the process and the argv, specifically argv[0] above.
+      //  This is no longer the case for 1.9 and 2.x. On ruby 2.5.0 crashes have been observed
+      //  with this code, so it got moved into the 1.8.x branch.
+      static VALUE argv0 = Qnil;
+      argv0 = c2ruby<const char *> (main_argv [0]);
+      rb_define_hooked_variable("$0", &argv0, 0, 0);
+      rb_define_hooked_variable("$PROGRAM_NAME", &argv0, 0, 0);
+
       //  1.8.x does not have ruby_run_node
       ruby_options(argc, argv);
       ruby_run();
       int res = 0;
+
 #else
       int res = ruby_run_node (ruby_options (argc, argv));
 #endif

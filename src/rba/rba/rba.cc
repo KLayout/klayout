@@ -1780,9 +1780,12 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
   char **argv = argvv;
 
 #if HAVE_RUBY_VERSION_CODE>=10900
-  //  Make sure we call ruby_sysinit because otherwise the program will crash (this
+  //  Make sure we call ruby_sysinit on Windows because otherwise the program will crash (this
   //  has been observed on Windows under MSVC 2017 with Ruby 2.5.1 for example)
-  ruby_sysinit (&argc, &argv);
+  //  ruby_sysinit will restore the argc/argv to their originals, so we use copies here.
+  int xargc = argc;
+  char **xargv = argv;
+  ruby_sysinit (&xargc, &xargv);
 #endif
 
   {

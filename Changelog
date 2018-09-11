@@ -1,10 +1,13 @@
 0.26            (2018-12-31):
+
+* YET TO BE RELEASED
 * Enhancement: Standalone Python modules provided
        For details see: 
        https://github.com/klayoutmatthias/klayout/wiki/klayout---Standalone-KLayout-Python-Module
 
-0.25.5          (2018-12-31):
+0.25.5          (2018-12-30):
 
+* YET TO BE RELEASED
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/162
        GDS2 LIBNAME was not maintained on "File/Save".
 

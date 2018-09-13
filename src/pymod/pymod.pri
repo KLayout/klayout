@@ -42,6 +42,9 @@ lib_target.path = $$PREFIX/pymod/klayout
 # This would be nice:
 #   lib_target.files += $$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX}
 # but some Qt versions need this explicitly:
-lib_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX} $(INSTALLROOT)$$PREFIX/pymod/klayout
+msvc {
+  lib_target.extra = $(INSTALL_PROGRAM) $$shell_path($$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX}) $$shell_path($(INSTALLROOT)$$PREFIX/pymod/klayout)
+} else {
+  lib_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX} $(INSTALLROOT)$$PREFIX/pymod/klayout
+}
 INSTALLS = lib_target
-

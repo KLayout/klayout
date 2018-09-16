@@ -1151,5 +1151,5 @@ TEST(166)
 {
   db::GDS2WriterOptions opt;
   opt.max_vertex_count = 4;
-  run_test (_this, "t166.oas.gz", "t166_au.gds.gz", true, opt);
+  run_test (_this, "t166.oas.gz", "t166_au.gds.gz", false, opt);
 }

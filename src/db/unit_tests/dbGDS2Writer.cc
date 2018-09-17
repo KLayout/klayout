@@ -1145,3 +1145,11 @@ TEST(121)
   opt.max_vertex_count = 4;
   run_test (_this, "t121.oas.gz", "t121_au.gds.gz", true, opt);
 }
+
+//  Extreme fracturing by max. points
+TEST(166)
+{
+  db::GDS2WriterOptions opt;
+  opt.max_vertex_count = 4;
+  run_test (_this, "t166.oas.gz", "t166_au.gds.gz", false, opt);
+}

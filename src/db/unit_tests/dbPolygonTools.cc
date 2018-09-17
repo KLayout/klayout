@@ -2241,3 +2241,20 @@ TEST(403)
     EXPECT_EQ (right_of.size (), size_t (0));
   }
 }
+
+//  issue 166
+TEST(404)
+{
+  db::Polygon poly;
+  std::string s ("(390,0;438,936;176,874;0,832;438,937;541,961;821,102)");
+  tl::Extractor ex (s.c_str ());
+  ex.read (poly);
+
+  std::vector<db::Polygon> sp;
+  db::split_polygon (poly, sp);
+  EXPECT_EQ (sp.size (), size_t (2));
+  if (sp.size () >= 2) {
+    EXPECT_EQ (sp[0].to_string (), "(390,0;438,936;390,925;438,937;541,961;821,102)");
+    EXPECT_EQ (sp[1].to_string (), "(0,832;176,874;390,925)");
+  }
+}

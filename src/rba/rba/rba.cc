@@ -1772,12 +1772,16 @@ static VALUE run_app_func (VALUE)
 int
 RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) (int &, char **))
 {
+  static char argv1[] = "-e";
+  static char argv2[] = "__run_app__";
+
   int argc = 3;
-  char *argv[3];
-  argv[0] = main_argv[0];
+  char *argvv[3];
+  argvv[0] = main_argv[0];
   // Hint: to keep ruby_options from reading stdin, we simulate a "-e" option with an empty script
-  argv[1] = (char *)"-e";
-  argv[2] = (char *)"__run_app__";
+  argvv[1] = argv1;
+  argvv[2] = argv2;
+  char **argv = argvv;
 
 #if HAVE_RUBY_VERSION_CODE>=10900
   //  Make sure we call ruby_sysinit because otherwise the program will crash
@@ -1851,13 +1855,6 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
 
 #endif
 
-      //  Remove setters for $0 and $PROGRAM_NAME (still both are linked) because
-      //  the setter does strange things with the process and the argv, specifically argv[0] above.
-      static VALUE argv0 = Qnil;
-      argv0 = c2ruby<const char *> (main_argv [0]);
-      rb_define_hooked_variable("$0", &argv0, 0, 0);
-      rb_define_hooked_variable("$PROGRAM_NAME", &argv0, 0, 0);
-
       rb_define_global_function("__run_app__", (VALUE (*)(...)) run_app_func, 0);
 
       s_argc = &main_argc;
@@ -1870,10 +1867,21 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
       //  fault on exception.
      
 #if HAVE_RUBY_VERSION_CODE<10900
+
+      //  Remove setters for $0 and $PROGRAM_NAME (still both are linked) because
+      //  the setter does strange things with the process and the argv, specifically argv[0] above.
+      //  This is no longer the case for 1.9 and 2.x. On ruby 2.5.0 crashes have been observed
+      //  with this code, so it got moved into the 1.8.x branch.
+      static VALUE argv0 = Qnil;
+      argv0 = c2ruby<const char *> (main_argv [0]);
+      rb_define_hooked_variable("$0", &argv0, 0, 0);
+      rb_define_hooked_variable("$PROGRAM_NAME", &argv0, 0, 0);
+
       //  1.8.x does not have ruby_run_node
       ruby_options(argc, argv);
       ruby_run();
       int res = 0;
+
 #else
       int res = ruby_run_node (ruby_options (argc, argv));
 #endif

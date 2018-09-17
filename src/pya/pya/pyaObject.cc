@@ -111,50 +111,6 @@ bool CallbackFunction::operator== (const CallbackFunction &other) const
   return callable_ref () == other.callable_ref ();
 }
 
-/**
- *  @brief An adaptor class for the callback mechanism
- */
-class Callee
-  : public gsi::Callee
-{
-public:
-  /**
-   *  @brief Constructor for a Callee object pointing the to given Python object
-   */
-  Callee (PYAObjectBase *obj);
-
-  /**
-   *  @brief Destructor
-   */
-  ~Callee ();
-
-  /**
-   *  @brief Adds a callback (given by the CallbackFunction)
-   *  This method returns a callback ID which can be used to register the callback
-   *  at an GSI object.
-   */
-  int add_callback (const CallbackFunction &vf);
-
-  /**
-   *  @brief Clears all callbacks registered
-   */
-  void clear_callbacks ();
-
-  /**
-   *  @brief Implementation of the Callee interface
-   */
-  virtual void call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const;
-
-  /**
-   *  @brief Implementation of the Callee interface
-   */
-  virtual bool can_call () const;
-
-private:
-  PYAObjectBase *mp_obj;
-  std::vector<CallbackFunction> m_cbfuncs;
-};
-
 // --------------------------------------------------------------------------
 //  Implementation of Callee
 

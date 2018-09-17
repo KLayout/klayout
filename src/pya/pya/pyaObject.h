@@ -94,6 +94,11 @@ public:
    */
   virtual void call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const;
 
+  /**
+   *  @brief Implementation of the Callee interface
+   */
+  virtual bool can_call () const;
+
 private:
   PYAObjectBase *mp_obj;
   std::vector<CallbackFunction> m_cbfuncs; 

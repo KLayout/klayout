@@ -1,6 +1,7 @@
 .PHONY: help build deploy test dropbox-deploy
 
 GITCOMMIT := $(shell git rev-parse --short HEAD)
+KLAYOUT_VERSION := $(shell source version.sh && echo $$KLAYOUT_VERSION)
 
 .ONESHELL:
 
@@ -30,7 +31,7 @@ test: deploy
 	ln -s klayout.app/Contents/MacOS/klayout klayout; \
 	export TESTTMP=testtmp; \
 	export TESTSRC=..; \
-	./ut_runner -h; \
+	./ut_runner -h || true; \
 #	./ut_runner || true; \
 	cd ..;
 
@@ -40,5 +41,5 @@ dropbox-deploy: test
 	pwd; \
 	ls -lah; \
 	touch build.txt; \
-	cp build.txt deploy; \
-	tar czf "deploy/qt5.pkg.macos-$(MACOS_VERSION)-release-$(GITCOMMIT).tar.gz" qt5.pkg.macos-$(MACOS_VERSION)-release
+	cp build.txt deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).log.txt; \
+	tar czf "deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).tar.gz" qt5.pkg.macos-$(MACOS_VERSION)-release

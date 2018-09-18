@@ -26,26 +26,26 @@ deploy:
 	
 test:
 	@echo "Testing 4 Mac $(GITCOMMIT)"
-	qt5.pkg.macos-$(MACOS_VERSION)-release/klayout.app/Contents/MacOS/klayout -b -r test-pylib-script.py; \
-	cd qt5.build.macos-$(MACOS_VERSION)-release; \
-	ln -s klayout.app/Contents/MacOS/klayout klayout; \
-	export TESTTMP=testtmp; \
-	export TESTSRC=..; \
-	./ut_runner -h || true; \
-#	./ut_runner || true; \
-	cd ..;
+	qt5.pkg.macos-$(MACOS_VERSION)-release/klayout.app/Contents/MacOS/klayout -b -r test-pylib-script.py
+	cd qt5.build.macos-$(MACOS_VERSION)-release
+	ln -s klayout.app/Contents/MacOS/klayout klayout
+	export TESTTMP=testtmp
+	export TESTSRC=..
+	./ut_runner -h || true
+	cd ..
 
 dropbox-deploy:
 	@echo "Preparing for dropbox deployment $(MACOS_VERSION) $(GITCOMMIT)"
-	mkdir deploy; \
-	pwd; \
-	ls -lah; \
-	touch build.txt; \
-	cp build.txt deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).log.txt; \
-	hdiutil convert macbuild/Resources/klayoutDMGTemplate.dmg -format UDRW -o work-KLayout.dmg; \
-	hdiutil attach work-KLayout.dmg -readwrite -noverify -quiet -mountpoint tempKLayout -noautoopen; \
-	cp -a qt5.pkg.macos-$(MACOS_VERSION)-release/ tempKLayout/; \
-	hdiutil detach tempKLayout; \
-	hdiutil convert work-KLayout.dmg -format UDZO -imagekey zlib-level=9 -o deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg; \
+	mkdir deploy
+	pwd
+	ls -lah
+	touch build.txt
+	cp build.txt deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).log.txt
+	hdiutil convert macbuild/Resources/klayoutDMGTemplate.dmg -format UDRW -o work-KLayout.dmg
+	hdiutil resize -size 500m work-KLayout.dmg
+	hdiutil attach work-KLayout.dmg -readwrite -noverify -quiet -mountpoint tempKLayout -noautoopen
+	cp -a qt5.pkg.macos-$(MACOS_VERSION)-release/ tempKLayout/
+	hdiutil detach tempKLayout
+	hdiutil convert work-KLayout.dmg -format UDZO -imagekey zlib-level=9 -o deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg
 	md5 -q deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg > deploy/qt5.pkg.macos-$(MACOS_VERSION)-$(PYTHON_VERSION)-release-$(KLAYOUT_VERSION)-$(GITCOMMIT).dmg.md5
-	rm work-KLayout.dmg; \
+	rm work-KLayout.dmg

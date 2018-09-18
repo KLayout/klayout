@@ -20,11 +20,11 @@ build:
 	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew -c; \
 	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew
 
-deploy: build
+deploy:
 	@echo "Deploying 4 Mac $(GITCOMMIT)"
 	./build4mac.py -p $(PYTHON_VERSION) -q Qt5Brew -y
 	
-test: deploy
+test:
 	@echo "Testing 4 Mac $(GITCOMMIT)"
 	qt5.pkg.macos-$(MACOS_VERSION)-release/klayout.app/Contents/MacOS/klayout -b -r test-pylib-script.py; \
 	cd qt5.build.macos-$(MACOS_VERSION)-release; \

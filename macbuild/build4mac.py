@@ -765,7 +765,7 @@ def DeployBinariesForBundle():
 
     deploymentPython = True
     if deploymentPython and NonOSStdLang:
-      from build4mac_util import WalkFrameworkPaths, PerformChanges, DetectChanges
+      from build4mac_util import WalkFrameworkPaths, PerformChanges
 
       bundlePath = AbsMacPkgDir + '/klayout.app'
       # bundlePath = os.getcwd() + '/qt5.pkg.macos-HighSierra-release/klayout.app'

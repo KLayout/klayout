@@ -190,9 +190,9 @@ Python36MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versi
 
 # Python 3.7 from Brew *+*+*+ EXPERIMENTAL *+*+*+
 # [Key Type Name] = 'pybrew'
-Python37Brew= { 'exe': '/usr/local/opt/python3/libexec/bin/python' ,
-                'inc': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/3.7/Headers',
-                'lib': '/usr/local/opt/python3/Frameworks/Python.framework/Versions/3.7/Python'
+Python37Brew= { 'exe': '/usr/local/opt/python/libexec/bin/python' ,
+                'inc': '/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/Headers',
+                'lib': '/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/Python'
               }
 
 # Consolidated dictionary kit for Python

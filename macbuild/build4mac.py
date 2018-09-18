@@ -770,7 +770,7 @@ def DeployBinariesForBundle():
       bundlePath = AbsMacPkgDir + '/klayout.app'
       # bundlePath = os.getcwd() + '/qt5.pkg.macos-HighSierra-release/klayout.app'
       bundleExecPathAbs = '%s/Contents/MacOS/' % bundlePath
-      pythonOriginalFrameworkPath = '/usr/local/opt/python3/Frameworks/Python.framework'
+      pythonOriginalFrameworkPath = '/usr/local/opt/python/Frameworks/Python.framework'
       pythonFrameworkPath = '%s/Contents/Frameworks/Python.framework' % bundlePath
 
       print(" [8.1] Deploying Python from %s ..." % pythonOriginalFrameworkPath)

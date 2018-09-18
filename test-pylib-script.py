@@ -16,6 +16,8 @@ print("-------------")
 import os
 print("Environment variables:")
 for variable, value in os.environ.items():
+    if variable == 'DROPBOX_OAUTH_BEARER':
+        continue
     print(variable, ":", value)
 
 pipmain = get_pip_main()

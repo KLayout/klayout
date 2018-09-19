@@ -1,0 +1,58 @@
+matrix:
+  include:
+    # Python 3
+    - os: osx
+      osx_image: xcode9.4 # macOS 10.13
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=B37
+        - MACOS_VERSION=HighSierra
+    - os: osx
+      osx_image: xcode8.3 # macOS 10.12
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=B37
+        - MACOS_VERSION=Sierra
+    - os: osx
+      osx_image: xcode8 # macOS 10.11
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=B37
+        - MACOS_VERSION=ElCapitan
+
+    # Python 2
+    - os: osx
+      osx_image: xcode9.4 # macOS 10.13
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=Sys
+        - MACOS_VERSION=HighSierra
+    - os: osx
+      osx_image: xcode8.3 # macOS 10.12
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=Sys
+        - MACOS_VERSION=Sierra
+    - os: osx
+      osx_image: xcode8 # macOS 10.11
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=Sys
+        - MACOS_VERSION=ElCapitan
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+  - find "$(brew --prefix)/Caskroom/"*'/.metadata' -type f -name '*.rb' | xargs grep 'EOS.undent' --files-with-matches | xargs sed -i '' 's/EOS.undent/EOS/'
+  - brew update
+  - brew bundle
+  - env
+
+install:
+  - gem install dropbox-deployment
+  - git clone https://github.com/kristovatlas/osx-config-check
+  - cd osx-config-check ; python2.7 app.py --report-only --skip-sudo-checks ; cd ..
+
+script: ./travis-build.sh
+
+after_success:
+  - dropbox-deployment

@@ -361,7 +361,7 @@ def MakeTargetDMGFile(msg=""):
   # (4) Mount the DMG
   #--------------------------------------------------------
   print( ">>> (4) Mounting <%s> to <%s>" % (WorkDMG, MountDir ) )
-  command1 = "hdiutil attach %s -readwrite -noverify -noautoopen -quiet" % WorkDMG
+  command1 = "hdiutil attach %s -readwrite -noverify -quiet -noautoopen" % WorkDMG
   os.system(command1)
 
   command2 = "hdiutil info | grep %s | grep \"/dev/\" | awk '{print $1}'" % VolumeDMG

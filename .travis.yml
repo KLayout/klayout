@@ -1,44 +1,71 @@
 matrix:
   include:
-    # python 3 osx
-    - os: osx
+    # python 2 osx
+    
+    - name: "klayout python2 osx10.13"
+      os: osx
       osx_image: xcode9.4  # macOS 10.13
       env:
         - MATRIX_EVAL=""
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
-    - os: osx
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+    
+    - name: "klayout python2 osx10.12"
+      os: osx
       osx_image: xcode8.3  # macOS 10.12
       env:
         - MATRIX_EVAL="brew install python2 || brew link --overwrite python@2"  # deficient python2 in travis's xcode8.3 (no ssl)
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
-    - os: osx
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+    
+    - name: "klayout python2 osx10.11"
+      os: osx
       osx_image: xcode8  # macOS 10.11
       env:
         - MATRIX_EVAL=""
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
-    # python 2 osx
-    - os: osx
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+
+    # python 3 osx
+    
+    - name: "klayout python3 osx10.13"
+      os: osx
       osx_image: xcode9.4  # macOS 10.13
       env:
-        - MATRIX_EVAL="brew update; brew bundle; shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
-    - os: osx
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=true
+    
+    - name: "klayout python3 osx10.12"
+      os: osx
       osx_image: xcode8.3  # macOS 10.12
       env:
-        - MATRIX_EVAL="brew update; brew bundle; shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
-    - os: osx
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=true
+    
+    - name: "klayout python3 osx10.11"
+      os: osx
       osx_image: xcode8  # macOS 10.11
       env:
-        - MATRIX_EVAL="brew update; brew bundle; shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
-    - os: linux
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=true
+    
+    - name: "klayout python3.6 package"
+      os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
       language: python
@@ -46,7 +73,11 @@ matrix:
       env:
         - MATRIX_EVAL=""
         - PIP_UPDATE="1"
-    - os: linux
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+    
+    - name: "klayout python2.7 package"
+      os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
       language: python
@@ -54,7 +85,11 @@ matrix:
       env:
         - MATRIX_EVAL=""
         - PIP_UPDATE="1"
-    - os: linux
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+    
+    - name: "klayout python2.6 package"
+      os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
       language: python
@@ -62,7 +97,11 @@ matrix:
       env:
         - MATRIX_EVAL=""
         - PIP_UPDATE="0"  # setuptools installed from last pip has syntax error on py 2.6
-    - os: linux
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+    
+    - name: "klayout python3.3 package"
+      os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
       language: python
@@ -70,7 +109,11 @@ matrix:
       env:
         - MATRIX_EVAL=""
         - PIP_UPDATE="1"
-    - os: linux
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+    
+    - name: "klayout python3.4 package"
+      os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
       language: python
@@ -78,7 +121,11 @@ matrix:
       env:
         - MATRIX_EVAL=""
         - PIP_UPDATE="1"
-    - os: linux
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+    
+    - name: "klayout python3.5 package"
+      os: linux
       dist: trusty # Ubuntu 14.04
       sudo: false
       language: python
@@ -86,12 +133,82 @@ matrix:
       env:
         - MATRIX_EVAL=""
         - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+
+    # KLayout builds for mac
+    # Python 3
+    - name: "KLayout macOS 10.13 with py3.7"
+      os: osx
+      osx_image: xcode9.4 # macOS 10.13
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=B37
+        - MACOS_VERSION=HighSierra
+        - KLAYOUT_BUILD=true
+        - BREW_BUNDLE=true
+
+    - name: "KLayout macOS 10.12 with py3.7"
+      os: osx
+      osx_image: xcode8.3 # macOS 10.12
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=B37
+        - MACOS_VERSION=Sierra
+        - KLAYOUT_BUILD=true
+        - BREW_BUNDLE=true
+
+    - name: "KLayout macOS 10.11 with py3.7"
+      os: osx
+      osx_image: xcode8 # macOS 10.11
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=B37
+        - MACOS_VERSION=ElCapitan
+        - KLAYOUT_BUILD=true
+        - BREW_BUNDLE=true
+
+    # Python 2
+    - name: "KLayout macOS 10.13 with py2.7"
+      os: osx
+      osx_image: xcode9.4 # macOS 10.13
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=Sys
+        - MACOS_VERSION=HighSierra
+        - KLAYOUT_BUILD=true
+        - BREW_BUNDLE=true
+
+    - name: "KLayout macOS 10.12 with py2.7"
+      os: osx
+      osx_image: xcode8.3 # macOS 10.12
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=Sys
+        - MACOS_VERSION=Sierra
+        - KLAYOUT_BUILD=true
+        - BREW_BUNDLE=true
+
+    - name: "KLayout macOS 10.11 with py2.7"
+      os: osx
+      osx_image: xcode8 # macOS 10.11
+      env:
+        - MATRIX_EVAL=""
+        - PYTHON_VERSION=Sys
+        - MACOS_VERSION=ElCapitan
+        - KLAYOUT_BUILD=true
+        - BREW_BUNDLE=true
 
 before_install:
   - env
   - rvm install ruby --latest
   - gem install dropbox-deployment
   - eval "${MATRIX_EVAL}"
+  - if [ "$BREW_BUNDLE" = true ]; then
+        find "$(brew --prefix)/Caskroom/"*'/.metadata' -type f -name '*.rb' | xargs grep 'EOS.undent' --files-with-matches | xargs sed -i '' 's/EOS.undent/EOS/';
+        brew update;
+        brew bundle;
+    fi
   - if [ "${PIP_UPDATE}" == "1" ]; then
         pip --version;
         pip install --upgrade pip || sudo pip install --upgrade pip;
@@ -100,15 +217,20 @@ before_install:
     fi
   - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
 
-install:
-  - python setup.py build
-  - python setup.py bdist_wheel
-  - python setup.py install
-
-script:
-  - python -c 'import klayout.db as db; print(dir(db))'
-  - python -c 'import klayout.rdb as rdb; print(dir(rdb))'
-  - python -c 'import klayout.tl as tl; print(dir(tl))'
+script: 
+  - if [ "$PYTHON_BUILD" = true ]; then
+        python setup.py build;
+        python setup.py bdist_wheel;
+        python setup.py install;
+        cp -a dist deploy/;
+        python -c 'import klayout.db as db; print(dir(db))';
+        python -c 'import klayout.rdb as rdb; print(dir(rdb))';
+        python -c 'import klayout.tl as tl; print(dir(tl))';
+    fi
+  - if [ "$KLAYOUT_BUILD" = true ]; then
+        ./travis-build.sh;
+    fi
 
 after_success:
+  - mkdir -p deploy
   - dropbox-deployment

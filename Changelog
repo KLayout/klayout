@@ -5,11 +5,18 @@
        For details see: 
        https://github.com/klayoutmatthias/klayout/wiki/klayout---Standalone-KLayout-Python-Module
 
-0.25.5          (2018-12-30):
+0.25.5          (2018-09-19):
 
 * YET TO BE RELEASED
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/162
        GDS2 LIBNAME was not maintained on "File/Save".
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/166
+       Internal error when writing GDS files (breaking of polygons)
+* Bugfix: some potential memory corruption issues fixed
+       During the efforts for making the code base compatible
+       with MSVC, some potential candidates for memory corruption
+       have been identified and fixed. 
+       These fixes are included in this release.
 
 0.25.4          (2018-08-25):
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/121

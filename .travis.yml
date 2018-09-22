@@ -222,7 +222,8 @@ script:
         python setup.py build;
         python setup.py bdist_wheel;
         python setup.py install;
-        cp -a dist deploy/;
+        mkdir -p deploy/dist;
+        cp -a dist deploy/dist;
         python -c 'import klayout.db as db; print(dir(db))';
         python -c 'import klayout.rdb as rdb; print(dir(rdb))';
         python -c 'import klayout.tl as tl; print(dir(tl))';
@@ -232,5 +233,4 @@ script:
     fi
 
 after_success:
-  - mkdir -p deploy
   - dropbox-deployment

@@ -268,7 +268,7 @@ struct InteractionRegistrationShape2Inst
 {
 public:
   InteractionRegistrationShape2Inst (db::Layout *layout, unsigned int intruder_layer, std::map<db::PolygonRef, std::vector<db::PolygonRef> > *result)
-    : mp_layout (layout), m_intruder_layer (intruder_layer), m_inst_bc (*layout, intruder_layer), mp_result (result)
+    : mp_layout (layout), m_intruder_layer (intruder_layer), mp_result (result)
   {
     //  nothing yet ..
   }
@@ -276,30 +276,37 @@ public:
   void add (const db::PolygonRef *ref, int, const db::CellInstArray *inst, int)
   {
     const db::Cell &intruder_cell = mp_layout->cell (inst->object ().cell_index ());
-    db::Box region = ref->box () & m_inst_bc (*inst);
-    if (! region.empty ()) {
 
-      //  @@@ TODO: should be lighter, cache, handle arrays ..
-      db::RecursiveShapeIterator si (*mp_layout, intruder_cell, m_intruder_layer, region);
-      si.shape_flags (polygon_ref_flags ());
-      while (! si.at_end ()) {
+    for (db::CellInstArray::iterator n = inst->begin (); !n.at_end (); ++n) {
 
-        //  @@@ should be easier to transform references
-        const db::PolygonRef *ref2 = si.shape ().basic_ptr (db::PolygonRef::tag ());
-        db::Polygon poly = ref2->obj ().transformed (si.trans () * db::ICplxTrans (ref->trans ()));
-        (*mp_result)[*ref].push_back (db::PolygonRef (poly, mp_layout->shape_repository()));
+      db::ICplxTrans tn = inst->complex_trans (*n);
 
-        ++si;
+      db::Box region = ref->box ().transformed (tn.inverted ()) & intruder_cell.bbox (m_intruder_layer);
+      if (! region.empty ()) {
+
+        //  @@@ TODO: should be lighter, cache, handle arrays ..
+        db::RecursiveShapeIterator si (*mp_layout, intruder_cell, m_intruder_layer, region);
+        si.shape_flags (polygon_ref_flags ());
+        while (! si.at_end ()) {
+
+          //  @@@ should be easier to transform references
+          const db::PolygonRef *ref2 = si.shape ().basic_ptr (db::PolygonRef::tag ());
+          db::Polygon poly = ref2->obj ().transformed (tn * si.trans () * db::ICplxTrans (ref2->trans ()));
+          (*mp_result)[*ref].push_back (db::PolygonRef (poly, mp_layout->shape_repository()));
+
+          ++si;
+
+        }
 
       }
 
     }
+
   }
 
 private:
   db::Layout *mp_layout;
   unsigned int m_intruder_layer;
-  db::box_convert <db::CellInstArray, true> m_inst_bc;
   std::map<db::PolygonRef, std::vector<db::PolygonRef> > *mp_result;
 };
 
@@ -444,20 +451,25 @@ void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_con
 
     for (std::map<const db::CellInstArray *, std::pair<std::set<const db::CellInstArray *>, std::set<db::PolygonRef> > >::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
-      std::pair<std::set<db::CellInstArray>, std::set<db::PolygonRef> > intruders_below;
-      intruders_below.second = i->second.second;
-
       db::Cell &child_cell = mp_layout->cell (i->first->object ().cell_index ());
 
       for (db::CellInstArray::iterator n = i->first->begin (); ! n.at_end (); ++n) {
 
         db::ICplxTrans tn = i->first->complex_trans (*n);
         db::ICplxTrans tni = tn.inverted ();
-        db::Box nbox = tn * child_cell.bbox (m_intruder_layer);
+        db::Box nbox = tn * child_cell.bbox (m_scope_layer);
 
         if (! nbox.empty ()) {
 
-          intruders_below.first.clear ();
+          std::pair<std::set<db::CellInstArray>, std::set<db::PolygonRef> > intruders_below;
+
+          //  @@@ transformation of polygon refs - can this be done more efficiently?
+          for (std::set<db::PolygonRef>::const_iterator p = i->second.second.begin (); p != i->second.second.end (); ++p) {
+            if (nbox.overlaps (p->box ())) {
+              db::Polygon poly = p->obj ().transformed (tni * db::ICplxTrans (p->trans ()));
+              intruders_below.second.insert (db::PolygonRef (poly, mp_layout->shape_repository ()));
+            }
+          }
 
           //  @@@ TODO: in some cases, it may be possible to optimize this for arrays
 

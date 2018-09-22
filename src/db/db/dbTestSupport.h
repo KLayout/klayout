@@ -46,6 +46,7 @@ class LayerMap;
 enum NormalizationMode
 {
   NoNormalization,        //  no normalization - take the test subject as it is
+  AsPolygons,             //  paths and boxes are treated as polygons
   WriteGDS2,              //  normalize subject by writing to GDS2 and reading back
   WriteOAS                //  normalize subject by writing to OASIS and reading back
 };

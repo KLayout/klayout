@@ -148,8 +148,9 @@ class Config(object):
         elif platform.system() == "Darwin":
             return []
         else:
-            # Avoids many "type-punned pointer" warnings
-            return ["-Wno-strict-aliasing"]
+            return ["-Wno-strict-aliasing",  # Avoids many "type-punned pointer" warnings
+                    "-std=c++0x",  # because we use unordered_map/unordered_set
+                    ]
 
     def link_args(self, mod):
         """
@@ -173,7 +174,7 @@ class Config(object):
             # build path and the loader will fail.
             args = []
             args += ['-Wl,-soname,' + self.libname_of(mod)]
-            if not '_dbpi' in mod:
+            if '_dbpi' not in mod:
                 loader_path = '$ORIGIN'
             else:
                 loader_path = '$ORIGIN/..'

@@ -1,68 +1,68 @@
 matrix:
   include:
-    # python 2 osx
+    # # python 2 osx
     
-    - name: "klayout python2 osx10.13"
-      os: osx
-      osx_image: xcode9.4  # macOS 10.13
-      env:
-        - MATRIX_EVAL=""
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - BREW_BUNDLE=false
+    # - name: "klayout python2 osx10.13"
+    #   os: osx
+    #   osx_image: xcode9.4  # macOS 10.13
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - ARCHFLAGS="-std=c++11"
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - BREW_BUNDLE=false
     
-    - name: "klayout python2 osx10.12"
-      os: osx
-      osx_image: xcode8.3  # macOS 10.12
-      env:
-        - MATRIX_EVAL="brew install python2 || brew link --overwrite python@2"  # deficient python2 in travis's xcode8.3 (no ssl)
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - BREW_BUNDLE=false
+    # - name: "klayout python2 osx10.12"
+    #   os: osx
+    #   osx_image: xcode8.3  # macOS 10.12
+    #   env:
+    #     - MATRIX_EVAL="brew install python2 || brew link --overwrite python@2"  # deficient python2 in travis's xcode8.3 (no ssl)
+    #     - ARCHFLAGS="-std=c++11"
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - BREW_BUNDLE=false
     
-    - name: "klayout python2 osx10.11"
-      os: osx
-      osx_image: xcode8  # macOS 10.11
-      env:
-        - MATRIX_EVAL=""
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - BREW_BUNDLE=false
+    # - name: "klayout python2 osx10.11"
+    #   os: osx
+    #   osx_image: xcode8  # macOS 10.11
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - ARCHFLAGS="-std=c++11"
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - BREW_BUNDLE=false
 
-    # python 3 osx
+    # # python 3 osx
     
-    - name: "klayout python3 osx10.13"
-      os: osx
-      osx_image: xcode9.4  # macOS 10.13
-      env:
-        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - BREW_BUNDLE=true
+    # - name: "klayout python3 osx10.13"
+    #   os: osx
+    #   osx_image: xcode9.4  # macOS 10.13
+    #   env:
+    #     - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+    #     - ARCHFLAGS="-std=c++11"
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - BREW_BUNDLE=true
     
-    - name: "klayout python3 osx10.12"
-      os: osx
-      osx_image: xcode8.3  # macOS 10.12
-      env:
-        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - BREW_BUNDLE=true
+    # - name: "klayout python3 osx10.12"
+    #   os: osx
+    #   osx_image: xcode8.3  # macOS 10.12
+    #   env:
+    #     - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+    #     - ARCHFLAGS="-std=c++11"
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - BREW_BUNDLE=true
     
-    - name: "klayout python3 osx10.11"
-      os: osx
-      osx_image: xcode8  # macOS 10.11
-      env:
-        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
-        - ARCHFLAGS="-std=c++11"
-        - PIP_UPDATE="1"
-        - PYTHON_BUILD=true
-        - BREW_BUNDLE=true
+    # - name: "klayout python3 osx10.11"
+    #   os: osx
+    #   osx_image: xcode8  # macOS 10.11
+    #   env:
+    #     - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+    #     - ARCHFLAGS="-std=c++11"
+    #     - PIP_UPDATE="1"
+    #     - PYTHON_BUILD=true
+    #     - BREW_BUNDLE=true
     
     - name: "klayout python3.6 package"
       os: linux
@@ -136,68 +136,68 @@ matrix:
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
 
-    # KLayout builds for mac
-    # Python 3
-    - name: "KLayout macOS 10.13 with py3.7"
-      os: osx
-      osx_image: xcode9.4 # macOS 10.13
-      env:
-        - MATRIX_EVAL=""
-        - PYTHON_VERSION=B37
-        - MACOS_VERSION=HighSierra
-        - KLAYOUT_BUILD=true
-        - BREW_BUNDLE=true
+    # # KLayout builds for mac
+    # # Python 3
+    # - name: "KLayout macOS 10.13 with py3.7"
+    #   os: osx
+    #   osx_image: xcode9.4 # macOS 10.13
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PYTHON_VERSION=B37
+    #     - MACOS_VERSION=HighSierra
+    #     - KLAYOUT_BUILD=true
+    #     - BREW_BUNDLE=true
 
-    - name: "KLayout macOS 10.12 with py3.7"
-      os: osx
-      osx_image: xcode8.3 # macOS 10.12
-      env:
-        - MATRIX_EVAL=""
-        - PYTHON_VERSION=B37
-        - MACOS_VERSION=Sierra
-        - KLAYOUT_BUILD=true
-        - BREW_BUNDLE=true
+    # - name: "KLayout macOS 10.12 with py3.7"
+    #   os: osx
+    #   osx_image: xcode8.3 # macOS 10.12
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PYTHON_VERSION=B37
+    #     - MACOS_VERSION=Sierra
+    #     - KLAYOUT_BUILD=true
+    #     - BREW_BUNDLE=true
 
-    - name: "KLayout macOS 10.11 with py3.7"
-      os: osx
-      osx_image: xcode8 # macOS 10.11
-      env:
-        - MATRIX_EVAL=""
-        - PYTHON_VERSION=B37
-        - MACOS_VERSION=ElCapitan
-        - KLAYOUT_BUILD=true
-        - BREW_BUNDLE=true
+    # - name: "KLayout macOS 10.11 with py3.7"
+    #   os: osx
+    #   osx_image: xcode8 # macOS 10.11
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PYTHON_VERSION=B37
+    #     - MACOS_VERSION=ElCapitan
+    #     - KLAYOUT_BUILD=true
+    #     - BREW_BUNDLE=true
 
-    # Python 2
-    - name: "KLayout macOS 10.13 with py2.7"
-      os: osx
-      osx_image: xcode9.4 # macOS 10.13
-      env:
-        - MATRIX_EVAL=""
-        - PYTHON_VERSION=Sys
-        - MACOS_VERSION=HighSierra
-        - KLAYOUT_BUILD=true
-        - BREW_BUNDLE=true
+    # # Python 2
+    # - name: "KLayout macOS 10.13 with py2.7"
+    #   os: osx
+    #   osx_image: xcode9.4 # macOS 10.13
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PYTHON_VERSION=Sys
+    #     - MACOS_VERSION=HighSierra
+    #     - KLAYOUT_BUILD=true
+    #     - BREW_BUNDLE=true
 
-    - name: "KLayout macOS 10.12 with py2.7"
-      os: osx
-      osx_image: xcode8.3 # macOS 10.12
-      env:
-        - MATRIX_EVAL=""
-        - PYTHON_VERSION=Sys
-        - MACOS_VERSION=Sierra
-        - KLAYOUT_BUILD=true
-        - BREW_BUNDLE=true
+    # - name: "KLayout macOS 10.12 with py2.7"
+    #   os: osx
+    #   osx_image: xcode8.3 # macOS 10.12
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PYTHON_VERSION=Sys
+    #     - MACOS_VERSION=Sierra
+    #     - KLAYOUT_BUILD=true
+    #     - BREW_BUNDLE=true
 
-    - name: "KLayout macOS 10.11 with py2.7"
-      os: osx
-      osx_image: xcode8 # macOS 10.11
-      env:
-        - MATRIX_EVAL=""
-        - PYTHON_VERSION=Sys
-        - MACOS_VERSION=ElCapitan
-        - KLAYOUT_BUILD=true
-        - BREW_BUNDLE=true
+    # - name: "KLayout macOS 10.11 with py2.7"
+    #   os: osx
+    #   osx_image: xcode8 # macOS 10.11
+    #   env:
+    #     - MATRIX_EVAL=""
+    #     - PYTHON_VERSION=Sys
+    #     - MACOS_VERSION=ElCapitan
+    #     - KLAYOUT_BUILD=true
+    #     - BREW_BUNDLE=true
 
 before_install:
   - env

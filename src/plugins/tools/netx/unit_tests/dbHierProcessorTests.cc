@@ -120,3 +120,13 @@ TEST(BasicNot2)
 {
   run_test_bool (_this, "hlp2.oas", TMNot, 101);
 }
+
+TEST(BasicAnd3)
+{
+  run_test_bool (_this, "hlp3.oas", TMAnd, 100);
+}
+
+TEST(BasicNot3)
+{
+  run_test_bool (_this, "hlp3.oas", TMNot, 101);
+}

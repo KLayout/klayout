@@ -222,8 +222,8 @@ script:
         python setup.py build;
         python setup.py bdist_wheel;
         python setup.py install;
-        mkdir -p deploy/dist;
-        cp -a dist deploy/dist;
+        mkdir -p deploy/dist-pymod;
+        cp -a dist/ deploy/dist-pymod;
         python -c 'import klayout.db as db; print(dir(db))';
         python -c 'import klayout.rdb as rdb; print(dir(rdb))';
         python -c 'import klayout.tl as tl; print(dir(tl))';

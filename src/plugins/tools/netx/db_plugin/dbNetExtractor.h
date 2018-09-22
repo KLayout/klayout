@@ -26,9 +26,30 @@
 #define HDR_dbNetExtractor
 
 #include "dbPluginCommon.h"
+#include "dbLayout.h"
+#include "dbCellMapping.h"
+#include "tlTypeTraits.h"
 
 namespace db
 {
+
+class NetLayer
+{
+public:
+  NetLayer (unsigned int index)
+    : m_layer_index (index)
+  {
+    //  .. nothing yet ..
+  }
+
+  unsigned int layer_index () const
+  {
+    return m_layer_index;
+  }
+
+private:
+  unsigned int m_layer_index;
+};
 
 /**
  *  @brief The net extractor
@@ -43,11 +64,43 @@ public:
    */
   NetExtractor ();
 
+  ~NetExtractor ();
+
   // @@@
-  void dummy ();
+  void open (const db::Layout &orig_layout, db::cell_index_type orig_top_cell);
+  NetLayer load (unsigned int layer_index);
+  NetLayer bool_and (NetLayer a, NetLayer b);
+  NetLayer bool_not (NetLayer a, NetLayer b);
+  db::Layout *layout_copy () const;
 
 private:
+  //  no copying
+  NetExtractor (const db::NetExtractor &);
+  NetExtractor &operator= (const db::NetExtractor &);
+
   // @@@
+  const db::Layout *mp_orig_layout; // @@@ should be a smart pointer
+  db::Layout *mp_layout;
+  db::CellMapping m_cm;
+};
+
+}
+
+namespace tl
+{
+
+template <>
+struct type_traits<db::NetLayer> : public tl::type_traits<void>
+{
+  //  mark "NetLayer" as not having a default ctor
+  typedef tl::false_tag has_default_constructor;
+};
+
+template <>
+struct type_traits<db::NetExtractor> : public tl::type_traits<void>
+{
+  //  mark "NetExtractor" as not copyable
+  typedef tl::false_tag has_copy_constructor;
 };
 
 }

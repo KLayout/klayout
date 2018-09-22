@@ -148,3 +148,15 @@ TEST(BasicNot4)
   //  Sibling interactions, variant building, NOT
   run_test_bool (_this, "hlp4.oas", TMNot, 101);
 }
+
+TEST(BasicAnd5)
+{
+  //  Variant building with intermediate hierarchy, AND
+  run_test_bool (_this, "hlp5.oas", TMAnd, 100);
+}
+
+TEST(BasicNot5)
+{
+  //  Variant building with intermediate hierarchy, NOT
+  run_test_bool (_this, "hlp5.oas", TMNot, 101);
+}

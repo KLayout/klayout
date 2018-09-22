@@ -111,6 +111,11 @@ msvc {
 
 } else {
 
+  CONFIG(gcov) {
+    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
+    QMAKE_LFLAGS += -fprofile-arcs -ftest-coverage
+  }
+
   QMAKE_CXXFLAGS_WARN_ON += \
       -pedantic \
       -Woverloaded-virtual \

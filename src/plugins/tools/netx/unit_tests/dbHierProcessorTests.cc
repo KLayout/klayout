@@ -103,30 +103,48 @@ void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int ou
 
 TEST(BasicAnd1)
 {
+  //  Simple flat AND
   run_test_bool (_this, "hlp1.oas", TMAnd, 100);
 }
 
 TEST(BasicNot1)
 {
+  //  Simple flat NOT
   run_test_bool (_this, "hlp1.oas", TMNot, 101);
 }
 
 TEST(BasicAnd2)
 {
+  //  Up/down and down/up interactions, AND
   run_test_bool (_this, "hlp2.oas", TMAnd, 100);
 }
 
 TEST(BasicNot2)
 {
+  //  Up/down and down/up interactions, NOT
   run_test_bool (_this, "hlp2.oas", TMNot, 101);
 }
 
 TEST(BasicAnd3)
 {
+  //  Variant building, AND
   run_test_bool (_this, "hlp3.oas", TMAnd, 100);
 }
 
 TEST(BasicNot3)
 {
+  //  Variant building, NOT
   run_test_bool (_this, "hlp3.oas", TMNot, 101);
+}
+
+TEST(BasicAnd4)
+{
+  //  Sibling interactions, variant building, AND
+  run_test_bool (_this, "hlp4.oas", TMAnd, 100);
+}
+
+TEST(BasicNot4)
+{
+  //  Sibling interactions, variant building, NOT
+  run_test_bool (_this, "hlp4.oas", TMNot, 101);
 }

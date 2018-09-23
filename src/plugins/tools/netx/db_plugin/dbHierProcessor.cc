@@ -322,7 +322,10 @@ public:
 
   void add (const db::CellInstArray *inst1, int, const db::CellInstArray *inst2, int)
   {
-    (*mp_result) [inst1].first.insert (inst2);
+    // @@@ TODO: always insert, if both instances come from different layouts
+    if (*inst1 != *inst2) {
+      (*mp_result) [inst1].first.insert (inst2);
+    }
   }
 
 private:
@@ -361,21 +364,8 @@ LocalProcessor::LocalProcessor (db::Layout *layout, db::Cell *top, LocalOperatio
 
 void LocalProcessor::run ()
 {
-  try {
-
-    mp_layout->update ();
-    mp_layout->start_changes ();
-
-    std::pair<std::set<db::CellInstArray>, std::set<db::PolygonRef> > intruders;
-    compute_contexts (0, 0, mp_top, db::ICplxTrans (), intruders);
-    compute_results ();
-
-    mp_layout->end_changes ();
-
-  } catch (...) {
-    mp_layout->end_changes ();
-    throw;
-  }
+  compute_contexts ();
+  compute_results ();
 }
 
 void LocalProcessor::push_results (db::Cell *cell, const std::set<db::PolygonRef> &result)
@@ -383,6 +373,14 @@ void LocalProcessor::push_results (db::Cell *cell, const std::set<db::PolygonRef
   if (! result.empty ()) {
     cell->shapes (m_output_layer).insert (result.begin (), result.end ());
   }
+}
+
+void LocalProcessor::compute_contexts ()
+{
+  m_contexts_per_cell.clear ();
+
+  std::pair<std::set<db::CellInstArray>, std::set<db::PolygonRef> > intruders;
+  compute_contexts (0, 0, mp_top, db::ICplxTrans (), intruders);
 }
 
 void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_context, db::Cell *parent, db::Cell *cell, const db::ICplxTrans &cell_inst, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders)

@@ -89,6 +89,11 @@ public:
     return m_propagated;
   }
 
+  size_t size () const
+  {
+    return m_drops.size ();
+  }
+
 private:
   std::set<db::PolygonRef> m_propagated;
   std::vector<LocalProcessorCellDrop> m_drops;
@@ -98,12 +103,24 @@ class DB_PLUGIN_PUBLIC LocalProcessorCellContexts
 {
 public:
   typedef std::pair<std::set<CellInstArray>, std::set<db::PolygonRef> > key_type;
+  typedef std::map<key_type, db::LocalProcessorCellContext> map_type;
+  typedef map_type::const_iterator iterator;
 
   LocalProcessorCellContexts ();
 
   db::LocalProcessorCellContext *find_context (const key_type &intruders);
   db::LocalProcessorCellContext *create (const key_type &intruders);
   void compute_results (db::Cell *cell, LocalProcessor *proc);
+
+  iterator begin () const
+  {
+    return m_contexts.begin ();
+  }
+
+  iterator end () const
+  {
+    return m_contexts.end ();
+  }
 
 private:
   std::map<key_type, db::LocalProcessorCellContext> m_contexts;
@@ -112,12 +129,20 @@ private:
 class DB_PLUGIN_PUBLIC LocalProcessor
 {
 public:
+  typedef std::map<db::Cell *, LocalProcessorCellContexts> contexts_per_cell_type;
+
   LocalProcessor (db::Layout *layout, db::Cell *top, LocalOperation *op, unsigned int scope_layer, unsigned int intruder_layer, unsigned int output_layer);
   void run ();
+  void compute_contexts ();
+  void compute_results ();
+
+  const contexts_per_cell_type &contexts_per_cell () const
+  {
+    return m_contexts_per_cell;
+  }
 
 private:
   friend class LocalProcessorCellContexts;
-  typedef std::map<db::Cell *, LocalProcessorCellContexts> contexts_per_cell_type;
 
   db::Layout *mp_layout;
   db::Cell *mp_top;
@@ -126,7 +151,6 @@ private:
   LocalOperation *mp_op;
 
   void compute_contexts (db::LocalProcessorCellContext *parent_context, db::Cell *parent, db::Cell *cell, const db::ICplxTrans &cell_inst, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders);
-  void compute_results ();
   void push_results (db::Cell *cell, const std::set<db::PolygonRef> &result);
   void compute_local_cell (db::Cell *cell, const std::pair<std::set<CellInstArray>, std::set<db::PolygonRef> > &intruders, std::set<db::PolygonRef> &result) const;
 };

@@ -56,7 +56,26 @@ void normalize_layer (db::Layout &layout, unsigned int layer)
   }
 }
 
-void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num)
+
+std::string contexts_to_s (db::Layout *layout, const db::LocalProcessor::contexts_per_cell_type &contexts)
+{
+  std::string res;
+
+  for (db::Layout::top_down_const_iterator i = layout->begin_top_down (); i != layout->end_top_down(); ++i) {
+    db::LocalProcessor::contexts_per_cell_type::const_iterator cc = contexts.find (&layout->cell (*i));
+    if (cc != contexts.end ()) {
+      int index = 1;
+      for (db::LocalProcessorCellContexts::iterator j = cc->second.begin (); j != cc->second.end (); ++j) {
+        res += tl::sprintf ("%s[%d] %d insts, %d shapes (%d times)\n", layout->cell_name (*i), index, int (j->first.first.size ()), int (j->first.second.size ()), int (j->second.size ()));
+        index += 1;
+      }
+    }
+  }
+
+  return res;
+}
+
+void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0)
 {
   db::Layout layout_org;
 
@@ -96,7 +115,14 @@ void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int ou
 
   db::BoolAndOrNotLocalOperation op (mode == TMAnd);
   db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()), &op, l1, l2, lout);
-  proc.run ();
+
+  if (! context_doc) {
+    proc.run ();
+  } else {
+    proc.compute_contexts ();
+    *context_doc = contexts_to_s (&layout_org, proc.contexts_per_cell ());
+    proc.compute_results ();
+  }
 
   db::compare_layouts (_this, layout_org, testdata (file), lmap, false /*skip other layers*/, db::AsPolygons);
 }
@@ -183,4 +209,35 @@ TEST(BasicNot7)
 {
   //  Context replication - direct and indirect, NOT
   run_test_bool (_this, "hlp7.oas", TMNot, 101);
+}
+
+TEST(BasicAnd8)
+{
+  //  Mixed sibling-parent contexts, AND
+  run_test_bool (_this, "hlp8.oas", TMAnd, 100);
+}
+
+TEST(BasicNot8)
+{
+  //  Mixed sibling-parent contexts, NOT
+  run_test_bool (_this, "hlp8.oas", TMNot, 101);
+}
+
+TEST(BasicAnd9)
+{
+  //  Top-level ring structure, AND
+  std::string doc;
+  run_test_bool (_this, "hlp9.oas", TMAnd, 100, &doc);
+  EXPECT_EQ (doc,
+    "TOP[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 0 insts, 12 shapes (1 times)\n"
+    "CHILD1[1] 1 insts, 6 shapes (1 times)\n"
+    "CHILD1[2] 1 insts, 6 shapes (1 times)\n"
+  );
+}
+
+TEST(BasicNot9)
+{
+  //  Top-level ring structure, NOT
+  run_test_bool (_this, "hlp9.oas", TMNot, 101);
 }

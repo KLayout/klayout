@@ -22,6 +22,7 @@
 
 
 #include "dbNetExtractor.h"
+#include "dbHierProcessor.h"
 #include "dbLayoutUtils.h"
 #include "dbCellMapping.h"
 #include "dbPolygonTools.h"
@@ -34,7 +35,7 @@ namespace db
 {
 
 NetExtractor::NetExtractor()
-  : mp_orig_layout (0), mp_layout (0)
+  : mp_orig_layout (0), mp_layout (0), mp_top_cell (0)
 {
 
   // @@@
@@ -45,21 +46,30 @@ NetExtractor::~NetExtractor ()
 {
   delete mp_layout;
   mp_layout = 0;
+  mp_top_cell = 0;
 }
 
 void
 NetExtractor::open (const db::Layout &orig_layout, cell_index_type orig_top_cell)
 {
+  tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Open layout")));
+
   delete mp_layout;
   mp_orig_layout = &orig_layout;
 
   mp_layout = new db::Layout ();
   mp_layout->dbu (orig_layout.dbu ());
-  db::cell_index_type top = mp_layout->add_cell (orig_layout.cell_name (orig_top_cell));
+  mp_top_cell = &mp_layout->cell (mp_layout->add_cell (orig_layout.cell_name (orig_top_cell)));
 
   //  copy hierarchy
   m_cm.clear ();
-  m_cm.create_from_names_full (*mp_layout, top, orig_layout, orig_top_cell);
+  m_cm.create_from_names_full (*mp_layout, mp_top_cell->cell_index (), orig_layout, orig_top_cell);
+}
+
+void
+NetExtractor::output (NetLayer a, const LayerProperties &lp)
+{
+  mp_layout->set_properties (a.layer_index (), lp);
 }
 
 static double area_ratio (const db::Polygon &poly)
@@ -92,6 +102,8 @@ static void split_polygon_into (const db::Polygon &poly, db::Shapes &dest, size_
 NetLayer
 NetExtractor::load (unsigned int layer_index)
 {
+  tl::SelfTimer timer (tl::verbosity () >= 31, tl::to_string (tr ("Loading layer ")) + mp_orig_layout->get_properties (layer_index).to_string ());
+
   const double max_area_ratio = 3.0;
   const size_t max_points = 16;
 
@@ -126,13 +138,25 @@ NetExtractor::load (unsigned int layer_index)
 NetLayer
 NetExtractor::bool_and (NetLayer a, NetLayer b)
 {
-  return NetLayer (mp_layout->insert_layer ()); // @@@
+  return and_or_not (a, b, true);
 }
 
 NetLayer
 NetExtractor::bool_not (NetLayer a, NetLayer b)
 {
-  return NetLayer (mp_layout->insert_layer ()); // @@@
+  return and_or_not (a, b, false);
+}
+
+NetLayer
+NetExtractor::and_or_not (NetLayer a, NetLayer b, bool is_and)
+{
+  unsigned int lout = mp_layout->insert_layer ();
+
+  db::BoolAndOrNotLocalOperation op (is_and);
+  db::LocalProcessor proc (mp_layout, mp_top_cell, &op, a.layer_index (), b.layer_index (), lout);
+  proc.run ();
+
+  return NetLayer (lout);
 }
 
 db::Layout *

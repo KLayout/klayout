@@ -71,6 +71,7 @@ public:
   NetLayer load (unsigned int layer_index);
   NetLayer bool_and (NetLayer a, NetLayer b);
   NetLayer bool_not (NetLayer a, NetLayer b);
+  void output (NetLayer a, const db::LayerProperties &lp);
   db::Layout *layout_copy () const;
 
 private:
@@ -78,9 +79,12 @@ private:
   NetExtractor (const db::NetExtractor &);
   NetExtractor &operator= (const db::NetExtractor &);
 
+  NetLayer and_or_not (NetLayer a, NetLayer b, bool is_and);
+
   // @@@
   const db::Layout *mp_orig_layout; // @@@ should be a smart pointer
   db::Layout *mp_layout;
+  db::Cell *mp_top_cell;
   db::CellMapping m_cm;
 };
 

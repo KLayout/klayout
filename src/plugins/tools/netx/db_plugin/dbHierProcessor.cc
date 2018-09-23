@@ -538,12 +538,18 @@ void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_con
       InteractionRegistrationInst2Inst rec (mp_layout, m_subject_layer, mp_layout, m_intruder_layer, &interactions);
 
       for (db::Cell::const_iterator i = cell->begin (); !i.at_end (); ++i) {
-        scanner.insert1 (&i->cell_inst (), 0);
-        scanner.insert2 (&i->cell_inst (), 0);
+        if (! inst_bcs (i->cell_inst ()).empty ()) {
+          scanner.insert1 (&i->cell_inst (), 0);
+        }
+        if (! inst_bci (i->cell_inst ()).empty ()) {
+          scanner.insert2 (&i->cell_inst (), 0);
+        }
       }
 
       for (std::set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
-        scanner.insert2 (i.operator-> (), 0);
+        if (! inst_bci (*i).empty ()) {
+          scanner.insert2 (i.operator-> (), 0);
+        }
       }
 
       scanner.process (rec, 0, inst_bcs, inst_bci);
@@ -554,7 +560,9 @@ void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_con
       InteractionRegistrationInst2Shape rec (mp_layout, m_subject_layer, &interactions);
 
       for (db::Cell::const_iterator i = cell->begin (); !i.at_end (); ++i) {
-        scanner.insert1 (&i->cell_inst (), 0);
+        if (! inst_bcs (i->cell_inst ()).empty ()) {
+          scanner.insert1 (&i->cell_inst (), 0);
+        }
       }
 
       for (std::set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
@@ -676,10 +684,14 @@ LocalProcessor::compute_local_cell (db::Cell *cell, const std::pair<std::set<Cel
     }
 
     for (db::Cell::const_iterator i = cell->begin (); !i.at_end (); ++i) {
-      scanner.insert2 (&i->cell_inst (), 0);
+      if (! inst_bci (i->cell_inst ()).empty ()) {
+        scanner.insert2 (&i->cell_inst (), 0);
+      }
     }
     for (std::set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
-      scanner.insert2 (i.operator-> (), 0);
+      if (! inst_bci (*i).empty ()) {
+        scanner.insert2 (i.operator-> (), 0);
+      }
     }
 
     scanner.process (rec, 0, db::box_convert<db::PolygonRef> (), inst_bci);

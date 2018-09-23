@@ -41,11 +41,27 @@ void open2 (db::NetExtractor *ex, const db::Layout *orig_layout, const db::Cell 
   ex->open (*orig_layout, cell->cell_index ());
 }
 
+void output1 (db::NetExtractor *ex, const db::NetLayer &nl, const db::LayerProperties &lp)
+{
+  ex->output (nl, lp);
+}
+
+void output2 (db::NetExtractor *ex, const db::NetLayer &nl, int layer, int datatype, const std::string &name)
+{
+  ex->output (nl, db::LayerProperties (layer, datatype, name));
+}
+
 gsi::Class<db::NetExtractor> decl_NetNetExtractor ("db", "NetExtractor",
   gsi::method ("open", &db::NetExtractor::open, gsi::arg ("orig_layout"), gsi::arg ("orig_top_cell_index"),
     "@@@"
   ) +
   gsi::method_ext ("open", &open2, gsi::arg ("orig_layout"), gsi::arg ("orig_top_cell"),
+    "@@@"
+  ) +
+  gsi::method_ext ("output", &output1, gsi::arg ("net_layer"), gsi::arg ("layer"),
+    "@@@"
+  ) +
+  gsi::method_ext ("output", &output2, gsi::arg ("net_layer"), gsi::arg ("layer"), gsi::arg ("datatype"), gsi::arg ("name", std::string ()),
     "@@@"
   ) +
   gsi::method ("load", &db::NetExtractor::load, gsi::arg ("layer_index"),

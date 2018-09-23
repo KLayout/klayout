@@ -254,3 +254,16 @@ TEST(BasicNot9)
     "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
   );
 }
+
+TEST(BasicAnd10)
+{
+  //  Array instances, AND
+  run_test_bool (_this, "hlp10.oas", TMAnd, 100);
+}
+
+TEST(BasicNot10)
+{
+  //  Array instances, NOT
+  run_test_bool (_this, "hlp10.oas", TMNot, 101);
+}
+

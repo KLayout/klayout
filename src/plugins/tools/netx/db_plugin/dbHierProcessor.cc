@@ -335,6 +335,8 @@ private:
 static bool
 instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, unsigned int layer1, const db::Layout *layout2, const db::CellInstArray *inst2, unsigned int layer2)
 {
+  //  TODO: this algorithm is not in particular effective for identical arrays
+
   const db::Cell &cell1 = layout1->cell (inst1->object ().cell_index ());
   const db::Cell &cell2 = layout2->cell (inst2->object ().cell_index ());
   db::box_convert <db::CellInst, true> inst2_bc (*layout2, layer2);
@@ -352,6 +354,11 @@ instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, u
       //  @@@ TODO: in some cases, it may be possible to optimize this for arrays
 
       for (db::CellInstArray::iterator k = inst2->begin_touching (ibox1.enlarged (db::Vector (-1, -1)), inst2_bc); ! k.at_end (); ++k) {
+
+        if (inst1 == inst2 && *n == *k) {
+          //  skip self-interactions - this is handled inside the cell
+          continue;
+        }
 
         db::ICplxTrans tn2 = inst2->complex_trans (*k);
         db::Box ibox2 = tn2 * cell2.bbox (layer2);
@@ -398,7 +405,10 @@ public:
   void add (const db::CellInstArray *inst1, int, const db::CellInstArray *inst2, int)
   {
     // @@@ TODO: always insert, if both instances come from different layouts
-    if (*inst1 != *inst2 && instances_interact (mp_subject_layout, inst1, m_subject_layer, mp_intruder_layout, inst2, m_intruder_layer)) {
+    //  NOTE: self-interactions are possible for arrays: different elements of the
+    //  array may interact which is a cell-external interaction.
+    if ((*inst1 != *inst2 || inst1->size () > 1)
+        && instances_interact (mp_subject_layout, inst1, m_subject_layer, mp_intruder_layout, inst2, m_intruder_layer)) {
       (*mp_result) [inst1].first.insert (inst2);
     }
   }

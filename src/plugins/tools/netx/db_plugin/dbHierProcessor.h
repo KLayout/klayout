@@ -50,6 +50,7 @@ public:
 
   virtual void compute_local (db::Layout *layout, const std::map<db::PolygonRef, std::vector<db::PolygonRef> > &interactions, std::set<db::PolygonRef> &result) const = 0;
   virtual on_empty_intruder_mode on_empty_intruder_hint () const = 0;
+  virtual std::string description () const = 0;
 };
 
 class DB_PLUGIN_PUBLIC BoolAndOrNotLocalOperation
@@ -60,6 +61,7 @@ public:
 
   virtual void compute_local (db::Layout *layout, const std::map<db::PolygonRef, std::vector<db::PolygonRef> > &interactions, std::set<db::PolygonRef> &result) const;
   virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual std::string description () const;
 
 private:
   bool m_is_and;
@@ -147,6 +149,16 @@ public:
     return m_contexts_per_cell;
   }
 
+  void set_description (const std::string &d)
+  {
+    m_description = d;
+  }
+
+  const std::string &description () const
+  {
+    return m_description;
+  }
+
 private:
   friend class LocalProcessorCellContexts;
 
@@ -155,6 +167,7 @@ private:
   unsigned int m_subject_layer, m_intruder_layer, m_output_layer;
   contexts_per_cell_type m_contexts_per_cell;
   LocalOperation *mp_op;
+  std::string m_description;
 
   void compute_contexts (db::LocalProcessorCellContext *parent_context, db::Cell *parent, db::Cell *cell, const db::ICplxTrans &cell_inst, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders);
   void push_results (db::Cell *cell, const std::set<db::PolygonRef> &result);

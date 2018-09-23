@@ -28,6 +28,8 @@
 #include "dbEdgeProcessor.h"
 #include "dbPolygonGenerators.h"
 #include "tlLog.h"
+#include "tlTimer.h"
+#include "tlInternational.h"
 
 namespace db
 {
@@ -74,6 +76,12 @@ LocalOperation::on_empty_intruder_mode
 BoolAndOrNotLocalOperation::on_empty_intruder_hint () const
 {
   return m_is_and ? LocalOperation::Drop : LocalOperation::Copy;
+}
+
+std::string
+BoolAndOrNotLocalOperation::description () const
+{
+  return m_is_and ? tl::to_string (tr ("AND operation")) : tl::to_string (tr ("NOT operation"));
 }
 
 void
@@ -192,7 +200,15 @@ LocalProcessorCellContexts::compute_results (db::Cell *cell, LocalProcessor *pro
   bool first = true;
   std::set<db::PolygonRef> common;
 
+  int index = 0;
+  int total = int (m_contexts.size ());
   for (std::map<key_type, db::LocalProcessorCellContext>::iterator c = m_contexts.begin (); c != m_contexts.end (); ++c) {
+
+    ++index;
+
+    if (tl::verbosity () >= 30) {
+      tl::log << tr ("Computing local results for ") << cell->layout ()->cell_name (cell->cell_index ()) << " (context " << index << "/" << total << ")";
+    }
 
     if (first) {
 
@@ -453,7 +469,7 @@ private:
 LocalProcessor::LocalProcessor (db::Layout *layout, db::Cell *top, LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer)
   : mp_layout (layout), mp_top (top), m_subject_layer (subject_layer), m_intruder_layer (intruder_layer), m_output_layer (output_layer), mp_op (op)
 {
-  //  .. nothing yet ..
+  set_description (op->description ());
 }
 
 void LocalProcessor::run ()
@@ -471,6 +487,8 @@ void LocalProcessor::push_results (db::Cell *cell, const std::set<db::PolygonRef
 
 void LocalProcessor::compute_contexts ()
 {
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Computing contexts for ")) + description ());
+
   m_contexts_per_cell.clear ();
 
   std::pair<std::set<db::CellInstArray>, std::set<db::PolygonRef> > intruders;
@@ -479,6 +497,14 @@ void LocalProcessor::compute_contexts ()
 
 void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_context, db::Cell *parent, db::Cell *cell, const db::ICplxTrans &cell_inst, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders)
 {
+  if (tl::verbosity () >= 30) {
+    if (! parent) {
+      tl::log << tr ("Computing context for top cell ") << mp_layout->cell_name (cell->cell_index ());
+    } else {
+      tl::log << tr ("Computing context for ") << mp_layout->cell_name (parent->cell_index ()) << " -> " << mp_layout->cell_name (cell->cell_index ()) << " @" << cell_inst.to_string ();
+    }
+  }
+
   db::LocalProcessorCellContexts &contexts = m_contexts_per_cell [cell];
 
   db::LocalProcessorCellContext *context = contexts.find_context (intruders);
@@ -585,6 +611,12 @@ void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_con
 void
 LocalProcessor::compute_results ()
 {
+  tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Computing results for ")) + description ());
+
+  //  avoids updates while we work on the layout
+  mp_layout->update ();
+  db::LayoutLocker locker (mp_layout);
+
   for (db::Layout::bottom_up_const_iterator bu = mp_layout->begin_bottom_up (); bu != mp_layout->end_bottom_up (); ++bu) {
 
     contexts_per_cell_type::iterator cpc = m_contexts_per_cell.find (&mp_layout->cell (*bu));
@@ -594,7 +626,6 @@ LocalProcessor::compute_results ()
     }
 
   }
-
 }
 
 void

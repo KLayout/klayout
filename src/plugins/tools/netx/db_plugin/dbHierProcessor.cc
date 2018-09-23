@@ -70,6 +70,12 @@ BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and)
   //  .. nothing yet ..
 }
 
+LocalOperation::on_empty_intruder_mode
+BoolAndOrNotLocalOperation::on_empty_intruder_hint () const
+{
+  return m_is_and ? LocalOperation::Drop : LocalOperation::Copy;
+}
+
 void
 BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const std::map<db::PolygonRef, std::vector<db::PolygonRef> > &interactions, std::set<db::PolygonRef> &result) const
 {
@@ -496,7 +502,7 @@ void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_con
 
     std::map<const db::CellInstArray *, interaction_value_type> interactions;
 
-    // @@@ TODO: don't do this in AND more for instances without an intruder
+    //  insert dummy interactions to handle at least the child cell vs. itself
     for (db::Cell::const_iterator i = cell->begin (); !i.at_end (); ++i) {
       interactions.insert (std::make_pair (&i->cell_inst (), interaction_value_type ()));
     }
@@ -602,9 +608,11 @@ LocalProcessor::compute_local_cell (db::Cell *cell, const std::pair<std::set<Cel
   std::map<db::PolygonRef, std::vector<db::PolygonRef> > interactions;
   db::box_convert <db::CellInstArray, true> inst_bci (*mp_layout, m_intruder_layer);
 
-  // @@@ TODO: don't do this in AND mode (we don't need interactions without an intruder)
-  for (db::Shapes::shape_iterator i = shapes_subject.begin (polygon_ref_flags ()); !i.at_end (); ++i) {
-    interactions.insert (std::make_pair (*i->basic_ptr (db::PolygonRef::tag ()), std::vector<db::PolygonRef> ()));
+  if (mp_op->on_empty_intruder_hint () != LocalOperation::Drop) {
+    //  insert dummy interactions to accommodate subject vs. nothing
+    for (db::Shapes::shape_iterator i = shapes_subject.begin (polygon_ref_flags ()); !i.at_end (); ++i) {
+      interactions.insert (std::make_pair (*i->basic_ptr (db::PolygonRef::tag ()), std::vector<db::PolygonRef> ()));
+    }
   }
 
   if (! shapes_subject.empty () && ! (shapes_intruders.empty () && intruders.second.empty ())) {

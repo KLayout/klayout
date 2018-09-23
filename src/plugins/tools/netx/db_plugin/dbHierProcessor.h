@@ -41,10 +41,15 @@ class LocalProcessorCellContext;
 class DB_PLUGIN_PUBLIC LocalOperation
 {
 public:
+  enum on_empty_intruder_mode {
+    Ignore = 0, Copy, Drop
+  };
+
   LocalOperation () { }
   virtual ~LocalOperation () { }
 
   virtual void compute_local (db::Layout *layout, const std::map<db::PolygonRef, std::vector<db::PolygonRef> > &interactions, std::set<db::PolygonRef> &result) const = 0;
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const = 0;
 };
 
 class DB_PLUGIN_PUBLIC BoolAndOrNotLocalOperation
@@ -54,6 +59,7 @@ public:
   BoolAndOrNotLocalOperation (bool is_and);
 
   virtual void compute_local (db::Layout *layout, const std::map<db::PolygonRef, std::vector<db::PolygonRef> > &interactions, std::set<db::PolygonRef> &result) const;
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
 
 private:
   bool m_is_and;

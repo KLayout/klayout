@@ -160,3 +160,27 @@ TEST(BasicNot5)
   //  Variant building with intermediate hierarchy, NOT
   run_test_bool (_this, "hlp5.oas", TMNot, 101);
 }
+
+TEST(BasicAnd6)
+{
+  //  Extreme variants (copy, vanishing), AND
+  run_test_bool (_this, "hlp6.oas", TMAnd, 100);
+}
+
+TEST(BasicNot6)
+{
+  //  Extreme variants (copy, vanishing), NOT
+  run_test_bool (_this, "hlp6.oas", TMNot, 101);
+}
+
+TEST(BasicAnd7)
+{
+  //  Context replication - direct and indirect, AND
+  run_test_bool (_this, "hlp7.oas", TMAnd, 100);
+}
+
+TEST(BasicNot7)
+{
+  //  Context replication - direct and indirect, NOT
+  run_test_bool (_this, "hlp7.oas", TMNot, 101);
+}

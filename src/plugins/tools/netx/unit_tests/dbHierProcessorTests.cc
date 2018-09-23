@@ -229,15 +229,28 @@ TEST(BasicAnd9)
   std::string doc;
   run_test_bool (_this, "hlp9.oas", TMAnd, 100, &doc);
   EXPECT_EQ (doc,
+    //  This means: the interaction test is strong enough, so it does not see interactions between the
+    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
     "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "RING[1] 0 insts, 12 shapes (1 times)\n"
-    "CHILD1[1] 1 insts, 6 shapes (1 times)\n"
-    "CHILD1[2] 1 insts, 6 shapes (1 times)\n"
+    "RING[1] 0 insts, 0 shapes (1 times)\n"
+    "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
   );
 }
 
 TEST(BasicNot9)
 {
   //  Top-level ring structure, NOT
-  run_test_bool (_this, "hlp9.oas", TMNot, 101);
+  std::string doc;
+  run_test_bool (_this, "hlp9.oas", TMNot, 101, &doc);
+  EXPECT_EQ (doc,
+    //  This means: the interaction test is strong enough, so it does not see interactions between the
+    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+    "TOP[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 0 insts, 0 shapes (1 times)\n"
+    "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
+  );
 }

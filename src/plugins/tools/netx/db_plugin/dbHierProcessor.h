@@ -131,7 +131,7 @@ class DB_PLUGIN_PUBLIC LocalProcessor
 public:
   typedef std::map<db::Cell *, LocalProcessorCellContexts> contexts_per_cell_type;
 
-  LocalProcessor (db::Layout *layout, db::Cell *top, LocalOperation *op, unsigned int scope_layer, unsigned int intruder_layer, unsigned int output_layer);
+  LocalProcessor (db::Layout *layout, db::Cell *top, LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer);
   void run ();
   void compute_contexts ();
   void compute_results ();
@@ -146,7 +146,7 @@ private:
 
   db::Layout *mp_layout;
   db::Cell *mp_top;
-  unsigned int m_scope_layer, m_intruder_layer, m_output_layer;
+  unsigned int m_subject_layer, m_intruder_layer, m_output_layer;
   contexts_per_cell_type m_contexts_per_cell;
   LocalOperation *mp_op;
 

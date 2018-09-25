@@ -153,8 +153,8 @@ NetExtractor::and_or_not (NetLayer a, NetLayer b, bool is_and)
   unsigned int lout = mp_layout->insert_layer ();
 
   db::BoolAndOrNotLocalOperation op (is_and);
-  db::LocalProcessor proc (mp_layout, mp_top_cell, &op, a.layer_index (), b.layer_index (), lout);
-  proc.run ();
+  db::LocalProcessor proc (mp_layout, mp_top_cell);
+  proc.run (&op, a.layer_index (), b.layer_index (), lout);
 
   return NetLayer (lout);
 }

@@ -195,7 +195,7 @@ LocalProcessorCellContexts::create (const key_type &intruders)
 }
 
 void
-LocalProcessorCellContexts::compute_results (db::Cell *cell, LocalProcessor *proc)
+LocalProcessorCellContexts::compute_results (LocalProcessorContexts &contexts, db::Cell *cell, const LocalOperation *op, unsigned int output_layer, LocalProcessor *proc)
 {
   bool first = true;
   std::set<db::PolygonRef> common;
@@ -213,13 +213,13 @@ LocalProcessorCellContexts::compute_results (db::Cell *cell, LocalProcessor *pro
     if (first) {
 
       common = c->second.propagated ();
-      proc->compute_local_cell (cell, c->first, common);
+      proc->compute_local_cell (contexts, cell, op, c->first, common);
       first = false;
 
     } else {
 
       std::set<db::PolygonRef> res = c->second.propagated ();
-      proc->compute_local_cell (cell, c->first, res);
+      proc->compute_local_cell (contexts, cell, op, c->first, res);
 
       if (common.empty ()) {
 
@@ -252,7 +252,7 @@ LocalProcessorCellContexts::compute_results (db::Cell *cell, LocalProcessor *pro
 
   }
 
-  proc->push_results (cell, common);
+  proc->push_results (cell, output_layer, common);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -476,36 +476,40 @@ private:
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessor implementation
 
-LocalProcessor::LocalProcessor (db::Layout *layout, db::Cell *top, LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer)
-  : mp_layout (layout), mp_top (top), m_subject_layer (subject_layer), m_intruder_layer (intruder_layer), m_output_layer (output_layer), mp_op (op)
+LocalProcessor::LocalProcessor (db::Layout *layout, db::Cell *top)
+  : mp_layout (layout), mp_top (top)
 {
-  set_description (op->description ());
+  //  .. nothing yet ..
 }
 
-void LocalProcessor::run ()
+void LocalProcessor::run (LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer, db::Coord dist)
 {
-  compute_contexts ();
-  compute_results ();
+  LocalProcessorContexts contexts;
+  compute_contexts (contexts, op, subject_layer, intruder_layer, dist);
+  compute_results (contexts, op, output_layer);
 }
 
-void LocalProcessor::push_results (db::Cell *cell, const std::set<db::PolygonRef> &result)
+void LocalProcessor::push_results (db::Cell *cell, unsigned int output_layer, const std::set<db::PolygonRef> &result) const
 {
   if (! result.empty ()) {
-    cell->shapes (m_output_layer).insert (result.begin (), result.end ());
+    cell->shapes (output_layer).insert (result.begin (), result.end ());
   }
 }
 
-void LocalProcessor::compute_contexts ()
+void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, db::Coord dist)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Computing contexts for ")) + description ());
 
-  m_contexts_per_cell.clear ();
+  contexts.clear ();
+  contexts.set_intruder_layer (intruder_layer);
+  contexts.set_subject_layer (subject_layer);
+  contexts.set_description (op->description ());
 
   std::pair<std::set<db::CellInstArray>, std::set<db::PolygonRef> > intruders;
-  compute_contexts (0, 0, mp_top, db::ICplxTrans (), intruders);
+  compute_contexts (contexts, 0, 0, mp_top, db::ICplxTrans (), dist, intruders);
 }
 
-void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_context, db::Cell *parent, db::Cell *cell, const db::ICplxTrans &cell_inst, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders)
+void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *parent, db::Cell *cell, const db::ICplxTrans &cell_inst, db::Coord dist, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders)
 {
   if (tl::verbosity () >= 30) {
     if (! parent) {
@@ -515,22 +519,22 @@ void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_con
     }
   }
 
-  db::LocalProcessorCellContexts &contexts = m_contexts_per_cell [cell];
+  db::LocalProcessorCellContexts &cell_contexts = contexts.contexts_per_cell (cell);
 
-  db::LocalProcessorCellContext *context = contexts.find_context (intruders);
+  db::LocalProcessorCellContext *context = cell_contexts.find_context (intruders);
   if (context) {
     context->add (parent_context, parent, cell_inst);
     return;
   }
 
-  context = contexts.create (intruders);
+  context = cell_contexts.create (intruders);
   context->add (parent_context, parent, cell_inst);
 
-  const db::Shapes &shapes_intruders = cell->shapes (m_intruder_layer);
+  const db::Shapes &shapes_intruders = cell->shapes (contexts.intruder_layer ());
 
-  db::box_convert <db::CellInstArray, true> inst_bcs (*mp_layout, m_subject_layer);
-  db::box_convert <db::CellInstArray, true> inst_bci (*mp_layout, m_intruder_layer);
-  db::box_convert <db::CellInst, true> inst_bcii (*mp_layout, m_intruder_layer);
+  db::box_convert <db::CellInstArray, true> inst_bcs (*mp_layout, contexts.subject_layer ());
+  db::box_convert <db::CellInstArray, true> inst_bci (*mp_layout, contexts.intruder_layer ());
+  db::box_convert <db::CellInst, true> inst_bcii (*mp_layout, contexts.intruder_layer ());
 
   if (! cell->begin ().at_end ()) {
 
@@ -545,7 +549,7 @@ void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_con
 
     {
       db::box_scanner2<db::CellInstArray, int, db::CellInstArray, int> scanner;
-      InteractionRegistrationInst2Inst rec (mp_layout, m_subject_layer, mp_layout, m_intruder_layer, &interactions);
+      InteractionRegistrationInst2Inst rec (mp_layout, contexts.subject_layer (), mp_layout, contexts.intruder_layer (), &interactions);
 
       for (db::Cell::const_iterator i = cell->begin (); !i.at_end (); ++i) {
         if (! inst_bcs (i->cell_inst ()).empty ()) {
@@ -567,7 +571,7 @@ void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_con
 
     {
       db::box_scanner2<db::CellInstArray, int, db::PolygonRef, int> scanner;
-      InteractionRegistrationInst2Shape rec (mp_layout, m_subject_layer, &interactions);
+      InteractionRegistrationInst2Shape rec (mp_layout, contexts.subject_layer (), &interactions);
 
       for (db::Cell::const_iterator i = cell->begin (); !i.at_end (); ++i) {
         if (! inst_bcs (i->cell_inst ()).empty ()) {
@@ -593,7 +597,7 @@ void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_con
 
         db::ICplxTrans tn = i->first->complex_trans (*n);
         db::ICplxTrans tni = tn.inverted ();
-        db::Box nbox = tn * child_cell.bbox (m_subject_layer);
+        db::Box nbox = tn * child_cell.bbox (contexts.subject_layer ());
 
         if (! nbox.empty ()) {
 
@@ -615,7 +619,7 @@ void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_con
             }
           }
 
-          compute_contexts (context, cell, &child_cell, tn, intruders_below);
+          compute_contexts (contexts, context, cell, &child_cell, tn, dist, intruders_below);
 
         }
 
@@ -627,7 +631,7 @@ void LocalProcessor::compute_contexts (db::LocalProcessorCellContext *parent_con
 }
 
 void
-LocalProcessor::compute_results ()
+LocalProcessor::compute_results (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int output_layer)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Computing results for ")) + description ());
 
@@ -637,27 +641,27 @@ LocalProcessor::compute_results ()
 
   for (db::Layout::bottom_up_const_iterator bu = mp_layout->begin_bottom_up (); bu != mp_layout->end_bottom_up (); ++bu) {
 
-    contexts_per_cell_type::iterator cpc = m_contexts_per_cell.find (&mp_layout->cell (*bu));
-    if (cpc != m_contexts_per_cell.end ()) {
-      cpc->second.compute_results (cpc->first, this);
-      m_contexts_per_cell.erase (cpc);
+    LocalProcessorContexts::iterator cpc = contexts.context_map ().find (&mp_layout->cell (*bu));
+    if (cpc != contexts.context_map ().end ()) {
+      cpc->second.compute_results (contexts, cpc->first, op, output_layer, this);
+      contexts.context_map ().erase (cpc);
     }
 
   }
 }
 
 void
-LocalProcessor::compute_local_cell (db::Cell *cell, const std::pair<std::set<CellInstArray>, std::set<db::PolygonRef> > &intruders, std::set<db::PolygonRef> &result) const
+LocalProcessor::compute_local_cell (LocalProcessorContexts &contexts, db::Cell *cell, const db::LocalOperation *op, const std::pair<std::set<CellInstArray>, std::set<db::PolygonRef> > &intruders, std::set<db::PolygonRef> &result)
 {
-  const db::Shapes &shapes_subject = cell->shapes (m_subject_layer);
-  const db::Shapes &shapes_intruders = cell->shapes (m_intruder_layer);
+  const db::Shapes &shapes_subject = cell->shapes (contexts.subject_layer ());
+  const db::Shapes &shapes_intruders = cell->shapes (contexts.intruder_layer ());
 
   //  local shapes vs. child cell
 
   std::map<db::PolygonRef, std::vector<db::PolygonRef> > interactions;
-  db::box_convert <db::CellInstArray, true> inst_bci (*mp_layout, m_intruder_layer);
+  db::box_convert <db::CellInstArray, true> inst_bci (*mp_layout, contexts.intruder_layer ());
 
-  if (mp_op->on_empty_intruder_hint () != LocalOperation::Drop) {
+  if (op->on_empty_intruder_hint () != LocalOperation::Drop) {
     //  insert dummy interactions to accommodate subject vs. nothing
     for (db::Shapes::shape_iterator i = shapes_subject.begin (polygon_ref_flags ()); !i.at_end (); ++i) {
       interactions.insert (std::make_pair (*i->basic_ptr (db::PolygonRef::tag ()), std::vector<db::PolygonRef> ()));
@@ -687,7 +691,7 @@ LocalProcessor::compute_local_cell (db::Cell *cell, const std::pair<std::set<Cel
   if (! shapes_subject.empty () && ! (cell->begin ().at_end () && intruders.first.empty ())) {
 
     db::box_scanner2<db::PolygonRef, int, db::CellInstArray, int> scanner;
-    InteractionRegistrationShape2Inst rec (mp_layout, m_intruder_layer, &interactions);
+    InteractionRegistrationShape2Inst rec (mp_layout, contexts.intruder_layer (), &interactions);
 
     for (db::Shapes::shape_iterator i = shapes_subject.begin (polygon_ref_flags ()); !i.at_end (); ++i) {
       scanner.insert1 (i->basic_ptr (db::PolygonRef::tag ()), 0);
@@ -708,7 +712,7 @@ LocalProcessor::compute_local_cell (db::Cell *cell, const std::pair<std::set<Cel
 
   }
 
-  mp_op->compute_local (mp_layout, interactions, result);
+  op->compute_local (mp_layout, interactions, result);
 }
 
 }

@@ -37,6 +37,7 @@ namespace db
 
 class LocalProcessor;
 class LocalProcessorCellContext;
+class LocalProcessorContexts;
 
 class DB_PLUGIN_PUBLIC LocalOperation
 {
@@ -118,7 +119,7 @@ public:
 
   db::LocalProcessorCellContext *find_context (const key_type &intruders);
   db::LocalProcessorCellContext *create (const key_type &intruders);
-  void compute_results (db::Cell *cell, LocalProcessor *proc);
+  void compute_results (LocalProcessorContexts &contexts, db::Cell *cell, const LocalOperation *op, unsigned int output_layer, LocalProcessor *proc);
 
   iterator begin () const
   {
@@ -134,20 +135,86 @@ private:
   std::map<key_type, db::LocalProcessorCellContext> m_contexts;
 };
 
-class DB_PLUGIN_PUBLIC LocalProcessor
+class DB_PLUGIN_PUBLIC LocalProcessorContexts
 {
 public:
   typedef std::map<db::Cell *, LocalProcessorCellContexts> contexts_per_cell_type;
+  typedef contexts_per_cell_type::iterator iterator;
 
-  LocalProcessor (db::Layout *layout, db::Cell *top, LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer);
-  void run ();
-  void compute_contexts ();
-  void compute_results ();
+  LocalProcessorContexts ()
+    : m_subject_layer (0), m_intruder_layer (0)
+  {
+    //  .. nothing yet ..
+  }
 
-  const contexts_per_cell_type &contexts_per_cell () const
+  void clear ()
+  {
+    m_contexts_per_cell.clear ();
+  }
+
+  LocalProcessorCellContexts &contexts_per_cell (db::Cell *cell)
+  {
+    return m_contexts_per_cell [cell];
+  }
+
+  contexts_per_cell_type &context_map ()
   {
     return m_contexts_per_cell;
   }
+
+  iterator begin ()
+  {
+    return m_contexts_per_cell.begin ();
+  }
+
+  iterator end ()
+  {
+    return m_contexts_per_cell.end ();
+  }
+
+  void set_subject_layer (unsigned int l)
+  {
+    m_subject_layer = l;
+  }
+
+  unsigned int subject_layer () const
+  {
+    return m_subject_layer;
+  }
+
+  void set_intruder_layer (unsigned int l)
+  {
+    m_intruder_layer = l;
+  }
+
+  unsigned int intruder_layer () const
+  {
+    return m_intruder_layer;
+  }
+
+  void set_description (const std::string &desc)
+  {
+    m_description = desc;
+  }
+
+  const std::string &description () const
+  {
+    return m_description;
+  }
+
+private:
+  contexts_per_cell_type m_contexts_per_cell;
+  unsigned int m_subject_layer, m_intruder_layer;
+  std::string m_description;
+};
+
+class DB_PLUGIN_PUBLIC LocalProcessor
+{
+public:
+  LocalProcessor (db::Layout *layout, db::Cell *top);
+  void run (LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer, db::Coord dist = 0);
+  void compute_contexts (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, db::Coord dist = 0);
+  void compute_results (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int output_layer);
 
   void set_description (const std::string &d)
   {
@@ -164,14 +231,11 @@ private:
 
   db::Layout *mp_layout;
   db::Cell *mp_top;
-  unsigned int m_subject_layer, m_intruder_layer, m_output_layer;
-  contexts_per_cell_type m_contexts_per_cell;
-  LocalOperation *mp_op;
   std::string m_description;
 
-  void compute_contexts (db::LocalProcessorCellContext *parent_context, db::Cell *parent, db::Cell *cell, const db::ICplxTrans &cell_inst, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders);
-  void push_results (db::Cell *cell, const std::set<db::PolygonRef> &result);
-  void compute_local_cell (db::Cell *cell, const std::pair<std::set<CellInstArray>, std::set<db::PolygonRef> > &intruders, std::set<db::PolygonRef> &result) const;
+  void compute_contexts (LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *parent, db::Cell *cell, const db::ICplxTrans &cell_inst, db::Coord dist, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders);
+  void push_results (db::Cell *cell, unsigned int output_layer, const std::set<db::PolygonRef> &result) const;
+  void compute_local_cell (LocalProcessorContexts &contexts, db::Cell *cell, const LocalOperation *op, const std::pair<std::set<CellInstArray>, std::set<db::PolygonRef> > &intruders, std::set<db::PolygonRef> &result);
 };
 
 }

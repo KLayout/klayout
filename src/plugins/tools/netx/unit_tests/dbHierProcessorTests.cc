@@ -57,13 +57,13 @@ void normalize_layer (db::Layout &layout, unsigned int layer)
 }
 
 
-std::string contexts_to_s (db::Layout *layout, const db::LocalProcessor::contexts_per_cell_type &contexts)
+std::string contexts_to_s (db::Layout *layout, db::LocalProcessorContexts &contexts)
 {
   std::string res;
 
   for (db::Layout::top_down_const_iterator i = layout->begin_top_down (); i != layout->end_top_down(); ++i) {
-    db::LocalProcessor::contexts_per_cell_type::const_iterator cc = contexts.find (&layout->cell (*i));
-    if (cc != contexts.end ()) {
+    db::LocalProcessorContexts::iterator cc = contexts.context_map ().find (&layout->cell (*i));
+    if (cc != contexts.context_map ().end ()) {
       int index = 1;
       for (db::LocalProcessorCellContexts::iterator j = cc->second.begin (); j != cc->second.end (); ++j) {
         res += tl::sprintf ("%s[%d] %d insts, %d shapes (%d times)\n", layout->cell_name (*i), index, int (j->first.first.size ()), int (j->first.second.size ()), int (j->second.size ()));
@@ -75,7 +75,7 @@ std::string contexts_to_s (db::Layout *layout, const db::LocalProcessor::context
   return res;
 }
 
-void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0)
+void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, db::Coord enl = 0, std::string *context_doc = 0)
 {
   db::Layout layout_org;
 
@@ -114,14 +114,15 @@ void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int ou
   normalize_layer (layout_org, l2);
 
   db::BoolAndOrNotLocalOperation op (mode == TMAnd);
-  db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()), &op, l1, l2, lout);
+  db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
 
   if (! context_doc) {
-    proc.run ();
+    proc.run (&op, l1, l2, lout);
   } else {
-    proc.compute_contexts ();
-    *context_doc = contexts_to_s (&layout_org, proc.contexts_per_cell ());
-    proc.compute_results ();
+    db::LocalProcessorContexts contexts;
+    proc.compute_contexts (contexts, &op, l1, l2, enl);
+    *context_doc = contexts_to_s (&layout_org, contexts);
+    proc.compute_results (contexts, &op, lout);
   }
 
   db::compare_layouts (_this, layout_org, testdata (file), lmap, false /*skip other layers*/, db::AsPolygons);
@@ -227,7 +228,7 @@ TEST(BasicAnd9)
 {
   //  Top-level ring structure, AND
   std::string doc;
-  run_test_bool (_this, "hlp9.oas", TMAnd, 100, &doc);
+  run_test_bool (_this, "hlp9.oas", TMAnd, 100, 0, &doc);
   EXPECT_EQ (doc,
     //  This means: the interaction test is strong enough, so it does not see interactions between the
     //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
@@ -243,7 +244,7 @@ TEST(BasicNot9)
 {
   //  Top-level ring structure, NOT
   std::string doc;
-  run_test_bool (_this, "hlp9.oas", TMNot, 101, &doc);
+  run_test_bool (_this, "hlp9.oas", TMNot, 101, 0, &doc);
   EXPECT_EQ (doc,
     //  This means: the interaction test is strong enough, so it does not see interactions between the
     //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes

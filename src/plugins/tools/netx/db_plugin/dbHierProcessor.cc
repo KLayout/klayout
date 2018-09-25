@@ -289,8 +289,8 @@ struct InteractionRegistrationShape2Inst
   : db::box_scanner_receiver2<db::PolygonRef, int, db::CellInstArray, int>
 {
 public:
-  InteractionRegistrationShape2Inst (db::Layout *layout, unsigned int intruder_layer, std::map<db::PolygonRef, std::vector<db::PolygonRef> > *result)
-    : mp_layout (layout), m_intruder_layer (intruder_layer), mp_result (result)
+  InteractionRegistrationShape2Inst (db::Layout *layout, unsigned int intruder_layer, db::Coord dist, std::map<db::PolygonRef, std::vector<db::PolygonRef> > *result)
+    : mp_layout (layout), m_intruder_layer (intruder_layer), m_dist (dist), mp_result (result)
   {
     //  nothing yet ..
   }
@@ -300,11 +300,11 @@ public:
     const db::Cell &intruder_cell = mp_layout->cell (inst->object ().cell_index ());
     db::box_convert <db::CellInst, true> inst_bc (*mp_layout, m_intruder_layer);
 
-    for (db::CellInstArray::iterator n = inst->begin_touching (ref->box ().enlarged (db::Vector (-1, -1)), inst_bc); !n.at_end (); ++n) {
+    for (db::CellInstArray::iterator n = inst->begin_touching (ref->box ().enlarged (db::Vector (m_dist - 1, m_dist - 1)), inst_bc); !n.at_end (); ++n) {
 
       db::ICplxTrans tn = inst->complex_trans (*n);
 
-      db::Box region = ref->box ().transformed (tn.inverted ()) & intruder_cell.bbox (m_intruder_layer);
+      db::Box region = ref->box ().transformed (tn.inverted ()).enlarged (db::Vector (m_dist, m_dist)) & intruder_cell.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
       if (! region.empty ()) {
 
         //  @@@ TODO: should be lighter, cache, handle arrays ..
@@ -312,7 +312,7 @@ public:
         si.shape_flags (polygon_ref_flags ());
         while (! si.at_end ()) {
 
-          //  @@@ should be easier to transform references
+          //  @@@ it should be easier to transform references
           const db::PolygonRef *ref2 = si.shape ().basic_ptr (db::PolygonRef::tag ());
           db::Polygon poly = ref2->obj ().transformed (tn * si.trans () * db::ICplxTrans (ref2->trans ()));
           (*mp_result)[*ref].push_back (db::PolygonRef (poly, mp_layout->shape_repository()));
@@ -329,11 +329,12 @@ public:
 private:
   db::Layout *mp_layout;
   unsigned int m_intruder_layer;
+  db::Coord m_dist;
   std::map<db::PolygonRef, std::vector<db::PolygonRef> > *mp_result;
 };
 
 static bool
-instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, unsigned int layer1, const db::Layout *layout2, const db::CellInstArray *inst2, unsigned int layer2)
+instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, unsigned int layer1, const db::Layout *layout2, const db::CellInstArray *inst2, unsigned int layer2, db::Coord dist)
 {
   //  TODO: this algorithm is not in particular effective for identical arrays
 
@@ -347,7 +348,7 @@ instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, u
 
     db::ICplxTrans tn1 = inst1->complex_trans (*n);
     db::ICplxTrans tni1 = tn1.inverted ();
-    db::Box ibox1 = tn1 * cell1.bbox (layer1);
+    db::Box ibox1 = tn1 * cell1.bbox (layer1).enlarged (db::Vector (dist, dist));
 
     if (! ibox1.empty ()) {
 
@@ -361,7 +362,9 @@ instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, u
         }
 
         db::ICplxTrans tn2 = inst2->complex_trans (*k);
-        db::Box ibox2 = tn2 * cell2.bbox (layer2);
+
+        //  NOTE: we need to enlarge both subject *and* intruder boxes - either ubject comes close to intruder or the other way around
+        db::Box ibox2 = tn2 * cell2.bbox (layer2).enlarged (db::Vector (dist, dist));
 
         db::ICplxTrans tn21 = tni1 * tn2;
         if (! relative_trans_seen.insert (tn21).second) {
@@ -396,8 +399,8 @@ struct InteractionRegistrationInst2Inst
   : db::box_scanner_receiver2<db::CellInstArray, int, db::CellInstArray, int>
 {
 public:
-  InteractionRegistrationInst2Inst (const db::Layout *subject_layout, unsigned int subject_layer, const db::Layout *intruder_layout, unsigned int intruder_layer, std::map<const db::CellInstArray *, std::pair<std::set<const db::CellInstArray *>, std::set<db::PolygonRef> > > *result)
-    : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), m_subject_layer (subject_layer), m_intruder_layer (intruder_layer), mp_result (result)
+  InteractionRegistrationInst2Inst (const db::Layout *subject_layout, unsigned int subject_layer, const db::Layout *intruder_layout, unsigned int intruder_layer, db::Coord dist, std::map<const db::CellInstArray *, std::pair<std::set<const db::CellInstArray *>, std::set<db::PolygonRef> > > *result)
+    : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), m_subject_layer (subject_layer), m_intruder_layer (intruder_layer), m_dist (dist), mp_result (result)
   {
     //  nothing yet ..
   }
@@ -408,7 +411,7 @@ public:
     //  NOTE: self-interactions are possible for arrays: different elements of the
     //  array may interact which is a cell-external interaction.
     if ((*inst1 != *inst2 || inst1->size () > 1)
-        && instances_interact (mp_subject_layout, inst1, m_subject_layer, mp_intruder_layout, inst2, m_intruder_layer)) {
+        && instances_interact (mp_subject_layout, inst1, m_subject_layer, mp_intruder_layout, inst2, m_intruder_layer, m_dist)) {
       (*mp_result) [inst1].first.insert (inst2);
     }
   }
@@ -416,20 +419,21 @@ public:
 private:
   const db::Layout *mp_subject_layout, *mp_intruder_layout;
   unsigned int m_subject_layer, m_intruder_layer;
+  db::Coord m_dist;
   std::map<const db::CellInstArray *, std::pair<std::set<const db::CellInstArray *>, std::set<db::PolygonRef> > > *mp_result;
 };
 
 static bool
-instance_shape_interacts (const db::Layout *layout, const db::CellInstArray *inst, unsigned int layer, const db::PolygonRef &ref)
+instance_shape_interacts (const db::Layout *layout, const db::CellInstArray *inst, unsigned int layer, const db::PolygonRef &ref, db::Coord dist)
 {
   const db::Cell &cell = layout->cell (inst->object ().cell_index ());
   db::box_convert <db::CellInst, true> inst_bc (*layout, layer);
   db::Box rbox = ref.box ();
 
-  for (db::CellInstArray::iterator n = inst->begin_touching (rbox.enlarged (db::Vector (-1, -1)), inst_bc); ! n.at_end (); ++n) {
+  for (db::CellInstArray::iterator n = inst->begin_touching (rbox.enlarged (db::Vector (dist - 1, dist - 1)), inst_bc); ! n.at_end (); ++n) {
 
     db::ICplxTrans tn = inst->complex_trans (*n);
-    db::Box cbox = (tn * cell.bbox (layer)) & rbox;
+    db::Box cbox = (tn * cell.bbox (layer)).enlarged (db::Vector (dist, dist)) & rbox.enlarged (db::Vector (dist, dist));
 
     if (! cbox.empty ()) {
 
@@ -452,15 +456,15 @@ struct InteractionRegistrationInst2Shape
   : db::box_scanner_receiver2<db::CellInstArray, int, db::PolygonRef, int>
 {
 public:
-  InteractionRegistrationInst2Shape (const db::Layout *subject_layout, unsigned int subject_layer, std::map<const db::CellInstArray *, std::pair<std::set<const db::CellInstArray *>, std::set<db::PolygonRef> > > *result)
-    : mp_subject_layout (subject_layout), m_subject_layer (subject_layer), mp_result (result)
+  InteractionRegistrationInst2Shape (const db::Layout *subject_layout, unsigned int subject_layer, db::Coord dist, std::map<const db::CellInstArray *, std::pair<std::set<const db::CellInstArray *>, std::set<db::PolygonRef> > > *result)
+    : mp_subject_layout (subject_layout), m_subject_layer (subject_layer), m_dist (dist), mp_result (result)
   {
     //  nothing yet ..
   }
 
   void add (const db::CellInstArray *inst, int, const db::PolygonRef *ref, int)
   {
-    if (instance_shape_interacts (mp_subject_layout, inst, m_subject_layer, *ref)) {
+    if (instance_shape_interacts (mp_subject_layout, inst, m_subject_layer, *ref, m_dist)) {
       (*mp_result) [inst].second.insert (*ref);
     }
   }
@@ -468,6 +472,7 @@ public:
 private:
   const db::Layout *mp_subject_layout;
   unsigned int m_subject_layer;
+  db::Coord m_dist;
   std::map<const db::CellInstArray *, std::pair<std::set<const db::CellInstArray *>, std::set<db::PolygonRef> > > *mp_result;
 };
 
@@ -482,10 +487,10 @@ LocalProcessor::LocalProcessor (db::Layout *layout, db::Cell *top)
   //  .. nothing yet ..
 }
 
-void LocalProcessor::run (LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer, db::Coord dist)
+void LocalProcessor::run (LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer)
 {
   LocalProcessorContexts contexts;
-  compute_contexts (contexts, op, subject_layer, intruder_layer, dist);
+  compute_contexts (contexts, op, subject_layer, intruder_layer);
   compute_results (contexts, op, output_layer);
 }
 
@@ -496,7 +501,7 @@ void LocalProcessor::push_results (db::Cell *cell, unsigned int output_layer, co
   }
 }
 
-void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, db::Coord dist)
+void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Computing contexts for ")) + description ());
 
@@ -506,10 +511,10 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, const L
   contexts.set_description (op->description ());
 
   std::pair<std::set<db::CellInstArray>, std::set<db::PolygonRef> > intruders;
-  compute_contexts (contexts, 0, 0, mp_top, db::ICplxTrans (), dist, intruders);
+  compute_contexts (contexts, 0, 0, mp_top, db::ICplxTrans (), intruders, op->dist ());
 }
 
-void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *parent, db::Cell *cell, const db::ICplxTrans &cell_inst, db::Coord dist, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders)
+void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *parent, db::Cell *cell, const db::ICplxTrans &cell_inst, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders, db::Coord dist)
 {
   if (tl::verbosity () >= 30) {
     if (! parent) {
@@ -549,7 +554,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, db::Loc
 
     {
       db::box_scanner2<db::CellInstArray, int, db::CellInstArray, int> scanner;
-      InteractionRegistrationInst2Inst rec (mp_layout, contexts.subject_layer (), mp_layout, contexts.intruder_layer (), &interactions);
+      InteractionRegistrationInst2Inst rec (mp_layout, contexts.subject_layer (), mp_layout, contexts.intruder_layer (), dist, &interactions);
 
       for (db::Cell::const_iterator i = cell->begin (); !i.at_end (); ++i) {
         if (! inst_bcs (i->cell_inst ()).empty ()) {
@@ -566,12 +571,12 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, db::Loc
         }
       }
 
-      scanner.process (rec, 0, inst_bcs, inst_bci);
+      scanner.process (rec, dist, inst_bcs, inst_bci);
     }
 
     {
       db::box_scanner2<db::CellInstArray, int, db::PolygonRef, int> scanner;
-      InteractionRegistrationInst2Shape rec (mp_layout, contexts.subject_layer (), &interactions);
+      InteractionRegistrationInst2Shape rec (mp_layout, contexts.subject_layer (), dist, &interactions);
 
       for (db::Cell::const_iterator i = cell->begin (); !i.at_end (); ++i) {
         if (! inst_bcs (i->cell_inst ()).empty ()) {
@@ -586,7 +591,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, db::Loc
         scanner.insert2 (i->basic_ptr (db::PolygonRef::tag ()), 0);
       }
 
-      scanner.process (rec, 0, inst_bcs, db::box_convert<db::PolygonRef> ());
+      scanner.process (rec, dist, inst_bcs, db::box_convert<db::PolygonRef> ());
     }
 
     for (std::map<const db::CellInstArray *, std::pair<std::set<const db::CellInstArray *>, std::set<db::PolygonRef> > >::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -597,7 +602,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, db::Loc
 
         db::ICplxTrans tn = i->first->complex_trans (*n);
         db::ICplxTrans tni = tn.inverted ();
-        db::Box nbox = tn * child_cell.bbox (contexts.subject_layer ());
+        db::Box nbox = tn * child_cell.bbox (contexts.subject_layer ()).enlarged (db::Vector (dist, dist));
 
         if (! nbox.empty ()) {
 
@@ -619,7 +624,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts, db::Loc
             }
           }
 
-          compute_contexts (contexts, context, cell, &child_cell, tn, dist, intruders_below);
+          compute_contexts (contexts, context, cell, &child_cell, tn, intruders_below, dist);
 
         }
 
@@ -684,14 +689,14 @@ LocalProcessor::compute_local_cell (LocalProcessorContexts &contexts, db::Cell *
       scanner.insert2 (i->basic_ptr (db::PolygonRef::tag ()), 0);
     }
 
-    scanner.process (rec, 0, db::box_convert<db::PolygonRef> (), db::box_convert<db::PolygonRef> ());
+    scanner.process (rec, op->dist (), db::box_convert<db::PolygonRef> (), db::box_convert<db::PolygonRef> ());
 
   }
 
   if (! shapes_subject.empty () && ! (cell->begin ().at_end () && intruders.first.empty ())) {
 
     db::box_scanner2<db::PolygonRef, int, db::CellInstArray, int> scanner;
-    InteractionRegistrationShape2Inst rec (mp_layout, contexts.intruder_layer (), &interactions);
+    InteractionRegistrationShape2Inst rec (mp_layout, contexts.intruder_layer (), op->dist (), &interactions);
 
     for (db::Shapes::shape_iterator i = shapes_subject.begin (polygon_ref_flags ()); !i.at_end (); ++i) {
       scanner.insert1 (i->basic_ptr (db::PolygonRef::tag ()), 0);
@@ -708,7 +713,7 @@ LocalProcessor::compute_local_cell (LocalProcessorContexts &contexts, db::Cell *
       }
     }
 
-    scanner.process (rec, 0, db::box_convert<db::PolygonRef> (), inst_bci);
+    scanner.process (rec, op->dist (), db::box_convert<db::PolygonRef> (), inst_bci);
 
   }
 

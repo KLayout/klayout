@@ -40,6 +40,41 @@ enum TestMode
 };
 
 /**
+ *  @brief A new processor class which and/nots with a sized version of the intruder
+ */
+class BoolAndOrNotWithSizedLocalOperation
+  : public db::BoolAndOrNotLocalOperation
+{
+public:
+  BoolAndOrNotWithSizedLocalOperation (bool is_and, db::Coord dist)
+    : BoolAndOrNotLocalOperation (is_and), m_dist (dist)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void compute_local (db::Layout *layout, const std::map<db::PolygonRef, std::vector<db::PolygonRef> > &interactions, std::set<db::PolygonRef> &result) const
+  {
+    std::map<db::PolygonRef, std::vector<db::PolygonRef> > sized_interactions = interactions;
+    for (std::map<db::PolygonRef, std::vector<db::PolygonRef> >::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
+      for (std::vector<db::PolygonRef>::iterator j = i->second.begin (); j != i->second.end (); ++j) {
+        db::Polygon poly = j->obj ().transformed (j->trans ());
+        poly.size (m_dist, m_dist);
+        *j = db::PolygonRef (poly, layout->shape_repository ());
+      }
+    }
+    BoolAndOrNotLocalOperation::compute_local (layout, sized_interactions, result);
+  }
+
+  db::Coord dist () const
+  {
+    return m_dist;
+  }
+
+private:
+  db::Coord m_dist;
+};
+
+/**
  *  @brief Turns a layer into polygons and polygon references
  *  The hierarchical processor needs polygon references and can't work on polygons directly.
  */
@@ -75,7 +110,7 @@ std::string contexts_to_s (db::Layout *layout, db::LocalProcessorContexts &conte
   return res;
 }
 
-void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, db::Coord enl = 0, std::string *context_doc = 0)
+void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0)
 {
   db::Layout layout_org;
 
@@ -120,7 +155,60 @@ void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int ou
     proc.run (&op, l1, l2, lout);
   } else {
     db::LocalProcessorContexts contexts;
-    proc.compute_contexts (contexts, &op, l1, l2, enl);
+    proc.compute_contexts (contexts, &op, l1, l2);
+    *context_doc = contexts_to_s (&layout_org, contexts);
+    proc.compute_results (contexts, &op, lout);
+  }
+
+  db::compare_layouts (_this, layout_org, testdata (file), lmap, false /*skip other layers*/, db::AsPolygons);
+}
+
+void run_test_bool_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0)
+{
+  db::Layout layout_org;
+
+  unsigned int l1 = 0, l2 = 0, lout = 0;
+  db::LayerMap lmap;
+
+  {
+    tl::InputStream stream (testdata (file));
+    db::Reader reader (stream);
+
+    db::LayerProperties p;
+
+    p.layer = 1;
+    p.datatype = 0;
+    lmap.map (db::LDPair (1, 0), l1 = layout_org.insert_layer ());
+    layout_org.set_properties (l1, p);
+
+    p.layer = 2;
+    p.datatype = 0;
+    lmap.map (db::LDPair (2, 0), l2 = layout_org.insert_layer ());
+    layout_org.set_properties (l2, p);
+
+    p.layer = out_layer_num;
+    p.datatype = 0;
+    lmap.map (db::LDPair (out_layer_num, 0), lout = layout_org.insert_layer ());
+    layout_org.set_properties (lout, p);
+
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+    reader.read (layout_org, options);
+  }
+
+  layout_org.clear_layer (lout);
+  normalize_layer (layout_org, l1);
+  normalize_layer (layout_org, l2);
+
+  BoolAndOrNotWithSizedLocalOperation op (mode == TMAnd, dist);
+  db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
+
+  if (! context_doc) {
+    proc.run (&op, l1, l2, lout);
+  } else {
+    db::LocalProcessorContexts contexts;
+    proc.compute_contexts (contexts, &op, l1, l2);
     *context_doc = contexts_to_s (&layout_org, contexts);
     proc.compute_results (contexts, &op, lout);
   }
@@ -228,7 +316,7 @@ TEST(BasicAnd9)
 {
   //  Top-level ring structure, AND
   std::string doc;
-  run_test_bool (_this, "hlp9.oas", TMAnd, 100, 0, &doc);
+  run_test_bool (_this, "hlp9.oas", TMAnd, 100, &doc);
   EXPECT_EQ (doc,
     //  This means: the interaction test is strong enough, so it does not see interactions between the
     //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
@@ -244,7 +332,7 @@ TEST(BasicNot9)
 {
   //  Top-level ring structure, NOT
   std::string doc;
-  run_test_bool (_this, "hlp9.oas", TMNot, 101, 0, &doc);
+  run_test_bool (_this, "hlp9.oas", TMNot, 101, &doc);
   EXPECT_EQ (doc,
     //  This means: the interaction test is strong enough, so it does not see interactions between the
     //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
@@ -266,5 +354,145 @@ TEST(BasicNot10)
 {
   //  Array instances, NOT
   run_test_bool (_this, "hlp10.oas", TMNot, 101);
+}
+
+TEST(BasicAndWithSize1)
+{
+  //  Simple flat AND
+  run_test_bool_with_size (_this, "hlp1.oas", TMAnd, 1500, 102);
+}
+
+TEST(BasicNotWithSize1)
+{
+  //  Simple flat NOT
+  run_test_bool_with_size (_this, "hlp1.oas", TMNot, 1500, 103);
+}
+
+TEST(BasicAndWithSize2)
+{
+  //  Up/down and down/up interactions, AND
+  run_test_bool_with_size (_this, "hlp2.oas", TMAnd, 1500, 102);
+}
+
+TEST(BasicNotWithSize2)
+{
+  //  Up/down and down/up interactions, NOT
+  run_test_bool_with_size (_this, "hlp2.oas", TMNot, 1500, 103);
+}
+
+TEST(BasicAndWithSize3)
+{
+  //  Variant building, AND
+  run_test_bool_with_size (_this, "hlp3.oas", TMAnd, 1500, 102);
+}
+
+TEST(BasicNotWithSize3)
+{
+  //  Variant building, NOT
+  run_test_bool_with_size (_this, "hlp3.oas", TMNot, 1500, 103);
+}
+
+TEST(BasicAndWithSize4)
+{
+  //  Sibling interactions, variant building, AND
+  run_test_bool_with_size (_this, "hlp4.oas", TMAnd, 1500, 102);
+}
+
+TEST(BasicNotWithSize4)
+{
+  //  Sibling interactions, variant building, NOT
+  run_test_bool_with_size (_this, "hlp4.oas", TMNot, 1500, 103);
+}
+
+TEST(BasicAndWithSize5)
+{
+  //  Variant building with intermediate hierarchy, AND
+  run_test_bool_with_size (_this, "hlp5.oas", TMAnd, 1500, 102);
+}
+
+TEST(BasicNotWithSize5)
+{
+  //  Variant building with intermediate hierarchy, NOT
+  run_test_bool_with_size (_this, "hlp5.oas", TMNot, 1500, 103);
+}
+
+TEST(BasicAndWithSize6)
+{
+  //  Extreme variants (copy, vanishing), AND
+  run_test_bool_with_size (_this, "hlp6.oas", TMAnd, 1500, 102);
+}
+
+TEST(BasicNotWithSize6)
+{
+  //  Extreme variants (copy, vanishing), NOT
+  run_test_bool_with_size (_this, "hlp6.oas", TMNot, 1500, 103);
+}
+
+TEST(BasicAndWithSize7)
+{
+  //  Context replication - direct and indirect, AND
+  run_test_bool_with_size (_this, "hlp7.oas", TMAnd, 1500, 102);
+}
+
+TEST(BasicNotWithSize7)
+{
+  //  Context replication - direct and indirect, NOT
+  run_test_bool_with_size (_this, "hlp7.oas", TMNot, 1500, 103);
+}
+
+TEST(BasicAndWithSize8)
+{
+  //  Mixed sibling-parent contexts, AND
+  run_test_bool_with_size (_this, "hlp8.oas", TMAnd, 1500, 102);
+}
+
+TEST(BasicNotWithSize8)
+{
+  //  Mixed sibling-parent contexts, NOT
+  run_test_bool_with_size (_this, "hlp8.oas", TMNot, 1500, 103);
+}
+
+TEST(BasicAndWithSize9)
+{
+  //  Top-level ring structure, AND
+  std::string doc;
+  run_test_bool_with_size (_this, "hlp9.oas", TMAnd, 1500, 102, &doc);
+  EXPECT_EQ (doc,
+    //  This means: the interaction test is strong enough, so it does not see interactions between the
+    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+    "TOP[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 0 insts, 0 shapes (1 times)\n"
+    "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
+  );
+}
+
+TEST(BasicNotWithSize9)
+{
+  //  Top-level ring structure, NOT
+  std::string doc;
+  run_test_bool_with_size (_this, "hlp9.oas", TMNot, 1500, 103, &doc);
+  EXPECT_EQ (doc,
+    //  This means: the interaction test is strong enough, so it does not see interactions between the
+    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+    "TOP[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 0 insts, 0 shapes (1 times)\n"
+    "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
+  );
+}
+
+TEST(BasicAndWithSize10)
+{
+  //  Array instances, AND
+  run_test_bool_with_size (_this, "hlp10.oas", TMAnd, 150, 102);
+}
+
+TEST(BasicNotWithSize10)
+{
+  //  Array instances, NOT
+  run_test_bool_with_size (_this, "hlp10.oas", TMNot, 150, 103);
 }
 

@@ -459,6 +459,9 @@ LEFImporter::do_read (db::Layout &layout)
       std::string cellname = "VIA_" + n;
       db::Cell &cell = layout.cell (layout.add_cell (cellname.c_str ()));
 
+      ViaDesc &via_desc = m_vias[n];
+      via_desc.cell = &cell;
+
       while (test ("DEFAULT") || test ("TOPOFSTACKONLY")) 
         ;
       test (";");
@@ -544,9 +547,9 @@ LEFImporter::do_read (db::Layout &layout)
 
           } else if (test ("LAYERS")) {
 
-            geometry[0].first = get ();
+            via_desc.m1 = geometry[0].first = get ();
             geometry[1].first = get ();
-            geometry[2].first = get ();
+            via_desc.m2 = geometry[2].first = get ();
 
             test (";");
 

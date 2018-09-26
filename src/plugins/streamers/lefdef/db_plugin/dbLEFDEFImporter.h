@@ -536,7 +536,7 @@ private:
 /**
  *  @brief A structure describing a via
  */
-struct EXT_PUBLIC ViaDesc
+struct DB_PLUGIN_PUBLIC ViaDesc
 {
   ViaDesc () : cell (0) { }
 

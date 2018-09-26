@@ -150,7 +150,7 @@ class DBTransTests(unittest.TestCase):
     self.assertEqual( c.is_mirror(), True )
     self.assertEqual( c.rot(), pya.DCplxTrans.M135.rot() )
     self.assertEqual( str(c.s_trans()), "m135 0,0" )
-    self.assertEqual( c.angle, 270 )
+    self.assertAlmostEqual( c.angle, 270 )
 
     self.assertEqual( str(c.trans( pya.Edge(0, 1, 2, 3) )), "(-1,0;-3,-2)" )
     self.assertEqual( str(( c * pya.Edge(0, 1, 2, 3) )), "(-1,0;-3,-2)" )
@@ -174,7 +174,7 @@ class DBTransTests(unittest.TestCase):
     self.assertEqual( c.is_mirror(), False )
     self.assertEqual( c.rot(), pya.DCplxTrans.R0.rot() )
     self.assertEqual( str(c.s_trans()), "r0 0,0" )
-    self.assertEqual( c.angle, 0 )
+    self.assertAlmostEqual( c.angle, 0 )
 
     c = pya.DCplxTrans( 0.75, 45, True, 2.5, -12.5 )
     self.assertEqual( str(c), "m22.5 *0.75 2.5,-12.5" )
@@ -185,7 +185,7 @@ class DBTransTests(unittest.TestCase):
     self.assertEqual( c.is_mag(), True )
     self.assertEqual( c.rot(), pya.DCplxTrans.M0.rot() )
     self.assertEqual( str(c.s_trans()), "m0 2.5,-12.5" )
-    self.assertEqual( c.angle, 45 )
+    self.assertAlmostEqual( c.angle, 45 )
 
     self.assertEqual( str(c.ctrans( 5 )), "3.75" )
     self.assertEqual( str(c.trans( pya.DPoint( 12, 16 ) )), "17.3492424049,-14.6213203436" )
@@ -335,7 +335,7 @@ class DBTransTests(unittest.TestCase):
     self.assertEqual( c.is_mirror(), True )
     self.assertEqual( c.rot(), pya.CplxTrans.M135.rot() )
     self.assertEqual( str(c.s_trans()), "m135 0,0" )
-    self.assertEqual( c.angle, 270 )
+    self.assertAlmostEqual( c.angle, 270 )
 
     c = pya.CplxTrans.from_dtrans( pya.DCplxTrans.M135 )
     self.assertEqual( str(c), "m135 *1 0,0" )
@@ -348,7 +348,7 @@ class DBTransTests(unittest.TestCase):
     self.assertEqual( c.is_mirror(), False )
     self.assertEqual( c.rot(), pya.CplxTrans.R0.rot() )
     self.assertEqual( str(c.s_trans()), "r0 0,0" )
-    self.assertEqual( c.angle, 0 )
+    self.assertAlmostEqual( c.angle, 0 )
 
     c = pya.CplxTrans( 0.75, 45, True, 2.5, -12.5 )
     self.assertEqual( str(c), "m22.5 *0.75 2.5,-12.5" )
@@ -360,7 +360,7 @@ class DBTransTests(unittest.TestCase):
     self.assertEqual( c.is_mag(), True )
     self.assertEqual( c.rot(), pya.CplxTrans.M0.rot() )
     self.assertEqual( str(c.s_trans()), "m0 3,-13" )
-    self.assertEqual( c.angle, 45 )
+    self.assertAlmostEqual( c.angle, 45 )
 
     self.assertEqual( str(c.ctrans( 5 )), "3.75" )
     self.assertEqual( str(c.trans( pya.Point( 12, 16 ) )), "17.3492424049,-14.6213203436" )
@@ -517,7 +517,7 @@ class DBTransTests(unittest.TestCase):
     self.assertEqual(t1 < t4, True)
     self.assertEqual(t4 < t1, False)
 
-  # Hash values 
+  # Hash values
   def test_5_Trans_Hash(self):
 
     t1 = pya.DTrans( pya.DTrans.M135, pya.DPoint( 17, 5 ))

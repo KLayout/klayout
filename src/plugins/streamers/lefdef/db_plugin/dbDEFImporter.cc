@@ -70,17 +70,6 @@ DEFImporter::get_orient (bool optional)
   }
 }
 
-/**
- *  @brief A structure describing a via
- */
-struct ViaDesc
-{
-  ViaDesc () : cell (0) { }
-
-  db::Cell *cell;
-  std::string m1, m2;
-};
-
 void
 DEFImporter::read_polygon (db::Polygon &poly, double scale)
 {
@@ -153,7 +142,7 @@ DEFImporter::do_read (db::Layout &layout)
   double dbu_mic = 1000.0;
   double scale = 1.0 / (dbu_mic * layout.dbu ());
   std::map<int, db::Polygon> styles;
-  std::map<std::string, ViaDesc> via_desc;
+  std::map<std::string, ViaDesc> via_desc = m_lef_importer.vias ();
   std::map<std::string, std::vector<db::Polygon> > regions;
   std::list<Group> groups;
   std::list<std::pair<std::string, db::CellInstArray> > instances;

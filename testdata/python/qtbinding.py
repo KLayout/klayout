@@ -471,9 +471,11 @@ class QtBindingTest(unittest.TestCase):
 
     pya.QApplication.processEvents()
 
-    s1 = "QKeyEvent: ShortcutOverride (51)\nQKeyEvent: KeyPress (6)\nQKeyEvent: ShortcutOverride (51)\nQKeyEvent: KeyPress (6)\nQKeyEvent: ShortcutOverride (51)\nQKeyEvent: KeyPress (6)" 
-    s2 = "QKeyEvent: KeyPress (6)\nQKeyEvent: KeyPress (6)\nQKeyEvent: KeyPress (6)" 
-    self.assertEqual("\n".join(ef.log()) == s1 or "\n".join(ef.log()) == s2, True)
+    s1 = "QKeyEvent: ShortcutOverride (51)\nQKeyEvent: KeyPress (6)\nQKeyEvent: ShortcutOverride (51)\nQKeyEvent: KeyPress (6)\nQKeyEvent: ShortcutOverride (51)\nQKeyEvent: KeyPress (6)"
+    s2 = "QKeyEvent: KeyPress (6)\nQKeyEvent: KeyPress (6)\nQKeyEvent: KeyPress (6)"
+    s3 = "QKeyEvent_Native: ShortcutOverride (51)\nQKeyEvent: KeyPress (6)\nQKeyEvent_Native: ShortcutOverride (51)\nQKeyEvent: KeyPress (6)\nQKeyEvent_Native: ShortcutOverride (51)\nQKeyEvent: KeyPress (6)"
+    self.assertIn("\n".join(ef.log()), (s1, s2, s3))
+
     ef = None
 
     self.assertEqual(widget.text, "ABCpO")

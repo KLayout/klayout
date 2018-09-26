@@ -86,6 +86,16 @@ public:
    */
   double layer_ext (const std::string &layer, double def_ext = 0.0) const;
 
+  /**
+   *  @brief Gets a map of the vias defined in this LEF file
+   *
+   *  The map maps the via name to the via description.
+   */
+  const std::map<std::string, ViaDesc> &vias () const
+  {
+    return m_vias;
+  }
+
 protected:
   void do_read (db::Layout &layout);
 
@@ -95,6 +105,7 @@ private:
   std::map<std::string, double> m_default_ext;
   std::map<std::string, db::Cell *> m_macros_by_name;
   std::map<std::string, db::Box> m_macro_bboxes_by_name;
+  std::map<std::string, ViaDesc> m_vias;
 
   std::vector <db::Trans> get_iteration (db::Layout &layout);
   void read_geometries (db::Layout &layout, db::Cell &cell, LayerPurpose purpose, std::map<std::string, db::Box> *collect_bboxes = 0);

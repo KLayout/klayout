@@ -534,7 +534,10 @@ class QtBinding_TestClass < TestBase
 
     GC.start
 
-    assert_equal(ef.log.select { |s| s !~ /RBA::QKeyEvent: ShortcutOverride/ }.join("\n"), "RBA::QKeyEvent: KeyPress (6)\nRBA::QKeyEvent: KeyPress (6)\nRBA::QKeyEvent: KeyPress (6)") 
+    assert_equal(ef.log.select { |s| s !~ /RBA::QKeyEvent: ShortcutOverride/ }.join("\n"), "RBA::QKeyEvent: KeyPress (6)\nRBA::QKeyEvent: KeyPress (6)\nRBA::QKeyEvent: KeyPress (6)")
+
+    # TODO: on macOS 10.13, ef.log yields "RBA::QKeyEvent_Native: ShortcutOverride (51)\nRBA::QKeyEvent: KeyPress (6)\nRBA::QKeyEvent_Native: ShortcutOverride (51)\nRBA::QKeyEvent: KeyPress (6)\nRBA::QKeyEvent_Native: ShortcutOverride (51)\nRBA::QKeyEvent: KeyPress (6)", causing this test to fail.
+
     ef = nil
     ef = EventFilter::new
     GC.start

@@ -112,7 +112,7 @@ struct cut_polygon_edge
 {
   typedef typename PointType::coord_type coord_type;
   typedef typename db::edge<coord_type> edge_type;
-  typedef typename db::coord_traits<coord_type>::area_type projection_type;
+  typedef double projection_type;
 
   cut_polygon_edge ()
     : contour (-1), index (0), projected (0), point (), last_point ()
@@ -179,7 +179,7 @@ public:
 
   bool operator< (const loose_end_struct<CuttingEdgeType> &other) const
   {
-    if (proj () != other.proj ()) {
+    if (! db::coord_traits<double>::equal (proj (), other.proj ())) {
       return proj () < other.proj ();
     } else {
       return db::vprod_sign (edge (), other.edge ()) > 0;
@@ -196,13 +196,13 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, C
   typedef db::edge<coord_type> edge_type;
   typedef cut_polygon_edge<point_type> cut_polygon_edge_type;
   typedef cut_polygon_segment<cut_polygon_edge_type> cutting_segment_type;
-  typedef typename db::coord_traits<coord_type>::area_type projection_type;
 
   bool do_hole_assignment = (input.holes () > 0);
   std::vector <PolygonType> hull_polygons;
   std::vector <PolygonType> hole_polygons;
 
   std::vector<cutting_segment_type> cutting_segments;
+  double line_length = line.double_length ();
 
   for (unsigned int nc = 0; nc < input.holes () + 1; ++nc) {
 
@@ -229,7 +229,7 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, C
         int s1 = line.side_of (e.p1 ());
         int s2 = line.side_of (e.p2 ());
 
-        projection_type p = db::sprod (ip.second - line.p1 (), line.p2 () - line.p1 ());
+        double p = line_length * double (db::vprod (e.p1 () - line.p1 (), e.d ())) / double (db::vprod (line.d (), e.d ()));
 
         if (s1 < 0 && s2 >= 0) {
           // right -> left or on edge

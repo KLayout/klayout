@@ -33,7 +33,7 @@
 #include <cstdlib>
 #include <QDir>
 
-static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au)
+static void run_test (tl::TestBase *_this, const char *lef_dir, const char *filename, const char *au, bool priv = true)
 {
   ext::LEFDEFReaderOptions tc;
   tc.set_via_geometry_datatype (0);
@@ -63,7 +63,7 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
     if (ex.test ("def:")) {
 
-      std::string fn (tl::testsrc_private ());
+      std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
       fn += "/testdata/lefdef/";
       fn += lef_dir;
       fn += "/";
@@ -76,7 +76,7 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
     } else if (ex.test ("lef:")) {
 
-      std::string fn (tl::testsrc_private ());
+      std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
       fn += "/testdata/lefdef/";
       fn += lef_dir;
       fn += "/";
@@ -120,7 +120,7 @@ static void run_test (tl::TestBase *_this, const char *lef_dir, const char *file
 
   if (au) {
 
-    std::string fn (tl::testsrc_private ());
+    std::string fn (priv ? tl::testsrc_private () : tl::testsrc ());
     fn += "/testdata/lefdef/";
     fn += lef_dir;
     fn += "/";
@@ -233,5 +233,10 @@ TEST(18)
 TEST(19)
 {
   run_test (_this, "def10", "def:in.def", "au.oas.gz");
+}
+
+TEST(20)
+{
+  run_test (_this, "issue-172", "lef:in.lef+def:in.def", "au.oas.gz", false);
 }
 

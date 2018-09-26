@@ -534,6 +534,24 @@ private:
 };
 
 /**
+ *  @brief A structure describing a via
+ */
+struct DB_PLUGIN_PUBLIC ViaDesc
+{
+  ViaDesc () : cell (0) { }
+
+  /**
+   *  @brief The cell representing the via
+   */
+  db::Cell *cell;
+
+  /**
+   *  @brief The names of bottom and top metal respectively
+   */
+  std::string m1, m2;
+};
+
+/**
  *  @brief The LEF importer object
  */
 class DB_PLUGIN_PUBLIC LEFDEFImporter

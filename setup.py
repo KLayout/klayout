@@ -344,12 +344,11 @@ rdb = Extension(config.root + '.rdb',
 # Core setup function
 
 if __name__ == '__main__':
-    print("Number of cores", N_cores)
-    setup(name=config.root,
-          version=config.version(),
-          description='KLayout standalone Python package',
-          author='Matthias Koefferlein',
-          author_email='matthias@klayout.de',
-          packages=[config.root],
-          package_dir={config.root: 'src/pymod/distutils_src'},
-          ext_modules=[_tl, _gsi, _pya, _db, _rdb] + db_plugins + [tl, db, rdb])
+    setup(name = config.root,
+          version =                 config.version(),
+          description =             'KLayout standalone Python package',
+          author =                  'Matthias Koefferlein',
+          author_email =            'matthias@klayout.de',
+          packages =                [config.root],
+          package_dir =             {config.root: 'src/pymod/distutils_src'},
+          ext_modules =             [_tl, _gsi, _pya, _db, _rdb] + db_plugins + [tl, db, rdb])

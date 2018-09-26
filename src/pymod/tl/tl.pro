@@ -35,5 +35,9 @@ init_target.path = $$PREFIX/pymod/klayout
 # This would be nice:
 #   init_target.files += $$DESTDIR_PYMOD/__init__.py
 # but some Qt versions need this explicitly:
-init_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/__init__.py $(INSTALLROOT)$$PREFIX/pymod/klayout
+msvc {
+  init_target.extra = $(INSTALL_PROGRAM) $$shell_path($$DESTDIR_PYMOD/__init__.py) $$shell_path($(INSTALLROOT)$$PREFIX/pymod/klayout)
+} else {
+  init_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/__init__.py $(INSTALLROOT)$$PREFIX/pymod/klayout
+}
 INSTALLS += init_target

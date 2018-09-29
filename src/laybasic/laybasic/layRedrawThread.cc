@@ -307,7 +307,7 @@ RedrawThread::do_start (bool clear, const db::Vector *shift_vector, const std::v
       }
 
       for (int i = 0; i < m_nlayers; ++i) {
-        if (m_layers [i].visible && m_layers [i].enabled) {
+        if (m_layers [i].needs_drawing ()) {
           schedule (new RedrawThreadTask (i));
         }
       }

@@ -510,7 +510,7 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
 
         if (pb != 0 
             && w > 0
-            && (pb->first_scanline () + w - 1 < y + slice && pb->last_scanline () > y + w - 1)
+            && ((pb->first_scanline () < y + slice && pb->last_scanline () > y) || w > 1)
             && (vop.ormask () | ~vop.andmask ()) != 0) {
 
           uint32_t non_empty_sl = 0;
@@ -748,7 +748,7 @@ bitmaps_to_image_mono (const std::vector<lay::ViewOp> &view_ops_in,
 
         if (pb != 0
             && w > 0
-            && (pb->first_scanline () + w - 1 < y + slice && pb->last_scanline () > y + w - 1)
+            && ((pb->first_scanline () < y + slice && pb->last_scanline () > y) || w > 1)
             && (vop.ormask () | ~vop.andmask ()) != 0) {
 
           uint32_t non_empty_sl = 0;

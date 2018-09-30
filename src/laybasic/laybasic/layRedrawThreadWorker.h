@@ -180,7 +180,7 @@ private:
   void draw_layer (int from_level, int to_level, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_box, int level, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text, const UpdateSnapshotCallback *update_snapshot);
   void draw_layer_wo_cache (int from_level, int to_level, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector<db::Box> &vv, int level, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text, const UpdateSnapshotCallback *update_snapshot);
   void draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
-  void draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_region, int level, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text);
+  void draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_region, int level, lay::CanvasPlane *fill, lay::CanvasPlane *frame, lay::CanvasPlane *vertex, lay::CanvasPlane *text, Bitmap *opt_bitmap);
   void draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);
   void draw_boxes (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &redraw_region, int level);
   void draw_box_properties (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const std::vector <db::Box> &redraw_regions, int level);

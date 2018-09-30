@@ -15,7 +15,7 @@
        DEF reader did not pull vias from LEF
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/174
        Performance issue with many layers with width >1
-* Bugfix: https://github.com/klayoutmatthias/klayout/issues/175
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/176
        Painting issue with texts
 * Bugfix: some potential memory corruption issues fixed
        During the efforts for making the code base compatible

@@ -74,9 +74,10 @@ struct RedrawLayerInfo
   /**
    *  @brief The layer index
    *
-   *  The logical layer to draw. If this member is <0 and the cellview_index is <0, it is an invalid layer,
-   *  which is ignored. If the cellview_index is >=0, it denotes a "cell frame" pseudo
-   *  layer. It is set by the constructor.
+   *  The logical layer to draw. The layer index can be <0 which indicates a
+   *  layer with not layout source (cell_frame may be true to indicate a
+   *  pseudo layer then).
+   *  This attribute is set by the constructor.
    */
   int layer_index;
 
@@ -115,6 +116,14 @@ struct RedrawLayerInfo
    *  This member is set by the constructor.
    */
   bool inverse_prop_sel;
+
+  /**
+   *  @brief Returns true, if the layer needs to be drawn
+   */
+  bool needs_drawing () const
+  {
+    return visible && enabled && (cell_frame || layer_index >= 0) && cellview_index >= 0;
+  }
 };
 
 }

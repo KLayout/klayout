@@ -250,6 +250,11 @@ echo on
   "HAVE_64BIT_COORD=%HAVE_64BIT_COORD%" ^
   "PREFIX=%option-bin%" ^
   "BITS_PATH=%option-bits%\%compiler%\%arch%" ^
-  %inst_path%\src\klayout.pro ^
-&& nmake %MAKE_OPT% ^
-&& nmake install
+  %inst_path%\src\klayout.pro || exit /b 1 
+
+rem start the build
+nmake %MAKE_OPT% || exit /b 2
+
+rem install the binaries
+nmake install || exit /b 3
+

@@ -1232,20 +1232,26 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
   vertex = m_planes[3 + plane_group * (planes_per_layer / 3)];
 
   //  do not draw, if there is nothing to draw
-  if (mp_layout->cells () <= ci || vp.empty ()) {
+  if (mp_layout->cells () <= ci || vp.empty () || mp_layout->cell (ci).bbox (m_layer).empty ()) {
     return;
   }
   if (cell_var_cached (ci, trans)) {
     return;
   }
 
+  std::auto_ptr<lay::Bitmap> opt_bitmap;
+  lay::Bitmap *vertex_bitmap = dynamic_cast<lay::Bitmap *> (vertex);
+  if (m_text_lazy_rendering && vertex_bitmap) {
+    opt_bitmap.reset (new lay::Bitmap (vertex_bitmap->width (), vertex_bitmap->height (), vertex_bitmap->resolution ()));
+  }
+
   for (std::vector<db::Box>::const_iterator b = vp.begin (); b != vp.end (); ++b) {
-    draw_text_layer (drawing_context, ci, trans, *b, level, fill, frame, vertex, text);
+    draw_text_layer (drawing_context, ci, trans, *b, level, fill, frame, vertex, text, opt_bitmap.get ());
   }
 }
 
 void
-RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level, CanvasPlane *fill, CanvasPlane *frame, CanvasPlane *vertex, CanvasPlane *text)
+RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type ci, const db::CplxTrans &trans, const db::Box &vp, int level, CanvasPlane *fill, CanvasPlane *frame, CanvasPlane *vertex, CanvasPlane *text, lay::Bitmap *opt_bitmap)
 {
   test_snapshot (0);
 
@@ -1283,6 +1289,9 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
         //  paint the simplified box
         if (anything) {
           r.draw (trans * bbox, 0, frame, vertex, 0);
+          if (opt_bitmap) {
+            r.draw (trans * bbox, 0, 0, opt_bitmap, 0);
+          }
         }
 
         //  do not dive further into hierarchy
@@ -1318,6 +1327,9 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
               test_snapshot (0); 
 
               r.draw (*shape, trans, fill, frame, vertex, text);
+              if (opt_bitmap) {
+                r.draw (*shape, trans, 0, 0, opt_bitmap, 0);
+              }
               ++shape;
 
               --ntexts;
@@ -1355,8 +1367,6 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
     //  dive down into the hierarchy ..
     if (need_to_dive) {
 
-      const lay::Bitmap *vertex_bitmap = dynamic_cast<const lay::Bitmap *> (vertex);
-
       //  create a set of boxes to look into
       std::vector<db::Box> vv = search_regions (cell_bbox, vp, level);
 
@@ -1377,7 +1387,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
             bool skip = false;
             if (m_text_lazy_rendering && qid != current_quad_id) {
               current_quad_id = qid;
-              skip = vertex_bitmap && skip_quad (inst.quad_box () & bbox, vertex_bitmap, trans);
+              skip = opt_bitmap && skip_quad (inst.quad_box () & bbox, opt_bitmap, trans);
             }  
 
             if (skip) {
@@ -1448,7 +1458,7 @@ RedrawThreadWorker::draw_text_layer (bool drawing_context, db::cell_index_type c
 
                       db::ICplxTrans t (cell_inst.complex_trans (*p));
                       db::Box new_vp = db::Box (t.inverted () * *v);
-                      draw_text_layer (drawing_context, new_ci, trans * t, new_vp, level + 1, fill, frame, vertex, text);
+                      draw_text_layer (drawing_context, new_ci, trans * t, new_vp, level + 1, fill, frame, vertex, text, opt_bitmap);
 
                     } 
 
@@ -1648,7 +1658,7 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
         //  skip this quad if we have drawn something here already
         size_t qid = inst.quad_id ();
         bool skip = false;
-        if (m_text_lazy_rendering && qid != current_quad_id) {
+        if (qid != current_quad_id) {
           current_quad_id = qid;
           skip = skip_quad (inst.quad_box () & bbox, vertex_bitmap, trans);
         }  

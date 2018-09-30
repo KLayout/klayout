@@ -1,4 +1,4 @@
-0.25.5          (2018-09-26):
+0.25.5          (2018-09-30):
 
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/162
        GDS2 LIBNAME was not maintained on "File/Save".
@@ -6,6 +6,10 @@
        Internal error when writing GDS files (breaking of polygons)
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/172
        DEF reader did not pull vias from LEF
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/174
+       Performance issue with many layers with width >1
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/175
+       Painting issue with texts
 * Bugfix: some potential memory corruption issues fixed
        During the efforts for making the code base compatible
        with MSVC, some potential candidates for memory corruption

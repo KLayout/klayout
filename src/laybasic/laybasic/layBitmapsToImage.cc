@@ -386,13 +386,18 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
   }
 }
 
-static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_in, const std::vector<lay::Bitmap *> &pbitmaps_in, const lay::LineStyles &ls, unsigned int width, unsigned int height, std::map<unsigned int, lay::Bitmap> &precursors, QMutex *mutex)
+static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_in, const std::vector <unsigned int> &vo_map, const std::vector<lay::Bitmap *> &pbitmaps_in, const std::vector<unsigned int> &bm_map, const lay::LineStyles &ls, unsigned int width, unsigned int height, std::map<unsigned int, lay::Bitmap> &precursors, QMutex *mutex)
 {
+  tl_assert (bm_map.size () == vo_map.size ());
+
   //  Styled lines with width > 1 are not rendered directly, but through an intermediate step.
   //  We prepare the necessary precursor bitmaps now
-  for (unsigned int i = 0; i < view_ops_in.size (); ++i) {
+  for (unsigned int i = 0; i < vo_map.size (); ++i) {
 
-    const ViewOp &op = view_ops_in [i];
+    unsigned int vo_index = vo_map [i];
+    unsigned int bm_index = bm_map [i];
+
+    const ViewOp &op = view_ops_in [vo_index];
     if (op.width () > 1 && ls.style (op.line_style_index ()).width () > 0) {
 
       //  lock bitmaps against change by the redraw thread
@@ -400,12 +405,12 @@ static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_i
         mutex->lock ();
       }
 
-      lay::Bitmap &bp = precursors.insert (std::make_pair (i, lay::Bitmap (width, height, 1.0))).first->second;
+      lay::Bitmap &bp = precursors.insert (std::make_pair (bm_index, lay::Bitmap (width, height, 1.0))).first->second;
       LineStyleInfo ls_info = ls.style (op.line_style_index ());
       ls_info.scale_pattern (op.width ());
 
       for (unsigned int y = 0; y < height; y++) {
-        render_scanline_std_edge (ls_info.pattern (), ls_info.pattern_stride (), pbitmaps_in [i], y, width, height, bp.scanline (y));
+        render_scanline_std_edge (ls_info.pattern (), ls_info.pattern_stride (), pbitmaps_in [bm_index], y, width, height, bp.scanline (y));
       }
 
       if (mutex) {
@@ -418,7 +423,7 @@ static void create_precursor_bitmaps (const std::vector<lay::ViewOp> &view_ops_i
 }
 
 static void 
-bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in, 
+bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
                       const std::vector<lay::Bitmap *> &pbitmaps_in,
                       const lay::DitherPattern &dp,
                       const lay::LineStyles &ls,
@@ -427,29 +432,33 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
                       bool transparent,
                       QMutex *mutex)
 {
-  unsigned int n_in = view_ops_in.size ();
-
   std::vector<unsigned int> bm_map;
   std::vector<unsigned int> vo_map;
 
-  vo_map.reserve (n_in);
-  for (unsigned int i = 0; i < n_in; ++i) {
-    vo_map.push_back (i);
-  }
+  vo_map.reserve (view_ops_in.size ());
+  bm_map.reserve (view_ops_in.size ());
+  unsigned int n_in = 0;
 
-  if (! use_bitmap_index) {
-    bm_map = vo_map;
-  } else {
-    bm_map.reserve (n_in);
-    for (unsigned int i = 0; i < n_in; ++i) {
-      bm_map.push_back (view_ops_in [i].bitmap_index () < 0 ? i : view_ops_in [i].bitmap_index ());
+  //  drop invisible and empty bitmaps, build bitmap mask
+  for (unsigned int i = 0; i < view_ops_in.size (); ++i) {
+
+    const lay::ViewOp &vop = view_ops_in [i];
+
+    unsigned int bi = (use_bitmap_index && vop.bitmap_index () >= 0) ? (unsigned int) vop.bitmap_index () : i;
+    const lay::Bitmap *pb = bi < pbitmaps_in.size () ? pbitmaps_in [bi] : 0;
+
+    if ((vop.ormask () | ~vop.andmask ()) != 0 && pb && ! pb->empty ()) {
+      vo_map.push_back (i);
+      bm_map.push_back (bi);
+      ++n_in;
     }
+
   }
 
   //  Styled lines with width > 1 are not rendered directly, but through an intermediate step.
   //  We prepare the necessary precursor bitmaps now
   std::map<unsigned int, lay::Bitmap> precursors;
-  create_precursor_bitmaps (view_ops_in, pbitmaps_in, ls, width, height, precursors, mutex);
+  create_precursor_bitmaps (view_ops_in, vo_map, pbitmaps_in, bm_map, ls, width, height, precursors, mutex);
 
   std::vector<lay::ViewOp> view_ops;
   std::vector<const lay::Bitmap *> pbitmaps;
@@ -489,12 +498,13 @@ bitmaps_to_image_rgb (const std::vector<lay::ViewOp> &view_ops_in,
         unsigned int w = vop.width ();
 
         const lay::Bitmap *pb = 0;
+        unsigned int bm_index = bm_map[i];
         if (bm_map [i] < pbitmaps_in.size ()) {
           if (w > 1 && ls.style (vop.line_style_index ()).width () > 0) {
-            tl_assert (precursors.find (i) != precursors.end ());
-            pb = &precursors [i];
+            tl_assert (precursors.find (bm_index) != precursors.end ());
+            pb = &precursors [bm_index];
           } else {
-            pb = pbitmaps_in [bm_map[i]];
+            pb = pbitmaps_in [bm_index];
           }
         }
 
@@ -660,29 +670,33 @@ bitmaps_to_image_mono (const std::vector<lay::ViewOp> &view_ops_in,
                        bool use_bitmap_index,
                        QMutex *mutex)
 {
-  unsigned int n_in = view_ops_in.size ();
-
   std::vector<unsigned int> bm_map;
   std::vector<unsigned int> vo_map;
 
-  vo_map.reserve (n_in);
-  for (unsigned int i = 0; i < n_in; ++i) {
-    vo_map.push_back (i);
-  }
+  vo_map.reserve (view_ops_in.size ());
+  bm_map.reserve (view_ops_in.size ());
+  unsigned int n_in = 0;
 
-  if (! use_bitmap_index) {
-    bm_map = vo_map;
-  } else {
-    bm_map.reserve (n_in);
-    for (unsigned int i = 0; i < n_in; ++i) {
-      bm_map.push_back (view_ops_in [i].bitmap_index () < 0 ? i : view_ops_in [i].bitmap_index ());
+  //  drop invisible and empty bitmaps, build bitmap mask
+  for (unsigned int i = 0; i < view_ops_in.size (); ++i) {
+
+    const lay::ViewOp &vop = view_ops_in [i];
+
+    unsigned int bi = (use_bitmap_index && vop.bitmap_index () >= 0) ? (unsigned int) vop.bitmap_index () : i;
+    const lay::Bitmap *pb = bi < pbitmaps_in.size () ? pbitmaps_in [bi] : 0;
+
+    if ((vop.ormask () | ~vop.andmask ()) != 0 && pb && ! pb->empty ()) {
+      vo_map.push_back (i);
+      bm_map.push_back (bi);
+      ++n_in;
     }
+
   }
 
   //  Styled lines with width > 1 are not rendered directly, but through an intermediate step.
   //  We prepare the necessary precursor bitmaps now
   std::map<unsigned int, lay::Bitmap> precursors;
-  create_precursor_bitmaps (view_ops_in, pbitmaps_in, ls, width, height, precursors, mutex);
+  create_precursor_bitmaps (view_ops_in, vo_map, pbitmaps_in, bm_map, ls, width, height, precursors, mutex);
 
   std::vector<lay::ViewOp> view_ops;
   std::vector<const lay::Bitmap *> pbitmaps;
@@ -722,16 +736,17 @@ bitmaps_to_image_mono (const std::vector<lay::ViewOp> &view_ops_in,
         unsigned int w = vop.width ();
 
         const lay::Bitmap *pb = 0;
+        unsigned int bm_index = bm_map[i];
         if (bm_map [i] < pbitmaps_in.size ()) {
           if (w > 1 && ls.style (vop.line_style_index ()).width () > 0) {
-            tl_assert (precursors.find (i) != precursors.end ());
-            pb = &precursors [i];
+            tl_assert (precursors.find (bm_index) != precursors.end ());
+            pb = &precursors [bm_index];
           } else {
-            pb = pbitmaps_in [bm_map[i]];
+            pb = pbitmaps_in [bm_index];
           }
         }
 
-        if (pb != 0 
+        if (pb != 0
             && w > 0
             && ((pb->first_scanline () < y + slice && pb->last_scanline () > y) || w > 1)
             && (vop.ormask () | ~vop.andmask ()) != 0) {

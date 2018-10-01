@@ -117,6 +117,7 @@ public:
   typedef map_type::const_iterator iterator;
 
   LocalProcessorCellContexts ();
+  LocalProcessorCellContexts (const db::Cell *intruder_cell);
 
   db::LocalProcessorCellContext *find_context (const key_type &intruders);
   db::LocalProcessorCellContext *create (const key_type &intruders);
@@ -133,6 +134,7 @@ public:
   }
 
 private:
+  const db::Cell *mp_intruder_cell;
   std::map<key_type, db::LocalProcessorCellContext> m_contexts;
 };
 
@@ -153,9 +155,13 @@ public:
     m_contexts_per_cell.clear ();
   }
 
-  LocalProcessorCellContexts &contexts_per_cell (db::Cell *cell)
+  LocalProcessorCellContexts &contexts_per_cell (db::Cell *subject_cell, const db::Cell *intruder_cell)
   {
-    return m_contexts_per_cell [cell];
+    contexts_per_cell_type::iterator ctx = m_contexts_per_cell.find (subject_cell);
+    if (ctx == m_contexts_per_cell.end ()) {
+      ctx = m_contexts_per_cell.insert (std::make_pair (subject_cell, LocalProcessorCellContexts (intruder_cell))).first;
+    }
+    return ctx->second;
   }
 
   contexts_per_cell_type &context_map ()
@@ -213,6 +219,7 @@ class DB_PLUGIN_PUBLIC LocalProcessor
 {
 public:
   LocalProcessor (db::Layout *layout, db::Cell *top);
+  LocalProcessor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_cell);
   void run (LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer);
   void compute_contexts (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int subject_layer, unsigned int intruder_layer);
   void compute_results (LocalProcessorContexts &contexts, const LocalOperation *op, unsigned int output_layer);
@@ -230,13 +237,15 @@ public:
 private:
   friend class LocalProcessorCellContexts;
 
-  db::Layout *mp_layout;
-  db::Cell *mp_top;
+  db::Layout *mp_subject_layout;
+  const db::Layout *mp_intruder_layout;
+  db::Cell *mp_subject_top;
+  const db::Cell *mp_intruder_top;
   std::string m_description;
 
-  void compute_contexts (LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *parent, db::Cell *cell, const db::ICplxTrans &cell_inst, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders, db::Coord dist);
+  void compute_contexts (LocalProcessorContexts &contexts, db::LocalProcessorCellContext *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const std::pair<std::set<CellInstArray>, std::set<PolygonRef> > &intruders, db::Coord dist);
   void push_results (db::Cell *cell, unsigned int output_layer, const std::set<db::PolygonRef> &result) const;
-  void compute_local_cell (LocalProcessorContexts &contexts, db::Cell *cell, const LocalOperation *op, const std::pair<std::set<CellInstArray>, std::set<db::PolygonRef> > &intruders, std::set<db::PolygonRef> &result);
+  void compute_local_cell (LocalProcessorContexts &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const LocalOperation *op, const std::pair<std::set<CellInstArray>, std::set<db::PolygonRef> > &intruders, std::set<db::PolygonRef> &result);
 };
 
 }

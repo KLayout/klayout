@@ -110,7 +110,7 @@ std::string contexts_to_s (db::Layout *layout, db::LocalProcessorContexts &conte
   return res;
 }
 
-void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0)
+void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc, bool single)
 {
   db::Layout layout_org;
 
@@ -149,21 +149,51 @@ void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int ou
   normalize_layer (layout_org, l2);
 
   db::BoolAndOrNotLocalOperation op (mode == TMAnd);
-  db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
 
-  if (! context_doc) {
-    proc.run (&op, l1, l2, lout);
+  if (single) {
+
+    db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
+
+    if (! context_doc) {
+      proc.run (&op, l1, l2, lout);
+    } else {
+      db::LocalProcessorContexts contexts;
+      proc.compute_contexts (contexts, &op, l1, l2);
+      *context_doc = contexts_to_s (&layout_org, contexts);
+      proc.compute_results (contexts, &op, lout);
+    }
+
   } else {
-    db::LocalProcessorContexts contexts;
-    proc.compute_contexts (contexts, &op, l1, l2);
-    *context_doc = contexts_to_s (&layout_org, contexts);
-    proc.compute_results (contexts, &op, lout);
+
+    db::Layout layout_org2 = layout_org;
+
+    db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()), &layout_org2, &layout_org2.cell (*layout_org2.begin_top_down ()));
+
+    if (! context_doc) {
+      proc.run (&op, l1, l2, lout);
+    } else {
+      db::LocalProcessorContexts contexts;
+      proc.compute_contexts (contexts, &op, l1, l2);
+      *context_doc = contexts_to_s (&layout_org, contexts);
+      proc.compute_results (contexts, &op, lout);
+    }
+
   }
 
   db::compare_layouts (_this, layout_org, testdata (file), lmap, false /*skip other layers*/, db::AsPolygons);
 }
 
-void run_test_bool_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0)
+void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0)
+{
+  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true);
+}
+
+void run_test_bool2 (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0)
+{
+  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false);
+}
+
+void run_test_bool_with_size_gen (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc, bool single)
 {
   db::Layout layout_org;
 
@@ -202,18 +232,48 @@ void run_test_bool_with_size (tl::TestBase *_this, const char *file, TestMode mo
   normalize_layer (layout_org, l2);
 
   BoolAndOrNotWithSizedLocalOperation op (mode == TMAnd, dist);
-  db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
 
-  if (! context_doc) {
-    proc.run (&op, l1, l2, lout);
+  if (single) {
+
+    db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
+
+    if (! context_doc) {
+      proc.run (&op, l1, l2, lout);
+    } else {
+      db::LocalProcessorContexts contexts;
+      proc.compute_contexts (contexts, &op, l1, l2);
+      *context_doc = contexts_to_s (&layout_org, contexts);
+      proc.compute_results (contexts, &op, lout);
+    }
+
   } else {
-    db::LocalProcessorContexts contexts;
-    proc.compute_contexts (contexts, &op, l1, l2);
-    *context_doc = contexts_to_s (&layout_org, contexts);
-    proc.compute_results (contexts, &op, lout);
+
+    db::Layout layout_org2 = layout_org;
+
+    db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()), &layout_org2, &layout_org2.cell (*layout_org2.begin_top_down ()));
+
+    if (! context_doc) {
+      proc.run (&op, l1, l2, lout);
+    } else {
+      db::LocalProcessorContexts contexts;
+      proc.compute_contexts (contexts, &op, l1, l2);
+      *context_doc = contexts_to_s (&layout_org, contexts);
+      proc.compute_results (contexts, &op, lout);
+    }
+
   }
 
   db::compare_layouts (_this, layout_org, testdata (file), lmap, false /*skip other layers*/, db::AsPolygons);
+}
+
+void run_test_bool_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0)
+{
+  run_test_bool_with_size_gen (_this, file, mode, dist, out_layer_num, context_doc, true);
+}
+
+void run_test_bool2_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0)
+{
+  run_test_bool_with_size_gen (_this, file, mode, dist, out_layer_num, context_doc, false);
 }
 
 TEST(BasicAnd1)
@@ -496,3 +556,282 @@ TEST(BasicNotWithSize10)
   run_test_bool_with_size (_this, "hlp10.oas", TMNot, 150, 103);
 }
 
+TEST(TwoInputsAnd1)
+{
+  //  Simple flat AND
+  run_test_bool2 (_this, "hlp1.oas", TMAnd, 100);
+}
+
+TEST(TwoInputsNot1)
+{
+  //  Simple flat NOT
+  run_test_bool2 (_this, "hlp1.oas", TMNot, 101);
+}
+
+TEST(TwoInputsAnd2)
+{
+  //  Up/down and down/up interactions, AND
+  run_test_bool2 (_this, "hlp2.oas", TMAnd, 100);
+}
+
+TEST(TwoInputsNot2)
+{
+  //  Up/down and down/up interactions, NOT
+  run_test_bool2 (_this, "hlp2.oas", TMNot, 101);
+}
+
+TEST(TwoInputsAnd3)
+{
+  //  Variant building, AND
+  run_test_bool2 (_this, "hlp3.oas", TMAnd, 100);
+}
+
+TEST(TwoInputsNot3)
+{
+  //  Variant building, NOT
+  run_test_bool2 (_this, "hlp3.oas", TMNot, 101);
+}
+
+TEST(TwoInputsAnd4)
+{
+  //  Sibling interactions, variant building, AND
+  run_test_bool2 (_this, "hlp4.oas", TMAnd, 100);
+}
+
+TEST(TwoInputsNot4)
+{
+  //  Sibling interactions, variant building, NOT
+  run_test_bool2 (_this, "hlp4.oas", TMNot, 101);
+}
+
+TEST(TwoInputsAnd5)
+{
+  //  Variant building with intermediate hierarchy, AND
+  run_test_bool2 (_this, "hlp5.oas", TMAnd, 100);
+}
+
+TEST(TwoInputsNot5)
+{
+  //  Variant building with intermediate hierarchy, NOT
+  run_test_bool2 (_this, "hlp5.oas", TMNot, 101);
+}
+
+TEST(TwoInputsAnd6)
+{
+  //  Extreme variants (copy, vanishing), AND
+  run_test_bool2 (_this, "hlp6.oas", TMAnd, 100);
+}
+
+TEST(TwoInputsNot6)
+{
+  //  Extreme variants (copy, vanishing), NOT
+  run_test_bool2 (_this, "hlp6.oas", TMNot, 101);
+}
+
+TEST(TwoInputsAnd7)
+{
+  //  Context replication - direct and indirect, AND
+  run_test_bool2 (_this, "hlp7.oas", TMAnd, 100);
+}
+
+TEST(TwoInputsNot7)
+{
+  //  Context replication - direct and indirect, NOT
+  run_test_bool2 (_this, "hlp7.oas", TMNot, 101);
+}
+
+TEST(TwoInputsAnd8)
+{
+  //  Mixed sibling-parent contexts, AND
+  run_test_bool2 (_this, "hlp8.oas", TMAnd, 100);
+}
+
+TEST(TwoInputsNot8)
+{
+  //  Mixed sibling-parent contexts, NOT
+  run_test_bool2 (_this, "hlp8.oas", TMNot, 101);
+}
+
+TEST(TwoInputsAnd9)
+{
+  //  Top-level ring structure, AND
+  std::string doc;
+  run_test_bool2 (_this, "hlp9.oas", TMAnd, 100, &doc);
+  EXPECT_EQ (doc,
+    //  This means: the interaction test is strong enough, so it does not see interactions between the
+    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+    "TOP[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 1 insts, 0 shapes (1 times)\n"
+    "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
+  );
+}
+
+TEST(TwoInputsNot9)
+{
+  //  Top-level ring structure, NOT
+  std::string doc;
+  run_test_bool2 (_this, "hlp9.oas", TMNot, 101, &doc);
+  EXPECT_EQ (doc,
+    //  This means: the interaction test is strong enough, so it does not see interactions between the
+    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+    "TOP[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 1 insts, 0 shapes (1 times)\n"
+    "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
+  );
+}
+
+TEST(TwoInputsAnd10)
+{
+  //  Array instances, AND
+  run_test_bool2 (_this, "hlp10.oas", TMAnd, 100);
+}
+
+TEST(TwoInputsNot10)
+{
+  //  Array instances, NOT
+  run_test_bool2 (_this, "hlp10.oas", TMNot, 101);
+}
+
+TEST(TwoInputsAndWithSize1)
+{
+  //  Simple flat AND
+  run_test_bool2_with_size (_this, "hlp1.oas", TMAnd, 1500, 102);
+}
+
+TEST(TwoInputsNotWithSize1)
+{
+  //  Simple flat NOT
+  run_test_bool2_with_size (_this, "hlp1.oas", TMNot, 1500, 103);
+}
+
+TEST(TwoInputsAndWithSize2)
+{
+  //  Up/down and down/up interactions, AND
+  run_test_bool2_with_size (_this, "hlp2.oas", TMAnd, 1500, 102);
+}
+
+TEST(TwoInputsNotWithSize2)
+{
+  //  Up/down and down/up interactions, NOT
+  run_test_bool2_with_size (_this, "hlp2.oas", TMNot, 1500, 103);
+}
+
+TEST(TwoInputsAndWithSize3)
+{
+  //  Variant building, AND
+  run_test_bool2_with_size (_this, "hlp3.oas", TMAnd, 1500, 102);
+}
+
+TEST(TwoInputsNotWithSize3)
+{
+  //  Variant building, NOT
+  run_test_bool2_with_size (_this, "hlp3.oas", TMNot, 1500, 103);
+}
+
+TEST(TwoInputsAndWithSize4)
+{
+  //  Sibling interactions, variant building, AND
+  run_test_bool2_with_size (_this, "hlp4.oas", TMAnd, 1500, 102);
+}
+
+TEST(TwoInputsNotWithSize4)
+{
+  //  Sibling interactions, variant building, NOT
+  run_test_bool2_with_size (_this, "hlp4.oas", TMNot, 1500, 103);
+}
+
+TEST(TwoInputsAndWithSize5)
+{
+  //  Variant building with intermediate hierarchy, AND
+  run_test_bool2_with_size (_this, "hlp5.oas", TMAnd, 1500, 102);
+}
+
+TEST(TwoInputsNotWithSize5)
+{
+  //  Variant building with intermediate hierarchy, NOT
+  run_test_bool2_with_size (_this, "hlp5.oas", TMNot, 1500, 103);
+}
+
+TEST(TwoInputsAndWithSize6)
+{
+  //  Extreme variants (copy, vanishing), AND
+  run_test_bool2_with_size (_this, "hlp6.oas", TMAnd, 1500, 102);
+}
+
+TEST(TwoInputsNotWithSize6)
+{
+  //  Extreme variants (copy, vanishing), NOT
+  run_test_bool2_with_size (_this, "hlp6.oas", TMNot, 1500, 103);
+}
+
+TEST(TwoInputsAndWithSize7)
+{
+  //  Context replication - direct and indirect, AND
+  run_test_bool2_with_size (_this, "hlp7.oas", TMAnd, 1500, 102);
+}
+
+TEST(TwoInputsNotWithSize7)
+{
+  //  Context replication - direct and indirect, NOT
+  run_test_bool2_with_size (_this, "hlp7.oas", TMNot, 1500, 103);
+}
+
+TEST(TwoInputsAndWithSize8)
+{
+  //  Mixed sibling-parent contexts, AND
+  run_test_bool2_with_size (_this, "hlp8.oas", TMAnd, 1500, 102);
+}
+
+TEST(TwoInputsNotWithSize8)
+{
+  //  Mixed sibling-parent contexts, NOT
+  run_test_bool2_with_size (_this, "hlp8.oas", TMNot, 1500, 103);
+}
+
+TEST(TwoInputsAndWithSize9)
+{
+  //  Top-level ring structure, AND
+  std::string doc;
+  run_test_bool2_with_size (_this, "hlp9.oas", TMAnd, 1500, 102, &doc);
+  EXPECT_EQ (doc,
+    //  This means: the interaction test is strong enough, so it does not see interactions between the
+    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+    "TOP[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 1 insts, 0 shapes (1 times)\n"
+    "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
+  );
+}
+
+TEST(TwoInputsNotWithSize9)
+{
+  //  Top-level ring structure, NOT
+  std::string doc;
+  run_test_bool2_with_size (_this, "hlp9.oas", TMNot, 1500, 103, &doc);
+  EXPECT_EQ (doc,
+    //  This means: the interaction test is strong enough, so it does not see interactions between the
+    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+    "TOP[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 1 insts, 0 shapes (1 times)\n"
+    "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
+  );
+}
+
+TEST(TwoInputsAndWithSize10)
+{
+  //  Array instances, AND
+  run_test_bool2_with_size (_this, "hlp10.oas", TMAnd, 150, 102);
+}
+
+TEST(TwoInputsNotWithSize10)
+{
+  //  Array instances, NOT
+  run_test_bool2_with_size (_this, "hlp10.oas", TMNot, 150, 103);
+}

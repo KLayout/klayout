@@ -581,6 +581,10 @@ def DeployBinariesForBundle():
   #                             |              +-- '*.dylib'
   #                             +-- MacOS/+
   #                             |         +-- 'klayout'
+  #                             |         +-- 'db_plugins'/+
+  #                             |                          +-- '*.dylib'
+  #                             |         +-- 'lay_plugins'/+
+  #                             |                           +-- '*.dylib'
   #                             +-- Buddy/+
   #                                       +-- 'strm2cif'
   #                                       +-- 'strm2dxf'
@@ -631,7 +635,7 @@ def DeployBinariesForBundle():
   #       :
   #-------------------------------------------------------------------------------
   os.chdir( targetDirF )
-  dynamicLinkLibs = glob.glob( AbsMacBinDir + "/*.dylib" )
+  dynamicLinkLibs = glob.glob( os.path.join( AbsMacBinDir, "*.dylib" ) )
   depDicOrdinary  = {} # inter-library dependency dictionary
   for item in dynamicLinkLibs:
     if os.path.isfile(item) and not os.path.islink(item):
@@ -691,6 +695,22 @@ def DeployBinariesForBundle():
   shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
   shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
 
+  # copy the contents of the plugin directories to a place next to the application
+  # binary
+  for piDir in [ "db_plugins", "lay_plugins" ]:
+    os.makedirs( os.path.join( targetDirM, piDir ), exist_ok = True )
+    dynamicLinkLibs = glob.glob( os.path.join( sourceDir3, piDir, "*.dylib" ) )
+    for item in dynamicLinkLibs:
+      if os.path.isfile(item) and not os.path.islink(item):
+        #-------------------------------------------------------------------
+        # (A) Copy an ordinary *.dylib file here by changing the name
+        #     to style (3) and set its mode to 0755 (sanity check).
+        #-------------------------------------------------------------------
+        fullName = os.path.basename(item).split('.')
+        # e.g. [ 'libklayout_lay', '0', '25', '0', 'dylib' ]
+        nameStyle3 = os.path.join( targetDirM, piDir, fullName[0] + "." + fullName[1] + ".dylib" )
+        shutil.copy2( item, nameStyle3 )
+        os.chmod( nameStyle3, 0o0755 )
 
   os.chmod( targetDir0 + "/PkgInfo",      0o0644 )
   os.chmod( targetDir0 + "/Info.plist",   0o0644 )

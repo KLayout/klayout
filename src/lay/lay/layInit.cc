@@ -130,6 +130,8 @@ void init (const std::vector<std::string> &_paths)
 #if defined(_WIN32)
     pattern.set_case_sensitive (false);
     pattern = std::string ("*.dll");
+#elif defined(__APPLE__)
+    pattern = std::string ("*.dylib");
 #else
     pattern = std::string ("*.so");
 #endif

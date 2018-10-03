@@ -661,7 +661,7 @@ def DeployBinariesForBundle():
       #-------------------------------------------------------------------
       # (C) This library goes into Frameworks, hence record it's path there
       #-------------------------------------------------------------------
-      pathDic[nameStyle3] = "@executable_path/../Frameworks/" + nameStyle3 
+      pathDic[nameStyle3] = "@executable_path/../Frameworks/" + nameStyle3
 
   os.chdir(ProjectDir)
   #-------------------------------------------------------------------
@@ -695,8 +695,8 @@ def DeployBinariesForBundle():
         #-------------------------------------------------------------------
         # (C) This library goes into the plugin dir
         #-------------------------------------------------------------------
-        pathDic[nameStyle3] = "@executable_path/" + piDir + "/" + nameStyle3 
-  
+        pathDic[nameStyle3] = "@executable_path/" + piDir + "/" + nameStyle3
+
   '''
   PrintLibraryDependencyDictionary( depDicOrdinary, pathDic, "Style (3)" )
   exit()

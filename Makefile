@@ -2,6 +2,12 @@
 
 GITCOMMIT := $(shell git rev-parse --short HEAD)
 KLAYOUT_VERSION := $(shell source version.sh && echo $$KLAYOUT_VERSION)
+ifndef PYTHON_VERSION
+    PYTHON_VERSION := B37
+endif
+ifndef MACOS_VERSION
+	MACOS_VERSION := HighSierra
+endif
 
 .ONESHELL:
 

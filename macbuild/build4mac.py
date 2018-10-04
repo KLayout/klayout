@@ -669,7 +669,7 @@ def DeployBinariesForBundle():
   # binary
   #-------------------------------------------------------------------
   for piDir in [ "db_plugins", "lay_plugins" ]:
-    os.makedirs( os.path.join( targetDirM, piDir ), exist_ok = True )
+    os.makedirs( os.path.join( targetDirM, piDir ))
     dynamicLinkLibs = glob.glob( os.path.join( MacBinDir, piDir, "*.dylib" ) )
     for item in dynamicLinkLibs:
       if os.path.isfile(item) and not os.path.islink(item):

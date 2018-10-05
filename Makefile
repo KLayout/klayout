@@ -37,6 +37,7 @@ test:
 	ln -s klayout.app/Contents/MacOS/klayout klayout; \
 	export TESTTMP=testtmp; \
 	export TESTSRC=..; \
+	export DYLD_LIBRARY_PATH=.:db_plugins/:lay_plugins/; \
 	./ut_runner -h || true; \
 	cd ..
 

@@ -39,6 +39,44 @@ class LocalProcessor;
 class LocalProcessorCellContext;
 class LocalProcessorContexts;
 
+//  @@@ TODO: move this somewhere else?
+class DB_PLUGIN_PUBLIC ShapeInteractions
+{
+public:
+  typedef std::map<unsigned int, std::vector<unsigned int> > container;
+  typedef container::const_iterator iterator;
+  typedef container::value_type::second_type::const_iterator iterator2;
+
+  ShapeInteractions ();
+
+  iterator begin () const
+  {
+    return m_interactions.begin ();
+  }
+
+  iterator end () const
+  {
+    return m_interactions.end ();
+  }
+
+  bool has_shape_id (unsigned int id) const;
+  void add_shape (unsigned int id, const db::PolygonRef &shape);
+  void add_subject (unsigned int id, const db::PolygonRef &shape);
+  void add_interaction (unsigned int subject_id, unsigned int intruder_id);
+  const std::vector<unsigned int> &intruders_for (unsigned int subject_id) const;
+  const db::PolygonRef &shape (unsigned int id) const;
+
+  unsigned int next_id ()
+  {
+    return ++m_id;
+  }
+
+private:
+  std::map<unsigned int, std::vector<unsigned int> > m_interactions;
+  std::map<unsigned int, db::PolygonRef> m_shapes;
+  unsigned int m_id;
+};
+
 class DB_PLUGIN_PUBLIC LocalOperation
 {
 public:
@@ -49,7 +87,7 @@ public:
   LocalOperation () { }
   virtual ~LocalOperation () { }
 
-  virtual void compute_local (db::Layout *layout, const std::map<db::PolygonRef, std::vector<db::PolygonRef> > &interactions, std::set<db::PolygonRef> &result) const = 0;
+  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const = 0;
   virtual on_empty_intruder_mode on_empty_intruder_hint () const = 0;
   virtual std::string description () const = 0;
   virtual db::Coord dist () const { return 0; }
@@ -61,12 +99,26 @@ class DB_PLUGIN_PUBLIC BoolAndOrNotLocalOperation
 public:
   BoolAndOrNotLocalOperation (bool is_and);
 
-  virtual void compute_local (db::Layout *layout, const std::map<db::PolygonRef, std::vector<db::PolygonRef> > &interactions, std::set<db::PolygonRef> &result) const;
+  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const;
   virtual on_empty_intruder_mode on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
   bool m_is_and;
+};
+
+class DB_PLUGIN_PUBLIC SelfOverlapMergeLocalOperation
+  : public LocalOperation
+{
+public:
+  SelfOverlapMergeLocalOperation (unsigned int wrap_count);
+
+  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const;
+  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
+  virtual std::string description () const;
+
+private:
+  unsigned int m_wrap_count;
 };
 
 //  @@@ TODO: should be hidden (private data?)

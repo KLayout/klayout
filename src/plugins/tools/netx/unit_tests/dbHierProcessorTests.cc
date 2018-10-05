@@ -36,7 +36,8 @@ static std::string testdata (const std::string &fn)
 enum TestMode
 {
   TMAnd = 0,
-  TMNot = 1
+  TMNot = 1,
+  TMSelfOverlap = 2
 };
 
 /**
@@ -52,14 +53,15 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout *layout, const std::map<db::PolygonRef, std::vector<db::PolygonRef> > &interactions, std::set<db::PolygonRef> &result) const
+  virtual void compute_local (db::Layout *layout, const db::ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const
   {
-    std::map<db::PolygonRef, std::vector<db::PolygonRef> > sized_interactions = interactions;
-    for (std::map<db::PolygonRef, std::vector<db::PolygonRef> >::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
-      for (std::vector<db::PolygonRef>::iterator j = i->second.begin (); j != i->second.end (); ++j) {
-        db::Polygon poly = j->obj ().transformed (j->trans ());
+    db::ShapeInteractions sized_interactions = interactions;
+    for (db::ShapeInteractions::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
+      for (db::ShapeInteractions::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        const db::PolygonRef &ref = interactions.shape (*j);
+        db::Polygon poly = ref.obj ().transformed (ref.trans ());
         poly.size (m_dist, m_dist);
-        *j = db::PolygonRef (poly, layout->shape_repository ());
+        sized_interactions.add_shape (*j, db::PolygonRef (poly, layout->shape_repository ()));
       }
     }
     BoolAndOrNotLocalOperation::compute_local (layout, sized_interactions, result);
@@ -130,8 +132,12 @@ void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, in
 
     p.layer = 2;
     p.datatype = 0;
-    lmap.map (db::LDPair (2, 0), l2 = layout_org.insert_layer ());
-    layout_org.set_properties (l2, p);
+    if (mode == TMSelfOverlap) {
+      lmap.map (db::LDPair (2, 0), l2 = l1);
+    } else {
+      lmap.map (db::LDPair (2, 0), l2 = layout_org.insert_layer ());
+      layout_org.set_properties (l2, p);
+    }
 
     p.layer = out_layer_num;
     p.datatype = 0;
@@ -146,21 +152,30 @@ void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, in
 
   layout_org.clear_layer (lout);
   normalize_layer (layout_org, l1);
-  normalize_layer (layout_org, l2);
+  if (l1 != l2) {
+    normalize_layer (layout_org, l2);
+  }
 
-  db::BoolAndOrNotLocalOperation op (mode == TMAnd);
+  db::LocalOperation *lop = 0;
+  db::BoolAndOrNotLocalOperation bool_op (mode == TMAnd);
+  db::SelfOverlapMergeLocalOperation self_intersect_op (2);
+  if (mode == TMSelfOverlap) {
+    lop = &self_intersect_op;
+  } else {
+    lop = &bool_op;
+  }
 
   if (single) {
 
     db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
 
     if (! context_doc) {
-      proc.run (&op, l1, l2, lout);
+      proc.run (lop, l1, l2, lout);
     } else {
       db::LocalProcessorContexts contexts;
-      proc.compute_contexts (contexts, &op, l1, l2);
+      proc.compute_contexts (contexts, lop, l1, l2);
       *context_doc = contexts_to_s (&layout_org, contexts);
-      proc.compute_results (contexts, &op, lout);
+      proc.compute_results (contexts, lop, lout);
     }
 
   } else {
@@ -170,12 +185,12 @@ void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, in
     db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()), &layout_org2, &layout_org2.cell (*layout_org2.begin_top_down ()));
 
     if (! context_doc) {
-      proc.run (&op, l1, l2, lout);
+      proc.run (lop, l1, l2, lout);
     } else {
       db::LocalProcessorContexts contexts;
-      proc.compute_contexts (contexts, &op, l1, l2);
+      proc.compute_contexts (contexts, lop, l1, l2);
       *context_doc = contexts_to_s (&layout_org, contexts);
-      proc.compute_results (contexts, &op, lout);
+      proc.compute_results (contexts, lop, lout);
     }
 
   }
@@ -835,3 +850,147 @@ TEST(TwoInputsNotWithSize10)
   //  Array instances, NOT
   run_test_bool2_with_size (_this, "hlp10.oas", TMNot, 150, 103);
 }
+
+TEST(BasicSelfOverlap1)
+{
+  //  Simple flat AND
+  run_test_bool (_this, "hlp1.oas", TMSelfOverlap, 110);
+}
+
+TEST(BasicSelfOverlap2)
+{
+  //  Up/down and down/up interactions, AND
+  run_test_bool (_this, "hlp2.oas", TMSelfOverlap, 110);
+}
+
+TEST(BasicSelfOverlap3)
+{
+  //  Variant building, AND
+  run_test_bool (_this, "hlp3.oas", TMSelfOverlap, 110);
+}
+
+TEST(BasicSelfOverlap4)
+{
+  //  Sibling interactions, variant building, AND
+  run_test_bool (_this, "hlp4.oas", TMSelfOverlap, 110);
+}
+
+TEST(BasicSelfOverlap5)
+{
+  //  Variant building with intermediate hierarchy, AND
+  run_test_bool (_this, "hlp5.oas", TMSelfOverlap, 110);
+}
+
+TEST(BasicSelfOverlap6)
+{
+  //  Extreme variants (copy, vanishing), AND
+  run_test_bool (_this, "hlp6.oas", TMSelfOverlap, 110);
+}
+
+TEST(BasicSelfOverlap7)
+{
+  //  Context replication - direct and indirect, AND
+  run_test_bool (_this, "hlp7.oas", TMSelfOverlap, 110);
+}
+
+TEST(BasicSelfOverlap8)
+{
+  //  Mixed sibling-parent contexts, AND
+  run_test_bool (_this, "hlp8.oas", TMSelfOverlap, 110);
+}
+
+TEST(BasicSelfOverlap9)
+{
+  //  Top-level ring structure, AND
+  std::string doc;
+  run_test_bool (_this, "hlp9.oas", TMSelfOverlap, 110, &doc);
+  EXPECT_EQ (doc,
+    //  This means: the interaction test is strong enough, so it does not see interactions between the
+    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+    "TOP[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 0 insts, 0 shapes (1 times)\n"
+    "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
+  );
+}
+
+TEST(BasicSelfOverlap10)
+{
+  //  Array instances, AND
+  run_test_bool (_this, "hlp10.oas", TMSelfOverlap, 110);
+}
+
+#if 0 // @@@
+TEST(BasicSelfOverlapWithSize1)
+{
+  //  Simple flat AND
+  run_test_bool_with_size (_this, "hlp1.oas", TMSelfOverlap, 1500, 111);
+}
+
+TEST(BasicSelfOverlapWithSize2)
+{
+  //  Up/down and down/up interactions, AND
+  run_test_bool_with_size (_this, "hlp2.oas", TMSelfOverlap, 1500, 111);
+}
+
+TEST(BasicSelfOverlapWithSize3)
+{
+  //  Variant building, AND
+  run_test_bool_with_size (_this, "hlp3.oas", TMSelfOverlap, 1500, 111);
+}
+
+TEST(BasicSelfOverlapWithSize4)
+{
+  //  Sibling interactions, variant building, AND
+  run_test_bool_with_size (_this, "hlp4.oas", TMSelfOverlap, 1500, 111);
+}
+
+TEST(BasicSelfOverlapWithSize5)
+{
+  //  Variant building with intermediate hierarchy, AND
+  run_test_bool_with_size (_this, "hlp5.oas", TMSelfOverlap, 1500, 111);
+}
+
+TEST(BasicSelfOverlapWithSize6)
+{
+  //  Extreme variants (copy, vanishing), AND
+  run_test_bool_with_size (_this, "hlp6.oas", TMSelfOverlap, 1500, 111);
+}
+
+TEST(BasicSelfOverlapWithSize7)
+{
+  //  Context replication - direct and indirect, AND
+  run_test_bool_with_size (_this, "hlp7.oas", TMSelfOverlap, 1500, 111);
+}
+
+TEST(BasicSelfOverlapWithSize8)
+{
+  //  Mixed sibling-parent contexts, AND
+  run_test_bool_with_size (_this, "hlp8.oas", TMSelfOverlap, 1500, 111);
+}
+
+TEST(BasicSelfOverlapWithSize9)
+{
+  //  Top-level ring structure, AND
+  std::string doc;
+  run_test_bool_with_size (_this, "hlp9.oas", TMSelfOverlap, 1500, 111, &doc);
+  EXPECT_EQ (doc,
+    //  This means: the interaction test is strong enough, so it does not see interactions between the
+    //  ring and the cells embedded inside the ring. So there is only one cell context. Some shapes
+    //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
+    //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
+    "TOP[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 0 insts, 0 shapes (1 times)\n"
+    "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
+  );
+}
+
+TEST(BasicSelfOverlapWithSize10)
+{
+  //  Array instances, AND
+  run_test_bool_with_size (_this, "hlp10.oas", TMSelfOverlap, 150, 111);
+}
+#endif
+
+

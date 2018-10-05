@@ -72,6 +72,8 @@ BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and)
   //  .. nothing yet ..
 }
 
+// ---------------------------------------------------------------------------------------------
+
 LocalOperation::on_empty_intruder_mode
 BoolAndOrNotLocalOperation::on_empty_intruder_hint () const
 {
@@ -85,36 +87,36 @@ BoolAndOrNotLocalOperation::description () const
 }
 
 void
-BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const std::map<db::PolygonRef, std::vector<db::PolygonRef> > &interactions, std::set<db::PolygonRef> &result) const
+BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const
 {
   db::EdgeProcessor ep;
 
   size_t p1 = 0, p2 = 1;
 
   std::set<db::PolygonRef> others;
-  for (std::map<db::PolygonRef, std::vector<db::PolygonRef> >::const_iterator r = interactions.begin (); r != interactions.end (); ++r) {
-
-    //  TODO: vector could be set
-    bool found = false;
-    for (std::vector<db::PolygonRef>::const_iterator i = r->second.begin (); i != r->second.end () && ! found; ++i) {
-      found = (*i == r->first);
+  for (ShapeInteractions::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (ShapeInteractions::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+      others.insert (interactions.shape (*j));
     }
-    if (found) {
-      //  shortcut (and: keep, not: drop)
+  }
+
+  for (ShapeInteractions::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::PolygonRef &subject = interactions.shape (i->first);
+    if (others.find (subject) != others.end ()) {
       if (m_is_and) {
-        result.insert (r->first);
+        result.insert (subject);
       }
-    } else if (r->second.empty ()) {
+    } else if (i->second.empty ()) {
       //  shortcut (not: keep, and: drop)
       if (! m_is_and) {
-        result.insert (r->first);
+        result.insert (subject);
       }
     } else {
-      for (db::PolygonRef::polygon_edge_iterator e = r->first.begin_edge (); ! e.at_end(); ++e) {
+      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
         ep.insert (*e, p1);
       }
       p1 += 2;
-      others.insert (r->second.begin (), r->second.end ());
     }
 
   }
@@ -134,6 +136,64 @@ BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const std::map<db
     ep.process (pg, op);
 
   }
+}
+
+// ---------------------------------------------------------------------------------------------
+
+SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wrap_count)
+  : m_wrap_count (wrap_count)
+{
+  //  .. nothing yet ..
+}
+
+void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const
+{
+  if (m_wrap_count == 0) {
+    return;
+  }
+
+  db::EdgeProcessor ep;
+
+  size_t p1 = 0, p2 = 1;
+  std::set<unsigned int> seen2;
+
+  for (ShapeInteractions::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::PolygonRef &subject = interactions.shape (i->first);
+    for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+      ep.insert (*e, p1);
+    }
+    p1 += 2;
+
+    for (db::ShapeInteractions::iterator2 o = i->second.begin (); o != i->second.end (); ++o) {
+      //  don't take the same (really the same, not an identical one) shape twice - the interaction
+      //  set does not take care to list just one copy of the same item on the intruder side.
+      if (seen2.find (*o) == seen2.end ()) {
+        seen2.insert (*o);
+        const db::PolygonRef &intruder = interactions.shape (*o);
+        for (db::PolygonRef::polygon_edge_iterator e = intruder.begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, p2);
+        }
+        p2 += 2;
+      }
+    }
+
+  }
+
+  db::MergeOp op (m_wrap_count - 1);
+  db::PolygonRefGenerator pr (layout, result);
+  db::PolygonGenerator pg (pr, true, true);
+  ep.process (pg, op);
+}
+
+SelfOverlapMergeLocalOperation::on_empty_intruder_mode SelfOverlapMergeLocalOperation::on_empty_intruder_hint () const
+{
+  return m_wrap_count > 1 ? LocalOperation::Drop : LocalOperation::Copy;
+}
+
+std::string SelfOverlapMergeLocalOperation::description () const
+{
+  return tl::sprintf (tl::to_string (tr ("Self-overlap (wrap count %d)")), int (m_wrap_count));
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -263,6 +323,63 @@ LocalProcessorCellContexts::compute_results (LocalProcessorContexts &contexts, d
 }
 
 // ---------------------------------------------------------------------------------------------
+
+ShapeInteractions::ShapeInteractions ()
+  : m_id (0)
+{
+  //  .. nothing yet ..
+}
+
+bool
+ShapeInteractions::has_shape_id (unsigned int id) const
+{
+  return m_shapes.find (id) != m_shapes.end ();
+}
+
+void
+ShapeInteractions::add_shape (unsigned int id, const db::PolygonRef &shape)
+{
+  m_shapes [id] = shape;
+}
+
+void
+ShapeInteractions::add_subject (unsigned int id, const db::PolygonRef &shape)
+{
+  add_shape (id, shape);
+  m_interactions.insert (std::make_pair (id, container::value_type::second_type ()));
+}
+
+void
+ShapeInteractions::add_interaction (unsigned int subject_id, unsigned int intruder_id)
+{
+  m_interactions [subject_id].push_back (intruder_id);
+}
+
+const std::vector<unsigned int> &
+ShapeInteractions::intruders_for (unsigned int subject_id) const
+{
+  iterator i = m_interactions.find (subject_id);
+  if (i == m_interactions.end ()) {
+    static std::vector<unsigned int> empty;
+    return empty;
+  } else {
+    return i->second;
+  }
+}
+
+const db::PolygonRef &
+ShapeInteractions::shape (unsigned int id) const
+{
+  std::map<unsigned int, db::PolygonRef>::const_iterator i = m_shapes.find (id);
+  if (i == m_shapes.end ()) {
+    static db::PolygonRef s;
+    return s;
+  } else {
+    return i->second;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
 //  Helper classes for the LocalProcessor
 
 namespace
@@ -274,46 +391,73 @@ inline unsigned int polygon_ref_flags ()
 }
 
 struct InteractionRegistrationShape2Shape
-  : db::box_scanner_receiver2<db::PolygonRef, int, db::PolygonRef, int>
+  : db::box_scanner_receiver2<db::PolygonRef, unsigned int, db::PolygonRef, unsigned int>
 {
 public:
-  InteractionRegistrationShape2Shape (db::Layout *layout, std::map<db::PolygonRef, std::vector<db::PolygonRef> > *result)
+  InteractionRegistrationShape2Shape (db::Layout *layout, ShapeInteractions *result)
     : mp_result (result), mp_layout (layout)
   {
     //  nothing yet ..
   }
 
-  void add (const db::PolygonRef *ref1, int, const db::PolygonRef *ref2, int)
+  void add (const db::PolygonRef *ref1, unsigned int id1, const db::PolygonRef *ref2, unsigned int id2)
   {
+    mp_result->add_shape (id1, *ref1);
+
     if (mp_layout) {
       //  In order to guarantee the refs come from the subject layout, we'd need to
       //  rewrite them to the subject layout if required.
-      db::Polygon poly = ref2->obj ().transformed (ref2->trans ());
-      (*mp_result) [*ref1].push_back (db::PolygonRef (poly, mp_layout->shape_repository ()));
+      if (!mp_result->has_shape_id (id2)) {
+        db::Polygon poly = ref2->obj ().transformed (ref2->trans ());
+        mp_result->add_shape (id2, db::PolygonRef (poly, mp_layout->shape_repository ()));
+      }
     } else {
-      (*mp_result) [*ref1].push_back (*ref2);
+      mp_result->add_shape (id2, *ref2);
     }
+    mp_result->add_interaction (id1, id2);
   }
 
 private:
-  std::map<db::PolygonRef, std::vector<db::PolygonRef> > *mp_result;
+  ShapeInteractions *mp_result;
   db::Layout *mp_layout;
 };
 
-struct InteractionRegistrationShape2Inst
-  : db::box_scanner_receiver2<db::PolygonRef, int, db::CellInstArray, int>
+struct InteractionRegistrationShape1
+  : db::box_scanner_receiver<db::PolygonRef, unsigned int>
 {
 public:
-  InteractionRegistrationShape2Inst (db::Layout *subject_layout, const db::Layout *intruder_layout, unsigned int intruder_layer, db::Coord dist, std::map<db::PolygonRef, std::vector<db::PolygonRef> > *result)
+  InteractionRegistrationShape1 (ShapeInteractions *result)
+    : mp_result (result)
+  {
+    //  nothing yet ..
+  }
+
+  void add (const db::PolygonRef *ref1, unsigned int id1, const db::PolygonRef *ref2, unsigned int id2)
+  {
+    mp_result->add_shape (id1, *ref1);
+    mp_result->add_shape (id2, *ref2);
+    mp_result->add_interaction (id1, id2);
+  }
+
+private:
+  ShapeInteractions *mp_result;
+};
+
+struct InteractionRegistrationShape2Inst
+  : db::box_scanner_receiver2<db::PolygonRef, unsigned int, db::CellInstArray, unsigned int>
+{
+public:
+  InteractionRegistrationShape2Inst (db::Layout *subject_layout, const db::Layout *intruder_layout, unsigned int intruder_layer, db::Coord dist, ShapeInteractions *result)
     : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout), m_intruder_layer (intruder_layer), m_dist (dist), mp_result (result)
   {
     //  nothing yet ..
   }
 
-  void add (const db::PolygonRef *ref, int, const db::CellInstArray *inst, int)
+  void add (const db::PolygonRef *ref, unsigned int id1, const db::CellInstArray *inst, unsigned int inst_id)
   {
     const db::Cell &intruder_cell = mp_intruder_layout->cell (inst->object ().cell_index ());
     db::box_convert <db::CellInst, true> inst_bc (*mp_intruder_layout, m_intruder_layer);
+    mp_result->add_shape (id1, *ref);
 
     for (db::CellInstArray::iterator n = inst->begin_touching (ref->box ().enlarged (db::Vector (m_dist - 1, m_dist - 1)), inst_bc); !n.at_end (); ++n) {
 
@@ -327,12 +471,23 @@ public:
         si.shape_flags (polygon_ref_flags ());
         while (! si.at_end ()) {
 
-          //  @@@ it should be easier to transform references
           const db::PolygonRef *ref2 = si.shape ().basic_ptr (db::PolygonRef::tag ());
-          db::Polygon poly = ref2->obj ().transformed (tn * si.trans () * db::ICplxTrans (ref2->trans ()));
-          //  NOTE: we intentionally rewrite to the subject layout - this way polygon refs in the context come from the
-          //  subject, not from the intruder.
-          (*mp_result)[*ref].push_back (db::PolygonRef (poly, mp_subject_layout->shape_repository()));
+
+          //  reuse the same id for shapes from the same instance -> this avoid duplicates with different IDs on
+          //  the intruder side.
+          std::map<std::pair<unsigned int, const db::PolygonRef *>, unsigned int>::const_iterator k = m_inst_shape_ids.find (std::make_pair (inst_id, ref2));
+          if (k == m_inst_shape_ids.end ()) {
+
+            k = m_inst_shape_ids.insert (std::make_pair (std::make_pair (inst_id, ref2), mp_result->next_id ())).first;
+
+            db::Polygon poly = ref2->obj ().transformed (tn * si.trans () * db::ICplxTrans (ref2->trans ()));
+            //  NOTE: we intentionally rewrite to the subject layout - this way polygon refs in the context come from the
+            //  subject, not from the intruder.
+            mp_result->add_shape (k->second, db::PolygonRef (poly, mp_subject_layout->shape_repository()));
+
+          }
+
+          mp_result->add_interaction (id1, k->second);
 
           ++si;
 
@@ -348,7 +503,8 @@ private:
   const db::Layout *mp_intruder_layout;
   unsigned int m_intruder_layer;
   db::Coord m_dist;
-  std::map<db::PolygonRef, std::vector<db::PolygonRef> > *mp_result;
+  ShapeInteractions *mp_result;
+  std::map<std::pair<unsigned int, const db::PolygonRef *>, unsigned int> m_inst_shape_ids;
 };
 
 static bool
@@ -414,7 +570,7 @@ instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, u
 }
 
 struct InteractionRegistrationInst2Inst
-  : db::box_scanner_receiver2<db::CellInstArray, int, db::CellInstArray, int>
+  : db::box_scanner_receiver2<db::CellInstArray, unsigned int, db::CellInstArray, unsigned int>
 {
 public:
   typedef std::pair<std::set<const db::CellInstArray *>, std::set<db::PolygonRef> > interaction_value_type;
@@ -425,14 +581,26 @@ public:
     //  nothing yet ..
   }
 
-  void add (const db::CellInstArray *inst1, int, const db::CellInstArray *inst2, int)
+  void add (const db::CellInstArray *inst1, unsigned int id1, const db::CellInstArray *inst2, unsigned int id2)
   {
-    // @@@ TODO: always insert, if both instances come from different layouts
     //  NOTE: self-interactions are possible for arrays: different elements of the
     //  array may interact which is a cell-external interaction.
-    if ((mp_subject_layout != mp_intruder_layout || *inst1 != *inst2 || inst1->size () > 1)
-        && instances_interact (mp_subject_layout, inst1, m_subject_layer, mp_intruder_layout, inst2, m_intruder_layer, m_dist)) {
-      (*mp_result) [inst1].first.insert (inst2);
+    if (mp_subject_layout != mp_intruder_layout || id1 != id2 || inst1->size () > 1) {
+
+      bool ignore = false;
+      if (mp_subject_layout == mp_intruder_layout && m_subject_layer == m_intruder_layer) {
+        if (m_interactions.find (std::make_pair (id2, id1)) != m_interactions.end ()) {
+          //  for self interactions ignore the reverse interactions
+          ignore = true;
+        } else {
+          m_interactions.insert (std::make_pair (id1, id2));
+        }
+      }
+
+      if (! ignore && instances_interact (mp_subject_layout, inst1, m_subject_layer, mp_intruder_layout, inst2, m_intruder_layer, m_dist)) {
+        (*mp_result) [inst1].first.insert (inst2);
+      }
+
     }
   }
 
@@ -441,6 +609,7 @@ private:
   unsigned int m_subject_layer, m_intruder_layer;
   db::Coord m_dist;
   std::map<const db::CellInstArray *, std::pair<std::set<const db::CellInstArray *>, std::set<db::PolygonRef> > > *mp_result;
+  std::set<std::pair<unsigned int, unsigned int> > m_interactions;
 };
 
 static bool
@@ -473,7 +642,7 @@ instance_shape_interacts (const db::Layout *layout, const db::CellInstArray *ins
 }
 
 struct InteractionRegistrationInst2Shape
-  : db::box_scanner_receiver2<db::CellInstArray, int, db::PolygonRef, int>
+  : db::box_scanner_receiver2<db::CellInstArray, unsigned int, db::PolygonRef, unsigned int>
 {
 public:
   InteractionRegistrationInst2Shape (const db::Layout *subject_layout, unsigned int subject_layer, db::Coord dist, std::map<const db::CellInstArray *, std::pair<std::set<const db::CellInstArray *>, std::set<db::PolygonRef> > > *result)
@@ -482,7 +651,7 @@ public:
     //  nothing yet ..
   }
 
-  void add (const db::CellInstArray *inst, int, const db::PolygonRef *ref, int)
+  void add (const db::CellInstArray *inst, unsigned int, const db::PolygonRef *ref, unsigned int)
   {
     if (instance_shape_interacts (mp_subject_layout, inst, m_subject_layer, *ref, m_dist)) {
       (*mp_result) [inst].second.insert (*ref);
@@ -599,23 +768,44 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
       db::box_scanner2<db::CellInstArray, int, db::CellInstArray, int> scanner;
       InteractionRegistrationInst2Inst rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, contexts.intruder_layer (), dist, &interactions);
 
-      for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
-        if (! inst_bcs (i->cell_inst ()).empty ()) {
-          scanner.insert1 (&i->cell_inst (), 0);
-        }
-      }
+      unsigned int id = 0;
 
-      if (intruder_cell) {
-        for (db::Cell::const_iterator i = intruder_cell->begin (); !i.at_end (); ++i) {
+      if (subject_cell == intruder_cell) {
+
+        //  Use the same id's for same instances - this way we can easily detect same instances
+        //  and don't make the self-interacting
+
+        for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
+          unsigned int iid = ++id;
+          if (! inst_bcs (i->cell_inst ()).empty ()) {
+            scanner.insert1 (&i->cell_inst (), iid);
+          }
           if (! inst_bci (i->cell_inst ()).empty ()) {
-            scanner.insert2 (&i->cell_inst (), 0);
+            scanner.insert2 (&i->cell_inst (), iid);
           }
         }
+
+      } else {
+
+        for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
+          if (! inst_bcs (i->cell_inst ()).empty ()) {
+            scanner.insert1 (&i->cell_inst (), ++id);
+          }
+        }
+
+        if (intruder_cell) {
+          for (db::Cell::const_iterator i = intruder_cell->begin (); !i.at_end (); ++i) {
+            if (! inst_bci (i->cell_inst ()).empty ()) {
+              scanner.insert2 (&i->cell_inst (), ++id);
+            }
+          }
+        }
+
       }
 
       for (std::set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
         if (! inst_bci (*i).empty ()) {
-          scanner.insert2 (i.operator-> (), 0);
+          scanner.insert2 (i.operator-> (), ++id);
         }
       }
 
@@ -724,36 +914,69 @@ LocalProcessor::compute_local_cell (LocalProcessorContexts &contexts, db::Cell *
 
   //  local shapes vs. child cell
 
-  std::map<db::PolygonRef, std::vector<db::PolygonRef> > interactions;
+  ShapeInteractions interactions;
   db::box_convert <db::CellInstArray, true> inst_bci (*mp_intruder_layout, contexts.intruder_layer ());
 
-  if (op->on_empty_intruder_hint () != LocalOperation::Drop) {
-    //  insert dummy interactions to accommodate subject vs. nothing
-    for (db::Shapes::shape_iterator i = subject_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
-      interactions.insert (std::make_pair (*i->basic_ptr (db::PolygonRef::tag ()), std::vector<db::PolygonRef> ()));
+  //  insert dummy interactions to accommodate subject vs. nothing and assign an ID
+  //  range for the subject shapes.
+  unsigned int subject_id0 = 0;
+  for (db::Shapes::shape_iterator i = subject_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
+
+    unsigned int id = interactions.next_id ();
+    if (subject_id0 == 0) {
+      subject_id0 = id;
     }
+
+    if (op->on_empty_intruder_hint () != LocalOperation::Drop) {
+      const db::PolygonRef *ref = i->basic_ptr (db::PolygonRef::tag ());
+      interactions.add_subject (id, *ref);
+    }
+
   }
 
   if (! subject_shapes->empty () && (intruder_shapes || ! intruders.second.empty ())) {
 
-    db::box_scanner2<db::PolygonRef, int, db::PolygonRef, int> scanner;
-    InteractionRegistrationShape2Shape rec (mp_subject_layout == mp_intruder_layout ? 0 : mp_subject_layout, &interactions);
+    if (subject_cell == intruder_cell && contexts.subject_layer () == contexts.intruder_layer ()) {
 
-    for (db::Shapes::shape_iterator i = subject_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
-      scanner.insert1 (i->basic_ptr (db::PolygonRef::tag ()), 0);
-    }
+      db::box_scanner<db::PolygonRef, int> scanner;
+      InteractionRegistrationShape1 rec (&interactions);
 
-    for (std::set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
-      scanner.insert2 (i.operator-> (), 0);
-    }
-
-    if (intruder_shapes) {
-      for (db::Shapes::shape_iterator i = intruder_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
-        scanner.insert2 (i->basic_ptr (db::PolygonRef::tag ()), 0);
+      unsigned int id = subject_id0;
+      for (db::Shapes::shape_iterator i = subject_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
+        const db::PolygonRef *ref = i->basic_ptr (db::PolygonRef::tag ());
+        scanner.insert (ref, id++);
       }
-    }
 
-    scanner.process (rec, op->dist (), db::box_convert<db::PolygonRef> (), db::box_convert<db::PolygonRef> ());
+      for (std::set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
+        scanner.insert (i.operator-> (), interactions.next_id ());
+      }
+
+      scanner.process (rec, op->dist (), db::box_convert<db::PolygonRef> ());
+
+    } else {
+
+      db::box_scanner2<db::PolygonRef, int, db::PolygonRef, int> scanner;
+      InteractionRegistrationShape2Shape rec (mp_subject_layout == mp_intruder_layout ? 0 : mp_subject_layout, &interactions);
+
+      unsigned int id = subject_id0;
+      for (db::Shapes::shape_iterator i = subject_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
+        const db::PolygonRef *ref = i->basic_ptr (db::PolygonRef::tag ());
+        scanner.insert1 (ref, id++);
+      }
+
+      for (std::set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
+        scanner.insert2 (i.operator-> (), interactions.next_id ());
+      }
+
+      if (intruder_shapes) {
+        for (db::Shapes::shape_iterator i = intruder_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
+          scanner.insert2 (i->basic_ptr (db::PolygonRef::tag ()), interactions.next_id ());
+        }
+      }
+
+      scanner.process (rec, op->dist (), db::box_convert<db::PolygonRef> (), db::box_convert<db::PolygonRef> ());
+
+    }
 
   }
 
@@ -762,21 +985,30 @@ LocalProcessor::compute_local_cell (LocalProcessorContexts &contexts, db::Cell *
     db::box_scanner2<db::PolygonRef, int, db::CellInstArray, int> scanner;
     InteractionRegistrationShape2Inst rec (mp_subject_layout, mp_intruder_layout, contexts.intruder_layer (), op->dist (), &interactions);
 
+    unsigned int id = subject_id0;
     for (db::Shapes::shape_iterator i = subject_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
-      scanner.insert1 (i->basic_ptr (db::PolygonRef::tag ()), 0);
+      scanner.insert1 (i->basic_ptr (db::PolygonRef::tag ()), id++);
     }
 
-    if (intruder_cell) {
+    unsigned int inst_id = 0;
+
+    if (subject_cell == intruder_cell && contexts.subject_layer () == contexts.intruder_layer ()) {
+
+      //  Same cell, same layer -> no shape to child instance interactions because this will be taken care of
+      //  by the instances themselves (and their intruders). This also means, we prefer to deal with
+      //  interactions low in the hierarchy.
+
+    } else if (intruder_cell) {
       for (db::Cell::const_iterator i = intruder_cell->begin (); !i.at_end (); ++i) {
         if (! inst_bci (i->cell_inst ()).empty ()) {
-          scanner.insert2 (&i->cell_inst (), 0);
+          scanner.insert2 (&i->cell_inst (), ++inst_id);
         }
       }
     }
 
     for (std::set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
       if (! inst_bci (*i).empty ()) {
-        scanner.insert2 (i.operator-> (), 0);
+        scanner.insert2 (i.operator-> (), ++inst_id);
       }
     }
 

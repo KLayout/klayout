@@ -77,6 +77,50 @@ private:
 };
 
 /**
+ *  @brief A new processor class which and/nots with a sized version of the intruder
+ */
+class SelfOverlapWithSizedLocalOperation
+  : public db::SelfOverlapMergeLocalOperation
+{
+public:
+  SelfOverlapWithSizedLocalOperation (unsigned int wc, db::Coord dist)
+    : SelfOverlapMergeLocalOperation (wc), m_dist (dist)
+  {
+    //  .. nothing yet ..
+  }
+
+  virtual void compute_local (db::Layout *layout, const db::ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const
+  {
+    db::ShapeInteractions sized_interactions = interactions;
+    for (db::ShapeInteractions::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
+
+      const db::PolygonRef &ref = interactions.shape (i->first);
+      db::Polygon poly = ref.obj ().transformed (ref.trans ());
+      poly.size (m_dist / 2, m_dist / 2);
+      sized_interactions.add_shape (i->first, db::PolygonRef (poly, layout->shape_repository ()));
+
+      for (db::ShapeInteractions::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        const db::PolygonRef &ref = interactions.shape (*j);
+        db::Polygon poly = ref.obj ().transformed (ref.trans ());
+        poly.size (m_dist / 2, m_dist / 2);
+        sized_interactions.add_shape (*j, db::PolygonRef (poly, layout->shape_repository ()));
+      }
+
+    }
+
+    SelfOverlapMergeLocalOperation::compute_local (layout, sized_interactions, result);
+  }
+
+  db::Coord dist () const
+  {
+    return m_dist;
+  }
+
+private:
+  db::Coord m_dist;
+};
+
+/**
  *  @brief Turns a layer into polygons and polygon references
  *  The hierarchical processor needs polygon references and can't work on polygons directly.
  */
@@ -228,8 +272,12 @@ void run_test_bool_with_size_gen (tl::TestBase *_this, const char *file, TestMod
 
     p.layer = 2;
     p.datatype = 0;
-    lmap.map (db::LDPair (2, 0), l2 = layout_org.insert_layer ());
-    layout_org.set_properties (l2, p);
+    if (mode == TMSelfOverlap) {
+      lmap.map (db::LDPair (2, 0), l2 = l1);
+    } else {
+      lmap.map (db::LDPair (2, 0), l2 = layout_org.insert_layer ());
+      layout_org.set_properties (l2, p);
+    }
 
     p.layer = out_layer_num;
     p.datatype = 0;
@@ -246,19 +294,27 @@ void run_test_bool_with_size_gen (tl::TestBase *_this, const char *file, TestMod
   normalize_layer (layout_org, l1);
   normalize_layer (layout_org, l2);
 
-  BoolAndOrNotWithSizedLocalOperation op (mode == TMAnd, dist);
+  db::LocalOperation *lop = 0;
+  BoolAndOrNotWithSizedLocalOperation bool_op (mode == TMAnd, dist);
+  SelfOverlapWithSizedLocalOperation self_intersect_op (2, dist);
+  if (mode == TMSelfOverlap) {
+    lop = &self_intersect_op;
+  } else {
+    lop = &bool_op;
+  }
+
 
   if (single) {
 
     db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
 
     if (! context_doc) {
-      proc.run (&op, l1, l2, lout);
+      proc.run (lop, l1, l2, lout);
     } else {
       db::LocalProcessorContexts contexts;
-      proc.compute_contexts (contexts, &op, l1, l2);
+      proc.compute_contexts (contexts, lop, l1, l2);
       *context_doc = contexts_to_s (&layout_org, contexts);
-      proc.compute_results (contexts, &op, lout);
+      proc.compute_results (contexts, lop, lout);
     }
 
   } else {
@@ -268,12 +324,12 @@ void run_test_bool_with_size_gen (tl::TestBase *_this, const char *file, TestMod
     db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()), &layout_org2, &layout_org2.cell (*layout_org2.begin_top_down ()));
 
     if (! context_doc) {
-      proc.run (&op, l1, l2, lout);
+      proc.run (lop, l1, l2, lout);
     } else {
       db::LocalProcessorContexts contexts;
-      proc.compute_contexts (contexts, &op, l1, l2);
+      proc.compute_contexts (contexts, lop, l1, l2);
       *context_doc = contexts_to_s (&layout_org, contexts);
-      proc.compute_results (contexts, &op, lout);
+      proc.compute_results (contexts, lop, lout);
     }
 
   }
@@ -853,55 +909,55 @@ TEST(TwoInputsNotWithSize10)
 
 TEST(BasicSelfOverlap1)
 {
-  //  Simple flat AND
+  //  Simple flat Self overlap
   run_test_bool (_this, "hlp1.oas", TMSelfOverlap, 110);
 }
 
 TEST(BasicSelfOverlap2)
 {
-  //  Up/down and down/up interactions, AND
+  //  Up/down and down/up interactions, Self overlap
   run_test_bool (_this, "hlp2.oas", TMSelfOverlap, 110);
 }
 
 TEST(BasicSelfOverlap3)
 {
-  //  Variant building, AND
+  //  Variant building, Self overlap
   run_test_bool (_this, "hlp3.oas", TMSelfOverlap, 110);
 }
 
 TEST(BasicSelfOverlap4)
 {
-  //  Sibling interactions, variant building, AND
+  //  Sibling interactions, variant building, Self overlap
   run_test_bool (_this, "hlp4.oas", TMSelfOverlap, 110);
 }
 
 TEST(BasicSelfOverlap5)
 {
-  //  Variant building with intermediate hierarchy, AND
+  //  Variant building with intermediate hierarchy, Self overlap
   run_test_bool (_this, "hlp5.oas", TMSelfOverlap, 110);
 }
 
 TEST(BasicSelfOverlap6)
 {
-  //  Extreme variants (copy, vanishing), AND
+  //  Extreme variants (copy, vanishing), Self overlap
   run_test_bool (_this, "hlp6.oas", TMSelfOverlap, 110);
 }
 
 TEST(BasicSelfOverlap7)
 {
-  //  Context replication - direct and indirect, AND
+  //  Context replication - direct and indirect, Self overlap
   run_test_bool (_this, "hlp7.oas", TMSelfOverlap, 110);
 }
 
 TEST(BasicSelfOverlap8)
 {
-  //  Mixed sibling-parent contexts, AND
+  //  Mixed sibling-parent contexts, Self overlap
   run_test_bool (_this, "hlp8.oas", TMSelfOverlap, 110);
 }
 
 TEST(BasicSelfOverlap9)
 {
-  //  Top-level ring structure, AND
+  //  Top-level ring structure, Self overlap
   std::string doc;
   run_test_bool (_this, "hlp9.oas", TMSelfOverlap, 110, &doc);
   EXPECT_EQ (doc,
@@ -917,62 +973,61 @@ TEST(BasicSelfOverlap9)
 
 TEST(BasicSelfOverlap10)
 {
-  //  Array instances, AND
+  //  Array instances, Self overlap
   run_test_bool (_this, "hlp10.oas", TMSelfOverlap, 110);
 }
 
-#if 0 // @@@
 TEST(BasicSelfOverlapWithSize1)
 {
-  //  Simple flat AND
+  //  Simple flat Self overlap
   run_test_bool_with_size (_this, "hlp1.oas", TMSelfOverlap, 1500, 111);
 }
 
 TEST(BasicSelfOverlapWithSize2)
 {
-  //  Up/down and down/up interactions, AND
+  //  Up/down and down/up interactions, Self overlap
   run_test_bool_with_size (_this, "hlp2.oas", TMSelfOverlap, 1500, 111);
 }
 
 TEST(BasicSelfOverlapWithSize3)
 {
-  //  Variant building, AND
+  //  Variant building, Self overlap
   run_test_bool_with_size (_this, "hlp3.oas", TMSelfOverlap, 1500, 111);
 }
 
 TEST(BasicSelfOverlapWithSize4)
 {
-  //  Sibling interactions, variant building, AND
+  //  Sibling interactions, variant building, Self overlap
   run_test_bool_with_size (_this, "hlp4.oas", TMSelfOverlap, 1500, 111);
 }
 
 TEST(BasicSelfOverlapWithSize5)
 {
-  //  Variant building with intermediate hierarchy, AND
+  //  Variant building with intermediate hierarchy, Self overlap
   run_test_bool_with_size (_this, "hlp5.oas", TMSelfOverlap, 1500, 111);
 }
 
 TEST(BasicSelfOverlapWithSize6)
 {
-  //  Extreme variants (copy, vanishing), AND
+  //  Extreme variants (copy, vanishing), Self overlap
   run_test_bool_with_size (_this, "hlp6.oas", TMSelfOverlap, 1500, 111);
 }
 
 TEST(BasicSelfOverlapWithSize7)
 {
-  //  Context replication - direct and indirect, AND
+  //  Context replication - direct and indirect, Self overlap
   run_test_bool_with_size (_this, "hlp7.oas", TMSelfOverlap, 1500, 111);
 }
 
 TEST(BasicSelfOverlapWithSize8)
 {
-  //  Mixed sibling-parent contexts, AND
+  //  Mixed sibling-parent contexts, Self overlap
   run_test_bool_with_size (_this, "hlp8.oas", TMSelfOverlap, 1500, 111);
 }
 
 TEST(BasicSelfOverlapWithSize9)
 {
-  //  Top-level ring structure, AND
+  //  Top-level ring structure, Self overlap
   std::string doc;
   run_test_bool_with_size (_this, "hlp9.oas", TMSelfOverlap, 1500, 111, &doc);
   EXPECT_EQ (doc,
@@ -981,16 +1036,14 @@ TEST(BasicSelfOverlapWithSize9)
     //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
     //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
     "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "RING[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 0 insts, 1 shapes (1 times)\n"
     "CHILD1[1] 0 insts, 6 shapes (2 times)\n"
   );
 }
 
 TEST(BasicSelfOverlapWithSize10)
 {
-  //  Array instances, AND
+  //  Array instances, Self overlap
   run_test_bool_with_size (_this, "hlp10.oas", TMSelfOverlap, 150, 111);
 }
-#endif
-
 

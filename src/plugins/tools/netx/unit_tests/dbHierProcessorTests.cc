@@ -910,7 +910,7 @@ TEST(BasicSelfOverlap9)
     //  from atop the CHILD cell don't interact with shapes inside CHILD, so there are 4 shapes rather than
     //  6. And the shapes from top inside the ring are not seen by the RING's subject shapes.
     "TOP[1] 0 insts, 0 shapes (1 times)\n"
-    "RING[1] 0 insts, 0 shapes (1 times)\n"
+    "RING[1] 0 insts, 1 shapes (1 times)\n"
     "CHILD1[1] 0 insts, 4 shapes (2 times)\n"
   );
 }

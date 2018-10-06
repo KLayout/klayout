@@ -155,21 +155,24 @@ void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const Sh
   db::EdgeProcessor ep;
 
   size_t p1 = 0, p2 = 1;
-  std::set<unsigned int> seen2;
+  std::set<unsigned int> seen;
 
   for (ShapeInteractions::iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
-    const db::PolygonRef &subject = interactions.shape (i->first);
-    for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
-      ep.insert (*e, p1);
+    if (seen.find (i->first) == seen.end ()) {
+      seen.insert (i->first);
+      const db::PolygonRef &subject = interactions.shape (i->first);
+      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, p1);
+      }
+      p1 += 2;
     }
-    p1 += 2;
 
     for (db::ShapeInteractions::iterator2 o = i->second.begin (); o != i->second.end (); ++o) {
       //  don't take the same (really the same, not an identical one) shape twice - the interaction
       //  set does not take care to list just one copy of the same item on the intruder side.
-      if (seen2.find (*o) == seen2.end ()) {
-        seen2.insert (*o);
+      if (seen.find (*o) == seen.end ()) {
+        seen.insert (*o);
         const db::PolygonRef &intruder = interactions.shape (*o);
         for (db::PolygonRef::polygon_edge_iterator e = intruder.begin_edge (); ! e.at_end(); ++e) {
           ep.insert (*e, p2);
@@ -414,6 +417,7 @@ public:
     } else {
       mp_result->add_shape (id2, *ref2);
     }
+
     mp_result->add_interaction (id1, id2);
   }
 
@@ -863,7 +867,11 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 
           for (std::set<const db::CellInstArray *>::const_iterator j = i->second.first.begin (); j != i->second.first.end (); ++j) {
             for (db::CellInstArray::iterator k = (*j)->begin_touching (nbox.enlarged (db::Vector (-1, -1)), inst_bcii); ! k.at_end (); ++k) {
-              intruders_below.first.insert (db::CellInstArray (db::CellInst ((*j)->object ().cell_index ()), tni * (*j)->complex_trans (*k)));
+              db::ICplxTrans tk = (*j)->complex_trans (*k);
+              //  NOTE: no self-interactions
+              if (i->first != *j || tn != tk) {
+                intruders_below.first.insert (db::CellInstArray (db::CellInst ((*j)->object ().cell_index ()), tni * tk));
+              }
             }
           }
 

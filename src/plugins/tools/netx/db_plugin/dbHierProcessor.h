@@ -27,6 +27,7 @@
 
 #include "dbLayout.h"
 #include "dbPluginCommon.h"
+#include "dbLocalOperation.h"
 
 #include <map>
 #include <set>
@@ -75,50 +76,6 @@ private:
   std::map<unsigned int, std::vector<unsigned int> > m_interactions;
   std::map<unsigned int, db::PolygonRef> m_shapes;
   unsigned int m_id;
-};
-
-class DB_PLUGIN_PUBLIC LocalOperation
-{
-public:
-  enum on_empty_intruder_mode {
-    Ignore = 0, Copy, Drop
-  };
-
-  LocalOperation () { }
-  virtual ~LocalOperation () { }
-
-  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const = 0;
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const = 0;
-  virtual std::string description () const = 0;
-  virtual db::Coord dist () const { return 0; }
-};
-
-class DB_PLUGIN_PUBLIC BoolAndOrNotLocalOperation
-  : public LocalOperation
-{
-public:
-  BoolAndOrNotLocalOperation (bool is_and);
-
-  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const;
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
-  virtual std::string description () const;
-
-private:
-  bool m_is_and;
-};
-
-class DB_PLUGIN_PUBLIC SelfOverlapMergeLocalOperation
-  : public LocalOperation
-{
-public:
-  SelfOverlapMergeLocalOperation (unsigned int wrap_count);
-
-  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const;
-  virtual on_empty_intruder_mode on_empty_intruder_hint () const;
-  virtual std::string description () const;
-
-private:
-  unsigned int m_wrap_count;
 };
 
 //  @@@ TODO: should be hidden (private data?)

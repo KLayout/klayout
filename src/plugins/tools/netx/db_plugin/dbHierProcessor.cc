@@ -34,170 +34,37 @@
 namespace db
 {
 
-
 // ---------------------------------------------------------------------------------------------
-//  BoolAndOrNotLocalOperation implementation
+//  Shape reference translator
 
-namespace {
-
-class PolygonRefGenerator
-  : public PolygonSink
+template <class Ref>
+class shape_reference_translator
 {
 public:
-  /**
-   *  @brief Constructor specifying an external vector for storing the polygons
-   */
-  PolygonRefGenerator (db::Layout *layout, std::set<db::PolygonRef> &polyrefs)
-    : PolygonSink (), mp_layout (layout), mp_polyrefs (&polyrefs)
-  { }
+  typedef typename Ref::shape_type shape_type;
 
-  /**
-   *  @brief Implementation of the PolygonSink interface
-   */
-  virtual void put (const db::Polygon &polygon)
+  shape_reference_translator (db::Layout *target_layout)
+    : mp_layout (target_layout)
   {
-    mp_polyrefs->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
+    //  .. nothing yet ..
+  }
+
+  Ref operator() (const Ref &ref) const
+  {
+    shape_type sh = ref.obj ().transformed (ref.trans ());
+    return Ref (sh, mp_layout->shape_repository ());
+  }
+
+  template <class Trans>
+  Ref operator() (const Ref &ref, const Trans &tr) const
+  {
+    shape_type sh = ref.obj ().transformed (tr * Trans (ref.trans ()));
+    return Ref (sh, mp_layout->shape_repository ());
   }
 
 private:
   db::Layout *mp_layout;
-  std::set<db::PolygonRef> *mp_polyrefs;
 };
-
-}
-
-BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and)
-  : m_is_and (is_and)
-{
-  //  .. nothing yet ..
-}
-
-// ---------------------------------------------------------------------------------------------
-
-LocalOperation::on_empty_intruder_mode
-BoolAndOrNotLocalOperation::on_empty_intruder_hint () const
-{
-  return m_is_and ? LocalOperation::Drop : LocalOperation::Copy;
-}
-
-std::string
-BoolAndOrNotLocalOperation::description () const
-{
-  return m_is_and ? tl::to_string (tr ("AND operation")) : tl::to_string (tr ("NOT operation"));
-}
-
-void
-BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const
-{
-  db::EdgeProcessor ep;
-
-  size_t p1 = 0, p2 = 1;
-
-  std::set<db::PolygonRef> others;
-  for (ShapeInteractions::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (ShapeInteractions::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-      others.insert (interactions.shape (*j));
-    }
-  }
-
-  for (ShapeInteractions::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-
-    const db::PolygonRef &subject = interactions.shape (i->first);
-    if (others.find (subject) != others.end ()) {
-      if (m_is_and) {
-        result.insert (subject);
-      }
-    } else if (i->second.empty ()) {
-      //  shortcut (not: keep, and: drop)
-      if (! m_is_and) {
-        result.insert (subject);
-      }
-    } else {
-      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
-        ep.insert (*e, p1);
-      }
-      p1 += 2;
-    }
-
-  }
-
-  if (! others.empty () || p1 > 0) {
-
-    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
-        ep.insert (*e, p2);
-      }
-      p2 += 2;
-    }
-
-    db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
-    db::PolygonRefGenerator pr (layout, result);
-    db::PolygonGenerator pg (pr, true, true);
-    ep.process (pg, op);
-
-  }
-}
-
-// ---------------------------------------------------------------------------------------------
-
-SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wrap_count)
-  : m_wrap_count (wrap_count)
-{
-  //  .. nothing yet ..
-}
-
-void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const
-{
-  if (m_wrap_count == 0) {
-    return;
-  }
-
-  db::EdgeProcessor ep;
-
-  size_t p1 = 0, p2 = 1;
-  std::set<unsigned int> seen;
-
-  for (ShapeInteractions::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-
-    if (seen.find (i->first) == seen.end ()) {
-      seen.insert (i->first);
-      const db::PolygonRef &subject = interactions.shape (i->first);
-      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
-        ep.insert (*e, p1);
-      }
-      p1 += 2;
-    }
-
-    for (db::ShapeInteractions::iterator2 o = i->second.begin (); o != i->second.end (); ++o) {
-      //  don't take the same (really the same, not an identical one) shape twice - the interaction
-      //  set does not take care to list just one copy of the same item on the intruder side.
-      if (seen.find (*o) == seen.end ()) {
-        seen.insert (*o);
-        const db::PolygonRef &intruder = interactions.shape (*o);
-        for (db::PolygonRef::polygon_edge_iterator e = intruder.begin_edge (); ! e.at_end(); ++e) {
-          ep.insert (*e, p2);
-        }
-        p2 += 2;
-      }
-    }
-
-  }
-
-  db::MergeOp op (m_wrap_count - 1);
-  db::PolygonRefGenerator pr (layout, result);
-  db::PolygonGenerator pg (pr, true, true);
-  ep.process (pg, op);
-}
-
-SelfOverlapMergeLocalOperation::on_empty_intruder_mode SelfOverlapMergeLocalOperation::on_empty_intruder_hint () const
-{
-  return m_wrap_count > 1 ? LocalOperation::Drop : LocalOperation::Copy;
-}
-
-std::string SelfOverlapMergeLocalOperation::description () const
-{
-  return tl::sprintf (tl::to_string (tr ("Self-overlap (wrap count %d)")), int (m_wrap_count));
-}
 
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorCellContext implementation
@@ -226,10 +93,9 @@ LocalProcessorCellContext::propagate (const std::set<db::PolygonRef> &res)
     tl_assert (d->parent != 0);
 
     db::Layout *subject_layout = d->parent->layout ();
-
+    shape_reference_translator<db::PolygonRef> rt (subject_layout);
     for (std::set<db::PolygonRef>::const_iterator r = res.begin (); r != res.end (); ++r) {
-      db::Polygon poly = r->obj ().transformed (d->cell_inst * db::ICplxTrans (r->trans ()));
-      d->parent_context->propagated ().insert (db::PolygonRef (poly, subject_layout->shape_repository ()));
+      d->parent_context->propagated ().insert (rt (*r, d->cell_inst));
     }
 
   }
@@ -411,8 +277,8 @@ public:
       //  In order to guarantee the refs come from the subject layout, we'd need to
       //  rewrite them to the subject layout if required.
       if (!mp_result->has_shape_id (id2)) {
-        db::Polygon poly = ref2->obj ().transformed (ref2->trans ());
-        mp_result->add_shape (id2, db::PolygonRef (poly, mp_layout->shape_repository ()));
+        db::shape_reference_translator<db::PolygonRef> rt (mp_layout);
+        mp_result->add_shape (id2, rt (*ref2));
       }
     } else {
       mp_result->add_shape (id2, *ref2);
@@ -463,42 +329,14 @@ public:
     db::box_convert <db::CellInst, true> inst_bc (*mp_intruder_layout, m_intruder_layer);
     mp_result->add_shape (id1, *ref);
 
+    //  Find all instance array members that potentially interact with the shape and use
+    //  add_shapes_from_intruder_inst on them
     for (db::CellInstArray::iterator n = inst->begin_touching (ref->box ().enlarged (db::Vector (m_dist - 1, m_dist - 1)), inst_bc); !n.at_end (); ++n) {
-
       db::ICplxTrans tn = inst->complex_trans (*n);
-
       db::Box region = ref->box ().transformed (tn.inverted ()).enlarged (db::Vector (m_dist, m_dist)) & intruder_cell.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
       if (! region.empty ()) {
-
-        //  @@@ TODO: should be lighter, cache, handle arrays ..
-        db::RecursiveShapeIterator si (*mp_intruder_layout, intruder_cell, m_intruder_layer, region);
-        si.shape_flags (polygon_ref_flags ());
-        while (! si.at_end ()) {
-
-          const db::PolygonRef *ref2 = si.shape ().basic_ptr (db::PolygonRef::tag ());
-
-          //  reuse the same id for shapes from the same instance -> this avoid duplicates with different IDs on
-          //  the intruder side.
-          std::map<std::pair<unsigned int, const db::PolygonRef *>, unsigned int>::const_iterator k = m_inst_shape_ids.find (std::make_pair (inst_id, ref2));
-          if (k == m_inst_shape_ids.end ()) {
-
-            k = m_inst_shape_ids.insert (std::make_pair (std::make_pair (inst_id, ref2), mp_result->next_id ())).first;
-
-            db::Polygon poly = ref2->obj ().transformed (tn * si.trans () * db::ICplxTrans (ref2->trans ()));
-            //  NOTE: we intentionally rewrite to the subject layout - this way polygon refs in the context come from the
-            //  subject, not from the intruder.
-            mp_result->add_shape (k->second, db::PolygonRef (poly, mp_subject_layout->shape_repository()));
-
-          }
-
-          mp_result->add_interaction (id1, k->second);
-
-          ++si;
-
-        }
-
+        add_shapes_from_intruder_inst (id1, intruder_cell, tn, inst_id, region);
       }
-
     }
   }
 
@@ -509,6 +347,39 @@ private:
   db::Coord m_dist;
   ShapeInteractions *mp_result;
   std::map<std::pair<unsigned int, const db::PolygonRef *>, unsigned int> m_inst_shape_ids;
+
+  void add_shapes_from_intruder_inst (unsigned int id1, const db::Cell &intruder_cell, const db::ICplxTrans &tn, unsigned int inst_id, const db::Box &region)
+  {
+    db::shape_reference_translator<db::PolygonRef> rt (mp_subject_layout);
+
+    //  Look up all shapes from the intruder instance which interact with the subject shape
+    //  (given through region)
+    //  @@@ TODO: should be lighter, cache, handle arrays ..
+    db::RecursiveShapeIterator si (*mp_intruder_layout, intruder_cell, m_intruder_layer, region);
+    si.shape_flags (polygon_ref_flags ());
+    while (! si.at_end ()) {
+
+      const db::PolygonRef *ref2 = si.shape ().basic_ptr (db::PolygonRef::tag ());
+
+      //  reuse the same id for shapes from the same instance -> this avoid duplicates with different IDs on
+      //  the intruder side.
+      std::map<std::pair<unsigned int, const db::PolygonRef *>, unsigned int>::const_iterator k = m_inst_shape_ids.find (std::make_pair (inst_id, ref2));
+      if (k == m_inst_shape_ids.end ()) {
+
+        k = m_inst_shape_ids.insert (std::make_pair (std::make_pair (inst_id, ref2), mp_result->next_id ())).first;
+
+        //  NOTE: we intentionally rewrite to the *subject* layout - this way polygon refs in the context come from the
+        //  subject, not from the intruder.
+        mp_result->add_shape (k->second, rt (*ref2, tn * si.trans ()));
+
+      }
+
+      mp_result->add_interaction (id1, k->second);
+
+      ++si;
+
+    }
+  }
 };
 
 static bool
@@ -842,6 +713,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
     for (std::map<const db::CellInstArray *, interaction_value_type>::const_iterator i = interactions.begin (); i != interactions.end (); ++i) {
 
       db::Cell &subject_child_cell = mp_subject_layout->cell (i->first->object ().cell_index ());
+      db::shape_reference_translator<db::PolygonRef> rt (mp_subject_layout);
 
       for (db::CellInstArray::iterator n = i->first->begin (); ! n.at_end (); ++n) {
 
@@ -856,10 +728,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
           //  @@@ transformation of polygon refs - can this be done more efficiently?
           for (std::set<db::PolygonRef>::const_iterator p = i->second.second.begin (); p != i->second.second.end (); ++p) {
             if (nbox.overlaps (p->box ())) {
-              db::Polygon poly = p->obj ().transformed (tni * db::ICplxTrans (p->trans ()));
-              //  NOTE: we intentionally transform into the *subject* layout so the intruders are local to
-              //  the subject layout.
-              intruders_below.second.insert (db::PolygonRef (poly, mp_subject_layout->shape_repository ()));
+              intruders_below.second.insert (rt (*p, tni));
             }
           }
 

@@ -55,7 +55,7 @@ Qt5Brew = { 'qmake' : '/usr/local/opt/qt/bin/qmake',
 # [2] Ruby
 #-----------------------------------------------------
 Rubies  = [ 'nil', 'RubyYosemite', 'RubyElCapitan', 'RubySierra', 'RubyHighSierra' ]
-Rubies += [ 'Ruby24SrcBuild', 'Ruby24MacPorts', 'Ruby24Brew' ]
+Rubies += [ 'RubyMojave', 'Ruby24SrcBuild', 'Ruby24MacPorts', 'Ruby24Brew' ]
 
 #-----------------------------------------------------
 # Whereabout of different components of Ruby
@@ -84,6 +84,13 @@ RubySierra      = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2
 # Bundled with High Sierra (10.13)
 # [Key Type Name] = 'Sys'
 RubyHighSierra  = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/bin/ruby' ,
+                    'inc': '/System/Library/Frameworks/Ruby.framework/Headers',
+                    'lib': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/lib/libruby.dylib'
+                  }
+
+# Bundled with Mojave (10.14)
+# [Key Type Name] = 'Sys'
+RubyMojave      = { 'exe': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/bin/ruby' ,
                     'inc': '/System/Library/Frameworks/Ruby.framework/Headers',
                     'lib': '/System/Library/Frameworks/Ruby.framework/Versions/2.3/usr/lib/libruby.dylib'
                   }
@@ -117,6 +124,7 @@ RubyDictionary  = { 'nil'           : None,
                     'RubyElCapitan' : RubyElCapitan,
                     'RubySierra'    : RubySierra,
                     'RubyHighSierra': RubyHighSierra,
+                    'RubyMojave'    : RubyMojave,
                     'Ruby24SrcBuild': Ruby24SrcBuild,
                     'Ruby24MacPorts': Ruby24MacPorts,
                     'Ruby25Brew'    : Ruby25Brew
@@ -126,7 +134,7 @@ RubyDictionary  = { 'nil'           : None,
 # [3] Python
 #-----------------------------------------------------
 Pythons  = [ 'nil', 'PythonYosemite', 'PythonElCapitan', 'PythonSierra', 'PythonHighSierra' ]
-Pythons += [ 'Anaconda27', 'Anaconda36', 'Python36MacPorts', 'Python37Brew' ]
+Pythons += [ 'PythonMojave', 'Anaconda27', 'Anaconda36', 'Python36MacPorts', 'Python37Brew' ]
 
 #-----------------------------------------------------
 # Whereabout of different components of Python
@@ -155,6 +163,13 @@ PythonSierra    = { 'exe': '/System/Library/Frameworks/Python.framework/Versions
 # Bundled with High Sierra (10.13)
 # [Key Type Name] = 'Sys'
 PythonHighSierra= { 'exe': '/System/Library/Frameworks/Python.framework/Versions/2.7/bin/python' ,
+                    'inc': '/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7',
+                    'lib': '/System/Library/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib'
+                  }
+
+# Bundled with Mojave (10.14)
+# [Key Type Name] = 'Sys'
+PythonMojave    = { 'exe': '/System/Library/Frameworks/Python.framework/Versions/2.7/bin/python' ,
                     'inc': '/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7',
                     'lib': '/System/Library/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib'
                   }
@@ -201,6 +216,7 @@ PythonDictionary= { 'nil'             : None,
                     'PythonElCapitan' : PythonElCapitan,
                     'PythonSierra'    : PythonSierra,
                     'PythonHighSierra': PythonHighSierra,
+                    'PythonMojave'    : PythonMojave,
                     'Anaconda27'      : Anaconda27,
                     'Anaconda36'      : Anaconda36,
                     'Python36MacPorts': Python36MacPorts,

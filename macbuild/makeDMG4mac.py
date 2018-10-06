@@ -73,7 +73,7 @@ def SetGlobals():
   Usage += "   <-c|--clean>         : clean the work directory                                   | disabled \n"
   Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled \n"
   Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
-  Usage += "   [-q|--qt <ID>]       : ID name of deployed Qt                                     | Qt510Xmp \n"
+  Usage += "   [-q|--qt <ID>]       : ID name of deployed Qt                                     | Qt511Xmp \n"
   Usage += "   [-s|--serial <num>]  : DMG serial number                                          | 1 \n"
   Usage += "   [-?|--?]             : print this usage and exit                                  | disabled \n"
   Usage += "--------------------------------------------------------------------------------------------------------\n"
@@ -100,6 +100,9 @@ def SetGlobals():
   elif release == 17:
     GenOSName = "macOS"
     Platform  = "HighSierra"
+  elif release == 18:
+    GenOSName = "macOS"
+    Platform  = "Mojave"
   else:
     Platform = ""
     print("")
@@ -117,7 +120,7 @@ def SetGlobals():
   OpClean          = False
   OpMake           = False
   DMGSerialNum     = 1
-  QtIdentification = "Qt510Xmp"
+  QtIdentification = "Qt511Xmp"
   Version          = GetKLayoutVersionFrom( "./version.sh" )
   OccupiedDS       = -1
   BackgroundPNG    = "KLayoutDMG-Back.png"
@@ -237,7 +240,7 @@ def ParseCommandLineArguments():
   p.set_defaults( pkg_dir           = "",
                   operation_clean   = False,
                   operation_make    = False,
-                  qt_identification = "Qt510Xmp",
+                  qt_identification = "Qt511Xmp",
                   dmg_serial        = "1",
                   checkusage        = False )
 

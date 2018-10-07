@@ -158,7 +158,7 @@ std::string contexts_to_s (db::Layout *layout, db::LocalProcessorContexts &conte
   return res;
 }
 
-void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc, bool single, db::Coord dist)
+void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc, bool single, db::Coord dist, unsigned int nthreads = 0)
 {
   db::Layout layout_org;
 
@@ -225,6 +225,7 @@ void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, in
   if (single) {
 
     db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
+    proc.set_threads (nthreads);
 
     if (! context_doc) {
       proc.run (lop, l1, l2, lout);
@@ -240,6 +241,7 @@ void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, in
     db::Layout layout_org2 = layout_org;
 
     db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()), &layout_org2, &layout_org2.cell (*layout_org2.begin_top_down ()));
+    proc.set_threads (nthreads);
 
     if (! context_doc) {
       proc.run (lop, l1, l2, lout);
@@ -255,24 +257,24 @@ void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, in
   db::compare_layouts (_this, layout_org, testdata (file), lmap, false /*skip other layers*/, db::AsPolygons);
 }
 
-void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0)
+void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
-  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true, 0);
+  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true, 0, nthreads);
 }
 
-void run_test_bool2 (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0)
+void run_test_bool2 (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
-  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false, 0);
+  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false, 0, nthreads);
 }
 
-void run_test_bool_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0)
+void run_test_bool_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
-  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true, dist);
+  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true, dist, nthreads);
 }
 
-void run_test_bool2_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0)
+void run_test_bool2_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
-  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false, dist);
+  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false, dist, nthreads);
 }
 
 TEST(BasicAnd1)
@@ -281,10 +283,34 @@ TEST(BasicAnd1)
   run_test_bool (_this, "hlp1.oas", TMAnd, 100);
 }
 
+TEST(BasicAnd1SingleThread)
+{
+  //  Simple flat AND
+  run_test_bool (_this, "hlp1.oas", TMAnd, 100, 0, 1);
+}
+
+TEST(BasicAnd1FourThreads)
+{
+  //  Simple flat AND
+  run_test_bool (_this, "hlp1.oas", TMAnd, 100, 0, 4);
+}
+
 TEST(BasicNot1)
 {
-  //  Simple flat NOT
+  //  Simple flat AND
   run_test_bool (_this, "hlp1.oas", TMNot, 101);
+}
+
+TEST(BasicNot1SingleThread)
+{
+  //  Simple flat NOT
+  run_test_bool (_this, "hlp1.oas", TMNot, 101, 0, 1);
+}
+
+TEST(BasicNot1FourThreads)
+{
+  //  Simple flat NOT
+  run_test_bool (_this, "hlp1.oas", TMNot, 101, 0, 4);
 }
 
 TEST(BasicAnd2)
@@ -293,10 +319,34 @@ TEST(BasicAnd2)
   run_test_bool (_this, "hlp2.oas", TMAnd, 100);
 }
 
+TEST(BasicAnd2SingleThread)
+{
+  //  Up/down and down/up interactions, AND
+  run_test_bool (_this, "hlp2.oas", TMAnd, 100, 0, 1);
+}
+
+TEST(BasicAnd2FourThreads)
+{
+  //  Up/down and down/up interactions, AND
+  run_test_bool (_this, "hlp2.oas", TMAnd, 100, 0, 4);
+}
+
 TEST(BasicNot2)
 {
   //  Up/down and down/up interactions, NOT
   run_test_bool (_this, "hlp2.oas", TMNot, 101);
+}
+
+TEST(BasicNot2SingleThread)
+{
+  //  Up/down and down/up interactions, NOT
+  run_test_bool (_this, "hlp2.oas", TMNot, 101, 0, 1);
+}
+
+TEST(BasicNot2FourThreads)
+{
+  //  Up/down and down/up interactions, NOT
+  run_test_bool (_this, "hlp2.oas", TMNot, 101, 0, 4);
 }
 
 TEST(BasicAnd3)
@@ -305,10 +355,34 @@ TEST(BasicAnd3)
   run_test_bool (_this, "hlp3.oas", TMAnd, 100);
 }
 
+TEST(BasicAnd3SingleThread)
+{
+  //  Variant building, AND
+  run_test_bool (_this, "hlp3.oas", TMAnd, 100, 0, 1);
+}
+
+TEST(BasicAnd3FourThreads)
+{
+  //  Variant building, AND
+  run_test_bool (_this, "hlp3.oas", TMAnd, 100, 0, 4);
+}
+
 TEST(BasicNot3)
 {
   //  Variant building, NOT
   run_test_bool (_this, "hlp3.oas", TMNot, 101);
+}
+
+TEST(BasicNot3SingleThread)
+{
+  //  Variant building, NOT
+  run_test_bool (_this, "hlp3.oas", TMNot, 101, 0, 1);
+}
+
+TEST(BasicNot3FourThreads)
+{
+  //  Variant building, NOT
+  run_test_bool (_this, "hlp3.oas", TMNot, 101, 0, 4);
 }
 
 TEST(BasicAnd4)

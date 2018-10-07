@@ -74,6 +74,12 @@ public:
   void output (NetLayer a, const db::LayerProperties &lp);
   db::Layout *layout_copy () const;
 
+  void set_threads (unsigned int nthreads);
+  unsigned int threads () const
+  {
+    return m_nthreads;
+  }
+
 private:
   //  no copying
   NetExtractor (const db::NetExtractor &);
@@ -86,6 +92,7 @@ private:
   db::Layout *mp_layout;
   db::Cell *mp_top_cell;
   db::CellMapping m_cm;
+  unsigned int m_nthreads;
 };
 
 }

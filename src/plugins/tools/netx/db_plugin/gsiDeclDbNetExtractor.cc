@@ -55,6 +55,12 @@ gsi::Class<db::NetExtractor> decl_NetNetExtractor ("db", "NetExtractor",
   gsi::method ("open", &db::NetExtractor::open, gsi::arg ("orig_layout"), gsi::arg ("orig_top_cell_index"),
     "@@@"
   ) +
+  gsi::method ("threads=", &db::NetExtractor::set_threads, gsi::arg ("nthreads"),
+    "@@@"
+  ) +
+  gsi::method ("threads", &db::NetExtractor::threads,
+    "@@@"
+  ) +
   gsi::method_ext ("open", &open2, gsi::arg ("orig_layout"), gsi::arg ("orig_top_cell"),
     "@@@"
   ) +

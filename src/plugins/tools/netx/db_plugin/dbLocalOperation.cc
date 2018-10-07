@@ -56,6 +56,7 @@ public:
    */
   virtual void put (const db::Polygon &polygon)
   {
+    tl::MutexLocker locker (&mp_layout->lock ());
     mp_polyrefs->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
   }
 

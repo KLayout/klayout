@@ -38,6 +38,7 @@
 #include "tlException.h"
 #include "tlVector.h"
 #include "tlString.h"
+#include "tlThreads.h"
 #include "gsi.h"
 
 #include <cstring>
@@ -570,6 +571,15 @@ public:
   const PropertiesRepository &properties_repository () const
   {
     return m_properties_repository;
+  }
+
+  /**
+   *  @brief Gets the lock for the layout object
+   *  This is a generic lock that can be used to lock modifications against multiple threads.
+   */
+  tl::Mutex &lock ()
+  {
+    return m_lock;
   }
 
   /**
@@ -1630,6 +1640,7 @@ private:
   int m_waste_layer;
   bool m_editable;
   meta_info m_meta_info;
+  tl::Mutex m_lock;
 
   /**
    *  @brief Sort the cells topologically

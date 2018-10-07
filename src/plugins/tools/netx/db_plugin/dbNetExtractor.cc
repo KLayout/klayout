@@ -35,7 +35,7 @@ namespace db
 {
 
 NetExtractor::NetExtractor()
-  : mp_orig_layout (0), mp_layout (0), mp_top_cell (0)
+  : mp_orig_layout (0), mp_layout (0), mp_top_cell (0), m_nthreads (0)
 {
 
   // @@@
@@ -47,6 +47,12 @@ NetExtractor::~NetExtractor ()
   delete mp_layout;
   mp_layout = 0;
   mp_top_cell = 0;
+}
+
+void
+NetExtractor::set_threads (unsigned int nthreads)
+{
+  m_nthreads = nthreads;
 }
 
 void
@@ -154,6 +160,7 @@ NetExtractor::and_or_not (NetLayer a, NetLayer b, bool is_and)
 
   db::BoolAndOrNotLocalOperation op (is_and);
   db::LocalProcessor proc (mp_layout, mp_top_cell);
+  proc.set_threads (m_nthreads);
   proc.run (&op, a.layer_index (), b.layer_index (), lout);
 
   return NetLayer (lout);

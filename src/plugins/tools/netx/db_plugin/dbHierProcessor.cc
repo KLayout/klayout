@@ -354,7 +354,7 @@ private:
 
     //  Look up all shapes from the intruder instance which interact with the subject shape
     //  (given through region)
-    //  @@@ TODO: should be lighter, cache, handle arrays ..
+    //  TODO: should be lighter, cache, handle arrays ..
     db::RecursiveShapeIterator si (*mp_intruder_layout, intruder_cell, m_intruder_layer, region);
     si.shape_flags (polygon_ref_flags ());
     while (! si.at_end ()) {
@@ -401,7 +401,7 @@ instances_interact (const db::Layout *layout1, const db::CellInstArray *inst1, u
 
     if (! ibox1.empty ()) {
 
-      //  @@@ TODO: in some cases, it may be possible to optimize this for arrays
+      //  TODO: in some cases, it may be possible to optimize this for arrays
 
       for (db::CellInstArray::iterator k = inst2->begin_touching (ibox1.enlarged (db::Vector (-1, -1)), inst2_bc); ! k.at_end (); ++k) {
 
@@ -725,14 +725,13 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
 
           std::pair<std::set<db::CellInstArray>, std::set<db::PolygonRef> > intruders_below;
 
-          //  @@@ transformation of polygon refs - can this be done more efficiently?
           for (std::set<db::PolygonRef>::const_iterator p = i->second.second.begin (); p != i->second.second.end (); ++p) {
             if (nbox.overlaps (p->box ())) {
               intruders_below.second.insert (rt (*p, tni));
             }
           }
 
-          //  @@@ TODO: in some cases, it may be possible to optimize this for arrays
+          //  TODO: in some cases, it may be possible to optimize this for arrays
 
           for (std::set<const db::CellInstArray *>::const_iterator j = i->second.first.begin (); j != i->second.first.end (); ++j) {
             for (db::CellInstArray::iterator k = (*j)->begin_touching (nbox.enlarged (db::Vector (-1, -1)), inst_bcii); ! k.at_end (); ++k) {

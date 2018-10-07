@@ -37,7 +37,9 @@ enum TestMode
 {
   TMAnd = 0,
   TMNot = 1,
-  TMSelfOverlap = 2
+  TMAndSwapped = 2,
+  TMNotSwapped = 3,
+  TMSelfOverlap = 4
 };
 
 /**
@@ -156,12 +158,13 @@ std::string contexts_to_s (db::Layout *layout, db::LocalProcessorContexts &conte
   return res;
 }
 
-void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc, bool single)
+void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc, bool single, db::Coord dist)
 {
   db::Layout layout_org;
 
   unsigned int l1 = 0, l2 = 0, lout = 0;
   db::LayerMap lmap;
+  bool swap = (mode == TMAndSwapped || mode == TMNotSwapped);
 
   {
     tl::InputStream stream (testdata (file));
@@ -169,17 +172,17 @@ void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, in
 
     db::LayerProperties p;
 
-    p.layer = 1;
+    p.layer = swap ? 2 : 1;
     p.datatype = 0;
-    lmap.map (db::LDPair (1, 0), l1 = layout_org.insert_layer ());
+    lmap.map (db::LDPair (p.layer, p.datatype), l1 = layout_org.insert_layer ());
     layout_org.set_properties (l1, p);
 
-    p.layer = 2;
+    p.layer = swap ? 1 : 2;
     p.datatype = 0;
     if (mode == TMSelfOverlap) {
-      lmap.map (db::LDPair (2, 0), l2 = l1);
+      lmap.map (db::LDPair (p.layer, p.datatype), l2 = l1);
     } else {
-      lmap.map (db::LDPair (2, 0), l2 = layout_org.insert_layer ());
+      lmap.map (db::LDPair (p.layer, p.datatype), l2 = layout_org.insert_layer ());
       layout_org.set_properties (l2, p);
     }
 
@@ -201,12 +204,22 @@ void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, in
   }
 
   db::LocalOperation *lop = 0;
-  db::BoolAndOrNotLocalOperation bool_op (mode == TMAnd);
+  db::BoolAndOrNotLocalOperation bool_op (mode == TMAnd || mode == TMAndSwapped);
   db::SelfOverlapMergeLocalOperation self_intersect_op (2);
+  BoolAndOrNotWithSizedLocalOperation sized_bool_op (mode == TMAnd || mode == TMAndSwapped, dist);
+  SelfOverlapWithSizedLocalOperation sized_self_intersect_op (2, dist);
   if (mode == TMSelfOverlap) {
-    lop = &self_intersect_op;
+    if (dist > 0) {
+      lop = &sized_self_intersect_op;
+    } else {
+      lop = &self_intersect_op;
+    }
   } else {
-    lop = &bool_op;
+    if (dist > 0) {
+      lop = &sized_bool_op;
+    } else {
+      lop = &bool_op;
+    }
   }
 
   if (single) {
@@ -244,107 +257,22 @@ void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, in
 
 void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0)
 {
-  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true);
+  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true, 0);
 }
 
 void run_test_bool2 (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0)
 {
-  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false);
-}
-
-void run_test_bool_with_size_gen (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc, bool single)
-{
-  db::Layout layout_org;
-
-  unsigned int l1 = 0, l2 = 0, lout = 0;
-  db::LayerMap lmap;
-
-  {
-    tl::InputStream stream (testdata (file));
-    db::Reader reader (stream);
-
-    db::LayerProperties p;
-
-    p.layer = 1;
-    p.datatype = 0;
-    lmap.map (db::LDPair (1, 0), l1 = layout_org.insert_layer ());
-    layout_org.set_properties (l1, p);
-
-    p.layer = 2;
-    p.datatype = 0;
-    if (mode == TMSelfOverlap) {
-      lmap.map (db::LDPair (2, 0), l2 = l1);
-    } else {
-      lmap.map (db::LDPair (2, 0), l2 = layout_org.insert_layer ());
-      layout_org.set_properties (l2, p);
-    }
-
-    p.layer = out_layer_num;
-    p.datatype = 0;
-    lmap.map (db::LDPair (out_layer_num, 0), lout = layout_org.insert_layer ());
-    layout_org.set_properties (lout, p);
-
-    db::LoadLayoutOptions options;
-    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
-    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
-    reader.read (layout_org, options);
-  }
-
-  layout_org.clear_layer (lout);
-  normalize_layer (layout_org, l1);
-  normalize_layer (layout_org, l2);
-
-  db::LocalOperation *lop = 0;
-  BoolAndOrNotWithSizedLocalOperation bool_op (mode == TMAnd, dist);
-  SelfOverlapWithSizedLocalOperation self_intersect_op (2, dist);
-  if (mode == TMSelfOverlap) {
-    lop = &self_intersect_op;
-  } else {
-    lop = &bool_op;
-  }
-
-
-  if (single) {
-
-    db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()));
-
-    if (! context_doc) {
-      proc.run (lop, l1, l2, lout);
-    } else {
-      db::LocalProcessorContexts contexts;
-      proc.compute_contexts (contexts, lop, l1, l2);
-      *context_doc = contexts_to_s (&layout_org, contexts);
-      proc.compute_results (contexts, lop, lout);
-    }
-
-  } else {
-
-    db::Layout layout_org2 = layout_org;
-
-    db::LocalProcessor proc (&layout_org, &layout_org.cell (*layout_org.begin_top_down ()), &layout_org2, &layout_org2.cell (*layout_org2.begin_top_down ()));
-
-    if (! context_doc) {
-      proc.run (lop, l1, l2, lout);
-    } else {
-      db::LocalProcessorContexts contexts;
-      proc.compute_contexts (contexts, lop, l1, l2);
-      *context_doc = contexts_to_s (&layout_org, contexts);
-      proc.compute_results (contexts, lop, lout);
-    }
-
-  }
-
-  db::compare_layouts (_this, layout_org, testdata (file), lmap, false /*skip other layers*/, db::AsPolygons);
+  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false, 0);
 }
 
 void run_test_bool_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0)
 {
-  run_test_bool_with_size_gen (_this, file, mode, dist, out_layer_num, context_doc, true);
+  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true, dist);
 }
 
 void run_test_bool2_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0)
 {
-  run_test_bool_with_size_gen (_this, file, mode, dist, out_layer_num, context_doc, false);
+  run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false, dist);
 }
 
 TEST(BasicAnd1)
@@ -625,6 +553,18 @@ TEST(BasicNotWithSize10)
 {
   //  Array instances, NOT
   run_test_bool_with_size (_this, "hlp10.oas", TMNot, 150, 103);
+}
+
+TEST(BasicNotWithSize11)
+{
+  //  Up/down and down/up interactions, NOT
+  run_test_bool_with_size (_this, "hlp11.oas", TMNot, 1500, 103);
+}
+
+TEST(BasicNotWithSizeSwappedLayers11)
+{
+  //  Up/down and down/up interactions, NOT
+  run_test_bool_with_size (_this, "hlp11.oas", TMNotSwapped, 1500, 104);
 }
 
 TEST(TwoInputsAnd1)

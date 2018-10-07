@@ -2,6 +2,12 @@
 
 GITCOMMIT := $(shell git rev-parse --short HEAD)
 KLAYOUT_VERSION := $(shell source version.sh && echo $$KLAYOUT_VERSION)
+ifndef PYTHON_VERSION
+    PYTHON_VERSION := B37
+endif
+ifndef MACOS_VERSION
+	MACOS_VERSION := HighSierra
+endif
 
 .ONESHELL:
 
@@ -31,6 +37,7 @@ test:
 	ln -s klayout.app/Contents/MacOS/klayout klayout; \
 	export TESTTMP=testtmp; \
 	export TESTSRC=..; \
+	export DYLD_LIBRARY_PATH=.:db_plugins/:lay_plugins/; \
 	./ut_runner -h || true; \
 	cd ..
 

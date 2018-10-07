@@ -25,6 +25,7 @@
 
 #include "dbLoadLayoutOptions.h"
 #include "dbSaveLayoutOptions.h"
+#include "dbPluginCommon.h"
 
 namespace db
 {
@@ -34,7 +35,7 @@ namespace db
  *  NOTE: this structure is non-public linkage by intention. This way it's instantiated
  *  in all compile units and the shared object does not need to be linked.
  */
-class DXFReaderOptions
+class DB_PLUGIN_PUBLIC DXFReaderOptions
   : public FormatSpecificReaderOptions
 {
 public:
@@ -192,7 +193,7 @@ public:
  *  NOTE: this structure is non-public linkage by intention. This way it's instantiated
  *  in all compile units and the shared object does not need to be linked.
  */
-class DXFWriterOptions
+class DB_PLUGIN_PUBLIC DXFWriterOptions
   : public FormatSpecificWriterOptions
 {
 public:

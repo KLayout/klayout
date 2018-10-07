@@ -25,6 +25,7 @@
 
 #include "dbSaveLayoutOptions.h"
 #include "dbLoadLayoutOptions.h"
+#include "dbPluginCommon.h"
 
 namespace db
 {
@@ -34,7 +35,7 @@ namespace db
  *  NOTE: this structure is non-public linkage by intention. This way it's instantiated
  *  in all compile units and the shared object does not need to be linked.
  */
-class GDS2ReaderOptions
+class DB_PLUGIN_PUBLIC GDS2ReaderOptions
   : public FormatSpecificReaderOptions
 {
 public:
@@ -97,7 +98,7 @@ public:
  *  NOTE: this structure is non-public linkage by intention. This way it's instantiated
  *  in all compile units and the shared object does not need to be linked.
  */
-class GDS2WriterOptions
+class DB_PLUGIN_PUBLIC GDS2WriterOptions
   : public FormatSpecificWriterOptions
 {
 public:

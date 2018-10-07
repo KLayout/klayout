@@ -43,6 +43,16 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=true
+
+    - name: "klayout python3.6.5_1 osx10.13"
+      os: osx
+      osx_image: xcode9.4  # macOS 10.13
+      env:
+        - MATRIX_EVAL="brew update; brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb; brew switch python 3.6.5_1; shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
     
     - name: "klayout python3 osx10.12"
       os: osx
@@ -58,11 +68,11 @@ matrix:
       os: osx
       osx_image: xcode8  # macOS 10.11
       env:
-        - MATRIX_EVAL="shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+        - MATRIX_EVAL="brew update; brew config; brew upgrade python;"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
-        - BREW_BUNDLE=true
+        - BREW_BUNDLE=false
     
     - name: "klayout python3.6 package"
       os: linux

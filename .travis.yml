@@ -58,7 +58,7 @@ matrix:
       os: osx
       osx_image: xcode8  # macOS 10.11
       env:
-        - MATRIX_EVAL="rvm list; rvm use ruby-2.3.0; brew install python3; brew unlink python && brew link --overwrite python;"
+        - MATRIX_EVAL="rvm list; rvm use ruby-2.3.0; brew install python3; brew unlink python && brew link --overwrite python3;"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true

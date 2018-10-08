@@ -68,7 +68,7 @@ matrix:
       os: osx
       osx_image: xcode8  # macOS 10.11
       env:
-        - MATRIX_EVAL="brew update; brew config; brew upgrade python;"
+        - MATRIX_EVAL="brew update; brew config; brew upgrade python; brew postinstall python; ls -l /usr/local/opt/python/libexec/bin/; shopt -s expand_aliases; alias python='/usr/local/opt/python/libexec/bin/python'; alias pip='/usr/local/opt/python/libexec/bin/pip';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true

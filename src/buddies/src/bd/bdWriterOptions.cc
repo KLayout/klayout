@@ -58,11 +58,11 @@ GenericWriterOptions::GenericWriterOptions ()
   //  .. nothing yet ..
 }
 
-const std::string GenericWriterOptions::m_gds2_format_name      = "GDS2";
-const std::string GenericWriterOptions::m_gds2text_format_name  = "GDS2Text";  //  no special options
-const std::string GenericWriterOptions::m_oasis_format_name     = "OASIS";
-const std::string GenericWriterOptions::m_dxf_format_name       = "DXF";
-const std::string GenericWriterOptions::m_cif_format_name       = "CIF";
+const std::string GenericWriterOptions::gds2_format_name      = "GDS2";
+const std::string GenericWriterOptions::gds2text_format_name  = "GDS2Text";  //  no special options
+const std::string GenericWriterOptions::oasis_format_name     = "OASIS";
+const std::string GenericWriterOptions::dxf_format_name       = "DXF";
+const std::string GenericWriterOptions::cif_format_name       = "CIF";
 
 void
 GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::string &format)
@@ -75,7 +75,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                   "given factor."
                  );
 
-  if (format.empty () || format == m_gds2_format_name || format == m_gds2text_format_name || format == m_oasis_format_name) {
+  if (format.empty () || format == gds2_format_name || format == gds2text_format_name || format == oasis_format_name) {
     cmd << tl::arg (group +
                     "-od|--dbu-out=dbu",    &m_dbu, "Uses the specified database unit",
                     "Specifies the database unit to save the layout in. The database unit is given "
@@ -90,7 +90,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                   "If given, empty cells won't be written. See --keep-instances for more options."
                  );
 
-  if (format.empty () || format == m_gds2_format_name || format == m_gds2text_format_name) {
+  if (format.empty () || format == gds2_format_name || format == gds2text_format_name) {
     cmd << tl::arg (group +
                     "#--keep-instances",      &m_keep_instances, "Keeps instances of dropped cells",
                     "If given, instances of dropped cell's won't be removed. Hence, ghost cells are "
@@ -101,7 +101,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                    );
   }
 
-  if (format.empty () || format == m_gds2_format_name || format == m_gds2text_format_name || format == m_oasis_format_name) {
+  if (format.empty () || format == gds2_format_name || format == gds2text_format_name || format == oasis_format_name) {
     cmd << tl::arg (group +
                     "!#--no-context-info",    &m_write_context_info, "Does not write context information",
                     "Context information is included to maintain PCell parameters and library connections. "
@@ -132,7 +132,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                   "* \"TOP,-A\" - Select cell TOP (plus children), then remove A (with children)"
                  );
 
-  if (format.empty () || format == m_gds2_format_name || format == m_gds2text_format_name) {
+  if (format.empty () || format == gds2_format_name || format == gds2text_format_name) {
 
     //  Add GDS2 and GDS2Text format options
     std::string group = "[Output options - GDS2 specific]";
@@ -186,7 +186,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
 
   }
 
-  if (format.empty () || format == m_oasis_format_name) {
+  if (format.empty () || format == oasis_format_name) {
 
     //  Add OASIS format options
     std::string group = "[Output options - OASIS specific]";
@@ -231,7 +231,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
 
   }
 
-  if (format.empty () || format == m_dxf_format_name) {
+  if (format.empty () || format == dxf_format_name) {
 
     //  Add DXF format options
     std::string group = "[Output options - DXF specific]";
@@ -248,7 +248,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
 
   }
 
-  if (format.empty () || format == m_cif_format_name) {
+  if (format.empty () || format == cif_format_name) {
 
     //  Add CIF format options
     std::string group = "[Output options - CIF specific]";

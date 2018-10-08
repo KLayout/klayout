@@ -21,9 +21,9 @@
 */
 
 #include "bdConverterMain.h"
-#include "dbDXFFormat.h"
+#include "bdWriterOptions.h"
 
 BD_PUBLIC int strm2dxf (int argc, char *argv[])
 {
-  return bd::converter_main (argc, argv, db::DXFWriterOptions ().format_name ());
+  return bd::converter_main (argc, argv, bd::GenericWriterOptions::dxf_format_name);
 }

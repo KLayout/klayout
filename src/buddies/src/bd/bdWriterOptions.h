@@ -65,7 +65,7 @@ public:
    */
   void add_options_for_gds2 (tl::CommandLineOptions &cmd)
   {
-    add_options (cmd, m_gds2_format_name);
+    add_options (cmd, gds2_format_name);
   }
 
   /**
@@ -73,7 +73,7 @@ public:
    */
   void add_options_for_oasis (tl::CommandLineOptions &cmd)
   {
-    add_options (cmd, m_oasis_format_name);
+    add_options (cmd, oasis_format_name);
   }
 
   /**
@@ -81,7 +81,7 @@ public:
    */
   void add_options_for_cif (tl::CommandLineOptions &cmd)
   {
-    add_options (cmd, m_cif_format_name);
+    add_options (cmd, cif_format_name);
   }
 
   /**
@@ -89,7 +89,7 @@ public:
    */
   void add_options_for_dxf (tl::CommandLineOptions &cmd)
   {
-    add_options (cmd, m_dxf_format_name);
+    add_options (cmd, dxf_format_name);
   }
 
   /**
@@ -97,6 +97,12 @@ public:
    *  The layout is required in order to derive the cell and layer ID's.
    */
   void configure (db::SaveLayoutOptions &save_options, const db::Layout &layout) const;
+
+  static const std::string gds2_format_name;
+  static const std::string gds2text_format_name;
+  static const std::string oasis_format_name;
+  static const std::string cif_format_name;
+  static const std::string dxf_format_name;
 
 private:
   double m_scale_factor;
@@ -128,12 +134,6 @@ private:
   bool m_cif_blank_separator;
 
   int m_dxf_polygon_mode;
-
-  static const std::string m_gds2_format_name;
-  static const std::string m_gds2text_format_name;
-  static const std::string m_oasis_format_name;
-  static const std::string m_cif_format_name;
-  static const std::string m_dxf_format_name;
 
   void set_oasis_substitution_char (const std::string &text);
 };

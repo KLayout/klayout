@@ -24,10 +24,6 @@
 #define HDR_bdWriterOptions
 
 #include "bdCommon.h"
-#include "dbGDS2Format.h"
-#include "dbOASISFormat.h"
-#include "dbDXFFormat.h"
-#include "dbCIFFormat.h"
 
 #include <string>
 
@@ -69,7 +65,7 @@ public:
    */
   void add_options_for_gds2 (tl::CommandLineOptions &cmd)
   {
-    add_options (cmd, m_gds2_writer_options.format_name ());
+    add_options (cmd, m_gds2_format_name);
   }
 
   /**
@@ -77,7 +73,7 @@ public:
    */
   void add_options_for_oasis (tl::CommandLineOptions &cmd)
   {
-    add_options (cmd, m_oasis_writer_options.format_name ());
+    add_options (cmd, m_oasis_format_name);
   }
 
   /**
@@ -85,7 +81,7 @@ public:
    */
   void add_options_for_cif (tl::CommandLineOptions &cmd)
   {
-    add_options (cmd, m_cif_writer_options.format_name ());
+    add_options (cmd, m_cif_format_name);
   }
 
   /**
@@ -93,7 +89,7 @@ public:
    */
   void add_options_for_dxf (tl::CommandLineOptions &cmd)
   {
-    add_options (cmd, m_dxf_writer_options.format_name ());
+    add_options (cmd, m_dxf_format_name);
   }
 
   /**
@@ -109,10 +105,35 @@ private:
   bool m_keep_instances;
   bool m_write_context_info;
   std::string m_cell_selection;
-  db::GDS2WriterOptions m_gds2_writer_options;
-  db::OASISWriterOptions m_oasis_writer_options;
-  db::CIFWriterOptions m_cif_writer_options;
-  db::DXFWriterOptions m_dxf_writer_options;
+
+  unsigned int m_gds2_max_vertex_count;
+  bool m_gds2_no_zero_length_paths;
+  bool m_gds2_multi_xy_records;
+  unsigned int m_gds2_max_cellname_length;
+  std::string m_gds2_libname;
+  double m_gds2_user_units;
+  bool m_gds2_write_timestamps;
+  bool m_gds2_write_cell_properties;
+  bool m_gds2_write_file_properties;
+
+  int m_oasis_compression_level;
+  bool m_oasis_write_cblocks;
+  bool m_oasis_strict_mode;
+  bool m_oasis_recompress;
+  bool m_oasis_permissive;
+  int m_oasis_write_std_properties;
+  std::string m_oasis_subst_char;
+
+  bool m_cif_dummy_calls;
+  bool m_cif_blank_separator;
+
+  int m_dxf_polygon_mode;
+
+  static const std::string m_gds2_format_name;
+  static const std::string m_gds2text_format_name;
+  static const std::string m_oasis_format_name;
+  static const std::string m_cif_format_name;
+  static const std::string m_dxf_format_name;
 
   void set_oasis_substitution_char (const std::string &text);
 };

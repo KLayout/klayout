@@ -26,6 +26,11 @@
 #include "tlUnitTest.h"
 #include "dbLayout.h"
 #include "dbCell.h"
+#include "dbSaveLayoutOptions.h"
+#include "dbCIFFormat.h"
+#include "dbDXFFormat.h"
+#include "dbOASISFormat.h"
+#include "dbGDS2Format.h"
 
 //  Testing writer options
 TEST(1)

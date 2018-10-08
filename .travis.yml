@@ -257,7 +257,6 @@ matrix:
 
 before_install:
   - env
-  - rvm install ruby --latest
   - gem install dropbox-deployment
   - eval "${MATRIX_EVAL}"
   - if [ "$BREW_BUNDLE" = true ]; then

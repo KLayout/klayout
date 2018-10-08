@@ -149,7 +149,7 @@ class Config(object):
             return []
         else:
             return ["-Wno-strict-aliasing",  # Avoids many "type-punned pointer" warnings
-                    "-std=c++0x",  # because we use unordered_map/unordered_set
+                    "-std=c++11",  # because we use unordered_map/unordered_set
                     ]
 
     def link_args(self, mod):

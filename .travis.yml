@@ -86,6 +86,7 @@ matrix:
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
         - CC=clang
+        - CXX=clang++
 
     - name: "klayout python3.6 package"
       os: linux

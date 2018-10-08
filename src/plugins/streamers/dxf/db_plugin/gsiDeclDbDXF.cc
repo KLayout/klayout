@@ -204,6 +204,8 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "\n"
     "This method has been added in version 0.25 and replaces the respective global option in \\LoadLayoutOptions "
     "in a format-specific fashion."
+    "\n"
+    "Python note: this method has been turned into a property in version 0.26."
   ) +
   gsi::method_ext ("dxf_create_other_layers?", &create_other_layers,
     "@brief Gets a value indicating whether other layers shall be created\n"

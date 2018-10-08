@@ -115,6 +115,8 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
     "@return A reference to the layer map\n"
     "\n"
     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
+    "\n"
+    "Python note: this method has been turned into a property in version 0.26."
   ) +
   gsi::method_ext ("create_other_layers?", &create_other_layers,
     "@brief Gets a value indicating whether other layers shall be created\n"

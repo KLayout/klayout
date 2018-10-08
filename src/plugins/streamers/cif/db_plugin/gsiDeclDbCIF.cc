@@ -129,7 +129,9 @@ gsi::ClassExt<db::LoadLayoutOptions> cif_reader_options (
       "@return A reference to the layer map\n"
       "\n"
       "This method has been added in version 0.25 and replaces the respective global option in \\LoadLayoutOptions "
-      "in a format-specific fashion."
+      "in a format-specific fashion.\n"
+      "\n"
+      "Python note: this method has been turned into a property in version 0.26."
     ) +
     gsi::method_ext ("cif_create_other_layers?", &create_other_layers,
       "@brief Gets a value indicating whether other layers shall be created\n"

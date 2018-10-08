@@ -31,14 +31,14 @@ class DBReadersTests(unittest.TestCase):
     lm.map(pya.LayerInfo(1, 0), 2, pya.LayerInfo(42, 17))
     opt.set_layer_map(lm, True)
 
-    self.assertEqual(opt.layer_map().to_string(), "1/0 : 42/17\n")
+    self.assertEqual(opt.layer_map.to_string(), "1/0 : 42/17\n")
     self.assertEqual(opt.create_other_layers, True)
 
     opt.create_other_layers = False
     self.assertEqual(opt.create_other_layers, False)
 
     opt.select_all_layers()
-    self.assertEqual(opt.layer_map().to_string(), "")
+    self.assertEqual(opt.layer_map.to_string(), "")
     self.assertEqual(opt.create_other_layers, True)
 
     opt.text_enabled = True
@@ -88,14 +88,14 @@ class DBReadersTests(unittest.TestCase):
     lm.map(pya.LayerInfo(1, 0), 2, pya.LayerInfo(42, 17))
     opt.dxf_set_layer_map(lm, True)
 
-    self.assertEqual(opt.dxf_layer_map().to_string(), "1/0 : 42/17\n")
+    self.assertEqual(opt.dxf_layer_map.to_string(), "1/0 : 42/17\n")
     self.assertEqual(opt.dxf_create_other_layers, True)
 
     opt.dxf_create_other_layers = False
     self.assertEqual(opt.dxf_create_other_layers, False)
 
     opt.dxf_select_all_layers()
-    self.assertEqual(opt.dxf_layer_map().to_string(), "")
+    self.assertEqual(opt.dxf_layer_map.to_string(), "")
     self.assertEqual(opt.dxf_create_other_layers, True)
 
     opt.dxf_dbu = 0.5
@@ -144,14 +144,14 @@ class DBReadersTests(unittest.TestCase):
     lm.map(pya.LayerInfo(1, 0), 2, pya.LayerInfo(42, 17))
     opt.cif_set_layer_map(lm, True)
 
-    self.assertEqual(opt.cif_layer_map().to_string(), "1/0 : 42/17\n")
+    self.assertEqual(opt.cif_layer_map.to_string(), "1/0 : 42/17\n")
     self.assertEqual(opt.cif_create_other_layers, True)
 
     opt.cif_create_other_layers = False
     self.assertEqual(opt.cif_create_other_layers, False)
 
     opt.cif_select_all_layers()
-    self.assertEqual(opt.cif_layer_map().to_string(), "")
+    self.assertEqual(opt.cif_layer_map.to_string(), "")
     self.assertEqual(opt.cif_create_other_layers, True)
 
     opt.cif_keep_layer_names = True

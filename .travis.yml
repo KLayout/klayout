@@ -99,6 +99,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
     
     - name: "klayout python2.7 package"
       os: linux
@@ -111,6 +113,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
     
     - name: "klayout python2.6 package"
       os: linux
@@ -123,6 +127,8 @@ matrix:
         - PIP_UPDATE="0"  # setuptools installed from last pip has syntax error on py 2.6
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
     
     - name: "klayout python3.3 package"
       os: linux
@@ -135,6 +141,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
     
     - name: "klayout python3.4 package"
       os: linux
@@ -147,6 +155,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
     
     - name: "klayout python3.5 package"
       os: linux
@@ -159,6 +169,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
 
     # KLayout builds for mac
     # Python 3

@@ -74,6 +74,19 @@ matrix:
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
     
+    - name: "klayout python3.7 package"
+      os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '3.7-dev'
+      env:
+        - MATRIX_EVAL=""
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+        - CC=clang
+
     - name: "klayout python3.6 package"
       os: linux
       dist: trusty # Ubuntu 14.04

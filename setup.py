@@ -191,7 +191,7 @@ class Config(object):
         """
         Gets the version string
         """
-        return "0.26.0.dev1"
+        return "0.26.0.dev2"
 
 
 config = Config()
@@ -201,13 +201,15 @@ config = Config()
 
 _tl_path = os.path.join("src", "tl", "tl")
 
-_tl_sources = glob.glob(os.path.join(_tl_path, "*.cc"))
+_tl_sources = set(glob.glob(os.path.join(_tl_path, "*.cc")))
 
 # Exclude sources which are compatible with Qt only
-_tl_sources.remove(os.path.join(_tl_path, "tlHttpStreamQt.cc"))
-_tl_sources.remove(os.path.join(_tl_path, "tlHttpStreamNoQt.cc"))
-_tl_sources.remove(os.path.join(_tl_path, "tlFileSystemWatcher.cc"))
-_tl_sources.remove(os.path.join(_tl_path, "tlDeferredExecutionQt.cc"))
+# Caveat, in source distribution tarballs from pypi, these files will
+# not exist. So we need an error-free discard method instead of list's remove.
+_tl_sources.discard(os.path.join(_tl_path, "tlHttpStreamQt.cc"))
+_tl_sources.discard(os.path.join(_tl_path, "tlHttpStreamNoQt.cc"))
+_tl_sources.discard(os.path.join(_tl_path, "tlFileSystemWatcher.cc"))
+_tl_sources.discard(os.path.join(_tl_path, "tlDeferredExecutionQt.cc"))
 
 _tl = Extension(config.root + '._tl',
                 define_macros=config.macros() + [('MAKE_TL_LIBRARY', 1)],
@@ -215,7 +217,7 @@ _tl = Extension(config.root + '._tl',
                 libraries=['curl', 'expat'],
                 extra_link_args=config.link_args('_tl'),
                 extra_compile_args=config.compile_args('_tl'),
-                sources=_tl_sources)
+                sources=list(_tl_sources))
 
 # ------------------------------------------------------------------
 # _gsi dependency library
@@ -249,10 +251,12 @@ _pya = Extension(config.root + '._pya',
 # _db dependency library
 
 _db_path = os.path.join("src", "db", "db")
-_db_sources = glob.glob(os.path.join(_db_path, "*.cc"))
+_db_sources = set(glob.glob(os.path.join(_db_path, "*.cc")))
 
 # Not a real source:
-_db_sources.remove(os.path.join(_db_path, "fonts.cc"))
+# Caveat, in source distribution tarballs from pypi, these files will
+# not exist. So we need an error-free discard method instead of list's remove.
+_db_sources.discard(os.path.join(_db_path, "fonts.cc"))
 
 _db = Extension(config.root + '._db',
                 define_macros=config.macros() + [('MAKE_DB_LIBRARY', 1)],
@@ -261,7 +265,7 @@ _db = Extension(config.root + '._db',
                 language='c++',
                 extra_link_args=config.link_args('_db'),
                 extra_compile_args=config.compile_args('_db'),
-                sources=_db_sources)
+                sources=list(_db_sources))
 
 # ------------------------------------------------------------------
 # _rdb dependency library

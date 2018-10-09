@@ -31,6 +31,51 @@ namespace gsi
 {
 
 // ---------------------------------------------------------------
+//  gsi Implementation of specific methods of LoadLayoutOptions
+
+static void set_oasis_read_all_properties (db::LoadLayoutOptions *options, bool f)
+{
+  options->get_options<db::OASISReaderOptions> ().read_all_properties = f;
+}
+
+static int get_oasis_read_all_properties (const db::LoadLayoutOptions *options)
+{
+  return options->get_options<db::OASISReaderOptions> ().read_all_properties;
+}
+
+static void set_oasis_expect_strict_mode (db::LoadLayoutOptions *options, int f)
+{
+  options->get_options<db::OASISReaderOptions> ().expect_strict_mode = f;
+}
+
+static int get_oasis_expect_strict_mode (const db::LoadLayoutOptions *options)
+{
+  return options->get_options<db::OASISReaderOptions> ().expect_strict_mode;
+}
+
+//  extend lay::LoadLayoutOptions with the OASIS options
+static
+gsi::ClassExt<db::LoadLayoutOptions> oasis_reader_options (
+  gsi::method_ext ("oasis_read_all_properties=", &set_oasis_read_all_properties,
+    //  this method is mainly provided as access point for the generic interface
+    "@hide"
+  ) +
+  gsi::method_ext ("oasis_read_all_properties?", &get_oasis_read_all_properties,
+    //  this method is mainly provided as access point for the generic interface
+    "@hide"
+  ) +
+  gsi::method_ext ("oasis_expect_strict_mode=", &set_oasis_expect_strict_mode,
+    //  this method is mainly provided as access point for the generic interface
+    "@hide"
+  ) +
+  gsi::method_ext ("oasis_expect_strict_mode?", &get_oasis_expect_strict_mode,
+    //  this method is mainly provided as access point for the generic interface
+    "@hide"
+  ),
+  ""
+);
+
+// ---------------------------------------------------------------
 //  gsi Implementation of specific methods
 
 static void set_oasis_compression (db::SaveLayoutOptions *options, int comp)
@@ -76,6 +121,16 @@ static void set_oasis_write_std_properties (db::SaveLayoutOptions *options, bool
 static bool get_oasis_write_std_properties (const db::SaveLayoutOptions *options)
 {
   return options->get_options<db::OASISWriterOptions> ().write_std_properties != 0;
+}
+
+static void set_oasis_write_std_properties_ext (db::SaveLayoutOptions *options, int f)
+{
+  options->get_options<db::OASISWriterOptions> ().write_std_properties = f;
+}
+
+static int get_oasis_write_std_properties_ext (const db::SaveLayoutOptions *options)
+{
+  return options->get_options<db::OASISWriterOptions> ().write_std_properties;
 }
 
 static void set_oasis_write_cell_bounding_boxes (db::SaveLayoutOptions *options, bool f)
@@ -221,6 +276,14 @@ gsi::ClassExt<db::SaveLayoutOptions> oasis_writer_options (
     "See \\oasis_write_std_properties= method for a description of this flag."
     "\n"
     "This method has been introduced in version 0.24."
+  ) +
+  gsi::method_ext ("oasis_write_std_properties_ext=", &set_oasis_write_std_properties_ext,
+    //  this method is mainly provided as access point for the generic interface
+    "@hide"
+  ) +
+  gsi::method_ext ("oasis_write_std_properties_ext", &get_oasis_write_std_properties_ext,
+    //  this method is mainly provided as access point for the generic interface
+    "@hide"
   ) +
   gsi::method_ext ("oasis_compression_level=", &set_oasis_compression,
     "@brief Set the OASIS compression level\n"

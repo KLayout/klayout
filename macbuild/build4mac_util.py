@@ -59,15 +59,18 @@ def DecomposeLibraryDependency( depstr ):
 # @param[in] depdic  dictionary
 # @param[in] namedic dictionary name
 #------------------------------------------------------------------------------
-def PrintLibraryDependencyDictionary( depdic, namedic ):
+def PrintLibraryDependencyDictionary( depdic, pathdic, namedic ):
   keys = depdic.keys()
   print("")
   print("##### Contents of <%s> #####:" % namedic )
   for key in keys:
     supporters = depdic[key]
-    print( " %s:" % key )
+    keyName = os.path.basename(key)
+    print( " %s: (%s)" % (key, pathdic[keyName]) )
     for item in supporters:
-      print( "    %s" % item )
+      itemName = os.path.basename(item)
+      if itemName != keyName and (itemName in pathdic):
+        print( "    %s (%s)" % (item, pathdic[itemName]) )
 
 #------------------------------------------------------------------------------
 ## To set and change identification name of KLayout's dylib
@@ -76,7 +79,7 @@ def PrintLibraryDependencyDictionary( depdic, namedic ):
 #
 # @return 0 on success; non-zero on failure
 #------------------------------------------------------------------------------
-def SetChangeIdentificationNameOfDyLib( libdic ):
+def SetChangeIdentificationNameOfDyLib( libdic, pathDic ):
   cmdNameId     = XcodeToolChain['nameID']
   cmdNameChg    = XcodeToolChain['nameCH']
   dependentLibs = libdic.keys()
@@ -86,7 +89,8 @@ def SetChangeIdentificationNameOfDyLib( libdic ):
     # [1] Set the identification name of each dependent library
     #-----------------------------------------------------------
     nameOld = "%s" % lib
-    nameNew = "@executable_path/../Frameworks/%s" % lib
+    libName = os.path.basename(lib)
+    nameNew = pathDic[libName]
     command = "%s %s %s" % ( cmdNameId, nameNew, nameOld )
     if subprocess.call( command, shell=True ) != 0:
       msg = "!!! Failed to set the new identification name to <%s> !!!"
@@ -98,13 +102,15 @@ def SetChangeIdentificationNameOfDyLib( libdic ):
     #-------------------------------------------------------------------------
     supporters = libdic[lib]
     for sup in supporters:
-      nameOld = "%s" % sup
-      nameNew = "@executable_path/../Frameworks/%s" % sup
-      command = "%s %s %s %s" % ( cmdNameChg, nameOld, nameNew, lib )
-      if subprocess.call( command, shell=True ) != 0:
-        msg = "!!! Failed to make the library aware of the new identification name <%s> of supporter <%s> !!!"
-        print( msg % (nameNew, sup), file=sys.stderr )
-        return 1
+      supName = os.path.basename(sup)
+      if libName != supName and (supName in pathDic):
+        nameOld = "%s" % sup
+        nameNew = pathDic[supName]
+        command = "%s %s %s %s" % ( cmdNameChg, nameOld, nameNew, lib )
+        if subprocess.call( command, shell=True ) != 0:
+          msg = "!!! Failed to make the library aware of the new identification name <%s> of supporter <%s> !!!"
+          print( msg % (nameNew, sup), file=sys.stderr )
+          return 1
   # for-lib
   return 0
 

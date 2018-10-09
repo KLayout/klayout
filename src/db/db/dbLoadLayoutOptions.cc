@@ -25,6 +25,7 @@
 #include "dbStream.h"
 #include "tlClassRegistry.h"
 #include "tlStream.h"
+#include "tlExpression.h"
 
 namespace db
 {
@@ -104,6 +105,35 @@ namespace db
     } else {
       return 0;
     }
+  }
+
+  void
+  LoadLayoutOptions::set_option_by_name (const std::string &method, const tl::Variant &value)
+  {
+    //  Utilizes the GSI binding to set the values
+    tl::Variant options_ref = tl::Variant::make_variant_ref (this);
+    const tl::EvalClass *eval_cls = options_ref.user_cls ()->eval_cls ();
+    tl::ExpressionParserContext context;
+
+    tl::Variant out;
+    std::vector<tl::Variant> args;
+    args.push_back (value);
+    eval_cls->execute (context, out, options_ref, method + "=", args);
+  }
+
+  tl::Variant
+  LoadLayoutOptions::get_option_by_name (const std::string &method)
+  {
+    //  Utilizes the GSI binding to set the values
+    tl::Variant options_ref = tl::Variant::make_variant_ref (this);
+    const tl::EvalClass *eval_cls = options_ref.user_cls ()->eval_cls ();
+    tl::ExpressionParserContext context;
+
+    tl::Variant out;
+    std::vector<tl::Variant> args;
+    eval_cls->execute (context, out, options_ref, method, args);
+
+    return out;
   }
 }
 

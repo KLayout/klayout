@@ -25,6 +25,7 @@
 
 #include "dbSaveLayoutOptions.h"
 #include "dbLoadLayoutOptions.h"
+#include "dbPluginCommon.h"
 
 namespace db
 {
@@ -34,7 +35,7 @@ namespace db
  *  NOTE: this structure is non-public linkage by intention. This way it's instantiated
  *  in all compile units and the shared object does not need to be linked.
  */
-class CIFReaderOptions
+class DB_PLUGIN_PUBLIC CIFReaderOptions
   : public FormatSpecificReaderOptions
 {
 public:
@@ -118,7 +119,7 @@ public:
  *  NOTE: this structure is non-public linkage by intention. This way it's instantiated
  *  in all compile units and the shared object does not need to be linked.
  */
-class CIFWriterOptions
+class DB_PLUGIN_PUBLIC CIFWriterOptions
   : public FormatSpecificWriterOptions
 {
 public:

@@ -33,6 +33,8 @@
 #include "dbStreamLayers.h"
 
 #include "gsiObject.h"
+#include "gsiClass.h"
+#include "tlVariant.h"
 
 namespace db
 {
@@ -181,6 +183,22 @@ public:
    *  This is the non-const version.
    */
   FormatSpecificReaderOptions *get_options (const std::string &name);
+
+  /**
+   *  @brief Sets a layout reader option by name
+   *
+   *  The name is taken to be a GSI method which is called to set the
+   *  option. For example, setting "gds2_unit", the method "gds2_unit=" is
+   *  called with the given value.
+   */
+  void set_option_by_name (const std::string &name, const tl::Variant &value);
+
+  /**
+   *  @brief Gets a layout reader option by name
+   *
+   *  See "set_option_by_name" for details.
+   */
+  tl::Variant get_option_by_name (const std::string &name);
 
 private:
   std::map <std::string, FormatSpecificReaderOptions *> m_options;

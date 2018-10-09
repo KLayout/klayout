@@ -380,48 +380,6 @@ main_cont (int &argc, char **argv)
     pya::PythonInterpreter::initialize ();
     gsi::initialize_external ();
 
-#if defined(HAVE_QT)
-
-    //  NOTE: we need an application object, but we don't call parse_cmd. This makes the object
-    //  behave neutral as far as possible.
-    lay::GuiApplication app (argc, argv);
-    app.init_app ();
-
-    app.ruby_interpreter ().push_console (&console);
-    app.python_interpreter ().push_console (&console);
-
-    app.autorun ();
-
-#if QT_VERSION < 0x050000
-    QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
-#endif
-
-#else
-
-    //  select the system locale
-    setlocale (LC_ALL, "");
-
-    //  initialize the modules (load their plugins from the paths)
-    db::init ();
-
-    //  initialize the GSI class system (Variant binding, Expression support)
-    //  We have to do this now since plugins may register GSI classes and before the
-    //  ruby interpreter, because it depends on a proper class system.
-    gsi::initialize ();
-
-    //  initialize the tl::Expression subsystem with GSI-bound classes
-    gsi::initialize_expressions ();
-
-    //  instantiate the interpreters
-
-    ruby_interpreter.reset (new rba::RubyInterpreter ());
-    ruby_interpreter->push_console (&console);
-
-    python_interpreter.reset (new pya::PythonInterpreter ());
-    python_interpreter->push_console (&console);
-
-#endif
-
     //  Search and initialize plugin unit tests
 
     std::string inst_dir = tl::get_inst_path ();
@@ -463,6 +421,48 @@ main_cont (int &argc, char **argv)
     if (! tl::TestRegistrar::instance()) {
       throw tl::Exception ("No test libraries found - make sure, the *.ut files are next to the ut_runner executable.");
     }
+
+#if defined(HAVE_QT)
+
+    //  NOTE: we need an application object, but we don't call parse_cmd. This makes the object
+    //  behave neutral as far as possible.
+    lay::GuiApplication app (argc, argv);
+    app.init_app ();
+
+    app.ruby_interpreter ().push_console (&console);
+    app.python_interpreter ().push_console (&console);
+
+    app.autorun ();
+
+#if QT_VERSION < 0x050000
+    QTextCodec::setCodecForTr (QTextCodec::codecForName ("utf8"));
+#endif
+
+#else
+
+    //  select the system locale
+    setlocale (LC_ALL, "");
+
+    //  initialize the modules (load their plugins from the paths)
+    db::init ();
+
+    //  initialize the GSI class system (Variant binding, Expression support)
+    //  We have to do this now since plugins may register GSI classes and before the
+    //  ruby interpreter, because it depends on a proper class system.
+    gsi::initialize ();
+
+    //  initialize the tl::Expression subsystem with GSI-bound classes
+    gsi::initialize_expressions ();
+
+    //  instantiate the interpreters
+
+    ruby_interpreter.reset (new rba::RubyInterpreter ());
+    ruby_interpreter->push_console (&console);
+
+    python_interpreter.reset (new pya::PythonInterpreter ());
+    python_interpreter->push_console (&console);
+
+#endif
 
     bool editable = false, non_editable = false;
     bool gsi_coverage = false;

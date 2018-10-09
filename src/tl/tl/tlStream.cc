@@ -966,10 +966,17 @@ InputPipe::~InputPipe ()
 void
 InputPipe::close ()
 {
+  wait ();
+}
+
+int InputPipe::wait ()
+{
+  int ret = 0;
   if (m_file != NULL) {
-    fclose (m_file);
+    ret = pclose (m_file);
     m_file = NULL;
   }
+  return ret;
 }
 
 size_t 

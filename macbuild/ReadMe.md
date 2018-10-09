@@ -31,7 +31,7 @@ Also by default, supported script languages, i.e, Ruby and Python, are those sta
 You may want to use a non-OS-standard script language such as Python 3.6 from Anaconda2 (https://www.anaconda.com/download/#macos) in combination with KLayout.
 
 Since Anaconda2 is a popular Python development environment, this is worth trying. Unfortunately, however, some dynamic linkage problems are observed as of today. 
-On the other hand, Python 3.6 provided by MacPorts or Homebrew is usable.
+On the other hand, Python 3.7 provided by MacPorts or Homebrew is usable.
 Please try this (refer to 3B below or Section #5) if you feel it's useful.
 
 # 3. Use-cases
@@ -90,20 +90,20 @@ $ ./makeDMG4mac.py -p qt5.pkg.macos-HighSierra-release -m
 
 
 # 5. Alternative building options
-### 5.1 Python 3.6 from Homebrew, Qt 5.10.1 from Homebrew
+### 5.1 Python 3.7 from Homebrew, Qt 5.10.1 from Homebrew
 
 Homebrew's installation of python3 (`brew install python3`) places a `Python.framework` in `/usr/local/opt/python/Frameworks/Python.framework/`, which you can use to build KLayout from. Qt can also be downloaded from brew with `brew install qt`.
 
 ```
 # Build step
-./build4mac.py -p B36 -q Qt5Brew
+./build4mac.py -p B37 -q Qt5Brew
 # build with log
-./build4mac.py -p B36 -q Qt5Brew 2>&1 | tee qt5.build.macos-HighSierra-release-version.log
+./build4mac.py -p B37 -q Qt5Brew 2>&1 | tee qt5.build.macos-HighSierra-release-version.log
 
 
 # Deploy step
-./build4mac.py -p B36 -q Qt5Brew -y  # normal deploy
-./build4mac.py -p B36 -q Qt5Brew -y -v 3 2>&1 | tee qt5.pkg.macos-HighSierra-release.log  # deploy with debug options
+./build4mac.py -p B37 -q Qt5Brew -y  # normal deploy
+./build4mac.py -p B37 -q Qt5Brew -y -v 3 2>&1 | tee qt5.pkg.macos-HighSierra-release.log  # deploy with debug options
 
 # Packaging step
 ./makeDMG4mac.py -p qt5.pkg.macos-HighSierra-release -m -q Qt5101

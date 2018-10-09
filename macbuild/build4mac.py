@@ -67,7 +67,7 @@ def SetGlobals():
   Usage += "                        : Refer to 'macbuild/build4mac_env.py' for details           | \n"
   Usage += "   [-q|--qt <type>]     : type=['Qt4MacPorts', 'Qt5MacPorts', 'Qt5Brew']             | qt5macports \n"
   Usage += "   [-r|--ruby <type>]   : type=['nil', 'Sys', 'Src24', 'MP24', 'B25']                | sys \n"
-  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B36']       | sys \n"
+  Usage += "   [-p|--python <type>] : type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37']       | sys \n"
   Usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                  | disabled \n"
   Usage += "   [-m|--make <option>] : option passed to 'make'                                    | -j4 \n"
   Usage += "   [-d|--debug]         : enable debug mode build                                    | disabled \n"
@@ -175,7 +175,7 @@ def ParseCommandLineArguments():
 
   p.add_option( '-p', '--python',
                 dest='type_python',
-                help="Python type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36']" )
+                help="Python type=['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37']" )
 
   p.add_option( '-n', '--noqtbinding',
                 action='store_true',
@@ -294,7 +294,7 @@ def ParseCommandLineArguments():
     exit()
 
   # Determine Python type
-  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B36'] ]
+  candidates   = [ i.upper() for i in ['nil', 'Sys', 'Ana27', 'Ana36', 'MP36', 'B37'] ]
   ModulePython = ""
   index        = 0
   for item in candidates:
@@ -324,7 +324,7 @@ def ParseCommandLineArguments():
         ModulePython = 'Python36MacPorts'
         NonOSStdLang = True
       elif index == 5:
-        ModulePython = 'Python36Brew'
+        ModulePython = 'Python37Brew'
         NonOSStdLang = True
     else:
       index += 1
@@ -581,6 +581,10 @@ def DeployBinariesForBundle():
   #                             |              +-- '*.dylib'
   #                             +-- MacOS/+
   #                             |         +-- 'klayout'
+  #                             |         +-- 'db_plugins'/+
+  #                             |                          +-- '*.dylib'
+  #                             |         +-- 'lay_plugins'/+
+  #                             |                           +-- '*.dylib'
   #                             +-- Buddy/+
   #                                       +-- 'strm2cif'
   #                                       +-- 'strm2dxf'
@@ -631,8 +635,9 @@ def DeployBinariesForBundle():
   #       :
   #-------------------------------------------------------------------------------
   os.chdir( targetDirF )
-  dynamicLinkLibs = glob.glob( AbsMacBinDir + "/*.dylib" )
+  dynamicLinkLibs = glob.glob( os.path.join( AbsMacBinDir, "*.dylib" ) )
   depDicOrdinary  = {} # inter-library dependency dictionary
+  pathDic = {} # paths to insert for each library
   for item in dynamicLinkLibs:
     if os.path.isfile(item) and not os.path.islink(item):
       #-------------------------------------------------------------------
@@ -646,13 +651,54 @@ def DeployBinariesForBundle():
       os.chmod( nameStyle3, 0o0755 )
       #-------------------------------------------------------------------
       # (B) Then get inter-library dependencies
+      #     Note that will pull all dependencies and sort them out later
+      #     dropping those which don't have a path entry
       #-------------------------------------------------------------------
-      otoolCm   = "otool -L %s | grep libklayout" % nameStyle3
+      otoolCm   = "otool -L %s | grep dylib" % nameStyle3
       otoolOut  = os.popen( otoolCm ).read()
       dependDic = DecomposeLibraryDependency(otoolOut)
       depDicOrdinary.update(dependDic)
+      #-------------------------------------------------------------------
+      # (C) This library goes into Frameworks, hence record it's path there
+      #-------------------------------------------------------------------
+      pathDic[nameStyle3] = "@executable_path/../Frameworks/" + nameStyle3
+
+  os.chdir(ProjectDir)
+  #-------------------------------------------------------------------
+  # copy the contents of the plugin directories to a place next to the application
+  # binary
+  #-------------------------------------------------------------------
+  for piDir in [ "db_plugins", "lay_plugins" ]:
+    os.makedirs( os.path.join( targetDirM, piDir ))
+    dynamicLinkLibs = glob.glob( os.path.join( MacBinDir, piDir, "*.dylib" ) )
+    for item in dynamicLinkLibs:
+      if os.path.isfile(item) and not os.path.islink(item):
+        #-------------------------------------------------------------------
+        # (A) Copy an ordinary *.dylib file here by changing the name
+        #     to style (3) and set its mode to 0755 (sanity check).
+        #-------------------------------------------------------------------
+        fullName = os.path.basename(item).split('.')
+        # e.g. [ 'libklayout_lay', '0', '25', '0', 'dylib' ]
+        nameStyle3 = fullName[0] + "." + fullName[1] + ".dylib"
+        destPath = os.path.join( targetDirM, piDir, nameStyle3 )
+        shutil.copy2( item, destPath )
+        os.chmod( destPath, 0o0755 )
+        #-------------------------------------------------------------------
+        # (B) Then get inter-library dependencies
+        #     Note that will pull all dependencies and sort them out later
+        #     dropping those which don't have a path entry
+        #-------------------------------------------------------------------
+        otoolCm   = "otool -L %s | grep 'dylib'" % destPath
+        otoolOut  = os.popen( otoolCm ).read()
+        dependDic = DecomposeLibraryDependency(otoolOut)
+        depDicOrdinary.update(dependDic)
+        #-------------------------------------------------------------------
+        # (C) This library goes into the plugin dir
+        #-------------------------------------------------------------------
+        pathDic[nameStyle3] = "@executable_path/" + piDir + "/" + nameStyle3
+
   '''
-  PrintLibraryDependencyDictionary( depDicOrdinary, "Style (3)" )
+  PrintLibraryDependencyDictionary( depDicOrdinary, pathDic, "Style (3)" )
   exit()
   '''
 
@@ -662,7 +708,8 @@ def DeployBinariesForBundle():
   #     and make the library aware of the locations of libraries
   #     on which it depends; that is, inter-library dependency
   #-------------------------------------------------------------
-  ret = SetChangeIdentificationNameOfDyLib( depDicOrdinary )
+  os.chdir( targetDirF )
+  ret = SetChangeIdentificationNameOfDyLib( depDicOrdinary, pathDic )
   if not ret == 0:
     msg = "!!! Failed to set and change to new identification names !!!"
     print(msg)
@@ -690,7 +737,6 @@ def DeployBinariesForBundle():
   shutil.copy2( sourceDir0 + "/PkgInfo",      targetDir0 ) # this file is not mandatory
   shutil.copy2( sourceDir1 + "/klayout",      targetDirM )
   shutil.copy2( sourceDir2 + "/klayout.icns", targetDirR )
-
 
   os.chmod( targetDir0 + "/PkgInfo",      0o0644 )
   os.chmod( targetDir0 + "/Info.plist",   0o0644 )
@@ -765,12 +811,12 @@ def DeployBinariesForBundle():
 
     deploymentPython = True
     if deploymentPython and NonOSStdLang:
-      from build4mac_util import WalkFrameworkPaths, PerformChanges, DetectChanges
+      from build4mac_util import WalkFrameworkPaths, PerformChanges
 
       bundlePath = AbsMacPkgDir + '/klayout.app'
       # bundlePath = os.getcwd() + '/qt5.pkg.macos-HighSierra-release/klayout.app'
       bundleExecPathAbs = '%s/Contents/MacOS/' % bundlePath
-      pythonOriginalFrameworkPath = '/usr/local/opt/python3/Frameworks/Python.framework'
+      pythonOriginalFrameworkPath = '/usr/local/opt/python/Frameworks/Python.framework'
       pythonFrameworkPath = '%s/Contents/Frameworks/Python.framework' % bundlePath
 
       print(" [8.1] Deploying Python from %s ..." % pythonOriginalFrameworkPath)
@@ -1012,8 +1058,6 @@ def main():
 
     if not ret2 == 0:
       sys.exit(1)
-    else:
-      sys.exit(0)
 
 #===================================================================================
 if __name__ == "__main__":

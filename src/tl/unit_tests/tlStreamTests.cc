@@ -20,10 +20,25 @@
 
 */
 
-#include "bdConverterMain.h"
-#include "bdWriterOptions.h"
+#include "tlStream.h"
+#include "tlUnitTest.h"
 
-BD_PUBLIC int strm2dxf (int argc, char *argv[])
+TEST(InputPipe1)
 {
-  return bd::converter_main (argc, argv, bd::GenericWriterOptions::dxf_format_name);
+  tl::InputPipe pipe ("echo HELLOWORLD");
+  tl::InputStream str (pipe);
+  tl::TextInputStream tstr (str);
+  EXPECT_EQ (tstr.get_line (), "HELLOWORLD");
+  EXPECT_EQ (pipe.wait (), 0);
+}
+
+TEST(InputPipe2)
+{
+  tl::InputPipe pipe ("thiscommanddoesnotexistithink 2>&1");
+  tl::InputStream str (pipe);
+  tl::TextInputStream tstr (str);
+  tstr.get_line ();
+  int ret = pipe.wait ();
+  tl::info << "Process exit code: " << ret;
+  EXPECT_NE (ret, 0);
 }

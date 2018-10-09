@@ -38,6 +38,11 @@ static void set_layer_map (db::LoadLayoutOptions *options, const db::LayerMap &l
   options->get_options<db::CommonReaderOptions> ().create_other_layers = f;
 }
 
+static void set_layer_map1 (db::LoadLayoutOptions *options, const db::LayerMap &lm)
+{
+  options->get_options<db::CommonReaderOptions> ().layer_map = lm;
+}
+
 static db::LayerMap &get_layer_map (db::LoadLayoutOptions *options)
 {
   return options->get_options<db::CommonReaderOptions> ().layer_map;
@@ -91,6 +96,12 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
     "\n"
     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
   ) +
+  gsi::method_ext ("layer_map=", &set_layer_map1, gsi::arg ("map"),
+    "@brief Sets the layer map, but does not affect the \"create_other_layers\" flag.\n"
+    "@param map The layer map to set."
+    "\n"
+    "This convenience method has been introduced with version 0.26."
+  ) +
   gsi::method_ext ("select_all_layers", &select_all_layers,
     "@brief Selects all layers and disables the layer map\n"
     "\n"
@@ -104,6 +115,8 @@ gsi::ClassExt<db::LoadLayoutOptions> common_reader_options (
     "@return A reference to the layer map\n"
     "\n"
     "Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration."
+    "\n"
+    "Python note: this method has been turned into a property in version 0.26."
   ) +
   gsi::method_ext ("create_other_layers?", &create_other_layers,
     "@brief Gets a value indicating whether other layers shall be created\n"

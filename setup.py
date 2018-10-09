@@ -191,7 +191,8 @@ class Config(object):
         """
         Gets the version string
         """
-        return "0.26"
+        return "0.26.0.dev1"
+
 
 config = Config()
 
@@ -345,11 +346,14 @@ rdb = Extension(config.root + '.rdb',
 # Core setup function
 
 if __name__ == '__main__':
-    setup(name = config.root,
-          version =                 config.version(),
-          description =             'KLayout standalone Python package',
-          author =                  'Matthias Koefferlein',
-          author_email =            'matthias@klayout.de',
-          packages =                [config.root],
-          package_dir =             {config.root: 'src/pymod/distutils_src'},
-          ext_modules =             [_tl, _gsi, _pya, _db, _rdb] + db_plugins + [tl, db, rdb])
+    setup(name=config.root,
+          version=config.version(),
+          license='GNU GPLv3',
+          description='KLayout standalone Python package',
+          long_description='TODO',
+          author='Matthias Koefferlein',
+          author_email='matthias@klayout.de',
+          url='https://github.com/klayoutmatthias/klayout',
+          packages=[config.root],
+          package_dir={config.root: 'src/pymod/distutils_src'},
+          ext_modules=[_tl, _gsi, _pya, _db, _rdb] + db_plugins + [tl, db, rdb])

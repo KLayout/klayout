@@ -25,10 +25,6 @@
 
 #include "bdCommon.h"
 #include "dbCommonReader.h"
-#include "dbGDS2Format.h"
-#include "dbOASISFormat.h"
-#include "dbDXFFormat.h"
-#include "dbCIFFormat.h"
 
 #include <string>
 
@@ -99,13 +95,40 @@ public:
 
 private:
   std::string m_prefix, m_long_prefix, m_group_prefix;
+
+  //  generic
   db::LayerMap m_layer_map;
   bool m_create_other_layers;
-  db::CommonReaderOptions m_common_reader_options;
-  db::GDS2ReaderOptions m_gds2_reader_options;
-  db::OASISReaderOptions m_oasis_reader_options;
-  db::CIFReaderOptions m_cif_reader_options;
-  db::DXFReaderOptions m_dxf_reader_options;
+
+  //  common GDS2+OASIS
+  bool m_common_enable_text_objects;
+  bool m_common_enable_properties;
+
+  //  GDS2
+  unsigned int m_gds2_box_mode;
+  bool m_gds2_allow_big_records;
+  bool m_gds2_allow_multi_xy_records;
+
+  //  OASIS
+  bool m_oasis_read_all_properties;
+  int m_oasis_expect_strict_mode;
+
+  //  CIF
+  unsigned int m_cif_wire_mode;
+  double m_cif_dbu;
+  bool m_cif_keep_layer_names;
+
+  //  DXF
+  double m_dxf_dbu;
+  double m_dxf_unit;
+  double m_dxf_text_scaling;
+  int m_dxf_polyline_mode;
+  int m_dxf_circle_points;
+  double m_dxf_circle_accuracy;
+  double m_dxf_contour_accuracy;
+  bool m_dxf_render_texts_as_polygons;
+  bool m_dxf_keep_layer_names;
+  bool m_dxf_keep_other_cells;
 
   void set_layer_map (const std::string &lm);
   void set_dbu (double dbu);

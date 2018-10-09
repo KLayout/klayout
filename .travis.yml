@@ -232,6 +232,7 @@ script:
         python setup.py build;
         python setup.py bdist_wheel;
         python setup.py install;
+        python test-klayout-db-plugins.py;
         mkdir -p deploy/dist-pymod;
         cp -a dist/* deploy/dist-pymod/;
         python -c 'import klayout.db as db; print(dir(db))';

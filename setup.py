@@ -60,9 +60,9 @@ import os
 import platform
 import distutils.sysconfig as sysconfig
 from distutils.errors import CompileError
+import distutils.command.build_ext
 import multiprocessing
 N_cores = multiprocessing.cpu_count()
-
 
 # monkey-patch for parallel compilation
 # from https://stackoverflow.com/questions/11013851/speeding-up-build-process-with-distutils
@@ -103,6 +103,24 @@ if sys.version_info[0] * 10 + sys.version_info[1] > 26:
     import distutils.ccompiler
     distutils.ccompiler.CCompiler.compile = parallelCCompile
 
+
+from distutils.command.build_ext import build_ext
+_old_get_ext_filename = build_ext.get_ext_filename
+
+
+def patched_get_ext_filename(self, ext_name):
+    r"""Convert the name of an extension (eg. "foo.bar") into the name
+    of the file from which it will be loaded (eg. "foo/bar.so", or
+    "foo\bar.pyd").
+    """
+    filename = _old_get_ext_filename(self, ext_name)
+    # Making sure this matches qmake's default extension .dylib, instead of .so
+    if platform.system() == "Darwin" and '_dbpi' in ext_name:
+        filename = filename.replace('.so', '.dylib')
+    return filename
+
+
+distutils.command.build_ext.build_ext.get_ext_filename = patched_get_ext_filename
 # ----------------------------------------------------------------------------------------
 
 
@@ -121,6 +139,7 @@ class Config(object):
         self.build_platlib = build_cmd.build_platlib
 
         self.ext_suffix = sysconfig.get_config_var("EXT_SUFFIX")
+
         if self.ext_suffix is None:
             self.ext_suffix = ".so"
 
@@ -131,7 +150,10 @@ class Config(object):
         Returns the library name for a given module
         The library name is usually decorated (i.e. "tl" -> "tl.cpython-35m-x86_64-linux-gnu.so").
         """
-        return mod + self.ext_suffix
+        ext_suffix = self.ext_suffix
+        if platform.system() == "Darwin" and '_dbpi' in mod:
+            ext_suffix = ext_suffix.replace('.so', '.dylib')
+        return mod + ext_suffix
 
     def path_of(self, mod):
         """
@@ -191,7 +213,7 @@ class Config(object):
         """
         Gets the version string
         """
-        return "0.26.0.dev2"
+        return "0.26.0.dev4"
 
 
 config = Config()

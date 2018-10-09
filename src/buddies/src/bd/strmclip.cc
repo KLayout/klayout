@@ -24,9 +24,9 @@
 #include "bdWriterOptions.h"
 #include "dbClip.h"
 #include "dbLayout.h"
-#include "dbGDS2Writer.h"
-#include "dbOASISWriter.h"
 #include "dbReader.h"
+#include "dbWriter.h"
+#include "dbSaveLayoutOptions.h"
 #include "tlLog.h"
 #include "tlCommandLineParser.h"
 

@@ -21,13 +21,10 @@
 */
 
 #include "bdConverterMain.h"
+#include "bdWriterOptions.h"
 #include "dbStream.h"
-#include "dbCIFFormat.h"
-#include "dbDXFReader.h"
-#include "dbOASISReader.h"
-#include "dbGDS2Reader.h"
 #include "dbTestSupport.h"
-#include "contrib/dbGDS2TextReader.h"
+#include "dbReader.h"
 #include "tlUnitTest.h"
 
 //  Testing the converter main implementation (CIF)
@@ -40,14 +37,13 @@ TEST(1)
 
   const char *argv[] = { "x", input.c_str (), output.c_str () };
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, db::CIFReaderOptions ().format_name ()), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::cif_format_name), 0);
 
   db::Layout layout;
 
   {
     tl::InputStream stream (output);
     db::LoadLayoutOptions options;
-    options.set_options (new db::CIFReaderOptions ());
     db::Reader reader (stream);
     reader.read (layout, options);
     EXPECT_EQ (reader.format (), "CIF");
@@ -66,14 +62,13 @@ TEST(2)
 
   const char *argv[] = { "x", input.c_str (), output.c_str () };
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, db::DXFReaderOptions ().format_name ()), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::dxf_format_name), 0);
 
   db::Layout layout;
 
   {
     tl::InputStream stream (output);
     db::LoadLayoutOptions options;
-    options.set_options (new db::DXFReaderOptions ());
     db::Reader reader (stream);
     reader.read (layout, options);
     EXPECT_EQ (reader.format (), "DXF");
@@ -98,14 +93,13 @@ TEST(3)
 
   const char *argv[] = { "x", input.c_str (), output.c_str () };
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, db::GDS2ReaderOptions ().format_name ()), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::gds2_format_name), 0);
 
   db::Layout layout;
 
   {
     tl::InputStream stream (output);
     db::LoadLayoutOptions options;
-    options.set_options (new db::GDS2ReaderOptions ());
     db::Reader reader (stream);
     reader.read (layout, options);
     EXPECT_EQ (reader.format (), "GDS2");
@@ -124,14 +118,13 @@ TEST(4)
 
   const char *argv[] = { "x", input.c_str (), output.c_str () };
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, db::GDS2ReaderOptions ().format_name () + "Text"), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::gds2text_format_name), 0);
 
   db::Layout layout;
 
   {
     tl::InputStream stream (output);
     db::LoadLayoutOptions options;
-    options.set_options (new db::GDS2ReaderOptions ());
     db::Reader reader (stream);
     reader.read (layout, options);
     EXPECT_EQ (reader.format (), "GDS2Text");
@@ -150,14 +143,13 @@ TEST(5)
 
   const char *argv[] = { "x", input.c_str (), output.c_str () };
 
-  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, db::OASISReaderOptions ().format_name ()), 0);
+  EXPECT_EQ (bd::converter_main (sizeof (argv) / sizeof (argv[0]), (char **) argv, bd::GenericWriterOptions::oasis_format_name), 0);
 
   db::Layout layout;
 
   {
     tl::InputStream stream (output);
     db::LoadLayoutOptions options;
-    options.set_options (new db::OASISReaderOptions ());
     db::Reader reader (stream);
     reader.read (layout, options);
     EXPECT_EQ (reader.format (), "OASIS");

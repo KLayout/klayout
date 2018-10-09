@@ -33,6 +33,10 @@
 #include "dbLayout.h"
 #include "dbStreamLayers.h"
 
+#include "gsiObject.h"
+#include "gsiClass.h"
+#include "tlVariant.h"
+
 namespace db
 {
 
@@ -408,6 +412,22 @@ public:
    *  It must be given a list of valid layers which is used to determine empty cells if dont_save_empty_cells is true.
    */
   void get_cells (const db::Layout &layout, std::set <db::cell_index_type> &cells, const std::vector <std::pair <unsigned int, db::LayerProperties> > &valid_layers) const;
+
+  /**
+   *  @brief Sets a layout reader option by name
+   *
+   *  The name is taken to be a GSI method which is called to set the
+   *  option. For example, setting "gds2_unit", the method "gds2_unit=" is
+   *  called with the given value.
+   */
+  void set_option_by_name (const std::string &name, const tl::Variant &value);
+
+  /**
+   *  @brief Gets a layout reader option by name
+   *
+   *  See "set_option_by_name" for details.
+   */
+  tl::Variant get_option_by_name (const std::string &name);
 
 private:
   std::string m_format;

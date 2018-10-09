@@ -133,6 +133,11 @@ static void set_layer_map (db::LoadLayoutOptions *options, const db::LayerMap &l
   options->get_options<db::DXFReaderOptions> ().create_other_layers = f;
 }
 
+static void set_layer_map1 (db::LoadLayoutOptions *options, const db::LayerMap &lm)
+{
+  options->get_options<db::DXFReaderOptions> ().layer_map = lm;
+}
+
 static db::LayerMap &get_layer_map (db::LoadLayoutOptions *options)
 {
   return options->get_options<db::DXFReaderOptions> ().layer_map;
@@ -177,6 +182,13 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "This method has been added in version 0.25 and replaces the respective global option in \\LoadLayoutOptions "
     "in a format-specific fashion."
   ) +
+  gsi::method_ext ("dxf_layer_map=", &set_layer_map1, gsi::arg ("map"),
+    "@brief Sets the layer map\n"
+    "This sets a layer mapping for the reader. Unlike \\dxf_set_layer_map, the 'create_other_layers' flag is not changed.\n"
+    "@param map The layer map to set."
+    "\n"
+    "This convenience method has been added in version 0.26."
+  ) +
   gsi::method_ext ("dxf_select_all_layers", &select_all_layers,
     "@brief Selects all layers and disables the layer map\n"
     "\n"
@@ -192,6 +204,8 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "\n"
     "This method has been added in version 0.25 and replaces the respective global option in \\LoadLayoutOptions "
     "in a format-specific fashion."
+    "\n"
+    "Python note: this method has been turned into a property in version 0.26."
   ) +
   gsi::method_ext ("dxf_create_other_layers?", &create_other_layers,
     "@brief Gets a value indicating whether other layers shall be created\n"

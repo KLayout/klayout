@@ -28,7 +28,27 @@ namespace bd
 {
 
 GenericReaderOptions::GenericReaderOptions ()
-  : m_prefix ("i"), m_group_prefix ("Input"), m_create_other_layers (true)
+  : m_prefix ("i"), m_group_prefix ("Input"), m_create_other_layers (true),
+    m_common_enable_text_objects (true),
+    m_common_enable_properties (true),
+    m_gds2_box_mode (1),
+    m_gds2_allow_big_records (true),
+    m_gds2_allow_multi_xy_records (true),
+    m_oasis_read_all_properties (true),
+    m_oasis_expect_strict_mode (-1),
+    m_cif_wire_mode (0),
+    m_cif_dbu (0.001),
+    m_cif_keep_layer_names (false),
+    m_dxf_dbu (0.001),
+    m_dxf_unit (1.0),
+    m_dxf_text_scaling (100.0),
+    m_dxf_polyline_mode (0),
+    m_dxf_circle_points (100),
+    m_dxf_circle_accuracy (0.0),
+    m_dxf_contour_accuracy (0.0),
+    m_dxf_render_texts_as_polygons (false),
+    m_dxf_keep_layer_names (false),
+    m_dxf_keep_other_cells (false)
 {
   //  .. nothing yet ..
 }
@@ -79,11 +99,11 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
     std::string group ("[" + m_group_prefix + " options - GDS2 and OASIS specific]");
 
     cmd << tl::arg (group +
-                    "#!--" + m_long_prefix + "no-texts", &m_common_reader_options.enable_text_objects, "Skips text objects",
+                    "#!--" + m_long_prefix + "no-texts", &m_common_enable_text_objects, "Skips text objects",
                     "With this option set, text objects won't be read."
                    )
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "no-properties", &m_common_reader_options.enable_properties, "Skips properties",
+                    "#!--" + m_long_prefix + "no-properties", &m_common_enable_properties, "Skips properties",
                     "With this option set, properties won't be read."
                    )
       ;
@@ -93,20 +113,20 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
     std::string group ("[" + m_group_prefix + " options - GDS2 specific]");
 
     cmd << tl::arg (group +
-                    "#!--" + m_long_prefix + "no-multi-xy-records", &m_gds2_reader_options.allow_multi_xy_records, "Gives an error on multi-XY records",
+                    "#!--" + m_long_prefix + "no-multi-xy-records", &m_gds2_allow_multi_xy_records, "Gives an error on multi-XY records",
                     "This option disables an advanced interpretation of GDS2 which allows unlimited polygon and path "
                     "complexity. For compatibility with other readers, this option restores the standard behavior and "
                     "disables this feature."
                    )
         << tl::arg (group +
-                    "#!--" + m_long_prefix + "no-big-records", &m_gds2_reader_options.allow_big_records, "Gives an error on big (>32767 bytes) records",
+                    "#!--" + m_long_prefix + "no-big-records", &m_gds2_allow_big_records, "Gives an error on big (>32767 bytes) records",
                     "The GDS2 specification claims the record length to be a signed 16 bit value. So a record "
                     "can be 32767 bytes max. To allow bigger records (i.e. bigger polygons), the usual approach "
                     "is to take the length as a unsigned 16 bit value, so the length is up to 65535 bytes. "
                     "This option restores the original behavior and reports big (>32767 bytes) records are errors."
                    )
         << tl::arg (group +
-                    "-" + m_prefix + "b|--" + m_long_prefix + "box-mode=mode", &m_gds2_reader_options.box_mode, "Specifies how BOX records are read",
+                    "-" + m_prefix + "b|--" + m_long_prefix + "box-mode=mode", &m_gds2_box_mode, "Specifies how BOX records are read",
                     "This an option provided for compatibility with other readers. The mode value specifies how "
                     "BOX records are read:\n"
                     "\n"
@@ -122,7 +142,7 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
     std::string group ("[" + m_group_prefix + " options - OASIS specific]");
 
     cmd << tl::arg (group +
-                    "#--" + m_long_prefix + "expect-strict-mode=mode", &m_oasis_reader_options.expect_strict_mode, "Makes the reader expect strict or non-strict mode",
+                    "#--" + m_long_prefix + "expect-strict-mode=mode", &m_oasis_expect_strict_mode, "Makes the reader expect strict or non-strict mode",
                     "With this option, the OASIS reader will expect strict mode (mode is 1) or expect non-strict mode "
                     "(mode is 0). By default, both modes are allowed. This is a diagnostic feature and does not "
                     "have any other effect than checking the mode."
@@ -150,7 +170,7 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
     std::string group ("[" + m_group_prefix + " options - CIF specific]");
 
     cmd << tl::arg (group +
-                    "-" + m_prefix + "w|--" + m_long_prefix + "wire-mode=mode", &m_cif_reader_options.wire_mode, "Specifies how wires (W) are read",
+                    "-" + m_prefix + "w|--" + m_long_prefix + "wire-mode=mode", &m_cif_wire_mode, "Specifies how wires (W) are read",
                     "This option specifies how wire objects (W) are read:\n"
                     "\n"
                     "* 0: as square ended paths (the default)\n"
@@ -164,19 +184,19 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
     std::string group ("[" + m_group_prefix + " options - DXF specific]");
 
     cmd << tl::arg (group +
-                    "-" + m_prefix + "u|--" + m_long_prefix + "dxf-unit=unit", &m_dxf_reader_options.unit, "Specifies the DXF drawing units",
+                    "-" + m_prefix + "u|--" + m_long_prefix + "dxf-unit=unit", &m_dxf_unit, "Specifies the DXF drawing units",
                     "Since DXF is unitless, this value needs to be given to specify the drawing units. "
                     "By default, a drawing unit of micrometers is assumed."
                    )
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-text-scaling=factor", &m_dxf_reader_options.text_scaling, "Specifies text scaling",
+                    "#--" + m_long_prefix + "dxf-text-scaling=factor", &m_dxf_text_scaling, "Specifies text scaling",
                     "This value specifies text scaling in percent. A value of 100 roughly means that the letter "
                     "pitch of the font will be 92% of the specified text height. That value applies for ROMANS fonts. "
                     "When generating GDS texts, a value of 100 generates TEXT objects with "
                     "the specified size. Smaller values generate smaller sizes."
                    )
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-polyline-mode=mode", &m_dxf_reader_options.polyline_mode, "Specifies how POLYLINE records are handled",
+                    "#--" + m_long_prefix + "dxf-polyline-mode=mode", &m_dxf_polyline_mode, "Specifies how POLYLINE records are handled",
                     "This value specifies how POLYLINE records are handled:\n"
                     "\n"
                     "* 0: automatic mode (default)\n"
@@ -186,11 +206,11 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "* 4: as 3 and auto-close contours"
                    )
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-circle-points=points", &m_dxf_reader_options.circle_points, "Specifies the number of points for a full circle for arc interpolation",
+                    "#--" + m_long_prefix + "dxf-circle-points=points", &m_dxf_circle_points, "Specifies the number of points for a full circle for arc interpolation",
                     "See --" + m_long_prefix + "dxf-circle-accuracy for another way of specifying the number of points per circle."
                    )
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-circle-accuracy=value", &m_dxf_reader_options.circle_accuracy, "Specifies the accuracy of circle approximation",
+                    "#--" + m_long_prefix + "dxf-circle-accuracy=value", &m_dxf_circle_accuracy, "Specifies the accuracy of circle approximation",
                     "This value specifies the approximation accuracy of the circle and other\n"
                     "\"round\" structures. If this value is a positive number bigger than the\n"
                     "database unit (see dbu), it will control the number of points the\n"
@@ -203,16 +223,16 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "The value is given in the units of the DXF file."
                    )
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-contour-accuracy=value", &m_dxf_reader_options.contour_accuracy, "Specifies the point accuracy for contour closing",
+                    "#--" + m_long_prefix + "dxf-contour-accuracy=value", &m_dxf_contour_accuracy, "Specifies the point accuracy for contour closing",
                     "This value specifies the distance (in units of the DXF file) by which points can be separated and still\n"
                     "be considered to be connected. This value is effective in polyline mode 3 and 4.\n"
                    )
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-render-texts-as-polygons", &m_dxf_reader_options.render_texts_as_polygons, "Renders texts as polygons",
+                    "#--" + m_long_prefix + "dxf-render-texts-as-polygons", &m_dxf_render_texts_as_polygons, "Renders texts as polygons",
                     "If this option is used, texts are converted to polygons instead of being converted to labels."
                    )
         << tl::arg (group +
-                    "#--" + m_long_prefix + "dxf-keep-other-cells", &m_dxf_reader_options.keep_other_cells, "Keeps cells which are not instantiated by the top cell",
+                    "#--" + m_long_prefix + "dxf-keep-other-cells", &m_dxf_keep_other_cells, "Keeps cells which are not instantiated by the top cell",
                     "With this option, all cells not found to be instantiated are kept as additional top cells. "
                     "By default, such cells are removed."
                    )
@@ -234,36 +254,49 @@ void GenericReaderOptions::set_layer_map (const std::string &lm)
 
 void GenericReaderOptions::set_read_named_layers (bool f)
 {
-  m_dxf_reader_options.keep_layer_names = f;
-  m_cif_reader_options.keep_layer_names = f;
+  m_dxf_keep_layer_names = f;
+  m_cif_keep_layer_names = f;
 }
 
 void GenericReaderOptions::set_dbu (double dbu)
 {
-  m_dxf_reader_options.dbu = dbu;
-  m_cif_reader_options.dbu = dbu;
+  m_dxf_dbu = dbu;
+  m_cif_dbu = dbu;
 }
 
 void
 GenericReaderOptions::configure (db::LoadLayoutOptions &load_options) const
 {
-  db::CommonReaderOptions common_reader_options = m_common_reader_options;
-  common_reader_options.layer_map = m_layer_map;
-  common_reader_options.create_other_layers = m_create_other_layers;
+  load_options.set_option_by_name ("layer_map", tl::Variant::make_variant (m_layer_map));
+  load_options.set_option_by_name ("create_other_layers", m_create_other_layers);
+  load_options.set_option_by_name ("text_enabled", m_common_enable_text_objects);
+  load_options.set_option_by_name ("properties_enabled", m_common_enable_properties);
 
-  db::DXFReaderOptions dxf_reader_options = m_dxf_reader_options;
-  dxf_reader_options.layer_map = m_layer_map;
-  dxf_reader_options.create_other_layers = m_create_other_layers;
+  load_options.set_option_by_name ("gds2_box_mode", m_gds2_box_mode);
+  load_options.set_option_by_name ("gds2_allow_big_records", m_gds2_allow_big_records);
+  load_options.set_option_by_name ("gds2_allow_multi_xy_records", m_gds2_allow_multi_xy_records);
 
-  db::CIFReaderOptions cif_reader_options = m_cif_reader_options;
-  cif_reader_options.layer_map = m_layer_map;
-  cif_reader_options.create_other_layers = m_create_other_layers;
+  load_options.set_option_by_name ("oasis_read_all_properties", m_oasis_read_all_properties);
+  load_options.set_option_by_name ("oasis_expect_strict_mode", m_oasis_expect_strict_mode);
 
-  load_options.set_options (common_reader_options);
-  load_options.set_options (m_gds2_reader_options);
-  load_options.set_options (m_oasis_reader_options);
-  load_options.set_options (cif_reader_options);
-  load_options.set_options (dxf_reader_options);
+  load_options.set_option_by_name ("cif_layer_map", tl::Variant::make_variant (m_layer_map));
+  load_options.set_option_by_name ("cif_create_other_layers", m_create_other_layers);
+  load_options.set_option_by_name ("cif_dbu", m_dxf_dbu);
+  load_options.set_option_by_name ("cif_wire_mode", m_cif_wire_mode);
+  load_options.set_option_by_name ("cif_keep_layer_names", m_cif_keep_layer_names);
+
+  load_options.set_option_by_name ("dxf_layer_map", tl::Variant::make_variant (m_layer_map));
+  load_options.set_option_by_name ("dxf_create_other_layers", m_create_other_layers);
+  load_options.set_option_by_name ("dxf_dbu", m_dxf_dbu);
+  load_options.set_option_by_name ("dxf_unit", m_dxf_unit);
+  load_options.set_option_by_name ("dxf_text_scaling", m_dxf_text_scaling);
+  load_options.set_option_by_name ("dxf_polyline_mode", m_dxf_polyline_mode);
+  load_options.set_option_by_name ("dxf_circle_points", m_dxf_circle_points);
+  load_options.set_option_by_name ("dxf_circle_accuracy", m_dxf_circle_accuracy);
+  load_options.set_option_by_name ("dxf_contour_accuracy", m_dxf_contour_accuracy);
+  load_options.set_option_by_name ("dxf_render_texts_as_polygons", m_dxf_render_texts_as_polygons);
+  load_options.set_option_by_name ("dxf_keep_layer_names", m_dxf_keep_layer_names);
+  load_options.set_option_by_name ("dxf_keep_other_cells", m_dxf_keep_other_cells);
 }
 
 }

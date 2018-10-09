@@ -53,7 +53,20 @@ int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 
   std::string text;
   {
-    std::string cmd = std::string ("\"") + STRINGIFY (PYTHON) + "\" " + fp + " 2>&1";
+    std::string cmd;
+
+#if defined(__APPLE__)
+    //  NOTE: because of system integrity, MacOS does not inherit DYLD_LIBRARY_PATH to child
+    //  processes like sh. We need to port this variable explicitly.
+    const char *ldpath_name = "DYLD_LIBRARY_PATH";
+    const char *ldpath = getenv (ldpath_name);
+    if (ldpath) {
+      cmd += std::string (ldpath_name) + "=\"" + ldpath + "\"; export " + ldpath_name + "; ";
+    }
+#endif
+
+    cmd += std::string ("\"") + STRINGIFY (PYTHON) + "\" " + fp + " 2>&1";
+    
     tl::info << cmd;
     tl::InputPipe pipe (cmd);
     tl::InputStream is (pipe);

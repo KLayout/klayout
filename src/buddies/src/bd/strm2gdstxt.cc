@@ -21,9 +21,9 @@
 */
 
 #include "bdConverterMain.h"
-#include "dbGDS2Format.h"
+#include "bdWriterOptions.h"
 
 BD_PUBLIC int strm2gdstxt (int argc, char *argv[])
 {
-  return bd::converter_main (argc, argv, db::GDS2WriterOptions ().format_name () + "Text");
+  return bd::converter_main (argc, argv, bd::GenericWriterOptions::gds2text_format_name);
 }

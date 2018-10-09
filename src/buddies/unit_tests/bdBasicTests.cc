@@ -26,6 +26,7 @@
 #include "tlUnitTest.h"
 #include "dbLayout.h"
 #include "dbCell.h"
+#include "dbSaveLayoutOptions.h"
 
 //  Testing writer options
 TEST(1)
@@ -73,23 +74,23 @@ TEST(1)
   EXPECT_EQ (stream_opt.dont_write_empty_cells (), false);
   EXPECT_EQ (stream_opt.keep_instances (), false);
   EXPECT_EQ (stream_opt.write_context_info (), true);
-  EXPECT_EQ (stream_opt.get_options<db::CIFWriterOptions> ().blank_separator, false);
-  EXPECT_EQ (stream_opt.get_options<db::CIFWriterOptions> ().dummy_calls, false);
-  EXPECT_EQ (stream_opt.get_options<db::DXFWriterOptions> ().polygon_mode, 0);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().libname, "LIB");
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().max_vertex_count, (unsigned int) 8000);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().multi_xy_records, false);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().write_timestamps, true);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().no_zero_length_paths, false);
-  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::GDS2WriterOptions> ().user_units), "1");
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().write_cell_properties, false);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().write_file_properties, false);
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().write_cblocks, false);
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().compression_level, 2);
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().strict_mode, false);
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().recompress, false);
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().subst_char, "*");
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().write_std_properties, 1);
+  EXPECT_EQ (stream_opt.get_option_by_name ("cif_blank_separator").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("cif_dummy_calls").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_polygon_mode").to_int (), 0);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_libname").to_string (), "LIB");
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_max_vertex_count").to_uint (), (unsigned int) 8000);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_multi_xy_records").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_timestamps").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_no_zero_length_paths").to_bool (), false);
+  EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("gds2_user_units").to_double ()), "1");
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_cell_properties").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_file_properties").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_write_cblocks").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_compression_level").to_int (), 2);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_strict_mode").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_recompress").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_substitution_char").to_string (), "*");
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_write_std_properties_ext").to_int (), 1);
 
   opt.configure (stream_opt, layout);
 
@@ -98,23 +99,23 @@ TEST(1)
   EXPECT_EQ (stream_opt.dont_write_empty_cells (), true);
   EXPECT_EQ (stream_opt.keep_instances (), true);
   EXPECT_EQ (stream_opt.write_context_info (), false);
-  EXPECT_EQ (stream_opt.get_options<db::CIFWriterOptions> ().blank_separator, true);
-  EXPECT_EQ (stream_opt.get_options<db::CIFWriterOptions> ().dummy_calls, true);
-  EXPECT_EQ (stream_opt.get_options<db::DXFWriterOptions> ().polygon_mode, 2);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().libname, "MYLIBNAME");
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().max_vertex_count, (unsigned int) 250);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().multi_xy_records, true);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().write_timestamps, false);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().no_zero_length_paths, true);
-  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::GDS2WriterOptions> ().user_units), "2.5");
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().write_cell_properties, true);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2WriterOptions> ().write_file_properties, true);
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().write_cblocks, true);
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().compression_level, 9);
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().strict_mode, true);
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().recompress, true);
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().subst_char, "X");
-  EXPECT_EQ (stream_opt.get_options<db::OASISWriterOptions> ().write_std_properties, 2);
+  EXPECT_EQ (stream_opt.get_option_by_name ("cif_blank_separator").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("cif_dummy_calls").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_polygon_mode").to_int (), 2);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_libname").to_string (), "MYLIBNAME");
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_max_vertex_count").to_uint (), (unsigned int) 250);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_multi_xy_records").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_timestamps").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_no_zero_length_paths").to_bool (), true);
+  EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("gds2_user_units").to_double ()), "2.5");
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_cell_properties").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_write_file_properties").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_write_cblocks").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_compression_level").to_int (), 9);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_strict_mode").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_recompress").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_substitution_char").to_string (), "X");
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_write_std_properties_ext").to_int (), 2);
 }
 
 static std::string cells2string (const db::Layout &layout, const std::set<db::cell_index_type> &cells)
@@ -241,52 +242,52 @@ TEST(10)
   cmd.parse (sizeof (argv) / sizeof (argv[0]), (char **) argv);
 
   db::LoadLayoutOptions stream_opt;
-  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::CIFReaderOptions> ().dbu), "0.001");
-  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().wire_mode, (unsigned int) 0);
-  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().layer_map.to_string (), "layer_map()");
-  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().create_other_layers, true);
-  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::DXFReaderOptions> ().dbu), "0.001");
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().layer_map.to_string (), "layer_map()");
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().create_other_layers, true);
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().unit, 1.0);
-  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::DXFReaderOptions> ().circle_accuracy), "0");
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().circle_points, 100);
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().keep_other_cells, false);
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().polyline_mode, 0);
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().render_texts_as_polygons, false);
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().text_scaling, 100);
-  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().layer_map.to_string (), "layer_map()");
-  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().create_other_layers, true);
-  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().enable_properties, true);
-  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().enable_text_objects, true);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().box_mode, (unsigned int) 1);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().allow_big_records, true);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().allow_multi_xy_records, true);
-  EXPECT_EQ (stream_opt.get_options<db::OASISReaderOptions> ().expect_strict_mode, -1);
+  EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("cif_dbu").to_double ()), "0.001");
+  EXPECT_EQ (stream_opt.get_option_by_name ("cif_wire_mode").to_uint (), (unsigned int) 0);
+  EXPECT_EQ (stream_opt.get_option_by_name ("cif_layer_map").to_user<db::LayerMap> ().to_string (), "layer_map()");
+  EXPECT_EQ (stream_opt.get_option_by_name ("cif_create_other_layers").to_bool (), true);
+  EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("dxf_dbu").to_double ()), "0.001");
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_layer_map").to_user<db::LayerMap> ().to_string (), "layer_map()");
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_create_other_layers").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_unit").to_double (), 1.0);
+  EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("dxf_circle_accuracy").to_double ()), "0");
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_circle_points").to_int (), 100);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_keep_other_cells").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_polyline_mode").to_int (), 0);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_render_texts_as_polygons").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_text_scaling").to_int (), 100);
+  EXPECT_EQ (stream_opt.get_option_by_name ("layer_map").to_user<db::LayerMap> ().to_string (), "layer_map()");
+  EXPECT_EQ (stream_opt.get_option_by_name ("create_other_layers").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("properties_enabled").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("text_enabled").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_box_mode").to_uint (), (unsigned int) 1);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_allow_big_records").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_allow_multi_xy_records").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_expect_strict_mode").to_int (), -1);
 
   opt.configure (stream_opt);
 
-  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::CIFReaderOptions> ().dbu), "0.125");
-  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().wire_mode, (unsigned int) 1);
-  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().layer_map.to_string (), "layer_map('1/0';'3-4/0-255';'A : 17/0')");
-  EXPECT_EQ (stream_opt.get_options<db::CIFReaderOptions> ().create_other_layers, false);
-  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::DXFReaderOptions> ().dbu), "0.125");
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().layer_map.to_string (), "layer_map('1/0';'3-4/0-255';'A : 17/0')");
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().create_other_layers, false);
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().unit, 2.5);
-  EXPECT_EQ (tl::to_string (stream_opt.get_options<db::DXFReaderOptions> ().circle_accuracy), "0.5");
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().circle_points, 1000);
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().keep_other_cells, true);
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().polyline_mode, 3);
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().render_texts_as_polygons, true);
-  EXPECT_EQ (stream_opt.get_options<db::DXFReaderOptions> ().text_scaling, 75);
-  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().layer_map.to_string (), "layer_map('1/0';'3-4/0-255';'A : 17/0')");
-  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().create_other_layers, false);
-  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().enable_properties, false);
-  EXPECT_EQ (stream_opt.get_options<db::CommonReaderOptions> ().enable_text_objects, false);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().box_mode, (unsigned int) 3);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().allow_big_records, false);
-  EXPECT_EQ (stream_opt.get_options<db::GDS2ReaderOptions> ().allow_multi_xy_records, false);
-  EXPECT_EQ (stream_opt.get_options<db::OASISReaderOptions> ().expect_strict_mode, 1);
+  EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("cif_dbu").to_double ()), "0.125");
+  EXPECT_EQ (stream_opt.get_option_by_name ("cif_wire_mode").to_uint (), (unsigned int) 1);
+  EXPECT_EQ (stream_opt.get_option_by_name ("cif_layer_map").to_user<db::LayerMap> ().to_string (), "layer_map('1/0';'3-4/0-255';'A : 17/0')");
+  EXPECT_EQ (stream_opt.get_option_by_name ("cif_create_other_layers").to_bool (), false);
+  EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("dxf_dbu").to_double ()), "0.125");
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_layer_map").to_user<db::LayerMap> ().to_string (), "layer_map('1/0';'3-4/0-255';'A : 17/0')");
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_create_other_layers").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_unit").to_double (), 2.5);
+  EXPECT_EQ (tl::to_string (stream_opt.get_option_by_name ("dxf_circle_accuracy").to_double ()), "0.5");
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_circle_points").to_int (), 1000);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_keep_other_cells").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_polyline_mode").to_int (), 3);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_render_texts_as_polygons").to_bool (), true);
+  EXPECT_EQ (stream_opt.get_option_by_name ("dxf_text_scaling").to_int (), 75);
+  EXPECT_EQ (stream_opt.get_option_by_name ("layer_map").to_user<db::LayerMap> ().to_string (), "layer_map('1/0';'3-4/0-255';'A : 17/0')");
+  EXPECT_EQ (stream_opt.get_option_by_name ("create_other_layers").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("properties_enabled").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("text_enabled").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_box_mode").to_uint (), (unsigned int) 3);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_allow_big_records").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("gds2_allow_multi_xy_records").to_bool (), false);
+  EXPECT_EQ (stream_opt.get_option_by_name ("oasis_expect_strict_mode").to_int (), 1);
 }
 

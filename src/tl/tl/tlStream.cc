@@ -967,7 +967,8 @@ void
 InputPipe::close ()
 {
   if (m_file != NULL) {
-    fclose (m_file);
+    pclose (m_file);
+    //  TODO: pclose delivers the exit code - we should indicate it as return value of close.
     m_file = NULL;
   }
 }

@@ -30,8 +30,25 @@ load("test_prologue.rb")
 
 class KLayoutMain_TestClass < TestBase
 
+  def setup
+    @klayout_home_name = "KLAYOUT_HOME"
+    @klayout_home = ENV[@klayout_home_name]
+    # setting "KLAYOUT_HOME" to empty means we don't search any place
+    # for macros
+    ENV[@klayout_home_name] = ""
+  end
+
+  def teardown
+    ENV[@klayout_home_name] = @klayout_home
+  end
+
   def klayout_bin
-    File.join(RBA::Application::instance.inst_path, "klayout")
+    # special location for MacOS
+    file = File.join(RBA::Application::instance.inst_path, "klayout.app", "Contents", "MacOS", "klayout")
+    if !File.exists?(file)
+      file = File.join(RBA::Application::instance.inst_path, "klayout")
+    end
+    return file
   end
 
   def test_1

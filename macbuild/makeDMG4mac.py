@@ -51,6 +51,7 @@ def SetGlobals():
   global VolumeDMG          # the volume name of DMG
   global TargetDMG          # the name of target DMG file
   global RootApplications   # reserved directory name for applications
+  global IncScriptIcons     # include 2 script icons for backward compatibility (False, by default)
   # auxiliary variables on platform
   global System             # 6-tuple from platform.uname()
   global Node               # - do -
@@ -75,6 +76,7 @@ def SetGlobals():
   Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
   Usage += "   [-q|--qt <ID>]       : ID name of deployed Qt                                     | Qt511Xmp \n"
   Usage += "   [-s|--serial <num>]  : DMG serial number                                          | 1 \n"
+  Usage += "   [-i|--icon2]         : include two script icons (for backward compatibility)      | disabled \n"
   Usage += "   [-?|--?]             : print this usage and exit                                  | disabled \n"
   Usage += "--------------------------------------------------------------------------------------------------------\n"
 
@@ -123,13 +125,14 @@ def SetGlobals():
   QtIdentification = "Qt511Xmp"
   Version          = GetKLayoutVersionFrom( "./version.sh" )
   OccupiedDS       = -1
-  BackgroundPNG    = "KLayoutDMG-Back.png"
+  BackgroundPNG    = "1App-KLayoutDMG-Back.png"
   VolumeIcons      = "KLayoutHDD.icns"
   AppleScriptDMG   = "macbuild/Resources/KLayoutDMG.applescript"
   WorkDMG          = "work-KLayout.dmg"
   VolumeDMG        = "KLayout"
   TargetDMG        = ""
   RootApplications = "/Applications"
+  IncScriptIcons   = False
 
 #------------------------------------------------------------------------------
 ## To check the contents of the package directory
@@ -150,42 +153,53 @@ def CheckPkgDirectory():
     return -1
 
   os.chdir(PkgDir)
-  items = glob.glob( "*" ) # must be ['klayout.app', 'klayout.scripts']
-  if not len(items) == 2:
-    print( "! The package directory <%s> must have just <2> directories ['klayout.app', 'klayout.scripts']" % PkgDir, file=sys.stderr )
-    print( "" )
-    os.chdir(ProjectDir)
-    return -1
+  items = glob.glob( "*" ) # this directory may hold ['klayout.app', 'klayout.scripts']
+  if not IncScriptIcons:
+    if not os.path.isdir( "klayout.app" ): # mandatory
+      print( "! The package directory <%s> does not hold <klayout.app> bundle" % PkgDir, file=sys.stderr )
+      print( "" )
+      os.chdir(ProjectDir)
+    if len(items) == 2 and os.path.isdir( "klayout.scripts" ): # remove unnecessary directory
+      shutil.rmtree( "klayout.scripts" )
+  else:
+    if not len(items) == 2:
+      print( "! The package directory <%s> must have just <2> directories ['klayout.app', 'klayout.scripts']" % PkgDir, file=sys.stderr )
+      print( "" )
+      os.chdir(ProjectDir)
+      return -1
 
-  if not os.path.isdir( "klayout.app" ):
-    print( "! The package directory <%s> does not hold <klayout.app> bundle" % PkgDir, file=sys.stderr )
-    print( "" )
-    os.chdir(ProjectDir)
-    return -1
+    if not os.path.isdir( "klayout.app" ): # mandatory
+      print( "! The package directory <%s> does not hold <klayout.app> bundle" % PkgDir, file=sys.stderr )
+      print( "" )
+      os.chdir(ProjectDir)
+      return -1
 
-  if not os.path.isdir( "klayout.scripts" ):
-    print( "! The package directory <%s> does not hold <klayout.scripts> subdirectory" % PkgDir, file=sys.stderr )
-    print( "" )
-    os.chdir(ProjectDir)
-    return -1
+    if not os.path.isdir( "klayout.scripts" ):
+      print( "! The package directory <%s> does not hold <klayout.scripts> subdirectory" % PkgDir, file=sys.stderr )
+      print( "" )
+      os.chdir(ProjectDir)
+      return -1
 
-  os.chdir( "klayout.scripts" )
-  if not os.path.isdir( "KLayoutEditor.app" ):
-    print( "! The package directory <%s> does not hold <KLayoutEditor.app> bundle under 'klayout.scripts/'" % PkgDir, file=sys.stderr )
-    print( "" )
-    os.chdir(ProjectDir)
-    return -1
+    os.chdir( "klayout.scripts" )
+    if not os.path.isdir( "KLayoutEditor.app" ):
+      print( "! The package directory <%s> does not hold <KLayoutEditor.app> bundle under 'klayout.scripts/'" % PkgDir, file=sys.stderr )
+      print( "" )
+      os.chdir(ProjectDir)
+      return -1
 
-  if not os.path.isdir( "KLayoutViewer.app" ):
-    print( "! The package directory <%s> does not hold <KLayoutViewer.app> bundle under 'klayout.scripts/'" % PkgDir, file=sys.stderr )
-    print( "" )
-    os.chdir(ProjectDir)
-    return -1
+    if not os.path.isdir( "KLayoutViewer.app" ):
+      print( "! The package directory <%s> does not hold <KLayoutViewer.app> bundle under 'klayout.scripts/'" % PkgDir, file=sys.stderr )
+      print( "" )
+      os.chdir(ProjectDir)
+      return -1
 
   os.chdir(ProjectDir)
   os.chdir(PkgDir)
   size1 = int( os.popen( "\du -sm klayout.app" )    .read().strip("\n").split("\t")[0] )
-  size2 = int( os.popen( "\du -sm klayout.scripts" ).read().strip("\n").split("\t")[0] )
+  if IncScriptIcons:
+    size2 = int( os.popen( "\du -sm klayout.scripts" ).read().strip("\n").split("\t")[0] )
+  else:
+    size2 = 0
   os.chdir(ProjectDir)
   return size1+size2
 
@@ -204,7 +218,9 @@ def ParseCommandLineArguments():
   global QtIdentification
   global Version
   global OccupiedDS
+  global BackgroundPNG
   global TargetDMG
+  global IncScriptIcons
 
   p = optparse.OptionParser( usage=Usage )
   p.add_option( '-p', '--pkg',
@@ -231,6 +247,12 @@ def ParseCommandLineArguments():
                 dest='dmg_serial',
                 help="DMG serial number" )
 
+  p.add_option( '-i', '--icon2',
+                action='store_true',
+                dest='inc2scripticons',
+                default=False,
+                help='generate 2 script icons for backward compatibility' )
+
   p.add_option( '-?', '--??',
                 action='store_true',
                 dest='checkusage',
@@ -242,6 +264,7 @@ def ParseCommandLineArguments():
                   operation_make    = False,
                   qt_identification = "Qt511Xmp",
                   dmg_serial        = "1",
+                  inc2scripticons   = False,
                   checkusage        = False )
 
   opt, args = p.parse_args()
@@ -255,10 +278,16 @@ def ParseCommandLineArguments():
   QtIdentification = opt.qt_identification
   DMGSerialNum     = int(opt.dmg_serial)
   TargetDMG        = "klayout-%s-%s-%s-%d-%s.dmg" % (Version, GenOSName, Platform, DMGSerialNum, QtIdentification)
+  IncScriptIcons   = opt.inc2scripticons
 
   OccupiedDS = CheckPkgDirectory()
   if not OccupiedDS > 0:
     quit()
+
+  if not IncScriptIcons:
+    BackgroundPNG = "1App-KLayoutDMG-Back.png"
+  else:
+    BackgroundPNG = "KLayoutDMG-Back.png"
 
   if (OpClean and OpMake) or (not OpClean and not OpMake):
     print( "! Specify <-c|--clean> OR <-m|--make>", file=sys.stderr )
@@ -301,7 +330,10 @@ def MakeTargetDMGFile(msg=""):
   #--------------------------------------------------------
   os.chdir(ProjectDir)
   print( ">>> (1) Preparing AppleScript to execute later..." )
-  tempScr = "macbuild/Resources/template-KLayoutDMG.applescript"
+  if not IncScriptIcons:
+    tempScr = "macbuild/Resources/template-1App-KLayoutDMG.applescript"
+  else:
+    tempScr = "macbuild/Resources/template-KLayoutDMG.applescript"
   try:
     fd   = open( tempScr, "r" )
     tmpl = fd.read()
@@ -312,16 +344,27 @@ def MakeTargetDMGFile(msg=""):
   else:
     t = string.Template(tmpl)
     # Figures below were determined by experiments for best fit
-    applescript = t.safe_substitute(
-                      ORGX='50', ORGY='100',
-                      WIN_WIDTH='1000', WIN_HEIGHT='700',
-                      FULL_PATH_DS_STORE='/Volumes/%s/.DS_Store' % VolumeDMG,
-                      BACKGROUND_PNG_FILE=BackgroundPNG,
-                      ITEM_1='klayout.app',     X1='960', Y1='140',
-                      ITEM_2='klayout.scripts', X2='610', Y2='140',
-                      ITEM_3='Applications',    X3='790', Y3='140',
-                      CHECK_BASH='[ -f " & dotDSStore & " ]; echo $?'
-                    )
+    if not IncScriptIcons:
+      applescript = t.safe_substitute(
+                        ORGX='50', ORGY='100',
+                        WIN_WIDTH='1000', WIN_HEIGHT='500',
+                        FULL_PATH_DS_STORE='/Volumes/%s/.DS_Store' % VolumeDMG,
+                        BACKGROUND_PNG_FILE=BackgroundPNG,
+                        ITEM_1='klayout.app',     X1='860', Y1='165',
+                        ITEM_3='Applications',    X3='860', Y3='345',
+                        CHECK_BASH='[ -f " & dotDSStore & " ]; echo $?'
+                      )
+    else:
+      applescript = t.safe_substitute(
+                        ORGX='50', ORGY='100',
+                        WIN_WIDTH='1000', WIN_HEIGHT='700',
+                        FULL_PATH_DS_STORE='/Volumes/%s/.DS_Store' % VolumeDMG,
+                        BACKGROUND_PNG_FILE=BackgroundPNG,
+                        ITEM_1='klayout.app',     X1='960', Y1='140',
+                        ITEM_2='klayout.scripts', X2='610', Y2='140',
+                        ITEM_3='Applications',    X3='790', Y3='140',
+                        CHECK_BASH='[ -f " & dotDSStore & " ]; echo $?'
+                      )
   try:
     # print(applescript)
     fd = open( AppleScriptDMG, "w" )

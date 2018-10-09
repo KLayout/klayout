@@ -251,7 +251,7 @@ def ParseCommandLineArguments():
                 action='store_true',
                 dest='inc2scripticons',
                 default=False,
-                help='generate 2 script icons for backward compatibility' )
+                help='include 2 script icons for backward compatibility' )
 
   p.add_option( '-?', '--??',
                 action='store_true',

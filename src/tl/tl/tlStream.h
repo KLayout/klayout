@@ -326,6 +326,7 @@ public:
 
   /**
    *  @brief Closes the pipe
+   *  This method will wait for the child process to terminate.
    */
   virtual void close ();
 
@@ -351,6 +352,11 @@ public:
     //  No source (in the sense of a file name) is available ..
     return std::string ();
   }
+
+  /**
+   *  @brief Closes the pipe and returns the exit code of the child process
+   */
+  int wait ();
 
 private:
   //  No copying

@@ -966,11 +966,17 @@ InputPipe::~InputPipe ()
 void
 InputPipe::close ()
 {
+  wait ();
+}
+
+int InputPipe::wait ()
+{
+  int ret = 0;
   if (m_file != NULL) {
-    pclose (m_file);
-    //  TODO: pclose delivers the exit code - we should indicate it as return value of close.
+    ret = pclose (m_file);
     m_file = NULL;
   }
+  return ret;
 }
 
 size_t 

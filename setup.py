@@ -60,9 +60,9 @@ import os
 import platform
 import distutils.sysconfig as sysconfig
 from distutils.errors import CompileError
+import distutils.command.build_ext
 import multiprocessing
 N_cores = multiprocessing.cpu_count()
-
 
 # monkey-patch for parallel compilation
 # from https://stackoverflow.com/questions/11013851/speeding-up-build-process-with-distutils
@@ -103,6 +103,24 @@ if sys.version_info[0] * 10 + sys.version_info[1] > 26:
     import distutils.ccompiler
     distutils.ccompiler.CCompiler.compile = parallelCCompile
 
+
+from distutils.command.build_ext import build_ext
+_old_get_ext_filename = build_ext.get_ext_filename
+
+
+def patched_get_ext_filename(self, ext_name):
+    r"""Convert the name of an extension (eg. "foo.bar") into the name
+    of the file from which it will be loaded (eg. "foo/bar.so", or
+    "foo\bar.pyd").
+    """
+    filename = _old_get_ext_filename(self, ext_name)
+    # Making sure this matches qmake's default extension .dylib, instead of .so
+    if platform.system() == "Darwin" and '_dbpi' in ext_name:
+        filename = filename.replace('.so', '.dylib')
+    return filename
+
+
+distutils.command.build_ext.build_ext.get_ext_filename = patched_get_ext_filename
 # ----------------------------------------------------------------------------------------
 
 
@@ -121,6 +139,7 @@ class Config(object):
         self.build_platlib = build_cmd.build_platlib
 
         self.ext_suffix = sysconfig.get_config_var("EXT_SUFFIX")
+
         if self.ext_suffix is None:
             self.ext_suffix = ".so"
 
@@ -131,7 +150,10 @@ class Config(object):
         Returns the library name for a given module
         The library name is usually decorated (i.e. "tl" -> "tl.cpython-35m-x86_64-linux-gnu.so").
         """
-        return mod + self.ext_suffix
+        ext_suffix = self.ext_suffix
+        if platform.system() == "Darwin" and '_dbpi' in mod:
+            ext_suffix = ext_suffix.replace('.so', '.dylib')
+        return mod + ext_suffix
 
     def path_of(self, mod):
         """
@@ -191,7 +213,7 @@ class Config(object):
         """
         Gets the version string
         """
-        return "0.26.0.dev1"
+        return "0.26.0.dev4"
 
 
 config = Config()
@@ -201,13 +223,15 @@ config = Config()
 
 _tl_path = os.path.join("src", "tl", "tl")
 
-_tl_sources = glob.glob(os.path.join(_tl_path, "*.cc"))
+_tl_sources = set(glob.glob(os.path.join(_tl_path, "*.cc")))
 
 # Exclude sources which are compatible with Qt only
-_tl_sources.remove(os.path.join(_tl_path, "tlHttpStreamQt.cc"))
-_tl_sources.remove(os.path.join(_tl_path, "tlHttpStreamNoQt.cc"))
-_tl_sources.remove(os.path.join(_tl_path, "tlFileSystemWatcher.cc"))
-_tl_sources.remove(os.path.join(_tl_path, "tlDeferredExecutionQt.cc"))
+# Caveat, in source distribution tarballs from pypi, these files will
+# not exist. So we need an error-free discard method instead of list's remove.
+_tl_sources.discard(os.path.join(_tl_path, "tlHttpStreamQt.cc"))
+_tl_sources.discard(os.path.join(_tl_path, "tlHttpStreamNoQt.cc"))
+_tl_sources.discard(os.path.join(_tl_path, "tlFileSystemWatcher.cc"))
+_tl_sources.discard(os.path.join(_tl_path, "tlDeferredExecutionQt.cc"))
 
 _tl = Extension(config.root + '._tl',
                 define_macros=config.macros() + [('MAKE_TL_LIBRARY', 1)],
@@ -215,7 +239,7 @@ _tl = Extension(config.root + '._tl',
                 libraries=['curl', 'expat'],
                 extra_link_args=config.link_args('_tl'),
                 extra_compile_args=config.compile_args('_tl'),
-                sources=_tl_sources)
+                sources=list(_tl_sources))
 
 # ------------------------------------------------------------------
 # _gsi dependency library
@@ -249,10 +273,12 @@ _pya = Extension(config.root + '._pya',
 # _db dependency library
 
 _db_path = os.path.join("src", "db", "db")
-_db_sources = glob.glob(os.path.join(_db_path, "*.cc"))
+_db_sources = set(glob.glob(os.path.join(_db_path, "*.cc")))
 
 # Not a real source:
-_db_sources.remove(os.path.join(_db_path, "fonts.cc"))
+# Caveat, in source distribution tarballs from pypi, these files will
+# not exist. So we need an error-free discard method instead of list's remove.
+_db_sources.discard(os.path.join(_db_path, "fonts.cc"))
 
 _db = Extension(config.root + '._db',
                 define_macros=config.macros() + [('MAKE_DB_LIBRARY', 1)],
@@ -261,7 +287,7 @@ _db = Extension(config.root + '._db',
                 language='c++',
                 extra_link_args=config.link_args('_db'),
                 extra_compile_args=config.compile_args('_db'),
-                sources=_db_sources)
+                sources=list(_db_sources))
 
 # ------------------------------------------------------------------
 # _rdb dependency library

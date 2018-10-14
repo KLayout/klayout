@@ -44,11 +44,31 @@ matrix:
         - PYTHON_BUILD=true
         - BREW_BUNDLE=true
 
-    - name: "klayout python3.6.5_1 osx10.13"
+    - name: "klayout python3.6.6 osx10.13"
       os: osx
       osx_image: xcode9.4  # macOS 10.13
       env:
-        - MATRIX_EVAL="brew update; brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb; brew switch python 3.6.5_1; shopt -s expand_aliases; alias python='python3'; alias pip='pip3';"
+        - MATRIX_EVAL="brew update; brew install sashkab/python/python36; brew link --force --overwrite python36; shopt -s expand_aliases; alias python='/usr/local/opt/python36/bin/python3.6'; alias pip='/usr/local/opt/python36/bin/pip3.6';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+
+    - name: "klayout python3.5.6 osx10.13"
+      os: osx
+      osx_image: xcode9.4  # macOS 10.13
+      env:
+        - MATRIX_EVAL="brew update; brew install sashkab/python/python35; brew link --force --overwrite python35; shopt -s expand_aliases; alias python='/usr/local/opt/python35/bin/python3.5'; alias pip='/usr/local/opt/python35/bin/pip3.5';"
+        - ARCHFLAGS="-std=c++11"
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+
+    - name: "klayout python3.4.9 osx10.13"
+      os: osx
+      osx_image: xcode9.4  # macOS 10.13
+      env:
+        - MATRIX_EVAL="brew update; brew install sashkab/python/python34; brew link --force --overwrite python34; shopt -s expand_aliases; alias python='/usr/local/opt/python34/bin/python3.4'; alias pip='/usr/local/opt/python34/bin/pip3.4';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
@@ -68,12 +88,26 @@ matrix:
       os: osx
       osx_image: xcode8  # macOS 10.11
       env:
-        - MATRIX_EVAL="brew update; brew config; brew upgrade python;"
+        - MATRIX_EVAL="brew update; brew config; brew upgrade python; brew postinstall python; ls -l /usr/local/opt/python/libexec/bin/; shopt -s expand_aliases; alias python='/usr/local/opt/python/libexec/bin/python'; alias pip='/usr/local/opt/python/libexec/bin/pip';"
         - ARCHFLAGS="-std=c++11"
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
     
+    - name: "klayout python3.7 package"
+      os: linux
+      dist: trusty # Ubuntu 14.04
+      sudo: false
+      language: python
+      python: '3.7-dev'
+      env:
+        - MATRIX_EVAL=""
+        - PIP_UPDATE="1"
+        - PYTHON_BUILD=true
+        - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
+
     - name: "klayout python3.6 package"
       os: linux
       dist: trusty # Ubuntu 14.04
@@ -85,6 +119,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
     
     - name: "klayout python2.7 package"
       os: linux
@@ -97,6 +133,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
     
     - name: "klayout python2.6 package"
       os: linux
@@ -109,6 +147,8 @@ matrix:
         - PIP_UPDATE="0"  # setuptools installed from last pip has syntax error on py 2.6
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
     
     - name: "klayout python3.3 package"
       os: linux
@@ -121,6 +161,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
     
     - name: "klayout python3.4 package"
       os: linux
@@ -133,6 +175,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
     
     - name: "klayout python3.5 package"
       os: linux
@@ -145,6 +189,8 @@ matrix:
         - PIP_UPDATE="1"
         - PYTHON_BUILD=true
         - BREW_BUNDLE=false
+        - CC=clang
+        - CXX=clang++
 
     # KLayout builds for mac
     # Python 3
@@ -211,7 +257,6 @@ matrix:
 
 before_install:
   - env
-  - rvm install ruby --latest
   - gem install dropbox-deployment
   - eval "${MATRIX_EVAL}"
   - if [ "$BREW_BUNDLE" = true ]; then
@@ -232,6 +277,7 @@ script:
         python setup.py build;
         python setup.py bdist_wheel;
         python setup.py install;
+        python -m unittest testdata/pymod/import_db.py  testdata/pymod/import_rdb.py testdata/pymod/import_tl.py;
         mkdir -p deploy/dist-pymod;
         cp -a dist/* deploy/dist-pymod/;
         python -c 'import klayout.db as db; print(dir(db))';

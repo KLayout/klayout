@@ -2687,6 +2687,12 @@ PythonModule::make_classes (const char *mod_name)
                 add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)'")));
               }
 
+            } else if (name == "hash" && m_first->compatible_with_num_args (0)) {
+
+              //  The hash method is also routed via the tp_hash implementation
+              alt_names.push_back ("__hash__");
+              add_python_doc (*c, mt, int (mid), tl::to_string (tr ("This method is also available as 'hash(object)'")));
+
             } else if (name == "inspect" && m_first->compatible_with_num_args (0)) {
 
               //  The str method is also routed via the tp_str implementation

@@ -530,6 +530,14 @@ class DBTransTests(unittest.TestCase):
     self.assertEqual(t1.hash() == t3.hash(), False)
     self.assertEqual(t1.hash() == t4a.hash(), False)
     self.assertEqual(t1.hash() == t4b.hash(), False)
+    self.assertEqual(hash(t1) == hash(t2), True)
+    self.assertEqual(hash(t1) == hash(t3), False)
+    self.assertEqual(hash(t1) == hash(t4a), False)
+    self.assertEqual(hash(t1) == hash(t4b), False)
+    self.assertEqual(t1.__hash__() == t2.__hash__(), True)
+    self.assertEqual(t1.__hash__() == t3.__hash__(), False)
+    self.assertEqual(t1.__hash__() == t4a.__hash__(), False)
+    self.assertEqual(t1.__hash__() == t4b.__hash__(), False)
 
     # Transformations can't be used as hash keys currently
     if False:

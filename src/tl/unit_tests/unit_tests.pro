@@ -30,6 +30,7 @@ SOURCES = \
   tlVariant.cc \
   tlXMLParser.cc \
   tlUri.cc \
+  tlStreamTests.cc \
   tlWebDAV.cc \
   tlHttpStream.cc \
   tlInt128Support.cc \

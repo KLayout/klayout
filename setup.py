@@ -252,7 +252,7 @@ class Config(object):
         """
         Gets the version string
         """
-        return "0.26.0.dev4"
+        return "0.26.0.dev5"
 
 
 config = Config()

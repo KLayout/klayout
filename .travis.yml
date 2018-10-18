@@ -255,6 +255,8 @@ matrix:
         - KLAYOUT_BUILD=true
         - BREW_BUNDLE=true
 
+cache: ccache
+
 before_install:
   - env
   - gem install dropbox-deployment
@@ -272,6 +274,9 @@ before_install:
     fi
   - python -c "import distutils.sysconfig as sysconfig; print(sysconfig.__file__)"
 
+install:
+  - if [ "${KLAYOUT_BUILD}" == "1" ]; then brew install ccache; fi;
+  - if [ "${KLAYOUT_BUILD}" == "1" ]; then export PATH="/usr/local/opt/ccache/libexec:$PATH"; fi;
 script: 
   - if [ "$PYTHON_BUILD" = true ]; then
         python setup.py build;

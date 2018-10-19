@@ -54,7 +54,7 @@ and won't find them. So we need to take away the path with
 "-Wl,-soname" on Linux (see Config.link_args).
 """
 
-from setuptools import setup, Extension, Distribution
+from setuptools import setup, Extension, Distribution, find_packages
 import glob
 import os
 import platform
@@ -380,6 +380,6 @@ if __name__ == '__main__':
           author='Matthias Koefferlein',
           author_email='matthias@klayout.de',
           url='https://github.com/klayoutmatthias/klayout',
-          packages=[config.root],
-          package_dir={config.root: 'src/pymod/distutils_src'},
+          packages=find_packages('src/pymod/distutils_src'),
+          package_dir={'': 'src/pymod/distutils_src'},  # https://github.com/pypa/setuptools/issues/230
           ext_modules=[_tl, _gsi, _pya, _db, _rdb] + db_plugins + [tl, db, rdb])

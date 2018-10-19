@@ -213,7 +213,7 @@ class Config(object):
         """
         Gets the version string
         """
-        return "0.26.0.dev4"
+        return "0.26.0.dev5"
 
 
 config = Config()
@@ -333,12 +333,12 @@ for pi in glob.glob("src/plugins/*/db_plugin") + glob.glob("src/plugins/*/*/db_p
 
 tl_sources = glob.glob("src/pymod/tl/*.cc")
 
-tl = Extension(config.root + '.tl',
+tl = Extension(config.root + '.tlcore',
                define_macros=config.macros(),
                include_dirs=['src/tl/tl', 'src/gsi/gsi', 'src/pya/pya'],
                extra_objects=[config.path_of('_tl'), config.path_of(
                    '_gsi'), config.path_of('_pya')],
-               extra_link_args=config.link_args('tl'),
+               extra_link_args=config.link_args('tlcore'),
                sources=tl_sources)
 
 # ------------------------------------------------------------------
@@ -346,12 +346,12 @@ tl = Extension(config.root + '.tl',
 
 db_sources = glob.glob("src/pymod/db/*.cc")
 
-db = Extension(config.root + '.db',
+db = Extension(config.root + '.dbcore',
                define_macros=config.macros(),
                include_dirs=['src/db/db', 'src/tl/tl', 'src/gsi/gsi', 'src/pya/pya'],
                extra_objects=[config.path_of('_db'), config.path_of(
                    '_tl'), config.path_of('_gsi'), config.path_of('_pya')],
-               extra_link_args=config.link_args('db'),
+               extra_link_args=config.link_args('dbcore'),
                sources=db_sources)
 
 # ------------------------------------------------------------------
@@ -359,13 +359,13 @@ db = Extension(config.root + '.db',
 
 rdb_sources = glob.glob("src/pymod/rdb/*.cc")
 
-rdb = Extension(config.root + '.rdb',
+rdb = Extension(config.root + '.rdbcore',
                 define_macros=config.macros(),
                 include_dirs=['src/rdb/rdb', 'src/db/db',
                               'src/tl/tl', 'src/gsi/gsi', 'src/pya/pya'],
                 extra_objects=[config.path_of('_rdb'), config.path_of(
                     '_gsi'), config.path_of('_pya')],
-                extra_link_args=config.link_args('rdb'),
+                extra_link_args=config.link_args('rdbcore'),
                 sources=rdb_sources)
 
 # ------------------------------------------------------------------

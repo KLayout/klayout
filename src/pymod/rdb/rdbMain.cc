@@ -25,4 +25,4 @@
 //  to force linking of the rdb module
 #include "../../rdb/rdb/rdbForceLink.h"
 
-DEFINE_PYMOD(rdb, "rdb", "KLayout core module 'rdb'")
+DEFINE_PYMOD(rdbcore, "rdbcore", "KLayout core module 'rdbcore'")

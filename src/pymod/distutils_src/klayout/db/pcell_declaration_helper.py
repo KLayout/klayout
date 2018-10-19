@@ -276,5 +276,3 @@ for k in dir(PCellParameterDeclaration):
 
 # Inject the PCellDeclarationHelper into pya module for consistency:
 PCellDeclarationHelper = _PCellDeclarationHelper
-
-__all__ = ['PCellDeclarationHelper']

@@ -1,4 +1,4 @@
-0.25.5          (2018-09-30):
+0.25.5          (2018-10-20):
 
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/162
        GDS2 LIBNAME was not maintained on "File/Save".

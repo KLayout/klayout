@@ -62,6 +62,7 @@ import platform
 import distutils.sysconfig as sysconfig
 from distutils.errors import CompileError
 import distutils.command.build_ext
+import setuptools.command.build_ext
 import multiprocessing
 N_cores = multiprocessing.cpu_count()
 
@@ -122,6 +123,26 @@ def patched_get_ext_filename(self, ext_name):
 
 
 distutils.command.build_ext.build_ext.get_ext_filename = patched_get_ext_filename
+
+# despite it's name, setuptools.command.build_ext.link_shared_object won't
+# link a shared object on Linux, but a static library and patches distutils 
+# for this ... We're patching this back now.
+
+def always_link_shared_object(
+    self, objects, output_libname, output_dir=None, libraries=None,
+    library_dirs=None, runtime_library_dirs=None, export_symbols=None,
+    debug=0, extra_preargs=None, extra_postargs=None, build_temp=None,
+    target_lang=None):
+    self.link(
+        self.SHARED_LIBRARY, objects, output_libname,
+        output_dir, libraries, library_dirs, runtime_library_dirs,
+        export_symbols, debug, extra_preargs, extra_postargs,
+        build_temp, target_lang
+    )
+
+setuptools.command.build_ext.libtype = "shared"
+setuptools.command.build_ext.link_shared_object = always_link_shared_object
+
 # ----------------------------------------------------------------------------------------
 
 
@@ -159,9 +180,17 @@ class Config(object):
         The library name is usually decorated (i.e. "tl" -> "tl.cpython-35m-x86_64-linux-gnu.so").
         """
         ext_suffix = self.ext_suffix
-        if platform.system() == "Darwin" and '_dbpi' in mod:
-            ext_suffix = ext_suffix.replace('.so', '.dylib')
-        return mod + ext_suffix
+        if platform.system() == "Windows":
+            return mod + ext_suffix
+        else:
+            if platform.system() == "Darwin" and '_dbpi' in mod:
+                ext_suffix = ext_suffix.replace('.so', '.dylib')
+            if mod[0] == '_':
+                # is a library, not an extension module and setuptools
+                # will add the "lib" suffix
+                return "lib" + mod + ext_suffix
+            else:
+                return mod + ext_suffix
 
     def path_of(self, mod, mod_src_path):
         """
@@ -203,7 +232,7 @@ class Config(object):
                 return [ "libcurl", "expat", "pthreadVCE2", "zlib", "wsock32" ]
         else:
             if mod == "_tl":
-                ['curl', 'expat'],
+                return ['curl', 'expat']
         return []
 
     def link_args(self, mod):
@@ -252,7 +281,7 @@ class Config(object):
         """
         Gets the version string
         """
-        return "0.26.0.dev5"
+        return "0.26.0.dev6"
 
 
 config = Config()

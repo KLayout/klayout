@@ -65,6 +65,7 @@ public:
    *  1: create LWPOLYLINE
    *  2: decompose into SOLID
    *  3: create HATCH
+   *  4: create LINE: refer to 'void DXFWriter::write_polygon()' definition
    */
   int polygon_mode;
 

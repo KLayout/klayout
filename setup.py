@@ -106,6 +106,8 @@ if sys.version_info[0] * 10 + sys.version_info[1] > 26:
     distutils.ccompiler.CCompiler.compile = parallelCCompile
 
 
+# TODO: delete (Obsolete)
+# patch get_ext_filename
 from distutils.command.build_ext import build_ext
 _old_get_ext_filename = build_ext.get_ext_filename
 
@@ -124,8 +126,32 @@ def patched_get_ext_filename(self, ext_name):
 
 distutils.command.build_ext.build_ext.get_ext_filename = patched_get_ext_filename
 
-# despite it's name, setuptools.command.build_ext.link_shared_object won't
-# link a shared object on Linux, but a static library and patches distutils 
+# end patch get_ext_filename
+
+
+# patch CCompiler's library_filename for _dbpi libraries (SOs)
+# Its default is to have .so for shared objects, instead of dylib,
+# hence the patch
+
+from distutils.ccompiler import CCompiler
+old_library_filename = CCompiler.library_filename
+
+
+def patched_library_filename(self, libname, lib_type='static',     # or 'shared'
+                     strip_dir=0, output_dir=''):
+    if platform.system() == "Darwin" and '_dbpi' in libname:
+        lib_type = 'dylib'
+    return old_library_filename(self, libname, lib_type=lib_type,
+        strip_dir=strip_dir, output_dir=output_dir)
+
+
+distutils.ccompiler.CCompiler.library_filename = patched_library_filename
+
+# end patch CCompiler's library_filename for _dbpi libraries (SOs)
+
+
+# despite its name, setuptools.command.build_ext.link_shared_object won't
+# link a shared object on Linux, but a static library and patches distutils
 # for this ... We're patching this back now.
 
 def always_link_shared_object(

@@ -193,30 +193,43 @@ class Config(object):
             else:
                 self.build_temp = os.path.join(self.build_temp, "Release")
 
-        self.ext_suffix = sysconfig.get_config_var("EXT_SUFFIX")
+        build_ext_cmd = Distribution().get_command_obj('build_ext')
 
-        if self.ext_suffix is None:
-            self.ext_suffix = ".so"
+        build_ext_cmd.initialize_options()
+        build_ext_cmd.setup_shlib_compiler()
+        self.build_ext_cmd = build_ext_cmd
 
         self.root = "klayout"
 
-    def libname_of(self, mod):
+    def add_extension(self, ext):
+        self.build_ext_cmd.ext_map[ext.name] = ext
+
+    def libname_of(self, mod, is_lib=None):
         """
         Returns the library name for a given module
         The library name is usually decorated (i.e. "tl" -> "tl.cpython-35m-x86_64-linux-gnu.so").
+        This code was extracted from the source in setuptools.command.build_ext.build_ext
         """
-        ext_suffix = self.ext_suffix
-        if platform.system() == "Windows":
-            return mod + ext_suffix
+        libtype = setuptools.command.build_ext.libtype
+        full_mod = self.root + '.' + mod
+        if is_lib is True:
+            # Here we are guessing it is a library and that the filename
+            # is to be computed by shlib_compiler.
+            # See source code of setuptools.command.build_ext.build_ext.get_ext_filename
+            filename = self.build_ext_cmd.get_ext_filename(full_mod)
+            fn, ext = os.path.splitext(filename)
+            ext_path = self.build_ext_cmd.shlib_compiler.library_filename(fn, libtype)
         else:
-            if platform.system() == "Darwin" and '_dbpi' in mod:
-                ext_suffix = ext_suffix.replace('.so', '.dylib')
-            if mod[0] == '_':
-                # is a library, not an extension module and setuptools
-                # will add the "lib" suffix
-                return "lib" + mod + ext_suffix
-            else:
-                return mod + ext_suffix
+            # This assumes that the Extension/Library object was added to the
+            # ext_map dictionary via config.add_extension.
+            assert full_mod in self.build_ext_cmd.ext_map
+            ext_path = self.build_ext_cmd.get_ext_filename(full_mod)
+        ext_filename = os.path.basename(ext_path)
+
+        # Exception for database plugins, which will always be dylib.
+        if platform.system() == "Darwin" and '_dbpi' in mod:
+            ext_filename = ext_filename.replace('.so', '.dylib')
+        return ext_filename
 
     def path_of(self, mod, mod_src_path):
         """
@@ -279,7 +292,7 @@ class Config(object):
             # We can only link against such, but the bundles produced otherwise.
             args = []
             if mod[0] == "_":
-                args += ["-Wl,-dylib", '-Wl,-install_name,@rpath/%s' % self.libname_of(mod)]
+                args += ["-Wl,-dylib", '-Wl,-install_name,@rpath/%s' % self.libname_of(mod, is_lib=True)]
             args += ['-Wl,-rpath,@loader_path/']
             return args
         else:
@@ -289,7 +302,7 @@ class Config(object):
             # will look for the path-qualified library. But that's the
             # build path and the loader will fail.
             args = []
-            args += ['-Wl,-soname,' + self.libname_of(mod)]
+            args += ['-Wl,-soname,' + self.libname_of(mod, is_lib=True)]
             if '_dbpi' not in mod:
                 loader_path = '$ORIGIN'
             else:
@@ -334,6 +347,8 @@ _tl = Library(config.root + '._tl',
               extra_compile_args=config.compile_args('_tl'),
               sources=list(_tl_sources))
 
+config.add_extension(_tl)
+
 # ------------------------------------------------------------------
 # _gsi dependency library
 
@@ -348,6 +363,7 @@ _gsi = Library(config.root + '._gsi',
                extra_link_args=config.link_args('_gsi'),
                extra_compile_args=config.compile_args('_gsi'),
                sources=list(_gsi_sources))
+config.add_extension(_gsi)
 
 # ------------------------------------------------------------------
 # _pya dependency library
@@ -363,6 +379,7 @@ _pya = Library(config.root + '._pya',
                extra_link_args=config.link_args('_pya'),
                extra_compile_args=config.compile_args('_pya'),
                sources=list(_pya_sources))
+config.add_extension(_pya)
 
 # ------------------------------------------------------------------
 # _db dependency library
@@ -383,6 +400,7 @@ _db = Library(config.root + '._db',
               extra_link_args=config.link_args('_db'),
               extra_compile_args=config.compile_args('_db'),
               sources=list(_db_sources))
+config.add_extension(_db)
 
 # ------------------------------------------------------------------
 # _rdb dependency library
@@ -398,6 +416,7 @@ _rdb = Library(config.root + '._rdb',
                extra_link_args=config.link_args('_rdb'),
                extra_compile_args=config.compile_args('_rdb'),
                sources=list(_rdb_sources))
+config.add_extension(_rdb)
 
 # ------------------------------------------------------------------
 # dependency libraries from db_plugins
@@ -424,6 +443,7 @@ for pi in dbpi_dirs:
                      sources=pi_sources)
 
     db_plugins.append(pi_ext)
+    config.add_extension(pi_ext)
 
 # ------------------------------------------------------------------
 # tl extension library

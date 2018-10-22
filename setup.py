@@ -54,7 +54,7 @@ and won't find them. So we need to take away the path with
 "-Wl,-soname" on Linux (see Config.link_args).
 """
 
-from setuptools import setup, Distribution
+from setuptools import setup, Distribution, find_packages
 from setuptools.extension import Extension, Library
 import glob
 import os
@@ -320,7 +320,7 @@ class Config(object):
         """
         Gets the version string
         """
-        return "0.26.0.dev6"
+        return "0.26.0.dev7"
 
 
 config = Config()
@@ -451,11 +451,11 @@ for pi in dbpi_dirs:
 tl_path = os.path.join("src", "pymod", "tl")
 tl_sources = set(glob.glob(os.path.join(tl_path, "*.cc")))
 
-tl = Extension(config.root + '.tl',
+tl = Extension(config.root + '.tlcore',
                define_macros=config.macros(),
                include_dirs=[_tl_path, _gsi_path, _pya_path],
                extra_objects=[config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
-               extra_link_args=config.link_args('tl'),
+               extra_link_args=config.link_args('tlcore'),
                sources=list(tl_sources))
 
 # ------------------------------------------------------------------
@@ -464,11 +464,11 @@ tl = Extension(config.root + '.tl',
 db_path = os.path.join("src", "pymod", "db")
 db_sources = set(glob.glob(os.path.join(db_path, "*.cc")))
 
-db = Extension(config.root + '.db',
+db = Extension(config.root + '.dbcore',
                define_macros=config.macros(),
                include_dirs=[_db_path, _tl_path, _gsi_path, _pya_path],
                extra_objects=[config.path_of('_db', _db_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
-               extra_link_args=config.link_args('db'),
+               extra_link_args=config.link_args('dbcore'),
                sources=list(db_sources))
 
 # ------------------------------------------------------------------
@@ -477,11 +477,12 @@ db = Extension(config.root + '.db',
 rdb_path = os.path.join("src", "pymod", "rdb")
 rdb_sources = set(glob.glob(os.path.join(rdb_path, "*.cc")))
 
-rdb = Extension(config.root + '.rdb',
+rdb = Extension(config.root + '.rdbcore',
                 define_macros=config.macros(),
+
                 include_dirs=[_rdb_path, _db_path, _tl_path, _gsi_path, _pya_path],
                 extra_objects=[config.path_of('_rdb', _rdb_path), config.path_of('_tl', _tl_path), config.path_of('_gsi', _gsi_path), config.path_of('_pya', _pya_path)],
-                extra_link_args=config.link_args('rdb'),
+                extra_link_args=config.link_args('rdbcore'),
                 sources=list(rdb_sources))
 
 # ------------------------------------------------------------------
@@ -496,6 +497,6 @@ if __name__ == '__main__':
           author='Matthias Koefferlein',
           author_email='matthias@klayout.de',
           url='https://github.com/klayoutmatthias/klayout',
-          packages=[config.root],
-          package_dir={config.root: 'src/pymod/distutils_src'},
+          packages=find_packages('src/pymod/distutils_src'),
+          package_dir={'': 'src/pymod/distutils_src'},  # https://github.com/pypa/setuptools/issues/230
           ext_modules=[_tl, _gsi, _pya, _db, _rdb] + db_plugins + [tl, db, rdb])

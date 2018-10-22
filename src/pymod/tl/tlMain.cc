@@ -22,4 +22,4 @@
 
 #include "../pymodHelper.h"
 
-DEFINE_PYMOD(tl, "tl", "KLayout core module 'tl'")
+DEFINE_PYMOD(tlcore, "tl", "KLayout core module 'tl'")

@@ -137,6 +137,10 @@ mkdir -p %{buildroot}%{_libdir}/klayout/lay_plugins
 mkdir -p %{buildroot}%{_bindir}
 cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.so %{buildroot}%{pylib}/klayout
 cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.py %{buildroot}%{pylib}/klayout
+for d in tl db rdb; do
+  mkdir -p %{buildroot}%{pylib}/klayout/$d
+  cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/$d/*.py %{buildroot}%{pylib}/klayout/$d
+done
 cp -pd %{_builddir}/bin.$TARGET/lib*.so* %{buildroot}%{_libdir}/klayout
 cp -pd %{_builddir}/bin.$TARGET/db_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/db_plugins
 cp -pd %{_builddir}/bin.$TARGET/lay_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/lay_plugins

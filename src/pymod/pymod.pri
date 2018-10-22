@@ -52,9 +52,9 @@ INSTALLS = lib_target
 !equals(REALMODULE, "") {
 
   msvc {
-    QMAKE_POST_LINK += && $(MKDIR) $$shell_path($$DESTDIR_PYMOD/$$REALMODULE) && $(COPY) $$shell_path($$PWD/distutils_src/klayout/$$REALMODULE/*) $$shell_path($$DESTDIR_PYMOD/$$REALMODULE)
+    QMAKE_POST_LINK += && (if not exist $$shell_path($$DESTDIR_PYMOD/$$REALMODULE) $(MKDIR) $$shell_path($$DESTDIR_PYMOD/$$REALMODULE)) && $(COPY) $$shell_path($$PWD/distutils_src/klayout/$$REALMODULE/*.py) $$shell_path($$DESTDIR_PYMOD/$$REALMODULE)
   } else {
-    QMAKE_POST_LINK += && $(MKDIR) $$DESTDIR_PYMOD/$$REALMODULE && $(COPY) $$PWD/distutils_src/klayout/$$REALMODULE/* $$DESTDIR_PYMOD/$$REALMODULE
+    QMAKE_POST_LINK += && $(MKDIR) $$DESTDIR_PYMOD/$$REALMODULE && $(COPY) $$PWD/distutils_src/klayout/$$REALMODULE/*.py $$DESTDIR_PYMOD/$$REALMODULE
   }
 
   # INSTALLS needs to be inside a lib or app templates.

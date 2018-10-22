@@ -105,7 +105,7 @@ static tl::RegisteredClass<lay::PluginDeclaration> plugin_decl (new lay::DXFWrit
 
 static void set_dxf_polygon_mode (db::SaveLayoutOptions *options, int mode)
 {
-  if (mode < 0 || mode > 3) {
+  if (mode < 0 || mode > 4) {
     throw tl::Exception (tl::to_string (QObject::tr ("Invalid polygon mode")));
   }
 
@@ -125,7 +125,7 @@ gsi::ClassExt<db::SaveLayoutOptions> dxf_writer_options (
     "@args mode\n"
     "The mode is 0 (write POLYLINE entities), 1 (write LWPOLYLINE entities), 2 (decompose into SOLID entities), "
     "3 (write HATCH entities), or 4 (write LINE entities).\n"
-    "\nThis property has been added in version 0.21.3. '4', in version 0.25.5.\n"
+    "\nThis property has been added in version 0.21.3. '4', in version 0.25.6.\n"
   ) +
   gsi::method_ext ("dxf_polygon_mode", &get_dxf_polygon_mode,
     "@brief Specifies how to write polygons.\n"

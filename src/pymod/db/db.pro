@@ -1,5 +1,6 @@
 
-TARGET = db
+TARGET = dbcore
+REALMODULE = db
 
 include($$PWD/../pymod.pri)
 

@@ -1,5 +1,6 @@
 
-TARGET = tl
+TARGET = tlcore
+REALMODULE = tl
 
 include($$PWD/../pymod.pri)
 
@@ -41,3 +42,4 @@ msvc {
   init_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/__init__.py $(INSTALLROOT)$$PREFIX/pymod/klayout
 }
 INSTALLS += init_target
+

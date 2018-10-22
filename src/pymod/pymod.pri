@@ -63,9 +63,9 @@ INSTALLS = lib_target
   #   init_target.files += $$DESTDIR_PYMOD/$$REALMODULE/*
   # but some Qt versions need this explicitly:
   msvc {
-    modsrc_target.extra = $(INSTALL_PROGRAM) $$shell_path($$DESTDIR_PYMOD/$$REALMODULE/*) $$shell_path($(INSTALLROOT)$$PREFIX/pymod/klayout/$$REALMODULE)
+    modsrc_target.extra = $(INSTALL_PROGRAM) $$shell_path($$DESTDIR_PYMOD/$$REALMODULE/*.py) $$shell_path($(INSTALLROOT)$$PREFIX/pymod/klayout/$$REALMODULE)
   } else {
-    modsrc_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/* $(INSTALLROOT)$$PREFIX/pymod/klayout/$$REALMODULE
+    modsrc_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/$$REALMODULE/*.py $(INSTALLROOT)$$PREFIX/pymod/klayout/$$REALMODULE
   }
   INSTALLS += modsrc_target
 

@@ -1,5 +1,5 @@
 
 # klayout library definition file
 
-__all__ = [ "tl", "db", "lay", "rdb", "QtCore", "QtGui", "QtXml", "QtSql", "QtNetwork", "QtDesigner" ]
+__all__ = [ "tl", "db", "rdb", "QtCore", "QtGui", "QtXml", "QtSql", "QtNetwork", "QtDesigner", "lay" ]
 

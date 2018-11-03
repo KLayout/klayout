@@ -47,7 +47,7 @@ public:
   /**
    *  @brief Constructor specifying an external vector for storing the polygons
    */
-  PolygonRefGenerator (db::Layout *layout, std::set<db::PolygonRef> &polyrefs)
+  PolygonRefGenerator (db::Layout *layout, std::unordered_set<db::PolygonRef> &polyrefs)
     : PolygonSink (), mp_layout (layout), mp_polyrefs (&polyrefs)
   { }
 
@@ -62,7 +62,7 @@ public:
 
 private:
   db::Layout *mp_layout;
-  std::set<db::PolygonRef> *mp_polyrefs;
+  std::unordered_set<db::PolygonRef> *mp_polyrefs;
 };
 
 }
@@ -88,7 +88,7 @@ BoolAndOrNotLocalOperation::description () const
 }
 
 void
-BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const
+BoolAndOrNotLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const
 {
   db::EdgeProcessor ep;
 
@@ -147,7 +147,7 @@ SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wra
   //  .. nothing yet ..
 }
 
-void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const
+void SelfOverlapMergeLocalOperation::compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const
 {
   if (m_wrap_count == 0) {
     return;

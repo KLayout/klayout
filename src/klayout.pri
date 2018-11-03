@@ -97,6 +97,12 @@ equals(HAVE_RUBY, "1") {
   }
 }
 
+equals(HAVE_CRONOLOGY, "1") {
+  DEFINES += HAVE_CRONOLOGY
+  LIBS += $$CRONOLOGY_LIB
+  INCLUDEPATH += $$CRONOLOGY_INCLUDE
+}
+
 msvc {
 
   QMAKE_CXXFLAGS += \

@@ -28,8 +28,8 @@
 #include "dbLayout.h"
 #include "dbPluginCommon.h"
 
-#include <map>
-#include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace db
@@ -87,7 +87,7 @@ public:
    *  @param interactions The interaction set
    *  @param result The container to which the results are written
    */
-  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const = 0;
+  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const = 0;
 
   /**
    *  @brief Indicates the desired behaviour when a shape does not have an intruder
@@ -115,7 +115,7 @@ class DB_PLUGIN_PUBLIC BoolAndOrNotLocalOperation
 public:
   BoolAndOrNotLocalOperation (bool is_and);
 
-  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const;
+  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const;
   virtual on_empty_intruder_mode on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -134,7 +134,7 @@ class DB_PLUGIN_PUBLIC SelfOverlapMergeLocalOperation
 public:
   SelfOverlapMergeLocalOperation (unsigned int wrap_count);
 
-  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const;
+  virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const;
   virtual on_empty_intruder_mode on_empty_intruder_hint () const;
   virtual std::string description () const;
 

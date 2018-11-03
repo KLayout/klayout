@@ -55,7 +55,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout *layout, const db::ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const
+  virtual void compute_local (db::Layout *layout, const db::ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const
   {
     db::ShapeInteractions sized_interactions = interactions;
     for (db::ShapeInteractions::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
@@ -91,7 +91,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void compute_local (db::Layout *layout, const db::ShapeInteractions &interactions, std::set<db::PolygonRef> &result) const
+  virtual void compute_local (db::Layout *layout, const db::ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const
   {
     db::ShapeInteractions sized_interactions = interactions;
     for (db::ShapeInteractions::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {

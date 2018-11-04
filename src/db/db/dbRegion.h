@@ -3422,6 +3422,7 @@ private:
   Region selected_interacting_generic (const Edges &other, bool inverse) const;
   void select_interacting_generic (const Edges &other, bool inverse);
 };
+#endif
 
 /**
  *  @brief A polygon receiver putting the polygons into a Region object
@@ -3466,7 +3467,6 @@ private:
   Region *mp_region;
   bool m_clear;
 };
-#endif
 
 } // namespace db
 

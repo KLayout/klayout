@@ -581,12 +581,11 @@ public:
    *  This method will keep all edges for which the filter returns true.
    *  Merged semantics applies.
    */
-  template <class F>
-  Edges &filter (F &filter)
+  Edges &filter (EdgeFilterBase &filter)
   {
     edge_iterator_type ew = m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().begin ();
     for (const_iterator e = begin_merged (); ! e.at_end (); ++e) {
-      if (filter (*e)) {
+      if (filter.selected (*e)) {
         if (ew == m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
           m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*e);
           ew = m_edges.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
@@ -609,12 +608,11 @@ public:
    *  conform to the filter criterion.
    *  Merged semantics applies.
    */
-  template <class F>
-  Edges filtered (F &filter) const
+  Edges filtered (const EdgeFilterBase &filter) const
   {
     Edges d;
     for (const_iterator e = begin_merged (); ! e.at_end (); ++e) {
-      if (filter (*e)) {
+      if (filter.selected (*e)) {
         d.insert (*e);
       }
     }

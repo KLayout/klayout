@@ -724,7 +724,6 @@ Edges::select_interacting (const Region &other)
     scanner.insert ((char *) &*e, 0);
   }
 
-  other.ensure_valid_polygons ();
   for (Region::const_iterator p = other.begin (); ! p.at_end (); ++p) {
     scanner.insert ((char *) &*p + 1, 1);
   }
@@ -754,7 +753,6 @@ Edges::select_not_interacting (const Region &other)
     scanner.insert ((char *) &*e, 0);
   }
 
-  other.ensure_valid_polygons ();
   for (Region::const_iterator p = other.begin (); ! p.at_end (); ++p) {
     scanner.insert ((char *) &*p + 1, 1);
   }

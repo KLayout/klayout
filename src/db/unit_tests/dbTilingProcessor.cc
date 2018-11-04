@@ -237,7 +237,6 @@ TEST(3)
   tp.input ("i2", ir2.begin_iter ().first, ir2.begin_iter ().second);
   EXPECT_EQ (ir2.has_valid_polygons (), false);
   db::Region ir3 (db::RecursiveShapeIterator (ly, ly.cell (top), l3));
-  ir3.ensure_valid_polygons ();
   tp.input ("i3", ir3.begin_iter ().first, ir3.begin_iter ().second);
   EXPECT_EQ (ir3.has_valid_polygons (), true);
   tp.output ("o1", ly, top, o1);

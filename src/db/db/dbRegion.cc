@@ -261,6 +261,16 @@ AsIfFlatRegion::in (const Region &other, bool invert) const
   return new_region.release ();
 }
 
+size_t
+AsIfFlatRegion::size () const
+{
+  size_t n = 0;
+  for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
+    ++n;
+  }
+  return n;
+}
+
 bool
 AsIfFlatRegion::is_box () const
 {
@@ -1971,217 +1981,229 @@ FlatRegion::insert (const db::Shape &shape)
 }
 
 // -------------------------------------------------------------------------------------------------------------
+//  OriginalLayerRegion implementation
 
-#if 0 //  @@@ ORIGINAL
-/**
- *  @brief A region iterator
- *
- *  The iterator delivers the polygons of the region
- */
-
-class DB_PUBLIC RegionIterator
+namespace
 {
-public:
-  typedef db::Polygon value_type;
-  typedef const db::Polygon &reference;
-  typedef const db::Polygon *pointer;
-  typedef std::forward_iterator_tag iterator_category;
-  typedef void difference_type;
 
-  /**
-   *  @Returns true, if the iterator is at the end
-   */
-  bool at_end () const
+  class OriginalLayerRegionIterator
+    : public RegionIteratorDelegate
   {
-    return m_from == m_to && m_rec_iter.at_end ();
-  }
-
-  /**
-   *  @brief Increment
-   */
-  RegionIterator &operator++ ()
-  {
-    inc ();
-    set ();
-    return *this;
-  }
-
-  /**
-   *  @brief Access
-   */
-  reference operator* () const
-  {
-    if (m_rec_iter.at_end ()) {
-      return *m_from;
-    } else {
-      return m_polygon;
+  public:
+    OriginalLayerRegionIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
+      : m_rec_iter (iter), m_iter_trans (trans)
+    {
+      set ();
     }
-  }
 
-  /**
-   *  @brief Access
-   */
-  pointer operator-> () const
-  {
-    if (m_rec_iter.at_end ()) {
-      return &*m_from;
-    } else {
+    virtual bool at_end () const
+    {
+      return m_rec_iter.at_end ();
+    }
+
+    virtual void increment ()
+    {
+      inc ();
+      set ();
+    }
+
+    virtual const value_type *get () const
+    {
       return &m_polygon;
     }
-  }
 
-private:
-  friend class Region;
-
-  typedef db::layer<db::Polygon, db::unstable_layer_tag> polygon_layer_type;
-  typedef polygon_layer_type::iterator iterator_type;
-
-  db::RecursiveShapeIterator m_rec_iter;
-  db::ICplxTrans m_iter_trans;
-  db::Polygon m_polygon;
-  iterator_type m_from, m_to;
-
-  /**
-   *  @brief ctor from a recursive shape iterator
-   */
-  RegionIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
-    : m_rec_iter (iter), m_iter_trans (trans), m_from (), m_to ()
-  {
-    //  NOTE: the following initialization appears to be required on some compilers
-    //  (specifically MacOS/clang) to ensure the proper initialization of the iterators
-    m_from = m_to;
-    set ();
-  }
-
-  /**
-   *  @brief ctor from a range of polygons inside a vector
-   */
-  RegionIterator (iterator_type from, iterator_type to)
-    : m_from (from), m_to (to)
-  {
-    //  no required yet: set ();
-  }
-
-  /**
-   *  @brief Establish the iterator at the current position
-   */
-  void set ()
-  {
-    while (! m_rec_iter.at_end () && ! (m_rec_iter.shape ().is_polygon () || m_rec_iter.shape ().is_path () || m_rec_iter.shape ().is_box ())) {
-      inc ();
+    virtual RegionIteratorDelegate *clone () const
+    {
+      return new OriginalLayerRegionIterator (*this);
     }
-    if (! m_rec_iter.at_end ()) {
-      m_rec_iter.shape ().polygon (m_polygon);
-      m_polygon.transform (m_iter_trans * m_rec_iter.trans (), false);
+
+  private:
+    friend class Region;
+
+    db::RecursiveShapeIterator m_rec_iter;
+    db::ICplxTrans m_iter_trans;
+    db::Polygon m_polygon;
+
+    void set ()
+    {
+      while (! m_rec_iter.at_end () && ! (m_rec_iter.shape ().is_polygon () || m_rec_iter.shape ().is_path () || m_rec_iter.shape ().is_box ())) {
+        ++m_rec_iter;
+      }
+      if (! m_rec_iter.at_end ()) {
+        m_rec_iter.shape ().polygon (m_polygon);
+        m_polygon.transform (m_iter_trans * m_rec_iter.trans (), false);
+      }
     }
-  }
 
-  /**
-   *  @brief Increment the iterator
-   */
-  void inc ()
-  {
-    if (! m_rec_iter.at_end ()) {
-      ++m_rec_iter;
-    } else {
-      ++m_from;
+    void inc ()
+    {
+      if (! m_rec_iter.at_end ()) {
+        ++m_rec_iter;
+      }
     }
-  }
-};
-#endif
+  };
 
-#if 0 // @@@ TODO
-// ..........................................................
+}
 
-
-
-/**
- *  @brief An original layerregion based on a RecursiveShapeIterator
- */
-class DB_PUBLIC OriginalLayerRegion
-  : public RegionDelegate
+OriginalLayerRegion::OriginalLayerRegion ()
+  : AsIfFlatRegion ()
 {
-public:
-  OriginalLayerRegion () { }
-  virtual ~OriginalLayerRegion () { }
+  init ();
+}
 
-  RegionDelegate *clone () const;
+OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, bool is_merged)
+  : AsIfFlatRegion (), m_iter (si)
+{
+  init ();
 
-  virtual void enable_progress (const std::string &progress_desc);
-  virtual void disable_progress ();
+  m_is_merged = is_merged;
+}
 
-  virtual RegionIteratorDelegate *begin () const;
-  virtual RegionIteratorDelegate *begin_merged () const;
+OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged)
+  : AsIfFlatRegion (), m_iter (si), m_iter_trans (trans)
+{
+  init ();
 
-  virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_iter () const;
-  virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const;
+  m_is_merged = is_merged;
+  set_merged_semantics (merged_semantics);
+}
 
-  virtual bool empty () const;
-  virtual size_t size () const;
+OriginalLayerRegion::~OriginalLayerRegion ()
+{
+  //  .. nothing yet ..
+}
 
-  virtual bool is_box () const;
-  virtual bool is_merged () const;
-  virtual area_type area (const db::Box &box = db::Box ()) const;
-  virtual perimeter_type perimeter (const db::Box &box = db::Box ()) const;
+RegionDelegate *
+OriginalLayerRegion::clone () const
+{
+  return new OriginalLayerRegion (*this);
+}
 
-  virtual Box bbox () const;
+RegionIteratorDelegate *
+OriginalLayerRegion::begin () const
+{
+  return new OriginalLayerRegionIterator (m_iter, m_iter_trans);
+}
 
-  virtual EdgePairs width_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  virtual EdgePairs space_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  virtual EdgePairs isolated_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  virtual EdgePairs notch_check (db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  virtual EdgePairs enclosing_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  virtual EdgePairs overlap_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  virtual EdgePairs separation_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  virtual EdgePairs inside_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  virtual EdgePairs grid_check (db::Coord gx, db::Coord gy) const;
-  virtual EdgePairs angle_check (double min, double max, bool inverse) const;
-  virtual void snap (db::Coord gx, db::Coord gy);
-  virtual Region strange_polygon_check () const;
+RegionIteratorDelegate *
+OriginalLayerRegion::begin_merged () const
+{
+  if (! merged_semantics () || m_is_merged) {
+    return begin ();
+  } else {
+    ensure_merged_polygons_valid ();
+    return new FlatRegionIterator (m_merged_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), m_merged_polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+  }
+}
 
-  virtual Edges edges () const;
+std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
+OriginalLayerRegion::begin_iter () const
+{
+  return std::make_pair (m_iter, m_iter_trans);
+}
 
-  virtual void transform (const db::ICplxTrans &trans);
-  virtual void transform (const db::Trans &trans);
-  virtual void merge ();
-  virtual void merge (bool min_coherence, unsigned int min_wc);
+std::pair<db::RecursiveShapeIterator, db::ICplxTrans>
+OriginalLayerRegion::begin_merged_iter () const
+{
+  if (! merged_semantics () || m_is_merged) {
+    return begin_iter ();
+  } else {
+    ensure_merged_polygons_valid ();
+    return std::make_pair (db::RecursiveShapeIterator (m_merged_polygons), db::ICplxTrans ());
+  }
+}
 
-  virtual RegionDelegate *sized (coord_type d, unsigned int mode);
-  virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode);
+bool
+OriginalLayerRegion::empty () const
+{
+  return m_iter.at_end ();
+}
 
-  virtual RegionDelegate *and_with (const Region &other) const;
-  virtual RegionDelegate *not_with (const Region &other) const;
-  virtual RegionDelegate *xor_with (const Region &other) const;
-  virtual RegionDelegate *or_with (const Region &other) const;
-  virtual RegionDelegate *add (const Region &other) const;
+bool
+OriginalLayerRegion::is_merged () const
+{
+  return m_is_merged;
+}
 
-  virtual RegionDelegate *selected_outside (const Region &other) const;
-  virtual RegionDelegate *selected_not_outside (const Region &other) const;
-  virtual RegionDelegate *selected_inside (const Region &other) const;
-  virtual RegionDelegate *selected_not_inside (const Region &other) const;
-  virtual RegionDelegate *selected_interacting (const Region &other) const;
-  virtual RegionDelegate *selected_not_interacting (const Region &other) const;
-  virtual RegionDelegate *selected_interacting (const Edges &other) const;
-  virtual RegionDelegate *selected_not_interacting (const Edges &other) const;
-  virtual RegionDelegate *selected_overlapping (const Region &other) const;
-  virtual RegionDelegate *selected_not_overlapping (const Region &other) const;
+const db::Polygon *
+OriginalLayerRegion::nth (size_t) const
+{
+  tl_assert (false);
+}
 
-  virtual RegionDelegate *holes () const;
-  virtual RegionDelegate *hulls () const;
-  virtual RegionDelegate *in (const Region &other, bool invert) const;
-  virtual RegionDelegate *rounded_corners (double rinner, double router, unsigned int n) const;
-  virtual RegionDelegate *smoothed (coord_type d) const;
+bool
+OriginalLayerRegion::has_valid_polygons () const
+{
+  return false;
+}
 
-  virtual const db::Polygon *nth (size_t n) const;
-  virtual bool has_valid_polygons () const;
+const db::RecursiveShapeIterator *
+OriginalLayerRegion::iter () const
+{
+  return &m_iter;
+}
 
-  virtual const db::RecursiveShapeIterator *iter () const;
+bool
+OriginalLayerRegion::equals (const Region &other) const
+{
+  const OriginalLayerRegion *other_delegate = dynamic_cast<const OriginalLayerRegion *> (other.delegate ());
+  if (other_delegate && other_delegate->m_iter == m_iter && other_delegate->m_iter_trans == m_iter_trans) {
+    return true;
+  } else {
+    return AsIfFlatRegion::equals (other);
+  }
+}
 
-  virtual bool equals (const Region &other) const;
-  virtual bool less (const Region &other) const;
-};
+bool
+OriginalLayerRegion::less (const Region &other) const
+{
+  const OriginalLayerRegion *other_delegate = dynamic_cast<const OriginalLayerRegion *> (other.delegate ());
+  if (other_delegate && other_delegate->m_iter == m_iter && other_delegate->m_iter_trans == m_iter_trans) {
+    return false;
+  } else {
+    return AsIfFlatRegion::less (other);
+  }
+}
 
-#endif
+void
+OriginalLayerRegion::init ()
+{
+  m_is_merged = true;
+  m_merged_polygons_valid = false;
+}
+
+void
+OriginalLayerRegion::ensure_merged_polygons_valid () const
+{
+  if (! m_merged_polygons_valid) {
+
+    m_merged_polygons.clear ();
+
+    db::EdgeProcessor ep (report_progress (), progress_desc ());
+
+    //  count edges and reserve memory
+    size_t n = 0;
+    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
+      n += p->vertices ();
+    }
+    ep.reserve (n);
+
+    //  insert the polygons into the processor
+    n = 0;
+    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++n) {
+      ep.insert (*p, n);
+    }
+
+    //  and run the merge step
+    db::MergeOp op (0);
+    db::ShapeGenerator pc (m_merged_polygons);
+    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
+    ep.process (pg, op);
+
+    m_merged_polygons_valid = true;
+
+  }
+}
 
 // -------------------------------------------------------------------------------------------------------------
 //  Region implementation

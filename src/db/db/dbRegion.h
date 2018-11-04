@@ -655,6 +655,7 @@ public:
   virtual ~AsIfFlatRegion ();
 
   virtual bool is_box () const;
+  virtual size_t size () const;
 
   virtual area_type area (const db::Box &box) const;
   virtual perimeter_type perimeter (const db::Box &box) const;
@@ -956,14 +957,11 @@ class DB_PUBLIC OriginalLayerRegion
 {
 public:
   OriginalLayerRegion ();
-  OriginalLayerRegion (const RecursiveShapeIterator &si);
-  OriginalLayerRegion (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics);
+  OriginalLayerRegion (const RecursiveShapeIterator &si, bool is_merged = false);
+  OriginalLayerRegion (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged = false);
   virtual ~OriginalLayerRegion ();
 
   RegionDelegate *clone () const;
-
-  virtual void enable_progress (const std::string &progress_desc);
-  virtual void disable_progress ();
 
   virtual RegionIteratorDelegate *begin () const;
   virtual RegionIteratorDelegate *begin_merged () const;
@@ -972,45 +970,8 @@ public:
   virtual std::pair<db::RecursiveShapeIterator, db::ICplxTrans> begin_merged_iter () const;
 
   virtual bool empty () const;
-  virtual size_t size () const;
 
-  virtual bool is_box () const;
   virtual bool is_merged () const;
-  virtual area_type area (const db::Box &box = db::Box ()) const;
-  virtual perimeter_type perimeter (const db::Box &box = db::Box ()) const;
-
-  virtual Box bbox () const;
-
-  virtual RegionDelegate *merged_in_place ();
-  virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc);
-  virtual RegionDelegate *merged () const;
-  virtual RegionDelegate *merged (bool min_coherence, unsigned int min_wc) const;
-
-  virtual RegionDelegate *sized (coord_type d, unsigned int mode) const;
-  virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const;
-
-  virtual RegionDelegate *and_with (const Region &other) const;
-  virtual RegionDelegate *not_with (const Region &other) const;
-  virtual RegionDelegate *xor_with (const Region &other) const;
-  virtual RegionDelegate *or_with (const Region &other) const;
-  virtual RegionDelegate *add (const Region &other) const;
-
-  virtual RegionDelegate *selected_outside (const Region &other) const;
-  virtual RegionDelegate *selected_not_outside (const Region &other) const;
-  virtual RegionDelegate *selected_inside (const Region &other) const;
-  virtual RegionDelegate *selected_not_inside (const Region &other) const;
-  virtual RegionDelegate *selected_interacting (const Region &other) const;
-  virtual RegionDelegate *selected_not_interacting (const Region &other) const;
-  virtual RegionDelegate *selected_interacting (const Edges &other) const;
-  virtual RegionDelegate *selected_not_interacting (const Edges &other) const;
-  virtual RegionDelegate *selected_overlapping (const Region &other) const;
-  virtual RegionDelegate *selected_not_overlapping (const Region &other) const;
-
-  virtual RegionDelegate *holes () const;
-  virtual RegionDelegate *hulls () const;
-  virtual RegionDelegate *in (const Region &other, bool invert) const;
-  virtual RegionDelegate *rounded_corners (double rinner, double router, unsigned int n) const;
-  virtual RegionDelegate *smoothed (coord_type d) const;
 
   virtual const db::Polygon *nth (size_t n) const;
   virtual bool has_valid_polygons () const;
@@ -1019,6 +980,18 @@ public:
 
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;
+
+private:
+  FlatRegion &operator= (const FlatRegion &other);
+
+  bool m_is_merged;
+  mutable db::Shapes m_merged_polygons;
+  mutable bool m_merged_polygons_valid;
+  mutable db::RecursiveShapeIterator m_iter;
+  db::ICplxTrans m_iter_trans;
+
+  void init ();
+  void ensure_merged_polygons_valid () const;
 };
 
 /**

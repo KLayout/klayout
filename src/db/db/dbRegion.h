@@ -584,8 +584,8 @@ public:
   virtual EdgePairs space_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
   virtual EdgePairs isolated_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
   virtual EdgePairs notch_check (db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
-  virtual EdgePairs enclosing_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
-  virtual EdgePairs overlap_check (const Region &other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
+  virtual EdgePairs enclosing_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
+  virtual EdgePairs overlap_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
   virtual EdgePairs separation_check (const Region &, db::Coord, bool , metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
   virtual EdgePairs inside_check (const Region &, db::Coord, bool, metrics_type, double, distance_type, distance_type) const { return EdgePairs (); }
   virtual EdgePairs grid_check (db::Coord, db::Coord) const { return EdgePairs (); }

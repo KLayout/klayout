@@ -133,6 +133,18 @@ EmptyRegion::add (const Region &other) const
   return other.delegate ()->clone ();
 }
 
+bool
+EmptyRegion::equals (const Region &other) const
+{
+  return other.empty ();
+}
+
+bool
+EmptyRegion::less (const Region &other) const
+{
+  return other.empty () ? false : true;
+}
+
 // -------------------------------------------------------------------------------------------------------------
 //  AsIfFlagRegion implementation
 

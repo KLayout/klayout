@@ -42,6 +42,18 @@ namespace db {
 class Edges;
 
 /**
+ *  @brief A base class for polygon filters
+ */
+class DB_PUBLIC EdgeFilterBase
+{
+public:
+  EdgeFilterBase () { }
+  virtual ~EdgeFilterBase () { }
+
+  virtual bool selected (const db::Edge &edge) const = 0;
+};
+
+/**
  *  @brief An edge length filter for use with Edges::filter or Edges::filtered
  *
  *  This filter has two parameters: lmin and lmax.
@@ -51,6 +63,7 @@ class Edges;
  */
 
 struct DB_PUBLIC EdgeLengthFilter
+  : public EdgeFilterBase
 {
   typedef db::Edge::distance_type length_type;
 
@@ -70,7 +83,7 @@ struct DB_PUBLIC EdgeLengthFilter
   /**
    *  @brief Returns true if the edge length matches the criterion
    */
-  bool operator() (const db::Edge &edge) const
+  bool selected (const db::Edge &edge) const
   {
     length_type l = edge.length ();
     if (! m_inverse) {
@@ -96,6 +109,7 @@ private:
  */
 
 struct DB_PUBLIC EdgeOrientationFilter
+  : public EdgeFilterBase
 {
   /**
    *  @brief Constructor 
@@ -132,7 +146,7 @@ struct DB_PUBLIC EdgeOrientationFilter
   /**
    *  @brief Returns true if the edge orientation matches the criterion
    */
-  bool operator() (const db::Edge &edge) const
+  bool selected (const db::Edge &edge) const
   {
     int smin = db::vprod_sign (m_emin, db::DVector (edge.d ()));
     if (m_exact) {

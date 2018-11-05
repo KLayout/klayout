@@ -825,7 +825,7 @@ private:
   mutable bool m_bbox_valid;
   mutable db::Box m_bbox;
 
-  void ensure_bbox_valid ();
+  virtual db::Box compute_bbox () const;
   static RegionDelegate *region_from_box (const db::Box &b);
 
   EdgePairs run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, bool whole_edges, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection) const;
@@ -868,8 +868,6 @@ public:
   virtual bool empty () const;
   virtual size_t size () const;
   virtual bool is_merged () const;
-
-  virtual Box bbox () const;
 
   virtual RegionDelegate *merged_in_place ();
   virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc);
@@ -930,11 +928,11 @@ public:
     }
   }
 
-  db::Shapes &raw_polygons ();
+  db::Shapes &raw_polygons () { return m_polygons; }
 
 protected:
   virtual void merged_semantics_changed ();
-  void set_box (const db::Box &box);
+  virtual Box compute_bbox () const;
   void invalidate_cache ();
 
 private:
@@ -957,6 +955,7 @@ class DB_PUBLIC OriginalLayerRegion
 {
 public:
   OriginalLayerRegion ();
+  OriginalLayerRegion (const OriginalLayerRegion &other);
   OriginalLayerRegion (const RecursiveShapeIterator &si, bool is_merged = false);
   OriginalLayerRegion (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged = false);
   virtual ~OriginalLayerRegion ();

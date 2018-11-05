@@ -369,20 +369,30 @@ AsIfFlatRegion::perimeter (const db::Box &box) const
 Box AsIfFlatRegion::bbox () const
 {
   if (! m_bbox_valid) {
-    m_bbox = db::Box ();
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-      m_bbox += p->box ();
-    }
+    m_bbox = compute_bbox ();
     m_bbox_valid = true;
   }
-
   return m_bbox;
+}
+
+Box AsIfFlatRegion::compute_bbox () const
+{
+  db::Box b;
+  for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
+    b += p->box ();
+  }
+  return b;
 }
 
 void AsIfFlatRegion::update_bbox (const db::Box &b)
 {
   m_bbox = b;
   m_bbox_valid = true;
+}
+
+void AsIfFlatRegion::invalidate_bbox ()
+{
+  m_bbox_valid = false;
 }
 
 RegionDelegate *
@@ -1612,7 +1622,7 @@ namespace
 
 
 FlatRegion::FlatRegion ()
-  : AsIfFlatRegion ()
+  : AsIfFlatRegion (), m_polygons (false), m_merged_polygons (false)
 {
   init ();
 }
@@ -1751,18 +1761,10 @@ bool FlatRegion::is_merged () const
   return m_is_merged;
 }
 
-void FlatRegion::set_box (const db::Box &b)
+Box FlatRegion::compute_bbox () const
 {
-  m_polygons.clear ();
-  if (! b.empty () && b.width () > 0 && b.height () > 0 ) {
-    m_polygons.insert (db::Polygon (b));
-  }
-
-  m_is_merged = true;
-  update_bbox (b);
-
-  m_merged_polygons.clear ();
-  m_merged_polygons_valid = false;
+  m_polygons.update_bbox ();
+  return m_polygons.bbox ();
 }
 
 RegionDelegate *FlatRegion::filter_in_place (const PolygonFilterBase &filter)
@@ -2058,13 +2060,24 @@ namespace
 }
 
 OriginalLayerRegion::OriginalLayerRegion ()
-  : AsIfFlatRegion ()
+  : AsIfFlatRegion (), m_merged_polygons (false)
 {
   init ();
 }
 
+OriginalLayerRegion::OriginalLayerRegion (const OriginalLayerRegion &other)
+  : AsIfFlatRegion (other),
+    m_is_merged (other.m_is_merged),
+    m_merged_polygons (other.m_merged_polygons),
+    m_merged_polygons_valid (other.m_merged_polygons_valid),
+    m_iter (other.m_iter),
+    m_iter_trans (other.m_iter_trans)
+{
+  //  .. nothing yet ..
+}
+
 OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, bool is_merged)
-  : AsIfFlatRegion (), m_iter (si)
+  : AsIfFlatRegion (), m_merged_polygons (false), m_iter (si)
 {
   init ();
 
@@ -2072,7 +2085,7 @@ OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, bool
 }
 
 OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged)
-  : AsIfFlatRegion (), m_iter (si), m_iter_trans (trans)
+  : AsIfFlatRegion (), m_merged_polygons (false), m_iter (si), m_iter_trans (trans)
 {
   init ();
 

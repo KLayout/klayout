@@ -72,7 +72,7 @@ TechnologyController::instance ()
 void
 TechnologyController::initialize (lay::PluginRoot *root)
 {
-  mp_mw = dynamic_cast <lay::MainWindow *> (root);
+  mp_mw = lay::MainWindow::instance ();
   if (mp_mw) {
     mp_editor = new lay::TechSetupDialog (mp_mw);
     mp_editor->setModal (false);

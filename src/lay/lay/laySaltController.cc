@@ -51,7 +51,7 @@ SaltController::initialized (lay::PluginRoot *root)
     connect (m_file_watcher, SIGNAL (fileRemoved (const QString &)), this, SLOT (file_watcher_triggered ()));
   }
 
-  mp_mw = dynamic_cast <lay::MainWindow *> (root);
+  mp_mw = lay::MainWindow::instance ();
 
   connect (&m_salt, SIGNAL (collections_changed ()), this, SIGNAL (salt_changed ()));
 }

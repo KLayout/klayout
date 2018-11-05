@@ -128,11 +128,9 @@ SaltController::show_editor ()
 
   if (mp_salt_dialog) {
 
-    if (mp_mw) {
-      std::string s = mp_mw->config_get (cfg_salt_manager_window_state);
-      if (! s.empty ()) {
-        lay::restore_dialog_state (mp_salt_dialog, s);
-      }
+    std::string s = lay::PluginRoot::instance ()->config_get (cfg_salt_manager_window_state);
+    if (! s.empty ()) {
+      lay::restore_dialog_state (mp_salt_dialog, s);
     }
 
     //  while running the dialog, don't watch file events - that would interfere with
@@ -141,9 +139,7 @@ SaltController::show_editor ()
     mp_salt_dialog->exec ();
     m_file_watcher->enable (true);
 
-    if (mp_mw) {
-      mp_mw->config_set (cfg_salt_manager_window_state, lay::save_dialog_state (mp_salt_dialog));
-    }
+    lay::PluginRoot::instance ()->config_set (cfg_salt_manager_window_state, lay::save_dialog_state (mp_salt_dialog));
 
     sync_file_watcher ();
 

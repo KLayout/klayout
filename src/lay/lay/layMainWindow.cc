@@ -468,7 +468,7 @@ MainWindow::MainWindow (QApplication *app, const char *name)
   }
   mw_instance = this;
 
-  mp_setup_form = new SettingsForm (0, this, "setup_form"),
+  mp_setup_form = new SettingsForm (0, lay::PluginRoot::instance (), "setup_form"),
 
   db::LibraryManager::instance ().changed_event.add (this, &MainWindow::libraries_changed);
 
@@ -1077,13 +1077,13 @@ void
 MainWindow::dock_widget_visibility_changed (bool /*visible*/)
 {
   if (sender () == mp_lp_dock_widget) {
-    config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
+    lay::PluginRoot::instance ()->config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
   } else if (sender () == mp_hp_dock_widget) {
-    config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
+    lay::PluginRoot::instance ()->config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
   } else if (sender () == mp_navigator_dock_widget) {
-    config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
+    lay::PluginRoot::instance ()->config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
   } else if (sender () == mp_layer_toolbox_dock_widget) {
-    config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
+    lay::PluginRoot::instance ()->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
   }
 }
 
@@ -1259,7 +1259,7 @@ MainWindow::about_to_exec ()
   bool f;
 
   f = false;
-  config_get (cfg_full_hier_new_cell, f);
+  lay::PluginRoot::instance ()->config_get (cfg_full_hier_new_cell, f);
   if (!f) {
     TipDialog td (this,
                   tl::to_string (QObject::tr ("<html><body>"
@@ -1278,7 +1278,7 @@ MainWindow::about_to_exec ()
     lay::TipDialog::button_type button = lay::TipDialog::null_button;
     if (td.exec_dialog (button)) {
       if (button == lay::TipDialog::yes_button) {
-        config_set (cfg_full_hier_new_cell, true);
+        lay::PluginRoot::instance ()->config_set (cfg_full_hier_new_cell, true);
       }
       //  Don't bother the user with more dialogs.
       return;
@@ -1297,7 +1297,7 @@ MainWindow::about_to_exec ()
   }
 
   f = false;
-  config_get (cfg_no_stipple, f);
+  lay::PluginRoot::instance ()->config_get (cfg_no_stipple, f);
   if (f) {
     TipDialog td (this,
                   tl::to_string (QObject::tr ("Layers are shown without fill because fill has been intentionally turned off. This can be confusing since selecting a stipple does not have an effect in this case.\n\nTo turn this feature off, uncheck \"Show Layers Without Fill\" in the \"View\" menu.")),
@@ -1309,7 +1309,7 @@ MainWindow::about_to_exec ()
   }
 
   f = false;
-  config_get (cfg_markers_visible, f);
+  lay::PluginRoot::instance ()->config_get (cfg_markers_visible, f);
   if (! f) {
     TipDialog td (this,
                   tl::to_string (QObject::tr ("Markers are not visible because they have been turned off.\nYou may not see markers when using the marker browser feature.\n\nTo turn markers on, check \"Show Markers\" in the \"View\" menu.")),
@@ -1321,7 +1321,7 @@ MainWindow::about_to_exec ()
   }
 
   f = false;
-  config_get (cfg_hide_empty_layers, f);
+  lay::PluginRoot::instance ()->config_get (cfg_hide_empty_layers, f);
   if (f) {
     TipDialog td (this,
                   tl::to_string (QObject::tr ("The \"Hide Empty Layers\" feature is enabled. This can be confusing, in particular in edit mode, because layers are not shown although they are actually present.\n\nTo disable this feature, uncheck \"Hide Empty Layers\" in the layer panel's context menu.")),
@@ -1813,10 +1813,10 @@ MainWindow::libraries_changed ()
 void
 MainWindow::read_dock_widget_state ()
 {
-  config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
-  config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
-  config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
-  config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
+  lay::PluginRoot::instance ()->config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
+  lay::PluginRoot::instance ()->config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
+  lay::PluginRoot::instance ()->config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
+  lay::PluginRoot::instance ()->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
 }
 
 void
@@ -1929,7 +1929,7 @@ MainWindow::can_close ()
 
   for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
     lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-    if (! pd->can_exit (this)) {
+    if (! pd->can_exit (lay::PluginRoot::instance ())) {
       return false;
     }
   }
@@ -1974,8 +1974,8 @@ MainWindow::save_state_to_config ()
 {
   //  save the dock widget state with all views closed (that state can be
   //  used for staring klayout without any layout)
-  config_set (cfg_window_geometry, (const char *) saveGeometry ().toBase64 ().data ());
-  config_set (cfg_window_state, (const char *) saveState ().toBase64 ().data ());
+  lay::PluginRoot::instance ()->config_set (cfg_window_geometry, (const char *) saveGeometry ().toBase64 ().data ());
+  lay::PluginRoot::instance ()->config_set (cfg_window_state, (const char *) saveState ().toBase64 ().data ());
 }
 
 void
@@ -3400,13 +3400,13 @@ MainWindow::cm_pull_in ()
 void
 MainWindow::cm_reader_options ()
 {
-  mp_layout_load_options->edit_global_options (this, lay::Technologies::instance ());
+  mp_layout_load_options->edit_global_options (lay::PluginRoot::instance (), lay::Technologies::instance ());
 }
 
 void
 MainWindow::cm_writer_options ()
 {
-  mp_layout_save_options->edit_global_options (this, lay::Technologies::instance ());
+  mp_layout_save_options->edit_global_options (lay::PluginRoot::instance (), lay::Technologies::instance ());
 }
 
 void
@@ -3675,7 +3675,7 @@ MainWindow::clone_current_view ()
   }
 
   //  create a new view
-  view = new lay::LayoutView (current_view (), &m_manager, lay::ApplicationBase::instance ()->is_editable (), this, mp_view_stack);
+  view = new lay::LayoutView (current_view (), &m_manager, lay::ApplicationBase::instance ()->is_editable (), lay::PluginRoot::instance (), mp_view_stack);
   connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (edits_enabled_changed ()), this, SLOT (edits_enabled_changed ()));
@@ -4111,7 +4111,7 @@ MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
     }
   }
 
-  config_set (cfg_mru, config_str);
+  lay::PluginRoot::instance ()->config_set (cfg_mru, config_str);
 }
 
 void
@@ -4164,7 +4164,7 @@ MainWindow::open_recent ()
     return;
   }
 
-  if (mp_layout_load_options->show_always () && !mp_layout_load_options->edit_global_options (this, lay::Technologies::instance ())) {
+  if (mp_layout_load_options->show_always () && !mp_layout_load_options->edit_global_options (lay::PluginRoot::instance (), lay::Technologies::instance ())) {
     return;
   }
 
@@ -4213,7 +4213,7 @@ MainWindow::open (int mode)
     return;
   }
 
-  if (mp_layout_load_options->show_always () && !mp_layout_load_options->edit_global_options (this, lay::Technologies::instance ())) {
+  if (mp_layout_load_options->show_always () && !mp_layout_load_options->edit_global_options (lay::PluginRoot::instance (), lay::Technologies::instance ())) {
     return;
   }
 
@@ -4284,7 +4284,7 @@ int
 MainWindow::do_create_view ()
 {
   //  create a new view
-  lay::LayoutView *view = new lay::LayoutView (&m_manager, lay::ApplicationBase::instance ()->is_editable (), this, mp_view_stack);
+  lay::LayoutView *view = new lay::LayoutView (&m_manager, lay::ApplicationBase::instance ()->is_editable (), lay::PluginRoot::instance (), mp_view_stack);
 
   connect (view, SIGNAL (title_changed ()), this, SLOT (view_title_changed ()));
   connect (view, SIGNAL (dirty_changed ()), this, SLOT (view_title_changed ()));
@@ -4305,7 +4305,7 @@ MainWindow::do_create_view ()
   view->set_synchronous (synchronous ());
 
   int tl = 0;
-  config_get (cfg_initial_hier_depth, tl);
+  lay::PluginRoot::instance ()->config_get (cfg_initial_hier_depth, tl);
   view->set_hier_levels (std::make_pair (0, tl));
 
   //  select the current mode and select the enabled editables
@@ -4364,7 +4364,7 @@ MainWindow::create_or_load_layout (const std::string *filename, const db::LoadLa
     if (mode == 0) {
       //  reset the hierarchy depth in the "replace" case
       int tl = 0;
-      config_get (cfg_initial_hier_depth, tl);
+      lay::PluginRoot::instance ()->config_get (cfg_initial_hier_depth, tl);
       vw->set_hier_levels (std::make_pair (0, tl));
       vw->clear_states ();
       vw->store_state ();
@@ -4564,7 +4564,7 @@ MainWindow::get_hier_levels () const
     return current_view ()->get_hier_levels ();
   } else {
     int tl = 0;
-    config_get (cfg_initial_hier_depth, tl);
+    lay::PluginRoot::instance ()->config_get (cfg_initial_hier_depth, tl);
     return std::make_pair (0, tl);
   }
 }
@@ -4861,8 +4861,8 @@ MainWindow::show_assistant_topic (const std::string &s, bool modal)
 void
 MainWindow::cm_show_all_tips ()
 {
-  config_set (cfg_tip_window_hidden, "");
-  config_finalize ();
+  lay::PluginRoot::instance ()->config_set (cfg_tip_window_hidden, "");
+  lay::PluginRoot::instance ()->config_end ();
 }
 
 void
@@ -4894,7 +4894,7 @@ MainWindow::action_for_slot (const char *slot)
 lay::Action *
 MainWindow::create_config_action (const std::string &title, const std::string &cname, const std::string &cvalue)
 {
-  lay::ConfigureAction *ca = new lay::ConfigureAction(this, title, cname, cvalue);
+  lay::ConfigureAction *ca = new lay::ConfigureAction(lay::PluginRoot::instance (), title, cname, cvalue);
   m_ca_collection.push_back (ca);
   return ca;
 }
@@ -4902,7 +4902,7 @@ MainWindow::create_config_action (const std::string &title, const std::string &c
 lay::Action *
 MainWindow::create_config_action (const std::string &cname, const std::string &cvalue)
 {
-  lay::ConfigureAction *ca = new lay::ConfigureAction(this, std::string (), cname, cvalue);
+  lay::ConfigureAction *ca = new lay::ConfigureAction(lay::PluginRoot::instance (), std::string (), cname, cvalue);
   m_ca_collection.push_back (ca);
   return ca;
 }
@@ -5600,11 +5600,8 @@ MainWindow::plugin_registered (lay::PluginDeclaration *cls)
 
   //  recreate all plugins
   for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-    (*vp)->create_plugins (this);
+    (*vp)->create_plugins (lay::PluginRoot::instance ());
   }
-
-  //  re-establish the configuration
-  config_setup ();
 }
 
 void
@@ -5614,11 +5611,79 @@ MainWindow::plugin_removed (lay::PluginDeclaration *cls)
 
   //  recreate all plugins except the one that got removed
   for (std::vector <lay::LayoutView *>::iterator vp = mp_views.begin (); vp != mp_views.end (); ++vp) {
-    (*vp)->create_plugins (this, cls);
+    (*vp)->create_plugins (lay::PluginRoot::instance (), cls);
+  }
+}
+
+// ------------------------------------------------------------
+//  Implementation of the PluginRootToMainWindow bride
+
+PluginRootToMainWindow::PluginRootToMainWindow ()
+  : mp_main_window (0)
+{
+  //  .. nothing yet ..
+}
+
+void
+PluginRootToMainWindow::attach_to (lay::MainWindow *main_window)
+{
+  mp_main_window = main_window;
+}
+
+void
+PluginRootToMainWindow::plugin_registered (lay::PluginDeclaration *cls)
+{
+  if (mp_main_window.get ()) {
+    mp_main_window->plugin_registered (cls);
   }
 
   //  re-establish the configuration
   config_setup ();
+}
+
+void
+PluginRootToMainWindow::plugin_removed (lay::PluginDeclaration *cls)
+{
+  if (mp_main_window.get ()) {
+    mp_main_window->plugin_removed (cls);
+  }
+
+  //  re-establish the configuration
+  config_setup ();
+}
+
+void
+PluginRootToMainWindow::select_mode (int mode)
+{
+  if (mp_main_window.get ()) {
+    mp_main_window->select_mode (mode);
+  }
+}
+
+void
+PluginRootToMainWindow::menu_activated (const std::string &symbol)
+{
+  if (mp_main_window.get ()) {
+    mp_main_window->menu_activated (symbol);
+  }
+}
+
+bool
+PluginRootToMainWindow::configure (const std::string &name, const std::string &value)
+{
+  if (mp_main_window.get ()) {
+    return mp_main_window->configure (name, value);
+  } else {
+    return false;
+  }
+}
+
+void
+PluginRootToMainWindow::config_finalize ()
+{
+  if (mp_main_window.get ()) {
+    mp_main_window->config_finalize ();
+  }
 }
 
 // ------------------------------------------------------------

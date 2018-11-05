@@ -62,6 +62,7 @@ namespace lay
 {
 
 class MainWindow;
+class PluginRootToMainWindow;
 class PluginRoot;
 class ProgressReporter;
 class ProgressBar;
@@ -475,6 +476,7 @@ protected:
 
 private:
   MainWindow *mp_mw;
+  PluginRootToMainWindow *mp_plugin_root;
   gtf::Recorder *mp_recorder;
   std::auto_ptr<tl::DeferredMethodScheduler> mp_dm_scheduler;
 };

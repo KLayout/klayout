@@ -162,11 +162,10 @@ MacroController::finish ()
 void
 MacroController::initialized (lay::PluginRoot *root)
 {
-  mp_mw = dynamic_cast <lay::MainWindow *> (root);
-  if (mp_mw) {
-    mp_macro_editor = new lay::MacroEditorDialog (mp_mw, &lym::MacroCollection::root ());
-    mp_macro_editor->setModal (false);
-  }
+  mp_mw = lay::MainWindow::instance ();
+
+  mp_macro_editor = new lay::MacroEditorDialog (root, &lym::MacroCollection::root ());
+  mp_macro_editor->setModal (false);
 
   if (! m_file_watcher) {
     m_file_watcher = new tl::FileSystemWatcher (this);

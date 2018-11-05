@@ -447,7 +447,7 @@ Navigator::Navigator (MainWindow *main_window)
   mp_menu_bar->setFrameShape (QFrame::NoFrame);
   mp_menu_bar->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-  mp_view = new LayoutView (0, false, mp_main_window, this, "navigator", LayoutView::LV_Naked + LayoutView::LV_NoZoom + LayoutView::LV_NoServices + LayoutView::LV_NoGrid);
+  mp_view = new LayoutView (0, false, lay::PluginRoot::instance (), this, "navigator", LayoutView::LV_Naked + LayoutView::LV_NoZoom + LayoutView::LV_NoServices + LayoutView::LV_NoGrid);
   mp_view->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
   mp_view->setMinimumWidth (100);
   mp_view->setMinimumHeight (100);
@@ -586,8 +586,8 @@ Navigator::showEvent (QShowEvent *)
 void 
 Navigator::closeEvent (QCloseEvent *)
 {
-  mp_main_window->config_set (cfg_show_navigator, "false");
-  mp_main_window->config_finalize ();
+  lay::PluginRoot::instance ()->config_set (cfg_show_navigator, "false");
+  lay::PluginRoot::instance ()->config_end ();
 }
 
 void 

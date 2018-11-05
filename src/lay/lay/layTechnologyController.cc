@@ -203,7 +203,7 @@ void
 TechnologyController::technologies_changed ()
 {
   //  update the configuration to reflect the persisted technologies
-  lay::PluginRoot *pr = mp_mw;
+  lay::PluginRoot *pr = lay::PluginRoot::instance ();
   if (pr) {
     m_configure_enabled = false;
     try {
@@ -474,9 +474,7 @@ TechnologyController::show_editor ()
 
   }
 
-  if (mp_mw) {
-    mp_mw->config_set (cfg_tech_editor_window_state, lay::save_dialog_state (mp_editor));
-  }
+  lay::PluginRoot::instance ()->config_set (cfg_tech_editor_window_state, lay::save_dialog_state (mp_editor));
 }
 
 const std::string &

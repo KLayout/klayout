@@ -50,7 +50,7 @@ std::string tech_string_from_name (const std::string &tn)
 }
 
 TechnologyController::TechnologyController ()
-  : PluginDeclaration (), mp_editor (0), mp_mw (0), mp_active_technology (0)
+  : PluginDeclaration (), mp_editor (0), mp_mw (0), mp_plugin_root (0), mp_active_technology (0)
 {
   m_configure_enabled = true;
   m_current_technology_updated = false;
@@ -70,8 +70,9 @@ TechnologyController::instance ()
 }
 
 void
-TechnologyController::initialize (lay::PluginRoot * /*root*/)
+TechnologyController::initialize (lay::PluginRoot *root)
 {
+  mp_plugin_root = root;
   mp_mw = lay::MainWindow::instance ();
   if (mp_mw) {
     mp_editor = new lay::TechSetupDialog (mp_mw);
@@ -192,7 +193,7 @@ TechnologyController::update_active_technology ()
 #if 0 
   //  Hint with this implementation, the current technology follows the current layout.
   //  Although that's a nice way to display the current technology, it's pretty confusing
-  lay::PluginRoot *pr = mp_mw;
+  lay::PluginRoot *pr = mp_plugin_root;
   if (pr) {
     pr->config_set (cfg_initial_technology, active_tech);
   }
@@ -203,7 +204,7 @@ void
 TechnologyController::technologies_changed ()
 {
   //  update the configuration to reflect the persisted technologies
-  lay::PluginRoot *pr = lay::PluginRoot::instance ();
+  lay::PluginRoot *pr = mp_plugin_root;
   if (pr) {
     m_configure_enabled = false;
     try {
@@ -474,7 +475,7 @@ TechnologyController::show_editor ()
 
   }
 
-  lay::PluginRoot::instance ()->config_set (cfg_tech_editor_window_state, lay::save_dialog_state (mp_editor));
+  mp_plugin_root->config_set (cfg_tech_editor_window_state, lay::save_dialog_state (mp_editor));
 }
 
 const std::string &

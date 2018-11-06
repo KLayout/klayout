@@ -182,7 +182,7 @@ public:
   /**
    *  @brief Constructor
    */
-  LayoutView (db::Manager *mgr, bool editable, lay::PluginRoot *root, QWidget *parent = 0, const char *name = "view", unsigned int options = (unsigned int) LV_Normal);
+  LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent = 0, const char *name = "view", unsigned int options = (unsigned int) LV_Normal);
 
   /**
    *  @brief Constructor (clone from another view)
@@ -650,6 +650,11 @@ public:
    *  is triggered.
    */
   tl::Event viewport_changed_event;
+
+  /**
+   *  @brief This event is triggered if the background color changed
+   */
+  tl::Event background_color_changed_event;
 
   /**
    *  @brief An event signalling that the layer list has changed.

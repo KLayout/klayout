@@ -121,6 +121,7 @@ private:
   void layers_changed (int);
   void viewport_changed ();
   void hier_levels_changed ();
+  void update_background_color ();
 
   void content_changed_with_int (int)
   {

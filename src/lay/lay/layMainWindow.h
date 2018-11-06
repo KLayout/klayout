@@ -134,7 +134,7 @@ public:
   /**
    *  @brief Constructor
    */
-  MainWindow (QApplication *app = 0, lay::PluginRoot *plugin_root = 0, const char *name = "main_window");
+  MainWindow (QApplication *app = 0, lay::Plugin *parent_plugin = 0, const char *name = "main_window");
 
   /** 
    *  @brief Destructor
@@ -872,7 +872,6 @@ protected:
 private:
   friend class PluginRootToMainWindow;
 
-  lay::PluginRoot *mp_plugin_root;
   TextProgressDelegate m_text_progress;
 
   //  Main menu

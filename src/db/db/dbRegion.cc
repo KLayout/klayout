@@ -50,6 +50,23 @@ RegionDelegate::RegionDelegate ()
   m_merge_min_coherence = false;
 }
 
+RegionDelegate::RegionDelegate (const RegionDelegate &other)
+{
+  operator= (other);
+}
+
+RegionDelegate &
+RegionDelegate::operator= (const RegionDelegate &other)
+{
+  if (this != &other) {
+    m_report_progress = other.m_report_progress;
+    m_merged_semantics = other.m_merged_semantics;
+    m_strict_handling = other.m_strict_handling;
+    m_merge_min_coherence = other.m_merge_min_coherence;
+  }
+  return *this;
+}
+
 RegionDelegate::~RegionDelegate ()
 {
   //  .. nothing yet ..
@@ -110,18 +127,6 @@ EmptyRegion::clone () const
 }
 
 RegionDelegate *
-EmptyRegion::xor_with (const Region &other) const
-{
-  return other.delegate ()->clone ();
-}
-
-RegionDelegate *
-EmptyRegion::or_with (const Region &other) const
-{
-  return other.delegate ()->clone ();
-}
-
-RegionDelegate *
 EmptyRegion::add_in_place (const Region &other)
 {
   return add (other);
@@ -131,6 +136,24 @@ RegionDelegate *
 EmptyRegion::add (const Region &other) const
 {
   return other.delegate ()->clone ();
+}
+
+RegionDelegate *
+EmptyRegion::xor_with (const Region &other) const
+{
+  return or_with (other);
+}
+
+RegionDelegate *
+EmptyRegion::or_with (const Region &other) const
+{
+  if (other.empty ()) {
+    return new EmptyRegion ();
+  } else if (! other.strict_handling ()) {
+    return other.delegate ()->clone ();
+  } else {
+    return other.delegate ()->merged ();
+  }
 }
 
 bool
@@ -1267,7 +1290,7 @@ AsIfFlatRegion::and_with (const Region &other) const
 
     //  map AND with box to clip ..
     db::Box b = bbox ();
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion ());
+    std::auto_ptr<FlatRegion> new_region (new FlatRegion (false));
 
     std::vector<db::Polygon> clipped;
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
@@ -1282,7 +1305,7 @@ AsIfFlatRegion::and_with (const Region &other) const
 
     //  map AND with box to clip ..
     db::Box b = other.bbox ();
-    std::auto_ptr<FlatRegion> new_region (new FlatRegion ());
+    std::auto_ptr<FlatRegion> new_region (new FlatRegion (false));
 
     std::vector<db::Polygon> clipped;
     for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
@@ -1500,6 +1523,8 @@ AsIfFlatRegion::add (const Region &other) const
   if (other_flat) {
 
     std::auto_ptr<FlatRegion> new_region (new FlatRegion (*other_flat));
+    new_region->set_is_merged (false);
+    new_region->invalidate_cache ();
 
     size_t n = new_region->raw_polygons ().size () + size ();
 
@@ -1657,6 +1682,11 @@ FlatRegion::FlatRegion (bool is_merged)
   init ();
 
   m_is_merged = is_merged;
+}
+
+void FlatRegion::set_is_merged (bool m)
+{
+  m_is_merged = m;
 }
 
 void FlatRegion::invalidate_cache ()
@@ -1872,6 +1902,8 @@ RegionDelegate *FlatRegion::merged () const
 RegionDelegate *FlatRegion::add (const Region &other) const
 {
   std::auto_ptr<FlatRegion> new_region (new FlatRegion (*this));
+  new_region->invalidate_cache ();
+  new_region->set_is_merged (false);
 
   FlatRegion *other_flat = dynamic_cast<FlatRegion *> (other.delegate ());
   if (other_flat) {
@@ -1899,6 +1931,7 @@ RegionDelegate *FlatRegion::add (const Region &other) const
 RegionDelegate *FlatRegion::add_in_place (const Region &other)
 {
   invalidate_cache ();
+  m_is_merged = false;
 
   FlatRegion *other_flat = dynamic_cast<FlatRegion *> (other.delegate ());
   if (other_flat) {
@@ -1919,8 +1952,6 @@ RegionDelegate *FlatRegion::add_in_place (const Region &other)
     }
 
   }
-
-  m_is_merged = false;
 
   return this;
 }
@@ -1944,9 +1975,21 @@ void
 FlatRegion::insert (const db::Box &box)
 {
   if (! box.empty () && box.width () > 0 && box.height () > 0) {
-    m_polygons.insert (db::Polygon (box));
-    m_is_merged = false;
-    invalidate_cache ();
+
+    if (empty ()) {
+
+      m_polygons.insert (db::Polygon (box));
+      m_is_merged = true;
+      update_bbox (box);
+
+    } else {
+
+      m_polygons.insert (db::Polygon (box));
+      m_is_merged = false;
+      invalidate_cache ();
+
+    }
+
   }
 }
 
@@ -2281,6 +2324,29 @@ Region::iter () const
   static db::RecursiveShapeIterator def_iter;
   const db::RecursiveShapeIterator *i = mp_delegate->iter ();
   return *(i ? i : &def_iter);
+}
+
+void
+Region::set_delegate (RegionDelegate *delegate)
+{
+  if (delegate != mp_delegate) {
+    delete mp_delegate;
+    mp_delegate = delegate;
+  }
+}
+
+FlatRegion *
+Region::flat_region ()
+{
+  FlatRegion *region = dynamic_cast<FlatRegion *> (mp_delegate);
+  if (! region) {
+    region = new FlatRegion ();
+    region->RegionDelegate::operator= (*mp_delegate);
+    region->insert_seq (begin ());
+    set_delegate (region);
+  }
+
+  return region;
 }
 
 // -------------------------------------------------------------------------------------------------------------

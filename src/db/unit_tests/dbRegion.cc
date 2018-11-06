@@ -52,9 +52,18 @@ TEST(1)
   EXPECT_EQ (r.transformed (db::Trans (db::Vector (1, 2))).to_string (), "(1,2;1,202;101,202;101,2)");
   EXPECT_EQ (r.bbox ().to_string (), "(0,0;100,200)");
   EXPECT_EQ (r.empty (), false);
-  EXPECT_EQ (r.is_merged (), false);
+  EXPECT_EQ (r.is_merged (), true);
   EXPECT_EQ (r.is_box (), true);
   EXPECT_EQ (r.begin ().at_end (), false);
+
+  db::Region rr = r;
+  rr.insert (db::Box (db::Point (10, 10), db::Point (110, 30)));
+  EXPECT_EQ (rr.bbox ().to_string (), "(0,0;110,200)");
+  EXPECT_EQ (rr.to_string (), "(0,0;0,200;100,200;100,0);(10,10;10,30;110,30;110,10)");
+  EXPECT_EQ (rr.empty (), false);
+  EXPECT_EQ (rr.is_merged (), false);
+  EXPECT_EQ (rr.is_box (), false);
+  EXPECT_EQ (rr.begin ().at_end (), false);
 
   db::Region r1 = r;
   db::Region r2;

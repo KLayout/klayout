@@ -429,6 +429,9 @@ public:
   RegionDelegate ();
   virtual ~RegionDelegate ();
 
+  RegionDelegate (const RegionDelegate &other);
+  RegionDelegate &operator= (const RegionDelegate &other);
+
   virtual RegionDelegate *clone () const = 0;
 
   void enable_progress (const std::string &progress_desc);
@@ -632,7 +635,7 @@ public:
   virtual RegionDelegate *rounded_corners (double, double, unsigned int) const { return new EmptyRegion (); }
   virtual RegionDelegate *smoothed (coord_type) const { return new EmptyRegion (); }
 
-  virtual bool has_valid_polygons () const { return false; }
+  virtual bool has_valid_polygons () const { return true; }
   virtual const db::Polygon *nth (size_t) const { tl_assert (false); }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
@@ -928,14 +931,17 @@ public:
     }
   }
 
-  db::Shapes &raw_polygons () { return m_polygons; }
-
 protected:
   virtual void merged_semantics_changed ();
   virtual Box compute_bbox () const;
   void invalidate_cache ();
+  void set_is_merged (bool m);
 
 private:
+  friend class AsIfFlatRegion;
+
+  db::Shapes &raw_polygons () { return m_polygons; }
+
   FlatRegion &operator= (const FlatRegion &other);
 
   bool m_is_merged;
@@ -2195,25 +2201,8 @@ public:
 private:
   RegionDelegate *mp_delegate;
 
-  void set_delegate (RegionDelegate *delegate)
-  {
-    if (delegate != mp_delegate) {
-      delete mp_delegate;
-      mp_delegate = delegate;
-    }
-  }
-
-  FlatRegion *flat_region ()
-  {
-    FlatRegion *region = dynamic_cast<FlatRegion *> (mp_delegate);
-    if (! region) {
-      region = new FlatRegion ();
-      region->insert_seq (begin ());
-      set_delegate (region);
-    }
-
-    return region;
-  }
+  void set_delegate (RegionDelegate *delegate);
+  FlatRegion *flat_region ();
 };
 
 

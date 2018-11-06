@@ -163,9 +163,10 @@ void
 MacroController::initialized (lay::PluginRoot *root)
 {
   mp_mw = lay::MainWindow::instance ();
-
-  mp_macro_editor = new lay::MacroEditorDialog (root, &lym::MacroCollection::root ());
-  mp_macro_editor->setModal (false);
+  if (mp_mw) {
+    mp_macro_editor = new lay::MacroEditorDialog (root, &lym::MacroCollection::root ());
+    mp_macro_editor->setModal (false);
+  }
 
   if (! m_file_watcher) {
     m_file_watcher = new tl::FileSystemWatcher (this);

@@ -1525,7 +1525,7 @@ GuiApplication::setup ()
   tl_assert (mp_mw == 0 && mp_plugin_root == 0);
 
   mp_plugin_root = new lay::PluginRootToMainWindow ();
-  mp_mw = new lay::MainWindow (this, "main_window");
+  mp_mw = new lay::MainWindow (this, mp_plugin_root, "main_window");
   mp_plugin_root->attach_to (mp_mw);
 
   QObject::connect (mp_mw, SIGNAL (closed ()), this, SLOT (quit ()));

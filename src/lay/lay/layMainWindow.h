@@ -120,7 +120,7 @@ private:
 
 class LAY_PUBLIC MainWindow
   : public QMainWindow,
-    public tl::Object,
+    public lay::Plugin,
     public lay::AbstractMenuProvider
 {
 Q_OBJECT
@@ -134,7 +134,7 @@ public:
   /**
    *  @brief Constructor
    */
-  MainWindow (QApplication *app = 0, const char *name = "main_window");
+  MainWindow (QApplication *app = 0, lay::PluginRoot *plugin_root = 0, const char *name = "main_window");
 
   /** 
    *  @brief Destructor
@@ -872,6 +872,7 @@ protected:
 private:
   friend class PluginRootToMainWindow;
 
+  lay::PluginRoot *mp_plugin_root;
   TextProgressDelegate m_text_progress;
 
   //  Main menu
@@ -994,9 +995,6 @@ public:
   virtual void plugin_registered (lay::PluginDeclaration *cls);
   virtual void plugin_removed (lay::PluginDeclaration *cls);
   virtual void select_mode (int mode);
-  virtual void menu_activated (const std::string &symbol);
-  virtual bool configure (const std::string &name, const std::string &value);
-  virtual void config_finalize ();
 
 private:
   PluginRootToMainWindow (const PluginRootToMainWindow &);

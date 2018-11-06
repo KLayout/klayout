@@ -43,7 +43,7 @@ SaltController::SaltController ()
 }
 
 void
-SaltController::initialized (lay::PluginRoot *root)
+SaltController::initialized (lay::PluginRoot * /*root*/)
 {
   if (! m_file_watcher) {
     m_file_watcher = new tl::FileSystemWatcher (this);

@@ -1079,13 +1079,13 @@ void
 MainWindow::dock_widget_visibility_changed (bool /*visible*/)
 {
   if (sender () == mp_lp_dock_widget) {
-    config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
+    mp_plugin_root->config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
   } else if (sender () == mp_hp_dock_widget) {
-    config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
+    mp_plugin_root->config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
   } else if (sender () == mp_navigator_dock_widget) {
-    config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
+    mp_plugin_root->config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
   } else if (sender () == mp_layer_toolbox_dock_widget) {
-    config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
+    mp_plugin_root->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
   }
 }
 
@@ -1280,7 +1280,7 @@ MainWindow::about_to_exec ()
     lay::TipDialog::button_type button = lay::TipDialog::null_button;
     if (td.exec_dialog (button)) {
       if (button == lay::TipDialog::yes_button) {
-        config_set (cfg_full_hier_new_cell, true);
+        mp_plugin_root->config_set (cfg_full_hier_new_cell, true);
       }
       //  Don't bother the user with more dialogs.
       return;
@@ -1815,10 +1815,10 @@ MainWindow::libraries_changed ()
 void
 MainWindow::read_dock_widget_state ()
 {
-  config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
-  config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
-  config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
-  config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
+  mp_plugin_root->config_set (cfg_show_layer_panel, tl::to_string (!mp_lp_dock_widget->isHidden ()));
+  mp_plugin_root->config_set (cfg_show_hierarchy_panel, tl::to_string (!mp_hp_dock_widget->isHidden ()));
+  mp_plugin_root->config_set (cfg_show_navigator, tl::to_string (!mp_navigator_dock_widget->isHidden ()));
+  mp_plugin_root->config_set (cfg_show_layer_toolbox, tl::to_string (!mp_layer_toolbox_dock_widget->isHidden ()));
 }
 
 void
@@ -1976,8 +1976,8 @@ MainWindow::save_state_to_config ()
 {
   //  save the dock widget state with all views closed (that state can be
   //  used for staring klayout without any layout)
-  config_set (cfg_window_geometry, (const char *) saveGeometry ().toBase64 ().data ());
-  config_set (cfg_window_state, (const char *) saveState ().toBase64 ().data ());
+  mp_plugin_root->config_set (cfg_window_geometry, (const char *) saveGeometry ().toBase64 ().data ());
+  mp_plugin_root->config_set (cfg_window_state, (const char *) saveState ().toBase64 ().data ());
 }
 
 void
@@ -4113,7 +4113,7 @@ MainWindow::add_mru (const std::string &fn_rel, const std::string &tech)
     }
   }
 
-  config_set (cfg_mru, config_str);
+  mp_plugin_root->config_set (cfg_mru, config_str);
 }
 
 void
@@ -4863,8 +4863,7 @@ MainWindow::show_assistant_topic (const std::string &s, bool modal)
 void
 MainWindow::cm_show_all_tips ()
 {
-  config_set (cfg_tip_window_hidden, "");
-  config_end ();
+  mp_plugin_root->config_set (cfg_tip_window_hidden, "");
 }
 
 void

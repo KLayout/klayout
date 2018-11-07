@@ -507,6 +507,7 @@ public:
    */
   template <class Sh>
   Region (const Sh &s)
+    : mp_delegate (0)
   {
     insert (s);
   }
@@ -520,6 +521,7 @@ public:
    */
   template <class Iter>
   Region (const Iter &b, const Iter &e)
+    : mp_delegate (0)
   {
     reserve (e - b);
     for (Iter i = b; i != e; ++i) {

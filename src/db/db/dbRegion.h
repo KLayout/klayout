@@ -41,6 +41,8 @@
 #include "tlString.h"
 #include "gsiObject.h"
 
+#include <list>
+
 namespace db {
 
 class EdgeFilterBase;
@@ -526,6 +528,7 @@ public:
 
   virtual const db::Polygon *nth (size_t n) const = 0;
   virtual bool has_valid_polygons () const = 0;
+  virtual bool has_valid_merged_polygons () const = 0;
 
   virtual const db::RecursiveShapeIterator *iter () const = 0;
 
@@ -636,6 +639,7 @@ public:
   virtual RegionDelegate *smoothed (coord_type) const { return new EmptyRegion (); }
 
   virtual bool has_valid_polygons () const { return true; }
+  virtual bool has_valid_merged_polygons () const { return true; }
   virtual const db::Polygon *nth (size_t) const { tl_assert (false); }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
@@ -883,6 +887,7 @@ public:
 
   virtual const db::Polygon *nth (size_t n) const;
   virtual bool has_valid_polygons () const;
+  virtual bool has_valid_merged_polygons () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
 
@@ -980,6 +985,7 @@ public:
 
   virtual const db::Polygon *nth (size_t n) const;
   virtual bool has_valid_polygons () const;
+  virtual bool has_valid_merged_polygons () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
 
@@ -997,6 +1003,61 @@ private:
 
   void init ();
   void ensure_merged_polygons_valid () const;
+};
+
+/**
+ *  @brief A helper class allowing delivery of addressable polygons
+ *
+ *  In some applications (i.e. box scanner), polygons need to be taken
+ *  by address. The region cannot always deliver adressable polygons.
+ *  This class help providing this ability by keeping a temporary copy
+ *  if required.
+ */
+
+class DB_PUBLIC AddressablePolygonDelivery
+{
+public:
+  AddressablePolygonDelivery ()
+    : m_iter (), m_valid (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  AddressablePolygonDelivery (const RegionIterator &iter, bool valid)
+    : m_iter (iter), m_valid (valid)
+  {
+    if (! m_valid && ! m_iter.at_end ()) {
+      m_heap.push_back (*m_iter);
+    }
+  }
+
+  bool at_end () const
+  {
+    return m_iter.at_end ();
+  }
+
+  AddressablePolygonDelivery &operator++ ()
+  {
+    ++m_iter;
+    if (! m_valid && ! m_iter.at_end ()) {
+      m_heap.push_back (*m_iter);
+    }
+    return *this;
+  }
+
+  const db::Polygon *operator-> () const
+  {
+    if (m_valid) {
+      return m_iter.operator-> ();
+    } else {
+      return &m_heap.back ();
+    }
+  }
+
+private:
+  RegionIterator m_iter;
+  bool m_valid;
+  std::list<db::Polygon> m_heap;
 };
 
 /**
@@ -2161,10 +2222,45 @@ public:
 
   /**
    *  @brief Returns true, if the region has valid polygons stored within itself
+   *
+   *  If the region has valid polygons, it is permissable to use the polygon's addresses
+   *  from the iterator. Furthermore, the random access operator nth() is available.
    */
   bool has_valid_polygons () const
   {
     return mp_delegate->has_valid_polygons ();
+  }
+
+  /**
+   *  @brief Returns an addressable delivery for polygons
+   *
+   *  This object allows accessing the polygons by address, even if they
+   *  are not delivered from a container. The magic is a heap object
+   *  inside the delivery object. Hence, the deliver object must persist
+   *  as long as the addresses are required.
+   */
+  AddressablePolygonDelivery addressable_polygons () const
+  {
+    return AddressablePolygonDelivery (begin (), has_valid_polygons ());
+  }
+
+  /**
+   *  @brief Returns true, if the region has valid merged polygons stored within itself
+   *
+   *  If the region has valid merged polygons, it is permissable to use the polygon's addresses
+   *  from the merged polygon iterator. Furthermore, the random access operator nth() is available.
+   */
+  bool has_valid_merged_polygons () const
+  {
+    return mp_delegate->has_valid_merged_polygons ();
+  }
+
+  /**
+   *  @brief Returns an addressable delivery for merged polygons
+   */
+  AddressablePolygonDelivery addressable_merged_polygons () const
+  {
+    return AddressablePolygonDelivery (begin_merged (), has_valid_merged_polygons ());
   }
 
   /**

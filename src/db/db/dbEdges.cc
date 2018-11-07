@@ -724,8 +724,11 @@ Edges::select_interacting (const Region &other)
     scanner.insert ((char *) &*e, 0);
   }
 
-  for (Region::const_iterator p = other.begin (); ! p.at_end (); ++p) {
-    scanner.insert ((char *) &*p + 1, 1);
+  AddressablePolygonDelivery p = other.addressable_polygons ();
+
+  for ( ; ! p.at_end (); ++p) {
+    //  NOTE: dirty hack - we can take the address of the polygon because we used ensure_flat_polygons.
+    scanner.insert ((char *) p.operator-> () + 1, 1);
   }
 
   Edges output;
@@ -753,8 +756,10 @@ Edges::select_not_interacting (const Region &other)
     scanner.insert ((char *) &*e, 0);
   }
 
-  for (Region::const_iterator p = other.begin (); ! p.at_end (); ++p) {
-    scanner.insert ((char *) &*p + 1, 1);
+  AddressablePolygonDelivery p = other.addressable_polygons ();
+  for ( ; ! p.at_end (); ++p) {
+    //  NOTE: dirty hack - we can take the address of the polygon because we used ensure_flat_polygons.
+    scanner.insert ((char *) p.operator-> () + 1, 1);
   }
 
   std::set<db::Edge> interacting;

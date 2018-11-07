@@ -559,8 +559,10 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse) 
   db::box_scanner<char, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (size () + other.size ());
 
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    scanner.insert ((char *) &*p + 1, 1);
+  AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
+
+  for ( ; ! p.at_end (); ++p) {
+    scanner.insert ((char *) p.operator-> () + 1, 1);
   }
 
   other.ensure_valid_merged_edges ();
@@ -1020,22 +1022,27 @@ public:
 
   void finish (const db::Polygon *o, size_t p)
   {
+    enter (*o, p);
+  }
+
+  void enter (const db::Polygon &o, size_t p)
+  {
     if (! mp_output->requires_different_layers () && ! mp_output->different_polygons ()) {
 
       //  finally we check the polygons vs. itself for checks involving intra-polygon interactions
 
       m_scanner.clear ();
-      m_scanner.reserve (o->vertices ());
+      m_scanner.reserve (o.vertices ());
 
       m_edges.clear ();
-      m_edges.reserve (o->vertices ());
+      m_edges.reserve (o.vertices ());
 
-      for (db::Polygon::polygon_edge_iterator e = o->begin_edge (); ! e.at_end (); ++e) {
+      for (db::Polygon::polygon_edge_iterator e = o.begin_edge (); ! e.at_end (); ++e) {
         m_edges.push_back (*e);
         m_scanner.insert (& m_edges.back (), p);
       }
 
-      tl_assert (m_edges.size () == o->vertices ());
+      tl_assert (m_edges.size () == o.vertices ());
 
       m_scanner.process (*mp_output, mp_output->distance (), db::box_convert<db::Edge> ());
 
@@ -1044,25 +1051,30 @@ public:
 
   void add (const db::Polygon *o1, size_t p1, const db::Polygon *o2, size_t p2)
   {
+    enter (*o1, p1, *o2, p2);
+  }
+
+  void enter (const db::Polygon &o1, size_t p1, const db::Polygon &o2, size_t p2)
+  {
     if ((! mp_output->different_polygons () || p1 != p2) && (! mp_output->requires_different_layers () || ((p1 ^ p2) & 1) != 0)) {
 
       m_scanner.clear ();
-      m_scanner.reserve (o1->vertices () + o2->vertices ());
+      m_scanner.reserve (o1.vertices () + o2.vertices ());
 
       m_edges.clear ();
-      m_edges.reserve (o1->vertices () + o2->vertices ());
+      m_edges.reserve (o1.vertices () + o2.vertices ());
 
-      for (db::Polygon::polygon_edge_iterator e = o1->begin_edge (); ! e.at_end (); ++e) {
+      for (db::Polygon::polygon_edge_iterator e = o1.begin_edge (); ! e.at_end (); ++e) {
         m_edges.push_back (*e);
         m_scanner.insert (& m_edges.back (), p1);
       }
 
-      for (db::Polygon::polygon_edge_iterator e = o2->begin_edge (); ! e.at_end (); ++e) {
+      for (db::Polygon::polygon_edge_iterator e = o2.begin_edge (); ! e.at_end (); ++e) {
         m_edges.push_back (*e);
         m_scanner.insert (& m_edges.back (), p2);
       }
 
-      tl_assert (m_edges.size () == o1->vertices () + o2->vertices ());
+      tl_assert (m_edges.size () == o1.vertices () + o2.vertices ());
 
       //  temporarily disable intra-polygon check in that step .. we do that later in finish()
       //  if required (#650).
@@ -1092,18 +1104,26 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   db::box_scanner<db::Polygon, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (size () + (other ? other->size () : 0));
 
+  AddressablePolygonDelivery p (begin_merged (), has_valid_merged_polygons ());
+
   size_t n = 0;
-  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-    scanner.insert (&*p, n);
+  for ( ; ! p.at_end (); ++p) {
+    scanner.insert (p.operator-> (), n);
     n += 2;
   }
 
+  AddressablePolygonDelivery po;
+
   if (other) {
+
+    po = other->addressable_merged_polygons ();
+
     n = 1;
-    for (RegionIterator p (other->begin_merged ()); ! p.at_end (); ++p) {
-      scanner.insert (&*p, n);
+    for ( ; ! po.at_end (); ++po) {
+      scanner.insert (po.operator-> (), n);
       n += 2;
     }
+
   }
 
   EdgeRelationFilter check (rel, d, metrics);
@@ -1138,11 +1158,13 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
   Poly2PolyCheck poly_check (edge_check);
 
   do {
+
     size_t n = 0;
     for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-      poly_check.finish (&*p, n);
+      poly_check.enter (*p, n);
       n += 2;
     }
+
   } while (edge_check.prepare_next_pass ());
 
   return result;
@@ -1966,6 +1988,11 @@ bool FlatRegion::has_valid_polygons () const
   return true;
 }
 
+bool FlatRegion::has_valid_merged_polygons () const
+{
+  return true;
+}
+
 const db::RecursiveShapeIterator *FlatRegion::iter () const
 {
   return 0;
@@ -2203,6 +2230,12 @@ bool
 OriginalLayerRegion::has_valid_polygons () const
 {
   return false;
+}
+
+bool
+OriginalLayerRegion::has_valid_merged_polygons () const
+{
+  return merged_semantics () && ! m_is_merged;
 }
 
 const db::RecursiveShapeIterator *

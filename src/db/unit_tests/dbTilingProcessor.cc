@@ -29,6 +29,7 @@
 #include "gsiDecl.h"
 #include "dbWriter.h"
 #include "dbSaveLayoutOptions.h"
+#include "dbShapeProcessor.h"
 
 #include <cstdlib>
 #include <QMutex>

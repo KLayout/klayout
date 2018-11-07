@@ -28,6 +28,7 @@
 #include "dbBoxConvert.h"
 #include "dbBoxScanner.h"
 #include "dbPolygonTools.h"
+#include "dbShapeProcessor.h"
 
 #include "tlIntervalMap.h"
 #include "tlVariant.h"

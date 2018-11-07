@@ -119,7 +119,12 @@ SOURCES = \
   gsiDeclDbVector.cc \
   gsiDeclDbLayoutDiff.cc \
   gsiDeclDbGlyphs.cc \
-    dbConverters.cc
+    dbConverters.cc \
+    dbAsIfFlatRegion.cc \
+    dbEmptyRegion.cc \
+    dbFlatRegion.cc \
+    dbOriginalLayerRegion.cc \
+    dbRegionDelegate.cc
 
 HEADERS = \
   dbArray.h \
@@ -208,7 +213,12 @@ HEADERS = \
   dbForceLink.h \
   dbPlugin.h \
   dbInit.h \
-    dbConverters.h
+    dbConverters.h \
+    dbAsIfFlatRegion.h \
+    dbEmptyRegion.h \
+    dbFlatRegion.h \
+    dbOriginalLayerRegion.h \
+    dbRegionDelegate.h
 
 !equals(HAVE_QT, "0") {
 

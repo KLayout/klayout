@@ -83,13 +83,13 @@ public:
   void freeze_clicked (); 
   void all_hier_levels (bool f);
   void show_images (bool f);
-  void background_color (QColor c);
 
   static void init_menu (AbstractMenu &menu);
 
 protected:
   virtual void closeEvent (QCloseEvent *event);
   virtual void showEvent (QShowEvent *event);
+  virtual void resizeEvent (QResizeEvent *event);
 
 private slots:
   void menu_changed ();

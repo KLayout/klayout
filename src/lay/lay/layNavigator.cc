@@ -58,7 +58,7 @@ public:
       mp_box (0), 
       m_color (0)
   {
-    // .. nothing yet ..
+    //  .. nothing yet ..
   }
 
   ~NavigatorService ()
@@ -68,6 +68,25 @@ public:
       mp_viewport_marker = 0;
     }
     drag_cancel ();
+  }
+
+  void background_color_changed ()
+  {
+    QColor c = mp_view->background_color ();
+
+    //  replace by "real" background color if required
+    if (! c.isValid ()) {
+      c = mp_view->palette ().color (QPalette::Normal, QPalette::Base);
+    }
+
+    QColor contrast;
+    if (c.green () > 128) {
+      contrast = QColor (0, 0, 0);
+    } else {
+      contrast = QColor (255, 255, 255);
+    }
+
+    set_colors (c, contrast);
   }
 
   bool mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) 
@@ -349,10 +368,10 @@ public:
       tl::Object::detach_from_all_events ();
 
       mp_source_view = source_view;
+      mp_source_view->viewport_changed_event.add (this, &NavigatorService::update_marker);
 
-      if (mp_source_view) {
-        mp_source_view->viewport_changed_event.add (this, &NavigatorService::update_marker);
-      }
+      mp_view->background_color_changed_event.add (this, &NavigatorService::background_color_changed);
+      background_color_changed ();
 
       update_marker ();
 
@@ -459,6 +478,7 @@ Navigator::Navigator (MainWindow *main_window)
   QVBoxLayout *layout = new QVBoxLayout (this);
   layout->addWidget (mp_menu_bar);
   layout->addWidget (mp_placeholder_label);
+  layout->setStretchFactor (mp_placeholder_label, 1);
   layout->setMargin (0);
   layout->setSpacing (0);
   setLayout (layout);
@@ -630,6 +650,14 @@ Navigator::view_closed (int index)
 }
 
 void
+Navigator::resizeEvent (QResizeEvent *)
+{
+  if (mp_view) {
+    mp_view->setGeometry (mp_placeholder_label->geometry ());
+  }
+}
+
+void
 Navigator::attach_view (LayoutView *view)
 {
   if (view != mp_source_view) {
@@ -644,7 +672,7 @@ Navigator::attach_view (LayoutView *view)
     delete mp_service;
     mp_service = 0;
 
-    delete mp_view;
+    LayoutView *old_view = mp_view;
     mp_view = 0;
 
     if (mp_source_view) {
@@ -653,10 +681,8 @@ Navigator::attach_view (LayoutView *view)
       mp_view->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
       mp_view->setMinimumWidth (100);
       mp_view->setMinimumHeight (100);
-
-      QVBoxLayout *ly = dynamic_cast<QVBoxLayout *> (layout ());
-      ly->insertWidget (1, mp_view);
-      ly->setStretchFactor (mp_view, 1);
+      mp_view->setGeometry (mp_placeholder_label->geometry ());
+      mp_view->show ();
 
       mp_service = new NavigatorService (mp_view);
       mp_view->view_object_widget ()->activate (mp_service);
@@ -666,15 +692,11 @@ Navigator::attach_view (LayoutView *view)
       mp_source_view->geom_changed_event.add (this, &Navigator::content_changed);
       mp_source_view->layer_list_changed_event.add (this, &Navigator::layers_changed),
       mp_source_view->hier_levels_changed_event.add (this, &Navigator::hier_levels_changed);
-      mp_source_view->background_color_changed_event.add (this, &Navigator::update_background_color);
 
       img::Service *image_plugin = mp_source_view->get_plugin<img::Service> ();
       if (image_plugin) {
         image_plugin->images_changed_event.add (this, &Navigator::content_changed);
       }
-
-      update_background_color ();
-      mp_placeholder_label->hide ();
 
       //  update the list of frozen flags per view
       std::set <lay::LayoutView *> all_views;
@@ -702,38 +724,10 @@ Navigator::attach_view (LayoutView *view)
 
       update ();
 
-    } else {
-      mp_placeholder_label->show ();
     }
 
-  }
-}
+    delete old_view;
 
-void
-Navigator::background_color (QColor c)
-{
-  //  replace by "real" background color if required
-  if (! c.isValid ()) {
-    c = palette ().color (QPalette::Normal, QPalette::Base);
-  }
-
-  QColor contrast;
-  if (c.green () > 128) {
-    contrast = QColor (0, 0, 0);
-  } else {
-    contrast = QColor (255, 255, 255);
-  }
-
-  if (mp_service) {
-    mp_service->set_colors (c, contrast);
-  }
-}
-
-void
-Navigator::update_background_color ()
-{
-  if (mp_source_view) {
-    background_color (mp_source_view->background_color ());
   }
 }
 

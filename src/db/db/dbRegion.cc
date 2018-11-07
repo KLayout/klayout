@@ -145,8 +145,10 @@ Region::flat_region ()
   FlatRegion *region = dynamic_cast<FlatRegion *> (mp_delegate);
   if (! region) {
     region = new FlatRegion ();
-    region->RegionDelegate::operator= (*mp_delegate);
-    region->insert_seq (begin ());
+    if (mp_delegate) {
+      region->RegionDelegate::operator= (*mp_delegate);
+      region->insert_seq (begin ());
+    }
     set_delegate (region);
   }
 

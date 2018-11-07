@@ -124,7 +124,8 @@ SOURCES = \
     dbEmptyRegion.cc \
     dbFlatRegion.cc \
     dbOriginalLayerRegion.cc \
-    dbRegionDelegate.cc
+    dbRegionDelegate.cc \
+    dbEdgesDelegate.cc
 
 HEADERS = \
   dbArray.h \
@@ -218,7 +219,8 @@ HEADERS = \
     dbEmptyRegion.h \
     dbFlatRegion.h \
     dbOriginalLayerRegion.h \
-    dbRegionDelegate.h
+    dbRegionDelegate.h \
+    dbEdgesDelegate.h
 
 !equals(HAVE_QT, "0") {
 

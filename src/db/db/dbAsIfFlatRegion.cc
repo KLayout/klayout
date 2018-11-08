@@ -433,9 +433,10 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, bool inverse) 
     scanner.insert ((char *) p.operator-> () + 1, 1);
   }
 
-  other.ensure_valid_merged_edges ();
-  for (Edges::const_iterator e = other.begin (); ! e.at_end (); ++e) {
-    scanner.insert ((char *) &*e, 0);
+  AddressableEdgeDelivery e (other.addressable_edges ());
+
+  for ( ; ! e.at_end (); ++e) {
+    scanner.insert ((char *) e.operator-> (), 0);
   }
 
   std::auto_ptr<FlatRegion> output (new FlatRegion (false));

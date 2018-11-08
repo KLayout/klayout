@@ -1659,6 +1659,8 @@ public:
   }
 
 private:
+  friend class Edges;
+
   RegionDelegate *mp_delegate;
 
   void set_delegate (RegionDelegate *delegate);

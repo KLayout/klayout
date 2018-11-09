@@ -295,6 +295,8 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Shapes::unit_trans_typ
     return (insert_array_by_tag (shape_type::simple_polygon_ptr_array_type::tag (), shape, shape_repository (), pm));
   case shape_type::Edge:
     return (insert_by_tag (shape_type::edge_type::tag (), shape, pm));
+  case shape_type::EdgePair:
+    return (insert_by_tag (shape_type::edge_pair_type::tag (), shape, pm));
   case shape_type::Path:
     return (insert_by_tag (shape_type::path_type::tag (), shape, pm));
   case shape_type::PathRef:
@@ -439,6 +441,16 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Trans &t, tl::func_del
         return insert (db::object_with_properties<shape_type::edge_type> (p, pm (shape.prop_id ())));
       }
     }
+  case shape_type::EdgePair:
+    {
+      shape_type::edge_pair_type p (shape.edge_pair ());
+      p.transform (t);
+      if (! shape.has_prop_id ()) {
+        return insert (p);
+      } else {
+        return insert (db::object_with_properties<shape_type::edge_pair_type> (p, pm (shape.prop_id ())));
+      }
+    }
   case shape_type::Path:
     {
       shape_type::path_type p (shape.path ());
@@ -554,6 +566,8 @@ Shapes::find (const Shapes::shape_type &shape) const
     return find_shape_by_tag (shape_type::simple_polygon_ptr_array_type::tag (), shape);
   case shape_type::Edge:
     return find_shape_by_tag (shape_type::edge_type::tag (), shape);
+  case shape_type::EdgePair:
+    return find_shape_by_tag (shape_type::edge_pair_type::tag (), shape);
   case shape_type::Path:
     return find_shape_by_tag (shape_type::path_type::tag (), shape);
   case shape_type::PathRef:
@@ -620,6 +634,9 @@ Shapes::replace_prop_id (const Shapes::shape_type &ref, db::properties_id_type p
     case shape_type::Edge:
       replace_prop_id (ref.basic_ptr (object_with_properties<shape_type::edge_type>::tag ()), prop_id);
       break;
+    case shape_type::EdgePair:
+      replace_prop_id (ref.basic_ptr (object_with_properties<shape_type::edge_pair_type>::tag ()), prop_id);
+      break;
     case shape_type::Path:
       replace_prop_id (ref.basic_ptr (object_with_properties<shape_type::path_type>::tag ()), prop_id);
       break;
@@ -682,6 +699,8 @@ Shapes::replace_prop_id (const Shapes::shape_type &ref, db::properties_id_type p
       return replace_prop_id_iter (shape_type::simple_polygon_ptr_array_type::tag (), ref.basic_iter (shape_type::simple_polygon_ptr_array_type::tag ()), prop_id);
     case shape_type::Edge:
       return replace_prop_id_iter (shape_type::edge_type::tag (), ref.basic_iter (shape_type::edge_type::tag ()), prop_id);
+    case shape_type::EdgePair:
+      return replace_prop_id_iter (shape_type::edge_pair_type::tag (), ref.basic_iter (shape_type::edge_pair_type::tag ()), prop_id);
     case shape_type::Path:
       return replace_prop_id_iter (shape_type::path_type::tag (), ref.basic_iter (shape_type::path_type::tag ()), prop_id);
     case shape_type::PathRef:
@@ -758,6 +777,12 @@ Shapes::transform (const Shapes::shape_type &ref, const Trans &t)
       shape_type::edge_type p (ref.edge ());
       p.transform (t);
       return replace_member_with_props (shape_type::edge_type::tag (), ref, p);
+    }
+  case shape_type::EdgePair:
+    {
+      shape_type::edge_pair_type p (ref.edge_pair ());
+      p.transform (t);
+      return replace_member_with_props (shape_type::edge_pair_type::tag (), ref, p);
     }
   case shape_type::Path:
     {
@@ -845,6 +870,8 @@ Shapes::replace (const Shapes::shape_type &ref, const Sh &sh)
     return replace_member_with_props (shape_type::simple_polygon_ptr_array_type::tag (), ref, sh);
   case shape_type::Edge:
     return replace_member_with_props (shape_type::edge_type::tag (), ref, sh);
+  case shape_type::EdgePair:
+    return replace_member_with_props (shape_type::edge_pair_type::tag (), ref, sh);
   case shape_type::Path:
     return replace_member_with_props (shape_type::path_type::tag (), ref, sh);
   case shape_type::PathRef:
@@ -1212,6 +1239,7 @@ template DB_PUBLIC Shape Shapes::replace<>(const Shape &, const Polygon &);
 template DB_PUBLIC Shape Shapes::replace<>(const Shape &, const SimplePolygon &);
 template DB_PUBLIC Shape Shapes::replace<>(const Shape &, const Text &);
 template DB_PUBLIC Shape Shapes::replace<>(const Shape &, const Edge &);
+template DB_PUBLIC Shape Shapes::replace<>(const Shape &, const EdgePair &);
 
 template DB_PUBLIC Shape Shapes::transform<> (const Shape &, const ICplxTrans &);
 template DB_PUBLIC Shape Shapes::transform<> (const Shape &, const Trans &);
@@ -1239,6 +1267,8 @@ template class DB_PUBLIC layer_op<db::Shape::path_ptr_array_type, db::stable_lay
 template class DB_PUBLIC layer_op<db::object_with_properties<db::Shape::path_ptr_array_type>, db::stable_layer_tag>;
 template class DB_PUBLIC layer_op<db::Shape::edge_type, db::stable_layer_tag>;
 template class DB_PUBLIC layer_op<db::object_with_properties<db::Shape::edge_type>, db::stable_layer_tag>;
+template class DB_PUBLIC layer_op<db::Shape::edge_pair_type, db::stable_layer_tag>;
+template class DB_PUBLIC layer_op<db::object_with_properties<db::Shape::edge_pair_type>, db::stable_layer_tag>;
 template class DB_PUBLIC layer_op<db::Shape::text_type, db::stable_layer_tag>;
 template class DB_PUBLIC layer_op<db::object_with_properties<db::Shape::text_type>, db::stable_layer_tag>;
 template class DB_PUBLIC layer_op<db::Shape::text_ref_type, db::stable_layer_tag>;
@@ -1275,6 +1305,8 @@ template class DB_PUBLIC layer_op<db::Shape::path_ptr_array_type, db::unstable_l
 template class DB_PUBLIC layer_op<db::object_with_properties<db::Shape::path_ptr_array_type>, db::unstable_layer_tag>;
 template class DB_PUBLIC layer_op<db::Shape::edge_type, db::unstable_layer_tag>;
 template class DB_PUBLIC layer_op<db::object_with_properties<db::Shape::edge_type>, db::unstable_layer_tag>;
+template class DB_PUBLIC layer_op<db::Shape::edge_pair_type, db::unstable_layer_tag>;
+template class DB_PUBLIC layer_op<db::object_with_properties<db::Shape::edge_pair_type>, db::unstable_layer_tag>;
 template class DB_PUBLIC layer_op<db::Shape::text_type, db::unstable_layer_tag>;
 template class DB_PUBLIC layer_op<db::object_with_properties<db::Shape::text_type>, db::unstable_layer_tag>;
 template class DB_PUBLIC layer_op<db::Shape::text_ref_type, db::unstable_layer_tag>;

@@ -219,7 +219,7 @@ public:
   }
 
   /**
-   *  @brief Returns the transformed edge set
+   *  @brief Returns the transformed edge pair set
    */
   template <class T>
   EdgePairs transformed (const T &trans) const
@@ -230,7 +230,7 @@ public:
   }
 
   /**
-   *  @brief Swap with the other region
+   *  @brief Swaps with the other edge pair set
    */
   void swap (db::EdgePairs &other)
   {
@@ -240,7 +240,7 @@ public:
   }
 
   /**
-   *  @brief Convert to polygons
+   *  @brief Converts to polygons
    *
    *  Note: because of the include hierarchy we can't use a direct return value.
    *  
@@ -263,7 +263,7 @@ public:
    */
   void edges (Edges &output) const;
 
-  /*
+  /**
    *  @brief Returns the first edges
    *
    *  Note: because of the include hierarchy we can't use a direct return value.
@@ -273,7 +273,7 @@ public:
    */  
   void first_edges (Edges &output) const;
 
-  /*
+  /**
    *  @brief Returns the second edges
    *
    *  Note: because of the include hierarchy we can't use a direct return value.

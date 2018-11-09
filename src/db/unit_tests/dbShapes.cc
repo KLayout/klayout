@@ -172,6 +172,16 @@ std::string shapes_to_string_norm (tl::TestBase *_this, const db::Shapes &shapes
       r += "path " + p.to_string ();
       EXPECT_EQ (p.box ().to_string (), shape->bbox ().to_string ());
       EXPECT_EQ (p.area (), shape->area ());
+    } else if (shape->is_edge ()) {
+      db::Shape::edge_type p;
+      shape->edge (p);
+      r += "edge " + p.to_string ();
+      EXPECT_EQ (p.bbox ().to_string (), shape->bbox ().to_string ());
+    } else if (shape->is_edge_pair ()) {
+      db::Shape::edge_pair_type p;
+      shape->edge_pair (p);
+      r += "edge_pair " + p.to_string ();
+      EXPECT_EQ (p.bbox ().to_string (), shape->bbox ().to_string ());
     } else if (shape->is_text ()) {
       db::Shape::text_type p;
       shape->text (p);
@@ -3261,6 +3271,42 @@ TEST(22)
   EXPECT_EQ (shapes.find (*s).to_string (), s->to_string ());
   ++s;
   EXPECT_EQ (shapes.find (*s).to_string (), "null");
+}
+
+//  Edge pairs
+TEST(23)
+{
+  db::Manager m;
+  db::Shapes s (&m, 0, db::default_editable_mode ());
+  db::Box b_empty;
+
+  s.update_bbox ();
+  EXPECT_EQ (s.bbox (), b_empty);
+
+  db::EdgePair ep (db::Edge (-100, -200, 0, 0), db::Edge (0, -100, 100, 100));
+  s.insert (ep);
+  s.update_bbox ();
+  EXPECT_EQ (s.bbox (), db::Box (-100, -200, 100, 100));
+
+  db::ShapeIterator si = s.begin (db::ShapeIterator::EdgePairs);
+  EXPECT_EQ (!si.at_end (), true);
+  EXPECT_EQ (si->edge_pair ().to_string (), "(-100,-200;0,0)/(0,-100;100,100)");
+  EXPECT_EQ (si->is_edge_pair (), true);
+
+  db::EdgePair ep2;
+  si->instantiate (ep2);
+  EXPECT_EQ (ep2.to_string (), "(-100,-200;0,0)/(0,-100;100,100)");
+
+  ++si;
+  EXPECT_EQ (si.at_end (), true);
+
+  db::Shapes s2 = s;
+  EXPECT_EQ (shapes_to_string_norm (_this, s2), "edge_pair (-100,-200;0,0)/(0,-100;100,100) #0\n");
+
+  s2.clear ();
+  s2.insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (0, 0, 1, 1), db::Edge (10, 10, 11, 11)), 17));
+
+  EXPECT_EQ (shapes_to_string_norm (_this, s2), "edge_pair (0,0;1,1)/(10,10;11,11) #17\n");
 }
 
 //  Bug #107

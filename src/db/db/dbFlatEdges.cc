@@ -96,7 +96,7 @@ void FlatEdges::merged_semantics_changed ()
 
 void FlatEdges::reserve (size_t n)
 {
-  m_edges.reserve (db::Polygon::tag (), n);
+  m_edges.reserve (db::Edge::tag (), n);
 }
 
 void

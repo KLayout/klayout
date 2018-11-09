@@ -386,9 +386,11 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
     scanner.reserve (size ());
 
+    AddressableEdgeDelivery e (begin (), has_valid_edges ());
+
     size_t n = 0;
-    for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
-      scanner.insert (&*e, n);
+    for ( ; ! e.at_end (); ++e) {
+      scanner.insert (e.operator-> (), n);
       ++n;
     }
 
@@ -743,16 +745,21 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (size () + (other ? other->size () : 0));
 
+  AddressableEdgeDelivery e (begin_merged (), has_valid_edges ());
+
   size_t n = 0;
-  for (EdgesIterator e (begin_merged ()); ! e.at_end (); ++e) {
-    scanner.insert (&*e, n); 
+  for ( ; ! e.at_end (); ++e) {
+    scanner.insert (e.operator-> (), n);
     n += 2;
   }
 
+  AddressableEdgeDelivery ee;
+
   if (other) {
+    ee = other->addressable_merged_edges ();
     n = 1;
-    for (EdgesIterator e (other->begin_merged ()); ! e.at_end (); ++e) {
-      scanner.insert (&*e, n); 
+    for ( ; ! ee.at_end (); ++ee) {
+      scanner.insert (ee.operator-> (), n);
       n += 2;
     }
   }
@@ -779,15 +786,21 @@ AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (size () + (other ? other->size () : 0));
 
-  for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
+  AddressableEdgeDelivery e (begin (), has_valid_edges ());
+
+  for ( ; ! e.at_end (); ++e) {
     if (! e->is_degenerate ()) {
-      scanner.insert (&*e, 0); 
+      scanner.insert (e.operator-> (), 0);
     }
   }
+
+  AddressableEdgeDelivery ee;
+
   if (other) {
-    for (EdgesIterator e (other->begin ()); ! e.at_end (); ++e) {
-      if (! e->is_degenerate ()) {
-        scanner.insert (&*e, 1); 
+    ee = other->addressable_edges ();
+    for ( ; ! ee.at_end (); ++ee) {
+      if (! ee->is_degenerate ()) {
+        scanner.insert (ee.operator-> (), 1);
       }
     }
   }

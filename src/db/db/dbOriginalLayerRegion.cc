@@ -139,6 +139,13 @@ OriginalLayerRegion::clone () const
   return new OriginalLayerRegion (*this);
 }
 
+void
+OriginalLayerRegion::merged_semantics_changed ()
+{
+  m_merged_polygons.clear ();
+  m_merged_polygons_valid = false;
+}
+
 RegionIteratorDelegate *
 OriginalLayerRegion::begin () const
 {

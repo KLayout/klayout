@@ -64,6 +64,9 @@ public:
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;
 
+protected:
+  virtual void merged_semantics_changed ();
+
 private:
   OriginalLayerRegion &operator= (const OriginalLayerRegion &other);
 

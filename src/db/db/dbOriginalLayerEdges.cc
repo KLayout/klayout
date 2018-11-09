@@ -139,6 +139,13 @@ OriginalLayerEdges::clone () const
   return new OriginalLayerEdges (*this);
 }
 
+void
+OriginalLayerEdges::merged_semantics_changed ()
+{
+  m_merged_edges.clear ();
+  m_merged_edges_valid = false;
+}
+
 EdgesIteratorDelegate *
 OriginalLayerEdges::begin () const
 {
@@ -245,15 +252,17 @@ OriginalLayerEdges::ensure_merged_edges_valid () const
 
     m_merged_edges.clear ();
 
-    db::Shapes tmp;
+    db::Shapes tmp (false);
     EdgeBooleanClusterCollector<db::Shapes> cluster_collector (&tmp, EdgeOr);
 
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
     scanner.reserve (size ());
 
-    for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
+    AddressableEdgeDelivery e (begin (), has_valid_edges ());
+
+    for ( ; ! e.at_end (); ++e) {
       if (! e->is_degenerate ()) {
-        scanner.insert (&*e, 0);
+        scanner.insert (e.operator-> (), 0);
       }
     }
 

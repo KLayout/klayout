@@ -873,7 +873,7 @@ public:
    */
   Edges operator- (const Region &other) const
   {
-    return Edges (mp_delegate->and_with (other));
+    return Edges (mp_delegate->not_with (other));
   }
 
   /**
@@ -883,7 +883,7 @@ public:
    */
   Edges &operator-= (const Region &other)
   {
-    set_delegate (mp_delegate->and_with (other));
+    set_delegate (mp_delegate->not_with (other));
     return *this;
   }
 

@@ -66,6 +66,9 @@ public:
   virtual bool equals (const Edges &other) const;
   virtual bool less (const Edges &other) const;
 
+protected:
+  virtual void merged_semantics_changed ();
+
 private:
   OriginalLayerEdges &operator= (const OriginalLayerEdges &other);
 

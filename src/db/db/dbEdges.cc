@@ -135,6 +135,7 @@ Edges &Edges::transform (const T &trans)
 //  explicit instantiations
 template Edges &Edges::transform (const db::ICplxTrans &);
 template Edges &Edges::transform (const db::Trans &);
+template Edges &Edges::transform (const db::Disp &);
 
 template <class Sh>
 void Edges::insert (const Sh &shape)
@@ -161,6 +162,7 @@ void Edges::insert (const db::Shape &shape, const T &trans)
 
 template void Edges::insert (const db::Shape &, const db::ICplxTrans &);
 template void Edges::insert (const db::Shape &, const db::Trans &);
+template void Edges::insert (const db::Shape &, const db::Disp &);
 
 FlatEdges *
 Edges::flat_edges ()

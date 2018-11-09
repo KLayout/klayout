@@ -113,6 +113,7 @@ Region &Region::transform (const T &trans)
 //  explicit instantiations
 template Region &Region::transform (const db::ICplxTrans &);
 template Region &Region::transform (const db::Trans &);
+template Region &Region::transform (const db::Disp &);
 
 template <class Sh>
 void Region::insert (const Sh &shape)
@@ -138,6 +139,7 @@ void Region::insert (const db::Shape &shape, const T &trans)
 
 template void Region::insert (const db::Shape &, const db::ICplxTrans &);
 template void Region::insert (const db::Shape &, const db::Trans &);
+template void Region::insert (const db::Shape &, const db::Disp &);
 
 FlatRegion *
 Region::flat_region ()

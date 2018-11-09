@@ -1660,6 +1660,7 @@ public:
 
 private:
   friend class Edges;
+  friend class EdgePairs;
 
   RegionDelegate *mp_delegate;
 

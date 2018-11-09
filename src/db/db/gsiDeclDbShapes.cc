@@ -338,7 +338,7 @@ static void insert_edges_with_dtrans (db::Shapes *sh, const db::Edges &r, const 
 
 static void insert_edge_pairs_as_polygons (db::Shapes *sh, const db::EdgePairs &r, db::Coord e)
 {
-  for (db::EdgePairs::const_iterator s = r.begin (); s != r.end (); ++s) {
+  for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
     sh->insert (s->normalized ().to_simple_polygon (e));
   }
 }
@@ -346,14 +346,14 @@ static void insert_edge_pairs_as_polygons (db::Shapes *sh, const db::EdgePairs &
 static void insert_edge_pairs_as_polygons_d (db::Shapes *sh, const db::EdgePairs &r, db::DCoord de)
 {
   db::Coord e = db::coord_traits<db::Coord>::rounded (de / shapes_dbu (sh));
-  for (db::EdgePairs::const_iterator s = r.begin (); s != r.end (); ++s) {
+  for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
     sh->insert (s->normalized ().to_simple_polygon (e));
   }
 }
 
 static void insert_edge_pairs_as_polygons_with_trans (db::Shapes *sh, const db::EdgePairs &r, const db::ICplxTrans &trans, db::Coord e)
 {
-  for (db::EdgePairs::const_iterator s = r.begin (); s != r.end (); ++s) {
+  for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
     sh->insert (s->normalized ().to_simple_polygon (e).transformed (trans));
   }
 }
@@ -363,14 +363,14 @@ static void insert_edge_pairs_as_polygons_with_dtrans (db::Shapes *sh, const db:
   db::Coord e = db::coord_traits<db::Coord>::rounded (de / shapes_dbu (sh));
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
-  for (db::EdgePairs::const_iterator s = r.begin (); s != r.end (); ++s) {
+  for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
     sh->insert (s->normalized ().to_simple_polygon (e).transformed (itrans));
   }
 }
 
 static void insert_edge_pairs_as_edges (db::Shapes *sh, const db::EdgePairs &r)
 {
-  for (db::EdgePairs::const_iterator s = r.begin (); s != r.end (); ++s) {
+  for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
     sh->insert (s->first ());
     sh->insert (s->second ());
   }
@@ -378,7 +378,7 @@ static void insert_edge_pairs_as_edges (db::Shapes *sh, const db::EdgePairs &r)
 
 static void insert_edge_pairs_as_edges_with_trans (db::Shapes *sh, const db::EdgePairs &r, const db::ICplxTrans &trans)
 {
-  for (db::EdgePairs::const_iterator s = r.begin (); s != r.end (); ++s) {
+  for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
     sh->insert (s->first ().transformed (trans));
     sh->insert (s->second ().transformed (trans));
   }
@@ -388,9 +388,32 @@ static void insert_edge_pairs_as_edges_with_dtrans (db::Shapes *sh, const db::Ed
 {
   db::CplxTrans dbu_trans (shapes_dbu (sh));
   db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
-  for (db::EdgePairs::const_iterator s = r.begin (); s != r.end (); ++s) {
+  for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
     sh->insert (s->first ().transformed (itrans));
     sh->insert (s->second ().transformed (itrans));
+  }
+}
+
+static void insert_edge_pairs (db::Shapes *sh, const db::EdgePairs &r)
+{
+  for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
+    sh->insert (*s);
+  }
+}
+
+static void insert_edge_pairs_with_trans (db::Shapes *sh, const db::EdgePairs &r, const db::ICplxTrans &trans)
+{
+  for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
+    sh->insert (s->transformed (trans));
+  }
+}
+
+static void insert_edge_pairs_with_dtrans (db::Shapes *sh, const db::EdgePairs &r, const db::DCplxTrans &trans)
+{
+  db::CplxTrans dbu_trans (shapes_dbu (sh));
+  db::ICplxTrans itrans = dbu_trans.inverted () * trans * dbu_trans;
+  for (db::EdgePairs::const_iterator s = r.begin (); ! s.at_end (); ++s) {
+    sh->insert (s->transformed (itrans));
   }
 }
 
@@ -550,6 +573,34 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "Before an edge is inserted, the given transformation is applied.\n"
     "\n"
     "This method has been introduced in version 0.25.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_edge_pairs, gsi::arg ("edge_pairs"),
+    "@brief Inserts the edges from the edge pair collection into this shape container\n"
+    "@param edges The edge pairs to insert\n"
+    "\n"
+    "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_edge_pairs_with_trans, gsi::arg ("edge_pairs"), gsi::arg ("trans"),
+    "@brief Inserts the edge pairs from the edge pair collection into this shape container with a transformation\n"
+    "@param edges The edge pairs to insert\n"
+    "@param trans The transformation to apply\n"
+    "\n"
+    "This method inserts all edge pairs from the edge pair collection into this shape container.\n"
+    "Before an edge pair is inserted, the given transformation is applied.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  gsi::method_ext ("insert", &insert_edge_pairs_with_dtrans, gsi::arg ("edge_pairs"), gsi::arg ("trans"),
+    "@brief Inserts the edge pairs from the edge pair collection into this shape container with a transformation (given in micrometer units)\n"
+    "@param edges The edge pairs to insert\n"
+    "@param trans The transformation to apply (displacement in micrometer units)\n"
+    "\n"
+    "This method inserts all edge pairs from the edge collection into this shape container.\n"
+    "Before an edge pair is inserted, the given transformation is applied.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
   ) +
   gsi::method_ext ("insert_as_polygons", &insert_edge_pairs_as_polygons, gsi::arg ("edge_pairs"), gsi::arg ("e"),
     "@brief Inserts the edge pairs from the edge pair collection as polygons into this shape container\n"

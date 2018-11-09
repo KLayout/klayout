@@ -106,8 +106,9 @@ TEST(2)
 }
 
 struct EPTestFilter
+  : public db::EdgePairFilterBase
 {
-  bool operator() (const db::EdgePair &ep)
+  bool selected (const db::EdgePair &ep) const
   {
     return ep.first ().double_length () < 50;
   }

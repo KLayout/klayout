@@ -37,7 +37,6 @@ class EdgeFilterBase;
 class FlatEdges;
 class EmptyEdges;
 
-
 /**
  *  @brief An edge set iterator
  *
@@ -200,7 +199,7 @@ private:
 class Edges;
 
 /**
- *  @brief A base class for polygon filters
+ *  @brief A base class for edge filters
  */
 class DB_PUBLIC EdgeFilterBase
 {
@@ -1256,6 +1255,8 @@ public:
   }
 
 private:
+  friend class EdgePairs;
+
   EdgesDelegate *mp_delegate;
 
   void set_delegate (EdgesDelegate *delegate);

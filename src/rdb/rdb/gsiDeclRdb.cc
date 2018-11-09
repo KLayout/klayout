@@ -1024,7 +1024,7 @@ void create_items_from_edge_pairs (rdb::Database *db, rdb::id_type cell_id, rdb:
 {
   typedef db::EdgePairs::const_iterator iter;
 
-  for (iter o = collection.begin (); o != collection.end (); ++o) {
+  for (iter o = collection.begin (); ! o.at_end (); ++o) {
     rdb::Item *item = db->create_item (cell_id, cat_id);
     item->values ().add (new rdb::Value <db::DEdgePair> (o->transformed (trans)));
   }

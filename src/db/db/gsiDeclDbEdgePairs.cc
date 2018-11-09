@@ -45,15 +45,6 @@ static std::string to_string1 (const db::EdgePairs *r, size_t n)
   return r->to_string (n);
 }
 
-static const db::EdgePair *nth (const db::EdgePairs *r, size_t n)
-{
-  if (n >= r->size ()) {
-    return 0;
-  } else {
-    return &r->begin ()[n];
-  }
-}
-
 static db::EdgePairs &move_p (db::EdgePairs *r, const db::Vector &p)
 {
   r->transform (db::Disp (p));
@@ -94,7 +85,7 @@ static db::Region extents2 (const db::EdgePairs *r, db::Coord dx, db::Coord dy)
 {
   db::Region e;
   e.reserve (r->size ());
-  for (db::EdgePairs::const_iterator i = r->begin (); i != r->end (); ++i) {
+  for (db::EdgePairs::const_iterator i = r->begin (); ! i.at_end (); ++i) {
     e.insert (i->bbox ().enlarged (db::Vector (dx, dy)));
   }
   return e;
@@ -133,7 +124,7 @@ static db::Edges second_edges (const db::EdgePairs *ep)
 
 static void insert_e (db::EdgePairs *e, const db::EdgePairs &a)
 {
-  for (db::EdgePairs::const_iterator p = a.begin (); p != a.end (); ++p) {
+  for (db::EdgePairs::const_iterator p = a.begin (); ! p.at_end (); ++p) {
     e->insert (*p);
   }
 }
@@ -339,10 +330,10 @@ Class<db::EdgePairs> decl_EdgePairs ("db", "EdgePairs",
   method ("size", &db::EdgePairs::size,
     "@brief Returns the number of edge pairs in this collection\n"
   ) +
-  gsi::iterator ("each", &db::EdgePairs::begin, &db::EdgePairs::end,
+  gsi::iterator ("each", &db::EdgePairs::begin,
     "@brief Returns each edge pair of the edge pair collection\n"
   ) +
-  method_ext ("[]", &nth,
+  method ("[]", &db::EdgePairs::nth,
     "@brief Returns the nth edge pair\n"
     "@args n\n"
     "\n"

@@ -39,7 +39,7 @@
 #include "gsiExpression.h"
 
 static PyObject *
-module_init (const char *mod_name, const char *mod_description)
+module_init (const char *pymod_name, const char *mod_name, const char *mod_description)
 {
   static pya::PythonModule module;
 
@@ -50,7 +50,7 @@ module_init (const char *mod_name, const char *mod_description)
     //  required for the tiling processor for example
     gsi::initialize_expressions ();
 
-    module.init (mod_name, mod_description);
+    module.init (pymod_name, mod_description);
     module.make_classes (mod_name);
 
     return module.take_module ();
@@ -60,6 +60,9 @@ module_init (const char *mod_name, const char *mod_description)
   return 0;
 }
 
+#define STRINGIFY(s) _STRINGIFY(s)
+#define _STRINGIFY(s) #s
+
 #if PY_MAJOR_VERSION < 3
 
 #define DEFINE_PYMOD(__name__, __name_str__, __description__) \
@@ -67,7 +70,7 @@ module_init (const char *mod_name, const char *mod_description)
   DEF_INSIDE_PUBLIC \
   void init##__name__ () \
   { \
-    module_init (__name_str__, __description__); \
+    module_init (STRINGIFY(__name__), __name_str__, __description__); \
   } \
 
 #define DEFINE_PYMOD_WITH_INIT(__name__, __name_str__, __description__, __init__) \
@@ -75,7 +78,7 @@ module_init (const char *mod_name, const char *mod_description)
   DEF_INSIDE_PUBLIC \
   void init##__name__ () \
   { \
-    __init__ (__name_str__, __description__); \
+    __init__ (STRINGIFY(__name__), __name_str__, __description__); \
   } \
 
 #else
@@ -85,7 +88,7 @@ module_init (const char *mod_name, const char *mod_description)
   DEF_INSIDE_PUBLIC \
   PyObject *PyInit_##__name__ () \
   { \
-    return module_init (__name_str__, __description__); \
+    return module_init (STRINGIFY(__name__), __name_str__, __description__); \
   } \
 
 #define DEFINE_PYMOD_WITH_INIT(__name__, __name_str__, __description__, __init__) \
@@ -93,7 +96,7 @@ module_init (const char *mod_name, const char *mod_description)
   DEF_INSIDE_PUBLIC \
   PyObject *PyInit_##__name__ () \
   { \
-    return __init__ (__name_str__, __description__); \
+    return __init__ (STRINGIFY(__name__), __name_str__, __description__); \
   } \
 
 #endif

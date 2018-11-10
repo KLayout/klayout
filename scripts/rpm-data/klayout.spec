@@ -130,22 +130,34 @@ strip %{_builddir}/bin.$TARGET/strm*
 
 TARGET="linux-release"
 
+# create and populate pylib
 mkdir -p %{buildroot}%{pylib}/klayout
+cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.so %{buildroot}%{pylib}/klayout
+cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.py %{buildroot}%{pylib}/klayout
+chmod 644 %{buildroot}%{pylib}/klayout/*
+for d in tl db rdb; do
+  mkdir -p %{buildroot}%{pylib}/klayout/$d
+  cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/$d/*.py %{buildroot}%{pylib}/klayout/$d
+  chmod 644 %{buildroot}%{pylib}/klayout/$d/*
+done
+
+# create and populate libdir
 mkdir -p %{buildroot}%{_libdir}/klayout
 mkdir -p %{buildroot}%{_libdir}/klayout/db_plugins
 mkdir -p %{buildroot}%{_libdir}/klayout/lay_plugins
-mkdir -p %{buildroot}%{_bindir}
-cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.so %{buildroot}%{pylib}/klayout
-cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.py %{buildroot}%{pylib}/klayout
 cp -pd %{_builddir}/bin.$TARGET/lib*.so* %{buildroot}%{_libdir}/klayout
 cp -pd %{_builddir}/bin.$TARGET/db_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/db_plugins
 cp -pd %{_builddir}/bin.$TARGET/lay_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/lay_plugins
-chmod 644 %{buildroot}%{pylib}/klayout/*
 chmod 644 %{buildroot}%{_libdir}/klayout/*.so*
 chmod 644 %{buildroot}%{_libdir}/klayout/db_plugins/*.so*
 chmod 644 %{buildroot}%{_libdir}/klayout/lay_plugins/*.so*
+
+# create and populate bindir
+mkdir -p %{buildroot}%{_bindir}
 cp -pd %{_builddir}/bin.$TARGET/klayout %{_builddir}/bin.$TARGET/strm* %{buildroot}%{_bindir}
 chmod 755 %{buildroot}%{_bindir}/*
+
+# other files
 install -Dm644 %{_sourcedir}/etc/%{name}.desktop %{buildroot}%{_datadir}/applications/%{name}.desktop
 install -Dm644 %{_sourcedir}/etc/logo.png %{buildroot}%{_datadir}/pixmaps/%{name}.png
 

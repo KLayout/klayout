@@ -48,3 +48,25 @@ msvc {
   lib_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX} $(INSTALLROOT)$$PREFIX/pymod/klayout
 }
 INSTALLS = lib_target
+
+!equals(REALMODULE, "") {
+
+  msvc {
+    QMAKE_POST_LINK += && (if not exist $$shell_path($$DESTDIR_PYMOD/$$REALMODULE) $(MKDIR) $$shell_path($$DESTDIR_PYMOD/$$REALMODULE)) && $(COPY) $$shell_path($$PWD/distutils_src/klayout/$$REALMODULE/*.py) $$shell_path($$DESTDIR_PYMOD/$$REALMODULE)
+  } else {
+    QMAKE_POST_LINK += && $(MKDIR) $$DESTDIR_PYMOD/$$REALMODULE && $(COPY) $$PWD/distutils_src/klayout/$$REALMODULE/*.py $$DESTDIR_PYMOD/$$REALMODULE
+  }
+
+  # INSTALLS needs to be inside a lib or app templates.
+  modsrc_target.path = $$PREFIX/pymod/klayout/$$REALMODULE
+  # This would be nice:
+  #   init_target.files += $$DESTDIR_PYMOD/$$REALMODULE/*
+  # but some Qt versions need this explicitly:
+  msvc {
+    modsrc_target.extra = $(INSTALL_PROGRAM) $$shell_path($$DESTDIR_PYMOD/$$REALMODULE/*.py) $$shell_path($(INSTALLROOT)$$PREFIX/pymod/klayout/$$REALMODULE)
+  } else {
+    modsrc_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/$$REALMODULE/*.py $(INSTALLROOT)$$PREFIX/pymod/klayout/$$REALMODULE
+  }
+  INSTALLS += modsrc_target
+
+}

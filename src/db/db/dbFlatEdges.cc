@@ -338,7 +338,12 @@ FlatEdges::insert (const db::SimplePolygon &polygon)
 void
 FlatEdges::insert (const db::Edge &edge)
 {
+  if (! empty ()) {
+    m_is_merged = false;
+  }
+
   m_edges.insert (edge);
+  invalidate_cache ();
 }
 
 void

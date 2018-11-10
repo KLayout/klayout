@@ -135,7 +135,8 @@ SOURCES = \
     dbEmptyEdgePairs.cc \
     dbFlatEdgePairs.cc \
     dbOriginalLayerEdgePairs.cc \
-    dbEdgePairsDelegate.cc
+    dbEdgePairsDelegate.cc \
+    dbDeepShapeStore.cc
 
 HEADERS = \
   dbArray.h \
@@ -240,7 +241,8 @@ HEADERS = \
     dbEmptyEdgePairs.h \
     dbFlatEdgePairs.h \
     dbOriginalLayerEdgePairs.h \
-    dbEdgePairsDelegate.h
+    dbEdgePairsDelegate.h \
+    dbDeepShapeStore.h
 
 !equals(HAVE_QT, "0") {
 

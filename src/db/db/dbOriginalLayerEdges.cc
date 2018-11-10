@@ -195,7 +195,7 @@ OriginalLayerEdges::is_merged () const
 const db::Edge *
 OriginalLayerEdges::nth (size_t) const
 {
-  tl_assert (false);
+  throw tl::Exception (tl::to_string (tr ("Random access to edges is available only for flat collections")));
 }
 
 bool

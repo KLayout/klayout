@@ -1433,10 +1433,27 @@ Class<db::Edges> dec_Edges ("db", "Edges",
     "This method has been introduced in version 0.25."
   ) +
   method ("[]", &db::Edges::nth,
-    "@brief Returns the nth edge of the edge collection\n"
+    "@brief Returns the nth edge of the collection\n"
     "@args n\n"
     "\n"
-    "This method returns nil if the index is out of range.\n"
+    "This method returns nil if the index is out of range. It is available for flat edge collections only - i.e. "
+    "those for which \\has_valid_edges? is true. Use \\flatten to explicitly flatten an edge collection.\n"
+    "This method returns the raw edge (not merged edges, even if merged semantics is enabled).\n"
+    "\n"
+    "The \\each iterator is the more general approach to access the edges."
+  ) +
+  method ("flatten", &db::Edges::flatten,
+    "@brief Explicitly flattens an edge collection\n"
+    "\n"
+    "If the collection is already flat (i.e. \\has_valid_edges? returns true), this method will "
+    "not change it.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  method ("has_valid_edges?", &db::Edges::has_valid_edges,
+    "@brief Returns true if the edge collection is flat and individual edges can be accessed randomly\n"
+    "\n"
+    "This method has been introduced in version 0.26."
   ) +
   method_ext ("to_s", &to_string0,
     "@brief Converts the edge collection to a string\n"

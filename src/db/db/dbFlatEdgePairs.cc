@@ -184,6 +184,7 @@ void
 FlatEdgePairs::insert (const db::EdgePair &ep)
 {
   m_edge_pairs.insert (ep);
+  invalidate_cache ();
 }
 
 void

@@ -1576,12 +1576,22 @@ public:
   /**
    *  @brief Returns the nth polygon
    *
-   *  This operation is only cheap if "has_valid_polygons" is true. Otherwise, the
-   *  complexity is O(n).
+   *  This operation is available only for flat regions - i.e. such for which
+   *  "has_valid_polygons" is true.
    */
   const db::Polygon *nth (size_t n) const
   {
     return mp_delegate->nth (n);
+  }
+
+  /**
+   *  @brief Forces flattening of the region
+   *
+   *  This method will turn any region into a flat shape collection.
+   */
+  void flatten ()
+  {
+    flat_region ();
   }
 
   /**

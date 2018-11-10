@@ -41,7 +41,7 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.is_empty?, false)
     assert_equal(r.size, 1)
     assert_equal(r.bbox.to_s, "(10,20;100,200)")
-    assert_equal(r.is_merged?, false)
+    assert_equal(r.is_merged?, true)
     assert_equal(r.is_box?, true)
     assert_equal(r.edges.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
 
@@ -149,6 +149,12 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.to_s, "(-10,-20;-10,20;10,20;10,-20);(-10,80;-10,120;10,120;10,80);(190,80;190,120;210,120;210,80)")
     assert_equal(r.is_empty?, false)
     assert_equal(r.size, 3)
+    assert_equal(r.bbox.to_s, "(-10,-20;210,120)")
+    assert_equal(r.is_merged?, false)
+    assert_equal(r.has_valid_polygons?, false)
+
+    r.flatten
+    assert_equal(r.has_valid_polygons?, true)
     assert_equal(r[1].to_s, "(-10,80;-10,120;10,120;10,80)")
     assert_equal(r[4].to_s, "")
     assert_equal(r.bbox.to_s, "(-10,-20;210,120)")

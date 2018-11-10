@@ -40,6 +40,13 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.is_empty?, false)
     assert_equal(r.size, 1)
     assert_equal(r.bbox.to_s, "(10,20;100,200)")
+    assert_equal(r.is_merged?, true)
+
+    r.assign(RBA::Edges::new([RBA::Edge::new(10, 20, 100, 200), RBA::Edge::new(11, 21, 101, 201)]))
+    assert_equal(r.to_s, "(10,20;100,200);(11,21;101,201)")
+    assert_equal(r.is_empty?, false)
+    assert_equal(r.size, 2)
+    assert_equal(r.bbox.to_s, "(10,20;101,201)")
     assert_equal(r.is_merged?, false)
 
     r.assign(RBA::Edges::new(RBA::Edge::new(10, 20, 100, 200)))
@@ -47,7 +54,7 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.is_empty?, false)
     assert_equal(r.size, 1)
     assert_equal(r.bbox.to_s, "(10,20;100,200)")
-    assert_equal(r.is_merged?, false)
+    assert_equal(r.is_merged?, true)
 
     r.assign(RBA::Edges::new(RBA::Box::new(10, 20, 100, 200)))
     assert_equal(r.to_s, "(10,20;10,200);(10,200;100,200);(100,200;100,20);(100,20;10,20)")
@@ -60,7 +67,7 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.is_empty?, false)
     assert_equal(r.size, 4)
     assert_equal(r.bbox.to_s, "(10,20;100,200)")
-    assert_equal(r.is_merged?, false)
+    assert_equal(r.is_merged?, true)
 
     assert_equal(r.moved(RBA::Point::new(10, 20)).bbox.to_s, "(20,40;110,220)")
     assert_equal(r.moved(10, 20).bbox.to_s, "(20,40;110,220)")
@@ -163,6 +170,12 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.to_s(2), "(-10,-20;10,20);(-10,80;10,120)...")
     assert_equal(r.is_empty?, false)
     assert_equal(r.size, 3)
+    assert_equal(r.bbox.to_s, "(-10,-20;210,120)")
+    assert_equal(r.is_merged?, false)
+    assert_equal(r.has_valid_edges?, false)
+
+    r.flatten
+    assert_equal(r.has_valid_edges?, true)
     assert_equal(r[1].to_s, "(-10,80;10,120)")
     assert_equal(r[100].to_s, "")
     assert_equal(r.bbox.to_s, "(-10,-20;210,120)")

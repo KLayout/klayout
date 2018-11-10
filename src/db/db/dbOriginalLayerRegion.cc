@@ -195,7 +195,7 @@ OriginalLayerRegion::is_merged () const
 const db::Polygon *
 OriginalLayerRegion::nth (size_t) const
 {
-  tl_assert (false);
+  throw tl::Exception (tl::to_string (tr ("Random access to polygons is available only for flat regions")));
 }
 
 bool

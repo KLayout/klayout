@@ -23,6 +23,7 @@
 
 #include "dbOriginalLayerEdgePairs.h"
 #include "dbEdgePairs.h"
+#include "tlInternational.h"
 
 namespace db
 {
@@ -150,7 +151,7 @@ OriginalLayerEdgePairs::empty () const
 const db::EdgePair *
 OriginalLayerEdgePairs::nth (size_t) const
 {
-  tl_assert (false);
+  throw tl::Exception (tl::to_string (tr ("Random access to edge pairs is available only for flat collections")));
 }
 
 bool

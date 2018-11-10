@@ -423,6 +423,7 @@ static unsigned int s_properties ()          { return db::ShapeIterator::Propert
 static unsigned int s_polygons ()            { return db::ShapeIterator::Polygons; }
 static unsigned int s_boxes ()               { return db::ShapeIterator::Boxes; }
 static unsigned int s_edges ()               { return db::ShapeIterator::Edges; }
+static unsigned int s_edge_pairs ()          { return db::ShapeIterator::EdgePairs; }
 static unsigned int s_paths ()               { return db::ShapeIterator::Paths; }
 static unsigned int s_texts ()               { return db::ShapeIterator::Texts; }
 static unsigned int s_user_objects ()        { return db::ShapeIterator::UserObjects; }
@@ -780,9 +781,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("replace", &replace<db::Edge>,
+  gsi::method_ext ("replace", &replace<db::Edge>, gsi::arg ("shape"), gsi::arg ("edge"),
     "@brief Replaces the given shape with an edge object\n"
-    "@args shape,edge\n"
     "\n"
     "This method has been introduced with version 0.16. It replaces the given shape with the "
     "object specified. It does not change the property Id. To change the property Id, "
@@ -792,13 +792,34 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "This method is permitted in editable mode only."
   ) +
   gsi::method_ext ("replace", &dreplace<db::DEdge>, gsi::arg ("shape"), gsi::arg ("edge"),
-    "@brief Replaces the given shape with a edge given in micrometer units\n"
+    "@brief Replaces the given shape with an edge given in micrometer units\n"
     "@return A reference to the new shape (a \\Shape object)\n"
     "\n"
     "This method behaves like the \\replace version with an \\Edge argument, except that it will "
     "internally translate the edge from micrometer to database units.\n"
     "\n"
     "This variant has been introduced in version 0.25."
+  ) +
+  gsi::method_ext ("replace", &replace<db::EdgePair>, gsi::arg ("shape"), gsi::arg ("edge_pair"),
+    "@brief Replaces the given shape with an edge pair object\n"
+    "\n"
+    "It replaces the given shape with the "
+    "object specified. It does not change the property Id. To change the property Id, "
+    "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
+    "shape and insert a new shape."
+    "\n"
+    "This method is permitted in editable mode only.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  gsi::method_ext ("replace", &dreplace<db::DEdgePair>, gsi::arg ("shape"), gsi::arg ("edge_pair"),
+    "@brief Replaces the given shape with an edge pair given in micrometer units\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "\n"
+    "This method behaves like the \\replace version with an \\EdgePair argument, except that it will "
+    "internally translate the edge pair from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.26.\n"
   ) +
   gsi::method_ext ("replace", &replace<db::Text>,
     "@brief Replaces the given shape with a text object\n"
@@ -893,9 +914,8 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("insert|#insert_edge", &insert<db::Edge>,
-    "@brief Inserts a edge into the shapes list\n"
-    "@args edge\n"
+  gsi::method_ext ("insert|#insert_edge", &insert<db::Edge>, gsi::arg ("edge"),
+    "@brief Inserts an edge into the shapes list\n"
     "\n"
     "Starting with version 0.16, this method returns a reference to the newly created shape\n"
   ) +
@@ -906,6 +926,19 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "internally translate the edge from micrometer to database units.\n"
     "\n"
     "This variant has been introduced in version 0.25."
+  ) +
+  gsi::method_ext ("insert", &insert<db::EdgePair>, gsi::arg ("edge_pair"),
+    "@brief Inserts an edge pair into the shapes list\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  gsi::method_ext ("insert", &dinsert<db::DEdgePair>, gsi::arg ("edge_pair"),
+    "@brief Inserts a micrometer-unit edge pair into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "This method behaves like the \\insert version with a \\EdgePair argument, except that it will "
+    "internally translate the edge pair from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.26."
   ) +
   gsi::method_ext ("insert|#insert_text", &insert<db::Text>,
     "@brief Inserts a text into the shapes list\n"
@@ -986,14 +1019,13 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("insert|#insert_edge_with_properties", &insert_with_properties<db::Edge>,
-    "@brief Inserts a edge with properties into the shapes list\n"
-    "@args edge, property_id\n"
+  gsi::method_ext ("insert|#insert_edge_with_properties", &insert_with_properties<db::Edge>, gsi::arg ("edge"), gsi::arg ("property_id"),
+    "@brief Inserts an edge with properties into the shapes list\n"
     "@return A reference to the new shape (a \\Shape object)\n"
     "The property Id must be obtained from the \\Layout object's property_id method which "
     "associates a property set with a property Id."
     "\n"
-    "Starting with version 0.16, this method returns a reference to the newly created shape\n"
+    "Starting with version 0.16, this method returns a reference to the newly created shape.\n"
   ) +
   gsi::method_ext ("insert", &dinsert_with_properties<db::DEdge, db::Edge>, gsi::arg ("edge"), gsi::arg ("property_id"),
     "@brief Inserts a micrometer-unit edge with properties into the shapes list\n"
@@ -1002,6 +1034,22 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "internally translate the edge from micrometer to database units.\n"
     "\n"
     "This variant has been introduced in version 0.25."
+  ) +
+  gsi::method_ext ("insert", &insert_with_properties<db::EdgePair>, gsi::arg ("edge_pair"), gsi::arg ("property_id"),
+    "@brief Inserts an edge pair with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "The property Id must be obtained from the \\Layout object's property_id method which "
+    "associates a property set with a property Id."
+    "\n"
+    "This method has been introduced in version 0.26.\n"
+  ) +
+  gsi::method_ext ("insert", &dinsert_with_properties<db::DEdgePair, db::EdgePair>, gsi::arg ("edge_pair"), gsi::arg ("property_id"),
+    "@brief Inserts a micrometer-unit edge pair with properties into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "This method behaves like the \\insert version with a \\EdgePair argument and a property ID, except that it will "
+    "internally translate the edge pair from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.26."
   ) +
   gsi::method_ext ("insert|#insert_text_with_properties", &insert_with_properties<db::Text>,
     "@brief Inserts a text with properties into the shapes list\n"
@@ -1185,6 +1233,9 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
   gsi::method ("SEdges|#s_edges", &s_edges,
     "@brief Indicates that edges shall be retrieved"
   ) +
+  gsi::method ("SEdgePairs|#s_edge_pairs", &s_edge_pairs,
+    "@brief Indicates that edge pairs shall be retrieved"
+  ) +
   gsi::method ("SPaths|#s_paths", &s_paths,
     "@brief Indicates that paths shall be retrieved"
   ) +
@@ -1203,7 +1254,7 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
   "@brief A collection of shapes\n"
   "\n"
   "A shapes collection is a collection of geometrical objects, such as "
-  "polygons, boxes, paths, edges or text objects.\n"
+  "polygons, boxes, paths, edges, edge pairs or text objects.\n"
   "\n"
   "Shapes objects are the basic containers for geometrical objects of a cell. Inside a cell, there is "
   "one Shapes object per layer.\n"

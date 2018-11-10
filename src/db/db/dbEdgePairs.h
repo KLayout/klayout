@@ -493,12 +493,22 @@ public:
   /**
    *  @brief Returns the nth edge pair
    *
-   *  This operation is only cheap if "has_valid_edge_pairs" is true. Otherwise, the
-   *  complexity is O(n).
+   *  This operation is available only for flat regions - i.e. such for which
+   *  "has_valid_edge_pairs" is true.
    */
   const db::EdgePair *nth (size_t n) const
   {
     return mp_delegate->nth (n);
+  }
+
+  /**
+   *  @brief Forces flattening of the edge pair collection
+   *
+   *  This method will turn any edge pair collection into a flat one.
+   */
+  void flatten ()
+  {
+    flat_edge_pairs ();
   }
 
   /**

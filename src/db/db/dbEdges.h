@@ -1172,12 +1172,21 @@ public:
   /**
    *  @brief Returns the nth edge
    *
-   *  This operation is only cheap if "has_valid_edges" is true. Otherwise, the
-   *  complexity is O(n).
+   *  This operation is available only for flat regions - i.e. such for which "has_valid_edges" is true.
    */
   const db::Edge *nth (size_t n) const
   {
     return mp_delegate->nth (n);
+  }
+
+  /**
+   *  @brief Forces flattening of the edge collection
+   *
+   *  This method will turn any edge collection into a flat one.
+   */
+  void flatten ()
+  {
+    flat_edges ();
   }
 
   /**

@@ -689,6 +689,26 @@ static tl::Variant get_dedge (const db::Shape *s)
   }
 }
 
+static tl::Variant get_edge_pair (const db::Shape *s)
+{
+  db::Shape::edge_pair_type p;
+  if (s->edge_pair (p)) {
+    return tl::Variant (p);
+  } else {
+    return tl::Variant ();
+  }
+}
+
+static tl::Variant get_dedge_pair (const db::Shape *s)
+{
+  db::Shape::edge_pair_type p;
+  if (s->edge_pair (p)) {
+    return tl::Variant (db::CplxTrans (shape_dbu (s)) * p);
+  } else {
+    return tl::Variant ();
+  }
+}
+
 static tl::Variant get_text (const db::Shape *s)
 {
   db::Shape::text_type p;
@@ -1087,6 +1107,7 @@ static int t_simplePolygonRef ()            { return db::Shape::SimplePolygonRef
 static int t_simplePolygonPtrArray ()       { return db::Shape::SimplePolygonPtrArray; }
 static int t_simplePolygonPtrArrayMember () { return db::Shape::SimplePolygonPtrArrayMember; }
 static int t_edge ()                        { return db::Shape::Edge; }
+static int t_edge_pair ()                   { return db::Shape::EdgePair; }
 static int t_path ()                        { return db::Shape::Path; }
 static int t_pathRef ()                     { return db::Shape::PathRef; }
 static int t_pathPtrArray ()                { return db::Shape::PathPtrArray; }
@@ -1218,7 +1239,7 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method_ext ("edge=", &set_shape<db::Edge>,
+  gsi::method_ext ("edge=", &set_shape<db::Edge>, gsi::arg("edge"),
     "@brief Replaces the shape by the given edge\n"
     "@args box\n"
     "This method replaces the shape by the given edge. This method can only be called "
@@ -1234,6 +1255,23 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "This version translates the edge from micrometer units to database units internally.\n"
     "\n"
     "This method has been introduced in version 0.25."
+  ) +
+  gsi::method_ext ("edge_pair=", &set_shape<db::EdgePair>, gsi::arg("edge_pair"),
+    "@brief Replaces the shape by the given edge pair\n"
+    "@args box\n"
+    "This method replaces the shape by the given edge pair. This method can only be called "
+    "for editable layouts. It does not change the user properties of the shape.\n"
+    "Calling this method will invalidate any iterators. It should not be called inside a "
+    "loop iterating over shapes.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  gsi::method_ext ("edge_pair=|dedge_pair=", &set_dshape<db::DEdgePair>, gsi::arg("edge_pair"),
+    "@brief Replaces the shape by the given edge pair (in micrometer units)\n"
+    "This method replaces the shape by the given edge pair, like \\edge_pair= with a \\EdgePair argument does. "
+    "This version translates the edge pair from micrometer units to database units internally.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
   ) +
   gsi::method_ext ("delete_property", &delete_property,
     "@brief Deletes the user property with the given key\n"
@@ -1713,11 +1751,28 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "Starting with version 0.23, this method returns nil, if the shape does not represent an edge."
   ) +
   gsi::method_ext ("dedge", &get_dedge,
-    "@brief Returns the path object as a \\DEdge object in micrometer units\n"
+    "@brief Returns the edge object as a \\DEdge object in micrometer units\n"
     "See \\edge for a description of this method. This method returns the edge after translation to "
     "micrometer units.\n"
     "\n"
     "This method has been added in version 0.25.\n"
+  ) +
+  gsi::method ("is_edge_pair?", &db::Shape::is_edge_pair,
+    "@brief Returns true, if the object is an edge pair\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  gsi::method_ext ("edge_pair", &get_edge_pair,
+    "@brief Returns the edge pair object\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  gsi::method_ext ("dedge_pair", &get_dedge_pair,
+    "@brief Returns the edge pair object as a \\DEdgePair object in micrometer units\n"
+    "See \\edge_pair for a description of this method. This method returns the edge pair after translation to "
+    "micrometer units.\n"
+    "\n"
+    "This method has been added in version 0.26.\n"
   ) +
   gsi::method ("is_text?", &db::Shape::is_text,
     "@brief Returns true, if the object is a text\n"
@@ -1729,7 +1784,7 @@ Class<db::Shape> decl_Shape ("db", "Shape",
   ) +
   gsi::method_ext ("dtext", &get_dtext,
     "@brief Returns the path object as a \\DText object in micrometer units\n"
-    "See \\edge for a description of this method. This method returns the text after translation to "
+    "See \\text for a description of this method. This method returns the text after translation to "
     "micrometer units.\n"
     "\n"
     "This method has been added in version 0.25.\n"
@@ -2026,6 +2081,7 @@ Class<db::Shape> decl_Shape ("db", "Shape",
   gsi::method ("TSimplePolygonPtrArray|#t_simple_polygon_ptr_array", &t_simplePolygonPtrArray) +
   gsi::method ("TSimplePolygonPtrArrayMember|#t_simple_polygon_ptr_array_member", &t_simplePolygonPtrArrayMember) +
   gsi::method ("TEdge|#t_edge", &t_edge) +
+  gsi::method ("TEdgePair|#t_edge_pair", &t_edge_pair) +
   gsi::method ("TPath|#t_path", &t_path) +
   gsi::method ("TPathRef|#t_path_ref", &t_pathRef) +
   gsi::method ("TPathPtrArray|#t_path_ptr_array", &t_pathPtrArray) +

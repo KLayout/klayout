@@ -797,7 +797,7 @@ Class<db::Region> decl_Region ("db", "Region",
     "@param as_pattern If true, the selection string is treated as a glob pattern. Otherwise the match is exact.\n"
     "\n"
     "This special constructor will create a region from the text objects delivered by the shape iterator. "
-    "Each text object will deliver a small (non-empty) box that represents the text origin.\n"
+    "Each text object will give a small (non-empty) box that represents the text origin.\n"
     "Texts can be selected by their strings - either through a glob pattern or by exact comparison with "
     "the given string. The following options are available:\n"
     "\n"
@@ -2320,11 +2320,24 @@ Class<db::Region> decl_Region ("db", "Region",
     "@brief Returns the nth polygon of the region\n"
     "@args n\n"
     "\n"
-    "This method returns nil if the index is out of range.\n"
-    "This returns the raw polygon (not merged polygons if merged semantics is enabled).\n"
+    "This method returns nil if the index is out of range. It is available for flat regions only - i.e. "
+    "those for which \\has_valid_polygons? is true. Use \\flatten to explicitly flatten a region.\n"
+    "This method returns the raw polygon (not merged polygons, even if merged semantics is enabled).\n"
     "\n"
-    "Using this method may be costly in terms of memory since it will load the polygons into an array if they have been "
-    "stored in an hierarchical layout before. It is recommended to use the \\each iterator instead if possible."
+    "The \\each iterator is the more general approach to access the polygons."
+  ) +
+  method ("flatten", &db::Region::flatten,
+    "@brief Explicitly flattens a region\n"
+    "\n"
+    "If the region is already flat (i.e. \\has_valid_polygons? returns true), this method will "
+    "not change it.\n"
+    "\n"
+    "This method has been introduced in version 0.26."
+  ) +
+  method ("has_valid_polygons?", &db::Region::has_valid_polygons,
+    "@brief Returns true if the region is flat and individual polygons can be accessed randomly\n"
+    "\n"
+    "This method has been introduced in version 0.26."
   ) +
   method_ext ("to_s", &to_string0,
     "@brief Converts the region to a string\n"

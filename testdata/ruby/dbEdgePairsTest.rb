@@ -108,6 +108,51 @@ class DBEdgePairs_TestClass < TestBase
 
   end
 
+  def test_3
+
+    ep1 = RBA::EdgePair::new(RBA::Edge::new(0, 1, 2, 3), RBA::Edge::new(10, 11, 12, 13))
+    ep2 = RBA::EdgePair::new(RBA::Edge::new(20, 21, 22, 23), RBA::Edge::new(30, 31, 32, 33))
+
+    r1 = RBA::EdgePairs::new([ ep1, ep2 ])
+    assert_equal(r1.to_s, "(0,1;2,3)/(10,11;12,13);(20,21;22,23)/(30,31;32,33)")
+
+    r1 = RBA::EdgePairs::new(ep1)
+    assert_equal(r1.to_s, "(0,1;2,3)/(10,11;12,13)")
+
+    s = RBA::Shapes::new
+    s.insert(ep1)
+    s.insert(ep2)
+    r1 = RBA::EdgePairs::new(s)
+    assert_equal(r1.to_s, "(0,1;2,3)/(10,11;12,13);(20,21;22,23)/(30,31;32,33)")
+
+    ly = RBA::Layout::new
+    l1 = ly.layer("l1")
+    l2 = ly.layer("l2")
+    c1 = ly.create_cell("C1")
+    c2 = ly.create_cell("C2")
+    c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(0, 0)))
+    c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(0, 100)))
+    c1.insert(RBA::CellInstArray::new(c2.cell_index, RBA::Trans::new(200, 100)))
+    c2.shapes(l1).insert(ep1)
+    c2.shapes(l2).insert(ep2)
+    
+    r = RBA::EdgePairs::new(ly.begin_shapes(c1.cell_index, l1))
+    assert_equal(r.to_s(30), "(0,1;2,3)/(10,11;12,13);(0,101;2,103)/(10,111;12,113);(200,101;202,103)/(210,111;212,113)")
+    assert_equal(r.to_s(2), "(0,1;2,3)/(10,11;12,13);(0,101;2,103)/(10,111;12,113)...")
+    assert_equal(r.is_empty?, false)
+    assert_equal(r.size, 3)
+
+    assert_equal(r.has_valid_edge_pairs?, false)
+    assert_equal(r.bbox.to_s, "(0,1;212,113)")
+
+    r.flatten
+    assert_equal(r.has_valid_edge_pairs?, true)
+    assert_equal(r[1].to_s, "(0,101;2,103)/(10,111;12,113)")
+    assert_equal(r[100].inspect, "nil")
+    assert_equal(r.bbox.to_s, "(0,1;212,113)")
+    
+  end
+
 end
 
 

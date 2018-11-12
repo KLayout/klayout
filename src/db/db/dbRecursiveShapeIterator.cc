@@ -383,7 +383,7 @@ private:
 }
 
 void
-RecursiveShapeIterator::validate () const
+RecursiveShapeIterator::validate (RecursiveShapeReceiver *receiver) const
 {
   if (! m_needs_reinit) {
     return;
@@ -438,8 +438,8 @@ RecursiveShapeIterator::validate () const
   } else if (mp_layout && (! m_has_layers || m_current_layer < m_layers.size ())) {
     //  Ensures the trees are built properly - this is important in MT contexts (i.e. TilingProcessor)
     mp_layout->update ();
-    new_cell ();
-    next_shape ();
+    new_cell (receiver);
+    next_shape (receiver);
   }
 }
 
@@ -519,7 +519,7 @@ RecursiveShapeIterator::select_all_cells ()
 bool
 RecursiveShapeIterator::at_end () const
 {
-  validate ();
+  validate (0);
   return m_shape.at_end () || is_inactive ();
 }
 
@@ -611,7 +611,7 @@ RecursiveShapeIterator::skip_inst_iter_for_complex_region () const
 }
 
 void
-RecursiveShapeIterator::next ()
+RecursiveShapeIterator::next (RecursiveShapeReceiver *receiver)
 {
   if (! at_end ()) {
 
@@ -622,14 +622,14 @@ RecursiveShapeIterator::next ()
     }
 
     if (! mp_shapes && m_shape.at_end ()) {
-      next_shape ();
+      next_shape (receiver);
     }
 
   }
 }
 
 void
-RecursiveShapeIterator::next_shape () const
+RecursiveShapeIterator::next_shape (RecursiveShapeReceiver *receiver) const
 {
   while (at_end ()) {
 
@@ -674,10 +674,10 @@ RecursiveShapeIterator::next_shape () const
         if (is_empty) {
 
           ++m_inst;
-          new_inst ();
+          new_inst (receiver);
 
         } else {
-          down ();
+          down (receiver);
         }
 
       } else {
@@ -688,12 +688,14 @@ RecursiveShapeIterator::next_shape () const
         }
 
         //  no more instances: up and next instance
-        up ();
+        up (receiver);
 
         ++m_inst_array;
+        new_inst_member (receiver);
+
         if (m_inst_array.at_end ()) {
           ++m_inst;
-          new_inst ();
+          new_inst (receiver);
         }
 
       }
@@ -704,7 +706,7 @@ RecursiveShapeIterator::next_shape () const
 }
 
 void
-RecursiveShapeIterator::down () const
+RecursiveShapeIterator::down (RecursiveShapeReceiver *receiver) const
 {
   m_trans_stack.push_back (m_trans);
   m_cells.push_back (mp_cell);
@@ -761,12 +763,24 @@ RecursiveShapeIterator::down () const
 
   }
 
-  new_cell ();
+  if (receiver && ! receiver->enter_cell (this, cell (), m_local_region_stack.back (), m_local_complex_region_stack.empty () ? 0 : &m_local_complex_region_stack.back ())) {
+    if (m_has_layers) {
+      m_current_layer = m_layers.size ();
+    }
+    m_shape = shape_iterator ();
+    m_inst = inst_iterator ();
+  } else {
+    new_cell (receiver);
+  }
 }
 
 void
-RecursiveShapeIterator::up () const
+RecursiveShapeIterator::up (RecursiveShapeReceiver *receiver) const
 {
+  if (receiver) {
+    receiver->leave_cell (this, cell ());
+  }
+
   m_shape = shape_iterator ();
   m_shape_quad_id = 0;
 
@@ -823,7 +837,7 @@ RecursiveShapeIterator::new_layer () const
 }
 
 void 
-RecursiveShapeIterator::new_cell () const
+RecursiveShapeIterator::new_cell (RecursiveShapeReceiver *receiver) const
 {
   if (m_has_layers) {
     m_current_layer = 0;
@@ -847,11 +861,11 @@ RecursiveShapeIterator::new_cell () const
     skip_inst_iter_for_complex_region ();
   }
 
-  new_inst ();
+  new_inst (receiver);
 }
 
 void 
-RecursiveShapeIterator::new_inst () const
+RecursiveShapeIterator::new_inst (RecursiveShapeReceiver *receiver) const
 {
   //  look for the next instance with a non-empty array iterator. The latter can be 
   //  empty because we use a per-layer box converter for that case what we don't for the
@@ -866,18 +880,49 @@ RecursiveShapeIterator::new_inst () const
       }
     }
 
-    if (m_local_region_stack.back () != box_type::world ()) {
+    bool all_of_instance = true;
+    if (m_local_region_stack.back () != box_type::world () && ! m_inst->cell_inst ().bbox (m_box_convert).inside (m_local_region_stack.back ())) {
       m_inst_array = m_inst->cell_inst ().begin_touching (m_local_region_stack.back (), m_box_convert);
+      all_of_instance = false;
     } else {
-      m_inst_array = m_inst->cell_inst ().begin (); 
+      m_inst_array = m_inst->cell_inst ().begin ();
+      //  TODO: optimization potential: only report all_of_instance == false, if not entirely within the complex region
+      all_of_instance = m_local_complex_region_stack.empty ();
     }
 
+    if (receiver) {
+      receiver->new_inst (this, m_inst->cell_inst (), m_local_region_stack.back (), m_local_complex_region_stack.empty () ? 0 : &m_local_complex_region_stack.back (), all_of_instance);
+    }
+
+    new_inst_member (receiver);
     if (! m_inst_array.at_end ()) {
       break;
     } else {
       ++m_inst;
     }
 
+  }
+}
+
+void
+RecursiveShapeIterator::new_inst_member (RecursiveShapeReceiver *receiver) const
+{
+  if (! m_local_complex_region_stack.empty ()) {
+
+    //  skip instance array members not part of the complex region
+    while (! m_inst_array.at_end ()) {
+      db::Box ia_box = m_inst->complex_trans (*m_inst_array) * m_box_convert (m_inst->cell_inst ().object ());
+      if (! is_outside_complex_region (ia_box)) {
+        break;
+      } else {
+        ++m_inst_array;
+      }
+    }
+
+  }
+
+  if (! m_inst_array.at_end () && receiver) {
+    receiver->new_inst_member (this, m_inst->cell_inst (), m_inst->complex_trans (*m_inst_array), m_local_region_stack.back (), m_local_complex_region_stack.empty () ? 0 : &m_local_complex_region_stack.back ());
   }
 }
 
@@ -889,6 +934,24 @@ RecursiveShapeIterator::is_outside_complex_region (const db::Box &box) const
   } else {
     return m_local_complex_region_stack.back ().begin_touching (box, db::box_convert<db::Box> ()).at_end ();
   }
+}
+
+void
+RecursiveShapeIterator::push (RecursiveShapeReceiver *receiver)
+{
+  //  force reset so we can validate with a receiver
+  reset ();
+
+  receiver->begin (this);
+
+  validate (receiver);
+
+  while (! at_end ()) {
+    receiver->shape (this, *m_shape, m_trans);
+    next (receiver);
+  }
+
+  receiver->end (this);
 }
 
 }

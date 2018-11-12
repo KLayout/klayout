@@ -453,7 +453,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
   gsi::method ("cell_index", &db::RecursiveShapeIterator::cell_index, 
     "@brief Gets the current cell's index \n"
   ) +
-  gsi::method ("next", &db::RecursiveShapeIterator::next, 
+  gsi::method ("next", (void (db::RecursiveShapeIterator::*) ()) &db::RecursiveShapeIterator::next,
     "@brief Increment the iterator\n"
     "This moves the iterator to the next shape inside the search scope."
   ) +

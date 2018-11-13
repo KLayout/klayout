@@ -758,10 +758,7 @@ public:
    *  @brief Enters a cell
    *
    *  This method is called when the recursive shape iterator
-   *  enters a new cell. This method can return false. In this
-   *  case, the cell is skipped together with it's subcells.
-   *
-   *  This method is not called for the top cell. When it is called, "iter->trans()"
+   *  enters a new cell. It is not called for the top cell. When it is called, "iter->trans()"
    *  will already be updated.
    *
    *  @param iter The iterator
@@ -769,7 +766,7 @@ public:
    *  @param region The clip box as seen from "cell" or db::Box::world if there is no clip box
    *  @param complex_region A complex clip region if one is supplied together with "region"
    */
-  virtual bool enter_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { return true; }
+  virtual void enter_cell (const RecursiveShapeIterator * /*iter*/, const db::Cell * /*cell*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { }
 
   /**
    *  @brief Leaves the current cell
@@ -798,8 +795,10 @@ public:
    *    ...
    *
    *  The "all" parameter is true, if all instances of the array will be addressed.
+   *
+   *  If this method returns false, the instance (the whole array) is skipped and the cell is not entered.
    */
-  virtual void new_inst (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { }
+  virtual bool new_inst (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return true; }
 
   /**
    *  @brief Enters a new array member of the instance
@@ -807,8 +806,10 @@ public:
    *  See "new_inst" for a description. This method adds the "trans" parameter
    *  which holds the complex transformation for this particular instance of
    *  the array.
+   *
+   *  If this method returns false, this array instance (but not the whole array) is skipped and the cell is not entered.
    */
-  virtual void new_inst_member (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { }
+  virtual bool new_inst_member (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { return true; }
 
   /**
    *  @brief Delivers a shape

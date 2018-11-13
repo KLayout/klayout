@@ -120,8 +120,8 @@ private:
 
 class LAY_PUBLIC MainWindow
   : public QMainWindow,
-    public lay::AbstractMenuProvider,
-    public lay::PluginRoot
+    public lay::Plugin,
+    public lay::AbstractMenuProvider
 {
 Q_OBJECT
 public:
@@ -134,7 +134,7 @@ public:
   /**
    *  @brief Constructor
    */
-  MainWindow (QApplication *app = 0, const char *name = "main_window");
+  MainWindow (QApplication *app = 0, lay::PluginRoot *plugin_root = 0, const char *name = "main_window");
 
   /** 
    *  @brief Destructor
@@ -551,7 +551,7 @@ public:
   void show_macro_editor (const std::string &cat = std::string (), bool add = false);
 
   /**
-   *  @brief Reimplementation of the plugin interface: handle a generic menu request
+   *  @brief Handles a generic menu request
    */
   void menu_activated (const std::string &symbol);
 
@@ -870,6 +870,9 @@ protected:
   void do_update_file_menu ();
 
 private:
+  friend class PluginRootToMainWindow;
+
+  lay::PluginRoot *mp_plugin_root;
   TextProgressDelegate m_text_progress;
 
   //  Main menu
@@ -973,12 +976,31 @@ private:
   void update_dock_widget_state ();
   void read_dock_widget_state ();
 
-  virtual void plugin_registered (lay::PluginDeclaration *cls);
-  virtual void plugin_removed (lay::PluginDeclaration *cls);
+  void plugin_registered (lay::PluginDeclaration *cls);
+  void plugin_removed (lay::PluginDeclaration *cls);
 
   void libraries_changed ();
   void apply_key_bindings ();
   void apply_hidden (const std::vector<std::pair <std::string, bool> > &hidden);
+};
+
+class LAY_PUBLIC PluginRootToMainWindow
+  : public lay::PluginRoot
+{
+public:
+  PluginRootToMainWindow ();
+
+  void attach_to (lay::MainWindow *main_window);
+
+  virtual void plugin_registered (lay::PluginDeclaration *cls);
+  virtual void plugin_removed (lay::PluginDeclaration *cls);
+  virtual void select_mode (int mode);
+
+private:
+  PluginRootToMainWindow (const PluginRootToMainWindow &);
+  PluginRootToMainWindow &operator= (const PluginRootToMainWindow &);
+
+  tl::weak_ptr<MainWindow> mp_main_window;
 };
 
 }

@@ -98,7 +98,7 @@ public:
   /**
    *  @brief Constructor
    */
-  MacroEditorDialog (lay::MainWindow *parent, lym::MacroCollection *root);
+  MacroEditorDialog (lay::PluginRoot *pr, lym::MacroCollection *root);
 
   /**
    *  @brief Destructor

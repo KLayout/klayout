@@ -267,6 +267,29 @@ public:
   }
 
   /**
+   *  @brief Specify the minimum hierarchy depth to look into
+   *
+   *  A depth of 0 instructs the iterator to deliver shapes from the top level.
+   *  1 instructs to deliver shapes from the first child level.
+   *  The minimum depth must be specified before the shapes are being retrieved.
+   */
+  void min_depth (int depth)
+  {
+    if (m_min_depth != depth) {
+      m_min_depth = depth;
+      m_needs_reinit = true;
+    }
+  }
+
+  /**
+   *  @brief Gets the minimum hierarchy depth to search for
+   */
+  int min_depth () const
+  {
+    return m_min_depth;
+  }
+
+  /**
    *  @brief Gets the iterated shapes
    *
    *  Alternatively to layout/cell, the shape iterator can iterate shapes which will 
@@ -418,18 +441,23 @@ public:
   void reset_selection ();
 
   /**
-   *  @brief Specify the minimum hierarchy depth to look into
+   *  @brief Returns the cells in the "enable" selection
    *
-   *  A depth of 0 instructs the iterator to deliver shapes from the top level.
-   *  1 instructs to deliver shapes from the first child level.
-   *  The minimum depth must be specified before the shapes are being retrieved.
+   *  Cells in this set make the iterator become active, while cells in the
+   *  disable selection make the iterator inactive. Only when active, the
+   *  iterator will deliver shapes.
    */
-  void min_depth (int depth) 
-  { 
-    if (m_min_depth != depth) {
-      m_min_depth = depth; 
-      m_needs_reinit = true;
-    }
+  const std::set<db::cell_index_type> &enables () const
+  {
+    return m_start;
+  }
+
+  /**
+   *  @brief Returns the cells in the "disable" selection
+   */
+  const std::set<db::cell_index_type> &disables () const
+  {
+    return m_stop;
   }
 
   /**

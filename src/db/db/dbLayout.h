@@ -39,6 +39,7 @@
 #include "tlVector.h"
 #include "tlString.h"
 #include "tlThreads.h"
+#include "tlObject.h"
 #include "gsi.h"
 
 #include <cstring>
@@ -457,7 +458,8 @@ public:
 class DB_PUBLIC Layout 
   : public db::Object,
     public db::LayoutStateModel,
-    public gsi::ObjectBase
+    public gsi::ObjectBase,
+    public tl::Object
 {
 public:
   typedef db::Box box_type;

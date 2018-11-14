@@ -69,6 +69,11 @@ public:
   /**
    *  @brief Reimplementation of the PluginDeclaration interface
    */
+  virtual void initialize (lay::PluginRoot *root);
+
+  /**
+   *  @brief Reimplementation of the PluginDeclaration interface
+   */
   virtual void initialized (lay::PluginRoot *root);
 
   /**
@@ -186,6 +191,7 @@ signals:
 private:
   lay::SaltManagerDialog *mp_salt_dialog;
   lay::MainWindow *mp_mw;
+  lay::PluginRoot * mp_plugin_root;
   std::string m_salt_mine_url;
   lay::Salt m_salt;
   tl::FileSystemWatcher *m_file_watcher;

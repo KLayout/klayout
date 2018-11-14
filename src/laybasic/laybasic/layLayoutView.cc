@@ -249,7 +249,7 @@ static LayoutView *ms_current = 0;
 
 LayoutView::LayoutView (db::Manager *manager, bool editable, lay::PluginRoot *root, QWidget *parent, const char *name, unsigned int options)
   : QFrame (parent), 
-    lay::Plugin (root), 
+    lay::Plugin (root),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager),

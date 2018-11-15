@@ -918,19 +918,23 @@ public:
     m_text += std::string ("leave_cell(") + iter->layout ()->cell_name (cell->cell_index ()) + ")\n";
   }
 
-  virtual bool new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
   {
     m_text += std::string ("new_inst(") + iter->layout ()->cell_name (inst.object ().cell_index ());
     if (all) {
       m_text += ",all";
     }
     m_text += ")\n";
-    return true;
+    return NI_all;
   }
 
-  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
+  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
   {
-    m_text += std::string ("new_inst_member(") + iter->layout ()->cell_name (inst.object ().cell_index ()) + "," + tl::to_string (trans) + ")\n";
+    m_text += std::string ("new_inst_member(") + iter->layout ()->cell_name (inst.object ().cell_index ()) + "," + tl::to_string (trans);
+    if (all) {
+      m_text += ",all";
+    }
+    m_text += ")\n";
     return true;
   }
 
@@ -949,10 +953,26 @@ class ReceiverRejectingACellInstanceArray
 public:
   ReceiverRejectingACellInstanceArray (db::cell_index_type rejected) : m_rejected (rejected) { }
 
-  virtual bool new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::Box &region, const box_tree_type *complex_region, bool all)
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::Box &region, const box_tree_type *complex_region, bool all)
   {
     LoggingReceiver::new_inst (iter, inst, region, complex_region, all);
-    return inst.object ().cell_index () != m_rejected;
+    return inst.object ().cell_index () != m_rejected ? NI_all : NI_skip;
+  }
+
+private:
+  db::cell_index_type m_rejected;
+};
+
+class ReceiverRejectingACellInstanceArrayExceptOne
+  : public LoggingReceiver
+{
+public:
+  ReceiverRejectingACellInstanceArrayExceptOne (db::cell_index_type rejected) : m_rejected (rejected) { }
+
+  virtual new_inst_mode new_inst (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::Box &region, const box_tree_type *complex_region, bool all)
+  {
+    LoggingReceiver::new_inst (iter, inst, region, complex_region, all);
+    return inst.object ().cell_index () != m_rejected ? NI_all : NI_single;
   }
 
 private:
@@ -965,9 +985,9 @@ class ReceiverRejectingACellInstance
 public:
   ReceiverRejectingACellInstance (db::cell_index_type rejected, const db::ICplxTrans &trans_rejected) : m_rejected (rejected), m_trans_rejected (trans_rejected) { }
 
-  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region)
+  virtual bool new_inst_member (const db::RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all)
   {
-    LoggingReceiver::new_inst_member (iter, inst, trans, region, complex_region);
+    LoggingReceiver::new_inst_member (iter, inst, trans, region, complex_region, all);
     return inst.object ().cell_index () != m_rejected || trans != m_trans_rejected;
   }
 
@@ -1001,82 +1021,82 @@ TEST(10)
   EXPECT_EQ (lr1.text (),
     "begin\n"
     "new_inst($2,all)\n"
-    "new_inst_member($2,r0 *1 0,0)\n"
+    "new_inst_member($2,r0 *1 0,0,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
-    "new_inst_member($3,r0 *1 0,0)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 0,0)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 0,2000)\n"
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 0,2000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,1000)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 3000,1000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,3000)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 3000,3000)\n"
     "leave_cell($3)\n"
     "leave_cell($2)\n"
-    "new_inst_member($2,r0 *1 0,6000)\n"
+    "new_inst_member($2,r0 *1 0,6000,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
-    "new_inst_member($3,r0 *1 0,0)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 0,6000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 0,2000)\n"
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 0,8000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,1000)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 3000,7000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,3000)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 3000,9000)\n"
     "leave_cell($3)\n"
     "leave_cell($2)\n"
-    "new_inst_member($2,r0 *1 6000,0)\n"
+    "new_inst_member($2,r0 *1 6000,0,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
-    "new_inst_member($3,r0 *1 0,0)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 6000,0)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 0,2000)\n"
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 6000,2000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,1000)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 9000,1000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,3000)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 9000,3000)\n"
     "leave_cell($3)\n"
     "leave_cell($2)\n"
-    "new_inst_member($2,r0 *1 6000,6000)\n"
+    "new_inst_member($2,r0 *1 6000,6000,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
-    "new_inst_member($3,r0 *1 0,0)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 6000,6000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 0,2000)\n"
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 6000,8000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,1000)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 9000,7000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,3000)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 9000,9000)\n"
     "leave_cell($3)\n"
@@ -1091,21 +1111,63 @@ TEST(10)
   EXPECT_EQ (rr1.text (),
     "begin\n"
     "new_inst($2,all)\n"
-    "new_inst_member($2,r0 *1 0,0)\n"
+    "new_inst_member($2,r0 *1 0,0,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
     "leave_cell($2)\n"
-    "new_inst_member($2,r0 *1 0,6000)\n"
+    "new_inst_member($2,r0 *1 0,6000,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
     "leave_cell($2)\n"
-    "new_inst_member($2,r0 *1 6000,0)\n"
+    "new_inst_member($2,r0 *1 6000,0,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
     "leave_cell($2)\n"
-    "new_inst_member($2,r0 *1 6000,6000)\n"
+    "new_inst_member($2,r0 *1 6000,6000,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
+    "leave_cell($2)\n"
+    "end\n"
+  );
+
+  ReceiverRejectingACellInstanceArrayExceptOne rs1 (c2.cell_index ());
+  db::RecursiveShapeIterator is1 (g, c0, 0);
+  is1.push (&rs1);
+
+  EXPECT_EQ (rs1.text (),
+    "begin\n"
+    "new_inst($2,all)\n"
+    "new_inst_member($2,r0 *1 0,0,all)\n"
+    "enter_cell($2)\n"
+    "new_inst($3,all)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 0,0)\n"
+    "leave_cell($3)\n"
+    "leave_cell($2)\n"
+    "new_inst_member($2,r0 *1 0,6000,all)\n"
+    "enter_cell($2)\n"
+    "new_inst($3,all)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 0,6000)\n"
+    "leave_cell($3)\n"
+    "leave_cell($2)\n"
+    "new_inst_member($2,r0 *1 6000,0,all)\n"
+    "enter_cell($2)\n"
+    "new_inst($3,all)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 6000,0)\n"
+    "leave_cell($3)\n"
+    "leave_cell($2)\n"
+    "new_inst_member($2,r0 *1 6000,6000,all)\n"
+    "enter_cell($2)\n"
+    "new_inst($3,all)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
+    "enter_cell($3)\n"
+    "shape(box (1000,-500;2000,500),r0 *1 6000,6000)\n"
+    "leave_cell($3)\n"
     "leave_cell($2)\n"
     "end\n"
   );
@@ -1117,70 +1179,70 @@ TEST(10)
   EXPECT_EQ (rri1.text (),
     "begin\n"
     "new_inst($2,all)\n"
-    "new_inst_member($2,r0 *1 0,0)\n"
+    "new_inst_member($2,r0 *1 0,0,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
-    "new_inst_member($3,r0 *1 0,0)\n"     // -> skipped
-    "new_inst_member($3,r0 *1 0,2000)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"     // -> skipped
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 0,2000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,1000)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 3000,1000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,3000)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 3000,3000)\n"
     "leave_cell($3)\n"
     "leave_cell($2)\n"
-    "new_inst_member($2,r0 *1 0,6000)\n"
+    "new_inst_member($2,r0 *1 0,6000,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
-    "new_inst_member($3,r0 *1 0,0)\n"
-    "new_inst_member($3,r0 *1 0,2000)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 0,8000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,1000)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 3000,7000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,3000)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 3000,9000)\n"
     "leave_cell($3)\n"
     "leave_cell($2)\n"
-    "new_inst_member($2,r0 *1 6000,0)\n"
+    "new_inst_member($2,r0 *1 6000,0,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
-    "new_inst_member($3,r0 *1 0,0)\n"
-    "new_inst_member($3,r0 *1 0,2000)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 6000,2000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,1000)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 9000,1000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,3000)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 9000,3000)\n"
     "leave_cell($3)\n"
     "leave_cell($2)\n"
-    "new_inst_member($2,r0 *1 6000,6000)\n"
+    "new_inst_member($2,r0 *1 6000,6000,all)\n"
     "enter_cell($2)\n"
     "new_inst($3,all)\n"
-    "new_inst_member($3,r0 *1 0,0)\n"
-    "new_inst_member($3,r0 *1 0,2000)\n"
+    "new_inst_member($3,r0 *1 0,0,all)\n"
+    "new_inst_member($3,r0 *1 0,2000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 6000,8000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,1000)\n"
+    "new_inst_member($3,r0 *1 3000,1000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 9000,7000)\n"
     "leave_cell($3)\n"
-    "new_inst_member($3,r0 *1 3000,3000)\n"
+    "new_inst_member($3,r0 *1 3000,3000,all)\n"
     "enter_cell($3)\n"
     "shape(box (1000,-500;2000,500),r0 *1 9000,9000)\n"
     "leave_cell($3)\n"

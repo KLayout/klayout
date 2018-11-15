@@ -30,6 +30,9 @@
 #include "dbLayout.h"
 #include "dbRecursiveShapeIterator.h"
 
+#include <set>
+#include <map>
+
 namespace db {
 
 class DeepShapeStore;
@@ -81,9 +84,6 @@ private:
    */
   DeepLayer (DeepShapeStore *store, unsigned int layout, unsigned int layer);
 
-  unsigned int layout () const { return m_layout; }
-  unsigned int layer () const { return m_layer; }
-
   tl::weak_ptr<DeepShapeStore> mp_store;
   unsigned int m_layout;
   unsigned int m_layer;
@@ -92,7 +92,7 @@ private:
 /**
  *  @brief The "deep shape store" is a working model for the hierarchical ("deep") processor
  *
- *  The deep shape store keep temporary data for the deep shape processor.
+ *  The deep shape store keeps temporary data for the deep shape processor.
  *  It mainly consists of layout objects holding the hierarchy trees and layers
  *  for the actual shapes.
  *
@@ -110,10 +110,28 @@ public:
    */
   DeepShapeStore ();
 
+  /**
+   *  @brief The destructor
+   */
+  ~DeepShapeStore ();
+
+  /**
+   *  @brief Inserts a polygon layer into the deep shape store
+   *
+   *  This method will create a new layer inside the deep shape store as a
+   *  working copy of the original layer. Preparation involves re-shaping
+   *  the polygons so their bounding box is a better approximation and the
+   *  polygon complexity is reduced. For this, the polygons are split
+   *  into parts satisfying the area ratio (bounding box vs. polygon area)
+   *  and maximum vertex count constraints.
+   */
+  DeepLayer create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio = 3.0, size_t max_vertex_count = 16);
+
 private:
   //  no copying
   DeepShapeStore (const DeepShapeStore &);
   DeepShapeStore &operator= (const DeepShapeStore &);
+
 };
 
 }

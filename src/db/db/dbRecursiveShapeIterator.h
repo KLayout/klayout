@@ -548,7 +548,7 @@ public:
   }
 
   /**
-   *  @brief Get the current depth
+   *  @brief Gets the current depth
    *
    *  Returns the number of hierarchy levels we are below top level currently.
    */
@@ -559,7 +559,7 @@ public:
   }
 
   /**
-   *  @brief Get the current shape
+   *  @brief Gets the current shape
    *
    *  Returns the shape currently referred to by the recursive iterator. 
    *  This shape is not transformed yet and is located in the current cell.
@@ -600,27 +600,25 @@ public:
   bool at_end () const;
 
   /**
-   *  @brief Get the current cell's index 
+   *  @brief Gets the current cell's index
    */
   db::cell_index_type cell_index () const
   {
-    validate (0);
-    size_t c = reinterpret_cast<size_t> (mp_cell);
-    return reinterpret_cast<const cell_type *> (c - (c & size_t (1)))->cell_index ();
+    return cell ()->cell_index ();
   }
 
   /**
-   *  @brief Get the current cell's reference 
+   *  @brief Gets the current cell's reference
    */
   const cell_type *cell () const
   {
     validate (0);
     size_t c = reinterpret_cast<size_t> (mp_cell);
-    return reinterpret_cast<const cell_type *> (c - (c & size_t (1)));
+    return reinterpret_cast<const cell_type *> (c - (c & size_t (3)));
   }
 
   /**
-   *  @brief Increment the iterator (operator version)
+   *  @brief Increments the iterator (operator version)
    */
   RecursiveShapeIterator &operator++() 
   {
@@ -749,7 +747,19 @@ private:
   {
     size_t c = reinterpret_cast<size_t> (mp_cell);
     c -= (c & size_t (1));
-    mp_cell = reinterpret_cast<const db::Cell *> (c + a);
+    mp_cell = reinterpret_cast<const db::Cell *> (c + (a ? 1 : 0));
+  }
+
+  bool is_all_of_instance () const
+  {
+    return (reinterpret_cast<size_t> (mp_cell) & size_t (2)) != 0;
+  }
+
+  void set_all_of_instance (bool a) const
+  {
+    size_t c = reinterpret_cast<size_t> (mp_cell);
+    c -= (c & size_t (2));
+    mp_cell = reinterpret_cast<const db::Cell *> (c + (a ? 2 : 0));
   }
 };
 
@@ -769,7 +779,19 @@ class DB_PUBLIC RecursiveShapeReceiver
 public:
   typedef RecursiveShapeIterator::box_tree_type box_tree_type;
 
+  /**
+   *  @brief See new_inst for details.
+   */
+  enum  new_inst_mode { NI_all = 0, NI_single = 1, NI_skip = 2 };
+
+  /**
+   *  @brief Constructor
+   */
   RecursiveShapeReceiver () { }
+
+  /**
+   *  @brief Destructor
+   */
   virtual ~RecursiveShapeReceiver () { }
 
   /**
@@ -824,9 +846,12 @@ public:
    *
    *  The "all" parameter is true, if all instances of the array will be addressed.
    *
-   *  If this method returns false, the instance (the whole array) is skipped and the cell is not entered.
+   *  This method can return the following values:
+   *   - NI_all: iterate all members through "new_inst_member"
+   *   - NI_single: iterate a single member (the first one)
+   *   - NI_skip: skips the whole array (not a single instance is iterated)
    */
-  virtual bool new_inst (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return true; }
+  virtual new_inst_mode new_inst (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return NI_all; }
 
   /**
    *  @brief Enters a new array member of the instance
@@ -835,16 +860,18 @@ public:
    *  which holds the complex transformation for this particular instance of
    *  the array.
    *
+   *  "all" is true, if an instance array is iterated in "all" mode (see new_inst).
+   *
    *  If this method returns false, this array instance (but not the whole array) is skipped and the cell is not entered.
    */
-  virtual bool new_inst_member (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { return true; }
+  virtual bool new_inst_member (const RecursiveShapeIterator * /*iter*/, const db::CellInstArray & /*inst*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool /*all*/) { return true; }
 
   /**
    *  @brief Delivers a shape
    *
    *  @param trans The transformation which maps the shape to the top cell.
    */
-  virtual void shape (const RecursiveShapeIterator * /*iter*/, const db::Shape & /*shape*/, const db::ICplxTrans & /*trans*/) { }
+  virtual void shape (const RecursiveShapeIterator * /*iter*/, const db::Shape & /*shape*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/) { }
 };
 
 }  // namespace db

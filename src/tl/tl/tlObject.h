@@ -106,14 +106,14 @@ public:
    *  no strong pointer is having a reference to this object and longer, the
    *  object is not deleted.
    */
-  void keep ();
+  void keep_object ();
 
   /**
    *  @brief Releases this object from being kept
    *  This method may delete the object if no strong pointer holds a
    *  reference to it.
    */
-  void release ();
+  void release_object ();
 
 protected:
   /**

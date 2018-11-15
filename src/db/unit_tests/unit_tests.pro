@@ -53,7 +53,8 @@ SOURCES = \
   dbWriterTools.cc \
     dbVariableWidthPath.cc \
     dbLoadLayoutOptionsTests.cc \
-    dbSaveLayoutOptionsTests.cc
+    dbSaveLayoutOptionsTests.cc \
+    dbHierarchyBuilderTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

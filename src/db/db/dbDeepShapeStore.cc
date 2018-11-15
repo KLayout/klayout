@@ -21,4 +21,39 @@
 */
 
 
-// ...
+#include "dbDeepShapeStore.h"
+
+namespace db
+{
+
+DeepLayer::DeepLayer (const DeepLayer &x)
+  : mp_store (x.mp_store), m_layout (x.m_layout), m_layer (x.m_layer)
+{
+  //  .. nothing yet ..
+}
+
+DeepLayer::DeepLayer (DeepShapeStore *store, unsigned int layout, unsigned int layer)
+  : mp_store (store), m_layout (layout), m_layer (layer)
+{
+  //  .. nothing yet ..
+}
+
+
+
+DeepShapeStore::DeepShapeStore ()
+{
+  // @@@
+}
+
+DeepShapeStore::~DeepShapeStore ()
+{
+  // @@@
+}
+
+DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count)
+{
+  return DeepLayer (0, 0, 0); // @@@
+}
+
+}
+

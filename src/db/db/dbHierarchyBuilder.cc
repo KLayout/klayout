@@ -24,9 +24,12 @@
 #include "dbHierarchyBuilder.h"
 #include "dbClip.h"
 #include "dbRegion.h"
+#include "dbPolygonTools.h"
 
 namespace db
 {
+
+static HierarchyBuilderShapeInserter def_inserter;
 
 // -------------------------------------------------------------------------------------------
 
@@ -78,102 +81,80 @@ compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIter
 
 // -------------------------------------------------------------------------------------------
 
-static bool is_outside (const db::Box &obj, const std::set<db::Box> &region)
-{
-  if (region.empty ()) {
-    return false;
-  }
-
-  for (std::set<db::Box>::const_iterator b = region.begin (); b != region.end (); ++b) {
-    if (obj.touches (*b)) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-static bool is_inside (const db::Box &obj, const std::set<db::Box> &region)
-{
-  if (region.empty ()) {
-    return true;
-  }
-
-  for (std::set<db::Box>::const_iterator b = region.begin (); b != region.end (); ++b) {
-    if (obj.inside (*b)) {
-      return true;
-    }
-  }
-
-  if (is_outside (obj, region)) {
-    return false;
-  } else {
-
-    //  TODO: basically a detailed analysis is required here
-    return false;
-
-  }
-}
-
 /**
  *  @brief Computes the clip variant (a box set) from a cell bbox, a region and a complex region (optional)
  */
-static std::set<db::Box> compute_clip_variant (const db::Box &cell_bbox, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region)
+static std::pair<bool, std::set<db::Box> > compute_clip_variant (const db::Box &cell_bbox, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region)
 {
+  if (region == db::Box::world ()) {
+    return std::make_pair (true, std::set<db::Box> ());
+  }
+
+  db::ICplxTrans trans_inv (trans.inverted ());
+  db::Box region_in_cell = region.transformed (trans_inv);
+
   std::set<db::Box> clip_variant;
-  if (region != db::Box::world () && ! cell_bbox.inside (region)) {
+  if (! cell_bbox.overlaps (region_in_cell)) {
+    //  an empty clip variant should not happen, but who knows
+    return std::make_pair (false, std::set<db::Box> ());
+  }
 
-    db::Box rect_box = region & cell_bbox;
+  db::Box rect_box = region_in_cell & cell_bbox;
 
-    if (complex_region) {
+  if (complex_region) {
 
-      for (db::RecursiveShapeReceiver::box_tree_type::overlapping_iterator cr = complex_region->begin_overlapping (rect_box, db::box_convert<db::Box> ()); ! cr.at_end (); ++cr) {
-        if (rect_box.overlaps (*cr)) {
-          clip_variant.insert (rect_box * *cr);
-        }
+    for (db::RecursiveShapeReceiver::box_tree_type::overlapping_iterator cr = complex_region->begin_overlapping (region, db::box_convert<db::Box> ()); ! cr.at_end (); ++cr) {
+      db::Box cr_in_cell = (*cr).transformed (trans_inv);
+      if (rect_box.overlaps (cr_in_cell)) {
+        clip_variant.insert (rect_box * cr_in_cell);
       }
-
-      if (clip_variant.empty ()) {
-        //  an empty clip variant should not happen, but who knows
-        clip_variant.insert (db::Box ());
-      }
-
-    } else {
-      clip_variant.insert (rect_box);
     }
 
+    if (clip_variant.empty ()) {
+      //  an empty clip variant should not happen, but who knows
+      return std::make_pair (false, std::set<db::Box> ());
+    }
+
+  } else {
+    clip_variant.insert (rect_box);
   }
 
-  return clip_variant;
+  return std::make_pair (true, clip_variant);
 }
 
-static void insert_clipped (const db::Box &box, const std::set<db::Box> &clip, db::Shapes &shapes)
+HierarchyBuilder::HierarchyBuilder (db::Layout *target, unsigned int target_layer, HierarchyBuilderShapeReceiver *pipe)
+  : mp_target (target), m_initial_pass (true), m_target_layer (target_layer)
 {
-  for (std::set<db::Box>::const_iterator b = clip.begin (); b != clip.end (); ++b) {
-    db::Box bb = *b & box;
-    if (! bb.empty ()) {
-      shapes.insert (bb);
-    }
-  }
+  mp_pipe = pipe ? pipe : &def_inserter;
 }
 
-static void insert_clipped (const db::Polygon &poly, const std::set<db::Box> &clip, db::Shapes &shapes)
+HierarchyBuilder::HierarchyBuilder (db::Layout *target, HierarchyBuilderShapeReceiver *pipe)
+  : mp_target (target), m_initial_pass (true), m_target_layer (0)
 {
-  //  TODO: is this good way to clip a polygon at a complex boundary?
-  for (std::set<db::Box>::const_iterator b = clip.begin (); b != clip.end (); ++b) {
-    std::vector<db::Polygon> clipped_poly;
-    db::clip_poly (poly, *b, clipped_poly);
-    for (std::vector<db::Polygon>::const_iterator p = clipped_poly.begin (); p != clipped_poly.end (); ++p) {
-      shapes.insert (*p);
-    }
-  }
+  mp_pipe = pipe ? pipe : &def_inserter;
 }
 
-
-HierarchyBuilder::HierarchyBuilder (db::Layout *target, unsigned int target_layer, bool clip_shapes)
-  : mp_target (target), m_clip_shapes (clip_shapes), m_initial_pass (true), m_target_layer (target_layer)
+HierarchyBuilder::~HierarchyBuilder ()
 {
   //  .. nothing yet ..
+}
+
+void
+HierarchyBuilder::set_shape_receiver (HierarchyBuilderShapeReceiver *pipe)
+{
+  mp_pipe = pipe;
+}
+
+void
+HierarchyBuilder::reset ()
+{
+  m_initial_pass = true;
+  mp_initial_cell = 0;
+
+  m_cell_map.clear ();
+  m_cells_seen.clear ();
+  m_cell_stack.clear ();
+  m_cm_entry = cell_map_type::const_iterator ();
 }
 
 void
@@ -185,20 +166,32 @@ HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
     tl_assert (compare_iterators_with_respect_to_target_hierarchy (m_ref_iter, *iter) == 0);
   }
 
-  m_cells_seen.clear ();
-  m_cm_entry = cell_map_type::const_iterator ();
-
   m_cell_stack.clear ();
+  m_cells_seen.clear ();
 
-  db::Cell &new_top = mp_target->cell (mp_target->add_cell (iter->layout ()->cell_name (iter->top_cell ()->cell_index ())));
+  std::pair<db::cell_index_type, std::set<db::Box> > key (iter->top_cell ()->cell_index (), std::set<db::Box> ());
+  m_cm_entry = m_cell_map.find (key);
+  if (m_cm_entry == m_cell_map.end ()) {
+
+    db::cell_index_type new_top_index = mp_target->add_cell (iter->layout ()->cell_name (key.first));
+    m_cm_entry = m_cell_map.insert (std::make_pair (key, new_top_index)).first;
+
+  }
+
+  db::Cell &new_top = mp_target->cell (m_cm_entry->second);
+  m_cells_seen.insert (key);
+
   m_cell_stack.push_back (&new_top);
 }
 
 void
 HierarchyBuilder::end (const RecursiveShapeIterator * /*iter*/)
 {
+  tl_assert (m_cell_stack.size () == 1);
+
   m_initial_pass = false;
   m_cells_seen.clear ();
+  mp_initial_cell = m_cell_stack.back ();
   m_cell_stack.pop_back ();
 }
 
@@ -217,7 +210,7 @@ HierarchyBuilder::leave_cell (const RecursiveShapeIterator * /*iter*/, const db:
   m_cell_stack.pop_back ();
 }
 
-bool
+HierarchyBuilder::new_inst_mode
 HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::Box & /*region*/, const box_tree_type * /*complex_region*/, bool all)
 {
   if (all) {
@@ -238,67 +231,296 @@ HierarchyBuilder::new_inst (const RecursiveShapeIterator *iter, const db::CellIn
 
     }
 
-    return (m_cells_seen.find (key) == m_cells_seen.end ());
+    //  To see the cell once, use NI_single. If we did see the cell already, skip the whole instance array.
+    return (m_cells_seen.find (key) == m_cells_seen.end ()) ? NI_single : NI_skip;
 
   } else {
-    //  iterate by instance array members
-    return true;
+
+    //  Iterate by instance array members
+    return NI_all;
+
   }
 }
 
 bool
-HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region)
+HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db::CellInstArray &inst, const db::ICplxTrans &trans, const db::Box &region, const box_tree_type *complex_region, bool all)
 {
-  db::Box cell_bbox = iter->layout ()->cell (inst.object ().cell_index ()).bbox ();
-  std::set<db::Box> clip_variant = compute_clip_variant (cell_bbox, region, complex_region);
+  if (all) {
 
-  std::pair<db::cell_index_type, std::set<db::Box> > key (inst.object ().cell_index (), clip_variant);
-  m_cm_entry = m_cell_map.find (key);
+    return true;
 
-  if (m_initial_pass) {
+  } else {
 
-    if (m_cm_entry == m_cell_map.end ()) {
-      std::string suffix;
-      if (! key.second.empty ()) {
-        suffix = "$CLIP_VAR";
-      }
-      db::cell_index_type new_cell = mp_target->add_cell ((std::string (iter->layout ()->cell_name (inst.object ().cell_index ())) + suffix).c_str ());
-      m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
+    db::Box cell_bbox = iter->layout ()->cell (inst.object ().cell_index ()).bbox ();
+    std::pair<bool, std::set<db::Box> > clip_variant = compute_clip_variant (cell_bbox, trans, region, complex_region);
+    if (! clip_variant.first) {
+      return false;
     }
 
-    db::CellInstArray new_inst (db::CellInst (m_cm_entry->second), trans);
-    m_cell_stack.back ()->insert (new_inst);
+    std::pair<db::cell_index_type, std::set<db::Box> > key (inst.object ().cell_index (), clip_variant.second);
+    m_cm_entry = m_cell_map.find (key);
+
+    if (m_initial_pass) {
+
+      if (m_cm_entry == m_cell_map.end ()) {
+        std::string suffix;
+        if (! key.second.empty ()) {
+          suffix = "$CLIP_VAR";
+        }
+        db::cell_index_type new_cell = mp_target->add_cell ((std::string (iter->layout ()->cell_name (inst.object ().cell_index ())) + suffix).c_str ());
+        m_cm_entry = m_cell_map.insert (std::make_pair (key, new_cell)).first;
+      }
+
+      db::CellInstArray new_inst (db::CellInst (m_cm_entry->second), trans);
+      m_cell_stack.back ()->insert (new_inst);
+
+    }
+
+    return (m_cells_seen.find (key) == m_cells_seen.end ());
 
   }
-
-  return (m_cells_seen.find (key) == m_cells_seen.end ());
 }
 
 void
-HierarchyBuilder::shape (const RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*trans*/)
+HierarchyBuilder::shape (const RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*trans*/, const db::Box &region, const box_tree_type *complex_region)
 {
-  tl_assert (m_cm_entry != m_cell_map.end () && m_cm_entry != cell_map_type::const_iterator ());
-
-  //  TODO: property mapping?
-
   db::Shapes &shapes = m_cell_stack.back ()->shapes (m_target_layer);
+  mp_pipe->push (shape, region, complex_region, &shapes);
+}
 
-  if (m_cm_entry->first.second.empty () || is_inside (shape.bbox (), m_cm_entry->first.second)) {
+// ---------------------------------------------------------------------------------------------
 
-    shapes.insert (shape);
+ClippingHierarchyBuilderShapeReceiver::ClippingHierarchyBuilderShapeReceiver (HierarchyBuilderShapeReceiver *pipe)
+  : mp_pipe (pipe ? pipe : &def_inserter)
+{
+  //  .. nothing yet ..
+}
 
-  } else if (! is_outside (shape.bbox (), m_cm_entry->first.second)) {
+void
+ClippingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+{
+  static db::Box world = db::Box::world ();
+
+  if (region == world || is_inside (shape.bbox (), region, complex_region)) {
+
+    mp_pipe->push (shape, world, 0, target);
+
+  } else if (! is_outside (shape.bbox (), region, complex_region)) {
 
     //  clip the shape if required
-    if (! m_clip_shapes || shape.is_text () || shape.is_edge () || shape.is_edge_pair ()) {
-      shapes.insert (shape);
+    if (shape.is_text () || shape.is_edge () || shape.is_edge_pair ()) {
+      mp_pipe->push (shape, world, 0, target);
     } else if (shape.is_box ()) {
-      insert_clipped (shape.box (), m_cm_entry->first.second, shapes);
+      insert_clipped (shape.box (), region, complex_region, target);
     } else if (shape.is_polygon () || shape.is_simple_polygon () || shape.is_path ()) {
-      insert_clipped (shape.polygon (), m_cm_entry->first.second, shapes);
+      db::Polygon poly;
+      shape.polygon (poly);
+      insert_clipped (poly, region, complex_region, target);
     }
 
   }
+}
+
+void
+ClippingHierarchyBuilderShapeReceiver::push (const db::Box &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+{
+  static db::Box world = db::Box::world ();
+
+  if (! complex_region) {
+    db::Box r = shape & region;
+    if (! r.empty()) {
+      mp_pipe->push (r, world, 0, target);
+    }
+  } else {
+    insert_clipped (shape, region, complex_region, target);
+  }
+}
+
+void
+ClippingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+{
+  static db::Box world = db::Box::world ();
+
+  if (region == world || (shape.box ().inside (region) && ! complex_region)) {
+    mp_pipe->push (shape, world, 0, target);
+  } else {
+    insert_clipped (shape, region, complex_region, target);
+  }
+}
+
+bool
+ClippingHierarchyBuilderShapeReceiver::is_inside (const db::Box &box, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region)
+{
+  if (region == db::Box::world ()) {
+    return true;
+  }
+
+  if (box.inside (region)) {
+
+    db::Box rect_box = region & box;
+
+    if (complex_region) {
+
+      //  TODO: this is not a real test for being inside a complex region
+      for (db::RecursiveShapeReceiver::box_tree_type::overlapping_iterator cr = complex_region->begin_overlapping (rect_box, db::box_convert<db::Box> ()); ! cr.at_end (); ++cr) {
+        if (rect_box.inside (*cr)) {
+          return true;
+        }
+      }
+
+    }
+
+  }
+
+  return false;
+}
+
+bool
+ClippingHierarchyBuilderShapeReceiver::is_outside (const db::Box &box, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region)
+{
+  if (region == db::Box::world ()) {
+    return false;
+  }
+
+  if (box.overlaps (region)) {
+
+    db::Box rect_box = region & box;
+
+    if (complex_region) {
+      for (db::RecursiveShapeReceiver::box_tree_type::overlapping_iterator cr = complex_region->begin_overlapping (rect_box, db::box_convert<db::Box> ()); ! cr.at_end (); ++cr) {
+        if (rect_box.overlaps (*cr)) {
+          return false;
+        }
+      }
+    } else {
+      return false;
+    }
+
+  }
+
+  return true;
+}
+
+void
+ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Box &box, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+{
+  db::Box bb = box & region;
+  static db::Box world = db::Box::world ();
+
+  if (complex_region) {
+    for (db::RecursiveShapeReceiver::box_tree_type::overlapping_iterator cr = complex_region->begin_overlapping (bb, db::box_convert<db::Box> ()); ! cr.at_end (); ++cr) {
+      mp_pipe->push (*cr & bb, world, 0, target);
+    }
+  } else {
+    mp_pipe->push (bb, world, 0, target);
+  }
+}
+
+void
+ClippingHierarchyBuilderShapeReceiver::insert_clipped (const db::Polygon &poly, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+{
+  std::vector<db::Polygon> clipped_poly;
+  static db::Box world = db::Box::world ();
+
+  if (complex_region) {
+    //  TODO: is this good way to clip a polygon at a complex boundary?
+    for (db::RecursiveShapeReceiver::box_tree_type::overlapping_iterator cr = complex_region->begin_overlapping (region, db::box_convert<db::Box> ()); ! cr.at_end (); ++cr) {
+      db::clip_poly (poly, *cr & region, clipped_poly);
+    }
+  } else {
+    db::clip_poly (poly, region, clipped_poly);
+  }
+
+  for (std::vector<db::Polygon>::const_iterator p = clipped_poly.begin (); p != clipped_poly.end (); ++p) {
+    mp_pipe->push (*p, world, 0, target);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+
+ReducingHierarchyBuilderShapeReceiver::ReducingHierarchyBuilderShapeReceiver (HierarchyBuilderShapeReceiver *pipe, double area_ratio, size_t max_vertex_count)
+  : mp_pipe (pipe ? pipe : &def_inserter), m_area_ratio (area_ratio), m_max_vertex_count (max_vertex_count)
+{
+  //  .. nothing yet ..
+}
+
+void
+ReducingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+{
+  if (shape.is_text () || shape.is_edge () || shape.is_edge_pair ()) {
+    mp_pipe->push (shape, region, complex_region, target);
+  } else if (shape.is_box ()) {
+    mp_pipe->push (shape.box (), region, complex_region, target);
+  } else if (shape.is_polygon () || shape.is_simple_polygon () || shape.is_path ()) {
+    db::Polygon poly;
+    shape.polygon (poly);
+    reduce (poly, region, complex_region, target);
+  }
+}
+
+void
+ReducingHierarchyBuilderShapeReceiver::push (const db::Box &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+{
+  mp_pipe->push (shape, region, complex_region, target);
+}
+
+void
+ReducingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+{
+  reduce (shape, region, complex_region, target);
+}
+
+static double area_ratio (const db::Polygon &poly)
+{
+  return double (poly.box ().area ()) / double (poly.area ());
+}
+
+void
+ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+{
+  size_t npoints = 0;
+  for (unsigned int c = 0; c < poly.holes () + 1; ++c) {
+    npoints += poly.contour (c).size ();
+  }
+
+  if (npoints > m_max_vertex_count || area_ratio (poly) > m_area_ratio) {
+
+    std::vector <db::Polygon> split_polygons;
+    db::split_polygon (poly, split_polygons);
+    for (std::vector <db::Polygon>::const_iterator sp = split_polygons.begin (); sp != split_polygons.end (); ++sp) {
+      reduce (*sp, region, complex_region, target);
+    }
+
+  } else {
+    mp_pipe->push (poly, region, complex_region, target);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+
+PolygonReferenceHierarchyBuilderShapeReceiver::PolygonReferenceHierarchyBuilderShapeReceiver (db::Layout *layout)
+  : mp_layout (layout)
+{
+  //  nothing yet ..
+}
+
+void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Shape &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
+{
+  if (shape.is_box () || shape.is_polygon () || shape.is_simple_polygon () || shape.is_path ()) {
+    db::Polygon poly;
+    shape.polygon (poly);
+    target->insert (db::PolygonRef (poly, mp_layout->shape_repository ()));
+  }
+}
+
+void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Box &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
+{
+  target->insert (db::PolygonRef (db::Polygon (shape), mp_layout->shape_repository ()));
+}
+
+void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
+{
+  target->insert (db::PolygonRef (shape, mp_layout->shape_repository ()));
 }
 
 }

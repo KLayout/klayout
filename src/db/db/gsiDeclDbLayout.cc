@@ -367,41 +367,24 @@ static std::vector<db::cell_index_type> multi_clip_into (db::Layout *l, db::cell
   return db::clip_layout(*l, *t, c, boxes, true);
 }
 
-static unsigned int get_layer (db::Layout *l, const db::LayerProperties &lp)
-{
-  if (lp.is_null ()) {
-    //  for a null layer info always create a layer
-    return l->insert_layer ();
-  } else {
-    //  if we have a layer with the requested properties already, return this.
-    for (db::Layout::layer_iterator li = l->begin_layers (); li != l->end_layers (); ++li) {
-      if ((*li).second->log_equal (lp)) {
-        return (*li).first;
-      }
-    }
-    //  otherwise create a new layer
-    return l->insert_layer (lp);
-  }
-}
-
 static unsigned int get_layer0 (db::Layout *l)
 {
-  return get_layer (l, db::LayerProperties ());
+  return l->get_layer (db::LayerProperties ());
 }
 
 static unsigned int get_layer1 (db::Layout *l, const std::string &name)
 {
-  return get_layer (l, db::LayerProperties (name));
+  return l->get_layer (db::LayerProperties (name));
 }
 
 static unsigned int get_layer2 (db::Layout *l, int ln, int dn)
 {
-  return get_layer (l, db::LayerProperties (ln, dn));
+  return l->get_layer (db::LayerProperties (ln, dn));
 }
 
 static unsigned int get_layer3 (db::Layout *l, int ln, int dn, const std::string &name)
 {
-  return get_layer (l, db::LayerProperties (ln, dn, name));
+  return l->get_layer (db::LayerProperties (ln, dn, name));
 }
 
 static tl::Variant find_layer (db::Layout *l, const db::LayerProperties &lp)
@@ -1297,7 +1280,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
-  gsi::method_ext ("layer", &get_layer,
+  gsi::method ("layer", &db::Layout::get_layer,
     "@brief Finds or creates a layer with the given properties\n"
     "@args info\n"
     "\n"

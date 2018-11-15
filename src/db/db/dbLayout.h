@@ -1448,6 +1448,14 @@ public:
   void insert_layer (unsigned int index, const LayerProperties &props = LayerProperties ());
 
   /**
+   *  @brief Gets or creates a layer with the given properties
+   *
+   *  If there already is a layer matching the given properties, it's index will be
+   *  returned. Otherwise a new layer with these properties is created.
+   */
+  unsigned int get_layer (const db::LayerProperties &props);
+
+  /**
    *  @brief Insert a new special layer with the given properties
    *
    *  A special layers is used for example to represent rulers.

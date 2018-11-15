@@ -1512,6 +1512,24 @@ Layout::insert_layer (unsigned int index, const LayerProperties &props)
 }
 
 unsigned int
+Layout::get_layer (const db::LayerProperties &lp)
+{
+  if (lp.is_null ()) {
+    //  for a null layer info always create a layer
+    return insert_layer ();
+  } else {
+    //  if we have a layer with the requested properties already, return this.
+    for (db::Layout::layer_iterator li = begin_layers (); li != end_layers (); ++li) {
+      if ((*li).second->log_equal (lp)) {
+        return (*li).first;
+      }
+    }
+    //  otherwise create a new layer
+    return insert_layer (lp);
+  }
+}
+
+unsigned int
 Layout::waste_layer () const
 {
   if (m_waste_layer < 0) {

@@ -25,8 +25,9 @@
 #ifndef HDR_dbLocalOperation
 #define HDR_dbLocalOperation
 
+#include "dbCommon.h"
+
 #include "dbLayout.h"
-#include "dbPluginCommon.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -48,7 +49,7 @@ class ShapeInteractions;
  *  This class implements the actual operation. It receives a
  *  cluster of subject shapes vs. corresponding intruder shapes.
  */
-class DB_PLUGIN_PUBLIC LocalOperation
+class DB_PUBLIC LocalOperation
 {
 public:
   /**
@@ -109,7 +110,7 @@ public:
 /**
  *  @brief Implements a boolean AND or NOT operation
  */
-class DB_PLUGIN_PUBLIC BoolAndOrNotLocalOperation
+class DB_PUBLIC BoolAndOrNotLocalOperation
   : public LocalOperation
 {
 public:
@@ -128,7 +129,7 @@ private:
  *  With a given wrap_count, the result will only contains shapes where
  *  the original shapes overlap at least "wrap_count" times.
  */
-class DB_PLUGIN_PUBLIC SelfOverlapMergeLocalOperation
+class DB_PUBLIC SelfOverlapMergeLocalOperation
   : public LocalOperation
 {
 public:

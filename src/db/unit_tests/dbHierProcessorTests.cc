@@ -30,7 +30,7 @@
 
 static std::string testdata (const std::string &fn)
 {
-  return tl::testsrc () + "/src/plugins/tools/netx/testdata/" + fn;
+  return tl::testsrc () + "/testdata/algo/" + fn;
 }
 
 enum TestMode

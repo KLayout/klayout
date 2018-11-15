@@ -25,8 +25,9 @@
 #ifndef HDR_dbHierProcessor
 #define HDR_dbHierProcessor
 
+#include "dbCommon.h"
+
 #include "dbLayout.h"
-#include "dbPluginCommon.h"
 #include "dbLocalOperation.h"
 #include "tlThreadedWorkers.h"
 
@@ -36,9 +37,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
-//  @@@ should go into dbHash.h
 #include "dbHash.h"
 
+//  @@@ should go into dbHash.h
 namespace std
 {
   template <class C>
@@ -82,7 +83,7 @@ class LocalProcessorCellContext;
 class LocalProcessorContexts;
 
 //  TODO: move this somewhere else?
-class DB_PLUGIN_PUBLIC ShapeInteractions
+class DB_PUBLIC ShapeInteractions
 {
 public:
   typedef std::unordered_map<unsigned int, std::vector<unsigned int> > container;
@@ -120,7 +121,7 @@ private:
 };
 
 //  TODO: should be hidden (private data?)
-struct DB_PLUGIN_PUBLIC LocalProcessorCellDrop
+struct DB_PUBLIC LocalProcessorCellDrop
 {
   LocalProcessorCellDrop (db::LocalProcessorCellContext *_parent_context, db::Cell *_parent, const db::ICplxTrans &_cell_inst)
     : parent_context (_parent_context), parent (_parent), cell_inst (_cell_inst)
@@ -134,7 +135,7 @@ struct DB_PLUGIN_PUBLIC LocalProcessorCellDrop
 };
 
 //  TODO: should be hidden (private data?)
-class DB_PLUGIN_PUBLIC LocalProcessorCellContext
+class DB_PUBLIC LocalProcessorCellContext
 {
 public:
   typedef std::pair<const db::Cell *, db::ICplxTrans> parent_inst_type;
@@ -170,7 +171,7 @@ private:
   tl::Mutex m_lock;
 };
 
-class DB_PLUGIN_PUBLIC LocalProcessorCellContexts
+class DB_PUBLIC LocalProcessorCellContexts
 {
 public:
   typedef std::pair<std::unordered_set<CellInstArray>, std::unordered_set<db::PolygonRef> > key_type;
@@ -199,7 +200,7 @@ private:
   std::unordered_map<key_type, db::LocalProcessorCellContext> m_contexts;
 };
 
-class DB_PLUGIN_PUBLIC LocalProcessorContexts
+class DB_PUBLIC LocalProcessorContexts
 {
 public:
   typedef std::unordered_map<db::Cell *, LocalProcessorCellContexts> contexts_per_cell_type;
@@ -271,7 +272,7 @@ private:
   mutable tl::Mutex m_lock;
 };
 
-class DB_PLUGIN_PUBLIC LocalProcessorContextComputationTask
+class DB_PUBLIC LocalProcessorContextComputationTask
   : public tl::Task
 {
 public:
@@ -290,7 +291,7 @@ private:
   db::Coord m_dist;
 };
 
-class DB_PLUGIN_PUBLIC LocalProcessorContextComputationWorker
+class DB_PUBLIC LocalProcessorContextComputationWorker
   : public tl::Worker
 {
 public:
@@ -306,7 +307,7 @@ public:
   }
 };
 
-class DB_PLUGIN_PUBLIC LocalProcessorResultComputationTask
+class DB_PUBLIC LocalProcessorResultComputationTask
   : public tl::Task
 {
 public:
@@ -322,7 +323,7 @@ private:
   unsigned int m_output_layer;
 };
 
-class DB_PLUGIN_PUBLIC LocalProcessorResultComputationWorker
+class DB_PUBLIC LocalProcessorResultComputationWorker
   : public tl::Worker
 {
 public:
@@ -338,7 +339,7 @@ public:
   }
 };
 
-class DB_PLUGIN_PUBLIC LocalProcessor
+class DB_PUBLIC LocalProcessor
 {
 public:
   LocalProcessor (db::Layout *layout, db::Cell *top);

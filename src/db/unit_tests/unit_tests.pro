@@ -39,7 +39,6 @@ SOURCES = \
   dbPolygon.cc \
   dbPolygonTools.cc \
   dbPropertiesRepository.cc \
-  dbRecursiveShapeIterator.cc \
   dbRegion.cc \
   dbShapeArray.cc \
   dbShape.cc \
@@ -54,7 +53,8 @@ SOURCES = \
     dbVariableWidthPath.cc \
     dbLoadLayoutOptionsTests.cc \
     dbSaveLayoutOptionsTests.cc \
-    dbHierarchyBuilderTests.cc
+    dbHierarchyBuilderTests.cc \
+    dbRecursiveShapeIteratorTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

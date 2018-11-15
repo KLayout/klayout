@@ -715,7 +715,7 @@ class FlatPusher
 public:
   FlatPusher (std::set<db::Box> *boxes) : mp_boxes (boxes) { }
 
-  void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans &trans)
+  void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
   {
     mp_boxes->insert (trans * shape.bbox ());
   }
@@ -938,7 +938,7 @@ public:
     return true;
   }
 
-  virtual void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans &trans)
+  virtual void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
   {
     m_text += "shape(" + shape.to_string () + "," + tl::to_string (trans) + ")\n";
   }

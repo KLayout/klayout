@@ -125,13 +125,13 @@ static std::pair<bool, std::set<db::Box> > compute_clip_variant (const db::Box &
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, unsigned int target_layer, HierarchyBuilderShapeReceiver *pipe)
   : mp_target (target), m_initial_pass (true), m_target_layer (target_layer)
 {
-  mp_pipe = pipe ? pipe : &def_inserter;
+  set_shape_receiver (pipe);
 }
 
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, HierarchyBuilderShapeReceiver *pipe)
   : mp_target (target), m_initial_pass (true), m_target_layer (0)
 {
-  mp_pipe = pipe ? pipe : &def_inserter;
+  set_shape_receiver (pipe);
 }
 
 HierarchyBuilder::~HierarchyBuilder ()
@@ -142,7 +142,7 @@ HierarchyBuilder::~HierarchyBuilder ()
 void
 HierarchyBuilder::set_shape_receiver (HierarchyBuilderShapeReceiver *pipe)
 {
-  mp_pipe = pipe;
+  mp_pipe = pipe ? pipe : &def_inserter;
 }
 
 void
@@ -191,8 +191,9 @@ HierarchyBuilder::end (const RecursiveShapeIterator * /*iter*/)
 
   m_initial_pass = false;
   m_cells_seen.clear ();
-  mp_initial_cell = m_cell_stack.back ();
-  m_cell_stack.pop_back ();
+  mp_initial_cell = m_cell_stack.front ();
+  m_cell_stack.clear ();
+  m_cm_entry = cell_map_type::const_iterator ();
 }
 
 void

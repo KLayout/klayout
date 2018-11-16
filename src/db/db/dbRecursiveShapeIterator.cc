@@ -961,14 +961,23 @@ RecursiveShapeIterator::push (RecursiveShapeReceiver *receiver)
 
   receiver->begin (this);
 
-  validate (receiver);
+  try {
 
-  while (! at_end ()) {
-    receiver->shape (this, *m_shape, m_trans, m_local_region_stack.back (), m_local_complex_region_stack.empty () ? 0 : &m_local_complex_region_stack.back ());
-    next (receiver);
+    validate (receiver);
+
+    while (! at_end ()) {
+      receiver->shape (this, *m_shape, m_trans, m_local_region_stack.back (), m_local_complex_region_stack.empty () ? 0 : &m_local_complex_region_stack.back ());
+      next (receiver);
+    }
+
+    receiver->end (this);
+
+  } catch (...) {
+
+    receiver->end (this);
+    throw;
+
   }
-
-  receiver->end (this);
 }
 
 }

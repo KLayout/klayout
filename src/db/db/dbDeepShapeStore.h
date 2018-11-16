@@ -27,8 +27,10 @@
 #include "dbCommon.h"
 
 #include "tlObject.h"
+#include "tlStableVector.h"
 #include "dbLayout.h"
 #include "dbRecursiveShapeIterator.h"
+#include "dbHierarchyBuilder.h"
 
 #include <set>
 #include <map>
@@ -47,6 +49,11 @@ class DB_PUBLIC DeepLayer
 {
 public:
   /**
+   *  @brief Default constructor
+   */
+  DeepLayer ();
+
+  /**
    *  @brief Destructor
    */
   ~DeepLayer ();
@@ -63,10 +70,14 @@ public:
 
   /**
    *  @brief Gets the layout object
-   *
    *  The return value is guaranteed to be non-null.
    */
   db::Layout *layout ();
+
+  /**
+   *  @brief Gets the layout object (const version)
+   */
+  const db::Layout *layout () const;
 
   /**
    *  @brief Gets the layer
@@ -87,6 +98,14 @@ private:
   tl::weak_ptr<DeepShapeStore> mp_store;
   unsigned int m_layout;
   unsigned int m_layer;
+};
+
+struct DB_PUBLIC RecursiveShapeIteratorCompareForTargetHierarchy
+{
+  bool operator () (const db::RecursiveShapeIterator &a, const db::RecursiveShapeIterator &b) const
+  {
+    return db::compare_iterators_with_respect_to_target_hierarchy (a, b) < 0;
+  }
 };
 
 /**
@@ -128,10 +147,15 @@ public:
   DeepLayer create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio = 3.0, size_t max_vertex_count = 16);
 
 private:
+  typedef std::map<db::RecursiveShapeIterator, unsigned int, RecursiveShapeIteratorCompareForTargetHierarchy> layout_map_type;
+
   //  no copying
   DeepShapeStore (const DeepShapeStore &);
   DeepShapeStore &operator= (const DeepShapeStore &);
 
+  tl::stable_vector<db::Layout> m_layouts;
+  tl::stable_vector<db::HierarchyBuilder> m_builders;
+  layout_map_type m_layout_map;
 };
 
 }

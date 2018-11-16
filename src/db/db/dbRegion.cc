@@ -25,6 +25,7 @@
 #include "dbOriginalLayerRegion.h"
 #include "dbEmptyRegion.h"
 #include "dbFlatRegion.h"
+#include "dbDeepRegion.h"
 
 namespace db
 {
@@ -72,6 +73,16 @@ Region::Region (const RecursiveShapeIterator &si)
 Region::Region (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics)
 {
   mp_delegate = new OriginalLayerRegion (si, trans, merged_semantics);
+}
+
+Region::Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, double area_ratio, size_t max_vertex_count)
+{
+  mp_delegate = new DeepRegion (si, dss, area_ratio, max_vertex_count);
+}
+
+Region::Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics, double area_ratio, size_t max_vertex_count)
+{
+  mp_delegate = new DeepRegion (si, dss, trans, merged_semantics, area_ratio, max_vertex_count);
 }
 
 const db::RecursiveShapeIterator &

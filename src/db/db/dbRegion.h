@@ -38,6 +38,7 @@ namespace db {
 class EdgeFilterBase;
 class FlatRegion;
 class EmptyRegion;
+class DeepShapeStore;
 
 /**
  *  @brief A base class for polygon filters
@@ -532,7 +533,7 @@ public:
   /**
    *  @brief Constructor from a RecursiveShapeIterator
    *
-   *  Creates a region from a recursive shape iterator. This allows to feed a region
+   *  Creates a region from a recursive shape iterator. This allows feeding a region
    *  from a hierarchy of cells.
    */
   Region (const RecursiveShapeIterator &si);
@@ -540,11 +541,27 @@ public:
   /**
    *  @brief Constructor from a RecursiveShapeIterator with a transformation
    *
-   *  Creates a region from a recursive shape iterator. This allows to feed a region
+   *  Creates a region from a recursive shape iterator. This allows feeding a region
    *  from a hierarchy of cells. The transformation is useful to scale to a specific
    *  DBU for example.
    */
   Region (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics = true);
+
+  /**
+   *  @brief Constructor from a RecursiveShapeIterator providing a deep representation
+   *
+   *  This version will create a hierarchical region. The DeepShapeStore needs to be provided
+   *  during the lifetime of the region and acts as a heap for optimized data.
+   *
+   *  "area_ratio" and "max_vertex_count" are optimization parameters for the
+   *  shape splitting algorithm.
+   */
+  Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, double area_ratio = 3.0, size_t max_vertex_count = 16);
+
+  /**
+   *  @brief Constructor from a RecursiveShapeIterator providing a deep representation with transformation
+   */
+  Region (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics = true, double area_ratio = 3.0, size_t max_vertex_count = 16);
 
   /**
    *  @brief Gets the underlying delegate object

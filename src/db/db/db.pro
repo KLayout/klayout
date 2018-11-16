@@ -139,7 +139,8 @@ SOURCES = \
     dbDeepShapeStore.cc \
     dbHierarchyBuilder.cc \
     dbLocalOperation.cc \
-    dbHierProcessor.cc
+    dbHierProcessor.cc \
+    dbDeepRegion.cc
 
 HEADERS = \
   dbArray.h \

@@ -120,6 +120,8 @@ public:
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;
 
+  virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const { }
+
 private:
   EmptyRegion &operator= (const EmptyRegion &other);
 };

@@ -32,57 +32,7 @@
 namespace db {
 
 /**
- *  @brief An iterator delegate for the deep region
- */
-class DB_PUBLIC DeepRegionIterator
-  : public RegionIteratorDelegate
-{
-public:
-  typedef db::Polygon value_type;
-
-  DeepRegionIterator (const db::RecursiveShapeIterator &iter)
-    : m_iter (iter)
-  {
-    set ();
-  }
-
-  virtual bool at_end () const
-  {
-    return m_iter.at_end ();
-  }
-
-  virtual void increment ()
-  {
-    ++m_iter;
-    set ();
-  }
-
-  virtual const value_type *get () const
-  {
-    return &m_tmp;
-  }
-
-  virtual RegionIteratorDelegate *clone () const
-  {
-    return new DeepRegionIterator (*this);
-  }
-
-private:
-  friend class Region;
-
-  db::RecursiveShapeIterator m_iter;
-  mutable value_type m_tmp;
-
-  void set () const
-  {
-    if (! m_iter.at_end ()) {
-      m_iter->polygon (m_tmp);
-    }
-  }
-};
-
-/**
- *  @brief A flat, polygon-set delegate
+ *  @brief A deep, polygon-set delegate
  */
 class DB_PUBLIC DeepRegion
   : public AsIfFlatRegion
@@ -119,6 +69,8 @@ public:
 
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;
+
+  virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 
 protected:
   virtual void merged_semantics_changed ();

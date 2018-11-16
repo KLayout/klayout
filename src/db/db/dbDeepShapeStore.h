@@ -31,6 +31,7 @@
 #include "dbLayout.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbHierarchyBuilder.h"
+#include "gsiObject.h"
 
 #include <set>
 #include <map>
@@ -87,6 +88,19 @@ public:
     return m_layer;
   }
 
+  /**
+   *  @brief Gets the layout index
+   */
+  unsigned int layout_index () const
+  {
+    return m_layout;
+  }
+
+  /**
+   *  @brief Inserts the layer into the given layout, starting from the given cell and into the given layer
+   */
+  void insert_into (Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer) const;
+
 private:
   friend class DeepShapeStore;
 
@@ -94,6 +108,8 @@ private:
    *  @brief The constructor
    */
   DeepLayer (DeepShapeStore *store, unsigned int layout, unsigned int layer);
+
+  void check_dss () const;
 
   tl::weak_ptr<DeepShapeStore> mp_store;
   unsigned int m_layout;
@@ -121,7 +137,7 @@ struct DB_PUBLIC RecursiveShapeIteratorCompareForTargetHierarchy
  *  algorithms for doing the preparation and transfer.
  */
 class DB_PUBLIC DeepShapeStore
-  : public tl::Object
+  : public tl::Object, public gsi::ObjectBase
 {
 public:
   /**
@@ -146,7 +162,24 @@ public:
    */
   DeepLayer create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio = 3.0, size_t max_vertex_count = 16);
 
+  /**
+   *  @brief Inserts the deep layer's into some target layout
+   */
+  void insert (const DeepLayer &layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer);
+
+  /**
+   *  @brief For testing
+   */
+  static size_t instance_count ();
+
 private:
+  friend class DeepLayer;
+
+  db::Layout *layout (unsigned int n)
+  {
+    return &m_layouts [n];
+  }
+
   typedef std::map<db::RecursiveShapeIterator, unsigned int, RecursiveShapeIteratorCompareForTargetHierarchy> layout_map_type;
 
   //  no copying
@@ -156,7 +189,45 @@ private:
   tl::stable_vector<db::Layout> m_layouts;
   tl::stable_vector<db::HierarchyBuilder> m_builders;
   layout_map_type m_layout_map;
+
+  struct DeliveryMappingCacheKey
+  {
+    //  NOTE: we shouldn't keep pointers here as the layouts may get deleted and recreated with the same address.
+    //  But as we don't access these objects that's fairly safe.
+    DeliveryMappingCacheKey (unsigned int _from_index, db::Layout *_into_layout, db::cell_index_type _into_cell)
+      : from_index (_from_index), into_layout (_into_layout), into_cell (_into_cell)
+    {
+      //  .. nothing yet ..
+    }
+
+    bool operator< (const DeliveryMappingCacheKey &other) const
+    {
+      if (from_index != other.from_index) {
+        return from_index < other.from_index;
+      }
+      if (into_layout != other.into_layout) {
+        return into_layout < other.into_layout;
+      }
+      return into_cell <other.into_cell;
+    }
+
+    unsigned int from_index;
+    db::Layout *into_layout;
+    db::cell_index_type into_cell;
+  };
+
+  std::map<DeliveryMappingCacheKey, db::CellMapping> m_delivery_mapping_cache;
 };
+
+}
+
+namespace tl
+{
+
+  //  disable copying of the deep shape store object
+  template <> struct type_traits <db::DeepShapeStore> : public type_traits<void> {
+    typedef tl::false_tag has_copy_constructor;
+  };
 
 }
 

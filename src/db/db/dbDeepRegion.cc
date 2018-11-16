@@ -31,17 +31,73 @@
 namespace db
 {
 
+namespace
+{
+  /**
+   *  @brief An iterator delegate for the deep region
+   *  TODO: this is kind of redundant with OriginalLayerIterator ..
+   */
+  class DB_PUBLIC DeepRegionIterator
+    : public RegionIteratorDelegate
+  {
+  public:
+    typedef db::Polygon value_type;
+
+    DeepRegionIterator (const db::RecursiveShapeIterator &iter)
+      : m_iter (iter)
+    {
+      set ();
+    }
+
+    virtual bool at_end () const
+    {
+      return m_iter.at_end ();
+    }
+
+    virtual void increment ()
+    {
+      ++m_iter;
+      set ();
+    }
+
+    virtual const value_type *get () const
+    {
+      return &m_polygon;
+    }
+
+    virtual RegionIteratorDelegate *clone () const
+    {
+      return new DeepRegionIterator (*this);
+    }
+
+  private:
+    friend class Region;
+
+    db::RecursiveShapeIterator m_iter;
+    mutable value_type m_polygon;
+
+    void set () const
+    {
+      if (! m_iter.at_end ()) {
+        m_iter.shape ().polygon (m_polygon);
+        m_polygon.transform (m_iter.trans (), false);
+      }
+    }
+  };
+
+}
+
 // -------------------------------------------------------------------------------------------------------------
 //  DeepRegion implementation
 
 DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, double area_ratio, size_t max_vertex_count)
-  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count))
+  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count)), m_merged_polygons (false)
 {
   init ();
 }
 
 DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, const db::ICplxTrans &trans, bool merged_semantics, double area_ratio, size_t max_vertex_count)
-  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count))
+  : AsIfFlatRegion (), m_deep_layer (dss.create_polygon_layer (si, area_ratio, max_vertex_count)), m_merged_polygons (false)
 {
   init ();
 
@@ -221,6 +277,12 @@ DeepRegion::ensure_merged_polygons_valid () const
     m_merged_polygons_valid = true;
 
   }
+}
+
+void
+DeepRegion::insert_into (db::Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+{
+  m_deep_layer.insert_into (layout, into_cell, into_layer);
 }
 
 }

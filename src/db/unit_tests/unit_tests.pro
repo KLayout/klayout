@@ -55,7 +55,8 @@ SOURCES = \
     dbSaveLayoutOptionsTests.cc \
     dbHierarchyBuilderTests.cc \
     dbRecursiveShapeIteratorTests.cc \
-    dbHierProcessorTests.cc
+    dbHierProcessorTests.cc \
+    dbDeepRegionTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

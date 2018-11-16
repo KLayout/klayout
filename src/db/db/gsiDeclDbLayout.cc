@@ -32,6 +32,7 @@
 #include "dbLibraryManager.h"
 #include "dbPCellDeclaration.h"
 #include "dbHash.h"
+#include "dbRegion.h"
 #include "tlStream.h"
 
 namespace gsi
@@ -1178,6 +1179,18 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@param cell_index The index of the cell to delete\n"
     "\n"
     "This method has been introduced in version 0.20.\n"
+  ) +
+  gsi::method ("insert", (void (db::Layout::*) (db::cell_index_type, unsigned int, const db::Region &)) &db::Layout::insert,
+    gsi::arg ("cell_index"), gsi::arg ("layer"), gsi::arg ("region"),
+    "@brief Inserts a region into the given cell and layer\n"
+    "If the region is (conceptionally) a flat region, it will be inserted into the cell's shapes "
+    "list as a flat sequence of polygons.\n"
+    "If the region is a deep (hierarchical) region, it will create a subhierarchy below the given "
+    "cell and it's shapes will be put into the respective cells. Suitable subcells will be picked "
+    "for inserting the shapes. If a hierarchy already exists below the given cell, the algorithm will "
+    "try to reuse this hierarchy.\n"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
   ) +
   gsi::method_ext ("flatten", &flatten,
     "@brief Flattens the given cell\n"

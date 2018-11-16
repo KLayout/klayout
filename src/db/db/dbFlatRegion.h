@@ -109,6 +109,8 @@ public:
   virtual size_t size () const;
   virtual bool is_merged () const;
 
+  virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
+
   virtual RegionDelegate *merged_in_place ();
   virtual RegionDelegate *merged_in_place (bool min_coherence, unsigned int min_wc);
   virtual RegionDelegate *merged () const;

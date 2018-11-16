@@ -179,6 +179,17 @@ public:
     return m_b2a_mapping;
   }
 
+  /**
+   *  @brief Creates mappings for all cells not mapped yet
+   *
+   *  When constructing a cell mapping by explicit mapping (map (a, b)), some cells may be
+   *  left unmapped. This method allows creating mappings for these missing cells by adding
+   *  new cells and the corresponding instances into the target layout_a.
+   *
+   *  The returned vector lists the new cells.
+   */
+  std::vector<db::cell_index_type> create_missing_mapping (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b);
+
 private:
   void extract_unique (std::map <db::cell_index_type, std::vector<db::cell_index_type> >::const_iterator cand, 
                        std::map<db::cell_index_type, db::cell_index_type> &unique_mapping,
@@ -186,8 +197,6 @@ private:
 
   void dump_mapping (const std::map <db::cell_index_type, std::vector<db::cell_index_type> > &candidates, 
                      const db::Layout &layout_a, const db::Layout &layout_b);
-
-  std::vector<db::cell_index_type> create_missing_mapping (db::Layout &layout_a, db::cell_index_type cell_index_a, const db::Layout &layout_b, db::cell_index_type cell_index_b);
 
   std::map <db::cell_index_type, db::cell_index_type> m_b2a_mapping;
 };

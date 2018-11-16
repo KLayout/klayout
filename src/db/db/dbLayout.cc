@@ -31,6 +31,7 @@
 #include "dbLibraryProxy.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
+#include "dbRegion.h"
 #include "tlTimer.h"
 #include "tlLog.h"
 #include "tlInternational.h"
@@ -636,6 +637,12 @@ Layout::delete_cell (cell_index_type id)
     delete take_cell (id);
 
   }
+}
+
+void
+Layout::insert (db::cell_index_type cell, int layer, const db::Region &region)
+{
+  region.insert_into (this, cell, layer);
 }
 
 void 

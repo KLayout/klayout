@@ -335,3 +335,135 @@ TEST(4_ComplexRegionAndLayoutWithClip)
   db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/hierarchy_builder_au4a.gds");
 }
 
+TEST(5_CompareRecursiveShapeIterators)
+{
+  db::Layout ly;
+  db::cell_index_type ci = ly.add_cell ("TOP");
+  db::cell_index_type ci1 = ly.add_cell ("TOPA");
+
+  db::Layout ly2;
+  db::cell_index_type ci2 = ly2.add_cell ("TOP");
+
+  {
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0);
+    db::RecursiveShapeIterator iter2 (ly2, ly2.cell (ci2), 0);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != 0, true);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != db::compare_iterators_with_respect_to_target_hierarchy (iter2, iter1), true);
+  }
+
+  {
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0);
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci1), 0);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != 0, true);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != db::compare_iterators_with_respect_to_target_hierarchy (iter2, iter1), true);
+  }
+
+  {
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0);
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), 1);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2), 0);
+  }
+
+  {
+    std::vector<unsigned int> ll1;
+    ll1.push_back (100);
+    ll1.push_back (101);
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), ll1);
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), 1);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2), 0);
+  }
+
+  {
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0);
+    iter1.max_depth (1);
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), 0);
+    iter2.max_depth (1);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2), 0);
+
+    iter2.max_depth (2);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != 0, true);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != db::compare_iterators_with_respect_to_target_hierarchy (iter2, iter1), true);
+  }
+
+  {
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0, db::Box (0, 1000, 2000, 3000));
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), 0);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != 0, true);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != db::compare_iterators_with_respect_to_target_hierarchy (iter2, iter1), true);
+  }
+
+  {
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0, db::Box (0, 1000, 2000, 3000));
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), 0, db::Box (0, 1000, 2000, 3000));
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2), 0);
+  }
+
+  {
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0, db::Box (0, 1000, 2000, 3000));
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), 1, db::Box (0, 1000, 2000, 3000));
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != 0, true);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != db::compare_iterators_with_respect_to_target_hierarchy (iter2, iter1), true);
+  }
+
+  {
+    std::vector<unsigned int> ll1;
+    ll1.push_back (100);
+    ll1.push_back (101);
+
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0, db::Box (0, 1000, 2000, 3000));
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), ll1, db::Box (0, 1000, 2000, 3000));
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != 0, true);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != db::compare_iterators_with_respect_to_target_hierarchy (iter2, iter1), true);
+  }
+
+  {
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0, db::Box (0, 1000, 2000, 3000));
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), 0, db::Box (0, 1000, 2000, 3001));
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != 0, true);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != db::compare_iterators_with_respect_to_target_hierarchy (iter2, iter1), true);
+  }
+
+  {
+    db::Region r1;
+    r1.insert (db::Box (0, 1000, 2000, 3000));
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0, r1);
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), 0, db::Box (0, 1000, 2000, 3000));
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2), 0);
+  }
+
+  {
+    db::Region r1;
+    r1.insert (db::Box (0, 1000, 2000, 3000));
+    r1.insert (db::Box (0, 4000, 2000, 6000));
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0, r1);
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), 0, db::Box (0, 1000, 2000, 3000));
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != 0, true);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != db::compare_iterators_with_respect_to_target_hierarchy (iter2, iter1), true);
+  }
+
+  {
+    db::Region r1;
+    r1.insert (db::Box (0, 1000, 2000, 3000));
+    r1.insert (db::Box (0, 4000, 2000, 6000));
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0, r1);
+    db::Region r2;
+    r2.insert (db::Box (0, 1000, 2000, 3000));
+    r2.insert (db::Box (0, 4000, 2000, 6000));
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), 0, r2);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2), 0);
+  }
+
+  {
+    db::Region r1;
+    r1.insert (db::Box (0, 1000, 2000, 3000));
+    r1.insert (db::Box (0, 4000, 2000, 6000));
+    db::RecursiveShapeIterator iter1 (ly, ly.cell (ci), 0, r1);
+    db::Region r2;
+    r2.insert (db::Box (0, 1000, 2000, 3000));
+    r2.insert (db::Box (0, 4000, 2000, 6001));
+    db::RecursiveShapeIterator iter2 (ly, ly.cell (ci), 0, r2);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != 0, true);
+    EXPECT_EQ (db::compare_iterators_with_respect_to_target_hierarchy (iter1, iter2) != db::compare_iterators_with_respect_to_target_hierarchy (iter2, iter1), true);
+  }
+}
+

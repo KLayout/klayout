@@ -41,7 +41,7 @@ namespace db
  *  This function will return -1, 0 or 1 depending on whether the two iterators
  *  can be used with the same builder (0) or whether they are less (-1) or greater (1).
  */
-int compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIterator &iter1, const db::RecursiveShapeIterator &iter2);
+int DB_PUBLIC compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIterator &iter1, const db::RecursiveShapeIterator &iter2);
 
 /**
  *  @brief A class to receive shapes from the hierarchy builder
@@ -199,18 +199,50 @@ public:
   void reset ();
 
   /**
-   *  @brief Gets the initial cell the builder produced
+   *  @brief Gets the initial cell the builder produced in the target layout
    */
   db::Cell *initial_cell ()
   {
     return mp_initial_cell;
   }
 
+  /**
+   *  @brief Gets the target layout
+   */
+  db::Layout *target ()
+  {
+    return mp_target.get ();
+  }
+
+  /**
+   *  @brief Gets the recursive shape iterator the data was taken from
+   */
+  const db::RecursiveShapeIterator &source () const
+  {
+    return m_source;
+  }
+
+  /**
+   *  @brief Gets the iterator for the cell map
+   */
+  cell_map_type::const_iterator begin_cell_map () const
+  {
+    return m_cell_map.begin ();
+  }
+
+  /**
+   *  @brief Gets the iterator for the cell map (end)
+   */
+  cell_map_type::const_iterator end_cell_map () const
+  {
+    return m_cell_map.end ();
+  }
+
 private:
   tl::weak_ptr<db::Layout> mp_target;
   HierarchyBuilderShapeReceiver *mp_pipe;
   bool m_initial_pass;
-  db::RecursiveShapeIterator m_ref_iter;
+  db::RecursiveShapeIterator m_source;
   cell_map_type m_cell_map;
   std::set<cell_map_type::key_type> m_cells_seen;
   cell_map_type::const_iterator m_cm_entry;

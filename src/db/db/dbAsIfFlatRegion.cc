@@ -1447,6 +1447,15 @@ AsIfFlatRegion::add (const Region &other) const
   }
 }
 
+void
+AsIfFlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+{
+  db::Shapes &shapes = layout->cell (into_cell).shapes (into_layer);
+  for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
+    shapes.insert (*p);
+  }
+}
+
 bool
 AsIfFlatRegion::equals (const Region &other) const
 {

@@ -62,16 +62,19 @@ compare_iterators_with_respect_to_target_hierarchy (const db::RecursiveShapeIter
     if (iter1.has_complex_region () && iter1.complex_region () != iter2.complex_region ()) {
       return iter1.complex_region () < iter2.complex_region () ? -1 : 1;
     }
+    if (iter1.region () != iter2.region ()) {
+      return iter1.region () < iter2.region () ? -1 : 1;
+    }
     if (iter1.multiple_layers () != iter2.multiple_layers ()) {
       return iter1.multiple_layers () < iter2.multiple_layers () ? -1 : 1;
     }
     if (iter1.multiple_layers ()) {
       if (iter1.layers () != iter2.layers ()) {
-        return iter1.layers () < iter2.layers ();
+        return iter1.layers () < iter2.layers () ? -1 : 1;
       }
     } else {
       if (iter1.layer () != iter2.layer ()) {
-        return iter1.layer () < iter2.layer ();
+        return iter1.layer () < iter2.layer () ? -1 : 1;
       }
     }
   }
@@ -161,9 +164,9 @@ void
 HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
 {
   if (m_initial_pass) {
-    m_ref_iter = *iter;
+    m_source = *iter;
   } else {
-    tl_assert (compare_iterators_with_respect_to_target_hierarchy (m_ref_iter, *iter) == 0);
+    tl_assert (compare_iterators_with_respect_to_target_hierarchy (m_source, *iter) == 0);
   }
 
   m_cell_stack.clear ();

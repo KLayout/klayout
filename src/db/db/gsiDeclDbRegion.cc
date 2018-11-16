@@ -26,6 +26,8 @@
 #include "dbPolygonTools.h"
 #include "dbLayoutUtils.h"
 #include "dbShapes.h"
+#include "dbDeepShapeStore.h"
+#include "dbRegion.h"
 #include "tlGlobPattern.h"
 
 #include <memory>
@@ -211,6 +213,11 @@ static typename Delivery::container_type *corners (const db::Region *r, double a
 static db::Region *new_si (const db::RecursiveShapeIterator &si)
 {
   return new db::Region (si);
+}
+
+static db::Region *new_sid (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, double area_ratio, size_t max_vertex_count)
+{
+  return new db::Region (si, dss, area_ratio, max_vertex_count);
 }
 
 static db::Region *new_si2 (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
@@ -712,6 +719,25 @@ static Container *decompose_trapezoids (const db::Region *r, int mode)
 int td_simple ();
 int po_any ();
 
+Class<db::DeepShapeStore> decl_DeepShapeStore ("db", "DeepShapeStore",
+  method ("instance_count", db::DeepShapeStore::instance_count, "@hide"),
+  "@brief An opaque layout heap for the deep region processor\n"
+  "\n"
+  "This class is used for keeping intermediate, hierarchical data for the "
+  "deep region processor. It is used in conjunction with the region "
+  "constructor to create a deep (hierarchical) region."
+  "\n"
+  "@code\n"
+  "layout = ... # a layout\n"
+  "layer = ...  # a layer\n"
+  "cell = ...   # a cell (initial cell for the deep region)\n"
+  "dss = RBA::DeepShapeStore::new\n"
+  "region = RBA::Region::new(cell.begin(layer), dss)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.26.\n"
+);
+
 Class<db::Region> decl_Region ("db", "Region",
   constructor ("new", &new_v, 
     "@brief Default constructor\n"
@@ -788,6 +814,22 @@ Class<db::Region> decl_Region ("db", "Region",
     "dbu    = 0.1 # the target database unit\n"
     "r = RBA::Region::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))\n"
     "@/code\n"
+  ) +
+  constructor ("new", &new_sid, gsi::arg ("shape_iterator"), gsi::arg ("deep_shape_store"), gsi::arg ("area_ratio", 3.0), gsi::arg ("max_vertex_count", size_t (16)),
+    "@brief Constructor for a deep region from a hierarchical shape set\n"
+    "\n"
+    "This constructor creates a hierarchical region. Use a \\DeepShapeStore object to "
+    "supply the hierarchical heap. See \\DeepShapeStore for more details.\n"
+    "\n"
+    "'area_ratio' and 'max_vertex' supply two optimization parameters which control how "
+    "big polygons are split to reduce the region's polygon complexity.\n"
+    "\n"
+    "@param shape_iterator The recursive shape iterator which delivers the hierarchy to take\n"
+    "@param deep_shape_store The hierarchical heap (see there)\n"
+    "@param area_ratio The maximum ratio of bounding box to polygon area before polygons are split\n"
+    "@param"
+    "\n"
+    "This method has been introduced in version 0.26.\n"
   ) +
   constructor ("new", &new_texts<BoxDelivery>, gsi::arg("shape_iterator"), gsi::arg ("expr"), gsi::arg ("as_pattern", true),
     "@brief Constructor from a text set\n"

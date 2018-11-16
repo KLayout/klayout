@@ -769,6 +769,35 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # deep region tests
+  def test_deep1
+
+    # construction/destruction magic ...
+    GC.start
+    assert_equal(RBA::DeepShapeStore::instance_count, 0)
+    dss = RBA::DeepShapeStore::new
+    dss._create
+    assert_equal(RBA::DeepShapeStore::instance_count, 1)
+    dss = nil
+    GC.start
+    assert_equal(RBA::DeepShapeStore::instance_count, 0)
+
+    dss = RBA::DeepShapeStore::new
+    ly = RBA::Layout::new
+    ly.read(File.join($ut_testsrc, "testdata", "algo", "deep_region_l1.gds"))
+    l1 = ly.layer(1, 0)
+    r = RBA::Region::new(ly.top_cell.begin_shapes_rec(l1), dss)
+    rf = RBA::Region::new(ly.top_cell.begin_shapes_rec(l1))
+
+    assert_equal(r.area, 53120000)
+    assert_equal(rf.area, 53120000)
+
+    # force destroy, so the unit tests pass on the next iteration
+    dss._destroy
+    assert_equal(RBA::DeepShapeStore::instance_count, 0)
+
+  end
+
 end
 
 load("test_epilogue.rb")

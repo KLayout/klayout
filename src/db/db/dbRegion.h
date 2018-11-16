@@ -1685,6 +1685,14 @@ public:
     return mp_delegate->less (other);
   }
 
+  /**
+   *  @brief Less operator
+   */
+  void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
+  {
+    return mp_delegate->insert_into (layout, into_cell, into_layer);
+  }
+
 private:
   friend class Edges;
   friend class EdgePairs;

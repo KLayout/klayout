@@ -792,6 +792,22 @@ class DBRegion_TestClass < TestBase
     assert_equal(r.area, 53120000)
     assert_equal(rf.area, 53120000)
 
+    ly_new = RBA::Layout::new
+    tc = ly_new.add_cell("TOP")
+    l1 = ly_new.layer(1, 0)
+    l2 = ly_new.layer(2, 0)
+    ly_new.insert(tc, l1, r)
+    ly_new.insert(tc, l2, rf)
+
+    s1 = { }
+    s2 = { }
+    ly_new.each_cell do |cell|
+      s1[cell.name] = cell.shapes(l1).size
+      s2[cell.name] = cell.shapes(l2).size
+    end
+    assert_equal(s1, {"INV2"=>1, "TOP"=>0, "TRANS"=>0})
+    assert_equal(s2, {"INV2"=>0, "TOP"=>10, "TRANS"=>0})
+
     # force destroy, so the unit tests pass on the next iteration
     dss._destroy
     assert_equal(RBA::DeepShapeStore::instance_count, 0)

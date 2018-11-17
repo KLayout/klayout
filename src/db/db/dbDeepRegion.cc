@@ -27,6 +27,7 @@
 #include "dbRegion.h"
 #include "dbShapeProcessor.h"
 #include "dbFlatRegion.h"
+#include "dbHierProcessor.h"
 
 namespace db
 {
@@ -107,6 +108,12 @@ DeepRegion::DeepRegion (const RecursiveShapeIterator &si, DeepShapeStore &dss, c
 
 DeepRegion::DeepRegion ()
   : AsIfFlatRegion ()
+{
+  init ();
+}
+
+DeepRegion::DeepRegion (const DeepLayer &dl)
+  : AsIfFlatRegion (), m_deep_layer (dl)
 {
   init ();
 }
@@ -283,6 +290,68 @@ void
 DeepRegion::insert_into (db::Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   m_deep_layer.insert_into (layout, into_cell, into_layer);
+}
+
+RegionDelegate *
+DeepRegion::and_with (const Region &other) const
+{
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty () || other.empty ()) {
+
+    //  Nothing to do
+    return new EmptyRegion ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatRegion::and_with (other);
+
+  } else {
+
+    return new DeepRegion (and_or_not_with (other_deep, true));
+
+  }
+}
+
+RegionDelegate *
+DeepRegion::not_with (const Region &other) const
+{
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty ()) {
+
+    //  Nothing to do
+    return new EmptyRegion ();
+
+  } else if (other.empty () && ! strict_handling ()) {
+
+    //  Nothing to do
+    return clone ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatRegion::not_with (other);
+
+  } else {
+
+    return new DeepRegion (and_or_not_with (other_deep, false));
+
+  }
+}
+
+DeepLayer
+DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
+{
+  DeepLayer dl_out (m_deep_layer.derived ());
+
+  db::BoolAndOrNotLocalOperation op (and_op);
+
+  db::LocalProcessor proc (const_cast <db::Layout *> (m_deep_layer.layout ()), const_cast <db::Cell *> (m_deep_layer.initial_cell ()), other->deep_layer ().layout (), other->deep_layer ().initial_cell ());
+  proc.set_threads (m_deep_layer.store ()->threads ());
+
+  proc.run (&op, m_deep_layer.layer (), other->deep_layer ().layer (), dl_out.layer ());
+
+  return dl_out;
 }
 
 }

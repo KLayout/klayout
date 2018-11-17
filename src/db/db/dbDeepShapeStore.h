@@ -81,6 +81,17 @@ public:
   const db::Layout *layout () const;
 
   /**
+   *  @brief Gets the layout object
+   *  The return value is guaranteed to be non-null.
+   */
+  db::Cell *initial_cell ();
+
+  /**
+   *  @brief Gets the initial cell object (const version)
+   */
+  const db::Cell *initial_cell () const;
+
+  /**
    *  @brief Gets the layer
    */
   unsigned int layer () const
@@ -100,6 +111,24 @@ public:
    *  @brief Inserts the layer into the given layout, starting from the given cell and into the given layer
    */
   void insert_into (Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer) const;
+
+  /**
+   *  @brief Creates a derived new deep layer
+   *  Derived layers use the same layout and context, but are initially
+   *  empty layers for use as output layers on the same hierarchy.
+   */
+  DeepLayer derived () const;
+
+  /**
+   *  @brief Gets the shape store object
+   *  This is a pure const version to prevent manipulation of the store.
+   *  This method is intended to fetch configuration options from the store.
+   */
+  const DeepShapeStore *store () const
+  {
+    check_dss ();
+    return mp_store.get ();
+  }
 
 private:
   friend class DeepShapeStore;
@@ -172,6 +201,21 @@ public:
    */
   static size_t instance_count ();
 
+  /**
+   *  @brief The deep shape store also keeps the number of threads to allocate for the hierarchical processor
+   *
+   *  This is a kind of hack, but it's convenient.
+   */
+  void set_threads (int n);
+
+  /**
+   *  @brief Gets the number of threads
+   */
+  int threads () const
+  {
+    return m_threads;
+  }
+
 private:
   friend class DeepLayer;
 
@@ -189,6 +233,7 @@ private:
   tl::stable_vector<db::Layout> m_layouts;
   tl::stable_vector<db::HierarchyBuilder> m_builders;
   layout_map_type m_layout_map;
+  int m_threads;
 
   struct DeliveryMappingCacheKey
   {

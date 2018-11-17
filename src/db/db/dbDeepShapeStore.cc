@@ -55,6 +55,12 @@ DeepLayer::~DeepLayer ()
   //  .. nothing yet ..
 }
 
+DeepLayer
+DeepLayer::derived () const
+{
+  return DeepLayer (const_cast <db::DeepShapeStore *> (mp_store.get ()), m_layout, const_cast <db::Layout *> (layout ())->insert_layer ());
+}
+
 void
 DeepLayer::insert_into (db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
@@ -76,6 +82,22 @@ DeepLayer::layout () const
   return const_cast<db::DeepShapeStore *> (mp_store.get ())->layout (m_layout);
 }
 
+db::Cell *
+DeepLayer::initial_cell ()
+{
+  db::Layout *ly = layout ();
+  tl_assert (ly->begin_top_down () != ly->end_top_down ());
+  return &ly->cell (*ly->begin_top_down ());
+}
+
+const db::Cell *
+DeepLayer::initial_cell () const
+{
+  const db::Layout *ly = layout ();
+  tl_assert (ly->begin_top_down () != ly->end_top_down ());
+  return &ly->cell (*ly->begin_top_down ());
+}
+
 void
 DeepLayer::check_dss () const
 {
@@ -89,6 +111,7 @@ DeepLayer::check_dss () const
 static size_t s_instance_count = 0;
 
 DeepShapeStore::DeepShapeStore ()
+  : m_threads (1)
 {
   ++s_instance_count;
 }
@@ -101,6 +124,11 @@ DeepShapeStore::~DeepShapeStore ()
 size_t DeepShapeStore::instance_count ()
 {
   return s_instance_count;
+}
+
+void DeepShapeStore::set_threads (int n)
+{
+  m_threads = n;
 }
 
 DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count)

@@ -108,6 +108,66 @@ TEST(2)
   }
 
   CHECKPOINT();
-  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au1.gds");
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au2.gds");
+}
+
+TEST(3_BoolAndNot)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+  unsigned int l42 = ly.get_layer (db::LayerProperties (42, 0));
+
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+  db::Region r42 (db::RecursiveShapeIterator (ly, top_cell, l42), dss);
+  db::Region box (db::Box (2000, -1000, 6000, 4000));
+
+  db::Region r2minus3   = r2 - r3;
+  db::Region r2minusbox = r2 - box;
+  db::Region r2minus42  = r2 - r42;
+  db::Region rboxminus3 = box - r3;
+  db::Region r42minus3  = r42 - r3;
+  db::Region r42minus42 = r42 - r42;
+
+  db::Region r2and3   = r2 & r3;
+  db::Region r2andbox = r2 & box;
+  db::Region r2and42  = r2 & r42;
+  db::Region rboxand3 = box & r3;
+  db::Region r42and3  = r42 & r3;
+  db::Region r42and42 = r42 & r42;
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r2minus3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2minusbox);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2minus42);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), rboxminus3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r42minus3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r42minus42);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2and3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2andbox);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r2and42);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), rboxand3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), r42and3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), r42and42);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au3.gds");
 }
 

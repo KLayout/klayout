@@ -720,6 +720,12 @@ int td_simple ();
 int po_any ();
 
 Class<db::DeepShapeStore> decl_DeepShapeStore ("db", "DeepShapeStore",
+  method ("threads=", &db::DeepShapeStore::set_threads, gsi::arg ("threads"),
+    "@brief Sets the number of threads for use for operations acting on this heap\n"
+  ) +
+  method ("threads", &db::DeepShapeStore::threads,
+    "@brief Gets the number of threads for use for operations acting on this heap\n"
+  ) +
   method ("instance_count", db::DeepShapeStore::instance_count, "@hide"),
   "@brief An opaque layout heap for the deep region processor\n"
   "\n"
@@ -734,6 +740,9 @@ Class<db::DeepShapeStore> decl_DeepShapeStore ("db", "DeepShapeStore",
   "dss = RBA::DeepShapeStore::new\n"
   "region = RBA::Region::new(cell.begin(layer), dss)\n"
   "@/code\n"
+  "\n"
+  "The DeepShapeStore object also supplies some configuration options "
+  "for the operations acting on the deep regions. See for example \\threads=.\n"
   "\n"
   "This class has been introduced in version 0.26.\n"
 );

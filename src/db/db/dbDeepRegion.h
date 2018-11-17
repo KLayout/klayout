@@ -70,13 +70,22 @@ public:
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;
 
+  virtual RegionDelegate *and_with (const Region &other) const;
+  virtual RegionDelegate *not_with (const Region &other) const;
+
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
+
+  const DeepLayer &deep_layer () const
+  {
+    return m_deep_layer;
+  }
 
 protected:
   virtual void merged_semantics_changed ();
 
 private:
   DeepRegion &operator= (const DeepRegion &other);
+  DeepRegion (const DeepLayer &dl);
 
   DeepLayer m_deep_layer;
   //  @@@ have hierarchical merged polygons later
@@ -85,6 +94,7 @@ private:
 
   void init ();
   void ensure_merged_polygons_valid () const;
+  DeepLayer and_or_not_with(const DeepRegion *other, bool and_op) const;
 };
 
 }

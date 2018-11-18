@@ -366,14 +366,20 @@ Plugin::get_config_names (std::vector<std::string> &names) const
 PluginRoot *
 Plugin::plugin_root ()
 {
+  PluginRoot *pr = plugin_root_maybe_null ();
+  tl_assert (pr != 0);
+  return pr;
+}
+
+PluginRoot *
+Plugin::plugin_root_maybe_null ()
+{
   Plugin *p = this;
   while (p->mp_parent) {
     p = p->mp_parent;
   }
 
-  PluginRoot *pr = dynamic_cast<PluginRoot *> (p);
-  tl_assert (pr != 0);
-  return pr;
+  return dynamic_cast<PluginRoot *> (p);
 }
 
 void 

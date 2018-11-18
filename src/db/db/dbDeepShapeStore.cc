@@ -61,6 +61,19 @@ DeepLayer::derived () const
   return DeepLayer (const_cast <db::DeepShapeStore *> (mp_store.get ()), m_layout, const_cast <db::Layout *> (layout ())->insert_layer ());
 }
 
+DeepLayer
+DeepLayer::copy () const
+{
+  DeepLayer new_layer (derived ());
+
+  db::DeepShapeStore *non_const_store = const_cast<db::DeepShapeStore *> (mp_store.get ());
+  if (non_const_store->layout (m_layout)) {
+    non_const_store->layout (m_layout)->copy_layer (m_layer, new_layer.layer ());
+  }
+
+  return new_layer;
+}
+
 void
 DeepLayer::insert_into (db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {

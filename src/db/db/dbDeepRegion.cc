@@ -28,6 +28,8 @@
 #include "dbShapeProcessor.h"
 #include "dbFlatRegion.h"
 #include "dbHierProcessor.h"
+#include "dbCellMapping.h"
+#include "dbLayoutUtils.h"
 
 namespace db
 {
@@ -125,7 +127,7 @@ DeepRegion::~DeepRegion ()
 
 DeepRegion::DeepRegion (const DeepRegion &other)
   : AsIfFlatRegion (other),
-    m_deep_layer (other.m_deep_layer),
+    m_deep_layer (other.m_deep_layer.copy ()),
     m_merged_polygons (other.m_merged_polygons),
     m_merged_polygons_valid (other.m_merged_polygons_valid)
 {
@@ -354,5 +356,72 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
   return dl_out;
 }
 
+RegionDelegate *
+DeepRegion::add_in_place (const Region &other)
+{
+  if (other.empty ()) {
+    return this;
+  }
+
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+  if (other_deep) {
+
+    if (other_deep->deep_layer ().layout () == deep_layer ().layout ()) {
+
+      //  intra-layout merge
+
+      deep_layer ().layout ()->copy_layer (other_deep->deep_layer ().layer (), deep_layer ().layer ());
+
+    } else {
+
+      //  inter-layout merge
+
+      db::cell_index_type into_cell = deep_layer ().initial_cell ()->cell_index ();
+      db::Layout *into_layout = deep_layer ().layout ();
+      db::cell_index_type source_cell = other_deep->deep_layer ().initial_cell ()->cell_index ();
+      const db::Layout *source_layout = other_deep->deep_layer ().layout ();
+
+      db::CellMapping cm;
+      cm.create_from_geometry_full (*into_layout, into_cell, *source_layout, source_cell);
+
+      //  Actually copy the shapes
+
+      std::map<unsigned int, unsigned int> lm;
+      lm.insert (std::make_pair (other_deep->deep_layer ().layer (), deep_layer ().layer ()));
+
+      std::vector <db::cell_index_type> source_cells;
+      source_cells.push_back (source_cell);
+      db::copy_shapes (*into_layout, *source_layout, db::ICplxTrans (), source_cells, cm.table (), lm);
+
+    }
+
+  } else {
+
+    //  non-deep to deep merge (flat)
+
+    db::Shapes &shapes = deep_layer ().initial_cell ()->shapes (deep_layer ().layer ());
+    for (db::Region::const_iterator p = other.begin (); ! p.at_end (); ++p) {
+      shapes.insert (*p);
+    }
+
+  }
+
+  return this;
+
 }
 
+RegionDelegate *
+DeepRegion::add (const Region &other) const
+{
+  if (other.empty ()) {
+    return clone ();
+  } else if (empty ()) {
+    return other.delegate ()->clone ();
+  } else {
+    DeepRegion *new_region = dynamic_cast<DeepRegion *> (clone ());
+    new_region->add_in_place (other);
+    return new_region;
+  }
+}
+
+}

@@ -120,6 +120,11 @@ public:
   DeepLayer derived () const;
 
   /**
+   *  @brief Creates a copy of this layer
+   */
+  DeepLayer copy () const;
+
+  /**
    *  @brief Gets the shape store object
    *  This is a pure const version to prevent manipulation of the store.
    *  This method is intended to fetch configuration options from the store.

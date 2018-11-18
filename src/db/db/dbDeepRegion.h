@@ -73,9 +73,17 @@ public:
   virtual RegionDelegate *and_with (const Region &other) const;
   virtual RegionDelegate *not_with (const Region &other) const;
 
+  virtual RegionDelegate *add_in_place (const Region &other);
+  virtual RegionDelegate *add (const Region &other) const;
+
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 
   const DeepLayer &deep_layer () const
+  {
+    return m_deep_layer;
+  }
+
+  DeepLayer &deep_layer ()
   {
     return m_deep_layer;
   }

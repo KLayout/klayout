@@ -169,7 +169,7 @@ PluginDeclaration::config_finalize ()
 }
 
 void 
-PluginDeclaration::initialized (lay::PluginRoot *)
+PluginDeclaration::initialized (lay::PluginRoot *root)
 {
   //  Check if we already have templates (initial setup)
   bool any_templates = false;
@@ -198,8 +198,8 @@ PluginDeclaration::initialized (lay::PluginRoot *)
 
     m_templates.push_back (ant::Template (tl::to_string (QObject::tr ("Box")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_box, true, lay::AC_Global, std::string ()));
 
-    lay::PluginRoot::instance ()->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
-    lay::PluginRoot::instance ()->config_end ();
+    root->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (m_templates));
+    root->config_end ();
 
   }
 }

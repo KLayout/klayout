@@ -36,22 +36,27 @@ namespace lay
 static const std::string cfg_salt_manager_window_state ("salt-manager-window-state");
 
 SaltController::SaltController ()
-  : mp_salt_dialog (0), mp_mw (0), m_file_watcher (0),
+  : mp_salt_dialog (0), mp_mw (0), mp_plugin_root (0), m_file_watcher (0),
     dm_sync_file_watcher (this, &SaltController::sync_file_watcher),
     dm_sync_files (this, &SaltController::sync_files)
 {
 }
 
 void
-SaltController::initialized (lay::PluginRoot *root)
+SaltController::initialize (lay::PluginRoot *root)
+{
+  mp_mw = lay::MainWindow::instance ();
+  mp_plugin_root = root;
+}
+
+void
+SaltController::initialized (lay::PluginRoot * /*root*/)
 {
   if (! m_file_watcher) {
     m_file_watcher = new tl::FileSystemWatcher (this);
     connect (m_file_watcher, SIGNAL (fileChanged (const QString &)), this, SLOT (file_watcher_triggered ()));
     connect (m_file_watcher, SIGNAL (fileRemoved (const QString &)), this, SLOT (file_watcher_triggered ()));
   }
-
-  mp_mw = dynamic_cast <lay::MainWindow *> (root);
 
   connect (&m_salt, SIGNAL (collections_changed ()), this, SIGNAL (salt_changed ()));
 }
@@ -128,11 +133,9 @@ SaltController::show_editor ()
 
   if (mp_salt_dialog) {
 
-    if (mp_mw) {
-      std::string s = mp_mw->config_get (cfg_salt_manager_window_state);
-      if (! s.empty ()) {
-        lay::restore_dialog_state (mp_salt_dialog, s);
-      }
+    std::string s = mp_plugin_root->config_get (cfg_salt_manager_window_state);
+    if (! s.empty ()) {
+      lay::restore_dialog_state (mp_salt_dialog, s);
     }
 
     //  while running the dialog, don't watch file events - that would interfere with
@@ -141,9 +144,7 @@ SaltController::show_editor ()
     mp_salt_dialog->exec ();
     m_file_watcher->enable (true);
 
-    if (mp_mw) {
-      mp_mw->config_set (cfg_salt_manager_window_state, lay::save_dialog_state (mp_salt_dialog));
-    }
+    mp_plugin_root->config_set (cfg_salt_manager_window_state, lay::save_dialog_state (mp_salt_dialog));
 
     sync_file_watcher ();
 

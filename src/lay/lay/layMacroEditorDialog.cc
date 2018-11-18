@@ -227,10 +227,10 @@ public:
 
 static lay::MacroEditorDialog *s_macro_editor_instance = 0;
 
-MacroEditorDialog::MacroEditorDialog (lay::MainWindow *mw, lym::MacroCollection *root)
+MacroEditorDialog::MacroEditorDialog (lay::PluginRoot *pr, lym::MacroCollection *root)
   : QDialog (0 /*show as individual top widget*/, Qt::Window),
-    lay::Plugin (mw, true),
-    mp_plugin_root (mw),
+    lay::Plugin (pr, true),
+    mp_plugin_root (pr),
     mp_root (root),
     m_first_show (true), m_in_processing (false), m_debugging_on (true),
     mp_run_macro (0),

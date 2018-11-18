@@ -132,6 +132,7 @@ private:
   bool m_technologies_configured;
   lay::TechSetupDialog *mp_editor;
   lay::MainWindow *mp_mw;
+  lay::PluginRoot *mp_plugin_root;
   std::vector<std::string> m_paths;
   std::vector<db::Technology> m_temp_tech;
   db::Technology *mp_active_technology;

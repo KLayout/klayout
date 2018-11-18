@@ -849,16 +849,26 @@ Class<gsi::ButtonStateNamespace> decl_ButtonState ("lay", "ButtonState",
 );
 
 static std::vector<std::string> 
-get_config_names (lay::PluginRoot *view)
+get_config_names (lay::PluginRoot *root)
 {
   std::vector<std::string> names;
-  view->get_config_names (names);
+  root->get_config_names (names);
   return names;
 }
 
-lay::PluginRoot *config_root_instance ()
+static lay::PluginRoot *config_root_instance ()
 {
   return lay::PluginRoot::instance ();
+}
+
+static tl::Variant get_config (lay::PluginRoot *root, const std::string &name)
+{
+  std::string value;
+  if (root->config_get (name, value)) {
+    return tl::Variant (value);
+  } else {
+    return tl::Variant ();
+  }
 }
 
 /**
@@ -868,7 +878,7 @@ lay::PluginRoot *config_root_instance ()
  *  identify the plugin root node for configuration. The Plugin nature of this interface
  *  is somewhat artificial and may be removed later. 
  *
- *  TODO: this is a duplicate of the respective methods in LayoutView and MainWindow.
+ *  TODO: this is a duplicate of the respective methods in LayoutView and Application.
  *  This is intentional since we don't want to spend the only derivation path on this.
  *  Once there is a mixin concept, provide a path through that concept.
  */
@@ -898,13 +908,13 @@ Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
     "exist. If it does and an error occured, the error message is printed\n"
     "on stderr. In both cases, false is returned.\n"
   ) +
-  method ("get_config", (bool (lay::PluginRoot::*) (const std::string &, std::string &) const) &lay::PluginRoot::config_get,
-    "@brief Get the value of a local configuration parameter\n"
+  method_ext ("get_config", &get_config,
+    "@brief Gets the value of a local configuration parameter\n"
     "\n"
     "@args name\n"
     "@param name The name of the configuration parameter whose value shall be obtained (a string)\n"
     "\n"
-    "@return The value of the parameter\n"
+    "@return The value of the parameter or nil if there is no such parameter\n"
   ) +
   method ("set_config", (void (lay::PluginRoot::*) (const std::string &, const std::string &)) &lay::PluginRoot::config_set,
     "@brief Set a local configuration parameter with the given name to the given value\n"
@@ -936,11 +946,16 @@ Class<lay::PluginRoot> decl_PluginRoot ("lay", "PluginRoot",
   ),
   "@brief Root of the configuration space in the plugin context\n"
   "\n"
-  "This class provides access to the root configuration space. This object provides access to the configuration space in the context "
-  "of plugin programming.\n"
-  "Plugins are organized in a configuration tree. Configuration settings are propagated down to the individual plugins. "
-  "If there is a main window, the configuration root is identical with this object, so configuration settings "
-  "applied in the configuration root are available to all views.\n"
+  "This class provides access to the root configuration space in the context "
+  "of plugin programming. You can use this class to obtain configuration parameters "
+  "from the configuration tree during plugin initialization. However, the "
+  "preferred way of plugin configuration is through \\Plugin#configure.\n"
+  "\n"
+  "Currently, the application object provides an identical entry point for configuration modification. "
+  "For example, \"Application::instance.set_config\" is identical to \"PluginRoot::instance.set_config\". "
+  "Hence there is little motivation for the PluginRoot class currently and "
+  "this interface may be modified or removed in the future."
+  "\n"
   "\n"
   "This class has been introduced in version 0.25.\n"
 );

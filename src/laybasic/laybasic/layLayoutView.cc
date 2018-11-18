@@ -247,9 +247,9 @@ const int timer_interval = 500;
 
 static LayoutView *ms_current = 0;
 
-LayoutView::LayoutView (db::Manager *manager, bool editable, lay::PluginRoot *root, QWidget *parent, const char *name, unsigned int options)
+LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, QWidget *parent, const char *name, unsigned int options)
   : QFrame (parent), 
-    lay::Plugin (root), 
+    lay::Plugin (plugin_parent),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager),
@@ -259,7 +259,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::PluginRoot *ro
   tl::DeferredMethodScheduler::instance ();
 
   setObjectName (QString::fromUtf8 (name));
-  init (manager, root, parent);
+  init (manager, plugin_root_maybe_null (), parent);
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::PluginRoot *root, QWidget *parent, const char *name, unsigned int options)
@@ -537,7 +537,9 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   connect (mp_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
   mp_timer->start (timer_interval);
 
-  create_plugins (root);
+  if (root) {
+    create_plugins (root);
+  }
 
   m_new_layer_props.layer = 1;
   m_new_layer_props.datatype = 0;
@@ -4468,6 +4470,8 @@ LayoutView::background_color (QColor c)
   mp_canvas->set_colors (c, contrast, mp_canvas->active_color ());
 
   update_content ();
+
+  background_color_changed_event ();
 }
 
 void 

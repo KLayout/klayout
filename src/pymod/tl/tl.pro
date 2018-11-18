@@ -43,7 +43,7 @@ msvc {
 }
 INSTALLS += init_target
 
-# And also provide the pya compatbility module here
+# And also provide the pya compatibility module here
 
 msvc {
   QMAKE_POST_LINK += && (if not exist $$shell_path($$DESTDIR_PYMOD/../pya) $(MKDIR) $$shell_path($$DESTDIR_PYMOD/../pya)) && $(COPY) $$shell_path($$PWD/../distutils_src/pya/*.py) $$shell_path($$DESTDIR_PYMOD/../pya)

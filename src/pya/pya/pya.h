@@ -101,8 +101,12 @@ class PYA_PUBLIC PythonInterpreter
 public:
   /**
    *  @brief The constructor 
+   *
+   *  If embedded is true, the interpreter is an embedded one. Only in this case, the
+   *  Python interpreter is initialized. Otherwise, it is assumed the interpreter
+   *  already exists and our application runs inside an external interpreter.
    */
-  PythonInterpreter ();
+  PythonInterpreter (bool embedded = true);
 
   /**
    *  @brief The destructor 
@@ -281,6 +285,7 @@ private:
   PyFrameObject *mp_current_frame;
   std::map<PyObject *, size_t> m_file_id_map;
   wchar_t *mp_py3_app_name;
+  bool m_embedded;
   std::auto_ptr<pya::PythonModule> m_pya_module;
 };
 

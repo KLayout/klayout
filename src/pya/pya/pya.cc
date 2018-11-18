@@ -168,11 +168,31 @@ init_pya_module ()
 
 #endif
 
-PythonInterpreter::PythonInterpreter ()
+static void reset_interpreter ()
+{
+  delete sp_interpreter;
+  tl_assert (sp_interpreter == 0);
+}
+
+PythonInterpreter::PythonInterpreter (bool embedded)
   : mp_current_console (0), mp_current_exec_handler (0), m_current_exec_level (0),
     m_in_trace (false), m_block_exceptions (false), m_ignore_next_exception (false),
-    mp_current_frame (NULL), mp_py3_app_name (0)
+    mp_current_frame (NULL), mp_py3_app_name (0), m_embedded (embedded)
 {
+  //  Don't attempt any additional initialization in the standalone module case
+  if (! embedded) {
+
+    sp_interpreter = this;
+
+    //  this monitor whether Python shuts down and deletes the interpreter's
+    //  instance.
+    //  NOTE: this assumes, the interpreter was created with new(!)
+    Py_AtExit (&reset_interpreter);
+
+    return;
+
+  }
+
   tl::SelfTimer timer (tl::verbosity () >= 21, "Initializing Python");
 
   std::string app_path;
@@ -316,11 +336,11 @@ PythonInterpreter::PythonInterpreter ()
   m_stderr_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stderr));
   m_stderr = PythonPtr (m_stderr_channel.get ());
 
+  sp_interpreter = this;
+
   m_pya_module.reset (new pya::PythonModule ());
   m_pya_module->init (pya_module_name, module);
   m_pya_module->make_classes ();
-
-  sp_interpreter = this;
 }
 
 PythonInterpreter::~PythonInterpreter ()
@@ -330,11 +350,15 @@ PythonInterpreter::~PythonInterpreter ()
   m_stdout = PythonPtr ();
   m_stderr = PythonPtr ();
 
-  Py_Finalize ();
+  if (m_embedded) {
 
-  if (mp_py3_app_name) {
-    PyMem_Free (mp_py3_app_name);
-    mp_py3_app_name = 0;
+    Py_Finalize ();
+
+    if (mp_py3_app_name) {
+      PyMem_Free (mp_py3_app_name);
+      mp_py3_app_name = 0;
+    }
+
   }
 
   sp_interpreter = 0;

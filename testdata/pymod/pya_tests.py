@@ -1,6 +1,7 @@
 
 import sys
 import os
+import unittest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "python"))
 
@@ -20,7 +21,7 @@ import dbTransTest
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(tlTest.TLTest)
   suite = unittest.TestLoader().loadTestsFromTestCase(dbPCells.DBPCellTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbLayoutTest.DBLayoutTests)
+  suite = unittest.TestLoader().loadTestsFromTestCase(dbLayoutTest.DBLayoutTest)
   suite = unittest.TestLoader().loadTestsFromTestCase(dbPolygonTest.DBPolygonTests)
   suite = unittest.TestLoader().loadTestsFromTestCase(dbReaders.DBReadersTests)
   suite = unittest.TestLoader().loadTestsFromTestCase(dbRegionTest.DBRegionTest)

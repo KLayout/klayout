@@ -256,7 +256,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
     dm_prop_changed (this, &LayoutView::do_prop_changed) 
 {
   setObjectName (QString::fromUtf8 (name));
-  init (manager, plugin_root (), parent);
+  init (manager, plugin_root_maybe_null (), parent);
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::PluginRoot *root, QWidget *parent, const char *name, unsigned int options)
@@ -271,7 +271,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
 
   m_annotation_shapes = source->m_annotation_shapes;
 
-  init (manager, plugin_root (), parent);
+  init (manager, root, parent);
 
   //  set the handle reference and clear all cell related stuff 
   m_cellviews = source->cellview_list ();
@@ -531,7 +531,9 @@ LayoutView::init (db::Manager *mgr, lay::PluginRoot *root, QWidget * /*parent*/)
   connect (mp_timer, SIGNAL (timeout ()), this, SLOT (timer ()));
   mp_timer->start (timer_interval);
 
-  create_plugins (root);
+  if (root) {
+    create_plugins (root);
+  }
 
   m_new_layer_props.layer = 1;
   m_new_layer_props.datatype = 0;

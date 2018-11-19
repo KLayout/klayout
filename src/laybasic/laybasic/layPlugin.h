@@ -640,6 +640,13 @@ public:
   PluginRoot *plugin_root ();
 
   /**
+   *  @brief Gets the plugin root (the parent plugin not having another parent)
+   *  This version may return null, if the plugin is instantiated without a
+   *  root.
+   */
+  PluginRoot *plugin_root_maybe_null ();
+
+  /**
    *  @brief Menu command handler
    *
    *  This method is called if a menu entry registered in the 

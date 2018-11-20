@@ -28,6 +28,7 @@
 
 #include "tlObject.h"
 #include "tlStableVector.h"
+#include "tlThreads.h"
 #include "dbLayout.h"
 #include "dbRecursiveShapeIterator.h"
 #include "dbHierarchyBuilder.h"
@@ -197,7 +198,7 @@ public:
   DeepLayer create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio = 3.0, size_t max_vertex_count = 16);
 
   /**
-   *  @brief Inserts the deep layer's into some target layout
+   *  @brief Inserts the deep layer's shapes into some target layout
    */
   void insert (const DeepLayer &layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer);
 
@@ -205,6 +206,24 @@ public:
    *  @brief For testing
    */
   static size_t instance_count ();
+
+  /**
+   *  @brief Gets the nth layout (const version)
+   */
+  const db::Layout *const_layout (unsigned int n) const;
+
+  /**
+   *  @brief Gets the number of layouts
+   */
+  unsigned int layouts () const
+  {
+    return (unsigned int) m_layouts.size ();
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the given index is a valid layout index
+   */
+  bool is_valid_layout_index (unsigned int n) const;
 
   /**
    *  @brief The deep shape store also keeps the number of threads to allocate for the hierarchical processor
@@ -224,10 +243,12 @@ public:
 private:
   friend class DeepLayer;
 
-  db::Layout *layout (unsigned int n)
-  {
-    return &m_layouts [n];
-  }
+  struct LayoutHolder;
+
+  db::Layout *layout (unsigned int n);
+
+  void add_ref (unsigned int layout, unsigned int layer);
+  void remove_ref (unsigned int layout, unsigned int layer);
 
   typedef std::map<db::RecursiveShapeIterator, unsigned int, RecursiveShapeIteratorCompareForTargetHierarchy> layout_map_type;
 
@@ -235,10 +256,10 @@ private:
   DeepShapeStore (const DeepShapeStore &);
   DeepShapeStore &operator= (const DeepShapeStore &);
 
-  tl::stable_vector<db::Layout> m_layouts;
-  tl::stable_vector<db::HierarchyBuilder> m_builders;
+  std::vector<LayoutHolder *> m_layouts;
   layout_map_type m_layout_map;
   int m_threads;
+  tl::Mutex m_lock;
 
   struct DeliveryMappingCacheKey
   {

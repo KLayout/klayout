@@ -41,18 +41,42 @@ DeepLayer::DeepLayer ()
 DeepLayer::DeepLayer (const DeepLayer &x)
   : mp_store (x.mp_store), m_layout (x.m_layout), m_layer (x.m_layer)
 {
-  //  .. nothing yet ..
+  if (mp_store.get ()) {
+    mp_store->add_ref (m_layout, m_layer);
+  }
 }
 
 DeepLayer::DeepLayer (DeepShapeStore *store, unsigned int layout, unsigned int layer)
   : mp_store (store), m_layout (layout), m_layer (layer)
 {
-  //  .. nothing yet ..
+  if (store) {
+    store->add_ref (layout, layer);
+  }
 }
+
+DeepLayer &DeepLayer::operator= (const DeepLayer &other)
+{
+  if (this != &other) {
+    if (mp_store.get ()) {
+      mp_store->remove_ref (m_layout, m_layer);
+    }
+    mp_store = other.mp_store;
+    m_layout = other.m_layout;
+    m_layer = other.m_layer;
+    if (mp_store.get ()) {
+      mp_store->add_ref (m_layout, m_layer);
+    }
+  }
+
+  return *this;
+}
+
 
 DeepLayer::~DeepLayer ()
 {
-  //  .. nothing yet ..
+  if (mp_store.get ()) {
+    mp_store->remove_ref (m_layout, m_layer);
+  }
 }
 
 DeepLayer
@@ -121,6 +145,35 @@ DeepLayer::check_dss () const
 
 // ----------------------------------------------------------------------------------
 
+struct DeepShapeStore::LayoutHolder
+{
+  LayoutHolder ()
+    : refs (0), layout (), builder (&layout)
+  {
+    //  .. nothing yet ..
+  }
+
+  void add_layer_ref (unsigned int layer)
+  {
+    layer_refs[layer] += 1;
+  }
+
+  void remove_layer_ref (unsigned int layer)
+  {
+    if ((layer_refs[layer] -= 1) <= 0) {
+      layout.clear_layer (layer);
+      layer_refs.erase (layer);
+    }
+  }
+
+  int refs;
+  db::Layout layout;
+  db::HierarchyBuilder builder;
+  std::map<unsigned int, int> layer_refs;
+};
+
+// ----------------------------------------------------------------------------------
+
 static size_t s_instance_count = 0;
 
 DeepShapeStore::DeepShapeStore ()
@@ -132,6 +185,28 @@ DeepShapeStore::DeepShapeStore ()
 DeepShapeStore::~DeepShapeStore ()
 {
   --s_instance_count;
+
+  for (std::vector<LayoutHolder *>::iterator h = m_layouts.begin (); h != m_layouts.end (); ++h) {
+    delete *h;
+  }
+  m_layouts.clear ();
+}
+
+bool DeepShapeStore::is_valid_layout_index (unsigned int n) const
+{
+  return (n < (unsigned int) m_layouts.size () && m_layouts[n] != 0);
+}
+
+const db::Layout *DeepShapeStore::const_layout (unsigned int n) const
+{
+  tl_assert (is_valid_layout_index (n));
+  return &(m_layouts [n]->layout);
+}
+
+db::Layout *DeepShapeStore::layout (unsigned int n)
+{
+  tl_assert (is_valid_layout_index (n));
+  return &(m_layouts [n]->layout);
 }
 
 size_t DeepShapeStore::instance_count ()
@@ -144,35 +219,55 @@ void DeepShapeStore::set_threads (int n)
   m_threads = n;
 }
 
+void DeepShapeStore::add_ref (unsigned int layout, unsigned int layer)
+{
+  tl::MutexLocker locker (&m_lock);
+
+  tl_assert (layout < (unsigned int) m_layouts.size () && m_layouts[layout] != 0);
+
+  m_layouts[layout]->refs += 1;
+  m_layouts[layout]->add_layer_ref (layer);
+}
+
+void DeepShapeStore::remove_ref (unsigned int layout, unsigned int layer)
+{
+  tl::MutexLocker locker (&m_lock);
+
+  tl_assert (layout < (unsigned int) m_layouts.size () && m_layouts[layout] != 0);
+
+  m_layouts[layout]->remove_layer_ref (layer);
+
+  if ((m_layouts[layout]->refs -= 1) <= 0) {
+    delete m_layouts[layout];
+    m_layouts[layout] = 0;
+  }
+}
+
 DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count)
 {
   unsigned int layout_index = 0;
-  unsigned int layer_index = 0;
 
   layout_map_type::iterator l = m_layout_map.find (si);
   if (l == m_layout_map.end ()) {
 
     layout_index = (unsigned int) m_layouts.size ();
 
-    m_layouts.push_back (new db::Layout ());
-    m_layouts.back ().dbu (si.layout ()->dbu ());
-    layer_index = m_layouts.back ().insert_layer ();
-
-    m_builders.push_back (new db::HierarchyBuilder (&m_layouts.back (), layer_index));
+    m_layouts.push_back (new LayoutHolder ());
+    m_layouts.back ()->layout.dbu (si.layout ()->dbu ());
 
     m_layout_map[si] = layout_index;
 
   } else {
 
     layout_index = l->second;
-    layer_index = m_layouts[layout_index].insert_layer ();
-
-    m_builders[layout_index].set_target_layer (layer_index);
 
   }
 
+  unsigned int layer_index = m_layouts[layout_index]->layout.insert_layer ();
+  m_layouts[layout_index]->builder.set_target_layer (layer_index);
+
   //  The chain of operators for producing clipped and reduced polygon references
-  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (& m_layouts[layout_index]);
+  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (& m_layouts[layout_index]->layout);
   db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count);
   db::ClippingHierarchyBuilderShapeReceiver clip (&red);
 
@@ -181,12 +276,12 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
 
     tl::SelfTimer timer (tl::to_string (tr ("Building working hierarchy")));
 
-    m_builders[layout_index].set_shape_receiver (&clip);
-    db::RecursiveShapeIterator (si).push (& m_builders[layout_index]);
-    m_builders[layout_index].set_shape_receiver (0);
+    m_layouts[layout_index]->builder.set_shape_receiver (&clip);
+    db::RecursiveShapeIterator (si).push (& m_layouts[layout_index]->builder);
+    m_layouts[layout_index]->builder.set_shape_receiver (0);
 
   } catch (...) {
-    m_builders[layout_index].set_shape_receiver (0);
+    m_layouts[layout_index]->builder.set_shape_receiver (0);
     throw;
   }
 
@@ -204,7 +299,7 @@ DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db
 
   db::cell_index_type source_top = *source_layout->begin_top_down();
 
-  db::HierarchyBuilder &original_builder = m_builders [deep_layer.layout_index ()];
+  db::HierarchyBuilder &original_builder = m_layouts [deep_layer.layout_index ()]->builder;
 
   //  derive a cell mapping for source to target. We employ a
 

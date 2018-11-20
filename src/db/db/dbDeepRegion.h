@@ -72,6 +72,7 @@ public:
 
   virtual RegionDelegate *and_with (const Region &other) const;
   virtual RegionDelegate *not_with (const Region &other) const;
+  virtual RegionDelegate *xor_with (const Region &other) const;
 
   virtual RegionDelegate *add_in_place (const Region &other);
   virtual RegionDelegate *add (const Region &other) const;
@@ -103,6 +104,7 @@ private:
   void init ();
   void ensure_merged_polygons_valid () const;
   DeepLayer and_or_not_with(const DeepRegion *other, bool and_op) const;
+  void add_from (const DeepLayer &dl);
 };
 
 }

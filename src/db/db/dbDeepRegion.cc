@@ -325,7 +325,7 @@ DeepRegion::not_with (const Region &other) const
     //  Nothing to do
     return new EmptyRegion ();
 
-  } else if (other.empty () && ! strict_handling ()) {
+  } else if (other.empty ()) {
 
     //  Nothing to do
     return clone ();
@@ -357,6 +357,73 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
 }
 
 RegionDelegate *
+DeepRegion::xor_with (const Region &other) const
+{
+  const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
+
+  if (empty ()) {
+
+    //  Nothing to do
+    return other.delegate ()->clone ();
+
+  } else if (other.empty ()) {
+
+    //  Nothing to do
+    return clone ();
+
+  } else if (! other_deep) {
+
+    return AsIfFlatRegion::xor_with (other);
+
+  } else {
+
+    //  Implement XOR as (A-B)+(B-A) - only this implementation
+    //  is compatible with the local processor scheme
+    DeepLayer n1 (and_or_not_with (other_deep, false));
+    DeepLayer n2 (other_deep->and_or_not_with (this, false));
+
+    std::auto_ptr<DeepRegion> r (new DeepRegion (n1));
+    r->add_from (n2);
+    return r.release ();
+
+  }
+}
+
+void
+DeepRegion::add_from (const DeepLayer &dl)
+{
+  if (dl.layout () == deep_layer ().layout ()) {
+
+    //  intra-layout merge
+
+    deep_layer ().layout ()->copy_layer (dl.layer (), deep_layer ().layer ());
+
+  } else {
+
+    //  inter-layout merge
+
+    db::cell_index_type into_cell = deep_layer ().initial_cell ()->cell_index ();
+    db::Layout *into_layout = deep_layer ().layout ();
+    db::cell_index_type source_cell = dl.initial_cell ()->cell_index ();
+    const db::Layout *source_layout = dl.layout ();
+
+    db::CellMapping cm;
+    cm.create_from_geometry_full (*into_layout, into_cell, *source_layout, source_cell);
+
+    //  Actually copy the shapes
+
+    std::map<unsigned int, unsigned int> lm;
+    lm.insert (std::make_pair (dl.layer (), deep_layer ().layer ()));
+
+    std::vector <db::cell_index_type> source_cells;
+    source_cells.push_back (source_cell);
+    db::copy_shapes (*into_layout, *source_layout, db::ICplxTrans (), source_cells, cm.table (), lm);
+
+  }
+}
+
+
+RegionDelegate *
 DeepRegion::add_in_place (const Region &other)
 {
   if (other.empty ()) {
@@ -366,34 +433,7 @@ DeepRegion::add_in_place (const Region &other)
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
   if (other_deep) {
 
-    if (other_deep->deep_layer ().layout () == deep_layer ().layout ()) {
-
-      //  intra-layout merge
-
-      deep_layer ().layout ()->copy_layer (other_deep->deep_layer ().layer (), deep_layer ().layer ());
-
-    } else {
-
-      //  inter-layout merge
-
-      db::cell_index_type into_cell = deep_layer ().initial_cell ()->cell_index ();
-      db::Layout *into_layout = deep_layer ().layout ();
-      db::cell_index_type source_cell = other_deep->deep_layer ().initial_cell ()->cell_index ();
-      const db::Layout *source_layout = other_deep->deep_layer ().layout ();
-
-      db::CellMapping cm;
-      cm.create_from_geometry_full (*into_layout, into_cell, *source_layout, source_cell);
-
-      //  Actually copy the shapes
-
-      std::map<unsigned int, unsigned int> lm;
-      lm.insert (std::make_pair (other_deep->deep_layer ().layer (), deep_layer ().layer ()));
-
-      std::vector <db::cell_index_type> source_cells;
-      source_cells.push_back (source_cell);
-      db::copy_shapes (*into_layout, *source_layout, db::ICplxTrans (), source_cells, cm.table (), lm);
-
-    }
+    add_from (other_deep->deep_layer ());
 
   } else {
 

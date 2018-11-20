@@ -241,3 +241,50 @@ TEST(4_Add)
     db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au4b.gds");
   }
 }
+
+TEST(5_BoolXOR)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/deep_region_l1.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));
+  unsigned int l42 = ly.get_layer (db::LayerProperties (42, 0));
+
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+  db::Region r42 (db::RecursiveShapeIterator (ly, top_cell, l42), dss);
+  db::Region box (db::Box (2000, -1000, 6000, 4000));
+
+  db::Region r2xor3   = r2 ^ r3;
+  db::Region r2xorbox = r2 ^ box;
+  db::Region r2xor42  = r2 ^ r42;
+  db::Region rboxxor3 = box ^ r3;
+  db::Region r42xor3  = r42 ^ r3;
+  db::Region r42xor42 = r42 ^ r42;
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r2xor3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2xorbox);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2xor42);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), rboxxor3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r42xor3);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r42xor42);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testsrc () + "/testdata/algo/deep_region_au5.gds");
+}
+

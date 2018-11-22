@@ -114,7 +114,7 @@ class DB_PUBLIC BoolAndOrNotLocalOperation
   : public LocalOperation
 {
 public:
-  BoolAndOrNotLocalOperation (bool is_and);
+  BoolAndOrNotLocalOperation (bool is_and, double max_area_ratio = 0.0, size_t max_vertex_count = 0);
 
   virtual void compute_local (db::Layout *layout, const ShapeInteractions &interactions, std::unordered_set<db::PolygonRef> &result) const;
   virtual on_empty_intruder_mode on_empty_intruder_hint () const;
@@ -122,6 +122,8 @@ public:
 
 private:
   bool m_is_and;
+  double m_max_area_ratio;
+  size_t m_max_vertex_count;
 };
 
 /**

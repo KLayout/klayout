@@ -101,14 +101,14 @@ public:
   template <class Trans>
   Ref operator() (const Ref &ref, const Trans &tr) const
   {
-    shape_type sh = ref.obj ().transformed (Trans (ref_trans_type (tr).inverted ()) * tr);
+    shape_type sh = ref.obj ().transformed (tr * Trans (ref.trans ()));
     ref_trans_type red_trans;
     sh.reduce (red_trans);
 
-    typename std::unordered_map<shape_type, std::pair<const shape_type *, ref_trans_type> >::const_iterator m = m_cache_by_shape.find (sh);
+    typename std::unordered_map<shape_type, const shape_type *>::const_iterator m = m_cache_by_shape.find (sh);
     if (m != m_cache_by_shape.end ()) {
 
-      return Ref (m->second.first, ref_trans_type (tr * Trans (ref.trans ())) * m->second.second);
+      return Ref (m->second, red_trans);
 
     } else {
 
@@ -118,8 +118,8 @@ public:
         ptr = mp_layout->shape_repository ().repository (typename shape_type::tag ()).insert (sh);
       }
 
-      m_cache_by_shape[sh] = std::make_pair (ptr, red_trans);
-      return Ref (ptr, ref_trans_type (tr * Trans (ref.trans ())) * red_trans);
+      m_cache_by_shape[sh] = ptr;
+      return Ref (ptr, red_trans);
 
     }
   }
@@ -127,7 +127,7 @@ public:
 private:
   db::Layout *mp_layout;
   mutable std::unordered_map<const shape_type *, const shape_type *> m_cache;
-  mutable std::unordered_map<shape_type, std::pair<const shape_type *, ref_trans_type> > m_cache_by_shape;
+  mutable std::unordered_map<shape_type, const shape_type *> m_cache_by_shape;
 };
 
 template <class Ref, class Trans>
@@ -494,9 +494,9 @@ private:
   unsigned int m_intruder_layer;
   db::Coord m_dist;
   ShapeInteractions *mp_result;
-  std::unordered_map<std::pair<unsigned int, const db::PolygonRef *>, unsigned int> m_inst_shape_ids;
+  std::unordered_map<db::PolygonRef, unsigned int> m_inst_shape_ids;
 
-  void add_shapes_from_intruder_inst (unsigned int id1, const db::Cell &intruder_cell, const db::ICplxTrans &tn, unsigned int inst_id, const db::Box &region)
+  void add_shapes_from_intruder_inst (unsigned int id1, const db::Cell &intruder_cell, const db::ICplxTrans &tn, unsigned int /*inst_id*/, const db::Box &region)
   {
     db::shape_reference_translator<db::PolygonRef> rt (mp_subject_layout);
 
@@ -507,18 +507,17 @@ private:
     si.shape_flags (polygon_ref_flags ());
     while (! si.at_end ()) {
 
-      const db::PolygonRef *ref2 = si.shape ().basic_ptr (db::PolygonRef::tag ());
+      //  NOTE: we intentionally rewrite to the *subject* layout - this way polygon refs in the context come from the
+      //  subject, not from the intruder.
+      db::PolygonRef ref2 = rt (*si.shape ().basic_ptr (db::PolygonRef::tag ()), tn * si.trans ());
 
       //  reuse the same id for shapes from the same instance -> this avoid duplicates with different IDs on
       //  the intruder side.
-      std::unordered_map<std::pair<unsigned int, const db::PolygonRef *>, unsigned int>::const_iterator k = m_inst_shape_ids.find (std::make_pair (inst_id, ref2));
+      std::unordered_map<db::PolygonRef, unsigned int>::const_iterator k = m_inst_shape_ids.find (ref2);
       if (k == m_inst_shape_ids.end ()) {
 
-        k = m_inst_shape_ids.insert (std::make_pair (std::make_pair (inst_id, ref2), mp_result->next_id ())).first;
-
-        //  NOTE: we intentionally rewrite to the *subject* layout - this way polygon refs in the context come from the
-        //  subject, not from the intruder.
-        mp_result->add_shape (k->second, rt (*ref2, tn * si.trans ()));
+        k = m_inst_shape_ids.insert (std::make_pair (ref2, mp_result->next_id ())).first;
+        mp_result->add_shape (k->second, ref2);
 
       }
 
@@ -887,6 +886,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
       }
     }
 
+//  @@@ can we shortcut this if interactions is empty?
     {
       db::box_scanner2<db::CellInstArray, int, db::CellInstArray, int> scanner;
       InteractionRegistrationInst2Inst rec (mp_subject_layout, contexts.subject_layer (), mp_intruder_layout, contexts.intruder_layer (), dist, &interactions);
@@ -935,6 +935,7 @@ void LocalProcessor::compute_contexts (LocalProcessorContexts &contexts,
       scanner.process (rec, dist, inst_bcs, inst_bci);
     }
 
+//  @@@ can we shortcut this if interactions is empty?
     {
       db::box_scanner2<db::CellInstArray, int, db::PolygonRef, int> scanner;
       InteractionRegistrationInst2Shape rec (mp_subject_layout, contexts.subject_layer (), dist, &interactions);
@@ -1136,6 +1137,7 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
         scanner.insert (ref, id++);
       }
 
+//  @@@ TODO: can we confine this search to the subject's (sized) bounding box?
       for (std::unordered_set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
         scanner.insert (i.operator-> (), interactions.next_id ());
       }
@@ -1153,11 +1155,13 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
         scanner.insert1 (ref, id++);
       }
 
+//  @@@ TODO: can we confine this search to the subject's (sized) bounding box?
       for (std::unordered_set<db::PolygonRef>::const_iterator i = intruders.second.begin (); i != intruders.second.end (); ++i) {
         scanner.insert2 (i.operator-> (), interactions.next_id ());
       }
 
       if (intruder_shapes) {
+//  @@@ TODO: can we confine this search to the subject's (sized) bounding box?
         for (db::Shapes::shape_iterator i = intruder_shapes->begin (polygon_ref_flags ()); !i.at_end (); ++i) {
           scanner.insert2 (i->basic_ptr (db::PolygonRef::tag ()), interactions.next_id ());
         }
@@ -1188,6 +1192,7 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
       //  interactions low in the hierarchy.
 
     } else if (intruder_cell) {
+//  @@@ TODO: can we confine this search to the subject's (sized) bounding box?
       for (db::Cell::const_iterator i = intruder_cell->begin (); !i.at_end (); ++i) {
         if (! inst_bci (i->cell_inst ()).empty ()) {
           scanner.insert2 (&i->cell_inst (), ++inst_id);
@@ -1195,6 +1200,7 @@ LocalProcessor::compute_local_cell (const LocalProcessorContexts &contexts, db::
       }
     }
 
+//  @@@ TODO: can we confine this search to the subject's (sized) bounding box?
     for (std::unordered_set<db::CellInstArray>::const_iterator i = intruders.first.begin (); i != intruders.first.end (); ++i) {
       if (! inst_bci (*i).empty ()) {
         scanner.insert2 (i.operator-> (), ++inst_id);

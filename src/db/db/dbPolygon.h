@@ -1662,7 +1662,7 @@ public:
   }
 
   /**
-   *  @brief Return the number of points in the polygon
+   *  @brief Returns the number of points in the polygon
    */
   size_t vertices () const
   {
@@ -1671,6 +1671,18 @@ public:
       n += h->size ();
     }
     return n;
+  }
+
+  /**
+   *  @brief Returns the area ratio between the polygon's bounding box and actual area
+   *
+   *  This number is a measure how well the polygon is approximated by the bounding box.
+   *  Values are bigger than 1 for well-formed polygons. Bigger values mean worse
+   *  approximation.
+   */
+  double area_ratio () const
+  {
+    return double (box ().area ()) / double (area ());
   }
 
   /**
@@ -2954,6 +2966,18 @@ public:
   size_t vertices () const
   {
     return m_hull.size ();
+  }
+
+  /**
+   *  @brief Returns the area ratio between the polygon's bounding box and actual area
+   *
+   *  This number is a measure how well the polygon is approximated by the bounding box.
+   *  Values are bigger than 1 for well-formed polygons. Bigger values mean worse
+   *  approximation.
+   */
+  double area_ratio () const
+  {
+    return double (box ().area ()) / double (area ());
   }
 
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self = false, void *parent = 0) const

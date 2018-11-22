@@ -1061,3 +1061,12 @@ TEST(BasicSelfOverlapWithSize10)
   run_test_bool_with_size (_this, "hlp10.oas", TMSelfOverlap, 150, 111);
 }
 
+TEST(TopWithBelow1)
+{
+  run_test_bool (_this, "hlp12.oas", TMNot, 100);
+}
+
+TEST(TopWithBelow2)
+{
+  run_test_bool (_this, "hlp12.oas", TMNotSwapped, 101);
+}

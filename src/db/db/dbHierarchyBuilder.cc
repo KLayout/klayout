@@ -474,20 +474,10 @@ ReducingHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, const db:
   reduce (shape, region, complex_region, target);
 }
 
-static double area_ratio (const db::Polygon &poly)
-{
-  return double (poly.box ().area ()) / double (poly.area ());
-}
-
 void
 ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
 {
-  size_t npoints = 0;
-  for (unsigned int c = 0; c < poly.holes () + 1; ++c) {
-    npoints += poly.contour (c).size ();
-  }
-
-  if (npoints > m_max_vertex_count || area_ratio (poly) > m_area_ratio) {
+  if (poly.vertices () > m_max_vertex_count || poly.area_ratio () > m_area_ratio) {
 
     std::vector <db::Polygon> split_polygons;
     db::split_polygon (poly, split_polygons);

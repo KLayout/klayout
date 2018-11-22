@@ -195,7 +195,7 @@ public:
    *  into parts satisfying the area ratio (bounding box vs. polygon area)
    *  and maximum vertex count constraints.
    */
-  DeepLayer create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio = 3.0, size_t max_vertex_count = 16);
+  DeepLayer create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio = 0.0, size_t max_vertex_count = 0);
 
   /**
    *  @brief Inserts the deep layer's shapes into some target layout
@@ -240,6 +240,40 @@ public:
     return m_threads;
   }
 
+  /**
+   *  @brief Sets the maximum vertex count default value
+   *
+   *  This parameter is used to simplify complex polygons. It is used by
+   *  create_polygon_layer with the default parameters. It's also used by
+   *  boolean operations when they deliver their output.
+   */
+  void set_max_vertex_count (size_t n);
+
+  /**
+   *  @brief Gets the maximum vertex count
+   */
+  size_t max_vertex_count () const
+  {
+    return m_max_vertex_count;
+  }
+
+  /**
+   *  @brief Sets the max. area ratio for bounding box vs. polygon area
+   *
+   *  This parameter is used to simplify complex polygons. It is used by
+   *  create_polygon_layer with the default parameters. It's also used by
+   *  boolean operations when they deliver their output.
+   */
+  void set_max_area_ratio (double ar);
+
+  /**
+   *  @brief Gets the max. area ratio
+   */
+  double max_area_ratio () const
+  {
+    return m_max_area_ratio;
+  }
+
 private:
   friend class DeepLayer;
 
@@ -259,6 +293,8 @@ private:
   std::vector<LayoutHolder *> m_layouts;
   layout_map_type m_layout_map;
   int m_threads;
+  double m_max_area_ratio;
+  size_t m_max_vertex_count;
   tl::Mutex m_lock;
 
   struct DeliveryMappingCacheKey

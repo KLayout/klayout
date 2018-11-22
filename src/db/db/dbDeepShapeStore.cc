@@ -177,7 +177,7 @@ struct DeepShapeStore::LayoutHolder
 static size_t s_instance_count = 0;
 
 DeepShapeStore::DeepShapeStore ()
-  : m_threads (1)
+  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16)
 {
   ++s_instance_count;
 }
@@ -219,6 +219,16 @@ void DeepShapeStore::set_threads (int n)
   m_threads = n;
 }
 
+void DeepShapeStore::set_max_area_ratio (double ar)
+{
+  m_max_area_ratio = ar;
+}
+
+void DeepShapeStore::set_max_vertex_count (size_t n)
+{
+  m_max_vertex_count = n;
+}
+
 void DeepShapeStore::add_ref (unsigned int layout, unsigned int layer)
 {
   tl::MutexLocker locker (&m_lock);
@@ -245,6 +255,13 @@ void DeepShapeStore::remove_ref (unsigned int layout, unsigned int layer)
 
 DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count)
 {
+  if (max_area_ratio == 0.0) {
+    max_area_ratio = m_max_area_ratio;
+  }
+  if (max_vertex_count == 0) {
+    max_vertex_count = m_max_vertex_count;
+  }
+
   unsigned int layout_index = 0;
 
   layout_map_type::iterator l = m_layout_map.find (si);

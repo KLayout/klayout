@@ -110,25 +110,82 @@ EdgesToContours::contour (size_t i) const
   }
 }
 
+namespace {
+
+template <class C>
+class point_matcher
+{
+public:
+
+  point_matcher () : m_vp_min (0.0), m_d_min (0.0), m_any (false), m_any_coincident (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief A search criterion for fitting next edges for a point (with attached edge)
+   *  This search will select the edge whose starting point is closest to the
+   *  end point of the reference edge and - if both points are coincident - forms
+   *  the smallest angle with the reference edge.
+   */
+  bool more (const db::point<C> &p, const db::edge<C> &e, const db::edge<C> &other, bool swapped)
+  {
+    typedef db::coord_traits<C> coord_traits;
+
+    double d = p.double_distance (swapped ? other.p2 () : other.p1 ());
+    bool coincident = d < coord_traits::prec ();
+
+    if (coincident) {
+
+      double vp = db::vprod (other.d (), e.d ()) * (1.0 / other.d ().double_length ());
+      if (! m_any_coincident || vp < m_vp_min) {
+        m_any_coincident = true;
+        m_vp_min = vp;
+        m_d_min = 0.0;
+        return true;
+      } else {
+        return false;
+      }
+
+    } else if (! m_any_coincident) {
+
+      if (! m_any || d < m_d_min) {
+        m_any = true;
+        m_d_min = d;
+        return true;
+      } else {
+        return false;
+      }
+
+    } else {
+      return false;
+    }
+
+  }
+
+private:
+  double m_vp_min;
+  double m_d_min;
+  bool m_any, m_any_coincident;
+};
+
+}
+
 template <class Iter, class C> static
 EdgeRef<Iter> *search_follower (const db::point<C> &p, const EdgeRef<Iter> *e, C distance, const db::box_tree<db::box<C>, EdgeRef<Iter> *, EdgeRefToBox<Iter, false> > &t1, const db::box_tree<db::box<C>, EdgeRef<Iter> *, EdgeRefToBox<Iter, true> > &t2)
 {
   typedef db::box<C> box_type;
 
-  double vp_min = 0.0;
   EdgeRef<Iter> *cand = 0;
   bool fwd = true;
+  point_matcher<C> pm;
 
   //  try in forward tree
 
   typename db::box_tree<box_type, EdgeRef<Iter> *, EdgeRefToBox<Iter, false> >::touching_iterator f = t1.begin_touching (box_type (p, p), EdgeRefToBox <Iter, false> (distance));
   while (! f.at_end ()) {
-    if (*f != e && ! (*f)->connected && (*f)->swapped != 1) {
-      double vp = db::vprod ((*f)->iter->d (), e->iter->d ()) * (1.0 / (*f)->iter->d ().double_length ());
-      if (! cand || vp < vp_min) {
-        vp_min = vp;
-        cand = *f;
-      }
+    if (*f != e && ! (*f)->connected && (*f)->swapped != 1 && pm.more (p, *e->iter, *(*f)->iter, false)) {
+      cand = *f;
     }
     ++f;
   }
@@ -136,13 +193,9 @@ EdgeRef<Iter> *search_follower (const db::point<C> &p, const EdgeRef<Iter> *e, C
   if (! t2.empty ()) {
     typename db::box_tree<box_type, EdgeRef<Iter> *, EdgeRefToBox<Iter, true> >::touching_iterator f = t2.begin_touching (box_type (p, p), EdgeRefToBox <Iter, true> (distance));
     while (! f.at_end ()) {
-      if (*f != e && ! (*f)->connected && (*f)->swapped != -1) {
-        double vp = db::vprod ((*f)->iter->d (), e->iter->d ()) * (1.0 / (*f)->iter->d ().double_length ());
-        if (! cand || vp < vp_min) {
-          vp_min = vp;
-          cand = *f;
-          fwd = false;
-        }
+      if (*f != e && ! (*f)->connected && (*f)->swapped != -1 && pm.more (p, *e->iter, *(*f)->iter, true)) {
+        cand = *f;
+        fwd = false;
       }
       ++f;
     }

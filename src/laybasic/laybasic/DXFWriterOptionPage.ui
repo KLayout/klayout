@@ -73,6 +73,11 @@
           <string>Write HATCH entity</string>
          </property>
         </item>
+        <item>
+         <property name="text" >
+          <string>Write LINE entity</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>

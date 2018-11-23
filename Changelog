@@ -1,5 +1,7 @@
-0.25.6          (2018-11-20):
+0.25.6          (2018-11-22):
 
+* Bugfix: https://github.com/klayoutmatthias/klayout/issues/198
+       Stitching of DXF contours wasn't taking nearest neighbours
 * Bugfix: https://github.com/klayoutmatthias/klayout/issues/191
        MainWindow/PluginRoot classes got mixed up
        As a side effect of this fix, layout views can now

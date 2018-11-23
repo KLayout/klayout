@@ -975,18 +975,22 @@ private:
 
       value_type *new_start = (value_type *) (new char [sizeof (value_type) * n]);
 
-      size_type l = last ();
-      size_type i = first ();
-      memcpy ((void *)(new_start + i), (void *)(mp_start + i), (l - i) * sizeof (Value));
+      size_type e = 0;
 
-      size_type e = size_type (mp_finish - mp_start);
+      if (mp_start) {
+
+        e = size_type (mp_finish - mp_start);
+
+        size_type l = last ();
+        size_type i = first ();
+        memcpy ((void *)(new_start + i), (void *)(mp_start + i), (l - i) * sizeof (Value));
+
+        delete [] ((char *) mp_start);
+
+      }
 
       if (mp_rdata) {
         mp_rdata->reserve (n);
-      }
-
-      if (mp_start) {
-        delete [] ((char *) mp_start);
       }
 
       mp_start = new_start;

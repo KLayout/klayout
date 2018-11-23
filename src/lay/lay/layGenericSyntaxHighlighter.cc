@@ -32,7 +32,7 @@
 
 #include <QDomDocument>
 
-// #define DEBUG_HIGHLIGHTER 
+// #define DEBUG_HIGHLIGHTER
 
 /**
  *  @brief Provide a compare operator for QList<QString> because Qt doesn't
@@ -907,20 +907,31 @@ GenericSyntaxHighlighterAttributes::GenericSyntaxHighlighterAttributes (const Ge
   : mp_basic_attributes (basic_attributes)
 {
   if (! basic_attributes) {
-    add (QString::fromUtf8 ("Normal"),          dsNormal,       false, false, false, false, 0,         0,         0,         0);
-    add (QString::fromUtf8 ("Alert"),           dsAlert,        true,  false, false, false, "#BF0303", "#9C0D0D", "#F7E7E7", 0);
-    add (QString::fromUtf8 ("Base-N Integer"),  dsBaseN,        false, false, false, false, "#B07E00", "#FFDD00", 0,         0);
-    add (QString::fromUtf8 ("Character"),       dsChar,         false, false, false, false, "#FF80E0", "#FF80E0", 0,         0);
-    add (QString::fromUtf8 ("Comment"),         dsComment,      false, true,  false, false, "#888786", "#A6C2E4", 0,         0);
-    add (QString::fromUtf8 ("Data Type"),       dsDataType,     false, false, false, false, "#0057AE", "#00316E", 0,         0);
-    add (QString::fromUtf8 ("Decimal/Value"),   dsDecVal,       false, false, false, false, "#B07E00", "#FFDD00", 0,         0);
-    add (QString::fromUtf8 ("Error"),           dsError,        false, false, true,  false, "#BF0303", "#9C0D0D", 0,         0);
-    add (QString::fromUtf8 ("Floating Point"),  dsFloat,        false, false, false, false, "#B07E00", "#FFDD00", 0,         0);
-    add (QString::fromUtf8 ("Function"),        dsFunction,     false, false, false, false, "#442886", "#442886", 0,         0);
-    add (QString::fromUtf8 ("Keyword"),         dsKeyword,      true,  false, false, false, 0,         0,         0,         0);
-    add (QString::fromUtf8 ("Others"),          dsOthers,       false, false, false, false, "#006E26", "#80FF80", 0,         0);
-    add (QString::fromUtf8 ("Region Marker"),   dsRegionMarker, false, false, false, false, "#0057AE", "#00316E", "#E1EAF8", 0);
-    add (QString::fromUtf8 ("String"),          dsString,       false, false, false, false, "#BF0303", "#9C0D0D", 0,         0);
+    add (QString::fromUtf8 ("Normal"),            dsNormal,         false, false, false, false, 0,         0,         0,         0);
+    add (QString::fromUtf8 ("Alert"),             dsAlert,          true,  false, false, false, "#BF0303", "#9C0D0D", "#F7E7E7", 0);
+    add (QString::fromUtf8 ("Base-N Integer"),    dsBaseN,          false, false, false, false, "#B07E00", "#FFDD00", 0,         0);
+    add (QString::fromUtf8 ("Character"),         dsChar,           false, false, false, false, "#FF80E0", "#FF80E0", 0,         0);
+    add (QString::fromUtf8 ("Comment"),           dsComment,        false, true,  false, false, "#888786", "#A6C2E4", 0,         0);
+    add (QString::fromUtf8 ("Data Type"),         dsDataType,       false, false, false, false, "#0057AE", "#00316E", 0,         0);
+    add (QString::fromUtf8 ("Decimal/Value"),     dsDecVal,         false, false, false, false, "#B07E00", "#FFDD00", 0,         0);
+    add (QString::fromUtf8 ("Error"),             dsError,          false, false, true,  false, "#BF0303", "#9C0D0D", 0,         0);
+    add (QString::fromUtf8 ("Floating Point"),    dsFloat,          false, false, false, false, "#B07E00", "#FFDD00", 0,         0);
+    add (QString::fromUtf8 ("Function"),          dsFunction,       false, false, false, false, "#442886", "#442886", 0,         0);
+    add (QString::fromUtf8 ("Keyword"),           dsKeyword,        true,  false, false, false, 0,         0,         0,         0);
+    add (QString::fromUtf8 ("Others"),            dsOthers,         false, false, false, false, "#006E26", "#80FF80", 0,         0);
+    add (QString::fromUtf8 ("Region Marker"),     dsRegionMarker,   false, false, false, false, "#0057AE", "#00316E", "#E1EAF8", 0);
+    add (QString::fromUtf8 ("String"),            dsString,         false, false, false, false, "#BF0303", "#9C0D0D", 0,         0);
+    add (QString::fromUtf8 ("Operator"),          dsOperator,       false, false, false, false, "#1F1C1B", 0,         0,         0);
+    add (QString::fromUtf8 ("Control Flow"),      dsControlFlow,    true,  false, false, false, "#1F1C1B", 0,         0,         0);
+    add (QString::fromUtf8 ("Built-in"),          dsBuiltIn,        true,  false, false, false, "#644A9B", "#452886", 0,         0);
+    add (QString::fromUtf8 ("Variable"),          dsVariable,       false, false, false, false, "#0057AE", "#00316e", 0,         0);
+    add (QString::fromUtf8 ("Extension"),         dsExtension,      false, false, false, false, "#0095FF", 0,         0,         0);
+    add (QString::fromUtf8 ("Preprocessor"),      dsPreprocessor,   false, false, false, false, "#006E28", "#006e28", 0,         0);
+    add (QString::fromUtf8 ("Import"),            dsImport,         false, false, false, false, "#FF5500", "#FF5500", 0,         0);
+    add (QString::fromUtf8 ("Verbatim String"),   dsVerbatimString, false, false, false, false, "#BF0303", "#9C0E0E", 0,         0);
+    add (QString::fromUtf8 ("Special String"),    dsSpecialString,  false, false, false, false, "#FF5500", "#FF5500", 0,         0);
+    add (QString::fromUtf8 ("Special Character"), dsSpecialChar,    false, false, false, false, "#3DAEE9", "#FCFCFC", 0,         0);
+    add (QString::fromUtf8 ("Attribute"),         dsAttribute,      false, false, false, false, "#0057AE", "#00316E", 0,         0);
   }
 }
 
@@ -1416,7 +1427,7 @@ parse_rule (QDomElement e, GenericSyntaxHighlighterContexts &contexts, std::map<
 }
 
 static GenericSyntaxHighlighterContext 
-parse_context (QDomElement e, GenericSyntaxHighlighterContexts &contexts, std::map<QString, GenericSyntaxHighlighterRuleStringList> &lists, GenericSyntaxHighlighterAttributes &attributes)
+parse_context (QDomElement e, const std::map<QString, QDomElement> &contexts_by_name, GenericSyntaxHighlighterContexts &contexts, std::map<QString, GenericSyntaxHighlighterRuleStringList> &lists, GenericSyntaxHighlighterAttributes &attributes)
 {
   GenericSyntaxHighlighterContext context;
 
@@ -1424,7 +1435,11 @@ parse_context (QDomElement e, GenericSyntaxHighlighterContexts &contexts, std::m
     if (n.isElement()) {
       QDomElement ee = n.toElement();
       if (ee.tagName () == QString::fromUtf8 ("IncludeRules")) {
-        context.include (contexts.context (ee.attributeNode (QString::fromUtf8 ("context")).value ()));
+        QString included_name = ee.attributeNode (QString::fromUtf8 ("context")).value ();
+        std::map<QString, QDomElement>::const_iterator c2n = contexts_by_name.find (included_name);
+        if (c2n != contexts_by_name.end ()) {
+          context.include (parse_context (c2n->second, contexts_by_name, contexts, lists, attributes));
+        }
       } else {
         context.add_rule (parse_rule (ee, contexts, lists, attributes));
       }
@@ -1498,6 +1513,18 @@ parse_item_data (QDomElement e, GenericSyntaxHighlighterAttributes &attributes)
     else if (s == QString::fromUtf8 ("dsOthers")) { ds = dsOthers; }
     else if (s == QString::fromUtf8 ("dsRegionMarker")) { ds = dsRegionMarker; }
     else if (s == QString::fromUtf8 ("dsString")) { ds = dsString; }
+    else if (s == QString::fromUtf8 ("dsOperator")) { ds = dsOperator; }
+    else if (s == QString::fromUtf8 ("dsControlFlow")) { ds = dsControlFlow; }
+    else if (s == QString::fromUtf8 ("dsBuiltIn")) { ds = dsBuiltIn; }
+    else if (s == QString::fromUtf8 ("dsVariable")) { ds = dsVariable; }
+    else if (s == QString::fromUtf8 ("dsExtension")) { ds = dsExtension; }
+    else if (s == QString::fromUtf8 ("dsPreprocessor")) { ds = dsPreprocessor; }
+    else if (s == QString::fromUtf8 ("dsImport")) { ds = dsImport; }
+    else if (s == QString::fromUtf8 ("dsVerbatimString")) { ds = dsVerbatimString; }
+    else if (s == QString::fromUtf8 ("dsSpecialString")) { ds = dsSpecialString; }
+    else if (s == QString::fromUtf8 ("dsSpecialString")) { ds = dsSpecialString; }
+    else if (s == QString::fromUtf8 ("dsSpecialChar")) { ds = dsSpecialChar; }
+    else if (s == QString::fromUtf8 ("dsAttribute")) { ds = dsAttribute; }
   }
 
   attributes.set_styles (attribute_id, ds, format);
@@ -1534,12 +1561,26 @@ GenericSyntaxHighlighter::GenericSyntaxHighlighter (QObject *parent, QIODevice &
 
       } else if (e.tagName () == QString::fromUtf8 ("contexts")) {
 
+        //  first analyze the list of contexts and their dependencies
+
+        std::map<QString, QDomElement> contexts_by_name;
+
         for (QDomNode nn = e.firstChild(); !nn.isNull(); nn = nn.nextSibling()) {
           if (nn.isElement()) {
             QDomElement ee = nn.toElement ();
             if (ee.tagName () == QString::fromUtf8 ("context")) {
               QString context_name = ee.attributeNode (QString::fromUtf8 ("name")).value ();
-              m_contexts.insert (context_name, parse_context (ee, m_contexts, m_lists, *mp_attributes));
+              contexts_by_name[context_name] = ee;
+            }
+          }
+        }
+
+        for (QDomNode nn = e.firstChild(); !nn.isNull(); nn = nn.nextSibling()) {
+          if (nn.isElement()) {
+            QDomElement ee = nn.toElement ();
+            if (ee.tagName () == QString::fromUtf8 ("context")) {
+              QString context_name = ee.attributeNode (QString::fromUtf8 ("name")).value ();
+              m_contexts.insert (context_name, parse_context (ee, contexts_by_name, m_contexts, m_lists, *mp_attributes));
             }
           }
         }

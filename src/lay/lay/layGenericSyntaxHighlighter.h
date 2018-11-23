@@ -562,6 +562,17 @@ enum def_style {
   dsOthers,
   dsRegionMarker,
   dsString,
+  dsOperator,
+  dsControlFlow,
+  dsBuiltIn,
+  dsVariable,
+  dsExtension,
+  dsPreprocessor,
+  dsImport,
+  dsVerbatimString,
+  dsSpecialString,
+  dsSpecialChar,
+  dsAttribute,
   dsLast
 };
 

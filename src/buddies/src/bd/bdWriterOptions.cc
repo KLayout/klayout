@@ -242,7 +242,8 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                     "* 0: create POLYLINE (default)\n"
                     "* 1: create LWPOLYLINE\n"
                     "* 2: decompose into SOLID\n"
-                    "* 3: create HATCH"
+                    "* 3: create HATCH\n"
+                    "* 4: create LINE"
                    )
       ;
 

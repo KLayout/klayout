@@ -117,7 +117,7 @@ class point_matcher
 {
 public:
 
-  point_matcher () : m_vp_min (0.0), m_d_min (0.0), m_any (false), m_any_coincident (false)
+  point_matcher () : m_vp_min (0.0), m_d_min (0.0), m_any (false)
   {
     //  .. nothing yet ..
   }
@@ -133,40 +133,40 @@ public:
     typedef db::coord_traits<C> coord_traits;
 
     double d = p.double_distance (swapped ? other.p2 () : other.p1 ());
-    bool coincident = d < coord_traits::prec ();
+    double vp = db::vprod (other.d (), e.d ()) * (1.0 / other.d ().double_length ());
 
-    if (coincident) {
+    if (! m_any) {
+
+      m_vp_min = vp;
+      m_d_min = d;
+      m_any = true;
+      return true;
+
+    } else if (fabs (d - m_d_min) < coord_traits::prec ()) {
 
       double vp = db::vprod (other.d (), e.d ()) * (1.0 / other.d ().double_length ());
-      if (! m_any_coincident || vp < m_vp_min) {
-        m_any_coincident = true;
+      if (vp < m_vp_min) {
         m_vp_min = vp;
-        m_d_min = 0.0;
         return true;
       } else {
         return false;
       }
 
-    } else if (! m_any_coincident) {
+    } else if (d < m_d_min) {
 
-      if (! m_any || d < m_d_min) {
-        m_any = true;
-        m_d_min = d;
-        return true;
-      } else {
-        return false;
-      }
+      m_vp_min = vp;
+      m_d_min = d;
+      return true;
 
     } else {
       return false;
     }
-
   }
 
 private:
   double m_vp_min;
   double m_d_min;
-  bool m_any, m_any_coincident;
+  bool m_any;
 };
 
 }

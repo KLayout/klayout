@@ -507,7 +507,36 @@ DXFWriter::write_polygon (const db::Polygon &polygon, double sf)
       }
     }
 
+  } else if (m_options.polygon_mode == 4) {
+    //--------------------------------------------------------------------------------------
+    // Last modified by: Kazzz-S on October 21, 2018 (newly added)
+    //
+    // Description: When importing a DXF file comprising POLYLINEs or LWPOLYLINEs into 
+    //              Abaqus CAE, they are forcibly converted to points! 
+    //                *** This is a "specification" of Abaqus CAE. ***
+    //              In contrast, LINEs are kept as lines, which will be then assembled into 
+    //              polygonal objects internally if required.
+    //--------------------------------------------------------------------------------------
+    for (unsigned int c = 0; c < polygon.holes () + 1; ++c) {
+
+      for (db::Polygon::polygon_contour_iterator p = polygon.contour (c).begin (); p != polygon.contour (c).end (); ++p) {
+        db::Polygon::polygon_contour_iterator q = p + 1;
+
+        if (q == polygon.contour (c).end ()) {
+          q = polygon.contour (c).begin ();
+        }
+
+        *this << 0 << endl << "LINE" << endl;
+        *this << 8 << endl; emit_layer (m_layer);
+        *this << 66 << endl << 1 << endl;  //  required by TrueView
+        *this << 10 << endl << (*p).x () * sf << endl;
+        *this << 20 << endl << (*p).y () * sf << endl;
+        *this << 11 << endl << (*q).x () * sf << endl;
+        *this << 21 << endl << (*q).y () * sf << endl;
+      }
+    }
   }
+  
 }
 
 void 

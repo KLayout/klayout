@@ -1114,7 +1114,7 @@ ApplicationBase::run ()
     //  Give the plugins a change to do some last-minute initialisation and checks
     for (tl::Registrar<lay::PluginDeclaration>::iterator cls = tl::Registrar<lay::PluginDeclaration>::begin (); cls != tl::Registrar<lay::PluginDeclaration>::end (); ++cls) {
       lay::PluginDeclaration *pd = const_cast<lay::PluginDeclaration *> (&*cls);
-      pd->initialized (mw);
+      pd->initialized (plugin_root ());
     }
 
     if (! m_no_gui && m_gtf_replay.empty () && m_gtf_record.empty ()) {
@@ -1280,6 +1280,7 @@ ApplicationBase::special_app_flag (const std::string &name)
 GuiApplication::GuiApplication (int &argc, char **argv)
   : QApplication (argc, argv), ApplicationBase (false),
     mp_mw (0),
+    mp_plugin_root (0),
     mp_recorder (0)
 {
   //  install a special style proxy to overcome the issue of black-on-black tree expanders
@@ -1300,6 +1301,9 @@ GuiApplication::~GuiApplication ()
   }
 
   shutdown ();
+
+  delete mp_plugin_root;
+  mp_plugin_root = 0;
 }
 
 bool
@@ -1455,15 +1459,18 @@ GuiApplication::start_recording ()
 lay::PluginRoot *
 GuiApplication::plugin_root () const
 {
-  return mp_mw;
+  return mp_plugin_root;
 }
 
 void
 GuiApplication::setup ()
 {
-  tl_assert (mp_mw == 0);
+  tl_assert (mp_mw == 0 && mp_plugin_root == 0);
 
-  mp_mw = new lay::MainWindow (this, "main_window");
+  mp_plugin_root = new lay::PluginRootToMainWindow ();
+  mp_mw = new lay::MainWindow (this, mp_plugin_root, "main_window");
+  mp_plugin_root->attach_to (mp_mw);
+
   QObject::connect (mp_mw, SIGNAL (closed ()), this, SLOT (quit ()));
 
   //  create a password dialog for use with the HTTP streams

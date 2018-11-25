@@ -461,3 +461,26 @@ TEST(31)
   run_test (_this, "t31.dxf.gz", "t31d_au.gds.gz", opt);
 }
 
+//  issue #198
+TEST(32)
+{
+  db::DXFReaderOptions opt;
+  opt.layer_map = string2lm ("L11D0:1,L12D0:2");
+  opt.create_other_layers = false;
+  opt.polyline_mode = 3;
+
+  opt.contour_accuracy = 0.0;
+  run_test_public (_this, "round_path.dxf.gz", "t32a_au.gds.gz", opt);
+
+  opt.contour_accuracy = 0.1;
+  run_test_public (_this, "round_path.dxf.gz", "t32b_au.gds.gz", opt);
+
+  opt.contour_accuracy = 1.0;
+  run_test_public (_this, "round_path.dxf.gz", "t32c_au.gds.gz", opt);
+
+  opt.polyline_mode = 4;
+  run_test_public (_this, "round_path.dxf.gz", "t32d_au.gds.gz", opt);
+
+  opt.polyline_mode = 2;
+  run_test_public (_this, "round_path.dxf.gz", "t32e_au.gds.gz", opt);
+}

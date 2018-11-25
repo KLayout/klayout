@@ -40,9 +40,9 @@ namespace lay
 
 // -------------------------------------------------------------
 
-SettingsForm::SettingsForm (QWidget *parent, lay::MainWindow *mw, const char *name)
+SettingsForm::SettingsForm (QWidget *parent, lay::PluginRoot *plugin_root, const char *name)
   : QDialog (parent), Ui::SettingsForm (),
-    mp_main_window (mw), m_finalize_recursion (false)
+    mp_plugin_root (plugin_root), m_finalize_recursion (false)
 { 
   setObjectName (QString::fromUtf8 (name));
 
@@ -237,7 +237,7 @@ SettingsForm::setup ()
 
   //  setup the custom config pages
   for (std::vector <lay::ConfigPage *>::iterator cp = m_config_pages.begin (); cp != m_config_pages.end (); ++cp) {
-    (*cp)->setup (mp_main_window);
+    (*cp)->setup (mp_plugin_root);
   }
 }
 
@@ -246,14 +246,14 @@ SettingsForm::commit ()
 {
   //  commit the custom config pages
   for (std::vector <lay::ConfigPage *>::iterator cp = m_config_pages.begin (); cp != m_config_pages.end (); ++cp) {
-    (*cp)->commit (mp_main_window);
+    (*cp)->commit (mp_plugin_root);
   }
 
   m_finalize_recursion = true;
   try {
     //  config_end will make the main window call setup on the settings form. 
     //  the recursion sentinel takes care of that.
-    mp_main_window->config_end ();
+    mp_plugin_root->config_end ();
     m_finalize_recursion = false;
   } catch (...) {
     m_finalize_recursion = false;

@@ -305,7 +305,7 @@ Plugin::config_set (const std::string &name, const std::string &value)
     }
   }
 
-  do_config_set (name, value);
+  do_config_set (name, value, false);
 
   //  schedule a configuration finalization call (once for all config_set calls)
   dm_finalize_config ();
@@ -363,6 +363,25 @@ Plugin::get_config_names (std::vector<std::string> &names) const
   }
 }
 
+PluginRoot *
+Plugin::plugin_root ()
+{
+  PluginRoot *pr = plugin_root_maybe_null ();
+  tl_assert (pr != 0);
+  return pr;
+}
+
+PluginRoot *
+Plugin::plugin_root_maybe_null ()
+{
+  Plugin *p = this;
+  while (p->mp_parent) {
+    p = p->mp_parent;
+  }
+
+  return dynamic_cast<PluginRoot *> (p);
+}
+
 void 
 Plugin::do_config_setup (Plugin *target)
 {
@@ -371,7 +390,7 @@ Plugin::do_config_setup (Plugin *target)
   } 
   //  local configurations override the parent's configuration, i.e. are applied after the parents settings
   for (std::map<std::string, std::string>::const_iterator p = m_repository.begin (); p != m_repository.end (); ++p) {
-    target->do_config_set (p->first, p->second);
+    target->do_config_set (p->first, p->second, false);
   }
 }
 
@@ -385,8 +404,14 @@ Plugin::do_config_end ()
 }
 
 bool 
-Plugin::do_config_set (const std::string &name, const std::string &value)
+Plugin::do_config_set (const std::string &name, const std::string &value, bool for_child)
 {
+  if (for_child) {
+    //  this is the case when we impose a configuration from the parent: in this case we
+    //  have to remove it from the repository of local parameters.
+    m_repository.erase (name);
+  }
+
   try {
     if (configure (name, value)) {
       //  taken by us - don't propagate to the children
@@ -398,7 +423,7 @@ Plugin::do_config_set (const std::string &name, const std::string &value)
 
   //  propagate to all children (not only the first that takes it!)
   for (tl::weak_collection<Plugin>::iterator c = m_children.begin (); c != m_children.end (); ++c) {
-    c->do_config_set (name, value);
+    c->do_config_set (name, value, true);
   }
 
   return false;

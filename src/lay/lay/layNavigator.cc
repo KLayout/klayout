@@ -58,7 +58,7 @@ public:
       mp_box (0), 
       m_color (0)
   {
-    // .. nothing yet ..
+    //  .. nothing yet ..
   }
 
   ~NavigatorService ()
@@ -68,6 +68,25 @@ public:
       mp_viewport_marker = 0;
     }
     drag_cancel ();
+  }
+
+  void background_color_changed ()
+  {
+    QColor c = mp_view->background_color ();
+
+    //  replace by "real" background color if required
+    if (! c.isValid ()) {
+      c = mp_view->palette ().color (QPalette::Normal, QPalette::Base);
+    }
+
+    QColor contrast;
+    if (c.green () > 128) {
+      contrast = QColor (0, 0, 0);
+    } else {
+      contrast = QColor (255, 255, 255);
+    }
+
+    set_colors (c, contrast);
   }
 
   bool mouse_release_event (const db::DPoint & /*p*/, unsigned int /*buttons*/, bool /*prio*/) 
@@ -349,10 +368,10 @@ public:
       tl::Object::detach_from_all_events ();
 
       mp_source_view = source_view;
+      mp_source_view->viewport_changed_event.add (this, &NavigatorService::update_marker);
 
-      if (mp_source_view) {
-        mp_source_view->viewport_changed_event.add (this, &NavigatorService::update_marker);
-      }
+      mp_view->background_color_changed_event.add (this, &NavigatorService::background_color_changed);
+      background_color_changed ();
 
       update_marker ();
 
@@ -447,11 +466,8 @@ Navigator::Navigator (MainWindow *main_window)
   mp_menu_bar->setFrameShape (QFrame::NoFrame);
   mp_menu_bar->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-  mp_view = new LayoutView (0, false, mp_main_window, this, "navigator", LayoutView::LV_Naked + LayoutView::LV_NoZoom + LayoutView::LV_NoServices + LayoutView::LV_NoGrid);
-  mp_view->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
-  mp_view->setMinimumWidth (100);
-  mp_view->setMinimumHeight (100);
-  mp_view->hide ();
+  mp_view = 0;
+  mp_service = 0;
 
   mp_placeholder_label = new QLabel (this);
   mp_placeholder_label->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -461,9 +477,8 @@ Navigator::Navigator (MainWindow *main_window)
 
   QVBoxLayout *layout = new QVBoxLayout (this);
   layout->addWidget (mp_menu_bar);
-  layout->addWidget (mp_view);
   layout->addWidget (mp_placeholder_label);
-  layout->setStretchFactor (mp_view, 1);
+  layout->setStretchFactor (mp_placeholder_label, 1);
   layout->setMargin (0);
   layout->setSpacing (0);
   setLayout (layout);
@@ -473,9 +488,6 @@ Navigator::Navigator (MainWindow *main_window)
 
   do_update_menu ();
   connect (mp_main_window->menu (), SIGNAL (changed ()), this, SLOT (menu_changed ()));
-
-  mp_service = new NavigatorService (mp_view);
-  mp_view->view_object_widget ()->activate (mp_service);
 }
 
 Navigator::~Navigator ()
@@ -586,8 +598,8 @@ Navigator::showEvent (QShowEvent *)
 void 
 Navigator::closeEvent (QCloseEvent *)
 {
-  mp_main_window->config_set (cfg_show_navigator, "false");
-  mp_main_window->config_finalize ();
+  lay::PluginRoot::instance ()->config_set (cfg_show_navigator, "false");
+  lay::PluginRoot::instance ()->config_end ();
 }
 
 void 
@@ -638,6 +650,14 @@ Navigator::view_closed (int index)
 }
 
 void
+Navigator::resizeEvent (QResizeEvent *)
+{
+  if (mp_view) {
+    mp_view->setGeometry (mp_placeholder_label->geometry ());
+  }
+}
+
+void
 Navigator::attach_view (LayoutView *view)
 {
   if (view != mp_source_view) {
@@ -649,7 +669,23 @@ Navigator::attach_view (LayoutView *view)
 
     mp_source_view = view;
 
+    delete mp_service;
+    mp_service = 0;
+
+    LayoutView *old_view = mp_view;
+    mp_view = 0;
+
     if (mp_source_view) {
+
+      mp_view = new LayoutView (0, false, mp_source_view, this, "navigator", LayoutView::LV_Naked + LayoutView::LV_NoZoom + LayoutView::LV_NoServices + LayoutView::LV_NoGrid);
+      mp_view->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
+      mp_view->setMinimumWidth (100);
+      mp_view->setMinimumHeight (100);
+      mp_view->setGeometry (mp_placeholder_label->geometry ());
+      mp_view->show ();
+
+      mp_service = new NavigatorService (mp_view);
+      mp_view->view_object_widget ()->activate (mp_service);
 
       mp_source_view->cellviews_changed_event.add (this, &Navigator::content_changed);
       mp_source_view->cellview_changed_event.add (this, &Navigator::content_changed_with_int);
@@ -662,60 +698,36 @@ Navigator::attach_view (LayoutView *view)
         image_plugin->images_changed_event.add (this, &Navigator::content_changed);
       }
 
-      mp_view->show ();
-      mp_placeholder_label->hide ();
+      //  update the list of frozen flags per view
+      std::set <lay::LayoutView *> all_views;
 
-    } else {
-      mp_view->hide ();
-      mp_placeholder_label->show ();
-    }
-
-    //  update the list of frozen flags per view
-    std::set <lay::LayoutView *> all_views;
-
-    for (std::map <lay::LayoutView *, NavigatorFrozenViewInfo>::const_iterator f = m_frozen_list.begin (); f != m_frozen_list.end (); ++f) {
-      all_views.insert (f->first);
-    }
-
-    for (unsigned int i = 0; i < mp_main_window->views (); ++i) {
-      lay::LayoutView *view = mp_main_window->view (i);
-      if (m_frozen_list.find (view) != m_frozen_list.end ()) {
-        all_views.erase (view);
+      for (std::map <lay::LayoutView *, NavigatorFrozenViewInfo>::const_iterator f = m_frozen_list.begin (); f != m_frozen_list.end (); ++f) {
+        all_views.insert (f->first);
       }
+
+      for (unsigned int i = 0; i < mp_main_window->views (); ++i) {
+        lay::LayoutView *view = mp_main_window->view (i);
+        if (m_frozen_list.find (view) != m_frozen_list.end ()) {
+          all_views.erase (view);
+        }
+      }
+
+      for (std::set <lay::LayoutView *>::const_iterator v = all_views.begin (); v != all_views.end (); ++v) {
+        all_views.erase (*v);
+      }
+
+      Action freeze_action = mp_main_window->menu ()->action (freeze_action_path);
+      freeze_action.set_checked (m_frozen_list.find (mp_source_view) != m_frozen_list.end ());
+
+      //  Hint: this must happen before update ()
+      mp_service->attach_view (mp_source_view);
+
+      update ();
+
     }
 
-    for (std::set <lay::LayoutView *>::const_iterator v = all_views.begin (); v != all_views.end (); ++v) {
-      all_views.erase (*v);
-    }
+    delete old_view;
 
-    Action freeze_action = mp_main_window->menu ()->action (freeze_action_path);
-    freeze_action.set_checked (m_frozen_list.find (mp_source_view) != m_frozen_list.end ());
-
-    //  Hint: this must happen before update ()
-    mp_service->attach_view (mp_source_view);
-
-    update ();
-
-  }
-}
-
-void
-Navigator::background_color (QColor c)
-{
-  //  replace by "real" background color if required
-  if (! c.isValid ()) {
-    c = palette ().color (QPalette::Normal, QPalette::Base);
-  }
-
-  QColor contrast;
-  if (c.green () > 128) {
-    contrast = QColor (0, 0, 0);
-  } else {
-    contrast = QColor (255, 255, 255);
-  }
-
-  if (mp_service) {
-    mp_service->set_colors (c, contrast);
   }
 }
 
@@ -738,16 +750,13 @@ Navigator::update_layers ()
 void
 Navigator::update ()
 {
-  if (! mp_source_view || m_frozen_list.find (mp_source_view) == m_frozen_list.end ()) {
+  if (! mp_view || ! mp_source_view) {
+    return;
+  }
 
-    if (! mp_source_view) {
-      mp_view->clear_cellviews ();
-      mp_view->clear_layers ();
-    } else {
-      mp_view->select_cellviews (mp_source_view->cellview_list ());
-      mp_view->set_properties (mp_source_view->get_properties ());
-    }
-
+  if (m_frozen_list.find (mp_source_view) == m_frozen_list.end ()) {
+    mp_view->select_cellviews (mp_source_view->cellview_list ());
+    mp_view->set_properties (mp_source_view->get_properties ());
   } else {
     mp_view->select_cellviews (mp_source_view->cellview_list ());
     mp_view->set_properties (m_frozen_list [mp_source_view].layer_properties);
@@ -759,7 +768,7 @@ Navigator::update ()
     img_target->clear_images ();
 
     if (m_show_images) {
-      img::Service *img_source = (mp_source_view ? mp_source_view->get_plugin<img::Service> () : 0);
+      img::Service *img_source = (mp_source_view->get_plugin<img::Service> ());
       if (img_source) {
         for (img::ImageIterator i = img_source->begin_images (); ! i.at_end (); ++i) {
           img_target->insert_image (*i);

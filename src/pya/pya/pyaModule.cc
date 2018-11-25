@@ -2198,6 +2198,12 @@ PythonModule::take_module ()
 void
 PythonModule::init (const char *mod_name, const char *description)
 {
+  //  create a (standalone) Python interpreter if we don't have one yet
+  //  NOTE: Python itself will take care to remove this instance in this case.
+  if (! pya::PythonInterpreter::instance ()) {
+    new pya::PythonInterpreter (false);
+  }
+
   //  do some checks before we create the module
   tl_assert (mod_name != 0);
   tl_assert (mp_module.get () == 0);

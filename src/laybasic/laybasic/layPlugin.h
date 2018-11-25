@@ -532,7 +532,8 @@ public:
    *
    *  In order to make configuration changes effective, this method
    *  must be called. It calls config_finalize recursively on the 
-   *  children.
+   *  children. In GUI-enabled applications this step is optional
+   *  and is performed automatically through a timer.
    */
   void config_end ();
 
@@ -631,6 +632,19 @@ public:
    *  @brief Get the names of all configuration options available
    */
   void get_config_names (std::vector<std::string> &names) const;
+
+  /**
+   *  @brief Gets the plugin root (the parent plugin not having another parent)
+   *  The returned pointer is guaranteed to be non-zero.
+   */
+  PluginRoot *plugin_root ();
+
+  /**
+   *  @brief Gets the plugin root (the parent plugin not having another parent)
+   *  This version may return null, if the plugin is instantiated without a
+   *  root.
+   */
+  PluginRoot *plugin_root_maybe_null ();
 
   /**
    *  @brief Menu command handler
@@ -761,7 +775,7 @@ private:
   /**
    *  @brief Do the actual set or pass to the children if not taken 
    */
-  bool do_config_set (const std::string &name, const std::string &value);
+  bool do_config_set (const std::string &name, const std::string &value, bool for_child);
 
   /**
    *  @brief Recursively call config_finalize

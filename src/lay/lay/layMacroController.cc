@@ -164,9 +164,9 @@ MacroController::initialized (lay::PluginRoot *root)
   connect (&m_temp_macros, SIGNAL (menu_needs_update ()), this, SLOT (macro_collection_changed ()));
   connect (&m_temp_macros, SIGNAL (macro_collection_changed (lym::MacroCollection *)), this, SLOT (macro_collection_changed ()));
 
-  mp_mw = dynamic_cast <lay::MainWindow *> (root);
+  mp_mw = lay::MainWindow::instance ();
   if (mp_mw) {
-    mp_macro_editor = new lay::MacroEditorDialog (mp_mw, &lym::MacroCollection::root ());
+    mp_macro_editor = new lay::MacroEditorDialog (root, &lym::MacroCollection::root ());
     mp_macro_editor->setModal (false);
   }
 

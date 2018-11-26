@@ -71,7 +71,7 @@ TEST(2_WithoutClip)
   }
 
   db::Layout target;
-  db::HierarchyBuilder builder (&target, false);
+  db::HierarchyBuilder builder (&target);
 
   db::cell_index_type target_top = target.add_cell ("CLIP_TOP");
 

@@ -40,7 +40,7 @@ TEST(1)
   }
 
   db::Layout target;
-  db::HierarchyBuilder builder (&target, false);
+  db::HierarchyBuilder builder (&target);
 
   for (db::Layout::layer_iterator li = ly.begin_layers (); li != ly.end_layers (); ++li) {
 

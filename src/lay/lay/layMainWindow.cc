@@ -5647,6 +5647,14 @@ PluginRootToMainWindow::select_mode (int mode)
   }
 }
 
+void
+PluginRootToMainWindow::menu_activated (const std::string &symbol)
+{
+  if (mp_main_window.get ()) {
+    mp_main_window->menu_activated (symbol);
+  }
+}
+
 // ------------------------------------------------------------
 //  Implementation of the "help about" dialog
 

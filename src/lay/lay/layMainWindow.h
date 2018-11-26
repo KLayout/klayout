@@ -994,6 +994,7 @@ public:
   virtual void plugin_registered (lay::PluginDeclaration *cls);
   virtual void plugin_removed (lay::PluginDeclaration *cls);
   virtual void select_mode (int mode);
+  virtual void menu_activated (const std::string &symbol);
 
 private:
   PluginRootToMainWindow (const PluginRootToMainWindow &);

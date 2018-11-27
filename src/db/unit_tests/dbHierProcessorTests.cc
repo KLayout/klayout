@@ -129,7 +129,7 @@ private:
 void normalize_layer (db::Layout &layout, unsigned int layer)
 {
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
-    db::Shapes s;
+    db::Shapes s (layout.is_editable ());
     s.swap (c->shapes (layer));
     for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes); !i.at_end (); ++i) {
       db::Polygon poly;

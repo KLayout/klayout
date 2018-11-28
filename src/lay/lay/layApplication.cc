@@ -1468,10 +1468,16 @@ GuiApplication::shutdown ()
     mp_mw = 0;
   }
 
-  //  delete all other top level widgets for safety - we don't want Ruby clean them up for us
+  //  top-level widgets created from Ruby create a special issue:
+  //  those are without parents and not deleted by QApplication. But after
+  //  QApplication has died, they must not be deleted by Ruby, otherwise
+  //  we'll get a segfault. So we clean up all of them, but not the ones
+  //  Qt has created by itself (see GibHub #203).
   QWidgetList tl_widgets = topLevelWidgets ();
   for (QWidgetList::iterator w = tl_widgets.begin (); w != tl_widgets.end (); ++w) {
-    delete *w;
+    if (dynamic_cast<gsi::ObjectBase *> (*w)) {
+      delete *w;
+    }
   }
 
   if (mp_recorder) {

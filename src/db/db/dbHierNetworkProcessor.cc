@@ -472,7 +472,7 @@ template class DB_PUBLIC local_clusters<db::PolygonRef>;
 
 template <class T>
 const typename connected_clusters<T>::connections_type &
-connected_clusters<T>::connections_for_cluster (typename local_cluster<T>::id_type id)
+connected_clusters<T>::connections_for_cluster (typename local_cluster<T>::id_type id) const
 {
   typename std::map<typename local_cluster<T>::id_type, connections_type>::const_iterator c = m_connections.find (id);
   if (c == m_connections.end ()) {
@@ -531,6 +531,9 @@ connected_clusters<T>::find_cluster_with_connection (const ClusterInstance &ci, 
 
   return 0;
 }
+
+//  explicit instantiations
+template class DB_PUBLIC connected_clusters<db::PolygonRef>;
 
 // ------------------------------------------------------------------------------
 //  connected_clusters implementation

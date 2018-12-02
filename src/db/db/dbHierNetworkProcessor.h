@@ -391,7 +391,7 @@ public:
   /**
    *  @brief Gets the connections for a given cluster ID
    */
-  const connections_type &connections_for_cluster (typename local_cluster<T>::id_type id);
+  const connections_type &connections_for_cluster (typename local_cluster<T>::id_type id) const;
 
   /**
    *  @brief Adds a connection between a local cluster and one from a child instance
@@ -414,7 +414,6 @@ public:
 
 private:
   std::map<typename local_cluster<T>::id_type, connections_type> m_connections;
-  box_type m_full_bbox;
 };
 
 template <typename> class cell_clusters_box_converter;

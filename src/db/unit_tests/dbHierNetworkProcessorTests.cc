@@ -323,3 +323,72 @@ TEST(20_LocalClustersBasic)
   );
 }
 
+TEST(30_LocalConnectedClusters)
+{
+  db::Layout layout;
+  db::cell_index_type ci1 = layout.add_cell ("C1");
+  db::cell_index_type ci2 = layout.add_cell ("C2");
+  db::cell_index_type ci3 = layout.add_cell ("C3");
+
+  db::Instance i1 = layout.cell (ci1).insert (db::CellInstArray (db::CellInst (ci2), db::Trans ()));
+  db::Instance i2 = layout.cell (ci2).insert (db::CellInstArray (db::CellInst (ci3), db::Trans ()));
+
+  db::connected_clusters<db::PolygonRef> cc;
+
+  db::ClusterInstance::inst_path_type p1;
+  p1.push_back (db::InstElement (i1));
+
+  db::ClusterInstance::inst_path_type p2;
+  p2.push_back (db::InstElement (i1));
+  p2.push_back (db::InstElement (i2));
+
+  db::ClusterInstance::inst_path_type p3;
+  p3.push_back (db::InstElement (i2));
+
+  db::connected_clusters<db::PolygonRef>::connections_type x;
+  db::connected_clusters<db::PolygonRef>::connections_type::const_iterator ix;
+
+  x = cc.connections_for_cluster (1);
+  EXPECT_EQ (x.size (), size_t (0));
+  x = cc.connections_for_cluster (2);
+  EXPECT_EQ (x.size (), size_t (0));
+
+  cc.add_connection (1, db::ClusterInstance (1, p1));
+  cc.add_connection (1, db::ClusterInstance (2, p2));
+
+  x = cc.connections_for_cluster (1);
+  EXPECT_EQ (x.size (), size_t (2));
+  x = cc.connections_for_cluster (2);
+  EXPECT_EQ (x.size (), size_t (0));
+
+  cc.add_connection (2, db::ClusterInstance (1, p2));
+  x = cc.connections_for_cluster (2);
+  EXPECT_EQ (x.size (), size_t (1));
+
+  cc.join_connected_clusters (1, 2);
+  x = cc.connections_for_cluster (1);
+  EXPECT_EQ (x.size (), size_t (3));
+  ix = x.begin ();
+  EXPECT_EQ (ix->id (), size_t (1));
+  EXPECT_EQ (ix->inst () == p1, true);
+  ++ix;
+  EXPECT_EQ (ix->id (), size_t (2));
+  EXPECT_EQ (ix->inst () == p2, true);
+  ++ix;
+  EXPECT_EQ (ix->id (), size_t (1));
+  EXPECT_EQ (ix->inst () == p2, true);
+
+  x = cc.connections_for_cluster (2);
+  EXPECT_EQ (x.size (), size_t (0));
+
+  cc.add_connection (2, db::ClusterInstance (3, p1));
+
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (3, p1), 0), 2);
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p1), 0), 0);
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p2), 0), 1);
+
+  cc.add_connection (17, db::ClusterInstance (2, p3));
+
+  //  p3 == p2 minus 1 at the beginning
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p2), 1 /*one stripped*/), 17);
+}

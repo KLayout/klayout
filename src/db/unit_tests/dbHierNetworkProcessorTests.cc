@@ -133,3 +133,97 @@ TEST(2_ShapeInteractionsRealPolygon)
   EXPECT_EQ (conn.interacts (ref1, 1, ref2, 2), false);
   EXPECT_EQ (conn.interacts (ref1, 1, ref1, 2, t2), false);
 }
+
+TEST(10_LocalClusterBasic)
+{
+  db::GenericRepository repo;
+
+  db::Polygon poly;
+  tl::from_string ("(0,0;0,1000;1000,1000;1000,0)", poly);
+
+  db::local_cluster<db::PolygonRef> cluster;
+  EXPECT_EQ (cluster.bbox ().to_string (), "()");
+  EXPECT_EQ (cluster.id (), size_t (0));
+
+  cluster.add (db::PolygonRef (poly, repo), 0);
+  EXPECT_EQ (cluster.bbox ().to_string (), "(0,0;1000,1000)");
+
+  db::local_cluster<db::PolygonRef> cluster2;
+  cluster.add (db::PolygonRef (poly, repo).transformed (db::Trans (db::Vector (10, 20))), 1);
+
+  cluster.join_with (cluster2);
+  EXPECT_EQ (cluster.bbox ().to_string (), "(0,0;1010,1020)");
+}
+
+TEST(11_LocalClusterInteractBasic)
+{
+  db::GenericRepository repo;
+
+  db::Connectivity conn;
+  conn.connect (0);
+  conn.connect (1);
+  conn.connect (2);
+  conn.connect (0, 1);
+  conn.connect (0, 2);
+
+  db::Polygon poly;
+  tl::from_string ("(0,0;0,1000;1000,1000;1000,0)", poly);
+
+  db::local_cluster<db::PolygonRef> cluster;
+  db::local_cluster<db::PolygonRef> cluster2;
+
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+
+  cluster.add (db::PolygonRef (poly, repo), 0);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+
+  cluster2.add (db::PolygonRef (poly, repo), 0);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (10, 20))), conn), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1000))), conn), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1001))), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 2000))), conn), false);
+
+  cluster.clear ();
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+}
+
+TEST(11_LocalClusterInteractDifferentLayers)
+{
+  db::GenericRepository repo;
+
+  db::Connectivity conn;
+  conn.connect (0);
+  conn.connect (1);
+  conn.connect (2);
+  conn.connect (0, 1);
+  conn.connect (0, 2);
+
+  db::Polygon poly;
+  tl::from_string ("(0,0;0,1000;1000,1000;1000,0)", poly);
+
+  db::local_cluster<db::PolygonRef> cluster;
+  db::local_cluster<db::PolygonRef> cluster2;
+
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+
+  cluster.add (db::PolygonRef (poly, repo), 0);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+
+  cluster2.add (db::PolygonRef (poly, repo), 1);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (10, 20))), conn), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1000))), conn), true);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 1001))), conn), false);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (db::Trans (db::Vector (0, 2000))), conn), false);
+
+  cluster.clear ();
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  cluster.add (db::PolygonRef (poly, repo), 2);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false); //  not connected
+
+  cluster.clear ();
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), false);
+  cluster.add (db::PolygonRef (poly, repo), 1);
+  EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), true);
+}

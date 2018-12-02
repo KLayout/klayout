@@ -134,6 +134,15 @@ local_cluster<T>::local_cluster ()
 
 template <class T>
 void
+local_cluster<T>::clear ()
+{
+  m_shapes.clear ();
+  m_needs_update = false;
+  m_bbox = box_type ();
+}
+
+template <class T>
+void
 local_cluster<T>::add (const T &s, unsigned int la)
 {
   m_shapes[la].insert (s);
@@ -241,7 +250,7 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
 {
   const_cast<local_cluster<T> *> (this)->ensure_sorted ();
 
-  if (! other.bbox ().overlaps (bbox ())) {
+  if (! other.bbox ().touches (bbox ())) {
     return false;
   }
 
@@ -253,7 +262,7 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
 
   bool any = false;
   for (typename std::map<unsigned int, tree_type>::const_iterator s = m_shapes.begin (); s != m_shapes.end (); ++s) {
-    for (typename tree_type::overlapping_iterator i = s->second.begin_overlapping (common, bc); ! i.at_end (); ++i) {
+    for (typename tree_type::touching_iterator i = s->second.begin_touching (common, bc); ! i.at_end (); ++i) {
       scanner.insert1 (i.operator-> (), s->first);
       any = true;
     }
@@ -264,13 +273,13 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
   }
 
   for (typename std::map<unsigned int, tree_type>::const_iterator s = other.m_shapes.begin (); s != other.m_shapes.end (); ++s) {
-    for (typename tree_type::overlapping_iterator i = s->second.begin_overlapping (common.transformed (trans.inverted ()), bc); ! i.at_end (); ++i) {
+    for (typename tree_type::touching_iterator i = s->second.begin_touching (common.transformed (trans.inverted ()), bc); ! i.at_end (); ++i) {
       scanner.insert2 (i.operator-> (), s->first);
     }
   }
 
   interaction_receiver<T> rec (conn, trans);
-  return ! scanner.process (rec, 0, bc, bc_t);
+  return ! scanner.process (rec, 1 /*==touching*/, bc, bc_t);
 }
 
 //  explicit instantiations

@@ -126,6 +126,11 @@ public:
   local_cluster ();
 
   /**
+   *  @brief Clears the cluster
+   */
+  void clear ();
+
+  /**
    *  @brief Adds a shape with the given layer to the cluster
    */
   void add (const T &s, unsigned int la);

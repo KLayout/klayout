@@ -80,15 +80,23 @@ TEST(2_ShapeInteractions)
   tl::from_string ("(0,0;0,1000;1000,1000;1000,0)", poly);
   db::GenericRepository repo;
   db::PolygonRef ref1 (poly, repo);
-  db::PolygonRef ref2 (poly.transformed (db::Trans (db::Vector (0, 10))), repo);
-  db::PolygonRef ref3 (poly.transformed (db::Trans (db::Vector (0, 2000))), repo);
+  db::ICplxTrans t2 (db::Trans (db::Vector (0, 10)));
+  db::PolygonRef ref2 (poly.transformed (t2), repo);
+  db::ICplxTrans t3 (db::Trans (db::Vector (0, 2000)));
+  db::PolygonRef ref3 (poly.transformed (t3), repo);
 
   EXPECT_EQ (conn.interacts (ref1, 0, ref2, 0), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t2), true);  // t2*ref1 == ref2
   EXPECT_EQ (conn.interacts (ref1, 0, ref2, 1), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t2), true);
   EXPECT_EQ (conn.interacts (ref1, 1, ref2, 0), true);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 0, t2), true);
   EXPECT_EQ (conn.interacts (ref1, 0, ref3, 0), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t3), false);  // t3*ref1 == ref3
   EXPECT_EQ (conn.interacts (ref1, 0, ref3, 1), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t3), false);
   EXPECT_EQ (conn.interacts (ref1, 1, ref2, 2), false);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 2, t2), false);
 }
 
 TEST(2_ShapeInteractionsRealPolygon)
@@ -103,15 +111,25 @@ TEST(2_ShapeInteractionsRealPolygon)
   tl::from_string ("(0,0;0,1000;500,1000;500,1500;1000,1500;1000,0)", poly);
   db::GenericRepository repo;
   db::PolygonRef ref1 (poly, repo);
-  db::PolygonRef ref2 (poly.transformed (db::Trans (db::Vector (0, 10))), repo);
-  db::PolygonRef ref3 (poly.transformed (db::Trans (db::Vector (0, 2000))), repo);
-  db::PolygonRef ref4 (poly.transformed (db::Trans (db::Vector (0, 1500))), repo);
+  db::ICplxTrans t2 (db::Trans (db::Vector (0, 10)));
+  db::PolygonRef ref2 (poly.transformed (t2), repo);
+  db::ICplxTrans t3 (db::Trans (db::Vector (0, 2000)));
+  db::PolygonRef ref3 (poly.transformed (t3), repo);
+  db::ICplxTrans t4 (db::Trans (db::Vector (0, 1500)));
+  db::PolygonRef ref4 (poly.transformed (t4), repo);
 
   EXPECT_EQ (conn.interacts (ref1, 0, ref2, 0), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t2), true);  // t2*ref1 == ref2
   EXPECT_EQ (conn.interacts (ref1, 0, ref2, 1), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t2), true);
   EXPECT_EQ (conn.interacts (ref1, 1, ref2, 0), true);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 0, t2), true);
   EXPECT_EQ (conn.interacts (ref1, 0, ref3, 0), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t3), false);
   EXPECT_EQ (conn.interacts (ref1, 0, ref4, 0), true);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 0, t4), true);
   EXPECT_EQ (conn.interacts (ref1, 0, ref3, 1), false);
+  EXPECT_EQ (conn.interacts (ref1, 0, ref1, 1, t3), false);
   EXPECT_EQ (conn.interacts (ref1, 1, ref2, 2), false);
+  EXPECT_EQ (conn.interacts (ref1, 1, ref1, 2, t2), false);
 }

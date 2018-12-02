@@ -129,6 +129,14 @@ struct box_scanner_receiver
    *  definition.
    */
   void add (const Obj * /*o1*/, const Prop & /*p1*/, const Obj * /*o2*/, const Prop & /*p2*/) { }
+
+  /**
+   *  @brief Indicates whether the scanner may stop
+   *
+   *  The scanner will stop if this method returns true. This feature can be used to
+   *  terminate the scan process early if the outcome is known.
+   */
+  bool stop () const { return false; }
 };
 
 /**
@@ -250,9 +258,13 @@ public:
    *
    *  The box converter must be capable of converting the Obj object into a box. 
    *  It must provide a box_type typedef.
+   *
+   *  The scanner process can be terminated early by making the receiver's
+   *  stop() method return true. In this case, this method will return false.
+   *  Otherwise it will return true.
    */
   template <class Rec, class BoxConvert>
-  void process (Rec &rec, typename BoxConvert::box_type::coord_type enl, const BoxConvert &bc = BoxConvert ())
+  bool process (Rec &rec, typename BoxConvert::box_type::coord_type enl, const BoxConvert &bc = BoxConvert ())
   {
     typedef typename BoxConvert::box_type box_type;
     typedef typename box_type::coord_type coord_type;
@@ -269,6 +281,9 @@ public:
         for (iterator_type j = i + 1; j != m_pp.end (); ++j) {
           if (bs_boxes_overlap (bc (*i->first), bc (*j->first), enl)) {
             rec.add (i->first, i->second, j->first, j->second);
+            if (rec.stop ()) {
+              return false;
+            }
           }
         }
       }
@@ -355,6 +370,9 @@ public:
                 if (seen.insert (std::make_pair (i->first, j->first)).second) {
                   seen.insert (std::make_pair (j->first, i->first));
                   rec.add (i->first, i->second, j->first, j->second);
+                  if (rec.stop ()) {
+                    return false;
+                  }
                 }
               }
             }
@@ -378,6 +396,8 @@ public:
       }
 
     }
+
+    return true;
 
   }
 
@@ -421,6 +441,14 @@ struct box_scanner_receiver2
    *  definition.
    */
   void add (const Obj1 * /*o1*/, const Prop1 & /*p1*/, const Obj2 * /*o2*/, const Prop2 & /*p2*/) { }
+
+  /**
+   *  @brief Indicates whether the scanner may stop
+   *
+   *  The scanner will stop if this method returns true. This feature can be used to
+   *  terminate the scan process early if the outcome is known.
+   */
+  bool stop () const { return false; }
 };
 
 /**
@@ -558,9 +586,13 @@ public:
    *  The box converter 1 must be capable of converting the Obj1 object into a box.
    *  It must provide a box_type typedef. The box converter 2 must be able to convert Obj2 to
    *  a box. The box type of both box converters must be identical.
+   *
+   *  The scanner process can be terminated early by making the receiver's
+   *  stop() method return true. In this case, this method will return false.
+   *  Otherwise it will return true.
    */
   template <class Rec, class BoxConvert1, class BoxConvert2>
-  void process (Rec &rec, typename BoxConvert1::box_type::coord_type enl, const BoxConvert1 &bc1 = BoxConvert1 (), const BoxConvert2 &bc2 = BoxConvert2 ())
+  bool process (Rec &rec, typename BoxConvert1::box_type::coord_type enl, const BoxConvert1 &bc1 = BoxConvert1 (), const BoxConvert2 &bc2 = BoxConvert2 ())
   {
     typedef typename BoxConvert1::box_type box_type; //  must be same as BoxConvert2::box_type
     typedef typename box_type::coord_type coord_type;
@@ -592,6 +624,9 @@ public:
         for (iterator_type2 j = m_pp2.begin (); j != m_pp2.end (); ++j) {
           if (bs_boxes_overlap (bc1 (*i->first), bc2 (*j->first), enl)) {
             rec.add (i->first, i->second, j->first, j->second);
+            if (rec.stop ()) {
+              return false;
+            }
           }
         }
       }
@@ -716,6 +751,9 @@ public:
                     if (seen1.insert (std::make_pair (i->first, j->first)).second) {
                       seen2.insert (std::make_pair (j->first, i->first));
                       rec.add (i->first, i->second, j->first, j->second);
+                      if (rec.stop ()) {
+                        return false;
+                      }
                     }
                   }
                 }
@@ -746,6 +784,8 @@ public:
       }
 
     }
+
+    return true;
 
   }
 

@@ -35,6 +35,8 @@ struct BoxScannerTestRecorder
     str += "<" + tl::to_string (p) + ">";
   }
 
+  bool stop () const { return false; }
+
   void add (const db::Box * /*b1*/, size_t p1, const db::Box * /*b2*/, size_t p2)
   {
     str += "(" + tl::to_string (p1) + "-" + tl::to_string (p2) + ")";
@@ -43,9 +45,31 @@ struct BoxScannerTestRecorder
   std::string str;
 };
 
+struct BoxScannerTestRecorderStopping
+{
+  BoxScannerTestRecorderStopping () : do_stop (false) { }
+
+  void finish (const db::Box * /*box*/, size_t p) {
+    str += "<" + tl::to_string (p) + ">";
+  }
+
+  bool stop () const { return do_stop; }
+
+  void add (const db::Box * /*b1*/, size_t p1, const db::Box * /*b2*/, size_t p2)
+  {
+    str += "(" + tl::to_string (p1) + "-" + tl::to_string (p2) + ")";
+    do_stop = true;
+  }
+
+  std::string str;
+  bool do_stop;
+};
+
 struct BoxScannerTestRecorder2
 {
   void finish (const db::Box *, size_t) { }
+
+  bool stop () const { return false; }
 
   void add (const db::Box * /*b1*/, size_t p1, const db::Box * /*b2*/, size_t p2)
   {
@@ -66,6 +90,8 @@ struct BoxScannerTestRecorderTwo
     str += "<" + tl::to_string (p) + ">";
   }
 
+  bool stop () const { return false; }
+
   void add (const db::Box * /*b1*/, size_t p1, const db::SimplePolygon * /*b2*/, int p2)
   {
     str += "(" + tl::to_string (p1) + "-" + tl::to_string (p2) + ")";
@@ -74,10 +100,36 @@ struct BoxScannerTestRecorderTwo
   std::string str;
 };
 
+struct BoxScannerTestRecorderTwoStopping
+{
+  BoxScannerTestRecorderTwoStopping () : do_stop (false) { }
+
+  void finish1 (const db::Box * /*box*/, size_t p) {
+    str += "<" + tl::to_string (p) + ">";
+  }
+
+  void finish2 (const db::SimplePolygon * /*poly*/, int p) {
+    str += "<" + tl::to_string (p) + ">";
+  }
+
+  bool stop () const { return do_stop; }
+
+  void add (const db::Box * /*b1*/, size_t p1, const db::SimplePolygon * /*b2*/, int p2)
+  {
+    str += "(" + tl::to_string (p1) + "-" + tl::to_string (p2) + ")";
+    do_stop = true;
+  }
+
+  std::string str;
+  bool do_stop;
+};
+
 struct BoxScannerTestRecorder2Two
 {
   void finish1 (const db::Box *, size_t) { }
   void finish2 (const db::SimplePolygon *, int) { }
+
+  bool stop () const { return false; }
 
   void add (const db::Box * /*b1*/, size_t p1, const db::SimplePolygon * /*b2*/, int p2)
   {
@@ -106,8 +158,12 @@ TEST(1)
   bs.set_fill_factor (0.0);
   db::box_convert<db::Box> bc;
   bs.set_scanner_threshold (0);
-  bs.process (tr, 1, bc);
+  EXPECT_EQ (bs.process (tr, 1, bc), true);
   EXPECT_EQ (tr.str, "(4-2)(5-2)(5-4)(3-2)(3-4)(5-3)<2><5><4><3>(1-0)<0><1>");
+
+  BoxScannerTestRecorderStopping trstop;
+  EXPECT_EQ (bs.process (trstop, 1, bc), false);
+  EXPECT_EQ (trstop.str, "(4-2)");
 }
 
 TEST(1a)
@@ -920,8 +976,13 @@ TEST(two_1b)
   db::box_convert<db::Box> bc1;
   db::box_convert<db::SimplePolygon> bc2;
   bs.set_scanner_threshold (0);
-  bs.process (tr, 1, bc1, bc2);
+  EXPECT_EQ (bs.process (tr, 1, bc1, bc2), true);
   EXPECT_EQ (tr.str, "(1-12)(2-12)(1-11)(2-11)<1><2><11><12>(0-10)<0><10>");
+
+
+  BoxScannerTestRecorderTwoStopping trstop;
+  EXPECT_EQ (bs.process (trstop, 1, bc1, bc2), false);
+  EXPECT_EQ (trstop.str, "(1-12)");
 }
 
 void run_test2_two (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)

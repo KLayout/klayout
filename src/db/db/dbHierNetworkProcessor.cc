@@ -27,7 +27,7 @@
 #include "dbInstElement.h"
 #include "dbPolygon.h"
 #include "dbPolygonTools.h"
-#include "dbBoxConvert.h"
+#include "dbBoxScanner.h"
 
 #include <vector>
 #include <map>
@@ -95,62 +95,193 @@ Connectivity::end_connected (unsigned int layer)
   }
 }
 
+template <class Trans>
 static bool
-interaction_test (const db::PolygonRef &a, const db::PolygonRef &b)
+interaction_test (const db::PolygonRef &a, const db::PolygonRef &b, const Trans &trans)
 {
   //  TODO: this could be part of db::interact (including transformation)
   if (a.obj ().is_box () && b.obj ().is_box ()) {
-    return db::interact (a.obj ().box ().transformed (b.trans ().inverted () * a.trans ()), b.obj ().box ());
+    return db::interact (a.obj ().box ().transformed (b.trans ().inverted () * a.trans ()), b.obj ().box ().transformed (trans));
   } else {
-    return db::interact (a.obj ().transformed (b.trans ().inverted () * a.trans ()), b.obj ());
+    return db::interact (a.obj ().transformed (b.trans ().inverted () * a.trans ()), b.obj ().transformed (trans));
   }
 }
 
-template <class T>
-bool Connectivity::interacts (const T &a, unsigned int la, T &b, unsigned int lb) const
+template <class T, class Trans>
+bool Connectivity::interacts (const T &a, unsigned int la, const T &b, unsigned int lb, const Trans &trans) const
 {
   std::map<unsigned int, layers_type>::const_iterator i = m_connected.find (la);
   if (i == m_connected.end () || i->second.find (lb) == i->second.end ()) {
     return false;
   } else {
-    return interaction_test (a, b);
+    return interaction_test (a, b, trans);
   }
 }
 
 //  explicit instantiations
-template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, db::PolygonRef &b, unsigned int lb) const;
+template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, const db::PolygonRef &b, unsigned int lb, const db::UnitTrans &trans) const;
+template DB_PUBLIC bool Connectivity::interacts<db::PolygonRef> (const db::PolygonRef &a, unsigned int la, const db::PolygonRef &b, unsigned int lb, const db::ICplxTrans &trans) const;
 
 // ------------------------------------------------------------------------------
-//  ...
+//  local_cluster implementation
+
+template <class T>
+local_cluster<T>::local_cluster ()
+  : m_id (0), m_needs_update (false)
+{
+  //  .. nothing yet ..
+}
+
+template <class T>
+void
+local_cluster<T>::add (const T &s, unsigned int la)
+{
+  m_shapes[la].insert (s);
+  m_needs_update = true;
+}
+
+template <class T>
+void
+local_cluster<T>::join_with (const local_cluster<T> &other)
+{
+  for (typename std::map<unsigned int, tree_type>::const_iterator s = other.m_shapes.begin (); s != other.m_shapes.end (); ++s) {
+    tree_type &other_tree = m_shapes[s->first];
+    other_tree.insert (s->second.begin (), s->second.end ());
+  }
+
+  m_needs_update = true;
+}
+
+template <class T>
+void
+local_cluster<T>::ensure_sorted ()
+{
+  if (! m_needs_update) {
+    return;
+  }
+
+  //  sort the shape trees
+  for (typename std::map<unsigned int, tree_type>::iterator s = m_shapes.begin (); s != m_shapes.end (); ++s) {
+    s->second.sort (db::box_convert<T> ());
+  }
+
+  //  recompute bounding box
+  m_bbox = box_type ();
+  db::box_convert<T> bc;
+  for (typename std::map<unsigned int, tree_type>::const_iterator s = m_shapes.begin (); s != m_shapes.end (); ++s) {
+    for (typename tree_type::const_iterator i = s->second.begin (); i != s->second.end (); ++i) {
+      m_bbox += bc (*i);
+    }
+  }
+
+  m_needs_update = false;
+}
+
+namespace
+{
+
+template <class T>
+struct interaction_receiver
+  : public box_scanner_receiver2<T, unsigned int, T, unsigned int>
+{
+public:
+  typedef typename local_cluster<T>::box_type box_type;
+
+  interaction_receiver (const Connectivity &conn, const db::ICplxTrans &trans)
+    : mp_conn (&conn), m_any (false), m_trans (trans)
+  {
+    //  .. nothing yet ..
+  }
+
+  void add (const T *s1, unsigned int l1, const T *s2, unsigned int l2)
+  {
+    if (mp_conn->interacts (*s1, l1, *s2, l2, m_trans)) {
+      m_any = true;
+    }
+  }
+
+  bool stop () const
+  {
+    return m_any;
+  }
+
+private:
+  const Connectivity *mp_conn;
+  bool m_any;
+  db::ICplxTrans m_trans;
+};
+
+template <class T, class Trans>
+struct transformed_box
+{
+  typedef db::box_convert<T> base_bc;
+  typedef typename T::box_type box_type;
+
+  transformed_box (const Trans &trans)
+    : m_trans (trans)
+  {
+    //  .. nothing yet ..
+  }
+
+  box_type operator() (const T &t) const
+  {
+    return m_bc (t).transformed (m_trans);
+  }
+
+private:
+  base_bc m_bc;
+  Trans m_trans;
+};
+
+}
+
+template <class T>
+bool
+local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans &trans, const Connectivity &conn) const
+{
+  const_cast<local_cluster<T> *> (this)->ensure_sorted ();
+
+  if (! other.bbox ().overlaps (bbox ())) {
+    return false;
+  }
+
+  box_type common = other.bbox () & bbox ();
+
+  db::box_scanner2<T, unsigned int, T, unsigned int> scanner;
+  transformed_box <T, db::ICplxTrans> bc_t (trans);
+  db::box_convert<T> bc;
+
+  bool any = false;
+  for (typename std::map<unsigned int, tree_type>::const_iterator s = m_shapes.begin (); s != m_shapes.end (); ++s) {
+    for (typename tree_type::overlapping_iterator i = s->second.begin_overlapping (common, bc); ! i.at_end (); ++i) {
+      scanner.insert1 (i.operator-> (), s->first);
+      any = true;
+    }
+  }
+
+  if (! any) {
+    return false;
+  }
+
+  for (typename std::map<unsigned int, tree_type>::const_iterator s = other.m_shapes.begin (); s != other.m_shapes.end (); ++s) {
+    for (typename tree_type::overlapping_iterator i = s->second.begin_overlapping (common.transformed (trans.inverted ()), bc); ! i.at_end (); ++i) {
+      scanner.insert2 (i.operator-> (), s->first);
+    }
+  }
+
+  interaction_receiver<T> rec (conn, trans);
+  return ! scanner.process (rec, 0, bc, bc_t);
+}
+
+//  explicit instantiations
+template class DB_PUBLIC local_cluster<db::PolygonRef>;
+
+
+// ------------------------------------------------------------------------------
+//  local_cluster implementation
 
 
 #if 0
-/**
- *  @brief Represents a cluster of shapes
- *
- *  A cluster of shapes is a set of shapes which are connected in terms
- *  of a given connectivity.
- */
-class LocalCluster
-{
-public:
-  typedef size_t id_type;
-
-  LocalCluster ();
-
-  void connect (const db::Shape &a, unsigned int la, const db::Shape &b, unsigned int lb);
-  id_type id () const;
-
-  // @@@ Trans is the transformation of the cluster to the shape (instance transformation)
-  void interacts (const db::Shape &s, unsigned int ls, const db::ICplxTrans &trans, const Connectivity &conn);
-  const db::Box &bbox () const;
-
-private:
-  friend class LocalClusters;
-
-  void set_id (id_type id);
-};
-
 /**
  *  @brief Represents a collection of clusters in a cell
  *

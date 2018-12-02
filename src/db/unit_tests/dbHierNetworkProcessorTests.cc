@@ -500,7 +500,7 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
   for (db::Layout::top_down_const_iterator td = ly.begin_top_down (); td != ly.end_top_down (); ++td) {
 
     const db::connected_clusters<db::PolygonRef> &clusters = hc.clusters_per_cell (*td);
-    for (db::connected_clusters<db::PolygonRef>::const_iterator c = clusters.begin (); c.at_end (); ++c) {
+    for (db::connected_clusters<db::PolygonRef>::const_iterator c = clusters.begin (); ! c.at_end (); ++c) {
 
       net_layers.push_back (std::make_pair (0, ly.insert_layer ()));
 

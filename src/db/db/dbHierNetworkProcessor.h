@@ -29,6 +29,7 @@
 #include "dbBoxConvert.h"
 #include "dbBoxTree.h"
 #include "dbCell.h"
+#include "dbInstElement.h"
 
 #include <map>
 #include <set>
@@ -309,6 +310,150 @@ private:
   bool m_needs_update;
   box_type m_bbox;
   tree_type m_clusters;
+};
+
+/**
+ *  @brief A connection to a cluster in a child instance
+ */
+class DB_PUBLIC ClusterInstance
+{
+public:
+  typedef std::vector<db::InstElement> inst_path_type;
+
+  ClusterInstance (size_t id, const inst_path_type &inst_path)
+    : m_id (id), m_inst_path (inst_path)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Gets the cluster ID
+   */
+  size_t id () const
+  {
+    return m_id;
+  }
+
+  /**
+   *  @brief Gets the instance path
+   */
+  const inst_path_type &inst () const
+  {
+    return m_inst_path;
+  }
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const ClusterInstance &other) const
+  {
+    return m_id == other.m_id && m_inst_path == other.m_inst_path;
+  }
+
+  /**
+   *  @brief Less operator
+   */
+  bool operator< (const ClusterInstance &other) const
+  {
+    if (m_id != other.m_id) {
+      return m_id < other.m_id;
+    }
+    return m_inst_path < other.m_inst_path;
+  }
+
+private:
+  size_t m_id;
+  inst_path_type m_inst_path;
+};
+
+template <class T> class hier_clusters;
+
+/**
+ *  @brief Local clusters with connections to clusters from child cells
+ */
+template <class T>
+class DB_PUBLIC connected_clusters
+  : public local_clusters<T>
+{
+public:
+  typedef std::list<ClusterInstance> connections_type;
+  typedef typename local_clusters<T>::box_type box_type;
+
+  /**
+   *  @brief Constructor
+   */
+  connected_clusters ()
+    : local_clusters<T> ()
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Gets the connections for a given cluster ID
+   */
+  const connections_type &connections_for_cluster (typename local_cluster<T>::id_type id);
+
+  /**
+   *  @brief Adds a connection between a local cluster and one from a child instance
+   */
+  void add_connection (typename local_cluster<T>::id_type, const ClusterInstance &inst);
+
+  /**
+   *  @brief Joins all connections of with_id to id
+   */
+  void join_connected_clusters (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
+
+  /**
+   *  @brief Reverse "connections_for_cluster"
+   *
+   *  Finds the cluster which has a connection given by inst. "strip" elements
+   *  are stipped from the front of the instantiation path.
+   *  This method returns 0 if no cluster can be found.
+   */
+  typename local_cluster<T>::id_type find_cluster_with_connection (const ClusterInstance &inst, size_t strip) const;
+
+private:
+  std::map<typename local_cluster<T>::id_type, connections_type> m_connections;
+  box_type m_full_bbox;
+};
+
+template <typename> class cell_clusters_box_converter;
+
+/**
+ *  @brief A hierarchical representation of clusters
+ *
+ *  Hierarchical clusters
+ */
+template <class T>
+class DB_PUBLIC hier_clusters
+{
+public:
+  typedef typename local_cluster<T>::box_type box_type;
+
+  /**
+   *  @brief Creates an empty set of clusters
+   */
+  hier_clusters ();
+
+  /**
+   *  @brief Builds a hierarchy of clusters from a cell hierarchy and given connectivity
+   */
+  void build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn);
+
+  /**
+   *  @brief Gets the connected clusters for a given cell
+   */
+  const connected_clusters<T> &clusters_per_cell (db::cell_index_type cell_index) const;
+
+  /**
+   *  @brief Clears this collection
+   */
+  void clear ();
+
+private:
+  void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn);
+
+  std::map<db::cell_index_type, connected_clusters<T> > m_per_cell_clusters;
 };
 
 }

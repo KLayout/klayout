@@ -468,112 +468,7 @@ local_clusters<T>::build_clusters (const db::Cell &cell, db::ShapeIterator::flag
 template class DB_PUBLIC local_clusters<db::PolygonRef>;
 
 // ------------------------------------------------------------------------------
-//  hier_clusters implementation
-
-/**
- *  @brief A connection to a cluster in a child instance
- */
-class DB_PUBLIC ClusterInstance
-{
-public:
-  typedef std::vector<db::InstElement> inst_path_type;
-
-  ClusterInstance (size_t id, const inst_path_type &inst_path)
-    : m_id (id), m_inst_path (inst_path)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Gets the cluster ID
-   */
-  size_t id () const
-  {
-    return m_id;
-  }
-
-  /**
-   *  @brief Gets the instance path
-   */
-  const inst_path_type &inst () const
-  {
-    return m_inst_path;
-  }
-
-  /**
-   *  @brief Equality
-   */
-  bool operator== (const ClusterInstance &other) const
-  {
-    return m_id == other.m_id && m_inst_path == other.m_inst_path;
-  }
-
-  /**
-   *  @brief Less operator
-   */
-  bool operator< (const ClusterInstance &other) const
-  {
-    if (m_id != other.m_id) {
-      return m_id < other.m_id;
-    }
-    return m_inst_path < other.m_inst_path;
-  }
-
-private:
-  size_t m_id;
-  inst_path_type m_inst_path;
-};
-
-template <class T> class hier_clusters;
-
-/**
- *  @brief Local clusters with connections to clusters from child cells
- */
-template <class T>
-class DB_PUBLIC connected_clusters
-  : public local_clusters<T>
-{
-public:
-  typedef std::list<ClusterInstance> connections_type;
-  typedef typename local_clusters<T>::box_type box_type;
-
-  /**
-   *  @brief Constructor
-   */
-  connected_clusters ()
-    : local_clusters<T> ()
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Gets the connections for a given cluster ID
-   */
-  const connections_type &connections_for_cluster (typename local_cluster<T>::id_type id);
-
-  /**
-   *  @brief Adds a connection between a local cluster and one from a child instance
-   */
-  void add_connection (typename local_cluster<T>::id_type, const ClusterInstance &inst);
-
-  /**
-   *  @brief Joins all connections of with_id to id
-   */
-  void join_connected_clusters (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
-
-  /**
-   *  @brief Reverse "connections_for_cluster"
-   *
-   *  Finds the cluster which has a connection given by inst. "strip" elements
-   *  are stipped from the front of the instantiation path.
-   *  This method returns 0 if no cluster can be found.
-   */
-  typename local_cluster<T>::id_type find_cluster_with_connection (const ClusterInstance &inst, size_t strip) const;
-
-private:
-  std::map<typename local_cluster<T>::id_type, connections_type> m_connections;
-  box_type m_full_bbox;
-};
+//  connected_clusters implementation
 
 template <class T>
 const typename connected_clusters<T>::connections_type &
@@ -637,53 +532,17 @@ connected_clusters<T>::find_cluster_with_connection (const ClusterInstance &ci, 
   return 0;
 }
 
-template <typename> class cell_box_converter;
-
-/**
- *  @brief A hierarchical representation of clusters
- *
- *  Hierarchical clusters
- */
-template <class T>
-class DB_PUBLIC hier_clusters
-{
-public:
-  typedef typename local_cluster<T>::box_type box_type;
-
-  /**
-   *  @brief Creates an empty set of clusters
-   */
-  hier_clusters ();
-
-  /**
-   *  @brief Builds a hierarchy of clusters from a cell hierarchy and given connectivity
-   */
-  void build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn);
-
-  /**
-   *  @brief Gets the connected clusters for a given cell
-   */
-  const connected_clusters<T> &clusters_per_cell (db::cell_index_type cell_index) const;
-
-  /**
-   *  @brief Clears this collection
-   */
-  void clear ();
-
-private:
-  void do_build (cell_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn);
-
-  std::map<db::cell_index_type, connected_clusters<T> > m_per_cell_clusters;
-};
+// ------------------------------------------------------------------------------
+//  connected_clusters implementation
 
 template <class T>
-class DB_PUBLIC cell_box_converter
+class DB_PUBLIC cell_clusters_box_converter
 {
 public:
   typedef db::simple_bbox_tag complexity;
   typedef typename hier_clusters<T>::box_type box_type;
 
-  cell_box_converter (const db::Layout &layout, const hier_clusters<T> &tree)
+  cell_clusters_box_converter (const db::Layout &layout, const hier_clusters<T> &tree)
     : mp_layout (&layout), mp_tree (&tree)
   {
     //  .. nothing yet ..
@@ -718,6 +577,9 @@ private:
   const hier_clusters<T> *mp_tree;
 };
 
+// ------------------------------------------------------------------------------
+//  hier_clusters implementation
+
 template <class T>
 hier_clusters<T>::hier_clusters ()
 {
@@ -735,13 +597,21 @@ void
 hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
 {
   clear ();
-  cell_box_converter<T> cbc (layout, *this);
+  cell_clusters_box_converter<T> cbc (layout, *this);
   do_build (cbc, layout, cell, shape_flags, conn);
 }
 
 namespace
 {
 
+/**
+ *  @brief The central interaction tester between clusters on a hierarchical level
+ *
+ *  This receiver is both used for the instance-to-instance and the local-to-instance
+ *  interactions. It is employed on cell level for in two box scanners: one
+ *  investigating the instance-to-instance interactions and another one invesitating
+ *  local cluster to instance interactions.
+ */
 template <class T>
 struct hc_receiver
   : public db::box_scanner_receiver<db::Instance, unsigned int>,
@@ -752,12 +622,18 @@ public:
   typedef typename local_cluster<T>::id_type id_type;
   typedef std::map<ClusterInstance, local_cluster<T> *> connector_map;
 
-  hc_receiver (const db::Layout &layout, db::connected_clusters<T> &cell_clusters, hier_clusters<T> &tree, const cell_box_converter<T> &cbc, const db::Connectivity &conn)
+  /**
+   *  @brief Constructor
+   */
+  hc_receiver (const db::Layout &layout, db::connected_clusters<T> &cell_clusters, hier_clusters<T> &tree, const cell_clusters_box_converter<T> &cbc, const db::Connectivity &conn)
     : mp_layout (&layout), mp_tree (&tree), mp_cbc (&cbc), mp_conn (&conn)
   {
     mp_cell_clusters = &cell_clusters;
   }
 
+  /**
+   *  @brief Receiver main event for instance-to-instance interactions
+   */
   void add (const db::Instance *i1, unsigned int /*p1*/, const db::Instance *i2, unsigned int /*p2*/)
   {
     std::vector<db::InstElement> p;
@@ -765,6 +641,9 @@ public:
     add_pair (*i1, p, t, *i2, p, t);
   }
 
+  /**
+   *  @brief Receiver main event for local-to-instance interactions
+   */
   void add (const local_cluster<T> *c1, unsigned int /*p1*/, const db::Instance *i2, unsigned int /*p2*/)
   {
     std::vector<db::InstElement> p;
@@ -781,11 +660,21 @@ private:
   const db::Layout *mp_layout;
   db::connected_clusters<T> *mp_cell_clusters;
   hier_clusters<T> *mp_tree;
-  const cell_box_converter<T> *mp_cbc;
+  const cell_clusters_box_converter<T> *mp_cbc;
   const db::Connectivity *mp_conn;
   connector_map m_connectors;
   mutable std::map<ClusterInstance, ClusterInstance> m_reduction_cache;
 
+  /**
+   *  @brief Handles the cluster interactions between two instances or instance arrays
+   *  @param common The region under investigation (seen from the top level)
+   *  @param i1 The index of the child cell 1
+   *  @param p1 The instantiation path to the child cell (not including i1)
+   *  @param t1 The accumulated transformation of the path, not including i1
+   *  @param i2 The index of the child cell 2
+   *  @param p2 The instantiation path to the child cell (not including i2)
+   *  @param t2 The accumulated transformation of the path, not including i2
+   */
   void add_pair (const db::Instance &i1, const std::vector<db::InstElement> &p1, const db::ICplxTrans &t1, const db::Instance &i2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
   {
     box_type bb1 = (*mp_cbc) (i1.cell_index ());
@@ -847,6 +736,16 @@ private:
     }
   }
 
+  /**
+   *  @brief Handles the cluster interactions between two specific instances
+   *  @param common The region under investigation (seen from the top level)
+   *  @param ci1 The cell index of the child cell 1
+   *  @param p1 The instantiation path to the child cell (last element is the instance to ci1)
+   *  @param t1 The accumulated transformation of the path p1
+   *  @param ci2 The cell index of the child cell 2
+   *  @param p2 The instantiation path to the child cell (last element is the instance to ci2)
+   *  @param t2 The accumulated transformation of the path p2
+   */
   void add_single_pair (const box_type &common,
                         db::cell_index_type ci1, const std::vector<db::InstElement> &p1, const db::ICplxTrans &t1,
                         db::cell_index_type ci2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
@@ -907,6 +806,13 @@ private:
 
   }
 
+  /**
+   *  @brief Handles a local clusters vs. the clusters of a specific child instance or instance array
+   *  @param c1 The local cluster
+   *  @param i2 The index of the child cell
+   *  @param p2 The instantiation path to the child cell (not including i2)
+   *  @param t2 The accumulated transformation of the path, not including i2
+   */
   void add_pair (const local_cluster<T> &c1, const db::Instance &i2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
   {
     box_type b1 = c1.bbox ();
@@ -945,6 +851,13 @@ private:
     }
   }
 
+  /**
+   *  @brief Handles a local clusters vs. the clusters of a specific child instance
+   *  @param c1 The local cluster
+   *  @param ci2 The cell index of the child cell
+   *  @param p2 The instantiation path to the child cell (last element is the instance to ci2)
+   *  @param t2 The accumulated transformation of the path
+   */
   void add_single_pair (const local_cluster<T> &c1,
                         db::cell_index_type ci2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
   {
@@ -1003,7 +916,7 @@ struct cell_inst_clusters_box_converter
   typedef typename local_cluster<T>::box_type box_type;
   typedef db::simple_bbox_tag complexity;
 
-  cell_inst_clusters_box_converter (const cell_box_converter<T> &cbc)
+  cell_inst_clusters_box_converter (const cell_clusters_box_converter<T> &cbc)
     : mp_cbc (&cbc)
   {
     //  .. nothing yet ..
@@ -1015,14 +928,14 @@ struct cell_inst_clusters_box_converter
   }
 
 private:
-  const cell_box_converter<T> *mp_cbc;
+  const cell_clusters_box_converter<T> *mp_cbc;
 };
 
 }
 
 template <class T>
 void
-hier_clusters<T>::do_build (cell_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
+hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
 {
   //  already done - don't do again
   if (m_per_cell_clusters.find (cell.cell_index ()) != m_per_cell_clusters.end ()) {

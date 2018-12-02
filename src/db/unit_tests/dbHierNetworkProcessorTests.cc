@@ -28,6 +28,7 @@
 #include "dbPolygon.h"
 #include "dbPath.h"
 #include "dbText.h"
+#include "dbLayout.h"
 
 static std::string l2s (db::Connectivity::layer_iterator b, db::Connectivity::layer_iterator e)
 {
@@ -227,3 +228,98 @@ TEST(11_LocalClusterInteractDifferentLayers)
   cluster.add (db::PolygonRef (poly, repo), 1);
   EXPECT_EQ (cluster.interacts (cluster2, db::ICplxTrans (), conn), true);
 }
+
+static std::string obj2string (const db::PolygonRef &ref)
+{
+  return ref.obj ().transformed (ref.trans ()).to_string ();
+}
+
+template <class T>
+static std::string local_cluster_to_string (const db::local_cluster<T> &cluster, const db::Connectivity &conn)
+{
+  std::string res;
+  for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+    for (typename db::local_cluster<T>::shape_iterator s = cluster.begin (*l); ! s.at_end (); ++s) {
+      if (! res.empty ()) {
+        res += ";";
+      }
+      res += "[" + tl::to_string (*l) + "]" + obj2string (*s);
+    }
+  }
+  return res;
+}
+
+template <class T>
+static std::string local_clusters_to_string (const db::local_clusters<T> &clusters, const db::Connectivity &conn)
+{
+  std::string s;
+  for (typename db::local_clusters<T>::const_iterator c = clusters.begin (); c != clusters.end (); ++c) {
+    if (! s.empty ()) {
+      s += "\n";
+    }
+    s += "#" + tl::to_string (c->id ()) + ":" + local_cluster_to_string (*c, conn);
+  }
+  return s;
+}
+
+TEST(20_LocalClustersBasic)
+{
+  db::Layout layout;
+  db::Cell &cell = layout.cell (layout.add_cell ("TOP"));
+  db::GenericRepository &repo = layout.shape_repository ();
+
+  db::Connectivity conn;
+  conn.connect (0);
+  conn.connect (1);
+  conn.connect (2);
+  conn.connect (0, 1);
+  conn.connect (0, 2);
+
+  db::Polygon poly;
+  tl::from_string ("(0,0;0,1000;1000,1000;1000,0)", poly);
+
+  cell.shapes (0).insert (db::PolygonRef (poly, repo));
+
+  db::local_clusters<db::PolygonRef> clusters;
+  EXPECT_EQ (local_clusters_to_string (clusters, conn), "");
+
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0)");
+
+  //  one more shape
+  cell.shapes (0).insert (db::PolygonRef (poly.transformed (db::Trans (db::Vector (10, 20))), repo));
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn), "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)");
+
+  //  one more shape creating a new cluster
+  cell.shapes (2).insert (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1100))), repo));
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn),
+    "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20)\n"
+    "#2:[2](0,1100;0,2100;1000,2100;1000,1100)"
+  );
+
+  //  one more shape connecting these
+  cell.shapes (2).insert (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1000))), repo));
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn),
+    "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1000;0,2000;1000,2000;1000,1000);[2](0,1100;0,2100;1000,2100;1000,1100)"
+  );
+
+  //  one more shape opening a new cluster
+  cell.shapes (1).insert (db::PolygonRef (poly.transformed (db::Trans (db::Vector (0, 1100))), repo));
+
+  clusters.clear ();
+  clusters.build_clusters (cell, db::ShapeIterator::Polygons, conn);
+  EXPECT_EQ (local_clusters_to_string (clusters, conn),
+    "#1:[0](0,0;0,1000;1000,1000;1000,0);[0](10,20;10,1020;1010,1020;1010,20);[2](0,1000;0,2000;1000,2000;1000,1000);[2](0,1100;0,2100;1000,2100;1000,1100)\n"
+    "#2:[1](0,1100;0,2100;1000,2100;1000,1100)"
+  );
+}
+

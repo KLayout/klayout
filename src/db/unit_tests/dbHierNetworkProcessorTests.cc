@@ -29,6 +29,8 @@
 #include "dbPath.h"
 #include "dbText.h"
 #include "dbLayout.h"
+#include "dbStream.h"
+#include "dbCommonReader.h"
 
 static std::string l2s (db::Connectivity::layer_iterator b, db::Connectivity::layer_iterator e)
 {
@@ -383,12 +385,155 @@ TEST(30_LocalConnectedClusters)
 
   cc.add_connection (2, db::ClusterInstance (3, p1));
 
-  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (3, p1), 0), 2);
-  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p1), 0), 0);
-  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p2), 0), 1);
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (3, p1), 0), size_t (2));
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p1), 0), size_t (0));
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p2), 0), size_t (1));
 
   cc.add_connection (17, db::ClusterInstance (2, p3));
 
   //  p3 == p2 minus 1 at the beginning
-  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p2), 1 /*one stripped*/), 17);
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p2), 1 /*one stripped*/), size_t (17));
+}
+
+static void normalize_layer (db::Layout &layout, unsigned int layer)
+{
+  for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+    db::Shapes s (layout.is_editable ());
+    s.swap (c->shapes (layer));
+    for (db::Shapes::shape_iterator i = s.begin (db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes); !i.at_end (); ++i) {
+      db::Polygon poly;
+      i->polygon (poly);
+      c->shapes (layer).insert (db::PolygonRef (poly, layout.shape_repository ()));
+    }
+  }
+}
+
+static void copy_cluster_shapes (db::Shapes &out, db::cell_index_type ci, const db::hier_clusters<db::PolygonRef> &hc, const db::local_cluster<db::PolygonRef> &cluster, const db::ICplxTrans &trans, const db::Connectivity &conn)
+{
+  //  use property #1 to code the cell name
+
+  db::PropertiesRepository &pr = out.layout ()->properties_repository ();
+  db::property_names_id_type pn_id = pr.prop_name_id (tl::Variant (1));
+  db::PropertiesRepository::properties_set pm;
+  pm.insert (std::make_pair (pn_id, tl::Variant (out.layout ()->cell_name (ci))));
+  db::properties_id_type cell_pid = pr.properties_id (pm);
+
+  //  copy the shapes from this cell
+  for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
+    for (db::local_cluster<db::PolygonRef>::shape_iterator s = cluster.begin (*l); ! s.at_end (); ++s) {
+      db::Polygon poly = s->obj ().transformed (trans * db::ICplxTrans (s->trans ()));
+      out.insert (db::PolygonWithProperties (poly, cell_pid));
+    }
+  }
+
+  out.layout ()->cell_name (ci);
+
+  //  copy the shapes from the child cells too
+  typedef db::connected_clusters<db::PolygonRef>::connections_type connections_type;
+  const connections_type &connections = hc.clusters_per_cell (ci).connections_for_cluster (cluster.id ());
+  for (connections_type::const_iterator i = connections.begin (); i != connections.end (); ++i) {
+
+    db::ICplxTrans t = trans;
+    for (db::ClusterInstance::inst_path_type::const_iterator p = i->inst ().begin (); p != i->inst ().end (); ++p) {
+      t = t * p->complex_trans ();
+    }
+
+    db::cell_index_type cci = i->inst ().back ().inst_ptr.cell_index ();
+    copy_cluster_shapes (out, cci, hc, hc.clusters_per_cell (cci).cluster_by_id (i->id ()), t, conn);
+
+  }
+}
+
+static void run_hc_test (tl::TestBase *_this, const std::string &file, const std::string &au_file)
+{
+  db::Layout ly;
+  unsigned int l1 = 0, l2 = 0, l3 = 0;
+
+  {
+    db::LayerProperties p;
+    db::LayerMap lmap;
+
+    p.layer = 1;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l1 = ly.insert_layer ());
+    ly.set_properties (l1, p);
+
+    p.layer = 2;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l2 = ly.insert_layer ());
+    ly.set_properties (l2, p);
+
+    p.layer = 3;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l3 = ly.insert_layer ());
+    ly.set_properties (l3, p);
+
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/";
+    fn += file;
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  normalize_layer (ly, l1);
+  normalize_layer (ly, l2);
+  normalize_layer (ly, l3);
+
+  //  connect 1 to 1, 1 to 2 and 1 to 3, but *not* 2 to 3
+  db::Connectivity conn;
+  conn.connect (l1, l1);
+  conn.connect (l2, l2);
+  conn.connect (l3, l3);
+  conn.connect (l1, l2);
+  conn.connect (l1, l3);
+
+  db::hier_clusters<db::PolygonRef> hc;
+  hc.build (ly, ly.cell (*ly.begin_top_down ()), db::ShapeIterator::Polygons, conn);
+
+  std::vector<std::pair<db::Polygon::area_type, unsigned int> > net_layers;
+
+  for (db::Layout::top_down_const_iterator td = ly.begin_top_down (); td != ly.end_top_down (); ++td) {
+
+    const db::connected_clusters<db::PolygonRef> &clusters = hc.clusters_per_cell (*td);
+    for (db::connected_clusters<db::PolygonRef>::const_iterator c = clusters.begin (); c.at_end (); ++c) {
+
+      net_layers.push_back (std::make_pair (0, ly.insert_layer ()));
+
+      unsigned int lout = net_layers.back ().second;
+
+      db::Shapes &out = ly.cell (*ly.begin_top_down ()).shapes (lout);
+      copy_cluster_shapes (out, *ly.begin_top_down (), hc, *c, db::ICplxTrans (), conn);
+
+      db::Polygon::area_type area = 0;
+      for (db::Shapes::shape_iterator s = out.begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
+        area += s->area ();
+      }
+      net_layers.back ().first = area;
+
+    }
+
+  }
+
+  //  sort layers by area so we have a consistent numbering
+  std::sort (net_layers.begin (), net_layers.end ());
+  std::reverse (net_layers.begin (), net_layers.end ());
+
+  int ln = 1000;
+  for (std::vector<std::pair<db::Polygon::area_type, unsigned int> >::const_iterator l = net_layers.begin (); l != net_layers.end (); ++l) {
+    ly.set_properties (l->second, db::LayerProperties (ln, 0));
+    ++ln;
+  }
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/" + au_file);
+}
+
+TEST(40_HierClusters)
+{
+  run_hc_test (_this, "hc_test_l1.gds", "hc_test_au1.gds");
 }

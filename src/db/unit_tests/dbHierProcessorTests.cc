@@ -126,7 +126,7 @@ private:
  *  @brief Turns a layer into polygons and polygon references
  *  The hierarchical processor needs polygon references and can't work on polygons directly.
  */
-void normalize_layer (db::Layout &layout, unsigned int layer)
+static void normalize_layer (db::Layout &layout, unsigned int layer)
 {
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
     db::Shapes s (layout.is_editable ());
@@ -140,7 +140,7 @@ void normalize_layer (db::Layout &layout, unsigned int layer)
 }
 
 
-std::string contexts_to_s (db::Layout *layout, db::LocalProcessorContexts &contexts)
+static std::string contexts_to_s (db::Layout *layout, db::LocalProcessorContexts &contexts)
 {
   std::string res;
 
@@ -158,7 +158,7 @@ std::string contexts_to_s (db::Layout *layout, db::LocalProcessorContexts &conte
   return res;
 }
 
-void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc, bool single, db::Coord dist, unsigned int nthreads = 0)
+static void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc, bool single, db::Coord dist, unsigned int nthreads = 0)
 {
   db::Layout layout_org;
 
@@ -257,22 +257,22 @@ void run_test_bool_gen (tl::TestBase *_this, const char *file, TestMode mode, in
   db::compare_layouts (_this, layout_org, testdata (file), lmap, false /*skip other layers*/, db::AsPolygons);
 }
 
-void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
+static void run_test_bool (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
   run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true, 0, nthreads);
 }
 
-void run_test_bool2 (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
+static void run_test_bool2 (tl::TestBase *_this, const char *file, TestMode mode, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
   run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false, 0, nthreads);
 }
 
-void run_test_bool_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
+static void run_test_bool_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
   run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, true, dist, nthreads);
 }
 
-void run_test_bool2_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
+static void run_test_bool2_with_size (tl::TestBase *_this, const char *file, TestMode mode, db::Coord dist, int out_layer_num, std::string *context_doc = 0, unsigned int nthreads = 0)
 {
   run_test_bool_gen (_this, file, mode, out_layer_num, context_doc, false, dist, nthreads);
 }

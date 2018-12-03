@@ -337,16 +337,6 @@ TEST(30_LocalConnectedClusters)
 
   db::connected_clusters<db::PolygonRef> cc;
 
-  db::ClusterInstance::inst_path_type p1;
-  p1.push_back (db::InstElement (i1));
-
-  db::ClusterInstance::inst_path_type p2;
-  p2.push_back (db::InstElement (i1));
-  p2.push_back (db::InstElement (i2));
-
-  db::ClusterInstance::inst_path_type p3;
-  p3.push_back (db::InstElement (i2));
-
   db::connected_clusters<db::PolygonRef>::connections_type x;
   db::connected_clusters<db::PolygonRef>::connections_type::const_iterator ix;
 
@@ -355,44 +345,67 @@ TEST(30_LocalConnectedClusters)
   x = cc.connections_for_cluster (2);
   EXPECT_EQ (x.size (), size_t (0));
 
-  cc.add_connection (1, db::ClusterInstance (1, p1));
-  cc.add_connection (1, db::ClusterInstance (2, p2));
+  //  after this:
+  //   [#1] -> i1:#1
+  //        -> i2:#2
+  cc.add_connection (1, db::ClusterInstance (1, db::InstElement (i1)));
+  cc.add_connection (1, db::ClusterInstance (2, db::InstElement (i2)));
 
   x = cc.connections_for_cluster (1);
   EXPECT_EQ (x.size (), size_t (2));
   x = cc.connections_for_cluster (2);
   EXPECT_EQ (x.size (), size_t (0));
 
-  cc.add_connection (2, db::ClusterInstance (1, p2));
+  //  after this:
+  //   [#1] -> i1:#1
+  //        -> i2:#2
+  //   [#2] -> i2:#1
+  cc.add_connection (2, db::ClusterInstance (1, db::InstElement (i2)));
   x = cc.connections_for_cluster (2);
   EXPECT_EQ (x.size (), size_t (1));
 
-  cc.join_connected_clusters (1, 2);
+  cc.join_cluster_with (1, 2);
   x = cc.connections_for_cluster (1);
   EXPECT_EQ (x.size (), size_t (3));
   ix = x.begin ();
   EXPECT_EQ (ix->id (), size_t (1));
-  EXPECT_EQ (ix->inst () == p1, true);
+  EXPECT_EQ (ix->inst () == db::InstElement (i1), true);
   ++ix;
   EXPECT_EQ (ix->id (), size_t (2));
-  EXPECT_EQ (ix->inst () == p2, true);
+  EXPECT_EQ (ix->inst () == db::InstElement (i2), true);
   ++ix;
   EXPECT_EQ (ix->id (), size_t (1));
-  EXPECT_EQ (ix->inst () == p2, true);
+  EXPECT_EQ (ix->inst () == db::InstElement (i2), true);
 
   x = cc.connections_for_cluster (2);
   EXPECT_EQ (x.size (), size_t (0));
 
-  cc.add_connection (2, db::ClusterInstance (3, p1));
+  //  after this:
+  //   [#1] -> i1:#1
+  //        -> i2:#2
+  //   [#2] -> i2:#1
+  //        -> i1:#3
+  cc.add_connection (2, db::ClusterInstance (3, db::InstElement (i1)));
 
-  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (3, p1), 0), size_t (2));
-  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p1), 0), size_t (0));
-  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p2), 0), size_t (1));
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (3, db::InstElement (i1))), size_t (2));
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, db::InstElement (i1))), size_t (0));
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, db::InstElement (i2))), size_t (1));
 
-  cc.add_connection (17, db::ClusterInstance (2, p3));
+  //  after this:
+  //   [#1] -> i1:#1
+  //        -> i2:#2
+  //        -> i2:#1
+  //        -> i1:#3
+  cc.join_cluster_with (1, 2);
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (3, db::InstElement (i1))), size_t (1));
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (1, db::InstElement (i1))), size_t (1));
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, db::InstElement (i1))), size_t (0));
+  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, db::InstElement (i2))), size_t (1));
 
-  //  p3 == p2 minus 1 at the beginning
-  EXPECT_EQ (cc.find_cluster_with_connection (db::ClusterInstance (2, p2), 1 /*one stripped*/), size_t (17));
+  x = cc.connections_for_cluster (1);
+  EXPECT_EQ (x.size (), size_t (4));
+  x = cc.connections_for_cluster (2);
+  EXPECT_EQ (x.size (), size_t (0));
 }
 
 static void normalize_layer (db::Layout &layout, unsigned int layer)
@@ -433,12 +446,9 @@ static void copy_cluster_shapes (db::Shapes &out, db::cell_index_type ci, const 
   const connections_type &connections = hc.clusters_per_cell (ci).connections_for_cluster (cluster.id ());
   for (connections_type::const_iterator i = connections.begin (); i != connections.end (); ++i) {
 
-    db::ICplxTrans t = trans;
-    for (db::ClusterInstance::inst_path_type::const_iterator p = i->inst ().begin (); p != i->inst ().end (); ++p) {
-      t = t * p->complex_trans ();
-    }
+    db::ICplxTrans t = trans * i->inst ().complex_trans ();
 
-    db::cell_index_type cci = i->inst ().back ().inst_ptr.cell_index ();
+    db::cell_index_type cci = i->inst ().inst_ptr.cell_index ();
     copy_cluster_shapes (out, cci, hc, hc.clusters_per_cell (cci).cluster_by_id (i->id ()), t, conn);
 
   }

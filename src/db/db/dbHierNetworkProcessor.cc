@@ -31,6 +31,8 @@
 
 #include <vector>
 #include <map>
+#include <list>
+#include <set>
 
 namespace db
 {
@@ -304,7 +306,7 @@ template class DB_PUBLIC local_cluster<db::PolygonRef>;
 
 template <class T>
 local_clusters<T>::local_clusters ()
-  : m_needs_update (false)
+  : m_needs_update (false), m_next_dummy_id (0)
 {
   //  .. nothing yet ..
 }
@@ -315,26 +317,61 @@ void local_clusters<T>::clear ()
   m_needs_update = false;
   m_clusters.clear ();
   m_bbox = box_type ();
+  m_next_dummy_id = 0;
 }
 
 template <class T>
 const local_cluster<T> &
 local_clusters<T>::cluster_by_id (typename local_cluster<T>::id_type id) const
 {
-  //  by convention the ID is the index + 1 so 0 can be used as "nil"
-  tl_assert (id > 0 && id <= m_clusters.size ());
-  return m_clusters.objects ().item (id - 1);
+  tl_assert (id > 0);
+
+  if (id > m_clusters.size ()) {
+
+    //  dummy connectors are not real ones - they just carry an arbitrary
+    //  ID. Still they need to be treated as empty ones.
+    static local_cluster<T> empty_cluster;
+    return empty_cluster;
+
+  } else {
+
+    //  by convention the ID is the index + 1 so 0 can be used as "nil"
+    return m_clusters.objects ().item (id - 1);
+
+  }
 }
 
 template <class T>
 void
 local_clusters<T>::remove_cluster (typename local_cluster<T>::id_type id)
 {
-  tl_assert (id > 0 && id <= m_clusters.size ());
+  if (id == 0 || id > m_clusters.size ()) {
+    return;
+  }
+
   //  TODO: get rid of this const_cast by providing "delete by index"
   //  m_clusters.erase (id - 1)
   local_cluster<T> *to_delete = const_cast<local_cluster<T> *> (& m_clusters.objects ().item (id - 1));
   m_clusters.erase (m_clusters.iterator_from_pointer (to_delete));
+  m_needs_update = true;
+}
+
+template <class T>
+void
+local_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id)
+{
+  tl_assert (id > 0);
+  if (with_id == 0 || with_id > m_clusters.size () || id > m_clusters.size ()) {
+    return;
+  }
+
+  //  TODO: this const_cast is required. But we know what we're doing ...
+  local_cluster<T> *with = const_cast<local_cluster<T> *> (& m_clusters.objects ().item (with_id - 1));
+  local_cluster<T> *first = const_cast<local_cluster<T> *> (& m_clusters.objects ().item (id - 1));
+  first->join_with (*with);
+
+  m_clusters.erase (m_clusters.iterator_from_pointer (with));
+
   m_needs_update = true;
 }
 
@@ -488,48 +525,43 @@ void
 connected_clusters<T>::add_connection (typename local_cluster<T>::id_type id, const ClusterInstance &inst)
 {
   m_connections [id].push_back (inst);
+  m_rev_connections [inst] = id;
 }
 
 template <class T>
 void
-connected_clusters<T>::join_connected_clusters (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id)
+connected_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id)
 {
   if (id == with_id) {
     return;
   }
 
+  //  join the shape clusters
+  local_clusters<T>::join_cluster_with (id, with_id);
+
+  //  handle the connections by translating
+
   const connections_type &to_join = connections_for_cluster (with_id);
   connections_type &target = m_connections [id];
   target.insert (target.end (), to_join.begin (), to_join.end ());
+
+  for (connections_type::const_iterator c = to_join.begin (); c != to_join.end (); ++c) {
+    m_rev_connections [*c] = id;
+  }
+
   m_connections.erase (with_id);
 }
 
 template <class T>
 typename local_cluster<T>::id_type
-connected_clusters<T>::find_cluster_with_connection (const ClusterInstance &ci, size_t strip) const
+connected_clusters<T>::find_cluster_with_connection (const ClusterInstance &inst) const
 {
-  for (typename std::map<typename local_cluster<T>::id_type, connections_type>::const_iterator i = m_connections.begin (); i != m_connections.end (); ++i) {
-
-    for (connections_type::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
-
-      const ClusterInstance::inst_path_type &path = j->inst ();
-      if (j->id () == ci.id () && path.size () == ci.inst ().size () - strip) {
-
-        bool match = true;
-        for (size_t k = 0; k < path.size () && match; ++k) {
-          match = (path [k] == ci.inst () [k + strip]);
-        }
-        if (match) {
-          return i->first;
-        }
-
-      }
-
-    }
-
+  typename std::map<ClusterInstance, typename local_cluster<T>::id_type>::const_iterator rc = m_rev_connections.find (inst);
+  if (rc != m_rev_connections.end ()) {
+    return rc->second;
+  } else {
+    return 0;
   }
-
-  return 0;
 }
 
 //  explicit instantiations
@@ -623,7 +655,7 @@ struct hc_receiver
 public:
   typedef typename hier_clusters<T>::box_type box_type;
   typedef typename local_cluster<T>::id_type id_type;
-  typedef std::map<ClusterInstance, local_cluster<T> *> connector_map;
+  typedef std::map<ClusterInstance, id_type> connector_map;
 
   /**
    *  @brief Constructor
@@ -659,6 +691,30 @@ public:
     return false;
   }
 
+  /**
+   *  @brief Finally join the clusters in the join set
+   *
+   *  This step is postponed because doing this while the iteration happens would
+   *  invalidate the box trees.
+   */
+  void join_superclusters ()
+  {
+    for (typename std::list<std::set<id_type> >::const_iterator sc = m_cm2join_sets.begin (); sc != m_cm2join_sets.end (); ++sc) {
+
+      if (sc->empty ()) {
+        //  dropped ones are empty
+        continue;
+      }
+
+      typename std::set<id_type>::const_iterator c = sc->begin ();
+      ++c;
+      for (typename std::set<id_type>::const_iterator cc = c; cc != sc->end (); ++cc) {
+        mp_cell_clusters->join_cluster_with (*c, *cc);
+      }
+
+    }
+  }
+
 private:
   const db::Layout *mp_layout;
   db::connected_clusters<T> *mp_cell_clusters;
@@ -666,7 +722,8 @@ private:
   const cell_clusters_box_converter<T> *mp_cbc;
   const db::Connectivity *mp_conn;
   connector_map m_connectors;
-  mutable std::map<ClusterInstance, ClusterInstance> m_reduction_cache;
+  std::map<id_type, std::set<id_type> *> m_cm2join_map;
+  std::list<std::set<id_type> > m_cm2join_sets;
 
   /**
    *  @brief Handles the cluster interactions between two instances or instance arrays
@@ -701,7 +758,7 @@ private:
       box_type ib1 = bb1.transformed (tt1);
       box_type ib12 = ib1.transformed (t12);
 
-      ClusterInstance::inst_path_type pp1;
+      std::vector<db::InstElement> pp1;
       pp1.reserve (p1.size () + 1);
       pp1.insert (pp1.end (), p1.begin (), p1.end ());
       pp1.push_back (db::InstElement (i1, ii1));
@@ -713,7 +770,7 @@ private:
 
         if (ib1.touches (ib2)) {
 
-          ClusterInstance::inst_path_type pp2;
+          std::vector<db::InstElement> pp2;
           pp2.reserve (p2.size () + 1);
           pp2.insert (pp2.end (), p2.begin (), p2.end ());
           pp2.push_back (db::InstElement (i2, ii2));
@@ -767,11 +824,8 @@ private:
 
         if (i->interacts (*j, t21, *mp_conn)) {
 
-          ClusterInstance k1 (i->id (), p1);
-          reduce (k1);
-
-          ClusterInstance k2 (j->id (), p2);
-          reduce (k2);
+          ClusterInstance k1 = make_path (i->id (), p1);
+          ClusterInstance k2 = make_path (j->id (), p2);
 
           typename connector_map::iterator x1 = m_connectors.find (k1);
           typename connector_map::iterator x2 = m_connectors.find (k2);
@@ -780,23 +834,23 @@ private:
 
             if (x2 == m_connectors.end ()) {
 
-              db::local_cluster<T> *connector = mp_cell_clusters->insert ();
+              id_type connector = mp_cell_clusters->insert_dummy ();
               m_connectors [k1] = connector;
-              mp_cell_clusters->add_connection (connector->id (), k1);
-              mp_cell_clusters->add_connection (connector->id (), k2);
+              mp_cell_clusters->add_connection (connector, k1);
+              mp_cell_clusters->add_connection (connector, k2);
 
             } else {
-              mp_cell_clusters->add_connection (x2->second->id (), k1);
+              mp_cell_clusters->add_connection (x2->second, k1);
             }
 
           } else if (x2 == m_connectors.end ()) {
 
-            mp_cell_clusters->add_connection (x1->second->id (), k2);
+            mp_cell_clusters->add_connection (x1->second, k2);
 
           } else if (x1->second != x2->second) {
 
-            mp_cell_clusters->join_connected_clusters (x1->second->id (), x2->second->id ());
-            mp_cell_clusters->remove_cluster (x2->second->id ());
+            mp_cell_clusters->join_cluster_with (x1->second, x2->second);
+            mp_cell_clusters->remove_cluster (x2->second);
             x2->second = x1->second;
 
           }
@@ -836,7 +890,7 @@ private:
 
       if (b1.touches (ib2)) {
 
-        ClusterInstance::inst_path_type pp2;
+        std::vector<db::InstElement> pp2;
         pp2.reserve (p2.size () + 1);
         pp2.insert (pp2.end (), p2.begin (), p2.end ());
         pp2.push_back (db::InstElement (i2, ii2));
@@ -870,10 +924,19 @@ private:
 
       if (c1.interacts (*j, t2, *mp_conn)) {
 
-        ClusterInstance k2 (j->id (), p2);
-        reduce (k2);
+        ClusterInstance k2 = make_path (j->id (), p2);
 
-        mp_cell_clusters->add_connection (c1.id (), k2);
+        id_type other = mp_cell_clusters->find_cluster_with_connection (k2);
+        if (other > 0) {
+
+          //  we found a child cluster that connects two clusters on our own level:
+          //  we must join them into one, but not now. We're still iterating and
+          //  would invalidate the box trees. So keep this now and combine the clusters later.
+          mark_to_join (other, c1.id ());
+
+        } else {
+          mp_cell_clusters->add_connection (c1.id (), k2);
+        }
 
       }
 
@@ -881,35 +944,85 @@ private:
   }
 
   /**
-   *  @brief Reduce the connection path to the connector highest in the hierarchy
-   *
-   *  This feature shall prevent a situation where a connection is made to a sub-cluster of
-   *  another hierarchical cluster. We always attach to the highest possible connector.
+   *  @brief Inserts a pair of clusters to join
    */
-  void reduce (ClusterInstance &k) const
+  void mark_to_join (id_type a, id_type b)
   {
-    std::map<ClusterInstance, ClusterInstance>::const_iterator kr = m_reduction_cache.find (k);
-    if (kr != m_reduction_cache.end ()) {
-      k = kr->second;
-      return;
+    typename std::map<id_type, std::set<id_type> *>::const_iterator x = m_cm2join_map.find (a);
+    typename std::map<id_type, std::set<id_type> *>::const_iterator y = m_cm2join_map.find (b);
+
+    if (x == m_cm2join_map.end ()) {
+
+      if (y == m_cm2join_map.end ()) {
+
+        m_cm2join_sets.push_back (std::set<id_type> ());
+        m_cm2join_sets.back ().insert (a);
+        m_cm2join_sets.back ().insert (b);
+
+        m_cm2join_map [a] = &m_cm2join_sets.back ();
+        m_cm2join_map [b] = &m_cm2join_sets.back ();
+
+      } else {
+
+        y->second->insert (a);
+        m_cm2join_map [a] = y->second;
+
+      }
+
+    } else if (y == m_cm2join_map.end ()) {
+
+      x->second->insert (b);
+      m_cm2join_map [b] = x->second;
+
+    } else if (x->second != y->second) {
+
+      //  join two superclusters
+      x->second->insert (y->second->begin (), y->second->end ());
+      for (typename std::set<id_type>::const_iterator i = y->second->begin (); i != y->second->end (); ++i) {
+        m_cm2join_map [*i] = x->second;
+      }
+      y->second->clear ();
+
     }
+  }
 
-    for (size_t rn = 1; rn + 1 < k.inst ().size (); ++rn) {
+  /**
+   *  @brief Makes a valid path to a child cluster
+   *
+   *  Cluster connections can only cross one level of hierarchy. This method
+   *  creates necessary dummy entries for the given path.
+   */
+  ClusterInstance make_path (id_type id, const std::vector<db::InstElement> &path) const
+  {
+    std::vector<db::InstElement>::const_iterator p = path.end ();
+    tl_assert (p != path.begin ());
 
-      const db::connected_clusters<T> &clusters = mp_tree->clusters_per_cell (k.inst () [rn - 1].inst_ptr.cell_index ());
-      id_type red_id = clusters.find_cluster_with_connection (k, rn);
-      if (red_id > 0) {
+    while (true) {
 
-        //  reduction possible
-        ClusterInstance::inst_path_type new_path;
-        new_path.insert (new_path.end (), k.inst ().begin (), k.inst ().begin () + rn);
-        k = ClusterInstance (red_id, new_path);
-        return;
+      --p;
+
+      ClusterInstance ci (id, *p);
+      if (p == path.begin ()) {
+        return ci;
+      }
+
+      connected_clusters<T> &target_cc = mp_tree->clusters_per_cell (p [-1].inst_ptr.cell_index ());
+      id_type parent_cluster = target_cc.find_cluster_with_connection (ci);
+
+      if (parent_cluster > 0) {
+
+        //  taken parent
+        id = parent_cluster;
+
+      } else {
+
+        //  no parent -> create vertical connector
+        id = target_cc.insert_dummy ();
+        target_cc.add_connection (id, ci);
 
       }
 
     }
-
   }
 };
 
@@ -987,6 +1100,9 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
 
     bs2.process (rec, 1 /*touching*/, local_cluster_box_convert<T> (), cibc);
   }
+
+  //  finally join local clusters which got connected by child clusters
+  rec.join_superclusters ();
 }
 
 template <class T>
@@ -1000,6 +1116,15 @@ hier_clusters<T>::clusters_per_cell (db::cell_index_type cell_index) const
   } else {
     return c->second;
   }
+}
+
+template <class T>
+connected_clusters<T> &
+hier_clusters<T>::clusters_per_cell (db::cell_index_type cell_index)
+{
+  typename std::map<db::cell_index_type, connected_clusters<T> >::iterator c = m_per_cell_clusters.find (cell_index);
+  tl_assert (c != m_per_cell_clusters.end ());
+  return c->second;
 }
 
 //  explicit instantiations

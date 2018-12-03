@@ -255,6 +255,13 @@ public:
   void remove_cluster (typename local_cluster<T>::id_type id);
 
   /**
+   *  @brief Joins a cluster with another one
+   *
+   *  This will also remove the other cluster.
+   */
+  void join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
+
+  /**
    *  @brief Gets the bounding box of the clusters
    */
   box_type bbox () const
@@ -304,12 +311,23 @@ public:
    */
   local_cluster<T> *insert ();
 
+  /**
+   *  @brief Allocates a new ID for dummy clusters
+   *
+   *  Dummy cluster ID's will deliver empty clusters. Used for connectors.
+   */
+  typename local_cluster<T>::id_type insert_dummy ()
+  {
+    return --m_next_dummy_id;
+  }
+
 private:
   void ensure_sorted ();
 
   bool m_needs_update;
   box_type m_bbox;
   tree_type m_clusters;
+  size_t m_next_dummy_id;
 };
 
 /**
@@ -318,10 +336,8 @@ private:
 class DB_PUBLIC ClusterInstance
 {
 public:
-  typedef std::vector<db::InstElement> inst_path_type;
-
-  ClusterInstance (size_t id, const inst_path_type &inst_path)
-    : m_id (id), m_inst_path (inst_path)
+  ClusterInstance (size_t id, const db::InstElement &inst)
+    : m_id (id), m_inst (inst)
   {
     //  .. nothing yet ..
   }
@@ -337,9 +353,9 @@ public:
   /**
    *  @brief Gets the instance path
    */
-  const inst_path_type &inst () const
+  const db::InstElement &inst () const
   {
-    return m_inst_path;
+    return m_inst;
   }
 
   /**
@@ -347,7 +363,7 @@ public:
    */
   bool operator== (const ClusterInstance &other) const
   {
-    return m_id == other.m_id && m_inst_path == other.m_inst_path;
+    return m_id == other.m_id && m_inst == other.m_inst;
   }
 
   /**
@@ -358,12 +374,12 @@ public:
     if (m_id != other.m_id) {
       return m_id < other.m_id;
     }
-    return m_inst_path < other.m_inst_path;
+    return m_inst < other.m_inst;
   }
 
 private:
   size_t m_id;
-  inst_path_type m_inst_path;
+  db::InstElement m_inst;
 };
 
 template <class T> class hier_clusters;
@@ -394,26 +410,28 @@ public:
   const connections_type &connections_for_cluster (typename local_cluster<T>::id_type id) const;
 
   /**
+   *  @brief Reverse "connections_for_cluster"
+   *  Finds the cluster which has a connection given by inst.
+   *  Returns 0 if the given connection does not exist.
+   */
+  typename local_cluster<T>::id_type find_cluster_with_connection (const ClusterInstance &inst) const;
+
+  /**
    *  @brief Adds a connection between a local cluster and one from a child instance
    */
   void add_connection (typename local_cluster<T>::id_type, const ClusterInstance &inst);
 
   /**
-   *  @brief Joins all connections of with_id to id
-   */
-  void join_connected_clusters (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
-
-  /**
-   *  @brief Reverse "connections_for_cluster"
+   *  @brief Joins the cluster id with the cluster with_id
    *
-   *  Finds the cluster which has a connection given by inst. "strip" elements
-   *  are stipped from the front of the instantiation path.
-   *  This method returns 0 if no cluster can be found.
+   *  The "with_id" cluster is removed. All connections of "with_id" are transferred to the
+   *  first one. All shapes of "with_id" are transferred to "id".
    */
-  typename local_cluster<T>::id_type find_cluster_with_connection (const ClusterInstance &inst, size_t strip) const;
+  void join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
 
 private:
   std::map<typename local_cluster<T>::id_type, connections_type> m_connections;
+  std::map<ClusterInstance, typename local_cluster<T>::id_type> m_rev_connections;
 };
 
 template <typename> class cell_clusters_box_converter;
@@ -443,6 +461,11 @@ public:
    *  @brief Gets the connected clusters for a given cell
    */
   const connected_clusters<T> &clusters_per_cell (db::cell_index_type cell_index) const;
+
+  /**
+   *  @brief Gets the connected clusters for a given cell (non-const version)
+   */
+  connected_clusters<T> &clusters_per_cell (db::cell_index_type cell_index);
 
   /**
    *  @brief Clears this collection

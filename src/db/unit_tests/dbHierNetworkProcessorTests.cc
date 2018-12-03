@@ -516,8 +516,8 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
 
       unsigned int lout = net_layers.back ().second;
 
-      db::Shapes &out = ly.cell (*ly.begin_top_down ()).shapes (lout);
-      copy_cluster_shapes (out, *ly.begin_top_down (), hc, *c, db::ICplxTrans (), conn);
+      db::Shapes &out = ly.cell (*td).shapes (lout);
+      copy_cluster_shapes (out, *td, hc, *c, db::ICplxTrans (), conn);
 
       db::Polygon::area_type area = 0;
       for (db::Shapes::shape_iterator s = out.begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
@@ -546,4 +546,9 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
 TEST(40_HierClusters)
 {
   run_hc_test (_this, "hc_test_l1.gds", "hc_test_au1.gds");
+}
+
+TEST(41_HierClusters)
+{
+  run_hc_test (_this, "hc_test_l2.gds", "hc_test_au2.gds");
 }

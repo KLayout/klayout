@@ -349,10 +349,11 @@ local_clusters<T>::remove_cluster (typename local_cluster<T>::id_type id)
     return;
   }
 
-  //  TODO: get rid of this const_cast by providing "delete by index"
-  //  m_clusters.erase (id - 1)
+  //  TODO: this const_cast is required. But we know what we're doing ...
+  //  NOTE: we cannot really delete a cluster as this would shift the indexes. So
+  //  we just clear them.
   local_cluster<T> *to_delete = const_cast<local_cluster<T> *> (& m_clusters.objects ().item (id - 1));
-  m_clusters.erase (m_clusters.iterator_from_pointer (to_delete));
+  to_delete->clear ();
   m_needs_update = true;
 }
 
@@ -370,7 +371,9 @@ local_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id, typ
   local_cluster<T> *first = const_cast<local_cluster<T> *> (& m_clusters.objects ().item (id - 1));
   first->join_with (*with);
 
-  m_clusters.erase (m_clusters.iterator_from_pointer (with));
+  //  NOTE: we cannot really delete a cluster as this would shift the indexes. So
+  //  we just clear them.
+  with->clear ();
 
   m_needs_update = true;
 }
@@ -707,8 +710,8 @@ public:
       }
 
       typename std::set<id_type>::const_iterator c = sc->begin ();
-      ++c;
-      for (typename std::set<id_type>::const_iterator cc = c; cc != sc->end (); ++cc) {
+      typename std::set<id_type>::const_iterator cc = c;
+      for (++cc; cc != sc->end (); ++cc) {
         mp_cell_clusters->join_cluster_with (*c, *cc);
       }
 
@@ -1074,12 +1077,28 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
   hc_receiver<T> rec (layout, local, *this, cbc, conn);
   cell_inst_clusters_box_converter<T> cibc (cbc);
 
+  //  The box scanner needs pointers so we have to first store the instances
+  //  delivered by the cell's iterator (which does not deliver real pointer).
+
+  std::vector<db::Instance> inst_storage;
+
+  //  TODO: there should be a cell.size () for this ...
+  size_t n = 0;
+  for (db::Cell::const_iterator inst = cell.begin (); ! inst.at_end (); ++inst) {
+    n += 1;
+  }
+
+  inst_storage.reserve (n);
+  for (db::Cell::const_iterator inst = cell.begin (); ! inst.at_end (); ++inst) {
+    inst_storage.push_back (*inst);
+  }
+
   //  handle instance to instance connections
 
   {
     db::box_scanner<db::Instance, unsigned int> bs;
 
-    for (db::Cell::const_iterator inst = cell.begin (); ! inst.at_end (); ++inst) {
+    for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
       bs.insert (inst.operator-> (), 0);
     }
 
@@ -1094,7 +1113,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
     for (typename connected_clusters<T>::const_iterator c = local.begin (); c != local.end (); ++c) {
       bs2.insert1 (c.operator-> (), 0);
     }
-    for (db::Cell::const_iterator inst = cell.begin (); ! inst.at_end (); ++inst) {
+    for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
       bs2.insert2 (inst.operator-> (), 0);
     }
 

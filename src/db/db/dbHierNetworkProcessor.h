@@ -383,6 +383,48 @@ private:
 };
 
 template <class T> class hier_clusters;
+template <class T> class connected_clusters;
+
+/**
+ *  @brief An iterator delivering all clusters of a connected_clusters set
+ */
+template <class T>
+class DB_PUBLIC connected_clusters_iterator
+{
+public:
+  typedef typename local_cluster<T>::id_type value_type;
+
+  connected_clusters_iterator (const connected_clusters<T> &c);
+
+  connected_clusters_iterator &operator++ ()
+  {
+    if (! m_lc_iter.at_end ()) {
+      ++m_lc_iter;
+    } else if (m_x_iter != m_x_iter_end) {
+      ++m_x_iter;
+    }
+    return *this;
+  }
+
+  bool at_end () const
+  {
+    return m_lc_iter.at_end () && m_x_iter == m_x_iter_end;
+  }
+
+  value_type operator* () const
+  {
+    if (m_lc_iter.at_end ()) {
+      return m_x_iter->first;
+    } else {
+      return m_lc_iter->id ();
+    }
+  }
+
+private:
+  typename local_clusters<T>::const_iterator m_lc_iter;
+  typedef std::list<ClusterInstance> connections_type;
+  typename std::map<typename local_cluster<T>::id_type, connections_type>::const_iterator m_x_iter, m_x_iter_end;
+};
 
 /**
  *  @brief Local clusters with connections to clusters from child cells
@@ -394,6 +436,7 @@ class DB_PUBLIC connected_clusters
 public:
   typedef std::list<ClusterInstance> connections_type;
   typedef typename local_clusters<T>::box_type box_type;
+  typedef connected_clusters_iterator<T> all_iterator;
 
   /**
    *  @brief Constructor
@@ -429,10 +472,37 @@ public:
    */
   void join_cluster_with (typename local_cluster<T>::id_type id, typename local_cluster<T>::id_type with_id);
 
+  /**
+   *  @brief An iterator delivering all clusters (even the connectors)
+   *
+   *  This iterator will deliver ID's rather than cluster objects.
+   */
+  all_iterator begin_all () const
+  {
+    return connected_clusters_iterator<T> (*this);
+  }
+
 private:
+  template<typename> friend class connected_clusters_iterator;
+
   std::map<typename local_cluster<T>::id_type, connections_type> m_connections;
   std::map<ClusterInstance, typename local_cluster<T>::id_type> m_rev_connections;
 };
+
+template <class T>
+connected_clusters_iterator<T>::connected_clusters_iterator (const connected_clusters<T> &c)
+  : m_lc_iter (c.begin ())
+{
+  size_t max_id = 0;
+  for (typename connected_clusters<T>::const_iterator i = c.begin (); i != c.end (); ++i) {
+    if (i->id () > max_id) {
+      max_id = i->id ();
+    }
+  }
+
+  m_x_iter = c.m_connections.lower_bound (max_id + 1);
+  m_x_iter_end = c.m_connections.end ();
+}
 
 template <typename> class cell_clusters_box_converter;
 

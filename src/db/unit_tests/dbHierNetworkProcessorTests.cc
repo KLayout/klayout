@@ -421,7 +421,7 @@ static void normalize_layer (db::Layout &layout, unsigned int layer)
   }
 }
 
-static void copy_cluster_shapes (db::Shapes &out, db::cell_index_type ci, const db::hier_clusters<db::PolygonRef> &hc, const db::local_cluster<db::PolygonRef> &cluster, const db::ICplxTrans &trans, const db::Connectivity &conn)
+static void copy_cluster_shapes (db::Shapes &out, db::cell_index_type ci, const db::hier_clusters<db::PolygonRef> &hc, db::local_cluster<db::PolygonRef>::id_type cluster_id, const db::ICplxTrans &trans, const db::Connectivity &conn)
 {
   //  use property #1 to code the cell name
 
@@ -431,9 +431,12 @@ static void copy_cluster_shapes (db::Shapes &out, db::cell_index_type ci, const 
   pm.insert (std::make_pair (pn_id, tl::Variant (out.layout ()->cell_name (ci))));
   db::properties_id_type cell_pid = pr.properties_id (pm);
 
+  const db::connected_clusters<db::PolygonRef> &clusters = hc.clusters_per_cell (ci);
+  const db::local_cluster<db::PolygonRef> &lc = clusters.cluster_by_id (cluster_id);
+
   //  copy the shapes from this cell
   for (db::Connectivity::layer_iterator l = conn.begin_layers (); l != conn.end_layers (); ++l) {
-    for (db::local_cluster<db::PolygonRef>::shape_iterator s = cluster.begin (*l); ! s.at_end (); ++s) {
+    for (db::local_cluster<db::PolygonRef>::shape_iterator s = lc.begin (*l); ! s.at_end (); ++s) {
       db::Polygon poly = s->obj ().transformed (trans * db::ICplxTrans (s->trans ()));
       out.insert (db::PolygonWithProperties (poly, cell_pid));
     }
@@ -443,13 +446,13 @@ static void copy_cluster_shapes (db::Shapes &out, db::cell_index_type ci, const 
 
   //  copy the shapes from the child cells too
   typedef db::connected_clusters<db::PolygonRef>::connections_type connections_type;
-  const connections_type &connections = hc.clusters_per_cell (ci).connections_for_cluster (cluster.id ());
+  const connections_type &connections = clusters.connections_for_cluster (cluster_id);
   for (connections_type::const_iterator i = connections.begin (); i != connections.end (); ++i) {
 
     db::ICplxTrans t = trans * i->inst ().complex_trans ();
 
     db::cell_index_type cci = i->inst ().inst_ptr.cell_index ();
-    copy_cluster_shapes (out, cci, hc, hc.clusters_per_cell (cci).cluster_by_id (i->id ()), t, conn);
+    copy_cluster_shapes (out, cci, hc, i->id (), t, conn);
 
   }
 }
@@ -510,7 +513,7 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
   for (db::Layout::top_down_const_iterator td = ly.begin_top_down (); td != ly.end_top_down (); ++td) {
 
     const db::connected_clusters<db::PolygonRef> &clusters = hc.clusters_per_cell (*td);
-    for (db::connected_clusters<db::PolygonRef>::const_iterator c = clusters.begin (); ! c.at_end (); ++c) {
+    for (db::connected_clusters<db::PolygonRef>::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
 
       net_layers.push_back (std::make_pair (0, ly.insert_layer ()));
 
@@ -543,22 +546,32 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/" + au_file);
 }
 
-TEST(40_HierClusters)
+TEST(41_HierClusters)
 {
   run_hc_test (_this, "hc_test_l1.gds", "hc_test_au1.gds");
 }
 
-TEST(41_HierClusters)
+TEST(42_HierClusters)
 {
   run_hc_test (_this, "hc_test_l2.gds", "hc_test_au2.gds");
 }
 
-TEST(42_HierClusters)
+TEST(43_HierClusters)
 {
   run_hc_test (_this, "hc_test_l3.gds", "hc_test_au3.gds");
 }
 
-TEST(43_HierClusters)
+TEST(44_HierClusters)
 {
   run_hc_test (_this, "hc_test_l4.gds", "hc_test_au4.gds");
+}
+
+TEST(45_HierClusters)
+{
+  run_hc_test (_this, "hc_test_l5.gds", "hc_test_au5.gds");
+}
+
+TEST(46_HierClusters)
+{
+  run_hc_test (_this, "hc_test_l6.gds", "hc_test_au6.gds");
 }

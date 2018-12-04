@@ -552,3 +552,13 @@ TEST(41_HierClusters)
 {
   run_hc_test (_this, "hc_test_l2.gds", "hc_test_au2.gds");
 }
+
+TEST(42_HierClusters)
+{
+  run_hc_test (_this, "hc_test_l3.gds", "hc_test_au3.gds");
+}
+
+TEST(43_HierClusters)
+{
+  run_hc_test (_this, "hc_test_l4.gds", "hc_test_au4.gds");
+}

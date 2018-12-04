@@ -103,9 +103,21 @@ interaction_test (const db::PolygonRef &a, const db::PolygonRef &b, const Trans 
 {
   //  TODO: this could be part of db::interact (including transformation)
   if (a.obj ().is_box () && b.obj ().is_box ()) {
-    return db::interact (a.obj ().box ().transformed (b.trans ().inverted () * a.trans ()), b.obj ().box ().transformed (trans));
+    return db::interact (a.obj ().box ().transformed (a.trans ()), b.obj ().box ().transformed (trans * Trans (b.trans ())));
   } else {
-    return db::interact (a.obj ().transformed (b.trans ().inverted () * a.trans ()), b.obj ().transformed (trans));
+    return db::interact (a.obj ().transformed (a.trans ()), b.obj ().transformed (trans * Trans (b.trans ())));
+  }
+}
+
+template <class C>
+static bool
+interaction_test (const db::PolygonRef &a, const db::PolygonRef &b, const db::unit_trans<C> &)
+{
+  //  TODO: this could be part of db::interact (including transformation)
+  if (a.obj ().is_box () && b.obj ().is_box ()) {
+    return db::interact (a.obj ().box ().transformed (a.trans ()), b.obj ().box ().transformed (b.trans ()));
+  } else {
+    return db::interact (a.obj ().transformed (a.trans ()), b.obj ().transformed (b.trans ()));
   }
 }
 
@@ -265,11 +277,10 @@ local_cluster<T>::interacts (const local_cluster<T> &other, const db::ICplxTrans
 {
   const_cast<local_cluster<T> *> (this)->ensure_sorted ();
 
-  if (! other.bbox ().touches (bbox ())) {
+  box_type common = other.bbox ().transformed (trans) & bbox ();
+  if (common.empty ()) {
     return false;
   }
-
-  box_type common = other.bbox () & bbox ();
 
   db::box_scanner2<T, unsigned int, T, unsigned int> scanner;
   transformed_box <T, db::ICplxTrans> bc_t (trans);
@@ -586,6 +597,11 @@ public:
     //  .. nothing yet ..
   }
 
+  const box_type &operator() (const db::CellInst &cell_inst) const
+  {
+    return (*this) (cell_inst.cell_index ());
+  }
+
   const box_type &operator() (db::cell_index_type cell_index) const
   {
     typename std::map<db::cell_index_type, box_type>::const_iterator b = m_cache.find (cell_index);
@@ -601,7 +617,7 @@ public:
       const db::Cell &cell = mp_layout->cell (cell_index);
       for (db::Cell::const_iterator inst = cell.begin (); ! inst.at_end (); ++inst) {
         const db::CellInstArray &inst_array = inst->cell_inst ();
-        box += inst_array.raw_bbox () * (*this) (inst_array.object ().cell_index ());
+        box += inst_array.bbox (*this);
       }
 
       return m_cache.insert (std::make_pair (cell_index, box)).first->second;
@@ -741,10 +757,10 @@ private:
   void add_pair (const db::Instance &i1, const std::vector<db::InstElement> &p1, const db::ICplxTrans &t1, const db::Instance &i2, const std::vector<db::InstElement> &p2, const db::ICplxTrans &t2)
   {
     box_type bb1 = (*mp_cbc) (i1.cell_index ());
-    box_type b1 = (i1.cell_inst ().raw_bbox () * bb1).transformed (t1);
+    box_type b1 = i1.cell_inst ().bbox (*mp_cbc).transformed (t1);
 
     box_type bb2 = (*mp_cbc) (i2.cell_index ());
-    box_type b2 = (i2.cell_inst ().raw_bbox () * bb2).transformed (t2);
+    box_type b2 = i2.cell_inst ().bbox (*mp_cbc).transformed (t2);
 
     if (! b1.touches (b2)) {
       return;
@@ -878,7 +894,7 @@ private:
     box_type b1 = c1.bbox ();
 
     box_type bb2 = (*mp_cbc) (i2.cell_index ());
-    box_type b2 = (i2.cell_inst ().raw_bbox () * bb2).transformed (t2);
+    box_type b2 = i2.cell_inst ().bbox (*mp_cbc).transformed (t2);
 
     if (! b1.touches (b2)) {
       return;
@@ -1043,7 +1059,7 @@ struct cell_inst_clusters_box_converter
 
   box_type operator() (const db::Instance &inst) const
   {
-    return inst.cell_inst ().raw_bbox () * (*mp_cbc) (inst.cell_index ());
+    return inst.cell_inst ().bbox (*mp_cbc);
   }
 
 private:

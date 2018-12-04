@@ -621,8 +621,9 @@ public:
       //  below m_scanner_thr elements use the brute force approach which is faster in that case
 
       for (iterator_type1 i = m_pp1.begin (); i != m_pp1.end (); ++i) {
+        box_type b1 = bc1 (*i->first);
         for (iterator_type2 j = m_pp2.begin (); j != m_pp2.end (); ++j) {
-          if (bs_boxes_overlap (bc1 (*i->first), bc2 (*j->first), enl)) {
+          if (bs_boxes_overlap (b1, bc2 (*j->first), enl)) {
             rec.add (i->first, i->second, j->first, j->second);
             if (rec.stop ()) {
               return false;

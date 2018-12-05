@@ -342,6 +342,12 @@ public:
     //  .. nothing yet ..
   }
 
+  ClusterInstance ()
+    : m_id (0), m_inst ()
+  {
+    //  .. nothing yet ..
+  }
+
   /**
    *  @brief Gets the cluster ID
    */

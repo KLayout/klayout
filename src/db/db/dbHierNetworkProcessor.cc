@@ -740,7 +740,6 @@ private:
   hier_clusters<T> *mp_tree;
   const cell_clusters_box_converter<T> *mp_cbc;
   const db::Connectivity *mp_conn;
-  connector_map m_connectors;
   std::map<id_type, std::set<id_type> *> m_cm2join_map;
   std::list<std::set<id_type> > m_cm2join_sets;
 
@@ -846,31 +845,29 @@ private:
           ClusterInstance k1 = make_path (i->id (), p1);
           ClusterInstance k2 = make_path (j->id (), p2);
 
-          typename connector_map::iterator x1 = m_connectors.find (k1);
-          typename connector_map::iterator x2 = m_connectors.find (k2);
+          id_type x1 = mp_cell_clusters->find_cluster_with_connection (k1);
+          id_type x2 = mp_cell_clusters->find_cluster_with_connection (k2);
 
-          if (x1 == m_connectors.end ()) {
+          if (x1 == 0) {
 
-            if (x2 == m_connectors.end ()) {
+            if (x2 == 0) {
 
               id_type connector = mp_cell_clusters->insert_dummy ();
-              m_connectors [k1] = connector;
               mp_cell_clusters->add_connection (connector, k1);
               mp_cell_clusters->add_connection (connector, k2);
 
             } else {
-              mp_cell_clusters->add_connection (x2->second, k1);
+              mp_cell_clusters->add_connection (x2, k1);
             }
 
-          } else if (x2 == m_connectors.end ()) {
+          } else if (x2 == 0) {
 
-            mp_cell_clusters->add_connection (x1->second, k2);
+            mp_cell_clusters->add_connection (x1, k2);
 
-          } else if (x1->second != x2->second) {
+          } else if (x1 != x2) {
 
-            mp_cell_clusters->join_cluster_with (x1->second, x2->second);
-            mp_cell_clusters->remove_cluster (x2->second);
-            x2->second = x1->second;
+            mp_cell_clusters->join_cluster_with (x1, x2);
+            mp_cell_clusters->remove_cluster (x2);
 
           }
 

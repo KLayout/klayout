@@ -28,6 +28,9 @@
 #include "dbPolygon.h"
 #include "dbPolygonTools.h"
 #include "dbBoxScanner.h"
+#include "tlProgress.h"
+#include "tlLog.h"
+#include "tlTimer.h"
 
 #include <vector>
 #include <map>
@@ -1069,21 +1072,96 @@ template <class T>
 void
 hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
 {
-  //  already done - don't do again
-  if (m_per_cell_clusters.find (cell.cell_index ()) != m_per_cell_clusters.end ()) {
-    return;
+  tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Computing shape clusters")));
+
+  std::set<db::cell_index_type> called;
+  cell.collect_called_cells (called);
+  called.insert (cell.cell_index ());
+
+  //  first build all local clusters
+
+  {
+    tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Computing local shape clusters")));
+    tl::RelativeProgress progress (tl::to_string (tr ("Computing local clusters")), called.size (), 1);
+
+    for (std::set<db::cell_index_type>::const_iterator c = called.begin (); c != called.end (); ++c) {
+      build_local_cluster (layout, layout.cell (*c), shape_flags, conn);
+      ++progress;
+    }
   }
 
-  //  Build local clusters
+  //  build the hierarchical connections bottom-up and for all cells whose children are computed already
+
+  {
+    tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Computing hierarchical shape clusters")));
+    tl::RelativeProgress progress (tl::to_string (tr ("Computing hierarchical clusters")), called.size (), 1);
+
+    std::set<db::cell_index_type> done;
+    std::vector<db::cell_index_type> todo;
+    for (db::Layout::bottom_up_const_iterator c = layout.begin_bottom_up (); c != layout.end_bottom_up (); ++c) {
+
+      if (called.find (*c) != called.end ()) {
+
+        bool all_available = true;
+        const db::Cell &cell = layout.cell (*c);
+        for (db::Cell::child_cell_iterator cc = cell.begin_child_cells (); ! cc.at_end () && all_available; ++cc) {
+          all_available = (done.find (*cc) != done.end ());
+        }
+
+        if (all_available) {
+          todo.push_back (*c);
+        } else {
+          tl_assert (! todo.empty ());
+          build_hier_connections_for_cells (cbc, layout, todo, conn);
+          done.insert (todo.begin (), todo.end ());
+          todo.clear ();
+          todo.push_back (*c);
+        }
+
+        ++progress;
+
+      }
+
+    }
+
+    build_hier_connections_for_cells (cbc, layout, todo, conn);
+  }
+}
+
+template <class T>
+void
+hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn)
+{
+  std::string msg = tl::to_string (tr ("Computing local clusters for cell: ")) + std::string (layout.cell_name (cell.cell_index ()));
+  if (tl::verbosity () >= 30) {
+    tl::log << msg;
+  }
+  tl::SelfTimer (tl::verbosity () >= 31, msg);
 
   connected_clusters<T> &local = m_per_cell_clusters [cell.cell_index ()];
   local.build_clusters (cell, shape_flags, conn);
+}
 
-  //  handle connections inside child cells in a bottom-up fashion
-
-  for (db::Cell::child_cell_iterator cc = cell.begin_child_cells (); ! cc.at_end (); ++cc) {
-    do_build (cbc, layout, layout.cell (*cc), shape_flags, conn);
+template <class T>
+void
+hier_clusters<T>::build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn)
+{
+  for (std::vector<db::cell_index_type>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
+    build_hier_connections (cbc, layout, layout.cell (*c), conn);
   }
+}
+
+template <class T>
+void
+hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn)
+{
+  std::string msg = tl::to_string (tr ("Computing hierarchical clusters for cell: ")) + std::string (layout.cell_name (cell.cell_index ()));
+  if (tl::verbosity () >= 30) {
+    tl::log << msg;
+  }
+  tl::SelfTimer (tl::verbosity () >= 31, msg);
+
+  connected_clusters<T> &local = m_per_cell_clusters [cell.cell_index ()];
 
   //  NOTE: this is a receiver for both the child-to-child and
   //  local to child interactions.
@@ -1109,6 +1187,8 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
   //  handle instance to instance connections
 
   {
+    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Instance to instance treatment")));
+
     db::box_scanner<db::Instance, unsigned int> bs;
 
     for (std::vector<db::Instance>::const_iterator inst = inst_storage.begin (); inst != inst_storage.end (); ++inst) {
@@ -1121,6 +1201,8 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
   //  handle local to instance connections
 
   {
+    tl::SelfTimer timer (tl::verbosity () >= 41, tl::to_string (tr ("Local to instance treatment")));
+
     db::box_scanner2<db::local_cluster<T>, unsigned int, db::Instance, unsigned int> bs2;
 
     for (typename connected_clusters<T>::const_iterator c = local.begin (); c != local.end (); ++c) {

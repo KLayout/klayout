@@ -546,57 +546,129 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/" + au_file);
 }
 
+static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::string &file, const std::string &au_file)
+{
+  db::Layout ly;
+  unsigned int l1 = 0, l2 = 0, l3 = 0;
+
+  {
+    db::LayerProperties p;
+    db::LayerMap lmap;
+
+    p.layer = 1;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l1 = ly.insert_layer ());
+    ly.set_properties (l1, p);
+
+    p.layer = 2;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l2 = ly.insert_layer ());
+    ly.set_properties (l2, p);
+
+    p.layer = 3;
+    p.datatype = 0;
+    lmap.map (db::LDPair (p.layer, p.datatype), l3 = ly.insert_layer ());
+    ly.set_properties (l3, p);
+
+    db::LoadLayoutOptions options;
+    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
+
+    std::string fn (tl::testsrc ());
+    fn += "/testdata/algo/";
+    fn += file;
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly, options);
+  }
+
+  normalize_layer (ly, l1);
+  normalize_layer (ly, l2);
+  normalize_layer (ly, l3);
+
+  //  connect 1 to 1, 1 to 2 and 1 to 3, but *not* 2 to 3
+  db::Connectivity conn;
+  conn.connect (l1, l1);
+  conn.connect (l2, l2);
+  conn.connect (l3, l3);
+  conn.connect (l1, l2);
+  conn.connect (l1, l3);
+
+  db::hier_clusters<db::PolygonRef> hc;
+  hc.build (ly, ly.cell (*ly.begin_top_down ()), db::ShapeIterator::Polygons, conn);
+
+  std::map<unsigned int, unsigned int> lm;
+  lm[l1] = ly.insert_layer (db::LayerProperties (101, 0));
+  lm[l2] = ly.insert_layer (db::LayerProperties (102, 0));
+  lm[l3] = ly.insert_layer (db::LayerProperties (103, 0));
+  hc.return_to_hierarchy (ly, ly.cell (*ly.begin_top_down ()), lm);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/" + au_file);
+}
+
 TEST(41_HierClusters)
 {
   run_hc_test (_this, "hc_test_l1.gds", "hc_test_au1.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l1.gds", "hc_test_au1b.gds");
 }
 
 TEST(42_HierClusters)
 {
   run_hc_test (_this, "hc_test_l2.gds", "hc_test_au2.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l2.gds", "hc_test_au2b.gds");
 }
 
 TEST(43_HierClusters)
 {
   run_hc_test (_this, "hc_test_l3.gds", "hc_test_au3.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l3.gds", "hc_test_au3b.gds");
 }
 
 TEST(44_HierClusters)
 {
   run_hc_test (_this, "hc_test_l4.gds", "hc_test_au4.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l4.gds", "hc_test_au4b.gds");
 }
 
 TEST(45_HierClusters)
 {
   run_hc_test (_this, "hc_test_l5.gds", "hc_test_au5.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l5.gds", "hc_test_au5b.gds");
 }
 
 TEST(46_HierClusters)
 {
   run_hc_test (_this, "hc_test_l6.gds", "hc_test_au6.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l6.gds", "hc_test_au6b.gds");
 }
 
 TEST(47_HierClusters)
 {
   run_hc_test (_this, "hc_test_l7.gds", "hc_test_au7.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l7.gds", "hc_test_au7b.gds");
 }
 
 TEST(48_HierClusters)
 {
   run_hc_test (_this, "hc_test_l8.gds", "hc_test_au8.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l8.gds", "hc_test_au8b.gds");
 }
 
 TEST(49_HierClusters)
 {
   run_hc_test (_this, "hc_test_l9.gds", "hc_test_au9.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l9.gds", "hc_test_au9b.gds");
 }
 
 TEST(50_HierClusters)
 {
   run_hc_test (_this, "hc_test_l10.gds", "hc_test_au10.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l10.gds", "hc_test_au10b.gds");
 }
 
 TEST(51_HierClusters)
 {
   run_hc_test (_this, "hc_test_l11.gds", "hc_test_au11.gds");
+  run_hc_test_with_backannotation (_this, "hc_test_l4.gds", "hc_test_au4b.gds");
 }

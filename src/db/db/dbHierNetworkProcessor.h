@@ -443,6 +443,7 @@ public:
   typedef std::list<ClusterInstance> connections_type;
   typedef typename local_clusters<T>::box_type box_type;
   typedef connected_clusters_iterator<T> all_iterator;
+  typedef typename std::map<typename local_cluster<T>::id_type, connections_type>::const_iterator connections_iterator;
 
   /**
    *  @brief Constructor
@@ -488,6 +489,24 @@ public:
     return connected_clusters_iterator<T> (*this);
   }
 
+  /**
+   *  @brief Begin iterator for the connections
+   *
+   *  The iterated object is a pair or (cluster id, connections_type).
+   */
+  connections_iterator begin_connections () const
+  {
+    return m_connections.begin ();
+  }
+
+  /**
+   *  @brief Begin iterator for the connections
+   */
+  connections_iterator end_connections () const
+  {
+    return m_connections.end ();
+  }
+
 private:
   template<typename> friend class connected_clusters_iterator;
 
@@ -519,6 +538,7 @@ template <typename> class cell_clusters_box_converter;
  */
 template <class T>
 class DB_PUBLIC hier_clusters
+  : public tl::Object
 {
 public:
   typedef typename local_cluster<T>::box_type box_type;
@@ -544,6 +564,18 @@ public:
   connected_clusters<T> &clusters_per_cell (db::cell_index_type cell_index);
 
   /**
+   *  @brief Writes the net shapes back to the original hierarchy
+   *
+   *  The layout object is supposed to be the original layout or one with identical cell indexes.
+   *  "lm" is a layer mapping table from the connection layer indexes to the target layer
+   *  indexes.
+   *
+   *  The backannotation process usually involves propagation of shapes up in the hierarchy
+   *  to resolve variants.
+   */
+  void return_to_hierarchy (db::Layout &layout, db::Cell &cell, const std::map<unsigned int, unsigned int> &lm) const;
+
+  /**
    *  @brief Clears this collection
    */
   void clear ();
@@ -555,6 +587,103 @@ private:
   void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn);
 
   std::map<db::cell_index_type, connected_clusters<T> > m_per_cell_clusters;
+};
+
+/**
+ *  @brief A connection to a cluster from a parent cluster
+ */
+class DB_PUBLIC IncomingClusterInstance
+{
+public:
+  IncomingClusterInstance (db::cell_index_type pc, size_t parent_cluster_id, const db::InstElement &inst)
+    : m_parent_cell (pc), m_parent_cluster_id (parent_cluster_id), m_inst (inst)
+  {
+    //  .. nothing yet ..
+  }
+
+  IncomingClusterInstance ()
+    : m_parent_cell (0), m_parent_cluster_id (0), m_inst ()
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Gets the cell index of the parent cell
+   */
+  size_t parent_cell () const
+  {
+    return m_parent_cell;
+  }
+
+  /**
+   *  @brief Gets the cluster ID from which the cluster is connected to
+   *  The parent cluster lives in the parent cell
+   */
+  size_t parent_cluster_id () const
+  {
+    return m_parent_cluster_id;
+  }
+
+  /**
+   *  @brief Gets the instance path
+   */
+  const db::InstElement &inst () const
+  {
+    return m_inst;
+  }
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const IncomingClusterInstance &other) const
+  {
+    return m_parent_cluster_id == other.m_parent_cluster_id && m_parent_cell == other.m_parent_cell && m_inst == other.m_inst;
+  }
+
+  /**
+   *  @brief Less operator
+   */
+  bool operator< (const IncomingClusterInstance &other) const
+  {
+    if (m_parent_cluster_id != other.m_parent_cluster_id) {
+      return m_parent_cluster_id < other.m_parent_cluster_id;
+    }
+    if (m_parent_cell != other.m_parent_cell) {
+      return m_parent_cell < other.m_parent_cell;
+    }
+    return m_inst < other.m_inst;
+  }
+
+private:
+  db::cell_index_type m_parent_cell;
+  size_t m_parent_cluster_id;
+  db::InstElement m_inst;
+};
+
+/**
+ *  @brief A class holding the parent relationships for clusters of cells
+ *
+ *  This class can be used to quickly identify the connections made to a specific cluster from a parent cluster.
+ */
+template <class T>
+class incoming_cluster_connections
+{
+public:
+  typedef std::list<IncomingClusterInstance> incoming_connections;
+
+  incoming_cluster_connections (const db::Layout &layout, const db::Cell &cell, const hier_clusters<T> &hc);
+
+  bool has_incoming (db::cell_index_type ci, size_t cluster_id) const;
+  const incoming_connections &incoming (db::cell_index_type ci, size_t cluster_id) const;
+
+private:
+  mutable std::set<db::cell_index_type> m_called_cells;
+  mutable std::map<db::cell_index_type, std::map<size_t, incoming_connections> > m_incoming;
+  tl::weak_ptr<db::Layout> mp_layout;
+  tl::weak_ptr<hier_clusters<T> > mp_hc;
+
+  void ensure_computed (db::cell_index_type ci) const;
+  void ensure_computed_parent (db::cell_index_type ci) const;
 };
 
 }

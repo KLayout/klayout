@@ -1241,7 +1241,148 @@ hier_clusters<T>::clusters_per_cell (db::cell_index_type cell_index)
   return c->second;
 }
 
+template <class T>
+static
+void put_or_propagate (const hier_clusters<T> &hc, incoming_cluster_connections<T> &inc, size_t cluster_id, const local_cluster<T> &cluster, db::Layout &layout, db::cell_index_type ci, const std::map<unsigned int, unsigned int> &lm, const db::ICplxTrans &trans)
+{
+  db::Cell &target_cell = layout.cell (ci);
+
+  if (cluster_id > 0 && inc.has_incoming (ci, cluster_id)) {
+
+    typedef std::pair<db::cell_index_type, db::InstElement> reference_type;
+    std::map<reference_type, bool> references;
+
+    for (db::Cell::parent_inst_iterator pi = target_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
+      db::Instance i = pi->child_inst ();
+      for (db::CellInstArray::iterator ii = i.cell_inst ().begin (); ! ii.at_end (); ++ii) {
+        references.insert (std::make_pair (reference_type ((*pi).parent_cell_index (), db::InstElement (i, ii)), false));
+      }
+    }
+
+    const typename incoming_cluster_connections<T>::incoming_connections &connections = inc.incoming (ci, cluster_id);
+    for (typename incoming_cluster_connections<T>::incoming_connections::const_iterator x = connections.begin (); x != connections.end (); ++x) {
+      typename std::map<reference_type, bool>::iterator r = references.find (reference_type (x->parent_cell (), x->inst ()));
+      if (r != references.end () && ! r->second) {
+        put_or_propagate (hc, inc, x->parent_cluster_id (), cluster, layout, r->first.first, lm, r->first.second.complex_trans () * trans);
+        r->second = true;
+      }
+    }
+
+    for (typename std::map<reference_type, bool>::const_iterator r = references.begin (); r != references.end (); ++r) {
+      if (! r->second) {
+        put_or_propagate (hc, inc, 0, cluster, layout, r->first.first, lm, r->first.second.complex_trans () * trans);
+      }
+    }
+
+  } else {
+
+    for (typename std::map<unsigned int, unsigned int>::const_iterator m = lm.begin (); m != lm.end (); ++m) {
+      db::Shapes shapes;
+      for (typename local_cluster<T>::shape_iterator s = cluster.begin (m->first); ! s.at_end (); ++s) {
+        shapes.insert (*s);
+      }
+      tl::ident_map<db::properties_id_type> pm;
+      target_cell.shapes (m->second).insert_transformed (shapes, trans, pm);
+    }
+
+  }
+}
+
+template <class T>
+void
+hier_clusters<T>::return_to_hierarchy (db::Layout &layout, db::Cell &cell, const std::map<unsigned int, unsigned int> &lm) const
+{
+  incoming_cluster_connections<T> inc (layout, cell, *this);
+
+  for (db::Layout::bottom_up_iterator c = layout.begin_bottom_up (); c != layout.end_bottom_up (); ++c) {
+    const db::connected_clusters<T> &cc = clusters_per_cell (*c);
+    for (typename db::connected_clusters<T>::const_iterator lc = cc.begin (); lc != cc.end (); ++lc) {
+      put_or_propagate (*this, inc, lc->id (), *lc, layout, *c, lm, db::ICplxTrans ());
+    }
+  }
+}
+
 //  explicit instantiations
 template class DB_PUBLIC hier_clusters<db::PolygonRef>;
+
+// ------------------------------------------------------------------------------
+//  incoming_cluster_connections implementation
+
+template <class T>
+incoming_cluster_connections<T>::incoming_cluster_connections (const db::Layout &layout, const db::Cell &cell, const hier_clusters<T> &hc)
+  : mp_layout (const_cast<db::Layout *> (&layout)), mp_hc (const_cast<hier_clusters<T> *> (&hc))
+{
+  cell.collect_called_cells (m_called_cells);
+  m_called_cells.insert (cell.cell_index ());
+}
+
+template <class T>
+bool
+incoming_cluster_connections<T>::has_incoming (db::cell_index_type ci, size_t cluster_id) const
+{
+  std::map<db::cell_index_type, std::map<size_t, incoming_connections> >::const_iterator i = m_incoming.find (ci);
+  if (i == m_incoming.end ()) {
+    ensure_computed (ci);
+    i = m_incoming.find (ci);
+    tl_assert (i != m_incoming.end ());
+  }
+
+  tl_assert (i != m_incoming.end ());
+  return (i->second.find (cluster_id) != i->second.end ());
+}
+
+template <class T>
+const typename incoming_cluster_connections<T>::incoming_connections &
+incoming_cluster_connections<T>::incoming (db::cell_index_type ci, size_t cluster_id) const
+{
+  std::map<db::cell_index_type, std::map<size_t, incoming_connections> >::const_iterator i = m_incoming.find (ci);
+  if (i == m_incoming.end ()) {
+    ensure_computed (ci);
+    i = m_incoming.find (ci);
+    tl_assert (i != m_incoming.end ());
+  }
+
+  std::map<size_t, incoming_connections>::const_iterator ii = i->second.find (cluster_id);
+  if (ii != i->second.end ()) {
+    return ii->second;
+  } else {
+    static incoming_connections empty;
+    return empty;
+  }
+}
+
+template <class T>
+void
+incoming_cluster_connections<T>::ensure_computed (db::cell_index_type ci) const
+{
+  tl_assert (mp_layout.get () != 0);
+  m_incoming.insert (std::make_pair (ci, std::map<size_t, incoming_connections> ()));
+
+  const db::Cell &cell = mp_layout->cell (ci);
+  for (db::Cell::parent_cell_iterator pc = cell.begin_parent_cells (); pc != cell.end_parent_cells (); ++pc) {
+    if (m_called_cells.find (*pc) != m_called_cells.end ()) {
+      ensure_computed_parent (*pc);
+    }
+  }
+
+  m_called_cells.erase (ci);
+}
+
+template <class T>
+void
+incoming_cluster_connections<T>::ensure_computed_parent (db::cell_index_type ci) const
+{
+  ensure_computed (ci);
+
+  const connected_clusters<T> &cc = ((const hier_clusters<T> *) mp_hc.get ())->clusters_per_cell (ci);
+  for (typename connected_clusters<T>::connections_iterator x = cc.begin_connections (); x != cc.end_connections (); ++x) {
+    for (typename connected_clusters<T>::connections_type::const_iterator xx = x->second.begin (); xx != x->second.end (); ++xx) {
+      m_incoming [xx->inst ().inst_ptr.cell_index ()][xx->id ()].push_back (IncomingClusterInstance (ci, x->first, xx->inst ()));
+    }
+  }
+}
+
+//  explicit instantiations
+template class DB_PUBLIC incoming_cluster_connections<db::PolygonRef>;
 
 }

@@ -229,6 +229,7 @@ template <class T>
 class DB_PUBLIC local_clusters
 {
 public:
+  typedef typename local_cluster<T>::id_type id_type;
   typedef typename local_cluster<T>::box_type box_type;
   typedef db::box_tree<box_type, local_cluster<T>, local_cluster_box_convert<T> > tree_type;
   typedef typename tree_type::touching_iterator touching_iterator;
@@ -373,6 +374,14 @@ public:
   }
 
   /**
+   *  @brief Inequality
+   */
+  bool operator!= (const ClusterInstance &other) const
+  {
+    return ! operator== (other);
+  }
+
+  /**
    *  @brief Less operator
    */
   bool operator< (const ClusterInstance &other) const
@@ -434,12 +443,20 @@ private:
 
 /**
  *  @brief Local clusters with connections to clusters from child cells
+ *
+ *  Clusters can get connected. There are incoming connections (from above the hierarchy)
+ *  and outgoing connections (down to a child cell).
+ *
+ *  "root" clusters are some that don't have incoming connections. There are only
+ *  root clusters or clusters which are connected from every parent cell. There are no
+ *  "half connected" clusters.
  */
 template <class T>
 class DB_PUBLIC connected_clusters
   : public local_clusters<T>
 {
 public:
+  typedef typename local_clusters<T>::id_type id_type;
   typedef std::list<ClusterInstance> connections_type;
   typedef typename local_clusters<T>::box_type box_type;
   typedef connected_clusters_iterator<T> all_iterator;
@@ -507,11 +524,29 @@ public:
     return m_connections.end ();
   }
 
+  /**
+   *  @brief Returns true, if the given cluster ID is a root cluster
+   */
+  bool is_root (id_type id) const
+  {
+    return m_connected_clusters.find (id) == m_connected_clusters.end ();
+  }
+
+  /**
+   *  @brief Resets the root status of a cluster
+   *  CAUTION: don't call this method unless you know what you're doing.
+   */
+  void reset_root (id_type id)
+  {
+    m_connected_clusters.insert (id);
+  }
+
 private:
   template<typename> friend class connected_clusters_iterator;
 
-  std::map<typename local_cluster<T>::id_type, connections_type> m_connections;
+  std::map<id_type, connections_type> m_connections;
   std::map<ClusterInstance, typename local_cluster<T>::id_type> m_rev_connections;
+  std::set<id_type> m_connected_clusters;
 };
 
 template <class T>
@@ -573,7 +608,7 @@ public:
    *  The backannotation process usually involves propagation of shapes up in the hierarchy
    *  to resolve variants.
    */
-  void return_to_hierarchy (db::Layout &layout, db::Cell &cell, const std::map<unsigned int, unsigned int> &lm) const;
+  void return_to_hierarchy (db::Layout &layout, const std::map<unsigned int, unsigned int> &lm) const;
 
   /**
    *  @brief Clears this collection
@@ -587,6 +622,100 @@ private:
   void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, db::ShapeIterator::flags_type shape_flags, const db::Connectivity &conn);
 
   std::map<db::cell_index_type, connected_clusters<T> > m_per_cell_clusters;
+};
+
+/**
+ *  @brief A recursive shape iterator for the shapes of a cluster
+ *
+ *  This iterator will deliver the shapes of a cluster including the shapes for the
+ *  connected child clusters.
+ *
+ *  This iterator applies to one layer.
+ */
+template <class T>
+class DB_PUBLIC recursive_cluster_shape_iterator
+{
+public:
+  typedef T value_type;
+  typedef const T &reference;
+  typedef const T *pointer;
+
+  /**
+   *  @brief Constructor
+   */
+  recursive_cluster_shape_iterator (const hier_clusters<T> &hc, unsigned int layer, db::cell_index_type ci, typename local_cluster<T>::id_type id);
+
+  /**
+   *  @brief Returns a value indicating whether there are any more shapes
+   */
+  bool at_end () const
+  {
+    return m_shape_iter.at_end ();
+  }
+
+  /**
+   *  @brief Returns the shape (untransformed)
+   */
+  reference operator* () const
+  {
+    return *m_shape_iter;
+  }
+
+  /**
+   *  @brief Returns the shape pointer (untransformed)
+   */
+  pointer operator-> () const
+  {
+    return m_shape_iter.operator-> ();
+  }
+
+  /**
+   *  @brief Returns the transformation applicable for transforming the shape to the root cluster
+   */
+  const db::ICplxTrans &trans () const
+  {
+    return m_trans_stack.back ();
+  }
+
+  /**
+   *  @brief Returns the cell index the shape lives in
+   */
+  db::cell_index_type cell_index () const
+  {
+    return m_cell_index_stack.back ();
+  }
+
+  /**
+   *  @brief Returns the id of the current cluster
+   */
+  typename db::local_cluster<T>::id_type cluster_id () const
+  {
+    if (m_conn_iter_stack.size () <= 1) {
+      return m_id;
+    } else {
+      return m_conn_iter_stack [m_conn_iter_stack.size () - 2].first->id ();
+    }
+  }
+
+  /**
+   *  @brief Increment operator
+   */
+  recursive_cluster_shape_iterator &operator++ ();
+
+private:
+  typedef typename db::connected_clusters<T>::connections_type connections_type;
+
+  const hier_clusters<T> *mp_hc;
+  std::vector<db::ICplxTrans> m_trans_stack;
+  std::vector<db::cell_index_type> m_cell_index_stack;
+  std::vector<std::pair<typename connections_type::const_iterator, typename connections_type::const_iterator> > m_conn_iter_stack;
+  typename db::local_cluster<T>::shape_iterator m_shape_iter;
+  unsigned int m_layer;
+  typename db::local_cluster<T>::id_type m_id;
+
+  void next_conn ();
+  void up ();
+  void down (db::cell_index_type ci, typename db::local_cluster<T>::id_type id, const db::ICplxTrans &t);
 };
 
 /**

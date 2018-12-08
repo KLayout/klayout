@@ -682,8 +682,8 @@ public:
   /**
    *  @brief Constructor
    */
-  hc_receiver (const db::Layout &layout, db::connected_clusters<T> &cell_clusters, hier_clusters<T> &tree, const cell_clusters_box_converter<T> &cbc, const db::Connectivity &conn)
-    : mp_layout (&layout), mp_tree (&tree), mp_cbc (&cbc), mp_conn (&conn)
+  hc_receiver (const db::Layout &layout, const db::Cell &cell, db::connected_clusters<T> &cell_clusters, hier_clusters<T> &tree, const cell_clusters_box_converter<T> &cbc, const db::Connectivity &conn)
+    : mp_layout (&layout), mp_cell (&cell), mp_tree (&tree), mp_cbc (&cbc), mp_conn (&conn)
   {
     mp_cell_clusters = &cell_clusters;
   }
@@ -739,6 +739,7 @@ public:
 
 private:
   const db::Layout *mp_layout;
+  const db::Cell *mp_cell;
   db::connected_clusters<T> *mp_cell_clusters;
   hier_clusters<T> *mp_tree;
   const cell_clusters_box_converter<T> *mp_cbc;
@@ -930,7 +931,7 @@ private:
   /**
    *  @brief Handles a local clusters vs. the clusters of a specific child instance
    *  @param c1 The local cluster
-   *  @param ci2 The cell index of the child cell
+   *  @param ci2 The cell index of the cell investigated
    *  @param p2 The instantiation path to the child cell (last element is the instance to ci2)
    *  @param t2 The accumulated transformation of the path
    */
@@ -1022,10 +1023,40 @@ private:
 
       ClusterInstance ci (id, *p);
       if (p == path.begin ()) {
+
+        //  if we're attaching to a child which is root yet, we need to promote the
+        //  cluster to the parent in all places
+        connected_clusters<T> &child_cc = mp_tree->clusters_per_cell (p->inst_ptr.cell_index ());
+        if (child_cc.is_root (id)) {
+
+          const db::Cell &child_cell = mp_layout->cell (p->inst_ptr.cell_index ());
+          for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
+
+            connected_clusters<T> &parent_cc = mp_tree->clusters_per_cell (pi->parent_cell_index ());
+            for (db::CellInstArray::iterator pii = pi->child_inst ().begin (); ! pii.at_end (); ++pii) {
+
+              ClusterInstance ci2 (id, db::InstElement (pi->child_inst (), pii));
+              if (mp_cell->cell_index () != pi->parent_cell_index () || ci != ci2) {
+
+                id_type id_dummy = parent_cc.insert_dummy ();
+                parent_cc.add_connection (id_dummy, ci2);
+
+              }
+
+            }
+
+          }
+
+          child_cc.reset_root (id);
+
+        }
+
         return ci;
+
       }
 
-      connected_clusters<T> &target_cc = mp_tree->clusters_per_cell (p [-1].inst_ptr.cell_index ());
+      db::cell_index_type pci = p [-1].inst_ptr.cell_index ();
+      connected_clusters<T> &target_cc = mp_tree->clusters_per_cell (pci);
       id_type parent_cluster = target_cc.find_cluster_with_connection (ci);
 
       if (parent_cluster > 0) {
@@ -1035,13 +1066,43 @@ private:
 
       } else {
 
+        id_type id_new = 0;
+
+        //  if we're attaching to a child which is root yet, we need to promote the
+        //  cluster to the parent in all places
+        connected_clusters<T> &child_cc = mp_tree->clusters_per_cell (p->inst_ptr.cell_index ());
+        if (child_cc.is_root (id)) {
+
+          const db::Cell &child_cell = mp_layout->cell (p->inst_ptr.cell_index ());
+          for (db::Cell::parent_inst_iterator pi = child_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
+
+            connected_clusters<T> &parent_cc = mp_tree->clusters_per_cell (pi->parent_cell_index ());
+            for (db::CellInstArray::iterator pii = pi->child_inst ().begin (); ! pii.at_end (); ++pii) {
+
+              id_type id_dummy = parent_cc.insert_dummy ();
+              ClusterInstance ci2 (id, db::InstElement (pi->child_inst (), pii));
+              parent_cc.add_connection (id_dummy, ci2);
+
+              if (pci == pi->parent_cell_index () && ci == ci2) {
+                id_new = id_dummy;
+              }
+
+            }
+
+          }
+
+          child_cc.reset_root (id);
+
+        }
+
         //  no parent -> create vertical connector
-        id = target_cc.insert_dummy ();
-        target_cc.add_connection (id, ci);
+        id = id_new;
+        tl_assert (id != 0);
 
       }
 
     }
+
   }
 };
 
@@ -1165,7 +1226,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
   //  NOTE: this is a receiver for both the child-to-child and
   //  local to child interactions.
-  hc_receiver<T> rec (layout, local, *this, cbc, conn);
+  hc_receiver<T> rec (layout, cell, local, *this, cbc, conn);
   cell_inst_clusters_box_converter<T> cibc (cbc);
 
   //  The box scanner needs pointers so we have to first store the instances
@@ -1241,69 +1302,130 @@ hier_clusters<T>::clusters_per_cell (db::cell_index_type cell_index)
   return c->second;
 }
 
-template <class T>
-static
-void put_or_propagate (const hier_clusters<T> &hc, incoming_cluster_connections<T> &inc, size_t cluster_id, const local_cluster<T> &cluster, db::Layout &layout, db::cell_index_type ci, const std::map<unsigned int, unsigned int> &lm, const db::ICplxTrans &trans)
+template <class Shape, class Trans> void insert_transformed (db::Layout &layout, db::Shapes &shapes, const Shape &s, const Trans &t);
+
+template <class Trans> void insert_transformed (db::Layout &layout, db::Shapes &shapes, const db::PolygonRef &s, const Trans &t)
 {
-  db::Cell &target_cell = layout.cell (ci);
-
-  if (cluster_id > 0 && inc.has_incoming (ci, cluster_id)) {
-
-    typedef std::pair<db::cell_index_type, db::InstElement> reference_type;
-    std::map<reference_type, bool> references;
-
-    for (db::Cell::parent_inst_iterator pi = target_cell.begin_parent_insts (); ! pi.at_end (); ++pi) {
-      db::Instance i = pi->child_inst ();
-      for (db::CellInstArray::iterator ii = i.cell_inst ().begin (); ! ii.at_end (); ++ii) {
-        references.insert (std::make_pair (reference_type ((*pi).parent_cell_index (), db::InstElement (i, ii)), false));
-      }
-    }
-
-    const typename incoming_cluster_connections<T>::incoming_connections &connections = inc.incoming (ci, cluster_id);
-    for (typename incoming_cluster_connections<T>::incoming_connections::const_iterator x = connections.begin (); x != connections.end (); ++x) {
-      typename std::map<reference_type, bool>::iterator r = references.find (reference_type (x->parent_cell (), x->inst ()));
-      if (r != references.end () && ! r->second) {
-        put_or_propagate (hc, inc, x->parent_cluster_id (), cluster, layout, r->first.first, lm, r->first.second.complex_trans () * trans);
-        r->second = true;
-      }
-    }
-
-    for (typename std::map<reference_type, bool>::const_iterator r = references.begin (); r != references.end (); ++r) {
-      if (! r->second) {
-        put_or_propagate (hc, inc, 0, cluster, layout, r->first.first, lm, r->first.second.complex_trans () * trans);
-      }
-    }
-
-  } else {
-
-    for (typename std::map<unsigned int, unsigned int>::const_iterator m = lm.begin (); m != lm.end (); ++m) {
-      db::Shapes shapes;
-      for (typename local_cluster<T>::shape_iterator s = cluster.begin (m->first); ! s.at_end (); ++s) {
-        shapes.insert (*s);
-      }
-      tl::ident_map<db::properties_id_type> pm;
-      target_cell.shapes (m->second).insert_transformed (shapes, trans, pm);
-    }
-
+  db::Polygon poly = s.obj ();
+  poly.transform (s.trans ());
+  if (! t.is_unity ()) {
+    poly.transform (t);
   }
+  shapes.insert (db::PolygonRef (poly, layout.shape_repository ()));
 }
 
 template <class T>
 void
-hier_clusters<T>::return_to_hierarchy (db::Layout &layout, db::Cell &cell, const std::map<unsigned int, unsigned int> &lm) const
+hier_clusters<T>::return_to_hierarchy (db::Layout &layout, const std::map<unsigned int, unsigned int> &lm) const
 {
-  incoming_cluster_connections<T> inc (layout, cell, *this);
-
   for (db::Layout::bottom_up_iterator c = layout.begin_bottom_up (); c != layout.end_bottom_up (); ++c) {
+
     const db::connected_clusters<T> &cc = clusters_per_cell (*c);
-    for (typename db::connected_clusters<T>::const_iterator lc = cc.begin (); lc != cc.end (); ++lc) {
-      put_or_propagate (*this, inc, lc->id (), *lc, layout, *c, lm, db::ICplxTrans ());
+    db::Cell &target_cell = layout.cell (*c);
+
+    for (typename db::connected_clusters<T>::all_iterator lc = cc.begin_all (); ! lc.at_end (); ++lc) {
+
+      if (cc.is_root (*lc)) {
+
+        for (typename std::map<unsigned int, unsigned int>::const_iterator m = lm.begin (); m != lm.end (); ++m) {
+
+          db::Shapes &shapes = target_cell.shapes (m->second);
+
+          for (recursive_cluster_shape_iterator<T> si (*this, m->first, *c, *lc); ! si.at_end (); ++si) {
+            insert_transformed (layout, shapes, *si, si.trans ());
+          }
+
+        }
+
+      }
+
     }
+
   }
 }
 
 //  explicit instantiations
 template class DB_PUBLIC hier_clusters<db::PolygonRef>;
+
+// ------------------------------------------------------------------------------
+//  recursive_cluster_shape_iterator implementation
+
+template <class T>
+recursive_cluster_shape_iterator<T>::recursive_cluster_shape_iterator (const hier_clusters<T> &hc, unsigned int layer, db::cell_index_type ci, typename local_cluster<T>::id_type id)
+  : mp_hc (&hc), m_layer (layer), m_id (id)
+{
+  down (ci, id, db::ICplxTrans ());
+
+  while (m_shape_iter.at_end () && ! m_conn_iter_stack.empty ()) {
+    next_conn ();
+  }
+}
+
+template <class T>
+recursive_cluster_shape_iterator<T> &recursive_cluster_shape_iterator<T>::operator++ ()
+{
+  ++m_shape_iter;
+
+  while (m_shape_iter.at_end () && ! m_conn_iter_stack.empty ()) {
+    next_conn ();
+  }
+
+  return *this;
+}
+
+template <class T>
+void recursive_cluster_shape_iterator<T>::next_conn ()
+{
+  if (m_conn_iter_stack.back ().first != m_conn_iter_stack.back ().second) {
+
+    const ClusterInstance &cli = *m_conn_iter_stack.back ().first;
+    down (cli.inst ().inst_ptr.cell_index (), cli.id (), cli.inst ().complex_trans ());
+
+  } else {
+
+    while (m_conn_iter_stack.back ().first == m_conn_iter_stack.back ().second) {
+
+      up ();
+      if (m_conn_iter_stack.empty ()) {
+        return;
+      }
+
+      ++m_conn_iter_stack.back ().first;
+
+    }
+
+  }
+}
+
+template <class T>
+void recursive_cluster_shape_iterator<T>::up ()
+{
+  m_conn_iter_stack.pop_back ();
+  m_trans_stack.pop_back ();
+  m_cell_index_stack.pop_back ();
+}
+
+template <class T>
+void recursive_cluster_shape_iterator<T>::down (db::cell_index_type ci, typename db::local_cluster<T>::id_type id, const db::ICplxTrans &t)
+{
+  const connected_clusters<T> &clusters = mp_hc->clusters_per_cell (ci);
+  const typename connected_clusters<T>::connections_type &conn = clusters.connections_for_cluster (id);
+
+  if (! m_trans_stack.empty ()) {
+    m_trans_stack.push_back (m_trans_stack.back () * t);
+  } else {
+    m_trans_stack.push_back (t);
+  }
+
+  m_cell_index_stack.push_back (ci);
+  m_conn_iter_stack.push_back (std::make_pair (conn.begin (), conn.end ()));
+
+  const local_cluster<T> &cluster = mp_hc->clusters_per_cell (cell_index ()).cluster_by_id (cluster_id ());
+  m_shape_iter = cluster.begin (m_layer);
+}
+
+//  explicit instantiations
+template class DB_PUBLIC recursive_cluster_shape_iterator<db::PolygonRef>;
 
 // ------------------------------------------------------------------------------
 //  incoming_cluster_connections implementation

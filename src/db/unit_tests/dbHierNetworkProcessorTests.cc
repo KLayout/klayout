@@ -515,6 +515,10 @@ static void run_hc_test (tl::TestBase *_this, const std::string &file, const std
     const db::connected_clusters<db::PolygonRef> &clusters = hc.clusters_per_cell (*td);
     for (db::connected_clusters<db::PolygonRef>::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
 
+      if (! clusters.is_root (*c)) {
+        continue;
+      }
+
       net_layers.push_back (std::make_pair (0, ly.insert_layer ()));
 
       unsigned int lout = net_layers.back ().second;
@@ -601,7 +605,7 @@ static void run_hc_test_with_backannotation (tl::TestBase *_this, const std::str
   lm[l1] = ly.insert_layer (db::LayerProperties (101, 0));
   lm[l2] = ly.insert_layer (db::LayerProperties (102, 0));
   lm[l3] = ly.insert_layer (db::LayerProperties (103, 0));
-  hc.return_to_hierarchy (ly, ly.cell (*ly.begin_top_down ()), lm);
+  hc.return_to_hierarchy (ly, lm);
 
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testsrc () + "/testdata/algo/" + au_file);
